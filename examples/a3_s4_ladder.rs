@@ -26,8 +26,8 @@
 //! so FFD is inapplicable — recorded per the decomposition schema).
 
 use crypto_lib::cryptanalysis::ec_index_calculus::{
-    ec_index_calculus_dlp_s4_s3_staged_with_la, ec_index_calculus_dlp_s4_staged_with_la,
-    pollard_rho_ecdlp, LaEngine,
+    ec_index_calculus_dlp_s4_mitm_staged, ec_index_calculus_dlp_s4_s3_staged_with_la,
+    ec_index_calculus_dlp_s4_staged_with_la, pollard_rho_ecdlp, LaEngine,
 };
 use crypto_lib::cryptanalysis::research_bench::bench_curves_a_minus_3;
 use crypto_lib::cryptanalysis::residual_walk::is_prime_u64;
@@ -47,8 +47,8 @@ fn main() {
         .unwrap_or(20261006);
     let class_filter: Option<String> = arguments.get(3).cloned();
     let oracle: String = arguments.get(4).cloned().unwrap_or_else(|| "s3".into());
-    if oracle != "s3" && oracle != "quartic" {
-        eprintln!("oracle must be `s3` or `quartic`, got {oracle:?}");
+    if oracle != "s3" && oracle != "quartic" && oracle != "mitm" {
+        eprintln!("oracle must be `s3`, `quartic` or `mitm`, got {oracle:?}");
         std::process::exit(2);
     }
     let fb_size: usize = arguments.get(5).and_then(|a| a.parse().ok()).unwrap_or(120);
@@ -115,7 +115,17 @@ fn main() {
     );
 
     let t0 = Instant::now();
-    let staged = if oracle == "quartic" {
+    let staged = if oracle == "mitm" {
+        ec_index_calculus_dlp_s4_mitm_staged(
+            &curve,
+            &g,
+            &q,
+            fb_size,
+            extra,
+            max_trials,
+            max_relation_attempts,
+        )
+    } else if oracle == "quartic" {
         ec_index_calculus_dlp_s4_staged_with_la(
             &curve,
             &g,
@@ -177,10 +187,10 @@ fn main() {
             "decomposition": {
                 "m_summands": 3,
                 "system_degree": 4,
-                "oracle_class": if oracle == "quartic" {
-                    "quartic_root_find_cantor_zassenhaus"
-                } else {
-                    "s3_anchor_pair_sweep"
+                "oracle_class": match oracle.as_str() {
+                    "quartic" => "quartic_root_find_cantor_zassenhaus",
+                    "mitm" => "pair_sum_mitm",
+                    _ => "s3_anchor_pair_sweep",
                 },
                 "ffd": {"status": "inapplicable", "reason": "direct univariate quartic root finding; no Boolean/Gröbner system solved"},
                 "unknowns": fb_size,

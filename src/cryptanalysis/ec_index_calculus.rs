@@ -1254,6 +1254,114 @@ pub fn find_one_relation_s4_via_s3_counted(
     None
 }
 
+/// **Pair-sum table** for the meet-in-the-middle 3-decomposition oracle.
+///
+/// Built once per factor base: every unordered pair `{F_i, F_j}`, `i ≤ j`,
+/// contributes its sum keyed by the `x`-coordinate of the sum.  The `y`
+/// sign is not stored: the probe tests both `R − F_k` and `R + F_k` and
+/// [`try_finalise_s4`] resolves the eight sign patterns in the group, so
+/// an `x` collision (two pair sums `±S`) only costs one failed verify.
+pub struct PairSumTable {
+    by_x: std::collections::HashMap<BigUint, Vec<(u32, u32)>>,
+    /// Number of non-identity pair sums stored.
+    pub pairs: usize,
+    /// Number of group additions spent building the table.
+    pub build_additions: usize,
+}
+
+/// Build the pair-sum table for `factor_base` (`B(B+1)/2` additions).
+pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> PairSumTable {
+    let a_fe = curve.a_fe();
+    let n = factor_base.len();
+    let mut by_x: std::collections::HashMap<BigUint, Vec<(u32, u32)>> =
+        std::collections::HashMap::with_capacity(n * (n + 1) / 2);
+    let mut pairs = 0usize;
+    for i in 0..n {
+        for j in i..n {
+            if let Point::Affine { x, .. } = factor_base[i].point.add(&factor_base[j].point, &a_fe)
+            {
+                by_x.entry(x.value.clone())
+                    .or_default()
+                    .push((i as u32, j as u32));
+                pairs += 1;
+            }
+        }
+    }
+    PairSumTable {
+        by_x,
+        pairs,
+        build_additions: pairs,
+    }
+}
+
+/// **Meet-in-the-middle 3-decomposition**: the third factor-base point is
+/// enumerated (both signs), and the remaining two-point sum is answered by
+/// one hash probe into [`PairSumTable`] instead of the `B²` pair sweep of
+/// [`find_one_relation_s4_via_s3_counted`].
+///
+/// Cost per random `(a, b)` draw is `2B` probes, so a relation costs
+/// `≈ p/B²` probes after the `B²` table is built; `B` relations then cost
+/// `≈ B² + p/B` — balanced at `B ≈ p^{1/4}` for `≈ p^{3/4}` total, against
+/// the `≈ p` of every enumeration sweep.  The decided relation family is
+/// identical (three signed factor-base points summing to `R`), so the
+/// yield per draw is unchanged and correctness is checked by the same
+/// in-group finaliser.
+pub fn find_one_relation_s4_via_mitm_counted(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    factor_base: &[FactorBaseEntry],
+    table: &PairSumTable,
+    max_trials: usize,
+) -> Option<(Relation, usize)> {
+    use crate::utils::random::random_scalar;
+
+    let a_fe = curve.a_fe();
+    let negatives: Vec<Point> = factor_base.iter().map(|fb| fb.point.neg()).collect();
+
+    for trial in 1..=max_trials {
+        let a = random_scalar(&curve.n);
+        let b = random_scalar(&curve.n);
+        let r = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
+        if matches!(r, Point::Infinity) {
+            continue;
+        }
+        for k in 0..factor_base.len() {
+            // R ∓ F_k: both anchor signs, so the table only needs one
+            // orientation of each pair sum.
+            for s in [
+                r.add(&negatives[k], &a_fe),
+                r.add(&factor_base[k].point, &a_fe),
+            ] {
+                let Point::Affine { x, .. } = s else {
+                    continue;
+                };
+                let Some(pairs) = table.by_x.get(&x.value) else {
+                    continue;
+                };
+                for &(i, j) in pairs {
+                    let (i, j) = (i as usize, j as usize);
+                    if let Some(rel) = try_finalise_s4(
+                        &r,
+                        i,
+                        &factor_base[i].point,
+                        j,
+                        &factor_base[j].point,
+                        k,
+                        &factor_base[k].point,
+                        curve,
+                        &a,
+                        &b,
+                    ) {
+                        return Some((rel, trial));
+                    }
+                }
+            }
+        }
+    }
+    None
+}
+
 /// Sign resolution for the 3-point decomposition: try all eight sign
 /// combinations `(ε_i, ε_j, ε_k) ∈ {±1}³` and accept the one with
 /// `ε_i F_i + ε_j F_j + ε_k F_k = R`.
@@ -1972,6 +2080,8 @@ fn solve_relation_matrix(
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct EcIcStageReport {
     pub factor_base_ms: f64,
+    /// Pair-sum table build (meet-in-the-middle oracle); `0.0` otherwise.
+    pub pair_table_ms: f64,
     pub relations_ms: f64,
     pub linear_algebra_ms: f64,
     pub verify_ms: f64,
@@ -2090,6 +2200,7 @@ pub fn ec_index_calculus_dlp_staged(
     };
     let report = EcIcStageReport {
         factor_base_ms,
+        pair_table_ms: 0.0,
         relations_ms,
         linear_algebra_ms,
         verify_ms,
@@ -2126,7 +2237,7 @@ pub fn ec_index_calculus_dlp_s4_staged(
         extra_relations,
         max_trials_per_relation,
         max_relation_attempts,
-        find_one_relation_s4_counted,
+        |_fb| find_one_relation_s4_counted,
         LaEngine::Dense,
     )
 }
@@ -2157,7 +2268,7 @@ pub fn ec_index_calculus_dlp_s4_staged_with_la(
         extra_relations,
         max_trials_per_relation,
         max_relation_attempts,
-        find_one_relation_s4_counted,
+        |_fb| find_one_relation_s4_counted,
         la_engine,
     )
 }
@@ -2187,7 +2298,7 @@ pub fn ec_index_calculus_dlp_s4_s3_staged(
         extra_relations,
         max_trials_per_relation,
         max_relation_attempts,
-        find_one_relation_s4_via_s3_counted,
+        |_fb| find_one_relation_s4_via_s3_counted,
         LaEngine::Dense,
     )
 }
@@ -2212,16 +2323,19 @@ pub fn ec_index_calculus_dlp_s4_s3_staged_with_la(
         extra_relations,
         max_trials_per_relation,
         max_relation_attempts,
-        find_one_relation_s4_via_s3_counted,
+        |_fb| find_one_relation_s4_via_s3_counted,
         la_engine,
     )
 }
 
-/// Shared body of the staged S₄ drivers.  `finder` supplies one relation
-/// (and its trial count) per call; everything else — factor base,
-/// relation target, linear algebra, `[x]G = Q` — is identical.
-#[allow(clippy::too_many_arguments)]
-fn ec_index_calculus_dlp_s4_staged_with(
+/// Staged S₄ 3-decomposition driver on the **pair-sum meet-in-the-middle**
+/// oracle ([`find_one_relation_s4_via_mitm_counted`]).
+///
+/// Same relation family, report shape and `[x]G = Q` check as the other
+/// staged S₄ drivers.  The pair-sum table is built once, inside the
+/// measured preprocessing stage (`pair_table_ms`), so the relation stage
+/// pays `2B` hash probes per draw instead of the `B²` pair sweep.
+pub fn ec_index_calculus_dlp_s4_mitm_staged(
     curve: &CurveParams,
     g: &Point,
     q: &Point,
@@ -2229,15 +2343,88 @@ fn ec_index_calculus_dlp_s4_staged_with(
     extra_relations: usize,
     max_trials_per_relation: usize,
     max_relation_attempts: usize,
-    finder: fn(
-        &CurveParams,
-        &Point,
-        &Point,
-        &[FactorBaseEntry],
-        usize,
-    ) -> Option<(Relation, usize)>,
+) -> Option<(BigUint, EcIcStageReport)> {
+    ec_index_calculus_dlp_s4_staged_with(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        |fb| {
+            let table = build_pair_sum_table(curve, fb);
+            move |curve: &CurveParams,
+                  g: &Point,
+                  q: &Point,
+                  fb: &[FactorBaseEntry],
+                  max_trials: usize| {
+                find_one_relation_s4_via_mitm_counted(curve, g, q, fb, &table, max_trials)
+            }
+        },
+        LaEngine::Dense,
+    )
+}
+
+/// Staged S₄ MITM driver with an explicit linear-algebra engine.
+///
+/// Same oracle and preprocessing accounting as
+/// [`ec_index_calculus_dlp_s4_mitm_staged`]; `la_engine` picks between dense
+/// Gauss–Jordan and the sparse Markowitz elimination on the same system.
+#[allow(clippy::too_many_arguments)]
+pub fn ec_index_calculus_dlp_s4_mitm_staged_with_la(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
     la_engine: LaEngine,
 ) -> Option<(BigUint, EcIcStageReport)> {
+    ec_index_calculus_dlp_s4_staged_with(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        |fb| {
+            let table = build_pair_sum_table(curve, fb);
+            move |curve: &CurveParams,
+                  g: &Point,
+                  q: &Point,
+                  fb: &[FactorBaseEntry],
+                  max_trials: usize| {
+                find_one_relation_s4_via_mitm_counted(curve, g, q, fb, &table, max_trials)
+            }
+        },
+        la_engine,
+    )
+}
+
+/// Shared body of the staged S₄ drivers.  `prepare` builds the oracle from
+/// the finished factor base and returns its finder: the identity for the
+/// stateless oracles, the pair-sum table closed over for
+/// meet-in-the-middle.  Everything else — factor base, relation target,
+/// linear algebra, `[x]G = Q` — is identical.
+#[allow(clippy::too_many_arguments)]
+fn ec_index_calculus_dlp_s4_staged_with<P, F>(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+    prepare: P,
+    la_engine: LaEngine,
+) -> Option<(BigUint, EcIcStageReport)>
+where
+    P: FnOnce(&[FactorBaseEntry]) -> F,
+    F: FnMut(&CurveParams, &Point, &Point, &[FactorBaseEntry], usize) -> Option<(Relation, usize)>,
+{
     use std::time::Instant;
     let total_started = Instant::now();
 
@@ -2248,6 +2435,13 @@ fn ec_index_calculus_dlp_s4_staged_with(
         return None;
     }
     let target = fb.len() + extra_relations;
+
+    // Oracle preprocessing (pair-sum table for meet-in-the-middle; the
+    // identity closure for the stateless oracles) is charged separately
+    // from relation collection.
+    let prepare_started = Instant::now();
+    let mut finder = prepare(&fb);
+    let pair_table_ms = prepare_started.elapsed().as_secs_f64() * 1e3;
 
     let relations_started = Instant::now();
     let mut relations = Vec::with_capacity(target);
@@ -2303,6 +2497,7 @@ fn ec_index_calculus_dlp_s4_staged_with(
     };
     let report = EcIcStageReport {
         factor_base_ms,
+        pair_table_ms,
         relations_ms,
         linear_algebra_ms,
         verify_ms,
@@ -3427,5 +3622,33 @@ mod tests {
         assert_eq!(g.scalar_mul(&rho, &a_fe), q);
         // And they should in fact match each other mod n.
         assert_eq!(ic % &curve.n, rho % &curve.n);
+    }
+
+    /// The meet-in-the-middle oracle decides the same relation family as
+    /// the S₃-anchored sweep: on one 16-bit a = −3 fixture both staged
+    /// drivers recover the same scalar, every relation re-added in the
+    /// group by the shared finaliser.
+    #[test]
+    fn mitm_driver_agrees_with_s3_driver() {
+        use crate::cryptanalysis::research_bench::bench_curves_a_minus_3;
+        use crate::utils::random::random_scalar;
+
+        let (_, curve) = bench_curves_a_minus_3()
+            .into_iter()
+            .find(|(bits, _)| *bits == 16)
+            .expect("16-bit a=-3 fixture");
+        let g = curve.generator();
+        let a_fe = curve.a_fe();
+        let x_truth = random_scalar(&curve.n);
+        let q = g.scalar_mul(&x_truth, &a_fe);
+
+        let s3 = ec_index_calculus_dlp_s4_s3_staged(&curve, &g, &q, 120, 8, 200_000, 4)
+            .expect("S3-anchored driver should recover the 16-bit log");
+        let mitm = ec_index_calculus_dlp_s4_mitm_staged(&curve, &g, &q, 120, 8, 200_000, 4)
+            .expect("MITM driver should recover the 16-bit log");
+        assert_eq!(s3.0, mitm.0);
+        assert_eq!(g.scalar_mul(&mitm.0, &a_fe), q);
+        assert_eq!(mitm.1.relations_collected, 128);
+        assert!(mitm.1.pair_table_ms >= 0.0);
     }
 }
