@@ -19,6 +19,8 @@ _(none pinned — set one with `/goal <text>`)_
 - [ ] Repair the 28 examples/tests/bins on main broken by lossy merges (syntax, struct drift, lost library APIs) (claude, started 2026-11-17, branch claude/fastest-grobner-base-algorithm-u74ipw; in progress)
 - [x] Clean up main CI breakages and add an ecbench CI check (claude, started 2026-11-17, branch claude/fastest-grobner-base-algorithm-u74ipw, PR #4569 merged; ecbench-smoke check passing; remaining main blockers need the owner: AWS key, pcc claim_type, hec-multi record, rho currency)
 
+- [ ] Freeze H115 Frobenius--Kummer resolvent-moment ECDLP lead, derive its cohomological cost obligations, and preregister exact small-curve controls (Codex, started 2026-11-17, branch research/h115-frobenius-kummer-resolvent-freeze, PR #4625)
+
 - [ ] Novel radical (closed-form) univariate root finder for low-degree (d≤4) Semaev polynomials over F_p vs Cantor–Zassenhaus: prototype, validate, measure field-op counts (claude, started 2026-11-17, branch claude/radical-rootfind-20261117)
 
 - [ ] Add a Faugère–Lachartre reducer/free-column split to Boolean F4 for Semaev systems (Codex, started 2026-11-17, branch codex/semaev-f4-subset-reducers, PR #4562)
