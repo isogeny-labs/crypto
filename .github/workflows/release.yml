@@ -270,6 +270,8 @@ jobs:
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         shell: bash
         run: |
+          set -E
+          trap 'code=$?; set +e; printf "::error::archive staging failed (exit %s): %s\n" "$code" "$BASH_COMMAND" >&2; for diagnostic in construct-smoke.json verified-smoke.json arithmetic-smoke.json catalog-smoke.json transfer-catalog-replay.json fixed-f8-order-smoke.json binary-transfer-sweep-smoke.json binary-transfer-sweep-verify-smoke.json odd-transfer-sweep-smoke.json odd-transfer-sweep-verify-smoke.json transfer-smoke.json binary-generated-subgroup-smoke.json odd-transfer-smoke.json malformed-divisor-smoke.json; do if [ -f "$diagnostic" ]; then printf "::group::%s\n" "$diagnostic" >&2; tail -c 8192 "$diagnostic" >&2; printf "\n::endgroup::\n" >&2; fi; done; exit "$code"' ERR
           name="crypto-${{ needs.meta.outputs.tag }}-${{ matrix.target }}"
           mkdir -p "dist/$name"
           ext=""
