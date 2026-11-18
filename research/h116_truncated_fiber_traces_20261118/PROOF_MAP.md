@@ -152,13 +152,62 @@ generic square-root work remain separate endpoint obligations.  The generic
 prefix congruence lemmas are plausible `crypto-lean` candidates, but remain
 local to H116 until the study demonstrates a reusable theorem boundary.
 
+## Formal-scalar Frobenius-cutoff instance gate
+
+1. **Structure above.** The existing H116 `PowerSeriesPrefixEq`, itself
+   equality under Mathlib `PowerSeries.trunc`, represents equality through a
+   finite local-parameter precision. The only operations touched here are the
+   Mathlib monomial `PowerSeries.X ^ n`, truncation and coefficient extraction.
+2. **Theorems used as stated.** `PowerSeries.trunc_X_pow_self_mul` states that a
+   monomial of order `m` vanishes under `trunc m`;
+   `PowerSeries.coeff_X_pow` identifies its first nonzero coefficient. The
+   prime-gap step uses `Nat.Prime` plus finite arithmetic for the only integers
+   strictly between 19 and 23.
+3. **Object as an instance.** After the normalized local parameter loses the
+   leading factor `z`, the first Frobenius correction is represented by
+   `X^(p-1)`. Its invisibility is a `PowerSeriesPrefixEq 22` instance, not a new
+   formal-series type.
+4. **Assembly probe.** A temporary module importing `H116FiberTrace` first
+   wrapped `PowerSeries.trunc_X_pow_self_mul` at its exact precision
+   `trunc m (X^m)=0`, then used the pre-existing prefix monotonicity theorem to
+   instantiate it at `n=22`, `m=p-1` under `[Fact p.Prime]` and `19<p`. The
+   exact wrapper avoided the default-heartbeat timeout triggered by coercing a
+   truncated polynomial back to a series inside a more general wrapper. The
+   successful probe uses the default limits.
+5. **Missing components only.** The H116-specific component is the arithmetic
+   fact that a prime strictly above 19 is at least 23. The elliptic identities
+   `V+pi=[t]`, `pi(z)=z^p`, the formal-group subtraction law and the
+   x-coordinate pole-order transfer remain separate semantic obligations; this
+   cutoff lemma must not claim them.
+6. **Inheritance table.** Monomial formation and coefficients come from
+   Mathlib PowerSeries; prefix equality and monotonicity come from the existing
+   H116 wrapper; primality comes from `Fact p.Prime`; the `22 <= p-1` bound is
+   the only local instance proof. There is no limit override, copied formal
+   group law or curve-specific computation.
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| a monomial of order `m` is zero below degree `m` | generic wrapper | H116 over Mathlib `PowerSeries.trunc_X_pow_self_mul` | semiring power series | none; lower precision uses existing `PowerSeriesPrefixEq.mono` |
+| normalized Frobenius correction is invisible below degree 22 | instance obligation | H116 Lean module | `ZMod p` power series | `Fact p.Prime`, `19<p`, supplied identification of the correction with `X^(p-1)` |
+| the first eleven normalized x-map coefficients equal the scalar-formal jet | endpoint obligation, not established by the cutoff alone | future elliptic formal-group owner | ordinary elliptic curve and normalized `V-1` map | `V+pi=[t]`, local Frobenius, pole-order transfer, unit substitutions |
+
+[pcc:unverified]
+
+The implemented wrapper and three specialization theorems pass the repository
+gate at `64 thm, 0 trusted` under the default limits. The first attempted
+general wrapper coerced a truncated polynomial back to a series and exceeded
+the default heartbeat budget; it was discarded. The checked implementation
+uses Mathlib's theorem at its exact precision and the pre-existing H116
+monotonicity lemma, so no limit was raised and no theorem was weakened.
+[pcc:unverified]
+
 ## Inheritance table
 
 | Operation/law | Inheritance |
 | --- | --- |
 | polynomial multiplication, derivative, evaluation | Mathlib instances plus `Polynomial.derivative'` |
 | finite product derivative | `Polynomial.derivative_prod_finset`, used as stated |
-| finite sums and coefficient extraction | Mathlib finite sums plus proved H116 power-series reciprocal/convolution, concrete `F_U` coefficient lemmas and recurrence uniqueness through degree eight; reciprocal-at-infinity isogeny substitution remains open |
+| finite sums and coefficient extraction | Mathlib finite sums plus existing H116 power-series reciprocal/convolution, concrete `F_U` coefficient lemmas and recurrence uniqueness through degree eight; reciprocal-at-infinity isogeny substitution remains open |
 | field division/cancellation | `Field K` laws; `bostanDenominatorsNonzero` proves the concrete native divisions are defined for prime `p>19` |
 | isogeny homomorphism and differential coordinate formula | hypothesis at study endpoint; no Mathlib isogeny object was found, so a finite `N,D` certificate is the checked interface; producing it from the actual kernel and independently validating map semantics remain open |
 | `V+pi=[t]` and `pi(z)=z^p` | H115 algebra plus formal-group instance; lookup pending |

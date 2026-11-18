@@ -29,10 +29,10 @@
   },
   "obligations": {
     "existence": {"state":"supported","evidence":["H115 factorization and prime-order fixtures", "COHORT_V2_GATE.md independent structural verification"],"scope":"ordinary non-anomalous toy curves"},
-    "explicit_construction": {"state":"unknown","evidence":["JET_CERTIFICATE_EXPERIMENT.md proves fixed-size verification only"],"scope":"construct the correct eleven-coefficient N,D jet without dense degree-r map"},
-    "map_correctness": {"state":"unknown","evidence":[],"scope":"all frozen targets and coordinate isomorphisms"},
+    "explicit_construction": {"state":"supported","evidence":["FORMAL_SCALAR_JET_EXPERIMENT.md constructs eleven coefficients from (p,A,B,t) and matches the excluded p=31,r=37 full-map oracle", "JET_CERTIFICATE_EXPERIMENT.md proves fixed-size verification"],"scope":"one excluded p=31,r=37 fixture at precision eleven; generic construction remains unknown pending the elliptic formal-group bridge"},
+    "map_correctness": {"state":"supported","evidence":["h116_formal_scalar_verify.py independently matches the full-map quotient, recurrence, first-order identity and lambda=2 coordinate control"],"scope":"excluded p=31,r=37 fixture only; intended V-1 kernel semantics on generic inputs remain unknown"},
     "subgroup_preservation": {"state":"supported","evidence":["same Q and full fiber of V-1; no destination DLP transfer"],"scope":"prime-order source subgroup"},
-    "computational_advantage": {"state":"unknown","evidence":[],"scope":"cold and online candidate versus direct enumeration"},
+    "computational_advantage": {"state":"unknown","evidence":["FORMAL_SCALAR_JET_CONTROL.json reports separate exact operation counts for construction and controls"],"scope":"candidate uses fixed precision but naive dense construction; no comparable end-to-end or asymptotic advantage established"},
     "scaling_support": {"state":"unknown","evidence":[],"scope":"five deterministic toy sizes only; asymptotic argument separate"}
   },
   "preservation_certificate": {
@@ -40,12 +40,12 @@
     "kernel_intersection": "not_applicable: destination is a fiber trace, not an injective group transfer",
     "recovery_map": "candidate moments feed the separately frozen radix-six predicate/decoder",
     "scalar_multiplier": null,
-    "proof_artifact": "PROOF_MAP.md and lean/H116FiberTrace.lean; a full finite certificate and an eleven-coefficient quotient/ten-coefficient curve-identity certificate each imply the recurrence. MAP_CERTIFICATE_EXPERIMENT.md and JET_CERTIFICATE_EXPERIMENT.md record independently replayed excluded-fixture controls"
+    "proof_artifact": "PROOF_MAP.md and lean/H116FiberTrace.lean; a full finite certificate and an eleven-coefficient quotient/ten-coefficient curve-identity certificate each imply the recurrence. The Lean cutoff proves X^(p-1) is invisible below degree 22 for prime p>19. MAP_CERTIFICATE_EXPERIMENT.md, JET_CERTIFICATE_EXPERIMENT.md and FORMAL_SCALAR_JET_EXPERIMENT.md record independently replayed excluded-fixture controls"
   },
   "mechanism": {
     "proposed_benefit": "replace r explicit extension-field summands by a fixed-length base-field Laurent calculation",
-    "prediction": "all 16 candidate moments equal direct enumeration on every in-domain target",
-    "falsification_condition": "one independently reproduced mismatch, silent out-of-domain acceptance, or total construction cost requiring degree-r data",
+    "prediction": "after the missing elliptic formal-group bridge, the first eleven normalized V-1 map coefficients equal the formal-scalar jet for every prime p>19",
+    "falsification_condition": "one independently reproduced excluded-curve mismatch below coefficient eleven, a Frobenius correction below the predicted boundary, silent out-of-domain acceptance, or total construction cost requiring degree-r data",
     "assumptions": ["p>2J+3 for recurrence v1", "non-anomalous a=t-1", "correct normalized coordinate scaling"]
   },
   "cost_comparison": {
@@ -61,7 +61,7 @@
     "memory_and_data": "peak RSS and packet bytes",
     "setup_reuse": "cold total and exact target count stated; no reuse across curves",
     "uncertainty": "five EKS measured rounds plus interleaved A/A",
-    "evidence_label": "unmeasured"
+    "evidence_label": "exact operation-count diagnostic on one excluded fixture; no timing or speedup"
   },
   "controls": [
     "identical direct-enumeration A/A arm",
@@ -97,12 +97,12 @@
   ],
   "open_obligations": [
     "prove trace and residue identities",
-    "construct the correct eleven reversed numerator/denominator coefficients without first constructing the dense degree-r map, and prove that this prefix represents the intended kernel quotient; the fixed certificate already implies the complete recurrence for frozen prime p>19",
+    "prove V+pi=[t], pi(z)=z^p, formal-group subtraction and x-coordinate pole-order transfer in the elliptic formal-group interface, thereby lifting the excluded-fixture formal-scalar constructor to generic prime p>19 inputs",
     "construct and validate candidate source",
     "bind independent verifier before scoring",
     "measure through EKS and test the fixed predicate family",
     "prove complete decoder complexity only under an exact predicate premise"
   ],
-  "recommended_next_action": "freeze protocol, select cohort, then implement producer without reading scalar labels",
+  "recommended_next_action": "formalize the elliptic formal-group bridge, then run the unchanged constructor on a larger excluded out-of-sample curve set before admitting any target data",
   "official_status_change": "none"
 }

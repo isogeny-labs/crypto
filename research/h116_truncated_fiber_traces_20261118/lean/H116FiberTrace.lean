@@ -439,7 +439,48 @@ theorem cancel_left (D : PowerSeries R)
   have hi := mul (refl (D⁻¹)) hfg
   simpa only [← mul_assoc, PowerSeries.inv_mul_cancel D hD, one_mul] using hi
 
+/-- A monomial contributes nothing below its own degree. This is the exact
+Mathlib truncation theorem, packaged in the prefix relation used by H116. -/
+theorem X_pow_eq_zero (m : ℕ) :
+    PowerSeriesPrefixEq m ((PowerSeries.X : PowerSeries R) ^ m) 0 := by
+  unfold PowerSeriesPrefixEq
+  simpa using PowerSeries.trunc_X_pow_self_mul m (1 : PowerSeries R)
+
 end PowerSeriesPrefixEq
+
+/-- A prime strictly above 19 is at least 23. Keeping primality explicit is
+necessary: the numerical inequality alone would admit 20, 21 and 22. -/
+theorem prime_ge_twentyThree {p : ℕ} [Fact p.Prime] (hp : 19 < p) : 23 ≤ p := by
+  have hprime : p.Prime := Fact.out
+  by_contra hnot
+  have hp22 : p ≤ 22 := by omega
+  interval_cases p <;> norm_num at hp hprime
+
+/-- Once the leading local-parameter factor has been removed, a `z^p`
+Frobenius correction begins with `z^(p-1)`. For prime `p>19`, that normalized
+correction is invisible through every degree strictly below 22. This theorem
+formalizes only the precision cutoff; identifying an elliptic Frobenius term
+with this monomial is a separate endpoint obligation. -/
+theorem frobeniusNormalizedCorrection_invisible
+    {p : ℕ} [Fact p.Prime] (hp : 19 < p) :
+    PowerSeriesPrefixEq 22
+      ((PowerSeries.X : PowerSeries (ZMod p)) ^ (p - 1)) 0 := by
+  apply PowerSeriesPrefixEq.mono (m := 22) (n := p - 1)
+  · have hp23 := prime_ge_twentyThree hp
+    omega
+  · exact PowerSeriesPrefixEq.X_pow_eq_zero (p - 1)
+
+/-- In particular, the even `z`-degrees corresponding to `w^0,...,w^10`
+cannot contain the normalized Frobenius correction in the frozen prime range. -/
+theorem frobeniusNormalizedCorrection_even_coeff_zero
+    {p : ℕ} [Fact p.Prime] (hp : 19 < p) (n : ℕ) (hn : n ≤ 10) :
+    PowerSeries.coeff (2 * n)
+      ((PowerSeries.X : PowerSeries (ZMod p)) ^ (p - 1)) = 0 := by
+  rw [PowerSeries.coeff_X_pow]
+  have hp23 := prime_ge_twentyThree hp
+  split_ifs with heq
+  · omega
+  · rfl
 
 /-- Equation (14) after substituting `R(x)=xU(w)`, `w=1/x`, and multiplying
 by `w³`. The factor `W=U-wU'` is the transformed derivative `R'(x)`. -/
@@ -1253,6 +1294,10 @@ theorem fiberDenominatorSeries_coeff_eq_of_bostanRecurrence
 #print axioms NormalizedRationalMapPolynomialCertificate.to_firstOrder
 #print axioms PowerSeriesPrefixEq.derivative
 #print axioms PowerSeriesPrefixEq.cancel_left
+#print axioms PowerSeriesPrefixEq.X_pow_eq_zero
+#print axioms prime_ge_twentyThree
+#print axioms frobeniusNormalizedCorrection_invisible
+#print axioms frobeniusNormalizedCorrection_even_coeff_zero
 #print axioms NormalizedRationalMapJetCertificate.to_firstOrderPrefix
 #print axioms NormalizedIsogenyFirstOrderPrefix.to_secondOrderPrefix
 #print axioms NormalizedIsogenyFirstOrderPrefix.base_coefficients

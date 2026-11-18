@@ -126,6 +126,24 @@ mutation controls. This does not remove the degree-`r` cost of constructing the
 correct low jet or certify its intended kernel semantics; those remain the
 active algorithmic obligations. [pcc:unverified]
 
+The next [formal-scalar low-jet experiment](FORMAL_SCALAR_JET_EXPERIMENT.md)
+constructs that eleven-coefficient prefix from only `(p,A,B,t)` on the excluded
+`p=31,r=37` fixture. It computes the elliptic formal logarithm, solves
+`L([t-1](z))=(t-1)L(z)`, applies the normalized target scaling, and re-expands
+the x-coordinate ratio in `w=1/x`. Its prefix exactly matches both the retained
+full-map quotient through coefficient ten and the recurrence through
+coefficient eight; wrong-scalar, omitted-scaling, coordinate-isomorphism and
+synthetic Frobenius-boundary controls also pass. An independent verifier
+recomputes the comparisons and the first-order curve identity. This supports
+one fixed-size excluded-fixture construction, not generic map semantics or an
+asymptotic advantage. [pcc:unverified]
+
+Lean now proves the associated precision cutoff: for prime `p>19`, a normalized
+monomial correction `X^(p-1)` vanishes below degree 22, so it cannot affect the
+eleven even z-degrees corresponding to coefficients `w^0,...,w^10`. The theorem
+does not identify the actual elliptic Frobenius term with that monomial; the
+formal-group and pole-order bridge remains open. [pcc:unverified]
+
 At the formal-series level, the target/reference denominators are now proved
 to share every coefficient except `-Uw`: their difference is exactly
 `(U0-U)w`. This is conditional on one supplied normalized jet `h`; identifying
