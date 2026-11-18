@@ -148,7 +148,7 @@ pub fn fingerprint(
     part_cols: &[u64],
 ) -> [u8; 32] {
     let mut h = Sha256::new();
-    h.update(b"hky3-closure-state/v1");
+    h.update(b"hky3-closure-state/v2");
     h.update(ring.p.to_le_bytes());
     h.update((ring.n_free as u64).to_le_bytes());
     for r in &ring.rules {
@@ -184,6 +184,11 @@ pub fn fingerprint(
     }
     h.update(o.interreduce.to_bits().to_le_bytes());
     h.update([o.rebucket as u8, o.par_second as u8, o.bitmap as u8, o.fault]);
+    // engine-opt: the row storage (epoch coordinates) and the sweep schedule
+    h.update([o.np_epochs as u8, o.sweep as u8]);
+    h.update(o.sweep_ratio.to_le_bytes());
+    h.update((o.sweep_tile_bytes as u64).to_le_bytes());
+    h.update((o.sweep_max_words as u64).to_le_bytes());
     match &o.symmetry {
         None => h.update([0u8]),
         Some(p) => {
@@ -410,6 +415,9 @@ pub(super) fn checkpoint_now(io: &IoOptions, fp: &[u8; 32], st: &ClosureState, r
         for r in &e.rows {
             write_row(&mut w, r);
         }
+        // the epoch columns: stored tails are in these coordinates
+        w.u64(e.np_cols.len() as u64);
+        w.u32s(&e.np_cols);
     }
     w.u32(st.queue.len() as u32);
     for b in &st.queue {
@@ -540,7 +548,14 @@ pub(super) fn try_resume(io: &IoOptions, fp: &[u8; 32], space: &Space) -> Option
             pivot[l] = i as u32;
             rows.push(row);
         }
-        ech.push(Echelon { pivot, rows });
+        let nnp = r.u64() as usize;
+        let np_cols = r.u32s(nnp);
+        assert!(
+            np_cols.windows(2).all(|w| w[0] < w[1])
+                && np_cols.last().map_or(true, |&c| (c as usize) < n),
+            "hky_closure_io: bad epoch columns"
+        );
+        ech.push(Echelon::with_epoch(pivot, rows, np_cols));
     }
     let nb = r.u32() as usize;
     let mut queue = Vec::with_capacity(nb);
@@ -786,9 +801,12 @@ pub(super) fn export_basis(
         }
     } else {
         let inv2 = (p + 1) / 2;
-        let lift = |q: usize, row: &RowS| -> Vec<(u32, u64)> {
-            let mut v = Vec::with_capacity(row.nnz() * 2);
-            row.for_each(|col, x| {
+        // rows are read through `Echelon::row_full`: stored tails are in
+        // epoch coordinates (engine-opt)
+        let lift = |q: usize, ri: usize| -> Vec<(u32, u64)> {
+            let full = ech[q].row_full(ri);
+            let mut v = Vec::with_capacity(full.len() * 2);
+            for &(col, x) in &full {
                 let x = u64::from(x);
                 let i = if q == 0 { col as usize } else { m1_to_0[col as usize] as usize };
                 let at = pos0[i];
@@ -796,13 +814,13 @@ pub(super) fn export_basis(
                 if paired[i] {
                     v.push((at + 1, if q == 0 { x } else { (p - x) % p }));
                 }
-            });
+            }
             v
         };
         for i in 0..keys0.len() {
-            let r0 = (ech[0].pivot[i] != NONE).then(|| &ech[0].rows[ech[0].pivot[i] as usize]);
+            let r0 = (ech[0].pivot[i] != NONE).then(|| ech[0].pivot[i] as usize);
             let r1 = (split && m0_to_1[i] != NONE && ech[1].pivot[m0_to_1[i] as usize] != NONE)
-                .then(|| &ech[1].rows[ech[1].pivot[m0_to_1[i] as usize] as usize]);
+                .then(|| ech[1].pivot[m0_to_1[i] as usize] as usize);
             let at = pos0[i];
             let one = |v: &[(u32, u64)], piv: u32| {
                 assert!(

@@ -15,6 +15,7 @@
 //! `[--out PATH]` `[--export-basis PATH]` `[--checkpoint-dir DIR]`
 //! `[--checkpoint-every MINUTES]` `[--checkpoint-every-batches N]`
 //! `[--resume DIR]` `[--max-entries N]` `[--budget SECONDS]`
+//! `[--hky3-verify-closed on]` (engine-opt: re-check closedness at the end; doubles memory)
 //! `[--override-a A]` `[--override-x X]` (negative controls: change the curve
 //! coefficient or the target abscissa; the cross-check against the file's
 //! generator is then skipped and the record says so).
@@ -103,6 +104,7 @@ struct PArgs {
     budget: u64,
     override_a: Option<u64>,
     override_x: Option<u64>,
+    verify_closed: bool,
 }
 
 fn parse(argv: &[String]) -> PArgs {
@@ -117,6 +119,7 @@ fn parse(argv: &[String]) -> PArgs {
         budget: 60 * 86_400,
         override_a: None,
         override_x: None,
+        verify_closed: false,
     };
     let mut i = 1;
     while i < argv.len() {
@@ -149,6 +152,7 @@ fn parse(argv: &[String]) -> PArgs {
             "--budget" => a.budget = v.parse().expect("--budget"),
             "--override-a" => a.override_a = Some(v.parse().expect("--override-a")),
             "--override-x" => a.override_x = Some(v.parse().expect("--override-x")),
+            "--hky3-verify-closed" => a.verify_closed = v == "on",
             o => panic!("--instance mode: unknown flag `{o}`"),
         }
         i += 2;
@@ -275,6 +279,7 @@ pub fn run(argv: &[String]) {
             let opts = Fast2Options {
                 symmetry: perm,
                 io: pa.io.clone(),
+                verify_closed: pa.verify_closed,
                 ..Fast2Options::default()
             };
             let (cl, st) = hky_fp_tower_fast2::closure_fast2(&ring, &gens, pa.d, &limits, &opts);
@@ -291,12 +296,18 @@ pub fn run(argv: &[String]) {
             let ej = json!({"name": "hky_fp_tower_fast2", "symmetry": st.symmetry, "part_cols": st.part_cols,
                 "part_rank": st.part_rank, "threads": st.threads, "simd": st.simd, "batches": st.batches,
                 "interreductions": st.interreductions, "products": st.products, "zero": st.zero,
+                "core_muladds": st.core_muladds, "zero_muladds": st.zero_muladds, "swept_batches": st.swept_batches,
+                "verify_products": st.verify_products, "verify_nonzero": st.verify_nonzero, "verify_s": st.verify_s,
+                "final_row_bytes": st.final_row_bytes, "sweep_bytes": st.sweep_bytes,
                 "peak_words": st.peak_words, "stored_words": st.stored_words,
                 "parallel_s": st.parallel_s, "second_s": st.second_s, "interreduce_s": st.interreduce_s,
                 "options": {"batch_min": o.batch_min, "batch_max": o.batch_max, "target_pivots": o.target_pivots,
                   "interreduce": o.interreduce, "interreduce_min": o.interreduce_min,
                   "interreduce_block": o.interreduce_block, "rebucket": o.rebucket, "par_second": o.par_second,
-                  "bitmap": o.bitmap, "deg_weight": o.deg_weight, "dense": [o.dense_num, o.dense_den]}});
+                  "bitmap": o.bitmap, "deg_weight": o.deg_weight, "dense": [o.dense_num, o.dense_den],
+                  "np_epochs": o.np_epochs, "sweep": o.sweep, "sweep_ratio": o.sweep_ratio,
+                  "sweep_tile_bytes": o.sweep_tile_bytes, "sweep_max_words": o.sweep_max_words,
+                  "verify_closed": o.verify_closed}});
             (cl, ej, io)
         }
         _ => {
