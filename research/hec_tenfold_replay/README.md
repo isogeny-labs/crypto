@@ -196,3 +196,24 @@ One-place matches reduced the number of visited members by 7.6–16.8%. Includin
 A native one-place prototype computed the support and orientation from the leading coefficients, stored unmatched rows in a hash table, and submitted matched rows to the existing rank solver. Seed 2026111911 used eight fresh input pairs per field, 32 repetitions, and opposite timing orders. All complete solves verified the scalar. Median original/matching full-solve ratios, forward/reverse, were 0.658/0.668, 0.553/0.548, 0.460/0.456 and 0.437/0.434 at increasing primes. Matching was slower on all 32 cases in both orders. Against the pencil reference, 28 original cases and zero matching cases reached 10× in both orders. The default stays unchanged. The two-place result above measures rank only.
 
 Run `ruby harness/g3-quadratic-census.rb | c++ -std=c++17 -O3 -x c++ - -o /tmp/g3-census` followed by `/tmp/g3-census | ruby harness/g3-quadratic-rank.rb` to reproduce the rank table. The compressed stream also supports independent rank replay without recompilation. Run `harness/g3-quadratic-places.zsh` for the native timings. Arm 0 is the pencil, arm 1 the original optimized solver, and arm 2 the one-place prototype. The medians file stores prime, case, order and paired ratios for pencil/original, pencil/matching and original/matching.
+
+### A second quartic residual pencil in genus 3
+
+On the odd-degree-seven model, write z = x − h at a nonbranch point A. The cubic family y − T₂(z) − bz³ has a pole of order seven at infinity and at least three zeros at A. Its residual has degree four. The original family y − T₃(z) − tz⁴ also has degree-four residuals (including infinity where applicable). Away from A their bucket indices satisfy b = s₃ + zt, with s₃ the third Taylor coefficient. Both families can therefore use a single scan of the affine points. The implementation marks candidate buckets in a bitset, checks multiplicities, and inserts relations into the same rank solver. Its single-family control uses the same bucket representation.
+
+An independent polynomial multiplication check compared every accepted cubic residual with the full product of its signed affine places' linear factors, including multiplicities, and checked each ordinate. The resulting catalogue values agreed with the original up to a nonzero scalar on each curve.
+
+| Prime | Poles to rank, original → combined | Rows to rank, original → combined |
+|---:|---:|---:|
+| 73 | 8 → 5 | 39 → 40 |
+| 127 | 11 → 6 | 69 → 69 |
+| 257 | 14 → 7 | 125 → 128 |
+| 383 | 12 → 7 | 195 → 209 |
+
+The development comparison (seeds 2026111912, 2026111913, and the earlier 2026111906) used four arms: pencil reference, original optimized solver, bitset single-family control, and combined families. Across six timing processes the field median for original/combined ranged from 1.042–1.071× at 127, 1.096–1.136× at 257, and 0.884–0.932× at 383. At 73 it ranged from 0.990–1.013×. These are medians across eight cases of per-case medians over 32 paired repetitions.
+
+Before measuring seeds 2026111914–1916 we selected combined families at 127 and 257 and the original implementation at 73 and 383. Every one of the 48 fresh cases on the selected fields ran faster in both orders. Across all four fields, the rule and original reached 10× against the pencil on 92/96 and 91/96 cases respectively. Both counts use the slower of the two per-case paired medians. This selection tests new inputs on the same four curves.
+
+In the four-arm harness, identical original code paths on the unselected fields showed execution-order differences. A separate balanced crossover on fresh seed 2026111917 removed the pencil arm and ran original/candidate/candidate/original and its reverse assignment in alternating repetitions. We divided total original time by total candidate time within each quartet, then took the median over 32 quartets per case. The field medians in the two processes were 1.055×/1.065× at 127 and 1.123×/1.123× at 257. On the two same-code control fields they were 0.999×/1.000× at 73 and 1.000×/0.999× at 383. All timed solves verified their scalars. The selection remains experimental.
+
+Run `harness/g3-cubic-pencil.zsh panel`, `rule`, or `crossover` for the three comparisons. The compressed archive contains every timing and audit log. Timing columns follow the native driver format; crossover arms 0 and 3 use the original code and arms 1 and 2 use the selected candidate. The four-arm medians file stores seed, order, prime, case, then ratios 0/1, 0/2, 0/3, 1/2, 1/3 and 2/3. The counts file stores prime, mode, poles, original-family rows and cubic-family rows (mode 0 is the uninstrumented original).
