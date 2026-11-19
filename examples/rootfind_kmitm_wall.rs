@@ -66,6 +66,9 @@ fn main() {
         mitm.prepare(&ctx, &fb, &pm, &mut bm).unwrap();
         let build_m_ns = t_build_m.elapsed().as_nanos() as f64;
         let left_entries = mitm.left_entries();
+        let left_k = mitm.left_k();
+        let right_k = mitm.right_k();
+        let right_pre = mitm.right_precomputed();
 
         // Warm-up.
         for t in targets.iter().take(4) {
@@ -124,7 +127,8 @@ fn main() {
         let build_ratio = ksum_build_ns.map(|k| k / build_m_ns);
         let probe_ratio = ksum_probe_ns.map(|k| k / probe_m_ns);
         println!(
-            "m={m:>2}  kmitm build {build_m_ns:10.0} ns  entries {left_entries:<8}  \
+            "m={m:>2}  split {left_k}/{right_k}  kmitm build {build_m_ns:10.0} ns  \
+             left {left_entries:<8} right_pre {right_pre:<6}  \
              probe {probe_m_ns:10.1} ns/tgt  hits {hits_m}   \
              ksum build {}  probe {}  ratio build/probe {} / {}",
             ksum_build_ns
@@ -142,11 +146,13 @@ fn main() {
         );
         rows.push(json!({
             "m": m,
-            "left_k": (m + 1) / 2,
-            "right_k": m / 2,
+            "left_k": left_k,
+            "right_k": right_k,
+            "split": "probe",
             "abscissae": a,
             "kmitm_build_ns": build_m_ns,
             "kmitm_left_entries": left_entries,
+            "kmitm_right_precomputed": right_pre,
             "kmitm_probe_ns_per_target": probe_m_ns,
             "kmitm_hits": hits_m,
             "ksum_ok": ksum_ok,

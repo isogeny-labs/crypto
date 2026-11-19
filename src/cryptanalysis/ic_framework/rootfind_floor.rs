@@ -306,9 +306,8 @@ impl DecompositionOracle<PrimeCurve> for RootfindFloorOracle<'_> {
         point: PrimePoint,
     ) -> Option<Vec<usize>> {
         let f = self.field?;
-        if self.bloom.is_none() {
-            return None;
-        }
+        // Existence check only — do not hold the borrow across &mut self below.
+        self.bloom.as_ref()?;
         if point.infinity {
             return None;
         }

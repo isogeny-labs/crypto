@@ -1,17 +1,20 @@
 //! `rootfind-kmitm`: meet-in-the-middle root-finding for arity `m = 3..=12`.
 //!
 //! Full [`KSumTable`] stops at `m = 9` (u64 packing) and costs about
-//! `2^{m−1}·C(|F|, m)` build additions. This oracle stores a table of
-//! **left** = `⌈m/2⌉` sums and probes with every **right** = `⌊m/2⌋` sum
-//! `S`, looking up `R − S`. Overlap between left and right summands is
-//! rejected. Cost is about `2^{L−1}·C(A, L)` build plus
-//! `2^{R−1}·C(A, R)` probe additions a target — drastic vs a full
-//! `m`-sum table once `m ≥ 4`, and the only practical path for `m = 10..12`.
+//! `2^{m−1}·C(|F|, m)` build additions. This oracle stores a **left**
+//! `L`-sum table and probes with every **right** `R`-sum `S` via `R − S`
+//! (here `R` is the target). Overlap between left and right summands is
+//! rejected.
 //!
-//! At `m = 3` this is the same shape as `rootfind-subtract:m=3` (pair
-//! table + one subtract). New id: do not change `ksum` or
-//! `rootfind-subtract`. Classification: engineering (wall / build size);
-//! charged group additions are the MITM's own (not equal to full `ksum`).
+//! Default split is **probe-favoring**: `L = min(9, m−1)`, `R = m−L`.
+//! That makes `R = 1` for every `m ≤ 10`, so a probe is one pass over the
+//! factor base — drastic vs a balanced half-split (and the only practical
+//! path for `m = 10..12`). Pass `split=balanced` for `⌈m/2⌉ / ⌊m/2⌋` when
+//! the left table would be too large.
+//!
+//! Right-half sums with `R ≥ 2` are materialised once at prepare and reused
+//! across targets. Classification: engineering (wall / build size); charged
+//! group additions are the MITM's own (not equal to full `ksum`).
 
 use std::collections::BTreeMap;
 
@@ -26,14 +29,20 @@ use crate::cryptanalysis::ic_boundary::{
 pub const KMITM_MAX_M: u32 = 12;
 
 #[inline]
-fn split_arity(m: u32) -> (u32, u32) {
-    let right = m / 2;
-    (m - right, right)
+fn split_arity(m: u32, balanced: bool) -> (u32, u32) {
+    if balanced {
+        let right = m / 2;
+        (m - right, right)
+    } else {
+        // Probe-favoring: biggest left table KSumTable can hold.
+        let left = KSUM_MAX_K.min(m.saturating_sub(1));
+        (left, m - left)
+    }
 }
 
 enum LeftTable {
-    Pairs(PairTable),
-    KSum(KSumTable),
+    Pairs(Box<PairTable>),
+    KSum(Box<KSumTable>),
 }
 
 impl LeftTable {
@@ -69,6 +78,12 @@ impl LeftTable {
     }
 }
 
+/// One precomputed right-half sum (used when `right_k ≥ 2`).
+struct RightSum<P> {
+    point: P,
+    idxs: Vec<usize>,
+}
+
 /// Meet-in-the-middle k-sum root finding for `m = 3..=12`.
 pub struct RootfindKMitmOracle<'i> {
     m: u32,
@@ -76,9 +91,12 @@ pub struct RootfindKMitmOracle<'i> {
     instance: Option<&'i PrimeInstance>,
     left_k: u32,
     right_k: u32,
+    balanced: bool,
     table: Option<LeftTable>,
-    /// Scratch for the right-hand combination walk.
-    right_idx: Vec<usize>,
+    /// Precomputed right-half sums for prime probes (`right_k ≥ 2`).
+    right_prime: Vec<RightSum<PrimePoint>>,
+    /// Precomputed right-half sums for binary probes (`right_k ≥ 2`).
+    right_bin: Vec<RightSum<crate::cryptanalysis::koblitz_fast::FastPoint>>,
     pub mismatches: u64,
     probe_right_adds: u64,
     probe_lookups: u64,
@@ -87,14 +105,16 @@ pub struct RootfindKMitmOracle<'i> {
 
 impl<'i> RootfindKMitmOracle<'i> {
     pub fn new(m: u32) -> Self {
-        let (left_k, right_k) = split_arity(m);
+        let (left_k, right_k) = split_arity(m, false);
         Self {
             m,
             instance: None,
             left_k,
             right_k,
+            balanced: false,
             table: None,
-            right_idx: Vec::new(),
+            right_prime: Vec::new(),
+            right_bin: Vec::new(),
             mismatches: 0,
             probe_right_adds: 0,
             probe_lookups: 0,
@@ -113,6 +133,130 @@ impl<'i> RootfindKMitmOracle<'i> {
     pub fn left_entries(&self) -> u64 {
         self.table.as_ref().map(LeftTable::entries).unwrap_or(0)
     }
+
+    pub fn left_k(&self) -> u32 {
+        self.left_k
+    }
+
+    pub fn right_k(&self) -> u32 {
+        self.right_k
+    }
+
+    pub fn right_precomputed(&self) -> u64 {
+        self.right_prime.len().max(self.right_bin.len()) as u64
+    }
+}
+
+fn build_left_table<G: CountedGroup>(
+    g: &G,
+    fb: &FactorBase<G::Elt>,
+    left_k: u32,
+    prune: bool,
+    sib: bool,
+    ops: &mut GroupOps,
+) -> Result<LeftTable, String> {
+    if left_k == 2 {
+        let t = PairTable::build_negation_folded(g, fb);
+        ops.merge(t.build_ops);
+        Ok(LeftTable::Pairs(Box::new(t)))
+    } else {
+        if left_k > KSUM_MAX_K {
+            return Err(format!(
+                "rootfind-kmitm left half {left_k} exceeds KSumTable max {KSUM_MAX_K}"
+            ));
+        }
+        let t = KSumTable::build_negation_folded_full(g, fb, left_k, false, prune, sib)?;
+        ops.merge(t.build_ops);
+        Ok(LeftTable::KSum(Box::new(t)))
+    }
+}
+
+/// Enumerate every ordered distinct-abscissa `right_k`-sum into `out`.
+fn collect_right_sums<G: CountedGroup>(
+    g: &G,
+    fb: &FactorBase<G::Elt>,
+    right_k: u32,
+    ops: &mut GroupOps,
+    out: &mut Vec<RightSum<G::Elt>>,
+) where
+    G::Elt: Copy,
+{
+    out.clear();
+    if right_k == 0 {
+        return;
+    }
+    let groups: Vec<&Vec<usize>> = fb
+        .abscissa_list
+        .iter()
+        .map(|x| fb.x_index.get(x).expect("listed abscissa indexed"))
+        .collect();
+    let mut idxs = vec![0usize; right_k as usize];
+    collect_right_rec(
+        g,
+        fb,
+        &groups,
+        right_k as usize,
+        0,
+        0,
+        None,
+        &mut idxs,
+        ops,
+        out,
+    );
+}
+
+#[allow(clippy::too_many_arguments)]
+fn collect_right_rec<G: CountedGroup>(
+    g: &G,
+    fb: &FactorBase<G::Elt>,
+    groups: &[&Vec<usize>],
+    right_k: usize,
+    depth: usize,
+    from: usize,
+    partial: Option<G::Elt>,
+    idxs: &mut [usize],
+    ops: &mut GroupOps,
+    out: &mut Vec<RightSum<G::Elt>>,
+) where
+    G::Elt: Copy,
+{
+    if depth == right_k {
+        let Some(point) = partial else {
+            return;
+        };
+        if g.is_identity(&point) {
+            return;
+        }
+        out.push(RightSum {
+            point,
+            idxs: idxs.to_vec(),
+        });
+        return;
+    }
+    for ai in from..groups.len() {
+        for &j in groups[ai].iter() {
+            let s = match partial {
+                None => fb.points[j],
+                Some(p) => g.add(ops, p, fb.points[j]),
+            };
+            if g.is_identity(&s) {
+                continue;
+            }
+            idxs[depth] = j;
+            collect_right_rec(
+                g,
+                fb,
+                groups,
+                right_k,
+                depth + 1,
+                ai + 1,
+                Some(s),
+                idxs,
+                ops,
+                out,
+            );
+        }
+    }
 }
 
 impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
@@ -125,17 +269,29 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
     }
 
     fn describe(&self, _params: &Params) -> String {
+        let mode = if self.balanced {
+            "balanced"
+        } else {
+            "probe-favoring"
+        };
         format!(
-            "meet-in-the-middle root finding: table of left={} sums, probe with every right={} sum \
-             (m={}, drastic vs full k-sum for m≥4; enables m=10..12)",
+            "meet-in-the-middle root finding: left={}-sum table, right={}-sum probe \
+             (m={}, split={mode}; enables m=10..12; drastic vs full k-sum)",
             self.left_k, self.right_k, self.m
         )
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
         &[
-            ("m", "summands, 3 to 12; left=⌈m/2⌉ table, right=⌊m/2⌋ probe"),
-            ("sib", "1: left table last level uses x-only siblings when the curve supports them (default 1 on primes)"),
+            ("m", "summands, 3 to 12"),
+            (
+                "split",
+                "probe (default): left=min(9,m-1); balanced: left=⌈m/2⌉",
+            ),
+            (
+                "sib",
+                "1: left table last level uses x-only siblings when the curve supports them (default 1 on primes)",
+            ),
             ("prune", "1: skip dead-end partials in the left k-sum build (default 1)"),
         ]
     }
@@ -154,17 +310,22 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
             ));
         }
         for key in params.0.keys() {
-            if key != "m" && key != "sib" && key != "prune" {
+            if key != "m" && key != "sib" && key != "prune" && key != "split" {
                 return Err(format!(
-                    "rootfind-kmitm reads only `m`, `sib`, `prune`; `{key}` would change the \
+                    "rootfind-kmitm reads only `m`, `sib`, `prune`, `split`; `{key}` would change the \
                      method's identity without changing the search"
                 ));
             }
         }
-        let (left_k, right_k) = split_arity(self.m);
+        let balanced = params
+            .0
+            .get("split")
+            .map(|s| s == "balanced" || s == "half")
+            .unwrap_or(false);
+        let (left_k, right_k) = split_arity(self.m, balanced);
+        self.balanced = balanced;
         self.left_k = left_k;
         self.right_k = right_k;
-        self.right_idx = vec![0; right_k as usize];
         let prune = params.0.get("prune").map(|s| s != "0").unwrap_or(true);
         let sib = params
             .0
@@ -172,22 +333,12 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
             .map(|s| s != "0")
             .unwrap_or(ctx.group.supports_siblings());
 
-        let table = if left_k == 2 {
-            let t = PairTable::build_negation_folded(ctx.group, fb);
-            ops.merge(t.build_ops);
-            LeftTable::Pairs(t)
-        } else {
-            if left_k > KSUM_MAX_K {
-                return Err(format!(
-                    "rootfind-kmitm left half {left_k} exceeds KSumTable max {KSUM_MAX_K}"
-                ));
-            }
-            let t =
-                KSumTable::build_negation_folded_full(ctx.group, fb, left_k, false, prune, sib)?;
-            ops.merge(t.build_ops);
-            LeftTable::KSum(t)
-        };
-        self.table = Some(table);
+        self.table = Some(build_left_table(ctx.group, fb, left_k, prune, sib, ops)?);
+        self.right_bin.clear();
+        self.right_prime.clear();
+        if right_k >= 2 {
+            collect_right_sums(ctx.group, fb, right_k, ops, &mut self.right_prime);
+        }
         self.mismatches = 0;
         self.probe_right_adds = 0;
         self.probe_lookups = 0;
@@ -203,8 +354,15 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
             .unwrap_or_default();
         out.insert("kmitm_left_k".to_string(), u64::from(self.left_k));
         out.insert("kmitm_right_k".to_string(), u64::from(self.right_k));
+        out.insert("kmitm_split_balanced".to_string(), u64::from(self.balanced));
         if let Some(t) = &self.table {
             out.insert("kmitm_left_entries".to_string(), t.entries());
+        }
+        if !self.right_prime.is_empty() {
+            out.insert(
+                "kmitm_right_precomputed".to_string(),
+                self.right_prime.len() as u64,
+            );
         }
         table_counted(out)
     }
@@ -237,106 +395,124 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
         if point.infinity {
             return None;
         }
-        // Take the table pointer pattern that avoids holding &mut self and
-        // &table together: clone isn't available; use index-free reborrow
-        // via split of fields after checking table exists.
-        if self.table.is_none() {
-            return None;
-        }
+        // Existence check only — do not hold the borrow across &mut self below.
+        self.table.as_ref()?;
         let g = ctx.group;
-        let groups: Vec<&Vec<usize>> = fb
-            .abscissa_list
-            .iter()
-            .map(|x| fb.x_index.get(x).expect("listed abscissa indexed"))
-            .collect();
-        self.enum_right(g, fb, ops, counters, point, &groups, 0, 0, None)
+        if self.right_k == 1 {
+            return self.probe_right1_prime(g, fb, ops, counters, point);
+        }
+        self.probe_right_precomputed_prime(g, fb, ops, counters, point)
     }
 }
 
 impl RootfindKMitmOracle<'_> {
-    #[allow(clippy::too_many_arguments)]
-    fn enum_right(
+    fn finish_hit_prime(
         &mut self,
         g: &PrimeCurve,
         fb: &FactorBase<PrimePoint>,
         ops: &mut GroupOps,
         counters: &mut OracleCounters,
         target: PrimePoint,
-        groups: &[&Vec<usize>],
-        depth: usize,
-        from: usize,
-        partial: Option<PrimePoint>,
+        left: Vec<usize>,
+        right: &[usize],
     ) -> Option<Vec<usize>> {
-        let right_k = self.right_k as usize;
-        if depth == right_k {
-            let s = partial?;
+        let overlap = left.iter().any(|&i| right.contains(&i));
+        if overlap {
+            self.overlaps_rejected += 1;
+            return None;
+        }
+        let mut out = left;
+        out.extend_from_slice(right);
+        let mut acc = fb.points[out[0]];
+        for &i in &out[1..] {
+            acc = g.add(ops, acc, fb.points[i]);
+        }
+        if acc == target {
+            return Some(out);
+        }
+        if acc == g.neg(target) {
+            for i in &mut out {
+                *i = fb.neg_index[*i];
+            }
+            return Some(out);
+        }
+        self.mismatches += 1;
+        counters.frobfold_mismatches += 1;
+        None
+    }
+
+    fn probe_right1_prime(
+        &mut self,
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        target: PrimePoint,
+    ) -> Option<Vec<usize>> {
+        for (j, &pj) in fb.points.iter().enumerate() {
+            if g.is_identity(&pj) {
+                continue;
+            }
+            let t = g.add(ops, target, g.neg(pj));
+            self.probe_right_adds += 1;
+            let mut lookups = 0u64;
+            let left = {
+                let table = self.table.as_ref()?;
+                match table.probe_left(g, fb, ops, &mut lookups, t) {
+                    Some(v) => v,
+                    None => {
+                        self.probe_lookups += lookups;
+                        counters.lookups += lookups;
+                        continue;
+                    }
+                }
+            };
+            self.probe_lookups += lookups;
+            counters.lookups += lookups;
+            if let Some(hit) =
+                self.finish_hit_prime(g, fb, ops, counters, target, left, std::slice::from_ref(&j))
+            {
+                return Some(hit);
+            }
+        }
+        None
+    }
+
+    fn probe_right_precomputed_prime(
+        &mut self,
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        target: PrimePoint,
+    ) -> Option<Vec<usize>> {
+        // Index into owned vec without holding &self.right_prime across &mut self.
+        let n = self.right_prime.len();
+        for i in 0..n {
+            let (s, right_idxs) = {
+                let e = &self.right_prime[i];
+                (e.point, e.idxs.clone())
+            };
             let t = g.add(ops, target, g.neg(s));
             self.probe_right_adds += 1;
             let mut lookups = 0u64;
             let left = {
                 let table = self.table.as_ref()?;
-                table.probe_left(g, fb, ops, &mut lookups, t)?
+                match table.probe_left(g, fb, ops, &mut lookups, t) {
+                    Some(v) => v,
+                    None => {
+                        self.probe_lookups += lookups;
+                        counters.lookups += lookups;
+                        continue;
+                    }
+                }
             };
             self.probe_lookups += lookups;
             counters.lookups += lookups;
-            // Disjointness: no shared base index between left and right.
-            let overlap = left.iter().any(|&i| self.right_idx[..right_k].contains(&i));
-            if overlap {
-                self.overlaps_rejected += 1;
-                return None;
-            }
-            let mut out = left;
-            out.extend_from_slice(&self.right_idx[..right_k]);
-            // Fail-closed: re-sum on the ledger.
-            let mut acc = fb.points[out[0]];
-            for &i in &out[1..] {
-                acc = g.add(ops, acc, fb.points[i]);
-            }
-            if acc == target {
-                return Some(out);
-            }
-            if acc == g.neg(target) {
-                for i in &mut out {
-                    *i = fb.neg_index[*i];
-                }
-                return Some(out);
-            }
-            self.mismatches += 1;
-            counters.frobfold_mismatches += 1;
-            return None;
-        }
-
-        let end = groups.len();
-        for ai in from..end {
-            let group = groups[ai];
-            // All signs on the right (full search); left table used the
-            // negation fold so ± collisions are resolved at probe time.
-            for &j in group.iter() {
-                let s = match partial {
-                    None => fb.points[j],
-                    Some(p) => {
-                        let q = g.add(ops, p, fb.points[j]);
-                        self.probe_right_adds += 1;
-                        q
-                    }
-                };
-                if g.is_identity(&s) {
-                    continue;
-                }
-                self.right_idx[depth] = j;
-                if let Some(hit) = self.enum_right(
-                    g,
-                    fb,
-                    ops,
-                    counters,
-                    target,
-                    groups,
-                    depth + 1,
-                    ai + 1,
-                    Some(s),
-                ) {
-                    return Some(hit);
-                }
+            if let Some(hit) =
+                self.finish_hit_prime(g, fb, ops, counters, target, left, &right_idxs)
+            {
+                return Some(hit);
             }
         }
         None
@@ -362,6 +538,10 @@ impl<'a> DecompositionOracle<crate::cryptanalysis::ic_boundary::BinaryGroup<'a>>
     fn parameters(&self) -> &[(&str, &str)] {
         &[
             ("m", "summands, 3 to 12"),
+            (
+                "split",
+                "probe (default): left=min(9,m-1); balanced: left=⌈m/2⌉",
+            ),
             ("prune", "1: prune left k-sum dead ends (default 1)"),
         ]
     }
@@ -378,22 +558,22 @@ impl<'a> DecompositionOracle<crate::cryptanalysis::ic_boundary::BinaryGroup<'a>>
                 self.m
             ));
         }
-        let (left_k, right_k) = split_arity(self.m);
+        let balanced = params
+            .0
+            .get("split")
+            .map(|s| s == "balanced" || s == "half")
+            .unwrap_or(false);
+        let (left_k, right_k) = split_arity(self.m, balanced);
+        self.balanced = balanced;
         self.left_k = left_k;
         self.right_k = right_k;
-        self.right_idx = vec![0; right_k as usize];
         let prune = params.0.get("prune").map(|s| s != "0").unwrap_or(true);
-        let table = if left_k == 2 {
-            let t = PairTable::build_negation_folded(ctx.group, fb);
-            ops.merge(t.build_ops);
-            LeftTable::Pairs(t)
-        } else {
-            let t =
-                KSumTable::build_negation_folded_full(ctx.group, fb, left_k, false, prune, false)?;
-            ops.merge(t.build_ops);
-            LeftTable::KSum(t)
-        };
-        self.table = Some(table);
+        self.table = Some(build_left_table(ctx.group, fb, left_k, prune, false, ops)?);
+        self.right_prime.clear();
+        self.right_bin.clear();
+        if right_k >= 2 {
+            collect_right_sums(ctx.group, fb, right_k, ops, &mut self.right_bin);
+        }
         Ok(())
     }
     fn setup_work_native(&self) -> BTreeMap<String, u64> {
@@ -404,6 +584,12 @@ impl<'a> DecompositionOracle<crate::cryptanalysis::ic_boundary::BinaryGroup<'a>>
             .unwrap_or_default();
         out.insert("kmitm_left_k".to_string(), u64::from(self.left_k));
         out.insert("kmitm_right_k".to_string(), u64::from(self.right_k));
+        if !self.right_bin.is_empty() {
+            out.insert(
+                "kmitm_right_precomputed".to_string(),
+                self.right_bin.len() as u64,
+            );
+        }
         table_counted(out)
     }
     fn decompose(
@@ -417,96 +603,121 @@ impl<'a> DecompositionOracle<crate::cryptanalysis::ic_boundary::BinaryGroup<'a>>
         if ctx.group.is_identity(&point) {
             return None;
         }
-        if self.table.is_none() {
-            return None;
-        }
+        self.table.as_ref()?;
         let g = ctx.group;
-        let groups: Vec<&Vec<usize>> = fb
-            .abscissa_list
-            .iter()
-            .map(|x| fb.x_index.get(x).expect("listed"))
-            .collect();
-        self.enum_right_bin(g, fb, ops, counters, point, &groups, 0, 0, None)
+        if self.right_k == 1 {
+            return self.probe_right1_bin(g, fb, ops, counters, point);
+        }
+        self.probe_right_precomputed_bin(g, fb, ops, counters, point)
     }
 }
 
 impl RootfindKMitmOracle<'_> {
-    #[allow(clippy::too_many_arguments)]
-    fn enum_right_bin(
+    fn finish_hit_bin(
         &mut self,
         g: &crate::cryptanalysis::ic_boundary::BinaryGroup<'_>,
         fb: &FactorBase<crate::cryptanalysis::koblitz_fast::FastPoint>,
         ops: &mut GroupOps,
         counters: &mut OracleCounters,
         target: crate::cryptanalysis::koblitz_fast::FastPoint,
-        groups: &[&Vec<usize>],
-        depth: usize,
-        from: usize,
-        partial: Option<crate::cryptanalysis::koblitz_fast::FastPoint>,
+        left: Vec<usize>,
+        right: &[usize],
     ) -> Option<Vec<usize>> {
-        let right_k = self.right_k as usize;
-        if depth == right_k {
-            let s = partial?;
+        for &i in &left {
+            if right.contains(&i) {
+                self.overlaps_rejected += 1;
+                return None;
+            }
+        }
+        let mut out = left;
+        out.extend_from_slice(right);
+        let mut acc = fb.points[out[0]];
+        for &i in &out[1..] {
+            acc = g.add(ops, acc, fb.points[i]);
+        }
+        if acc == target || acc == g.neg(target) {
+            if acc == g.neg(target) {
+                for i in &mut out {
+                    *i = fb.neg_index[*i];
+                }
+            }
+            return Some(out);
+        }
+        self.mismatches += 1;
+        counters.frobfold_mismatches += 1;
+        None
+    }
+
+    fn probe_right1_bin(
+        &mut self,
+        g: &crate::cryptanalysis::ic_boundary::BinaryGroup<'_>,
+        fb: &FactorBase<crate::cryptanalysis::koblitz_fast::FastPoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        target: crate::cryptanalysis::koblitz_fast::FastPoint,
+    ) -> Option<Vec<usize>> {
+        for (j, &pj) in fb.points.iter().enumerate() {
+            if g.is_identity(&pj) {
+                continue;
+            }
+            let t = g.add(ops, target, g.neg(pj));
+            self.probe_right_adds += 1;
+            let mut lookups = 0u64;
+            let left = {
+                let table = self.table.as_ref()?;
+                match table.probe_left(g, fb, ops, &mut lookups, t) {
+                    Some(v) => v,
+                    None => {
+                        self.probe_lookups += lookups;
+                        counters.lookups += lookups;
+                        continue;
+                    }
+                }
+            };
+            self.probe_lookups += lookups;
+            counters.lookups += lookups;
+            if let Some(hit) =
+                self.finish_hit_bin(g, fb, ops, counters, target, left, std::slice::from_ref(&j))
+            {
+                return Some(hit);
+            }
+        }
+        None
+    }
+
+    fn probe_right_precomputed_bin(
+        &mut self,
+        g: &crate::cryptanalysis::ic_boundary::BinaryGroup<'_>,
+        fb: &FactorBase<crate::cryptanalysis::koblitz_fast::FastPoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        target: crate::cryptanalysis::koblitz_fast::FastPoint,
+    ) -> Option<Vec<usize>> {
+        let n = self.right_bin.len();
+        for i in 0..n {
+            let (s, right_idxs) = {
+                let e = &self.right_bin[i];
+                (e.point, e.idxs.clone())
+            };
             let t = g.add(ops, target, g.neg(s));
             self.probe_right_adds += 1;
             let mut lookups = 0u64;
             let left = {
                 let table = self.table.as_ref()?;
-                table.probe_left(g, fb, ops, &mut lookups, t)?
+                match table.probe_left(g, fb, ops, &mut lookups, t) {
+                    Some(v) => v,
+                    None => {
+                        self.probe_lookups += lookups;
+                        counters.lookups += lookups;
+                        continue;
+                    }
+                }
             };
             self.probe_lookups += lookups;
             counters.lookups += lookups;
-            for &i in &left {
-                if self.right_idx[..right_k].contains(&i) {
-                    self.overlaps_rejected += 1;
-                    return None;
-                }
-            }
-            let mut out = left;
-            out.extend_from_slice(&self.right_idx[..right_k]);
-            let mut acc = fb.points[out[0]];
-            for &i in &out[1..] {
-                acc = g.add(ops, acc, fb.points[i]);
-            }
-            if acc == target || acc == g.neg(target) {
-                if acc == g.neg(target) {
-                    for i in &mut out {
-                        *i = fb.neg_index[*i];
-                    }
-                }
-                return Some(out);
-            }
-            self.mismatches += 1;
-            counters.frobfold_mismatches += 1;
-            return None;
-        }
-        for ai in from..groups.len() {
-            for &j in groups[ai].iter() {
-                let s = match partial {
-                    None => fb.points[j],
-                    Some(p) => {
-                        let q = g.add(ops, p, fb.points[j]);
-                        self.probe_right_adds += 1;
-                        q
-                    }
-                };
-                if g.is_identity(&s) {
-                    continue;
-                }
-                self.right_idx[depth] = j;
-                if let Some(hit) = self.enum_right_bin(
-                    g,
-                    fb,
-                    ops,
-                    counters,
-                    target,
-                    groups,
-                    depth + 1,
-                    ai + 1,
-                    Some(s),
-                ) {
-                    return Some(hit);
-                }
+            if let Some(hit) = self.finish_hit_bin(g, fb, ops, counters, target, left, &right_idxs)
+            {
+                return Some(hit);
             }
         }
         None
@@ -534,11 +745,15 @@ mod tests {
     }
 
     #[test]
-    fn split_arity_balances() {
-        assert_eq!(split_arity(3), (2, 1));
-        assert_eq!(split_arity(4), (2, 2));
-        assert_eq!(split_arity(5), (3, 2));
-        assert_eq!(split_arity(12), (6, 6));
+    fn split_arity_probe_favoring_and_balanced() {
+        assert_eq!(split_arity(3, false), (2, 1));
+        assert_eq!(split_arity(4, false), (3, 1));
+        assert_eq!(split_arity(6, false), (5, 1));
+        assert_eq!(split_arity(10, false), (9, 1));
+        assert_eq!(split_arity(11, false), (9, 2));
+        assert_eq!(split_arity(12, false), (9, 3));
+        assert_eq!(split_arity(4, true), (2, 2));
+        assert_eq!(split_arity(12, true), (6, 6));
     }
 
     /// Planted m-sum is recovered by kmitm for several arities.
@@ -550,7 +765,6 @@ mod tests {
         let g = &inst.curve;
         assert!(fb.points.len() >= 12);
         for m in [3u32, 4, 5, 6] {
-            // Distinct abscissa representatives.
             let mut idxs = Vec::new();
             for x in &fb.abscissa_list {
                 if idxs.len() == m as usize {
@@ -568,6 +782,11 @@ mod tests {
             let mut oracle = RootfindKMitmOracle::new_prime(m, &inst);
             let mut build = GroupOps::default();
             oracle.prepare(&c, &fb, &params, &mut build).unwrap();
+            assert_eq!(
+                oracle.right_k(),
+                1,
+                "m={m} should be right=1 under probe split"
+            );
             let mut dops = GroupOps::default();
             let mut counters = OracleCounters::default();
             let hit = oracle
@@ -584,11 +803,11 @@ mod tests {
     }
 
     /// m=10 builds (full ksum cannot); planted recovery on a tiny base.
+    /// Probe-favoring uses left=9, so keep |F_x| small (C(A,9)·2⁸).
     #[test]
     fn kmitm_m10_builds_and_recovers_on_tiny_base() {
         let inst = prime_instance_for(20, 59297);
-        // Need ≥10 abscissae; size 24 is safe.
-        let fb = prime_factor_base(&inst, 24);
+        let fb = prime_factor_base(&inst, 14);
         let c = ctx(&inst);
         let g = &inst.curve;
         let m = 10u32;
@@ -608,8 +827,9 @@ mod tests {
         let mut oracle = RootfindKMitmOracle::new_prime(m, &inst);
         let mut build = GroupOps::default();
         oracle.prepare(&c, &fb, &params, &mut build).unwrap();
+        assert_eq!(oracle.left_k(), 9);
+        assert_eq!(oracle.right_k(), 1);
         assert!(oracle.table.as_ref().unwrap().entries() > 0);
-        // Full ksum must refuse m=10.
         let err = match KSumTable::build_negation_folded(g, &fb, 10) {
             Err(e) => e,
             Ok(_) => panic!("full ksum should refuse m=10"),
@@ -621,9 +841,43 @@ mod tests {
         assert!(hit.is_some(), "m=10 should recover planted 10-sum");
     }
 
-    /// Against full ksum at m=4 on a small base: kmitm build is far smaller.
+    /// m=12 with right=3 precomputed list recovers a planted sum.
+    /// left=9 ⇒ keep |F_x| modest so the 9-sum table fits in CI.
     #[test]
-    fn kmitm_m4_build_much_smaller_than_full_ksum() {
+    fn kmitm_m12_recovers_with_precomputed_right() {
+        let inst = prime_instance_for(20, 59297);
+        let fb = prime_factor_base(&inst, 14);
+        let c = ctx(&inst);
+        let g = &inst.curve;
+        let m = 12u32;
+        let mut idxs = Vec::new();
+        for x in &fb.abscissa_list {
+            if idxs.len() == m as usize {
+                break;
+            }
+            idxs.push(fb.x_index[x][0]);
+        }
+        assert_eq!(idxs.len(), 12);
+        let mut ops = GroupOps::default();
+        let mut s = fb.points[idxs[0]];
+        for &i in &idxs[1..] {
+            s = g.add(&mut ops, s, fb.points[i]);
+        }
+        let (_, params) = Params::parse_spec("rootfind-kmitm:m=12").unwrap();
+        let mut oracle = RootfindKMitmOracle::new_prime(m, &inst);
+        let mut build = GroupOps::default();
+        oracle.prepare(&c, &fb, &params, &mut build).unwrap();
+        assert_eq!((oracle.left_k(), oracle.right_k()), (9, 3));
+        assert!(!oracle.right_prime.is_empty());
+        let mut dops = GroupOps::default();
+        let mut counters = OracleCounters::default();
+        let hit = oracle.decompose(&c, &fb, &mut dops, &mut counters, s);
+        assert!(hit.is_some(), "m=12 should recover planted 12-sum");
+    }
+
+    /// Against full ksum at m=4: kmitm still charges fewer build adds.
+    #[test]
+    fn kmitm_m4_build_cheaper_than_full_ksum() {
         let inst = prime_instance_for(20, 1);
         let fb = prime_factor_base(&inst, 12);
         let c = ctx(&inst);
@@ -635,12 +889,7 @@ mod tests {
         let mut bm = GroupOps::default();
         ksum.prepare(&c, &fb, &pk, &mut bk).unwrap();
         mitm.prepare(&c, &fb, &pm, &mut bm).unwrap();
-        let m_entries = mitm.table.as_ref().unwrap().entries();
-        // Pair table (~A²/4) vs 4-sum (~8·C(A,4)).
-        assert!(
-            m_entries < 500,
-            "mitm left entries should be pair-table sized, got {m_entries}"
-        );
+        assert_eq!(mitm.right_k(), 1);
         assert!(bk.adds > bm.adds, "full ksum build should charge more adds");
         let _ = <KSumOracle as DecompositionOracle<PrimeCurve>>::setup_work_native(&ksum);
     }

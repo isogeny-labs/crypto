@@ -996,13 +996,14 @@ bases the Gröbner arms use, so the engines meet on one query stream
   oracle id: never change what `rootfind-subtract` counts. Classification
   is constant-factor engineering (wall / field work); evidence under
   `research/rootfind_floor_oracle_20261119/`.
-- `rootfind-kmitm:m=3..12` is meet-in-the-middle root finding: a table of
-  left `⌈m/2⌉` sums (pair table or `KSumTable`) probed with every right
-  `⌊m/2⌋` sum `S` via `R − S`, rejecting overlapping summands. Full
-  `ksum` stops at `m = 9` and costs ~`2^{m−1}·C(A,m)` build; this path is
-  ~`2^{L−1}·C(A,L)` build plus ~`2^{R−1}·C(A,R)` probe a target, so it is
-  the practical route for `m = 10..12` and a large wall/build cut for
-  `m ≥ 4`. New id; evidence under `research/rootfind_kmitm_20261119/`.
+- `rootfind-kmitm:m=3..12` is meet-in-the-middle root finding. Default
+  **probe-favoring** split: left `L = min(9, m−1)`, right `R = m−L`
+  (so `R = 1` for every `m ≤ 10`); `split=balanced` keeps `⌈m/2⌉/⌊m/2⌋`.
+  Probe looks up `R − S` for every right sum `S`, rejecting overlapping
+  summands; right sums with `R ≥ 2` are materialised once at prepare.
+  Full `ksum` stops at `m = 9`; this path enables `m = 10..12` and cuts
+  probe wall by orders of magnitude vs a balanced half-split. New id;
+  evidence under `research/rootfind_kmitm_20261119/`.
 
 Read a root-finding arm against a Gröbner arm on the resource vector and on
 wall time: the root finder's `S` is a complete count of group additions,

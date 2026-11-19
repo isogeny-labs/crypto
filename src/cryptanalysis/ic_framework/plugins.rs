@@ -40,7 +40,7 @@
 //! | `mitm-frobenius-layout-counted` | 2 or 3 | the same entries and probe on a base laid out by orbit (`compact-orbit-scan`): members named by index, and half the same-orbit pairs added |
 //! | `rootfind-subtract` | 2 or 3 | prime curves: `prime_fast`'s direct-subtraction root finding, every `x(R ∓ F_i)` of a target from one Montgomery batched inversion, then a lookup (`m = 2`) or a probe of the negation-folded pair table (`m = 3`) |
 //! | `rootfind-floor` | 2 or 3 | same search and charged additions as `rootfind-subtract`, with x-only Montgomery candidates and a word-blocked Bloom filter in front of the exact abscissa map (lever 1 of the 100× plan) |
-//! | `rootfind-kmitm` | 3 to 12 | meet-in-the-middle: table of `⌈m/2⌉` sums, probe with every `⌊m/2⌋` complementary sum (drastic vs full `ksum` for `m≥4`; enables `m=10..12`) |
+//! | `rootfind-kmitm` | 3 to 12 | meet-in-the-middle: left=`min(9,m−1)` table (probe-favoring; `split=balanced` for half), probe with every complementary right sum — `right=1` for `m≤10`; enables `m=10..12` |
 //! | `chained-x` | 2, 3 or 4 | Koblitz subspace bases: the chained `x`-frame descent (`groebner_decompose`), `m − 1` Semaev `S₃` links solved by boolean F4 with splitting |
 //!
 //! The pair table is where memory buys time, and `mitm`'s

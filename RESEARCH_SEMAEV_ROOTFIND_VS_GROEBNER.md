@@ -374,6 +374,7 @@ subtract on 32-bit prime A∈{64,256,1024} (`[pcc:unverified]`). Evidence
 `research/rootfind_floor_oracle_20261119/`. No security claim.
 
 Engineering 2026-11-19: `rootfind-kmitm:m=3..12` meet-in-the-middle
-half-sum tables (enables m=10..12; build 7–76× vs full ksum at m=3..8 on
-|Fx|=12). Probe is heavier than full ksum when the table fits — see
+with **probe-favoring** split `L=min(9,m−1)` (so right=1 for m≤10;
+m=11→9/2, m=12→9/3; `split=balanced` for half). Enables m=10..12;
+right≥2 sums precomputed once. Evidence
 `research/rootfind_kmitm_20261119/`. No security claim.

@@ -41,9 +41,9 @@ use crypto_lib::cryptanalysis::ic_framework::plugins::{
     PrimeAbscissaBase, PrimeBatchMitmOracle, RootfindSubtractOracle, SubtractOracle,
     SymmetrisedOracle,
 };
+use crypto_lib::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crypto_lib::cryptanalysis::ic_framework::rootfind_floor::RootfindFloorOracle;
 use crypto_lib::cryptanalysis::ic_framework::rootfind_kmitm::RootfindKMitmOracle;
-use crypto_lib::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crypto_lib::cryptanalysis::ic_framework::solvers::{
     solver_by_name, solver_registry, validate_solver_params,
 };
@@ -884,7 +884,8 @@ fn run_binary(
             }
         }
         let mut subtract = SubtractOracle;
-        let mut subtract_binary = crypto_lib::cryptanalysis::ic_framework::binary_subtract::BinarySubtractOracle::new();
+        let mut subtract_binary =
+            crypto_lib::cryptanalysis::ic_framework::binary_subtract::BinarySubtractOracle::new();
         let mut mitm = MitmOracle::new(m);
         let mut frob = FrobeniusMitmOracle::new(m, inst);
         let mut frob_counted = FrobeniusMitmOracle::new_counted(m, inst);
