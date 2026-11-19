@@ -1022,3 +1022,36 @@ and `Quot.sound`; the seven directly imported Atlas Hasse/Manin source files
 contain no `sorry`, `admit`, user `axiom`, or `native_decide`. A fresh checker
 replay exits 0. Hash-bound claim `PCC-20261119-c7c015` passes its local Lean
 verifier. [pcc:unverified]
+
+## 2026-11-19 fixed-curve character sums and first moment
+
+The concrete dilation analysis now counts the actual quadratic fibres above a
+finite set of nonzero abscissas. Lean proves the square-map pushforward
+identity, identifies the cubic character sum with an elliptic point-count
+trace, and reduces the quartic sum to a second elliptic curve when `B != 0`.
+The `B = 0` branch is closed separately by an explicit parametrization of
+`Y^2 = X^2 + A`. Atlas Hasse therefore supplies both character-sum bounds
+without a generic unproved Weil premise. [pcc:unverified]
+
+`dilationFactorBaseFirstMoment` proves the exact scaled `3/4` mean bound under
+integral radius hypotheses. `dilationLargeFactorBaseSeeds_of_card_ge_324`
+specializes those hypotheses with radius `2 * (Nat.sqrt q + 1)`: over every
+odd finite field with `q >= 324`, at least one sixth of nonzero dilations have
+signed factor-base size at least half the abscissa-set size. Hash-bound claim
+`PCC-20261119-a5a8e2` passes its local Lean verifier. The earlier radius-form
+claim `PCC-20261119-191546` also passes; initial claim
+`PCC-20261119-d93617` omitted its declaration hash, fails closed, and remains
+uncited. [pcc:unverified]
+
+`dilationAndEnergyGiveOneTwelfthGoodSeeds_of_card_ge_324` composes the clean
+first-moment theorem with finite Markov counting. Its only analytic premise is
+the displayed total-energy upper bound; corrected Semaev nondegeneracy is
+still required to instantiate that premise for the ECDLP collector. This is
+not yet an end-to-end subexponential ECDLP theorem. [pcc:unverified]
+
+The pinned project build completes 2,738 jobs. The repository proof gate
+reports `PASS 212 thm 0 trusted`; the new clean first-moment theorem, concrete
+one-twelfth endpoint, and both Hasse character-sum bounds depend only on
+`propext`, `Classical.choice`, and `Quot.sound`. A final-source independent
+`lake env leanchecker --fresh TensorBoundaryBounds` replay exits 0.
+[pcc:unverified]

@@ -346,8 +346,15 @@ into `#seeds <= 6 #{u : X <= 2 value(u)}`. The theorem
 size at most `1/12` and leaves at least `1/12` of all seeds. Claims
 `PCC-20261118-07b50f` and `PCC-20261118-aee405` pass their local Lean
 verifiers and retain unverified signed standing. The character-sum estimate
-and the total-energy estimate that instantiate these generic hypotheses remain
-paper-to-curve obligations. [pcc:unverified]
+is now instantiated by `dilationLargeFactorBaseSeeds`: the exact square-map
+average, both cubic point-count bounds, concrete quadratic fibres, the `2X`
+upper bound, and the `3/4` mean imply the `1/6` event under the displayed
+integral radius conditions. Its clean specialization
+`dilationLargeFactorBaseSeeds_of_card_ge_324` removes the radius parameter for
+every odd field of cardinality at least `324`. Claims
+`PCC-20261119-191546` and `PCC-20261119-a5a8e2` pass their local Lean
+verifiers and retain unverified signed standing. The total-energy estimate
+remains the paper-to-curve obligation. [pcc:unverified]
 
 The energy accounting is now composed rather than merely listed.
 `twelveMarkovBadSetBound` derives the factor-12 bad-set cardinality directly
@@ -355,8 +362,11 @@ from a supplied total-energy bound, and
 `firstMomentAndEnergyGiveOneTwelfthGoodSeeds` combines both supplied totals
 into the exact joint `1/12` event. Claims `PCC-20261119-1fd609` and
 `PCC-20261119-5bbc92` pass locally and retain unverified signed standing.
-The remaining curve-specific inputs are precisely the two total-sum estimates,
-not an additional probabilistic inference. [pcc:unverified]
+The concrete endpoint
+`dilationAndEnergyGiveOneTwelfthGoodSeeds_of_card_ge_324` has only the
+displayed total-energy inequality left as an analytic premise. The remaining
+curve-specific input is therefore the total-energy estimate, not an
+additional character-sum or probabilistic inference. [pcc:unverified]
 
 The generic planted-diagonal root count is now kernel-checked as well.
 `charpolySingularShiftCardLeDimension` proves that an `f`-dimensional square
@@ -385,9 +395,9 @@ they are not the only Lean evidence for the planting step. [pcc:unverified]
 Before the ECDLP specialization is promoted from unverified paper deduction,
 the remaining independent obligations are:
 
-1. formalize or independently reconstruct the curve-specific character-sum
-   and energy estimates that instantiate the checked finite coverage lemmas,
-   together with all constants used by the capped relation collector
+1. formalize or independently reconstruct the corrected Semaev
+   nondegeneracy and total-energy estimate that instantiates the checked finite
+   coverage lemmas, together with all constants used by the capped relation collector
    [pcc:unverified];
 2. bind the factor-base labels returned by the Lean oracle to the rows used by
    the arbitrary-group relation lattice;

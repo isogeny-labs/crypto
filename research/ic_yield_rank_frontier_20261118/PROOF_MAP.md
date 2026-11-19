@@ -584,9 +584,9 @@ remain explicitly outside the model.
    function. No character sum or elliptic-curve fact is re-proved in these
    generic lemmas.
 3. **Object as an instance.** Seeds are nonzero dilation parameters and
-   `value(u)` is the signed factor-base cardinality. The paper-level character
-   sum supplies `3 X #Seed <= 4 sum value`; the elementary bound is
-   `value(u) <= 2X`.
+   `value(u)` is the signed factor-base cardinality. The checked Atlas-Hasse
+   character-sum bridge supplies `3 X #Seed <= 4 sum value`; the checked
+   quadratic-fibre bound is `value(u) <= 2X`.
 4. **Assembly probe.** Split the doubled total sum into large and small seeds.
    Each large summand is at most `4X`; each small summand is at most `X` by the
    definition of the filter. Compare this upper bound with four times the
@@ -596,10 +596,10 @@ remain explicitly outside the model.
    `μ` to obtain `12 #bad <= #Seed`. The existing event-intersection lemma
    then gives the `1/12` joint event in one endpoint application.
    [pcc:unverified]
-5. **Missing components only.** The generic finite first-moment lemma, the
-   finite Markov specialization at factor 12, the finite intersection lemma,
-   and their composed endpoint. The character-sum and total-energy estimates
-   that instantiate the two sum bounds remain paper-to-instance obligations.
+5. **Missing components only.** The corrected Semaev nondegeneracy argument
+   and its resulting total-energy estimate.  The character sum, concrete
+   factor-base first moment, finite Markov step, and event intersection are
+   now checked locally.
 6. **Inheritance table.** Population split:
    `Finset.sum_filter_add_sum_filter_not`; large-part cardinality:
    `Finset.sum_const`; pointwise bounds: supplied upper bound and filter
@@ -611,12 +611,70 @@ remain explicitly outside the model.
 | `twelveMarkovBadSetBound` | endpoint | same | finite seed-indexed natural energies | positive mean scale and total energy at most scale times population |
 | `oneSixthEventSurvivesOneTwelfthBadSet` | law | same; upstream candidate for `crypto-lean` | finite seed space and two event finsets | event size at least `1/6`, bad-set size at most `1/12` |
 | `firstMomentAndEnergyGiveOneTwelfthGoodSeeds` | endpoint | same | finite factor-base and energy functions | hypotheses of the first-moment and total-energy interfaces |
+| `dilationLargeFactorBaseSeeds_of_card_ge_324` | endpoint | same | nonsingular short curve and positive finite set of nonzero abscissas | odd characteristic and field cardinality at least `324` |
+| `dilationAndEnergyGiveOneTwelfthGoodSeeds_of_card_ge_324` | endpoint | same | the concrete dilated factor base and a supplied natural-valued energy | previous row plus a positive mean scale and total-energy upper bound |
 
 The exact checked conclusions are `card Seed <= 6 * card {seed | X <= 2 *
 value seed}` and, after removing a bad set of cardinality at most `1/12`,
 `card Seed <= 12 * card(good)`. Thus the corrected first-moment and energy
 events intersect with finite uniform probability at least `1/12` once their
-source estimates are supplied.
+source estimates are supplied. [pcc:unverified]
+
+## Hasse bridge for the first-moment character sums
+
+1. **Structure above.** A finite field `K` of odd characteristic, coefficients
+   `a₂ a₄ a₆ : K`, the short Weierstrass model
+   `Y² = X³ + a₂X² + a₄X + a₆`, and Mathlib's integer-valued quadratic
+   character.  The model is assumed elliptic only where Atlas's Hasse theorem
+   is invoked. [pcc:unverified]
+2. **Theorem used as stated.** `quadraticChar_card_sqrts` identifies the size
+   of every `Y`-fibre with `1 + χ(rhs)`.  Atlas's source-pinned
+   `hasse_bound` bounds the square of `|K| + 1 - #E(K)` by `4|K|`.
+3. **Object as an instance.** The first sum uses coefficients `(0,A,B)`.
+   For `B ≠ 0`, inversion in the second paper sum sends
+   `χ(x(x³+Ax+B))` to `χ(1+Az²+Bz³)` on `Kˣ`; scaling
+   `(X,Y)=(Bz,By)` gives the short model
+   `Y²=X³+AX²+B²`.  Its discriminant is `B²` times the original short
+   curve discriminant, so the original nonsingularity and `B ≠ 0` make it
+   elliptic.
+4. **Assembly probe.** Count affine equation solutions by `X`-fibres, adjoin
+   the point at infinity, rearrange the resulting integer equality, and
+   substitute it into Atlas Hasse.  Separately prove the inversion/scaling
+   identity for the nonzero-domain character sum.  These steps produce two
+   square bounds without appealing to an unformalized generic Weil theorem.
+5. **Missing components only.** None for the character-sum/first-moment slice.
+   Both the `B = 0` conic branch and the `B ≠ 0` elliptic branch, the exact
+   square-map average, integral radius conversion, and the clean
+   `|K| >= 324` specialization are checked.  Total energy is a separate
+   Semaev-nondegeneracy obligation.
+6. **Inheritance table.** `quadraticChar_card_sqrts`,
+   `WeierstrassCurve.Affine.pointEquiv`, `Finite.card_option`,
+   `WeierstrassCurve.Affine.equation_iff`, and
+   `MathlibExt.AlgebraicGeometry.EllipticCurve.HasseBoundWanted.hasse_bound`.
+
+| statement | kind | owner | quantified structure | hypotheses |
+|---|---|---|---|---|
+| `shortCubicCharacterSum` | definition | `TensorBoundaryBounds`; upstream candidate for `crypto-lean` | finite field and three coefficients | none |
+| `shortCharacterCurve` | definition | same | field and three coefficients | none |
+| `shortCharacterCurve_point_card_eq_card_add_one_add_characterSum` | law | same | finite odd-characteristic field | curve elliptic |
+| `shortCubicCharacterSum_sq_le` | endpoint | same | finite odd-characteristic field | curve elliptic |
+| `quarticCharacterSum_eq_transformedCubic_sub_one` | law | same | finite odd-characteristic field, short coefficients `A,B` | `B ≠ 0` |
+| `transformedShortCurveIsElliptic` | law | same | field, short coefficients `A,B` | original discriminant nonzero and `B ≠ 0` |
+| `quarticCharacterSum_add_one_sq_le_of_nonsingular` | endpoint | same | finite odd-characteristic field, short coefficients `A,B` | original discriminant nonzero |
+
+The implemented quartic endpoint is stronger than the provisional table: it
+also covers `B = 0` by an explicit equivalence between `Y²=X²+A` and the
+nonzero field elements, and exposes the unified declaration
+`quarticCharacterSum_add_one_sq_le_of_nonsingular`.  The next exact averaging
+layer uses these declarations:
+
+| statement | kind | owner | quantified structure | hypotheses |
+|---|---|---|---|---|
+| `sum_square_eq_characterWeighted` | law | `TensorBoundaryBounds` | finite odd-characteristic field and integer-valued function | none beyond odd characteristic |
+| `sum_nonzero_inverseSquare_eq_characterWeighted` | law | same | nonzero field elements and integer-valued function | none beyond odd characteristic |
+| `dilationCharacterTotal_eq_cubic_add_quartic` | law | same | nonsingular short curve and nonzero abscissa `t` | odd characteristic |
+| `dilationFactorBaseFirstMoment` | endpoint | same | finite finset of nonzero abscissas | explicit integral square-radius and density inequalities |
+| `dilationLargeFactorBaseSeeds_of_card_ge_324` | endpoint | same | finite finset of nonzero abscissas | nonsingular short curve, odd characteristic, positive base and `|K| >= 324` |
 
 ## Planted-diagonal bad shifts
 

@@ -8,6 +8,9 @@ import Mathlib.Data.Matrix.ColumnRowPartitioned
 import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.Data.Nat.Size
+import Mathlib.Data.Nat.Sqrt
+import Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.Basic
+import Mathlib.SetTheory.Cardinal.NatCard
 import MathlibExt.AlgebraicGeometry.EllipticCurve.HasseBound
 
 /-!
@@ -1893,12 +1896,824 @@ theorem birdSixthPowerRowBoundAtFixedArity
     _ ≤ 3 ^ (6 * m) * p ^ 6 :=
       Nat.mul_le_mul_left _ (Nat.pow_le_pow_left scaleBound 6)
 
+/-! ## Hasse bounds for the first-moment character sums -/
+
+open Finset
+
+/-- The quadratic-character sum of a general monic short Weierstrass cubic. -/
+def shortCubicCharacterSum
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (a₂ a₄ a₆ : K) : ℤ :=
+  ∑ x : K, quadraticChar K (x ^ 3 + a₂ * x ^ 2 + a₄ * x + a₆)
+
+/-- The short Weierstrass model whose affine equation is
+`Y² = X³ + a₂X² + a₄X + a₆`. -/
+def shortCharacterCurve
+    {K : Type*} [Field K] (a₂ a₄ a₆ : K) : WeierstrassCurve K :=
+  ⟨0, a₂, 0, a₄, a₆⟩
+
+theorem shortCharacterCurve_equation_iff
+    {K : Type*} [Field K] (a₂ a₄ a₆ x y : K) :
+    (shortCharacterCurve a₂ a₄ a₆).toAffine.Equation x y ↔
+      y ^ 2 = x ^ 3 + a₂ * x ^ 2 + a₄ * x + a₆ := by
+  rw [WeierstrassCurve.Affine.equation_iff]
+  simp only [shortCharacterCurve, zero_mul, zero_add]
+  constructor <;> intro h
+  · linear_combination h
+  · linear_combination h
+
+/-- Affine solutions of the short equation, rearranged into `X`-fibres. -/
+def shortAffineSolutionEquivSigma
+    {K : Type*} [Field K] (a₂ a₄ a₆ : K) :
+    {xy : K × K // xy.2 ^ 2 =
+      xy.1 ^ 3 + a₂ * xy.1 ^ 2 + a₄ * xy.1 + a₆} ≃
+      Σ x : K, {y : K // y ^ 2 = x ^ 3 + a₂ * x ^ 2 + a₄ * x + a₆} where
+  toFun xy := ⟨xy.1.1, xy.1.2, xy.2⟩
+  invFun xy := ⟨(xy.1, xy.2.1), xy.2.2⟩
+  left_inv _ := rfl
+  right_inv _ := rfl
+
+/-- The Mathlib affine equation subtype is exactly the displayed short
+equation subtype. -/
+def shortAffineEquationEquiv
+    {K : Type*} [Field K] (a₂ a₄ a₆ : K) :
+    {xy : K × K //
+      (shortCharacterCurve a₂ a₄ a₆).toAffine.Equation xy.1 xy.2} ≃
+      {xy : K × K // xy.2 ^ 2 =
+        xy.1 ^ 3 + a₂ * xy.1 ^ 2 + a₄ * xy.1 + a₆} where
+  toFun xy := ⟨xy.1,
+    (shortCharacterCurve_equation_iff a₂ a₄ a₆ xy.1.1 xy.1.2).mp xy.2⟩
+  invFun xy := ⟨xy.1,
+    (shortCharacterCurve_equation_iff a₂ a₄ a₆ xy.1.1 xy.1.2).mpr xy.2⟩
+  left_inv _ := rfl
+  right_inv _ := rfl
+
+/-- Counting the short equation by `X`-fibres gives `|K|` plus its quadratic
+character sum. -/
+theorem shortAffineSolution_card_eq_card_add_characterSum
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (a₂ a₄ a₆ : K) :
+    (Fintype.card {xy : K × K // xy.2 ^ 2 =
+      xy.1 ^ 3 + a₂ * xy.1 ^ 2 + a₄ * xy.1 + a₆} : ℤ) =
+      Fintype.card K + shortCubicCharacterSum a₂ a₄ a₆ := by
+  rw [Fintype.card_congr (shortAffineSolutionEquivSigma a₂ a₄ a₆),
+    Fintype.card_sigma]
+  push_cast
+  calc
+    ∑ x : K, (Fintype.card {y : K //
+          y ^ 2 = x ^ 3 + a₂ * x ^ 2 + a₄ * x + a₆} : ℤ) =
+        ∑ x : K, (quadraticChar K
+          (x ^ 3 + a₂ * x ^ 2 + a₄ * x + a₆) + 1) := by
+      apply sum_congr rfl
+      intro x _
+      calc
+        (Fintype.card {y : K //
+            y ^ 2 = x ^ 3 + a₂ * x ^ 2 + a₄ * x + a₆} : ℤ) =
+            ((({y : K | y ^ 2 =
+              x ^ 3 + a₂ * x ^ 2 + a₄ * x + a₆} : Set K).toFinset.card : ℕ) : ℤ) := by
+              rw [Set.toFinset_card]
+              exact_mod_cast Fintype.card_congr
+                (Equiv.refl {y : K //
+                  y ^ 2 = x ^ 3 + a₂ * x ^ 2 + a₄ * x + a₆})
+        _ = quadraticChar K
+              (x ^ 3 + a₂ * x ^ 2 + a₄ * x + a₆) + 1 :=
+          quadraticChar_card_sqrts hK
+            (x ^ 3 + a₂ * x ^ 2 + a₄ * x + a₆)
+    _ = Fintype.card K + shortCubicCharacterSum a₂ a₄ a₆ := by
+      simp [shortCubicCharacterSum, sum_add_distrib, add_comm]
+
+/-- Exact point-count identity behind the short cubic character sum. -/
+theorem shortCharacterCurve_point_card_eq_card_add_one_add_characterSum
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (a₂ a₄ a₆ : K)
+    [(shortCharacterCurve a₂ a₄ a₆).IsElliptic] :
+    (Nat.card (shortCharacterCurve a₂ a₄ a₆).toAffine.Point : ℤ) =
+      Fintype.card K + 1 + shortCubicCharacterSum a₂ a₄ a₆ := by
+  let W := shortCharacterCurve a₂ a₄ a₆
+  calc
+    (Nat.card W.toAffine.Point : ℤ) =
+        Nat.card (WithZero {xy : K × K // W.toAffine.Equation xy.1 xy.2}) := by
+      exact_mod_cast Nat.card_congr W.toAffine.pointEquiv
+    _ = Nat.card {xy : K × K // W.toAffine.Equation xy.1 xy.2} + 1 := by
+      change (Nat.card (Option {xy : K × K // W.toAffine.Equation xy.1 xy.2}) : ℤ) = _
+      rw [Finite.card_option]
+      norm_num
+    _ = Nat.card {xy : K × K // xy.2 ^ 2 =
+          xy.1 ^ 3 + a₂ * xy.1 ^ 2 + a₄ * xy.1 + a₆} + 1 := by
+      exact_mod_cast congrArg (fun n : ℕ => n + 1)
+        (Nat.card_congr (shortAffineEquationEquiv a₂ a₄ a₆))
+    _ = Fintype.card {xy : K × K // xy.2 ^ 2 =
+          xy.1 ^ 3 + a₂ * xy.1 ^ 2 + a₄ * xy.1 + a₆} + 1 := by
+      rw [Nat.card_eq_fintype_card]
+    _ = Fintype.card K + shortCubicCharacterSum a₂ a₄ a₆ + 1 := by
+      rw [shortAffineSolution_card_eq_card_add_characterSum hK a₂ a₄ a₆]
+    _ = Fintype.card K + 1 + shortCubicCharacterSum a₂ a₄ a₆ := by ring
+
+/-- Atlas Hasse, expressed directly as the square bound for a monic short
+cubic quadratic-character sum. -/
+theorem shortCubicCharacterSum_sq_le
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (a₂ a₄ a₆ : K)
+    [(shortCharacterCurve a₂ a₄ a₆).IsElliptic] :
+    shortCubicCharacterSum a₂ a₄ a₆ ^ 2 ≤
+      4 * (Fintype.card K : ℤ) := by
+  have hcount :=
+    shortCharacterCurve_point_card_eq_card_add_one_add_characterSum
+      hK a₂ a₄ a₆
+  have hhasse :=
+    MathlibExt.AlgebraicGeometry.EllipticCurve.HasseBoundWanted.hasse_bound
+      (shortCharacterCurve a₂ a₄ a₆)
+  rw [Nat.card_eq_fintype_card] at hhasse
+  nlinarith
+
+/-- The discriminant of the original short curve `Y² = X³ + AX + B`. -/
+theorem originalShortCurve_discriminant
+    {K : Type*} [Field K] (A B : K) :
+    (shortCharacterCurve 0 A B).Δ = -(16 : K) * (4 * A ^ 3 + 27 * B ^ 2) := by
+  simp only [shortCharacterCurve, WeierstrassCurve.Δ, WeierstrassCurve.b₂,
+    WeierstrassCurve.b₄, WeierstrassCurve.b₆, WeierstrassCurve.b₈]
+  ring
+
+/-- After inversion and scaling, the quartic sum is attached to
+`Y² = X³ + AX² + B²`; its discriminant is `B²` times that of the original
+short curve. -/
+theorem transformedShortCurve_discriminant
+    {K : Type*} [Field K] (A B : K) :
+    (shortCharacterCurve A 0 (B ^ 2)).Δ =
+      B ^ 2 * (shortCharacterCurve 0 A B).Δ := by
+  simp only [shortCharacterCurve, WeierstrassCurve.Δ, WeierstrassCurve.b₂,
+    WeierstrassCurve.b₄, WeierstrassCurve.b₆, WeierstrassCurve.b₈]
+  ring
+
+/-- Nonsingularity of the original short curve and `B ≠ 0` imply
+nonsingularity of the transformed cubic used for the quartic sum. -/
+theorem transformedShortCurveIsElliptic
+    {K : Type*} [Field K] (A B : K)
+    (hOriginal : (shortCharacterCurve 0 A B).Δ ≠ 0) (hB : B ≠ 0) :
+    (shortCharacterCurve A 0 (B ^ 2)).IsElliptic := by
+  constructor
+  rw [isUnit_iff_ne_zero, transformedShortCurve_discriminant]
+  exact mul_ne_zero (pow_ne_zero 2 hB) hOriginal
+
+/-- The nonzero arguments of the paper's quartic character sum. -/
+abbrev NonzeroField (K : Type*) [Zero K] := {x : K // x ≠ 0}
+
+/-- On nonzero field elements, `x ↦ B/x` is an involution when `B ≠ 0`. -/
+def nonzeroBOverEquiv
+    {K : Type*} [Field K] (B : K) (hB : B ≠ 0) :
+    NonzeroField K ≃ NonzeroField K where
+  toFun x := ⟨B / x.1, div_ne_zero hB x.2⟩
+  invFun x := ⟨B / x.1, div_ne_zero hB x.2⟩
+  left_inv x := by
+    apply Subtype.ext
+    field_simp
+  right_inv x := by
+    apply Subtype.ext
+    field_simp
+
+/-- The character sum of `x(x³+Ax+B)` over nonzero `x`. -/
+def quarticCharacterSum
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (A B : K) : ℤ :=
+  ∑ x : NonzeroField K,
+    quadraticChar K (x.1 * (x.1 ^ 3 + A * x.1 + B))
+
+/-- Inverting `x` and scaling by `B` turns the nonzero quartic sum into the
+nonzero part of the transformed cubic sum. -/
+theorem quarticCharacterSum_eq_transformedCubic_sub_one
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (A B : K) (hB : B ≠ 0) :
+    quarticCharacterSum A B =
+      shortCubicCharacterSum A 0 (B ^ 2) - 1 := by
+  let e := nonzeroBOverEquiv B hB
+  have hterm : ∀ x : NonzeroField K,
+      quadraticChar K
+          ((e x).1 ^ 3 + A * (e x).1 ^ 2 + 0 * (e x).1 + B ^ 2) =
+        quadraticChar K (x.1 * (x.1 ^ 3 + A * x.1 + B)) := by
+    intro x
+    have hfactor : B / x.1 ^ 2 ≠ 0 := div_ne_zero hB (pow_ne_zero 2 x.2)
+    have harg :
+        (e x).1 ^ 3 + A * (e x).1 ^ 2 + 0 * (e x).1 + B ^ 2 =
+          (B / x.1 ^ 2) ^ 2 * (x.1 * (x.1 ^ 3 + A * x.1 + B)) := by
+      dsimp [e, nonzeroBOverEquiv]
+      field_simp [x.2]
+      ring
+    rw [harg, map_mul, quadraticChar_sq_one' hfactor, one_mul]
+  have hreindex :
+      (∑ x : NonzeroField K,
+        quadraticChar K
+          (x.1 ^ 3 + A * x.1 ^ 2 + 0 * x.1 + B ^ 2)) =
+        quarticCharacterSum A B := by
+    rw [← Equiv.sum_comp e]
+    exact Fintype.sum_congr _ _ hterm
+  have hsplit := Fintype.sum_eq_add_sum_subtype_ne
+    (fun x : K => quadraticChar K (x ^ 3 + A * x ^ 2 + 0 * x + B ^ 2)) 0
+  rw [shortCubicCharacterSum]
+  rw [hsplit]
+  have hzero :
+      quadraticChar K ((0 : K) ^ 3 + A * 0 ^ 2 + 0 * 0 + B ^ 2) = 1 := by
+    rw [show (0 : K) ^ 3 + A * 0 ^ 2 + 0 * 0 + B ^ 2 = B ^ 2 by ring]
+    exact quadraticChar_sq_one' hB
+  have hreindex' :
+      (∑ x : NonzeroField K,
+        quadraticChar K (x.1 ^ 3 + A * x.1 ^ 2 + 0 * x.1 + B ^ 2)) =
+          quarticCharacterSum A B := by
+    exact hreindex
+  rw [hzero, hreindex']
+  omega
+
+/-- Atlas Hasse supplies the quartic-sum square bound after the explicit
+inversion/scaling reduction. -/
+theorem quarticCharacterSum_add_one_sq_le
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A B : K)
+    (hOriginal : (shortCharacterCurve 0 A B).Δ ≠ 0) (hB : B ≠ 0) :
+    (quarticCharacterSum A B + 1) ^ 2 ≤ 4 * (Fintype.card K : ℤ) := by
+  let _ : (shortCharacterCurve A 0 (B ^ 2)).IsElliptic :=
+    transformedShortCurveIsElliptic A B hOriginal hB
+  rw [quarticCharacterSum_eq_transformedCubic_sub_one A B hB]
+  convert shortCubicCharacterSum_sq_le hK A 0 (B ^ 2) using 1 <;> ring
+
+/-- The complete quadratic sum used by the `B = 0` squarefree-part case. -/
+def quadraticTranslateCharacterSum
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K] (A : K) : ℤ :=
+  ∑ x : K, quadraticChar K (x ^ 2 + A)
+
+/-- Factoring `Y²-X²=A` as `(Y-X)(Y+X)=A` parametrizes all its solutions by
+one nonzero field element. -/
+def quadraticEquationSolutionEquivNonzero
+    {K : Type*} [Field K] (hK : ringChar K ≠ 2) (A : K) (hA : A ≠ 0) :
+    {xy : K × K // xy.2 ^ 2 = xy.1 ^ 2 + A} ≃ NonzeroField K where
+  toFun xy := ⟨xy.1.2 - xy.1.1, by
+    intro hzero
+    have hyx : xy.1.2 = xy.1.1 := sub_eq_zero.mp hzero
+    have heq := xy.2
+    rw [hyx] at heq
+    apply hA
+    linear_combination -heq⟩
+  invFun u :=
+    ⟨((A / u.1 - u.1) / 2, (A / u.1 + u.1) / 2), by
+      field_simp [Ring.two_ne_zero hK, u.2]
+      ring⟩
+  left_inv xy := by
+    apply Subtype.ext
+    apply Prod.ext
+    · have hu : xy.1.2 - xy.1.1 ≠ 0 := by
+        intro hzero
+        have hyx : xy.1.2 = xy.1.1 := sub_eq_zero.mp hzero
+        have heq := xy.2
+        rw [hyx] at heq
+        apply hA
+        linear_combination -heq
+      dsimp
+      field_simp [Ring.two_ne_zero hK, hu]
+      have heq := xy.2
+      ring_nf
+      rw [heq]
+      ring
+    · have hu : xy.1.2 - xy.1.1 ≠ 0 := by
+        intro hzero
+        have hyx : xy.1.2 = xy.1.1 := sub_eq_zero.mp hzero
+        have heq := xy.2
+        rw [hyx] at heq
+        apply hA
+        linear_combination -heq
+      dsimp
+      field_simp [Ring.two_ne_zero hK, hu]
+      have heq := xy.2
+      ring_nf
+      rw [heq]
+      ring
+  right_inv u := by
+    apply Subtype.ext
+    dsimp
+    field_simp [Ring.two_ne_zero hK, u.2]
+    ring
+
+/-- Counting `Y²=X²+A` by `X`-fibres gives `|K|` plus the complete
+quadratic character sum. -/
+theorem quadraticEquation_card_eq_card_add_characterSum
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A : K) :
+    (Fintype.card {xy : K × K // xy.2 ^ 2 = xy.1 ^ 2 + A} : ℤ) =
+      Fintype.card K + quadraticTranslateCharacterSum A := by
+  let e : {xy : K × K // xy.2 ^ 2 = xy.1 ^ 2 + A} ≃
+      Σ x : K, {y : K // y ^ 2 = x ^ 2 + A} :=
+    { toFun := fun xy => ⟨xy.1.1, xy.1.2, xy.2⟩
+      invFun := fun xy => ⟨(xy.1, xy.2.1), xy.2.2⟩
+      left_inv := fun _ => rfl
+      right_inv := fun _ => rfl }
+  rw [Fintype.card_congr e, Fintype.card_sigma]
+  push_cast
+  calc
+    ∑ x : K, (Fintype.card {y : K // y ^ 2 = x ^ 2 + A} : ℤ) =
+        ∑ x : K, (quadraticChar K (x ^ 2 + A) + 1) := by
+      apply sum_congr rfl
+      intro x _
+      calc
+        (Fintype.card {y : K // y ^ 2 = x ^ 2 + A} : ℤ) =
+            ((({y : K | y ^ 2 = x ^ 2 + A} : Set K).toFinset.card : ℕ) : ℤ) := by
+              rw [Set.toFinset_card]
+              exact_mod_cast Fintype.card_congr
+                (Equiv.refl {y : K // y ^ 2 = x ^ 2 + A})
+        _ = quadraticChar K (x ^ 2 + A) + 1 :=
+          quadraticChar_card_sqrts hK (x ^ 2 + A)
+    _ = Fintype.card K + quadraticTranslateCharacterSum A := by
+      simp [quadraticTranslateCharacterSum, sum_add_distrib, add_comm]
+
+/-- The classical complete quadratic-character identity
+`Σₓ χ(x²+A) = -1` for `A ≠ 0`, proved here by the explicit hyperbola
+parametrization rather than assumed as a Weil estimate. -/
+theorem quadraticTranslateCharacterSum_eq_neg_one
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A : K) (hA : A ≠ 0) :
+    quadraticTranslateCharacterSum A = -1 := by
+  have hsolutions := quadraticEquation_card_eq_card_add_characterSum hK A
+  have hequivCard :
+      Fintype.card {xy : K × K // xy.2 ^ 2 = xy.1 ^ 2 + A} =
+        Fintype.card (NonzeroField K) :=
+    Fintype.card_congr (quadraticEquationSolutionEquivNonzero hK A hA)
+  have hnonzeroCard :
+      Fintype.card K = Fintype.card (NonzeroField K) + 1 := by
+    calc
+      Fintype.card K = Fintype.card Kˣ + 1 :=
+        Fintype.card_eq_card_units_add_one K
+      _ = Fintype.card (NonzeroField K) + 1 := by
+        rw [Fintype.card_congr unitsEquivNeZero]
+  rw [hequivCard] at hsolutions
+  have hnonzeroCardInt :
+      (Fintype.card K : ℤ) = Fintype.card (NonzeroField K) + 1 := by
+    exact_mod_cast hnonzeroCard
+  rw [hnonzeroCardInt] at hsolutions
+  linarith
+
+/-- When `B=0`, the nonzero quartic sum is the complete quadratic sum with
+its `x=0` term removed. -/
+theorem quarticCharacterSum_zero_eq
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A : K) (hA : A ≠ 0) :
+    quarticCharacterSum A 0 = -1 - quadraticChar K A := by
+  have hterm : ∀ x : NonzeroField K,
+      quadraticChar K (x.1 * (x.1 ^ 3 + A * x.1 + 0)) =
+        quadraticChar K (x.1 ^ 2 + A) := by
+    intro x
+    rw [show x.1 * (x.1 ^ 3 + A * x.1 + 0) =
+      x.1 ^ 2 * (x.1 ^ 2 + A) by ring]
+    rw [map_mul, quadraticChar_sq_one' x.2, one_mul]
+  have hquartic : quarticCharacterSum A 0 =
+      ∑ x : NonzeroField K, quadraticChar K (x.1 ^ 2 + A) := by
+    rw [quarticCharacterSum]
+    exact Fintype.sum_congr _ _ hterm
+  have hsplit := Fintype.sum_eq_add_sum_subtype_ne
+    (fun x : K => quadraticChar K (x ^ 2 + A)) 0
+  have hcomplete := quadraticTranslateCharacterSum_eq_neg_one hK A hA
+  rw [quadraticTranslateCharacterSum, hsplit] at hcomplete
+  have hzero : quadraticChar K ((0 : K) ^ 2 + A) = quadraticChar K A := by
+    congr 1
+    ring
+  rw [hzero] at hcomplete
+  rw [hquartic]
+  linarith
+
+/-- The exceptional `B=0` quartic sum has an elementary constant square
+bound, stronger than the Hasse-scale bound needed by the first moment. -/
+theorem quarticCharacterSum_zero_add_one_sq_le
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A : K) (hA : A ≠ 0) :
+    (quarticCharacterSum A 0 + 1) ^ 2 ≤ 4 * (Fintype.card K : ℤ) := by
+  rw [quarticCharacterSum_zero_eq hK A hA]
+  have hchar : quadraticChar K A ^ 2 = 1 := quadraticChar_sq_one hA
+  have hcard : (1 : ℤ) ≤ 4 * Fintype.card K := by
+    have : 0 < Fintype.card K := Fintype.card_pos
+    exact_mod_cast (show 1 ≤ 4 * Fintype.card K by omega)
+  nlinarith
+
+/-- Unified quartic character-sum bound for every nonsingular short curve in
+odd characteristic. The `B ≠ 0` branch is Hasse on an explicit transformed
+elliptic curve; the `B = 0` branch is the elementary hyperbola count above. -/
+theorem quarticCharacterSum_add_one_sq_le_of_nonsingular
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A B : K)
+    (hOriginal : (shortCharacterCurve 0 A B).Δ ≠ 0) :
+    (quarticCharacterSum A B + 1) ^ 2 ≤ 4 * (Fintype.card K : ℤ) := by
+  by_cases hB : B = 0
+  · subst B
+    have hA : A ≠ 0 := by
+      intro hAzero
+      subst A
+      apply hOriginal
+      rw [originalShortCurve_discriminant]
+      ring
+    exact quarticCharacterSum_zero_add_one_sq_le hK A hA
+  · exact quarticCharacterSum_add_one_sq_le hK A B hOriginal hB
+
+/-- Pushing an integer-valued function through the squaring map weights each
+field element by `1 + χ`. This is the exact finite identity behind the
+two-to-one square-class substitution in the dilation average. -/
+theorem sum_square_eq_characterWeighted
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (value : K → ℤ) :
+    (∑ u : K, value (u ^ 2)) =
+      ∑ s : K, (quadraticChar K s + 1) * value s := by
+  rw [← Fintype.sum_fiberwise' (fun u : K => u ^ 2) value]
+  apply Fintype.sum_congr
+  intro s
+  have hcard :
+      (Fintype.card {u : K // u ^ 2 = s} : ℤ) = quadraticChar K s + 1 := by
+    calc
+      (Fintype.card {u : K // u ^ 2 = s} : ℤ) =
+          ((({u : K | u ^ 2 = s} : Set K).toFinset.card : ℕ) : ℤ) := by
+            rw [Set.toFinset_card]
+            exact_mod_cast Fintype.card_congr (Equiv.refl {u : K // u ^ 2 = s})
+      _ = quadraticChar K s + 1 := quadraticChar_card_sqrts hK s
+  simp only [Finset.sum_const, nsmul_eq_mul]
+  rw [Finset.card_univ]
+  exact congrArg (fun count : ℤ => count * value s) hcard
+
+/-- Inversion is a permutation of the nonzero field elements. -/
+def nonzeroInvEquiv
+    {K : Type*} [Field K] : NonzeroField K ≃ NonzeroField K where
+  toFun x := ⟨x.1⁻¹, inv_ne_zero x.2⟩
+  invFun x := ⟨x.1⁻¹, inv_ne_zero x.2⟩
+  left_inv x := by
+    apply Subtype.ext
+    exact inv_inv x.1
+  right_inv x := by
+    apply Subtype.ext
+    exact inv_inv x.1
+
+/-- Removing the zero term and reindexing by inversion gives the exact
+nonzero inverse-square identity used by the dilation family. -/
+theorem sum_nonzero_inverseSquare_eq_characterWeighted
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (value : K → ℤ) :
+    (∑ u : NonzeroField K, value (u.1⁻¹ ^ 2)) =
+      ∑ s : NonzeroField K,
+        (quadraticChar K s.1 + 1) * value s.1 := by
+  have hfull := sum_square_eq_characterWeighted hK value
+  have hleft := Fintype.sum_eq_add_sum_subtype_ne
+    (fun u : K => value (u ^ 2)) 0
+  have hright := Fintype.sum_eq_add_sum_subtype_ne
+    (fun s : K => (quadraticChar K s + 1) * value s) 0
+  have hzero : (quadraticChar K (0 : K) + 1) * value 0 = value 0 := by
+    rw [quadraticChar_zero]
+    ring
+  rw [hleft, hright, hzero] at hfull
+  have hsquare :
+      (∑ u : NonzeroField K, value (u.1 ^ 2)) =
+        ∑ s : NonzeroField K,
+          (quadraticChar K s.1 + 1) * value s.1 := by
+    simpa using hfull
+  let e : NonzeroField K ≃ NonzeroField K := nonzeroInvEquiv
+  calc
+    (∑ u : NonzeroField K, value (u.1⁻¹ ^ 2)) =
+        ∑ u : NonzeroField K, value ((e u).1 ^ 2) := by rfl
+    _ = ∑ u : NonzeroField K, value (u.1 ^ 2) :=
+      Equiv.sum_comp e (fun u : NonzeroField K => value (u.1 ^ 2))
+    _ = _ := hsquare
+
+/-- The first complete cubic sum with its zero argument removed. -/
+def cubicNonzeroCharacterSum
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (A B : K) : ℤ :=
+  ∑ x : NonzeroField K, quadraticChar K (x.1 ^ 3 + A * x.1 + B)
+
+/-- Removing the zero argument from the cubic sum costs exactly `χ(B)`. -/
+theorem shortCubicCharacterSum_eq_zero_add_nonzero
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (A B : K) :
+    shortCubicCharacterSum 0 A B =
+      quadraticChar K B + cubicNonzeroCharacterSum A B := by
+  have hsplit := Fintype.sum_eq_add_sum_subtype_ne
+    (fun x : K => quadraticChar K (x ^ 3 + 0 * x ^ 2 + A * x + B)) 0
+  rw [shortCubicCharacterSum, hsplit, cubicNonzeroCharacterSum]
+  congr 1
+  · congr 1
+    ring
+  · apply Fintype.sum_congr
+    intro x
+    congr 1
+    ring
+
+/-- Atlas Hasse in the exact shifted form needed after excluding `x=0`. -/
+theorem cubicNonzeroCharacterSum_add_zero_sq_le
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A B : K)
+    [(shortCharacterCurve 0 A B).IsElliptic] :
+    (cubicNonzeroCharacterSum A B + quadraticChar K B) ^ 2 ≤
+      4 * (Fintype.card K : ℤ) := by
+  rw [add_comm, ← shortCubicCharacterSum_eq_zero_add_nonzero A B]
+  exact shortCubicCharacterSum_sq_le hK 0 A B
+
+/-- Multiplication by a nonzero scalar permutes the nonzero field elements. -/
+def nonzeroScaleEquiv
+    {K : Type*} [Field K] (t : K) (ht : t ≠ 0) :
+    NonzeroField K ≃ NonzeroField K where
+  toFun x := ⟨t * x.1, mul_ne_zero ht x.2⟩
+  invFun x := ⟨x.1 / t, div_ne_zero x.2 ht⟩
+  left_inv x := by
+    apply Subtype.ext
+    dsimp
+    field_simp [ht]
+  right_inv x := by
+    apply Subtype.ext
+    dsimp
+    field_simp [ht]
+
+/-- Total quadratic-character contribution of one nonzero abscissa across all
+inverse-square dilations. -/
+def dilationCharacterTotal
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (A B t : K) : ℤ :=
+  ∑ u : NonzeroField K,
+    quadraticChar K
+      ((t * u.1⁻¹ ^ 2) ^ 3 + A * (t * u.1⁻¹ ^ 2) + B)
+
+/-- Exact source identity for the first moment: the dilation total at `t` is
+the nonzero cubic sum plus `χ(t)` times the nonzero quartic sum. -/
+theorem dilationCharacterTotal_eq_cubic_add_quartic
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A B t : K) (ht : t ≠ 0) :
+    dilationCharacterTotal A B t =
+      cubicNonzeroCharacterSum A B +
+        quadraticChar K t * quarticCharacterSum A B := by
+  let value : K → ℤ := fun s =>
+    quadraticChar K ((t * s) ^ 3 + A * (t * s) + B)
+  have hsquare := sum_nonzero_inverseSquare_eq_characterWeighted hK value
+  have hdilation : dilationCharacterTotal A B t =
+      ∑ s : NonzeroField K,
+        (quadraticChar K s.1 + 1) * value s.1 := by
+    rw [dilationCharacterTotal]
+    exact hsquare
+  have hcubic : (∑ s : NonzeroField K, value s.1) =
+      cubicNonzeroCharacterSum A B := by
+    let e := nonzeroScaleEquiv t ht
+    simpa [value, cubicNonzeroCharacterSum, e, nonzeroScaleEquiv] using
+      (Equiv.sum_comp e
+        (fun x : NonzeroField K =>
+          quadraticChar K (x.1 ^ 3 + A * x.1 + B)))
+  have hweightedTerm : ∀ s : NonzeroField K,
+      quadraticChar K s.1 * value s.1 =
+        quadraticChar K t *
+          quadraticChar K
+            ((t * s.1) * ((t * s.1) ^ 3 + A * (t * s.1) + B)) := by
+    intro s
+    dsimp [value]
+    rw [map_mul, map_mul]
+    have htchar : quadraticChar K t ^ 2 = 1 := quadraticChar_sq_one ht
+    calc
+      quadraticChar K s.1 *
+          quadraticChar K ((t * s.1) ^ 3 + A * (t * s.1) + B) =
+        1 * (quadraticChar K s.1 *
+          quadraticChar K ((t * s.1) ^ 3 + A * (t * s.1) + B)) := by ring
+      _ = quadraticChar K t ^ 2 * (quadraticChar K s.1 *
+          quadraticChar K ((t * s.1) ^ 3 + A * (t * s.1) + B)) := by
+        rw [htchar]
+      _ = quadraticChar K t *
+          (quadraticChar K t * quadraticChar K s.1 *
+            quadraticChar K ((t * s.1) ^ 3 + A * (t * s.1) + B)) := by ring
+  have hquarticReindex :
+      (∑ s : NonzeroField K,
+        quadraticChar K
+          ((t * s.1) * ((t * s.1) ^ 3 + A * (t * s.1) + B))) =
+        quarticCharacterSum A B := by
+    let e := nonzeroScaleEquiv t ht
+    simpa [quarticCharacterSum, e, nonzeroScaleEquiv] using
+      (Equiv.sum_comp e
+        (fun x : NonzeroField K =>
+          quadraticChar K (x.1 * (x.1 ^ 3 + A * x.1 + B))))
+  rw [hdilation]
+  simp_rw [add_mul, one_mul]
+  rw [sum_add_distrib, hcubic, add_comm]
+  calc
+    cubicNonzeroCharacterSum A B +
+        ∑ s : NonzeroField K, quadraticChar K s.1 * value s.1 =
+      cubicNonzeroCharacterSum A B +
+        ∑ s : NonzeroField K,
+          quadraticChar K t * quadraticChar K
+            ((t * s.1) * ((t * s.1) ^ 3 + A * (t * s.1) + B)) := by
+        congr 1
+        exact Fintype.sum_congr _ _ hweightedTerm
+    _ = cubicNonzeroCharacterSum A B +
+        quadraticChar K t * quarticCharacterSum A B := by
+      rw [← Finset.mul_sum, hquarticReindex]
+
+/-- An integral square bound against a nonnegative radius gives the usual
+two-sided interval bound, without introducing real square roots. -/
+theorem intBounds_of_sq_le_sq (value radius : ℤ) (radiusNonnegative : 0 ≤ radius)
+    (squareBound : value ^ 2 ≤ radius ^ 2) :
+    -radius ≤ value ∧ value ≤ radius := by
+  constructor <;> nlinarith [sq_nonneg (value - radius), sq_nonneg (value + radius)]
+
+/-- The finite-field quadratic character always lies in `[-1,1]`. -/
+theorem quadraticChar_bounds
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K] (x : K) :
+    (-1 : ℤ) ≤ quadraticChar K x ∧ quadraticChar K x ≤ 1 := by
+  by_cases hx : x = 0
+  · subst x
+    rw [quadraticChar_zero]
+    omega
+  · rcases quadraticChar_dichotomy hx with h | h <;> rw [h] <;> omega
+
+/-- A radius dominating `2√|K|` gives an explicit lower bound for the exact
+character contribution of every nonzero abscissa across all dilations. -/
+theorem dilationCharacterTotal_lower
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A B t : K) (ht : t ≠ 0)
+    (hOriginal : (shortCharacterCurve 0 A B).Δ ≠ 0)
+    (radius : ℤ) (radiusNonnegative : 0 ≤ radius)
+    (radiusSquare : 4 * (Fintype.card K : ℤ) ≤ radius ^ 2) :
+    -(2 * radius + 2) ≤ dilationCharacterTotal A B t := by
+  let _ : (shortCharacterCurve 0 A B).IsElliptic :=
+    ⟨isUnit_iff_ne_zero.mpr hOriginal⟩
+  have hcubicSq := cubicNonzeroCharacterSum_add_zero_sq_le hK A B
+  have hquarticSq :=
+    quarticCharacterSum_add_one_sq_le_of_nonsingular hK A B hOriginal
+  have hcubicBounds := intBounds_of_sq_le_sq
+    (cubicNonzeroCharacterSum A B + quadraticChar K B) radius
+    radiusNonnegative (hcubicSq.trans radiusSquare)
+  have hquarticBounds := intBounds_of_sq_le_sq
+    (quarticCharacterSum A B + 1) radius radiusNonnegative
+    (hquarticSq.trans radiusSquare)
+  have hBchar := quadraticChar_bounds (K := K) B
+  have hcubicLower : -radius - 1 ≤ cubicNonzeroCharacterSum A B := by
+    linarith
+  have hweightedLower :
+      -radius - 1 ≤ quadraticChar K t * quarticCharacterSum A B := by
+    rcases quadraticChar_dichotomy ht with htchar | htchar
+    · rw [htchar, one_mul]
+      linarith
+    · rw [htchar, neg_one_mul]
+      linarith
+  rw [dilationCharacterTotal_eq_cubic_add_quartic hK A B t ht]
+  linarith
+
+/-- The actual number of `Y`-coordinates above one dilated abscissa. -/
+def dilationFiberCard
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (A B t : K) (u : NonzeroField K) : ℕ :=
+  Fintype.card {y : K // y ^ 2 =
+    (t * u.1⁻¹ ^ 2) ^ 3 + A * (t * u.1⁻¹ ^ 2) + B}
+
+/-- The signed factor-base size on one dilation, counted as the sum of all
+`Y`-fibres above the supplied abscissa set. -/
+def dilationFactorBaseSize
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (A B : K) (T : Finset K) (u : NonzeroField K) : ℕ :=
+  ∑ t ∈ T, dilationFiberCard A B t u
+
+/-- Each concrete `Y`-fibre is exactly `1 + χ(rhs)`. -/
+theorem dilationFiberCard_cast
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A B t : K) (u : NonzeroField K) :
+    (dilationFiberCard A B t u : ℤ) =
+      quadraticChar K
+        ((t * u.1⁻¹ ^ 2) ^ 3 + A * (t * u.1⁻¹ ^ 2) + B) + 1 := by
+  rw [dilationFiberCard]
+  calc
+    (Fintype.card {y : K // y ^ 2 =
+        (t * u.1⁻¹ ^ 2) ^ 3 + A * (t * u.1⁻¹ ^ 2) + B} : ℤ) =
+        ((({y : K | y ^ 2 =
+          (t * u.1⁻¹ ^ 2) ^ 3 + A * (t * u.1⁻¹ ^ 2) + B} : Set K).toFinset.card : ℕ) : ℤ) := by
+      rw [Set.toFinset_card]
+      exact_mod_cast Fintype.card_congr
+        (Equiv.refl {y : K // y ^ 2 =
+          (t * u.1⁻¹ ^ 2) ^ 3 + A * (t * u.1⁻¹ ^ 2) + B})
+    _ = _ := quadraticChar_card_sqrts hK
+      ((t * u.1⁻¹ ^ 2) ^ 3 + A * (t * u.1⁻¹ ^ 2) + B)
+
+/-- Integer form of one concrete factor-base size: one main term per
+abscissa plus the character contributions. -/
+theorem dilationFactorBaseSize_cast
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A B : K) (T : Finset K)
+    (u : NonzeroField K) :
+    (dilationFactorBaseSize A B T u : ℤ) =
+      T.card + ∑ t ∈ T, quadraticChar K
+        ((t * u.1⁻¹ ^ 2) ^ 3 + A * (t * u.1⁻¹ ^ 2) + B) := by
+  rw [dilationFactorBaseSize]
+  push_cast
+  simp_rw [dilationFiberCard_cast hK]
+  rw [Finset.sum_add_distrib]
+  simp
+  ring
+
+/-- Exact total of the concrete factor-base sizes across every nonzero
+dilation. -/
+theorem dilationFactorBaseSize_total
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A B : K) (T : Finset K) :
+    (∑ u : NonzeroField K, (dilationFactorBaseSize A B T u : ℤ)) =
+      Fintype.card (NonzeroField K) * T.card +
+        ∑ t ∈ T, dilationCharacterTotal A B t := by
+  simp_rw [dilationFactorBaseSize_cast hK A B T]
+  rw [Finset.sum_add_distrib]
+  simp only [Finset.sum_const, nsmul_eq_mul]
+  rw [Finset.sum_comm]
+  rfl
+
+/-- Summing the per-abscissa character bound gives a lower bound for the
+actual natural-valued factor-base total. -/
+theorem dilationFactorBaseSize_total_lower
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A B : K) (T : Finset K)
+    (TNonzero : ∀ t ∈ T, t ≠ 0)
+    (hOriginal : (shortCharacterCurve 0 A B).Δ ≠ 0)
+    (radius : ℤ) (radiusNonnegative : 0 ≤ radius)
+    (radiusSquare : 4 * (Fintype.card K : ℤ) ≤ radius ^ 2) :
+    (T.card : ℤ) *
+        ((Fintype.card K : ℤ) - 1 - (2 * radius + 2)) ≤
+      ∑ u : NonzeroField K, (dilationFactorBaseSize A B T u : ℤ) := by
+  have hcharacters :
+      (∑ t ∈ T, (-(2 * radius + 2) : ℤ)) ≤
+        ∑ t ∈ T, dilationCharacterTotal A B t := by
+    apply Finset.sum_le_sum
+    intro t ht
+    exact dilationCharacterTotal_lower hK A B t (TNonzero t ht)
+      hOriginal radius radiusNonnegative radiusSquare
+  have hcard :
+      (Fintype.card K : ℤ) = Fintype.card (NonzeroField K) + 1 := by
+    calc
+      (Fintype.card K : ℤ) = Fintype.card Kˣ + 1 := by
+        exact_mod_cast Fintype.card_eq_card_units_add_one K
+      _ = Fintype.card (NonzeroField K) + 1 := by
+        norm_cast
+        rw [Fintype.card_congr unitsEquivNeZero]
+  rw [dilationFactorBaseSize_total hK A B T]
+  simp only [Finset.sum_const, nsmul_eq_mul] at hcharacters
+  rw [hcard]
+  nlinarith
+
+/-- The exact `3/4` first-moment inequality consumed by
+`firstMomentForcesLargeValueSeeds`, under a division-free radius condition. -/
+theorem dilationFactorBaseFirstMoment
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A B : K) (T : Finset K)
+    (TNonzero : ∀ t ∈ T, t ≠ 0)
+    (hOriginal : (shortCharacterCurve 0 A B).Δ ≠ 0)
+    (radius : ℕ)
+    (radiusSquare : 4 * Fintype.card K ≤ radius ^ 2)
+    (density : 4 * (2 * radius + 2) ≤ Fintype.card K - 1) :
+    3 * T.card * Fintype.card (NonzeroField K) ≤
+      4 * ∑ u : NonzeroField K, dilationFactorBaseSize A B T u := by
+  have hlower := dilationFactorBaseSize_total_lower hK A B T TNonzero
+    hOriginal (radius : ℤ) (by positivity) (by exact_mod_cast radiusSquare)
+  have hcardNat :
+      Fintype.card K = Fintype.card (NonzeroField K) + 1 := by
+    calc
+      Fintype.card K = Fintype.card Kˣ + 1 :=
+        Fintype.card_eq_card_units_add_one K
+      _ = Fintype.card (NonzeroField K) + 1 := by
+        rw [Fintype.card_congr unitsEquivNeZero]
+  have hdensityInt :
+      4 * (2 * (radius : ℤ) + 2) ≤ (Fintype.card K : ℤ) - 1 := by
+    have hle : 4 * (2 * radius + 2) ≤ Fintype.card K :=
+      density.trans (Nat.sub_le _ _)
+    have hpositive : 0 < Fintype.card K := Fintype.card_pos
+    omega
+  have htargetInt :
+      3 * (T.card : ℤ) * Fintype.card (NonzeroField K) ≤
+        4 * ∑ u : NonzeroField K, (dilationFactorBaseSize A B T u : ℤ) := by
+    have hTnonnegative : (0 : ℤ) ≤ T.card := by positivity
+    have hnonzeroCardInt :
+        (Fintype.card K : ℤ) - 1 = Fintype.card (NonzeroField K) := by
+      have hcardCast :
+          (Fintype.card K : ℤ) = Fintype.card (NonzeroField K) + 1 := by
+        exact_mod_cast hcardNat
+      omega
+    rw [← hnonzeroCardInt]
+    nlinarith
+  exact_mod_cast htargetInt
+
+/-- Every quadratic `Y`-fibre has at most two points. -/
+theorem dilationFiberCard_le_two
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A B t : K) (u : NonzeroField K) :
+    dilationFiberCard A B t u ≤ 2 := by
+  have hcast := dilationFiberCard_cast hK A B t u
+  have hchar := quadraticChar_bounds (K := K)
+    ((t * u.1⁻¹ ^ 2) ^ 3 + A * (t * u.1⁻¹ ^ 2) + B)
+  exact_mod_cast (show (dilationFiberCard A B t u : ℤ) ≤ 2 by linarith)
+
+/-- Consequently a factor base over `X` supplied abscissas has at most `2X`
+signed points on every dilation. -/
+theorem dilationFactorBaseSize_le_twice
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A B : K) (T : Finset K)
+    (u : NonzeroField K) :
+    dilationFactorBaseSize A B T u ≤ 2 * T.card := by
+  rw [dilationFactorBaseSize]
+  calc
+    ∑ t ∈ T, dilationFiberCard A B t u ≤ ∑ _t ∈ T, 2 := by
+      exact Finset.sum_le_sum fun t _ => dilationFiberCard_le_two hK A B t u
+    _ = 2 * T.card := by simp [Nat.mul_comm]
+
 /-! ## First-moment coverage repair
 
 The following finite counting lemmas isolate the arithmetic in the corrected
-fixed-arity coverage argument.  The curve-specific character sum and energy
-estimates are deliberately hypotheses of the eventual specialization, not
-claims of this module.
+fixed-arity coverage argument.  The preceding declarations now discharge the
+curve-specific character-sum estimate under explicit radius hypotheses; the
+total-energy estimate remains an input to the eventual specialization.
 -/
 
 /-- If a nonnegative finite population is pointwise at most `2X` and has mean
@@ -1944,6 +2759,70 @@ theorem firstMomentForcesLargeValueSeeds
   have scaled : X * Fintype.card Seed ≤ X * (6 * high.card) := by
     nlinarith
   exact Nat.le_of_mul_le_mul_left scaled XPositive
+
+/-- Concrete first-moment coverage event for the actual finite-field
+factor-base fibres. Atlas Hasse and the elementary `B=0` conic argument supply
+the mean bound; no character-sum premise remains. -/
+theorem dilationLargeFactorBaseSeeds
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A B : K) (T : Finset K)
+    (TPositive : 0 < T.card) (TNonzero : ∀ t ∈ T, t ≠ 0)
+    (hOriginal : (shortCharacterCurve 0 A B).Δ ≠ 0)
+    (radius : ℕ)
+    (radiusSquare : 4 * Fintype.card K ≤ radius ^ 2)
+    (density : 4 * (2 * radius + 2) ≤ Fintype.card K - 1) :
+    Fintype.card (NonzeroField K) ≤
+      6 * (Finset.univ.filter fun u : NonzeroField K =>
+        T.card ≤ 2 * dilationFactorBaseSize A B T u).card := by
+  apply firstMomentForcesLargeValueSeeds
+    (fun u : NonzeroField K => dilationFactorBaseSize A B T u) T.card
+    TPositive
+  · exact dilationFactorBaseSize_le_twice hK A B T
+  · exact dilationFactorBaseFirstMoment hK A B T TNonzero hOriginal
+      radius radiusSquare density
+
+/-- Twice the successor of the natural square root is an integral radius
+whose square dominates `4q`. -/
+theorem twiceSuccSqrt_radiusSquare (q : ℕ) :
+    4 * q ≤ (2 * (Nat.sqrt q + 1)) ^ 2 := by
+  have hsqrt := Nat.succ_le_succ_sqrt' q
+  nlinarith
+
+/-- From `q ≥ 324`, the same explicit radius satisfies the density inequality
+required by the `3/4` first moment. -/
+theorem twiceSuccSqrt_density (q : ℕ) (fieldLarge : 324 ≤ q) :
+    4 * (2 * (2 * (Nat.sqrt q + 1)) + 2) ≤ q - 1 := by
+  let s := Nat.sqrt q
+  have hsLower : 18 ≤ s := by
+    rw [Nat.le_sqrt']
+    exact fieldLarge
+  have hsSquare : s ^ 2 ≤ q := Nat.sqrt_le' q
+  have hleft : (0 : ℤ) ≤ (s : ℤ) - 18 := by omega
+  have hright : (0 : ℤ) ≤ (s : ℤ) + 2 := by positivity
+  have hproduct := mul_nonneg hleft hright
+  have htargetInt : (16 : ℤ) * s + 25 ≤ q := by
+    have hsSquareInt : (s : ℤ) ^ 2 ≤ q := by
+      exact_mod_cast hsSquare
+    nlinarith
+  have htargetNat : 16 * s + 25 ≤ q := by
+    exact_mod_cast htargetInt
+  dsimp [s] at htargetNat
+  omega
+
+/-- Clean field-size specialization of the concrete first-moment event. -/
+theorem dilationLargeFactorBaseSeeds_of_card_ge_324
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A B : K) (T : Finset K)
+    (TPositive : 0 < T.card) (TNonzero : ∀ t ∈ T, t ≠ 0)
+    (hOriginal : (shortCharacterCurve 0 A B).Δ ≠ 0)
+    (fieldLarge : 324 ≤ Fintype.card K) :
+    Fintype.card (NonzeroField K) ≤
+      6 * (Finset.univ.filter fun u : NonzeroField K =>
+        T.card ≤ 2 * dilationFactorBaseSize A B T u).card := by
+  apply dilationLargeFactorBaseSeeds hK A B T TPositive TNonzero hOriginal
+    (2 * (Nat.sqrt (Fintype.card K) + 1))
+  · exact twiceSuccSqrt_radiusSquare (Fintype.card K)
+  · exact twiceSuccSqrt_density (Fintype.card K) fieldLarge
 
 /-- Finite Markov specialization at factor twelve. If total energy is at most
 `meanBound` times the population size, at most one twelfth of the seeds have
@@ -1996,6 +2875,31 @@ theorem firstMomentAndEnergyGiveOneTwelfthGoodSeeds
         (Finset.univ.filter fun seed => 12 * meanBound ≤ energy seed)).card := by
   apply oneSixthEventSurvivesOneTwelfthBadSet
   · exact firstMomentForcesLargeValueSeeds value X XPositive valueUpper valueTotalLower
+  · exact twelveMarkovBadSetBound energy meanBound meanPositive energyTotalUpper
+
+/-- Concrete one-twelfth coverage endpoint for the dilated short-curve factor
+bases.  For odd finite fields of cardinality at least `324`, the character-sum
+and first-moment inputs have been discharged.  The only remaining premise is
+the displayed total-energy estimate for the caller-supplied natural-valued
+energy function. -/
+theorem dilationAndEnergyGiveOneTwelfthGoodSeeds_of_card_ge_324
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A B : K) (T : Finset K)
+    (TPositive : 0 < T.card) (TNonzero : ∀ t ∈ T, t ≠ 0)
+    (hOriginal : (shortCharacterCurve 0 A B).Δ ≠ 0)
+    (fieldLarge : 324 ≤ Fintype.card K)
+    (energy : NonzeroField K → ℕ) (meanBound : ℕ)
+    (meanPositive : 0 < meanBound)
+    (energyTotalUpper :
+      (∑ u, energy u) ≤ meanBound * Fintype.card (NonzeroField K)) :
+    Fintype.card (NonzeroField K) ≤ 12 *
+      ((Finset.univ.filter fun u : NonzeroField K =>
+          T.card ≤ 2 * dilationFactorBaseSize A B T u) \
+        (Finset.univ.filter fun u : NonzeroField K =>
+          12 * meanBound ≤ energy u)).card := by
+  apply oneSixthEventSurvivesOneTwelfthBadSet
+  · exact dilationLargeFactorBaseSeeds_of_card_ge_324 hK A B T TPositive
+      TNonzero hOriginal fieldLarge
   · exact twelveMarkovBadSetBound energy meanBound meanPositive energyTotalUpper
 
 /-! ## Planted-diagonal bad shifts
