@@ -1,0 +1,59 @@
+name: Prime31 RR9 exterior-4 public-only algebraic B4 falsifier
+on:
+  push:
+    branches:
+      - automation/prime31-wedge4-public-algebraic-20261119
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_exterior4.rs
+      - research/prime31_ic_20261115/native/verify_prime31_rr9_exterior4.py
+      - research/prime31_ic_20261115/rr9/RR9_EXTERIOR4_PUBLIC_PROTOCOL_20261119.md
+      - .github/workflows/prime31-rr9-exterior4.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_exterior4.rs
+      - research/prime31_ic_20261115/native/verify_prime31_rr9_exterior4.py
+      - .github/workflows/prime31-rr9-exterior4.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pinned-original-prime31-exterior4:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout candidate source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout original Prime31 arithmetic pinned source
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Rust 1.100.0 exact toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only exterior-4 example onto pinned original crate
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_exterior4.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_rr9_exterior4.rs
+      - name: Original 40 Rust library regression tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Exterior-4 modular field and Laplace identity unit tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_exterior4
+      - name: Full B4 algebraic positive and natural public query
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_exterior4 > prime31-rr9-exterior4.json
+          test -s prime31-rr9-exterior4.json
+      - name: Independent Python BigInt replay and blinded grader match
+        run: python3 research/prime31_ic_20261115/native/verify_prime31_rr9_exterior4.py prime31-rr9-exterior4.json
+      - name: Preserve exact run evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-public-rr9-exterior4-evidence
+          path: prime31-rr9-exterior4.json
+          if-no-files-found: warn
+          retention-days: 30
