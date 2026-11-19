@@ -748,6 +748,37 @@ fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
             }
         }
     }
+    // Root certificates sometimes contain five or more nonzero terms
+    // separated by gaps. For these, skip zero pairs during symmetric
+    // squaring, without perturbing the dense path (or existing <=4-term
+    // specializations) for the common all-nonzero case.
+    if a.len() >= 6 && (a[1] == 0 || a[2] == 0) {
+        let mut zeros = 0;
+        for &value in a {
+            if value == 0 {
+                zeros += 1;
+                if zeros == 2 { break; }
+            }
+        }
+        if zeros == 2 {
+            let mut result = vec![0; 2 * a.len() - 1];
+            for (i, &x) in a.iter().enumerate() {
+                if x == 0 { continue; }
+                let diagonal = vmul(x, x, p);
+                let sum = result[2 * i] + diagonal;
+                result[2 * i] = if sum >= p { sum - p } else { sum };
+                for (j, &y) in a.iter().enumerate().skip(i + 1) {
+                    if y == 0 { continue; }
+                    let cross = vmul(x, y, p);
+                    let twice = cross + cross;
+                    let twice = if twice >= p { twice - p } else { twice };
+                    let sum = result[i + j] + twice;
+                    result[i + j] = if sum >= p { sum - p } else { sum };
+                }
+            }
+            return trim(result);
+        }
+    }
     let mut result = vec![0; 2 * a.len() - 1];
     for (i, &x) in a.iter().enumerate() {
         let diagonal = vmul(x, x, p);
@@ -807,69 +838,88 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
         }
         return Ok((trim(q), if carry == 0 { vec![] } else { vec![carry] }));
     }
-    // A monic binomial x^k + c (k >= 3, c != 0) only changes
-    // one remainder coefficient per quotient digit.  In particular,
-    // do not multiply and subtract the k-1 known zero coefficients.
-    if b.len() >= 4 && b[0] != 0 && *b.last().unwrap() == 1
-        && b[1..b.len() - 1].iter().all(|&x| x == 0)
-    {
-        let mut r = a.to_vec();
-        let mut q = vec![0; a.len() - b.len() + 1];
-        while !r.is_empty() && r.len() >= b.len() {
-            let shift = r.len() - b.len();
-            let c = *r.last().unwrap();
-            q[shift] = c;
-            r.pop();
-            let product = vmul(c, b[0], p);
-            let old = r[shift];
-            r[shift] = if old >= product { old - product }
-                       else { old + p - product };
-            r = trim(r);
+    // Synthetic division by a nonmonic linear divisor needs just a
+    // running remainder and no repeated temporary-polynomial trimming.
+    if b.len() == 2 {
+        let inverse = vpow(b[1], p - 2, p);
+        let mut quotient = vec![0; a.len() - 1];
+        let mut carry = *a.last().unwrap();
+        for index in (1..a.len()).rev() {
+            let coefficient = vmul(carry, inverse, p);
+            quotient[index - 1] = coefficient;
+            let product = vmul(coefficient, b[0], p);
+            let value = a[index - 1];
+            carry = if value >= product { value - product }
+                    else { value + p - product };
         }
-        return Ok((trim(q), r));
+        return Ok((trim(quotient), if carry == 0 { vec![] } else { vec![carry] }));
     }
-    let mut r = a.to_vec();
-    let mut q = vec![0; a.len() - b.len() + 1];
-    // GCD factors, X^p mod f divisors and root certificates are commonly
-    // monic. Avoid a full exponentiation to invert their leading 1.
+    // A monic sparse divisor x^k + c*x^j + d (at most one nonzero
+    // interior coefficient) changes at most two remainder positions per
+    // quotient digit. Iterate a fixed descending degree to avoid repeated
+    // trimming and to skip zero quotient digits.
+    if *b.last().unwrap() == 1 {
+        let degree = b.len() - 1;
+        let mut middle = None;
+        let mut too_many = false;
+        for (index, &value) in b[1..degree].iter().enumerate() {
+            if value != 0 {
+                if middle.is_some() {
+                    too_many = true;
+                    break;
+                }
+                middle = Some((index + 1, value));
+            }
+        }
+        if !too_many {
+            let mut remainder = a.to_vec();
+            let mut quotient = vec![0; a.len() - degree];
+            for shift in (0..quotient.len()).rev() {
+                let coefficient = remainder[shift + degree];
+                if coefficient == 0 { continue; }
+                quotient[shift] = coefficient;
+                remainder[shift + degree] = 0;
+                if b[0] != 0 {
+                    let product = vmul(coefficient, b[0], p);
+                    let old = remainder[shift];
+                    remainder[shift] = if old >= product { old - product }
+                                       else { old + p - product };
+                }
+                if let Some((index, value)) = middle {
+                    let product = vmul(coefficient, value, p);
+                    let old = remainder[shift + index];
+                    remainder[shift + index] = if old >= product { old - product }
+                                               else { old + p - product };
+                }
+            }
+            remainder.truncate(degree);
+            return Ok((trim(quotient), trim(remainder)));
+        }
+    }
+    // General long division: a descending fixed degree removes both the
+    // per-iteration pop/trim scan and multiplications by zero divisor
+    // coefficients. The top term cancels algebraically for every step.
+    let mut remainder = a.to_vec();
+    let mut quotient = vec![0; a.len() - b.len() + 1];
     let lead = *b.last().unwrap();
-    if lead == 1 {
-        // Synthetic division by a monic polynomial. The leading term
-        // cancels exactly, so neither its multiplication nor subtraction
-        // needs to be performed.
-        while !r.is_empty() && r.len() >= b.len() {
-            let shift = r.len() - b.len();
-            let c = *r.last().unwrap();
-            q[shift] = c;
-            r.pop();
-            for (i, &x) in b[..b.len() - 1].iter().enumerate() {
-                let product = vmul(c, x, p);
-                let old = r[shift + i];
-                r[shift + i] = if old >= product { old - product }
-                               else { old + p - product };
-            }
-            r = trim(r);
-        }
-    } else {
-        // Preserve the nonmonic route, including its original reduction
-        // order, rather than adding a branch to each inner iteration.
-        let inv = vpow(lead, p - 2, p);
-        while !r.is_empty() && r.len() >= b.len() {
-            let shift = r.len() - b.len();
-            let c = vmul(*r.last().unwrap(), inv, p);
-            q[shift] = c;
-            // c*lead cancels the top term exactly, even for nonmonic b.
-            r.pop();
-            for (i, &x) in b[..b.len() - 1].iter().enumerate() {
-                let product = vmul(c, x, p);
-                let old = r[shift + i];
-                r[shift + i] = if old >= product { old - product }
-                               else { old + p - product };
-            }
-            r = trim(r);
+    let inverse = if lead == 1 { 1 } else { vpow(lead, p - 2, p) };
+    for shift in (0..quotient.len()).rev() {
+        let highest = remainder[shift + b.len() - 1];
+        if highest == 0 { continue; }
+        let coefficient = if lead == 1 { highest } else { vmul(highest, inverse, p) };
+        quotient[shift] = coefficient;
+        remainder[shift + b.len() - 1] = 0;
+        for (index, &value) in b[..b.len() - 1].iter().enumerate() {
+            if value == 0 { continue; }
+            let product = vmul(coefficient, value, p);
+            let old = remainder[shift + index];
+            remainder[shift + index] = if old >= product { old - product }
+                                       else { old + p - product };
         }
     }
-    Ok((trim(q), r))
+    remainder.truncate(b.len() - 1);
+    Ok((trim(quotient), trim(remainder)))
+}
 }
 fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, String> {
     let mut r = vdiv(&[1], m, p)?.1;
