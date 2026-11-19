@@ -13,7 +13,9 @@ follow-ups here; history belongs in the session log, not in this file.
 
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
-## Active items (top = next)
+## Active items
+- [ ] Prime31 target-coupled transformed-slot S3 chain (14-variable degree-8 and 7-variable resultant variants), independent controls and original Rust CI (automation, started 2026-11-19, branch automation/prime31-horner-xy-chain-20261119, PR #4812; extraction remains #4692)
+ (top = next)
 - [x] Prove weighted Prime31 W8 slot-root resultant membership exactness and validate transformed-slot disjointness in original Rust (automation, started/completed 2026-11-19, branch automation/prime31-horner-xy-chain-20261119, PR #4812; 512/512 producer + independent Python replay, source CI #44619747239 PASS; target-conditioned public-only extraction still owned by #4692)
 - [x] Derive and source-verify Prime31 Horner rational elimination 21->14 variables, with original Rust + independent BigInt controls (automation, started/completed 2026-11-19, branch automation/prime31-horner-xy-chain-20261119, PR #4812; source CI #44587413473/#44587425573 PASS; public-only F4 extraction remains #4692's separate open gate)
 - [x] Validate x-only signed Horner/F3 chain and sign lifting on ordinary Prime31 (automation, started 2026-11-19, branch automation/prime31-horner-xy-chain-20261119, PR #4812; 1024/1024 original-Rust and independent replay PASS; public-only F4 and signed PCC remain separate)
