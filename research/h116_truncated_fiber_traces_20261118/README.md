@@ -548,3 +548,17 @@ leaves the full cocycle multiset unchanged and that selecting the fixed point
 forces zero; the 224-theorem audit has no failures or trusted decisions.  The
 next lead tests the first p-adic carry of a canonical lift, with anomalous
 Smart quotient as a positive control. [pcc:unverified]
+
+The p-adic carry route is already represented by the repository's
+non-anomalous formal-log experiment, so the next distinct frozen
+[genus-three trace test](GENUS3_TRACE_PARITY_EXPERIMENT.md) instead evaluates
+fixed-genus Frobenius-trace bits, which are theoretically polynomial-time
+computable by the Schoof--Pila framework.  All algebraic and planted controls
+pass, but the retained rule is exactly 760/1,520 and family-wise `p=1`.
+Moreover, `Q -> -Q` multiplies the defining character sum only by
+`chi(-1)=+/-1`, so every trace parity is negation-invariant.  The Lean
+obstruction composes this fact with the opposite parity of `k` and `r-k` in
+an odd-order subgroup.  It rules out every deterministic decoder from this
+entire mod-two trace family, not only the 512 measured affine rules.  The next
+lead changes to an odd trace modulus, where the twist sign remains visible.
+[pcc:unverified]

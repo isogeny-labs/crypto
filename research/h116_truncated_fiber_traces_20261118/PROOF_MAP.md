@@ -146,6 +146,41 @@ for the full identity.  Thus the certificate carries eleven coefficients
 last two are derivative guards, not decoded moments.
 [pcc:unverified]
 
+## Genus-three signed-twist trace-parity obstruction gate
+
+This section was written after the frozen native result exposed exact pair
+balance and before adding the corresponding Lean declarations.
+
+1. **Structure above.**  The geometric calculation supplies integers `t` and
+   `S(Q)` with `S(-Q)=epsilon(Q)*S(Q)`, where `epsilon(Q)` is either `1` or
+   `-1`.  Lean formalizes only this exact arithmetic interface; it does not
+   pretend to construct the genus-three curve or its character sum.
+2. **Theorems used as stated.**  Integer remainder arithmetic is discharged by
+   `omega`.  Pair failure reuses the already-audited local theorem
+   `negInvariant_binaryDecoder_pair_failure`.
+3. **Object as an instance.**  The observable is the integer remainder
+   `(t-S(Q)) % 2`.  The native change of variables `R -> -R` establishes the
+   supplied signed-twist premise for the concrete cover.
+4. **Assembly probe.**  The intended arithmetic statement is that
+   `t-epsilon*S` and `t-S` have equal residues modulo two for
+   `epsilon in {1,-1}`.  The proof splits the two signs and uses only integer
+   arithmetic.  A modulus-three mutation is retained to demonstrate that the
+   modulus-two conclusion cannot be generalized to every modulus.
+5. **Missing components only.**  Smoothness, genus, the character-sum trace
+   formula, and `S(-y0)=chi(-1)S(y0)` remain native checked mathematics and
+   paper derivations.  The theorem proves the exact obstruction conditional on
+   that explicit interface; it makes no point-counting runtime claim.
+6. **Inheritance table.**
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| sign twists preserve an integer trace modulo two | generic arithmetic law | H116 Lean module | integers | sign is `1` or `-1` |
+| signed-twist trace parity is negation-invariant | generic composition law | H116 Lean module | additive commutative group, integer sum observable | supplied signed-twist identity |
+| no exact scalar-parity decoder exists on paired odd orbits | instance obstruction | H116 Lean module | odd-order killed orbit | signed-twist identity and ordinary orbit premises |
+| sign twists need not preserve residue modulo three | mutation control | H116 Lean module | concrete integers | none |
+
+[pcc:unverified]
+
 This gate discharges only fixed-size verification.  Constructing those eleven
 correct coefficients from a generic prime-field isogeny, proving that they
 represent the intended kernel quotient, and bounding that construction below

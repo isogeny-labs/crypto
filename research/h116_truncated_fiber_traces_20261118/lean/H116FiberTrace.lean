@@ -424,6 +424,50 @@ does not reverse the parity of the paired indices one and three. -/
 theorem evenOrder_parityMutation_control : (4 - 1) % 2 = 1 % 2 := by
   norm_num
 
+/-- Multiplying an integer character sum by either quadratic-twist sign does
+not change the resulting trace modulo two.  This is the arithmetic core of
+the genus-three cover-trace obstruction. -/
+theorem signedTwist_traceParity_invariant (trace sum epsilon : ℤ)
+    (hepsilon : epsilon = 1 ∨ epsilon = -1) :
+    (trace - epsilon * sum) % 2 = (trace - sum) % 2 := by
+  rcases hepsilon with rfl | rfl <;> omega
+
+/-- A sum that changes under point negation only by a sign has
+negation-invariant trace parity.  The concrete genus-three character sum
+supplies `epsilon = chi(-1)`. -/
+theorem signedTwist_traceParity_negInvariant
+    {G : Type*} [AddCommGroup G]
+    (trace : ℤ) (sum : G → ℤ) (epsilon : G → ℤ)
+    (hepsilon : ∀ Q, epsilon Q = 1 ∨ epsilon Q = -1)
+    (htwist : ∀ Q, sum (-Q) = epsilon Q * sum Q) :
+    ∀ Q, (trace - sum (-Q)) % 2 = (trace - sum Q) % 2 := by
+  intro Q
+  rw [htwist Q]
+  exact signedTwist_traceParity_invariant trace (sum Q) (epsilon Q) (hepsilon Q)
+
+/-- Consequently, no deterministic decoder of signed-twist trace parity can
+recover scalar parity on both members of an odd-order paired orbit. -/
+theorem signedTwist_traceParity_decoder_pair_failure
+    {G : Type*} [AddCommGroup G]
+    (P : G) (n k : ℕ) (trace : ℤ) (sum : G → ℤ) (epsilon : G → ℤ)
+    (decode : ℤ → ℕ)
+    (hn : n % 2 = 1) (hk : k ≤ n) (hnP : n • P = 0)
+    (hepsilon : ∀ Q, epsilon Q = 1 ∨ epsilon Q = -1)
+    (htwist : ∀ Q, sum (-Q) = epsilon Q * sum Q) :
+    decode ((trace - sum (k • P)) % 2) ≠ k % 2 ∨
+      decode ((trace - sum ((n - k) • P)) % 2) ≠ (n - k) % 2 := by
+  let observable : G → ℤ := fun Q => (trace - sum Q) % 2
+  apply negInvariant_binaryDecoder_pair_failure P n k observable decode hn hk hnP
+  intro Q
+  dsimp only [observable]
+  exact signedTwist_traceParity_negInvariant trace sum epsilon hepsilon htwist Q
+
+/-- Mutation control: unlike parity, an odd residue can distinguish the two
+twist signs.  This is why the next experiment moves to modulus three. -/
+theorem oddModulus_signedTwistMutation_control :
+    ((0 : ℤ) - (-1) * 1) % 3 ≠ ((0 : ℤ) - 1) % 3 := by
+  norm_num
+
 /-- The shared normalized at-infinity series before subtracting the target
 coordinate. Under the remaining geometric bridge it represents `S(x)/x` at
 `w=1/x`. -/
@@ -4830,6 +4874,10 @@ theorem fixedPoint_frobeniusCocycle_zero
 #print axioms orbit_sub_eq_neg
 #print axioms negInvariant_binaryDecoder_pair_failure
 #print axioms evenOrder_parityMutation_control
+#print axioms signedTwist_traceParity_invariant
+#print axioms signedTwist_traceParity_negInvariant
+#print axioms signedTwist_traceParity_decoder_pair_failure
+#print axioms oddModulus_signedTwistMutation_control
 #print axioms fiberDenominatorSeries_eq_normalizedMap_sub_linear
 #print axioms fiberDenominatorSeries_sub
 #print axioms bostanDenominatorsNonzero

@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-3c9d1cb6d2a80e9427340ead3a5aab9421270eb3c3a8ec6b9edbe74f97dda434  H116FiberTrace.lean
+325c58f4d1f5e1860214f2dd4fcd9a8f08dc05e22085834130b21847af59954f  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  224 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  228 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -112,6 +112,8 @@ ef592d2dd12b3d0310ff9033bb2993d5878ac904ee662c8382ecd68b964512f6  receipts/kumme
 11c05abc769c4c504f62feba348545ac6860ef49b1815922ab5882e1d38bc147  receipts/kummer-parity-obstruction-audit.txt
 328a4a8605bdcfad301e811912c4edaef1cc91602cf9d128b2e282398ecd0dd8  receipts/division-torsor-cocycle-build.txt
 5627e74bd114ce1566597d258e9039a7f36965c25daf49aaa15b116fa315a572  receipts/division-torsor-cocycle-audit.txt
+3fde375485dc1275d81077833314cf766e0af381e4d52706ba3e8846a33dec08  receipts/genus3-trace-parity-build.txt
+d2d57acd1964aaed2dde36dc316cc35e58a836b85de0eda77e85ae67fba27c4e  receipts/genus3-trace-parity-audit.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -515,3 +517,15 @@ is necessary. The theorem covers every x-only observable, not only the 184
 tested covers; y-sensitive and nonsymmetric observables remain outside its
 scope. The pinned 3,164-job build passes and the exact auditor reports 219
 theorems, zero failures and zero trusted/native decisions. [pcc:unverified]
+
+The 228-theorem checkpoint explains the exact half accuracy of the frozen
+genus-three trace-parity experiment. Lean proves that multiplying an integer
+character sum by either quadratic-twist sign cannot change the resulting
+trace modulo two, lifts this to a negation-invariant group observable, and
+composes it with the existing odd-order orbit-pair theorem. Thus every
+deterministic decoder of the complete trace-parity vector fails on one of
+`kP,-kP`; the result is not limited to the 512 measured affine rules. A
+modulus-three mutation confirms that odd residues escape this particular
+obstruction. The pinned 3,164-job build passes and the exact auditor reports
+228 theorems, zero failures and zero trusted/native decisions.
+[pcc:unverified]
