@@ -9,20 +9,26 @@ on:
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'src/lib.rs'
+      - 'src/build_provenance.rs'
+      - 'src/ct_bignum.rs'
       - 'src/bin/curve_standards.rs'
       - 'src/bin/curve_standards/**'
       - 'src/bin/curve_cover_check.rs'
       - 'src/bin/curve_cover_check/**'
       - 'src/bin/hyperelliptic_cover.rs'
       - 'src/bin/curve_transfer_sweep.rs'
+      - 'src/bin/odd_transfer_catalog.rs'
+      - 'src/bin/odd_extension_transfer_pilot.rs'
       - 'tests/binary_cover_transfer_oracle.rs'
       - 'tests/prime_cover_transfer_oracle.rs'
+      - 'tests/prime_montgomery_transfer_adapter.rs'
       - 'examples/cover_catalog_transition_audit.rs'
       - 'src/bin/ecdlp_audit.rs'
       - 'src/bin/ecdlp_audit/**'
       - 'src/binary_ecc/**'
       - 'src/prime_hyperelliptic/**'
       - 'src/cryptanalysis/ecc2k130_guard.rs'
+      - 'src/cryptanalysis/bitops.rs'
       - 'src/cryptanalysis/mod.rs'
       - 'src/hash/mod.rs'
       - 'src/hash/sha256.rs'
@@ -46,6 +52,8 @@ on:
       - 'problems/catalog-cover-subgroup-certificates-incomplete.md'
       - 'research/hyperelliptic_cover_infrastructure_20261006/evidence.json'
       - 'research/hyperelliptic_cover_infrastructure_20261006/README.md'
+      - 'research/curve_transfer_infrastructure_20261118/fixed-f8-source-law-assessment.draft.json'
+      - 'research/chained_jacobian_transfers_20261110/lean/ChainTransfer.lean'
       - '.github/workflows/curve-covers.yml'
       - '.github/workflows/release.yml'
   workflow_dispatch:
@@ -130,7 +138,6 @@ jobs:
           cargo test --lib binary_ecc::cover_transfer::tests
           cargo test --bin hyperelliptic-cover
           cargo test --bin curve-transfer-sweep
-          cargo test --test binary_cover_transfer_oracle
           cargo test --test binary_cover_transfer_f2_source_oracle
           cargo test --test prime_cover_transfer_oracle
           cargo run --bin hyperelliptic-cover -- transfer-catalog-verify \
@@ -140,6 +147,49 @@ jobs:
             --traits docs/curves/traits.json \
             --expected-sha256 8c61e842945bf1e9ad8dd3adf326c6c11e55bb97018659b2abf40a5b15256941 \
             --expected-bytes 500925
+      - name: Optimized independent oracles and odd-transfer catalog controls
+        run: |
+          odd_corpus_sha256="7c60fc122c73abbe7b0df1413d24abbb064a9842bb35c2da8248d30c87f65670"
+          odd_corpus_bytes="17879352"
+          actual_odd_sha256="$(sha256sum docs/curves/odd-subgroup-transfer-certificates.json | awk '{print $1}')"
+          actual_odd_bytes="$(wc -c < docs/curves/odd-subgroup-transfer-certificates.json)"
+          test "$actual_odd_sha256" = "$odd_corpus_sha256"
+          test "$actual_odd_bytes" = "$odd_corpus_bytes"
+          cargo test --release --bin odd-transfer-catalog -- --test-threads=1
+          cargo test --release --bin odd_extension_transfer_pilot -- --test-threads=1
+          cargo test --release --test prime_montgomery_transfer_adapter -- --test-threads=1
+          cargo test --release --test binary_cover_transfer_oracle -- --nocapture --test-threads=1
+          set +e
+          cargo run --release --bin odd-transfer-catalog -- verify \
+            --input docs/curves/odd-subgroup-transfer-certificates.json \
+            --registry docs/curves/registry.json \
+            --cover-graph docs/curves/cover-links.yaml \
+            --expected-sha256 "$odd_corpus_sha256" \
+            --expected-bytes "$odd_corpus_bytes" \
+            --output "$RUNNER_TEMP/odd-subgroup-transfer-replay.json"
+          odd_verify_code=$?
+          set -e
+          test "$odd_verify_code" -eq 1
+          jq -e --arg sha "$odd_corpus_sha256" --argjson bytes "$odd_corpus_bytes" '
+            .status == "verified_named_subgroup_incomplete" and
+            .checks.canonical_bytes_equal == true and
+            .checks.optional_raw_hash_and_size == true and
+            .checks.all_named_subgroup_records_supported == false and
+            .corpus.sha256 == $sha and
+            .corpus.bytes == $bytes
+          ' "$RUNNER_TEMP/odd-subgroup-transfer-replay.json" >/dev/null
+          cargo run --release --bin odd-transfer-catalog -- verify-source \
+            --input docs/curves/odd-subgroup-transfer-certificates.json \
+            --repo-root . \
+            --output "$RUNNER_TEMP/odd-subgroup-transfer-source-replay.json"
+          producer_commit="$(jq -r .producer.git_commit docs/curves/odd-subgroup-transfer-certificates.json)"
+          producer_source="$(jq -r .producer.source_sha256 docs/curves/odd-subgroup-transfer-certificates.json)"
+          jq -e --arg commit "$producer_commit" --arg source "$producer_source" '
+            .status == "source_manifest_bound_to_recorded_git_tree" and
+            .producer_commit == $commit and
+            .source_sha256 == $source and
+            ([.checks[]] | all(. == true))
+          ' "$RUNNER_TEMP/odd-subgroup-transfer-source-replay.json" >/dev/null
       - name: Replay the native audit plan and fixed-F8 order certificate
         run: |
           cargo test --bin ecdlp-audit
@@ -244,6 +294,7 @@ jobs:
         run: |
           python -m jsonschema -i docs/curves/cover-transfer-assessments.json docs/curves/cover-transfer-assessment.schema.json
           python -m jsonschema -i docs/curves/binary-subgroup-transfer-certificates.json docs/curves/binary-subgroup-transfer-certificates.schema.json
+          python -m jsonschema -i docs/curves/odd-subgroup-transfer-certificates.json docs/curves/odd-subgroup-transfer-certificates.schema.json
       - name: Install native PDF metadata reader
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends poppler-utils
       - name: Verify typed map, subgroup, and evidence bindings

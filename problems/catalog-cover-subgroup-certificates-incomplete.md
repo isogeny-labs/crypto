@@ -4,27 +4,40 @@
 - **Kind:** proof gap, implementation gap, and independent-verification gap
 - **Affected work:** all 1,090 EC1/map bindings in the [content-addressed cover graph](../docs/curves/cover-links.yaml), the [ICV1/EC1 registry](../docs/curves/registry.json), and the dated [catalog transfer assessment](../docs/curves/cover-transfer-assessments.json)
 - **Next action owner:** curve identity and transfer certification workstream (unassigned)
-- **Last updated:** 2026-11-18
+- **Last updated:** 2026-11-19
 
 ## Problem
 
-We cannot promote catalog-wide subgroup preservation, image-order, or recovery
-claims because only the exact order-29 binary fixture currently has the full
-narrow certificate. The remaining 1,089 EC1/map bindings have exact numeric
-catalog tuples but lack proof-grade, map-bound evidence for the generator's
-exact source order, kernel intersection, image order, and recovery.
+We cannot yet promote catalog-wide subgroup preservation, image-order, or
+recovery claims. The frozen binary corpus supplies typed injectivity and
+recovery checks for all 150 binary bindings; 102 also have proved exact prime
+generated order and 48 deliberately retain unknown exact order. The tracked
+odd-characteristic corpus classifies all 940 odd bindings: 675 direct
+prime-field rows have exact-prime-order named-subgroup pullback and recovery
+evidence, 233 lack an accepted primality certificate, 22 need a composed
+normalized-target backend, 9 need an extension-field Jacobian backend, and one
+catalog generator is invalid. The canonical odd corpus is now frozen to its
+clean producer commit, raw artifact hash, and framed source digest; its replay
+remains same-implementation evidence rather than an independent oracle.
+
+Thus 777 bindings currently have the narrow exact-order/map certificate in a
+passing implementation or frozen corpus, while 313 retain an exact-order,
+backend, or invalid-input obligation. The supported rows still retain their
+independent-replay obligations. Graph `subgroup_transport` fields remain
+historical `not_tested` values, and a fixed-field oracle is not a catalog-wide
+independent replay.
 
 All 1,090 declared subgroup orders are numerically coprime to their cover
 degrees: 940 degree-two bindings have odd declared order and 150 degree-three
 bindings have order not divisible by three. That calculation supplies a
 necessary conditional input, not the missing exact-order or induced-map
 certificate. The catalog-wide typed checks now present for all 150 binary
-generators exercise the bounded generator path, but they do not turn
-the other 149 binary numeric order declarations into proof-grade exact-order
-certificates. General binary arbitrary-class pushforward and the structured
-CLI now exist. A separate GF(8) map oracle covers all 486 control classes and
-236,196 ordered sums, but its source sums still come from the production
-Jacobian law and it is not a catalog-wide independent replay.
+generators exercise the bounded generator path, but the 48 unresolved numeric
+order declarations remain explicitly unknown. General binary arbitrary-class
+pushforward and the structured CLI now exist. A separate GF(8) oracle
+independently constructs all 486 control classes and checks all 114,791,256
+associativity triples and 236,196 ordered transfer pairs, but it is one fixed
+fixture rather than a catalog-wide independent replay.
 
 ## Evidence and uncertainty
 
@@ -34,8 +47,9 @@ Jacobian law and it is not a catalog-wide independent replay.
   binds each representation to its exact CV1 map, but every generated
   `subgroup_transport` value is `not_tested`. The catalog-wide integer check
   finds `gcd(2,r)=1` for all 940 degree-two bindings and `gcd(3,r)=1` for all
-  150 degree-three bindings. The existing detailed evidence supports only the
-  order-29 record on its typed point-class domain.
+  150 degree-three bindings. Exact-order evidence is currently present for 102
+  frozen binary bindings and 675 direct-prime odd bindings in the final
+  hash-bound corpus; independent replay remains open.
 - **Derived or proved:** if a subgroup really has exact order `r`, checked
   homomorphisms satisfy `phi_* phi^* = [d]` on it, and `gcd(d,r)=1`, then
   pullback is injective on that subgroup and multiplication by `d^-1 mod r`
@@ -50,9 +64,10 @@ Jacobian law and it is not a catalog-wide independent replay.
   order evidence, plus map-bound pullback image, kernel, image-order, and
   recovery certificates for every EC1 representation. The 940 prime-family
   bindings additionally depend on induced maps for the balanced Jacobian. The
-  current balanced arithmetic slice is limited to monic split sextics over
-  checked odd prime fields of at most 64 bits; it does not support extensions,
-  larger primes, or an induced cover map.
+  direct-prime backend now supplies those maps for proved prime fields in the
+  deterministic `u64` and strict `psi_13` domains. Accepted certificates for
+  wider primes, end-to-end normalized targets, extension fields, and nonsplit
+  infinity configurations remain missing.
 - **What this evidence does not establish:** missing certificates do not show
   that a selected subgroup fails to transfer. Conversely, catalog labels,
   coprimality, a conditional group-theoretic lemma, or generated point-class
@@ -61,10 +76,10 @@ Jacobian law and it is not a catalog-wide independent replay.
 
 ## What would unblock it
 
-- [ ] For each of the remaining 1,089 exact `(map_uid, EC1, curve_uid)` tuples,
-  issue a replayable source certificate: declared-field validation, generator
-  membership and nonidentity, proof-grade factor/primality evidence for `r`,
-  and exact-order checks sufficient for the actual order structure.
+- [ ] Resolve the 313 bindings still carrying an exact-order, proof-range,
+  normalized-backend, extension-backend, or invalid-input obligation, and
+  independently replay the supported 675-row odd partition rather than
+  treating canonical same-implementation replay as independent evidence.
 - [ ] Construct the exact pullback image, validate its divisor class, prove its
   image order and kernel intersection, and bind every result to the full map,
   curve, field, generator, and subgroup identities rather than to a bit size or
@@ -88,10 +103,10 @@ comparison.
 ## Next discriminating step
 
 - **Action or proof obligation:** complete proof-grade source-order evidence
-  for the 149 binary EC1 records beyond the existing order-29 control, then
-  combine it with the generated typed pullback/composition checks without
-  treating the bounded GF(8) map oracle as an independent catalog-wide source
-  group implementation.
+  for the remaining 48 binary records; independently replay the supported
+  partition of the frozen 940-row odd corpus; then address its 233 proof-range,
+  22 normalized-backend, 9 extension-backend, and 1 invalid-generator records
+  without treating the fixed GF(8) oracle as catalog-wide evidence.
 - **Inputs and controls:** use every exact binary EC1 tuple from the graph;
   retain the order-29 fixture as a positive control and include a changed
   generator, changed `r`, divisible-by-three synthetic order, duplicate/missing
@@ -100,10 +115,11 @@ comparison.
   not search for discrete logarithms. Stop a batch on the first invalid tuple
   and retain the exact failing identity and reason rather than silently
   downgrading or skipping it.
-- **Outcomes and next actions:** complete binary certificates narrow the open
-  population to the 940 prime-family bindings; a failed exact-order proof
-  leaves that tuple unknown or invalid with preserved evidence; a typed-map
-  failure blocks its transfer claim; an infrastructure failure remains a
+- **Outcomes and next actions:** resolving the 48 binary orders and obtaining
+  an independent odd-corpus replay narrows the remaining work to its explicit
+  unsupported or failed buckets; a failed exact-order proof leaves that tuple
+  unknown or invalid with preserved evidence; a typed-map failure blocks its
+  transfer claim; an infrastructure failure remains a
   tooling blocker. Prime-family work proceeds only after a compatible induced
   map exists.
 - **Recheck trigger:** new exact-order proofs, completed catalog binary
@@ -156,6 +172,39 @@ The 15,791-map assessment at commit
 new geometry rows nor the new implementation paths inherit or create a
 subgroup certificate, solver result, key recovery, or computational-advantage
 claim.
+
+## 2026-11-19: independent GF(8) law and odd binding partition
+
+The local optimized fixed-GF(8) oracle constructs all 486 source classes from
+principal divisors without production source addition, checks every group-law
+associativity triple, every ordered pushforward pair, and both composition
+identities, and only then compares with production. It supports closure of the
+circular source-addition gap for that fixture: a clean Rust 1.98 replay is
+bound to producer commit
+`e0ae0fe5d09c0492a8b50600e88d0b9da68afef1`, exact raw output, and a
+resource receipt. The companion remains a draft with no signed PCC standing;
+packaged reproduction, mutation controls, complete hardware/isolation,
+named-subgroup evidence, independent review, and the catalog-wide gap remain
+open.
+
+The tracked canonical odd corpus retains 22,243 maps and all 940 bindings in
+17,879,352 bytes with SHA-256
+`7c60fc122c73abbe7b0df1413d24abbb064a9842bb35c2da8248d30c87f65670`.
+It was generated by clean producer commit
+`e0ae0fe5d09c0492a8b50600e88d0b9da68afef1` and binds framed source digest
+`3116ef637921b9aade22bbbaa0bd5f3eaaa798e6d7517474dab912a9dc8c2768`.
+Its exact partition is 675 supported direct, 233 unsupported without an
+accepted primality certificate, 0 kernel-intersection unsupported, 22
+unsupported normalized-target, 9 unsupported extension-field, 1 failed
+invalid target generator, 0 other invalid, and 0 transfer-arithmetic failures.
+External Draft 2020-12 schema validation passed. Canonical
+same-implementation replay exits `1` with
+`verified_named_subgroup_incomplete`; repository source replay binds all 27
+source files and the local unsigned conditional Lean artifact to the producer
+tree and exits `0`. The Rust compiler label remains caller-supplied and
+unverified. Installed-package replay and independent corpus replay remain
+open, so this result does not rewrite graph or historical-ledger statuses and
+establishes no solver or advantage claim. [pcc:unverified]
 
 ## Resolution and history
 

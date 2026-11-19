@@ -4,14 +4,15 @@
 the repository implements for one exact elliptic model. It is a construction
 and evidence-inventory tool, not a discrete-log solver.
 
-The executable supports two families:
+The request schema supports two integrated families:
 
 - `binary_cubic_pullback_v1`, the fixed genus-three degree-three cover in
   characteristic two;
 - `prime_quadratic_pullback_v1`, the genus-two degree-two cover
   `x = u^2 + c`, swept over an explicitly bounded interval of prime-subfield
-  shifts `c`. This includes direct short-Weierstrass targets and the existing
-  checked Montgomery/Edwards normalization route.
+  shifts `c`. Geometry construction also retains a target-model normalization
+  when the catalog supplies one, but the induced-map backend currently accepts
+  only direct short-Weierstrass targets.
 
 It does not search arbitrary rational functions, unimplemented Xarles
 families, isogenies, correspondences, non-hyperelliptic curves, or all curves
@@ -19,6 +20,30 @@ of a genus. “Exhaustive” in an output means only every parameter point in th
 declared finite family/shift bounds was checked. Zero candidates means no
 candidate passed the family checker in that search space; it is not evidence
 that no cover exists.
+
+## Capability inventory
+
+The machine-readable inventory distinguishes integrated sweep requests from
+other bounded constructors and searches in the repository:
+
+```sh
+curve-transfer-sweep capabilities --output capabilities.json
+```
+
+The `curve-transfer-sweep-capabilities/v1` result contains six rows. Only
+`binary_cubic_pullback_v1` and `prime_quadratic_pullback_v1` are accepted by
+the `sweep` request schema. The other four rows are routing records:
+
+- the bounded genus-two bielliptic atlas and chained-transfer backend;
+- the selected genus-three hyperelliptic constructor;
+- the genus-three non-hyperelliptic plane-quartic diagnostic; and
+- the bounded small-`F_2` characteristic-polynomial factor search.
+
+The quartic row explicitly reports an elliptic norm projection without a full
+quartic Jacobian group. The small-`F_2` row is a candidate filter and constructs
+no induced map. Neither is promoted to an implemented transfer or solver. The
+inventory also records that an empty bounded search is not a nonexistence
+proof.
 
 ## Sweep
 
@@ -101,6 +126,16 @@ A changed registry, coefficient, bound, attempt disposition, certificate, or
 status makes replay fail. A matching replay reports the SHA-256 of the compact
 JSON result value and its candidate count; it does not add an independent
 arithmetic implementation or establish a computational advantage.
+
+Catalog-wide odd-map disposition is recorded separately in the canonical
+`odd-transfer-catalog` corpus, not inferred from a sweep result. That tracked
+17,879,352-byte artifact (SHA-256
+`7c60fc122c73abbe7b0df1413d24abbb064a9842bb35c2da8248d30c87f65670`)
+retains all 22,243 odd maps and 940 named bindings, including its 675 supported
+records and every typed unsupported or failed record. Its source-bound replay
+does not turn this bounded family sweeper into a complete cover search,
+independent Jacobian oracle, relation solver, or advantage result.
+[pcc:unverified]
 
 Exit code `0` is a successful sweep or replay. Invalid input, an unresolved or
 ambiguous identity, an over-budget finite search, and replay disagreement use

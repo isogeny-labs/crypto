@@ -46,12 +46,15 @@ are:
 ```
 
 The source capabilities documented here are active-branch work. The release
-workflow is being extended to package `hyperelliptic-cover` and
+workflow is configured to package `hyperelliptic-cover` and
 `curve-transfer-sweep` and to smoke-test transfer, malformed-input, and bounded
-sweep requests, but no package containing this revision has been published.
-Do not attribute these commands to an older published archive. A fresh
-artifact digest, installed-layout replay, and direct replay of the complete
-live registry remain open release obligations.
+sweep requests. Workflow configuration is not package evidence. A historical
+installed-layout replay exists for a retention-bound artifact built from
+crypto revision `74752a1e`; it is neither stable publication nor a package of
+the current implementation revision. Do not attribute current commands to an
+older published archive. A fresh current-head artifact digest, stable
+publication, installed-layout replay, and direct replay of the complete live
+registry remain open release obligations.
 
 At the 2026-11-18 source snapshot, the regenerated geometry graph covers all
 22,417 registry models with 22,417 maps and 22,415 distinct cover models. Its
@@ -485,11 +488,25 @@ The result explicitly compares the pushforward with `[2]` of the input. The
 source-side composition takes a balanced `divisor` and compares the pullback
 of its image with the input plus its deck transform. Direct prime-field
 transfer rejects extension models and moduli outside the strict deterministic
-proof range with a structured `unsupported` response. Geometry construction over an extension
-field remains supported separately; transfer support is not inferred from
-that construction. Montgomery and Edwards geometry likewise remains explicit,
-but transfer rejects those normalized targets until their coordinate maps,
-including exceptional projective points, are implemented end to end.
+proof range with a structured `unsupported` response. Geometry construction
+over an extension field remains supported separately; transfer support is not
+inferred from that construction. A bounded five-row `GF(5^2)`/`GF(7^2)` pilot
+locally checks the exact catalog polynomial bases with implementation-separated
+finite-field arithmetic, source-sextic squarefreeness, the separable
+degree-two map, all rational points and fibers, and the two unramified infinity
+branches. Graph regeneration still uses the repository checker and the basis
+comparison is differential against `Fp2Ctx`, so this is not an independent
+source-Jacobian implementation. It implements no general source-Jacobian
+reduction or arbitrary-class transfer, and those five rows have no named EC1
+binding; the other 1,400 odd-extension rows remain structured unsupported.
+
+The Montgomery-to-short projective isomorphism is now a checked typed module
+with exhaustive tests over `p=5,7,11`, including infinity and an independent
+group law. It is model-isomorphism infrastructure only: it is not yet composed
+end to end with the quadratic-cover transfer API, and all six live Montgomery
+normalizations have moduli outside the accepted deterministic prime-proof
+range. Edwards normalization remains geometry-only. No normalized live row is
+promoted by these facts.
 
 `pushforward_arbitrary_jacobian_class` handles every valid reduced class of
 support degree at most three on the supplied checked binary model. It factors
@@ -541,12 +558,25 @@ Jacobian components, and do not establish a computational advantage.
 The F2^7 evidence fixture additionally checks in the same native stack that
 the named generator is nonidentity and is killed by the prime 29, and
 therefore has exact order 29 before applying the degree-inverse argument. This
-is not an independent source-order implementation. A separate test-only GF(8)
-oracle reimplements support factorization, residue fields, Frobenius trace,
-and the target elliptic group law for all 486 classes and all 236,196 ordered
-image sums. Its source additions still use the production Jacobian law, so it
-does not independently validate that group law or establish catalog-wide
-support.
+is not an independent source-order implementation. A separate fixed-GF(8)
+oracle, frozen at producer commit
+`e0ae0fe5d09c0492a8b50600e88d0b9da68afef1`, constructs all 486 reduced
+source classes
+from 233 graph places and 33,856 retained principal divisors without importing
+the production source law. It checks all 57,513,726
+principal-relation lookups, 114,791,256 associativity triples, 236,196 ordered
+pushforward-additivity pairs, every pullback, and both composition identities
+before comparing every class operation with production. Exact counters also
+pin inert and higher-degree rejections plus repeated, nonsplit, ramified,
+shared, and conjugate support. The clean Rust 1.98 replay passed 2/2 and binds
+the raw output and whole-Cargo-invocation resource receipt, including its
+wrapper-level peak RSS, in the companion draft assessment. This supports the
+source law and maps for this one fixed fixture; it has no signed PCC standing
+and retains packaged replay, complete hardware/isolation, mutation-control,
+named-subgroup, independent-review, and catalog-wide obligations.
+The dated 2026-11-18 report is preserved; its
+[additive status note](../../research/curve_transfer_infrastructure_20261118/ERRATA-2026-11-19.md)
+records this later fixture result without rewriting the earlier evidence.
 
 A separate exact `F_2` control uses
 `E: y^2+xy=x^3+1`, `H: v^2+u^2v=u^7+u`, and
@@ -554,9 +584,9 @@ A separate exact `F_2` control uses
 divisors without production Jacobian addition, checks all 400 ordered sums,
 all 8,000 associativity triples, independently implemented pullback and
 pushforward, and both composition identities, and only then compares with
-production. This is independent source-law evidence for one tiny general-path
-fixture; it does not close the full 486-class `GF(8)` source-law gate or a
-catalog-wide oracle.
+production. This remains independent source-law evidence for a second tiny
+general-path fixture; it is not the basis for the 486-class result and does not
+establish a catalog-wide oracle.
 
 The conforming machine-readable envelope is
 [`../../research/hyperelliptic_cover_infrastructure_20261006/evidence.json`](../../research/hyperelliptic_cover_infrastructure_20261006/evidence.json).
@@ -603,10 +633,12 @@ balanced arithmetic and the induced degree-two maps for checked split sextics.
 Its deterministic proof boundary covers 20,539 live direct-prime maps and 675
 linked EC1 records, including the two 73-bit rows at
 `p=5902977611310272157103`. The other 269 wide-direct maps and 234 bindings,
-normalized targets, and extensions remain unsupported for
-those maps. The widened live catalog support is therefore exactly a two-row
-pilot under the strict exclusive `psi_13` proof bound, not a general
-wide-prime claim. Numeric exact-order evidence remains a separate per-record field.
+normalized targets, and extensions do not receive direct-backend support: the
+canonical odd corpus classifies 233 bindings as proof-range unsupported and
+one as invalid target-generator data. The widened live catalog support is
+therefore exactly a two-row pilot under the strict exclusive `psi_13` proof
+bound, not a general wide-prime claim. Numeric exact-order evidence remains a
+separate per-record field.
 The supplied traits file is recorded as advisory provenance and cannot
 promote that field. The exporter records non-`unknown` evidence only from its
 bounded deterministic small-prime check; the named-subgroup certificate
@@ -627,8 +659,9 @@ did not change. Local mirror validation passed
 tests, 6 of 6 transfer tests including the strict live 73-bit pilot, and 8 of
 8 parity tests; strict library Clippy and targeted `rustfmt` also passed. The
 generated corpus and independent `F_2` source-law oracle remain crypto-owned
-and were not copied into cryptanalysis. The full 486-class `GF(8)` independent
-source-law gate, remote mirror CI and review, and a fresh current-head package
+and were not copied into cryptanalysis. The fixed 486-class `GF(8)` independent
+source-law gate now passes locally and has a read-only mathematical review;
+cryptanalysis integration, remote CI/review, and a fresh current-head package
 and extracted-package replay remain open. This receipt is not a Jacobian
 index-calculus solver or evidence of a speedup. The assessment does not change
 the geometry semantics or browser status fields in `covers.json` and
@@ -666,6 +699,7 @@ populations must not be conflated.
 finite candidate inventories:
 
 ```text
+./curve-transfer-sweep capabilities --output CAPABILITIES.json
 ./curve-transfer-sweep sweep \
   --request REQUEST.json --registry docs/curves/registry.json \
   --output SWEEP.json
@@ -687,6 +721,15 @@ declared finite family and bounds. Zero candidates is not a proof that no
 cover, isogeny, correspondence, higher-dimensional representation, or
 transfer exists. The sweeper is not an index-calculus solver and does not
 establish an advantage.
+
+The `curve-transfer-sweep-capabilities/v1` inventory lists six repository
+shapes but marks only the binary-cubic and prime-quadratic pullbacks as
+integrated request families. The bielliptic atlas and selected genus-three
+hyperelliptic constructor route to separate bounded tools. The plane-quartic
+row is an elliptic norm projection without a full quartic Jacobian group, and
+the small-`F_2` factor search constructs no transfer map. See
+[`CURVE_TRANSFER_SWEEP.md`](CURVE_TRANSFER_SWEEP.md) for the exact routing and
+claim boundaries.
 
 ## Catalog export
 
@@ -788,3 +831,32 @@ retained failed obligation. Successful named-generator records prove only the
 scoped injectivity result described above. They are not solver, timing, or
 computational-advantage records.
 [pcc:unverified]
+
+## Odd-characteristic catalog certificates
+
+`odd-transfer-catalog` is a separate standalone exporter and exact replay
+tool for the 22,243 odd-characteristic maps and 940 named bindings. Its command
+contract and fail-closed exit semantics are documented in
+[`ODD_SUBGROUP_TRANSFER_CERTIFICATES.md`](ODD_SUBGROUP_TRANSFER_CERTIFICATES.md).
+The tracked 17,879,352-byte canonical corpus has SHA-256
+`7c60fc122c73abbe7b0df1413d24abbb064a9842bb35c2da8248d30c87f65670`.
+It was generated from clean producer commit
+`e0ae0fe5d09c0492a8b50600e88d0b9da68afef1` with framed source digest
+`3116ef637921b9aade22bbbaa0bd5f3eaaa798e6d7517474dab912a9dc8c2768`.
+Its binding partition is 675 supported direct, 233 proof-range unsupported, 0
+kernel-intersection unsupported, 22 normalized-backend unsupported, 9
+extension-backend unsupported, 1 failed invalid generator, 0 other invalid,
+and 0 transfer-arithmetic failures. Canonical same-implementation replay exits
+`1` with `verified_named_subgroup_incomplete`; repository source replay exits
+`0` after binding all 27 source files and the Lean artifact to the producer
+commit. Malformed or stale input exits `3`.
+
+This corpus is additional evidence, not a rewrite of the generated graph.
+Normalized and extension rows remain unsupported until their typed backends
+are composed, and the one invalid generator is not relabelled as a missing
+proof. The recorded Rust compiler label is caller-supplied and unverified, and
+the local unsigned Lean theorem proves only the conditional structural
+implication under supplied hypotheses. Installed-package replay, independent
+replay, and the remaining source-order certificates are separate release
+gates. The corpus supplies no relation solver, key recovery, scaling result,
+or computational-advantage evidence. [pcc:unverified]
