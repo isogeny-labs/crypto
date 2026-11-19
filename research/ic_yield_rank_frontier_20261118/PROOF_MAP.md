@@ -311,6 +311,41 @@ the exact eventual natural-power inequality required by
 |---|---|---|---|---|
 | `denseCubicRowBoundAtFixedArity` | law | `TensorBoundaryBounds`; upstream candidate for `crypto-lean` | natural `p`, `X`, `m`, and row count | `rows <= 3X`, `X^m <= p` |
 
+## Bird planted-dense fallback
+
+1. **Structure above.** A square matrix over a commutative ring, Mathlib's
+   verified Bird determinant, the adjugate formula, and fixed-arity row bounds.
+   [pcc:unverified]
+2. **Theorem used as stated.** `BirdDet.det_eq_birdDet`,
+   `Matrix.adjugate_apply`, `Matrix.nonsing_inv_apply`, and
+   `ZMod.inv_coe_unit`; natural power monotonicity for the cost exponent.
+3. **Goal below.** Replace every cofactor determinant in the adjugate by the
+   verified Bird recurrence, and record the conservative numerator-6 exponent
+   obtained from `n^2` determinant calls at advertised `O(n^4)` cost.
+4. **Assembly probe.** Define `birdAdjugate A i j` by applying
+   `BirdDet.birdDet` to the row-updated matrix used by
+   `Matrix.adjugate_apply`; extensionality and Bird correctness give equality
+   with `A.adjugate`. Scale it by the concrete `ZMod` inverse of the Bird
+   determinant and, under `IsUnit A.det`, identify that scalar with Mathlib's
+   nonsingular inverse scalar. Separately raise `rows <= 3X` to `6m`, rewrite
+   `X^(6m) = (X^m)^6`, and apply `X^m <= p`.
+5. **Missing components only.** The Bird determinant, adjugate, executable
+   `ZMod` inverse equality, and numerator-6 natural-power bound are checked.
+   Still missing is an eager array implementation and kernel-checked operation
+   counter: Mathlib's source comment states `O(n^4)`, but its function-valued
+   recurrence does not itself specify an evaluation cost model.
+6. **Inheritance table.** `BirdDet.det_eq_birdDet`,
+   `Matrix.adjugate_apply`, `Matrix.nonsing_inv_apply`, `ZMod.inv_coe_unit`,
+   matrix extensionality, `Nat.pow_le_pow_left`, `mul_pow`, and `pow_mul`.
+
+| statement | kind | owner | quantified structure | hypotheses |
+|---|---|---|---|---|
+| `birdAdjugate` | definition | `TensorBoundaryBounds`; upstream candidate for `crypto-lean` | finite square matrix over a commutative ring | none |
+| `birdAdjugate_eq_adjugate` | law | same | same | none |
+| `birdZModInverse` | definition | same | square matrix over `ZMod q` | none |
+| `birdZModInverse_eq_inv` | law | same | square matrix over `ZMod q` | `IsUnit A.det` |
+| `birdSixthPowerRowBoundAtFixedArity` | law | same | natural `p`, `X`, `m`, and row count | `rows <= 3X`, `X^m <= p` |
+
 ## First-moment coverage repair
 
 1. **Structure above.** A finite seed space, a natural-valued factor-base size

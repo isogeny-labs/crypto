@@ -54,6 +54,7 @@ match an independent rational eliminator. See
 [lead reconciliation](SEARCH_20261101.md).
 
 The census now emits independently recomputable nonzero-minor certificates.
+[pcc:unverified]
 A Lean-checked theorem proves that an order-`k` certificate forces every exact
 linear separator factorization to use at least `k` coordinates. A second
 theorem makes the asymptotic gap precise: exponential rank on a linear-width
@@ -65,9 +66,22 @@ This is instrument verification, not an E1 row. Stable production semantic
 cuts, matched rewired nulls, a fresh-process A/A runner, disjoint preflight and
 the final frozen identities remain open. No affected rank data has been taken.
 
+## Fixed-arity recovery update — 2026-11-19
+
+The separate fixed-arity route now has a kernel-checked planted-dense fallback.
+Mathlib's verified Bird determinant is lifted to adjugates, and the resulting
+executable `ZMod` formula is proved equal to the nonsingular matrix inverse
+under a unit-determinant hypothesis. Exact natural arithmetic also shows that
+a prospective `rows^6` implementation has fixed numerator six and is therefore
+absorbed by the already checked fixed-arity diagonal. This does not yet prove
+the runtime: the remaining task is an eager array refinement of the
+function-valued Bird recurrence with a checked operation counter, followed by
+the planted-block binding and bit-cost accounting. [pcc:unverified] See
+[`FIXED_ARITY_DIAGONAL.md`](FIXED_ARITY_DIAGONAL.md).
+
 ## Claim boundary
 
-No result in the proposed rank census proves a subexponential ECDLP algorithm. E1 can identify or reject a finite-size compression mechanism. E4 can establish an exact-engine improvement on a frozen ladder. E5 can establish complete relation-oracle progress. A complexity claim still needs a proved family invariant and complete end-to-end cost theorem.
+No result in the proposed rank census proves a subexponential ECDLP algorithm. E1 can identify or reject a finite-size compression mechanism. E4 can establish an exact-engine improvement on a frozen ladder. E5 can establish complete relation-oracle progress. A complexity claim still needs a proved family invariant and complete end-to-end cost theorem. [pcc:unverified]
 
 ## State of evidence
 

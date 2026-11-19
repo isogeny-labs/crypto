@@ -95,7 +95,7 @@ new theorem `fixedNumeratorCandidateFamilyHasVanishingRate` checks that every
 fixed numerator `c` is absorbed after a fixed polynomial simulation degree;
 its local claim is `PCC-20261119-76300b`. Consequently numerator `3` from the
 dense algorithm is enough. The
-project proof gate now reports 37 theorems and zero trusted declarations; a fresh
+project proof gate now reports 44 theorems and zero trusted declarations; a fresh
 `leanchecker` replay exits successfully. These theorems formalize the generic
 implication, not the ECDLP premises. Claims `PCC-20261118-546652` and
 `PCC-20261118-ed2042` pass their local Lean verifiers and retain unverified
@@ -113,6 +113,49 @@ after cross-multiplying by the arity, without real roots or asymptotic exponent
 manipulation. Claim `PCC-20261119-77d40e` passes its local Lean verifier and
 retains unverified signed standing. The theorem checks exponent arithmetic,
 not an executable elimination implementation or its bit costs.
+[pcc:unverified]
+
+## Bird planted-dense fallback
+
+There is now a checked algebraic alternative to relying immediately on a
+general Howell implementation. Mathlib's flat-array Bird implementation is
+wrapped as `birdMatrixDet`, and `det_eq_birdMatrixDet` proves value equality
+with the ordinary determinant. Applying it to every row-updated cofactor gives
+`birdAdjugate`; `birdAdjugate_eq_adjugate` proves that this is exactly the
+ordinary adjugate. Finally, `birdZModInverse` scales that computed adjugate by
+the concrete, executable `ZMod` inverse of the computed determinant, and
+`birdZModInverse_eq_inv` proves equality with Mathlib's nonsingular matrix
+inverse whenever `IsUnit A.det`. Claims `PCC-20261119-7f673b`,
+`PCC-20261119-de3426`, and `PCC-20261119-598c61` pass their local Lean
+verifiers and retain unverified signed standing. [pcc:unverified]
+
+The conservative exponent arithmetic is checked separately: [pcc:unverified]
+`birdSixthPowerRowBoundAtFixedArity` proves
+
+```text
+X^m <= p, rows <= 3X  ->  rows^(6m) <= 3^(6m) p^6.
+```
+
+This is the fixed-numerator form that would result from `rows^2` cofactor
+determinants at `rows^4` operations each. Claim `PCC-20261119-cfa7f9` passes
+its local Lean verifier. It does **not** prove that operation count. Mathlib's
+source documentation advertises `O(n^4)` for Bird's algorithm, but the checked
+definition uses function-valued recurrence states and carries no evaluation
+cost semantics. The remaining implementation obligation is therefore narrow
+and explicit: materialize each recurrence state eagerly in arrays, prove it
+refines `BirdDet.birdDet`, and verify an operation counter. Only then does the
+`n^2`-cofactor construction justify an executable `O(n^6)` inverse. This
+fallback can use the upstream unit-determinant planted block in place of sparse
+Wiedemann--Dixon, but the concrete block binding and bit costs remain open.
+[pcc:unverified]
+
+The Mathlib pin is commit
+`cfc55fc58714a59dc06e6e79edc6d1d95140d3c2`. The exact source hashes are
+`fa690f7f31bdb3108c61c7c4aca62f56182732728a8928e793c2a5b743a4ba54`
+for `Bird/Defs.lean` and
+`e36d1901d2279de39d4cb702625ac1c6defaae30eaaba372260c8a1551369fc1`
+for `Bird/Correctness.lean`. The local project gate reports 44 theorems and
+zero trusted declarations, and the independent fresh checker exits 0.
 [pcc:unverified]
 
 ## What the pinned primary source supplies
@@ -266,8 +309,9 @@ the remaining independent obligations are:
    [pcc:unverified];
 2. bind the factor-base labels returned by the Lean oracle to the rows used by
    the arbitrary-group relation lattice;
-3. implement and cost the Howell/dense-elimination procedure using the checked
-   cubic row-to-`p^3` conversion, bind the checked finite round to the concrete
+3. implement and cost either the Howell/dense-elimination procedure using the
+   checked cubic row-to-`p^3` conversion or the eager Bird planted-block
+   fallback using the checked sixth-power conversion; bind the checked finite round to the concrete
    coverage oracle, instantiate the checked
    near-uniform transfer with an identity-inclusive curve sampler, assemble the
    remaining restart events, and derive Theorem 5's bit bound

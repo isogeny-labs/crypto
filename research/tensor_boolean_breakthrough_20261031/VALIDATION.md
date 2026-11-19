@@ -768,3 +768,43 @@ The theorem proves `rows^(3m) <= 3^(3m) p^3` from `rows <= 3X` and `X^m <= p`.
 This is the exact natural form of the dense `p^(3/m)` exponent. It does not
 implement the Howell procedure, count its ring operations, or bound operand
 bit lengths.
+
+## 2026-11-19 Bird planted-dense fallback follow-up
+
+The pinned Mathlib dependency is commit
+`cfc55fc58714a59dc06e6e79edc6d1d95140d3c2`. Its Bird sources hash to:
+
+```text
+fa690f7f31bdb3108c61c7c4aca62f56182732728a8928e793c2a5b743a4ba54  Bird/Defs.lean
+e36d1901d2279de39d4cb702625ac1c6defaae30eaaba372260c8a1551369fc1  Bird/Correctness.lean
+```
+
+An assembly probe established the concrete `ZMod` inverse statement before it
+was added to the module. The pinned project build completed with 2,188 jobs,
+and the proof gate reported:
+
+```text
+PASS 44 thm 0 trusted research/tensor_boolean_breakthrough_20261031/lean
+```
+
+The axiom readback is `[propext, Classical.choice, Quot.sound]` for
+`det_eq_birdMatrixDet`, `birdAdjugate_eq_adjugate`, and
+`birdZModInverse_eq_inv`, and `[propext, Quot.sound]` for
+`birdSixthPowerRowBoundAtFixedArity`. The independent fresh checker exited 0.
+Claims `PCC-20261119-7f673b`, `PCC-20261119-de3426`,
+`PCC-20261119-cfa7f9`, and `PCC-20261119-598c61` pass their local Lean
+verifiers and retain unverified signed standing. [pcc:unverified]
+
+The checked content is determinant value correctness, cofactor/adjugate
+correctness, equality of an executable `ZMod` Bird inverse with the canonical
+matrix inverse under `IsUnit A.det`, and the exact numerator-6 natural-power
+bound. The advertised `O(n^4)` determinant runtime is not kernel-checked by
+Mathlib's function-valued implementation. An eager array refinement and
+operation counter are still required before multiplying that cost by `n^2`
+cofactors and claiming an executable `O(n^6)` planted inverse. Operand bit
+costs and the upstream planted-block binding also remain open. [pcc:unverified]
+
+The first inverse claim record, `PCC-20261119-46d8c7`, omitted the mandatory
+declaration hash and fails closed. It remains uncited in the append-only
+ledger; corrected hash-bound claim `PCC-20261119-598c61` was issued and
+verified. [pcc:unverified]

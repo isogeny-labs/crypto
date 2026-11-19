@@ -3,6 +3,7 @@ import Mathlib.Algebra.Polynomial.Roots
 import Mathlib.Algebra.Field.ZMod
 import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
 import Mathlib.Analysis.SpecificLimits.Basic
+import Mathlib.LinearAlgebra.Matrix.Determinant.Bird.Correctness
 
 /-!
 # Exact separator-message bounds
@@ -462,6 +463,81 @@ theorem denseCubicRowBoundAtFixedArity
       omega
     _ ≤ 3 ^ (3 * m) * p ^ 3 :=
       Nat.mul_le_mul_left _ (Nat.pow_le_pow_left scaleBound 3)
+
+/-! ## Bird planted-dense fallback -/
+
+/-- The public flat-array Bird implementation, specialized back to a square
+matrix through its row-major array representation. -/
+def birdMatrixDet
+    {R : Type*} [CommRing R] {n : ℕ}
+    (A : Matrix (Fin n) (Fin n) R) : R :=
+  BirdDet.birdDet n (.ofFn fun k : Fin (n * n) => A k.divNat k.modNat)
+
+/-- Mathlib's verified flat-array Bird implementation computes the matrix
+determinant. -/
+theorem det_eq_birdMatrixDet
+    {R : Type*} [CommRing R] {n : ℕ}
+    (A : Matrix (Fin n) (Fin n) R) :
+    A.det = birdMatrixDet A := by
+  simpa [birdMatrixDet, Matrix.ofArray_ofFn] using
+    (BirdDet.det_eq_birdDet
+      (.ofFn fun k : Fin (n * n) => A k.divNat k.modNat) Array.size_ofFn)
+
+/-- Compute every adjugate entry with the verified Bird determinant
+implementation applied to the row-updated matrix from Cramer's rule. -/
+def birdAdjugate
+    {R : Type*} [CommRing R] {n : ℕ}
+    (A : Matrix (Fin n) (Fin n) R) : Matrix (Fin n) (Fin n) R :=
+  Matrix.of fun i j =>
+    birdMatrixDet (A.updateRow j (Pi.single i 1))
+
+/-- The Bird-computed cofactor matrix is exactly the ordinary adjugate. -/
+theorem birdAdjugate_eq_adjugate
+    {R : Type*} [CommRing R] {n : ℕ}
+    (A : Matrix (Fin n) (Fin n) R) :
+    birdAdjugate A = A.adjugate := by
+  ext i j
+  rw [birdAdjugate, Matrix.of_apply, ← det_eq_birdMatrixDet,
+    Matrix.adjugate_apply]
+
+/-- An executable inverse candidate for matrices over `ZMod q`.  Unlike
+`Matrix.inv`, this definition uses the computable `ZMod.inv` operation. -/
+def birdZModInverse
+    {q n : ℕ}
+    (A : Matrix (Fin n) (Fin n) (ZMod q)) :
+    Matrix (Fin n) (Fin n) (ZMod q) :=
+  (birdMatrixDet A)⁻¹ • birdAdjugate A
+
+/-- When the determinant is a unit, the executable Bird formula agrees with
+Mathlib's nonsingular matrix inverse. -/
+theorem birdZModInverse_eq_inv
+    {q n : ℕ}
+    (A : Matrix (Fin n) (Fin n) (ZMod q))
+    (h : IsUnit A.det) :
+    birdZModInverse A = A⁻¹ := by
+  rw [birdZModInverse, birdAdjugate_eq_adjugate,
+    Matrix.nonsing_inv_apply A h, ← det_eq_birdMatrixDet]
+  congr 1
+  calc
+    A.det⁻¹ = (h.unit : ZMod q)⁻¹ := congrArg Inv.inv h.unit_spec.symm
+    _ = (h.unit⁻¹ : (ZMod q)ˣ) := ZMod.inv_coe_unit h.unit
+
+/-- A conservative `rows^6` planted-dense cost has fixed numerator six.  This
+matches `rows^2` Bird determinant calls for the adjugate at an advertised
+`rows^4` operations per determinant; the operation-count connection itself is
+not asserted by this arithmetic theorem. -/
+theorem birdSixthPowerRowBoundAtFixedArity
+    (p X m rows : ℕ) (rowBound : rows ≤ 3 * X) (scaleBound : X ^ m ≤ p) :
+    rows ^ (6 * m) ≤ 3 ^ (6 * m) * p ^ 6 := by
+  calc
+    rows ^ (6 * m) ≤ (3 * X) ^ (6 * m) :=
+      Nat.pow_le_pow_left rowBound _
+    _ = 3 ^ (6 * m) * (X ^ m) ^ 6 := by
+      rw [mul_pow, ← pow_mul]
+      congr 2
+      omega
+    _ ≤ 3 ^ (6 * m) * p ^ 6 :=
+      Nat.mul_le_mul_left _ (Nat.pow_le_pow_left scaleBound 6)
 
 /-! ## First-moment coverage repair
 
