@@ -14,7 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
-- [ ] Accelerate PKM Semaev and T_2-torus F4 via basis inheritance, Schwartz–Zippel refutation-trace replay, tower descent, and X_R-split ParamS5; evaluate m >= 8 T_2-torus and aligned P-256 auxiliary curve (Cursor, started 2026-11-19, branch cursor/prime-pkm-aux-tower-3858)
+- [ ] Accelerate PKM Semaev and T_2-torus F4 via basis inheritance, Schwartz–Zippel refutation-trace replay, tower descent, and X_R-split ParamS5; evaluate m >= 8 T_2-torus and aligned P-256 auxiliary curve (Cursor, started 2026-11-19, branch cursor/prime-pkm-aux-tower-3858, PR #4820)
 
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
