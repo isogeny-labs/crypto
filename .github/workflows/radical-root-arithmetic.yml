@@ -390,3 +390,35 @@ jobs:
           name: round36-root-replay-rust
           path: ${{ runner.temp }}/round36-rust.txt
           if-no-files-found: ignore
+
+
+  round37-fp2-frobenius:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            research/radical_field_perf_20261117/isolated
+            src/cryptanalysis/prime_radical_root.rs
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Check exact production Rust arithmetic and benchmark paired before/after
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              round37_fp2_frobenius_and_canonical_fp_match_frozen -- --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_round37_fp2_frobenius_and_fp_powm_actual_rust -- --ignored --nocapture
+          } | tee "$RUNNER_TEMP/round37-native-rust.txt"
+          cat "$RUNNER_TEMP/round37-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round37-native-rust-benchmark
+          path: ${{ runner.temp }}/round37-native-rust.txt
+          if-no-files-found: ignore
