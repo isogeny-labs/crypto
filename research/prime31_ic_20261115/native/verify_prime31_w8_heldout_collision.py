@@ -75,11 +75,17 @@ def main(path):
     for i,h in enumerate(doc["w1_power2_collision_certificates"]["halves"]):
         assert h["half"]==i and h["unique_sums"]==65496
         assert h["formal_duplicate_words"]==0 and h["accidental_duplicate_words"]==40
-        for c in h["first_12_certificates"]:
+        assert len(h["all_certificates"])==40
+        for c in h["all_certificates"]:
             coeff1,q1=word_summary(c["first_word"],i,pts)
             coeff2,q2=word_summary(c["colliding_word"],i,pts)
             assert coeff1==c["first_coeff"] and coeff2==c["colliding_coeff"]
             assert coeff1 != coeff2
+            # Exactly one short factor-base relation generates every W1
+            # collision in the respective four-slot half.
+            difference=tuple(a-b for a,b in zip(coeff1,coeff2))
+            expected=(0,8,1,8,6,-2,0,-1)
+            assert difference==tuple((16**i)*v for v in expected)
             assert q1==q2
             assert list(q1) == c["sum"]
             verified+=1
@@ -87,6 +93,15 @@ def main(path):
     assert counts["old_hits"]==counts["both"]+counts["old_only"]
     assert counts["powers_two_hits"]==counts["both"]+counts["new_only"]
     assert sum(counts[k] for k in ("both","old_only","new_only","neither"))==1024
+    # Recheck the primitive six-point dependence independently.
+    short_relation=None
+    for idx,c in enumerate((0,8,1,8,6,-2,0,-1)):
+        if not c:continue
+        q=mul(abs(c),pts[WIN[idx]])
+        if c<0:q=(q[0],(-q[1])%P)
+        short_relation=add(short_relation,q)
+    assert short_relation is None
+    assert verified==80
     print(json.dumps({"independent_affine_verified_certificates":verified,
         "heldout_paired":counts,"status":"PASS"},sort_keys=True))
 
