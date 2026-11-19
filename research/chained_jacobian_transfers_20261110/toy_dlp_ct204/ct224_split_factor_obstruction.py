@@ -63,6 +63,11 @@ def analyze(poly=A_POLY):
         raise ValueError('Jacobian order disagrees with factorization')
     if any(math.gcd(orders[i],orders[j]) != 1 for i in range(3) for j in range(i)):
         raise ValueError('group factors not pairwise coprime')
+    ext2_orders = [(P+1)**2-(P+1-ne)**2, (P+1)**2, nb**2]
+    if ext2_orders != [10355,10404,108097609]:
+        raise ValueError("quadratic-extension counts disagree")
+    if any(math.gcd(ext2_orders[i],ext2_orders[j]) != 1 for i in range(3) for j in range(i)):
+        raise ValueError("quadratic-extension group orders overlap")
     projectors = [crt_projector(orders,i) for i in range(3)]
     if projectors[0] != 80597544 or sum(projectors)%J_ORDER != 1:
         raise ValueError('CRT identity mismatch')
@@ -83,7 +88,8 @@ def analyze(poly=A_POLY):
       'E_rational_count':ne, 'C_rational_count':nc,
       'E0_rational_count':ne0, 'B_rational_order':nb,
       'J_rational_order':J_ORDER,
-      'orders_E_E0_B':orders, 'crt_projectors_E_E0_B':projectors,
+      'orders_E_E0_B':orders, 'orders_degree2_E_E0_B':ext2_orders,
+      'crt_projectors_E_E0_B':projectors,
       'all_three_orders_pairwise_coprime':True,
       'scope':'isogeny decomposition over F101 conditional on CT221 zeta counts; Hom between distinct simple factors vanishes over F101; no solver cost claimed'}
 
