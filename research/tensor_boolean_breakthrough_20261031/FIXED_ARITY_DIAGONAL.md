@@ -368,6 +368,17 @@ displayed total-energy inequality left as an analytic premise. The remaining
 curve-specific input is therefore the total-energy estimate, not an
 additional character-sum or probabilistic inference. [pcc:unverified]
 
+The root-count part of that remaining input is now separated and checked.
+`inverseSquareFiberCard_le_two` proves that `u ↦ u⁻²` has fibres of size at
+most two, and `inverseSquarePolynomialCertificate_card_le` proves that one
+nonzero degree-`D` polynomial containing every bad inverse-square parameter
+gives the exact `2D` bad-dilation bound required by the upstream
+`DilationNondeg` interface. Claim `PCC-20261119-998f26` passes its local Lean
+verifier and retains unverified signed standing. What remains is the
+curve-specific certificate itself: construction, degree, vanishing, and
+especially nonvanishing of the specialized Semaev polynomial for every
+nontrivial tuple. [pcc:unverified]
+
 The generic planted-diagonal root count is now kernel-checked as well.
 `charpolySingularShiftCardLeDimension` proves that an `f`-dimensional square
 matrix has at most `f` candidate scalars `nu` for which `nu I - M` is

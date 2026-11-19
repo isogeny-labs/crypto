@@ -676,6 +676,37 @@ layer uses these declarations:
 | `dilationFactorBaseFirstMoment` | endpoint | same | finite finset of nonzero abscissas | explicit integral square-radius and density inequalities |
 | `dilationLargeFactorBaseSeeds_of_card_ge_324` | endpoint | same | finite finset of nonzero abscissas | nonsingular short curve, odd characteristic, positive base and `|K| >= 324` |
 
+## Dilation polynomial root-count bridge
+
+1. **Structure above.** A finite field, nonzero dilation parameters, a tuple
+   index, a tuple-dependent bad predicate, and a univariate polynomial in the
+   inverse-square parameter `s = u⁻²`.
+2. **Theorem used as stated.** A nonzero polynomial has at most its natural
+   degree many distinct roots. The map `u ↦ u⁻²` has fibres of size at
+   most two: equality of inverse squares is contained in the roots of
+   `value * X² - 1`, itself a nonzero polynomial of degree at most two.
+3. **Object as an instance.** For a fixed nontrivial Semaev tuple `t`, the bad
+   predicate is the existence of points above `t` on the dilated curve whose
+   sum is zero. The intended polynomial is the specialized summation
+   polynomial `g_t(s)` from Lemma N'. [pcc:unverified]
+4. **Assembly probe.** Partition the bad dilation set by its inverse-square
+   image, bound every fibre by two, and bound the image by the roots of
+   `g_t`. This gives the exact `2D` cardinality used by upstream
+   `DilationNondeg`.
+5. **Missing components only.** Construct `g_t`, prove its degree bound and
+   vanishing law, and prove `g_t != 0` for every nontrivial tuple using the
+   corrected constant-field/Kummer argument. [pcc:unverified]
+
+| statement | kind | owner | quantified structure | hypotheses |
+|---|---|---|---|---|
+| `polynomialPullbackBadSetCardLe` | law | `TensorBoundaryBounds` | finite seed space mapped to a field | bounded fibres, bad points map to roots, nonzero polynomial, degree bound |
+| `inverseSquareFiberCard_le_two` | law | same | nonzero elements of a finite field | none beyond field structure |
+| `InverseSquarePolynomialCertificate` | interface | same | tuple-indexed bad dilation predicates | one nonzero bounded-degree vanishing polynomial per tuple |
+| `inverseSquarePolynomialCertificate_card_le` | endpoint | same | previous row | certificate; conclusion is the exact `2D` bad-set bound |
+
+Claim `PCC-20261119-998f26` binds the endpoint and passes its local verifier;
+signed standing remains unverified. [pcc:unverified]
+
 ## Planted-diagonal bad shifts
 
 1. **Structure above.** A commutative field, a square finite matrix, a finite

@@ -2922,6 +2922,148 @@ theorem polynomialBadValuesCardLeDegree
   rw [Polynomial.mem_roots nonzero]
   exact (Finset.mem_filter.mp valueMem).2
 
+/-- A finite bad set pulled back through a map with fibres of size at most
+`multiplicity` has size at most `multiplicity * degree` when every bad point
+maps to a root of a nonzero polynomial of degree at most `degree`. -/
+theorem polynomialPullbackBadSetCardLe
+    {K Seed : Type*} [Field K] [DecidableEq K]
+    [Fintype Seed] [DecidableEq Seed]
+    (polynomial : Polynomial K) (parameter : Seed → K)
+    (bad : Finset Seed) (multiplicity degree : ℕ)
+    (fiberBound : ∀ value,
+      (bad.filter fun seed => parameter seed = value).card ≤ multiplicity)
+    (badRoot : ∀ seed ∈ bad, polynomial.eval (parameter seed) = 0)
+    (nonzero : polynomial ≠ 0) (degreeBound : polynomial.natDegree ≤ degree) :
+    bad.card ≤ multiplicity * degree := by
+  have imageRoot : ∀ value ∈ bad.image parameter,
+      polynomial.eval value = 0 := by
+    intro value valueMem
+    obtain ⟨seed, seedMem, rfl⟩ := Finset.mem_image.mp valueMem
+    exact badRoot seed seedMem
+  have imageDegree : (bad.image parameter).card ≤ polynomial.natDegree := by
+    have filtered :
+        (bad.image parameter).filter (fun value => polynomial.eval value = 0) =
+          bad.image parameter := by
+      exact Finset.filter_eq_self.mpr imageRoot
+    rw [← filtered]
+    exact polynomialBadValuesCardLeDegree polynomial (bad.image parameter) nonzero
+  rw [Finset.card_eq_sum_card_image parameter bad]
+  calc
+    ∑ value ∈ bad.image parameter,
+        (bad.filter fun seed => parameter seed = value).card ≤
+        ∑ _value ∈ bad.image parameter, multiplicity := by
+      exact Finset.sum_le_sum fun value _ => fiberBound value
+    _ = multiplicity * (bad.image parameter).card := by
+      simp [Nat.mul_comm]
+    _ ≤ multiplicity * polynomial.natDegree :=
+      Nat.mul_le_mul_left multiplicity imageDegree
+    _ ≤ multiplicity * degree :=
+      Nat.mul_le_mul_left multiplicity degreeBound
+
+/-- The inverse-square parameter map on nonzero field elements is at most
+two-to-one.  This is the elementary multiplicity factor in the dilation
+root-count argument. -/
+theorem inverseSquareFiberCard_le_two
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (value : K) :
+    ((Finset.univ : Finset (NonzeroField K)).filter fun u =>
+      u.1⁻¹ ^ 2 = value).card ≤ 2 := by
+  let fiber := (Finset.univ : Finset (NonzeroField K)).filter fun u =>
+    u.1⁻¹ ^ 2 = value
+  let roots := fiber.image fun u => u.1
+  let polynomial : Polynomial K :=
+    Polynomial.C value * Polynomial.X ^ 2 - 1
+  have polynomialNonzero : polynomial ≠ 0 := by
+    intro polynomialZero
+    have evaluated := congrArg (Polynomial.eval (0 : K)) polynomialZero
+    simp [polynomial] at evaluated
+  have rootsAreRoots :
+      roots.filter (fun x => polynomial.eval x = 0) = roots := by
+    apply Finset.filter_eq_self.mpr
+    intro x xMem
+    obtain ⟨u, uMem, rfl⟩ := Finset.mem_image.mp xMem
+    have inverseSquare := (Finset.mem_filter.mp uMem).2
+    simp only [polynomial, Polynomial.eval_sub, Polynomial.eval_mul,
+      Polynomial.eval_C, Polynomial.eval_pow, Polynomial.eval_X,
+      Polynomial.eval_one]
+    rw [← inverseSquare]
+    field_simp
+    rw [div_self u.2, sub_self]
+  have rootsDegree : roots.card ≤ polynomial.natDegree := by
+    rw [← rootsAreRoots]
+    exact polynomialBadValuesCardLeDegree polynomial roots polynomialNonzero
+  have polynomialDegree : polynomial.natDegree ≤ 2 := by
+    calc
+      polynomial.natDegree ≤
+          max (Polynomial.C value * Polynomial.X ^ 2).natDegree
+            (1 : Polynomial K).natDegree := by
+        exact Polynomial.natDegree_sub_le _ _
+      _ ≤ 2 := by
+        apply max_le
+        · exact Polynomial.natDegree_C_mul_X_pow_le value 2
+        · simp
+  calc
+    fiber.card = roots.card := by
+      exact (Finset.card_image_of_injective fiber Subtype.val_injective).symm
+    _ ≤ polynomial.natDegree := rootsDegree
+    _ ≤ 2 := polynomialDegree
+
+/-- Exact root-count bridge used by the dilation nondegeneracy obligation.
+If a nonzero degree-`degree` polynomial in `s = u⁻²` vanishes for every
+bad nonzero dilation, then there are at most `2 * degree` bad dilations. -/
+theorem inverseSquarePolynomialBadSetCardLe
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (polynomial : Polynomial K) (bad : Finset (NonzeroField K)) (degree : ℕ)
+    (badRoot : ∀ u ∈ bad, polynomial.eval (u.1⁻¹ ^ 2) = 0)
+    (nonzero : polynomial ≠ 0) (degreeBound : polynomial.natDegree ≤ degree) :
+    bad.card ≤ 2 * degree := by
+  apply polynomialPullbackBadSetCardLe polynomial
+    (fun u : NonzeroField K => u.1⁻¹ ^ 2) bad 2 degree
+  · intro value
+    calc
+      (bad.filter fun u => u.1⁻¹ ^ 2 = value).card ≤
+          ((Finset.univ : Finset (NonzeroField K)).filter fun u =>
+            u.1⁻¹ ^ 2 = value).card := by
+        apply Finset.card_le_card
+        intro u uMem
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+        exact (Finset.mem_filter.mp uMem).2
+      _ ≤ 2 := inverseSquareFiberCard_le_two value
+  · exact badRoot
+  · exact nonzero
+  · exact degreeBound
+
+/-- Uniform certificate interface for dilation nondegeneracy.  For every
+tuple, it supplies one nonzero polynomial of bounded degree whose roots contain
+all bad inverse-square dilation parameters. -/
+def InverseSquarePolynomialCertificate
+    {K Tuple : Type*} [Field K] [Fintype K]
+    (bad : Tuple → NonzeroField K → Prop) (degree : ℕ) : Prop :=
+  ∀ tuple, ∃ polynomial : Polynomial K,
+    polynomial ≠ 0 ∧ polynomial.natDegree ≤ degree ∧
+      ∀ u, bad tuple u → polynomial.eval (u.1⁻¹ ^ 2) = 0
+
+/-- A uniform inverse-square polynomial certificate implies the exact
+`2 * degree` bad-dilation bound for every tuple.  Thus, after this theorem,
+the remaining curve-specific work is precisely construction, degree,
+vanishing, and nonvanishing of the specialized polynomial family. -/
+theorem inverseSquarePolynomialCertificate_card_le
+    {K Tuple : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (bad : Tuple → NonzeroField K → Prop) [DecidableRel bad] (degree : ℕ)
+    (certificate : InverseSquarePolynomialCertificate bad degree)
+    (tuple : Tuple) :
+    ((Finset.univ : Finset (NonzeroField K)).filter fun u =>
+      bad tuple u).card ≤ 2 * degree := by
+  classical
+  obtain ⟨polynomial, nonzero, degreeBound, badRoot⟩ := certificate tuple
+  apply inverseSquarePolynomialBadSetCardLe polynomial
+    ((Finset.univ : Finset (NonzeroField K)).filter fun u => bad tuple u)
+    degree
+  · intro u uMem
+    exact badRoot u (Finset.mem_filter.mp uMem).2
+  · exact nonzero
+  · exact degreeBound
+
 /-- An `n × n` matrix has at most `n` candidate scalar shifts for which
 `value * I - matrix` is singular. This is the characteristic-polynomial root
 bound, stated directly in the determinant form used by diagonal planting. -/

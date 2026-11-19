@@ -1055,3 +1055,24 @@ one-twelfth endpoint, and both Hasse character-sum bounds depend only on
 `propext`, `Classical.choice`, and `Quot.sound`. A final-source independent
 `lake env leanchecker --fresh TensorBoundaryBounds` replay exits 0.
 [pcc:unverified]
+
+## 2026-11-19 inverse-square polynomial root-count bridge
+
+`polynomialPullbackBadSetCardLe` bounds a finite bad set pulled back through a
+bounded-fibre parameter map. `inverseSquareFiberCard_le_two` specializes the
+fibre bound to `u ↦ u⁻²`, and `inverseSquarePolynomialBadSetCardLe` gives
+the exact `2D` root-count conclusion for one polynomial. The uniform
+`InverseSquarePolynomialCertificate` interface and
+`inverseSquarePolynomialCertificate_card_le` endpoint quantify this over all
+tuples. [pcc:unverified]
+
+This verifies the elementary cardinality reduction used by upstream
+`DilationNondeg`. It does not construct a Semaev polynomial or prove that its
+specialization is nonzero; those remain explicit premises. Hash-bound claim
+`PCC-20261119-998f26` passes its local Lean verifier. [pcc:unverified]
+
+The pinned project build completes 2,738 jobs. The repository proof gate
+reports `PASS 216 thm 0 trusted`; all four new root-count laws depend only on
+`propext`, `Classical.choice`, and `Quot.sound`. A final-source independent
+`lake env leanchecker --fresh TensorBoundaryBounds` replay exits 0.
+[pcc:unverified]
