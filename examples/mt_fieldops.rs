@@ -385,6 +385,49 @@ fn hp_vec<T: Clone>(n: usize, x: T) -> Vec<T> {
     v.resize(n, x);
     v
 }
+/// Environment `MTF_Z=1` (research/mt_ic_tb_20261119): every flat table, for every arm, marks an empty slot by
+/// a stored index of 0 (entries store index + 1), so its slot array is allocated already zeroed (lazily, by the
+/// kernel) instead of being filled with a non-zero "empty" pattern first. Contents and lookups are unchanged.
+static ZMODE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+#[inline]
+fn z_on() -> bool {
+    ZMODE.load(std::sync::atomic::Ordering::Relaxed)
+}
+/// The slot array of a flat table: zeroed (zero mode) or filled with `empty`, advised for huge pages either way.
+fn slot_vec<T: Clone>(n: usize, zero: T, empty: T) -> Vec<T> {
+    if z_on() {
+        let v = vec![zero; n];
+        hp_advise(&v);
+        v
+    } else {
+        hp_vec(n, empty)
+    }
+}
+/// Slot value -> (empty?, entry index), and entry index -> slot value, in the current mode.
+#[inline]
+fn slot_free(v: u32) -> bool {
+    if z_on() {
+        v == 0
+    } else {
+        v == FLAT_EMPTY
+    }
+}
+#[inline]
+fn slot_idx(v: u32) -> usize {
+    if z_on() {
+        v as usize - 1
+    } else {
+        v as usize
+    }
+}
+#[inline]
+fn slot_val(i: usize) -> u32 {
+    if z_on() {
+        i as u32 + 1
+    } else {
+        i as u32
+    }
+}
 /// `Vec::with_capacity(n)`, advised before first touch.
 fn hp_cap<T>(n: usize) -> Vec<T> {
     let v = Vec::with_capacity(n);
@@ -394,11 +437,13 @@ fn hp_cap<T>(n: usize) -> Vec<T> {
 /// A flat-table key: the x coordinate, narrowed to u32 when p < 2^32. `EMPTY` is never a valid x.
 trait FKey: Copy + Eq {
     const EMPTY: Self;
+    const ZERO: Self;
     fn of(x: u64) -> Self;
     fn wide(self) -> u64;
 }
 impl FKey for u32 {
     const EMPTY: u32 = u32::MAX;
+    const ZERO: u32 = 0;
     #[inline]
     fn of(x: u64) -> u32 {
         x as u32
@@ -410,6 +455,7 @@ impl FKey for u32 {
 }
 impl FKey for u64 {
     const EMPTY: u64 = u64::MAX;
+    const ZERO: u64 = 0;
     #[inline]
     fn of(x: u64) -> u64 {
         x
@@ -419,10 +465,20 @@ impl FKey for u64 {
         self
     }
 }
+/// A `Flat`/`FlatW` slot is free when its key is the EMPTY sentinel (classic) or its value is 0 (zero mode).
+#[inline]
+fn kslot_free<K: FKey>(k: K, v: u32) -> bool {
+    if z_on() {
+        v == 0
+    } else {
+        k == K::EMPTY
+    }
+}
 #[inline]
 fn flat_home(x: u64, shift: u32) -> usize {
     (x.wrapping_mul(0x9e37_79b9_7f4a_7c15) >> shift) as usize
 }
+#[inline(always)]
 fn flat_insert<K: FKey, V>(
     slots: &mut Vec<(K, u32)>,
     ents: &mut Vec<V>,
@@ -436,11 +492,11 @@ fn flat_insert<K: FKey, V>(
     if 2 * ents.len() >= slots.len() {
         let size = 2 * slots.len();
         let nshift = 64 - size.trailing_zeros();
-        let mut ns = hp_vec(size, (K::EMPTY, 0u32));
+        let mut ns = slot_vec(size, (K::ZERO, 0u32), (K::EMPTY, 0u32));
         for &(k, v) in slots.iter() {
-            if k != K::EMPTY {
+            if !kslot_free(k, v) {
                 let mut j = flat_home(k.wide(), nshift);
-                while ns[j].0 != K::EMPTY {
+                while !kslot_free(ns[j].0, ns[j].1) {
                     j = (j + 1) & (size - 1);
                 }
                 ns[j] = (k, v);
@@ -453,9 +509,9 @@ fn flat_insert<K: FKey, V>(
     let key = K::of(x);
     let mut i = flat_home(x, *shift);
     loop {
-        let (k, _) = slots[i];
-        if k == K::EMPTY {
-            slots[i] = (key, ents.len() as u32);
+        let (k, v) = slots[i];
+        if kslot_free(k, v) {
+            slots[i] = (key, slot_val(ents.len()));
             ents.push(e);
             return;
         }
@@ -480,15 +536,16 @@ fn flat_get<K: FKey, V: Copy>(
     let mut i = flat_home(x, shift);
     loop {
         let (k, v) = slots[i];
-        if k == K::EMPTY {
+        if kslot_free(k, v) {
             return None;
         }
         if k == key {
-            return Some(ents[v as usize]);
+            return Some(ents[slot_idx(v)]);
         }
         i = (i + 1) & mask;
     }
 }
+#[inline(always)]
 fn flatf_insert<V>(
     slots: &mut [(u32, u32)],
     xs: &mut Vec<u64>,
@@ -504,13 +561,13 @@ fn flatf_insert<V>(
     let mut i = flat_home(x, shift);
     loop {
         let (k, v) = slots[i];
-        if v == FLAT_EMPTY {
-            slots[i] = (fp, ents.len() as u32);
+        if slot_free(v) {
+            slots[i] = (fp, slot_val(ents.len()));
             ents.push(e);
             xs.push(x);
             return;
         }
-        if k == fp && xs[v as usize] == x {
+        if k == fp && xs[slot_idx(v)] == x {
             return;
         }
         i = (i + 1) & mask;
@@ -529,11 +586,11 @@ fn flatf_get<V: Copy>(
     let mut i = flat_home(x, shift);
     loop {
         let (k, v) = slots[i];
-        if v == FLAT_EMPTY {
+        if slot_free(v) {
             return None;
         }
-        if k == fp && xs[v as usize] == x {
-            return Some(ents[v as usize]);
+        if k == fp && xs[slot_idx(v)] == x {
+            return Some(ents[slot_idx(v)]);
         }
         i = (i + 1) & mask;
     }
@@ -558,14 +615,14 @@ impl<V: Copy> Tab<V> {
             let (mask, shift) = (size - 1, 64 - size.trailing_zeros());
             if p <= FLAT_EMPTY as u64 {
                 Tab::Flat {
-                    slots: hp_vec(size, (FLAT_EMPTY, 0)),
+                    slots: slot_vec(size, (0, 0), (FLAT_EMPTY, 0)),
                     ents: hp_cap(cap),
                     mask,
                     shift,
                 }
             } else {
                 Tab::FlatW {
-                    slots: hp_vec(size, (u64::MAX, 0)),
+                    slots: slot_vec(size, (0, 0), (u64::MAX, 0)),
                     ents: hp_cap(cap),
                     mask,
                     shift,
@@ -582,7 +639,7 @@ impl<V: Copy> Tab<V> {
         }
         let size = (2 * cap.max(1)).next_power_of_two();
         Tab::FlatF {
-            slots: hp_vec(size, (0, FLAT_EMPTY)),
+            slots: slot_vec(size, (0, 0), (0, FLAT_EMPTY)),
             xs: hp_cap(cap),
             ents: hp_cap(cap),
             mask: size - 1,
@@ -595,11 +652,63 @@ impl<V: Copy> Tab<V> {
     fn new_fp_dense(cap: usize, _p: u64) -> Tab<V> {
         let size = (cap.max(1) * 5).div_ceil(3).next_power_of_two();
         Tab::FlatF {
-            slots: hp_vec(size, (0, FLAT_EMPTY)),
+            slots: slot_vec(size, (0, 0), (0, FLAT_EMPTY)),
             xs: hp_cap(cap),
             ents: hp_cap(cap),
             mask: size - 1,
             shift: 64 - size.trailing_zeros(),
+        }
+    }
+    /// Insert a chunk in order (research/mt_ic_tb_20261119, ic5b option "ib"): the variant is matched once per
+    /// chunk and each slot is prefetched 32 inserts ahead, so the table equals in-order `insert_if_absent`.
+    fn insert_batch(&mut self, items: &[(u64, V)]) {
+        const D: usize = 32;
+        match self {
+            Tab::Std(m) => {
+                for &(x, e) in items {
+                    m.entry(x).or_insert(e);
+                }
+            }
+            Tab::Flat {
+                slots,
+                ents,
+                mask,
+                shift,
+            } => {
+                for i in 0..items.len() {
+                    if i + D < items.len() {
+                        flat_prefetch(slots, flat_home(items[i + D].0, *shift));
+                    }
+                    flat_insert(slots, ents, mask, shift, items[i].0, items[i].1);
+                }
+            }
+            Tab::FlatW {
+                slots,
+                ents,
+                mask,
+                shift,
+            } => {
+                for i in 0..items.len() {
+                    if i + D < items.len() {
+                        flat_prefetch(slots, flat_home(items[i + D].0, *shift));
+                    }
+                    flat_insert(slots, ents, mask, shift, items[i].0, items[i].1);
+                }
+            }
+            Tab::FlatF {
+                slots,
+                xs,
+                ents,
+                mask,
+                shift,
+            } => {
+                for i in 0..items.len() {
+                    if i + D < items.len() {
+                        flat_prefetch(slots, flat_home(items[i + D].0, *shift));
+                    }
+                    flatf_insert(slots, xs, ents, *mask, *shift, items[i].0, items[i].1);
+                }
+            }
         }
     }
     fn insert_if_absent(&mut self, x: u64, e: V) {
@@ -723,6 +832,10 @@ fn rad_flush<V: Copy>(table: &mut Tab<V>, buf: &mut Vec<(u64, V)>, tmp: &mut Vec
 }
 
 fn main() {
+    ZMODE.store(
+        std::env::var("MTF_Z").map(|v| v == "1").unwrap_or(false),
+        std::sync::atomic::Ordering::Relaxed,
+    );
     let args: Vec<String> = std::env::args().collect();
     let arm = args[1].as_str();
     let d: serde_json::Value =
@@ -1309,12 +1422,25 @@ fn main() {
                 .map(|s| s.split(',').collect())
                 .unwrap_or_default();
             for o in &opts {
-                assert!(["pf", "rel", "rad", "cb"].contains(o), "ic5b option {o}");
+                assert!(
+                    ["pf", "rel", "rad", "cb", "xb", "ib"].contains(o),
+                    "ic5b option {o}"
+                );
             }
             let pf = opts.contains(&"pf");
             let rel_b = opts.contains(&"rel");
             let rad = opts.contains(&"rad");
             let cb = opts.contains(&"cb");
+            // "xb" (research/mt_ic_tb_20261119): the table build's simultaneous inversions span consecutive combos
+            // until at least XB_MIN denominators are pending, instead of one per combo; insert order is unchanged.
+            let xb = opts.contains(&"xb");
+            const XB_MIN: usize = 64;
+            // "ib" (research/mt_ic_tb_20261119): table-build inserts are buffered IB_CHUNK at a time and inserted
+            // in order by Tab::insert_batch; the table equals in-order insertion.
+            let ib = opts.contains(&"ib");
+            const IB_CHUNK: usize = 1024;
+            let mut ibuf: Vec<(u64, (u32, u16, i8))> =
+                Vec::with_capacity(if ib { IB_CHUNK } else { 0 });
             const RAD_CHUNK: usize = 1 << 22;
             let mut rbuf: Vec<(u64, (u32, u16, i8))> = Vec::new();
             let mut rtmp: Vec<(u64, (u32, u16, i8))> = Vec::new();
@@ -1410,7 +1536,13 @@ fn main() {
                 Tab::new(flat, cap, p)
             };
             let mut put = |table: &mut Tab<(u32, u16, i8)>, x: u64, e: (u32, u16, i8)| {
-                if rad {
+                if ib {
+                    ibuf.push((x, e));
+                    if ibuf.len() >= IB_CHUNK {
+                        table.insert_batch(&ibuf);
+                        ibuf.clear();
+                    }
+                } else if rad {
                     rbuf.push((x, e));
                     if rbuf.len() >= RAD_CHUNK {
                         rad_flush(table, &mut rbuf, &mut rtmp);
@@ -1427,8 +1559,33 @@ fn main() {
                 }
             };
             let mut dens: Vec<u64> = Vec::with_capacity(m);
+            let mut xq: Vec<(u32, u16, (u64, u64))> = Vec::with_capacity(2 * XB_MIN + m);
             for (ci_, (p, idx, _)) in combos.iter().enumerate() {
                 let last = *idx.last().unwrap() as usize;
+                if bi && xb {
+                    // queue this combo's pairs; flush when enough denominators are pending (or at the last combo)
+                    if let Some(pp) = *p {
+                        for (l, fl) in fb.iter().enumerate().take(m).skip(last + 1) {
+                            if fl.0 != pp.0 {
+                                dens.push(f.sub(fl.0, pp.0));
+                                xq.push((ci_ as u32, l as u16, pp));
+                            }
+                        }
+                    }
+                    if dens.len() >= XB_MIN || ci_ + 1 == combos.len() {
+                        f.batch_inv(&mut dens, &mut bscr);
+                        for (j, &(c, l, pp)) in xq.iter().enumerate() {
+                            let (xp, xm) = f.xpair_d(pp, fb[l as usize], dens[j]);
+                            f.hash();
+                            put(&mut table, xp, (c, l, 1));
+                            f.hash();
+                            put(&mut table, xm, (c, l, -1));
+                        }
+                        dens.clear();
+                        xq.clear();
+                    }
+                    continue;
+                }
                 if bi {
                     // one simultaneous inversion over this combo's l > last (xpair is None when P is None or x equal)
                     let pp = match *p {
@@ -1465,7 +1622,9 @@ fn main() {
                     }
                 }
             }
-            let _ = put; // end the closure's borrow of `ring` and `rbuf`
+            let _ = put; // end the closure's borrow of `ring`, `rbuf` and `ibuf`
+            table.insert_batch(&ibuf);
+            drop(ibuf);
             while let Some((x0, e0)) = ring.pop_front() {
                 table.insert_if_absent(x0, e0);
             }
