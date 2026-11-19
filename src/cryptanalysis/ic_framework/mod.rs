@@ -81,6 +81,7 @@ pub mod residual;
 pub mod rootfind;
 pub mod rootfind_floor;
 pub mod rootfind_gpu;
+pub mod rootfind_kmitm;
 pub mod shared_rank;
 pub mod solver_units;
 pub mod solvers;

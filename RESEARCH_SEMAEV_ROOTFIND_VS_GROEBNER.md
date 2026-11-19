@@ -372,3 +372,8 @@ the 100× plan as `rootfind-floor:m=2|3` — same search/charged adds as
 `rootfind-subtract`, x-only Montgomery + Bloom filter. Wall ~1.9–2.1× vs
 subtract on 32-bit prime A∈{64,256,1024} (`[pcc:unverified]`). Evidence
 `research/rootfind_floor_oracle_20261119/`. No security claim.
+
+Engineering 2026-11-19: `rootfind-kmitm:m=3..12` meet-in-the-middle
+half-sum tables (enables m=10..12; build 7–76× vs full ksum at m=3..8 on
+|Fx|=12). Probe is heavier than full ksum when the table fits — see
+`research/rootfind_kmitm_20261119/`. No security claim.
