@@ -113,6 +113,18 @@ fn inv(a: u64, p: u64) -> u64 {
     r
 }
 
+/// [`mul_tower_var`] for the unit tests of `hky_fp_tower_fast2`.
+#[cfg(test)]
+pub(super) fn mul_tower_var_pub(
+    ring: &HkyRing,
+    m: u64,
+    j: usize,
+    coef: u64,
+    out: &mut Vec<(u64, u64)>,
+) {
+    mul_tower_var(ring, m, j, coef, out)
+}
+
 /// `y_j · (mask, coef)` in normal form: the reference's `mul_tower_var`.
 fn mul_tower_var(ring: &HkyRing, m: u64, j: usize, coef: u64, out: &mut Vec<(u64, u64)>) {
     let p = ring.p;
