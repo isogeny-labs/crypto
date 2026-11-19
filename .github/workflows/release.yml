@@ -189,7 +189,7 @@ jobs:
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
             /research/chained_jacobian_transfers_20261110/lean/ChainTransfer.lean
-            /research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-e0ae0fe5.json
+            /research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json
             /research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json
             /research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json
             /docs/curves/
@@ -308,7 +308,7 @@ jobs:
           # paths and pinned Git objects that are intentionally not staged.
           cp -R docs/ecdlp-audit "dist/$name/docs/"
           mkdir -p "dist/$name/research/curve_transfer_infrastructure_20261118"
-          cp research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-e0ae0fe5.json \
+          cp research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json \
              research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json \
              research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json \
              "dist/$name/research/curve_transfer_infrastructure_20261118/"
@@ -342,7 +342,7 @@ jobs:
               docs/curves/cover-transfer-assessments.json \
               docs/curves/cover-transfer-assessment.schema.json \
               docs/curves/fixed-f8-genus3-order-certificate.json \
-              research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-e0ae0fe5.json \
+              research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json \
               research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json \
               research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json; do
               test -f "$required"
@@ -371,7 +371,7 @@ jobs:
               --registry docs/curves/registry.json \
               --cover-graph docs/curves/cover-links.yaml \
               --traits docs/curves/traits.json \
-              --expected-sha256 671425585e8f67e0596186fc574f2265938cd6465057d85ca1ae9844e47619cc \
+              --expected-sha256 a55c7f9a0c836614281388f19b3b31fa622eeb1650ddc00c59e4e78562471392 \
               --expected-bytes 500924 \
               --output transfer-catalog-replay.json; then
               :
@@ -393,8 +393,8 @@ jobs:
               exit "$verify_code"
             fi
             node -e 'const fs=require("fs"); for(const file of ["verified-smoke.json","arithmetic-smoke.json"]){const r=JSON.parse(fs.readFileSync(file)); if(r.status!=="ok") process.exit(1)} const c=JSON.parse(fs.readFileSync("catalog-smoke.json")); if(c.schema_version!=="curve-covers/v1") process.exit(1);'
-            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("transfer-catalog-replay.json")); if(r.schema_version!=="binary-subgroup-transfer-catalog-verification/v1"||r.status!=="verified_complete"||r.checks.optional_raw_hash_and_size!==true||r.checks.canonical_bytes_equal!==true||r.corpus.sha256!=="671425585e8f67e0596186fc574f2265938cd6465057d85ca1ae9844e47619cc"||r.corpus.bytes!==500924||r.summary.failed_named_subgroup_records!==0) process.exit(1);'
-            cmp transfer-catalog-replay.json research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-e0ae0fe5.json
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("transfer-catalog-replay.json")); if(r.schema_version!=="binary-subgroup-transfer-catalog-verification/v1"||r.status!=="verified_complete"||r.checks.optional_raw_hash_and_size!==true||r.checks.canonical_bytes_equal!==true||r.corpus.sha256!=="a55c7f9a0c836614281388f19b3b31fa622eeb1650ddc00c59e4e78562471392"||r.corpus.bytes!==500924||r.summary.failed_named_subgroup_records!==0) process.exit(1);'
+            cmp transfer-catalog-replay.json research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json
             odd_corpus_sha256="1ecfabcdaecc3e00d78ab2ce7eebeb94607e1c2c224f261fb5718a4f53b65268"
             odd_corpus_bytes="17879292"
             actual_odd_sha256="$(sha256sum docs/curves/odd-subgroup-transfer-certificates.json | awk '{print $1}')"

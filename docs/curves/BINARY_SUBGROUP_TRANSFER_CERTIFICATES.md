@@ -61,26 +61,28 @@ only about the named generated subgroup, not the ambient curve order.
 The repository-tracked corpus is
 `docs/curves/binary-subgroup-transfer-certificates.json`: 500,924 bytes,
 SHA-256
-`671425585e8f67e0596186fc574f2265938cd6465057d85ca1ae9844e47619cc`.
+`a55c7f9a0c836614281388f19b3b31fa622eeb1650ddc00c59e4e78562471392`.
 It records producer revision
-`e0ae0fe5d09c0492a8b50600e88d0b9da68afef1`, length-framed source digest
-`73afe2092d1c065c048c5c9aa566d0c0ab606f3291230392a70697898267b870`,
+`5c6e43a6f0cffe0afc4c962ff54056716cf6437e`, length-framed source digest
+`e7a12f60c219624b2442bb54a79bb114ad8c89cfd1d33f6f0ca4643af7bae7dd`,
 174 maps, 150 supported named-subgroup records, 102 locally proved exact
 generated orders, 48 unknown exact orders, and zero failed records. The
 producer revision and compiler string inside the JSON are caller-supplied;
 the source digest binds the binary module routing and deterministic primality
 implementation used by exact-order evidence. Exact regeneration is the
-executable binding. The prior 500,925-byte `f402ccd4…` / `8c61e842…`
-snapshot remains in Git history and in its historical package receipt; it is
-not the current exact-replay target.
+executable binding. The 500,924-byte `67142558…` / `e0ae0fe5…` snapshot and
+the earlier 500,925-byte `f402ccd4…` / `8c61e842…` snapshot remain historical;
+neither is the current exact-replay target.
 [pcc:unverified]
 
-The clean Rust 1.98 canonical replay is retained at
-[`binary-transfer-catalog-canonical-replay-e0ae0fe5.json`](../../research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-e0ae0fe5.json).
+The Rust 1.98 canonical replay candidate is retained at
+[`binary-transfer-catalog-canonical-replay-5c6e43a6.json`](../../research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json).
 It is 1,681 bytes with SHA-256
-`f8aba60113f2090f5c183ba2e759b17c7195cb2b9a484f1bd2182ec8a4f7e815`.
-This is same-implementation evidence, not an independent arithmetic oracle or
-signed standing. [pcc:unverified]
+`31df0daef4b583eeb87f9589460b83bd73345bd8a81a68c74c11ee8d0a2101d6`.
+Native exact replay and installed-package comparison remain required before
+this successor is treated as run evidence. Even after they pass, it is
+same-implementation evidence, not an independent arithmetic oracle or signed
+standing. [pcc:unverified]
 
 ## Required bindings and checks
 
