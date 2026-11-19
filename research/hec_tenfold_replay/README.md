@@ -374,3 +374,20 @@ On (59,15) all 27 poles of the three-family catalogue gave 20 accepted rows and 
 The first seed (2026111930) used 16 input pairs per curve; the second (2026111931) used 32. All four-family scalars were verified. In each order the benchmark rotated the pencil reference, original three-family, packed three-family and four-family solvers for 32 repetitions per input. Each available candidate rebuilt its catalogue, decomposed the input pair and verified the scalar inside the elapsed time. Qualification and catalogue availability checks preceded timing. The reported speedup is pencil time divided by four-family time. The smallest paired median on the replication was 9.392×.
 
 Run `harness/g4-transfer.zsh` and `harness/g4-transfer.zsh expanded`. The fixture rows give p, c, subgroup prime and the multiplier for (0,1). The rank file gives p, c, arm, anchor (−1 on exhaustion), poles, accepted rows and rank. The medians files identify curve, input and order, then give the three speedup ratios against pencil. The raw archives include both orders and all audit streams.
+
+### Packed degree test across all four genus-4 pencil families
+
+The fourth family fixes four copies of its pole and leaves a residual of degree five. Initializing its degree counter to one makes the same six-count test used by the other families exact. Each rational residual contributes its intersection multiplicity to the counter. A qualifying bucket emits the signed points with those multiplicities and adds four copies of the pole. An exhaustive audit compared all 454 relation vectors and their stream positions with the four-family reference over eight curves.
+
+We timed pencil, four-family, packed four-family and packed three-family in the same binary. The main panels used multiples of (0,1) specified in the fixture file. The packed three-family arm exhausted its catalogue on (59,15), as in the transfer experiment. Both four-family arms verified every input. Each timing order rotated arms over 32 repetitions per case. Every available candidate reconstructed the catalogue for each timed solve.
+
+| Seed | Inputs per curve | Four / packed four median full-solve ratios across curves and orders | Packed four faster in both orders | At least 10× vs pencil in both orders, four / packed four |
+|---|---:|---:|---:|---:|
+| 2026111932 | 16 | 1.054–1.100× | 128/128 | 128 / 128 |
+| 2026111933 | 32 | 1.055–1.100× | 256/256 | 254 / 255 |
+
+The one miss on the second seed was (37,9), input 14, at 9.604× and 9.369×. It had the fastest pencil reference time among the 32 inputs on its curve in both orders. The median reference took 348 and 328 microseconds for this input, versus 539 and 526 microseconds across inputs. On the rank-deficient three-family curve (59,15), packing the four-family counters improved the full solve by 1.093–1.100× across both seeds and orders.
+
+We also reran two earlier misses with their original input generators. On (43,5), seed 2026111929 input 9 reached 10.676× / 10.621×. On (43,7), seed 2026111931 input 31 reached 9.991× / 9.890×. These targeted repeats are separate from the two fresh panels.
+
+Run `harness/g4-packed-four.zsh` and repeat with `expanded` for the second seed. Pass a build output directory to `harness/g4-packed-four-recheck.zsh` for the historical input comparisons. Use `ruby harness/g4-packed-four.rb audit results/g4-packed-four-curves.txt` to generate the standalone C++17 exhaustive audit. The transfer medians reducer accepts `--packed-four` and the optional `--expanded` flag.
