@@ -37,6 +37,7 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             research/prime31_ic_20261115/native
+            src/cryptanalysis
       - name: Install source-bound Rust toolchain
         run: rustup toolchain install 1.100.0 --profile minimal
       - name: Overlay only algebraic examples onto original arithmetic
