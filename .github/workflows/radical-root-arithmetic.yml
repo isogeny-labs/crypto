@@ -20,6 +20,7 @@ on:
       - 'research/amm_digit_perf_20261118/round45_quadratic_frobenius_isolated.py'
       - 'research/amm_digit_perf_20261118/round46_quadratic_split_isolated.py'
       - 'research/amm_digit_perf_20261118/round47_quadratic_split_isolated.py'
+      - 'research/amm_digit_perf_20261118/round48_joint_tonelli_isolated.py'
       - 'research/amm_digit_perf_20261118/round31_bounded_baseline.rs'
       - 'research/amm_digit_perf_20261118/round23_verifier_isolated.py'
       - 'research/amm_digit_perf_20261118/round24_verifier_isolated.py'
@@ -679,4 +680,32 @@ jobs:
         with:
           name: round45-quadratic-native-rust
           path: ${{ runner.temp }}/round45-quadratic-native-rust.txt
+          if-no-files-found: ignore
+
+  bounded-joint-tonelli-round48:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round48_joint_tonelli_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Native Rust R47-vs-R48 frozen roots, replay and 13-pair timing
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round48_joint_tonelli_isolated.py
+          } | tee "$RUNNER_TEMP/round48-tonelli-rust.txt"
+          cat "$RUNNER_TEMP/round48-tonelli-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round48-tonelli-native-rust
+          path: ${{ runner.temp }}/round48-tonelli-rust.txt
           if-no-files-found: ignore
