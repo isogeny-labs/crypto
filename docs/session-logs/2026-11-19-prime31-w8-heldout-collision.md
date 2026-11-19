@@ -30,3 +30,19 @@
 
 ## Errors (what went wrong, how it was handled)
 - No source-bound implementation failure; no local Rust. Tool-specific plain-text GitHub API source and CI log verification substituted for local build. [pcc:unverified].
+
+## 2026-11-19 12:34 UTC — What was done (commands, files, features)
+- Post-outcome strengthened exact-certificate source and independently authored Python script (all 40 in each W1 half, no seed change). Source-specific [CI #44524323141](https://github.com/isogeny-labs/crypto/actions/runs/44524323141) PASS at source `cc044eda1d854672891094ec0a691c92ca17605b`: 40/40 original Rust lib, 3/3 focused, 1,024 target grading and **80/80 independently recomputed short-relation collision certificates**. [Raw artifact #14529033204](https://github.com/isogeny-labs/crypto/actions/runs/44524323141/artifacts/14529033204), raw JSON SHA256 `3a297b765e3ada35961aa5683b1ac004e606d273ef057297149304996ab12794`.
+- Checked in scientific result `W8_HELDOUT_COLLISION_RESULT_20261119.md` and frozen `W8_HELDOUT_COLLISION_SUMMARY_20261119.json`. The report covers exact scale-16 theorem, one six-point group relation explaining all 40 pair collisions, held-out 772/1024 vs 902/1024 generic grading, same-source test evidence, literature/previous leads, and public-only F4/complete-solver next gates.
+- Full study original Rust code `native/examples/prime31_w8_heldout_collision.rs` and independent verifier `native/verify_prime31_w8_heldout_collision.py` committed. This remains an out-of-band MITM grader; no genuine public-only unknown-index extractor was implemented, no new rank31 whole-solve benchmark, no signed PCC.
+
+## Decisions made (and why)
+- Promote only the validated mathematical collision certificate and sampled **generic relation availability**; do not promote solver-speed or asymptotic claims. The new `S+[16]S` representation is a hypothesis to test in the existing #4692 algebraic extractor, with duplication-chain degree/memory charged.
+- A separate candidate with last weight 127 removes the observed W1 right-half collision in independent affine exploratory enumeration, but needs fresh prospective registration before yield or F4 cost comparisons.
+
+## Open threads (unfinished, pick up next time)
+- Owner #4692: implement source-bound non-generic RR9/F4 or remainder-tower B8 extraction on public residuals, compare both weight arms, frozen 46+/18- corpus, then rank31/1,024 full cost vs same-runner fastest shared BSGS/IC/rho.
+- Independent signed PCC and held-out cross-curve generalization; full eight-slot additive-energy/multiplicity study; optional near-powers right-weight candidate.
+
+## Errors (what went wrong, how it was handled)
+- GitHub runner jobs passed; no local Rust installation. Repository-global inherited artifact checks are unrelated and not claimed as passing. [pcc:unverified].
