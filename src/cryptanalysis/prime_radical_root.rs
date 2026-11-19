@@ -42,10 +42,19 @@ fn frobenius_roots(p: u64, poly: &[u64]) -> Result<Vec<u64>, String> {
 #[derive(Clone, Copy)]
 pub(crate) struct Fp {
     pub p: u64,
+    // floor(2^64/p) for the canonical 32-bit multiplication path.
+    reciprocal32: u64,
 }
 impl Fp {
     pub fn new(p: u64) -> Self {
-        Fp { p }
+        Fp {
+            p,
+            reciprocal32: if p >= 2 && p <= u32::MAX as u64 {
+                ((1u128 << 64) / u128::from(p)) as u64
+            } else {
+                0
+            },
+        }
     }
     #[inline]
     pub fn add(&self, a: u64, b: u64) -> u64 {
@@ -97,8 +106,12 @@ impl Fp {
                 folded
             }
         } else if self.p <= u32::MAX as u64 && a < self.p && b < self.p {
-            // Canonical 32-bit operands fit in a native 64-bit product.
-            (a * b) % self.p
+            // Canonical operands have a 64-bit product; Barrett's 64-bit
+            // reciprocal underestimates the quotient by at most one.
+            let product = a * b;
+            let quotient = ((u128::from(product) * u128::from(self.reciprocal32)) >> 64) as u64;
+            let residual = product - quotient * self.p;
+            if residual >= self.p { residual - self.p } else { residual }
         } else {
             ((a as u128 * b as u128) % self.p as u128) as u64
         }
@@ -3164,7 +3177,8 @@ mod tests {
         }
         let mut seed = 0x7d3af0192ebc42u64;
         for &p in &[5u64, 7, 11, 13, 97, 65_537, 998_244_353,
-                     1_000_000_007, 2_147_483_647, MAX_PRIME] {
+                     1_000_000_007, 1_000_000_009, 2_147_483_647,
+                     4_294_967_291, MAX_PRIME] {
             let f = Fp::new(p);
             let mut input = vec![0, 1, 2, p / 2, p - 2, p - 1];
             for _ in 0..4_096 {
@@ -3201,6 +3215,11 @@ mod tests {
                 assert_eq!(q.mul(x, y), (real, imag), "Fq2 p={p} x={x:?} y={y:?}");
             }
             // Public Fp entry points previously accepted noncanonical values.
+            if p == 1_000_000_007 {
+                // Noncanonical 32-bit inputs continue through the u128 fallback.
+                assert_eq!(f.mul(p + 1, p + 2), 2);
+                assert_eq!(f.mul(u64::MAX, 3), ref_mul(p, u64::MAX, 3));
+            }
             if p == MAX_PRIME {
                 assert_eq!(f.mul(p + 1, p + 2), 2);
                 assert_eq!(f.add(p + 1, p + 2), 3);
