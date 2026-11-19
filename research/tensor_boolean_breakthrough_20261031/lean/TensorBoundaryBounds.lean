@@ -889,6 +889,132 @@ theorem eagerBirdZModInverseBitWork_le
     (Nat.mul_le_mul (eagerBirdZModInverseRingOps_le n) hRing)
     hInverse
 
+/-! ### Counted dense rectangular postprocessing -/
+
+/-- Structurally recursive dense dot product on finite vectors. -/
+def denseDot
+    {R : Type*} [CommRing R] : {n : ℕ} → (Fin n → R) → (Fin n → R) → R
+  | 0, _, _ => 0
+  | _n + 1, left, right =>
+      left 0 * right 0 + denseDot (fun k => left k.succ) (fun k => right k.succ)
+
+/-- The recursive dot product is the ordinary finite sum. -/
+theorem denseDot_eq_sum
+    {R : Type*} [CommRing R] {n : ℕ} (left right : Fin n → R) :
+    denseDot left right = ∑ k, left k * right k := by
+  induction n with
+  | zero => simp [denseDot]
+  | succ n ih =>
+      rw [denseDot, Fin.sum_univ_succ]
+      congr 1
+      exact ih _ _
+
+/-- Dot product with scalar-ring operations instrumented. -/
+def countedDenseDot
+    {R : Type*} [CommRing R] :
+    {n : ℕ} → (Fin n → R) → (Fin n → R) → RingCounted R
+  | 0, _, _ => RingCounted.lift 0
+  | _n + 1, left, right =>
+      RingCounted.add
+        (RingCounted.mul (RingCounted.lift (left 0))
+          (RingCounted.lift (right 0)))
+        (countedDenseDot (fun k => left k.succ) (fun k => right k.succ))
+
+/-- Erasing the dense-dot counter recovers the recursive value. -/
+theorem countedDenseDot_value
+    {R : Type*} [CommRing R] {n : ℕ} (left right : Fin n → R) :
+    (countedDenseDot left right).value = denseDot left right := by
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+      simp only [countedDenseDot, denseDot, RingCounted.add, RingCounted.mul,
+        RingCounted.lift]
+      rw [ih]
+
+/-- A dense dot product of length `n` uses exactly `n` multiplications and
+`n` additions, counting addition into the zero accumulator. -/
+theorem countedDenseDot_ops
+    {R : Type*} [CommRing R] {n : ℕ} (left right : Fin n → R) :
+    (countedDenseDot left right).ops = 2 * n := by
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+      simp only [countedDenseDot, RingCounted.add, RingCounted.mul,
+        RingCounted.lift]
+      rw [ih]
+      omega
+
+/-- Dense rectangular multiplication through the counted dot-product value
+formula. -/
+def eagerDenseMatrixMul
+    {R : Type*} [CommRing R] {rows inner cols : ℕ}
+    (left : Matrix (Fin rows) (Fin inner) R)
+    (right : Matrix (Fin inner) (Fin cols) R) :
+    Matrix (Fin rows) (Fin cols) R :=
+  fun i j => denseDot (left i) (fun k => right k j)
+
+/-- The recursive dense multiplication equals Mathlib matrix multiplication. -/
+theorem eagerDenseMatrixMul_eq_mul
+    {R : Type*} [CommRing R] {rows inner cols : ℕ}
+    (left : Matrix (Fin rows) (Fin inner) R)
+    (right : Matrix (Fin inner) (Fin cols) R) :
+    eagerDenseMatrixMul left right = left * right := by
+  ext i j
+  rw [eagerDenseMatrixMul, Matrix.mul_apply, denseDot_eq_sum]
+
+/-- Total scalar-ring operations for eagerly materializing a dense
+`rows × inner` by `inner × cols` product. -/
+def eagerDenseMatrixMulRingOps (rows inner cols : ℕ) : ℕ :=
+  rows * cols * (2 * inner)
+
+/-- Summing the exact entry counters over every materialized output entry
+recovers the advertised dense-multiplication budget. -/
+theorem eagerDenseMatrixMulRingOps_eq
+    {R : Type*} [CommRing R] {rows inner cols : ℕ}
+    (left : Matrix (Fin rows) (Fin inner) R)
+    (right : Matrix (Fin inner) (Fin cols) R) :
+    (∑ i : Fin rows, ∑ j : Fin cols,
+      (countedDenseDot (left i) (fun k => right k j)).ops) =
+        eagerDenseMatrixMulRingOps rows inner cols := by
+  simp [countedDenseDot_ops, eagerDenseMatrixMulRingOps, mul_assoc]
+
+/-- Scalar-ring budget for the complete executable planted kernel: the Bird
+inverse, the dense `R * B⁻¹` product, and one negation per output entry. -/
+def eagerBirdPlantedKernelRingOps (f s : ℕ) : ℕ :=
+  eagerBirdZModInverseRingOps f + eagerDenseMatrixMulRingOps s f f + s * f
+
+/-- Explicit algebraic-operation bound for the complete planted kernel. -/
+theorem eagerBirdPlantedKernelRingOps_le (f s : ℕ) :
+    eagerBirdPlantedKernelRingOps f s ≤
+      4 * (f + 1) ^ 6 + 4 * (f + 1) ^ 4 + f * f +
+        s * f * (2 * f) + s * f := by
+  exact Nat.add_le_add
+    (Nat.add_le_add (eagerBirdZModInverseRingOps_le f) le_rfl) le_rfl
+
+/-- Abstract bit work for the complete planted kernel. -/
+def eagerBirdPlantedKernelBitWork
+    (f s scalarRingBitCost scalarInverseBitCost : ℕ) : ℕ :=
+  eagerBirdPlantedKernelRingOps f s * scalarRingBitCost + scalarInverseBitCost
+
+/-- Conditional polynomial bit bound for inverse construction and rectangular
+postprocessing together. -/
+theorem eagerBirdPlantedKernelBitWork_le
+    (f s modulusBits scalarRingBitCost scalarInverseBitCost : ℕ)
+    (ringConstant ringDegree inverseConstant inverseDegree : ℕ)
+    (hRing : scalarRingBitCost ≤
+      ringConstant * (modulusBits + 1) ^ ringDegree)
+    (hInverse : scalarInverseBitCost ≤
+      inverseConstant * (modulusBits + 1) ^ inverseDegree) :
+    eagerBirdPlantedKernelBitWork f s scalarRingBitCost scalarInverseBitCost ≤
+      (4 * (f + 1) ^ 6 + 4 * (f + 1) ^ 4 + f * f +
+          s * f * (2 * f) + s * f) *
+          (ringConstant * (modulusBits + 1) ^ ringDegree) +
+        inverseConstant * (modulusBits + 1) ^ inverseDegree := by
+  rw [eagerBirdPlantedKernelBitWork]
+  exact Nat.add_le_add
+    (Nat.mul_le_mul (eagerBirdPlantedKernelRingOps_le f s) hRing)
+    hInverse
+
 /-! ### Executable planted kernel -/
 
 /-- The planted-kernel matrix with the executable Bird inverse substituted for

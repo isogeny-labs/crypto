@@ -166,7 +166,18 @@ intentional: the pinned Mathlib implements `ZMod.inv` through `Nat.gcdA` but
 contains no proved machine-time theorem for that implementation. Array
 allocation and integer-indexing costs remain open as well. Claim
 `PCC-20261119-e1a1a1` passes its local Lean verifier. The algebraic
-block binding itself is checked: `executableBirdPlantedKernel` substitutes the
+postprocessing is now counted too. A recursive dot product is proved equal to
+the finite sum in `Matrix.mul`, uses exactly `2f` charged operations, and sums
+to `2sf^2` operations over the `s` by `f` result. Charging the final `sf`
+negations gives the full planted-kernel bound. [pcc:unverified]
+
+```text
+4(f+1)^6 + 4(f+1)^4 + f^2 + 2sf^2 + sf
+```
+
+plus one scalar inverse. Array allocation/indexing and proofs of the polynomial
+scalar bit-cost hypotheses remain open. The algebraic block binding itself is
+checked: `executableBirdPlantedKernel` substitutes the
 Bird inverse into `(-R B⁻¹ | I)`, and
 `executableBirdPlantedKernel_spec` proves both annihilation of `[B;R]` and the
 identity right-block law under `IsUnit B.det`. That is the exact interface used

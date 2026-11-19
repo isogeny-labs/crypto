@@ -393,6 +393,19 @@ the exact eventual natural-power inequality required by
 | `eagerBirdZModInverseRingOps_le` | law | same | dimension | none |
 | `eagerBirdZModInverseBitWork` | definition | same | dimension and supplied scalar-operation/inversion bit costs | none |
 | `eagerBirdZModInverseBitWork_le` | law | same | dimension, modulus bit length, fixed scalar and inversion polynomial parameters | supplied scalar-operation and inversion costs satisfy the stated polynomial bounds |
+| `denseDot` | definition | same | finite vectors over a commutative ring | none |
+| `denseDot_eq_sum` | law | same | same | none |
+| `countedDenseDot` | definition | same | same | none |
+| `countedDenseDot_value` | law | same | same | none |
+| `countedDenseDot_ops` | law | same | inner dimension | none |
+| `eagerDenseMatrixMul` | definition | same | finite rectangular matrices | none |
+| `eagerDenseMatrixMul_eq_mul` | law | same | same | none |
+| `eagerDenseMatrixMulRingOps` | definition | same | row, inner, and column dimensions | none |
+| `eagerDenseMatrixMulRingOps_eq` | law | same | finite rectangular matrices | none |
+| `eagerBirdPlantedKernelRingOps` | definition | same | planted and remainder dimensions | none |
+| `eagerBirdPlantedKernelRingOps_le` | law | same | planted and remainder dimensions | none |
+| `eagerBirdPlantedKernelBitWork` | definition | same | dimensions and supplied scalar-operation/inversion bit costs | none |
+| `eagerBirdPlantedKernelBitWork_le` | law | same | dimensions, modulus bit length, fixed scalar and inversion polynomial parameters | supplied scalar-operation and inversion costs satisfy the stated polynomial bounds |
 
 The inverse budget counts one determinant for the scalar denominator, all
 `n^2` row-update determinants used by `birdAdjugate`, `n^2` final scalar
@@ -403,6 +416,15 @@ that extended-GCD implementation.  Thus the new law isolates that missing
 arithmetic premise instead of attributing an unproved runtime to evaluator
 execution.  Array access, allocation, and integer-indexing costs remain a
 separate machine-model obligation.
+
+The rectangular postprocessing uses a structurally recursive dense dot
+product.  Its counted erasure theorem binds the counter to the value, its
+operation theorem gives exactly `2f` charged operations per entry (one
+multiplication and one addition per term, including the zero accumulator), and
+the matrix theorem identifies the materialized entry formula with
+`Matrix.mul`.  Summing over all `s*f` output entries and charging their
+negations closes the scalar-operation part of `-R * B^-1`; memory and indexing
+remain explicitly outside the model.
 
 ## Executable planted kernel
 

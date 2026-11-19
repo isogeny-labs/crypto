@@ -893,3 +893,24 @@ The pinned build completed with 2,189 jobs. The repository proof gate reported
 `lake env leanchecker --fresh TensorBoundaryBounds` exited 0. Hash-bound claim
 `PCC-20261119-e1a1a1` passes its local Lean verifier.
 [pcc:unverified]
+
+## 2026-11-19 counted rectangular postprocessing
+
+`denseDot` is a structurally recursive finite-vector dot product.
+`denseDot_eq_sum` identifies it with the finite sum used by `Matrix.mul`;
+`countedDenseDot_value` erases its counter to that value, and
+`countedDenseDot_ops` gives exactly `2f` operations for inner dimension `f`.
+Summing all entry counters proves the materialized `s` by `f` product costs
+exactly `2sf^2` charged operations. Including the `sf` negations gives the
+following bound. [pcc:unverified]
+
+```text
+eagerBirdPlantedKernelRingOps f s <=
+  4(f+1)^6 + 4(f+1)^4 + f^2 + 2sf^2 + sf.
+```
+
+The corresponding conditional bit-work theorem charges the same explicit
+polynomial scalar costs as the inverse theorem. The pinned build completed
+with 2,189 jobs; the proof gate reports `PASS 103 thm 0 trusted`, the seven
+audited public laws use only standard Lean axioms, and the fresh checker exits
+0. Memory allocation and indexing remain outside the model. [pcc:unverified]
