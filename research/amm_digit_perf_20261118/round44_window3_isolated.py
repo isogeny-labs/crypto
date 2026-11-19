@@ -14,7 +14,7 @@ for name in ["PRODUCER_WINDOW_HELPER", "PRODUCER_WINDOW_SWITCH", "REPLAY_WINDOW_
         raise AssertionError(f"missing or duplicate round44 marker: {name}")
 assert "R44_" not in before
 assert "fn window3_power" in source
-assert "fn replay_window3" in source
+assert "fn replay_window2" in source
 
 header = """#![allow(dead_code)]
 mod cryptanalysis {
