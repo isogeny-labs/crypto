@@ -259,3 +259,31 @@ We tested two ways to decide when a replacement is worthwhile. The scan counts n
 The counts measure the innermost elimination coefficient updates and exclude the work of selecting, normalizing and storing replacements. The timing ratios include the entire solve. Each curve had eight fresh inputs (seed 2026111919) and 32 balanced quartets per process. Ratios above one favor the modified solver. The bitset reduced updates on all eight curves and improved full solves on all eight inputs of just one curve, p = 383, c = 42. On the two p = 257 curves, an exact scan cut updates by 10.0% and 7.3%, but the median elapsed-time ratios were only 0.882/0.881 and 0.836/0.834. In the separate four-arm bitset panel, the unchanged and modified two-pencil solvers cleared 10× against the pencil in both orders on 54/64 and 52/64 cases respectively. The fixed-pivot solver remains the default.
 
 Run `harness/g3-pivot-exchange.zsh scan` or `harness/g3-pivot-exchange.zsh mask` for the corresponding replay. The four-arm panel uses pencil, two-pencil fixed pivot, intermediate control and two-pencil modified pivot. The scan control exchanges on initial collisions only; the bitset control traverses the same support bitsets without exchanges. The crossover compares the fixed and modified pivots. Counts files contain OPS lines with prime, coefficient, variant, coefficient updates and exchanges, followed by catalogue records in the transfer format. Medians columns use the transfer format, with original and combined denoting fixed and modified pivots here. Raw timing and audit logs for both implementations are in the archive.
+
+### Selecting genus-2 factor-base places by quadratic character
+
+For the curve with constant coefficient 4 at p = 127 and 257, take the factor g of the curve polynomial to be X − 81 and X² + 222X + 97 respectively. The certificate checks divisibility and irreducibility of the quadratic. At a nonbranch rational place, retain x if g(x) is a nonzero square. Evaluating functions attached to factors of the curve polynomial is motivated by explicit descent. The coverage and timing results below are specific to these experiments. [Poonen and Schaefer, Explicit descent for Jacobians of cyclic covers](https://math.mit.edu/~poonen/papers/descent.pdf)
+
+The census enumerates signed triples with distinct x coordinates mapping to a degree-two divisor in the selected subgroup, excluding overlaps with its Mumford u polynomial. Each eligible triple in the original base has zero or two nonsquare values. Consequently scanning only the positive places encounters at least one root of every such triple. Exhaustive subset search also gives an exact lower bound on how many fixed places a scan must probe to encounter at least one or at least two roots of every triple.
+
+| p | Base size | Eligible signed triples | Minimum one-root scan | Minimum two-root scan | Eligible triples in a full-size positive base |
+|---:|---:|---:|---:|---:|---:|
+| 127 | 26 | 10,230 | 12 | 25 | 20,310 |
+| 257 | 52 | 43,642 | 22 | 51 | 87,270 |
+
+The one-root cover and the timed factor base use different membership rules. For coverage, one positive root suffices. For the timed collector, all three roots must lie in the base, and the search extends to larger x until the original cardinality is reached. Restricting the base to positive places inside the original x range gave 1,726 and 5,990 eligible triples, versus 814 and 3,020 in ascending prefixes of the same reduced sizes.
+
+In the initial two seeds (2026111920–21), the full-size positive base beat the ascending base on 127/128 inputs in both timing orders. Relative to the existing pencil solver, 127/128 cleared 10× in both orders with the positive base and 122/128 with the ascending base. This comparison includes the earlier collector and solver improvements.
+
+The independent input seed 2026111922 used 32 inputs per field and 16 balanced quartets per process. The table reports the median across inputs of each input's median original-time / selected-time ratio. The p = 4093 curve uses X − 268 and 410 places in each base. The p = 1021 control executes identical selection code in both arms.
+
+| p | Forward | Reverse |
+|---:|---:|---:|
+| 127 | 1.217× | 1.237× |
+| 257 | 1.276× | 1.255× |
+| 1021, control | 1.000× | 1.000× |
+| 4093 | 1.438× | 1.446× |
+
+A separate prefix-scan experiment stopped after two roots in a three-quarter prefix or one root in a quarter prefix and reconstructed residual candidates. At p = 4093 the one-root arm reduced point probes from 981,130 to 414,060 across 32 inputs, but ran at 0.220× and 0.217× of the original speed. Reusing the signs already computed by the two-root scan gave 0.997× and 0.957×. The timed character experiment uses the full scan of its selected base.
+
+Run `harness/g2-scan.zsh` with `original`, `optimized`, `character` or `crossover` for the native experiments. To replay a census, pipe `ruby harness/g2-scan-cover.rb` (optionally with `expanded`) to `c++ -I. -O3 -std=c++17 -x c++ - -o /tmp/hec-cover` from this directory and run the binary. The default census columns are p, base size, required hits, eligible signed triples, unsigned supports, triples reached by the prefix, minimum scan size, omitted-set witness mask, search nodes, positive places, signed triples entirely positive and signed triples in the equal-size prefix. Expanded output gives p, base size and eligible triples. Git contains the timing and audit logs in `results/g2-scan-raw.tar.gz`. The medians files give order, p and input index followed by pencil/original, pencil/second, pencil/third, original/second and original/third. Crossover files instead give the original/selected quartet ratio.
