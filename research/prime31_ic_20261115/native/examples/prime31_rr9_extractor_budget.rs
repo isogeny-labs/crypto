@@ -12,6 +12,7 @@ struct Input {
     comparison: Comparison,
     queries: Queries,
     chart: Chart,
+    historical_frontier: HistoricalFrontier,
 }
 #[derive(Debug, Deserialize)]
 struct CurveInput {
@@ -35,6 +36,20 @@ struct Chart {
     b8_negative_pairs: u64,
     fp_products_per_pair: u64,
 }
+// The 2^20-entry shared BSGS cohort was measured in a DIFFERENT CI execution.
+// We use this for a sensitivity calculation, never an observed paired crossover.
+#[derive(Debug, Deserialize)]
+struct HistoricalFrontier {
+    curve_same_as_prime31: bool,
+    same_public_target_cohort_as_4774: bool,
+    same_host_run_as_4774: bool,
+    n_public_logs: u64,
+    baby_table_size: u64,
+    setup_ms: f64,
+    online_ms: f64,
+    fully_charged_batch_ms: f64,
+    memory_rss_kib: u64,
+}
 #[derive(Debug, Serialize)]
 struct Gate {
     schema: &'static str,
@@ -56,6 +71,16 @@ struct Gate {
     b8_vs_b4_pair_count_ratio: u64,
     field_products_per_second_to_fit_one_b8_scan_in_entire_batch: f64,
     field_products_per_second_if_every_query_scans_b8_under_per_call_budget: f64,
+    // HISTORICAL context only. Not a same-runner, same-Q comparison to #4774.
+    historical_frontier_is_cross_run_and_cross_cohort: bool,
+    historical_million_baby_bsgs_ms: f64,
+    historical_million_baby_rss_kib: u64,
+    historical_million_baby_setup_ms: f64,
+    historical_million_baby_online_ms: f64,
+    historical_optimistic_budget_ms_per_call_cross_run_sensitivity_only: f64,
+    historical_optimistic_budget_ms_per_completed_log_cross_run_sensitivity_only: f64,
+    historical_affine_to_million_baby_wall_ratio_NOT_PAIRED: f64,
+    historical_2pow20_baseline_remeasured_same_runner: bool,
     empirical_b8_scan_measured: bool,
     nonenumerative_solver_measured: bool,
     independent_signed_pcc_verified: bool,
@@ -73,6 +98,14 @@ fn calculate(inp: &Input) -> Gate {
     assert_eq!(inp.chart.b4_negative_pairs, 1u64 << 24);
     assert_eq!(inp.chart.b8_negative_pairs, 1u64 << 32);
     assert_eq!(inp.chart.fp_products_per_pair, 30);
+    assert!(inp.historical_frontier.curve_same_as_prime31);
+    assert!(!inp.historical_frontier.same_public_target_cohort_as_4774);
+    assert!(!inp.historical_frontier.same_host_run_as_4774);
+    assert_eq!(inp.historical_frontier.n_public_logs, 1024);
+    assert_eq!(inp.historical_frontier.baby_table_size, 1 << 20);
+    assert_eq!(inp.historical_frontier.memory_rss_kib, 67924);
+    assert!((inp.historical_frontier.setup_ms + inp.historical_frontier.online_ms
+        - inp.historical_frontier.fully_charged_batch_ms).abs() < 0.002);
     let mut ar = Arithmetic::default();
     check_curve(PRIME31, &mut ar).expect("prime-order original Rust curve certificate");
     let calls = inp.queries.training + inp.queries.online;
@@ -102,6 +135,20 @@ fn calculate(inp: &Input) -> Gate {
         field_products_per_second_to_fit_one_b8_scan_in_entire_batch: b8_products as f64 / full_batch_sec,
         field_products_per_second_if_every_query_scans_b8_under_per_call_budget:
             b8_products as f64 / (limit_ms / 1000.0),
+        historical_frontier_is_cross_run_and_cross_cohort: true,
+        historical_million_baby_bsgs_ms: inp.historical_frontier.fully_charged_batch_ms,
+        historical_million_baby_rss_kib: inp.historical_frontier.memory_rss_kib,
+        historical_million_baby_setup_ms: inp.historical_frontier.setup_ms,
+        historical_million_baby_online_ms: inp.historical_frontier.online_ms,
+        historical_optimistic_budget_ms_per_call_cross_run_sensitivity_only:
+            inp.historical_frontier.fully_charged_batch_ms / calls as f64,
+        historical_optimistic_budget_ms_per_completed_log_cross_run_sensitivity_only:
+            inp.historical_frontier.fully_charged_batch_ms
+                / inp.historical_frontier.n_public_logs as f64,
+        historical_affine_to_million_baby_wall_ratio_NOT_PAIRED:
+            inp.comparison.mean_signed_shared_bsgs_1024_ms
+                / inp.historical_frontier.fully_charged_batch_ms,
+        historical_2pow20_baseline_remeasured_same_runner: false,
         empirical_b8_scan_measured: false,
         nonenumerative_solver_measured: false,
         independent_signed_pcc_verified: false,
@@ -132,5 +179,19 @@ mod tests {
         assert!((x.remaining_gap_to_bsgs_ms - 4492.14005).abs() < 1e-4);
         assert!(x.b4_to_per_call_budget_ratio_cross_run_diagnostic > 500.0);
         assert!(!x.nonenumerative_solver_measured);
+    }
+    #[test]
+    fn historical_million_baby_frontier_is_only_a_sensitivity_bound() {
+        let input: Input = serde_json::from_str(INPUT).unwrap();
+        let x = calculate(&input);
+        assert!(x.historical_frontier_is_cross_run_and_cross_cohort);
+        assert!(!x.historical_2pow20_baseline_remeasured_same_runner);
+        assert!((x.historical_million_baby_bsgs_ms - 170.113).abs() < 1e-6);
+        assert!((x.historical_optimistic_budget_ms_per_call_cross_run_sensitivity_only
+            - 0.13955127153404429).abs() < 1e-10);
+        assert!((x.historical_optimistic_budget_ms_per_completed_log_cross_run_sensitivity_only
+            - 0.1661259765625).abs() < 1e-10);
+        assert!((x.historical_affine_to_million_baby_wall_ratio_NOT_PAIRED
+            - 19.65042908243344).abs() < 1e-7);
     }
 }
