@@ -760,9 +760,9 @@ impl Producer<'_> {
             // 11^((p-1)/8) mod p = 172252358 for p=1_000_000_009.
             // Its fourth power is -1 and eighth power is 1. Avoid
             // recomputing a fixed nonresidue power on every split attempt.
-            const CUBED_NONRESIDUE: u64 = 172_252_358;
+            const NONRESIDUE_Q_POWER: u64 = 172_252_358;
             let q = (self.p - 1) / 8;
-            let mut c = CUBED_NONRESIDUE;
+            let mut c = NONRESIDUE_Q_POWER;
             // Obtain d^q and d^((q+1)/2) with a shared square ladder.
             // Separate binary powers square the same base twice at each bit.
             let mut t = 1u64;
