@@ -5130,4 +5130,375 @@ theorem shortCMLinearRelation_implies_norm_torsion
       omegaNonidentity point
   · exact linearRelation
 
+/-- Two multiplicative integer sign characters separated at one group element
+have zero inner product over the finite group. -/
+theorem separatedSignCharacters_innerProduct_zero
+    {Gamma : Type*} [Fintype Gamma] [DecidableEq Gamma] [Group Gamma]
+    (left right : Gamma → ℤ)
+    (leftMultiplicative : ∀ x y, left (x * y) = left x * left y)
+    (rightMultiplicative : ∀ x y, right (x * y) = right x * right y)
+    (separates : ∃ delta, left delta * right delta = -1) :
+    (∑ gamma, left gamma * right gamma) = 0 := by
+  obtain ⟨delta, separatesAtDelta⟩ := separates
+  let productCharacter : Gamma → ℤ := fun gamma => left gamma * right gamma
+  have translated :
+      (∑ gamma, productCharacter (delta * gamma)) =
+        ∑ gamma, productCharacter gamma := by
+    exact Equiv.sum_comp (Equiv.mulLeft delta) productCharacter
+  have translatedNeg :
+      (∑ gamma, productCharacter (delta * gamma)) =
+        -∑ gamma, productCharacter gamma := by
+    calc
+      (∑ gamma, productCharacter (delta * gamma)) =
+          ∑ gamma, -productCharacter gamma := by
+        apply Fintype.sum_congr
+        intro gamma
+        simp only [productCharacter, leftMultiplicative,
+          rightMultiplicative]
+        rw [← neg_one_mul (productCharacter gamma), ← separatesAtDelta]
+        ring
+      _ = -∑ gamma, productCharacter gamma := by simp
+  have sumNeg :
+      (∑ gamma, productCharacter gamma) =
+        -∑ gamma, productCharacter gamma :=
+    translated.symm.trans translatedNeg
+  have sumZero : (∑ gamma, productCharacter gamma) = 0 := by omega
+  simpa [productCharacter] using sumZero
+
+/-- A sign-character projector with exactly one duplicate character isolates
+the two corresponding summands together.  This is the algebra needed for the
+size-two collision classes in the `A = 0` branch. -/
+theorem twoCollisionSignCharacterProjector_isolates_pair
+    {Index Gamma Point : Type*}
+    [Fintype Index] [DecidableEq Index]
+    [Fintype Gamma] [DecidableEq Gamma] [Group Gamma]
+    [AddCommGroup Point]
+    (character : Index → Gamma → ℤ) (coefficient : Index → ℤ)
+    (point : Index → Point) (chosen partner : Index)
+    (distinct : chosen ≠ partner)
+    (multiplicative : ∀ index left right,
+      character index (left * right) =
+        character index left * character index right)
+    (squareOne : ∀ index gamma,
+      character index gamma * character index gamma = 1)
+    (sameCharacter : ∀ gamma,
+      character partner gamma = character chosen gamma)
+    (separatesOthers : ∀ index,
+      index ≠ chosen → index ≠ partner →
+        ∃ delta, character chosen delta * character index delta = -1)
+    (transformedRelation : ∀ gamma,
+      ∑ index, (character index gamma * coefficient index) • point index = 0) :
+    ((Fintype.card Gamma : ℤ) * coefficient chosen) • point chosen +
+      ((Fintype.card Gamma : ℤ) * coefficient partner) • point partner = 0 := by
+  have innerProduct : ∀ index,
+      (∑ gamma, character chosen gamma * character index gamma) =
+        if index = chosen ∨ index = partner then
+          (Fintype.card Gamma : ℤ) else 0 := by
+    intro index
+    by_cases chosenEqual : index = chosen
+    · subst index
+      simp [squareOne]
+    by_cases partnerEqual : index = partner
+    · subst index
+      simp only [sameCharacter]
+      simp [squareOne]
+    · rw [if_neg (not_or_intro chosenEqual partnerEqual)]
+      exact separatedSignCharacters_innerProduct_zero
+        (character chosen) (character index)
+        (multiplicative chosen) (multiplicative index)
+        (separatesOthers index chosenEqual partnerEqual)
+  have projectedZero :
+      ∑ gamma, character chosen gamma •
+        (∑ index, (character index gamma * coefficient index) • point index) = 0 := by
+    simp [transformedRelation]
+  have rearranged :
+      (∑ gamma, character chosen gamma •
+        (∑ index, (character index gamma * coefficient index) • point index)) =
+      ∑ index,
+        (((∑ gamma, character chosen gamma * character index gamma) *
+          coefficient index) • point index) := by
+    simp_rw [smul_sum, ← mul_smul]
+    rw [Finset.sum_comm]
+    apply Finset.sum_congr rfl
+    intro index _
+    rw [← Finset.sum_smul, Finset.sum_mul]
+    apply congrArg fun scalar : ℤ => scalar • point index
+    apply Finset.sum_congr rfl
+    intro gamma _
+    ring
+  rw [rearranged] at projectedZero
+  simp_rw [innerProduct] at projectedZero
+  have splitIndicator : ∀ index,
+      (((if index = chosen ∨ index = partner then
+          (Fintype.card Gamma : ℤ) else 0) * coefficient index) • point index) =
+        (if index = chosen then
+            ((Fintype.card Gamma : ℤ) * coefficient chosen) • point chosen
+          else 0) +
+        (if index = partner then
+            ((Fintype.card Gamma : ℤ) * coefficient partner) • point partner
+          else 0) := by
+    intro index
+    by_cases chosenEqual : index = chosen
+    · subst index
+      simp [distinct]
+    by_cases partnerEqual : index = partner
+    · subst index
+      simp [chosenEqual]
+    · simp [chosenEqual, partnerEqual]
+  simp_rw [splitIndicator] at projectedZero
+  simpa [Finset.sum_add_distrib] using projectedZero
+
+/-- A size-two sign-character collision whose partner point is a signed CM
+image yields an explicit norm-torsion relation for the chosen point. -/
+theorem twoCollisionSignCharacterProjector_implies_cubicCMNormTorsion
+    {Index Gamma Point : Type*}
+    [Fintype Index] [DecidableEq Index]
+    [Fintype Gamma] [DecidableEq Gamma] [Group Gamma]
+    [AddCommGroup Point]
+    (character : Index → Gamma → ℤ) (coefficient : Index → ℤ)
+    (point : Index → Point) (chosen partner : Index)
+    (distinct : chosen ≠ partner)
+    (multiplicative : ∀ index left right,
+      character index (left * right) =
+        character index left * character index right)
+    (squareOne : ∀ index gamma,
+      character index gamma * character index gamma = 1)
+    (sameCharacter : ∀ gamma,
+      character partner gamma = character chosen gamma)
+    (separatesOthers : ∀ index,
+      index ≠ chosen → index ≠ partner →
+        ∃ delta, character chosen delta * character index delta = -1)
+    (transformedRelation : ∀ gamma,
+      ∑ index, (character index gamma * coefficient index) • point index = 0)
+    (zeta : Point →+ Point) (sign : ℤ)
+    (partnerPoint : point partner = sign • zeta (point chosen))
+    (orbitRelation :
+      zeta (zeta (point chosen)) + zeta (point chosen) + point chosen = 0) :
+    (((Fintype.card Gamma : ℤ) * coefficient chosen) ^ 2 -
+        ((Fintype.card Gamma : ℤ) * coefficient chosen) *
+          (((Fintype.card Gamma : ℤ) * coefficient partner) * sign) +
+        (((Fintype.card Gamma : ℤ) * coefficient partner) * sign) ^ 2) •
+      point chosen = 0 := by
+  apply cubicCMRelation_implies_norm_torsion zeta (point chosen)
+    ((Fintype.card Gamma : ℤ) * coefficient chosen)
+    (((Fintype.card Gamma : ℤ) * coefficient partner) * sign)
+    orbitRelation
+  have isolated := twoCollisionSignCharacterProjector_isolates_pair
+    character coefficient point chosen partner distinct multiplicative
+      squareOne sameCharacter separatesOthers transformedRelation
+  rw [partnerPoint] at isolated
+  simpa only [smul_smul] using isolated
+
+/-- Concrete short-curve specialization of the two-collision projector.  The
+cubic CM endomorphism and its orbit relation are constructed internally; the
+remaining geometric input is the signed identification of the partner point. -/
+theorem twoCollisionSignCharacterProjector_implies_shortCMNormTorsion
+    {K Index Gamma : Type*} [Field K] [DecidableEq K]
+    [Fintype Index] [DecidableEq Index]
+    [Fintype Gamma] [DecidableEq Gamma] [Group Gamma]
+    (B omega : K) [(shortCharacterCurve 0 0 B).IsElliptic]
+    (twoNonzero : (2 : K) ≠ 0)
+    (omegaRelation : omega ^ 2 + omega + 1 = 0)
+    (omegaNonidentity : omega ≠ 1)
+    (character : Index → Gamma → ℤ) (coefficient : Index → ℤ)
+    (point : Index → (shortCharacterCurve 0 0 B).toAffine.Point)
+    (chosen partner : Index) (distinct : chosen ≠ partner)
+    (multiplicative : ∀ index left right,
+      character index (left * right) =
+        character index left * character index right)
+    (squareOne : ∀ index gamma,
+      character index gamma * character index gamma = 1)
+    (sameCharacter : ∀ gamma,
+      character partner gamma = character chosen gamma)
+    (separatesOthers : ∀ index,
+      index ≠ chosen → index ≠ partner →
+        ∃ delta, character chosen delta * character index delta = -1)
+    (transformedRelation : ∀ gamma,
+      ∑ index, (character index gamma * coefficient index) • point index = 0)
+    (sign : ℤ)
+    (partnerPoint : point partner = sign •
+      shortCMEndomorphism B omega
+        (cube_eq_one_of_sq_add_self_add_one_eq_zero omegaRelation)
+        (point chosen)) :
+    (((Fintype.card Gamma : ℤ) * coefficient chosen) ^ 2 -
+        ((Fintype.card Gamma : ℤ) * coefficient chosen) *
+          (((Fintype.card Gamma : ℤ) * coefficient partner) * sign) +
+        (((Fintype.card Gamma : ℤ) * coefficient partner) * sign) ^ 2) •
+      point chosen = 0 := by
+  apply twoCollisionSignCharacterProjector_implies_cubicCMNormTorsion
+    character coefficient point chosen partner distinct multiplicative
+      squareOne sameCharacter separatesOthers transformedRelation
+      (shortCMEndomorphism B omega
+        (cube_eq_one_of_sq_add_self_add_one_eq_zero omegaRelation))
+      sign partnerPoint
+  exact shortCM_orbit_sum_eq_zero B omega twoNonzero omegaRelation
+    omegaNonidentity (point chosen)
+
+/-- Two short-curve points whose `X`-coordinates differ by the cubic CM
+scaling and whose `Y`-coordinates have the same square differ by a sign from
+the CM image. -/
+theorem shortCMPoints_signedOrbit_of_sq_eq
+    {K : Type*} [Field K] [DecidableEq K]
+    (B omega : K) [(shortCharacterCurve 0 0 B).IsElliptic]
+    (omegaCube : omega ^ 3 = 1)
+    {x y x' y' : K}
+    (nonsingular : (shortCharacterCurve 0 0 B).toAffine.Nonsingular x y)
+    (nonsingular' : (shortCharacterCurve 0 0 B).toAffine.Nonsingular x' y')
+    (xScaling : x' = omega * x) (squareEqual : y' ^ 2 = y ^ 2) :
+    ∃ sign : ℤ, (sign = 1 ∨ sign = -1) ∧
+      WeierstrassCurve.Affine.Point.some x' y' nonsingular' =
+        sign • shortCMEndomorphism B omega omegaCube
+          (WeierstrassCurve.Affine.Point.some x y nonsingular) := by
+  rcases sq_eq_sq_iff_eq_or_eq_neg.mp squareEqual with yEqual | yNeg
+  · refine ⟨1, Or.inl rfl, ?_⟩
+    change WeierstrassCurve.Affine.Point.some x' y' nonsingular' =
+      WeierstrassCurve.Affine.Point.some (omega * x) y
+        (shortCM_nonsingular B omega x y omegaCube nonsingular)
+    rw [WeierstrassCurve.Affine.Point.some.injEq]
+    exact ⟨xScaling, yEqual⟩
+  · refine ⟨-1, Or.inr rfl, ?_⟩
+    change WeierstrassCurve.Affine.Point.some x' y' nonsingular' =
+      -WeierstrassCurve.Affine.Point.some (omega * x) y
+        (shortCM_nonsingular B omega x y omegaCube nonsingular)
+    rw [WeierstrassCurve.Affine.Point.neg_some,
+      WeierstrassCurve.Affine.Point.some.injEq]
+    refine ⟨xScaling, ?_⟩
+    simpa [shortCharacterCurve, WeierstrassCurve.Affine.negY] using yNeg
+
+/-- A nonidentity cubic root of unity satisfies the quadratic CM relation. -/
+theorem cubeRootOfOne_quadraticRelation
+    {K : Type*} [Field K] {omega : K}
+    (omegaCube : omega ^ 3 = 1) (omegaNonidentity : omega ≠ 1) :
+    omega ^ 2 + omega + 1 = 0 := by
+  have productZero : (omega - 1) * (omega ^ 2 + omega + 1) = 0 := by
+    calc
+      (omega - 1) * (omega ^ 2 + omega + 1) = omega ^ 3 - 1 := by ring
+      _ = 0 := by rw [omegaCube, sub_self]
+  exact (mul_eq_zero.mp productZero).resolve_left
+    (sub_ne_zero.mpr omegaNonidentity)
+
+/-- In the `A = 0` branch, a square product of two distinct scaled cubic
+radicands constructs the nontrivial cubic CM ratio relating their scales. -/
+theorem shortCubicPolynomial_scaled_pair_CM_ratio_of_isSquare
+    {K : Type*} [Field K] (hK : ringChar K ≠ 2)
+    (B left right : K)
+    (nonsingular : (27 : K) * B ^ 2 ≠ 0)
+    (BNonzero : B ≠ 0) (leftNonzero : left ≠ 0)
+    (rightNonzero : right ≠ 0) (distinct : left ≠ right)
+    (squareInFunctionField : IsSquare
+      (algebraMap (Polynomial K) (FractionRing (Polynomial K))
+        ((shortCubicPolynomial 0 B).comp (Polynomial.C left * Polynomial.X) *
+          (shortCubicPolynomial 0 B).comp
+            (Polynomial.C right * Polynomial.X)))) :
+    ∃ omega : K,
+      omega ^ 2 + omega + 1 = 0 ∧ omega ≠ 1 ∧ right = omega * left := by
+  let omega := right / left
+  have omegaCube : omega ^ 3 = 1 :=
+    ((shortCubicPolynomial_scaled_pair_fraction_square_classification hK
+      0 B left right (by simpa using nonsingular) leftNonzero rightNonzero
+      distinct squareInFunctionField).2 rfl BNonzero)
+  have omegaNonidentity : omega ≠ 1 := by
+    intro omegaOne
+    have rightEqLeft : right = left := by
+      have multiplied := (div_eq_iff leftNonzero).mp omegaOne
+      simpa using multiplied
+    exact distinct rightEqLeft.symm
+  refine ⟨omega, cubeRootOfOne_quadraticRelation omegaCube omegaNonidentity,
+    omegaNonidentity, ?_⟩
+  dsimp [omega]
+  exact (div_mul_cancel₀ right leftNonzero).symm
+
+/-- End-to-end `A = 0` size-two collision bridge.  A square-product scale
+collision constructs the nontrivial cubic CM ratio; the two lifted points are
+then signed CM images, and the duplicated sign-character projector produces
+an explicit norm-torsion relation. -/
+theorem shortCubicPairCollision_implies_CMNormTorsion
+    {K Index Gamma : Type*} [Field K] [DecidableEq K]
+    [Fintype Index] [DecidableEq Index]
+    [Fintype Gamma] [DecidableEq Gamma] [Group Gamma]
+    (B left right parameter y y' : K)
+    [(shortCharacterCurve 0 0 B).IsElliptic]
+    (hK : ringChar K ≠ 2) (twoNonzero : (2 : K) ≠ 0)
+    (cubicNonsingular : (27 : K) * B ^ 2 ≠ 0)
+    (BNonzero : B ≠ 0) (leftNonzero : left ≠ 0)
+    (rightNonzero : right ≠ 0) (scalesDistinct : left ≠ right)
+    (squareInFunctionField : IsSquare
+      (algebraMap (Polynomial K) (FractionRing (Polynomial K))
+        ((shortCubicPolynomial 0 B).comp (Polynomial.C left * Polynomial.X) *
+          (shortCubicPolynomial 0 B).comp
+            (Polynomial.C right * Polynomial.X))))
+    (leftNonsingular :
+      (shortCharacterCurve 0 0 B).toAffine.Nonsingular
+        (left * parameter) y)
+    (rightNonsingular :
+      (shortCharacterCurve 0 0 B).toAffine.Nonsingular
+        (right * parameter) y')
+    (character : Index → Gamma → ℤ) (coefficient : Index → ℤ)
+    (point : Index → (shortCharacterCurve 0 0 B).toAffine.Point)
+    (chosen partner : Index) (indicesDistinct : chosen ≠ partner)
+    (chosenPoint : point chosen =
+      WeierstrassCurve.Affine.Point.some
+        (left * parameter) y leftNonsingular)
+    (partnerPoint : point partner =
+      WeierstrassCurve.Affine.Point.some
+        (right * parameter) y' rightNonsingular)
+    (multiplicative : ∀ index gamma₁ gamma₂,
+      character index (gamma₁ * gamma₂) =
+        character index gamma₁ * character index gamma₂)
+    (squareOne : ∀ index gamma,
+      character index gamma * character index gamma = 1)
+    (sameCharacter : ∀ gamma,
+      character partner gamma = character chosen gamma)
+    (separatesOthers : ∀ index,
+      index ≠ chosen → index ≠ partner →
+        ∃ delta, character chosen delta * character index delta = -1)
+    (transformedRelation : ∀ gamma,
+      ∑ index, (character index gamma * coefficient index) • point index = 0) :
+    ∃ omega : K, ∃ sign : ℤ,
+      omega ^ 2 + omega + 1 = 0 ∧ omega ≠ 1 ∧
+      right = omega * left ∧ (sign = 1 ∨ sign = -1) ∧
+      (((Fintype.card Gamma : ℤ) * coefficient chosen) ^ 2 -
+          ((Fintype.card Gamma : ℤ) * coefficient chosen) *
+            (((Fintype.card Gamma : ℤ) * coefficient partner) * sign) +
+          (((Fintype.card Gamma : ℤ) * coefficient partner) * sign) ^ 2) •
+        point chosen = 0 := by
+  obtain ⟨omega, omegaRelation, omegaNonidentity, scaleRelation⟩ :=
+    shortCubicPolynomial_scaled_pair_CM_ratio_of_isSquare hK B left right
+      cubicNonsingular BNonzero leftNonzero rightNonzero scalesDistinct
+      squareInFunctionField
+  have omegaCube :=
+    cube_eq_one_of_sq_add_self_add_one_eq_zero omegaRelation
+  have xScaling : right * parameter = omega * (left * parameter) := by
+    rw [scaleRelation]
+    ring
+  have leftEquation :=
+    WeierstrassCurve.Affine.equation_iff_nonsingular.mpr leftNonsingular
+  rw [shortCharacterCurve_equation_iff] at leftEquation
+  simp only [zero_mul, zero_add, add_zero] at leftEquation
+  have rightEquation :=
+    WeierstrassCurve.Affine.equation_iff_nonsingular.mpr rightNonsingular
+  rw [shortCharacterCurve_equation_iff] at rightEquation
+  simp only [zero_mul, zero_add, add_zero] at rightEquation
+  have squareEqual : y' ^ 2 = y ^ 2 := by
+    calc
+      y' ^ 2 = (right * parameter) ^ 3 + B := rightEquation
+      _ = (omega * (left * parameter)) ^ 3 + B := by rw [xScaling]
+      _ = (left * parameter) ^ 3 + B := by
+        rw [mul_pow, omegaCube, one_mul]
+      _ = y ^ 2 := leftEquation.symm
+  obtain ⟨sign, signCases, signedPoint⟩ :=
+    shortCMPoints_signedOrbit_of_sq_eq B omega omegaCube
+      leftNonsingular rightNonsingular xScaling squareEqual
+  have familyPartner : point partner = sign •
+      shortCMEndomorphism B omega omegaCube (point chosen) := by
+    rw [partnerPoint, chosenPoint]
+    exact signedPoint
+  have normTorsion :=
+    twoCollisionSignCharacterProjector_implies_shortCMNormTorsion
+      B omega twoNonzero omegaRelation omegaNonidentity character coefficient
+      point chosen partner indicesDistinct multiplicative squareOne
+      sameCharacter separatesOthers transformedRelation sign familyPartner
+  exact ⟨omega, sign, omegaRelation, omegaNonidentity, scaleRelation,
+    signCases, normTorsion⟩
+
 end TensorBoundaryBounds

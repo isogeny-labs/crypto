@@ -744,6 +744,10 @@ layer uses these declarations:
 | `shortCMEndomorphism` | construction | same | affine points of the elliptic curve `Y^2 = X^3 + B` | cubic root of unity in the base field |
 | `shortCM_orbit_sum_eq_zero` | law | same | previous row | characteristic not two, nonidentity root satisfying `omega^2 + omega + 1 = 0` |
 | `shortCMLinearRelation_implies_norm_torsion` | endpoint | same | previous row with integers `a,b` and a point `P` | `a*P + b*zeta(P) = 0`; conclusion is `(a^2 - a*b + b^2)*P = 0` |
+| `twoCollisionSignCharacterProjector_isolates_pair` | endpoint | same | finite sign characters with one duplicate pair | the chosen and partner characters coincide; every other character is separated |
+| `shortCMPoints_signedOrbit_of_sq_eq` | law | same | two affine points on `Y^2 = X^3 + B` | cubic scaling of `X` and equality of the two `Y` squares |
+| `shortCubicPolynomial_scaled_pair_CM_ratio_of_isSquare` | law | same | two distinct nonzero scales in the `A = 0` branch | square product in the rational function field |
+| `shortCubicPairCollision_implies_CMNormTorsion` | endpoint | same | previous collision, two lifted points and a duplicated sign-character pair | transformed relations and exact duplicate/separation classification |
 | `algebraic_ne_const_mul_transcendental` | law | same | field extension, algebraic coordinate and transcendental parameter | nonzero constant multiplier |
 | `divisionPolynomial_ne_zero_at_const_mul_transcendental` | law | same | Weierstrass curve over the constant field and extension parameter | division index nonzero in the constant field, nonzero constant multiplier |
 
@@ -777,6 +781,13 @@ proves the coordinate action is additive, proves the cubic orbit relation on
 all affine points, and derives explicit norm torsion from a supplied
 two-coefficient CM relation. It does not construct that relation from an
 interval collision or prove division-polynomial vanishing. [pcc:unverified]
+
+Claim `PCC-20261119-d842a3` binds the composed `A = 0` pair-collision
+endpoint. It constructs the nontrivial cubic ratio, the signed CM partner,
+the two-member character projection, and the explicit norm-torsion relation.
+It still requires the transformed relations and the concrete assertion that
+the selected Galois characters are the unique duplicate pair while all other
+characters are separated. [pcc:unverified]
 
 Claims `PCC-20261119-cd776f` and `PCC-20261119-fc17e6` bind respectively the
 polynomial constant-times-square and the stronger rational-function-square

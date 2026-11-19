@@ -1255,3 +1255,27 @@ All three claim verifiers pass. The repository proof gate reports
 ledger contains 1,431 entries and verifies after serializing the three new
 tail records. The complete local project build succeeds with 9,086 jobs.
 [pcc:unverified]
+
+## 2026-11-19 A-zero pair-collision composition
+
+`twoCollisionSignCharacterProjector_isolates_pair` proves that one duplicated
+sign-character class contributes exactly its two point terms while all
+characters separated at one group element contribute zero.
+`shortCMPoints_signedOrbit_of_sq_eq` derives the signed CM partner directly
+from cubic `X` scaling and equality of the two `Y` squares.
+`shortCubicPolynomial_scaled_pair_CM_ratio_of_isSquare` constructs the
+nonidentity cubic ratio and its quadratic relation from the `A = 0`
+square-product collision. [pcc:unverified]
+
+`shortCubicPairCollision_implies_CMNormTorsion` composes those facts with the
+checked CM endomorphism and norm calculation. Its conclusion exhibits the
+cubic ratio and square-root sign and proves that the corresponding explicit
+Eisenstein norm annihilates the chosen point. Claim
+`PCC-20261119-d842a3` binds this endpoint. The full 9,086-job build succeeds
+and the proof gate reports `PASS 301 thm 0 trusted`. [pcc:unverified]
+
+The remaining `A = 0` work is the Semaev-specific instantiation of the
+duplicated-versus-separated Galois sign characters and the transformed
+relations. Torsion-to-division-polynomial vanishing, specialized polynomial
+construction/degree/vanishing, and runtime assembly also remain open.
+[pcc:unverified]

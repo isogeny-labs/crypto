@@ -380,6 +380,7 @@ especially nonvanishing of the specialized Semaev polynomial for every
 nontrivial tuple. [pcc:unverified]
 
 Four internal steps of that nonvanishing proof are now checked separately.
+[pcc:unverified]
 `shortCubicPolynomial_scale_classification` proves the coefficient
 classification for nontrivial cubic scaling symmetries;
 `zmodNoFullCubicOrbitInShortInterval` proves the `A = 0`, `3X < p` orbit
@@ -416,6 +417,15 @@ turns `a*P + b*zeta(P) = 0` into
 `(a^2 - a*b + b^2)*P = 0` (`PCC-20261119-cbf30e`). Constructing that linear
 relation from the interval collision and torsion-to-division-polynomial
 vanishing remain open.
+
+The stronger `shortCubicPairCollision_implies_CMNormTorsion` now constructs
+the nonidentity cubic ratio from the square-product collision, identifies the
+second lifted point as a signed CM image, projects the duplicated character
+pair, and concludes explicit norm torsion (`PCC-20261119-d842a3`). The
+remaining `A = 0` specialization must instantiate the duplicate/separation
+classification for the concrete Galois signs and derive their transformed
+relations from the original Semaev relation; the CM and size-two projector
+algebra are no longer premises. [pcc:unverified]
 [pcc:unverified]
 
 The generic certificate is now connected to the pinned upstream definitions,
