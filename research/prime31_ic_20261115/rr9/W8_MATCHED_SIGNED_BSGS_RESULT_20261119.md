@@ -28,3 +28,31 @@ A search of public \`Q-i*hG\` against the x-keyed baby table yields +/- jG (or i
 4. Retain source-specific independent replay separate from a signed PCC validation receipt.
 
 No demonstrated cheaper non-generic complete solver is asserted by this control alone.
+
+
+## Exact-source six-arm result — verified 2026-11-19 01:26 UTC
+
+**GitHub Actions [#44436754627](https://github.com/isogeny-labs/crypto/actions/runs/44436754627) PASSED on candidate source commit \`12f7906e9c0703dd838a1b1b614b31d4b99e46fc\`.** Original EC library at \`1df714645aa683cf975bc76fcacb9842cb4780fd\`. Rust 1.100.0 original library regression 40/40, new signed-BSGS 2/2, original W8-control tests 3/3 passed. Both BSGS 1024-target runs and all four W8 complete runs independently passed Python BigInt group arithmetic and full target-stream identity checks. The repeated BSGS arms had identical non-timing records (tables, all 1024 outputs, counted operations and exactly 16,768,762 giant probes). Signed independent PCC validation remains outstanding.
+
+| Same GitHub runner, 1024 public Q each, all setup included | OLD W8 generic-table IC | TERNARY W8 generic-table IC | Signed shared BSGS (generic reference) |
+|---|---:|---:|---:|
+| Mean fully charged wall time | 9,122.589 ms | 7,834.933 ms | **3,342.793 ms** |
+| Exact group additions | 44,344,469 | 35,150,980 | **16,940,250** |
+| Exact finite-field multiplications | 2,837,165,077 | 2,249,470,574 | **1,084,071,298** |
+| Exact inversions | 44,329,042 | 35,146,369 | **16,937,174** |
+| Public Q logs verified / run | 1,024/1,024 | 1,024/1,024 | 1,024/1,024 |
+| Mean setup only | 110.979 ms | 117.998 ms | **7.307 ms** |
+| Natural training and linear algebra | included | included | not applicable |
+| BSGS table memory | not applicable | not applicable | 32,768 signed x-key entries |
+
+The signed shared-BSGS reference is **2.729x faster** than the original W8 generic-table full batch and **2.344x faster** than ternary W8, across paired two-run means. BSGS A/B took 3,379.561 / 3,306.026 ms; ternary 7,750.837 / 7,919.030 ms; original 9,404.034 / 8,841.143 ms. The W8 ternary advantage on this runner is 9,122.589 / 7,834.933 = **1.164x**, distinct from the **1.262x** in prior #4770's separate same-runner execution. These are real run-to-run differences; never transfer timing ratios between hosts or run series.
+
+**Raw reproducibility:** [GitHub Actions seven-file artifact #14488208293](https://github.com/isogeny-labs/crypto/actions/runs/44436754627/artifacts/14488208293), SHA256 \`360a761d92aa41b18ca3f99e1709ac280c69d867e1c1284281158b9a06065753\`, 30-day retention until **2026-12-19 01:26 UTC**. [Durable exact producer summary](W8_MATCHED_SIGNED_BSGS_SUMMARY_20261119.json) stores six-arm times, group/field operations and all comparison ratios. Source file SHA256 signed-BSGS example \`353b82daaee18e1a0058e88b956e8e3d5312fd2fc5a3e1ada16cc2b1620515b2\`; old/ternary control example \`9e7c67c15dfe29e7cb17809139f85ba1979f9c6827c108c38b0c49eb01854f45\`.
+
+### Interpretation and new experimental priority
+
+This result supplies the **first same-runner, same-affine-arithmetic 1024-Q control** missing from #4770: even an unoptimized (affine EC arithmetic) signed shared-BSGS implementation decisively beats both complete W8 generic-table controls at p=2^31−1. It is **not** an optimized BSGS frontier record or a proof that a genuinely non-generic approach could not beat BSGS. This experiment introduces no new non-generic extractor. Generic table/weight refinements that only yield another small constant-factor win should be deprioritized.
+
+Priority non-generic falsifier: implement a public-residual-only signed B8 RR9/F4 coefficient and unknown-index extractor with no 4+4 group sum table, no planted charts, and zero private scalar access; test the frozen **46 positive / 18 negative** natural-target panel, fully accounting for censored timeouts, rejected charts, F4 linear algebra and signed-point replay. Only if that passes integrate the real extractor with four B8 windows for 31/31 factor-log rank and all 1024 public Q; compare *same runner* to strongest existing mixed index calculus, optimized cached negation-BSGS and rho with full costs. Register a growing ordinary cofactor-one prime-field ladder to guard against fixed-arity false scaling conclusions.
+
+**Scientific disposition:** qualified same-runner native baseline **complete**, source-specific arithmetic and Python replay **passed**, producer-only unsigned [pcc:unverified]. Cheaper complete **non-generic** prime-field ECDLP is **not yet established**.
