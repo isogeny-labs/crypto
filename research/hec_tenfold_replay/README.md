@@ -238,3 +238,24 @@ The comparison retained the pencil reference, the original optimized solver, the
 The exact update count comes from a separate untimed replay of the pivot elimination loop. Six curves improved on every pair in both crossover orders. Both p = 257 curves slowed down on every pair. At c = 78 the two-pencil matrix consumed 171 rows against 146 and needed 36% more coefficient updates. The original solver reached 10× against the pencil reference on 55/64 cases and the two-pencil solver on 50/64. Applying the earlier field-only choice (two pencils at 127 and 257) to the paired results gives 48/64. This last count is derived from the measured arms. Field size alone did not transfer as a selection rule.
 
 Run `harness/g3-transfer.zsh` to reselect the curves, audit the catalogues and coefficient counts, and rerun the full-solve comparisons. The curves file stores prime, coefficient, subgroup order and multiplier of the starting point. The results archive contains all four timing streams and audits. The median table gives per-case ratios for pencil/original, pencil/two-pencil, original/two-pencil and the balanced crossover. All ratios compare times within the same repetition or quartet.
+
+### Shorter pivots on the same genus-3 relation stream
+
+All arms in this test used the two-pencil collector on the eight transfer curves. Suppose an incoming equation W and a stored pivot E have the same leading column with nonzero coefficients. Replacing E by the normalized W and continuing elimination with the difference W − (Wⱼ/Eⱼ)E preserves their span over the subgroup field. Any later row can use the shorter pivot. The implementations append a replacement and finish the current subtraction against the old pivot. Previous pivot equations remain available for reconstruction.
+
+We tested two ways to decide when a replacement is worthwhile. The scan counts nonzero coefficients modulo the subgroup prime, abandoning the scan once the current pivot cannot be improved. It checks an initial collision when the input is shorter, or a subsequent collision when the old pivot has at least eight tail entries. The bitset version tracks an upper bound on nonzero columns, tests pivots with at least four tail entries, and exchanges only when that bound is strictly smaller. Both versions reproduced the original projective factor-base coordinates, pole counts and accepted row counts on all eight curves.
+
+| p | c | Coefficient updates, fixed pivot → scan → bitset | Bitset exchanges | Bitset full-solve ratio, forward / reverse |
+|---:|---:|---:|---:|---:|
+| 73 | 33 | 455 → 477 → 441 | 4 | 0.982× / 0.987× |
+| 73 | 57 | 566 → 505 → 493 | 4 | 0.977× / 0.981× |
+| 127 | 15 | 1,318 → 1,201 → 1,281 | 10 | 0.979× / 0.980× |
+| 127 | 45 | 2,032 → 1,872 → 1,942 | 4 | 0.973× / 0.966× |
+| 257 | 54 | 11,807 → 10,622 → 11,582 | 14 | 0.961× / 0.962× |
+| 257 | 78 | 20,931 → 19,400 → 20,180 | 23 | 0.964× / 0.933× |
+| 383 | 42 | 21,813 → 18,303 → 18,621 | 22 | 1.072× / 1.076× |
+| 383 | 80 | 41,022 → 36,238 → 35,805 | 51 | 0.990× / 0.981× |
+
+The counts measure the innermost elimination coefficient updates and exclude the work of selecting, normalizing and storing replacements. The timing ratios include the entire solve. Each curve had eight fresh inputs (seed 2026111919) and 32 balanced quartets per process. Ratios above one favor the modified solver. The bitset reduced updates on all eight curves and improved full solves on all eight inputs of just one curve, p = 383, c = 42. On the two p = 257 curves, an exact scan cut updates by 10.0% and 7.3%, but the median elapsed-time ratios were only 0.882/0.881 and 0.836/0.834. In the separate four-arm bitset panel, the unchanged and modified two-pencil solvers cleared 10× against the pencil in both orders on 54/64 and 52/64 cases respectively. The fixed-pivot solver remains the default.
+
+Run `harness/g3-pivot-exchange.zsh scan` or `harness/g3-pivot-exchange.zsh mask` for the corresponding replay. The four-arm panel uses pencil, two-pencil fixed pivot, intermediate control and two-pencil modified pivot. The scan control exchanges on initial collisions only; the bitset control traverses the same support bitsets without exchanges. The crossover compares the fixed and modified pivots. Counts files contain OPS lines with prime, coefficient, variant, coefficient updates and exchanges, followed by catalogue records in the transfer format. Medians columns use the transfer format, with original and combined denoting fixed and modified pivots here. Raw timing and audit logs for both implementations are in the archive.
