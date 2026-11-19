@@ -1,0 +1,78 @@
+{
+  "schema": "crypto.exact-compile-input-ci-repair/v1",
+  "standing": "unverified",
+  "parent_commit": "5150e4aca978afe4cdca98e4102ae648e30c9017",
+  "baseline_ci": {
+    "rust_lint": 44579649858,
+    "all_targets": 44579652680
+  },
+  "failures": {
+    "clippy": "Duplicated large_enum_variant attribute; original allowance retained and only the duplicate removed.",
+    "all_targets": "Original selected-representatives.csv is absent from sparse checkout after artifact-store migration."
+  },
+  "repair": {
+    "source_recovery": {
+      "schema": "crypto.exact-compile-input-recovery/v1",
+      "source_path": "research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv",
+      "source_commit": "3c13bc691a87fac0b42a81ccc8e5b547fcc3c144",
+      "source_git_blob": "1034abfaaf3e73c0578abe384d36b220da7a77b3",
+      "original_manifest_sha256": "534e58ced979e05ec747eb462aa1d63135d8004813d094c522a4d7160c03c4a4",
+      "original_bytes": 238585,
+      "exact_manifest_match": true,
+      "s3_contacted": false,
+      "replacement_data_generated": false
+    },
+    "compressed_sha256": "2bcb419e75d66f7de43a618f9e904d380c4ff91e86aba71fba68b0d71afbc8de",
+    "compressed_bytes": 81827,
+    "existing_recovery_entries_preserved": 617,
+    "original_recovery_index_sha256": "86e2eb1391afb36548935e481599bb56775347f80b577a2aa0451ae8c82ef23d",
+    "new_bundle_path": ".artifacts/recovery/534e58ced979e05ec747eb462aa1d63135d8004813d094c522a4d7160c03c4a4-selected-representatives.csv.gz",
+    "runtime_code_change": "Remove only duplicated large_enum_variant allowance; retain original allowance",
+    "scientific_data_changed": false,
+    "s3_contacted": false
+  },
+  "actual_cold_reader_controls": {
+    "schema": "crypto.exact-compile-input-controls/v1",
+    "at": "2026-11-19T18:48:37.469803+00:00",
+    "tool_sha256": "6d4f273c678408a97c5fda777878fb95061852b60f7d83e84592afa9890b1e36",
+    "cases": [
+      {
+        "case": "exact-original",
+        "returncode": 0,
+        "expected_success": true,
+        "target_exists": true,
+        "target_sha256": "534e58ced979e05ec747eb462aa1d63135d8004813d094c522a4d7160c03c4a4",
+        "s3_contacted": false,
+        "aws_binary": "deliberately unavailable"
+      },
+      {
+        "case": "same-size-wrong",
+        "returncode": 2,
+        "expected_success": false,
+        "target_exists": false,
+        "target_sha256": null,
+        "s3_contacted": false,
+        "aws_binary": "deliberately unavailable"
+      },
+      {
+        "case": "oversized",
+        "returncode": 2,
+        "expected_success": false,
+        "target_exists": false,
+        "target_sha256": null,
+        "s3_contacted": false,
+        "aws_binary": "deliberately unavailable"
+      }
+    ],
+    "scope": "Actual canonical artifact CLI in cold disposable Git repositories with no AWS executable; exact original retained and corrupt/oversized inputs refused"
+  },
+  "frozen_input_manifest_changed": false,
+  "historical_records_changed": false,
+  "original_input_sha256": "534e58ced979e05ec747eb462aa1d63135d8004813d094c522a4d7160c03c4a4",
+  "original_input_bytes": 238585,
+  "source_original_commit": "3c13bc691a87fac0b42a81ccc8e5b547fcc3c144",
+  "artifact_reader": "Existing canonical tools/artifacts/artifacts.py with --source git; manifest SHA-256 and size remain mandatory.",
+  "s3_contacted": false,
+  "scientific_measurement": false,
+  "next_gate": "Exact candidate Linux lint, all-target compilation and applicable full-suite validation must pass before merge."
+}

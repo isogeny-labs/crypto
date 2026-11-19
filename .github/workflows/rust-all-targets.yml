@@ -59,6 +59,11 @@ jobs:
           sparse-checkout: |
             /tools/factor-base/
             /.github/scripts/
+            /tools/artifacts/
+            /.artifacts/config.json
+            /.artifacts/recovery/index.json
+            /.artifacts/recovery/534e58ced979e05ec747eb462aa1d63135d8004813d094c522a4d7160c03c4a4-selected-representatives.csv.gz
+            /research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/.artifacts.json
             /build.rs
             /rustfmt.toml
             /clippy.toml
@@ -104,6 +109,11 @@ jobs:
             /.cargo/
             /rust-toolchain*
             /.github/scripts/
+            /tools/artifacts/
+            /.artifacts/config.json
+            /.artifacts/recovery/index.json
+            /.artifacts/recovery/534e58ced979e05ec747eb462aa1d63135d8004813d094c522a4d7160c03c4a4-selected-representatives.csv.gz
+            /research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/.artifacts.json
             /build.rs
             /rustfmt.toml
             /clippy.toml
@@ -115,7 +125,9 @@ jobs:
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
       - name: Materialize compile-time inputs without research archives
-        run: node .github/scripts/ci-scope.mjs --materialize
+        run: |
+          node .github/scripts/ci-scope.mjs --materialize
+          python3 tools/artifacts/artifacts.py pull --source git research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       # Warnings stay out of the gate: this job answers "does it compile",
@@ -184,6 +196,8 @@ jobs:
             src/cryptanalysis/koblitz_index_calculus.rs \
             src/cryptanalysis/ic_framework/plugins.rs examples/koblitz_halftrace.rs \
             > "$VALIDATION_DIR/source.sha256"
+      - name: Restore the exact compile-time CSV from verified Git recovery
+        run: python3 tools/artifacts/artifacts.py pull --source git research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv
       - name: Build the complete release library test executable
         timeout-minutes: 25
         shell: bash
