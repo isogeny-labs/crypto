@@ -28,7 +28,7 @@ def rho_spec(b, rep):
     d["description"] = "Matched rho reference and target source for lane B. Public synthetic curve; no security claim."
     d["workloads"]["targets_per_curve"] = 48
     d["workloads"]["target_seed"] = 20261119000 + b * 10 + rep
-    d["measurement"].update({"rounds": 1, "warmup": 0, "order": "alternate", "seed": 20261119500 + b * 10 + rep})
+    d["measurement"].update({"rounds": 3, "warmup": 0, "order": "alternate", "seed": 20261119500 + b * 10 + rep})
     return d
 if __name__ == "__main__":
     mode = sys.argv[1]
