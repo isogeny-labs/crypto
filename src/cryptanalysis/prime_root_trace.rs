@@ -574,6 +574,33 @@ fn vpow(mut a: u64, mut e: u64, p: u64) -> u64 {
     }
     r
 }
+// Independent extended Euclid inversion for public root-certificate inputs.
+// p is an odd prime bounded by 2^61-1; the signed Bezout coefficients remain
+// within the modulus and fit i64. Variable-time: NOT for secret scalar data.
+// Keep the original Fermat vpow above as a frozen cross-check reference.
+#[inline]
+fn vinv(a: u64, p: u64) -> u64 {
+    let mut r0 = p;
+    let mut r1 = if a < p { a } else { a % p };
+    if r1 == 0 {
+        return 0; // preserve vpow(0, p-2, p) behavior
+    }
+    let (mut t0, mut t1) = (0i64, 1i64);
+    while r1 != 0 {
+        let q = r0 / r1;
+        let r2 = r0 - q * r1;
+        let t2 = t0 - (q as i64) * t1;
+        r0 = r1;
+        r1 = r2;
+        t0 = t1;
+        t1 = t2;
+    }
+    if t0 < 0 {
+        (t0 + p as i64) as u64
+    } else {
+        t0 as u64
+    }
+}
 // Recognize multiplication by 1 or a monic power of x, common when
 // replaying polynomial root certificates. Restrict the shortcut to monic
 // operands: canonical coefficient copying is then sufficient.
@@ -811,7 +838,7 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
         if b[0] == 1 { return Ok((trim(a.to_vec()), vec![])); }
         // Degree-zero division has no remainder. Avoid allocating a
         // temporary dividend and trimming after every quotient digit.
-        let inverse = vpow(b[0], p - 2, p);
+        let inverse = vinv(b[0], p);
         let quotient = a.iter().map(|&x| vmul(x, inverse, p)).collect();
         return Ok((trim(quotient), vec![]));
     }
@@ -841,7 +868,7 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
     // Synthetic division by a nonmonic linear divisor needs just a
     // running remainder and no repeated temporary-polynomial trimming.
     if b.len() == 2 {
-        let inverse = vpow(b[1], p - 2, p);
+        let inverse = vinv(b[1], p);
         let mut quotient = vec![0; a.len() - 1];
         let mut carry = *a.last().unwrap();
         for index in (1..a.len()).rev() {
@@ -923,7 +950,7 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
     let mut remainder = a.to_vec();
     let mut quotient = vec![0; a.len() - b.len() + 1];
     let lead = *b.last().unwrap();
-    let inverse = if lead == 1 { 1 } else { vpow(lead, p - 2, p) };
+    let inverse = if lead == 1 { 1 } else { vinv(lead, p) };
     for shift in (0..quotient.len()).rev() {
         let highest = remainder[shift + b.len() - 1];
         if highest == 0 { continue; }
@@ -963,7 +990,7 @@ fn vmonic(mut a: Vec<u64>, p: u64) -> Vec<u64> {
         // The typical GCD result is already monic. No Fermat inversion
         // or coefficient multiplies are needed to normalize it again.
         if lead != 1 {
-            let inv = vpow(lead, p - 2, p);
+            let inv = vinv(lead, p);
             for c in &mut a {
                 *c = vmul(*c, inv, p);
             }
