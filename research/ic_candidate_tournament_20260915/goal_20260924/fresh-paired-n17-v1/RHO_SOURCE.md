@@ -15,8 +15,13 @@ archived program. The publication retains `target_config_archived=false`,
 `target_card_created=false`, zero target worker calls and a null online
 speedup.
 
-This gate alone does not authorize a fresh rho run, mint an IC1/workload ID,
-or create a point card. The remaining three independent source publications
-(SAT already present; MatrixF5 already present; pair-table incumbent separate)
-and the card generator remain required before any four-arm dispatch. Old
-consumed controllers and the readiness session stay closed.
+The committed pre-card publication is under
+[rho-source-v1/result-v1](rho-source-v1/result-v1/RESULT.md)
+(external seal
+`f74601e7be2ef1c7141fee5a997b38c090e0f19eadbe0d7e843577b59918cf59`;
+6,958 archive members independently replayed). This gate alone does not
+authorize a fresh rho run, mint an IC1/workload ID, or create a point card.
+SAT and MatrixF5 source publications are already present; with the incumbent
+publication also committed, the card generator remains required before any
+four-arm dispatch. Old consumed controllers and the readiness session stay
+closed.
