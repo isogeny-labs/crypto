@@ -1,0 +1,242 @@
+{
+  "created": "2026-11-19T08:20:20Z",
+  "round": 5,
+  "rules": {
+    "exploration_slots": 3,
+    "families_enabled": [
+      "mitm2",
+      "tw2l-x20-j16",
+      "wwalkGg-x09-sr",
+      "ksum4f",
+      "wsum-b8",
+      "wsum-b12",
+      "tw2l-x15-j16",
+      "tw2l-x20-j8"
+    ],
+    "max_candidates": 5,
+    "n_grid": [
+      0.5,
+      0.7,
+      0.85,
+      1.2,
+      1.4,
+      2.0
+    ]
+  },
+  "schema": "ic_autolab.panel/v1",
+  "sizes": {
+    "20": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b8",
+            "n": 3,
+            "name": "wsum-b8-n3",
+            "oracle": "wsum:coef=8,free=1"
+          },
+          "reason": "exploration: family wsum-b8 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b12",
+            "n": 3,
+            "name": "wsum-b12-n3",
+            "oracle": "wsum:coef=12,free=1"
+          },
+          "reason": "exploration: family wsum-b12 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=2",
+            "family": "tw2l-x15-j16",
+            "n": 2,
+            "name": "tw2l-x15-j16-n2",
+            "oracle": "wwalk:x=1.5,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family tw2l-x15-j16 untried at k = 20, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-abscissa:size=2",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "incumbent_s": [
+        2.1233600091644935,
+        2.3052912593086563,
+        3.942672510606116
+      ],
+      "tried_before": 5
+    },
+    "24": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b8",
+            "n": 3,
+            "name": "wsum-b8-n3",
+            "oracle": "wsum:coef=8,free=1"
+          },
+          "reason": "exploration: family wsum-b8 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b12",
+            "n": 3,
+            "name": "wsum-b12-n3",
+            "oracle": "wsum:coef=12,free=1"
+          },
+          "reason": "exploration: family wsum-b12 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=2",
+            "family": "tw2l-x15-j16",
+            "n": 2,
+            "name": "tw2l-x15-j16-n2",
+            "oracle": "wwalk:x=1.5,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family tw2l-x15-j16 untried at k = 24, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-abscissa:size=2",
+        "family": "wwalkGg-x09-sr",
+        "n": 2,
+        "name": "wwalkGg-x09-sr-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "incumbent_s": [
+        1.9456717767436498,
+        2.1282172186426567,
+        3.77112619573372
+      ],
+      "tried_before": 5
+    },
+    "28": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b8",
+            "n": 3,
+            "name": "wsum-b8-n3",
+            "oracle": "wsum:coef=8,free=1"
+          },
+          "reason": "exploration: family wsum-b8 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b12",
+            "n": 3,
+            "name": "wsum-b12-n3",
+            "oracle": "wsum:coef=12,free=1"
+          },
+          "reason": "exploration: family wsum-b12 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=2",
+            "family": "tw2l-x15-j16",
+            "n": 2,
+            "name": "tw2l-x15-j16-n2",
+            "oracle": "wwalk:x=1.5,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family tw2l-x15-j16 untried at k = 28, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-abscissa:size=2",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "incumbent_s": [
+        1.7262493111981574,
+        1.8968029838894191,
+        3.431786038110781
+      ],
+      "tried_before": 5
+    },
+    "32": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b8",
+            "n": 3,
+            "name": "wsum-b8-n3",
+            "oracle": "wsum:coef=8,free=1"
+          },
+          "reason": "exploration: family wsum-b8 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b12",
+            "n": 3,
+            "name": "wsum-b12-n3",
+            "oracle": "wsum:coef=12,free=1"
+          },
+          "reason": "exploration: family wsum-b12 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=2",
+            "family": "tw2l-x15-j16",
+            "n": 2,
+            "name": "tw2l-x15-j16-n2",
+            "oracle": "wwalk:x=1.5,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "exploration: family tw2l-x15-j16 untried at k = 32, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-abscissa:size=2",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "incumbent_s": [
+        1.8327949714681069,
+        2.015424749859092,
+        3.659092755377962
+      ],
+      "tried_before": 5
+    }
+  },
+  "track": "generic"
+}

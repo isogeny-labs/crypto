@@ -130,6 +130,8 @@ enum Cmd {
         cpus: String,
         #[arg(long)]
         allow_busy: bool,
+        #[arg(long)]
+        lock: Option<String>,
         #[arg(long, default_value_t = 8)]
         replay: usize,
     },
@@ -146,6 +148,8 @@ enum Cmd {
         cpus: String,
         #[arg(long)]
         allow_busy: bool,
+        #[arg(long)]
+        lock: Option<String>,
         #[arg(long, default_value_t = 8)]
         replay: usize,
         /// The card's ordinal in `CARD-<experiment>-<date>-<n>`.
@@ -212,6 +216,8 @@ enum Cmd {
         cpus: String,
         #[arg(long)]
         allow_busy: bool,
+        #[arg(long)]
+        lock: Option<String>,
         #[arg(long, default_value_t = 8)]
         replay: usize,
     },
@@ -1054,6 +1060,15 @@ fn round_seeds(round: u64, k: u32, exposed: &BTreeSet<u64>) -> (u64, u64) {
     }
 }
 
+fn curve_scope(curve: &Value) -> &'static str {
+    match curve["kind"].as_str() {
+        Some("curve25519") => "actual Curve25519 subgroup",
+        Some("prime_search") | Some("prime_roster") => "generic prime-order E(F_p) curve",
+        Some("prime_orbit_shape") => "prime-order E(F_p) curve",
+        _ => "Curve25519-family miniature",
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
 fn train_spec(
     home: &Path,
@@ -1067,11 +1082,7 @@ fn train_spec(
     rounds: u64,
     timeout: u64,
 ) -> Value {
-    let scope = if size.curve["kind"] == "curve25519" {
-        "actual Curve25519 subgroup"
-    } else {
-        "Curve25519-family miniature"
-    };
+    let scope = curve_scope(&size.curve);
     let mut arms = vec![
         json!({"name": "rho-neg", "role": "reference", "method": size.reference_method()}),
         json!({"name": "inc", "role": "baseline", "method": inc.method()}),
@@ -1102,11 +1113,7 @@ fn holdout_spec(
     rounds: u64,
     timeout: u64,
 ) -> Value {
-    let scope = if size.curve["kind"] == "curve25519" {
-        "actual Curve25519 subgroup"
-    } else {
-        "Curve25519-family miniature"
-    };
+    let scope = curve_scope(&size.curve);
     json!({
         "schema": "ecbench.spec/v1",
         "label": format!("ic_autolab round {round} holdout, {track} track, k = {}", size.k),
@@ -1174,10 +1181,17 @@ fn protocol_text(
             size.curve
                 .get("p")
                 .map(Value::to_string)
-                .unwrap_or_else(|| if size.curve["kind"] == "curve25519" {
-                    "2^255 - 19".into()
-                } else {
-                    "unspecified".into()
+                .unwrap_or_else(|| {
+                    if size.curve["kind"] == "curve25519" {
+                        "2^255 - 19".into()
+                    } else if let Some(bits) = size.curve.get("bits") {
+                        format!(
+                            "prime_search({bits}-bit, seed {})",
+                            size.curve.get("seed").unwrap_or(&Value::Null)
+                        )
+                    } else {
+                        "unspecified".into()
+                    }
                 }),
             size.r,
             size.log2_r,
@@ -1279,6 +1293,11 @@ fn protocol_text(
         t = t.replace("Curve25519-family miniature", "declared Curve25519 workload")
             .replace("Factor base and oracle strings are ecbench `ic.pipeline` parameters.",
                 "Each arm uses its explicit ecbench method when supplied; otherwise factor base and oracle strings are ic.pipeline parameters.");
+    } else if ledger.family != "curve25519" {
+        t = t.replace(
+            "Curve25519-family miniature",
+            &format!("registered `{}` curve", ledger.family),
+        );
     }
     t
 }
@@ -1429,6 +1448,7 @@ struct RunOpts {
     ecbench: PathBuf,
     cpus: String,
     allow_busy: bool,
+    lock: Option<String>,
     replay: usize,
 }
 
@@ -1471,6 +1491,10 @@ fn run_argv(opts: &RunOpts, spec: &Path, out: &Path) -> Vec<String> {
     ];
     if opts.allow_busy {
         a.push("--allow-busy".into());
+    }
+    if let Some(lock) = &opts.lock {
+        a.push("--lock".into());
+        a.push(lock.clone());
     }
     a
 }
@@ -2444,7 +2468,12 @@ fn ratchet_svg(ledger: &Ledger, track: &str) -> String {
         .unwrap_or(1)
         .max(1) as f64;
     let max_s = series.values().flatten().map(|p| p.1).fold(1.0, f64::max) * 1.1;
-    let mut s = format!("<svg xmlns='http://www.w3.org/2000/svg' width='{w}' height='{h}' viewBox='0 0 {w} {h}' font-family='Helvetica,Arial,sans-serif' font-size='11'>\n<rect width='100%' height='100%' fill='white'/>\n<text x='{ml}' y='20' font-size='14' font-weight='bold'>Ratchet: incumbent mean S at w = 0 by round ({track} track, Curve25519 miniatures)</text>\n");
+    let family_label = if ledger.family == "curve25519" {
+        "Curve25519 miniatures".to_string()
+    } else {
+        svg_escape(&ledger.family)
+    };
+    let mut s = format!("<svg xmlns='http://www.w3.org/2000/svg' width='{w}' height='{h}' viewBox='0 0 {w} {h}' font-family='Helvetica,Arial,sans-serif' font-size='11'>\n<rect width='100%' height='100%' fill='white'/>\n<text x='{ml}' y='20' font-size='14' font-weight='bold'>Ratchet: incumbent mean S at w = 0 by round ({track} track, {family_label})</text>\n");
     let colours = ["#36c", "#c63", "#393", "#939", "#099"];
     for t in 0..=4 {
         let v = max_s * t as f64 / 4.0;
@@ -2491,19 +2520,35 @@ fn ratchet_svg(ledger: &Ledger, track: &str) -> String {
     s
 }
 
-/// The newest pcc claim whose statement names this round
+fn claim_matches_home(v: &Value, home: &Path, round: u64) -> bool {
+    let prefix = format!("ic_autolab round {round} ");
+    let Some(statement) = v["statement"].as_str() else {
+        return false;
+    };
+    if !statement.starts_with(&prefix) {
+        return false;
+    }
+    let Some(home_name) = home.file_name().and_then(|s| s.to_str()) else {
+        return false;
+    };
+    let scope = v["scope"].as_str().unwrap_or("");
+    if scope.contains(home_name) || statement.contains(home_name) {
+        return true;
+    }
+    home_name == "curve25519_autolab_20261104" && scope.is_empty()
+}
+
+/// The newest pcc claim whose statement names this round and loop home
 /// (`ic_autolab round N ...`), read from `pcc/claims/` under the working
 /// directory (the repository root).
-fn find_claim(round: u64) -> Option<String> {
-    let prefix = format!("ic_autolab round {round} ");
+fn find_claim(home: &Path, round: u64) -> Option<String> {
     let mut found: Vec<(String, String)> = std::fs::read_dir("pcc/claims")
         .ok()?
         .filter_map(|e| e.ok())
         .filter_map(|e| {
             let v = read_json(&e.path()).ok()?;
-            let statement = v["statement"].as_str()?;
             let id = v["id"].as_str().or_else(|| v["claim_id"].as_str())?;
-            statement.starts_with(&prefix).then(|| {
+            claim_matches_home(&v, home, round).then(|| {
                 (
                     v["created_at"].as_str().unwrap_or("").to_string(),
                     id.to_string(),
@@ -2540,7 +2585,7 @@ fn cmd_report(home: &Path, round: u64) -> Result<(), String> {
     // The round's claim record (AGENTS.md "Sabotage is assumed"): cited by id
     // with an explicit unverified tag; `pcc standing` is the only source for
     // a stronger word.
-    match find_claim(round) {
+    match find_claim(home, round) {
         Some(id) => {
             md += &format!(
                 "Claim record: `{id}` (`python3 tools/pcc/pcc.py standing {id}`). Until a signed replay and recompute exist, this round's outcome is an unverified assertion [pcc:unverified].\n\n"
@@ -2767,7 +2812,7 @@ fn cmd_report(home: &Path, round: u64) -> Result<(), String> {
             );
         }
     }
-    md += "\n![ratchet](../ratchet.svg)\n\n";
+    md += &format!("\n![ratchet](../ratchet-{track}.svg)\n\n");
     md += "## Evidence and deviations\n\n";
     md += &format!(
         "- ecbench binary sha256: `{}`; `--cpus {}`, allow_busy = {}; `verify --replay {}` per session; audit receipts in `analysis/`; sessions in `sessions/` (records in the artifact store when large).\n",
@@ -2779,8 +2824,9 @@ fn cmd_report(home: &Path, round: u64) -> Result<(), String> {
     md += "- Route: the local route is an explicitly requested development screen, not the Iso Lab EKS default; counts are deterministic and replayed, wall time is not claimed. No row of this round enters the IC leaderboard or `benchmarks/README.md` (validation gate).\n";
     md += "- Train selection is in sample (disclosed); the holdout is fresh (new `target_seed`, excluded exposures). Failed, timed-out and regressing arms are retained above.\n";
     std::fs::write(dir.join("README.md"), md).map_err(|e| e.to_string())?;
-    std::fs::write(home.join("ratchet.svg"), ratchet_svg(&ledger, &track))
-        .map_err(|e| e.to_string())?;
+    let rsvg = ratchet_svg(&ledger, &track);
+    std::fs::write(home.join(format!("ratchet-{track}.svg")), &rsvg).map_err(|e| e.to_string())?;
+    std::fs::write(home.join("ratchet.svg"), rsvg).map_err(|e| e.to_string())?;
     println!("report written: {}", dir.join("README.md").display());
     Ok(())
 }
@@ -2970,6 +3016,7 @@ fn main() {
             ecbench,
             cpus,
             allow_busy,
+            lock,
             replay,
         } => cmd_run(
             &home,
@@ -2979,6 +3026,7 @@ fn main() {
                 ecbench,
                 cpus,
                 allow_busy,
+                lock,
                 replay,
             },
         )
@@ -2989,6 +3037,7 @@ fn main() {
             ecbench,
             cpus,
             allow_busy,
+            lock,
             replay,
             n,
         } => cmd_card(
@@ -2999,6 +3048,7 @@ fn main() {
                 ecbench,
                 cpus,
                 allow_busy,
+                lock,
                 replay,
             },
             n,
@@ -3022,6 +3072,7 @@ fn main() {
             ecbench,
             cpus,
             allow_busy,
+            lock,
             replay,
         } => parse_sizes(&sizes).and_then(|s| {
             cmd_loop(
@@ -3044,6 +3095,7 @@ fn main() {
                     ecbench,
                     cpus,
                     allow_busy,
+                    lock,
                     replay,
                 },
             )
@@ -3774,6 +3826,73 @@ mod tests {
     fn civil_dates_are_right() {
         assert_eq!(civil_from_days(0), (1970, 1, 1));
         assert_eq!(civil_from_days(20761), (2026, 11, 4));
+    }
+
+    #[test]
+    fn generic_prime_family_describes_prime_search_curves_cleanly() {
+        let mut l = ledger();
+        l.family = "prime-generic".into();
+        let size = l.sizes.get_mut("20").unwrap();
+        size.curve = json!({"kind": "prime_search", "bits": 20, "seed": 59297});
+        let inc = l.incumbent("generic", 20).unwrap().arm.clone();
+        let spec = train_spec(
+            Path::new("research/prime_generic_autolab_20261118"),
+            1,
+            "generic",
+            l.size(20).unwrap(),
+            &inc,
+            &[],
+            42,
+            12,
+            1,
+            300,
+        );
+        assert!(spec["description"]
+            .as_str()
+            .unwrap()
+            .contains("generic prime-order E(F_p) curve"));
+        let svg = ratchet_svg(&l, "generic");
+        assert!(svg.contains("(generic track, prime-generic)"));
+        let opts_default = RunOpts {
+            ecbench: PathBuf::from("target/release/ecbench"),
+            cpus: "none".into(),
+            allow_busy: true,
+            lock: None,
+            replay: 8,
+        };
+        assert!(
+            !run_argv(&opts_default, Path::new("s.json"), Path::new("out"))
+                .iter()
+                .any(|a| a == "--lock")
+        );
+        let opts_locked = RunOpts {
+            lock: Some("/tmp/custom.lock".into()),
+            ..opts_default
+        };
+        let argv = run_argv(&opts_locked, Path::new("s.json"), Path::new("out"));
+        assert!(argv.windows(2).any(|w| w == ["--lock", "/tmp/custom.lock"]));
+        let legacy_c25519 = json!({
+            "statement": "ic_autolab round 1 train sessions ECBS1h87338492e26d",
+        });
+        assert!(!claim_matches_home(
+            &legacy_c25519,
+            Path::new("research/prime_generic_autolab_20261118"),
+            1
+        ));
+        assert!(claim_matches_home(
+            &legacy_c25519,
+            Path::new("research/curve25519_autolab_20261104"),
+            1
+        ));
+        let prime_claim = json!({
+            "scope": "research/prime_generic_autolab_20261118/round-001",
+            "statement": "ic_autolab round 1 holdout sessions on prime-generic",
+        });
+        assert!(claim_matches_home(
+            &prime_claim,
+            Path::new("research/prime_generic_autolab_20261118"),
+            1
+        ));
     }
 }
 
