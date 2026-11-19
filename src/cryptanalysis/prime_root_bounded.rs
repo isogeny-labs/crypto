@@ -239,17 +239,34 @@ impl Producer<'_> {
         self.gate.metrics.acknowledged_events += 1;
         self.gate.clock()
     }
+    // All inputs are canonical field elements, and the setup restricts
+    // p <= 2^61-1, so addition/subtraction fit in one native word.
+    // Gate charging and deadline checks must remain exactly one per op.
     fn add(&mut self, a: u64, b: u64) -> Result<u64> {
         self.gate.scalar()?;
-        Ok(((a as u128 + b as u128) % self.p as u128) as u64)
+        let sum = a + b;
+        Ok(if sum >= self.p { sum - self.p } else { sum })
     }
     fn sub(&mut self, a: u64, b: u64) -> Result<u64> {
         self.gate.scalar()?;
-        Ok(((a as u128 + self.p as u128 - b as u128) % self.p as u128) as u64)
+        Ok(if a >= b { a - b } else { a + self.p - b })
     }
     fn mul(&mut self, a: u64, b: u64) -> Result<u64> {
         self.gate.scalar()?;
-        Ok((a as u128 * b as u128 % self.p as u128) as u64)
+        let p = self.p;
+        Ok(if p == (1u64 << 61) - 1 {
+            // Mersenne reduction: 2^61 = 1 (mod p), with two folds
+            // sufficient for a product of canonical 61-bit operands.
+            let product = a as u128 * b as u128;
+            let folded = ((product as u64) & p) + (product >> 61) as u64;
+            let folded = (folded & p) + (folded >> 61);
+            if folded >= p { folded - p } else { folded }
+        } else if p <= u32::MAX as u64 {
+            // (p-1)^2 fits in u64, including p=2^32-5.
+            (a * b) % p
+        } else {
+            ((a as u128 * b as u128) % p as u128) as u64
+        })
     }
     fn inverse(&mut self, value: u64) -> Result<u64> {
         if value == 0 {
@@ -632,17 +649,33 @@ impl Replay {
             failure: None,
         })
     }
+    // Replay uses independently implemented canonical arithmetic. In
+    // particular it never invokes Producer, and the raw-wide oracle in
+    // the regression tests checks each fast reduction separately.
     fn times(&mut self, x: u64, y: u64) -> Result<u64> {
         self.gate.scalar()?;
-        Ok((u128::from(x) * u128::from(y) % u128::from(self.p)) as u64)
+        let p = self.p;
+        Ok(if p == (1u64 << 61) - 1 {
+            let wide = u128::from(x) * u128::from(y);
+            let low = wide as u64 & p;
+            let high = (wide >> 61) as u64;
+            let combined = low + high;
+            let reduced = (combined & p) + (combined >> 61);
+            if reduced == p { 0 } else { reduced }
+        } else if p <= u32::MAX as u64 {
+            (x * y) % p
+        } else {
+            (u128::from(x) * u128::from(y) % u128::from(p)) as u64
+        })
     }
     fn plus(&mut self, x: u64, y: u64) -> Result<u64> {
         self.gate.scalar()?;
-        Ok((x + y) % self.p)
+        let sum = x + y;
+        Ok(if sum < self.p { sum } else { sum - self.p })
     }
     fn minus(&mut self, x: u64, y: u64) -> Result<u64> {
         self.gate.scalar()?;
-        Ok((x + self.p - y) % self.p)
+        Ok(if x >= y { x - y } else { self.p - (y - x) })
     }
     // Left-to-right scalar exponentiation, separate from producer inverse.
     fn reciprocal(&mut self, x: u64) -> Result<u64> {
@@ -1139,6 +1172,58 @@ mod tests {
             ((u128::from(a) * u128::from(x) + u128::from(c)) % u128::from(p)) as u64
         })
     }
+    // Compare both independently implemented consumers with the exact wide
+    // modulo reference, including carries, zero, p-1 and random inputs.
+    #[test]
+    fn round31_bounded_canonical_ops_match_wide_reference() {
+        for p in [3u64, 7, 17, 487, 17_497, 1_000_000_007,
+                  4_294_967_291, 140_737_488_355_213, (1u64 << 61) - 1] {
+            let field = field(p);
+            let mut observer = |_: &BoundedRootEvent| Ok(());
+            let mut producer = Producer {
+                p,
+                gate: Gate::new(budget(), deadline()),
+                observer: &mut observer,
+                unacknowledged: None,
+                pending: [Poly17::ZERO; 8],
+                pending_len: 0,
+                roots: [0; 8],
+                root_count: 0,
+            };
+            producer.gate.admit().unwrap();
+            let mut replay =
+                Replay::new(&field, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+            let mut seed = 0x2026_1119_3131_0001u64;
+            let mut comparisons = 0usize;
+            for index in 0..2_048 {
+                seed = seed.wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                let mut x = (seed ^ (seed >> 29)) % p;
+                seed = seed.wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                let mut y = (seed ^ (seed >> 29)) % p;
+                match index % 37 {
+                    0 => { x = p - 1; y = p - 1; }
+                    1 => { x = 0; y = p - 1; }
+                    2 => { x = p - 1; y = 0; }
+                    3 => { x = 0; y = 0; }
+                    _ => {}
+                }
+                let expected_add = ((x as u128 + y as u128) % p as u128) as u64;
+                let expected_sub = ((x as u128 + p as u128 - y as u128) % p as u128) as u64;
+                let expected_mul = ((x as u128 * y as u128) % p as u128) as u64;
+                assert_eq!(producer.add(x, y).unwrap(), expected_add, "producer add p={p}");
+                assert_eq!(producer.sub(x, y).unwrap(), expected_sub, "producer sub p={p}");
+                assert_eq!(producer.mul(x, y).unwrap(), expected_mul, "producer mul p={p}");
+                assert_eq!(replay.plus(x, y).unwrap(), expected_add, "replay plus p={p}");
+                assert_eq!(replay.minus(x, y).unwrap(), expected_sub, "replay minus p={p}");
+                assert_eq!(replay.times(x, y).unwrap(), expected_mul, "replay times p={p}");
+                comparisons += 6;
+            }
+            assert_eq!(comparisons, 12_288);
+        }
+    }
+
     #[test]
     fn bounded_prime_roots_exhaustive_quadratics_and_degeneracies() {
         for a in 0..7 {
