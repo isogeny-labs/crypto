@@ -55,6 +55,17 @@ The original-crate Rust candidate is [`prime31_transformed_slot_f3.rs`](../nativ
 - `crypto-autoresearcher/ideas/mythos-20261109-relations.md` previously examined resultant towers and warned about joint solving costs; `cryptanalysis/suite/src/cryptanalysis/prime_orbit_index_calculus.rs` contains automorphism/generic factor-base work. This is **not** a novelty or asymptotic improvement claim.
 - Primary external background: [Kousidis–Wiemers 2019](https://doi.org/10.1515/jmc-2017-0022) on first fall degree and [Kosters–Yeo 2015](https://arxiv.org/abs/1503.08001) on summation polynomial caveats. See also [complexity bounds on Semaev's naive IC](https://doi.org/10.1515/jmc-2019-0029). Shared research-KB MCP was inaccessible in this runtime; searched accessible GitHub sources and literature instead.
 
+
+## Original-source Rust CI and independent verification — November 19, 22:38 UTC
+
+[GitHub Actions source-specific push run #44630431346](https://github.com/isogeny-labs/crypto/actions/runs/44630431346) on candidate commit `5a0942768fd81be66cb0bb4db38f04d7200fb8a6` finished **every original-Rust and independent replay job step successfully**; [artifact #14580424253](https://github.com/isogeny-labs/crypto/actions/runs/44630431346/artifacts/14580424253) is available. The actual original Rust 1.100.0 library passed **40/40**, candidate example **1/1**. Original Rust produced a JSON cohort whose strict registered `jq` gate checked **512/512 finite relations, 4,096 H_i zero equations, 3,584 S3, 3,584 factored K_i, 512 poisoned-target rejections, 512 post-solve sign reconstructions, and zero generic sum-table calls**. Separately authored Python BigInt affine arithmetic reproduced **all 512 source cases**, their certificates, all K coefficient term counts and mutated controls.
+
+- Original JSON SHA256: `8efc9f1a2d5d98fe3f5d2b46f844ae6a81150e80b702361017e80d029d544cdb`.
+- Independent verifier JSON SHA256: `be00dd6de9dcb67914982d7cdbc39f0986e5477fb9c55e3b0cac7e893c32523a`.
+- Uploaded artifact ZIP SHA256: `e478f23840168d661a306a1cbf665bcd8f80a759cae4e6863ad2088717c3325f`.
+
+An earlier sparse-checkout CI attempt **failed during compilation of the unchanged original library**, because `f4_fp_tower.rs` and `sig_fp_tower.rs` were omitted from the checkout, not because the new S3 experiment failed. Corrected the sparse checkout at commit `5a094276`; retain the failed run [#44629961677](https://github.com/isogeny-labs/crypto/actions/runs/44629961677) as an auditable precursor. This is a mathematical and Rust-original-source validation, **not** an independently signed PCC validation, public-only F4 solution, or complete ECDLP speedup.
+
 ## Registered next falsifier
 
 Have the current #4692 F4 solver load **all four algebraic systems** for identical residuals: 21-variable quartic Horner, 14-variable degree-10 eliminated Horner, the new 14-variable selector/S3, and the 7-variable degree-32 product chart. Freeze variable order, elimination degree, memory cap and full 46-positive/18-negative B8 custody. For each query require recovered unknown original factor indices, signed points and `[d]G=Q` downstream, **without hidden signs, planted witness data or generic sum-table accesses**. Report SAT, certified UNSAT, timeout, false positives, F4 matrix nonzeros, peak RSS, operations, and 1/64/1024 target setup amortization. Only if the new chart passes should it replace the generic grader in #4728 and be tested against matched BSGS, rho, and the best current index-calculus implementation on the same runner.
