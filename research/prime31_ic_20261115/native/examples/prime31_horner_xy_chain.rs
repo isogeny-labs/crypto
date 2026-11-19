@@ -198,13 +198,11 @@ fn run(cases_per_window: usize) -> Value {
                     assert_eq!(Some(terminal),target,"wrong final polynomial point");
                     let mut group_verifier=Arithmetic::default();
                     for step in &steps {
-                        assert_eq!(
-                            Some(step.next),
-                            group_verifier.add(PRIME31,
-                                Some(step.leaf),
-                                group_verifier.add(PRIME31,Some(step.tail),Some(step.tail))
-                            )
-                        );
+                        let doubled_group = group_verifier.add(
+                            PRIME31, Some(step.tail), Some(step.tail));
+                        let sum_group = group_verifier.add(
+                            PRIME31, Some(step.leaf), doubled_group);
+                        assert_eq!(Some(step.next), sum_group);
                         for v in step.residuals() {
                             max_residual=max_residual.max(v);
                             assert_eq!(v,0);
