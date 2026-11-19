@@ -55,9 +55,9 @@ for marker, original in [
         lambda _: original, before, count=1, flags=re.S,
     )
     assert count == 1, marker
-before = before.replace("if symbol == -1 {", "if symbol == self.p - 1 {", 1)
 before = before.replace("if symbol == 1 {", "if acc == 1 {", 1)
 before = before.replace("if symbol == -1 {", "if acc == self.p - 1 {", 1)
+before = before.replace("if symbol == -1 {", "if symbol == self.p - 1 {", 1)
 # The R49 Frobenius replay path is now the remaining "symbol" comparison.
 assert "if symbol == self.p - 1 {" in before
 assert "R49_" not in before
