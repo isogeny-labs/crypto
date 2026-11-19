@@ -562,3 +562,14 @@ an odd-order subgroup.  It rules out every deterministic decoder from this
 entire mod-two trace family, not only the 512 measured affine rules.  The next
 lead changes to an odd trace modulus, where the twist sign remains visible.
 [pcc:unverified]
+
+The frozen [chiral genus-three trace-digit test](CHIRAL_GENUS3_TRACE_DIGIT_EXPERIMENT.md)
+then replaces `y-y(T)` by the ordered covers
+`(x+c*y)-(x(T)+c*y(T))`, `c=+/-1`.  Negation swaps the two traces instead of
+making them equal: all 3,040 exact swap controls pass, and 1,296/1,520 targets
+have a residue tuple distinct from its negation.  Nevertheless, the best of
+all 243 affine `F_3` digit maps scores only 554/1,505, no rule is exact, and
+family-wise `p=0.431047`.  The geometry escapes the old obstruction but its
+first Frobenius trace does not decode the digit.  The next lead tests the
+second Frobenius power sum and second zeta coefficient of the same fixed-genus
+cover. [pcc:unverified]
