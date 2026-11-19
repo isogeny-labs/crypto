@@ -1074,21 +1074,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 if state.exponent & 1 == 1 {
                     state.acc = vdiv(&vproduct(&state.acc, &state.base, p), &state.modulus, p)?.1;
                 }
-                // A long monic-form binomial can be squared in three
-                // products. Keep dense bases on the fused product path:
-                // general symmetric squaring regressed in native controls.
-                let sparse_binomial = state.base.len() >= 6
-                    && state.base[0] != 0
-                    && state.base[1] == 0
-                    && state.base[2] == 0
-                    && *state.base.last().unwrap() != 0
-                    && state.base[3..state.base.len() - 1].iter().all(|&x| x == 0);
-                let product = if sparse_binomial {
-                    vsquare(&state.base, p)
-                } else {
-                    vproduct(&state.base, &state.base, p)
-                };
-                state.base = vdiv(&product, &state.modulus, p)?.1;
+                state.base = vdiv(&vproduct(&state.base, &state.base, p), &state.modulus, p)?.1;
                 state.exponent >>= 1;
                 if (*exponent, accumulator, base) != (state.exponent, &state.acc, &state.base) {
                     return Err("modular power step failed".into());
