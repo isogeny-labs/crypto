@@ -20,6 +20,9 @@ Bench record: `benchmarks/records/20261119T0319Z-tableb-sib-l3.json`. There is n
 
 ## Result (three Table B curves, 48 public targets each, 2 rounds, L0)
 
+The "w = 0 [95%]" columns are `ecbench compare`'s paired ratio of recorded S. The band's w = 0 values, which differ in the third decimal, are in `compare-*.txt`. A few values here and in `ablation/` are rounded from four-decimal figures, so the third decimal can differ by one from a direct rounding; `validation/REPORT.md` lists them.
+
+
 | bits | sib8-p256 / tw2l, w = 0 [95%] | w = 0.1 | w = 1 | bitop/v1 | sib8-p256 / rho-neg, w = 0 [95%] | w = 1 | bitop/v1 [95%] | end-to-end wall / tw2l |
 |---|---|---|---|---|---|---|---|---|
 | 20 | 0.480 [0.459, 0.502] | 0.540 | 0.880 | 0.532 | 1.108 [0.994, 1.236] | 1.73 | 1.234 [1.106, 1.377] | 0.92 |

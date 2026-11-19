@@ -18,6 +18,9 @@ The bench record is `benchmarks/records/20261118T1738Z-tableb-fewcol-stack.json`
 
 ## Result (three Table B curves, 48 public targets each, 2 rounds, L0, counted cost; 720/720 runs verified per curve, all 480 candidate runs replayed)
 
+The headline ratio columns marked "w = 0 [95%]" are `ecbench compare`'s paired ratio of recorded S with its interval. The band's own w = 0 value differs slightly; for example tw2l / ksum5-sib at P20 is 0.475 against the band's 0.481. Both are in `compare-*.txt` and were reproduced by the validation gate (`validation/REPORT.md`).
+
+
 | bits | ksum5-ps / ksum5-sib, w = 0 [95%] | w = 0.1 | w = 1 | tw2l / ksum5-sib, w = 0 [95%] | w = 0.1 | w = 1 | tw2l / rho-neg, w = 0 / 0.1 / 1 | end-to-end wall, tw2l / ksum5-sib |
 |---|---|---|---|---|---|---|---|---|
 | 20 | 0.890 [0.886, 0.894] | 0.902 | 0.953 | 0.475 [0.453, 0.498] | 0.448 | 0.321 | 2.18 / 2.13 / 1.84 | 0.64 |
@@ -44,7 +47,7 @@ S at P24 (w = 0 / 1):
 
 - **Verification:** every tw2l run verified ([d]G = Q), and every replay reproduced. [pcc:unverified]
 - **Ratio:** tw2l / ksum5-sib is 0.41–0.48 at w = 0 and 0.28–0.32 at w = 1, against the registered maxima of 0.60 and 0.55. `ecbench band` orders tw2l < ksum5-sib at every weight. The ratio falls with size.
-- **Verdict:** FEWCOL is an improvement over the Table B incumbent at every size and weight. With it the distance to matched rho falls from 4.6–5.3× to 2.1–2.2× at w = 0, and from 6.3–6.7× to 1.8–2.0× at w = 1. That is inside the predicted 1.7–2.4×.
+- **Verdict:** FEWCOL is an improvement over the Table B incumbent at every size and weight. With it the distance to matched rho falls from 4.5–5.1× (this session's ksum5-sib / rho-neg, S ratio; P2's session read 4.6–5.3×) to 2.1–2.2× at w = 0, and from 5.7–7.2× (P2: 6.3–6.7×) to 1.8–2.0× at w = 1. That is inside the predicted 1.7–2.4×.
 - **Wall time:** tw2l pays 1.37× more wall time per GAE (`compare-P24`). End to end it still takes 0.57–0.64× of the incumbent's wall time.
 - **Unpriced counters:** tw2l lists three small uncharged base-construction counters, `projected_base_*_uncharged`, at about 4 per run. That is negligible against about 7k GAE.
 
