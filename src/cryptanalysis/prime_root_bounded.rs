@@ -323,17 +323,29 @@ impl Producer<'_> {
             return Ok((quotient, remainder));
         }
         quotient.len = a.len - b.len + 1;
-        let inv = self.inverse(b.coefficients[b.len as usize - 1])?;
+        // Most GCD and splitting factors are monic. In that case no
+        // reciprocal, leading multiplication, or leading subtraction is needed.
+        // For a general divisor, the leading term also cancels exactly.
+        let monic = b.coefficients[b.len as usize - 1] == 1;
+        let inv = if monic { 1 } else { self.inverse(b.coefficients[b.len as usize - 1])? };
         while remainder.len >= b.len {
             self.gate.charge(COPY_WORK)?;
+            let high = remainder.len as usize - 1;
             let shift = (remainder.len - b.len) as usize;
-            let coefficient = self.mul(remainder.coefficients[remainder.len as usize - 1], inv)?;
+            let coefficient = if monic {
+                remainder.coefficients[high]
+            } else {
+                self.mul(remainder.coefficients[high], inv)?
+            };
             quotient.coefficients[shift] = coefficient;
-            for j in 0..b.len as usize {
-                let v = self.mul(coefficient, b.coefficients[j])?;
+            for j in 0..b.len as usize - 1 {
+                let bj = b.coefficients[j];
+                if bj == 0 { continue; }
+                let v = self.mul(coefficient, bj)?;
                 remainder.coefficients[shift + j] =
                     self.sub(remainder.coefficients[shift + j], v)?;
             }
+            remainder.coefficients[high] = 0;
             remainder.trim();
         }
         quotient.trim();
@@ -374,6 +386,33 @@ impl Producer<'_> {
         }
         Ok(())
     }
+    // Symmetric polynomial square for repeated Frobenius powering.
+    // Off-diagonal products occur twice and can be doubled after one mul.
+    // Skip exact-zero terms in sparse powers; all outputs stay canonical.
+    fn square(&mut self, a: &Poly17) -> Result<Poly17> {
+        self.gate.charge(3 * COPY_WORK)?;
+        let mut out = Poly17::ZERO;
+        if a.len == 0 { return Ok(out); }
+        let n = 2 * a.len as usize - 1;
+        if n > 17 { return Err(Stop::InvalidInput); }
+        out.len = n as u8;
+        for i in 0..a.len as usize {
+            let ai = a.coefficients[i];
+            if ai == 0 { continue; }
+            let diag = self.mul(ai, ai)?;
+            out.coefficients[2 * i] = self.add(out.coefficients[2 * i], diag)?;
+            for j in i + 1..a.len as usize {
+                let aj = a.coefficients[j];
+                if aj == 0 { continue; }
+                let cross = self.mul(ai, aj)?;
+                let twice = self.add(cross, cross)?;
+                out.coefficients[i + j] = self.add(out.coefficients[i + j], twice)?;
+            }
+        }
+        out.trim();
+        Ok(out)
+    }
+
     fn power(&mut self, base: &Poly17, mut exponent: u64, modulus: &Poly17) -> Result<Poly17> {
         self.gate.charge(6 * COPY_WORK)?;
         let monic = self.power_modulus(modulus)?;
@@ -390,7 +429,7 @@ impl Producer<'_> {
             }
             exponent >>= 1;
             if exponent != 0 {
-                let mut product = self.product(&b, &b)?;
+                let mut product = self.square(&b)?;
                 self.reduce_monic(&mut product, &monic)?;
                 b = product;
             }
@@ -784,6 +823,34 @@ impl Replay {
         numerator.trim();
         Ok(())
     }
+    // Independent output-diagonal symmetric square for certificate replay.
+    // Deliberately use a different traversal from the producer's row-major
+    // square, while skipping the mirrored half of each convolution diagonal.
+    fn square_diagonals(&mut self, x: &Poly17) -> Result<Poly17> {
+        self.gate.charge(4 * COPY_WORK)?;
+        let mut z = Poly17::ZERO;
+        if x.len == 0 { return Ok(z); }
+        let len = usize::from(x.len);
+        let n = 2 * len - 1;
+        if n > 17 { return Err(Stop::InvalidCertificate); }
+        z.len = n as u8;
+        for k in 0..n {
+            self.gate.charge(32)?;
+            let start = (k + 1).saturating_sub(len);
+            let end = len.min(k + 1);
+            for i in start..end {
+                let j = k - i;
+                if i > j { break; }
+                self.gate.charge(32)?;
+                let v = self.times(x.coefficients[i], x.coefficients[j])?;
+                let term = if i == j { v } else { self.plus(v, v)? };
+                z.coefficients[k] = self.plus(z.coefficients[k], term)?;
+            }
+        }
+        z.trim();
+        Ok(z)
+    }
+
     fn modular_power(&mut self, base: Poly17, exponent: u64, modulus: &Poly17) -> Result<Poly17> {
         self.gate.charge(6 * COPY_WORK)?;
         let monic = self.normalized_modulus(modulus)?;
@@ -793,7 +860,7 @@ impl Replay {
         self.cancel_monic(&mut acc, &monic)?;
         for bit in (0..64 - exponent.leading_zeros()).rev() {
             self.gate.charge(4 * COPY_WORK)?;
-            let mut square = self.convolution(&acc, &acc)?;
+            let mut square = self.square_diagonals(&acc)?;
             self.cancel_monic(&mut square, &monic)?;
             acc = square;
             if exponent & (1u64 << bit) != 0 {
