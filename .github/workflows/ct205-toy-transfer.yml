@@ -7,7 +7,7 @@ on:
       - 'tests/prime_cover_toy_complete_dlp.rs'
       - 'tests/prime_cover_toy_cold_cost.rs'
       - 'tests/ct226_native_genus4_transferred_ic.rs'
-      - 'tests/ct229_reduced_base_probe.rs'
+      - 'tests/ct229_impl/probe.rs'
       - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/**'
       - 'src/prime_hyperelliptic/**'
       - 'Cargo.toml'
@@ -19,7 +19,7 @@ on:
       - '.github/workflows/ct205-toy-transfer.yml'
       - 'tests/prime_cover_toy_cold_cost.rs'
       - 'tests/ct226_native_genus4_transferred_ic.rs'
-      - 'tests/ct229_reduced_base_probe.rs'
+      - 'tests/ct229_impl/probe.rs'
       - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/**'
   workflow_dispatch:
 
@@ -138,7 +138,7 @@ jobs:
             /tests/prime_cover_toy_complete_dlp.rs
             /tests/prime_cover_toy_cold_cost.rs
             /tests/ct226_native_genus4_transferred_ic.rs
-            /tests/ct229_reduced_base_probe.rs
+            /tests/ct229_impl/probe.rs
             /.cargo/
             /build.rs
             /crates/
@@ -181,6 +181,6 @@ jobs:
           test "$(grep -c 'CT226_NATIVE_PAIR_JSON' /tmp/ct226-native.log)" -eq 3
           # CT229: fixed six-size native reduced factor-base screen; includes the
           # original CT226 source but only runs the independently scoped CT229 test.
-          cargo test --locked --release --test ct229_reduced_base_probe ct229_ -- --nocapture 2>&1 | tee /tmp/ct229-native.log
+          cargo test --locked --release --test ct226_native_genus4_transferred_ic ct229_ -- --nocapture 2>&1 | tee /tmp/ct229-native.log
           test "$(grep -c 'CT229_PANEL_JSON' /tmp/ct229-native.log)" -eq 6
           grep 'CT229_PANEL_JSON' /tmp/ct229-native.log
