@@ -42,3 +42,13 @@ Published prime-field index calculus: Petit–Kosters–Messeng (PKC 2016), DOI 
 Next mathematical target: a genuinely **subquadratic zero-inner-product search** over the 70-coordinate signed half tables, or a bounded F4/SAT elimination that outputs signed indices without examining most pairs. If that succeeds on sealed 46-positive/18-negative B8 natural targets, replace only the relation oracle in the existing Rust B8-window rank31/1,024-log system, charging setup, failed shifts, LA, extraction and verification. Compare cold-one-target, 64 and 1,024 public logs on a single host against optimized index calculus, shared signed BSGS and optimized negation-map rho. Extend to ordinary prime-field ladder before any scaling claims.
 
 **Standing:** mathematical factorization, reproducible source-bound candidate and a strong work-budget falsifier. **No cheaper complete non-generic prime-field ECDLP solver has been established.**
+
+## Local independent Python arithmetic preflight (not source-exact native CI)
+
+Frozen [preflight JSON](RR9_EXTERIOR4_B4_PREFLIGHT_20261119.json). A separately implemented Python BigInt EC group enumerator reconstructed base points (0,309380359), (1,749117756), (2,51658786), (3,166645833), and independently counted 3,921 unique sums in each 4-slot B4 half. With the original eight weights:
+
+- Planted B4 target R=(1991076510,718644930) admits all-zero slot labels; both direct eight-row determinant and 70-term exterior contraction are exactly zero.
+- Unplanted target R=G=(625037715,2100627251) admits **no** B4 signed eight-slot word, by exhaustive independent 4+4 *grader* enumeration. The all-zero word's determinant and exterior contraction both equal 735,647,190, nonzero.
+- A different nonmatching signed word (0,1,2,3,4,5,6,7) at R=G gives determinant and contraction both 468,030,532.
+
+This confirms exact planted/negative fixture labels and the Laplace identity on three original-curve examples. It does **not** establish a native Rust result or wall-time: the new Rust public-only enumerator must still complete the source-bound CI. The Python truth grader is excluded from the native candidate interface.
