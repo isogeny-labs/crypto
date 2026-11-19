@@ -653,6 +653,61 @@ pub struct F4Options {
     /// Test hook for [`F4Options::checkpointing_in_step`]: stop (reported as
     /// `timed_out`) right after this many in-step snapshots.
     pub checkpoint_stop_in_rref: Option<usize>,
+    /// How the recursive visitor ([`solve_visit`] and its variants) finds the
+    /// roots of a univariate in a variable with a finite domain (a factor-base
+    /// coordinate).  Every mode returns the same roots in the same (domain)
+    /// order, so the traversal and the visitor's call sequence do not depend
+    /// on it; only the work does.  The default is the domain scan, kept as the
+    /// control.  See [`DomainRootMode`].
+    pub domain_roots: DomainRootMode,
+}
+
+/// Root extraction for a univariate whose variable has a finite domain `D`.
+///
+/// The roots of `g` in `D` are exactly the `F_p`-roots of `g` that lie in
+/// `D`, because the visitor requires `D ⊂ F_p`.  The scan evaluates `g` at
+/// every element of `D`: about `|D| · terms · log deg` multiplications for
+/// each univariate at each node.  [`DomainRootMode::Frobenius`] instead finds
+/// the few rational roots with the counted `gcd(g, x^p − x)` / Cantor–Zassenhaus
+/// root finder that unrestricted univariates already use (`O(log p · deg²)`
+/// multiplications, independent of `|D|`), then keeps those in `D` through a
+/// value → position index built once per traversal and shared by every node,
+/// and returns them in domain order.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum DomainRootMode {
+    /// Evaluate the univariate at every domain element (the legacy control).
+    #[default]
+    Scan,
+    /// Frobenius root extraction filtered through the domain index.
+    Frobenius,
+    /// Per univariate, whichever of the two has the smaller estimated
+    /// multiplication count ([`domain_scan_cost`] against
+    /// [`domain_frobenius_cost`]).
+    Auto,
+}
+
+/// Multiplications the domain scan spends on one univariate: for each domain
+/// element and each term, square-and-multiply `x^e` and one coefficient
+/// product.  Exact for the scan below.
+pub fn domain_scan_cost(exponents: &[u32], domain_len: usize) -> u64 {
+    let per_point: u64 = exponents.iter().map(|&e| powmod_muls(u64::from(e)) + 1).sum();
+    per_point.saturating_mul(domain_len as u64)
+}
+
+/// An upper estimate of the Frobenius root finder's multiplications for a
+/// univariate of degree `degree`: square-and-multiply for `x^p mod g`, each
+/// step a schoolbook product and a reduction, plus the gcd.  Used only to
+/// choose between the modes in [`DomainRootMode::Auto`]; never reported.
+pub fn domain_frobenius_cost(degree: u32, p: u64) -> u64 {
+    let n = u64::from(degree) + 1;
+    let step = 2 * n * n;
+    powmod_muls(p).saturating_mul(step).saturating_add(n * n)
+}
+
+/// Multiplications of the square-and-multiply loop of [`powmod`] for exponent
+/// `e`: one squaring a bit and one product a set bit.
+fn powmod_muls(e: u64) -> u64 {
+    u64::from(64 - e.leading_zeros()) + u64::from(e.count_ones())
 }
 
 impl F4Options {
@@ -672,7 +727,14 @@ impl F4Options {
             checkpoint_stop_after: None,
             checkpoint_in_step: None,
             checkpoint_stop_in_rref: None,
+            domain_roots: DomainRootMode::Scan,
         }
+    }
+
+    /// Select the visitor's root extraction for finite-domain variables.
+    pub fn with_domain_roots(mut self, mode: DomainRootMode) -> Self {
+        self.domain_roots = mode;
+        self
     }
     /// Checkpoint the run to `path` and resume from it.
     ///
@@ -6513,6 +6575,31 @@ pub struct VisitReport {
     /// Counted coefficient multiplications in the reused root finder only.
     pub root_field_multiplications: u64,
     pub full_field_branches: u64,
+    /// Finite-domain univariates whose roots came from the Frobenius root
+    /// finder and the domain index ([`DomainRootMode`]); zero, and omitted
+    /// from serialised reports, under the default scan.
+    #[serde(skip_serializing_if = "is_zero_usize")]
+    pub domain_frobenius_univariates: usize,
+    /// Counted multiplications of those extractions.
+    #[serde(skip_serializing_if = "is_zero_u64")]
+    pub domain_root_field_multiplications: u64,
+    /// Entries inserted into the per-traversal domain indexes.
+    #[serde(skip_serializing_if = "is_zero_u64")]
+    pub domain_index_entries: u64,
+    /// Multiplications of the domain scan (exact: [`domain_scan_cost`] for
+    /// each element evaluated), so that the two [`DomainRootMode`]s can be
+    /// compared in one unit.  In-process only: never serialised, so existing
+    /// transcripts are unchanged.
+    #[serde(skip_serializing)]
+    pub domain_scan_field_multiplications: u64,
+}
+
+fn is_zero_u64(v: &u64) -> bool {
+    *v == 0
+}
+
+fn is_zero_usize(v: &usize) -> bool {
+    *v == 0
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -6572,6 +6659,9 @@ struct VisitState<'a, F, S> {
     pool: Option<&'a mut TracePool>,
     next_node: usize,
     report: VisitReport,
+    /// Lazily built value → position index of each original variable's
+    /// finite domain, shared by every node of the traversal.
+    domain_index: Vec<Option<FxMap<u64, usize>>>,
 }
 
 impl<F, S> VisitState<'_, F, S>
@@ -6767,13 +6857,55 @@ where
                 continue;
             }
             let var = *vars.iter().next().unwrap();
-            let roots = if let Some(domain) = &self.domains[active[var]] {
+            let frobenius = self.domains[active[var]].as_ref().is_some_and(|domain| {
+                match self.opts.domain_roots {
+                    DomainRootMode::Scan => false,
+                    DomainRootMode::Frobenius => true,
+                    DomainRootMode::Auto => {
+                        let exponents: Vec<u32> = g.iter().map(|(e, _)| e[var]).collect();
+                        let degree = exponents.iter().copied().max().unwrap_or(0);
+                        domain_frobenius_cost(degree, self.p)
+                            < domain_scan_cost(&exponents, domain.len())
+                    }
+                }
+            });
+            let roots = if frobenius {
+                let original = active[var];
+                let domain = self.domains[original]
+                    .as_ref()
+                    .expect("selected only for a finite domain");
+                if self.domain_index[original].is_none() {
+                    self.report.domain_index_entries += domain.len() as u64;
+                    self.domain_index[original] = Some(domain_position_index(domain));
+                }
+                let degree = g.iter().map(|(e, _)| e[var]).max().unwrap_or(0) as usize;
+                let mut coefficients = vec![0; degree + 1];
+                for (e, c) in g {
+                    coefficients[e[var] as usize] = *c;
+                }
+                self.report.domain_frobenius_univariates += 1;
+                let Some(roots) = domain_roots_frobenius(
+                    &coefficients,
+                    self.domain_index[original]
+                        .as_ref()
+                        .expect("built above"),
+                    self.p,
+                    &mut self.report.domain_root_field_multiplications,
+                    self.opts.deadline,
+                ) else {
+                    return VisitEnd::TimedOut;
+                };
+                roots
+            } else if let Some(domain) = &self.domains[active[var]] {
                 let mut roots = Vec::new();
+                let exponents: Vec<u32> = g.iter().map(|(e, _)| e[var]).collect();
+                let per_point = domain_scan_cost(&exponents, 1);
                 for &x in domain {
                     if self.expired() {
                         return VisitEnd::TimedOut;
                     }
                     self.report.domain_evaluations += 1;
+                    self.report.domain_scan_field_multiplications += per_point;
                     let value = g.iter().fold(0, |v, (e, c)| {
                         (v + mulmod(*c, powmod(x, u64::from(e[var]), self.p), self.p)) % self.p
                     });
@@ -7000,6 +7132,7 @@ where
         pool,
         next_node: 0,
         report: VisitReport::default(),
+        domain_index: vec![None; n_vars],
     };
     let end = state.walk(input, &(0..n_vars).collect::<Vec<_>>(), None);
     state.report.complete = end == VisitEnd::Complete;
@@ -7040,6 +7173,72 @@ pub struct SolveReport {
     /// evaluation against the input keeps the verdict exact.  Non-zero only
     /// when some run of the tree was truncated.
     pub candidates_rejected: usize,
+}
+
+/// Seed of the Cantor–Zassenhaus split stream shared with the unrestricted
+/// univariate path of the visitor.  The split stream changes only the work,
+/// never the root set.
+const VISIT_ROOT_SEED: u64 = 0x4634_524f_4f54;
+
+/// Value → position of a finite domain (the visitor validates that its
+/// values are distinct and below `p`).  Built once per traversal and
+/// variable, then shared by every node.
+pub(crate) fn domain_position_index(domain: &[u64]) -> FxMap<u64, usize> {
+    let mut index = FxMap::default();
+    index.reserve(domain.len());
+    for (position, &x) in domain.iter().enumerate() {
+        index.insert(x, position);
+    }
+    index
+}
+
+/// The roots in a finite domain of the univariate `coefficients` (low to
+/// high), in domain order: the counted `F_p`-root finder
+/// ([`super::glv_invariant_base::poly_roots_fp_counted_until`]), then the
+/// domain index.  Exact because the domain lies in `F_p`; `None` only when
+/// the deadline expires.  Multiplications are added to `muls`.
+pub(crate) fn domain_roots_frobenius(
+    coefficients: &[u64],
+    index: &FxMap<u64, usize>,
+    p: u64,
+    muls: &mut u64,
+    deadline: Option<Instant>,
+) -> Option<Vec<u64>> {
+    let rational = super::glv_invariant_base::poly_roots_fp_counted_until(
+        coefficients,
+        p,
+        VISIT_ROOT_SEED,
+        muls,
+        deadline,
+    )?;
+    let mut hits: Vec<(usize, u64)> = rational
+        .into_iter()
+        .filter_map(|r| index.get(&r).map(|&position| (position, r)))
+        .collect();
+    hits.sort_unstable_by_key(|&(position, _)| position);
+    Some(hits.into_iter().map(|(_, r)| r).collect())
+}
+
+/// The domain scan exactly as the visitor runs it (the control), with its
+/// multiplications counted: `terms` are `(exponent, coefficient)`.
+#[cfg(test)]
+pub(crate) fn domain_roots_scan(
+    terms: &[(u32, u64)],
+    domain: &[u64],
+    p: u64,
+    muls: &mut u64,
+) -> Vec<u64> {
+    let exponents: Vec<u32> = terms.iter().map(|&(e, _)| e).collect();
+    *muls += domain_scan_cost(&exponents, domain.len());
+    domain
+        .iter()
+        .copied()
+        .filter(|&x| {
+            terms.iter().fold(0, |v, &(e, c)| {
+                (v + mulmod(c, powmod(x, u64::from(e), p), p)) % p
+            }) == 0
+        })
+        .collect()
 }
 
 /// Roots in `F_p` of a univariate polynomial given as `(degree, coeff)`.
@@ -9553,5 +9752,273 @@ mod packed_set_tests {
                 assert_eq!(mulmod(a % p, invmod(a, p), p), 1, "{a}^-1 mod {p}");
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod domain_root_tests {
+    //! [`DomainRootMode`]: the Frobenius extraction returns the scan's roots,
+    //! in the scan's order, so the visitor's traversal cannot tell them apart.
+    use super::*;
+    use rand::rngs::StdRng;
+    use rand::{Rng, SeedableRng};
+
+    fn mul_poly(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+        let mut out = vec![0u64; a.len() + b.len() - 1];
+        for (i, &x) in a.iter().enumerate() {
+            for (j, &y) in b.iter().enumerate() {
+                out[i + j] = (out[i + j] + mulmod(x, y, p)) % p;
+            }
+        }
+        out
+    }
+
+    /// Coefficients (low to high) with a nonzero leading coefficient and
+    /// degree at least one: planted roots (some repeated, some outside the
+    /// domain), an optional random cofactor that may carry irreducible
+    /// factors, and a random scale.
+    fn random_univariate(rng: &mut StdRng, p: u64, planted: &[u64]) -> Vec<u64> {
+        let mut f = vec![1u64];
+        for &r in planted {
+            f = mul_poly(&f, &[(p - r % p) % p, 1], p);
+        }
+        if planted.is_empty() || rng.gen_bool(0.5) {
+            let d = rng.gen_range(1..=4usize);
+            let mut cof: Vec<u64> = (0..d).map(|_| rng.gen_range(0..p)).collect();
+            cof.push(rng.gen_range(1..p.max(2)));
+            f = mul_poly(&f, &cof, p);
+        }
+        let scale = rng.gen_range(1..p.max(2));
+        f.iter().map(|&c| mulmod(c, scale, p)).collect()
+    }
+
+    fn terms_of(f: &[u64]) -> Vec<(u32, u64)> {
+        f.iter()
+            .enumerate()
+            .filter(|(_, &c)| c != 0)
+            .map(|(e, &c)| (e as u32, c))
+            .collect()
+    }
+
+    fn random_domain(rng: &mut StdRng, p: u64, size: usize, must: &[u64]) -> Vec<u64> {
+        let mut seen = HashSet::new();
+        let mut d = Vec::new();
+        for &x in must {
+            if seen.insert(x % p) {
+                d.push(x % p);
+            }
+        }
+        let size = size.min(p as usize);
+        while d.len() < size {
+            let x = rng.gen_range(0..p);
+            if seen.insert(x) {
+                d.push(x);
+            }
+        }
+        // Domain order is arbitrary in the visitor; the extraction must keep it.
+        for i in (1..d.len()).rev() {
+            d.swap(i, rng.gen_range(0..=i));
+        }
+        d
+    }
+
+    fn check(f: &[u64], domain: &[u64], p: u64) {
+        let index = domain_position_index(domain);
+        let (mut scan_muls, mut frob_muls) = (0u64, 0u64);
+        let scan = domain_roots_scan(&terms_of(f), domain, p, &mut scan_muls);
+        let frob = domain_roots_frobenius(f, &index, p, &mut frob_muls, None).unwrap();
+        assert_eq!(frob, scan, "p = {p}, f = {f:?}, |D| = {}", domain.len());
+    }
+
+    #[test]
+    fn frobenius_extraction_returns_the_scans_roots_in_domain_order() {
+        let mut rng = StdRng::seed_from_u64(0x0F4D_0A1B);
+        let primes = [2u64, 3, 5, 7, 13, 101, 1009, 65_521, 1_000_003, 2_147_483_647, 4_294_967_291];
+        let mut cases = 0usize;
+        for &p in &primes {
+            for _ in 0..60 {
+                let k = rng.gen_range(0..=6usize);
+                let planted: Vec<u64> = (0..k).map(|_| rng.gen_range(0..p)).collect();
+                // Repeat a planted root now and then.
+                let mut planted = planted;
+                if !planted.is_empty() && rng.gen_bool(0.3) {
+                    planted.push(planted[0]);
+                }
+                let f = random_univariate(&mut rng, p, &planted);
+                let inside: Vec<u64> = planted.iter().copied().filter(|_| rng.gen_bool(0.6)).collect();
+                let size = if p <= 13 { rng.gen_range(0..=p as usize) } else { rng.gen_range(0..=200usize) };
+                let domain = random_domain(&mut rng, p, size, &inside);
+                check(&f, &domain, p);
+                cases += 1;
+            }
+            if p <= 13 {
+                // Degree at least p, vanishing on the whole field: x^p − x, and
+                // its product with a planted factor; full and partial domains.
+                let mut xp_x = vec![0u64; p as usize + 1];
+                xp_x[1] = p - 1;
+                xp_x[p as usize] = 1;
+                let full: Vec<u64> = (0..p).rev().collect();
+                check(&xp_x, &full, p);
+                check(&mul_poly(&xp_x, &[1, 1], p), &full[..full.len() / 2], p);
+                check(&[0, 1], &[], p);
+                cases += 3;
+            }
+        }
+        assert!(cases > 600);
+    }
+
+    #[test]
+    fn frobenius_needs_far_fewer_multiplications_on_a_large_domain() {
+        let p = 2_147_483_647u64;
+        let mut rng = StdRng::seed_from_u64(7);
+        let planted = [11u64, 23, 99_991];
+        let f = random_univariate(&mut rng, p, &planted);
+        let domain = random_domain(&mut rng, p, 1 << 14, &planted);
+        let index = domain_position_index(&domain);
+        let (mut s, mut fr) = (0u64, 0u64);
+        let a = domain_roots_scan(&terms_of(&f), &domain, p, &mut s);
+        let b = domain_roots_frobenius(&f, &index, p, &mut fr, None).unwrap();
+        assert_eq!(a, b);
+        assert_eq!(a.len(), 3);
+        assert!(fr * 10 < s, "frobenius {fr} vs scan {s}");
+    }
+
+    /// Dense random quadrics in three variables through planted points, with
+    /// finite domains on some variables: the generic F4 bases produce
+    /// univariates of degree up to eight with arbitrary roots.
+    fn planted_system(rng: &mut StdRng, p: u64, n: usize) -> (Vec<Poly>, Vec<Vec<u64>>) {
+        let points: Vec<Vec<u64>> = (0..rng.gen_range(1..=3usize))
+            .map(|_| (0..n).map(|_| rng.gen_range(0..p)).collect())
+            .collect();
+        let mut monomials: Vec<Vec<u32>> = Vec::new();
+        for i in 0..n {
+            for j in i..n {
+                let mut e = vec![0u32; n];
+                e[i] += 1;
+                e[j] += 1;
+                monomials.push(e);
+            }
+            let mut e = vec![0u32; n];
+            e[i] = 1;
+            monomials.push(e);
+        }
+        let eval = |e: &[u32], x: &[u64]| {
+            e.iter()
+                .zip(x)
+                .fold(1u64, |v, (&k, &xi)| mulmod(v, powmod(xi, u64::from(k), p), p))
+        };
+        // Each equation is a random combination of monomials, with the constant
+        // chosen to vanish at the first planted point, times nothing else: the
+        // other planted points are kept only by the linear span (a degenerate
+        // system is still a valid traversal test).
+        let mut system = Vec::new();
+        for _ in 0..n {
+            let coeffs: Vec<u64> = monomials.iter().map(|_| rng.gen_range(0..p)).collect();
+            let mut terms: Vec<(Vec<u32>, u64)> = monomials.iter().cloned().zip(coeffs.iter().copied()).collect();
+            let at = |x: &[u64]| {
+                terms
+                    .iter()
+                    .fold(0u64, |v, (e, c)| (v + mulmod(*c, eval(e, x), p)) % p)
+            };
+            let c0 = (p - at(&points[0])) % p;
+            terms.push((vec![0u32; n], c0));
+            system.push(normalise(&terms, p, Ordering::Grevlex));
+        }
+        (system, points)
+    }
+
+    type Branches = Vec<(usize, usize, u64, &'static str)>;
+
+    fn traverse(
+        system: &[Poly],
+        n: usize,
+        p: u64,
+        domains: &[Option<Vec<u64>>],
+        mode: DomainRootMode,
+        stop_after: Option<usize>,
+    ) -> (Vec<Vec<u64>>, Branches, VisitReport) {
+        let opts = F4Options::new(Ordering::Grevlex, 12).with_domain_roots(mode);
+        let mut seen = Vec::new();
+        let mut branches = Vec::new();
+        let report = solve_visit_traced(
+            system,
+            n,
+            p,
+            &opts,
+            domains,
+            |s| {
+                seen.push(s.to_vec());
+                stop_after.is_some_and(|k| seen.len() >= k)
+            },
+            |event| {
+                if let VisitEvent::Branch {
+                    node_id,
+                    original_variable,
+                    value,
+                    source,
+                } = event
+                {
+                    branches.push((node_id, original_variable, value, source));
+                }
+                Ok(())
+            },
+        )
+        .unwrap();
+        (seen, branches, report)
+    }
+
+    #[test]
+    fn every_mode_gives_the_identical_traversal() {
+        let mut rng = StdRng::seed_from_u64(0xD0_4A1E);
+        let mut with_frobenius = 0usize;
+        for round in 0..40 {
+            let p = [101u64, 1009, 65_521, 1_000_003][round % 4];
+            let n = 2 + round % 2;
+            let (system, points) = planted_system(&mut rng, p, n);
+            let domains: Vec<Option<Vec<u64>>> = (0..n)
+                .map(|i| {
+                    rng.gen_bool(0.75).then(|| {
+                        let must: Vec<u64> = points.iter().map(|pt| pt[i]).collect();
+                        let size = rng.gen_range(must.len()..=must.len() + 300);
+                        random_domain(&mut rng, p, size, &must)
+                    })
+                })
+                .collect();
+            for stop in [None, Some(1)] {
+                let (s0, b0, r0) = traverse(&system, n, p, &domains, DomainRootMode::Scan, stop);
+                for mode in [DomainRootMode::Frobenius, DomainRootMode::Auto] {
+                    let (s1, b1, r1) = traverse(&system, n, p, &domains, mode, stop);
+                    assert_eq!(s1, s0, "solutions differ, round {round}, {mode:?}");
+                    assert_eq!(b1, b0, "branch sequence differs, round {round}, {mode:?}");
+                    assert_eq!(
+                        (r1.complete, r1.stopped_early, r1.timed_out, r1.solutions_visited),
+                        (r0.complete, r0.stopped_early, r0.timed_out, r0.solutions_visited)
+                    );
+                    assert_eq!(
+                        (r1.candidates_rejected, r1.f4_runs, r1.field_ops, r1.full_field_branches),
+                        (r0.candidates_rejected, r0.f4_runs, r0.field_ops, r0.full_field_branches)
+                    );
+                    if mode == DomainRootMode::Frobenius {
+                        assert_eq!(r1.domain_evaluations, 0);
+                        with_frobenius += r1.domain_frobenius_univariates;
+                    }
+                }
+                assert_eq!(r0.domain_frobenius_univariates, 0);
+            }
+        }
+        assert!(with_frobenius > 20, "only {with_frobenius} domain univariates exercised");
+    }
+
+    #[test]
+    fn default_reports_serialise_without_the_new_fields() {
+        let json = serde_json::to_value(VisitReport::default()).unwrap();
+        for key in [
+            "domain_frobenius_univariates",
+            "domain_root_field_multiplications",
+            "domain_index_entries",
+        ] {
+            assert!(json.get(key).is_none(), "{key} serialised under the default");
+        }
+        assert_eq!(F4Options::new(Ordering::Grevlex, 4).domain_roots, DomainRootMode::Scan);
     }
 }
