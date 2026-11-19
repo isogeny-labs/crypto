@@ -1,0 +1,63 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Scalar throughput controls on evaluated prime33555419 crossing",
+  "description": "32 points,6 measured rounds plus1 warmup, original53bit subgroup, source/image/u2 models; no ECDLP solve.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_mont4_explicit",
+        "p": "5629830687772387",
+        "a": "5620419248410339",
+        "b": "675862186879016",
+        "group_order": "5629830654216971",
+        "r": 5629830654216971,
+        "gx": "2",
+        "gy": "1401162638053187"
+      },
+      {
+        "kind": "prime_mont4_explicit",
+        "p": "5629830687772387",
+        "a": "2539833775737119",
+        "b": "1737207970637906",
+        "group_order": "5629830654216971",
+        "r": 5629830654216971,
+        "gx": "2975092980436849",
+        "gy": "5333622322807887"
+      },
+      {
+        "kind": "prime_mont4_explicit",
+        "p": "5629830687772387",
+        "a": "5479247657979619",
+        "b": "3846365145850315",
+        "group_order": "5629830654216971",
+        "r": 5629830654216971,
+        "gx": "8",
+        "gy": "5579470416653109"
+      }
+    ],
+    "targets_per_curve": 32,
+    "target_seed": 20261119,
+    "target_kind": "planted_shared"
+  },
+  "arms": [
+    {
+      "name": "rho-counted",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "paired_curves_v1",
+    "seed": 20261119,
+    "isolation_required": "L2",
+    "timeout_seconds": 120,
+    "algorithm_seed_round": "measured_index"
+  }
+}

@@ -1,0 +1,51 @@
+In file included from /workspace/tools/conductor-native/usr/include/x86_64-linux-gnu/pari/pari.h:40,
+                 from research/prime_conductor_gap80_20261031/native/complete_twisted_pipeline.cpp:10:
+/workspace/tools/conductor-native/usr/include/x86_64-linux-gnu/pari/parigen.h:24:9: error: "ulong" redefined [-Werror]
+   24 | #define ulong pari_ulong
+      |         ^~~~~
+In file included from research/prime_conductor_gap80_20261031/native/complete_twisted_pipeline.cpp:4:
+/workspace/tools/conductor-native/usr/include/flint/flint.h:95:9: note: this is the location of the previous definition
+   95 | #define ulong mp_limb_t
+      |         ^~~~~
+In file included from research/prime_conductor_gap80_20261031/native/complete_twisted_pipeline.cpp:7:
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h: In function ‘void fmpz_mod_poly_init(fmpz_mod_poly_struct*, const fmpz_mod_ctx_struct*)’:
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h:91:68: error: unused parameter ‘ctx’ [-Werror=unused-parameter]
+   91 | void fmpz_mod_poly_init(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
+      |                                               ~~~~~~~~~~~~~~~~~~~~~^~~
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h: In function ‘void fmpz_mod_poly_fit_length(fmpz_mod_poly_struct*, mp_limb_signed_t, const fmpz_mod_ctx_struct*)’:
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h:111:76: error: unused parameter ‘ctx’ [-Werror=unused-parameter]
+  111 |                                                       const fmpz_mod_ctx_t ctx)
+      |                                                       ~~~~~~~~~~~~~~~~~~~~~^~~
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h: In function ‘mp_limb_signed_t fmpz_mod_poly_length(const fmpz_mod_poly_struct*, const fmpz_mod_ctx_struct*)’:
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h:175:77: error: unused parameter ‘ctx’ [-Werror=unused-parameter]
+  175 | slong fmpz_mod_poly_length(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
+      |                                                        ~~~~~~~~~~~~~~~~~~~~~^~~
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h: In function ‘mp_limb_signed_t fmpz_mod_poly_degree(const fmpz_mod_poly_struct*, const fmpz_mod_ctx_struct*)’:
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h:180:77: error: unused parameter ‘ctx’ [-Werror=unused-parameter]
+  180 | slong fmpz_mod_poly_degree(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
+      |                                                        ~~~~~~~~~~~~~~~~~~~~~^~~
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h: In function ‘fmpz* fmpz_mod_poly_lead(const fmpz_mod_poly_struct*, const fmpz_mod_ctx_struct*)’:
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h:186:76: error: unused parameter ‘ctx’ [-Werror=unused-parameter]
+  186 | fmpz * fmpz_mod_poly_lead(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
+      |                                                       ~~~~~~~~~~~~~~~~~~~~~^~~
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h: In function ‘int fmpz_mod_poly_is_monic(const fmpz_mod_poly_struct*, const fmpz_mod_ctx_struct*)’:
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h:195:74: error: unused parameter ‘ctx’ [-Werror=unused-parameter]
+  195 | int fmpz_mod_poly_is_monic(const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx)
+      |                                                     ~~~~~~~~~~~~~~~~~~~~~^~~
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h: In function ‘int fmpz_mod_poly_is_one(const fmpz_mod_poly_struct*, const fmpz_mod_ctx_struct*)’:
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h:201:75: error: unused parameter ‘ctx’ [-Werror=unused-parameter]
+  201 | int fmpz_mod_poly_is_one(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
+      |                                                      ~~~~~~~~~~~~~~~~~~~~~^~~
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h: In function ‘int fmpz_mod_poly_is_gen(const fmpz_mod_poly_struct*, const fmpz_mod_ctx_struct*)’:
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h:207:73: error: unused parameter ‘ctx’ [-Werror=unused-parameter]
+  207 | int fmpz_mod_poly_is_gen(const fmpz_mod_poly_t op, const fmpz_mod_ctx_t ctx)
+      |                                                    ~~~~~~~~~~~~~~~~~~~~~^~~
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h: In function ‘void fmpz_mod_poly_swap(fmpz_mod_poly_struct*, fmpz_mod_poly_struct*, const fmpz_mod_ctx_struct*)’:
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h:221:76: error: unused parameter ‘ctx’ [-Werror=unused-parameter]
+  221 |                                fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)
+      |                                                       ~~~~~~~~~~~~~~~~~~~~~^~~
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h: In function ‘void fmpz_mod_poly_zero(fmpz_mod_poly_struct*, const fmpz_mod_ctx_struct*)’:
+/workspace/tools/conductor-native/usr/include/flint/fmpz_mod_poly.h:232:68: error: unused parameter ‘ctx’ [-Werror=unused-parameter]
+  232 | void fmpz_mod_poly_zero(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
+      |                                               ~~~~~~~~~~~~~~~~~~~~~^~~
+cc1plus: all warnings being treated as errors

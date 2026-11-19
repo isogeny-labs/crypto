@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T20:18:40Z",
+ "id": "PCC-20261118-61e7ed",
+ "kind": "statement",
+ "producer": {
+  "commit": "960d00782d5872360297d724bd608c93667dd10e",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/memory-frontier-20261118/summary.json",
+    "sha256": "3019d1486f3761164d44943c3d782e97c7b253520d7ebe363eeac13dce34681b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/memory-frontier-20261118/DERIVATION.md",
+    "sha256": "68ca09fb15f9a4208c2f380059089b28d31d6249b61c36cfa5b537b2ce3b8d5c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/memory-frontier-20261118/proof/qualification.stdout",
+    "sha256": "c9b36e11af665d6f2774168ca2cd92d36ac897a7599225b5c3a4e94c1084195c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/memory-frontier-20261118/proof/recorded.stdout",
+    "sha256": "1fe00f5555ae024c4618f25ab37d911973084a86334e457a1a90d0aae0f1ac32"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/memory-frontier-20261118/pre-call.sha256",
+    "sha256": "1f24bb55f5cc1e3ecf4f2e4141fda285c4a98076ce96a1a2127b4e86f41bbfea"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/memory-frontier-20261118/recorded-pre-call.sha256",
+    "sha256": "e92a005e3ee0b2f08fd39afbaa9e271af210c50d67d98cc5a75e1b0f6a6ae888"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/memory-frontier-20261118/post-check.stdout",
+    "sha256": "485754672fbb4733fefe8dec66e68197c572d4167004dde2ce4fd2a902ea96f0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/memory-frontier-20261118/recorded-post-check.stdout",
+    "sha256": "abe2e447cfca617d5ae6eef8fdd4d47ba7539711c91e6708388bae40aa0489e7"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/memory-frontier-20261118",
+ "statement": "For the pinned evaluator and unchanged 80-bit target, optimizing the two mandatory logical coefficient-slot phases over all baby windows gives a minimum 9665413335568 bytes for a single full rectangle, excluding limbs/other objects. Under the example 137438953472-byte cap, the source-loop derivation bounds every fitting tiling by at least 21241297635754 coordinate contexts and 2473 rectangles. Native controls match exhaustive enumeration on 1048576 windows and 6291456 blocked configurations; nine native monic-layout and seven prior schedule metadata controls pass. This is a conditional source-model derivation, not a formal/independent signed proof, RSS observation, universal isogeny bound, wall-time impossibility or completed crossing."
+}

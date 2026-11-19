@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-19T17:57:39Z",
+ "id": "PCC-20261119-5c4b81",
+ "kind": "statement",
+ "producer": {
+  "commit": "668c1615afb4050910510abc6027d7806c0506c2",
+  "model": "codex",
+  "session": "conductor-local-20261119"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/stage-results.json",
+    "sha256": "297fe69dae0232f9c0f825fb668e46152c1b4a8f22942593f407bdb7c9cd3b77"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/pilot-audit.json",
+    "sha256": "9aa6c28cecdcdd9a174df16c9073826f663c16dbee17afd3e17adb5d3b6286c3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/results/target80-bounded/exit",
+    "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/results/target80-bounded/stderr",
+    "sha256": "84f598d1d3f049edbe3527fce64f65b123b3076bc746cb86b6b21394eadd5543"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/target80-pre-call.sha256",
+    "sha256": "32df41ff79258647e6970a892e89420047a714a86ca9efec88370766eabb4c18"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "authorized-local-run-stages",
+ "statement": "Local conductor-control ECDLP pilot passes native audit with12 exact deterministic replays. The actual original80bit kernel with33 input points was executed in bounded native tiles and stopped at its60second cap, exit124; no quotient/images or completed coverage was produced. This is not an80bit result or an impossibility claim."
+}

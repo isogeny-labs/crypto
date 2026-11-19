@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-19T20:55:35Z",
+ "id": "PCC-20261119-89d1ac",
+ "kind": "statement",
+ "producer": {
+  "commit": "8c71d21370fd541c74e5d48f9b429d1615df6c62",
+  "model": "codex",
+  "session": "conductor-rust-20261119"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/summary.json",
+    "sha256": "dd8421d7ed85ae607dd9caebc5faff34608dd203b4fc7fa3e9972d555dad883b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/reports/report.pdf",
+    "sha256": "306f6c0dc82a9131aae09e0932fa132d9771b33d0530a4b9c448dfe3b4fde9a2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/archive-info.json",
+    "sha256": "4cc71dfe071827c8bc4f863d36b15739ab0e6dd19f66323d3e385d06c4997d0b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/raw-results.tar.xz",
+    "sha256": "7591f3dfad2e846a0a3e5edb1fc1770f41a7e4229cff92340ba122f75679210e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/frozen-signed-v2/isogeny_eval.rs",
+    "sha256": "9f93a2e10358f14546a1a6b26c78b15a1899b130372b13423dc67b607589e9a5"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "final-rust-evaluator-local-evidence",
+ "statement": "Final signed-input Rust evaluator passes7 tests,18 reference maps/470 points,8 rejections and scoped port clippy; final full33555419-degree main and dual runs independently pass33 point/composition checks. Final whole-process L0 main/probe/dual elapsed values are8.336/0.609/8.776seconds. Exact original80bit input actually executes in Rust and reaches60second watchdog (exit124;60.008seconds), with no quotient/images. Earlier32ms codec refusal remains distinct. Complete raw archive is12164bytes SHA2567591f3dfad2e846a0a3e5edb1fc1770f41a7e4229cff92340ba122f75679210e, extraction and identical repack checked. Both final PDF pages were visually inspected. No80bit completion, world-record, speedup or remote-upload claim is made."
+}

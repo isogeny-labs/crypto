@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T16:35:39Z",
+ "id": "PCC-20261118-2b6436",
+ "kind": "statement",
+ "producer": {
+  "commit": "a1ceeeeadc82a3e86b074d17c8d758e0d8f04067",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/cli-summary.json",
+    "sha256": "8e9f485e85e67ce81c3f27e7dada18a0dc065633638526ffe94dcd7216e9c88e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/cli-build-b-inputs.sha256",
+    "sha256": "e4897df7b2ed1fbfd0676b171f623c577582e82ba02b9c5845ae4c57b6280e1c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/cli-v2-pre-call.sha256",
+    "sha256": "f72fd072931e857e3b5b56c078ec43b1363c930f2d8cd8eae6baa3dbf4e2c0b4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/results/cli-b/rows.json",
+    "sha256": "324b1fad2f6c950845f2e3b6066e3e2b11c6692929d1cc7cac859f6d0a975c52"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/results/cli-b/exit.json",
+    "sha256": "99945a7055fb979d8dd561fe949005c8fd3b3f3e6cc5e262de93876669181b60"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/wide-harness-20261118",
+ "statement": "The unchanged ecbench CLI source, built in a development manifest against the actual tested library, accepts exact 202-bit and 96-bit source inputs. Its planner matches 64 scalar/coordinate rows with the native GMP comparator; the unimplemented wide-field IC arm rejects with exit 2. The original five-round alternating-order warning is retained; a separate six-round/one-warmup plan passes the strict planning checks. These are unregistered source-only planning controls, not admitted measurements, a target quotient, or an evaluated conductor crossing."
+}

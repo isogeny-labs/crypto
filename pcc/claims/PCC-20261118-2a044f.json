@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T20:38:53Z",
+ "id": "PCC-20261118-2a044f",
+ "kind": "statement",
+ "producer": {
+  "commit": "4541edbc50cd331d17b3c39ca390cb97239fe4a0",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/admission-check-20261118/status.json",
+    "sha256": "b618b364a56ef650848a6fe3e0e7947198974c349f8d53c9b907ab7eb3f67f66"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/admission-check-20261118/sts.exit",
+    "sha256": "ce8bafb38615aeb5d44ebbabe78ec14ac35a5de87bdc5ad5ea82a72656024ce4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/admission-check-20261118/sts.stderr",
+    "sha256": "a8d6f583e4c9c23475905e5a3b10daa5d9c21e8989f3d3d492318ddb7ee7def1"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/admission-check-20261118",
+ "statement": "Read-only admission recheck: local STS exits255 with no credentials; no EKS tool is exposed; reviewed main ad2a014c0022cf000845014499a9649b6c2cef2d has ecbench/fixed norm-branch modes and no native evaluator mode. Publisher PR4690 remains unmerged/blocked. The fixed diagnosis route targets unrelated historical jobs and was not used. No live budget/capacity or submitted trial is established. This is the first consecutive no-progress goal continuation for this external blocker; keep the goal active. Original construction and endpoint measurement obligations remain open."
+}

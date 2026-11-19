@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-19T18:42:58Z",
+ "id": "PCC-20261119-22bcb7",
+ "kind": "statement",
+ "producer": {
+  "commit": "668c1615afb4050910510abc6027d7806c0506c2",
+  "model": "codex",
+  "session": "conductor-local-20261119"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/summary.json",
+    "sha256": "94d0c97894602189a22829e75d640a9c31e39d53aa28420a32bf882084cdb474"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/pilot96-audit.json",
+    "sha256": "9f6efd0dbbbad7535fab94fb73c076d7e75dbb2913ddd53704a5b1d28950f120"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/dlp-audit.stdout",
+    "sha256": "5bed8fceac10cb3d9a0a29e201a9156ff8a708830134a5354ec22204cefbc5d3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/dlp-audit-pre-call.sha256",
+    "sha256": "a9eeb0c52d5fedf2b8a2774a37ee3a0ea0631e3714111b055461ff608092bca7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/scalar-clippy.exit",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/local-20261119/wide-ic.stderr",
+    "sha256": "76e4b199f06749b0679305bf4b40151fdca328d8632e68d597ba5aa8a084a0ad"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "completed-authorized-local-controls",
+ "statement": "Both local ECDLP pilots complete24 verified runs,24 exact native replays and24 independent PARI recovery checks across actual202/96bit fields, one target per field and two rounds. Full32-point/six-round scalar controls pass1344 independent PARI checks and focused clippy. The original80bit local attempt times out at60seconds without quotient/images; IC dispatch rejects a missing wide adapter. All clocks are descriptive L0, not admitted speedup evidence."
+}

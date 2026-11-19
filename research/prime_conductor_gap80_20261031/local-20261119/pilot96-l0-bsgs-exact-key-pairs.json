@@ -1,0 +1,166 @@
+{
+  "schema": "ecbench.endpoint_pairs/v1",
+  "scope": "structural_join_only",
+  "plan_only": false,
+  "spec_id": "ECS1h743af55c17c8",
+  "spec_sha256": "743af55c17c880e5a2966502326d254be66fdb30d45f02a6c2cc5d4e9f34a54a",
+  "plan_sha256": "ead9fc1146e7649217828bba013f565f06fa89579c3e71bfd6303adb441ff85c",
+  "session_sha256": "77cfe436112b4954d6f319b42a05c1d91c9a56f8f12f2a31ff8a605b1e422797",
+  "records_sha256": "37075906a771ab0da10cb90116006d6fbec3e5cf751545d9e536265685f3526f",
+  "session": {
+    "schema": "ecbench.session/v1",
+    "session_id": "ECBS1h71e554f9e2d4",
+    "label": "Authorized local96bit pilot; horizontal degree5 control, no80bit claim",
+    "spec_id": "ECS1h743af55c17c8",
+    "spec_sha256": "743af55c17c880e5a2966502326d254be66fdb30d45f02a6c2cc5d4e9f34a54a",
+    "env_class_id": "ECBENV3h8756b061d3c3",
+    "host_sha256": "87035135349c990c8916aee71600cca6a6286f5791f79dde685fbd6877cfd7ae",
+    "plan_sha256": "ead9fc1146e7649217828bba013f565f06fa89579c3e71bfd6303adb441ff85c",
+    "binary_sha256": "9c8db223d0d6be523460519f5339863cbf0935df61cbe0edc69917e24ee2f990",
+    "git_commit": null,
+    "git_dirty": null,
+    "options": {
+      "cpus": "none",
+      "lock_path": "/tmp/crypto-bench.lock",
+      "wait_for_lock": true,
+      "allow_busy": false,
+      "thresholds": {
+        "settle_seconds": 2.0,
+        "max_other_cpu": 0.1,
+        "max_psi": 5.0,
+        "max_preemptions_per_second": 50.0
+      },
+      "exe": "/proc/self/exe"
+    },
+    "cpu_plan": null,
+    "preflight": null,
+    "eviction": null,
+    "runner_on_run_cpu": false,
+    "runner_cpus": null,
+    "ticks_per_second": 100,
+    "grading_version": 3,
+    "accounting_versions": {
+      "f6_ic_tree": 2,
+      "inherited_f4_specialise": 2
+    },
+    "child_env_sha256": "5fcca52408a68c08609b1aebe24bb4f03f94c8f0ec0e418fdf510c73a93a4e98",
+    "child_env": {
+      "HOME": "/home/agent",
+      "LC_ALL": "C",
+      "OMP_NUM_THREADS": "1",
+      "PATH": "/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "RAYON_NUM_THREADS": "1",
+      "RUST_BACKTRACE": "0",
+      "RUST_MIN_STACK": "8388608"
+    },
+    "started_unix_ms": 1795112112821,
+    "finished_unix_ms": 1795112786361,
+    "status": "complete",
+    "executions_planned": 12,
+    "records_written": 12,
+    "records_sha256": "37075906a771ab0da10cb90116006d6fbec3e5cf751545d9e536265685f3526f",
+    "status_counts": {
+      "verified": 12
+    },
+    "last_seq": 11
+  },
+  "source_curve": "icv1-fp96-tm125000000302577-0b06b926",
+  "destination_curve": "icv1-fp96-tm125000000302577-2550b472",
+  "arm": {
+    "name": "bsgs-exact-key",
+    "role": "candidate",
+    "method": {
+      "id": "bsgs.prime_mont4_v1",
+      "family": "bsgs",
+      "params": {},
+      "method_id": "ECM1h4f0bb4b7e178",
+      "method_sha256": "4f0bb4b7e1782d02f4c909f94b2417af0aa42e49eef396e169275aeb8195e531",
+      "entry": "ecbench::prime_mont4::bsgs"
+    }
+  },
+  "observations_in_input": 12,
+  "observations_selected": 4,
+  "pairs": [
+    {
+      "r": "125000000302579",
+      "target_seed": 20261119,
+      "target_index": 0,
+      "round": 0,
+      "warmup": false,
+      "source": {
+        "execution": {
+          "seq": 1,
+          "round": 0,
+          "warmup": false,
+          "arm": 1,
+          "workload": 0,
+          "algorithm_seed": 7701010587527600627
+        },
+        "workload_id": "W682659e2d870",
+        "workload_sha256": "682659e2d870d53e451a2905ed478990db574eed1f23614b36d5148ad1038a7d",
+        "record": {"schema":"ecbench.record/v1","record_id":"ECR1h3fe7b1502051","session_id":"ECBS1h71e554f9e2d4","run_id":"ECM1h4f0bb4b7e178W682659e2d870R1","seq":1,"round":0,"warmup":false,"arm":"bsgs-exact-key","role":"candidate","method":{"id":"bsgs.prime_mont4_v1","family":"bsgs","params":{},"method_id":"ECM1h4f0bb4b7e178","method_sha256":"4f0bb4b7e1782d02f4c909f94b2417af0aa42e49eef396e169275aeb8195e531","entry":"ecbench::prime_mont4::bsgs"},"workload":{"workload_id":"W682659e2d870","workload_sha256":"682659e2d870d53e451a2905ed478990db574eed1f23614b36d5148ad1038a7d","curve_spec":{"kind":"prime_mont4_explicit","p":"78125000378223625457769953627","a":"18274853889642953323454959912","b":"32133284755955526260408304513","group_order":"78125000378223750457770256205","r":125000000302579,"gx":"56427920970213953953111743943","gy":"4354194121617047333390549409"},"curve":{"slug":"icv1-fp96-tm125000000302577-0b06b926","icv1":"ICV1:fp-78125000378223625457769953627:-125000000302577:78125000378223750457770256205:78125000378223625457769068891:unk:unk:r:0b06b926cae3","family":"prime","construction":"PrimeMont4 { p: 78125000378223625457769953627, a: 18274853889642953323454959912, b: 32133284755955526260408304513 } (explicit)","field_degree":null,"field_bits":96,"group_order":"78125000378223750457770256205","r":125000000302579,"cofactor":625000001512895,"generator":["0xb654150d3cc0bf7b386c1dc7","0xe11b4784dd59db0e1dc81a1"],"automorphisms_available":2,"registered":false,"ec1":null,"curve_uid":null},"target_law":"uniform_scalar_sha256_shared_v1","target_seed":20261119,"target_index":0,"target":["0xc7168b6bbc12ed61d413c2ac","0x7eb22ebcff6625c53013ff19"],"planted":79059150462809},"algorithm_seed":"7701010587527600627","outcome":{"status":"verified","recovered":"79059150462809","matches_target":true,"matches_planted":true,"error":null,"exit":"exit 0","stderr_sha256":null},"cost":{"unit":"ecbench.gae","total_gae":18251637.0,"s":1.6324760393302011,"lower_bound":true,"unpriced":["full_point_key_bytes_stored_uncharged","inserts_uncharged","lookups_uncharged"],"deterministic":true,"nondeterminism":[]},"boundaries":{"automorphisms_available":2,"automorphisms_used":1,"floor_s":0.8862269254527579,"ratio_to_floor":1.8420519535627937,"floor_rule":"automorphisms/v2"},"phases":[{"name":"setup","adds":11180349,"doubles":23,"scalar_mults":1,"gae":11180372.0,"wall_ns":null,"native":{}},{"name":"search","adds":7071265,"doubles":0,"scalar_mults":0,"gae":7071265.0,"wall_ns":null,"native":{}}],"counters":{"full_point_key_bytes_stored_uncharged":804984480,"inserts_uncharged":11180340,"lookups_uncharged":7071266},"factor_base":null,"detail":null,"online":null,"solver":null,"allocator":{"name":"glibc 2.41","pre_solve_trim":true,"trim_result":1},"field_ops":{"muls":36503272,"sqrs":18251660,"invs":18251636},"time":{"solve_wall_ns":86217555594,"method_call_wall_ns":86217938964,"parent_audit_verification_ns":209848,"online_clock_diagnostics":{"error":"online interval not closed"},"process_wall_ns":86259337585,"user_ns":84083777000,"sys_ns":2087152000,"max_rss_kib":1356536,"minor_faults":336869,"major_faults":0,"voluntary_switches":1,"involuntary_switches":460,"schedstat_solve":{"cpu_ns":86129355251,"run_delay_ns":84962833,"timeslices":460},"hw_solve":{"instructions":null,"cycles":null,"instructions_time_enabled_ns":null,"instructions_time_running_ns":null,"cycles_time_enabled_ns":null,"cycles_time_running_ns":null,"error":"perf_event_open: Operation not permitted (os error 1)"},"solve":{"threads_before":1,"threads_after":1,"involuntary_switches":460,"voluntary_switches":0,"minor_faults":336201,"major_faults":0,"schedstat_all":{"cpu_ns":86130308895,"run_delay_ns":84962833,"timeslices":460},"cpu":null,"irq":null,"cpu_sched":null}},"isolation":{"level":"L0","blockers":["L1: no CPU reservation (--cpus none, or no affinity control on this OS)"],"run_cpu":null,"reserved":[],"node":null,"placement":{"affinity":[0,1,2,3,4],"cpu_at_start":4,"cpu_at_end":2,"mems_allowed":"0","mempolicy":null,"anon_pages_by_node":{"0":332096}},"foreign_busy_ticks":null,"steal_ticks":null,"idle_sibling_busy_ticks":null,"before":{"unix_ms":1795112124576,"loadavg":[0.22802734375,0.0908203125,0.09912109375],"psi_cpu_some_avg10":null,"psi_cpu_some_total_us":null,"psi_memory_some_avg10":null,"psi_memory_some_total_us":null,"reserved_ticks":{}},"after":{"unix_ms":1795112210837,"loadavg":[0.8154296875,0.31884765625,0.18212890625],"psi_cpu_some_avg10":null,"psi_cpu_some_total_us":null,"psi_memory_some_avg10":null,"psi_memory_some_total_us":null,"reserved_ticks":{}}},"env_class_id":"ECBENV3h8756b061d3c3","binary_sha256":"9c8db223d0d6be523460519f5339863cbf0935df61cbe0edc69917e24ee2f990","work":{"schema":"ecbench.work/v1","unit":"bitop/v1","widths":{"field":{"kind":"prime","bits":96},"r_bits":47},"phases":[{"name":"setup","prims":{"group_add":11180349,"group_double":23},"bitops":"6481756192416","log2_bitops":42.55952189416872},{"name":"search","prims":{"group_add":7071265,"group_double":0},"bitops":"4099523456160","log2_bitops":41.89859335389312},{"name":"natives","prims":{"hash_probe":18251606},"bitops":"7008616704","log2_bitops":32.706482580503156}],"bitops":"10588288265280","log2_bitops":43.26753461127055,"bitops_per_sqrt_r":947045.2919149521,"floor_bitops":5744288059010.652,"ratio_to_floor":1.843272509405393,"unpriced":["full_point_key_bytes_stored_uncharged"],"known_uncounted":[],"complete":false,"reusable_bitops":"6481756192416","per_target_bitops":"4106532072864"}}
+      },
+      "destination": {
+        "execution": {
+          "seq": 4,
+          "round": 0,
+          "warmup": false,
+          "arm": 1,
+          "workload": 1,
+          "algorithm_seed": 7701010587527600627
+        },
+        "workload_id": "Wf94d257e6bd1",
+        "workload_sha256": "f94d257e6bd189157fed5ed5151b620df3291a0d8797100b306a5317a60c85cc",
+        "record": {"schema":"ecbench.record/v1","record_id":"ECR1h8a27177e0b0b","session_id":"ECBS1h71e554f9e2d4","run_id":"ECM1h4f0bb4b7e178Wf94d257e6bd1R1","seq":4,"round":0,"warmup":false,"arm":"bsgs-exact-key","role":"candidate","method":{"id":"bsgs.prime_mont4_v1","family":"bsgs","params":{},"method_id":"ECM1h4f0bb4b7e178","method_sha256":"4f0bb4b7e1782d02f4c909f94b2417af0aa42e49eef396e169275aeb8195e531","entry":"ecbench::prime_mont4::bsgs"},"workload":{"workload_id":"Wf94d257e6bd1","workload_sha256":"f94d257e6bd189157fed5ed5151b620df3291a0d8797100b306a5317a60c85cc","curve_spec":{"kind":"prime_mont4_explicit","p":"78125000378223625457769953627","a":"15990497153433373631697108307","b":"48428362807562559250646568586","group_order":"78125000378223750457770256205","r":125000000302579,"gx":"23468729782310777244428981341","gy":"73111346012038691962804678190"},"curve":{"slug":"icv1-fp96-tm125000000302577-2550b472","icv1":"ICV1:fp-78125000378223625457769953627:-125000000302577:78125000378223750457770256205:78125000378223625457769068891:unk:unk:r:2550b4723dd2","family":"prime","construction":"PrimeMont4 { p: 78125000378223625457769953627, a: 15990497153433373631697108307, b: 48428362807562559250646568586 } (explicit)","field_degree":null,"field_bits":96,"group_order":"78125000378223750457770256205","r":125000000302579,"cofactor":625000001512895,"generator":["0x4bd4e0d6c5d833654f8ed45d","0xec3c49b8fac650644e92ae2e"],"automorphisms_available":2,"registered":false,"ec1":null,"curve_uid":null},"target_law":"uniform_scalar_sha256_shared_v1","target_seed":20261119,"target_index":0,"target":["0x48162f77731f812c65e699a5","0xbc608da84d9fce1ad4048bcf"],"planted":79059150462809},"algorithm_seed":"7701010587527600627","outcome":{"status":"verified","recovered":"79059150462809","matches_target":true,"matches_planted":true,"error":null,"exit":"exit 0","stderr_sha256":null},"cost":{"unit":"ecbench.gae","total_gae":18251637.0,"s":1.6324760393302011,"lower_bound":true,"unpriced":["full_point_key_bytes_stored_uncharged","inserts_uncharged","lookups_uncharged"],"deterministic":true,"nondeterminism":[]},"boundaries":{"automorphisms_available":2,"automorphisms_used":1,"floor_s":0.8862269254527579,"ratio_to_floor":1.8420519535627937,"floor_rule":"automorphisms/v2"},"phases":[{"name":"setup","adds":11180349,"doubles":23,"scalar_mults":1,"gae":11180372.0,"wall_ns":null,"native":{}},{"name":"search","adds":7071265,"doubles":0,"scalar_mults":0,"gae":7071265.0,"wall_ns":null,"native":{}}],"counters":{"full_point_key_bytes_stored_uncharged":804984480,"inserts_uncharged":11180340,"lookups_uncharged":7071266},"factor_base":null,"detail":null,"online":null,"solver":null,"allocator":{"name":"glibc 2.41","pre_solve_trim":true,"trim_result":1},"field_ops":{"muls":36503272,"sqrs":18251660,"invs":18251636},"time":{"solve_wall_ns":82322101195,"method_call_wall_ns":82322579339,"parent_audit_verification_ns":250098,"online_clock_diagnostics":{"error":"online interval not closed"},"process_wall_ns":82363551445,"user_ns":79801162000,"sys_ns":2493097000,"max_rss_kib":1356296,"minor_faults":336845,"major_faults":0,"voluntary_switches":1,"involuntary_switches":1000,"schedstat_solve":{"cpu_ns":82251860072,"run_delay_ns":66308419,"timeslices":999},"hw_solve":{"instructions":null,"cycles":null,"instructions_time_enabled_ns":null,"instructions_time_running_ns":null,"cycles_time_enabled_ns":null,"cycles_time_running_ns":null,"error":"perf_event_open: Operation not permitted (os error 1)"},"solve":{"threads_before":1,"threads_after":1,"involuntary_switches":999,"voluntary_switches":0,"minor_faults":336177,"major_faults":0,"schedstat_all":{"cpu_ns":82253714402,"run_delay_ns":66308419,"timeslices":999},"cpu":null,"irq":null,"cpu_sched":null}},"isolation":{"level":"L0","blockers":["L1: no CPU reservation (--cpus none, or no affinity control on this OS)"],"run_cpu":null,"reserved":[],"node":null,"placement":{"affinity":[0,1,2,3,4],"cpu_at_start":4,"cpu_at_end":3,"mems_allowed":"0","mempolicy":null,"anon_pages_by_node":{"0":310978}},"foreign_busy_ticks":null,"steal_ticks":null,"idle_sibling_busy_ticks":null,"before":{"unix_ms":1795112247359,"loadavg":[0.90673828125,0.40576171875,0.21728515625],"psi_cpu_some_avg10":null,"psi_cpu_some_total_us":null,"psi_memory_some_avg10":null,"psi_memory_some_total_us":null,"reserved_ticks":{}},"after":{"unix_ms":1795112329723,"loadavg":[0.9775390625,0.548828125,0.2861328125],"psi_cpu_some_avg10":null,"psi_cpu_some_total_us":null,"psi_memory_some_avg10":null,"psi_memory_some_total_us":null,"reserved_ticks":{}}},"env_class_id":"ECBENV3h8756b061d3c3","binary_sha256":"9c8db223d0d6be523460519f5339863cbf0935df61cbe0edc69917e24ee2f990","work":{"schema":"ecbench.work/v1","unit":"bitop/v1","widths":{"field":{"kind":"prime","bits":96},"r_bits":47},"phases":[{"name":"setup","prims":{"group_add":11180349,"group_double":23},"bitops":"6481756192416","log2_bitops":42.55952189416872},{"name":"search","prims":{"group_add":7071265,"group_double":0},"bitops":"4099523456160","log2_bitops":41.89859335389312},{"name":"natives","prims":{"hash_probe":18251606},"bitops":"7008616704","log2_bitops":32.706482580503156}],"bitops":"10588288265280","log2_bitops":43.26753461127055,"bitops_per_sqrt_r":947045.2919149521,"floor_bitops":5744288059010.652,"ratio_to_floor":1.843272509405393,"unpriced":["full_point_key_bytes_stored_uncharged"],"known_uncounted":[],"complete":false,"reusable_bitops":"6481756192416","per_target_bitops":"4106532072864"}}
+      },
+      "source_status": "verified",
+      "destination_status": "verified"
+    },
+    {
+      "r": "125000000302579",
+      "target_seed": 20261119,
+      "target_index": 0,
+      "round": 1,
+      "warmup": false,
+      "source": {
+        "execution": {
+          "seq": 10,
+          "round": 1,
+          "warmup": false,
+          "arm": 1,
+          "workload": 0,
+          "algorithm_seed": 12033083312777092757
+        },
+        "workload_id": "W682659e2d870",
+        "workload_sha256": "682659e2d870d53e451a2905ed478990db574eed1f23614b36d5148ad1038a7d",
+        "record": {"schema":"ecbench.record/v1","record_id":"ECR1he6d8045640ef","session_id":"ECBS1h71e554f9e2d4","run_id":"ECM1h4f0bb4b7e178W682659e2d870R2","seq":10,"round":1,"warmup":false,"arm":"bsgs-exact-key","role":"candidate","method":{"id":"bsgs.prime_mont4_v1","family":"bsgs","params":{},"method_id":"ECM1h4f0bb4b7e178","method_sha256":"4f0bb4b7e1782d02f4c909f94b2417af0aa42e49eef396e169275aeb8195e531","entry":"ecbench::prime_mont4::bsgs"},"workload":{"workload_id":"W682659e2d870","workload_sha256":"682659e2d870d53e451a2905ed478990db574eed1f23614b36d5148ad1038a7d","curve_spec":{"kind":"prime_mont4_explicit","p":"78125000378223625457769953627","a":"18274853889642953323454959912","b":"32133284755955526260408304513","group_order":"78125000378223750457770256205","r":125000000302579,"gx":"56427920970213953953111743943","gy":"4354194121617047333390549409"},"curve":{"slug":"icv1-fp96-tm125000000302577-0b06b926","icv1":"ICV1:fp-78125000378223625457769953627:-125000000302577:78125000378223750457770256205:78125000378223625457769068891:unk:unk:r:0b06b926cae3","family":"prime","construction":"PrimeMont4 { p: 78125000378223625457769953627, a: 18274853889642953323454959912, b: 32133284755955526260408304513 } (explicit)","field_degree":null,"field_bits":96,"group_order":"78125000378223750457770256205","r":125000000302579,"cofactor":625000001512895,"generator":["0xb654150d3cc0bf7b386c1dc7","0xe11b4784dd59db0e1dc81a1"],"automorphisms_available":2,"registered":false,"ec1":null,"curve_uid":null},"target_law":"uniform_scalar_sha256_shared_v1","target_seed":20261119,"target_index":0,"target":["0xc7168b6bbc12ed61d413c2ac","0x7eb22ebcff6625c53013ff19"],"planted":79059150462809},"algorithm_seed":"12033083312777092757","outcome":{"status":"verified","recovered":"79059150462809","matches_target":true,"matches_planted":true,"error":null,"exit":"exit 0","stderr_sha256":null},"cost":{"unit":"ecbench.gae","total_gae":18251637.0,"s":1.6324760393302011,"lower_bound":true,"unpriced":["full_point_key_bytes_stored_uncharged","inserts_uncharged","lookups_uncharged"],"deterministic":true,"nondeterminism":[]},"boundaries":{"automorphisms_available":2,"automorphisms_used":1,"floor_s":0.8862269254527579,"ratio_to_floor":1.8420519535627937,"floor_rule":"automorphisms/v2"},"phases":[{"name":"setup","adds":11180349,"doubles":23,"scalar_mults":1,"gae":11180372.0,"wall_ns":null,"native":{}},{"name":"search","adds":7071265,"doubles":0,"scalar_mults":0,"gae":7071265.0,"wall_ns":null,"native":{}}],"counters":{"full_point_key_bytes_stored_uncharged":804984480,"inserts_uncharged":11180340,"lookups_uncharged":7071266},"factor_base":null,"detail":null,"online":null,"solver":null,"allocator":{"name":"glibc 2.41","pre_solve_trim":true,"trim_result":1},"field_ops":{"muls":36503272,"sqrs":18251660,"invs":18251636},"time":{"solve_wall_ns":87231114310,"method_call_wall_ns":87231296836,"parent_audit_verification_ns":210459,"online_clock_diagnostics":{"error":"online interval not closed"},"process_wall_ns":87268692322,"user_ns":84299756000,"sys_ns":2935610000,"max_rss_kib":1356432,"minor_faults":336869,"major_faults":0,"voluntary_switches":1,"involuntary_switches":366,"schedstat_solve":{"cpu_ns":87196194164,"run_delay_ns":30096173,"timeslices":363},"hw_solve":{"instructions":null,"cycles":null,"instructions_time_enabled_ns":null,"instructions_time_running_ns":null,"cycles_time_enabled_ns":null,"cycles_time_running_ns":null,"error":"perf_event_open: Operation not permitted (os error 1)"},"solve":{"threads_before":1,"threads_after":1,"involuntary_switches":363,"voluntary_switches":0,"minor_faults":336201,"major_faults":0,"schedstat_all":{"cpu_ns":87198494294,"run_delay_ns":30096173,"timeslices":363},"cpu":null,"irq":null,"cpu_sched":null}},"isolation":{"level":"L0","blockers":["L1: no CPU reservation (--cpus none, or no affinity control on this OS)"],"run_cpu":null,"reserved":[],"node":null,"placement":{"affinity":[0,1,2,3,4],"cpu_at_start":4,"cpu_at_end":1,"mems_allowed":"0","mempolicy":null,"anon_pages_by_node":{"0":332095}},"foreign_busy_ticks":null,"steal_ticks":null,"idle_sibling_busy_ticks":null,"before":{"unix_ms":1795112639455,"loadavg":[1.0,0.85009765625,0.50048828125],"psi_cpu_some_avg10":null,"psi_cpu_some_total_us":null,"psi_memory_some_avg10":null,"psi_memory_some_total_us":null,"reserved_ticks":{}},"after":{"unix_ms":1795112726724,"loadavg":[1.02734375,0.90380859375,0.55419921875],"psi_cpu_some_avg10":null,"psi_cpu_some_total_us":null,"psi_memory_some_avg10":null,"psi_memory_some_total_us":null,"reserved_ticks":{}}},"env_class_id":"ECBENV3h8756b061d3c3","binary_sha256":"9c8db223d0d6be523460519f5339863cbf0935df61cbe0edc69917e24ee2f990","work":{"schema":"ecbench.work/v1","unit":"bitop/v1","widths":{"field":{"kind":"prime","bits":96},"r_bits":47},"phases":[{"name":"setup","prims":{"group_add":11180349,"group_double":23},"bitops":"6481756192416","log2_bitops":42.55952189416872},{"name":"search","prims":{"group_add":7071265,"group_double":0},"bitops":"4099523456160","log2_bitops":41.89859335389312},{"name":"natives","prims":{"hash_probe":18251606},"bitops":"7008616704","log2_bitops":32.706482580503156}],"bitops":"10588288265280","log2_bitops":43.26753461127055,"bitops_per_sqrt_r":947045.2919149521,"floor_bitops":5744288059010.652,"ratio_to_floor":1.843272509405393,"unpriced":["full_point_key_bytes_stored_uncharged"],"known_uncounted":[],"complete":false,"reusable_bitops":"6481756192416","per_target_bitops":"4106532072864"}}
+      },
+      "destination": {
+        "execution": {
+          "seq": 7,
+          "round": 1,
+          "warmup": false,
+          "arm": 1,
+          "workload": 1,
+          "algorithm_seed": 12033083312777092757
+        },
+        "workload_id": "Wf94d257e6bd1",
+        "workload_sha256": "f94d257e6bd189157fed5ed5151b620df3291a0d8797100b306a5317a60c85cc",
+        "record": {"schema":"ecbench.record/v1","record_id":"ECR1ha72a9a6f79b5","session_id":"ECBS1h71e554f9e2d4","run_id":"ECM1h4f0bb4b7e178Wf94d257e6bd1R2","seq":7,"round":1,"warmup":false,"arm":"bsgs-exact-key","role":"candidate","method":{"id":"bsgs.prime_mont4_v1","family":"bsgs","params":{},"method_id":"ECM1h4f0bb4b7e178","method_sha256":"4f0bb4b7e1782d02f4c909f94b2417af0aa42e49eef396e169275aeb8195e531","entry":"ecbench::prime_mont4::bsgs"},"workload":{"workload_id":"Wf94d257e6bd1","workload_sha256":"f94d257e6bd189157fed5ed5151b620df3291a0d8797100b306a5317a60c85cc","curve_spec":{"kind":"prime_mont4_explicit","p":"78125000378223625457769953627","a":"15990497153433373631697108307","b":"48428362807562559250646568586","group_order":"78125000378223750457770256205","r":125000000302579,"gx":"23468729782310777244428981341","gy":"73111346012038691962804678190"},"curve":{"slug":"icv1-fp96-tm125000000302577-2550b472","icv1":"ICV1:fp-78125000378223625457769953627:-125000000302577:78125000378223750457770256205:78125000378223625457769068891:unk:unk:r:2550b4723dd2","family":"prime","construction":"PrimeMont4 { p: 78125000378223625457769953627, a: 15990497153433373631697108307, b: 48428362807562559250646568586 } (explicit)","field_degree":null,"field_bits":96,"group_order":"78125000378223750457770256205","r":125000000302579,"cofactor":625000001512895,"generator":["0x4bd4e0d6c5d833654f8ed45d","0xec3c49b8fac650644e92ae2e"],"automorphisms_available":2,"registered":false,"ec1":null,"curve_uid":null},"target_law":"uniform_scalar_sha256_shared_v1","target_seed":20261119,"target_index":0,"target":["0x48162f77731f812c65e699a5","0xbc608da84d9fce1ad4048bcf"],"planted":79059150462809},"algorithm_seed":"12033083312777092757","outcome":{"status":"verified","recovered":"79059150462809","matches_target":true,"matches_planted":true,"error":null,"exit":"exit 0","stderr_sha256":null},"cost":{"unit":"ecbench.gae","total_gae":18251637.0,"s":1.6324760393302011,"lower_bound":true,"unpriced":["full_point_key_bytes_stored_uncharged","inserts_uncharged","lookups_uncharged"],"deterministic":true,"nondeterminism":[]},"boundaries":{"automorphisms_available":2,"automorphisms_used":1,"floor_s":0.8862269254527579,"ratio_to_floor":1.8420519535627937,"floor_rule":"automorphisms/v2"},"phases":[{"name":"setup","adds":11180349,"doubles":23,"scalar_mults":1,"gae":11180372.0,"wall_ns":null,"native":{}},{"name":"search","adds":7071265,"doubles":0,"scalar_mults":0,"gae":7071265.0,"wall_ns":null,"native":{}}],"counters":{"full_point_key_bytes_stored_uncharged":804984480,"inserts_uncharged":11180340,"lookups_uncharged":7071266},"factor_base":null,"detail":null,"online":null,"solver":null,"allocator":{"name":"glibc 2.41","pre_solve_trim":true,"trim_result":1},"field_ops":{"muls":36503272,"sqrs":18251660,"invs":18251636},"time":{"solve_wall_ns":84473270583,"method_call_wall_ns":84473945825,"parent_audit_verification_ns":324551,"online_clock_diagnostics":{"error":"online interval not closed"},"process_wall_ns":84507490136,"user_ns":81825703000,"sys_ns":2656635000,"max_rss_kib":1356540,"minor_faults":336845,"major_faults":0,"voluntary_switches":1,"involuntary_switches":530,"schedstat_solve":{"cpu_ns":84446822902,"run_delay_ns":21691116,"timeslices":525},"hw_solve":{"instructions":null,"cycles":null,"instructions_time_enabled_ns":null,"instructions_time_running_ns":null,"cycles_time_enabled_ns":null,"cycles_time_running_ns":null,"error":"perf_event_open: Operation not permitted (os error 1)"},"solve":{"threads_before":1,"threads_after":1,"involuntary_switches":525,"voluntary_switches":0,"minor_faults":336177,"major_faults":0,"schedstat_all":{"cpu_ns":84449678616,"run_delay_ns":21691116,"timeslices":525},"cpu":null,"irq":null,"cpu_sched":null}},"isolation":{"level":"L0","blockers":["L1: no CPU reservation (--cpus none, or no affinity control on this OS)"],"run_cpu":null,"reserved":[],"node":null,"placement":{"affinity":[0,1,2,3,4],"cpu_at_start":4,"cpu_at_end":1,"mems_allowed":"0","mempolicy":null,"anon_pages_by_node":{"0":310978}},"foreign_busy_ticks":null,"steal_ticks":null,"idle_sibling_busy_ticks":null,"before":{"unix_ms":1795112425268,"loadavg":[0.99755859375,0.67626953125,0.3603515625],"psi_cpu_some_avg10":null,"psi_cpu_some_total_us":null,"psi_memory_some_avg10":null,"psi_memory_some_total_us":null,"reserved_ticks":{}},"after":{"unix_ms":1795112509776,"loadavg":[1.0,0.76025390625,0.4189453125],"psi_cpu_some_avg10":null,"psi_cpu_some_total_us":null,"psi_memory_some_avg10":null,"psi_memory_some_total_us":null,"reserved_ticks":{}}},"env_class_id":"ECBENV3h8756b061d3c3","binary_sha256":"9c8db223d0d6be523460519f5339863cbf0935df61cbe0edc69917e24ee2f990","work":{"schema":"ecbench.work/v1","unit":"bitop/v1","widths":{"field":{"kind":"prime","bits":96},"r_bits":47},"phases":[{"name":"setup","prims":{"group_add":11180349,"group_double":23},"bitops":"6481756192416","log2_bitops":42.55952189416872},{"name":"search","prims":{"group_add":7071265,"group_double":0},"bitops":"4099523456160","log2_bitops":41.89859335389312},{"name":"natives","prims":{"hash_probe":18251606},"bitops":"7008616704","log2_bitops":32.706482580503156}],"bitops":"10588288265280","log2_bitops":43.26753461127055,"bitops_per_sqrt_r":947045.2919149521,"floor_bitops":5744288059010.652,"ratio_to_floor":1.843272509405393,"unpriced":["full_point_key_bytes_stored_uncharged"],"known_uncounted":[],"complete":false,"reusable_bitops":"6481756192416","per_target_bitops":"4106532072864"}}
+      },
+      "source_status": "verified",
+      "destination_status": "verified"
+    }
+  ],
+  "result_admitted": false,
+  "conductor_gap": null,
+  "cost_ratio": null,
+  "wall_ratio": null,
+  "obligations": [
+    "Independent ecbench verify/replay and record accounting audit",
+    "Certified endpoint conductors, explicit isogeny and subgroup/target transport",
+    "Missing/failure/censoring and unpriced-work analysis before statistics",
+    "Target-cluster statistics; warmups excluded; no complete-case substitution",
+    "Wall isolation, host/binary, A/A, registration and sample-size admission"
+  ]
+}

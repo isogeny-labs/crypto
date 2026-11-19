@@ -104,6 +104,7 @@ pub mod optimization;
 pub mod oracle;
 pub mod orbit_ic;
 pub mod plane_quartic;
+pub mod prime_mont4;
 pub mod prime_orbit;
 pub mod record;
 pub mod resources;

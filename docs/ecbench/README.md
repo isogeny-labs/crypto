@@ -291,6 +291,37 @@ no record's `automorphisms_used` exceeds the `A` available. The *reference* is a
 rho: `rho.negation` on a prime curve, `rho.signed_frobenius` on a Koblitz
 curve. `ecbench table` divides every arm by it.
 
+### Paired prime-curve execution order
+
+`measurement.order: "paired_curves_v1"` selects a versioned execution and
+algorithm-seed law for `planted_shared` prime-field workloads with u64
+subgroup orders. It requires an even measured-round count and at least two
+distinct curve workloads for every subgroup order. Six measured rounds and
+one warm-up retain the usual repeated-measurement minimum.
+
+The planner groups by `(target_index,r)`, in ascending order. Each group
+uses listed curve order on even measured rounds and reversed curve order
+on odd measured rounds. Arms reverse by the same parity. Warm-ups alternate
+separately, so the first measured round starts in listed order.
+
+The seed is the first eight SHA-256 bytes, big-endian, of canonical JSON
+with domain `ecbench.paired_curves_v1.algorithm_seed` and integer parts
+`[measurement.seed,r,target_seed,target_index,seed_round]`. Warm-ups use
+the separate `ecbench.paired_curves_v1.warmup_seed` domain. The existing
+`algorithm_seed_round` option selects absolute or measured indices;
+`"measured_index"` keeps measured streams independent of warm-up count.
+Same-order/scalar-index workloads share RNG inputs across models and arms.
+This does not make coordinate-hashed walks identical.
+
+This mode preserves individual cold single-target executions, workload
+identities, solver implementations and accounting. The spec identity binds
+the new order. Historical scheduling modes keep their seed/order laws.
+Equal subgroup order does not certify an isogeny or conductor gap; those
+need external evidence. The ordinary `compare` command still compares
+methods within workloads: endpoint statistics require an explicit transport
+join. Scheduling alone does not establish registration, wall admission,
+scalar timing or a measured endpoint comparison.
+
 ## 4. Names and identities
 
 Every object is named by a hash of what it is. A label never enters an
@@ -520,6 +551,7 @@ default; the ids are:
 | `rho.signed_frobenius_strong`, `…_legacy`, `…_escape` | rho | the strong single-target reference (lockstep walks, batched inversion), its trajectory-identical pre-2026-10-14 implementation control, and the variant that escapes fruitless cycles by doubling |
 | `rho.signed_frobenius_full`, `rho.signed_frobenius_v2_full` (the Brent walk of `rho.signed_frobenius_v2`), `rho.signed_frobenius_strong_full`, `ic.pipeline_full` | — | the base method repriced with every native operation charged (`price-units`) |
 | `bsgs.textbook`, `bsgs.interleaved`, `bsgs.negation` | bsgs | baby table then giant steps (mean 1.5√r); Pollard's interleaving (mean 4√r/3); classes `{P, −P}` with stride 2m + 1 (mean about √r) |
+| `bsgs.prime_mont4_v1` | bsgs | textbook baby/giant steps on `prime_mont4_explicit`, complete four-limb point keys in a deterministic B-tree; same square-root group-operation count, different key storage and native tree costs |
 | `bsgs.textbook_v2`, `bsgs.interleaved_v2`, `bsgs.negation_v2` | bsgs | the same, plus one charged final `[d]G = Q` in a `verification` phase |
 | `kangaroo.vow`, `kangaroo.vow_v2` | kangaroo | van Oorschot–Wiener tame/wild kangaroo on `[0, r)`, distinguished points; the frozen id charges a re-placement after a same-kind collision to `search`, the `_v2` id to its own `restarts` phase and adds the charged final check |
 | `claw.pair_table`, `claw.pair_table_v2` | claw | the four-point signed-Frobenius pair claw (cryptanalysis#175): known-log orbit base, target-independent quotient pair table; the `_v2` id adds the final check and counts the `recover` phase in the `max_adds` budget |
@@ -584,6 +616,7 @@ Curves of higher genus and the transfers are described in
 | `rho.multitarget_pooled` | the whole batch of `L = batch` targets: the shared jump table (full-size multiples of `G`), each target's `G + Q_i` and start stride, every walk start and step, look-ahead and escapes, and the internal `[d]G = Q_i` check of every recovered log; phases `setup`, `search`, `internal_verification` | canonicalisations; distinguished-point table inserts and probes |
 | `rho.prime_fast` | group additions exactly (table build, walker starts and restarts, each step, cycle-escape doublings); candidate collision checks at `1.5·log₂ r` additions each; prime curves with `p < 2^62` only, one thread, the fast prime wall reference | sign canonicalisations, distinguished-point table probes, field operations (not counted) |
 | `bsgs.*` | baby steps, the giant stride, giant steps | table inserts and lookups |
+| `bsgs.prime_mont4_v1` | exact counted baby steps, giant stride and giant steps, with semantic field multiplication/squaring/inversion counts | tree inserts/lookups and stored full-point key bytes; B-tree allocation, node overhead and exact comparison work remain unpriced; final scalar verification belongs to the runner and is outside these solve totals |
 | `kangaroo.vow` | jump-table set-up and the two starts (phase `setup`); every jump and any re-placement after a same-kind collision (phase `search`; before 2026-10-18 a re-placement was charged to `setup`, total unchanged; no committed record ever restarted, so every kangaroo record replays exactly; `generic::tests::a_kangaroo_restart_is_charged_to_search` is the pinned control on a curve where every seed restarts) | table inserts and lookups |
 | `bsgs.*` | baby steps, the giant stride, giant steps (the `_v2` ids add the final check, phase `verification`) | table inserts and lookups |
 | `kangaroo.vow` | jump-table set-up and the two starts (phase `setup`); every jump and any re-placement after a same-kind collision (phase `search`; before 2026-10-18 a re-placement was charged to `setup`, total unchanged; no committed record ever restarted, so every kangaroo record replays exactly; `generic::tests::a_kangaroo_restart_is_charged_to_search` is the pinned control on a curve where every seed restarts). `kangaroo.vow_v2`: the same walk, but a re-placement is charged to its own `restarts` phase (not to `search`), and the final `[d]G = Q` check is a charged `verification` phase | table inserts and lookups |
@@ -1922,6 +1955,30 @@ FROM method_by_curve ORDER BY curve_slug, mean_s;
 ```
 
 ## 11. Adding a method, a curve family or a factor base
+
+### Exact four-limb prime-field inputs
+
+`prime_mont4_explicit` takes `p`, `a`, `b`, `group_order`, `gx`, `gy` as
+canonical unsigned decimal strings and prime subgroup order `r` as a u64.
+Coordinates and modulus remain four limbs (`p < 2^256`); the order must
+also fit 256 bits. Field primality and the supplied exact group order require
+external certificates. Construction checks canonical bounds, nonsingularity,
+Hasse eligibility, membership and the prime-order generator; these checks
+alone certify neither field primality nor the ambient group order.
+
+This path currently supports planted/shared-scalar inputs on nonspecial
+models (`a,b != 0`), existing `rho.negation` and the distinct full-point-key
+`bsgs.prime_mont4_v1`. It rejects public target hashing, special automorphism
+models, word-key BSGS and IC/factor-base adapters. Semantic field operations
+are counted; inversion implementation work is represented by the inversion
+count, rather than also counting its exponentiation as curve-formula
+multiplications. Wide-field native prices, strongest wall reference and
+measurement admission still need their own evidence. The same ICV1 and
+registry lookup is used; adding a constructor does not register its curves.
+
+Large-field source arithmetic support does not establish an evaluated
+isogeny or a conductor crossing. The 80-bit conductor study retains its
+original explicit-map and matched repeated measurement gates.
 
 - **A method:** an entry in `methods::registry()` and an arm in
   `methods::solve`. Once a session that uses it is committed, its counts

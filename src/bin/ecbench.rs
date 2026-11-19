@@ -34,6 +34,12 @@
 //!
 //! The standard is `docs/ecbench/README.md`.
 
+#[path = "ecbench/endpoint_pairs.rs"]
+mod endpoint_pairs;
+#[path = "ecbench/isogeny_eval.rs"]
+mod isogeny_eval;
+#[cfg(test)]
+use crypto_lib::{ct_bignum, ecc};
 #[path = "ecbench/pdp3_koblitz.rs"]
 mod pdp3_koblitz;
 #[path = "ecbench/pdp_split_oracle.rs"]
@@ -42,6 +48,8 @@ mod pdp_split_oracle;
 mod pkm_tower;
 #[path = "ecbench/retained_chain_study.rs"]
 mod retained_chain_study;
+#[path = "ecbench/scalar_timing.rs"]
+mod scalar_timing;
 #[path = "ecbench/structured_s4.rs"]
 mod structured_s4;
 
@@ -70,6 +78,54 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
+    /// Complete public-input isogeny evaluation in Rust with FLINT primitives.
+    IsogenyEvaluate {
+        #[arg(long)]
+        input: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long)]
+        native_library: PathBuf,
+        #[arg(long)]
+        native_sha256: String,
+        #[arg(long, default_value = "1")]
+        twist_scale: String,
+        #[arg(long)]
+        max_window: usize,
+        #[arg(long)]
+        block: usize,
+        #[arg(long, default_value_t = 0)]
+        baby_window: usize,
+        #[arg(long, default_value_t = 64)]
+        projective_batch: usize,
+        #[arg(long, default_value = isolation::DEFAULT_LOCK)]
+        lock: String,
+    },
+    /// Descriptive local timings of the existing counted scalar multiplication.
+    ScalarTiming {
+        #[arg(long)]
+        spec: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long, default_value_t = 64)]
+        batch: u64,
+        #[arg(long, default_value = isolation::DEFAULT_LOCK)]
+        lock: String,
+    },
+    /// Join distinct endpoint workloads without admitting costs or timings.
+    EndpointPairs {
+        #[arg(long)]
+        dir: PathBuf,
+        #[arg(long)]
+        source_curve: String,
+        #[arg(long)]
+        destination_curve: String,
+        #[arg(long)]
+        arm: String,
+        /// Validate an unexecuted plan; refuses existing observations/sessions.
+        #[arg(long)]
+        plan_only: bool,
+    },
     /// Run the frozen retained-chain probe or complete toy relation pipeline.
     /// Counters are raw observations; this command does not admit timings.
     RetainedChainStudy {
@@ -1231,6 +1287,50 @@ fn compare_pooled_cmd(
 
 fn run(cli: Cli) -> Result<ExitCode, String> {
     match cli.cmd {
+        Cmd::IsogenyEvaluate {
+            input,
+            out,
+            native_library,
+            native_sha256,
+            twist_scale,
+            max_window,
+            block,
+            baby_window,
+            projective_batch,
+            lock,
+        } => isogeny_eval::run(
+            &input,
+            &out,
+            &native_library,
+            &native_sha256,
+            &twist_scale,
+            max_window,
+            block,
+            baby_window,
+            projective_batch,
+            &lock,
+        )?,
+        Cmd::ScalarTiming {
+            spec,
+            out,
+            batch,
+            lock,
+        } => scalar_timing::run(&spec, &out, batch, &lock)?,
+        Cmd::EndpointPairs {
+            dir,
+            source_curve,
+            destination_curve,
+            arm,
+            plan_only,
+        } => {
+            print_json(&endpoint_pairs::join(
+                &dir,
+                &source_curve,
+                &destination_curve,
+                &arm,
+                plan_only,
+            )?)?;
+        }
         Cmd::RetainedChainStudy { phase, out } => retained_chain_study::run(&phase, &out)?,
         Cmd::DiagnosticPreflight {
             request,

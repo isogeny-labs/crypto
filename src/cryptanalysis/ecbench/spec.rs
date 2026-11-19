@@ -62,7 +62,7 @@ pub struct WorkloadPlan {
     pub target_kind: TargetKind,
 }
 
-/// Order of the arms inside a round.
+/// Execution-order law. The versioned paired mode also specifies its seed law.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Order {
@@ -80,6 +80,13 @@ pub enum Order {
     /// even number of measured rounds each arm leads and trails equally
     /// often.
     AlternateMeasured,
+    /// Same-order prime curves, grouped by target index. Reverse each curve
+    /// group and its arms on odd measured rounds (warm-ups alternate separately).
+    /// Algorithm seeds hash the shared public (r, target_seed, target_index),
+    /// instead of the model-specific workload id, in a distinct v1 domain.
+    /// Requires planted_shared, word-size prime subgroup orders, at least two
+    /// curves per order and an even measured-round count. Does not certify a map.
+    PairedCurvesV1,
 }
 
 pub use super::isolation::Level;
@@ -239,7 +246,7 @@ fn order_warnings(m: &Measurement) -> Vec<String> {
                 "order `alternate_measured` with {} measured round(s) cannot be balanced: spec order is used once more than the reverse; use an even number of rounds",
                 m.rounds
             )),
-            Order::Shuffle => {}
+            Order::Shuffle | Order::PairedCurvesV1 => {}
         }
     }
     out
@@ -255,6 +262,23 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
     }
     if spec.workloads.curves.is_empty() || spec.workloads.targets_per_curve == 0 {
         return Err("a spec needs at least one curve and one target per curve".into());
+    }
+    if spec.measurement.order == Order::PairedCurvesV1
+        && (spec.workloads.target_kind != TargetKind::PlantedShared
+            || !spec.measurement.rounds.is_multiple_of(2))
+    {
+        return Err(
+            "paired_curves_v1 requires planted_shared and an even measured-round count".into(),
+        );
+    }
+    if spec.measurement.order == Order::PairedCurvesV1
+        && spec
+            .measurement
+            .warmup
+            .checked_add(spec.measurement.rounds)
+            .is_none()
+    {
+        return Err("paired_curves_v1 round count exceeds u32".into());
     }
     let mut names = std::collections::BTreeSet::new();
     let mut arms = Vec::new();
@@ -330,11 +354,46 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
         instances.push(inst);
     }
     let m = &spec.measurement;
+    let paired = if m.order == Order::PairedCurvesV1 {
+        let mut groups = std::collections::BTreeMap::<(u64, u64), Vec<usize>>::new();
+        let mut orders = Vec::with_capacity(workloads.len());
+        for (wi, w) in workloads.iter().enumerate() {
+            let r = w.curve.r.checked_u64()
+                .filter(|_| w.curve.family == "prime")
+                .ok_or("paired_curves_v1 currently requires prime-field curves with u64 subgroup orders")?;
+            orders.push(r);
+            groups.entry((w.target_index, r)).or_default().push(wi);
+        }
+        if groups.values().any(|g| g.len() < 2) {
+            return Err(
+                "paired_curves_v1 needs at least two distinct curve workloads per subgroup order"
+                    .into(),
+            );
+        }
+        Some((groups.into_values().collect::<Vec<_>>(), orders))
+    } else {
+        None
+    };
     let mut executions = Vec::new();
     let mut seq = 0u64;
     for round in 0..(m.warmup + m.rounds) {
         let warmup = round < m.warmup;
-        for (wi, w) in workloads.iter().enumerate() {
+        let phase_round = if warmup { round } else { round - m.warmup };
+        let workload_order = if let Some((groups, _)) = &paired {
+            let mut order = Vec::with_capacity(workloads.len());
+            for group in groups {
+                if phase_round % 2 == 1 {
+                    order.extend(group.iter().rev().copied());
+                } else {
+                    order.extend(group.iter().copied());
+                }
+            }
+            order
+        } else {
+            (0..workloads.len()).collect()
+        };
+        for wi in workload_order {
+            let w = &workloads[wi];
             // One seed per (workload, round), shared by every arm.
             let wid = u64::from_str_radix(&w.workload_id[1..], 16).unwrap_or(0);
             let seed_round =
@@ -343,14 +402,31 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
                 } else {
                     round
                 };
-            let algorithm_seed = derive_u64(
-                if warmup {
-                    "ecbench.warmup_seed"
-                } else {
-                    "ecbench.algorithm_seed"
-                },
-                &[m.seed, wid, seed_round as u64],
-            );
+            let algorithm_seed = if let Some((_, orders)) = &paired {
+                derive_u64(
+                    if warmup {
+                        "ecbench.paired_curves_v1.warmup_seed"
+                    } else {
+                        "ecbench.paired_curves_v1.algorithm_seed"
+                    },
+                    &[
+                        m.seed,
+                        orders[wi],
+                        w.target_seed,
+                        w.target_index,
+                        seed_round as u64,
+                    ],
+                )
+            } else {
+                derive_u64(
+                    if warmup {
+                        "ecbench.warmup_seed"
+                    } else {
+                        "ecbench.algorithm_seed"
+                    },
+                    &[m.seed, wid, seed_round as u64],
+                )
+            };
             let mut order: Vec<usize> = (0..arms.len()).collect();
             match m.order {
                 Order::Alternate => {
@@ -358,7 +434,7 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
                         order.reverse();
                     }
                 }
-                Order::AlternateMeasured => {
+                Order::AlternateMeasured | Order::PairedCurvesV1 => {
                     let k = if warmup { round } else { round - m.warmup };
                     if k % 2 == 1 {
                         order.reverse();

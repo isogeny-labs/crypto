@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T17:51:48Z",
+ "id": "PCC-20261118-a08131",
+ "kind": "statement",
+ "producer": {
+  "commit": "5158b9db0ae9410209056f94a309641dc3c8770f",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-20261118/summary.json",
+    "sha256": "e11b422ac5ae552f3050354d89decdaa6353812468a13990a03853ebc904ad76"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-20261118/attempt-a/conductor.cert",
+    "sha256": "0d8436fabf198eac552846f934cf94483befc1e84b7341ec365530c510bd720a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-20261118/attempt-a/replay.stdout",
+    "sha256": "e8f30382e80a91f38fec61b37ec162ebcdd26b35f042a541525a96d45f762c46"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-20261118/attempt-a/certificate.stdout",
+    "sha256": "523ff97dd087f72fbf7d5f5e43e7a92a202632b2f1ba06ea82e12bb9a4ccbbc0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-20261118/pre-check.sha256",
+    "sha256": "2f44f99c82fb9f406dbc1752ff601dcb955fafdb3e15b2f3b45d395ed09d7097"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/published-lucas-20261118",
+ "statement": "The fixed published Lucas index 7351 reconstructs a 3673-bit prime Frobenius conductor for the ordinary model y^2+xy=x^3+1 over GF(2^7351), with geometric source endomorphism conductor 1. Native PARI and C++ GMP arithmetic agree; PARI generates and validates a complete ECPP certificate, a fresh GP process recomputes the subject and accepts replay, and a changed subject rejects. This is same-host unsigned producer evidence for the exact conductor prime, not a supplied lower endpoint, explicit isogeny crossing, measured ECDLP result or world record."
+}

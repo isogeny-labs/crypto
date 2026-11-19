@@ -1,0 +1,26 @@
+{
+  "scoped_committed_export_pass": true,
+  "since": "2026-11-18T00:00:00Z",
+  "new_metric_rows": [
+    {
+      "metric": "conductor.fixed_lucas.n9551.prime_bits",
+      "value": 4774.0,
+      "date": "2026-11-18",
+      "problem": "ordinary-prime-conductor-crossing",
+      "unit": "bits",
+      "better": "higher",
+      "kind": "gauge",
+      "label": "Fixed Frobenius conductor prime; no evaluated crossing; PCC unverified",
+      "source": "research/prime_conductor_gap80_20261031/published-lucas-9551-20261118/summary.json@e0d501a78a02"
+    }
+  ],
+  "prior_metric_preserved": true,
+  "full_export_pass": false,
+  "full_export_not_repeated": "Unchanged legacy timeline failure separately retained.",
+  "initial_qualification_failure": {
+    "since": "2026-11-18",
+    "assertion": "Expected one new row; no rows were returned.",
+    "cause": "Git date-only --since retains the current time of day; used explicit UTC midnight for the intended full day.",
+    "production_source_changed_for_remedy": false
+  }
+}

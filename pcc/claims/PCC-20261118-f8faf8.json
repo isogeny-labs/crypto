@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T17:10:07Z",
+ "id": "PCC-20261118-f8faf8",
+ "kind": "statement",
+ "producer": {
+  "commit": "a1ceeeeadc82a3e86b074d17c8d758e0d8f04067",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/final-summary.json",
+    "sha256": "e5f77c43041ae56099b5560ae3495dcae46585994c9c80aa7b2d0d8622d6f5b9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/focused-build-v2-inputs.sha256",
+    "sha256": "1256b81d89cb59a8d8accc26ab0f5840b3a7c2ac75aaefd797524018ed6928bf"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/focused-v2-pre-call.sha256",
+    "sha256": "0817ab2b691d3ad8dc716785d3f23ab0472fc634a3f0a6b14328f4427e208f82"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/cli-build-c-inputs.sha256",
+    "sha256": "42dfc404155ddcd27a23f70d4d4a87be14327948d64c6c74c4aabea3b55d9d94"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/paired-cli-pre-call.sha256",
+    "sha256": "6d88011a89519e4b3df9b88d977724e46cfc982871316443611b868eaf49f80b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/results/focused-b/tests.stdout",
+    "sha256": "c8e17353333cd8569a2d379cbeacdc3c81431c8654da1277a51d79a6ca3ad696"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/results/paired-cli-a/rows.json",
+    "sha256": "ecc3cd56ba636133d09d5550efd9cbd6b061c9d85221248244d7eb5bbb508913"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/results/map-negatives/rejections.jsonl",
+    "sha256": "0859375e36f43893d51b4114618b10404b51858d86c8769074a2fb9321b3959e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/wide-harness-20261118",
+ "statement": "Corrected-source focused release tests pass all five controls, root-library clippy passes with warnings denied, and the unchanged ecbench CLI source matches 192 source/destination/coordinate-control scalar rows from degree-2 and degree-5 native map controls in the 202-bit and 96-bit fields. The two maps have 70 native input comparisons with PARI, including 64 target images, and 32 distinct scalars per case. Tampered rows, off-curve generators and unsupported IC reject. The full legacy unit suite remains blocked; no wide-field ECDLP timing, conductor-gap classification for these controls or evaluated 80-bit target is established."
+}

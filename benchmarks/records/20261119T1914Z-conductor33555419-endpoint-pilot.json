@@ -1,0 +1,149 @@
+{
+  "branch": "research/conductor-widefield-harness-20261118",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/run-pilot.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T19:14:21+00:00",
+      "wall_s": 37.051
+    },
+    {
+      "argv": [
+        "/workspace/tools/conductor-local-20261119/ecbench",
+        "verify",
+        "--dir",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/results/pilot-l0",
+        "--replay-all",
+        "--out",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/pilot-audit.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T19:16:35+00:00",
+      "wall_s": 39.255
+    }
+  ],
+  "commit": "7314ee267f930db7e4af85bc0ae466a2fb0f8267",
+  "commit_dirty": true,
+  "created_utc": "2026-11-19T19:14:17+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/prime_conductor_gap80_20261031/twist-transport-20261119"
+  ],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "fd3f496179cc",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261119T1914Z-conductor33555419-endpoint-pilot",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "icv1-fp53-t33555417-7e2a3b7a.rho.mean_solve",
+      "note": "Native L0 mean, one shared target/two rounds; setup included, canonicalizations unpriced; no endpoint ratio admission.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 7.6369364065
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "icv1-fp53-t33555417-ade0b980.rho.mean_solve",
+      "note": "Native L0 mean, one shared target/two rounds; setup included, canonicalizations unpriced; no endpoint ratio admission.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 10.318364511
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "ic_exhausted.seq1.attempt_seconds",
+      "note": "Direct native ns-to-seconds conversion;10000 trials exhausted, zero relations, no recovered logarithm; not solve time.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.011625441
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "ic_exhausted.seq3.attempt_seconds",
+      "note": "Direct native ns-to-seconds conversion;10000 trials exhausted, zero relations, no recovered logarithm; not solve time.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.012229414
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "ic_exhausted.seq4.attempt_seconds",
+      "note": "Direct native ns-to-seconds conversion;10000 trials exhausted, zero relations, no recovered logarithm; not solve time.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.012129043
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "ic_exhausted.seq6.attempt_seconds",
+      "note": "Direct native ns-to-seconds conversion;10000 trials exhausted, zero relations, no recovered logarithm; not solve time.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.011363787
+    }
+  ],
+  "problem": "ecdlp:prime53-transported",
+  "raw": [
+    {
+      "bytes": 61700,
+      "path": "research/prime_conductor_gap80_20261031/twist-transport-20261119/raw-results.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e33b1259ac0710fb7a1b8a87bb5091a5c0b8477356276cbd489b485430eec259",
+      "sha256": "e33b1259ac0710fb7a1b8a87bb5091a5c0b8477356276cbd489b485430eec259",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/report.pdf",
+    "png": [
+      "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/rho.png",
+      "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/scalar.png"
+    ],
+    "svg": [
+      "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/rho.svg",
+      "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/scalar.svg",
+      "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/map.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "conductor33555419-endpoint-pilot",
+  "status": "open",
+  "summary": "Original53bit subgroup:4 verified rho solves and4 IC exhaustions, one shared target/two rounds;8 exact native replays and independent PARI checks. Failed plan preserved. All times descriptive L0; record remains open pending authenticated S3 publication.",
+  "validation": "research/prime_conductor_gap80_20261031/twist-transport-20261119/summary.json"
+}

@@ -326,3 +326,10 @@ research/chained_jacobian_transfers_20261110/evidence/post-norm-merge-queue-chec
 research/chained_jacobian_transfers_20261110/evidence/whole-guarded-source-original-object-12/first-actual-whole-Git-object.stderr -whitespace
 
 research/chained_jacobian_transfers_20261110/evidence/whole-source-PR-and-research-queue-21/exact-new-queue-body.md -whitespace
+
+# Preserve exact native test stdout, including its terminal blank line.
+research/prime_conductor_gap80_20261031/endpoint-join-20261118/results/qualification-a/tests.stdout -text -whitespace
+research/prime_conductor_gap80_20261031/endpoint-join-20261118/results/qualification-b/tests.stdout -text -whitespace
+
+# Exact raw HTTP response headers retain their original CRLF bytes.
+research/prime_conductor_gap80_20261031/admission-recheck-20261118T2132Z/s3.headers -text -whitespace

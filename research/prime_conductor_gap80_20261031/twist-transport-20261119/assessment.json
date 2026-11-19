@@ -1,0 +1,205 @@
+{
+  "format": "correspondence-assessment-draft-v1",
+  "assessment_state": "draft",
+  "authority": "companion artifact; not an official ledger record or formal proof",
+  "source": {
+    "equations": [
+      "5620419248410339",
+      "675862186879016"
+    ],
+    "field": {
+      "kind": "Fp",
+      "p": "5629830687772387"
+    },
+    "dimension": 1,
+    "subgroup_order": "5629830654216971",
+    "generator": [
+      2,
+      1401162638053187
+    ]
+  },
+  "destination": {
+    "equations": [
+      "2539833775737119",
+      "1737207970637906"
+    ],
+    "field": {
+      "kind": "Fp",
+      "p": "5629830687772387"
+    },
+    "dimension": 1,
+    "ambient_group_order": "5629830654216971",
+    "generator": [
+      "2975092980436849",
+      "5333622322807887"
+    ]
+  },
+  "transformation": {
+    "kind": "elliptic_isogeny",
+    "family": "quadratic-twist conjugate of normalized complete Velu",
+    "degree": "33555419",
+    "field_of_definition": "Fp",
+    "formulas": "Phi_d(x,y)=(d*f(x/d),y*fprime(x/d)); d=2",
+    "exceptional_cases": [
+      "infinity maps to infinity",
+      "kernel abscissa collision maps to infinity",
+      "zero/noncanonical d rejected"
+    ],
+    "normalization": "normalized auxiliary quotient, actual coefficient d^2/d^3 and x d scaling"
+  },
+  "obligations": {
+    "existence": {
+      "state": "supported",
+      "evidence": [
+        "prepare-case0.gp",
+        "case0.gpvec",
+        "CM_ARGUMENT.md"
+      ],
+      "scope": "fixed ordinary case with nonzero prime-order auxiliary kernel; standard Velu theorem"
+    },
+    "explicit_construction": {
+      "state": "supported",
+      "evidence": [
+        "results/case0-main-b/stdout",
+        "main-audit.stdout"
+      ],
+      "scope": "full half-kernel coverage, explicit quotient and33 images; three identical outputs"
+    },
+    "map_correctness": {
+      "state": "supported",
+      "evidence": [
+        "qualification.json",
+        "main-audit.stdout",
+        "dual-audit.stdout"
+      ],
+      "scope": "bounded direct PARI controls and33-point independent checks; no compiled formal proof"
+    },
+    "subgroup_preservation": {
+      "state": "supported",
+      "evidence": [
+        "check-dual.gp",
+        "dual-audit.stdout",
+        "pilot-independent.stdout"
+      ],
+      "scope": "original prime subgroup, degree coprime to its order; normalized dual/recovery controls"
+    },
+    "computational_advantage": {
+      "state": "unknown",
+      "evidence": [
+        "pilot-analysis.json"
+      ],
+      "scope": "descriptive L0 measurements only; unpriced work and different walks"
+    },
+    "scaling_support": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": "one fixed26-bit-prime crossing; original80-bit case remains uncomputed"
+    }
+  },
+  "preservation_certificate": {
+    "identity": "hatPhi_normalized(Phi(P)) = u_ell([ell]P)",
+    "kernel_intersection": "trivial on original prime subgroup, gcd(ell,r)=1",
+    "recovery_map": "u_ell inverse, then multiply ell inverse mod r",
+    "scalar_multiplier": "33555419",
+    "proof_artifact": "dual-audit.stdout; standard prime-degree isogeny theorem"
+  },
+  "mechanism": {
+    "proposed_benefit": "measure endpoint algorithm costs as conductor changes",
+    "prediction": null,
+    "falsification_condition": "incorrect quotient, subgroup, scalar image or normalized dual composition",
+    "assumptions": [
+      "ordinary-order CM interpretation as documented",
+      "native kernel/norm identities and independent bounded implementation controls"
+    ]
+  },
+  "cost_comparison": {
+    "workload": "33-point constructor; one ECDLP target/two rounds; separate32-base scalar panel",
+    "baseline": "source endpoint with same subgroup/known target scalar",
+    "units": "seconds; scalar native nanoseconds per multiplication",
+    "construction": [
+      {
+        "label": "case0-main-b",
+        "resource_text": "wall_s=8.661 user_s=8.615 sys_s=0.042",
+        "RSS_observed": false
+      },
+      {
+        "label": "main-repeat2",
+        "resource_text": "wall_s=8.664 user_s=8.564 sys_s=0.071",
+        "RSS_observed": false
+      },
+      {
+        "label": "main-repeat3",
+        "resource_text": "wall_s=8.457 user_s=8.423 sys_s=0.024",
+        "RSS_observed": false
+      },
+      {
+        "label": "case0-probe-b",
+        "resource_text": "wall_s=0.578 user_s=0.559 sys_s=0.019",
+        "RSS_observed": false
+      },
+      {
+        "label": "case0-dual-b",
+        "resource_text": "wall_s=8.594 user_s=8.539 sys_s=0.039",
+        "RSS_observed": false
+      }
+    ],
+    "transfer": "not separated from construction",
+    "destination": "pilot-analysis.json",
+    "recovery": "dual construction plus standard inverse scaling; separate recovery runtime not measured",
+    "verification": "independent PARI checks; excluded from scalar timer",
+    "failed_attempts_and_duplicates": "preserved launcher/build/plan failures; three identical constructor outputs",
+    "memory_and_data": "12GiB address cap; map RSS unobserved; runner per-call RSS retained",
+    "setup_reuse": "prepared norm reused inside each call; cold reconstruction per call",
+    "uncertainty": "L0; no confidence interval or endpoint performance admission",
+    "evidence_label": "measured component times; unpriced work retained"
+  },
+  "controls": [
+    "square/nonsquare twists",
+    "default bytes",
+    "kernel/infinity/source rejection",
+    "coordinate u=2",
+    "wrong-output/truncated-coverage",
+    "matched original subgroup",
+    "normalized dual"
+  ],
+  "protocol": {
+    "parameter_scope": "fixed retained case0",
+    "sample_selection": "frozen PARI32-scalar map panel; distinct SHA32-base scalar panel; one native pilot target",
+    "stopping_rules": "recorded120second constructor/child caps, whole-session caps and12GiB address cap",
+    "invalidation_rules": "any equation/order/image/replay/coverage mismatch",
+    "hardware_manifest": "host-before.json",
+    "execution_route": "existing native constructor and ecbench CLI, explicit local authorization"
+  },
+  "exploration_boundary": {
+    "families": [
+      "retained ordinary CM discriminant-19 case0"
+    ],
+    "parameters": "exact case0.gpvec",
+    "completed_scope": "fixed26-bit prime crossing and stated controls/measurements",
+    "completeness_claim": "none"
+  },
+  "composition": {
+    "edge_ids": [
+      "T_to_Tprime",
+      "twist_isomorphisms_over_Fp2",
+      "E_to_Eprime_over_Fp",
+      "normalized_dual"
+    ],
+    "junction_compatibility": "same exact field, equations and original subgroup verified",
+    "weakest_open_obligation": "large80-bit construction remains absent; performance admission incomplete"
+  },
+  "sources": [
+    "CM_ARGUMENT.md",
+    "PROTOCOL.md",
+    "PILOT_PROTOCOL.md",
+    "SCALAR_PROTOCOL.md"
+  ],
+  "open_obligations": [
+    "original80bit evaluated crossing",
+    "full32-target ECDLP protocol",
+    "priced/admitted performance",
+    "authenticated S3 publication"
+  ],
+  "recommended_next_action": "NEXT_LOCAL.md; separately frozen larger-family local experiment",
+  "official_status_change": "none"
+}

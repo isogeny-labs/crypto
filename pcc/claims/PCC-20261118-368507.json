@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T20:57:47Z",
+ "id": "PCC-20261118-368507",
+ "kind": "statement",
+ "producer": {
+  "commit": "b367b5f373ddabb55e4163ea410ebe68b7e0b2f6",
+  "model": "codex",
+  "session": "conductor-endpoint-join-20261118"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/endpoint-join-20261118/results/qualification-a/tests.stdout",
+    "sha256": "62a1fe57b9a13a7854ad49b54d115724662f9aefbf5cd9e662f47d35bec4c293"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/endpoint-join-20261118/results/qualification-a/tests.stderr",
+    "sha256": "0671e4a3423e759eb58271fd563db95a7d33bdd27fa66a0dfaa4588d6fa12939"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/endpoint-join-20261118/qualification-a.exit",
+    "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "endpoint-join-codec-development",
+ "statement": "The first endpoint-join qualifier reports seven passing controls and one failing fixture-selection assertion; this is diagnostic codec evidence, not a measured ECDLP session."
+}

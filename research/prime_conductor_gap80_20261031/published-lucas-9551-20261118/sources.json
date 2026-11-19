@@ -1,0 +1,38 @@
+{
+  "schema": "fixed-lucas-primary-review/v1",
+  "reviewed_utc": "2026-11-18",
+  "sources": [
+    {
+      "url": "https://oeis.org/A101087",
+      "access": "Direct opens return HTTP 403; indexed primary entry/internal text retrieved via search.",
+      "finding": "Certified entry list stops at 7351; comment explicitly labels 9551 and later entries as probable primes.",
+      "authority": "sequence entry; not a mathematical certificate"
+    },
+    {
+      "url": "https://www.numericana.com/answer/numbers.htm#m",
+      "access": "Primary author page opened.",
+      "finding": "Defines recurrence with +1 leading coefficient; absolute values agree with the sign-conjugate -1 recurrence for odd index. Lists 9551 and larger indices."
+    },
+    {
+      "url": "https://pari.math.u-bordeaux.fr/dochtml/html-stable/Arithmetic_functions.html#primecert",
+      "finding": "Existing reviewed primecert/primecertisvalid API and subject-binding contract reused."
+    }
+  ],
+  "kb": "Unavailable: no tools; repository wrapper exits 127.",
+  "earlier_qualified_fixture": "../published-lucas-20261118",
+  "novelty_or_world_record_claim": false,
+  "additional_search_boundary": {
+    "queries": [
+      "A101087 certificate",
+      "A001607 largest prime",
+      "9551 ECPP",
+      "elliptic isogeny conductor gap largest",
+      "elliptic curves isogeny large prime conductor record"
+    ],
+    "primary_pdf_access_failures": [
+      "https://eprint.iacr.org/2018/307.pdf",
+      "https://eprint.iacr.org/2004/312.pdf"
+    ],
+    "interpretation": "Search pointers do not establish a world record or certify a larger integer; the new PDF opens returned 403. The published fixed candidate and original acceptance criteria are unchanged."
+  }
+}

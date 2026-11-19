@@ -1,5 +1,18 @@
 # Native log-norm optimization and 80-bit candidate evidence
 
+The [18 November source construction audit](construction-audit-20261118/README.md)
+checks explicit CM action on the actual kernel and the specific
+single-power-of-two torsion prerequisites for a higher-dimensional route.
+Its source-only checks do not supply the degree-ell quotient or images.
+[pcc:unverified]
+
+The [18 November fixed published Lucas reconstruction](published-lucas-20261118/README.md)
+checks a 3673-bit prime Frobenius conductor at extension degree 7351,
+with a complete PARI ECPP certificate and fresh-process replay. The source
+endomorphism conductor remains 1; no lower curve or explicit isogeny is
+supplied by this arithmetic check. The original 80-bit construction and
+endpoint measurements remain open. [pcc:unverified]
+
 The [18 November complete-evaluator continuation](evaluator-20261118/README.md)
 adds balanced baby products, block reuse, additive kernel walks and a guarded
 supplied-case interface. Its independent-PARI development controls and raw
@@ -174,3 +187,55 @@ the 96-case direct-root oracle and PARI verification passed in the publishing
 runtime. Cargo is not installed: `cargo test --release --lib` returned 127;
 no Rust/library execution path changed. Conductor is not installed, as
 documented as nonblocking in `docs/CONDUCTOR.md`.
+
+
+## Larger fixed conductor arithmetic, 18 November
+
+The separate [published n=9551 fixture](published-lucas-9551-20261118/RESULTS.md)
+now has a complete PARI ECPP certificate and fresh-process replay for its
+4774-bit prime Frobenius conductor (1438 decimal digits). Native GP and
+C++/GMP arithmetic agree. The original direct timeout and successful staged
+continuation are both retained. PCC-20261118-0282a8 remains an unsigned,
+unverified/not_covered producer statement. [pcc:unverified]
+
+The source y²+xy=x³+1 over GF(2^9551) still has geometric endomorphism
+conductor 1. This arithmetic fixture supplies no lower endpoint or evaluated
+map; the original 80-bit source/kernel and measurement criteria remain open.
+The [paired planner component](paired-schedule-20261118/README.md) is qualified
+separately; no new endpoint performance session has executed.
+
+
+## Prepared native context, 18 November
+
+The optional [prepared norm backend](prepared-norm-20261118/RESULTS.md)
+reuses baby-polynomial preparation and native FLINT objects. It passes the
+recorded primitive/cache controls and 21 pipeline replays/483 point-input
+evaluations over four fields, with explicit PARI oracle reuse for degree
+10009. Default bytes match. PCC-20261118-2521f3 retains the final corrected
+producer interpretation, unsigned/unverified/not_covered. [pcc:unverified]
+
+The full target window, quotient/non-kernel images and paired endpoint
+measurements remain open. No elapsed advantage or peak-RSS change has been
+measured; the context adds live cache/scratch data during later tile builds.
+
+
+## Full-phase all-window audit, 18 November
+
+The [new source-model audit](memory-frontier-20261118/RESULTS.md) adds the
+mandatory simultaneous h/zeroth-giant-jet phase and derives all-window
+bounds. For the fixed 80-bit target, the minimum necessary single-rectangle
+slot model is 9665413335568 bytes. Under the example 128 GiB cap, every
+fitting tiling of these loops entails at least 21241297635754 coordinate
+contexts and 2473 rectangles. These are exact conditional model bounds,
+excluding other data and all timings; PCC-20261118-61e7ed remains an unsigned,
+unverified/not_covered producer statement. [pcc:unverified]
+
+No production evaluator source or original acceptance criterion changes.
+External-memory/different traversals are not ruled out. The complete target
+quotient, non-kernel images and paired endpoint measurements remain open.
+
+
+The [endpoint record join](endpoint-join-20261118/RESULTS.md) now preserves original endpoint workload/record identities, missing/failure/warmup rows and raw numeric tokens. Native codec controls and frozen two-field plan selections are qualified; statistical and wall admission, actual measured sessions and the original explicit prime-conductor crossing remain open. [pcc:unverified]
+
+
+The [retained-fixture conductor audit](fixture-conductor-audit-20261118/README.md) now classifies four existing explicit maps using actual geometric endomorphism orders. In particular, degree10009 joins conductor-three curves; it is horizontal. The actual202bit-field degree2 control joins conductor one to two. Direct native PARI sums verify the original input/image/scalar panels. This adds no80bit crossing or timing session and leaves prior generic null fields unchanged. [pcc:unverified]
