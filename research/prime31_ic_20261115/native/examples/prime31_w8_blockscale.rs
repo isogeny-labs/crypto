@@ -39,7 +39,8 @@ fn nonzero_scalar(seed: &mut u64) -> u64 {
 fn base31(ar: &mut Arithmetic) -> Vec<Point> {
     let mut base = Vec::with_capacity(31);
     for x in 0..10_000u64 {
-        if let Some(y) = ar.sqrt(ar_rhs(ar, x), PRIME31.p) {
+        let rhs = ar_rhs(ar, x);
+        if let Some(y) = ar.sqrt(rhs, PRIME31.p) {
             if y != 0 {
                 let p = Some((x, y.min(PRIME31.p - y)));
                 assert!(ar.on_curve(PRIME31, p));
@@ -270,7 +271,8 @@ mod tests {
     fn four_slot_bijective_doubling_invariant() {
         let mut ar = Arithmetic::default();
         let base = base31(&mut ar);
-        let s = build_s(&mut ar, &signed_slots(&mut ar, &base, WINDOWS[1]));
+        let slots = signed_slots(&mut ar, &base, WINDOWS[1]);
+        let s = build_s(&mut ar, &slots);
         let original = s.iter().map(|(_,f)|f.0).sum::<u64>();
         let mut scaled = s.clone();
         for _k in 1..=8 {
@@ -297,14 +299,14 @@ mod tests {
     }
     #[test]
     fn small_public_only_deterministic_study() {
-        let r=study(2);
+        let r=study(8);
         assert_eq!(r["schema"],"prime31.w8.blockscale.v1");
         assert_eq!(r["certificates"].as_array().unwrap().len(),20);
         for row in r["per_window"].as_array().unwrap() {
             for arm in row["arms"].as_array().unwrap() {
                 assert_eq!(arm["four_slot_unique"],arm["right_unique"]);
                 let st=&arm["stats"];
-                assert_eq!(st["hits"].as_u64().unwrap()+st["misses"].as_u64().unwrap(),2);
+                assert_eq!(st["hits"].as_u64().unwrap()+st["misses"].as_u64().unwrap(),8);
             }
         }
     }
