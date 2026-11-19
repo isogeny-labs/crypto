@@ -336,3 +336,22 @@ When the direct quartic decomposition of D misses, the retry computes D+A for th
 The crossover compares the entire solve with and without the retry. At (257,78), the median ratio across inputs that actually needed a retry was 2.030× / 2.028× in forward / reverse order on the first seed and 2.034× / 2.032× on the second. Across all eight inputs on that curve, the ratios were within 0.3% of parity because most inputs decomposed directly. At (257,54) the all-input ratio was near parity on the first seed and 1.115× / 1.113× on the second. At (383,42) the affected-input median was below parity on the first seed. All 128 input scalars were verified. The 10× counts compare against the earlier pencil solver and include catalogue and descent improvements together.
 
 Run `HEC_SHIFT_SEED=2026111925 harness/g3-character-solve.zsh shift` and repeat with seed 2026111926. The comparison panel uses pencil, selected catalogue without retry, full catalogue without retry, and selected catalogue with retry. The crossover compares only the two selected-catalogue arms. Run `ruby harness/g3-shift-summary.rb OUTPUT_DIRECTORY` on the output directory for the per-curve table. The affected-input subset includes every input requiring a retry, including failed retries. Git stores the full timing and audit streams.
+
+### Screening genus-4 pencil members by intersection degree
+
+For each pole and each of the three pencil families, the rational affine intersection multiplicities are already known during collection. Adding the multiplicity at infinity and the fixed multiplicity at the pole gives the degree supported on rational places. A completely split residual has the target degree, five in the first family and six in the other two. The packed implementation adds one to the first-family counter to give all three families the same threshold. It initializes the exceptional parameters separately, accumulates the point contributions in byte counters, and tests eight counters per machine word. Since each counter lies between zero and six, adding 122 per byte sets the high bit exactly at six, with no carry between bytes. The alternative mask implementation marks plausible parameters and performs the original degree check on those parameters.
+
+| Field | Pencil members in exhaustive scan | Candidates after mask | Candidates after packed test | Relations reproduced |
+|---:|---:|---:|---:|---:|
+| 37 | 2,220 | 117 | 22 | 22 |
+| 43 | 3,225 | 165 | 48 | 48 |
+| 59 | 5,133 | 180 | 45 | 45 |
+| 67 | 7,437 | 281 | 107 | 107 |
+
+Both implementations reproduced every row coefficient and its original position across the full catalogues. The packed test still accumulates multiplicities and reads the degree counters for every block. The reduction in candidates measures the work after that scan.
+
+On seeds 2026111927 and 2026111928 each field had eight fresh inputs, 32 repetitions and two timing orders. The packed implementation improved all 64 full solves in both orders. Relative to the existing three-family solver, field medians across seeds and orders ranged from 1.050–1.058× at p = 37, 1.037–1.043× at p = 43, 1.062–1.074× at p = 59 and 1.027–1.037× at p = 67. All 64 cleared 10× against the pencil reference in both orders, compared with 62 for the existing solver in the same binary. The simpler mask improved all 64 full solves too, and both its arms cleared 10× on 63 of them.
+
+Use `harness/g4-degree-screen.zsh mask` or `harness/g4-degree-screen.zsh packed` for the timing runs. Append `expanded` for the 32-input-per-field replication. The audit generator accepts `mask audit` or `packed audit` and emits a standalone C++17 program. The medians reducer accepts the timing logs as arguments. The raw archives also retain the untimed verification streams.
+
+The expanded seed 2026111929 used 32 fresh inputs per field. The packed solver improved all 128 in both orders. Both the existing and packed solvers cleared 10× on 127/128. The remaining case was p = 43, input 9, where the packed solver achieved 9.797× and 9.823×, versus 9.311× and 9.441× for the existing solver. All scalar checks passed. This replication varies the input pairs on four fixed curves.
