@@ -450,7 +450,8 @@ mod graph_tests {
     #[test]
     fn original_prime31_positive_negative_chart_checks() {
         let mut ar=Arithmetic::default();
-        let slots=supports(&mut ar,&canonical_base(&mut ar,4));
+        let base=canonical_base(&mut ar,4);
+        let slots=supports(&mut ar,&base);
         let planted=replay(&mut ar,&slots,[0u8;8]);
         for target in [planted,G] {
             let rows:Vec<Vec<Row>>=slots.iter()
