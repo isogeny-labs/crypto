@@ -42,7 +42,8 @@ fn nonzero_scalar(seed: &mut u64) -> u64 {
 fn first_x31(ar: &mut Arithmetic) -> Vec<Point> {
     let mut out = Vec::with_capacity(31);
     for x in 0..10_000u64 {
-        if let Some(y) = ar.sqrt(ar.rhs(PRIME31, x), P) {
+        let rhs = ar.rhs(PRIME31, x);
+        if let Some(y) = ar.sqrt(rhs, P) {
             if y != 0 {
                 let q = Some((x, y.min(P - y)));
                 assert!(ar.on_curve(PRIME31, q));
