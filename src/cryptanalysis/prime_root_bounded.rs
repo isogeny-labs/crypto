@@ -825,11 +825,17 @@ impl Producer<'_> {
         if self.mul(sqrt_d, sqrt_d)? != discriminant {
             return Ok(None);
         }
+        // R50_QUADRATIC_FINISH_PRODUCER_BEGIN
+        // For odd p, half(a) = (a >> 1) + (a & 1) * ((p+1)/2).
+        // Avoid two modular multiplications by inv(2), and use Vieta's
+        // r0+r1=-b to reconstruct the other root. Canonical input only.
         let neg_b = self.sub(0, b)?;
         let numerator_a = self.add(neg_b, sqrt_d)?;
-        let numerator_b = self.sub(neg_b, sqrt_d)?;
-        let root_a = self.mul(numerator_a, (self.p + 1) / 2)?;
-        let root_b = self.mul(numerator_b, (self.p + 1) / 2)?;
+        self.gate.charge(32)?;
+        let root_a = (numerator_a >> 1)
+            + ((numerator_a & 1) * ((self.p + 1) / 2));
+        let root_b = self.sub(neg_b, root_a)?;
+        // R50_QUADRATIC_FINISH_PRODUCER_END
         if root_a == root_b {
             return Ok(None);
         }
@@ -1653,12 +1659,20 @@ impl Replay {
         if self.times(sqrt, sqrt)? != discriminant {
             return Ok(None);
         }
-        let inv_two = (self.p + 1) / 2;
+        // R50_QUADRATIC_FINISH_REPLAY_BEGIN
+        // Independently derive half(a) by parity, then recover the
+        // complementary quadratic root using the sum of roots. Both
+        // roots are still explicitly substituted into f below.
         let negative = self.minus(0, b)?;
         let numerator0 = self.plus(negative, sqrt)?;
-        let numerator1 = self.minus(negative, sqrt)?;
-        let r0 = self.times(numerator0, inv_two)?;
-        let r1 = self.times(numerator1, inv_two)?;
+        self.gate.charge(32)?;
+        let r0 = if numerator0 & 1 == 0 {
+            numerator0 / 2
+        } else {
+            (numerator0 / 2) + (self.p / 2) + 1
+        };
+        let r1 = self.minus(negative, r0)?;
+        // R50_QUADRATIC_FINISH_REPLAY_END
         if r0 == r1 {
             return Ok(None);
         }
