@@ -1137,3 +1137,24 @@ Every number is `[pcc:unverified]`.
   - Draw 1 is rerun only if its current job is also censored.
 - **Spend.** At most 2 × US$13.5, within the US$690 ceiling (Amendment 33).
 - Gate, readings, seeds and draws are unchanged.
+
+## Amendment 35 (2026-11-19; record of the Amendment 33–34 batch outcome; no job launched)
+
+Every number is `[pcc:unverified]`. Spend comes from `GET /v2/billing/pods?podId=…`.
+
+- **Rows obtained.**
+  - Validation `t = 12`, draws 0 and 1: `d_F = 6`, uncensored (Amendment 34).
+  - Route F `t = 14`, draw 0: aborted on an allocation failure at degree 6. Draw 1: stopped `oversize` (`--max-nnz`) at
+    degree 7, step 35, with 41.2·10⁹ nonzeros. Both are censored, so `d_F ≥ 7` stands. Route F cannot decide `t = 14` on
+    256 GB hosts.
+  - Validation `t = 13`, the first attempts: both censored by the 14,400 s limit.
+- **Lost.** All four remaining pods disappeared at about 07:45Z on 2026-11-19. RunPod returns 404 for them, and every other
+  running pod on the account went at the same time. No rows exist from:
+  - the `t = 14` closures `0pj4vejkpzvoec` and `b0n2ty4prxtg6o`, after about 9.3 h of their 24 h limit;
+  - the `t = 13` reruns `zvab5ld49rak17` and `4zsd29k4seqw47`, after about 7 h and 6.2 h.
+  - The closure writes a row only on completion, so nothing partial was fetchable. The cause is not visible through the API.
+    An account-level stop, such as the balance being exhausted, matches the simultaneous loss.
+- **Spend of the Amendment 33–34 pods.** US$82.85 in total; the four lost pods account for US$46.33. The study total is about
+  US$549 of the US$690 ceiling.
+- **State of the question.** At `m = 2`, `t = 14`: `d_F ≥ 7`, unchanged. The validation gate is 2 of 4 pass and 2 undecided.
+  No relaunch without the owner's balance confirmation (decision 18).
