@@ -177,3 +177,22 @@ All 18 matches increased rank. An untimed pass checked irreducibility and the cu
 At p = 43 all 24 pairs improved in both orders. Across those six processes the median case speedup was 1.069–1.094×. At p = 59 and 67 the field medians fell below one in reverse order on two seeds. Reducing members visited therefore supports a collection-work saving on all four curves, with a smaller and field-dependent elapsed-time effect. The solver default stays unchanged.
 
 Run `ruby harness/g4-quadratic-places.rb | c++ -std=c++17 -O3 -x c++ - -o /tmp/g4-quadratics`, then run the binary with no arguments and again with `reverse`. Its columns are prime, repetition, matching enabled, poles, members visited, partials, matches, ramified partials checked, matches increasing rank and nanoseconds. Repetition −1 enables the extension-field checks. Run `HEC_PAIR_SEED=2026111910 harness/g4-quadratic-places.zsh` for the full benchmark; its default seed is 2026111909. Case summaries store prime, case, order and paired medians for pencil/original, pencil/matching and original/matching. The raw logs and audits for all three seeds are checked into Git.
+
+### Genus-3 quartics with one or two quadratic places
+
+We held the original pole sequence and stopping fibre fixed on each field. For every pencil member we formed its residual norm polynomial and removed its rational roots with multiplicity. For a quartic without rational roots we tested for two quadratic factors using coefficient comparison. Writing the factors as (z²+az+d)(z²+cz+e), each candidate constant d determines e. The cubic and linear coefficients determine a and c when d differs from e. The remaining coefficient verifies the factorization; the equal-constant case requires a quadratic equation. For each retained quadratic we verified irreducibility and the ordinate's curve equation in its residue field. Support and ordinate sign identify the place across different poles.
+
+The exact replay inserts the signed equations over the subgroup scalar field, eliminating quadratic columns first. Each resulting rational equation was verified against the original factor-base solution. The table gives the first pencil member at which the rational system attains the original rank. The last two columns count one-place equations read and independent rational rows they supplied by that point in the one-place run.
+
+| Prime | Original | One quadratic allowed | Up to two allowed | One-place equations read | Independent rows from matches |
+|---:|---:|---:|---:|---:|---:|
+| 73 | 542 | 473 | 465 | 119 | 7 |
+| 127 | 1,363 | 1,145 | 1,145 | 327 | 11 |
+| 257 | 3,546 | 2,952 | 2,935 | 754 | 19 |
+| 383 | 4,282 | 3,958 | 3,958 | 973 | 11 |
+
+One-place matches reduced the number of visited members by 7.6–16.8%. Including two-place equations did not save an additional pole on any field. The count of independent rows per 100 one-place equations fell from 5.9 to 1.1 over these four instances. Field size and curve both vary, so the observed trend does not establish an asymptotic law.
+
+A native one-place prototype computed the support and orientation from the leading coefficients, stored unmatched rows in a hash table, and submitted matched rows to the existing rank solver. Seed 2026111911 used eight fresh input pairs per field, 32 repetitions, and opposite timing orders. All complete solves verified the scalar. Median original/matching full-solve ratios, forward/reverse, were 0.658/0.668, 0.553/0.548, 0.460/0.456 and 0.437/0.434 at increasing primes. Matching was slower on all 32 cases in both orders. Against the pencil reference, 28 original cases and zero matching cases reached 10× in both orders. The default stays unchanged. The two-place result above measures rank only.
+
+Run `ruby harness/g3-quadratic-census.rb | c++ -std=c++17 -O3 -x c++ - -o /tmp/g3-census` followed by `/tmp/g3-census | ruby harness/g3-quadratic-rank.rb` to reproduce the rank table. The compressed stream also supports independent rank replay without recompilation. Run `harness/g3-quadratic-places.zsh` for the native timings. Arm 0 is the pencil, arm 1 the original optimized solver, and arm 2 the one-place prototype. The medians file stores prime, case, order and paired ratios for pencil/original, pencil/matching and original/matching.
