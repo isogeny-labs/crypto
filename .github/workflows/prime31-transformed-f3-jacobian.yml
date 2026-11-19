@@ -1,0 +1,85 @@
+name: Prime31 transformed F3 Jacobian regularity source gate
+on:
+  push:
+    branches:
+      - automation/prime31-horner-xy-chain-20261119
+    paths:
+      - '.github/workflows/prime31-transformed-f3-jacobian.yml'
+      - 'research/prime31_ic_20261115/native/examples/prime31_transformed_f3_jacobian.rs'
+      - 'research/prime31_ic_20261115/rr9/TRANSFORMED_F3_JACOBIAN_PROTOCOL_20261119.md'
+  pull_request:
+    paths:
+      - '.github/workflows/prime31-transformed-f3-jacobian.yml'
+      - 'research/prime31_ic_20261115/native/examples/prime31_transformed_f3_jacobian.rs'
+      - 'research/prime31_ic_20261115/rr9/TRANSFORMED_F3_JACOBIAN_PROTOCOL_20261119.md'
+permissions:
+  contents: read
+jobs:
+  original-prime31-rust-jacobian:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_transformed_f3_jacobian.rs
+            research/prime31_ic_20261115/rr9/TRANSFORMED_F3_JACOBIAN_PROTOCOL_20261119.md
+      - name: Checkout pinned original Rust Arithmetic and F4 source
+        uses: actions/checkout@v4
+        with:
+          repository: isogeny-labs/crypto
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/
+            src/cryptanalysis/f4_fp_tower.rs
+            src/cryptanalysis/sig_fp_tower.rs
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Freeze source receipt and reuse original crate
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_transformed_f3_jacobian.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_transformed_f3_jacobian.rs
+          git rev-parse HEAD
+          sha256sum research/prime31_ic_20261115/native/examples/prime31_transformed_f3_jacobian.rs \
+            research/prime31_ic_20261115/rr9/TRANSFORMED_F3_JACOBIAN_PROTOCOL_20261119.md | tee input-sha256.txt
+      - name: Run unmodified original Rust library tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Run focused Rust Jacobian test
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_transformed_f3_jacobian
+      - name: Check preregistered 512 original-curve gates
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_transformed_f3_jacobian > prime31-transformed-f3-jacobian.json
+          jq -e '.schema=="prime31.transformed_f3_jacobian.v1" and
+            .curve.p==2147483647 and .curve.n==2147446831 and
+            .cases_per_window==128 and .tested==512 and .ordinary==512 and
+            .exceptional==0 and .selector_derivatives_nonzero==4096 and
+            .f3_equations_and_derivatives_nonzero==3584 and
+            .f3_discriminant_identities==3584 and
+            .full_rank_14x14_pivots==7168 and
+            .target_conditioned_variables==14 and .target_conditioned_equations==15 and
+            .untargeted_14eq_upper_degree==1073741824 and
+            .generic_sum_table_calls==0 and
+            .uses_original_arithmetic==true and .planted_fixture_gate_only==true and
+            .public_only_unknown_index_extraction==false and
+            .whole_solver_speedup_measured==false and .pcc_signed==false' \
+            prime31-transformed-f3-jacobian.json
+          sha256sum prime31-transformed-f3-jacobian.json | tee output-sha256.txt
+      - name: Upload source-specific run evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-transformed-f3-jacobian-source-evidence
+          path: |
+            prime31-transformed-f3-jacobian.json
+            input-sha256.txt
+            output-sha256.txt
+          if-no-files-found: warn
