@@ -87,7 +87,9 @@ would complete the forbidden cubic orbit. Finally,
 the actual finite-Galois sign characters, obtains all separators from that
 interval theorem, constructs the signed CM partner, and concludes that an
 explicit Eisenstein norm annihilates the chosen point. Thus the earlier
-abstract duplicate/separation premises are discharged. [pcc:unverified]
+abstract duplicate/separation premises are discharged. Hash-bound claim
+`PCC-20261119-f444b9` binds this endpoint and passes its local Lean verifier;
+signed standing remains unverified. [pcc:unverified]
 
 This remains a conditional component, not a proof of subexponential ECDLP:
 the theorem still receives square roots, lifted affine points, and the family

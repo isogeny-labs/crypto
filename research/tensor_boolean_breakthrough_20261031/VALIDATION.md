@@ -1303,6 +1303,8 @@ point sign, and the explicit Eisenstein norm annihilating the chosen point.
 The complete pinned project build succeeds with 9,086 jobs. [pcc:unverified]
 The repository proof gate reports `PASS 310 thm 0 trusted`.
 [pcc:unverified]
+Claim `PCC-20261119-f444b9` binds the endpoint and passes its local Lean
+verifier; signed standing remains unverified. [pcc:unverified]
 
 This closes the former duplicated-versus-separated character obligation for
 the stated interval model. It still assumes the selected square roots,

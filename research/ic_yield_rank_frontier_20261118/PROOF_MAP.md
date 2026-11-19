@@ -280,7 +280,9 @@ the exact eventual natural-power inequality required by
 The last theorem removes the abstract duplicate-character and separator
 premises from the `A=0` CM norm endpoint. It does not yet construct the
 Semaev lifted relation, prove torsion-to-division-polynomial vanishing, or
-establish a collector/runtime theorem. [pcc:unverified]
+establish a collector/runtime theorem. Claim `PCC-20261119-f444b9` binds the
+endpoint and passes its local Lean verifier; signed standing remains
+unverified. [pcc:unverified]
 
 ## Near-uniform pair-event transfer
 
