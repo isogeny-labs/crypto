@@ -40,6 +40,7 @@
 //! and reported `*_uncharged`.
 
 use std::collections::BTreeMap;
+use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use num_bigint::BigUint;
@@ -52,12 +53,15 @@ use crate::cryptanalysis::ecbench::canonical::{sha256_hex, short_id};
 use crate::cryptanalysis::ecbench::methods::FactorBaseFacts;
 use crate::cryptanalysis::group_op_count::{ops_snapshot, OpCounts};
 use crate::cryptanalysis::ic_measurement::{self as measurement, Phase, Snapshot};
+use crate::cryptanalysis::koblitz_factor_base_search::FactorBaseSpec;
 use crate::cryptanalysis::koblitz_index_calculus::{
     build_subgroup_orbit_factor_base_with_cost, projected_signed_orbit_count, CollectedRelation,
-    ColumnCoverage, DecompositionStrategy, FactorBaseLogSolver, FactorBaseSelectionCost,
-    FilterLayout, FrobeniusFactorBase, IndividualLogSolver, KoblitzCurve, KoblitzIcOptions,
-    LinearAlgebra, PairSumTable, ProbeBudget, RelationCollector, RelationWorkUnit,
+    ColumnCoverage, DecompositionStrategy, FactorBaseLogSolver, FactorBaseLogTable,
+    FactorBaseSelectionCost, FilterLayout, FrobeniusFactorBase, IndividualLogSolver, KoblitzCurve,
+    KoblitzIcOptions, LinearAlgebra, PairSumTable, ProbeBudget, RelationCollector,
+    RelationWorkUnit,
 };
+use crate::cryptanalysis::koblitz_log_store as log_store;
 use crate::cryptanalysis::koblitz_sparse_la::{SparseSolveOptions, SparseSolveReport};
 
 /// The value of a parameter that takes the rule v8 parameter file's value
@@ -288,6 +292,41 @@ impl DescentParams {
     }
 }
 
+/// The optional method parameter that names a factor-base log store
+/// (`koblitz_log_store`, the store `ic logs/solve/price --log-store`
+/// share).  It is not declared with a default, so a method spec without it
+/// resolves, hashes and runs exactly as before; a spec with it is a
+/// different method identity.  The value is a directory, or `env` for
+/// `$IC_LOG_STORE` (an error when that is unset or empty).
+pub const LOG_STORE_PARAM: &str = "log_store";
+
+/// The store directory an `ic.koblitz_descent` method's parameters name, if
+/// any ([`LOG_STORE_PARAM`]).
+pub fn log_store_dir(params: &BTreeMap<String, String>) -> Result<Option<PathBuf>, String> {
+    match params.get(LOG_STORE_PARAM).map(String::as_str) {
+        None => Ok(None),
+        Some("") => Err(format!(
+            "`{LOG_STORE_PARAM}` must name a directory or `env`"
+        )),
+        Some("env") => log_store::dir_from(None).map(Some).ok_or_else(|| {
+            format!(
+                "`{LOG_STORE_PARAM}=env` but ${} is unset or empty",
+                log_store::STORE_ENV
+            )
+        }),
+        Some(dir) => Ok(Some(PathBuf::from(dir))),
+    }
+}
+
+/// The recipe a stored table names for this pipeline's factor base (the
+/// key binds the points themselves; the recipe is informational).
+pub fn stored_spec(p: &DescentParams) -> FactorBaseSpec {
+    FactorBaseSpec::SubgroupOrbits {
+        seed: p.seed,
+        points: p.factor_base_points,
+    }
+}
+
 /// What one stage spent: its counted operations and its wall time.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PhaseTally {
@@ -401,7 +440,7 @@ pub fn run(
     q: &BinaryPoint,
     p: &DescentParams,
 ) -> Result<DescentOutcome, String> {
-    run_with_filter_layout(kc, q, p, FilterLayout::Low)
+    run_with_filter_layout(kc, q, p, FilterLayout::Low, None).map(|(out, _)| out)
 }
 
 /// Run the current pipeline with the partition-local folded-table filter.
@@ -415,7 +454,75 @@ pub fn run_top(
     q: &BinaryPoint,
     p: &DescentParams,
 ) -> Result<DescentOutcome, String> {
-    run_with_filter_layout(kc, q, p, FilterLayout::Top)
+    run_with_filter_layout(kc, q, p, FilterLayout::Top, None).map(|(out, _)| out)
+}
+
+/// [`run`] (`top_layout` false) or [`run_top`] (true) against a
+/// factor-base log store.
+///
+/// - **Miss**: the pipeline runs cold exactly as without the store (the
+///   same phases and counts); after the counted session has closed, the
+///   solved table is inserted under its key (the insert's re-verification
+///   is not charged to any phase: it is the store's bookkeeping, not the
+///   solve).  Provenance `log_table_source: "computed"`, cold.
+/// - **Hit**: the factor base and the pair table are built as always (the
+///   key needs the base, the descent needs the table), the stored table is
+///   re-verified column by column (`[log]G == point`) in its own charged
+///   phase `log_store_verify`, and relation collection and linear algebra
+///   are skipped.  Provenance `log_table_source: "store"`: the run is
+///   **amortized**, never a cold `S`.
+/// - A stored file that does not match or does not verify is an error,
+///   never a fallback to computing.
+///
+/// Returns the outcome and the provenance block ([`log_store::provenance`]
+/// plus `store_write` on a miss).
+pub fn run_stored(
+    kc: &KoblitzCurve,
+    q: &BinaryPoint,
+    p: &DescentParams,
+    top_layout: bool,
+    store: &Path,
+) -> Result<(DescentOutcome, Value), String> {
+    let layout = if top_layout {
+        FilterLayout::Top
+    } else {
+        FilterLayout::Low
+    };
+    let (out, stored) = run_with_filter_layout(kc, q, p, layout, Some(store))?;
+    let provenance = match stored {
+        Stored::Hit { key, path } => log_store::provenance("store", Some(&key), Some(&path)),
+        Stored::Computed(table) => {
+            let doc = log_store::stored_doc(
+                kc,
+                &stored_spec(p),
+                &out.factor_base,
+                p.summands,
+                log_store::Solver::PairTable,
+                &table,
+            )?;
+            let (how, key, path) = log_store::insert(store, kc, &out.factor_base, &doc)?;
+            let mut v = log_store::provenance("computed", Some(&key), None);
+            v["store_miss"] = json!(store.display().to_string());
+            v["store_write"] = json!(how.name());
+            v["store_path"] = json!(path.display().to_string());
+            v
+        }
+        Stored::Unused => return Err("the log store was not consulted".into()),
+    };
+    Ok((out, provenance))
+}
+
+/// Where the pipeline's log table came from.
+enum Stored {
+    /// No store was given.
+    Unused,
+    /// Computed in this run (cold); the table, for the store.
+    Computed(FactorBaseLogTable),
+    /// Read from the store and re-verified (amortized).
+    Hit {
+        key: log_store::StoreKey,
+        path: PathBuf,
+    },
 }
 
 fn run_with_filter_layout(
@@ -423,7 +530,8 @@ fn run_with_filter_layout(
     q: &BinaryPoint,
     p: &DescentParams,
     filter_layout: FilterLayout,
-) -> Result<DescentOutcome, String> {
+    store: Option<&Path>,
+) -> Result<(DescentOutcome, Stored), String> {
     let pool = rayon::ThreadPoolBuilder::new()
         .num_threads(1)
         .thread_name(|_| "ic-koblitz-descent".into())
@@ -432,12 +540,12 @@ fn run_with_filter_layout(
     pool.install(|| {
         let single = rayon::current_num_threads() == 1 && rayon::current_thread_index() == Some(0);
         let session = measurement::Session::begin().map_err(|e| e.to_string())?;
-        let out = pipeline(kc, q, p, filter_layout);
+        let out = pipeline(kc, q, p, filter_layout, store);
         let snapshot = session.finish().map_err(|e| e.to_string());
-        let mut out = out?;
+        let (mut out, stored) = out?;
         out.snapshot = snapshot;
         out.single_thread = single && rayon::current_thread_index() == Some(0);
-        Ok(out)
+        Ok((out, stored))
     })
 }
 
@@ -446,7 +554,8 @@ fn pipeline(
     q: &BinaryPoint,
     p: &DescentParams,
     filter_layout: FilterLayout,
-) -> Result<DescentOutcome, String> {
+    store: Option<&Path>,
+) -> Result<(DescentOutcome, Stored), String> {
     if kc.n >= 64 || kc.subgroup_order.bits() > 64 || kc.n.is_multiple_of(2) {
         return Err("ic.koblitz_descent needs odd n < 64 and r ≤ 2^64".into());
     }
@@ -498,6 +607,139 @@ fn pipeline(
     .ok_or("field too wide for the pair table")?;
     ledger.lap("oracle_setup");
 
+    // A stored table, re-verified column by column in its own charged
+    // phase, replaces collection and linear algebra.  On a miss the lookup
+    // (a hash of the base and one stat, no group operation) is not a phase
+    // of its own, so a miss's phases are the cold run's.
+    let hit = match store {
+        Some(dir) => {
+            let hit = log_store::lookup(dir, kc, &fb)?;
+            if hit.is_some() {
+                ledger.lap("log_store_verify");
+            }
+            hit
+        }
+        None => None,
+    };
+    let (table, units, extended, la_counts, relation_scalars, stored) = match hit {
+        Some((table, _doc, key, path)) => (
+            table,
+            BTreeMap::new(),
+            0usize,
+            LaCounts {
+                log_columns: 0,
+                relations_accepted: 0,
+                relations_rejected: 0,
+                relations_duplicate: 0,
+                solve_attempts: 0,
+                sparse: None,
+            },
+            Vec::new(),
+            Stored::Hit { key, path },
+        ),
+        None => {
+            let (table, units, extended, la_counts, relation_scalars) =
+                collect_and_solve(kc, &fb, p, &ic, &pair, &mut ledger)?;
+            let stored = if store.is_some() {
+                Stored::Computed(table.clone())
+            } else {
+                Stored::Unused
+            };
+            (table, units, extended, la_counts, relation_scalars, stored)
+        }
+    };
+    let log_columns = if matches!(stored, Stored::Hit { .. }) {
+        table.len()
+    } else {
+        la_counts.log_columns
+    };
+
+    // 5. The descent's target-independent set-up.
+    let descent = IndividualLogSolver::new(kc, &fb, &table, &ic, Some(&pair))
+        .ok_or("the log table does not match the base")?;
+    ledger.lap("descent_setup");
+
+    // 6. The online interval: the first target-dependent operation to
+    // the logarithm the descent has checked.
+    measurement::begin_online(Phase::TargetQuery);
+    let report = descent.solve_report(q);
+    measurement::end_online();
+    ledger.lap("descent");
+
+    // 7. The pipeline's own check, in the general arithmetic.
+    let verified = report
+        .log
+        .as_ref()
+        .is_some_and(|d| d < &kc.subgroup_order && kc.mul(kc.generator(), d) == *q);
+    ledger.lap("verify");
+
+    let counts = DescentCounts {
+        fb_points: fb.points.len(),
+        fb_signed_orbits: fb.signed_orbits.len(),
+        fb_abscissae: fb.subspace.len(),
+        columns,
+        selection,
+        pair_table_tier: pair.tier().into(),
+        pair_table_entries: pair.len(),
+        units: units.len(),
+        units_planned: p.units,
+        units_extended: extended,
+        trials: units.values().map(|u| u.1).sum(),
+        summands_scanned: units.values().map(|u| u.2).sum(),
+        relations_collected: units.values().map(|u| u.0.len()).sum(),
+        per_unit: units
+            .iter()
+            .map(|(u, (rels, tr, sc))| [*u as u64, rels.len() as u64, *tr, *sc])
+            .collect(),
+        log_columns,
+        relations_accepted: la_counts.relations_accepted,
+        relations_rejected: la_counts.relations_rejected,
+        relations_duplicate: la_counts.relations_duplicate,
+        solve_attempts: la_counts.solve_attempts,
+        sparse: la_counts.sparse,
+        descent_trials: report.trials,
+    };
+    Ok((
+        DescentOutcome {
+            recovered: if verified { report.log.clone() } else { None },
+            descended: report.log.is_some(),
+            verified,
+            phases: ledger.phases,
+            counts,
+            snapshot: Err("not yet finished".into()),
+            column_logs: table.columns.iter().map(|(_, log)| log.clone()).collect(),
+            factor_base: fb,
+            single_thread: false,
+            relation_scalars,
+        },
+        stored,
+    ))
+}
+
+/// The linear algebra's figures for [`DescentCounts`].
+struct LaCounts {
+    log_columns: usize,
+    relations_accepted: usize,
+    relations_rejected: usize,
+    relations_duplicate: usize,
+    solve_attempts: usize,
+    sparse: Option<SparseSolveReport>,
+}
+
+/// The units collected: `unit -> (relations, trials, summands scanned)`.
+type Units = BTreeMap<usize, (Vec<CollectedRelation>, u64, u64)>;
+
+/// Steps 3 and 4 of the pipeline, unchanged: the planned units, aimed,
+/// then the logs, extending unit by unit until they are determined.
+#[allow(clippy::type_complexity)]
+fn collect_and_solve(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    p: &DescentParams,
+    ic: &KoblitzIcOptions,
+    pair: &PairSumTable,
+    ledger: &mut Ledger,
+) -> Result<(FactorBaseLogTable, Units, usize, LaCounts, Vec<u64>), String> {
     // 3. The planned units, aimed.
     let work = |unit: usize| RelationWorkUnit {
         seed: p.seed,
@@ -506,10 +748,10 @@ fn pipeline(
     };
     let mut units: BTreeMap<usize, (Vec<CollectedRelation>, u64, u64)> = BTreeMap::new();
     {
-        let collector = RelationCollector::with_pair_table(kc, &fb, &ic, Some(&pair))
+        let collector = RelationCollector::with_pair_table(kc, fb, ic, Some(pair))
             .ok_or("factor base cannot decompose with this summand count")?;
         let mut coverage = if p.collection_aim {
-            Some(ColumnCoverage::new(kc, &fb).ok_or("factor base has no projected columns")?)
+            Some(ColumnCoverage::new(kc, fb).ok_or("factor base has no projected columns")?)
         } else {
             None
         };
@@ -537,17 +779,17 @@ fn pipeline(
         .collect();
     let mut relation_scalars: Vec<u64> = merged.iter().map(|r| r.a).collect();
     let mut solver =
-        FactorBaseLogSolver::new(kc, &fb, &ic).ok_or("factor base has no projected columns")?;
+        FactorBaseLogSolver::new(kc, fb, ic).ok_or("factor base has no projected columns")?;
     solver.push(&merged);
     let mut outcome = solver.try_solve();
     ledger.lap("linear_algebra");
     let mut extended = 0usize;
     if outcome.is_none() {
-        let collector = RelationCollector::with_pair_table(kc, &fb, &ic, Some(&pair))
+        let collector = RelationCollector::with_pair_table(kc, fb, ic, Some(pair))
             .ok_or("factor base cannot decompose with this summand count")?;
         let mut extend_coverage = if p.collection_aim {
             let mut cov =
-                ColumnCoverage::new(kc, &fb).ok_or("factor base has no projected columns")?;
+                ColumnCoverage::new(kc, fb).ok_or("factor base has no projected columns")?;
             cov.add(&merged);
             Some(cov)
         } else {
@@ -591,64 +833,15 @@ fn pipeline(
         }
     };
     ledger.lap("linear_algebra");
-
-    // 5. The descent's target-independent set-up.
-    let descent = IndividualLogSolver::new(kc, &fb, &table, &ic, Some(&pair))
-        .ok_or("the log table does not match the base")?;
-    ledger.lap("descent_setup");
-
-    // 6. The online interval: the first target-dependent operation to
-    // the logarithm the descent has checked.
-    measurement::begin_online(Phase::TargetQuery);
-    let report = descent.solve_report(q);
-    measurement::end_online();
-    ledger.lap("descent");
-
-    // 7. The pipeline's own check, in the general arithmetic.
-    let verified = report
-        .log
-        .as_ref()
-        .is_some_and(|d| d < &kc.subgroup_order && kc.mul(kc.generator(), d) == *q);
-    ledger.lap("verify");
-
-    let counts = DescentCounts {
-        fb_points: fb.points.len(),
-        fb_signed_orbits: fb.signed_orbits.len(),
-        fb_abscissae: fb.subspace.len(),
-        columns,
-        selection,
-        pair_table_tier: pair.tier().into(),
-        pair_table_entries: pair.len(),
-        units: units.len(),
-        units_planned: p.units,
-        units_extended: extended,
-        trials: units.values().map(|u| u.1).sum(),
-        summands_scanned: units.values().map(|u| u.2).sum(),
-        relations_collected: units.values().map(|u| u.0.len()).sum(),
-        per_unit: units
-            .iter()
-            .map(|(u, (rels, tr, sc))| [*u as u64, rels.len() as u64, *tr, *sc])
-            .collect(),
+    let la = LaCounts {
         log_columns: final_report.columns,
         relations_accepted: final_report.relations,
         relations_rejected: final_report.rejected_relations,
         relations_duplicate: final_report.duplicate_relations,
         solve_attempts: final_report.solve_attempts,
         sparse: final_report.sparse_report.clone(),
-        descent_trials: report.trials,
     };
-    Ok(DescentOutcome {
-        recovered: if verified { report.log.clone() } else { None },
-        descended: report.log.is_some(),
-        verified,
-        phases: ledger.phases,
-        counts,
-        snapshot: Err("not yet finished".into()),
-        column_logs: table.columns.iter().map(|(_, log)| log.clone()).collect(),
-        factor_base: fb,
-        single_thread: false,
-        relation_scalars,
-    })
+    Ok((table, units, extended, la, relation_scalars))
 }
 
 /// The factor base's identity, computed as `ic.pipeline`'s is
@@ -1015,6 +1208,152 @@ mod tests {
             extended_somewhere,
             "the extension loop ran in at least one case"
         );
+    }
+
+    fn small_curve() -> KoblitzCurve {
+        [23u32, 29, 31, 37]
+            .into_iter()
+            .flat_map(|n| [0u8, 1].map(|a| (a, n)))
+            .find_map(|(a, n)| KoblitzCurve::new(a, n))
+            .expect("a small Koblitz curve")
+    }
+
+    fn store_dir(tag: &str) -> PathBuf {
+        let d = std::env::temp_dir().join(format!(
+            "ecbench-log-store-{tag}-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir_all(&d).unwrap();
+        d
+    }
+
+    fn ops_by_phase(out: &DescentOutcome) -> Vec<(String, OpCounts)> {
+        out.phases
+            .iter()
+            .map(|p| (p.name.clone(), p.ops.clone()))
+            .collect()
+    }
+
+    /// (1) A miss computes cold exactly as the store-less run does and
+    /// fills the store; (2) a second target on the same curve is a hit
+    /// that recovers its logarithm, re-verifies the table in a charged
+    /// phase of its own, skips collection and linear algebra, and says it
+    /// is amortized.
+    #[test]
+    fn log_store_miss_then_hit_recovers_and_the_hit_is_amortized() {
+        let kc = small_curve();
+        let p = params(7, 256, 64, 64);
+        let dir = store_dir("miss-hit");
+        for top in [false, true] {
+            let d1 = BigUint::from(123_457u64) % &kc.subgroup_order;
+            let q1 = kc.mul(kc.generator(), &d1);
+            let cold = if top {
+                run_top(&kc, &q1, &p).unwrap()
+            } else {
+                run(&kc, &q1, &p).unwrap()
+            };
+            let (miss, prov) = run_stored(&kc, &q1, &p, top, &dir).unwrap();
+            assert_eq!(miss.recovered.as_ref(), Some(&d1));
+            assert_eq!(
+                prov["log_table_source"],
+                if top { "store" } else { "computed" }
+            );
+            if !top {
+                // The miss is the cold run, phase for phase and count for count.
+                assert_eq!(prov["precomputation_paid_in_this_run"], true);
+                assert_eq!(prov["store_write"], "written");
+                assert_eq!(ops_by_phase(&miss), ops_by_phase(&cold));
+                assert_eq!(miss.counts, cold.counts);
+                assert_eq!(miss.column_logs, cold.column_logs);
+                let names: Vec<&str> = miss.phases.iter().map(|p| p.name.as_str()).collect();
+                assert_eq!(names, PHASES);
+            }
+            // A second target: the store answers for the base.
+            let d2 = BigUint::from(98_765u64 + u64::from(top)) % &kc.subgroup_order;
+            let q2 = kc.mul(kc.generator(), &d2);
+            let (hit, prov2) = run_stored(&kc, &q2, &p, top, &dir).unwrap();
+            assert_eq!(
+                hit.recovered.as_ref(),
+                Some(&d2),
+                "the hit recovers the log"
+            );
+            assert!(hit.verified && hit.single_thread);
+            assert_eq!(prov2["log_table_source"], "store");
+            assert_eq!(prov2["precomputation_paid_in_this_run"], false);
+            assert_eq!(prov2["cost_basis"], "amortized");
+            assert!(log_store::detail_is_amortized(
+                &json!({ "log_table": prov2 })
+            ));
+            let names: Vec<&str> = hit.phases.iter().map(|p| p.name.as_str()).collect();
+            assert_eq!(
+                names,
+                [
+                    "factor_base",
+                    "oracle_setup",
+                    "log_store_verify",
+                    "descent_setup",
+                    "descent",
+                    "verify"
+                ]
+            );
+            // The re-verification is charged: one ladder per column.
+            let lsv = phase(&hit, "log_store_verify");
+            assert_eq!(lsv.scalar_mults, hit.column_logs.len() as u64);
+            assert_eq!(
+                lsv.adds + lsv.doubles,
+                hit.column_logs.iter().map(ladder_gae).sum::<u64>()
+            );
+            assert_eq!(hit.column_logs, cold.column_logs);
+            assert_eq!(hit.counts.trials, 0);
+            assert_eq!(hit.counts.relations_collected, 0);
+            assert_eq!(hit.counts.units, 0);
+            assert!(hit.relation_scalars.is_empty());
+            // The shared stages are the cold run's.
+            for name in ["factor_base", "oracle_setup", "descent_setup"] {
+                assert_eq!(phase(&hit, name), phase(&cold, name), "{name}");
+            }
+        }
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// (3) A stored column whose logarithm was tampered with is refused
+    /// with an error; the run neither recomputes nor uses it.
+    #[test]
+    fn a_tampered_stored_column_is_an_error_not_a_fallback() {
+        let kc = small_curve();
+        let p = params(11, 256, 64, 64);
+        let dir = store_dir("tamper");
+        let d = BigUint::from(4242u32) % &kc.subgroup_order;
+        let q = kc.mul(kc.generator(), &d);
+        let (_, prov) = run_stored(&kc, &q, &p, false, &dir).unwrap();
+        let path = PathBuf::from(prov["store_path"].as_str().unwrap());
+        let mut doc = log_store::load_log_table(&path).unwrap();
+        let log = log_store::number(&doc.columns[0].log).unwrap() + 1u32;
+        doc.columns[0].log = (log % &kc.subgroup_order).to_string();
+        std::fs::remove_file(&path).unwrap();
+        std::fs::write(&path, serde_json::to_string(&doc).unwrap()).unwrap();
+        let err = run_stored(&kc, &q, &p, false, &dir).unwrap_err();
+        assert!(err.contains("re-verification"), "{err}");
+        // Still the tampered file: nothing replaced it.
+        assert_eq!(
+            std::fs::read_to_string(&path).unwrap(),
+            serde_json::to_string(&doc).unwrap()
+        );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn the_log_store_parameter_is_opt_in() {
+        let mut m = BTreeMap::new();
+        assert_eq!(log_store_dir(&m).unwrap(), None);
+        m.insert(LOG_STORE_PARAM.to_string(), "/x/y".to_string());
+        assert_eq!(log_store_dir(&m).unwrap(), Some(PathBuf::from("/x/y")));
+        m.insert(LOG_STORE_PARAM.to_string(), String::new());
+        assert!(log_store_dir(&m).is_err());
     }
 
     #[test]

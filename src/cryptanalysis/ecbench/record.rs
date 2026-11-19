@@ -698,6 +698,21 @@ pub struct Cost {
     pub unpriced: Vec<String>,
     pub deterministic: bool,
     pub nondeterminism: Vec<String>,
+    /// An **amortized** run's total: set, with `s_store`, only when the
+    /// run's factor-base logarithms came from a store
+    /// ([`Record::log_table_amortized`]), and then `total_gae`, `s` and
+    /// `boundaries.ratio_to_floor` are null, so no reader of the cold
+    /// fields can take it for a cold one-target `S` (the `ic price`
+    /// convention, `s_cold` → `s_store`; docs/ic/FRAMEWORK.md).  Absent in
+    /// every other record, which therefore serialises as before.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub total_gae_store: Option<f64>,
+    /// `total_gae_store / √r`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub s_store: Option<f64>,
+    /// `"amortized"` on such a run; absent otherwise (cold).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cost_basis: Option<String>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -816,6 +831,14 @@ impl Record {
     /// A result: verified, measured (not a warm-up).
     pub fn counts(&self) -> bool {
         !self.warmup && self.outcome.status == "verified"
+    }
+
+    /// The run's factor-base logarithms were not computed in it (a store
+    /// hit: `detail.log_table.log_table_source` is `store`), so its cost is
+    /// amortized, carried in `cost.s_store`, and never a cold `S`.
+    pub fn log_table_amortized(&self) -> bool {
+        self.cost.cost_basis.as_deref() == Some("amortized")
+            || crate::cryptanalysis::koblitz_log_store::detail_is_amortized(&self.detail)
     }
 }
 
