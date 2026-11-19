@@ -1,0 +1,9 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m18-t393-d2c04152 | 15.00 | bsgs-neg | 96/96 | 1.092 | 1.195 | 2.128 | — |
+| icv1-f2m18-t393-d2c04152 | 15.00 | ksum4 | 96/96 | 9.687 | 10.409 | 16.905 | — |
+| icv1-f2m18-t393-d2c04152 | 15.00 | rho-neg | 96/96 | 1.949 | 2.102 | 3.478 | — |
+| icv1-f2m18-t393-d2c04152 | 15.00 | ww | 96/96 | 8.289 | 8.560 | 11.000 | — |
+| icv1-f2m18-t393-d2c04152 | 15.00 | ww-tw | 96/96 | 6.663 | 6.847 | 8.511 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
