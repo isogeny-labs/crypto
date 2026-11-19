@@ -559,7 +559,11 @@ fn last_level_par(
     let n = off[ne] as usize;
     let bits = 64 - (p - 1).leading_zeros();
     assert!(bits >= 16);
-    let shift = bits - 16;
+    // Directory bits sized to the table: about 4 keys a bucket, 10 to 16 bits.
+    let dbits = (((2 * n) as f64 / 4.0).log2().ceil() as u32).clamp(10, 16);
+    let shift = bits - dbits;
+    let sub = 1usize << (dbits - 8);
+    let top = bits - 8;
     let nt = threads.max(1);
     let per = (n.div_ceil(nt)).div_ceil(avx::GROUP) * avx::GROUP;
     let dummy_k = ((llast[0] as usize + 1) % a) as u64;
@@ -634,8 +638,8 @@ fn last_level_par(
                             let (u, v) = (xp[i] as u32, xm[i] as u32);
                             kp[c0 - t0 + i] = u;
                             km[c0 - t0 + i] = v;
-                            hist[(u >> (shift + 8)) as usize] += 1;
-                            hist[(v >> (shift + 8)) as usize] += 1;
+                            hist[(u >> top) as usize] += 1;
+                            hist[(v >> top) as usize] += 1;
                         }
                         c0 += cl;
                     }
@@ -687,7 +691,7 @@ fn last_level_par(
                     }
                     let t = (t0 + i) as u32;
                     for (k, r) in [(kp[i], 2 * t), (km[i], 2 * t + 1)] {
-                        let b = (k >> (shift + 8)) as usize;
+                        let b = (k >> top) as usize;
                         // SAFETY: each (bucket, thread) owns a disjoint range.
                         unsafe {
                             *tkp.0.add(fill[b]) = k;
@@ -708,7 +712,7 @@ fn last_level_par(
         );
     }
     // Phase 3: contiguous bucket ranges per thread.
-    let nb = 1usize << 16;
+    let nb = 1usize << dbits;
     let mut dir = vec![0u32; nb + 1];
     let mut keys = vec![0u32; total];
     let mut refs = vec![0u32; total];
@@ -737,7 +741,7 @@ fn last_level_par(
         for th in 0..nt {
             let (b0, b1) = (bounds[th], bounds[th + 1]);
             let (lo, hi) = (c8[b0], c8[b1]);
-            let (d_now, d_t) = std::mem::take(&mut dir_rest).split_at_mut((b1 - b0) * 256);
+            let (d_now, d_t) = std::mem::take(&mut dir_rest).split_at_mut((b1 - b0) * sub);
             let (k_now, k_t) = std::mem::take(&mut keys_rest).split_at_mut(hi - lo);
             let (r_now, r_t) = std::mem::take(&mut refs_rest).split_at_mut(hi - lo);
             let (w_now, w_t) = std::mem::take(&mut words_rest).split_at_mut((b1 - b0) * wper);
@@ -752,18 +756,18 @@ fn last_level_par(
                     let (blo, bhi) = (c8[b], c8[b + 1]);
                     let mut cnt = [0usize; 257];
                     for &k in &tk[blo..bhi] {
-                        cnt[((k >> shift) & 255) as usize + 1] += 1;
+                        cnt[((k >> shift) as usize & (sub - 1)) + 1] += 1;
                     }
-                    for i in 0..256 {
+                    for i in 0..sub {
                         cnt[i + 1] += cnt[i];
                     }
-                    for i in 0..256 {
-                        d_now[(b - b0) * 256 + i] = (blo + cnt[i]) as u32;
+                    for i in 0..sub {
+                        d_now[(b - b0) * sub + i] = (blo + cnt[i]) as u32;
                     }
                     let mut fl = cnt;
                     for i in blo..bhi {
                         let k = tk[i];
-                        let sb = ((k >> shift) & 255) as usize;
+                        let sb = (k >> shift) as usize & (sub - 1);
                         k_now[blo - lo + fl[sb]] = k;
                         r_now[blo - lo + fl[sb]] = tr[i];
                         fl[sb] += 1;
@@ -1142,14 +1146,56 @@ fn build_levels_avx(f: &Mont, bx: &[u64], by: &[u64], m: u32) -> (Levels, u64, u
         let mut xp = vec![0u64; padded];
         let mut xm = vec![0u64; padded];
         let (mut yp, mut ym) = (vec![0u64; padded], vec![0u64; padded]);
-        // SAFETY: callers use this only when AVX-512 was detected.
-        unsafe {
-            avx::pair_add(
-                f, &lx, &ly, bx, by, &pe, &pk, &mut dd, &mut pre, &mut zm, &mut xp, &mut xm,
-                &mut yp, &mut ym, true,
-            )
-        };
-        invs += 1;
+        // Split across the pool's threads above a few thousand pairs: each
+        // thread runs the kernel on a contiguous, group-aligned range and
+        // writes its own slices (one inversion a range).
+        let nt = POOL.get().map(|p| p.workers + 1).unwrap_or(1);
+        if nt > 1 && padded >= 4096 {
+            let per = padded.div_ceil(nt).div_ceil(avx::GROUP) * avx::GROUP;
+            let (lxr, lyr, per_r) = (&lx, &ly, per);
+            let mut jobs = Vec::new();
+            let (mut ddr, mut prer, mut zmr): (&mut [u64], &mut [u64], &mut [u8]) =
+                (&mut dd, &mut pre, &mut zm);
+            let (mut xpr, mut xmr, mut ypr, mut ymr): (
+                &mut [u64],
+                &mut [u64],
+                &mut [u64],
+                &mut [u64],
+            ) = (&mut xp, &mut xm, &mut yp, &mut ym);
+            let mut start = 0;
+            while start < padded {
+                let len = per_r.min(padded - start);
+                let (d0, d1) = std::mem::take(&mut ddr).split_at_mut(len);
+                let (p0, p1) = std::mem::take(&mut prer).split_at_mut(len);
+                let (z0, z1) = std::mem::take(&mut zmr).split_at_mut(len / 8);
+                let (a0, a1) = std::mem::take(&mut xpr).split_at_mut(len);
+                let (b0, b1) = std::mem::take(&mut xmr).split_at_mut(len);
+                let (c0, c1) = std::mem::take(&mut ypr).split_at_mut(len);
+                let (e0, e1) = std::mem::take(&mut ymr).split_at_mut(len);
+                (ddr, prer, zmr, xpr, xmr, ypr, ymr) = (d1, p1, z1, a1, b1, c1, e1);
+                let (pe_s, pk_s) = (&pe[start..start + len], &pk[start..start + len]);
+                jobs.push(move || {
+                    // SAFETY: callers use this only when AVX-512 was detected.
+                    unsafe {
+                        avx::pair_add(
+                            f, lxr, lyr, bx, by, pe_s, pk_s, d0, p0, z0, a0, b0, c0, e0, true,
+                        )
+                    };
+                });
+                start += len;
+            }
+            invs += jobs.len() as u64;
+            par_run(jobs);
+        } else {
+            // SAFETY: callers use this only when AVX-512 was detected.
+            unsafe {
+                avx::pair_add(
+                    f, &lx, &ly, bx, by, &pe, &pk, &mut dd, &mut pre, &mut zm, &mut xp, &mut xm,
+                    &mut yp, &mut ym, true,
+                )
+            };
+            invs += 1;
+        }
         let zero_at = |t: usize| zm[t / 8] >> (t % 8) & 1 == 1;
 
         let live = (0..n).filter(|&t| !zero_at(t)).count();
@@ -1865,6 +1911,28 @@ fn walk_thread<G: CountedGroup<Elt = PrimePoint>>(
     let mut xs = vec![u64::MAX; lanes];
     let (mut xprev, mut yprev) = (vec![0u64; lanes], vec![0u64; lanes]);
     let mut found2: Vec<(usize, u64)> = Vec::new();
+    // Fixed offsets T_i = t_i G (KSUM_OFFS, default 0): every walk point R
+    // is also probed as R ± T_i, two points per offset from one shared
+    // denominator, through the table builder's pair kernel.
+    let n_offs: usize = std::env::var("KSUM_OFFS")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(0);
+    let offs: Vec<(PrimePoint, u64)> = (0..n_offs)
+        .map(|i| {
+            let t = (0x9E37_79B9u64.wrapping_mul(i as u64 + 1) ^ 0x5bd1_e995) % r;
+            (g.mul(&mut ops, inst.gen, t), t)
+        })
+        .collect();
+    let otx: Vec<u64> = offs.iter().map(|o| f.to(o.0.x)).collect();
+    let oty: Vec<u64> = offs.iter().map(|o| f.to(o.0.y)).collect();
+    let lane_ids: Vec<u64> = (0..lanes as u64).collect();
+    let mut opk = vec![0u64; lanes];
+    let (mut odd, mut opre) = (vec![0u64; lanes], vec![0u64; lanes]);
+    let mut ozm = vec![0u8; lanes / 8];
+    let (mut oxp, mut oxm) = (vec![0u64; lanes], vec![0u64; lanes]);
+    let (mut oyp, mut oym) = (Vec::<u64>::new(), Vec::<u64>::new());
+    let mut found3: Vec<(usize, u64, usize, bool)> = Vec::new();
     let cap: u64 = if probe { u64::MAX } else { 300_000 };
     let mut zero = vec![false; lanes];
     let mut exc: Vec<usize> = Vec::new();
@@ -1917,6 +1985,39 @@ fn walk_thread<G: CountedGroup<Elt = PrimePoint>>(
                             found.push((l, v));
                         }
                     }
+                    let tbl = table.unwrap();
+                    for oi in 0..n_offs {
+                        opk.iter_mut().for_each(|v| *v = oi as u64);
+                        // SAFETY: `intr` implies AVX-512 was detected.
+                        unsafe {
+                            avx::pair_add(
+                                f, &x, &y, &otx, &oty, &lane_ids, &opk, &mut odd, &mut opre,
+                                &mut ozm, &mut oxp, &mut oxm, &mut oyp, &mut oym, false,
+                            )
+                        };
+                        for (out, neg) in [(&oxp, false), (&oxm, true)] {
+                            cand.clear();
+                            // SAFETY: as above.
+                            unsafe {
+                                avx::bloom_pass(
+                                    &tbl.bloom.words,
+                                    tbl.bloom.mask,
+                                    tbl.bloom.wshift,
+                                    out,
+                                    &mut cand,
+                                )
+                            };
+                            for &l in &cand {
+                                if ozm[l / 8] >> (l % 8) & 1 == 1 {
+                                    continue;
+                                }
+                                if let Some(v) = tbl.get_exact(out[l]) {
+                                    found3.push((l, v, oi, neg));
+                                }
+                            }
+                        }
+                        st.steps += 2 * lanes as u64;
+                    }
                 } else {
                     for l in 0..lanes {
                         if let Some(v) = table.unwrap().get(x[l]) {
@@ -1955,6 +2056,50 @@ fn walk_thread<G: CountedGroup<Elt = PrimePoint>>(
                     (la[l], lb[l])
                 } else if s == g.neg(rp) {
                     (subm(0, la[l], r), subm(0, lb[l], r))
+                } else {
+                    st.rejected += 1;
+                    continue;
+                };
+                st.verified += 1;
+                let mut guard = sink.lock().unwrap();
+                if guard.0.len() < need && guard.1.insert(v ^ a.rotate_left(17) ^ b.rotate_left(41))
+                {
+                    guard.0.push(Rel { cols, a, b });
+                    if guard.0.len() >= need {
+                        done.store(true, Ordering::Relaxed);
+                    }
+                }
+            }
+            for (l, v, oi, neg) in found3.drain(..) {
+                st.hits += 1;
+                // R ± T_i: (a, b) = (la ± t_i, lb).
+                let rcur = PrimePoint::affine(f.from(x[l]), f.from(y[l]));
+                let tp = if neg { g.neg(offs[oi].0) } else { offs[oi].0 };
+                let rp = g.add(&mut ops, rcur, tp);
+                let pa = if neg {
+                    subm(la[l], offs[oi].1, r)
+                } else {
+                    addm(la[l], offs[oi].1, r)
+                };
+                let pb = lb[l];
+                let cols = unpack(v, m);
+                let mut s5 = PrimePoint {
+                    x: 0,
+                    y: 0,
+                    infinity: true,
+                };
+                for &(i, ng) in &cols {
+                    let pt = if ng {
+                        g.neg(inst.reps[i])
+                    } else {
+                        inst.reps[i]
+                    };
+                    s5 = g.add(&mut ops, s5, pt);
+                }
+                let (a, b) = if s5 == rp {
+                    (pa, pb)
+                } else if s5 == g.neg(rp) {
+                    (subm(0, pa, r), subm(0, pb, r))
                 } else {
                     st.rejected += 1;
                     continue;
