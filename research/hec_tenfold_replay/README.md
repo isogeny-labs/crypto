@@ -355,3 +355,22 @@ On seeds 2026111927 and 2026111928 each field had eight fresh inputs, 32 repetit
 Use `harness/g4-degree-screen.zsh mask` or `harness/g4-degree-screen.zsh packed` for the timing runs. Append `expanded` for the 32-input-per-field replication. The audit generator accepts `mask audit` or `packed audit` and emits a standalone C++17 program. The medians reducer accepts the timing logs as arguments. The raw archives also retain the untimed verification streams.
 
 The expanded seed 2026111929 used 32 fresh inputs per field. The packed solver improved all 128 in both orders. Both the existing and packed solvers cleared 10× on 127/128. The remaining case was p = 43, input 9, where the packed solver achieved 9.797× and 9.823×, versus 9.311× and 9.441× for the existing solver. All scalar checks passed. This replication varies the input pairs on four fixed curves.
+
+### Genus-4 transfer to different curves
+
+We scanned the same family y² = x⁹ + x³ + cx + 1 at the four original primes. For each field the picker scans c in ascending order. It selects up to two smooth curves for which the place (0,1) has a certified prime-order multiple, with subgroup prime at least 1,000, at most 20 million and at least one quarter of the lower Hasse bound. The test excludes the original and previously selected values of c³ modulo p. Multiplication of x by a cube root of unity sends c to ac without changing the other coefficients, so failing to exclude these values would admit copies of the same curve.
+
+Two curves qualified at each of p = 43 and 59. No additional orbit qualified at 37 or 67 under this picker. PARI/GP's Frobenius characteristic polynomial gives Jacobian orders 3,688,816 and 3,222,209 at 43, and 11,395,238 and 11,917,372 at 59. These distinguish the selected curves from each other and from the original curves over the same fields (orders 4,082,476 and 12,132,012). The driver uses the resulting cofactor in scalar verification.
+
+| p, c | Three-family rank / required | Four-family poles to rank | Four-family solves ≥10× on first / second seed | Four-family median vs pencil, second seed forward / reverse |
+|---|---:|---:|---:|---:|
+| 43, 7 | 21 / 21 | 14 | 16/16, 31/32 | 15.60× / 15.81× |
+| 43, 10 | 20 / 20 | 13 | 16/16, 32/32 | 19.67× / 20.23× |
+| 59, 15 | 18 / 26 | 22 | 16/16, 32/32 | 14.80× / 15.22× |
+| 59, 20 | 28 / 28 | 12 | 16/16, 32/32 | 19.33× / 19.50× |
+
+On (59,15) all 27 poles of the three-family catalogue gave 20 accepted rows and rank 18. The packed screen returned the same deficient rank. The fourth family, fixing four copies of a point and leaving a residual of degree five, brought the combined catalogue to rank 26 after 22 poles and 28 accepted rows. The three-family arms are recorded as rank-deficient for every input on this curve. On the other three curves the packed and original three-family coordinates agreed exactly and the four-family coordinates agreed up to scalar.
+
+The first seed (2026111930) used 16 input pairs per curve; the second (2026111931) used 32. All four-family scalars were verified. In each order the benchmark rotated the pencil reference, original three-family, packed three-family and four-family solvers for 32 repetitions per input. Each available candidate rebuilt its catalogue, decomposed the input pair and verified the scalar inside the elapsed time. Qualification and catalogue availability checks preceded timing. The reported speedup is pencil time divided by four-family time. The smallest paired median on the replication was 9.392×.
+
+Run `harness/g4-transfer.zsh` and `harness/g4-transfer.zsh expanded`. The fixture rows give p, c, subgroup prime and the multiplier for (0,1). The rank file gives p, c, arm, anchor (−1 on exhaustion), poles, accepted rows and rank. The medians files identify curve, input and order, then give the three speedup ratios against pencil. The raw archives include both orders and all audit streams.
