@@ -29,7 +29,7 @@ middle = "\n  } pub mod before {\n"
 tail = "\n  }\n }\n}\n"
 probe = r"""
 pub fn round44_probe(p:u64, coefficients:&[u64], delta:u64, exponent:u64)
-    ->(Vec<u64>,Vec<u64>,u64,u64){
+    ->(Vec<u64>,Vec<u64>,u64,u64,u64,u64){
     let field=Fp64Arithmetic{p};
     let modulus=Poly17::from_coefficients(&field,coefficients).unwrap();
     let mut base=Poly17::ZERO;
@@ -45,12 +45,16 @@ pub fn round44_probe(p:u64, coefficients:&[u64], delta:u64, exponent:u64)
         unacknowledged:None,pending:[Poly17::ZERO;8],pending_len:0,
         roots:[0;8],root_count:0
     };
+    let producer_start=Instant::now();
     let generated=producer.power(&base,exponent,&modulus).unwrap();
+    let producer_ns=producer_start.elapsed().as_nanos() as u64;
     let pwork=producer.gate.metrics.field_work;
     let mut replay=Replay::new(&field,&[1],42,limits,limits,deadline).unwrap();
+    let replay_start=Instant::now();
     let checked=replay.modular_power(base,exponent,&modulus).unwrap();
+    let replay_ns=replay_start.elapsed().as_nanos() as u64;
     (generated.coefficients().to_vec(),checked.coefficients().to_vec(),
-     pwork,replay.gate.metrics.field_work)
+     pwork,replay.gate.metrics.field_work,producer_ns,replay_ns)
 }
 """
 tests=r"""
@@ -199,6 +203,15 @@ mod round44 {
         }
         black_box(digest);start.elapsed().as_nanos() as f64/reps as f64
     }
+    fn probe_parts(p:u64,f:&[u64],delta:u64,exp:u64,old:bool)->(f64,f64){
+        let mut producer=0f64;let mut replay=0f64;
+        for _ in 0..6 {
+            let v=if old{before::round44_probe(p,f,black_box(delta),exp)}
+                  else{after::round44_probe(p,f,black_box(delta),exp)};
+            producer+=v.4 as f64;replay+=v.5 as f64;
+        }
+        (producer/6.0,replay/6.0)
+    }
     fn solve_timed(p:u64,f:&[u64],old:bool,reps:usize)->f64{
         let start=Instant::now();let mut digest=0u64;
         for _ in 0..reps {
@@ -226,6 +239,22 @@ mod round44 {
                 }
                 let a=median(old);let b=median(new);
                 println!("ROUND44_NATIVE_POWER p={p} degree={degree} exponent={exp} before_ns={a:.1} after_ns={b:.1} speedup={:.4}x",a/b);
+                let mut bp=Vec::new();let mut ap=Vec::new();let mut br=Vec::new();let mut ar=Vec::new();
+                for trial in 0..13 {
+                    let (oldP,oldR,newP,newR)=if trial%2==0 {
+                        let old=probe_parts(p,&f,13,exp,true);
+                        let new=probe_parts(p,&f,13,exp,false);
+                        (old.0,old.1,new.0,new.1)
+                    } else {
+                        let new=probe_parts(p,&f,13,exp,false);
+                        let old=probe_parts(p,&f,13,exp,true);
+                        (old.0,old.1,new.0,new.1)
+                    };
+                    bp.push(oldP);br.push(oldR);ap.push(newP);ar.push(newR);
+                }
+                let (bp,ap,br,ar)=(median(bp),median(ap),median(br),median(ar));
+                println!("ROUND44_NATIVE_PRODUCER p={p} degree={degree} exponent={exp} before_ns={bp:.1} after_ns={ap:.1} speedup={:.4}x",bp/ap);
+                println!("ROUND44_NATIVE_REPLAY p={p} degree={degree} exponent={exp} before_ns={br:.1} after_ns={ar:.1} speedup={:.4}x",br/ar);
             }
             let mut old=Vec::new();let mut new=Vec::new();
             for trial in 0..13 {
