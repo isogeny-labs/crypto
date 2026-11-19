@@ -23,3 +23,22 @@
 ## Errors (what went wrong, how it was handled)
 - First source-bound CI failed at original lib compilation due to sparse-checkout missing a relative-path source; patched sparse checkout to include `src/cryptanalysis/f4_fp_tower.rs`. Candidate Rust and dual-number replay had not yet been exercised by that failed execution.
 - Shared KB, EKS and local Rust compiler unavailable in this tool runtime; used direct GitHub repository sources and launched the exact-source GitHub Actions checks.
+
+## 2026-11-19T00:55Z — exact-source GitHub CI PASS and frozen report
+
+### What was done (commands, files, features)
+- Fixed original arithmetic pinned sparse checkout by adding `src/cryptanalysis/f4_fp_tower.rs`. The source bound first retry #44432429016 then exposed Rust E0499 nested mutable borrow `ar.sqrt(ar.rhs(...))`; fixed using an intermediate rhs and removed an unused import. Final source `4778af32e52025487add1aac4caf54a583d143b9`.
+- Source-specific [CI #44432622706](https://github.com/isogeny-labs/crypto/actions/runs/44432622706) PASSED. Original native Rust library regressions 40/40; new example tests 2/2; Python BigInt independently replayed 32/32 original-curve fixtures and all 960/960 independent dual-number Jacobian cells, signed group identities, and predetermined mutated negatives. Both old and ternary schedules passed.
+- Raw JSON artifact [#14487621363](https://github.com/isogeny-labs/crypto/actions/runs/44432622706/artifacts/14487621363), SHA256 `793151c31b23ab33a36d595e66b271095914aa8e8108c282116f727386e2d54b`; retain through December 19, 2026.
+- Published [scientific report](../../research/prime31_ic_20261115/rr9/RR9_TWO_PREFIX_RESULT_20261119.md) distinguishing exact algebraic correctness from absent non-generic selector and absent F4/complete-solver speedup.
+
+### Decisions made (and why)
+- Complete the scoped two-prefix component and publish passing evidence; retain `[pcc:unverified]` because Python source-specific independent replay is not a signed independent PCC attestation.
+- 256 signed prefix branches must be charged, and the dense degree-16 monomial ceiling is not a measured F4 solve. A public-index extractor, costed same-runner full ECDLP and scaling remain future separate gates.
+
+### Open threads (unfinished, pick up next time)
+- Add measured public-only F4/XL polynomial extractor for 46 positive, 18 negative natural targets with all guessed prefix branches charged, or explicitly falsify this route at memory/degree budget. Test one-index and zero-index controls.
+- If successful, reuse four B8 rank31 / 1024 blind targets and same-runner mixed index calculus / cached BSGS / rho. Independent signed PCC verdict required for leaderboard.
+
+### Errors (what went wrong, how it was handled)
+- The initial two source-specific workflows failed as documented (one missing sparse file, one E0499). Both corrected; the final exact-source workflow and independent replay succeeded.
