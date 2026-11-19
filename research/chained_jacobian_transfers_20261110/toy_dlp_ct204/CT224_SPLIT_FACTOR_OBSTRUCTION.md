@@ -29,6 +29,18 @@ The source elliptic Frobenius polynomial `X²+7X+101`, the trace-zero factor `X�
 
 Consequently, any multi-hop chain consisting of `F101`-defined group homomorphisms that starts in `E` and ends *entirely in the complementary E_0 or B factor* is zero. It cannot preserve a 109-order DLP. This statement does **not** prohibit the proven nonzero pullback `E→J_C`, a larger target containing the E-isotypic component, maps after a field extension with separately analyzed Frobenius, or index calculus on the full composite Jacobian. It also does not exclude a different genus-2 or genus-4 cover.
 
+## Quadratic-extension no-transfer check
+
+The same simple factor orders remain **pairwise coprime over F101²**. With `#E(F101²)=(101+1)²−(−7)²` and analogous formulas for the trace-zero factor, while `#B(F101²)=L_B(1)L_B(−1)`, the results are:
+
+| Rational group over F101² | Exact order | Factorization |
+| --- | ---: | --- |
+| E | 10,355 | 5·19·109 |
+| E_0 | 10,404 | 2²·3²·17² |
+| B | 108,097,609 | 37²·281² |
+
+All three pairwise gcds are 1 (checked in the executable). Even an **arbitrary abstract group homomorphism** from `E(F101²)` into `E_0(F101²)` or `B(F101²)` must be zero. Consequently, simply extending to F101² does not rescue the proposed transfer to the smaller factors. This does *not* establish the same conclusion for all extension degrees, nonlinear encodings, or a different cover. No extension-field Cantor homomorphism was implemented in this audit.
+
 ## Three mutually orthogonal CRT projectors on J_C(F101)
 
 Because `109`, `102`, and `10397` are pairwise coprime, CRT supplies scalar idempotents on the **finite rational group** `J_C(F101)`:
