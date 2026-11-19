@@ -1,0 +1,6 @@
+Trigger UTC: 2026-11-19T12:19:56Z
+Purpose: run existing frozen n23 Koblitz relation-yield control via hourly-relation-finding workflow.
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Baseline: results/relation_baseline.json; alert threshold: >20%.
+Output: results/hourly_log.csv, committed and pushed by GitHub Actions on hourly-runs.
+Note: control experiment is not ECC2K-130.
