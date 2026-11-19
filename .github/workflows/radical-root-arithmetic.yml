@@ -18,6 +18,7 @@ on:
       - 'research/amm_digit_perf_20261118/round43_dense_square_isolated.py'
       - 'research/amm_digit_perf_20261118/round44_window3_isolated.py'
       - 'research/amm_digit_perf_20261118/round45_karatsuba_isolated.py'
+      - 'research/amm_digit_perf_20261118/round45_quadratic_frobenius_isolated.py'
       - 'research/amm_digit_perf_20261118/round31_bounded_baseline.rs'
       - 'research/amm_digit_perf_20261118/round23_verifier_isolated.py'
       - 'research/amm_digit_perf_20261118/round24_verifier_isolated.py'
@@ -621,4 +622,32 @@ jobs:
         with:
           name: round45-karatsuba-native-rust
           path: ${{ runner.temp }}/round45-karatsuba-native-rust.txt
+          if-no-files-found: ignore
+
+  bounded-quadratic-frobenius-round45:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round45_quadratic_frobenius_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Check quadratic Frobenius identities and 13-pair Rust root extraction A/B
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round45_quadratic_frobenius_isolated.py
+          } | tee "$RUNNER_TEMP/round45-quadratic-native-rust.txt"
+          cat "$RUNNER_TEMP/round45-quadratic-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round45-quadratic-native-rust
+          path: ${{ runner.temp }}/round45-quadratic-native-rust.txt
           if-no-files-found: ignore
