@@ -2787,6 +2787,91 @@ mod tests {
         );
     }
 
+    /// **Attempt schedules end to end.**  On a 16-bit roster curve with a
+    /// 96-point base (stride `cols / 32 = 3`), every schedule of
+    /// `sparse-cado` and `wiedemann` recovers the logarithm the dense
+    /// full-rank matrix recovers; the relations read past the dense
+    /// full-rank point (the overshoot) stay within the schedule's bound;
+    /// totals are printed (`--nocapture`).
+    #[test]
+    fn sparse_attempt_schedules_match_the_full_rank_matrix_end_to_end() {
+        let inst = roster_prime_instance(16).unwrap();
+        let (ctx, planted) = ctx_and_planted(&inst);
+        let base = PrimeAbscissaBase { instance: &inst };
+        println!("| matrix | seed | relations (dense) | overshoot | attempt points | failed | LA row_ops | targets tried |");
+        for seed in [7u64, 8, 9] {
+            let mut spec = PipelineSpec {
+                factor_base: "prime-abscissa".into(),
+                oracle: "mitm".into(),
+                targets: Targets::Walk,
+                max_trials: 2_000_000,
+                seed,
+                linalg: "incremental-gauss-full-rank".into(),
+                ..Default::default()
+            };
+            spec.factor_base_params.set("size", "96");
+            spec.oracle_params.set("negation_folded", "1");
+            let run = |spec: &PipelineSpec| {
+                run_pipeline(
+                    &ctx,
+                    spec,
+                    &base,
+                    &mut MitmOracle::new(2),
+                    planted,
+                    &Calibration::default(),
+                    None,
+                )
+                .unwrap()
+            };
+            let dense = run(&spec);
+            assert!(dense.verified);
+            let cols = dense.factor_base.columns as u64 + 1;
+            for (name, bound) in [
+                ("sparse-cado", (cols / 32).max(1)),
+                ("sparse-cado:schedule=fixed", (cols / 32).max(1)),
+                ("sparse-cado:schedule=geometric,start=1,growth=2", u64::MAX),
+                ("sparse-cado:schedule=predicted,margin=0", 1),
+                ("sparse-cado:schedule=predicted,margin=1", 1),
+                ("wiedemann:schedule=fixed", (cols / 32).max(1)),
+                ("wiedemann:schedule=predicted,margin=1", (cols / 32).max(1)),
+            ] {
+                spec.linalg = name.into();
+                let other = run(&spec);
+                assert!(other.verified, "{name}");
+                assert_eq!(other.recovered, dense.recovered, "{name}");
+                assert_eq!(
+                    other.linear_algebra.rank, dense.linear_algebra.rank,
+                    "{name}"
+                );
+                let over = other
+                    .decomposition
+                    .relations_found
+                    .checked_sub(dense.decomposition.relations_found)
+                    .expect("no answer below full rank");
+                assert!(
+                    over <= bound,
+                    "{name} seed {seed}: overshoot {over} > {bound}"
+                );
+                let wn = &other.linear_algebra.cost.work_native;
+                let get = |k: &str| wn.get(k).map_or("-".to_string(), u64::to_string);
+                if let Some(b) = wn.get("sparse_overshoot_rows_bound") {
+                    assert!(
+                        over <= *b,
+                        "{name}: overshoot {over} above reported bound {b}"
+                    );
+                }
+                println!(
+                    "| {name} | {seed} | {} | {over} | {} | {} | {} | {} |",
+                    dense.decomposition.relations_found,
+                    get("sparse_attempt_points"),
+                    get("sparse_failed_attempt_points"),
+                    other.linear_algebra.work,
+                    other.decomposition.targets_tried,
+                );
+            }
+        }
+    }
+
     #[test]
     fn checked_full_rank_point_checks_each_column_without_changing_the_relation_stream() {
         let inst = roster_prime_instance(16).unwrap();
