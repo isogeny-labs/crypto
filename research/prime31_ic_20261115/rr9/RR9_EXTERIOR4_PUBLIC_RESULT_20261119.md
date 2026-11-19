@@ -1,6 +1,6 @@
 # Prime31 public-only exterior-4 RR9 candidate and B8 cost falsifier
 
-2026-11-19 UTC. Draft [PR #4776](https://github.com/isogeny-labs/crypto/pull/4776). Preregistered [protocol](RR9_EXTERIOR4_PUBLIC_PROTOCOL_20261119.md), new [original-crate Rust candidate](../native/examples/prime31_rr9_exterior4.rs), [independent Python BigInt grader](../native/verify_prime31_rr9_exterior4.py) and [source-specific CI](../../../.github/workflows/prime31-rr9-exterior4.yml). **Source-specific CI not yet observed; no wall-time or pass claim.** Independent signed PCC pending.
+2026-11-19 UTC. Draft [PR #4776](https://github.com/isogeny-labs/crypto/pull/4776). Preregistered [protocol](RR9_EXTERIOR4_PUBLIC_PROTOCOL_20261119.md), new [original-crate Rust candidate](../native/examples/prime31_rr9_exterior4.rs), [independent Python BigInt grader](../native/verify_prime31_rr9_exterior4.py) and [source-specific CI](../../../.github/workflows/prime31-rr9-exterior4.yml). **Source-specific CI PASS:** [run #44445676750](https://github.com/isogeny-labs/crypto/actions/runs/44445676750), source ef037d6c641ff69351f2714fee8ad2cbfc54ec7d, original Rust regression tests, focused algebraic identity tests and independent Python BigInt replay passed. [pcc:unverified]. Independent signed PCC pending.
 
 ## Algebraic method and exact identity
 
@@ -31,7 +31,7 @@ Each tested pair contracts 70 field-coordinate products, plus modular additions.
 - Separate Python BigInt implementation: reconstruct canonical x=0,1,2,3 base, signed weighted supports, exact EC group truth and replay, all emitted witness identities and exact coordinate-product counts. Do not include the independent group grader in candidate timing.
 - Exact-source GitHub workflow overlays only the candidate example on the pinned original Rust crate, runs original library tests and focused tests, then produces two-case JSON and independently replays it.
 
-No new benchmark figure is claimed before reading the completed workflow.
+Source-specific measurements are now included below; this original-curve B4 diagnostic is **not** a complete ECDLP benchmark.
 
 ## Prior leads, novelty scope and next experiments
 
@@ -52,3 +52,22 @@ Frozen [preflight JSON](RR9_EXTERIOR4_B4_PREFLIGHT_20261119.json). A separately 
 - A different nonmatching signed word (0,1,2,3,4,5,6,7) at R=G gives determinant and contraction both 468,030,532.
 
 This confirms exact planted/negative fixture labels and the Laplace identity on three original-curve examples. It does **not** establish a native Rust result or wall-time: the new Rust public-only enumerator must still complete the source-bound CI. The Python truth grader is excluded from the native candidate interface.
+
+## Source-bound original-curve Rust result — CI PASS, 2026-11-19 UTC
+
+[Passing source-specific GitHub Actions #44445676750](https://github.com/isogeny-labs/crypto/actions/runs/44445676750) ran original Rust arithmetic pinned to commit 1df714645aa683cf975bc76fcacb9842cb4780fd, candidate source ef037d6c641ff69351f2714fee8ad2cbfc54ec7d, Rust 1.100.0, and an independent Python BigInt witness/truth checker. All CI steps passed, including original 40 Rust regression tests and focused modular-field/Laplace determinant unit tests. Signed independent PCC remains [pcc:unverified].
+
+| Original B4 public-only algebraic candidate | Planted positive | Unplanted natural R=G |
+|---|---:|---:|
+| Correct EC truth (independent grader) | witness exists | no witness |
+| Candidate outcome | witness [0,0,0,0,0,0,0,0] | no witness after entire scan |
+| Algebraic half-pair contractions | 1 | 16,777,216 |
+| Field coordinate products in contractions | 70 | 1,174,405,120 |
+| Candidate elapsed including 4x4 minor table build | **175.178 ms** | **1,295.600 ms** |
+| Public-only; generic EC sum tables inside candidate | yes; **none** | yes; **none** |
+
+Public support setup was separately 0.034 ms, and the independent grading was excluded from the candidate elapsed times. The positive is a **planted first-pair control**, so 175 ms is not a natural-hit median. The negative is an actual complete exhaustive no-hit B4 scan. The observed outcomes exactly match independent original-curve Python BigInt truth enumeration. These are **one-run diagnostic times**, not paired cost comparisons or full ECDLP timing.
+
+The frozen [durable exact-source JSON summary](RR9_EXTERIOR4_B4_CI_SUMMARY_20261119.json) preserves the source bound and counters. [Complete 758-byte raw GitHub artifact #14493406334](https://github.com/isogeny-labs/crypto/actions/runs/44445676750/artifacts/14493406334) has GitHub SHA-256 digest 8399b320128ebe7e8e2f931111d25c3abd72f4af03b48c23bcca5d3eea745640 and is retained until approximately 2026-12-19.
+
+**Decision:** This public-only exterior contraction is a correctly checked algebraic relation recognizer at B4 but is an uncompetitive *exhaustive* architecture for B8 without an independently validated subquadratic orthogonal-vector or F4/SAT extraction breakthrough. No complete B8 extraction, rank-31 non-generic learning, 1,024 non-generic logs or advantage over shared BSGS/rho has been shown.
