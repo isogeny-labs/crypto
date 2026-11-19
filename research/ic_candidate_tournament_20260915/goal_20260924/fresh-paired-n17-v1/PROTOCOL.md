@@ -8,7 +8,7 @@ passed its independent data-only audit. The SAT arm has a
 with complete archive replay and exact-built exporter parity. The MatrixF5
 arm has a separate [target-free source publication](f5-source-v1/result-v1/RESULT.md)
 from a new, unconsumed validation capsule, with all 6,968 archived members
-independently replayed. F5 card adoption remains unexercised. Publisher
+independently replayed. F5 card adoption is archived under [f5-card-adoption-v1](f5-card-adoption-v1/RESULT.md). Publisher
 commands now exist for the remaining two pre-card arms:
 [`incumbent-source-publish` / `incumbent-source-replay`](INCUMBENT_SOURCE.md)
 and [`rho-source-publish` / `rho-source-replay`](RHO_SOURCE.md). Their
@@ -16,9 +16,11 @@ committed publications are retained under
 [incumbent-source-v1/result-v1](incumbent-source-v1/result-v1/RESULT.md) and
 [rho-source-v1/result-v1](rho-source-v1/result-v1/RESULT.md). The first
 [public point card](public-card-v1/RESULT.md) is now retained
-(`card_sha256` `bd969a4092a329bf093688b9d4715c86d77850c11f115ff47852c9235d7c2379`);
-four-arm dispatch, F5 card adoption and scientific target registration remain
-uncreated. A separate
+(`card_sha256` `bd969a4092a329bf093688b9d4715c86d77850c11f115ff47852c9235d7c2379`).
+[F5 card adoption](f5-card-adoption-v1/RESULT.md) passed
+(`PASS_SOURCE_BOUND_F5_CARD_ADOPTION`, scientific registration
+`e0b2520c58e6f327202328790b0784c8e305963aab788cb3a4d53c455a0cd93e`);
+four-arm dispatch and the sole F5 target run remain uncreated. A separate
 [disclosed strong-rho readiness control](rho-readiness-v1/RESULT.md)
 recovered and replayed one already exposed public point; it is neither a
 source publication nor a fresh paired arm.
