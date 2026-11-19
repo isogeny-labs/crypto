@@ -56,14 +56,19 @@ impl Rng {
 }
 
 // ---------- exact intervals ----------
-fn ln_choose(n: u64, k: u64) -> f64 {
-    (1..=k).map(|i| ((n - k + i) as f64).ln() - (i as f64).ln()).sum()
-}
+/// Binomial CDF P(X <= k), X ~ Bin(n, q), by the log-pmf recurrence (O(k)).
 fn binom_cdf(k: i64, n: u64, q: f64) -> f64 {
     if k < 0 {
         return 0.0;
     }
-    (0..=k as u64).map(|i| (ln_choose(n, i) + i as f64 * q.ln() + (n - i) as f64 * (1.0 - q).ln()).exp()).sum::<f64>().min(1.0)
+    let (lq, lr) = (q.ln(), (1.0 - q).ln());
+    let mut lt = n as f64 * lr;
+    let mut s = lt.exp();
+    for i in 1..=(k as u64).min(n) {
+        lt += ((n - i + 1) as f64).ln() - (i as f64).ln() + lq - lr;
+        s += lt.exp();
+    }
+    s.min(1.0)
 }
 /// Clopper-Pearson two-sided interval at level 1 - alpha.
 fn clopper_pearson(k: u64, n: u64, alpha: f64) -> (f64, f64) {
