@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Round 39: compare the committed Rust producer/replay against exact pre-round40 power and linear-root code."""
+"""Round 40: compare exact Rust constant/linear Frobenius with immediate baseline."""
 from pathlib import Path
 import subprocess
 import tempfile
@@ -223,3 +223,28 @@ with tempfile.TemporaryDirectory() as folder:
     subprocess.run([str(binary),"polynomial_power_edge_exponents_match_frozen","--nocapture"],check=True)
     subprocess.run([str(binary),"roots_and_certificate_events_are_equal","--nocapture"],check=True)
     subprocess.run([str(binary),"bench_full_root_extraction","--ignored","--nocapture"],check=True)
+
+    # Compile the original (not stripped) production #[cfg(test)] module
+    # as well, using only a field-construction stub. This checks the new
+    # in-file regression test without requiring unrelated crate dependencies.
+    original = Path("src/cryptanalysis/prime_root_bounded.rs").read_text()
+    full_header = """#![allow(dead_code)]
+mod cryptanalysis {
+ pub mod fp_backend {
+  pub struct Fp64Arithmetic {pub p:u64}
+  pub struct Admission {pub field:Fp64Arithmetic}
+  impl Fp64Arithmetic {
+   pub fn p(&self)->u64{self.p}
+   pub fn try_new<F:FnMut(&())->Result<(),()>>(
+      p:u64,_work:u64,_bytes:u64,_deadline:std::time::Instant,_callback:&mut F
+   )->Result<Admission,()> {Ok(Admission{field:Self{p}})}
+  }
+ }
+ pub mod prime_root_trace { pub mod after {
+"""
+    full_tail = "\n } } }\n"
+    full_path = Path(folder)/"round40_full_tests.rs"
+    full_bin = Path(folder)/"round40_full_tests"
+    full_path.write_text(full_header + original + full_tail)
+    subprocess.run(["rustc","--edition=2021","-O","--test",str(full_path),"-o",str(full_bin)],check=True)
+    subprocess.run([str(full_bin),"round40_linear_and_constant_frobenius_events_are_certified","--nocapture"],check=True)
