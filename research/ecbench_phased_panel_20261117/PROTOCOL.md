@@ -68,6 +68,32 @@ the sum of the nine exclusive phases `route_search`, `construction`,
 `individual_log_or_descent`, `source_recovery`, and `verification`, following
 [`docs/transfer-assessment/MEASUREMENT.md`](../../docs/transfer-assessment/MEASUREMENT.md).
 
+### 2.2 Phase 1 executable-adapter contract
+
+The first higher-genus implementation slice is frozen before adapter changes.
+It does not authorize a benchmark run and does not turn an earlier smoke result
+into a completed phase result. [pcc:unverified]
+
+| Requirement | Exact Phase 1 object or route | Implementation evidence required before admission |
+|---|---|---|
+| Direct hyperelliptic/Jacobian cell | `jcv1-g2-fp10-4c1c114a`, `J: y^2 = 706 + 731x + 331x^2 + 360x^3 + 270x^4 + x^5` over `F_769`, `#J=571017=3*190339` | pinned explicit curve and generator, 32 public targets, `rho.negation` reference, `ic.hyperelliptic_v2` candidate, source-independent answer replay, cold wall and native work retained |
+| Typed cover-transfer route | panel source `P1-K0-23`, `r=2095853`, through `C: v^2+u^2v=u^7+u` and the degree-three pullback | exact field/model binding, construction certificate, `gcd(3,r)=1` subgroup check, destination rho control, destination BSGS candidate, scalar replay on the source, and all nine exclusive cost phases |
+| Evidence boundary | both paths | planning and smoke checks are implementation evidence only; Phase 1 remains `planned_unmeasured` until the frozen 32-target specs complete and pass the protocol gates |
+
+The typed transfer assessment is
+[`phase1-cover-transfer-assessment.json`](phase1-cover-transfer-assessment.json).
+Its measurement and advantage fields remain unmeasured until a separately
+authorized run produces replayable records.
+
+Sources checked before selecting these paths: the executed Jacobian/transfer
+study in `research/ecbench_jacobians_transfers_20261025/README.md`, the direct
+hyperelliptic ecbench study in `research/hyperelliptic_ecbench_20261024/README.md`,
+the checked ordinary-binary cover implementation and `docs/curves/COVERS.md`,
+Milne's *Jacobian Varieties* notes cited by the cover report, and the frozen
+transfer methodology in `docs/transfer-assessment/`. The shared research KB was
+unavailable (`scripts/research-kb status`: no executable), so these pinned
+repository sources supplied the review.
+
 ## 3. Phase admission gate G0
 
 All items must pass before a phase consumes benchmark resources:

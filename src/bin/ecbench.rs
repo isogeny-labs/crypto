@@ -220,7 +220,7 @@ enum Cmd {
         /// Show admission for one independently promoted benchmark lane.
         #[arg(long)]
         lane: Option<String>,
-        /// Only this family: koblitz, binary, or prime.
+        /// Only this family: koblitz, binary, prime, or genus2.
         #[arg(long)]
         family: Option<String>,
         /// Omit blocked cells that have no runnable curve spec.
@@ -1459,9 +1459,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             json,
         } => {
             if let Some(value) = &family {
-                if !["koblitz", "binary", "prime"].contains(&value.as_str()) {
+                if !["koblitz", "binary", "prime", "genus2"].contains(&value.as_str()) {
                     return Err(format!(
-                        "panel family is koblitz, binary, or prime, not `{value}`"
+                        "panel family is koblitz, binary, prime, or genus2, not `{value}`"
                     ));
                 }
             }
@@ -1493,20 +1493,56 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     .lane(value)
                     .is_some_and(|definition| definition.curve_selector == "source_panel_cells")
             });
+            let show_destination_cells = lane.as_deref().is_none_or(|value| {
+                catalog.lane(value).is_some_and(|definition| {
+                    definition.curve_selector == "registered_destination_cells"
+                })
+            });
+            let show_transfer_routes = lane.as_deref().is_none_or(|value| {
+                catalog.lane(value).is_some_and(|definition| {
+                    definition.curve_selector == "registered_transfer_routes"
+                })
+            });
             let mut rows = Vec::new();
+            let mut destination_rows = Vec::new();
             for record in &catalog.phases {
-                if !show_source_cells || phase.is_some_and(|number| record.phase != number) {
+                if phase.is_some_and(|number| record.phase != number) {
                     continue;
                 }
-                for cell in &record.curves {
-                    if family.as_deref().is_some_and(|value| value != cell.family)
-                        || (runnable && !cell.runnable())
-                    {
-                        continue;
+                if show_source_cells {
+                    for cell in &record.curves {
+                        if family.as_deref().is_some_and(|value| value != cell.family)
+                            || (runnable && !cell.runnable())
+                        {
+                            continue;
+                        }
+                        rows.push((record, cell));
                     }
-                    rows.push((record, cell));
+                }
+                if show_destination_cells {
+                    for cell in &record.destination_cells {
+                        if family.as_deref().is_some_and(|value| value != cell.family)
+                            || (runnable && !cell.runnable())
+                        {
+                            continue;
+                        }
+                        destination_rows.push((record, cell));
+                    }
                 }
             }
+            let route_rows = catalog
+                .transfer_routes
+                .iter()
+                .filter(|_| show_transfer_routes)
+                .filter(|route| phase.is_none_or(|number| route.phase == number))
+                .filter(|route| {
+                    family.as_deref().is_none_or(|value| {
+                        catalog
+                            .cell(&route.source_cell)
+                            .is_some_and(|(_, cell)| cell.family == value)
+                    })
+                })
+                .collect::<Vec<_>>();
             if json {
                 print_json(&serde_json::json!({
                     "schema": panel::PANEL_SCHEMA,
@@ -1527,6 +1563,15 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         "admission_state": record.admission_state,
                         "cell": cell,
                     })).collect::<Vec<_>>(),
+                    "destinations": destination_rows.iter().map(|(record, cell)| serde_json::json!({
+                        "phase": record.phase,
+                        "nominal_subgroup_bits": record.nominal_subgroup_bits,
+                        "subgroup_bit_window": record.subgroup_bit_window,
+                        "minimum_public_targets_per_curve": record.minimum_public_targets_per_curve,
+                        "admission_state": record.admission_state,
+                        "cell": cell,
+                    })).collect::<Vec<_>>(),
+                    "transfer_routes": route_rows,
                 }))?;
             } else {
                 println!(
@@ -1552,6 +1597,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 }
                 if !rows.is_empty() {
                     println!();
+                    println!("source cells");
                     println!(
                         "{:<5} {:<26} {:<8} {:>6} {:>6} {:<45} {}",
                         "phase", "cell", "family", "r bits", "field", "identity", "status"
@@ -1572,6 +1618,56 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                             cell.size.field_bits_or_degree,
                             identity,
                             cell.ecbench.status
+                        );
+                    }
+                }
+                if !destination_rows.is_empty() {
+                    println!();
+                    println!("destination cells");
+                    println!(
+                        "{:<5} {:<26} {:<8} {:>6} {:>6} {:<45} {}",
+                        "phase", "cell", "family", "r bits", "field", "identity", "status"
+                    );
+                    for (record, cell) in destination_rows {
+                        let identity = cell
+                            .identity
+                            .icv1
+                            .as_deref()
+                            .or(cell.identity.external_name.as_deref())
+                            .unwrap_or("-");
+                        println!(
+                            "{:<5} {:<26} {:<8} {:>6} {:>6} {:<45} {}",
+                            record.phase,
+                            cell.cell_id,
+                            cell.family,
+                            cell.size.subgroup_bits,
+                            cell.size.field_bits_or_degree,
+                            identity,
+                            cell.ecbench.status
+                        );
+                    }
+                }
+                if !route_rows.is_empty() {
+                    println!();
+                    println!("transfer routes");
+                    println!(
+                        "{:<5} {:<27} {:<14} {:>6} {:<28} {}",
+                        "phase",
+                        "route",
+                        "source",
+                        "degree",
+                        "source reference",
+                        "destination methods"
+                    );
+                    for route in route_rows {
+                        println!(
+                            "{:<5} {:<27} {:<14} {:>6} {:<28} {}",
+                            route.phase,
+                            route.route_id,
+                            route.source_cell,
+                            route.map_degree,
+                            route.source_reference,
+                            route.destination_methods.join(",")
                         );
                     }
                 }

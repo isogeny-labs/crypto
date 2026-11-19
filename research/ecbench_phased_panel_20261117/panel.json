@@ -49,9 +49,25 @@
       "lane_id": "cover_transfer",
       "object_kind": "typed_transfer_route",
       "algorithm_track": "cover_transfer",
-      "curve_selector": "source_panel_cells",
+      "curve_selector": "registered_transfer_routes",
       "promotion_scope": "independent",
       "required_obligations": ["route_existence", "explicit_construction", "map_correctness", "subgroup_preservation", "destination_solver_applicability", "source_scalar_recovery", "nine_phase_complete_cost"]
+    }
+  ],
+  "transfer_routes": [
+    {
+      "route_id": "P1-K0-23-G3-COVER",
+      "phase": 1,
+      "source_cell": "P1-K0-23",
+      "destination": "Jac(v^2+u^2*v=u^7+u over the same GF(2^23))",
+      "map_degree": 3,
+      "construction": "binary_ecc::OrdinaryBinaryCover::new plus verify_certificate",
+      "map": "point-class pullback induced by phi(u,v)=(u^3,u*v+1)",
+      "subgroup_condition": "the registered source has prime r=2095853 and gcd(3,r)=1",
+      "source_reference": "rho.signed_frobenius_strong",
+      "destination_methods": ["jacobian_image.rho3_v2", "jacobian_image.bsgs_v2"],
+      "cost_adapter": "binary_cubic_pullback_nine_phase_v2",
+      "assessment": "research/ecbench_phased_panel_20261117/phase1-cover-transfer-assessment.json"
     }
   ],
   "phases": [
@@ -65,8 +81,30 @@
       "lanes": [
         {"lane_id": "elliptic_algebraic", "mandatory": true, "admission_state": "ready_to_preregister", "blockers": []},
         {"lane_id": "elliptic_generic_decomposition", "mandatory": true, "admission_state": "ready_to_preregister", "blockers": []},
-        {"lane_id": "hyperelliptic_jacobian", "mandatory": true, "admission_state": "blocked", "blockers": ["register phase-matched Jacobian cells with exact r-parts and executable strongest-Jacobian-rho references"]},
-        {"lane_id": "cover_transfer", "mandatory": true, "admission_state": "blocked", "blockers": ["register typed source-cover-Jacobian routes and executable destination solvers with recovery and complete-cost adapters"]}
+        {"lane_id": "hyperelliptic_jacobian", "mandatory": true, "admission_state": "ready_to_preregister", "blockers": []},
+        {"lane_id": "cover_transfer", "mandatory": true, "admission_state": "ready_to_preregister", "blockers": []}
+      ],
+      "destination_cells": [
+        {
+          "cell_id": "P1-JG2-18",
+          "family": "genus2",
+          "role": "core",
+          "mandatory": true,
+          "identity": {
+            "status": "locally_pinned",
+            "icv1": "JCV1:g2:fp769:706,731,331,360,270,1:571017"
+          },
+          "size": {"subgroup_order": "190339", "subgroup_bits": 18, "field_bits_or_degree": 10},
+          "cofactor": "3",
+          "traits": ["prime_field", "hyperelliptic", "genus_2", "one_rational_infinity", "exact_jacobian_order"],
+          "evidence_status": {"order": "proved", "subgroup": "proved"},
+          "ecbench": {
+            "status": "runnable_narrow",
+            "curve_spec": {"kind": "genus2_explicit", "p": 769, "f": [706, 731, 331, 360, 270, 1], "group_order": 571017, "r": 190339, "gx": 1209378, "gy": 569899},
+            "required_reference": "rho.negation",
+            "required_candidates": ["ic.hyperelliptic_v2"]
+          }
+        }
       ],
       "curves": [
         {
@@ -231,6 +269,7 @@
         {"lane_id": "hyperelliptic_jacobian", "mandatory": true, "admission_state": "blocked", "blockers": ["register phase-matched Jacobian cells with exact r-parts and executable strongest-Jacobian-rho references"]},
         {"lane_id": "cover_transfer", "mandatory": true, "admission_state": "blocked", "blockers": ["register typed source-cover-Jacobian routes and executable destination solvers with recovery and complete-cost adapters"]}
       ],
+      "destination_cells": [],
       "curves": [
         {
           "cell_id": "P2-KOBLITZ-37",
@@ -310,6 +349,7 @@
         {"lane_id": "hyperelliptic_jacobian", "mandatory": true, "admission_state": "blocked", "blockers": ["register phase-matched wide Jacobian cells and executable same-Jacobian solver/reference pairs"]},
         {"lane_id": "cover_transfer", "mandatory": true, "admission_state": "blocked", "blockers": ["register phase-matched typed routes and wide destination solvers with recovery and complete-cost adapters"]}
       ],
+      "destination_cells": [],
       "curves": [
         {
           "cell_id": "P3-KOBLITZ-73",
@@ -389,6 +429,7 @@
         {"lane_id": "hyperelliptic_jacobian", "mandatory": true, "admission_state": "blocked", "blockers": ["register phase-matched wide Jacobian cells and executable same-Jacobian solver/reference pairs"]},
         {"lane_id": "cover_transfer", "mandatory": true, "admission_state": "blocked", "blockers": ["register phase-matched typed routes and wide destination solvers with recovery and complete-cost adapters"]}
       ],
+      "destination_cells": [],
       "curves": [
         {
           "cell_id": "P4-KOBLITZ-83",

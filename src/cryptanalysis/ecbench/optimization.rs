@@ -339,6 +339,18 @@ const POLICIES: &[PolicyDecl] = &[
         JacobianImageNative
     ),
     policy!(
+        "jacobian_image.rho3_v2",
+        ImplementationAb,
+        SpecializedDomain,
+        JacobianImageNative
+    ),
+    policy!(
+        "jacobian_image.bsgs_v2",
+        ImplementationAb,
+        SpecializedDomain,
+        JacobianImageNative
+    ),
+    policy!(
         "bsgs.textbook",
         ReplayControl,
         FrozenHistorical,

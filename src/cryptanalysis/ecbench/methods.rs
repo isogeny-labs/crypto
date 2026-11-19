@@ -24,7 +24,7 @@ use serde_json::{json, Value};
 
 use crate::binary_ecc::{
     hcdlp_bsgs_counted, hcdlp_pollard_rho_counted, operation_tally::OperationTally, F2mElement,
-    HcdlpGroupOps, OrdinaryBinaryCover,
+    HcdlpGroupOps, OrdinaryBinaryCover, SubgroupTransferStatus,
 };
 use crate::cryptanalysis::cheon_counted::{
     cheon_pminus1, cheon_pplus1, shape_divisor, Outcome as CheonOutcome, Side,
@@ -875,6 +875,33 @@ pub fn registry() -> &'static [MethodDecl] {
             family: "bsgs",
             summary: "accounting-only form of jacobian_image.bsgs: the complete instrumented F2mElement route is tallied, so its wall/instruction timing includes ledger overhead and must not be compared with untallied source timing",
             entry: "binary_ecc::hcdlp_bsgs_counted + operation_tally",
+            applies: Applies::BinaryOnly,
+            params: &[],
+        },
+        MethodDecl {
+            id: "jacobian_image.rho3_v2",
+            family: "rho",
+            summary: "jacobian_image.rho3 with the exact cover certificate and prime-subgroup injectivity condition checked at run time, source scalar replay charged, and complete cold wall split across the transfer methodology's nine exclusive phases; destination Jacobian operations remain unpriced in source GAE",
+            entry: "binary_ecc::hcdlp_pollard_rho_counted + binary_cubic_pullback_nine_phase_v2",
+            applies: Applies::BinaryOnly,
+            params: &[
+                ParamDecl {
+                    name: "cap_multiple",
+                    default: Some("64"),
+                    help: "walk-step budget per restart as a multiple of sqrt(r)",
+                },
+                ParamDecl {
+                    name: "max_restarts",
+                    default: Some("64"),
+                    help: "deterministic restart cap for degenerate rho collisions",
+                },
+            ],
+        },
+        MethodDecl {
+            id: "jacobian_image.bsgs_v2",
+            family: "bsgs",
+            summary: "jacobian_image.bsgs with the exact cover certificate and prime-subgroup injectivity condition checked at run time, source scalar replay charged, and complete cold wall split across the transfer methodology's nine exclusive phases; destination Jacobian operations remain unpriced in source GAE",
+            entry: "binary_ecc::hcdlp_bsgs_counted + binary_cubic_pullback_nine_phase_v2",
             applies: Applies::BinaryOnly,
             params: &[],
         },
@@ -4717,6 +4744,21 @@ fn jacobian_phase(name: &str, ops: HcdlpGroupOps) -> PhaseRecord {
     }
 }
 
+fn jacobian_phase_timed(name: &str, ops: HcdlpGroupOps, wall_ns: u64) -> PhaseRecord {
+    PhaseRecord {
+        wall_ns: Some(wall_ns),
+        ..jacobian_phase(name, ops)
+    }
+}
+
+fn empty_timed_phase(name: &str, wall_ns: u64) -> PhaseRecord {
+    PhaseRecord {
+        name: name.into(),
+        wall_ns: Some(wall_ns),
+        ..Default::default()
+    }
+}
+
 /// Execute a named solver on the exact image of the certified same-field
 /// degree-three pullback. The planted logarithm is not an input. The solver
 /// verifies its candidate in the destination group and ecbench independently
@@ -4731,8 +4773,13 @@ fn solve_jacobian_image(
         return Err("jacobian-image adapter requires an affine target".into());
     }
     let started = Instant::now();
+    let nine_phase = matches!(
+        method.id.as_str(),
+        "jacobian_image.rho3_v2" | "jacobian_image.bsgs_v2"
+    );
     let field_tally_enabled = method.id.ends_with("_field_tally");
     let field_tally = field_tally_enabled.then(OperationTally::begin);
+    let construction_started = Instant::now();
     let cover = OrdinaryBinaryCover::new(
         inst.n,
         inst.irreducible.clone(),
@@ -4740,39 +4787,77 @@ fn solve_jacobian_image(
         F2mElement::from_biguint(&BigUint::from(inst.b), inst.n),
     )
     .map_err(|e| format!("constructing the certified genus-three cover: {e}"))?;
+    if nine_phase {
+        cover
+            .verify_certificate()
+            .map_err(|e| format!("verifying the genus-three cover certificate: {e}"))?;
+    }
+    let construction_wall_ns = construction_started.elapsed().as_nanos() as u64;
+
+    let forward_started = Instant::now();
     let source_generator = crate::binary_ecc::BinaryPoint::Affine {
         x: F2mElement::from_biguint(&BigUint::from(inst.generator.x), inst.n),
         y: F2mElement::from_biguint(&BigUint::from(inst.generator.y), inst.n),
     };
-    let image_generator = cover
-        .pullback_point_class(&source_generator)
-        .map_err(|e| format!("pulling the generator into the Jacobian: {e}"))?;
-
-    measurement::begin_online(Phase::RhoSolve);
     let source_target = crate::binary_ecc::BinaryPoint::Affine {
         x: F2mElement::from_biguint(&BigUint::from(target.x), inst.n),
         y: F2mElement::from_biguint(&BigUint::from(target.y), inst.n),
     };
-    let image_target = cover
-        .pullback_point_class(&source_target)
-        .map_err(|e| format!("pulling the target into the Jacobian: {e}"))?;
     let order = BigUint::from(inst.r);
+    if nine_phase {
+        match cover
+            .subgroup_transfer_status(&order)
+            .map_err(|e| format!("checking the order-r pullback condition: {e}"))?
+        {
+            SubgroupTransferStatus::InjectiveIfExactSubgroupOrder { .. } => {}
+            SubgroupTransferStatus::KernelIntersectionUnresolved { common_factor, .. } => {
+                return Err(format!(
+                    "degree-three pullback does not certify injectivity: gcd(3,r)={common_factor}"
+                ))
+            }
+        }
+    }
+    let (image_generator, image_target) = if nine_phase {
+        let generator = cover
+            .pull_push_composition_certificate(&source_generator)
+            .map_err(|e| format!("certifying the generator pullback: {e}"))?;
+        let target = cover
+            .pull_push_composition_certificate(&source_target)
+            .map_err(|e| format!("certifying the target pullback: {e}"))?;
+        (generator.pullback, target.pullback)
+    } else {
+        (
+            cover
+                .pullback_point_class(&source_generator)
+                .map_err(|e| format!("pulling the generator into the Jacobian: {e}"))?,
+            cover
+                .pullback_point_class(&source_target)
+                .map_err(|e| format!("pulling the target into the Jacobian: {e}"))?,
+        )
+    };
+    let forward_wall_ns = forward_started.elapsed().as_nanos() as u64;
+
+    measurement::begin_online(Phase::RhoSolve);
     let outcome = match method.id.as_str() {
-        "jacobian_image.bsgs" | "jacobian_image.bsgs_field_tally" => hcdlp_bsgs_counted(
-            &image_generator,
-            &image_target,
-            &order,
-            cover.source_curve(),
-        ),
-        "jacobian_image.rho3" | "jacobian_image.rho3_field_tally" => hcdlp_pollard_rho_counted(
-            &image_generator,
-            &image_target,
-            &order,
-            cover.source_curve(),
-            seed,
-            rho_cap(inst.r, param_u64(method, "cap_multiple")? as f64),
-            param_u64(method, "max_restarts")?,
-        ),
+        "jacobian_image.bsgs" | "jacobian_image.bsgs_field_tally" | "jacobian_image.bsgs_v2" => {
+            hcdlp_bsgs_counted(
+                &image_generator,
+                &image_target,
+                &order,
+                cover.source_curve(),
+            )
+        }
+        "jacobian_image.rho3" | "jacobian_image.rho3_field_tally" | "jacobian_image.rho3_v2" => {
+            hcdlp_pollard_rho_counted(
+                &image_generator,
+                &image_target,
+                &order,
+                cover.source_curve(),
+                seed,
+                rho_cap(inst.r, param_u64(method, "cap_multiple")? as f64),
+                param_u64(method, "max_restarts")?,
+            )
+        }
         other => return Err(format!("unknown Jacobian-image solver `{other}`")),
     }
     .map_err(|e| format!("destination Jacobian solver failed: {e}"))?;
@@ -4789,6 +4874,7 @@ fn solve_jacobian_image(
             .unwrap_or(0),
     });
 
+    let recovery_started = Instant::now();
     let recovered = outcome
         .recovered
         .as_ref()
@@ -4798,6 +4884,28 @@ fn solve_jacobian_image(
             })
         })
         .transpose()?;
+    let recovery_wall_ns = recovery_started.elapsed().as_nanos() as u64;
+
+    let source_verification_started = Instant::now();
+    let mut source_verification = GroupOps::default();
+    if nine_phase {
+        if let Some(value) = outcome.recovered.as_ref() {
+            let scalar = value
+                .to_u64()
+                .ok_or("destination solver returned a scalar wider than the source subgroup")?;
+            let replay = CountedGroup::mul(
+                &BinaryGroup(&inst.fast),
+                &mut source_verification,
+                inst.generator,
+                scalar,
+            );
+            if replay != target {
+                return Err("destination scalar failed charged source replay".into());
+            }
+        }
+    }
+    let source_verification_wall_ns = source_verification_started.elapsed().as_nanos() as u64;
+    let solve_wall_ns = started.elapsed().as_nanos() as u64;
     let native_operations = outcome
         .setup
         .operations()
@@ -4826,28 +4934,74 @@ fn solve_jacobian_image(
         counters.insert(format!("complete_route_{name}_uncharged"), count);
     }
     counters.retain(|_, value| *value > 0);
-    let phases = vec![
-        jacobian_phase("setup", outcome.setup),
-        jacobian_phase("search", outcome.search),
-        jacobian_phase("internal_verification", outcome.verification),
-    ];
+    let phases = if nine_phase {
+        let individually_clocked = construction_wall_ns
+            .saturating_add(forward_wall_ns)
+            .saturating_add(outcome.setup_wall_ns)
+            .saturating_add(outcome.search_wall_ns)
+            .saturating_add(outcome.verification_wall_ns)
+            .saturating_add(recovery_wall_ns)
+            .saturating_add(source_verification_wall_ns);
+        let setup_wall_ns = outcome
+            .setup_wall_ns
+            .saturating_add(solve_wall_ns.saturating_sub(individually_clocked));
+        let mut verification = jacobian_phase_timed(
+            "verification",
+            outcome.verification,
+            outcome
+                .verification_wall_ns
+                .saturating_add(source_verification_wall_ns),
+        );
+        verification.adds = source_verification.adds;
+        verification.doubles = source_verification.doubles;
+        verification.scalar_mults = source_verification.scalar_mults;
+        verification.gae = source_verification.gae();
+        verification.native.insert(
+            "source_verification_additions".into(),
+            source_verification.adds,
+        );
+        verification.native.insert(
+            "source_verification_doublings".into(),
+            source_verification.doubles,
+        );
+        vec![
+            empty_timed_phase("route_search", 0),
+            empty_timed_phase("construction", construction_wall_ns),
+            empty_timed_phase("forward_map", forward_wall_ns),
+            jacobian_phase_timed("solver_setup", outcome.setup, setup_wall_ns),
+            jacobian_phase_timed("relation_or_walk", outcome.search, outcome.search_wall_ns),
+            empty_timed_phase("linear_algebra", 0),
+            empty_timed_phase("individual_log_or_descent", 0),
+            empty_timed_phase("source_recovery", recovery_wall_ns),
+            verification,
+        ]
+    } else {
+        vec![
+            jacobian_phase("setup", outcome.setup),
+            jacobian_phase("search", outcome.search),
+            jacobian_phase("internal_verification", outcome.verification),
+        ]
+    };
+    let phase_wall_sum_ns = phases.iter().filter_map(|phase| phase.wall_ns).sum::<u64>();
+    let total_gae = phases.iter().map(|phase| phase.gae).sum();
     let unpriced = unpriced_of(&counters);
     Ok(SolveReport {
         recovered,
         exhausted: outcome.exhausted,
         phases,
-        // Deliberately zero until a versioned source-GAE conversion is
-        // supplied. `unpriced` makes the resulting record a lower bound.
-        total_gae: 0.0,
+        // The v2 adapters charge only the source replay. Destination work
+        // remains unpriced until a versioned source-GAE conversion exists,
+        // so `unpriced` keeps the record visibly a lower bound.
+        total_gae,
         automorphisms_used: 1,
         counters,
         unpriced,
         deterministic: true,
         nondeterminism: Vec::new(),
-        solve_wall_ns: started.elapsed().as_nanos() as u64,
+        solve_wall_ns,
         factor_base: None,
         detail: json!({
-            "adapter": "binary_cubic_pullback_v1",
+            "adapter": if nine_phase { "binary_cubic_pullback_nine_phase_v2" } else { "binary_cubic_pullback_v1" },
             "destination": "genus_3_jacobian_image",
             "destination_solver": method.id,
             "map_degree": 3,
@@ -4860,9 +5014,15 @@ fn solve_jacobian_image(
             },
             "inversion_count_includes_its_mul_and_square_cost": true,
             "complete_machine_instruction_count": false,
+            "nine_phase_cold_wall_complete": nine_phase,
+            "phase_wall_sum_ns": phase_wall_sum_ns,
             "source_gae_conversion": "unavailable",
             "destination_candidate_verified": recovered.is_some(),
-            "source_reverification": "performed independently by the ecbench runner"
+            "source_reverification": if nine_phase {
+                "performed and charged inside the adapter, then performed independently by the ecbench runner"
+            } else {
+                "performed independently by the ecbench runner"
+            }
         }),
         online: None,
         online_error: None,
@@ -9389,6 +9549,70 @@ mod tests {
                 .online
                 .as_ref()
                 .is_some_and(|window| window.wall_ns > 0));
+        }
+    }
+
+    #[test]
+    fn v2_jacobian_image_adapters_emit_complete_nine_phase_wall_and_source_replay() {
+        use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+        let spec = CurveSpec::Koblitz { a: 0, n: 7 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::Binary(binary) = &inst else {
+            unreachable!()
+        };
+        let scalar = 13u64;
+        let target = binary.fast.mul_u64(binary.generator, scalar);
+        let coordinates = [format!("0x{:x}", target.x), format!("0x{:x}", target.y)];
+        for id in ["jacobian_image.rho3_v2", "jacobian_image.bsgs_v2"] {
+            let method = resolve(&MethodSpec {
+                id: id.into(),
+                params: BTreeMap::new(),
+            })
+            .unwrap();
+            let report = solve(&method, &inst, &facts, &coordinates, 0x83_03).unwrap();
+            assert_eq!(
+                report.recovered,
+                Some(ExactScalar::from(u128::from(scalar)))
+            );
+            assert!(!report.exhausted);
+            assert_eq!(
+                report
+                    .phases
+                    .iter()
+                    .map(|phase| phase.name.as_str())
+                    .collect::<Vec<_>>(),
+                vec![
+                    "route_search",
+                    "construction",
+                    "forward_map",
+                    "solver_setup",
+                    "relation_or_walk",
+                    "linear_algebra",
+                    "individual_log_or_descent",
+                    "source_recovery",
+                    "verification"
+                ]
+            );
+            assert!(report.phases.iter().all(|phase| phase.wall_ns.is_some()));
+            assert_eq!(
+                report
+                    .phases
+                    .iter()
+                    .filter_map(|phase| phase.wall_ns)
+                    .sum::<u64>(),
+                report.solve_wall_ns
+            );
+            assert!(report.total_gae > 0.0);
+            assert!(report
+                .unpriced
+                .contains(&"jacobian_group_operations_uncharged".into()));
+            assert_eq!(report.detail["nine_phase_cold_wall_complete"], true);
+            assert_eq!(
+                report.detail["source_reverification"],
+                "performed and charged inside the adapter, then performed independently by the ecbench runner"
+            );
         }
     }
 

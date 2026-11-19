@@ -34,18 +34,20 @@ The curve ladder is crossed with four independently promoted lanes. Algebraic
 decomposition and generic table/root-finding decomposition remain separate
 tracks. Direct hyperelliptic/Jacobian work is a third lane, and a typed
 cover/transfer plus destination-solver and source-recovery pipeline is a fourth.
-The latter two are explicitly blocked at every current phase: existing smoke
-implementations, checked covers, and transfer audits do not yet provide
-phase-matched registered destination cells and complete end-to-end adapters.
-This records required scope without converting partial evidence into a result
-[12–15].
+Phase 1 now pins one exact direct Jacobian cell and one exact typed cover route.
+The direct entry is an 18-bit prime subgroup of a genus-2 Jacobian with
+same-Jacobian negation rho and hyperelliptic index calculus. The transfer entry
+is a degree-three same-field pullback from `P1-K0-23` to a genus-3 Jacobian
+image with source rho, destination rho/BSGS, source replay, and nine-phase cold
+wall accounting. Phases 2–4 remain blocked. These are executable
+preregistrations, not completed measurements or speedup results [12–15].
 
 | Lane | P1 | P2 | P3 | P4 |
 |---|---|---|---|---|
 | elliptic algebraic | ready | ready | partially blocked | blocked |
 | elliptic generic decomposition | ready | ready | partially blocked | blocked |
-| hyperelliptic/Jacobian | blocked | blocked | blocked | blocked |
-| cover/transfer | blocked | blocked | blocked | blocked |
+| hyperelliptic/Jacobian | ready | blocked | blocked | blocked |
+| cover/transfer | ready | blocked | blocked | blocked |
 
 ![Four phased panels separated by admission, correctness, rank, replay, and resource gates. The speedup-claim gate is a separate branch. [pcc:unverified]](phased-panel.svg)
 
@@ -90,6 +92,7 @@ not evidence that this study’s methods solve them faster. [pcc:unverified]
 | P1-P20 | 20 | 20-bit prime | 1 | generic short Weierstrass | runnable narrow |
 | P1-P25-J0 | 21 | 25-bit prime | 12 | `j=0`, order-6 automorphism sentinel | runnable narrow |
 | P1-P28-J1728 | 23 | 28-bit prime | 50 | `j=1728`, order-4 automorphism sentinel | runnable narrow |
+| P1-JG2-18 | 18 | `F_769`, genus-2 Jacobian | 3 | direct higher-genus destination | runnable narrow |
 | P2-KOBLITZ-37 | 28 | `GF(2^37)` | 596 | Koblitz high-cofactor stress | runnable narrow |
 | P2-B27 | 27 | `GF(2^27)` | 2 | general binary | runnable narrow |
 | P2-P32a | 32 | 32-bit prime | 1 | standard-panel `a=-3` prime | runnable narrow |
@@ -107,6 +110,15 @@ The two external anchors use the exact Certicom parameters mirrored at pinned
 `efd49aa0a802cda679748533ec5bc5e44ab9ea71`, blob
 `a82dc0ee00a6d25bbfc09f260a4e5430a2a52f9e` [7]. They deliberately have no
 local ICV1 or EC1 yet. [pcc:unverified]
+
+The Phase 1 transfer route is not another source cell. It maps the exact
+`P1-K0-23` order-`2095853` subgroup through
+`phi(u,v)=(u^3,u*v+1)` to the pullback image in
+`Jac(v^2+u^2*v=u^7+u)` over the same `GF(2^23)`. Because `gcd(3,r)=1`, the
+implemented degree-three composition certificate makes the restriction
+injective conditional on the registered exact source order. Destination
+Jacobian operations remain unpriced in source GAE; wall-time comparisons and
+that lower-bound operation ledger must be reported separately [13–15].
 
 ### Trait cautions
 
@@ -225,9 +237,12 @@ the committed registry/traits catalogues, repository protocols, and the primary
 standards/challenge sources below. No curve facts were filled from an unpinned
 search result.
 
-The crypto source snapshot used for selection was
-`46ad9d87de45e372f8a741a3a38dee5b385425eb`. This report creates no ecbench
-session and makes no performance observation.
+The original curve-ladder selection used crypto source snapshot
+`46ad9d87de45e372f8a741a3a38dee5b385425eb`; the Phase 1 adapter revision is
+implemented in this report's PR source. One-target L0 smoke runs checked both
+direct-Jacobian arms and both transfer adapters, but they are correctness
+diagnostics only. No 32-target canonical Phase 1 session has run, and this
+report makes no performance observation.
 
 ## Sources
 
