@@ -38,9 +38,9 @@ for x, name in ((103.3, "n=4 desk: 2^103 (gaudry_quartic_d4_cost)"), (291, "n=5 
     o.append(f'<line x1="{sx(x)}" x2="{sx(x)}" y1="{T}" y2="{H-B}" stroke="#ff7f0e" stroke-dasharray="4 4"/>')
     o.append(f'<text x="{sx(x)-4}" y="{T+12+ (0 if x<200 else 14)}" text-anchor="end" fill="#ff7f0e">{name}</text>')
 for i, (col, dash, name) in enumerate(lab):
-    y = T + 6 + i * 14 + 150
-    o.append(f'<line x1="{L+10}" x2="{L+34}" y1="{y}" y2="{y}" stroke="{col}" stroke-width="2" stroke-dasharray="{dash}"/><text x="{L+40}" y="{y+4}">{name}</text>')
-o.append(f'<text x="{L+10}" y="{T+12+150+5*14+8}" fill="#444">dots: measured mean S_IC / 0.886 (rho theory), single thread; rho plain (kappa 0.886); [pcc:unverified]</text>')
+    y = T + 50 + i * 14
+    o.append(f'<line x1="{sx(140)}" x2="{sx(140)+24}" y1="{y}" y2="{y}" stroke="{col}" stroke-width="2" stroke-dasharray="{dash}"/><text x="{sx(140)+30}" y="{y+4}">{name}</text>')
+o.append(f'<text x="{sx(140)}" y="{T+50+5*14+4}" fill="#444">dots: measured mean S_IC / 0.886 (rho theory), single thread; rho plain (kappa 0.886); [pcc:unverified]</text>')
 o.append("</svg>")
 open(os.path.join(HERE, "figure.svg"), "w").write("\n".join(o))
 print("ok")
