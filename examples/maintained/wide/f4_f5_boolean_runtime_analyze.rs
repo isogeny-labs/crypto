@@ -4,7 +4,7 @@ use std::{fs, path::Path};
 fn median(v: &[f64]) -> f64 {
     let mut v = v.to_vec();
     v.sort_by(f64::total_cmp);
-    if v.len() % 2 == 0 {
+    if v.len().is_multiple_of(2) {
         (v[v.len() / 2 - 1] + v[v.len() / 2]) / 2.0
     } else {
         v[v.len() / 2]
