@@ -43,6 +43,33 @@ arm is measured only at p = 1009.
   on one curve. This refines the paper's open problem 1 (the plain box): testing it needs an
   average over curves, which this tool can do cheaply.
 
+## Averaging over curves (follow-up)
+
+`coverage_multi.cpp` repeats the measurement over the first 16 prime-order generic curves per
+prime (an O(X) factor-base build, cross-checked below). This answers the two questions the
+single-curve run left open.
+
+| p | mean coverage over curves (SD) | E_2/X^2 | mean coverage(u=1) (SD) | per-curve coverage range |
+| --- | --- | --- | --- | --- |
+| 1009 | 0.3732 (0.0117) | 4.047 | 0.3523 (0.1254) | [0.349, 0.397] |
+| 4099 | 0.3895 (0.0042) | 4.031 | 0.4327 (0.0907) | [0.381, 0.396] |
+| 10007 | 0.3894 (0.0035) | 3.980 | 0.3848 (0.0610) | [0.385, 0.396] |
+
+- **Coverage reaches the paper's band.** Averaged over curves, mean coverage is 0.389-0.390 at
+  p = 4099 and 10007, with a tight across-curve SD (0.004) — right at the lower edge of the
+  paper's 0.39-0.42. The single-curve 0.367-0.385 was a finite-sample draw from this
+  distribution. At p = 1009 (small X = 31) it is 0.373, still rising with p.
+- **Energy is essentially exactly 4.** E_2/X^2 = 3.98-4.05 over curves, closer to the paper's ~4
+  than the single-curve 3.86-3.89.
+- **u = 1 approaches the over-dilation mean as p grows.** mean coverage(u=1) over curves is
+  0.385 at p = 10007 against the over-dilation mean 0.389 — consistent with the paper's "u = 1
+  equals the average over u". It stays a high-variance single dilation at small p (0.352 +/-
+  0.125 at p = 1009, and 0.433 at p = 4099), so the identity holds in trend and tightens with p,
+  not pointwise on one curve.
+- **Cross-check.** The first curve `coverage_multi` measures at each prime reproduces
+  `coverage_t3`'s generic arm to all printed digits (e.g. p = 1009: coverage 0.367003 vs 0.3670,
+  E_2/X^2 3.865740 vs 3.866), so the O(X) factor-base build gives the identical set.
+
 ## Checks
 
 - **Independent cross-check.** `verify_one.cpp` recomputes (p=1009, generic, u=1) by direct

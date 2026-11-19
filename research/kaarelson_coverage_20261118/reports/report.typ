@@ -22,7 +22,8 @@ generic 2-sum of two factor-base points; additive energy E_2/X^2; averaged over
 all dilations u. At p in {1009, 4099, 10007}, m = 2, on prime-order curves.
 
 #figure(image("coverage.svg", width: 100%),
-  caption: [Measured mean coverage and E_2/X^2 against the paper's values.])
+  caption: [Measured coverage and E_2/X^2 against the paper's values: single-curve
+  bars, plain-box u=1 (red), j=0 (green), and the 16-curve average (black squares).])
 
 #table(columns: 7, align: (left, left, right, right, right, right, right),
   stroke: 0.4pt + rgb("#bbb"), inset: 4pt,
@@ -54,6 +55,14 @@ generic, u = 1) to all digits: coverage 0.274432, E_2/X^2 2.378772. The energy
 identity sum r = f^2 and E_2 >= f^2 hold; each n is prime and within Hasse; the
 run is ~8 s and byte-reproducible.
 
-*Next step.* Average coverage over several curves per prime (same tool, cheap) to
-test the paper's exact 0.39-0.42 band and the u = 1 ~ mean claim. The Lean engine
-`subexponentialRate_all` audit remains a separate open obligation for Theorem 1.
+*Averaging over 16 curves (coverage_multi.cpp).* Mean coverage over curves is
+0.373 (1009), 0.390 (4099), 0.389 (10007), with tight across-curve SD (0.004 at the
+two larger primes) — at the paper's 0.39-0.42 lower edge, so the single-curve values
+were finite-sample low. E_2/X^2 = 3.98-4.05, essentially the paper's 4. mean
+coverage(u=1) over curves reaches 0.385 at p = 10007 against the mean 0.389,
+consistent with the paper's "u = 1 ~ average over u" in trend (noisy at small p). The
+first curve per prime reproduces coverage_t3's generic arm to all digits.
+
+*Next step.* The Lean engine `subexponentialRate_all` audit remains the separate open
+obligation for the full Theorem 1; widening the prime range would sharpen the band
+further but is not needed for the reproduction.
