@@ -450,6 +450,18 @@ jobs:
               --output odd-transfer-sweep-verify-smoke.json
             node -e 'const fs=require("fs"); const s=JSON.parse(fs.readFileSync("odd-transfer-sweep-smoke.json")); const v=JSON.parse(fs.readFileSync("odd-transfer-sweep-verify-smoke.json")); if(s.record_state!=="bounded_search_result"||s.summary.parameter_points_attempted!==4||s.summary.verified_candidates!==4||v.status!=="verified"||v.candidate_count!==4) process.exit(1);'
             printf '%s\n' \
+              '{"schema":"curve-transfer-sweep-request/v1","selector":{"kind":"model","value":{"v":"1","form":"B*y^2=x^3+A*x^2+x","p":"11","field":"fp-11","A":"3","B":"1"}},"families":["prime_quadratic_pullback_v1"],"bounds":{"prime_shift_start":0,"prime_shift_end":0,"max_attempts":1,"max_field_bits":4,"max_genus":2,"max_degree":2}}' \
+              > montgomery-transfer-sweep-request.json
+            "./curve-transfer-sweep$ext" sweep \
+              --request montgomery-transfer-sweep-request.json \
+              --registry docs/curves/registry.json \
+              --output montgomery-transfer-sweep-smoke.json
+            "./curve-transfer-sweep$ext" verify \
+              --input montgomery-transfer-sweep-smoke.json \
+              --registry docs/curves/registry.json \
+              --output montgomery-transfer-sweep-verify-smoke.json
+            node -e 'const fs=require("fs"); const s=JSON.parse(fs.readFileSync("montgomery-transfer-sweep-smoke.json")); const v=JSON.parse(fs.readFileSync("montgomery-transfer-sweep-verify-smoke.json")); const c=s.candidates&&s.candidates[0], st=c&&c.statuses; if(s.record_state!=="bounded_search_result"||s.resolved_target.model.form!=="B*y^2=x^3+A*x^2+x"||s.summary.parameter_points_attempted!==1||s.summary.verified_candidates!==1||c.family!=="prime_quadratic_pullback_v1"||st.explicit_construction!=="verified"||st.transfer_runtime_constructor!=="runtime_transfer_constructor_replayed"||st.jacobian_arithmetic!=="strict_proof_split_sextic_backend_available_not_replayed_by_sweep"||st.arbitrary_class_pushforward!=="runtime_constructor_replayed_operations_not_replayed_by_sweep"||st.composition_identities!=="runtime_constructor_replayed_operations_not_replayed_by_sweep"||v.status!=="verified"||v.candidate_count!==1) process.exit(1);'
+            printf '%s\n' \
               '{"schema":"hyperelliptic-transfer-operation/v1","model":{"a":"0x0","b":"0x1","field":"f2m-7-e1a6f45a","form":"y^2+xy=x^3+a*x^2+b","modulus":"0x83","v":"1"},"operation":"pull_push_composition_certificate","point":{"kind":"affine","x":"0x0","y":"0x1"}}' \
               | "./hyperelliptic-cover$ext" transfer --input - > transfer-smoke.json
             node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("transfer-smoke.json")); if(r.status!=="ok"||r.result.context.field_degree!==7||r.result.context.map_degree!==3||r.result.result.identity_holds!==true) process.exit(1);'
@@ -461,6 +473,11 @@ jobs:
               '{"schema":"hyperelliptic-transfer-operation/v1","model":{"v":"1","form":"y^2=x^3+a*x+b","p":"5","field":"fp-5","a":"0","b":"1"},"operation":"pull_push_composition_certificate","point":{"kind":"affine","x":"0","y":"1"}}' \
               | "./hyperelliptic-cover$ext" transfer --input - > odd-transfer-smoke.json
             node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("odd-transfer-smoke.json")); if(r.status!=="ok"||r.result.context.map_degree!==2||r.result.result.identity_holds!==true) process.exit(1);'
+            printf '%s\n' \
+              '{"schema":"hyperelliptic-transfer-operation/v1","model":{"v":"1","form":"B*y^2=x^3+A*x^2+x","p":"11","field":"fp-11","A":"3","B":"1"},"operation":"pull_push_composition_certificate","point":{"kind":"affine","x":"10","y":"1"}}' \
+              | "./hyperelliptic-cover$ext" transfer --input - \
+              > montgomery-transfer-smoke.json
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("montgomery-transfer-smoke.json")); const c=r.result&&r.result.context, q=r.result&&r.result.result; if(r.status!=="ok"||c.family!=="normalized_prime_quadratic_pullback_v1_split_sextic_balanced_montgomery"||c.target_model.form!=="B*y^2=x^3+A*x^2+x"||!c.coordinate_scope.includes("original Montgomery coordinates")||c.map.composed.x!=="0x1*(u^2+0x0)-0x1"||c.map.composed.y!=="0x1*v"||q.identity_holds!==true||q.input.kind!=="affine"||q.input.x!=="0xa"||q.input.y!=="0x1"||q.pullback.u.join(",")!=="0x0,0x0,0x1"||q.pushforward.kind!=="affine"||q.pushforward.x!=="0x0"||q.pushforward.y!=="0x0"||q.twice_input.kind!=="affine"||q.twice_input.x!=="0x0"||q.twice_input.y!=="0x0") process.exit(1);'
             if printf '%s\n' \
               '{"schema":"hyperelliptic-transfer-operation/v1","model":{"a":"0x0","b":"0x1","field":"f2m-7-e1a6f45a","form":"y^2+xy=x^3+a*x^2+b","modulus":"0x83","v":"1"},"operation":"pushforward","divisor":{"u":[],"v":[]}}' \
               | "./hyperelliptic-cover$ext" transfer --input - > malformed-divisor-smoke.json; then
@@ -473,8 +490,12 @@ jobs:
                curve-cover-check-smoke.json binary-transfer-sweep-request.json \
                binary-transfer-sweep-smoke.json binary-transfer-sweep-verify-smoke.json \
                odd-transfer-sweep-request.json odd-transfer-sweep-smoke.json \
-               odd-transfer-sweep-verify-smoke.json transfer-smoke.json \
+               odd-transfer-sweep-verify-smoke.json \
+               montgomery-transfer-sweep-request.json \
+               montgomery-transfer-sweep-smoke.json \
+               montgomery-transfer-sweep-verify-smoke.json transfer-smoke.json \
                binary-generated-subgroup-smoke.json odd-transfer-smoke.json \
+               montgomery-transfer-smoke.json \
                malformed-divisor-smoke.json transfer-catalog-replay.json \
                odd-transfer-catalog-replay.json odd-transfer-source-replay.json \
                transfer-capabilities-smoke.json

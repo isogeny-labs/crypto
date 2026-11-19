@@ -13,7 +13,8 @@ mod models;
 
 use clap::{Parser, Subcommand};
 use crypto_lib::prime_hyperelliptic::{
-    prime_proof_evidence, prime_proof_status, PrimeProofStatus, PrimeQuadraticCoverP,
+    prime_proof_evidence, prime_proof_status, PrimeMontgomeryQuadraticCoverP, PrimeProofStatus,
+    PrimeQuadraticCoverP,
 };
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
@@ -106,11 +107,15 @@ fn capabilities() -> Value {
                 "field_scope": "odd_prime_or_declared_extension_geometry",
                 "map_degree": 2,
                 "construction": "explicit_equations_and_map",
-                "jacobian_arithmetic": "implemented_for_checked_direct_prime_models",
-                "induced_maps": "implemented_for_checked_direct_short_weierstrass_targets",
+                "jacobian_arithmetic": "implemented_for_checked_direct_prime_and_montgomery_normalized_models",
+                "induced_maps": "implemented_for_checked_direct_short_weierstrass_and_projective_montgomery_targets",
                 "subgroup_evidence": "not_verified_by_sweep",
                 "implementation": "src/prime_hyperelliptic/cover_transfer.rs",
-                "limits": "normalized targets, extension arithmetic, and primes outside the accepted proof range remain structured unsupported cases",
+                "implementation_paths": [
+                    "src/prime_hyperelliptic/cover_transfer.rs",
+                    "src/prime_hyperelliptic/normalized_cover_transfer.rs"
+                ],
+                "limits": "Edwards exceptional-point adapters, extension arithmetic, and primes outside the accepted proof range remain structured unsupported cases",
             },
             {
                 "id": "prime_bielliptic_genus2_atlas_v1",
@@ -558,11 +563,17 @@ fn candidate(
     let (source_identity, map_identity) = source_and_map_identities(target, certificate);
     let binary = family == SweepFamily::BinaryCubicPullbackV1;
     let normalized_target = model.normalization.is_some();
+    let normalization_kind = model
+        .normalization
+        .as_ref()
+        .and_then(|map| map["kind"].as_str());
+    let montgomery_target = normalization_kind == Some("montgomery_from_short");
+    let unsupported_normalized_target = normalized_target && !montgomery_target;
     let (prime_proof, transfer_runtime_constructor) = match &model.field {
         checker::Field::Prime(p) => {
             let evidence = serde_json::to_value(prime_proof_evidence(p))
                 .map_err(|error| format!("serialize prime proof: {error}"))?;
-            let status = if normalized_target {
+            let status = if unsupported_normalized_target {
                 "unsupported_normalized_target_transfer_backend"
             } else if matches!(
                 prime_proof_status(p),
@@ -576,14 +587,49 @@ fn candidate(
                 {
                     return Err("verified prime candidate has an unexpected coordinate map".into());
                 }
-                let runtime = PrimeQuadraticCoverP::try_new(
-                    p.clone(),
-                    model.a.clone(),
-                    model.b.clone(),
-                    coordinate_map[0].clone(),
-                )
-                .map_err(|error| format!("runtime prime transfer construction: {error}"))?;
-                if encoded(runtime.source_curve().f.coeffs.clone()) != certificate.f {
+                let runtime_source = if let Some(normalization) = &model.normalization {
+                    let read = |name: &str| -> Result<BigUint, String> {
+                        normalization[name]
+                            .as_str()
+                            .ok_or_else(|| format!("normalized map is missing `{name}`"))
+                            .and_then(checker::number)
+                    };
+                    let runtime = PrimeMontgomeryQuadraticCoverP::try_new(
+                        p.clone(),
+                        read("montgomery_A")?,
+                        read("montgomery_B")?,
+                        coordinate_map[0].clone(),
+                    )
+                    .map_err(|error| {
+                        format!("runtime normalized Montgomery construction: {error}")
+                    })?;
+                    if runtime.adapter().short_a() != &model.a
+                        || runtime.adapter().short_b() != &model.b
+                        || normalization["shift_A_over_3"]
+                            .as_str()
+                            .and_then(|value| checker::number(value).ok())
+                            .as_ref()
+                            != Some(runtime.adapter().shift_a_over_3())
+                    {
+                        return Err(
+                            "normalized Montgomery metadata differs from the typed adapter".into(),
+                        );
+                    }
+                    runtime.source_curve().f.coeffs.clone()
+                } else {
+                    PrimeQuadraticCoverP::try_new(
+                        p.clone(),
+                        model.a.clone(),
+                        model.b.clone(),
+                        coordinate_map[0].clone(),
+                    )
+                    .map_err(|error| format!("runtime prime transfer construction: {error}"))?
+                    .source_curve()
+                    .f
+                    .coeffs
+                    .clone()
+                };
+                if encoded(runtime_source) != certificate.f {
                     return Err(
                         "runtime prime transfer source differs from the verified family certificate"
                             .into(),
@@ -604,10 +650,10 @@ fn candidate(
             "unsupported_odd_extension_field_transfer_backend",
         ),
     };
-    let proved_direct_prime = matches!(
+    let proved_runtime_prime = matches!(
         &model.field,
         checker::Field::Prime(p)
-            if !normalized_target
+            if !unsupported_normalized_target
                 && matches!(
                     prime_proof_status(p),
                     PrimeProofStatus::ProvedU64 | PrimeProofStatus::ProvedPsi13
@@ -628,10 +674,10 @@ fn candidate(
     };
     let arbitrary_class_pushforward = match &model.field {
         checker::Field::Binary(_) => "implemented_in_library_not_replayed_by_this_sweep",
-        checker::Field::Prime(_) if normalized_target => {
+        checker::Field::Prime(_) if unsupported_normalized_target => {
             "unsupported_normalized_target_transfer_backend"
         }
-        checker::Field::Prime(_) if proved_direct_prime => {
+        checker::Field::Prime(_) if proved_runtime_prime => {
             "runtime_constructor_replayed_operations_not_replayed_by_sweep"
         }
         checker::Field::Prime(p) if p <= &BigUint::from(3u32) => {
@@ -677,9 +723,9 @@ fn candidate(
             "arbitrary_class_pushforward": arbitrary_class_pushforward,
             "composition_identities": if binary {
                 "implemented_in_library_not_replayed_by_this_sweep"
-            } else if normalized_target {
+            } else if unsupported_normalized_target {
                 "unsupported_normalized_target_transfer_backend"
-            } else if proved_direct_prime {
+            } else if proved_runtime_prime {
                 "runtime_constructor_replayed_operations_not_replayed_by_sweep"
             } else if matches!(&model.field, checker::Field::Prime(_)) {
                 "unsupported_without_primality_certificate"
@@ -1073,7 +1119,7 @@ mod tests {
     }
 
     #[test]
-    fn normalized_target_keeps_geometry_and_transfer_statuses_separate() {
+    fn montgomery_normalized_target_replays_the_composed_constructor() {
         let model = json!({
             "v":"1", "form":"B*y^2=x^3+A*x^2+x", "p":"11",
             "field":"fp-11", "A":"3", "B":"1"
@@ -1094,11 +1140,57 @@ mod tests {
         );
         assert_eq!(
             result["candidates"][0]["statuses"]["arbitrary_class_pushforward"],
+            "runtime_constructor_replayed_operations_not_replayed_by_sweep"
+        );
+        assert_eq!(
+            result["candidates"][0]["statuses"]["composition_identities"],
+            "runtime_constructor_replayed_operations_not_replayed_by_sweep"
+        );
+        assert_eq!(
+            result["candidates"][0]["statuses"]["transfer_runtime_constructor"],
+            "runtime_transfer_constructor_replayed"
+        );
+    }
+
+    #[test]
+    fn edwards_normalized_target_keeps_the_projective_backend_gap_explicit() {
+        let model = json!({
+            "v":"1", "form":"a*x^2+y^2=1+d*x^2*y^2", "p":"11",
+            "field":"fp-11", "a":"1", "d":"2"
+        });
+        let result = sweep(
+            request(model, SweepFamily::PrimeQuadraticPullbackV1, 0, 0),
+            &empty_registry(),
+        )
+        .unwrap();
+        assert_eq!(result["summary"]["verified_candidates"], 1);
+        assert_eq!(
+            result["candidates"][0]["statuses"]["transfer_runtime_constructor"],
             "unsupported_normalized_target_transfer_backend"
         );
         assert_eq!(
             result["candidates"][0]["statuses"]["composition_identities"],
             "unsupported_normalized_target_transfer_backend"
+        );
+    }
+
+    #[test]
+    fn wide_montgomery_target_reports_the_proof_gate_not_a_missing_backend() {
+        let model = json!({
+            "v":"1", "form":"B*y^2=x^3+A*x^2+x",
+            "p":"3317044064679887385962123",
+            "field":"fp-3317044064679887385962123", "A":"3", "B":"1"
+        });
+        let mut request = request(model, SweepFamily::PrimeQuadraticPullbackV1, 0, 0);
+        request.bounds.max_field_bits = 82;
+        let result = sweep(request, &empty_registry()).unwrap();
+        assert_eq!(
+            result["candidates"][0]["statuses"]["transfer_runtime_constructor"],
+            "unsupported_without_primality_certificate"
+        );
+        assert_eq!(
+            result["candidates"][0]["statuses"]["composition_identities"],
+            "unsupported_without_primality_certificate"
         );
     }
 

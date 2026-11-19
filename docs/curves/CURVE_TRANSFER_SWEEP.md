@@ -94,17 +94,19 @@ The current odd-characteristic cover has two rational points at infinity. The
 separate balanced backend handles monic split sextics over deterministically
 proved prime fields in the complete `u64` domain and below the strict
 Sorenson--Webster `psi_13` bound, but this sweeper does not replay group
-operations. For direct short-Weierstrass candidates in that boundary it now
-instantiates the runtime transfer object and compares its source sextic with
-the family certificate; arbitrary-class operations and composition identities
-remain implemented-but-not-replayed by the sweep. Odd extension fields,
-normalized targets, and primes without a deterministic proof remain explicitly
-unsupported by the induced-map backend. A geometric cover
-candidate is not promoted to subgroup transfer or solver evidence. For a
-normalized target, source balanced arithmetic may still be available, while
-pushforward and composition are recorded as
-`unsupported_normalized_target_transfer_backend` rather than being inferred
-from the normalized short-Weierstrass field alone.
+operations. For direct short-Weierstrass and Montgomery-normalized candidates
+in that boundary it now instantiates the runtime transfer object and compares
+its source sextic with the family certificate; arbitrary-class operations and
+composition identities remain implemented-but-not-replayed by the sweep. The
+Montgomery path uses an everywhere-defined projective isomorphism and never
+reinterprets original target coordinates as short-Weierstrass coordinates.
+Odd extension fields, Edwards exceptional-point charts, and primes without a
+deterministic proof remain explicitly unsupported by the induced-map backend.
+A geometric cover candidate is not promoted to subgroup transfer or solver
+evidence. For a Montgomery target outside the proof boundary, the primary
+disposition is `unsupported_without_primality_certificate`; an Edwards target
+retains `unsupported_normalized_target_transfer_backend`. Source balanced
+arithmetic alone never promotes either case.
 
 The command rejects a search whose parameter count exceeds `max_attempts`;
 it never returns a silently truncated prefix. Incompatible families and

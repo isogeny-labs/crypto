@@ -368,17 +368,20 @@ equality, negation, addition, and scalar multiplication. Reference enumeration
 is separately capped at `p<=31`; ordinary arithmetic is not an enumeration.
 
 The same balanced representation now supports the induced maps for a direct
-short-Weierstrass prime-field cover. The checked formulas implement pullback,
+short-Weierstrass prime-field cover and for its checked projective composition
+with a Montgomery target model. The checked formulas implement pullback,
 arbitrary-class pushforward, the deck action, and both compositions
 `pi_* pi^*=[2]` and `pi^* pi_*=1+deck_*`. This map implementation has the same
 strict deterministic prime-proof boundary as balanced arithmetic: the
 complete `u64` witness set, plus the first sixteen prime bases through 53
 under the exclusive Sorenson--Webster bound
-`3317044064679887385961981`. It does not extend the map support to normalized target models or
-extension fields. A normalized target therefore returns
-`unsupported_normalized_target_transfer_backend` before parsing a point or
-divisor as short-Weierstrass coordinates; source-Jacobian arithmetic on the
-verified normalized cover remains a separate supported operation.
+`3317044064679887385961981`. A Montgomery request inside that boundary parses
+points only in the original Montgomery coordinates and conjugates both maps
+through the checked degree-one isomorphism. Edwards normalization still
+returns `unsupported_normalized_target_transfer_backend` before parsing a
+point, because its rational charts need typed projective exceptional-point
+handling. Extension fields remain unsupported for balanced arithmetic and
+induced maps.
 [pcc:unverified]
 
 Odd extension fields return structured `unsupported_extension_field`.
@@ -503,13 +506,14 @@ source-Jacobian implementation. It implements no general source-Jacobian
 reduction or arbitrary-class transfer, and those five rows have no named EC1
 binding; the other 1,400 odd-extension rows remain structured unsupported.
 
-The Montgomery-to-short projective isomorphism is now a checked typed module
-with exhaustive tests over `p=5,7,11`, including infinity and an independent
-group law. It is model-isomorphism infrastructure only: it is not yet composed
-end to end with the quadratic-cover transfer API, and all six live Montgomery
-normalizations have moduli outside the accepted deterministic prime-proof
-range. Edwards normalization remains geometry-only. No normalized live row is
-promoted by these facts.
+The Montgomery-to-short projective isomorphism is a checked typed module with
+exhaustive adapter tests over `p=5,7,11`, including infinity and an independent
+group law. It is now composed end to end with the quadratic-cover transfer
+API. A complete `p=7` fixture checks all 12 target points and all 72 balanced
+classes, both compositions, and pullback/pushforward additivity. All six live
+Montgomery normalizations have moduli outside the accepted deterministic
+prime-proof range, so no normalized live row is promoted. Edwards
+normalization remains geometry-only.
 
 `pushforward_arbitrary_jacobian_class` handles every valid reduced class of
 support degree at most three on the supplied checked binary model. It factors
@@ -637,11 +641,15 @@ Its deterministic proof boundary covers 20,539 live direct-prime maps and 675
 linked EC1 records, including the two 73-bit rows at
 `p=5902977611310272157103`. The other 269 wide-direct maps and 234 bindings,
 normalized targets, and extensions do not receive direct-backend support: the
-canonical odd corpus classifies 233 bindings as proof-range unsupported and
-one as invalid target-generator data. The widened live catalog support is
-therefore exactly a two-row pilot under the strict exclusive `psi_13` proof
-bound, not a general wide-prime claim. Numeric exact-order evidence remains a
-separate per-record field.
+current canonical odd corpus classifies 233 bindings as proof-range
+unsupported, 22 as normalized-backend unsupported, 9 as extension-backend
+unsupported, and one as invalid target-generator data. The standalone command and sweeper now distinguish the
+seven Montgomery bindings' proof gap from the fifteen Edwards bindings'
+backend gap, but the catalog exporter and corpus have not yet been regenerated
+with that split. The widened live catalog support is therefore exactly a
+two-row pilot under the strict exclusive `psi_13` proof bound, not a general
+wide-prime claim. Numeric exact-order evidence remains a separate per-record
+field.
 The supplied traits file is recorded as advisory provenance and cannot
 promote that field. The exporter records non-`unknown` evidence only from its
 bounded deterministic small-prime check; the named-subgroup certificate

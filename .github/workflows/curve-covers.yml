@@ -22,6 +22,7 @@ on:
       - 'tests/binary_cover_transfer_oracle.rs'
       - 'tests/prime_cover_transfer_oracle.rs'
       - 'tests/prime_montgomery_transfer_adapter.rs'
+      - 'tests/prime_montgomery_composed_transfer.rs'
       - 'examples/cover_catalog_transition_audit.rs'
       - 'src/bin/ecdlp_audit.rs'
       - 'src/bin/ecdlp_audit/**'
@@ -158,6 +159,7 @@ jobs:
           cargo test --release --bin odd-transfer-catalog -- --test-threads=1
           cargo test --release --bin odd_extension_transfer_pilot -- --test-threads=1
           cargo test --release --test prime_montgomery_transfer_adapter -- --test-threads=1
+          cargo test --release --test prime_montgomery_composed_transfer -- --test-threads=1
           cargo test --release --test binary_cover_transfer_oracle -- --nocapture --test-threads=1
           set +e
           cargo run --release --bin odd-transfer-catalog -- verify \
@@ -321,6 +323,8 @@ jobs:
           df -h .
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 0
+          filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /research/cover_transfer_assessment_20261013/lean/**

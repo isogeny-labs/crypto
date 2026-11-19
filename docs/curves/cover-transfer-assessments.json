@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "093170c89d82fc53ed563bd62509c1a5547524e071bd0e0c228a7d2998812918",
+      "sha256": "e448d93c9fe811ef7201876b360f87a0355e21b9a201321b2ae7d914e0606485",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -141,7 +141,7 @@
     },
     {
       "path": "src/bin/hyperelliptic_cover.rs",
-      "sha256": "548387a07a6af005df33a7fa274e57ae3e757d0c6e81c8c35d3b60cc71c64e8b",
+      "sha256": "7721374da2b7cc12a7b8d4bf996437c4fdae744af6ca8c47ecd4d2b6aeebdb39",
       "role": "standalone construction, arithmetic, transfer, and catalog command plus native binary subgroup batch certificate",
       "freshness": {
         "status": "supported",
@@ -155,7 +155,7 @@
     },
     {
       "path": "src/bin/curve_transfer_sweep.rs",
-      "sha256": "28bca329b407141b0227f69120d62691b54622d91736173af15cc23e587002e0",
+      "sha256": "f07e7c22fccfb485f64433b4001c6561c1df67127719a35c34238a04f009b9da",
       "role": "parameter sweeper and runtime-constructor cross-check",
       "freshness": {
         "status": "supported",
@@ -274,7 +274,7 @@
     },
     {
       "path": "src/prime_hyperelliptic/cover_transfer.rs",
-      "sha256": "4ac06190059262ab96b9ebc80f84ee27a3d9a660d8b4e05186ea7c8c5362724e",
+      "sha256": "10bb0b0fd2c35b8fafb9e5570c01c5ff597f43a71bdac49a9b9f7e51ad5093a4",
       "role": "checked direct-prime quadratic-cover pullback, arbitrary-class pushforward, and composition certificates",
       "freshness": {
         "status": "supported",
@@ -282,6 +282,58 @@
         "rationale": "The implementation supplies pi^*, pi_*, pi_*pi^*=[2], and pi^*pi_*=1+deck_* on their validated domains. It excludes extension fields, normalized Montgomery/Edwards coordinates, exact subgroup-order proofs, and any solver claim.",
         "evidence_refs": [
           "src/prime_hyperelliptic/cover_transfer.rs"
+        ]
+      }
+    },
+    {
+      "path": "src/prime_hyperelliptic/model_transfer.rs",
+      "sha256": "cf8d723a0aadd9a4bbdcd2dd56e581ee4bdc0253513d6da9deba95fc5f67ec50",
+      "role": "checked projective Montgomery/short-Weierstrass target-model isomorphism",
+      "freshness": {
+        "status": "supported",
+        "scope": "smooth Montgomery prime-field targets admitted by the shared deterministic proof gate",
+        "rationale": "The implementation validates both models, every projective point map, and the degree-one inverse identities. Edwards affine charts and their exceptional points remain outside this adapter.",
+        "evidence_refs": [
+          "src/prime_hyperelliptic/model_transfer.rs"
+        ]
+      }
+    },
+    {
+      "path": "src/prime_hyperelliptic/normalized_cover_transfer.rs",
+      "sha256": "35f81b57d72b4f12e1c14a2392e2510982ca9225843117798c0f1e80d16a571a",
+      "role": "typed composition of the quadratic cover with the projective Montgomery target isomorphism",
+      "freshness": {
+        "status": "supported",
+        "scope": "Montgomery prime-field covers admitted by the shared deterministic proof gate, with original-coordinate target inputs and outputs",
+        "rationale": "The implementation supplies target arithmetic, pi^*, pi_*, pi_*pi^*=[2], and pi^*pi_*=1+deck_* after the degree-one model change. Its bounded F7 fixtures do not establish a catalog-wide independent oracle, exact subgroup orders, solver integration, scaling, or advantage.",
+        "evidence_refs": [
+          "src/prime_hyperelliptic/normalized_cover_transfer.rs"
+        ]
+      }
+    },
+    {
+      "path": "tests/prime_montgomery_transfer_adapter.rs",
+      "sha256": "c426d54d49a3d8655c447a22225492897e8c9e888a4c581ce5646d047e920efd",
+      "role": "bounded projective Montgomery adapter differential and malformed-input controls",
+      "freshness": {
+        "status": "supported",
+        "scope": "all smooth Montgomery parameter choices over p=5,7,11 for projective-map bijections and one complete p=11,A=3,B=2 independent group-law comparison",
+        "rationale": "The test is bounded adapter evidence. It does not exercise the genus-two cover, live wide-prime rows, Edwards exceptional points, a solver, or computational advantage.",
+        "evidence_refs": [
+          "tests/prime_montgomery_transfer_adapter.rs"
+        ]
+      }
+    },
+    {
+      "path": "tests/prime_montgomery_composed_transfer.rs",
+      "sha256": "d765f63a062224c471546a43330d0100bf1a36be6b5e02fbc98a6cc5a5cfb6ce",
+      "role": "public-API exhaustive F7 Montgomery cover-composition control",
+      "freshness": {
+        "status": "supported",
+        "scope": "the p=7,A=3,B=1,c=0 fixture with 12 target points and 72 balanced source classes",
+        "rationale": "The test exhausts pullback and pushforward homomorphism pairs and both compositions through the public API. It reuses production arithmetic and is therefore not an independent divisor-map oracle or catalog-wide result.",
+        "evidence_refs": [
+          "tests/prime_montgomery_composed_transfer.rs"
         ]
       }
     },
@@ -313,7 +365,7 @@
     },
     {
       "path": ".github/workflows/curve-covers.yml",
-      "sha256": "ab70300d5661a5749b0a2566983097e36cfa88eab3095526edc276c5dd4936b9",
+      "sha256": "488c0232e1c8b5cdee61b164e71b8e0b95485cd987c1855e91a2d182c7d663b6",
       "role": "exact implementation-version dependency: .github/workflows/curve-covers.yml",
       "freshness": {
         "status": "supported",
@@ -326,7 +378,7 @@
     },
     {
       "path": ".github/workflows/release.yml",
-      "sha256": "4aac1931c3ae490aaad15b3a474a3f91c5f2d8e9fb6c10550beec22e0aadf44b",
+      "sha256": "135fb29d796934abe56bf24454a6526a7486c5b8f39273b9e07323a158f30f81",
       "role": "exact implementation-version dependency: .github/workflows/release.yml",
       "freshness": {
         "status": "supported",
@@ -456,7 +508,7 @@
     },
     {
       "path": "src/prime_hyperelliptic/mod.rs",
-      "sha256": "c87c2681b51c052582e3f1389b9bcd58c5ca38797c58e6a8914459cef21b0ffd",
+      "sha256": "e199bbc9bd33e6df119f4f71a153737f7bdf6e1da3303fc702f6347a4a8e6766",
       "role": "exact implementation-version dependency: src/prime_hyperelliptic/mod.rs",
       "freshness": {
         "status": "supported",
@@ -551,7 +603,7 @@
     },
     {
       "path": "docs/curves/COVERS.md",
-      "sha256": "2cecbfbeb967427f7389a68644c58078096342384cb91e56423f91f7164b8397",
+      "sha256": "361e6fe056b452fafdf48c547c67485fcfd8045e12ed81e39bae8371798eb74d",
       "role": "catalog geometry contract and proof boundary",
       "freshness": {
         "status": "supported",
@@ -564,7 +616,7 @@
     },
     {
       "path": "docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md",
-      "sha256": "664d20417aa9443db66be445673a7309ca81436967d52c27e40654eb63c6aabf",
+      "sha256": "a75e002bf757a52f43441d03de3a54f02cf05e668f2597c819784642c26a7533",
       "role": "standalone CLI and supported-model documentation",
       "freshness": {
         "status": "supported",

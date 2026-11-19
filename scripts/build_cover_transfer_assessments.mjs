@@ -1339,6 +1339,46 @@ async function buildSourceArtifacts() {
         ["src/prime_hyperelliptic/cover_transfer.rs"],
       ),
     ),
+    sourceArtifact(
+      "src/prime_hyperelliptic/model_transfer.rs",
+      "checked projective Montgomery/short-Weierstrass target-model isomorphism",
+      freshness(
+        "supported",
+        "smooth Montgomery prime-field targets admitted by the shared deterministic proof gate",
+        "The implementation validates both models, every projective point map, and the degree-one inverse identities. Edwards affine charts and their exceptional points remain outside this adapter.",
+        ["src/prime_hyperelliptic/model_transfer.rs"],
+      ),
+    ),
+    sourceArtifact(
+      "src/prime_hyperelliptic/normalized_cover_transfer.rs",
+      "typed composition of the quadratic cover with the projective Montgomery target isomorphism",
+      freshness(
+        "supported",
+        "Montgomery prime-field covers admitted by the shared deterministic proof gate, with original-coordinate target inputs and outputs",
+        "The implementation supplies target arithmetic, pi^*, pi_*, pi_*pi^*=[2], and pi^*pi_*=1+deck_* after the degree-one model change. Its bounded F7 fixtures do not establish a catalog-wide independent oracle, exact subgroup orders, solver integration, scaling, or advantage.",
+        ["src/prime_hyperelliptic/normalized_cover_transfer.rs"],
+      ),
+    ),
+    sourceArtifact(
+      "tests/prime_montgomery_transfer_adapter.rs",
+      "bounded projective Montgomery adapter differential and malformed-input controls",
+      freshness(
+        "supported",
+        "all smooth Montgomery parameter choices over p=5,7,11 for projective-map bijections and one complete p=11,A=3,B=2 independent group-law comparison",
+        "The test is bounded adapter evidence. It does not exercise the genus-two cover, live wide-prime rows, Edwards exceptional points, a solver, or computational advantage.",
+        ["tests/prime_montgomery_transfer_adapter.rs"],
+      ),
+    ),
+    sourceArtifact(
+      "tests/prime_montgomery_composed_transfer.rs",
+      "public-API exhaustive F7 Montgomery cover-composition control",
+      freshness(
+        "supported",
+        "the p=7,A=3,B=1,c=0 fixture with 12 target points and 72 balanced source classes",
+        "The test exhausts pullback and pushforward homomorphism pairs and both compositions through the public API. It reuses production arithmetic and is therefore not an independent divisor-map oracle or catalog-wide result.",
+        ["tests/prime_montgomery_composed_transfer.rs"],
+      ),
+    ),
     ...IMPLEMENTATION_VERSION_PATHS.map(implementationVersionArtifact),
     sourceArtifact(
       "research/hyperelliptic_cover_infrastructure_20261006/evidence.json",

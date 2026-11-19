@@ -19,18 +19,22 @@ annihilator is itself proved prime. For such a row the exporter checks:
 
 Prime-field rows outside the accepted deterministic primality-proof range,
 exact-order subgroups whose trivial degree-two kernel intersection is not
-certified by coprimality, normalized targets not composed with the transfer backend,
-extension-field rows without a general balanced-Jacobian backend, invalid
+certified by coprimality, Edwards targets without an exceptional-point-safe
+projective adapter, extension-field rows without a general balanced-Jacobian backend, invalid
 catalog data, and transfer-arithmetic failures have distinct statuses. An
 unsupported proof range is not a failed generator, and a failed generator is
-never silently downgraded to unsupported.
+never silently downgraded to unsupported. The tracked corpus predates the
+composed Montgomery backend and therefore retains all 22 normalized bindings
+under its immutable backend-unsupported status. A successor export will move
+the seven Montgomery bindings to the proof-range status because their fields
+are outside the accepted proof boundary; the other fifteen are Edwards rows.
 
 | Record status | Meaning |
 |---|---|
 | `supported_on_named_generated_subgroup` | The concrete generator, exact prime order, pullback, pushforward, composition, and recovery checks passed. |
 | `unsupported_without_primality_certificate` | The field or declared order is outside the accepted deterministic proof range. |
 | `unsupported_kernel_intersection` | The declared prime order annihilates the nonidentity generator, but coprimality with degree two does not certify a trivial kernel intersection. |
-| `unsupported_normalized_target_transfer_backend` | The target generator was preflighted, but the normalization adapter is not composed with transfer. |
+| `unsupported_normalized_target_transfer_backend` | The target generator was preflighted, but its normalized target family has no checked projective transfer backend. In the immutable pre-composition corpus this also includes seven Montgomery bindings; successor exports reserve it for the fifteen Edwards bindings. |
 | `unsupported_odd_extension_field_transfer_backend` | The catalog-basis generator was preflighted, but general extension-field transfer is absent. |
 | `failed_invalid_target_generator` | The encoded generator is malformed, noncanonical, the identity, or off the linked target. |
 | `failed_invalid_named_subgroup_data` | A field/model/order binding or annihilation claim is invalid. |

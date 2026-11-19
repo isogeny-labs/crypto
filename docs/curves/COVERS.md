@@ -179,11 +179,12 @@ identities before comparing with production. That exact tiny-field fixture is
 additional independent evidence rather than the basis for the 486-class
 result.
 The bounded balanced backend handles direct short-Weierstrass quadratic-cover
-maps over deterministically proved prime fields in the complete `u64` domain
-and below the strict Sorenson--Webster `psi_13` bound. It
-implements arbitrary balanced-class pushforward, pullback, the deck action,
-and both degree-two composition identities. Normalized targets, extension
-fields, moduli without a deterministic proof, solver evidence, and every
+maps, and their checked projective Montgomery compositions, over
+deterministically proved prime fields in the complete `u64` domain and below
+the strict Sorenson--Webster `psi_13` bound. It implements arbitrary
+balanced-class pushforward, pullback, the deck action, and both degree-two
+composition identities. Edwards exceptional-point charts, extension fields,
+moduli without a deterministic proof, solver evidence, and every
 computational-advantage claim remain unsupported or unassessed as applicable.
 
 The Rust tests enumerate all affine cover points on every nonsingular
@@ -234,14 +235,19 @@ that map. Genus two and degree two are preserved. Small-field tests exhaust
 all nonsingular parameter choices in characteristics 5, 7 and 11 and verify
 the forward equations and inverse identities wherever affine formulas apply.
 
-The transfer library now also has a typed, everywhere-defined projective
-Montgomery/short-Weierstrass isomorphism and independently checks that it
-commutes with the group law over `p=5,7,11`. This does not yet compose the
-normalization with the genus-two pullback/pushforward API. Moreover, the six
-live Montgomery-normalized rows lie outside the accepted deterministic
-prime-proof range, so all six remain unsupported for transfer. The Edwards
-charts likewise remain geometry evidence rather than an end-to-end induced
-map implementation.
+The transfer library now has a typed, everywhere-defined projective
+Montgomery/short-Weierstrass isomorphism and composes it with the genus-two
+pullback/pushforward API. Adapter tests exhaust point and projective-map
+bijections for every smooth parameter choice over `p=5,7,11`, and an
+independently coded group law checks one complete `p=11`, `A=3`, `B=2` model.
+A complete composed `p=7` fixture checks all 12 Montgomery points, all 72
+balanced classes, both compositions, and both homomorphism laws. The
+standalone transfer command consumes and returns original
+Montgomery coordinates, while the sweeper replays the composed constructor.
+The six live Montgomery-normalized maps (seven named bindings) are all
+outside the accepted deterministic prime-proof range, so this adds no live
+supported binding. The Edwards charts likewise remain geometry evidence
+rather than an end-to-end induced-map implementation.
 
 The [standards importer](standards/README.md) expands the inventory, while
 [`cover-links.yaml`](cover-links.yaml) supplies exact ICV1/EC1/HC1/CV1 links.
