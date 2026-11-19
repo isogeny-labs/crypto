@@ -930,3 +930,18 @@ The pinned build completed with 2,189 jobs; the proof gate reports
 and the fresh checker exits 0. The concrete affine fibre counts remain an
 external curve-specific premise. Claim `PCC-20261119-4e2d4b` passes its local
 Lean verifier. [pcc:unverified]
+
+## 2026-11-19 exact finite rejection sampling
+
+The one-trial interface `Seed -> Option Output` now has checked double-counting
+and retry laws. `rejectionSamplerWeight_sum` partitions accepted seeds by
+output; equal fibres give the exact accepted cardinality and exact pair-event
+weight. `uniqueAcceptedSeedWeight_eq_one` reduces singleton fibres to a
+successful encoder law and uniqueness of every accepted seed. The geometric
+retry tail sums exactly to `total / accepted`, and a `1/cap` success density
+bounds this expectation by `cap`. [pcc:unverified]
+
+The pinned build completed with 2,189 jobs; the proof gate reports
+`PASS 117 thm 0 trusted`, all six audited public laws use only standard Lean
+axioms, and the fresh checker exits 0. The concrete signed-x decoder and Hasse
+cardinality specialization are not claimed. [pcc:unverified]

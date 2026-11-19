@@ -528,6 +528,124 @@ theorem identityInclusiveNearUniformPairEventTransfer
     (identityInclusiveTotalUpper identity lower distortion weight
       distortionPositive baseTotalUpper)
 
+/-! ### Exact finite rejection sampling -/
+
+/-- Number of one-trial seeds accepted as a specified output. -/
+def rejectionSamplerWeight
+    {Seed Output : Type*} [Fintype Seed] [DecidableEq Output]
+    (sample : Seed → Option Output) (output : Output) : ℕ :=
+  (Finset.univ.filter fun seed => sample seed = some output).card
+
+/-- Finite set of one-trial seeds that are accepted rather than rejected. -/
+def rejectionSamplerAcceptedSeeds
+    {Seed Output : Type*} [Fintype Seed]
+    (sample : Seed → Option Output) : Finset Seed :=
+  Finset.univ.filter fun seed => (sample seed).isSome
+
+/-- Accepted one-trial seeds are partitioned exactly by their output fibres. -/
+theorem rejectionSamplerWeight_sum
+    {Seed Output : Type*} [Fintype Seed] [Fintype Output]
+    [DecidableEq Output] (sample : Seed → Option Output) :
+    (∑ output, rejectionSamplerWeight sample output) =
+      (rejectionSamplerAcceptedSeeds sample).card := by
+  classical
+  calc
+    (∑ output, rejectionSamplerWeight sample output) =
+        ∑ output, ∑ seed, if sample seed = some output then 1 else 0 := by
+      simp [rejectionSamplerWeight]
+    _ = ∑ seed, ∑ output, if sample seed = some output then 1 else 0 :=
+      Finset.sum_comm
+    _ = ∑ seed, if (sample seed).isSome then 1 else 0 := by
+      apply Finset.sum_congr rfl
+      intro seed _
+      cases h : sample seed with
+      | none => simp
+      | some output => simp
+    _ = (rejectionSamplerAcceptedSeeds sample).card := by
+      simp [rejectionSamplerAcceptedSeeds]
+
+/-- Equal accepted fibres give the exact successful-seed count. -/
+theorem uniformAcceptedFibres_card
+    {Seed Output : Type*} [Fintype Seed] [Fintype Output]
+    [DecidableEq Output] (sample : Seed → Option Output) (fibre : ℕ)
+    (uniformFibres : ∀ output, rejectionSamplerWeight sample output = fibre) :
+    (rejectionSamplerAcceptedSeeds sample).card =
+      fibre * Fintype.card Output := by
+  rw [← rejectionSamplerWeight_sum]
+  simp [uniformFibres, Nat.mul_comm]
+
+/-- With equal accepted fibres, every pair event has exactly its uniform count
+times the square of the common fibre size. -/
+theorem uniformAcceptedPairEventWeight
+    {Seed Output : Type*} [Fintype Seed] [Fintype Output]
+    [DecidableEq Output] (sample : Seed → Option Output)
+    (good : Output × Output → Prop) [DecidablePred good] (fibre : ℕ)
+    (uniformFibres : ∀ output, rejectionSamplerWeight sample output = fibre) :
+    (∑ pair : Output × Output,
+        if good pair then
+          rejectionSamplerWeight sample pair.1 *
+            rejectionSamplerWeight sample pair.2
+        else 0) =
+      fibre ^ 2 * (Finset.univ.filter good).card := by
+  rw [← Finset.sum_filter]
+  simp [uniformFibres, pow_two, Nat.mul_comm]
+
+/-- The tail-sum series for independent rejection trials is exactly
+`total / accepted`, the usual expected number of trials. -/
+theorem rejectionTrialTailHasSum
+    (total accepted : ℕ) (acceptedPositive : 0 < accepted)
+    (acceptedLeTotal : accepted ≤ total) :
+    HasSum
+      (fun failures : ℕ =>
+        (1 - (accepted : ℝ) / (total : ℝ)) ^ failures)
+      ((total : ℝ) / (accepted : ℝ)) := by
+  have totalPositive : (0 : ℝ) < total := by
+    exact_mod_cast acceptedPositive.trans_le acceptedLeTotal
+  have acceptedRealPositive : (0 : ℝ) < accepted := by exact_mod_cast acceptedPositive
+  have ratioNonnegative :
+      0 ≤ 1 - (accepted : ℝ) / (total : ℝ) := by
+    rw [sub_nonneg]
+    exact (div_le_one totalPositive).mpr (by exact_mod_cast acceptedLeTotal)
+  have ratioLtOne : 1 - (accepted : ℝ) / (total : ℝ) < 1 := by
+    have : 0 < (accepted : ℝ) / (total : ℝ) := div_pos acceptedRealPositive totalPositive
+    linarith
+  convert geometricSchedulerTailBound 1
+    (1 - (accepted : ℝ) / (total : ℝ)) ratioNonnegative ratioLtOne using 1
+  · simp
+  · rw [sub_sub_cancel]
+    field_simp
+
+/-- If every output has one specified successful encoding and no other seed
+decodes to it, then its accepted fibre has cardinality exactly one. -/
+theorem uniqueAcceptedSeedWeight_eq_one
+    {Seed Output : Type*} [Fintype Seed] [DecidableEq Seed]
+    [DecidableEq Output] (sample : Seed → Option Output) (encode : Output → Seed)
+    (sampleEncode : ∀ output, sample (encode output) = some output)
+    (acceptedUnique : ∀ seed output, sample seed = some output → seed = encode output) :
+    ∀ output, rejectionSamplerWeight sample output = 1 := by
+  intro output
+  have hfibre :
+      Finset.univ.filter (fun seed => sample seed = some output) = {encode output} := by
+    ext seed
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_singleton]
+    constructor
+    · exact acceptedUnique seed output
+    · intro hseed
+      rw [hseed]
+      exact sampleEncode output
+  rw [rejectionSamplerWeight, hfibre]
+  simp
+
+/-- A one-trial success density of at least `1/cap` bounds the expected number
+of independent rejection trials by `cap`. -/
+theorem rejectionTrialExpectation_le
+    (total accepted cap : ℕ) (acceptedPositive : 0 < accepted)
+    (totalLe : total ≤ cap * accepted) :
+    (total : ℝ) / (accepted : ℝ) ≤ cap := by
+  have acceptedRealPositive : (0 : ℝ) < accepted := by exact_mod_cast acceptedPositive
+  rw [div_le_iff₀ acceptedRealPositive]
+  exact_mod_cast totalLe
+
 /-! ## Dense fixed-arity elimination exponent -/
 
 /-- If the dense relation dimension is at most `3X` and `X^m ≤ p`, its cubic

@@ -297,6 +297,14 @@ the exact eventual natural-power inequality required by
 | `identityInclusiveWeight_total` | law | same | same | none |
 | `identityInclusiveTotalUpper` | law | same | same plus distortion | positive distortion and base total bounded by `distortion * (card - 1) * lower` |
 | `identityInclusiveNearUniformPairEventTransfer` | endpoint | same | same plus pair event | positive distortion, nonidentity fibre floor, and the base total bound |
+| `rejectionSamplerWeight` | definition | same | finite seed and output types, one-trial `Option`-valued sampler | none |
+| `rejectionSamplerAcceptedSeeds` | definition | same | finite seed type and one-trial sampler | none |
+| `rejectionSamplerWeight_sum` | law | same | same | none |
+| `uniformAcceptedFibres_card` | law | same | same plus common fibre size | every accepted output fibre has that size |
+| `uniformAcceptedPairEventWeight` | law | same | same plus pair event | every accepted output fibre has the common size |
+| `rejectionTrialTailHasSum` | law | same | natural total and accepted one-trial seed counts | positive accepted count and accepted count no larger than total |
+| `uniqueAcceptedSeedWeight_eq_one` | law | same | one-trial sampler and an encoder from outputs to seeds | decoding the encoded output succeeds; every successful decoding seed equals the encoded seed |
+| `rejectionTrialExpectation_le` | law | same | total, accepted, and cap | positive accepted count and `total <= cap * accepted` |
 
 The identity-inclusive adapter adds exactly `lower` seeds mapping to the
 distinguished identity.  Its total-size theorem derives the original
@@ -305,6 +313,17 @@ near-uniform interface from a base sampler supported on the other
 without requiring the base sampler itself to hit the identity.  Instantiating
 the base weights and their bounds with the paper's concrete affine encoding
 remains a curve-specific obligation.
+
+The rejection-sampling layer models one trial as `Seed -> Option Output`.
+It proves that the accepted-seed cardinality is the sum of the output fibre
+cardinalities, that equal nonzero fibres make the conditioned accepted output
+exactly uniform, and that every pair event receives exactly the square of the
+common fibre multiplier.  Its geometric tail theorem gives the exact expected
+trial series `total / accepted`.  For the paper's affine sampler, the remaining
+specialization must exhibit the finite `2p` signed-x seed type, the bijection
+between accepted seeds and affine points (including the half-accepted zero
+root), and the curve-cardinality lower bound used to make the expectation
+constant. [pcc:unverified]
 
 ## Dense cubic row-cost exponent
 

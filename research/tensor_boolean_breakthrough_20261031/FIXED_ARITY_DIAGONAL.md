@@ -291,6 +291,22 @@ transfer. The remaining sampler obligation is only to instantiate the base
 weights and their fibre/total bounds with the paper's concrete affine encoding.
 Claim `PCC-20261119-4e2d4b` passes its local Lean verifier. [pcc:unverified]
 
+The finite rejection layer is now checked exactly. A one-trial sampler is a
+map `Seed -> Option Output`; Lean proves that accepted seeds are partitioned by
+output fibres, equal fibres make every accepted output and every pair event
+exactly uniform, and independent retries have tail-sum expectation
+`|Seed| / |accepted|`. A unique encoder/decoder law forces every fibre to have
+size one, while `|Seed| <= cap * |accepted|` bounds the expected trials by
+`cap`. [pcc:unverified]
+
+Section 6.2 of the pinned paper uses `2p` signed-x seeds: nonzero square roots
+use the two sign seeds and a zero root accepts one of them. This suggests one
+accepted seed per affine point and hence exact uniformity on nonidentity
+points, stronger than the paper's factor-16 comparison. The remaining formal
+specialization is to define that decoder over Mathlib's affine-point type,
+prove its two unique-decoding laws, and derive `2p <= 4(|E(F_p)|-1)` from the
+curve-cardinality bound. [pcc:unverified]
+
 ## Corrections and remaining obligations
 
 The paper's Lemma 5.5 overstates its constant-torsion conclusion: a torsion
