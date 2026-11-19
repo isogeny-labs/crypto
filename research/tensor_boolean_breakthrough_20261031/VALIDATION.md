@@ -1133,6 +1133,31 @@ nonsingularity. Torsion-to-division-polynomial vanishing, the `A = 0` CM
 finite-kernel step, specialized polynomial construction/degree/vanishing, and
 collector/runtime assembly remain open. [pcc:unverified]
 
+## 2026-11-19 prime-field interval radicand specialization
+
+`shortCubicPolynomial_scaled_pair_fraction_square_classification` normalizes
+the product of `l(left*X)` and `l(right*X)` by the left scale and invokes the
+checked rational-function square-product classification. In the `A != 0`
+branch a square product forces `right/left = -1`.
+`zmodPositivePairRatio_ne_neg_one` proves that positive representatives whose
+sum is below the prime modulus cannot have that quotient. [pcc:unverified]
+
+`shortCubicFunctionRadicand` packages the scaled cubic in the rational
+function field and its nonzero theorem checks the leading coefficient.
+`zmodShortCubicFunctionRadicands_pairwise_not_isSquare_of_A_ne_zero` then
+proves the full indexed pairwise-nonsquare premise from positive injective
+interval scales. Claim `PCC-20261119-4e1bc6` binds this endpoint and its local
+verifier passes. The complete project build succeeds with 9,086 jobs and the
+proof gate reports `PASS 277 thm 0 trusted`. A final-source independent
+`lake env leanchecker --fresh TensorBoundaryBounds` replay exits 0.
+[pcc:unverified]
+
+This closes the radicand nonzero/pairwise-nonsquare premise only for the
+`A != 0` branch. The original lifted Semaev point relation, its exact
+nonsingularity composition, the `A = 0` collision/CM argument,
+torsion-to-division-polynomial vanishing and runtime assembly remain open.
+[pcc:unverified]
+
 The complete pinned project build succeeds with 9,086 jobs. The repository
 proof gate reports `PASS 244 thm 0 trusted`. [pcc:unverified]
 

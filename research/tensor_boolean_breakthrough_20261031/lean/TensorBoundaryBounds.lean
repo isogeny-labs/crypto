@@ -3262,6 +3262,302 @@ theorem shortCubicPolynomial_fraction_square_product_classification
   exact shortCubicPolynomial_square_product_classification hK A B r constant
     nonsingular rNonzero rNonidentity constantNonzero ⟨square, squareRelation⟩
 
+/-- Two independently scaled copies of a nonsingular short cubic reduce to
+the one-parameter square-product classification after normalizing by the
+left scale.  This is the function-field form needed for the radicands
+`ℓ(s * tᵢ)` and `ℓ(s * tⱼ)` in Lemma N'. -/
+theorem shortCubicPolynomial_scaled_pair_fraction_square_classification
+    {K : Type*} [Field K] (hK : ringChar K ≠ 2)
+    (A B left right : K)
+    (nonsingular : (4 : K) * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (leftNonzero : left ≠ 0) (rightNonzero : right ≠ 0)
+    (distinct : left ≠ right)
+    (squareInFunctionField :
+      IsSquare (algebraMap (Polynomial K) (FractionRing (Polynomial K))
+        ((shortCubicPolynomial A B).comp (Polynomial.C left * Polynomial.X) *
+          (shortCubicPolynomial A B).comp
+            (Polynomial.C right * Polynomial.X)))) :
+    (A ≠ 0 → B = 0 ∧ right / left = -1) ∧
+      (A = 0 → B ≠ 0 → (right / left) ^ 3 = 1) := by
+  let normalizedA : K := A / left ^ 2
+  let normalizedB : K := B / left ^ 3
+  let ratio : K := right / left
+  have leftScale :
+      (shortCubicPolynomial A B).comp (Polynomial.C left * Polynomial.X) =
+        Polynomial.C (left ^ 3) *
+          shortCubicPolynomial normalizedA normalizedB := by
+    rw [shortCubicPolynomial_comp_scale,
+      shortCubicPolynomial_scale_mul]
+    dsimp [normalizedA, normalizedB]
+    congr 1 <;> field_simp
+  have rightScale :
+      (shortCubicPolynomial A B).comp (Polynomial.C right * Polynomial.X) =
+        Polynomial.C (left ^ 3) *
+          (shortCubicPolynomial normalizedA normalizedB).comp
+            (Polynomial.C ratio * Polynomial.X) := by
+    have cubeCoefficient : Polynomial.C (right ^ 3) =
+        Polynomial.C (left ^ 3) * Polynomial.C (ratio ^ 3) := by
+      rw [← Polynomial.C_mul]
+      congr 1
+      dsimp [ratio]
+      field_simp
+    have linearCoefficient : Polynomial.C (A * right) =
+        Polynomial.C (left ^ 3) *
+          Polynomial.C (normalizedA * ratio) := by
+      rw [← Polynomial.C_mul]
+      congr 1
+      dsimp [normalizedA, ratio]
+      field_simp
+    have constantCoefficient : Polynomial.C B =
+        Polynomial.C (left ^ 3) * Polynomial.C normalizedB := by
+      rw [← Polynomial.C_mul]
+      congr 1
+      dsimp [normalizedB]
+      field_simp
+    rw [shortCubicPolynomial_comp_scale,
+      shortCubicPolynomial_comp_scale]
+    rw [cubeCoefficient, linearCoefficient, constantCoefficient]
+    ring
+  obtain ⟨constant, square, constantNonzero, squareRelation⟩ :=
+    polynomial_constantMulSquare_of_isSquare_fractionRing _
+      squareInFunctionField
+  have leftSixNonzero : left ^ 6 ≠ 0 := pow_ne_zero 6 leftNonzero
+  have normalizedSquareRelation :
+      shortCubicPolynomial normalizedA normalizedB *
+          (shortCubicPolynomial normalizedA normalizedB).comp
+            (Polynomial.C ratio * Polynomial.X) =
+        Polynomial.C ((left ^ 6)⁻¹ * constant) * square ^ 2 := by
+    apply mul_left_cancel₀ (Polynomial.C_ne_zero.mpr leftSixNonzero)
+    calc
+      Polynomial.C (left ^ 6) *
+          (shortCubicPolynomial normalizedA normalizedB *
+            (shortCubicPolynomial normalizedA normalizedB).comp
+              (Polynomial.C ratio * Polynomial.X)) =
+        (shortCubicPolynomial A B).comp
+            (Polynomial.C left * Polynomial.X) *
+          (shortCubicPolynomial A B).comp
+            (Polynomial.C right * Polynomial.X) := by
+              rw [leftScale, rightScale]
+              have constantPower : Polynomial.C (left ^ 6) =
+                  Polynomial.C (left ^ 3) * Polynomial.C (left ^ 3) := by
+                rw [← Polynomial.C_mul]
+                congr 1
+                ring
+              rw [constantPower]
+              ring
+      _ = Polynomial.C constant * square ^ 2 := squareRelation
+      _ = Polynomial.C
+          (left ^ 6 * ((left ^ 6)⁻¹ * constant)) * square ^ 2 := by
+            have scalarCancel :
+                left ^ 6 * ((left ^ 6)⁻¹ * constant) = constant := by
+              field_simp
+            rw [scalarCancel]
+      _ = Polynomial.C (left ^ 6) *
+          (Polynomial.C ((left ^ 6)⁻¹ * constant) * square ^ 2) := by
+            rw [Polynomial.C_mul]
+            ring
+  have normalizedNonsingular :
+      (4 : K) * normalizedA ^ 3 + 27 * normalizedB ^ 2 ≠ 0 := by
+    intro normalizedZero
+    apply nonsingular
+    dsimp [normalizedA, normalizedB] at normalizedZero
+    field_simp at normalizedZero
+    simpa using normalizedZero
+  have ratioNonzero : ratio ≠ 0 := div_ne_zero rightNonzero leftNonzero
+  have ratioNonidentity : ratio ≠ 1 := by
+    intro ratioOne
+    apply distinct
+    exact ((div_eq_one_iff_eq leftNonzero).mp ratioOne).symm
+  have classified := shortCubicPolynomial_square_product_classification hK
+    normalizedA normalizedB ratio ((left ^ 6)⁻¹ * constant)
+    normalizedNonsingular ratioNonzero ratioNonidentity
+    (mul_ne_zero (inv_ne_zero leftSixNonzero) constantNonzero)
+    ⟨square, normalizedSquareRelation⟩
+  dsimp [normalizedA, normalizedB, ratio] at classified ⊢
+  constructor
+  · intro ANonzero
+    obtain ⟨normalizedBZero, ratioNegOne⟩ :=
+      classified.1 (div_ne_zero ANonzero (pow_ne_zero 2 leftNonzero))
+    exact ⟨(div_eq_zero_iff.mp normalizedBZero).resolve_right
+      (pow_ne_zero 3 leftNonzero), ratioNegOne⟩
+  · intro AZero BNonzero
+    exact classified.2 (by simp [AZero])
+      (div_ne_zero BNonzero (pow_ne_zero 3 leftNonzero))
+
+/-- In the `A ≠ 0` branch, the two scaled short-cubic radicands have
+nonsquare product in the rational function field as soon as their scale ratio
+is not `-1`. -/
+theorem shortCubicPolynomial_scaled_pair_not_isSquare_of_A_ne_zero
+    {K : Type*} [Field K] (hK : ringChar K ≠ 2)
+    (A B left right : K)
+    (nonsingular : (4 : K) * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (ANonzero : A ≠ 0) (leftNonzero : left ≠ 0)
+    (rightNonzero : right ≠ 0) (distinct : left ≠ right)
+    (ratioNotNegOne : right / left ≠ -1) :
+    ¬ IsSquare (algebraMap (Polynomial K) (FractionRing (Polynomial K))
+      ((shortCubicPolynomial A B).comp (Polynomial.C left * Polynomial.X) *
+        (shortCubicPolynomial A B).comp
+          (Polynomial.C right * Polynomial.X))) := by
+  intro squareInFunctionField
+  exact ratioNotNegOne
+    ((shortCubicPolynomial_scaled_pair_fraction_square_classification hK
+      A B left right nonsingular leftNonzero rightNonzero distinct
+      squareInFunctionField).1 ANonzero).2
+
+/-- The short-cubic radicand `ℓ(tX)` as an element of the rational
+function field. -/
+noncomputable def shortCubicFunctionRadicand
+    {K : Type*} [Field K] (A B scale : K) :
+    FractionRing (Polynomial K) :=
+  algebraMap (Polynomial K) (FractionRing (Polynomial K))
+    ((shortCubicPolynomial A B).comp
+      (Polynomial.C scale * Polynomial.X))
+
+/-- A nonzero scale makes the cubic function-field radicand nonzero. -/
+theorem shortCubicFunctionRadicand_ne_zero
+    {K : Type*} [Field K] (A B scale : K) (scaleNonzero : scale ≠ 0) :
+    shortCubicFunctionRadicand A B scale ≠ 0 := by
+  intro radicandZero
+  have polynomialZero :
+      (shortCubicPolynomial A B).comp
+        (Polynomial.C scale * Polynomial.X) = 0 := by
+    apply IsFractionRing.injective (Polynomial K)
+      (FractionRing (Polynomial K))
+    simpa only [shortCubicFunctionRadicand, map_zero] using radicandZero
+  have leadingCoefficient := congrArg
+    (fun polynomial : Polynomial K ↦ polynomial.coeff 3) polynomialZero
+  rw [shortCubicPolynomial_comp_scale] at leadingCoefficient
+  simp only [Polynomial.coeff_add, Polynomial.coeff_C_mul_X_pow,
+    Polynomial.coeff_C_mul_X, Polynomial.coeff_C, Polynomial.coeff_zero]
+    at leadingCoefficient
+  norm_num at leadingCoefficient
+  exact scaleNonzero leadingCoefficient
+
+/-- On an elliptic short curve, the displayed square-root equation already
+supplies the nonsingularity proof required by the affine point constructor. -/
+theorem shortCharacterCurve_nonsingular_of_sq
+    {K : Type*} [Field K] (A B x y : K)
+    [(shortCharacterCurve 0 A B).IsElliptic]
+    (square : y ^ 2 = x ^ 3 + A * x + B) :
+    (shortCharacterCurve 0 A B).toAffine.Nonsingular x y := by
+  apply (WeierstrassCurve.Affine.equation_iff_nonsingular).mp
+  exact (shortCharacterCurve_equation_iff 0 A B x y).mpr (by
+    simpa using square)
+
+/-- Function-field packaging of the `A ≠ 0` scaled-radicand
+nonsquareness result. -/
+theorem shortCubicFunctionRadicand_mul_not_isSquare_of_A_ne_zero
+    {K : Type*} [Field K] (hK : ringChar K ≠ 2)
+    (A B left right : K)
+    (nonsingular : (4 : K) * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (ANonzero : A ≠ 0) (leftNonzero : left ≠ 0)
+    (rightNonzero : right ≠ 0) (distinct : left ≠ right)
+    (ratioNotNegOne : right / left ≠ -1) :
+    ¬ IsSquare
+      (shortCubicFunctionRadicand A B left *
+        shortCubicFunctionRadicand A B right) := by
+  simpa only [shortCubicFunctionRadicand, ← map_mul] using
+    shortCubicPolynomial_scaled_pair_not_isSquare_of_A_ne_zero
+      hK A B left right nonsingular ANonzero leftNonzero rightNonzero
+        distinct ratioNotNegOne
+
+/-- Two positive natural representatives whose sum is below the modulus
+cannot have quotient `-1` in the prime residue field. -/
+theorem zmodPositivePairRatio_ne_neg_one
+    (modulus left right : ℕ) [Fact modulus.Prime]
+    (leftPositive : 0 < left) (rightPositive : 0 < right)
+    (sumBelow : left + right < modulus) :
+    (right : ZMod modulus) / (left : ZMod modulus) ≠ -1 := by
+  have leftBelow : left < modulus := by omega
+  have rightBelow : right < modulus := by omega
+  have leftNonzero : (left : ZMod modulus) ≠ 0 := by
+    intro leftZero
+    have values := congrArg ZMod.val leftZero
+    rw [ZMod.val_natCast_of_lt leftBelow, ZMod.val_zero] at values
+    omega
+  have rightNonzero : (right : ZMod modulus) ≠ 0 := by
+    intro rightZero
+    have values := congrArg ZMod.val rightZero
+    rw [ZMod.val_natCast_of_lt rightBelow, ZMod.val_zero] at values
+    omega
+  intro ratioNegOne
+  have rightEq : (right : ZMod modulus) = -(left : ZMod modulus) := by
+    have multiplied := (div_eq_iff leftNonzero).mp ratioNegOne
+    simpa using multiplied
+  have sumZero : ((left + right : ℕ) : ZMod modulus) = 0 := by
+    rw [Nat.cast_add, rightEq, add_neg_cancel]
+  have values := congrArg ZMod.val sumZero
+  rw [ZMod.val_natCast_of_lt sumBelow, ZMod.val_zero] at values
+  omega
+
+/-- Prime-field interval specialization of the `A ≠ 0` radicand
+nonsquareness theorem.  Positive representatives with sum below the modulus
+automatically exclude the only exceptional scale ratio. -/
+theorem zmodShortCubicPolynomial_scaled_pair_not_isSquare_of_A_ne_zero
+    (modulus left right : ℕ) [Fact modulus.Prime]
+    (hChar : ringChar (ZMod modulus) ≠ 2)
+    (A B : ZMod modulus)
+    (nonsingular : (4 : ZMod modulus) * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (ANonzero : A ≠ 0)
+    (leftPositive : 0 < left) (rightPositive : 0 < right)
+    (distinct : left ≠ right) (sumBelow : left + right < modulus) :
+    ¬ IsSquare
+      (algebraMap (Polynomial (ZMod modulus))
+        (FractionRing (Polynomial (ZMod modulus)))
+        ((shortCubicPolynomial A B).comp
+            (Polynomial.C (left : ZMod modulus) * Polynomial.X) *
+          (shortCubicPolynomial A B).comp
+            (Polynomial.C (right : ZMod modulus) * Polynomial.X))) := by
+  have leftBelow : left < modulus := by omega
+  have rightBelow : right < modulus := by omega
+  have leftNonzero : (left : ZMod modulus) ≠ 0 := by
+    intro leftZero
+    have values := congrArg ZMod.val leftZero
+    rw [ZMod.val_natCast_of_lt leftBelow, ZMod.val_zero] at values
+    omega
+  have rightNonzero : (right : ZMod modulus) ≠ 0 := by
+    intro rightZero
+    have values := congrArg ZMod.val rightZero
+    rw [ZMod.val_natCast_of_lt rightBelow, ZMod.val_zero] at values
+    omega
+  have castDistinct : (left : ZMod modulus) ≠ (right : ZMod modulus) := by
+    intro castEqual
+    have values := congrArg ZMod.val castEqual
+    rw [ZMod.val_natCast_of_lt leftBelow,
+      ZMod.val_natCast_of_lt rightBelow] at values
+    exact distinct values
+  exact shortCubicPolynomial_scaled_pair_not_isSquare_of_A_ne_zero
+    hChar A B (left : ZMod modulus) (right : ZMod modulus)
+    nonsingular ANonzero leftNonzero rightNonzero castDistinct
+    (zmodPositivePairRatio_ne_neg_one modulus left right
+      leftPositive rightPositive sumBelow)
+
+/-- Indexed prime-field interval radicands satisfy exactly the pairwise
+nonsquare premise of the quadratic splitting-field projector in the
+`A ≠ 0` branch. -/
+theorem zmodShortCubicFunctionRadicands_pairwise_not_isSquare_of_A_ne_zero
+    {Index : Type*} [Fintype Index]
+    (modulus : ℕ) [Fact modulus.Prime]
+    (hChar : ringChar (ZMod modulus) ≠ 2)
+    (A B : ZMod modulus)
+    (nonsingular : (4 : ZMod modulus) * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (ANonzero : A ≠ 0) (scale : Index → ℕ)
+    (scalePositive : ∀ index, 0 < scale index)
+    (scaleInjective : Function.Injective scale)
+    (pairSumBelow : ∀ left right, left ≠ right →
+      scale left + scale right < modulus) :
+    ∀ left right, left ≠ right →
+      ¬ IsSquare
+        (shortCubicFunctionRadicand A B (scale left : ZMod modulus) *
+          shortCubicFunctionRadicand A B (scale right : ZMod modulus)) := by
+  intro left right distinct
+  simpa only [shortCubicFunctionRadicand, ← map_mul] using
+    zmodShortCubicPolynomial_scaled_pair_not_isSquare_of_A_ne_zero
+      modulus (scale left) (scale right) hChar A B nonsingular ANonzero
+      (scalePositive left) (scalePositive right)
+      (fun equal ↦ distinct (scaleInjective equal))
+      (pairSumBelow left right distinct)
+
 /-- A positive triple of natural representatives with sum below the modulus
 cannot sum to zero in `ZMod modulus`. -/
 theorem zmodPositiveTripleSum_ne_zero

@@ -405,9 +405,13 @@ canonical splitting field and selected roots, proves its finite-Galois
 instance, defines the affine-point Galois action, proves the sign eigenvector
 identities, and obtains every transformed relation from one original relation
 (`PCC-20261119-ae2460`). The remaining specialization must construct the
-Semaev radicands and original lifted relation and prove radicand nonvanishing,
-pairwise nonsquareness and point nonsingularity. Torsion-to-division-polynomial
-vanishing and the CM endomorphism finite-kernel argument also remain open.
+Semaev original lifted relation and prove point nonsingularity. For `A != 0`,
+`zmodShortCubicFunctionRadicands_pairwise_not_isSquare_of_A_ne_zero` now
+constructs the interval function-field radicands and proves their nonzero and
+pairwise-nonsquare laws by normalization and exclusion of the exceptional
+ratio `-1` (`PCC-20261119-4e1bc6`). The `A = 0` character-collision branch,
+torsion-to-division-polynomial vanishing and the CM endomorphism argument
+remain open.
 [pcc:unverified]
 
 The generic certificate is now connected to the pinned upstream definitions,

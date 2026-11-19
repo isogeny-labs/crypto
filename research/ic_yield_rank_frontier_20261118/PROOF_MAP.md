@@ -705,9 +705,10 @@ layer uses these declarations:
    separation from nonsquare radicand products, the canonical quadratic
    splitting field and roots, the affine-point Galois action, derivation of all
    transformed relations from one original relation, and the corrected final
-   transcendence contradiction. Still missing are the Semaev-specific
-   radicands and lifted original relation with proofs of radicand nonvanishing,
-   pairwise nonsquareness and point nonsingularity,
+   transcendence contradiction. In the `A != 0` interval branch, normalization
+   of independently scaled cubics plus the short-sum exclusion of ratio `-1`
+   now constructs nonzero radicands and proves pairwise nonsquareness. Still
+   missing are the lifted original relation and its point nonsingularity,
    torsion-to-division-polynomial vanishing, and the `A = 0` CM
    endomorphism/finite-kernel specialization.
    [pcc:unverified]
@@ -734,6 +735,9 @@ layer uses these declarations:
 | `transformedRelations_of_addEquiv_eigenvectors` | law | same | finite additive point group with indexed eigenvectors | one original relation and the action/eigenvector identity |
 | `affinePointGaloisAddEquiv_eigenvector` | law | same | short-form affine elliptic curve after base change | selected square root and point nonsingularity |
 | `quadraticSplittingFieldAffinePointProjector_isolates_term` | endpoint | same | canonical quadratic splitting field and short-form affine points | nonzero pairwise-nonsquare radicands, point nonsingularity and one original relation |
+| `shortCubicPolynomial_scaled_pair_fraction_square_classification` | law | same | two nonzero distinct short-cubic scales over a field | odd characteristic and nonsingular cubic |
+| `zmodPositivePairRatio_ne_neg_one` | law | same | positive natural representatives in a prime residue field | their sum is below the modulus |
+| `zmodShortCubicFunctionRadicands_pairwise_not_isSquare_of_A_ne_zero` | endpoint | same | injectively indexed positive prime-field interval scales | `A != 0`, nonsingular cubic and every distinct scale pair has sum below the modulus |
 | `algebraic_ne_const_mul_transcendental` | law | same | field extension, algebraic coordinate and transcendental parameter | nonzero constant multiplier |
 | `divisionPolynomial_ne_zero_at_const_mul_transcendental` | law | same | Weierstrass curve over the constant field and extension parameter | division index nonzero in the constant field, nonzero constant multiplier |
 
@@ -754,6 +758,13 @@ action and transformed relations are constructed internally from one original
 relation. The remaining obligation is the Semaev-specific source of its
 radicands, lifted points and original relation, not a supplied extension,
 character table or transformed-relation family. [pcc:unverified]
+
+Claim `PCC-20261119-4e1bc6` binds the `A != 0` indexed interval-radicand
+endpoint. It packages `l(s*t)` in the rational function field, proves nonzero
+for positive scales, normalizes every distinct pair to Lemma 5.4, and excludes
+the only exceptional ratio using the short interval. It does not cover the
+`A = 0` cubic-character collisions or construct the original Semaev relation.
+[pcc:unverified]
 
 Claims `PCC-20261119-cd776f` and `PCC-20261119-fc17e6` bind respectively the
 polynomial constant-times-square and the stronger rational-function-square
