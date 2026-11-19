@@ -5501,4 +5501,483 @@ theorem shortCubicPairCollision_implies_CMNormTorsion
   exact ⟨omega, sign, omegaRelation, omegaNonidentity, scaleRelation,
     signCases, normTorsion⟩
 
+/-- Negating a selected square root does not change its integer-valued Galois
+sign character. -/
+theorem galoisSqrtSign_neg
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    (x : L) (sigma : L ≃ₐ[K] L) :
+    galoisSqrtSign (-x) sigma = galoisSqrtSign x sigma := by
+  classical
+  by_cases fixed : sigma x = x
+  · have negFixed : sigma (-x) = -x := by rw [map_neg, fixed]
+    simp [galoisSqrtSign, fixed, negFixed]
+  · have negNotFixed : sigma (-x) ≠ -x := by
+      intro negFixed
+      apply fixed
+      have := congrArg Neg.neg negFixed
+      simpa using this
+    simp [galoisSqrtSign, fixed, negNotFixed]
+
+/-- Chosen square roots of the same radicand have identical Galois sign
+characters, independently of the choices of root signs. -/
+theorem galoisSqrtSigns_eq_of_same_square
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    {a : K} {x y : L}
+    (xSquare : x ^ 2 = algebraMap K L a)
+    (ySquare : y ^ 2 = algebraMap K L a) :
+    ∀ sigma : L ≃ₐ[K] L,
+      galoisSqrtSign y sigma = galoisSqrtSign x sigma := by
+  intro sigma
+  have squareEqual : y ^ 2 = x ^ 2 := ySquare.trans xSquare.symm
+  rcases sq_eq_sq_iff_eq_or_eq_neg.mp squareEqual with equal | negated
+  · subst y
+    rfl
+  · rw [negated, galoisSqrtSign_neg]
+
+/-- If the product of two radicands is already a square in the base field,
+then every Galois automorphism gives their selected roots the same sign. -/
+theorem galoisSqrtSigns_eq_of_isSquare_mul
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    {a b : K} {x y : L}
+    (xNonzero : x ≠ 0) (yNonzero : y ≠ 0)
+    (xSquare : x ^ 2 = algebraMap K L a)
+    (ySquare : y ^ 2 = algebraMap K L b)
+    (productSquare : IsSquare (a * b)) :
+    ∀ sigma : L ≃ₐ[K] L,
+      galoisSqrtSign y sigma = galoisSqrtSign x sigma := by
+  obtain ⟨c, cSquare⟩ := productSquare
+  intro sigma
+  have xySquare : (x * y) ^ 2 = (algebraMap K L c) ^ 2 := by
+    calc
+      (x * y) ^ 2 = x ^ 2 * y ^ 2 := by ring
+      _ = algebraMap K L a * algebraMap K L b := by rw [xSquare, ySquare]
+      _ = algebraMap K L (a * b) := (map_mul (algebraMap K L) a b).symm
+      _ = algebraMap K L (c * c) := by rw [cSquare]
+      _ = (algebraMap K L c) ^ 2 := by simp [pow_two]
+  have productFixed : sigma (x * y) = x * y := by
+    rcases sq_eq_sq_iff_eq_or_eq_neg.mp xySquare with positive | negative
+    · rw [positive, sigma.commutes]
+    · rw [negative, map_neg, sigma.commutes]
+  have fixedEquivalent : sigma x = x ↔ sigma y = y := by
+    constructor
+    · intro xFixed
+      apply mul_left_cancel₀ xNonzero
+      calc
+        x * sigma y = sigma x * sigma y := by rw [xFixed]
+        _ = sigma (x * y) := (map_mul sigma x y).symm
+        _ = x * y := productFixed
+    · intro yFixed
+      apply mul_right_cancel₀ yNonzero
+      calc
+        sigma x * y = sigma x * sigma y := by rw [yFixed]
+        _ = sigma (x * y) := (map_mul sigma x y).symm
+        _ = x * y := productFixed
+  by_cases xFixed : sigma x = x
+  · have yFixed := fixedEquivalent.mp xFixed
+    simp [galoisSqrtSign, xFixed, yFixed]
+  · have yNotFixed : sigma y ≠ y := by
+      exact fun yFixed ↦ xFixed (fixedEquivalent.mpr yFixed)
+    simp [galoisSqrtSign, xFixed, yNotFixed]
+
+/-- Concrete Galois-sign projector for one duplicated radicand pair.  Equal
+radicands give the duplicate character; nonsquare products with every other
+radicand construct all required separators. -/
+theorem galoisTwoCollisionSignCharacterProjector_isolates_pair
+    {K L Index Point : Type*}
+    [Field K] [Field L] [Algebra K L]
+    [FiniteDimensional K L] [IsGalois K L]
+    [Fintype Index] [DecidableEq Index] [AddCommGroup Point]
+    (radicand : Index → K) (root : Index → L)
+    (coefficient : Index → ℤ) (point : Index → Point)
+    (chosen partner : Index) (distinct : chosen ≠ partner)
+    (rootNonzero : ∀ index, root index ≠ 0)
+    (twoNonzero : (2 : L) ≠ 0)
+    (rootSquare : ∀ index,
+      root index ^ 2 = algebraMap K L (radicand index))
+    (sameRadicand : radicand partner = radicand chosen)
+    (otherNonsquare : ∀ index,
+      index ≠ chosen → index ≠ partner →
+        ¬ IsSquare (radicand chosen * radicand index))
+    (transformedRelation : ∀ sigma : L ≃ₐ[K] L,
+      ∑ index, (galoisSqrtSign (root index) sigma * coefficient index) •
+        point index = 0) :
+    ((Fintype.card (L ≃ₐ[K] L) : ℤ) * coefficient chosen) • point chosen +
+      ((Fintype.card (L ≃ₐ[K] L) : ℤ) * coefficient partner) • point partner = 0 := by
+  classical
+  apply twoCollisionSignCharacterProjector_isolates_pair
+    (fun index sigma ↦ galoisSqrtSign (root index) sigma)
+    coefficient point chosen partner distinct
+  · intro index left right
+    exact galoisSqrtSign_multiplicative
+      (rootNonzero index) twoNonzero (rootSquare index) left right
+  · intro index sigma
+    exact galoisSqrtSign_squareOne (root index) sigma
+  · intro sigma
+    apply galoisSqrtSigns_eq_of_same_square
+      (x := root chosen) (y := root partner) (rootSquare chosen)
+    simpa only [sameRadicand] using rootSquare partner
+  · intro index notChosen notPartner
+    exact galoisSqrtSigns_separate_of_not_isSquare_mul
+      (rootNonzero chosen) (rootNonzero index)
+      (rootSquare chosen) (rootSquare index)
+      (otherNonsquare index notChosen notPartner)
+  · exact transformedRelation
+
+/-- Galois-sign pair projector in the form needed for cubic collisions: the
+two radicands need not be equal; it is enough that their product is a square
+in the base field. -/
+theorem galoisTwoCollisionSignCharacterProjector_isolates_pair_of_isSquare_mul
+    {K L Index Point : Type*}
+    [Field K] [Field L] [Algebra K L]
+    [FiniteDimensional K L] [IsGalois K L]
+    [Fintype Index] [DecidableEq Index] [AddCommGroup Point]
+    (radicand : Index → K) (root : Index → L)
+    (coefficient : Index → ℤ) (point : Index → Point)
+    (chosen partner : Index) (distinct : chosen ≠ partner)
+    (rootNonzero : ∀ index, root index ≠ 0)
+    (twoNonzero : (2 : L) ≠ 0)
+    (rootSquare : ∀ index,
+      root index ^ 2 = algebraMap K L (radicand index))
+    (pairSquare : IsSquare (radicand chosen * radicand partner))
+    (otherNonsquare : ∀ index,
+      index ≠ chosen → index ≠ partner →
+        ¬ IsSquare (radicand chosen * radicand index))
+    (transformedRelation : ∀ sigma : L ≃ₐ[K] L,
+      ∑ index, (galoisSqrtSign (root index) sigma * coefficient index) •
+        point index = 0) :
+    ((Fintype.card (L ≃ₐ[K] L) : ℤ) * coefficient chosen) • point chosen +
+      ((Fintype.card (L ≃ₐ[K] L) : ℤ) * coefficient partner) • point partner = 0 := by
+  classical
+  apply twoCollisionSignCharacterProjector_isolates_pair
+    (fun index sigma ↦ galoisSqrtSign (root index) sigma)
+    coefficient point chosen partner distinct
+  · intro index left right
+    exact galoisSqrtSign_multiplicative
+      (rootNonzero index) twoNonzero (rootSquare index) left right
+  · intro index sigma
+    exact galoisSqrtSign_squareOne (root index) sigma
+  · intro sigma
+    exact galoisSqrtSigns_eq_of_isSquare_mul
+      (rootNonzero chosen) (rootNonzero partner)
+      (rootSquare chosen) (rootSquare partner) pairSquare sigma
+  · intro index notChosen notPartner
+    exact galoisSqrtSigns_separate_of_not_isSquare_mul
+      (rootNonzero chosen) (rootNonzero index)
+      (rootSquare chosen) (rootSquare index)
+      (otherNonsquare index notChosen notPartner)
+  · exact transformedRelation
+
+/-- End-to-end `A = 0` collision bridge with the character hypotheses
+discharged by an actual finite Galois extension. Equal radicands force the
+duplicated character, while nonsquare products with all other radicands
+provide the separating automorphisms. -/
+theorem shortCubicGaloisPairCollision_implies_CMNormTorsion
+    {K L Index : Type*}
+    [Field K] [DecidableEq K] [Field L] [Algebra K L]
+    [FiniteDimensional K L] [IsGalois K L]
+    [Fintype Index] [DecidableEq Index]
+    (B left right parameter y y' : K)
+    [(shortCharacterCurve 0 0 B).IsElliptic]
+    (hK : ringChar K ≠ 2) (twoNonzeroK : (2 : K) ≠ 0)
+    (twoNonzeroL : (2 : L) ≠ 0)
+    (cubicNonsingular : (27 : K) * B ^ 2 ≠ 0)
+    (BNonzero : B ≠ 0) (leftNonzero : left ≠ 0)
+    (rightNonzero : right ≠ 0) (scalesDistinct : left ≠ right)
+    (squareInFunctionField : IsSquare
+      (algebraMap (Polynomial K) (FractionRing (Polynomial K))
+        ((shortCubicPolynomial 0 B).comp (Polynomial.C left * Polynomial.X) *
+          (shortCubicPolynomial 0 B).comp
+            (Polynomial.C right * Polynomial.X))))
+    (leftNonsingular :
+      (shortCharacterCurve 0 0 B).toAffine.Nonsingular
+        (left * parameter) y)
+    (rightNonsingular :
+      (shortCharacterCurve 0 0 B).toAffine.Nonsingular
+        (right * parameter) y')
+    (radicand : Index → K) (root : Index → L)
+    (coefficient : Index → ℤ)
+    (point : Index → (shortCharacterCurve 0 0 B).toAffine.Point)
+    (chosen partner : Index) (indicesDistinct : chosen ≠ partner)
+    (chosenPoint : point chosen =
+      WeierstrassCurve.Affine.Point.some
+        (left * parameter) y leftNonsingular)
+    (partnerPoint : point partner =
+      WeierstrassCurve.Affine.Point.some
+        (right * parameter) y' rightNonsingular)
+    (rootNonzero : ∀ index, root index ≠ 0)
+    (rootSquare : ∀ index,
+      root index ^ 2 = algebraMap K L (radicand index))
+    (sameRadicand : radicand partner = radicand chosen)
+    (otherNonsquare : ∀ index,
+      index ≠ chosen → index ≠ partner →
+        ¬ IsSquare (radicand chosen * radicand index))
+    (transformedRelation : ∀ sigma : L ≃ₐ[K] L,
+      ∑ index, (galoisSqrtSign (root index) sigma * coefficient index) •
+        point index = 0) :
+    ∃ omega : K, ∃ sign : ℤ,
+      omega ^ 2 + omega + 1 = 0 ∧ omega ≠ 1 ∧
+      right = omega * left ∧ (sign = 1 ∨ sign = -1) ∧
+      (((Fintype.card (L ≃ₐ[K] L) : ℤ) * coefficient chosen) ^ 2 -
+          ((Fintype.card (L ≃ₐ[K] L) : ℤ) * coefficient chosen) *
+            (((Fintype.card (L ≃ₐ[K] L) : ℤ) *
+              coefficient partner) * sign) +
+          (((Fintype.card (L ≃ₐ[K] L) : ℤ) *
+            coefficient partner) * sign) ^ 2) • point chosen = 0 := by
+  classical
+  apply shortCubicPairCollision_implies_CMNormTorsion
+    B left right parameter y y' hK twoNonzeroK cubicNonsingular BNonzero
+    leftNonzero rightNonzero scalesDistinct squareInFunctionField
+    leftNonsingular rightNonsingular
+    (fun index sigma ↦ galoisSqrtSign (root index) sigma)
+    coefficient point chosen partner indicesDistinct chosenPoint partnerPoint
+  · intro index sigma tau
+    exact galoisSqrtSign_multiplicative
+      (rootNonzero index) twoNonzeroL (rootSquare index) sigma tau
+  · intro index sigma
+    exact galoisSqrtSign_squareOne (root index) sigma
+  · intro sigma
+    apply galoisSqrtSigns_eq_of_same_square
+      (x := root chosen) (y := root partner) (rootSquare chosen)
+    simpa only [sameRadicand] using rootSquare partner
+  · intro index notChosen notPartner
+    exact galoisSqrtSigns_separate_of_not_isSquare_mul
+      (rootNonzero chosen) (rootNonzero index)
+      (rootSquare chosen) (rootSquare index)
+      (otherNonsquare index notChosen notPartner)
+  · exact transformedRelation
+
+/-- Two nonidentity cubic roots of unity are either equal or one is the
+square of the other. This is the algebraic two-root classification used to
+turn a third `A = 0` collision into a full cubic orbit. -/
+theorem nonidentityCubeRoots_eq_or_eq_sq
+    {K : Type*} [Field K] {omega rho : K}
+    (omegaRelation : omega ^ 2 + omega + 1 = 0)
+    (rhoRelation : rho ^ 2 + rho + 1 = 0) :
+    rho = omega ∨ rho = omega ^ 2 := by
+  have productZero : (rho - omega) * (rho + omega + 1) = 0 := by
+    calc
+      (rho - omega) * (rho + omega + 1) =
+          (rho ^ 2 + rho + 1) - (omega ^ 2 + omega + 1) := by ring
+      _ = 0 := by rw [rhoRelation, omegaRelation, sub_self]
+  rcases mul_eq_zero.mp productZero with equal | conjugate
+  · exact Or.inl (sub_eq_zero.mp equal)
+  · right
+    linear_combination conjugate - omegaRelation
+
+/-- In a prime-field interval with `3X < p`, one `A = 0` cubic collision has
+no third member. Consequently, after selecting its unique possible partner,
+the chosen radicand has nonsquare product with every remaining interval
+radicand. -/
+theorem zmodShortCubicFunctionRadicand_mul_not_isSquare_of_A_eq_zero_outside_partner
+    {Index : Type*} [Fintype Index]
+    (modulus X : ℕ) [Fact modulus.Prime]
+    (hChar : ringChar (ZMod modulus) ≠ 2)
+    (B : ZMod modulus)
+    (cubicNonsingular : (27 : ZMod modulus) * B ^ 2 ≠ 0)
+    (BNonzero : B ≠ 0)
+    (scale : Index → ℕ)
+    (scalePositive : ∀ index, 0 < scale index)
+    (scaleBound : ∀ index, scale index ≤ X)
+    (scaleInjective : Function.Injective scale)
+    (intervalShort : 3 * X < modulus)
+    (chosen partner : Index) (indicesDistinct : chosen ≠ partner)
+    (chosenPartnerSquare : IsSquare
+      (shortCubicFunctionRadicand 0 B
+          (scale chosen : ZMod modulus) *
+        shortCubicFunctionRadicand 0 B
+          (scale partner : ZMod modulus))) :
+    ∀ index, index ≠ chosen → index ≠ partner →
+      ¬ IsSquare
+        (shortCubicFunctionRadicand 0 B
+            (scale chosen : ZMod modulus) *
+          shortCubicFunctionRadicand 0 B
+            (scale index : ZMod modulus)) := by
+  have scaleBelow : ∀ index, scale index < modulus := by
+    intro index
+    have := scaleBound index
+    omega
+  have castNonzero : ∀ index, (scale index : ZMod modulus) ≠ 0 := by
+    intro index castZero
+    have values := congrArg ZMod.val castZero
+    rw [ZMod.val_natCast_of_lt (scaleBelow index), ZMod.val_zero] at values
+    exact (Nat.ne_of_gt (scalePositive index)) values
+  have castDistinct : ∀ left right, left ≠ right →
+      (scale left : ZMod modulus) ≠ (scale right : ZMod modulus) := by
+    intro left right distinct castEqual
+    apply distinct
+    apply scaleInjective
+    have values := congrArg ZMod.val castEqual
+    simpa [ZMod.val_natCast_of_lt (scaleBelow left),
+      ZMod.val_natCast_of_lt (scaleBelow right)] using values
+  have chosenPartnerPolynomialSquare : IsSquare
+      (algebraMap (Polynomial (ZMod modulus))
+        (FractionRing (Polynomial (ZMod modulus)))
+        ((shortCubicPolynomial 0 B).comp
+            (Polynomial.C (scale chosen : ZMod modulus) * Polynomial.X) *
+          (shortCubicPolynomial 0 B).comp
+            (Polynomial.C (scale partner : ZMod modulus) * Polynomial.X))) := by
+    simpa only [shortCubicFunctionRadicand, ← map_mul] using
+      chosenPartnerSquare
+  obtain ⟨omega, omegaRelation, omegaNonidentity, partnerOrbit⟩ :=
+    shortCubicPolynomial_scaled_pair_CM_ratio_of_isSquare hChar B
+      (scale chosen : ZMod modulus) (scale partner : ZMod modulus)
+      cubicNonsingular BNonzero (castNonzero chosen) (castNonzero partner)
+      (castDistinct chosen partner indicesDistinct)
+      chosenPartnerPolynomialSquare
+  intro index indexNotChosen indexNotPartner candidateSquare
+  have candidatePolynomialSquare : IsSquare
+      (algebraMap (Polynomial (ZMod modulus))
+        (FractionRing (Polynomial (ZMod modulus)))
+        ((shortCubicPolynomial 0 B).comp
+            (Polynomial.C (scale chosen : ZMod modulus) * Polynomial.X) *
+          (shortCubicPolynomial 0 B).comp
+            (Polynomial.C (scale index : ZMod modulus) * Polynomial.X))) := by
+    simpa only [shortCubicFunctionRadicand, ← map_mul] using candidateSquare
+  obtain ⟨rho, rhoRelation, rhoNonidentity, indexOrbit⟩ :=
+    shortCubicPolynomial_scaled_pair_CM_ratio_of_isSquare hChar B
+      (scale chosen : ZMod modulus) (scale index : ZMod modulus)
+      cubicNonsingular BNonzero (castNonzero chosen) (castNonzero index)
+      (castDistinct chosen index indexNotChosen.symm)
+      candidatePolynomialSquare
+  have rhoNotOmega : rho ≠ omega := by
+    intro rhoEqual
+    apply castDistinct index partner indexNotPartner
+    rw [indexOrbit, partnerOrbit, rhoEqual]
+  have rhoSquare : rho = omega ^ 2 :=
+    (nonidentityCubeRoots_eq_or_eq_sq omegaRelation rhoRelation).resolve_left
+      rhoNotOmega
+  exact zmodNoFullCubicOrbitInShortInterval modulus X
+    (scale chosen) (scale partner) (scale index) omega
+    (scalePositive chosen) (scaleBound chosen) (scaleBound partner)
+    (scaleBound index) intervalShort omegaRelation partnerOrbit (by
+      calc
+        (scale index : ZMod modulus) = rho * (scale chosen : ZMod modulus) :=
+          indexOrbit
+        _ = omega ^ 2 * (scale chosen : ZMod modulus) := by rw [rhoSquare]
+        _ = omega * (omega * (scale chosen : ZMod modulus)) := by ring
+        _ = omega * (scale partner : ZMod modulus) := by rw [partnerOrbit])
+
+/-- Prime-field `A = 0` interval endpoint. A selected square-product
+collision supplies the CM partner, `3X < p` proves that every other product
+is nonsquare, and the actual finite-Galois sign action yields the explicit
+CM norm-torsion relation. -/
+theorem zmodShortCubicIntervalGaloisPairCollision_implies_CMNormTorsion
+    (modulus X : ℕ) [Fact modulus.Prime]
+    {L Index : Type*} [Field L]
+    [Algebra (FractionRing (Polynomial (ZMod modulus))) L]
+    [FiniteDimensional (FractionRing (Polynomial (ZMod modulus))) L]
+    [IsGalois (FractionRing (Polynomial (ZMod modulus))) L]
+    [Fintype Index] [DecidableEq Index]
+    (hChar : ringChar (ZMod modulus) ≠ 2)
+    (twoNonzeroBase : (2 : ZMod modulus) ≠ 0)
+    (twoNonzeroExtension : (2 : L) ≠ 0)
+    (B parameter y y' : ZMod modulus)
+    [(shortCharacterCurve 0 0 B).IsElliptic]
+    (cubicNonsingular : (27 : ZMod modulus) * B ^ 2 ≠ 0)
+    (BNonzero : B ≠ 0)
+    (scale : Index → ℕ)
+    (scalePositive : ∀ index, 0 < scale index)
+    (scaleBound : ∀ index, scale index ≤ X)
+    (scaleInjective : Function.Injective scale)
+    (intervalShort : 3 * X < modulus)
+    (chosen partner : Index) (indicesDistinct : chosen ≠ partner)
+    (pairSquare : IsSquare
+      (shortCubicFunctionRadicand 0 B
+          (scale chosen : ZMod modulus) *
+        shortCubicFunctionRadicand 0 B
+          (scale partner : ZMod modulus)))
+    (leftNonsingular :
+      (shortCharacterCurve 0 0 B).toAffine.Nonsingular
+        ((scale chosen : ZMod modulus) * parameter) y)
+    (rightNonsingular :
+      (shortCharacterCurve 0 0 B).toAffine.Nonsingular
+        ((scale partner : ZMod modulus) * parameter) y')
+    (root : Index → L)
+    (rootNonzero : ∀ index, root index ≠ 0)
+    (rootSquare : ∀ index, root index ^ 2 =
+      algebraMap (FractionRing (Polynomial (ZMod modulus))) L
+        (shortCubicFunctionRadicand 0 B
+          (scale index : ZMod modulus)))
+    (coefficient : Index → ℤ)
+    (point : Index → (shortCharacterCurve 0 0 B).toAffine.Point)
+    (chosenPoint : point chosen =
+      WeierstrassCurve.Affine.Point.some
+        ((scale chosen : ZMod modulus) * parameter) y leftNonsingular)
+    (partnerPoint : point partner =
+      WeierstrassCurve.Affine.Point.some
+        ((scale partner : ZMod modulus) * parameter) y' rightNonsingular)
+    (transformedRelation : ∀ sigma :
+        L ≃ₐ[FractionRing (Polynomial (ZMod modulus))] L,
+      ∑ index, (galoisSqrtSign (root index) sigma * coefficient index) •
+        point index = 0) :
+    ∃ omega : ZMod modulus, ∃ sign : ℤ,
+      omega ^ 2 + omega + 1 = 0 ∧ omega ≠ 1 ∧
+      (scale partner : ZMod modulus) =
+        omega * (scale chosen : ZMod modulus) ∧
+      (sign = 1 ∨ sign = -1) ∧
+      (((Fintype.card
+            (L ≃ₐ[FractionRing (Polynomial (ZMod modulus))] L) : ℤ) *
+          coefficient chosen) ^ 2 -
+        ((Fintype.card
+            (L ≃ₐ[FractionRing (Polynomial (ZMod modulus))] L) : ℤ) *
+          coefficient chosen) *
+          (((Fintype.card
+              (L ≃ₐ[FractionRing (Polynomial (ZMod modulus))] L) : ℤ) *
+            coefficient partner) * sign) +
+        (((Fintype.card
+            (L ≃ₐ[FractionRing (Polynomial (ZMod modulus))] L) : ℤ) *
+          coefficient partner) * sign) ^ 2) • point chosen = 0 := by
+  classical
+  have scaleBelow : ∀ index, scale index < modulus := by
+    intro index
+    have := scaleBound index
+    omega
+  have castNonzero : ∀ index, (scale index : ZMod modulus) ≠ 0 := by
+    intro index castZero
+    have values := congrArg ZMod.val castZero
+    rw [ZMod.val_natCast_of_lt (scaleBelow index), ZMod.val_zero] at values
+    exact (Nat.ne_of_gt (scalePositive index)) values
+  have castDistinct : ∀ left right, left ≠ right →
+      (scale left : ZMod modulus) ≠ (scale right : ZMod modulus) := by
+    intro left right distinct castEqual
+    apply distinct
+    apply scaleInjective
+    have values := congrArg ZMod.val castEqual
+    simpa [ZMod.val_natCast_of_lt (scaleBelow left),
+      ZMod.val_natCast_of_lt (scaleBelow right)] using values
+  have polynomialPairSquare : IsSquare
+      (algebraMap (Polynomial (ZMod modulus))
+        (FractionRing (Polynomial (ZMod modulus)))
+        ((shortCubicPolynomial 0 B).comp
+            (Polynomial.C (scale chosen : ZMod modulus) * Polynomial.X) *
+          (shortCubicPolynomial 0 B).comp
+            (Polynomial.C (scale partner : ZMod modulus) * Polynomial.X))) := by
+    simpa only [shortCubicFunctionRadicand, ← map_mul] using pairSquare
+  apply shortCubicPairCollision_implies_CMNormTorsion
+    B (scale chosen : ZMod modulus) (scale partner : ZMod modulus)
+    parameter y y' hChar twoNonzeroBase cubicNonsingular BNonzero
+    (castNonzero chosen) (castNonzero partner)
+    (castDistinct chosen partner indicesDistinct) polynomialPairSquare
+    leftNonsingular rightNonsingular
+    (fun index sigma ↦ galoisSqrtSign (root index) sigma)
+    coefficient point chosen partner indicesDistinct chosenPoint partnerPoint
+  · intro index sigma tau
+    exact galoisSqrtSign_multiplicative
+      (rootNonzero index) twoNonzeroExtension (rootSquare index) sigma tau
+  · intro index sigma
+    exact galoisSqrtSign_squareOne (root index) sigma
+  · intro sigma
+    exact galoisSqrtSigns_eq_of_isSquare_mul
+      (rootNonzero chosen) (rootNonzero partner)
+      (rootSquare chosen) (rootSquare partner) pairSquare sigma
+  · intro index indexNotChosen indexNotPartner
+    exact galoisSqrtSigns_separate_of_not_isSquare_mul
+      (rootNonzero chosen) (rootNonzero index)
+      (rootSquare chosen) (rootSquare index)
+      (zmodShortCubicFunctionRadicand_mul_not_isSquare_of_A_eq_zero_outside_partner
+        modulus X hChar B cubicNonsingular BNonzero scale scalePositive
+        scaleBound scaleInjective intervalShort chosen partner indicesDistinct
+        pairSquare index indexNotChosen indexNotPartner)
+  · exact transformedRelation
+
 end TensorBoundaryBounds

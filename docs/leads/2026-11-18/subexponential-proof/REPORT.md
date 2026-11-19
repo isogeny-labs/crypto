@@ -72,3 +72,26 @@ For uniform residuals, a fixed signed alphabet of $B$ points at arity at most $m
 - **Diem, published extension-field result.** Dividing Theorem 2's exponent by $\log(q^n)$ gives $\max\{1/n,1/\sqrt{\log q},\sqrt n/\log q\}$. The regime needs $n\to\infty$ and $n=o((\log q)^2)$. The abstract states this correctly. Consequence (i) on p. 1282 appears to print the first limit with $q$ in place of $n$. The prime-field case has $n=1$. [Diem II](https://msp.org/ant/2013/7-6/ant-v7-n6-p01-s.pdf)
 
 The remaining formal obligations for the qualitative route are the half-edge interface and bit-cost bound, corrected Semaev nondegeneracy and the resulting total-energy estimate, binding the decomposition oracle and coverage event to the concrete row collector, executable Howell/dense-elimination ring and bit costs and the remaining expected-time restart assembly for Theorem 5, and a concrete universal-interpreter cost instantiation. The character-sum first moment and an exact identity-inclusive curve sampler are now checked. Sparse Wiedemann--Dixon is needed only for the sharper numerator-$2$ route. The local scheduler, fixed-numerator and dense-cubic conversions, sampler transfer, finite coverage, and planted-diagonal implications have a pinned Lean build and fresh-checker evidence; the validation ledger records the current proof-gate count. The exact pinned upstream planting, row-collection, cap and generation modules also build locally with standard axiom output. The native hashed-tensor audit still needs a typed entry-cost contract and aggregate bit and allocation bounds. The research-KB connector and executable were unavailable. This audit used the local lead atlas, linked lab evidence, and the exact paper and Lean revisions above. [Native audit obligations](https://github.com/isogeny-labs/crypto/blob/9ec88b7637/problems/hashed-ecdl-tensor-backend.md)
+
+### A-zero interval/Galois closure checkpoint
+
+The `A=0` collision classification is now composed through the concrete
+prime-field interval. `galoisSqrtSigns_eq_of_isSquare_mul` proves that a
+square product, rather than literal equality of radicands, is the correct
+duplicate-character condition. The interval theorem
+`zmodShortCubicFunctionRadicand_mul_not_isSquare_of_A_eq_zero_outside_partner`
+shows that after choosing one partner, every other product is nonsquare when
+the positive injective scales lie at most `X` and `3X < p`: any third partner
+would complete the forbidden cubic orbit. Finally,
+`zmodShortCubicIntervalGaloisPairCollision_implies_CMNormTorsion` constructs
+the actual finite-Galois sign characters, obtains all separators from that
+interval theorem, constructs the signed CM partner, and concludes that an
+explicit Eisenstein norm annihilates the chosen point. Thus the earlier
+abstract duplicate/separation premises are discharged. [pcc:unverified]
+
+This remains a conditional component, not a proof of subexponential ECDLP:
+the theorem still receives square roots, lifted affine points, and the family
+of transformed relations. The specialized Semaev relation must construct
+those inputs. The independent torsion-to-division-polynomial-root lemma,
+specialized polynomial degree/vanishing bounds, collector binding, and final
+runtime assembly also remain open. [pcc:unverified]

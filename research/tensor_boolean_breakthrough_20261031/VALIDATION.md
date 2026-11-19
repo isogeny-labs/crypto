@@ -1281,3 +1281,31 @@ duplicated-versus-separated Galois sign characters and the transformed
 relations. Torsion-to-division-polynomial vanishing, specialized polynomial
 construction/degree/vanishing, and runtime assembly also remain open.
 [pcc:unverified]
+
+## 2026-11-19 A-zero interval Galois composition
+
+`galoisSqrtSigns_eq_of_isSquare_mul` proves the exact collision criterion:
+when two base-field radicands have square product, all automorphisms give the
+selected roots the same sign. The complementary nonsquare theorem supplies a
+separating automorphism. [pcc:unverified]
+
+`zmodShortCubicFunctionRadicand_mul_not_isSquare_of_A_eq_zero_outside_partner`
+proves the missing interval classification. Starting from one square-product
+partner, any further square-product index has the conjugate cubic ratio and
+therefore completes a full three-element orbit. This contradicts the checked
+`zmodNoFullCubicOrbitInShortInterval` theorem under `3X < p`.
+[pcc:unverified]
+
+`zmodShortCubicIntervalGaloisPairCollision_implies_CMNormTorsion` composes
+that classification with the actual finite-Galois signs and the checked
+short-CM endpoint. Its conclusion exhibits the nonidentity cubic ratio, the
+point sign, and the explicit Eisenstein norm annihilating the chosen point.
+The complete pinned project build succeeds with 9,086 jobs. [pcc:unverified]
+The repository proof gate reports `PASS 310 thm 0 trusted`.
+[pcc:unverified]
+
+This closes the former duplicated-versus-separated character obligation for
+the stated interval model. It still assumes the selected square roots,
+lifted-point nonsingularity, point identifications, and all Galois-transformed
+relations. The Semaev construction, torsion-to-division-polynomial vanishing,
+and final algorithm/runtime theorem remain open. [pcc:unverified]

@@ -267,6 +267,21 @@ the exact eventual natural-power inequality required by
 `p^(3/m+o(1))` Theorem 5 route suffices without sparse Wiedemann--Dixon.
 [pcc:unverified]
 
+## Concrete A-zero interval collision chain
+
+| statement | kind | owner | quantified structure | hypotheses |
+|---|---|---|---|---|
+| `galoisSqrtSigns_eq_of_isSquare_mul` | law | `TensorBoundaryBounds` | two selected square roots in a field extension | their base-field radicand product is square and both roots are nonzero |
+| `galoisTwoCollisionSignCharacterProjector_isolates_pair_of_isSquare_mul` | endpoint | same | finite Galois extension, indexed roots and additive point group | one square-product pair, nonsquare products with every other index, every transformed relation |
+| `nonidentityCubeRoots_eq_or_eq_sq` | law | same | two roots of `T^2+T+1` over a field | none beyond the two displayed relations |
+| `zmodShortCubicFunctionRadicand_mul_not_isSquare_of_A_eq_zero_outside_partner` | endpoint | same | injective positive interval scales over a prime field | `A=0`, one square-product pair, nonsingular cubic, `3X < p` |
+| `zmodShortCubicIntervalGaloisPairCollision_implies_CMNormTorsion` | endpoint | same | prime-field short curve, function-field finite Galois extension, indexed roots and points | preceding interval conditions, lifted points, root equations and every transformed relation |
+
+The last theorem removes the abstract duplicate-character and separator
+premises from the `A=0` CM norm endpoint. It does not yet construct the
+Semaev lifted relation, prove torsion-to-division-polynomial vanishing, or
+establish a collector/runtime theorem. [pcc:unverified]
+
 ## Near-uniform pair-event transfer
 
 1. **Structure above.** A finite output type, a natural weight giving the
