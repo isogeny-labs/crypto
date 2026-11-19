@@ -373,5 +373,8 @@ The same pinned tree's `L116_Alg`, `L116_Chernoff`, and `L116_Main` additionally
 construct the actual row collector, prove its row relations and adaptive cap
 bound, derive tag surjectivity from generation, and discharge the prime-power
 generation hypothesis. Their targeted build and axiom audit pass; coverage,
-oracle binding, executable Howell cost and expected-time assembly remain.
+oracle binding and executable Howell cost remain. `L118_Tot` also checks the
+reciprocal-probability bound for two uniform generators; transfer to the
+paper's affine near-uniform sampler and the remaining expected-time assembly
+remain external.
 [pcc:unverified]

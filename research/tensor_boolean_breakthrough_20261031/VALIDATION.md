@@ -699,3 +699,21 @@ surjective, and the prime-power lattice generation hypothesis is discharged.
 It does not supply the curve-specific coverage fraction, bind the decomposition
 machine to `hOrc`, implement the `HowellSpec` procedure with bit costs, or
 formalize the expected-time outer restart loop. [pcc:unverified]
+
+### Uniform-generator expectation
+
+The additional exact target `ECDLPv2.L118_Tot` built successfully with 9,065
+jobs. Axiom output for `prod_ratio_le`, `card_primeFactors_le_log`,
+`totient_ge`, `gen_two_log`, and `gen_two_trials` is exactly `[propext,
+Classical.choice, Quot.sound]`. Its source hash is:
+
+```text
+f7a1c4817f76a5f7a463a0f6f3e84798c05f6132cef53b904d41f0112cead4de  L118_Tot.lean
+```
+
+`gen_two_trials` proves that two uniform samples from a rank-two finite abelian
+group require at most `(16/5) * (1 + log₂ |G|)` trials in reciprocal-probability
+form. The concrete curve algorithm samples affine points with a stated
+near-uniform lower bound rather than sampling all of `G` uniformly. A
+constant-factor transfer from that sampler to the uniform theorem is still an
+external obligation. [pcc:unverified]

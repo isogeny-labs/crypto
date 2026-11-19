@@ -157,6 +157,16 @@ all 9,067 jobs. Explicit axiom output for `algSpec_row_rel`, `cap_bound`,
 `hsurj_of_pair`, and `genBound_primePow` is exactly `[propext,
 Classical.choice, Quot.sound]`. [pcc:unverified]
 
+`L118_Tot` also checks the uniform-generator restart factor. Its
+`gen_two_trials` theorem bounds the reciprocal two-generator probability by
+`(16/5) * (1 + log₂ |G|)`, using a proved elementary totient bound. The pinned
+target built successfully with 9,065 jobs, and axiom output for
+`prod_ratio_le`, `card_primeFactors_le_log`, `totient_ge`, `gen_two_log`, and
+`gen_two_trials` is exactly `[propext, Classical.choice, Quot.sound]`. This is
+an expectation bound for two uniform elements. The paper's concrete affine
+point sampler is only near-uniform, so its constant-factor transfer remains a
+separate interface. [pcc:unverified]
+
 ## Corrections and remaining obligations
 
 The paper's Lemma 5.5 overstates its constant-torsion conclusion: a torsion
@@ -225,8 +235,9 @@ the remaining independent obligations are:
 2. bind the factor-base labels returned by the Lean oracle to the rows used by
    the arbitrary-group relation lattice;
 3. implement and cost the Howell/dense-elimination procedure, bind the checked
-   finite round to the concrete coverage oracle, near-uniform generator sampler
-   and expected-time restart loop, and derive Theorem 5's bit bound
+   finite round to the concrete coverage oracle, transfer the checked uniform
+   generator expectation to the affine near-uniform sampler, assemble the
+   remaining restart events, and derive Theorem 5's bit bound
    [pcc:unverified];
 4. implement or formalize the universal interpreter, independent random tapes,
    scalar-output length cap and polynomial simulation exponent `C`.
@@ -253,6 +264,8 @@ remove any of these fixed-`m` correctness and cost obligations.
   <https://github.com/kaarelkaarelson/fast-ecdlp/blob/d1deb5abe008e981206ed58cbd83012b6afc3740/v2/lean/ECDLPv2/L116_Alg.lean>,
   <https://github.com/kaarelkaarelson/fast-ecdlp/blob/d1deb5abe008e981206ed58cbd83012b6afc3740/v2/lean/ECDLPv2/L116_Chernoff.lean>, and
   <https://github.com/kaarelkaarelson/fast-ecdlp/blob/d1deb5abe008e981206ed58cbd83012b6afc3740/v2/lean/ECDLPv2/L116_Main.lean>.
+- Pinned uniform-generator expectation source:
+  <https://github.com/kaarelkaarelson/fast-ecdlp/blob/d1deb5abe008e981206ed58cbd83012b6afc3740/v2/lean/ECDLPv2/L118_Tot.lean>.
 - Local source hashes: `v2/paper.pdf`
   `eacf5acb66cedbd7eb656580322c9770d72f47ad6d95412e3d4e5c87309f696d`;
   `lean/ECDLP/L104_Final.lean`
@@ -268,7 +281,9 @@ remove any of these fixed-`m` correctness and cost obligations.
   `v2/lean/ECDLPv2/L116_Chernoff.lean`
   `d95c55f402b699f3e2a093d24b9d20190117dc458c6dc5567a457c5dc536ec70`;
   `v2/lean/ECDLPv2/L116_Main.lean`
-  `e4d970303f43f75701347e50eef9f042dd9a337df7c95d1c2892fb8709f398bf`.
+  `e4d970303f43f75701347e50eef9f042dd9a337df7c95d1c2892fb8709f398bf`;
+  `v2/lean/ECDLPv2/L118_Tot.lean`
+  `f7a1c4817f76a5f7a463a0f6f3e84798c05f6132cef53b904d41f0112cead4de`.
 
 The repository research-KB wrapper was unavailable (`research-kb: no
 executable found`). The review therefore used this exact primary-source pin,
