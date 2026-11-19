@@ -28,7 +28,11 @@ the capsule remains unconsumed. The
 [four-arm freeze](four-arm-freeze-v1/RESULT.md) locks arm order
 `rho → f5 → sat → incumbent`, policy bounds, and publication pins
 (`FOUR_ARM_FROZEN_NOT_DISPATCHED`) without granting dispatch. Sole F5/SAT
-target runs and four-arm results remain uncreated. A separate
+target runs and four-arm results remain uncreated. Tip `icprog` now exposes
+card-bound rho one-use commands under [RHO_TARGET.md](RHO_TARGET.md) /
+[rho-target-registration-v1](rho-target-registration-v1/PROTOCOL.md); freeze
+and publish leave the capsule `RHO_CARD_REGISTERED_NOT_DISPATCHED`, and
+execute still requires a separate authorization token. A separate
 [disclosed strong-rho readiness control](rho-readiness-v1/RESULT.md)
 recovered and replayed one already exposed public point; it is neither a
 source publication nor a fresh paired arm.

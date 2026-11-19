@@ -38,7 +38,11 @@ IC1 identity and prepared solver admission remain open. The fresh-paired
 [incumbent](goal_20260924/fresh-paired-n17-v1/INCUMBENT_SOURCE.md) and
 [rho](goal_20260924/fresh-paired-n17-v1/RHO_SOURCE.md) source publishers archive
 target-free bytes only; committed publications are still required before a
-card. The Python entry points below are historical contracts, not commands for
+card. After the four-arm freeze, tip
+[`rho-target-*`](goal_20260924/fresh-paired-n17-v1/RHO_TARGET.md) binds the
+public card to archived `ecbench` under a one-use registration without
+granting execute; dispatch still needs a separate authorization token. The
+Python entry points below are historical contracts, not commands for
 new research.
 The [ordinary preparation mathematical gate](goal_20260924/native-ordinary-preparation-v1/PROTOCOL.md)
 independently checks target-free n17 input chronology, the complete geometric

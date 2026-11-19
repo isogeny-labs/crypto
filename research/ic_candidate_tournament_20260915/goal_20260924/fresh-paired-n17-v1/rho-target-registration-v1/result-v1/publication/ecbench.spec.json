@@ -1,0 +1,39 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.signed_frobenius_strong",
+        "params": {
+          "dp_bits": "4",
+          "lanes": "32",
+          "step_cap_factor": "2000"
+        }
+      },
+      "name": "rho-strong",
+      "role": "reference"
+    }
+  ],
+  "description": "Card-bound one-use strong-rho arm for the fresh-paired n17 campaign. Not authorized by the four-arm freeze alone.",
+  "label": "fresh-paired-n17-rho-arm-v1",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 1,
+    "seed": 2026111901,
+    "timeout_seconds": 900,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 1,
+        "kind": "koblitz",
+        "n": 17
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 13942624875975887236,
+    "targets_per_curve": 1
+  }
+}

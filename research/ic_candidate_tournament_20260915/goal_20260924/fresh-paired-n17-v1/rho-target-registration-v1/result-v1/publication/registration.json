@@ -1,0 +1,90 @@
+{
+  "arm": "rho",
+  "arm_order_position": 0,
+  "card_sha256": "bd969a4092a329bf093688b9d4715c86d77850c11f115ff47852c9235d7c2379",
+  "controller_sha256": "22493de376a83a206267e90916329e73f9b9c375aa60f5712572f929c1465de3",
+  "curve_id": "EC1N17Ckb1hbbe2b5b6b1e6",
+  "dispatch_authorization_recorded": "not_granted_freeze_only",
+  "ecbench_sha256": "60fa3f7a042de090faabffcc09af28a59970c6d112320564b0f0621ecd413d47",
+  "ecbench_spec": {
+    "arms": [
+      {
+        "method": {
+          "id": "rho.signed_frobenius_strong",
+          "params": {
+            "dp_bits": "4",
+            "lanes": "32",
+            "step_cap_factor": "2000"
+          }
+        },
+        "name": "rho-strong",
+        "role": "reference"
+      }
+    ],
+    "description": "Card-bound one-use strong-rho arm for the fresh-paired n17 campaign. Not authorized by the four-arm freeze alone.",
+    "label": "fresh-paired-n17-rho-arm-v1",
+    "measurement": {
+      "isolation_required": "L0",
+      "order": "alternate",
+      "rounds": 1,
+      "seed": 2026111901,
+      "timeout_seconds": 900,
+      "warmup": 0
+    },
+    "schema": "ecbench.spec/v1",
+    "workloads": {
+      "curves": [
+        {
+          "a": 1,
+          "kind": "koblitz",
+          "n": 17
+        }
+      ],
+      "target_kind": "public",
+      "target_seed": 13942624875975887236,
+      "targets_per_curve": 1
+    }
+  },
+  "ecbench_workload_id": "Wf3040f4f5554",
+  "ecbench_workload_sha256": "f3040f4f5554a12cd8c8f04bfcf38f021a34e5de5f8248da6f23ee5e88d07927",
+  "execution_admitted": false,
+  "four_arm_freeze_sha256": "a94df27cd3ed73974787e4cf87d755bbb062f5431645704a61b8c4d45f761aa2",
+  "immutable_files": {
+    "immutable/bin/ecbench": {
+      "bytes": 7980048,
+      "sha256": "60fa3f7a042de090faabffcc09af28a59970c6d112320564b0f0621ecd413d47"
+    },
+    "immutable/build/build-record.json": {
+      "bytes": 1725,
+      "sha256": "037d592da03a58d0854593b6801a5eda8e2ae51cb7d2d0ad49f85ca7aef2aefc"
+    },
+    "immutable/build/build.log": {
+      "bytes": 3560,
+      "sha256": "cbf5c2032cde77f276a74b01603b3657fe1773145e7c26b144e6cce875d906f5"
+    }
+  },
+  "one_use": true,
+  "online_speedup": null,
+  "policy": {
+    "dp_bits": 4,
+    "lanes": 32,
+    "method": "rho.signed_frobenius_strong",
+    "step_cap_factor": 2000
+  },
+  "public_target": [
+    87633,
+    27
+  ],
+  "question": "fresh-paired-n17-rho-target-registration-v1",
+  "resume_forbidden": true,
+  "retry_forbidden": true,
+  "role": "rho",
+  "schema_version": 1,
+  "scientific_worker_calls": 0,
+  "source_archive_sha256": "b0f0983a01ad3d7fc113f4e9f7b394890dcf019647c423263c5b2e61639eb05a",
+  "source_bound_execution_admitted": false,
+  "source_descriptor_sha256": "24d65abf45d33aa566882ec83f0bd73a676af5c2cb431f7a4841dd621b327256",
+  "source_registration_sha256": "f74601e7be2ef1c7141fee5a997b38c090e0f19eadbe0d7e843577b59918cf59",
+  "status": "RHO_CARD_REGISTERED_NOT_DISPATCHED",
+  "target_seed": 13942624875975887236
+}

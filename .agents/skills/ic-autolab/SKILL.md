@@ -230,6 +230,12 @@ add `incumbent-source-publish`/`incumbent-source-replay` and
 bytes only. Committed publications and independent repository replays remain
 required before a point card; these commands alone do not mint IC1 identities
 or authorize a four-arm dispatch.
+The [rho target registration](../../../research/ic_candidate_tournament_20260915/goal_20260924/fresh-paired-n17-v1/RHO_TARGET.md)
+adds tip `rho-target-freeze`/`publish`/`replay`/`execute` so the first freeze
+arm can bind the public card to archived `ecbench` under a one-use claim.
+Freeze/publish leave `RHO_CARD_REGISTERED_NOT_DISPATCHED`. Execute refuses
+unless `--dispatch-authorization separately_authorized_rho_arm_v1`; do not
+invent that token from the four-arm freeze alone.
 Do not charge child startup to the online interval by stopwatch subtraction.
 On Unix, `isolated_bench busy` serializes builds/tests against the same lock as
 the historical wrapper; macOS supports busy only. Timed affinity/reservation
