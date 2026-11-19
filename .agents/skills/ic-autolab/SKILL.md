@@ -236,6 +236,12 @@ arm can bind the public card to archived `ecbench` under a one-use claim.
 Freeze/publish leave `RHO_CARD_REGISTERED_NOT_DISPATCHED`. Execute refuses
 unless `--dispatch-authorization separately_authorized_rho_arm_v1`; do not
 invent that token from the four-arm freeze alone.
+The [incumbent target registration](../../../research/ic_candidate_tournament_20260915/goal_20260924/fresh-paired-n17-v1/INCUMBENT_TARGET.md)
+adds tip `incumbent-target-freeze`/`publish`/`replay`/`execute` for the fourth
+freeze arm and the archived pairinv worker. Freeze/publish leave
+`INCUMBENT_CARD_REGISTERED_NOT_DISPATCHED` with IC1 still null. Execute refuses
+unless `--dispatch-authorization separately_authorized_incumbent_arm_v1`; do
+not invent that token either.
 Do not charge child startup to the online interval by stopwatch subtraction.
 On Unix, `isolated_bench busy` serializes builds/tests against the same lock as
 the historical wrapper; macOS supports busy only. Timed affinity/reservation

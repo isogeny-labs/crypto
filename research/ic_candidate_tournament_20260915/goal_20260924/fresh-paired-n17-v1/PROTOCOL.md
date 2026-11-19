@@ -32,7 +32,13 @@ target runs and four-arm results remain uncreated. Tip `icprog` now exposes
 card-bound rho one-use commands under [RHO_TARGET.md](RHO_TARGET.md) /
 [rho-target-registration-v1](rho-target-registration-v1/PROTOCOL.md); freeze
 and publish leave the capsule `RHO_CARD_REGISTERED_NOT_DISPATCHED`, and
-execute still requires a separate authorization token. A separate
+execute still requires a separate authorization token. Tip `icprog` likewise
+exposes card-bound incumbent one-use commands under
+[INCUMBENT_TARGET.md](INCUMBENT_TARGET.md) /
+[incumbent-target-registration-v1](incumbent-target-registration-v1/PROTOCOL.md);
+freeze and publish leave `INCUMBENT_CARD_REGISTERED_NOT_DISPATCHED`, keep IC1
+null until a separate pre-card inventory, and refuse execute without a separate
+authorization token. A separate
 [disclosed strong-rho readiness control](rho-readiness-v1/RESULT.md)
 recovered and replayed one already exposed public point; it is neither a
 source publication nor a fresh paired arm.

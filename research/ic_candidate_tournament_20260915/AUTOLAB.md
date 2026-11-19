@@ -41,8 +41,10 @@ target-free bytes only; committed publications are still required before a
 card. After the four-arm freeze, tip
 [`rho-target-*`](goal_20260924/fresh-paired-n17-v1/RHO_TARGET.md) binds the
 public card to archived `ecbench` under a one-use registration without
-granting execute; dispatch still needs a separate authorization token. The
-Python entry points below are historical contracts, not commands for
+granting execute; dispatch still needs a separate authorization token. Tip
+[`incumbent-target-*`](goal_20260924/fresh-paired-n17-v1/INCUMBENT_TARGET.md)
+likewise binds the card to the archived pairinv worker without granting
+execute. The Python entry points below are historical contracts, not commands for
 new research.
 The [ordinary preparation mathematical gate](goal_20260924/native-ordinary-preparation-v1/PROTOCOL.md)
 independently checks target-free n17 input chronology, the complete geometric

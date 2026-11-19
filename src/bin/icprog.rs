@@ -62,6 +62,8 @@ mod rho_target;
 mod f5_source_custody;
 #[path = "icprog/incumbent_source.rs"]
 mod incumbent_source;
+#[path = "icprog/incumbent_target.rs"]
+mod incumbent_target;
 #[path = "icprog/json.rs"]
 #[allow(dead_code)]
 mod json;
@@ -338,6 +340,55 @@ enum Command {
         source_registration_sha256: String,
         #[arg(long)]
         out: PathBuf,
+    },
+    /// Freeze a card-bound one-use incumbent registration around archived pairinv worker; no run.
+    IncumbentTargetFreeze {
+        #[arg(long)]
+        source_publication: PathBuf,
+        #[arg(long)]
+        source_descriptor: PathBuf,
+        #[arg(long)]
+        card: PathBuf,
+        #[arg(long)]
+        four_arm_freeze: PathBuf,
+        #[arg(long)]
+        capsule: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Publish unconsumed incumbent target registration custody as data; no execute.
+    IncumbentTargetPublish {
+        #[arg(long)]
+        capsule: PathBuf,
+        #[arg(long)]
+        registration_sha256: String,
+        #[arg(long)]
+        publication: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Replay published incumbent target registration as data; executes no archived binary.
+    IncumbentTargetReplay {
+        #[arg(long)]
+        publication: PathBuf,
+        #[arg(long)]
+        registration_sha256: String,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Consume one incumbent registration and launch archived worker once when separately authorized.
+    IncumbentTargetExecute {
+        #[arg(long)]
+        capsule: PathBuf,
+        #[arg(long)]
+        publication: PathBuf,
+        #[arg(long)]
+        execution: PathBuf,
+        #[arg(long)]
+        registration_sha256: String,
+        /// Must be `separately_authorized_incumbent_arm_v1`; freeze alone is not enough.
+        #[arg(long)]
+        dispatch_authorization: String,
     },
     /// Freeze a card-bound one-use rho registration around archived ecbench; no run.
     RhoTargetFreeze {
@@ -1359,6 +1410,45 @@ fn main() -> ExitCode {
             source_registration_sha256,
             out,
         } => rho_source::replay(&publication, &source_registration_sha256, &out),
+        Command::IncumbentTargetFreeze {
+            source_publication,
+            source_descriptor,
+            card,
+            four_arm_freeze,
+            capsule,
+            out,
+        } => incumbent_target::freeze(
+            &source_publication,
+            &source_descriptor,
+            &card,
+            &four_arm_freeze,
+            &capsule,
+            &out,
+        ),
+        Command::IncumbentTargetPublish {
+            capsule,
+            registration_sha256,
+            publication,
+            out,
+        } => incumbent_target::publish(&capsule, &registration_sha256, &publication, &out),
+        Command::IncumbentTargetReplay {
+            publication,
+            registration_sha256,
+            out,
+        } => incumbent_target::replay(&publication, &registration_sha256, &out),
+        Command::IncumbentTargetExecute {
+            capsule,
+            publication,
+            execution,
+            registration_sha256,
+            dispatch_authorization,
+        } => incumbent_target::execute(
+            &capsule,
+            &publication,
+            &execution,
+            &registration_sha256,
+            &dispatch_authorization,
+        ),
         Command::RhoTargetFreeze {
             source_publication,
             source_descriptor,
