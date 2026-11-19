@@ -203,10 +203,15 @@ fn verified(points: Vec<Mask>, system: &BooleanSystem, tests: &mut u64) -> Vec<M
 /// Also holds an [`F4PairTrace`] (opt-in, `trace=1`): Traverso's Gröbner
 /// trace — the useful pairs of the first system of each shape, replayed on
 /// the later ones, verified by one charged F4 pass over the replayed
-/// basis's pairs and the inputs, with a fall-back to the plain path (see
-/// the test `f4_f2_trace_matches_plain_on_descent_systems` for what it
-/// measured).  `trace_mb` (default 64) caps the stored bytes.  The two
-/// options are exclusive.
+/// basis's pairs and the inputs, with a fall-back to the plain path.  On
+/// 32 `S_3` descents over `F_{2^13}` (one support, but 21 distinct plain
+/// run outcomes) every one of the 31 replays mismatched at its first
+/// step, so every system paid a failed replay plus a re-recording plain
+/// run: 382,248 word XORs against 133,813 plain (×2.86, of which 247,230
+/// the provenance passes), 4.83M against 3.55M `bitop` word operations —
+/// a net loss, so the default stays off (`trace=0`).  Random same-shape
+/// systems varying only their affine part replay with hits.  `trace_mb`
+/// (default 64) caps the stored bytes.  The two options are exclusive.
 #[derive(Default)]
 pub struct F4F2 {
     skeleton: std::sync::Mutex<Option<F4Skeleton>>,
@@ -358,6 +363,7 @@ impl SystemSolver for F4F2 {
             ("trace_hits", st.trace_hits),
             ("trace_fallbacks", st.trace_fallbacks),
             ("trace_mismatches", st.trace_mismatches),
+            ("trace_steps_matched", st.trace_steps_matched),
             ("trace_verifications", st.trace_verifications),
             ("trace_verify_failures", st.trace_verify_failures),
             ("trace_verify_word_xors", st.trace_verify_word_xors),
@@ -3192,6 +3198,7 @@ mod tests {
         let off = Params::default();
         let mut sums: BTreeMap<String, (u64, u64)> = BTreeMap::new();
         let mut supports = std::collections::BTreeSet::new();
+        let mut plain_shapes = std::collections::BTreeMap::new();
         let n_systems = 32;
         for k in 0..n_systems {
             let x_r = rng.gen::<u64>() & inst.gf.mask;
@@ -3217,6 +3224,14 @@ mod tests {
             );
             assert_eq!(ca.extra["basis_len"], cb.extra["basis_len"], "system {k}");
             assert_eq!(cb.extra["trace_replays"], 0);
+            *plain_shapes
+                .entry((
+                    cb.extra["steps"],
+                    cb.extra["new_elements"],
+                    cb.extra["basis_len"],
+                    cb.solving_degree,
+                ))
+                .or_insert(0) += 1;
             let e = sums.entry("word_xors".into()).or_default();
             e.0 += ca.ops;
             e.1 += cb.ops;
@@ -3232,6 +3247,9 @@ mod tests {
                 "trace_hits",
                 "trace_fallbacks",
                 "trace_mismatches",
+                "trace_steps_matched",
+                "steps",
+                "new_elements",
                 "trace_verifications",
                 "trace_verify_failures",
                 "trace_verify_word_xors",
@@ -3249,6 +3267,7 @@ mod tests {
             "trace vs plain over {n_systems} descent systems ({} distinct supports):",
             supports.len()
         );
+        eprintln!("  plain (steps, new elements, basis, solving degree): {plain_shapes:?}");
         for (k, (a, b)) in &sums {
             eprintln!("  {k:28} trace {a:>12} plain {b:>12}");
         }

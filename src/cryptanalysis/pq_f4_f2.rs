@@ -264,6 +264,9 @@ pub struct F4Stats {
     /// Of the fallbacks: the replay stopped early because a step's new
     /// leading monomials differed from the recorded ones.
     pub trace_mismatches: u64,
+    /// Replay steps whose new leading monomials matched the recorded ones
+    /// (before a mismatch, or all of them).
+    pub trace_steps_matched: u64,
     /// Verification passes run, and those that found the replayed basis
     /// incomplete (a fallback each).
     pub trace_verifications: u64,
@@ -329,6 +332,7 @@ impl F4Stats {
             trace_hits,
             trace_fallbacks,
             trace_mismatches,
+            trace_steps_matched,
             trace_verifications,
             trace_verify_failures,
             trace_verify_word_xors,
@@ -3394,6 +3398,7 @@ fn groebner_basis_f4_inner(
                 st.trace_mismatches = 1;
                 return finish(Vec::new(), st);
             }
+            st.trace_steps_matched += 1;
         }
         if !fresh.is_empty() {
             st.solving_degree = st.solving_degree.max(d);
