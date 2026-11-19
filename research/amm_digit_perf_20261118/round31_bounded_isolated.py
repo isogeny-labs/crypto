@@ -124,6 +124,23 @@ mod round31 {
     }
 
     #[test]
+    fn scalar_gate_limit_and_deadline_priority() {
+        let mut caps=budget();
+        caps.field_work=0;
+        let mut expired=Gate::new(caps,Instant::now());
+        assert_eq!(expired.scalar(),Err(Stop::Deadline));
+        assert_eq!(expired.metrics.work,0);
+        let mut capped=Gate::new(caps,deadline());
+        assert_eq!(capped.scalar(),Err(Stop::FieldLimit));
+        assert_eq!(capped.metrics.work,0);
+        let mut caps=budget();
+        caps.work=0;
+        let mut work_limited=Gate::new(caps,deadline());
+        assert_eq!(work_limited.scalar(),Err(Stop::WorkLimit));
+        assert_eq!(work_limited.metrics.field_work,0);
+    }
+
+    #[test]
     fn full_bounded_solver_and_replay_smoke() {
         for p in [17u64,1_000_000_007,(1u64<<61)-1] {
             let field=Fp64Arithmetic{p};
@@ -296,6 +313,7 @@ with tempfile.TemporaryDirectory() as tmp:
     file.write_text(rust)
     subprocess.run(["rustc","--edition=2021","-O","--test",str(file),"-o",str(out)],check=True)
     subprocess.run([str(out),"exact_comparisons","--nocapture"],check=True)
+    subprocess.run([str(out),"scalar_gate_limit_and_deadline_priority","--nocapture"],check=True)
     subprocess.run([str(out),"full_bounded_solver_and_replay_smoke","--nocapture"],check=True)
     subprocess.run([str(out),"whole_rootfinder_before_after_exact","--nocapture"],check=True)
     subprocess.run([str(out),"whole_rootfinder_paired_timings","--ignored","--nocapture"],check=True)
