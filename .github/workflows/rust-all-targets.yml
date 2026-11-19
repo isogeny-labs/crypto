@@ -29,6 +29,9 @@ concurrency:
   group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+env:
+  ARTIFACTS_PULL_SOURCE: git
+
 jobs:
   scope:
     if: >-
@@ -74,6 +77,26 @@ jobs:
             /benches/
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/bitop_ladder_20261019/sessions/holdout-P24/records.jsonl research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl research/ecbench_all_candidates_20261003/sessions/koblitz/records.jsonl research/ecbench_all_candidates_20261003/sessions/prime/records.jsonl research/ecbench_bounds_challenges_20261006/sessions/koblitz-toy-reference-e1/records.jsonl research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/records.jsonl research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/records.jsonl research/ecbench_numa_vm_20261002/sessions/v2-auto/records.jsonl research/ecbench_yield_sweep_20261004/sessions/koblitz/records.jsonl research/ext_endo_rho_20261023/sessions-a1/gls-fp2/records.jsonl research/ext_endo_rho_20261023/sessions/gls-fp2/records.jsonl research/ext_endo_rho_20261023/sessions/subfield-fp3/records.jsonl research/ic_planner_validation_20261020/sessions/c24/records.jsonl research/ic_planner_validation_20261020/sessions/r24/records.jsonl research/ic_planner_validation_20261020/sessions/r26/records.jsonl research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv
       - id: scope
         env:
           CI_EVENT: ${{ github.event_name }}
@@ -124,6 +147,26 @@ jobs:
             /benches/
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/bitop_ladder_20261019/sessions/holdout-P24/records.jsonl research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl research/ecbench_all_candidates_20261003/sessions/koblitz/records.jsonl research/ecbench_all_candidates_20261003/sessions/prime/records.jsonl research/ecbench_bounds_challenges_20261006/sessions/koblitz-toy-reference-e1/records.jsonl research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/records.jsonl research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/records.jsonl research/ecbench_numa_vm_20261002/sessions/v2-auto/records.jsonl research/ecbench_yield_sweep_20261004/sessions/koblitz/records.jsonl research/ext_endo_rho_20261023/sessions-a1/gls-fp2/records.jsonl research/ext_endo_rho_20261023/sessions/gls-fp2/records.jsonl research/ext_endo_rho_20261023/sessions/subfield-fp3/records.jsonl research/ic_planner_validation_20261020/sessions/c24/records.jsonl research/ic_planner_validation_20261020/sessions/r24/records.jsonl research/ic_planner_validation_20261020/sessions/r26/records.jsonl research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv
       - name: Materialize compile-time inputs without research archives
         run: |
           node .github/scripts/ci-scope.mjs --materialize
@@ -184,6 +227,26 @@ jobs:
           ref: ${{ inputs.source_revision }}
           filter: blob:none
           persist-credentials: false
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/bitop_ladder_20261019/sessions/holdout-P24/records.jsonl research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl research/ecbench_all_candidates_20261003/sessions/koblitz/records.jsonl research/ecbench_all_candidates_20261003/sessions/prime/records.jsonl research/ecbench_bounds_challenges_20261006/sessions/koblitz-toy-reference-e1/records.jsonl research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/records.jsonl research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/records.jsonl research/ecbench_numa_vm_20261002/sessions/v2-auto/records.jsonl research/ecbench_yield_sweep_20261004/sessions/koblitz/records.jsonl research/ext_endo_rho_20261023/sessions-a1/gls-fp2/records.jsonl research/ext_endo_rho_20261023/sessions/gls-fp2/records.jsonl research/ext_endo_rho_20261023/sessions/subfield-fp3/records.jsonl research/ic_planner_validation_20261020/sessions/c24/records.jsonl research/ic_planner_validation_20261020/sessions/r24/records.jsonl research/ic_planner_validation_20261020/sessions/r26/records.jsonl research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv
       - name: Bind the checkout and toolchain
         shell: bash
         run: |
