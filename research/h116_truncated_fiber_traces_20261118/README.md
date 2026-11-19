@@ -600,3 +600,12 @@ prime-order curves.  Every exact oracle control passes, but the rule scores
 closes the selected raw-residue rule.  The next lead changes to Frobenius
 splitting-type bits of the Prym real-Weil polynomial modulo auxiliary primes.
 [pcc:unverified]
+
+The frozen [Prym splitting-bit test](PRYM_FROBENIUS_SPLITTING_PARITY_EXPERIMENT.md)
+then checks the real-Weil polynomial over `F_5` and `F_7`.  All 6,296 direct
+root controls pass and 1,486/1,520 targets are distinguished from their
+negations, but the selected rule is only 385/688, no rule is exact, and
+family-wise `p=0.342690`.  The next lead tests linear factors of the full
+degree-four Prym Weil polynomial, probing rational auxiliary-torsion
+Frobenius eigenlines rather than only the real quadratic discriminant.
+[pcc:unverified]
