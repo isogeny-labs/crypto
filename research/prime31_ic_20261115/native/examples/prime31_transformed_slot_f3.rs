@@ -4,7 +4,7 @@
 //! Frozen protocol: ../rr9/TRANSFORMED_SLOT_F3_PROTOCOL_20261119.md
 use prime31_algebraic_ic::{check_curve, Arithmetic, Point, PRIME31};
 use serde_json::{json, Value};
-use std::collections::HashSet;
+use std::collections::{BTreeMap, HashSet};
 
 type Aff = (u64, u64);
 const P: u64 = 2_147_483_647;
@@ -41,6 +41,49 @@ fn h(slot: &[Aff;8], t: u64) -> u64 {
 fn k(slot: &[Aff;8], suffix: u64, sum: u64) -> u64 {
     slot.iter().fold(1,|acc,pt|mul(acc,s3(pt.0,suffix,sum)))
 }
+
+type BiPoly = BTreeMap<(usize,usize),u64>;
+// With transformed leaf root t fixed, S3(t,U,V) has nine possible
+// bivariate monomials. Eight factors have bi-degree <=(16,16) and <=289 terms.
+fn s3_fixed_poly(t:u64) -> BiPoly {
+    let t2=mul(t,t);
+    let two=2u64;
+    let terms=[
+        ((2,2),1u64),
+        ((1,2),sub(0,mul(two,t))),
+        ((0,2),t2),
+        ((2,1),sub(0,mul(two,t))),
+        ((1,1),sub(0,mul(two,add(t2,PRIME31.a)))),
+        ((0,1),sub(0,mul(two,add(mul(PRIME31.a,t),mul(two,PRIME31.b))))),
+        ((2,0),t2),
+        ((1,0),sub(0,add(mul(two,mul(PRIME31.a,t)),mul(4,PRIME31.b)))),
+        ((0,0),sub(mul(PRIME31.a,PRIME31.a),mul(4,mul(PRIME31.b,t)))),
+    ];
+    terms.into_iter().filter(|(_,c)|*c!=0).collect()
+}
+fn bivariate_product(f:&BiPoly,g:&BiPoly)->BiPoly {
+    let mut out=BiPoly::new();
+    for (&(i,j),&x) in f {
+        for (&(k,l),&y) in g {
+            let key=(i+k,j+l);
+            let old=out.get(&key).copied().unwrap_or(0);
+            out.insert(key,add(old,mul(x,y)));
+        }
+    }
+    out.retain(|_,c|*c!=0);
+    out
+}
+fn k_coefficients(slot:&[Aff;8])->BiPoly {
+    let mut coefficients=BiPoly::from([((0,0),1)]);
+    for pt in slot { coefficients=bivariate_product(&coefficients,&s3_fixed_poly(pt.0)); }
+    coefficients
+}
+fn eval_bivariate(p:&BiPoly,u:u64,v:u64)->u64 {
+    let mut us=[1u64;17]; let mut vs=[1u64;17];
+    for i in 1..=16 {us[i]=mul(us[i-1],u);vs[i]=mul(vs[i-1],v);}
+    p.iter().fold(0,|acc,(&(i,j),&c)|add(acc,mul(c,mul(us[i],vs[j]))))
+}
+
 fn base31(ar: &mut Arithmetic) -> Vec<Aff> {
     let mut base=Vec::new();
     for x in 0..10_000 {
@@ -101,6 +144,17 @@ fn run(per_window:usize) -> Value {
         }));
         let distinct:HashSet<u64>=slots.iter().flat_map(|v|v.iter().map(|p|p.0)).collect();
         assert_eq!(distinct.len(),64,"wrong slot-support assumption");
+        let mut k_term_counts=Vec::new();
+        for i in 0..7 {
+            let coeff=k_coefficients(&slots[i]);
+            assert!(coeff.len()<=289 && !coeff.is_empty());
+            assert_eq!(coeff.get(&(16,16)).copied(),Some(1));
+            for (u,v) in [(0u64,0u64),(1,1),(27,173),(P-1,P-2)] {
+                assert_eq!(eval_bivariate(&coeff,u,v),k(&slots[i],u,v),
+                    "expanded K coefficient replay failed");
+            }
+            k_term_counts.push(coeff.len());
+        }
         let mut win_ord=0u64;let mut win_exc=0u64;
         for ci in 0..per_window {
             let mut choices=[0usize;8];let mut signs=[0u64;8];
@@ -144,7 +198,8 @@ fn run(per_window:usize) -> Value {
             }
         }
         windows_json.push(json!({"window":wi,"distinct_slot_roots":distinct.len(),
-            "ordinary":win_ord,"exceptional":win_exc}));
+            "ordinary":win_ord,"exceptional":win_exc,
+            "k_polynomial_term_counts":k_term_counts}));
     }
     json!({"schema":"prime31.transformed_slot_f3.v1","curve":PRIME31,
         "seed":format!("0x{SEED:016x}"),"cases_per_window":per_window,
@@ -172,6 +227,7 @@ fn transformed_f3_original_prime31() {
     assert_eq!(result["s3_zero"].as_u64(),Some(56));
     assert_eq!(result["k_zero"].as_u64(),Some(56));
     assert_eq!(result["post_solve_sign_lift_verified"].as_u64(),Some(8));
+    assert_eq!(result["windows"][0]["k_polynomial_term_counts"],json!([285,288,289,289,289,289,289]));
 }
 fn main() {
     println!("{}",serde_json::to_string_pretty(&run(128)).expect("JSON"));
