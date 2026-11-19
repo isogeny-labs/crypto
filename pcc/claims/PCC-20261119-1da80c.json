@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-19T19:13:30Z",
+ "id": "PCC-20261119-1da80c",
+ "kind": "statement",
+ "producer": {
+  "commit": "7314ee267f930db7e4af85bc0ae466a2fb0f8267",
+  "model": "codex",
+  "session": "conductor-twist-20261119"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/twist-transport-20261119/dual-audit.stdout",
+    "sha256": "c54f1142eb2e9065a75dbc18f2e37277e80eb9047146865940af6b0ff433462e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/twist-transport-20261119/check-dual.gp",
+    "sha256": "c170253679a6b0f7acdecf022163be1ff1530db348e704643624de797297d1e8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/twist-transport-20261119/dual-audit.gpvec",
+    "sha256": "eae43881fcf3fd695848229065f92b89ec8caf96bf3e6a7141b3620a3135b91a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/twist-transport-20261119/results/case0-dual-b/stdout",
+    "sha256": "83b99b22a9418e2cba4e4b5d9d6c7b42f10f581e8013a1da7a4e25082d764c8c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "retained33555419-dual-composition",
+ "statement": "The full normalized dual constructor completes on all33 transported original-subgroup points. Independent PARI checks confirm the double quotient equation scaled by ell^4/ell^6 and33 compositions equal ell^2/ell^3-scaled [ell]P, with gcd(ell,original subgroup order)=1. This supports invertible transport on that original subgroup; no endpoint ECDLP runtime or80bit completion is asserted."
+}

@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-19T19:06:36Z",
+ "id": "PCC-20261119-3b9f6e",
+ "kind": "statement",
+ "producer": {
+  "commit": "7314ee267f930db7e4af85bc0ae466a2fb0f8267",
+  "model": "codex",
+  "session": "conductor-twist-20261119"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/twist-transport-20261119/qualification.json",
+    "sha256": "656ad80186e1f95388f251a79ba37bf7af39bd17c2346a5335e75a40915d6003"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/twist-transport-20261119/qualification-a/commands.json",
+    "sha256": "31179c2d092b2d67245255781b45d50a18cd0dec8e4b2713a41735ccee0d7b1f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/twist-transport-20261119/frozen/complete_twisted_pipeline.cpp",
+    "sha256": "e7a042acdd2c8f33e20b467ff30e681ace92825d628543d50c50d28f0af23dcd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/twist-transport-20261119/build-b/binary.sha256",
+    "sha256": "8b4547556ef93b983ec9f3b22228702b50dd156173da75bfe15308543bbbaa06"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "quadratic-twist-map-development-controls",
+ "statement": "Separately versioned native quadratic-twist evaluator passes18 direct PARI map controls over fields71 and11 with470 point-input evaluations, three default byte matches and eight negative controls. Square and nonsquare twists are covered. These are bounded correctness checks, not the larger-conductor case,80bit crossing, or performance evidence."
+}
