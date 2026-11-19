@@ -81,3 +81,25 @@ the reference and should not be cited (critic F3).
   the dropped entries, labelled post-hoc.
 - The two root-build fixes outside `src/`: one in `tests/` and one in
   `examples/`. Both are one-line duplicate removals.
+
+## Round 3 (2026-11-19)
+
+All results are [pcc:unverified]. No paid compute was used.
+
+- [l1-pattern-tally](l1-pattern-tally/README.md): **L1 step 1 keeps the lead.**
+  - On the recorded Run50 stream (3,419 solutions), (1^4,2) occurs 69 times against a kill threshold of 35 or fewer, and (1^2,2^2) 238 times against 110 or fewer.
+  - Observed/predicted ratios are 0.97–1.11.
+  - This confirms only the pattern-frequency assumption. The exact-log match rate, valid signed classes and any descent saving are still unmeasured.
+  - Next: step 2 (an exact |D_universe| count), then the step-3 matched-rows test.
+  - The 92 KB seed-389 rows file is LOCAL pending a store push; see the custody note.
+- [fresh-scaling-v2](fresh-scaling-v2/README.md): the amended draft protocol fixes critic findings F1–F5 and F8 ([CHANGES.md](fresh-scaling-v2/CHANGES.md)).
+  - The new exponent rule FAILs the lane's own e=3 model, which v1 passed.
+  - G-cov now requires a count for every inventory row.
+  - The table IC arm is primary, with a priced Karatsuba rho.
+  - p2017 is dropped: the frozen worker refuses it, and several unreduced u64 sums mod l were found. The ladder is now p101–p1511.
+  - Modelled compute is about 23 CPU-h, down from about 55.
+  - It is still a draft. The owner decisions are listed in its README.
+- CI hygiene on #4741:
+  - clippy debt fixed in 9 examples, plus the library errors;
+  - the n83 example now reads its store-managed CSV at run time;
+  - the oversized data file was removed from Git.
