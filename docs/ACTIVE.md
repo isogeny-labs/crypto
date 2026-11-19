@@ -14,7 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
-- [ ] Prime31 exterior-4 public-only Plücker-span compression gate, source-bound Rust rank certificate and next experiment (automation, started 2026-11-19, branch automation/prime31-exterior4-plucker-span-20261119, PR #4779)
+- [x] Prime31 exterior-4 public-only Plücker-span compression gate: local owner-waived rank certificate reports 70/70/70 in all N4/P4/N8/P8 cases, closing fixed linear compression only; raw attempts and report retained in Git, SAT/F4/XL remain separate (automation, completed 2026-11-19, branch automation/prime31-exterior4-plucker-span-20261119, PR #4779) `[pcc:unverified]`
 - [x] Original-curve Prime31 public-only exterior-4 RR9 algebraic candidate, B4 correctness/cost falsifier and B8 scaling gate (automation, completed 2026-11-19, branch automation/prime31-wedge4-public-algebraic-20261119, PR #4776; exact-source CI #44445676750 passed, exhaustive B8 direct-search gate negative; nonenumerative extractor remains with PR #4692)
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 

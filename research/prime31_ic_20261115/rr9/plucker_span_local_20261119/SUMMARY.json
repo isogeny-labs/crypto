@@ -1,0 +1,115 @@
+{
+  "schema": "prime31.rr9-plucker-span-local-summary/v1",
+  "pcc_claim": "PCC-20261119-50ffe2",
+  "pcc_standing": "unverified",
+  "protocol_sha256": "ab67f98a2f1e58f4e5f6c610d5b4ca6ab3fe7eabc8050e94f2103200322ca62a",
+  "candidate_commit": "f1de40fbcd1957872d571109522ca4560eb6ab06",
+  "original_arithmetic_commit": "1df714645aa683cf975bc76fcacb9842cb4780fd",
+  "execution": {
+    "venue": "local owner-waived run",
+    "attempt": 3,
+    "timeout_minutes": 30,
+    "endpoint_virtual_memory_limit_kib": 4194304,
+    "artifact_store": "git",
+    "source_verified_ci": false
+  },
+  "controls": {
+    "random_left_rank": 70,
+    "random_right_rank": 70,
+    "random_pairing_rank": 70,
+    "synthetic_left_rank": 7,
+    "synthetic_right_rank": 7,
+    "synthetic_pairing_rank": 7
+  },
+  "cases": [
+    {
+      "id": "N4",
+      "vectors_total_per_side": 4096,
+      "left_vectors_examined": 2049,
+      "right_vectors_examined": 2049,
+      "left_rank": 70,
+      "right_rank": 70,
+      "pairing_rank": 70,
+      "left_basis_determinant": 1907250672,
+      "right_basis_determinant": 162115678,
+      "pairing_determinant": 1293780219
+    },
+    {
+      "id": "P4",
+      "vectors_total_per_side": 4096,
+      "left_vectors_examined": 2049,
+      "right_vectors_examined": 2049,
+      "left_rank": 70,
+      "right_rank": 70,
+      "pairing_rank": 70,
+      "left_basis_determinant": 1573700009,
+      "right_basis_determinant": 732756365,
+      "pairing_determinant": 1924240935
+    },
+    {
+      "id": "N8",
+      "vectors_total_per_side": 65536,
+      "left_vectors_examined": 16385,
+      "right_vectors_examined": 16385,
+      "left_rank": 70,
+      "right_rank": 70,
+      "pairing_rank": 70,
+      "left_basis_determinant": 76436789,
+      "right_basis_determinant": 1912721374,
+      "pairing_determinant": 2107085659
+    },
+    {
+      "id": "P8",
+      "vectors_total_per_side": 65536,
+      "left_vectors_examined": 16385,
+      "right_vectors_examined": 16385,
+      "left_rank": 70,
+      "right_rank": 70,
+      "pairing_rank": 70,
+      "left_basis_determinant": 380450643,
+      "right_basis_determinant": 1399734726,
+      "pairing_determinant": 1115076500
+    }
+  ],
+  "validation": {
+    "producer_aa_byte_identical": true,
+    "checker_aa_byte_identical": true,
+    "independent_checker_cases": 4,
+    "mutations_rejected": [
+      "target",
+      "word",
+      "coordinate",
+      "pivot",
+      "determinant",
+      "rank"
+    ],
+    "all_recorded_exit_codes_zero": true,
+    "sha256_manifest_verified": true
+  },
+  "operational_resources": {
+    "producer_a_elapsed_seconds": 2.66,
+    "producer_a_peak_rss_kib": 2536,
+    "producer_b_elapsed_seconds": 2.91,
+    "producer_b_peak_rss_kib": 2340,
+    "checker_a_elapsed_seconds": 3.10,
+    "checker_a_peak_rss_kib": 4500,
+    "checker_b_elapsed_seconds": 3.30,
+    "checker_b_peak_rss_kib": 4496
+  },
+  "failed_attempts": [
+    {
+      "attempt": 1,
+      "exit": 128,
+      "stage": "temporary checkout",
+      "reason": "Git pack mmap denied under premature process-wide virtual-memory cap"
+    },
+    {
+      "attempt": 2,
+      "exit": 127,
+      "stage": "first producer wrapper",
+      "reason": "/usr/bin/time absent after tests and release build passed"
+    }
+  ],
+  "verdict": "KILL_FIXED_LINEAR_COMPRESSION",
+  "scope": "registered 70-coordinate fixed linear-message compression only; no SAT, F4, XL, orthogonal-vector, ECDLP, timing, or novelty claim"
+}

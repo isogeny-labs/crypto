@@ -42,3 +42,27 @@
 
 ### Errors (what went wrong, how it was handled)
 - None in final candidate CI. Other unrelated repository workflows may have separate failures.
+
+## 2026-11-19T16:56:00Z — exterior-four span rank gate run locally
+
+### What was done (commands, files, features)
+- Stacked draft PR #4779 on #4776 and froze `RR9_PLUCKER_SPAN_PROTOCOL_20261119.md` before implementation. The producer computes exact streaming spans and restricted complementary-minor pairing rank; a separate Rust checker uses permutation-expanded minors and u128 modular arithmetic.
+- The S3 resume checkpoint gate failed because this runtime has no upload token or AWS credentials. The owner authorized one local run with Git-resident artifacts; the deviation and each retry were added to the PCC bypass ledger before execution.
+- Attempt 01 exited 128 during temporary checkout because the first local runner placed the 4 GiB virtual-memory limit around Git. Attempt 02 passed formatting, original library tests, focused producer/checker tests and release compilation, then exited 127 before producer execution because `/usr/bin/time` was absent. Both failures are retained byte-for-byte. `[pcc:unverified]`
+- Attempt 03 used locally built GNU Time 1.9, retained the 30-minute outer cap, and applied 4 GiB limits to producer/checker processes as in the frozen workflow. Two producer outputs and two checker outputs were byte-identical; all recorded exit codes are zero and six mutations were rejected. `[pcc:unverified]`
+- Exact local result: N4, P4, N8 and P8 each report left/right/pairing rank 70/70/70 with nonzero determinant certificates. Under the frozen rule the verdict is `KILL_FIXED_LINEAR_COMPRESSION`. Claim record `PCC-20261119-50ffe2` is unverified. `[pcc:unverified]`
+- Raw attempts, `SUMMARY.json`, `RESULT.md`, `rank_gate.svg`, PNG and inspected three-page `REPORT.pdf` are under `research/prime31_ic_20261115/rr9/plucker_span_local_20261119/`. `[pcc:unverified]`
+
+### Decisions made (and why)
+- Close only fixed linear compression of the registered 70-coordinate exterior-four message. Full span and restricted-pairing rank supply no smaller lossless fixed linear message on the frozen B8 fixtures. `[pcc:unverified]`
+- Do not generalize this result to nonlinear charting, Boolean/tensor SAT, F4, XL, orthogonal-vector indexing, relation yield, scalar recovery or end-to-end ECDLP cost.
+- Use a canonical Boolean/tensor encoding-growth gate as the next discriminator for #4692 before paying for a SAT solve.
+
+### Open threads (unfinished, pick up next time)
+- Preregister a SAT encoding experiment that emits one typed predicate IR, independently checks tiny B2/B3 truth tables, compares bit-blasted and finite-field encodings, and measures held-out clause/monomial growth through B4/B6/B8.
+- Advance SAT only if extraction and verification included, held-out scaling improves over exhaustive `16^8` pairwork; otherwise preserve the negative and move to F4/XL degree-of-regularity or orthogonal-vector indexing.
+- A source-bound GitHub rerun remains useful for execution attestation if checkpoint access is restored; it is not required to retain this owner-waived local result.
+
+### Errors (what went wrong, how it was handled)
+- Attempts 01 and 02 are preserved rather than overwritten; amendments A1 and A2 change only local cap placement and GNU Time path, respectively.
+- Headless Chromium lingered without creating a PDF. It was stopped, and the report was rendered with Pandoc/pdfTeX after converting the SVG figure to PNG; the first page and extracted text were inspected.
