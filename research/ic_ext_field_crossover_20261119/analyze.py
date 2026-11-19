@@ -129,8 +129,12 @@ def main():
     res["crossover"] = {}
     for arm in summ:
         res["crossover"][arm] = {}
-        for fname, forced in (("free", None), ("forced_theory", theory[arm])):
-            t = {k: tuple(v) for k, v in res["fits"][arm][fname if fname == "free" else "forced"].items()}
+        scen = {"free": None,
+                "R_fit_LA_theory": {"cpr": 0.0, "la": theory[arm]["la"]},
+                "forced_theory": theory[arm]}
+        for fname, forced in scen.items():
+            t = {k: tuple(v) for k, v in fit_terms([r for r in rows if r["arm"] == arm], forced).items()}
+            res["fits"][arm]["scen_" + fname] = {k: list(v) for k, v in t.items()}
             for kname, kappa in (("rho_negation_0.627", 0.627), ("rho_plain_0.886", 0.886)):
                 for kfac in (1.0, 1.1, 2.0):
                     for c3div in (1.0, 3.0, 10.0):
