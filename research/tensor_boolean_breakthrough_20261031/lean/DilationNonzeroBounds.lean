@@ -149,6 +149,33 @@ theorem sum_fiberCoefficient_zsmul
   intro i
   simp
 
+/-- Regrouping over the finite image of the tuple.  Unlike
+`sum_fiberCoefficient_zsmul`, this version requires no finiteness assumption
+on the ambient field, so it applies to rational-function fields and their
+algebraic closures. -/
+theorem sum_fiberCoefficient_zsmul_image
+    {K G : Type*} [DecidableEq K] [AddCommGroup G]
+    {n : ℕ} (t : Fin n → K) (sign : Fin n → ℤ) (point : K → G) :
+    (∑ v : {v // v ∈ Finset.univ.image t},
+        fiberCoefficient t sign v.1 • point v.1) =
+      ∑ i, sign i • point (t i) := by
+  classical
+  calc
+    (∑ v : {v // v ∈ Finset.univ.image t},
+        fiberCoefficient t sign v.1 • point v.1) =
+        ∑ v ∈ Finset.univ.image t,
+          fiberCoefficient t sign v • point v := by
+      exact (Finset.sum_subtype (Finset.univ.image t)
+        (fun _ ↦ Iff.rfl)
+        (fun v : K ↦ fiberCoefficient t sign v • point v)).symm
+    _ = ∑ i, sign i • point (t i) := by
+      simp only [fiberCoefficient, Finset.sum_smul]
+      simp_rw [Finset.sum_filter]
+      rw [Finset.sum_comm]
+      apply Fintype.sum_congr
+      intro i
+      simp
+
 /-- Exact certificate extracted from a nontrivial signed relation: the
 regrouped relation is zero and one coefficient survives with explicit size. -/
 theorem nontriv_signed_relation_certificate
@@ -163,6 +190,24 @@ theorem nontriv_signed_relation_certificate
         (fiberCoefficient t sign v).natAbs ≤ n := by
   constructor
   · rw [sum_fiberCoefficient_zsmul t sign point, relation]
+  · exact exists_nonzero_fiberCoefficient_of_not_triv
+      t sign sign_unit nontriv
+
+/-- Finite-image form of the signed-relation certificate, suitable when the
+ambient x-coordinate field is infinite. -/
+theorem nontriv_signed_relation_image_certificate
+    {K G : Type*} [DecidableEq K] [AddCommGroup G]
+    {n : ℕ} (t : Fin n → K) (sign : Fin n → ℤ)
+    (sign_unit : ∀ i, sign i = 1 ∨ sign i = -1)
+    (point : K → G)
+    (relation : ∑ i, sign i • point (t i) = 0)
+    (nontriv : ¬ ECDLP.L40.TrivL (List.ofFn t)) :
+    (∑ v : {v // v ∈ Finset.univ.image t},
+        fiberCoefficient t sign v.1 • point v.1 = 0) ∧
+      ∃ v, fiberCoefficient t sign v ≠ 0 ∧
+        (fiberCoefficient t sign v).natAbs ≤ n := by
+  constructor
+  · rw [sum_fiberCoefficient_zsmul_image t sign point, relation]
   · exact exists_nonzero_fiberCoefficient_of_not_triv
       t sign sign_unit nontriv
 
@@ -182,6 +227,22 @@ theorem projectedCoefficient_zmod_ne_zero
   · rw [Int.natAbs_mul, Int.natAbs_natCast]
     exact (Nat.mul_le_mul_left (Fintype.card Gamma) coefficientBound).trans_lt
       projectedBelow
+
+/-- Direct projector input extracted from `¬TrivL`: one value has a Galois-
+projected coefficient that is nonzero modulo the prime modulus. -/
+theorem exists_projectedCoefficient_zmod_ne_zero_of_not_triv
+    {K Gamma : Type*} [DecidableEq K] [Fintype Gamma] [Nonempty Gamma]
+    {n modulus : ℕ} (t : Fin n → K) (sign : Fin n → ℤ)
+    (sign_unit : ∀ i, sign i = 1 ∨ sign i = -1)
+    (nontriv : ¬ ECDLP.L40.TrivL (List.ofFn t))
+    (projectedBelow : Fintype.card Gamma * n < modulus) :
+    ∃ v, ((((Fintype.card Gamma : ℤ) *
+      fiberCoefficient t sign v : ℤ)) : ZMod modulus) ≠ 0 := by
+  obtain ⟨v, coefficientNonzero, coefficientBound⟩ :=
+    exists_nonzero_fiberCoefficient_of_not_triv t sign sign_unit nontriv
+  exact ⟨v, projectedCoefficient_zmod_ne_zero modulus n
+    (fiberCoefficient t sign v) coefficientNonzero coefficientBound
+      projectedBelow⟩
 
 /-- Eisenstein norm appearing in the `A = 0` cubic-CM branch. -/
 def eisensteinNorm (a b : ℤ) : ℤ := a ^ 2 - a * b + b ^ 2
@@ -221,5 +282,33 @@ theorem eisensteinNorm_zmod_ne_zero
   apply intCast_zmod_ne_zero_of_natAbs_lt modulus
   · exact ne_of_gt (eisensteinNorm_pos nonzero)
   · exact (eisensteinNorm_natAbs_le ha hb).trans_lt normBelow
+
+/-- The exact scalar produced by the two-term cubic-CM projector is nonzero
+modulo `p` under `3 * (|Gamma| * n)^2 < p`, provided the selected fibre
+coefficient survives. -/
+theorem projectedEisensteinNorm_zmod_ne_zero
+    {Gamma : Type*} [Fintype Gamma] [Nonempty Gamma]
+    (modulus n : ℕ) (chosen partner sign : ℤ)
+    (chosenNonzero : chosen ≠ 0)
+    (chosenBound : chosen.natAbs ≤ n)
+    (partnerBound : partner.natAbs ≤ n)
+    (signUnit : sign = 1 ∨ sign = -1)
+    (normBelow : 3 * (Fintype.card Gamma * n) ^ 2 < modulus) :
+    (eisensteinNorm
+      ((Fintype.card Gamma : ℤ) * chosen)
+      (((Fintype.card Gamma : ℤ) * partner) * sign) :
+        ZMod modulus) ≠ 0 := by
+  have hcard : (Fintype.card Gamma : ℤ) ≠ 0 := by
+    exact_mod_cast (Fintype.card_ne_zero : Fintype.card Gamma ≠ 0)
+  apply eisensteinNorm_zmod_ne_zero modulus (Fintype.card Gamma * n)
+  · exact Or.inl (mul_ne_zero hcard chosenNonzero)
+  · rw [Int.natAbs_mul, Int.natAbs_natCast]
+    exact Nat.mul_le_mul_left (Fintype.card Gamma) chosenBound
+  · rw [Int.natAbs_mul, Int.natAbs_mul, Int.natAbs_natCast]
+    have hsign : sign.natAbs = 1 := by
+      rcases signUnit with rfl | rfl <;> simp
+    rw [hsign, Nat.mul_one]
+    exact Nat.mul_le_mul_left (Fintype.card Gamma) partnerBound
+  · exact normBelow
 
 end TensorBoundaryBounds

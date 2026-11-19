@@ -1427,16 +1427,41 @@ integer coefficient is nonzero and has absolute value at most the tuple arity.
 Regrouping the signed point relation by value is proved exactly. Consequently
 the selected coefficient remains nonzero in `ZMod p` when the arity is below
 `p`, and its Galois-projected multiple remains nonzero under
-`|Gamma| * arity < p`. [pcc:unverified]
+`|Gamma| * arity < p`. The theorem
+`exists_projectedCoefficient_zmod_ne_zero_of_not_triv` packages that chain
+directly from `¬TrivL`. [pcc:unverified]
 
 For the `A = 0` collision branch, the same module proves positivity of the
 Eisenstein norm `a^2-a*b+b^2`, the explicit absolute bound `3M^2` when both
 projected coefficients have absolute value at most `M`, and nonvanishing in
-`ZMod p` under `3M^2 < p`. These are rigorous characteristic thresholds; the
+`ZMod p` under `3M^2 < p`. The direct theorem
+`projectedEisensteinNorm_zmod_ne_zero` instantiates
+`M = |Gamma| * arity` for the two-term cubic-CM projector. These are rigorous
+characteristic thresholds; the
 module does not construct the original function-field Semaev relation or
 complete the torsion-coordinate contradiction. The targeted
 `lake build DilationNonzeroBounds` completes 9,132 jobs. The repository proof
-gate reports `PASS 387 thm 0 trusted` across all eight tracked modules.
+gate reports `PASS 389 thm 0 trusted` across all eight tracked modules.
+[pcc:unverified]
+
+## 2026-11-19 Semaev relation sign normalization
+
+`SemaevRelationSigns.lean` proves that any zero-sum tuple of elliptic-curve
+points can be rewritten on arbitrary chosen points in the same x-coordinate
+fibres using occurrence signs `±1`. It then applies the checked converse
+`canonical_zero_iff`: canonical Semaev vanishing over an algebraically closed
+field produces an exact signed relation on any chosen lifts of the input
+x-coordinates. [pcc:unverified]
+
+The finite-image regrouping in `DilationNonzeroBounds.lean` removes the old
+`Fintype K` restriction. For a nontrivial tuple, the combined endpoint
+`evalCanonical_zero_implies_nontriv_image_certificate` returns an exact
+relation indexed by the distinct tuple values and a coefficient that is
+nonzero over the integers with absolute value at most the arity. This does not
+yet descend the chosen points from the algebraic closure into the explicit
+finite multiquadratic splitting field. `lake build DilationNonzeroBounds
+SemaevRelationSigns` completes 9,133 jobs. The correctly scoped repository
+proof gate reports `PASS 394 thm 0 trusted` across all nine tracked modules.
 [pcc:unverified]
 
 ## 2026-11-19 scalar-torsion to `ΨSq` bridge
