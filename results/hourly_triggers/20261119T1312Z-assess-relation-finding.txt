@@ -1,0 +1,6 @@
+Trigger UTC: 2026-11-19T13:12:13Z
+Purpose: trigger established hourly relation-finding benchmark for the frozen Koblitz GF(2^23) n=23, a=0, m=2 control.
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Baseline: results/relation_baseline.json; anomaly threshold >20% on relations_per_sec or success_rate; failures alert.
+Output: results/hourly_log.csv, committed and pushed by the GitHub Actions workflow on hourly-runs.
+This control is not an ECC2K-130 benchmark.
