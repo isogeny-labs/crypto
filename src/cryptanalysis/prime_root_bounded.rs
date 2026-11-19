@@ -149,8 +149,6 @@ struct Gate {
     limits: RootBudget,
     deadline: Instant,
     metrics: Metrics,
-    // Cached floor(2^64/p) for all canonical 32-bit field products.
-    barrett32: u64,
 }
 impl Gate {
     fn new(limits: RootBudget, deadline: Instant) -> Self {
@@ -158,16 +156,7 @@ impl Gate {
             limits,
             deadline,
             metrics: Metrics::default(),
-            barrett32: 0,
         }
-    }
-    // The quotient estimate floor(x * floor(2^64/p) / 2^64) is at most
-    // one below floor(x/p), for x < 2^64. Compute once per Gate.
-    fn reciprocal32(&mut self, p: u64) -> u64 {
-        if self.barrett32 == 0 {
-            self.barrett32 = ((1u128 << 64) / u128::from(p)) as u64;
-        }
-        self.barrett32
     }
     fn clock(&self) -> Result<()> {
         if Instant::now() >= self.deadline {
@@ -276,13 +265,8 @@ impl Producer<'_> {
             let folded = (folded & p) + (folded >> 61);
             if folded >= p { folded - p } else { folded }
         } else if p <= u32::MAX as u64 {
-            // Avoid runtime division: the precomputed reciprocal yields
-            // q=floor(ab/p) or q=floor(ab/p)-1. A single correction suffices.
-            let product = a * b;
-            let reciprocal = self.gate.reciprocal32(p);
-            let q = ((u128::from(product) * u128::from(reciprocal)) >> 64) as u64;
-            let remainder = product - q * p;
-            if remainder >= p { remainder - p } else { remainder }
+            // (p-1)^2 fits in u64, including p=2^32-5.
+            (a * b) % p
         } else {
             ((a as u128 * b as u128) % p as u128) as u64
         })
@@ -818,13 +802,7 @@ impl Replay {
             let reduced = (combined & p) + (combined >> 61);
             if reduced == p { 0 } else { reduced }
         } else if p <= u32::MAX as u64 {
-            // Independent verifier reduction, with the same proven
-            // one-correction bound but a distinct arithmetic expression.
-            let product = x * y;
-            let reciprocal = self.gate.reciprocal32(p);
-            let quotient = ((u128::from(reciprocal) * u128::from(product)) >> 64) as u64;
-            let residual = product - quotient * p;
-            if residual < p { residual } else { residual - p }
+            (x * y) % p
         } else {
             (u128::from(x) * u128::from(y) % u128::from(p)) as u64
         })
@@ -1482,33 +1460,6 @@ mod tests {
     }
     // Compare both independently implemented consumers with the exact wide
     // modulo reference, including carries, zero, p-1 and random inputs.
-    #[test]
-    fn round41_cached_barrett_matches_reference_and_replay() {
-        for p in [3u64, 17, 487, 1_000_000_007, 1_000_000_009,
-                  4_294_967_291, (1u64 << 61) - 1] {
-            let field = field(p);
-            let mut observer = |_: &BoundedRootEvent| Ok(());
-            let mut producer = Producer {
-                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
-                unacknowledged: None, pending: [Poly17::ZERO; 8],
-                pending_len: 0, roots: [0; 8], root_count: 0,
-            };
-            let mut replay = Replay::new(
-                &field, &[1], 42, budget(), budget(), deadline()
-            ).unwrap();
-            let mut state = p ^ 0x9e3779b97f4a7c15;
-            for index in 0..10_000 {
-                state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
-                let a = if index % 23 == 0 { p - 1 } else { state % p };
-                state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
-                let b = if index % 29 == 0 { p - 1 } else { state % p };
-                let wide = (u128::from(a) * u128::from(b) % u128::from(p)) as u64;
-                assert_eq!(producer.mul(a, b).unwrap(), wide, "producer p={p}");
-                assert_eq!(replay.times(a, b).unwrap(), wide, "replay p={p}");
-            }
-        }
-    }
-
     #[test]
     fn round31_bounded_canonical_ops_match_wide_reference() {
         for p in [3u64, 7, 17, 487, 17_497, 1_000_000_007,
