@@ -75,14 +75,35 @@ the earlier 500,925-byte `f402ccd4…` / `8c61e842…` snapshot remain historica
 neither is the current exact-replay target.
 [pcc:unverified]
 
-The Rust 1.98 canonical replay candidate is retained at
+The Rust 1.98 canonical replay is retained at
 [`binary-transfer-catalog-canonical-replay-5c6e43a6.json`](../../research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json).
 It is 1,681 bytes with SHA-256
 `31df0daef4b583eeb87f9589460b83bd73345bd8a81a68c74c11ee8d0a2101d6`.
-Native exact replay and installed-package comparison remain required before
-this successor is treated as run evidence. Even after they pass, it is
-same-implementation evidence, not an independent arithmetic oracle or signed
-standing. [pcc:unverified]
+Release run `44585934651`, Rust GNU job `135778928449`, built the exact
+`b98fb11d…` executable, passed installed-layout exact replay and byte comparison
+against this receipt, and uploaded artifact `14560899671` (104,462,060 ZIP
+bytes; GitHub digest
+`f6343d57d7a16e5c6be2269fe910e7c67f9a7b5a19e121b3b8da1d9a1f952b4e`).
+The durable job-side record is
+[`standalone-package-run-44585934651.json`](../../research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json).
+The aggregate release remained cancelled by
+unrelated package hydration and runner failures. Executor proxy policy blocked
+independent artifact download, so inner-archive and executable hashes and a
+second direct package replay remain open. This is same-implementation evidence,
+not an independent arithmetic oracle or signed standing. [pcc:unverified]
+
+The deterministic repository-mode source receipt is
+[`binary-transfer-catalog-source-replay-5c6e43a6.json`](../../research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json),
+4,958 bytes with SHA-256
+`38405fb08dc6ec3e30c0b59035a63f156476c6a0838048afd6b89f2088e01433`.
+It binds all 21 reviewed paths and their normalized `include_str!` targets to
+the exact recorded Git tree and recomputes `e7a12f60…` with Git replacement
+objects disabled. The verifier is 12,930 bytes with SHA-256
+`64e09943c4a2be2508485325fcafa3dfa3d2dc27614db149270c2b5b1894e245`; its
+8/8 local mutation and substitution controls pass. Exact-head workflow replay
+of this new receipt remains pending. Even after that replay, it does not attest
+that an executable was built from the recorded commit or widen any arithmetic,
+subgroup, solver, or advantage claim. [pcc:unverified]
 
 ## Required bindings and checks
 

@@ -1234,6 +1234,98 @@ async function buildSourceArtifacts() {
       ),
     ),
     sourceArtifact(
+      "docs/curves/binary-subgroup-transfer-certificates.json",
+      "binary named-subgroup transfer certificate corpus",
+      freshness(
+        "supported",
+        "the exact 500,924-byte corpus identity, 174 map records, 150 named bindings, 102 proved exact-order records, 48 unknown-order records, and zero recorded transfer failures",
+        "The artifact digest pins the saved corpus and its bounded named-subgroup witnesses. It does not convert unknown orders into proofs, extend the certificates to arbitrary classes, independently replay arithmetic, attest a build, or establish a solver or computational advantage.",
+        ["docs/curves/binary-subgroup-transfer-certificates.json"],
+      ),
+    ),
+    sourceArtifact(
+      "docs/curves/binary-subgroup-transfer-certificates.schema.json",
+      "machine-readable binary transfer certificate corpus contract",
+      freshness(
+        "supported",
+        "the exact corpus shape, typed dispositions, witness fields, and producer metadata contract",
+        "The schema digest pins validation semantics only; schema conformance is not independent arithmetic or build evidence.",
+        ["docs/curves/binary-subgroup-transfer-certificates.schema.json"],
+      ),
+    ),
+    sourceArtifact(
+      "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json",
+      "binary catalog canonical same-implementation replay receipt",
+      freshness(
+        "supported",
+        "byte-exact native replay of the 500,924-byte binary corpus with zero failed named-subgroup records",
+        "The receipt records same-implementation canonical replay and is separately exercised from the staged package layout. It is not an independent arithmetic oracle, open build attestation, signed standing, solver, or advantage result.",
+        [
+          "docs/curves/binary-subgroup-transfer-certificates.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "scripts/verify_binary_transfer_source.mjs",
+      "fail-closed binary transfer producer Git-tree verifier",
+      freshness(
+        "supported",
+        "the recorded 21-path binary transfer producer closure at the corpus producer commit",
+        "The verifier disables Git replacement objects, checks each displayed source path against its normalized include_str target, reads the exact commit blobs, and recomputes the framed source digest. This binds source provenance only; it does not attest an executable build or independently replay arithmetic.",
+        [
+          "scripts/verify_binary_transfer_source.mjs",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "scripts/test_verify_binary_transfer_source.mjs",
+      "binary producer-source mutation and substitution controls",
+      freshness(
+        "supported",
+        "closure order, include-target drift, Git replacement objects, malformed metadata, missing/non-UTF-8 blobs, framing, bounds, and atomic-output controls",
+        "These tests exercise the provenance verifier's fail-closed behavior. They do not validate cover, Jacobian, transfer, subgroup, solver, or performance claims.",
+        ["scripts/test_verify_binary_transfer_source.mjs"],
+      ),
+    ),
+    sourceArtifact(
+      "docs/curves/binary-subgroup-transfer-source-verification.schema.json",
+      "machine-readable binary producer-source receipt contract",
+      freshness(
+        "supported",
+        "the exact 21-file receipt shape and claim boundary",
+        "The schema fixes ordered paths, required checks, and provenance-only status; schema conformance alone is not execution or mathematical evidence.",
+        ["docs/curves/binary-subgroup-transfer-source-verification.schema.json"],
+      ),
+    ),
+    sourceArtifact(
+      "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json",
+      "deterministic binary transfer producer Git-tree receipt",
+      freshness(
+        "supported",
+        "the binary corpus source digest and reviewed 21-path closure at producer commit 5c6e43a6f0cffe0afc4c962ff54056716cf6437e",
+        "The receipt binds the saved source digest to exact Git blobs and the verifier version. It does not prove that the packaged executable was built from that commit, supply independent arithmetic, signed standing, a solver, or computational advantage.",
+        [
+          "docs/curves/binary-subgroup-transfer-certificates.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json",
+      "standalone Linux GNU package-run receipt",
+      freshness(
+        "supported",
+        "the successful Rust GNU package job and installed-layout catalog replay at evidence head b98fb11df2353c3daf0200956190ba0764c5fff7",
+        "The receipt distinguishes the successful package lane from the cancelled aggregate workflow and records the proxy-blocked independent download. It is same-implementation job-side evidence, not an independent artifact replay, source-to-binary attestation, mathematical oracle, solver, or advantage result.",
+        [
+          "research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json",
+        ],
+      ),
+    ),
+    sourceArtifact(
       "src/bin/curve_transfer_sweep.rs",
       "parameter sweeper and runtime-constructor cross-check",
       freshness(

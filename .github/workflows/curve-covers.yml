@@ -47,6 +47,8 @@ on:
       - 'scripts/build_curve_registry.py'
       - 'scripts/build_cover_transfer_assessments.mjs'
       - 'scripts/test_cover_transfer_assessment.mjs'
+      - 'scripts/verify_binary_transfer_source.mjs'
+      - 'scripts/test_verify_binary_transfer_source.mjs'
       - 'scripts/catalog_snapshot.mjs'
       - 'scripts/test_catalog_snapshot.mjs'
       - 'research/cover_transfer_assessment_20261013/**'
@@ -56,6 +58,9 @@ on:
       - 'research/hyperelliptic_cover_infrastructure_20261006/evidence.json'
       - 'research/hyperelliptic_cover_infrastructure_20261006/README.md'
       - 'research/curve_transfer_infrastructure_20261118/fixed-f8-source-law-assessment.draft.json'
+      - 'research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json'
+      - 'research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json'
+      - 'research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json'
       - 'research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json'
       - 'research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json'
       - 'research/chained_jacobian_transfers_20261110/lean/ChainTransfer.lean'
@@ -152,6 +157,21 @@ jobs:
             --traits docs/curves/traits.json \
             --expected-sha256 a55c7f9a0c836614281388f19b3b31fa622eeb1650ddc00c59e4e78562471392 \
             --expected-bytes 500924
+          binary_producer_commit="$(jq -r .producer.git_commit docs/curves/binary-subgroup-transfer-certificates.json)"
+          git fetch --no-tags --filter=blob:none --recurse-submodules=no origin "$binary_producer_commit"
+          node scripts/test_verify_binary_transfer_source.mjs
+          node scripts/verify_binary_transfer_source.mjs \
+            --input docs/curves/binary-subgroup-transfer-certificates.json \
+            --repo-root . \
+            --output "$RUNNER_TEMP/binary-transfer-source-replay.json"
+          jq -e --arg commit "$binary_producer_commit" '
+            .status == "producer_source_digest_bound_to_recorded_git_tree" and
+            .producer_commit == $commit and
+            .source_files_checked == 21 and
+            ([.checks[]] | all(. == true))
+          ' "$RUNNER_TEMP/binary-transfer-source-replay.json" >/dev/null
+          cmp "$RUNNER_TEMP/binary-transfer-source-replay.json" \
+            research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json
       - name: Optimized independent oracles and odd-transfer catalog controls
         run: |
           odd_corpus_sha256="1ecfabcdaecc3e00d78ab2ce7eebeb94607e1c2c224f261fb5718a4f53b65268"
@@ -253,6 +273,9 @@ jobs:
             /tests/prime_montgomery_transfer_adapter.rs
             /docs/curves/
             /research/cover_transfer_assessment_20261013/
+            /research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json
+            /research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json
+            /research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json
             /research/hyperelliptic_cover_infrastructure_20261006/
             /tools/artifacts/
             /.artifacts/
@@ -311,6 +334,7 @@ jobs:
         run: |
           python -m jsonschema -i docs/curves/cover-transfer-assessments.json docs/curves/cover-transfer-assessment.schema.json
           python -m jsonschema -i docs/curves/binary-subgroup-transfer-certificates.json docs/curves/binary-subgroup-transfer-certificates.schema.json
+          python -m jsonschema -i research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json docs/curves/binary-subgroup-transfer-source-verification.schema.json
           python -m jsonschema -i docs/curves/odd-subgroup-transfer-certificates.json docs/curves/odd-subgroup-transfer-certificates.schema.json
       - name: Install native PDF metadata reader
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends poppler-utils

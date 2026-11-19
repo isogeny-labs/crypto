@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "7b2c8e61938ec573ee4cce590440b042fd910872bbb07508a8d84f182ac39937",
+      "sha256": "c786a8ce90d096d62820f19078313d535d5e07ba47d4bd9902b9dc77874e6f4d",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -150,6 +150,114 @@
         "evidence_refs": [
           "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses",
           "src/bin/hyperelliptic_cover.rs#strict_psi13_wide_prime_reaches_arithmetic_and_transfer_but_fails_closed_above_bound"
+        ]
+      }
+    },
+    {
+      "path": "docs/curves/binary-subgroup-transfer-certificates.json",
+      "sha256": "a55c7f9a0c836614281388f19b3b31fa622eeb1650ddc00c59e4e78562471392",
+      "role": "binary named-subgroup transfer certificate corpus",
+      "freshness": {
+        "status": "supported",
+        "scope": "the exact 500,924-byte corpus identity, 174 map records, 150 named bindings, 102 proved exact-order records, 48 unknown-order records, and zero recorded transfer failures",
+        "rationale": "The artifact digest pins the saved corpus and its bounded named-subgroup witnesses. It does not convert unknown orders into proofs, extend the certificates to arbitrary classes, independently replay arithmetic, attest a build, or establish a solver or computational advantage.",
+        "evidence_refs": [
+          "docs/curves/binary-subgroup-transfer-certificates.json"
+        ]
+      }
+    },
+    {
+      "path": "docs/curves/binary-subgroup-transfer-certificates.schema.json",
+      "sha256": "00ffc04318b3b826769e9a1fc697eb5d62662e2bb7c6707808f9084487787053",
+      "role": "machine-readable binary transfer certificate corpus contract",
+      "freshness": {
+        "status": "supported",
+        "scope": "the exact corpus shape, typed dispositions, witness fields, and producer metadata contract",
+        "rationale": "The schema digest pins validation semantics only; schema conformance is not independent arithmetic or build evidence.",
+        "evidence_refs": [
+          "docs/curves/binary-subgroup-transfer-certificates.schema.json"
+        ]
+      }
+    },
+    {
+      "path": "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json",
+      "sha256": "31df0daef4b583eeb87f9589460b83bd73345bd8a81a68c74c11ee8d0a2101d6",
+      "role": "binary catalog canonical same-implementation replay receipt",
+      "freshness": {
+        "status": "supported",
+        "scope": "byte-exact native replay of the 500,924-byte binary corpus with zero failed named-subgroup records",
+        "rationale": "The receipt records same-implementation canonical replay and is separately exercised from the staged package layout. It is not an independent arithmetic oracle, open build attestation, signed standing, solver, or advantage result.",
+        "evidence_refs": [
+          "docs/curves/binary-subgroup-transfer-certificates.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json"
+        ]
+      }
+    },
+    {
+      "path": "scripts/verify_binary_transfer_source.mjs",
+      "sha256": "64e09943c4a2be2508485325fcafa3dfa3d2dc27614db149270c2b5b1894e245",
+      "role": "fail-closed binary transfer producer Git-tree verifier",
+      "freshness": {
+        "status": "supported",
+        "scope": "the recorded 21-path binary transfer producer closure at the corpus producer commit",
+        "rationale": "The verifier disables Git replacement objects, checks each displayed source path against its normalized include_str target, reads the exact commit blobs, and recomputes the framed source digest. This binds source provenance only; it does not attest an executable build or independently replay arithmetic.",
+        "evidence_refs": [
+          "scripts/verify_binary_transfer_source.mjs",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json"
+        ]
+      }
+    },
+    {
+      "path": "scripts/test_verify_binary_transfer_source.mjs",
+      "sha256": "e341b84716bdeadfc2afce08f2c0ba4fc5aa3973a4327f88e43859aeef562f2a",
+      "role": "binary producer-source mutation and substitution controls",
+      "freshness": {
+        "status": "supported",
+        "scope": "closure order, include-target drift, Git replacement objects, malformed metadata, missing/non-UTF-8 blobs, framing, bounds, and atomic-output controls",
+        "rationale": "These tests exercise the provenance verifier's fail-closed behavior. They do not validate cover, Jacobian, transfer, subgroup, solver, or performance claims.",
+        "evidence_refs": [
+          "scripts/test_verify_binary_transfer_source.mjs"
+        ]
+      }
+    },
+    {
+      "path": "docs/curves/binary-subgroup-transfer-source-verification.schema.json",
+      "sha256": "ebc6c21de0ae2288a28252e70c041b7e14a9b408cf9c56662dce224ad20dd56d",
+      "role": "machine-readable binary producer-source receipt contract",
+      "freshness": {
+        "status": "supported",
+        "scope": "the exact 21-file receipt shape and claim boundary",
+        "rationale": "The schema fixes ordered paths, required checks, and provenance-only status; schema conformance alone is not execution or mathematical evidence.",
+        "evidence_refs": [
+          "docs/curves/binary-subgroup-transfer-source-verification.schema.json"
+        ]
+      }
+    },
+    {
+      "path": "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json",
+      "sha256": "38405fb08dc6ec3e30c0b59035a63f156476c6a0838048afd6b89f2088e01433",
+      "role": "deterministic binary transfer producer Git-tree receipt",
+      "freshness": {
+        "status": "supported",
+        "scope": "the binary corpus source digest and reviewed 21-path closure at producer commit 5c6e43a6f0cffe0afc4c962ff54056716cf6437e",
+        "rationale": "The receipt binds the saved source digest to exact Git blobs and the verifier version. It does not prove that the packaged executable was built from that commit, supply independent arithmetic, signed standing, a solver, or computational advantage.",
+        "evidence_refs": [
+          "docs/curves/binary-subgroup-transfer-certificates.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json"
+        ]
+      }
+    },
+    {
+      "path": "research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json",
+      "sha256": "4dc701ef6b5c73510711cf1dded744b9d7fa8a77f6195290559a13b1b31782f1",
+      "role": "standalone Linux GNU package-run receipt",
+      "freshness": {
+        "status": "supported",
+        "scope": "the successful Rust GNU package job and installed-layout catalog replay at evidence head b98fb11df2353c3daf0200956190ba0764c5fff7",
+        "rationale": "The receipt distinguishes the successful package lane from the cancelled aggregate workflow and records the proxy-blocked independent download. It is same-implementation job-side evidence, not an independent artifact replay, source-to-binary attestation, mathematical oracle, solver, or advantage result.",
+        "evidence_refs": [
+          "research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json"
         ]
       }
     },
@@ -408,7 +516,7 @@
     },
     {
       "path": ".github/workflows/curve-covers.yml",
-      "sha256": "02d2a163028ef773af50e1494989c8b55b830e73bb9f0175f93b3c67493d3ffe",
+      "sha256": "f60d0525730188f2d0c823377b2497b09738258a73163080a39d886cce7989d9",
       "role": "exact implementation-version dependency: .github/workflows/curve-covers.yml",
       "freshness": {
         "status": "supported",
@@ -421,7 +529,7 @@
     },
     {
       "path": ".github/workflows/release.yml",
-      "sha256": "8c29f657ed0d4aa9527f48c84f0d3c76923a00e139e3c96b2a3c6e9e2126d39c",
+      "sha256": "9d0cc5224b62f27f720c0ffa0c37b41399b82ea30243bec41755634685e34760",
       "role": "exact implementation-version dependency: .github/workflows/release.yml",
       "freshness": {
         "status": "supported",
@@ -659,7 +767,7 @@
     },
     {
       "path": "docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md",
-      "sha256": "92a3c28db996e683c465e302d01b1698efc20b9e1cb32bdbdce4807707d0646f",
+      "sha256": "c46a66ceb2530cc4f8582ca1046a8faa3af194422d973beb3dfe9403901e8230",
       "role": "standalone CLI and supported-model documentation",
       "freshness": {
         "status": "supported",

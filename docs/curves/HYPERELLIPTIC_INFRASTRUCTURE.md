@@ -865,7 +865,7 @@ caller-supplied metadata; a successful same-implementation replay is not an
 independent execution attestation or a claim of exact order where the record
 still says unknown.
 
-For the tracked 2026-11-19 source-custody successor candidate, `CORPUS_SHA256` is
+For the tracked 2026-11-19 source-custody successor, `CORPUS_SHA256` is
 `a55c7f9a0c836614281388f19b3b31fa622eeb1650ddc00c59e4e78562471392`
 and `CORPUS_BYTES` is `500924`. It records producer revision
 `5c6e43a6f0cffe0afc4c962ff54056716cf6437e` with length-framed producer-source
@@ -873,9 +873,20 @@ digest
 `e7a12f60c219624b2442bb54a79bb114ad8c89cfd1d33f6f0ca4643af7bae7dd`.
 That source frame includes the binary-module re-exports and the deterministic
 primality implementation and word-sized helper used by exact-order evidence.
-Native exact replay of this successor remains a current-head workflow gate.
+Release run `44585934651`, Rust GNU job `135778928449`, passed native
+installed-layout exact replay and receipt comparison at evidence head
+`b98fb11d…`, then uploaded artifact `14560899671`; independent download of the
+artifact remains proxy-blocked. The durable job-side record is
+[`standalone-package-run-44585934651.json`](../../research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json).
+The repository-mode 21-file Git-tree verifier
+and receipt additionally reproduce `e7a12f60…` with replacement objects
+disabled and logical paths checked against their normalized `include_str!`
+targets. Its 8/8 local controls pass; exact-head workflow integration remains
+pending. This source receipt does not attest the executable build or supply an
+independent arithmetic check.
 The earlier `67142558…` / `e0ae0fe5…` and `f402ccd4…` / `8c61e842…` corpora
 remain historical evidence, not the current same-implementation replay target.
+[pcc:unverified]
 
 For the 2026-11-18 graph, the expected bounded population is 174 binary map
 records, 147 maps with 150 named generator bindings, and 27 maps without a
