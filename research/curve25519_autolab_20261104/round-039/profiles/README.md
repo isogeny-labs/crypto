@@ -9,7 +9,7 @@ Round 39 (`../README.md`) ratcheted `tw2l-x20-j16-n2` at k = 28 on counted GAE (
 ## Method
 
 - Fixed workload: the first 160 non-warm-up holdout records of each arm (`ab/seqs.json`), exported with `ecbench profile-input` and run through the hidden measured child `ecbench exec`. The standalone `exec` reproduces the stored counted cost (job 642: `total_gae` 10664, as recorded).
-- Profile: `tools/profile.sh cpu --call-graph dwarf` (perf `cpu-clock`, 999 Hz, software timer: where time goes, no cycle or cache attribution; `isolation: none`), 160 jobs x 10 repeats per arm. Outputs: `k28-sel-cpu/`, `k28-inc-cpu/` (the 160 to 180 MB `perf.data` files are not committed).
+- Profile: `tools/profile.sh cpu --call-graph dwarf` (perf `cpu-clock`, 999 Hz, software timer: where time goes, no cycle or cache attribution; `isolation: none`), 160 jobs x 10 repeats per arm. Outputs: `k28-sel-cpu/`, `k28-inc-cpu/`. Not committed: the 160 to 180 MB `perf.data` files, and the folded stacks (`folded.txt`, 1.6 MB each, sha256 `2d01ef87037789b0d01395ac27f1ae58001cab5720b9d559511314fe2ce91a72` for `sel` and `3c90811cf34fc3ddd2e4e1f73a314713dc1172bfdc50b7710a06391c4dde7a97` for `inc`) and `hotspots.tsv`, which the artifact policy sends to the store and this session has no store credentials for. `ab/analyze_folded.py` splits folded stacks by phase and leaf cost and `ab/folded_breakdown.jsonl` holds its output for these two runs; the tables below come from it.
 - A/B: `ab/ab_bin.py` and `ab/ab_wall.py` run the arms interleaved (order alternating per job and round), read `report.solve_wall_ns` measured inside the child, and require every non-timing field of the report to be identical across variants and repeats.
 
 ## What the profile shows
