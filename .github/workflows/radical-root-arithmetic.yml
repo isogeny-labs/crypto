@@ -5,6 +5,9 @@ on:
     paths:
       - 'src/cryptanalysis/prime_radical_root.rs'
       - 'src/cryptanalysis/prime_root_trace.rs'
+      - 'src/cryptanalysis/prime_root_bounded.rs'
+      - 'research/amm_digit_perf_20261118/round31_bounded_isolated.py'
+      - 'research/amm_digit_perf_20261118/round31_bounded_baseline.rs'
       - 'research/amm_digit_perf_20261118/round23_verifier_isolated.py'
       - 'research/amm_digit_perf_20261118/round24_verifier_isolated.py'
       - 'research/amm_digit_perf_20261118/round25_verifier_isolated.py'
@@ -173,6 +176,32 @@ jobs:
         with:
           name: radical-power-reuse-rust-bench
           path: ${{ runner.temp }}/radical-power-reuse.txt
+          if-no-files-found: ignore
+
+  bounded-arithmetic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round31_bounded_baseline.rs
+            research/amm_digit_perf_20261118/round31_bounded_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compiled Rust bounded producer and independent replay A/B
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/amm_digit_perf_20261118/round31_bounded_isolated.py \
+            | tee "$RUNNER_TEMP/round31-bounded-rust.txt"
+          cat "$RUNNER_TEMP/round31-bounded-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round31-bounded-rust-bench
+          path: ${{ runner.temp }}/round31-bounded-rust.txt
           if-no-files-found: ignore
 
   radical:
