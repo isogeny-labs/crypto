@@ -137,7 +137,9 @@ out = {'total_deviation': tot_dev, 'verify': [{k: v for k, v in r.items() if k !
 for rt in (False, True):
     for k in (1, 10, 100):
         rows = census(k, rt)
+        if not rt:
+            rows = [{'N': r['N'], 'distinct_n_type_m_genus': sorted({(c['n'], c['type'], c['m'], c['genus']) for c in r['classes']}),
+                     'sum_over_towers_upper': r['sum_over_towers_upper'], 'frac_max': r['frac_max']} for r in rows]
         out['weak'][f"{'T' if rt else 'asregistered'}_kappa{k}"] = rows
-        print(('with T' if rt else 'as registered'), 'kappa', k, 'first N with a weak class:', rows[0]['N'] if rows else None,
-              '| distinct (n,type,m,genus):', sorted({(c['n'], c['type'], c['m'], c['genus']) for r in rows for c in r['classes']})[:12], flush=True)
+        print(('with T' if rt else 'as registered'), 'kappa', k, 'first N:', rows[0]['N'] if rows else None, flush=True)
 json.dump(out, open(f'{LANE}/census_summary.json', 'w'))
