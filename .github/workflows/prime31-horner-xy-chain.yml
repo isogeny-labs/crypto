@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/prime31-horner-xy-chain.yml'
       - 'research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_family_separation.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_rr9_weighted_family_separation.py'
       - 'research/prime31_ic_20261115/rr9/RR9_WEIGHTED_FAMILY_SEPARATION_PROTOCOL_20261119.md'
       - 'research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs'
       - 'research/prime31_ic_20261115/native/verify_prime31_horner_xy_chain.py'
@@ -17,6 +18,7 @@ on:
     paths:
       - '.github/workflows/prime31-horner-xy-chain.yml'
       - 'research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_family_separation.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_rr9_weighted_family_separation.py'
       - 'research/prime31_ic_20261115/rr9/RR9_WEIGHTED_FAMILY_SEPARATION_PROTOCOL_20261119.md'
       - 'research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs'
       - 'research/prime31_ic_20261115/native/verify_prime31_horner_xy_chain.py'
@@ -139,8 +141,11 @@ jobs:
             .generic_squarefree_grader_used==true and
             .public_only_unknown_index_extraction==false and
             .complete_ecdlp_solved==false' prime31-weighted-family-separation.json
+          python3 research/prime31_ic_20261115/native/verify_prime31_rr9_weighted_family_separation.py \
+            prime31-weighted-family-separation.json | tee prime31-weighted-family-verified.json
           sha256sum prime31-weighted-family-separation.json \
             research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_family_separation.rs \
+            research/prime31_ic_20261115/native/verify_prime31_rr9_weighted_family_separation.py \
             research/prime31_ic_20261115/rr9/RR9_WEIGHTED_FAMILY_SEPARATION_PROTOCOL_20261119.md \
             | tee weighted-family-sha256.txt
       - name: Preserve scientific artifacts
@@ -156,5 +161,6 @@ jobs:
             prime31-horner-xonly-verified.json
             xonly-sha256.txt
             prime31-weighted-family-separation.json
+            prime31-weighted-family-verified.json
             weighted-family-sha256.txt
           if-no-files-found: warn
