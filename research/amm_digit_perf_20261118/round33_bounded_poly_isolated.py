@@ -101,6 +101,8 @@ mod round33 {
             for len in 0..=9usize {
                 for mode in 0..3 {
                     for _ in 0..64 {
+                        e.gate.metrics=Metrics::default();
+                        r.gate.metrics=Metrics::default();
                         let a=poly(p,len,&mut seed,mode);
                         assert_eq!(e.square(&a).unwrap(),e.product(&a,&a).unwrap());
                         assert_eq!(r.square_diagonals(&a).unwrap(),r.convolution(&a,&a).unwrap());
