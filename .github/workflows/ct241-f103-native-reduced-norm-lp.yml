@@ -1,0 +1,80 @@
+name: CT241 F103 paired native reduced norm two-LP ECDLP cost
+
+on:
+  push:
+    branches:
+      - research/ct204-odd-cover-toy-dlp-20261118
+    paths:
+      - "tests/ct238_native_cubic_norm_compression.rs"
+      - ".github/workflows/ct241-f103-native-reduced-norm-lp.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-f103-norm-reduced:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      CARGO_BUILD_JOBS: '2'
+      CARGO_INCREMENTAL: '0'
+      CARGO_PROFILE_RELEASE_DEBUG: '0'
+    steps:
+      - name: Recover hosted-runner disk
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup
+          df -h .
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/*/
+            /src/
+            /tests/prime_cover_toy_complete_dlp.rs
+            /tests/prime_cover_toy_cold_cost.rs
+            /tests/ct226_native_genus4_transferred_ic.rs
+            /tests/ct238_native_cubic_norm_compression.rs
+            /tests/ct229_impl/probe.rs
+            /tests/ct231_impl/probe.rs
+            /tests/ct233_impl/probe.rs
+            /tests/ct235_impl/probe.rs
+            /.cargo/
+            /build.rs
+            /crates/
+            /compat/ct_dynamic_audit.rs
+            /research/ct_dynamic_audit_20261102/
+            /docs/ecdlp-audit/
+            /research/full_volcano_graphwide_ic_20261017/execution/
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct209_native_source_preflight.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/test_ct209_native_source_preflight.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct214_cost_log_validator.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct215_paired_cost_audit.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/test_ct214_cost_log_validator.py
+            /research/n83_highk_beyond4405_20261021/native_exclusion_audit.rs
+            /research/n83_jacobian_projector_20261031/
+            /docs/ic/
+            /docs/ecbench/
+            /docs/curves/
+            /research/pencil_large_prime_20261029/
+            /tools/factor-base/
+            /tools/volcano-cli/
+            /isogeny_algos/
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.98'
+      - name: Fail fast on missing manifest sources
+        run: |
+          (cd research/chained_jacobian_transfers_20261110/toy_dlp_ct204 && python3 -m unittest -v test_ct209_native_source_preflight.py)
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct209_native_source_preflight.py .
+      - name: Compile and run 15 cold paired F103 CT241 solves
+        shell: bash
+        run: |
+          set -euo pipefail
+          git log -1 --format='CT241_SOURCE_SHA %H'
+          cargo test --locked --release --test ct238_native_cubic_norm_compression ct241_paired_native -- --nocapture --test-threads=1 2>&1 | tee /tmp/ct241-f103-native.log
+          test "$(grep -c 'CT241_REDUCED_NORM_PAIR_JSON' /tmp/ct241-f103-native.log)" -eq 15
+          grep 'CT241_REDUCED_NORM_PAIR_JSON' /tmp/ct241-f103-native.log
