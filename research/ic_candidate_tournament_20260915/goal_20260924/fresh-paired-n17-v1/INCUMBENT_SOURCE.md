@@ -32,12 +32,12 @@ columns must be re-inventoried from this exact worker before a new IC1 ID is
 assigned; the historical n17 inventory had 272 usable points and eight
 columns, while F5/SAT use a different base policy.
 
-Local, **uncommitted-publisher validation** passed data-only replay of all
-459 archived regular files with zero worker calls. A second replay passed from
-an archive-only copy containing the full tar, seal, manifest and four retained
-build sidecars, with no unpacked source tree or executable. Appending one byte
-to a separate archive copy made replay reject it as `incumbent source archive
-bytes differ`; changing a build sidecar was rejected as `incumbent source
-sidecar differs from archived inventory`. These controls check the new gate,
-but are not the pre-card publication: that publication must be rebuilt from
-committed publisher source and independently replayed from its repository copy.
+The committed pre-card publication is under
+[incumbent-source-v1/result-v1](incumbent-source-v1/result-v1/RESULT.md)
+(external seal
+`36923bdb0110841fef8c481b941f134c87076244ed20440684bae3d385c6e6bf`;
+459 archive members independently replayed). Earlier local
+uncommitted-publisher validation also passed data-only replay of all 459
+archived regular files with zero worker calls, including archive-only and
+tamper negatives; those controls checked the gate and do not replace the
+committed publication above.

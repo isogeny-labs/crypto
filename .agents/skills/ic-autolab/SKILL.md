@@ -210,7 +210,12 @@ have independently checked source publications and a public card exists,
 `target-control-adopt-card` and `target-control-audit-adoption` may bind that
 card to the same F5 capsule before the ordinary one-use scientific publication
 and dispatch. The adoption path has not yet been exercised; the old consumed
-F5 capsule cannot be adopted. Incumbent IC and rho source gates remain open.
+F5 capsule cannot be adopted. Incumbent IC and rho now have committed
+target-free source publications under
+[incumbent-source-v1](../../../research/ic_candidate_tournament_20260915/goal_20260924/fresh-paired-n17-v1/incumbent-source-v1/result-v1/RESULT.md)
+and
+[rho-source-v1](../../../research/ic_candidate_tournament_20260915/goal_20260924/fresh-paired-n17-v1/rho-source-v1/result-v1/RESULT.md);
+a public point card and four-arm dispatch remain uncreated.
 The [disclosed strong-rho readiness control](../../../research/ic_candidate_tournament_20260915/goal_20260924/fresh-paired-n17-v1/rho-readiness-v1/RESULT.md)
 passed scalar replay and deterministic session audit on one already exposed
 public point. It is L0, source-unpublished and unpaired. Use its exact

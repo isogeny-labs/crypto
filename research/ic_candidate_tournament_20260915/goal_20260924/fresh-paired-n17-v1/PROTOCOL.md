@@ -11,9 +11,11 @@ from a new, unconsumed validation capsule, with all 6,968 archived members
 independently replayed. F5 card adoption remains unexercised. Publisher
 commands now exist for the remaining two pre-card arms:
 [`incumbent-source-publish` / `incumbent-source-replay`](INCUMBENT_SOURCE.md)
-and [`rho-source-publish` / `rho-source-replay`](RHO_SOURCE.md). Committed,
-independently replayed publications for those arms are still required before a
-card may be drawn. A separate
+and [`rho-source-publish` / `rho-source-replay`](RHO_SOURCE.md). Their
+committed publications are retained under
+[incumbent-source-v1/result-v1](incumbent-source-v1/result-v1/RESULT.md) and
+[rho-source-v1/result-v1](rho-source-v1/result-v1/RESULT.md). A public point
+card and four-arm dispatch remain uncreated. A separate
 [disclosed strong-rho readiness control](rho-readiness-v1/RESULT.md)
 recovered and replayed one already exposed public point; it is neither a
 source publication nor a fresh paired arm.
