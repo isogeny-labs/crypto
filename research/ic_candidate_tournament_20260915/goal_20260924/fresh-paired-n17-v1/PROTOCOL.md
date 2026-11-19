@@ -14,15 +14,18 @@ commands now exist for the remaining two pre-card arms:
 and [`rho-source-publish` / `rho-source-replay`](RHO_SOURCE.md). Their
 committed publications are retained under
 [incumbent-source-v1/result-v1](incumbent-source-v1/result-v1/RESULT.md) and
-[rho-source-v1/result-v1](rho-source-v1/result-v1/RESULT.md). A public point
-card and four-arm dispatch remain uncreated. A separate
+[rho-source-v1/result-v1](rho-source-v1/result-v1/RESULT.md). The first
+[public point card](public-card-v1/RESULT.md) is now retained
+(`card_sha256` `bd969a4092a329bf093688b9d4715c86d77850c11f115ff47852c9235d7c2379`);
+four-arm dispatch, F5 card adoption and scientific target registration remain
+uncreated. A separate
 [disclosed strong-rho readiness control](rho-readiness-v1/RESULT.md)
 recovered and replayed one already exposed public point; it is neither a
 source publication nor a fresh paired arm.
-No point card, fresh target registration, four-arm result or isolated-host
-receipt exists under this protocol. The three earlier confirmation sets and
-every consumed controller remain closed. A stage control is never a complete
-one-target result. Neither SAT nor F5 has run a fresh card.
+No fresh target registration, four-arm result or isolated-host receipt exists
+under this protocol. The three earlier confirmation sets and every consumed
+controller remain closed. A stage control is never a complete one-target
+result. Neither SAT nor F5 has run a fresh card.
 
 ## Entry gates and point custody
 

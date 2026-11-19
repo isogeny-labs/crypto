@@ -19,6 +19,9 @@ The [independent replay](independent-replay.json) and
 members as data with zero archived binary executions, `target_card_created=false`,
 and null online speedup.
 
-This is a pre-card custody gate only. It does not authorize a fresh rho run,
-mint an IC1/workload ID, or create a point card. The L0 readiness control
-remains closed and unpaired.
+The matching [source descriptor](source-descriptor.json) asserts the same
+seal, source-manifest and archive digests under
+`fresh-paired-n17-source-publication-v1` for the public-point card generator.
+This remains a pre-card custody gate only: it does not authorize a fresh rho
+run or mint an IC1/workload ID. The L0 readiness control remains closed and
+unpaired.
