@@ -354,7 +354,10 @@ mod tests {
             "research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv",
         );
         let Ok(bytes) = fs::read(path) else {
-            eprintln!("skip: missing selected-representatives.csv artifact at {}", path.display());
+            eprintln!(
+                "skip: missing selected-representatives.csv artifact at {}",
+                path.display()
+            );
             return;
         };
         assert_eq!(representatives(&bytes).unwrap().len(), 16_627);
