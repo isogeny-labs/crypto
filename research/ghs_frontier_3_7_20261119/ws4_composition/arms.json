@@ -1,0 +1,34 @@
+{
+  "schema": "ghs-rho-composition-arms/v1",
+  "status": "protocol-frozen-execution-binding-pending",
+  "primary_width": 8,
+  "correctness_widths": [1, 4, 8, 16, 32],
+  "field_kernel_domain": "q is coprime to 6 and q < 2^31",
+  "composition_order": ["R17-mul5", "R36-walker-table", "R64-counter-removal"],
+  "primary_arms": [
+    {"id": "strong-b8", "mechanism": "baseline", "role": "counted", "field_authority": true, "native_authority": true},
+    {"id": "strong-b8-mul6", "mechanism": "baseline", "role": "counted-alias-control", "field_authority": true, "native_authority": true},
+    {"id": "strong-b8-mul5", "mechanism": "R17", "role": "counted", "field_authority": true, "native_authority": true},
+    {"id": "strong-b8-walker-table", "mechanism": "R36", "role": "counted", "field_authority": true, "native_authority": true},
+    {"id": "strong-b8-mul6-walker-table", "mechanism": "R36", "role": "counted-alias-control", "field_authority": true, "native_authority": true},
+    {"id": "strong-b8-mul5-walker-table", "mechanism": "R17+R36", "role": "counted", "field_authority": true, "native_authority": true},
+    {"id": "fast-b8", "mechanism": "baseline", "role": "native-diagnostic", "field_authority": false, "native_authority": true},
+    {"id": "fast-b8-mul5", "mechanism": "R17", "role": "native-diagnostic", "field_authority": false, "native_authority": true},
+    {"id": "fast-b8-walker-table", "mechanism": "R36", "role": "native-diagnostic", "field_authority": false, "native_authority": true},
+    {"id": "fast-b8-mul5-walker-table", "mechanism": "R17+R36", "role": "native-diagnostic", "field_authority": false, "native_authority": true},
+    {"id": "bare-b8", "mechanism": "baseline", "role": "wall", "field_authority": false, "native_authority": false},
+    {"id": "bare-b8-mul5", "mechanism": "R17", "role": "wall", "field_authority": false, "native_authority": false},
+    {"id": "bare-b8-walker-table", "mechanism": "R36", "role": "wall", "field_authority": false, "native_authority": false},
+    {"id": "bare-b8-mul5-walker-table", "mechanism": "R17+R36", "role": "wall", "field_authority": false, "native_authority": false}
+  ],
+  "development": {"q": [4051, 16363, 65479], "seeds": [101, 102, 103], "target_policy": "sequence", "target_index": 0},
+  "holdout": {"q": [4051, 16363, 65479], "seeds": [1, 2, 3], "target_policy": "ic-repeat", "target_index": 0},
+  "wall_schedule": [
+    ["A0", "A1", "B0", "B1"],
+    ["B1", "B0", "A1", "A0"],
+    ["A1", "B1", "A0", "B0"],
+    ["B0", "A0", "B1", "A1"],
+    ["A0", "B0", "A1", "B1"]
+  ],
+  "execution_binding": null
+}

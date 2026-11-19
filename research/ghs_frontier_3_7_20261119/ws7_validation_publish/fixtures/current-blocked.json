@@ -1,0 +1,110 @@
+{
+  "schema": "ghs.frontier.validation-bundle/v1",
+  "claim_id": "GHS-FRONTIER-3-7-20261119",
+  "test_only": false,
+  "promotion_requested": true,
+  "scope": {
+    "family": "restricted-ghs-weak-e0-fq3",
+    "target_count": 1,
+    "interval": "cold-end-to-end",
+    "unit": "M-eq-and-S",
+    "matched_reference": "strongest-applicable-strong-rho",
+    "restricted_family_wording": true,
+    "generic_curve_claim": false
+  },
+  "source": {
+    "revision": null,
+    "revision_published": false,
+    "clean_tree": false,
+    "binary_sha256": null,
+    "image_digest": null,
+    "spec_sha256": null,
+    "protocol_sha256": null,
+    "source_binary_identity_verified": false,
+    "no_post_result_code_change": false
+  },
+  "lanes": [
+    {"id": "ws3_parallel_rho", "status": "implemented-unverified", "evidence_count": 0},
+    {"id": "ws4_composition", "status": "implemented-unverified", "evidence_count": 0},
+    {"id": "ws5_matched_ghs", "status": "implemented-unverified", "evidence_count": 0},
+    {"id": "ws6_solver_coverage", "status": "implemented-unverified", "evidence_count": 0}
+  ],
+  "measurement": {
+    "session_status": "not-run",
+    "cold_one_target": false,
+    "same_target_both_arms": false,
+    "strongest_applicable_reference": false,
+    "all_phases_charged": false,
+    "all_failures_retained": true,
+    "warmup_rounds": 0,
+    "measured_rounds": 0,
+    "automatic_measurement_retries": 0,
+    "isolation_level": "none",
+    "aa": {
+      "admitted_pairs": 0,
+      "ratio": null,
+      "ci_low": null,
+      "ci_high": null,
+      "outside_noise_for_claimed_wall_result": false
+    },
+    "pricing": {
+      "band_weights_gae": [0.0, 0.1, 1.0],
+      "every_unpriced_counter_emitted": false,
+      "table_work_priced": false,
+      "non_operation_bytes_not_priced_as_ops": true,
+      "calibration_complete": false,
+      "same_calibration_both_arms": false,
+      "calibration_triples_per_seed": 0,
+      "calibrated_weight": null,
+      "complete_cold_cost": false
+    },
+    "rho_phases": [],
+    "ic_phases": [],
+    "correctness": {
+      "completed_runs": 0,
+      "recovered_scalars_verified": 0,
+      "wrong_answers": 0,
+      "invalid_records_accepted": 0,
+      "phase_sums_exact": false
+    },
+    "replay": {
+      "audit_status": "not-run",
+      "replay_all": false,
+      "deterministic_runs": 0,
+      "identical_replays": 0,
+      "receipt_sha256": null
+    },
+    "independent": {
+      "original_host_class": null,
+      "validator_host_class": null,
+      "both_arms_replayed": false,
+      "every_recovered_scalar_checked": false,
+      "receipt_sha256": null
+    }
+  },
+  "validation": {
+    "raw_evidence_sealed": false,
+    "producer_distinct_validator": false,
+    "headlines_recomputed_from_raw": false,
+    "no_post_result_tuning": true,
+    "validation_json_status": "not-created",
+    "pcc_standing": "unverified",
+    "claim_scope_exact": true
+  },
+  "publication": {
+    "benchmark_record_closed": false,
+    "experiment_export_verified": false,
+    "run_report_present": false,
+    "result_report_present": false,
+    "report_pdf_present": false,
+    "figures_svg_and_png_present": false,
+    "failures_timeouts_regressions_included": false,
+    "frontier_rebuilt_and_checked": false,
+    "leaderboard_generated_and_checked": false,
+    "lab_browser_generated_and_checked": false,
+    "dashboard_coverage_checked": false,
+    "progress_timeline_updated_if_numeric": false,
+    "no_manual_dashboard_edits": true
+  },
+  "evidence_files": []
+}

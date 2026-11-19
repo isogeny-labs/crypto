@@ -1,0 +1,287 @@
+{
+  "acceptance": {
+    "all_sizes_required_for_full_verdict": true,
+    "h1": "every size admitted and every 95% upper bound for IC/reference below 1 at w=0,0.1,1",
+    "h2": "composed strong rho below old-neg on every diagnostic q and weight; separate engineering question",
+    "missing_size_verdict": "limited",
+    "rho_steps_over_sqrt_ell": [
+      0.75,
+      1.15
+    ],
+    "scalar_verification_required": true
+  },
+  "analysis": {
+    "bootstrap_clusters": "instance_seed",
+    "bootstrap_resamples": 10000,
+    "confidence": 0.95,
+    "primary_estimator": "ratio_of_seed_cluster_means",
+    "repetitions_averaged_within_seed_first": true,
+    "selection_rule": "lowest complete frozen IC-arm mean independently at each q and price weight",
+    "tie_break": "lexicographic_arm_id"
+  },
+  "arms": {
+    "historical_ic": [
+      "B0",
+      "S",
+      "L0",
+      "L1",
+      "L",
+      "D",
+      "DL1",
+      "DL"
+    ],
+    "rho_diagnostics": [
+      "strong-b4-mul5-walker-table",
+      "strong-b16-mul5-walker-table",
+      "old-neg"
+    ],
+    "rho_primary": "strong-b8-mul5-walker-table"
+  },
+  "cost_model": {
+    "band_operation_contract": "complete per-arm native operation count; bytes are listed but not priced",
+    "calibration": {
+      "aggregation": "median across the three seed calibrations at fixed q",
+      "interleaved_triples_per_q_seed": 600,
+      "same_weights_for_ic_and_rho": true
+    },
+    "formulas": {
+      "GAE": "56 + r_inv",
+      "M_eq": "fq_mul + r_inv*fq_inv + r_lmul*mod_ell_mul",
+      "S": "cold_M_eq_w / sqrt(ell)",
+      "cold_M_eq_w": "M_eq + w*GAE*band_ops"
+    },
+    "weights": [
+      0.0,
+      0.1,
+      1.0
+    ]
+  },
+  "evidence_status": {
+    "measurements_present": false,
+    "promotion_allowed": false,
+    "status": "implemented_unverified"
+  },
+  "execution": {
+    "automatic_retries": 0,
+    "job_cpu": 4,
+    "job_memory": "4Gi",
+    "manual_infrastructure_retries_max": 1,
+    "max_concurrent_jobs": 2,
+    "runner": "isolab-eks-command",
+    "usd_all_attempt_ceiling": 5.0,
+    "wall_admission": {
+      "current_bridge": "isolab.eks.command-request/v1 standard profile",
+      "current_bridge_can_earn_L2": false,
+      "disposition": "blocked_until_custom_binary_L2_bridge",
+      "required_level": "L2"
+    },
+    "waves": [
+      [
+        "low",
+        "mid"
+      ],
+      [
+        "high",
+        "top"
+      ]
+    ]
+  },
+  "family": {
+    "curve": "E_0",
+    "field": "F_(q^3)",
+    "order": "4*ell",
+    "scope": "restricted-ghs-weak-plane-quartic",
+    "target_kind": "public_known_answer"
+  },
+  "grid": [
+    {
+      "deadline_seconds": 3600,
+      "k": 12,
+      "q": 4051,
+      "repetitions_per_seed": 5,
+      "split": "low"
+    },
+    {
+      "deadline_seconds": 3600,
+      "k": 13,
+      "q": 8191,
+      "repetitions_per_seed": 5,
+      "split": "low"
+    },
+    {
+      "deadline_seconds": 3600,
+      "k": 14,
+      "q": 16363,
+      "repetitions_per_seed": 5,
+      "split": "low"
+    },
+    {
+      "deadline_seconds": 3600,
+      "k": 15,
+      "q": 32719,
+      "repetitions_per_seed": 5,
+      "split": "low"
+    },
+    {
+      "deadline_seconds": 3600,
+      "k": 16,
+      "q": 65479,
+      "repetitions_per_seed": 5,
+      "split": "low"
+    },
+    {
+      "deadline_seconds": 3600,
+      "k": 17,
+      "q": 131071,
+      "repetitions_per_seed": 5,
+      "split": "low"
+    },
+    {
+      "deadline_seconds": 3600,
+      "k": 18,
+      "q": 262111,
+      "repetitions_per_seed": 5,
+      "split": "low"
+    },
+    {
+      "deadline_seconds": 3600,
+      "k": 19,
+      "q": 524287,
+      "repetitions_per_seed": 3,
+      "split": "mid"
+    },
+    {
+      "deadline_seconds": 3600,
+      "k": 20,
+      "q": 1048507,
+      "repetitions_per_seed": 3,
+      "split": "mid"
+    },
+    {
+      "deadline_seconds": 7200,
+      "k": 21,
+      "q": 2097091,
+      "repetitions_per_seed": 3,
+      "split": "high"
+    },
+    {
+      "deadline_seconds": 10800,
+      "k": 22,
+      "q": 4194271,
+      "repetitions_per_seed": 3,
+      "split": "top"
+    }
+  ],
+  "historical_archive": {
+    "bytes": 382105,
+    "relative_path": "research/quartic_n4v2_20261020/results/grid-20261025/units.tar.gz",
+    "sha256": "aac9a25ce50ac5d23895f0dba8f907fb223aaac32a2a41391bc590e3c6bcca42"
+  },
+  "identity": {
+    "protocol_id": "ghs-matched-frontier-m3-composed-v1",
+    "revision_binding": "full_git_sha_required",
+    "schema": "ghs.matched-frontier.protocol/v1",
+    "source_date": "2026-11-19"
+  },
+  "intervals": {
+    "cold": {
+      "ic": [
+        "factor_base_and_solver_setup",
+        "relation_generation",
+        "relation_filtering_and_deduplication",
+        "linear_algebra_or_algebraic_solving",
+        "target_recovery",
+        "independent_verification"
+      ],
+      "rho": [
+        "jump_table_and_walker_setup",
+        "walk_and_lookahead",
+        "distinguished_point_and_collision_work",
+        "scalar_recovery",
+        "independent_verification"
+      ]
+    },
+    "online_only": {
+      "headline": false,
+      "reported_separately": true,
+      "starts": "first target-dependent operation after reusable setup",
+      "stops": "after recovered scalar and independent verification"
+    },
+    "setup_reuse_count_for_cold": 1
+  },
+  "publication": {
+    "independent_replay": "required",
+    "independent_validator": "required",
+    "leaderboard_change_before_validation": false,
+    "pcc_ci_main_standing": "required",
+    "raw_manifest": "required",
+    "second_host_when_claim_tier_requires": true
+  },
+  "required_admission": [
+    "authorized_aws_identity_account_104186811093",
+    "fresh_daily_and_monthly_budget_readbacks",
+    "usd_5_unreserved_headroom",
+    "all_tenant_pool_check_for_8_vcpu_8Gi",
+    "namespace_quota_and_active_job_inventory",
+    "checkpoint_gate",
+    "git_custody_for_every_launch_input",
+    "digest_pinned_source_bound_image",
+    "raw_result_readback_and_sha256_verification",
+    "custom_binary_L2_bridge_with_native_replay_and_AA"
+  ],
+  "required_result_phase_coverage": {
+    "ic": [
+      "cold_setup",
+      "cold_relations",
+      "cold_filtering",
+      "cold_solver",
+      "cold_recovery",
+      "cold_verify",
+      "online_target_dependent",
+      "online_verify"
+    ],
+    "rho": [
+      "cold_setup",
+      "cold_walk",
+      "cold_collision",
+      "cold_recovery",
+      "cold_verify",
+      "online_walk",
+      "online_collision",
+      "online_recovery",
+      "online_verify"
+    ]
+  },
+  "sampling": {
+    "diagnostic_q": [
+      4051,
+      65479,
+      262111
+    ],
+    "diagnostic_repetitions_per_seed": 1,
+    "seeds": [
+      1,
+      2,
+      3
+    ],
+    "target_policy": "ic-repeat"
+  },
+  "scope_warning": "A result applies only to the named GHS-weak E_0/F_(q^3) family and establishes nothing for generic prime, random-binary, Koblitz, prime-order extension-field, standardized, deployed, or ECC2K-130 curves.",
+  "sources_checked": {
+    "kb_status": "unavailable: scripts/research-kb reported no executable",
+    "paths": [
+      "research/ecbench_e2e_frontier_20261031/LITERATURE.md",
+      "research/ecbench_e2e_frontier_20261031/REPORT.md#the-restricted-ghs-weak-exception",
+      "research/quartic_ghs_strong_rho_20261114/PROTOCOL.md",
+      "research/quartic_ghs_strong_rho_20261114/ROUND_A.md",
+      "research/quartic_ghs_strong_rho_parallel_20261118/IMPLEMENTATION_SPEC.md#18-m3--matched-restricted-family-frontier-grid",
+      "research/quartic_ghs_r0_r99_20261119/REPORT.md"
+    ],
+    "primary_literature": [
+      "van Oorschot and Wiener, Parallel Collision Search with Cryptanalytic Applications, J. Cryptology 1999, DOI 10.1007/PL00003816",
+      "Gallant, Lambert and Vanstone, Improving the Parallelized Pollard Lambda Search, Math. Comp. 2000, DOI 10.1090/S0025-5718-99-01119-9",
+      "Gaudry, Index calculus for abelian varieties of small dimension and the elliptic curve discrete logarithm problem, JSC 2009, DOI 10.1016/j.jsc.2008.08.005"
+    ]
+  }
+}
+

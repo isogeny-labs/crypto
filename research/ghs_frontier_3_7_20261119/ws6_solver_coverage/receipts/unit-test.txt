@@ -1,0 +1,16 @@
+WS6 exact inventory unit-test receipt
+status=PASS
+source_scope=integrated-worktree
+production_build=cargo build --release --bin ecbench
+production_build_status=PASS
+production_binary_sha256=dcac1f24cd12b81a0729794aebe8c736592cbf20fe6cfd92e86da549df303476
+production_binary_bytes=101265008
+production_replay=inventory and require-all audit byte-identical to retained receipts
+test_command=CARGO_TARGET_DIR=/dev/shm/ghs-ws6-unit CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_DEV_INCREMENTAL=false cargo test --lib cryptanalysis::ecbench::optimization::tests::every_native_solver_and_nested_engine_is_in_the_inventory -- --exact --nocapture
+test_profile=unoptimized, debug-info disabled, incremental disabled
+test_result=1 passed; 0 failed; 0 ignored; 0 measured; 7717 filtered out
+test_name=cryptanalysis::ecbench::optimization::tests::every_native_solver_and_nested_engine_is_in_the_inventory
+test_elapsed=7m12s build; 0.00s test
+cleanup=cargo clean --target-dir /dev/shm/ghs-ws6-unit; 2282 files and 1.5GiB generated artifacts removed
+prior_release_test_attempt=source compiled after duplicate-test fix but final artifact write failed ENOSPC before test execution
+evidence_boundary=no performance timing, ranking, ECDLP ratio, or leaderboard claim

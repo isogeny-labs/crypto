@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://isogeny-labs.example/contracts/isolab.eks.ghs-l2-request.v1.json",
+  "title": "Fail-closed standalone GHS L2 benchmark request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "job", "provenance"],
+  "properties": {
+    "schema": {"const": "isolab.eks.ghs-l2-request/v1"},
+    "job": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "job_name", "instance_type", "cpu", "memory", "seconds",
+        "retries", "isolation_required", "build", "runner", "spec"
+      ],
+      "properties": {
+        "job_name": {"type": "string", "pattern": "^ghs-l2-[a-z0-9-]{1,48}$"},
+        "instance_type": {"enum": ["c8a.2xlarge", "m8a.2xlarge"]},
+        "cpu": {"const": 4},
+        "memory": {"enum": ["4Gi", "8Gi"]},
+        "seconds": {"type": "integer", "minimum": 1, "maximum": 4800},
+        "retries": {"const": 0},
+        "isolation_required": {"const": "L2"},
+        "build": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "image_uri", "source_revision", "binary_path", "binary_sha256",
+            "validator_path", "validator_sha256"
+          ],
+          "properties": {
+            "image_uri": {
+              "type": "string",
+              "pattern": "^104186811093\\.dkr\\.ecr\\.us-east-2\\.amazonaws\\.com/isolab/tasks@sha256:[0-9a-f]{64}$"
+            },
+            "source_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "binary_path": {"const": "/usr/local/bin/ghs-strong-rho"},
+            "binary_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "validator_path": {"const": "/usr/local/bin/ghs-l2-validate"},
+            "validator_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        },
+        "runner": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "sha256", "argv"],
+          "properties": {
+            "path": {"const": "/usr/local/bin/ghs-l2-runner"},
+            "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "argv": {
+              "const": [
+                "/usr/local/bin/ghs-l2-runner", "--spec",
+                "/opt/isolab/ghs-l2-spec.json", "--out", "/work/results"
+              ]
+            }
+          }
+        },
+        "spec": {"$ref": "#/$defs/spec"}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["harness", "source_revision", "protocol_sha256"],
+      "properties": {
+        "harness": {"const": "isolab-eks/ghs-l2-bridge-v1"},
+        "source_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "protocol_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  },
+  "$defs": {
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema", "suite_id", "source_revision", "protocol_sha256",
+        "workload", "measurement", "arms", "replay", "required_artifacts"
+      ],
+      "properties": {
+        "schema": {"const": "ghs.l2.spec/v1"},
+        "suite_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"},
+        "source_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "protocol_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "workload": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["q", "instance_seed", "target_index", "target_policy"],
+          "properties": {
+            "q": {"type": "integer", "minimum": 3, "maximum": 2147483647},
+            "instance_seed": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+            "target_index": {"type": "integer", "minimum": 0, "maximum": 4294967295},
+            "target_policy": {"enum": ["sequence", "ic-repeat"]}
+          }
+        },
+        "measurement": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["warmup", "rounds", "warmup_order", "order"],
+          "properties": {
+            "warmup": {"type": "integer", "minimum": 1, "maximum": 20},
+            "rounds": {"type": "integer", "minimum": 5, "maximum": 50},
+            "warmup_order": {
+              "type": "array", "minItems": 1, "maxItems": 20,
+              "items": {"type": "array", "minItems": 3, "maxItems": 8,
+                "items": {"type": "string"}}
+            },
+            "order": {
+              "type": "array", "minItems": 5, "maxItems": 50,
+              "items": {"type": "array", "minItems": 3, "maxItems": 8,
+                "items": {"type": "string"}}
+            }
+          }
+        },
+        "arms": {
+          "type": "array", "minItems": 3, "maxItems": 8,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["name", "role", "driver_argv"],
+            "properties": {
+              "name": {"type": "string", "pattern": "^[a-z][a-z0-9-]{0,31}$"},
+              "role": {"enum": ["reference", "control", "candidate"]},
+              "driver_argv": {
+                "type": "array", "minItems": 8, "maxItems": 8,
+                "items": {"type": "string", "minLength": 1, "maxLength": 128}
+              }
+            }
+          }
+        },
+        "replay": {
+          "type": "object", "additionalProperties": false,
+          "required": ["all", "validator_path", "validator_sha256", "canonical_excluded_fields"],
+          "properties": {
+            "all": {"const": true},
+            "validator_path": {"const": "/usr/local/bin/ghs-l2-validate"},
+            "validator_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "canonical_excluded_fields": {
+              "const": ["timestamps", "wall_intervals", "cpu_intervals", "scheduler_counters", "host_load"]
+            }
+          }
+        },
+        "required_artifacts": {
+          "const": [
+            "build-info.json", "control-comparison.json", "input-request.json",
+            "job-exit.json", "l2-gate.json", "replay.json", "session.jsonl",
+            "validation.json", "warmup.json", "SHA256SUMS"
+          ]
+        }
+      }
+    }
+  }
+}
