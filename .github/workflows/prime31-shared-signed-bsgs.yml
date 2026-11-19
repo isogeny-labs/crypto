@@ -29,12 +29,18 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
       - name: Pin original Prime31 Rust arithmetic
         uses: actions/checkout@v4
         with:
           ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
           path: pinned
           persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis/f4_fp_tower.rs
+            src/cryptanalysis/sig_fp_tower.rs
       - name: Install Rust 1.100.0
         run: rustup toolchain install 1.100.0 --profile minimal
       - name: Overlay only paired baseline examples, log source identities
