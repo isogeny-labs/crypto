@@ -277,12 +277,31 @@ jobs:
           "./target/${{ matrix.target }}/release/ecbench$ext" host --json \
             > ecbench-host-smoke.json
           grep -Fq '"git_commit": "'"$GITHUB_SHA"'"' ecbench-host-smoke.json
+      - name: Verify binary producer source tree
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        shell: bash
+        run: |
+          binary_producer_commit="$(node -e 'const c=require("./docs/curves/binary-subgroup-transfer-certificates.json"); process.stdout.write(c.producer.git_commit)')"
+          git fetch --no-tags --filter=blob:none --recurse-submodules=no origin "$binary_producer_commit"
+          node scripts/test_verify_binary_transfer_source.mjs
+          node scripts/verify_binary_transfer_source.mjs \
+            --input docs/curves/binary-subgroup-transfer-certificates.json \
+            --repo-root . \
+            --output "$RUNNER_TEMP/binary-transfer-source-replay.json"
+          jq -e --arg commit "$binary_producer_commit" '
+            .status == "producer_source_digest_bound_to_recorded_git_tree" and
+            .producer_commit == $commit and
+            .source_files_checked == 21 and
+            ([.checks[]] | all(. == true))
+          ' "$RUNNER_TEMP/binary-transfer-source-replay.json" >/dev/null
+          cmp "$RUNNER_TEMP/binary-transfer-source-replay.json" \
+            research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json
       - name: Stage the archive
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         shell: bash
         run: |
           set -E
-          trap 'code=$?; set +e; printf "::error::archive staging failed (exit %s): %s\n" "$code" "$BASH_COMMAND" >&2; for diagnostic in construct-smoke.json verified-smoke.json arithmetic-smoke.json catalog-smoke.json transfer-catalog-replay.json binary-transfer-source-replay.json odd-transfer-catalog-replay.json odd-transfer-source-replay.json fixed-f8-order-smoke.json transfer-capabilities-smoke.json binary-transfer-sweep-smoke.json binary-transfer-sweep-verify-smoke.json odd-transfer-sweep-smoke.json odd-transfer-sweep-verify-smoke.json transfer-smoke.json binary-generated-subgroup-smoke.json odd-transfer-smoke.json malformed-divisor-smoke.json; do if [ -f "$diagnostic" ]; then printf "::group::%s\n" "$diagnostic" >&2; tail -c 8192 "$diagnostic" >&2; printf "\n::endgroup::\n" >&2; fi; done; exit "$code"' ERR
+          trap 'code=$?; set +e; printf "::error::archive staging failed (exit %s): %s\n" "$code" "$BASH_COMMAND" >&2; for diagnostic in *-smoke.json *-replay.json; do [ -f "$diagnostic" ] || continue; printf "::group::%s\n" "$diagnostic" >&2; tail -c 8192 "$diagnostic" >&2; printf "\n::endgroup::\n" >&2; done; exit "$code"' ERR
           name="crypto-${{ needs.meta.outputs.tag }}-${{ matrix.target }}"
           mkdir -p "dist/$name"
           ext=""
@@ -330,10 +349,7 @@ jobs:
             [ -f "$extra" ] && cp "$extra" "dist/$name/" || true
           done
           odd_producer_commit="$(node -e 'const c=require("./docs/curves/odd-subgroup-transfer-certificates.json"); process.stdout.write(c.producer.git_commit)')"
-          binary_producer_commit="$(node -e 'const c=require("./docs/curves/binary-subgroup-transfer-certificates.json"); process.stdout.write(c.producer.git_commit)')"
-          git fetch --no-tags --filter=blob:none --recurse-submodules=no origin "$binary_producer_commit"
           git fetch --no-tags --filter=blob:none --recurse-submodules=no origin "$odd_producer_commit"
-          node scripts/test_verify_binary_transfer_source.mjs
           # Exercise the installed layout, not just binaries in target/. The
           # generated verification request reuses the constructor's exact
           # certificate, while native catalog checking consumes the staged
@@ -410,12 +426,7 @@ jobs:
             node -e 'const fs=require("fs"); for(const file of ["verified-smoke.json","arithmetic-smoke.json"]){const r=JSON.parse(fs.readFileSync(file)); if(r.status!=="ok") process.exit(1)} const c=JSON.parse(fs.readFileSync("catalog-smoke.json")); if(c.schema_version!=="curve-covers/v1") process.exit(1);'
             node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("transfer-catalog-replay.json")); if(r.schema_version!=="binary-subgroup-transfer-catalog-verification/v1"||r.status!=="verified_complete"||r.checks.optional_raw_hash_and_size!==true||r.checks.canonical_bytes_equal!==true||r.corpus.sha256!=="a55c7f9a0c836614281388f19b3b31fa622eeb1650ddc00c59e4e78562471392"||r.corpus.bytes!==500924||r.summary.failed_named_subgroup_records!==0) process.exit(1);'
             cmp transfer-catalog-replay.json research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json
-            node "$GITHUB_WORKSPACE/scripts/verify_binary_transfer_source.mjs" \
-              --input docs/curves/binary-subgroup-transfer-certificates.json \
-              --repo-root "$GITHUB_WORKSPACE" \
-              --output binary-transfer-source-replay.json
-            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("binary-transfer-source-replay.json")); if(r.schema_version!=="binary-subgroup-transfer-source-verification/v1"||r.status!=="producer_source_digest_bound_to_recorded_git_tree"||r.source_files_checked!==21||Object.values(r.checks).some(v=>v!==true)) process.exit(1);'
-            cmp binary-transfer-source-replay.json research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json
+            cmp "$RUNNER_TEMP/binary-transfer-source-replay.json" research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json
             odd_corpus_sha256="1ecfabcdaecc3e00d78ab2ce7eebeb94607e1c2c224f261fb5718a4f53b65268"
             odd_corpus_bytes="17879292"
             actual_odd_sha256="$(sha256sum docs/curves/odd-subgroup-transfer-certificates.json | awk '{print $1}')"
@@ -526,7 +537,6 @@ jobs:
                binary-generated-subgroup-smoke.json odd-transfer-smoke.json \
                montgomery-transfer-smoke.json \
                malformed-divisor-smoke.json transfer-catalog-replay.json \
-               binary-transfer-source-replay.json \
                odd-transfer-catalog-replay.json odd-transfer-source-replay.json \
                transfer-capabilities-smoke.json
           )
