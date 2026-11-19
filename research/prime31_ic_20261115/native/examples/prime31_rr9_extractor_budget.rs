@@ -79,7 +79,7 @@ struct Gate {
     historical_million_baby_online_ms: f64,
     historical_optimistic_budget_ms_per_call_cross_run_sensitivity_only: f64,
     historical_optimistic_budget_ms_per_completed_log_cross_run_sensitivity_only: f64,
-    historical_affine_to_million_baby_wall_ratio_NOT_PAIRED: f64,
+    historical_affine_to_million_baby_wall_ratio_cross_run_only: f64,
     historical_2pow20_baseline_remeasured_same_runner: bool,
     empirical_b8_scan_measured: bool,
     nonenumerative_solver_measured: bool,
@@ -145,7 +145,7 @@ fn calculate(inp: &Input) -> Gate {
         historical_optimistic_budget_ms_per_completed_log_cross_run_sensitivity_only:
             inp.historical_frontier.fully_charged_batch_ms
                 / inp.historical_frontier.n_public_logs as f64,
-        historical_affine_to_million_baby_wall_ratio_NOT_PAIRED:
+        historical_affine_to_million_baby_wall_ratio_cross_run_only:
             inp.comparison.mean_signed_shared_bsgs_1024_ms
                 / inp.historical_frontier.fully_charged_batch_ms,
         historical_2pow20_baseline_remeasured_same_runner: false,
@@ -191,7 +191,7 @@ mod tests {
             - 0.13955127153404429).abs() < 1e-10);
         assert!((x.historical_optimistic_budget_ms_per_completed_log_cross_run_sensitivity_only
             - 0.1661259765625).abs() < 1e-10);
-        assert!((x.historical_affine_to_million_baby_wall_ratio_NOT_PAIRED
+        assert!((x.historical_affine_to_million_baby_wall_ratio_cross_run_only
             - 19.65042908243344).abs() < 1e-7);
     }
 }
