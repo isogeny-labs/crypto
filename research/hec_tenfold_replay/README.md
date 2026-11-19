@@ -303,3 +303,23 @@ Five of the eight transfer curves have reducible curve polynomials. The other th
 The positive base reaches a one-dimensional nullspace on four curves. The equal-size prefix does so on two. At (127,15) adding the first ten nonsquare places reaches rank 30 on 31 places. Nine additions reach rank 26 on 30 places. This is a threshold for that particular ordering. Every reduced basis annihilates the independently reconstructed full-catalogue coordinate vector restricted to its columns, and every restriction is nonzero.
 
 From this directory, pipe `ruby harness/g3-character-census.rb` to `c++ -std=c++17 -O3 -x c++ - -o /tmp/hec-character-census`, then run the binary. The output fields are p, curve coefficient, arm, base size, rows and rank. Arms 0 and 1 use the full base and matched prefix. Arms 2 through 14 use the character base with zero through twelve extra nonsquare places. This census measures catalogue completeness. Full-solve timings for the restricted genus-3 bases remain open.
+
+### Full solves with genus-3 character bases
+
+The solver constructs the two-pencil catalogue for each input pair and decomposes both divisors over the retained places. The quartic completion accepts a candidate only when both reconstructed roots have known coordinates. The shift fallback likewise checks membership of every factor. Audited runs compare the reduced catalogue to the full catalogue on retained coordinates, check the quartic divisor sum and cross-check successful quartic decompositions by shifting. All 64 input scalars matched their planted values on each of two seeds.
+
+The first experiment used character selection on all five eligible transfer curves, including ten extra places on (127,15). The second used a fresh seed and kept the full base on (127,15), where the pure character base was rank-deficient. Each curve used eight inputs and 32 balanced quartets per input, in forward and reverse processes. Times include catalogue construction, decomposition and scalar verification. Ratios above one favor the selected solver. Three irreducible-polynomial curves ran as identical-code controls, with median ratios between 0.993 and 1.001 across the two seeds and orders.
+
+| p, c | Seed 2026111923, forward / reverse | Seed 2026111924, forward / reverse |
+|---|---:|---:|
+| 127, 15 | 0.588 / 0.587 | 1.000 / 0.999 (full-base control) |
+| 257, 54 | 1.019 / 1.011 | 0.803 / 0.804 |
+| 257, 78 | 1.295 / 1.280 | 1.216 / 1.209 |
+| 383, 42 | 1.116 / 1.120 | 1.139 / 1.125 |
+| 383, 80 | 1.112 / 1.094 | 1.115 / 1.110 |
+
+At (257,54), the restricted base needed the shift fallback for two of sixteen divisor coordinates on the first seed and six on the second. The full base completed all sixteen directly on each seed. At (127,15), the first seed's selected catalogue needed 31 poles to reach rank, versus 12 for the full catalogue. These costs help explain why rank alone was insufficient to select a faster solver.
+
+Against the pencil baseline, the full and selected solvers respectively cleared 10× in both orders on 55 and 53 of 64 inputs on seed 2026111923, and on 54 and 53 on seed 2026111924. Character selection improved full solves reproducibly on three of five eligible curves. The full-base solver remains the default.
+
+Replay with `harness/g3-character-solve.zsh all` or `harness/g3-character-solve.zsh positive-only`. The tracked raw archives include the comparison panel, balanced crossover and decomposition audits. Both medians files use the transfer-panel format.
