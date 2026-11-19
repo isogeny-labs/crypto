@@ -73,7 +73,7 @@ concurrency:
 jobs:
   certificates:
     runs-on: ubuntu-latest
-    timeout-minutes: 75
+    timeout-minutes: 120
     env:
       # Integration-test targets pull in many large binaries. Serializing their
       # links and omitting unused debug sections avoid concurrent rust-lld

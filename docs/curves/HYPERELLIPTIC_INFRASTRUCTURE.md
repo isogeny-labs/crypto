@@ -882,10 +882,12 @@ artifact remains proxy-blocked. The durable job-side record is
 The repository-mode 21-file Git-tree verifier
 and receipt additionally reproduce `e7a12f60…` with replacement objects
 disabled and logical paths checked against their normalized `include_str!`
-targets. Its 8/8 local controls and the exact-head release replay pass; curve
-run `44596591504` has green assessment and Lean jobs, while its first
-certificate attempt exhausted runner disk and its identical rerun remains
-active. This source receipt does not attest the executable build or supply an
+targets. Its 8/8 local controls and the exact-head release replay pass. Curve
+run `44605710291` at successor head `3f4706b2…` has green assessment and Lean
+jobs; its disk-hardened certificate job passed the previously disk-failing
+combined transfer/source-replay step, then exhausted the 75-minute job budget
+during optimized oracles. Later controls were skipped, and a timeout-only
+successor is pending. This source receipt does not attest the executable build or supply an
 independent arithmetic check.
 The earlier `67142558…` / `e0ae0fe5…` and `f402ccd4…` / `8c61e842…` corpora
 remain historical evidence, not the current same-implementation replay target.
