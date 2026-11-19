@@ -1,0 +1,35 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-t1059-6df599df | 23.97 | inc | 12/12 | 14.363 | 16.523 | 35.961 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | ksum3f-n56 | 12/12 | 29.067 | 32.955 | 67.944 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | ksum4f-n24 | 12/12 | 24.025 | 26.550 | 49.273 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | mitm2-n136 | 12/12 | 13.327 | 15.449 | 34.547 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | mitm2-n192 | 12/12 | 15.328 | 17.410 | 36.154 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | rho-neg | 12/12 | 1.027 | 1.120 | 1.962 | — |
+| icv1-fp24-t1059-6df599df | 23.97 | wsum-b5-n3 | 12/12 | 12.445 | 14.808 | 36.069 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp24-t1059-6df599df | inc vs ksum3f-n56 | inc < ksum3f-n56 |
+| icv1-fp24-t1059-6df599df | inc vs ksum4f-n24 | inc < ksum4f-n24 |
+| icv1-fp24-t1059-6df599df | inc vs mitm2-n136 | mitm2-n136 < inc |
+| icv1-fp24-t1059-6df599df | inc vs mitm2-n192 | inc < mitm2-n192 |
+| icv1-fp24-t1059-6df599df | inc vs rho-neg | rho-neg < inc |
+| icv1-fp24-t1059-6df599df | inc vs wsum-b5-n3 | unresolved inside the band |
+| icv1-fp24-t1059-6df599df | ksum3f-n56 vs ksum4f-n24 | ksum4f-n24 < ksum3f-n56 |
+| icv1-fp24-t1059-6df599df | ksum3f-n56 vs mitm2-n136 | mitm2-n136 < ksum3f-n56 |
+| icv1-fp24-t1059-6df599df | ksum3f-n56 vs mitm2-n192 | mitm2-n192 < ksum3f-n56 |
+| icv1-fp24-t1059-6df599df | ksum3f-n56 vs rho-neg | rho-neg < ksum3f-n56 |
+| icv1-fp24-t1059-6df599df | ksum3f-n56 vs wsum-b5-n3 | wsum-b5-n3 < ksum3f-n56 |
+| icv1-fp24-t1059-6df599df | ksum4f-n24 vs mitm2-n136 | mitm2-n136 < ksum4f-n24 |
+| icv1-fp24-t1059-6df599df | ksum4f-n24 vs mitm2-n192 | mitm2-n192 < ksum4f-n24 |
+| icv1-fp24-t1059-6df599df | ksum4f-n24 vs rho-neg | rho-neg < ksum4f-n24 |
+| icv1-fp24-t1059-6df599df | ksum4f-n24 vs wsum-b5-n3 | wsum-b5-n3 < ksum4f-n24 |
+| icv1-fp24-t1059-6df599df | mitm2-n136 vs mitm2-n192 | mitm2-n136 < mitm2-n192 |
+| icv1-fp24-t1059-6df599df | mitm2-n136 vs rho-neg | rho-neg < mitm2-n136 |
+| icv1-fp24-t1059-6df599df | mitm2-n136 vs wsum-b5-n3 | unresolved inside the band |
+| icv1-fp24-t1059-6df599df | mitm2-n192 vs rho-neg | rho-neg < mitm2-n192 |
+| icv1-fp24-t1059-6df599df | mitm2-n192 vs wsum-b5-n3 | wsum-b5-n3 < mitm2-n192 |
+| icv1-fp24-t1059-6df599df | rho-neg vs wsum-b5-n3 | rho-neg < wsum-b5-n3 |

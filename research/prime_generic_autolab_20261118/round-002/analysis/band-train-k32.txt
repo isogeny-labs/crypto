@@ -1,0 +1,35 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp32-t74357-b7396dac | 31.69 | inc | 12/12 | 27.526 | 31.914 | 71.402 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | mitm2-n689 | 12/12 | 27.625 | 32.339 | 74.765 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | mitm2-n972 | 12/12 | 30.545 | 35.048 | 75.581 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | rho-neg | 12/12 | 0.703 | 0.772 | 1.399 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | wsum-b12-n3 | 12/12 | 17.438 | 20.902 | 52.076 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | wsum-b20-n3 | 12/12 | 4.496 | 5.330 | 12.830 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | wsum-b8-n3 | 12/12 | 50.902 | 61.066 | 152.538 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp32-t74357-b7396dac | inc vs mitm2-n689 | inc < mitm2-n689 |
+| icv1-fp32-t74357-b7396dac | inc vs mitm2-n972 | inc < mitm2-n972 |
+| icv1-fp32-t74357-b7396dac | inc vs rho-neg | rho-neg < inc |
+| icv1-fp32-t74357-b7396dac | inc vs wsum-b12-n3 | wsum-b12-n3 < inc |
+| icv1-fp32-t74357-b7396dac | inc vs wsum-b20-n3 | wsum-b20-n3 < inc |
+| icv1-fp32-t74357-b7396dac | inc vs wsum-b8-n3 | inc < wsum-b8-n3 |
+| icv1-fp32-t74357-b7396dac | mitm2-n689 vs mitm2-n972 | mitm2-n689 < mitm2-n972 |
+| icv1-fp32-t74357-b7396dac | mitm2-n689 vs rho-neg | rho-neg < mitm2-n689 |
+| icv1-fp32-t74357-b7396dac | mitm2-n689 vs wsum-b12-n3 | wsum-b12-n3 < mitm2-n689 |
+| icv1-fp32-t74357-b7396dac | mitm2-n689 vs wsum-b20-n3 | wsum-b20-n3 < mitm2-n689 |
+| icv1-fp32-t74357-b7396dac | mitm2-n689 vs wsum-b8-n3 | mitm2-n689 < wsum-b8-n3 |
+| icv1-fp32-t74357-b7396dac | mitm2-n972 vs rho-neg | rho-neg < mitm2-n972 |
+| icv1-fp32-t74357-b7396dac | mitm2-n972 vs wsum-b12-n3 | wsum-b12-n3 < mitm2-n972 |
+| icv1-fp32-t74357-b7396dac | mitm2-n972 vs wsum-b20-n3 | wsum-b20-n3 < mitm2-n972 |
+| icv1-fp32-t74357-b7396dac | mitm2-n972 vs wsum-b8-n3 | mitm2-n972 < wsum-b8-n3 |
+| icv1-fp32-t74357-b7396dac | rho-neg vs wsum-b12-n3 | rho-neg < wsum-b12-n3 |
+| icv1-fp32-t74357-b7396dac | rho-neg vs wsum-b20-n3 | rho-neg < wsum-b20-n3 |
+| icv1-fp32-t74357-b7396dac | rho-neg vs wsum-b8-n3 | rho-neg < wsum-b8-n3 |
+| icv1-fp32-t74357-b7396dac | wsum-b12-n3 vs wsum-b20-n3 | wsum-b20-n3 < wsum-b12-n3 |
+| icv1-fp32-t74357-b7396dac | wsum-b12-n3 vs wsum-b8-n3 | wsum-b12-n3 < wsum-b8-n3 |
+| icv1-fp32-t74357-b7396dac | wsum-b20-n3 vs wsum-b8-n3 | wsum-b20-n3 < wsum-b8-n3 |

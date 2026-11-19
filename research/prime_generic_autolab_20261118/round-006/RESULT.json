@@ -1,0 +1,141 @@
+{
+  "assessed": "2026-11-19T08:44:22Z",
+  "round": 6,
+  "rule": "improvement = paired sel/inc 95% interval below 1 at w = 0 and band order sel < inc at every weight; regression = interval above 1 or band inc < sel; else null",
+  "schema": "ic_autolab.result/v1",
+  "sizes": {
+    "28": {
+      "class": "no_challenger",
+      "incumbent": {
+        "factor_base": "prime-abscissa:size=3",
+        "family": "wsum-b20",
+        "n": 3,
+        "name": "wsum-b20-n3",
+        "oracle": "wsum:coef=20,free=1"
+      },
+      "incumbent_s": [
+        3.0808603310809026,
+        3.4663506232518855,
+        6.93576325279074
+      ],
+      "why": [
+        "no_challenger"
+      ]
+    },
+    "32": {
+      "band_rho": "rho-neg < sel",
+      "band_verdict": "sel < inc",
+      "class": "improvement",
+      "distance_to_rho": {
+        "inc": [
+          3.636660505197696,
+          3.9152733042342582,
+          5.172847212192583
+        ],
+        "sel": [
+          2.6881673499440724,
+          2.799893198898631,
+          3.3041898894153814
+        ]
+      },
+      "evidence": {
+        "binary_sha256": "5f53faa52d15bf8249d4b990928949e3a375b30cb82eda391deb22223f0223e4",
+        "compare_verdict": "ops (ok): sel / inc = 0.7392 [0.665, 0.822] (linearised_t, df 23) over 48 pairs on 24 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.7392, w=0.1: 0.7151, w=1: 0.6388): sel < inc at every weight; wall: admitted ns/GAE sel/inc 0.8163 [0.797, 0.836], bias-corrected 0.8180 [0.798, 0.838] (A/A 0.9979, includes arm A), outside noise; end-to-end wall 0.6034 [0.528, 0.690]; ns/GAE of inc, sel is an upper bound on its cost per operation (GAE is a lower bound)",
+        "levels": {
+          "verified": 360
+        },
+        "session_dir": "research/prime_generic_autolab_20261118/round-006/sessions/holdout-k32",
+        "session_id": "ECBS1h80afb0ec9fc2",
+        "spec_sha256": "4259db4878f5ba7d188d24a936105c6ddabba6e60921c7e756da3b09cc927324",
+        "verify_exit": 0,
+        "verify_receipt": "research/prime_generic_autolab_20261118/round-006/analysis/verify-holdout-k32.json",
+        "verify_receipt_sha256": "40d83a74f53d3db44622ff77a0e5b0a044ab77cc95829388d4291fd2cbcefdbb"
+      },
+      "incumbent": {
+        "factor_base": "prime-abscissa:size=3",
+        "family": "wsum-b20",
+        "n": 3,
+        "name": "wsum-b20-n3",
+        "oracle": "wsum:coef=20,free=1"
+      },
+      "ratio": {
+        "aa": {
+          "ci95": [
+            1.0,
+            1.0
+          ],
+          "ratio": 1.0
+        },
+        "w0": {
+          "admissible": true,
+          "ci95": [
+            0.6649482798209058,
+            0.8217112196089082
+          ],
+          "ratio": 0.7391856749075172,
+          "status": "ok"
+        },
+        "w0.1": {
+          "ci95": [
+            0.6421977630889949,
+            0.796324314296105
+          ],
+          "ratio": 0.7151207543725301
+        },
+        "w1": {
+          "ci95": [
+            0.5701703354773049,
+            0.7155929866110147
+          ],
+          "ratio": 0.6387565210948603
+        }
+      },
+      "rho_reference": {
+        "arm": "rho-neg",
+        "charged_sum": 3118304.0,
+        "curve": "icv1-fp32-t74357-b7396dac",
+        "log2_r": 31.69088403413618,
+        "mean_s": [
+          1.1033768626316587,
+          1.2130448736321762,
+          2.2000569726368355
+        ],
+        "native_sum": 3099378,
+        "runs": 48,
+        "uncounted": [],
+        "verified": 48
+      },
+      "s": {
+        "inc": [
+          4.012607058681497,
+          4.7494022105702784,
+          11.380558577569309
+        ],
+        "rho_neg": [
+          1.1033768626316587,
+          1.2130448736321762,
+          2.2000569726368355
+        ],
+        "sel": [
+          2.9660616568101505,
+          3.396396091641579,
+          7.269406005124444
+        ]
+      },
+      "sel": {
+        "factor_base": "prime-abscissa:size=3",
+        "family": "wsum-b28",
+        "n": 3,
+        "name": "wsum-b28-n3",
+        "oracle": "wsum:coef=28,free=1"
+      },
+      "why": [
+        "compare ops.status = ok, admissible = true",
+        "sel / inc = 0.7392 [0.665, 0.822] at w = 0",
+        "band: sel < inc",
+        "A/A inc-aa / inc interval [1.000, 1.000] contains 1"
+      ]
+    }
+  },
+  "track": "multibase"
+}

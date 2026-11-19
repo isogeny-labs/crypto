@@ -1,0 +1,35 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp28-tm3161-380f655a | 27.96 | inc | 12/12 | 3.273 | 3.696 | 7.509 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | ksum5f-n32 | 12/12 | 234.099 | 259.345 | 486.555 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | mitmbatch-n402 | 12/12 | 20.713 | 23.835 | 51.927 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | mitmblocked-n402 | 12/12 | 20.713 | 23.835 | 51.927 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | rho-neg | 12/12 | 0.995 | 1.092 | 1.966 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | wsum-b12-n4 | 12/12 | 12.437 | 13.697 | 25.036 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | wsum-b20-n4 | 12/12 | 87.706 | 96.472 | 175.362 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp28-tm3161-380f655a | inc vs ksum5f-n32 | inc < ksum5f-n32 |
+| icv1-fp28-tm3161-380f655a | inc vs mitmbatch-n402 | inc < mitmbatch-n402 |
+| icv1-fp28-tm3161-380f655a | inc vs mitmblocked-n402 | inc < mitmblocked-n402 |
+| icv1-fp28-tm3161-380f655a | inc vs rho-neg | rho-neg < inc |
+| icv1-fp28-tm3161-380f655a | inc vs wsum-b12-n4 | inc < wsum-b12-n4 |
+| icv1-fp28-tm3161-380f655a | inc vs wsum-b20-n4 | inc < wsum-b20-n4 |
+| icv1-fp28-tm3161-380f655a | ksum5f-n32 vs mitmbatch-n402 | mitmbatch-n402 < ksum5f-n32 |
+| icv1-fp28-tm3161-380f655a | ksum5f-n32 vs mitmblocked-n402 | mitmblocked-n402 < ksum5f-n32 |
+| icv1-fp28-tm3161-380f655a | ksum5f-n32 vs rho-neg | rho-neg < ksum5f-n32 |
+| icv1-fp28-tm3161-380f655a | ksum5f-n32 vs wsum-b12-n4 | wsum-b12-n4 < ksum5f-n32 |
+| icv1-fp28-tm3161-380f655a | ksum5f-n32 vs wsum-b20-n4 | wsum-b20-n4 < ksum5f-n32 |
+| icv1-fp28-tm3161-380f655a | mitmbatch-n402 vs mitmblocked-n402 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | mitmbatch-n402 vs rho-neg | rho-neg < mitmbatch-n402 |
+| icv1-fp28-tm3161-380f655a | mitmbatch-n402 vs wsum-b12-n4 | wsum-b12-n4 < mitmbatch-n402 |
+| icv1-fp28-tm3161-380f655a | mitmbatch-n402 vs wsum-b20-n4 | mitmbatch-n402 < wsum-b20-n4 |
+| icv1-fp28-tm3161-380f655a | mitmblocked-n402 vs rho-neg | rho-neg < mitmblocked-n402 |
+| icv1-fp28-tm3161-380f655a | mitmblocked-n402 vs wsum-b12-n4 | wsum-b12-n4 < mitmblocked-n402 |
+| icv1-fp28-tm3161-380f655a | mitmblocked-n402 vs wsum-b20-n4 | mitmblocked-n402 < wsum-b20-n4 |
+| icv1-fp28-tm3161-380f655a | rho-neg vs wsum-b12-n4 | rho-neg < wsum-b12-n4 |
+| icv1-fp28-tm3161-380f655a | rho-neg vs wsum-b20-n4 | rho-neg < wsum-b20-n4 |
+| icv1-fp28-tm3161-380f655a | wsum-b12-n4 vs wsum-b20-n4 | wsum-b12-n4 < wsum-b20-n4 |

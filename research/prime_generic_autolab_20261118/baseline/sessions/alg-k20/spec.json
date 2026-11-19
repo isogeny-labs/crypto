@@ -1,0 +1,18 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "prime_generic_autolab round 0 algebraic baseline, k = 20 (icv1-fp20-t727-cd198a38)",
+  "description": "Round-0 algebraic-track baseline measurement on the registered 20-bit generic prime-order curve (prime_search seed 59297, icv1-fp20-t727-cd198a38): PKM auxiliary-curve 2-isogeny tower (prime-isogeny:t=6,seed=1093 + pkm-semaev:m=2,mode=full,guess=4) against matched rho.negation and A/A controls across the AGENTS.md section 5a pricing band. Public synthetic targets; no security claim.",
+  "workloads": {
+    "curves": [{"kind": "prime_search", "bits": 20, "seed": 59297}],
+    "targets_per_curve": 4,
+    "target_seed": 2026111860,
+    "target_kind": "public"
+  },
+  "arms": [
+    {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+    {"name": "inc", "role": "baseline", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-isogeny:t=6,seed=1093", "oracle": "pkm-semaev:m=2,mode=full,guess=4"}}},
+    {"name": "inc-aa", "role": "control", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-isogeny:t=6,seed=1093", "oracle": "pkm-semaev:m=2,mode=full,guess=4"}}},
+    {"name": "rho-neg-aa", "role": "control", "method": {"id": "rho.negation"}}
+  ],
+  "measurement": {"rounds": 2, "warmup": 1, "order": "alternate", "seed": 2026111867, "isolation_required": "L0", "timeout_seconds": 600}
+}

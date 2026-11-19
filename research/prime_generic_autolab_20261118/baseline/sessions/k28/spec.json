@@ -1,0 +1,18 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "prime_generic_autolab round 0 baseline, k = 28 (icv1-fp28-tm3161-380f655a)",
+  "description": "Round-0 baseline measurement on the registered 28-bit generic prime-order curve (prime_search seed 59297, icv1-fp28-tm3161-380f655a): standing m = 2 negation-folded pair-table incumbent (prime-abscissa:size=402 + mitm:negation_folded=1) against matched rho.negation and A/A controls across the AGENTS.md section 5a pricing band. Public synthetic targets; no security claim.",
+  "workloads": {
+    "curves": [{"kind": "prime_search", "bits": 28, "seed": 59297}],
+    "targets_per_curve": 16,
+    "target_seed": 2026111828,
+    "target_kind": "public"
+  },
+  "arms": [
+    {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+    {"name": "inc", "role": "baseline", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=402", "oracle": "mitm:negation_folded=1"}}},
+    {"name": "inc-aa", "role": "control", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=402", "oracle": "mitm:negation_folded=1"}}},
+    {"name": "rho-neg-aa", "role": "control", "method": {"id": "rho.negation"}}
+  ],
+  "measurement": {"rounds": 2, "warmup": 1, "order": "alternate", "seed": 2026111835, "isolation_required": "L0", "timeout_seconds": 600}
+}

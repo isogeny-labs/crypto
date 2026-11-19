@@ -1,0 +1,22 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-t727-cd198a38 | 19.10 | inc | 12/12 | 2.055 | 2.231 | 3.811 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | rho-neg | 12/12 | 1.275 | 1.381 | 2.337 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | tw2l-x15-j16-n2 | 12/12 | 1.915 | 2.077 | 3.534 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | wsum-b12-n3 | 12/12 | 17.065 | 18.687 | 33.282 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | wsum-b8-n3 | 12/12 | 5.097 | 5.549 | 9.618 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-t727-cd198a38 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-t727-cd198a38 | inc vs tw2l-x15-j16-n2 | tw2l-x15-j16-n2 < inc |
+| icv1-fp20-t727-cd198a38 | inc vs wsum-b12-n3 | inc < wsum-b12-n3 |
+| icv1-fp20-t727-cd198a38 | inc vs wsum-b8-n3 | inc < wsum-b8-n3 |
+| icv1-fp20-t727-cd198a38 | rho-neg vs tw2l-x15-j16-n2 | rho-neg < tw2l-x15-j16-n2 |
+| icv1-fp20-t727-cd198a38 | rho-neg vs wsum-b12-n3 | rho-neg < wsum-b12-n3 |
+| icv1-fp20-t727-cd198a38 | rho-neg vs wsum-b8-n3 | rho-neg < wsum-b8-n3 |
+| icv1-fp20-t727-cd198a38 | tw2l-x15-j16-n2 vs wsum-b12-n3 | tw2l-x15-j16-n2 < wsum-b12-n3 |
+| icv1-fp20-t727-cd198a38 | tw2l-x15-j16-n2 vs wsum-b8-n3 | tw2l-x15-j16-n2 < wsum-b8-n3 |
+| icv1-fp20-t727-cd198a38 | wsum-b12-n3 vs wsum-b8-n3 | wsum-b8-n3 < wsum-b12-n3 |

@@ -1,0 +1,77 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2",
+          "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "inc",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2",
+          "oracle": "wwalk:x=1.5,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "sel",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=2",
+          "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+          "targets": "stride-generator"
+        }
+      },
+      "name": "inc-aa",
+      "role": "control"
+    },
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg-aa",
+      "role": "control"
+    }
+  ],
+  "description": "research/prime_generic_autolab_20261118/round-005/PROTOCOL.md (frozen before data), fresh holdout: sel = tw2l-x15-j16-n2 (prime-abscissa:size=2 + wwalk:x=1.5,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run). Public synthetic generic prime-order E(F_p) curve and targets; no security claim.",
+  "label": "ic_autolab round 5 holdout, generic track, k = 24",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 2,
+    "seed": 2026115931,
+    "timeout_seconds": 300,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "bits": 24,
+        "kind": "prime_search",
+        "seed": 59297
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 2026115924,
+    "targets_per_curve": 24
+  }
+}

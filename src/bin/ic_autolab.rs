@@ -2520,19 +2520,35 @@ fn ratchet_svg(ledger: &Ledger, track: &str) -> String {
     s
 }
 
-/// The newest pcc claim whose statement names this round
+fn claim_matches_home(v: &Value, home: &Path, round: u64) -> bool {
+    let prefix = format!("ic_autolab round {round} ");
+    let Some(statement) = v["statement"].as_str() else {
+        return false;
+    };
+    if !statement.starts_with(&prefix) {
+        return false;
+    }
+    let Some(home_name) = home.file_name().and_then(|s| s.to_str()) else {
+        return false;
+    };
+    let scope = v["scope"].as_str().unwrap_or("");
+    if scope.contains(home_name) || statement.contains(home_name) {
+        return true;
+    }
+    home_name == "curve25519_autolab_20261104" && scope.is_empty()
+}
+
+/// The newest pcc claim whose statement names this round and loop home
 /// (`ic_autolab round N ...`), read from `pcc/claims/` under the working
 /// directory (the repository root).
-fn find_claim(round: u64) -> Option<String> {
-    let prefix = format!("ic_autolab round {round} ");
+fn find_claim(home: &Path, round: u64) -> Option<String> {
     let mut found: Vec<(String, String)> = std::fs::read_dir("pcc/claims")
         .ok()?
         .filter_map(|e| e.ok())
         .filter_map(|e| {
             let v = read_json(&e.path()).ok()?;
-            let statement = v["statement"].as_str()?;
             let id = v["id"].as_str().or_else(|| v["claim_id"].as_str())?;
-            statement.starts_with(&prefix).then(|| {
+            claim_matches_home(&v, home, round).then(|| {
                 (
                     v["created_at"].as_str().unwrap_or("").to_string(),
                     id.to_string(),
@@ -2569,7 +2585,7 @@ fn cmd_report(home: &Path, round: u64) -> Result<(), String> {
     // The round's claim record (AGENTS.md "Sabotage is assumed"): cited by id
     // with an explicit unverified tag; `pcc standing` is the only source for
     // a stronger word.
-    match find_claim(round) {
+    match find_claim(home, round) {
         Some(id) => {
             md += &format!(
                 "Claim record: `{id}` (`python3 tools/pcc/pcc.py standing {id}`). Until a signed replay and recompute exist, this round's outcome is an unverified assertion [pcc:unverified].\n\n"
@@ -2796,7 +2812,7 @@ fn cmd_report(home: &Path, round: u64) -> Result<(), String> {
             );
         }
     }
-    md += "\n![ratchet](../ratchet.svg)\n\n";
+    md += &format!("\n![ratchet](../ratchet-{track}.svg)\n\n");
     md += "## Evidence and deviations\n\n";
     md += &format!(
         "- ecbench binary sha256: `{}`; `--cpus {}`, allow_busy = {}; `verify --replay {}` per session; audit receipts in `analysis/`; sessions in `sessions/` (records in the artifact store when large).\n",
@@ -2808,8 +2824,9 @@ fn cmd_report(home: &Path, round: u64) -> Result<(), String> {
     md += "- Route: the local route is an explicitly requested development screen, not the Iso Lab EKS default; counts are deterministic and replayed, wall time is not claimed. No row of this round enters the IC leaderboard or `benchmarks/README.md` (validation gate).\n";
     md += "- Train selection is in sample (disclosed); the holdout is fresh (new `target_seed`, excluded exposures). Failed, timed-out and regressing arms are retained above.\n";
     std::fs::write(dir.join("README.md"), md).map_err(|e| e.to_string())?;
-    std::fs::write(home.join("ratchet.svg"), ratchet_svg(&ledger, &track))
-        .map_err(|e| e.to_string())?;
+    let rsvg = ratchet_svg(&ledger, &track);
+    std::fs::write(home.join(format!("ratchet-{track}.svg")), &rsvg).map_err(|e| e.to_string())?;
+    std::fs::write(home.join("ratchet.svg"), rsvg).map_err(|e| e.to_string())?;
     println!("report written: {}", dir.join("README.md").display());
     Ok(())
 }
@@ -3854,6 +3871,28 @@ mod tests {
         };
         let argv = run_argv(&opts_locked, Path::new("s.json"), Path::new("out"));
         assert!(argv.windows(2).any(|w| w == ["--lock", "/tmp/custom.lock"]));
+        let legacy_c25519 = json!({
+            "statement": "ic_autolab round 1 train sessions ECBS1h87338492e26d",
+        });
+        assert!(!claim_matches_home(
+            &legacy_c25519,
+            Path::new("research/prime_generic_autolab_20261118"),
+            1
+        ));
+        assert!(claim_matches_home(
+            &legacy_c25519,
+            Path::new("research/curve25519_autolab_20261104"),
+            1
+        ));
+        let prime_claim = json!({
+            "scope": "research/prime_generic_autolab_20261118/round-001",
+            "statement": "ic_autolab round 1 holdout sessions on prime-generic",
+        });
+        assert!(claim_matches_home(
+            &prime_claim,
+            Path::new("research/prime_generic_autolab_20261118"),
+            1
+        ));
     }
 }
 

@@ -1,0 +1,260 @@
+{
+  "baselines": [
+    {
+      "band_s": [
+        19.41579945636463,
+        11571335.445204563,
+        115713179.70985052
+      ],
+      "class": "ok",
+      "detail": "",
+      "scale": 10
+    },
+    {
+      "band_s": [
+        10.751766166574413,
+        128007489.0642866,
+        1280074793.8769705
+      ],
+      "class": "ok",
+      "detail": "",
+      "scale": 12
+    },
+    {
+      "band_s": null,
+      "class": "exhausted",
+      "detail": "wall-clock limit of 240 s reached",
+      "scale": 14
+    },
+    {
+      "band_s": null,
+      "class": "exhausted",
+      "detail": "wall-clock limit of 240 s reached",
+      "scale": 16
+    }
+  ],
+  "complete": 10,
+  "failed": 7,
+  "header": {
+    "binary_blake3": "6d78bd456862cb019138e17267ac9b12c45840ad840feaa2f776dbfa13305cd6",
+    "counted": true,
+    "git_commit": null,
+    "instance": "prime generic",
+    "max_trials": 200000,
+    "min_fit": 4,
+    "repeats": 2,
+    "rho_runs": 4,
+    "rungs": [
+      10,
+      12,
+      14,
+      16
+    ],
+    "schema": "ic.sweep-store/v1",
+    "seed": 20261118,
+    "space": "prime-algebraic",
+    "target_log2_r": 80.0,
+    "track": "algebraic"
+  },
+  "operation": "sweep-show",
+  "pruned": 1,
+  "schema_version": 1,
+  "software": {
+    "arch": "aarch64",
+    "binary_blake3": "6d78bd456862cb019138e17267ac9b12c45840ad840feaa2f776dbfa13305cd6",
+    "git_commit": null,
+    "git_commit_source": null,
+    "git_dirty": null,
+    "os": "macos",
+    "version": "0.1.0"
+  },
+  "status": "complete",
+  "top": [
+    {
+      "assignment": {
+        "base": "prime-abscissa-bits",
+        "degree": 7,
+        "linalg": "structured-gauss",
+        "m": "3",
+        "mode": "full",
+        "t_frac": 0.4419967389798002,
+        "targets": "walk"
+      },
+      "id": 10,
+      "objective_log2_ratio": 0.2338734228860365,
+      "projected": false,
+      "rung_log2_ratio": [
+        0.002587794489156111,
+        0.2338734228860365
+      ],
+      "slope_per_bit": null
+    },
+    {
+      "assignment": {
+        "base": "prime-abscissa-bits",
+        "degree": 6,
+        "linalg": "structured-gauss",
+        "m": "3",
+        "mode": "full",
+        "t_frac": 0.45296713437507574,
+        "targets": "walk"
+      },
+      "id": 11,
+      "objective_log2_ratio": 0.2338734228860365,
+      "projected": false,
+      "rung_log2_ratio": [
+        0.1569159408804498,
+        0.2338734228860365
+      ],
+      "slope_per_bit": null
+    },
+    {
+      "assignment": {
+        "base": "prime-abscissa-bits",
+        "degree": 6,
+        "linalg": "structured-gauss",
+        "m": "3",
+        "mode": "full",
+        "t_frac": 0.45614538491060275,
+        "targets": "walk"
+      },
+      "id": 13,
+      "objective_log2_ratio": 0.2338734228860365,
+      "projected": false,
+      "rung_log2_ratio": [
+        0.1569159408804498,
+        0.2338734228860365
+      ],
+      "slope_per_bit": null
+    },
+    {
+      "assignment": {
+        "base": "prime-abscissa-bits",
+        "degree": 8,
+        "linalg": "structured-gauss",
+        "m": "3",
+        "mode": "full",
+        "t_frac": 0.4153894875127022,
+        "targets": "walk"
+      },
+      "id": 15,
+      "objective_log2_ratio": 0.2338734228860365,
+      "projected": false,
+      "rung_log2_ratio": [
+        0.002587794489156111,
+        0.2338734228860365
+      ],
+      "slope_per_bit": null
+    },
+    {
+      "assignment": {
+        "base": "prime-isogeny",
+        "degree": 11,
+        "linalg": "structured-gauss",
+        "m": "3",
+        "mode": "full",
+        "t_frac": 0.3718325734265855,
+        "targets": "walk"
+      },
+      "id": 5,
+      "objective_log2_ratio": 0.7382560191546451,
+      "projected": false,
+      "rung_log2_ratio": [
+        0.5944284729151125,
+        0.7382560191546451
+      ],
+      "slope_per_bit": null
+    },
+    {
+      "assignment": {
+        "base": "prime-isogeny",
+        "degree": 15,
+        "linalg": "incremental-gauss",
+        "m": "2",
+        "t_frac": 0.2942107529657534,
+        "targets": "walk"
+      },
+      "id": 7,
+      "objective_log2_ratio": 0.910686880954066,
+      "projected": false,
+      "rung_log2_ratio": [
+        1.2210967813383757,
+        0.910686880954066
+      ],
+      "slope_per_bit": null
+    },
+    {
+      "assignment": {
+        "base": "prime-isogeny",
+        "degree": 10,
+        "linalg": "incremental-gauss",
+        "m": "2",
+        "t_frac": 0.2795441680762799,
+        "targets": "walk"
+      },
+      "id": 9,
+      "objective_log2_ratio": 1.7726682214002012,
+      "projected": false,
+      "rung_log2_ratio": [
+        1.2210967813383757,
+        1.7726682214002012
+      ],
+      "slope_per_bit": null
+    },
+    {
+      "assignment": {
+        "base": "prime-isogeny",
+        "degree": 14,
+        "linalg": "incremental-gauss",
+        "m": "2",
+        "t_frac": 0.5823370103206177,
+        "targets": "walk"
+      },
+      "id": 4,
+      "objective_log2_ratio": 1.877985743766757,
+      "projected": false,
+      "rung_log2_ratio": [
+        1.6516056893796593,
+        1.877985743766757
+      ],
+      "slope_per_bit": null
+    },
+    {
+      "assignment": {
+        "base": "prime-isogeny",
+        "degree": 11,
+        "linalg": "incremental-gauss",
+        "m": "3",
+        "mode": "full",
+        "t_frac": 0.47871167032236983,
+        "targets": "random"
+      },
+      "id": 2,
+      "objective_log2_ratio": 2.572898709024424,
+      "projected": false,
+      "rung_log2_ratio": [
+        1.527273432385738,
+        2.572898709024424
+      ],
+      "slope_per_bit": null
+    },
+    {
+      "assignment": {
+        "base": "prime-isogeny",
+        "degree": 12,
+        "linalg": "structured-gauss",
+        "m": "2",
+        "t_frac": 0.3138110705404973,
+        "targets": "random"
+      },
+      "id": 0,
+      "objective_log2_ratio": 3.5388695790989937,
+      "projected": false,
+      "rung_log2_ratio": [
+        2.1606861783325555,
+        3.5388695790989937
+      ],
+      "slope_per_bit": null
+    }
+  ]
+}

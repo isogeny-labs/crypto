@@ -1,0 +1,22 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp28-tm3161-380f655a | 27.96 | inc | 48/48 | 19.700 | 22.895 | 51.648 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | inc-aa | 48/48 | 19.700 | 22.895 | 51.648 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | rho-neg | 48/48 | 0.941 | 1.032 | 1.857 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | rho-neg-aa | 48/48 | 0.941 | 1.032 | 1.857 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | sel | 48/48 | 3.081 | 3.466 | 6.936 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp28-tm3161-380f655a | inc vs inc-aa | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | inc vs rho-neg | rho-neg < inc |
+| icv1-fp28-tm3161-380f655a | inc vs rho-neg-aa | rho-neg-aa < inc |
+| icv1-fp28-tm3161-380f655a | inc vs sel | sel < inc |
+| icv1-fp28-tm3161-380f655a | inc-aa vs rho-neg | rho-neg < inc-aa |
+| icv1-fp28-tm3161-380f655a | inc-aa vs rho-neg-aa | rho-neg-aa < inc-aa |
+| icv1-fp28-tm3161-380f655a | inc-aa vs sel | sel < inc-aa |
+| icv1-fp28-tm3161-380f655a | rho-neg vs rho-neg-aa | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | rho-neg vs sel | rho-neg < sel |
+| icv1-fp28-tm3161-380f655a | rho-neg-aa vs sel | rho-neg-aa < sel |
