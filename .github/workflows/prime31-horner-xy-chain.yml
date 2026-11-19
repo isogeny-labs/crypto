@@ -1,0 +1,81 @@
+name: Prime31 weighted Horner x-y polynomial gate
+on:
+  push:
+    branches:
+      - automation/prime31-horner-xy-chain-20261119
+    paths:
+      - '.github/workflows/prime31-horner-xy-chain.yml'
+      - 'research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_horner_xy_chain.py'
+      - 'research/prime31_ic_20261115/rr9/HORNER_XY_CHAIN_PROTOCOL_20261119.md'
+  pull_request:
+    paths:
+      - '.github/workflows/prime31-horner-xy-chain.yml'
+      - 'research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_horner_xy_chain.py'
+      - 'research/prime31_ic_20261115/rr9/HORNER_XY_CHAIN_PROTOCOL_20261119.md'
+permissions:
+  contents: read
+jobs:
+  original-rust-x-y-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout original native arithmetic
+        uses: actions/checkout@v4
+        with:
+          repository: isogeny-labs/crypto
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only candidate example
+        run: |
+          mkdir -p pinned/research/prime31_ic_20261115/native/examples
+          cp research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs
+          git rev-parse HEAD
+          sha256sum research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs \
+            research/prime31_ic_20261115/rr9/HORNER_XY_CHAIN_PROTOCOL_20261119.md
+      - name: Native original Rust unit tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Polynomial-chain focused Rust tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_horner_xy_chain
+      - name: Freeze complete generated positive and mutated witness controls
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_horner_xy_chain > prime31-horner-xy-full.json
+          jq -e '.schema=="prime31.horner_xy_chain.v1" and
+            .curve.p==2147483647 and .curve.n==2147446831 and
+            .cases_per_window==64 and .tested==256 and .ordinary>=240 and
+            .ordinary+.exceptional==256 and
+            .mutated_slope_rejected==.ordinary and
+            .mutated_target_same_witness_rejected==.ordinary and
+            .max_polynomial_identity_residual==0 and
+            .polynomial_equations==74 and
+            .public_only_unknown_index_extraction==false and
+            .complete_ecdlp_solved==false and
+            .planted_witness_controls_only==true' prime31-horner-xy-full.json
+      - name: Independently verify certificates
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_horner_xy_chain.py \
+            prime31-horner-xy-full.json | tee prime31-horner-xy-verified.json
+          sha256sum prime31-horner-xy-full.json prime31-horner-xy-verified.json \
+            research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs \
+            research/prime31_ic_20261115/native/verify_prime31_horner_xy_chain.py \
+            | tee sha256.txt
+      - name: Preserve scientific artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-horner-xy-chain-20261119
+          path: |
+            prime31-horner-xy-full.json
+            prime31-horner-xy-verified.json
+            sha256.txt
+          if-no-files-found: warn
