@@ -44,7 +44,8 @@ fn splitmix64(state: &mut u64) -> u64 {
 fn base31(ar: &mut Arithmetic) -> Vec<Aff> {
     let mut base=Vec::new();
     for x in 0..10_000 {
-        if let Some(y)=ar.sqrt(ar.rhs(PRIME31,x),P) {
+        let y2=ar.rhs(PRIME31,x);
+        if let Some(y)=ar.sqrt(y2,P) {
             if y!=0 {
                 base.push((x,y.min(P-y)));
                 if base.len()==31 { break; }
