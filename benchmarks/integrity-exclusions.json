@@ -119,6 +119,10 @@
     "benchmarks/records/20261115T0947Z-ic-fast-verify-ab.json": {
       "reason": "Historical receipts disagree on direction for shared A/A setup metric identities [['ic:koblitz_setup_phase', 'setup_aa_k0n53', 'ratio'], ['ic:koblitz_setup_phase', 'setup_aa_k0n61', 'ratio']]. Preserve all six records and their raw successful/control arms; conservatively omit whole records from automated comparisons until an explicit versioned metric-identity disposition. No preferred direction or scientific invalidity is inferred.",
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
+    },
+    "benchmarks/records/20261117T0334Z-hec-multi-production-cold.json": {
+      "reason": "Historical receipt is not in bench.record/v1 measurement form: its commands are recorded as strings with no integer exit code, and its 90 metrics are raw per-workload rows (median_batch_ns, min_batch_ns, max_batch_ns, spread) without name, value, unit or better fields. It aborts progress regeneration for every later record. Original record and its raw rows are preserved. This excludes automated comparisons; it does not decide the validity of every underlying measurement.",
+      "sha256": "95485dfd5a3c23e120474d55320bb6eaf3c5c7557978a2e9039681f53cae6d78"
     }
   },
   "schema": "bench.integrity-exclusions/v1"
