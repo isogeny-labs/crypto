@@ -708,6 +708,64 @@ impl Producer<'_> {
         }
         Ok(a)
     }
+    // R46_PRODUCER_HELPER_BEGIN
+    // In a split squarefree quadratic, evaluating the quadratic character
+    // at both roots is much cheaper than polynomial Euler powering + GCD.
+    // For p == 3 (mod 4), sqrt(D) is D^((p+1)/4). Return None for any
+    // unsupported/degenerate case, retaining the generic path.
+    fn split_scalar_pow(&mut self, base: u64, mut exponent: u64) -> Result<u64> {
+        let mut acc = 1u64;
+        let mut factor = base;
+        while exponent != 0 {
+            if exponent & 1 != 0 {
+                acc = self.mul(acc, factor)?;
+            }
+            exponent >>= 1;
+            if exponent != 0 {
+                factor = self.mul(factor, factor)?;
+            }
+        }
+        Ok(acc)
+    }
+    fn quadratic_split_factor(&mut self, h: &Poly17, delta: u64) -> Result<Option<Poly17>> {
+        if h.len != 3 || self.p & 3 != 3 || h.coefficients[2] != 1 {
+            return Ok(None);
+        }
+        let b = h.coefficients[1];
+        let c = h.coefficients[0];
+        let double_c = self.add(c, c)?;
+        let discriminant = self.sub(self.mul(b, b)?, self.add(double_c, double_c)?)?;
+        if discriminant == 0 {
+            return Ok(None);
+        }
+        let sqrt_d = self.split_scalar_pow(discriminant, (self.p + 1) / 4)?;
+        if self.mul(sqrt_d, sqrt_d)? != discriminant {
+            return Ok(None);
+        }
+        let neg_b = self.sub(0, b)?;
+        let root_a = self.mul(self.add(neg_b, sqrt_d)?, (self.p + 1) / 2)?;
+        let root_b = self.mul(self.sub(neg_b, sqrt_d)?, (self.p + 1) / 2)?;
+        if root_a == root_b {
+            return Ok(None);
+        }
+        let exponent = (self.p - 1) / 2;
+        let a_selected = self.split_scalar_pow(self.add(root_a, delta)?, exponent)? == 1;
+        let b_selected = self.split_scalar_pow(self.add(root_b, delta)?, exponent)? == 1;
+        if a_selected && b_selected {
+            return Ok(Some(*h));
+        }
+        if !a_selected && !b_selected {
+            return Ok(Some(Poly17::constant(1)));
+        }
+        let root = if a_selected { root_a } else { root_b };
+        let mut factor = Poly17::ZERO;
+        factor.len = 2;
+        factor.coefficients[0] = self.sub(0, root)?;
+        factor.coefficients[1] = 1;
+        Ok(Some(factor))
+    }
+    // R46_PRODUCER_HELPER_END
+
     fn execute(&mut self, f: Poly17, seed: u64) -> Result<Stop> {
         self.prepare_event()?;
         self.emit(EventKind::Begin {
@@ -809,11 +867,17 @@ impl Producer<'_> {
             let delta = (z ^ (z >> 31)) % self.p;
             let mut base = x;
             base.coefficients[0] = delta;
-            let mut s = self.power(&base, (self.p - 1) / 2, &h)?;
-            s.len = s.len.max(1);
-            s.coefficients[0] = self.sub(s.coefficients[0], 1)?;
-            s.trim();
-            let d = self.gcd(h, s)?;
+            // R46_PRODUCER_SPLIT_BEGIN
+            let d = if let Some(d) = self.quadratic_split_factor(&h, delta)? {
+                d
+            } else {
+                let mut s = self.power(&base, (self.p - 1) / 2, &h)?;
+                s.len = s.len.max(1);
+                s.coefficients[0] = self.sub(s.coefficients[0], 1)?;
+                s.trim();
+                self.gcd(h, s)?
+            };
+            // R46_PRODUCER_SPLIT_END
             let accepted = d.len > 1 && d.len < h.len;
             let q = if accepted {
                 self.division(&h, &d)?.0
@@ -1395,6 +1459,67 @@ impl Replay {
         }
         Ok(out)
     }
+    // R46_REPLAY_HELPER_BEGIN
+    // Certificate replay evaluates quadratic split characters independently,
+    // with left-to-right scalar powering and separate field arithmetic.
+    fn split_character_power(&mut self, x: u64, exponent: u64) -> Result<u64> {
+        let mut acc = 1u64;
+        for bit in (0..64 - exponent.leading_zeros()).rev() {
+            acc = self.times(acc, acc)?;
+            if exponent & (1u64 << bit) != 0 {
+                acc = self.times(acc, x)?;
+            }
+        }
+        Ok(acc)
+    }
+    fn replay_quadratic_split(&mut self, f: Poly17, delta: u64) -> Result<Option<Poly17>> {
+        if f.len != 3 || self.p % 4 != 3 || f.coefficients[2] != 1 {
+            return Ok(None);
+        }
+        let b = f.coefficients[1];
+        let c = f.coefficients[0];
+        let quadruple = self.plus(self.plus(c, c)?, self.plus(c, c)?)?;
+        let discriminant = self.minus(self.times(b, b)?, quadruple)?;
+        if discriminant == 0 {
+            return Ok(None);
+        }
+        let sqrt = self.split_character_power(discriminant, (self.p + 1) / 4)?;
+        if self.times(sqrt, sqrt)? != discriminant {
+            return Ok(None);
+        }
+        let inv_two = (self.p + 1) / 2;
+        let negative = self.minus(0, b)?;
+        let r0 = self.times(self.plus(negative, sqrt)?, inv_two)?;
+        let r1 = self.times(self.minus(negative, sqrt)?, inv_two)?;
+        if r0 == r1 {
+            return Ok(None);
+        }
+        // Independently verify both roots satisfy the actual supplied factor,
+        // before using their quadratic characters for the claimed split.
+        for root in [r0, r1] {
+            let square = self.times(root, root)?;
+            let linear = self.times(b, root)?;
+            if self.plus(self.plus(square, linear)?, c)? != 0 {
+                return Err(Stop::InvalidCertificate);
+            }
+        }
+        let exponent = (self.p - 1) / 2;
+        let s0 = self.split_character_power(self.plus(r0, delta)?, exponent)? == 1;
+        let s1 = self.split_character_power(self.plus(r1, delta)?, exponent)? == 1;
+        if s0 && s1 {
+            return Ok(Some(f));
+        }
+        if !s0 && !s1 {
+            return Ok(Some(Poly17::constant(1)));
+        }
+        let mut factor = Poly17::ZERO;
+        factor.len = 2;
+        factor.coefficients[0] = self.minus(0, if s0 { r0 } else { r1 })?;
+        factor.coefficients[1] = 1;
+        Ok(Some(factor))
+    }
+    // R46_REPLAY_HELPER_END
+
     fn top(&mut self) -> Result<Poly17> {
         self.gate.charge(8 * COPY_WORK)?;
         while self.pending_len > 0 && self.pending[self.pending_len - 1].len <= 1 {
@@ -1514,11 +1639,17 @@ impl Replay {
                 base.len = 2;
                 base.coefficients[0] = delta;
                 base.coefficients[1] = 1;
-                let mut value = self.modular_power(base, (self.p - 1) / 2, &polynomial)?;
-                value.len = value.len.max(1);
-                value.coefficients[0] = self.minus(value.coefficients[0], 1)?;
-                value.trim();
-                let expected = self.monic_gcd(polynomial, value)?;
+                // R46_REPLAY_SPLIT_BEGIN
+                let expected = if let Some(factor) = self.replay_quadratic_split(polynomial, delta)? {
+                    factor
+                } else {
+                    let mut value = self.modular_power(base, (self.p - 1) / 2, &polynomial)?;
+                    value.len = value.len.max(1);
+                    value.coefficients[0] = self.minus(value.coefficients[0], 1)?;
+                    value.trim();
+                    self.monic_gcd(polynomial, value)?
+                };
+                // R46_REPLAY_SPLIT_END
                 let proper = expected.len > 1 && expected.len < polynomial.len;
                 if expected != factor || proper != accepted {
                     return Err(Stop::InvalidCertificate);
