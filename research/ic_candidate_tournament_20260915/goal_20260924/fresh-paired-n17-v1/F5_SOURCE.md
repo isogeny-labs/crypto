@@ -2,7 +2,9 @@
 
 The [first target-free publication and independent replay](f5-source-v1/result-v1/RESULT.md)
 passed. [Card adoption](f5-card-adoption-v1/RESULT.md) passed on the public-point
-card; fresh target execution and the original post-run audit have not occurred.
+card. The [scientific registration publication](f5-scientific-registration-v1/result-v1/RESULT.md)
+passed data-only custody replay; fresh target execution and the original
+post-run audit have not occurred.
 
 The earlier complete F5 control recovered one disclosed point, but its target
 capsule was consumed and its full publication included that old target config.
@@ -29,8 +31,11 @@ unconsumed validation capsule**. It irreversibly records the adoption start,
 preserves its disclosed validation sidecars, and writes a fresh config and
 scientific registration for the card while leaving every prepublished
 `immutable/` byte in place. `target-control-audit-adoption` must pass before
-the scientific registration is published. The F5 worker may then run once
-under its original frozen controller and full scientific publication. That
-controller replays the source/card adoption before its claim and again in its
-original post-run audit. A changed source manifest, binary, card or descriptor
-blocks the arm. The old consumed F5 target capsule is never reused.
+the scientific registration is published. That publication and its
+data-only replay are archived under
+[f5-scientific-registration-v1](f5-scientific-registration-v1/result-v1/RESULT.md).
+The F5 worker may then run once under its original frozen controller with
+`target-control-execute --publication ...`. That controller replays the
+source/card adoption before its claim and again in its original post-run
+audit. A changed source manifest, binary, card or descriptor blocks the arm.
+The old consumed F5 target capsule is never reused.

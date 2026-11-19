@@ -19,15 +19,20 @@ committed publications are retained under
 (`card_sha256` `bd969a4092a329bf093688b9d4715c86d77850c11f115ff47852c9235d7c2379`).
 [F5 card adoption](f5-card-adoption-v1/RESULT.md) passed
 (`PASS_SOURCE_BOUND_F5_CARD_ADOPTION`, scientific registration
-`e0b2520c58e6f327202328790b0784c8e305963aab788cb3a4d53c455a0cd93e`);
-four-arm dispatch and the sole F5 target run remain uncreated. A separate
+`e0b2520c58e6f327202328790b0784c8e305963aab788cb3a4d53c455a0cd93e`).
+The F5 [scientific registration publication](f5-scientific-registration-v1/result-v1/RESULT.md)
+passed data-only custody replay
+(`PASS_DATA_ONLY_TARGET_SCIENTIFIC_REGISTRATION_CUSTODY`, archive
+`ce9b58765bcfb60f8ab76d4914670b8dca36125821d552db9f9abfadc162ccc7`);
+the capsule remains unconsumed. Four-arm dispatch and the sole F5 target run
+remain uncreated. A separate
 [disclosed strong-rho readiness control](rho-readiness-v1/RESULT.md)
 recovered and replayed one already exposed public point; it is neither a
 source publication nor a fresh paired arm.
-No fresh target registration, four-arm result or isolated-host receipt exists
-under this protocol. The three earlier confirmation sets and every consumed
-controller remain closed. A stage control is never a complete one-target
-result. Neither SAT nor F5 has run a fresh card.
+No four-arm result or isolated-host receipt exists under this protocol. The
+three earlier confirmation sets and every consumed controller remain closed. A
+stage control is never a complete one-target result. Neither SAT nor F5 has run
+a fresh card.
 
 ## Entry gates and point custody
 
