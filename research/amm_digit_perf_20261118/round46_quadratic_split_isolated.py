@@ -259,6 +259,53 @@ mod round46_quad {
         println!("ROUND46_QUAD_DISCRIMINANT_CLASSES checked=20");
     }
     #[test]
+    fn randomized_distinct_quadratic_root_events_match_frozen() {
+        let mut checked=0usize;
+        for p in [7u64,487,1_000_000_007,(1u64<<61)-1] {
+            for j in 1u64..=12 {
+                let r0=j%p;
+                let r1=(j*17+3)%p;
+                if r0==r1 {continue;}
+                let c=((r0 as u128*r1 as u128)%p as u128) as u64;
+                let b=(p-((r0+r1)%p))%p;
+                let poly=[c,b,1u64];
+                for seed in [0u64,42,0x5291ae77] {
+                    let old=solve_before(p,&poly,seed);
+                    let new=solve_after(p,&poly,seed);
+                    assert_eq!(old.0,new.0,"p={p} roots={r0},{r1} seed={seed}");
+                    assert_eq!(old.1,new.1,"p={p} roots={r0},{r1} seed={seed}");
+                    checked+=1;
+                }
+            }
+        }
+        println!("ROUND46_QUAD_RANDOM_ROOT_EVENTS checked={checked}");
+    }
+    #[test]
+    #[ignore="Paired production Rust end-to-end split and higher-degree controls"]
+    fn bench_complete_degree_controls() {
+        for p in [487u64,1_000_000_007,1_000_000_009,(1u64<<61)-1] {
+            for degree in [2usize,3,4,6,8] {
+                let poly=polynomial(p,degree);
+                let old_result=solve_before(p,&poly,42);
+                let new_result=solve_after(p,&poly,42);
+                assert_eq!(old_result.0,new_result.0);
+                assert_eq!(old_result.1,new_result.1);
+                let mut old=Vec::new();let mut new=Vec::new();
+                for trial in 0..13 {
+                    if trial%2==0 {
+                        old.push(solve_timed(p,&poly,true,2));
+                        new.push(solve_timed(p,&poly,false,2));
+                    } else {
+                        new.push(solve_timed(p,&poly,false,2));
+                        old.push(solve_timed(p,&poly,true,2));
+                    }
+                }
+                let before=median(old);let after=median(new);
+                println!("ROUND46_NATIVE_COMPLETE p={p} degree={degree} before_ns={before:.1} after_ns={after:.1} speedup={:.4}x producer_work={}:{} replay_work={}:{}",before/after,old_result.2,new_result.2,old_result.3,new_result.3);
+            }
+        }
+    }
+    #[test]
     #[ignore="Benchmark split, irreducible and repeated quadratics"]
     fn bench_quadratic_classes_complete() {
         for p in [487u64, 1_000_000_007, 1_000_000_009, (1u64<<61)-1] {
@@ -350,4 +397,6 @@ with tempfile.TemporaryDirectory() as tmp:
                  "complete_root_and_certificate_events_match_frozen"]:
         subprocess.run([str(binary),test,"--nocapture"],check=True)
     subprocess.run([str(binary),"exact_quadratic_discriminant_classes_and_events","--nocapture"],check=True)
+    subprocess.run([str(binary),"randomized_distinct_quadratic_root_events_match_frozen","--nocapture"],check=True)
     subprocess.run([str(binary),"bench_quadratic_classes_complete","--ignored","--nocapture"],check=True)
+    subprocess.run([str(binary),"bench_complete_degree_controls","--ignored","--nocapture"],check=True)
