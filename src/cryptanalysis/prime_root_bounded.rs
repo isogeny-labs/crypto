@@ -619,6 +619,51 @@ impl Producer<'_> {
         {
             return Ok(Poly17::constant(self.sub(0, monic.coefficients[0])?));
         }
+        // R45_QUADRATIC_FROBENIUS_PRODUCER_BEGIN
+        // In Fp[x]/(x^2+b*x+c), x^p equals x when the discriminant
+        // is a nonzero square, -b-x when irreducible, and -b/2 when
+        // the discriminant vanishes. Euler's criterion uses scalar
+        // field operations rather than degree-two polynomial powering.
+        // Prime p >= 3 is guaranteed by Fp64Arithmetic::try_new.
+        if monic.len == 3 && exponent == self.p
+            && base.len == 2 && base.coefficients[0] == 0
+            && base.coefficients[1] == 1
+        {
+            let linear = monic.coefficients[1];
+            let doubled = self.add(monic.coefficients[0], monic.coefficients[0])?;
+            let four_c = self.add(doubled, doubled)?;
+            let b_squared = self.mul(linear, linear)?;
+            let discriminant = self.sub(b_squared, four_c)?;
+            if discriminant == 0 {
+                let half = (self.p + 1) / 2;
+                let root = self.mul(linear, half)?;
+                return Ok(Poly17::constant(self.sub(0, root)?));
+            }
+            let mut power = (self.p - 1) / 2;
+            let mut acc = 1u64;
+            let mut scalar_base = discriminant;
+            while power != 0 {
+                if power & 1 != 0 {
+                    acc = self.mul(acc, scalar_base)?;
+                }
+                power >>= 1;
+                if power != 0 {
+                    scalar_base = self.mul(scalar_base, scalar_base)?;
+                }
+            }
+            if acc == 1 {
+                return Ok(*base);
+            }
+            if acc == self.p - 1 {
+                let mut value = Poly17::ZERO;
+                value.len = 2;
+                value.coefficients[0] = self.sub(0, linear)?;
+                value.coefficients[1] = self.sub(0, 1)?;
+                return Ok(value);
+            }
+            return Err(Stop::InvalidInput);
+        }
+        // R45_QUADRATIC_FROBENIUS_PRODUCER_END
         let mut b = *base;
         self.reduce_monic(&mut b, &monic)?;
         // R42_PRODUCER_FASTPATH_BEGIN
@@ -1267,6 +1312,43 @@ impl Replay {
         {
             return Ok(Poly17::constant(self.minus(0, monic.coefficients[0])?));
         }
+        // R45_QUADRATIC_FROBENIUS_REPLAY_BEGIN
+        // Verify quadratic Frobenius using a separate left-to-right
+        // Euler-criterion implementation. Do not invoke producer code.
+        if monic.len == 3 && exponent == self.p
+            && base.len == 2 && base.coefficients[0] == 0
+            && base.coefficients[1] == 1
+        {
+            let linear = monic.coefficients[1];
+            let twice = self.plus(monic.coefficients[0], monic.coefficients[0])?;
+            let four = self.plus(twice, twice)?;
+            let square = self.times(linear, linear)?;
+            let discriminant = self.minus(square, four)?;
+            if discriminant == 0 {
+                let root = self.times(linear, (self.p + 1) / 2)?;
+                return Ok(Poly17::constant(self.minus(0, root)?));
+            }
+            let exponent = (self.p - 1) / 2;
+            let mut symbol = 1u64;
+            for bit in (0..64 - exponent.leading_zeros()).rev() {
+                symbol = self.times(symbol, symbol)?;
+                if exponent & (1u64 << bit) != 0 {
+                    symbol = self.times(symbol, discriminant)?;
+                }
+            }
+            if symbol == 1 {
+                return Ok(base);
+            }
+            if symbol == self.p - 1 {
+                let mut result = Poly17::ZERO;
+                result.len = 2;
+                result.coefficients[0] = self.minus(0, linear)?;
+                result.coefficients[1] = self.minus(0, 1)?;
+                return Ok(result);
+            }
+            return Err(Stop::InvalidCertificate);
+        }
+        // R45_QUADRATIC_FROBENIUS_REPLAY_END
         let mut base = base;
         self.cancel_monic(&mut base, &monic)?;
         // R42_REPLAY_FASTPATH_BEGIN
