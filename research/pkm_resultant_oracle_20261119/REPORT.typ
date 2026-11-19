@@ -5,7 +5,7 @@
 
 = A quasi-linear algebraic decomposition oracle at `m = 2`
 
-EXP-PKM-RESULTANT-001 · 2026-11-19 · protocol `PROTOCOL.md` (frozen in `b8c8408de2` before any row, no amendments)
+EXP-PKM-RESULTANT-001 · 2026-11-19 · protocol `PROTOCOL.md` (frozen in `b8c8408de2` before any row; Amendment 1 frozen in `4aba464d84` before its rows)
 · oracle `resultant_decompose_m2` (`src/cryptanalysis/pkm_smooth_tower.rs`) · instrument
 `examples/pkm_algebraic_oracle.rs --membership resultant` · rows `runs/` · analysis `analyze.py` → `results.json` ·
 figure `make_figures.py`. Counted F#sub[p] multiplications. Nothing here concerns cryptographic sizes or Pollard rho
@@ -59,6 +59,31 @@ F4 oracles' `S` (dense) and `S^2.5` (tower). The oracle is 30–120× cheaper th
 - *Smooth or random `V`.* Irrelevant again (R5): the cost depends only on `|V|`.
 - *R1's threshold was too optimistic below `S = 4096`.* The oracle is 30–120× cheaper than F4 dense, not 100×
   everywhere; the advantage grows with `S`, as both exponents predicted.
+
+== Amendment 1: one `V`, many targets
+
+In relation collection `V` is fixed and targets vary, so work that depends only on `V` is paid once. A labelled
+extension (owner's request; predictions frozen before its rows; `run_amortised.sh`, `analyze_amortised.py` →
+`results_amortised.json`) pays the product tree of `Z` and every node's cached reciprocal once per cell
+(`ResultantOracleM2`), and treats enumeration the same way: its lifting of `V` is also paid once.
+
+#table(columns: 4, align: left,
+  [], [prediction], [verdict], [measured (planted, median)],
+  [A1], [refactored frozen path reproduces committed counts; amortised oracle exact], [*held*],
+    [24 frozen-cell rows rerun, all `field_ops` and targets identical; every amortised target agrees with enumeration],
+  [A2], [marginal ÷ frozen per-target cost in `[0.3, 0.7]` at `S ≥ 256`], [*held*], [0.49–0.54],
+  [A3], [marginal resultant ÷ marginal enumeration `> 1` at `S ≥ 64`, growth `< 16`× from `2^8` to `2^16`],
+    [*held*], [2.26 (`S = 64`) to 52.9 (`S = 2^16`); growth 7.8×],
+)
+
+- *The `V`-only work was half the oracle's cost*, and the setup pays for itself after about 1.5 targets (setup ÷
+  marginal 1.5–1.6 for `S ≥ 256`).
+- *It does not change the comparison.* Enumeration's own `V`-only work (lifting `V`) is also about half its cost,
+  so both arms halve and the ratio at `S = 2^16` moves from 55.7 to 52.9. The cell where the frozen run found the
+  oracle cheaper (`S = 16`, 0.86) does not survive: on marginal costs it is 1.53. At `m = 2` enumeration stays the
+  cheaper relation oracle at every measured size, by a factor that grows like `log² S` [pcc:unverified].
+- One cell outside the protocol was run by a slip in `run_amortised.sh` (`P3`, `S = 16`, frozen path, `runs/aa/`);
+  it has no frozen reference and is not used.
 
 == Limits
 

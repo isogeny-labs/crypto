@@ -39,8 +39,19 @@ ax.set_ylabel("field_ops to find all relations (planted, median)")
 ax.set_title("m = 2: cost of one target")
 ax.grid(alpha=0.3, which="both")
 ax.legend(fontsize=7)
+AM = os.path.join(HERE, "results_amortised.json")
+am = [c for c in json.load(open(AM))["cells"] if c["vkind"] == "coset"] if os.path.exists(AM) else []
+if am:
+    ax.plot(*zip(*sorted({c["S"]: c["marginal"] for c in am}.items())), "o--", color="#c08bd6", ms=3,
+            label="resultant, V-only work paid once (Amendment 1)")
+    ax.plot(*zip(*sorted({c["S"]: c["enum_marginal"] for c in am}.items())), "d--", color="#999999", ms=3,
+            label="enumeration, V lifted once (Amendment 1)")
+    ax.legend(fontsize=6.5)
 ratio = sorted({c["S"]: c["res_over_enum"] for c in cells}.items())
 bx.plot(*zip(*ratio), "o-", color="#7a3e9d", ms=4, label="resultant ÷ enumeration")
+if am:
+    bx.plot(*zip(*sorted({c["S"]: c["marginal_over_enum_marginal"] for c in am}.items())), "o--", color="#c08bd6",
+            ms=3, label="same, both with V-only work paid once")
 s0, r0 = ratio[-1]
 bx.plot([s for s, _ in ratio], [r0 * (math.log2(s) / math.log2(s0)) ** 2 for s, _ in ratio], "--", color="#999",
         label="∝ log² S (reference)")
