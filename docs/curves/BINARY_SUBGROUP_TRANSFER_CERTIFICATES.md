@@ -107,12 +107,13 @@ objects disabled. The verifier is 12,930 bytes with SHA-256
 8/8 local mutation and substitution controls pass. Exact-head release run
 `44596599220` repeated all eight controls, bound the 21 Git blobs, compared this
 receipt before staging, and compared it again from the installed package tree.
-Curve run `44605710291` at successor head `3f4706b2…` has green assessment and
+Curve run `44618940782` at successor head `37b9b2a6…` has green assessment and
 Lean jobs. Its disk-hardened certificate job passed the combined cover,
-Jacobian, transfer, CLI, binary source, and canonical replay controls that had
-failed on runner disk, then GitHub cancelled the still-running optimized-oracle
-step at the 75-minute job limit; later controls were skipped. A timeout-only
-successor is pending. The passed provenance replay does not attest
+Jacobian, transfer, CLI, binary source, canonical replay, optimized-oracle,
+odd-transfer, native-plan, fixed-F8, and Rust standards controls. The job then
+failed on a pre-existing global IC display input mismatch in the Python
+standards wrapper; final cover/browser checks were skipped, and a scoped
+registry/browser successor is pending. The passed provenance replay does not attest
 that an executable was built from the recorded producer commit or widen any
 arithmetic, subgroup, solver, or advantage claim.
 [pcc:unverified]

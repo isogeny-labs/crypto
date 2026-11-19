@@ -883,11 +883,12 @@ The repository-mode 21-file Git-tree verifier
 and receipt additionally reproduce `e7a12f60…` with replacement objects
 disabled and logical paths checked against their normalized `include_str!`
 targets. Its 8/8 local controls and the exact-head release replay pass. Curve
-run `44605710291` at successor head `3f4706b2…` has green assessment and Lean
-jobs; its disk-hardened certificate job passed the previously disk-failing
-combined transfer/source-replay step, then exhausted the 75-minute job budget
-during optimized oracles. Later controls were skipped, and a timeout-only
-successor is pending. This source receipt does not attest the executable build or supply an
+run `44618940782` at successor head `37b9b2a6…` has green assessment and Lean
+jobs; its certificate job passed the combined transfer/source replay,
+optimized oracles, odd-transfer replay, native plan, fixed-F8 certificate, and
+Rust standards checks. A pre-existing global IC display input mismatch then
+failed the Python standards wrapper and skipped the final cover/browser checks;
+a scoped successor is pending. This source receipt does not attest the executable build or supply an
 independent arithmetic check.
 The earlier `67142558…` / `e0ae0fe5…` and `f402ccd4…` / `8c61e842…` corpora
 remain historical evidence, not the current same-implementation replay target.
