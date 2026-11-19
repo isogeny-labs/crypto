@@ -10927,6 +10927,52 @@ impl TwTable {
         self.len
     }
 
+    fn unpack(slot: &[u64; 5]) -> (u128, u64, u64) {
+        (
+            u128::from(slot[1]) | (u128::from(slot[2]) << 64),
+            slot[3],
+            slot[4],
+        )
+    }
+
+    /// The stored value of `key`, if any.
+    fn get(&self, key: u64) -> Option<(u128, u64, u64)> {
+        if key == u64::MAX {
+            return self.special;
+        }
+        let want = key + 1;
+        let mut i = self.home(key);
+        // Load stays below 7/8, so an empty slot ends the probe.
+        loop {
+            let slot = &self.slots[i];
+            if slot[0] == 0 {
+                return None;
+            }
+            if slot[0] == want {
+                return Some(Self::unpack(slot));
+            }
+            i += 1;
+            if i == self.slots.len() {
+                i = 0;
+            }
+        }
+    }
+
+    /// Every stored `(key, value)`, in no particular order.
+    #[cfg(test)]
+    fn iter(&self) -> impl Iterator<Item = (u64, (u128, u64, u64))> + '_ {
+        self.slots
+            .iter()
+            .filter(|s| s[0] != 0)
+            .map(|s| (s[0] - 1, Self::unpack(s)))
+            .chain(self.special.map(|v| (u64::MAX, v)))
+    }
+
+    #[cfg(test)]
+    fn values(&self) -> impl Iterator<Item = (u128, u64, u64)> + '_ {
+        self.iter().map(|(_, v)| v)
+    }
+
     fn home(&self, key: u64) -> usize {
         let h = key.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15);
         ((u128::from(h) * self.slots.len() as u128) >> 64) as usize
@@ -10975,11 +11021,7 @@ impl TwTable {
                 });
             }
             if slot[0] == want {
-                return TwEntry::Occupied((
-                    u128::from(slot[1]) | (u128::from(slot[2]) << 64),
-                    slot[3],
-                    slot[4],
-                ));
+                return TwEntry::Occupied(Self::unpack(slot));
             }
             i += 1;
             if i == self.slots.len() {
@@ -12648,7 +12690,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                 point_rot = i << TW_AUT_SHIFT;
             }
         }
-        let (u, z, b) = *self.map.get(&key)?;
+        let (u, z, b) = self.map.get(key)?;
         // Clear the cv=0 / lazy sign bit and the aut rotation (never set
         // otherwise).
         let entry_rot = u & TW_AUT_MASK;
@@ -21414,13 +21456,13 @@ mod wwalk_table_tests {
                 assert_eq!(n.steps, n.insert_attempts + n.identities_skipped);
                 assert_eq!(n.entries, v.entries);
                 assert_eq!(n.map.len(), v.map.len());
-                for (key, &(u, z, b)) in &v.map {
+                for (key, (u, z, b)) in v.map.iter() {
                     assert_eq!(u & TW_SIGN_BIT, 0);
-                    let &(nu, nz, nb) = n.map.get(key).expect("same keys");
+                    let (nu, nz, nb) = n.map.get(key).expect("same keys");
                     assert_eq!((nu & !TW_SIGN_BIT, nz, nb), (u, z, b));
                 }
                 // The relation loop's probe reads the same entry in both.
-                for &(u, z, b) in v.map.values().take(8) {
+                for (u, z, b) in v.map.values().take(8) {
                     // One seed: the u128 word holds `u` itself.
                     let Some(pt) = v.eval(g, &mut cops, u as u64, 0, z, b) else {
                         continue;
@@ -21508,9 +21550,9 @@ mod wwalk_table_tests {
                 assert_eq!(n.steps_rank_three, v.steps_rank_three);
                 assert_eq!(n.table_probes, v.table_probes);
                 assert_eq!(n.map.len(), v.map.len());
-                for (key, &(u, z, b)) in &v.map {
+                for (key, (u, z, b)) in v.map.iter() {
                     assert_eq!(u & TW_SIGN_BIT, 0);
-                    let &(nu, nz, nb) = n.map.get(key).expect("same keys");
+                    let (nu, nz, nb) = n.map.get(key).expect("same keys");
                     assert_eq!((nu & !TW_SIGN_BIT, nz, nb), (u, z, b));
                 }
                 assert_eq!(n.verify_ops, GroupOps::default());
