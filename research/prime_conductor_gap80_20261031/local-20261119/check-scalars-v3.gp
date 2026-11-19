@@ -1,0 +1,11 @@
+require(ok,why)={if(!ok,print("FAIL: ",why);quit(2))};
+hexnum(audit_s)=eval(Str("0x",audit_s));
+pt(P,p)={if(type(P)=="t_INT",[0],[Mod(hexnum(P[1]),p),Mod(hexnum(P[2]),p)])};
+audit_s=readstr(getenv("SCALAR_AUDIT_INPUT"));
+audit_defs=eval(audit_s[1]);audit_curves=vector(#audit_defs);audit_primes=vector(#audit_defs);audit_orders=vector(#audit_defs);
+for(i=1,#audit_defs,v=audit_defs[i];p=eval(v[1]);q=v[4];require(isprime(p)&&isprime(q),"prime field/order");audit_curves[i]=ellinit([eval(v[2]),eval(v[3])],p);audit_primes[i]=p;audit_orders[i]=q);
+audit_checked=0;
+for(i=2,#audit_s,v=eval(audit_s[i]);E=audit_curves[v[1]];p=audit_primes[v[1]];P=pt(v[3],p);R=pt(v[4],p);k=eval(v[2]);require(ellisoncurve(E,P)&&P!=[0]&&ellmul(E,P,audit_orders[v[1]])==[0],"base membership/order");require(ellisoncurve(E,R)&&ellmul(E,P,k)==R,"independent scalar result");audit_checked++);
+require(audit_checked==1344&&#audit_defs==6,"complete expected input coverage");
+print("{\"independent_PARI_scalar_samples\":",audit_checked,",\"curve_models\":",#audit_defs,",\"all_outputs_match\":true,\"timings_independently_remeasured\":false}");
+quit(0);

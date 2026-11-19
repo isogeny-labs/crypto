@@ -44,6 +44,8 @@ mod pdp_split_oracle;
 mod pkm_tower;
 #[path = "ecbench/retained_chain_study.rs"]
 mod retained_chain_study;
+#[path = "ecbench/scalar_timing.rs"]
+mod scalar_timing;
 #[path = "ecbench/structured_s4.rs"]
 mod structured_s4;
 
@@ -72,6 +74,17 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
+    /// Descriptive local timings of the existing counted scalar multiplication.
+    ScalarTiming {
+        #[arg(long)]
+        spec: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long, default_value_t = 64)]
+        batch: u64,
+        #[arg(long, default_value = isolation::DEFAULT_LOCK)]
+        lock: String,
+    },
     /// Join distinct endpoint workloads without admitting costs or timings.
     EndpointPairs {
         #[arg(long)]
@@ -1247,6 +1260,12 @@ fn compare_pooled_cmd(
 
 fn run(cli: Cli) -> Result<ExitCode, String> {
     match cli.cmd {
+        Cmd::ScalarTiming {
+            spec,
+            out,
+            batch,
+            lock,
+        } => scalar_timing::run(&spec, &out, batch, &lock)?,
         Cmd::EndpointPairs {
             dir,
             source_curve,
