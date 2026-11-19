@@ -1845,22 +1845,6 @@ impl SmallEntries {
     }
 }
 
-fn merge_entries(mut entries: Vec<(u32, i8)>) -> Vec<(u32, i8)> {
-    entries.sort_unstable_by_key(|e| e.0);
-    let mut merged: Vec<(u32, i8)> = Vec::with_capacity(entries.len());
-    for (idx, s) in entries {
-        if let Some(last) = merged.last_mut() {
-            if last.0 == idx {
-                last.1 += s;
-                continue;
-            }
-        }
-        merged.push((idx, s));
-    }
-    merged.retain(|e| e.1 != 0);
-    merged
-}
-
 /// Fail-closed check: re-add the decomposition in the group.
 fn relation_holds(curve: &FastCurve, fb: &FastFactorBase, r: Pt, entries: &[(u32, i8)]) -> bool {
     let mut acc: Option<Pt> = None;
@@ -2980,15 +2964,15 @@ pub fn poly_mul_mont(f: &Fp64, a: &[u64], b: &[u64], out: &mut Vec<u64>) {
     }
     let mut z1 = Vec::new();
     poly_mul_mont(f, &sa, &sb, &mut z1);
+    let z1_need = z1.len().max(z0.len()).max(z2.len());
+    if z1.len() < z1_need {
+        z1.resize(z1_need, 0);
+    }
     for (i, &v) in z0.iter().enumerate() {
-        if i < z1.len() {
-            z1[i] = f.sub(z1[i], v);
-        }
+        z1[i] = f.sub(z1[i], v);
     }
     for (i, &v) in z2.iter().enumerate() {
-        if i < z1.len() {
-            z1[i] = f.sub(z1[i], v);
-        }
+        z1[i] = f.sub(z1[i], v);
     }
     poly_trim_mont(&mut z1);
 
@@ -3300,7 +3284,6 @@ pub struct SubproductBatchScratch {
     rem_curr: Vec<Vec<u64>>,
     rem_next: Vec<Vec<u64>>,
     gcd_a: Vec<Vec<u64>>,
-    gcd_b: Vec<Vec<u64>>,
     denoms: Vec<u64>,
     denom_idx: Vec<usize>,
     prefix: Vec<u64>,
@@ -3899,7 +3882,7 @@ pub struct LockStepCollectScratch {
     degenerate: Vec<bool>,
     found: Vec<SmallEntries>,
     lane_seen: HashSet<SmallEntries>,
-    global_seen: HashSet<SmallEntries>,
+    global_seen: HashSet<(u64, u64, SmallEntries)>,
 }
 
 /// Lock-step multi-walker relation collector (`W = 64..256` walkers):
@@ -4025,7 +4008,11 @@ pub fn collect_relations_lockstep(
                             let merged = scratch.found[idx];
                             if merged.is_empty()
                                 || !scratch.lane_seen.insert(merged)
-                                || !scratch.global_seen.insert(merged)
+                                || !scratch.global_seen.insert((
+                                    scratch.ra[lane],
+                                    scratch.rb[lane],
+                                    merged,
+                                ))
                             {
                                 continue;
                             }
@@ -4044,19 +4031,17 @@ pub fn collect_relations_lockstep(
                                 entries: merged.to_vec(),
                             });
                             productive = true;
+                            break;
+                        }
+                        if productive {
                             if rels.len() >= needed {
                                 break 'rounds;
                             }
-                        }
-                        if productive {
                             let (na, nb, npt) = next_start(&mut rng);
-                            // Pre-shift `a` by -1 and `R`? Simpler: place directly after step below,
-                            // or mark degenerate so the step loop leaves this fresh point intact!
                             scratch.rx[lane] = npt.x;
                             scratch.ry[lane] = npt.y;
                             scratch.ra[lane] = na;
                             scratch.rb[lane] = nb;
-                            // Tag via `u64::MAX` in `denoms` below? Better: use `scratch.degenerate`.
                         }
                     }
                 }
@@ -4160,7 +4145,11 @@ pub fn collect_relations_lockstep(
                                 let merged = scratch.found[idx];
                                 if merged.is_empty()
                                     || !scratch.lane_seen.insert(merged)
-                                    || !scratch.global_seen.insert(merged)
+                                    || !scratch.global_seen.insert((
+                                        scratch.ra[lane],
+                                        scratch.rb[lane],
+                                        merged,
+                                    ))
                                 {
                                     continue;
                                 }
@@ -4179,11 +4168,12 @@ pub fn collect_relations_lockstep(
                                     entries: merged.to_vec(),
                                 });
                                 productive = true;
+                                break;
+                            }
+                            if productive {
                                 if rels.len() >= needed {
                                     break 'rounds;
                                 }
-                            }
-                            if productive {
                                 let (na, nb, npt) = next_start(&mut rng);
                                 scratch.rx[lane] = npt.x;
                                 scratch.ry[lane] = npt.y;
@@ -4281,7 +4271,7 @@ pub fn ic_solve_lockstep(
     let needed = fb.len() + extra_relations;
     let t2 = Instant::now();
     let mut scratch = LockStepCollectScratch::default();
-    let (rels, stats) = collect_relations_lockstep(
+    let (mut rels, mut stats) = collect_relations_lockstep(
         curve,
         g,
         q,
@@ -4294,13 +4284,51 @@ pub fn ic_solve_lockstep(
         seed,
         &mut scratch,
     );
-    let relations_ms = t2.elapsed().as_secs_f64() * 1e3;
+    let mut relations_ms = t2.elapsed().as_secs_f64() * 1e3;
     if rels.len() < needed {
         return None;
     }
-    let t3 = Instant::now();
-    let d = solve_relations(curve, fb.len(), &rels)?;
-    let linear_algebra_ms = t3.elapsed().as_secs_f64() * 1e3;
+    let mut linear_algebra_ms = 0.0;
+    let mut topup_epoch = 1u64;
+    let topup_step = (fb.len() / 4).clamp(16, 64);
+    let d = loop {
+        let t3 = Instant::now();
+        let sol = solve_relations(curve, fb.len(), &rels);
+        linear_algebra_ms += t3.elapsed().as_secs_f64() * 1e3;
+        if let Some(d_found) = sol {
+            break d_found;
+        }
+        if stats.targets >= max_targets || topup_epoch > 8 {
+            return None;
+        }
+        let rem_budget = max_targets - stats.targets;
+        let t_more = Instant::now();
+        let (more_rels, more_stats) = collect_relations_lockstep(
+            curve,
+            g,
+            q,
+            &fb,
+            pairs.as_ref(),
+            topup_step,
+            rem_budget,
+            walkers,
+            mode,
+            seed.wrapping_add(topup_epoch.wrapping_mul(0x9E37_79B9_7F4A_7C15)),
+            &mut scratch,
+        );
+        relations_ms += t_more.elapsed().as_secs_f64() * 1e3;
+        stats.targets += more_stats.targets;
+        stats.rows_one += more_stats.rows_one;
+        stats.rows_two += more_stats.rows_two;
+        stats.rows_three += more_stats.rows_three;
+        stats.rejected += more_stats.rejected;
+        if more_rels.is_empty() {
+            return None;
+        }
+        rels.extend(more_rels);
+        stats.relations = rels.len();
+        topup_epoch += 1;
+    };
     let t4 = Instant::now();
     if curve.mul(Some(g), d) != Some(q) {
         return None;
