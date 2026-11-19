@@ -61,6 +61,33 @@ mod cryptanalysis {
 """
 middle = "\n  } pub mod before {\n"
 tail = "\n  }\n }\n}\n"
+kernel = r"""
+pub fn round41_mul_kernel(p:u64,pairs:&[(u64,u64)],replay_path:bool)->u64 {
+    let field=Fp64Arithmetic{p};
+    let deadline=Instant::now()+std::time::Duration::from_secs(120);
+    let limits=RootBudget{work:MAX_WORK,field_work:MAX_FIELD_WORK,
+        bytes:STORAGE_BYTES,events:MAX_EVENTS,split_attempts:1000,degree:8};
+    let mut digest=0u64;
+    if replay_path {
+        let mut replay=Replay::new(&field,&[1],42,limits,limits,deadline).unwrap();
+        for &(x,y) in pairs {
+            digest=digest.wrapping_add(replay.times(x,y).unwrap());
+        }
+    } else {
+        let mut observer=|_:&BoundedRootEvent|Ok(());
+        let mut producer=Producer{
+            p,gate:Gate::new(limits,deadline),observer:&mut observer,
+            unacknowledged:None,pending:[Poly17::ZERO;8],pending_len:0,
+            roots:[0;8],root_count:0
+        };
+        for &(x,y) in pairs {
+            digest=digest.wrapping_add(producer.mul(x,y).unwrap());
+        }
+    }
+    digest
+}
+"""
+
 checks = r"""
 #[cfg(test)]
 mod round41 {
@@ -148,6 +175,43 @@ mod round41 {
         black_box(digest);
         begin.elapsed().as_nanos() as f64/reps as f64
     }
+
+    #[test]
+    #[ignore="Compile actual producer/replay scalar operations and compare versions"]
+    fn bench_producer_replay_kernels() {
+        let mut seed=0x903e_e50e_2026_0041u64;
+        for p in [487u64,1_000_000_007,1_000_000_009,4_294_967_291,(1u64<<61)-1] {
+            let mut pairs=Vec::new();
+            for _ in 0..16384 {
+                seed=seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let a=seed%p;
+                seed=seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                pairs.push((a,seed%p));
+            }
+            for replay_path in [false,true] {
+                let mut old=Vec::new(); let mut new=Vec::new();
+                for trial in 0..13 {
+                    for after_first in [trial%2==1,trial%2==0] {
+                        let begin=Instant::now();
+                        let digest=if after_first {
+                            after::round41_mul_kernel(p,black_box(&pairs),replay_path)
+                        } else {
+                            before::round41_mul_kernel(p,black_box(&pairs),replay_path)
+                        };
+                        black_box(digest);
+                        let ns=begin.elapsed().as_nanos() as f64 / pairs.len() as f64;
+                        if after_first {new.push(ns)} else {old.push(ns)}
+                    }
+                }
+                old.sort_by(f64::total_cmp);
+                new.sort_by(f64::total_cmp);
+                let name=if replay_path {"replay"}else{"producer"};
+                println!("ROUND41_KERNEL kind={name} p={p} before_ns={:.3} after_ns={:.3} speedup={:.4}x",
+                    old[6],new[6],old[6]/new[6]);
+            }
+        }
+    }
+
     #[test]
     #[ignore="Compare full compiled Rust producer/replay against exact preceding version"]
     fn bench_complete_solver() {
@@ -177,10 +241,12 @@ mod round41 {
 with tempfile.TemporaryDirectory() as folder:
     path = Path(folder) / "round41.rs"
     binary = Path(folder) / "round41"
-    path.write_text(header + after + middle + before + tail + checks)
+    path.write_text(header + after + kernel + middle + before + kernel + tail + checks)
     subprocess.run(["rustc", "--edition=2021", "-O", "--test",
                     str(path), "-o", str(binary)], check=True)
     subprocess.run([str(binary), "same_complete_root_report_events_and_replay",
                     "--nocapture"], check=True)
     subprocess.run([str(binary), "bench_complete_solver",
+                    "--ignored", "--nocapture"], check=True)
+    subprocess.run([str(binary), "bench_producer_replay_kernels",
                     "--ignored", "--nocapture"], check=True)
