@@ -252,6 +252,126 @@ pub struct F4Stats {
     pub skeleton_store_refused: u64,
     /// Bytes the skeleton holds after this call (charged as memory).
     pub skeleton_bytes: u64,
+    /// [`F4PairTrace`] counters (all zero without a trace).  A run recorded
+    /// a trace for its shape (the plain run plus its provenance pass).
+    pub trace_records: u64,
+    /// A stored trace of the system's shape was replayed.
+    pub trace_replays: u64,
+    /// The replay was accepted (verified, or it derived `1`).
+    pub trace_hits: u64,
+    /// The replay was discarded and the plain computation run as well.
+    pub trace_fallbacks: u64,
+    /// Of the fallbacks: the replay stopped early because a step's new
+    /// leading monomials differed from the recorded ones.
+    pub trace_mismatches: u64,
+    /// Replay steps whose new leading monomials matched the recorded ones
+    /// (before a mismatch, or all of them).
+    pub trace_steps_matched: u64,
+    /// Verification passes run, and those that found the replayed basis
+    /// incomplete (a fallback each).
+    pub trace_verifications: u64,
+    pub trace_verify_failures: u64,
+    /// Work of the verification passes (already inside `word_xors`,
+    /// `divisor_tests` and `pairs_reduced`/`field_pairs_reduced`).
+    pub trace_verify_word_xors: u64,
+    pub trace_verify_divisor_tests: u64,
+    pub trace_verify_pairs: u64,
+    /// Word XORs of the recording's provenance pass (inside `word_xors`).
+    pub trace_record_xors: u64,
+    /// Pairs a replay discarded unreduced because the trace did not list
+    /// them.
+    pub trace_pairs_dropped: u64,
+    /// Bytes the trace store holds after this call (charged as memory).
+    pub trace_bytes: u64,
+}
+
+impl F4Stats {
+    /// Add the work of a second run on the same system (a replay, its
+    /// verification, a fallback) to this one: counts summed, maxima kept.
+    /// The outcome fields (`degree_reached`, `solving_degree`, `basis_len`,
+    /// `timed_out`, `oversize`, `pairs_left`, `early_stopped`,
+    /// `free_at_stop`, `wall_ns`) are left to the caller.
+    fn absorb(&mut self, o: &F4Stats) {
+        macro_rules! sum {
+            ($($f:ident),*) => { $( self.$f = self.$f.saturating_add(o.$f); )* };
+        }
+        macro_rules! max {
+            ($($f:ident),*) => { $( self.$f = self.$f.max(o.$f); )* };
+        }
+        sum!(
+            steps,
+            pairs_reduced,
+            field_pairs_reduced,
+            pairs_product_skipped,
+            pairs_chain_skipped,
+            pair_dense_select_calls,
+            pair_quadratic_select_calls,
+            pair_candidate_visits,
+            pair_lcm_groups,
+            pair_cover_lookups,
+            reducer_rows,
+            matrix_rows_sum,
+            word_xors,
+            word_xors_performed,
+            divisor_tests,
+            new_elements,
+            full_m4ri_matrices,
+            full_m4ri_blocks,
+            full_m4ri_table_word_xors,
+            fl_matrices,
+            fl_reducer_rows,
+            fl_pair_rows,
+            fl_free_cols,
+            build_ns,
+            eliminate_ns,
+            matrix_profile_unbinned_eliminate_ns,
+            matrix_profile_unbinned_logical_xors,
+            matrix_profile_unbinned_performed_xors,
+            trace_records,
+            trace_replays,
+            trace_hits,
+            trace_fallbacks,
+            trace_mismatches,
+            trace_steps_matched,
+            trace_verifications,
+            trace_verify_failures,
+            trace_verify_word_xors,
+            trace_verify_divisor_tests,
+            trace_verify_pairs,
+            trace_record_xors,
+            trace_pairs_dropped
+        );
+        max!(
+            pair_dense_scratch_bytes_max,
+            inner_build_parallel_disabled_calls,
+            matrix_rows_max,
+            matrix_cols_max,
+            max_poly_degree,
+            peak_matrix_bytes,
+            peak_table_bytes
+        );
+        for b in 0..MATRIX_PROFILE_BINS {
+            self.matrix_profile_counts[b] += o.matrix_profile_counts[b];
+            self.matrix_profile_rows_sum[b] += o.matrix_profile_rows_sum[b];
+            self.matrix_profile_cols_sum[b] += o.matrix_profile_cols_sum[b];
+            self.matrix_profile_eliminate_ns[b] += o.matrix_profile_eliminate_ns[b];
+            self.matrix_profile_logical_xors[b] += o.matrix_profile_logical_xors[b];
+            self.matrix_profile_performed_xors[b] += o.matrix_profile_performed_xors[b];
+            self.matrix_profile_full_m4ri_counts[b] += o.matrix_profile_full_m4ri_counts[b];
+        }
+    }
+
+    /// Take the outcome of the run whose basis is returned.
+    fn take_outcome(&mut self, o: &F4Stats) {
+        self.degree_reached = o.degree_reached;
+        self.solving_degree = o.solving_degree;
+        self.basis_len = o.basis_len;
+        self.timed_out = o.timed_out;
+        self.oversize = o.oversize;
+        self.pairs_left = o.pairs_left;
+        self.early_stopped = o.early_stopped;
+        self.free_at_stop = o.free_at_stop;
+    }
 }
 
 /// **Symbolic preprocessing shared across the systems of one run**
@@ -330,6 +450,177 @@ impl F4Skeleton {
     }
 }
 
+/// **Gröbner trace across the systems of one run** (Traverso 1988;
+/// `docs/ic/GROEBNER_PERF_LEVERS_20261111.md`, lever 2).
+///
+/// *Record.*  The first system of a shape — key `(unknowns, input degree,
+/// sorted input monomial support)` — runs the plain computation, and each
+/// step additionally passes its matrix once through a sequential
+/// elimination with row provenance (charged: its XORs go into
+/// `word_xors`, and `trace_record_xors` shows them).  A row is
+/// *productive* when it is independent of the rows above it and, for a
+/// pair half, either left its own leading column (it was reduced there:
+/// the second half of a pair, or a row an earlier one met) or was used as
+/// a pivot by a row of another leading column; a field product is
+/// productive when independent.  A pair is *useful* when one of its rows
+/// is productive; the others reduced to zero, or only cancelled their own
+/// partner.  The trace keeps, per step, the degree, the useful pairs (by
+/// basis indices) and the new leading monomials.
+///
+/// *Replay.*  A later system of the same shape reduces, at step `k`, only
+/// the queued pairs of the recorded degree that the trace lists, and
+/// drops the other pairs of that degree unreduced.  As soon as a step's
+/// new leading monomials differ from the recorded ones the replay stops
+/// (`trace_mismatches`); after the last recorded step the queue is
+/// dropped.  The active elements are then interreduced to `G`.
+///
+/// *Verification* (one F4 pass, charged in full).  Every row of every
+/// matrix is an `F_2`-combination of monomial multiples of ideal elements,
+/// so `G ⊆ I`, and `G = {1}` is a certificate on its own.  Otherwise a
+/// fresh run starts from `G` (no initial echelon), installs its pairs by
+/// the same Gebauer–Möller `UPDATE` plus the field pairs, and reduces in
+/// **one** matrix every surviving pair of every degree *together with
+/// every input polynomial*; it passes iff no row ends on a column no
+/// leading monomial of `G` divides.  Symbolic preprocessing gives every
+/// divisible column a row that is a monomial multiple of an element of
+/// `G` leading there (a reducer, or a pair half on an lcm column), so a
+/// pass means every row of the span — each S-polynomial, each field
+/// product `v·g`, each input — top-reduces to zero by `G`.  For the
+/// inputs that is `I ⊆ ⟨G⟩`; for the pairs it is the Buchberger criterion
+/// with Gebauer–Möller deletions and Brickenstein's field pairs — the
+/// criterion the plain run itself terminates on.  So `G` is a Gröbner
+/// basis of `I` in `F_2[v]/(v² − v)`, and, being interreduced, *the*
+/// reduced one: the plain path's basis.  The check does not depend on the
+/// replay having followed the trace, nor on the Gebauer–Möller bookkeeping
+/// of the replay (whose dropped pairs void it).
+///
+/// *Fallback.*  A mismatch, a failed verification, or a verification out
+/// of budget discards the replay and runs the plain computation, which
+/// records the trace afresh; everything executed is charged.  The store
+/// lives on one solver instance and is never written to disk.
+#[derive(Default)]
+pub struct F4PairTrace {
+    traces: FxMap<TraceShape, Vec<TraceStep>>,
+    bytes: u64,
+    cap_bytes: u64,
+}
+
+type TraceShape = (usize, u32, Box<[Mask]>);
+
+struct TraceStep {
+    deg: u32,
+    useful: FxSet<PairKind>,
+    /// New leading monomials of the step, in insertion order.
+    fresh: Box<[Mask]>,
+}
+
+/// Default byte cap of an [`F4PairTrace`].
+pub const TRACE_DEFAULT_CAP_BYTES: u64 = 64 << 20;
+
+impl F4PairTrace {
+    /// An empty store that stops storing new traces past `cap_bytes`.
+    pub fn with_cap(cap_bytes: u64) -> Self {
+        Self {
+            cap_bytes,
+            ..Self::default()
+        }
+    }
+
+    /// Bytes held.
+    pub fn bytes(&self) -> u64 {
+        self.bytes
+    }
+
+    /// Shapes held.
+    pub fn len(&self) -> usize {
+        self.traces.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.traces.is_empty()
+    }
+
+    fn shape_bytes(key: &TraceShape, steps: &[TraceStep]) -> u64 {
+        48 + 8 * key.2.len() as u64
+            + steps
+                .iter()
+                .map(|t| 48 + 32 * t.useful.capacity() as u64 + 8 * t.fresh.len() as u64)
+                .sum::<u64>()
+    }
+}
+
+/// What [`groebner_basis_f4_inner`] does besides the plain computation.
+enum TraceMode<'a> {
+    Off,
+    /// Run plainly and append each step's trace.
+    Record(&'a mut Vec<TraceStep>),
+    /// Reduce only the pairs the trace lists.
+    Replay(&'a [TraceStep]),
+    /// `initial` is an interreduced basis `G`: one step reducing all its
+    /// pairs and these polynomials; the stats say whether a row was new.
+    Verify(&'a [F2BoolPoly]),
+}
+
+/// Sequential elimination of a step matrix for the trace record (rows are
+/// the reducers, with distinct leads, then the S-rows).  Returns, per
+/// S-row, whether it is productive (see [`F4PairTrace`]; a row that is
+/// not a pair half, `is_half[k] == false`, is productive when independent),
+/// and adds its XORs to `xors` and its other word operations to `ops`.
+fn productive_rows(
+    rows: &[Row],
+    n_reducers: usize,
+    is_half: &[bool],
+    n_cols: usize,
+    xors: &mut u64,
+    ops: &mut u64,
+) -> Vec<bool> {
+    // pivot rows, with the row (matrix position) each came from
+    let mut pivots: Vec<(Row, usize)> = Vec::new();
+    let mut pivot_of = vec![NONE; n_cols];
+    *ops += (n_cols as u64).div_ceil(2);
+    let n = rows.len();
+    let mut orig_lead = vec![usize::MAX; n];
+    let mut final_lead = vec![usize::MAX; n];
+    let mut used_foreign = vec![false; n];
+    for (i, row) in rows.iter().enumerate() {
+        let mut r = row.clone();
+        *ops += (r.end - r.start) as u64;
+        let Some(first) = r.lead_counted(ops) else {
+            continue;
+        };
+        orig_lead[i] = first;
+        let mut lead = Some(first);
+        while let Some(c) = lead {
+            let p = pivot_of[c];
+            if p == NONE {
+                break;
+            }
+            let (prow, owner) = &pivots[p as usize];
+            if orig_lead[*owner] != first {
+                used_foreign[*owner] = true;
+            }
+            for w in prow.start..prow.end {
+                r.bits[w] ^= prow.bits[w];
+            }
+            *xors += (prow.end - prow.start) as u64;
+            r.end = r.end.max(prow.end);
+            lead = r.lead_counted(ops);
+        }
+        if let Some(c) = lead {
+            debug_assert!(i >= n_reducers || c == first, "reducer leads are distinct");
+            final_lead[i] = c;
+            pivot_of[c] = pivots.len() as u32;
+            pivots.push((r, i));
+        }
+    }
+    (n_reducers..n)
+        .map(|i| {
+            final_lead[i] != usize::MAX
+                && (!is_half[i - n_reducers] || final_lead[i] != orig_lead[i] || used_foreign[i])
+        })
+        .collect()
+}
+
 /// The largest matrix a step may build, in 64-bit words (1 GiB), unless
 /// `F4_F2_MAX_MATRIX_WORDS` raises or lowers it for one run.
 pub const MAX_MATRIX_WORDS: u64 = 1 << 27;
@@ -347,7 +638,7 @@ fn max_matrix_words() -> u64 {
 const NONE: u32 = u32::MAX;
 pub const MATRIX_PROFILE_BINS: usize = 6;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 enum PairKind {
     /// The S-polynomial of basis elements `i` and `j`.
     Critical(usize, usize),
@@ -2118,9 +2409,132 @@ pub fn groebner_basis_f4_skeleton(
         max_matrix_words(),
         EARLY_GUARD,
         Some(&mut *skeleton),
+        TraceMode::Off,
     );
     st.skeleton_bytes = skeleton.bytes;
     (basis, st)
+}
+
+/// The shape key of a trace: the unknowns, the inputs' degree and their
+/// sorted monomial support (charged: a word operation a term, the sort,
+/// the hash probe of the lookup).
+fn trace_shape(inputs: &[F2BoolPoly], n_vars: usize) -> TraceShape {
+    let mut support: Vec<Mask> = inputs
+        .iter()
+        .flat_map(|p| p.terms.iter().map(|t| t.mask))
+        .collect();
+    let n_terms = support.len();
+    support.sort_unstable();
+    support.dedup();
+    tally::word_ops(2 * n_terms as u64 + tally::sort_cost(n_terms));
+    tally::hash_probes(1);
+    (
+        n_vars,
+        inputs.iter().map(degree).max().unwrap_or(0),
+        support.into_boxed_slice(),
+    )
+}
+
+/// [`groebner_basis_f4`] through a [`F4PairTrace`] shared with the earlier
+/// systems of the run: replay the trace of the system's shape when there
+/// is one, verify, and fall back to the plain computation (which records
+/// the trace) when there is none or the replay fails.  The basis is the
+/// plain path's; the stats sum the work of every run made — replay,
+/// verification and fallback — and their outcome fields are those of the
+/// run whose basis is returned.
+pub fn groebner_basis_f4_traced(
+    initial: Vec<F2BoolPoly>,
+    n_vars: usize,
+    budget: Option<Duration>,
+    store: &mut F4PairTrace,
+) -> (Vec<F2BoolPoly>, F4Stats) {
+    let started = Instant::now();
+    let remaining = || budget.map(|b| b.saturating_sub(started.elapsed()));
+    let run = |eqs: Vec<F2BoolPoly>, mode: TraceMode<'_>, budget: Option<Duration>| {
+        groebner_basis_f4_inner(
+            eqs,
+            n_vars,
+            budget,
+            None,
+            max_matrix_words(),
+            EARLY_GUARD,
+            None,
+            mode,
+        )
+    };
+    let inputs: Vec<F2BoolPoly> = initial.into_iter().filter(|p| !p.is_zero()).collect();
+    if inputs.is_empty() {
+        return run(inputs, TraceMode::Off, budget);
+    }
+    let key = trace_shape(&inputs, n_vars);
+    // the copies of the inputs a replay and its verification take
+    let copy_cost = || tally::word_ops(inputs.iter().map(|p| p.terms.len() as u64).sum());
+
+    let mut total = F4Stats::default();
+    if let Some(steps) = store.traces.get(&key) {
+        total.trace_replays = 1;
+        copy_cost();
+        let (basis, st) = run(inputs.clone(), TraceMode::Replay(steps), remaining());
+        total.absorb(&st);
+        if st.timed_out || st.oversize {
+            // the budget or the size guard ended the replay: a plain run
+            // would meet it too
+            total.take_outcome(&st);
+            total.wall_ns = started.elapsed().as_nanos() as u64;
+            total.trace_bytes = store.bytes;
+            return (basis, total);
+        }
+        let accepted = if st.trace_mismatches != 0 {
+            false
+        } else if basis.len() == 1 && is_one(&basis[0]) {
+            // `1` lies in the ideal: a certificate on its own
+            true
+        } else {
+            total.trace_verifications = 1;
+            copy_cost();
+            let (_, vst) = run(basis.clone(), TraceMode::Verify(&inputs), remaining());
+            total.absorb(&vst);
+            total.trace_verify_word_xors += vst.word_xors;
+            total.trace_verify_divisor_tests += vst.divisor_tests;
+            total.trace_verify_pairs += vst.pairs_reduced + vst.field_pairs_reduced;
+            let ok = vst.trace_verify_failures == 0 && !vst.timed_out && !vst.oversize;
+            total.trace_verify_failures = u64::from(!ok);
+            ok
+        };
+        if accepted {
+            total.trace_hits = 1;
+            total.take_outcome(&st);
+            total.wall_ns = started.elapsed().as_nanos() as u64;
+            total.trace_bytes = store.bytes;
+            return (basis, total);
+        }
+        total.trace_fallbacks = 1;
+    }
+    // The plain computation, recording the shape's trace.
+    let mut steps = Vec::new();
+    let (basis, st) = run(inputs, TraceMode::Record(&mut steps), remaining());
+    total.absorb(&st);
+    total.take_outcome(&st);
+    if !st.timed_out && !st.oversize {
+        let added = F4PairTrace::shape_bytes(&key, &steps);
+        let removed = store
+            .traces
+            .get(&key)
+            .map_or(0, |old| F4PairTrace::shape_bytes(&key, old));
+        let after = store.bytes.saturating_sub(removed).saturating_add(added);
+        if after <= store.cap_bytes {
+            total.trace_records = 1;
+            store.bytes = after;
+            store.traces.insert(key, steps);
+        } else if removed > 0 {
+            // a failed trace that cannot be replaced is dropped
+            store.bytes = store.bytes.saturating_sub(removed);
+            store.traces.remove(&key);
+        }
+    }
+    total.wall_ns = started.elapsed().as_nanos() as u64;
+    total.trace_bytes = store.bytes;
+    (basis, total)
 }
 
 /// The variables the degree-1 elements of `polys` pin: one bit per
@@ -2154,6 +2568,7 @@ pub fn groebner_basis_f4_until(
         max_matrix_words(),
         EARLY_GUARD,
         None,
+        TraceMode::Off,
     )
 }
 
@@ -2210,6 +2625,7 @@ fn groebner_basis_f4_inner(
     max_words: u64,
     guard: EarlyGuard,
     mut skel: Option<&mut F4Skeleton>,
+    mut trace: TraceMode<'_>,
 ) -> (Vec<F2BoolPoly>, F4Stats) {
     static BATCH_INSERTS: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     let batch_inserts =
@@ -2269,20 +2685,26 @@ fn groebner_basis_f4_inner(
         }
     }
 
-    // The initial echelon: distinct leading monomials to start from.
-    let t = Instant::now();
-    let cols = Columns::from_monomials(inputs.iter().flat_map(|p| p.terms.iter().map(|t| t.mask)));
-    let rows: Vec<Row> = inputs.iter().map(|p| cols.pack(p)).collect();
-    cols.charge_pack(&inputs);
-    st.build_ns += t.elapsed().as_nanos() as u64;
-    let t = Instant::now();
-    let Some(pivots) = echelon(rows, cols.monos.len(), &mut st, deadline) else {
-        st.timed_out = true;
+    // The initial echelon: distinct leading monomials to start from.  A
+    // verification starts from the interreduced basis itself.
+    let mut start: Vec<F2BoolPoly> = if matches!(trace, TraceMode::Verify(_)) {
+        inputs.clone()
+    } else {
+        let t = Instant::now();
+        let cols =
+            Columns::from_monomials(inputs.iter().flat_map(|p| p.terms.iter().map(|t| t.mask)));
+        let rows: Vec<Row> = inputs.iter().map(|p| cols.pack(p)).collect();
+        cols.charge_pack(&inputs);
+        st.build_ns += t.elapsed().as_nanos() as u64;
+        let t = Instant::now();
+        let Some(pivots) = echelon(rows, cols.monos.len(), &mut st, deadline) else {
+            st.timed_out = true;
+            st.eliminate_ns += t.elapsed().as_nanos() as u64;
+            return finish(inputs, st);
+        };
         st.eliminate_ns += t.elapsed().as_nanos() as u64;
-        return finish(inputs, st);
+        pivots.iter().map(|(_, r)| cols.unpack(r, n_vars)).collect()
     };
-    st.eliminate_ns += t.elapsed().as_nanos() as u64;
-    let mut start: Vec<F2BoolPoly> = pivots.iter().map(|(_, r)| cols.unpack(r, n_vars)).collect();
     if start.iter().any(is_one) {
         return finish(one(), st);
     }
@@ -2316,24 +2738,78 @@ fn groebner_basis_f4_inner(
     let mut field_keys: Vec<(Mask, usize)> = Vec::new();
     let mut lcm_columns: FxSet<Mask> = FxSet::default();
     let mut active: Vec<usize> = Vec::new();
-    'steps: while !s.pairs.is_empty() {
+    // The trace step a replay is at; a verification's single step.
+    let mut trace_at = 0usize;
+    let mut verify_pending = matches!(trace, TraceMode::Verify(_));
+    let replay_steps: Option<&[TraceStep]> = match &trace {
+        TraceMode::Replay(steps) => Some(*steps),
+        _ => None,
+    };
+    'steps: while !s.pairs.is_empty() || verify_pending {
         if deadline.is_some_and(|d| Instant::now() >= d) {
             st.timed_out = true;
             break;
         }
         // the scan for the lowest degree and the partition, one a pair
         tally::word_ops(2 * s.pairs.len() as u64);
-        let d = s.pairs.iter().map(|p| p.deg).min().unwrap();
-        // the partition in place: both sides keep their order
         selected.clear();
-        s.pairs.retain(|p| {
-            if p.deg == d {
-                selected.push(*p);
-                false
-            } else {
-                true
+        let mut replay_step: Option<&TraceStep> = None;
+        let d = match (&trace, replay_steps) {
+            (TraceMode::Verify(_), _) => {
+                // every pair of every degree, in one matrix
+                verify_pending = false;
+                selected.append(&mut s.pairs);
+                selected.iter().map(|p| p.deg).max().unwrap_or(0)
             }
-        });
+            (_, Some(steps)) => {
+                let Some(ts) = steps.get(trace_at) else {
+                    // past the trace: the rest is left to the verification
+                    st.trace_pairs_dropped += s.pairs.len() as u64;
+                    s.pairs.clear();
+                    break 'steps;
+                };
+                trace_at += 1;
+                replay_step = Some(ts);
+                let d = ts.deg;
+                let (mut probes, mut dropped) = (0u64, 0u64);
+                s.pairs.retain(|p| {
+                    if p.deg == d {
+                        probes += 1;
+                        if ts.useful.contains(&p.kind) {
+                            selected.push(*p);
+                        } else {
+                            dropped += 1;
+                        }
+                        false
+                    } else {
+                        true
+                    }
+                });
+                tally::hash_probes(probes);
+                st.trace_pairs_dropped += dropped;
+                if selected.is_empty() {
+                    if !ts.fresh.is_empty() {
+                        st.trace_mismatches = 1;
+                        return finish(Vec::new(), st);
+                    }
+                    continue 'steps;
+                }
+                d
+            }
+            _ => {
+                let d = s.pairs.iter().map(|p| p.deg).min().unwrap();
+                // the partition in place: both sides keep their order
+                s.pairs.retain(|p| {
+                    if p.deg == d {
+                        selected.push(*p);
+                        false
+                    } else {
+                        true
+                    }
+                });
+                d
+            }
+        };
         st.steps += 1;
         st.degree_reached = st.degree_reached.max(d);
 
@@ -2488,7 +2964,20 @@ fn groebner_basis_f4_inner(
                 .sum::<u64>()
                 + field_rows.len() as u64,
         );
+        if matches!(trace, TraceMode::Record(_)) {
+            // keep the keys beside their rows for the provenance
+            let mut k = 0;
+            field_keys.retain(|_| {
+                k += 1;
+                !field_rows[k - 1].is_zero()
+            });
+        }
         field_rows.retain(|p| !p.is_zero());
+        if let TraceMode::Verify(extra) = &trace {
+            // the inputs, each a row of its own
+            tally::word_ops(extra.iter().map(|p| p.terms.len() as u64).sum());
+            field_rows.extend(extra.iter().filter(|p| !p.is_zero()).cloned());
+        }
 
         // Symbolic preprocessing.  Every monomial other than an S-pair's
         // lcm is examined once; a divisible one gets a reducer led by it.
@@ -2764,11 +3253,20 @@ fn groebner_basis_f4_inner(
         st.peak_matrix_bytes = st.peak_matrix_bytes.max(words * n_rows as u64 * 8);
         // Reducers first, each on a column of its own; then the S-rows by
         // leading monomial, so the second half of a pair meets the first.
-        let mut s_rows: Vec<&F2BoolPoly> = half_rows.iter().chain(field_rows.iter()).collect();
+        let n_half = half_rows.len();
+        let s_at = |i: usize| -> &F2BoolPoly {
+            if i < n_half {
+                &half_rows[i]
+            } else {
+                &field_rows[i - n_half]
+            }
+        };
+        let mut s_order: Vec<usize> = (0..n_half + field_rows.len()).collect();
         // the keys, the sort, and the degree scan of every row below
-        tally::word_ops(s_rows.len() as u64 + tally::sort_cost(s_rows.len()) + n_rows as u64);
+        tally::word_ops(s_order.len() as u64 + tally::sort_cost(s_order.len()) + n_rows as u64);
         // stable: rows sharing a leading monomial keep their order
-        s_rows.sort_by_cached_key(|p| std::cmp::Reverse(mono_key(p.lt().unwrap())));
+        s_order.sort_by_cached_key(|&i| std::cmp::Reverse(mono_key(s_at(i).lt().unwrap())));
+        let s_rows: Vec<&F2BoolPoly> = s_order.iter().map(|&i| s_at(i)).collect();
         // Every row is a monomial multiple, canonical, so its degree is its
         // leading term's.
         for p in reducers.iter().chain(s_rows.iter().copied()) {
@@ -2788,6 +3286,33 @@ fn groebner_basis_f4_inner(
         };
         cols.charge_pack(all.iter().copied());
         st.build_ns += t.elapsed().as_nanos() as u64;
+
+        // The trace record: which S-rows were productive, by their index
+        // in `half_rows ++ field_rows` (a pass of its own, charged).
+        let productive: Option<Vec<bool>> = if matches!(trace, TraceMode::Record(_)) {
+            let is_half: Vec<bool> = s_order.iter().map(|&i| i < n_half).collect();
+            let (mut xors, mut ops) = (0u64, 0u64);
+            let by_pos = productive_rows(
+                &rows,
+                reducers.len(),
+                &is_half,
+                cols.monos.len(),
+                &mut xors,
+                &mut ops,
+            );
+            st.peak_matrix_bytes = st.peak_matrix_bytes.max(2 * words * n_rows as u64 * 8);
+            st.word_xors += xors;
+            st.word_xors_performed += xors;
+            st.trace_record_xors += xors;
+            tally::word_ops(ops + by_pos.len() as u64);
+            let mut by_index = vec![false; by_pos.len()];
+            for (pos, &i) in s_order.iter().enumerate() {
+                by_index[i] = by_pos[pos];
+            }
+            Some(by_index)
+        } else {
+            None
+        };
 
         let t = Instant::now();
         let pair_row_count = all.len() - reducers.len();
@@ -2820,13 +3345,64 @@ fn groebner_basis_f4_inner(
             *b = b.saturating_add(skel_added).saturating_sub(skel_removed);
         }
         tally::word_ops(fresh.len() as u64 + tally::sort_cost(fresh.len()));
+        if matches!(trace, TraceMode::Verify(_)) {
+            // the verdict: a new row means `G` was not a Gröbner basis of
+            // the inputs' ideal
+            st.trace_verify_failures = u64::from(!fresh.is_empty());
+            return finish(Vec::new(), st);
+        }
+        fresh.sort_by(|a, b| cmp_mono(a.lt().unwrap(), b.lt().unwrap()));
+        if let (TraceMode::Record(steps), Some(productive)) = (&mut trace, &productive) {
+            // a pair is useful when one of its rows was productive
+            let mut row_of: FxMap<(Mask, usize), usize> = FxMap::default();
+            for (i, &key) in half_keys.iter().chain(&field_keys).enumerate() {
+                row_of.insert(key, i);
+            }
+            let mut probes = half_keys.len() + field_keys.len();
+            let useful: FxSet<PairKind> = selected
+                .iter()
+                .filter(|p| {
+                    let keys: &[(Mask, usize)] = &match p.kind {
+                        PairKind::Critical(i, j) => {
+                            vec![(p.lcm & !s.lm[i], i), (p.lcm & !s.lm[j], j)]
+                        }
+                        PairKind::Field(g, v) => vec![(bit(v), g)],
+                    };
+                    probes += keys.len();
+                    keys.iter()
+                        .any(|k| row_of.get(k).is_some_and(|&r| productive[r]))
+                })
+                .map(|p| p.kind)
+                .collect();
+            tally::hash_probes((probes + useful.len()) as u64);
+            tally::word_ops(fresh.len() as u64);
+            steps.push(TraceStep {
+                deg: d,
+                useful,
+                fresh: fresh.iter().map(|p| p.lt().unwrap().mask).collect(),
+            });
+        }
         if fresh.iter().any(is_one) {
             return finish(one(), st);
+        }
+        if let Some(ts) = replay_step {
+            // the step must lead where the recorded one led
+            tally::word_ops(1 + fresh.len() as u64);
+            if ts.fresh.len() != fresh.len()
+                || ts
+                    .fresh
+                    .iter()
+                    .zip(&fresh)
+                    .any(|(&m, p)| p.lt().unwrap().mask != m)
+            {
+                st.trace_mismatches = 1;
+                return finish(Vec::new(), st);
+            }
+            st.trace_steps_matched += 1;
         }
         if !fresh.is_empty() {
             st.solving_degree = st.solving_degree.max(d);
         }
-        fresh.sort_by(|a, b| cmp_mono(a.lt().unwrap(), b.lt().unwrap()));
         st.new_elements += fresh.len() as u64;
         if batch_inserts {
             s.insert_batch(fresh, &mut st);
@@ -3913,7 +4489,8 @@ mod tests {
         guard: EarlyGuard,
     ) -> (Vec<F2BoolPoly>, F4Stats, tally::Tally) {
         let before = tally::snapshot();
-        let (gb, st) = groebner_basis_f4_inner(eqs, n, None, None, max_words, guard, None);
+        let (gb, st) =
+            groebner_basis_f4_inner(eqs, n, None, None, max_words, guard, None, TraceMode::Off);
         (gb, st, tally::snapshot().since(before))
     }
 
@@ -4148,6 +4725,272 @@ mod tests {
         }
         assert!(skeleton.is_empty());
         assert_eq!(skeleton.bytes(), 0);
+    }
+
+    /// The plain run and the traced run return the same basis, and the
+    /// traced run's verdict counters are consistent.
+    fn check_traced(eqs: &[F2BoolPoly], n: usize, store: &mut F4PairTrace, what: &str) -> F4Stats {
+        let plain = groebner_basis_f4(eqs.to_vec(), n, None);
+        let traced = groebner_basis_f4_traced(eqs.to_vec(), n, None, store);
+        assert_eq!(traced.0, plain.0, "{what}: bases differ");
+        let t = &traced.1;
+        assert!(!t.timed_out && !t.oversize, "{what}");
+        assert_eq!(t.trace_hits + t.trace_fallbacks, t.trace_replays, "{what}");
+        assert!(
+            t.trace_hits + t.trace_records <= 1 + t.trace_fallbacks,
+            "{what}"
+        );
+        assert_eq!(t.basis_len, plain.1.basis_len, "{what}");
+        if t.trace_replays == 0 {
+            // a recording run is the plain run plus its provenance pass
+            assert_eq!(
+                t.word_xors,
+                plain.1.word_xors + t.trace_record_xors,
+                "{what}"
+            );
+            assert_eq!(t.pairs_reduced, plain.1.pairs_reduced, "{what}");
+            assert_eq!(t.solving_degree, plain.1.solving_degree, "{what}");
+        }
+        traced.1
+    }
+
+    /// Same-shape systems that differ only in their affine part: one
+    /// quadratic template, each system adding random linear and constant
+    /// terms (the way a target enters a descent system).
+    fn affine_variation_batch(
+        n: usize,
+        m: usize,
+        count: usize,
+        rng: &mut StdRng,
+    ) -> Vec<Vec<F2BoolPoly>> {
+        let template = random_quadratic(n, m, rng);
+        (0..count)
+            .map(|_| {
+                template
+                    .iter()
+                    .map(|p| {
+                        let mut kept: Vec<u64> = p
+                            .terms
+                            .iter()
+                            .map(|t| mask_low64(t.mask))
+                            .filter(|&m| m.count_ones() >= 2)
+                            .collect();
+                        kept.extend((0..n).map(|i| 1u64 << i).filter(|_| rng.gen_bool(0.5)));
+                        if rng.gen_bool(0.5) {
+                            kept.push(0);
+                        }
+                        poly(&kept, n)
+                    })
+                    .collect()
+            })
+            .collect()
+    }
+
+    /// **The trace changes no basis** over many random same-shape systems
+    /// — one template support, each system keeping a random 80% of the
+    /// terms of each equation (the union support, the shape key, is mostly
+    /// the template's), or each system varying only its affine part — and
+    /// a system replaying its own trace is accepted.
+    #[test]
+    fn trace_matches_the_plain_path_on_same_shape_systems() {
+        let mut total = F4Stats::default();
+        let mut self_hits = 0;
+        for (seed, n, m, affine) in [
+            (1u64, 8usize, 8usize, false),
+            (2, 9, 9, false),
+            (3, 10, 12, false),
+            (4, 7, 5, false),
+            (5, 8, 8, true),
+            (6, 10, 10, true),
+            (7, 9, 12, true),
+        ] {
+            let mut rng = StdRng::seed_from_u64(0x7ace_0 + seed);
+            let batch = if affine {
+                affine_variation_batch(n, m, 24, &mut rng)
+            } else {
+                same_shape_batch(n, m, 24, 0.8, &mut rng)
+            };
+            let mut store = F4PairTrace::with_cap(TRACE_DEFAULT_CAP_BYTES);
+            // the recorded system itself replays without a fallback
+            check_traced(&batch[0], n, &mut store, "record");
+            let again = check_traced(&batch[0], n, &mut store, "self replay");
+            assert_eq!(again.trace_replays, 1);
+            assert_eq!(again.trace_mismatches, 0, "n={n}: self replay mismatched");
+            self_hits += again.trace_hits;
+            for (k, eqs) in batch.iter().enumerate() {
+                let st = check_traced(eqs, n, &mut store, &format!("n={n} system {k}"));
+                total.absorb(&st);
+            }
+            assert!(store.bytes() > 0 && !store.is_empty());
+        }
+        eprintln!(
+            "random same-shape: records {} replays {} hits {} fallbacks {} (mismatches {}, \
+             verify failures {}), verify xors {}, pairs dropped {}",
+            total.trace_records,
+            total.trace_replays,
+            total.trace_hits,
+            total.trace_fallbacks,
+            total.trace_mismatches,
+            total.trace_verify_failures,
+            total.trace_verify_word_xors,
+            total.trace_pairs_dropped,
+        );
+        assert!(total.trace_replays > 0);
+        assert_eq!(self_hits, 7, "a self replay failed its verification");
+    }
+
+    /// **A wrong trace is caught.**  A trace recorded on one system is
+    /// stored under the key of systems it does not fit — other random
+    /// systems, inconsistent ones, degenerate ones, ones with extra linear
+    /// equations — and an empty trace (no pair reduced at all) is tried on
+    /// every one: the basis is always the plain one, the verification or
+    /// the mismatch check refuses the replays that would be wrong, and an
+    /// empty trace is accepted only where the inputs' echelon already is
+    /// the basis.
+    #[test]
+    fn a_wrong_trace_falls_back_to_the_plain_path() {
+        let n = 8;
+        let mut rng = StdRng::seed_from_u64(0xfa11);
+        let donor = random_quadratic(n, 8, &mut rng);
+        let mut donor_store = F4PairTrace::with_cap(TRACE_DEFAULT_CAP_BYTES);
+        check_traced(&donor, n, &mut donor_store, "donor");
+        let donor_steps: Vec<&TraceStep> =
+            donor_store.traces.values().next().unwrap().iter().collect();
+        assert!(!donor_steps.is_empty());
+        let clone_steps = || -> Vec<TraceStep> {
+            donor_steps
+                .iter()
+                .map(|t| TraceStep {
+                    deg: t.deg,
+                    useful: t.useful.clone(),
+                    fresh: t.fresh.clone(),
+                })
+                .collect()
+        };
+        let mut targets: Vec<(String, Vec<F2BoolPoly>)> = Vec::new();
+        for k in 0..12 {
+            targets.push((format!("random {k}"), random_quadratic(n, 8, &mut rng)));
+        }
+        // inconsistent: v0 = 0 and v0 = 1 among quadrics
+        let mut bad = random_quadratic(n, 6, &mut rng);
+        bad.push(poly(&[1], n));
+        bad.push(poly(&[1, 0], n));
+        targets.push(("inconsistent".into(), bad));
+        // degenerate: one equation, many solutions; or a single product
+        targets.push(("one equation".into(), random_quadratic(n, 1, &mut rng)));
+        targets.push(("monomial".into(), vec![poly(&[0b11], n)]));
+        // linear system: its echelon is already the reduced basis
+        targets.push((
+            "linear".into(),
+            (0..n).map(|i| poly(&[1u64 << i, 0], n)).collect(),
+        ));
+        // more equations than the donor, with linear ones
+        let mut wide = random_quadratic(n, 8, &mut rng);
+        wide.extend((0..3).map(|i| poly(&[1u64 << i, 1u64 << (i + 3)], n)));
+        targets.push(("with linear".into(), wide));
+        // the donor with one equation dropped and one term changed
+        let mut near = donor.clone();
+        near.pop();
+        near[0] = near[0].add(&poly(&[0b101], n));
+        targets.push(("near donor".into(), near));
+
+        let (mut fallbacks, mut verify_failures, mut empty_hits) = (0, 0, 0);
+        for (what, eqs) in &targets {
+            let inputs: Vec<F2BoolPoly> = eqs.iter().filter(|p| !p.is_zero()).cloned().collect();
+            let key = trace_shape(&inputs, n);
+            for (label, steps) in [("donor trace", clone_steps()), ("empty trace", Vec::new())] {
+                let mut store = F4PairTrace::with_cap(TRACE_DEFAULT_CAP_BYTES);
+                store.traces.insert(key.clone(), steps);
+                let st = check_traced(eqs, n, &mut store, &format!("{what}, {label}"));
+                assert_eq!(st.trace_replays, 1, "{what}, {label}");
+                fallbacks += st.trace_fallbacks;
+                verify_failures += st.trace_verify_failures;
+                if label == "empty trace" && st.trace_hits == 1 {
+                    empty_hits += 1;
+                }
+                if st.trace_fallbacks == 1 {
+                    // the fallback re-records the shape
+                    assert_eq!(st.trace_records, 1, "{what}, {label}");
+                }
+            }
+        }
+        eprintln!(
+            "wrong traces: {} replays, {fallbacks} fallbacks ({verify_failures} by \
+             verification), {empty_hits} empty traces accepted",
+            2 * targets.len()
+        );
+        assert!(fallbacks >= targets.len() as u64);
+        assert!(verify_failures > 0);
+        // the linear system and the single monomial need no pair
+        assert!(empty_hits >= 1);
+    }
+
+    /// **The verification alone refuses an incomplete basis.**  Run the
+    /// verification directly on the inputs' interreduced echelon (what an
+    /// empty replay leaves) for systems whose basis needs pairs: every one
+    /// fails; on the plain run's own reduced basis every one passes.
+    #[test]
+    fn the_verification_pass_decides_the_groebner_property() {
+        let n = 8;
+        let mut rng = StdRng::seed_from_u64(0x7e51);
+        for k in 0..16 {
+            let eqs = random_quadratic(n, 6 + k % 4, &mut rng);
+            let (gb, _) = groebner_basis_f4(eqs.clone(), n, None);
+            if gb.len() == 1 && is_one(&gb[0]) {
+                continue;
+            }
+            let (_, ok) = groebner_basis_f4_inner(
+                gb.clone(),
+                n,
+                None,
+                None,
+                max_matrix_words(),
+                EARLY_GUARD,
+                None,
+                TraceMode::Verify(&eqs),
+            );
+            assert_eq!(ok.trace_verify_failures, 0, "system {k}: the basis fails");
+            assert_eq!(ok.steps, 1);
+            let mut st = F4Stats::default();
+            let nonzero: Vec<F2BoolPoly> = eqs.iter().filter(|p| !p.is_zero()).cloned().collect();
+            let partial = interreduce(nonzero, n, &mut st);
+            if partial == gb {
+                continue;
+            }
+            let (_, bad) = groebner_basis_f4_inner(
+                partial,
+                n,
+                None,
+                None,
+                max_matrix_words(),
+                EARLY_GUARD,
+                None,
+                TraceMode::Verify(&eqs),
+            );
+            assert_eq!(
+                bad.trace_verify_failures, 1,
+                "system {k}: a partial basis passes"
+            );
+            // the reduced basis of a proper sub-ideal also fails: the inputs
+            // are not all in it
+            let (sub, _) = groebner_basis_f4(eqs[..eqs.len() - 1].to_vec(), n, None);
+            if sub != gb {
+                let (_, bad) = groebner_basis_f4_inner(
+                    sub,
+                    n,
+                    None,
+                    None,
+                    max_matrix_words(),
+                    EARLY_GUARD,
+                    None,
+                    TraceMode::Verify(&eqs),
+                );
+                assert_eq!(
+                    bad.trace_verify_failures, 1,
+                    "system {k}: a sub-ideal passes"
+                );
+            }
+        }
     }
 }
 
