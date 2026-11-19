@@ -10,6 +10,7 @@ on:
       - 'tests/ct229_impl/probe.rs'
       - 'tests/ct231_impl/probe.rs'
       - 'tests/ct233_impl/probe.rs'
+      - 'tests/ct235_impl/probe.rs'
       - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/**'
       - 'src/prime_hyperelliptic/**'
       - 'Cargo.toml'
@@ -24,6 +25,7 @@ on:
       - 'tests/ct229_impl/probe.rs'
       - 'tests/ct231_impl/probe.rs'
       - 'tests/ct233_impl/probe.rs'
+      - 'tests/ct235_impl/probe.rs'
       - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/**'
   workflow_dispatch:
 
@@ -145,6 +147,7 @@ jobs:
             /tests/ct229_impl/probe.rs
             /tests/ct231_impl/probe.rs
             /tests/ct233_impl/probe.rs
+            /tests/ct235_impl/probe.rs
             /.cargo/
             /build.rs
             /crates/
@@ -199,3 +202,8 @@ jobs:
           cargo test --locked --release --test ct226_native_genus4_transferred_ic ct233_ -- --nocapture 2>&1 | tee /tmp/ct233-native.log
           test "$(grep -c 'CT233_PANEL_JSON' /tmp/ct233-native.log)" -eq 4
           grep 'CT233_PANEL_JSON' /tmp/ct233-native.log
+          # CT235: Q73-only four-round ABBA/BAAB paired cold complete source solver.
+          # This does NOT assert matched rho/frontier-IC or a speedup.
+          cargo test --locked --release --test ct226_native_genus4_transferred_ic ct235_ -- --nocapture --test-threads=1 2>&1 | tee /tmp/ct235-native.log
+          test "$(grep -c 'CT235_SINGLE_JSON' /tmp/ct235-native.log)" -eq 16
+          grep 'CT235_SINGLE_JSON' /tmp/ct235-native.log
