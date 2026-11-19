@@ -476,3 +476,240 @@ mod graph_tests {
         }
     }
 }
+
+
+// --- Rank-one row-replacement gate: see RR9_RANKONE_UPDATE_PROTOCOL_20261119.md ---
+// This changes chart construction ONLY. It does NOT enumerate unknown indices
+// nonexhaustively; it never calls an EC group table during the candidate test.
+fn inv_a_block(rows:&[Row;4])->Option<Graph4> {
+    let mut a=[[0u64;8];4];
+    for i in 0..4 {
+        for k in 0..4 {a[i][k]=rows[i][k];}
+        a[i][4+i]=1;
+    }
+    for k in 0..4 {
+        let pivot=(k..4).find(|&i|a[i][k]!=0)?;
+        if pivot!=k {a.swap(k,pivot);}
+        let ip=inv(a[k][k]);
+        for t in k..8 {a[k][t]=mul(a[k][t],ip);}
+        for i in 0..4 {
+            if i==k {continue;}
+            let c=a[i][k];
+            if c==0 {continue;}
+            for t in k+1..8 {a[i][t]=sub(a[i][t],mul(c,a[k][t]));}
+            a[i][k]=0;
+        }
+    }
+    Some(std::array::from_fn(|i|std::array::from_fn(|k|a[i][k+4])))
+}
+
+// A' = A + e_j (a'_j-a_j), B' = B + e_j (b'_j-b_j).
+// Let u=A^-1 e_j, d=1+(a'_j-a_j)u. Then
+// M' = M + (u/d) (b'_j-a'_j M), for d != 0.
+// d=0 is exactly the singular A' case; NEVER silently accept it.
+fn row_replace_chart(
+    old_m:&Graph4, old_inv_a:&Graph4, old_row:&Row,
+    new_row:&Row, j:usize
+)->Option<Graph4> {
+    assert!(j<4);
+    let mut d=1u64;
+    for k in 0..4 {
+        d=add(d,mul(sub(new_row[k],old_row[k]),old_inv_a[k][j]));
+    }
+    if d==0 {return None;}
+    let id=inv(d);
+    let mut v=[0u64;4];
+    for k in 0..4 {
+        let mut t=new_row[k+4];
+        for i in 0..4 {t=sub(t,mul(new_row[i],old_m[i][k]));}
+        v[k]=t;
+    }
+    let mut m=*old_m;
+    for i in 0..4 {
+        let ui=mul(old_inv_a[i][j],id);
+        for k in 0..4 {
+            m[i][k]=add(m[i][k],mul(ui,v[k]));
+        }
+    }
+    Some(m)
+}
+
+struct RowUpdateContext {
+    target:Point,
+    old_points:[Point;4],
+    right_points:[Point;4],
+    old_rows:[Row;4],
+    right_rows:[Row;4],
+    choices:[Vec<(Point,Row)>;4],
+}
+
+fn rowupdate_contexts()->Vec<RowUpdateContext> {
+    let mut ar=Arithmetic::default();
+    let base=canonical_base(&mut ar,8);
+    let slots=supports(&mut ar,&base);
+    let planted=replay(&mut ar,&slots,[0u8;8]);
+    assert_ne!(planted,None);
+    assert_ne!(planted,G);
+    let mut out=Vec::new();
+    for target in [G,planted] {
+        let old_points=std::array::from_fn(|i|slots[i][0]);
+        let right_points=std::array::from_fn(|i|slots[i+4][0]);
+        let old_rows=std::array::from_fn(|i|row(old_points[i],target));
+        let right_rows=std::array::from_fn(|i|row(right_points[i],target));
+        let choices=std::array::from_fn(|j|
+            slots[j].iter().copied().map(|q|(q,row(q,target))).collect());
+        out.push(RowUpdateContext{
+            target,old_points,right_points,old_rows,right_rows,choices
+        });
+    }
+    out
+}
+
+fn rowupdate_original_curve_cases(
+    contexts:&[RowUpdateContext]
+)->Vec<serde_json::Value> {
+    let mut out=Vec::new();
+    for ctx in contexts {
+        let old_m=graph_chart(ctx.old_rows).expect("base chart must be valid").0;
+        let inv_a=inv_a_block(&ctx.old_rows).expect("base A must be invertible");
+        let (right_m,right_det)=graph_chart(ctx.right_rows)
+            .expect("right chart must be valid");
+        for j in 0..4 {
+            for (choice,(point,new_row)) in ctx.choices[j].iter().enumerate() {
+                let mut changed=ctx.old_rows;
+                changed[j]=*new_row;
+                let direct=graph_chart(changed);
+                let updated=row_replace_chart(
+                    &old_m,&inv_a,&ctx.old_rows[j],new_row,j);
+                assert_eq!(direct.map(|x|x.0),updated,"rank-one chart mismatch");
+                let (chart,det_l)=direct.expect("original B8 fixture must be nonsingular");
+                let mut all=[[0u64;8];8];
+                all[..4].copy_from_slice(&changed);
+                all[4..].copy_from_slice(&ctx.right_rows);
+                let exact=det8(all);
+                let schur=mul(mul(det_l,right_det),
+                              det_graph_difference(&chart,&right_m));
+                assert_eq!(exact,schur,"8x8 residue mismatch");
+                out.push(json!({
+                    "target":ctx.target,"row":j,"choice":choice,
+                    "old_left_points":ctx.old_points,
+                    "right_points":ctx.right_points,
+                    "new_leaf":point,
+                    "updated_chart":updated,
+                    "fresh_chart":chart,
+                    "det8":exact,
+                    "schur":schur
+                }));
+            }
+        }
+    }
+    out
+}
+
+fn benchmark_rowupdates(
+    ctxs:&[RowUpdateContext], use_update:bool, reps:usize
+)->(f64,u64) {
+    let start=Instant::now();
+    let mut digest=0u64;
+    for _ in 0..reps {
+        for ctx in ctxs {
+            if use_update {
+                // Charge base chart AND old inverse once per 64 sibling updates.
+                let m=graph_chart(ctx.old_rows).unwrap().0;
+                let ia=inv_a_block(&ctx.old_rows).unwrap();
+                for j in 0..4 {
+                    for (_,r) in &ctx.choices[j] {
+                        let next=row_replace_chart(
+                            &m,&ia,&ctx.old_rows[j],r,j).unwrap();
+                        digest=add(digest,std::hint::black_box(next[0][0]));
+                    }
+                }
+            } else {
+                for j in 0..4 {
+                    for (_,r) in &ctx.choices[j] {
+                        let mut changed=ctx.old_rows;
+                        changed[j]=*r;
+                        let next=graph_chart(changed).unwrap().0;
+                        digest=add(digest,std::hint::black_box(next[0][0]));
+                    }
+                }
+            }
+        }
+    }
+    std::hint::black_box(digest);
+    (start.elapsed().as_secs_f64()*1000.0,digest)
+}
+
+pub(crate) fn prime31_rowupdate_main() {
+    let contexts=rowupdate_contexts();
+    let cases=rowupdate_original_curve_cases(&contexts);
+    assert_eq!(cases.len(),128);
+    const REPS:usize=500;
+    let a1=benchmark_rowupdates(&contexts,false,REPS);
+    let b1=benchmark_rowupdates(&contexts,true,REPS);
+    let b2=benchmark_rowupdates(&contexts,true,REPS);
+    let a2=benchmark_rowupdates(&contexts,false,REPS);
+    assert_eq!(a1.1,b1.1);
+    assert_eq!(a1.1,b2.1);
+    assert_eq!(a1.1,a2.1);
+    println!("{}",serde_json::to_string_pretty(&json!({
+        "scope":"B8 Prime31 RR9 rank-one four-chart preprocessing-only gate",
+        "p":P,"group_order":2_147_446_831u64,
+        "public_only":true,
+        "generic_group_table_in_candidate":false,
+        "full_b8_pair_comparisons_unchanged":16u64.pow(8),
+        "public_residuals":2,
+        "original_curve_swaps_checked":cases.len(),
+        "bench_repetitions":REPS,
+        "timings_order":"fresh,updated,updated,fresh",
+        "timings_ms":[a1.0,b1.0,b2.0,a2.0],
+        "digest":a1.1,
+        "updated_setup_charged_once_per_64_replacements":true,
+        "candidate_exhaustive_unknown_index":true,
+        "complete_solver_speedup_claim":false,
+        "pcc":"unverified",
+        "cases":cases
+    })).unwrap());
+}
+
+#[cfg(test)]
+mod rowupdate_tests {
+    use super::*;
+    #[test]
+    fn synthetic_rankone_and_singular_gate() {
+        let mut s=0x24b16822u64;
+        let mut checked=0usize;
+        for t in 0..128usize {
+            let mut next=||{s=s.wrapping_mul(6364136223846793005).wrapping_add(1); (s>>32)%P};
+            let mut rows=[[0u64;8];4];
+            for rr in &mut rows {for a in rr { *a=next(); }}
+            let Some((m,_))=graph_chart(rows) else {continue;};
+            let ia=inv_a_block(&rows).unwrap();
+            let j=t%4;
+            let mut changed=rows;
+            for k in 0..8 {changed[j][k]=next();}
+            assert_eq!(
+                row_replace_chart(&m,&ia,&rows[j],&changed[j],j),
+                graph_chart(changed).map(|c|c.0));
+            checked+=1;
+        }
+        assert_eq!(checked,128);
+        // Force an exact duplicate row in A, so the rank-one denominator is zero.
+        let mut x=[[0u64;8];4];
+        for i in 0..4 {x[i][i]=1;}
+        let m=graph_chart(x).unwrap().0;
+        let ia=inv_a_block(&x).unwrap();
+        let mut changed=x;
+        changed[0]=x[1];
+        assert!(row_replace_chart(&m,&ia,&x[0],&changed[0],0).is_none());
+        assert!(graph_chart(changed).is_none());
+    }
+    #[test]
+    fn original_prime31_b8_rankone_128_cases() {
+        let ctxs=rowupdate_contexts();
+        assert_eq!(rowupdate_original_curve_cases(&ctxs).len(),128);
+        let a=benchmark_rowupdates(&ctxs,false,1);
+        let b=benchmark_rowupdates(&ctxs,true,1);
+        assert_eq!(a.1,b.1);
+    }
+}
