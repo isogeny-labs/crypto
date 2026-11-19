@@ -68,3 +68,10 @@ This excludes **all-62-point two-sign interpolation** as a low-degree direct rel
 4. **P3 — reproducibility/PCC:** Bind exact candidate source and frozen target corpus to raw artifacts, independent signed mathematical checks and paired A/A noise controls. No novelty/leaderboard claim without solver-stage and complete-solver comparisons.
 
 **Scientific standing:** An exact mathematical no-go for one public-only interpolation family at two original bases and one original public target; implementation and source-specific CI verification tracked on PR #4801. **No new measured cheaper complete non-generic prime-field ECDLP solver is claimed.**
+
+
+## Source-specific validation closeout (2026-11-19 UTC)
+
+**PASS:** [GitHub Actions #44497509496](https://github.com/isogeny-labs/crypto/actions/runs/44497509496), job 135468364685, on the source-workflow commit `60ac479fc972266915cf065363bd0fd4d7feadf3`; the native example and pinned workflow did not change in the subsequent report/log-only commits. GitHub job steps all succeeded, including original library tests **40/40**, focused example tests **2/2**, release Rust 1.100.0 execution, direct JSON `jq` rank assertions for both bases, and raw-output artifact upload. The raw stdout prints both bases' rank vectors `[[7,15,14,1,1,0],[27,145,61,84,84,0],[28,155,62,93,92,1]]`, with `group_sum_enumeration_used=false` and `unknown_scalar_recovered=false`. This corroborates the independent Python modular cross-check. Later documentation commits do not change the candidate Rust source.
+
+This is verified at **producer source-exact CI** scope, not a signed third-party PCC and not an ECDLP speed claim. Artifact availability is tied to the CI run, while the summary and implementation are committed for durable replay.
