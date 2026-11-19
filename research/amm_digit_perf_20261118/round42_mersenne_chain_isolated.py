@@ -139,6 +139,39 @@ mod round42 {
         println!("ROUND42_POWER_EXACT comparisons={comparisons}");
     }
     #[test]
+    fn randomized_dense_sparse_and_nonmonic_powers_match_frozen() {
+        let p=(1u64<<61)-1;
+        let mut state=0x2026_1119_4242_0001u64;
+        let mut comparisons=0usize;
+        for degree in 1usize..=8 {
+            for trial in 0..24 {
+                let mut f=vec![0u64;degree+1];
+                for j in 0..degree {
+                    state=state.wrapping_mul(6364136223846793005)
+                               .wrapping_add(1442695040888963407);
+                    f[j]=if trial%4==0 && j%2==0{0}else{state%p};
+                }
+                f[degree]=if trial%3==0 {17} else {1};
+                state=state.wrapping_mul(6364136223846793005)
+                           .wrapping_add(1442695040888963407);
+                let delta=state%p;
+                for exp in [(p-1)/2,p] {
+                    let old=before::round42_probe(p,&f,delta,exp);
+                    let new=after::round42_probe(p,&f,delta,exp);
+                    assert_eq!(old.0,new.0,
+                        "producer degree={degree} trial={trial} exp={exp}");
+                    assert_eq!(old.1,new.1,
+                        "replay degree={degree} trial={trial} exp={exp}");
+                    assert_eq!(new.0,new.1,
+                        "cross-check degree={degree} trial={trial} exp={exp}");
+                    assert!(new.2 < old.2 && new.3 < old.3);
+                    comparisons+=3;
+                }
+            }
+        }
+        println!("ROUND42_RANDOM_EXACT comparisons={comparisons}");
+    }
+    #[test]
     fn complete_root_and_certificate_events_match_frozen() {
         let p=(1u64<<61)-1;let mut n=0;
         for degree in [3usize,4,6,8] {
@@ -213,6 +246,7 @@ with tempfile.TemporaryDirectory() as tmp:
     path.write_text(header+source+probe+middle+before+probe+tail+tests)
     subprocess.run(["rustc","--edition=2021","-O","--test",str(path),"-o",str(binary)],check=True)
     for test in ["exact_powers_and_independent_replay_match_frozen",
+                 "randomized_dense_sparse_and_nonmonic_powers_match_frozen",
                  "complete_root_and_certificate_events_match_frozen"]:
         subprocess.run([str(binary),test,"--nocapture"],check=True)
     subprocess.run([str(binary),"bench_mersenne_chain_actual_rust","--ignored","--nocapture"],check=True)
