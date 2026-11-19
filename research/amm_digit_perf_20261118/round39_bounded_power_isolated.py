@@ -12,6 +12,21 @@ def swap_once(text, newer, former):
         raise ValueError(f"expected unique code block, got {text.count(newer)}: {newer[:70]}")
     return text.replace(newer, former, 1)
 
+def remove_large_exponent_guard(code, function_name):
+    start = code.index("    fn " + function_name + "(")
+    boundary = code.index("        if exponent > u32::MAX as u64 {", start)
+    depth = 0
+    for at in range(boundary + 8, len(code)):
+        if code[at] == "{": depth += 1
+        elif code[at] == "}":
+            depth -= 1
+            if depth == 0:
+                return code[:boundary] + code[at + 1:]
+    raise ValueError("unterminated large exponent guard in " + function_name)
+
+before = remove_large_exponent_guard(before, "power")
+before = remove_large_exponent_guard(before, "modular_power")
+
 before = swap_once(before, """        let mut acc = Poly17::constant(1);
         // The identity is reduced modulo any positive-degree polynomial.
         // A degree-zero modulus is exceptional: 1 mod c = 0.
