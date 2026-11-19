@@ -289,3 +289,265 @@ fn ct238_paired_native_norm_compressed_ic_vs_direct_bsgs() {
     }
 }
 
+
+
+
+// CT241: preregistered reduced norm-image LP native cold cost panel.
+// Finite known-answer F103 diagnostic. Reuses CT238's genuine Cantor arithmetic.
+// This is not the original 695/701 norm fixture and not a PCC-verified speedup.
+mod ct241 {
+    use super::*;
+    type LpRow = (Vec<i64>, Vec<i64>, i64);
+
+    fn lp_insert(
+        pivots: &mut [Option<LpRow>],
+        mut base: Vec<i64>,
+        mut lp: Vec<i64>,
+        mut rhs: i64
+    ) -> Option<(Vec<i64>, i64)> {
+        for v in &mut base { *v = m(*v, R); }
+        for v in &mut lp { *v = m(*v, R); }
+        rhs = m(rhs, R);
+        for i in 0..lp.len() {
+            let mul = lp[i];
+            if mul == 0 { continue; }
+            if let Some((pb, pl, pr)) = &pivots[i] {
+                for j in 0..base.len() { base[j] = m(base[j] - mul*pb[j], R); }
+                for j in 0..lp.len() { lp[j] = m(lp[j] - mul*pl[j], R); }
+                rhs = m(rhs - mul*pr, R);
+            } else {
+                let inv = inverse(mul);
+                for v in &mut base { *v = m(*v*inv, R); }
+                for v in &mut lp { *v = m(*v*inv, R); }
+                rhs = m(rhs*inv, R);
+                pivots[i] = Some((base, lp, rhs));
+                return None;
+            }
+        }
+        assert!(lp.iter().all(|&v| v == 0), "uneliminated large-prime column");
+        Some((base, rhs))
+    }
+
+    fn recovered_lp(pivots: &[Option<LpRow>], fb: &[i64]) -> Vec<Option<i64>> {
+        let mut result: Vec<Option<i64>> = vec![None; pivots.len()];
+        for i in (0..pivots.len()).rev() {
+            let Some((base, lp, rhs)) = &pivots[i] else { continue; };
+            if (i+1..lp.len()).any(|j| lp[j] != 0 && result[j].is_none()) {
+                continue; // Never guess an unresolved LP logarithm.
+            }
+            let mut value = *rhs;
+            for (a, z) in base.iter().zip(fb) { value -= a*z; }
+            for j in i+1..lp.len() {
+                if lp[j] != 0 { value -= lp[j]*result[j].unwrap(); }
+            }
+            result[i] = Some(m(value, R));
+        }
+        result
+    }
+
+    fn source_point(x: i64) -> Ec {
+        let yy = (0..P).find(|&y| m(y*y-(power(x,3,P)+x+24),P)==0)
+            .expect("norm x has no source E y");
+        Some((x, yy))
+    }
+
+    #[derive(Debug)]
+    struct Cold {
+        ns: u128, setup: u128, relations: u128, linear_algebra: u128,
+        recovery: u128, verify: u128,
+        candidates: usize, rank: usize, full: usize, lp1: usize,
+        lp2: usize, rejected: usize, b_rows: usize, lp_pivots: usize,
+        determined_lp: usize, target_candidates: usize,
+        cantor_adds: u64, target_adds: u64, field_add: u64,
+        field_mul: u64, field_sqr: u64, field_inv: u64,
+        matrix_bytes: usize, vmhwm_kb: usize,
+    }
+
+    fn vmhwm_kb() -> usize {
+        std::fs::read_to_string("/proc/self/status").ok()
+            .and_then(|s| s.lines().find(|l| l.starts_with("VmHWM:"))
+                .and_then(|l| l.split_whitespace().nth(1))
+                .and_then(|n| n.parse().ok()))
+            .unwrap_or(0)
+    }
+
+    fn cold(base_size: usize) -> Cold {
+        let start = Instant::now();
+        let before = ops::snapshot().total();
+        let c = curve();
+        let g = Some((1, 51));
+        let q = Some((42, 71));
+        let gdiv = image(&c, g);
+        let qdiv = image(&c, q);
+        assert_eq!(gdiv.scalar_mul_fast(&b(R), &c), Div::identity(b(P)));
+        assert_eq!(gdiv.scalar_mul_fast(&b(73), &c), qdiv);
+        let (xs, first) = x_roster(&c);
+        assert_eq!(xs.len(), 22);
+        let roster = offsets(&first);
+        let setup = start.elapsed().as_nanos();
+        let excluded = xs.len() - base_size;
+        let mut bp = vec![None; base_size];
+        let mut lp = vec![None; excluded];
+        let mut rank=0usize;
+        let mut candidates=0usize;
+        let mut full=0usize;
+        let mut lp1=0usize;
+        let mut lp2=0usize;
+        let mut rejected=0usize;
+        let mut b_rows=0usize;
+        let mut cantor_adds=0u64;
+        let rel_start = Instant::now();
+        'collect: for pts in roster.iter().take(60) {
+            let mut cur = Div::identity(b(P));
+            let mut off = vec![0i64;xs.len()];
+            for &(x,y) in pts {
+                cur = cur.add_fast(&point(&c,x,y),&c);
+                cantor_adds+=1;
+                let row=coord(x,y,&xs);
+                for (a,z) in off.iter_mut().zip(row) { *a+=z; }
+            }
+            for k in 0..R {
+                if candidates == 6540 { break 'collect; }
+                candidates+=1;
+                if let Some(sup) = support(&cur, &xs) {
+                    let diff: Vec<i64> = sup.iter().zip(&off).map(|(a,z)|a-z).collect();
+                    let nlp = diff[base_size..].iter().filter(|&&v|m(v,R)!=0).count();
+                    if nlp>2 {
+                        rejected+=1;
+                    } else {
+                        match nlp {0=>full+=1,1=>lp1+=1,2=>lp2+=1,_=>unreachable!()}
+                        let residual=lp_insert(&mut lp,
+                            diff[..base_size].to_vec(), diff[base_size..].to_vec(),
+                            m(3*k,R));
+                        if let Some((row, rhs))=residual {
+                            b_rows+=1;
+                            if reduce_row(&mut bp,&row,rhs) {
+                                rank+=1;
+                                if rank==base_size { break 'collect; }
+                            }
+                        }
+                    }
+                }
+                if k<R-1 && candidates<6540 {
+                    cur=cur.add_fast(&gdiv,&c);
+                    cantor_adds+=1;
+                }
+            }
+        }
+        let relations = rel_start.elapsed().as_nanos();
+        assert_eq!(rank,base_size,"CT240 fixed base failed full rank");
+        assert_eq!(candidates,if base_size==12 {589} else {381},
+            "CT240 exact relation-candidate stream drift");
+        let la_start=Instant::now();
+        let fb=solve(&bp);
+        let determined=recovered_lp(&lp,&fb);
+        let determined_count=determined.iter().filter(|x|x.is_some()).count();
+        let lp_pivots=lp.iter().filter(|x|x.is_some()).count();
+        let linear_algebra=la_start.elapsed().as_nanos();
+        let target_start=Instant::now();
+        let mut recovered=None;
+        let mut target_candidates=0usize;
+        let mut target_adds=0u64;
+        'target: for pts in roster.iter().take(60) {
+            let mut cur=qdiv.clone();
+            let mut off=vec![0i64;xs.len()];
+            for &(x,y) in pts {
+                cur=cur.add_fast(&point(&c,x,y),&c);
+                target_adds+=1;
+                let row=coord(x,y,&xs);
+                for (a,z) in off.iter_mut().zip(row) {*a+=z;}
+            }
+            for a in 0..R {
+                if target_candidates==6540 {break 'target;}
+                target_candidates+=1;
+                if let Some(sup)=support(&cur,&xs) {
+                    let diff: Vec<i64> = sup.iter().zip(&off).map(|(u,z)|u-z).collect();
+                    let mut sum=0i64;
+                    let mut ready=true;
+                    for (i,&v) in diff.iter().enumerate() {
+                        if m(v,R)==0 {continue;}
+                        let log=if i<base_size {Some(fb[i])}
+                            else {determined[i-base_size]};
+                        if let Some(t)=log {sum+=v*t;} else {ready=false;break;}
+                    }
+                    if ready {
+                        let scalar=m(sum*inverse(3)-a,R);
+                        assert_eq!(ec_mul(scalar,g),q,"incorrect recovered E discrete log");
+                        assert_eq!(gdiv.scalar_mul_fast(&b(scalar),&c),qdiv,
+                            "incorrect recovered Jacobian scalar");
+                        recovered=Some(scalar);
+                        break 'target;
+                    }
+                }
+                if a<R-1 && target_candidates<6540 {
+                    cur=cur.add_fast(&gdiv,&c);
+                    target_adds+=1;
+                }
+            }
+        }
+        assert_eq!(recovered,Some(73),"CT240 scalar not recovered");
+        assert_eq!(target_candidates,27,"CT240 target candidate stream drift");
+        let recovery=target_start.elapsed().as_nanos();
+        let verification_start=Instant::now();
+        for (i,&x) in xs.iter().enumerate() {
+            let log=if i<base_size {Some(fb[i])}
+                else {determined[i-base_size]};
+            if let Some(v)=log {
+                assert_eq!(ec_mul(v,g),source_point(x),
+                    "independently incorrect known source factor log");
+            }
+        }
+        assert_eq!(determined_count, excluded,"CT240 LP recovery drift");
+        assert_eq!(lp_pivots, excluded,"CT240 LP rank drift");
+        if base_size==22 {
+            assert_eq!((full,lp1,lp2,rejected),(27,0,0,0));
+        }
+        let verify=verification_start.elapsed().as_nanos();
+        let tally=ops::snapshot().total().since(&before);
+        let matrix_bytes=8*(base_size*(base_size+1)+
+            excluded*(base_size+excluded+1));
+        Cold {
+            ns:setup+relations+linear_algebra+recovery+verify,
+            setup,relations,linear_algebra,recovery,verify,
+            candidates,rank,full,lp1,lp2,rejected,b_rows,
+            lp_pivots,determined_lp:determined_count,target_candidates,
+            cantor_adds,target_adds,
+            field_add:tally.get(Kind::FieldAdd),
+            field_mul:tally.get(Kind::FieldMul),
+            field_sqr:tally.get(Kind::FieldSqr),
+            field_inv:tally.get(Kind::FieldInv),
+            matrix_bytes,vmhwm_kb:vmhwm_kb(),
+        }
+    }
+
+    #[test]
+    fn ct241_paired_native_f103_reduced_norm_lp() {
+        for &base_size in &[12usize,16,18,20,22] {
+            for round in 0..3usize {
+                let bsgs=||{
+                    let st=Instant::now();
+                    let (scalar,adds)=direct_bsgs(Some((1,51)),Some((42,71)));
+                    assert_eq!(scalar,73);
+                    (st.elapsed().as_nanos(),adds)
+                };
+                let (ic, (bs_ns,bs_ops))=if round%2==0 {
+                    let ic=cold(base_size);let bs=bsgs();(ic,bs)
+                } else {
+                    let bs=bsgs();let ic=cold(base_size);(ic,bs)
+                };
+                assert!(ic.ns>0 && bs_ns>0);
+                eprintln!(
+                    "CT241_REDUCED_NORM_PAIR_JSON {{\"base\":{},\"round\":{},\"order\":\"{}\",\"candidate_ns\":{},\"direct_bsgs_ns\":{},\"ratio_direct_over_candidate\":{:.12},\"setup_ns\":{},\"relation_online_la_ns\":{},\"backsolve_ns\":{},\"recovery_ns\":{},\"verification_ns\":{},\"candidates\":{},\"rank\":{},\"full\":{},\"single_lp\":{},\"double_lp\":{},\"discarded\":{},\"b_only\":{},\"lp_pivots\":{},\"determined_lp\":{},\"target_candidates\":{},\"cantor_adds\":{},\"target_adds\":{},\"direct_bsgs_adds\":{},\"field_add\":{},\"field_mul\":{},\"field_sqr\":{},\"field_inv\":{},\"logical_matrix_bytes\":{},\"vmhwm_kb\":{},\"pcc\":\"unverified\",\"memory\":\"vmhwm_processwide\"}}",
+                    base_size,round,if round%2==0 {"IC_BSGS"} else {"BSGS_IC"},
+                    ic.ns,bs_ns,bs_ns as f64/ic.ns as f64,
+                    ic.setup,ic.relations,ic.linear_algebra,ic.recovery,ic.verify,
+                    ic.candidates,ic.rank,ic.full,ic.lp1,ic.lp2,ic.rejected,
+                    ic.b_rows,ic.lp_pivots,ic.determined_lp,ic.target_candidates,
+                    ic.cantor_adds,ic.target_adds,bs_ops,
+                    ic.field_add,ic.field_mul,ic.field_sqr,ic.field_inv,
+                    ic.matrix_bytes,ic.vmhwm_kb
+                );
+            }
+        }
+    }
+}
