@@ -713,3 +713,213 @@ mod rowupdate_tests {
         assert_eq!(a.1,b.1);
     }
 }
+
+
+// --- Preregistered target-independent Vandermonde/barycentric B8 half tables ---
+// RR9 H=[diag(x-r)V | diag(y+s)V] yields
+// M=V^{-1} diag((y+s)/(x-r)) V.  The unsigned x-coordinate tuple
+// is independent of target and of the sign of each original EC leaf.
+// Cache the four rank-one outer-product bases ONCE for each unsigned tuple.
+// Online per target: only 4*B field inversions per half, no chart inversions.
+// This speeds half-table BUILDING, not the exhaustive 16^8 pair search.
+struct CachedVandermondeEntry {
+    det_v: u64,
+    xs: [u64;4],
+    outer: [Graph4;4],
+}
+struct CachedVandermondeHalf {
+    b: usize,
+    items: Vec<CachedVandermondeEntry>,
+}
+fn cached_vandermonde_setup(slots:&[Vec<Point>],start:usize)
+    ->Option<CachedVandermondeHalf> {
+    let b=slots[start].len()/2;
+    if b==0 || 2*b != slots[start].len() {return None;}
+    let mut items=Vec::with_capacity(b.pow(4));
+    for a in 0..b {for c in 0..b {for d in 0..b {for e in 0..b {
+        let digits=[a,c,d,e];
+        let xs=std::array::from_fn(|i|slots[start+i][digits[i]].unwrap().0);
+        let mut vrows=[[0u64;8];4];
+        for i in 0..4 {
+            let mut p=1u64;
+            for k in 0..4 {vrows[i][k]=p; p=mul(p,xs[i]);}
+        }
+        // This is target-independent, and computed once per unsigned tuple.
+        let ia=inv_a_block(&vrows)?;
+        let mut det_v=1u64;
+        for i in 0..4 {for j in i+1..4 {
+            if xs[i]==xs[j] {return None;}
+            det_v=mul(det_v,sub(xs[j],xs[i]));
+        }}
+        // M=sum_i z_i * outer_i, outer_i=(column i of V^-1)*(row i of V).
+        let mut outer=[[[0u64;4];4];4];
+        for i in 0..4 {for j in 0..4 {for k in 0..4 {
+            outer[i][j][k]=mul(ia[j][i],vrows[i][k]);
+        }}}
+        items.push(CachedVandermondeEntry{det_v,xs,outer});
+    }}}}
+    Some(CachedVandermondeHalf{b,items})
+}
+fn cached_vandermonde_halves(
+    slots:&[Vec<Point>], target:Point, start:usize,
+    cache:&CachedVandermondeHalf
+)->Option<Vec<(Word,Graph4,u64)>> {
+    let (rx,ry)=target?;
+    let b=cache.b;
+    if slots.len()!=8 || cache.items.len()!=b.pow(4) {return None;}
+    let mut z=[Vec::new(),Vec::new(),Vec::new(),Vec::new()];
+    for i in 0..4 {
+        if slots[start+i].len()!=2*b {return None;}
+        let mut di=Vec::with_capacity(b);
+        for k in 0..b {
+            let x=slots[start+i][k]?.0;
+            let delta=sub(x,rx);
+            if delta==0 {return None;} // singular A chart; fail closed.
+            di.push(inv(delta));
+        }
+        for k in 0..2*b {
+            let (x,y)=slots[start+i][k]?;
+            if x!=slots[start+i][k%b]?.0 {return None;}
+            z[i].push(mul(add(y,ry),di[k%b]));
+        }
+    }
+    let mut out=Vec::with_capacity((2*b).pow(4));
+    for a in 0..2*b {for c in 0..2*b {for d in 0..2*b {for e in 0..2*b {
+        let digits=[a,c,d,e];
+        let unsigned=digits.map(|k|k%b);
+        let ix=(((unsigned[0]*b+unsigned[1])*b+unsigned[2])*b)+unsigned[3];
+        let entry=&cache.items[ix];
+        let mut m=[[0u64;4];4];
+        let mut det_a=entry.det_v;
+        for i in 0..4 {
+            let zi=z[i][digits[i]];
+            det_a=mul(det_a,sub(entry.xs[i],rx));
+            for j in 0..4 {for k in 0..4 {
+                m[j][k]=add(m[j][k],mul(zi,entry.outer[i][j][k]));
+            }}
+        }
+        out.push(([a as u8,c as u8,d as u8,e as u8],m,det_a));
+    }}}}
+    Some(out)
+}
+fn half_digest(entries:&[(Word,Graph4,u64)])->u64 {
+    let mut sum=0u64;
+    for (word,m,det) in entries {
+        let mut z=*det;
+        for k in 0..4 {z=add(z,m[k][(word[k] as usize)%4]);}
+        sum=add(sum,z);
+    }
+    std::hint::black_box(sum)
+}
+pub(crate) fn cached_vandermonde_main() {
+    let mut ar=Arithmetic::default();
+    let base=canonical_base(&mut ar,8);
+    assert_eq!(base.iter().map(|p|p.unwrap().0).collect::<Vec<_>>(),
+                vec![0,1,2,3,5,6,8,9]);
+    let slots=supports(&mut ar,&base);
+    let planted=replay(&mut ar,&slots,[0;8]);
+    let targets=[("G",G),("planted",planted)];
+    let started=Instant::now();
+    let l=cached_vandermonde_setup(&slots,0).expect("left cache setup");
+    let r=cached_vandermonde_setup(&slots,4).expect("right cache setup");
+    let cache_ms=started.elapsed().as_secs_f64()*1000.;
+    let contexts:Vec<Vec<Vec<Row>>>=targets.iter().map(|(_,target)|
+        slots.iter().map(|s|s.iter().map(|&q|row(q,*target)).collect()).collect()
+    ).collect();
+    let mut runs=Vec::new();
+    for (arm,mode) in [("A1","fresh"),("B1","cached"),
+                       ("B2","cached"),("A2","fresh")] {
+        let started=Instant::now();
+        let mut digest=0u64;
+        for ctx in 0..2 {
+            for side in 0..2 {
+                let entries=if mode=="fresh" {
+                    graph_halves(&contexts[ctx],side*4).expect("fresh chart nonsingular")
+                } else {
+                    cached_vandermonde_halves(&slots,targets[ctx].1,side*4,
+                                              if side==0 {&l} else {&r})
+                        .expect("cached chart nonsingular")
+                };
+                digest=add(digest,half_digest(&entries));
+            }
+        }
+        runs.push(json!({"arm":arm,"mode":mode,
+                         "elapsed_ms":started.elapsed().as_secs_f64()*1000.,
+                         "digest":digest,"half_charts":4u64*16u64.pow(4)}));
+    }
+    // Export 32 deterministically chosen real-curve half charts per target/half.
+    // The Python checker reconstructs V^-1 diag(z)V independently from these.
+    let mut samples=Vec::new();
+    for (ci,(_,target)) in targets.iter().enumerate() {
+        for side in 0..2 {
+            let entries=cached_vandermonde_halves(&slots,*target,side*4,
+                                                  if side==0 {&l} else {&r}).unwrap();
+            let indices=[0usize,1,7,15,16,17,31,63,127,255,511,1023,2047,
+                4095,4096,8191,8192,10000,12000,16383,16384,20000,24575,
+                30000,32767,32768,40000,49151,55000,60000,65534,65535];
+            for &ix in &indices {
+                let (word,m,det)=&entries[ix];
+                let points:Vec<Point>=(0..4).map(|j|
+                    slots[side*4+j][word[j] as usize]).collect();
+                samples.push(json!({"target":target,"target_id":ci,
+                    "half":side,"word":word,"points":points,"m":m,"det_a":det}));
+            }
+        }
+    }
+    println!("{}",serde_json::to_string_pretty(&json!({
+        "scope":"Prime31 B8 cached Vandermonde half-table build ONLY; still exhaustive pair search",
+        "field_prime":P,"group_order":2_147_446_831u64,
+        "curve_a":847514846u64,"curve_b":2087444724u64,
+        "base_x":[0,1,2,3,5,6,8,9],"weights":W,
+        "cache_unsigned_tables":2*b4(8),"target_independent_cache_ms":cache_ms,
+        "signed_halves_per_target":2u64*16u64.pow(4),
+        "target_field_inversions_for_denominators":64,
+        "fresh_gauss_pivot_inversions_per_target":2u64*16u64.pow(4)*4,
+        "B8_full_pair_tests_unchanged":16u64.pow(8),
+        "generic_group_tables_in_candidate":false,
+        "candidate_extracts_unknown_indices":false,
+        "external_pcc":"unverified",
+        "runs":runs,"independent_python_samples":samples
+    })).unwrap());
+}
+fn b4(b:usize)->usize{b.pow(4)}
+
+#[cfg(test)]
+mod cached_vandermonde_tests {
+    use super::*;
+    #[test]
+    fn full_b8_two_targets_two_halves_exact_equality() {
+        let mut ar=Arithmetic::default();
+        let base=canonical_base(&mut ar,8);
+        let slots=supports(&mut ar,&base);
+        let planted=replay(&mut ar,&slots,[0;8]);
+        let left=cached_vandermonde_setup(&slots,0).unwrap();
+        let right=cached_vandermonde_setup(&slots,4).unwrap();
+        assert_eq!(left.items.len(),4096);
+        assert_eq!(right.items.len(),4096);
+        for target in [G,planted] {
+            let rows:Vec<Vec<Row>>=slots.iter()
+                .map(|s|s.iter().map(|&q|row(q,target)).collect()).collect();
+            for (start,cache) in [(0,&left),(4,&right)] {
+                let fresh=graph_halves(&rows,start).unwrap();
+                let new=cached_vandermonde_halves(&slots,target,start,cache).unwrap();
+                assert_eq!(fresh.len(),65536);
+                assert_eq!(new.len(),65536);
+                for (a,b) in fresh.iter().zip(new.iter()) {
+                    assert_eq!(a.0,b.0,"signed slot tuple drift");
+                    assert_eq!(a.1,b.1,"Vandermonde chart differs from Gaussian");
+                    assert_eq!(a.2,b.2,"det(A) differs from Gaussian");
+                }
+            }
+        }
+    }
+    #[test]
+    fn denominator_zero_is_explicit_chart_failure() {
+        let mut ar=Arithmetic::default();
+        let base=canonical_base(&mut ar,8);
+        let slots=supports(&mut ar,&base);
+        let c=cached_vandermonde_setup(&slots,0).unwrap();
+        let one=slots[0][0];
+        assert!(cached_vandermonde_halves(&slots,one,0,&c).is_none());
+    }
+}
