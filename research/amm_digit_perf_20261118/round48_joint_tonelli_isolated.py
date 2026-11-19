@@ -20,7 +20,7 @@ for label, replacement in [
 """),
 ]:
     before, count = re.subn(
-        r"(?m)^ *// R48_TONELLI_" + label + r"_BEGIN\\n.*?^ *// R48_TONELLI_" + label + r"_END\\n",
+        r"(?m)^ *// R48_TONELLI_" + label + r"_BEGIN\n.*?^ *// R48_TONELLI_" + label + r"_END\n",
         replacement, before, count=1, flags=re.S,
     )
     assert count == 1, f"missing R48 marker {label}"
