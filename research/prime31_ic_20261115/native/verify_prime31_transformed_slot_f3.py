@@ -49,6 +49,30 @@ def product(items):
     for x in items: result = result*x % P
     return result
 
+
+def s3_fixed_poly(t):
+    t2=t*t%P
+    return {e:c%P for e,c in [
+        ((2,2),1), ((1,2),-2*t), ((0,2),t2),
+        ((2,1),-2*t), ((1,1),-2*(t2+A)),
+        ((0,1),-2*(A*t+2*B)), ((2,0),t2),
+        ((1,0),-2*A*t-4*B), ((0,0),A*A-4*B*t)
+    ] if c%P}
+
+def multiply_bivariate(f,g):
+    o={}
+    for (i,j),x in f.items():
+        for (k,l),y in g.items():
+            e=(i+k,j+l)
+            o[e]=(o.get(e,0)+x*y)%P
+    return {e:x for e,x in o.items() if x}
+
+def expanded_slot_terms(slot):
+    result={(0,0):1}
+    for t,_ in slot: result=multiply_bivariate(result,s3_fixed_poly(t))
+    assert result[(16,16)]==1 and len(result)<=289
+    return len(result)
+
 def base31():
     points = []
     for x in range(10000):
@@ -142,7 +166,8 @@ def run(cases_per_window):
             if ci == 0:
                 first_cases.append(dict(window=wi,choices=choices,planted_signs=signs,
                     transformed_roots=t,suffix_x=z,target_q=target,mutated_k0=poisoned))
-        windows.append(dict(window=wi,distinct_slot_roots=64,ordinary=good,exceptional=bad))
+        windows.append(dict(window=wi,distinct_slot_roots=64,ordinary=good,exceptional=bad,
+                            k_polynomial_term_counts=[expanded_slot_terms(slot[i]) for i in range(7)]))
     return counters, windows, first_cases
 
 def main():
