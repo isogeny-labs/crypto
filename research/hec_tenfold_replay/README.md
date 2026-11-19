@@ -323,3 +323,16 @@ At (257,54), the restricted base needed the shift fallback for two of sixteen di
 Against the pencil baseline, the full and selected solvers respectively cleared 10× in both orders on 55 and 53 of 64 inputs on seed 2026111923, and on 54 and 53 on seed 2026111924. Character selection improved full solves reproducibly on three of five eligible curves. The full-base solver remains the default.
 
 Replay with `harness/g3-character-solve.zsh all` or `harness/g3-character-solve.zsh positive-only`. The tracked raw archives include the comparison panel, balanced crossover and decomposition audits. Both medians files use the transfer-panel format.
+
+### Retrying a missed genus-3 decomposition after one place addition
+
+When the direct quartic decomposition of D misses, the retry computes D+A for the catalogue anchor A and attempts the same quartic decomposition once more. If the coordinate is found, linearity gives coord(D) = coord(D+A) − coord(A) modulo the subgroup order. A second miss takes the original shift fallback. The audit cross-checks each successful retry against that fallback on D. The comparison uses the same catalogue in both arms, with the positive base on the four curves whose positive base alone passed the rank test, and the full base elsewhere.
+
+| Input seed | Initial misses among 128 divisor coordinates | Coordinates recovered by one retry | Full solves at least 10× faster than pencil in both orders, before / after |
+|---|---:|---:|---:|
+| 2026111925 | 19 | 10 | 54 / 57 of 64 |
+| 2026111926 | 15 | 11 | 52 / 60 of 64 |
+
+The crossover compares the entire solve with and without the retry. At (257,78), the median ratio across inputs that actually needed a retry was 2.030× / 2.028× in forward / reverse order on the first seed and 2.034× / 2.032× on the second. Across all eight inputs on that curve, the ratios were within 0.3% of parity because most inputs decomposed directly. At (257,54) the all-input ratio was near parity on the first seed and 1.115× / 1.113× on the second. At (383,42) the affected-input median was below parity on the first seed. All 128 input scalars were verified. The 10× counts compare against the earlier pencil solver and include catalogue and descent improvements together.
+
+Run `HEC_SHIFT_SEED=2026111925 harness/g3-character-solve.zsh shift` and repeat with seed 2026111926. The comparison panel uses pencil, selected catalogue without retry, full catalogue without retry, and selected catalogue with retry. The crossover compares only the two selected-catalogue arms. Run `ruby harness/g3-shift-summary.rb OUTPUT_DIRECTORY` on the output directory for the per-curve table. The affected-input subset includes every input requiring a retry, including failed retries. Git stores the full timing and audit streams.
