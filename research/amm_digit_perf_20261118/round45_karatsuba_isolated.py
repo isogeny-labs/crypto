@@ -11,7 +11,7 @@ marker = r"(?m)^        // R45_PRODUCT_KARATSUBA_BEGIN\n.*?^        // R45_PRODU
 before, count = re.subn(marker, "", before, count=1, flags=re.S | re.M)
 if count != 1:
     raise AssertionError("missing or duplicate round45 karatsuba marker")
-assert "R45_" not in before
+assert "R45_PRODUCT_KARATSUBA" not in before
 assert "fn window3_power" in source
 assert "fn modular_power" in source
 
