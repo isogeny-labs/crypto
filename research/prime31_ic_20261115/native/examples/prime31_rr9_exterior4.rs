@@ -157,7 +157,8 @@ fn extract(slots:&[Vec<Point>],target:Point)->Extraction{
 fn canonical_base(ar:&mut Arithmetic,b:usize)->Vec<Point>{
     let mut out=Vec::new();
     for x in 0..10000 {
-        if let Some(y)=ar.sqrt(ar.rhs(PRIME31,x),P){
+        let rhs=ar.rhs(PRIME31,x);
+        if let Some(y)=ar.sqrt(rhs,P){
             if y!=0{
                 let q=Some((x,y.min(P-y)));
                 assert!(ar.on_curve(PRIME31,q));
