@@ -5282,7 +5282,7 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for ChainedXOracle<'_> {
 #[cfg(test)]
 mod tests {
     #[test]
-    fn the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e() {
+    fn trace_coset_basis_roundtrip_retains_affine_metadata() {
         use crate::cryptanalysis::ic_boundary::{
             binary_affine_subspace_factor_base, koblitz_instance,
         };

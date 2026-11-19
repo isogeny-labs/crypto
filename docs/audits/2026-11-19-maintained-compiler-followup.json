@@ -1,0 +1,35 @@
+{
+  "schema": "crypto.compiler-followup-audit/v1",
+  "standing": "unverified",
+  "base_commit": "ad2a014c0022cf000845014499a9649b6c2cef2d",
+  "baseline_ci_run": 44253735749,
+  "baseline_ci_url": "https://github.com/isogeny-labs/crypto/actions/runs/44253735749",
+  "baseline_findings": [
+    "duplicate Rust test function the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e in src/cryptanalysis/ic_framework/plugins.rs",
+    "Clippy 1.98 drop_non_drop for accept_receipt",
+    "Clippy 1.98 drop_non_drop for emit"
+  ],
+  "changes": [
+    {
+      "path": "src/ml_dataset/koblitz_m3.rs",
+      "before": "b95aad97eb9287d5082730954ca4a0fc0857f3e20a6cac267bd47c9474cf483b",
+      "after": "59fa0f41dfc84bbca9b594381981274aa385f64a6bd93df3260ce1b0e3b22cc2",
+      "change": "remove drop(accept_receipt);"
+    },
+    {
+      "path": "src/ml_dataset/sat_initial_packed.rs",
+      "before": "6b50daf5482ef0099c0819444f371d04fa76e8f140d12bdd3ef734618397df03",
+      "after": "f9b5a7f376c1183f51bd1c8bb2caeb0123f8d1f192aa2384eacfde233d0c748d",
+      "change": "remove drop(emit);"
+    },
+    {
+      "path": "src/cryptanalysis/ic_framework/plugins.rs",
+      "before": "401dfd708f131c114fcb6141610fd9099d0223f4bde107e1d77fcd0d444e70e2",
+      "after": "d26361ec097f63bed55672c810f7c6483aa8e69a09c80d1b0f04e0399256dd88",
+      "change": "rename first duplicate test only; both test bodies and every assertion retained"
+    }
+  ],
+  "local_validation_scope": "Prior macOS Rust 1.99.1 library Clippy passed; nine nonempty packed and worker tests observed passing. Full candidate on Linux Rust 1.98 is pending. Original raw runtime scratch no longer available; no independent replay claim.",
+  "frozen_artifacts": "Only maintained code and this derivative note change; all frozen originals, claim and ledger records remain untouched.",
+  "performance_measurement": false
+}
