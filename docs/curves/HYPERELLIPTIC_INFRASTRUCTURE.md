@@ -384,6 +384,22 @@ handling. Extension fields remain unsupported for balanced arithmetic and
 induced maps.
 [pcc:unverified]
 
+The production-independent split-sextic oracle now has a second exact wrapper
+for the composed Montgomery path. Over `F_7` it fixes original Montgomery
+parameters `A=3`, `B=2`, cover shift `c=1`, the short model
+`y^2=x^3+3x+1`, and source
+`v^2=u^6+3u^4+6u^2+5`. It independently obtains `N1=14`, `N2=58`,
+`#Jac(C)(F_7)=120`, and `#E(F_7)=12`, then checks all 14,400 source sums,
+1,728,000 associativity triples, every pullback and pushforward, and both
+composition identities before comparing with production. The exhaustive
+support inventory contains 2,608 principal zero divisors, 21 classes with
+irreducible-quadratic support, 12 repeated-support classes, 1,989
+shared-support pairs, and 1,989 conjugate-support pairs. This is evidence for
+one tiny-field fixture only. It does not promote any of the seven live
+proof-gated Montgomery bindings or establish family-wide or catalog-wide
+coverage, a subgroup result, a solver, scaling, or computational advantage.
+[pcc:unverified]
+
 Odd extension fields return structured `unsupported_extension_field`.
 All-passing prime moduli outside the strict proof bound return structured
 `unsupported_without_primality_certificate`; a Miller--Rabin witness remains
@@ -641,15 +657,15 @@ Its deterministic proof boundary covers 20,539 live direct-prime maps and 675
 linked EC1 records, including the two 73-bit rows at
 `p=5902977611310272157103`. The other 269 wide-direct maps and 234 bindings,
 normalized targets, and extensions do not receive direct-backend support: the
-current canonical odd corpus classifies 233 bindings as proof-range
-unsupported, 22 as normalized-backend unsupported, 9 as extension-backend
-unsupported, and one as invalid target-generator data. The standalone command and sweeper now distinguish the
-seven Montgomery bindings' proof gap from the fifteen Edwards bindings'
-backend gap, but the catalog exporter and corpus have not yet been regenerated
-with that split. The widened live catalog support is therefore exactly a
-two-row pilot under the strict exclusive `psi_13` proof bound, not a general
-wide-prime claim. Numeric exact-order evidence remains a separate per-record
-field.
+current canonical odd corpus classifies 240 bindings as proof-range
+unsupported, 15 as Edwards normalized-backend unsupported, 9 as
+extension-backend unsupported, and one as invalid target-generator data. The
+seven Montgomery bindings have a composed backend but remain in the proof-gap
+bucket because their fields or declared orders lack accepted certificates;
+they are not live-supported. The widened live catalog support is therefore
+exactly a two-row pilot under the strict exclusive `psi_13` proof bound, not a
+general wide-prime claim. Numeric exact-order evidence remains a separate
+per-record field.
 The supplied traits file is recorded as advisory provenance and cannot
 promote that field. The exporter records non-`unknown` evidence only from its
 bounded deterministic small-prime check; the named-subgroup certificate
@@ -659,21 +675,46 @@ implementation-separated cardinality-486 certificate for the separate fixed
 F8 source fixture. The latter is not an EC1 subgroup-order certificate. All
 computational-advantage and end-to-end solver costs for both the 15,791-row
 historical assessment and the larger live graph remain unknown. Cryptanalysis
-successor `f24ebf0f59e6f55ae8ce5a651d3c25ee4dc42512` mirrors the exact
-strict-primality, balanced-arithmetic, and transfer sources from crypto
-producer `153ac585d3b1ece0ebb0d49312b13267f651c94b`. Its earlier receipt for the
-corpus-containing crypto revision `bb87d501aa763e7243f845d4f07c8a31b88435f1`
-was superseded first by the historical `f402ccd4…` corpus and then by the
-current clean Rust 1.98 successor from producer `e0ae0fe5…`; the mirrored
-library source bytes did not change. Local mirror validation passed
-10 of 10 manifest-parity records, 1 of 1 primality test, 5 of 5 balanced
-tests, 6 of 6 transfer tests including the strict live 73-bit pilot, and 8 of
-8 parity tests; strict library Clippy and targeted `rustfmt` also passed. The
-generated corpus and independent `F_2` source-law oracle remain crypto-owned
-and were not copied into cryptanalysis. The fixed 486-class `GF(8)` independent
-source-law gate now passes locally and has a read-only mathematical review;
-cryptanalysis integration, remote CI/review, and a fresh current-head package
-and extracted-package replay remain open. This receipt is not a Jacobian
+implementation/custody head
+`69b803d2a31f39737674e2a33da623197a304157` mirrors the exact/adapted
+12-record source closure through crypto producer
+`5c6e43a6f0cffe0afc4c962ff54056716cf6437e`. The direct and composed transfer
+modules are byte-exact; the prime module omits only the unmirrored
+operation-pricing module, and the integration test changes only the crate path.
+Local implementation validation passed the composed integration target 3 of
+3, the focused normalized module 6 of 6, the existing model-adapter regression
+3 of 3, the parity verifier 8 of 8, all 12 live parity records, targeted Rust
+1.98 `rustfmt`, JSON parsing, exact/adapted comparisons, and
+`git diff --check`.
+
+The exact-head custody set has a 27,552-byte workflow at SHA-256
+`084795e244e5854fbc18c0a8023c8ef548a6687d968644e096fb8e4e848a809e`,
+the unchanged 7,803-byte G3 driver at
+`7ac0e9892f1e08c399ab5431716cd13628c2f74f8330db41ea1766ecb5618d9a`,
+the 29,406-byte G3 verifier at
+`e21b1b79e46717965772e16d854165ae07a50d5e992f35d006918fe386fe064c`,
+the 4,489-byte G3 transition at
+`2e121138eec70ab8dfca51cc811351a9d987a223d20afc2ab369df91e0c574b0`,
+and the 6,307-byte FP transition at
+`d8bfa5aff2bf039878bec961b90482deadd0e74fc4745ba0f4b3d5398ed8dd7a`.
+The frozen FP and G3 predecessor evidence and the G3 arithmetic replay body
+were not rewritten.
+
+Manual exact-head run `44570090434` passed all seven jobs. G3 reached the
+arithmetic/proof stage: producer and consumer tests passed; Lean `Descent`
+(12 theorems), `ModelTransport` (2), and `CanonicalNorm` (13) passed with zero
+trusted declarations; and the final receipt records
+`predecessor437+successor431plus6/allinputguards`. G3 job `135722448213`
+uploaded artifact `14553252727`, 68,150 bytes, at SHA-256
+`8baf6047ef49bb8ab130a46cd512fe42d2af8cae91b81bdb2cfc8e1a3cf8f4ce`.
+The docs-only successor head
+`0507db1f155ff5e41ebbab1cd0190f4d97a5da71` does not change this
+implementation/custody identity. The generated corpus and independent `F_2`
+source-law oracle remain crypto-owned and were not copied into cryptanalysis.
+The fixed 486-class `GF(8)` independent source-law gate passes locally and has
+a read-only mathematical review; required review, signed standing, a fresh
+current-head package and extracted-package replay, and catalog-wide
+independent divisor-map replay remain open. This receipt is not a Jacobian
 index-calculus solver or evidence of a speedup. The assessment does not change
 the geometry semantics or browser status fields in `covers.json` and
 `cover-links.yaml`.
@@ -763,7 +804,7 @@ The exported catalog identifies its wrapper with
 `producer_source_sha256` is SHA-256 of the exact UTF-8 checker source, model
 normalization source, and `hyperelliptic-cover` wrapper source concatenated in
 that order. At this revision that digest is
-`aae753f89f09b6157b0f3070858b3bc9c15b3ae48361076bcf52db3aa1c491b1`.
+`07de7a833349cab197c8accb7ee5b67059f78630a62ef13e29333c23c3b0ffea`.
 Read the value from the exact export rather than copying a digest from an
 earlier revision. Changing any of the three producer inputs changes the
 provenance digest, so this literal must change with them. Both
@@ -851,25 +892,32 @@ computational-advantage records.
 tool for the 22,243 odd-characteristic maps and 940 named bindings. Its command
 contract and fail-closed exit semantics are documented in
 [`ODD_SUBGROUP_TRANSFER_CERTIFICATES.md`](ODD_SUBGROUP_TRANSFER_CERTIFICATES.md).
-The tracked 17,879,352-byte canonical corpus has SHA-256
-`7c60fc122c73abbe7b0df1413d24abbb064a9842bb35c2da8248d30c87f65670`.
+The tracked 17,879,292-byte canonical corpus has SHA-256
+`1ecfabcdaecc3e00d78ab2ce7eebeb94607e1c2c224f261fb5718a4f53b65268`.
 It was generated from clean producer commit
-`e0ae0fe5d09c0492a8b50600e88d0b9da68afef1` with framed source digest
-`3116ef637921b9aade22bbbaa0bd5f3eaaa798e6d7517474dab912a9dc8c2768`.
-Its binding partition is 675 supported direct, 233 proof-range unsupported, 0
-kernel-intersection unsupported, 22 normalized-backend unsupported, 9
+`8c94831426fa35040fa7b38b1379299bf6e6d957` with framed source digest
+`a5412b92e5e027b281d79c541cc34df130e16d9c71a7034f2065c6e181d8b3ef`
+over 29 source files. Its binding partition is 675 supported direct, 240
+proof-range unsupported, 0 kernel-intersection unsupported, 15 Edwards
+normalized-backend unsupported, 9
 extension-backend unsupported, 1 failed invalid generator, 0 other invalid,
 and 0 transfer-arithmetic failures. Canonical same-implementation replay exits
 `1` with `verified_named_subgroup_incomplete`; repository source replay exits
-`0` after binding all 27 source files and the Lean artifact to the producer
+`0` after binding all 29 source files and the Lean artifact to the producer
 commit. Malformed or stale input exits `3`.
 
 This corpus is additional evidence, not a rewrite of the generated graph.
-Normalized and extension rows remain unsupported until their typed backends
-are composed, and the one invalid generator is not relabelled as a missing
-proof. The recorded Rust compiler label is caller-supplied and unverified, and
-the local unsigned Lean theorem proves only the conditional structural
-implication under supplied hypotheses. Installed-package replay, independent
-replay, and the remaining source-order certificates are separate release
-gates. The corpus supplies no relation solver, key recovery, scaling result,
-or computational-advantage evidence. [pcc:unverified]
+The seven Montgomery bindings use the composed backend but remain proof-gated
+because accepted field/order evidence is absent; all fifteen Edwards rows and
+the extension rows still need their typed backends. The one invalid generator
+is not relabelled as a missing proof. The recorded Rust compiler label is
+caller-supplied and unverified, and the local unsigned Lean theorem proves only
+the conditional structural implication under supplied hypotheses.
+Installed-package replay, independent replay, and the remaining source-order
+certificates are separate release gates. The corpus supplies no relation
+solver, key recovery, scaling result, or computational-advantage evidence.
+[pcc:unverified]
+
+The earlier 17,879,352-byte `7c60fc…` pre-composition corpus from producer
+`e0ae0fe5…`, with partition 675/233/22/9/1, remains immutable historical
+evidence.

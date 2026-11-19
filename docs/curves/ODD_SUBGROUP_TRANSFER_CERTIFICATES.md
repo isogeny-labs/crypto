@@ -23,18 +23,18 @@ certified by coprimality, Edwards targets without an exceptional-point-safe
 projective adapter, extension-field rows without a general balanced-Jacobian backend, invalid
 catalog data, and transfer-arithmetic failures have distinct statuses. An
 unsupported proof range is not a failed generator, and a failed generator is
-never silently downgraded to unsupported. The tracked corpus predates the
-composed Montgomery backend and therefore retains all 22 normalized bindings
-under its immutable backend-unsupported status. A successor export will move
-the seven Montgomery bindings to the proof-range status because their fields
-are outside the accepted proof boundary; the other fifteen are Edwards rows.
+never silently downgraded to unsupported. The tracked successor corpus knows
+the composed Montgomery backend, but its seven Montgomery bindings remain
+outside the accepted field/order proof boundary and are therefore proof-gated,
+not supported. The other fifteen normalized bindings are Edwards rows and
+remain backend-unsupported.
 
 | Record status | Meaning |
 |---|---|
 | `supported_on_named_generated_subgroup` | The concrete generator, exact prime order, pullback, pushforward, composition, and recovery checks passed. |
 | `unsupported_without_primality_certificate` | The field or declared order is outside the accepted deterministic proof range. |
 | `unsupported_kernel_intersection` | The declared prime order annihilates the nonidentity generator, but coprimality with degree two does not certify a trivial kernel intersection. |
-| `unsupported_normalized_target_transfer_backend` | The target generator was preflighted, but its normalized target family has no checked projective transfer backend. In the immutable pre-composition corpus this also includes seven Montgomery bindings; successor exports reserve it for the fifteen Edwards bindings. |
+| `unsupported_normalized_target_transfer_backend` | The target generator was preflighted, but its normalized target family has no checked projective transfer backend. In the current successor corpus this is reserved for the fifteen Edwards bindings. |
 | `unsupported_odd_extension_field_transfer_backend` | The catalog-basis generator was preflighted, but general extension-field transfer is absent. |
 | `failed_invalid_target_generator` | The encoded generator is malformed, noncanonical, the identity, or off the linked target. |
 | `failed_invalid_named_subgroup_data` | A field/model/order binding or annihilation claim is invalid. |
@@ -87,36 +87,46 @@ The checked-in corpus is
 Its raw artifact pins are:
 
 ```text
-CORPUS_SHA256=7c60fc122c73abbe7b0df1413d24abbb064a9842bb35c2da8248d30c87f65670
-CORPUS_BYTES=17879352
-PRODUCER_COMMIT=e0ae0fe5d09c0492a8b50600e88d0b9da68afef1
-PRODUCER_SOURCE_SHA256=3116ef637921b9aade22bbbaa0bd5f3eaaa798e6d7517474dab912a9dc8c2768
+CORPUS_SHA256=1ecfabcdaecc3e00d78ab2ce7eebeb94607e1c2c224f261fb5718a4f53b65268
+CORPUS_BYTES=17879292
+PRODUCER_COMMIT=8c94831426fa35040fa7b38b1379299bf6e6d957
+PRODUCER_SOURCE_SHA256=a5412b92e5e027b281d79c541cc34df130e16d9c71a7034f2065c6e181d8b3ef
 ```
 
 It retains 22,243 odd maps and 940 named-subgroup records. The exact record
-partition is 675 supported, 233 unsupported without an accepted primality
-certificate, 0 unsupported kernel-intersection records, 22 unsupported
+partition is 675 supported, 240 unsupported without an accepted primality
+certificate, 0 unsupported kernel-intersection records, 15 unsupported
 normalized-target records, 9 unsupported extension-field records, 1 failed
 invalid target generator, 0 failed other named-subgroup data records, and 0
-transfer-arithmetic failures. Of the supported records, 542 use ordinary
-fibers and 133 use ramified repeated support.
+transfer-arithmetic failures. The seven reclassified normalized records are
+Montgomery bindings whose composed backend is implemented but whose field or
+declared order lacks an accepted proof certificate; they are not live-supported.
+All fifteen remaining normalized-backend records are Edwards bindings. Of the
+supported records, 542 use ordinary fibers and 133 use ramified repeated
+support.
 
 External Draft 2020-12 schema validation passed. Canonical
 same-implementation replay with both raw pins returns exit `1` and
 `status=verified_named_subgroup_incomplete`; repository source replay returns
-exit `0` after checking 27 ordered source blobs plus the recorded Lean artifact
+exit `0` after checking 29 ordered source blobs plus the recorded Lean artifact
 against the producer tree. The saved Rust compiler label remains
 `caller_supplied_unverified`. The Lean record remains
 `local_unsigned_unverified` and proves only its conditional abstract theorem;
 neither replay supplies signed PCC standing or independent Jacobian evidence.
 [pcc:unverified]
 
-The exact local receipts are retained as
-[`odd-transfer-catalog-canonical-replay-e0ae0fe5.json`](../../research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-e0ae0fe5.json)
+The exact local successor receipts are retained as
+[`odd-transfer-catalog-canonical-replay-8c948314.json`](../../research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json)
 and
-[`odd-transfer-catalog-source-replay-e0ae0fe5.json`](../../research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-e0ae0fe5.json).
+[`odd-transfer-catalog-source-replay-8c948314.json`](../../research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json).
 They are reproducibility records for the checks described above, not an
 independent implementation.
+
+The prior 17,879,352-byte pre-composition corpus at SHA-256
+`7c60fc122c73abbe7b0df1413d24abbb064a9842bb35c2da8248d30c87f65670`,
+producer `e0ae0fe5d09c0492a8b50600e88d0b9da68afef1`, and partition
+675/233/22/9/1 remains immutable historical evidence. Its `e0ae0fe5` replay
+receipts are preserved and are not the current replay target.
 
 ## Exact replay
 

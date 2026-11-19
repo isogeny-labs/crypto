@@ -20,9 +20,11 @@ on:
       - 'src/bin/odd_transfer_catalog.rs'
       - 'src/bin/odd_extension_transfer_pilot.rs'
       - 'tests/binary_cover_transfer_oracle.rs'
+      - 'tests/common/prime_split_sextic_oracle.rs'
       - 'tests/prime_cover_transfer_oracle.rs'
       - 'tests/prime_montgomery_transfer_adapter.rs'
       - 'tests/prime_montgomery_composed_transfer.rs'
+      - 'tests/prime_montgomery_composed_transfer_oracle.rs'
       - 'examples/cover_catalog_transition_audit.rs'
       - 'src/bin/ecdlp_audit.rs'
       - 'src/bin/ecdlp_audit/**'
@@ -54,6 +56,8 @@ on:
       - 'research/hyperelliptic_cover_infrastructure_20261006/evidence.json'
       - 'research/hyperelliptic_cover_infrastructure_20261006/README.md'
       - 'research/curve_transfer_infrastructure_20261118/fixed-f8-source-law-assessment.draft.json'
+      - 'research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json'
+      - 'research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json'
       - 'research/chained_jacobian_transfers_20261110/lean/ChainTransfer.lean'
       - '.github/workflows/curve-covers.yml'
       - '.github/workflows/release.yml'
@@ -150,14 +154,16 @@ jobs:
             --expected-bytes 500924
       - name: Optimized independent oracles and odd-transfer catalog controls
         run: |
-          odd_corpus_sha256="7c60fc122c73abbe7b0df1413d24abbb064a9842bb35c2da8248d30c87f65670"
-          odd_corpus_bytes="17879352"
+          odd_corpus_sha256="1ecfabcdaecc3e00d78ab2ce7eebeb94607e1c2c224f261fb5718a4f53b65268"
+          odd_corpus_bytes="17879292"
           actual_odd_sha256="$(sha256sum docs/curves/odd-subgroup-transfer-certificates.json | awk '{print $1}')"
           actual_odd_bytes="$(wc -c < docs/curves/odd-subgroup-transfer-certificates.json)"
           test "$actual_odd_sha256" = "$odd_corpus_sha256"
           test "$actual_odd_bytes" = "$odd_corpus_bytes"
           cargo test --release --bin odd-transfer-catalog -- --test-threads=1
           cargo test --release --bin odd_extension_transfer_pilot -- --test-threads=1
+          cargo test --release --locked --test prime_cover_transfer_oracle -- --test-threads=1
+          cargo test --release --locked --test prime_montgomery_composed_transfer_oracle -- --test-threads=1
           cargo test --release --test prime_montgomery_transfer_adapter -- --test-threads=1
           cargo test --release --test prime_montgomery_composed_transfer -- --test-threads=1
           cargo test --release --test binary_cover_transfer_oracle -- --nocapture --test-threads=1
@@ -180,6 +186,8 @@ jobs:
             .corpus.sha256 == $sha and
             .corpus.bytes == $bytes
           ' "$RUNNER_TEMP/odd-subgroup-transfer-replay.json" >/dev/null
+          cmp "$RUNNER_TEMP/odd-subgroup-transfer-replay.json" \
+            research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json
           cargo run --release --bin odd-transfer-catalog -- verify-source \
             --input docs/curves/odd-subgroup-transfer-certificates.json \
             --repo-root . \
@@ -192,6 +200,8 @@ jobs:
             .source_sha256 == $source and
             ([.checks[]] | all(. == true))
           ' "$RUNNER_TEMP/odd-subgroup-transfer-source-replay.json" >/dev/null
+          cmp "$RUNNER_TEMP/odd-subgroup-transfer-source-replay.json" \
+            research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json
       - name: Replay the native audit plan and fixed-F8 order certificate
         run: |
           cargo test --bin ecdlp-audit

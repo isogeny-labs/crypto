@@ -19,15 +19,15 @@
     "supported_direct_bindings_sha256": "c6a9d57c70bc21c69d2e8223c3e3cf87836b0330dc01b198f17179599aeafa40",
     "unsupported_extension_bindings_sha256": "2575ccf0193436b0bf71f1114c07e24fccb4d20a34b1ab700637179f06b3a9f6",
     "unsupported_kernel_intersection_bindings_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "unsupported_normalized_bindings_sha256": "e6030c86de8bea5b1504ea662368518057a784be88fd7c7f77e035f6edb3b22e",
+    "unsupported_normalized_bindings_sha256": "492d04af25b7b6bb0f06efb1c1f6603c579af97963bb73549452bf2c5e8f67d4",
     "unsupported_or_failed_direct_bindings_sha256": "faa88c5abc76918cdda5b2c92a100c9e720a0b334d56b79ace1e4782acbd18da",
-    "unsupported_primality_bindings_sha256": "21cc2d5aa382929d5af5baefccef35da48790e07be2dd26134a45d292c45f19e"
+    "unsupported_primality_bindings_sha256": "b324e5589ccd7ebd09dcee580742f84eb7fcfc88465fa18b73821f11dc25b36e"
   },
   "producer": {
     "attestation": "embedded_clean_build_provenance_matches_requested_commit",
     "build_git_dirty": false,
     "build_provenance_source": "CRYPTO_BUILD_GIT_COMMIT",
-    "command": "'odd-transfer-catalog' 'export' '--registry' 'docs/curves/registry.json' '--cover-graph' 'docs/curves/cover-links.yaml' '--producer-commit' 'e0ae0fe5d09c0492a8b50600e88d0b9da68afef1' '--rustc-version' 'rustc 1.98.0 (88d9e12ae 2026-08-18)' '--output' 'docs/curves/odd-subgroup-transfer-certificates.json'",
+    "command": "'odd-transfer-catalog' 'export' '--registry' 'docs/curves/registry.json' '--cover-graph' 'docs/curves/cover-links.yaml' '--producer-commit' '8c94831426fa35040fa7b38b1379299bf6e6d957' '--rustc-version' 'rustc 1.98.0 (88d9e12ae 2026-08-18)' '--output' 'docs/curves/odd-subgroup-transfer-certificates.json'",
     "command_argv": [
       "odd-transfer-catalog",
       "export",
@@ -36,13 +36,13 @@
       "--cover-graph",
       "docs/curves/cover-links.yaml",
       "--producer-commit",
-      "e0ae0fe5d09c0492a8b50600e88d0b9da68afef1",
+      "8c94831426fa35040fa7b38b1379299bf6e6d957",
       "--rustc-version",
       "rustc 1.98.0 (88d9e12ae 2026-08-18)",
       "--output",
       "docs/curves/odd-subgroup-transfer-certificates.json"
     ],
-    "git_commit": "e0ae0fe5d09c0492a8b50600e88d0b9da68afef1",
+    "git_commit": "8c94831426fa35040fa7b38b1379299bf6e6d957",
     "repository": "aburan28/crypto",
     "rustc_version": "rustc 1.98.0 (88d9e12ae 2026-08-18)",
     "rustc_version_attestation": "caller_supplied_unverified",
@@ -84,9 +84,9 @@
         "sha256": "2a8569ac5b33d55d1fa312f1da0be3b49578ff916dc8cccd41561ad3c25d8f5d"
       },
       {
-        "bytes": 98408,
+        "bytes": 108831,
         "path": "src/bin/odd_transfer_catalog.rs",
-        "sha256": "e7e8375f79cb248d3245e2610f8cc20aae52dfdfcefd9582a6041af027b58d78"
+        "sha256": "d5c3db0821e387a164ad322434237eec16b8e81d8157e618afbc037096673b20"
       },
       {
         "bytes": 3850,
@@ -139,9 +139,19 @@
         "sha256": "5a5f275021cf901e44a2a2a0e3fb9238e55da2772a1620ec153d0d8e4461d451"
       },
       {
-        "bytes": 42055,
+        "bytes": 42227,
         "path": "src/prime_hyperelliptic/cover_transfer.rs",
-        "sha256": "4ac06190059262ab96b9ebc80f84ee27a3d9a660d8b4e05186ea7c8c5362724e"
+        "sha256": "10bb0b0fd2c35b8fafb9e5570c01c5ff597f43a71bdac49a9b9f7e51ad5093a4"
+      },
+      {
+        "bytes": 17517,
+        "path": "src/prime_hyperelliptic/model_transfer.rs",
+        "sha256": "cf8d723a0aadd9a4bbdcd2dd56e581ee4bdc0253513d6da9deba95fc5f67ec50"
+      },
+      {
+        "bytes": 20963,
+        "path": "src/prime_hyperelliptic/normalized_cover_transfer.rs",
+        "sha256": "35f81b57d72b4f12e1c14a2392e2510982ca9225843117798c0f1e80d16a571a"
       },
       {
         "bytes": 12739,
@@ -154,9 +164,9 @@
         "sha256": "20bba7310673b1591d1f8c2dc1b6bf851e9a310801a803d31bf7a6bb1e189f44"
       },
       {
-        "bytes": 4143,
+        "bytes": 4645,
         "path": "src/prime_hyperelliptic/mod.rs",
-        "sha256": "c87c2681b51c052582e3f1389b9bcd58c5ca38797c58e6a8914459cef21b0ffd"
+        "sha256": "e199bbc9bd33e6df119f4f71a153737f7bdf6e1da3303fc702f6347a4a8e6766"
       },
       {
         "bytes": 18601,
@@ -169,9 +179,9 @@
         "sha256": "3b055ac166717960963e4e80b7d75eaba6c1681a7bc2e7ddfbb0d4af4d5aaf1c"
       },
       {
-        "bytes": 26271,
+        "bytes": 26398,
         "path": "docs/curves/odd-subgroup-transfer-certificates.schema.json",
-        "sha256": "592b8eb1786050a44df676ac72ea9ad56f25e0bcb8d49f355e716fdf97b44e18"
+        "sha256": "5261720d6f991e1c8bdbc6e4e05db0258e9cbe0bb67e0b196344ed8d5380e077"
       },
       {
         "bytes": 20554,
@@ -204,6 +214,8 @@
       "src/utils/mod.rs",
       "src/prime_hyperelliptic/balanced.rs",
       "src/prime_hyperelliptic/cover_transfer.rs",
+      "src/prime_hyperelliptic/model_transfer.rs",
+      "src/prime_hyperelliptic/normalized_cover_transfer.rs",
       "src/prime_hyperelliptic/fp2.rs",
       "src/prime_hyperelliptic/fp_poly.rs",
       "src/prime_hyperelliptic/mod.rs",
@@ -213,7 +225,7 @@
       "Cargo.toml",
       "Cargo.lock"
     ],
-    "source_sha256": "3116ef637921b9aade22bbbaa0bd5f3eaaa798e6d7517474dab912a9dc8c2768"
+    "source_sha256": "a5412b92e5e027b281d79c541cc34df130e16d9c71a7034f2065c6e181d8b3ef"
   },
   "proof_artifacts": [
     {
@@ -359810,11 +359822,11 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "3369993333393829974333376885877453834204643052817571560137951281149"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
-          "status": "unsupported_normalized_target_transfer_backend"
+          "reason": "the Montgomery transfer backend is implemented, but the field modulus or annihilator is outside the accepted deterministic proof range",
+          "status": "unsupported_without_primality_certificate"
         }
       ],
-      "status": "unsupported_normalized_target_transfer_backend"
+      "status": "unsupported_without_primality_certificate"
     },
     {
       "cover_uid": "urn:hc-model:1:sha256:3672671f7e66770fc2405751544380edf87733131f0b1408f29e5ecb8eedf2a8",
@@ -359976,7 +359988,7 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "6739986666787659948666753771754907668409286105635143120275902562187"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
+          "reason": "the Edwards target still requires an exceptional-point-safe projective transfer adapter",
           "status": "unsupported_normalized_target_transfer_backend"
         }
       ],
@@ -367495,7 +367507,7 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "52435875175126190479447740508185965837690552500527637822603658699938581184513"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
+          "reason": "the Edwards target still requires an exceptional-point-safe projective transfer adapter",
           "status": "unsupported_normalized_target_transfer_backend"
         }
       ],
@@ -367703,8 +367715,8 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "57896044618658097711785492504343953926634992332820282019728792003956564819949"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
-          "status": "unsupported_normalized_target_transfer_backend"
+          "reason": "the Montgomery transfer backend is implemented, but the field modulus or annihilator is outside the accepted deterministic proof range",
+          "status": "unsupported_without_primality_certificate"
         },
         {
           "annihilator_primality": {
@@ -367771,11 +367783,11 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "57896044618658097711785492504343953926634992332820282019728792003956564819949"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
-          "status": "unsupported_normalized_target_transfer_backend"
+          "reason": "the Montgomery transfer backend is implemented, but the field modulus or annihilator is outside the accepted deterministic proof range",
+          "status": "unsupported_without_primality_certificate"
         }
       ],
-      "status": "unsupported_normalized_target_transfer_backend"
+      "status": "unsupported_without_primality_certificate"
     },
     {
       "cover_uid": "urn:hc-model:1:sha256:2681495f4e5a39adf14a3ddbb3168724ac1de68bfc52848b0d07dfc1ccbbfb06",
@@ -367854,7 +367866,7 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "57896044618658097711785492504343953926634992332820282019728792003956564819949"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
+          "reason": "the Edwards target still requires an exceptional-point-safe projective transfer adapter",
           "status": "unsupported_normalized_target_transfer_backend"
         }
       ],
@@ -368366,7 +368378,7 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "109112363276961190442711090369149551676330307646118204517771511330536253156371"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
+          "reason": "the Edwards target still requires an exceptional-point-safe projective transfer adapter",
           "status": "unsupported_normalized_target_transfer_backend"
         }
       ],
@@ -369100,7 +369112,7 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "115792089237316195423570985008687907853269984665640564039457584007913129639319"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
+          "reason": "the Edwards target still requires an exceptional-point-safe projective transfer adapter",
           "status": "unsupported_normalized_target_transfer_backend"
         }
       ],
@@ -369183,7 +369195,7 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "115792089237316195423570985008687907853269984665640564039457584007913129639747"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
+          "reason": "the Edwards target still requires an exceptional-point-safe projective transfer adapter",
           "status": "unsupported_normalized_target_transfer_backend"
         }
       ],
@@ -370152,7 +370164,7 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "9850501549098619803069760025035903451269934817616361666987073351061430442874302652853566563721228910201656997576599"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
+          "reason": "the Edwards target still requires an exceptional-point-safe projective transfer adapter",
           "status": "unsupported_normalized_target_transfer_backend"
         }
       ],
@@ -370263,11 +370275,11 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "19701003098197239606139520050071806902539869635232723333974146702122860885748605305707133127442457820403313995153221"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
-          "status": "unsupported_normalized_target_transfer_backend"
+          "reason": "the Montgomery transfer backend is implemented, but the field modulus or annihilator is outside the accepted deterministic proof range",
+          "status": "unsupported_without_primality_certificate"
         }
       ],
-      "status": "unsupported_normalized_target_transfer_backend"
+      "status": "unsupported_without_primality_certificate"
     },
     {
       "cover_uid": "urn:hc-model:1:sha256:73a38b8d8c84432c9c5a36b98df134b372c4eca7b8643f6045f6a869c1a325bb",
@@ -370346,11 +370358,11 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "19701003098197239606139520050071806902539869635232723333974146702122860885748605305707133127442457820403313995153221"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
-          "status": "unsupported_normalized_target_transfer_backend"
+          "reason": "the Montgomery transfer backend is implemented, but the field modulus or annihilator is outside the accepted deterministic proof range",
+          "status": "unsupported_without_primality_certificate"
         }
       ],
-      "status": "unsupported_normalized_target_transfer_backend"
+      "status": "unsupported_without_primality_certificate"
     },
     {
       "cover_uid": "urn:hc-model:1:sha256:332d466d05c241a565c1a7c4218362fab8616151ce11b2e96059dc17a57039f5",
@@ -371080,7 +371092,7 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "39402006196394479212279040100143613805079739270465446667948293404245721771497210611414266254884915640806627990306499"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
+          "reason": "the Edwards target still requires an exceptional-point-safe projective transfer adapter",
           "status": "unsupported_normalized_target_transfer_backend"
         }
       ],
@@ -371246,7 +371258,7 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "42307582002575910332922579714097346549017899709713998034217522897561970639123926132812109468141778230245837569601494931472367"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
+          "reason": "the Edwards target still requires an exceptional-point-safe projective transfer adapter",
           "status": "unsupported_normalized_target_transfer_backend"
         }
       ],
@@ -371495,11 +371507,11 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "726838724295606890549323807888004534353641360687318060281490199180612328166730772686396383698676545930088884461843637361053498018365439"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
-          "status": "unsupported_normalized_target_transfer_backend"
+          "reason": "the Montgomery transfer backend is implemented, but the field modulus or annihilator is outside the accepted deterministic proof range",
+          "status": "unsupported_without_primality_certificate"
         }
       ],
-      "status": "unsupported_normalized_target_transfer_backend"
+      "status": "unsupported_without_primality_certificate"
     },
     {
       "cover_uid": "urn:hc-model:1:sha256:05e93c3b9fc8dc0c3063c868d267b5071e2b49d1ea9c57a5246a4a67216ae717",
@@ -371578,7 +371590,7 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "726838724295606890549323807888004534353641360687318060281490199180612328166730772686396383698676545930088884461843637361053498018365439"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
+          "reason": "the Edwards target still requires an exceptional-point-safe projective transfer adapter",
           "status": "unsupported_normalized_target_transfer_backend"
         }
       ],
@@ -371661,7 +371673,7 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "726838724295606890549323807888004534353641360687318060281490199180612328166730772686396383698676545930088884461843637361053498018365439"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
+          "reason": "the Edwards target still requires an exceptional-point-safe projective transfer adapter",
           "status": "unsupported_normalized_target_transfer_backend"
         },
         {
@@ -371729,7 +371741,7 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "726838724295606890549323807888004534353641360687318060281490199180612328166730772686396383698676545930088884461843637361053498018365439"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
+          "reason": "the Edwards target still requires an exceptional-point-safe projective transfer adapter",
           "status": "unsupported_normalized_target_transfer_backend"
         }
       ],
@@ -372366,11 +372378,11 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "6703903964971298549787012499102923063739682910296196688861780721860882015036773488400937149083451713845015929093243025426876941405973284973216824503041861"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
-          "status": "unsupported_normalized_target_transfer_backend"
+          "reason": "the Montgomery transfer backend is implemented, but the field modulus or annihilator is outside the accepted deterministic proof range",
+          "status": "unsupported_without_primality_certificate"
         }
       ],
-      "status": "unsupported_normalized_target_transfer_backend"
+      "status": "unsupported_without_primality_certificate"
     },
     {
       "cover_uid": "urn:hc-model:1:sha256:908c42b04caa6babc7466698fca56b3ee8e9af4e30d6632c94b06d1fb7b6ce8b",
@@ -372823,7 +372835,7 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006083527"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
+          "reason": "the Edwards target still requires an exceptional-point-safe projective transfer adapter",
           "status": "unsupported_normalized_target_transfer_backend"
         }
       ],
@@ -373072,7 +373084,7 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "13407807929942597099574024998205846127479365820592393377723561443721764030073546976801874298166903427690031858186486050853753882811946569946433649006083527"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
+          "reason": "the Edwards target still requires an exceptional-point-safe projective transfer adapter",
           "status": "unsupported_normalized_target_transfer_backend"
         }
       ],
@@ -373155,7 +373167,7 @@
             "theorem_reference": "Sorenson-Webster-2015-Theorem-1.1-psi13-exclusive-bound",
             "value_decimal": "6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151"
           },
-          "reason": "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
+          "reason": "the Edwards target still requires an exceptional-point-safe projective transfer adapter",
           "status": "unsupported_normalized_target_transfer_backend"
         }
       ],
@@ -395221,7 +395233,7 @@
     "independent_source_jacobian_oracle": "not_provided_catalog_wide",
     "map": "pi(u,v)=(u^2+c,v)",
     "map_degree": 2,
-    "normalized_target_backend": "unsupported",
+    "normalized_target_backend": "montgomery_implemented_live_rows_primality_gated_edwards_unsupported",
     "solver_assessment": "not_provided",
     "source": "genus_2_split_sextic_with_two_rational_infinities",
     "supported_claim": "exact-prime-order_named-generated-subgroup_pullback_is_injective_with_checked_recovery",
@@ -395242,8 +395254,8 @@
     "supported_ordinary_fiber_records": 542,
     "supported_ramified_repeated_support_records": 133,
     "unsupported_kernel_intersection": 0,
-    "unsupported_normalized_target_transfer_backend": 22,
+    "unsupported_normalized_target_transfer_backend": 15,
     "unsupported_odd_extension_field_transfer_backend": 9,
-    "unsupported_without_primality_certificate": 233
+    "unsupported_without_primality_certificate": 240
   }
 }

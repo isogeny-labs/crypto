@@ -190,6 +190,8 @@ jobs:
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
             /research/chained_jacobian_transfers_20261110/lean/ChainTransfer.lean
             /research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-e0ae0fe5.json
+            /research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json
+            /research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json
             /docs/curves/
             /docs/ecdlp-audit/
             /README.md
@@ -307,6 +309,8 @@ jobs:
           cp -R docs/ecdlp-audit "dist/$name/docs/"
           mkdir -p "dist/$name/research/curve_transfer_infrastructure_20261118"
           cp research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-e0ae0fe5.json \
+             research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json \
+             research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json \
              "dist/$name/research/curve_transfer_infrastructure_20261118/"
           for bin in crypto ic ecbench curve_cover_check hyperelliptic-cover ecdlp-audit factor-base-sweep curve-transfer-sweep odd-transfer-catalog; do
             cp "target/${{ matrix.target }}/release/$bin$ext" "dist/$name/"
@@ -338,7 +342,9 @@ jobs:
               docs/curves/cover-transfer-assessments.json \
               docs/curves/cover-transfer-assessment.schema.json \
               docs/curves/fixed-f8-genus3-order-certificate.json \
-              research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-e0ae0fe5.json; do
+              research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-e0ae0fe5.json \
+              research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json \
+              research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json; do
               test -f "$required"
             done
             "./hyperelliptic-cover$ext" --help > /dev/null
@@ -389,8 +395,8 @@ jobs:
             node -e 'const fs=require("fs"); for(const file of ["verified-smoke.json","arithmetic-smoke.json"]){const r=JSON.parse(fs.readFileSync(file)); if(r.status!=="ok") process.exit(1)} const c=JSON.parse(fs.readFileSync("catalog-smoke.json")); if(c.schema_version!=="curve-covers/v1") process.exit(1);'
             node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("transfer-catalog-replay.json")); if(r.schema_version!=="binary-subgroup-transfer-catalog-verification/v1"||r.status!=="verified_complete"||r.checks.optional_raw_hash_and_size!==true||r.checks.canonical_bytes_equal!==true||r.corpus.sha256!=="671425585e8f67e0596186fc574f2265938cd6465057d85ca1ae9844e47619cc"||r.corpus.bytes!==500924||r.summary.failed_named_subgroup_records!==0) process.exit(1);'
             cmp transfer-catalog-replay.json research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-e0ae0fe5.json
-            odd_corpus_sha256="7c60fc122c73abbe7b0df1413d24abbb064a9842bb35c2da8248d30c87f65670"
-            odd_corpus_bytes="17879352"
+            odd_corpus_sha256="1ecfabcdaecc3e00d78ab2ce7eebeb94607e1c2c224f261fb5718a4f53b65268"
+            odd_corpus_bytes="17879292"
             actual_odd_sha256="$(sha256sum docs/curves/odd-subgroup-transfer-certificates.json | awk '{print $1}')"
             actual_odd_bytes="$(wc -c < docs/curves/odd-subgroup-transfer-certificates.json)"
             test "$actual_odd_sha256" = "$odd_corpus_sha256"
@@ -412,11 +418,13 @@ jobs:
               exit 1
             fi
             node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("odd-transfer-catalog-replay.json")); const sha=process.argv[1], bytes=Number(process.argv[2]); if(r.schema_version!=="odd-subgroup-transfer-catalog-verification/v1"||r.status!=="verified_named_subgroup_incomplete"||r.checks.optional_raw_hash_and_size!==true||r.checks.canonical_bytes_equal!==true||r.checks.all_named_subgroup_records_supported!==false||r.corpus.sha256!==sha||r.corpus.bytes!==bytes) process.exit(1);' "$odd_corpus_sha256" "$odd_corpus_bytes"
+            cmp odd-transfer-catalog-replay.json research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json
             "./odd-transfer-catalog$ext" verify-source \
               --input docs/curves/odd-subgroup-transfer-certificates.json \
               --repo-root "$GITHUB_WORKSPACE" \
               --output odd-transfer-source-replay.json
             node -e 'const fs=require("fs"); const c=JSON.parse(fs.readFileSync("docs/curves/odd-subgroup-transfer-certificates.json")); const r=JSON.parse(fs.readFileSync("odd-transfer-source-replay.json")); if(r.schema_version!=="odd-subgroup-transfer-source-verification/v1"||r.status!=="source_manifest_bound_to_recorded_git_tree"||r.producer_commit!==c.producer.git_commit||r.source_sha256!==c.producer.source_sha256||Object.values(r.checks).some(v=>v!==true)) process.exit(1);'
+            cmp odd-transfer-source-replay.json research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json
             "./ecdlp-audit$ext" verify-fixed-f8-order \
               --input docs/curves/fixed-f8-genus3-order-certificate.json \
               --repo-root . \

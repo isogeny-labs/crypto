@@ -64,19 +64,25 @@ perform no registry lookup. See
 `docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md` for the exact request contract,
 infinity-model boundary, and structured unsupported cases.
 
-The tracked odd corpus is exactly 17,879,352 bytes with SHA-256
-`7c60fc122c73abbe7b0df1413d24abbb064a9842bb35c2da8248d30c87f65670`.
+The tracked odd corpus is exactly 17,879,292 bytes with SHA-256
+`1ecfabcdaecc3e00d78ab2ce7eebeb94607e1c2c224f261fb5718a4f53b65268`.
 It records clean producer commit
-`e0ae0fe5d09c0492a8b50600e88d0b9da68afef1`, framed source digest
-`3116ef637921b9aade22bbbaa0bd5f3eaaa798e6d7517474dab912a9dc8c2768`,
-22,243 maps, and 940 named bindings. Its final partition is 675 supported, 233
-proof-range unsupported, 0 kernel-intersection unsupported, 22 normalized
+`8c94831426fa35040fa7b38b1379299bf6e6d957`, framed source digest
+`a5412b92e5e027b281d79c541cc34df130e16d9c71a7034f2065c6e181d8b3ef`,
+29 source files, 22,243 maps, and 940 named bindings. Its final partition is
+675 supported, 240 proof-range unsupported, 0 kernel-intersection unsupported,
+15 Edwards normalized
 backend unsupported, 9 extension backend unsupported, 1 invalid generator, 0
 other invalid, and 0 transfer-arithmetic failures. Canonical
 same-implementation replay exits `1`, while repository source replay exits
 `0`; neither result is an independent arithmetic check, a solver, or an
 advantage claim. The recorded compiler label remains caller-supplied and the
 Lean theorem remains local, unsigned, and conditional. [pcc:unverified]
+
+Seven Montgomery bindings now have a composed backend but remain proof-gated
+because accepted field/order evidence is missing; they are not live-supported.
+The earlier 17,879,352-byte `7c60fc…` corpus from producer `e0ae0fe5…`, with
+partition 675/233/22/9/1, remains immutable historical evidence.
 
 Before compression, the release job enters the staged archive tree, requires
 byte-identical native regeneration of the saved cover catalog and link graph,

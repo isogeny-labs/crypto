@@ -1379,6 +1379,46 @@ async function buildSourceArtifacts() {
         ["tests/prime_montgomery_composed_transfer.rs"],
       ),
     ),
+    sourceArtifact(
+      "tests/common/prime_split_sextic_oracle.rs",
+      "shared production-independent split-sextic Picard-class oracle core",
+      freshness(
+        "supported",
+        "exactly the direct F5 wrapper and the composed-Montgomery F7 wrapper configured by the two separately bound test sources",
+        "The shared core constructs its own finite-field arithmetic, Picard-class table, target group law, divisor maps, and both composition identities before any production comparison. Its evidence is exhaustive only for the two configured tiny-field fixtures; it does not establish family-wide, catalog-wide, scaling, solver, subgroup, or advantage claims.",
+        [
+          "tests/common/prime_split_sextic_oracle.rs",
+          "tests/prime_cover_transfer_oracle.rs",
+          "tests/prime_montgomery_composed_transfer_oracle.rs",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "tests/prime_cover_transfer_oracle.rs",
+      "direct F5 configuration wrapper for the shared independent split-sextic oracle",
+      freshness(
+        "supported",
+        "the single direct fixture p=5, E: y^2=x^3+1, C: v^2=u^6+1, with 36 Picard classes and 6 target points",
+        "Together with the shared core, this wrapper fixes the field, source, target, extension, order, principal-divisor, and support-counter expectations for the exhaustive direct fixture. It is not evidence for another field, curve, catalog row, subgroup, solver, or computational advantage.",
+        [
+          "tests/common/prime_split_sextic_oracle.rs",
+          "tests/prime_cover_transfer_oracle.rs",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "tests/prime_montgomery_composed_transfer_oracle.rs",
+      "composed-Montgomery F7 configuration wrapper for the shared independent split-sextic oracle",
+      freshness(
+        "supported",
+        "the single p=7 Montgomery fixture A=3, B=2, c=1, with short model y^2=x^3+3x+1 and source v^2=u^6+3u^4+6u^2+5",
+        "The wrapper fixes N1=14, N2=58, #Jac=120, and #E=12. With the shared core it exhausts 14,400 source sums, 1,728,000 associativity triples, every pullback and pushforward, both compositions, 2,608 principal zero divisors, 21 irreducible-quadratic classes, 12 repeated-support classes, 1,989 shared-support pairs, and 1,989 conjugate-support pairs before production comparison. This one fixture promotes none of the seven proof-gated live Montgomery bindings and supplies no family-wide, catalog-wide, scaling, solver, subgroup, or advantage claim.",
+        [
+          "tests/common/prime_split_sextic_oracle.rs",
+          "tests/prime_montgomery_composed_transfer_oracle.rs",
+        ],
+      ),
+    ),
     ...IMPLEMENTATION_VERSION_PATHS.map(implementationVersionArtifact),
     sourceArtifact(
       "research/hyperelliptic_cover_infrastructure_20261006/evidence.json",

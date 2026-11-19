@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "e448d93c9fe811ef7201876b360f87a0355e21b9a201321b2ae7d914e0606485",
+      "sha256": "7b2c8e61938ec573ee4cce590440b042fd910872bbb07508a8d84f182ac39937",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -338,6 +338,49 @@
       }
     },
     {
+      "path": "tests/common/prime_split_sextic_oracle.rs",
+      "sha256": "982b562bdb059a1bc1454979e78a32e4671e463026bc4a99cffac936cda087d6",
+      "role": "shared production-independent split-sextic Picard-class oracle core",
+      "freshness": {
+        "status": "supported",
+        "scope": "exactly the direct F5 wrapper and the composed-Montgomery F7 wrapper configured by the two separately bound test sources",
+        "rationale": "The shared core constructs its own finite-field arithmetic, Picard-class table, target group law, divisor maps, and both composition identities before any production comparison. Its evidence is exhaustive only for the two configured tiny-field fixtures; it does not establish family-wide, catalog-wide, scaling, solver, subgroup, or advantage claims.",
+        "evidence_refs": [
+          "tests/common/prime_split_sextic_oracle.rs",
+          "tests/prime_cover_transfer_oracle.rs",
+          "tests/prime_montgomery_composed_transfer_oracle.rs"
+        ]
+      }
+    },
+    {
+      "path": "tests/prime_cover_transfer_oracle.rs",
+      "sha256": "2e552e3eb6a249eac31c8b8adf828b9c7109c07e513a3e6126d059e444527276",
+      "role": "direct F5 configuration wrapper for the shared independent split-sextic oracle",
+      "freshness": {
+        "status": "supported",
+        "scope": "the single direct fixture p=5, E: y^2=x^3+1, C: v^2=u^6+1, with 36 Picard classes and 6 target points",
+        "rationale": "Together with the shared core, this wrapper fixes the field, source, target, extension, order, principal-divisor, and support-counter expectations for the exhaustive direct fixture. It is not evidence for another field, curve, catalog row, subgroup, solver, or computational advantage.",
+        "evidence_refs": [
+          "tests/common/prime_split_sextic_oracle.rs",
+          "tests/prime_cover_transfer_oracle.rs"
+        ]
+      }
+    },
+    {
+      "path": "tests/prime_montgomery_composed_transfer_oracle.rs",
+      "sha256": "d1d2b9adc0abfb5049e366f7fa65723327a3406e7fdc213038156400d8215116",
+      "role": "composed-Montgomery F7 configuration wrapper for the shared independent split-sextic oracle",
+      "freshness": {
+        "status": "supported",
+        "scope": "the single p=7 Montgomery fixture A=3, B=2, c=1, with short model y^2=x^3+3x+1 and source v^2=u^6+3u^4+6u^2+5",
+        "rationale": "The wrapper fixes N1=14, N2=58, #Jac=120, and #E=12. With the shared core it exhausts 14,400 source sums, 1,728,000 associativity triples, every pullback and pushforward, both compositions, 2,608 principal zero divisors, 21 irreducible-quadratic classes, 12 repeated-support classes, 1,989 shared-support pairs, and 1,989 conjugate-support pairs before production comparison. This one fixture promotes none of the seven proof-gated live Montgomery bindings and supplies no family-wide, catalog-wide, scaling, solver, subgroup, or advantage claim.",
+        "evidence_refs": [
+          "tests/common/prime_split_sextic_oracle.rs",
+          "tests/prime_montgomery_composed_transfer_oracle.rs"
+        ]
+      }
+    },
+    {
       "path": "Cargo.toml",
       "sha256": "c10489f74b7db80cf9bc9889bfed6d58637a9db6ae4ae90f40b8faae1cd6a9b3",
       "role": "exact implementation-version dependency: Cargo.toml",
@@ -365,7 +408,7 @@
     },
     {
       "path": ".github/workflows/curve-covers.yml",
-      "sha256": "488c0232e1c8b5cdee61b164e71b8e0b95485cd987c1855e91a2d182c7d663b6",
+      "sha256": "15d18fa0ba670a19dd220767a84af3a0896003133021ff4a2bc0f43dddac926a",
       "role": "exact implementation-version dependency: .github/workflows/curve-covers.yml",
       "freshness": {
         "status": "supported",
@@ -378,7 +421,7 @@
     },
     {
       "path": ".github/workflows/release.yml",
-      "sha256": "135fb29d796934abe56bf24454a6526a7486c5b8f39273b9e07323a158f30f81",
+      "sha256": "4fcb344e37ce749d5fe043cc035faf99e1c1a77be2c0471fb088a78afab48df7",
       "role": "exact implementation-version dependency: .github/workflows/release.yml",
       "freshness": {
         "status": "supported",
@@ -603,7 +646,7 @@
     },
     {
       "path": "docs/curves/COVERS.md",
-      "sha256": "361e6fe056b452fafdf48c547c67485fcfd8045e12ed81e39bae8371798eb74d",
+      "sha256": "454f8ee96011cf7d1a253c3f080cfa43452e36b8bfa4fdbef609bb6631518ff4",
       "role": "catalog geometry contract and proof boundary",
       "freshness": {
         "status": "supported",
@@ -616,7 +659,7 @@
     },
     {
       "path": "docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md",
-      "sha256": "a75e002bf757a52f43441d03de3a54f02cf05e668f2597c819784642c26a7533",
+      "sha256": "e388979022da5429f3cbdc1f05f13970775f35045068af9639105c1ad3e352c0",
       "role": "standalone CLI and supported-model documentation",
       "freshness": {
         "status": "supported",

@@ -59,19 +59,25 @@ proved direct-prime bindings, proof-range gaps, normalized targets,
 extension-field backends, and invalid catalog data in distinct buckets; it is
 not a catalog-wide Jacobian or solver claim.
 
-The tracked odd corpus covers 22,243 maps and 940 named bindings in 17,879,352
+The tracked odd corpus covers 22,243 maps and 940 named bindings in 17,879,292
 bytes (SHA-256
-`7c60fc122c73abbe7b0df1413d24abbb064a9842bb35c2da8248d30c87f65670`).
-Clean producer commit `e0ae0fe5d09c0492a8b50600e88d0b9da68afef1`
+`1ecfabcdaecc3e00d78ab2ce7eebeb94607e1c2c224f261fb5718a4f53b65268`).
+Clean producer commit `8c94831426fa35040fa7b38b1379299bf6e6d957`
 binds source digest
-`3116ef637921b9aade22bbbaa0bd5f3eaaa798e6d7517474dab912a9dc8c2768`.
-Its exact partition is 675 supported, 233 proof-range unsupported, 0
-kernel-intersection unsupported, 22 normalized-backend unsupported, 9
-extension-backend unsupported, 1 invalid generator, 0 other invalid, and 0
-transfer-arithmetic failures. Canonical same-implementation replay exits `1`
-because the unsupported and failed rows are retained; source-tree replay exits
-`0`. Neither receipt is catalog-wide independent evidence, a solver, or an
-advantage claim. [pcc:unverified]
+`a5412b92e5e027b281d79c541cc34df130e16d9c71a7034f2065c6e181d8b3ef`
+across 29 source files. Its exact partition is 675 supported, 240 proof-range
+unsupported, 0 kernel-intersection unsupported, 15 Edwards
+normalized-backend unsupported, 9 extension-backend unsupported, 1 invalid
+generator, 0 other invalid, and 0 transfer-arithmetic failures. Seven
+Montgomery bindings now use the composed
+backend but remain proof-gated because their fields or declared orders lack an
+accepted certificate; they are not live-supported. Canonical
+same-implementation replay exits `1` because the unsupported and failed rows
+are retained; source-tree replay exits `0`. Neither receipt is catalog-wide
+independent evidence, a solver, or an advantage claim. [pcc:unverified]
+
+The earlier 17,879,352-byte `7c60fc…` corpus from producer `e0ae0fe5…`, with
+partition 675/233/22/9/1, remains immutable historical evidence.
 
 For the exact polynomial-basis F8 genus-three fixture with `a=1`, `b=3`, the
 [machine-readable order certificate](fixed-f8-genus3-order-certificate.json)
