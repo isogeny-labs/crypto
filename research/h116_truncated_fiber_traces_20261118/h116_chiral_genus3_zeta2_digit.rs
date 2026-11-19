@@ -19,6 +19,9 @@ mod frozen {
             s1: i64,
             s2: i64,
             e2: i64,
+            prym_trace: i64,
+            prym_eta: i64,
+            prym_discriminant: i64,
         }
 
         #[derive(Clone)]
@@ -26,6 +29,7 @@ mod frozen {
             slug: String,
             digit: u8,
             residues: [[i8; FEATURES]; OBSERVABLES],
+            prym_residues: [[i8; FEATURES]; OBSERVABLES],
         }
 
         struct Rule {
@@ -155,6 +159,7 @@ mod frozen {
 
         fn prediction(
             target: &Target,
+            prym_panel: bool,
             observable: usize,
             coefficients: &[u8; FEATURES],
             offset: u8,
@@ -164,7 +169,11 @@ mod frozen {
                 if coefficients[feature] == 0 {
                     continue;
                 }
-                let residue = target.residues[observable][feature];
+                let residue = if prym_panel {
+                    target.prym_residues[observable][feature]
+                } else {
+                    target.residues[observable][feature]
+                };
                 if residue < 0 {
                     return 3;
                 }
@@ -194,10 +203,12 @@ mod frozen {
                 .join(",")
         }
 
-        fn observable_name(observable: usize) -> &'static str {
-            match observable {
-                0 => "s2",
-                1 => "e2",
+        fn observable_name(observable: usize, prym_panel: bool) -> &'static str {
+            match (prym_panel, observable) {
+                (false, 0) => "s2",
+                (false, 1) => "e2",
+                (true, 0) => "prym_eta",
+                (true, 1) => "prym_real_weil_discriminant",
                 _ => unreachable!(),
             }
         }
@@ -251,14 +262,24 @@ mod frozen {
                 slug: "control".to_string(),
                 digit: 1,
                 residues: [[1, 0, 0, 0], [2, 0, 0, 0]],
+                prym_residues: [[1, 0, 0, 0], [2, 0, 0, 0]],
             };
-            assert_eq!(prediction(&planted, 0, &[1, 0, 0, 0], 0), 1);
-            assert_eq!(prediction(&planted, 1, &[2, 0, 0, 0], 0), 1);
+            assert_eq!(prediction(&planted, false, 0, &[1, 0, 0, 0], 0), 1);
+            assert_eq!(prediction(&planted, false, 1, &[2, 0, 0, 0], 0), 1);
+            assert_eq!(prediction(&planted, true, 0, &[1, 0, 0, 0], 0), 1);
             println!("h116 chiral genus-three zeta2 digit selftest: pass rules=486");
             Ok(())
         }
 
         pub fn run(output_path: &Path) -> Result<(), String> {
+            run_with_panel(output_path, false)
+        }
+
+        pub fn run_prym(output_path: &Path) -> Result<(), String> {
+            run_with_panel(output_path, true)
+        }
+
+        fn run_with_panel(output_path: &Path, prym_panel: bool) -> Result<(), String> {
             let mut targets = Vec::new();
             let mut rows = BTreeMap::<String, Vec<usize>>::new();
             let mut extension_square_table_checks = 0_u64;
@@ -275,6 +296,9 @@ mod frozen {
             let mut chirality_swap_checks = 0_usize;
             let mut s2_distinguishing_targets = 0_usize;
             let mut e2_distinguishing_targets = 0_usize;
+            let mut prym_eta_distinguishing_targets = 0_usize;
+            let mut prym_discriminant_distinguishing_targets = 0_usize;
+            let mut prym_factor_checks = 0_usize;
 
             for spec in CURVES {
                 let base_field = Field::new(spec.p, 1, &[0, 1])?;
@@ -439,9 +463,35 @@ mod frozen {
                         if e2 * e2 > 225 * spec.p as i64 * spec.p as i64 {
                             return Err("second zeta coefficient bound failed".to_string());
                         }
+                        let prym_trace = s1 - spec.trace;
+                        let prym_eta =
+                            e2 - spec.p as i64 - spec.trace * prym_trace;
+                        let prym_discriminant = prym_trace * prym_trace
+                            - 4 * (prym_eta - 2 * spec.p as i64);
+                        if s1 != spec.trace + prym_trace
+                            || e2 != spec.p as i64 + spec.trace * prym_trace + prym_eta
+                        {
+                            return Err("Prym factor coefficient identity failed".to_string());
+                        }
+                        if prym_trace * prym_trace > 16 * spec.p as i64
+                            || prym_eta * prym_eta
+                                > 36 * spec.p as i64 * spec.p as i64
+                            || prym_discriminant < 0
+                            || prym_discriminant > 16 * spec.p as i64
+                        {
+                            return Err("Prym real-Weil bound failed".to_string());
+                        }
+                        prym_factor_checks += 1;
                         newton_checks += 1;
                         smooth_cover_levels += 1;
-                        table[level as usize] = Some(CoverData { s1, s2, e2 });
+                        table[level as usize] = Some(CoverData {
+                            s1,
+                            s2,
+                            e2,
+                            prym_trace,
+                            prym_eta,
+                            prym_discriminant,
+                        });
                     }
                     data_tables.push(table);
                 }
@@ -449,8 +499,11 @@ mod frozen {
                 for scalar in 1..spec.order {
                     let target_point = base_curve.scalar_mul(scalar, generator)?;
                     let mut residues = [[-1_i8; FEATURES]; OBSERVABLES];
+                    let mut prym_residues = [[-1_i8; FEATURES]; OBSERVABLES];
                     let mut s2_distinguished = false;
                     let mut e2_distinguished = false;
+                    let mut prym_eta_distinguished = false;
+                    let mut prym_discriminant_distinguished = false;
                     for multiplier in 1..=2_u64 {
                         let multiple = base_curve.scalar_mul(multiplier, target_point)?;
                         let (x, y) = point_base_coordinates(&base_field, multiple)?;
@@ -462,16 +515,29 @@ mod frozen {
                         if let Some(data) = plus_data {
                             residues[0][feature] = data.s2.rem_euclid(3) as i8;
                             residues[1][feature] = data.e2.rem_euclid(3) as i8;
+                            prym_residues[0][feature] = data.prym_eta.rem_euclid(3) as i8;
+                            prym_residues[1][feature] =
+                                data.prym_discriminant.rem_euclid(3) as i8;
                             smooth_feature_checks += 1;
                         }
                         if let Some(data) = minus_data {
                             residues[0][feature + 1] = data.s2.rem_euclid(3) as i8;
                             residues[1][feature + 1] = data.e2.rem_euclid(3) as i8;
+                            prym_residues[0][feature + 1] =
+                                data.prym_eta.rem_euclid(3) as i8;
+                            prym_residues[1][feature + 1] =
+                                data.prym_discriminant.rem_euclid(3) as i8;
                             smooth_feature_checks += 1;
                         }
                         if let (Some(plus), Some(minus)) = (plus_data, minus_data) {
                             s2_distinguished |= plus.s2.rem_euclid(3) != minus.s2.rem_euclid(3);
                             e2_distinguished |= plus.e2.rem_euclid(3) != minus.e2.rem_euclid(3);
+                            prym_eta_distinguished |=
+                                plus.prym_eta.rem_euclid(3) != minus.prym_eta.rem_euclid(3);
+                            prym_discriminant_distinguished |= plus
+                                .prym_discriminant
+                                .rem_euclid(3)
+                                != minus.prym_discriminant.rem_euclid(3);
                         }
 
                         let swapped_plus = data_tables[0][minus_level as usize];
@@ -483,11 +549,15 @@ mod frozen {
                     }
                     s2_distinguishing_targets += usize::from(s2_distinguished);
                     e2_distinguishing_targets += usize::from(e2_distinguished);
+                    prym_eta_distinguishing_targets += usize::from(prym_eta_distinguished);
+                    prym_discriminant_distinguishing_targets +=
+                        usize::from(prym_discriminant_distinguished);
                     let index = targets.len();
                     targets.push(Target {
                         slug: spec.slug.to_string(),
                         digit: (scalar % 3) as u8,
                         residues,
+                        prym_residues,
                     });
                     rows.entry(spec.slug.to_string()).or_default().push(index);
                 }
@@ -514,7 +584,13 @@ mod frozen {
                         let predictions: Vec<u8> = targets
                             .iter()
                             .map(|target| {
-                                prediction(target, observable, &coefficients, offset)
+                                prediction(
+                                    target,
+                                    prym_panel,
+                                    observable,
+                                    &coefficients,
+                                    offset,
+                                )
                             })
                             .collect();
                         let (coverage, matches) = score(&predictions, &labels);
@@ -594,7 +670,8 @@ mod frozen {
             let excess = 3_i64 * selected.matches as i64 - selected.coverage as i64;
             let json = format!(
                 concat!(
-                    "{{\n  \"schema\":\"h116-chiral-genus3-zeta2-digit/v1\",\n",
+                    "{{\n  \"schema\":\"h116-chiral-genus3-zeta2-digit/v2\",\n",
+                    "  \"panel\":\"{}\",\n",
                     "  \"targets\":{},\n  \"curves\":{},\n  \"observables\":2,\n  \"rules\":{},\n",
                     "  \"extension_square_table_checks\":{},\n",
                     "  \"extension_curve_census_checks\":{},\n  \"extension_fixed_point_checks\":{},\n",
@@ -604,6 +681,9 @@ mod frozen {
                     "  \"extension_trace_checks\":{},\n  \"newton_checks\":{},\n",
                     "  \"chirality_swap_checks\":{},\n  \"s2_distinguishing_targets\":{},\n",
                     "  \"e2_distinguishing_targets\":{},\n  \"planted_control_matches\":{},\n",
+                    "  \"prym_factor_checks\":{},\n",
+                    "  \"prym_eta_distinguishing_targets\":{},\n",
+                    "  \"prym_discriminant_distinguishing_targets\":{},\n",
                     "  \"selected_observable\":\"{}\",\n  \"selected_code\":{},\n",
                     "  \"selected_coefficients\":[{}],\n  \"selected_offset\":{},\n",
                     "  \"coverage\":{},\n  \"matches\":{},\n  \"ternary_excess\":{},\n",
@@ -613,6 +693,7 @@ mod frozen {
                     "  \"familywise_empirical_p\":{:.12},\n  \"per_curve\":[{}],\n",
                     "  \"status\":\"measured\"\n}}\n"
                 ),
+                if prym_panel { "prym" } else { "zeta2" },
                 targets.len(),
                 rows.len(),
                 rules.len(),
@@ -631,7 +712,10 @@ mod frozen {
                 s2_distinguishing_targets,
                 e2_distinguishing_targets,
                 TARGETS,
-                observable_name(selected.observable),
+                prym_factor_checks,
+                prym_eta_distinguishing_targets,
+                prym_discriminant_distinguishing_targets,
+                observable_name(selected.observable, prym_panel),
                 selected.code,
                 coefficient_string(&selected.coefficients),
                 selected.offset,
@@ -648,8 +732,9 @@ mod frozen {
             );
             fs::write(output_path, json).map_err(|error| error.to_string())?;
             println!(
-                "chiral genus-three zeta2 digit: observable={} coefficients=[{}] offset={} coverage={} matches={} exact={} p={:.6}",
-                observable_name(selected.observable),
+                "chiral genus-three {} digit: observable={} coefficients=[{}] offset={} coverage={} matches={} exact={} p={:.6}",
+                if prym_panel { "prym" } else { "zeta2" },
+                observable_name(selected.observable, prym_panel),
                 coefficient_string(&selected.coefficients),
                 selected.offset,
                 selected.coverage,
@@ -671,8 +756,11 @@ fn main() {
         [_, flag, output] if flag == "--run" => {
             frozen::chiral_genus3_zeta2::run(Path::new(output))
         }
+        [_, flag, output] if flag == "--run-prym" => {
+            frozen::chiral_genus3_zeta2::run_prym(Path::new(output))
+        }
         _ => Err(
-            "usage: h116_chiral_genus3_zeta2_digit --selftest | --run OUTPUT.json".to_string(),
+            "usage: h116_chiral_genus3_zeta2_digit --selftest | --run OUTPUT.json | --run-prym OUTPUT.json".to_string(),
         ),
     };
     if let Err(error) = result {
