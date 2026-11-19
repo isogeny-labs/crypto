@@ -1,0 +1,100 @@
+{
+  "schema": "crypto.native-library-fixture-and-isolation-repair/v1",
+  "standing": "unverified",
+  "parent_commit": "085f978ebf38aaebbb9d9499b1a1d40fa541de98",
+  "at": "2026-11-19T19:38:40.720643+00:00",
+  "baseline_run": {
+    "run": 44579652680,
+    "source": "5150e4aca978afe4cdca98e4102ae648e30c9017",
+    "parent_exit": 101,
+    "passed": 7536,
+    "failed": 38,
+    "ignored": 144,
+    "filtered_out": 0,
+    "receipt_and_complete_log_checksum_verified": true
+  },
+  "failure_groups": {
+    "missing_retained_fixture": 36,
+    "process_global_counter_comparison": 1,
+    "owner_lease_reopen_control": 1
+  },
+  "fixture_recovery": {
+    "parent": "085f978ebf38aaebbb9d9499b1a1d40fa541de98",
+    "old_recovery_entries_unchanged": 618,
+    "new_entries": 12,
+    "git_originals": 11,
+    "local_exact_cache_originals": 1,
+    "recovered_total_bytes": 33094620,
+    "gzip_bytes": 140550,
+    "fixture_paths": [
+      "research/bitop_ladder_20261019/sessions/holdout-P24/records.jsonl",
+      "research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl",
+      "research/ecbench_all_candidates_20261003/sessions/koblitz/records.jsonl",
+      "research/ecbench_all_candidates_20261003/sessions/prime/records.jsonl",
+      "research/ecbench_bounds_challenges_20261006/sessions/prime-toy-reference-e1/records.jsonl",
+      "research/ecbench_n37_native_online_wall_20261004/sessions/hosted_ubuntu_01/records.jsonl",
+      "research/ecbench_numa_vm_20261002/sessions/v2-auto/records.jsonl",
+      "research/ecbench_yield_sweep_20261004/sessions/koblitz/records.jsonl",
+      "research/ext_endo_rho_20261023/sessions-a1/gls-fp2/records.jsonl",
+      "research/ext_endo_rho_20261023/sessions/gls-fp2/records.jsonl",
+      "research/ext_endo_rho_20261023/sessions/subfield-fp3/records.jsonl",
+      "research/ic_planner_validation_20261020/sessions/r24/records.jsonl"
+    ],
+    "original_manifests_and_records_changed": false,
+    "S3_contacted": false
+  },
+  "cold_actual_canonical_cli_control": {
+    "cache_initially_absent": true,
+    "AWS_executable_absent": true,
+    "Git_lazy_fetch_disabled": true,
+    "explicit_exact_Git_blobs": 11,
+    "hash_bound_gzip": 1,
+    "hydrated_originals": 12,
+    "all_original_hashes_and_byte_counts_match": true,
+    "original_total_bytes": 33094620,
+    "no_S3_reads": true
+  },
+  "test_isolation": {
+    "change": "Run the two existing complete cases in fresh test executables to give each its required process isolation",
+    "original_test_bodies": {
+      "src/cryptanalysis/jv_cover.rs": {
+        "original_complete_body_preserved": true,
+        "original_file_sha256": "a30f7f40c140a09f2c0b3e74202f5edf76f4ff88776067ab50c54b241972ca98",
+        "candidate_sha256": "8aa87c8be1df9c4b5526c2d7b6974af7e165ed834d9db994449838efae487e92"
+      },
+      "src/ml_dataset/budget.rs": {
+        "original_complete_body_preserved": true,
+        "original_file_sha256": "980a8679f03ddf89b4bc862e9b829852ee7e4dc7de1e27b2ea31563f3f396ac1",
+        "candidate_sha256": "e69ab47a321e15b91d6e58430e6129a95f47770c8c2e388a860374c5ee3a2adc"
+      }
+    },
+    "helper_native_controls": [
+      "Successful exact test executes",
+      "Nonexistent test is refused instead of passing zero cases",
+      "Failed child is refused"
+    ],
+    "native_control_host": "macOS-27.2-arm64-arm-64bit-Mach-O",
+    "rustc": "rustc 1.93.1 (01f6ddf75 2026-02-11) (Homebrew)",
+    "standalone_helper_controls_passed": 3,
+    "native_OS_lease_control": "Barrier-controlled fork retains flock after parent close; reopen succeeds only after final inherited descriptor closes",
+    "Linux_original_case_validation": "Pending hosted CI; local standalone controls are not a full Linux suite result"
+  },
+  "workflow": {
+    "unfiltered_full_library_command_unchanged": true,
+    "test_threads_unchanged": 4,
+    "rayon_threads_unchanged": 1,
+    "deadline_minutes_unchanged": 90,
+    "automatic_retries": 0,
+    "ignored_test_policy_unchanged": true,
+    "fixture_pull": "Exact twelve paths through canonical pull --source git"
+  },
+  "frozen_artifacts_changed": false,
+  "production_solver_and_budget_code_changed": false,
+  "new_scientific_measurement": false,
+  "performance_optimization_introduced": false,
+  "earlier_local_control_setup_failures": [
+    "No manifests copied: zero outputs caught by exact expected-file checks",
+    "Untracked manifests: zero outputs caught by exact expected-file checks",
+    "Work volume filled before index staging; controls relocated with all 65 file hashes verified"
+  ]
+}

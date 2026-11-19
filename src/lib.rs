@@ -42,3 +42,6 @@ pub mod torsionguard;
 pub mod utils;
 pub mod visualize;
 pub mod zk;
+
+#[cfg(test)]
+mod test_process;
