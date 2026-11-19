@@ -19,7 +19,7 @@ This round records that baseline properly, with variance over many targets, and 
 
 - **`rhodpb … st`** (args[8]): single-target lanes. All L lanes walk the current target, each from its own random
   chained start, sharing one pending table and one simultaneous inversion per round. A collision of two walks with
-  opposite Q signs, or a database hit, solves it. Walk, step, distinguished-point and abandon rules are `rhodpb`'s.
+  opposite Q signs, or a database hit, gives the log. Walk, step, distinguished-point and abandon rules are `rhodpb`'s.
   This is the standard parallel distinguished-point rho for one target, with batched inversion.
 - **`ic5b … blk`**: a target checks 64 trial pairs per round under one simultaneous inversion, in order, stopping at
   the first hit. Trials, hits and logs are unchanged.
