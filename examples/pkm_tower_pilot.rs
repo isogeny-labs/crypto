@@ -3088,7 +3088,9 @@ fn parse_args() -> Args {
                     o => o.parse().expect("--hky3-skip-witness off|leads|span"),
                 }
             }
-            "--hky3-skip-witness-max" => a.hky3.skip_witness_max = v.parse().expect("--hky3-skip-witness-max"),
+            "--hky3-skip-witness-max" => {
+                a.hky3.skip_witness_max = v.parse().expect("--hky3-skip-witness-max")
+            }
             "--hky3-sweep-ratio" => a.hky3.sweep_ratio = v.parse().expect("--hky3-sweep-ratio"),
             "--hky3-sweep-tile-bytes" => {
                 a.hky3.sweep_tile_bytes = v.parse().expect("--hky3-sweep-tile-bytes")

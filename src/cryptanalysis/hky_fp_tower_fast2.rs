@@ -342,7 +342,12 @@ pub(super) struct Witness {
 
 impl Witness {
     pub(super) fn new(n: usize) -> Self {
-        Witness { pivot: vec![NONE; n], rows: Vec::new(), label: Vec::new(), acc: vec![0; n] }
+        Witness {
+            pivot: vec![NONE; n],
+            rows: Vec::new(),
+            label: Vec::new(),
+            acc: vec![0; n],
+        }
     }
 
     /// Takes the accumulator's entries in `from..=hi` as a monic row (and
@@ -365,7 +370,9 @@ impl Witness {
     /// `acc` is a zeroed scratch of at least the part's columns (left zeroed).
     pub(super) fn prereduce(&self, v: &Row, k: u16, p: u64, acc: &mut [u64]) -> (Row, u64) {
         let mut ops = 0u64;
-        let Some(&(first, _)) = v.first() else { return (Vec::new(), 0) };
+        let Some(&(first, _)) = v.first() else {
+            return (Vec::new(), 0);
+        };
         let p2 = p * p;
         let mut hi = 0usize;
         for &(j, x) in v {
@@ -490,9 +497,17 @@ impl Witness {
     /// with label `k` is a combination of inserted vectors of label at most
     /// `k` and has the column it is placed at as its leading column
     /// (PROOF.md). Returns the multiply-adds.
-    pub(super) fn insert(&mut self, v: Row, mut k: u16, p: u64, set: &mut impl FnMut(u32, u16)) -> u64 {
+    pub(super) fn insert(
+        &mut self,
+        v: Row,
+        mut k: u16,
+        p: u64,
+        set: &mut impl FnMut(u32, u16),
+    ) -> u64 {
         let mut ops = 0u64;
-        let Some(&(first, _)) = v.first() else { return 0 };
+        let Some(&(first, _)) = v.first() else {
+            return 0;
+        };
         let mut hi = 0usize;
         for &(j, x) in &v {
             self.acc[j as usize] = u64::from(x);
@@ -712,7 +727,10 @@ impl Echelon {
         v.push(r[0]);
         for &(c, x) in &r[1..] {
             let j = self.of_col[c as usize];
-            assert!(j != NONE, "hky_fp_tower_fast2: a tail meets a pivot of the epoch");
+            assert!(
+                j != NONE,
+                "hky_fp_tower_fast2: a tail meets a pivot of the epoch"
+            );
             v.push((j, x));
         }
         RowS::Sparse(v)
@@ -774,7 +792,10 @@ impl Echelon {
                 t.push((lead, 1));
                 let mut put = |j: usize, x: u32| {
                     let nj = remap[j];
-                    assert!(nj != NONE, "hky_fp_tower_fast2: new epoch: a tail meets a pivot");
+                    assert!(
+                        nj != NONE,
+                        "hky_fp_tower_fast2: new epoch: a tail meets a pivot"
+                    );
                     t.push((nj, x));
                 };
                 match &row {
@@ -826,7 +847,15 @@ impl Echelon {
     /// `acc[tail] += f · tail` of a stored row, in epoch coordinates.
     /// Returns the last index touched; marks the bitmap when `mark`.
     #[inline]
-    fn apply(&self, cx: &Ctx, row: &RowS, f: u64, acc: &mut [u64], bm: &mut [u64], mark: bool) -> usize {
+    fn apply(
+        &self,
+        cx: &Ctx,
+        row: &RowS,
+        f: u64,
+        acc: &mut [u64],
+        bm: &mut [u64],
+        mark: bool,
+    ) -> usize {
         let p2 = cx.p2;
         match row {
             RowS::Sparse(r) => {
@@ -895,7 +924,10 @@ impl Echelon {
             } else {
                 core = true;
                 let piv = self.pivot[col as usize];
-                assert!(piv != NONE, "hky_fp_tower_fast2: a column is neither in the epoch nor a pivot");
+                assert!(
+                    piv != NONE,
+                    "hky_fp_tower_fast2: a column is neither in the epoch nor a pivot"
+                );
                 match &self.rows[piv as usize] {
                     RowS::Sparse(rr) => {
                         if rr.len() > 1 {
@@ -1024,7 +1056,15 @@ impl Echelon {
     /// The cascade by a scan of `acc[ci..=last]` (epoch coordinates), against
     /// the rows of the pivots inserted since the epoch; leaves `acc` zero
     /// there and appends the other terms (the part's columns) to `out`.
-    fn scan(&self, cx: &Ctx, acc: &mut [u64], mut ci: usize, mut last: usize, red: &mut Red, out: &mut Row) {
+    fn scan(
+        &self,
+        cx: &Ctx,
+        acc: &mut [u64],
+        mut ci: usize,
+        mut last: usize,
+        red: &mut Red,
+        out: &mut Row,
+    ) {
         let (p, bm_) = (cx.p, cx.barrett_m);
         while ci <= last {
             let raw = acc[ci];
@@ -1148,7 +1188,6 @@ impl Pool {
     }
 }
 
-
 /// A raw pointer that parallel sections share; every use writes a range no
 /// other task writes (see [`reduce_products`]).
 #[derive(Clone, Copy)]
@@ -1226,7 +1265,10 @@ fn reduce_products(
                     continue;
                 }
                 let piv = e.pivot[col as usize];
-                assert!(piv != NONE, "hky_fp_tower_fast2: a column is neither in the epoch nor a pivot");
+                assert!(
+                    piv != NONE,
+                    "hky_fp_tower_fast2: a column is neither in the epoch nor a pivot"
+                );
                 let row = &e.rows[piv as usize];
                 pl.ops0 += row.nnz() as u64;
                 pl.core.push((piv, p - v));
@@ -1314,7 +1356,13 @@ fn reduce_products(
         .collect();
     // Tiles of epoch columns: one task each, across both parts.
     let nprod_q: Vec<usize> = (0..n_parts)
-        .map(|q| prods.iter().filter(|(pq, _)| *pq as usize == q).count().max(1))
+        .map(|q| {
+            prods
+                .iter()
+                .filter(|(pq, _)| *pq as usize == q)
+                .count()
+                .max(1)
+        })
         .collect();
     let mut tiles: Vec<(usize, usize, usize)> = Vec::new();
     for (q, e) in ech.iter().enumerate() {
@@ -1348,7 +1396,10 @@ fn reduce_products(
             match &e.rows[row_i as usize] {
                 RowS::Sparse(rr) => {
                     let tail = &rr[1..];
-                    if tail.is_empty() || (tail[0].0 as usize) >= j1 || (tail[tail.len() - 1].0 as usize) < j0 {
+                    if tail.is_empty()
+                        || (tail[0].0 as usize) >= j1
+                        || (tail[tail.len() - 1].0 as usize) < j0
+                    {
                         continue;
                     }
                     let lo = tail.partition_point(|t| (t.0 as usize) < j0);
@@ -1382,7 +1433,8 @@ fn reduce_products(
                         let o = off[k as usize];
                         // SAFETY: as above; the slice is this tile's columns
                         // of product k.
-                        let dst = unsafe { std::slice::from_raw_parts_mut(base.ptr().add(o + a), b - a) };
+                        let dst =
+                            unsafe { std::slice::from_raw_parts_mut(base.ptr().add(o + a), b - a) };
                         axpy_dense(cx.simd, dst, src, f, p2);
                     }
                 }
@@ -1415,7 +1467,6 @@ fn reduce_products(
         .collect();
     (done, true)
 }
-
 
 /// The closedness check of [`Fast2Options::verify_closed`]. `W` is the span
 /// of the final echelon (part by part). Every generator of degree at most
@@ -1464,7 +1515,9 @@ fn verify_closed(
         .enumerate()
         .flat_map(|(q, e)| {
             (0..e.rows.len() as u32)
-                .filter(move |&ri| u32::from(space.parts[q].deg[lead_of(&e.rows[ri as usize]) as usize]) < c)
+                .filter(move |&ri| {
+                    u32::from(space.parts[q].deg[lead_of(&e.rows[ri as usize]) as usize]) < c
+                })
                 .map(move |ri| (q as u8, ri))
         })
         .collect();
@@ -1589,11 +1642,19 @@ pub fn closure_fast2(
         let reps: Vec<usize> = (0..nv).filter(|&v| applies(v)).collect();
         let mut k = vec![NO_COVER; nv];
         for (i, &v) in reps.iter().enumerate() {
-            k[v] = if opts.skip_order == 0 { i } else { reps.len() - 1 - i } as u16;
+            k[v] = if opts.skip_order == 0 {
+                i
+            } else {
+                reps.len() - 1 - i
+            } as u16;
         }
         k
     };
-    let mut cover: Vec<Vec<u16>> = space.parts.iter().map(|q| vec![NO_COVER; q.keys.len()]).collect();
+    let mut cover: Vec<Vec<u16>> = space
+        .parts
+        .iter()
+        .map(|q| vec![NO_COVER; q.keys.len()])
+        .collect();
     // one witness space per part and degree (the vectors are homogeneous;
     // spaces of different degrees are independent), filled on demand
     let mut witness: Vec<Vec<Witness>> = space
@@ -1623,12 +1684,16 @@ pub fn closure_fast2(
     stats.setup_s = started.elapsed().as_secs_f64();
     let dense = (opts.dense_num, opts.dense_den);
     // ── io hook 1 of 3 (hky_closure_io): resume from a checkpoint ──────
-    let io_fp = crate::cryptanalysis::hky_closure_io::fingerprint(ring, gens, c, opts, &stats.part_cols);
+    let io_fp =
+        crate::cryptanalysis::hky_closure_io::fingerprint(ring, gens, c, opts, &stats.part_cols);
     let mut io_clock = crate::cryptanalysis::hky_closure_io::Clock::new(&opts.io);
     let mut elapsed_before_s = 0.0f64;
     let mut io_report = crate::cryptanalysis::hky_closure_io::IoReport::default();
-    if let Some(st) = crate::cryptanalysis::hky_closure_io::try_resume(&opts.io, &io_fp, &space, opts.skip) {
-        (ech, queue, rows_reduced, contains_one) = (st.ech, st.queue, st.rows_reduced, st.contains_one);
+    if let Some(st) =
+        crate::cryptanalysis::hky_closure_io::try_resume(&opts.io, &io_fp, &space, opts.skip)
+    {
+        (ech, queue, rows_reduced, contains_one) =
+            (st.ech, st.queue, st.rows_reduced, st.contains_one);
         if opts.skip {
             cover = st.cover;
         }
@@ -1655,12 +1720,33 @@ pub fn closure_fast2(
     'outer: while let Some(b) = queue.iter().position(|q| !q.is_empty()) {
         if crate::cryptanalysis::hky_closure_io::stop_requested() {
             // a checkpoint first (if configured), then a censored result
-            let st = ClosureState { ech, queue, rows_reduced, contains_one, yield_q16, fresh_since_ir, rank_at_ir,
-                stats: Fast2Stats { io: io_report.clone(), ..stats.clone() },
+            let st = ClosureState {
+                ech,
+                queue,
+                rows_reduced,
+                contains_one,
+                yield_q16,
+                fresh_since_ir,
+                rank_at_ir,
+                stats: Fast2Stats {
+                    io: io_report.clone(),
+                    ..stats.clone()
+                },
                 elapsed_before_s: elapsed_before_s + started.elapsed().as_secs_f64(),
-                cover: if opts.skip { cover } else { Vec::new() } };
-            crate::cryptanalysis::hky_closure_io::checkpoint_now(&opts.io, &io_fp, &st, &mut io_report);
-            let entries: u64 = st.ech.iter().flat_map(|e| &e.rows).map(|r| r.nnz() as u64).sum();
+                cover: if opts.skip { cover } else { Vec::new() },
+            };
+            crate::cryptanalysis::hky_closure_io::checkpoint_now(
+                &opts.io,
+                &io_fp,
+                &st,
+                &mut io_report,
+            );
+            let entries: u64 = st
+                .ech
+                .iter()
+                .flat_map(|e| &e.rows)
+                .map(|r| r.nnz() as u64)
+                .sum();
             stats.io = io_report;
             return censored("signal", st.rows_reduced, entries, stats);
         }
@@ -1746,7 +1832,9 @@ pub fn closure_fast2(
                         let ds = u32::from(space.parts[*part as usize].deg[ld as usize]);
                         let ka = kappa[*var as usize];
                         o.coverable = covered(cov, *part, ld, ka, opts.fault);
-                        o.cls = (2 * ds.min(14) as u8 + u8::from(covered(cov, *part, ld, NO_COVER, 0))).min(30);
+                        o.cls = (2 * ds.min(14) as u8
+                            + u8::from(covered(cov, *part, ld, NO_COVER, 0)))
+                        .min(30);
                         {
                             for (q, r) in &formed {
                                 if let Some(&(pl, _)) = r.first() {
@@ -1770,7 +1858,8 @@ pub fn closure_fast2(
                         let e = &ech_ref[*q as usize];
                         for &(col, _) in r {
                             if e.of_col[col as usize] == NONE {
-                                o.core.push(u64::from(*q) << 32 | u64::from(e.pivot[col as usize]));
+                                o.core
+                                    .push(u64::from(*q) << 32 | u64::from(e.pivot[col as usize]));
                             }
                         }
                     }
@@ -1968,7 +2057,12 @@ pub fn closure_fast2(
         // storage forms in parallel (a dense form is as long as the epoch)
         let taken: Vec<RowS> = inserted
             .iter()
-            .map(|&(q, ri)| std::mem::replace(&mut ech[q as usize].rows[ri as usize], RowS::Sparse(Vec::new())))
+            .map(|&(q, ri)| {
+                std::mem::replace(
+                    &mut ech[q as usize].rows[ri as usize],
+                    RowS::Sparse(Vec::new()),
+                )
+            })
             .collect();
         let ech_ref = &ech;
         let forms: Vec<RowS> = taken
@@ -2074,7 +2168,9 @@ pub fn closure_fast2(
                         let top = RowS::Sparse(top);
                         let mut formed: Vec<(u8, Row)> = Vec::new();
                         for v in 0..nv {
-                            if !applies(v) || (opts.skip_witness_max > 0 && kappa[v] >= opts.skip_witness_max) {
+                            if !applies(v)
+                                || (opts.skip_witness_max > 0 && kappa[v] >= opts.skip_witness_max)
+                            {
                                 continue;
                             }
                             formed.clear();
@@ -2085,7 +2181,9 @@ pub fn closure_fast2(
                                 let hv: Row = if opts.fault == 7 {
                                     r
                                 } else {
-                                    r.into_iter().filter(|&(col, _)| u32::from(dq[col as usize]) == ds + 1).collect()
+                                    r.into_iter()
+                                        .filter(|&(col, _)| u32::from(dq[col as usize]) == ds + 1)
+                                        .collect()
                                 };
                                 if !hv.is_empty() {
                                     out.push((q2, kappa[v], hv));
@@ -2104,7 +2202,8 @@ pub fn closure_fast2(
                     let mine: Vec<(u16, &Row)> = found
                         .iter()
                         .filter(|(q, _, hv)| {
-                            *q as usize == qi && usize::from(space.parts[qi].deg[hv[0].0 as usize]) == d
+                            *q as usize == qi
+                                && usize::from(space.parts[qi].deg[hv[0].0 as usize]) == d
                         })
                         .map(|(_, ka, hv)| (*ka, hv))
                         .collect();
@@ -2125,8 +2224,10 @@ pub fn closure_fast2(
                 .map(|(qi, _d, w, mine)| {
                     // by parallel rounds (Witness::insert_batch)
                     let mut set: Vec<(u32, u16)> = Vec::new();
-                    let cands: Vec<(u16, Row)> = mine.iter().map(|&(k, hv)| (k, hv.clone())).collect();
-                    let (ops, rounds) = w.insert_batch(cands, p, &pool, &mut |col, k| set.push((col, k)));
+                    let cands: Vec<(u16, Row)> =
+                        mine.iter().map(|&(k, hv)| (k, hv.clone())).collect();
+                    let (ops, rounds) =
+                        w.insert_batch(cands, p, &pool, &mut |col, k| set.push((col, k)));
                     surv += rounds;
                     (qi, ops, set)
                 })
@@ -2291,11 +2392,27 @@ pub fn closure_fast2(
         }
         // ── io hook 2 of 3: periodic checkpoint, at a batch boundary ───
         if io_clock.due(stats.batches) {
-            let st = ClosureState { ech, queue, rows_reduced, contains_one, yield_q16, fresh_since_ir, rank_at_ir,
-                stats: Fast2Stats { io: io_report.clone(), ..stats.clone() },
+            let st = ClosureState {
+                ech,
+                queue,
+                rows_reduced,
+                contains_one,
+                yield_q16,
+                fresh_since_ir,
+                rank_at_ir,
+                stats: Fast2Stats {
+                    io: io_report.clone(),
+                    ..stats.clone()
+                },
                 elapsed_before_s: elapsed_before_s + started.elapsed().as_secs_f64(),
-                cover: std::mem::take(&mut cover) };
-            crate::cryptanalysis::hky_closure_io::checkpoint_now(&opts.io, &io_fp, &st, &mut io_report);
+                cover: std::mem::take(&mut cover),
+            };
+            crate::cryptanalysis::hky_closure_io::checkpoint_now(
+                &opts.io,
+                &io_fp,
+                &st,
+                &mut io_report,
+            );
             (ech, queue, cover) = (st.ech, st.queue, st.cover);
             io_clock.reset();
         }
@@ -2366,9 +2483,18 @@ pub fn closure_fast2(
     // ── io hook 3 of 3: export the closed basis ───────────────────────
     if let Some(path) = &opts.io.export {
         let ex = crate::cryptanalysis::hky_closure_io::export_basis(
-            path, ring, &space, &ech, opts.symmetry.as_deref(), contains_one, c,
+            path,
+            ring,
+            &space,
+            &ech,
+            opts.symmetry.as_deref(),
+            contains_one,
+            c,
         );
-        assert_eq!(ex.profile, dims, "hky_closure_io: exported profile differs from the closure's");
+        assert_eq!(
+            ex.profile, dims,
+            "hky_closure_io: exported profile differs from the closure's"
+        );
         io_report.export = Some(ex);
     }
     io_report.elapsed_total_s = elapsed_before_s + started.elapsed().as_secs_f64();
@@ -2810,9 +2936,16 @@ mod opt_tests {
                 let (ring, gens) = system(t, planted);
                 for sym in [None, swap_first_two_blocks(t, 2)] {
                     for c in 3..=5 {
-                        let (a, sa) = closure_fast2(&ring, &gens, c, &limits, &opts(false, false, sym.clone()));
+                        let (a, sa) = closure_fast2(
+                            &ring,
+                            &gens,
+                            c,
+                            &limits,
+                            &opts(false, false, sym.clone()),
+                        );
                         for (np, sw) in [(true, false), (true, true), (false, true)] {
-                            let (b, sb) = closure_fast2(&ring, &gens, c, &limits, &opts(np, sw, sym.clone()));
+                            let (b, sb) =
+                                closure_fast2(&ring, &gens, c, &limits, &opts(np, sw, sym.clone()));
                             let tag = format!("planted {planted} t {t} c {c} np {np} sweep {sw}");
                             assert_eq!(a.dims, b.dims, "{tag}");
                             assert_eq!(a.contains_one, b.contains_one, "{tag}");
@@ -2828,7 +2961,10 @@ mod opt_tests {
                 }
             }
         }
-        assert!(exercised.0 && exercised.1, "phase 0 and the sweep must both run");
+        assert!(
+            exercised.0 && exercised.1,
+            "phase 0 and the sweep must both run"
+        );
     }
 
     #[test]
@@ -2846,7 +2982,10 @@ mod opt_tests {
             o.fault = 1;
             let (cl, st) = closure_fast2(&ring, &gens, 5, &limits, &o);
             assert!(!cl.contains_one);
-            assert!(st.verify_nonzero > 0, "products by variable 0 left out: not closed");
+            assert!(
+                st.verify_nonzero > 0,
+                "products by variable 0 left out: not closed"
+            );
         }
     }
 
@@ -2866,7 +3005,13 @@ mod opt_tests {
                         a: if general && !last { 3 + j as u64 } else { 0 },
                         b: u64::from(!last) * if general { 5 } else { 1 },
                         c: if general { 7 } else { 0 },
-                        d: if last { 11 } else if general { 13 } else { 0 },
+                        d: if last {
+                            11
+                        } else if general {
+                            13
+                        } else {
+                            0
+                        },
                     });
                 }
             }
@@ -2889,7 +3034,11 @@ mod opt_tests {
                 let x: std::collections::BTreeMap<u64, u64> = [(m, 1u64)].into();
                 for a in 0..n {
                     for b in 0..n {
-                        assert_eq!(apply(b, &apply(a, &x)), apply(a, &apply(b, &x)), "m {m} a {a} b {b}");
+                        assert_eq!(
+                            apply(b, &apply(a, &x)),
+                            apply(a, &apply(b, &x)),
+                            "m {m} a {a} b {b}"
+                        );
                     }
                     // degree rises by at most one
                     let d = m.count_ones();
@@ -2913,7 +3062,8 @@ mod opt_tests {
                 let (ring, gens) = system(t, planted);
                 for sym in [None, swap_first_two_blocks(t, 2)] {
                     for c in 3..=6 {
-                        let (a, _) = closure_fast2(&ring, &gens, c, &limits, &opts(true, true, sym.clone()));
+                        let (a, _) =
+                            closure_fast2(&ring, &gens, c, &limits, &opts(true, true, sym.clone()));
                         for (order, wit) in [(0u8, 0u8), (1, 0), (0, 1), (1, 1), (0, 2), (1, 2)] {
                             let mut o = opts(true, true, sym.clone());
                             o.skip = true;
@@ -2921,7 +3071,9 @@ mod opt_tests {
                             o.skip_witness = wit;
                             o.verify_closed = true;
                             let (b, sb) = closure_fast2(&ring, &gens, c, &limits, &o);
-                            let tag = format!("planted {planted} t {t} c {c} order {order} witness {wit}");
+                            let tag = format!(
+                                "planted {planted} t {t} c {c} order {order} witness {wit}"
+                            );
                             assert_eq!(a.dims, b.dims, "{tag}");
                             assert_eq!(a.contains_one, b.contains_one, "{tag}");
                             if !b.contains_one {
@@ -2930,7 +3082,9 @@ mod opt_tests {
                             skipped += sb.skipped_items;
                             o.fault = 8;
                             let (f, sf) = closure_fast2(&ring, &gens, c, &limits, &o);
-                            fault_seen |= f.dims != a.dims || f.contains_one != a.contains_one || sf.verify_nonzero > 0;
+                            fault_seen |= f.dims != a.dims
+                                || f.contains_one != a.contains_one
+                                || sf.verify_nonzero > 0;
                         }
                     }
                 }

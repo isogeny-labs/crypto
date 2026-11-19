@@ -188,7 +188,12 @@ pub fn fingerprint(
         h.update((x as u64).to_le_bytes());
     }
     h.update(o.interreduce.to_bits().to_le_bytes());
-    h.update([o.rebucket as u8, o.par_second as u8, o.bitmap as u8, o.fault]);
+    h.update([
+        o.rebucket as u8,
+        o.par_second as u8,
+        o.bitmap as u8,
+        o.fault,
+    ]);
     // engine-opt: the row storage (epoch coordinates) and the sweep schedule
     h.update([o.np_epochs as u8, o.sweep as u8]);
     h.update(o.sweep_ratio.to_le_bytes());
@@ -230,7 +235,12 @@ struct HW<W: Write> {
 
 impl<W: Write> HW<W> {
     fn new(w: W) -> Self {
-        HW { w, h: Sha256::new(), n: 0, err: None }
+        HW {
+            w,
+            h: Sha256::new(),
+            n: 0,
+            err: None,
+        }
     }
     fn put(&mut self, b: &[u8]) {
         self.h.update(b);
@@ -311,7 +321,9 @@ struct HR<R: Read> {
 impl<R: Read> HR<R> {
     fn get(&mut self, n: usize) -> Vec<u8> {
         let mut b = vec![0u8; n];
-        self.r.read_exact(&mut b).expect("hky_closure_io: truncated checkpoint");
+        self.r
+            .read_exact(&mut b)
+            .expect("hky_closure_io: truncated checkpoint");
         self.h.update(&b);
         b
     }
@@ -442,15 +454,26 @@ fn read_row<R: Read>(r: &mut HR<R>) -> RowS {
             let lead = r.u32();
             let n = r.u32() as usize;
             let nnz = r.u32();
-            RowS::Dense { lead, v: r.u32s(n), nnz }
+            RowS::Dense {
+                lead,
+                v: r.u32s(n),
+                nnz,
+            }
         }
         2 => {
             let n = r.u32() as usize;
             let wd = r.u8() as usize;
             let (cw, vw) = (wd & 15, wd >> 4);
-            assert!((1..=4).contains(&cw) && (1..=4).contains(&vw), "hky_closure_io: bad widths");
+            assert!(
+                (1..=4).contains(&cw) && (1..=4).contains(&vw),
+                "hky_closure_io: bad widths"
+            );
             let b = r.get(n * (cw + vw));
-            RowS::Sparse(b.chunks_exact(cw + vw).map(|c| (unpack(&c[..cw]), unpack(&c[cw..]))).collect())
+            RowS::Sparse(
+                b.chunks_exact(cw + vw)
+                    .map(|c| (unpack(&c[..cw]), unpack(&c[cw..])))
+                    .collect(),
+            )
         }
         3 => {
             let lead = r.u32();
@@ -459,7 +482,11 @@ fn read_row<R: Read>(r: &mut HR<R>) -> RowS {
             let vw = r.u8() as usize;
             assert!((1..=4).contains(&vw), "hky_closure_io: bad width");
             let b = r.get(n * vw);
-            RowS::Dense { lead, v: b.chunks_exact(vw).map(unpack).collect(), nnz }
+            RowS::Dense {
+                lead,
+                v: b.chunks_exact(vw).map(unpack).collect(),
+                nnz,
+            }
         }
         t => panic!("hky_closure_io: bad row tag {t}"),
     }
@@ -594,14 +621,22 @@ pub(super) fn checkpoint_now(io: &IoOptions, fp: &[u8; 32], st: &ClosureState, r
 
 /// The checkpoint of `io`, if resuming is asked for and one exists.
 /// Panics on a corrupt checkpoint or one of another closure (fingerprint).
-pub(super) fn try_resume(io: &IoOptions, fp: &[u8; 32], space: &Space, skip: bool) -> Option<ClosureState> {
+pub(super) fn try_resume(
+    io: &IoOptions,
+    fp: &[u8; 32],
+    space: &Space,
+    skip: bool,
+) -> Option<ClosureState> {
     if !io.resume {
         return None;
     }
     let dir = io.checkpoint_dir.as_deref()?;
     let path = Path::new(dir).join("state.ckpt");
     if !path.exists() {
-        eprintln!("hky3 resume: no checkpoint at {}, starting fresh", path.display());
+        eprintln!(
+            "hky3 resume: no checkpoint at {}, starting fresh",
+            path.display()
+        );
         return None;
     }
     let t0 = Instant::now();
@@ -610,7 +645,11 @@ pub(super) fn try_resume(io: &IoOptions, fp: &[u8; 32], space: &Space, skip: boo
         r: BufReader::with_capacity(8 << 20, f),
         h: Sha256::new(),
     };
-    assert_eq!(&r.get(8)[..], CKPT_MAGIC, "hky_closure_io: not a checkpoint");
+    assert_eq!(
+        &r.get(8)[..],
+        CKPT_MAGIC,
+        "hky_closure_io: not a checkpoint"
+    );
     let got = r.get(32);
     assert_eq!(
         &got[..],
@@ -659,7 +698,11 @@ pub(super) fn try_resume(io: &IoOptions, fp: &[u8; 32], space: &Space, skip: boo
         let nc = r.u32() as usize;
         for q in 0..nc {
             let n = r.u64() as usize;
-            assert_eq!(n, space.parts[q].keys.len(), "hky_closure_io: cover of part {q}");
+            assert_eq!(
+                n,
+                space.parts[q].keys.len(),
+                "hky_closure_io: cover of part {q}"
+            );
             cover.push(
                 r.u32s(n)
                     .into_iter()
@@ -673,7 +716,11 @@ pub(super) fn try_resume(io: &IoOptions, fp: &[u8; 32], space: &Space, skip: boo
     let mut ech = Vec::with_capacity(np);
     for q in 0..np {
         let n = r.u64() as usize;
-        assert_eq!(n, space.parts[q].keys.len(), "hky_closure_io: part {q} columns");
+        assert_eq!(
+            n,
+            space.parts[q].keys.len(),
+            "hky_closure_io: part {q} columns"
+        );
         let nr = r.u64() as usize;
         let mut rows = Vec::with_capacity(nr);
         let mut pivot = vec![NONE; n];
@@ -720,7 +767,10 @@ pub(super) fn try_resume(io: &IoOptions, fp: &[u8; 32], space: &Space, skip: boo
     let mut trailer = [0u8; 32];
     r.r.read_exact(&mut trailer)
         .expect("hky_closure_io: checkpoint without trailer");
-    assert_eq!(digest, trailer, "hky_closure_io: checkpoint SHA-256 mismatch");
+    assert_eq!(
+        digest, trailer,
+        "hky_closure_io: checkpoint SHA-256 mismatch"
+    );
     let mut extra = [0u8; 1];
     assert_eq!(
         r.r.read(&mut extra).unwrap_or(0),
@@ -819,7 +869,10 @@ pub(super) fn export_basis(
 ) -> ExportReport {
     let t0 = Instant::now();
     let p = ring.p;
-    assert_eq!(ring.n_free, 0, "hky.basis/v1: free variables are not supported");
+    assert_eq!(
+        ring.n_free, 0,
+        "hky.basis/v1: free variables are not supported"
+    );
     let n_vars = ring.n_tower() as u32;
     assert!(n_vars % 2 == 0, "hky.basis/v1: m = 2 blocks expected");
     let k = n_vars / 2;
@@ -839,7 +892,11 @@ pub(super) fn export_basis(
     };
     for (i, &key) in keys0.iter().enumerate() {
         let r = key_mask(key);
-        assert_eq!(u128::from(r) | (u128::from(r.count_ones()) << 120), key, "hky.basis/v1: key layout");
+        assert_eq!(
+            u128::from(r) | (u128::from(r.count_ones()) << 120),
+            key,
+            "hky.basis/v1: key layout"
+        );
         pos0.push(cols.len() as u32);
         cols.push(r);
         if split {
@@ -866,7 +923,11 @@ pub(super) fn export_basis(
                 j += 1;
             }
         }
-        assert_eq!(j, keys1.len(), "hky.basis/v1: part-1 columns are not a subsequence");
+        assert_eq!(
+            j,
+            keys1.len(),
+            "hky.basis/v1: part-1 columns are not a subsequence"
+        );
     }
     let n_cols = cols.len();
     let deg_of = |fc: usize| cols[fc].count_ones() as usize;
@@ -945,7 +1006,11 @@ pub(super) fn export_basis(
             let mut v = Vec::with_capacity(full.len() * 2);
             for &(col, x) in &full {
                 let x = u64::from(x);
-                let i = if q == 0 { col as usize } else { m1_to_0[col as usize] as usize };
+                let i = if q == 0 {
+                    col as usize
+                } else {
+                    m1_to_0[col as usize] as usize
+                };
                 let at = pos0[i];
                 v.push((at, x));
                 if paired[i] {

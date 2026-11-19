@@ -175,7 +175,9 @@ fn parse(argv: &[String]) -> PArgs {
                     o => o.parse().expect("--hky3-skip-witness off|leads|span"),
                 }
             }
-            "--hky3-skip-witness-max" => a.skip_witness_max = v.parse().expect("--hky3-skip-witness-max"),
+            "--hky3-skip-witness-max" => {
+                a.skip_witness_max = v.parse().expect("--hky3-skip-witness-max")
+            }
             "--hky3-fault" => a.fault = v.parse().expect("--hky3-fault"),
             o => panic!("--instance mode: unknown flag `{o}`"),
         }
@@ -242,8 +244,21 @@ pub fn run(argv: &[String]) {
         xs: Vec::new(),
     };
     let mut rng = StdRng::seed_from_u64(0);
-    let (eqs, n, _, _) = system(Control::Tower, &tower, &curve, 2, &target, 1, None, &mut rng);
-    assert_eq!(n, 2 * k, "two blocks of k chain variables, no free variable");
+    let (eqs, n, _, _) = system(
+        Control::Tower,
+        &tower,
+        &curve,
+        2,
+        &target,
+        1,
+        None,
+        &mut rng,
+    );
+    assert_eq!(
+        n,
+        2 * k,
+        "two blocks of k chain variables, no free variable"
+    );
     let ring = HkyRing::new(p, tower_ring(&tower, 2, p).rules, n - 2 * k);
     let gens: Vec<NfPoly> = eqs
         .iter()
@@ -261,7 +276,10 @@ pub fn run(argv: &[String]) {
         .filter(|(_, x)| *x != 0)
         .collect();
     let direct = paper_generator(p, a_c, b_c, x_r, k);
-    assert_eq!(mine, direct, "pilot NF(S3) differs from the paper's pkm_generator");
+    assert_eq!(
+        mine, direct,
+        "pilot NF(S3) differs from the paper's pkm_generator"
+    );
     let mut file_gen_match: Option<bool> = None;
     if let Some(obj) = inst["generator"].as_object() {
         let mut fg = BTreeMap::new();
@@ -364,8 +382,7 @@ pub fn run(argv: &[String]) {
         .unwrap_or_default();
     let commit = option_env!("HKY_ENGINE_COMMIT").unwrap_or("unknown");
     let inst_sha = sha256_file(&pa.instance);
-    let generator: BTreeMap<String, u64> =
-        mine.iter().map(|(m, x)| (format!("{m}"), *x)).collect();
+    let generator: BTreeMap<String, u64> = mine.iter().map(|(m, x)| (format!("{m}"), *x)).collect();
     let rec = json!({
         "schema": "hky_paper_runs.closure/v1",
         "instance": {"path": pa.instance, "sha256": inst_sha, "prime": p, "k": k, "a": a_file, "b": b_file,
@@ -394,7 +411,10 @@ pub fn run(argv: &[String]) {
         "rayon_threads": rayon::current_num_threads(),
     });
     // sidecar of an exported basis
-    if let Some(ex) = rec["io"]["export"].as_object().filter(|e| e["error"].is_null()) {
+    if let Some(ex) = rec["io"]["export"]
+        .as_object()
+        .filter(|e| e["error"].is_null())
+    {
         let path = ex["path"].as_str().unwrap().to_string();
         let side = json!({
             "schema": "hky.basis.sidecar/v1",

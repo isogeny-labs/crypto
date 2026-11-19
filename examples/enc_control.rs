@@ -128,8 +128,9 @@ fn derive(master: u64, parts: &[u64]) -> u64 {
     h
 }
 fn tag(s: &str) -> u64 {
-    s.bytes()
-        .fold(0xcbf2_9ce4_8422_2325u64, |h, b| (h ^ b as u64).wrapping_mul(0x100_0000_01b3))
+    s.bytes().fold(0xcbf2_9ce4_8422_2325u64, |h, b| {
+        (h ^ b as u64).wrapping_mul(0x100_0000_01b3)
+    })
 }
 
 // ── Polynomials (sparse, exponent vectors) ─────────────────────────
@@ -142,7 +143,10 @@ struct Pol {
 
 impl Pol {
     fn zero(n: usize) -> Self {
-        Pol { n, terms: BTreeMap::new() }
+        Pol {
+            n,
+            terms: BTreeMap::new(),
+        }
     }
     fn constant(n: usize, c: u64, p: u64) -> Self {
         let mut f = Pol::zero(n);
@@ -211,7 +215,11 @@ impl Pol {
         acc
     }
     fn degree(&self) -> u32 {
-        self.terms.keys().map(|e| e.iter().sum::<u32>()).max().unwrap_or(0)
+        self.terms
+            .keys()
+            .map(|e| e.iter().sum::<u32>())
+            .max()
+            .unwrap_or(0)
     }
     fn raw(&self) -> Vec<(Vec<u32>, u64)> {
         self.terms.iter().map(|(e, c)| (e.clone(), *c)).collect()
@@ -427,7 +435,15 @@ fn multilinear_interpolant(f: &[u64], k: usize, p: u64) -> Vec<u64> {
 /// A block's equations in `n` variables from `base`, its `x` variable, and
 /// the wrong-closing perturbation `delta` (0 for the correct encoding):
 /// tower `R_F + delta`, bits `P_F + delta`, single `∏ + delta`.
-fn block(enc: Enc, f: &[u64], k: usize, n: usize, base: usize, delta: u64, p: u64) -> (Vec<Pol>, usize) {
+fn block(
+    enc: Enc,
+    f: &[u64],
+    k: usize,
+    n: usize,
+    base: usize,
+    delta: u64,
+    p: u64,
+) -> (Vec<Pol>, usize) {
     assert_eq!(f.len(), 1 << k);
     match enc {
         Enc::Tower => {
@@ -521,7 +537,10 @@ fn arm_set(arm: &str, k: usize, r: usize, curve: &Curve, rng: &mut StdRng) -> (V
                     break g;
                 }
             };
-            (h.iter().map(|&z| mulm(g, z, p)).collect(), json!({"g": g, "g_pow_2k": powm(g, 1u64 << k, p)}))
+            (
+                h.iter().map(|&z| mulm(g, z, p)).collect(),
+                json!({"g": g, "g_pow_2k": powm(g, 1u64 << k, p)}),
+            )
         }
         "tower-rand" | "bits-rand" | "randbase" => {
             let mut f: Vec<u64> = Vec::new();
@@ -565,7 +584,10 @@ fn arm_set(arm: &str, k: usize, r: usize, curve: &Curve, rng: &mut StdRng) -> (V
                     reps.push(g);
                 }
             }
-            let f = reps.iter().flat_map(|&g| sub.iter().map(move |&z| mulm(g, z, p))).collect();
+            let f = reps
+                .iter()
+                .flat_map(|&g| sub.iter().map(move |&z| mulm(g, z, p)))
+                .collect();
             (f, json!({"j": j, "coset_keys": keys.len()}))
         }
         _ => panic!("unknown arm {arm}"),
@@ -594,8 +616,18 @@ fn staircase(lms: &[Vec<u32>], n: usize, cap: usize) -> Option<usize> {
     }
     let mut count = 0usize;
     let mut mono = vec![0u32; n];
-    fn walk(i: usize, mono: &mut Vec<u32>, bound: &[u32], lms: &[Vec<u32>], count: &mut usize, cap: usize) -> bool {
-        if lms.iter().any(|l| l.iter().zip(mono.iter()).all(|(a, b)| a <= b)) {
+    fn walk(
+        i: usize,
+        mono: &mut Vec<u32>,
+        bound: &[u32],
+        lms: &[Vec<u32>],
+        count: &mut usize,
+        cap: usize,
+    ) -> bool {
+        if lms
+            .iter()
+            .any(|l| l.iter().zip(mono.iter()).all(|(a, b)| a <= b))
+        {
             return true;
         }
         if i == bound.len() {
@@ -619,13 +651,29 @@ fn staircase(lms: &[Vec<u32>], n: usize, cap: usize) -> Option<usize> {
     }
 }
 
-fn run_f4(eqs: &[Pol], n: usize, p: u64, sol: Option<&[u64]>, max_degree: u32, budget: Duration, runlog: bool) -> Value {
+fn run_f4(
+    eqs: &[Pol],
+    n: usize,
+    p: u64,
+    sol: Option<&[u64]>,
+    max_degree: u32,
+    budget: Duration,
+    runlog: bool,
+) -> Value {
     if let Some(s) = sol {
         for (i, e) in eqs.iter().enumerate() {
-            assert_eq!(e.eval(s, p), 0, "equation {i} does not vanish at the planted solution");
+            assert_eq!(
+                e.eval(s, p),
+                0,
+                "equation {i} does not vanish at the planted solution"
+            );
         }
     }
-    let input: Vec<Poly> = eqs.iter().map(|e| e.to_poly(p)).filter(|f| !f.is_empty()).collect();
+    let input: Vec<Poly> = eqs
+        .iter()
+        .map(|e| e.to_poly(p))
+        .filter(|f| !f.is_empty())
+        .collect();
     let mut opts = F4Options::new(Ordering::Grevlex, max_degree)
         .with_budget(budget)
         .recording_degree_falls();
@@ -642,7 +690,8 @@ fn run_f4(eqs: &[Pol], n: usize, p: u64, sol: Option<&[u64]>, max_degree: u32, b
         .iter()
         .map(|s| json!([s.degree, s.pairs, s.all_rows, s.new_polys, s.ops]))
         .collect();
-    let planted_ok = sol.map(|s| !r.inconsistent && r.basis.iter().all(|f| f4_fp::eval(f, s, p) == 0));
+    let planted_ok =
+        sol.map(|s| !r.inconsistent && r.basis.iter().all(|f| f4_fp::eval(f, s, p) == 0));
     json!({
         "n_vars": n,
         "n_equations": input.len(),
@@ -680,9 +729,21 @@ fn run_hky(s3eq: &Pol, k: usize, closing: u64, p: u64, c_max: u32, budget: Durat
         let base = rules.len();
         for j in 0..k {
             if j + 1 < k {
-                rules.push(SquareRule { next: Some((base + j + 1) as u8), a: 0, b: 1, c: 0, d: 0 });
+                rules.push(SquareRule {
+                    next: Some((base + j + 1) as u8),
+                    a: 0,
+                    b: 1,
+                    c: 0,
+                    d: 0,
+                });
             } else {
-                rules.push(SquareRule { next: None, a: 0, b: 0, c: 0, d: closing });
+                rules.push(SquareRule {
+                    next: None,
+                    a: 0,
+                    b: 0,
+                    c: 0,
+                    d: closing,
+                });
             }
         }
     }
@@ -690,7 +751,10 @@ fn run_hky(s3eq: &Pol, k: usize, closing: u64, p: u64, c_max: u32, budget: Durat
     let g = ring.from_raw(&s3eq.raw());
     let gens = vec![g];
     let c_min = gens.iter().map(HkyRing::degree).min().unwrap_or(1);
-    let limits = HkyLimits { budget, ..HkyLimits::default() };
+    let limits = HkyLimits {
+        budget,
+        ..HkyLimits::default()
+    };
     let t0 = Instant::now();
     let fd = hky_fp_tower::fall_degrees(&ring, &gens, c_min, c_max, &limits);
     json!({
@@ -718,10 +782,23 @@ fn verify(enc: Enc, f: &[u64], k: usize, p: u64, budget: Duration) -> Value {
             })
             .count();
         let input: Vec<Poly> = eqs.iter().map(|e| e.to_poly(p)).collect();
-        let opts = F4Options::new(Ordering::Grevlex, (2 * k + 4).max(1 << k.min(10)) as u32 + 2).with_budget(budget);
+        let opts = F4Options::new(
+            Ordering::Grevlex,
+            (2 * k + 4).max(1 << k.min(10)) as u32 + 2,
+        )
+        .with_budget(budget);
         let r = f4_fp::f4(&input, n, p, &opts);
-        let lms: Vec<Vec<u32>> = r.basis.iter().filter(|g| !g.is_empty()).map(|g| g[0].0.clone()).collect();
-        let quot = if r.inconsistent { Some(0) } else { staircase(&lms, n, 1 << 20) };
+        let lms: Vec<Vec<u32>> = r
+            .basis
+            .iter()
+            .filter(|g| !g.is_empty())
+            .map(|g| g[0].0.clone())
+            .collect();
+        let quot = if r.inconsistent {
+            Some(0)
+        } else {
+            staircase(&lms, n, 1 << 20)
+        };
         // The univariate eliminant in x: ∏(x − f) (+ delta for tower and single;
         // for bits the variety is F + delta, so the F-point count is what moves).
         let mut pi = prod_linear(f, p);
@@ -741,7 +818,9 @@ fn verify(enc: Enc, f: &[u64], k: usize, p: u64, budget: Duration) -> Value {
     let ok = check(0);
     let wrong = check(1);
     let size = 1usize << k;
-    let pass_ok = ok["F_points_satisfying"] == json!(size) && ok["quotient_dim"] == json!(size) && ok["fp_points_of_variety"] == json!(size);
+    let pass_ok = ok["F_points_satisfying"] == json!(size)
+        && ok["quotient_dim"] == json!(size)
+        && ok["fp_points_of_variety"] == json!(size);
     let neg_detected = wrong["F_points_satisfying"] != json!(size);
     json!({"correct": ok, "wrong_closing": wrong, "encoding_exact": pass_ok, "negative_control_detected": neg_detected})
 }
@@ -812,8 +891,14 @@ fn main() {
     assert!(k >= 2, "k ≥ 2");
     let budget = Duration::from_secs(a.budget);
     // One curve for the whole study; random targets shared by every arm at k.
-    let curve = Curve::random(p, &mut StdRng::seed_from_u64(derive(a.seed, &[tag("curve")])));
-    let mut set_rng = StdRng::seed_from_u64(derive(a.seed, &[tag("set"), tag(&a.arm), k as u64, a.r as u64, a.draw]));
+    let curve = Curve::random(
+        p,
+        &mut StdRng::seed_from_u64(derive(a.seed, &[tag("curve")])),
+    );
+    let mut set_rng = StdRng::seed_from_u64(derive(
+        a.seed,
+        &[tag("set"), tag(&a.arm), k as u64, a.r as u64, a.draw],
+    ));
     let (f, set_info) = arm_set(&a.arm, k, a.r, &curve, &mut set_rng);
     let enc = arm_enc(&a.arm);
     {
@@ -841,7 +926,13 @@ fn main() {
         "abscissae_in_F": f.iter().filter(|&&x| curve.is_abscissa(x)).count(),
     });
     let mut out: Box<dyn Write> = match &a.out {
-        Some(path) => Box::new(std::fs::OpenOptions::new().create(true).append(true).open(path).unwrap()),
+        Some(path) => Box::new(
+            std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open(path)
+                .unwrap(),
+        ),
         None => Box::new(std::io::stdout()),
     };
     let mut emit = |mut row: Value, extra: Value| {
@@ -856,9 +947,20 @@ fn main() {
     };
     if a.verify {
         let v = verify(enc, &f, k, p, budget);
-        eprintln!("verify {} k={} r={} draw={}: exact={} neg_detected={}", a.arm, k, a.r, a.draw, v["encoding_exact"], v["negative_control_detected"]);
-        assert_eq!(v["encoding_exact"], json!(true), "encoding is not exact: {v}");
-        assert_eq!(v["negative_control_detected"], json!(true), "negative control not detected: {v}");
+        eprintln!(
+            "verify {} k={} r={} draw={}: exact={} neg_detected={}",
+            a.arm, k, a.r, a.draw, v["encoding_exact"], v["negative_control_detected"]
+        );
+        assert_eq!(
+            v["encoding_exact"],
+            json!(true),
+            "encoding is not exact: {v}"
+        );
+        assert_eq!(
+            v["negative_control_detected"],
+            json!(true),
+            "negative control not detected: {v}"
+        );
         emit(json!({"kind": "verify"}), v);
     }
     let bs = enc.block_size(k);
@@ -867,9 +969,17 @@ fn main() {
         Enc::Single => (1u32 << k) + 8,
         _ => (4 * k as u32 + 8).max(16),
     };
-    let blocks: Vec<(Vec<Pol>, usize)> = (0..2).map(|i| block(enc, &f, k, n, i * bs, 0, p)).collect();
+    let blocks: Vec<(Vec<Pol>, usize)> =
+        (0..2).map(|i| block(enc, &f, k, n, i * bs, 0, p)).collect();
     let system = |x_r: u64| -> Vec<Pol> {
-        let mut eqs = vec![s3(&Pol::var(n, blocks[0].1), &Pol::var(n, blocks[1].1), &Pol::constant(n, x_r, p), curve.a, curve.b, p)];
+        let mut eqs = vec![s3(
+            &Pol::var(n, blocks[0].1),
+            &Pol::var(n, blocks[1].1),
+            &Pol::constant(n, x_r, p),
+            curve.a,
+            curve.b,
+            p,
+        )];
         for (b, _) in &blocks {
             eqs.extend(b.iter().cloned());
         }
@@ -877,7 +987,10 @@ fn main() {
     };
     let mut targets: Vec<(String, u64, Option<Vec<u64>>)> = Vec::new();
     if a.planted {
-        let mut prng = StdRng::seed_from_u64(derive(a.seed, &[tag("plant"), tag(&a.arm), k as u64, a.r as u64, a.draw]));
+        let mut prng = StdRng::seed_from_u64(derive(
+            a.seed,
+            &[tag("plant"), tag(&a.arm), k as u64, a.r as u64, a.draw],
+        ));
         let abs: Vec<usize> = (0..f.len()).filter(|&i| curve.is_abscissa(f[i])).collect();
         if abs.len() >= 2 {
             let i1 = abs[prng.gen_range(0..abs.len())];
@@ -904,7 +1017,11 @@ fn main() {
     }
     for t in 0..a.random_targets {
         let mut trng = StdRng::seed_from_u64(derive(a.seed, &[tag("target"), k as u64, t as u64]));
-        targets.push((format!("random{t}"), curve.random_abscissa(&mut trng, &[]), None));
+        targets.push((
+            format!("random{t}"),
+            curve.random_abscissa(&mut trng, &[]),
+            None,
+        ));
     }
     for (name, x_r, sol) in &targets {
         let eqs = system(*x_r);
@@ -919,10 +1036,22 @@ fn main() {
         }
         eprintln!(
             "{:10} k={} r={:3} draw={} {:8} D={:3} reached={:3} incons={} ops={:>14} hky={} {:.2}s",
-            a.arm, k, a.r, a.draw, name, row["D"], row["degree_reached"], row["inconsistent"], row["field_ops"],
-            row.get("hky_last_fall").cloned().unwrap_or(Value::Null), row["wall_s"].as_f64().unwrap_or(0.0)
+            a.arm,
+            k,
+            a.r,
+            a.draw,
+            name,
+            row["D"],
+            row["degree_reached"],
+            row["inconsistent"],
+            row["field_ops"],
+            row.get("hky_last_fall").cloned().unwrap_or(Value::Null),
+            row["wall_s"].as_f64().unwrap_or(0.0)
         );
-        emit(row, json!({"target": name, "x_r": x_r, "loadavg_before": la.split_whitespace().next().unwrap_or("")}));
+        emit(
+            row,
+            json!({"target": name, "x_r": x_r, "loadavg_before": la.split_whitespace().next().unwrap_or("")}),
+        );
     }
 }
 
@@ -991,10 +1120,19 @@ mod tests {
                 s.dedup();
                 assert_eq!(s.len(), 1 << k);
                 let r = closing_coeffs(&f, P);
-                let deg = r.iter().enumerate().filter(|(_, &c)| c != 0).map(|(n, _)| n.count_ones()).max().unwrap_or(0);
+                let deg = r
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, &c)| c != 0)
+                    .map(|(n, _)| n.count_ones())
+                    .max()
+                    .unwrap_or(0);
                 assert!(deg as usize <= j, "k={k} j={j} deg={deg}");
                 // only u_{k−j}..u_{k−1} occur
-                assert!(r.iter().enumerate().all(|(n, &c)| c == 0 || n % (1 << (k - j)) == 0));
+                assert!(r
+                    .iter()
+                    .enumerate()
+                    .all(|(n, &c)| c == 0 || n % (1 << (k - j)) == 0));
             }
         }
     }
@@ -1022,7 +1160,14 @@ mod tests {
         let x2 = curve.random_abscissa(&mut rng, &[x1]);
         let (y1, y2) = (sqrtm(curve.rhs(x1), P), sqrtm(curve.rhs(x2), P));
         let x3 = curve.add_x(x1, y1, x2, y2);
-        let e = s3(&Pol::var(3, 0), &Pol::var(3, 1), &Pol::var(3, 2), curve.a, curve.b, P);
+        let e = s3(
+            &Pol::var(3, 0),
+            &Pol::var(3, 1),
+            &Pol::var(3, 2),
+            curve.a,
+            curve.b,
+            P,
+        );
         assert_eq!(e.eval(&[x1, x2, x3], P), 0);
     }
 }
