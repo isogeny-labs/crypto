@@ -11,6 +11,7 @@ on:
       - 'research/amm_digit_perf_20261118/round33_bounded_poly_isolated.py'
       - 'research/amm_digit_perf_20261118/round34_bounded_sparse_isolated.py'
       - 'research/amm_digit_perf_20261118/round36_bounded_replay_isolated.py'
+      - 'research/amm_digit_perf_20261118/round38_bounded_gcd_isolated.py'
       - 'research/amm_digit_perf_20261118/round31_bounded_baseline.rs'
       - 'research/amm_digit_perf_20261118/round23_verifier_isolated.py'
       - 'research/amm_digit_perf_20261118/round24_verifier_isolated.py'
@@ -421,4 +422,32 @@ jobs:
         with:
           name: round37-native-rust-benchmark
           path: ${{ runner.temp }}/round37-native-rust.txt
+          if-no-files-found: ignore
+
+  round38-bounded-gcd:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round38_bounded_gcd_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test actual producer/replay against frozen GCD and benchmark 13-pair A/B
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round38_bounded_gcd_isolated.py
+          } | tee "$RUNNER_TEMP/round38-gcd-native-rust.txt"
+          cat "$RUNNER_TEMP/round38-gcd-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round38-gcd-native-rust
+          path: ${{ runner.temp }}/round38-gcd-native-rust.txt
           if-no-files-found: ignore
