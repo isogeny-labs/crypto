@@ -212,6 +212,65 @@ mod round38 {
         }
     }
 }
+
+    fn whole(p:u64,degree:usize,fast:bool,reps:usize)->f64 {
+        use crate::cryptanalysis::prime_root_trace::bounded_before as old;
+        let field=Fp64Arithmetic{p};
+        let mut f=vec![1u64];
+        for r in 1..=degree {
+            let mut next=vec![0u64;f.len()+1];
+            for (i,&c) in f.iter().enumerate() {
+                next[i]=((next[i] as u128+p as u128-
+                     (c as u128*r as u128 % p as u128))%p as u128) as u64;
+                next[i+1]=(next[i+1]+c)%p;
+            }
+            f=next;
+        }
+        let start=Instant::now();
+        let mut checksum=0u64;
+        for _ in 0..reps {
+            if fast {
+                let mut events=Vec::new();
+                let report=solve_bounded(&field,black_box(&f),42,limits(),deadline(),&mut |e|{
+                    events.push(*e);Ok(())
+                });
+                assert_eq!(report.stop,Stop::Complete);
+                let mut replay=Replay::new(&field,&f,42,limits(),limits(),deadline()).unwrap();
+                for e in &events {replay.push(e).unwrap();}
+                checksum+=replay.finish(&report).unwrap().checked_root_count as u64;
+            } else {
+                let lb=old::RootBudget{work:old::MAX_WORK,field_work:old::MAX_FIELD_WORK,
+                    bytes:old::STORAGE_BYTES,events:old::MAX_EVENTS,split_attempts:1000,degree:8};
+                let mut events=Vec::new();
+                let report=old::solve_bounded(&field,black_box(&f),42,lb,deadline(),&mut |e|{
+                    events.push(*e);Ok(())
+                });
+                assert_eq!(report.stop,old::Stop::Complete);
+                let mut replay=old::Replay::new(&field,&f,42,lb,lb,deadline()).unwrap();
+                for e in &events {replay.push(e).unwrap();}
+                checksum+=replay.finish(&report).unwrap().checked_root_count as u64;
+            }
+        }
+        black_box(checksum);
+        start.elapsed().as_nanos() as f64/reps as f64
+    }
+    #[test]
+    #[ignore="Complete compiled-Rust root extraction and independent replay A/B"]
+    fn bench_round38_complete_roots() {
+        for p in [487u64,1_000_000_007,(1u64<<61)-1] {
+            for degree in [3usize,6,8] {
+                let mut before=Vec::new();let mut after=Vec::new();
+                for trial in 0..13 {
+                    if trial%2==0 {before.push(whole(p,degree,false,4));after.push(whole(p,degree,true,4));}
+                    else {after.push(whole(p,degree,true,4));before.push(whole(p,degree,false,4));}
+                }
+                before.sort_by(f64::total_cmp);after.sort_by(f64::total_cmp);
+                println!("ROUND38_WHOLE p={p} degree={degree} before={:.1}ns after={:.1}ns speedup={:.3}x",
+                    before[6],after[6],before[6]/after[6]);
+            }
+        }
+    }
+}
 """
 header = """#![allow(dead_code)]
 mod cryptanalysis {
@@ -222,7 +281,23 @@ mod cryptanalysis {
   pub mod prime_root_trace {
     pub mod bounded {
 """
-rust = header + source + "\n" + previous + tests + "\n} }\n}\n"
+
+def original_method(code, name):
+    start = code.index("    fn " + name + "(")
+    opening = code.index("{", start)
+    level = 0
+    for i in range(opening, len(code)):
+        if code[i] == "{": level += 1
+        if code[i] == "}":
+            level -= 1
+            if level == 0: return code[start:i + 1]
+    raise ValueError(name)
+
+before = source
+for name, former in [("gcd","previous_gcd"),("monic_gcd","previous_monic_gcd")]:
+    restored = original_method(previous,former).replace("fn "+former+"(", "fn "+name+"(", 1)
+    before = before.replace(original_method(before,name),restored,1)
+rust = header + source + "\n" + previous + tests + "\n} pub mod bounded_before {\n" + before + "\n} }\n}\n"
 with tempfile.TemporaryDirectory() as tmp:
     path = Path(tmp)/"round38.rs"
     binary = Path(tmp)/"round38"
@@ -231,3 +306,4 @@ with tempfile.TemporaryDirectory() as tmp:
     for test in ["round38_gcd_equivalence","round38_full_solver_and_certificates"]:
         subprocess.run([str(binary),test,"--nocapture"],check=True)
     subprocess.run([str(binary),"bench_round38_gcd","--ignored","--nocapture"],check=True)
+    subprocess.run([str(binary),"bench_round38_complete_roots","--ignored","--nocapture"],check=True)
