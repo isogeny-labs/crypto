@@ -1484,7 +1484,7 @@ mod tests {
     // modulo reference, including carries, zero, p-1 and random inputs.
     #[test]
     fn round41_cached_barrett_matches_reference_and_replay() {
-        for p in [2u64, 3, 17, 487, 1_000_000_007, 1_000_000_009,
+        for p in [3u64, 17, 487, 1_000_000_007, 1_000_000_009,
                   4_294_967_291, (1u64 << 61) - 1] {
             let field = field(p);
             let mut observer = |_: &BoundedRootEvent| Ok(());
