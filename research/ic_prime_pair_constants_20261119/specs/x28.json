@@ -1,0 +1,168 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "POST-HOC ksum m=3,4,5 size sweep, p28",
+ "description": "research/ic_prime_pair_constants_20261119 README, deviation D2 (not preregistered)",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 268435399,
+    "a": 268435396,
+    "b": 3,
+    "group_order": 268407199,
+    "r": 268407199,
+    "gx": 1,
+    "gy": 1
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 20261120
+ },
+ "arms": [
+  {
+   "name": "rho",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "inc",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=256",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "k3_24",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=24",
+     "linalg": "incremental-gauss",
+     "oracle": "ksum:m=3",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "k3_32",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=32",
+     "linalg": "incremental-gauss",
+     "oracle": "ksum:m=3",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "k3_40",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=40",
+     "linalg": "incremental-gauss",
+     "oracle": "ksum:m=3",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "k4_14",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=14",
+     "linalg": "incremental-gauss",
+     "oracle": "ksum:m=4",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "k4_16",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=16",
+     "linalg": "incremental-gauss",
+     "oracle": "ksum:m=4",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "k4_20",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=20",
+     "linalg": "incremental-gauss",
+     "oracle": "ksum:m=4",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "k5_11",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=11",
+     "linalg": "incremental-gauss",
+     "oracle": "ksum:m=5",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "k5_13",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=13",
+     "linalg": "incremental-gauss",
+     "oracle": "ksum:m=5",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "k5_16",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=16",
+     "linalg": "incremental-gauss",
+     "oracle": "ksum:m=5",
+     "targets": "walk"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate_measured",
+  "seed": 20261120,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}
