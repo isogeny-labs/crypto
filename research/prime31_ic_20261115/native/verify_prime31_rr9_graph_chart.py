@@ -6,6 +6,84 @@ witness labels. Uses the independently authored exterior-4 group oracle.
 import json,sys
 import verify_prime31_rr9_exterior4 as oracle
 
+
+def rr_row(q,r):
+    x,y=q
+    rx,ry=r
+    return [((x-rx)*pow(x,j,oracle.P))%oracle.P for j in range(4)]+[
+        ((y+ry)*pow(x,j,oracle.P))%oracle.P for j in range(4)
+    ]
+
+def det_gauss(rows):
+    n=len(rows)
+    a=[list(row) for row in rows]
+    z=1
+    for k in range(n):
+        pivot=next((i for i in range(k,n) if a[i][k]),None)
+        if pivot is None:return 0
+        if pivot!=k:
+            a[pivot],a[k]=a[k],a[pivot]
+            z=-z
+        q=a[k][k]
+        z=z*q%oracle.P
+        iq=pow(q,oracle.P-2,oracle.P)
+        for i in range(k+1,n):
+            factor=a[i][k]*iq%oracle.P
+            for j in range(k+1,n):
+                a[i][j]=(a[i][j]-factor*a[k][j])%oracle.P
+    return z%oracle.P
+
+def graph_of_rows(rows):
+    a=[list(row) for row in rows]
+    z=1
+    for k in range(4):
+        pivot=next((i for i in range(k,4) if a[i][k]),None)
+        assert pivot is not None, "inadmissible graph chart"
+        if pivot!=k:
+            a[pivot],a[k]=a[k],a[pivot]
+            z=-z
+        q=a[k][k]
+        z=z*q%oracle.P
+        iq=pow(q,oracle.P-2,oracle.P)
+        for j in range(k,8):
+            a[k][j]=a[k][j]*iq%oracle.P
+        for i in range(4):
+            if i==k:continue
+            factor=a[i][k]
+            for j in range(k+1,8):
+                a[i][j]=(a[i][j]-factor*a[k][j])%oracle.P
+            a[i][k]=0
+    return [row[4:] for row in a],z
+
+def det_four_2plus2(d):
+    total=0
+    for i,j in ((0,1),(0,2),(0,3),(1,2),(1,3),(2,3)):
+        k,h=[c for c in range(4) if c not in (i,j)]
+        top=(d[0][i]*d[1][j]-d[0][j]*d[1][i])%oracle.P
+        bot=(d[2][k]*d[3][h]-d[2][h]*d[3][k])%oracle.P
+        term=top*bot%oracle.P
+        total=(total + (term if (i+j)%2 else -term))%oracle.P
+    return total
+
+def verify_graph_identity(slots,planted):
+    # Independent Fp implementation; the Rust producer cannot provide these
+    # polynomial identities or the hidden word choices to the candidate.
+    for R in (planted,oracle.G):
+        words=[[0]*8]+[
+            [(case*97+i*23)%8 for i in range(8)] for case in range(30)
+        ]
+        for word in words:
+            rows=[rr_row(slots[i][word[i]],R) for i in range(8)]
+            lhs=det_gauss(rows)
+            lm,ld=graph_of_rows(rows[:4])
+            rm,rd=graph_of_rows(rows[4:])
+            delta=[[(rm[i][j]-lm[i][j])%oracle.P for j in range(4)] for i in range(4)]
+            rhs=ld*rd*det_four_2plus2(delta)%oracle.P
+            assert lhs==rhs
+            if R==planted and word==[0]*8:
+                assert lhs==0
+    print("INDEPENDENT_PYTHON_GRAPH_MATH_PASS: 62 original-curve residues")
+
 def verify(path):
     with open(path,encoding="utf8") as f:
         data=json.load(f)
@@ -23,6 +101,7 @@ def verify(path):
     assert data["separate_truth_grader_excluded_from_candidate_time"] is True
     slots=oracle.supports()
     planted=oracle.replay(slots,[0]*8)
+    verify_graph_identity(slots,planted)
     assert planted != oracle.G
     cases=data["cases"]
     assert len(cases)==2
