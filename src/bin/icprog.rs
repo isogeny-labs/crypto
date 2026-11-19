@@ -55,6 +55,8 @@ mod ordinary_preparation;
 mod report;
 #[path = "icprog/rho_source.rs"]
 mod rho_source;
+#[path = "icprog/rho_target.rs"]
+mod rho_target;
 // Shared with `isolated_bench`, which uses parts this binary does not.
 #[path = "icprog/f5_source_custody.rs"]
 mod f5_source_custody;
@@ -336,6 +338,55 @@ enum Command {
         source_registration_sha256: String,
         #[arg(long)]
         out: PathBuf,
+    },
+    /// Freeze a card-bound one-use rho registration around archived ecbench; no run.
+    RhoTargetFreeze {
+        #[arg(long)]
+        source_publication: PathBuf,
+        #[arg(long)]
+        source_descriptor: PathBuf,
+        #[arg(long)]
+        card: PathBuf,
+        #[arg(long)]
+        four_arm_freeze: PathBuf,
+        #[arg(long)]
+        capsule: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Publish unconsumed rho target registration custody as data; no execute.
+    RhoTargetPublish {
+        #[arg(long)]
+        capsule: PathBuf,
+        #[arg(long)]
+        registration_sha256: String,
+        #[arg(long)]
+        publication: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Replay published rho target registration as data; executes no archived binary.
+    RhoTargetReplay {
+        #[arg(long)]
+        publication: PathBuf,
+        #[arg(long)]
+        registration_sha256: String,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Consume one rho registration and launch archived ecbench once when separately authorized.
+    RhoTargetExecute {
+        #[arg(long)]
+        capsule: PathBuf,
+        #[arg(long)]
+        publication: PathBuf,
+        #[arg(long)]
+        execution: PathBuf,
+        #[arg(long)]
+        registration_sha256: String,
+        /// Must be `separately_authorized_rho_arm_v1`; freeze alone is not enough.
+        #[arg(long)]
+        dispatch_authorization: String,
     },
     /// Irreversibly bind a later public card to the prepublished F5 binary.
     TargetControlAdoptCard {
@@ -1308,6 +1359,45 @@ fn main() -> ExitCode {
             source_registration_sha256,
             out,
         } => rho_source::replay(&publication, &source_registration_sha256, &out),
+        Command::RhoTargetFreeze {
+            source_publication,
+            source_descriptor,
+            card,
+            four_arm_freeze,
+            capsule,
+            out,
+        } => rho_target::freeze(
+            &source_publication,
+            &source_descriptor,
+            &card,
+            &four_arm_freeze,
+            &capsule,
+            &out,
+        ),
+        Command::RhoTargetPublish {
+            capsule,
+            registration_sha256,
+            publication,
+            out,
+        } => rho_target::publish(&capsule, &registration_sha256, &publication, &out),
+        Command::RhoTargetReplay {
+            publication,
+            registration_sha256,
+            out,
+        } => rho_target::replay(&publication, &registration_sha256, &out),
+        Command::RhoTargetExecute {
+            capsule,
+            publication,
+            execution,
+            registration_sha256,
+            dispatch_authorization,
+        } => rho_target::execute(
+            &capsule,
+            &publication,
+            &execution,
+            &registration_sha256,
+            &dispatch_authorization,
+        ),
         Command::TargetControlAdoptCard {
             capsule,
             source_publication,
