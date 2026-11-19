@@ -4,6 +4,12 @@ Status: selectable production candidate implemented; deterministic control
 passed; isolated timing and promotion remain unmeasured
 `[pcc:unverified]`.
 
+The final q=223 correctness replay is bound to exact commit, source closure,
+reproducible binary, and raw record by
+[`receipts/commit_bound_manifest.json`](receipts/commit_bound_manifest.json).
+Its strict cross-row validation is recorded in
+[`receipts/commit_bound_validation.txt`](receipts/commit_bound_validation.txt).
+
 ## Change
 
 The composed strong-rho source now accepts the diagnostic suffix

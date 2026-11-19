@@ -11,7 +11,7 @@ from matplotlib.ticker import FuncFormatter
 
 
 ROOT = Path(__file__).resolve().parents[1]
-INPUT = ROOT / "receipts" / "r17_r36_q223.jsonl"
+INPUT = ROOT / "receipts" / "commit_bound_q223.jsonl"
 OUTPUT = Path(__file__).with_name("counter_composition.svg")
 
 ARMS = [

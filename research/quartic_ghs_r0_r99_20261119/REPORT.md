@@ -2,8 +2,10 @@
 
 **Status (2026-11-19):** all 100 lanes were registered and dispositioned in
 parallel. Three production mechanisms are selectable and passed deterministic
-controls. No new isolated timing, end-to-end frontier result, or leaderboard
-row is claimed `[pcc:unverified]`.
+controls. The final eight-arm q=223 control is bound to exact source commit
+`95297ce1d098e124e72d45effc07fe8c640de82b` and a cross-path reproducible
+binary. No new isolated timing, end-to-end frontier result, or leaderboard row
+is claimed `[pcc:unverified]`.
 
 This report answers two separate questions:
 
@@ -98,7 +100,9 @@ Controls completed `[pcc:unverified]`:
 - the q=223 known answer and complete trajectory across baseline, mul5,
   walker-table, composed, fast, and bare forms; and
 - a native fail-closed analyzer with twelve corruption tests and mandatory
-  rational small-division sensitivity.
+  rational small-division sensitivity; plus
+- a strict final-panel validator that binds the exact commit, six-file source
+  closure, compiler, reproducible binary, self-test, and eight-arm record.
 
 On the public q=223 deterministic record, mul5 changes complete abstract
 counts from 110,435 to 96,884 `fq_mul`, from 400,276 to 670,668 `fq_add`, and
@@ -140,9 +144,9 @@ counter elision in the inspected binary, not elapsed-time improvement
 ![Recorded q=223 operation classes for the counted candidates. Each panel has its own unit scale.](figures/counter_composition.pdf)
 
 The figure sums setup, walk, and verification counters from
-[`receipts/r17_r36_q223.jsonl`](receipts/r17_r36_q223.jsonl). Bars are raw,
-unweighted events; they are not wall time and are not comparable across
-counter classes without a frozen model.
+[`receipts/commit_bound_q223.jsonl`](receipts/commit_bound_q223.jsonl). Bars
+are raw, unweighted events; they are not wall time and are not comparable
+across counter classes without a frozen model.
 
 ## R67–R83: optimized rho comparison plan
 
@@ -198,14 +202,19 @@ are source declarations, not a fresh live inventory or solver execution.
 - Checkpoint upload, approved isolated pool, budget/image identity, and raw
   evidence readback remain unavailable as recorded in
   [`../../problems/ghs-strong-rho-measurement-admission.md`](../../problems/ghs-strong-rho-measurement-admission.md).
-- The first retained R17/R36 JSONL is internally consistent but identifies a
-  worktree rather than a commit. A commit/source/binary-bound rerun is required
-  before promotion.
+- The first retained R17/R36 JSONL identifies a worktree and is historical.
+  It is superseded for the q=223 correctness cell by the exact-commit capsule
+  in [`receipts/commit_bound_manifest.json`](receipts/commit_bound_manifest.json),
+  its two-build receipt, and the strict validator receipt. Broader isolated
+  measurement and signed validation standing remain open.
+- R16 remains blocked on signed standing. The source-bound producer capsule
+  does not substitute for independent validation/PCC publication authority.
 
 ## Promotion sequence
 
-1. Bind the composed source and binary to a pushed commit and rerun the native
-   record/analyzer/corruption gates.
+1. **Completed for the deterministic q=223 control:** bind the composed source
+   and binary to a pushed commit, reproduce the binary across two archive
+   roots, and rerun the record/analyzer/corruption gates.
 2. Restore checkpoint and isolated-host admission; pass A/A calibration.
 3. Measure baseline, R17, R36, R64, and the selected composition with
    interleaved A/B and untouched holdout targets.
@@ -226,14 +235,9 @@ source and exact receipt:
 - [`ranges/R51_R66.md`](ranges/R51_R66.md)
 - [`ranges/R67_R83.md`](ranges/R67_R83.md)
 - [`ranges/R84_R99.md`](ranges/R84_R99.md)
+- final q=223 capsule: [manifest](receipts/commit_bound_manifest.json) and
+  [strict validator report](ranges/COMMIT_BOUND_VALIDATION.md)
 
-The research-KB executable and Conductor were unavailable at campaign start.
-The fallback review used the repository literature inventory, the reviewed
-Round C integration, the measurement-admission problem, and the collaborative
-Pollard-rho design. No novelty or absence inference is based on tool
-unavailability.
-
-Canonical leaderboard and frontier graphs were checked and intentionally left
-unchanged: this round produced no admitted performance record. This report,
-its editable diagram, its recorded-counter figure, and the rendered PDF are
-the visual record for the implementation/search wave.
+Research-KB and Conductor were unavailable; fallback sources are listed in
+[`PROTOCOL.md`](PROTOCOL.md), and no novelty inference follows. The final
+capsule admits source/correctness evidence but excludes clocks.

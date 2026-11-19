@@ -27,6 +27,7 @@ four-page [`REPORT.pdf`](REPORT.pdf) for the consolidated result.
 | Execute independent work in parallel | Six disjoint range reports, prototypes, and receipts | Complete |
 | Implement every currently runnable lead | R17/R36/R64 production paths plus per-range deterministic screens | Complete at producer scope |
 | Preserve blocked or dependent leads | Canonical state, detailed disposition, and explicit unblock condition | Complete |
+| Bind the final deterministic control | Exact commit, six-file closure, two reproducible builds, and strict eight-arm validation | Complete at producer scope |
 | Measure admitted candidates end to end | Frozen matched grid and ECBench campaign | Blocked on execution admission |
 | Update the leaderboard for validated gains | Validation/PCC/publication lanes R96–R99 | No eligible measurement yet |
 
@@ -53,6 +54,14 @@ fixture. They do not establish throughput, isolated wall time, an end-to-end
 gain, or a changed frontier. Those claims remain behind checkpoint, host
 admission, preregistration, calibration, replay, independent validation, PCC,
 benchmark-record, and leaderboard gates.
+
+The final q=223 deterministic control is source-bound by
+[`receipts/commit_bound_manifest.json`](receipts/commit_bound_manifest.json)
+and independently checked by the strict final-panel validator. The capsule
+binds commit `95297ce1d098e124e72d45effc07fe8c640de82b`, all six transitive source
+files, a canonical binary reproduced from two archive roots, self-test streams,
+and the eight-arm record. Its emitted timing fields are retained but excluded
+from inference `[pcc:unverified]`.
 
 The research-KB and Conductor executables were unavailable at campaign start.
 The repository evidence and cited primary-source inventory named in the
