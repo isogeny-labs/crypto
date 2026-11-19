@@ -26,6 +26,17 @@ The exact discriminant identity is a mathematical fact, **not a new F3 algorithm
 ## Earlier two-arm CI evidence, already completed
 [Original source-bound Actions #44555480777](https://github.com/isogeny-labs/crypto/actions/runs/44555480777) PASSED against pinned original commit `1df714645aa683cf975bc76fcacb9842cb4780fd` on Rust 1.100.0: 40/40 library tests, 2/2 focused identity and full-fibre tests, 351/351 complete independent Python affine replays, 64/64 constructed positives, **0/256 random two-factor hits** (descriptive panel, not a population bound), 31 exact exceptional linear-branch cases. This validates a component's correctness. The amended three-arm production comparison supersedes its timing interpretation.
 
+
+## New exact two-factor feasibility obstruction (not a benchmark)
+
+The first-rational-x31 factor base contains 31 nonzero points and all their negatives, i.e. **62 distinct signed points** because the source group has odd prime order and distinct x values. There are at most `binom(62+1,2) = 1953` unordered two-point multisets (including repetition). The 31 inverse pairs `P_i + (-P_i) = O` all map to one sum, removing at least 30 duplicates. Therefore the complete signed two-factor public-target support satisfies the **rigorous group-independent inequality**
+
+`|S_2| <= 1953 - 30 = 1923`.
+
+On the exact original-curve prime-order group `n=2147446831`, every uniformly randomized public residual (by Q+[b]G with b uniform) hits this two-factor predicate with probability **at most `1923/n = 8.954820078616419e-7`**. Independently randomized residual trials therefore require **at least `n/1923 = 1,116,717.0208` expected queries per success** (unless the actual support is smaller, making it worse), and at least **34,618,227.64 expected queries for 31 successes**, without any rank-independence guarantee. This is an exact upper bound on support; the experiment's zero natural matches out of 256 are consistent but not a sharp population estimate. This does **not** bound nonuniform/adaptive residuals, larger factor bases, eight-factor W8/RR9, algebraic methods that avoid independent random Q shifts, or all ECDLP algorithms.
+
+**Scientific decision:** Completing or micro-optimizing the already-existing degree-2 F3 primitive cannot by itself supply a useful high-yield relation oracle on this fixed B31 support. Index-calculus priority should remain **higher-arity nonenumerative public-only extraction** owned by #4692 and larger factor-base/root-constraint designs, not claiming a faster complete solver from an arithmetic microbenchmark.
+
 ## Existing leads and exclusions
 - [#4692](https://github.com/isogeny-labs/crypto/pull/4692) owns a **different** public-only *eight-factor* RR9/F4/remainder-tower index extractor (46 positive/18 negative frozen checks); do not duplicate it.
 - [#4808](https://github.com/isogeny-labs/crypto/pull/4808), [#4807](https://github.com/isogeny-labs/crypto/pull/4807) measured weighted eight-factor **generic group-table grading**, not a solver. K=4 blockscale had 452/512 natural hits versus 440/512 at k=5; paired evidence inconclusive, and **does not** transfer to this two-factor rare-support system.
