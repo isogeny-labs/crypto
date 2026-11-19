@@ -1,0 +1,4 @@
+mkdir -p build
+g++ -O3 -march=native -std=c++20 -Wall -Wextra -Wpedantic -Wconversion src/semaev_lab.cpp -o build/semaev_lab
+./build/semaev_lab self-test
+PASS self-test s3=899 s4=899 root_methods=900 discriminants=900
