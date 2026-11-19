@@ -45,21 +45,35 @@ use the *coordinate representation* non-generically (summation polynomials, p-ad
 incidence geometry): those read `x(P) ∈ F_p` as a field element, outside the generic model.
 That gap is precisely H1/H2/H3/H5.
 
-### T3 (p-adic / torsion lifts are closed).
-*For the canonical lift `Ẽ/Z_p` of an ordinary `E/F_p`, the Frobenius-fixed subgroup
-`Ẽ(Z_p)^{φ̃=1}` is isomorphic to `E(F_p)` and consists of points of order prime to `p`; the
-p-adic elliptic logarithm vanishes on it.*
+### T3 (canonical-lift fixed points under a prime-to-`p` order hypothesis).
+*Let `E/F_p` be ordinary with `N = #E(F_p)` and `p ∤ N`. For its canonical lift
+`Ẽ/Z_p` and lifted Frobenius `φ̃`, reduction identifies the `φ̃`-fixed points
+with `E(F_p)`. Each fixed point has order prime to `p`. Every additive
+homomorphism defined on this fixed subgroup with torsion-free codomain
+vanishes on it.*
 
-Proof sketch. `φ̃ - 1` is an isomorphism on the formal group `Ê(pZ_p)` (its linear term is
-`a-1` with `a ≠ 1 mod p` for ordinary reduction), so the Frobenius-fixed locus meets each
-residue disc once and injects into the component group `Ẽ(Z_p)/Ê ≅ E(F_p)`. A fixed point has
-prime-to-`p` order because the `p`-part lives in `Ê`, where `φ̃=1` forces `0`. The formal
-logarithm `log: Ê(pZ_p) → pZ_p` is a homomorphism killing torsion, and the fixed points are
-torsion mod `Ê`. ∎
+Proof sketch. Write `t = p + 1 - N`. The two conditions are distinct:
+ordinarity gives `t ≠ 0 mod p`, while `p ∤ N` gives `t ≠ 1 mod p`. The unit
+root `a` of the Frobenius polynomial `X²-tX+p` satisfies `a ≡ t mod p`, so
+`a-1` is a unit under the second condition. Consequently `φ̃-1` has unit
+linear term on the formal group and is locally invertible there. Hensel
+lifting gives one fixed point in each residue disc; reduction identifies
+the fixed subgroup with `E(F_p)`. Its order is `N`, which is prime to `p` by
+hypothesis. Any additive map from this finite group to a torsion-free
+additive group is zero. The formal elliptic logarithm is defined on the
+formal subgroup; applying a logarithm to other fixed points requires an
+explicit extension and domain check. ∎
 
-Consequence: Smart's anomalous attack (`N = p`, where the fixed points are *not* prime-to-`p`)
-does not generalize; the lift carries no linear invariant. **But** T3 says nothing about the
-*digits* of a fixed point as a non-linear representation — see C3/H3.
+The prime-to-`p` condition is essential to the stated argument. The smooth
+curve `y²=x³+3x+2` over `F₅` has five group points and trace one. It is
+ordinary because its trace is nonzero modulo five, yet `5 | #E(F₅)` and the
+unit root satisfies `a ≡ 1 mod 5`. The actual point count, trace, and
+discriminant are checked in Lean in
+[`AnomalousOrdinaryException.lean`](https://github.com/isogeny-labs/cryptanalysis/pull/1875).
+The recorded H3 canonical-lift digit measurements used curves with
+`p ∤ #E(F_p)`; their data and decision boundary are unchanged. This theorem
+addresses additive maps on the fixed subgroup. The digit and sublevel-set
+questions remain the separate C3/H3 experiment.
 
 ### T4 (pairing transfer is out of range for both instances).
 *MOV/Frey–Rück maps the DLP into `F_{p^k}^*` (resp. `F_{2^{nk}}^*`) with `k` the embedding
