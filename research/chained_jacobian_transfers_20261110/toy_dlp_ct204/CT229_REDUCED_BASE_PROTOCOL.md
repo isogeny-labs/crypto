@@ -48,12 +48,11 @@ candidate budget, record the failure, not an estimated ECDLP cost.
 ## Reproduce
 
 ```sh
-cargo test --locked --release --test ct229_reduced_base_probe ct229_ -- --nocapture
+cargo test --locked --release --test ct226_native_genus4_transferred_ic ct229_ -- --nocapture
 ```
 
-Source: [ct229_reduced_base_probe.rs](../../../tests/ct229_reduced_base_probe.rs).
-The source includes [CT226's existing Rust implementation](../../../tests/ct226_native_genus4_transferred_ic.rs)
-directly, rather than implementing a new or divergent arithmetic library.
+Source: [ct229_impl/probe.rs](../../../tests/ct229_impl/probe.rs).
+The test is a private child module of [CT226's existing Rust implementation](../../../tests/ct226_native_genus4_transferred_ic.rs) and reuses its actual Fp, Cantor, point-map, relation and linear algebra functions, rather than reimplementing the arithmetic.
 CI: [ct205-toy-transfer.yml](../../../.github/workflows/ct205-toy-transfer.yml).
 Parse `CT229_PANEL_JSON` lines; each has rank, smooth/candidate counts,
 target success/failure, elapsed phase timings, baseline, and operation
