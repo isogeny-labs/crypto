@@ -9319,6 +9319,13 @@ impl PairTable {
         })
     }
 
+    /// Folded abscissa key (`x + 1`) → first witness pair, if present.
+    /// Used by x-only / sibling probes that already hold the folded key.
+    pub fn lookup_folded(&self, folded: u64) -> Option<(usize, usize)> {
+        let (i, j) = self.get(folded)?;
+        Some((i as usize, j as usize))
+    }
+
     /// The witness stored under a key, in whichever layout the table has.
     fn get(&self, key: u64) -> Option<(u32, u32)> {
         if let Some(dense) = &self.dense {
@@ -9720,6 +9727,13 @@ impl KSumTable {
         (0..self.k)
             .map(|d| ((packed >> (d * self.bits)) & mask) as usize)
             .collect()
+    }
+
+    /// Folded abscissa key (`x + 1`) → packed summand indices, if present.
+    /// Used by x-only / sibling probes that already hold the folded key.
+    pub fn lookup_folded(&self, folded: u64) -> Option<Vec<usize>> {
+        let packed = *self.map.get(&folded)?;
+        Some(self.unpack(packed))
     }
 
     /// The relations among the base logs hidden in the build's key

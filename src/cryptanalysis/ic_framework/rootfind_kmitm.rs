@@ -7,14 +7,16 @@
 //! rejected.
 //!
 //! Default split is **probe-favoring**: `L = min(9, m−1)`, `R = m−L`.
-//! That makes `R = 1` for every `m ≤ 10`, so a probe is one pass over the
-//! factor base — drastic vs a balanced half-split (and the only practical
-//! path for `m = 10..12`). Pass `split=balanced` for `⌈m/2⌉ / ⌊m/2⌋` when
-//! the left table would be too large.
+//! That makes `R = 1` for every `m ≤ 10`. Pass `split=balanced` for
+//! `⌈m/2⌉ / ⌊m/2⌋` when the left table would be too large.
 //!
-//! Right-half sums with `R ≥ 2` are materialised once at prepare and reused
-//! across targets. Classification: engineering (wall / build size); charged
-//! group additions are the MITM's own (not equal to full `ksum`).
+//! On primes with siblings, the `R = 1` probe runs a Montgomery **batch
+//! inversion** over the factor base and looks up folded abscissa keys in
+//! the left table (lever-1 style from `rootfind-floor`) — one inversion a
+//! target instead of a full group subtraction per base point. Right-half
+//! sums with `R ≥ 2` are materialised once at prepare. Classification:
+//! engineering (wall / build size); charged group additions are the MITM's
+//! own (not equal to full `ksum`).
 
 use std::collections::BTreeMap;
 
@@ -24,6 +26,7 @@ use crate::cryptanalysis::ic_boundary::{
     CountedGroup, FactorBase, GroupOps, KSumTable, OracleCounters, PairTable, PrimeCurve,
     PrimeInstance, PrimePoint, KSUM_MAX_K,
 };
+use crate::cryptanalysis::prime_fast::{Fp64, MAX_BITS as PRIME_FAST_MAX_BITS};
 
 /// Largest arity this oracle accepts.
 pub const KMITM_MAX_M: u32 = 12;
@@ -76,6 +79,17 @@ impl LeftTable {
             Self::KSum(t) => t.probe(g, fb, ops, lookups, target),
         }
     }
+
+    /// Lookup by folded abscissa key (`x + 1`), no group ops.
+    fn lookup_folded(&self, folded: u64) -> Option<Vec<usize>> {
+        match self {
+            Self::Pairs(t) => {
+                let (i, j) = t.lookup_folded(folded)?;
+                Some(vec![i, j])
+            }
+            Self::KSum(t) => t.lookup_folded(folded),
+        }
+    }
 }
 
 /// One precomputed right-half sum (used when `right_k ≥ 2`).
@@ -93,14 +107,21 @@ pub struct RootfindKMitmOracle<'i> {
     right_k: u32,
     balanced: bool,
     table: Option<LeftTable>,
+    /// Montgomery field for the prime right=1 batch-inv probe (lever-1 style).
+    field: Option<Fp64>,
     /// Precomputed right-half sums for prime probes (`right_k ≥ 2`).
     right_prime: Vec<RightSum<PrimePoint>>,
     /// Precomputed right-half sums for binary probes (`right_k ≥ 2`).
     right_bin: Vec<RightSum<crate::cryptanalysis::koblitz_fast::FastPoint>>,
+    /// Scratch for the right=1 batch-inv probe.
+    diffs: Vec<u64>,
+    scratch: Vec<u64>,
     pub mismatches: u64,
     probe_right_adds: u64,
     probe_lookups: u64,
     overlaps_rejected: u64,
+    /// Right=1 probes that used the batch-inv / x-only key path.
+    probe_batch_inv: u64,
 }
 
 impl<'i> RootfindKMitmOracle<'i> {
@@ -113,12 +134,16 @@ impl<'i> RootfindKMitmOracle<'i> {
             right_k,
             balanced: false,
             table: None,
+            field: None,
             right_prime: Vec::new(),
             right_bin: Vec::new(),
+            diffs: Vec::new(),
+            scratch: Vec::new(),
             mismatches: 0,
             probe_right_adds: 0,
             probe_lookups: 0,
             overlaps_rejected: 0,
+            probe_batch_inv: 0,
         }
     }
 
@@ -339,10 +364,25 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
         if right_k >= 2 {
             collect_right_sums(ctx.group, fb, right_k, ops, &mut self.right_prime);
         }
+        // Fast right=1 path: Montgomery batch-inv over the factor base.
+        self.field = if right_k == 1
+            && ctx.group.supports_siblings()
+            && (3..1u64 << PRIME_FAST_MAX_BITS).contains(&ctx.group.p)
+        {
+            let n = fb.points.len();
+            self.diffs.resize(n, 0);
+            self.scratch.resize(n, 0);
+            Some(Fp64::new(ctx.group.p))
+        } else {
+            self.diffs.clear();
+            self.scratch.clear();
+            None
+        };
         self.mismatches = 0;
         self.probe_right_adds = 0;
         self.probe_lookups = 0;
         self.overlaps_rejected = 0;
+        self.probe_batch_inv = 0;
         Ok(())
     }
 
@@ -380,6 +420,9 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
                 "kmitm_overlaps_rejected".to_string(),
                 self.overlaps_rejected,
             );
+        }
+        if self.probe_batch_inv > 0 {
+            out.insert("kmitm_probe_batch_inv".to_string(), self.probe_batch_inv);
         }
         out
     }
@@ -449,6 +492,16 @@ impl RootfindKMitmOracle<'_> {
         counters: &mut OracleCounters,
         target: PrimePoint,
     ) -> Option<Vec<usize>> {
+        // Lever-1 style: one batched inversion for every R ∓ F_j abscissa,
+        // then folded-key lookup into the left table (no full point build on
+        // misses). Falls back to group-add probes when siblings are unavailable.
+        if self.field.is_some() {
+            if let Some(hit) = self.probe_right1_prime_batch(g, fb, ops, counters, target) {
+                return Some(hit);
+            }
+            // Batch path enumerates every candidate; a miss is final.
+            return None;
+        }
         for (j, &pj) in fb.points.iter().enumerate() {
             if g.is_identity(&pj) {
                 continue;
@@ -473,6 +526,110 @@ impl RootfindKMitmOracle<'_> {
                 self.finish_hit_prime(g, fb, ops, counters, target, left, std::slice::from_ref(&j))
             {
                 return Some(hit);
+            }
+        }
+        None
+    }
+
+    /// Batch-inv + x-only folded keys for every factor-base point (right=1).
+    fn probe_right1_prime_batch(
+        &mut self,
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        target: PrimePoint,
+    ) -> Option<Vec<usize>> {
+        let f = self.field?;
+        let n = fb.points.len();
+        if self.diffs.len() < n {
+            self.diffs.resize(n, 0);
+            self.scratch.resize(n, 0);
+        }
+        let xr = f.to_mont(target.x);
+        let yr = f.to_mont(target.y);
+        ops.field_ops.muls += 2;
+        let mut active: Vec<usize> = Vec::with_capacity(n);
+        for (j, &pj) in fb.points.iter().enumerate() {
+            if g.is_identity(&pj) || pj.x == target.x {
+                // Same abscissa / identity: sibling path refuses; try group add.
+                if g.is_identity(&pj) {
+                    continue;
+                }
+                let t = g.add(ops, target, g.neg(pj));
+                self.probe_right_adds += 1;
+                let mut lookups = 0u64;
+                if let Some(left) = self.table.as_ref()?.probe_left(g, fb, ops, &mut lookups, t) {
+                    self.probe_lookups += lookups;
+                    counters.lookups += lookups;
+                    if let Some(hit) = self.finish_hit_prime(
+                        g,
+                        fb,
+                        ops,
+                        counters,
+                        target,
+                        left,
+                        std::slice::from_ref(&j),
+                    ) {
+                        return Some(hit);
+                    }
+                } else {
+                    self.probe_lookups += lookups;
+                    counters.lookups += lookups;
+                }
+                continue;
+            }
+            let xj = f.to_mont(pj.x);
+            // dx = x_J − x_R (same as CountedGroup::sibling_pair).
+            self.diffs[j] = f.sub(xj, xr);
+            active.push(j);
+        }
+        if active.is_empty() {
+            return None;
+        }
+        // Compact batch-inv over the active diffs.
+        let mut compact: Vec<u64> = active.iter().map(|&j| self.diffs[j]).collect();
+        let mut scratch = vec![0u64; compact.len()];
+        f.batch_inv(&mut compact, &mut scratch);
+        counters.inversions += 1;
+        ops.field_ops.invs += 1;
+        ops.field_ops.muls += 3 * compact.len() as u64;
+        self.probe_batch_inv += 1;
+        for (slot, &j) in active.iter().enumerate() {
+            let inv = compact[slot];
+            let pj = fb.points[j];
+            let xj = f.to_mont(pj.x);
+            let yj = f.to_mont(pj.y);
+            let dy = f.sub(yj, yr);
+            let sy = f.add(yj, yr);
+            let lp = f.mul(dy, inv);
+            let lm = f.mul(f.sub(0, sy), inv);
+            let base = f.add(xr, xj);
+            // Folded keys are canonical `x + 1` (same as PairTable / KSumTable).
+            let xp = f.from_mont(f.sub(f.mul(lp, lp), base));
+            let xm = f.from_mont(f.sub(f.mul(lm, lm), base));
+            // One sibling pair = one charged add (matches sibling_pair callers).
+            ops.adds += 1;
+            self.probe_right_adds += 1;
+            // key_plus = x(R+F_j)+1 → R = left + (−F_j); key_minus → R = left + F_j.
+            let candidates = [(xp + 1, fb.neg_index[j]), (xm + 1, j)];
+            for &(folded, right_j) in &candidates {
+                self.probe_lookups += 1;
+                counters.lookups += 1;
+                let Some(left) = self.table.as_ref()?.lookup_folded(folded) else {
+                    continue;
+                };
+                if let Some(hit) = self.finish_hit_prime(
+                    g,
+                    fb,
+                    ops,
+                    counters,
+                    target,
+                    left,
+                    std::slice::from_ref(&right_j),
+                ) {
+                    return Some(hit);
+                }
             }
         }
         None
