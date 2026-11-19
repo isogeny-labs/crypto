@@ -366,3 +366,9 @@ PairSumTable probes (~3× miss path), multi-target amortization (3–8× vs cold
 m=2 hit-path key reuse. ecbench smoke n=13: complete negfold / rho-strong ≈ 1.69
 (hard stop); negfold / XOR-priced F4 ≈ 0.059. Evidence
 `research/rootfind_faster_e2e_20261015/`. No security claim.
+
+Engineering 2026-11-19 (`cursor/rootfind-faster-e2e-1119-7120`): land lever 1 of
+the 100× plan as `rootfind-floor:m=2|3` — same search/charged adds as
+`rootfind-subtract`, x-only Montgomery + Bloom filter. Wall ~1.9–2.1× vs
+subtract on 32-bit prime A∈{64,256,1024} (`[pcc:unverified]`). Evidence
+`research/rootfind_floor_oracle_20261119/`. No security claim.

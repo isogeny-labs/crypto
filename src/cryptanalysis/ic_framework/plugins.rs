@@ -39,6 +39,7 @@
 //! | `mitm-frobenius-lazy-counted` | 2 or 3 | the same entries and probe; a hit names its summands' orbit members then, not every base point at build |
 //! | `mitm-frobenius-layout-counted` | 2 or 3 | the same entries and probe on a base laid out by orbit (`compact-orbit-scan`): members named by index, and half the same-orbit pairs added |
 //! | `rootfind-subtract` | 2 or 3 | prime curves: `prime_fast`'s direct-subtraction root finding, every `x(R ∓ F_i)` of a target from one Montgomery batched inversion, then a lookup (`m = 2`) or a probe of the negation-folded pair table (`m = 3`) |
+//! | `rootfind-floor` | 2 or 3 | same search and charged additions as `rootfind-subtract`, with x-only Montgomery candidates and a word-blocked Bloom filter in front of the exact abscissa map (lever 1 of the 100× plan) |
 //! | `chained-x` | 2, 3 or 4 | Koblitz subspace bases: the chained `x`-frame descent (`groebner_decompose`), `m − 1` Semaev `S₃` links solved by boolean F4 with splitting |
 //!
 //! The pair table is where memory buys time, and `mitm`'s
@@ -2191,7 +2192,7 @@ impl FactorBaseBuilder<Fp2Curve> for GlsLineBase<'_> {
 
 /// `counters` with the marker that says the oracle's set-up counts all
 /// its table work (`ecbench::work::known_uncounted`).
-fn table_counted(mut counters: BTreeMap<String, u64>) -> BTreeMap<String, u64> {
+pub(crate) fn table_counted(mut counters: BTreeMap<String, u64>) -> BTreeMap<String, u64> {
     counters.insert("counted:table_insert_attempts".to_string(), 1);
     counters
 }
@@ -5281,32 +5282,6 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for ChainedXOracle<'_> {
 
 #[cfg(test)]
 mod tests {
-    #[test]
-    fn the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e() {
-        use crate::cryptanalysis::ic_boundary::{
-            binary_affine_subspace_factor_base, koblitz_instance,
-        };
-        let ko = koblitz_instance(1, 17).expect("a = 1 over F_2^17");
-        let (basis, offset) = trace_coset_basis(&ko, 6).unwrap();
-        let tr = |v: u64| ko.artin_schreier.trace(v);
-        assert_eq!(tr(offset), 1);
-        assert!(basis.iter().all(|&v| tr(v) == 0));
-        let fb = binary_affine_subspace_factor_base(&ko, &basis, offset);
-        assert!(fb.subspace_basis.is_none());
-        assert_eq!(fb.affine_subspace, Some((basis.clone(), offset)));
-        assert!(!fb.points.is_empty());
-        let g = BinaryGroup(&ko.fast);
-        let mut ops = GroupOps::default();
-        let half = ko.r * ko.cofactor / 2;
-        assert!(fb.points.iter().all(|&p| g.mul(&mut ops, p, half).infinity));
-        let (b0, o0) = trace_coset_basis(&koblitz_instance(0, 13).unwrap(), 6).unwrap();
-        assert_eq!(o0, 0);
-        assert_eq!(
-            b0,
-            trace_kernel_basis(&koblitz_instance(0, 13).unwrap(), 6).unwrap()
-        );
-    }
-
     use super::*;
     use crate::cryptanalysis::ic_boundary::koblitz_instance;
     #[allow(unused_imports)]

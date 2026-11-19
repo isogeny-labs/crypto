@@ -989,6 +989,13 @@ bases the Gröbner arms use, so the engines meet on one query stream
   per relation and nothing else. The difference the unit does not see, one
   inversion a target against `2|F_x|`, is in the `inversions` counter, the
   record's field-operation tally and wall time.
+- `rootfind-floor:m=2|3` is the same search and the same charged additions
+  as `rootfind-subtract`, with x-only Montgomery candidates and a
+  word-blocked Bloom filter in front of the exact abscissa map (lever 1 of
+  `research/rootfind_baseline_100x_20261117/PLAN.md`). It is a separate
+  oracle id: never change what `rootfind-subtract` counts. Classification
+  is constant-factor engineering (wall / field work); evidence under
+  `research/rootfind_floor_oracle_20261119/`.
 
 Read a root-finding arm against a Gröbner arm on the resource vector and on
 wall time: the root finder's `S` is a complete count of group additions,

@@ -79,6 +79,7 @@ pub mod recursive_adapter;
 pub mod registry;
 pub mod residual;
 pub mod rootfind;
+pub mod rootfind_floor;
 pub mod rootfind_gpu;
 pub mod shared_rank;
 pub mod solver_units;
