@@ -34,7 +34,7 @@ python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct227_native_
 cargo test --locked --release --test ct226_native_genus4_transferred_ic -- --nocapture
 ```
 
-Local Python normal-mode self-test of the auditor against the six frozen rows succeeded with `CT227_SELFTEST_PASS 6 6`. This is a **new audit of producer CI logs**, not an independent algebraic implementation, signed PCC, blind-target challenge or independent remeasurement. A separate scoped cheap Python CI workflow has been added; its exact-head hosted verdict must be checked after publication.
+Local Python normal-mode self-test of the auditor against the six frozen rows succeeded with `CT227_SELFTEST_PASS 6 6`. This is a **new audit of producer CI logs**, not an independent algebraic implementation, signed PCC, blind-target challenge or independent remeasurement. The new bounded cost-audit [GitHub Actions run #44475024245](https://github.com/isogeny-labs/crypto/actions/runs/44475024245) **completed successfully** at exact source `da7d4151ddeb489dc8c7c8e816c050de68b85f7b`: [job 135393364844](https://github.com/isogeny-labs/crypto/actions/runs/44475024245/job/135393364844) printed `CT227_SELFTEST_PASS 6 6`, all six mutated witnesses rejected, and output 0.00003854534370015367 median paired direct/candidate. This is an audit of frozen producer logs, not signed independent PCC.
 
 ## Caveats and next action
 
