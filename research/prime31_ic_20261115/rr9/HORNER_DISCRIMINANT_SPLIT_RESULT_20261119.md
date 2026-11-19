@@ -21,6 +21,8 @@ For the eliminated-Horner equation `E(u,z,r) = D(z)^2 F3(u,N(z)/D(z),r)` defined
 
 Proof: the discriminant of Semaev's F3(u,v,r) as a polynomial in r is exactly 16 f(u) f(v). Scaling its coefficients by D² multiplies its discriminant by D^4. Substitute v=N/D and use f(N/D)=M²/D³. This gives 16 f(u) D M² = 64 f(u) f(z) M². Both identities are *polynomial identities*, with no division in the final form.
 
+**Symbolic cross-check:** Separately authored SymPy expansion over the indeterminates `(u,z,a,b)` (not just sampled Prime31 values) returned `True` for all three exact identities: the leading-coefficient formula, the discriminant formula, and the duplication numerator identity. This is an algebraic-computer check, not a Lean/kernel formal proof. Since every geometric root of the *full* chart has all denominators nonzero, algebraic saturation of its ideal by the product of the seven `D(t_{i+1})` is **already equal to the original full ideal**; explicit inverse variables are unnecessary for geometric correctness. An F4 implementation may nevertheless exhibit different intermediate costs if it introduces redundant saturation constraints.
+
 **Consequences for the specific unchanged Prime31 chart:** The curve over Fp has odd prime order n=2147446831 and cofactor 1; its 31 factor-base points all have ordinary rational x,y, with distinct x values and no order-2 or order-4 points. For every ordinary rational u=x(U), z=x(Z) with U,Z nonidentity:
 
 - D(z), f(u), f(z), M(z) are all nonzero. The discriminant is a nonzero square in Fp; E(u,z,r) is squarefree in r. Its degree is 2, or drops to a nonzero linear polynomial when u=x([2]Z).
