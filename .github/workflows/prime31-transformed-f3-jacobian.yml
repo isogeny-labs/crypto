@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/prime31-transformed-f3-jacobian.yml'
       - 'research/prime31_ic_20261115/native/examples/prime31_transformed_f3_jacobian.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_transformed_f3_jacobian.py'
       - 'research/prime31_ic_20261115/rr9/TRANSFORMED_F3_JACOBIAN_PROTOCOL_20261119.md'
   pull_request:
     paths:
@@ -26,6 +27,7 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             research/prime31_ic_20261115/native/examples/prime31_transformed_f3_jacobian.rs
+            research/prime31_ic_20261115/native/verify_prime31_transformed_f3_jacobian.py
             research/prime31_ic_20261115/rr9/TRANSFORMED_F3_JACOBIAN_PROTOCOL_20261119.md
       - name: Checkout pinned original Rust Arithmetic and F4 source
         uses: actions/checkout@v4
@@ -73,6 +75,11 @@ jobs:
             .whole_solver_speedup_measured==false and .pcc_signed==false' \
             prime31-transformed-f3-jacobian.json
           sha256sum prime31-transformed-f3-jacobian.json | tee output-sha256.txt
+      - name: Independent full-cohort Python BigInt affine replay
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_transformed_f3_jacobian.py \
+            prime31-transformed-f3-jacobian.json | tee prime31-transformed-f3-jacobian-independent.json
+          sha256sum prime31-transformed-f3-jacobian-independent.json | tee -a output-sha256.txt
       - name: Upload source-specific run evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -80,6 +87,7 @@ jobs:
           name: prime31-transformed-f3-jacobian-source-evidence
           path: |
             prime31-transformed-f3-jacobian.json
+            prime31-transformed-f3-jacobian-independent.json
             input-sha256.txt
             output-sha256.txt
           if-no-files-found: warn
