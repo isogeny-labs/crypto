@@ -54,7 +54,8 @@ use crate::cryptanalysis::ecbench::canonical::{sha256_hex, short_id, splitmix64}
 use crate::cryptanalysis::ecbench::host::{self, recompute_class, HostCapsule};
 use crate::cryptanalysis::ecbench::legacy;
 use crate::cryptanalysis::ecbench::methods::{
-    MethodSpec, PhaseRecord, ResolvedMethod, SolveReport,
+    v5_pre_tally_record, MethodSpec, PhaseRecord, ResolvedMethod, SolveReport,
+    V5_JUMP_INDEX_COUNTER,
 };
 use crate::cryptanalysis::ecbench::record::{
     check_line_seal, child_main, expected_automorphisms, f4_accounting_note, f6_tree_note,
@@ -725,6 +726,15 @@ fn compare_replay(
     if legacy::admits_pre_cost_accounting(r) {
         rep.counters
             .retain(|k, _| !legacy::is_cost_accounting_counter(k) || r.counters.contains_key(k));
+    }
+    // A `rho.signed_frobenius_v5` record written before its per-step
+    // jump-index tally (2026-11-19) is compared without it: the tally is a
+    // native counter only, equal to the recorded `steps`, and the walk,
+    // outcome and group operations it replays are unchanged.  Readers that
+    // price such a record derive the tally from `steps`.
+    if v5_pre_tally_record(&r.method.id, &r.counters) {
+        rep.counters.remove(V5_JUMP_INDEX_COUNTER);
+        rep.unpriced.retain(|k| k != V5_JUMP_INDEX_COUNTER);
     }
     let rep = &rep;
     let mut diffs = Vec::new();

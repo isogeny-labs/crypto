@@ -850,6 +850,17 @@ pub struct RhoResult {
     /// result.
     #[serde(skip)]
     pub work_native: BTreeMap<String, u64>,
+    /// Jump-index selections of the tuned walk ([`TunedWalker`]): one per
+    /// walk step, the mixed key reduced to a jump index (`index_of`), as
+    /// `koblitz_strong_rho` tallies one `partition_hashes` per lane step.
+    /// The look-ahead's rejected candidates are not selections (each is
+    /// charged a full addition in `look_ahead_additions`).  Zero for the
+    /// walks that do not tally it.  Kept out of `counters` and the
+    /// serialised result so that every report is unchanged; ecbench emits
+    /// it only for `rho.signed_frobenius_v5` (owner decision 2026-11-19,
+    /// research/koblitz_rho_reference_20261115/DECISION.md).
+    #[serde(skip)]
+    pub jump_index_selections: u64,
 }
 
 /// One instance of one regime: the curve, the boundaries, the reference
@@ -1700,6 +1711,7 @@ pub fn rho_reference<G: CountedGroup>(
         recovered,
         counters: BTreeMap::new(),
         work_native: BTreeMap::new(),
+        jump_index_selections: 0,
     }
 }
 
@@ -2588,6 +2600,9 @@ struct WalkTally {
     abandoned: u64,
     capped: u64,
     canonicalisations: u64,
+    /// Jump-index selections: one per step (`index_of` on the point's
+    /// mixed key).  See [`RhoResult::jump_index_selections`].
+    jump_index_selections: u64,
     /// Cycles longer than the window that the Brent detector found
     /// ([`WalkPolicy::brent`]).
     cycles_long: u64,
@@ -2648,6 +2663,7 @@ impl WalkTally {
         self.abandoned += o.abandoned;
         self.capped += o.capped;
         self.canonicalisations += o.canonicalisations;
+        self.jump_index_selections += o.jump_index_selections;
         self.cycles_long += o.cycles_long;
         self.lost_identity += o.lost_identity;
         self.lost_abandoned += o.lost_abandoned;
@@ -2852,6 +2868,7 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
         loop {
             // One step, with the look-ahead when it is on.
             let j0 = self.index_of(h);
+            tally.jump_index_selections += 1;
             let mut tried = 0usize;
             let (y, ya, yb, ky, hy) = loop {
                 // `j0` and `tried` are below `jump_count`, so one
@@ -3449,6 +3466,7 @@ fn rho_search_from<G: CountedGroup, C: RhoClasses<G>>(
         verified: recovered.is_some(),
         recovered,
         work_native: tally.work_native(),
+        jump_index_selections: tally.jump_index_selections,
         counters: {
             let mut counters =
                 tuned_counters(&shape, setup, start_adds, &tally, verification_ops, useless);
@@ -3893,6 +3911,7 @@ pub fn rho_walk_lanes<G: CountedGroup, C: RhoClasses<G>>(
         verified: recovered.is_some(),
         recovered,
         work_native: tally.work_native(),
+        jump_index_selections: 0,
         counters,
     })
 }
@@ -5119,6 +5138,7 @@ pub fn signed_frobenius_rho(
         verified: report.verified && recovered == Some(planted),
         counters: signed_rho_counters(&report),
         work_native: BTreeMap::new(),
+        jump_index_selections: 0,
     })
 }
 

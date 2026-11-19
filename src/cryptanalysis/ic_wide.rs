@@ -416,6 +416,7 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
         recovered: recovered.and_then(|d| d.checked_u128().and_then(|v| u64::try_from(v).ok())),
         counters,
         work_native: Default::default(),
+        jump_index_selections: 0,
     };
     (res, recovered)
 }
