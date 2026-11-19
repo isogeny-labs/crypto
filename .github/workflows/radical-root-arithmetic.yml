@@ -21,6 +21,7 @@ on:
       - 'research/amm_digit_perf_20261118/round46_quadratic_split_isolated.py'
       - 'research/amm_digit_perf_20261118/round47_quadratic_split_isolated.py'
       - 'research/amm_digit_perf_20261118/round48_joint_tonelli_isolated.py'
+      - 'research/amm_digit_perf_20261118/round49_jacobi_isolated.py'
       - 'research/amm_digit_perf_20261118/round31_bounded_baseline.rs'
       - 'research/amm_digit_perf_20261118/round23_verifier_isolated.py'
       - 'research/amm_digit_perf_20261118/round24_verifier_isolated.py'
@@ -680,6 +681,34 @@ jobs:
         with:
           name: round45-quadratic-native-rust
           path: ${{ runner.temp }}/round45-quadratic-native-rust.txt
+          if-no-files-found: ignore
+
+  bounded-jacobi-round49:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round49_jacobi_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Validate native Rust binary Jacobi against old Euler baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round49_jacobi_isolated.py
+          } | tee "$RUNNER_TEMP/round49-jacobi-rust.txt"
+          cat "$RUNNER_TEMP/round49-jacobi-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round49-jacobi-production-rust-ab
+          path: ${{ runner.temp }}/round49-jacobi-rust.txt
           if-no-files-found: ignore
 
   bounded-joint-tonelli-round48:
