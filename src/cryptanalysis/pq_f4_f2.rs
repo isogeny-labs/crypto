@@ -2411,6 +2411,26 @@ pub fn groebner_basis_f4_skeleton(
     (basis, st)
 }
 
+/// The shape key of a trace: the unknowns, the inputs' degree and their
+/// sorted monomial support (charged: a word operation a term, the sort,
+/// the hash probe of the lookup).
+fn trace_shape(inputs: &[F2BoolPoly], n_vars: usize) -> TraceShape {
+    let mut support: Vec<Mask> = inputs
+        .iter()
+        .flat_map(|p| p.terms.iter().map(|t| t.mask))
+        .collect();
+    let n_terms = support.len();
+    support.sort_unstable();
+    support.dedup();
+    tally::word_ops(2 * n_terms as u64 + tally::sort_cost(n_terms));
+    tally::hash_probes(1);
+    (
+        n_vars,
+        inputs.iter().map(degree).max().unwrap_or(0),
+        support.into_boxed_slice(),
+    )
+}
+
 /// [`groebner_basis_f4`] through a [`F4PairTrace`] shared with the earlier
 /// systems of the run: replay the trace of the system's shape when there
 /// is one, verify, and fall back to the plain computation (which records
@@ -2442,22 +2462,7 @@ pub fn groebner_basis_f4_traced(
     if inputs.is_empty() {
         return run(inputs, TraceMode::Off, budget);
     }
-    // The shape key: the unknowns, the inputs' degree and their sorted
-    // monomial support (a word operation a term, the sort, a hash probe).
-    let mut support: Vec<Mask> = inputs
-        .iter()
-        .flat_map(|p| p.terms.iter().map(|t| t.mask))
-        .collect();
-    let n_terms = support.len();
-    support.sort_unstable();
-    support.dedup();
-    tally::word_ops(2 * n_terms as u64 + tally::sort_cost(n_terms));
-    tally::hash_probes(1);
-    let key: TraceShape = (
-        n_vars,
-        inputs.iter().map(degree).max().unwrap_or(0),
-        support.into_boxed_slice(),
-    );
+    let key = trace_shape(&inputs, n_vars);
     // the copies of the inputs a replay and its verification take
     let copy_cost = || tally::word_ops(inputs.iter().map(|p| p.terms.len() as u64).sum());
 
@@ -2512,13 +2517,14 @@ pub fn groebner_basis_f4_traced(
             .traces
             .get(&key)
             .map_or(0, |old| F4PairTrace::shape_bytes(&key, old));
-        if store.bytes - removed + added <= store.cap_bytes {
+        let after = store.bytes.saturating_sub(removed).saturating_add(added);
+        if after <= store.cap_bytes {
             total.trace_records = 1;
-            store.bytes = store.bytes - removed + added;
+            store.bytes = after;
             store.traces.insert(key, steps);
         } else if removed > 0 {
             // a failed trace that cannot be replaced is dropped
-            store.bytes -= removed;
+            store.bytes = store.bytes.saturating_sub(removed);
             store.traces.remove(&key);
         }
     }
@@ -4714,6 +4720,272 @@ mod tests {
         }
         assert!(skeleton.is_empty());
         assert_eq!(skeleton.bytes(), 0);
+    }
+
+    /// The plain run and the traced run return the same basis, and the
+    /// traced run's verdict counters are consistent.
+    fn check_traced(eqs: &[F2BoolPoly], n: usize, store: &mut F4PairTrace, what: &str) -> F4Stats {
+        let plain = groebner_basis_f4(eqs.to_vec(), n, None);
+        let traced = groebner_basis_f4_traced(eqs.to_vec(), n, None, store);
+        assert_eq!(traced.0, plain.0, "{what}: bases differ");
+        let t = &traced.1;
+        assert!(!t.timed_out && !t.oversize, "{what}");
+        assert_eq!(t.trace_hits + t.trace_fallbacks, t.trace_replays, "{what}");
+        assert!(
+            t.trace_hits + t.trace_records <= 1 + t.trace_fallbacks,
+            "{what}"
+        );
+        assert_eq!(t.basis_len, plain.1.basis_len, "{what}");
+        if t.trace_replays == 0 {
+            // a recording run is the plain run plus its provenance pass
+            assert_eq!(
+                t.word_xors,
+                plain.1.word_xors + t.trace_record_xors,
+                "{what}"
+            );
+            assert_eq!(t.pairs_reduced, plain.1.pairs_reduced, "{what}");
+            assert_eq!(t.solving_degree, plain.1.solving_degree, "{what}");
+        }
+        traced.1
+    }
+
+    /// Same-shape systems that differ only in their affine part: one
+    /// quadratic template, each system adding random linear and constant
+    /// terms (the way a target enters a descent system).
+    fn affine_variation_batch(
+        n: usize,
+        m: usize,
+        count: usize,
+        rng: &mut StdRng,
+    ) -> Vec<Vec<F2BoolPoly>> {
+        let template = random_quadratic(n, m, rng);
+        (0..count)
+            .map(|_| {
+                template
+                    .iter()
+                    .map(|p| {
+                        let mut kept: Vec<u64> = p
+                            .terms
+                            .iter()
+                            .map(|t| mask_low64(t.mask))
+                            .filter(|&m| m.count_ones() >= 2)
+                            .collect();
+                        kept.extend((0..n).map(|i| 1u64 << i).filter(|_| rng.gen_bool(0.5)));
+                        if rng.gen_bool(0.5) {
+                            kept.push(0);
+                        }
+                        poly(&kept, n)
+                    })
+                    .collect()
+            })
+            .collect()
+    }
+
+    /// **The trace changes no basis** over many random same-shape systems
+    /// — one template support, each system keeping a random 80% of the
+    /// terms of each equation (the union support, the shape key, is mostly
+    /// the template's), or each system varying only its affine part — and
+    /// a system replaying its own trace is accepted.
+    #[test]
+    fn trace_matches_the_plain_path_on_same_shape_systems() {
+        let mut total = F4Stats::default();
+        let mut self_hits = 0;
+        for (seed, n, m, affine) in [
+            (1u64, 8usize, 8usize, false),
+            (2, 9, 9, false),
+            (3, 10, 12, false),
+            (4, 7, 5, false),
+            (5, 8, 8, true),
+            (6, 10, 10, true),
+            (7, 9, 12, true),
+        ] {
+            let mut rng = StdRng::seed_from_u64(0x7ace_0 + seed);
+            let batch = if affine {
+                affine_variation_batch(n, m, 24, &mut rng)
+            } else {
+                same_shape_batch(n, m, 24, 0.8, &mut rng)
+            };
+            let mut store = F4PairTrace::with_cap(TRACE_DEFAULT_CAP_BYTES);
+            // the recorded system itself replays without a fallback
+            check_traced(&batch[0], n, &mut store, "record");
+            let again = check_traced(&batch[0], n, &mut store, "self replay");
+            assert_eq!(again.trace_replays, 1);
+            assert_eq!(again.trace_mismatches, 0, "n={n}: self replay mismatched");
+            self_hits += again.trace_hits;
+            for (k, eqs) in batch.iter().enumerate() {
+                let st = check_traced(eqs, n, &mut store, &format!("n={n} system {k}"));
+                total.absorb(&st);
+            }
+            assert!(store.bytes() > 0 && !store.is_empty());
+        }
+        eprintln!(
+            "random same-shape: records {} replays {} hits {} fallbacks {} (mismatches {}, \
+             verify failures {}), verify xors {}, pairs dropped {}",
+            total.trace_records,
+            total.trace_replays,
+            total.trace_hits,
+            total.trace_fallbacks,
+            total.trace_mismatches,
+            total.trace_verify_failures,
+            total.trace_verify_word_xors,
+            total.trace_pairs_dropped,
+        );
+        assert!(total.trace_replays > 0);
+        assert_eq!(self_hits, 7, "a self replay failed its verification");
+    }
+
+    /// **A wrong trace is caught.**  A trace recorded on one system is
+    /// stored under the key of systems it does not fit — other random
+    /// systems, inconsistent ones, degenerate ones, ones with extra linear
+    /// equations — and an empty trace (no pair reduced at all) is tried on
+    /// every one: the basis is always the plain one, the verification or
+    /// the mismatch check refuses the replays that would be wrong, and an
+    /// empty trace is accepted only where the inputs' echelon already is
+    /// the basis.
+    #[test]
+    fn a_wrong_trace_falls_back_to_the_plain_path() {
+        let n = 8;
+        let mut rng = StdRng::seed_from_u64(0xfa11);
+        let donor = random_quadratic(n, 8, &mut rng);
+        let mut donor_store = F4PairTrace::with_cap(TRACE_DEFAULT_CAP_BYTES);
+        check_traced(&donor, n, &mut donor_store, "donor");
+        let donor_steps: Vec<&TraceStep> =
+            donor_store.traces.values().next().unwrap().iter().collect();
+        assert!(!donor_steps.is_empty());
+        let clone_steps = || -> Vec<TraceStep> {
+            donor_steps
+                .iter()
+                .map(|t| TraceStep {
+                    deg: t.deg,
+                    useful: t.useful.clone(),
+                    fresh: t.fresh.clone(),
+                })
+                .collect()
+        };
+        let mut targets: Vec<(String, Vec<F2BoolPoly>)> = Vec::new();
+        for k in 0..12 {
+            targets.push((format!("random {k}"), random_quadratic(n, 8, &mut rng)));
+        }
+        // inconsistent: v0 = 0 and v0 = 1 among quadrics
+        let mut bad = random_quadratic(n, 6, &mut rng);
+        bad.push(poly(&[1], n));
+        bad.push(poly(&[1, 0], n));
+        targets.push(("inconsistent".into(), bad));
+        // degenerate: one equation, many solutions; or a single product
+        targets.push(("one equation".into(), random_quadratic(n, 1, &mut rng)));
+        targets.push(("monomial".into(), vec![poly(&[0b11], n)]));
+        // linear system: its echelon is already the reduced basis
+        targets.push((
+            "linear".into(),
+            (0..n).map(|i| poly(&[1u64 << i, 0], n)).collect(),
+        ));
+        // more equations than the donor, with linear ones
+        let mut wide = random_quadratic(n, 8, &mut rng);
+        wide.extend((0..3).map(|i| poly(&[1u64 << i, 1u64 << (i + 3)], n)));
+        targets.push(("with linear".into(), wide));
+        // the donor with one equation dropped and one term changed
+        let mut near = donor.clone();
+        near.pop();
+        near[0] = near[0].add(&poly(&[0b101], n));
+        targets.push(("near donor".into(), near));
+
+        let (mut fallbacks, mut verify_failures, mut empty_hits) = (0, 0, 0);
+        for (what, eqs) in &targets {
+            let inputs: Vec<F2BoolPoly> = eqs.iter().filter(|p| !p.is_zero()).cloned().collect();
+            let key = trace_shape(&inputs, n);
+            for (label, steps) in [("donor trace", clone_steps()), ("empty trace", Vec::new())] {
+                let mut store = F4PairTrace::with_cap(TRACE_DEFAULT_CAP_BYTES);
+                store.traces.insert(key.clone(), steps);
+                let st = check_traced(eqs, n, &mut store, &format!("{what}, {label}"));
+                assert_eq!(st.trace_replays, 1, "{what}, {label}");
+                fallbacks += st.trace_fallbacks;
+                verify_failures += st.trace_verify_failures;
+                if label == "empty trace" && st.trace_hits == 1 {
+                    empty_hits += 1;
+                }
+                if st.trace_fallbacks == 1 {
+                    // the fallback re-records the shape
+                    assert_eq!(st.trace_records, 1, "{what}, {label}");
+                }
+            }
+        }
+        eprintln!(
+            "wrong traces: {} replays, {fallbacks} fallbacks ({verify_failures} by \
+             verification), {empty_hits} empty traces accepted",
+            2 * targets.len()
+        );
+        assert!(fallbacks >= targets.len() as u64);
+        assert!(verify_failures > 0);
+        // the linear system and the single monomial need no pair
+        assert!(empty_hits >= 1);
+    }
+
+    /// **The verification alone refuses an incomplete basis.**  Run the
+    /// verification directly on the inputs' interreduced echelon (what an
+    /// empty replay leaves) for systems whose basis needs pairs: every one
+    /// fails; on the plain run's own reduced basis every one passes.
+    #[test]
+    fn the_verification_pass_decides_the_groebner_property() {
+        let n = 8;
+        let mut rng = StdRng::seed_from_u64(0x7e51);
+        for k in 0..16 {
+            let eqs = random_quadratic(n, 6 + k % 4, &mut rng);
+            let (gb, _) = groebner_basis_f4(eqs.clone(), n, None);
+            if gb.len() == 1 && is_one(&gb[0]) {
+                continue;
+            }
+            let (_, ok) = groebner_basis_f4_inner(
+                gb.clone(),
+                n,
+                None,
+                None,
+                max_matrix_words(),
+                EARLY_GUARD,
+                None,
+                TraceMode::Verify(&eqs),
+            );
+            assert_eq!(ok.trace_verify_failures, 0, "system {k}: the basis fails");
+            assert_eq!(ok.steps, 1);
+            let mut st = F4Stats::default();
+            let nonzero: Vec<F2BoolPoly> = eqs.iter().filter(|p| !p.is_zero()).cloned().collect();
+            let partial = interreduce(nonzero, n, &mut st);
+            if partial == gb {
+                continue;
+            }
+            let (_, bad) = groebner_basis_f4_inner(
+                partial,
+                n,
+                None,
+                None,
+                max_matrix_words(),
+                EARLY_GUARD,
+                None,
+                TraceMode::Verify(&eqs),
+            );
+            assert_eq!(
+                bad.trace_verify_failures, 1,
+                "system {k}: a partial basis passes"
+            );
+            // the reduced basis of a proper sub-ideal also fails: the inputs
+            // are not all in it
+            let (sub, _) = groebner_basis_f4(eqs[..eqs.len() - 1].to_vec(), n, None);
+            if sub != gb {
+                let (_, bad) = groebner_basis_f4_inner(
+                    sub,
+                    n,
+                    None,
+                    None,
+                    max_matrix_words(),
+                    EARLY_GUARD,
+                    None,
+                    TraceMode::Verify(&eqs),
+                );
+                assert_eq!(
+                    bad.trace_verify_failures, 1,
+                    "system {k}: a sub-ideal passes"
+                );
+            }
+        }
     }
 }
 

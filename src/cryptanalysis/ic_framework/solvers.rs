@@ -3162,4 +3162,100 @@ mod tests {
         assert!(sums["skeleton_steps_replayed"].0 > 0);
         assert!(sums["divisor_tests"].0 < sums["divisor_tests"].1);
     }
+
+    /// **`f4-f2` with its trace decides real descent systems exactly as
+    /// the plain path does.**  One solver instance with `trace=1` solves a
+    /// batch of `S_3` descents of one cell (Koblitz curve over `F_{2^13}`,
+    /// a 6-dimensional subspace, 12 unknowns, random targets), as one
+    /// oracle does in one run; every verdict and solution set equals that
+    /// of `trace=0`, and the charged work of both (replays, verifications,
+    /// fallbacks and recordings included) is reported side by side.
+    #[test]
+    fn f4_f2_trace_matches_plain_on_descent_systems() {
+        use crate::cryptanalysis::ic_boundary::koblitz_instance;
+        use crate::cryptanalysis::pq_descent_symbolic::descend;
+        use rand::{Rng, SeedableRng};
+        let inst = koblitz_instance(0, 13).expect("Koblitz curve over F_2^13");
+        let basis: Vec<u64> = (0..6).map(|k| 1u64 << k).collect();
+        let mut rng = rand::rngs::StdRng::seed_from_u64(0x5ce1_17);
+        let with = F4F2::default();
+        let plain = F4F2::default();
+        let mut on = Params::default();
+        on.set("trace", "1");
+        assert!(validate_solver_params("f4-f2", &on).is_ok());
+        let mut both = on.clone();
+        both.set("skeleton", "1");
+        assert!(validate_solver_params("f4-f2", &both).is_err());
+        let mut two = Params::default();
+        two.set("trace", "2");
+        assert!(validate_solver_params("f4-f2", &two).is_err());
+        let off = Params::default();
+        let mut sums: BTreeMap<String, (u64, u64)> = BTreeMap::new();
+        let mut supports = std::collections::BTreeSet::new();
+        let n_systems = 32;
+        for k in 0..n_systems {
+            let x_r = rng.gen::<u64>() & inst.gf.mask;
+            let sys = descend(&inst.gf, inst.b, x_r, &basis, 2).unwrap();
+            let system = BooleanSystem {
+                equations: sys.equations.clone(),
+                n_vars: sys.n_vars,
+            };
+            let mut support: Vec<Mask> = system
+                .equations
+                .iter()
+                .flat_map(|p| p.terms.iter().map(|t| t.mask))
+                .collect();
+            support.sort_unstable();
+            support.dedup();
+            supports.insert(support);
+            let (va, ca) = with.solve(&system, &on, None);
+            let (vb, cb) = plain.solve(&system, &off, None);
+            assert_eq!(
+                format!("{va:?}"),
+                format!("{vb:?}"),
+                "system {k}: verdicts differ"
+            );
+            assert_eq!(ca.extra["basis_len"], cb.extra["basis_len"], "system {k}");
+            assert_eq!(cb.extra["trace_replays"], 0);
+            let e = sums.entry("word_xors".into()).or_default();
+            e.0 += ca.ops;
+            e.1 += cb.ops;
+            for key in [
+                "divisor_tests",
+                "pairs_reduced",
+                "field_pairs_reduced",
+                "matrix_rows_sum",
+                "bitop_word_ops",
+                "bitop_hash_probes",
+                "trace_records",
+                "trace_replays",
+                "trace_hits",
+                "trace_fallbacks",
+                "trace_mismatches",
+                "trace_verifications",
+                "trace_verify_failures",
+                "trace_verify_word_xors",
+                "trace_verify_divisor_tests",
+                "trace_verify_pairs",
+                "trace_record_xors",
+                "trace_pairs_dropped",
+            ] {
+                let e = sums.entry(key.to_string()).or_default();
+                e.0 += ca.extra.get(key).copied().unwrap_or(0);
+                e.1 += cb.extra.get(key).copied().unwrap_or(0);
+            }
+        }
+        eprintln!(
+            "trace vs plain over {n_systems} descent systems ({} distinct supports):",
+            supports.len()
+        );
+        for (k, (a, b)) in &sums {
+            eprintln!("  {k:28} trace {a:>12} plain {b:>12}");
+        }
+        assert!(sums["trace_records"].0 > 0);
+        assert_eq!(
+            sums["trace_hits"].0 + sums["trace_fallbacks"].0,
+            sums["trace_replays"].0
+        );
+    }
 }
