@@ -108,36 +108,36 @@ for l in range(2, 8):
     assert cl[(1, 'II')] == 2**l - 1 and cl[(2, 'I')] == 2**(2*l) - 1 and cl[(3, 'II')] == (2**l - 1)*(2**(2*l) - 1)
 res['n3_closed_forms_match_committed_census'] = True
 
-# ---- C-fin census: per N, per tower, weak b counts; subfield bound
-def weak_table(kappa):
+# ---- C-fin census.  Two readings: "as registered" (P6: C-fin only) and "with transfer condition T" (post-hoc, README D1):
+# the transfer E(K) -> Jac(C)(k) can carry the large prime subgroup only if dim Jac = g >= n (otherwise q^g < #E(K)/h and
+# l | #Jac(C)(k) happens with probability about q^(g-n) per curve).
+def weak_classes(N, l, kappa, requireT):
+    n = N//l; out = []
+    for c in classes(n, l):
+        g = c['genus']
+        if g < 2: continue
+        if requireT and g < n: continue
+        if log2_cost_ic(g, l, kappa) < log2_rho(N): out.append((l, n, c['type'], c['m'], g, c['count']))
+    return out
+def census(kappa, requireT):
     rows = []
     for N in range(4, 97):
-        per_tower = []
-        sub_bound = sum(2**s for s in range(1, N//2 + 1) if N % s == 0)       # |union of proper subfields| <= this
-        for l in [d for d in range(1, N//2 + 1) if N % d == 0]:
-            n = N//l
-            wk = 0; wk_cls = []
-            for c in classes(n, l):
-                if c['genus'] < 2: continue                                  # genus 1: the curve itself
-                if log2_cost_ic(c['genus'], l, kappa) < log2_rho(N):
-                    wk += c['count']; wk_cls.append((n, c['type'], c['m'], c['genus'], c['count']))
-            wk_lb = max(0, wk - sub_bound) if wk else 0
-            per_tower.append({'l': l, 'n': n, 'weak_b': wk, 'weak_b_minus_subfield_bound': wk_lb,
-                              'classes': [list(x) for x in wk_cls]})
-        best = max(per_tower, key=lambda t: t['weak_b_minus_subfield_bound'])
-        rows.append({'N': N, 'towers': per_tower, 'max_over_towers': best['weak_b_minus_subfield_bound'],
-                     'sum_over_towers_upper': sum(t['weak_b'] for t in per_tower),
-                     'frac_max': best['weak_b_minus_subfield_bound']/(2**N - 1)})
+        sub_bound = sum(2**s for s in range(1, N//2 + 1) if N % s == 0)
+        cl = []
+        for l in [d for d in range(1, N//2 + 1) if N % d == 0]: cl += weak_classes(N, l, kappa, requireT)
+        if not cl: continue
+        per = {}
+        for (l, n, t, m, g, cnt) in cl: per[l] = per.get(l, 0) + cnt
+        rows.append({'N': N, 'classes': [{'l': l, 'n': n, 'type': t, 'm': m, 'genus': g, 'count': cnt} for (l, n, t, m, g, cnt) in cl],
+                     'max_over_towers_minus_subfield_bound': max(0, max(per.values()) - sub_bound),
+                     'sum_over_towers_upper': sum(per.values()), 'frac_max': max(per.values())/(2**N - 1)})
     return rows
-res['census'] = {f'kappa{k}': weak_table(k) for k in (1, 10, 100)}
-json.dump(res, open(f'{LANE}/census.json', 'w'))
-# compact summary json (small)
-summ = {}
-for k, rows in res['census'].items():
-    summ[k] = [{'N': r['N'], 'max_over_towers': r['max_over_towers'], 'sum_over_towers_upper': r['sum_over_towers_upper'],
-                'frac_max': r['frac_max'], 'towers': [{'l': t['l'], 'n': t['n'], 'classes': t['classes']} for t in r['towers'] if t['weak_b']]}
-               for r in rows if r['sum_over_towers_upper']]
-json.dump({'total_deviation': tot_dev, 'verify': [{k: v for k, v in r.items() if k != 'classes'} for r in res['verify']], 'weak': summ},
-          open(f'{LANE}/census_summary.json', 'w'), indent=1)
-for k, v in summ.items():
-    print(k, 'first N with any weak b:', v[0]['N'] if v else None)
+res.pop('census', None)
+out = {'total_deviation': tot_dev, 'verify': [{k: v for k, v in r.items() if k != 'classes'} for r in res['verify']], 'weak': {}}
+for rt in (False, True):
+    for k in (1, 10, 100):
+        rows = census(k, rt)
+        out['weak'][f"{'T' if rt else 'asregistered'}_kappa{k}"] = rows
+        print(('with T' if rt else 'as registered'), 'kappa', k, 'first N with a weak class:', rows[0]['N'] if rows else None,
+              '| distinct (n,type,m,genus):', sorted({(c['n'], c['type'], c['m'], c['genus']) for r in rows for c in r['classes']})[:12], flush=True)
+json.dump(out, open(f'{LANE}/census_summary.json', 'w'))
