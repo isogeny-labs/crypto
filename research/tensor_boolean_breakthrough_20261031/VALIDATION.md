@@ -636,3 +636,35 @@ failed-planting-to-singular-block formal gaps. The upstream round theorem is
 still parameterized by explicit coverage, generation, cap and procedure
 interfaces, and the expected sparse Wiedemann--Dixon bit-cost claim is not a
 conclusion of these finite theorems. [pcc:unverified]
+
+## 2026-11-19 fixed-numerator dense-route follow-up
+
+An assembly probe first checked the generic conversion from a fixed numerator
+divided by arity to the existing vanishing-rate family interface. The final
+pinned project build completed successfully with 2,186 jobs, and the repository
+proof gate reported:
+
+```text
+PASS 34 thm 0 trusted research/tensor_boolean_breakthrough_20261031/lean
+```
+
+`fixedNumeratorCandidateFamilyHasVanishingRate` depends only on `[propext]`.
+The independent command
+`lake env leanchecker --fresh TensorBoundaryBounds` exited 0. Claim
+`PCC-20261119-76300b` passes its local Lean verifier and retains unverified
+signed standing. [pcc:unverified]
+
+The theorem chooses `m = numerator * degree * b + 1` for a requested positive
+rational exponent `a / b`. It therefore applies to every fixed numerator,
+including the numerator `3` in Kaarelson's unrestricted dense Theorem 5. On the
+paper's stated scope, that theorem covers every nonsingular prime-field curve,
+arbitrary group order and structure, and every valid `P, Q`, using dense
+elimination with expected time `p^(3/m+o(1))`. Consequently sparse
+Wiedemann--Dixon is not an obligation for the qualitative subexponential
+diagonal; it is needed only to retain the sharper planted exponent
+`p^(2/m+o(1))`.
+
+The checked local theorem is a quantifier and natural-arithmetic conversion. It
+does not verify the paper-to-machine instantiation of Theorem 5, its concrete
+bit costs, the curve-specific coverage estimates, or the universal
+interpreter's implementation. Those remain explicit external obligations.

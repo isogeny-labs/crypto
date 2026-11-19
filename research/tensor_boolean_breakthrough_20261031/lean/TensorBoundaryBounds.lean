@@ -327,6 +327,36 @@ def HasVanishingRateCandidateFamily
       ∃ N : ℕ, ∀ n : ℕ, N ≤ n →
         (overhead * candidate m n ^ degree) ^ b < 2 ^ (a * n)
 
+/-- A fixed-numerator rate family supplies the eventual work inequality for
+every arity whose rate clears the requested rational exponent.  The intended
+instance is a fixed-arity bound such as `p^(3/m+o(1))`, after charging the
+universal simulator's fixed polynomial degree. -/
+def HasFixedNumeratorCandidateFamily
+    (candidate : ℕ → ℕ → ℕ) (degree numerator : ℕ) : Prop :=
+  ∀ m a b : ℕ, 0 < a → 0 < b → numerator * degree * b < a * m →
+    ∀ overhead : ℕ, 0 < overhead →
+      ∃ N : ℕ, ∀ n : ℕ, N ≤ n →
+        (overhead * candidate m n ^ degree) ^ b < 2 ^ (a * n)
+
+/-- Every fixed numerator divided by arity has vanishing rate, even after a
+fixed polynomial simulation degree.  In particular, the dense
+`p^(3/m+o(1))` fixed-arity route is sufficient for the universal diagonal; the
+qualitative subexponential conclusion does not need a sparse `p^(2/m+o(1))`
+solver. -/
+theorem fixedNumeratorCandidateFamilyHasVanishingRate
+    (candidate : ℕ → ℕ → ℕ) (degree numerator : ℕ)
+    (fixedRate : HasFixedNumeratorCandidateFamily candidate degree numerator) :
+    HasVanishingRateCandidateFamily candidate degree := by
+  intro a b aPositive bPositive
+  let m := numerator * degree * b + 1
+  refine ⟨m, fixedRate m a b aPositive bPositive ?_⟩
+  have belowM : numerator * degree * b < m := by
+    exact Nat.lt_succ_self _
+  have oneLeA : 1 ≤ a := aPositive
+  have mLe : m ≤ a * m := by
+    simpa using Nat.mul_le_mul_right m oneLeA
+  exact belowM.trans_le mLe
+
 /-- Polynomial universal simulation of a vanishing-rate candidate family gives
 one subexponential work bound.  This is the generic diagonal endpoint; applying
 it to ECDLP still requires machine semantics, verified output checking and the

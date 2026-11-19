@@ -212,18 +212,23 @@ subexponential ECDLP solver exists.
    candidate and its polynomial-simulation overhead meet the corresponding
    eventual bound.  Rewrite the universal work through the supplied domination,
    raise both sides to the denominator power, and apply that candidate's bound.
+   For a fixed numerator `c`, choose `m = c * degree * b + 1`; positivity of
+   `a` makes `c * degree * b < a * m`, so the fixed-numerator interface supplies
+   the vanishing-rate premise without assuming numerator `2`.
    Separately, if each post-threshold stage is reached with probability at most
    `q^j` and costs at most a factor `B^j`, sum the geometric majorant with ratio
    `q*B < 1`.
-5. **Missing components only.** Predicates for polynomial universal simulation
-   and a vanishing-rate candidate family; their generic subexponential endpoint;
-   and the geometric scheduler-tail lemma.  Still missing are the actual
+5. **Missing components only.** Predicates for polynomial universal simulation,
+   a vanishing-rate candidate family and a fixed-numerator candidate family;
+   their generic subexponential and fixed-numerator conversion endpoints; and
+   the geometric scheduler-tail lemma.  Still missing are the actual
    probabilistic-machine semantics, a checked universal-interpreter overhead,
    and an end-to-end theorem instantiating candidates with the paper's coverage,
    relation, planted-diagonal and recovery algorithms. [pcc:unverified]
 6. **Inheritance table.** Eventual rational-rate test:
    `IsSubexponentialBinaryWork`; power monotonicity: `Nat.pow_le_pow_left`;
-   candidate choice: supplied family hypothesis; description enumeration and
+   candidate choice: supplied family hypothesis; fixed-arity choice: natural
+   multiplication monotonicity and `Nat.lt_succ_self`; description enumeration and
    output verification: external machine-model obligations; scheduler tail:
    Mathlib geometric series over `ℝ`.
 
@@ -231,6 +236,8 @@ subexponential ECDLP solver exists.
 |---|---|---|---|---|
 | `HasPolynomialUniversalSimulationBound` | definition | `TensorBoundaryBounds` | universal and candidate natural work bounds | fixed simulation degree and per-candidate overhead |
 | `HasVanishingRateCandidateFamily` | definition | same | candidate work family and simulation degree | eventual bound at every positive rational rate |
+| `HasFixedNumeratorCandidateFamily` | definition | same | fixed-arity candidate family, simulation degree and fixed numerator | eventual candidate bound whenever `numerator * degree * b < a * m` |
+| `fixedNumeratorCandidateFamilyHasVanishingRate` | law | same; upstream candidate for `crypto-lean` | same | fixed-numerator family interface |
 | `polynomialUniversalSchedulerIsSubexponential` | endpoint | same; upstream candidate for `crypto-lean` | universal and candidate work bounds | the two preceding interfaces |
 | `geometricSchedulerTailBound` | law | same; upstream candidate for `crypto-lean` | nonnegative real stage ratio and scale | geometric ratio below one |
 
@@ -245,10 +252,20 @@ universal(n)^b
   < 2^(a*n)                                           vanishing-rate family
 ```
 
-The fixed-arity paper bound `p^(2/m+o(1))` would make the family premise true
-for every fixed simulator degree by choosing `m` after the requested rational
-rate.  That specialization is not claimed as Lean-verified until the
-paper-to-machine cost bridge is supplied. [pcc:unverified]
+Either fixed-arity paper bound, dense `p^(3/m+o(1))` or planted sparse
+`p^(2/m+o(1))`, would make the family premise true for every fixed simulator
+degree by choosing `m` after the requested rational rate. That specialization
+is not claimed as Lean-verified until the paper-to-machine cost bridge is
+supplied. [pcc:unverified]
+
+The same implication uses no special property of numerator `2`. For a fixed
+numerator `c`, simulation degree `degree`, and requested rational rate `a/b`,
+choose `m = c * degree * b + 1`. Since `a > 0`, this gives
+`c * degree * b < a * m`. The fixed-numerator family interface then supplies
+the exact eventual natural-power inequality required by
+`HasVanishingRateCandidateFamily`. This assembly is the reason the dense
+`p^(3/m+o(1))` Theorem 5 route suffices without sparse Wiedemann--Dixon.
+[pcc:unverified]
 
 ## First-moment coverage repair
 
