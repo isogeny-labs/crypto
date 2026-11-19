@@ -54,8 +54,8 @@ fn ct231_single_lp_join_signs_and_rhs() {
         m(first.sign*(rhs2-next.rhs)-next.sign*(rhs1-first.rhs),R));
     let flipped=OneLp{sign:-next.sign, ..next};
     let (v2,t2)=join_one_lp(&first,&flipped);
-    assert_eq!(v2,vec![m(5,R),5,3]);
-    assert_eq!(t2,m(24,R));
+    assert_eq!(v2,vec![m(-5,R),m(-5,R),3]);
+    assert_eq!(t2,m(-24,R));
 }
 
 #[test]
