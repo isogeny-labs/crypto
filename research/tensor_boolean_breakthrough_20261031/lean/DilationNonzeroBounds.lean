@@ -1,0 +1,225 @@
+import DilationSemaevBridge
+
+/-!
+# Arithmetic bounds for the dilation nonzeroness argument
+
+This module isolates the finite combinatorics and integer bounds needed by
+the Galois-projector route to nonzeroness.  It does not construct the
+function-field point relation.
+-/
+
+namespace TensorBoundaryBounds
+
+open scoped BigOperators
+
+/-- The number of occurrences in `List.ofFn` is the cardinality of the
+corresponding finite fibre. -/
+theorem count_ofFn_eq_card_filter {K : Type*} [DecidableEq K] :
+    ∀ {n : ℕ} (t : Fin n → K) (v : K),
+    (List.ofFn t).count v =
+      (Finset.univ.filter fun i => t i = v).card := by
+  intro n
+  induction n with
+  | zero => intro t v; simp
+  | succ n ih =>
+      intro t v
+      rw [List.ofFn_succ, Finset.card_filter, Fin.sum_univ_succ,
+        List.count_cons, ih, Finset.card_filter]
+      by_cases h : t 0 = v <;> simp [h, Nat.add_comm]
+
+/-- Signed multiplicity of one value in a tuple. -/
+def fiberCoefficient {K : Type*} [DecidableEq K]
+    {n : ℕ} (t : Fin n → K) (sign : Fin n → ℤ) (v : K) : ℤ :=
+  ∑ i with t i = v, sign i
+
+/-- A nontrivial tuple has a value of odd multiplicity. -/
+theorem exists_odd_fiber_of_not_triv {K : Type*} [DecidableEq K]
+    {n : ℕ} (t : Fin n → K)
+    (h : ¬ ECDLP.L40.TrivL (List.ofFn t)) :
+    ∃ v, ¬ Even ((Finset.univ.filter fun i => t i = v).card) := by
+  unfold ECDLP.L40.TrivL at h
+  push Not at h
+  obtain ⟨v, hv⟩ := h
+  exact ⟨v, by simpa [count_ofFn_eq_card_filter] using hv⟩
+
+/-- An odd fibre cannot cancel when every occurrence has sign `±1`. -/
+theorem fiberCoefficient_ne_zero_of_odd
+    {K : Type*} [DecidableEq K] {n : ℕ}
+    (t : Fin n → K) (sign : Fin n → ℤ)
+    (sign_unit : ∀ i, sign i = 1 ∨ sign i = -1) (v : K)
+    (odd : ¬ Even ((Finset.univ.filter fun i => t i = v).card)) :
+    fiberCoefficient t sign v ≠ 0 := by
+  intro coefficientZero
+  let fiber := Finset.univ.filter fun i => t i = v
+  have eachMod : ∀ i ∈ fiber, sign i ≡ 1 [ZMOD (2 : ℤ)] := by
+    intro i hi
+    rcases sign_unit i with h | h
+    · rw [h]
+    · rw [h]
+      norm_num [Int.ModEq]
+  have sumMod := Int.ModEq.sum eachMod
+  have hone : (∑ _i ∈ fiber, (1 : ℤ)) = (fiber.card : ℤ) := by simp
+  have hmod : fiberCoefficient t sign v ≡
+      (fiber.card : ℤ) [ZMOD (2 : ℤ)] := by
+    unfold fiberCoefficient
+    rw [← hone]
+    exact sumMod
+  rw [coefficientZero] at hmod
+  have divides : (2 : ℤ) ∣ (fiber.card : ℤ) := by
+    rw [Int.modEq_iff_dvd] at hmod
+    simpa using hmod
+  apply odd
+  exact_mod_cast ((even_iff_two_dvd.mpr divides) : Even (fiber.card : ℤ))
+
+/-- The signed multiplicity is bounded by the size of its fibre. -/
+theorem fiberCoefficient_natAbs_le_card
+    {K : Type*} [DecidableEq K] {n : ℕ}
+    (t : Fin n → K) (sign : Fin n → ℤ)
+    (sign_unit : ∀ i, sign i = 1 ∨ sign i = -1) (v : K) :
+    (fiberCoefficient t sign v).natAbs ≤
+      (Finset.univ.filter fun i => t i = v).card := by
+  let fiber := Finset.univ.filter fun i => t i = v
+  calc
+    (fiberCoefficient t sign v).natAbs ≤
+        ∑ i ∈ fiber, (sign i).natAbs := by
+      exact Int.natAbs_sum_le fiber sign
+    _ = ∑ _i ∈ fiber, 1 := by
+      apply Finset.sum_congr rfl
+      intro i hi
+      rcases sign_unit i with h | h <;> simp [h]
+    _ = fiber.card := by simp
+
+/-- Every nontrivial signed tuple has a nonzero fibre coefficient of absolute
+value at most the arity. -/
+theorem exists_nonzero_fiberCoefficient_of_not_triv
+    {K : Type*} [DecidableEq K] {n : ℕ}
+    (t : Fin n → K) (sign : Fin n → ℤ)
+    (sign_unit : ∀ i, sign i = 1 ∨ sign i = -1)
+    (h : ¬ ECDLP.L40.TrivL (List.ofFn t)) :
+    ∃ v, fiberCoefficient t sign v ≠ 0 ∧
+      (fiberCoefficient t sign v).natAbs ≤ n := by
+  obtain ⟨v, odd⟩ := exists_odd_fiber_of_not_triv t h
+  refine ⟨v, fiberCoefficient_ne_zero_of_odd t sign sign_unit v odd, ?_⟩
+  refine (fiberCoefficient_natAbs_le_card t sign sign_unit v).trans ?_
+  simpa using
+    (Finset.card_le_univ (Finset.univ.filter fun i => t i = v))
+
+/-- A nonzero integer of absolute value below the modulus stays nonzero in
+`ZMod modulus`. -/
+theorem intCast_zmod_ne_zero_of_natAbs_lt
+    (modulus : ℕ) (coefficient : ℤ) (coefficientNonzero : coefficient ≠ 0)
+    (small : coefficient.natAbs < modulus) :
+    (coefficient : ZMod modulus) ≠ 0 := by
+  intro castZero
+  have intDivides : (modulus : ℤ) ∣ coefficient :=
+    (ZMod.intCast_zmod_eq_zero_iff_dvd coefficient modulus).mp castZero
+  have natDivides : modulus ∣ coefficient.natAbs := by
+    have h := Int.natAbs_dvd_natAbs.mpr intDivides
+    simpa using h
+  have positive : 0 < coefficient.natAbs :=
+    Int.natAbs_pos.mpr coefficientNonzero
+  have lower := Nat.le_of_dvd positive natDivides
+  omega
+
+/-- If the arity is below the characteristic modulus, some signed fibre
+coefficient from every nontrivial tuple remains nonzero modulo that modulus. -/
+theorem exists_nonzero_fiberCoefficient_cast_of_not_triv
+    {K : Type*} [DecidableEq K] {n modulus : ℕ}
+    (t : Fin n → K) (sign : Fin n → ℤ)
+    (sign_unit : ∀ i, sign i = 1 ∨ sign i = -1)
+    (h : ¬ ECDLP.L40.TrivL (List.ofFn t))
+    (arityBelow : n < modulus) :
+    ∃ v, (fiberCoefficient t sign v : ZMod modulus) ≠ 0 := by
+  obtain ⟨v, coefficientNonzero, bound⟩ :=
+    exists_nonzero_fiberCoefficient_of_not_triv t sign sign_unit h
+  exact ⟨v, intCast_zmod_ne_zero_of_natAbs_lt modulus _ coefficientNonzero
+    (bound.trans_lt arityBelow)⟩
+
+/-- Regrouping a signed point sum by tuple value produces exactly the fibre
+coefficients above. -/
+theorem sum_fiberCoefficient_zsmul
+    {K G : Type*} [Fintype K] [DecidableEq K] [AddCommGroup G]
+    {n : ℕ} (t : Fin n → K) (sign : Fin n → ℤ) (point : K → G) :
+    (∑ v, fiberCoefficient t sign v • point v) =
+      ∑ i, sign i • point (t i) := by
+  simp only [fiberCoefficient, Finset.sum_smul]
+  simp_rw [Finset.sum_filter]
+  rw [Finset.sum_comm]
+  apply Fintype.sum_congr
+  intro i
+  simp
+
+/-- Exact certificate extracted from a nontrivial signed relation: the
+regrouped relation is zero and one coefficient survives with explicit size. -/
+theorem nontriv_signed_relation_certificate
+    {K G : Type*} [Fintype K] [DecidableEq K] [AddCommGroup G]
+    {n : ℕ} (t : Fin n → K) (sign : Fin n → ℤ)
+    (sign_unit : ∀ i, sign i = 1 ∨ sign i = -1)
+    (point : K → G)
+    (relation : ∑ i, sign i • point (t i) = 0)
+    (nontriv : ¬ ECDLP.L40.TrivL (List.ofFn t)) :
+    (∑ v, fiberCoefficient t sign v • point v = 0) ∧
+      ∃ v, fiberCoefficient t sign v ≠ 0 ∧
+        (fiberCoefficient t sign v).natAbs ≤ n := by
+  constructor
+  · rw [sum_fiberCoefficient_zsmul t sign point, relation]
+  · exact exists_nonzero_fiberCoefficient_of_not_triv
+      t sign sign_unit nontriv
+
+/-- After a Galois projector sums over `Gamma`, a surviving coefficient is
+still nonzero modulo `p` under the explicit bound `|Gamma| * n < p`. -/
+theorem projectedCoefficient_zmod_ne_zero
+    {Gamma : Type*} [Fintype Gamma] [Nonempty Gamma]
+    (modulus n : ℕ) (coefficient : ℤ)
+    (coefficientNonzero : coefficient ≠ 0)
+    (coefficientBound : coefficient.natAbs ≤ n)
+    (projectedBelow : Fintype.card Gamma * n < modulus) :
+    (((Fintype.card Gamma : ℤ) * coefficient : ℤ) : ZMod modulus) ≠ 0 := by
+  apply intCast_zmod_ne_zero_of_natAbs_lt modulus
+  · have hcard : (Fintype.card Gamma : ℤ) ≠ 0 := by
+      exact_mod_cast (Fintype.card_ne_zero : Fintype.card Gamma ≠ 0)
+    exact mul_ne_zero hcard coefficientNonzero
+  · rw [Int.natAbs_mul, Int.natAbs_natCast]
+    exact (Nat.mul_le_mul_left (Fintype.card Gamma) coefficientBound).trans_lt
+      projectedBelow
+
+/-- Eisenstein norm appearing in the `A = 0` cubic-CM branch. -/
+def eisensteinNorm (a b : ℤ) : ℤ := a ^ 2 - a * b + b ^ 2
+
+theorem eisensteinNorm_pos {a b : ℤ} (nonzero : a ≠ 0 ∨ b ≠ 0) :
+    0 < eisensteinNorm a b := by
+  unfold eisensteinNorm
+  rcases nonzero with ha | hb
+  · nlinarith [sq_pos_of_ne_zero ha, sq_nonneg (a - b), sq_nonneg b]
+  · nlinarith [sq_nonneg a, sq_nonneg (a - b), sq_pos_of_ne_zero hb]
+
+/-- If both projected coefficients have absolute value at most `M`, their
+Eisenstein norm has absolute value at most `3 M²`. -/
+theorem eisensteinNorm_natAbs_le {a b : ℤ} {bound : ℕ}
+    (ha : a.natAbs ≤ bound) (hb : b.natAbs ≤ bound) :
+    (eisensteinNorm a b).natAbs ≤ 3 * bound ^ 2 := by
+  unfold eisensteinNorm
+  calc
+    (a ^ 2 - a * b + b ^ 2).natAbs ≤
+        (a ^ 2 - a * b).natAbs + (b ^ 2).natAbs :=
+      Int.natAbs_add_le _ _
+    _ ≤ ((a ^ 2).natAbs + (a * b).natAbs) + (b ^ 2).natAbs := by
+      gcongr
+      exact Int.natAbs_sub_le _ _
+    _ = a.natAbs ^ 2 + a.natAbs * b.natAbs + b.natAbs ^ 2 := by
+      rw [Int.natAbs_pow, Int.natAbs_mul, Int.natAbs_pow]
+    _ ≤ bound ^ 2 + bound * bound + bound ^ 2 := by gcongr
+    _ = 3 * bound ^ 2 := by ring
+
+/-- Explicit characteristic bound for the CM norm-torsion scalar. -/
+theorem eisensteinNorm_zmod_ne_zero
+    (modulus bound : ℕ) (a b : ℤ)
+    (nonzero : a ≠ 0 ∨ b ≠ 0)
+    (ha : a.natAbs ≤ bound) (hb : b.natAbs ≤ bound)
+    (normBelow : 3 * bound ^ 2 < modulus) :
+    (eisensteinNorm a b : ZMod modulus) ≠ 0 := by
+  apply intCast_zmod_ne_zero_of_natAbs_lt modulus
+  · exact ne_of_gt (eisensteinNorm_pos nonzero)
+  · exact (eisensteinNorm_natAbs_le ha hb).trans_lt normBelow
+
+end TensorBoundaryBounds

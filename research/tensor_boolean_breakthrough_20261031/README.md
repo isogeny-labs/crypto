@@ -67,8 +67,16 @@ The null changes only the global wiring of interior ports while preserving the v
     identically-zero specializations; this is bounded evidence, not an
     all-field or all-arity proof. Full subexponential ECDLP is not established.
     [pcc:unverified]
-11. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
-12. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
+11. **Kernel-checked 2026-11-19:** the first nonzeroness arithmetic layer is
+    explicit. A nontrivial tuple has an odd value fibre; every assignment of
+    point signs `±1` leaves a nonzero signed coefficient of absolute value at
+    most `2m`. The Galois-projected coefficient stays nonzero modulo `p` when
+    `|Gamma| * 2m < p`. In the cubic-CM branch the Eisenstein norm is positive
+    and bounded by `3M^2`, so `3M^2 < p` prevents modular collapse. The
+    function-field relation and torsion-coordinate contradiction remain open.
+    [pcc:unverified]
+12. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
+13. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
 
 The current `Network` stores predicates behind `Arc<dyn Predicate>`, so closure identity cannot be serialized faithfully. E0 therefore uses a hybrid semantic representation: predicates at or below 16 ports carry their complete truth table; larger production predicates carry a strict typed operation that is also their live evaluator. Tag, parameters, truth table or typed program, port order, interface and pins are bound into one SHA-256 identity. Untagged predicates are admitted only through an explicit bounded-truth-table policy for tiny fixtures and controls. Canonicalizing graph shape alone would be insufficient.
 
@@ -114,6 +122,9 @@ This hybrid requirement is a pre-freeze clarification of the original tag-only d
 - [`lean/DilationScaleExplicitDegree.lean`](lean/DilationScaleExplicitDegree.lean)
   — multivariate/tower evaluation equivalence and the checked total-degree
   derivation of the closed arity bound.
+- [`lean/DilationNonzeroBounds.lean`](lean/DilationNonzeroBounds.lean) —
+  odd-fibre signed-coefficient survival and explicit prime-characteristic
+  bounds for the ordinary and cubic-CM Galois projector branches.
 - [`audit_s4_dilation.py`](audit_s4_dilation.py) and
   [`s4-dilation-audit-20261119.json`](s4-dilation-audit-20261119.json) —
   exhaustive bounded prime-field `S4(st)` coefficient audit.

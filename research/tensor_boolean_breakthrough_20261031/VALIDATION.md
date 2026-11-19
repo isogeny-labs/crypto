@@ -1418,6 +1418,27 @@ An independent `lake env leanchecker --fresh DilationSemaevBridge` replay
 exits zero on the final Lean source.
 [pcc:unverified]
 
+## 2026-11-19 nonzeroness coefficient and CM bounds
+
+`DilationNonzeroBounds.lean` proves the arithmetic layer needed after a
+function-field point relation is constructed. `¬TrivL` supplies an
+odd-multiplicity value fibre. For arbitrary occurrence signs `±1`, that fibre's
+integer coefficient is nonzero and has absolute value at most the tuple arity.
+Regrouping the signed point relation by value is proved exactly. Consequently
+the selected coefficient remains nonzero in `ZMod p` when the arity is below
+`p`, and its Galois-projected multiple remains nonzero under
+`|Gamma| * arity < p`. [pcc:unverified]
+
+For the `A = 0` collision branch, the same module proves positivity of the
+Eisenstein norm `a^2-a*b+b^2`, the explicit absolute bound `3M^2` when both
+projected coefficients have absolute value at most `M`, and nonvanishing in
+`ZMod p` under `3M^2 < p`. These are rigorous characteristic thresholds; the
+module does not construct the original function-field Semaev relation or
+complete the torsion-coordinate contradiction. The targeted
+`lake build DilationNonzeroBounds` completes 9,132 jobs. The repository proof
+gate reports `PASS 387 thm 0 trusted` across all eight tracked modules.
+[pcc:unverified]
+
 ## 2026-11-19 scalar-torsion to `ΨSq` bridge
 
 The standalone project `lean-zsmul-torsion` pins Lean `v4.32.0-rc1` and the
