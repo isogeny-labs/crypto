@@ -96,3 +96,19 @@ Separate diagnostic builds timed the same inputs in both execution orders. The f
 Both orders point to the cost of constructing enough independent relations. At p = 127, even eliminating both genus-3 coordinate evaluations would save only about 2.4% of measured candidate time. The original 9.45× reverse-order result would need a 5.5% candidate-time reduction to reach 10× at fixed reference time. Comparing those percentages assumes phase shares transfer between builds.
 
 The four compressed timing logs under `results/phase-g*` retain the original column layout. For genus 2, read arm 2 at p = 127. Its first three diagnostic columns are nanoseconds in stream setup, the relation kernel including fallback, and the final native verification. Ignore diagnostic columns on the pencil arm, which does not refresh the native counters. For genus 3, read arm 2. Its first three counters surround the quartic setup call, both coordinate evaluations, and final arithmetic plus verification. Instrumentation adds clock overhead. Use the uninstrumented comparison above for speedup claims.
+
+### Earliest genus-3 certificate on the 32 seed-2026111906 inputs
+
+Let D and T denote the two factor-base coefficient vectors over the subgroup scalar field. After reducing both by a basis of the catalogue rows seen so far, a nonzero reduced D and a proportional reduced T give the scalar. The test derives it from one nonzero coordinate, checks proportionality on every coordinate, and compares the result with the planted scalar. On the original single representations, the first certificate occurred at the final catalogue row in all 32 cases.
+
+For each degree-three divisor, the experiment also enumerates the split residual quartics from the pencil v + t u. Each additional representation differs from the original by a relation. Each difference reduced to zero against the completed catalogue. We inserted the differences before processing the catalogue in its original order. With both input pencils, every case needed fewer ordinary catalogue poles. The first certificate preceded full rank of the augmented rows in 13 cases.
+
+| Additional pencils | Fewer total passes | Equal | More | Net passes saved over 32 cases |
+|---|---:|---:|---:|---:|
+| Generator | 6 | 22 | 4 | 2 |
+| Target | 6 | 19 | 7 | −1 |
+| Both | 4 | 17 | 11 | −7 |
+
+The pass count charges one unit per input pencil and one per ordinary catalogue pole visited. These operations can have different costs. The replay uses exhaustive residual factorization and exact prefix tests to measure the earliest possible stop. It makes no elapsed-time claim. At p = 127 case 5, adding both pencils moved the certificate from row 69 to row 58 and pole 11 to pole 9. At p = 257 case 1, it moved from row 125 to row 104 and pole 14 to pole 12. Charging the two extra pencils cancels the pole saving on both misses.
+
+Run `ruby harness/g3-prefix.rb results/g3-prefix-rows.gz results/g3-prefix-inputs.txt` and compare stdout with `results/g3-prefix.txt`. The compressed fixture retains catalogue emission order and both original signed coefficient vectors. The inputs file stores the curve coefficient and the generator and target Mumford polynomials. The arms column uses 0 for the generator and 1 for the target.
