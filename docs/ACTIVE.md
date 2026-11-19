@@ -15,6 +15,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 ## Active items (top = next)
 - [x] Implement and test a norm-fiber Riemann--Roch router for the n=83 image-compatible calculus, beginning with an exact n=9 gate (Codex, completed 2026-11-18, branch codex/n83-norm-fiber-rr-router-20261118, PR #4759; registered finite-crossover gate stopped n=13+)
+- [ ] Derive and screen a materially higher-degree image-compatible Riemann--Roch family, requiring a finite crossover before measurement (Codex, started 2026-11-19, branch codex/n83-norm-fiber-rr-router-20261118, PR #4759)
 
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
