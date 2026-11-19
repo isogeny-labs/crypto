@@ -69,6 +69,27 @@ impl Replay {
     }
 }
 """
+def method(code, name):
+    start = code.index("    fn " + name + "(")
+    brace = code.index("{", start)
+    depth = 0
+    for i in range(brace, len(code)):
+        if code[i] == "{": depth += 1
+        elif code[i] == "}":
+            depth -= 1
+            if depth == 0: return code[start:i+1]
+    raise RuntimeError(name)
+
+# Frozen pre-change verifier is built from the *same* production source,
+# reverting only the three edited functions. All other optimizations stay.
+before = production
+for name in ["remainder", "square_diagonals", "monic_gcd"]:
+    old = method(old_methods, "before_" + name)
+    old = old.replace("fn before_" + name + "(", "fn " + name + "(", 1)
+    if name == "monic_gcd":
+        old = old.replace("self.before_remainder(", "self.remainder(")
+    before = before.replace(method(before, name), old, 1)
+
 tests = r"""
 #[cfg(test)]
 mod round36 {
@@ -160,6 +181,60 @@ mod round36 {
         }
         println!("ROUND36_RUST full root + independent replay cases={count}");
     }
+    fn whole_replay(p:u64,degree:usize,fast:bool,reps:usize)->f64 {
+        use crate::cryptanalysis::prime_root_trace::bounded_before as old;
+        let field=Fp64Arithmetic{p};
+        let c=coefficients(p,degree);
+        let mut sum=0u64;
+        let start=Instant::now();
+        for _ in 0..reps {
+            if fast {
+                let mut events=Vec::new();
+                let report=solve_bounded(&field,black_box(&c),42,limits(),deadline(),&mut |event|{
+                    events.push(*event);Ok(())
+                });
+                assert_eq!(report.stop,Stop::Complete);
+                let mut replay=Replay::new(&field,&c,42,limits(),limits(),deadline()).unwrap();
+                for e in &events {replay.push(e).unwrap();}
+                sum=sum.wrapping_add(replay.finish(&report).unwrap().checked_root_count as u64);
+            } else {
+                let limits=old::RootBudget{work:old::MAX_WORK,field_work:old::MAX_FIELD_WORK,
+                    bytes:old::STORAGE_BYTES,events:old::MAX_EVENTS,
+                    split_attempts:1000,degree:8};
+                let mut events=Vec::new();
+                let report=old::solve_bounded(&field,black_box(&c),42,limits,deadline(),&mut |event|{
+                    events.push(*event);Ok(())
+                });
+                assert_eq!(report.stop,old::Stop::Complete);
+                let mut replay=old::Replay::new(&field,&c,42,limits,limits,deadline()).unwrap();
+                for e in &events {replay.push(e).unwrap();}
+                sum=sum.wrapping_add(replay.finish(&report).unwrap().checked_root_count as u64);
+            }
+        }
+        black_box(sum);
+        start.elapsed().as_nanos() as f64/reps as f64
+    }
+    #[test]
+    #[ignore="full root solve + certificate replay before/after"]
+    fn bench_round36_complete_replay() {
+        for p in [487u64,1_000_000_007,(1u64<<61)-1] {
+            for degree in [3usize,6,8] {
+                let mut before=Vec::new();let mut after=Vec::new();
+                for i in 0..13 {
+                    if i%2==0 {
+                        before.push(whole_replay(p,degree,false,6));
+                        after.push(whole_replay(p,degree,true,6));
+                    } else {
+                        after.push(whole_replay(p,degree,true,6));
+                        before.push(whole_replay(p,degree,false,6));
+                    }
+                }
+                before.sort_by(f64::total_cmp);after.sort_by(f64::total_cmp);
+                println!("ROUND36_WHOLE p={p} degree={degree} solve+replay: {:.2} -> {:.2} ns ({:.3}x)",
+                    before[6],after[6],before[6]/after[6]);
+            }
+        }
+    }
     fn sample(p:u64,mode:usize,kind:usize,fast:bool,reps:usize)->f64 {
         let mut seed=0x1122_9911_7223_4555;
         let mut work=Vec::new();
@@ -223,7 +298,7 @@ mod cryptanalysis {
     pub mod prime_root_trace {
         pub mod bounded {
 """
-rust = header + production + "\n" + old_methods + tests + "\n} }\n}\n"
+rust = header + production + "\n" + old_methods + tests + "\n} pub mod bounded_before {\n" + before + "\n} }\n}\n"
 with tempfile.TemporaryDirectory() as tmp:
     path = Path(tmp)/"round36.rs"
     binary = Path(tmp)/"round36"
@@ -233,3 +308,4 @@ with tempfile.TemporaryDirectory() as tmp:
                  "full_degree_one_to_eight_certificate_replay"]:
         subprocess.run([str(binary),test,"--nocapture"],check=True)
     subprocess.run([str(binary),"bench_round36_replay","--ignored","--nocapture"],check=True)
+    subprocess.run([str(binary),"bench_round36_complete_replay","--ignored","--nocapture"],check=True)
