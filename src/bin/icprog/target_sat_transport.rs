@@ -10,10 +10,10 @@ use serde_json::{json, Value};
 use std::{collections::BTreeSet, path::Path, time::Instant};
 
 #[path = "../prepared_sat_target_worker/contract.rs"]
-#[allow(dead_code)] // The worker owns some methods; this replay reads their contract.
+#[allow(dead_code, clippy::duplicate_mod)] // Shared worker contract; also path-loaded elsewhere in icprog.
 mod capsule;
 #[path = "../prepared_target_worker/journal.rs"]
-#[allow(dead_code)]
+#[allow(dead_code, clippy::duplicate_mod)] // Shared worker journal; also path-loaded elsewhere in icprog.
 mod journal;
 use super::ordinary_control::capsule as preparation;
 

@@ -423,8 +423,13 @@ fn verify(root: &Path, accepted: &Path, build: &Path, execution: &Path) -> Resul
             control.files[0],
         )?)?;
         require(
-            manifest["target"]["x"] == control.point[0].to_string()
-                && manifest["target"]["y"] == control.point[1].to_string(),
+            {
+                // Coordinates are JSON strings in the retained manifests.
+                #[allow(clippy::cmp_owned)]
+                let ok = manifest["target"]["x"] == control.point[0].to_string()
+                    && manifest["target"]["y"] == control.point[1].to_string();
+                ok
+            },
             "disclosed source manifest point differs",
         )?;
         let anf = String::from_utf8(pinned(

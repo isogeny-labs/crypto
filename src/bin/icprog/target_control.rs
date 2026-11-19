@@ -6,9 +6,10 @@ use super::{
     target_math,
 };
 #[path = "../prepared_target_worker/contract.rs"]
+#[allow(clippy::duplicate_mod)] // Shared worker contract; also path-loaded elsewhere in icprog.
 pub(super) mod capsule;
 #[path = "../prepared_target_worker/journal.rs"]
-#[allow(dead_code)] // The writer is shared with the worker; this controller inspects it.
+#[allow(dead_code, clippy::duplicate_mod)] // Shared worker journal; also path-loaded elsewhere in icprog.
 pub(super) mod journal;
 use crypto_lib::cryptanalysis::prepared_sat_control::{canonical_sha, sha256};
 use native::{read, require, save};

@@ -393,5 +393,6 @@ pub fn inspect(execution: &Path, expected_registration: &str) -> Result<Value, S
 }
 
 #[cfg(test)]
+#[allow(clippy::duplicate_mod)] // journal.rs is path-loaded from multiple icprog modules.
 #[path = "journal_tests.rs"]
 mod tests;
