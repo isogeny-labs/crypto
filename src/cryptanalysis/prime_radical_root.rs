@@ -126,8 +126,12 @@ impl Fp {
                 if exponent & 1 != 0 {
                     acc = self.mul(acc, b);
                 }
-                b = self.sqr(b);
                 exponent >>= 1;
+                // The final square is never consumed. This matters for
+                // 61-bit Mersenne powering inside Tonelli/Cardano.
+                if exponent != 0 {
+                    b = self.sqr(b);
+                }
             }
             acc
         } else {
@@ -1046,6 +1050,30 @@ impl RadicalRootCtx {
             roots.dedup();
             return roots;
         }
+        // A known rational root at +1 or -1 reduces the cubic to a
+        // quadratic. For public, canonical structured polynomials, this
+        // avoids Cardano, extension-field arithmetic and AMM entirely.
+        // Negative tests cost only a handful of field additions.
+        if c2 < f.p && c1 < f.p && c0 < f.p {
+            let plus_b = f.add(c2, 1);
+            let plus_c = f.add(plus_b, c1);
+            if f.add(plus_c, c0) == 0 {
+                let mut roots = self.quad_monic(plus_b, plus_c);
+                roots.push(1);
+                roots.sort_unstable();
+                roots.dedup();
+                return roots;
+            }
+            let minus_b = f.sub(c2, 1);
+            let minus_c = f.sub(c1, minus_b);
+            if c0 == minus_c {
+                let mut roots = self.quad_monic(minus_b, minus_c);
+                roots.push(f.p - 1);
+                roots.sort_unstable();
+                roots.dedup();
+                return roots;
+            }
+        }
         // Already depressed: avoid cubic translation and coefficient products.
         if c2 == 0 { return self.cubic_depressed(c1, c0); }
         // Shift x=t-sh, sh=c2/3. Reuse sh:
@@ -1161,6 +1189,32 @@ impl RadicalRootCtx {
             roots.sort_unstable();
             roots.dedup();
             return Ok((roots, false));
+        }
+        // Synthetic division by x-1 or x+1 before Ferrari's cubic
+        // resolvent. These tiny rational factors appear in constructed
+        // rootfinding and structured decomposition workloads. A quartic
+        // of Frobenius type (1,3) can also avoid the generic GCD fallback.
+        if b1 < f.p && c1 < f.p && d1 < f.p && e1 < f.p {
+            let plus_b = f.add(b1, 1);
+            let plus_c = f.add(c1, plus_b);
+            let plus_d = f.add(d1, plus_c);
+            if f.add(e1, plus_d) == 0 {
+                let mut roots = self.cubic_monic(plus_b, plus_c, plus_d);
+                roots.push(1);
+                roots.sort_unstable();
+                roots.dedup();
+                return Ok((roots, false));
+            }
+            let minus_b = f.sub(b1, 1);
+            let minus_c = f.sub(c1, minus_b);
+            let minus_d = f.sub(d1, minus_c);
+            if e1 == minus_d {
+                let mut roots = self.cubic_monic(minus_b, minus_c, minus_d);
+                roots.push(f.p - 1);
+                roots.sort_unstable();
+                roots.dedup();
+                return Ok((roots, false));
+            }
         }
         // x = y - B, B = b1/4
         // A zero cubic coefficient means the quartic is already depressed.
