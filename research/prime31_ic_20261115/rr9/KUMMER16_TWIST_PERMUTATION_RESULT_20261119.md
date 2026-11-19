@@ -1,6 +1,6 @@
 # Prime31 Kummer [16] rational fibres — theorem, certificate, extractor handoff (2026-11-19)
 
-**Standing:** exact mathematical theorem; new Rust source-specific CI and independent replay are pending confirmation. This is not a new complete ECDLP solver or solving-speed advantage.
+**Standing: SOURCE-SPECIFIC RUST CI PASSED and independent replay PASSED.** Exact mathematical theorem, not a new complete ECDLP solver or solving-speed advantage. [Actions run #44560635345](https://github.com/isogeny-labs/crypto/actions/runs/44560635345), [raw artifact #14551310263](https://github.com/isogeny-labs/crypto/actions/runs/44560635345/artifacts/14551310263).
 
 ## Mathematical statement
 
@@ -27,7 +27,7 @@ This lemma prevents the #4692 extractor from interpreting 256 algebraic-closure 
 - [Preregistered protocol](KUMMER16_TWIST_PERMUTATION_PROTOCOL_20261119.md), committed before executable and CI workflow.
 - [Original native Rust crate example](../native/examples/prime31_kummer16_twist_permutation.rs), pinned underlying arithmetic SHA 1df714645aa683cf975bc76fcacb9842cb4780fd: 512 deterministic public x in each curve/twist class; 31 original first-rational-x factor-base points; exact polynomial-square identity at each step; full group-law [16] and inverse-scalar assertions. This is not a group-sum-table oracle. Original Arithmetic counters do not price the separately written x-only rational formula; no runtime advantage may be inferred.
 - [Independent BigInt affine validator](../native/verify_prime31_kummer16_twist.py) reconstructs all 1,024 public samples and replays 64 sealed per-class x, [16] and inverse witnesses. This Python code is only a verifier; the candidate implementation is Rust.
-- [Source-specific CI](https://github.com/isogeny-labs/crypto/actions/workflows/prime31-kummer16-twist-permutation.yml) overlays only the example onto pinned source and performs original library and focused Rust tests, the full experiment, JSON checks, independent replay and SHA256 artifact capture. Pending final CI inspection at document creation.
+- [Source-specific CI](https://github.com/isogeny-labs/crypto/actions/workflows/prime31-kummer16-twist-permutation.yml) overlays only the example onto pinned source and performs original library and focused Rust tests, the full experiment, JSON checks, independent replay and SHA256 artifact capture. **Passed on 19 November 2026:** original crate 40/40 tests, focused 3/3 tests, 1,024 deterministically sampled x (512 curve + 512 twist), 31 original base points, 64 independent affine inverse certificates (32+32), all rational-character/doubling assertions. Raw producer SHA256 87a26ae8465397ef3855f93eb611fc6df2bddf57c6ad2c0fbe1886ff467fc29c; independent validator SHA256 078d8e648b1ed437ab44ad72828dcd588392d3bf32cbe30362b7ddaba772866f. The exact experiment source and pinned historical original arithmetic were run by the Actions job.
 
 ## Prior leads checked
 
@@ -48,3 +48,7 @@ Published prime-field polynomial index calculus was also checked: Petit–Koster
 3. **Whole solver**: only after a correct public-only extractor exists, integrate into existing original Rust rank31/1024 pipeline. Report separately fully charged single-target cold vs rho, and 64/1024-target throughput vs same-runner optimized BSGS and existing IC frontier. Verify every recovered scalar and all setup.
 
 No whole solver advantage, subexponential algorithm or new complete logarithm has been established by this theorem alone.
+
+## Validation boundary
+
+The passing CI confirms finite-field sample checks on the pinned original curve and an independent validator, **not** a Lean-kernel proof or independently signed PCC. The theorem itself is elementary and given above, with assumptions verified for the original exact curve. The benchmark remains **no complete ECDLP solver advantage**; this experiment charges neither the entire F4 extraction nor all x-only field operations in a full solving cost.
