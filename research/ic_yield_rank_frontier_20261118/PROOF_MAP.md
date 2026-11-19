@@ -267,6 +267,32 @@ the exact eventual natural-power inequality required by
 `p^(3/m+o(1))` Theorem 5 route suffices without sparse Wiedemann--Dixon.
 [pcc:unverified]
 
+## Near-uniform pair-event transfer
+
+1. **Structure above.** A finite output type, a natural weight giving the
+   number of uniform random seeds that produce each output, a Boolean pair
+   event, a common fibre floor and a distortion constant.
+2. **Theorem used as stated.** Finite sums over the output-pair type and natural
+   multiplication monotonicity.
+3. **Goal below.** A division-free comparison between the weighted pair-event
+   count and the uniform pair-event count.
+4. **Assembly probe.** Lower-bound every good pair's weight product by
+   `lower^2`, sum over the good-pair filter, then combine
+   `total <= distortion * card * lower` with squaring and multiplication by the
+   good-pair count. Rearrange products to obtain
+   `total^2 * goodCount <= distortion^2 * card^2 * weightedGood`.
+5. **Missing components only.** The weighted-event lower bound and its
+   distortion corollary. The curve sampler must separately expose a finite
+   uniform seed space and give the identity a positive fibre.
+6. **Inheritance table.** `Finset.sum_le_sum`, `Nat.mul_le_mul`,
+   `Nat.pow_le_pow_left`, filtered-cardinality summation and semiring
+   normalization.
+
+| statement | kind | owner | quantified structure | hypotheses |
+|---|---|---|---|---|
+| `weightedPairEventLower` | law | `TensorBoundaryBounds`; upstream candidate for `crypto-lean` | finite output type, natural weights and pair event | common pointwise fibre floor |
+| `nearUniformPairEventTransfer` | endpoint | same | same plus total seed count and distortion | total no larger than distortion times uniform baseline |
+
 ## First-moment coverage repair
 
 1. **Structure above.** A finite seed space, a natural-valued factor-base size

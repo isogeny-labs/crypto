@@ -167,6 +167,24 @@ an expectation bound for two uniform elements. The paper's concrete affine
 point sampler is only near-uniform, so its constant-factor transfer remains a
 separate interface. [pcc:unverified]
 
+The generic transfer is now locally kernel-checked. `weightedPairEventLower`
+proves that a common sampler-fibre floor `lower` gives weighted pair-event
+count at least `lower^2` times the uniform pair-event count. [pcc:unverified]
+`nearUniformPairEventTransfer` combines this with
+`total <= distortion * |G| * lower` to give the exact cross-multiplied loss
+bound
+
+```text
+total^2 * goodPairs <= distortion^2 * |G|^2 * weightedGoodPairs.
+```
+
+Claims `PCC-20261119-da3506` and `PCC-20261119-a2fecb` pass their local Lean
+verifiers and retain unverified signed standing. The project proof gate reports
+36 theorems and zero trusted declarations, and a fresh checker replay exits 0.
+The remaining sampler obligation is concrete: the paper's affine sampler omits
+the identity, so it must either expose an identity fibre or add an explicit
+identity branch before the checked transfer applies. [pcc:unverified]
+
 ## Corrections and remaining obligations
 
 The paper's Lemma 5.5 overstates its constant-torsion conclusion: a torsion
@@ -235,8 +253,8 @@ the remaining independent obligations are:
 2. bind the factor-base labels returned by the Lean oracle to the rows used by
    the arbitrary-group relation lattice;
 3. implement and cost the Howell/dense-elimination procedure, bind the checked
-   finite round to the concrete coverage oracle, transfer the checked uniform
-   generator expectation to the affine near-uniform sampler, assemble the
+   finite round to the concrete coverage oracle, instantiate the checked
+   near-uniform transfer with an identity-inclusive curve sampler, assemble the
    remaining restart events, and derive Theorem 5's bit bound
    [pcc:unverified];
 4. implement or formalize the universal interpreter, independent random tapes,

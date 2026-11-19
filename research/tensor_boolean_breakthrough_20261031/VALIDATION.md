@@ -717,3 +717,35 @@ form. The concrete curve algorithm samples affine points with a stated
 near-uniform lower bound rather than sampling all of `G` uniformly. A
 constant-factor transfer from that sampler to the uniform theorem is still an
 external obligation. [pcc:unverified]
+
+### Near-uniform pair-event transfer
+
+An assembly probe for the division-free weighted pair count type-checked before
+the module edit. The pinned project build completed with 2,186 jobs, and the
+repository proof gate reported:
+
+```text
+PASS 36 thm 0 trusted research/tensor_boolean_breakthrough_20261031/lean
+```
+
+`weightedPairEventLower` and `nearUniformPairEventTransfer` have the standard
+axiom set `[propext, Classical.choice, Quot.sound]`. The independent command
+`lake env leanchecker --fresh TensorBoundaryBounds` exited 0. Claims
+`PCC-20261119-da3506` and `PCC-20261119-a2fecb` pass their local Lean verifiers
+and retain unverified signed standing. [pcc:unverified]
+
+The endpoint proves the exact natural inequality [pcc:unverified]
+
+```text
+total^2 * goodPairs <= distortion^2 * |Output|^2 * weightedGoodPairs
+```
+
+from a common fibre floor and
+`total <= distortion * |Output| * lower`. It makes no division or positivity
+assumptions. The curve sampler still needs a concrete finite seed encoding and
+a positive fibre for the identity; adding a separate identity branch preserves
+the asymptotic cost but is not instantiated by this generic theorem.
+
+[pcc:unverified] Two claim records created without the required declaration
+hashes (`PCC-20261119-fa8515` and `PCC-20261119-8212b4`) fail closed, remain in
+the append-only ledger, and are not cited as evidence.

@@ -382,6 +382,67 @@ theorem geometricSchedulerTailBound
   simpa [div_eq_mul_inv] using
     (hasSum_geometric_of_lt_one ratioNonnegative ratioLtOne).mul_left scale
 
+/-! ## Near-uniform pair-event transfer
+
+The following division-free lemmas compare a finite sampler with uniform
+sampling.  They apply to generator events once every group element, including
+the identity, has an explicit positive fibre in the sampler.
+-/
+
+/-- If every output has at least `lower` uniform seeds, the weighted count of
+any pair event is at least `lower^2` times its uniform pair count. -/
+theorem weightedPairEventLower
+    {Output : Type*} [Fintype Output]
+    (weight : Output → ℕ) (good : Output × Output → Prop)
+    [DecidablePred good] (lower : ℕ)
+    (fibreFloor : ∀ output, lower ≤ weight output) :
+    lower ^ 2 * (Finset.univ.filter good).card ≤
+      ∑ pair : Output × Output,
+        if good pair then weight pair.1 * weight pair.2 else 0 := by
+  classical
+  calc
+    lower ^ 2 * (Finset.univ.filter good).card =
+        ∑ pair ∈ Finset.univ.filter good, lower ^ 2 := by
+      simp [Nat.mul_comm]
+    _ ≤ ∑ pair ∈ Finset.univ.filter good,
+        weight pair.1 * weight pair.2 := by
+      exact Finset.sum_le_sum fun pair _ => by
+        simpa [pow_two] using
+          Nat.mul_le_mul (fibreFloor pair.1) (fibreFloor pair.2)
+    _ = ∑ pair : Output × Output,
+        if good pair then weight pair.1 * weight pair.2 else 0 := by
+      rw [Finset.sum_filter]
+
+/-- A sampler whose total seed count is at most `distortion * |Output| * lower`
+loses at most `distortion^2` on any pair event compared with uniform sampling.
+The inequality is cross-multiplied, so it makes no divisibility or positivity
+assumptions. -/
+theorem nearUniformPairEventTransfer
+    {Output : Type*} [Fintype Output]
+    (weight : Output → ℕ) (good : Output × Output → Prop)
+    [DecidablePred good] (lower distortion total : ℕ)
+    (fibreFloor : ∀ output, lower ≤ weight output)
+    (totalUpper : total ≤ distortion * Fintype.card Output * lower) :
+    total ^ 2 * (Finset.univ.filter good).card ≤
+      distortion ^ 2 * Fintype.card Output ^ 2 *
+        (∑ pair : Output × Output,
+          if good pair then weight pair.1 * weight pair.2 else 0) := by
+  have pairLower := weightedPairEventLower weight good lower fibreFloor
+  have totalSquare : total ^ 2 ≤
+      (distortion * Fintype.card Output * lower) ^ 2 :=
+    Nat.pow_le_pow_left totalUpper 2
+  calc
+    total ^ 2 * (Finset.univ.filter good).card ≤
+        (distortion * Fintype.card Output * lower) ^ 2 *
+          (Finset.univ.filter good).card :=
+      Nat.mul_le_mul_right _ totalSquare
+    _ = distortion ^ 2 * Fintype.card Output ^ 2 *
+        (lower ^ 2 * (Finset.univ.filter good).card) := by ring
+    _ ≤ distortion ^ 2 * Fintype.card Output ^ 2 *
+        (∑ pair : Output × Output,
+          if good pair then weight pair.1 * weight pair.2 else 0) :=
+      Nat.mul_le_mul_left _ pairLower
+
 /-! ## First-moment coverage repair
 
 The following finite counting lemmas isolate the arithmetic in the corrected
