@@ -7,7 +7,8 @@ implemented here instead of imported from the previous CT222 Node.js oracle.
 """
 import json
 import sys
-from hashlib import sha256
+if not __debug__:
+    raise SystemExit("CT223 requires assertions: Python -O prohibited")
 
 P=101; NONSQUARE=2; R=109; H=1060494; J=115593846; PROJ=80597544; G=4
 assert pow(NONSQUARE,(P-1)//2,P)==P-1
@@ -189,7 +190,6 @@ def run():
     # Combined divisor with a rational C point whose support is explicitly known
     G_source=((2,0),(37,0))
     assert ec_valid(G_source)
-    rat=(1,37) # Need actual C rational point: cubic root of x=2 (uniquely rational)
     u0=next(u for u in range(P) if u**3%P==2)
     rat=([(-u0)%P,1],[37]);assert valid(rat)
     for i in range(0,8,2):
