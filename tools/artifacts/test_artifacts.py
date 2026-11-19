@@ -640,14 +640,6 @@ class WorkflowPullStep(unittest.TestCase):
         stale = once.replace("pull --jobs 16 docs/x", "pull docs/old")
         self.assertEqual(wire_workflows.wire(stale, ["docs/x"])[0], once)
 
-    def test_continue_on_error_marker_only_changes_its_workflow(self):
-        marked = "# tools/artifacts pull-continue-on-error\n" + self.WF
-        out, _ = wire_workflows.wire(marked, ["docs/x"])
-        self.assertIn("continue-on-error: true", out)
-        self.assertEqual(wire_workflows.wire(out, ["docs/x"])[0], out)
-        ordinary, _ = wire_workflows.wire(self.WF, ["docs/x"])
-        self.assertNotIn("continue-on-error", ordinary)
-
 
 class WorkflowStalePullEntries(unittest.TestCase):
     """The generated pull line is output, not a reference: entries it names

@@ -14,7 +14,6 @@ name: validation-gate
 # Store data the gate reads through VALIDATION.json (session records named as
 # raw_data, replay inputs) and that this file never names: tools/artifacts/
 # wire_workflows.py pulls these declared paths with the ones it finds.
-# tools/artifacts pull-continue-on-error
 # tools/artifacts pull: benchmarks/20261029-ic-aimed-gather/registry-binding-20261116
 # tools/artifacts pull: benchmarks/20261115-fes-k13-runpod/session experiments/31_solve_cost
 # tools/artifacts pull: experiments/37_solver_b_pivot_count
@@ -86,7 +85,6 @@ jobs:
           fetch-depth: 1
           filter: blob:none
       - name: Pull store data this workflow reads (tools/artifacts)
-        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:
