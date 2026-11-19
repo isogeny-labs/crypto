@@ -62,13 +62,13 @@ So, at extension degrees 24 or 1320, common 109-torsion can enable an **abstract
 
 ## Reproduction
 
-\`\`\`bash
+```bash
 python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_geometric_hom_obstruction.py --self-test
 python3 -O research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_geometric_hom_obstruction.py --self-test
 python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_geometric_hom_obstruction.py > /tmp/ct225_hom.json
 cmp /tmp/ct225_hom.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_f101_geometric_hom.json
 sha256sum /tmp/ct225_hom.json
-\`\`\`
+```
 
 Producer-local normal and optimized Python tests passed, including three altered-model negative controls and signed squarefree field checks; the deterministic output has SHA-256 **9ce82b4861d8d2437a177eb673772ce6a89267820025aa4307436f92c3aa0702**. The existing bounded CI workflow has been extended to replay and compare exact output on its checked-out commit. The new exact-head hosted CI verdict and independent PCC signature have **not yet been observed**. No paid compute was used.
 
