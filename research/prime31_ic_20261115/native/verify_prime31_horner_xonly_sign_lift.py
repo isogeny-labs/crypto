@@ -60,6 +60,23 @@ def poly_D(x):
 def f3(u,v,r):
     return ((r-u)**2*v*v-2*((r+u)*(r*u+A)+2*B)*v+
             (r*u-A)**2-4*B*(r+u))%P
+def eliminated_f3(u,z,r):
+    # A*N^2+B*N*D+C*D^2: independently derive the rational elimination.
+    n=poly_N(z); d=poly_D(z)
+    aa=(r-u)**2
+    bb=-2*((r+u)*(r*u+A)+2*B)
+    cc=(r*u-A)**2-4*B*(r+u)
+    return (aa*n*n+bb*n*d+cc*d*d)%P
+
+def verify_elimination(u,z,r):
+    d=poly_D(z)
+    assert d!=0
+    v=poly_N(z)*pow(d,P-2,P)%P
+    fv=f3(u,v,r)
+    e=eliminated_f3(u,z,r)
+    assert e==(fv*d*d)%P
+    assert (e==0)==(fv==0)
+
 def lift_signed(xleaf,x_suffix,Q,base,window):
     """Only PUBLIC x-chart, PUBLIC Q and public canonical factor-base points."""
     if x_suffix[0]!=Q[0] or xleaf[7]!=x_suffix[7]:
@@ -96,6 +113,13 @@ def main(path):
     assert raw["seed"]==f"0x{SEED:016x}"
     assert raw["variables_after_public_x_target"]==21
     assert raw["equations_after_public_x_target"]==22
+    assert raw["eliminated_variables_after_public_target"]==14
+    assert raw["eliminated_equations_after_public_target"]==15
+    assert raw["eliminated_total_degree"]==10
+    assert raw["eliminated_z_degree"]==8
+    assert raw["eliminated_u_and_r_degree"]==2
+    assert raw["uniform_field_triples_equivalence_checked"]==8192
+    assert raw["cleared_denominator_rational_roots_only"]
     assert raw["generic_sum_table_calls"]==0
     assert not raw["public_only_unknown_index_extraction"]
     assert times(N,G) is None
@@ -103,6 +127,7 @@ def main(path):
     assert [x for x,y in base[:8]]==[0,1,2,3,5,6,8,9]
     s=SEED
     ordinary=exceptional=0
+    eliminated_checked=0
     certs=[]
     counts=[]
     ncases=raw["cases_per_window"]
@@ -128,6 +153,10 @@ def main(path):
             dz=[plus(tail[i+1],tail[i+1])[0] for i in range(7)]
             assert all(poly_D(tx[i+1])*dz[i]%P==poly_N(tx[i+1]) for i in range(7))
             assert all(f3(xleaf[i],dz[i],tx[i])==0 for i in range(7))
+            assert all(eliminated_f3(xleaf[i],tx[i+1],tx[i])==0 for i in range(7))
+            for i in range(7):
+                verify_elimination(xleaf[i],tx[i+1],tx[i])
+                eliminated_checked+=1
             assert all(any(base[j][0]==x for j in window) for x in xleaf)
             assert poly_D(tx[1])*(dz[0]+1)%P!=poly_N(tx[1])
             recovered=lift_signed(xleaf,tx,tail[0],base,window)
@@ -141,6 +170,13 @@ def main(path):
         counts.append({"window":wi,"ordinary":yes,"exceptional":no})
     assert ordinary==raw["ordinary"] and exceptional==raw["exceptional"]
     assert raw["tested"]==4*ncases
+    assert raw["eliminated_steps_verified"]==eliminated_checked==ordinary*7
+    state=0x454c494d5f443134
+    for _ in range(8192):
+        state,bits=splitmix(state);u=bits%P
+        state,bits=splitmix(state);z=bits%P
+        state,bits=splitmix(state);r=bits%P
+        verify_elimination(u,z,r)
     assert raw["poisoned_double_rejected"]==ordinary
     assert raw["poisoned_target_rejected"]==ordinary
     assert raw["per_window"]==counts
@@ -148,7 +184,10 @@ def main(path):
     print(json.dumps({"schema":"prime31.xonly_horner_independent_replay.v1",
        "all_case_verified":raw["tested"],"ordinary":ordinary,"exceptional":exceptional,
        "certificate_exact_matches":len(certs),"prime31_order_check":True,
-       "sign_lifting_independently_replayed":True,"pcc_signed":False},
+       "sign_lifting_independently_replayed":True,
+       "eliminated_14var_steps_replayed":eliminated_checked,
+       "uniform_field_triples_replayed":8192,
+       "pcc_signed":False},
        sort_keys=True))
 
 if __name__=="__main__":
