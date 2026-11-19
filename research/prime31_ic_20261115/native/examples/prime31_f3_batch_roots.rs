@@ -218,6 +218,50 @@ fn extract_group_reference(ar:&mut Arithmetic,base:&[Point],
     }
     found.into_iter().collect()
 }
+// Existing production prime_fast direct-subtraction/Semaev S3 method, adapted
+// to full fibres and the r==x tangent branch on the original fixed Prime31 curve.
+fn extract_direct_batch(
+    ar: &mut Arithmetic, op: &mut FieldOps, base: &[Point],
+    by_x: &HashMap<u64,usize>, q: Point, degenerate: &mut u64
+) -> Vec<Witness> {
+    let (r,s)=q.expect("nonzero public target");
+    let mut denoms=Vec::with_capacity(base.len());
+    for &pi in base {
+        let (x,y)=pi.unwrap();
+        let dx=sub(r,x);
+        if dx==0 {
+            *degenerate+=1;
+            denoms.push(add(y,y)); // tangent denominator, never zero in odd prime group
+        } else {
+            denoms.push(dx);
+        }
+    }
+    let inverses=op.batch_inverse(&denoms);
+    let mut found=BTreeSet::new();
+    for (i,&pi) in base.iter().enumerate() {
+        let (x,y)=pi.unwrap();
+        if r==x {
+            let xx=op.mul(x,x);
+            let triple=op.mul(3,xx);
+            let slope=op.mul(add(triple,A),inverses[i]);
+            let sq=op.mul(slope,slope);
+            let root=sub(sub(sq,x),x);
+            if let Some(&j)=by_x.get(&root) {
+                verify_pair(ar,q,base,i,j,&mut found);
+            }
+        } else {
+            for numerator in [add(s,y),sub(s,y)] {
+                let slope=op.mul(numerator,inverses[i]);
+                let sq=op.mul(slope,slope);
+                let root=sub(sub(sq,r),x);
+                if let Some(&j)=by_x.get(&root) {
+                    verify_pair(ar,q,base,i,j,&mut found);
+                }
+            }
+        }
+    }
+    found.into_iter().collect()
+}
 #[derive(Serialize)]
 struct Pass {
     witnesses: Vec<Vec<Witness>>,
@@ -243,6 +287,17 @@ fn run_pass(base:&[Point],by_x:&HashMap<u64,usize>,cases:&[Case],use_f3:bool)->P
     Pass {witnesses,field_ops:op,curve_ops:ar.counts,
           degenerate_roots:degenerate,elapsed_ns}
 }
+fn run_direct_pass(base:&[Point],by_x:&HashMap<u64,usize>,cases:&[Case])->Pass {
+    let mut ar=Arithmetic::default();
+    let mut op=FieldOps::default();
+    let mut degenerate=0;
+    let t=Instant::now();
+    let witnesses=cases.iter().map(|c|
+        extract_direct_batch(&mut ar,&mut op,base,by_x,c.q,&mut degenerate)
+    ).collect();
+    Pass {witnesses,field_ops:op,curve_ops:ar.counts,
+          degenerate_roots:degenerate,elapsed_ns:t.elapsed().as_nanos()}
+}
 fn study(rounds:usize)->serde_json::Value {
     assert!(rounds>=1);
     let mut ar=Arithmetic::default();
@@ -253,29 +308,50 @@ fn study(rounds:usize)->serde_json::Value {
     let by_x=base_lookup(&base);
     let setup=ar.counts;
     let mut f3_times=Vec::new();
+    let mut direct_times=Vec::new();
     let mut group_times=Vec::new();
     let mut first_f3=None;
+    let mut first_direct=None;
     let mut first_group=None;
     for iter in 0..rounds {
-        let (f3,reference)=if iter%2==0 {
-            (run_pass(&base,&by_x,&cases,true),run_pass(&base,&by_x,&cases,false))
-        } else {
-            let reference=run_pass(&base,&by_x,&cases,false);
-            let f3=run_pass(&base,&by_x,&cases,true);
-            (f3,reference)
+        // Three balanced orderings; identical cohort and frozen source setup.
+        let (f3,direct,reference)=match iter%3 {
+            0 => (run_pass(&base,&by_x,&cases,true),
+                  run_direct_pass(&base,&by_x,&cases),
+                  run_pass(&base,&by_x,&cases,false)),
+            1 => {
+                let reference=run_pass(&base,&by_x,&cases,false);
+                let f3=run_pass(&base,&by_x,&cases,true);
+                let direct=run_direct_pass(&base,&by_x,&cases);
+                (f3,direct,reference)
+            },
+            _ => {
+                let direct=run_direct_pass(&base,&by_x,&cases);
+                let reference=run_pass(&base,&by_x,&cases,false);
+                let f3=run_pass(&base,&by_x,&cases,true);
+                (f3,direct,reference)
+            }
         };
-        assert_eq!(f3.witnesses,reference.witnesses,"disagreement in signed full fibre");
+        assert_eq!(f3.witnesses,direct.witnesses,
+                   "F3 disagreed with prior direct-batched production method");
+        assert_eq!(f3.witnesses,reference.witnesses,
+                   "polynomial F3 disagreed with signed affine reference");
         assert!(f3.degenerate_roots>=31);
+        assert!(direct.degenerate_roots>=31);
         assert!(cases.iter().take(64).enumerate()
                     .all(|(i,_)|!f3.witnesses[i].is_empty()));
         f3_times.push(f3.elapsed_ns);
+        direct_times.push(direct.elapsed_ns);
         group_times.push(reference.elapsed_ns);
         if first_f3.is_none() {first_f3=Some(f3);}
+        if first_direct.is_none() {first_direct=Some(direct);}
         if first_group.is_none() {first_group=Some(reference);}
     }
     f3_times.sort();
+    direct_times.sort();
     group_times.sort();
     let f3=first_f3.unwrap();
+    let direct=first_direct.unwrap();
     let reference=first_group.unwrap();
     let summarize=|start:usize,end:usize| {
         let witness=&f3.witnesses[start..end];
@@ -299,6 +375,12 @@ fn study(rounds:usize)->serde_json::Value {
         "field_ops_f3":f3.field_ops,
         "verification_curve_ops_f3":f3.curve_ops,
         "reference_curve_ops":reference.curve_ops,
+        "direct_batch_field_ops":direct.field_ops,
+        "direct_batch_verification_curve_ops":direct.curve_ops,
+        "direct_batch_degenerate_linear_roots":direct.degenerate_roots,
+        "direct_batch_times_ns_sorted":direct_times,
+        "direct_batch_median_ns":direct_times[rounds/2],
+        "existing_prime_fast_direct_batch_method":true,
         "source_setup_curve_ops":setup,
         "f3_degenerate_linear_roots":f3.degenerate_roots,
         "rounds":rounds,"f3_times_ns_sorted":f3_times,
