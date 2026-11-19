@@ -204,7 +204,7 @@ fn w1_accidental_collision_certificates(base: &[Point]) -> Value {
                     formal_duplicates += 1;
                 } else {
                     accidental_duplicates += 1;
-                    if examples.len() < 12 {
+                    if examples.len() < 40 {
                         examples.push(json!({
                             "half": begin/4,
                             "first_word":first_word,
@@ -224,7 +224,7 @@ fn w1_accidental_collision_certificates(base: &[Point]) -> Value {
             "unique_sums":seen.len(),
             "formal_duplicate_words":formal_duplicates,
             "accidental_duplicate_words":accidental_duplicates,
-            "first_12_certificates":examples
+            "all_certificates":examples
         }));
     }
     json!({"window":1,"weights":POW2,"halves":halves,
@@ -344,7 +344,7 @@ mod tests {
         for h in witnesses["halves"].as_array().unwrap() {
             assert_eq!(h["formal_duplicate_words"],0);
             assert_eq!(h["accidental_duplicate_words"],40);
-            assert!(h["first_12_certificates"].as_array().unwrap().len()>=8);
+            assert!(h["all_certificates"].as_array().unwrap().len()>=8);
         }
     }
     #[test]
