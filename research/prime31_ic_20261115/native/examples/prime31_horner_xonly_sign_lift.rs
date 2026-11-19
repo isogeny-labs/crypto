@@ -34,6 +34,37 @@ fn f3(u: u64, v: u64, r: u64) -> u64 {
     let gamma=sub(mul(dr2,dr2),mul(4,mul(PRIME31.b,add(r,u))));
     add(add(mul(mul(dr,dr),mul(v,v)),mul(beta,v)),gamma)
 }
+
+fn pow_mod(mut z: u64, mut exponent: u64) -> u64 {
+    let mut out=1;
+    while exponent!=0 {
+        if exponent&1!=0 {out=mul(out,z);}
+        z=mul(z,z); exponent>>=1;
+    }
+    out
+}
+/// Eliminate the doubled-x variable in F3(u,d,r) using d=N(z)/D(z).
+/// Total degree 10, degrees (2,8,2) in (u,z,r). Rational roots are
+/// equivalent on this odd-order Prime31 curve because D(z) never vanishes.
+fn eliminated_f3(u: u64,z: u64,r: u64) -> u64 {
+    let d=denominator(z);let n=numerator(z);
+    let ru=mul(r,u);
+    let aa=mul(sub(r,u),sub(r,u));
+    let bb=sub(0,mul(2,add(mul(add(r,u),add(ru,PRIME31.a)),mul(2,PRIME31.b))));
+    let cc=sub(mul(sub(ru,PRIME31.a),sub(ru,PRIME31.a)),
+               mul(4,mul(PRIME31.b,add(r,u))));
+    add(add(mul(aa,mul(n,n)),mul(bb,mul(n,d))),mul(cc,mul(d,d)))
+}
+fn verify_elimination(u:u64,z:u64,r:u64) {
+    let d=denominator(z);
+    assert_ne!(d,0,"rational two-torsion contradicts odd group order");
+    let v=mul(numerator(z),pow_mod(d,P-2));
+    let e=eliminated_f3(u,z,r);
+    let f=f3(u,v,r);
+    assert_eq!(e,mul(f,mul(d,d)),"cleared denominator identity failed");
+    assert_eq!(e==0,f==0,"rational root set changed");
+}
+
 fn splitmix64(state: &mut u64) -> u64 {
     *state=state.wrapping_add(0x9e37_79b9_7f4a_7c15);
     let mut z=*state;
@@ -131,6 +162,7 @@ fn run(cases_per_window:usize) -> Value {
     let mut poisoned_double_rejected=0u64; let mut poisoned_target_rejected=0u64;
     let mut fixture_group_ops=0u64; let mut recovery_group_ops=0u64;
     let mut certificates=Vec::new(); let mut per_window=Vec::new();
+    let mut eliminated_steps_verified=0u64;
     for (wi,win) in WINDOWS.iter().enumerate() {
         let mut good=0u64;let mut skipped=0u64;
         for ci in 0..cases_per_window {
@@ -157,6 +189,12 @@ fn run(cases_per_window:usize) -> Value {
             // Pure polynomial root check: no group operations or supplied signs.
             assert_eq!(xonly_residuals(&xleaf,&x_suffix,&x_double,target.0,&base,win),
                        (0,0,0,0),"x-only polynomial failed");
+            for i in 0..7 {
+                assert_eq!(eliminated_f3(xleaf[i],x_suffix[i+1],x_suffix[i]),0,
+                           "14-variable eliminated polynomial failed");
+                verify_elimination(xleaf[i],x_suffix[i+1],x_suffix[i]);
+                eliminated_steps_verified+=1;
+            }
             let mut poisoned=x_double;
             poisoned[0]=add(poisoned[0],1);
             if xonly_residuals(&xleaf,&x_suffix,&poisoned,target.0,&base,win).1!=0 {
@@ -179,6 +217,14 @@ fn run(cases_per_window:usize) -> Value {
         }
         per_window.push(json!({"window":wi,"ordinary":good,"exceptional":skipped}));
     }
+    // Separate random-field triple controls, not natural public-target relations.
+    let mut random_state=0x454c_494d_5f44_3134u64;
+    for _ in 0..8192 {
+        let u=splitmix64(&mut random_state)%P;
+        let z=splitmix64(&mut random_state)%P;
+        let r=splitmix64(&mut random_state)%P;
+        verify_elimination(u,z,r);
+    }
     assert_eq!(ordinary+exceptional,tested);
     json!({"schema":"prime31.xonly_horner_sign_lift.v1",
        "curve":PRIME31,"seed":format!("0x{SEED:016x}"),
@@ -190,11 +236,24 @@ fn run(cases_per_window:usize) -> Value {
        "post_solve_recovery_group_additions":recovery_group_ops,
        "variables_unspecialized":22,"equations_unspecialized":23,
        "variables_after_public_x_target":21,"equations_after_public_x_target":22,
+       "eliminated_variables_after_public_target":14,
+       "eliminated_equations_after_public_target":15,
+       "eliminated_total_degree":10,"eliminated_z_degree":8,
+       "eliminated_u_and_r_degree":2,
+       "eliminated_steps_verified":eliminated_steps_verified,
+       "uniform_field_triples_equivalence_checked":8192,
+       "cleared_denominator_rational_roots_only":true,
        "f3_and_doubling_max_total_degree":4,"leaf_max_degree":8,
        "prior_xy_variables_unspecialized":72,"prior_xy_equations":74,
        "per_window":per_window,"certificates":certificates,
        "generic_sum_table_calls":0,"public_only_unknown_index_extraction":false,
        "complete_ecdlp_solved":false,"independent_signed_pcc_verified":false})
+}
+#[test]
+fn cleared_denominator_exact_rational_set() {
+    let r=run(8);
+    assert_eq!(r["eliminated_steps_verified"].as_u64(),Some(224));
+    assert_eq!(r["uniform_field_triples_equivalence_checked"].as_u64(),Some(8192));
 }
 #[test]
 fn planted_polynomial_identities_and_sign_lift() {
