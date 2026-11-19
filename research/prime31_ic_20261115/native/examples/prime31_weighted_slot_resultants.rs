@@ -53,6 +53,25 @@ fn resultant(c: &[u64], slot: &[u64; 8]) -> u64 {
     // Res_X(H_i,M) = product_{alpha root H_i} M(alpha)
     slot.iter().fold(1u64, |acc, &x| mul_mod(acc, eval(c, x)))
 }
+fn jacobian_det(c: &[u64], slot: &[[u64; 8]; 8], roots: &[u64; 8]) -> u64 {
+    // Differentiating product_t M(t) at its unique zero t_i gives
+    // row i = (product_{t != t_i} M(t)) * [1,t_i,...,t_i^7].
+    // Thus the determinant is a row-scale product times Vandermonde.
+    let mut det = 1u64;
+    for i in 0..8 {
+        for &t in &slot[i] {
+            if t != roots[i] {
+                det = mul_mod(det, eval(c, t));
+            }
+        }
+    }
+    for i in 0..8 {
+        for j in (i + 1)..8 {
+            det = mul_mod(det, sub_mod(roots[j], roots[i]));
+        }
+    }
+    det
+}
 fn base31(ar: &mut Arithmetic) -> Vec<(u64, u64)> {
     let mut points = Vec::new();
     for x in 0..10_000 {
@@ -77,6 +96,7 @@ fn run(cases_per_window: usize) -> Value {
     let mut negatives = 0u64;
     let mut positive_zero_resultants = 0u64;
     let mut negative_only_slot0_failed = 0u64;
+    let mut jacobian_nonsingular = 0u64;
     let mut first = Vec::new();
     let mut windows_json = Vec::new();
 
@@ -115,6 +135,9 @@ fn run(cases_per_window: usize) -> Value {
             let m = monic_from_roots(&roots);
             let pos: [u64; 8] = std::array::from_fn(|i| resultant(&m, &xsets[i]));
             assert_eq!(pos, [0u64; 8], "planted M not in each slot support");
+            let jac_det = jacobian_det(&m, &xsets, &roots);
+            assert_ne!(jac_det, 0, "radical complete-intersection Jacobian singular");
+            jacobian_nonsingular += 1;
             positives += 1;
             window_pos += 1;
             positive_zero_resultants += pos.iter().filter(|&&r| r == 0).count() as u64;
@@ -138,6 +161,7 @@ fn run(cases_per_window: usize) -> Value {
                     "positive_coefficients_c0_to_c8": m,
                     "negative_coefficients_c0_to_c8": bad,
                     "negative_slot0_resultant": neg[0],
+                    "jacobian_det": jac_det,
                     "weighted_target": q,
                 }));
             }
@@ -158,6 +182,8 @@ fn run(cases_per_window: usize) -> Value {
         "negative": negatives,
         "positive_zero_resultants": positive_zero_resultants,
         "negative_only_slot0_failed": negative_only_slot0_failed,
+        "jacobian_nonsingular": jacobian_nonsingular,
+        "membership_geometric_quotient_dimension": 16_777_216u64,
         "windows": windows_json,
         "first_case_per_window": first,
         "candidate_monic_degree": 8,
@@ -184,6 +210,7 @@ mod tests {
         assert_eq!(r["negative"].as_u64(), Some(8));
         assert_eq!(r["positive_zero_resultants"].as_u64(), Some(64));
         assert_eq!(r["negative_only_slot0_failed"].as_u64(), Some(8));
+        assert_eq!(r["jacobian_nonsingular"].as_u64(), Some(8));
         assert_eq!(r["slot_supports_pairwise_disjoint"].as_bool(), Some(true));
         assert_eq!(r["public_only_unknown_index_extraction"].as_bool(), Some(false));
     }
