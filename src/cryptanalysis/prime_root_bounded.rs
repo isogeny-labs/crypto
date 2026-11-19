@@ -445,12 +445,12 @@ impl Producer<'_> {
 
     fn power(&mut self, base: &Poly17, mut exponent: u64, modulus: &Poly17) -> Result<Poly17> {
         self.gate.charge(6 * COPY_WORK)?;
-        let monic = self.power_modulus(modulus)?;
-        // Fp[x]/(nonzero constant) is the zero ring: every remainder is zero.
-        // This also handles exponent zero (the residue of 1 is zero).
-        if monic.len == 1 {
+        // Every polynomial reduces to zero modulo a nonzero constant;
+        // avoid even normalizing the constant (which would invert it).
+        if modulus.len == 1 {
             return Ok(Poly17::ZERO);
         }
+        let monic = self.power_modulus(modulus)?;
         // Over Fp, r^p == r. In Fp[x]/(x-r), x^p is therefore r.
         // The canonical input x is the only base eligible for this path.
         if monic.len == 2 && exponent == self.p
@@ -1011,11 +1011,12 @@ impl Replay {
 
     fn modular_power(&mut self, base: Poly17, exponent: u64, modulus: &Poly17) -> Result<Poly17> {
         self.gate.charge(6 * COPY_WORK)?;
-        let monic = self.normalized_modulus(modulus)?;
-        // Independent replay: modulo a nonzero constant every residue is 0.
-        if monic.len == 1 {
+        // Independent replay: modulo a nonzero constant every residue
+        // is zero, so no reciprocal or convolution is necessary.
+        if modulus.len == 1 {
             return Ok(Poly17::ZERO);
         }
+        let monic = self.normalized_modulus(modulus)?;
         // Evaluate x^p at the unique root of the linear modulus using
         // Frobenius on Fp; do not call the producer's arithmetic.
         if monic.len == 2 && exponent == self.p
