@@ -1,0 +1,69 @@
+{
+  "schema": "engineering.sparse-artifact-support-inputs/v1",
+  "parent_commit": "00128bd71f72449ad071a56c162c9005cbef7681",
+  "failed_hosted_run": 44629498850,
+  "failed_job": 135932061526,
+  "failure": "Canonical managed pull names the target-walk records, but the sparse scope/check checkouts omit the indexed gzip recovery source.",
+  "correction": "Add the exact existing target-walk recovery gzip to both sparse checkout pattern lists. Full checkout already includes it.",
+  "support_file": ".artifacts/recovery/8970667e2f18587eeb08d033123dab029b94042ac5c07c870b08988f1ee5b738-targetwalk-records.jsonl.gz",
+  "cold_actual_cli_controls": {
+    "cases": [
+      {
+        "case": "missing-support",
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3",
+          "tools/artifacts/artifacts.py",
+          "pull",
+          "--source",
+          "git",
+          "--jobs",
+          "2",
+          "research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv",
+          "research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl"
+        ],
+        "exit_code": 1,
+        "source_head": "4305e8bdf8ce6493392bc62d99f0aada6d811f16",
+        "aws_executable_absent": true,
+        "hashes": {
+          "research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv": "534e58ced979e05ec747eb462aa1d63135d8004813d094c522a4d7160c03c4a4"
+        }
+      },
+      {
+        "case": "complete-support",
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3",
+          "tools/artifacts/artifacts.py",
+          "pull",
+          "--source",
+          "git",
+          "--jobs",
+          "2",
+          "research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv",
+          "research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl"
+        ],
+        "exit_code": 0,
+        "source_head": "4305e8bdf8ce6493392bc62d99f0aada6d811f16",
+        "aws_executable_absent": true,
+        "hashes": {
+          "research/n83_d18_subgroup_orbit_census_20261018/run-20261019T0142Z/selected-representatives.csv": "534e58ced979e05ec747eb462aa1d63135d8004813d094c522a4d7160c03c4a4",
+          "research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl": "8970667e2f18587eeb08d033123dab029b94042ac5c07c870b08988f1ee5b738"
+        }
+      }
+    ],
+    "original_bytes_modified": false,
+    "repository_s3_contacted": false,
+    "scope": "Exact two gzip-backed input paths in a cold partial checkout; other managed pull paths are unchanged."
+  },
+  "validation": [
+    "Only two sparse-support patterns added",
+    "YAML parsed",
+    "Bash syntax checked",
+    "Canonical generated hooks remain idempotent",
+    "Existing managed pull list and all test commands unchanged"
+  ],
+  "program_source_changed": false,
+  "artifact_reader_changed": false,
+  "frozen_artifact_bytes_changed": false,
+  "native_full_library_run_44633841449": "continues at identical Rust source and test inputs; no cancellation",
+  "hosted_final_head_status": "pending"
+}
