@@ -51,7 +51,8 @@ impl SharedSignedBsgs {
             assert!(baby.insert(x,(j,y)).is_none(), "unexpected signed baby collision");
         }
         assert_eq!(baby.len(),M as usize);
-        let neg_stride = ar.neg(PRIME31,ar.scalar(PRIME31,STEP,G));
+        let stride = ar.scalar(PRIME31,STEP,G);
+        let neg_stride = ar.neg(PRIME31,stride);
         Self { baby,neg_stride }
     }
     fn solve(&self, ar: &mut Arithmetic, target: Point) -> (u64,u64) {
