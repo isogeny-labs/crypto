@@ -21,6 +21,8 @@ K_i(U,V) := Res_X(H_i(X), S3(X,U,V))
 ```
 The alternative **7-variable / 8-equation chart** is `K_i(z_(i+1),z_i)=0` for `i=0..6` plus `H_7(z_7)=0` with `z_0=x(Q)` fixed. Its maximal total degree is **32**. Each `S3(t,U,V)` contains at most nine monomials with bidegree at most (2,2), so `K_i` has bidegree at most (16,16) and **at most 289 monomials**. The product equations factor explicitly into eight quadratic-in-each-variable components; they should be kept factored until the elimination backend requires expansion.
 
+**Input-polynomial sparsity:** direct expansion of one generic S3 uses 13 nonzero monomials at these curve parameters; each H_i has eight or nine nonzero univariate coefficients. The four original windows therefore present **162, 163, 163, and 163 total monomial occurrences** across the 15 input equations, independently counted in Python. By contrast the earlier degree-10 eliminated Horner S3 equation was reported to have 67 terms per link (seven links), before adding its eight selectors. This is an *input-size* reduction, not evidence about F4 fill, last-fall degree, or total solving time.
+
 The 7-variable system is triangular but **not** automatically cheap: conditioning on a suffix coordinate, `K_i` can have up to 16 possible next x-values. Naive sequential branching across seven levels can reach `16^7=268,435,456` partial assignments before applying the final eight-leaf test, and should NOT be mistaken for a fast public target extractor. This is an upper branch cap, not a lower bound on F4, resultant-tree, or batched rootfinding methods.
 
 ## Preregistered independent preflight (Python BigInt, not Rust CI)
