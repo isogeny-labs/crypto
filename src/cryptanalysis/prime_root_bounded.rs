@@ -464,6 +464,61 @@ impl Producer<'_> {
         Ok(out)
     }
 
+    // R44_PRODUCER_WINDOW_HELPER_BEGIN
+    // Width-three left-to-right sliding window for non-Mersenne primes.
+    // Odd powers b,b^3,b^5,b^7 cost one square and three products,
+    // but reduce the number of full products in dense 30-bit powers.
+    fn window3_power(&mut self, base: &Poly17, exponent: u64, monic: &Poly17) -> Result<Poly17> {
+        debug_assert!(exponent > 0);
+        let mut odd = [Poly17::ZERO; 4];
+        odd[0] = *base;
+        let mut b2 = self.square(base)?;
+        self.reduce_monic(&mut b2, monic)?;
+        for index in 1..odd.len() {
+            self.gate.charge(4 * COPY_WORK)?;
+            let mut next = self.product(&odd[index - 1], &b2)?;
+            self.reduce_monic(&mut next, monic)?;
+            odd[index] = next;
+        }
+        let mut acc = Poly17::constant(1);
+        let mut initialized = false;
+        let mut bit = 63i32 - exponent.leading_zeros() as i32;
+        while bit >= 0 {
+            self.gate.charge(4 * COPY_WORK)?;
+            if exponent & (1u64 << bit) == 0 {
+                if initialized {
+                    let mut next = self.square(&acc)?;
+                    self.reduce_monic(&mut next, monic)?;
+                    acc = next;
+                }
+                bit -= 1;
+                continue;
+            }
+            let mut low = (bit - 2).max(0);
+            while exponent & (1u64 << low) == 0 {
+                low += 1;
+            }
+            let width = bit - low + 1;
+            let digit = ((exponent >> low) & ((1u64 << width) - 1)) as usize;
+            debug_assert!(digit & 1 == 1 && digit <= 7);
+            if initialized {
+                for _ in 0..width {
+                    let mut next = self.square(&acc)?;
+                    self.reduce_monic(&mut next, monic)?;
+                    acc = next;
+                }
+                let mut next = self.product(&acc, &odd[digit >> 1])?;
+                self.reduce_monic(&mut next, monic)?;
+                acc = next;
+            } else {
+                acc = odd[digit >> 1];
+                initialized = true;
+            }
+            bit = low - 1;
+        }
+        Ok(acc)
+    }
+    // R44_PRODUCER_WINDOW_HELPER_END
     // R42_PRODUCER_HELPER_BEGIN
     // For e=2^k-1, let U_k=b^(2^k-1).  Then
     // U_(2m)=(U_m)^(2^m)*U_m and U_(2m+1)=U_(2m)^2*b.
@@ -524,6 +579,16 @@ impl Producer<'_> {
             return self.mersenne_bits_power(&b, 64 - exponent.leading_zeros(), &monic);
         }
         // R42_PRODUCER_FASTPATH_END
+        // R44_PRODUCER_WINDOW_SWITCH_BEGIN
+        // Avoid table setup on small degrees, sparse-bit exponents, and
+        // the 61-bit prime already handled by the Mersenne addition chain.
+        if monic.len >= 5 && exponent >= (1u64 << 20)
+            && exponent <= u32::MAX as u64 && exponent.count_ones() >= 12
+            && (exponent == self.p || exponent == (self.p - 1) / 2)
+        {
+            return self.window3_power(&b, exponent, &monic);
+        }
+        // R44_PRODUCER_WINDOW_SWITCH_END
         // For 61-bit exponents, the extra first-bit state test was slower
         // than one identity multiply in local regression screening.
         if exponent > u32::MAX as u64 {
@@ -1097,6 +1162,65 @@ impl Replay {
         Ok(z)
     }
 
+    // R44_REPLAY_WINDOW_HELPER_BEGIN
+    // Independent certificate arithmetic: descending bit traversal and
+    // diagonal squaring, without calling the producer's polynomial kernels.
+    fn replay_window3(&mut self, base: &Poly17, exponent: u64, monic: &Poly17) -> Result<Poly17> {
+        debug_assert!(exponent > 0);
+        let mut powers = [Poly17::ZERO; 4];
+        powers[0] = *base;
+        let mut even = self.square_diagonals(base)?;
+        self.cancel_monic(&mut even, monic)?;
+        for slot in 1..4 {
+            self.gate.charge(4 * COPY_WORK)?;
+            let mut product = self.convolution(&powers[slot - 1], &even)?;
+            self.cancel_monic(&mut product, monic)?;
+            powers[slot] = product;
+        }
+        let top = 63i32 - exponent.leading_zeros() as i32;
+        let mut acc = Poly17::constant(1);
+        let mut started = false;
+        let mut cursor = top;
+        while cursor >= 0 {
+            self.gate.charge(4 * COPY_WORK)?;
+            if ((exponent >> cursor) & 1) == 0 {
+                if started {
+                    let mut square = self.square_diagonals(&acc)?;
+                    self.cancel_monic(&mut square, monic)?;
+                    acc = square;
+                }
+                cursor -= 1;
+                continue;
+            }
+            let lower_bound = (cursor - 2).max(0);
+            let mut bottom = cursor;
+            for candidate in lower_bound..=cursor {
+                if (exponent >> candidate) & 1 != 0 {
+                    bottom = candidate;
+                    break;
+                }
+            }
+            let digits = (cursor - bottom + 1) as usize;
+            let mask = (1u64 << digits) - 1;
+            let value = ((exponent >> bottom) & mask) as usize;
+            if started {
+                for _ in 0..digits {
+                    let mut square = self.square_diagonals(&acc)?;
+                    self.cancel_monic(&mut square, monic)?;
+                    acc = square;
+                }
+                let mut product = self.convolution(&acc, &powers[value >> 1])?;
+                self.cancel_monic(&mut product, monic)?;
+                acc = product;
+            } else {
+                acc = powers[value >> 1];
+                started = true;
+            }
+            cursor = bottom - 1;
+        }
+        Ok(acc)
+    }
+    // R44_REPLAY_WINDOW_HELPER_END
     // R42_REPLAY_HELPER_BEGIN
     // Independent iteration over the binary expansion of the bit count k.
     // Keep diagonal squaring, descending cancellation and replay accounting.
@@ -1164,6 +1288,14 @@ impl Replay {
             );
         }
         // R42_REPLAY_FASTPATH_END
+        // R44_REPLAY_WINDOW_SWITCH_BEGIN
+        if monic.len >= 5 && exponent >= (1u64 << 20)
+            && exponent <= u32::MAX as u64 && exponent.count_ones() >= 12
+            && (exponent == self.p || exponent == (self.p - 1) / 2)
+        {
+            return self.replay_window3(&base, exponent, &monic);
+        }
+        // R44_REPLAY_WINDOW_SWITCH_END
         // Keep the former loop for large (61-bit) exponents: native and
         // local A/B shows no reproducible gain from its first-bit shortcut.
         if exponent > u32::MAX as u64 {
