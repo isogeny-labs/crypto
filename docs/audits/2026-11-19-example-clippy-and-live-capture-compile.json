@@ -1,0 +1,117 @@
+{
+  "schema": "crypto.example-clippy-and-live-capture-compile/v1",
+  "standing": "unverified",
+  "parent_commit": "e0f1fbe039a420878e1b61982abec029d6ea89cc",
+  "at": "2026-11-19T20:08:02.010890+00:00",
+  "baseline_CI": {
+    "lint_run": 44593190178,
+    "lint_job": 135804615777,
+    "source": "085f978ebf38aaebbb9d9499b1a1d40fa541de98",
+    "observed_lint_diagnostics": 31,
+    "example_files": 8,
+    "all_targets_run": 44593193382,
+    "all_targets_job": 135804609444,
+    "compiler_error": "E0062 duplicate channels field in tests/ml_dataset_live_capture.rs",
+    "compile_time_CSV_recovery": "Hosted materialization restored exact original successfully"
+  },
+  "repairs": [
+    "Remove one of two identical channels:None constructor fields",
+    "Use existing standard integer predicates and ceiling division on the existing nonzero-divisor paths",
+    "Preserve multiplication/shift precedence explicitly",
+    "Keep affine-add side effects and both branches in an initializer expression",
+    "Use Option::is_some_and and Option propagation without changing accepted cases",
+    "Accept mutable slices in the private median helper",
+    "Retain the curve-generator assertion in a const block",
+    "Remove an unused closure mut binding and an integer +0",
+    "Annotate only the intentionally empty unit-control example entry point as dead_code",
+    "Apply required changed-file Rust formatting"
+  ],
+  "unchanged_baseline_sources": [
+    {
+      "path": "examples/binary_falldeg_arms.rs",
+      "bytes": 34935,
+      "sha": "51c4d7100ca3001d9b3f32a24dadafc4c6fb55a4",
+      "sha256": "a04947d86712be5fcf9109936d654e7735a8f07dff4798b6009f6693941f8d32"
+    },
+    {
+      "path": "examples/ic_3sum_lowmem.rs",
+      "bytes": 27723,
+      "sha": "71e629c4a48c6126c2d9f19ae0bbc6c5926e0992",
+      "sha256": "34ed69bb5826f836a043a9c954a3decb059a3b45ede0d09e56094d117050803f"
+    },
+    {
+      "path": "examples/ic_alt_cuckoo.rs",
+      "bytes": 32089,
+      "sha": "da4d6552b759d957ce0be45d15dcdf0c90c8b827",
+      "sha256": "d375a60a8ec5f7aec730310cc4d2defe106bb39ce325e0dee58022ffece1409b"
+    },
+    {
+      "path": "examples/ic_alt_dulmage_mendelsohn.rs",
+      "bytes": 15289,
+      "sha": "b4a5cb6fadb41572b3301d1ae76e358b9ecadff6",
+      "sha256": "d6e604211549e5f28df6c4e2cbc254bb7803542f92fd6d1c9b200ebb09c4fac3"
+    },
+    {
+      "path": "examples/ic_alt_sort_merge_join.rs",
+      "bytes": 15900,
+      "sha": "5ac4948538a6b6addf6eb9f8d11fd425625b2318",
+      "sha256": "8e4c1b481f61958de02727c32d847d3ba2069425017fbabe8ffc7689a64196fa"
+    },
+    {
+      "path": "examples/ic_alt_xor_ribbon_build.rs",
+      "bytes": 18501,
+      "sha": "9c76b1eb2c6804d35008a70dede5023200766760",
+      "sha256": "ed3b630ede910855913cd1dd11eefe2fc03bf7c92ca499c4519049f1a74e7dd7"
+    },
+    {
+      "path": "examples/jv_sieve_quadratic_pair_graph_controls.rs",
+      "bytes": 322,
+      "sha": "34f0c03e0a3c4bb0db02249194f74e6f5a7d61d8",
+      "sha256": "6a9da3f7928ef73f66725b353645109f7bbabc20722711fdf75f8fe1057f70da"
+    },
+    {
+      "path": "examples/semaev_linear_bench.rs",
+      "bytes": 10203,
+      "sha": "f32b3dca2aacb940b64453b1164240b48d85e3eb",
+      "sha256": "4cd7cf74775aa0640bbc23d0e178314496f9c6d2e5dd0c31c5e125ebd6ea8a73"
+    },
+    {
+      "path": "tests/ml_dataset_live_capture.rs",
+      "bytes": 29026,
+      "sha": "52c1750e84532af2f6cd957e44039b65cf8b1052",
+      "sha256": "ce14906c732ef74df1b6738f39b5c1ca24ca28110b09f58af8fa7809320cd152"
+    }
+  ],
+  "local_controls": [
+    {
+      "example": "ic_alt_sort_merge_join",
+      "unchanged_baseline_exit": 1,
+      "candidate_exit": 0,
+      "baseline_log_sha256": "184c533aca80f275fba59dd1809bc5685d560109b3991a5d89d4c9da1ce1a872",
+      "candidate_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "example": "ic_alt_xor_ribbon_build",
+      "unchanged_baseline_exit": 1,
+      "candidate_exit": 0,
+      "baseline_log_sha256": "5e74b729a8de954a1be20e68bbe9433eaa46d551fbeba6e87188493329bd3b89",
+      "candidate_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "example": "ic_alt_cuckoo",
+      "unchanged_baseline_exit": 1,
+      "candidate_exit": 0,
+      "baseline_log_sha256": "1a0d52db03a76080a0d5a3e02a96b345f087fac8264ca51ca4478c97ccb95e82",
+      "candidate_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "local_toolchain": "rustc 1.93.1 (01f6ddf75 2026-02-11) (Homebrew)",
+  "all_nine_changed_sources_parse_and_pass_rustfmt": true,
+  "remaining_hosted_validation": "Full Cargo all-targets and example Clippy checks, including dependent examples and the integration constructor, pending",
+  "CI_lint_flags_changed": false,
+  "library_implementations_changed": false,
+  "original_assertions_removed": false,
+  "frozen_research_records_and_source_snapshots_changed": false,
+  "performance_optimization_claim": false,
+  "new_benchmark_or_research_execution": false
+}
