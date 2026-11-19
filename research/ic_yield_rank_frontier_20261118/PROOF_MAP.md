@@ -395,7 +395,10 @@ from the usual squared Hasse trace bound once the field has at least 16
 elements.  The pinned dependency tree supplies the point-count definition but
 not the Hasse theorem itself, so connecting a concrete curve to the bridge
 remains an explicit theorem-level obligation rather than an implicit sampler
-assumption. [pcc:unverified]
+assumption. Claims `PCC-20261119-c1ad13`, `PCC-20261119-e5e1f9`, and
+`PCC-20261119-54ee4b` bind the curve-level Hasse arithmetic endpoint, counted
+square-root bit-work theorem, and short-curve root interface respectively;
+all three pass their local Lean verifiers. [pcc:unverified]
 
 ## Dense cubic row-cost exponent
 

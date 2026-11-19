@@ -994,4 +994,8 @@ The pinned project builds 2,335 jobs. The repository proof gate reports
 `PASS 160 thm 0 trusted`; explicit axiom audits of the Hasse bridge, binary
 power, square-root cost, and short-curve root laws contain only `propext`,
 `Classical.choice`, and `Quot.sound`. A fresh independent checker replay exits
-0. [pcc:unverified]
+0. Hash-bound claims `PCC-20261119-c1ad13`, `PCC-20261119-e5e1f9`, and
+`PCC-20261119-54ee4b` pass their local Lean verifiers. The first three claim
+records (`PCC-20261119-55e0bd`, `PCC-20261119-0b3f70`, and
+`PCC-20261119-b73c0b`) omitted mandatory declaration hashes, fail closed, and
+remain uncited. [pcc:unverified]

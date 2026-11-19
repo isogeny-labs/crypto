@@ -314,8 +314,11 @@ Hasse-form premise `2|K|+1 <= 4|E(K)|`. Lean now derives that premise, for
 Hasse theorem. For `|K| = 3 mod 4`, an executable binary-power square root is
 also checked: it uses at most `2 * Nat.size |K|` field multiplications, and on
 elliptic short-form curves (`a1=a3=0`) it supplies the nonsingular root required
-by the sampler. Claims `PCC-20261119-e93da3`, `PCC-20261119-2b8ae7`, and
-`PCC-20261119-e67bd2` pass their local Lean verifiers. [pcc:unverified]
+by the sampler. Claims `PCC-20261119-c1ad13`, `PCC-20261119-e5e1f9`, and
+`PCC-20261119-54ee4b` bind these new endpoints and pass their local Lean
+verifiers; the earlier sampler claims `PCC-20261119-e93da3`,
+`PCC-20261119-2b8ae7`, and `PCC-20261119-e67bd2` also pass locally.
+[pcc:unverified]
 
 ## Corrections and remaining obligations
 
