@@ -249,6 +249,90 @@ fn run(cases_per_window:usize) -> Value {
        "generic_sum_table_calls":0,"public_only_unknown_index_extraction":false,
        "complete_ecdlp_solved":false,"independent_signed_pcc_verified":false})
 }
+// Exact duplication y-numerator: f(x([2]Z)) = M(z)^2 / D(z)^3.
+// This is a symbolic identity (also holds for twist x), not an extractor.
+fn duplication_y_numerator(z: u64) -> u64 {
+    let a=PRIME31.a;let b=PRIME31.b;
+    let z2=mul(z,z);let z3=mul(z2,z);let z4=mul(z2,z2);let z6=mul(z3,z3);
+    let a2=mul(a,a);let a3=mul(a2,a);
+    let positives=add(add(z6,mul(5,mul(a,z4))),mul(20,mul(b,z3)));
+    let negatives=add(add(mul(5,mul(a2,z2)),mul(4,mul(mul(a,b),z))),
+                      add(mul(8,mul(b,b)),a3));
+    sub(positives,negatives)
+}
+// Coefficients L*r^2+B*r+C of the polynomial E(u,z,r).
+fn eliminated_r_coefficients(u:u64,z:u64)->(u64,u64,u64) {
+    let a=PRIME31.a;let b=PRIME31.b;
+    let n=numerator(z);let d=denominator(z);
+    let n2=mul(n,n);let nd=mul(n,d);let d2=mul(d,d);
+    let leading=mul(sub(n,mul(u,d)),sub(n,mul(u,d)));
+    let linear=sub(0,add(add(mul(2,mul(u,n2)),
+                              mul(2,mul(add(mul(u,u),a),nd))),
+                         mul(add(mul(2,mul(a,u)),mul(4,b)),d2)));
+    let constant=sub(add(mul(mul(u,u),n2),
+                             mul(sub(mul(a,a),mul(4,mul(b,u))),d2)),
+                         mul(2,mul(add(mul(a,u),mul(2,b)),nd)));
+    (leading,linear,constant)
+}
+// For valid ordinary-curve x inputs, this quadratic splits over Fp.
+// Crucially, the FULL factor-base triangular chart is split; one isolated
+// cleared-denominator equation can still have nonrational torsion branches.
+#[test]
+fn eliminated_horner_discriminant_and_split_fibres() {
+    let mut random=0x4431_345f_5350_4c54u64;
+    for _ in 0..8192 {
+        let u=splitmix64(&mut random)%P;
+        let z=splitmix64(&mut random)%P;
+        let n=numerator(z);let d=denominator(z);
+        let m=duplication_y_numerator(z);
+        let lhs=add(add(mul(mul(n,n),n),mul(PRIME31.a,mul(n,mul(d,d)))),
+                    mul(PRIME31.b,mul(mul(d,d),d)));
+        assert_eq!(lhs,mul(m,m),"duplication division-polynomial identity");
+        let (l,b,c)=eliminated_r_coefficients(u,z);
+        let discr=sub(mul(b,b),mul(4,mul(l,c)));
+        assert_eq!(discr,mul(64,mul(rhs(u),mul(rhs(z),mul(m,m)))),
+                   "univariate eliminated-F3 discriminant");
+        for r in [0,1,P-1] {
+            assert_eq!(add(add(mul(l,mul(r,r)),mul(b,r)),c),
+                       eliminated_f3(u,z,r),
+                       "polynomial coefficient reconstruction");
+        }
+    }
+    // Each of the 31 public factor-base x-values is ordinary (has an Fp y).
+    // With t7 a leaf, induction on the 7 Horner steps forces every geometric
+    // affine root of the full 14-variable chart to have Fp internal x values.
+    let mut ar=Arithmetic::default();
+    check_curve(PRIME31,&mut ar).expect("unchanged prime-order curve");
+    let base=base31(&mut ar);
+    let mut witnessed=0u64;let mut infinities=0u64;let mut linear_steps=0u64;
+    for &u_point in &base {
+        for &z_point in &base {
+            let u=u_point.0;let z=z_point.0;
+            assert_ne!(rhs(u),0);
+            assert_ne!(rhs(z),0);
+            let m=duplication_y_numerator(z);
+            assert_ne!(m,0,"no rational order-four points");
+            let (l,b,c)=eliminated_r_coefficients(u,z);
+            assert_ne!(sub(mul(b,b),mul(4,mul(l,c))),0);
+            if l==0 {
+                linear_steps+=1;
+                assert_ne!(b,0,"a dropped-degree step must have one finite root");
+            }
+            let doubled=ar.add(PRIME31,Some(z_point),Some(z_point))
+                .expect("odd-order curve has no doubling-to-infinity leaf");
+            for v in [doubled,neg(doubled)] {
+                if let Some(out)=ar.add(PRIME31,Some(u_point),Some(v)) {
+                    assert_eq!(eliminated_f3(u,z,out.0),0);
+                    witnessed+=1;
+                } else {
+                    infinities+=1;
+                }
+            }
+        }
+    }
+    assert_eq!(witnessed+infinities,2*31*31);
+    assert_eq!(infinities,linear_steps);
+}
 #[test]
 fn cleared_denominator_exact_rational_set() {
     let r=run(8);
