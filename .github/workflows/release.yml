@@ -313,7 +313,7 @@ jobs:
             [ -f "$extra" ] && cp "$extra" "dist/$name/" || true
           done
           odd_producer_commit="$(node -e 'const c=require("./docs/curves/odd-subgroup-transfer-certificates.json"); process.stdout.write(c.producer.git_commit)')"
-          git fetch --no-tags --filter=blob:none origin "$odd_producer_commit"
+          git fetch --no-tags --filter=blob:none --recurse-submodules=no origin "$odd_producer_commit"
           # Exercise the installed layout, not just binaries in target/. The
           # generated verification request reuses the constructor's exact
           # certificate, while native catalog checking consumes the staged
