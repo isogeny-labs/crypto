@@ -10,6 +10,7 @@ on:
       - 'research/amm_digit_perf_20261118/round25_verifier_isolated.py'
       - 'research/amm_digit_perf_20261118/round26_verifier_isolated.py'
       - 'research/amm_digit_perf_20261118/round27_verifier_isolated.py'
+      - 'research/amm_digit_perf_20261118/round28_verifier_isolated.py'
       - '.github/workflows/radical-root-arithmetic.yml'
   workflow_dispatch:
 
@@ -43,6 +44,7 @@ jobs:
             research/amm_digit_perf_20261118/round25_verifier_isolated.py
             research/amm_digit_perf_20261118/round26_verifier_isolated.py
             research/amm_digit_perf_20261118/round27_verifier_isolated.py
+            research/amm_digit_perf_20261118/round28_verifier_isolated.py
       - uses: dtolnay/rust-toolchain@stable
       - name: Compile actual Rust module and check arithmetic
         run: |
@@ -102,6 +104,8 @@ jobs:
         run: python3 research/amm_digit_perf_20261118/round26_verifier_isolated.py
       - name: Verify and benchmark monomial and sparse-square specializations
         run: python3 research/amm_digit_perf_20261118/round27_verifier_isolated.py
+      - name: Verify and benchmark scalar arithmetic and trinomial squares
+        run: python3 research/amm_digit_perf_20261118/round28_verifier_isolated.py
       - name: Actual Rust paired benchmark of AMM/Tonelli/discriminant
         shell: bash
         run: |
