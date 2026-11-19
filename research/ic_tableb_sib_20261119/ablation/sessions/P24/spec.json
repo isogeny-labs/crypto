@@ -1,0 +1,89 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ic_tableb_sib_20261119 ablation 24-bit: tw2l +sib, +stride-generator, vs sib8-p256",
+ "description": "Round-3 lead L3-SIB. Generic decomposition track (C = 2). research/ic_tableb_sib_20261119/PROTOCOL.md. Public synthetic curve and targets; no security claim.",
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "tw2l",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "max_trials": "13528399621",
+     "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run"
+    }
+   }
+  },
+  {
+   "name": "tw2l-sib",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "max_trials": "13528399621",
+     "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run,sib=8,pool=256"
+    }
+   }
+  },
+  {
+   "name": "tw2l-sg",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "max_trials": "13528399621",
+     "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "sib8-p256",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "max_trials": "13528399621",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,seed=run,lazy=1,sib=8,pool=256",
+     "targets": "stride-generator"
+    }
+   }
+  }
+ ],
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 10935329,
+    "a": 5320418,
+    "b": 8535318,
+    "group_order": 10933753,
+    "r": 10933753,
+    "gx": 258338,
+    "gy": 9805035
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261115241,
+  "target_kind": "public"
+ },
+ "measurement": {
+  "rounds": 2,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261119374,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

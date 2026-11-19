@@ -57,7 +57,7 @@ The sibling arm is the autolab's arm as published. It differs from tw2l in three
 - `targets=stride-generator`;
 - no `jumps=16`.
 
-So the measured gain belongs to the combined arm, not to the siblings alone. The autolab's stage 1 isolates the sibling effect at 28–32 bits: 0.49–0.55× of the same walk without siblings at w = 0. A sibling-only ablation on Table B (tw2l plus `sib=8,pool=256`, with nothing else changed) is the next control to run.
+So the measured gain belongs to the combined arm, not to the siblings alone. The autolab's stage 1 isolates the sibling effect at 28–32 bits: 0.49–0.55× of the same walk without siblings at w = 0. Addendum A ([`ablation/README.md`](ablation/README.md)) separates them. Stride-generator targets alone give 0.68–0.85× of tw2l, below it at every weight. Siblings alone give 0.62–0.80× at w = 0 and tie at w = 1. The combined arm stays best.
 
 ## Reading
 - **Not a break of √r.** This is still the generic C = 2 table-and-walk track.
@@ -67,4 +67,3 @@ So the measured gain belongs to the combined arm, not to the siblings alone. The
 ## Not done
 - **Validation gate:** no leaderboard or `benchmarks/README.md` row, because the replay certificate and validator report were not produced.
 - **Scope:** L0 only, one host.
-- **Ablation:** the sibling-only ablation was not run.
