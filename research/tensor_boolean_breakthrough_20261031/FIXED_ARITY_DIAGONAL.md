@@ -443,6 +443,8 @@ retains the two-torsion factor. Lean now checks both the index-two obstruction
 and `ΨSq 2` vanishing on affine two-torsion, plus the general `ΨSq` root
 algebraicity/transcendence contradiction. Thus the remaining group-law lemma
 is specifically scalar torsion implies `ΨSq` vanishing.
+Claim `PCC-20261119-487eb4` binds the corrected `ΨSq` transcendence endpoint
+and passes its local Lean verifier; signed standing remains unverified.
 [pcc:unverified]
 
 The generic planted-diagonal root count is now kernel-checked as well.

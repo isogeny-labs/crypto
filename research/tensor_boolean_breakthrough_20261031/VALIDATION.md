@@ -1256,6 +1256,9 @@ remaining group-law theorem must prove that scalar torsion forces `ΨSq`, not
 `preΨ`, to vanish at the x-coordinate. [pcc:unverified]
 The complete pinned build succeeds with 9,086 jobs and the proof gate reports
 `PASS 314 thm 0 trusted`. [pcc:unverified]
+Claim `PCC-20261119-487eb4` binds the parity-correct `ΨSq` transcendence
+endpoint and passes its local Lean verifier; signed standing remains
+unverified. [pcc:unverified]
 
 All three claim verifiers pass. The repository proof gate reports
 `PASS 233 thm 0 trusted`; a final-source independent

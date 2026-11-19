@@ -821,6 +821,9 @@ torsion-coordinate step is now the precise group-law lemma that a nonzero
 torsion point makes the full squared division polynomial `ΨSq` vanish at its
 x-coordinate. The auxiliary `preΨ` formulation is insufficient at even
 indices because `preΨ 2 = 1`. [pcc:unverified]
+Claim `PCC-20261119-487eb4` binds the parity-correct `ΨSq` transcendence
+endpoint and passes its local Lean verifier; signed standing remains
+unverified. [pcc:unverified]
 
 ## Planted-diagonal bad shifts
 

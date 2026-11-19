@@ -113,4 +113,6 @@ parity-correct algebraicity and transcendence contradiction for every index
 nonzero in the constant field. The still-open group-law statement must show
 `nP = 0` implies `ΨSq n` vanishes at `x(P)`; current Mathlib, including its
 latest default branch, contains definitions and degree theorems but no such
-general multiplication formula. [pcc:unverified]
+general multiplication formula. Claim `PCC-20261119-487eb4` binds the
+parity-correct `ΨSq` transcendence endpoint and passes its local Lean verifier;
+signed standing remains unverified. [pcc:unverified]
