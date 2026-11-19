@@ -673,7 +673,9 @@ fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
             } else {
                 for i in 0..3 {
                     let (ix, x) = terms[i];
-                    result[2 * ix] = vmul(x, x, p);
+                    let diagonal = vmul(x, x, p);
+                    let sum = result[2 * ix] + diagonal;
+                    result[2 * ix] = if sum >= p { sum - p } else { sum };
                     for j in (i + 1)..3 {
                         let (jx, y) = terms[j];
                         let cross = vmul(x, y, p);
