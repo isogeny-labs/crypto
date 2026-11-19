@@ -112,3 +112,26 @@ For each degree-three divisor, the experiment also enumerates the split residual
 The pass count charges one unit per input pencil and one per ordinary catalogue pole visited. These operations can have different costs. The replay uses exhaustive residual factorization and exact prefix tests to measure the earliest possible stop. It makes no elapsed-time claim. At p = 127 case 5, adding both pencils moved the certificate from row 69 to row 58 and pole 11 to pole 9. At p = 257 case 1, it moved from row 125 to row 104 and pole 14 to pole 12. Charging the two extra pencils cancels the pole saving on both misses.
 
 Run `ruby harness/g3-prefix.rb results/g3-prefix-rows.gz results/g3-prefix-inputs.txt` and compare stdout with `results/g3-prefix.txt`. The compressed fixture retains catalogue emission order and both original signed coefficient vectors. The inputs file stores the curve coefficient and the generator and target Mumford polynomials. The arms column uses 0 for the generator and 1 for the target.
+
+### How much of the catalogue time goes to elimination?
+
+We replayed the four genus-3 and four genus-4 catalogue matrices, removed pivot equations, solved the residual systems, and reconstructed all original factor-base coordinates. On all eight matrices the reconstructed vector satisfied every original equation and matched ordinary elimination up to a nonzero scalar.
+
+The degree-one/two filter removes a column by substituting its shortest pivot equation into at most one other row. In genus 3 it left cores with 33/40, 58/69, 101/126 and 151/196 columns. In genus 4 it left 19/20, 23/25, 26/29 and 35/37 columns. A second filter admits higher-degree pivots when a structural upper bound guarantees that the total number of nonzero entries cannot grow during substitution. This reduced four matrices to one free coordinate (genus 3 at 73, genus 4 at 37, 43 and 59). Selecting pivots, performing substitutions, and reconstructing coordinates still cost work.
+
+We measured a separate timing control to quantify the opportunity. Each process captured the original stopping row and factor-base solution in one untimed catalogue run. It then alternated ordinary catalogue construction with a version that consumed the same row stream and supplied the recorded solution at that row. Each of the 128 pairs per field checked the anchor, canonical ordinates and complete value array. The table gives median paired ordinary/replay catalogue times in processes with opposite starting orders.
+
+| Genus | Prime | Forward | Reverse |
+|---|---:|---:|---:|
+| 3 | 73 | 1.509× | 1.464× |
+| 3 | 127 | 1.538× | 1.508× |
+| 3 | 257 | 1.748× | 1.737× |
+| 3 | 383 | 2.061× | 2.078× |
+| 4 | 37 | 1.076× | 1.085× |
+| 4 | 43 | 1.104× | 1.108× |
+| 4 | 59 | 1.118× | 1.118× |
+| 4 | 67 | 1.174× | 1.176× |
+
+The timing control measures the catalogue stage in isolation, with a previously computed solution. It does not time the filters or provide an independent solver. Even on three genus-4 matrices that reduce to one free coordinate, bypassing rank determination gave only 1.08–1.12× on this stage. Reducing collection work is the larger opportunity there.
+
+Run `ruby harness/matrix-filter.rb results/g3-prefix-rows.gz results/g4-catalogue-rows.txt` to reproduce the filter table. To rerun the diagnostic build from this directory on macOS, use `ruby harness/catalogue-rank-control.rb 3 | c++ -std=c++17 -O3 -x c++ - -o /tmp/hec-rank-control`, then run the binary once with no arguments and once with `reverse`. Substitute 4 for genus 4. Each timing row stores genus, prime, repetition, arm (0 ordinary, 1 replay), and elapsed nanoseconds. The four original streams are under `results/catalogue-rank-*`.
