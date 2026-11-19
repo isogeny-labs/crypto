@@ -1054,6 +1054,15 @@ fn round_seeds(round: u64, k: u32, exposed: &BTreeSet<u64>) -> (u64, u64) {
     }
 }
 
+fn curve_scope(curve: &Value) -> &'static str {
+    match curve["kind"].as_str() {
+        Some("curve25519") => "actual Curve25519 subgroup",
+        Some("prime_search") | Some("prime_roster") => "generic prime-order E(F_p) curve",
+        Some("prime_orbit_shape") => "prime-order E(F_p) curve",
+        _ => "Curve25519-family miniature",
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
 fn train_spec(
     home: &Path,
@@ -1067,11 +1076,7 @@ fn train_spec(
     rounds: u64,
     timeout: u64,
 ) -> Value {
-    let scope = if size.curve["kind"] == "curve25519" {
-        "actual Curve25519 subgroup"
-    } else {
-        "Curve25519-family miniature"
-    };
+    let scope = curve_scope(&size.curve);
     let mut arms = vec![
         json!({"name": "rho-neg", "role": "reference", "method": size.reference_method()}),
         json!({"name": "inc", "role": "baseline", "method": inc.method()}),
@@ -1102,11 +1107,7 @@ fn holdout_spec(
     rounds: u64,
     timeout: u64,
 ) -> Value {
-    let scope = if size.curve["kind"] == "curve25519" {
-        "actual Curve25519 subgroup"
-    } else {
-        "Curve25519-family miniature"
-    };
+    let scope = curve_scope(&size.curve);
     json!({
         "schema": "ecbench.spec/v1",
         "label": format!("ic_autolab round {round} holdout, {track} track, k = {}", size.k),
@@ -1174,10 +1175,17 @@ fn protocol_text(
             size.curve
                 .get("p")
                 .map(Value::to_string)
-                .unwrap_or_else(|| if size.curve["kind"] == "curve25519" {
-                    "2^255 - 19".into()
-                } else {
-                    "unspecified".into()
+                .unwrap_or_else(|| {
+                    if size.curve["kind"] == "curve25519" {
+                        "2^255 - 19".into()
+                    } else if let Some(bits) = size.curve.get("bits") {
+                        format!(
+                            "prime_search({bits}-bit, seed {})",
+                            size.curve.get("seed").unwrap_or(&Value::Null)
+                        )
+                    } else {
+                        "unspecified".into()
+                    }
                 }),
             size.r,
             size.log2_r,
@@ -1279,6 +1287,11 @@ fn protocol_text(
         t = t.replace("Curve25519-family miniature", "declared Curve25519 workload")
             .replace("Factor base and oracle strings are ecbench `ic.pipeline` parameters.",
                 "Each arm uses its explicit ecbench method when supplied; otherwise factor base and oracle strings are ic.pipeline parameters.");
+    } else if ledger.family != "curve25519" {
+        t = t.replace(
+            "Curve25519-family miniature",
+            &format!("registered `{}` curve", ledger.family),
+        );
     }
     t
 }
@@ -2444,7 +2457,12 @@ fn ratchet_svg(ledger: &Ledger, track: &str) -> String {
         .unwrap_or(1)
         .max(1) as f64;
     let max_s = series.values().flatten().map(|p| p.1).fold(1.0, f64::max) * 1.1;
-    let mut s = format!("<svg xmlns='http://www.w3.org/2000/svg' width='{w}' height='{h}' viewBox='0 0 {w} {h}' font-family='Helvetica,Arial,sans-serif' font-size='11'>\n<rect width='100%' height='100%' fill='white'/>\n<text x='{ml}' y='20' font-size='14' font-weight='bold'>Ratchet: incumbent mean S at w = 0 by round ({track} track, Curve25519 miniatures)</text>\n");
+    let family_label = if ledger.family == "curve25519" {
+        "Curve25519 miniatures".to_string()
+    } else {
+        svg_escape(&ledger.family)
+    };
+    let mut s = format!("<svg xmlns='http://www.w3.org/2000/svg' width='{w}' height='{h}' viewBox='0 0 {w} {h}' font-family='Helvetica,Arial,sans-serif' font-size='11'>\n<rect width='100%' height='100%' fill='white'/>\n<text x='{ml}' y='20' font-size='14' font-weight='bold'>Ratchet: incumbent mean S at w = 0 by round ({track} track, {family_label})</text>\n");
     let colours = ["#36c", "#c63", "#393", "#939", "#099"];
     for t in 0..=4 {
         let v = max_s * t as f64 / 4.0;
@@ -3774,6 +3792,33 @@ mod tests {
     fn civil_dates_are_right() {
         assert_eq!(civil_from_days(0), (1970, 1, 1));
         assert_eq!(civil_from_days(20761), (2026, 11, 4));
+    }
+
+    #[test]
+    fn generic_prime_family_describes_prime_search_curves_cleanly() {
+        let mut l = ledger();
+        l.family = "prime-generic".into();
+        let size = l.sizes.get_mut("20").unwrap();
+        size.curve = json!({"kind": "prime_search", "bits": 20, "seed": 59297});
+        let inc = l.incumbent("generic", 20).unwrap().arm.clone();
+        let spec = train_spec(
+            Path::new("research/prime_generic_autolab_20261118"),
+            1,
+            "generic",
+            l.size(20).unwrap(),
+            &inc,
+            &[],
+            42,
+            12,
+            1,
+            300,
+        );
+        assert!(spec["description"]
+            .as_str()
+            .unwrap()
+            .contains("generic prime-order E(F_p) curve"));
+        let svg = ratchet_svg(&l, "generic");
+        assert!(svg.contains("(generic track, prime-generic)"));
     }
 }
 
