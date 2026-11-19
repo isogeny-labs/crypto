@@ -25,7 +25,9 @@
 //! that sum_j w_j * source_j has large part exactly +D (graph invariant), so its
 //! discrete log is fixed by the certified kernel. The export also replays each
 //! anchor witness against the source certificates (integer incidence: large
-//! part equals +D exactly, every other class cancels).
+//! part equals +D exactly, every other class cancels) and records the integer
+//! small-base part `small` = sum_j w_j * terms_j, so that the group identity
+//! sum_i small_i * B_i + D = 0 can be checked later with Cantor arithmetic.
 //!
 //! Run: run50_deferred PUBLIC_JSON SEED MAX_DESCENT_RESIDUALS RAW_OUT DEXACT_OUT SUMMARY_OUT
 use crypto_lib::cryptanalysis::{
@@ -144,7 +146,17 @@ fn main() -> Result<(), String> {
             })
             .collect()
     };
-    let mut anchors: BTreeMap<[u64; 6], (usize, Vec<(usize, i64)>)> = BTreeMap::new();
+    let terms_of = |id: usize| -> Result<Vec<(usize, i64)>, String> {
+        let s = sources.get(id).ok_or("witness source range")?;
+        s["certificate"]["terms"]
+            .as_array()
+            .ok_or("terms")?
+            .iter()
+            .map(|t| Ok((t[0].as_u64().ok_or("t")? as usize, t[1].as_i64().ok_or("t")?)))
+            .collect()
+    };
+    type Anchor = (usize, Vec<(usize, i64)>, Vec<(usize, i64)>);
+    let mut anchors: BTreeMap<[u64; 6], Anchor> = BTreeMap::new();
     let (mut replay_ok, mut replay_bad) = (0u64, 0u64);
     for (sid, s) in sources.iter().enumerate() {
         for ev in s["graph"].as_array().ok_or("graph")? {
@@ -164,26 +176,31 @@ fn main() -> Result<(), String> {
                 .collect::<Result<_, String>>()?;
             // integer incidence: sum_j w_j * large(source_j) == +key
             let mut large: BTreeMap<[u64; 6], i64> = BTreeMap::new();
+            let mut small: BTreeMap<usize, i64> = BTreeMap::new();
             for &(id, c) in &witness {
                 for (rk, rc) in rem_of(id)? {
                     *large.entry(rk).or_default() += c * rc;
                 }
+                for (i, sgn) in terms_of(id)? {
+                    *small.entry(i).or_default() += c * sgn;
+                }
             }
             large.retain(|_, v| *v != 0);
+            small.retain(|_, v| *v != 0);
             if large.len() == 1 && large.get(&key) == Some(&1) && witness.iter().all(|&(id, _)| id <= sid) {
                 replay_ok += 1;
             } else {
                 replay_bad += 1;
             }
-            if anchors.insert(key, (sid, witness)).is_some() {
+            if anchors.insert(key, (sid, witness, small.into_iter().collect())).is_some() {
                 return Err("class anchored twice".into());
             }
         }
     }
     {
         let mut w = create(&args[5])?;
-        for (key, (sid, witness)) in &anchors {
-            writeln!(w, "{}", json!({"class":key,"activation_source":sid,"witness":witness})).map_err(|e| e.to_string())?;
+        for (key, (sid, witness, small)) in &anchors {
+            writeln!(w, "{}", json!({"class":key,"activation_source":sid,"witness":witness,"small":small})).map_err(|e| e.to_string())?;
         }
         w.flush().map_err(|e| e.to_string())?;
     }
@@ -197,7 +214,7 @@ fn main() -> Result<(), String> {
         "descent_residuals":report["descent_residuals"],"accepted_descents":report["descents"].as_array().map(|a|a.len()),
         "collection_rank_ready":report["collection_rank_ready"],
         "screen_calls":coll["discriminant_screen"]["calls"],"screen_refusals":coll["discriminant_screen"]["refusals"].as_array().map(|a|a.len()),
-        "h":coll["h"],"base_len":coll["base"].as_array().map(|a|a.len()),
+        "h":coll["h"],"base_len":coll["base"].as_array().map(|a|a.len()),"base":coll["base"],
         "d_exact_classes":anchors.len(),"anchor_witness_replay_ok":replay_ok,"anchor_witness_replay_bad":replay_bad,
         "phases":phase_rows,
     });
