@@ -756,10 +756,34 @@ impl Producer<'_> {
             }
         } else {
             debug_assert_eq!(self.p, 1_000_000_009);
+            // R48_TONELLI_PRODUCER_BEGIN
+            // 11^((p-1)/8) mod p = 172252358 for p=1_000_000_009.
+            // Its fourth power is -1 and eighth power is 1. Avoid
+            // recomputing a fixed nonresidue power on every split attempt.
+            const CUBED_NONRESIDUE: u64 = 172_252_358;
             let q = (self.p - 1) / 8;
-            let mut c = self.split_scalar_pow(11, q)?;
-            let mut t = self.split_scalar_pow(discriminant, q)?;
-            let mut r = self.split_scalar_pow(discriminant, (q + 1) / 2)?;
+            let mut c = CUBED_NONRESIDUE;
+            // Obtain d^q and d^((q+1)/2) with a shared square ladder.
+            // Separate binary powers square the same base twice at each bit.
+            let mut t = 1u64;
+            let mut r = 1u64;
+            let mut base = discriminant;
+            let mut exp_t = q;
+            let mut exp_r = (q + 1) / 2;
+            while exp_t != 0 || exp_r != 0 {
+                if exp_t & 1 != 0 {
+                    t = self.mul(t, base)?;
+                }
+                if exp_r & 1 != 0 {
+                    r = self.mul(r, base)?;
+                }
+                exp_t >>= 1;
+                exp_r >>= 1;
+                if exp_t != 0 || exp_r != 0 {
+                    base = self.mul(base, base)?;
+                }
+            }
+            // R48_TONELLI_PRODUCER_END
             let mut m = 3usize;
             while t != 1 {
                 let mut v = t;
@@ -1545,10 +1569,31 @@ impl Replay {
             value
         } else {
             debug_assert_eq!(self.p, 1_000_000_009);
+            // R48_TONELLI_REPLAY_BEGIN
+            // The independently implemented verifier uses its own field
+            // operations and a bit-indexed, low-to-high shared ladder.
+            // The fixed nonresidue power is checked against a wide oracle
+            // in the round-48 regression test.
             let odd = (self.p - 1) >> 3;
-            let mut root = self.split_character_power(discriminant, (odd + 1) / 2)?;
-            let mut residue = self.split_character_power(discriminant, odd)?;
-            let mut nonresidue = self.split_character_power(11, odd)?;
+            let root_exponent = (odd + 1) / 2;
+            let mut root = 1u64;
+            let mut residue = 1u64;
+            let mut factor = discriminant;
+            let bits = 64 - odd.leading_zeros();
+            for bit in 0..bits {
+                let mask = 1u64 << bit;
+                if odd & mask != 0 {
+                    residue = self.times(residue, factor)?;
+                }
+                if root_exponent & mask != 0 {
+                    root = self.times(root, factor)?;
+                }
+                if bit + 1 < bits {
+                    factor = self.times(factor, factor)?;
+                }
+            }
+            let mut nonresidue = 172_252_358u64;
+            // R48_TONELLI_REPLAY_END
             let mut order = 3u32;
             while residue != 1 {
                 let mut order_test = residue;
@@ -2052,6 +2097,46 @@ mod tests {
         }
     }
 
+    #[test]
+    fn round48_joint_tonelli_nonresidue_and_certificate_cases() {
+        let p = 1_000_000_009u64;
+        let q = (p - 1) / 8;
+        // Oracle intentionally uses a plain u128 remainder, not the
+        // producer or verifier's field multiplication implementations.
+        let mut power = q;
+        let mut base = 11u128;
+        let mut value = 1u128;
+        while power != 0 {
+            if power & 1 != 0 {
+                value = value * base % p as u128;
+            }
+            power >>= 1;
+            if power != 0 {
+                base = base * base % p as u128;
+            }
+        }
+        assert_eq!(value as u64, 172_252_358);
+        assert_eq!(value.pow(4) % p as u128, p as u128 - 1);
+        assert_eq!(value.pow(8) % p as u128, 1);
+
+        let mut comparisons = 0;
+        for (r0, r1) in [
+            (0, 1), (1, 2), (2, 7), (17, 31), (31, 997),
+            (101, 103), (1_000, 20_000), (p - 3, p - 1),
+        ] {
+            for leading in [1u64, p - 2] {
+                let f = polynomial(&[r0, r1], p, leading);
+                let (report, events) = run(&f, p, budget());
+                assert_eq!(report.stop, Stop::Complete, "p={p} roots=({r0},{r1})");
+                let mut expected = [r0, r1];
+                expected.sort_unstable();
+                assert_eq!(&report.roots[..report.root_count as usize], &expected);
+                assert!(check(&f, &report, &events).unwrap().finite_complete);
+                comparisons += 1;
+            }
+        }
+        assert_eq!(comparisons, 16);
+    }
     #[test]
     fn round47_quadratic_sqrt_congruence_classes_and_replay() {
         for p in [1_000_000_009u64, 1_000_000_021, 1_000_000_007] {
