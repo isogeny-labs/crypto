@@ -304,4 +304,5 @@ pub(crate) mod tests {
 
 /// The example is a test harness (`cargo test --example jv_sieve_quadratic_pair_relation_controls`);
 /// an empty `main` lets `cargo check --all-targets` build it.
+#[allow(dead_code)] // built as crate-type = ["lib"] (Cargo.toml); main is never called
 fn main() {}
