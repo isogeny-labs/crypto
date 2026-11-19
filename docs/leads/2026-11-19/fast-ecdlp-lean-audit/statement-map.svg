@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" font-family="Helvetica,Arial,sans-serif">
+<defs><marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#555"/></marker></defs>
+<rect width="960" height="540" fill="white"/>
+<text x="480.0" y="34" text-anchor="middle" font-size="16" font-weight="bold">Kaarelson v2 Lean statement-fidelity audit: the decomposition oracle (Theorem 2(ii))</text>
+<text x="480.0" y="53" text-anchor="middle" font-size="11" fill="#444">statement-level audit of kaarelkaarelson/fast-ecdlp@d1deb5ab; build not run</text>
+<path d="M280,116 C315,116 315,105 342,105" fill="none" stroke="#555" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M280,116 C155,116 155,248 22,248" fill="none" stroke="#555" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M580,105 C465,105 465,223 342,223" fill="none" stroke="#555" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M580,223 C465,223 465,335 342,335" fill="none" stroke="#555" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M580,105 C610,105 610,108 632,108" fill="none" stroke="#555" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M580,223 C610,223 610,215 632,215" fill="none" stroke="#555" stroke-width="1.4" marker-end="url(#a)"/>
+<path d="M580,335 C610,335 610,322 632,322" fill="none" stroke="#555" stroke-width="1.4" marker-end="url(#a)"/>
+<rect x="30" y="70" width="250" height="92" rx="7" fill="#e3f3e8" stroke="#2a9d55" stroke-width="2"/>
+<text x="39" y="88" font-size="11" font-weight="bold" fill="#222">Challenge.lean : subexponentialRate m</text>
+<text x="39" y="103" font-size="9" fill="#444">exists M : TM2ComputableInTime</text>
+<text x="39" y="116" font-size="9" fill="#444"> enc encOut (lexLeast m), finite Gamma,</text>
+<text x="39" y="128" font-size="9" fill="#444"> time &lt;= C_k * 2^(l/k) for all k&gt;=1</text>
+<text x="39" y="140" font-size="9" fill="#444">= 2^o(l) = p^o(1). sorry (challenge).</text>
+<rect x="30" y="196" width="250" height="104" rx="7" fill="#fbf1d8" stroke="#caa43a" stroke-width="2"/>
+<text x="39" y="214" font-size="11" font-weight="bold" fill="#222">lexLeast m / strings m (the function)</text>
+<text x="39" y="229" font-size="9" fill="#444">curve membership type-enforced;</text>
+<text x="39" y="242" font-size="9" fill="#444"> p prime, Delta != 0 gated; no vacuity.</text>
+<text x="39" y="254" font-size="9" fill="#444"> (2) factor base x &lt; ceil(p^1/m), incl 0</text>
+<text x="39" y="266" font-size="9" fill="#444">   (paper uses [1, floor(p^1/m)]).</text>
+<text x="39" y="279" font-size="9" fill="#444"> (3) genericity vs Definition 3.1: verify.</text>
+<rect x="350" y="70" width="230" height="70" rx="7" fill="#e3f3e8" stroke="#2a9d55" stroke-width="2"/>
+<text x="359" y="88" font-size="11" font-weight="bold" fill="#222">Solution.lean : subexponentialRate_all</text>
+<text x="359" y="103" font-size="9" fill="#444">ECDLP.L104R.subexponentialRate_all</text>
+<text x="359" y="116" font-size="9" fill="#444"> (the proof term)</text>
+<rect x="350" y="182" width="230" height="82" rx="7" fill="#e3eefa" stroke="#4b8fd1" stroke-width="2"/>
+<text x="359" y="200" font-size="11" font-weight="bold" fill="#222">Verify.lean</text>
+<text x="359" y="215" font-size="9" fill="#444">example : forall m, type_of%(subexp m)</text>
+<text x="359" y="228" font-size="9" fill="#444">   := subexponentialRate_all</text>
+<text x="359" y="240" font-size="9" fill="#444"> #print axioms over the full set</text>
+<rect x="350" y="300" width="230" height="70" rx="7" fill="#fbf1d8" stroke="#caa43a" stroke-width="2"/>
+<text x="359" y="318" font-size="11" font-weight="bold" fill="#222">Comparator (comparator.json)</text>
+<text x="359" y="333" font-size="9" fill="#444">(4) real Challenge&lt;-&gt;Solution identity</text>
+<text x="359" y="346" font-size="9" fill="#444"> guarantee; 2nd kernel &#x27;nanoda&#x27;.</text>
+<text x="359" y="358" font-size="9" fill="#444"> Not run here.</text>
+<rect x="640" y="70" width="290" height="76" rx="7" fill="#ededed" stroke="#8a8a8a" stroke-width="2" stroke-dasharray="5,3"/>
+<text x="649" y="88" font-size="11" font-weight="bold" fill="#222">Vendored engine + Mathlib</text>
+<text x="649" y="103" font-size="9" fill="#444">lean/vendor/rudich-factoring/ (Rudich-</text>
+<text x="649" y="116" font-size="9" fill="#444"> Rousseau, unrefereed) + Mathlib v4.35.0.</text>
+<text x="649" y="128" font-size="9" fill="#444"> (d) independent review open.</text>
+<rect x="640" y="182" width="290" height="66" rx="7" fill="#ededed" stroke="#8a8a8a" stroke-width="2" stroke-dasharray="5,3"/>
+<text x="649" y="200" font-size="11" font-weight="bold" fill="#222">#print axioms result</text>
+<text x="649" y="215" font-size="9" fill="#444">[propext, Classical.choice, Quot.sound]</text>
+<text x="649" y="228" font-size="9" fill="#444"> (5) needs ~12 min / ~10 GB build to</text>
+<text x="649" y="240" font-size="9" fill="#444"> confirm; not run here.</text>
+<rect x="640" y="286" width="290" height="72" rx="7" fill="#ededed" stroke="#8a8a8a" stroke-width="2" stroke-dasharray="5,3"/>
+<text x="649" y="304" font-size="11" font-weight="bold" fill="#222">lake build / lake env lean Verify.lean</text>
+<text x="649" y="319" font-size="9" fill="#444">one sorry (challenge only), clean axioms.</text>
+<text x="649" y="332" font-size="9" fill="#444"> Build NOT run in this runtime.</text>
+<rect x="30" y="396" width="900" height="118" rx="6" fill="#fbfbfb" stroke="#ccc"/>
+<rect x="44" y="410" width="12" height="11" rx="2" fill="#e3f3e8" stroke="#2a9d55" stroke-width="1.5"/>
+<text x="62" y="420" font-size="9.5" fill="#333">statement found faithful / standard</text>
+<rect x="44" y="426" width="12" height="11" rx="2" fill="#fbf1d8" stroke="#caa43a" stroke-width="1.5"/>
+<text x="62" y="436" font-size="9.5" fill="#333">item to verify</text>
+<rect x="44" y="442" width="12" height="11" rx="2" fill="#e3eefa" stroke="#4b8fd1" stroke-width="1.5"/>
+<text x="62" y="452" font-size="9.5" fill="#333">audit mechanism</text>
+<rect x="44" y="458" width="12" height="11" rx="2" fill="#ededed" stroke="#8a8a8a" stroke-width="1.5"/>
+<text x="62" y="468" font-size="9.5" fill="#333">unrefereed, or not run in this runtime</text>
+<text x="360" y="420" font-size="10.5" font-weight="bold" fill="#1a3a5a">Verdict (statement level):</text>
+<text x="360" y="438" font-size="9.5" fill="#333">The oracle statement is a faithful, non-vacuous formalization of the paper&#x27;s search:</text>
+<text x="360" y="454" font-size="9.5" fill="#333">M is bound to compute lexLeast m; curve membership type-enforced; time is 2^o(l)=p^o(1).</text>
+<text x="360" y="470" font-size="9.5" fill="#333">Open to close the audit: (2) factor-base set, (3) genericity = Def 3.1, (4) Comparator</text>
+<text x="360" y="486" font-size="9.5" fill="#333">anti-circularity, (5) build for the sorry/axiom result, (d) the vendored engine.</text>
+</svg>
