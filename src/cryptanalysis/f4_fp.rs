@@ -690,7 +690,10 @@ pub enum DomainRootMode {
 /// element and each term, square-and-multiply `x^e` and one coefficient
 /// product.  Exact for the scan below.
 pub fn domain_scan_cost(exponents: &[u32], domain_len: usize) -> u64 {
-    let per_point: u64 = exponents.iter().map(|&e| powmod_muls(u64::from(e)) + 1).sum();
+    let per_point: u64 = exponents
+        .iter()
+        .map(|&e| powmod_muls(u64::from(e)) + 1)
+        .sum();
     per_point.saturating_mul(domain_len as u64)
 }
 
@@ -6886,9 +6889,7 @@ where
                 self.report.domain_frobenius_univariates += 1;
                 let Some(roots) = domain_roots_frobenius(
                     &coefficients,
-                    self.domain_index[original]
-                        .as_ref()
-                        .expect("built above"),
+                    self.domain_index[original].as_ref().expect("built above"),
                     self.p,
                     &mut self.report.domain_root_field_multiplications,
                     self.opts.deadline,
@@ -9833,7 +9834,19 @@ mod domain_root_tests {
     #[test]
     fn frobenius_extraction_returns_the_scans_roots_in_domain_order() {
         let mut rng = StdRng::seed_from_u64(0x0F4D_0A1B);
-        let primes = [2u64, 3, 5, 7, 13, 101, 1009, 65_521, 1_000_003, 2_147_483_647, 4_294_967_291];
+        let primes = [
+            2u64,
+            3,
+            5,
+            7,
+            13,
+            101,
+            1009,
+            65_521,
+            1_000_003,
+            2_147_483_647,
+            4_294_967_291,
+        ];
         let mut cases = 0usize;
         for &p in &primes {
             for _ in 0..60 {
@@ -9845,8 +9858,16 @@ mod domain_root_tests {
                     planted.push(planted[0]);
                 }
                 let f = random_univariate(&mut rng, p, &planted);
-                let inside: Vec<u64> = planted.iter().copied().filter(|_| rng.gen_bool(0.6)).collect();
-                let size = if p <= 13 { rng.gen_range(0..=p as usize) } else { rng.gen_range(0..=200usize) };
+                let inside: Vec<u64> = planted
+                    .iter()
+                    .copied()
+                    .filter(|_| rng.gen_bool(0.6))
+                    .collect();
+                let size = if p <= 13 {
+                    rng.gen_range(0..=p as usize)
+                } else {
+                    rng.gen_range(0..=200usize)
+                };
                 let domain = random_domain(&mut rng, p, size, &inside);
                 check(&f, &domain, p);
                 cases += 1;
@@ -9903,9 +9924,9 @@ mod domain_root_tests {
             monomials.push(e);
         }
         let eval = |e: &[u32], x: &[u64]| {
-            e.iter()
-                .zip(x)
-                .fold(1u64, |v, (&k, &xi)| mulmod(v, powmod(xi, u64::from(k), p), p))
+            e.iter().zip(x).fold(1u64, |v, (&k, &xi)| {
+                mulmod(v, powmod(xi, u64::from(k), p), p)
+            })
         };
         // Each equation is a random combination of monomials, with the constant
         // chosen to vanish at the first planted point, times nothing else: the
@@ -9914,7 +9935,11 @@ mod domain_root_tests {
         let mut system = Vec::new();
         for _ in 0..n {
             let coeffs: Vec<u64> = monomials.iter().map(|_| rng.gen_range(0..p)).collect();
-            let mut terms: Vec<(Vec<u32>, u64)> = monomials.iter().cloned().zip(coeffs.iter().copied()).collect();
+            let mut terms: Vec<(Vec<u32>, u64)> = monomials
+                .iter()
+                .cloned()
+                .zip(coeffs.iter().copied())
+                .collect();
             let at = |x: &[u64]| {
                 terms
                     .iter()
@@ -9991,8 +10016,18 @@ mod domain_root_tests {
                     assert_eq!(s1, s0, "solutions differ, round {round}, {mode:?}");
                     assert_eq!(b1, b0, "branch sequence differs, round {round}, {mode:?}");
                     assert_eq!(
-                        (r1.complete, r1.stopped_early, r1.timed_out, r1.solutions_visited),
-                        (r0.complete, r0.stopped_early, r0.timed_out, r0.solutions_visited)
+                        (
+                            r1.complete,
+                            r1.stopped_early,
+                            r1.timed_out,
+                            r1.solutions_visited
+                        ),
+                        (
+                            r0.complete,
+                            r0.stopped_early,
+                            r0.timed_out,
+                            r0.solutions_visited
+                        )
                     );
                     // `field_ops` is a delta of the process-wide counter (unless
                     // `F4_FP_THREAD_OPS=1`), so tests running in parallel leak into
@@ -10011,7 +10046,10 @@ mod domain_root_tests {
                 assert_eq!(r0.domain_frobenius_univariates, 0);
             }
         }
-        assert!(with_frobenius > 20, "only {with_frobenius} domain univariates exercised");
+        assert!(
+            with_frobenius > 20,
+            "only {with_frobenius} domain univariates exercised"
+        );
     }
 
     #[test]
@@ -10022,8 +10060,14 @@ mod domain_root_tests {
             "domain_root_field_multiplications",
             "domain_index_entries",
         ] {
-            assert!(json.get(key).is_none(), "{key} serialised under the default");
+            assert!(
+                json.get(key).is_none(),
+                "{key} serialised under the default"
+            );
         }
-        assert_eq!(F4Options::new(Ordering::Grevlex, 4).domain_roots, DomainRootMode::Scan);
+        assert_eq!(
+            F4Options::new(Ordering::Grevlex, 4).domain_roots,
+            DomainRootMode::Scan
+        );
     }
 }

@@ -122,7 +122,11 @@ struct Curve {
 impl Curve {
     fn rhs(&self, x: u64) -> u64 {
         let p = self.p;
-        addm(addm(mulm(mulm(x, x, p), x, p), mulm(self.a, x, p), p), self.b, p)
+        addm(
+            addm(mulm(mulm(x, x, p), x, p), mulm(self.a, x, p), p),
+            self.b,
+            p,
+        )
     }
     fn lift(&self, x: u64) -> Option<Pt> {
         let r = self.rhs(x);
@@ -139,7 +143,11 @@ impl Curve {
         }
         let lam = if s.x == t.x {
             if addm(s.y, t.y, p) == 0 {
-                return Pt { x: 0, y: 0, inf: true };
+                return Pt {
+                    x: 0,
+                    y: 0,
+                    inf: true,
+                };
             }
             let num = addm(mulm(3, mulm(s.x, s.x, p), p), self.a, p);
             mulm(num, inv(mulm(2, s.y, p), p), p)
@@ -195,7 +203,13 @@ struct Row {
     seconds: f64,
 }
 
-fn run(system: &[Poly], n: usize, p: u64, domains: &[Option<Vec<u64>>], mode: DomainRootMode) -> Row {
+fn run(
+    system: &[Poly],
+    n: usize,
+    p: u64,
+    domains: &[Option<Vec<u64>>],
+    mode: DomainRootMode,
+) -> Row {
     let opts = F4Options::new(Ordering::Grevlex, 12).with_domain_roots(mode);
     let mut solutions = Vec::new();
     let t = Instant::now();
@@ -238,12 +252,27 @@ fn main() {
     ];
     println!(
         "{:>2} {:>4} {:>6} {:>4} | {:>14} {:>14} {:>7} | {:>14} {:>9} | {:>9} {:>9} {:>7} | {}",
-        "m", "bits", "|D|", "tgt", "root mul scan", "root mul frob", "ratio",
-        "F4 field_ops", "F4 share", "wall scan", "wall frob", "ratio", "auto/scan wall"
+        "m",
+        "bits",
+        "|D|",
+        "tgt",
+        "root mul scan",
+        "root mul frob",
+        "ratio",
+        "F4 field_ops",
+        "F4 share",
+        "wall scan",
+        "wall frob",
+        "ratio",
+        "auto/scan wall"
     );
     for &(m, bits, size, targets) in configs {
         let p = prime_below(bits);
-        let curve = Curve { p, a: p - 3, b: 0x5a5a_1234 % p };
+        let curve = Curve {
+            p,
+            a: p - 3,
+            b: 0x5a5a_1234 % p,
+        };
         let base: Vec<Pt> = (1..p).filter_map(|x| curve.lift(x)).take(size).collect();
         let domain: Vec<u64> = base.iter().map(|q| q.x).collect();
         let n = if m == 2 { 2 } else { 4 };
@@ -263,7 +292,11 @@ fn main() {
         for t in 0..targets {
             let planted = t % 2 == 0;
             let target_x = if planted {
-                let mut r = Pt { x: 0, y: 0, inf: true };
+                let mut r = Pt {
+                    x: 0,
+                    y: 0,
+                    inf: true,
+                };
                 for _ in 0..m {
                     r = curve.add(r, base[next(size as u64) as usize]);
                 }
