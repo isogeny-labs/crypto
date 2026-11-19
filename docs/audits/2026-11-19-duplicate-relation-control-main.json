@@ -1,0 +1,26 @@
+{
+  "schema": "engineering.correctness-repair/v1",
+  "claim_status": "pcc:unverified",
+  "baseline_commit": "8658cc8f815ea3b4f61d5ab176307ebb80f92c7b",
+  "path": "examples/jv_sieve_quadratic_pair_relation_controls.rs",
+  "baseline_sha256": "0f3292e9b71643154797318c6ed4d7918875dd5a91204c18e01aacdfca485dd5",
+  "candidate_sha256": "db12c98a3155684dd4381fbd00deb3fc40ad86e0e7c16a81edf5f77faface39a",
+  "defect": "Duplicate identical empty main functions cause E0428 in all-targets check and Clippy",
+  "change": "Remove only the trailing redundant empty entry point and its two explanatory comments",
+  "source_review": [
+    "https://doc.rust-lang.org/error_codes/E0428.html",
+    "examples/jv_sieve_quadratic_pair_relation_controls.rs"
+  ],
+  "controls": {
+    "unit_test_definitions_before": 6,
+    "unit_test_definitions_after": 6,
+    "entire_remaining_file_is_exact_original_prefix": true,
+    "frozen_artifacts_changed": false
+  },
+  "baseline_ci": [
+    44605722325,
+    44605719947
+  ],
+  "candidate_ci": "pending",
+  "performance_measurement": "none; compile repair only"
+}
