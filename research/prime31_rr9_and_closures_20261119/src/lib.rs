@@ -362,6 +362,7 @@ pub use f4_fp_host::f4_fp;
 pub mod plane_quartic_pic;
 
 pub mod cover_and_deuring;
+pub mod p2_6_suite;
 pub mod prime31_field;
 pub mod rr9_remainder_tower;
 pub mod rr9_wiedemann;

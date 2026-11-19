@@ -1084,7 +1084,11 @@ pub fn solve_4var_sparse_wiedemann(
     // If `kernel_basis` was non-empty (singular `A`) and `l < cols` indicates higher corank `d = cols - l`
     // (or `solutions.is_empty()` because `dim ker(M) > 1`), sample up to `corank_est` additional RHS vectors
     // with the ALREADY COMPUTED minimal polynomial `c_bm` (no extra BM run needed!).
-    let corank_est = cols.saturating_sub(l);
+    let corank_est = if last == 0 {
+        cols.saturating_sub(l) + 1
+    } else {
+        0
+    };
     if last == 0 && (solutions.is_empty() || corank_est > 1) {
         let max_extra = corank_est.clamp(2, 6);
         let mut rref_ker: Vec<(usize, Vec<u64>)> = Vec::new();

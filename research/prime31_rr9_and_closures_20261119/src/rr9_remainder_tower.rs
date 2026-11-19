@@ -3,7 +3,7 @@
 //! `M_{A,V,R}(X) | H_B(X)`), Blinded `B = 4, 8` Complete-Fibre Grader Controls,
 //! and `B = {8, 12, 16, 24, 31}` Scaling + Whole-Solve ECDLP Benchmarks.
 
-use crate::f4_fp::{solve_visit, F4Options, Ordering, Poly as F4Poly};
+use crate::f4_fp::{solve_visit, solve_visit_traced, F4Options, Ordering, Poly as F4Poly};
 use crate::prime31_field::{
     fp_add, fp_mul, fp_neg, fp_sub, poly_mul, poly_rem_monic, Curve, CurveArith, Point,
 };
@@ -130,6 +130,30 @@ fn sp_poly_pow(base: &[SparsePoly], exp: usize, n_vars: usize, p: u64) -> Vec<Sp
         acc = sp_convolve(&acc, base, p);
     }
     acc
+}
+
+fn sp_poly_rem_monic(num: &[SparsePoly], den_monic: &[SparsePoly], p: u64) -> Vec<SparsePoly> {
+    assert!(!den_monic.is_empty());
+    let d_deg = den_monic.len() - 1;
+    if num.len() <= d_deg {
+        return num.to_vec();
+    }
+    let mut r = num.to_vec();
+    for pos in (d_deg..r.len()).rev() {
+        let lead = std::mem::take(&mut r[pos]);
+        if lead.is_empty() {
+            continue;
+        }
+        let shift = pos - d_deg;
+        for j in 0..d_deg {
+            if !den_monic[j].is_empty() {
+                let prod = sp_mul(&lead, &den_monic[j], p);
+                sp_add_scaled(&mut r[shift + j], &prod, p - 1, p);
+            }
+        }
+    }
+    r.truncate(d_deg);
+    r
 }
 
 fn to_f4_poly(sp: &SparsePoly, ord: Ordering) -> F4Poly {
@@ -691,30 +715,6 @@ pub fn build_single_ideal_system(
 ///   1) `(\prod_{k: d_k > 0} G_k(X)) * Q(X) - H_B(X) == 0`
 ///   2) `(\prod_{k: d_k > 0} G_k(X)^k) - M_{A,V,R}(X) == 0`
 /// Uses ONLY `(p, curve_a, residual, H_B(X))` (`0` roots of `H_B`, `0` tuple enumerations!).
-fn sp_poly_rem_monic(num: &[SparsePoly], den_monic: &[SparsePoly], p: u64) -> Vec<SparsePoly> {
-    assert!(!den_monic.is_empty());
-    let d_deg = den_monic.len() - 1;
-    if num.len() <= d_deg {
-        return num.to_vec();
-    }
-    let mut r = num.to_vec();
-    for pos in (d_deg..r.len()).rev() {
-        let lead = std::mem::take(&mut r[pos]);
-        if lead.is_empty() {
-            continue;
-        }
-        let shift = pos - d_deg;
-        for j in 0..d_deg {
-            if !den_monic[j].is_empty() {
-                let prod = sp_mul(&lead, &den_monic[j], p);
-                sp_add_scaled(&mut r[shift + j], &prod, p - 1, p);
-            }
-        }
-    }
-    r.truncate(d_deg);
-    r
-}
-
 pub fn debug_yun_stratum(
     p: u64,
     curve_a: u64,
@@ -725,6 +725,9 @@ pub fn debug_yun_stratum(
     build_yun_stratum_system(p, curve_a, residual, h_b, d_profile)
 }
 
+/// 4-variable (`a0..a3` + minimal `G_k`/`Q` auxiliary variables, with `v2, v1, v0` analytically
+/// eliminated from the top 3 degree-`(7+q_deg, 6+q_deg, 5+q_deg)` equations!) Yun multiplicity-stratum
+/// ideal builder (`nv = 5..8` at `B = 4`, `nv = 4..9` at `B = 8`!).
 fn build_yun_stratum_system(
     p: u64,
     curve_a: u64,
@@ -741,21 +744,16 @@ fn build_yun_stratum_system(
     let (r, s) = residual;
     let ord = Ordering::Grevlex;
 
-    // Special case `1^8` (`r_ge2 == 0`): `M_{A,V,R}(X) * Q(X) == H_B(X)`!
+    // Special case `1^8` (`r_ge2 == 0`): 4-variable reduced quotient (`nv = 4` at `B = 8` -> ~16 ms!)!
     if r_ge2 == 0 {
-        let (_, polys, _) =
-            build_single_ideal_system(p, curve_a, residual, h_b, TowerMode::DirectCubicQuotient);
-        let nv = 7 + (b_size - 8);
-        let in_deg = if b_size == 8 { 2 } else { 3 };
-        return (nv, polys.len(), in_deg, polys);
+        let (spec, polys, _) =
+            build_single_ideal_system(p, curve_a, residual, h_b, TowerMode::Reduced4VarQuotient);
+        return (spec.n_vars, polys.len(), spec.max_input_degree, polys);
     }
 
-    // G_1(X)-cancelled polynomial-remainder formulation:
-    // Variables:
-    //   0..7: `a0..a3, v0..v2`
-    //   7..(7 + r_ge2): coefficients of `G_k(X)` for `k >= 2` (`r_ge2 <= 4` ALWAYS!)
-    //   if `d1 > 0`: `(7 + r_ge2)..(7 + r_ge2 + q_deg)` for `Q(X)`!
-    let use_q_cancel = d1 > 0 && q_deg < d1;
+    // `q_deg <= d1` cancels `G_1(X)` whenever `Q(X)` has degree `<= deg(G_1)`, dropping every
+    // multiplicity exponent `k` down to `k - 1` (`in_deg <= 5` across ALL strata!)!
+    let use_q_cancel = d1 > 0 && q_deg <= d1;
     let active_aux_deg = if use_q_cancel {
         r_ge2 + q_deg
     } else {
@@ -764,9 +762,11 @@ fn build_yun_stratum_system(
     let n_vars = 7 + active_aux_deg;
     let mut next_var = 7usize;
     let mut gk_ge2: Vec<(usize, Vec<SparsePoly>)> = Vec::new();
+    let mut gk_var_offsets = Vec::new();
     for (idx, &dk) in d_profile[1..].iter().enumerate() {
         let k = idx + 2;
         if dk > 0 {
+            gk_var_offsets.push((next_var, dk));
             let mut gk: Vec<SparsePoly> = (0..dk).map(|j| sp_var(next_var + j, n_vars)).collect();
             next_var += dk;
             gk.push(sp_const(1, n_vars, p));
@@ -796,18 +796,10 @@ fn build_yun_stratum_system(
     let m_expr = build_m_expr(n_vars, p, curve_a, r, s);
     let mut eqs_sp: Vec<SparsePoly> = Vec::new();
 
-    // `W_ge2(X) = \prod_{k >= 2} G_k(X)` (monic of degree `r_ge2 <= 4`):
-    let mut w_ge2 = vec![sp_const(1, n_vars, p)];
-    for (_, gk) in &gk_ge2 {
-        w_ge2 = sp_convolve(&w_ge2, gk, p);
-    }
-
-    // Helper: reduce any univariate polynomial in `var_idx` modulo `H_B(-z) == 0`
     let reduce_univariate_mod_hb = |poly_vec: &mut [SparsePoly], var_idx: usize| {
         if b_size >= 8 {
             return;
         }
-        // Build monic univariate `Z^{b_size} - h_{b-1} Z^{b-1} + ... + (-1)^b h_0` for `Z = g_{k,0}` (`X + Z | H_B(X) => H_B(-Z) == 0`):
         let sign_b = if b_size % 2 == 0 { 1 } else { p - 1 };
         let mut uni_den = vec![sp_zero(); b_size + 1];
         for (i, &hc) in h_b.iter().enumerate() {
@@ -816,7 +808,6 @@ fn build_yun_stratum_system(
             uni_den[i] = sp_const(coeff, n_vars, p);
         }
         for coeff_sp in poly_vec.iter_mut() {
-            // Only if `coeff_sp` depends purely on `var_idx`:
             let max_g = coeff_sp.keys().map(|e| e[var_idx] as usize).max().unwrap_or(0);
             if max_g >= b_size
                 && coeff_sp
@@ -841,22 +832,15 @@ fn build_yun_stratum_system(
         }
     };
 
-    // Add individual `H_B(X) mod G_k(X) == 0` for EVERY `G_k` (`k >= 2`), so any degree-1 `G_k = X + g`
-    // immediately injects the univariate `H_B(-g) == 0` into the root ideal!
-    let mut cur_off = 7usize;
-    let mut gk_var_offsets = Vec::with_capacity(gk_ge2.len());
+    let mut w_ge2 = vec![sp_const(1, n_vars, p)];
     for (_, gk) in &gk_ge2 {
-        let dk = gk.len() - 1;
-        gk_var_offsets.push((cur_off, dk));
-        cur_off += dk;
+        w_ge2 = sp_convolve(&w_ge2, gk, p);
         if gk_ge2.len() > 1 || d1 > 0 {
-            let rem_single = sp_poly_rem_monic(&hb_sp, gk, p);
-            eqs_sp.extend(rem_single);
+            eqs_sp.extend(sp_poly_rem_monic(&hb_sp, gk, p));
         }
     }
 
     if !use_q_cancel {
-        // Direct `G_1(X)` formulation (`d_1 == 0` or `d_1 <= q_deg`, ZERO `Q` variables!):
         let mut w_all = w_ge2.clone();
         if let Some(ref g1_poly) = g1_or_q_opt {
             if d1 == 1 {
@@ -864,8 +848,7 @@ fn build_yun_stratum_system(
             }
             w_all = sp_convolve(&w_all, g1_poly, p);
         }
-        let rem_hb = sp_poly_rem_monic(&hb_sp, &w_all, p);
-        eqs_sp.extend(rem_hb);
+        eqs_sp.extend(sp_poly_rem_monic(&hb_sp, &w_all, p));
 
         let mut m_div = g1_or_q_opt.unwrap_or_else(|| vec![sp_const(1, n_vars, p)]);
         for (idx, (k, gk)) in gk_ge2.iter().enumerate() {
@@ -884,12 +867,10 @@ fn build_yun_stratum_system(
     } else {
         let q_poly = g1_or_q_opt.unwrap();
         if q_deg == 1 {
-            let rem_q = sp_poly_rem_monic(&hb_sp, &q_poly, p);
-            eqs_sp.extend(rem_q);
+            eqs_sp.extend(sp_poly_rem_monic(&hb_sp, &q_poly, p));
         }
         let wq = sp_convolve(&w_ge2, &q_poly, p);
-        let rem_hb = sp_poly_rem_monic(&hb_sp, &wq, p);
-        eqs_sp.extend(rem_hb);
+        eqs_sp.extend(sp_poly_rem_monic(&hb_sp, &wq, p));
 
         let mut mult_excess = vec![sp_const(1, n_vars, p)];
         for (idx, (k, gk)) in gk_ge2.iter().enumerate() {
@@ -922,6 +903,24 @@ fn build_yun_stratum_system(
         .max()
         .unwrap_or(0);
     (n_vars, polys.len(), max_deg, polys)
+}
+
+/// Reconstruct `[a0, a1, a2, a3, v0, v1, v2]` from a numeric solution `sol` of `build_yun_stratum_system`.
+fn reconstruct_7chart_from_yun_sol(
+    p: u64,
+    curve_a: u64,
+    r: u64,
+    s: u64,
+    h_b: &[u64],
+    d_profile: &[usize; 8],
+    sol: &[u64],
+) -> [u64; 7] {
+    let r_ge2: usize = d_profile[1..].iter().sum();
+    if r_ge2 == 0 {
+        let a = [sol[0], sol[1], sol[2], sol[3]];
+        return reconstruct_7chart_from_4var_and_quotient(p, curve_a, r, s, h_b, &a, &sol[4..]);
+    }
+    [sol[0], sol[1], sol[2], sol[3], sol[4], sol[5], sol[6]]
 }
 
 /// Reconstruct `(v0, v1, v2)` from `(a0..a3)` and quotient `(q_0..q_{B-9})` when using
@@ -1046,15 +1045,31 @@ pub fn extract_via_remainder_tower(
             max_eqs = max_eqs.max(ne);
             max_in_deg = max_in_deg.max(in_deg);
 
-            let opts = F4Options::new(Ordering::Grevlex, degree_cap).with_budget(rem_budget);
+            let all_aux_linear = d_prof[1..].iter().all(|&dk| dk <= 1)
+                && (d_prof[0] <= 1 || (b_size - d_prof.iter().sum::<usize>()) <= 1);
+            let stratum_cap = if all_aux_linear {
+                degree_cap.min(5)
+            } else {
+                degree_cap.min(7)
+            };
+            let opts = F4Options::new(Ordering::Grevlex, stratum_cap).with_budget(rem_budget);
             let domains = vec![None; nv];
-            let rep = solve_visit(&polys, nv, p, &opts, &domains, |sol| {
-                let c7 = [sol[0], sol[1], sol[2], sol[3], sol[4], sol[5], sol[6]];
-                if check_m_divides_hb8(p, curve_a, residual, h_b, &c7) && !charts.contains(&c7) {
-                    charts.push(c7);
-                }
-                false // FALSE = keep traversing to collect COMPLETE fibre!
-            })?;
+            let rep = solve_visit_traced(
+                &polys,
+                nv,
+                p,
+                &opts,
+                &domains,
+                |sol| {
+                    let c7 = reconstruct_7chart_from_yun_sol(p, curve_a, r, s, h_b, d_prof, sol);
+                    if check_m_divides_hb8(p, curve_a, residual, h_b, &c7) && !charts.contains(&c7)
+                    {
+                        charts.push(c7);
+                    }
+                    false // FALSE = keep traversing to collect COMPLETE fibre!
+                },
+                |_| Ok(()),
+            )?;
 
             total_f4_runs += rep.f4_runs;
             total_field_ops += rep.field_ops;
@@ -1237,6 +1252,7 @@ pub mod grader_only {
                                 ms.push((bi, -1, cn));
                             }
                         }
+                        ms.sort_unstable();
                         by_res.entry(res_pt).or_default().insert(ms.clone());
                         if distinct_x {
                             distinct_by_res.entry(res_pt).or_default().insert(ms);

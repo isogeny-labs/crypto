@@ -608,6 +608,14 @@ pub fn negation_pollard_rho(curve: Curve, q: Point, seed: u64) -> Result<RhoSolv
             ((x.wrapping_mul(0x517c_c1b7_2722_0a95) >> 59) as usize) % BRANCHES
         };
 
+        // Brent's 4-register cycle guard (0 extra curve ops, 100% stateless walk map `f`):
+        // catches any fruitless cycle on `E/{±1}` that contains no distinguished point in `< 2*L` steps!
+        let mut brent_power = 1u64;
+        let mut brent_lam = 0u64;
+        let mut brent_x = u64::MAX;
+        let mut brent_a = 0u64;
+        let mut brent_b = 0u64;
+
         while walk_steps < step_cap {
             let Some(((cx, cy), na, nb)) = canon_ab(cur, a, b) else {
                 if b % curve.n != 0 {
@@ -660,10 +668,43 @@ pub fn negation_pollard_rho(curve: Curve, q: Point, seed: u64) -> Result<RhoSolv
                 }
             }
 
-            // Stateless step function with stateless 1- and 2-cycle breaking on E/{±1}:
-            // step(P) = canon(P + M[branch(x(P))]), unless that returns to P in 1 step
-            // or x(next) < x(P) and canon(next + M[branch(x(next))]) returns to P (2-cycle),
-            // in which case step(P) = canon(2 * P). Depends purely on P!
+            if cx == brent_x {
+                if (brent_a, brent_b) != (na, nb) {
+                    let db = fp_sub(nb, brent_b, curve.n);
+                    if db != 0 {
+                        ar.counts.scalar_invs += 1;
+                        ar.counts.scalar_muls += 1;
+                        let da = fp_sub(brent_a, na, curve.n);
+                        let d = fp_mul(da, fp_inv(db, curve.n), curve.n);
+                        if ar.scalar(curve, d, Some(curve.g)) == q {
+                            return Ok(RhoSolveReceipt {
+                                scalar: d,
+                                verified: true,
+                                walk_steps,
+                                distinguished_points: dp_table.len(),
+                                restarts,
+                                counts: ar.counts,
+                                wall_ns: t0.elapsed().as_nanos(),
+                            });
+                        }
+                    }
+                }
+                restarts += 1;
+                continue 'outer;
+            }
+            if brent_lam == brent_power {
+                brent_x = cx;
+                brent_a = na;
+                brent_b = nb;
+                brent_power <<= 1;
+                brent_lam = 0;
+            }
+            brent_lam += 1;
+
+            // Stateless step function on `E / {±1}` with exact zero-lookahead Wiener-Zuccherato
+            // 1- and 2-cycle breaking (`x(P + M_idx) == x(P)` OR `y(P + M_idx) > p - y` AND
+            // `branch(x(P + M_idx)) == idx`, which detects `canon(canon(P + M_idx) + M_idx) == P`
+            // in 1 integer compare with 0 extra curve additions!):
             let idx = branch_of(cx);
             let canon_pt = Some((cx, cy));
             let raw_next = ar.add(curve, canon_pt, jumps_pt[idx]);
@@ -671,19 +712,7 @@ pub fn negation_pollard_rho(curve: Curve, q: Point, seed: u64) -> Result<RhoSolv
 
             let take_double = match raw_next {
                 None => false,
-                Some((nx, ny)) => {
-                    if nx == cx {
-                        true
-                    } else if nx < cx {
-                        let ncy = ny.min(curve.p - ny);
-                        let idx2 = branch_of(nx);
-                        let back = ar.add(curve, Some((nx, ncy)), jumps_pt[idx2]);
-                        walk_steps += 1;
-                        matches!(back, Some((bx, _)) if bx == cx)
-                    } else {
-                        false
-                    }
-                }
+                Some((nx, ny)) => nx == cx || (ny > curve.p - ny && branch_of(nx) == idx),
             };
 
             if take_double {
