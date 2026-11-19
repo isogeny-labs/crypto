@@ -15,3 +15,18 @@
 
 ## Errors (what went wrong, how it was handled)
 - No local Rust toolchain or GitHub DNS in container. Source-specific GitHub Actions must run the new Rust example; distinguish lack of local test from CI success.
+
+## 2026-11-19 12:27 UTC — What was done (commands, files, features)
+- Source-specific [GitHub Actions #44523406912](https://github.com/isogeny-labs/crypto/actions/runs/44523406912) PASSED on pinned original Prime31 Rust 1.100.0; 40/40 original lib tests, 3/3 focused tests, 1024 held-out targets, jq outcome gates and independently authored affine/BigInt verification of 24 collision certificates. Raw [artifact #14528827855](https://github.com/isogeny-labs/crypto/actions/runs/44523406912/artifacts/14528827855) JSON SHA256 `b3b7dc977584825082ea2b4f48c7f138dbc47244627ad8a9a4541e6d806d05d1`. Source/workflow commit `f9dbd02cd0352bc3c8a7540ddc43dc573cf180af`.
+- Frozen held-out paired 1024 public queries: old 772/1024 vs powers-of-two 902/1024 (676 both, 96 old-only, 226 candidate-only, 26 neither). Per-window old [195,194,189,194], new [228,223,229,222]. +130 matched hits / +12.6953 pp, descriptive paired exact p ~3.12e-13; **generic grading only**; no candidate algebraic extractor or complete solve.
+- Independent locally authored Python affine census confirmed W1 each half 65,496 unique sums and exactly 40 non-formal colliding words. All 40 left-half collision pairs share integer coefficient difference `[0,8,1,8,6,-2,0,-1]`; independent EC arithmetic verifies its six-point group relation vanishes on base x [12,14,16,18,19,26] in W1. Right-half weights are exactly 16× left, so the identical 40 fibers are mathematically forced by invertibility of [16] on the odd-order group.
+
+## Decisions made (and why)
+- Record held-out **grade-yield** improvement, not complete-solver advantage. Precise structural result suggests a reusable single four-slot sumset S, with eight-slot representation R=U+[16]V for U,V in S. This may suggest shared polynomials for #4692, but a degree-256 multiplication map may offset any gain.
+- Extend witness capture from first 12 to **all 40 per half** with independent replay, as a post-outcome validation amendment, preserving the first preregistered run as primary. No seed/outcome tuning.
+
+## Open threads (unfinished, pick up next time)
+- Commit exact-scale theorem, report and full certificate validation. Coordinate upstream #4692. Investigate collision-aware right weights [16,32,64,127] only on a separate prospectively frozen corpus, not the observed 1024 targets.
+
+## Errors (what went wrong, how it was handled)
+- No source-bound implementation failure; no local Rust. Tool-specific plain-text GitHub API source and CI log verification substituted for local build. [pcc:unverified].
