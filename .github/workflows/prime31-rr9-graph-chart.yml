@@ -27,12 +27,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
       - name: Checkout unchanged original Prime31 Rust arithmetic
         uses: actions/checkout@v4
         with:
           ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
           path: pinned
           persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
       - name: Install source-bound Rust toolchain
         run: rustup toolchain install 1.100.0 --profile minimal
       - name: Overlay only algebraic examples onto original arithmetic
