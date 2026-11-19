@@ -4,7 +4,7 @@
 It constructs and verifies the repository's two explicit cover families and
 runs checked Jacobian arithmetic only when the infinity configuration matches
 an implemented representation. It is not an index-calculus or key-recovery
-solver.
+solver. [pcc:unverified]
 
 The additive catalog/evidence schema is
 [`hyperelliptic-infrastructure.schema.json`](hyperelliptic-infrastructure.schema.json).
@@ -166,6 +166,7 @@ The supported constructors are deliberately separate:
 An unsuccessful bounded construction never proves that no cover exists.
 The `construct`, `verify`, and arithmetic `model` paths reject additional
 properties even when the required coefficients are otherwise valid.
+[pcc:unverified]
 
 ## Arithmetic request contract
 
@@ -223,7 +224,7 @@ The two curve selectors are intentionally not interchangeable.
 For `model`, the tool verifies the elliptic model, reconstructs its fixed
 cover, verifies the cover certificate, and then initializes the checked
 one-infinity binary Jacobian. This complete request returns the identity on
-the F2^7 catalog cover:
+the F2^7 catalog cover. [pcc:unverified]
 
 ```json
 {
@@ -323,6 +324,7 @@ replays its monic sextic cover, then initializes the distinct balanced
 two-infinity backend when the prime is proved by either the complete `u64`
 test or the strict Sorenson--Webster `psi_13` bound. It
 never applies the odd-degree one-infinity representation to that cover.
+[pcc:unverified]
 
 This complete model-derived F5 request returns the balanced identity for
 `v^2=u^6+1`, the cover of `y^2=x^3+1` under `(x,y)=(u^2,v)`:
@@ -377,6 +379,7 @@ extension fields. A normalized target therefore returns
 `unsupported_normalized_target_transfer_backend` before parsing a point or
 divisor as short-Weierstrass coordinates; source-Jacobian arithmetic on the
 verified normalized cover remains a separate supported operation.
+[pcc:unverified]
 
 Odd extension fields return structured `unsupported_extension_field`.
 All-passing prime moduli outside the strict proof bound return structured
@@ -400,7 +403,7 @@ has the narrower `p <= 4096` boundary, matching the bounded quadratic point
 counter: `Fp2Ctx` rechecks that `p` is an odd prime, constructs and validates
 a canonical nonzero quadratic nonresidue, and every element operation
 canonicalizes both coordinates before use. Forged public element fields
-therefore cannot bypass reduction.
+therefore cannot bypass reduction. [pcc:unverified]
 
 The exhaustive point counters are diagnostics, not general large-field
 algorithms:
@@ -527,7 +530,7 @@ The fixed fixture's Jacobian cardinality has a separate machine-readable
 exhaustively counts `6`, `104`, and `558` points over `GF(8)`, `GF(8^2)`, and
 `GF(8^3)`, reconstructs the genus-three zeta numerator
 `1-3T+24T^2-48T^3+192T^4-192T^5+512T^6`, and verifies
-`#Jac(H)(GF(8))=P(1)=486`:
+`#Jac(H)(GF(8))=P(1)=486`. [pcc:unverified]
 
 ```sh
 cargo run --locked --bin ecdlp-audit -- verify-fixed-f8-order \
@@ -652,9 +655,9 @@ successor `f24ebf0f59e6f55ae8ce5a651d3c25ee4dc42512` mirrors the exact
 strict-primality, balanced-arithmetic, and transfer sources from crypto
 producer `153ac585d3b1ece0ebb0d49312b13267f651c94b`. Its earlier receipt for the
 corpus-containing crypto revision `bb87d501aa763e7243f845d4f07c8a31b88435f1`
-is superseded by the clean corpus regeneration from producer
-`f402ccd4c657735e290f3a0a95b3a53024cba2cf`; the mirrored library source bytes
-did not change. Local mirror validation passed
+was superseded first by the historical `f402ccd4…` corpus and then by the
+current clean Rust 1.98 successor from producer `e0ae0fe5…`; the mirrored
+library source bytes did not change. Local mirror validation passed
 10 of 10 manifest-parity records, 1 of 1 primality test, 5 of 5 balanced
 tests, 6 of 6 transfer tests including the strict live 73-bit pilot, and 8 of
 8 parity tests; strict library Clippy and targeted `rustfmt` also passed. The
@@ -684,7 +687,7 @@ formalizes
 only the conditional group-theoretic injectivity step under an already-proved
 push-pull identity, exact finite subgroup cardinality, and coprimality. It does
 not construct the maps or certify catalog subgroup orders. A full Jacobian
-index-calculus solver remains a separate deliverable.
+index-calculus solver remains a separate deliverable. [pcc:unverified]
 
 The historical envelope records the prime F827 cover as an explicit
 construction while marking use of one-infinity arithmetic on its even sextic
@@ -813,14 +816,16 @@ caller-supplied metadata; a successful same-implementation replay is not an
 independent execution attestation or a claim of exact order where the record
 still says unknown.
 
-For the tracked 2026-11-18 corpus, `CORPUS_SHA256` is
-`8c61e842945bf1e9ad8dd3adf326c6c11e55bb97018659b2abf40a5b15256941`
-and `CORPUS_BYTES` is `500925`. It was regenerated from producer revision
-`f402ccd4c657735e290f3a0a95b3a53024cba2cf` with length-framed producer-source
+For the tracked 2026-11-19 successor corpus, `CORPUS_SHA256` is
+`671425585e8f67e0596186fc574f2265938cd6465057d85ca1ae9844e47619cc`
+and `CORPUS_BYTES` is `500924`. It was regenerated from producer revision
+`e0ae0fe5d09c0492a8b50600e88d0b9da68afef1` with length-framed producer-source
 digest
-`04fc744060ec7a4c1ced6c36f9190422d886c593d29e4bd263f223db77f36c65`.
+`73afe2092d1c065c048c5c9aa566d0c0ab606f3291230392a70697898267b870`.
 That source frame includes the binary-module re-exports and the deterministic
 primality implementation and word-sized helper used by exact-order evidence.
+The earlier `f402ccd4…` / `8c61e842…` corpus remains historical evidence, not
+the current same-implementation replay target.
 
 For the 2026-11-18 graph, the expected bounded population is 174 binary map
 records, 147 maps with 150 named generator bindings, and 27 maps without a
