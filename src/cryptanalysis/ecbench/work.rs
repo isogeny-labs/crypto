@@ -113,9 +113,40 @@ pub struct WorkBlock {
 /// elimination are per target (an amortised method that solved the base's
 /// logarithms once would do better, and must be measured as such, as
 /// `ic.shared_rank` is).
+///
+/// Two IC methods do solve the base's logarithms before reading the
+/// target, so their database phases are reusable too (an accounting
+/// correction to the split; the total `S` over every phase is unchanged):
+///
+/// - `ic.koblitz_descent` and `ic.koblitz_descent_v2` (both run
+///   `koblitz_descent::pipeline`, `koblitz_descent.rs:444-605`):
+///   `factor_base`, `oracle_setup`, `relations`, `linear_algebra` and
+///   `descent_setup` take only the curve, the base, the seed and the
+///   parameters (the pair table's tier is sized for one target's probes,
+///   a count, not `Q`); `Q` is first read by `descent.solve_report(q)` in
+///   `descent` (`koblitz_descent.rs:603`) and again in `verify`
+///   (`koblitz_descent.rs:608-611`), which stay per target.
+/// - `ic.prime_orbit_relations_v1` (`prime_orbit.rs:136-155`): `relations`
+///   is `OrbitIcReport::precompute_ops`, the group operations of
+///   `solve_logs(c, &fb, opts)` (`prime_orbit_index_calculus.rs:2123`,
+///   called at `:2621` before any target is touched; the base is
+///   `OrbitFactorBase::select(c, orbits, seed)`), and
+///   `relation_postprocess` is that call's remaining wall time at zero
+///   gates; `target_descent` is `descend(c, &db, q, ..)` and stays per
+///   target.  The adapter runs with `learn: false`, so the descent does
+///   not extend the database.
 pub fn is_reusable_phase(method: &str, phase: &str) -> bool {
     if method == "ic.shared_rank" {
         return !phase.starts_with("target_");
+    }
+    if matches!(method, "ic.koblitz_descent" | "ic.koblitz_descent_v2") {
+        return matches!(
+            phase,
+            "factor_base" | "oracle_setup" | "relations" | "linear_algebra" | "descent_setup"
+        );
+    }
+    if method == "ic.prime_orbit_relations_v1" {
+        return matches!(phase, "relations" | "relation_postprocess");
     }
     if matches!(method, "rho.plain" | "rho.negation" | "kangaroo.vow") {
         return false;
@@ -2573,6 +2604,95 @@ mod tests {
         assert!(is_reusable_phase("ic.pipeline", "factor_base"));
         assert!(is_reusable_phase("ic.pipeline", "oracle_setup"));
         assert!(!is_reusable_phase("ic.pipeline", "relations"));
+    }
+
+    /// Price `phases` (name, adds) for `method` on a fixed curve.
+    fn priced(method: &str, phases: &[(&str, u64)]) -> WorkBlock {
+        let c = curve("prime", 20, (1 << 19) + 21, 2);
+        let phases: Vec<PhaseRecord> = phases
+            .iter()
+            .map(|&(name, adds)| PhaseRecord {
+                name: name.into(),
+                adds,
+                gae: adds as f64,
+                ..Default::default()
+            })
+            .collect();
+        price(&Priceable {
+            method_id: method,
+            method_params: &BTreeMap::new(),
+            curve: &c,
+            phases: &phases,
+            counters: &BTreeMap::new(),
+            solver: None,
+        })
+        .unwrap()
+    }
+
+    #[test]
+    fn database_phases_of_target_blind_ic_methods_are_reusable() {
+        // Accounting correction: the same phases priced under the generic
+        // IC rule (`ic.pipeline`) and under the method's own rule give the
+        // same total S; only the reusable/per-target split moves, by
+        // exactly the phases that never read the target.
+        let koblitz = [
+            ("factor_base", 11),
+            ("oracle_setup", 13),
+            ("relations", 1000),
+            ("linear_algebra", 70),
+            ("descent_setup", 17),
+            ("descent", 300),
+            ("verify", 19),
+        ];
+        let orbit = [
+            ("relations", 2000),
+            ("relation_postprocess", 0),
+            ("target_descent", 500),
+        ];
+        let cases: [(&str, &[(&str, u64)], &[&str]); 3] = [
+            (
+                "ic.koblitz_descent",
+                &koblitz,
+                &["relations", "linear_algebra", "descent_setup"],
+            ),
+            (
+                "ic.koblitz_descent_v2",
+                &koblitz,
+                &["relations", "linear_algebra", "descent_setup"],
+            ),
+            (
+                "ic.prime_orbit_relations_v1",
+                &orbit,
+                &["relations", "relation_postprocess"],
+            ),
+        ];
+        for (method, phases, moved) in cases {
+            let old = priced("ic.pipeline", phases);
+            let new = priced(method, phases);
+            assert_eq!(new.bitops, old.bitops, "{method}: S must not change");
+            let gates = |w: &WorkBlock, n: &str| -> u128 {
+                w.phases
+                    .iter()
+                    .find(|p| p.name == n)
+                    .unwrap()
+                    .bitops
+                    .parse()
+                    .unwrap()
+            };
+            let delta: u128 = moved.iter().map(|n| gates(&new, n)).sum();
+            assert!(delta > 0, "{method}");
+            let r_old: u128 = old.reusable_bitops.parse().unwrap();
+            let r_new: u128 = new.reusable_bitops.parse().unwrap();
+            let p_old: u128 = old.per_target_bitops.parse().unwrap();
+            let p_new: u128 = new.per_target_bitops.parse().unwrap();
+            assert_eq!(r_new, r_old + delta, "{method}");
+            assert_eq!(p_new + delta, p_old, "{method}");
+            assert_eq!(target_split(method, &old).unwrap(), (r_new, p_new));
+            // Phases that read Q stay per target.
+            for p in ["descent", "verify", "target_descent"] {
+                assert!(!is_reusable_phase(method, p), "{method} {p}");
+            }
+        }
     }
 
     #[test]
