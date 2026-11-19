@@ -443,6 +443,39 @@ impl Producer<'_> {
         Ok(out)
     }
 
+    // R42_PRODUCER_HELPER_BEGIN
+    // For e=2^k-1, let U_k=b^(2^k-1).  Then
+    // U_(2m)=(U_m)^(2^m)*U_m and U_(2m+1)=U_(2m)^2*b.
+    // This removes most full polynomial multiplications for Mersenne exponents.
+    fn mersenne_bits_power(&mut self, base: &Poly17, bits: u32, monic: &Poly17) -> Result<Poly17> {
+        debug_assert!(bits > 0);
+        if bits == 1 {
+            return Ok(*base);
+        }
+        let half = bits / 2;
+        let lower = self.mersenne_bits_power(base, half, monic)?;
+        let mut shifted = lower;
+        for _ in 0..half {
+            self.gate.charge(4 * COPY_WORK)?;
+            let mut squared = self.square(&shifted)?;
+            self.reduce_monic(&mut squared, monic)?;
+            shifted = squared;
+        }
+        self.gate.charge(4 * COPY_WORK)?;
+        let mut combined = self.product(&shifted, &lower)?;
+        self.reduce_monic(&mut combined, monic)?;
+        if bits & 1 != 0 {
+            self.gate.charge(4 * COPY_WORK)?;
+            let mut squared = self.square(&combined)?;
+            self.reduce_monic(&mut squared, monic)?;
+            self.gate.charge(4 * COPY_WORK)?;
+            let mut extended = self.product(&squared, base)?;
+            self.reduce_monic(&mut extended, monic)?;
+            combined = extended;
+        }
+        Ok(combined)
+    }
+    // R42_PRODUCER_HELPER_END
     fn power(&mut self, base: &Poly17, mut exponent: u64, modulus: &Poly17) -> Result<Poly17> {
         self.gate.charge(6 * COPY_WORK)?;
         // Every polynomial reduces to zero modulo a nonzero constant;
@@ -461,6 +494,15 @@ impl Producer<'_> {
         }
         let mut b = *base;
         self.reduce_monic(&mut b, &monic)?;
+        // R42_PRODUCER_FASTPATH_BEGIN
+        // Both x^p and split's (x+delta)^((p-1)/2) have all-one
+        // exponents for p=2^61-1. Avoid 51-53 redundant poly products.
+        if self.p == (1u64 << 61) - 1
+            && (exponent == self.p || exponent == (self.p - 1) / 2)
+        {
+            return self.mersenne_bits_power(&b, 64 - exponent.leading_zeros(), &monic);
+        }
+        // R42_PRODUCER_FASTPATH_END
         // For 61-bit exponents, the extra first-bit state test was slower
         // than one identity multiply in local regression screening.
         if exponent > u32::MAX as u64 {
@@ -1009,6 +1051,44 @@ impl Replay {
         Ok(z)
     }
 
+    // R42_REPLAY_HELPER_BEGIN
+    // Independent iteration over the binary expansion of the bit count k.
+    // Keep diagonal squaring, descending cancellation and replay accounting.
+    fn repeated_mersenne_bits_power(
+        &mut self, base: &Poly17, bits: u32, monic: &Poly17,
+    ) -> Result<Poly17> {
+        debug_assert!(bits > 0);
+        let mut length = 1u32;
+        let mut acc = *base;
+        let top = 31 - bits.leading_zeros();
+        for bit in (0..top).rev() {
+            let previous = acc;
+            for _ in 0..length {
+                self.gate.charge(4 * COPY_WORK)?;
+                let mut square = self.square_diagonals(&acc)?;
+                self.cancel_monic(&mut square, monic)?;
+                acc = square;
+            }
+            self.gate.charge(4 * COPY_WORK)?;
+            let mut product = self.convolution(&acc, &previous)?;
+            self.cancel_monic(&mut product, monic)?;
+            acc = product;
+            length *= 2;
+            if bits & (1u32 << bit) != 0 {
+                self.gate.charge(4 * COPY_WORK)?;
+                let mut square = self.square_diagonals(&acc)?;
+                self.cancel_monic(&mut square, monic)?;
+                self.gate.charge(4 * COPY_WORK)?;
+                let mut product = self.convolution(&square, base)?;
+                self.cancel_monic(&mut product, monic)?;
+                acc = product;
+                length += 1;
+            }
+        }
+        debug_assert_eq!(length, bits);
+        Ok(acc)
+    }
+    // R42_REPLAY_HELPER_END
     fn modular_power(&mut self, base: Poly17, exponent: u64, modulus: &Poly17) -> Result<Poly17> {
         self.gate.charge(6 * COPY_WORK)?;
         // Independent replay: modulo a nonzero constant every residue
@@ -1027,6 +1107,17 @@ impl Replay {
         }
         let mut base = base;
         self.cancel_monic(&mut base, &monic)?;
+        // R42_REPLAY_FASTPATH_BEGIN
+        // Replay uses a distinct, iterative addition chain and its own
+        // polynomial arithmetic; certificate contents remain unchanged.
+        if self.p == (1u64 << 61) - 1
+            && (exponent == self.p || exponent == (self.p - 1) / 2)
+        {
+            return self.repeated_mersenne_bits_power(
+                &base, 64 - exponent.leading_zeros(), &monic,
+            );
+        }
+        // R42_REPLAY_FASTPATH_END
         // Keep the former loop for large (61-bit) exponents: native and
         // local A/B shows no reproducible gain from its first-bit shortcut.
         if exponent > u32::MAX as u64 {
