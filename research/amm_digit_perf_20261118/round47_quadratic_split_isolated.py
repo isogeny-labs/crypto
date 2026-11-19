@@ -29,14 +29,15 @@ pub mod fp_backend {
  pub struct Fp64Arithmetic { pub p:u64 }
  impl Fp64Arithmetic { pub fn p(&self)->u64 {self.p} }
 }
+pub mod bounded {
 pub mod after {
 """
 middle = "\n} pub mod before {\n"
-footer = "\n}\n}\n"
+footer = "\n}\n}\n}\n"
 tests = r"""
 #[cfg(test)]
 mod round47_tests {
-use super::cryptanalysis::{fp_backend::Fp64Arithmetic,after,before};
+use super::cryptanalysis::{fp_backend::Fp64Arithmetic,bounded::{after,before}};
 use std::{hint::black_box,time::{Instant,Duration}};
 fn field(p:u64)->Fp64Arithmetic { Fp64Arithmetic{p} }
 fn budget_after()->after::RootBudget {
@@ -88,7 +89,7 @@ fn frozen_event_and_certificate_comparisons() {
  let mut count=0;
  for p in [1_000_000_007u64,1_000_000_009,1_000_000_021,(1u64<<61)-1] {
   for degree in [2usize,3,4,6,8] {
-   let roots:(Vec<u64>)=(1..=degree as u64).collect();
+   let roots:Vec<u64>=(1..=degree as u64).collect();
    let f=polynomial(p,&roots,1);
    for seed in [0,42,0x5291ae77] {
     let x=old(p,&f,seed);let y=new(p,&f,seed);
