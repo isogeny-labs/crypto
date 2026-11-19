@@ -107,7 +107,7 @@ fn main() {
                 let line = match res {
                     Ok((rep, _fb)) => json!({
                         "arm": name, "target": ti, "round": round, "seed": seed, "ok": true,
-                        "verified": rep.recovered.map_or(false, |d| inst.fast.mul_u64(inst.generator, d) == target),
+                        "verified": rep.recovered.is_some_and(|d| inst.fast.mul_u64(inst.generator, d) == target),
                         "pipeline_verified": rep.verified, "exhausted": rep.exhausted, "recovered": rep.recovered,
                         "r": rep.r, "total_gae": rep.total_gae, "s": rep.s,
                         "targets_tried": rep.decomposition.targets_tried,
