@@ -306,6 +306,7 @@ fn study(rounds:usize)->serde_json::Value {
         "f3_median_ns":f3_times[rounds/2],
         "generic_median_ns":group_times[rounds/2],
         "certificates_first_per_hit":proofs,
+        "full_signed_witnesses":f3.witnesses,
         "nonenumerative_two_factor_polynomial_roots":true,
         "forbidden_group_sum_tables":0,
         "generic_group_equivalent_at_two_factor_degree":true,
