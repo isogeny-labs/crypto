@@ -3847,6 +3847,22 @@ impl SparseRows {
         }))
     }
 
+    /// The same rows with each right-hand side replaced by the row
+    /// evaluated at `x` (so `x` solves the result): the consistent
+    /// system `A·y = A·x` a kernel probe solves.  Costs one
+    /// multiply-add per non-zero.
+    pub fn with_rhs_at(&self, x: &[BigUint]) -> Self {
+        let mut out = self.clone();
+        with_rows!(&mut out, |modulus, rows| {
+            let m = *modulus;
+            let x: Vec<_> = x.iter().map(|v| ModWord::from_biguint(v, &m)).collect();
+            for row in rows.iter_mut() {
+                row.rhs = row.evaluate(&x, m);
+            }
+        });
+        out
+    }
+
     /// How many rows each of `columns` columns occurs in.
     pub fn column_weights(&self, columns: usize) -> Vec<usize> {
         let mut weights = vec![0usize; columns];

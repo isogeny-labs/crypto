@@ -789,8 +789,31 @@ fn berlekamp_massey<S: RhoScalar>(s: &[S], m: S, ops: &mut u64) -> Vec<S> {
 /// seed returns the same vector: for a rank-deficient system the two
 /// differ by a random kernel element except with probability about
 /// `1/r`.  Both solves are charged; the filter, which does not depend
-/// on the seed, runs once for the pair.  Until then [`RelationSolver::rank`]
-/// reports `min(rows, cols − 1)`, a placeholder rather than a rank (the
+/// on the seed, runs once for the pair.
+///
+/// That argument needs the two solutions to be independent draws from
+/// the solution set, which block Wiedemann's homogenised kernel vectors
+/// are; block Lanczos's are not.  Unfiltered, below full rank, both
+/// seeds return the same solution, the one in the Krylov space of the
+/// right-hand side, so the pair agrees on a system that does not
+/// determine its columns (the `lanczos` arm answered wrongly at 204
+/// rows where full rank needs 253 on the covered-early planted
+/// systems).  The unfiltered `lanczos` arm therefore replaces the
+/// second solve by a **kernel probe**: draw `r` uniformly from
+/// `F_p^cols`, solve `A·y = A·r` on the same rows under the second
+/// seed, and accept the first solution only if `y = r`.  Soundness: write
+/// `r = r₀ + k` with `k` the component of `r` in `ker A`, uniform on
+/// `ker A` and independent of `A·r = A·r₀`; `y` is a function of the rows,
+/// `A·r` and the seed only, so it is independent of `k`, and
+/// `Pr[y = r] = 1/|ker A| ≤ 1/p` whenever the columns are not all
+/// determined, whatever the Krylov method returns (and `y` is checked
+/// against every row, so a full-rank system, whose only solution is
+/// `r`, passes whenever the solve returns).  The false-accept bound is
+/// the same `1/p` order as the two-seed check's, per attempt.  Its cost
+/// replaces the second solve's: one solve, plus one multiply-add per
+/// non-zero to form `A·r`, both charged to `row_ops`.
+///
+/// Until a solution is accepted [`RelationSolver::rank`] reports `min(rows, cols − 1)`, a placeholder rather than a rank (the
 /// method tracks none); at acceptance it is `cols` and the rows beyond
 /// it are counted as dependent.
 ///
@@ -810,6 +833,9 @@ pub struct SparseCado {
     /// A schedule was set explicitly (`with_schedule`): only then are
     /// its counters reported, so unparameterised records are unchanged.
     schedule_named: bool,
+    /// Confirm with a kernel probe instead of a second seed (the
+    /// unfiltered Lanczos arm; see the type's documentation).
+    kernel_probe: bool,
     state: RefCell<SparseCadoState>,
 }
 
@@ -946,6 +972,9 @@ struct SparseCadoState {
     uncovered: usize,
     next_attempt: usize,
     solution: Option<Vec<u64>>,
+    /// Non-zeros of the buffered rows (the cost of forming a probe's
+    /// right-hand side).
+    nnz: u64,
     /// The last solve found a contradiction; the next row reports it.
     inconsistent: bool,
     row_ops: u64,
@@ -990,6 +1019,7 @@ impl SparseCado {
             core,
             schedule: AttemptSchedule::Fixed,
             schedule_named: false,
+            kernel_probe: core == SparseCoreSolver::BlockLanczos && !filtered,
             state: RefCell::new(SparseCadoState {
                 rows: SparseRows::for_modulus(&BigUint::from(modulus))
                     .expect("a prime modulus of at most 256 bits"),
@@ -997,6 +1027,7 @@ impl SparseCado {
                 uncovered: cols,
                 next_attempt: cols,
                 solution: None,
+                nnz: 0,
                 inconsistent: false,
                 row_ops: 0,
                 dependent: 0,
@@ -1058,11 +1089,13 @@ impl SparseCado {
         // Both solves see the same rows, and the filter does not depend on
         // the seed: it runs once, and the second solve (only tried when the
         // first returns a solution) reuses its core under its own seed.
-        let solves = st.rows.solve_seeds(
-            self.cols,
-            &opts,
-            &[opts.seed, 0x4345_5254_4946_5932 ^ rows as u64],
-        );
+        let second_seed = 0x4345_5254_4946_5932 ^ rows as u64;
+        let seeds: &[u64] = if self.kernel_probe {
+            &[opts.seed]
+        } else {
+            &[opts.seed, second_seed]
+        };
+        let solves = st.rows.solve_seeds(self.cols, &opts, seeds);
         st.attempts += solves.len() as u64;
         st.row_ops += solves.iter().map(|(_, r)| r.row_ops).sum::<u64>();
         let deficit = solves.first().map_or(0, |(_, r)| deficit_lower_bound(r));
@@ -1075,13 +1108,21 @@ impl SparseCado {
             }
             _ => return self.failed(st, rows, deficit),
         };
-        let second = match outcomes.next() {
-            Some(SparseSolveOutcome::Solved(x)) => x,
-            _ => return self.failed(st, rows, deficit),
-        };
-        if first != second {
-            // Two solutions differ by a kernel element: deficit ≥ 1.
-            return self.failed(st, rows, deficit.max(1));
+        if self.kernel_probe {
+            if !self.kernel_probe_passes(st, &opts, second_seed) {
+                // A failed probe solve, or `y ≠ r`: a kernel element
+                // (deficit ≥ 1) or, rarely, a Krylov failure.
+                return self.failed(st, rows, deficit.max(1));
+            }
+        } else {
+            let second = match outcomes.next() {
+                Some(SparseSolveOutcome::Solved(x)) => x,
+                _ => return self.failed(st, rows, deficit),
+            };
+            if first != second {
+                // Two solutions differ by a kernel element: deficit ≥ 1.
+                return self.failed(st, rows, deficit.max(1));
+            }
         }
         st.stats.solved_rows = Some(rows);
         let modulus = BigUint::from(self.modulus);
@@ -1092,6 +1133,30 @@ impl SparseCado {
                 .collect(),
         );
         st.dependent += (rows - self.cols) as u64;
+    }
+
+    /// The kernel probe (see the type's documentation): solve
+    /// `A·y = A·r` for a pseudo-random `r` under `seed` and report
+    /// whether `y = r`, i.e. whether no kernel element showed.  Forming
+    /// `A·r` (one per non-zero) and the solve are charged to `row_ops`,
+    /// the solve to `attempts`.
+    fn kernel_probe_passes(
+        &self,
+        st: &mut SparseCadoState,
+        opts: &SparseSolveOptions,
+        seed: u64,
+    ) -> bool {
+        use rand::{rngs::StdRng, Rng, SeedableRng};
+        let mut rng = StdRng::seed_from_u64(seed ^ 0x4b45_524e_454c_5052);
+        let r: Vec<BigUint> = (0..self.cols)
+            .map(|_| BigUint::from(rng.gen_range(0..self.modulus)))
+            .collect();
+        let probe = st.rows.with_rhs_at(&r);
+        st.row_ops += st.nnz;
+        let solves = probe.solve_seeds(self.cols, &SparseSolveOptions { seed, ..*opts }, &[seed]);
+        st.attempts += solves.len() as u64;
+        st.row_ops += solves.iter().map(|(_, rep)| rep.row_ops).sum::<u64>();
+        matches!(solves.first(), Some((SparseSolveOutcome::Solved(y), _)) if *y == r)
     }
 
     /// Record an attempt at `rows` that did not answer, whose filter
@@ -1163,6 +1228,7 @@ impl RelationSolver for SparseCado {
             st.gate_visits += v;
             st.row_ops += v;
         }
+        st.nnz += entries.len() as u64;
         st.rows.push_entries(&entries, &BigUint::from(rhs % m));
         RowStatus::Independent
     }
@@ -2137,6 +2203,116 @@ mod tests {
             .collect()
     }
 
+    /// Every column covered by `cols / 2` disjoint pairs first, then
+    /// `4·cols` uniform three-term rows: coverage comes long before full
+    /// rank, so the schedule, not the coverage gate, decides.
+    fn covered_early_rows(
+        rng: &mut StdRng,
+        cols: usize,
+        modulus: u64,
+        x: &[u64],
+    ) -> Vec<(Vec<u64>, u64)> {
+        let mut rows: Vec<(Vec<u64>, u64)> = (0..cols / 2)
+            .map(|i| {
+                let mut row = vec![0u64; cols];
+                row[2 * i] = rng.gen_range(1..modulus);
+                row[(2 * i + 1) % cols] = rng.gen_range(1..modulus);
+                let rhs = row.iter().zip(x).fold(0u64, |acc, (&a, &b)| {
+                    addmod(acc, mulmod(a, b, modulus), modulus)
+                });
+                (row, rhs)
+            })
+            .collect();
+        rows.extend(planted_rows(rng, cols, 4 * cols, modulus, x));
+        rows
+    }
+
+    /// **Regression: unfiltered `lanczos` below full rank.**  On the
+    /// covered-early systems, retried after every row
+    /// (`predicted, margin = 0`), the arm never answers before the
+    /// full-rank point `structured-gauss` finds, and answers the planted
+    /// solution.  The defect it guards against is shown on the same
+    /// rows: some row count below full rank where two independently
+    /// seeded unfiltered Lanczos solves return the same wrong solution,
+    /// which the former two-seed check accepted; the kernel probe
+    /// rejects it.
+    #[test]
+    fn lanczos_waits_for_full_rank_on_covered_early_systems() {
+        let modulus = 1_000_003u64;
+        let mut fooled = 0;
+        for (cols, seed) in [(96usize, 0u64), (96, 1), (192, 0), (192, 1), (192, 2)] {
+            let mut rng = StdRng::seed_from_u64(0x5c4e_d000 ^ (seed * 7919 + cols as u64));
+            let x: Vec<u64> = (0..cols).map(|_| rng.gen_range(0..modulus)).collect();
+            let rows = covered_early_rows(&mut rng, cols, modulus, &x);
+            let mut reference = StructuredGauss::new(cols, modulus);
+            let full_rank_at = rows
+                .iter()
+                .position(|(row, rhs)| {
+                    reference.add_row(row.clone(), *rhs);
+                    RelationSolver::rank(&reference) == cols
+                })
+                .expect("the stream reaches full rank")
+                + 1;
+            let mut m = deferred_named("lanczos", cols, modulus)
+                .with_schedule(AttemptSchedule::Predicted { margin: 0 });
+            let mut fed = 0usize;
+            while m.pinned(cols - 1).is_none() {
+                assert!(fed < rows.len(), "{cols} {seed}: unsolved");
+                let (row, rhs) = &rows[fed];
+                assert!(!matches!(
+                    m.add_row(row.clone(), *rhs),
+                    RowStatus::Inconsistent
+                ));
+                fed += 1;
+            }
+            assert!(
+                fed >= full_rank_at,
+                "{cols} {seed}: answered at {fed} rows, full rank at {full_rank_at}"
+            );
+            let sol: Vec<u64> = (0..cols).map(|c| m.pinned(c).unwrap()).collect();
+            assert_eq!(sol, x, "{cols} {seed}: planted solution");
+            assert_eq!(RelationSolver::rank(&m), cols);
+            // The former acceptance rule on the same rows, below full rank.
+            let probe = SparseCado::with_core(cols, modulus, SparseCoreSolver::BlockLanczos, false);
+            let opts = SparseSolveOptions {
+                filter: probe.filter,
+                solver: probe.core,
+                seed: 0x5350_4152_5345_4341,
+                ..SparseSolveOptions::default()
+            };
+            let mut buffered = SparseRows::for_modulus(&BigUint::from(modulus)).unwrap();
+            for (n, (row, rhs)) in rows[..full_rank_at - 1].iter().enumerate() {
+                let entries: Vec<(u32, BigUint)> = row
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, &v)| v != 0)
+                    .map(|(c, &v)| (c as u32, BigUint::from(v)))
+                    .collect();
+                buffered.push_entries(&entries, &BigUint::from(*rhs));
+                if n + 1 < cols {
+                    continue;
+                }
+                let solves = buffered.solve_seeds(
+                    cols,
+                    &opts,
+                    &[opts.seed, 0x4345_5254_4946_5932 ^ (n + 1) as u64],
+                );
+                if let [(SparseSolveOutcome::Solved(a), _), (SparseSolveOutcome::Solved(b), _)] =
+                    &solves[..]
+                {
+                    if a == b && a.iter().zip(&x).any(|(v, &w)| *v != BigUint::from(w)) {
+                        fooled += 1;
+                        break;
+                    }
+                }
+            }
+        }
+        assert!(
+            fooled > 0,
+            "no system fooled the two-seed check: the regression is not exercised"
+        );
+    }
+
     /// **Attempt schedules of the deferred solvers.**  On planted
     /// systems of two shapes and two sizes, every schedule recovers the
     /// planted solution (the same values as `fixed`); the exact
@@ -2162,7 +2338,7 @@ mod tests {
             ("predicted(2)", AttemptSchedule::Predicted { margin: 2 }),
         ];
         // (shape, name, schedule) -> [systems, points, failed, row_ops, overshoot, max overshoot]
-        let mut totals: std::collections::BTreeMap<(String, String, String), [u64; 7]> =
+        let mut totals: std::collections::BTreeMap<(String, String, String), [u64; 6]> =
             Default::default();
         for shape in ["uniform3", "ic-like", "pairs", "covered-early"] {
             for cols in [96usize, 192] {
@@ -2173,25 +2349,7 @@ mod tests {
                         "uniform3" => planted_rows(&mut rng, cols, 4 * cols, modulus, &x),
                         "ic-like" => ic_like_rows(&mut rng, cols, 6 * cols, modulus, &x, 3),
                         "pairs" => ic_like_rows(&mut rng, cols, 8 * cols, modulus, &x, 2),
-                        _ => {
-                            // Every column covered by `cols / 2` disjoint
-                            // pairs first, then uniform three-term rows:
-                            // coverage comes long before full rank, so
-                            // the schedule, not the coverage gate, decides.
-                            let mut rows: Vec<(Vec<u64>, u64)> = (0..cols / 2)
-                                .map(|i| {
-                                    let mut row = vec![0u64; cols];
-                                    row[2 * i] = rng.gen_range(1..modulus);
-                                    row[(2 * i + 1) % cols] = rng.gen_range(1..modulus);
-                                    let rhs = row.iter().zip(&x).fold(0u64, |acc, (&a, &b)| {
-                                        addmod(acc, mulmod(a, b, modulus), modulus)
-                                    });
-                                    (row, rhs)
-                                })
-                                .collect();
-                            rows.extend(planted_rows(&mut rng, cols, 4 * cols, modulus, &x));
-                            rows
-                        }
+                        _ => covered_early_rows(&mut rng, cols, modulus, &x),
                     };
                     let mut reference = StructuredGauss::new(cols, modulus);
                     let full_rank_at = rows
@@ -2219,25 +2377,10 @@ mod tests {
                             let sol: Vec<u64> = (0..cols).map(|c| m.pinned(c).unwrap()).collect();
                             let stats = m.schedule_stats();
                             assert_eq!(stats.solved_rows, Some(fed));
-                            if sol != x {
-                                // Known, schedule-independent defect of the
-                                // unfiltered Lanczos arm: below full rank both
-                                // seeds return the same solution of A·x = b in
-                                // the Krylov space of the right-hand side, so
-                                // the two-seed check cannot see the kernel.
-                                // Counted (last column), not hidden.
-                                assert_eq!(
-                                    *name, "lanczos",
-                                    "{shape} {cols} {seed} {name} {label}: wrong answer"
-                                );
-                                assert!(fed < full_rank_at);
-                                println!("WRONG {shape} {cols} {seed} {name} {label} fed {fed} full-rank {full_rank_at} {stats:?}");
-                                let t = totals
-                                    .entry((shape.to_string(), name.to_string(), label.to_string()))
-                                    .or_default();
-                                t[6] += 1;
-                                continue;
-                            }
+                            assert_eq!(
+                                sol, x,
+                                "{shape} {cols} {seed} {name} {label}: wrong answer"
+                            );
                             let over = fed.checked_sub(full_rank_at).unwrap_or_else(|| {
                                 panic!("{name} {label}: answered below full rank")
                             });
@@ -2269,11 +2412,11 @@ mod tests {
                 }
             }
         }
-        println!("| shape | matrix | schedule | correct | attempt points | failed | row_ops | overshoot rows (sum) | max | wrong |");
+        println!("| shape | matrix | schedule | correct | attempt points | failed | row_ops | overshoot rows (sum) | max |");
         for ((shape, name, label), t) in &totals {
             println!(
-                "| {shape} | {name} | {label} | {} | {} | {} | {} | {} | {} | {} |",
-                t[0], t[1], t[2], t[3], t[4], t[5], t[6]
+                "| {shape} | {name} | {label} | {} | {} | {} | {} | {} | {} |",
+                t[0], t[1], t[2], t[3], t[4], t[5]
             );
         }
     }

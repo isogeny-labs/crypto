@@ -2789,7 +2789,7 @@ mod tests {
 
     /// **Attempt schedules end to end.**  On a 16-bit roster curve with a
     /// 96-point base (stride `cols / 32 = 3`), every schedule of
-    /// `sparse-cado` and `wiedemann` recovers the logarithm the dense
+    /// `sparse-cado`, `wiedemann` and `lanczos` recovers the logarithm the dense
     /// full-rank matrix recovers; the relations read past the dense
     /// full-rank point (the overshoot) stay within the schedule's bound;
     /// totals are printed (`--nocapture`).
@@ -2834,6 +2834,8 @@ mod tests {
                 ("sparse-cado:schedule=predicted,margin=1", 1),
                 ("wiedemann:schedule=fixed", (cols / 32).max(1)),
                 ("wiedemann:schedule=predicted,margin=1", (cols / 32).max(1)),
+                ("lanczos:schedule=fixed", (cols / 32).max(1)),
+                ("lanczos:schedule=predicted,margin=1", (cols / 32).max(1)),
             ] {
                 spec.linalg = name.into();
                 let other = run(&spec);
