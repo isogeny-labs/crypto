@@ -1386,6 +1386,38 @@ bound for the structural degree (the expected bound is
 nontrivial tuple. No relation-yield, expected-runtime, or subexponential ECDLP
 theorem follows from this increment alone. [pcc:unverified]
 
+## 2026-11-19 explicit canonical dilation degree
+
+`DilationScaleExplicitDegree.lean` imports the previously checked full-input
+symmetry theorem for the production canonical resultant. It proves that every
+input has exact individual degree `2^(r-2)`, bounds total degree by the sum of
+the `r` individual degrees, and proves that evaluating every variable at a
+linear polynomial cannot increase total degree. A separate tower-evaluation
+equivalence checks the variable reversal between the multivariate canonical
+form and the existing nested production evaluator. [pcc:unverified]
+
+Consequently Lean proves the closed, curve-, field-, and tuple-independent
+bound
+
+`deg S_(2m)(s t) ≤ (2m) * 2^(2m-2)`.
+
+This is one factor `2m/(2m-1)` coarser than the expected sharp total degree,
+but it is already an explicit arity-only exponential bound and is sufficient
+for the upstream root count. The new endpoint
+`canonicalDilationPolynomial_nonzero_implies_nondeg_explicit` supplies this
+degree directly to `ECDLP.L49.DilationNondeg`. Therefore uniform nonzeroness
+on upstream nontrivial tuples is now the only family-specific hypothesis in
+that exact bridge. It does not by itself prove relation yield, expected
+runtime, or subexponential ECDLP. [pcc:unverified]
+
+The targeted `lake build +DilationSemaevBridge` completes 9,131 jobs. The
+repository proof gate reports `PASS 373 thm 0 trusted` across all seven
+tracked project modules, including `DilationScaleExplicitDegree`. The gate
+therefore found no forbidden proof dependency or trusted/native declaration.
+An independent `lake env leanchecker --fresh DilationSemaevBridge` replay
+exits zero on the final Lean source.
+[pcc:unverified]
+
 ## 2026-11-19 scalar-torsion to `ΨSq` bridge
 
 The standalone project `lean-zsmul-torsion` pins Lean `v4.32.0-rc1` and the

@@ -58,10 +58,11 @@ The null changes only the global wiring of interior ports while preserving the v
     family is now integrated into the exact upstream dilation interface.
     Lean proves coefficient base change, descent of zero-sum vanishing from
     algebraic closure to the base field, simultaneous-scale evaluation,
-    tuple-independent structural degree control, and that every exact upstream
-    bad dilation is a root at `u⁻²`. Thus only an explicit arity-only bound for
-    the structural degree and nonzeroness on nontrivial tuples remain in the
-    Semaev `DilationNondeg` bridge. An exhaustive coefficient audit of `S4(st)`
+    tuple-independent structural degree control, the explicit closed bound
+    `deg S_(2m)(s t) ≤ (2m) * 2^(2m-2)`, and that every exact upstream bad
+    dilation is a root at `u⁻²`. Thus uniform nonzeroness on nontrivial tuples
+    is the sole remaining family-specific premise in the Semaev
+    `DilationNondeg` bridge. An exhaustive coefficient audit of `S4(st)`
     over every smooth short curve over F5, F7, and F11 found zero nontrivial
     identically-zero specializations; this is bounded evidence, not an
     all-field or all-arity proof. Full subexponential ECDLP is not established.
@@ -107,9 +108,12 @@ This hybrid requirement is a pre-freeze clarification of the original tag-only d
 - [`FIXED_ARITY_DIAGONAL.md`](FIXED_ARITY_DIAGONAL.md) — universal capped-repetition scheduler, fixed-arity specialization, primary-source pins and remaining ECDLP obligations.
 - [`lean-zsmul-torsion/`](lean-zsmul-torsion/) — exact-pin Lean proof that scalar torsion forces the full squared division polynomial `ΨSq` to vanish.
 - [`lean/DilationSemaevBridge.lean`](lean/DilationSemaevBridge.lean) — exact
-  canonical-family bridge to upstream `DilationNondeg`; vanishing and a
-  structural uniform degree are checked, while closed arity growth and
-  nonzeroness remain open.
+  canonical-family bridge to upstream `DilationNondeg`; vanishing and the
+  explicit degree `(2m) * 2^(2m-2)` are checked, while uniform nonzeroness
+  remains open.
+- [`lean/DilationScaleExplicitDegree.lean`](lean/DilationScaleExplicitDegree.lean)
+  — multivariate/tower evaluation equivalence and the checked total-degree
+  derivation of the closed arity bound.
 - [`audit_s4_dilation.py`](audit_s4_dilation.py) and
   [`s4-dilation-audit-20261119.json`](s4-dilation-audit-20261119.json) —
   exhaustive bounded prime-field `S4(st)` coefficient audit.

@@ -1,6 +1,6 @@
 import TensorBoundaryBounds
 import FiniteFieldSemaevVanishing
-import DilationScaleDegree
+import DilationScaleExplicitDegree
 import ECDLP.L49_Transport
 
 /-!
@@ -162,6 +162,27 @@ theorem canonicalEvenDilationPolynomial_degree_le
     (ECDLP.L43.shortW A B) (evenArityStage m)
       (fun i => t (Fin.cast (evenArityStage_arity m hm) i))
 
+/-- Closed arity-only degree bound.  This coarse bound is obtained from
+all-input symmetry and the exact individual-variable degree of the canonical
+Semaev polynomial; it is independent of the curve, field, and tuple. -/
+theorem canonicalEvenDilationPolynomial_degree_le_explicit
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (A B : K) (m : ℕ) (hm : 2 ≤ m) (t : Fin (2 * m) → K) :
+    (canonicalEvenDilationPolynomial A B m hm t).natDegree ≤
+      (2 * m) * 2 ^ (2 * m - 2) := by
+  calc
+    (canonicalEvenDilationPolynomial A B m hm t).natDegree ≤
+        (evenArityStage m + 3) * 2 ^ (evenArityStage m + 1) :=
+      DilationSemaevBridge.simultaneousScalePolynomial_natDegree_le_explicit
+        (ECDLP.L43.shortW A B) (evenArityStage m)
+          (fun i => t (Fin.cast (evenArityStage_arity m hm) i))
+    _ = (2 * m) * 2 ^ (2 * m - 2) := by
+      congr 1
+      · exact evenArityStage_arity m hm
+      · congr 1
+        unfold evenArityStage
+        omega
+
 theorem canonicalDilationPolynomial_degree_le_structural
     {K : Type*} [Field K] [Fintype K] [DecidableEq K]
     (A B : K) (m : ℕ) (hm : 2 ≤ m) (t : Fin (2 * m) → K) :
@@ -169,6 +190,14 @@ theorem canonicalDilationPolynomial_degree_le_structural
       canonicalEvenDilationDegree A B m := by
   rw [canonicalDilationPolynomial_of_two_le A B m hm t]
   exact canonicalEvenDilationPolynomial_degree_le A B m hm t
+
+theorem canonicalDilationPolynomial_degree_le_explicit
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (A B : K) (m : ℕ) (hm : 2 ≤ m) (t : Fin (2 * m) → K) :
+    (canonicalDilationPolynomial A B m t).natDegree ≤
+      (2 * m) * 2 ^ (2 * m - 2) := by
+  rw [canonicalDilationPolynomial_of_two_le A B m hm t]
+  exact canonicalEvenDilationPolynomial_degree_le_explicit A B m hm t
 
 /-- The exact maximum degree of the canonical specialized family over the
 finite tuple space.  This is a rigorous uniform bound, but deliberately makes
@@ -250,5 +279,20 @@ theorem canonicalDilationPolynomial_nonzero_implies_nondeg_structural
   exact canonicalDilationPolynomial_bounds_imply_nondeg
     A B hDelta m hm T (canonicalEvenDilationDegree A B m) nonzero
       (canonicalDilationPolynomial_degree_le_structural A B m hm)
+
+/-- Fully explicit-degree reduction: for every recursive arity, the sole
+remaining family-specific obligation is nonzeroness on nontrivial tuples. -/
+theorem canonicalDilationPolynomial_nonzero_implies_nondeg_explicit
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (A B : K) (hDelta : (ECDLP.L43.shortW A B).Δ ≠ 0)
+    (m : ℕ) (hm : 2 ≤ m) (T : Finset K)
+    (nonzero : ∀ t : Fin (2 * m) → K, (∀ i, t i ∈ T) →
+      ¬ ECDLP.L40.TrivL (List.ofFn t) →
+        canonicalDilationPolynomial A B m t ≠ 0) :
+    ECDLP.L49.DilationNondeg A B m T
+      ((2 * m) * 2 ^ (2 * m - 2)) := by
+  exact canonicalDilationPolynomial_bounds_imply_nondeg
+    A B hDelta m hm T ((2 * m) * 2 ^ (2 * m - 2)) nonzero
+      (canonicalDilationPolynomial_degree_le_explicit A B m hm)
 
 end TensorBoundaryBounds
