@@ -67,6 +67,9 @@ is made [pcc:unverified].
 - [`round-c-counterfree/`](round-c-counterfree/RESULTS.md) records the optional
   `fast-b*` field-counter-free mode and the analyzer's fail-closed authority
   gate. Fast records are diagnostics and cannot enter modeled-cost analysis.
+- [`../quartic_ghs_strong_rho_parallel_20261118/IMPLEMENTATION_SPEC.md`](../quartic_ghs_strong_rho_parallel_20261118/IMPLEMENTATION_SPEC.md)
+  defines the source changes, counters, controls, matched measurement grid,
+  comprehensive ECBench rerun, publication gates, and follow-on PR sequence.
 - `main.rs` and the Round A revision of `strong_rho.rs` are the
   source-hash-pinned Round A measurement code. The current `strong_rho.rs` is
   the combined prospective engineering candidate; Round A remains bound by

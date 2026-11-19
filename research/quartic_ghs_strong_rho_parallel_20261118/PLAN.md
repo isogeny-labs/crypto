@@ -1,5 +1,8 @@
 # Parallel GHS strong-rho optimization leads
 
+The reviewed follow-on implementation and measurement contract is
+[`IMPLEMENTATION_SPEC.md`](IMPLEMENTATION_SPEC.md).
+
 Status: prospective coordination plan frozen on 2026-11-18 before any of the
 six candidate branches is integrated. Base revision:
 `ad2a014c0022cf000845014499a9649b6c2cef2d`.

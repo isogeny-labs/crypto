@@ -4,6 +4,10 @@ Status: prospective engineering hypotheses recorded after the reviewed
 six-lane composition. They are not measured speedups or frontier rows
 `[pcc:unverified]`.
 
+The implementation-level source changes, counters, test matrix, measurement
+campaign, publication gates, and PR sequence are frozen in
+[`IMPLEMENTATION_SPEC.md`](IMPLEMENTATION_SPEC.md).
+
 ## Evidence basis
 
 The combined public q=223 `strong-b8` control totals 110,435 base-field
