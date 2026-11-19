@@ -1111,7 +1111,7 @@ def validate_claim(claim: Any, reasons: list[str]) -> bool:
     if not CLAIM_ID_RE.match(str(claim.get("id", ""))):
         reasons.append("claim: id must match PCC-YYYYMMDD-xxxxxx")
         ok = False
-    if claim.get("kind") not in CLAIM_KINDS:
+    if not isinstance(claim.get("kind"), str) or claim["kind"] not in CLAIM_KINDS:
         reasons.append(f"claim: kind must be one of {sorted(CLAIM_KINDS)}")
         ok = False
     if not isinstance(claim.get("statement"), str) or not claim["statement"].strip():
@@ -1122,7 +1122,8 @@ def validate_claim(claim: Any, reasons: list[str]) -> bool:
         reasons.append("claim: proofs must be a list")
         return False
     for i, pr in enumerate(proofs):
-        if not isinstance(pr, dict) or pr.get("kind") not in PROOF_KINDS:
+        if (not isinstance(pr, dict) or not isinstance(pr.get("kind"), str)
+                or pr["kind"] not in PROOF_KINDS):
             reasons.append(f"claim: proofs[{i}] kind must be one of {sorted(PROOF_KINDS)}")
             ok = False
     problem = claim_type_problem(claim)

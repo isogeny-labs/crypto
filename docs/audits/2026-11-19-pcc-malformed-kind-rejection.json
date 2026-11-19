@@ -1,0 +1,36 @@
+{
+  "schema": "engineering.correctness-repair/v1",
+  "claim_status": "pcc:unverified",
+  "baseline_commit": "e6033befbc4ae6bfa33825e09a6a29bc710278ed",
+  "baseline_pcc_sha256": "a4e5ce5076e2551896e453f554d63ac24a650fa700e242e3e7bcac209ff3f50e",
+  "defect": "List/object claim kinds and proof kinds raise TypeError outside the proof-verifier exception boundary",
+  "change": "Require string types before claim/proof kind set membership; return ordinary failed verdicts and failed standings for malformed payloads",
+  "source_review": [
+    "tools/pcc/pcc.py: validate_claim, verify_claim, standing",
+    "tools/pcc/test_pcc.py: signed invalid-schema standing controls"
+  ],
+  "baseline_regression": {
+    "tests": 1,
+    "errors": 4,
+    "cases": 14,
+    "log_sha256": "8191bf477d221fde3d8b21fc2d0e49d57028720b96711fd7bcd4a035474e88a0"
+  },
+  "candidate_regression": {
+    "tests": 1,
+    "result": "pass",
+    "cases": 14,
+    "real_disposable_ed25519_signatures": true,
+    "actual_verify_cli": true,
+    "log_sha256": "589fecb7f0e61f2d52b8371861cdfeb64a0155924b60cbac43bc29d4b1ef4123"
+  },
+  "candidate_full_suite": {
+    "tests": 35,
+    "result": "pass",
+    "seconds": 17.06,
+    "log_sha256": "5150aa94adf39d12352ef8c12380a36c2f9a59172e285414bccc02555402a2e0"
+  },
+  "frozen_claims_ledger_keyring_changed": false,
+  "signature_algorithm_or_trust_policy_changed": false,
+  "performance_measurement": "none; validation correctness repair",
+  "hosted_ci": "pending"
+}

@@ -444,6 +444,39 @@ class ClaimTypeTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("only be appended", result.stdout)
 
+    def test_malformed_kinds_return_failed_verdict_with_real_signed_pass(self):
+        cid = "PCC-20261119-666666"
+        self.write_claim(cid, "2026-11-19T00:00:00Z", "data")
+        path = self.repo / pcc.CLAIMS_DIR / f"{cid}.json"
+        original = json.loads(path.read_text())
+        keyring = pcc.load_keyring(self.repo / pcc.KEYRING_PATH)
+        for field in ("claim", "proof"):
+            for value in (None, True, 0, [], {}, "", "unknown"):
+                with self.subTest(field=field, value=value):
+                    claim = dict(original)
+                    if field == "claim":
+                        claim["kind"] = value
+                    else:
+                        claim["proofs"] = [{"kind": value}]
+                    path.write_text(json.dumps(claim))
+                    verdict = {"type": "verdict", "body": {"claim_id": cid,
+                        "claim_sha256": pcc.claim_digest(claim), "verdict": "pass",
+                        "commit": "a" * 40}}
+                    verdict["sig"] = pcc.make_signature(
+                        pcc.read_secret(self.key), "ci-main", "verdict",
+                        pcc.verdict_subject(verdict["body"]),
+                    )
+                    standing = pcc.standing(claim, [verdict], keyring)
+                    self.assertTrue(standing["verdicts"][0]["signed"])
+                    self.assertEqual(standing["standing"], "failed")
+                    self.assertTrue(standing["schema_rejected"])
+                    checked = run(["verify", cid, "--json"], self.repo)
+                    self.assertEqual(checked.returncode, 1, checked.stdout + checked.stderr)
+                    self.assertNotIn("Traceback", checked.stderr)
+                    result = json.loads(checked.stdout)
+                    self.assertEqual(result["verdict"], "fail")
+                    self.assertTrue(result["reasons"])
+
     def test_current_signed_pass_cannot_promote_schema_invalid_payload(self):
         cid = "PCC-20261112-444444"
         self.write_claim(cid, "2026-11-12T00:00:00Z", None)
