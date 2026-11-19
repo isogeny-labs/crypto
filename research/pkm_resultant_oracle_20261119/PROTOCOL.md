@@ -66,3 +66,30 @@ Nothing here concerns cryptographic sizes or Pollard rho.
 `src/cryptanalysis/isogeny_eval/poly.rs` (counted product/remainder trees, reused unchanged);
 `research/pkm_dense_decompose_20261115/` (baselines); no prior resultant or multipoint decomposition oracle
 for `S₃` found under `src/`, `examples/` or `research/`.
+
+## Amendments
+
+### Amendment 1 (2026-11-19, after the frozen run; owner's request): one `V`, many targets
+
+The frozen run charged every target for work that depends only on `V`. In relation collection `V` is fixed and
+targets vary, so that work is paid once. This labelled extension measures the per-target (marginal) cost with the
+`V`-only work paid once per cell. The frozen verdicts above stand.
+
+- *Resultant oracle.* `ResultantOracleM2::new(e, V)` builds the product tree of `Z` and fills every node's cached
+  reciprocal by one remainder-tree evaluation of a dummy polynomial of degree `2S` (the precision real targets
+  need); all of that is `setup_ops`, an upper bound on the one-off cost. Each target then pays `product_ops` (the
+  `S` quadratics and their product), `eval_ops` (remainders with cached reciprocals) and `finish_ops`.
+- *Enumeration, treated the same way.* Lifting `V` (`6⌈log₂ p⌉` per point of the base) is `V`-only, so the
+  enumeration's marginal cost is `enum_field_ops − |base|·6⌈log₂ p⌉`. Both arms are compared on marginal cost.
+- *Instrument.* `--membership resultant-amortized`; same cells, seed and targets as the frozen run. The frozen
+  path (`resultant_decompose_m2`) keeps its exact counts: the refactor is checked by rerunning frozen cells and
+  comparing `field_ops` with the committed rows.
+
+Predictions:
+
+- **A1 (validity)**: relations equal enumeration's on every target; the rerun frozen cells reproduce the committed
+  `field_ops` exactly.
+- **A2**: marginal ÷ frozen per-target cost of the resultant oracle in `[0.3, 0.7]` at every `S ≥ 256`.
+- **A3**: marginal resultant ÷ marginal enumeration `> 1` at every `S ≥ 64`, and it grows `< 16`× from `S = 2^8`
+  to `2^16` (`P3` coset).
+- **A4 (reported, no threshold)**: `setup_ops` ÷ marginal cost, the number of targets that pay for the setup.

@@ -14,6 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
+- [ ] EXP-PKM-RESULTANT-001 Amendment 1: amortise the V-only work (product tree, reciprocals; enumeration's lifting) over targets (claude, started 2026-11-19, branch claude/tooling-build-alq44y, PR #4742)
 - [x] EXP-PKM-RESULTANT-001: quasi-linear resultant / multipoint-evaluation decomposition oracle at m = 2 vs enumeration and the F4 dense oracle, S up to 2^16 (claude, started 2026-11-19, branch claude/tooling-build-alq44y, PR #4742)
 - [x] RunPod resilient tooling: pod stops itself after its job completes, so a lost controller cannot leave a finished pod billing (claude, started 2026-11-18, branch claude/tooling-build-alq44y, PR #4742)
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
