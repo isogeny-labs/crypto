@@ -1,0 +1,30 @@
+R17-R33 producer-side arithmetic receipt [pcc:unverified]
+
+Date: 2026-11-19
+Host: Linux 6.18.57 x86_64
+Compiler: rustc 1.100.0 (0ef1bc386 2026-11-09)
+Source: prototypes/r17_33.rs
+Source SHA-256: aee56445e570b57d9c483ee818068332471204baf1607dde9479328275d4b7b7
+
+Commands:
+  rustfmt --edition 2021 research/quartic_ghs_r0_r99_20261119/prototypes/r17_33.rs
+  rustc --edition 2021 -O research/quartic_ghs_r0_r99_20261119/prototypes/r17_33.rs -o /tmp/ghs-r17-r33
+  /tmp/ghs-r17-r33
+
+Exit status: 0
+
+Exact stdout:
+mul5 PASS: 768394 exhaustive pairs over q=5,7/all nonzero c; exact core count 5 fq_mul + 4 fq_small_div
+square5 PASS: 2558 exhaustive elements over q=5,7/all nonzero c
+mul5 random PASS: 180000 deterministic pairs over 18 cells
+small division/domain PASS: canonical div2/div3 and gcd(q,6) fallback
+adjugate inversion PASS: 342 exhaustive nonzero F_(7^3) elements for z^3=2
+binary inversion PASS: 169839 base-field cases versus Euclid
+reduction PASS: 80056 Barrett boundary/random cases
+representation PASS: 80000 branchless/u32/Montgomery cases
+lazy accumulation SCREEN: only 4 maximal products fit in u64 at q=2^31-1; five/nine-product accumulation requires u128 or staged reduction
+
+Scope:
+  These are standalone algebra, representation, and counter-contract
+  falsifiers. They do not call the production strong-rho implementation,
+  measure elapsed time, establish an optimization, or move a frontier row.

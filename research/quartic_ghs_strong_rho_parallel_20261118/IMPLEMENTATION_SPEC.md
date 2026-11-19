@@ -932,12 +932,14 @@ repair a failed holdout in the publication PR.
 
 ## 25. Immediate next action
 
-After this specification PR is accepted, start PR B by freezing
-`ROUND_D_MUL5.md` before writing candidate code. Implement the five-product
-kernel as a selectable diagnostic, run the independent nine-product oracle and
-q223 trajectory gates, and preserve the six-product kernel as the control.
-In parallel at the project level, an authorized operator can resolve M0; no
-measurement job should launch until its receipts pass.
+The expanded R00–R99 execution registry and its six parallel implementation
+batches are tracked in
+[`../quartic_ghs_r0_r99_20261119/`](../quartic_ghs_r0_r99_20261119/).
+R17–R33 owns the selectable five-product diagnostic and independent
+schoolbook oracle. Other batches may screen their disjoint leads in parallel,
+but accepted mutations are recomposed one at a time against the frozen
+baseline. In parallel at the project level, an authorized operator can resolve
+M0; no measurement job should launch until its receipts pass.
 
 ## 26. Sources checked
 

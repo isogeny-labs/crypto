@@ -17,6 +17,7 @@ pub struct FieldCounts {
     pub fq_mul: u64,
     pub fq_inv: u64,
     pub fq_add: u64,
+    pub fq_small_div: u64,
     pub f3_mul: u64,
     pub f3_sq: u64,
     pub f3_inv: u64,
@@ -30,6 +31,7 @@ impl FieldCounts {
             fq_mul: self.fq_mul - before.fq_mul,
             fq_inv: self.fq_inv - before.fq_inv,
             fq_add: self.fq_add - before.fq_add,
+            fq_small_div: self.fq_small_div - before.fq_small_div,
             f3_mul: self.f3_mul - before.f3_mul,
             f3_sq: self.f3_sq - before.f3_sq,
             f3_inv: self.f3_inv - before.f3_inv,
@@ -83,6 +85,125 @@ impl NativeCounts {
     }
 }
 
+/// Compile-time-selected sink for native diagnostic counters.
+///
+/// `CountedNative` retains the historical diagnostics used by `strong-*` and
+/// `fast-*`. `BareNative` is a zero-sized sink used only by the selectable
+/// `bare-*` production arm. Keeping both behind one statically dispatched
+/// interface means the mathematical walk is not forked while the optimizer
+/// can erase every bare-mode counter mutation.
+trait NativeSink {
+    fn snapshot(&self) -> NativeCounts;
+    fn bump_rng_draws(&mut self, amount: u64);
+    fn bump_hashes(&mut self, amount: u64);
+    fn bump_canonicalisations(&mut self, amount: u64);
+    fn bump_lookahead_tests(&mut self, amount: u64);
+    fn bump_dp_tests(&mut self, amount: u64);
+    fn bump_table_ops(&mut self, amount: u64);
+    fn bump_cycle_compares(&mut self, amount: u64);
+    fn bump_scalar_adds(&mut self, amount: u64);
+    fn bump_scalar_muls(&mut self, amount: u64);
+    fn bump_scalar_invs(&mut self, amount: u64);
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+struct CountedNative {
+    counts: NativeCounts,
+}
+
+impl NativeSink for CountedNative {
+    #[inline(always)]
+    fn snapshot(&self) -> NativeCounts {
+        self.counts
+    }
+
+    #[inline(always)]
+    fn bump_rng_draws(&mut self, amount: u64) {
+        self.counts.rng_draws += amount;
+    }
+
+    #[inline(always)]
+    fn bump_hashes(&mut self, amount: u64) {
+        self.counts.hashes += amount;
+    }
+
+    #[inline(always)]
+    fn bump_canonicalisations(&mut self, amount: u64) {
+        self.counts.canonicalisations += amount;
+    }
+
+    #[inline(always)]
+    fn bump_lookahead_tests(&mut self, amount: u64) {
+        self.counts.lookahead_tests += amount;
+    }
+
+    #[inline(always)]
+    fn bump_dp_tests(&mut self, amount: u64) {
+        self.counts.dp_tests += amount;
+    }
+
+    #[inline(always)]
+    fn bump_table_ops(&mut self, amount: u64) {
+        self.counts.table_ops += amount;
+    }
+
+    #[inline(always)]
+    fn bump_cycle_compares(&mut self, amount: u64) {
+        self.counts.cycle_compares += amount;
+    }
+
+    #[inline(always)]
+    fn bump_scalar_adds(&mut self, amount: u64) {
+        self.counts.scalar_adds += amount;
+    }
+
+    #[inline(always)]
+    fn bump_scalar_muls(&mut self, amount: u64) {
+        self.counts.scalar_muls += amount;
+    }
+
+    #[inline(always)]
+    fn bump_scalar_invs(&mut self, amount: u64) {
+        self.counts.scalar_invs += amount;
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+struct BareNative;
+
+// A type-level guard: bare mode owns no `NativeCounts` storage that the hot
+// path could mutate. Optimized-IR validation below the source level remains a
+// separate release gate.
+const _: [(); 0] = [(); std::mem::size_of::<BareNative>()];
+
+impl NativeSink for BareNative {
+    #[inline(always)]
+    fn snapshot(&self) -> NativeCounts {
+        NativeCounts::default()
+    }
+
+    #[inline(always)]
+    fn bump_rng_draws(&mut self, _amount: u64) {}
+    #[inline(always)]
+    fn bump_hashes(&mut self, _amount: u64) {}
+    #[inline(always)]
+    fn bump_canonicalisations(&mut self, _amount: u64) {}
+    #[inline(always)]
+    fn bump_lookahead_tests(&mut self, _amount: u64) {}
+    #[inline(always)]
+    fn bump_dp_tests(&mut self, _amount: u64) {}
+    #[inline(always)]
+    fn bump_table_ops(&mut self, _amount: u64) {}
+    #[inline(always)]
+    fn bump_cycle_compares(&mut self, _amount: u64) {}
+    #[inline(always)]
+    fn bump_scalar_adds(&mut self, _amount: u64) {}
+    #[inline(always)]
+    fn bump_scalar_muls(&mut self, _amount: u64) {}
+    #[inline(always)]
+    fn bump_scalar_invs(&mut self, _amount: u64) {}
+}
+
 /// Native arithmetic for `F_q[z]/(z^3-c)`, `q = 7 mod 12`.
 fn barrett_reciprocal(q: u64) -> u64 {
     assert!(
@@ -112,11 +233,16 @@ pub struct FastF3<const COUNT: bool = true> {
     c: u64,
     w: u64,
     w2: u64,
+    use_mul5: bool,
     counts: Cell<FieldCounts>,
 }
 
 impl<const COUNT: bool> FastF3<COUNT> {
     pub fn from_instance(inst: &Inst) -> Self {
+        Self::from_instance_with_mul5(inst, false)
+    }
+
+    pub fn from_instance_with_mul5(inst: &Inst, use_mul5: bool) -> Self {
         Self {
             q: inst.q,
             reciprocal: barrett_reciprocal(inst.q),
@@ -126,6 +252,7 @@ impl<const COUNT: bool> FastF3<COUNT> {
             c: inst.kf.c,
             w: inst.kf.w,
             w2: inst.kf.w2,
+            use_mul5,
             counts: Cell::new(FieldCounts::default()),
         }
     }
@@ -212,6 +339,30 @@ impl<const COUNT: bool> FastF3<COUNT> {
     }
 
     #[inline(always)]
+    fn fdiv2(&self, x: u64) -> u64 {
+        debug_assert!(x < self.q && self.q & 1 == 1);
+        self.bump(|c| c.fq_small_div += 1);
+        if x & 1 == 0 {
+            x / 2
+        } else {
+            (x + self.q) / 2
+        }
+    }
+
+    #[inline(always)]
+    fn fdiv3(&self, x: u64) -> u64 {
+        debug_assert!(x < self.q && self.q % 3 != 0);
+        self.bump(|c| c.fq_small_div += 1);
+        for k in 0..3 {
+            let lifted = x + k * self.q;
+            if lifted % 3 == 0 {
+                return lifted / 3;
+            }
+        }
+        unreachable!("one of x, x+q, x+2q is divisible by three")
+    }
+
+    #[inline(always)]
     pub fn add(&self, a: &K, b: &K) -> K {
         [
             self.fa(a[0], b[0]),
@@ -234,7 +385,7 @@ impl<const COUNT: bool> FastF3<COUNT> {
         [self.fn_(a[0]), self.fn_(a[1]), self.fn_(a[2])]
     }
 
-    fn mul_raw(&self, a: &K, b: &K) -> K {
+    fn mul6_raw(&self, a: &K, b: &K) -> K {
         // Cubic Karatsuba: three diagonal and three cross products.
         let p0 = self.fm(a[0], b[0]);
         let p1 = self.fm(a[1], b[1]);
@@ -256,6 +407,50 @@ impl<const COUNT: bool> FastF3<COUNT> {
             self.fa(s01, self.fmul_small(p2, self.c)),
             self.fa(s02, p1),
         ]
+    }
+
+    fn mul5_raw(&self, a: &K, b: &K) -> K {
+        debug_assert!(self.q % 2 != 0 && self.q % 3 != 0);
+        let v0 = self.fm(a[0], b[0]);
+        let v1 = self.fm(
+            self.fa(self.fa(a[0], a[1]), a[2]),
+            self.fa(self.fa(b[0], b[1]), b[2]),
+        );
+        let vm1 = self.fm(
+            self.fa(self.fs(a[0], a[1]), a[2]),
+            self.fa(self.fs(b[0], b[1]), b[2]),
+        );
+        let two_a1 = self.fa(a[1], a[1]);
+        let two_a2 = self.fa(a[2], a[2]);
+        let a_at_2 = self.fa(self.fa(a[0], two_a1), self.fa(two_a2, two_a2));
+        let two_b1 = self.fa(b[1], b[1]);
+        let two_b2 = self.fa(b[2], b[2]);
+        let b_at_2 = self.fa(self.fa(b[0], two_b1), self.fa(two_b2, two_b2));
+        let v2 = self.fm(a_at_2, b_at_2);
+        let vinf = self.fm(a[2], b[2]);
+
+        let even = self.fdiv2(self.fa(v1, vm1));
+        let d2 = self.fs(self.fs(even, v0), vinf);
+        let odd = self.fdiv2(self.fs(v1, vm1));
+        let at2 = self.fdiv2(self.fs(
+            self.fs(self.fs(v2, v0), self.fmul_small(d2, 4)),
+            self.fmul_small(vinf, 16),
+        ));
+        let d3 = self.fdiv3(self.fs(at2, odd));
+        let d1 = self.fs(odd, d3);
+        [
+            self.fa(v0, self.fmul_small(d3, self.c)),
+            self.fa(d1, self.fmul_small(vinf, self.c)),
+            d2,
+        ]
+    }
+
+    fn mul_raw(&self, a: &K, b: &K) -> K {
+        if self.use_mul5 && self.q % 2 != 0 && self.q % 3 != 0 {
+            self.mul5_raw(a, b)
+        } else {
+            self.mul6_raw(a, b)
+        }
     }
 
     #[inline(always)]
@@ -659,6 +854,15 @@ pub struct StrongOpts {
     /// on the lane-ordered retry path in `new_walker`.
     /// `false` is retained only as an in-source exact control.
     pub batch_setup: bool,
+    /// Reuse the cold width-two joint table for each initial walker while
+    /// preserving the baseline's lane-ordered coefficient and retry stream.
+    /// This remains a selectable candidate until its complete setup cost and
+    /// isolated wall time pass the promotion gates.
+    pub reuse_setup_table_for_walkers: bool,
+    /// Select the five-evaluation cubic multiplication diagnostic. The
+    /// six-product Karatsuba kernel remains the default and differential
+    /// control until isolated end-to-end promotion gates pass.
+    pub use_mul5: bool,
 }
 
 impl StrongOpts {
@@ -672,6 +876,8 @@ impl StrongOpts {
             snapshot_period: 128,
             max_steps: 60 * (inst.ell as f64).sqrt() as u64 + 200_000,
             batch_setup: true,
+            reuse_setup_table_for_walkers: false,
+            use_mul5: false,
         }
     }
 }
@@ -707,8 +913,8 @@ struct Walker {
 }
 
 #[inline(always)]
-fn sadd(a: u64, b: u64, n: u64, c: &mut NativeCounts) -> u64 {
-    c.scalar_adds += 1;
+fn sadd<N: NativeSink>(a: u64, b: u64, n: u64, c: &mut N) -> u64 {
+    c.bump_scalar_adds(1);
     let (s, overflow) = a.overflowing_add(b);
     if overflow || s >= n {
         s.wrapping_sub(n)
@@ -718,8 +924,8 @@ fn sadd(a: u64, b: u64, n: u64, c: &mut NativeCounts) -> u64 {
 }
 
 #[inline(always)]
-fn ssub(a: u64, b: u64, n: u64, c: &mut NativeCounts) -> u64 {
-    c.scalar_adds += 1;
+fn ssub<N: NativeSink>(a: u64, b: u64, n: u64, c: &mut N) -> u64 {
+    c.bump_scalar_adds(1);
     if a >= b {
         a - b
     } else {
@@ -728,8 +934,8 @@ fn ssub(a: u64, b: u64, n: u64, c: &mut NativeCounts) -> u64 {
 }
 
 #[inline(always)]
-fn smul(a: u64, b: u64, n: u64, c: &mut NativeCounts) -> u64 {
-    c.scalar_muls += 1;
+fn smul<N: NativeSink>(a: u64, b: u64, n: u64, c: &mut N) -> u64 {
+    c.bump_scalar_muls(1);
     ((a as u128 * b as u128) % n as u128) as u64
 }
 
@@ -748,15 +954,15 @@ fn partition_index(h: u64, r: usize) -> usize {
     }
 }
 
-fn canon<const COUNT: bool>(
+fn canon<const COUNT: bool, N: NativeSink>(
     f: &FastF3<COUNT>,
     p: EP,
     a: u64,
     b: u64,
     n: u64,
-    c: &mut NativeCounts,
+    c: &mut N,
 ) -> (EP, u64, u64) {
-    c.canonicalisations += 1;
+    c.bump_canonicalisations(1);
     let EP::A(x, y) = p else { return (p, a, b) };
     let first = if y[0] != 0 {
         y[0]
@@ -771,24 +977,58 @@ fn canon<const COUNT: bool>(
         let ny = f.neg(&y);
         let na = if a == 0 { 0 } else { n - a };
         let nb = if b == 0 { 0 } else { n - b };
-        c.scalar_adds += 2;
+        c.bump_scalar_adds(2);
         (EP::A(x, ny), na, nb)
     }
 }
 
-fn new_walker<const COUNT: bool>(
+fn new_walker<const COUNT: bool, N: NativeSink>(
     ec: &FastEc<'_, COUNT>,
     f: &FastF3<COUNT>,
     g: &EP,
     q: &EP,
     n: u64,
     rng: &mut Rng,
-    c: &mut NativeCounts,
+    c: &mut N,
 ) -> Walker {
     loop {
         let (a, b) = (rng.below(n), rng.below(n - 1) + 1);
-        c.rng_draws += 2;
+        c.bump_rng_draws(2);
         let p = ec.add(&ec.mul(g, a as u128), &ec.mul(q, b as u128));
+        if p != EP::Inf {
+            let (p, a, b) = canon(f, p, a, b, n, c);
+            return Walker {
+                p,
+                h: None,
+                a,
+                b,
+                tail: 0,
+                local: 0,
+                snapshot: None,
+            };
+        }
+    }
+}
+
+/// Construct one walker from the already cold-charged width-two joint table.
+///
+/// Coefficients are still sampled and rejected one walker at a time. This is
+/// intentionally not a cross-walker batch: an infinity retry must consume the
+/// same next coefficient pair as the baseline and must retain the field work
+/// spent on the rejected attempt.
+fn new_walker_with_table<const COUNT: bool, N: NativeSink>(
+    ec: &FastEc<'_, COUNT>,
+    f: &FastF3<COUNT>,
+    table: &[EP; 16],
+    n: u64,
+    rng: &mut Rng,
+    c: &mut N,
+) -> Walker {
+    loop {
+        let (a, b) = (rng.below(n), rng.below(n - 1) + 1);
+        c.bump_rng_draws(2);
+        let mut points = ec.batch_window2_mul(table, &[(a, b)]);
+        let p = points.pop().expect("one coefficient pair yields one point");
         if p != EP::Inf {
             let (p, a, b) = canon(f, p, a, b, n, c);
             return Walker {
@@ -844,7 +1084,7 @@ struct InitialState {
 
 /// Build the jump table and initial walkers. The candidate keeps the exact
 /// baseline RNG stream and coefficients; only point construction changes.
-fn initial_state<const COUNT: bool>(
+fn initial_state<const COUNT: bool, N: NativeSink>(
     ec: &FastEc<'_, COUNT>,
     f: &FastF3<COUNT>,
     g: &EP,
@@ -853,15 +1093,20 @@ fn initial_state<const COUNT: bool>(
     r: usize,
     batch: usize,
     rng: &mut Rng,
-    native: &mut NativeCounts,
+    native: &mut N,
     batch_setup: bool,
+    reuse_setup_table_for_walkers: bool,
 ) -> InitialState {
+    assert!(
+        batch_setup || !reuse_setup_table_for_walkers,
+        "setup-table walker reuse requires batched setup"
+    );
     let mut ma = Vec::with_capacity(r);
     let mut mb = Vec::with_capacity(r);
     for _ in 0..r {
         ma.push(rng.below(n - 1) + 1);
         mb.push(rng.below(n - 1) + 1);
-        native.rng_draws += 2;
+        native.bump_rng_draws(2);
     }
 
     if !batch_setup {
@@ -887,9 +1132,15 @@ fn initial_state<const COUNT: bool>(
     // Keep walker construction on the exact sequential retry path. Apart
     // from charging every attempted point, this centralizes all Walker state
     // initialization for later hot-loop cache fields.
-    let walkers = (0..batch)
-        .map(|_| new_walker(ec, f, g, q, n, rng, native))
-        .collect();
+    let walkers = if reuse_setup_table_for_walkers {
+        (0..batch)
+            .map(|_| new_walker_with_table(ec, f, &table, n, rng, native))
+            .collect()
+    } else {
+        (0..batch)
+            .map(|_| new_walker(ec, f, g, q, n, rng, native))
+            .collect()
+    };
     InitialState {
         ma,
         mb,
@@ -902,11 +1153,11 @@ fn initial_state<const COUNT: bool>(
 /// rule applied in batches. If jump j would land in partition j again, retry
 /// from the original point with j+1. This removes the dominant fruitless
 /// two-cycle without giving up a shared inversion on the common first try.
-fn batched_lookahead_step<const COUNT: bool>(
+fn batched_lookahead_step<const COUNT: bool, N: NativeSink>(
     ec: &FastEc<'_, COUNT>,
     jumps: &[EP],
     walkers: &[Walker],
-    native: &mut NativeCounts,
+    native: &mut N,
     scratch: &mut StepScratch,
 ) -> u64 {
     let r = jumps.len();
@@ -940,11 +1191,11 @@ fn batched_lookahead_step<const COUNT: bool>(
         retry.clear();
         for (slot, &i) in pending.iter().enumerate() {
             let candidate = candidates[slot];
-            native.lookahead_tests += 1;
+            native.bump_lookahead_tests(1);
             let candidate_hash = match candidate {
                 EP::Inf => None,
                 EP::A(x, _) => {
-                    native.hashes += 1;
+                    native.bump_hashes(1);
                     Some(hx(&x))
                 }
             };
@@ -978,7 +1229,7 @@ fn point_key(p: &EP) -> [u64; 6] {
 /// Scalar version used only to traverse a detected fruitless cycle. Returning
 /// to the cycle's canonical minimum before doubling makes escape independent
 /// of a lane's snapshot phase, so merged walks remain coalesced.
-fn single_lookahead_step<const COUNT: bool>(
+fn single_lookahead_step<const COUNT: bool, N: NativeSink>(
     ec: &FastEc<'_, COUNT>,
     f: &FastF3<COUNT>,
     jumps: &[EP],
@@ -988,22 +1239,22 @@ fn single_lookahead_step<const COUNT: bool>(
     a: u64,
     b: u64,
     n: u64,
-    native: &mut NativeCounts,
+    native: &mut N,
 ) -> Option<(EP, u64, u64, u64, u64)> {
     let r = jumps.len();
     let EP::A(x, _) = p else { return None };
-    native.hashes += 1;
+    native.bump_hashes(1);
     let mut j = partition_index(hx(x), r);
     let mut adds = 0u64;
     let mut extra = 0u64;
     for attempt in 0..r {
         let candidate = ec.add(p, &jumps[j]);
         adds += 1;
-        native.lookahead_tests += 1;
+        native.bump_lookahead_tests(1);
         let same_partition = match candidate {
             EP::Inf => false,
             EP::A(nx, _) => {
-                native.hashes += 1;
+                native.bump_hashes(1);
                 partition_index(hx(&nx), r) == j
             }
         };
@@ -1023,7 +1274,7 @@ fn single_lookahead_step<const COUNT: bool>(
     unreachable!("look-ahead loop accepts its final candidate")
 }
 
-fn collision_scalar(
+fn collision_scalar<N: NativeSink>(
     n: u64,
     y: &K,
     a: u64,
@@ -1031,7 +1282,7 @@ fn collision_scalar(
     y2: &K,
     a2: u64,
     b2: u64,
-    c: &mut NativeCounts,
+    c: &mut N,
 ) -> Option<u64> {
     let (num, den) = if y == y2 {
         (ssub(a, a2, n, c), ssub(b2, b, n, c))
@@ -1043,12 +1294,12 @@ fn collision_scalar(
     if den == 0 {
         return None;
     }
-    c.scalar_invs += 1;
+    c.bump_scalar_invs(1);
     let di = inv_mod_u64(den, n);
     Some(smul(num, di, n, c))
 }
 
-fn strong_rho_impl<const COUNT: bool>(
+fn strong_rho_impl<const FIELD_COUNT: bool, N: NativeSink + Default>(
     inst: &Inst,
     k_true: u64,
     seed: u64,
@@ -1057,9 +1308,9 @@ fn strong_rho_impl<const COUNT: bool>(
     assert!(opts.batch > 0 && opts.r > 0 && opts.dp_bits < 63 && opts.snapshot_period > 0);
     let start = Instant::now();
     let n = inst.ell;
-    let f = FastF3::<COUNT>::from_instance(inst);
+    let f = FastF3::<FIELD_COUNT>::from_instance_with_mul5(inst, opts.use_mul5);
     let ec = FastEc::from_instance(&f, inst);
-    let mut native = NativeCounts::default();
+    let mut native = N::default();
     let mut rng = Rng::new(seed ^ 0x4E45_47);
     let target = ec.mul(&inst.g, k_true as u128);
     let InitialState {
@@ -1078,9 +1329,10 @@ fn strong_rho_impl<const COUNT: bool>(
         &mut rng,
         &mut native,
         opts.batch_setup,
+        opts.reuse_setup_table_for_walkers,
     );
     let setup_field = f.counts();
-    let setup_native = native;
+    let setup_native = native.snapshot();
     let mask = (1u64 << opts.dp_bits) - 1;
     let tail_cap = 20u64 << opts.dp_bits;
     let mut table: HashMap<K, (K, u64, u64)> = HashMap::with_capacity(128);
@@ -1100,7 +1352,7 @@ fn strong_rho_impl<const COUNT: bool>(
                     };
                     let h = hx(&x);
                     walker.h = Some(h);
-                    native.hashes += 1;
+                    native.bump_hashes(1);
                     h
                 }
             };
@@ -1126,7 +1378,7 @@ fn strong_rho_impl<const COUNT: bool>(
             walkers[i].local += 1;
             let mut cycle_len = None;
             if let Some((snapshot, snapshot_step)) = walkers[i].snapshot {
-                native.cycle_compares += 1;
+                native.bump_cycle_compares(1);
                 if snapshot == p {
                     cycle_len = Some(walkers[i].local - snapshot_step);
                 }
@@ -1169,7 +1421,7 @@ fn strong_rho_impl<const COUNT: bool>(
                 let EP::A(nx, _) = p else { unreachable!() };
                 x = nx;
                 h = hx(&x);
-                native.hashes += 1;
+                native.bump_hashes(1);
             }
             if walkers[i].local % opts.snapshot_period == 0 {
                 walkers[i].snapshot = Some((p, walkers[i].local));
@@ -1181,9 +1433,9 @@ fn strong_rho_impl<const COUNT: bool>(
             walkers[i].b = b;
             walkers[i].tail += 1;
 
-            native.dp_tests += 1;
+            native.bump_dp_tests(1);
             if (h >> 20) & mask == 0 {
-                native.table_ops += 1;
+                native.bump_table_ops(1);
                 let EP::A(_, y) = p else { unreachable!() };
                 if let Some((y2, a2, b2)) = table.get(&x).copied() {
                     if let Some(k) = collision_scalar(n, &y, a, b, &y2, a2, b2, &mut native) {
@@ -1194,7 +1446,7 @@ fn strong_rho_impl<const COUNT: bool>(
                     walkers[i] = new_walker(&ec, &f, &inst.g, &target, n, &mut rng, &mut native);
                 } else {
                     table.insert(x, (y, a, b));
-                    native.table_ops += 1;
+                    native.bump_table_ops(1);
                     walkers[i].tail = 0;
                 }
             } else if walkers[i].tail > tail_cap {
@@ -1208,7 +1460,7 @@ fn strong_rho_impl<const COUNT: bool>(
     }
 
     let walk_field_end = f.counts();
-    let walk_native_end = native;
+    let walk_native_end = native.snapshot();
     let ok = found
         .map(|k| ec.mul(&inst.g, k as u128) == target)
         .unwrap_or(false);
@@ -1235,13 +1487,22 @@ fn strong_rho_impl<const COUNT: bool>(
 /// Exactly counted reference path. Its field-operation totals remain the
 /// authoritative input to modeled-cost comparisons.
 pub fn strong_rho(inst: &Inst, k_true: u64, seed: u64, opts: StrongOpts) -> StrongOut {
-    strong_rho_impl::<true>(inst, k_true, seed, opts)
+    strong_rho_impl::<true, CountedNative>(inst, k_true, seed, opts)
 }
 
 /// Production arithmetic path with field-operation counter updates removed at
 /// monomorphization time. Its zero field totals are intentionally non-authoritative.
 pub fn strong_rho_uncounted(inst: &Inst, k_true: u64, seed: u64, opts: StrongOpts) -> StrongOut {
-    strong_rho_impl::<false>(inst, k_true, seed, opts)
+    strong_rho_impl::<false, CountedNative>(inst, k_true, seed, opts)
+}
+
+/// Selectable production path with both field and native counter mutation
+/// removed at monomorphization time. Its zero count families are deliberately
+/// non-authoritative; it shares the exact mathematical walk with the counted
+/// and field-counter-free arms.
+#[inline(never)]
+pub fn strong_rho_bare(inst: &Inst, k_true: u64, seed: u64, opts: StrongOpts) -> StrongOut {
+    strong_rho_impl::<false, BareNative>(inst, k_true, seed, opts)
 }
 
 /// Deterministic development controls.  Kept outside Rust's test harness so
@@ -1377,6 +1638,33 @@ pub fn selftest() {
         eprintln!("selftest: fast field matches frozen field");
     }
     {
+        let inst = instance();
+        let baseline = FastF3::<true>::from_instance(&inst);
+        let mul5 = FastF3::<true>::from_instance_with_mul5(&inst, true);
+        let mul5_uncounted = FastF3::<false>::from_instance_with_mul5(&inst, true);
+        let mut rng = Rng::new(0x17_33_2026);
+        for _ in 0..20_000 {
+            let a = [rng.below(inst.q), rng.below(inst.q), rng.below(inst.q)];
+            let b = [rng.below(inst.q), rng.below(inst.q), rng.below(inst.q)];
+            let before = mul5.counts();
+            let got = mul5.mul(&a, &b);
+            let delta = mul5.counts().since(before);
+            assert_eq!(got, baseline.mul(&a, &b));
+            assert_eq!(got, inst.kf.mul(&a, &b));
+            assert_eq!(mul5_uncounted.mul(&a, &b), got);
+            assert_eq!(delta.fq_mul, 5);
+            assert_eq!(delta.fq_small_div, 4);
+            assert_eq!(delta.f3_mul, 1);
+            assert_eq!(delta.fq_inv, 0);
+            assert_eq!(delta.f3_sq, 0);
+            assert_eq!(delta.f3_inv, 0);
+        }
+        assert_eq!(mul5_uncounted.counts(), FieldCounts::default());
+        eprintln!(
+            "selftest: production mul5 matches Karatsuba/frozen field on 20000 pairs; per call 5 fq_mul + 4 fq_small_div"
+        );
+    }
+    {
         let q = 223;
         let kf = crate::common::Kf {
             fp: crate::common::Fp { q },
@@ -1392,6 +1680,7 @@ pub fn selftest() {
             c: kf.c,
             w: kf.w,
             w2: kf.w2,
+            use_mul5: false,
             counts: Cell::new(FieldCounts::default()),
         };
         check_inverses(&f, &kf, 10, "fallback-c=18");
@@ -1522,10 +1811,14 @@ pub fn selftest() {
         let ec_legacy = FastEc::from_instance(&f_legacy, &inst);
         let f_batch = FastF3::<true>::from_instance(&inst);
         let ec_batch = FastEc::from_instance(&f_batch, &inst);
+        let f_table = FastF3::<true>::from_instance(&inst);
+        let ec_table = FastEc::from_instance(&f_table, &inst);
         let mut rng_legacy = Rng::new(0x51A7_E001);
         let mut rng_batch = Rng::new(0x51A7_E001);
-        let mut native_legacy = NativeCounts::default();
-        let mut native_batch = NativeCounts::default();
+        let mut rng_table = Rng::new(0x51A7_E001);
+        let mut native_legacy = CountedNative::default();
+        let mut native_batch = CountedNative::default();
+        let mut native_table = CountedNative::default();
         let legacy = initial_state(
             &ec_legacy,
             &f_legacy,
@@ -1536,6 +1829,7 @@ pub fn selftest() {
             8,
             &mut rng_legacy,
             &mut native_legacy,
+            false,
             false,
         );
         let batched = initial_state(
@@ -1549,6 +1843,20 @@ pub fn selftest() {
             &mut rng_batch,
             &mut native_batch,
             true,
+            false,
+        );
+        let tabled = initial_state(
+            &ec_table,
+            &f_table,
+            &inst.g,
+            &target,
+            inst.ell,
+            32,
+            8,
+            &mut rng_table,
+            &mut native_table,
+            true,
+            true,
         );
         assert_eq!(legacy.ma, batched.ma);
         assert_eq!(legacy.mb, batched.mb);
@@ -1560,9 +1868,21 @@ pub fn selftest() {
             assert_eq!(a.snapshot, b.snapshot);
         }
         assert_eq!(rng_legacy.0, rng_batch.0);
-        assert_eq!(native_legacy, native_batch);
+        assert_eq!(native_legacy.snapshot(), native_batch.snapshot());
+        assert_eq!(batched.ma, tabled.ma);
+        assert_eq!(batched.mb, tabled.mb);
+        assert_eq!(batched.mp, tabled.mp);
+        assert_eq!(batched.walkers.len(), tabled.walkers.len());
+        for (a, b) in batched.walkers.iter().zip(&tabled.walkers) {
+            assert_eq!(a.p, b.p);
+            assert_eq!((a.a, a.b, a.tail, a.local), (b.a, b.b, b.tail, b.local));
+            assert_eq!(a.snapshot, b.snapshot);
+        }
+        assert_eq!(rng_batch.0, rng_table.0);
+        assert_eq!(native_batch.snapshot(), native_table.snapshot());
         let lc = f_legacy.counts();
         let bc = f_batch.counts();
+        let tc = f_table.counts();
         assert!(
             bc.fq_mul <= lc.fq_mul,
             "batch fq_mul {} > legacy {}",
@@ -1576,7 +1896,9 @@ pub fn selftest() {
             lc.fq_inv
         );
         assert!(bc.fq_mul < lc.fq_mul || bc.fq_inv < lc.fq_inv);
-        eprintln!("selftest: setup state exact; field legacy={lc:?} batch={bc:?}");
+        eprintln!(
+            "selftest: setup state exact; field legacy={lc:?} batch={bc:?} walker_table={tc:?}"
+        );
     }
     {
         let inst = instance();
@@ -1594,6 +1916,12 @@ pub fn selftest() {
                 100 + i as u64,
                 StrongOpts::for_instance(&inst, width),
             );
+            let bare = strong_rho_bare(
+                &inst,
+                k,
+                100 + i as u64,
+                StrongOpts::for_instance(&inst, width),
+            );
             assert!(
                 out.ok,
                 "width={width} found={:?} steps={}",
@@ -1603,6 +1931,7 @@ pub fn selftest() {
             assert_selftest_oracle(width, &out);
             assert_eq!(out.setup_reciprocal_div, 1);
             assert_eq!(uncounted.setup_reciprocal_div, 1);
+            assert_eq!(bare.setup_reciprocal_div, 1);
             assert_eq!(uncounted.ok, out.ok);
             assert_eq!(uncounted.found, out.found);
             assert_eq!(uncounted.steps, out.steps);
@@ -1616,12 +1945,25 @@ pub fn selftest() {
             assert_eq!(uncounted.setup_field, FieldCounts::default());
             assert_eq!(uncounted.walk_field, FieldCounts::default());
             assert_eq!(uncounted.verify_field, FieldCounts::default());
+            assert_eq!(bare.ok, out.ok);
+            assert_eq!(bare.found, out.found);
+            assert_eq!(bare.steps, out.steps);
+            assert_eq!(bare.dps, out.dps);
+            assert_eq!(bare.restarts, out.restarts);
+            assert_eq!(bare.lookahead, out.lookahead);
+            assert_eq!(bare.cycles, out.cycles);
+            assert_eq!(bare.cycle_adds, out.cycle_adds);
+            assert_eq!(bare.setup_field, FieldCounts::default());
+            assert_eq!(bare.walk_field, FieldCounts::default());
+            assert_eq!(bare.verify_field, FieldCounts::default());
+            assert_eq!(bare.setup_native, NativeCounts::default());
+            assert_eq!(bare.walk_native, NativeCounts::default());
             if width > 1 {
                 assert!(out.walk_field.fq_inv < out.steps);
             }
         }
         eprintln!(
-            "selftest: counted and counter-free planted logs match at widths 1, 4, 8, 16, and 32"
+            "selftest: counted, field-counter-free, and bare planted logs match at widths 1, 4, 8, 16, and 32"
         );
     }
     {
@@ -1630,7 +1972,19 @@ pub fn selftest() {
         legacy_opts.batch_setup = false;
         let legacy = strong_rho(&inst, 119, 0xC01D, legacy_opts);
         let batched = strong_rho(&inst, 119, 0xC01D, StrongOpts::for_instance(&inst, 8));
-        assert!(legacy.ok && batched.ok);
+        let mut table_opts = StrongOpts::for_instance(&inst, 8);
+        table_opts.reuse_setup_table_for_walkers = true;
+        let tabled = strong_rho(&inst, 119, 0xC01D, table_opts);
+        let mut mul5_opts = StrongOpts::for_instance(&inst, 8);
+        mul5_opts.use_mul5 = true;
+        let mul5 = strong_rho(&inst, 119, 0xC01D, mul5_opts);
+        let mut combined_opts = StrongOpts::for_instance(&inst, 8);
+        combined_opts.use_mul5 = true;
+        combined_opts.reuse_setup_table_for_walkers = true;
+        let combined = strong_rho(&inst, 119, 0xC01D, combined_opts);
+        let bare_combined = strong_rho_bare(&inst, 119, 0xC01D, combined_opts);
+        assert!(legacy.ok && batched.ok && tabled.ok && mul5.ok && combined.ok);
+        assert!(bare_combined.ok);
         assert_eq!(legacy.found, batched.found);
         assert_eq!(legacy.steps, batched.steps);
         assert_eq!(legacy.dps, batched.dps);
@@ -1642,6 +1996,52 @@ pub fn selftest() {
         assert_eq!(legacy.walk_field, batched.walk_field);
         assert_eq!(legacy.verify_field, batched.verify_field);
         assert_eq!(legacy.walk_native, batched.walk_native);
+        assert_eq!(batched.found, tabled.found);
+        assert_eq!(batched.steps, tabled.steps);
+        assert_eq!(batched.dps, tabled.dps);
+        assert_eq!(batched.restarts, tabled.restarts);
+        assert_eq!(batched.lookahead, tabled.lookahead);
+        assert_eq!(batched.cycles, tabled.cycles);
+        assert_eq!(batched.cycle_adds, tabled.cycle_adds);
+        assert_eq!(batched.setup_native, tabled.setup_native);
+        assert_eq!(batched.walk_field, tabled.walk_field);
+        assert_eq!(batched.verify_field, tabled.verify_field);
+        assert_eq!(batched.walk_native, tabled.walk_native);
+        for (kernel_baseline, candidate) in [(&batched, &mul5), (&tabled, &combined)] {
+            assert_eq!(batched.found, candidate.found);
+            assert_eq!(batched.steps, candidate.steps);
+            assert_eq!(batched.dps, candidate.dps);
+            assert_eq!(batched.restarts, candidate.restarts);
+            assert_eq!(batched.lookahead, candidate.lookahead);
+            assert_eq!(batched.cycles, candidate.cycles);
+            assert_eq!(batched.cycle_adds, candidate.cycle_adds);
+            assert_eq!(batched.setup_native, candidate.setup_native);
+            assert_eq!(batched.walk_native, candidate.walk_native);
+            for (baseline_phase, candidate_phase) in [
+                (kernel_baseline.setup_field, candidate.setup_field),
+                (kernel_baseline.walk_field, candidate.walk_field),
+                (kernel_baseline.verify_field, candidate.verify_field),
+            ] {
+                assert_eq!(baseline_phase.f3_mul, candidate_phase.f3_mul);
+                assert_eq!(
+                    baseline_phase.fq_mul - candidate_phase.fq_mul,
+                    baseline_phase.f3_mul
+                );
+                assert_eq!(candidate_phase.fq_small_div, 4 * candidate_phase.f3_mul);
+            }
+        }
+        assert_eq!(bare_combined.found, combined.found);
+        assert_eq!(bare_combined.steps, combined.steps);
+        assert_eq!(bare_combined.dps, combined.dps);
+        assert_eq!(bare_combined.restarts, combined.restarts);
+        assert_eq!(bare_combined.lookahead, combined.lookahead);
+        assert_eq!(bare_combined.cycles, combined.cycles);
+        assert_eq!(bare_combined.cycle_adds, combined.cycle_adds);
+        assert_eq!(bare_combined.setup_field, FieldCounts::default());
+        assert_eq!(bare_combined.walk_field, FieldCounts::default());
+        assert_eq!(bare_combined.verify_field, FieldCounts::default());
+        assert_eq!(bare_combined.setup_native, NativeCounts::default());
+        assert_eq!(bare_combined.walk_native, NativeCounts::default());
         assert!(batched.setup_field.fq_mul <= legacy.setup_field.fq_mul);
         assert!(batched.setup_field.fq_inv <= legacy.setup_field.fq_inv);
         assert!(
@@ -1649,8 +2049,12 @@ pub fn selftest() {
                 || batched.setup_field.fq_inv < legacy.setup_field.fq_inv
         );
         eprintln!(
-            "selftest: full trajectory exact; setup legacy={:?} batch={:?}",
-            legacy.setup_field, batched.setup_field
+            "selftest: full trajectory exact; setup legacy={:?} batch={:?} walker_table={:?} mul5={:?} combined={:?}",
+            legacy.setup_field,
+            batched.setup_field,
+            tabled.setup_field,
+            mul5.setup_field,
+            combined.setup_field
         );
     }
     println!("SELFTEST OK");
@@ -1663,6 +2067,7 @@ fn assert_selftest_oracle(width: usize, out: &StrongOut) {
                 fq_mul: $qm,
                 fq_inv: $qi,
                 fq_add: $qa,
+                fq_small_div: 0,
                 f3_mul: $m,
                 f3_sq: $s,
                 f3_inv: $i,

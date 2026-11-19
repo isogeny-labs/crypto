@@ -1,0 +1,303 @@
+{
+  "schema": "ghs-r0-r99-range/v1",
+  "range": [
+    67,
+    83
+  ],
+  "claim_scope": "producer-side deterministic screens only",
+  "lanes": [
+    {
+      "id": "R67",
+      "title": "Post-composition width-by-partition correctness grid",
+      "status": "specified_not_run",
+      "mechanism": "Evaluate widths 1,4,8,16,32 against partition counts 16,32,64,128 only after R17-R66 candidates are composed, retaining every cell through the correctness and count screen.",
+      "target": "strong_rho.rs plus the GHS development ECBench spec",
+      "prerequisites": [
+        "composed R17-R66 baseline",
+        "frozen development instances and seeds"
+      ],
+      "deterministic_falsifier": "Any cell fails planted-log recovery, counted/counter-free answer parity, or its preregistered trajectory policy.",
+      "measurement_gate": "Source-bound profile, host A/A, interleaved ABAB development panel, then one frozen primary and at most one sensitivity configuration on holdout.",
+      "evidence": [
+        "research/quartic_ghs_strong_rho_parallel_20261118/IMPLEMENTATION_SPEC.md#10-r6--retune-batch-width-and-partition-count"
+      ],
+      "state": "queued-after-dependency"
+    },
+    {
+      "id": "R68",
+      "title": "Explicit masked tails for partial batches",
+      "status": "producer_diagnostic_passed",
+      "mechanism": "Represent every partial batch with an explicit active-lane mask so retry and terminal tails neither read nor charge inactive lanes.",
+      "target": "batched_lookahead_step and check_masked_tails",
+      "prerequisites": [
+        "scalar lane oracle"
+      ],
+      "deterministic_falsifier": "Any active logical item is visited other than exactly once, or any inactive lane is dereferenced.",
+      "measurement_gate": "Sanitizer/UB screen, exact trajectory and scalar-operation parity for every tail length, then isolated full-batch versus tail-heavy controls.",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/receipts/r67_83.txt"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R69",
+      "title": "Retry-lane stable compaction",
+      "status": "specified_not_implemented",
+      "mechanism": "Compact unresolved lookahead lanes between attempts while carrying the original lane id and charging every attempted addition.",
+      "target": "strong_rho.rs::batched_lookahead_step",
+      "prerequisites": [
+        "R68 active masks",
+        "frozen lane-order semantics"
+      ],
+      "deterministic_falsifier": "A compacted lane changes its selected jump, coefficient update, retry count, final point, or charged attempted work relative to the scalar lane oracle.",
+      "measurement_gate": "Multi-q retry-heavy deterministic panel followed by phase-isolated ABAB only if complete counts remain authoritative.",
+      "evidence": [
+        "research/quartic_ghs_strong_rho_20261114/round-c-integration/RESULTS.md#retained-failures-and-boundary"
+      ],
+      "state": "queued-after-dependency"
+    },
+    {
+      "id": "R70",
+      "title": "Structure-of-arrays Fq3 batch representation",
+      "status": "blocked_on_profile",
+      "mechanism": "Store the three cubic coefficients in separate aligned lane arrays while preserving the scalar abstract-operation accounting.",
+      "target": "strong_rho.rs F3 and StepScratch",
+      "prerequisites": [
+        "M1 attributes material time to lane field arithmetic",
+        "R68 active masks"
+      ],
+      "deterministic_falsifier": "AoS and SoA paths disagree for any coefficient, trajectory field, collision scalar, or scalar counter vector.",
+      "measurement_gate": "Exact lane parity, sanitizer checks, source-bound host features, then isolated scalar-AoS versus scalar-SoA ABAB.",
+      "evidence": [
+        "research/quartic_ghs_strong_rho_parallel_20261118/IMPLEMENTATION_SPEC.md#11-r7--simdstructure-of-arrays-field-kernel"
+      ],
+      "state": "blocked"
+    },
+    {
+      "id": "R71",
+      "title": "Portable SIMD u32 field lanes",
+      "status": "blocked_on_profile",
+      "mechanism": "Vectorize widened u32 lane products and reductions behind the same batch-field trait for the admitted q<2^31 domain.",
+      "target": "FastF3 behind a future ghs_batch_field trait",
+      "prerequisites": [
+        "R70 SoA parity",
+        "M1 arithmetic hotspot",
+        "explicit q<2^31 domain check"
+      ],
+      "deterministic_falsifier": "Any vector lane differs from the scalar reducer on boundaries, random deterministic vectors, partial masks, or fallback hosts.",
+      "measurement_gate": "Scalar counts stay unchanged; vector instructions are separately recorded; isolated per-host ABAB and cold E2E must both improve.",
+      "evidence": [
+        "research/quartic_ghs_strong_rho_parallel_20261118/IMPLEMENTATION_SPEC.md#11-r7--simdstructure-of-arrays-field-kernel"
+      ],
+      "state": "blocked"
+    },
+    {
+      "id": "R72",
+      "title": "Source-bound SIMD dispatch and scalar fallback",
+      "status": "specified_not_implemented",
+      "mechanism": "Select scalar, portable-vector, or architecture-specific kernels from recorded host features without changing mathematical or accounting authority.",
+      "target": "main.rs and a future ghs_batch_field dispatch module",
+      "prerequisites": [
+        "R71 candidate kernels"
+      ],
+      "deterministic_falsifier": "Forced dispatch paths disagree, an unsupported instruction can execute, or the record omits selected kernel and host features.",
+      "measurement_gate": "Forced-path differential tests on every supported host class and a source/binary/feature-bound run identity.",
+      "evidence": [
+        "research/quartic_ghs_strong_rho_parallel_20261118/IMPLEMENTATION_SPEC.md#11-r7--simdstructure-of-arrays-field-kernel"
+      ],
+      "state": "queued-after-dependency"
+    },
+    {
+      "id": "R73",
+      "title": "Cache-aligned walker hot/cold state split",
+      "status": "blocked_on_profile",
+      "mechanism": "Separate per-step point/coefficient/hash state from diagnostics and rarely used restart metadata, with alignment and size asserted at build time.",
+      "target": "strong_rho.rs Walker and NativeCounts",
+      "prerequisites": [
+        "M1 cache or load/store attribution"
+      ],
+      "deterministic_falsifier": "Layout conversion changes trajectory, coefficients, counters, or loses restart/cycle state.",
+      "measurement_gate": "Record struct sizes/alignment and cache counters on an admitted host; require cold E2E improvement beyond A/A.",
+      "evidence": [
+        "research/quartic_ghs_strong_rho_20261114/round-c-integration/RESULTS.md#composition-disposition"
+      ],
+      "state": "blocked"
+    },
+    {
+      "id": "R74",
+      "title": "Jump-table hot/cold split and prefetch screen",
+      "status": "blocked_on_profile",
+      "mechanism": "Keep per-step jump points and scalar deltas contiguous, move setup-only metadata cold, and screen bounded prefetch distances without changing selected jumps.",
+      "target": "strong_rho.rs initial_state and batched_lookahead_step",
+      "prerequisites": [
+        "M1 jump-table cache-miss attribution"
+      ],
+      "deterministic_falsifier": "Any prefetch address may be outside allocated storage, or hot/cold layouts disagree on selected jump, point, scalar, or count.",
+      "measurement_gate": "Sanitizer plus exact trajectory parity, then preregistered prefetch-distance ABAB with no post-hoc distance selection.",
+      "evidence": [
+        "research/quartic_ghs_strong_rho_20261114/round-c-integration/RESULTS.md#composition-disposition"
+      ],
+      "state": "blocked"
+    },
+    {
+      "id": "R75",
+      "title": "Canonical distinguished-point record packing",
+      "status": "specified_not_implemented",
+      "mechanism": "Pack the canonical DP key, coefficients, walker id, and provenance into a fixed schema while retaining full independent verification inputs.",
+      "target": "future GHS parallel DP record, aligned with src/cryptanalysis/pollard_collab",
+      "prerequisites": [
+        "canonical sign/key rule",
+        "collision-verification contract"
+      ],
+      "deterministic_falsifier": "Pack/unpack is not byte-stable, merges opposite sign incorrectly, truncates a scalar, or accepts a record that fails aP+bQ=R.",
+      "measurement_gate": "Round-trip and tamper tests first; memory/traffic comparison reports bytes and verification CPU separately.",
+      "evidence": [
+        "docs/POLLARD_COLLAB_DESIGN.md#4-check-ins",
+        "docs/POLLARD_COLLAB_DESIGN.md#5-state-as-a-crdt"
+      ],
+      "state": "queued-after-dependency"
+    },
+    {
+      "id": "R76",
+      "title": "Deterministic disjoint worker-start indices",
+      "status": "producer_diagnostic_passed",
+      "mechanism": "Interleave worker ids within a job-derived index interval so workers share one transition but never intentionally start the same trail.",
+      "target": "future GHS parallel worker scheduler and prototype walker_index",
+      "prerequisites": [
+        "immutable job identity",
+        "fixed worker count in run identity"
+      ],
+      "deterministic_falsifier": "Any two worker/generation pairs map to the same walker index, or replay under the same job identity differs.",
+      "measurement_gate": "Production PRF conformance vectors and large-domain uniqueness audit before threaded execution.",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/receipts/r67_83.txt",
+        "docs/POLLARD_COLLAB_DESIGN.md#3-search-space-division-indexed-walkers"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R77",
+      "title": "Shared transition and jump-table identity",
+      "status": "producer_diagnostic_passed",
+      "mechanism": "Bind every worker to one job-derived transition and jump table; only trail starts differ.",
+      "target": "future GHS parallel job spec and prototype transition",
+      "prerequisites": [
+        "R76 start derivation",
+        "source and binary hashes"
+      ],
+      "deterministic_falsifier": "Worker-local configuration changes a transition for the same state or a record lacks the transition identity.",
+      "measurement_gate": "Cross-thread and cross-process transition vectors plus exact same-job replay before collision trials.",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/receipts/r67_83.txt",
+        "docs/POLLARD_COLLAB_DESIGN.md#2-background-why-plain-rho-does-not-divide"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R78",
+      "title": "Prefix-sharded distinguished-point table",
+      "status": "producer_diagnostic_passed",
+      "mechanism": "Route each canonical DP key to one power-of-two prefix shard so all coefficient records for that key meet at the same collision detector.",
+      "target": "future GHS parallel DP table and prototype shard_for",
+      "prerequisites": [
+        "R75 canonical key",
+        "R77 shared transition"
+      ],
+      "deterministic_falsifier": "The same key can route to different shards or two different coefficient records for one key evade comparison.",
+      "measurement_gate": "Deterministic routing/collision tests, then report per-shard occupancy, table bytes, operations, and skew under admitted runs.",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/receipts/r67_83.txt",
+        "docs/POLLARD_COLLAB_DESIGN.md#10-trust-model-and-what-is-deliberately-not-done"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R79",
+      "title": "Bounded shard queues and contention accounting",
+      "status": "specified_not_implemented",
+      "mechanism": "Give each DP shard a bounded submission queue and record enqueue, wait, probe, insertion, collision, and backpressure events without dropping records.",
+      "target": "future GHS parallel DP table and coordinator",
+      "prerequisites": [
+        "R78 shard ownership",
+        "R75 fixed record schema"
+      ],
+      "deterministic_falsifier": "A full queue drops or reorders a record in a way that changes collision detection, or accounting fails total_submitted=processed+queued.",
+      "measurement_gate": "Deterministic saturation test then isolated worker-count panel reporting wait CPU, queue depth, contention, and total work.",
+      "evidence": [
+        "research/quartic_ghs_strong_rho_parallel_20261118/IMPLEMENTATION_SPEC.md#12-r8--parallel-distinguished-point-rho"
+      ],
+      "state": "queued-after-dependency"
+    },
+    {
+      "id": "R80",
+      "title": "Checked-stop and overshoot accounting",
+      "status": "producer_diagnostic_passed",
+      "mechanism": "Count work through checked collision detection and retain every step performed during propagation and worker-stop latency as overshoot.",
+      "target": "future GHS parallel coordinator and prototype simulate",
+      "prerequisites": [
+        "independent collision check",
+        "explicit stop protocol"
+      ],
+      "deterministic_falsifier": "total_steps differs from useful_steps+overshoot_steps, or a worker step after detection disappears from the record.",
+      "measurement_gate": "Threaded forced-collision tests with injected stop delays, followed by admitted runs reporting latency, total CPU, useful work, and overshoot together.",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/receipts/r67_83.txt"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R81",
+      "title": "Affinity and NUMA placement in run identity",
+      "status": "blocked_on_admission",
+      "mechanism": "Record worker count, CPU set, affinity outcome, NUMA nodes, memory policy, queue depth, and shard policy as immutable run-identity fields.",
+      "target": "future GHS parallel run schema and GHS development ECBench spec",
+      "prerequisites": [
+        "admitted isolated host",
+        "R79 coordinator"
+      ],
+      "deterministic_falsifier": "Requested placement differs from observed placement without invalidating the run, or two materially different placements share an identity.",
+      "measurement_gate": "Pool/affinity preflight plus observed topology receipt before any worker-count scaling result is admitted.",
+      "evidence": [
+        "problems/ghs-strong-rho-measurement-admission.md"
+      ],
+      "state": "blocked"
+    },
+    {
+      "id": "R82",
+      "title": "Latency, total-work, and scaling-efficiency ledger",
+      "status": "producer_accounting_screen_passed",
+      "mechanism": "Keep wall latency separate from total CPU and steps; compute scaling efficiency only against matched same-host worker-count controls while retaining overshoot.",
+      "target": "future GHS parallel result schema/analyzer and prototype Summary",
+      "prerequisites": [
+        "R80 complete stop accounting",
+        "R81 run identity"
+      ],
+      "deterministic_falsifier": "The record omits a required numerator/denominator, mixes host classes, or total_steps!=useful_steps+overshoot_steps.",
+      "measurement_gate": "A/A per worker count, interleaved scaling panel, confidence intervals, and simultaneous reporting of latency, total CPU, total/useful steps, overshoot, DP/table work, and memory.",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/receipts/r67_83.txt",
+        "research/quartic_ghs_strong_rho_parallel_20261118/IMPLEMENTATION_SPEC.md#12-r8--parallel-distinguished-point-rho"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R83",
+      "title": "Cross-host deterministic portability and fallback gate",
+      "status": "producer_replay_screen_passed",
+      "mechanism": "Require scalar-fallback replay identity across hosts and bind any SIMD/threaded result to its source, binary, compiler, features, topology, and configuration.",
+      "target": "future GHS host capsule and the R67-R83 prototype",
+      "prerequisites": [
+        "R72 dispatch",
+        "R81 topology identity",
+        "R82 accounting ledger"
+      ],
+      "deterministic_falsifier": "Two replays of the same scalar-fallback identity differ, or a host-specific result lacks enough metadata to reproduce dispatch and placement.",
+      "measurement_gate": "Independent second-host scalar replay, then separately calibrated host-specific measurements; never pool unmatched hosts into one speed ratio.",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/receipts/r67_83.txt",
+        "problems/ghs-strong-rho-measurement-admission.md"
+      ],
+      "state": "executed-pass"
+    }
+  ]
+}

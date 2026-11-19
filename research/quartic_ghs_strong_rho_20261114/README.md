@@ -70,6 +70,10 @@ is made [pcc:unverified].
 - [`../quartic_ghs_strong_rho_parallel_20261118/IMPLEMENTATION_SPEC.md`](../quartic_ghs_strong_rho_parallel_20261118/IMPLEMENTATION_SPEC.md)
   defines the source changes, counters, controls, matched measurement grid,
   comprehensive ECBench rerun, publication gates, and follow-on PR sequence.
+- [`../quartic_ghs_r0_r99_20261119/`](../quartic_ghs_r0_r99_20261119/)
+  expands that contract into one hundred explicit R00–R99 lanes, dispatched
+  in six disjoint parallel batches with serialized composition and promotion
+  gates.
 - `main.rs` and the Round A revision of `strong_rho.rs` are the
   source-hash-pinned Round A measurement code. The current `strong_rho.rs` is
   the combined prospective engineering candidate; Round A remains bound by
