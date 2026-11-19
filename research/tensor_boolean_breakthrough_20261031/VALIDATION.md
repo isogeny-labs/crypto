@@ -1158,6 +1158,29 @@ nonsingularity composition, the `A = 0` collision/CM argument,
 torsion-to-division-polynomial vanishing and runtime assembly remain open.
 [pcc:unverified]
 
+## 2026-11-19 cubic-CM additive norm endpoint
+
+`shortCM_nonsingular`, `shortCM_slope`, `shortCM_addX`, and `shortCM_addY`
+check the coordinate identities for `(x,y) -> (omega*x,y)` on
+`Y^2 = X^3 + B`. `shortCMPointMap_add` handles the identity, inverse-point,
+secant, and tangent cases and packages the result as `shortCMEndomorphism`.
+`shortCM_orbit_sum_eq_zero` then proves the pointwise endomorphism identity
+`zeta^2 + zeta + 1 = 0`, including the tangent case at `X = 0`.
+[pcc:unverified]
+
+`cubicCMRelation_implies_norm_torsion` carries out the abstract Eisenstein
+norm calculation, and `shortCMLinearRelation_implies_norm_torsion`
+specializes it: `a*P + b*zeta(P) = 0` forces
+`(a^2 - a*b + b^2)*P = 0`. Claim `PCC-20261119-cbf30e` binds that endpoint.
+The complete pinned project build succeeds with 9,086 jobs and the proof gate
+reports `PASS 293 thm 0 trusted`. [pcc:unverified]
+
+This removes the unproved finite-kernel shortcut from the CM step. It does
+not construct the two-coefficient relation from the `A = 0` interval
+collision, prove torsion-to-division-polynomial vanishing, construct the
+specialized Semaev polynomial, or establish the final runtime theorem.
+[pcc:unverified]
+
 The complete pinned project build succeeds with 9,086 jobs. The repository
 proof gate reports `PASS 244 thm 0 trusted`. [pcc:unverified]
 

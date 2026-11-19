@@ -708,9 +708,12 @@ layer uses these declarations:
    transcendence contradiction. In the `A != 0` interval branch, normalization
    of independently scaled cubics plus the short-sum exclusion of ratio `-1`
    now constructs nonzero radicands and proves pairwise nonsquareness. Still
-   missing are the lifted original relation and its point nonsingularity,
-   torsion-to-division-polynomial vanishing, and the `A = 0` CM
-   endomorphism/finite-kernel specialization.
+   missing are the lifted original relation and its point nonsingularity and
+   torsion-to-division-polynomial vanishing. In the `A = 0` branch the cubic
+   CM coordinate action, its additive group law, the pointwise
+   `zeta^2 + zeta + 1 = 0` identity, and the explicit Eisenstein norm are now
+   checked; constructing the collision-derived linear relation that feeds
+   that endpoint remains open.
    [pcc:unverified]
 
 | statement | kind | owner | quantified structure | hypotheses |
@@ -738,6 +741,9 @@ layer uses these declarations:
 | `shortCubicPolynomial_scaled_pair_fraction_square_classification` | law | same | two nonzero distinct short-cubic scales over a field | odd characteristic and nonsingular cubic |
 | `zmodPositivePairRatio_ne_neg_one` | law | same | positive natural representatives in a prime residue field | their sum is below the modulus |
 | `zmodShortCubicFunctionRadicands_pairwise_not_isSquare_of_A_ne_zero` | endpoint | same | injectively indexed positive prime-field interval scales | `A != 0`, nonsingular cubic and every distinct scale pair has sum below the modulus |
+| `shortCMEndomorphism` | construction | same | affine points of the elliptic curve `Y^2 = X^3 + B` | cubic root of unity in the base field |
+| `shortCM_orbit_sum_eq_zero` | law | same | previous row | characteristic not two, nonidentity root satisfying `omega^2 + omega + 1 = 0` |
+| `shortCMLinearRelation_implies_norm_torsion` | endpoint | same | previous row with integers `a,b` and a point `P` | `a*P + b*zeta(P) = 0`; conclusion is `(a^2 - a*b + b^2)*P = 0` |
 | `algebraic_ne_const_mul_transcendental` | law | same | field extension, algebraic coordinate and transcendental parameter | nonzero constant multiplier |
 | `divisionPolynomial_ne_zero_at_const_mul_transcendental` | law | same | Weierstrass curve over the constant field and extension parameter | division index nonzero in the constant field, nonzero constant multiplier |
 
@@ -765,6 +771,12 @@ for positive scales, normalizes every distinct pair to Lemma 5.4, and excludes
 the only exceptional ratio using the short interval. It does not cover the
 `A = 0` cubic-character collisions or construct the original Semaev relation.
 [pcc:unverified]
+
+Claim `PCC-20261119-cbf30e` binds the `A = 0` cubic-CM norm endpoint. It
+proves the coordinate action is additive, proves the cubic orbit relation on
+all affine points, and derives explicit norm torsion from a supplied
+two-coefficient CM relation. It does not construct that relation from an
+interval collision or prove division-polynomial vanishing. [pcc:unverified]
 
 Claims `PCC-20261119-cd776f` and `PCC-20261119-fc17e6` bind respectively the
 polynomial constant-times-square and the stronger rational-function-square

@@ -409,9 +409,13 @@ Semaev original lifted relation and prove point nonsingularity. For `A != 0`,
 `zmodShortCubicFunctionRadicands_pairwise_not_isSquare_of_A_ne_zero` now
 constructs the interval function-field radicands and proves their nonzero and
 pairwise-nonsquare laws by normalization and exclusion of the exceptional
-ratio `-1` (`PCC-20261119-4e1bc6`). The `A = 0` character-collision branch,
-torsion-to-division-polynomial vanishing and the CM endomorphism argument
-remain open.
+ratio `-1` (`PCC-20261119-4e1bc6`). For `A = 0`, the coordinate action
+`(x,y) -> (omega*x,y)` is now proved additive on the full affine point group;
+its cubic orbit sums to zero, and the explicit Eisenstein-norm calculation
+turns `a*P + b*zeta(P) = 0` into
+`(a^2 - a*b + b^2)*P = 0` (`PCC-20261119-cbf30e`). Constructing that linear
+relation from the interval collision and torsion-to-division-polynomial
+vanishing remain open.
 [pcc:unverified]
 
 The generic certificate is now connected to the pinned upstream definitions,

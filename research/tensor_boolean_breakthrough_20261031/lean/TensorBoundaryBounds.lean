@@ -16,6 +16,7 @@ import Mathlib.AlgebraicGeometry.EllipticCurve.DivisionPolynomial.Degree
 import Mathlib.FieldTheory.Galois.Basic
 import Mathlib.FieldTheory.SplittingField.Construction
 import Mathlib.RingTheory.Localization.NumDen
+import Mathlib.Tactic.Module
 import ECDLP.L49_Main
 
 /-!
@@ -4760,5 +4761,373 @@ theorem sevenEighthsShiftsSurvive
       simpa [Nat.mul_assoc] using candidateLarge)
   rw [Finset.card_sdiff_of_subset unionSubset]
   omega
+
+/-! ## The cubic CM automorphism on the `A = 0` short curve -/
+
+/-- A field element whose cube is one is nonzero. -/
+theorem cubeRootOfOne_ne_zero
+    {K : Type*} [Field K] {omega : K} (omegaCube : omega ^ 3 = 1) :
+    omega ≠ 0 := by
+  intro omegaZero
+  rw [omegaZero, zero_pow (by norm_num)] at omegaCube
+  exact zero_ne_one omegaCube
+
+/-- Multiplication of the `X`-coordinate by a cubic root of unity preserves
+the affine equation, hence nonsingularity, of `Y² = X³ + B`. -/
+theorem shortCM_nonsingular
+    {K : Type*} [Field K] (B omega x y : K)
+    [(shortCharacterCurve 0 0 B).IsElliptic]
+    (omegaCube : omega ^ 3 = 1)
+    (nonsingular : (shortCharacterCurve 0 0 B).toAffine.Nonsingular x y) :
+    (shortCharacterCurve 0 0 B).toAffine.Nonsingular (omega * x) y := by
+  apply WeierstrassCurve.Affine.equation_iff_nonsingular.mp
+  rw [shortCharacterCurve_equation_iff]
+  have equation :=
+    WeierstrassCurve.Affine.equation_iff_nonsingular.mpr nonsingular
+  rw [shortCharacterCurve_equation_iff] at equation
+  simp only [zero_mul, zero_add, add_zero] at equation ⊢
+  calc
+    y ^ 2 = x ^ 3 + B := equation
+    _ = (omega * x) ^ 3 + B := by rw [mul_pow, omegaCube, one_mul]
+
+/-- On `Y² = X³ + B`, the secant-or-tangent slope transforms by `omega²`
+under `(x,y) ↦ (omega*x,y)`. -/
+theorem shortCM_slope
+    {K : Type*} [Field K] [DecidableEq K]
+    (B omega x₁ x₂ y₁ y₂ : K) (omegaCube : omega ^ 3 = 1) :
+    (shortCharacterCurve 0 0 B).toAffine.slope
+        (omega * x₁) (omega * x₂) y₁ y₂ =
+      omega ^ 2 *
+        (shortCharacterCurve 0 0 B).toAffine.slope x₁ x₂ y₁ y₂ := by
+  have omegaNonzero : omega ≠ 0 := cubeRootOfOne_ne_zero omegaCube
+  by_cases xEqual : x₁ = x₂
+  · have scaledXEqual : omega * x₁ = omega * x₂ := congrArg (omega * ·) xEqual
+    by_cases yOpposite : y₁ = -y₂
+    · rw [WeierstrassCurve.Affine.slope_of_Y_eq scaledXEqual,
+        WeierstrassCurve.Affine.slope_of_Y_eq xEqual] <;>
+        simpa [shortCharacterCurve, WeierstrassCurve.Affine.negY] using yOpposite
+    · have originalNotOpposite :
+        y₁ ≠ (shortCharacterCurve 0 0 B).toAffine.negY x₂ y₂ := by
+          simpa [shortCharacterCurve, WeierstrassCurve.Affine.negY] using yOpposite
+      have scaledNotOpposite :
+        y₁ ≠ (shortCharacterCurve 0 0 B).toAffine.negY (omega * x₂) y₂ := by
+          simpa [shortCharacterCurve, WeierstrassCurve.Affine.negY] using yOpposite
+      rw [WeierstrassCurve.Affine.slope_of_Y_ne scaledXEqual scaledNotOpposite,
+        WeierstrassCurve.Affine.slope_of_Y_ne xEqual originalNotOpposite]
+      simp only [shortCharacterCurve, WeierstrassCurve.Affine.negY,
+        zero_mul, zero_add, add_zero, sub_zero]
+      ring
+  · have scaledXNotEqual : omega * x₁ ≠ omega * x₂ := by
+      intro equality
+      exact xEqual (mul_left_cancel₀ omegaNonzero equality)
+    rw [WeierstrassCurve.Affine.slope_of_X_ne scaledXNotEqual,
+      WeierstrassCurve.Affine.slope_of_X_ne xEqual]
+    have differenceNonzero : x₁ - x₂ ≠ 0 := sub_ne_zero.mpr xEqual
+    field_simp [omegaNonzero, differenceNonzero]
+    rw [omegaCube, mul_one]
+
+/-- The `X`-coordinate addition formula is equivariant under the cubic CM
+scaling. -/
+theorem shortCM_addX
+    {K : Type*} [Field K] (B omega x₁ x₂ slope : K)
+    (omegaCube : omega ^ 3 = 1) :
+    (shortCharacterCurve 0 0 B).toAffine.addX
+        (omega * x₁) (omega * x₂) (omega ^ 2 * slope) =
+      omega * (shortCharacterCurve 0 0 B).toAffine.addX x₁ x₂ slope := by
+  have omegaFourth : omega ^ 4 = omega := by
+    calc
+      omega ^ 4 = omega * omega ^ 3 := by ring
+      _ = omega := by rw [omegaCube, mul_one]
+  simp only [WeierstrassCurve.Affine.addX, shortCharacterCurve,
+    zero_mul, zero_add, add_zero, sub_zero]
+  calc
+    (omega ^ 2 * slope) ^ 2 - omega * x₁ - omega * x₂ =
+        omega ^ 4 * slope ^ 2 - omega * x₁ - omega * x₂ := by ring
+    _ = omega * slope ^ 2 - omega * x₁ - omega * x₂ := by rw [omegaFourth]
+    _ = omega * (slope ^ 2 - x₁ - x₂) := by ring
+
+/-- The `Y`-coordinate addition formula is fixed by the cubic CM scaling. -/
+theorem shortCM_addY
+    {K : Type*} [Field K] (B omega x₁ x₂ y₁ slope : K)
+    (omegaCube : omega ^ 3 = 1) :
+    (shortCharacterCurve 0 0 B).toAffine.addY
+        (omega * x₁) (omega * x₂) y₁ (omega ^ 2 * slope) =
+      (shortCharacterCurve 0 0 B).toAffine.addY x₁ x₂ y₁ slope := by
+  rw [WeierstrassCurve.Affine.addY, WeierstrassCurve.Affine.addY,
+    WeierstrassCurve.Affine.negAddY, WeierstrassCurve.Affine.negAddY,
+    shortCM_addX B omega x₁ x₂ slope omegaCube]
+  simp only [shortCharacterCurve, WeierstrassCurve.Affine.negY,
+    zero_mul, zero_add, add_zero, sub_zero]
+  calc
+    -(omega ^ 2 * slope *
+          (omega * (shortCharacterCurve 0 0 B).toAffine.addX x₁ x₂ slope -
+            omega * x₁) + y₁) =
+        -(omega ^ 3 * slope *
+          ((shortCharacterCurve 0 0 B).toAffine.addX x₁ x₂ slope - x₁) + y₁) := by
+          ring
+    _ = -(slope *
+          ((shortCharacterCurve 0 0 B).toAffine.addX x₁ x₂ slope - x₁) + y₁) := by
+          rw [omegaCube, one_mul]
+
+/-- Coordinate action of the cubic CM map on affine points of
+`Y² = X³ + B`. -/
+noncomputable def shortCMPointMap
+    {K : Type*} [Field K] (B omega : K)
+    [(shortCharacterCurve 0 0 B).IsElliptic]
+    (omegaCube : omega ^ 3 = 1) :
+    (shortCharacterCurve 0 0 B).toAffine.Point →
+      (shortCharacterCurve 0 0 B).toAffine.Point
+  | .zero => .zero
+  | .some x y nonsingular =>
+      .some (omega * x) y
+        (shortCM_nonsingular B omega x y omegaCube nonsingular)
+
+@[simp]
+theorem shortCMPointMap_zero
+    {K : Type*} [Field K] (B omega : K)
+    [(shortCharacterCurve 0 0 B).IsElliptic]
+    (omegaCube : omega ^ 3 = 1) :
+    shortCMPointMap B omega omegaCube
+      (0 : (shortCharacterCurve 0 0 B).toAffine.Point) = 0 :=
+  rfl
+
+@[simp]
+theorem shortCMPointMap_some
+    {K : Type*} [Field K] (B omega x y : K)
+    [(shortCharacterCurve 0 0 B).IsElliptic]
+    (omegaCube : omega ^ 3 = 1)
+    (nonsingular : (shortCharacterCurve 0 0 B).toAffine.Nonsingular x y) :
+    shortCMPointMap B omega omegaCube
+        (WeierstrassCurve.Affine.Point.some x y nonsingular) =
+      WeierstrassCurve.Affine.Point.some (omega * x) y
+        (shortCM_nonsingular B omega x y omegaCube nonsingular) :=
+  rfl
+
+/-- The cubic CM coordinate action preserves affine point addition. -/
+theorem shortCMPointMap_add
+    {K : Type*} [Field K] [DecidableEq K]
+    (B omega : K) [(shortCharacterCurve 0 0 B).IsElliptic]
+    (omegaCube : omega ^ 3 = 1)
+    (left right : (shortCharacterCurve 0 0 B).toAffine.Point) :
+    shortCMPointMap B omega omegaCube (left + right) =
+      shortCMPointMap B omega omegaCube left +
+        shortCMPointMap B omega omegaCube right := by
+  let W := (shortCharacterCurve 0 0 B).toAffine
+  rcases left with _ | ⟨x₁, y₁, leftNonsingular⟩
+  · rfl
+  rcases right with _ | ⟨x₂, y₂, rightNonsingular⟩
+  · rfl
+  by_cases opposite : x₁ = x₂ ∧ y₁ = W.negY x₂ y₂
+  · have scaledOpposite :
+        omega * x₁ = omega * x₂ ∧ y₁ = W.negY (omega * x₂) y₂ := by
+      refine ⟨congrArg (omega * ·) opposite.1, ?_⟩
+      simpa [W, shortCharacterCurve, WeierstrassCurve.Affine.negY] using opposite.2
+    rw [WeierstrassCurve.Affine.Point.add_of_Y_eq opposite.1 opposite.2,
+      shortCMPointMap_zero B omega omegaCube]
+    simp only [shortCMPointMap]
+    rw [WeierstrassCurve.Affine.Point.add_of_Y_eq
+      scaledOpposite.1 scaledOpposite.2]
+  · have omegaNonzero : omega ≠ 0 := cubeRootOfOne_ne_zero omegaCube
+    have scaledNotOpposite :
+        ¬(omega * x₁ = omega * x₂ ∧ y₁ = W.negY (omega * x₂) y₂) := by
+      intro scaledOpposite
+      apply opposite
+      refine ⟨mul_left_cancel₀ omegaNonzero scaledOpposite.1, ?_⟩
+      simpa [W, shortCharacterCurve, WeierstrassCurve.Affine.negY] using
+        scaledOpposite.2
+    rw [WeierstrassCurve.Affine.Point.add_some opposite]
+    simp only [shortCMPointMap]
+    rw [WeierstrassCurve.Affine.Point.add_some scaledNotOpposite]
+    rw [WeierstrassCurve.Affine.Point.some.injEq]
+    constructor
+    · rw [shortCM_slope B omega x₁ x₂ y₁ y₂ omegaCube,
+        shortCM_addX B omega x₁ x₂
+          (W.slope x₁ x₂ y₁ y₂) omegaCube]
+    · rw [shortCM_slope B omega x₁ x₂ y₁ y₂ omegaCube,
+        shortCM_addY B omega x₁ x₂ y₁
+          (W.slope x₁ x₂ y₁ y₂) omegaCube]
+
+/-- The additive endomorphism of `Y² = X³ + B` induced by the cubic CM
+coordinate action. -/
+noncomputable def shortCMEndomorphism
+    {K : Type*} [Field K] [DecidableEq K]
+    (B omega : K) [(shortCharacterCurve 0 0 B).IsElliptic]
+    (omegaCube : omega ^ 3 = 1) :
+    (shortCharacterCurve 0 0 B).toAffine.Point →+
+      (shortCharacterCurve 0 0 B).toAffine.Point where
+  toFun := shortCMPointMap B omega omegaCube
+  map_zero' := shortCMPointMap_zero B omega omegaCube
+  map_add' := shortCMPointMap_add B omega omegaCube
+
+/-- The quadratic cubic-root relation implies the cubic relation. -/
+theorem cube_eq_one_of_sq_add_self_add_one_eq_zero
+    {K : Type*} [Field K] {omega : K}
+    (omegaRelation : omega ^ 2 + omega + 1 = 0) : omega ^ 3 = 1 := by
+  calc
+    omega ^ 3 = (omega - 1) * (omega ^ 2 + omega + 1) + 1 := by ring
+    _ = 1 := by rw [omegaRelation, mul_zero, zero_add]
+
+/-- The line through the `omega²` and `omega` images of one point is
+horizontal, including the tangent case at `X = 0`. -/
+theorem shortCM_orbit_slope_zero
+    {K : Type*} [Field K] [DecidableEq K]
+    (B omega x y : K) (omegaNonzero : omega ≠ 0)
+    (omegaNonidentity : omega ≠ 1) :
+    (shortCharacterCurve 0 0 B).toAffine.slope
+      (omega ^ 2 * x) (omega * x) y y = 0 := by
+  by_cases xEqual : omega ^ 2 * x = omega * x
+  · have omegaTimesX : omega * x = x := by
+      apply mul_left_cancel₀ omegaNonzero
+      simpa [pow_two, mul_assoc] using xEqual
+    have xZero : x = 0 := by
+      have productZero : (omega - 1) * x = 0 := by
+        calc
+          (omega - 1) * x = omega * x - x := by ring
+          _ = 0 := sub_eq_zero.mpr omegaTimesX
+      exact (mul_eq_zero.mp productZero).resolve_left
+        (sub_ne_zero.mpr omegaNonidentity)
+    by_cases yOpposite :
+        y = (shortCharacterCurve 0 0 B).toAffine.negY (omega * x) y
+    · exact WeierstrassCurve.Affine.slope_of_Y_eq xEqual yOpposite
+    · rw [WeierstrassCurve.Affine.slope_of_Y_ne xEqual yOpposite]
+      simp [xZero, shortCharacterCurve, WeierstrassCurve.Affine.negY]
+  · rw [WeierstrassCurve.Affine.slope_of_X_ne xEqual]
+    simp
+
+/-- The three points in one cubic-CM orbit sum to zero.  This is the
+pointwise endomorphism identity `zeta² + zeta + 1 = 0`. -/
+theorem shortCM_orbit_sum_eq_zero
+    {K : Type*} [Field K] [DecidableEq K]
+    (B omega : K) [(shortCharacterCurve 0 0 B).IsElliptic]
+    (twoNonzero : (2 : K) ≠ 0)
+    (omegaRelation : omega ^ 2 + omega + 1 = 0)
+    (omegaNonidentity : omega ≠ 1)
+    (point : (shortCharacterCurve 0 0 B).toAffine.Point) :
+    shortCMEndomorphism B omega
+          (cube_eq_one_of_sq_add_self_add_one_eq_zero omegaRelation)
+        (shortCMEndomorphism B omega
+          (cube_eq_one_of_sq_add_self_add_one_eq_zero omegaRelation) point) +
+      shortCMEndomorphism B omega
+          (cube_eq_one_of_sq_add_self_add_one_eq_zero omegaRelation) point +
+      point = 0 := by
+  let W := (shortCharacterCurve 0 0 B).toAffine
+  let omegaCube := cube_eq_one_of_sq_add_self_add_one_eq_zero omegaRelation
+  rcases point with _ | ⟨x, y, nonsingular⟩
+  · rfl
+  have omegaNonzero : omega ≠ 0 := cubeRootOfOne_ne_zero omegaCube
+  have BNonzero : B ≠ 0 := by
+    intro BZero
+    have discriminantNonzero :=
+      (shortCharacterCurve 0 0 B).isUnit_Δ.ne_zero
+    rw [originalShortCurve_discriminant] at discriminantNonzero
+    simp [BZero] at discriminantNonzero
+  have firstNonsingular := shortCM_nonsingular B omega x y omegaCube nonsingular
+  have secondNonsingular :=
+    shortCM_nonsingular B omega (omega * x) y omegaCube firstNonsingular
+  have notOpposite :
+      ¬(omega ^ 2 * x = omega * x ∧ y = W.negY (omega * x) y) := by
+    rintro ⟨xEqual, yOpposite⟩
+    have omegaTimesX : omega * x = x := by
+      apply mul_left_cancel₀ omegaNonzero
+      simpa [pow_two, mul_assoc] using xEqual
+    have xZero : x = 0 := by
+      have productZero : (omega - 1) * x = 0 := by
+        calc
+          (omega - 1) * x = omega * x - x := by ring
+          _ = 0 := sub_eq_zero.mpr omegaTimesX
+      exact (mul_eq_zero.mp productZero).resolve_left
+        (sub_ne_zero.mpr omegaNonidentity)
+    have yNeg : y = -y := by
+      simpa [W, shortCharacterCurve, WeierstrassCurve.Affine.negY] using yOpposite
+    have twoY : (2 : K) * y = 0 := by linear_combination yNeg
+    have yZero : y = 0 :=
+      (mul_eq_zero.mp twoY).resolve_left twoNonzero
+    have equation :=
+      WeierstrassCurve.Affine.equation_iff_nonsingular.mpr nonsingular
+    rw [shortCharacterCurve_equation_iff] at equation
+    simp [xZero, yZero] at equation
+    exact BNonzero equation.symm
+  have slopeZero : W.slope (omega ^ 2 * x) (omega * x) y y = 0 :=
+    shortCM_orbit_slope_zero B omega x y omegaNonzero omegaNonidentity
+  have addXEq :
+      W.addX (omega ^ 2 * x) (omega * x)
+          (W.slope (omega ^ 2 * x) (omega * x) y y) = x := by
+    rw [slopeZero]
+    simp only [W, WeierstrassCurve.Affine.addX, shortCharacterCurve,
+      pow_two, zero_mul, zero_add, add_zero, sub_zero]
+    linear_combination -x * omegaRelation
+  have addXZero : W.addX (omega ^ 2 * x) (omega * x) 0 = x := by
+    simpa only [slopeZero] using addXEq
+  have addYEq :
+      W.addY (omega ^ 2 * x) (omega * x) y
+          (W.slope (omega ^ 2 * x) (omega * x) y y) = -y := by
+    rw [WeierstrassCurve.Affine.addY, WeierstrassCurve.Affine.negAddY,
+      slopeZero, addXZero]
+    simp [W, shortCharacterCurve, WeierstrassCurve.Affine.negY]
+  have firstSum :
+      WeierstrassCurve.Affine.Point.some (omega ^ 2 * x) y
+          (by simpa [pow_two, mul_assoc] using secondNonsingular) +
+        WeierstrassCurve.Affine.Point.some (omega * x) y firstNonsingular =
+      -WeierstrassCurve.Affine.Point.some x y nonsingular := by
+    rw [WeierstrassCurve.Affine.Point.add_some notOpposite,
+      WeierstrassCurve.Affine.Point.neg_some,
+      WeierstrassCurve.Affine.Point.some.injEq]
+    exact ⟨addXEq, by
+      simpa [W, shortCharacterCurve, WeierstrassCurve.Affine.negY] using addYEq⟩
+  have secondPointEq :
+      WeierstrassCurve.Affine.Point.some (omega * (omega * x)) y
+          secondNonsingular =
+        WeierstrassCurve.Affine.Point.some (omega ^ 2 * x) y
+          (by simpa [pow_two, mul_assoc] using secondNonsingular) := by
+    rw [WeierstrassCurve.Affine.Point.some.injEq]
+    exact ⟨by ring, rfl⟩
+  change
+    WeierstrassCurve.Affine.Point.some (omega * (omega * x)) y _ +
+        WeierstrassCurve.Affine.Point.some (omega * x) y _ +
+      WeierstrassCurve.Affine.Point.some x y nonsingular = 0
+  rw [secondPointEq, firstSum, neg_add_cancel]
+
+/-- Abstract Eisenstein-norm calculation.  If an additive endomorphism
+`zeta` satisfies `zeta² + zeta + 1 = 0` at `point`, then a relation
+`a*point + b*zeta(point) = 0` forces the explicit norm
+`a² - ab + b²` to annihilate `point`. -/
+theorem cubicCMRelation_implies_norm_torsion
+    {Point : Type*} [AddCommGroup Point]
+    (zeta : Point →+ Point) (point : Point) (a b : ℤ)
+    (orbitRelation : zeta (zeta point) + zeta point + point = 0)
+    (linearRelation : a • point + b • zeta point = 0) :
+    (a ^ 2 - a * b + b ^ 2) • point = 0 := by
+  have zetaSquare : zeta (zeta point) = -(zeta point + point) := by
+    rw [eq_neg_iff_add_eq_zero]
+    simpa [add_assoc] using orbitRelation
+  have mappedRelation := congrArg zeta linearRelation
+  simp only [map_add, map_zsmul, map_zero] at mappedRelation
+  rw [zetaSquare] at mappedRelation
+  have conjugateRelation :
+      (-b) • point + (a - b) • zeta point = 0 := by
+    linear_combination (norm := module) mappedRelation
+  linear_combination (norm := module)
+    (a - b) • linearRelation - b • conjugateRelation
+
+/-- Concrete norm-torsion endpoint for the cubic CM automorphism of
+`Y² = X³ + B`. -/
+theorem shortCMLinearRelation_implies_norm_torsion
+    {K : Type*} [Field K] [DecidableEq K]
+    (B omega : K) [(shortCharacterCurve 0 0 B).IsElliptic]
+    (twoNonzero : (2 : K) ≠ 0)
+    (omegaRelation : omega ^ 2 + omega + 1 = 0)
+    (omegaNonidentity : omega ≠ 1)
+    (point : (shortCharacterCurve 0 0 B).toAffine.Point) (a b : ℤ)
+    (linearRelation :
+      a • point + b • shortCMEndomorphism B omega
+        (cube_eq_one_of_sq_add_self_add_one_eq_zero omegaRelation) point = 0) :
+    (a ^ 2 - a * b + b ^ 2) • point = 0 := by
+  apply cubicCMRelation_implies_norm_torsion
+    (shortCMEndomorphism B omega
+      (cube_eq_one_of_sq_add_self_add_one_eq_zero omegaRelation))
+    point a b
+  · exact shortCM_orbit_sum_eq_zero B omega twoNonzero omegaRelation
+      omegaNonidentity point
+  · exact linearRelation
 
 end TensorBoundaryBounds
