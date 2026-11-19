@@ -426,6 +426,27 @@ impl Producer<'_> {
         let n = 2 * a.len as usize - 1;
         if n > 17 { return Err(Stop::InvalidInput); }
         out.len = n as u8;
+        // R43_PRODUCER_SQUARE_BEGIN
+        // In dense squares, double each row coefficient once rather than
+        // doubling all off-diagonal products. Each term remains canonical.
+        if a.len >= 5 && !a.coefficients[..a.len as usize].contains(&0) {
+            for i in 0..a.len as usize {
+                let ai = a.coefficients[i];
+                let diag = self.mul(ai, ai)?;
+                out.coefficients[2 * i] = self.add(out.coefficients[2 * i], diag)?;
+                if i + 1 < a.len as usize {
+                    let twice_ai = self.add(ai, ai)?;
+                    for j in i + 1..a.len as usize {
+                        let cross = self.mul(twice_ai, a.coefficients[j])?;
+                        out.coefficients[i + j] =
+                            self.add(out.coefficients[i + j], cross)?;
+                    }
+                }
+            }
+            out.trim();
+            return Ok(out);
+        }
+        // R43_PRODUCER_SQUARE_END
         for i in 0..a.len as usize {
             let ai = a.coefficients[i];
             if ai == 0 { continue; }
@@ -1010,6 +1031,31 @@ impl Replay {
         let n = 2 * len - 1;
         if n > 17 { return Err(Stop::InvalidCertificate); }
         z.len = n as u8;
+        // R43_REPLAY_SQUARE_BEGIN
+        // Independent diagonal traversal. Cache twice the lower-index
+        // coefficient so every off-diagonal term needs only one add.
+        if len >= 5 && !x.coefficients[..len].contains(&0) {
+            let mut doubled = [0u64; 17];
+            for i in 0..len - 1 {
+                doubled[i] = self.plus(x.coefficients[i], x.coefficients[i])?;
+            }
+            for k in 0..n {
+                self.gate.charge(32)?;
+                let start = (k + 1).saturating_sub(len);
+                let end = len.min(k + 1);
+                for i in start..end {
+                    let j = k - i;
+                    if i > j { break; }
+                    self.gate.charge(32)?;
+                    let left = if i == j { x.coefficients[i] } else { doubled[i] };
+                    let product = self.times(left, x.coefficients[j])?;
+                    z.coefficients[k] = self.plus(z.coefficients[k], product)?;
+                }
+            }
+            z.trim();
+            return Ok(z);
+        }
+        // R43_REPLAY_SQUARE_END
         let sparse = x.coefficients[..len].contains(&0);
         if sparse {
             // Sparse Frobenius powers are common; omit products with an
