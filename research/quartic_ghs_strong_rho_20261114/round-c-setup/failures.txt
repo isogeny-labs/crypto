@@ -1,0 +1,25 @@
+Retained development failures
+=============================
+
+1. First candidate compile
+
+Command:
+rustc --edition 2021 -O research/quartic_ghs_strong_rho_20261114/main.rs -o /dev/shm/ghs-leads/ghs-setup-candidate
+
+Exit: 1
+
+rustc E0277 reported that StepBy<RangeInclusive<usize>> was not a
+DoubleEndedIterator at the reversed width-2 window loop. The implementation
+was changed to reverse the window index range and multiply each index by two.
+The exact-commit compile and all subsequent controls passed.
+
+2. Checkpoint gate
+
+Command:
+scripts/checkpoint.sh gate
+
+Exit: 2
+
+The gate refused because `.resume/RESUME.md` was absent and therefore no
+resume checkpoint was in S3. No profile, timing panel, larger diagnostic,
+paid run, frontier inference, or leaderboard update was attempted.

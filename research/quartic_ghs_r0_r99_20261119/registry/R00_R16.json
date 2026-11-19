@@ -1,0 +1,332 @@
+{
+  "schema": "ghs-r0-r99-range/v1",
+  "range": [
+    "R00",
+    "R16"
+  ],
+  "claim_scope": "producer-side deterministic screens only",
+  "lanes": [
+    {
+      "id": "R00",
+      "title": "Requirement-to-evidence closure",
+      "mechanism": "Require every registered lead to name its implementation target, deterministic falsifier, measurement gate, status, and evidence path.",
+      "target": [
+        "research/quartic_ghs_r0_r99_20261119/registry"
+      ],
+      "prerequisites": [],
+      "deterministic_falsifier": "Reject a registry with a missing or duplicate R00-R99 identifier or an empty required field.",
+      "measurement_gate": "Not a speed claim; the final campaign validator must bind every promoted row to one registered lead.",
+      "status": "implemented-unverified",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/registry/R00_R16.json"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R01",
+      "title": "Source revision binding",
+      "mechanism": "Fail closed unless the instance record identifies the frozen composed source revision.",
+      "target": [
+        "research/quartic_ghs_strong_rho_20261114/main.rs",
+        "research/quartic_ghs_r0_r99_20261119/prototypes/r00_r16.rs"
+      ],
+      "prerequisites": [
+        "R00"
+      ],
+      "deterministic_falsifier": "Change source_revision away from d85752a9a0; the native validator must exit nonzero.",
+      "measurement_gate": "Every measured record must bind the pushed commit, source digest, binary digest, and immutable protocol digest.",
+      "status": "screened-pass-unverified",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/r00-r16-receipt.txt"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R02",
+      "title": "Reproducible binary and digest capsule",
+      "mechanism": "Compile the same frozen source twice with the same revision binding and require byte-identical binaries.",
+      "target": [
+        "research/quartic_ghs_strong_rho_20261114/main.rs",
+        "research/quartic_ghs_strong_rho_20261114/round-c-integration/metadata.txt"
+      ],
+      "prerequisites": [
+        "R01"
+      ],
+      "deterministic_falsifier": "A byte difference or digest mismatch between the two builds rejects the capsule.",
+      "measurement_gate": "The isolated runner must rebuild or fetch the exact digest-pinned binary and record the compiler and host capsule.",
+      "status": "screened-pass-unverified",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/r00-r16-receipt.txt"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R03",
+      "title": "Known-answer algebra self-test",
+      "mechanism": "Exercise reciprocal reduction, partition selection, direct inversion, batch inversion, simultaneous multiplication, setup, and planted logs before candidate admission.",
+      "target": [
+        "research/quartic_ghs_strong_rho_20261114/strong_rho.rs"
+      ],
+      "prerequisites": [
+        "R02"
+      ],
+      "deterministic_falsifier": "Any field mismatch, point mismatch, planted-log failure, or self-test panic rejects the build.",
+      "measurement_gate": "The exact self-test runs inside the measured image before and after the timed panel.",
+      "status": "screened-pass-unverified",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/r00-r16-receipt.txt"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R04",
+      "title": "Counted versus production differential pairing",
+      "mechanism": "Pair strong-bW and fast-bW arms and require identical mathematical and native execution fields at W in {1,4,8,16,32}.",
+      "target": [
+        "research/quartic_ghs_strong_rho_20261114/strong_rho.rs",
+        "research/quartic_ghs_r0_r99_20261119/prototypes/r00_r16.rs"
+      ],
+      "prerequisites": [
+        "R03"
+      ],
+      "deterministic_falsifier": "A one-step mutation in fast-b8 must be rejected; the prototype self-test performs this mutation in memory.",
+      "measurement_gate": "Every candidate width needs paired counted and production records on identical instances.",
+      "status": "screened-pass-unverified",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/r00-r16-receipt.txt"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R05",
+      "title": "Counter authority fail-closed gate",
+      "mechanism": "Counted arms alone may claim count authority; production arms must report false authority and zero field counters.",
+      "target": [
+        "research/quartic_ghs_strong_rho_20261114/main.rs",
+        "research/quartic_ghs_strong_rho_20261114/analyze.py"
+      ],
+      "prerequisites": [
+        "R04"
+      ],
+      "deterministic_falsifier": "Set fast-b4 count_authoritative=true or fast-b1 walk.fq_mul=1; both mutations must be rejected.",
+      "measurement_gate": "Modeled-cost analysis must reject null, false, malformed, and zero-filled authority substitutions.",
+      "status": "screened-pass-unverified",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/r00-r16-receipt.txt"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R06",
+      "title": "Full trajectory invariant tuple",
+      "mechanism": "Bind batch, setup mode, instance, recovered scalar, steps, distinguished points, retries, cycles, and native transition counts across paired modes.",
+      "target": [
+        "research/quartic_ghs_r0_r99_20261119/prototypes/r00_r16.rs"
+      ],
+      "prerequisites": [
+        "R04"
+      ],
+      "deterministic_falsifier": "Any paired-field mismatch, including one changed step, is a hard failure.",
+      "measurement_gate": "Candidate and control records must retain the complete tuple rather than compare only the final scalar.",
+      "status": "screened-pass-unverified",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/r00-r16-receipt.txt"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R07",
+      "title": "Collision-scalar recovery gate",
+      "mechanism": "Require ok=true and k_found=k for every retained rho record.",
+      "target": [
+        "research/quartic_ghs_strong_rho_20261114/main.rs",
+        "research/quartic_ghs_r0_r99_20261119/prototypes/r00_r16.rs"
+      ],
+      "prerequisites": [
+        "R03"
+      ],
+      "deterministic_falsifier": "A wrong recovered scalar or false success value rejects the complete input.",
+      "measurement_gate": "Every measured target must be a public known-answer fixture or carry an independently verified group equation.",
+      "status": "screened-pass-unverified",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/r00-r16-receipt.txt"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R08",
+      "title": "Phase-complete accounting",
+      "mechanism": "Retain setup, walk, and verification counters separately and reject a comparison that omits any phase.",
+      "target": [
+        "research/quartic_ghs_strong_rho_20261114/main.rs",
+        "research/quartic_ghs_strong_rho_20261114/analyze.py"
+      ],
+      "prerequisites": [
+        "R05"
+      ],
+      "deterministic_falsifier": "A missing phase counter or nonnumeric counter makes the native control parser fail.",
+      "measurement_gate": "Cold one-target comparisons include setup, online walk, collision solve, and answer verification.",
+      "status": "screened-pass-unverified",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/r00-r16-receipt.txt"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R09",
+      "title": "Exact composed count vector",
+      "mechanism": "Bind the complete strong-b8 phase vector to the reviewed composed record rather than recompute a sum of standalone lane deltas.",
+      "target": [
+        "research/quartic_ghs_strong_rho_20261114/round-c-integration/q223.jsonl",
+        "research/quartic_ghs_r0_r99_20261119/prototypes/r00_r16.rs"
+      ],
+      "prerequisites": [
+        "R08"
+      ],
+      "deterministic_falsifier": "Changing any of the 24 strong-b8 phase counters rejects the record.",
+      "measurement_gate": "A newly composed binary establishes a new exact vector before any wall experiment.",
+      "status": "screened-pass-unverified",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/r00-r16-receipt.txt"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R10",
+      "title": "RNG and retry-order invariance",
+      "mechanism": "Include setup RNG, scalar-add, lookahead, retry, cycle, and table diagnostics in differential equality.",
+      "target": [
+        "research/quartic_ghs_strong_rho_20261114/strong_rho.rs",
+        "research/quartic_ghs_r0_r99_20261119/prototypes/r00_r16.rs"
+      ],
+      "prerequisites": [
+        "R06"
+      ],
+      "deterministic_falsifier": "A candidate that rolls back or reorders RNG/retry state changes one bound execution field and is rejected.",
+      "measurement_gate": "Setup-reuse candidates must preserve sequential sampling and charge failed infinity retries.",
+      "status": "screened-pass-unverified",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/r00-r16-receipt.txt"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R11",
+      "title": "Arm parser fail-closed behavior",
+      "mechanism": "Reject unknown suffixes, zero widths, and malformed batch widths rather than silently selecting another arm.",
+      "target": [
+        "research/quartic_ghs_strong_rho_20261114/main.rs"
+      ],
+      "prerequisites": [
+        "R02"
+      ],
+      "deterministic_falsifier": "Run strong-b8junk; acceptance or exit zero fails the lead.",
+      "measurement_gate": "The frozen arm manifest and emitted arm field must match exactly in every session.",
+      "status": "screened-pass-unverified",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/r00-r16-receipt.txt"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R12",
+      "title": "Rejected-variant retention",
+      "mechanism": "Keep incorrect setup rollback and count-negative retry-compaction evidence while excluding their code from the composed source.",
+      "target": [
+        "research/quartic_ghs_strong_rho_20261114/round-c-setup",
+        "research/quartic_ghs_strong_rho_20261114/round-c-retry",
+        "research/quartic_ghs_strong_rho_20261114/round-c-integration/RESULTS.md"
+      ],
+      "prerequisites": [
+        "R00"
+      ],
+      "deterministic_falsifier": "A composition that imports a rejected source or deletes its recorded failure is rejected in review.",
+      "measurement_gate": "Every attempted variant remains addressable by source/evidence digest and explicit disposition.",
+      "status": "screened-pass-unverified",
+      "evidence": [
+        "research/quartic_ghs_strong_rho_20261114/round-c-integration/RESULTS.md"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R13",
+      "title": "Optimized-IR counter-elision",
+      "mechanism": "Inspect optimized LLVM IR and require zero counter SSA read/modify/write markers in COUNT=false arithmetic and walk wrappers.",
+      "target": [
+        "research/quartic_ghs_strong_rho_20261114/round-c-counterfree/verify_counterfree_ir.sh"
+      ],
+      "prerequisites": [
+        "R05"
+      ],
+      "deterministic_falsifier": "Any counter SSA marker in the production specialization fails the gate.",
+      "measurement_gate": "Repeat with the exact compiler used by the isolated binary and retain the optimized IR digest.",
+      "status": "screened-pass-unverified",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/r00-r16-receipt.txt"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R14",
+      "title": "Release-build reproducibility",
+      "mechanism": "Require two clean invocations of rustc with the same revision binding to produce identical bytes.",
+      "target": [
+        "research/quartic_ghs_strong_rho_20261114/main.rs",
+        "research/quartic_ghs_strong_rho_20261114/strong_rho.rs"
+      ],
+      "prerequisites": [
+        "R02"
+      ],
+      "deterministic_falsifier": "cmp or SHA-256 disagreement rejects the build.",
+      "measurement_gate": "The measured image binds this digest and preserves the build command and compiler version.",
+      "status": "screened-pass-unverified",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/r00-r16-receipt.txt"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R15",
+      "title": "Nonadditive composition gate",
+      "mechanism": "Re-run one composed binary after accepted mutations; never infer its total from isolated candidate deltas.",
+      "target": [
+        "research/quartic_ghs_strong_rho_20261114/round-c-integration/q223.jsonl",
+        "research/quartic_ghs_strong_rho_20261114/round-c-integration/check_q223.jq"
+      ],
+      "prerequisites": [
+        "R09",
+        "R10",
+        "R12"
+      ],
+      "deterministic_falsifier": "Missing composed raw output, a trajectory change, or a mismatch with the exact count vector blocks promotion.",
+      "measurement_gate": "Only the final composed binary may become the next baseline in the matched grid.",
+      "status": "screened-pass-unverified",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/r00-r16-receipt.txt"
+      ],
+      "state": "executed-pass"
+    },
+    {
+      "id": "R16",
+      "title": "Independent replay and signed standing",
+      "mechanism": "Hand the immutable raw records to a separately authored replay/validator and require the repository validation and PCC chains before publication.",
+      "target": [
+        "docs/VALIDATION_GATE.md",
+        "pcc/claims",
+        "pcc/ledger.jsonl"
+      ],
+      "prerequisites": [
+        "R15"
+      ],
+      "deterministic_falsifier": "A replay mismatch, missing signature, producer-authored independence assertion, or nonverified standing blocks the claim.",
+      "measurement_gate": "VALIDATION.json must point to replay, validator, and matched-rho artifacts; pcc standing must be signed by an accepted verifier.",
+      "status": "independent_content_validation_passed_source_binding_and_signed_standing_blocked",
+      "evidence": [
+        "research/quartic_ghs_strong_rho_parallel_20261118/IMPLEMENTATION_SPEC.md",
+        "ranges/R17_R36_INDEPENDENT_REVIEW.md",
+        "receipts/r17_r36_independent_validation.txt"
+      ],
+      "state": "blocked"
+    }
+  ]
+}

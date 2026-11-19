@@ -1,0 +1,53 @@
+digraph G {
+  graph [
+    rankdir=LR,
+    bgcolor="white",
+    fontname="DejaVu Sans",
+    fontsize=12,
+    labelloc="t",
+    label="R00–R99: discovery, composition, and promotion path"
+  ];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10,
+        color="#475569", fillcolor="#f8fafc", margin="0.10,0.07"];
+  edge [color="#64748b", arrowsize=0.7, fontname="DejaVu Sans", fontsize=9];
+
+  subgraph cluster_parallel {
+    label="Parallel first pass: deterministic screens";
+    color="#93c5fd";
+    style="rounded,dashed";
+    b0 [label="R00–16\ncontrols + accounting"];
+    b1 [label="R17–33\nfield arithmetic"];
+    b2 [label="R34–50\nsetup + group"];
+    b3 [label="R51–66\nwalk + symmetry"];
+    b4 [label="R67–83\nSIMD + parallel DP"];
+    b5 [label="R84–99\nECBench + publication"];
+  }
+
+  registry [label="100-ID registry\nunique + contiguous", fillcolor="#dbeafe", color="#2563eb"];
+  r17 [label="R17/R20/R33\nselectable mul5 kernel", fillcolor="#dcfce7", color="#16a34a"];
+  r36 [label="R36/R50\nwalker-table reuse", fillcolor="#dcfce7", color="#16a34a"];
+  r64 [label="R64\nselectable bare hot path", fillcolor="#fef3c7", color="#d97706"];
+  compose [label="Serialized composition\nselftest + known answer +\ntrajectory + authority", fillcolor="#e0e7ff", color="#4f46e5"];
+  admission [label="Checkpoint + isolated host\nA/A calibration", fillcolor="#fee2e2", color="#dc2626"];
+  measure [label="A/B + ABAB + holdout\ncold one-target accounting", fillcolor="#f1f5f9"];
+  controls [label="Matched strongest rho +\nexternal equal-output tools", fillcolor="#f1f5f9"];
+  validate [label="Replay + independent validator\nPCC + benchmark record", fillcolor="#f1f5f9"];
+  publish [label="R99 publication\nleaderboard + PDF", fillcolor="#f1f5f9"];
+
+  b0 -> registry;
+  b1 -> registry;
+  b2 -> registry;
+  b3 -> registry;
+  b4 -> registry;
+  b5 -> registry;
+  b1 -> r17;
+  b2 -> r36;
+  b3 -> r64;
+  r17 -> compose;
+  r36 -> compose;
+  r64 -> compose;
+  registry -> compose [style=dashed];
+  compose -> admission;
+  admission -> measure [label="currently blocked", color="#dc2626", fontcolor="#b91c1c"];
+  measure -> controls -> validate -> publish;
+}

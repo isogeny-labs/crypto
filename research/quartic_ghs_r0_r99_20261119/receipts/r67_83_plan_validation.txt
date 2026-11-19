@@ -1,0 +1,72 @@
+R67-R83 measurement-plan validation receipt
+status: static producer-side plan check [pcc:unverified]
+date: 2026-11-19 UTC
+branch: codex/ghs-rho-parallel-20261118
+
+Validated file
+--------------
+path: research/quartic_ghs_r0_r99_20261119/ranges/R67_R83_MEASUREMENT_PLAN.md
+sha256: 328a2dbe521d2bac952d15cf1f1a19fe8dee04157cf60afe2e05b483278a07c2
+
+Checks
+------
+1. PCC prose lint.
+2. Git whitespace/error check.
+3. Presence of the frozen parallel CLI, accounting, worker, isolation,
+   admission, stop, replay and honest-status tokens.
+4. Presence of deterministic matrix rows D00 through D10.
+5. Balanced Markdown code fences.
+
+Commands
+--------
+python3 tools/pcc/pcc.py lint-prose \
+  research/quartic_ghs_r0_r99_20261119/ranges/R67_R83_MEASUREMENT_PLAN.md
+
+git diff --check -- \
+  research/quartic_ghs_r0_r99_20261119/ranges/R67_R83_MEASUREMENT_PLAN.md
+
+plan=research/quartic_ghs_r0_r99_20261119/ranges/R67_R83_MEASUREMENT_PLAN.md
+for token in \
+  'check-parallel' \
+  'run-parallel' \
+  'indexed-sha256-v1' \
+  'total_steps = useful_steps + overshoot_steps' \
+  'P1A' 'P1B' 'P2' 'P4' \
+  'L2 or higher' \
+  'scripts/checkpoint.sh gate' \
+  'scripts/isolab_pool_check.sh --cpu 8 --memory 8Gi --pool cpu-spot' \
+  'wrong answer' \
+  'deterministic replay mismatch' \
+  'not implemented' \
+  'not launched'
+do
+  rg -q -F "$token" "$plan" || exit 1
+done
+
+for row in D00 D01 D02 D03 D04 D05 D06 D07 D08 D09 D10
+do
+  rg -q "\\| $row \\|" "$plan" || exit 1
+done
+
+code_fences=$(rg -c '^```' "$plan")
+test $((code_fences % 2)) -eq 0
+
+Final output
+------------
+lint-prose: 0 finding(s)
+plan validation PASS: required_tokens=15 deterministic_rows=11 code_fences=30
+
+Retained correction
+-------------------
+The first PCC prose-lint attempt reported one uncited strong-claim token on
+the planned report-table row containing `successful`. The plan was corrected
+by marking that future status row `[pcc:unverified]`; the final lint above has
+zero findings.
+
+Execution boundary
+------------------
+No `run`, `run-parallel`, `check-parallel`, calibration, benchmark, perf,
+IsoLab, EKS, or other timing command was executed for this second pass. The
+parallel CLI named by the plan is not implemented, and the existing
+checkpoint/isolation admission problem remains open. Static plan validation
+does not establish execution readiness, performance, or a frontier result.

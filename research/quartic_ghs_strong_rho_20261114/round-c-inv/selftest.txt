@@ -1,0 +1,11 @@
+command: /dev/shm/ghs-leads/ghs-inv-a973d17346 selftest
+exit: 0
+source_revision: a973d173465aa6983e97a393664bf2c0548903b2
+
+selftest: small-c: 200 inverses match; fq_mul direct=12..12, reference=16..16, delta=4 each
+selftest: fast field matches frozen field
+selftest: fallback-c=18: 200 inverses match; fq_mul direct=13..15, reference=17..19, delta=4 each
+selftest: batch inverse matches pointwise inversion
+selftest: fast and batched curve addition match frozen curve
+selftest: planted logs recovered at widths 1, 8, and 32
+SELFTEST OK
