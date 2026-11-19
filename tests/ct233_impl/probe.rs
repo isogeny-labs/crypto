@@ -128,6 +128,7 @@ fn ct233_weighted_graph_cycle_and_mutation_controls() {
         assert!(out.is_none(),"false B-only relation from unbalanced cycle");
     }
     assert_eq!(p.iter().filter(|v|v.is_some()).count(),3);
+    assert_eq!(recover_lp(&p,&[0,0]),vec![Some(0),Some(0),Some(0)]);
     let mut p=vec![None;3];
     let rows=[
         EqRow{b:vec![2,0],lp:vec![1,1,0],rhs:1},
@@ -138,9 +139,12 @@ fn ct233_weighted_graph_cycle_and_mutation_controls() {
     assert!(lp_insert(&mut p,rows[1].clone()).is_none());
     let (brow,rhs)=lp_insert(&mut p,rows[2].clone()).unwrap();
     assert_eq!((brow,rhs),(vec![9,m(-5,R)],2));
-    // Mutation must fail direct substitution for the known relation.
-    let fake_rhs=m(rhs+1,R);
-    assert_ne!(m(9*7-5*3,R),fake_rhs); // Independent concrete vector 7,3 yields 48 != 3.
+    // A balanced-cycle equation is true at this fixed B witness, but a
+    // one-unit RHS mutation is rejected rather than falsely certified.
+    assert_eq!(m(9*3-5*5,R),rhs);
+    assert_ne!(m(9*3-5*5,R),m(rhs+1,R));
+    assert!(recover_lp(&p,&[3,5]).iter().any(Option::is_none),
+        "an unanchored signed graph must not certify all its LP logs");
     // Two signed one-LP parallel edges cancel exactly (CT231 compatibility).
     let mut p=vec![None;1];
     assert!(lp_insert(&mut p,EqRow{b:vec![2,-5],lp:vec![-1],rhs:17}).is_none());
