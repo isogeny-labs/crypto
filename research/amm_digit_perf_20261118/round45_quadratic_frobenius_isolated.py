@@ -247,14 +247,15 @@ mod round45_quad {
         for degree in [2usize,3,4,6,8]{
             let f=polynomial(p,degree);
             for exp in [(p-1)/2,p]{
+                let delta = if exp==p {0} else {13};
                 let mut old=Vec::new();let mut new=Vec::new();
                 for trial in 0..13{
                     if trial%2==0{
-                        old.push(probe_timed(p,&f,13,exp,true,6));
-                        new.push(probe_timed(p,&f,13,exp,false,6));
+                        old.push(probe_timed(p,&f,delta,exp,true,6));
+                        new.push(probe_timed(p,&f,delta,exp,false,6));
                     }else{
-                        new.push(probe_timed(p,&f,13,exp,false,6));
-                        old.push(probe_timed(p,&f,13,exp,true,6));
+                        new.push(probe_timed(p,&f,delta,exp,false,6));
+                        old.push(probe_timed(p,&f,delta,exp,true,6));
                     }
                 }
                 let a=median(old);let b=median(new);
@@ -262,12 +263,12 @@ mod round45_quad {
                 let mut bp=Vec::new();let mut ap=Vec::new();let mut br=Vec::new();let mut ar=Vec::new();
                 for trial in 0..13 {
                     let (oldP,oldR,newP,newR)=if trial%2==0 {
-                        let old=probe_parts(p,&f,13,exp,true);
-                        let new=probe_parts(p,&f,13,exp,false);
+                        let old=probe_parts(p,&f,delta,exp,true);
+                        let new=probe_parts(p,&f,delta,exp,false);
                         (old.0,old.1,new.0,new.1)
                     } else {
-                        let new=probe_parts(p,&f,13,exp,false);
-                        let old=probe_parts(p,&f,13,exp,true);
+                        let new=probe_parts(p,&f,delta,exp,false);
+                        let old=probe_parts(p,&f,delta,exp,true);
                         (old.0,old.1,new.0,new.1)
                     };
                     bp.push(oldP);br.push(oldR);ap.push(newP);ar.push(newR);
