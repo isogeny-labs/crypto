@@ -1,0 +1,9 @@
+Hourly relation monitor invocation
+UTC: 2026-11-19 19:13
+Requested repository: aburan28/crypto (redirects to isogeny-labs/crypto)
+Branch: hourly-runs
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Curve: frozen Koblitz GF(2^23), a=0, m=2 synthetic control (not ECC2K-130)
+Baseline: results/relation_baseline.json
+Threshold: >20% absolute change in relations/sec or success rate
+Output: results/hourly_log.csv
