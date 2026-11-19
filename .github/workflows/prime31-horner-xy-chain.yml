@@ -170,6 +170,8 @@ jobs:
             .cases_per_window==128 and .positive==512 and .negative==512 and
             .positive_zero_resultants==4096 and
             .negative_only_slot0_failed==512 and
+            .jacobian_nonsingular==512 and
+            .membership_geometric_quotient_dimension==16777216 and
             (.windows | length)==4 and
             (.windows | all(.distinct_slot_roots==64)) and
             .slot_supports_pairwise_disjoint==true and
