@@ -348,5 +348,9 @@ source estimates are supplied.
 | `sevenEighthsShiftsSurvive` | endpoint | same | candidate finset and bad-set family | bad sets lie in candidates, family/card bounds, `8wf <= #candidates` |
 
 These theorems certify the generic planted-diagonal counting step only. They
-do not certify that the paper's residual blocks have the asserted form or
-that successful shifts recover an ECDLP relation.
+do not themselves certify that the paper's residual blocks have the asserted
+form or that successful shifts recover an ECDLP relation. The separately
+pinned upstream v2 modules `L114_Trans`, `L114_Plant`, and `L114_Main` do check
+the stronger algorithm-facing transcript, planted-kernel, round-failure and
+successful-round implications, parameterized by their explicit interfaces.
+[pcc:unverified]

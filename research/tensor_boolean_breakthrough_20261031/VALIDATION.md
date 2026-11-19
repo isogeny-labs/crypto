@@ -607,3 +607,32 @@ injection and finite cardinality arithmetic. The paper-specific proof that each
 failed planting yields one of the singular residual blocks, and the transcript
 independence making those blocks independent of the shift, remain outside this
 formalization.
+
+### Pinned upstream v2 planting and round modules
+
+The omitted `v2/lean` tree was materialized from exact source commit
+`d1deb5abe008e981206ed58cbd83012b6afc3740`. After fetching the pinned Mathlib
+cache, these declared targets built successfully:
+
+```text
+lake build ECDLPv2.L114_Plant  # 9,050 jobs
+lake build ECDLPv2.L114_Main   # 9,057 jobs
+```
+
+An explicit audit imported `ECDLPv2.L114_Main` and printed axioms for
+`det_sub_scalar`, `bad_nu_le`, `bad_nu_union`, `block_isUnit`,
+`planted_kernel`, `double_count`, `trans_count_indep`, `round_failure_le`, and
+`round_output`. Every declaration reports exactly `[propext,
+Classical.choice, Quot.sound]`. Source hashes are:
+
+```text
+9e98de7e7347505427643dd57dc2be513a58cb1dd11c0a24fbceec3b6c74ac3f  L114_Plant.lean
+378057e83147933551ff574be80e485220f867201a1db357f682fccc4b169109  L114_Trans.lean
+f247462fc4a23d8e2f4134d768b3e7072e2aba2a263c249c2c9180c173a34b39  L114_Main.lean
+```
+
+This closes the previously reported transcript-independence and
+failed-planting-to-singular-block formal gaps. The upstream round theorem is
+still parameterized by explicit coverage, generation, cap and procedure
+interfaces, and the expected sparse Wiedemann--Dixon bit-cost claim is not a
+conclusion of these finite theorems. [pcc:unverified]

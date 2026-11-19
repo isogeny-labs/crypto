@@ -111,19 +111,28 @@ every fixed `k`. Tracing `L61_Machine.tm_of_source` confirms that the machine
 and its per-input step proof are constructed, rather than postulated as a
 numeric work function.
 
-The Lean theorem stops at decomposition search. The paper supplies the
-following additional pieces:
+The decomposition capstone stops at decomposition search, but the same pinned
+v2 tree contains a separate checked index-calculus reduction. Its modules
+`L114_Trans`, `L114_Plant`, and `L114_Main` supply:
 
 - Theorem 3: constant-probability coverage after a random isomorphic dilation.
-- Sections 6.2--6.5: full-group relation lattices and exact recovery without a
-  random-rank hypothesis.
-- Section 6.6: a random planted diagonal and sparse Wiedemann--Dixon linear-system steps,
-  giving the stated `p^(2/m+o(1))` bound for arbitrary prime powers in the
-  group order.
+- Sections 6.2--6.5: checked full-group relation-lattice and exact-recovery
+  algebra, parameterized by its stated round hypotheses.
+- Section 6.6: checked adaptive-transcript independence, integer
+  characteristic-polynomial and union bounds, prime-power block invertibility,
+  planted kernel construction, a finite round-failure budget, and successful-
+  round correctness.
 - A final scalar multiplication check, which makes any returned output Las
   Vegas-correct even when a round's generation or linear-algebra events fail.
 
-These are paper proofs, not conclusions of `subexponentialRate_all`.
+These are not conclusions of `subexponentialRate_all`, but they are genuine
+Lean theorems in the separately declared `v2/lean` project. A local build at
+the pinned commit completed for `ECDLPv2.L114_Plant` (9,050 jobs) and
+`ECDLPv2.L114_Main` (9,057 jobs). Explicit axiom output for
+`det_sub_scalar`, `bad_nu_le`, `bad_nu_union`, `block_isUnit`,
+`planted_kernel`, `double_count`, `trans_count_indep`, `round_failure_le`, and
+`round_output` is exactly `[propext, Classical.choice, Quot.sound]`.
+[pcc:unverified]
 
 ## Corrections and remaining obligations
 
@@ -175,10 +184,13 @@ distinct modulo `ell` from `nu0 <= ell`, and
 `zmodCharpolySingularShiftCardLeDimension` composes this with the determinant
 root count over a prime residue field. Claims `PCC-20261119-5adae9`,
 `PCC-20261119-7817f3`, and `PCC-20261119-b9e430` pass locally and retain
-unverified signed standing. What remains is the source-specific bridge proving
-that each failed planting produces the asserted singular residual block, plus
-the transcript-independence premise that makes that block independent of the
-random shift. [pcc:unverified]
+unverified signed standing. The stronger pinned-source theorems close the
+source-specific bridge too: `trans_count_indep` proves transcript-law
+independence for an arbitrary history-dependent shift and stateful oracle;
+`round_failure_le` composes that fact with the integer determinant and union
+bound; and `round_output` proves correctness of a successful round. The local
+generic theorems remain useful as small independently checked replicas, but
+they are not the only Lean evidence for the planting step. [pcc:unverified]
 
 Before the ECDLP specialization is promoted from unverified paper deduction,
 the remaining independent obligations are:
@@ -189,9 +201,9 @@ the remaining independent obligations are:
    [pcc:unverified];
 2. bind the factor-base labels returned by the Lean oracle to the rows used by
    the arbitrary-group relation lattice;
-3. verify that every failed planted diagonal gives the characteristic-
-   polynomial singularity used by the checked root-count endpoint, and
-   formalize the transcript-independence premise [pcc:unverified];
+3. bind the checked finite round-failure and successful-round theorems to all
+   concrete coverage, generation, cap and Howell-procedure hypotheses used by
+   the claimed expected-time algorithm [pcc:unverified];
 4. give an exact cited sparse Wiedemann--Dixon success and bit-cost theorem in
    the regime `ell > 4 f^2`, including retries;
 5. implement or formalize the universal interpreter, independent random tapes,
@@ -208,10 +220,20 @@ remove any of these fixed-`m` correctness and cost obligations.
   <https://github.com/kaarelkaarelson/fast-ecdlp/blob/d1deb5abe008e981206ed58cbd83012b6afc3740/v2/paper.pdf>
 - Lean capstone at the same commit:
   <https://github.com/kaarelkaarelson/fast-ecdlp/blob/d1deb5abe008e981206ed58cbd83012b6afc3740/lean/ECDLP/L104_Final.lean>
+- Pinned planted-diagonal sources:
+  <https://github.com/kaarelkaarelson/fast-ecdlp/blob/d1deb5abe008e981206ed58cbd83012b6afc3740/v2/lean/ECDLPv2/L114_Plant.lean>,
+  <https://github.com/kaarelkaarelson/fast-ecdlp/blob/d1deb5abe008e981206ed58cbd83012b6afc3740/v2/lean/ECDLPv2/L114_Trans.lean>, and
+  <https://github.com/kaarelkaarelson/fast-ecdlp/blob/d1deb5abe008e981206ed58cbd83012b6afc3740/v2/lean/ECDLPv2/L114_Main.lean>.
 - Local source hashes: `v2/paper.pdf`
   `eacf5acb66cedbd7eb656580322c9770d72f47ad6d95412e3d4e5c87309f696d`;
   `lean/ECDLP/L104_Final.lean`
-  `fbe402947e16b04d13d96f90ebd3ba0e75503b66c264e35635f3db8d68665738`.
+  `fbe402947e16b04d13d96f90ebd3ba0e75503b66c264e35635f3db8d68665738`;
+  `v2/lean/ECDLPv2/L114_Plant.lean`
+  `9e98de7e7347505427643dd57dc2be513a58cb1dd11c0a24fbceec3b6c74ac3f`;
+  `v2/lean/ECDLPv2/L114_Trans.lean`
+  `378057e83147933551ff574be80e485220f867201a1db357f682fccc4b169109`;
+  `v2/lean/ECDLPv2/L114_Main.lean`
+  `f247462fc4a23d8e2f4134d768b3e7072e2aba2a263c249c2c9180c173a34b39`.
 
 The repository research-KB wrapper was unavailable (`research-kb: no
 executable found`). The review therefore used this exact primary-source pin,
