@@ -135,3 +135,22 @@ We measured a separate timing control to quantify the opportunity. Each process 
 The timing control measures the catalogue stage in isolation, with a previously computed solution. It does not time the filters or provide an independent solver. Even on three genus-4 matrices that reduce to one free coordinate, bypassing rank determination gave only 1.08–1.12× on this stage. Reducing collection work is the larger opportunity there.
 
 Run `ruby harness/matrix-filter.rb results/g3-prefix-rows.gz results/g4-catalogue-rows.txt` to reproduce the filter table. To rerun the diagnostic build from this directory on macOS, use `ruby harness/catalogue-rank-control.rb 3 | c++ -std=c++17 -O3 -x c++ - -o /tmp/hec-rank-control`, then run the binary once with no arguments and once with `reverse`. Substitute 4 for genus 4. Each timing row stores genus, prime, repetition, arm (0 ordinary, 1 replay), and elapsed nanoseconds. The four original streams are under `results/catalogue-rank-*`.
+
+### Genus-4 pencil through a point with multiplicity four
+
+For a nonbranch point A = (h,y) and z = x − h, let T₃ be the degree-three Taylor polynomial of the local branch at A. The functions y − T₃(z) − bz⁴ have a pole of order nine at infinity and vanish at A to order at least four. After subtracting 4A the residual divisor has degree five. A completely split residual gives a relation between 4A and up to five signed affine places, including repeated places. One extra bucket per point suffices to group the residuals by b, since for z ≠ 0 its bucket index is the fourth Taylor coefficient at A plus z times the existing fifth divided difference.
+
+The independent check formed the monic quintic [f(h+z) − (T₃(z)+bz⁴)²]/z⁴, checked exact division and exhaustively compared field roots, ordinates and multiplicities with the emitted buckets. It checked all 6,005 pencil members on the four curves. The numbers of completely split residuals were 5, 14, 15 and 23 at primes 37, 43, 59 and 67 respectively. Every optimized row consumed during the untimed subset checks annihilated the existing factor-base values. All successful catalogues agreed with the original kernel vector up to scalar.
+
+We tested all 15 nonempty subsets of the four families. At p = 37 every proper subset of the three original families exhausted the available poles before reaching rank 19. Adding the fourth family to all three reduced poles to rank on every curve. It increased the number of pencil members visited in three of the four fields.
+
+| Field | Poles, original → four families | Members visited, original → four families | Original / four-family full solve, forward / reverse |
+|---:|---:|---:|---:|
+| 37 | 17 → 15 | 1,796 → 2,147 | 0.995× / 0.990× |
+| 43 | 15 → 11 | 1,858 → 1,831 | 1.064× / 1.061× |
+| 59 | 18 → 15 | 3,074 → 3,478 | 1.017× / 1.017× |
+| 67 | 14 → 11 | 2,658 → 2,834 | 1.042× / 1.036× |
+
+The full solve used seed 2026111908, eight new pairs per curve, and 32 paired repetitions per case in each timing order. Columns report the median across cases of the per-case paired median. The original three-family solver and the four-family solver each reached 10× against the pencil reference on 30/32 cases in both orders. Every scalar matched its input. The fourth family improved full solve time in both orders on 22/32 cases. Results are specific to these curves and host. The default stays unchanged.
+
+From this directory, run `ruby harness/g4-fourth-pencil.rb verify | c++ -std=c++17 -O3 -x c++ - -o /tmp/g4-check && /tmp/g4-check` for the exhaustive residual check. Omitting `verify` produces the subset benchmark; run the binary with no arguments and again with `reverse`. Its columns are prime, family bit mask (8 selects the fourth family), repetition (−1 for validation), rank attained flag, rank, poles at success and pencil members visited, then nanoseconds. A zero pole count on failure denotes exhaustion. Run `harness/g4-fourth-pencil.zsh` for the complete native comparison. The timing arms are pencil reference, original optimized solver, and four-family solver respectively. The medians file stores prime, case, order, pencil/four-family and original/four-family ratios. Raw timing and audit streams are in Git.
