@@ -14,7 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
-- [ ] Single-target (T = 1) baseline: the multi-target IC instrument's single-target IC against batched single-target rho at 2^32, 2^36, 2^40 (claude, started 2026-11-19, branch aburan28/youthful-hopper-hfrwkd, PR #4747)
+- [x] Single-target (T = 1) baseline: the multi-target IC instrument's single-target IC against batched single-target rho at 2^32, 2^36, 2^40 (claude, started 2026-11-19, branch aburan28/youthful-hopper-hfrwkd, PR #4747): measured 2026-11-19, IC/rho 3.8x / 5.0x / 6.9x, gap grows; bench record close awaits main's malformed hec record
 
 - [x] Cut the multi-target IC's table-build cost at 2^36 (batched in-order inserts, zero-encoded empty slots; measured against tuned rho) (claude, started 2026-11-19, branch aburan28/youthful-hopper-hfrwkd, PR #4747): measured 2026-11-19, IC 0.90–0.92x at 2^36; distance to rho host-dependent; bench record close awaits main's malformed hec record
 
