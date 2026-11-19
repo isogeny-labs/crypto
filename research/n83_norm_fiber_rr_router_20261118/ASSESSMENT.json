@@ -1,0 +1,91 @@
+{
+  "schema": "crypto.transfer-assessment/v1",
+  "status": "screened_out_after_exact_toy_gate",
+  "claim_scope": "constant_one_step_degree4_effective_representatives; exhaustive_n9_transported_subgroup_and_one_fixed_kernel_coset",
+  "source_problem": {
+    "curve": "y^2 + x*y = x^3 + 1 over GF(2^83)",
+    "target_subgroup_order": "2417851639230796216685689",
+    "target_subgroup_order_bits_exact": 81.00000000000092,
+    "source_rho_exponent_in_r": 0.5,
+    "source_rho_exponent_bits": 40.50000000000046
+  },
+  "transport": {
+    "cover": "(u,v) -> (u^3,u*v+1)",
+    "projected_label": "[4]phi(R) in the prime-order target subgroup",
+    "relation_rhs": "[4]phi_*(X)",
+    "kernel_fixture": "K=[3]D-phi^*phi_*(D)",
+    "kernel_nonidentity": true,
+    "kernel_pushforward_identity": true
+  },
+  "exact_n9": {
+    "field_order": 512,
+    "target_group_order": 508,
+    "subgroup_order": 127,
+    "factor_base_bound_first_full_rank": 64,
+    "transported": {
+      "candidates": 65024,
+      "degree4_representatives": 64512,
+      "split_relations": 2844,
+      "b64_rows": 198,
+      "b64_rank": 64,
+      "b64_collision_rate": 0.09595959595959595,
+      "blind_logs": "16/16"
+    },
+    "kernel_coset": {
+      "candidates": 65024,
+      "degree4_representatives": 65024,
+      "split_relations": 2781,
+      "b64_rows": 171,
+      "b64_rank": 64,
+      "b64_collision_rate": 0.03508771929824561,
+      "blind_logs": "16/16"
+    },
+    "ordinary_ambient_control": {
+      "candidates": 65024,
+      "degree4_representatives": 65024,
+      "split_relations": 2650,
+      "b64_rows": 187,
+      "b64_rank": 64,
+      "b64_collision_rate": 0.02807486631016043
+    },
+    "consistency_failures": 0,
+    "validator_status": "pass"
+  },
+  "cost_model": {
+    "useful_relation_probability": "(1/24)*(B/r)^4",
+    "collection_candidates": "Theta(r^4/B^3)",
+    "sparse_linear_algebra": "Omega(B^2)",
+    "individual_log_candidates": "Theta(r^4/B^4)",
+    "balanced_factor_base": "r^(4/5)",
+    "balanced_total_exponent_in_r": 1.6,
+    "balanced_total_exponent_bits_at_n83": 129.60000000000147,
+    "gap_over_source_rho_exponent_bits": 89.10000000000102,
+    "finite_crossover_predicted": false
+  },
+  "controls": {
+    "transported_k0": "pass",
+    "known_nonzero_kernel": "pass",
+    "ordinary_ambient": "pass",
+    "identity_and_two_torsion": "classified",
+    "known_non_kernel_seed": "pass",
+    "nonsplit_support": "counted_as_nonsmooth_not_discarded"
+  },
+  "decision": {
+    "advance_to_n13": false,
+    "advance_to_n19": false,
+    "advance_to_n23": false,
+    "run_n83_timing": false,
+    "reason": "full rank and individual-log recovery do not alter the measured random-label yield or the registered r^(8/5) complete model"
+  },
+  "evidence": {
+    "certificate": {
+      "path": "runs/exact-n9-20261118T0708Z/certificate.json",
+      "sha256": "06d35ba1234579889966faa34ae8e3abfbaae823dce74799cdbd91ccb52471ce"
+    },
+    "validator": {
+      "path": "runs/exact-n9-20261118T0708Z/validator.json",
+      "sha256": "4e5b0c3a7f194f344b6a051febe14ba6fc12cfd117a84358457fb8fdf9061bf0"
+    }
+  },
+  "pcc": "unverified"
+}
