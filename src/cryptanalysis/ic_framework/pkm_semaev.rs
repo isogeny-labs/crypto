@@ -1796,7 +1796,7 @@ impl PkmSemaevOracle {
                     // Guessed summand: the sub-tower tops out at level t − G
                     // with that group's value; the levels above are unused.
                     let (top, c) = match &iso_group {
-                        Some((cg, _)) if i == 0 => (j + 1 == t - self.guess as usize, cg),
+                        Some((cg, _)) if i == 0 => (j + 1 >= t - self.guess as usize, cg),
                         _ => (top, c),
                     };
                     rules.push(if top {
