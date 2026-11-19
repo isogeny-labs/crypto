@@ -217,3 +217,24 @@ Before measuring seeds 2026111914–1916 we selected combined families at 127 an
 In the four-arm harness, identical original code paths on the unselected fields showed execution-order differences. A separate balanced crossover on fresh seed 2026111917 removed the pencil arm and ran original/candidate/candidate/original and its reverse assignment in alternating repetitions. We divided total original time by total candidate time within each quartet, then took the median over 32 quartets per case. The field medians in the two processes were 1.055×/1.065× at 127 and 1.123×/1.123× at 257. On the two same-code control fields they were 0.999×/1.000× at 73 and 1.000×/0.999× at 383. All timed solves verified their scalars. The selection remains experimental.
 
 Run `harness/g3-cubic-pencil.zsh panel`, `rule`, or `crossover` for the three comparisons. The compressed archive contains every timing and audit log. Timing columns follow the native driver format; crossover arms 0 and 3 use the original code and arms 1 and 2 use the selected candidate. The four-arm medians file stores seed, order, prime, case, then ratios 0/1, 0/2, 0/3, 1/2, 1/3 and 2/3. The counts file stores prime, mode, poles, original-family rows and cubic-family rows (mode 0 is the uninstrumented original).
+
+### Transfer to different genus-3 curves over the same fields
+
+For each prime we selected two additional smooth curves of the form y² = x⁷ + x³ + cx + 1. We scanned c in ascending order, excluding the previously measured coefficient. We factored the exact order of the point (0,1) obtained by baby-step giant-step. Its largest prime divisor had to meet the original 1,000 and quarter-Hasse-lower-bound criteria and the native solver limit of 20 million. Each generator passed the subgroup-order check. This selection used no timings or rank results. All eight selected curves completed. We used eight input pairs per curve and seed 2026111918.
+
+The comparison retained the pencil reference, the original optimized solver, the single-pencil bitset control and the two-pencil collector. A second process pair used the balanced crossover with the original and two-pencil solvers on every curve. Each case had 32 repetitions per process, and every timed result matched the planted scalar. The candidate's short scalar check used the curve-specific prime order and a conservative cofactor bound: the least common multiple of all possible positive cofactors up to the integer Hasse upper bound divided by the subgroup order. This avoids assuming the cofactor from a previous curve. All three catalogues produced the same factor-base coordinates up to a nonzero scalar.
+
+| p | c | Poles to rank, single → two | Elimination coefficient updates, single → two | Crossover speedup, forward / reverse |
+|---:|---:|---:|---:|---:|
+| 73 | 33 | 15 → 9 | 467 → 455 | 1.030× / 1.032× |
+| 73 | 57 | 17 → 8 | 877 → 566 | 1.126× / 1.138× |
+| 127 | 15 | 20 → 12 | 960 → 1,318 | 1.053× / 1.055× |
+| 127 | 45 | 12 → 6 | 2,418 → 2,032 | 1.090× / 1.089× |
+| 257 | 54 | 13 → 8 | 9,814 → 11,807 | 0.986× / 0.992× |
+| 257 | 78 | 9 → 6 | 15,338 → 20,931 | 0.870× / 0.878× |
+| 383 | 42 | 13 → 7 | 24,395 → 21,813 | 1.098× / 1.101× |
+| 383 | 80 | 14 → 7 | 37,001 → 41,022 | 1.013× / 1.011× |
+
+The exact update count comes from a separate untimed replay of the pivot elimination loop. Six curves improved on every pair in both crossover orders. Both p = 257 curves slowed down on every pair. At c = 78 the two-pencil matrix consumed 171 rows against 146 and needed 36% more coefficient updates. The original solver reached 10× against the pencil reference on 55/64 cases and the two-pencil solver on 50/64. Applying the earlier field-only choice (two pencils at 127 and 257) to the paired results gives 48/64. This last count is derived from the measured arms. Field size alone did not transfer as a selection rule.
+
+Run `harness/g3-transfer.zsh` to reselect the curves, audit the catalogues and coefficient counts, and rerun the full-solve comparisons. The curves file stores prime, coefficient, subgroup order and multiplier of the starting point. The results archive contains all four timing streams and audits. The median table gives per-case ratios for pencil/original, pencil/two-pencil, original/two-pencil and the balanced crossover. All ratios compare times within the same repetition or quartet.
