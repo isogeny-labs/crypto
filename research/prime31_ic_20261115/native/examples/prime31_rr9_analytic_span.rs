@@ -5,6 +5,7 @@
 //! Companion report: rr9/RR9_SPAN_FULLRANK_SHORTCUT_20261119.md
 use prime31_algebraic_ic::{Arithmetic, Point, PRIME31};
 use serde_json::json;
+use std::collections::HashSet;
 
 const P: u64 = 2_147_483_647;
 const G: Point = Some((625_037_715, 2_100_627_251));
@@ -113,6 +114,16 @@ fn audit() -> serde_json::Value {
         planted = ar.add(PRIME31, planted, term);
     }
     assert_eq!(planted, Some((1_991_076_510, 718_644_930)));
+    let mut forbidden_x = HashSet::new();
+    for &w in &W {
+        for &q in &base {
+            let weighted = ar.scalar(PRIME31, w, Some(q)).expect("non-infinite weighted point");
+            forbidden_x.insert(weighted.0);
+        }
+    }
+    assert_eq!(forbidden_x.len(), 32, "exact 32 distinct forbidden target x-coordinates");
+    assert!(!forbidden_x.contains(&G.expect("finite G").0));
+    assert!(!forbidden_x.contains(&planted.expect("finite P").0));
     let mut cases = Vec::new();
     for (name, target, expectation) in [("N", G, DN), ("P", planted, DP)] {
         let target_xy = target.expect("finite residual");
@@ -138,6 +149,8 @@ fn audit() -> serde_json::Value {
     }
     json!({"p":P,"curve":"original ordinary cofactor-one Prime31",
         "weight_count":W.len(),"selected_base_x":[0,1,2,3],
+        "forbidden_target_x_count":forbidden_x.len(),
+        "max_unproved_target_points_for_this_certificate":2*forbidden_x.len(),
         "proof":"8x8 slot det nonzero => every slot spans Fp^8 => wedge^4 of each half spans dimension 70 => complement pairing rank 70",
         "scope":"N4,P4,N8,P8 frozen cases; no full extractor or ECDLP claim",
         "cases":cases,"pcc":"unverified"})
