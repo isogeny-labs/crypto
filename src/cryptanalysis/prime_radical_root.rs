@@ -3229,6 +3229,57 @@ mod tests {
         }
     }
 
+    #[test]
+    #[ignore = "paired compiled-Rust Barrett screening for canonical 32-bit Fp products"]
+    fn bench_round41_barrett_fp_actual_rust() {
+        use std::{hint::black_box, time::Instant};
+        fn median(mut x: Vec<f64>) -> f64 {
+            x.sort_by(f64::total_cmp);
+            x[x.len() / 2]
+        }
+        for p in [487u64, 1_000_000_007, 1_000_000_009, 4_294_967_291] {
+            let f = Fp::new(p);
+            let mut seed = 0x163e_8f1a_2026_0041;
+            let mut values = [(0u64, 0u64); 1024];
+            for entry in &mut values {
+                entry.0 = lcg(&mut seed) % p;
+                entry.1 = lcg(&mut seed) % p;
+                assert_eq!(f.mul(entry.0, entry.1), entry.0 * entry.1 % p);
+            }
+            fn measure(f: Fp, values: &[(u64, u64)], old: bool) -> f64 {
+                let start = Instant::now();
+                let mut digest = 0u64;
+                for iteration in 0..64usize {
+                    for j in 0..values.len() {
+                        let (a, b) = values[(j + iteration) % values.len()];
+                        let result = if old {
+                            black_box(a) * black_box(b) % black_box(f.p)
+                        } else {
+                            f.mul(black_box(a), black_box(b))
+                        };
+                        digest ^= result;
+                    }
+                }
+                black_box(digest);
+                start.elapsed().as_nanos() as f64 / (64 * values.len()) as f64
+            }
+            let mut before = Vec::new();
+            let mut after = Vec::new();
+            for trial in 0..13 {
+                if trial & 1 == 0 {
+                    before.push(measure(f, &values, true));
+                    after.push(measure(f, &values, false));
+                } else {
+                    after.push(measure(f, &values, false));
+                    before.push(measure(f, &values, true));
+                }
+            }
+            let b = median(before);
+            let a = median(after);
+            println!("ROUND41_RADICAL p={p} before_ns={b:.4} after_ns={a:.4} speedup={:.4}x", b / a);
+        }
+    }
+
     // Run explicitly with:
     // cargo test --release --lib bench_radical_field_actual_rust -- --ignored --nocapture
     // Same corpus for frozen before and actual implementation; microbench only.
