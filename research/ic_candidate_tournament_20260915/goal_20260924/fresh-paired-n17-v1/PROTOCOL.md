@@ -24,8 +24,11 @@ The F5 [scientific registration publication](f5-scientific-registration-v1/resul
 passed data-only custody replay
 (`PASS_DATA_ONLY_TARGET_SCIENTIFIC_REGISTRATION_CUSTODY`, archive
 `ce9b58765bcfb60f8ab76d4914670b8dca36125821d552db9f9abfadc162ccc7`);
-the capsule remains unconsumed. Four-arm dispatch and the sole F5 target run
-remain uncreated. A separate
+the capsule remains unconsumed. The
+[four-arm freeze](four-arm-freeze-v1/RESULT.md) locks arm order
+`rho → f5 → sat → incumbent`, policy bounds, and publication pins
+(`FOUR_ARM_FROZEN_NOT_DISPATCHED`) without granting dispatch. Sole F5/SAT
+target runs and four-arm results remain uncreated. A separate
 [disclosed strong-rho readiness control](rho-readiness-v1/RESULT.md)
 recovered and replayed one already exposed public point; it is neither a
 source publication nor a fresh paired arm.
@@ -90,8 +93,10 @@ F5 and SAT use their separately registered standard-subspace base, so the
 comparison changes both decomposition and factor-base policies. Freeze the arm order,
 algorithm seeds, source/binary pins, resource envelope and timeout policies
 before dispatch. Randomize or alternate arm order across independently drawn
-future cards; never choose the order after seeing a result. For this first
-card, every arm gets exactly one irreversible run, including failures.
+future cards; never choose the order after seeing a result. The first-card
+freeze is archived under [four-arm-freeze-v1](four-arm-freeze-v1/RESULT.md)
+(`rho`, `f5`, `sat`, `incumbent`). For this first card, every arm gets exactly
+one irreversible run, including failures.
 
 The older ecbench curve registry's `EC1N17Ce1hdfbf24105ef5` uses hex
 polynomial-bit strings; the IC manifests' `EC1N17Ckb1hbbe2b5b6b1e6` use
