@@ -26,6 +26,11 @@ the step's own `pull` line is output, never a reference, so a directory the
 workflow stops naming is dropped on regeneration. Inputs a workflow's scripts
 discover at run time are declared with `# tools/artifacts pull: PATH ...`
 comment lines; hand edits to the generated line do not survive.
+
+A workflow whose validation can proceed from tracked recovery data during a
+documented store outage may add `# tools/artifacts pull-continue-on-error`.
+The generated pull step then receives `continue-on-error: true`; the marker is
+scoped to that workflow and does not weaken other consumers.
 """
 
 from __future__ import annotations
@@ -47,6 +52,9 @@ STEP_NAME = "Pull store data this workflow reads (tools/artifacts)"
 # paths per comment line, since its text never names them:
 #     # tools/artifacts pull: research/x/sessions research/y/results
 DECLARE_RE = re.compile(r"^\s*#\s*tools/artifacts pull:(.*)$")
+CONTINUE_ON_ERROR_RE = re.compile(
+    r"^\s*#\s*tools/artifacts pull-continue-on-error\s*$", re.M
+)
 PATH_RE = re.compile(r"(?<![A-Za-z0-9_./*-])((?:[A-Za-z0-9_+*-][A-Za-z0-9_.+*-]*/)+[A-Za-z0-9_.+*-]*)")
 
 
@@ -262,9 +270,9 @@ def pulled_by(text: str) -> list[str]:
     return m.group(1).split() if m else []
 
 
-def step_lines(indent: str, paths: list[str]) -> list[str]:
+def step_lines(indent: str, paths: list[str], continue_on_error: bool = False) -> list[str]:
     i2 = indent + "  "
-    return [
+    lines = [
         f"{indent}- name: {STEP_NAME}",
         f"{i2}shell: bash",
         f"{i2}working-directory: ${{{{ github.workspace }}}}",
@@ -287,6 +295,9 @@ def step_lines(indent: str, paths: list[str]) -> list[str]:
         f"{i2}  fi",
         f"{i2}  python3 tools/artifacts/artifacts.py pull --jobs 16 {' '.join(paths)}",
     ]
+    if continue_on_error:
+        lines.insert(1, f"{i2}continue-on-error: true")
+    return lines
 
 
 def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
@@ -294,6 +305,7 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
 
     With no paths, an earlier generated step is removed and nothing is added.
     """
+    continue_on_error = bool(CONTINUE_ON_ERROR_RE.search(text))
     lines = text.split("\n")
     notes: list[str] = []
     out: list[str] = []
@@ -339,7 +351,7 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
         if not paths:
             i = j
             continue
-        step = step_lines(indent, paths)
+        step = step_lines(indent, paths, continue_on_error)
         cond = next((re.sub(rf"^{indent}(?:- |  )", "", b) for b in block
                      if re.match(rf"^{indent}(?:- |  )if: ", b)), None)
         if cond:  # skipped with its checkout, so it never runs against an empty workspace
