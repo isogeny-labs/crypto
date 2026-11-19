@@ -49,3 +49,17 @@
 
 ### Errors (what went wrong, how it was handled)
 - Whole-repo Workflow files parse [run #44515209875](https://github.com/isogeny-labs/crypto/actions/runs/44515209875) failed before parser due inherited artifact-store pull failure; separate source-specific Rust study passed. No infrastructure modifications or paid compute commissioned.
+
+## 2026-11-19 11:40 UTC — GitHub review handoff
+
+### What was done (commands, files, features)
+- Updated PR #4805 with all frozen evidence and the exact 256-point table; marked it **ready for review** after source-specific CI passed. Posted handoff to RR9/F4 owner [#4692](https://github.com/isogeny-labs/crypto/pull/4692) (GitHub comment ID 7007994044), distinguishing the grading-only power-of-two yield from true public-only coefficient extraction.
+
+### Decisions made (and why)
+- Preserved the complete measured result and protocol without treating source-specific Rust CI as an independently signed PCC. PR stays open and reviewable.
+
+### Open threads (unfinished, pick up next time)
+- Inspect an independent signed replay, held-out seeds, and 40 W1 accidental collisions; do not promote an actual solver-speed claim until #4692 provides an efficient extractor and a fully charged same-runner whole-solver comparison.
+
+### Errors (what went wrong, how it was handled)
+- GitHub auto-merge failed because the configured GraphQL squash merge method is disallowed by this repository: `Merge method squash merging is not allowed on this repository`. No merge was performed; PR #4805 remains open, marked ready for review.
