@@ -159,16 +159,39 @@ into the exact joint `1/12` event. Claims `PCC-20261119-1fd609` and
 The remaining curve-specific inputs are precisely the two total-sum estimates,
 not an additional probabilistic inference. [pcc:unverified]
 
+The generic planted-diagonal root count is now kernel-checked as well.
+`charpolySingularShiftCardLeDimension` proves that an `f`-dimensional square
+matrix has at most `f` candidate scalars `nu` for which `nu I - M` is
+singular. `finiteBadShiftUnionCardBound` and `sevenEighthsShiftsSurvive` then
+prove that at most `wf` shifts are bad for `w` supplied residual blocks and
+that a candidate pool of size at least `8wf` leaves at least `7/8` of its
+shifts good. The underlying polynomial lemma is
+`polynomialBadValuesCardLeDegree`. Claims `PCC-20261119-d2e9ce`,
+`PCC-20261119-b68c62`, `PCC-20261119-698c76`, and
+`PCC-20261119-5e863b` pass locally and retain unverified signed standing.
+The residue injection is also checked:
+`zmodNatCastInjectiveOnFin` proves that the first `nu0` natural shifts are
+distinct modulo `ell` from `nu0 <= ell`, and
+`zmodCharpolySingularShiftCardLeDimension` composes this with the determinant
+root count over a prime residue field. Claims `PCC-20261119-5adae9`,
+`PCC-20261119-7817f3`, and `PCC-20261119-b9e430` pass locally and retain
+unverified signed standing. What remains is the source-specific bridge proving
+that each failed planting produces the asserted singular residual block, plus
+the transcript-independence premise that makes that block independent of the
+random shift. [pcc:unverified]
+
 Before the ECDLP specialization is promoted from unverified paper deduction,
 the remaining independent obligations are:
 
 1. formalize or independently reconstruct the curve-specific character-sum
    and energy estimates that instantiate the checked finite coverage lemmas,
-   together with all constants used by the capped relation collector;
+   together with all constants used by the capped relation collector
+   [pcc:unverified];
 2. bind the factor-base labels returned by the Lean oracle to the rows used by
    the arbitrary-group relation lattice;
-3. verify the planted-diagonal independence and simultaneous invertibility
-   argument for every prime divisor of the group order;
+3. verify that every failed planted diagonal gives the characteristic-
+   polynomial singularity used by the checked root-count endpoint, and
+   formalize the transcript-independence premise [pcc:unverified];
 4. give an exact cited sparse Wiedemann--Dixon success and bit-cost theorem in
    the regime `ell > 4 f^2`, including retries;
 5. implement or formalize the universal interpreter, independent random tapes,

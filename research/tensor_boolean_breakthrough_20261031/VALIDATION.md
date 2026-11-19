@@ -579,3 +579,31 @@ verifiers and retain unverified signed standing. [pcc:unverified]
 The composed theorem leaves exactly two supplied finite-sum hypotheses: the
 factor-base first moment and the total energy upper bound. Establishing those
 for the dilation family remains outside this generic formalization.
+
+## 2026-11-19 planted-diagonal counting follow-up
+
+The polynomial-root, characteristic-polynomial, injective-encoding,
+bounded-residue, finite-union and `7/8` survival assembly probes type-checked
+before the module edits. The final pinned project build completed successfully
+with 2,186 jobs, and the repository proof gate
+reported:
+
+```text
+PASS 33 thm 0 trusted research/tensor_boolean_breakthrough_20261031/lean
+```
+
+The root/counting declarations have the standard axiom set `[propext,
+Classical.choice, Quot.sound]`; `zmodNatCastInjectiveOnFin` uses only
+`[propext, Quot.sound]`. The independent command
+`lake env leanchecker --fresh TensorBoundaryBounds` exited 0. Claims
+`PCC-20261119-d2e9ce`, `PCC-20261119-b68c62`, `PCC-20261119-698c76`, and
+`PCC-20261119-5e863b`, together with residue claims
+`PCC-20261119-5adae9`, `PCC-20261119-7817f3`, and
+`PCC-20261119-b9e430`, pass their local Lean verifiers and retain unverified
+signed standing. [pcc:unverified]
+
+The checked scope is the determinant root count, bounded natural-residue
+injection and finite cardinality arithmetic. The paper-specific proof that each
+failed planting yields one of the singular residual blocks, and the transcript
+independence making those blocks independent of the shift, remain outside this
+formalization.

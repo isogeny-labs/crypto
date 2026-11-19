@@ -220,7 +220,7 @@ subexponential ECDLP solver exists.
    and the geometric scheduler-tail lemma.  Still missing are the actual
    probabilistic-machine semantics, a checked universal-interpreter overhead,
    and an end-to-end theorem instantiating candidates with the paper's coverage,
-   relation, planted-diagonal and recovery algorithms.
+   relation, planted-diagonal and recovery algorithms. [pcc:unverified]
 6. **Inheritance table.** Eventual rational-rate test:
    `IsSubexponentialBinaryWork`; power monotonicity: `Nat.pow_le_pow_left`;
    candidate choice: supplied family hypothesis; description enumeration and
@@ -248,7 +248,7 @@ universal(n)^b
 The fixed-arity paper bound `p^(2/m+o(1))` would make the family premise true
 for every fixed simulator degree by choosing `m` after the requested rational
 rate.  That specialization is not claimed as Lean-verified until the
-paper-to-machine cost bridge is supplied.
+paper-to-machine cost bridge is supplied. [pcc:unverified]
 
 ## First-moment coverage repair
 
@@ -273,6 +273,7 @@ paper-to-machine cost bridge is supplied.
    to the energy function, use `sum energy <= μ #Seed`, and cancel positive
    `μ` to obtain `12 #bad <= #Seed`. The existing event-intersection lemma
    then gives the `1/12` joint event in one endpoint application.
+   [pcc:unverified]
 5. **Missing components only.** The generic finite first-moment lemma, the
    finite Markov specialization at factor 12, the finite intersection lemma,
    and their composed endpoint. The character-sum and total-energy estimates
@@ -294,3 +295,58 @@ value seed}` and, after removing a bad set of cardinality at most `1/12`,
 `card Seed <= 12 * card(good)`. Thus the corrected first-moment and energy
 events intersect with finite uniform probability at least `1/12` once their
 source estimates are supplied.
+
+## Planted-diagonal bad shifts
+
+1. **Structure above.** A commutative field, a square finite matrix, a finite
+   set of candidate scalar shifts, and a finite family of bad-shift sets on a
+   common shift space.  The matrix dimension is its finite index cardinality;
+   no elliptic-curve or relation-matrix representation is introduced here.
+2. **Theorem used as stated.** `Polynomial.card_le_degree_of_subset_roots`
+   bounds a finite set of distinct roots by polynomial degree.
+   `Matrix.eval_charpoly` identifies evaluation of the characteristic
+   polynomial with `det(tI - M)`, while `Matrix.charpoly_natDegree_eq_dim`
+   supplies its degree. Standard `Finset.card_biUnion_le_card_mul` bounds a
+   union of finitely many bad sets.
+3. **Object as an instance.** For one residual block matrix `M`, the bad
+   shifts are the candidate values `t` for which `det(tI - M) = 0`.  For the
+   paper's simultaneous planting step, one such bad set is supplied for each
+   selected prime and all sets live on the same finite set of integer shifts.
+4. **Assembly probe.** Filter the candidate values by zero evaluation, show
+   their underlying multiset is contained in the roots of `charpoly M`, and
+   apply the root-cardinality theorem. Rewrite evaluation using
+   `Matrix.eval_charpoly` and degree using
+   `Matrix.charpoly_natDegree_eq_dim`. Pull this bound back along an injective
+   encoding of abstract shifts. For shifts `Fin nu0`, prove the natural cast
+   into `ZMod ell` is injective from `nu0 <= ell` by applying `ZMod.val` and
+   reducing values below the modulus. For a family of at most `w` bad sets,
+   apply the finite-union cardinality bound; subtract the union from the
+   candidate set and use `8 * w * f <= #candidates` to derive the exact
+   division-free `7/8` survival inequality. [pcc:unverified]
+5. **Missing components only.** The generic filtered-root lemma, the
+   characteristic-polynomial bad-shift endpoint, its pullback through an
+   injective shift encoding, the bounded-natural-to-residue injection, the
+   finite-union bound and the `7/8` survival arithmetic. Still missing is the
+   paper-specific proof that each failed planted diagonal is represented by
+   one of these determinant conditions and the transcript-independence premise
+   making the residual matrix independent of the sampled shift.
+6. **Inheritance table.** Distinct roots:
+   `Polynomial.card_le_degree_of_subset_roots`; determinant identity:
+   `Matrix.eval_charpoly`; degree: `Matrix.charpoly_natDegree_eq_dim`; union
+   size: `Finset.card_biUnion_le_card_mul`; complement split:
+   `Finset.card_sdiff_add_card_inter` and subset monotonicity; bounded residue
+   cast: `ZMod.val_natCast_of_lt` and `Fin.ext`.
+
+| statement | kind | owner | quantified structure | hypotheses |
+|---|---|---|---|---|
+| `polynomialBadValuesCardLeDegree` | law | `TensorBoundaryBounds`; upstream candidate for `crypto-lean` | field polynomial and finite candidate values | polynomial nonzero |
+| `charpolySingularShiftCardLeDimension` | endpoint | same | finite square matrix and finite candidate shifts | none beyond field and finite decidable index |
+| `charpolySingularEncodedShiftCardLeDimension` | law | same | injectively encoded abstract shifts and square matrix | injective shift encoding |
+| `zmodNatCastInjectiveOnFin` | instance obligation | same | bounded naturals mapped to a residue ring | range no larger than modulus |
+| `zmodCharpolySingularShiftCardLeDimension` | endpoint | same | bounded natural shifts and matrix over a prime residue field | prime modulus and range no larger than modulus |
+| `finiteBadShiftUnionCardBound` | law | same | finite family of bad finsets on a common shift type | pointwise cardinality bound |
+| `sevenEighthsShiftsSurvive` | endpoint | same | candidate finset and bad-set family | bad sets lie in candidates, family/card bounds, `8wf <= #candidates` |
+
+These theorems certify the generic planted-diagonal counting step only. They
+do not certify that the paper's residual blocks have the asserted form or
+that successful shifts recover an ECDLP relation.

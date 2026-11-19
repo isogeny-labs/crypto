@@ -1,4 +1,7 @@
 import Mathlib.LinearAlgebra.Matrix.Rank
+import Mathlib.Algebra.Polynomial.Roots
+import Mathlib.Algebra.Field.ZMod
+import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
 import Mathlib.Analysis.SpecificLimits.Basic
 
 /-!
@@ -453,5 +456,133 @@ theorem firstMomentAndEnergyGiveOneTwelfthGoodSeeds
   apply oneSixthEventSurvivesOneTwelfthBadSet
   · exact firstMomentForcesLargeValueSeeds value X XPositive valueUpper valueTotalLower
   · exact twelveMarkovBadSetBound energy meanBound meanPositive energyTotalUpper
+
+/-! ## Planted-diagonal bad shifts
+
+The following lemmas isolate the deterministic root-counting argument in the
+planted-diagonal step. They do not assert that a paper-specific failed planting
+is represented by one of these characteristic-polynomial roots.
+-/
+
+/-- Among any finite set of distinct field values, a nonzero polynomial has at
+most `natDegree` roots. -/
+theorem polynomialBadValuesCardLeDegree
+    {K : Type*} [Field K] [DecidableEq K]
+    (polynomial : Polynomial K) (candidates : Finset K) (nonzero : polynomial ≠ 0) :
+    (candidates.filter fun value => polynomial.eval value = 0).card ≤
+      polynomial.natDegree := by
+  classical
+  apply Polynomial.card_le_degree_of_subset_roots
+  intro value valueMem
+  rw [Polynomial.mem_roots nonzero]
+  exact (Finset.mem_filter.mp valueMem).2
+
+/-- An `n × n` matrix has at most `n` candidate scalar shifts for which
+`value * I - matrix` is singular. This is the characteristic-polynomial root
+bound, stated directly in the determinant form used by diagonal planting. -/
+theorem charpolySingularShiftCardLeDimension
+    {K Index : Type*} [Field K] [DecidableEq K]
+    [Fintype Index] [DecidableEq Index]
+    (matrix : Matrix Index Index K) (candidates : Finset K) :
+    (candidates.filter fun value =>
+      (Matrix.scalar Index value - matrix).det = 0).card ≤ Fintype.card Index := by
+  classical
+  have roots := polynomialBadValuesCardLeDegree matrix.charpoly candidates
+    matrix.charpoly_monic.ne_zero
+  rw [Matrix.charpoly_natDegree_eq_dim] at roots
+  have filterEq :
+      candidates.filter (fun value =>
+        (Matrix.scalar Index value - matrix).det = 0) =
+      candidates.filter (fun value => matrix.charpoly.eval value = 0) := by
+    ext value
+    simp only [Finset.mem_filter]
+    rw [Matrix.eval_charpoly]
+  rw [filterEq]
+  exact roots
+
+/-- The singular-shift bound pulls back along any injective encoding of an
+abstract finite shift set into the field. -/
+theorem charpolySingularEncodedShiftCardLeDimension
+    {K Index Shift : Type*} [Field K] [DecidableEq K]
+    [Fintype Index] [DecidableEq Index] [DecidableEq Shift]
+    (matrix : Matrix Index Index K) (candidates : Finset Shift)
+    (encode : Shift → K) (encodeInjective : Function.Injective encode) :
+    (candidates.filter fun shift =>
+      (Matrix.scalar Index (encode shift) - matrix).det = 0).card ≤
+      Fintype.card Index := by
+  classical
+  let badShifts := candidates.filter fun shift =>
+    (Matrix.scalar Index (encode shift) - matrix).det = 0
+  let badValues := (candidates.image encode).filter fun value =>
+    (Matrix.scalar Index value - matrix).det = 0
+  have mapsBad : Set.MapsTo encode (badShifts : Set Shift) (badValues : Set K) := by
+    intro shift shiftBad
+    have shiftData := Finset.mem_filter.mp shiftBad
+    exact Finset.mem_filter.mpr
+      ⟨Finset.mem_image.mpr ⟨shift, shiftData.1, rfl⟩, shiftData.2⟩
+  have badCard : badShifts.card ≤ badValues.card :=
+    Finset.card_le_card_of_injOn encode mapsBad encodeInjective.injOn
+  exact badCard.trans
+    (charpolySingularShiftCardLeDimension matrix (candidates.image encode))
+
+/-- Natural residues below a common bound embed injectively into `ZMod modulus`
+whenever that bound is no larger than the modulus. -/
+theorem zmodNatCastInjectiveOnFin
+    (bound modulus : ℕ) (rangeBound : bound ≤ modulus) :
+    Function.Injective (fun value : Fin bound => (value.val : ZMod modulus)) := by
+  intro left right equalCasts
+  apply Fin.ext
+  have leftLt : left.val < modulus := left.isLt.trans_le rangeBound
+  have rightLt : right.val < modulus := right.isLt.trans_le rangeBound
+  have equalVals := congrArg ZMod.val equalCasts
+  simpa [ZMod.val_natCast_of_lt leftLt, ZMod.val_natCast_of_lt rightLt] using equalVals
+
+/-- For a prime modulus, at most `dimension` of the first `bound` natural
+shifts make the residue-field matrix singular, provided `bound ≤ modulus`.
+This discharges the distinct-residues premise in the planted-diagonal count. -/
+theorem zmodCharpolySingularShiftCardLeDimension
+    (bound modulus dimension : ℕ) [Fact (Nat.Prime modulus)]
+    (rangeBound : bound ≤ modulus)
+    (matrix : Matrix (Fin dimension) (Fin dimension) (ZMod modulus)) :
+    (Finset.univ.filter fun shift : Fin bound =>
+      (Matrix.scalar (Fin dimension) (shift.val : ZMod modulus) - matrix).det = 0).card ≤
+      dimension := by
+  simpa using charpolySingularEncodedShiftCardLeDimension matrix Finset.univ
+    (fun value : Fin bound => (value.val : ZMod modulus))
+    (zmodNatCastInjectiveOnFin bound modulus rangeBound)
+
+/-- A union of finitely many bad-shift sets, each of size at most `bound`, has
+size at most the number of sets times `bound`. -/
+theorem finiteBadShiftUnionCardBound
+    {Family Shift : Type*} [DecidableEq Shift]
+    (families : Finset Family) (bad : Family → Finset Shift) (bound : ℕ)
+    (badCard : ∀ family ∈ families, (bad family).card ≤ bound) :
+    (families.biUnion bad).card ≤ families.card * bound := by
+  exact Finset.card_biUnion_le_card_mul families bad bound badCard
+
+/-- If every bad-shift set lies in the candidate pool, every one has size at
+most `bound`, and the pool has size at least eight times the union-bound scale,
+then at least seven eighths of the candidate shifts survive. The conclusion is
+division-free and remains exact for finite uniform sampling. -/
+theorem sevenEighthsShiftsSurvive
+    {Family Shift : Type*} [DecidableEq Shift]
+    (families : Finset Family) (candidates : Finset Shift)
+    (bad : Family → Finset Shift) (bound : ℕ)
+    (badSubset : ∀ family ∈ families, bad family ⊆ candidates)
+    (badCard : ∀ family ∈ families, (bad family).card ≤ bound)
+    (candidateLarge : 8 * families.card * bound ≤ candidates.card) :
+    7 * candidates.card ≤
+      8 * (candidates \ families.biUnion bad).card := by
+  have unionSubset : families.biUnion bad ⊆ candidates := by
+    intro value valueMem
+    obtain ⟨family, familyMem, valueBad⟩ := Finset.mem_biUnion.mp valueMem
+    exact badSubset family familyMem valueBad
+  have unionCard : (families.biUnion bad).card ≤ families.card * bound :=
+    finiteBadShiftUnionCardBound families bad bound badCard
+  have eightUnion : 8 * (families.biUnion bad).card ≤ candidates.card :=
+    (Nat.mul_le_mul_left 8 unionCard).trans (by
+      simpa [Nat.mul_assoc] using candidateLarge)
+  rw [Finset.card_sdiff_of_subset unionSubset]
+  omega
 
 end TensorBoundaryBounds
