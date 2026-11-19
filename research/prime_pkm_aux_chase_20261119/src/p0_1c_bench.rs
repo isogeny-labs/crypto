@@ -512,11 +512,11 @@ pub fn run_algebraic_rungs_benchmark() -> Vec<AlgebraicRungRow> {
             "pkm-semaev:m=2,guess=3,trace=0,inherit=0,descent=0",
             "pkm-semaev:m=2,guess=3,trace=1,inherit=1,descent=1",
         ),
-        // Also run m=3 with mode=sym (ParamSymmetricSemaev) vs legacy chain+grid on prime-isogeny:t=3!
+        // Also run m=3 with mode=sym (ParamSymmetricSemaev) Before vs After on prime-isogeny:t=3!
         (
             12,
             "prime-isogeny:t=3",
-            "pkm-semaev:m=3,guess=1,mode=chain,trace=0,inherit=0,descent=0",
+            "pkm-semaev:m=3,guess=1,mode=sym,trace=0,inherit=0,descent=0",
             "pkm-semaev:m=3,guess=1,mode=sym,trace=1,inherit=1,descent=1",
         ),
     ];
@@ -533,7 +533,7 @@ pub fn run_algebraic_rungs_benchmark() -> Vec<AlgebraicRungRow> {
             seed: 59297,
         };
         for target_idx in [0u32, 1u32] {
-            if bits == 20 && std::env::var("PKM_FAST_SMOKE").as_deref() == Ok("1") {
+            if std::env::var("PKM_FAST_SMOKE").as_deref() == Ok("1") && bits >= 16 {
                 continue;
             }
             if bits == 20 && target_idx > 0 {
@@ -904,7 +904,8 @@ pub fn run_dickson_torus_benchmarks() -> Vec<DicksonTorusSolveRow> {
                         }
                     }
                 }
-                assert!(trials <= 10_000, "M17 blind trials exceeded cap at m={m}, t={t}");
+                let trial_cap = if std::env::var("PKM_FAST_SMOKE").as_deref() == Ok("1") { 2_000 } else { 10_000 };
+                assert!(trials <= trial_cap, "M13 blind trials exceeded cap at m={m}, t={t}");
             };
             let wall_ms = t0.elapsed().as_secs_f64() * 1e3;
             let gae = (ops.adds + ops.doubles) as f64;
@@ -976,6 +977,9 @@ pub fn run_dickson_torus_benchmarks() -> Vec<DicksonTorusSolveRow> {
         });
     }
 
+    if std::env::var("PKM_FAST_SMOKE").as_deref() == Ok("1") {
+        return out;
+    }
     // 2. Prime-order M31 = 2^31 - 1 = 2,147,483,647 (`p + 1 = 2^31`, Dickson/T_2 torus, m = 3, 4, 5):
     //    - Matched Pollard `rho.negation` solves the exact M31 target (`[d]G == Q` verified).
     //    - Matched `PkmSemaevOracle::new_dickson` Before vs After is measured on natural random targets

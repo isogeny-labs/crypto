@@ -152,20 +152,47 @@ pub fn fp256_neg(a: &U256) -> U256 {
 }
 
 pub fn rem_u512_p256(prod: &[u64; 8]) -> U256 {
-    // Exact binary shift-reduce of `[u64; 8]` modulo `P256_P`: 0 heap allocs, exact.
-    let mut r = [0u64; 4];
-    for limb in (0..8).rev() {
-        let w = prod[limb];
-        for bit in (0..64).rev() {
-            let b = (w >> bit) & 1;
-            let top = r[3] >> 63;
-            r[3] = (r[3] << 1) | (r[2] >> 63);
-            r[2] = (r[2] << 1) | (r[1] >> 63);
-            r[1] = (r[1] << 1) | (r[0] >> 63);
-            r[0] = (r[0] << 1) | b;
-            if top != 0 || u256_cmp(&r, &P256_P) != std::cmp::Ordering::Less {
-                r = u256_sub_raw(&r, &P256_P).0;
+    // `2^256 ≡ R256 = 2^256 - P256_P (mod P256_P)` with `R256[3] < 2^32`.
+    const R256: [u64; 4] = [
+        0x0000_0000_0000_0001,
+        0xFFFF_FFFF_0000_0000,
+        0xFFFF_FFFF_FFFF_FFFF,
+        0x0000_0000_FFFF_FFFE,
+    ];
+    let fold = |buf: &[u64; 8]| -> [u64; 8] {
+        let mut out = [buf[0], buf[1], buf[2], buf[3], 0, 0, 0, 0];
+        for i in 0..4 {
+            let hi = buf[i + 4];
+            if hi == 0 {
+                continue;
             }
+            let mut carry = 0u128;
+            for j in 0..4 {
+                let cur = out[i + j] as u128 + (hi as u128) * (R256[j] as u128) + carry;
+                out[i + j] = cur as u64;
+                carry = cur >> 64;
+            }
+            let mut k = i + 4;
+            while carry > 0 && k < 8 {
+                let cur = out[k] as u128 + carry;
+                out[k] = cur as u64;
+                carry = cur >> 64;
+                k += 1;
+            }
+        }
+        out
+    };
+    let mut cur = *prod;
+    while cur[4] > 1 || cur[5] != 0 || cur[6] != 0 || cur[7] != 0 {
+        cur = fold(&cur);
+    }
+    let mut r = [cur[0], cur[1], cur[2], cur[3]];
+    let mut top = cur[4];
+    while top > 0 || u256_cmp(&r, &P256_P) != std::cmp::Ordering::Less {
+        let (sub, borrow) = u256_sub_raw(&r, &P256_P);
+        r = sub;
+        if borrow != 0 {
+            top -= 1;
         }
     }
     r
@@ -1277,16 +1304,20 @@ pub fn run_p256_presentations() -> (String, usize, Vec<P256PresentationRow>) {
             };
             assert!(planted_ok, "P-256 planted witness failed on depth={depth} arm={arm}");
 
-            let deg_cap = if arm == "dense" && depth >= 3 { 12 } else { 10 };
+            let (deg_cap, col_cap) = match depth {
+                1 | 2 => (9, 1_200),
+                3 => (6, 900),
+                _ => (5, 800),
+            };
             let (cal_eqs, _) = build_p256_presentation_system(&base, arm, xr_cal, None);
             let n_vars = cal_eqs[0].terms[0].0.0.len();
             let max_in_deg = cal_eqs.iter().map(|e| e.terms[0].0.deg()).max().unwrap_or(0);
-            let (cal_stats, trace) = run_f4_fp256(&cal_eqs, deg_cap, 2_500, None);
+            let (cal_stats, trace) = run_f4_fp256(&cal_eqs, deg_cap, col_cap, None);
 
             let (probe_eqs, _) = build_p256_presentation_system(&base, arm, xr_probe, None);
-            let (full_stats, _) = run_f4_fp256(&probe_eqs, deg_cap, 2_500, None);
+            let (full_stats, _) = run_f4_fp256(&probe_eqs, deg_cap, col_cap, None);
             let (rep_stats, _) = if cal_stats.inconsistent {
-                run_f4_fp256(&probe_eqs, deg_cap, 2_500, Some(&trace))
+                run_f4_fp256(&probe_eqs, deg_cap, col_cap, Some(&trace))
             } else {
                 (full_stats.clone(), Vec::new())
             };
@@ -1330,13 +1361,13 @@ pub fn run_p256_presentations() -> (String, usize, Vec<P256PresentationRow>) {
         let (d8_eqs, _) = build_p256_presentation_system(&base8, arm, xr_d8, None);
         let n_vars = d8_eqs[0].terms[0].0.0.len();
         let max_in_deg = d8_eqs.iter().map(|e| e.terms[0].0.deg()).max().unwrap_or(0);
-        let (d8_stats, _) = run_f4_fp256(&d8_eqs, 4, 3_000, None);
+        let (d8_stats, _) = run_f4_fp256(&d8_eqs, 3, 1_200, None);
 
         rows.push(P256PresentationRow {
             depth: 8,
             fb_id: base8.fb_id.clone(),
             signed_points: base8.columns.len() * 2,
-            arm: format!("{arm} (bounded deg<=4)"),
+            arm: format!("{arm} (bounded deg<=3)"),
             n_vars,
             n_equations: d8_eqs.len(),
             max_input_degree: max_in_deg,
