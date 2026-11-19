@@ -341,7 +341,8 @@ impl Producer<'_> {
                 out.coefficients[k] = lower[k];
             }
             for k in 0..7 {
-                let cross = self.sub(self.sub(combined[k], lower[k])?, upper[k])?;
+                let cross_part = self.sub(combined[k], lower[k])?;
+                let cross = self.sub(cross_part, upper[k])?;
                 let dst = &mut out.coefficients[k + 4];
                 *dst = if *dst == 0 { cross } else { self.add(*dst, cross)? };
             }
