@@ -1,0 +1,68 @@
+name: Prime31 RR9 two-sign weighted interpolation rank
+on:
+  push:
+    branches:
+      - automation/prime31-rr9-two-sign-wrank-20261119
+    paths:
+      - ".github/workflows/prime31-rr9-two-sign-wrank.yml"
+      - "research/prime31_ic_20261115/native/examples/prime31_rr9_two_sign_wrank.rs"
+  pull_request:
+    paths:
+      - ".github/workflows/prime31-rr9-two-sign-wrank.yml"
+      - "research/prime31_ic_20261115/native/examples/prime31_rr9_two_sign_wrank.rs"
+permissions:
+  contents: read
+jobs:
+  exact-native-rank:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Candidate checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verified original Prime31 Rust arithmetic checkout
+        uses: actions/checkout@v4
+        with:
+          repository: isogeny-labs/crypto
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only this algebraic-rank example
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_two_sign_wrank.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_rr9_two_sign_wrank.rs
+          sha256sum research/prime31_ic_20261115/native/examples/prime31_rr9_two_sign_wrank.rs
+      - name: Original native library tests
+        run: |
+          cargo +1.100.0 test --locked --manifest-path \
+            pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Original-curve focused exact-rank tests
+        run: |
+          cargo +1.100.0 test --locked --manifest-path \
+            pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_two_sign_wrank
+      - name: Native exact-rank certificate
+        run: |
+          cargo +1.100.0 run --locked --release --manifest-path \
+            pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_two_sign_wrank > prime31-rr9-two-sign-wrank.json
+          cat prime31-rr9-two-sign-wrank.json
+          jq -e '
+            .p == 2147483647 and .n == 2147446831 and
+            (.reports | length == 2) and
+            (all(.reports[];
+              (.ranks|map([.weighted_degree,.monomials,.evaluation_rank,.right_nullity,.universal_q0_multiples,.extra_kernel_dimension]))
+              == [[7,15,14,1,1,0],[27,145,61,84,84,0],[28,155,62,93,92,1]]))
+            and (.group_sum_enumeration_used == false)
+            and (.unknown_scalar_recovered == false)
+          ' prime31-rr9-two-sign-wrank.json
+          sha256sum prime31-rr9-two-sign-wrank.json
+      - name: Preserve exact raw output
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-two-sign-wrank
+          path: prime31-rr9-two-sign-wrank.json
+          if-no-files-found: error
