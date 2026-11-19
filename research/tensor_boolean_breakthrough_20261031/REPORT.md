@@ -74,9 +74,12 @@ executable `ZMod` formula is proved equal to the nonsingular matrix inverse
 under a unit-determinant hypothesis. Exact natural arithmetic also shows that
 a prospective `rows^6` implementation has fixed numerator six and is therefore
 absorbed by the already checked fixed-arity diagonal. This does not yet prove
-the runtime: the remaining task is an eager array refinement of the
-function-valued Bird recurrence with a checked operation counter, followed by
-the planted-block binding and bit-cost accounting. [pcc:unverified] See
+the full bit runtime, but the scalar-ring bound is now checked: array-backed
+eager states compute the same determinant, an instrumented entry count yields
+`4(n+1)^4` operations per determinant, and all `n²` cofactors cost at most
+`4(n+1)^6`. The remaining tasks are planted-block binding, array/indexing cost,
+concrete modular-inversion cost, and operand bit-cost accounting.
+[pcc:unverified] See
 [`FIXED_ARITY_DIAGONAL.md`](FIXED_ARITY_DIAGONAL.md).
 
 ## Claim boundary

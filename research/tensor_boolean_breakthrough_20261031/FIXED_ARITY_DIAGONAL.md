@@ -137,16 +137,26 @@ X^m <= p, rows <= 3X  ->  rows^(6m) <= 3^(6m) p^6.
 ```
 
 This is the fixed-numerator form that would result from `rows^2` cofactor
-determinants at `rows^4` operations each. Claim `PCC-20261119-cfa7f9` passes
-its local Lean verifier. It does **not** prove that operation count. Mathlib's
-source documentation advertises `O(n^4)` for Bird's algorithm, but the checked
-definition uses function-valued recurrence states and carries no evaluation
-cost semantics. The remaining implementation obligation is therefore narrow
-and explicit: materialize each recurrence state eagerly in arrays, prove it
-refines `BirdDet.birdDet`, and verify an operation counter. Only then does the
-`n^2`-cofactor construction justify an executable `O(n^6)` inverse. This
-fallback can use the upstream unit-determinant planted block in place of sparse
-Wiedemann--Dixon, but the concrete block binding and bit costs remain open.
+determinants at `rows^4` operations each. [pcc:unverified]
+Claim `PCC-20261119-cfa7f9` passes
+its local Lean verifier. The operation count is now checked independently of
+Mathlib's source comment. `eagerBirdStep` materializes every complete recurrence
+state as an array-backed length-`n^2` vector, and `eagerBirdDet_eq_det` proves
+that its result is the determinant. `RingCounted` instruments scalar addition,
+multiplication, and negation. Lean proves an exact `3(n-i-1)+3` count for entry
+`(i,j)`, then derives
+
+```text
+eagerBirdDetRingOps n      <= 4 (n+1)^4,
+eagerBirdAdjugateRingOps n <= 4 (n+1)^6.
+```
+
+Claims `PCC-20261119-2b2b04`, `PCC-20261119-8d6681`,
+`PCC-20261119-fa515d`, and `PCC-20261119-84b10b` pass their local Lean
+verifiers. The counted model covers scalar-ring operations. Array allocation,
+integer indexing, operand bit costs, concrete `ZMod` inversion cost, and the
+binding of the upstream unit-determinant planted block remain open. The
+fallback no longer depends on the unformalized sparse Wiedemann--Dixon cost.
 [pcc:unverified]
 
 The Mathlib pin is commit
@@ -154,7 +164,7 @@ The Mathlib pin is commit
 `fa690f7f31bdb3108c61c7c4aca62f56182732728a8928e793c2a5b743a4ba54`
 for `Bird/Defs.lean` and
 `e36d1901d2279de39d4cb702625ac1c6defaae30eaaba372260c8a1551369fc1`
-for `Bird/Correctness.lean`. The local project gate reports 44 theorems and
+for `Bird/Correctness.lean`. The local project gate reports 77 theorems and
 zero trusted declarations, and the independent fresh checker exits 0.
 [pcc:unverified]
 

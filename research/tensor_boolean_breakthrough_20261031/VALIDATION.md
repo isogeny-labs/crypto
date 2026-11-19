@@ -808,3 +808,30 @@ The first inverse claim record, `PCC-20261119-46d8c7`, omitted the mandatory
 declaration hash and fails closed. It remains uncited in the append-only
 ledger; corrected hash-bound claim `PCC-20261119-598c61` was issued and
 verified. [pcc:unverified]
+
+## 2026-11-19 eager Bird operation-count follow-up
+
+The array-backed value-refinement probe and the instrumented scalar-count probe
+both type-checked before integration. The pinned project build again completed
+with 2,188 jobs, and the proof gate reported:
+
+```text
+PASS 77 thm 0 trusted research/tensor_boolean_breakthrough_20261031/lean
+```
+
+`eagerBirdDet_eq_det` proves that materializing each recurrence state in a
+length-`n^2` vector preserves the determinant. `countedBirdStepEntry_value`
+connects the instrumented scalar formula to `BirdDet.stepEntry`, and
+`countedBirdStepEntry_ops` proves the exact `3(n-i-1)+3` count. Summation gives
+`eagerBirdDetRingOps_le_quartic`; multiplying by all `n^2` cofactors gives
+`eagerBirdAdjugateRingOps_le_sixth`. All audited declarations use only
+`propext`, `Classical.choice`, and `Quot.sound` (some omit
+`Classical.choice`). The independent fresh checker exited 0.
+[pcc:unverified]
+
+Claims `PCC-20261119-2b2b04`, `PCC-20261119-8d6681`,
+`PCC-20261119-fa515d`, and `PCC-20261119-84b10b` pass their local Lean
+verifiers and retain unverified signed standing. The model counts scalar-ring
+addition, multiplication, and negation. It deliberately excludes array
+allocation, integer indexing, operand bit cost, concrete `ZMod` inversion cost,
+and the binding of the upstream planted block. [pcc:unverified]

@@ -346,6 +346,50 @@ the exact eventual natural-power inequality required by
 | `birdZModInverse_eq_inv` | law | same | square matrix over `ZMod q` | `IsUnit A.det` |
 | `birdSixthPowerRowBoundAtFixedArity` | law | same | natural `p`, `X`, `m`, and row count | `rows <= 3X`, `X^m <= p` |
 
+## Eager Bird refinement
+
+1. **Structure above.** Length-`n^2` vectors backed by Lean arrays, conversion
+   between those vectors and `Matrix (Fin n) (Fin n) R`, and Mathlib's Bird
+   matrix recurrence. [pcc:unverified]
+2. **Theorem used as stated.** `Matrix.ofArray_ofFn`,
+   `BirdDet.birdDetSpec_eq_det`, and function-iterate induction.
+3. **Goal below.** Materialize every Bird recurrence state with
+   `Vector.ofFn`, prove matrix/vector round trips, prove one eager step refines
+   `BirdDet.stepEntry`, and conclude that the eager determinant has the same
+   value as `Matrix.det`. Instrument addition, multiplication, and negation,
+   prove the exact `3(n-i-1)+3` count for one output entry, sum it over the
+   materialized state, and obtain an explicit quartic full-determinant budget.
+4. **Assembly probe.** Flatten a matrix in row-major order, rebuild it with
+   `Matrix.ofArray`, use the existing round-trip theorem, then induct over the
+   `k` eager steps in dimension `k+1`.
+5. **Missing components only.** The eager value refinement, scalar-ring
+   operation counter, and `n^2`-cofactor aggregation. Operand bit-cost bounds,
+   array indexing/allocation costs, and the cost of concrete `ZMod` inversion
+   remain separate obligations.
+6. **Inheritance table.** `Matrix.ofArray_ofFn`,
+   `BirdDet.birdDetSpec_eq_det`, `Function.iterate_succ_apply`, matrix
+   extensionality, and vector size invariants.
+
+| statement | kind | owner | quantified structure | hypotheses |
+|---|---|---|---|---|
+| `BirdFlatMatrix` | definition | `TensorBoundaryBounds`; upstream candidate for `crypto-lean` | commutative ring and dimension | none |
+| `birdMatrixToFlat` | definition | same | finite square matrix | none |
+| `birdFlatToMatrix` | definition | same | length-`n^2` vector | none |
+| `birdFlatToMatrix_matrixToFlat` | law | same | finite square matrix | none |
+| `eagerBirdStep` | definition | same | two length-`n^2` vectors | none |
+| `eagerBirdStep_refines` | law | same | two length-`n^2` vectors | none |
+| `eagerBirdDet` | definition | same | length-`n^2` vector | none |
+| `eagerBirdDet_eq_det` | law | same | finite square matrix via flattened input | none |
+| `RingCounted` | definition | same | scalar value paired with natural operation count | none |
+| `countedBirdSumFrom_value` | law | same | counted suffix sum over a commutative ring | none |
+| `countedBirdSumFrom_ops` | law | same | counted suffix sum and constant per-term cost | valid suffix and per-term cost hypotheses |
+| `countedBirdStepEntry_value` | law | same | instrumented Bird scalar entry | none |
+| `countedBirdStepEntry_ops` | law | same | instrumented Bird scalar entry | valid row index |
+| `eagerBirdStepRingOps_le` | law | same | dimension | none |
+| `eagerBirdDetRingOps_le_quartic` | law | same | dimension | none |
+| `eagerBirdAdjugateRingOps` | definition | same | dimension | none |
+| `eagerBirdAdjugateRingOps_le_sixth` | law | same | dimension | none |
+
 ## First-moment coverage repair
 
 1. **Structure above.** A finite seed space, a natural-valued factor-base size
