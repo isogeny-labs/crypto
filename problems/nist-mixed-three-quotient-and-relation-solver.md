@@ -96,3 +96,13 @@ that cost evaluation. [pcc:unverified]
 ## Resolution and history
 
 Unresolved for the original P-192 advantage. 2026-11-16: actual kernels, source maps, coset-image quotient/dual and small-curve recovery implemented; later actual kernel1 moduli, smooth candidate quartic, Fp curve descent and destination principal relations added. Target Jacobian/twist/map identification, scalable restricted-base solver and full measurements remain open. Native correctness replays are distinguished from paid scientific jobs.
+
+2026-11-19: PR #4788 freshly replayed the existing complete kernel3 relation
+and transfer entrypoint. It retained226 quartic points,seven split fibers,six
+KM-verified principal relations,rank6 on225 projected columns,and six
+OpenSSL-checked `B(F(P))=[6]P` fixtures including the `-2G` old-shift infinity
+case. All four arithmetic workers and the portable comparison exited0;the
+new report records every local process and internal-stage cost. This closes
+the requested local reproducible-run criterion,not the still-open signed
+geometric verification,restricted solver or admitted performance comparison.
+[pcc:unverified]

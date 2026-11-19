@@ -1,0 +1,23 @@
+digraph p192_transfer_replay {
+  graph [rankdir=LR, bgcolor="transparent", pad=0.2, nodesep=0.45, ranksep=0.65];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10,
+        color="#264653", fillcolor="#f7fbfc", margin="0.13,0.08"];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#457b9d", penwidth=1.5];
+
+  E [label="P-192 subgroup\nO,G,-G,2G,Q,-2G", fillcolor="#e9f5db"];
+  H [label="genus-3 source Jacobian\npi* / pi_*", fillcolor="#edf6f9"];
+  C [label="plane-quartic Jacobian\nphi / phi^vee", fillcolor="#fff3b0"];
+  FB [label="factor base\n226 quartic points"];
+  R [label="6 principal relations\n6 / 6 KM zero checks", fillcolor="#fff3b0"];
+  P [label="225 projected columns\nrank 6, deficiency 219", fillcolor="#e9f5db"];
+  OSSL [label="separate OpenSSL checks\n226 images + 6 sums + 6 BF", fillcolor="#d8f3dc"];
+
+  E -> H [label="pi*"];
+  H -> C [label="phi"];
+  C -> H [label="phi^vee"];
+  H -> E [label="pi_*\nBF=[6]"];
+  FB -> R [label="7 split fibers\n1 reference"];
+  R -> P [label="B / point map"];
+  P -> OSSL [label="elliptic replay"];
+  E -> OSSL [label="[6] companions", style=dashed];
+}
