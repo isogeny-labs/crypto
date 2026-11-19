@@ -574,10 +574,28 @@ fn vpow(mut a: u64, mut e: u64, p: u64) -> u64 {
     }
     r
 }
+// Recognize multiplication by 1 or a monic power of x, common when
+// replaying polynomial root certificates. Restrict the shortcut to monic
+// operands: canonical coefficient copying is then sufficient.
+fn vmonomial_product(m: &[u64], other: &[u64]) -> Option<Vec<u64>> {
+    if m.len() == 1 && m[0] == 1 {
+        return Some(trim(other.to_vec()));
+    }
+    if m.len() < 2 || m[0] != 0 || *m.last().unwrap() != 1
+        || m[1..m.len()-1].iter().any(|&x| x != 0)
+    {
+        return None;
+    }
+    let mut result = vec![0; m.len() - 1];
+    result.extend_from_slice(other);
+    Some(trim(result))
+}
 fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     if a.is_empty() || b.is_empty() {
         return vec![];
     }
+    if let Some(result) = vmonomial_product(a, b) { return result; }
+    if let Some(result) = vmonomial_product(b, a) { return result; }
     let mut r = vec![0; a.len() + b.len() - 1];
     for (i, &x) in a.iter().enumerate() {
         // Sparse root polynomials often have zero middle coefficients.
@@ -613,6 +631,37 @@ fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
     if a.len() <= 2 || (a.len() <= 4 && p <= u32::MAX as u64) {
         return vproduct(a, a, p);
     }
+    // Long, sparse certificate polynomials can be squared with at most
+    // three field products. A cheap prefix guard avoids scanning dense inputs.
+    if a.len() >= 6 && a[1] == 0 && a[2] == 0 {
+        let mut terms = [(0usize, 0u64); 2];
+        let mut count = 0usize;
+        let mut dense = false;
+        for (i, &x) in a.iter().enumerate() {
+            if x != 0 {
+                if count == 2 {
+                    dense = true;
+                    break;
+                }
+                terms[count] = (i, x);
+                count += 1;
+            }
+        }
+        if !dense {
+            if count == 0 { return vec![]; }
+            let mut result = vec![0; 2 * a.len() - 1];
+            let (i, x) = terms[0];
+            result[2 * i] = vmul(x, x, p);
+            if count == 2 {
+                let (j, y) = terms[1];
+                result[2 * j] = vmul(y, y, p);
+                let cross = vmul(x, y, p);
+                let twice = cross + cross; // p <= 2^61-1, no overflow
+                result[i + j] = if twice >= p { twice - p } else { twice };
+            }
+            return trim(result);
+        }
+    }
     let mut result = vec![0; 2 * a.len() - 1];
     for (i, &x) in a.iter().enumerate() {
         let diagonal = vmul(x, x, p);
@@ -642,6 +691,14 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
     // trailing zero coefficients.
     if b.len() == 1 && b[0] == 1 {
         return Ok((trim(a.to_vec()), vec![]));
+    }
+    // Division by x^k is a coefficient split, not a polynomial long
+    // division. The guard avoids a full scan for dense divisors.
+    if b.len() > 1 && b[0] == 0 && *b.last().unwrap() == 1
+        && b[1..b.len()-1].iter().all(|&x| x == 0)
+    {
+        let shift = b.len() - 1;
+        return Ok((trim(a[shift..].to_vec()), trim(a[..shift].to_vec())));
     }
     // Synthetic division by x + c needs only one running remainder and
     // one quotient allocation, rather than a mutable dividend and a
