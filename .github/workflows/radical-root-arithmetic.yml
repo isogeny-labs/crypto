@@ -157,11 +157,6 @@ jobs:
         run: python3 research/amm_digit_perf_20261118/round29_verifier_isolated.py
       - name: Check and time fixed-degree sparse/linear division and sparse squares
         run: python3 research/amm_digit_perf_20261118/round30_verifier_isolated.py
-      - name: Measure compiled Rust Barrett multiplication against 32-bit modulus
-        run: |
-          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
-            bench_round41_barrett_fp_actual_rust -- --ignored --nocapture
-
       - name: Actual Rust paired benchmark of AMM/Tonelli/discriminant
         shell: bash
         run: |
