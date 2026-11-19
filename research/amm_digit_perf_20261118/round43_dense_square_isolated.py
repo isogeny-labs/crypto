@@ -140,9 +140,9 @@ mod round43 {
     }
     #[test]
     fn randomized_dense_sparse_and_nonmonic_powers_match_frozen() {
-        let p=(1u64<<61)-1;
         let mut state=0x2026_1119_4242_0001u64;
         let mut comparisons=0usize;
+        for p in [487u64,1_000_000_007u64,(1u64<<61)-1] {
         for degree in 1usize..=8 {
             for trial in 0..24 {
                 let mut f=vec![0u64;degree+1];
@@ -168,6 +168,7 @@ mod round43 {
                     comparisons+=3;
                 }
             }
+        }
         }
         println!("ROUND43_RANDOM_EXACT comparisons={comparisons}");
     }
