@@ -37,6 +37,7 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             research/prime31_ic_20261115/native
+            src/cryptanalysis/f4_fp_tower.rs
       - name: Install pinned Rust
         run: rustup toolchain install 1.100.0 --profile minimal
       - name: Overlay candidate example only
