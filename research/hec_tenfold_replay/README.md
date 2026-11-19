@@ -287,3 +287,19 @@ The independent input seed 2026111922 used 32 inputs per field and 16 balanced q
 A separate prefix-scan experiment stopped after two roots in a three-quarter prefix or one root in a quarter prefix and reconstructed residual candidates. At p = 4093 the one-root arm reduced point probes from 981,130 to 414,060 across 32 inputs, but ran at 0.220× and 0.217× of the original speed. Reusing the signs already computed by the two-root scan gave 0.997× and 0.957×. The timed character experiment uses the full scan of its selected base.
 
 Run `harness/g2-scan.zsh` with `original`, `optimized`, `character` or `crossover` for the native experiments. To replay a census, pipe `ruby harness/g2-scan-cover.rb` (optionally with `expanded`) to `c++ -I. -O3 -std=c++17 -x c++ - -o /tmp/hec-cover` from this directory and run the binary. The default census columns are p, base size, required hits, eligible signed triples, unsigned supports, triples reached by the prefix, minimum scan size, omitted-set witness mask, search nodes, positive places, signed triples entirely positive and signed triples in the equal-size prefix. Expanded output gives p, base size and eligible triples. Git contains the timing and audit logs in `results/g2-scan-raw.tar.gz`. The medians files give order, p and input index followed by pencil/original, pencil/second, pencil/third, original/second and original/third. Crossover files instead give the original/selected quartet ratio.
+
+### Character selection and catalogue rank in genus 3
+
+Five of the eight transfer curves have reducible curve polynomials. The other three, (73,33), (73,57) and (127,45), have irreducible degree-seven polynomials over their base fields. On each reducible curve we used its lowest-degree monic irreducible factor. We kept the nonbranch places where that factor evaluates to a nonzero square, and retained the rational branch points in both arms. The control took the same number of nonbranch places in ascending x order. Each arm exhausted both pencils over all its retained poles. Ranks are modulo the curve's subgroup prime.
+
+| p, c | Nonbranch places | Rows, prefix / character | Rank, prefix / character | Rank needed |
+|---|---:|---:|---:|---:|
+| 127, 15 | 21 | 1 / 8 | 1 / 8 | 20 |
+| 257, 54 | 58 | 55 / 108 | 55 / 57 | 57 |
+| 257, 78 | 63 | 63 / 159 | 62 / 62 | 62 |
+| 383, 42 | 88 | 114 / 249 | 86 / 87 | 87 |
+| 383, 80 | 100 | 263 / 461 | 99 / 99 | 99 |
+
+The positive base reaches a one-dimensional nullspace on four curves. The equal-size prefix does so on two. At (127,15) adding the first ten nonsquare places reaches rank 30 on 31 places. Nine additions reach rank 26 on 30 places. This is a threshold for that particular ordering. Every reduced basis annihilates the independently reconstructed full-catalogue coordinate vector restricted to its columns, and every restriction is nonzero.
+
+From this directory, pipe `ruby harness/g3-character-census.rb` to `c++ -std=c++17 -O3 -x c++ - -o /tmp/hec-character-census`, then run the binary. The output fields are p, curve coefficient, arm, base size, rows and rank. Arms 0 and 1 use the full base and matched prefix. Arms 2 through 14 use the character base with zero through twelve extra nonsquare places. This census measures catalogue completeness. Full-solve timings for the restricted genus-3 bases remain open.
