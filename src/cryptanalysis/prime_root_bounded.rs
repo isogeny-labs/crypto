@@ -197,8 +197,11 @@ impl Gate {
         Ok(())
     }
     fn scalar(&mut self) -> Result<()> {
-        self.clock()?;
+        // charge() already checks the deadline. On the normal in-budget
+        // path a separate clock() here would read Instant twice per field
+        // operation. Preserve Deadline precedence on FieldLimit itself.
         if self.metrics.field_work >= self.limits.field_work {
+            self.clock()?;
             return Err(Stop::FieldLimit);
         }
         self.charge(32)?;
