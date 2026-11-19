@@ -2,7 +2,8 @@ def median(v)
   v=v.sort
   (v[3]+v[4])/2.0
 end
-puts 'p c case order screen_hermite pencil_hermite'
+quotient=ARGV.delete('--quotient')
+puts(quotient ? 'p c case order hermite_quotient pencil_quotient pencil_hermite' : 'p c case order screen_hermite pencil_hermite')
 ARGV.each do |file|
   runs={}
   File.foreach(file) do |line|
@@ -22,6 +23,11 @@ ARGV.each do |file|
     end.transpose
     pencil=ratios[1]
     raise unless pencil.all?{|x|x.is_a?(Float)} || pencil.uniq.size==1
-    puts [p,c,i,File.basename(file,'.log'),median(ratios[0]),pencil.first.is_a?(Float) ? median(pencil) : pencil.first].join(' ')
+    previous=if quotient && pencil.first.is_a?(Float)
+      median(8.times.map{|r|runs.fetch([p,c,i,r,0])[0].fdiv(runs.fetch([p,c,i,r,1])[0])})
+    else
+      pencil.first
+    end
+    puts [p,c,i,File.basename(file,'.log'),median(ratios[0]),pencil.first.is_a?(Float) ? median(pencil) : pencil.first,*(quotient ? [previous] : [])].join(' ')
   end
 end

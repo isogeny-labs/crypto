@@ -427,3 +427,18 @@ We timed full solves on all 21 deficient curves. For each pair and arm, timing i
 The pencil eligibility check excluded 16 inputs per seed. Of the remaining inputs it returned no scalar on seven and four, respectively. The replication used the same host and binary; its timing window could overlap the separate rank replay. Both orders and both seeds are reported individually.
 
 Run `harness/g4-hermite-rank.zsh` for rank and coordinate verification. Run `harness/g4-hermite-solve.zsh` for seed 2026111934, or set `HEC_PAIR_SEED=2026111935` for the replication. The medians reducer accepts the two timing logs. STAGE rows give p, c, zero-based stage, cumulative rank, pairs visited, candidates tested and split rows consumed. The archives include the raw timings and audit outputs.
+
+### Direct residual coefficients for two-point Hermite relations
+
+Write z=x−x(A), t=x(B)−x(A), and m=2 or 3 for the prescribed order at B. The interpolation conditions give f−w²=z³(z−t)ᵐQ, with deg Q at most four. Since the fixed factor is monic, its leading coefficients determine Q by descending substitution. This requires only five high coefficients of f−w². The implementation evaluates Q at rational abscissae using powers computed once per A. After removing enough linear factors to reach a quadratic, it recovers both remaining roots from the discriminant. A zero discriminant gives the same root twice. When the quintic interpolant loses its leading term the residual has degree three; the same scan applies.
+
+An audit multiplied Q by the fixed factor and checked every coefficient against f−w² for every two-point Hermite candidate processed. The exact-division and direct-quotient catalogues agreed byte for byte across all 197 models, including the signs, columns, multiplicities and stream order of the 181 supplemental rows on the 21 deficient models. As a separate ordering test, prioritizing places that occurred least often in the initial matrix consumed 6,711 candidates and 174 supplemental rows, versus 6,697 and 181 in ascending place order. The reordered vectors passed all 5,191 independent coordinate checks. Timings below use ascending place order.
+
+| Input seed | Verified full solves | Full solves faster in both orders | Median exact-division / direct-quotient time, forward / reverse | Verified pencil comparisons | ≥10× in both orders, exact division → direct quotient |
+|---|---:|---:|---:|---:|---:|
+| 2026111936 | 84/84 | 84/84 | 1.536× / 1.531× | 65 | 23 → 55 |
+| 2026111937 | 84/84 | 84/84 | 1.504× / 1.470× | 65 | 24 → 55 |
+
+Each independent seed generated four input pairs per deficient curve. The same binary rotated the pencil, exact-division and direct-quotient arms, with eight repetitions per input in each of two processes with opposite orders. Both candidate timings include catalogue construction, input decomposition and scalar verification. Per seed, the existing pencil eligibility test excluded 16 pairs, and the reference returned no scalar on three additional pairs. Of the 20 verified comparisons below 10× after this change, five occurred on (47,31) and four on (53,38). The minimum observed direct-quotient speedup against a verified pencil run was 3.328× on (61,12).
+
+Run `harness/g4-quotient-check.zsh` for the coefficient and signed-row checks. Run `HEC_PAIR_SEED=2026111936 harness/g4-hermite-solve.zsh quotient` and repeat with seed 2026111937 for full solves. The two raw archives contain the rotated timings and untimed audits. Use `harness/g4-hermite-medians.rb --quotient` with the forward and reverse logs to reconstruct the result tables.

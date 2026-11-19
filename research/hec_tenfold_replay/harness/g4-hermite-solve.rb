@@ -30,7 +30,12 @@ RS
   puts s.sub('for rep in 0..32','for rep in 0..8').sub('for pass in 0..4','for pass in 0..3').sub('3-pass','2-pass').sub('else{pass})%4','else{pass})%3')
 else
   %w[screen hermite].each do |name|
-    s=(name=='screen' ? generated('harness/g4-rank-panel.rb','extend','screen') : generated('harness/g4-hermite.rb')).split(' template<int P> void panel(){').first
+    if ARGV.include?('quotient')
+      s=generated(name=='screen' ? 'harness/g4-hermite.rb' : 'harness/g4-hermite-quotient.rb')
+    else
+      s=name=='screen' ? generated('harness/g4-rank-panel.rb','extend','screen') : generated('harness/g4-hermite.rb')
+    end
+    s=s.split(' template<int P> void panel(){').first
     s=s.sub('namespace fourth_family {',"namespace #{name} { static int *out_y,*out_v,chosen;")
     s=s.sub('auto output=[&](const std::vector<int>& v,int a){',<<'CPP')
  auto output=[&](const std::vector<int>& v,int a){
