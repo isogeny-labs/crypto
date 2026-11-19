@@ -53,9 +53,13 @@ mod ordinary_control;
 mod ordinary_preparation;
 #[path = "icprog/report.rs"]
 mod report;
+#[path = "icprog/rho_source.rs"]
+mod rho_source;
 // Shared with `isolated_bench`, which uses parts this binary does not.
 #[path = "icprog/f5_source_custody.rs"]
 mod f5_source_custody;
+#[path = "icprog/incumbent_source.rs"]
+mod incumbent_source;
 #[path = "icprog/json.rs"]
 #[allow(dead_code)]
 mod json;
@@ -282,6 +286,50 @@ enum Command {
     },
     /// Replay the target-free F5 source archive as data without executing it.
     TargetControlReplaySource {
+        #[arg(long)]
+        publication: PathBuf,
+        #[arg(long)]
+        source_registration_sha256: String,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Publish accepted pair-table incumbent source/build without any target config.
+    IncumbentSourcePublish {
+        #[arg(long)]
+        material: PathBuf,
+        #[arg(long)]
+        publication: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Replay all incumbent source archive bytes as data; execute no worker.
+    IncumbentSourceReplay {
+        #[arg(long)]
+        publication: PathBuf,
+        #[arg(long)]
+        source_registration_sha256: String,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Build strong rho offline from the accepted F5 source and publish a complete target-free archive.
+    RhoSourcePublish {
+        #[arg(long)]
+        source: PathBuf,
+        #[arg(long)]
+        f5_publication: PathBuf,
+        #[arg(long)]
+        cargo: PathBuf,
+        #[arg(long)]
+        rustc: PathBuf,
+        #[arg(long)]
+        build_root: PathBuf,
+        #[arg(long)]
+        publication: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+    },
+    /// Replay the strong-rho source and executable archive as data.
+    RhoSourceReplay {
         #[arg(long)]
         publication: PathBuf,
         #[arg(long)]
@@ -1228,6 +1276,38 @@ fn main() -> ExitCode {
             source_registration_sha256,
             out,
         } => f5_source_custody::replay(&publication, &source_registration_sha256, &out),
+        Command::IncumbentSourcePublish {
+            material,
+            publication,
+            out,
+        } => incumbent_source::publish(&material, &publication, &out),
+        Command::IncumbentSourceReplay {
+            publication,
+            source_registration_sha256,
+            out,
+        } => incumbent_source::replay(&publication, &source_registration_sha256, &out),
+        Command::RhoSourcePublish {
+            source,
+            f5_publication,
+            cargo,
+            rustc,
+            build_root,
+            publication,
+            out,
+        } => rho_source::publish(
+            &source,
+            &f5_publication,
+            &cargo,
+            &rustc,
+            &build_root,
+            &publication,
+            &out,
+        ),
+        Command::RhoSourceReplay {
+            publication,
+            source_registration_sha256,
+            out,
+        } => rho_source::replay(&publication, &source_registration_sha256, &out),
         Command::TargetControlAdoptCard {
             capsule,
             source_publication,
