@@ -42,7 +42,10 @@ icprog rho-target-execute \
 ```
 
 `--dispatch-authorization not_granted_freeze_only` is refused. Do not invent
-that token. Do not redispatch a consumed registration. Use busy lock,
+that token. There is no in-repo seal, ledger entry, or automated issuer for
+`separately_authorized_rho_arm_v1`: only an external human operator may grant
+it by supplying the CLI flag when intentionally authorizing the sole consume.
+Do not redispatch a consumed registration. Use busy lock,
 `TMPDIR=/Volumes/SSD990/tmp`, and outs on SSD990-2.
 
 ## Pins

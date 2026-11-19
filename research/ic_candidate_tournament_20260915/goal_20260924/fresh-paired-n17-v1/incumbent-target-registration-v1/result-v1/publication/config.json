@@ -1,0 +1,21 @@
+{
+  "policy": {
+    "batch_trials": 1,
+    "factor_base": {
+      "kind": "subgroup_orbits",
+      "points": 102,
+      "seed": 43
+    },
+    "linear_algebra": "tiny_gauss",
+    "max_trials": 65536,
+    "note": "qualified pair-table; IC1 stays null until exact pre-card inventory",
+    "solver": "pair_table",
+    "summands": 3
+  },
+  "question": "fresh-paired-n17-incumbent-target-registration-v1",
+  "rayon_num_threads": "1",
+  "schema_version": 1,
+  "stdin_job": "job.json",
+  "worker": "pairinv-ic-tournament-worker",
+  "worker_timeout_ms": 900000
+}
