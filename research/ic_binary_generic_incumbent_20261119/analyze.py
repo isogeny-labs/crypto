@@ -133,3 +133,23 @@ def svg():
         y = y0 + hh - t / ymax * hh; out.append(f'<text x="2" y="{y+3:.1f}" font-size="9">{t}</text>')
     out.append('</svg>'); open("figure.svg", "w").write("\n".join(out))
 svg()
+
+# ---- cost decomposition of the strictest incumbent arm(s): GAE and unpriced native per phase, per sqrt(r) ----
+dec = {}
+for b in CURVES:
+    dec[str(b)] = {}
+    for arm in ("k4-p-p0", "k5-p-p0"):
+        acc = collections.defaultdict(lambda: [0.0, 0.0]); n = 0
+        for rep in (1, 2, 3):
+            for l in open(f"raw/B{b}-r{rep}.jsonl"):
+                d = json.loads(l)
+                if d["arm"] != arm or not d["ok"]: continue
+                n += 1; sq = math.sqrt(d["r"])
+                for p, v in d["phases"].items():
+                    acc[p][0] += v["gae"] / sq
+                    acc[p][1] += sum(v["native"].get(k, 0) + v["work_native"].get(k, 0) for k in PRICED) / sq
+        dec[str(b)][arm] = {p: {"S_gae": a[0] / n, "U_over_sqrt_r": a[1] / n} for p, a in acc.items()}
+res["decomposition_incumbent"] = dec
+json.dump(res, open("results.json", "w"), indent=1)
+for b, c in dec.items():
+    for a, ph in c.items(): print("DEC", b, a, {p: (round(v["S_gae"], 2), round(v["U_over_sqrt_r"], 2)) for p, v in ph.items()})
