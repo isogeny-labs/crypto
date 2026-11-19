@@ -144,4 +144,15 @@ timed analysis "$ANA" analyze "$S/out/targets.tsv" "$S/out/aa.tsv" "$BOOT_SEED" 
 (cd "$S/out" && for d in t* pc1 pc2-* dc; do [ -d "$d" ] && gzip -n -9 "$d"/*.jsonl; done; true)
 (cd "$S" && find out targets planted log -type f | sort | xargs sha256sum) > "$S/RAW.sha256"
 echo "spent_cpu_s=$(spent)" >> "$S/log/freeze.txt"
+# staging for runs/ (PROTOCOL.md section 7): the runner copies $S/commit/* into runs/ unchanged
+C="$S/commit"; mkdir -p "$C"
+cp "$S/out/targets.tsv" "$S/out/aa.tsv" "$S/out/analysis.json" "$S/out/controls.kv" "$S/out/pc1.json" "$S/out/refused.tsv" "$C/"
+[ -e "$S/out/collection_failed.txt" ] && cp "$S/out/collection_failed.txt" "$C/"
+cp "$S/log/nonce.txt" "$S/log/freeze.txt" "$S/log/cpu.tsv" "$C/"; cp "$S/log/build.out" "$C/build.log"
+while read -r i; do tr -d '\n' < "$S/targets/p1009/public-$(printf %04d "$i")/public.json"; echo; done < "$S/out/measured.txt" > "$C/publics.jsonl"
+cp "$S/RAW.sha256" "$C/RAW.sha256"
+for f in "$C"/*; do
+  if [ "$(stat -c %s "$f")" -gt 65536 ]; then split -d -a 2 -C 60000 "$f" "$f.part" && rm "$f"; fi
+done
+(cd "$C" && sha256sum * > COMMIT.sha256)
 cat "$S/out/analysis.json"
