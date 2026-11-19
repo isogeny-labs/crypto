@@ -448,6 +448,27 @@ impl Producer<'_> {
         let monic = self.power_modulus(modulus)?;
         let mut b = *base;
         self.reduce_monic(&mut b, &monic)?;
+        // For 61-bit exponents, the extra first-bit state test was slower
+        // than one identity multiply in local regression screening.
+        if exponent > u32::MAX as u64 {
+            let mut acc = Poly17::constant(1);
+            self.reduce_monic(&mut acc, &monic)?;
+            while exponent != 0 {
+                self.gate.charge(4 * COPY_WORK)?;
+                if exponent & 1 != 0 {
+                    let mut product = self.product(&acc, &b)?;
+                    self.reduce_monic(&mut product, &monic)?;
+                    acc = product;
+                }
+                exponent >>= 1;
+                if exponent != 0 {
+                    let mut product = self.square(&b)?;
+                    self.reduce_monic(&mut product, &monic)?;
+                    b = product;
+                }
+            }
+            return Ok(acc);
+        }
         let mut acc = Poly17::constant(1);
         // The identity is reduced modulo any positive-degree polynomial.
         // A degree-zero modulus is exceptional: 1 mod c = 0.
@@ -971,6 +992,24 @@ impl Replay {
         let monic = self.normalized_modulus(modulus)?;
         let mut base = base;
         self.cancel_monic(&mut base, &monic)?;
+        // Keep the former loop for large (61-bit) exponents: native and
+        // local A/B shows no reproducible gain from its first-bit shortcut.
+        if exponent > u32::MAX as u64 {
+            let mut acc = Poly17::constant(1);
+            self.cancel_monic(&mut acc, &monic)?;
+            for bit in (0..64 - exponent.leading_zeros()).rev() {
+                self.gate.charge(4 * COPY_WORK)?;
+                let mut square = self.square_diagonals(&acc)?;
+                self.cancel_monic(&mut square, &monic)?;
+                acc = square;
+                if exponent & (1u64 << bit) != 0 {
+                    let mut product = self.convolution(&acc, &base)?;
+                    self.cancel_monic(&mut product, &monic)?;
+                    acc = product;
+                }
+            }
+            return Ok(acc);
+        }
         // The top exponent bit is always 1. Initialize from the already
         // reduced base instead of squaring 1 and multiplying by base.
         let mut acc = if exponent == 0 { Poly17::constant(1) } else { base };
