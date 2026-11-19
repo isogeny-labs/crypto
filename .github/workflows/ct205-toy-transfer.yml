@@ -44,6 +44,8 @@ jobs:
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct219_anchor_free_cold_cost.py
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct220_split_prime_order_obstruction.py
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct221_zeta.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_projector_oracle.cjs
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_f101_projector_audit.json
       - name: Recount quotient curves, Jacobian and sextic-twist obstruction
         run: |
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/independent_quotient_oracle.py
@@ -68,6 +70,11 @@ jobs:
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct221_zeta.py --self-test
           python3 -O research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct221_zeta.py --self-test
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct221_zeta.py
+          node --check research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_projector_oracle.cjs
+          node research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_projector_oracle.cjs --self-test
+          node research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_projector_oracle.cjs > /tmp/ct222_projector.json
+          cmp /tmp/ct222_projector.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_f101_projector_audit.json
+          sha256sum /tmp/ct222_projector.json
 
   native-toy-dlp:
     runs-on: ubuntu-latest
