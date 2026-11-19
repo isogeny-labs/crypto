@@ -19,7 +19,7 @@ All six precommitted prefix sizes were preserved, including four failures. The n
 
 The **only successful** truncated basis (48) requires 1.56 times as many relation candidates as 54 (2213/1421), and complete candidate time is 1.52 times longer in both native executions. Shrinking the matrix by six variables did **not** reduce total solving time.
 
-Measured same-job **candidate/B**SGS ratios among successful arms are 40,755–41,468× slower at 48 and 27,086–27,288× slower at 54. These are measured *toy negative ratios*, not qualified frontiers: BSGS microsecond times are noisy; comparison lacks independent isolated runs, optimized negation-map rho, reference IC, peak RSS, physical transfer/norm cost, blind new targets, uncertainty intervals and signed PCC. **Never calculate a completed-solve speed ratio for the four failed arms.** All six configurations and two executions were retained.
+Measured same-job **candidate/BSGS ratios among successful arms are 40,755–41,468× slower at 48 and 27,086–27,288× slower at 54. These are measured *toy negative ratios*, not qualified frontiers: BSGS microsecond times are noisy; comparison lacks independent isolated runs, optimized negation-map rho, reference IC, peak RSS, physical transfer/norm cost, blind new targets, uncertainty intervals and signed PCC. **Never calculate a completed-solve speed ratio for the four failed arms.** All six configurations and two executions were retained.
 
 ## Scientific decision
 
@@ -38,4 +38,4 @@ rustc --edition=2021 --test tests/ct230_reduced_base_cost_audit.rs -o /tmp/ct230
 cargo test --locked --release --test ct226_native_genus4_transferred_ic ct229_ -- --nocapture
 ```
 
-Audit workflow: [CT230 standalone Rust audit](../../../.github/workflows/ct230-reduced-base-audit.yml). The audit verifies the frozen record's **internal fidelity**, not independent regeneration of the native logs, secure attestation, or cryptanalytic cost advantage. All findings remain **[pcc:unverified]**. No paid EKS/Spot run, protected merge or new data-access authorization was made.
+Audit workflow: [CT230 standalone Rust audit](../../../.github/workflows/ct230-reduced-base-audit.yml) — [exact-source GitHub Actions #44501390525](https://github.com/isogeny-labs/crypto/actions/runs/44501390525), record-audit job 135481812006 completed **success** at source `cb34c921` on 2026-11-19 UTC: both `ct230_two_unpruned_native_panels` and `ct230_fail_closed_mutations` passed; seven deliberately corrupted inputs were rejected as expected. The audit verifies the frozen record's **internal fidelity**, not independent regeneration of the native logs, secure attestation, or cryptanalytic cost advantage. All findings remain **[pcc:unverified]**. No paid EKS/Spot run, protected merge or new data-access authorization was made.
