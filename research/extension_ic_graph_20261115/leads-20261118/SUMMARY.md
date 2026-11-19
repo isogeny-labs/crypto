@@ -103,3 +103,26 @@ All results are [pcc:unverified]. No paid compute was used.
   - clippy debt fixed in 9 examples, plus the library errors;
   - the n83 example now reads its store-managed CSV at run time;
   - the oversized data file was removed from Git.
+
+## Round 4 (2026-11-19): L1 steps 2-3 and L5
+
+All results are [pcc:unverified]. No paid compute was used.
+
+- [l1-steps-2-3](l1-steps-2-3/README.md): **L1 gets a weak PROMOTE under the rule as written. A longer run of the same stream is inconclusive.**
+  - **Step 2.** |D_universe| = 254,530 classes up to sign, out of 508,536 monic irreducible U over F_1009. f = 20,510 / 254,530 = 0.0806. The halving rule does not trigger.
+  - **Step 3, prespecified seed-389 stream.**
+    - Matched rows: 6 (Poisson 95% 2.2–13.1). Full splits: 2.
+    - Ratio 3.0x, with a 95% interval of 0.54x–30x. This is PROMOTE by the ≥2x rule.
+    - Against the model full-split rate it is 1.26x (0.46x–2.75x).
+  - **Not prespecified: the same walk run to 30,000 residuals.**
+    - 57 matched rows (47 from (1^4,2), 10 from (1^2,2^2)) and 31 full splits.
+    - Ratio 1.84x (1.17x–2.95x), which is inconclusive. Against the model rate it is 1.36x (1.03x–1.76x).
+    - The model itself expects about 1.51x at this f, so the 1.5x kill line falls on the model.
+  - **Control.** The local rerun reproduces Run50's deferred collection exactly: graph stats, rank 508, every phase's bitops, the scalar.
+  - **Checks.** All matched rows pass the group identity and the anchor witnesses. The affine path and elliptic replay for matched rows are not yet done.
+  - **Next.** Only an M3-style paired protocol on fresh targets is justified. It needs ≥100 pooled successes per arm and a decision rule preregistered against the measured full-split rate. L2 (more anchors after rank readiness) is what raises f.
+- [l5-kernel-split](l5-kernel-split/README.md): **C4 is closed.**
+  - Krylov plus BM is 87.60% of linear-stage macs, above the >70% rule.
+  - NF does 0 multiplications.
+  - Per-kernel totals conserve exactly against complete-accounting.
+  - The Krylov products alone are 17.4% of descent; they are the only linear-stage target worth optimizing.
