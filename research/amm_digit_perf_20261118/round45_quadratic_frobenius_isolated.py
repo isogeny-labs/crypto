@@ -242,6 +242,35 @@ mod round45_quad {
         println!("ROUND45_QUAD_DISCRIMINANT_CLASSES checked=20");
     }
     #[test]
+    #[ignore="Benchmark split, irreducible and repeated quadratics"]
+    fn bench_quadratic_classes_complete() {
+        for p in [487u64, 1_000_000_007, 1_000_000_009, (1u64<<61)-1] {
+            let nonsquare_c=if p==1_000_000_009 {11} else {1};
+            let r=23u64;
+            let repeated=vec![r*r%p, p-2*r, 1];
+            let split=polynomial(p,2);
+            let irreducible=vec![nonsquare_c,0,1];
+            for (name,f) in [("split",split),("irreducible",irreducible),("repeated",repeated)] {
+                let old_result=solve_before(p,&f,42);
+                let new_result=solve_after(p,&f,42);
+                assert_eq!(old_result.0,new_result.0);
+                assert_eq!(old_result.1,new_result.1);
+                let mut old=Vec::new();let mut new=Vec::new();
+                for trial in 0..13 {
+                    if trial%2==0 {
+                        old.push(solve_timed(p,&f,true,4));
+                        new.push(solve_timed(p,&f,false,4));
+                    } else {
+                        new.push(solve_timed(p,&f,false,4));
+                        old.push(solve_timed(p,&f,true,4));
+                    }
+                }
+                let a=median(old);let b=median(new);
+                println!("ROUND45_QUAD_CLASS p={p} class={name} before_ns={a:.1} after_ns={b:.1} speedup={:.4}x",a/b);
+            }
+        }
+    }
+    #[test]
     #[ignore="Production Rust A/B paired time comparison"]
     fn bench_quadratic_actual_rust(){
         for p in [487u64, 1_000_000_007u64, 1_000_000_009u64] {
@@ -304,3 +333,4 @@ with tempfile.TemporaryDirectory() as tmp:
         subprocess.run([str(binary),test,"--nocapture"],check=True)
     subprocess.run([str(binary),"exact_quadratic_discriminant_classes_and_events","--nocapture"],check=True)
     subprocess.run([str(binary),"bench_quadratic_actual_rust","--ignored","--nocapture"],check=True)
+    subprocess.run([str(binary),"bench_quadratic_classes_complete","--ignored","--nocapture"],check=True)
