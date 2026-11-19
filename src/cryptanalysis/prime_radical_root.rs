@@ -135,7 +135,7 @@ impl Fp {
             }
             acc
         } else {
-            rpow(self, a % self.p, e as u128)
+            rpow(self, if a < self.p { a } else { a % self.p }, e as u128)
         }
     }
     pub fn inv(&self, a: u64) -> u64 {
@@ -342,14 +342,22 @@ impl Ring for Fq2 {
         let lo = (e % p) as u64;
         let hi = (e / p) as u64;
         let f = &self.f;
-        let norm = f.sub(f.sqr(x.0), f.mul(self.n, f.sqr(x.1)));
+        let norm = f.sub(f.sqr(x.0), self.mul_nonresidue(f.sqr(x.1)));
         if lo == hi {
             return (f.powm(norm, lo), 0);
         }
         let conjugate = (x.0, f.neg(x.1));
-        let mut acc = self.one();
+        // The top nonzero joint bit can initialize the accumulator directly.
+        // Avoid squaring and multiplying the identity at the first iteration.
         let bits = u64::BITS - (lo | hi).leading_zeros();
-        for bit in (0..bits).rev() {
+        let top = bits - 1; // e >= p, so at least one of lo/hi is nonzero.
+        let mut acc = match ((lo >> top) & 1) | (((hi >> top) & 1) << 1) {
+            1 => x,
+            2 => conjugate,
+            3 => (norm, 0),
+            _ => unreachable!(),
+        };
+        for bit in (0..top).rev() {
             acc = self.sqr(acc);
             match ((lo >> bit) & 1) | (((hi >> bit) & 1) << 1) {
                 1 => acc = self.mul(acc, x),
@@ -4561,5 +4569,143 @@ mod sparse_round19_tests {
         paired("dense cubic unchanged control",&dense,64,
             |x|digest(&ctx.roots_before_sparse(&x).unwrap()),
             |x|digest(&ctx.roots(&x).unwrap()));
+    }
+}
+
+
+// Fixed-frozen arithmetic references and reproducible paired release benchmarks
+// for the round-37 public-input Fp/Fp2 exponentiation hot paths.
+#[cfg(test)]
+mod round37_frobenius_tests {
+    use super::*;
+    use std::hint::black_box;
+    use std::time::Instant;
+
+    fn next(state: &mut u64) -> u64 {
+        *state ^= *state >> 12;
+        *state ^= *state << 25;
+        *state ^= *state >> 27;
+        state.wrapping_mul(2_685_821_657_736_338_717)
+    }
+
+    fn before_fp_powm(f: &Fp, a: u64, e: u64) -> u64 {
+        // Frozen 32-bit-prime path from before canonical input short-circuit.
+        rpow(f, a % f.p, e as u128)
+    }
+
+    fn before_fq2_frobenius_pow(q: &Fq2, x: (u64, u64), e: u128) -> (u64, u64) {
+        let f = &q.f;
+        let p = f.p as u128;
+        let lo = (e % p) as u64;
+        let hi = (e / p) as u64;
+        let norm = f.sub(f.sqr(x.0), f.mul(q.n, f.sqr(x.1)));
+        let conjugate = (x.0, f.neg(x.1));
+        let mut acc = q.one();
+        let bits = u64::BITS - (lo | hi).leading_zeros();
+        for bit in (0..bits).rev() {
+            acc = q.sqr(acc);
+            match ((lo >> bit) & 1) | (((hi >> bit) & 1) << 1) {
+                1 => acc = q.mul(acc, x),
+                2 => acc = q.mul(acc, conjugate),
+                3 => acc = (f.mul(acc.0, norm), f.mul(acc.1, norm)),
+                _ => {}
+            }
+        }
+        acc
+    }
+
+    #[test]
+    fn round37_fp2_frobenius_and_canonical_fp_match_frozen() {
+        let mut state = 0x3799_2026_1119_ee77u64;
+        for p in [5u64, 7, 11, 17, 97, 487, 17_497, 1_000_000_007,
+                  1_000_000_009, MAX_PRIME] {
+            let f = Fp::new(p);
+            let q = Fq2 { f, n: f.first_quadratic_nonresidue() };
+            for i in 0..192 {
+                let a = next(&mut state);
+                let e0 = next(&mut state) % (p - 1);
+                if p != MAX_PRIME {
+                    assert_eq!(f.powm(a, e0), before_fp_powm(&f, a, e0),
+                        "Fp pow p={p} sample={i}");
+                }
+                let x = (1 + next(&mut state) % (p - 1),
+                         1 + next(&mut state) % (p - 1));
+                let lo = next(&mut state) % p;
+                let hi = 1 + next(&mut state) % (p - 1);
+                let e = (hi as u128) * (p as u128) + lo as u128;
+                let actual = q.pow(x, e);
+                let frozen = before_fq2_frobenius_pow(&q, x, e);
+                assert_eq!(actual, frozen, "Fq2 pow p={p} sample={i} e={e}");
+                if i < 24 {
+                    assert_eq!(actual, rpow(&q, x, e),
+                        "independent binary/window Fq2 p={p} sample={i}");
+                }
+            }
+        }
+    }
+
+    fn nanos<T: Copy, F: Fn(T) -> u64>(inputs: &[T], repeats: usize, f: &F) -> f64 {
+        let start = Instant::now();
+        let mut digest = 0u64;
+        for _ in 0..repeats {
+            for &item in inputs {
+                digest = digest.wrapping_add(black_box(f(black_box(item))));
+            }
+        }
+        black_box(digest);
+        start.elapsed().as_nanos() as f64 / (inputs.len() * repeats) as f64
+    }
+    fn paired<T: Copy, F: Fn(T) -> u64, G: Fn(T) -> u64>(
+        label: &str, input: &[T], repeats: usize, before: F, after: G
+    ) {
+        let mut first = Vec::new();
+        let mut second = Vec::new();
+        for i in 0..13 {
+            if i & 1 == 0 {
+                first.push(nanos(input, repeats, &before));
+                second.push(nanos(input, repeats, &after));
+            } else {
+                second.push(nanos(input, repeats, &after));
+                first.push(nanos(input, repeats, &before));
+            }
+        }
+        first.sort_by(f64::total_cmp);
+        second.sort_by(f64::total_cmp);
+        println!("{label}: before={:.3}ns after={:.3}ns speedup={:.4}x",
+                 first[6], second[6], first[6] / second[6]);
+    }
+    #[test]
+    #[ignore]
+    fn bench_round37_fp2_frobenius_and_fp_powm_actual_rust() {
+        let mut state = 0x37ee_2026_1119_aaaa;
+        for p in [487u64, 1_000_000_007, 1_000_000_009, MAX_PRIME] {
+            let f = Fp::new(p);
+            let q = Fq2 { f, n: f.first_quadratic_nonresidue() };
+            let mut a = Vec::new();
+            let mut b = Vec::new();
+            for _ in 0..128 {
+                let c = 1 + next(&mut state) % (p - 1);
+                let e = next(&mut state) % (p - 1);
+                a.push((c, e));
+                let x = (1 + next(&mut state) % (p - 1),
+                         1 + next(&mut state) % (p - 1));
+                let lo = 1 + next(&mut state) % (p - 1);
+                let mut hi = 1 + next(&mut state) % (p - 1);
+                if lo == hi { hi = (hi % (p - 1)) + 1; }
+                b.push((x, (hi as u128) * p as u128 + lo as u128));
+            }
+            if p != MAX_PRIME {
+                paired(&format!("Fp::powm canonical p={p}"), &a, 64,
+                    |(c,e)| before_fp_powm(&f,c,e),
+                    |(c,e)| f.powm(c,e));
+            }
+            paired(&format!("Fq2 Frobenius pow p={p}"), &b, 64,
+                |(x,e)| {
+                    let v = before_fq2_frobenius_pow(&q,x,e); v.0 ^ v.1
+                },
+                |(x,e)| {
+                    let v = q.pow(x,e); v.0 ^ v.1
+                });
+        }
     }
 }
