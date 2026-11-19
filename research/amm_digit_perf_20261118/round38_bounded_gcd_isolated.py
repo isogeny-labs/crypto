@@ -211,7 +211,6 @@ mod round38 {
             }
         }
     }
-}
 
     fn whole(p:u64,degree:usize,fast:bool,reps:usize)->f64 {
         use crate::cryptanalysis::prime_root_trace::bounded_before as old;
