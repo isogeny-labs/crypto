@@ -1,0 +1,31 @@
+name: CT239 F103 frozen native record and corruption audit
+on:
+  push:
+    branches:
+      - research/ct204-odd-cover-toy-dlp-20261118
+    paths:
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct239_f103_native_three_pairs.jsonl"
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct239_f103_native_record_audit.py"
+      - ".github/workflows/ct239-f103-native-record-audit.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct239_f103_native_record_audit.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct239_f103_native_three_pairs.jsonl
+      - name: Audit all original rounds and 16 corruption controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          f=research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct239_f103_native_record_audit.py
+          python3 "$f"
+          python3 -O "$f"
