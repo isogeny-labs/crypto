@@ -8,6 +8,7 @@ on:
       - 'src/cryptanalysis/prime_root_bounded.rs'
       - 'research/amm_digit_perf_20261118/round31_bounded_isolated.py'
       - 'research/amm_digit_perf_20261118/round32_verifier_isolated.py'
+      - 'research/amm_digit_perf_20261118/round33_bounded_poly_isolated.py'
       - 'research/amm_digit_perf_20261118/round31_bounded_baseline.rs'
       - 'research/amm_digit_perf_20261118/round23_verifier_isolated.py'
       - 'research/amm_digit_perf_20261118/round24_verifier_isolated.py'
@@ -266,4 +267,32 @@ jobs:
         with:
           name: radical-root-arithmetic-timing
           path: ${{ runner.temp }}/radical-root-results.txt
+          if-no-files-found: ignore
+
+  bounded-polynomial-symmetric-division:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round33_bounded_poly_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Verify root polynomial arithmetic and measure real Rust before/after
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round33_bounded_poly_isolated.py
+          } | tee "$RUNNER_TEMP/round33-bounded-rust.txt"
+          cat "$RUNNER_TEMP/round33-bounded-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round33-bounded-polynomial-rust
+          path: ${{ runner.temp }}/round33-bounded-rust.txt
           if-no-files-found: ignore
