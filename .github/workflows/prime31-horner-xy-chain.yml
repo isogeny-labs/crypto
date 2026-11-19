@@ -5,6 +5,8 @@ on:
       - automation/prime31-horner-xy-chain-20261119
     paths:
       - '.github/workflows/prime31-horner-xy-chain.yml'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_family_separation.rs'
+      - 'research/prime31_ic_20261115/rr9/RR9_WEIGHTED_FAMILY_SEPARATION_PROTOCOL_20261119.md'
       - 'research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs'
       - 'research/prime31_ic_20261115/native/verify_prime31_horner_xy_chain.py'
       - 'research/prime31_ic_20261115/rr9/HORNER_XY_CHAIN_PROTOCOL_20261119.md'
@@ -14,6 +16,8 @@ on:
   pull_request:
     paths:
       - '.github/workflows/prime31-horner-xy-chain.yml'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_family_separation.rs'
+      - 'research/prime31_ic_20261115/rr9/RR9_WEIGHTED_FAMILY_SEPARATION_PROTOCOL_20261119.md'
       - 'research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs'
       - 'research/prime31_ic_20261115/native/verify_prime31_horner_xy_chain.py'
       - 'research/prime31_ic_20261115/rr9/HORNER_XY_CHAIN_PROTOCOL_20261119.md'
@@ -112,6 +116,33 @@ jobs:
             research/prime31_ic_20261115/native/verify_prime31_horner_xonly_sign_lift.py \
             research/prime31_ic_20261115/rr9/HORNER_XONLY_SIGN_LIFT_PROTOCOL_20261119.md \
             | tee xonly-sha256.txt
+      - name: Overlay original Rust weighted/unweighted language discriminator
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_family_separation.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_family_separation.rs
+      - name: Exact source Rust language discriminator focused tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_weighted_family_separation
+      - name: Frozen 512-fixture original Rust relation-family audit
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_weighted_family_separation > prime31-weighted-family-separation.json
+          jq -e '.schema=="prime31.rr9.weighted_family_separation.v1" and
+            .curve.p==2147483647 and .curve.n==2147446831 and
+            .planted_weighted_total==512 and .cases_per_window==128 and
+            .weighted_targets_in_squarefree_support==0 and
+            .weighted_equal_same_signed_unweighted==0 and
+            .transformed_x_equal_fixed_hb==0 and
+            .weighted_identity==0 and
+            (.per_window | length)==4 and
+            (.per_window | all(.squarefree_support_size==256)) and
+            .generic_squarefree_grader_used==true and
+            .public_only_unknown_index_extraction==false and
+            .complete_ecdlp_solved==false' prime31-weighted-family-separation.json
+          sha256sum prime31-weighted-family-separation.json \
+            research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_family_separation.rs \
+            research/prime31_ic_20261115/rr9/RR9_WEIGHTED_FAMILY_SEPARATION_PROTOCOL_20261119.md \
+            | tee weighted-family-sha256.txt
       - name: Preserve scientific artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -124,4 +155,6 @@ jobs:
             prime31-horner-xonly-full.json
             prime31-horner-xonly-verified.json
             xonly-sha256.txt
+            prime31-weighted-family-separation.json
+            weighted-family-sha256.txt
           if-no-files-found: warn
