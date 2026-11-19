@@ -33,3 +33,7 @@ This is **actual complete toy two-target recovery** for all four bases, not a pr
 3. The distinct original 695/701 norm-point reuse route already has **unsigned finite parity** in cryptanalysis; authenticated original-source replay and physical `C169/C13a/C13b/N2_actual/D` require approved custody and compute. Do not bypass S3/EKS budget controls.
 
 Reproduce: `python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct234_two_lp_cost_audit.py --self-test`. No paid compute, merge, or publication to validated solver leaderboards.
+
+## Hosted record-audit verification
+
+The newly committed [bounded CT234 audit run #44537847335](https://github.com/isogeny-labs/crypto/actions/runs/44537847335) **passed** on source `4eb1f46136e94fa1e1ad6c1341f5c038dbda14a6`, job 135607944757. Both standard and `python3 -O` executions recomputed the four native ratios and rejected all 11 corruptions; both emitted `CT234_RECORD_AUDIT_PASS source=84a62f1190dcf05e11af58b22c4243dff74079d3 records=4`. This is independently executed *record-only audit code*, not native solver replay, proof-carrying cryptographic signature or a matched single-target performance qualification.
