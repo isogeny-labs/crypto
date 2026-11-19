@@ -26,3 +26,24 @@
 
 - Local container lacks network access to GitHub and cargo/rustc. Used authenticated GitHub connector for reads/writes, independent local Python for algebra, and source-specific GitHub Actions for native compilation. No native validation result inferred from preflight.
 - Initial Rust source used a nested mutable RHS/sqrt expression; separated the method calls before CI.
+
+## 2026-11-19 21:35 UTC — exact-source verification closeout
+
+### What was done (commands, files, features)
+
+- Fetched GitHub Actions run [#44619747239](https://github.com/isogeny-labs/crypto/actions/runs/44619747239), completed job 135897900043, job logs and artifact [#14576493274](https://github.com/isogeny-labs/crypto/actions/runs/44619747239/artifacts/14576493274). All new source-specific steps passed.
+- Verified original Rust library 40/40; existing x/y 2/2; existing x-only 4/4; existing fixed/weighted family 1/1; new slot-root resultants 1/1. Original Rust release JSON passed registered gates: 64 distinct slot roots in each of 4 windows, 512 positives, 512 negatives, 4096 zero positive resultants, 512 nonzero negative R0, 512 nonsingular Jacobians. Separately authored Python bigint replay all 512 matched and checked generator order.
+- Recorded exact Rust JSON digest `690f24656bf2a7587ba10d8dcb23ad017a43c5737216db233cad505e94242fa4` and source digests in the report. Signed PCC remains unverified.
+
+### Decisions made (and why)
+
+- Mark this **exact membership characterization/test** complete; retain #4692 public-only target-conditioned extractor as unresolved. Full membership variety has 16.8M roots, so the only plausible next use couples Q at the start rather than a 16.8M-point pre-enumeration.
+
+### Open threads (unfinished, pick up next time)
+
+- #4692 owner to compare joint slot-resultant + RR9 target constraints against 14-var and 21-var Horner systems on 46/18 frozen B8 public-only corpus. If successful, full rank31/1024Q same-runner cost.
+- Independent signed PCC, exceptional other-curve slot collisions, scalable asymptotic analysis.
+
+### Errors (what went wrong, how it was handled)
+
+- None in the final CI run. Earlier corrected a Rust nested mutable borrow before exact-source test.
