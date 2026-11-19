@@ -131,7 +131,10 @@ exponent without a targeted sublinear norm-preimage algorithm.
 
 The replay was written by the producer in this session.  It is a separate
 formula implementation, not an independent PCC verifier, and all headline
-claims remain `[pcc:unverified]`.
+claims remain `[pcc:unverified]`.  Interpretive claim
+`PCC-20261119-153c80` is structurally replayable but has standing
+`not_covered` because the validator report has no independent keyring
+signature.
 
 ## Scope and next obligation
 
