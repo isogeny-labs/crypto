@@ -2,7 +2,7 @@
 //! `research/notes/cm-isogeny/RESEARCH_NIST_CYCLOTOMIC_POINT_HEIGHTS.md`,
 //! following the frozen protocol
 //! `research/nist_cyclotomic_controls_20261011/PROTOCOL.md`
-//! and `.claude/skills/controlled-experiment/SKILL.md`.
+//! and `isogeny-labs/workspace:.agents/skills/controlled-experiment/SKILL.md`.
 //!
 //! E1  small-factor content of n−1, n+1, twist vs random Hasse-interval primes
 //!     (+ planted-smooth positive control)

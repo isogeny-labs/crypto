@@ -7,13 +7,14 @@ readonly INSTALLER_SHA256='fbf1c9a92f525d2cb0bf902016d22fdc5dd9a275f781b554a32e3
 readonly INSTALLER_URL="https://github.com/alphaXiv/OpenResearch/releases/download/v${ORX_VERSION}/openresearch-cli-installer.sh"
 repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 prefix="${OPENRESEARCH_PREFIX:-${HOME}/.local}"
+readonly orx_skill_ref='isogeny-labs/workspace:.agents/skills/orx/SKILL.md'
 
 usage() {
   cat <<'USAGE'
 Usage: bash scripts/openresearch.sh <setup|doctor|up|skill> [arguments...]
 
   setup   Install the pinned CLI if absent; disable anonymous telemetry.
-  doctor  Check the CLI and repository skill without network access.
+  doctor  Check the CLI (and the trunk's orx skill) without network access.
   up      Open the loopback dashboard; add this checkout as an existing project.
   skill   Print the bundled CLI guide (optional module name).
 
@@ -74,7 +75,7 @@ setup() {
     exit 1
   fi
   "$orx_bin" telemetry off
-  echo "OpenResearch $ORX_VERSION ready; repository skill: .agents/skills/orx/SKILL.md"
+  echo "OpenResearch $ORX_VERSION ready; skill orx: $orx_skill_ref"
 }
 
 cd -- "$repo_root"
@@ -86,8 +87,13 @@ case "$command_name" in
   doctor)
     require_orx
     "$orx_bin" --version
-    test -r .agents/skills/orx/SKILL.md
-    test -r .claude/skills/orx/SKILL.md
+    # The orx skill lives in the workspace trunk (.agents/skills/README.md).
+    # From a workspace checkout this repository is repos/crypto.
+    if [[ -r "$repo_root/../../.agents/skills/orx/SKILL.md" ]]; then
+      echo "Skill orx: $(cd -- "$repo_root/../.." && pwd)/.agents/skills/orx/SKILL.md"
+    else
+      echo "Skill orx: $orx_skill_ref (no workspace checkout around this one)"
+    fi
     "$orx_bin" telemetry status
     printf 'Repository: %s\nDashboard: http://127.0.0.1:4791\n' "$repo_root"
     ;;

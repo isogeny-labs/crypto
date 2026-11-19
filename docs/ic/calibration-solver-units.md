@@ -49,7 +49,7 @@ curve of the table row it is written to. `Calibration::pin` stores
 **Host.** The calibration host named in `calibration.json` is
 `Intel(R) Xeon(R) Processor @ 2.10GHz`. The single Apple M4 Pro row is
 marked for re-pinning on that host. Run on that host class through
-[`isolab-eks`](../../.claude/skills/isolab-eks/SKILL.md) (CLAUDE.md default
+[`isolab-eks`](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/isolab-eks/SKILL.md) (CLAUDE.md default
 route). Requirements: an isolated node; `.resume/RESUME.md` filled
 (`scripts/checkpoint.sh init`); a `bench.record/v1` record
 (`python3 tools/benchrec.py init|run|add-raw|metric|close`), with raw

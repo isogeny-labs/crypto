@@ -265,7 +265,7 @@ Where it appears:
   flags change them. The provenance (`next.refine.json`) lists every kept and
   dropped candidate with its advice and reasons. It runs nothing and fails,
   rather than writing an empty plan, when it would drop everything. The
-  `dreg-triage` skill (`.agents/skills/dreg-triage/SKILL.md`) describes the
+  `dreg-triage` skill (`isogeny-labs/workspace:.agents/skills/dreg-triage/SKILL.md`) describes the
   plan → run → triage → refine loop under the repository's rules.
 
 `certified_degree_of_regularity` stays null everywhere. The forecast is a
