@@ -130,6 +130,8 @@ enum Cmd {
         cpus: String,
         #[arg(long)]
         allow_busy: bool,
+        #[arg(long)]
+        lock: Option<String>,
         #[arg(long, default_value_t = 8)]
         replay: usize,
     },
@@ -146,6 +148,8 @@ enum Cmd {
         cpus: String,
         #[arg(long)]
         allow_busy: bool,
+        #[arg(long)]
+        lock: Option<String>,
         #[arg(long, default_value_t = 8)]
         replay: usize,
         /// The card's ordinal in `CARD-<experiment>-<date>-<n>`.
@@ -212,6 +216,8 @@ enum Cmd {
         cpus: String,
         #[arg(long)]
         allow_busy: bool,
+        #[arg(long)]
+        lock: Option<String>,
         #[arg(long, default_value_t = 8)]
         replay: usize,
     },
@@ -1442,6 +1448,7 @@ struct RunOpts {
     ecbench: PathBuf,
     cpus: String,
     allow_busy: bool,
+    lock: Option<String>,
     replay: usize,
 }
 
@@ -1484,6 +1491,10 @@ fn run_argv(opts: &RunOpts, spec: &Path, out: &Path) -> Vec<String> {
     ];
     if opts.allow_busy {
         a.push("--allow-busy".into());
+    }
+    if let Some(lock) = &opts.lock {
+        a.push("--lock".into());
+        a.push(lock.clone());
     }
     a
 }
@@ -2988,6 +2999,7 @@ fn main() {
             ecbench,
             cpus,
             allow_busy,
+            lock,
             replay,
         } => cmd_run(
             &home,
@@ -2997,6 +3009,7 @@ fn main() {
                 ecbench,
                 cpus,
                 allow_busy,
+                lock,
                 replay,
             },
         )
@@ -3007,6 +3020,7 @@ fn main() {
             ecbench,
             cpus,
             allow_busy,
+            lock,
             replay,
             n,
         } => cmd_card(
@@ -3017,6 +3031,7 @@ fn main() {
                 ecbench,
                 cpus,
                 allow_busy,
+                lock,
                 replay,
             },
             n,
@@ -3040,6 +3055,7 @@ fn main() {
             ecbench,
             cpus,
             allow_busy,
+            lock,
             replay,
         } => parse_sizes(&sizes).and_then(|s| {
             cmd_loop(
@@ -3062,6 +3078,7 @@ fn main() {
                     ecbench,
                     cpus,
                     allow_busy,
+                    lock,
                     replay,
                 },
             )
@@ -3819,6 +3836,24 @@ mod tests {
             .contains("generic prime-order E(F_p) curve"));
         let svg = ratchet_svg(&l, "generic");
         assert!(svg.contains("(generic track, prime-generic)"));
+        let opts_default = RunOpts {
+            ecbench: PathBuf::from("target/release/ecbench"),
+            cpus: "none".into(),
+            allow_busy: true,
+            lock: None,
+            replay: 8,
+        };
+        assert!(
+            !run_argv(&opts_default, Path::new("s.json"), Path::new("out"))
+                .iter()
+                .any(|a| a == "--lock")
+        );
+        let opts_locked = RunOpts {
+            lock: Some("/tmp/custom.lock".into()),
+            ..opts_default
+        };
+        let argv = run_argv(&opts_locked, Path::new("s.json"), Path::new("out"));
+        assert!(argv.windows(2).any(|w| w == ["--lock", "/tmp/custom.lock"]));
     }
 }
 
