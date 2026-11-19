@@ -257,8 +257,10 @@ paper-to-machine cost bridge is supplied.
    A seed is called large when `X <= 2 * value(seed)`.
 2. **Theorem used as stated.** `Finset.sum_filter_add_sum_filter_not` partitions
    the total by the large-value predicate; `Finset.sum_le_sum` and natural
-   multiplication monotonicity bound the two parts. No character sum or
-   elliptic-curve fact is re-proved in this generic lemma.
+   multiplication monotonicity bound the two parts. The existing
+   `highRankSeedCountBound` supplies finite Markov counting for the energy
+   function. No character sum or elliptic-curve fact is re-proved in these
+   generic lemmas.
 3. **Object as an instance.** Seeds are nonzero dilation parameters and
    `value(u)` is the signed factor-base cardinality. The paper-level character
    sum supplies `3 X #Seed <= 4 sum value`; the elementary bound is
@@ -267,11 +269,14 @@ paper-to-machine cost bridge is supplied.
    Each large summand is at most `4X`; each small summand is at most `X` by the
    definition of the filter. Compare this upper bound with four times the
    supplied first-moment lower bound and cancel positive `X` to get
-   `#Seed <= 6 #large`.
-5. **Missing components only.** The generic finite first-moment lemma and the
-   finite intersection lemma that removes a bad set of size at most `1/12`.
-   The character-sum estimate that instantiates the total lower bound and the
-   energy Markov bound remain paper-to-instance obligations.
+   `#Seed <= 6 #large`. Apply `highRankSeedCountBound` at threshold `12μ`
+   to the energy function, use `sum energy <= μ #Seed`, and cancel positive
+   `μ` to obtain `12 #bad <= #Seed`. The existing event-intersection lemma
+   then gives the `1/12` joint event in one endpoint application.
+5. **Missing components only.** The generic finite first-moment lemma, the
+   finite Markov specialization at factor 12, the finite intersection lemma,
+   and their composed endpoint. The character-sum and total-energy estimates
+   that instantiate the two sum bounds remain paper-to-instance obligations.
 6. **Inheritance table.** Population split:
    `Finset.sum_filter_add_sum_filter_not`; large-part cardinality:
    `Finset.sum_const`; pointwise bounds: supplied upper bound and filter
@@ -280,7 +285,9 @@ paper-to-machine cost bridge is supplied.
 | statement | kind | owner | quantified structure | hypotheses |
 |---|---|---|---|---|
 | `firstMomentForcesLargeValueSeeds` | law | `TensorBoundaryBounds`; upstream candidate for `crypto-lean` | finite seed-indexed natural values | positive scale, pointwise `2X` upper bound, scaled `3/4` mean lower bound |
+| `twelveMarkovBadSetBound` | endpoint | same | finite seed-indexed natural energies | positive mean scale and total energy at most scale times population |
 | `oneSixthEventSurvivesOneTwelfthBadSet` | law | same; upstream candidate for `crypto-lean` | finite seed space and two event finsets | event size at least `1/6`, bad-set size at most `1/12` |
+| `firstMomentAndEnergyGiveOneTwelfthGoodSeeds` | endpoint | same | finite factor-base and energy functions | hypotheses of the first-moment and total-energy interfaces |
 
 The exact checked conclusions are `card Seed <= 6 * card {seed | X <= 2 *
 value seed}` and, after removing a bad set of cardinality at most `1/12`,

@@ -147,8 +147,17 @@ into `#seeds <= 6 #{u : X <= 2 value(u)}`. The theorem
 size at most `1/12` and leaves at least `1/12` of all seeds. Claims
 `PCC-20261118-07b50f` and `PCC-20261118-aee405` pass their local Lean
 verifiers and retain unverified signed standing. The character-sum estimate
-and the energy Markov bound that instantiate these generic hypotheses remain
+and the total-energy estimate that instantiate these generic hypotheses remain
 paper-to-curve obligations. [pcc:unverified]
+
+The energy accounting is now composed rather than merely listed.
+`twelveMarkovBadSetBound` derives the factor-12 bad-set cardinality directly
+from a supplied total-energy bound, and
+`firstMomentAndEnergyGiveOneTwelfthGoodSeeds` combines both supplied totals
+into the exact joint `1/12` event. Claims `PCC-20261119-1fd609` and
+`PCC-20261119-5bbc92` pass locally and retain unverified signed standing.
+The remaining curve-specific inputs are precisely the two total-sum estimates,
+not an additional probabilistic inference. [pcc:unverified]
 
 Before the ECDLP specialization is promoted from unverified paper deduction,
 the remaining independent obligations are:

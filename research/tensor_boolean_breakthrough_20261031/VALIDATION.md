@@ -560,3 +560,22 @@ verifiers and retain unverified signed standing. [pcc:unverified]
 The checked scope is finite counting only. The character-sum estimate and
 energy Markov bound needed for the elliptic dilation family remain external
 instance obligations.
+
+## 2026-11-19 energy-composition follow-up
+
+The factor-12 Markov and composed coverage assembly probe type-checked before
+the module edit. The pinned project build completed successfully with 2,153
+jobs, and the repository proof gate reported:
+
+```text
+PASS 26 thm 0 trusted research/tensor_boolean_breakthrough_20261031/lean
+```
+
+Both new declarations have the standard axiom set `[propext,
+Classical.choice, Quot.sound]`. The independent fresh checker exited 0.
+Claims `PCC-20261119-1fd609` and `PCC-20261119-5bbc92` pass their local Lean
+verifiers and retain unverified signed standing. [pcc:unverified]
+
+The composed theorem leaves exactly two supplied finite-sum hypotheses: the
+factor-base first moment and the total energy upper bound. Establishing those
+for the dilation family remains outside this generic formalization.

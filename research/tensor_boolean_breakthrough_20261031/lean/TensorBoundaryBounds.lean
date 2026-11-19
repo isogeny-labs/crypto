@@ -401,6 +401,27 @@ theorem firstMomentForcesLargeValueSeeds
     nlinarith
   exact Nat.le_of_mul_le_mul_left scaled XPositive
 
+/-- Finite Markov specialization at factor twelve. If total energy is at most
+`meanBound` times the population size, at most one twelfth of the seeds have
+energy at least `12 * meanBound`. -/
+theorem twelveMarkovBadSetBound
+    {Seed : Type*} [Fintype Seed]
+    (energy : Seed → ℕ) (meanBound : ℕ) (meanPositive : 0 < meanBound)
+    (totalBound : (∑ seed, energy seed) ≤ meanBound * Fintype.card Seed) :
+    12 * (Finset.univ.filter fun seed => 12 * meanBound ≤ energy seed).card ≤
+      Fintype.card Seed := by
+  classical
+  have counted := highRankSeedCountBound energy energy (12 * meanBound)
+    (fun seed => le_rfl)
+  apply Nat.le_of_mul_le_mul_left (c := meanBound) ?_ meanPositive
+  calc
+    meanBound * (12 * (Finset.univ.filter fun seed =>
+        12 * meanBound ≤ energy seed).card) =
+        (12 * meanBound) * (Finset.univ.filter fun seed =>
+          12 * meanBound ≤ energy seed).card := by ring
+    _ ≤ ∑ seed, energy seed := counted
+    _ ≤ meanBound * Fintype.card Seed := totalBound
+
 /-- An event of finite uniform probability at least `1/6` still has probability
 at least `1/12` after removing any bad event of probability at most `1/12`. -/
 theorem oneSixthEventSurvivesOneTwelfthBadSet
@@ -414,5 +435,23 @@ theorem oneSixthEventSurvivesOneTwelfthBadSet
   have interLe : (large ∩ bad).card ≤ bad.card :=
     Finset.card_le_card Finset.inter_subset_right
   omega
+
+/-- Composed finite coverage endpoint. A `3/4` first-moment lower bound for a
+quantity bounded by `2X`, together with an average energy upper bound, leaves
+at least one twelfth of all seeds simultaneously large and below the
+factor-twelve energy threshold. -/
+theorem firstMomentAndEnergyGiveOneTwelfthGoodSeeds
+    {Seed : Type*} [Fintype Seed] [DecidableEq Seed]
+    (value energy : Seed → ℕ) (X meanBound : ℕ)
+    (XPositive : 0 < X) (meanPositive : 0 < meanBound)
+    (valueUpper : ∀ seed, value seed ≤ 2 * X)
+    (valueTotalLower : 3 * X * Fintype.card Seed ≤ 4 * ∑ seed, value seed)
+    (energyTotalUpper : (∑ seed, energy seed) ≤ meanBound * Fintype.card Seed) :
+    Fintype.card Seed ≤ 12 *
+      ((Finset.univ.filter fun seed => X ≤ 2 * value seed) \
+        (Finset.univ.filter fun seed => 12 * meanBound ≤ energy seed)).card := by
+  apply oneSixthEventSurvivesOneTwelfthBadSet
+  · exact firstMomentForcesLargeValueSeeds value X XPositive valueUpper valueTotalLower
+  · exact twelveMarkovBadSetBound energy meanBound meanPositive energyTotalUpper
 
 end TensorBoundaryBounds
