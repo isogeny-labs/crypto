@@ -2,8 +2,11 @@ def median(v)
   v=v.sort
   (v[3]+v[4])/2.0
 end
-quotient=ARGV.delete('--quotient')
-puts(quotient ? 'p c case order hermite_quotient pencil_quotient pencil_hermite' : 'p c case order screen_hermite pencil_hermite')
+carry=ARGV.delete('--carry')
+pivots=ARGV.delete('--pivots')
+switch=ARGV.delete('--switch') || carry || pivots
+quotient=ARGV.delete('--quotient') || switch
+puts(carry ? 'p c case order regular_carry pencil_carry pencil_full' : pivots ? 'p c case order replay_carry pencil_carry pencil_replay' : switch ? 'p c case order full_half pencil_half pencil_full' : quotient ? 'p c case order hermite_quotient pencil_quotient pencil_hermite' : 'p c case order screen_hermite pencil_hermite')
 ARGV.each do |file|
   runs={}
   File.foreach(file) do |line|
@@ -14,7 +17,7 @@ ARGV.each do |file|
     runs[key]=[t,ok]
   end
   cases=runs.keys.map{|k|k.take(3)}.uniq.sort
-  raise unless cases.size==84
+  raise unless cases.size==(switch ? 394 : 84)
   cases.each do |p,c,i|
     ratios=8.times.map do |r|
       t=runs.fetch([p,c,i,r,2])[0]

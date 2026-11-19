@@ -442,3 +442,32 @@ An audit multiplied Q by the fixed factor and checked every coefficient against 
 Each independent seed generated four input pairs per deficient curve. The same binary rotated the pencil, exact-division and direct-quotient arms, with eight repetitions per input in each of two processes with opposite orders. Both candidate timings include catalogue construction, input decomposition and scalar verification. Per seed, the existing pencil eligibility test excluded 16 pairs, and the reference returned no scalar on three additional pairs. Of the 20 verified comparisons below 10× after this change, five occurred on (47,31) and four on (53,38). The minimum observed direct-quotient speedup against a verified pencil run was 3.328× on (61,12).
 
 Run `harness/g4-quotient-check.zsh` for the coefficient and signed-row checks. Run `HEC_PAIR_SEED=2026111936 harness/g4-hermite-solve.zsh quotient` and repeat with seed 2026111937 for full solves. The two raw archives contain the rotated timings and untimed audits. Use `harness/g4-hermite-medians.rb --quotient` with the forward and reverse logs to reconstruct the result tables.
+
+### Full genus-4 census: when to switch collectors and how to carry rank
+
+We tested the single-point and two-point collectors together on all 197 selected genus-4 models at the nine primes from 31 through 67. For each input we selected the first nonzero projected canonical place as generator and drew the source and target scalars before timing. Every timed candidate rebuilt its catalogue, computed both coordinates and verified its answer. Curves sharing a subgroup prime use a verifier cofactor keyed by field, coefficient and subgroup order.
+
+At a prescribed fraction of the n nonbranch poles, the adaptive rule switches to two-point Hermite relations if the rank is below the number of poles already visited. We rounded the checkpoint upwards. The fixed rule switches halfway whenever the first collector is still running. All five schedules reproduced full rank on all 197 models, and every schedule passed the independent 5,191-coordinate check.
+
+| Switch rule | Curves needing Hermite relations | Hermite candidates tested | Supplemental split rows consumed |
+|---|---:|---:|---:|
+| On exhaustion | 21 | 6,697 | 181 |
+| Adaptive, one quarter | 28 | 20,924 | 568 |
+| Adaptive, one half | 31 | 20,246 | 555 |
+| Adaptive, three quarters | 29 | 12,703 | 334 |
+| Fixed, one half | 101 | 34,520 | 1,030 |
+
+In the full-solve comparison on seed 2026111938, the halfway adaptive rule reduced the number of ≥10× wins against pencil from 280 to 258 out of 298 verified comparisons in both timing orders. The two candidate arms each verified 394 input scalars. The remaining experiments switch on exhaustion.
+
+The combined implementation computes the four-family degree thresholds with packed counters. When it needs two-point relations it passes the normalized pivots from the first elimination to the second. The first elimination uses the largest nonzero column as pivot, so the supplemental solver continues in descending column order and reconstructs coordinates in ascending order. It omits the history of accepted rows on the full-rank fast path. Across all 197 curves this preserved the previous Hermite stage ranks, candidates tested and split row counts, with all 5,191 projective coordinates checked independently.
+
+| Seed | Correct scalars | Packed collector and carried pivots faster in both orders | Median full-solve gain, forward / reverse | ≥10× in both orders, previous → combined / comparable inputs |
+|---|---:|---:|---:|---:|
+| 2026111939 | 394/394 | 384/394 | 1.090× / 1.080× | 282 → 289 / 298 |
+| 2026111940 | 394/394 | 385/394 | 1.090× / 1.079× | 270 → 277 / 298 |
+
+Each seed supplied two input pairs per model. We rotated the pencil reference and both candidate arms for eight repetitions per input in each of two opposite-order processes. On each seed the pencil eligibility check excluded 92 inputs, and the reference returned no scalar on four more. The combined solver cleared 10× in both orders on every input from 128 models across both seeds. The lowest verified comparison was 3.604× on (53,37).
+
+A third panel (seed 2026111941) held packed collection constant and compared retaining all accepted rows for replay with carrying the pivots. Carrying pivots improved the median full solve by 1.030× / 1.027× on the 21 models requiring Hermite relations and by 1.020× / 1.014× on the other 176. Both arms cleared 10× on 288 of 296 verified pencil comparisons. The full-rank path also benefits from omitting row history.
+
+Run `harness/g4-switch-check.zsh` for the rank checks. Run `HEC_PAIRS=2 HEC_PAIR_SEED=2026111939 harness/g4-hermite-solve.zsh carry` and repeat with seed 2026111940 for the combined comparison. The modes `switch` and `pivots` reproduce the switch and pivot-only panels with the seeds above. The medians reducer accepts the corresponding flag and the two timing logs. Raw archives include both timing orders and the untimed audits.

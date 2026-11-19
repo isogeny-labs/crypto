@@ -7,6 +7,12 @@ end
 root=File.expand_path('..',__dir__)
 groups=File.readlines("#{root}/results/g4-rank-panel-curves.txt").map{|s|p,c,t,n,l=s.split;[[p.to_i,c.to_i],n.to_i/l.to_i] if t=='selected'}.compact.to_h
 rows=File.readlines("#{root}/results/g4-two-point-rank.txt").map{|s|p,c,l=s.split[1,3].map(&:to_i);[p,c,l,groups.fetch([p,c])]}
+if (ARGV & %w[switch carry pivots]).any?
+  rows=File.readlines("#{root}/results/g4-rank-panel-curves.txt").map do |line|
+    p,c,state,n,l=line.split
+    [p.to_i,c.to_i,l.to_i,n.to_i/l.to_i] if state=='selected'
+  end.compact
+end
 if ARGV.first=='fixtures'
   rows.each{|r|puts r.join(' ')}
 elsif ARGV.first=='driver'
@@ -30,7 +36,13 @@ RS
   puts s.sub('for rep in 0..32','for rep in 0..8').sub('for pass in 0..4','for pass in 0..3').sub('3-pass','2-pass').sub('else{pass})%4','else{pass})%3')
 else
   %w[screen hermite].each do |name|
-    if ARGV.include?('quotient')
+    if ARGV.include?('pivots')
+      s=generated('harness/g4-carry.rb',name=='screen' ? 'replay' : 'carry')
+    elsif ARGV.include?('carry')
+      s=generated(name=='screen' ? 'harness/g4-hermite-quotient.rb' : 'harness/g4-carry.rb')
+    elsif ARGV.include?('switch')
+      s=name=='screen' ? generated('harness/g4-hermite-quotient.rb') : generated('harness/g4-switch.rb','half')
+    elsif ARGV.include?('quotient')
       s=generated(name=='screen' ? 'harness/g4-hermite.rb' : 'harness/g4-hermite-quotient.rb')
     else
       s=name=='screen' ? generated('harness/g4-rank-panel.rb','extend','screen') : generated('harness/g4-hermite.rb')

@@ -11,12 +11,14 @@ if ARGV.first=='driver'
   out,status=Open3.capture2('gp','-q',stdin_data:script)
   cofactors=out.lines.map{|line|Integer(line)}
   raise unless status.success? && cofactors.size==rows.size && cofactors.all?(&:positive?)
-  cases=rows.zip(cofactors).map{|(_,_,l,_),h|"#{l}=>#{h}"}.join(',')
+  by_curve=rows.map{|r|r[2]}.uniq.size!=rows.size
+  selector=by_curve ? '(c.fp.p,c.f.c[1],l)' : 'l'
+  cases=rows.zip(cofactors).map{|(p,c,l,_),h| by_curve ? "(#{p},#{c},#{l})=>#{h}" : "#{l}=>#{h}"}.join(',')
   key='match c.fp.p {37|43=>4,59=>12,67=>8,'
   verifier=File.read('../../sources/f28de4e9af-verify.rs')
   raise unless [s,verifier].all?{|src|src.scan(key).size==1}
-  s=s.sub(key,"match l {#{cases},")
-  s=s.sub('#[path="../../sources/f28de4e9af-verify.rs"] mod verify;'){"mod verify {#{verifier.sub(key,"match l {#{cases},")}}"}
+  s=s.sub(key,"match #{selector} {#{cases},")
+  s=s.sub('#[path="../../sources/f28de4e9af-verify.rs"] mod verify;'){"mod verify {#{verifier.sub(key,"match #{selector} {#{cases},")}}"}
   a=s.index('    for (g,p) in')
   b=s.index('        let mut rng',a)
   s[a...b]=<<~RS
