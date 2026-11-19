@@ -30,7 +30,7 @@ D = (-2)^4 \Big(\prod_{i=0}^{3}(x_i-r)y_i\Big)
 
 The target ordinate s cancels. Over a field of characteristic !=2, if every y_i !=0, all x_i are distinct and no x_i=r, then D!=0: eight signed rows of that single slot form a basis of K^8. Applying the exterior lemma to each half gives **left rank = right rank = pairing rank = 70**. This proof is independent of the hidden target logarithm and does not appeal to EC sums during extraction.
 
-The conditions are *sufficient*, not necessary. If a chosen four points fail them, another 4-tuple might still establish full rank.
+The conditions are *sufficient*, not necessary. If a chosen four points fail them, another 4-tuple might still establish full rank. **Stronger all-target corollary:** For fixed eight weights and a fixed four-point support, let F be the union of the 32 weighted abscissae \(x([w_j]P_i)\), \(0\le j<8\), \(0\le i<4\). As long as those four points in every slot have nonzero ordinates and distinct abscissae, the 70/70/70 conclusion holds for **every finite public target** \(R\) with \(x(R)\notin F\), independently of its scalar and ordinate. On a prime-order elliptic-curve group each excluded abscissa has at most two finite points, so the conclusion fails to be certified by this simple witness on at most \(2|F|\) target points; those points may still have full rank by a different witness.
 
 ## Original ordinary Prime31: exact finite-field preflight
 
@@ -43,7 +43,7 @@ A separately implemented Python modular EC group calculation and two **independe
 | N4 (also N8) | 1468457909, 1667486837, 936410919, 886543102, 2137754017, 1290111997, 1235269058, 1541396348 |
 | P4 (also P8) | 1418252579, 1982109171, 1921836591, 1045673972, 1683787312, 2146239327, 1923764810, 754634012 |
 
-Result: for **N4, P4, N8 and P8**, the exact restricted exterior pairing is full rank **70** by theorem, conditional only on the already checked one-slot determinant values. This is a narrower mathematical result than executing the frozen entire-span protocol; no producer/checker/PCC result is inferred.
+Result: for **N4, P4, N8 and P8**, the exact restricted exterior pairing is full rank **70** by theorem, conditional only on the already checked one-slot determinant values. More strongly, the 32 checked weighted support abscissae are distinct, so for **every finite \(R\) on this fixed Prime31 curve except at most 64 points**, the same explicit four-pair certificate proves both half ranks and restricted pairing rank exactly 70, for any B>=4 whose slot supports include the first four base points. Here \(n=2147446831\), so the exceptional set is at most 64/n of the full group (approximately 2.9815e-8); no independence assumption or probabilistic heuristic is used. At the exceptional targets the result is simply unproved by this particular certificate, not shown false. This is a narrower mathematical result than executing the frozen entire-span protocol; no producer/checker/PCC result is inferred.
 
 Receipt digest: SHA-256 of compact lexicographically sorted JSON object containing the four determinant arrays is `a899004552f53ba897d1a3145ea420dcd112686c1b35f5bfa7f4cebb5612e2a3`. The B8 entries reuse the B4 first-four subset and are intentionally identical.
 
