@@ -56,7 +56,8 @@ fn resultant(c: &[u64], slot: &[u64; 8]) -> u64 {
 fn base31(ar: &mut Arithmetic) -> Vec<(u64, u64)> {
     let mut points = Vec::new();
     for x in 0..10_000 {
-        if let Some(y) = ar.sqrt(ar.rhs(PRIME31, x), PRIME31.p) {
+        let y2 = ar.rhs(PRIME31, x);
+        if let Some(y) = ar.sqrt(y2, PRIME31.p) {
             if y != 0 {
                 points.push((x, y.min(PRIME31.p - y)));
                 if points.len() == 31 { break; }
