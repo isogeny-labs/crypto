@@ -1,0 +1,88 @@
+{
+  "schema": "prime31.signed-bsgs-w8-paired.v1",
+  "scope": "same GitHub runner; original Rust affine arithmetic for both controls; BSGS not separately frontier-optimized",
+  "status": "producer-side [pcc:unverified]",
+  "same_1024_q": true,
+  "bsgs_aa_identical_non_timing": true,
+  "means_ms": {
+    "bsgs": 3342.7934425000003,
+    "old_generic_ic": 9122.5885375,
+    "ternary_generic_ic": 7834.9334925
+  },
+  "generic_ic_over_native_shared_bsgs": {
+    "old": 2.7290314805324676,
+    "ternary": 2.3438281865960673
+  },
+  "arms": [
+    {
+      "arm": "old-A",
+      "time_ms": 9404.034233,
+      "setup_ms": 112.234441,
+      "online_ms": 9077.994687,
+      "ec_additions": 44344469,
+      "fp_multiplies": 2837165077,
+      "fp_inversions": 44329042,
+      "completed": 1024,
+      "training_ms": 213.805105,
+      "relation_queries": 1315
+    },
+    {
+      "arm": "ternary-A",
+      "time_ms": 7750.837044,
+      "setup_ms": 120.088854,
+      "online_ms": 7317.679268,
+      "ec_additions": 35150980,
+      "fp_multiplies": 2249470574,
+      "fp_inversions": 35146369,
+      "completed": 1024,
+      "training_ms": 313.068922,
+      "relation_queries": 1177
+    },
+    {
+      "arm": "bsgs-A",
+      "time_ms": 3379.561029,
+      "setup_ms": 7.326877,
+      "online_ms": 3372.234152,
+      "ec_additions": 16940250,
+      "fp_multiplies": 1084071298,
+      "fp_inversions": 16937174,
+      "completed": 1024,
+      "giant_probes": 16768762
+    },
+    {
+      "arm": "bsgs-B",
+      "time_ms": 3306.025856,
+      "setup_ms": 7.287468,
+      "online_ms": 3298.738388,
+      "ec_additions": 16940250,
+      "fp_multiplies": 1084071298,
+      "fp_inversions": 16937174,
+      "completed": 1024,
+      "giant_probes": 16768762
+    },
+    {
+      "arm": "ternary-B",
+      "time_ms": 7919.029941,
+      "setup_ms": 115.906951,
+      "online_ms": 7500.25565,
+      "ec_additions": 35150980,
+      "fp_multiplies": 2249470574,
+      "fp_inversions": 35146369,
+      "completed": 1024,
+      "training_ms": 302.86734,
+      "relation_queries": 1177
+    },
+    {
+      "arm": "old-B",
+      "time_ms": 8841.142842,
+      "setup_ms": 109.723903,
+      "online_ms": 8515.809641,
+      "ec_additions": 44344469,
+      "fp_multiplies": 2837165077,
+      "fp_inversions": 44329042,
+      "completed": 1024,
+      "training_ms": 215.609298,
+      "relation_queries": 1315
+    }
+  ]
+}
