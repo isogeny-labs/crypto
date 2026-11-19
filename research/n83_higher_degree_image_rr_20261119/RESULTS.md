@@ -123,7 +123,7 @@ exponent without a targeted sublinear norm-preimage algorithm.
   merged arity 1 through `d`, plus the inverse-Cantor ladder and n=83 bit
   conversions.
 - `VALIDATION.json`, SHA-256
-  `cc139efbffef10c5198923ad3bd9983bf34273c2d3e662927c30c63b6ece0d4d`,
+  `9420a20470cdbe07b9c6a7752bc557b87e9347d0212f245a2d194a7653353d94`,
   reports seven passing replay groups: registration, target/rho, complete
   Riemann--Roch grid, inverse-Cantor ladder, n=83 highlights, ambient control
   and advancement decision.

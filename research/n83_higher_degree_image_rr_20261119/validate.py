@@ -139,8 +139,31 @@ def validate(screen_path: Path) -> dict[str, Any]:
     assert data["decision"] == "stop_before_measurement"
     checks.append("strict_advancement_gate")
 
+    highlight_by_name = {item["name"]: item for item in data["highlights"]}
+    headline = [
+        {
+            "name": "survivor_count",
+            "claimed": len(data["survivors"]),
+            "recomputed": 0,
+            "rel_tol": 0.0,
+        }
+    ]
+    for name, expected in expected_highlights.items():
+        headline.append(
+            {
+                "name": f"{name}_exponent",
+                "claimed": highlight_by_name[name]["exponent"]["decimal"],
+                "recomputed": float(expected),
+                "rel_tol": 0.0,
+            }
+        )
+
     return {
         "schema": "n83-higher-degree-image-rr-validation-v1",
+        "input": str(screen_path),
+        "input_sha256": sha256(screen_path),
+        "raw_data": [{"path": screen_path.name, "sha256": sha256(screen_path)}],
+        "headline": headline,
         "screen_sha256": sha256(screen_path),
         "status": "pass",
         "check_count": len(checks),
