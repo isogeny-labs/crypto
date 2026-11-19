@@ -291,3 +291,7 @@ mod ct229;
 // CT231 stays in its own module while reusing all of CT226's native helpers.
 #[path = "ct231_impl/probe.rs"]
 mod ct231;
+
+// CT233: weighted two-large-prime graph over exact source norm relations.
+#[path = "ct233_impl/probe.rs"]
+mod ct233;
