@@ -1,0 +1,64 @@
+name: Prime31 public RR9 resultant Jacobian and fixed-arity scaling gate
+on:
+  push:
+    branches:
+      - automation/prime31-rr9-public-gradient-20261119
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_public_gradient.rs
+      - research/prime31_ic_20261115/native/verify_prime31_rr9_public_gradient.py
+      - research/prime31_ic_20261115/rr9/RR9_PUBLIC_GRADIENT_PROTOCOL_20261119.md
+      - .github/workflows/prime31-rr9-public-gradient.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_public_gradient.rs
+      - research/prime31_ic_20261115/native/verify_prime31_rr9_public_gradient.py
+      - research/prime31_ic_20261115/rr9/RR9_PUBLIC_GRADIENT_PROTOCOL_20261119.md
+      - .github/workflows/prime31-rr9-public-gradient.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-rr9-gradient:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout candidate source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout immutable original-curve Rust arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Pin Rust toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay ONLY candidate standalone example onto original native crate
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_public_gradient.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_rr9_public_gradient.rs
+          git rev-parse HEAD
+          git -C pinned rev-parse HEAD
+          sha256sum research/prime31_ic_20261115/native/examples/prime31_rr9_public_gradient.rs
+      - name: Original Rust regression library
+        run: cargo +1.100.0 test --release --locked --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Dedicated field-algebra dual-number and scaling tests
+        run: cargo +1.100.0 test --release --locked --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_public_gradient
+      - name: Original-curve 16 OLD plus 16 TERNARY RR9 algebraic fixtures
+        run: |
+          cargo +1.100.0 run --release --quiet --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_public_gradient > prime31-rr9-public-gradient.json
+      - name: Independent original-curve BigInt replay of every derivative and group identity
+        run: python3 research/prime31_ic_20261115/native/verify_prime31_rr9_public_gradient.py prime31-rr9-public-gradient.json
+      - name: Archive source-specific gated evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-public-gradient-exact-source
+          path: prime31-rr9-public-gradient.json
+          if-no-files-found: warn
+          retention-days: 30
