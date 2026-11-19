@@ -928,4 +928,5 @@ endpoint then applies the existing squared-distortion pair-event transfer.
 The pinned build completed with 2,189 jobs; the proof gate reports
 `PASS 108 thm 0 trusted`, the four audited laws use only standard Lean axioms,
 and the fresh checker exits 0. The concrete affine fibre counts remain an
-external curve-specific premise. [pcc:unverified]
+external curve-specific premise. Claim `PCC-20261119-4e2d4b` passes its local
+Lean verifier. [pcc:unverified]

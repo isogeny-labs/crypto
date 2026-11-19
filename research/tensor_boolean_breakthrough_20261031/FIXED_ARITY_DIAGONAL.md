@@ -289,7 +289,7 @@ the exact new total, preservation of the same distortion constant from a base
 bound on the `|G|-1` nonidentity outputs, and the resulting pair-event
 transfer. The remaining sampler obligation is only to instantiate the base
 weights and their fibre/total bounds with the paper's concrete affine encoding.
-[pcc:unverified]
+Claim `PCC-20261119-4e2d4b` passes its local Lean verifier. [pcc:unverified]
 
 ## Corrections and remaining obligations
 
