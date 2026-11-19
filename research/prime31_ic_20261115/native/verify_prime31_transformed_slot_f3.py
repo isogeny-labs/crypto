@@ -165,7 +165,7 @@ def run(cases_per_window):
             good += 1
             if ci == 0:
                 first_cases.append(dict(window=wi,choices=choices,planted_signs=signs,
-                    transformed_roots=t,suffix_x=z,target_q=target,mutated_k0=poisoned))
+                    transformed_roots=t,suffix_x=z,target_q=list(target),mutated_k0=poisoned))
         windows.append(dict(window=wi,distinct_slot_roots=64,ordinary=good,exceptional=bad,
                             k_polynomial_term_counts=[expanded_slot_terms(slot[i]) for i in range(7)]))
     return counters, windows, first_cases
