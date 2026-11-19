@@ -95,3 +95,41 @@ for b, o in res["curves"].items():
         x = o["arms"][a]; print(f"  {a:12s} S={['%.3f'%s for s in x['S']]} free={x['free_rows_emitted_mean']:.2f} coll={x['free_collisions_checked_mean']:.2f} tried={x['targets_tried_mean']:.0f} setupS0={x['setup_S0_mean']:.2f}")
     for k, t in o["T1"].items(): print("  T1", k, ["%.3f[%.3f,%.3f]" % tuple(t[f'w{w}']) for w in W])
     for k, t in o["T2"].items(): print("  T2", k, t["incumbent"], t["candidate"], "R=%.3f[%.3f,%.3f]" % tuple(t["R_pooled"]), "per-rep", ["%.3f" % p[0] for p in t["R_per_replicate"]], "dist inc/cand %.2f/%.2f" % (t["dist_incumbent"], t["dist_candidate"]))
+
+# ---- P8 cross-check against the committed prune study (research/ic_ksum_prune_20261115/band/B<n>.json) and figure ----
+chk = {}
+for b in CURVES:
+    d = json.load(open(f"../ic_ksum_prune_20261115/band/B{b}.json"))
+    com = {r["arm"]: r["mean_s"] for r in d["rows"]}
+    mine = res["curves"][str(b)]["arms"]
+    chk[str(b)] = {}
+    for arm, cname in (("k4-p-p0", "ksum4-p"), ("k5-p-p0", "ksum5-p"), ):
+        chk[str(b)][arm] = {"mine": mine[arm]["S"], "committed": com[cname], "rel_diff": [m / c - 1 for m, c in zip(mine[arm]["S"], com[cname])]}
+    chk[str(b)]["rho-neg"] = {"mine": res["curves"][str(b)]["rho_neg_S"], "committed": com["rho-neg"],
+                             "rel_diff": [m / c - 1 for m, c in zip(res["curves"][str(b)]["rho_neg_S"], com["rho-neg"])]}
+res["P8_crosscheck"] = chk
+json.dump(res, open("results.json", "w"), indent=1)
+print("P8:", {b: {a: ["%+.1f%%" % (100 * x) for x in v["rel_diff"]] for a, v in c.items()} for b, c in chk.items()})
+
+def svg():
+    cols = {"p": "#4477aa", "pf": "#cc6677"}
+    W_, H_ = 980, 330; out = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W_} {H_}" font-family="sans-serif" font-size="11">',
+        '<style>text{fill:#222}@media(prefers-color-scheme:dark){text{fill:#ddd}rect.bg{fill:#111}}rect.bg{fill:#fff}</style>', f'<rect class="bg" width="{W_}" height="{H_}"/>']
+    out.append('<text x="10" y="16" font-size="13">S at w = 0 (GAE per sqrt r), pruned k-sum: incumbent (blue) vs free=1 (red), by (m, N offset); mean of 432 paired runs; black line = matched rho-neg</text>')
+    order = [f"k{m}-{d}" for m in (4, 5) for d in ("m1", "p0", "p1", "p2")]
+    ymax = 11.0; y0, hh = 40, 240
+    for ci, b in enumerate(CURVES):
+        x0 = 20 + ci * 320; o = res["curves"][str(b)]
+        out.append(f'<text x="{x0}" y="{y0+hh+34}" font-size="12">B{b} (rho-neg {o["rho_neg_S"][0]:.2f})</text>')
+        for i, key in enumerate(order):
+            for j, fam in enumerate(("p", "pf")):
+                m, d = key.split("-"); a = f"{m}-{fam}-{d}"; s = o["arms"][a]["S"][0]
+                h = min(s, ymax) / ymax * hh; x = x0 + i * 38 + j * 16
+                out.append(f'<rect x="{x}" y="{y0+hh-h:.1f}" width="14" height="{h:.1f}" fill="{cols[fam]}"><title>{a} S={s:.3f}</title></rect>')
+            out.append(f'<text x="{x0+i*38}" y="{y0+hh+14}" font-size="9">{key}</text>')
+        yr = y0 + hh - o["rho_neg_S"][0] / ymax * hh
+        out.append(f'<line x1="{x0}" x2="{x0+300}" y1="{yr:.1f}" y2="{yr:.1f}" stroke="#000" stroke-width="1.5"/>')
+    for t in (0, 2, 4, 6, 8, 10):
+        y = y0 + hh - t / ymax * hh; out.append(f'<text x="2" y="{y+3:.1f}" font-size="9">{t}</text>')
+    out.append('</svg>'); open("figure.svg", "w").write("\n".join(out))
+svg()
