@@ -734,7 +734,9 @@ impl Producer<'_> {
         let b = h.coefficients[1];
         let c = h.coefficients[0];
         let double_c = self.add(c, c)?;
-        let discriminant = self.sub(self.mul(b, b)?, self.add(double_c, double_c)?)?;
+        let squared_b = self.mul(b, b)?;
+        let four_c = self.add(double_c, double_c)?;
+        let discriminant = self.sub(squared_b, four_c)?;
         if discriminant == 0 {
             return Ok(None);
         }
@@ -743,14 +745,18 @@ impl Producer<'_> {
             return Ok(None);
         }
         let neg_b = self.sub(0, b)?;
-        let root_a = self.mul(self.add(neg_b, sqrt_d)?, (self.p + 1) / 2)?;
-        let root_b = self.mul(self.sub(neg_b, sqrt_d)?, (self.p + 1) / 2)?;
+        let numerator_a = self.add(neg_b, sqrt_d)?;
+        let numerator_b = self.sub(neg_b, sqrt_d)?;
+        let root_a = self.mul(numerator_a, (self.p + 1) / 2)?;
+        let root_b = self.mul(numerator_b, (self.p + 1) / 2)?;
         if root_a == root_b {
             return Ok(None);
         }
         let exponent = (self.p - 1) / 2;
-        let a_selected = self.split_scalar_pow(self.add(root_a, delta)?, exponent)? == 1;
-        let b_selected = self.split_scalar_pow(self.add(root_b, delta)?, exponent)? == 1;
+        let shifted_a = self.add(root_a, delta)?;
+        let shifted_b = self.add(root_b, delta)?;
+        let a_selected = self.split_scalar_pow(shifted_a, exponent)? == 1;
+        let b_selected = self.split_scalar_pow(shifted_b, exponent)? == 1;
         if a_selected && b_selected {
             return Ok(Some(*h));
         }
@@ -1478,8 +1484,10 @@ impl Replay {
         }
         let b = f.coefficients[1];
         let c = f.coefficients[0];
-        let quadruple = self.plus(self.plus(c, c)?, self.plus(c, c)?)?;
-        let discriminant = self.minus(self.times(b, b)?, quadruple)?;
+        let twice = self.plus(c, c)?;
+        let quadruple = self.plus(twice, twice)?;
+        let squared_b = self.times(b, b)?;
+        let discriminant = self.minus(squared_b, quadruple)?;
         if discriminant == 0 {
             return Ok(None);
         }
@@ -1489,8 +1497,10 @@ impl Replay {
         }
         let inv_two = (self.p + 1) / 2;
         let negative = self.minus(0, b)?;
-        let r0 = self.times(self.plus(negative, sqrt)?, inv_two)?;
-        let r1 = self.times(self.minus(negative, sqrt)?, inv_two)?;
+        let numerator0 = self.plus(negative, sqrt)?;
+        let numerator1 = self.minus(negative, sqrt)?;
+        let r0 = self.times(numerator0, inv_two)?;
+        let r1 = self.times(numerator1, inv_two)?;
         if r0 == r1 {
             return Ok(None);
         }
@@ -1499,13 +1509,16 @@ impl Replay {
         for root in [r0, r1] {
             let square = self.times(root, root)?;
             let linear = self.times(b, root)?;
-            if self.plus(self.plus(square, linear)?, c)? != 0 {
+            let sum = self.plus(square, linear)?;
+            if self.plus(sum, c)? != 0 {
                 return Err(Stop::InvalidCertificate);
             }
         }
         let exponent = (self.p - 1) / 2;
-        let s0 = self.split_character_power(self.plus(r0, delta)?, exponent)? == 1;
-        let s1 = self.split_character_power(self.plus(r1, delta)?, exponent)? == 1;
+        let shifted0 = self.plus(r0, delta)?;
+        let shifted1 = self.plus(r1, delta)?;
+        let s0 = self.split_character_power(shifted0, exponent)? == 1;
+        let s1 = self.split_character_power(shifted1, exponent)? == 1;
         if s0 && s1 {
             return Ok(Some(f));
         }
