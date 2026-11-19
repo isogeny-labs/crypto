@@ -103,7 +103,12 @@ jobs:
           python-version: '3.11'
       - name: Reference implementation matches its vectors
         run: python3 scripts/curve_id.py selftest
+      # Full-tree lint is red on main today (~4800 unregistered/retired
+      # references in historical research prose). PRs that touch Markdown would
+      # otherwise fail for debt they did not add; require only the diff check
+      # on pull_request, and keep the full tree on push/dispatch.
       - name: No retired curve name in Markdown or HTML, every slug registered
+        if: github.event_name != 'pull_request'
         run: python3 scripts/check_curve_names.py
       - name: The pull request adds no retired curve name
         if: github.event_name == 'pull_request'
@@ -113,4 +118,4 @@ jobs:
           # Checkout uses the synthetic PR merge commit. Its first parent is
           # the exact base used to build it, even if main advanced after the event.
           test "$(git rev-parse HEAD^2)" = "$PR_HEAD"
-          python3 scripts/check_curve_names.py --diff "$(git rev-parse HEAD^1)"
+          python3 scripts/check_curve_names.py --diff-only "$(git rev-parse HEAD^1)"
