@@ -8,7 +8,8 @@
 //! pkm_algebraic_oracle --p P --degrees 3,3 [--form kummer|isogeny] [--m 2|3]
 //!     [--planted K] [--random K] [--seed S] [--budget SECS] [--dmax D]
 //!     [--cell NAME] [--out FILE.jsonl]
-//!     [--membership tower|dense|both|resultant] [--vkind coset|random] [--resume 1]
+//!     [--membership tower|dense|both|resultant|resultant-amortized]
+//!     [--vkind coset|random] [--resume 1]
 //! ```
 //! `--resume 1` (with `--out`) skips every target whose `index` already has a
 //! row in `--out` for this `--cell`. Targets are still drawn in the same order
@@ -22,12 +23,15 @@
 //! `--membership resultant` (`m = 2` only) runs the resultant / multipoint
 //! evaluation oracle `resultant_decompose_m2` instead of F4
 //! (EXP-PKM-RESULTANT-001); the row's `resultant` field holds it.
+//! `resultant-amortized` builds `ResultantOracleM2` once per run (its
+//! `setup_ops` in every row) and charges each target only its marginal cost
+//! (Amendment 1); `enum_marginal_ops` drops the enumeration's lifting of `V`.
 //! One JSON row per target: both relation sets must be equal (`agree`).
 //! The auxiliary-curve search of the isogeny form is not charged.
 
 use crypto_lib::cryptanalysis::pkm_smooth_tower::{
     algebraic_decompose, algebraic_decompose_dense, enumerate_decompositions, isogeny_tower_on,
-    kummer_tower, resultant_decompose_m2, search_aux_exact, sqrtm, Curve, Rng,
+    kummer_tower, resultant_decompose_m2, search_aux_exact, sqrtm, Curve, ResultantOracleM2, Rng,
 };
 use serde_json::json;
 use std::collections::{HashMap, HashSet};
@@ -62,11 +66,11 @@ fn main() {
     let membership = get("membership", "tower");
     let vkind = get("vkind", "coset");
     assert!(
-        ["tower", "dense", "both", "resultant"].contains(&membership.as_str()),
+        ["tower", "dense", "both", "resultant", "resultant-amortized"].contains(&membership.as_str()),
         "membership"
     );
     assert!(
-        vkind == "coset" || membership == "dense" || membership == "resultant",
+        vkind == "coset" || membership == "dense" || membership.starts_with("resultant"),
         "a random V has no tower"
     );
 
@@ -128,6 +132,12 @@ fn main() {
     });
     let mut trng = Rng(seed ^ 0x7a6e7 ^ (m as u64) << 8);
     let threads = std::env::var("RAYON_NUM_THREADS").unwrap_or_default();
+    let mut amortised = (membership == "resultant-amortized").then(|| {
+        assert_eq!(m, 2, "the resultant oracle is m = 2 only");
+        ResultantOracleM2::new(&e, &v)
+    });
+    let setup_ops = amortised.as_ref().map(|o| o.setup_ops);
+    let logp = 64 - p.leading_zeros() as u64;
     let mut k = 0;
     for (kind, count) in [("planted", planted), ("random", random)] {
         for draw in 0..count {
@@ -147,11 +157,14 @@ fn main() {
                 continue;
             }
             let (en, en_ops) = enumerate_decompositions(&e, &v, m, r);
-            let use_f4 = membership != "resultant";
-            let res = (!use_f4).then(|| {
-                assert_eq!(m, 2, "the resultant oracle is m = 2 only");
-                resultant_decompose_m2(&e, &v, r)
-            });
+            let use_f4 = !membership.starts_with("resultant");
+            let res = match amortised.as_mut() {
+                Some(o) => Some(o.decompose(r)),
+                None => (!use_f4).then(|| {
+                    assert_eq!(m, 2, "the resultant oracle is m = 2 only");
+                    resultant_decompose_m2(&e, &v, r)
+                }),
+            };
             let dense = (use_f4 && membership != "tower").then(|| {
                 algebraic_decompose_dense(&e, &v, m, r, dmax, Duration::from_secs(budget))
             });
@@ -185,7 +198,9 @@ fn main() {
                     "field_ops": d.field_ops, "tree_ops": d.tree_ops, "product_ops": d.product_ops,
                     "eval_ops": d.eval_ops, "finish_ops": d.finish_ops, "ms": d.ms,
                     "ratio_over_enum": d.field_ops as f64 / en_ops.max(1) as f64,
+                    "setup_ops": setup_ops,
                 })),
+                "enum_marginal_ops": en_ops - base.len() as u64 * 6 * logp,
                 "ratio_dense_over_tower": match (&dense, &alg) {
                     (Some(d), Some(t)) if !d.undetermined && !t.undetermined =>
                         Some(d.field_ops as f64 / t.field_ops.max(1) as f64),
