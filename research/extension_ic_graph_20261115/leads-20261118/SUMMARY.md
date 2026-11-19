@@ -126,3 +126,14 @@ All results are [pcc:unverified]. No paid compute was used.
   - NF does 0 multiplications.
   - Per-kernel totals conserve exactly against complete-accounting.
   - The Krylov products alone are 17.4% of descent; they are the only linear-stage target worth optimizing.
+
+## Round 5 (2026-11-19): L1 frozen paired protocol
+
+All results are [pcc:unverified].
+
+- [l1-paired/results](l1-paired/results/README.md): **INCONCLUSIVE**, because the interval straddles 1.5.
+  - 96 fresh p1009 targets; F = 555, M = 789.
+  - ρ̂ = 1.42, 95% interval 1.27–1.59.
+  - Every control passed, and every L1 row passed the full affine and elliptic replay.
+- **Established:** on fresh targets, the verified descent successes per solution are 2.42x those of full splits alone, matching the model.
+- **Not resolved:** the preregistered 1.5 line, which sits on the model's own expectation. No descent-cost or wall-time saving is claimed yet.
