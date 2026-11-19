@@ -443,6 +443,26 @@ theorem nearUniformPairEventTransfer
           if good pair then weight pair.1 * weight pair.2 else 0) :=
       Nat.mul_le_mul_left _ pairLower
 
+/-! ## Dense fixed-arity elimination exponent -/
+
+/-- If the dense relation dimension is at most `3X` and `X^m ≤ p`, its cubic
+cost has the exact fixed-numerator bound
+`rows^(3m) ≤ 3^(3m) * p^3`.  This is the natural-power form of the
+`p^(3/m)` exponent; executable ring-operation and bit-cost bounds remain
+separate obligations. -/
+theorem denseCubicRowBoundAtFixedArity
+    (p X m rows : ℕ) (rowBound : rows ≤ 3 * X) (scaleBound : X ^ m ≤ p) :
+    rows ^ (3 * m) ≤ 3 ^ (3 * m) * p ^ 3 := by
+  calc
+    rows ^ (3 * m) ≤ (3 * X) ^ (3 * m) :=
+      Nat.pow_le_pow_left rowBound _
+    _ = 3 ^ (3 * m) * (X ^ m) ^ 3 := by
+      rw [mul_pow, ← pow_mul]
+      congr 2
+      omega
+    _ ≤ 3 ^ (3 * m) * p ^ 3 :=
+      Nat.mul_le_mul_left _ (Nat.pow_le_pow_left scaleBound 3)
+
 /-! ## First-moment coverage repair
 
 The following finite counting lemmas isolate the arithmetic in the corrected

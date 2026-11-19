@@ -293,6 +293,24 @@ the exact eventual natural-power inequality required by
 | `weightedPairEventLower` | law | `TensorBoundaryBounds`; upstream candidate for `crypto-lean` | finite output type, natural weights and pair event | common pointwise fibre floor |
 | `nearUniformPairEventTransfer` | endpoint | same | same plus total seed count and distortion | total no larger than distortion times uniform baseline |
 
+## Dense cubic row-cost exponent
+
+1. **Structure above.** Natural field-size proxy `p`, factor-base scale `X`,
+   fixed arity `m`, and dense row dimension `rows`.
+2. **Theorem used as stated.** Monotonicity of natural powers and the semiring
+   identities `(a*b)^n = a^n*b^n` and `a^(r*s) = (a^r)^s`.
+3. **Goal below.** An exact integer form of the dense `p^(3/m)` exponent.
+4. **Assembly probe.** Raise `rows <= 3X` to `3m`, expand the product, rewrite
+   `X^(3m)` as `(X^m)^3`, and raise `X^m <= p` to the third power.
+5. **Missing components only.** The natural-power inequality. Executable ring
+   operation and bit-cost bounds remain separate machine obligations.
+6. **Inheritance table.** `Nat.pow_le_pow_left`, `mul_pow`, `pow_mul`, and
+   multiplication monotonicity.
+
+| statement | kind | owner | quantified structure | hypotheses |
+|---|---|---|---|---|
+| `denseCubicRowBoundAtFixedArity` | law | `TensorBoundaryBounds`; upstream candidate for `crypto-lean` | natural `p`, `X`, `m`, and row count | `rows <= 3X`, `X^m <= p` |
+
 ## First-moment coverage repair
 
 1. **Structure above.** A finite seed space, a natural-valued factor-base size

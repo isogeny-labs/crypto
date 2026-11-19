@@ -749,3 +749,22 @@ the asymptotic cost but is not instantiated by this generic theorem.
 [pcc:unverified] Two claim records created without the required declaration
 hashes (`PCC-20261119-fa8515` and `PCC-20261119-8212b4`) fail closed, remain in
 the append-only ledger, and are not cited as evidence.
+
+## 2026-11-19 dense cubic exponent follow-up
+
+The natural-power assembly probe type-checked before the module edit. The
+pinned project build completed with 2,186 jobs, and the proof gate reported:
+
+```text
+PASS 37 thm 0 trusted research/tensor_boolean_breakthrough_20261031/lean
+```
+
+`denseCubicRowBoundAtFixedArity` depends only on `[propext, Quot.sound]`. The
+independent fresh checker exited 0. Claim `PCC-20261119-77d40e` passes its local
+Lean verifier and retains unverified signed standing. [pcc:unverified]
+
+The theorem proves `rows^(3m) <= 3^(3m) p^3` from `rows <= 3X` and `X^m <= p`.
+[pcc:unverified]
+This is the exact natural form of the dense `p^(3/m)` exponent. It does not
+implement the Howell procedure, count its ring operations, or bound operand
+bit lengths.

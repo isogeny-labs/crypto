@@ -95,11 +95,25 @@ new theorem `fixedNumeratorCandidateFamilyHasVanishingRate` checks that every
 fixed numerator `c` is absorbed after a fixed polynomial simulation degree;
 its local claim is `PCC-20261119-76300b`. Consequently numerator `3` from the
 dense algorithm is enough. The
-project proof gate now reports 34 theorems and zero trusted declarations; a fresh
+project proof gate now reports 37 theorems and zero trusted declarations; a fresh
 `leanchecker` replay exits successfully. These theorems formalize the generic
 implication, not the ECDLP premises. Claims `PCC-20261118-546652` and
 `PCC-20261118-ed2042` pass their local Lean verifiers and retain unverified
 signed standing. [pcc:unverified]
+
+The dense numerator is checked in exact natural arithmetic too. [pcc:unverified]
+`denseCubicRowBoundAtFixedArity` proves
+
+```text
+X^m <= p, rows <= 3X  ->  rows^(3m) <= 3^(3m) p^3.
+```
+
+Thus cubic dense elimination on at most `3X` rows has fixed numerator `3`
+after cross-multiplying by the arity, without real roots or asymptotic exponent
+manipulation. Claim `PCC-20261119-77d40e` passes its local Lean verifier and
+retains unverified signed standing. The theorem checks exponent arithmetic,
+not an executable elimination implementation or its bit costs.
+[pcc:unverified]
 
 ## What the pinned primary source supplies
 
@@ -252,8 +266,9 @@ the remaining independent obligations are:
    [pcc:unverified];
 2. bind the factor-base labels returned by the Lean oracle to the rows used by
    the arbitrary-group relation lattice;
-3. implement and cost the Howell/dense-elimination procedure, bind the checked
-   finite round to the concrete coverage oracle, instantiate the checked
+3. implement and cost the Howell/dense-elimination procedure using the checked
+   cubic row-to-`p^3` conversion, bind the checked finite round to the concrete
+   coverage oracle, instantiate the checked
    near-uniform transfer with an identity-inclusive curve sampler, assemble the
    remaining restart events, and derive Theorem 5's bit bound
    [pcc:unverified];
