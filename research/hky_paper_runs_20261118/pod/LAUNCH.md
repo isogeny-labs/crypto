@@ -72,3 +72,11 @@ the run; a failed checkpoint is recorded and the closure continues (450d5b295b).
   1 not in V_6, rank 448,922 (parts 224,688 + 224,234 in 249,824 / 249,354 columns, as J1 and the paper);
   closedness check closed, 0 non-zero over 4,120,873 products; wall 49,797 s (slow, loaded host);
   peak RSS 74.0 GB; basis sha256 3d1f2996... The Rust lift started on the pod at 20:02.
+- 2026-11-19 ~01:50 UTC: **J2 lift done** (Rust `hky_lift`, 32 threads, on the J2 basis 3d1f2996...): verify exit 0
+  against `lift-unit-p163841-k14-D6to7.json` — k, D, p, dim V_6 448,922, 1 in V_7, fixed point,
+  dim V_7 1,683,218, profile, dim F 50,256, dim(V_7 ∩ M_<=6) 499,178 all **equal**; regular tops 1,166,824 vs
+  1,173,002 informational (different notion). Input checks: 4 generators in V_6, 84 shifted combinations stay
+  in V_6. madds 5.60e14, peak RSS 234,299 MB. Records in `results/J2/lift/`.
+- 2026-11-19 02:41 UTC: the session container restarted and its scratchpad (pod tokens) was wiped; the
+  control tokens of hky-j2 and bl-ladder were recovered from the pods' env via the RunPod API. 02:45 UTC: J2 pod
+  `5kmpu4gisqvd24` terminated (GET 404). Spend about 20.6 h x US$1.76 = about US$36.
