@@ -11,13 +11,7 @@ use crypto_lib::cryptanalysis::{
 use flate2::read::MultiGzDecoder;
 use native::{load, read, require, save};
 use serde_json::{json, Map, Value};
-use std::{
-    fs,
-    io::Read,
-    path::Path,
-    process::Command,
-    time::Instant,
-};
+use std::{fs, io::Read, path::Path, process::Command, time::Instant};
 
 const QUESTION: &str = "fresh-paired-n17-rho-target-registration-v1";
 const PUBLISH_QUESTION: &str = "fresh-paired-n17-rho-target-scientific-registration-custody-v1";
@@ -126,7 +120,10 @@ fn rederive_card_point() -> Result<(), String> {
 fn check_card(card_path: &Path) -> Result<(String, Vec<u8>), String> {
     let bytes = read(card_path, 65536)?;
     let sha = sha256(&bytes);
-    require(sha == CARD_SHA, "rho target card SHA-256 differs from freeze pin")?;
+    require(
+        sha == CARD_SHA,
+        "rho target card SHA-256 differs from freeze pin",
+    )?;
     let card = target_math::parse(&bytes)?;
     require(
         card["schema_version"] == 1
@@ -279,8 +276,12 @@ pub(super) fn freeze(
     capsule: &Path,
     out: &Path,
 ) -> Result<String, String> {
-    let source_publication = source_publication.canonicalize().map_err(|e| e.to_string())?;
-    let source_descriptor = source_descriptor.canonicalize().map_err(|e| e.to_string())?;
+    let source_publication = source_publication
+        .canonicalize()
+        .map_err(|e| e.to_string())?;
+    let source_descriptor = source_descriptor
+        .canonicalize()
+        .map_err(|e| e.to_string())?;
     let card = card.canonicalize().map_err(|e| e.to_string())?;
     let freeze_path = freeze_path.canonicalize().map_err(|e| e.to_string())?;
     require(
@@ -424,7 +425,10 @@ pub(super) fn publish(
     out: &Path,
 ) -> Result<String, String> {
     let capsule = capsule.canonicalize().map_err(|e| e.to_string())?;
-    require(!publication.exists(), "rho target publication already exists")?;
+    require(
+        !publication.exists(),
+        "rho target publication already exists",
+    )?;
     outside(out, &[&capsule, publication])?;
     let reg = load_registration(&capsule, registration_sha256)?;
     fs::create_dir(publication).map_err(|e| e.to_string())?;
@@ -435,16 +439,9 @@ pub(super) fn publish(
         if let Some(parent) = target.parent() {
             fs::create_dir_all(parent).map_err(|e| e.to_string())?;
         }
-        native::create(
-            &target,
-            &read(&capsule.join(name), 128 * 1024 * 1024)?,
-        )?;
+        native::create(&target, &read(&capsule.join(name), 128 * 1024 * 1024)?)?;
     }
-    ordinary_build::archive(
-        &publication,
-        &publication.join("capsule.tar.gz"),
-        &files,
-    )?;
+    ordinary_build::archive(&publication, &publication.join("capsule.tar.gz"), &files)?;
     let archive = read(&publication.join("capsule.tar.gz"), 96 * 1024 * 1024)?;
     let header = json!({
         "schema_version":1,
