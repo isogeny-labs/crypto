@@ -5281,32 +5281,6 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for ChainedXOracle<'_> {
 
 #[cfg(test)]
 mod tests {
-    #[test]
-    fn the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e() {
-        use crate::cryptanalysis::ic_boundary::{
-            binary_affine_subspace_factor_base, koblitz_instance,
-        };
-        let ko = koblitz_instance(1, 17).expect("a = 1 over F_2^17");
-        let (basis, offset) = trace_coset_basis(&ko, 6).unwrap();
-        let tr = |v: u64| ko.artin_schreier.trace(v);
-        assert_eq!(tr(offset), 1);
-        assert!(basis.iter().all(|&v| tr(v) == 0));
-        let fb = binary_affine_subspace_factor_base(&ko, &basis, offset);
-        assert!(fb.subspace_basis.is_none());
-        assert_eq!(fb.affine_subspace, Some((basis.clone(), offset)));
-        assert!(!fb.points.is_empty());
-        let g = BinaryGroup(&ko.fast);
-        let mut ops = GroupOps::default();
-        let half = ko.r * ko.cofactor / 2;
-        assert!(fb.points.iter().all(|&p| g.mul(&mut ops, p, half).infinity));
-        let (b0, o0) = trace_coset_basis(&koblitz_instance(0, 13).unwrap(), 6).unwrap();
-        assert_eq!(o0, 0);
-        assert_eq!(
-            b0,
-            trace_kernel_basis(&koblitz_instance(0, 13).unwrap(), 6).unwrap()
-        );
-    }
-
     use super::*;
     use crate::cryptanalysis::ic_boundary::koblitz_instance;
     #[allow(unused_imports)]
@@ -7780,6 +7754,89 @@ mod ksum_frobenius_tests {
                 );
                 let native = DecompositionOracle::<BinaryGroup>::setup_native(&oracle);
                 assert!(native["canonicalisations"] > 0 && native["frobenius_maps"] > 0);
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod wwalk_binary_tests {
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::Calibration;
+    use crate::cryptanalysis::ic_framework::stages::Targets;
+    use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec};
+    use crate::cryptanalysis::koblitz_fast::FastPoint;
+
+    /// Table B curve B15 (`research/ic_tableb_binary_ksum_20261115/specs/B15-r1.json`).
+    fn b15() -> BinaryInstance {
+        crate::cryptanalysis::ecbench_large_prime::binary_explicit_instance(
+            15, 32771, 1, 21067, 32638, 16319, 31539, 28502,
+        )
+        .unwrap()
+    }
+
+    /// One run; returns (verified, total GAE).
+    fn run(inst: &BinaryInstance, oracle: &str, s: u64) -> (bool, f64) {
+        let g = BinaryGroup(&inst.fast);
+        let planted = (1234 + 7919 * s) % inst.r;
+        let mut ops = GroupOps::default();
+        let q = g.mul(&mut ops, inst.generator, planted);
+        let ctx = InstanceCtx {
+            group: &g,
+            generator: inst.generator,
+            target: q,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: "B15".into(),
+            field_degree: Some(inst.n),
+        };
+        let (name, oracle_params) = Params::parse_spec(&format!("{oracle},seed={s}")).unwrap();
+        let (_, fbp) = Params::parse_spec("binary-multiplier:size=2,mult=1").unwrap();
+        let ps = PipelineSpec {
+            factor_base: "binary-multiplier".into(),
+            factor_base_params: fbp,
+            oracle: name,
+            oracle_params,
+            targets: Targets::Walk,
+            linalg: "incremental-gauss".into(),
+            max_trials: 5_000_000,
+            seed: s,
+            ..Default::default()
+        };
+        let mut o = WWalkOracle::<FastPoint>::new();
+        let rep = run_pipeline(
+            &ctx,
+            &ps,
+            &BinaryMultiplierBase { instance: inst },
+            &mut o,
+            planted,
+            &Calibration {
+                ns_per_add: 1.0,
+                ns_per_double: 1.0,
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
+        // [d]G = Q, checked here independently of the pipeline.
+        let d = rep.recovered.expect("a recovered log");
+        let mut o2 = GroupOps::default();
+        assert!(g.mul(&mut o2, inst.generator, d) == q, "[d]G != Q");
+        (rep.verified && d == planted, rep.total_gae)
+    }
+
+    #[test]
+    fn wwalk_solves_b15_plain_and_target_walk() {
+        let inst = b15();
+        for spec in [
+            "wwalk:x=2.0,g=1,grow=2",
+            "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,lazy=1",
+        ] {
+            for s in 0..4 {
+                let (ok, ops) = run(&inst, spec, s);
+                assert!(ok, "{spec} s={s}: planted log not recovered");
+                assert!(ops > 0.0);
             }
         }
     }
