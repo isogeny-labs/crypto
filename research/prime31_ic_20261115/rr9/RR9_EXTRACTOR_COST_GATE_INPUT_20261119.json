@@ -43,6 +43,22 @@
     "#4774 and #4780 are different GitHub Actions executions; do not treat their timings as a matched cross-experiment comparison.",
     "The query budget is a necessary optimistic upper bound conditional on 1219 queries, ignoring all non-extractor costs.",
     "No empirical B8 exhaustive wall time or public-only F4 runtime is provided.",
-    "Previous signed PCC independent validation remains unverified."
-  ]
+    "Previous signed PCC independent validation remains unverified.",
+    "Earlier merged #4532 achieved 170.113 ms for 1024 complete logs using 2^20 shared BSGS baby points (67,924 KiB RSS) on the SAME Prime31 curve; this is a different run and Q cohort from #4774. A new experiment must remeasure it on the SAME runner; until then, 170.113/1219 is a sensitivity budget only."
+  ],
+  "historical_frontier": {
+    "source_pr": "https://github.com/isogeny-labs/crypto/pull/4532",
+    "source_ci": "https://github.com/isogeny-labs/crypto/actions/runs/44031618724",
+    "source_report": "research/prime31_ic_20261115/mixed_base/SHARED_BSGS_1024Q_INDEPENDENT_AUDIT_20261117.json",
+    "curve_same_as_prime31": true,
+    "same_public_target_cohort_as_4774": false,
+    "same_host_run_as_4774": false,
+    "n_public_logs": 1024,
+    "baby_table_size": 1048576,
+    "setup_ms": 103.84,
+    "online_ms": 66.274,
+    "fully_charged_batch_ms": 170.113,
+    "memory_rss_kib": 67924,
+    "warning": "Historical independent GitHub runner and different PR target cohort; sensitivity comparator ONLY, never a paired cross-run speed ratio or qualified gate."
+  }
 }
