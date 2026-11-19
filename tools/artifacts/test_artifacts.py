@@ -57,6 +57,20 @@ class RoundTrip(unittest.TestCase):
     def art(self, *a, check=True, cwd=None):
         return sh(cwd or self.repo, sys.executable, str(TOOL), *a, check=check, env=self.env)
 
+    def test_push_refuses_same_size_corrupt_remote_before_staging(self):
+        relative = "research/r1/runs/a.jsonl"
+        digest = hashlib.sha256(self.big).hexdigest()
+        obj = self.remote / artifacts.object_key(digest)
+        obj.parent.mkdir(parents=True)
+        corrupt = b"x" * len(self.big)
+        obj.write_bytes(corrupt)
+        result = self.art("push", relative, check=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("stored object checksum mismatch", result.stderr)
+        self.assertEqual(self.git("diff", "--cached", "--name-status"), "")
+        self.assertEqual((self.repo / relative).read_bytes(), self.big)
+        self.assertEqual(obj.read_bytes(), corrupt)
+
     def test_s3_default_recovers_exact_git_bytes_without_aws(self):
         self.art("push", "research")
         self.git("add", "-A")
@@ -497,10 +511,10 @@ class RoundTrip(unittest.TestCase):
         obj.write_bytes(b"x" * len(payload))
         result = self.art("migrate", base, check=False)
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("remote byte replay failed", result.stderr)
-        self.assertIn("D\tnew.jsonl", self.git("diff", "--cached", "--name-status"))
-        # A failed replay can leave a staged migration for inspection, but
-        # the workflow's commit step must not run after the nonzero exit.
+        self.assertIn("stored object checksum mismatch", result.stderr)
+        self.assertEqual(self.git("diff", "--cached", "--name-status"), "")
+        self.assertEqual((self.repo / "new.jsonl").read_bytes(), payload)
+        self.assertEqual(obj.read_bytes(), b"x" * len(payload))
 
     def test_migrate_from_sparse_checkout_fetches_changed_blob(self):
         base = self.git("rev-parse", "HEAD").strip()
@@ -715,6 +729,50 @@ class WorkflowStalePullEntries(unittest.TestCase):
             text = wf.read_text()
             self.assertNotIn(wire_workflows.STEP_NAME, text)
             self.assertIn("      - uses: actions/checkout@v4\n      - run: python3 build.py\n", text)
+
+
+class FileStoreIntegrity(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.source = self.root / "source"
+        self.original = b"original"
+        self.source.write_bytes(self.original)
+        self.digest = hashlib.sha256(self.original).hexdigest()
+        cfg = artifacts.Config(root=self.root, remote="file://" + str(self.root / "store"),
+                               endpoint=None, read_url=None, cache=self.root / "cache", aws="/no/aws")
+        self.remote = artifacts.Remote(cfg)
+        self.object = self.root / "store" / artifacts.object_key(self.digest)
+
+    def test_put_refuses_source_changed_after_digest(self):
+        self.source.write_bytes(b"mutation")
+        with self.assertRaises(SystemExit):
+            self.remote.put(self.digest, self.source, len(self.original))
+        self.assertFalse(self.object.exists())
+        self.assertEqual(self.source.read_bytes(), b"mutation")
+        self.assertEqual(list(self.object.parent.glob(self.digest + ".tmp*")), [])
+
+    def test_concurrent_puts_publish_one_verified_object(self):
+        import concurrent.futures
+        import threading
+        barrier = threading.Barrier(2)
+        copyfile = shutil.copyfile
+
+        def copy_then_wait(source, destination):
+            result = copyfile(source, destination)
+            barrier.wait(timeout=5)
+            return result
+
+        with mock.patch.object(artifacts.shutil, "copyfile", side_effect=copy_then_wait):
+            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+                futures = [pool.submit(self.remote.put, self.digest, self.source,
+                                       len(self.original)) for _ in range(2)]
+                results = [future.result(timeout=10) for future in futures]
+        self.assertEqual(sorted(results), [False, True])
+        self.assertEqual(self.object.read_bytes(), self.original)
+        self.assertEqual(hashlib.sha256(self.object.read_bytes()).hexdigest(), self.digest)
+        self.assertEqual(list(self.object.parent.glob(self.digest + ".tmp*")), [])
 
 
 class S3Argv(unittest.TestCase):
