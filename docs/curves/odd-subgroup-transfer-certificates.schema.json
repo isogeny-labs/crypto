@@ -188,7 +188,12 @@
         "map": { "const": "pi(u,v)=(u^2+c,v)" },
         "map_degree": { "const": 2 },
         "supported_claim": { "const": "exact-prime-order_named-generated-subgroup_pullback_is_injective_with_checked_recovery" },
-        "normalized_target_backend": { "const": "unsupported" },
+        "normalized_target_backend": {
+          "enum": [
+            "unsupported",
+            "montgomery_implemented_live_rows_primality_gated_edwards_unsupported"
+          ]
+        },
         "extension_field_backend": { "const": "unsupported" },
         "independent_source_jacobian_oracle": { "const": "not_provided_catalog_wide" },
         "solver_assessment": { "const": "not_provided" },

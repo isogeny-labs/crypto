@@ -203,6 +203,14 @@ fn producer_sources() -> Vec<(&'static str, &'static str)> {
             include_str!("../prime_hyperelliptic/cover_transfer.rs"),
         ),
         (
+            "src/prime_hyperelliptic/model_transfer.rs",
+            include_str!("../prime_hyperelliptic/model_transfer.rs"),
+        ),
+        (
+            "src/prime_hyperelliptic/normalized_cover_transfer.rs",
+            include_str!("../prime_hyperelliptic/normalized_cover_transfer.rs"),
+        ),
+        (
             "src/prime_hyperelliptic/fp2.rs",
             include_str!("../prime_hyperelliptic/fp2.rs"),
         ),
@@ -626,6 +634,16 @@ fn validate_normalized_prime_generator(
             format!("{ec1}: unsupported normalized-prime generator encoding"),
         ));
     }
+    let field_characteristic = parse_model_integer(
+        &representation["field"]["characteristic"],
+        "representation field characteristic",
+    )?;
+    if representation["field"]["degree"] != 1 || &field_characteristic != p {
+        return Err(BindingFailure::invalid_named_subgroup_data(
+            "target_field_representation",
+            format!("{ec1}: representation field does not match the normalized prime target"),
+        ));
+    }
     let coordinates = representation["curve"]["generator"]
         .as_array()
         .filter(|coordinates| coordinates.len() == 2)
@@ -648,6 +666,25 @@ fn validate_normalized_prime_generator(
         "B*y^2=x^3+A*x^2+x" => {
             let a = parse_model_integer(&model_value["A"], "Montgomery A")?;
             let b = parse_model_integer(&model_value["B"], "Montgomery B")?;
+            let recorded_a = parse_model_integer(
+                &representation["curve"]["coefficients"]["a"],
+                "representation Montgomery a",
+            )?;
+            let recorded_b = parse_model_integer(
+                &representation["curve"]["coefficients"]["b"],
+                "representation Montgomery b",
+            )?;
+            if representation["curve"]["model"] != "Montgomery"
+                || recorded_a != a
+                || recorded_b != b
+            {
+                return Err(BindingFailure::invalid_named_subgroup_data(
+                    "target_model_binding",
+                    format!(
+                        "{ec1}: representation model or coefficients differ from the linked Montgomery target"
+                    ),
+                ));
+            }
             let lhs = mod_mul(&b, &y2, p);
             let rhs = mod_add(
                 &mod_add(&mod_mul(&x2, &x, p), &mod_mul(&a, &x2, p), p),
@@ -659,6 +696,25 @@ fn validate_normalized_prime_generator(
         "a*x^2+y^2=1+d*x^2*y^2" => {
             let a = parse_model_integer(&model_value["a"], "twisted-Edwards a")?;
             let d = parse_model_integer(&model_value["d"], "twisted-Edwards d")?;
+            let recorded_a = parse_model_integer(
+                &representation["curve"]["coefficients"]["a"],
+                "representation twisted-Edwards a",
+            )?;
+            let recorded_d = parse_model_integer(
+                &representation["curve"]["coefficients"]["d"],
+                "representation twisted-Edwards d",
+            )?;
+            if representation["curve"]["model"] != "TwistedEdwards"
+                || recorded_a != a
+                || recorded_d != d
+            {
+                return Err(BindingFailure::invalid_named_subgroup_data(
+                    "target_model_binding",
+                    format!(
+                        "{ec1}: representation model or coefficients differ from the linked twisted-Edwards target"
+                    ),
+                ));
+            }
             let lhs = mod_add(&mod_mul(&a, &x2, p), &y2, p);
             let rhs = mod_add(
                 &BigUint::from(1u32),
@@ -670,6 +726,22 @@ fn validate_normalized_prime_generator(
         "x^2+y^2=c^2*(1+d*x^2*y^2)" => {
             let c = parse_model_integer(&model_value["c"], "Edwards c")?;
             let d = parse_model_integer(&model_value["d"], "Edwards d")?;
+            let recorded_c = parse_model_integer(
+                &representation["curve"]["coefficients"]["c"],
+                "representation Edwards c",
+            )?;
+            let recorded_d = parse_model_integer(
+                &representation["curve"]["coefficients"]["d"],
+                "representation Edwards d",
+            )?;
+            if representation["curve"]["model"] != "Edwards" || recorded_c != c || recorded_d != d {
+                return Err(BindingFailure::invalid_named_subgroup_data(
+                    "target_model_binding",
+                    format!(
+                        "{ec1}: representation model or coefficients differ from the linked Edwards target"
+                    ),
+                ));
+            }
             let lhs = mod_add(&x2, &y2, p);
             let rhs = mod_mul(
                 &mod_mul(&c, &c, p),
@@ -1213,6 +1285,7 @@ fn odd_transfer_catalog(
     let mut maps_with_named_subgroups = 0usize;
     let mut supported = 0usize;
     let mut unsupported_primality = 0usize;
+    let mut unsupported_direct_primality = 0usize;
     let mut unsupported_kernel_intersection = 0usize;
     let mut unsupported_normalized = 0usize;
     let mut unsupported_extension = 0usize;
@@ -1342,6 +1415,25 @@ fn odd_transfer_catalog(
             checker::Field::Prime(p) if model.normalization.is_some() => {
                 family = "normalized_prime_quadratic_pullback_v1";
                 normalized_maps += 1;
+                let normalization_kind = model
+                    .normalization
+                    .as_ref()
+                    .and_then(|normalization| normalization["kind"].as_str())
+                    .ok_or_else(|| format!("{slug}: normalized target lacks a map kind"))?;
+                let target_form = model_value["form"].as_str().unwrap_or("");
+                let is_montgomery = match (normalization_kind, target_form) {
+                    ("montgomery_from_short", "B*y^2=x^3+A*x^2+x") => true,
+                    (
+                        "edwards_from_short",
+                        "a*x^2+y^2=1+d*x^2*y^2"
+                        | "x^2+y^2=c^2*(1+d*x^2*y^2)",
+                    ) => false,
+                    _ => {
+                        return Err(format!(
+                            "{slug}: normalization kind {normalization_kind} is inconsistent with target form {target_form}"
+                        ))
+                    }
+                };
                 let field_status = prime_proof_status(p);
                 if field_status == PrimeProofStatus::Composite {
                     failures.push(json!({
@@ -1365,12 +1457,30 @@ fn odd_transfer_catalog(
                                     "reason": failure.reason,
                                 }));
                                 failed_invalid_named_subgroup_data += 1;
+                            } else if is_montgomery
+                                && (!proved(field_status)
+                                    || !proved(prime_proof_status(&annihilator)))
+                            {
+                                unsupported_primality_membership.insert(membership);
+                                named_subgroups.push(unsupported_record(
+                                    representation,
+                                    "unsupported_without_primality_certificate",
+                                    "the Montgomery transfer backend is implemented, but the field modulus or annihilator is outside the accepted deterministic proof range",
+                                    Some(p),
+                                    Some(&annihilator),
+                                    backend_independent_checks(false, false),
+                                )?);
+                                unsupported_primality += 1;
+                            } else if is_montgomery {
+                                return Err(format!(
+                                    "{slug}: an admitted Montgomery field/order binding requires the composed supported-record certificate path"
+                                ));
                             } else {
                                 unsupported_normalized_membership.insert(membership);
                                 named_subgroups.push(unsupported_record(
                                     representation,
                                     "unsupported_normalized_target_transfer_backend",
-                                    "the catalog transfer exporter does not yet compose the checked target-model normalization adapter with pullback and pushforward",
+                                    "the Edwards target still requires an exceptional-point-safe projective transfer adapter",
                                     Some(p),
                                     Some(&annihilator),
                                     backend_independent_checks(false, false),
@@ -1396,10 +1506,17 @@ fn odd_transfer_catalog(
                 }
                 map_status = if field_status == PrimeProofStatus::Composite {
                     "failed_invalid_map_field_data"
-                } else if failures.is_empty() {
-                    "unsupported_normalized_target_transfer_backend"
-                } else {
+                } else if !failures.is_empty() {
                     "failed_invalid_named_subgroup_data"
+                } else if is_montgomery {
+                    if representations.is_empty() && proved(field_status) {
+                        return Err(format!(
+                            "{slug}: an admitted Montgomery map requires composed map-certificate integration"
+                        ));
+                    }
+                    "unsupported_without_primality_certificate"
+                } else {
+                    "unsupported_normalized_target_transfer_backend"
                 };
             }
             checker::Field::Prime(p) => {
@@ -1502,6 +1619,7 @@ fn odd_transfer_catalog(
                             backend_independent_checks(false, false),
                         )?);
                         unsupported_primality += 1;
+                        unsupported_direct_primality += 1;
                     } else {
                         let membership = binding_membership_line(&map_uid, representation)?;
                         match supported_direct_record(
@@ -1613,7 +1731,7 @@ fn odd_transfer_catalog(
     if binding_membership.len() != named_subgroup_records
         || supported_membership.len() != supported
         || unsupported_or_failed_direct_membership.len()
-            != unsupported_primality
+            != unsupported_direct_primality
                 + unsupported_kernel_intersection
                 + failed_direct_invalid_data
                 + failed_transfer_arithmetic
@@ -1662,7 +1780,7 @@ fn odd_transfer_catalog(
                 "map": "pi(u,v)=(u^2+c,v)",
                 "map_degree": 2,
                 "supported_claim": "exact-prime-order_named-generated-subgroup_pullback_is_injective_with_checked_recovery",
-                "normalized_target_backend": "unsupported",
+                "normalized_target_backend": "montgomery_implemented_live_rows_primality_gated_edwards_unsupported",
                 "extension_field_backend": "unsupported",
                 "independent_source_jacobian_oracle": "not_provided_catalog_wide",
                 "solver_assessment": "not_provided",
@@ -1913,6 +2031,7 @@ fn main() {
 mod tests {
     use super::*;
     use num_traits::One;
+    use std::collections::BTreeMap;
 
     #[test]
     fn canonical_unsigned_parser_rejects_ambiguous_encodings() {
@@ -1945,6 +2064,8 @@ mod tests {
             "src/utils/mod.rs",
             "src/prime_hyperelliptic/balanced.rs",
             "src/prime_hyperelliptic/cover_transfer.rs",
+            "src/prime_hyperelliptic/model_transfer.rs",
+            "src/prime_hyperelliptic/normalized_cover_transfer.rs",
             "src/prime_hyperelliptic/fp2.rs",
             "src/prime_hyperelliptic/fp_poly.rs",
             "src/prime_hyperelliptic/mod.rs",
@@ -2023,6 +2144,8 @@ mod tests {
                 "representation": "prime"
             },
             "curve": {
+                "model": "Montgomery",
+                "coefficients": {"a": 0, "b": 1},
                 "generator": ["0x0", "0x0"],
                 "subgroup_order": "2"
             }
@@ -2031,6 +2154,36 @@ mod tests {
             validate_normalized_prime_generator(&normalized, &normalized_model, &p).unwrap(),
             BigUint::from(2u32)
         );
+        let mut wrong_degree = normalized.clone();
+        wrong_degree["field"]["degree"] = json!(2);
+        let failure =
+            validate_normalized_prime_generator(&wrong_degree, &normalized_model, &p).unwrap_err();
+        assert_eq!(failure.status, "failed_invalid_named_subgroup_data");
+        assert_eq!(failure.obligation, "target_field_representation");
+
+        let mut wrong_characteristic = normalized.clone();
+        wrong_characteristic["field"]["characteristic"] = json!(7);
+        let failure =
+            validate_normalized_prime_generator(&wrong_characteristic, &normalized_model, &p)
+                .unwrap_err();
+        assert_eq!(failure.status, "failed_invalid_named_subgroup_data");
+        assert_eq!(failure.obligation, "target_field_representation");
+
+        let mut wrong_model = normalized.clone();
+        wrong_model["curve"]["model"] = json!("Edwards");
+        let failure =
+            validate_normalized_prime_generator(&wrong_model, &normalized_model, &p).unwrap_err();
+        assert_eq!(failure.status, "failed_invalid_named_subgroup_data");
+        assert_eq!(failure.obligation, "target_model_binding");
+
+        let mut wrong_coefficient = normalized.clone();
+        wrong_coefficient["curve"]["coefficients"]["b"] = json!(2);
+        let failure =
+            validate_normalized_prime_generator(&wrong_coefficient, &normalized_model, &p)
+                .unwrap_err();
+        assert_eq!(failure.status, "failed_invalid_named_subgroup_data");
+        assert_eq!(failure.obligation, "target_model_binding");
+
         let mut off_normalized = normalized.clone();
         off_normalized["curve"]["generator"][1] = json!("0x1");
         assert_eq!(
@@ -2290,9 +2443,9 @@ mod tests {
                 "supported_named_subgroup_records": 675,
                 "supported_ramified_repeated_support_records": 133,
                 "supported_ordinary_fiber_records": 542,
-                "unsupported_without_primality_certificate": 233,
+                "unsupported_without_primality_certificate": 240,
                 "unsupported_kernel_intersection": 0,
-                "unsupported_normalized_target_transfer_backend": 22,
+                "unsupported_normalized_target_transfer_backend": 15,
                 "unsupported_odd_extension_field_transfer_backend": 9,
                 "failed_invalid_target_generator": 1,
                 "failed_invalid_named_subgroup_data": 0,
@@ -2317,7 +2470,7 @@ mod tests {
         );
         assert_eq!(
             corpus["membership"]["unsupported_primality_bindings_sha256"],
-            "21cc2d5aa382929d5af5baefccef35da48790e07be2dd26134a45d292c45f19e"
+            "b324e5589ccd7ebd09dcee580742f84eb7fcfc88465fa18b73821f11dc25b36e"
         );
         assert_eq!(
             corpus["membership"]["unsupported_kernel_intersection_bindings_sha256"],
@@ -2325,7 +2478,7 @@ mod tests {
         );
         assert_eq!(
             corpus["membership"]["unsupported_normalized_bindings_sha256"],
-            "e6030c86de8bea5b1504ea662368518057a784be88fd7c7f77e035f6edb3b22e"
+            "492d04af25b7b6bb0f06efb1c1f6603c579af97963bb73549452bf2c5e8f67d4"
         );
         assert_eq!(
             corpus["membership"]["unsupported_extension_bindings_sha256"],
@@ -2338,6 +2491,66 @@ mod tests {
         assert_eq!(
             corpus["membership"]["failed_transfer_arithmetic_bindings_sha256"],
             "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        );
+        assert_eq!(
+            corpus["scope"]["normalized_target_backend"],
+            "montgomery_implemented_live_rows_primality_gated_edwards_unsupported"
+        );
+
+        let graph_value: Value = serde_json::from_slice(&graph).unwrap();
+        let records_by_map = corpus["records"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|record| (record["map_uid"].as_str().unwrap(), record))
+            .collect::<BTreeMap<_, _>>();
+        let mut montgomery_maps = 0usize;
+        let mut edwards_maps = 0usize;
+        let mut montgomery_bindings = BTreeSet::new();
+        let mut edwards_bindings = BTreeSet::new();
+        for row in graph_value["curves"].as_array().unwrap() {
+            let model: Value = serde_json::from_str(row["model_json"].as_str().unwrap()).unwrap();
+            let form = model["form"].as_str().unwrap();
+            let is_montgomery = form == "B*y^2=x^3+A*x^2+x";
+            let is_edwards = matches!(form, "a*x^2+y^2=1+d*x^2*y^2" | "x^2+y^2=c^2*(1+d*x^2*y^2)");
+            if !is_montgomery && !is_edwards {
+                continue;
+            }
+            let map_uid = row["cover_links"][0]["map_uid"].as_str().unwrap();
+            let record = records_by_map[map_uid];
+            let membership = if is_montgomery {
+                montgomery_maps += 1;
+                assert_eq!(
+                    record["status"],
+                    "unsupported_without_primality_certificate"
+                );
+                &mut montgomery_bindings
+            } else {
+                edwards_maps += 1;
+                assert_eq!(
+                    record["status"],
+                    "unsupported_normalized_target_transfer_backend"
+                );
+                &mut edwards_bindings
+            };
+            for representation in row["representations"].as_array().unwrap() {
+                membership.insert(binding_membership_line(map_uid, representation).unwrap());
+            }
+        }
+        assert_eq!((montgomery_maps, montgomery_bindings.len()), (6, 7));
+        assert_eq!((edwards_maps, edwards_bindings.len()), (24, 15));
+        assert_eq!(
+            membership_digest(&montgomery_bindings),
+            "dc3677987a113316d7abb6b4529b0035d7b3250c49f3575d158bedb71664cc01"
+        );
+        assert_eq!(
+            membership_digest(&edwards_bindings),
+            "492d04af25b7b6bb0f06efb1c1f6603c579af97963bb73549452bf2c5e8f67d4"
+        );
+        montgomery_bindings.extend(edwards_bindings);
+        assert_eq!(
+            membership_digest(&montgomery_bindings),
+            "e6030c86de8bea5b1504ea662368518057a784be88fd7c7f77e035f6edb3b22e"
         );
 
         let failed = corpus["records"]
