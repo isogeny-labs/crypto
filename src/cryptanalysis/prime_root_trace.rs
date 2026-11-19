@@ -640,55 +640,61 @@ fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
     if a.len() <= 2 || (a.len() <= 4 && p <= u32::MAX as u64) {
         return vproduct(a, a, p);
     }
-    // Three-term sparse polynomial squares need six products instead of
-    // the quadratic-size dense convolution. Retain the previous one/two
-    // term specialization, and stop scanning after the fourth nonzero.
+    // Preserve the previous two-term fast path exactly; it is frequent in
+    // certificates and a generic three-slot scan regressed ~4% in Rust.
+    // Only inspect the remainder for an additional term after a third
+    // nonzero is encountered.
     if a.len() >= 6 && a[1] == 0 && a[2] == 0 {
-        let mut terms = [(0usize, 0u64); 3];
+        let mut terms = [(0usize, 0u64); 2];
         let mut count = 0usize;
-        let mut dense = false;
+        let mut third = None;
         for (i, &x) in a.iter().enumerate() {
-            if x != 0 {
-                if count == 3 {
-                    dense = true;
-                    break;
-                }
-                terms[count] = (i, x);
-                count += 1;
+            if x == 0 { continue; }
+            if count == 2 {
+                third = Some((i, x));
+                break;
             }
+            terms[count] = (i, x);
+            count += 1;
         }
-        if !dense {
+        if third.is_none() {
             if count == 0 { return vec![]; }
             let mut result = vec![0; 2 * a.len() - 1];
-            if count <= 2 {
-                let (i, x) = terms[0];
-                result[2 * i] = vmul(x, x, p);
-                if count == 2 {
-                    let (j, y) = terms[1];
-                    result[2 * j] = vmul(y, y, p);
-                    let cross = vmul(x, y, p);
-                    let twice = cross + cross;
-                    result[i + j] = if twice >= p { twice - p } else { twice };
-                }
-            } else {
-                for i in 0..3 {
-                    let (ix, x) = terms[i];
-                    let diagonal = vmul(x, x, p);
-                    let sum = result[2 * ix] + diagonal;
-                    result[2 * ix] = if sum >= p { sum - p } else { sum };
-                    for j in (i + 1)..3 {
-                        let (jx, y) = terms[j];
-                        let cross = vmul(x, y, p);
-                        let twice = cross + cross;
-                        let twice = if twice >= p { twice - p } else { twice };
-                        // Cross term may coincide with another diagonal
-                        // (e.g. positions 0, 3, 6). Accumulate mod p.
-                        let sum = result[ix + jx] + twice;
-                        result[ix + jx] = if sum >= p { sum - p } else { sum };
-                    }
-                }
+            let (i, x) = terms[0];
+            result[2 * i] = vmul(x, x, p);
+            if count == 2 {
+                let (j, y) = terms[1];
+                result[2 * j] = vmul(y, y, p);
+                let cross = vmul(x, y, p);
+                let twice = cross + cross;
+                result[i + j] = if twice >= p { twice - p } else { twice };
             }
             return trim(result);
+        }
+        if let Some((k, z)) = third {
+            // Four or more terms fall through to the symmetric dense path.
+            if a[k + 1..].iter().all(|&x| x == 0) {
+                let (i, x) = terms[0];
+                let (j, y) = terms[1];
+                let mut result = vec![0; 2 * a.len() - 1];
+                result[2 * i] = vmul(x, x, p);
+                result[2 * j] = vmul(y, y, p);
+                result[2 * k] = vmul(z, z, p);
+                let cross = vmul(x, y, p);
+                let twice = cross + cross;
+                result[i + j] = if twice >= p { twice - p } else { twice };
+                let cross = vmul(x, z, p);
+                let twice = cross + cross;
+                let twice = if twice >= p { twice - p } else { twice };
+                let sum = result[i + k] + twice;
+                result[i + k] = if sum >= p { sum - p } else { sum };
+                let cross = vmul(y, z, p);
+                let twice = cross + cross;
+                let twice = if twice >= p { twice - p } else { twice };
+                let sum = result[j + k] + twice;
+                result[j + k] = if sum >= p { sum - p } else { sum };
+                return trim(result);
+            }
         }
     }
     let mut result = vec![0; 2 * a.len() - 1];
