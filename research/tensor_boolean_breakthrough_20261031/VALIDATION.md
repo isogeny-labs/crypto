@@ -913,4 +913,5 @@ The corresponding conditional bit-work theorem charges the same explicit
 polynomial scalar costs as the inverse theorem. The pinned build completed
 with 2,189 jobs; the proof gate reports `PASS 103 thm 0 trusted`, the seven
 audited public laws use only standard Lean axioms, and the fresh checker exits
-0. Memory allocation and indexing remain outside the model. [pcc:unverified]
+0. Claim `PCC-20261119-af7e06` passes its local Lean verifier. Memory allocation
+and indexing remain outside the model. [pcc:unverified]

@@ -176,7 +176,8 @@ negations gives the full planted-kernel bound. [pcc:unverified]
 ```
 
 plus one scalar inverse. Array allocation/indexing and proofs of the polynomial
-scalar bit-cost hypotheses remain open. The algebraic block binding itself is
+scalar bit-cost hypotheses remain open. Claim `PCC-20261119-af7e06` passes its
+local Lean verifier. The algebraic block binding itself is
 checked: `executableBirdPlantedKernel` substitutes the
 Bird inverse into `(-R B⁻¹ | I)`, and
 `executableBirdPlantedKernel_spec` proves both annihilation of `[B;R]` and the
