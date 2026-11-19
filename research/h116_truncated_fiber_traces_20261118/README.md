@@ -592,3 +592,11 @@ family-wise `p=0.0622407`.  This is not a decoder, but it is the strongest
 calibrated association in the chiral sequence; the next gate therefore keeps
 the exact `[0,2,0,2]`, offset-two rule unchanged on fresh ordinary
 prime-order curves. [pcc:unverified]
+
+The unchanged [Prym-discriminant OOS test](CHIRAL_GENUS3_PRYM_OOS_EXPERIMENT.md)
+then scores only that rule on 1,840 targets from three fresh ordinary
+prime-order curves.  Every exact oracle control passes, but the rule scores
+598/1,836, has ternary excess `-42`, fixed-rule `p=1`, and is not exact.  This
+closes the selected raw-residue rule.  The next lead changes to Frobenius
+splitting-type bits of the Prym real-Weil polynomial modulo auxiliary primes.
+[pcc:unverified]
