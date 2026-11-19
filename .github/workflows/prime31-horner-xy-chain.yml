@@ -1,0 +1,207 @@
+name: Prime31 weighted Horner x-y polynomial gate
+on:
+  push:
+    branches:
+      - automation/prime31-horner-xy-chain-20261119
+    paths:
+      - '.github/workflows/prime31-horner-xy-chain.yml'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_family_separation.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_weighted_slot_resultants.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_weighted_slot_resultants.py'
+      - 'research/prime31_ic_20261115/rr9/WEIGHTED_SLOT_RESULTANT_PROTOCOL_20261119.md'
+      - 'research/prime31_ic_20261115/native/verify_prime31_rr9_weighted_family_separation.py'
+      - 'research/prime31_ic_20261115/rr9/RR9_WEIGHTED_FAMILY_SEPARATION_PROTOCOL_20261119.md'
+      - 'research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_horner_xy_chain.py'
+      - 'research/prime31_ic_20261115/rr9/HORNER_XY_CHAIN_PROTOCOL_20261119.md'
+      - 'research/prime31_ic_20261115/native/examples/prime31_horner_xonly_sign_lift.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_horner_xonly_sign_lift.py'
+      - 'research/prime31_ic_20261115/rr9/HORNER_XONLY_SIGN_LIFT_PROTOCOL_20261119.md'
+  pull_request:
+    paths:
+      - '.github/workflows/prime31-horner-xy-chain.yml'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_family_separation.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_weighted_slot_resultants.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_weighted_slot_resultants.py'
+      - 'research/prime31_ic_20261115/rr9/WEIGHTED_SLOT_RESULTANT_PROTOCOL_20261119.md'
+      - 'research/prime31_ic_20261115/native/verify_prime31_rr9_weighted_family_separation.py'
+      - 'research/prime31_ic_20261115/rr9/RR9_WEIGHTED_FAMILY_SEPARATION_PROTOCOL_20261119.md'
+      - 'research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_horner_xy_chain.py'
+      - 'research/prime31_ic_20261115/rr9/HORNER_XY_CHAIN_PROTOCOL_20261119.md'
+      - 'research/prime31_ic_20261115/native/examples/prime31_horner_xonly_sign_lift.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_horner_xonly_sign_lift.py'
+      - 'research/prime31_ic_20261115/rr9/HORNER_XONLY_SIGN_LIFT_PROTOCOL_20261119.md'
+permissions:
+  contents: read
+jobs:
+  original-rust-x-y-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout original native arithmetic
+        uses: actions/checkout@v4
+        with:
+          repository: isogeny-labs/crypto
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only candidate example
+        run: |
+          mkdir -p pinned/research/prime31_ic_20261115/native/examples
+          cp research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs
+          git rev-parse HEAD
+          sha256sum research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs \
+            research/prime31_ic_20261115/rr9/HORNER_XY_CHAIN_PROTOCOL_20261119.md
+      - name: Native original Rust unit tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Polynomial-chain focused Rust tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_horner_xy_chain
+      - name: Freeze complete generated positive and mutated witness controls
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_horner_xy_chain > prime31-horner-xy-full.json
+          jq -e '.schema=="prime31.horner_xy_chain.v1" and
+            .curve.p==2147483647 and .curve.n==2147446831 and
+            .cases_per_window==64 and .tested==256 and .ordinary>=240 and
+            .ordinary+.exceptional==256 and
+            .mutated_slope_rejected==.ordinary and
+            .mutated_target_same_witness_rejected==.ordinary and
+            .max_polynomial_identity_residual==0 and
+            .polynomial_equations==74 and
+            .public_only_unknown_index_extraction==false and
+            .complete_ecdlp_solved==false and
+            .planted_witness_controls_only==true' prime31-horner-xy-full.json
+      - name: Independently verify certificates
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_horner_xy_chain.py \
+            prime31-horner-xy-full.json | tee prime31-horner-xy-verified.json
+          sha256sum prime31-horner-xy-full.json prime31-horner-xy-verified.json \
+            research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs \
+            research/prime31_ic_20261115/native/verify_prime31_horner_xy_chain.py \
+            | tee sha256.txt
+      - name: Overlay x-only sparse candidate onto pinned original Rust
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_horner_xonly_sign_lift.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_horner_xonly_sign_lift.rs
+      - name: Native Rust focused x-only polynomial and sign-lift tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_horner_xonly_sign_lift
+      - name: Exact-source x-only 1024-case experiment
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_horner_xonly_sign_lift > prime31-horner-xonly-full.json
+          jq -e '.schema=="prime31.xonly_horner_sign_lift.v1" and
+            .curve.p==2147483647 and .curve.n==2147446831 and
+            .cases_per_window==256 and .tested==1024 and .ordinary>=1000 and
+            (.ordinary+.exceptional)==1024 and
+            .poisoned_double_rejected==.ordinary and
+            .poisoned_target_rejected==.ordinary and
+            .variables_after_public_x_target==21 and
+            .equations_after_public_x_target==22 and
+            .eliminated_variables_after_public_target==14 and
+            .eliminated_equations_after_public_target==15 and
+            .eliminated_total_degree==10 and
+            .eliminated_steps_verified==(.ordinary*7) and
+            .uniform_field_triples_equivalence_checked==8192 and
+            .cleared_denominator_rational_roots_only==true and
+            .generic_sum_table_calls==0 and
+            .public_only_unknown_index_extraction==false and
+            .complete_ecdlp_solved==false' prime31-horner-xonly-full.json
+      - name: Independent entire-cohort bigint affine and F3 replay
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_horner_xonly_sign_lift.py \
+            prime31-horner-xonly-full.json | tee prime31-horner-xonly-verified.json
+          sha256sum prime31-horner-xonly-full.json prime31-horner-xonly-verified.json \
+            research/prime31_ic_20261115/native/examples/prime31_horner_xonly_sign_lift.rs \
+            research/prime31_ic_20261115/native/verify_prime31_horner_xonly_sign_lift.py \
+            research/prime31_ic_20261115/rr9/HORNER_XONLY_SIGN_LIFT_PROTOCOL_20261119.md \
+            | tee xonly-sha256.txt
+      - name: Overlay original Rust weighted/unweighted language discriminator
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_family_separation.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_family_separation.rs
+      - name: Exact source Rust language discriminator focused tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_weighted_family_separation
+      - name: Frozen 512-fixture original Rust relation-family audit
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_weighted_family_separation > prime31-weighted-family-separation.json
+          jq -e '.schema=="prime31.rr9.weighted_family_separation.v1" and
+            .curve.p==2147483647 and .curve.n==2147446831 and
+            .planted_weighted_total==512 and .cases_per_window==128 and
+            .weighted_targets_in_squarefree_support==0 and
+            .weighted_equal_same_signed_unweighted==0 and
+            .transformed_x_equal_fixed_hb==0 and
+            .weighted_identity==0 and
+            (.per_window | length)==4 and
+            (.per_window | all(.squarefree_support_size==256)) and
+            .generic_squarefree_grader_used==true and
+            .public_only_unknown_index_extraction==false and
+            .complete_ecdlp_solved==false' prime31-weighted-family-separation.json
+          python3 research/prime31_ic_20261115/native/verify_prime31_rr9_weighted_family_separation.py \
+            prime31-weighted-family-separation.json | tee prime31-weighted-family-verified.json
+          sha256sum prime31-weighted-family-separation.json \
+            research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_family_separation.rs \
+            research/prime31_ic_20261115/native/verify_prime31_rr9_weighted_family_separation.py \
+            research/prime31_ic_20261115/rr9/RR9_WEIGHTED_FAMILY_SEPARATION_PROTOCOL_20261119.md \
+            | tee weighted-family-sha256.txt
+      - name: Overlay original Rust weighted slot-root resultant candidate
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_weighted_slot_resultants.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_weighted_slot_resultants.rs
+      - name: Focused original Rust slot-root resultant tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_weighted_slot_resultants
+      - name: Frozen 512 paired positive/negative original Rust slot-root gate
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_weighted_slot_resultants > prime31-slot-resultants.json
+          jq -e '.schema=="prime31.weighted_slot_resultants.v1" and
+            .curve.p==2147483647 and .curve.n==2147446831 and
+            .cases_per_window==128 and .positive==512 and .negative==512 and
+            .positive_zero_resultants==4096 and
+            .negative_only_slot0_failed==512 and
+            .jacobian_nonsingular==512 and
+            .membership_geometric_quotient_dimension==16777216 and
+            (.windows | length)==4 and
+            (.windows | all(.distinct_slot_roots==64)) and
+            .slot_supports_pairwise_disjoint==true and
+            .generic_sum_table_calls==0 and
+            .public_only_unknown_index_extraction==false and
+            .target_conditioned_rr9_solved==false and
+            .complete_ecdlp_solved==false' prime31-slot-resultants.json
+          python3 research/prime31_ic_20261115/native/verify_prime31_weighted_slot_resultants.py \
+            prime31-slot-resultants.json | tee prime31-slot-resultants-independent.json
+          sha256sum prime31-slot-resultants.json prime31-slot-resultants-independent.json \
+            research/prime31_ic_20261115/native/examples/prime31_weighted_slot_resultants.rs \
+            research/prime31_ic_20261115/native/verify_prime31_weighted_slot_resultants.py \
+            research/prime31_ic_20261115/rr9/WEIGHTED_SLOT_RESULTANT_PROTOCOL_20261119.md \
+            | tee prime31-slot-resultants-sha256.txt
+      - name: Preserve scientific artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-horner-xy-chain-20261119
+          path: |
+            prime31-horner-xy-full.json
+            prime31-horner-xy-verified.json
+            sha256.txt
+            prime31-horner-xonly-full.json
+            prime31-horner-xonly-verified.json
+            xonly-sha256.txt
+            prime31-weighted-family-separation.json
+            prime31-weighted-family-verified.json
+            weighted-family-sha256.txt
+            prime31-slot-resultants.json
+            prime31-slot-resultants-independent.json
+            prime31-slot-resultants-sha256.txt
+          if-no-files-found: warn
