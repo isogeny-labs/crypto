@@ -1,6 +1,6 @@
 # Prime31: saturated x/y Horner chain for signed W8 — 2026-11-19
 
-**Evidence state:** mathematical derivation and executable original-Rust fixture validator committed. Actual CI result must be read from the [source-specific job](https://github.com/isogeny-labs/crypto/actions/workflows/prime31-horner-xy-chain.yml) and raw artifact, not inferred from the existence of the code. [pcc:unverified]. No full public-target index extraction or complete ECDLP solving improvement is claimed.
+**Evidence state:** Exact-source original Rust [Actions PASS #44566445209](https://github.com/isogeny-labs/crypto/actions/runs/44566445209), [full raw artifact #14551778515](https://github.com/isogeny-labs/crypto/actions/runs/44566445209/artifacts/14551778515). Original arithmetic library **40/40**; focused example **2/2**; 256 deterministic full eight-slot signed witness fixtures all validated; **12/12 independent BigInt affine certificates**; poison checks all passed. Source code SHA at tested run `43996f0c7615d95f92aaafe01c0bbfaf5a62e2ec` (subsequent documentation commits do not alter source). [pcc:unverified] pending signed independent PCC. No public-only extraction or complete ECDLP solving improvement is claimed.
 
 ## Precise result
 
@@ -38,7 +38,8 @@ The code implements a **certificate construction and verifier using planted sign
 - Independent BigInt affine verifier: research/prime31_ic_20261115/native/verify_prime31_horner_xy_chain.py.
 - Deterministic 64 signed leaf-tuples × 4 original windows, SplitMix seed 0x4858595f43484149. Test-only targets generated as exact weighted sums; Q's generating scalar is not supplied to any candidate.
 - Count: group additions, chart exceptions, all 7×8 ordinary polynomial identity residuals, same-witness target mutations, mutated-slope controls; first 12 witness certificates published.
-- CI runs original pinned native tests, focused Rust tests, release JSON, then independently replays serialized group identities. Do not claim passed validation until that source run completes.
+- **Measured original-source result:** ordinary chart **256/256**, exceptional **0/256**, all polynomial residuals zero. Poisoning the slope rejected **256/256**, changing the final public target to Q+G rejected **256/256 same witnesses** (not negative-target nonmembership). Counts for the same 256 planted fixtures: naive independently weighted accumulation **13,312 group additions** (52/fixture), split U+[16]V **4,352** (17/fixture), Horner recurrence **3,584** (14/fixture). These are **witness construction operation counts only**, not algebraic extraction cost.
+- CI [PASS](https://github.com/isogeny-labs/crypto/actions/runs/44566445209) on the exact-source SHA, original 40 + 2 focused tests; independent Python BigInt affine replay **12/12** and complete original group-order check true. [Raw JSON and SHA256 artifact](https://github.com/isogeny-labs/crypto/actions/runs/44566445209/artifacts/14551778515).
 
 ## Prior lead / duplicate-work audit
 
@@ -64,4 +65,4 @@ Literature: Petit–Kosters–Messengur (PKC 2016) on rational-map prime-field b
 4. Run on same host and targets against original optimized BSGS, mixed/weighted index calculus, and optimized negation rho. A whole-solver crossover, not a smaller positive chart, is the success criterion.
 
 ### Validation boundary
-Mathematical chart equivalence: derived. Rust fixture code: committed. Independent original-source CI: pending until source-specific run reports success. Real F4 extraction: not implemented. Complete nongeneric ECDLP advantage: not established. Independent signed PCC: not obtained.
+Mathematical chart equivalence: derived for its ordinary nonexceptional stratum. Rust fixture code: committed. Original-source CI: **passed** with 40+2 Rust tests and 12 independent BigInt certificate replays, 256/256 ordinary test fixtures. Real public-only F4 extraction: not implemented. Complete nongeneric ECDLP advantage: not established. Independent signed PCC: not obtained.
