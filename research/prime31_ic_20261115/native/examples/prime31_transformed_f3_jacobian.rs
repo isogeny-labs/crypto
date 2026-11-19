@@ -54,7 +54,8 @@ fn hprime(slot:&[Aff;8],root:u64)->u64 {
 fn base31(ar:&mut Arithmetic)->Vec<Aff> {
     let mut b=Vec::new();
     for x in 0..10_000u64 {
-        if let Some(y)=ar.sqrt(ar.rhs(PRIME31,x),P) {
+        let y2=ar.rhs(PRIME31,x);
+        if let Some(y)=ar.sqrt(y2,P) {
             if y!=0 {
                 b.push((x,y.min(P-y)));
                 if b.len()==31 {break;}
