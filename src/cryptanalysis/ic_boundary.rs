@@ -9326,6 +9326,47 @@ impl PairTable {
         Some((i as usize, j as usize))
     }
 
+    /// Visit every folded abscissa key the table stores (for Bloom / fuse
+    /// filters in front of [`Self::lookup_folded`]).
+    pub fn for_each_folded_key(&self, mut f: impl FnMut(u64)) {
+        if let Some(dense) = &self.dense {
+            for (key, &witness) in dense.iter().enumerate() {
+                if witness != 0 {
+                    f(key as u64);
+                }
+            }
+            return;
+        }
+        if let Some(lines) = &self.lines {
+            for (line_index, line) in lines.lines.iter().enumerate() {
+                let bits = lines.occupied[line_index];
+                for slot in 0..4 {
+                    if bits & (1 << slot) != 0 {
+                        f(line.keys[slot]);
+                    }
+                }
+            }
+            return;
+        }
+        if let Some(packed) = &self.packed {
+            for &word in packed.slots.iter().filter(|&&w| w != 0) {
+                f(word >> 32);
+            }
+            return;
+        }
+        if self.parts.is_empty() {
+            for &k in self.map.keys() {
+                f(k);
+            }
+        } else {
+            for part in &self.parts {
+                for &k in part.keys() {
+                    f(k);
+                }
+            }
+        }
+    }
+
     /// The witness stored under a key, in whichever layout the table has.
     fn get(&self, key: u64) -> Option<(u32, u32)> {
         if let Some(dense) = &self.dense {
@@ -9734,6 +9775,14 @@ impl KSumTable {
     pub fn lookup_folded(&self, folded: u64) -> Option<Vec<usize>> {
         let packed = *self.map.get(&folded)?;
         Some(self.unpack(packed))
+    }
+
+    /// Visit every folded abscissa key the table stores (for Bloom / fuse
+    /// filters in front of [`Self::lookup_folded`]).
+    pub fn for_each_folded_key(&self, mut f: impl FnMut(u64)) {
+        for &k in self.map.keys() {
+            f(k);
+        }
     }
 
     /// The relations among the base logs hidden in the build's key

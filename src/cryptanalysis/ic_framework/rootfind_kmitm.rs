@@ -10,11 +10,11 @@
 //! That makes `R = 1` for every `m ≤ 10`. Pass `split=balanced` for
 //! `⌈m/2⌉ / ⌊m/2⌋` when the left table would be too large.
 //!
-//! On primes with siblings, the `R = 1` probe runs a Montgomery **batch
-//! inversion** over the factor base and looks up folded abscissa keys in
-//! the left table (lever-1 style from `rootfind-floor`) — one inversion a
-//! target instead of a full group subtraction per base point. Right-half
-//! sums with `R ≥ 2` are materialised once at prepare. Classification:
+//! On primes with siblings, probes use a Montgomery **batch inversion**
+//! plus folded-key left lookups (lever-1 style from `rootfind-floor`):
+//! `R = 1` batches over the factor base; `R ≥ 2` batches over the
+//! precomputed right-half sums. A word-blocked **Bloom filter** sits in
+//! front of every folded lookup (lever-3 style). Classification:
 //! engineering (wall / build size); charged group additions are the MITM's
 //! own (not equal to full `ksum`).
 
@@ -27,6 +27,47 @@ use crate::cryptanalysis::ic_boundary::{
     PrimeInstance, PrimePoint, KSUM_MAX_K,
 };
 use crate::cryptanalysis::prime_fast::{Fp64, MAX_BITS as PRIME_FAST_MAX_BITS};
+
+/// Word-blocked Bloom filter: one 64-bit word a key, five bits in it
+/// (same layout as `rootfind-floor`).
+struct WordBloom {
+    words: Vec<u64>,
+    mask: usize,
+}
+
+impl WordBloom {
+    fn new(keys: usize) -> Self {
+        let words = (keys / 4).next_power_of_two().max(64);
+        Self {
+            words: vec![0; words],
+            mask: words - 1,
+        }
+    }
+
+    #[inline(always)]
+    fn slot(&self, key: u64) -> (usize, u64) {
+        let h = key.wrapping_mul(0x9E37_79B9_7F4A_7C15);
+        let h2 = (h ^ (h >> 29)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+        let mut bits = 0u64;
+        let mut g = h2;
+        for _ in 0..5 {
+            bits |= 1u64 << (g & 63);
+            g >>= 6;
+        }
+        ((h >> 34) as usize & self.mask, bits)
+    }
+
+    fn insert(&mut self, key: u64) {
+        let (w, bits) = self.slot(key);
+        self.words[w] |= bits;
+    }
+
+    #[inline(always)]
+    fn maybe(&self, key: u64) -> bool {
+        let (w, bits) = self.slot(key);
+        self.words[w] & bits == bits
+    }
+}
 
 /// Largest arity this oracle accepts.
 pub const KMITM_MAX_M: u32 = 12;
@@ -90,12 +131,22 @@ impl LeftTable {
             Self::KSum(t) => t.lookup_folded(folded),
         }
     }
+
+    fn for_each_folded_key(&self, f: impl FnMut(u64)) {
+        match self {
+            Self::Pairs(t) => t.for_each_folded_key(f),
+            Self::KSum(t) => t.for_each_folded_key(f),
+        }
+    }
 }
 
 /// One precomputed right-half sum (used when `right_k ≥ 2`).
 struct RightSum<P> {
     point: P,
     idxs: Vec<usize>,
+    /// Montgomery abscissa / ordinate when the prime batch-inv probe is on.
+    mont_x: u64,
+    mont_y: u64,
 }
 
 /// Meet-in-the-middle k-sum root finding for `m = 3..=12`.
@@ -107,21 +158,26 @@ pub struct RootfindKMitmOracle<'i> {
     right_k: u32,
     balanced: bool,
     table: Option<LeftTable>,
-    /// Montgomery field for the prime right=1 batch-inv probe (lever-1 style).
+    /// Montgomery field for the prime batch-inv probe (lever-1 style).
     field: Option<Fp64>,
+    /// Bloom filter over left-table folded keys (lever-3 style).
+    bloom: Option<WordBloom>,
     /// Precomputed right-half sums for prime probes (`right_k ≥ 2`).
     right_prime: Vec<RightSum<PrimePoint>>,
     /// Precomputed right-half sums for binary probes (`right_k ≥ 2`).
     right_bin: Vec<RightSum<crate::cryptanalysis::koblitz_fast::FastPoint>>,
-    /// Scratch for the right=1 batch-inv probe.
+    /// Scratch for the batch-inv probe.
     diffs: Vec<u64>,
     scratch: Vec<u64>,
     pub mismatches: u64,
     probe_right_adds: u64,
     probe_lookups: u64,
     overlaps_rejected: u64,
-    /// Right=1 probes that used the batch-inv / x-only key path.
+    /// Probes that used the batch-inv / x-only key path.
     probe_batch_inv: u64,
+    bloom_rejects: u64,
+    bloom_passes: u64,
+    bloom_false_positives: u64,
 }
 
 impl<'i> RootfindKMitmOracle<'i> {
@@ -135,6 +191,7 @@ impl<'i> RootfindKMitmOracle<'i> {
             balanced: false,
             table: None,
             field: None,
+            bloom: None,
             right_prime: Vec::new(),
             right_bin: Vec::new(),
             diffs: Vec::new(),
@@ -144,6 +201,9 @@ impl<'i> RootfindKMitmOracle<'i> {
             probe_lookups: 0,
             overlaps_rejected: 0,
             probe_batch_inv: 0,
+            bloom_rejects: 0,
+            bloom_passes: 0,
+            bloom_false_positives: 0,
         }
     }
 
@@ -255,6 +315,8 @@ fn collect_right_rec<G: CountedGroup>(
         out.push(RightSum {
             point,
             idxs: idxs.to_vec(),
+            mont_x: 0,
+            mont_y: 0,
         });
         return;
     }
@@ -301,7 +363,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
         };
         format!(
             "meet-in-the-middle root finding: left={}-sum table, right={}-sum probe \
-             (m={}, split={mode}; enables m=10..12; drastic vs full k-sum)",
+             (m={}, split={mode}; Bloom + batch-inv on primes; enables m=10..12)",
             self.left_k, self.right_k, self.m
         )
     }
@@ -359,19 +421,36 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
             .unwrap_or(ctx.group.supports_siblings());
 
         self.table = Some(build_left_table(ctx.group, fb, left_k, prune, sib, ops)?);
+        // Lever-3: Bloom over every left folded key (miss-dominated probes).
+        let entries = self.table.as_ref().map(LeftTable::entries).unwrap_or(1) as usize;
+        let mut bloom = WordBloom::new(entries.max(1));
+        if let Some(t) = &self.table {
+            t.for_each_folded_key(|k| bloom.insert(k));
+        }
+        self.bloom = Some(bloom);
         self.right_bin.clear();
         self.right_prime.clear();
+        let batch_ok = ctx.group.supports_siblings()
+            && (3..1u64 << PRIME_FAST_MAX_BITS).contains(&ctx.group.p);
         if right_k >= 2 {
             collect_right_sums(ctx.group, fb, right_k, ops, &mut self.right_prime);
+            if batch_ok {
+                let f = Fp64::new(ctx.group.p);
+                for e in &mut self.right_prime {
+                    e.mont_x = f.to_mont(e.point.x);
+                    e.mont_y = f.to_mont(e.point.y);
+                }
+            }
         }
-        // Fast right=1 path: Montgomery batch-inv over the factor base.
-        self.field = if right_k == 1
-            && ctx.group.supports_siblings()
-            && (3..1u64 << PRIME_FAST_MAX_BITS).contains(&ctx.group.p)
-        {
-            let n = fb.points.len();
-            self.diffs.resize(n, 0);
-            self.scratch.resize(n, 0);
+        // Montgomery batch-inv for right=1 (over F) and right≥2 (over S).
+        self.field = if batch_ok {
+            let n = if right_k == 1 {
+                fb.points.len()
+            } else {
+                self.right_prime.len()
+            };
+            self.diffs.resize(n.max(1), 0);
+            self.scratch.resize(n.max(1), 0);
             Some(Fp64::new(ctx.group.p))
         } else {
             self.diffs.clear();
@@ -383,6 +462,9 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
         self.probe_lookups = 0;
         self.overlaps_rejected = 0;
         self.probe_batch_inv = 0;
+        self.bloom_rejects = 0;
+        self.bloom_passes = 0;
+        self.bloom_false_positives = 0;
         Ok(())
     }
 
@@ -404,6 +486,9 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
                 self.right_prime.len() as u64,
             );
         }
+        if let Some(b) = &self.bloom {
+            out.insert("kmitm_bloom_words".to_string(), b.words.len() as u64);
+        }
         table_counted(out)
     }
 
@@ -423,6 +508,18 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
         }
         if self.probe_batch_inv > 0 {
             out.insert("kmitm_probe_batch_inv".to_string(), self.probe_batch_inv);
+        }
+        if self.bloom_rejects > 0 {
+            out.insert("kmitm_bloom_rejects".to_string(), self.bloom_rejects);
+        }
+        if self.bloom_passes > 0 {
+            out.insert("kmitm_bloom_passes".to_string(), self.bloom_passes);
+        }
+        if self.bloom_false_positives > 0 {
+            out.insert(
+                "kmitm_bloom_false_positives".to_string(),
+                self.bloom_false_positives,
+            );
         }
         out
     }
@@ -614,9 +711,13 @@ impl RootfindKMitmOracle<'_> {
             // key_plus = x(R+F_j)+1 → R = left + (−F_j); key_minus → R = left + F_j.
             let candidates = [(xp + 1, fb.neg_index[j]), (xm + 1, j)];
             for &(folded, right_j) in &candidates {
+                if !self.bloom_maybe(folded) {
+                    continue;
+                }
                 self.probe_lookups += 1;
                 counters.lookups += 1;
                 let Some(left) = self.table.as_ref()?.lookup_folded(folded) else {
+                    self.bloom_false_positives += 1;
                     continue;
                 };
                 if let Some(hit) = self.finish_hit_prime(
@@ -635,6 +736,21 @@ impl RootfindKMitmOracle<'_> {
         None
     }
 
+    #[inline]
+    fn bloom_maybe(&mut self, folded: u64) -> bool {
+        match &self.bloom {
+            Some(b) if b.maybe(folded) => {
+                self.bloom_passes += 1;
+                true
+            }
+            Some(_) => {
+                self.bloom_rejects += 1;
+                false
+            }
+            None => true,
+        }
+    }
+
     fn probe_right_precomputed_prime(
         &mut self,
         g: &PrimeCurve,
@@ -643,7 +759,15 @@ impl RootfindKMitmOracle<'_> {
         counters: &mut OracleCounters,
         target: PrimePoint,
     ) -> Option<Vec<usize>> {
-        // Index into owned vec without holding &self.right_prime across &mut self.
+        if self.field.is_some() {
+            if let Some(hit) =
+                self.probe_right_precomputed_prime_batch(g, fb, ops, counters, target)
+            {
+                return Some(hit);
+            }
+            // Batch path enumerates every right sum; a miss is final.
+            return None;
+        }
         let n = self.right_prime.len();
         for i in 0..n {
             let (s, right_idxs) = {
@@ -666,6 +790,96 @@ impl RootfindKMitmOracle<'_> {
             };
             self.probe_lookups += lookups;
             counters.lookups += lookups;
+            if let Some(hit) =
+                self.finish_hit_prime(g, fb, ops, counters, target, left, &right_idxs)
+            {
+                return Some(hit);
+            }
+        }
+        None
+    }
+
+    /// Batch-inv + x-only folded keys over every precomputed right sum.
+    fn probe_right_precomputed_prime_batch(
+        &mut self,
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        target: PrimePoint,
+    ) -> Option<Vec<usize>> {
+        let f = self.field?;
+        let n = self.right_prime.len();
+        if n == 0 {
+            return None;
+        }
+        if self.diffs.len() < n {
+            self.diffs.resize(n, 0);
+            self.scratch.resize(n, 0);
+        }
+        let xr = f.to_mont(target.x);
+        let yr = f.to_mont(target.y);
+        ops.field_ops.muls += 2;
+        let mut active: Vec<usize> = Vec::with_capacity(n);
+        for i in 0..n {
+            let e = &self.right_prime[i];
+            if e.point.x == target.x {
+                // Same abscissa: fall back to a full group subtract.
+                let t = g.add(ops, target, g.neg(e.point));
+                self.probe_right_adds += 1;
+                let right_idxs = e.idxs.clone();
+                let mut lookups = 0u64;
+                if let Some(left) = self.table.as_ref()?.probe_left(g, fb, ops, &mut lookups, t) {
+                    self.probe_lookups += lookups;
+                    counters.lookups += lookups;
+                    if let Some(hit) =
+                        self.finish_hit_prime(g, fb, ops, counters, target, left, &right_idxs)
+                    {
+                        return Some(hit);
+                    }
+                } else {
+                    self.probe_lookups += lookups;
+                    counters.lookups += lookups;
+                }
+                continue;
+            }
+            self.diffs[i] = f.sub(e.mont_x, xr);
+            active.push(i);
+        }
+        if active.is_empty() {
+            return None;
+        }
+        let mut compact: Vec<u64> = active.iter().map(|&i| self.diffs[i]).collect();
+        let mut scratch = vec![0u64; compact.len()];
+        f.batch_inv(&mut compact, &mut scratch);
+        counters.inversions += 1;
+        ops.field_ops.invs += 1;
+        ops.field_ops.muls += 3 * compact.len() as u64;
+        self.probe_batch_inv += 1;
+        for (slot, &i) in active.iter().enumerate() {
+            let inv = compact[slot];
+            let (xs, ys) = {
+                let e = &self.right_prime[i];
+                (e.mont_x, e.mont_y)
+            };
+            // Only R − S = R + (−S): lambda = (−y_S − y_R) / (x_S − x_R).
+            let sy = f.add(ys, yr);
+            let lm = f.mul(f.sub(0, sy), inv);
+            let base = f.add(xr, xs);
+            let xm = f.from_mont(f.sub(f.mul(lm, lm), base));
+            ops.adds += 1;
+            self.probe_right_adds += 1;
+            let folded = xm + 1;
+            if !self.bloom_maybe(folded) {
+                continue;
+            }
+            self.probe_lookups += 1;
+            counters.lookups += 1;
+            let Some(left) = self.table.as_ref()?.lookup_folded(folded) else {
+                self.bloom_false_positives += 1;
+                continue;
+            };
+            let right_idxs = self.right_prime[i].idxs.clone();
             if let Some(hit) =
                 self.finish_hit_prime(g, fb, ops, counters, target, left, &right_idxs)
             {

@@ -999,10 +999,10 @@ bases the Gröbner arms use, so the engines meet on one query stream
 - `rootfind-kmitm:m=3..12` is meet-in-the-middle root finding. Default
   **probe-favoring** split: left `L = min(9, m−1)`, right `R = m−L`
   (so `R = 1` for every `m ≤ 10`); `split=balanced` keeps `⌈m/2⌉/⌊m/2⌋`.
-  On primes, `R = 1` uses one Montgomery batch inversion a target and
-  folded-key lookups into the left table (same lever-1 idea as
-  `rootfind-floor`). Right sums with `R ≥ 2` are materialised once at
-  prepare. Enables `m = 10..12`. New id; evidence under
+  On primes, both `R = 1` and `R ≥ 2` use one Montgomery batch inversion
+  a target (over the factor base or the precomputed right sums) and
+  Bloom-filtered folded-key lookups into the left table (lever-1 +
+  lever-3 of the 100× plan). Enables `m = 10..12`. New id; evidence under
   `research/rootfind_kmitm_20261119/`.
 
 Read a root-finding arm against a Gröbner arm on the resource vector and on
