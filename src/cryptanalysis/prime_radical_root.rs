@@ -1055,18 +1055,23 @@ impl RadicalRootCtx {
         // avoids Cardano, extension-field arithmetic and AMM entirely.
         // Negative tests cost only a handful of field additions.
         if c2 < f.p && c1 < f.p && c0 < f.p {
-            let plus_b = f.add(c2, 1);
-            let plus_c = f.add(plus_b, c1);
-            if f.add(plus_c, c0) == 0 {
+            // Before any modular arithmetic, use bounded native-word
+            // coefficient sums. All four terms fit in u64 since p<2^61.
+            let common = c2 + c0;
+            let positive = common + c1 + 1;
+            if positive == f.p || positive == 2 * f.p {
+                let plus_b = f.add(c2, 1);
+                let plus_c = f.add(plus_b, c1);
                 let mut roots = self.quad_monic(plus_b, plus_c);
                 roots.push(1);
                 roots.sort_unstable();
                 roots.dedup();
                 return roots;
             }
-            let minus_b = f.sub(c2, 1);
-            let minus_c = f.sub(c1, minus_b);
-            if c0 == minus_c {
+            let negative = common + f.p - 1 - c1;
+            if negative == f.p || negative == 2 * f.p {
+                let minus_b = f.sub(c2, 1);
+                let minus_c = f.sub(c1, minus_b);
                 let mut roots = self.quad_monic(minus_b, minus_c);
                 roots.push(f.p - 1);
                 roots.sort_unstable();
@@ -1195,20 +1200,25 @@ impl RadicalRootCtx {
         // rootfinding and structured decomposition workloads. A quartic
         // of Frobenius type (1,3) can also avoid the generic GCD fallback.
         if b1 < f.p && c1 < f.p && d1 < f.p && e1 < f.p {
-            let plus_b = f.add(b1, 1);
-            let plus_c = f.add(c1, plus_b);
-            let plus_d = f.add(d1, plus_c);
-            if f.add(e1, plus_d) == 0 {
+            // For canonical coefficients, both evaluations can use
+            // bounded native sums with no modular division/multiplication.
+            // f(1)=1+b+c+d+e; f(-1)=1-b+c-d+e (mod p).
+            let positive = 1 + b1 + c1 + d1 + e1;
+            if positive == f.p || positive == 2 * f.p || positive == 3 * f.p {
+                let plus_b = f.add(b1, 1);
+                let plus_c = f.add(c1, plus_b);
+                let plus_d = f.add(d1, plus_c);
                 let mut roots = self.cubic_monic(plus_b, plus_c, plus_d);
                 roots.push(1);
                 roots.sort_unstable();
                 roots.dedup();
                 return Ok((roots, false));
             }
-            let minus_b = f.sub(b1, 1);
-            let minus_c = f.sub(c1, minus_b);
-            let minus_d = f.sub(d1, minus_c);
-            if e1 == minus_d {
+            let negative = 1 + c1 + e1 + 2 * f.p - b1 - d1;
+            if negative == f.p || negative == 2 * f.p || negative == 3 * f.p {
+                let minus_b = f.sub(b1, 1);
+                let minus_c = f.sub(c1, minus_b);
+                let minus_d = f.sub(d1, minus_c);
                 let mut roots = self.cubic_monic(minus_b, minus_c, minus_d);
                 roots.push(f.p - 1);
                 roots.sort_unstable();
