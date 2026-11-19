@@ -791,6 +791,25 @@ impl Producer<'_> {
             Poly17::constant(1)
         } else if f.len == 2 {
             self.power_modulus(&f)?
+        // R45_QUADRATIC_GCD_PRODUCER_BEGIN
+        } else if f.len == 3 && xp.len == 2
+            && xp.coefficients[0] == 0 && xp.coefficients[1] == 1
+        {
+            // x^p == x mod f: the quadratic is squarefree and split.
+            self.power_modulus(&f)?
+        } else if f.len == 3 && xp.len == 2
+            && xp.coefficients[1] == self.p - 1
+        {
+            // x^p == -b-x: the quadratic is irreducible.
+            Poly17::constant(1)
+        } else if f.len == 3 && xp.len <= 1 {
+            // A repeated quadratic has one distinct root r=x^p.
+            let mut linear = Poly17::ZERO;
+            linear.len = 2;
+            linear.coefficients[0] = self.sub(0, xp.coefficients[0])?;
+            linear.coefficients[1] = 1;
+            linear
+        // R45_QUADRATIC_GCD_PRODUCER_END
         } else {
             self.gcd(f, difference)?
         };
@@ -1485,6 +1504,22 @@ impl Replay {
                     Poly17::constant(1)
                 } else if input.len == 2 {
                     self.normalized_modulus(&input)?
+                // R45_QUADRATIC_GCD_REPLAY_BEGIN
+                } else if input.len == 3 && expected.len == 2
+                    && expected.coefficients[0] == 0 && expected.coefficients[1] == 1
+                {
+                    self.normalized_modulus(&input)?
+                } else if input.len == 3 && expected.len == 2
+                    && expected.coefficients[1] == self.p - 1
+                {
+                    Poly17::constant(1)
+                } else if input.len == 3 && expected.len <= 1 {
+                    let mut linear = Poly17::ZERO;
+                    linear.len = 2;
+                    linear.coefficients[0] = self.minus(0, expected.coefficients[0])?;
+                    linear.coefficients[1] = 1;
+                    linear
+                // R45_QUADRATIC_GCD_REPLAY_END
                 } else {
                     self.monic_gcd(input, xm)?
                 };
