@@ -13,6 +13,7 @@ on:
       - 'research/amm_digit_perf_20261118/round36_bounded_replay_isolated.py'
       - 'research/amm_digit_perf_20261118/round38_bounded_gcd_isolated.py'
       - 'research/amm_digit_perf_20261118/round39_bounded_power_isolated.py'
+      - 'research/amm_digit_perf_20261118/round40_bounded_frobenius_isolated.py'
       - 'research/amm_digit_perf_20261118/round31_bounded_baseline.rs'
       - 'research/amm_digit_perf_20261118/round23_verifier_isolated.py'
       - 'research/amm_digit_perf_20261118/round24_verifier_isolated.py'
@@ -477,4 +478,31 @@ jobs:
         with:
           name: round39-native-rust
           path: ${{ runner.temp }}/round39-native-rust.txt
+          if-no-files-found: ignore
+
+  round40-frobenius-linear-constant:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round40_bounded_frobenius_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare exact Rust before and after constant/linear Frobenius paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            rustc --version
+            python3 research/amm_digit_perf_20261118/round40_bounded_frobenius_isolated.py
+          } | tee "$RUNNER_TEMP/round40-frobenius-native-rust.txt"
+          cat "$RUNNER_TEMP/round40-frobenius-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round40-frobenius-native-rust
+          path: ${{ runner.temp }}/round40-frobenius-native-rust.txt
           if-no-files-found: ignore
