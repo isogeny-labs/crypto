@@ -94,6 +94,12 @@ jobs:
             .poisoned_target_rejected==.ordinary and
             .variables_after_public_x_target==21 and
             .equations_after_public_x_target==22 and
+            .eliminated_variables_after_public_target==14 and
+            .eliminated_equations_after_public_target==15 and
+            .eliminated_total_degree==10 and
+            .eliminated_steps_verified==(.ordinary*7) and
+            .uniform_field_triples_equivalence_checked==8192 and
+            .cleared_denominator_rational_roots_only==true and
             .generic_sum_table_calls==0 and
             .public_only_unknown_index_extraction==false and
             .complete_ecdlp_solved==false' prime31-horner-xonly-full.json
