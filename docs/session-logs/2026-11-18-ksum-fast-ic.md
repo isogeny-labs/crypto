@@ -86,3 +86,35 @@
 ### Errors
 - The container restarted mid-task; a cold `git status` took several
   minutes.
+
+## 2026-11-19 07:00Z: round 3 (offsets, parallel levels, sized directory)
+
+### What was done
+- Added fixed-offset probes (`KSUM_OFFS`, default 0), parallel non-last
+  build levels on the spin pool, and a table directory sized to about 4
+  keys a bucket.
+- Builder parity holds at A = 14–30 on 1 and 4 threads.
+- Ran round 3: library A, then four fast configurations on 48 × 2, then
+  library B. Data is in `research/ksum_fast_ic_20261118/round3/`.
+
+### Results (`[pcc:unverified]`, all 96 solves checked a configuration, 0 rejected)
+- Library: 86.5 / 86.6 ms.
+- A = 16, 4 threads: 1.46 ms, 59.3x [57.4, 61.4].
+- A = 16, 1 thread: 23.8x.
+- Offsets: 1–2 no gain, 4 slower (24-solve sweep).
+
+### Decisions made
+- Reported round 3 as null on the ratio. The absolute time fell 7 %, but
+  the library also ran 9 % faster this session, and the ratios agree with
+  round 2 within their intervals.
+- Kept offsets off.
+
+### Open threads
+- The per-solve ratio has plateaued (about 60x on 4 threads, 24–26x on
+  one).
+- Next real levers: wider fields (52/64-bit Montgomery lanes, so the
+  method reaches larger curves); a fast rho on the same arithmetic for a
+  fair wall-time comparison; an isolated replay.
+
+### Errors
+- None.

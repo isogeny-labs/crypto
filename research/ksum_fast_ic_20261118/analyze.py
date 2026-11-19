@@ -53,6 +53,12 @@ LABELS1 = {
     "amortized-A19-t4": "table once per curve, A = 19, 4 threads",
     "amortized-A21-t4": "table once per curve, A = 21, 4 threads",
 }
+LABELS3 = {
+    "r3-A15-t1": "round 3, A = 15, 1 thread",
+    "r3-A16-t1": "round 3, A = 16, 1 thread",
+    "r3-A17-t4": "round 3, A = 17, 4 threads",
+    "r3-A16-t4": "round 3, A = 16, 4 threads",
+}
 LABELS2 = {
     "sib-A16-L480-t1": "sibling probe, A = 16, 480 lanes, 1 thread",
     "nosib-A17-L256-t4": "no sibling (round 1 kernel), A = 17, 4 threads",
@@ -151,6 +157,7 @@ def analyze_round(R, labels, title):
 
 summary = analyze_round(D, LABELS1, "Round 1: k = 5 sum-table IC, 32-bit prime, speed-up over the library pipeline")
 summary2 = analyze_round(D / "round2", LABELS2, "Round 2 (sibling probe): speed-up over the library pipeline")
+summary3 = analyze_round(D / "round3", LABELS3, "Round 3 (parallel levels, sized directory): speed-up over the library pipeline")
 
 # Report: RESULTS.md as HTML with the figure, then PDF + PNG via Node Playwright.
 md = (D / "RESULTS.md").read_text()
@@ -211,7 +218,7 @@ flush()
 page = f"""<!doctype html><html><head><meta charset="utf-8"><title>k-sum IC fast</title>
 <style>body{{font-family:Helvetica,Arial,sans-serif;max-width:840px;margin:24px auto;font-size:12px;line-height:1.45}}
 table{{border-collapse:collapse;margin:8px 0}}td,th{{border:1px solid #bbb;padding:3px 6px}}code{{font-size:11px}}h1{{font-size:20px}}h2{{font-size:16px;margin-top:22px}}</style></head>
-<body>{''.join(out)}<h2>Figures</h2>{(D / 'speedup.svg').read_text()}<br/>{(D / 'round2' / 'speedup.svg').read_text()}</body></html>"""
+<body>{''.join(out)}<h2>Figures</h2>{(D / 'speedup.svg').read_text()}<br/>{(D / 'round2' / 'speedup.svg').read_text()}<br/>{(D / 'round3' / 'speedup.svg').read_text()}</body></html>"""
 (D / "report.html").write_text(page)
 npm_root = subprocess.run(["npm", "root", "-g"], capture_output=True, text=True).stdout.strip()
 subprocess.run(["node", str(D / "render.js"), str(D)], check=True, cwd="/", env={**os.environ, "NODE_PATH": npm_root})

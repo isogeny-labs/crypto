@@ -141,6 +141,41 @@ How to read the rows:
   A kernel with 8 vectors (64 chains) was also slower than 4 (9.4 against
   8.1 ns a lane-step).
 
+## Round 3: fixed offsets, parallel lower levels, a sized directory (null on the ratio)
+
+Three changes, all post hoc:
+- **Fixed-offset probes** (`KSUM_OFFS`): each walk point `R` is also
+  probed as `R ± T_i` through the table builder's pair kernel. A short
+  sweep (24 solves) showed no gain with one or two offsets and a loss
+  with four (1.57 → 2.17 ms at A = 16), because a pair of offset probes
+  costs about as much as a walk step. The option stays in the code,
+  default off, and was correct throughout.
+- **Parallel lower levels**: levels 2–4 of the build now run on the pool
+  (level 4 at A = 16: 0.29 → 0.15 ms).
+- **Sized directory**: the table's directory has about 4 keys a bucket
+  (10–16 bits) instead of 2^16 buckets (bucket phase: 0.27 → 0.16 ms).
+
+The AVX-512 builder still equals the scalar builder at A = 14, 16, 19, 24
+and 30 with 1 and 4 threads. Data: `round3/raw/`, 48 targets × 2 rounds
+per configuration, run as library A, fast, library B (86.5 and 86.6 ms).
+Every solve was checked (96/96 a configuration) and no hit was rejected.
+
+| Configuration | Median a solve | Build | Walk | vs library [95 % bootstrap] |
+|---|---|---|---|---|
+| A = 16, 4 threads | 1.46 ms | 0.58 ms | 0.82 ms | 59.3x [57.4, 61.4] |
+| A = 17, 4 threads | 1.69 ms | 0.83 ms | 0.78 ms | 51.2x [49.2, 53.1] |
+| A = 16, 1 thread | 3.64 ms | 0.96 ms | 2.60 ms | 23.8x [22.5, 24.8] |
+| A = 15, 1 thread | 4.36 ms | 0.66 ms | 3.65 ms | 19.9x [18.9, 21.0] |
+
+**Reading.** In absolute terms the best configuration fell from 1.57 to
+1.46 ms (−7 %). But the library also ran 9 % faster in this session
+(86.6 against 94.8 ms) on the same host type, and the ratios (59.3x
+against 60.4x on 4 threads, 23.8x against 25.7x on one) agree within
+their intervals. **Round 3 is not a measured improvement in the speed-up
+ratio.** The per-solve ratio has plateaued at about 60x on 4 threads and
+24–26x on one. What remains is the walk, at about 2.5 ns a probe per core
+(sibling included), and the table's memory traffic.
+
 ## Where the time goes, and what did not work
 
 - **Walk.** About 7 ns a lane-step on one core with the intrinsics kernel.
@@ -174,8 +209,8 @@ How to read the rows:
 ## Files
 
 - `analyze.py` builds `summary.json`, `speedup.svg`, `speedup.png` and
-  `report.pdf` from `raw/*.csv` and `round2/raw/*.csv` (`round2/summary.json`,
-  `round2/speedup.*`); `render.js` renders them.
+  `report.pdf` from `raw/*.csv`, `round2/raw/*.csv` and `round3/raw/*.csv`
+  (`round*/summary.json`, `round*/speedup.*`); `render.js` renders them.
 - `raw/fast-*.csv`: one row per solve and configuration.
 - `raw/library-lib{A,B}.csv`: one row per ecbench record.
 - `raw/lib{A,B}/`: session, spec and host metadata.

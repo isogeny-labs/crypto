@@ -7,7 +7,7 @@ const path = require('path');
   const d = process.argv[2];
   const b = await chromium.launch();
   const pg = await b.newPage({ deviceScaleFactor: 1 });
-  for (const sub of ['', 'round2']) {
+  for (const sub of ['', 'round2', 'round3']) {
     await pg.setContent(fs.readFileSync(path.join(d, sub, 'speedup.svg'), 'utf8'));
     await pg.locator('svg').screenshot({ path: path.join(d, sub, 'speedup.png') });
   }
