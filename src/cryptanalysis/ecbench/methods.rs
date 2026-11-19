@@ -8171,6 +8171,11 @@ fn solve_ic_binary(
     let mut oracle_box: Box<dyn DecompositionOracle<BinaryGroup> + '_> = match or_name.as_str() {
         "subtract" => Box::new(SubtractOracle),
         "mitm" => Box::new(MitmOracle::new(ms)),
+        // Generic over the group: one probe a target into the negation-folded
+        // table of every signed m-sum of the base (as on prime curves).
+        // Restored: present in 2476332d22 (the binary k-sum study's build) and
+        // lost from main since, which made `ksum` refuse binary curves.
+        "ksum" => Box::new(KSumOracle::new(ms)),
         "wwalk" => Box::new(WWalkOracle::<FastPoint>::new()),
         "mitm-frobenius" => Box::new(FrobeniusMitmOracle::new(ms, inst)),
         "mitm-frobenius-counted" => Box::new(FrobeniusMitmOracle::new_counted(ms, inst)),

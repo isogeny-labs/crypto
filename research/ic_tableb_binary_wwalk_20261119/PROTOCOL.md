@@ -29,3 +29,6 @@ Siblings and `aut` are refused on binary curves and are not tested. Comparisons 
 - **Kill:** any unverified run.
 - **Rho distance:** reported as the distance remaining.
 - **Leaderboard:** no row without the validation gate.
+
+## Addendum A (before any measured data)
+The B15 smoke run on the frozen build failed every `ksum4` run with "oracle `ksum` does not run on a binary curve". Main had lost the binary `"ksum"` dispatch line in `solve_ic_binary`, which was present in `2476332d22`, the binary k-sum study's build. The line is restored in the commit that adds this addendum, and the run uses `ecbench` built from that commit. After the fix, the 2-target B15 smoke run verified 30 of 30. Nothing else changes.
