@@ -573,3 +573,13 @@ family-wise `p=0.431047`.  The geometry escapes the old obstruction but its
 first Frobenius trace does not decode the digit.  The next lead tests the
 second Frobenius power sum and second zeta coefficient of the same fixed-genus
 cover. [pcc:unverified]
+
+The frozen [second-zeta follow-up](CHIRAL_GENUS3_ZETA2_DIGIT_EXPERIMENT.md)
+then constructs every `F_(p^2)` exactly, checks all extension curve and
+Frobenius-fixed censuses, and derives both the second Frobenius power sum and
+the second zeta coefficient.  The new residues distinguish up to 1,356/1,520
+targets from their negations, but the best of the 486 preregistered rules is
+only 562/1,505 with no exact rule and family-wise `p=0.226263`.  The next lead
+uses the isogeny decomposition `Jac(C) ~ E x Prym(C/E)` to remove the public
+elliptic factor before scoring the Prym middle coefficient and its real-Weil
+discriminant. [pcc:unverified]
