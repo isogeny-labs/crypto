@@ -389,6 +389,20 @@ the exact eventual natural-power inequality required by
 | `eagerBirdDetRingOps_le_quartic` | law | same | dimension | none |
 | `eagerBirdAdjugateRingOps` | definition | same | dimension | none |
 | `eagerBirdAdjugateRingOps_le_sixth` | law | same | dimension | none |
+| `eagerBirdZModInverseRingOps` | definition | same | dimension | none |
+| `eagerBirdZModInverseRingOps_le` | law | same | dimension | none |
+| `eagerBirdZModInverseBitWork` | definition | same | dimension and supplied scalar-operation/inversion bit costs | none |
+| `eagerBirdZModInverseBitWork_le` | law | same | dimension, modulus bit length, fixed scalar and inversion polynomial parameters | supplied scalar-operation and inversion costs satisfy the stated polynomial bounds |
+
+The inverse budget counts one determinant for the scalar denominator, all
+`n^2` row-update determinants used by `birdAdjugate`, `n^2` final scalar
+multiplications, and one scalar inverse.  The bit-work theorem is deliberately
+conditional: Mathlib implements `ZMod.inv` through `Nat.gcdA`, but the pinned
+library supplies no Turing-machine or other formal bit-runtime theorem for
+that extended-GCD implementation.  Thus the new law isolates that missing
+arithmetic premise instead of attributing an unproved runtime to evaluator
+execution.  Array access, allocation, and integer-indexing costs remain a
+separate machine-model obligation.
 
 ## Executable planted kernel
 

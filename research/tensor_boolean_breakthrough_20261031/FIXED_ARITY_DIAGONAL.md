@@ -153,9 +153,18 @@ eagerBirdAdjugateRingOps n <= 4 (n+1)^6.
 
 Claims `PCC-20261119-2b2b04`, `PCC-20261119-8d6681`,
 `PCC-20261119-fa515d`, and `PCC-20261119-84b10b` pass their local Lean
-verifiers. The counted model covers scalar-ring operations. Array allocation,
-integer indexing, operand bit costs, concrete `ZMod` inversion cost, and the
-cross-project specialization to the upstream source remain open. The algebraic
+verifiers. The whole inverse now has the checked conditional bit-work bound
+
+```text
+(4(n+1)^6 + 4(n+1)^4 + n^2) C (bits(q)+1)^d
+  + D (bits(q)+1)^e,
+```
+
+provided a modular ring operation costs at most `C(bits(q)+1)^d` and the one
+extended-GCD inverse costs at most `D(bits(q)+1)^e`. The hypotheses are
+intentional: the pinned Mathlib implements `ZMod.inv` through `Nat.gcdA` but
+contains no proved machine-time theorem for that implementation. Array
+allocation and integer-indexing costs remain open as well. The algebraic
 block binding itself is checked: `executableBirdPlantedKernel` substitutes the
 Bird inverse into `(-R B⁻¹ | I)`, and
 `executableBirdPlantedKernel_spec` proves both annihilation of `[B;R]` and the
@@ -176,7 +185,9 @@ The Mathlib pin is commit
 for `Bird/Defs.lean` and
 `e36d1901d2279de39d4cb702625ac1c6defaae30eaaba372260c8a1551369fc1`
 for `Bird/Correctness.lean`. The local project gate reports 84 theorems and
-zero trusted declarations, and the independent fresh checker exits 0.
+zero trusted declarations at the adapter checkpoint; after the conditional
+bit-work theorem it reports 87 theorems and zero trusted declarations. The
+independent fresh checker exits 0.
 [pcc:unverified]
 
 ## What the pinned primary source supplies

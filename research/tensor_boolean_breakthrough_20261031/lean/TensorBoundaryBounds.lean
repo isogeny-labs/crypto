@@ -846,6 +846,49 @@ theorem eagerBirdAdjugateRingOps_le_sixth (n : ℕ) :
       gcongr <;> omega
     _ = 4 * (n + 1) ^ 6 := by ring
 
+/-- Scalar-ring budget for the whole Bird inverse formula: one determinant,
+all row-update determinants forming the adjugate, and `n²` final scalar
+multiplications.  The single scalar inversion is kept separate because its
+bit cost is not a ring-operation count. -/
+def eagerBirdZModInverseRingOps (n : ℕ) : ℕ :=
+  eagerBirdAdjugateRingOps n + eagerBirdDetRingOps n + n * n
+
+/-- The complete Bird inverse formula, apart from its one scalar inversion,
+has an explicit algebraic-operation bound. -/
+theorem eagerBirdZModInverseRingOps_le (n : ℕ) :
+    eagerBirdZModInverseRingOps n ≤
+      4 * (n + 1) ^ 6 + 4 * (n + 1) ^ 4 + n * n := by
+  exact Nat.add_le_add
+    (Nat.add_le_add (eagerBirdAdjugateRingOps_le_sixth n)
+      (eagerBirdDetRingOps_le_quartic n))
+    le_rfl
+
+/-- Abstract bit work obtained by charging every scalar ring operation the
+same supplied cost and charging the one scalar inversion separately. -/
+def eagerBirdZModInverseBitWork
+    (n scalarRingBitCost scalarInverseBitCost : ℕ) : ℕ :=
+  eagerBirdZModInverseRingOps n * scalarRingBitCost + scalarInverseBitCost
+
+/-- Explicit conditional bit bound for the executable Bird inverse.  The two
+hypotheses expose the currently external arithmetic facts: a fixed polynomial
+bound for one modular ring operation and a fixed polynomial bound for the
+extended-GCD scalar inverse.  No runtime claim about Lean's evaluator is used. -/
+theorem eagerBirdZModInverseBitWork_le
+    (n modulusBits scalarRingBitCost scalarInverseBitCost : ℕ)
+    (ringConstant ringDegree inverseConstant inverseDegree : ℕ)
+    (hRing : scalarRingBitCost ≤
+      ringConstant * (modulusBits + 1) ^ ringDegree)
+    (hInverse : scalarInverseBitCost ≤
+      inverseConstant * (modulusBits + 1) ^ inverseDegree) :
+    eagerBirdZModInverseBitWork n scalarRingBitCost scalarInverseBitCost ≤
+      (4 * (n + 1) ^ 6 + 4 * (n + 1) ^ 4 + n * n) *
+          (ringConstant * (modulusBits + 1) ^ ringDegree) +
+        inverseConstant * (modulusBits + 1) ^ inverseDegree := by
+  rw [eagerBirdZModInverseBitWork]
+  exact Nat.add_le_add
+    (Nat.mul_le_mul (eagerBirdZModInverseRingOps_le n) hRing)
+    hInverse
+
 /-! ### Executable planted kernel -/
 
 /-- The planted-kernel matrix with the executable Bird inverse substituted for

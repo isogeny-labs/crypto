@@ -77,11 +77,17 @@ absorbed by the already checked fixed-arity diagonal. This does not yet prove
 the full bit runtime, but the scalar-ring bound is now checked: array-backed
 eager states compute the same determinant, an instrumented entry count yields
 `4(n+1)^4` operations per determinant, and all `n²` cofactors cost at most
-`4(n+1)^6`. The generic planted-block binding is checked too: the executable Bird kernel satisfies
+`4(n+1)^6`. Counting the extra determinant and final scaling gives the checked
+whole-inverse ring bound `4(n+1)^6 + 4(n+1)^4 + n^2`; a conditional bit-work
+theorem multiplies it by an explicit polynomial modular-operation cost and
+adds one explicit polynomial extended-GCD inversion cost. The latter two
+polynomial bounds remain hypotheses because the pinned Mathlib contains no
+machine-time proof for `Nat.gcdA`. The generic planted-block binding is checked
+too: the executable Bird kernel satisfies
 the annihilation and identity-right-block laws used by the upstream uniformity
 proof. The remaining tasks are the cross-project specialization,
-array/indexing cost, concrete modular-inversion cost, and operand bit-cost
-accounting. The exact upstream-shaped `Ttop`/`Rint`/`nu`/`q` specialization is
+array/indexing cost and proofs of the two stated modular bit-cost hypotheses.
+The exact upstream-shaped `Ttop`/`Rint`/`nu`/`q` specialization is
 now checked locally; only integration into the external pinned tree remains.
 [pcc:unverified] See
 [`FIXED_ARITY_DIAGONAL.md`](FIXED_ARITY_DIAGONAL.md).

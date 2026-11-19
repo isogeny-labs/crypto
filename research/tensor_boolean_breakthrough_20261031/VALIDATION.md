@@ -867,3 +867,28 @@ gate then reported `PASS 84 thm 0 trusted`; the declaration has standard axiom
 output and the fresh checker exited 0. Claim `PCC-20261119-0d4820` passes its
 local Lean verifier. Editing and rebuilding the external pinned source tree is
 not claimed. [pcc:unverified]
+
+## 2026-11-19 conditional Bird bit-work boundary
+
+The complete inverse budget now includes the determinant used for the scalar
+denominator, every adjugate row-update determinant, and the final `n^2` scalar
+multiplications. Lean proves the following bound. [pcc:unverified]
+
+```text
+eagerBirdZModInverseRingOps n <=
+  4 * (n + 1)^6 + 4 * (n + 1)^4 + n * n.
+```
+
+`eagerBirdZModInverseBitWork_le` then charges each of those operations a
+supplied `C(bits(q)+1)^d` bound and separately charges the single scalar
+inverse a supplied `D(bits(q)+1)^e` bound. These are explicit hypotheses, not
+claims about evaluator runtime: the pinned `ZMod.inv` reduces to `Nat.gcdA`,
+and the pinned library has no proved Turing-machine or other bit-runtime
+theorem for that extended-GCD implementation. Array allocation and indexing
+also remain outside the model. [pcc:unverified]
+
+The pinned build completed with 2,189 jobs. The repository proof gate reported
+`PASS 87 thm 0 trusted`; both new laws use only `propext`,
+`Classical.choice`, and `Quot.sound`, and
+`lake env leanchecker --fresh TensorBoundaryBounds` exited 0.
+[pcc:unverified]
