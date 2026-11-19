@@ -20,34 +20,22 @@ BASE=ad2a014c0022cf000845014499a9649b6c2cef2d
 # 0a. Local spec sanity, no build: both specs parse as JSON. Do this before any commit.
 for f in $D/specs/*.json; do python3 -m json.tool "$f" >/dev/null; done; sha256sum $D/specs/*.json
 
-# 0b. NEW revision: commit the study directory alone on the PR branch and push.
-#     It is a research-only commit, so the code stays a0b215b0d (or the frozen head).
-git add $D && git commit -m "Freeze the IC in-run caching timing protocol and specs (PR #4756)" && git push
-NEW_SHA=$(git rev-parse HEAD)
-git diff --name-only a0b215b0d77125539e9cc902a1a3bc7424874c73 "$NEW_SHA" -- src crates Cargo.lock Cargo.toml   # must print nothing
-
-# 0c. OLD revision: ad2a014 + this directory only, built through the GitHub git-data API
-#     (no checkout, no blob fetch). This creates branch ic-inrun-caching-timing-baseline.
-R=repos/isogeny-labs/crypto
-BASE_TREE=$(gh api $R/git/commits/$BASE --jq .tree.sha)
-entries='[]'
-for f in $(git ls-files $D); do
-  blob=$(base64 -w0 "$f" | jq -Rs '{content: ., encoding: "base64"}' | gh api $R/git/blobs --input - --jq .sha)
-  entries=$(jq -c --arg p "$f" --arg s "$blob" '. + [{path:$p,mode:"100644",type:"blob",sha:$s}]' <<<"$entries")
-done
-TREE=$(jq -n --arg b "$BASE_TREE" --argjson t "$entries" '{base_tree:$b,tree:$t}' | gh api $R/git/trees --input - --jq .sha)
-OLD_SHA=$(jq -n --arg t "$TREE" --arg p "$BASE" \
-  --arg m $'Baseline for the IC in-run caching timing: ad2a014 plus the study directory only\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01TCbLH8t4y43TBEgm7c8JxR' \
-  '{message:$m,tree:$t,parents:[$p]}' | gh api $R/git/commits --input - --jq .sha)
-gh api $R/git/refs -f ref=refs/heads/ic-inrun-caching-timing-baseline -f sha="$OLD_SHA"
-gh api $R/compare/$BASE...$OLD_SHA --jq '.files[].filename'     # must list only $D/...
+# 0b. NEW revision = the PR head after the freeze commit and the OLD merge below (code frozen
+#     at 0f1a8cd8d, which includes the lanczos kernel-probe fix).
+# 0c. OLD revision = ad2a014 + this directory only, built locally from git objects (no checkout,
+#     no GitHub write API), then merged into the PR branch so it is reachable and fetchable:
+export GIT_INDEX_FILE=$(mktemp); git read-tree $BASE
+for f in $(git ls-files $D); do git update-index --add --cacheinfo 100644,$(git rev-parse HEAD:$f),$f; done
+OLD_SHA=$(git commit-tree $(git write-tree) -p $BASE -m "Timing baseline: ad2a014 plus the study directory only")
+unset GIT_INDEX_FILE
+git diff --name-only $BASE $OLD_SHA          # must list only $D/...
+git merge --no-ff --no-edit $OLD_SHA         # no content change: the PR already has ad2a014 and $D
+git push; NEW_SHA=$(git rev-parse HEAD)
 for s in p24a-batch-sparse k0-13-descent-template; do                 # spec bytes identical on both
-  for rev in $OLD_SHA $NEW_SHA; do
-    gh api "$R/contents/$D/specs/$s.json?ref=$rev" --jq .content | base64 -d | sha256sum; done; done
+  for rev in $OLD_SHA $NEW_SHA; do git show $rev:$D/specs/$s.json | sha256sum; done; done
 ```
 
-Steps 0b and 0c push to GitHub. They need the owner's push authorization,
-which the lead holds and this package does not.
+Steps 0b and 0c push only to the PR branch (the owner authorised the run on 2026-11-19).
 
 ```sh
 # 0d. Publication receipt (COST_CONTROLS.md "Before spending"); NEW is the local HEAD.
