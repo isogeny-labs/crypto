@@ -10,9 +10,6 @@ pub mod quadratic_pair_graph;
 #[path = "../src/cryptanalysis/jv_quadratic_pair_relation.rs"]
 pub mod quadratic_pair_relation;
 
-/// The controls are unit tests: `cargo test --example <this example>`.
-fn main() {}
-
 #[cfg(test)]
 pub(crate) mod tests {
     use super::{principal_relation as single, quadratic_pair_relation as pair};
