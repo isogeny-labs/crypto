@@ -1423,7 +1423,7 @@ fn main() {
                 .unwrap_or_default();
             for o in &opts {
                 assert!(
-                    ["pf", "rel", "rad", "cb", "xb", "ib"].contains(o),
+                    ["pf", "rel", "rad", "cb", "xb", "ib", "blk"].contains(o),
                     "ic5b option {o}"
                 );
             }
@@ -1439,6 +1439,10 @@ fn main() {
             // in order by Tab::insert_batch; the table equals in-order insertion.
             let ib = opts.contains(&"ib");
             const IB_CHUNK: usize = 1024;
+            // "blk" (research/mt_st_20261119): each active target computes its next BLK_K trial pairs in one round
+            // (one simultaneous inversion, all probes prefetched) and checks them in order, stopping at the first hit;
+            // the trials checked, the hits and the logs are unchanged, only I and M move (single-target batching).
+            let blk_k: usize = if opts.contains(&"blk") { 64 } else { 1 };
             let mut ibuf: Vec<(u64, (u32, u16, i8))> =
                 Vec::with_capacity(if ib { IB_CHUNK } else { 0 });
             const RAD_CHUNK: usize = 1 << 22;
@@ -1808,14 +1812,21 @@ fn main() {
             }
             // per slot: Err(log) = solved by the x(Q) = x(W_k) shortcut; Ok(None) = degenerate pair; Ok(Some(x pair))
             let mut prob: Vec<Result<Option<(u64, u64)>, u64>> = Vec::with_capacity(bsz);
+            let mut vact: Vec<(usize, usize)> = Vec::with_capacity(bsz * blk_k);
             while !act.is_empty() {
-                let kmax = act.iter().map(|a| a.1).max().unwrap();
+                let kmax = act.iter().map(|a| a.1).max().unwrap() + blk_k - 1;
                 ensure_w(&f, kmax, &mut w_pts, &mut w_log);
                 prob.clear();
+                vact.clear();
+                for &(t, kq) in &act {
+                    for j in 0..blk_k {
+                        vact.push((t, kq + j));
+                    }
+                }
                 if bi {
                     // q and w_pts[kq] are never None here (as in the plain path, which unwraps both)
                     dens.clear();
-                    for &(t, kq) in &act {
+                    for &(t, kq) in &vact {
                         let (qx, wx) = (qs[t].unwrap().0, w_pts[kq].unwrap().0);
                         if qx != wx {
                             dens.push(f.sub(wx, qx));
@@ -1824,9 +1835,8 @@ fn main() {
                     f.batch_inv(&mut dens, &mut bscr);
                 }
                 let mut jd = 0usize;
-                for &(t, kq) in &act {
+                for &(t, kq) in &vact {
                     let q = qs[t];
-                    trials += 2;
                     if q.unwrap().0 == w_pts[kq].unwrap().0 {
                         prob.push(Err(if q == w_pts[kq] {
                             w_log[kq]
@@ -1848,30 +1858,39 @@ fn main() {
                     prob.push(Ok(pr));
                 }
                 let mut nact: Vec<(usize, usize)> = Vec::with_capacity(bsz);
-                for (j, &(t, kq)) in act.iter().enumerate() {
+                for (ja, &(t, kq0)) in act.iter().enumerate() {
                     let mut solved: Option<u64> = None;
-                    match prob[j] {
-                        Err(v) => solved = Some(v),
-                        Ok(Some((xp, xm))) => {
-                            for (xx, sw) in [(xp, 1i64), (xm, -1i64)] {
-                                f.hash();
-                                if let Some(e) = table.get(xx) {
-                                    let dl = md(
-                                        entry_terms(e)
-                                            .iter()
-                                            .map(|&(i, s)| s as i128 * ylog[i] as i128)
-                                            .sum(),
-                                        n,
-                                    );
-                                    let dpt2 = entry_pt(&f, e);
-                                    solved = Some(resolve(
-                                        &f, qs[t], w_pts[kq], sw, w_log[kq], dpt2, dl, n,
-                                    ));
-                                    break;
+                    let mut kq = kq0;
+                    for jb in 0..blk_k {
+                        kq = kq0 + jb;
+                        let j = ja * blk_k + jb;
+                        trials += 2;
+                        match prob[j] {
+                            Err(v) => solved = Some(v),
+                            Ok(Some((xp, xm))) => {
+                                for (xx, sw) in [(xp, 1i64), (xm, -1i64)] {
+                                    f.hash();
+                                    if let Some(e) = table.get(xx) {
+                                        let dl = md(
+                                            entry_terms(e)
+                                                .iter()
+                                                .map(|&(i, s)| s as i128 * ylog[i] as i128)
+                                                .sum(),
+                                            n,
+                                        );
+                                        let dpt2 = entry_pt(&f, e);
+                                        solved = Some(resolve(
+                                            &f, qs[t], w_pts[kq], sw, w_log[kq], dpt2, dl, n,
+                                        ));
+                                        break;
+                                    }
                                 }
                             }
+                            Ok(None) => {}
                         }
-                        Ok(None) => {}
+                        if solved.is_some() {
+                            break;
+                        }
                     }
                     match solved {
                         Some(v) => {
@@ -3949,6 +3968,13 @@ fn main() {
             let kappa = param;
             let doff: i32 = args.get(6).map(|s| s.parse().unwrap()).unwrap_or(0);
             let lanes: usize = args.get(7).map(|s| s.parse().unwrap()).unwrap_or(32).max(1);
+            // args[8] = "st" (research/mt_st_20261119): single-target lanes. All lanes walk the current target, each
+            // from its own random chained start, sharing one pending table; a collision of two lanes' walks with
+            // opposite Q signs (or a database hit) solves it, and then every lane moves to the next target. Walk,
+            // step, distinguished-point and abandon rules are rhodpb's.
+            let st = args.get(8).map(|s| s.as_str()) == Some("st");
+            let mut spt: Tab<(u64, i64)> = Tab::new(true, 64, f.p);
+            let mut spending: Vec<(u64, (u64, i64))> = Vec::new();
             let d0 = (0.25 * ((n as f64) / targets as f64).log2()).round() as i32;
             let d = (d0 + doff).max(1) as u32;
             let mask = (1u64 << d) - 1;
@@ -4139,7 +4165,25 @@ fn main() {
             let inv2 = n.div_ceil(2);
             let mut next_t = 0usize;
             let mut tl: Vec<Lane> = Vec::with_capacity(lanes);
-            while tl.len() < lanes && next_t < targets {
+            if st {
+                for _ in 0..lanes {
+                    tl.push(Lane {
+                        t: 0,
+                        sp: qs[0],
+                        sa: 0,
+                        p: None,
+                        a: 0,
+                        b: 0,
+                        len: 0,
+                        walking: false,
+                        h: 0,
+                        pending: Vec::new(),
+                        ptab: None,
+                    });
+                }
+                next_t = 1;
+            }
+            while !st && tl.len() < lanes && next_t < targets {
                 tl.push(Lane {
                     t: next_t,
                     sp: qs[next_t],
@@ -4213,12 +4257,17 @@ fn main() {
                     if kk[q] == usize::MAX && is_dp(res[q].0) {
                         let x = res[q].0.unwrap().0;
                         db.prefetch(x);
-                        ln.ptab.as_ref().unwrap().prefetch(x);
+                        if st {
+                            spt.prefetch(x);
+                        } else {
+                            ln.ptab.as_ref().unwrap().prefetch(x);
+                        }
                     }
                 }
                 let mut q = 0usize;
                 let mut keep: Vec<bool> = vec![true; tl.len()];
                 let mut refill: Vec<usize> = Vec::new();
+                let mut st_solved = false;
                 for ln in tl.iter_mut() {
                     if kk[q] != usize::MAX {
                         q += 1;
@@ -4231,6 +4280,13 @@ fn main() {
                     ln.len += 1;
                     let mut solved: Option<u64> = None;
                     let mut end = false;
+                    if st && st_solved {
+                        // the target was solved earlier in this round: this lane's step is spent and counted
+                        // with its walk in the tally below
+                        ln.len += 1;
+                        q += 1;
+                        continue;
+                    }
                     if is_dp(ln.p) {
                         let x = ln.p.unwrap().0;
                         f.hash();
@@ -4238,7 +4294,11 @@ fn main() {
                             solved = Some(md(ln.b as i128 * (a2 as i128 - ln.a as i128), n));
                         } else {
                             f.hash();
-                            let pt = ln.ptab.as_mut().unwrap();
+                            let pt = if st {
+                                &mut spt
+                            } else {
+                                ln.ptab.as_mut().unwrap()
+                            };
                             if let Some((a2, b2)) = pt.get(x) {
                                 if b2 != ln.b {
                                     let num = md(a2 as i128 - ln.a as i128, n);
@@ -4253,7 +4313,11 @@ fn main() {
                             } else {
                                 f.hash();
                                 pt.insert_if_absent(x, (ln.a, ln.b));
-                                ln.pending.push((x, (ln.a, ln.b)));
+                                if st {
+                                    spending.push((x, (ln.a, ln.b)));
+                                } else {
+                                    ln.pending.push((x, (ln.a, ln.b)));
+                                }
                             }
                         }
                         end = true;
@@ -4269,13 +4333,40 @@ fn main() {
                     }
                     if let Some(v) = solved {
                         found[ln.t] = v;
-                        for &(x, (a, b)) in &ln.pending {
+                        let pend = if st { &spending } else { &ln.pending };
+                        for &(x, (a, b)) in pend {
                             f.hash();
                             db.insert_if_absent(x, md(a as i128 + b as i128 * v as i128, n));
                         }
-                        refill.push(q);
+                        if st {
+                            st_solved = true;
+                        } else {
+                            refill.push(q);
+                        }
                     }
                     q += 1;
+                }
+                if st && st_solved {
+                    // count the unfinished walks' steps, then move every lane to the next target
+                    for ln in tl.iter_mut() {
+                        if ln.walking {
+                            steps_total += ln.len;
+                            ln.walking = false;
+                        }
+                    }
+                    if next_t < targets {
+                        for ln in tl.iter_mut() {
+                            ln.t = next_t;
+                            ln.sp = qs[next_t];
+                            ln.sa = 0;
+                        }
+                        next_t += 1;
+                        spt = Tab::new(true, 64, f.p);
+                        spending.clear();
+                    } else {
+                        tl.clear();
+                    }
+                    continue;
                 }
                 for q in refill {
                     if next_t < targets {
@@ -4301,14 +4392,15 @@ fn main() {
             Out {
                 ok: 0,
                 extra: format!(
-                    "\"db\":{},\"d\":{},\"pre_steps\":{},\"target_steps\":{},\"walks\":{},\"abandoned\":{},\"lanes\":{}",
+                    "\"db\":{},\"d\":{},\"pre_steps\":{},\"target_steps\":{},\"walks\":{},\"abandoned\":{},\"lanes\":{},\"st\":{}",
                     db.len(),
                     d,
                     pre_steps,
                     steps_total,
                     walks,
                     abandoned,
-                    lanes
+                    lanes,
+                    st
                 ),
             }
         }
