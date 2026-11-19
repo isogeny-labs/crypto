@@ -66,7 +66,8 @@ fn main() {
     let membership = get("membership", "tower");
     let vkind = get("vkind", "coset");
     assert!(
-        ["tower", "dense", "both", "resultant", "resultant-amortized"].contains(&membership.as_str()),
+        ["tower", "dense", "both", "resultant", "resultant-amortized"]
+            .contains(&membership.as_str()),
         "membership"
     );
     assert!(
