@@ -303,10 +303,25 @@ impl Producer<'_> {
             return Err(Stop::InvalidInput);
         }
         out.len = n as u8;
-        for i in 0..a.len as usize {
-            for j in 0..b.len as usize {
-                let value = self.mul(a.coefficients[i], b.coefficients[j])?;
-                out.coefficients[i + j] = self.add(out.coefficients[i + j], value)?;
+        // A zero constant term is a cheap indicator of structured/sparse
+        // factors. Preserve the original dense loop on ordinary inputs.
+        if a.coefficients[0] == 0 || b.coefficients[0] == 0 {
+            for i in 0..a.len as usize {
+                let ai = a.coefficients[i];
+                if ai == 0 { continue; }
+                for j in 0..b.len as usize {
+                    let bj = b.coefficients[j];
+                    if bj == 0 { continue; }
+                    let value = self.mul(ai, bj)?;
+                    out.coefficients[i + j] = self.add(out.coefficients[i + j], value)?;
+                }
+            }
+        } else {
+            for i in 0..a.len as usize {
+                for j in 0..b.len as usize {
+                    let value = self.mul(a.coefficients[i], b.coefficients[j])?;
+                    out.coefficients[i + j] = self.add(out.coefficients[i + j], value)?;
+                }
             }
         }
         out.trim();
@@ -372,14 +387,29 @@ impl Producer<'_> {
         if modulus.len == 0 || modulus.coefficients[modulus.len as usize - 1] != 1 {
             return Err(Stop::InvalidInput);
         }
+        // x^d+constant and x^d+... with a zero low coefficient appear
+        // in sparse factor bases; avoid paying the sparse branch on dense f.
+        let sparse_modulus = modulus.coefficients[0] == 0
+            || (modulus.len > 2 && modulus.coefficients[1] == 0);
         while value.len >= modulus.len {
             self.gate.charge(COPY_WORK)?;
             let high = value.len as usize - 1;
             let coefficient = value.coefficients[high];
             let shift = (value.len - modulus.len) as usize;
-            for j in 0..modulus.len as usize - 1 {
-                let product = self.mul(coefficient, modulus.coefficients[j])?;
-                value.coefficients[shift + j] = self.sub(value.coefficients[shift + j], product)?;
+            if sparse_modulus {
+                for j in 0..modulus.len as usize - 1 {
+                    let mj = modulus.coefficients[j];
+                    if mj == 0 { continue; }
+                    let product = self.mul(coefficient, mj)?;
+                    value.coefficients[shift + j] =
+                        self.sub(value.coefficients[shift + j], product)?;
+                }
+            } else {
+                for j in 0..modulus.len as usize - 1 {
+                    let product = self.mul(coefficient, modulus.coefficients[j])?;
+                    value.coefficients[shift + j] =
+                        self.sub(value.coefficients[shift + j], product)?;
+                }
             }
             value.coefficients[high] = 0;
             value.trim();
@@ -750,14 +780,19 @@ impl Replay {
             return Err(Stop::InvalidCertificate);
         }
         z.len = n as u8;
-        // Output-diagonal order differs from producer's input-row order.
+        // Keep the independent output-diagonal verifier traversal; only
+        // select the zero-eliding version for structured inputs.
+        let sparse = x.coefficients[0] == 0 || y.coefficients[0] == 0;
         for k in 0..n {
             self.gate.charge(32)?;
             let start = (k + 1).saturating_sub(usize::from(y.len));
             let end = usize::from(x.len).min(k + 1);
             for i in start..end {
                 self.gate.charge(32)?;
-                let v = self.times(x.coefficients[i], y.coefficients[k - i])?;
+                let xi = x.coefficients[i];
+                let yj = y.coefficients[k - i];
+                if sparse && (xi == 0 || yj == 0) { continue; }
+                let v = self.times(xi, yj)?;
                 z.coefficients[k] = self.plus(z.coefficients[k], v)?;
             }
         }
@@ -809,12 +844,20 @@ impl Replay {
             return Err(Stop::InvalidCertificate);
         }
         // Independent descending-index traversal rather than producer trim loop.
+        let sparse = denominator.coefficients[0] == 0
+            || (divisor_len > 2 && denominator.coefficients[1] == 0);
         for high in (divisor_len - 1..usize::from(numerator.len)).rev() {
             self.gate.charge(COPY_WORK)?;
             let factor = numerator.coefficients[high];
             let offset = high + 1 - divisor_len;
+            if sparse && factor == 0 {
+                numerator.coefficients[high] = 0;
+                continue;
+            }
             for low in 0..divisor_len - 1 {
-                let term = self.times(factor, denominator.coefficients[low])?;
+                let term = denominator.coefficients[low];
+                if sparse && term == 0 { continue; }
+                let term = self.times(factor, term)?;
                 numerator.coefficients[offset + low] =
                     self.minus(numerator.coefficients[offset + low], term)?;
             }
