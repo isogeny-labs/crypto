@@ -588,22 +588,13 @@ impl Producer<'_> {
                 let root = self.mul(linear, half)?;
                 return Ok(Poly17::constant(self.sub(0, root)?));
             }
-            let mut power = (self.p - 1) / 2;
-            let mut acc = 1u64;
-            let mut scalar_base = discriminant;
-            while power != 0 {
-                if power & 1 != 0 {
-                    acc = self.mul(acc, scalar_base)?;
-                }
-                power >>= 1;
-                if power != 0 {
-                    scalar_base = self.mul(scalar_base, scalar_base)?;
-                }
-            }
-            if acc == 1 {
+            // R49_FROBENIUS_PRODUCER_BEGIN
+            let symbol = self.quadratic_character(discriminant)?;
+            // R49_FROBENIUS_PRODUCER_END
+            if symbol == 1 {
                 return Ok(*base);
             }
-            if acc == self.p - 1 {
+            if symbol == -1 {
                 let mut value = Poly17::ZERO;
                 value.len = 2;
                 value.coefficients[0] = self.sub(0, linear)?;
@@ -708,6 +699,32 @@ impl Producer<'_> {
         }
         Ok(a)
     }
+    // R49_BINARY_JACOBI_PRODUCER_BEGIN
+    // The binary Jacobi symbol equals the Legendre symbol for odd prime p.
+    // This replaces ~log2(p) modular squarings/products during quadratic
+    // Frobenius and quadratic factor selection. Never used for square roots.
+    // Charge integer work/deadline each step; do not charge field operations.
+    fn quadratic_character(&mut self, mut a: u64) -> Result<i8> {
+        let mut n = self.p;
+        let mut sign = 1i8;
+        self.gate.charge(32)?;
+        while a != 0 {
+            self.gate.charge(32)?;
+            let twos = a.trailing_zeros();
+            a >>= twos;
+            if twos & 1 != 0 && (n & 7 == 3 || n & 7 == 5) {
+                sign = -sign;
+            }
+            if a & 3 == 3 && n & 3 == 3 {
+                sign = -sign;
+            }
+            let next = n % a;
+            n = a;
+            a = next;
+        }
+        Ok(if n == 1 { sign } else { 0 })
+    }
+    // R49_BINARY_JACOBI_PRODUCER_END
     // R46_PRODUCER_HELPER_BEGIN
     // In a split squarefree quadratic, evaluating the quadratic character
     // at both roots is much cheaper than polynomial Euler powering + GCD.
@@ -816,11 +833,12 @@ impl Producer<'_> {
         if root_a == root_b {
             return Ok(None);
         }
-        let exponent = (self.p - 1) / 2;
         let shifted_a = self.add(root_a, delta)?;
         let shifted_b = self.add(root_b, delta)?;
-        let a_selected = self.split_scalar_pow(shifted_a, exponent)? == 1;
-        let b_selected = self.split_scalar_pow(shifted_b, exponent)? == 1;
+        // R49_SPLIT_PRODUCER_BEGIN
+        let a_selected = self.quadratic_character(shifted_a)? == 1;
+        let b_selected = self.quadratic_character(shifted_b)? == 1;
+        // R49_SPLIT_PRODUCER_END
         if a_selected && b_selected {
             return Ok(Some(*h));
         }
@@ -1430,18 +1448,13 @@ impl Replay {
                 let root = self.times(linear, (self.p + 1) / 2)?;
                 return Ok(Poly17::constant(self.minus(0, root)?));
             }
-            let exponent = (self.p - 1) / 2;
-            let mut symbol = 1u64;
-            for bit in (0..64 - exponent.leading_zeros()).rev() {
-                symbol = self.times(symbol, symbol)?;
-                if exponent & (1u64 << bit) != 0 {
-                    symbol = self.times(symbol, discriminant)?;
-                }
-            }
+            // R49_FROBENIUS_REPLAY_BEGIN
+            let symbol = self.quadratic_character(discriminant)?;
+            // R49_FROBENIUS_REPLAY_END
             if symbol == 1 {
                 return Ok(base);
             }
-            if symbol == self.p - 1 {
+            if symbol == -1 {
                 let mut result = Poly17::ZERO;
                 result.len = 2;
                 result.coefficients[0] = self.minus(0, linear)?;
@@ -1529,6 +1542,27 @@ impl Replay {
         }
         Ok(out)
     }
+    // R49_BINARY_JACOBI_REPLAY_BEGIN
+    // Independent binary Jacobi implementation for certificate checks.
+    // The verifier still checks the quadratic roots by substitution.
+    fn quadratic_character(&mut self, mut value: u64) -> Result<i8> {
+        let mut odd_modulus = self.p;
+        let mut parity = false;
+        self.gate.charge(32)?;
+        while value > 0 {
+            self.gate.charge(32)?;
+            let factors_of_two = value.trailing_zeros();
+            value >>= factors_of_two;
+            parity ^= (factors_of_two & 1 != 0)
+                && (odd_modulus & 7 == 3 || odd_modulus & 7 == 5);
+            parity ^= (value & odd_modulus & 3) == 3;
+            let remainder = odd_modulus % value;
+            odd_modulus = value;
+            value = remainder;
+        }
+        Ok(if odd_modulus != 1 { 0 } else if parity { -1 } else { 1 })
+    }
+    // R49_BINARY_JACOBI_REPLAY_END
     // R46_REPLAY_HELPER_BEGIN
     // Certificate replay evaluates quadratic split characters independently,
     // with left-to-right scalar powering and separate field arithmetic.
@@ -1638,11 +1672,12 @@ impl Replay {
                 return Err(Stop::InvalidCertificate);
             }
         }
-        let exponent = (self.p - 1) / 2;
         let shifted0 = self.plus(r0, delta)?;
         let shifted1 = self.plus(r1, delta)?;
-        let s0 = self.split_character_power(shifted0, exponent)? == 1;
-        let s1 = self.split_character_power(shifted1, exponent)? == 1;
+        // R49_SPLIT_REPLAY_BEGIN
+        let s0 = self.quadratic_character(shifted0)? == 1;
+        let s1 = self.quadratic_character(shifted1)? == 1;
+        // R49_SPLIT_REPLAY_END
         if s0 && s1 {
             return Ok(Some(f));
         }
@@ -2097,6 +2132,47 @@ mod tests {
         }
     }
 
+    // This oracle uses u128 arithmetic only; the producer and the replay
+    // independently compute the binary Jacobi symbol without field powers.
+    #[test]
+    fn round49_binary_jacobi_matches_fermat_for_prime_fields() {
+        let mut checked = 0usize;
+        for p in [3u64, 7, 487, 1_000_000_007, 1_000_000_009,
+                  1_000_000_021, (1u64 << 61) - 1] {
+            let f = field(p);
+            let mut observer = |_: &BoundedRootEvent| Ok(());
+            let mut prod = Producer {
+                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
+                unacknowledged: None, pending: [Poly17::ZERO; 8],
+                pending_len: 0, roots: [0; 8], root_count: 0,
+            };
+            prod.gate.admit().unwrap();
+            let mut replay = Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+            let mut rng = 0x2026_1119_4949_0001u64;
+            for j in 0..512 {
+                rng = rng.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+                let v = match j % 29 {
+                    0 => 0, 1 => 1, 2 => p - 1, _ => rng % p,
+                };
+                let mut e = (p - 1) / 2;
+                let mut base = v as u128;
+                let mut acc = 1u128;
+                while e > 0 {
+                    if e & 1 != 0 { acc = acc * base % p as u128; }
+                    e >>= 1;
+                    if e > 0 { base = base * base % p as u128; }
+                }
+                let expected = if acc == 0 { 0 } else if acc == 1 { 1 }
+                    else { assert_eq!(acc, (p - 1) as u128); -1 };
+                assert_eq!(prod.quadratic_character(v).unwrap(), expected,
+                    "producer p={p} v={v}");
+                assert_eq!(replay.quadratic_character(v).unwrap(), expected,
+                    "replay p={p} v={v}");
+                checked += 2;
+            }
+        }
+        assert_eq!(checked, 7_168);
+    }
     #[test]
     fn round48_joint_tonelli_nonresidue_and_certificate_cases() {
         let p = 1_000_000_009u64;
