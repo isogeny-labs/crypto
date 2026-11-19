@@ -36,7 +36,9 @@ RS
   puts s.sub('for rep in 0..32','for rep in 0..8').sub('for pass in 0..4','for pass in 0..3').sub('3-pass','2-pass').sub('else{pass})%4','else{pass})%3')
 else
   %w[screen hermite].each do |name|
-    if ARGV.include?('pivots')
+    if ARGV.include?('resolvent')
+      s=generated(name=='screen' ? 'harness/g4-carry.rb' : 'harness/g4-resolvent.rb')
+    elsif ARGV.include?('pivots')
       s=generated('harness/g4-carry.rb',name=='screen' ? 'replay' : 'carry')
     elsif ARGV.include?('carry')
       s=generated(name=='screen' ? 'harness/g4-hermite-quotient.rb' : 'harness/g4-carry.rb')

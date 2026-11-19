@@ -471,3 +471,28 @@ Each seed supplied two input pairs per model. We rotated the pencil reference an
 A third panel (seed 2026111941) held packed collection constant and compared retaining all accepted rows for replay with carrying the pivots. Carrying pivots improved the median full solve by 1.030× / 1.027× on the 21 models requiring Hermite relations and by 1.020× / 1.014× on the other 176. Both arms cleared 10× on 288 of 296 verified pencil comparisons. The full-rank path also benefits from omitting row history.
 
 Run `harness/g4-switch-check.zsh` for the rank checks. Run `HEC_PAIRS=2 HEC_PAIR_SEED=2026111939 harness/g4-hermite-solve.zsh carry` and repeat with seed 2026111940 for the combined comparison. The modes `switch` and `pivots` reproduce the switch and pivot-only panels with the seeds above. The medians reducer accepts the corresponding flag and the two timing logs. Raw archives include both timing orders and the untimed audits.
+
+### Genus-3 bitangent cubics and a linear-size root table
+
+For two nonbranch places A,B with distinct abscissae, a cubic w interpolating their values and slopes gives f−w²=z²(z−t)²Q, where z=x−x(A), t=x(B)−x(A), and Q is monic of degree three. Computing its three free coefficients needs only the high terms of the norm. We enumerated unordered abscissa pairs by increasing index gap with both relative signs. On each of the eight transfer curves these relations alone reached rank n−1. The audit checked the full polynomial identity, compared the roots including repetitions against synthetic division, and compared the resulting coordinates on every nonbranch place against the two-pencil catalogue.
+
+Translate a monic cubic to Y³+aY+b. When ab is nonzero, Y=(b/a)Z gives Z³+u(Z+1)=0 with u=a³/b². Since −1 cannot solve this equation, each field element Z other than −1 can be placed in exactly one bucket, indexed by −Z³/(Z+1). A vanishing derivative supplies the multiplicity. Thus one linear pass over the field builds a table for all generic cubics. The b=0 case uses a square-root table and the a=0 case a pure-cube table. All setup is charged on each catalogue construction.
+
+We timed eight inputs on each transfer curve with seed 2026111942. The four arms were pencil reference, existing two-pencil collector, bitangents with a field scan and bitangents with the normalized table. Compared with scanning each residual, lookup sped up the **full bitangent solve** by 3.74× / 3.69× at p=73, 6.84× / 6.67× at 127, 7.70× / 7.46× at 257 and 11.37× / 11.15× at 383. These are median paired ratios pooled within field and timing order. The direct crossover against the existing two-pencil solver gave field/curve medians between 0.68× and 0.89× across both orders. All 64 scalars matched. The existing solver cleared 10× against pencil on 51 inputs in both orders and the table-based bitangent solver on 35.
+
+Run `harness/g3-bitangent.zsh` for the native timings. The rank audit generator takes `results/g3-transfer-curves.txt audit` and emits standalone C++17. PAIR records give p, c, nonbranch base size, scan flag, signed pairs tested, accepted rows and final rank. STATUS is the three-bit catalogue availability mask.
+
+### Constant-work quartic splitting via the cubic resolvent
+
+Translate and normalize a quartic to X⁴+aX²+bX+c. For b≠0 its factorization into (X²+sX+t)(X²−sX+v) yields w=s² with w((a+w)²−4c)=b². If the quartic splits completely, the three pairings of its roots give the three rational roots of this cubic, counted with multiplicity. The cubic table recovers them. Any chosen w gives a quadratic-factor candidate when it has a square root s. Since b≠0, s is invertible, and t,v=(a+w∓b/s)/2. The two quadratic discriminants complete the test. For b=0, factor as a quadratic in X² and take both square roots. This costs a bounded number of field operations per residual after linear table setup.
+
+Independent enumeration over the nine census fields checked all 22,569 depressed cubic coefficient pairs and all 1,214,695 depressed quartic coefficient triples, including repeated roots. Each case also used a translation, and each quartic used a nonzero leading coefficient. Across all 197 models the resolvent catalogue reproduced every published Hermite stage count.
+
+| Seed | Correct full solves | Faster than scan in both orders | Median scan / resolvent, forward / reverse | ≥10× in both orders, scan → resolvent / verified pencil comparisons |
+|---|---:|---:|---:|---:|
+| 2026111943 | 84/84 | 19/84 | 0.999× / 0.989× | 55 → 56 / 64 |
+| 2026111944 | 84/84 | 19/84 | 1.004× / 0.987× | 55 → 54 / 64 |
+
+These panels use the 21 deficient genus-4 models, four fresh pairs per curve, eight rotated repetitions per input and two timing orders. Both arms carry the packed collector's pivots into Hermite elimination. The scan arm reduces the residual to a quadratic by probing rational abscissae. The resolvent arm includes table construction, coordinate extraction, descent and scalar verification. The pencil reference excluded 16 inputs and returned no scalar on four more per seed. The first timing run could overlap a separate audit build; the second used the same binary in separate timing processes. The fixed-work splitting method provided no consistent full-solve gain at these field sizes.
+
+Compile `harness/g4-resolvent-check.cpp` with C++17 for the independent root census. Run `HEC_PAIR_SEED=2026111943 harness/g4-hermite-solve.zsh resolvent` and repeat with seed 2026111944 for the full solves. Use the medians reducer with `--resolvent` and the two logs. The archives include both orders and the untimed audit streams.
