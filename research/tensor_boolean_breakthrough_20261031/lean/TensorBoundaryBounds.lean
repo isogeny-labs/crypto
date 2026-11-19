@@ -12,6 +12,8 @@ import Mathlib.Data.Nat.Sqrt
 import Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.Basic
 import Mathlib.SetTheory.Cardinal.NatCard
 import MathlibExt.AlgebraicGeometry.EllipticCurve.HasseBound
+import Mathlib.AlgebraicGeometry.EllipticCurve.DivisionPolynomial.Degree
+import ECDLP.L49_Main
 
 /-!
 # Exact separator-message bounds
@@ -3084,6 +3086,34 @@ theorem algebraic_ne_const_mul_transcendental
   rw [← equality]
   exact xAlgebraic
 
+/-- A root in an extension field of a division polynomial whose index is
+nonzero in the constant field is algebraic over that constant field.  This
+isolates the available half of the corrected torsion-coordinate argument;
+the still-missing elliptic-curve lemma is that a nonzero torsion point makes
+the corresponding division polynomial vanish at its x-coordinate. -/
+theorem divisionPolynomialRoot_isAlgebraic
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    (curve : WeierstrassCurve K) (index : ℤ) (x : L)
+    (indexNonzero : (index : K) ≠ 0)
+    (root : Polynomial.aeval x (curve.preΨ index) = 0) :
+    IsAlgebraic K x := by
+  exact ⟨curve.preΨ index, curve.preΨ_ne_zero indexNonzero, root⟩
+
+/-- Consequently, a division polynomial with nonzero index cannot vanish at
+a nonzero constant multiple of a transcendental parameter. -/
+theorem divisionPolynomial_ne_zero_at_const_mul_transcendental
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    (curve : WeierstrassCurve K) (index : ℤ)
+    (indexNonzero : (index : K) ≠ 0)
+    (s : L) (sTranscendental : Transcendental K s)
+    (t : K) (tNonzero : t ≠ 0) :
+    Polynomial.aeval (algebraMap K L t * s) (curve.preΨ index) ≠ 0 := by
+  intro root
+  have algebraic : IsAlgebraic K (algebraMap K L t * s) :=
+    divisionPolynomialRoot_isAlgebraic curve index
+      (algebraMap K L t * s) indexNonzero root
+  exact (transcendental_const_mul s sTranscendental t tNonzero) algebraic
+
 /-- Abstract Kummer-character projector. Orthogonality of the sign characters
 and the transformed zero-sum relations isolate one term and force
 `|Gamma| * n_i` times that point to vanish. -/
@@ -3262,6 +3292,156 @@ theorem inverseSquarePolynomialCertificate_card_le
     exact badRoot u (Finset.mem_filter.mp uMem).2
   · exact nonzero
   · exact degreeBound
+
+/-! ## Exact bridge to the upstream dilation hypothesis
+
+The upstream ECDLP development indexes dilations by the unit group `Kˣ`,
+rather than by `NonzeroField K`.  The following variants close that purely
+representational gap and then instantiate its exact `DilationNondeg`
+predicate.
+-/
+
+/-- The inverse-square map on field units is at most two-to-one. -/
+theorem unitsInverseSquareFiberCard_le_two
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (value : K) :
+    ((Finset.univ : Finset Kˣ).filter fun u : Kˣ =>
+      ((u : K)⁻¹) ^ 2 = value).card ≤ 2 := by
+  let fiber : Finset Kˣ := (Finset.univ : Finset Kˣ).filter fun u : Kˣ =>
+    ((u : K)⁻¹) ^ 2 = value
+  let roots : Finset K := fiber.image fun u : Kˣ => (u : K)
+  let polynomial : Polynomial K :=
+    Polynomial.C value * Polynomial.X ^ 2 - 1
+  have polynomialNonzero : polynomial ≠ 0 := by
+    intro polynomialZero
+    have evaluated := congrArg (Polynomial.eval (0 : K)) polynomialZero
+    simp [polynomial] at evaluated
+  have rootsAreRoots :
+      roots.filter (fun x => polynomial.eval x = 0) = roots := by
+    apply Finset.filter_eq_self.mpr
+    intro x xMem
+    obtain ⟨u, uMem, rfl⟩ := Finset.mem_image.mp xMem
+    have inverseSquare := (Finset.mem_filter.mp uMem).2
+    simp only [polynomial, Polynomial.eval_sub, Polynomial.eval_mul,
+      Polynomial.eval_C, Polynomial.eval_pow, Polynomial.eval_X,
+      Polynomial.eval_one]
+    rw [← inverseSquare]
+    field_simp
+    simp
+  have rootsDegree : roots.card ≤ polynomial.natDegree := by
+    rw [← rootsAreRoots]
+    exact polynomialBadValuesCardLeDegree polynomial roots polynomialNonzero
+  have polynomialDegree : polynomial.natDegree ≤ 2 := by
+    calc
+      polynomial.natDegree ≤
+          max (Polynomial.C value * Polynomial.X ^ 2).natDegree
+            (1 : Polynomial K).natDegree := by
+        exact Polynomial.natDegree_sub_le _ _
+      _ ≤ 2 := by
+        apply max_le
+        · exact Polynomial.natDegree_C_mul_X_pow_le value 2
+        · simp
+  calc
+    fiber.card = roots.card := by
+      exact (Finset.card_image_of_injective fiber Units.val_injective).symm
+    _ ≤ polynomial.natDegree := rootsDegree
+    _ ≤ 2 := polynomialDegree
+
+/-- Unit-group form of the inverse-square polynomial root bound. -/
+theorem unitsInverseSquarePolynomialBadSetCardLe
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (polynomial : Polynomial K) (bad : Finset Kˣ) (degree : ℕ)
+    (badRoot : ∀ u ∈ bad, polynomial.eval (((u : K)⁻¹) ^ 2) = 0)
+    (nonzero : polynomial ≠ 0) (degreeBound : polynomial.natDegree ≤ degree) :
+    bad.card ≤ 2 * degree := by
+  apply polynomialPullbackBadSetCardLe polynomial
+    (fun u : Kˣ => ((u : K)⁻¹) ^ 2) bad 2 degree
+  · intro value
+    calc
+      (bad.filter fun u : Kˣ => ((u : K)⁻¹) ^ 2 = value).card ≤
+          ((Finset.univ : Finset Kˣ).filter fun u : Kˣ =>
+            ((u : K)⁻¹) ^ 2 = value).card := by
+        apply Finset.card_le_card
+        intro u uMem
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+        exact (Finset.mem_filter.mp uMem).2
+      _ ≤ 2 := unitsInverseSquareFiberCard_le_two value
+  · exact badRoot
+  · exact nonzero
+  · exact degreeBound
+
+/-- A curve-specific polynomial certificate with exactly the tuple and bad
+dilation predicates used by `ECDLP.L49.DilationNondeg`. -/
+def UpstreamDilationPolynomialCertificate
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (A B : K) (m : ℕ) (T : Finset K) (degree : ℕ) : Prop :=
+  ∀ t : Fin (2 * m) → K, (∀ i, t i ∈ T) →
+    ¬ ECDLP.L40.TrivL (List.ofFn t) →
+    ∃ polynomial : Polynomial K,
+      polynomial ≠ 0 ∧ polynomial.natDegree ≤ degree ∧
+        ∀ u : Kˣ,
+          (∃ P : Fin (2 * m) → (ECDLP.L49.Eu A B u).Point,
+            (∀ i, P i ≠ 0 ∧ ECDLP.L43.xco _ (P i) = t i) ∧
+              ∑ i, P i = 0) →
+          polynomial.eval (((u : K)⁻¹) ^ 2) = 0
+
+/-- A polynomial family satisfying construction, nonvanishing, degree, and
+vanishing for the exact upstream bad predicate proves the upstream
+`DilationNondeg` hypothesis. -/
+theorem upstreamDilationPolynomialCertificate_implies_nondeg
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (A B : K) (m : ℕ) (T : Finset K) (degree : ℕ)
+    (certificate : UpstreamDilationPolynomialCertificate A B m T degree) :
+    ECDLP.L49.DilationNondeg A B m T degree := by
+  classical
+  letI pointFintype (W : WeierstrassCurve.Affine K) : Fintype W.Point :=
+    ECDLP.L43.instFintypePoint W
+  intro t tupleInFactorBase nontrivial
+  obtain ⟨polynomial, nonzero, degreeBound, badRoot⟩ :=
+    certificate t tupleInFactorBase nontrivial
+  apply unitsInverseSquarePolynomialBadSetCardLe
+    (polynomial := polynomial) (degree := degree)
+  · intro u uMem
+    exact badRoot u (Finset.mem_filter.mp uMem).2
+  · exact nonzero
+  · exact degreeBound
+
+/-- Construction/nonvanishing/degree/vanishing form of the exact bridge.  It
+makes the four remaining curve-specific proof obligations explicit for a
+single supplied specialized polynomial family. -/
+theorem upstreamDilationPolynomialFamily_implies_nondeg
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (A B : K) (m : ℕ) (T : Finset K) (degree : ℕ)
+    (family : (Fin (2 * m) → K) → Polynomial K)
+    (nonzero : ∀ t, (∀ i, t i ∈ T) →
+      ¬ ECDLP.L40.TrivL (List.ofFn t) → family t ≠ 0)
+    (degreeBound : ∀ t, (family t).natDegree ≤ degree)
+    (vanishing : ∀ t u,
+      (∃ P : Fin (2 * m) → (ECDLP.L49.Eu A B u).Point,
+        (∀ i, P i ≠ 0 ∧ ECDLP.L43.xco _ (P i) = t i) ∧
+          ∑ i, P i = 0) →
+      (family t).eval (((u : K)⁻¹) ^ 2) = 0) :
+    ECDLP.L49.DilationNondeg A B m T degree := by
+  apply upstreamDilationPolynomialCertificate_implies_nondeg
+  intro t tupleInFactorBase nontrivial
+  exact ⟨family t, nonzero t tupleInFactorBase nontrivial,
+    degreeBound t, vanishing t⟩
+
+/-- The same certificate feeds directly into Kaarelson's exact average-energy
+bound.  No restatement of `Eng` or `Mdil` is used here. -/
+theorem upstreamDilationPolynomialCertificate_implies_avg_energy
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A B : K)
+    (n degree : ℕ) (T : Finset K)
+    (nonsingular : ECDLP.L43.disc A B ≠ 0)
+    (certificate :
+      UpstreamDilationPolynomialCertificate A B (n + 1) T degree) :
+    ∑ u : Kˣ,
+        (ECDLP.L43.Eng T n ((u : K) ^ 4 * A) ((u : K) ^ 6 * B) : ℝ) ≤
+      ECDLP.L49.Mdil K n T degree * (Fintype.card Kˣ : ℝ) := by
+  exact ECDLP.L49.avg_energy_dil hK A B nonsingular T n degree
+    (upstreamDilationPolynomialCertificate_implies_nondeg
+      A B (n + 1) T degree certificate)
 
 /-- An `n × n` matrix has at most `n` candidate scalar shifts for which
 `value * I - matrix` is singular. This is the characteristic-polynomial root

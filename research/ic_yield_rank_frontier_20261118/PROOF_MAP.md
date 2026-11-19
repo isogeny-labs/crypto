@@ -689,17 +689,21 @@ layer uses these declarations:
    predicate is the existence of points above `t` on the dilated curve whose
    sum is zero. The intended polynomial is the specialized summation
    polynomial `g_t(s)` from Lemma N'. [pcc:unverified]
-4. **Assembly probe.** Partition the bad dilation set by its inverse-square
-   image, bound every fibre by two, and bound the image by the roots of
-   `g_t`. This gives the exact `2D` cardinality used by upstream
-   `DilationNondeg`.
+4. **Assembly.** The pinned `fast-ecdlp` package is now imported directly.
+   `upstreamDilationPolynomialFamily_implies_nondeg` proves the exact upstream
+   `ECDLP.L49.DilationNondeg` proposition from construction, nonvanishing,
+   degree, and bad-dilation vanishing of `g_t`.
+   `upstreamDilationPolynomialCertificate_implies_avg_energy` then feeds that
+   proposition to upstream `avg_energy_dil`, with its original `Eng` and
+   `Mdil` definitions. Claims `PCC-20261119-1bad7c` and
+   `PCC-20261119-a2b707` pass their local verifiers. [pcc:unverified]
 5. **Missing components only.** Construct `g_t` and prove its degree and
    vanishing laws. For nonvanishing, the checked pieces now include the cubic
    coefficient classification, the short-interval orbit exclusion, the
    abstract character projector, and the corrected final transcendence
    contradiction. Still missing are square-product-to-scaling, the actual
-   Kummer extension and character orthogonality, torsion-coordinate
-   algebraicity, and the `A = 0` CM endomorphism/finite-kernel specialization.
+   Kummer extension and character orthogonality, torsion-to-division-polynomial
+   vanishing, and the `A = 0` CM endomorphism/finite-kernel specialization.
    [pcc:unverified]
 
 | statement | kind | owner | quantified structure | hypotheses |
@@ -708,10 +712,15 @@ layer uses these declarations:
 | `inverseSquareFiberCard_le_two` | law | same | nonzero elements of a finite field | none beyond field structure |
 | `InverseSquarePolynomialCertificate` | interface | same | tuple-indexed bad dilation predicates | one nonzero bounded-degree vanishing polynomial per tuple |
 | `inverseSquarePolynomialCertificate_card_le` | endpoint | same | previous row | certificate; conclusion is the exact `2D` bad-set bound |
+| `unitsInverseSquarePolynomialBadSetCardLe` | law | same | unit group of a finite field | nonzero bounded-degree polynomial vanishing on the bad units |
+| `UpstreamDilationPolynomialCertificate` | interface | same | exact pinned `ECDLP.L49` tuple and bad predicates | construction, nonvanishing, degree and vanishing certificate |
+| `upstreamDilationPolynomialFamily_implies_nondeg` | endpoint | same | exact pinned upstream `DilationNondeg` | supplied specialized polynomial family and its four laws |
+| `upstreamDilationPolynomialCertificate_implies_avg_energy` | endpoint | same | exact pinned upstream `Eng` and `Mdil` | odd characteristic, nonsingular curve and certificate |
 | `shortCubicPolynomial_scale_classification` | law | same | odd-characteristic field and short-cubic coefficients | a supplied nonzero nonidentity scaling symmetry |
 | `zmodNoFullCubicOrbitInShortInterval` | law | same | three positive residue representatives and a cubic root of unity | representatives at most `X`, `3X < p` |
 | `characterProjector_isolates_term` | law | same | finite character and point index sets, additive commutative point group | character orthogonality and every transformed relation |
 | `algebraic_ne_const_mul_transcendental` | law | same | field extension, algebraic coordinate and transcendental parameter | nonzero constant multiplier |
+| `divisionPolynomial_ne_zero_at_const_mul_transcendental` | law | same | Weierstrass curve over the constant field and extension parameter | division index nonzero in the constant field, nonzero constant multiplier |
 
 Claim `PCC-20261119-998f26` binds the endpoint and passes its local verifier;
 signed standing remains unverified. [pcc:unverified]
@@ -720,6 +729,14 @@ Claims `PCC-20261119-603d9c`, `PCC-20261119-0f3ed3`,
 `PCC-20261119-31e2b5`, and `PCC-20261119-752c5b` bind the four checked
 Lemma N' components and pass their local verifiers; signed standing remains
 unverified. [pcc:unverified]
+
+Claims `PCC-20261119-1bad7c` and `PCC-20261119-a2b707` bind the exact upstream
+nondegeneracy and average-energy endpoints. Claim `PCC-20261119-a69a2d`
+binds the division-polynomial transcendence contradiction. All three local
+verifiers pass; signed standing remains unverified. The remaining
+torsion-coordinate step is now the precise group-law lemma that a nonzero
+torsion point makes the indexed division polynomial vanish at its
+x-coordinate. [pcc:unverified]
 
 ## Planted-diagonal bad shifts
 

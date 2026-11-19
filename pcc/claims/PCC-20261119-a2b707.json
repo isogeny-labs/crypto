@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T06:10:35Z",
+ "id": "PCC-20261119-a2b707",
+ "kind": "theorem",
+ "producer": {
+  "commit": "f2f5fcdeb3373dba5fc9d45ca0540dbce657def0",
+  "model": "Codex",
+  "session": "upstream-dilation-bridge-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "65dc58df4300221871a7b34e57bd10c10007dd5b994c99429f66700694dbb4a5",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.upstreamDilationPolynomialCertificate_implies_avg_energy"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "This composes the local exact certificate bridge with fast-ecdlp commit d1deb5abe008e981206ed58cbd83012b6afc3740 theorem ECDLP.L49.avg_energy_dil. It still assumes construction, nonvanishing, degree, and vanishing of the specialized polynomial family.",
+ "statement": "The exact polynomial certificate for bad inverse-square dilations implies Kaarelson pinned average-energy inequality, with the upstream Eng and Mdil definitions and the explicit factor 2D root bound."
+}

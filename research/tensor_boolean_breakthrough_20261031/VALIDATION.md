@@ -1105,3 +1105,40 @@ reports `PASS 216 thm 0 trusted`; all four new root-count laws depend only on
 `propext`, `Classical.choice`, and `Quot.sound`. A final-source independent
 `lake env leanchecker --fresh TensorBoundaryBounds` replay exits 0.
 [pcc:unverified]
+
+## 2026-11-19 exact upstream dilation and average-energy bridge
+
+The local project now pins `fast-ecdlp` commit
+`d1deb5abe008e981206ed58cbd83012b6afc3740` as the `ECDLP` dependency while
+retaining Mathlib commit `cfc55fc58714a59dc06e6e79edc6d1d95140d3c2`.
+Targeted builds of `ECDLP.L49_Dil` and `ECDLP.L49_Main` complete with 9,073
+and 9,075 jobs respectively. The package default target is not claimed: it
+also reaches unrelated `ECDLP.L35_Challenge`, which fails under this retained
+Mathlib revision because its `strings` definition is not marked
+noncomputable. [pcc:unverified]
+
+`unitsInverseSquarePolynomialBadSetCardLe` supplies the exact root count over
+the upstream unit-group parameter type. `UpstreamDilationPolynomialCertificate`
+uses the precise upstream tuple and bad-point predicates.
+`upstreamDilationPolynomialFamily_implies_nondeg` proves the actual
+`ECDLP.L49.DilationNondeg` proposition from construction, nonvanishing,
+degree, and bad-dilation vanishing of one supplied polynomial family.
+`upstreamDilationPolynomialCertificate_implies_avg_energy` composes this with
+upstream `avg_energy_dil`, preserving its original `Eng` and `Mdil`
+definitions. Claims `PCC-20261119-1bad7c` and `PCC-20261119-a2b707` pass their
+local Lean verifiers. [pcc:unverified]
+
+`divisionPolynomialRoot_isAlgebraic` uses Mathlib's nonzero leading-term
+theorem for division polynomials, and
+`divisionPolynomial_ne_zero_at_const_mul_transcendental` proves that such a
+polynomial cannot vanish at a nonzero constant multiple of a transcendental
+parameter. Claim `PCC-20261119-a69a2d` passes locally. This does not supply the
+missing group-law theorem that a nonzero torsion point forces the indexed
+division polynomial to vanish at its x-coordinate. [pcc:unverified]
+
+All three claim verifiers pass. The repository proof gate reports
+`PASS 233 thm 0 trusted`; a final-source independent
+`lake env leanchecker --fresh TensorBoundaryBounds` replay exits 0. The PCC
+ledger contains 1,431 entries and verifies after serializing the three new
+tail records. The complete local project build succeeds with 9,086 jobs.
+[pcc:unverified]
