@@ -94,8 +94,14 @@ accepted fibres imply uniform outputs and pair events, with expected retry
 count `total/accepted`. The concrete signed-x elliptic-curve decoder is now
 bound to those hypotheses over Mathlib affine points, including the double-root
 half-acceptance rule and an explicit identity seed. Its full output is exactly
-uniform with expectation `(2|K|+1)/|E(K)|`; the constant bound awaits a pinned
-Hasse point-count theorem and executable square-root bit cost.
+uniform with expectation `(2|K|+1)/|E(K)|`. The arithmetic after Hasse is now
+checked: for `|K| >= 16`, the standard trace premises `t^2 <= 4|K|` and
+`|K|+1 <= |E(K)|+t` imply the sampler's four-trial inequality. Executable
+square-root cost is also checked for the common `|K| = 3 mod 4` case:
+repeated squaring uses at most twice the binary length of `|K|` field
+multiplications, and on elliptic short-form curves (`a1=a3=0`) the resulting
+root satisfies the sampler's nonsingular-root interface. A pinned Hasse theorem
+and general prime-field square roots remain open.
 The exact upstream-shaped `Ttop`/`Rint`/`nu`/`q` specialization is
 now checked locally; only integration into the external pinned tree remains.
 [pcc:unverified] See

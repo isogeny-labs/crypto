@@ -308,8 +308,13 @@ gives `affineFullSignedTrial`; every full curve point has fibre one, every
 conditioned pair event is exactly uniform, and the retry tail has expected
 length `(2|K|+1)/|E(K)|`. Thus the paper's factor-16 near-uniform loss is not
 needed for this sampler. The four-trial bound is reduced to the single explicit
-Hasse-form premise `2|K|+1 <= 4|E(K)|`; executable square-root bit cost remains
-separate. Claims `PCC-20261119-e93da3`, `PCC-20261119-2b8ae7`, and
+Hasse-form premise `2|K|+1 <= 4|E(K)|`. Lean now derives that premise, for
+`|K| >= 16`, from a trace deficit satisfying `t^2 <= 4|K|` and
+`|K|+1 <= |E(K)|+t`; the missing dependency is precisely the curve-specific
+Hasse theorem. For `|K| = 3 mod 4`, an executable binary-power square root is
+also checked: it uses at most `2 * Nat.size |K|` field multiplications, and on
+elliptic short-form curves (`a1=a3=0`) it supplies the nonsingular root required
+by the sampler. Claims `PCC-20261119-e93da3`, `PCC-20261119-2b8ae7`, and
 `PCC-20261119-e67bd2` pass their local Lean verifiers. [pcc:unverified]
 
 ## Corrections and remaining obligations

@@ -330,6 +330,28 @@ the exact eventual natural-power inequality required by
 | `affineFullSignedTrial_accepted_card` | law | same | finite field and affine curve | none |
 | `affineFullSignedTrialTailHasSum` | law | same | finite field and affine curve | none |
 | `affineFullSignedTrialExpectation_le_four` | law | same | finite field and affine curve | `2 * card K + 1 <= 4 * card W.Point` |
+| `hasseSquareImpliesHalfFieldTrace` | arithmetic bridge | same | natural field size and nonnegative trace deficit | field size at least 16 and `trace^2 <= 4 * fieldSize` |
+| `hasseTraceBoundGivesSamplerFour` | arithmetic bridge | same | natural field size, point count, and trace deficit | field size at least 16, `fieldSize + 1 <= pointCount + trace`, and `trace^2 <= 4 * fieldSize` |
+| `affineFullSignedTrialExpectation_le_four_of_hasseSquare` | endpoint | same | finite field, affine curve, and natural trace deficit | field size at least 16, `card K + 1 <= card W.Point + trace`, and `trace^2 <= 4 * card K` |
+| `threeModFourSqrt` | definition | same | finite field and field element | none |
+| `threeModFourSqrt_sq` | law | same | finite field, field element, and square witness | field cardinality is 3 modulo 4 |
+| `RingCounted.squareCached` | definition | same | counted scalar | none |
+| `RingCounted.mulCachedRight` | definition | same | counted scalar and available scalar | none |
+| `countedBinaryPow` | executable definition | same | monoid element and natural exponent | none |
+| `countedBinaryPow_zero` | law | same | same | none |
+| `countedBinaryPow_bit` | law | same | monoid element and a valid nonzero binary digit | none |
+| `countedBinaryPow_value` | law | same | same | none |
+| `countedBinaryPow_ops_le` | cost bound | same | same | none; at most twice the binary length |
+| `countedThreeModFourSqrt` | executable definition | same | finite field and field element | none |
+| `countedThreeModFourSqrt_value` | law | same | same | none |
+| `countedThreeModFourSqrt_ops_le` | cost bound | same | same | none; at most twice the binary length of `(|K|+1)/4` |
+| `countedThreeModFourSqrt_ops_le_fieldSize` | cost bound | same | finite field and field element | field cardinality is 3 modulo 4; at most twice the binary length of `|K|` |
+| `countedThreeModFourSqrtBitWork` | definition | same | finite field, field element, and supplied scalar multiplication bit cost | none |
+| `countedThreeModFourSqrtBitWork_le` | cost bound | same | same plus modulus-bit proxy and polynomial scalar-cost parameters | field cardinality is 3 modulo 4 and the supplied scalar multiplication cost obeys the displayed polynomial bound |
+| `countedThreeModFourSqrt_sq` | law | same | finite field, field element, and square witness | field cardinality is 3 modulo 4 |
+| `shortCurveRhs` | definition | same | affine Weierstrass curve and x-coordinate | none |
+| `shortThreeModFourRoot` | executable definition | same | finite-field affine curve and x-coordinate | none |
+| `shortThreeModFourRoot_spec` | law | same | elliptic affine curve, x-coordinate, and supplied nonsingular point | field cardinality is 3 modulo 4 and curve coefficients `a1 = a3 = 0` |
 
 The identity-inclusive adapter adds exactly `lower` seeds mapping to the
 distinguished identity.  Its total-size theorem derives the original
@@ -368,7 +390,12 @@ count is exactly `card W.Point`, its seed count is `2 * card K + 1`, and every
 conditioned full-curve pair event is uniform with no distortion loss.  The
 exact retry expectation is `(2 * card K + 1) / card W.Point`; a Hasse-derived
 cardinality inequality is the sole remaining premise for the checked
-four-trial corollary. [pcc:unverified]
+four-trial corollary.  The next arithmetic bridge derives that inequality
+from the usual squared Hasse trace bound once the field has at least 16
+elements.  The pinned dependency tree supplies the point-count definition but
+not the Hasse theorem itself, so connecting a concrete curve to the bridge
+remains an explicit theorem-level obligation rather than an implicit sampler
+assumption. [pcc:unverified]
 
 ## Dense cubic row-cost exponent
 

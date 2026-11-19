@@ -967,3 +967,31 @@ Mathlib supplies no Hasse point-count theorem in this pinned tree, and an
 executable square-root bit-cost theorem remains external. Claims
 `PCC-20261119-e93da3`, `PCC-20261119-2b8ae7`, and `PCC-20261119-e67bd2` pass
 their local Lean verifiers. [pcc:unverified]
+
+## 2026-11-19 Hasse arithmetic and executable three-mod-four roots
+
+The sampler's remaining cardinality premise is now separated from the missing
+geometric theorem. `hasseSquareImpliesHalfFieldTrace` proves that, for
+`q >= 16`, `t^2 <= 4q` implies `2t <= q`.
+`hasseTraceBoundGivesSamplerFour` then combines this with
+`q+1 <= #E+t` to obtain `2q+1 <= 4#E`, and the curve-level endpoint composes
+that inequality with the exact retry theorem. The pinned dependency audit
+found point-count definitions but no Hasse bound, so the curve-specific Hasse
+input remains explicit. [pcc:unverified]
+
+For fields with `q % 4 = 3`, `threeModFourSqrt` computes
+`a^((q+1)/4)`. Lean proves this squares to every supplied quadratic residue.
+The independently defined `countedBinaryPow` erases to ordinary exponentiation
+and uses at most two field multiplications per exponent bit; consequently the
+root uses at most `2 * Nat.size q` multiplications. Its conditional bit-work
+theorem charges only a supplied polynomial cost for one field multiplication.
+On elliptic short-form curves with `a1=a3=0`,
+`shortThreeModFourRoot_spec` proves the computed root satisfies the exact
+nonsingular-root interface used by the sampler. General prime-field square
+roots remain separate. [pcc:unverified]
+
+The pinned project builds 2,335 jobs. The repository proof gate reports
+`PASS 160 thm 0 trusted`; explicit axiom audits of the Hasse bridge, binary
+power, square-root cost, and short-curve root laws contain only `propext`,
+`Classical.choice`, and `Quot.sound`. A fresh independent checker replay exits
+0. [pcc:unverified]

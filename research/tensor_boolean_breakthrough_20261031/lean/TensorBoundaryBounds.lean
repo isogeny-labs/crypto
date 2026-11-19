@@ -6,6 +6,8 @@ import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.LinearAlgebra.Matrix.Determinant.Bird.Correctness
 import Mathlib.Data.Matrix.ColumnRowPartitioned
 import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
+import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.Data.Nat.Size
 
 /-!
 # Exact separator-message bounds
@@ -964,6 +966,95 @@ theorem affineFullSignedTrialExpectation_le_four
   exact rejectionTrialExpectation_le (2 * Fintype.card K + 1)
     (Fintype.card W.Point) 4 Fintype.card_pos hasseForm
 
+/-- For a field-size proxy at least 16, the squared Hasse trace bound already
+forces the trace deficit to be at most half the field size. -/
+theorem hasseSquareImpliesHalfFieldTrace
+    (fieldSize trace : ℕ) (fieldLarge : 16 ≤ fieldSize)
+    (hasseSquare : trace ^ 2 ≤ 4 * fieldSize) :
+    2 * trace ≤ fieldSize := by
+  by_contra traceTooLarge
+  have nextField_le_twiceTrace : fieldSize + 1 ≤ 2 * trace := by omega
+  have squareGrowth : (fieldSize + 1) ^ 2 ≤ (2 * trace) ^ 2 :=
+    Nat.pow_le_pow_left nextField_le_twiceTrace 2
+  nlinarith
+
+/-- The standard point-count relation and squared Hasse trace bound imply the
+exact cardinality inequality required by the full signed-x sampler. -/
+theorem hasseTraceBoundGivesSamplerFour
+    (fieldSize pointCount trace : ℕ) (fieldLarge : 16 ≤ fieldSize)
+    (pointTrace : fieldSize + 1 ≤ pointCount + trace)
+    (hasseSquare : trace ^ 2 ≤ 4 * fieldSize) :
+    2 * fieldSize + 1 ≤ 4 * pointCount := by
+  have traceHalf : 2 * trace ≤ fieldSize :=
+    hasseSquareImpliesHalfFieldTrace fieldSize trace fieldLarge hasseSquare
+  omega
+
+/-- Curve-level composition of the Hasse arithmetic bridge with the exact
+full-curve rejection-sampler expectation theorem. -/
+theorem affineFullSignedTrialExpectation_le_four_of_hasseSquare
+    {K : Type*} [Field K] [Fintype K]
+    (W : WeierstrassCurve.Affine K) (trace : ℕ)
+    (fieldLarge : 16 ≤ Fintype.card K)
+    (pointTrace : Fintype.card K + 1 ≤ Fintype.card W.Point + trace)
+    (hasseSquare : trace ^ 2 ≤ 4 * Fintype.card K) :
+    (2 * Fintype.card K + 1 : ℕ) / (Fintype.card W.Point : ℝ) ≤ 4 := by
+  apply affineFullSignedTrialExpectation_le_four W
+  exact hasseTraceBoundGivesSamplerFour (Fintype.card K)
+    (Fintype.card W.Point) trace fieldLarge pointTrace hasseSquare
+
+/-- For finite fields of cardinality three modulo four, exponentiation by
+`(|K|+1)/4` is an executable square-root candidate. -/
+def threeModFourSqrt
+    {K : Type*} [Field K] [Fintype K] (a : K) : K :=
+  a ^ ((Fintype.card K + 1) / 4)
+
+/-- The three-mod-four exponentiation candidate squares to every supplied
+quadratic residue, including zero. -/
+theorem threeModFourSqrt_sq
+    {K : Type*} [Field K] [Fintype K]
+    (cardModFour : Fintype.card K % 4 = 3)
+    {a : K} (isSquare : ∃ y : K, y ^ 2 = a) :
+    threeModFourSqrt a ^ 2 = a := by
+  rcases isSquare with ⟨y, rfl⟩
+  have exponentIdentity :
+      4 * ((Fintype.card K + 1) / 4) = Fintype.card K + 1 := by
+    omega
+  rw [threeModFourSqrt, ← pow_mul, ← pow_mul]
+  rw [show 2 * (((Fintype.card K + 1) / 4) * 2) =
+      Fintype.card K + 1 by omega]
+  rw [pow_succ, FiniteField.pow_card]
+  simp [pow_two]
+
+/-- The right-hand side of a short-form Weierstrass equation. -/
+def shortCurveRhs
+    {K : Type*} [Field K] (W : WeierstrassCurve.Affine K) (x : K) : K :=
+  x ^ 3 + W.a₂ * x ^ 2 + W.a₄ * x + W.a₆
+
+/-- Executable y-root candidate for short-form curves over fields of cardinality
+three modulo four. -/
+def shortThreeModFourRoot
+    {K : Type*} [Field K] [Fintype K]
+    (W : WeierstrassCurve.Affine K) (x : K) : K :=
+  threeModFourSqrt (shortCurveRhs W x)
+
+/-- On an elliptic short-form curve, the executable three-mod-four candidate
+is nonsingular whenever any y-coordinate above the same x is nonsingular. -/
+theorem shortThreeModFourRoot_spec
+    {K : Type*} [Field K] [Fintype K]
+    (W : WeierstrassCurve.Affine K) [W.IsElliptic]
+    (a₁_zero : W.a₁ = 0) (a₃_zero : W.a₃ = 0)
+    (cardModFour : Fintype.card K % 4 = 3)
+    {x y : K} (hy : W.Nonsingular x y) :
+    W.Nonsingular x (shortThreeModFourRoot W x) := by
+  have rhsIsSquare : ∃ root : K, root ^ 2 = shortCurveRhs W x := by
+    refine ⟨y, ?_⟩
+    have equation := (W.equation_iff x y).mp hy.1
+    simpa [shortCurveRhs, a₁_zero, a₃_zero] using equation
+  apply W.equation_iff_nonsingular.mp
+  apply (W.equation_iff x (shortThreeModFourRoot W x)).mpr
+  have rootSquare := threeModFourSqrt_sq cardModFour rhsIsSquare
+  simpa [shortThreeModFourRoot, shortCurveRhs, a₁_zero, a₃_zero] using rootSquare
+
 /-! ## Dense fixed-arity elimination exponent -/
 
 /-- If the dense relation dimension is at most `3X` and `X^m ≤ p`, its cubic
@@ -1203,6 +1294,121 @@ def RingCounted.mul [Mul R] (x y : RingCounted R) : RingCounted R :=
 /-- Count one scalar negation. -/
 def RingCounted.neg [Neg R] (x : RingCounted R) : RingCounted R :=
   ⟨-x.value, x.ops + 1⟩
+
+/-- Square an already computed scalar, charging only the new multiplication. -/
+def RingCounted.squareCached [Mul R] (x : RingCounted R) : RingCounted R :=
+  ⟨x.value * x.value, x.ops + 1⟩
+
+/-- Multiply an already computed scalar by an available scalar, charging only
+the new multiplication. -/
+def RingCounted.mulCachedRight [Mul R]
+    (x : RingCounted R) (y : R) : RingCounted R :=
+  ⟨x.value * y, x.ops + 1⟩
+
+/-- Executable right-to-left binary exponentiation with its scalar
+multiplications counted. -/
+def countedBinaryPow {R : Type*} [Monoid R]
+    (a : R) : ℕ → RingCounted R :=
+  Nat.binaryRec' (RingCounted.lift 1) fun bit _ _ previous =>
+    let squared := RingCounted.squareCached previous
+    if bit then RingCounted.mulCachedRight squared a else squared
+
+@[simp] theorem countedBinaryPow_zero
+    {R : Type*} [Monoid R] (a : R) :
+    countedBinaryPow a 0 = RingCounted.lift 1 := by
+  simp [countedBinaryPow]
+
+theorem countedBinaryPow_bit
+    {R : Type*} [Monoid R] (a : R) (bit : Bool) (exponent : ℕ)
+    (nonzero : exponent = 0 → bit = true) :
+    countedBinaryPow a (Nat.bit bit exponent) =
+      let squared := RingCounted.squareCached (countedBinaryPow a exponent)
+      if bit then RingCounted.mulCachedRight squared a else squared := by
+  rw [countedBinaryPow, Nat.binaryRec'_eq _ _ nonzero]
+  change (let squared := RingCounted.squareCached (countedBinaryPow a exponent)
+    if bit then RingCounted.mulCachedRight squared a else squared) = _
+  rfl
+
+/-- Erasing the multiplication counter from binary exponentiation gives the
+ordinary monoid power. -/
+theorem countedBinaryPow_value
+    {R : Type*} [Monoid R] (a : R) (exponent : ℕ) :
+    (countedBinaryPow a exponent).value = a ^ exponent := by
+  induction exponent using Nat.binaryRec' with
+  | zero => simp [RingCounted.lift]
+  | bit bit exponent nonzero ih =>
+      rw [countedBinaryPow_bit a bit exponent nonzero]
+      cases bit <;>
+        simp [RingCounted.squareCached, RingCounted.mulCachedRight, ih,
+          ← pow_add, two_mul, pow_succ]
+
+/-- Binary exponentiation uses at most two multiplications per exponent bit. -/
+theorem countedBinaryPow_ops_le
+    {R : Type*} [Monoid R] (a : R) (exponent : ℕ) :
+    (countedBinaryPow a exponent).ops ≤ 2 * Nat.size exponent := by
+  induction exponent using Nat.binaryRec' with
+  | zero => simp [countedBinaryPow, RingCounted.lift, Nat.size_zero]
+  | bit bit exponent nonzero ih =>
+      have bitNonzero : Nat.bit bit exponent ≠ 0 :=
+        Nat.bit_ne_zero_iff.mpr nonzero
+      rw [countedBinaryPow_bit a bit exponent nonzero,
+        Nat.size_bit bitNonzero]
+      cases bit <;>
+        simp [RingCounted.squareCached, RingCounted.mulCachedRight] <;> omega
+
+/-- Counted repeated-squaring implementation of the three-mod-four square-root
+candidate. -/
+def countedThreeModFourSqrt
+    {K : Type*} [Field K] [Fintype K] (a : K) : RingCounted K :=
+  countedBinaryPow a ((Fintype.card K + 1) / 4)
+
+theorem countedThreeModFourSqrt_value
+    {K : Type*} [Field K] [Fintype K] (a : K) :
+    (countedThreeModFourSqrt a).value = threeModFourSqrt a := by
+  exact countedBinaryPow_value a _
+
+theorem countedThreeModFourSqrt_ops_le
+    {K : Type*} [Field K] [Fintype K] (a : K) :
+    (countedThreeModFourSqrt a).ops ≤
+      2 * Nat.size ((Fintype.card K + 1) / 4) := by
+  exact countedBinaryPow_ops_le a _
+
+theorem countedThreeModFourSqrt_ops_le_fieldSize
+    {K : Type*} [Field K] [Fintype K] (a : K)
+    (cardModFour : Fintype.card K % 4 = 3) :
+    (countedThreeModFourSqrt a).ops ≤ 2 * Nat.size (Fintype.card K) := by
+  apply (countedThreeModFourSqrt_ops_le a).trans
+  apply Nat.mul_le_mul_left 2
+  apply Nat.size_le_size
+  omega
+
+/-- Abstract bit work for the counted three-mod-four square root. -/
+def countedThreeModFourSqrtBitWork
+    {K : Type*} [Field K] [Fintype K]
+    (a : K) (scalarMulBitCost : ℕ) : ℕ :=
+  (countedThreeModFourSqrt a).ops * scalarMulBitCost
+
+/-- Conditional bit-work bound for the executable three-mod-four square root.
+The only external arithmetic premise is the supplied scalar multiplication
+cost; the number of multiplications is checked above. -/
+theorem countedThreeModFourSqrtBitWork_le
+    {K : Type*} [Field K] [Fintype K]
+    (a : K) (modulusBits scalarMulBitCost constant degree : ℕ)
+    (cardModFour : Fintype.card K % 4 = 3)
+    (hMul : scalarMulBitCost ≤ constant * (modulusBits + 1) ^ degree) :
+    countedThreeModFourSqrtBitWork a scalarMulBitCost ≤
+      (2 * Nat.size (Fintype.card K)) *
+        (constant * (modulusBits + 1) ^ degree) := by
+  exact Nat.mul_le_mul (countedThreeModFourSqrt_ops_le_fieldSize a cardModFour)
+    hMul
+
+theorem countedThreeModFourSqrt_sq
+    {K : Type*} [Field K] [Fintype K]
+    (cardModFour : Fintype.card K % 4 = 3)
+    {a : K} (isSquare : ∃ y : K, y ^ 2 = a) :
+    (countedThreeModFourSqrt a).value ^ 2 = a := by
+  rw [countedThreeModFourSqrt_value]
+  exact threeModFourSqrt_sq cardModFour isSquare
 
 /-- Instrumented version of Bird's suffix sum. -/
 def countedBirdSumFrom
