@@ -728,7 +728,7 @@ impl Producer<'_> {
         Ok(acc)
     }
     fn quadratic_split_factor(&mut self, h: &Poly17, delta: u64) -> Result<Option<Poly17>> {
-        if h.len != 3 || self.p & 3 != 3 || h.coefficients[2] != 1 {
+        if h.len != 3 || (self.p & 3 != 3 && self.p & 7 != 5 && self.p != 1_000_000_009) || h.coefficients[2] != 1 {
             return Ok(None);
         }
         let b = h.coefficients[1];
@@ -740,7 +740,47 @@ impl Producer<'_> {
         if discriminant == 0 {
             return Ok(None);
         }
-        let sqrt_d = self.split_scalar_pow(discriminant, (self.p + 1) / 4)?;
+        // R47_SQRT_PRODUCER_BEGIN
+        // For p = 5 mod 8, Atkin's square root avoids polynomial factoring.
+        // For p = 1e9+9, v2(p-1)=3; 11 is a fixed quadratic nonresidue.
+        // All candidates are checked before use; unsupported cases fall back.
+        let sqrt_d = if self.p & 3 == 3 {
+            self.split_scalar_pow(discriminant, (self.p + 1) / 4)?
+        } else if self.p & 7 == 5 {
+            let candidate = self.split_scalar_pow(discriminant, (self.p + 3) / 8)?;
+            if self.mul(candidate, candidate)? == discriminant {
+                candidate
+            } else {
+                let sqrt_minus_one = self.split_scalar_pow(2, (self.p - 1) / 4)?;
+                self.mul(candidate, sqrt_minus_one)?
+            }
+        } else {
+            debug_assert_eq!(self.p, 1_000_000_009);
+            let q = (self.p - 1) / 8;
+            let mut c = self.split_scalar_pow(11, q)?;
+            let mut t = self.split_scalar_pow(discriminant, q)?;
+            let mut r = self.split_scalar_pow(discriminant, (q + 1) / 2)?;
+            let mut m = 3usize;
+            while t != 1 {
+                let mut v = t;
+                let mut i = 0usize;
+                while v != 1 && i < m {
+                    v = self.mul(v, v)?;
+                    i += 1;
+                }
+                if i == m { return Ok(None); }
+                let mut b = c;
+                for _ in 1..(m - i) {
+                    b = self.mul(b, b)?;
+                }
+                r = self.mul(r, b)?;
+                c = self.mul(b, b)?;
+                t = self.mul(t, c)?;
+                m = i;
+            }
+            r
+        };
+        // R47_SQRT_PRODUCER_END
         if self.mul(sqrt_d, sqrt_d)? != discriminant {
             return Ok(None);
         }
@@ -1479,7 +1519,7 @@ impl Replay {
         Ok(acc)
     }
     fn replay_quadratic_split(&mut self, f: Poly17, delta: u64) -> Result<Option<Poly17>> {
-        if f.len != 3 || self.p % 4 != 3 || f.coefficients[2] != 1 {
+        if f.len != 3 || (self.p % 4 != 3 && self.p % 8 != 5 && self.p != 1_000_000_009) || f.coefficients[2] != 1 {
             return Ok(None);
         }
         let b = f.coefficients[1];
@@ -1491,7 +1531,46 @@ impl Replay {
         if discriminant == 0 {
             return Ok(None);
         }
-        let sqrt = self.split_character_power(discriminant, (self.p + 1) / 4)?;
+        // R47_SQRT_REPLAY_BEGIN
+        // Independent verifier: left-to-right scalar powers and a separately
+        // structured Tonelli-Shanks loop. Validate the candidate by squaring.
+        let sqrt = if self.p % 4 == 3 {
+            self.split_character_power(discriminant, (self.p + 1) / 4)?
+        } else if self.p % 8 == 5 {
+            let mut value = self.split_character_power(discriminant, (self.p + 3) / 8)?;
+            if self.times(value, value)? != discriminant {
+                let correction = self.split_character_power(2, (self.p - 1) / 4)?;
+                value = self.times(value, correction)?;
+            }
+            value
+        } else {
+            debug_assert_eq!(self.p, 1_000_000_009);
+            let odd = (self.p - 1) >> 3;
+            let mut root = self.split_character_power(discriminant, (odd + 1) / 2)?;
+            let mut residue = self.split_character_power(discriminant, odd)?;
+            let mut nonresidue = self.split_character_power(11, odd)?;
+            let mut order = 3u32;
+            while residue != 1 {
+                let mut order_test = residue;
+                let mut count = 0u32;
+                while order_test != 1 && count < order {
+                    order_test = self.times(order_test, order_test)?;
+                    count += 1;
+                }
+                if count == order { return Ok(None); }
+                let mut multiplier = nonresidue;
+                for _ in 0..order - count - 1 {
+                    multiplier = self.times(multiplier, multiplier)?;
+                }
+                root = self.times(root, multiplier)?;
+                let multiplier_sq = self.times(multiplier, multiplier)?;
+                residue = self.times(residue, multiplier_sq)?;
+                nonresidue = multiplier_sq;
+                order = count;
+            }
+            root
+        };
+        // R47_SQRT_REPLAY_END
         if self.times(sqrt, sqrt)? != discriminant {
             return Ok(None);
         }
@@ -1973,6 +2052,26 @@ mod tests {
         }
     }
 
+    #[test]
+    fn round47_quadratic_sqrt_congruence_classes_and_replay() {
+        for p in [1_000_000_009u64, 1_000_000_021, 1_000_000_007] {
+            for (r0, r1) in [(2u64, 7u64), (17, 31), (0, 1), (31, 997)] {
+                let mut expected = [r0, r1];
+                expected.sort_unstable();
+                for leading in [1, p - 2] {
+                    let f = polynomial(&expected, p, leading);
+                    let (report, events) = run(&f, p, budget());
+                    assert_eq!(report.stop, Stop::Complete,
+                        "p={p} roots={expected:?} stop={:?}", report.stop);
+                    assert_eq!(&report.roots[..usize::from(report.root_count)], &expected);
+                    assert!(check(&f, &report, &events).unwrap().finite_complete);
+                    assert!(events.iter().any(|event|
+                        matches!(event.kind, EventKind::Split { .. })),
+                        "expected split event for p={p}");
+                }
+            }
+        }
+    }
     #[test]
     fn bounded_prime_roots_exhaustive_quadratics_and_degeneracies() {
         for a in 0..7 {
