@@ -287,3 +287,7 @@ fn paired_native_complete_composite_jacobian_ic_vs_direct_bsgs() {
 // CT229 lives as a child module to reuse these exact validated native helpers.
 #[path = "ct229_impl/probe.rs"]
 mod ct229;
+
+// CT231 stays in its own module while reusing all of CT226's native helpers.
+#[path = "ct231_impl/probe.rs"]
+mod ct231;
