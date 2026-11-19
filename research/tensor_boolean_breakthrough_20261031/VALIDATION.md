@@ -915,3 +915,17 @@ with 2,189 jobs; the proof gate reports `PASS 103 thm 0 trusted`, the seven
 audited public laws use only standard Lean axioms, and the fresh checker exits
 0. Claim `PCC-20261119-af7e06` passes its local Lean verifier. Memory allocation
 and indexing remain outside the model. [pcc:unverified]
+
+## 2026-11-19 identity-inclusive sampler adapter
+
+`identityInclusiveWeight` adds exactly `lower` seeds mapping to a distinguished
+identity. From a `lower` fibre floor on every nonidentity output and a base
+total bounded by `distortion * (|Output|-1) * lower`, Lean proves a global
+fibre floor and total at most `distortion * |Output| * lower`. The composed
+endpoint then applies the existing squared-distortion pair-event transfer.
+[pcc:unverified]
+
+The pinned build completed with 2,189 jobs; the proof gate reports
+`PASS 108 thm 0 trusted`, the four audited laws use only standard Lean axioms,
+and the fresh checker exits 0. The concrete affine fibre counts remain an
+external curve-specific premise. [pcc:unverified]

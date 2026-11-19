@@ -292,6 +292,19 @@ the exact eventual natural-power inequality required by
 |---|---|---|---|---|
 | `weightedPairEventLower` | law | `TensorBoundaryBounds`; upstream candidate for `crypto-lean` | finite output type, natural weights and pair event | common pointwise fibre floor |
 | `nearUniformPairEventTransfer` | endpoint | same | same plus total seed count and distortion | total no larger than distortion times uniform baseline |
+| `identityInclusiveWeight` | definition | same | finite output type with distinguished identity, base weights, and branch mass | none |
+| `identityInclusiveWeight_floor` | law | same | same | base fibre floor away from the identity |
+| `identityInclusiveWeight_total` | law | same | same | none |
+| `identityInclusiveTotalUpper` | law | same | same plus distortion | positive distortion and base total bounded by `distortion * (card - 1) * lower` |
+| `identityInclusiveNearUniformPairEventTransfer` | endpoint | same | same plus pair event | positive distortion, nonidentity fibre floor, and the base total bound |
+
+The identity-inclusive adapter adds exactly `lower` seeds mapping to the
+distinguished identity.  Its total-size theorem derives the original
+near-uniform interface from a base sampler supported on the other
+`card-1` outputs, and the endpoint applies `nearUniformPairEventTransfer`
+without requiring the base sampler itself to hit the identity.  Instantiating
+the base weights and their bounds with the paper's concrete affine encoding
+remains a curve-specific obligation.
 
 ## Dense cubic row-cost exponent
 

@@ -283,9 +283,13 @@ total^2 * goodPairs <= distortion^2 * |G|^2 * weightedGoodPairs.
 Claims `PCC-20261119-da3506` and `PCC-20261119-a2fecb` pass their local Lean
 verifiers and retain unverified signed standing. The project proof gate reports
 36 theorems and zero trusted declarations, and a fresh checker replay exits 0.
-The remaining sampler obligation is concrete: the paper's affine sampler omits
-the identity, so it must either expose an identity fibre or add an explicit
-identity branch before the checked transfer applies. [pcc:unverified]
+The identity omission is now repaired generically. `identityInclusiveWeight`
+adds exactly `lower` seeds for the identity; Lean proves a global fibre floor,
+the exact new total, preservation of the same distortion constant from a base
+bound on the `|G|-1` nonidentity outputs, and the resulting pair-event
+transfer. The remaining sampler obligation is only to instantiate the base
+weights and their fibre/total bounds with the paper's concrete affine encoding.
+[pcc:unverified]
 
 ## Corrections and remaining obligations
 

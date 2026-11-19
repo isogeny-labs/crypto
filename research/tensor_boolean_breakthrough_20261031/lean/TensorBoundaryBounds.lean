@@ -445,6 +445,89 @@ theorem nearUniformPairEventTransfer
           if good pair then weight pair.1 * weight pair.2 else 0) :=
       Nat.mul_le_mul_left _ pairLower
 
+/-- Add an explicit seed branch of mass `lower` for a distinguished identity
+output to a sampler that may otherwise omit it. -/
+def identityInclusiveWeight
+    {Output : Type*} [DecidableEq Output]
+    (identity : Output) (lower : ℕ) (weight : Output → ℕ) : Output → ℕ :=
+  fun output => weight output + if output = identity then lower else 0
+
+/-- The explicit identity branch extends a nonidentity fibre floor to every
+output. -/
+theorem identityInclusiveWeight_floor
+    {Output : Type*} [DecidableEq Output]
+    (identity : Output) (lower : ℕ) (weight : Output → ℕ)
+    (nonidentityFloor : ∀ output, output ≠ identity → lower ≤ weight output) :
+    ∀ output, lower ≤ identityInclusiveWeight identity lower weight output := by
+  intro output
+  by_cases h : output = identity
+  · simp [identityInclusiveWeight, h]
+  · simpa [identityInclusiveWeight, h] using nonidentityFloor output h
+
+/-- The identity-inclusive sampler has exactly `lower` more seeds than its
+base sampler. -/
+theorem identityInclusiveWeight_total
+    {Output : Type*} [Fintype Output] [DecidableEq Output]
+    (identity : Output) (lower : ℕ) (weight : Output → ℕ) :
+    (∑ output, identityInclusiveWeight identity lower weight output) =
+      (∑ output, weight output) + lower := by
+  simp [identityInclusiveWeight, Finset.sum_add_distrib]
+
+/-- A distortion bound for a sampler on the nonidentity outputs extends to
+the identity-inclusive sampler. -/
+theorem identityInclusiveTotalUpper
+    {Output : Type*} [Fintype Output] [DecidableEq Output]
+    (identity : Output) (lower distortion : ℕ) (weight : Output → ℕ)
+    (distortionPositive : 0 < distortion)
+    (baseTotalUpper :
+      (∑ output, weight output) ≤
+        distortion * (Fintype.card Output - 1) * lower) :
+    (∑ output, identityInclusiveWeight identity lower weight output) ≤
+      distortion * Fintype.card Output * lower := by
+  rw [identityInclusiveWeight_total]
+  have hlower : lower ≤ distortion * lower := by
+    calc
+      lower = 1 * lower := by simp
+      _ ≤ distortion * lower := Nat.mul_le_mul_right lower distortionPositive
+  calc
+    (∑ output, weight output) + lower ≤
+        distortion * (Fintype.card Output - 1) * lower + lower :=
+      Nat.add_le_add_right baseTotalUpper lower
+    _ ≤ distortion * (Fintype.card Output - 1) * lower +
+        distortion * lower := Nat.add_le_add_left hlower _
+    _ = distortion * ((Fintype.card Output - 1) + 1) * lower := by ring
+    _ = distortion * Fintype.card Output * lower := by
+      have hcard : 0 < Fintype.card Output := Fintype.card_pos_iff.mpr ⟨identity⟩
+      congr 2
+      omega
+
+/-- Exact pair-event transfer for an affine-style sampler after adding an
+explicit identity branch. -/
+theorem identityInclusiveNearUniformPairEventTransfer
+    {Output : Type*} [Fintype Output] [DecidableEq Output]
+    (identity : Output) (weight : Output → ℕ)
+    (good : Output × Output → Prop) [DecidablePred good]
+    (lower distortion : ℕ)
+    (distortionPositive : 0 < distortion)
+    (nonidentityFloor : ∀ output, output ≠ identity → lower ≤ weight output)
+    (baseTotalUpper :
+      (∑ output, weight output) ≤
+        distortion * (Fintype.card Output - 1) * lower) :
+    (∑ output, identityInclusiveWeight identity lower weight output) ^ 2 *
+        (Finset.univ.filter good).card ≤
+      distortion ^ 2 * Fintype.card Output ^ 2 *
+        (∑ pair : Output × Output,
+          if good pair then
+            identityInclusiveWeight identity lower weight pair.1 *
+              identityInclusiveWeight identity lower weight pair.2
+          else 0) := by
+  exact nearUniformPairEventTransfer
+    (identityInclusiveWeight identity lower weight) good lower distortion
+    (∑ output, identityInclusiveWeight identity lower weight output)
+    (identityInclusiveWeight_floor identity lower weight nonidentityFloor)
+    (identityInclusiveTotalUpper identity lower distortion weight
+      distortionPositive baseTotalUpper)
+
 /-! ## Dense fixed-arity elimination exponent -/
 
 /-- If the dense relation dimension is at most `3X` and `X^m ≤ p`, its cubic
