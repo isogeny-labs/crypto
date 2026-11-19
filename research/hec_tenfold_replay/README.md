@@ -66,3 +66,20 @@ Six genus-2 misses occurred at field prime 127 (cases 13, 14, 17, 19, 25 and 31)
 Use `HEC_PAIR_SEED=2026111906 ./replay.sh g2 forward` for the four-arm genus-2 comparison. Select arm 2 at prime 127 and arm 3 elsewhere. For genus 3 or 4 use `HEC_PAIR_SEED=2026111906 HEC_PAIRS=8 ./replay.sh g3 forward` (substitute `g4` for genus 4), then repeat in reverse order. The defaults preserve the registered generator seeds and case counts for those two genera.
 
 The field-rule table stores seed, timing order, prime, case, four arm medians in nanoseconds, and the median of paired reference/candidate ratios. The medians use eight repetitions. The compressed genus-2 timing log covers seed 2026111906 in reverse order. The other three genus-2 processes retain case summaries. The fresh genus-3 and genus-4 tables store timing order, prime, case, and median paired ratio over 32 repetitions. The compressed logs retain all timed rows for both orders in those genera.
+
+### Direct two-place relations in genus 2
+
+A translated divisor with split quadratic support gives a relation immediately when both points belong to the retained factor base. Repeated roots contribute with multiplicity two. In the finite subgroup check, every split decomposition was recomposed with Cantor arithmetic, and every recovered scalar was checked against its input. Over 8,192 pairs per field, adding these rows to the signed triples cut probes to the first certificate from 163,851 to 154,700 at p = 127 and from 167,787 to 162,663 at p = 257. All cases finished within 96 probes. Allowing two distinct outside points reduced the totals further to 153,083 and 162,170, while increasing the number of rows processed. Choosing the translate sequence from early rank gains took more probes than fixed alternating doublings at both primes.
+
+The native experiment used seed 2026111907 and 32 pairs per field. Each entry below is the median across cases of the median of eight paired elapsed-time ratios. Ratios above one favor the solver with direct rows. The incremental comparison uses identical alternating doublings and changes only direct-row collection.
+
+| Field prime | Incremental, forward | Incremental, reverse | Pencil / direct, forward | Pencil / direct, reverse |
+|---:|---:|---:|---:|---:|
+| 127 | 1.022× | 0.987× | 17.32× | 17.34× |
+| 257 | 1.018× | 0.979× | 15.49× | 15.21× |
+| 1021 | 0.998× | 0.960× | 18.86× | 19.21× |
+| 4093 | 1.035× | 0.949× | 18.52× | 18.21× |
+
+The direct-row arm cleared 10× against the pencil on 126 of 128 cases in both orders. Its incremental wall-time benefit did not reproduce across orders, so the existing solver remains the default.
+
+Run `c++ -std=c++17 -O3 -DHEC_RELATION_ABLATIONS certificates.cpp -o /tmp/hec-relations && /tmp/hec-relations` here to reproduce `results/relation-ablations.txt`. For each field the first four lines beginning with `first` cover Fibonacci, alternating doublings, interleaving, and rank feedback. The next four cover triples alone and triples plus split pairs allowing zero, one, or two outside columns. Each line reports prime, arm, total probes, rows, elimination updates, censored cases, median, 95th percentile, maximum, and counts earlier, tied, or later than the first arm in its group. Run `harness/direct-pairs.zsh` to rebuild and time the native comparison. Both original process logs and their correctness audits are checked into `results/direct-pairs-*`.

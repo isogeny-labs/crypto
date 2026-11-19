@@ -225,6 +225,10 @@ void count(int p, int c, int order, int *d, int limit) {
     used += freq[k] > 0;
     missed_classes += freq[k] > orig[k];
   }
+#ifdef HEC_RELATION_ABLATIONS
+#include "harness/feedback.inc"
+#include "harness/direct-pairs.inc"
+#else
   if (n == limit) {
     struct Row {
       Triple terms;
@@ -493,6 +497,7 @@ void count(int p, int c, int order, int *d, int limit) {
                   s.stop[7782], s.stop.back(), wins, ties, loss);
     }
   }
+#endif
   long long old = 0;
   for (int v : orig)
     old += v;
