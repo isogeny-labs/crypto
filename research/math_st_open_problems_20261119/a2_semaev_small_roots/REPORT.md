@@ -213,6 +213,6 @@ extraction code passes control (2'), and the S_3 control (2) passes in all
   the control cells, verdict inputs and the stop rule.
 - `results/controls.json`: controls (1) and (2').
 - `results.log`: console log of all runs.
-- `success_vs_alpha.svg` and `.png`, drawn by `plot_results.py` (plots
+- `success_vs_alpha.svg` (and an untracked `.png` render), drawn by `plot_results.py` (plots
   recorded numbers only).
 - `REPORT.pdf`, rendered by `render_report.sh`.
