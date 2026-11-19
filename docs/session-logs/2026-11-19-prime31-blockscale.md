@@ -37,3 +37,21 @@
 ### Errors (what went wrong, how it was handled)
 - Found two nested mutable borrow expressions while reviewing Rust code; corrected them in commit `995b373b` before workflow launch.
 - No local Rust compiler in automation container; all Rust compile and measurement claims require source-specific Actions evidence.
+
+## 2026-11-19T14:32Z — Exact-source original Rust CI PASS, raw and independent replay inspected
+### What was done (commands, files, features)
+- GitHub Actions **push #44543792457** and **PR #44543805506** both passed. Original pinned Rust 1.100.0 library tests 40/40, focused tests 4/4, 5-arm full data and independent Python affine replay of 20/20 signed witnesses; 512 Q point reconstruction; all 2,560 multiplicity row summaries verified.
+- Downloaded and inspected raw [GitHub artifact #14539671492](https://github.com/isogeny-labs/crypto/actions/runs/44543792457/artifacts/14539671492) with original full JSON, independent checker result and hashes. Original full JSON sha256 `681efda3b729f103cea62e82072989ef6032bf3ea9cfeaedc1f339b79c69431b`.
+- Observed public target relation hits: k4 **452/512**, k5 **440**, k6 **440**, k7 **444**, k8 **448**. Prespecified k4 versus k5 paired exclusives 64 vs 52; exact two-sided binomial test p~0.307. W1 shared four-slot EC support 65496; others 65536, invariant under all k scalings. Raw witness totals: 1052, 1063, 1026, 1027, 979.
+- Added source-linked machine summary `rr9/W8_BLOCK_SCALE_CI_SUMMARY_20261119.json`, report update `rr9/W8_BLOCK_SCALE_RESULT_20261119.md`, marked scoped task complete in `docs/ACTIVE.md`.
+
+### Decisions made (and why)
+- k=4 is the conservative candidate for #4692: highest observed yield with shortest x-only doubling-chain constraints. The observed paired yield difference is not significant on this one-curve cohort, and no higher-k advantage justifies extra chain depth.
+- Complete public-only nonenumerative index extraction, rank31/1024 unknown ECDLP solver, and matched faster-than-optimized-BSGS result are still unproved. This is a generic-only grader, not a real algorithmic solver speedup.
+
+### Open threads (unfinished, pick up next time)
+- Owner lane #4692: public-R-only B8 F4/remainder-tower with 46+/18− corpus and no generic half-table; same-runner fully charged optimized BSGS/rho vs final rank31/1024 solver.
+- Signed independent PCC or third-party replay beyond GitHub CI has not been completed.
+
+### Errors (what went wrong, how it was handled)
+- CI PASS; no Rust runtime or independent affine replay failures. Historical baseline #4532 is on a different runner and must never be used as a paired claim.
