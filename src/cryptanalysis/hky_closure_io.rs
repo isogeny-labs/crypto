@@ -157,7 +157,7 @@ pub fn fingerprint(
     h.update(ring.p.to_le_bytes());
     h.update((ring.n_free as u64).to_le_bytes());
     for r in &ring.rules {
-        h.update([r.next.map_or(255u8, |x| x)]);
+        h.update([r.next.unwrap_or(255u8)]);
         for x in [r.a, r.b, r.c, r.d] {
             h.update(x.to_le_bytes());
         }
@@ -203,7 +203,7 @@ pub fn fingerprint(
     // checkpoints keep their fingerprint)
     if o.skip {
         h.update(b"skip/v1");
-        h.update([o.skip_order, o.skip_witness as u8]);
+        h.update([o.skip_order, o.skip_witness]);
         h.update(o.skip_witness_max.to_le_bytes());
     }
     match &o.symmetry {
@@ -735,7 +735,7 @@ pub(super) fn try_resume(
         let np_cols = r.u32s(nnp);
         assert!(
             np_cols.windows(2).all(|w| w[0] < w[1])
-                && np_cols.last().map_or(true, |&c| (c as usize) < n),
+                && np_cols.last().is_none_or(|&c| (c as usize) < n),
             "hky_closure_io: bad epoch columns"
         );
         ech.push(Echelon::with_epoch(pivot, rows, np_cols));
@@ -819,19 +819,6 @@ fn sigma(mask: u64, perm: &[usize]) -> u64 {
     out
 }
 
-fn powm(mut a: u64, mut e: u64, p: u64) -> u64 {
-    let mut r = 1u64;
-    a %= p;
-    while e > 0 {
-        if e & 1 == 1 {
-            r = r * a % p;
-        }
-        a = a * a % p;
-        e >>= 1;
-    }
-    r
-}
-
 /// Sorted merge `a + s·b` of two sorted sparse vectors, times `scale`.
 fn merge(a: &[(u32, u64)], b: &[(u32, u64)], s_neg: bool, scale: u64, p: u64) -> Vec<(u32, u64)> {
     let mut out = Vec::with_capacity(a.len() + b.len());
@@ -874,7 +861,10 @@ pub(super) fn export_basis(
         "hky.basis/v1: free variables are not supported"
     );
     let n_vars = ring.n_tower() as u32;
-    assert!(n_vars % 2 == 0, "hky.basis/v1: m = 2 blocks expected");
+    assert!(
+        n_vars.is_multiple_of(2),
+        "hky.basis/v1: m = 2 blocks expected"
+    );
     let k = n_vars / 2;
     let split = space.split();
     let keys0 = &space.parts[0].keys;
@@ -998,7 +988,7 @@ pub(super) fn export_basis(
             emit(&mut w, fc as u32, &[]);
         }
     } else {
-        let inv2 = (p + 1) / 2;
+        let inv2 = p.div_ceil(2);
         // rows are read through `Echelon::row_full`: stored tails are in
         // epoch coordinates (engine-opt)
         let lift = |q: usize, ri: usize| -> Vec<(u32, u64)> {

@@ -336,8 +336,6 @@ pub(super) struct Witness {
     pub(super) pivot: Vec<u32>,
     pub(super) rows: Vec<Row>,
     pub(super) label: Vec<u16>,
-    /// Scratch: a dense accumulator over the part's columns (zero between calls).
-    acc: Vec<u64>,
 }
 
 impl Witness {
@@ -346,27 +344,13 @@ impl Witness {
             pivot: vec![NONE; n],
             rows: Vec::new(),
             label: Vec::new(),
-            acc: vec![0; n],
         }
-    }
-
-    /// Takes the accumulator's entries in `from..=hi` as a monic row (and
-    /// zeroes them).
-    fn gather(&mut self, from: usize, hi: usize, p: u64) -> Row {
-        let mut r: Row = Vec::new();
-        for j in from..=hi {
-            let x = std::mem::take(&mut self.acc[j]) % p;
-            if x != 0 {
-                r.push((j as u32, x as u32));
-            }
-        }
-        normalise(&mut r, p);
-        r
     }
 
     /// `v` minus rows of label ≤ `k`, reduced at its lead while the row
     /// there has label ≤ `k` (read-only: many in parallel before
-    /// [`Witness::insert`], which does the rest). The result stays in E_k.
+    /// the placement in [`Witness::insert_batch`], which does the rest). The
+    /// result stays in E_k.
     /// `acc` is a zeroed scratch of at least the part's columns (left zeroed).
     pub(super) fn prereduce(&self, v: &Row, k: u16, p: u64, acc: &mut [u64]) -> (Row, u64) {
         let mut ops = 0u64;
@@ -381,7 +365,7 @@ impl Witness {
         }
         let mut j = first as usize;
         loop {
-            while j <= hi && acc[j] % p == 0 {
+            while j <= hi && acc[j].is_multiple_of(p) {
                 acc[j] = 0;
                 j += 1;
             }
@@ -421,7 +405,9 @@ impl Witness {
     /// of smallest label (first among equals) is placed — at a free column,
     /// or in place of a row of larger label, which then goes on, minus the
     /// new row, with its own label; the others go to the next round.
-    /// Every placement keeps the invariant of [`Witness::insert`].
+    /// Every placement keeps the witness invariant (W) of PROOF.md §2.3: a
+    /// row placed at column ℓ with label k is a combination of inserted
+    /// vectors of label ≤ k with lead ℓ.
     fn insert_batch(
         &mut self,
         mut cands: Vec<(u16, Row)>,
@@ -490,92 +476,6 @@ impl Witness {
             }
         }
         (ops, rounds)
-    }
-
-    /// Inserts `v` (ascending columns, non-zero coefficients) with label
-    /// `k`; calls `set(column, label)` for every row placed. Every row placed
-    /// with label `k` is a combination of inserted vectors of label at most
-    /// `k` and has the column it is placed at as its leading column
-    /// (PROOF.md). Returns the multiply-adds.
-    pub(super) fn insert(
-        &mut self,
-        v: Row,
-        mut k: u16,
-        p: u64,
-        set: &mut impl FnMut(u32, u16),
-    ) -> u64 {
-        let mut ops = 0u64;
-        let Some(&(first, _)) = v.first() else {
-            return 0;
-        };
-        let mut hi = 0usize;
-        for &(j, x) in &v {
-            self.acc[j as usize] = u64::from(x);
-            hi = hi.max(j as usize);
-        }
-        // entries are kept below p² (lazy reduction); zero means 0 mod p
-        let p2 = p * p;
-        let mut j = first as usize;
-        loop {
-            while j <= hi && self.acc[j] % p == 0 {
-                self.acc[j] = 0;
-                j += 1;
-            }
-            if j > hi {
-                return ops;
-            }
-            let x = self.acc[j] % p;
-            self.acc[j] = x;
-            let ri = self.pivot[j];
-            if ri == NONE {
-                let r = self.gather(j, hi, p);
-                self.pivot[j] = self.rows.len() as u32;
-                self.rows.push(r);
-                self.label.push(k);
-                set(j as u32, k);
-                return ops;
-            }
-            let ri = ri as usize;
-            if self.label[ri] > k {
-                // the accumulator takes the column with the smaller label;
-                // the old row minus it goes on with the old label
-                let r = self.gather(j, hi, p);
-                let old = std::mem::replace(&mut self.rows[ri], r);
-                let ol = std::mem::replace(&mut self.label[ri], k);
-                set(j as u32, k);
-                k = ol;
-                for &(c, y) in &old {
-                    self.acc[c as usize] = u64::from(y);
-                    hi = hi.max(c as usize);
-                }
-                // subtract the new row (both monic at j)
-                let nf = p - 1;
-                let new = &self.rows[ri];
-                for &(c, y) in new {
-                    let a = &mut self.acc[c as usize];
-                    *a += nf * u64::from(y);
-                    if *a >= p2 {
-                        *a -= p2;
-                    }
-                    hi = hi.max(c as usize);
-                }
-                ops += new.len() as u64;
-            } else {
-                let nf = p - x;
-                let row = &self.rows[ri];
-                for &(c, y) in row {
-                    let a = &mut self.acc[c as usize];
-                    *a += nf * u64::from(y);
-                    if *a >= p2 {
-                        *a -= p2;
-                    }
-                    hi = hi.max(c as usize);
-                }
-                ops += row.len() as u64;
-            }
-            debug_assert_eq!(self.acc[j] % p, 0);
-            self.acc[j] = 0;
-        }
     }
 }
 
@@ -1306,7 +1206,6 @@ fn reduce_products(
     // The rows' own epoch terms (each product writes its own range).
     prods.par_iter().zip(&off).for_each(|((q, r), &o)| {
         let e = &ech[*q as usize];
-        let base = base;
         for &(col, x) in r {
             let j = e.of_col[col as usize];
             if j != NONE {
@@ -1386,7 +1285,6 @@ fn reduce_products(
             return;
         }
         let e = &ech[q];
-        let base = base;
         let rs = &runs[q];
         for &(row_i, i0, i1, a, b) in &meta[q] {
             if (a as usize) >= j1 || (b as usize) < j0 {

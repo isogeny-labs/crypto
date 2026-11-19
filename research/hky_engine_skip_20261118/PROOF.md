@@ -94,7 +94,7 @@ skipped (they are not items); rows of degree c have no items. Faults 6 (also ski
 
 ### 2.3 The witness structure keeps (W)
 
-`Witness::insert(v, k)` reduces v at its lead only: against the row at that column if its label is
+Inserting v with label k (sequentially) reduces v at its lead only: against the row at that column if its label is
 ≤ k (the result stays a combination of vectors of label ≤ k); if the row there has a label > k, v
 (normalised) takes the column with label k and the old row minus v continues with the old label
 (still a combination of vectors of label ≤ the old label, with its lead removed). By induction on

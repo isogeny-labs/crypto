@@ -52,7 +52,7 @@ fn status_kb(field: &str) -> Option<u64> {
 /// The order-2^k subgroup generator of `csd/ic_dreg.subgroup_2power`.
 pub fn subgroup_generator(p: u64, k: usize) -> u64 {
     let n = 1u64 << k;
-    assert!((p - 1) % n == 0, "2^{k} does not divide p − 1");
+    assert!((p - 1).is_multiple_of(n), "2^{k} does not divide p − 1");
     for h in 2..p {
         let g = powm(h, (p - 1) / n, p);
         if powm(g, n / 2, p) != 1 {
