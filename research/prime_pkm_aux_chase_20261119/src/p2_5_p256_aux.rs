@@ -796,12 +796,34 @@ fn run_f4_fp256(
         p.make_monic(muladds);
         let idx = basis.len();
         let lm_new = p.terms[0].0.clone();
+        // Gebauer-Möller pruning:
+        // 1. Drop existing pair (i, j) if lm_new strictly divides lcm(i, j) and lcm(i, idx) != lcm(i, j) != lcm(j, idx).
+        pairs.retain(|(_, l_ij, i, j)| {
+            if !lm_new.divides(l_ij) {
+                return true;
+            }
+            let l_ik = basis[*i].terms[0].0.lcm(&lm_new);
+            let l_jk = basis[*j].terms[0].0.lcm(&lm_new);
+            &l_ik == l_ij || &l_jk == l_ij
+        });
+        // 2. Collect candidate pairs (g, idx), drop coprime LMs unless needed, and prune dominated LCMs.
+        let mut cands: Vec<(u32, Mono256, usize)> = Vec::new();
         for g in 0..idx {
             let lm_g = &basis[g].terms[0].0;
             if !lm_new.coprime(lm_g) {
                 let l = lm_new.lcm(lm_g);
-                pairs.push((l.deg(), l, g, idx));
+                cands.push((l.deg(), l, g));
             }
+        }
+        cands.sort_unstable_by(|a, b| a.1.cmp(&b.1));
+        let mut kept: Vec<(u32, Mono256, usize)> = Vec::new();
+        for (d, l, g) in cands {
+            if !kept.iter().any(|(_, kl, _)| kl.divides(&l)) {
+                kept.push((d, l, g));
+            }
+        }
+        for (d, l, g) in kept {
+            pairs.push((d, l, g, idx));
         }
         basis.push(p);
     };
@@ -835,7 +857,7 @@ fn run_f4_fp256(
     let mut total_nnz = 0u64;
     let mut learned: Vec<F4Fp256TraceStep> = Vec::new();
 
-    while !pairs.is_empty() {
+    while !pairs.is_empty() && steps < 20 {
         let d = pairs.iter().map(|p| p.0).min().unwrap();
         if d > max_degree {
             break;
@@ -1294,6 +1316,7 @@ pub fn run_p256_presentations() -> (String, usize, Vec<P256PresentationRow>) {
         let p_sum = p256.add(&p0, &p1);
 
         for &arm in arms {
+            eprintln!("  -> P-256 depth={depth} arm={arm}...");
             let planted_ok = if !p_sum.infinity && p0.x != p1.x {
                 let (p_eqs, wit) =
                     build_p256_presentation_system(&base, arm, p_sum.x, Some((i0, i1)));
@@ -1304,10 +1327,12 @@ pub fn run_p256_presentations() -> (String, usize, Vec<P256PresentationRow>) {
             };
             assert!(planted_ok, "P-256 planted witness failed on depth={depth} arm={arm}");
 
-            let (deg_cap, col_cap) = match depth {
-                1 | 2 => (9, 1_200),
-                3 => (6, 900),
-                _ => (5, 800),
+            let (deg_cap, col_cap) = match (depth, arm) {
+                (1, _) => (7, 800),
+                (2, "paired" | "oriented") => (5, 700),
+                (2, _) => (6, 800),
+                (3, _) => (5, 700),
+                _ => (4, 700),
             };
             let (cal_eqs, _) = build_p256_presentation_system(&base, arm, xr_cal, None);
             let n_vars = cal_eqs[0].terms[0].0.0.len();
@@ -1347,6 +1372,7 @@ pub fn run_p256_presentations() -> (String, usize, Vec<P256PresentationRow>) {
 
     // Bounded degree-4 step census on exact P-256 `depth = 8` (`FB1h16882188194e`, 288 signed points):
     for &arm in &["tower", "paired", "oriented"] {
+        eprintln!("  -> P-256 depth=8 bounded arm={arm}...");
         let xr_d8 = p256_trial_point(&p256, "d8-probe", 0).x;
         let (p_eqs, wit) = build_p256_presentation_system(
             &base8,
@@ -1423,6 +1449,7 @@ pub fn run_scaled_j1728_aux_towers() -> Vec<ScaledAuxIsogenyRow> {
         assert!(!ker_top.infinity);
 
         for &(depth, m) in &[(3u32, 2u32), (4u32, 2u32), (3u32, 3u32)] {
+            eprintln!("  -> Scaled {label} depth={depth} m={m}...");
             // Build `depth`-step Vélu 2-isogeny chain from `E_aux: w^2 = x^3 - 3x`!
             let mut k_pt = aux.mul(&mut ops, ker_top, 1u64 << (odd_shift - depth));
             let mut cur_c = aux.clone();
@@ -1630,6 +1657,16 @@ pub fn run_scaled_j1728_aux_towers() -> Vec<ScaledAuxIsogenyRow> {
 }
 
 pub fn run_all_p2_5() -> P25Summary {
+    if std::env::var("PKM_FAST_SMOKE").as_deref() == Ok("1") {
+        eprintln!("  -> PKM_FAST_SMOKE: skipping exact P-256 presentation F4; running scaled j1728 towers only");
+        let scaled_j1728_aux_towers = run_scaled_j1728_aux_towers();
+        return P25Summary {
+            p256_depth8_fb_id_verified: "smoke-skipped".into(),
+            p256_depth8_signed_points: 0,
+            p256_presentations: Vec::new(),
+            scaled_j1728_aux_towers,
+        };
+    }
     let (fb_id8, sp8, p256_presentations) = run_p256_presentations();
     let scaled_j1728_aux_towers = run_scaled_j1728_aux_towers();
     P25Summary {

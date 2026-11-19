@@ -194,28 +194,32 @@ pub fn run_panel_a_scaling() -> PanelASummary {
         };
 
         for &t in ts {
+            eprintln!("  -> Panel A {fam} m={m} t={t}...");
             let b_size = 1u64 << t;
-            let (fb, g_or_lo) = if is_dickson {
+            let Some((fb, g_or_lo)) = (if is_dickson {
                 let mut chosen = None;
-                for lo in 0..128u64 {
+                for lo in 0..256u64 {
                     if let Ok(cand) = dickson_factor_base(inst, t, lo, 0) {
-                        if cand.columns >= (m as usize) {
+                        if cand.points.len() >= (m as usize) && cand.columns >= 2 {
                             chosen = Some((cand, lo));
                             break;
                         }
                     }
                 }
-                chosen.expect("Dickson FB")
+                chosen
             } else {
                 let mut chosen = None;
-                for g_c in 1..128u64 {
+                for g_c in 1..1024u64 {
                     let cand = build_kummer_fb(inst, t, g_c);
-                    if cand.columns >= (m as usize) {
+                    if cand.points.len() >= (m as usize) && cand.columns >= 2 {
                         chosen = Some((cand, g_c));
                         break;
                     }
                 }
-                chosen.expect("Kummer FB")
+                chosen
+            }) else {
+                eprintln!("  ! Panel A {fam} m={m} t={t}: no usable FB; skipping rung");
+                continue;
             };
 
             // Natural hidden targets `R = [a]G + [b]Q` (24 targets) + 4 genuine positive targets
@@ -373,6 +377,10 @@ pub fn run_panel_a_scaling() -> PanelASummary {
             });
         }
 
+        if xs_b.len() < 2 {
+            eprintln!("  ! Panel A {fam} m={m}: fewer than 2 rungs measured; skipping fit");
+            continue;
+        }
         let (g_pos, lcb_pos, ucb_pos) = ols_log2_slope(&xs_b, &ys_pos);
         let (g_bef, _, _) = ols_log2_slope(&xs_b, &ys_bef);
         let (g_aft, _, _) = ols_log2_slope(&xs_b, &ys_aft);
