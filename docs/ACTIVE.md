@@ -14,6 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
+- [x] Test RR9 Grassmann four-plane 4x4 graph-chart determinant and benchmark against exterior4 on original Prime31 (automation, completed 2026-11-19, branch automation/prime31-rr9-grassmann-chart-20261119, PR #4780; exact-source paired CI #44452737502 PASSED, independent Python exact residues/truth PASS; public-only B8 nonenumerative extractor still open with #4692; signed PCC pending)
 - [x] Original-curve Prime31 public-only exterior-4 RR9 algebraic candidate, B4 correctness/cost falsifier and B8 scaling gate (automation, completed 2026-11-19, branch automation/prime31-wedge4-public-algebraic-20261119, PR #4776; exact-source CI #44445676750 passed, exhaustive B8 direct-search gate negative; nonenumerative extractor remains with PR #4692)
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
