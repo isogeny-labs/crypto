@@ -1232,10 +1232,7 @@ mod tests {
     }
 
     fn ops_by_phase(out: &DescentOutcome) -> Vec<(String, OpCounts)> {
-        out.phases
-            .iter()
-            .map(|p| (p.name.clone(), p.ops.clone()))
-            .collect()
+        out.phases.iter().map(|p| (p.name.clone(), p.ops)).collect()
     }
 
     /// (1) A miss computes cold exactly as the store-less run does and
