@@ -56,7 +56,7 @@ def figure():
 
 f = figure()
 f.savefig(os.path.join(HERE, "figure.svg"))
-f.savefig(os.path.join(HERE, "figure.png"), dpi=150)
+f.savefig(os.path.join(HERE, "figure.png"), dpi=80)
 with PdfPages(os.path.join(HERE, "REPORT.pdf")) as pdf:
     pdf.savefig(f)
     plt.close(f)
