@@ -446,6 +446,19 @@ impl Producer<'_> {
     fn power(&mut self, base: &Poly17, mut exponent: u64, modulus: &Poly17) -> Result<Poly17> {
         self.gate.charge(6 * COPY_WORK)?;
         let monic = self.power_modulus(modulus)?;
+        // Fp[x]/(nonzero constant) is the zero ring: every remainder is zero.
+        // This also handles exponent zero (the residue of 1 is zero).
+        if monic.len == 1 {
+            return Ok(Poly17::ZERO);
+        }
+        // Over Fp, r^p == r. In Fp[x]/(x-r), x^p is therefore r.
+        // The canonical input x is the only base eligible for this path.
+        if monic.len == 2 && exponent == self.p
+            && base.len == 2 && base.coefficients[0] == 0
+            && base.coefficients[1] == 1
+        {
+            return Ok(Poly17::constant(self.sub(0, monic.coefficients[0])?));
+        }
         let mut b = *base;
         self.reduce_monic(&mut b, &monic)?;
         // For 61-bit exponents, the extra first-bit state test was slower
@@ -547,7 +560,16 @@ impl Producer<'_> {
         difference.len = difference.len.max(2);
         difference.coefficients[1] = self.sub(difference.coefficients[1], 1)?;
         difference.trim();
-        let g = self.gcd(f, difference)?;
+        // Every degree-one factor of x^p-x over Fp is exactly the
+        // normalized input. A nonzero constant is coprime to x^p-x.
+        // Preserve the same LinearPart event, but omit generic Euclid.
+        let g = if f.len == 1 {
+            Poly17::constant(1)
+        } else if f.len == 2 {
+            self.power_modulus(&f)?
+        } else {
+            self.gcd(f, difference)?
+        };
         self.prepare_event()?;
         self.emit(EventKind::LinearPart { xp, polynomial: g })?;
         self.pending[0] = g;
@@ -990,6 +1012,18 @@ impl Replay {
     fn modular_power(&mut self, base: Poly17, exponent: u64, modulus: &Poly17) -> Result<Poly17> {
         self.gate.charge(6 * COPY_WORK)?;
         let monic = self.normalized_modulus(modulus)?;
+        // Independent replay: modulo a nonzero constant every residue is 0.
+        if monic.len == 1 {
+            return Ok(Poly17::ZERO);
+        }
+        // Evaluate x^p at the unique root of the linear modulus using
+        // Frobenius on Fp; do not call the producer's arithmetic.
+        if monic.len == 2 && exponent == self.p
+            && base.len == 2 && base.coefficients[0] == 0
+            && base.coefficients[1] == 1
+        {
+            return Ok(Poly17::constant(self.minus(0, monic.coefficients[0])?));
+        }
         let mut base = base;
         self.cancel_monic(&mut base, &monic)?;
         // Keep the former loop for large (61-bit) exponents: native and
@@ -1109,7 +1143,15 @@ impl Replay {
                 xm.len = xm.len.max(2);
                 xm.coefficients[1] = self.minus(xm.coefficients[1], 1)?;
                 xm.trim();
-                let g = self.monic_gcd(input, xm)?;
+                // Independently verify the linear/constant Frobenius cases
+                // without invoking general polynomial Euclid.
+                let g = if input.len == 1 {
+                    Poly17::constant(1)
+                } else if input.len == 2 {
+                    self.normalized_modulus(&input)?
+                } else {
+                    self.monic_gcd(input, xm)?
+                };
                 if g != polynomial {
                     return Err(Stop::InvalidCertificate);
                 }
@@ -1514,6 +1556,49 @@ mod tests {
         assert_eq!(report.roots[0], 1);
         assert!(check(&f, &report, &events).unwrap().finite_complete);
     }
+    #[test]
+    fn round40_linear_and_constant_frobenius_events_are_certified() {
+        // Exercise monic/nonmonic linear factors, zero roots, and constants
+        // across small, word-sized, and Mersenne prime fields.
+        for p in [17u64, 487, 1_000_000_007, (1u64 << 61) - 1] {
+            for a in [1, 2, p - 2] {
+                for b in [0, 1, 3, p - 1] {
+                    let f = [b, a];
+                    let (report, events) = run(&f, p, budget());
+                    assert_eq!(report.stop, Stop::Complete, "p={p} a={a} b={b}");
+                    assert_eq!(report.root_count, 1);
+                    let root = report.roots[0];
+                    assert_eq!(
+                        (u128::from(a) * u128::from(root) + u128::from(b))
+                            % u128::from(p), 0,
+                        "p={p} a={a} b={b}"
+                    );
+                    assert!(check(&f, &report, &events).unwrap().finite_complete);
+                    let (xp, g) = events.iter().find_map(|e| {
+                        if let EventKind::LinearPart { xp, polynomial } = e.kind {
+                            Some((xp, polynomial))
+                        } else { None }
+                    }).unwrap();
+                    assert_eq!(xp, Poly17::constant(root));
+                    assert_eq!(g.len, 2);
+                    assert_eq!(g.coefficients[1], 1);
+                    assert_eq!(g.coefficients[0], if root == 0 { 0 } else { p - root });
+                }
+            }
+            for c in [1, 2, p - 1] {
+                let f = [c];
+                let (report, events) = run(&f, p, budget());
+                assert_eq!(report.stop, Stop::Complete);
+                assert_eq!(report.root_count, 0);
+                assert!(check(&f, &report, &events).unwrap().finite_complete);
+                assert!(events.iter().any(|e| matches!(
+                    e.kind, EventKind::LinearPart { xp: Poly17::ZERO, polynomial }
+                    if polynomial == Poly17::constant(1)
+                )));
+            }
+        }
+    }
+
     #[test]
     fn bounded_prime_roots_monic_remainders_match_general_division() {
         for p in [7, 140737488355213, (1u64 << 61) - 1] {
