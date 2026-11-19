@@ -1,0 +1,55 @@
+# CT222 — independent rational divisor projector replay and primitive-count audit
+
+**2026-11-19 UTC.** Continuing [crypto PR #4715](https://github.com/isogeny-labs/crypto/pull/4715) after [CT221](CT221_EXACT_COMPOSITE_J_ORDER.md). **[pcc:unverified]**.
+
+## Question and fixed public hypothesis
+
+Does CT221's exact scalar projector `e=[80,597,544]` actually agree **as a reduced-divisor operation**, on a nontrivial set of rational Jacobian classes, with the transfer projector `e=π*[73]π_*` for
+`C/F101: y²=u⁹+u³+46`, `E/F101: y²=x³+x+46`, `π(u,y)=(u³,y)`?
+
+The already justified fixed integer orders are `#E(F101)=109` and `#J_C(F101)=115593846=109·1060494`. They are **inputs**, not independently recounted by this script. No assertion about larger fields follows.
+
+## New independent executable evidence
+
+[ct222_projector_oracle.cjs](ct222_projector_oracle.cjs) is a separate, dependency-free Node.js implementation of F101 polynomial long division, extended Euclid, genus-4 Cantor composition/reduction, elliptic point addition/multiplication, pullback of rational E points, and norm-by-support for rational C divisors. It does **not import** CT216's Python Cantor arithmetic or CT221's zeta script.
+
+It deterministically constructs 27 public rational divisor classes: identity; 24 one-to-four-point support sums with prescribed indices; one five-point and one six-point sum. Each class is represented through genus-4 Cantor reduction. The calculation compares the two projector constructions and then checks their decomposition and order consequences:
+
+- `[80597544]D == π*([73] Σ π(P_i))` as **exact reduced Mumford pairs**;
+- `[109] e(D) = 0`, `[1060494](D-e(D))=0`, `[115593846]D=0`;
+- `e(e(D))=e(D)` and `(D-e(D))+e(D)=D`;
+- all 109 powers of public source generator `(2,37)` are distinct;
+- curve squarefreeness, reduced-divisor congruences and source pullback linearity;
+- the deliberately incorrect projector `[80597544+1060494]` is rejected on `π*(G)`.
+
+**Local Node.js v22.16.0 execution completed:** 27/27 projector equalities and 27/27 full-order annihilation checks; 26/27 examples possess a nonzero complementary divisor; 27/27 wrong-projector negative controls reject. This is exact small-field arithmetic, but the oracle is producer-supplied and does **not** provide independent PCC signature, Rust parity, or a theorem for arbitrary divisor classes.
+
+## Charged primitive counts, not physical prices
+
+The following are **counts of calls made in this standalone Node.js audit**, not comparable timing units or optimized Rust group operations:
+
+| Operation (27 classes) | Calls |
+| --- | ---: |
+| Scalar cofactor projector `[80597544]D` | 1,026 Cantor compositions |
+| Norm of explicit point supports `Σπ(P_i)` | 71 elliptic additions |
+| Scalar `[73]` on those norms | 243 elliptic additions |
+| Construct `π*([73]norm)` | 27 pullback constructions |
+
+Additional Cantor calls for verification, composing the supports, projector idempotence, group-order tests and negative controls are **excluded** from the primary projector costs; the full program separately counts them internally. The numerator and denominator have different field/group arithmetic and cannot be priced merely by comparing 1,026 with 314. `π_*` for general nonsplit divisor representatives is **not implemented** here; only linearity of the norm on the explicitly supplied rational point supports is exercised. The 695/701 original frozen fixture, `C169`/`C13a`/`C13b`/`N2_actual`/`D` and matched native rho/BSGS/IC remain separate gates.
+
+## Exact reproduction
+
+```sh
+node --check research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_projector_oracle.cjs
+node research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_projector_oracle.cjs --self-test
+node research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_projector_oracle.cjs > /tmp/ct222.json
+cmp /tmp/ct222.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_f101_projector_audit.json
+```
+
+Expected local self-test: `CT222_SELFTEST_PASS 27 27 26`. The frozen JSON is [here](ct222_f101_projector_audit.json). No hosted exact-head CI claim until the workflow verdict is observed.
+
+## Sources, decisions, restrictions
+
+Before implementation reviewed [CT217](CT217_NORM_PROJECTOR_RANK_AND_COST.md), [CT220](CT220_SPLIT_PRIME_ORDER_OBSTRUCTION.md), [CT221](CT221_EXACT_COMPOSITE_J_ORDER.md), concurrent [#4697](https://github.com/isogeny-labs/crypto/pull/4697), [#4693](https://github.com/isogeny-labs/crypto/pull/4693), [cryptanalysis #1766](https://github.com/isogeny-labs/cryptanalysis/pull/1766), and merged roots [#3877](https://github.com/isogeny-labs/crypto/pull/3877), [#4215](https://github.com/isogeny-labs/crypto/pull/4215), [#1523](https://github.com/isogeny-labs/cryptanalysis/pull/1523), [#4178](https://github.com/isogeny-labs/crypto/pull/4178). Relevant classical methods are hyperelliptic Cantor composition, Poincare complete reducibility, Weil point-count bounds, and Gaudry index calculus; no novelty claim. The shared research-KB MCP was unavailable in this connector runtime; manual repository review is not an exhaustive substitute.
+
+**Decision:** keep this as an independent algebraic arithmetic and *partial* cost-control rung. The next experiment is the native composite-order genus-4 IC complete solve with the verified 109-primary projector, all transfer/setup/relation/LA/target/verification and memory costs, matched strongest rho/BSGS/IC, blinded targets, uncertainty and PCC. The original 695/701 fixture remains blocked by documented S3 HTTP 403, and paid STOP persists. Do not make a speedup claim from toy projector consistency or mixed primitive counts. No paid compute or protected merge was performed.
