@@ -7,9 +7,9 @@ gp -q harness/g4-rank-panel.gp > "$build/curves"
 cmp "$build/curves" results/g4-rank-panel-curves.txt
 awk '$3=="selected"{print $1,$2,$5}' "$build/curves" > "$build/selected"
 for mode in census extend screen; do
-  options=()
-  case "$mode" in extend) options=(extend);; screen) options=(extend screen);; esac
-  ruby harness/g4-rank-panel.rb "${options[@]}" | c++ -std=c++17 -O3 -x c++ - -o "$build/$mode"
+  generator_args=()
+  case "$mode" in extend) generator_args=(extend);; screen) generator_args=(extend screen);; esac
+  ruby harness/g4-rank-panel.rb "${generator_args[@]}" | c++ -std=c++17 -O3 -x c++ - -o "$build/$mode"
   "$build/$mode" < "$build/selected" > "$build/$mode.out"
 done
 cmp "$build/census.out" results/g4-rank-panel.txt
