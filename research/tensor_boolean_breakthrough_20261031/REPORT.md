@@ -81,7 +81,9 @@ eager states compute the same determinant, an instrumented entry count yields
 the annihilation and identity-right-block laws used by the upstream uniformity
 proof. The remaining tasks are the cross-project specialization,
 array/indexing cost, concrete modular-inversion cost, and operand bit-cost
-accounting. [pcc:unverified] See
+accounting. The exact upstream-shaped `Ttop`/`Rint`/`nu`/`q` specialization is
+now checked locally; only integration into the external pinned tree remains.
+[pcc:unverified] See
 [`FIXED_ARITY_DIAGONAL.md`](FIXED_ARITY_DIAGONAL.md).
 
 ## Claim boundary

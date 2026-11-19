@@ -908,6 +908,51 @@ theorem executableBirdPlantedKernel_spec
   ⟨executableBirdPlantedKernel_mul B Rr hB,
     executableBirdPlantedKernel_rightInv B Rr hB⟩
 
+/-- Executable replacement for the exact integer-block interface of upstream
+`L114_Phase.kerMat`. -/
+def executableBirdKerMat
+    (q : ℕ) {f s : ℕ}
+    (Ttop : Matrix (Fin f) (Fin f) ℤ)
+    (Rint : Matrix (Fin s) (Fin f) ℤ)
+    (nu : ℤ) : Matrix (Fin s) (Fin f ⊕ Fin s) (ZMod q) :=
+  executableBirdPlantedKernel
+    ((Ttop - Matrix.scalar (Fin f) nu).map (Int.castRingHom (ZMod q)))
+    (Rint.map (Int.castRingHom (ZMod q)))
+
+/-- The executable upstream-shaped kernel equals the original canonical block
+formula whenever its planted block has unit determinant. -/
+theorem executableBirdKerMat_eq
+    (q : ℕ) {f s : ℕ}
+    (Ttop : Matrix (Fin f) (Fin f) ℤ)
+    (Rint : Matrix (Fin s) (Fin f) ℤ)
+    (nu : ℤ)
+    (hB : IsUnit (((Ttop - Matrix.scalar (Fin f) nu).map
+      (Int.castRingHom (ZMod q))).det)) :
+    executableBirdKerMat q Ttop Rint nu =
+      Matrix.fromCols (-((Rint.map (Int.castRingHom (ZMod q))) *
+        ((Ttop - Matrix.scalar (Fin f) nu).map
+          (Int.castRingHom (ZMod q)))⁻¹)) 1 := by
+  exact executableBirdPlantedKernel_eq _ _ hB
+
+/-- Exact specialization of the executable planted-kernel laws to upstream
+`Ttop`, `Rint`, `nu`, and `ZMod q` data. -/
+theorem executableBirdKerMat_spec
+    (q : ℕ) {f s : ℕ}
+    (Ttop : Matrix (Fin f) (Fin f) ℤ)
+    (Rint : Matrix (Fin s) (Fin f) ℤ)
+    (nu : ℤ)
+    (hB : IsUnit (((Ttop - Matrix.scalar (Fin f) nu).map
+      (Int.castRingHom (ZMod q))).det)) :
+    executableBirdKerMat q Ttop Rint nu *
+        Matrix.fromRows
+          ((Ttop - Matrix.scalar (Fin f) nu).map
+            (Int.castRingHom (ZMod q)))
+          (Rint.map (Int.castRingHom (ZMod q))) = 0 ∧
+      executableBirdKerMat q Ttop Rint nu *
+        Matrix.fromRows (0 : Matrix (Fin f) (Fin s) (ZMod q))
+          (1 : Matrix (Fin s) (Fin s) (ZMod q)) = 1 := by
+  exact executableBirdPlantedKernel_spec _ _ hB
+
 /-- A conservative `rows^6` planted-dense cost has fixed numerator six.  This
 matches `rows^2` Bird determinant calls for the adjugate at an advertised
 `rows^4` operations per determinant; the operation-count connection itself is

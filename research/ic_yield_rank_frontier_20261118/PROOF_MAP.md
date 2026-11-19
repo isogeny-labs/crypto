@@ -418,6 +418,9 @@ the exact eventual natural-power inequality required by
 | `executableBirdPlantedKernel_mul` | law | same | same | `IsUnit B.det` |
 | `executableBirdPlantedKernel_rightInv` | law | same | same | `IsUnit B.det` |
 | `executableBirdPlantedKernel_spec` | law | same | same | `IsUnit B.det` |
+| `executableBirdKerMat` | definition | same | upstream-shaped integer planted and remainder blocks | none |
+| `executableBirdKerMat_eq` | law | same | same | reduced planted determinant is a unit |
+| `executableBirdKerMat_spec` | law | same | same | reduced planted determinant is a unit |
 
 ## First-moment coverage repair
 

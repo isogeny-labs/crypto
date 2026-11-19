@@ -858,3 +858,12 @@ Classical.choice, Quot.sound]`; the independent fresh checker exited 0. Claim
 signed standing. Matrix-multiplication cost, array/indexing overhead, scalar
 bit costs, and the direct cross-project import adapter remain outside this
 claim. [pcc:unverified]
+
+The follow-up adapter `executableBirdKerMat` uses the exact upstream argument
+types: integer `Ttop`, integer `Rint`, integer shift `nu`, and modulus `q`.
+`executableBirdKerMat_spec` proves both block laws after the same
+`Int.castRingHom (ZMod q)` reduction used in `L114_Phase.kerMat`. The project
+gate then reported `PASS 84 thm 0 trusted`; the declaration has standard axiom
+output and the fresh checker exited 0. Claim `PCC-20261119-0d4820` passes its
+local Lean verifier. Editing and rebuilding the external pinned source tree is
+not claimed. [pcc:unverified]

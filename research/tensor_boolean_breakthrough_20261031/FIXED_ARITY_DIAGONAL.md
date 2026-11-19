@@ -161,8 +161,13 @@ Bird inverse into `(-R B⁻¹ | I)`, and
 `executableBirdPlantedKernel_spec` proves both annihilation of `[B;R]` and the
 identity right-block law under `IsUnit B.det`. That is the exact interface used
 by upstream `planted_kernel`, `kerMat_mul`, and `kerMat_rightInv`. Claim
-`PCC-20261119-d0d20c` passes its local Lean verifier. The fallback no longer
-depends on the unformalized sparse Wiedemann--Dixon cost.
+`PCC-20261119-d0d20c` passes its local Lean verifier. The exact source-shaped
+adapter is checked locally too: `executableBirdKerMat` accepts upstream
+`Ttop`, `Rint`, `nu`, and `q`, and `executableBirdKerMat_spec` proves the same
+two laws after integer reduction into `ZMod q`. Claim `PCC-20261119-0d4820`
+passes its local verifier. Only integration and rebuilding in the external
+pinned source tree remain; the fallback no longer depends on the unformalized
+sparse Wiedemann--Dixon cost.
 [pcc:unverified]
 
 The Mathlib pin is commit
@@ -170,7 +175,7 @@ The Mathlib pin is commit
 `fa690f7f31bdb3108c61c7c4aca62f56182732728a8928e793c2a5b743a4ba54`
 for `Bird/Defs.lean` and
 `e36d1901d2279de39d4cb702625ac1c6defaae30eaaba372260c8a1551369fc1`
-for `Bird/Correctness.lean`. The local project gate reports 82 theorems and
+for `Bird/Correctness.lean`. The local project gate reports 84 theorems and
 zero trusted declarations, and the independent fresh checker exits 0.
 [pcc:unverified]
 
