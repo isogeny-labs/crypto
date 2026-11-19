@@ -303,57 +303,6 @@ impl Producer<'_> {
             return Err(Stop::InvalidInput);
         }
         out.len = n as u8;
-        // R45_PRODUCT_KARATSUBA_BEGIN
-        // Degree-7 by degree-7 multiplication: 4+4 Karatsuba removes
-        // 16 field multiplications. Only use on fully dense inputs so
-        // sparse factors keep their zero-eliding schoolbook fast path.
-        // Every field operation is still charged by the resource gate.
-        if a.len == 8 && b.len == 8
-            && !a.coefficients[..8].contains(&0)
-            && !b.coefficients[..8].contains(&0)
-        {
-            let mut a_sum = [0u64; 4];
-            let mut b_sum = [0u64; 4];
-            for i in 0..4 {
-                a_sum[i] = self.add(a.coefficients[i], a.coefficients[i + 4])?;
-                b_sum[i] = self.add(b.coefficients[i], b.coefficients[i + 4])?;
-            }
-            let mut lower = [0u64; 7];
-            let mut upper = [0u64; 7];
-            let mut combined = [0u64; 7];
-            for i in 0..4 {
-                for j in 0..4 {
-                    let k = i + j;
-                    let lo = self.mul(a.coefficients[i], b.coefficients[j])?;
-                    lower[k] = if lower[k] == 0 { lo }
-                        else { self.add(lower[k], lo)? };
-                    let hi = self.mul(a.coefficients[i + 4], b.coefficients[j + 4])?;
-                    upper[k] = if upper[k] == 0 { hi }
-                        else { self.add(upper[k], hi)? };
-                    let mid = self.mul(a_sum[i], b_sum[j])?;
-                    combined[k] = if combined[k] == 0 { mid }
-                        else { self.add(combined[k], mid)? };
-                }
-            }
-            // L + x^4 (M-L-H) + x^8 H, with canonical field residues.
-            // Assign disjoint coefficients directly, only add overlaps.
-            for k in 0..7 {
-                out.coefficients[k] = lower[k];
-            }
-            for k in 0..7 {
-                let cross_part = self.sub(combined[k], lower[k])?;
-                let cross = self.sub(cross_part, upper[k])?;
-                let dst = &mut out.coefficients[k + 4];
-                *dst = if *dst == 0 { cross } else { self.add(*dst, cross)? };
-            }
-            for k in 0..7 {
-                let dst = &mut out.coefficients[k + 8];
-                *dst = if *dst == 0 { upper[k] } else { self.add(*dst, upper[k])? };
-            }
-            out.trim();
-            return Ok(out);
-        }
-        // R45_PRODUCT_KARATSUBA_END
         // A zero constant term is a cheap indicator of structured/sparse
         // factors. Preserve the original dense loop on ordinary inputs.
         if a.coefficients[0] == 0 || b.coefficients[0] == 0 {
