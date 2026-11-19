@@ -73,11 +73,11 @@ fn powm(mut a: u64, mut e: u64, p: u64) -> u64 {
     r
 }
 fn invm(a: u64, p: u64) -> u64 {
-    assert!(a % p != 0, "inverse of 0");
+    assert!(!a.is_multiple_of(p), "inverse of 0");
     powm(a, p - 2, p)
 }
 fn legendre(a: u64, p: u64) -> i32 {
-    if a % p == 0 {
+    if a.is_multiple_of(p) {
         return 0;
     }
     if powm(a, (p - 1) / 2, p) == 1 {
@@ -150,14 +150,14 @@ impl Pol {
     }
     fn constant(n: usize, c: u64, p: u64) -> Self {
         let mut f = Pol::zero(n);
-        if c % p != 0 {
+        if !c.is_multiple_of(p) {
             f.terms.insert(vec![0; n], c % p);
         }
         f
     }
     fn monomial(e: Vec<u32>, c: u64, p: u64) -> Self {
         let mut f = Pol::zero(e.len());
-        if c % p != 0 {
+        if !c.is_multiple_of(p) {
             f.terms.insert(e, c % p);
         }
         f
