@@ -20,7 +20,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 - [ ] Benchmark the Boolean Faugère–Lachartre F4 split on matched Semaev systems (Codex, started 2026-11-18, branch codex/semaev-fl-benchmark-20261118, PR #4679)
 
-- [ ] Execute the frozen ecbench Phase-1 panel through the cold one-target IC-versus-rho gates, starting with the smallest runnable Koblitz and prime cells (Codex, started 2026-11-18, branch codex/ecbench-phase1-e2e-20261118, PR #4681)
+- [ ] Execute the frozen ecbench Phase-1 panel through the cold one-target IC-versus-rho gates, starting with the smallest runnable Koblitz and prime cells (Codex, started 2026-11-18, branch codex/ecbench-phase1-e2e-20261118; tracking PR #4681 merged, content PR #4785)
 
 - [ ] Improve the exact Semaev projection/index-calculus lane toward cold one-target rho parity, with complete counted costs and verified recovery (Codex, started 2026-11-18, branch codex/semaev-rho-parity-20261118, PR #4682)
 

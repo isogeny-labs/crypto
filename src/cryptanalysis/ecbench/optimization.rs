@@ -626,6 +626,12 @@ const POLICIES: &[PolicyDecl] = &[
         StandardBand
     ),
     policy!(
+        "rho.signed_frobenius_v6",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
         "rho.negation_v5",
         ImplementationAb,
         FrontierEligible,
