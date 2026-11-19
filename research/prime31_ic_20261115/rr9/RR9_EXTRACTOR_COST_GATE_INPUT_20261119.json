@@ -1,0 +1,48 @@
+{
+  "schema": "prime31.rr9-extractor-cost-gate-input.v1",
+  "date_utc": "2026-11-19",
+  "classification": "derived reanalysis of prior frozen measurements, NOT a new solver benchmark",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "cofactor": 1,
+    "g": [
+      625037715,
+      2100627251
+    ]
+  },
+  "pinned_rust_arithmetic": "1df714645aa683cf975bc76fcacb9842cb4780fd",
+  "comparison": {
+    "url": "https://github.com/isogeny-labs/crypto/pull/4774",
+    "source": "research/prime31_ic_20261115/rr9/W8_MATCHED_SIGNED_BSGS_SUMMARY_20261119.json",
+    "source_blob_sha": "0ca2050b3c7e060bd83679dd4d6d31c9b92d9493",
+    "ci": "https://github.com/isogeny-labs/crypto/actions/runs/44436754627",
+    "mean_signed_shared_bsgs_1024_ms": 3342.7934425,
+    "mean_ternary_w8_1024_ms": 7834.9334925,
+    "completed_logs": 1024
+  },
+  "queries": {
+    "source": "https://github.com/isogeny-labs/crypto/pull/4770",
+    "training": 42,
+    "online": 1177,
+    "identical_for_replacement_assumption": true
+  },
+  "chart": {
+    "url": "https://github.com/isogeny-labs/crypto/pull/4780",
+    "source": "research/prime31_ic_20261115/rr9/RR9_GRAPH_CHART_SUMMARY_20261119.json",
+    "source_blob_sha": "from original PR #4780; check published frozen JSON",
+    "ci": "https://github.com/isogeny-labs/crypto/actions/runs/44452737502",
+    "b4_natural_negative_full_scan_mean_ms": 1445.472364,
+    "b4_negative_pairs": 16777216,
+    "b8_negative_pairs": 4294967296,
+    "fp_products_per_pair": 30
+  },
+  "warnings": [
+    "#4774 and #4780 are different GitHub Actions executions; do not treat their timings as a matched cross-experiment comparison.",
+    "The query budget is a necessary optimistic upper bound conditional on 1219 queries, ignoring all non-extractor costs.",
+    "No empirical B8 exhaustive wall time or public-only F4 runtime is provided.",
+    "Previous signed PCC independent validation remains unverified."
+  ]
+}
