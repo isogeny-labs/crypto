@@ -964,4 +964,6 @@ four-trial corollary assumes only `2|K|+1 <= 4|E(K)|`. The pinned project now
 builds 2,326 jobs. The proof gate reports `PASS 140 thm 0 trusted`, all audited
 sampler laws use only standard Lean axioms, and the fresh checker exits 0.
 Mathlib supplies no Hasse point-count theorem in this pinned tree, and an
-executable square-root bit-cost theorem remains external. [pcc:unverified]
+executable square-root bit-cost theorem remains external. Claims
+`PCC-20261119-e93da3`, `PCC-20261119-2b8ae7`, and `PCC-20261119-e67bd2` pass
+their local Lean verifiers. [pcc:unverified]

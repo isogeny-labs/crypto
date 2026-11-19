@@ -309,7 +309,8 @@ conditioned pair event is exactly uniform, and the retry tail has expected
 length `(2|K|+1)/|E(K)|`. Thus the paper's factor-16 near-uniform loss is not
 needed for this sampler. The four-trial bound is reduced to the single explicit
 Hasse-form premise `2|K|+1 <= 4|E(K)|`; executable square-root bit cost remains
-separate. [pcc:unverified]
+separate. Claims `PCC-20261119-e93da3`, `PCC-20261119-2b8ae7`, and
+`PCC-20261119-e67bd2` pass their local Lean verifiers. [pcc:unverified]
 
 ## Corrections and remaining obligations
 
