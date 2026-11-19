@@ -1,0 +1,103 @@
+{
+  "schema": "isolab.p192-quartic-transfer-replay/v1",
+  "run_id": "pr4788-local-replay-20261119",
+  "date_utc": "2026-11-19",
+  "source_revision": "5d05bef010a8a9dbd56b4cadf9a8c2cbeb79e6b2",
+  "entrypoint": "research/nist_cover_three_tests_20261116/check-relation-e2e.sh",
+  "status": "pass",
+  "standing": "producer-unverified functional replay with separate arithmetic checker",
+  "environment": {
+    "architecture": "x86_64",
+    "logical_cpus": 5,
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "kernel": "Linux 6.18.57",
+    "compiler": "c++ (Debian 14.2.0-19) 14.2.0",
+    "openssl": "OpenSSL 3.5.7 9 Jun 2026"
+  },
+  "complete_transfer": {
+    "definition": "F=phi o pi*, B=pi_* o phi^vee",
+    "expected_composition": "B(F(P))=[6]P",
+    "fixtures": ["O", "G", "-G", "2G", "Q", "-2G"],
+    "fresh_checks_passed": 6,
+    "source_dual_composition3_checks": 5,
+    "target_km_executed": true,
+    "exceptional_old_shift_infinity_case": "-2G",
+    "exceptional_case_passed": true,
+    "separate_openssl_checks_passed": 6,
+    "changed_norm_control_rejected": true
+  },
+  "quartic_relations": {
+    "candidate_vertical_lines": 256,
+    "factor_base_points": 226,
+    "split_fibers": 7,
+    "reference_fibers": 1,
+    "nontrivial_relations": 6,
+    "target_jacobian_zero_checks": 6,
+    "relation_yield_per_candidate": 0.0234375
+  },
+  "transport": {
+    "projected_nonzero_columns": 225,
+    "zero_rows": 0,
+    "elliptic_relation_checks": 6,
+    "rank_mod_subgroup_order": 6,
+    "rank_deficiency": 219,
+    "independent_row_yield": 1.0,
+    "point_image_checks": 226,
+    "fiber_factorization_checks": 7
+  },
+  "cost_seconds": {
+    "processes": [
+      {"name": "relation_producer_build", "wall": 11.382, "user": 10.978, "system": 0.401},
+      {"name": "relation_checker_build", "wall": 2.529, "user": 2.425, "system": 0.103},
+      {"name": "relation_producer", "wall": 5.324, "user": 5.310, "system": 0.012},
+      {"name": "relation_checker", "wall": 0.369, "user": 0.360, "system": 0.009},
+      {"name": "transfer_producer_build", "wall": 13.587, "user": 12.826, "system": 0.746},
+      {"name": "transfer_checker_build", "wall": 1.852, "user": 1.624, "system": 0.226},
+      {"name": "transfer_producer", "wall": 33.059, "user": 32.946, "system": 0.065},
+      {"name": "transfer_checker", "wall": 0.009, "user": 0.005, "system": 0.004},
+      {"name": "portable_reviewer_build", "wall": 2.210, "user": 1.740, "system": 0.460},
+      {"name": "portable_reviewer_comparison", "wall": 0.010, "user": 0.010, "system": 0.000}
+    ],
+    "total_recorded": {"wall": 70.331, "user": 68.224, "system": 2.026},
+    "relation_internal_stages": [
+      {"name": "input_and_field_setup", "wall": 1.067493, "cpu": 1.067285},
+      {"name": "collect_all_256_vertical_candidates", "wall": 0.780599, "cpu": 0.780380},
+      {"name": "target_KM_setup", "wall": 0.061267, "cpu": 0.061265},
+      {"name": "all_target_Jacobian_relation_checks", "wall": 1.614341, "cpu": 1.613433},
+      {"name": "all_point_norms_subgroup_checks_and_deduplication", "wall": 1.791241, "cpu": 1.790275},
+      {"name": "project_rows_check_sums_and_rank", "wall": 0.001106, "cpu": 0.001104},
+      {"name": "producer_negative_control", "wall": 0.000617, "cpu": 0.000618}
+    ],
+    "transfer_internal_stages": [
+      {"name": "input_setup_and_transpose_reference", "wall": 1.273409, "cpu": 1.270648},
+      {"name": "fresh_transfer_fixture_0", "wall": 0.000192, "cpu": 0.000188},
+      {"name": "fresh_transfer_fixture_1", "wall": 4.508505, "cpu": 4.503322},
+      {"name": "fresh_transfer_fixture_2", "wall": 5.280996, "cpu": 5.269481},
+      {"name": "fresh_transfer_fixture_3", "wall": 4.845137, "cpu": 4.838771},
+      {"name": "fresh_transfer_fixture_4", "wall": 4.775673, "cpu": 4.769535},
+      {"name": "fresh_transfer_fixture_5", "wall": 5.044627, "cpu": 5.038893},
+      {"name": "target_bridge_negation_and_doubling_checks", "wall": 7.318629, "cpu": 7.310719}
+    ],
+    "scope": "one local diagnostic run; includes builds and separate review; excludes historical quotient/map construction, checkout, and report rendering"
+  },
+  "portable_comparison": {
+    "manifest_subjects": 112,
+    "result_files_compared": 4,
+    "timing_fields_excluded": 33,
+    "corruptions_rejected": 6,
+    "mathematical_outputs_equal": true,
+    "receipt_sha256": "1a2d28860a5b88216aa42f62c942d9c05006d663578a33c83363bcc881deb836"
+  },
+  "result_sha256": {
+    "relations": "a69e37b9d52515c19415b996bb26e6a0322ce64f2ba293a26b743daf50a3c0b8",
+    "relation_checker": "03abe199548b6d5496c6853726a11a3f268e6df3017904d53dcc9ac5b9537a71",
+    "transfer": "fa1881978043a153c6715d47a1f35d41414939f6dcf467e4d187127aa41fa53e",
+    "transfer_checker": "f1f381fb16938aa9415e7939032b04bacb5418562f54e12105359b6d47447658"
+  },
+  "limitations": [
+    "No signed PCC verdict",
+    "Separate checkers do not independently reconstruct the quotient or correspondence",
+    "Six relations do not form a full logarithm system",
+    "Local timings are not an admitted performance comparison"
+  ]
+}
