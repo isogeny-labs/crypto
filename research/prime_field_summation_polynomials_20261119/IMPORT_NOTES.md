@@ -18,6 +18,29 @@ independent recomputation from raw data, and a matched strongest-rho comparison
 before a new canonical benchmark row may be added. Those obligations remain
 open, so the evidence stays under `research/`.
 
+## Production integration
+
+The reusable algorithmic subset is integrated independently of the imported
+timing claims:
+
+- `src/cryptanalysis/prime_summation_roots.rs` provides bounded all-root,
+  one-root, target-aware split-search, and coefficient-construction APIs;
+- `src/bin/ic/summation_roots.rs` exposes those paths as the existing
+  `ic summation-roots` cryptanalysis command;
+- the implementation reuses `prime_fast::{Fp64, FastCurve, BatchAddScratch}`
+  rather than introducing a C++ FFI or a second production field backend.
+
+Release-mode library and CLI checks, five focused CLI/unit cross-checks, and
+live all/one/target command receipts passed during integration. The all-library
+unit-test target could not run in the partial checkout because numerous
+pre-existing test-only `include_str!` fixtures were absent and an unrelated
+duplicate test name was already present in `ic_framework/plugins.rs`. This
+limitation is recorded as a test-harness blocker, not treated as a pass.
+
+No production benchmark row or speed claim follows from the source integration.
+The imported timing evidence and its validation obligations remain unchanged
+`[pcc:unverified]`.
+
 ## Provenance
 
 - Imported on 2026-11-19 from local source commit

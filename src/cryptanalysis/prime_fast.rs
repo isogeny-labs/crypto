@@ -510,6 +510,13 @@ impl FastCurve {
         }
     }
 
+    /// Construct only the prime-field curve arithmetic, without declaring a
+    /// scalar subgroup.  `n = 1` is a sentinel; callers must not request
+    /// scalar-field operations from this value.
+    pub fn for_arithmetic(name: &str, p: u64, a: u64, b: u64) -> Self {
+        Self::new(name, p, a, b, 1)
+    }
+
     /// Adopt a crate [`CurveParams`] whose `p` and `n` fit in 62 bits.
     pub fn from_params(c: &CurveParams) -> Option<Self> {
         let p = biguint_to_u64(&c.p)?;

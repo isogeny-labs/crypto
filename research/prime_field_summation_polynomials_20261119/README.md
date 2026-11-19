@@ -35,6 +35,33 @@ The structure-aware methods require the curve and originating `x_i` values (and 
 square root of each curve right-hand side). They are not generic factorization
 algorithms for an arbitrary coefficient vector.
 
+## Production cryptanalysis integration
+
+The maintained Rust implementation is exported as
+`crypto_lib::cryptanalysis::prime_summation_roots` and is available through the
+existing cryptanalysis CLI as `ic summation-roots`. It reuses the production
+`prime_fast` Montgomery field and batched affine curve arithmetic; it does not
+call the imported C++ harness.
+
+```bash
+ic --json summation-roots --p 1000003 --a 2 --b 3 \
+  --x 409692,926728,748446 --coefficients
+
+ic --json summation-roots --mode one --p 1000003 --a 2 --b 3 \
+  --x 409692,926728,748446 --sign-mask 2
+
+ic --json summation-roots --mode target --p 1000003 --a 2 --b 3 \
+  --x 409692,926728,748446 --target-x 448482,17
+```
+
+The production interface keeps state allocation explicit through
+`--max-states`, preserves finite-root multiplicity and roots at infinity, and
+returns replayable sign-mask certificates for one-root and target hits. Optional
+coefficient materialization supports quadratic or balanced product-tree
+construction. These are correctness-oriented integration paths; the imported
+timings remain exploratory and are not promoted by this implementation
+`[pcc:unverified]`.
+
 ## Build and verify
 
 ```bash
