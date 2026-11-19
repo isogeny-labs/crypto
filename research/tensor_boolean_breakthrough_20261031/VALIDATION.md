@@ -1305,6 +1305,8 @@ The repository proof gate reports `PASS 310 thm 0 trusted`.
 [pcc:unverified]
 Claim `PCC-20261119-f444b9` binds the endpoint and passes its local Lean
 verifier; signed standing remains unverified. [pcc:unverified]
+A committed-source `lake env leanchecker --fresh TensorBoundaryBounds` replay
+at `21345614` returns `FRESH_CHECKER_EXIT=0`. [pcc:unverified]
 
 This closes the former duplicated-versus-separated character obligation for
 the stated interval model. It still assumes the selected square roots,
