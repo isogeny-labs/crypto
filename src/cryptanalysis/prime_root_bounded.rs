@@ -1162,65 +1162,6 @@ impl Replay {
         Ok(z)
     }
 
-    // R44_REPLAY_WINDOW_HELPER_BEGIN
-    // Two-bit certificate window: cheaper precomputation than width three.\n    // Independent certificate arithmetic: descending bit traversal and
-    // diagonal squaring, without calling the producer's polynomial kernels.
-    fn replay_window2(&mut self, base: &Poly17, exponent: u64, monic: &Poly17) -> Result<Poly17> {
-        debug_assert!(exponent > 0);
-        let mut powers = [Poly17::ZERO; 2];
-        powers[0] = *base;
-        let mut even = self.square_diagonals(base)?;
-        self.cancel_monic(&mut even, monic)?;
-        for slot in 1..2 {
-            self.gate.charge(4 * COPY_WORK)?;
-            let mut product = self.convolution(&powers[slot - 1], &even)?;
-            self.cancel_monic(&mut product, monic)?;
-            powers[slot] = product;
-        }
-        let top = 63i32 - exponent.leading_zeros() as i32;
-        let mut acc = Poly17::constant(1);
-        let mut started = false;
-        let mut cursor = top;
-        while cursor >= 0 {
-            self.gate.charge(4 * COPY_WORK)?;
-            if ((exponent >> cursor) & 1) == 0 {
-                if started {
-                    let mut square = self.square_diagonals(&acc)?;
-                    self.cancel_monic(&mut square, monic)?;
-                    acc = square;
-                }
-                cursor -= 1;
-                continue;
-            }
-            let lower_bound = (cursor - 1).max(0);
-            let mut bottom = cursor;
-            for candidate in lower_bound..=cursor {
-                if (exponent >> candidate) & 1 != 0 {
-                    bottom = candidate;
-                    break;
-                }
-            }
-            let digits = (cursor - bottom + 1) as usize;
-            let mask = (1u64 << digits) - 1;
-            let value = ((exponent >> bottom) & mask) as usize;
-            if started {
-                for _ in 0..digits {
-                    let mut square = self.square_diagonals(&acc)?;
-                    self.cancel_monic(&mut square, monic)?;
-                    acc = square;
-                }
-                let mut product = self.convolution(&acc, &powers[value >> 1])?;
-                self.cancel_monic(&mut product, monic)?;
-                acc = product;
-            } else {
-                acc = powers[value >> 1];
-                started = true;
-            }
-            cursor = bottom - 1;
-        }
-        Ok(acc)
-    }
-    // R44_REPLAY_WINDOW_HELPER_END
     // R42_REPLAY_HELPER_BEGIN
     // Independent iteration over the binary expansion of the bit count k.
     // Keep diagonal squaring, descending cancellation and replay accounting.
@@ -1288,14 +1229,6 @@ impl Replay {
             );
         }
         // R42_REPLAY_FASTPATH_END
-        // R44_REPLAY_WINDOW_SWITCH_BEGIN
-        if monic.len >= 5 && exponent >= (1u64 << 20)
-            && exponent <= u32::MAX as u64 && exponent.count_ones() >= 12
-            && (exponent == self.p || exponent == (self.p - 1) / 2)
-        {
-            return self.replay_window2(&base, exponent, &monic);
-        }
-        // R44_REPLAY_WINDOW_SWITCH_END
         // Keep the former loop for large (61-bit) exponents: native and
         // local A/B shows no reproducible gain from its first-bit shortcut.
         if exponent > u32::MAX as u64 {
