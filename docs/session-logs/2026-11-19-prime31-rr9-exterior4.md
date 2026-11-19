@@ -24,3 +24,21 @@
 - Repository research KB server/wrapper not accessible from this connector-only runtime; bounded GitHub research and primary literature substituted, no novelty priority claim.
 - Nested mutable borrow in initial Rust canonical_base expression caught by static inspection and corrected before CI.
 - An earlier report-writing tool call had a JavaScript string delimiter parsing error; it wrote no file. Retried with properly formed source, committed report.
+
+## 2026-11-19T02:42:00Z — source-specific B4 Rust CI passed and raw artifact recorded
+
+### What was done (commands, files, features)
+- Fetched source-specific GitHub Actions run #44445676750 on candidate source ef037d6c641ff69351f2714fee8ad2cbfc54ec7d: status completed, **success**. All steps passed (original 40 Rust regressions, exterior-field/Laplace unit tests, native B4 candidate execution, independent Python BigInt truth replay).
+- Downloaded and inspected raw artifact #14493406334. Planted public target=(1991076510,718644930) returned correct all-zero word after 1 algebraic pair and 175.177977 ms including minor construction. Natural public R=G produced no witness after all 16,777,216 pairs, 1,174,405,120 coordinate products and 1,295.599945 ms including minor construction. Independent Python EC grader confirmed both truth labels.
+- Frozen exact source-specific summary JSON and updated scientific result, linking raw artifact and pending signed PCC status.
+
+### Decisions made (and why)
+- Narrow B4 correctness/cost experiment succeeded. Stop exhaustive B8 architecture: 300,647,710,720 coordinate products per all-negative public residual is an uncompetitive direct-search budget; not a lower bound on subquadratic orthogonal matching or F4.
+- Do not interpret the planted first-pair result as a natural positive-yield or full ECDLP benchmark. Keep 31-rank/1024 non-generic replacement work with #4692 owner.
+
+### Open threads (unfinished, pick up next time)
+- Develop public-only subquadratic orthogonal-vector match or genuine F4/SAT root extraction and validate on frozen B8 46 positive/18 negative natural corpus before any full-solver comparison.
+- Obtain independently signed PCC verification, and execute matched complete native index-calculus/BSGS/rho costs if a nonenumerative extractor succeeds.
+
+### Errors (what went wrong, how it was handled)
+- None in final candidate CI. Other unrelated repository workflows may have separate failures.
