@@ -164,7 +164,8 @@ provided a modular ring operation costs at most `C(bits(q)+1)^d` and the one
 extended-GCD inverse costs at most `D(bits(q)+1)^e`. The hypotheses are
 intentional: the pinned Mathlib implements `ZMod.inv` through `Nat.gcdA` but
 contains no proved machine-time theorem for that implementation. Array
-allocation and integer-indexing costs remain open as well. The algebraic
+allocation and integer-indexing costs remain open as well. Claim
+`PCC-20261119-e1a1a1` passes its local Lean verifier. The algebraic
 block binding itself is checked: `executableBirdPlantedKernel` substitutes the
 Bird inverse into `(-R B⁻¹ | I)`, and
 `executableBirdPlantedKernel_spec` proves both annihilation of `[B;R]` and the

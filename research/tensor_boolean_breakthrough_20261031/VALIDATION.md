@@ -890,5 +890,6 @@ also remain outside the model. [pcc:unverified]
 The pinned build completed with 2,189 jobs. The repository proof gate reported
 `PASS 87 thm 0 trusted`; both new laws use only `propext`,
 `Classical.choice`, and `Quot.sound`, and
-`lake env leanchecker --fresh TensorBoundaryBounds` exited 0.
+`lake env leanchecker --fresh TensorBoundaryBounds` exited 0. Hash-bound claim
+`PCC-20261119-e1a1a1` passes its local Lean verifier.
 [pcc:unverified]
