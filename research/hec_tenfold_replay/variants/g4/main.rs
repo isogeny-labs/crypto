@@ -214,8 +214,9 @@ mod phases {
         }
         println!("PANEL g={g} p={p} c={} ell={ell} status=selected",inst.c);
         let c = &inst.curve;
-        let mut rng = Rng::new(2026121307 ^ p ^ ((g as u64) << 32));
-        for case in 0..4 {
+        let mut rng = Rng::new(std::env::var("HEC_PAIR_SEED").map(|s|s.parse::<u64>().expect("invalid HEC_PAIR_SEED")).unwrap_or(2026121307) ^ p ^ ((g as u64) << 32));
+        let pairs = std::env::var("HEC_PAIRS").map(|s|s.parse::<usize>().expect("invalid HEC_PAIRS")).unwrap_or(4);
+        for case in 0..pairs {
             let d = c.mul(&inst.d1, 1 + rng.below(ell - 1));
             let truth = 1 + rng.below(ell - 1);
             let target = c.mul(&d, truth);
