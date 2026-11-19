@@ -3300,6 +3300,163 @@ mod tests {
         *s >> 33
     }
 
+    // Round 35: synthetic division by x±1 must preserve the complete
+    // root set for repeated factors, irreducible cofactors and tiny primes.
+    #[test]
+    fn round35_small_linear_factors_match_bruteforce() {
+        let mut seed = 0x3178_b3c0_2205_a87au64;
+        for &p in &[5u64, 7, 11, 13, 17, 31, 101] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = ctx.f;
+            for &root in &[1, p - 1] {
+                for _ in 0..48 {
+                    let (b, c, d) = (lcg(&mut seed) % p,
+                                     lcg(&mut seed) % p,
+                                     lcg(&mut seed) % p);
+                    let neg_root = f.neg(root);
+                    // (x-root)(x²+b*x+c)
+                    let cubic = [f.mul(neg_root, c),
+                                 f.add(c, f.mul(neg_root, b)),
+                                 f.add(b, neg_root), 1];
+                    let mut got = ctx.roots(&cubic).unwrap().roots;
+                    let want = brute(p, &cubic);
+                    got.sort_unstable();
+                    assert_eq!(got, want, "cubic p={p} root={root} {cubic:?}");
+                    let mut direct = ctx.cubic_monic(cubic[2], cubic[1], cubic[0]);
+                    direct.sort_unstable();
+                    direct.dedup();
+                    assert_eq!(direct, want);
+
+                    // (x-root)(x³+b*x²+c*x+d)
+                    let quartic = [f.mul(neg_root, d),
+                                   f.add(d, f.mul(neg_root, c)),
+                                   f.add(c, f.mul(neg_root, b)),
+                                   f.add(b, neg_root), 1];
+                    let mut got = ctx.roots(&quartic).unwrap().roots;
+                    got.sort_unstable();
+                    assert_eq!(got, brute(p, &quartic),
+                               "quartic p={p} root={root} {quartic:?}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn round35_mersenne_power_skip_terminal_square_matches_previous() {
+        let p = MAX_PRIME;
+        let f = Fp::new(p);
+        let old = |a: u64, mut e: u64| {
+            let mut base = a % p;
+            let mut result = 1u64;
+            while e != 0 {
+                if e & 1 != 0 { result = f.mul(result, base); }
+                base = f.sqr(base);
+                e >>= 1;
+            }
+            result
+        };
+        let mut seed = 0x7176_81c6_4ad0_81a7;
+        for i in 0..4096 {
+            let a = lcg(&mut seed) % p;
+            let e = match i % 5 {
+                0 => 0, 1 => 1, 2 => (p + 1) / 4,
+                3 => p - 2, _ => lcg(&mut seed),
+            };
+            assert_eq!(f.powm(a, e), old(a, e), "a={a} e={e}");
+        }
+    }
+
+    #[test]
+    #[ignore = "paired release-mode native Rust microbenchmark"]
+    fn bench_round35_small_factors_and_mersenne_pow() {
+        use std::hint::black_box;
+        use std::time::Instant;
+        fn median(mut x: Vec<f64>) -> f64 {
+            x.sort_by(f64::total_cmp);
+            x[x.len() / 2]
+        }
+        let timed = |f: &dyn Fn() -> u64, reps: usize| -> f64 {
+            let start = Instant::now();
+            let mut digest = 0u64;
+            for _ in 0..reps { digest ^= black_box(f()); }
+            black_box(digest);
+            start.elapsed().as_nanos() as f64 / reps as f64
+        };
+        let paired = |label: &str, old: &dyn Fn() -> u64,
+                      new: &dyn Fn() -> u64, reps: usize| {
+            let (mut bs, mut ns) = (Vec::new(), Vec::new());
+            for i in 0..13 {
+                if i % 2 == 0 {
+                    bs.push(timed(old, reps));
+                    ns.push(timed(new, reps));
+                } else {
+                    ns.push(timed(new, reps));
+                    bs.push(timed(old, reps));
+                }
+            }
+            let b = median(bs);
+            let n = median(ns);
+            println!("round35 {label}: {b:.3} -> {n:.3} ns/op, {:.3}x", b / n);
+        };
+        fn digest(roots: Vec<u64>) -> u64 {
+            roots.iter().fold(roots.len() as u64,
+                              |a, &v| a.wrapping_mul(131).wrapping_add(v))
+        }
+        let old_cubic = |ctx: &RadicalRootCtx, c2: u64, c1: u64, c0: u64| {
+            let f = ctx.f;
+            let sh = f.mul(c2, ctx.inv3);
+            let pp = f.sub(c1, f.mul(c2, sh));
+            let sh3 = f.mul(f.sqr(sh), sh);
+            let q = f.add(f.sub(f.add(sh3, sh3), f.mul(c1, sh)), c0);
+            let mut roots: Vec<u64> = ctx.cubic_depressed(pp, q).into_iter()
+                .map(|x| f.sub(x, sh)).collect();
+            roots.sort_unstable();
+            roots.dedup();
+            roots
+        };
+        for &p in &[1_000_000_007u64, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = ctx.f;
+            let neg = f.neg(1);
+            let cubic = [neg, 1, neg, 1]; // (x-1)(x²+1)
+            let quartic = [f.mul(neg, 2), f.add(1, 2),
+                           f.sub(neg, 2), f.add(neg, f.neg(2)), 1];
+            // Construct quartic reliably: (x-1)(x-2)(x²+1).
+            let t = f.add(2, 1);
+            let qcoeffs = [2, f.neg(t), f.add(2, 1), f.neg(t), 1];
+            let _ = black_box(quartic);
+            let _ = black_box(qcoeffs);
+            let old3 = || digest(old_cubic(&ctx, cubic[2], cubic[1], cubic[0]));
+            let new3 = || digest(ctx.cubic_monic(cubic[2], cubic[1], cubic[0]));
+            assert_eq!(old3(), new3());
+            paired(&format!("cubic_root_1_p{p}"), &old3, &new3, 64);
+            // (x-1)(x-2)(x²+1) with coefficients [2,-3,3,-3,1]
+            let quartic = [2, f.neg(3), 3, f.neg(3), 1];
+            let old4 = || digest(ctx.quartic_before_sparse(1, quartic[3],
+                                  quartic[2], quartic[1], quartic[0]).unwrap().0);
+            let new4 = || digest(ctx.quartic(1, quartic[3],
+                                  quartic[2], quartic[1], quartic[0]).unwrap().0);
+            assert_eq!(old4(), new4());
+            paired(&format!("quartic_root_1_p{p}"), &old4, &new4, 16);
+        }
+        let p = MAX_PRIME;
+        let f = Fp::new(p);
+        let a = 1_000_000_009;
+        let exp = (p + 1) / 4;
+        let old_pow = || {
+            let (mut x, mut out, mut e) = (a % p, 1u64, exp);
+            while e != 0 {
+                if e & 1 != 0 { out = f.mul(out, x); }
+                x = f.sqr(x);
+                e >>= 1;
+            }
+            out
+        };
+        let new_pow = || f.powm(a, exp);
+        assert_eq!(old_pow(), new_pow());
+        paired("mersenne_powm", &old_pow, &new_pow, 4096);
+    }
+
     #[test]
     fn rejects_bad_primes() {
         for p in [0u64, 1, 2, 3, 4, 9, 15, MAX_PRIME + 2] {
