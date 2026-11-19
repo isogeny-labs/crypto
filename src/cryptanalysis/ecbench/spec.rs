@@ -24,6 +24,14 @@ pub const SPEC_SCHEMA: &str = "ecbench.spec/v2";
 /// Frozen historical specs.  They remain parseable for replay and audit.
 pub const LEGACY_SPEC_SCHEMA: &str = "ecbench.spec/v1";
 
+fn default_phase_lane() -> String {
+    super::panel::DEFAULT_PHASE_LANE.to_string()
+}
+
+fn is_default_phase_lane(lane: &str) -> bool {
+    lane == super::panel::DEFAULT_PHASE_LANE
+}
+
 /// Why a spec is allowed to select its curves.
 ///
 /// Phase measurements must select canonical panel cells.  Tiny and off-panel
@@ -39,8 +47,17 @@ pub enum CurvePolicy {
     Smoke,
     /// Off-panel research that records why the canonical ladder is inapplicable.
     Diagnostic { off_panel_reason: String },
-    /// A scaling measurement on one or more cells of the named phase.
-    Phase { phase: u8 },
+    /// A scaling measurement on one or more cells in one independently
+    /// promoted benchmark lane of the named phase. Omission preserves the
+    /// pre-lane v2 identity and means `elliptic_algebraic`.
+    Phase {
+        phase: u8,
+        #[serde(
+            default = "default_phase_lane",
+            skip_serializing_if = "is_default_phase_lane"
+        )]
+        lane: String,
+    },
 }
 
 impl CurvePolicy {
@@ -286,26 +303,41 @@ fn validate_curve_policy(spec: &Spec) -> Result<(), String> {
                 Ok(())
             }
         }
-        CurvePolicy::Phase { phase } => {
+        CurvePolicy::Phase { phase, lane } => {
             let catalog = super::panel::catalog()?;
             let phase_record = catalog
                 .phase(*phase)
                 .ok_or_else(|| format!("canonical panel has no phase {phase}"))?;
-            if phase_record.admission_state != "ready_to_preregister" {
+            let lane_definition = catalog
+                .lane(lane)
+                .ok_or_else(|| format!("canonical panel has no benchmark lane `{lane}`"))?;
+            let lane_record = phase_record
+                .lanes
+                .iter()
+                .find(|record| record.lane_id == *lane)
+                .ok_or_else(|| format!("canonical phase {phase} has no benchmark lane `{lane}`"))?;
+            if lane_record.admission_state != "ready_to_preregister" {
                 return Err(format!(
-                    "canonical phase {phase} is {} and cannot start until its admission blockers are cleared in the panel manifest",
-                    phase_record.admission_state
+                    "canonical phase {phase} lane `{lane}` is {} and cannot start until its admission blockers are cleared in the panel manifest: {}",
+                    lane_record.admission_state,
+                    lane_record.blockers.join("; ")
+                ));
+            }
+            if lane_definition.curve_selector != "source_panel_cells" {
+                return Err(format!(
+                    "canonical phase {phase} lane `{lane}` requires {} support, which phase specs do not yet implement",
+                    lane_definition.curve_selector
                 ));
             }
             if spec.workloads.target_kind != TargetKind::Public {
                 return Err(format!(
-                    "phase {phase} requires public targets, not {:?}",
+                    "phase {phase} lane `{lane}` requires public targets, not {:?}",
                     spec.workloads.target_kind
                 ));
             }
             if spec.workloads.targets_per_curve < phase_record.minimum_public_targets_per_curve {
                 return Err(format!(
-                    "phase {phase} requires at least {} public targets per curve, not {}",
+                    "phase {phase} lane `{lane}` requires at least {} public targets per curve, not {}",
                     phase_record.minimum_public_targets_per_curve, spec.workloads.targets_per_curve
                 ));
             }
@@ -313,7 +345,7 @@ fn validate_curve_policy(spec: &Spec) -> Result<(), String> {
             for curve in &spec.workloads.curves {
                 let CurveSpec::Panel { cell } = curve else {
                     return Err(format!(
-                        "phase {phase} curves must use {{\"kind\":\"panel\",\"cell\":...}}; copied or generated curve parameters are off-panel diagnostics"
+                        "phase {phase} lane `{lane}` curves must use {{\"kind\":\"panel\",\"cell\":...}}; copied or generated curve parameters are off-panel diagnostics"
                     ));
                 };
                 if !selected.insert(cell.as_str()) {
@@ -920,7 +952,29 @@ mod tests {
             .to_string(),
         )
         .unwrap();
-        assert!(plan(blocked).err().unwrap().contains("phase 4 is blocked"));
+        assert!(plan(blocked)
+            .err()
+            .unwrap()
+            .contains("phase 4 lane `elliptic_algebraic` is blocked"));
+
+        let blocked_hec = Spec::from_json(
+            &json!({
+                "schema": SPEC_SCHEMA,
+                "label": "blocked hyperelliptic lane fixture",
+                "curve_policy": {"mode": "phase", "phase": 1,
+                                 "lane": "hyperelliptic_jacobian"},
+                "workloads": {"curves": [{"kind": "panel", "cell": "P1-K0-23"}],
+                    "targets_per_curve": 32, "target_seed": 1, "target_kind": "public"},
+                "arms": [{"name": "rho", "role": "reference", "method": {"id": "rho.plain"}}],
+                "measurement": {"rounds": 1, "warmup": 0, "seed": 9}
+            })
+            .to_string(),
+        )
+        .unwrap();
+        assert!(plan(blocked_hec)
+            .err()
+            .unwrap()
+            .contains("lane `hyperelliptic_jacobian` is blocked"));
     }
 
     #[test]

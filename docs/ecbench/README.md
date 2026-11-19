@@ -102,15 +102,18 @@ List the shared curve ladder before writing a scaling spec:
 ```bash
 ./target/release/ecbench panel
 ./target/release/ecbench panel --phase 1 --family koblitz --json
+./target/release/ecbench panel --phase 1 --lane hyperelliptic_jacobian
 ```
 
 New specs use `ecbench.spec/v2` and classify curve selection explicitly:
 
-- `{"mode":"phase","phase":1}` is scaling/claim evidence. Every curve must
+- `{"mode":"phase","phase":1,"lane":"elliptic_generic_decomposition"}`
+  is scaling/claim evidence in one independently promoted lane. Every curve must
   be named as `{"kind":"panel","cell":"P1-K0-23"}`, use public targets,
   and meet the phase's target-count floor. Copied parameters, wrong-phase
-  cells, a phase whose admission state is blocked, and substitutes are refused
-  before execution.
+  cells, a lane whose admission state is blocked, and substitutes are refused
+  before execution. For compatibility, an omitted `lane` means
+  `elliptic_algebraic`; new specs should always name it.
 - `{"mode":"smoke"}` is for correctness and plumbing fixtures.
 - `{"mode":"diagnostic","off_panel_reason":"..."}` is for research that
   cannot use the panel and records why.
@@ -121,6 +124,12 @@ enter a phase. Size always means `ceil(log2(r))`; field bits or binary degree
 are recorded separately. The authoritative cells are embedded from
 [`panel.json`](../../research/ecbench_phased_panel_20261117/panel.json), so a
 cell ID resolves to the same parameters and identities everywhere.
+The canonical lanes are `elliptic_algebraic`,
+`elliptic_generic_decomposition`, `hyperelliptic_jacobian`, and
+`cover_transfer`. The two decomposition tracks do not share promotion evidence.
+The current higher-genus and transfer entries are deliberately blocked until
+phase-matched objects and complete end-to-end adapters clear their listed
+obligations.
 
 An executable Phase 1 compatible-family slice is
 [`panel-phase1-k0-23.json`](specs/panel-phase1-k0-23.json). A full phase still
@@ -1301,6 +1310,16 @@ Every arm of a session runs on every curve, so a session holds one
 family; `plan` refuses an arm its curve cannot run, with the reason (no
 rational ℓ-isogeny, a negation the Jacobian does not have, a family the
 method does not take).
+
+These workload kinds and methods are implementation inventory, not automatic
+admission to the phased panel. A direct hyperelliptic run must enter the
+`hyperelliptic_jacobian` lane with an exact phase-matched Jacobian subgroup and
+same-Jacobian rho reference. A cover run must enter `cover_transfer` only after
+the typed route, subgroup preservation, destination solver, source recovery,
+three-arm control, and complete nine-phase cost obligations in
+[`docs/transfer-assessment/MEASUREMENT.md`](../transfer-assessment/MEASUREMENT.md)
+are executable. Until then, `plan` refuses those phase lanes even though smoke
+or diagnostic specs remain available.
 
 ## 8. Statistics
 

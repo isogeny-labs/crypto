@@ -217,6 +217,9 @@ enum Cmd {
         /// Only cells in this phase (1, 2, 3, or 4).
         #[arg(long)]
         phase: Option<u8>,
+        /// Show admission for one independently promoted benchmark lane.
+        #[arg(long)]
+        lane: Option<String>,
         /// Only this family: koblitz, binary, or prime.
         #[arg(long)]
         family: Option<String>,
@@ -1450,6 +1453,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
         }
         Cmd::Panel {
             phase,
+            lane,
             family,
             runnable,
             json,
@@ -1467,9 +1471,31 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     .phase(number)
                     .ok_or_else(|| format!("canonical panel has no phase {number}"))?;
             }
+            if let Some(value) = &lane {
+                catalog
+                    .lane(value)
+                    .ok_or_else(|| format!("canonical panel has no benchmark lane `{value}`"))?;
+            }
+            let lane_rows = catalog
+                .phases
+                .iter()
+                .filter(|record| phase.is_none_or(|number| record.phase == number))
+                .flat_map(|record| {
+                    record
+                        .lanes
+                        .iter()
+                        .filter(|entry| lane.as_deref().is_none_or(|value| entry.lane_id == value))
+                        .map(move |entry| (record, entry))
+                })
+                .collect::<Vec<_>>();
+            let show_source_cells = lane.as_deref().is_none_or(|value| {
+                catalog
+                    .lane(value)
+                    .is_some_and(|definition| definition.curve_selector == "source_panel_cells")
+            });
             let mut rows = Vec::new();
             for record in &catalog.phases {
-                if phase.is_some_and(|number| record.phase != number) {
+                if !show_source_cells || phase.is_some_and(|number| record.phase != number) {
                     continue;
                 }
                 for cell in &record.curves {
@@ -1487,6 +1513,12 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     "source": panel::PANEL_SOURCE,
                     "size_metric": catalog.size_metric,
                     "gate_defaults": catalog.gate_defaults,
+                    "lanes": lane_rows.iter().map(|(record, entry)| serde_json::json!({
+                        "phase": record.phase,
+                        "nominal_subgroup_bits": record.nominal_subgroup_bits,
+                        "definition": catalog.lane(&entry.lane_id),
+                        "admission": entry,
+                    })).collect::<Vec<_>>(),
                     "cells": rows.iter().map(|(record, cell)| serde_json::json!({
                         "phase": record.phase,
                         "nominal_subgroup_bits": record.nominal_subgroup_bits,
@@ -1502,26 +1534,46 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     panel::PANEL_SOURCE
                 );
                 println!(
-                    "{:<5} {:<26} {:<8} {:>6} {:>6} {:<45} {}",
-                    "phase", "cell", "family", "r bits", "field", "identity", "status"
+                    "{:<5} {:<34} {:<22} {}",
+                    "phase", "lane", "state", "blockers"
                 );
-                for (record, cell) in rows {
-                    let identity = cell
-                        .identity
-                        .icv1
-                        .as_deref()
-                        .or(cell.identity.external_name.as_deref())
-                        .unwrap_or("-");
+                for (record, entry) in lane_rows {
+                    println!(
+                        "{:<5} {:<34} {:<22} {}",
+                        record.phase,
+                        entry.lane_id,
+                        entry.admission_state,
+                        if entry.blockers.is_empty() {
+                            "-".to_string()
+                        } else {
+                            entry.blockers.join("; ")
+                        }
+                    );
+                }
+                if !rows.is_empty() {
+                    println!();
                     println!(
                         "{:<5} {:<26} {:<8} {:>6} {:>6} {:<45} {}",
-                        record.phase,
-                        cell.cell_id,
-                        cell.family,
-                        cell.size.subgroup_bits,
-                        cell.size.field_bits_or_degree,
-                        identity,
-                        cell.ecbench.status
+                        "phase", "cell", "family", "r bits", "field", "identity", "status"
                     );
+                    for (record, cell) in rows {
+                        let identity = cell
+                            .identity
+                            .icv1
+                            .as_deref()
+                            .or(cell.identity.external_name.as_deref())
+                            .unwrap_or("-");
+                        println!(
+                            "{:<5} {:<26} {:<8} {:>6} {:>6} {:<45} {}",
+                            record.phase,
+                            cell.cell_id,
+                            cell.family,
+                            cell.size.subgroup_bits,
+                            cell.size.field_bits_or_degree,
+                            identity,
+                            cell.ecbench.status
+                        );
+                    }
                 }
             }
         }

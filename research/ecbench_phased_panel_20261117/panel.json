@@ -1,5 +1,5 @@
 {
-  "schema": "ecbench.phased-panel/v1",
+  "schema": "ecbench.phased-panel/v2",
   "status": "planned_unmeasured",
   "size_metric": {
     "name": "subgroup_bits",
@@ -20,6 +20,40 @@
     "targets_per_curve_below_64_bits": 32,
     "targets_per_curve_at_or_above_64_bits": 8
   },
+  "lane_definitions": [
+    {
+      "lane_id": "elliptic_algebraic",
+      "object_kind": "elliptic_subgroup",
+      "algorithm_track": "algebraic_decomposition",
+      "curve_selector": "source_panel_cells",
+      "promotion_scope": "independent",
+      "required_obligations": ["exact_curve_and_subgroup", "applicable_algebraic_solver", "strongest_applicable_rho", "verified_recovery", "complete_cold_cost"]
+    },
+    {
+      "lane_id": "elliptic_generic_decomposition",
+      "object_kind": "elliptic_subgroup",
+      "algorithm_track": "generic_decomposition",
+      "curve_selector": "source_panel_cells",
+      "promotion_scope": "independent",
+      "required_obligations": ["exact_curve_and_subgroup", "applicable_table_or_rootfinder", "strongest_applicable_rho", "verified_recovery", "complete_cold_cost"]
+    },
+    {
+      "lane_id": "hyperelliptic_jacobian",
+      "object_kind": "jacobian_subgroup",
+      "algorithm_track": "higher_genus_index_calculus",
+      "curve_selector": "registered_destination_cells",
+      "promotion_scope": "independent",
+      "required_obligations": ["exact_curve_and_jacobian_subgroup", "applicable_higher_genus_solver", "strongest_same_jacobian_rho", "verified_recovery", "complete_cold_cost"]
+    },
+    {
+      "lane_id": "cover_transfer",
+      "object_kind": "typed_transfer_route",
+      "algorithm_track": "cover_transfer",
+      "curve_selector": "source_panel_cells",
+      "promotion_scope": "independent",
+      "required_obligations": ["route_existence", "explicit_construction", "map_correctness", "subgroup_preservation", "destination_solver_applicability", "source_scalar_recovery", "nine_phase_complete_cost"]
+    }
+  ],
   "phases": [
     {
       "phase": 1,
@@ -28,6 +62,12 @@
       "objective": "Calibrate relation, rank, cofactor, field-structure, Koblitz-sign, and automorphism effects before scaling.",
       "minimum_public_targets_per_curve": 32,
       "admission_state": "ready_to_preregister",
+      "lanes": [
+        {"lane_id": "elliptic_algebraic", "mandatory": true, "admission_state": "ready_to_preregister", "blockers": []},
+        {"lane_id": "elliptic_generic_decomposition", "mandatory": true, "admission_state": "ready_to_preregister", "blockers": []},
+        {"lane_id": "hyperelliptic_jacobian", "mandatory": true, "admission_state": "blocked", "blockers": ["register phase-matched Jacobian cells with exact r-parts and executable strongest-Jacobian-rho references"]},
+        {"lane_id": "cover_transfer", "mandatory": true, "admission_state": "blocked", "blockers": ["register typed source-cover-Jacobian routes and executable destination solvers with recovery and complete-cost adapters"]}
+      ],
       "curves": [
         {
           "cell_id": "P1-K0-23",
@@ -185,6 +225,12 @@
       "objective": "Confirm calibrated relation and rank behavior at the first scaling step with one curve from each core family.",
       "minimum_public_targets_per_curve": 32,
       "admission_state": "ready_to_preregister",
+      "lanes": [
+        {"lane_id": "elliptic_algebraic", "mandatory": true, "admission_state": "ready_to_preregister", "blockers": []},
+        {"lane_id": "elliptic_generic_decomposition", "mandatory": true, "admission_state": "ready_to_preregister", "blockers": []},
+        {"lane_id": "hyperelliptic_jacobian", "mandatory": true, "admission_state": "blocked", "blockers": ["register phase-matched Jacobian cells with exact r-parts and executable strongest-Jacobian-rho references"]},
+        {"lane_id": "cover_transfer", "mandatory": true, "admission_state": "blocked", "blockers": ["register typed source-cover-Jacobian routes and executable destination solvers with recovery and complete-cost adapters"]}
+      ],
       "curves": [
         {
           "cell_id": "P2-KOBLITZ-37",
@@ -258,6 +304,12 @@
       "objective": "Test whether the surviving candidates and their relation/rank models remain viable near the current narrow-backend boundary.",
       "minimum_public_targets_per_curve": 32,
       "admission_state": "partially_blocked",
+      "lanes": [
+        {"lane_id": "elliptic_algebraic", "mandatory": true, "admission_state": "partially_blocked", "blockers": ["the degree-73 Koblitz source has no matching wide algebraic index-calculus arm"]},
+        {"lane_id": "elliptic_generic_decomposition", "mandatory": true, "admission_state": "partially_blocked", "blockers": ["the degree-73 Koblitz source has no matching wide generic-decomposition arm"]},
+        {"lane_id": "hyperelliptic_jacobian", "mandatory": true, "admission_state": "blocked", "blockers": ["register phase-matched wide Jacobian cells and executable same-Jacobian solver/reference pairs"]},
+        {"lane_id": "cover_transfer", "mandatory": true, "admission_state": "blocked", "blockers": ["register phase-matched typed routes and wide destination solvers with recovery and complete-cost adapters"]}
+      ],
       "curves": [
         {
           "cell_id": "P3-KOBLITZ-73",
@@ -331,6 +383,12 @@
       "objective": "Run the final registered/challenge-anchored panel only after wide generic arithmetic, method parity, and local curve identities are available.",
       "minimum_public_targets_per_curve": 8,
       "admission_state": "blocked",
+      "lanes": [
+        {"lane_id": "elliptic_algebraic", "mandatory": true, "admission_state": "blocked", "blockers": ["import the two external anchors and provide wide algebraic method parity"]},
+        {"lane_id": "elliptic_generic_decomposition", "mandatory": true, "admission_state": "blocked", "blockers": ["import the two external anchors and provide wide generic-decomposition method parity"]},
+        {"lane_id": "hyperelliptic_jacobian", "mandatory": true, "admission_state": "blocked", "blockers": ["register phase-matched wide Jacobian cells and executable same-Jacobian solver/reference pairs"]},
+        {"lane_id": "cover_transfer", "mandatory": true, "admission_state": "blocked", "blockers": ["register phase-matched typed routes and wide destination solvers with recovery and complete-cost adapters"]}
+      ],
       "curves": [
         {
           "cell_id": "P4-KOBLITZ-83",

@@ -2,7 +2,7 @@
 title: "A phased curve panel for ecbench"
 subtitle: "20-, 30-, 60-, and 80-bit subgroup gates"
 author: "Isogeny Labs research planning"
-date: "2026-11-17"
+date: "2026-11-17; lane revision 2026-11-19"
 geometry: margin=0.72in
 colorlinks: true
 linkcolor: blue
@@ -29,6 +29,23 @@ The exact identities, parameters, and current execution states are frozen in
 [`panel.json`](panel.json). Promotion is a scientific-readiness decision. The
 separate end-to-end claim gate in [`PROTOCOL.md`](PROTOCOL.md) is required for
 any speedup statement. [pcc:unverified]
+
+The curve ladder is crossed with four independently promoted lanes. Algebraic
+decomposition and generic table/root-finding decomposition remain separate
+tracks. Direct hyperelliptic/Jacobian work is a third lane, and a typed
+cover/transfer plus destination-solver and source-recovery pipeline is a fourth.
+The latter two are explicitly blocked at every current phase: existing smoke
+implementations, checked covers, and transfer audits do not yet provide
+phase-matched registered destination cells and complete end-to-end adapters.
+This records required scope without converting partial evidence into a result
+[12–15].
+
+| Lane | P1 | P2 | P3 | P4 |
+|---|---|---|---|---|
+| elliptic algebraic | ready | ready | partially blocked | blocked |
+| elliptic generic decomposition | ready | ready | partially blocked | blocked |
+| hyperelliptic/Jacobian | blocked | blocked | blocked | blocked |
+| cover/transfer | blocked | blocked | blocked | blocked |
 
 ![Four phased panels separated by admission, correctness, rank, replay, and resource gates. The speedup-claim gate is a separate branch. [pcc:unverified]](phased-panel.svg)
 
@@ -161,9 +178,12 @@ sequence is:
 5. **Resources:** the next preregistered envelope fits the approved budget with
    4× headroom or receives an explicit revised cap before running.
 
-At least one candidate in each mandatory core family must complete the phase.
-Phase 1’s four extra sentinels are also mandatory. A failed family stops at that
-boundary; a redesigned algorithm restarts at Phase 1 under a new ID.
+At least one candidate in each mandatory core family must complete a ready
+elliptic lane. Phase 1’s four extra sentinels are also mandatory. Higher-genus
+and transfer lanes have their own mandatory destination objects and route
+obligations. Promotion is per lane: a failed or blocked lane stops at that
+boundary without blocking or promoting another lane. A redesigned algorithm
+restarts at Phase 1 under a new ID.
 
 The default 0.80 full-rank probability, 16 episodes, 2× maximum yield shortfall,
 and 4× resource headroom are operational program thresholds, not mathematical
@@ -222,3 +242,7 @@ session and makes no performance observation.
 9. Isogeny Labs crypto, [`docs/ecbench/README.md`](../../docs/ecbench/README.md) and [`src/cryptanalysis/ecbench/workload.rs`](../../src/cryptanalysis/ecbench/workload.rs), current constructor and method boundaries.
 10. Isogeny Labs crypto, [`research/relation_yield_pruning_20261031/PROTOCOL.md`](../relation_yield_pruning_20261031/PROTOCOL.md), familywise pruning and full-rank success protocol.
 11. Isogeny Labs crypto, [`docs/ic/SUCCESS_CRITERIA.md`](../../docs/ic/SUCCESS_CRITERIA.md), end-to-end evidence and target-count gates.
+12. Isogeny Labs crypto, [`research/ic_acct3_hec_ecbench_20261021/AUDIT_IR.md`](../ic_acct3_hec_ecbench_20261021/AUDIT_IR.md), direct hyperelliptic/Jacobian ecbench arm audit and its validation boundary.
+13. Isogeny Labs crypto, [`docs/curves/COVERS.md`](../../docs/curves/COVERS.md), executable cover catalogue and its explicit non-solver boundary.
+14. Isogeny Labs crypto, [`research/binary_genus2_cover_20261014/REPORT.md`](../binary_genus2_cover_20261014/REPORT.md), checked binary genus-2 cover maps without a destination-solver speed claim.
+15. Isogeny Labs crypto, [`docs/transfer-assessment/MEASUREMENT.md`](../../docs/transfer-assessment/MEASUREMENT.md), three-arm and nine-phase transfer measurement contract.

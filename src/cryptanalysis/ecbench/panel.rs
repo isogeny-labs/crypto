@@ -13,8 +13,9 @@ use serde::{Deserialize, Serialize};
 
 use super::workload::CurveSpec;
 
-pub const PANEL_SCHEMA: &str = "ecbench.phased-panel/v1";
+pub const PANEL_SCHEMA: &str = "ecbench.phased-panel/v2";
 pub const PANEL_SOURCE: &str = "research/ecbench_phased_panel_20261117/panel.json";
+pub const DEFAULT_PHASE_LANE: &str = "elliptic_algebraic";
 const PANEL_JSON: &str = include_str!("../../../research/ecbench_phased_panel_20261117/panel.json");
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -23,6 +24,7 @@ pub struct Panel {
     pub status: String,
     pub size_metric: SizeMetric,
     pub gate_defaults: GateDefaults,
+    pub lane_definitions: Vec<LaneDefinition>,
     pub phases: Vec<Phase>,
 }
 
@@ -44,6 +46,24 @@ pub struct GateDefaults {
     pub targets_per_curve_at_or_above_64_bits: u64,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct LaneDefinition {
+    pub lane_id: String,
+    pub object_kind: String,
+    pub algorithm_track: String,
+    pub curve_selector: String,
+    pub promotion_scope: String,
+    pub required_obligations: Vec<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PhaseLane {
+    pub lane_id: String,
+    pub mandatory: bool,
+    pub admission_state: String,
+    pub blockers: Vec<String>,
+}
+
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Phase {
     pub phase: u8,
@@ -52,6 +72,7 @@ pub struct Phase {
     pub objective: String,
     pub minimum_public_targets_per_curve: u64,
     pub admission_state: String,
+    pub lanes: Vec<PhaseLane>,
     pub curves: Vec<Cell>,
 }
 
@@ -134,6 +155,19 @@ impl Panel {
         })
     }
 
+    pub fn lane(&self, id: &str) -> Option<&LaneDefinition> {
+        self.lane_definitions.iter().find(|lane| lane.lane_id == id)
+    }
+
+    pub fn phase_lane(&self, phase: u8, lane: &str) -> Option<(&Phase, &PhaseLane)> {
+        let phase = self.phase(phase)?;
+        phase
+            .lanes
+            .iter()
+            .find(|record| record.lane_id == lane)
+            .map(|record| (phase, record))
+    }
+
     fn validate(&self) -> Result<(), String> {
         if self.schema != PANEL_SCHEMA {
             return Err(format!(
@@ -149,6 +183,66 @@ impl Panel {
                 "canonical panel must size cells by ceil(log2(r)), separately from field size"
                     .into(),
             );
+        }
+        let expected_lanes = [
+            (
+                "elliptic_algebraic",
+                "elliptic_subgroup",
+                "algebraic_decomposition",
+                "source_panel_cells",
+            ),
+            (
+                "elliptic_generic_decomposition",
+                "elliptic_subgroup",
+                "generic_decomposition",
+                "source_panel_cells",
+            ),
+            (
+                "hyperelliptic_jacobian",
+                "jacobian_subgroup",
+                "higher_genus_index_calculus",
+                "registered_destination_cells",
+            ),
+            (
+                "cover_transfer",
+                "typed_transfer_route",
+                "cover_transfer",
+                "source_panel_cells",
+            ),
+        ];
+        let mut lane_ids = BTreeSet::new();
+        for lane in &self.lane_definitions {
+            if !lane_ids.insert(lane.lane_id.as_str()) {
+                return Err(format!("benchmark lane `{}` appears twice", lane.lane_id));
+            }
+            if lane.promotion_scope != "independent" {
+                return Err(format!(
+                    "benchmark lane `{}` must promote independently",
+                    lane.lane_id
+                ));
+            }
+            if lane.required_obligations.is_empty() {
+                return Err(format!(
+                    "benchmark lane `{}` has no promotion obligations",
+                    lane.lane_id
+                ));
+            }
+        }
+        if lane_ids != expected_lanes.iter().map(|(id, _, _, _)| *id).collect() {
+            return Err("canonical panel benchmark lanes do not match the frozen lane set".into());
+        }
+        for (id, object_kind, algorithm_track, curve_selector) in expected_lanes {
+            let lane = self.lane(id).expect("lane set checked above");
+            if (
+                lane.object_kind.as_str(),
+                lane.algorithm_track.as_str(),
+                lane.curve_selector.as_str(),
+            ) != (object_kind, algorithm_track, curve_selector)
+            {
+                return Err(format!(
+                    "benchmark lane `{id}` does not carry its frozen object/track/selector contract"
+                ));
+            }
         }
         let expected = [
             (1, 20, 18, 23),
@@ -174,6 +268,48 @@ impl Panel {
             {
                 return Err(format!(
                     "phase {} does not carry the frozen nominal/window tuple",
+                    phase.phase
+                ));
+            }
+            let mut phase_lanes = BTreeSet::new();
+            for lane in &phase.lanes {
+                if !phase_lanes.insert(lane.lane_id.as_str()) {
+                    return Err(format!(
+                        "phase {} benchmark lane `{}` appears twice",
+                        phase.phase, lane.lane_id
+                    ));
+                }
+                if !lane_ids.contains(lane.lane_id.as_str()) {
+                    return Err(format!(
+                        "phase {} names unknown benchmark lane `{}`",
+                        phase.phase, lane.lane_id
+                    ));
+                }
+                if !lane.mandatory {
+                    return Err(format!(
+                        "phase {} benchmark lane `{}` must remain visible even when blocked",
+                        phase.phase, lane.lane_id
+                    ));
+                }
+                if !["ready_to_preregister", "partially_blocked", "blocked"]
+                    .contains(&lane.admission_state.as_str())
+                {
+                    return Err(format!(
+                        "phase {} benchmark lane `{}` has unknown admission state `{}`",
+                        phase.phase, lane.lane_id, lane.admission_state
+                    ));
+                }
+                let ready = lane.admission_state == "ready_to_preregister";
+                if ready != lane.blockers.is_empty() {
+                    return Err(format!(
+                        "phase {} benchmark lane `{}` must have no blockers exactly when ready",
+                        phase.phase, lane.lane_id
+                    ));
+                }
+            }
+            if phase_lanes != lane_ids {
+                return Err(format!(
+                    "phase {} does not carry every canonical benchmark lane",
                     phase.phase
                 ));
             }
@@ -243,6 +379,19 @@ mod tests {
         let panel = catalog().unwrap();
         assert_eq!(
             panel
+                .lane_definitions
+                .iter()
+                .map(|lane| lane.lane_id.as_str())
+                .collect::<Vec<_>>(),
+            vec![
+                "elliptic_algebraic",
+                "elliptic_generic_decomposition",
+                "hyperelliptic_jacobian",
+                "cover_transfer"
+            ]
+        );
+        assert_eq!(
+            panel
                 .phases
                 .iter()
                 .map(|phase| (
@@ -266,6 +415,14 @@ mod tests {
                 .map(|phase| phase.curves.len())
                 .sum::<usize>(),
             16
+        );
+        assert_eq!(
+            panel
+                .phase_lane(1, "hyperelliptic_jacobian")
+                .unwrap()
+                .1
+                .admission_state,
+            "blocked"
         );
     }
 

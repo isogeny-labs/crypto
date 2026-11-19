@@ -11,6 +11,14 @@ traits="$repo_dir/docs/curves/traits.json"
 jq empty "$panel" "$schema"
 
 jq -e '
+  .schema == "ecbench.phased-panel/v2" and
+  [.lane_definitions[].lane_id] == [
+    "elliptic_algebraic",
+    "elliptic_generic_decomposition",
+    "hyperelliptic_jacobian",
+    "cover_transfer"
+  ] and
+  all(.lane_definitions[]; .promotion_scope == "independent") and
   [.phases[].phase] == [1, 2, 3, 4] and
   [.phases[].nominal_subgroup_bits] == [20, 30, 60, 80] and
   [.phases[].subgroup_bit_window] == [
@@ -22,10 +30,35 @@ jq -e '
   ([.phases[].curves[].cell_id] | length) ==
     ([.phases[].curves[].cell_id] | unique | length) and
   all(.phases[];
+    [.lanes[].lane_id] == [
+      "elliptic_algebraic",
+      "elliptic_generic_decomposition",
+      "hyperelliptic_jacobian",
+      "cover_transfer"
+    ] and
+    all(.lanes[];
+      .mandatory == true and
+      if .admission_state == "ready_to_preregister"
+      then (.blockers | length) == 0
+      else (.blockers | length) > 0
+      end) and
     .subgroup_bit_window as $window |
     all(.curves[];
       .size.subgroup_bits >= $window.minimum and
       .size.subgroup_bits <= $window.maximum))
+' "$panel" >/dev/null
+
+jq -e '
+  .lane_definitions[] | select(.lane_id == "cover_transfer") |
+  .required_obligations == [
+    "route_existence",
+    "explicit_construction",
+    "map_correctness",
+    "subgroup_preservation",
+    "destination_solver_applicability",
+    "source_scalar_recovery",
+    "nine_phase_complete_cost"
+  ]
 ' "$panel" >/dev/null
 
 while IFS=$'\t' read -r slug ec1 bits cofactor; do
@@ -59,4 +92,4 @@ if command -v check-jsonschema >/dev/null 2>&1; then
   check-jsonschema --schemafile "$schema" "$panel"
 fi
 
-printf '%s\n' "ecbench phased panel: identity, size-window, evidence, and readiness checks pass"
+printf '%s\n' "ecbench phased panel: identity, size-window, lane, transfer-obligation, evidence, and readiness checks pass"

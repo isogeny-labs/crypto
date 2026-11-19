@@ -7,8 +7,10 @@ State: preregistration template; no measurements are included.
 
 The program asks whether any registered index-calculus candidate remains
 correct, relation-productive, rank-productive, and operationally affordable as
-the subgroup grows from approximately 20 to 80 bits across Koblitz, general
-binary, and prime-field elliptic curves.
+the subgroup grows from approximately 20 to 80 bits. The source ladder spans
+Koblitz, general-binary, and prime-field elliptic curves; independently gated
+lanes cover algebraic decomposition, generic decomposition, direct
+hyperelliptic/Jacobian work, and cover/transfer routes.
 
 This protocol has two distinct decisions:
 
@@ -40,9 +42,40 @@ The binary cells remain useful to exercise field structure and Koblitz
 endomorphisms even though NIST SP 800-186 deprecates binary curves for new
 applications.
 
+### 2.1 Independently promoted lanes
+
+`panel.json` defines four lane IDs. `elliptic_algebraic` is for
+polynomial-system, SAT, Weil-descent, or other algebraic decomposition engines.
+`elliptic_generic_decomposition` is for table, meet-in-the-middle, root-finding,
+or subtractive decomposition engines. Their evidence is not pooled.
+`hyperelliptic_jacobian` requires an exact curve, Jacobian subgroup and
+same-Jacobian generic reference. `cover_transfer` is a typed route from a source
+cell through a cover or other transfer, a destination solver, and recovery of
+the source scalar.
+
+Promotion is per `(phase, lane)`. A blocked higher-genus or transfer lane stays
+visible in the dossier but neither blocks an independently ready elliptic lane
+nor inherits that lane's result. Conversely, an elliptic result cannot promote
+a higher-genus or transfer lane.
+
+The transfer lane additionally requires route existence, explicit construction,
+map correctness, subgroup preservation, destination-solver applicability, source
+scalar recovery, and complete cost. Its comparison has three arms on the same
+order-`r` workload: the direct source reference, a destination generic control,
+and the destination candidate including transfer and recovery. Candidate cost is
+the sum of the nine exclusive phases `route_search`, `construction`,
+`forward_map`, `solver_setup`, `relation_or_walk`, `linear_algebra`,
+`individual_log_or_descent`, `source_recovery`, and `verification`, following
+[`docs/transfer-assessment/MEASUREMENT.md`](../../docs/transfer-assessment/MEASUREMENT.md).
+
 ## 3. Phase admission gate G0
 
 All items must pass before a phase consumes benchmark resources:
+
+- The spec names exactly one lane. That `(phase, lane)` manifest entry is
+  `ready_to_preregister`, has no blockers, and uses only objects admitted by its
+  selector. Omission of `curve_policy.lane` is retained only for compatibility
+  and means `elliptic_algebraic`.
 
 - Every mandatory local curve has one pinned ICV1 slug, EC1 representation,
   curve UID, field polynomial or prime, model, subgroup, cofactor, generator,
@@ -170,9 +203,10 @@ phase envelope. Promotion requires either:
 Model projections are labeled projections. They may size a reservation but are
 not benchmark observations and do not fill a missing curve cell.
 
-## 8. Phase promotion gate G5
+## 8. Phase/lane promotion gate G5
 
-A phase advances only when all mandatory family cells satisfy G0–G4 and:
+A lane advances to its next phase only when all mandatory objects for that lane
+satisfy G0–G4 and:
 
 - at least one non-pruned candidate per core family reaches the frozen target
   rank and full solver completion on the required public targets;
@@ -182,13 +216,18 @@ A phase advances only when all mandatory family cells satisfy G0–G4 and:
 - the complete phase dossier, including negative results and blockages, is
   reviewed before the next phase candidates are frozen.
 
-Phase 1 additionally requires all four sentinels because their purpose is to
-detect sign, cofactor, automorphism, and ambient-field interactions. Later
-phases keep one mandatory Koblitz, general-binary, and prime cell.
+For the two elliptic lanes, Phase 1 additionally requires all four sentinels
+because their purpose is to detect sign, cofactor, automorphism, and
+ambient-field interactions. Later phases keep one mandatory Koblitz,
+general-binary, and prime cell. A direct Jacobian lane instead requires its
+phase-matched registered Jacobian cells. A transfer lane requires its typed
+routes and all three comparison arms; checked map arithmetic alone is not a
+phase completion.
 
-If a core family has no survivor, the program stops for that family at the
-current boundary. Work on a redesigned candidate starts again at Phase 1 with a
-new ID; it does not inherit the failed candidate’s evidence.
+If a core family or typed lane has no survivor, the program stops for that
+family or lane at the current boundary. Work on a redesigned candidate starts
+again at Phase 1 with a new ID; it does not inherit the failed candidate’s
+evidence.
 
 ## 9. Separate speedup-claim gate G6
 

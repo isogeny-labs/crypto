@@ -10,10 +10,11 @@
     "size_metric",
     "source_snapshot",
     "gate_defaults",
+    "lane_definitions",
     "phases"
   ],
   "properties": {
-    "schema": {"const": "ecbench.phased-panel/v1"},
+    "schema": {"const": "ecbench.phased-panel/v2"},
     "status": {"const": "planned_unmeasured"},
     "size_metric": {
       "type": "object",
@@ -56,6 +57,12 @@
         "targets_per_curve_at_or_above_64_bits": {"type": "integer", "minimum": 1}
       }
     },
+    "lane_definitions": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {"$ref": "#/$defs/lane_definition"}
+    },
     "phases": {
       "type": "array",
       "minItems": 4,
@@ -64,6 +71,80 @@
     }
   },
   "$defs": {
+    "lane_definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lane_id",
+        "object_kind",
+        "algorithm_track",
+        "curve_selector",
+        "promotion_scope",
+        "required_obligations"
+      ],
+      "properties": {
+        "lane_id": {
+          "enum": [
+            "elliptic_algebraic",
+            "elliptic_generic_decomposition",
+            "hyperelliptic_jacobian",
+            "cover_transfer"
+          ]
+        },
+        "object_kind": {
+          "enum": ["elliptic_subgroup", "jacobian_subgroup", "typed_transfer_route"]
+        },
+        "algorithm_track": {
+          "enum": [
+            "algebraic_decomposition",
+            "generic_decomposition",
+            "higher_genus_index_calculus",
+            "cover_transfer"
+          ]
+        },
+        "curve_selector": {
+          "enum": ["source_panel_cells", "registered_destination_cells"]
+        },
+        "promotion_scope": {"const": "independent"},
+        "required_obligations": {
+          "type": "array",
+          "minItems": 5,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "phase_lane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lane_id", "mandatory", "admission_state", "blockers"],
+      "properties": {
+        "lane_id": {
+          "enum": [
+            "elliptic_algebraic",
+            "elliptic_generic_decomposition",
+            "hyperelliptic_jacobian",
+            "cover_transfer"
+          ]
+        },
+        "mandatory": {"const": true},
+        "admission_state": {
+          "enum": ["ready_to_preregister", "partially_blocked", "blocked"]
+        },
+        "blockers": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"admission_state": {"const": "ready_to_preregister"}}},
+          "then": {"properties": {"blockers": {"maxItems": 0}}},
+          "else": {"properties": {"blockers": {"minItems": 1}}}
+        }
+      ]
+    },
     "phase": {
       "type": "object",
       "additionalProperties": false,
@@ -74,6 +155,7 @@
         "objective",
         "minimum_public_targets_per_curve",
         "admission_state",
+        "lanes",
         "curves"
       ],
       "properties": {
@@ -92,6 +174,12 @@
         "minimum_public_targets_per_curve": {"type": "integer", "minimum": 1},
         "admission_state": {
           "enum": ["ready_to_preregister", "partially_blocked", "blocked"]
+        },
+        "lanes": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {"$ref": "#/$defs/phase_lane"}
         },
         "curves": {
           "type": "array",
