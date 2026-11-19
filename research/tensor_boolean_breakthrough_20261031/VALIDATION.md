@@ -1272,7 +1272,9 @@ checked CM endomorphism and norm calculation. Its conclusion exhibits the
 cubic ratio and square-root sign and proves that the corresponding explicit
 Eisenstein norm annihilates the chosen point. Claim
 `PCC-20261119-d842a3` binds this endpoint. The full 9,086-job build succeeds
-and the proof gate reports `PASS 301 thm 0 trusted`. [pcc:unverified]
+and the proof gate reports `PASS 301 thm 0 trusted`. A final-source
+`lake env leanchecker --fresh TensorBoundaryBounds` replay returns
+`FRESH_CHECKER_EXIT=0`. [pcc:unverified]
 
 The remaining `A = 0` work is the Semaev-specific instantiation of the
 duplicated-versus-separated Galois sign characters and the transformed
