@@ -54,8 +54,20 @@ The null changes only the global wiring of interior ports while preserving the v
     torsion-to-division-polynomial obligation, but not Semaev construction,
     curve-specific estimates, collection/runtime assembly, or the final
     subexponential theorem. [pcc:unverified]
-10. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
-11. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
+10. **Kernel-checked 2026-11-19:** the production canonical recursive Semaev
+    family is now integrated into the exact upstream dilation interface.
+    Lean proves coefficient base change, descent of zero-sum vanishing from
+    algebraic closure to the base field, simultaneous-scale evaluation,
+    tuple-independent structural degree control, and that every exact upstream
+    bad dilation is a root at `u⁻²`. Thus only an explicit arity-only bound for
+    the structural degree and nonzeroness on nontrivial tuples remain in the
+    Semaev `DilationNondeg` bridge. An exhaustive coefficient audit of `S4(st)`
+    over every smooth short curve over F5, F7, and F11 found zero nontrivial
+    identically-zero specializations; this is bounded evidence, not an
+    all-field or all-arity proof. Full subexponential ECDLP is not established.
+    [pcc:unverified]
+11. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
+12. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
 
 The current `Network` stores predicates behind `Arc<dyn Predicate>`, so closure identity cannot be serialized faithfully. E0 therefore uses a hybrid semantic representation: predicates at or below 16 ports carry their complete truth table; larger production predicates carry a strict typed operation that is also their live evaluator. Tag, parameters, truth table or typed program, port order, interface and pins are bound into one SHA-256 identity. Untagged predicates are admitted only through an explicit bounded-truth-table policy for tiny fixtures and controls. Canonicalizing graph shape alone would be insufficient.
 
@@ -94,6 +106,13 @@ This hybrid requirement is a pre-freeze clarification of the original tag-only d
 - [`SEMANTIC_RANK_BOUND.md`](SEMANTIC_RANK_BOUND.md) and `semantic-rank-20261118.pdf` — source-threshold semantic upper bound, matrix-scope split, Lean map and visual.
 - [`FIXED_ARITY_DIAGONAL.md`](FIXED_ARITY_DIAGONAL.md) — universal capped-repetition scheduler, fixed-arity specialization, primary-source pins and remaining ECDLP obligations.
 - [`lean-zsmul-torsion/`](lean-zsmul-torsion/) — exact-pin Lean proof that scalar torsion forces the full squared division polynomial `ΨSq` to vanish.
+- [`lean/DilationSemaevBridge.lean`](lean/DilationSemaevBridge.lean) — exact
+  canonical-family bridge to upstream `DilationNondeg`; vanishing and a
+  structural uniform degree are checked, while closed arity growth and
+  nonzeroness remain open.
+- [`audit_s4_dilation.py`](audit_s4_dilation.py) and
+  [`s4-dilation-audit-20261119.json`](s4-dilation-audit-20261119.json) —
+  exhaustive bounded prime-field `S4(st)` coefficient audit.
 - [`BOUNDS_REPORT.md`](BOUNDS_REPORT.md) and `bounds-20261101.pdf` — one-page visual bound/scope brief.
 - [`SEARCH_20261101.md`](SEARCH_20261101.md) — reconciliation of the requested separator, small-root and special-prime leads.
 - [`REPORT.md`](REPORT.md) — visual decision brief.

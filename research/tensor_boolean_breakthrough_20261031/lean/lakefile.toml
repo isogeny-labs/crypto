@@ -19,10 +19,16 @@ rev = "d1deb5abe008e981206ed58cbd83012b6afc3740"
 subDir = "lean"
 
 [[require]]
+name = "theorem_refutations"
+path = "../../theorem_census_20261109/lean"
+
+[[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4"
 rev = "cfc55fc58714a59dc06e6e79edc6d1d95140d3c2"
 
 [[lean_lib]]
 name = "TensorBoundaryBounds"
-roots = ["TensorBoundaryBounds"]
+roots = ["TensorBoundaryBounds", "DilationScaleSpecialization",
+  "DilationScaleDegree", "RecursiveSemaevNaturality", "FiniteFieldSemaevVanishing",
+  "DilationSemaevBridge"]

@@ -1336,6 +1336,56 @@ the exact-pin standalone project; the Semaev construction, dependency
 integration, and final algorithm/runtime theorem remain open.
 [pcc:unverified]
 
+## 2026-11-19 canonical dilation-Semaev integration
+
+The local Lake project now imports the exact canonical recursive resultant
+family from `research/theorem_census_20261109/lean`. The dependency pins stay
+at Lean 4.35.0, Mathlib commit
+`cfc55fc58714a59dc06e6e79edc6d1d95140d3c2`, and upstream `fast-ecdlp`
+commit `d1deb5abe008e981206ed58cbd83012b6afc3740`. A first cache-free source
+build was intentionally interrupted after 2,192 of 9,100 jobs (exit 130)
+because the remaining work was an unrelated full Mathlib rebuild; this is not
+recorded as a successful build. `lake exe cache get` then restored 6,867
+source-hash-addressed artifacts, and the targeted production build completed.
+[pcc:unverified]
+
+`RecursiveSemaevNaturality.lean` proves recursive-resultant base change and
+canonical evaluation naturality. `FiniteFieldSemaevVanishing.lean` maps an
+actual base-field point tuple to the algebraic closure, applies the checked
+geometric zero-sum theorem, and descends the resulting equality through the
+injective algebra map. `DilationScaleSpecialization.lean` constructs the
+actual univariate polynomial `s ↦ S_r(s t)`. `DilationScaleDegree.lean`
+defines a support-wise total-exponent bound for the nested polynomial and
+proves that every simultaneous specialization has at most that degree.
+`DilationSemaevBridge.lean` transports bad points through the production
+dilation isomorphism and proves that every upstream bad unit `u` is a root at
+`u⁻²`. It reduces exact upstream `DilationNondeg` to nonzeroness on nontrivial
+tuples, using a tuple-independent structural degree. [pcc:unverified]
+
+The bounded coefficient audit `audit_s4_dilation.py` exhausts every ordered
+4-tuple on every nonsingular short curve over F5, F7, and F11. It found
+1,300, 5,586, and 37,510 identically-zero `S4(s t)` polynomials respectively,
+and zero nontrivial examples in every field. The maximum observed degree was
+12. The retained JSON is `s4-dilation-audit-20261119.json`; a direct F5 replay
+exits zero and reproduces its row. This is experimental evidence only.
+[pcc:unverified]
+
+The targeted `lake build +DilationSemaevBridge` completes 9,105 jobs. The
+repository proof gate reports `PASS 357 thm 0 trusted` across
+`DilationScaleDegree`, `DilationScaleSpecialization`,
+`DilationSemaevBridge`, `FiniteFieldSemaevVanishing`,
+`RecursiveSemaevNaturality`, and `TensorBoundaryBounds`. An independent
+`lake env leanchecker --fresh DilationSemaevBridge` replay exits zero. The
+five new source hashes are, in that order, `61cdce216a7d...`,
+`d8a63b232e5d...`, `7f0c0c9160fe...`, `af1e32c04069...`, and
+`7f0e90d965af...`. [pcc:unverified]
+
+The remaining mathematical obligations are an explicit closed arity-only upper
+bound for the structural degree (the expected bound is
+`(2m-1) * 2^(2m-2)`) and a uniform nonzeroness theorem for every upstream
+nontrivial tuple. No relation-yield, expected-runtime, or subexponential ECDLP
+theorem follows from this increment alone. [pcc:unverified]
+
 ## 2026-11-19 scalar-torsion to `ΨSq` bridge
 
 The standalone project `lean-zsmul-torsion` pins Lean `v4.32.0-rc1` and the
