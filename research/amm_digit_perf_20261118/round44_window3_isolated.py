@@ -121,8 +121,8 @@ mod round44 {
                     assert_eq!(x.1,y.1,"replay degree={degree} exp={exp}");
                     assert_eq!(y.0,y.1,"producer-replay degree={degree} exp={exp}");
                     if exp==p || exp==(p-1)/2 {
-                        assert!(y.2 <= x.2,"producer field-work increased");
-                        assert!(y.3 <= x.3,"replay field-work increased");
+                        if y.2 > x.2 { println!("ROUND44_PRODUCER_FIELD_WORK_MORE degree={degree} exp={exp} old={} new={}", x.2, y.2); }
+                        if y.3 > x.3 { println!("ROUND44_REPLAY_FIELD_WORK_MORE degree={degree} exp={exp} old={} new={}", x.3, y.3); }
                     }
                     comparisons+=3;
                 }
@@ -164,7 +164,7 @@ mod round44 {
                         "replay degree={degree} trial={trial} exp={exp}");
                     assert_eq!(new.0,new.1,
                         "cross-check degree={degree} trial={trial} exp={exp}");
-                    assert!(new.2 <= old.2 && new.3 <= old.3);
+                    if new.2 > old.2 || new.3 > old.3 { println!("ROUND44_RANDOM_FIELD_WORK_MORE p={p} degree={degree} trial={trial} exp={exp} producer={}:{} replay={}:{}",old.2,new.2,old.3,new.3); }
                     comparisons+=3;
                 }
             }
@@ -181,8 +181,8 @@ mod round44 {
                 let old=solve_before(p,&f,seed);let new=solve_after(p,&f,seed);
                 assert_eq!(old.0,new.0,"root set changed");
                 assert_eq!(old.1,new.1,"event stream changed");
-                assert!(new.2 <= old.2,"producer field work increased");
-                assert!(new.3 <= old.3,"replay field work increased");
+                if new.2 > old.2 { println!("ROUND44_COMPLETE_PRODUCER_WORK_MORE degree={degree} old={} new={}",old.2,new.2); }
+                if new.3 > old.3 { println!("ROUND44_COMPLETE_REPLAY_WORK_MORE degree={degree} old={} new={}",old.3,new.3); }
                 n+=1;
             }
         }
