@@ -66,8 +66,8 @@ external controls; it does not make the native implementations fastest.
 ## Evidence and checks
 
 - [`MANIFEST.json`](MANIFEST.json) binds the base commit, exact additive source
-  blob/diff, source closure, compiler, release binary, and receipts. The parent
-  integration commit remains null until this shared worktree is committed.
+  blob/diff, source closure, compiler, release binary, receipts, and pushed
+  integrated source commit `da5760cb903d355c4bcb1128de8a2b0d6aee0801`.
 - [`SOURCE_SHA256SUMS`](SOURCE_SHA256SUMS) locks every registry/dispatch source
   used by the census. [`RECEIPT_SHA256SUMS`](RECEIPT_SHA256SUMS) locks both
   pre-fix and repaired receipts.

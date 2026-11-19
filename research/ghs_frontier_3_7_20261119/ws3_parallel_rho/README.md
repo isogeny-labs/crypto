@@ -44,16 +44,16 @@ temporary directory and reports no timing.
 
 | Control | Current status | Exact remaining gate |
 |:--|:--|:--|
-| D00 build/selftest | development pass | rerun from a clean pushed commit and bind source/compiler/binary hashes |
+| D00 build/selftest | exact pushed-source development pass; source/compiler/binary hashes bound in `DEVELOPMENT_RECEIPT.txt` | cross-materialization reproducibility and an admitted image build remain |
 | D01 serial-to-P1 bridge | blocked | define and implement a bridge preserving the legacy serial start stream, or prospectively version the changed start law; full trajectory and count equality are absent |
 | D02 indexed starts | partial | SHA-256 derivation and replay exist; the frozen first-1,000,000-start uniqueness corpus for P=1/2/4 is unexecuted |
 | D03 shared transition | partial | every record binds one shared transition digest; the 10,000 sealed-state cross-thread/process vector corpus is unexecuted |
-| D04 masked tails | partial: 66/66 no-crash/accounting cells; every nonempty cell recovers and verifies the injected scalar | scalar-oracle trajectory/count parity, sanitizer/UB, and exact-commit replay remain |
-| D05 DP sharding | development pass for H=1/2/4/8 | exact-commit replay and adversarial routing/tamper corpus remain |
+| D04 masked tails | partial: exact-commit 66/66 no-crash/accounting cells; every nonempty cell recovers and verifies the injected scalar | scalar-oracle trajectory/count parity and sanitizer/UB remain |
+| D05 DP sharding | exact-commit development pass for H=1/2/4/8 | adversarial routing/tamper corpus remains |
 | D06 bounded queues | development pass for depths 1/2/64 | real threaded saturation and deadlock/forced-close controls remain |
 | D07 stop accounting | development pass for delays 0/1/3/8 | real threaded forced-stop and per-thread overshoot readback remain |
 | D08 collision signs | partial | live same/opposite-sign equations are implemented; committed same-y, opposite-y, sterile-denominator and tampered-record fixtures remain |
-| D09 known answers | partial | seed 1 natural P=1/2/4 replays twice; seeds 2/3 and exact-commit transcript replay remain |
+| D09 known answers | partial | exact-commit seed 1 natural P=1/2/4 replays twice; seeds 2/3 remain |
 | D10 failure preservation | partial | unsupported timing, missing BENCHREC, pre-existing calibration output and invalid placement fail closed; forced queue close, worker panic and malformed-DP partial records remain |
 
 Threaded workers, per-thread affinity readback, NUMA memory-policy readback,

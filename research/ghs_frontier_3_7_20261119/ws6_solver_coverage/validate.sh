@@ -19,6 +19,18 @@ test -x "$ecbench_bin"
 test "$(sha256sum "$ecbench_bin" | awk '{print $1}')" \
   = dcac1f24cd12b81a0729794aebe8c736592cbf20fe6cfd92e86da549df303476
 grep -qx 'status=PASS' "$study_rel/receipts/unit-test.txt"
+jq -e \
+  --arg commit da5760cb903d355c4bcb1128de8a2b0d6aee0801 \
+  --arg closure "$(sha256sum "$study_rel/SOURCE_SHA256SUMS" | awk '{print $1}')" \
+  --arg binary_sha "$(sha256sum "$ecbench_bin" | awk '{print $1}')" \
+  --argjson binary_bytes "$(stat -c %s "$ecbench_bin")" '
+  .schema == "ghs.frontier.solver-census-manifest/v1" and
+  .source_identity.final_commit == $commit and
+  .source_identity.source_closure_sha256 == $closure and
+  .binary.sha256 == $binary_sha and
+  .binary.bytes == $binary_bytes and
+  .evidence_status.exact_inventory_unit_test == "pass-1-of-1"
+' "$study_rel/MANIFEST.json" >/dev/null
 
 jq -e '
   .schema == "ecbench.optimization-inventory/v1" and
