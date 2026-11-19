@@ -62,6 +62,16 @@ jobs:
             --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
             --example prime31_rr9_graph_chart > graph-chart.json
           python3 research/prime31_ic_20261115/native/verify_prime31_rr9_graph_chart.py graph-chart.json
+      - name: Reverse order paired replay (GRAPH then EXTERIOR) on same runner
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_graph_chart > graph-chart-replay.json
+          python3 research/prime31_ic_20261115/native/verify_prime31_rr9_graph_chart.py graph-chart-replay.json
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_exterior4 > exterior-reference-replay.json
+          python3 research/prime31_ic_20261115/native/verify_prime31_rr9_exterior4.py exterior-reference-replay.json
       - name: Preserve both original-curve candidate records
         if: always()
         uses: actions/upload-artifact@v4
@@ -70,5 +80,7 @@ jobs:
           path: |
             exterior-reference.json
             graph-chart.json
+            graph-chart-replay.json
+            exterior-reference-replay.json
           if-no-files-found: warn
           retention-days: 30
