@@ -3,7 +3,7 @@
 **Date:** 2026-11-19 (America/Los_Angeles)  
 **Branch:** `cursor/prime-pkm-aux-tower-3858` ([crypto#4820](https://github.com/isogeny-labs/crypto/pull/4820))  
 **Standing:** all numbers below are `[pcc:unverified]` machine measurements from a local release binary.  
-**Coverage:** P0-1c and P1-3a completed; P2-5 / Panel A aborted mid-run (`EXIT:143` / SIGTERM) before `RESULTS.json` flush. Log: `RUN_SMOKE.log`.
+**Coverage:** Full discriminating numbers for P0-1c / P1-3a are in `RUN_SMOKE.log` (includes M31). A machine-readable snapshot is `RESULTS_P0_P1.json` (fast-smoke shape: bits≥16 and M31 omitted; P2-5 marked `smoke-skipped`). A full `--suites all` re-run may still be in flight and will replace `RESULTS.json` when it finishes.
 
 ## Verdict (discriminating)
 
