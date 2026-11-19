@@ -11,6 +11,39 @@ import tempfile
 production = Path("src/cryptanalysis/prime_root_bounded.rs").read_text()
 production = production.split("\n#[cfg(test)]\n", 1)[0]
 baseline = Path("research/amm_digit_perf_20261118/round31_bounded_baseline.rs").read_text()
+# Reconstruct the pre-round31 full module directly from the frozen original
+# method bodies; this permits end-to-end compiled-Rust solve_bounded A/B with
+# identical surrounding code, event accounting and field setup stub.
+def method(code, name):
+    marker = "    fn " + name + "("
+    at = code.index(marker)
+    open_brace = code.index("{", at)
+    depth = 0
+    for i in range(open_brace, len(code)):
+        if code[i] == "{":
+            depth += 1
+        elif code[i] == "}":
+            depth -= 1
+            if depth == 0:
+                return code[at:i+1]
+    raise ValueError("unterminated method " + name)
+
+old_production = production
+for current, frozen in [
+    ("scalar", "before_scalar"),
+    ("add", "before_add"),
+    ("sub", "before_sub"),
+    ("mul", "before_mul"),
+    ("times", "before_times"),
+    ("plus", "before_plus"),
+    ("minus", "before_minus"),
+]:
+    current_code = method(old_production, current)
+    frozen_code = method(baseline, frozen)
+    frozen_code = frozen_code.replace("fn " + frozen, "fn " + current, 1)
+    frozen_code = frozen_code.replace("self.gate.before_scalar()", "self.gate.scalar()")
+    old_production = old_production.replace(current_code, frozen_code, 1)
+
 isolated = r'''
 #[cfg(test)]
 mod round31 {
@@ -128,6 +161,94 @@ mod round31 {
         black_box(checksum);
         start.elapsed().as_nanos() as f64/(repeats*cases.len()) as f64
     }
+    // Full production root extraction, not a microbench or arithmetic mirror.
+    // Both variants are assembled from the exact production module, with only
+    // the seven changed method bodies replaced by frozen pre-round31 code.
+    #[test]
+    fn whole_rootfinder_before_after_exact() {
+        use crate::cryptanalysis::prime_root_trace::bounded_before as old;
+        for p in [17u64,487,1_000_000_007,(1u64<<61)-1] {
+            let field=Fp64Arithmetic{p};
+            for f in [vec![p-1,1],vec![2,p-3,1]] {
+                let mut actual_events=Vec::new();
+                let actual=solve_bounded(&field,&f,42,budget(),deadline(),&mut |e| {
+                    actual_events.push(format!("{e:?}"));Ok(())
+                });
+                let old_limits=old::RootBudget {
+                    work:old::MAX_WORK,field_work:old::MAX_FIELD_WORK,
+                    bytes:old::STORAGE_BYTES,events:old::MAX_EVENTS,
+                    split_attempts:1000,degree:8
+                };
+                let mut old_events=Vec::new();
+                let expected=old::solve_bounded(&field,&f,42,old_limits,deadline(),&mut |e| {
+                    old_events.push(format!("{e:?}"));Ok(())
+                });
+                assert_eq!(format!("{:?}",actual.stop),format!("{:?}",expected.stop));
+                assert_eq!(actual.roots,expected.roots);
+                assert_eq!(actual.root_count,expected.root_count);
+                assert_eq!(actual.metrics.work,expected.metrics.work);
+                assert_eq!(actual.metrics.field_work,expected.metrics.field_work);
+                assert_eq!(actual.metrics.splits,expected.metrics.splits);
+                assert_eq!(actual.metrics.attempted_events,expected.metrics.attempted_events);
+                assert_eq!(actual_events,old_events);
+                assert_eq!(actual.stop,Stop::Complete,"p={p} f={f:?}");
+            }
+        }
+    }
+
+    fn whole_trial(p:u64,degree:usize,fast:bool,repeats:usize)->f64 {
+        use crate::cryptanalysis::prime_root_trace::bounded_before as old;
+        let field=Fp64Arithmetic{p};
+        let coeffs=if degree==1 {vec![p-1,1]} else {vec![2,p-3,1]};
+        let old_limits=old::RootBudget {
+            work:old::MAX_WORK,field_work:old::MAX_FIELD_WORK,
+            bytes:old::STORAGE_BYTES,events:old::MAX_EVENTS,
+            split_attempts:1000,degree:8
+        };
+        let mut checksum=0u64;
+        let start=Instant::now();
+        for _ in 0..repeats {
+            if fast {
+                let result=solve_bounded(&field,black_box(&coeffs),42,
+                    budget(),deadline(),&mut |_|Ok(()));
+                checksum=checksum.wrapping_add(result.metrics.field_work)
+                    .wrapping_add(result.roots[0]);
+                assert_eq!(result.stop,Stop::Complete);
+            } else {
+                let result=old::solve_bounded(&field,black_box(&coeffs),42,
+                    old_limits,deadline(),&mut |_|Ok(()));
+                checksum=checksum.wrapping_add(result.metrics.field_work)
+                    .wrapping_add(result.roots[0]);
+                assert_eq!(result.stop,old::Stop::Complete);
+            }
+        }
+        black_box(checksum);
+        start.elapsed().as_nanos() as f64/repeats as f64
+    }
+
+    #[test]
+    #[ignore="paired actual compiled Rust whole solve_bounded root extraction"]
+    fn whole_rootfinder_paired_timings() {
+        for p in [487u64,1_000_000_007,(1u64<<61)-1] {
+            for degree in [1usize,2] {
+                let (mut before,mut after)=(Vec::new(),Vec::new());
+                for i in 0..13 {
+                    if i%2==0 {
+                        before.push(whole_trial(p,degree,false,64));
+                        after.push(whole_trial(p,degree,true,64));
+                    } else {
+                        after.push(whole_trial(p,degree,true,64));
+                        before.push(whole_trial(p,degree,false,64));
+                    }
+                }
+                before.sort_by(f64::total_cmp);
+                after.sort_by(f64::total_cmp);
+                println!("WHOLE_RUST p={p} degree={degree}: {:.3} -> {:.3} ns ({:.3}x)",
+                    before[6],after[6],before[6]/after[6]);
+            }
+        }
+    }
+
     #[test]
     #[ignore="13 paired before/after native Rust comparisons"]
     fn paired_rust_timings() {
@@ -166,7 +287,7 @@ mod cryptanalysis {
     pub mod prime_root_trace {
         pub mod bounded {
 """
-tail = "\n" + baseline + "\n" + isolated + "\n}}}\n"
+tail = "\n" + baseline + "\n" + isolated + "\n} pub mod bounded_before {\n" + old_production + "\n}}}\n"
 # The production comment at file top uses //!, legal as module-level inner docs.
 rust = header + production + tail
 with tempfile.TemporaryDirectory() as tmp:
@@ -176,4 +297,6 @@ with tempfile.TemporaryDirectory() as tmp:
     subprocess.run(["rustc","--edition=2021","-O","--test",str(file),"-o",str(out)],check=True)
     subprocess.run([str(out),"exact_comparisons","--nocapture"],check=True)
     subprocess.run([str(out),"full_bounded_solver_and_replay_smoke","--nocapture"],check=True)
+    subprocess.run([str(out),"whole_rootfinder_before_after_exact","--nocapture"],check=True)
+    subprocess.run([str(out),"whole_rootfinder_paired_timings","--ignored","--nocapture"],check=True)
     subprocess.run([str(out),"paired_rust_timings","--ignored","--nocapture"],check=True)
