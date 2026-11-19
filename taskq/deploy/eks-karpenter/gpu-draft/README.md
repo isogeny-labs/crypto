@@ -3,7 +3,7 @@
 Status: **proposal only. Nothing in this directory has been applied, and no AWS or
 cluster call was made to write it.** Applying it widens the lab (a new instance family,
 new quota consumption, a new device plugin), so it needs the owner's explicit approval
-as a separate administrative action (`.claude/skills/isolab-eks/SKILL.md`, "Select the
+as a separate administrative action (`isogeny-labs/workspace:.agents/skills/isolab-eks/SKILL.md`, "Select the
 submission path"). Reason it exists: the GPU baseline in
 `research/gpu_ic_baseline_20261027/PROTOCOL.md` cannot run on the CPU-only pools, and
 AGENTS.md §9a forbids silently moving an unsupported workload elsewhere.

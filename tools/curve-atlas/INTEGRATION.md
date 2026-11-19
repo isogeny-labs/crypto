@@ -41,7 +41,7 @@ the UI and exported graph state the finite search family and bounds.
 - [Repository cover construction](../../docs/curves/COVERS.md): the n=2, m=2
   case already has a native construction. This tool presents a separate small-field
   interactive exploration and does not replace that certificate implementation.
-- [Higher-genus routing](../../.agents/skills/ecdlp-surfaces/references/higher-genus.md):
+- [Higher-genus routing](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/ecdlp-surfaces/references/higher-genus.md):
   distinguishes curve covers from induced Jacobian maps, divisor arithmetic,
   subgroup injectivity and costs. The graph keeps those obligations separate.
 - [Existing isogeny CLI](../isogeny-cli/README.md): native catalog and replay

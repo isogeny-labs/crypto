@@ -108,9 +108,10 @@ Restart the client and ask it to call `isolab_k8s_overview` before creating a jo
 
 ### Load the shared instructions and submit
 
-From a checkout containing this change, read
-[`.agents/skills/isolab-eks/SKILL.md`](../../../.agents/skills/isolab-eks/SKILL.md).
-Claude sees the same file through `.claude/skills/isolab-eks`.
+Read the `isolab-eks` skill in the workspace trunk,
+[`isogeny-labs/workspace:.agents/skills/isolab-eks/SKILL.md`](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/isolab-eks/SKILL.md)
+(`.agents/skills/README.md`). Claude sees the same file through the trunk's
+`.claude/skills/isolab-eks` link; start the session from a workspace checkout so it loads.
 [OpenCode discovers these shared locations too](https://opencode.ai/docs/skills/).
 If discovery fails, explicitly ask the client to read that file.
 
@@ -247,7 +248,7 @@ gh workflow run isolab-experiment.yml --repo aburan28/crypto --ref main \
 
 The exact commit must be available in `aburan28/crypto`, with the spec at that
 commit. Capture the matching run ID and follow the checks in
-[the submission reference](../../../.agents/skills/isolab-eks/references/submission.md).
+[the submission reference](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/isolab-eks/references/submission.md).
 A feature-branch dispatch skips publication and the experiment. Premerge L2
 evidence does not replace this separate Action verification.
 
@@ -290,6 +291,6 @@ Use the portable bridge instead if you only need remote submission.
 
 The lab remains capped at 64 vCPUs across ordinary and L2 pools, within a shared
 96-vCPU regional Standard Spot quota. Node labels do not establish L2. For
-resumable experiments, follow [the CRIU/EBS recovery instructions](../../../.agents/skills/isolab-eks/references/recovery.md):
+resumable experiments, follow [the CRIU/EBS recovery instructions](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/isolab-eks/references/recovery.md):
 preserve computation, invalidate interrupted timings and start one separate
 fresh benchmark epoch. Ordinary request-v1 jobs are non-resumable.

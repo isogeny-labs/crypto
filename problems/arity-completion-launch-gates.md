@@ -141,7 +141,7 @@ What would unblock it (owner decisions, none taken):
   node; the Koblitz worst case is about 17 h and the prime tower about 12 h
   plus t = 4.
 - [ ] Or route them through the CRIU/EBS resumable contract
-  (`isolab.eks.resumable/v1`, `.claude/skills/isolab-eks/references/recovery.md`),
+  (`isolab.eks.resumable/v1`, `isogeny-labs/workspace:.agents/skills/isolab-eks/references/recovery.md`),
   which preserves computation across Spot loss; it needs the command Jobs
   adapted to that contract.
 - [ ] Or wait for Spot capacity and file a protocol amendment raising the

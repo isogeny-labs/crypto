@@ -184,7 +184,9 @@ strong-rho run on a public target into a checked `vs_rho` claim (§9). On Linux 
 (`--cpus auto`); on macOS there is no affinity control, so it records
 every run at L0 and says so. Operation counts are unaffected.
 
-The skills in [`.agents/skills/`](../../.agents/skills) walk an agent
+The skills in the workspace trunk
+([`isogeny-labs/workspace:.agents/skills/`](https://github.com/isogeny-labs/workspace/tree/main/.agents/skills);
+[`.agents/skills/README.md`](../../.agents/skills/README.md)) walk an agent
 through a measurement (`ecbench-measure`), an independent run
 (`ecbench-independent-runner`) and an extension (`ecbench-extend`).
 

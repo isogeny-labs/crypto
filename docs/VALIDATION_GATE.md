@@ -163,7 +163,7 @@ line's artifacts check.
   lost or changed a line. A `--base` that does not resolve to a commit stops the
   check with an error; a file that is absent on a base that does resolve is
   treated as absent.
-- `.github/workflows/audit-runs-daily.yml` and `.claude/skills/audit-runs` re-audit
+- `.github/workflows/audit-runs-daily.yml` and the trunk skill `isogeny-labs/workspace:.agents/skills/audit-runs` re-audit
   finished sessions daily with a nonce-drawn sample.
 
 ## Making a row pass

@@ -1,9 +1,10 @@
 name: audit-runs-daily
 
 # Daily re-audit of finished runbook and ecbench sessions (AGENTS.md, "Validation
-# gate"; skill .claude/skills/audit-runs).  A nonce drawn at run time picks the
-# sessions, so what is looked at today cannot be arranged in advance; the nonce
-# is in the report so a failure can be reproduced with --nonce.
+# gate"; skill isogeny-labs/workspace:.agents/skills/audit-runs/SKILL.md).
+# A nonce drawn at run time picks the sessions, so what is looked at today
+# cannot be arranged in advance; the nonce is in the report so a failure can
+# be reproduced with --nonce.
 #
 # Each sampled ecbench session gets the digest checks (plan, host, records) and
 # an `ecbench verify --replay` of a few nonce-chosen runs; each sampled

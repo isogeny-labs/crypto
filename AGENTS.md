@@ -203,7 +203,7 @@ Change the index or ranking only against that measurement.
 
 - **Run experiments on EKS Spot by default** (owner, 2026-10-25). For an
   authorized x86 CPU experiment or crypto benchmark, read and use
-  [isolab-eks](.agents/skills/isolab-eks/SKILL.md), then submit and verify it;
+  [isolab-eks](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/isolab-eks/SKILL.md), then submit and verify it;
   do not merely give the user commands to run. This applies to Claude, Codex,
   OpenCode and their experiment agents. Authentication and routing are in
   §9a. Honor an explicitly requested backend, workload and budget.
@@ -455,7 +455,7 @@ For small-prime or pinned GF(2^83) elliptic-curve surface searches, quartic
 subgroup transfers, genus-2+ Jacobian transfers, hyperelliptic covers, Mumford
 arithmetic, gluing or polarization candidates, or Frobenius compatibility
 checks, use
-[ecdlp-surfaces](.agents/skills/ecdlp-surfaces/SKILL.md) for tool selection,
+[ecdlp-surfaces](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/ecdlp-surfaces/SKILL.md) for tool selection,
 commands, and interpretation limits.
 
 ## Reading discipline
@@ -478,7 +478,7 @@ commands, and interpretation limits.
 
 ## Preserve scope and report evidence
 
-Use [report-evidence](.agents/skills/report-evidence/SKILL.md) for implementation,
+Use [report-evidence](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/report-evidence/SKILL.md) for implementation,
 experiments, benchmarks, completion reports, and research handoffs.
 
 - Preserve the user's requested deliverables, parameters, workloads, and acceptance
@@ -731,8 +731,9 @@ Every experiment run (ICMS or ecbench session, autolab or tournament round,
 benchmark, or other research run), every PR that lands a result, and every
 substantive search for new isogenies, curves, scalar rules, endomorphisms, or
 related ECDLP mechanisms follows
-[the research-visuals skill](.agents/skills/research-visuals/SKILL.md), on
-every runtime (Claude Code reads it at `.claude/skills/research-visuals/`).
+[the research-visuals skill](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/research-visuals/SKILL.md), on
+every runtime (it lives in the workspace trunk, `isogeny-labs/workspace:.agents/skills/research-visuals/`;
+`.agents/skills/README.md`).
 Deliver a source-linked report, a graph or explanatory diagram, and a PDF
 containing the report and visual. A run report is descriptive and sits beside
 the run's records, never inside a sealed or audited session directory.
@@ -840,7 +841,7 @@ toolchain, and treat a gate change as a dependency change.
   Preserve frozen evidence and attach formalization updates as versioned
   additions rather than rewriting historical verification records.
 - Before the first Lean edit, run the
-  [`lean-instance-gate`](.agents/skills/lean-instance-gate/SKILL.md) skill:
+  [`lean-instance-gate`](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/lean-instance-gate/SKILL.md) skill:
   state the result as an instance of a Mathlib or crypto-lean structure,
   apply the existing theorem as stated, build missing laws generically in
   crypto-lean first, and write the inheritance table. The proof gate checks
@@ -1731,7 +1732,7 @@ existing EC2 key-pair name **`meow34`** when launching the instance.
 
 ### 9a. Experiments default to Iso Lab on EKS Spot
 
-Use [isolab-eks](.agents/skills/isolab-eks/SKILL.md) for supported x86 CPU
+Use [isolab-eks](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/isolab-eks/SKILL.md) for supported x86 CPU
 experiments and benchmarks. Freeze the requested spec, source/image identity,
 resources, deadline and acceptance criteria, submit the job, and retain its
 receipt. The experiment runs in a pod in cluster `isolab`, namespace `isolab`,
@@ -1881,7 +1882,7 @@ conditions both sides ran under.  Before changing code for speed:
   explicitly (`RAYON_NUM_THREADS=1`), and report the pinned CPUs.
 - **Profile to find the cost, then measure the change.** Before tuning a CPU
   loop or a CUDA kernel, find where the time goes with `tools/profile.sh`
-  (the [profile skill](.agents/skills/profile/SKILL.md)). It covers `perf`
+  (the [profile skill](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/profile/SKILL.md)). It covers `perf`
   sampling, Callgrind, top-down, `nsys`, `ncu` and `nvidia-smi`, and records
   the host, the tool versions and the binary hash. Profilers perturb what
   they observe (ncu replays each launch at locked clocks), so a profile
@@ -1994,7 +1995,8 @@ workloads, under the same isolation, into the same sealed records.
   reference; the counted reference stays `rho.negation`.  A prime wall ratio is `rho.prime_fast` online wall over
   IC online wall, priced under §5a, until a prime claim branch exists.
 - **Skills:** `ecbench-measure`, `ecbench-independent-runner` and
-  `ecbench-extend` under `.agents/skills/`.
+  `ecbench-extend`, in the workspace trunk (`isogeny-labs/workspace:.agents/skills/`;
+  `.agents/skills/README.md`).
 
 Historical autolab, tournament and ICMS evidence keeps its own protocols.
 
