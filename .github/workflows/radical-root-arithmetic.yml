@@ -7,6 +7,7 @@ on:
       - 'src/cryptanalysis/prime_root_trace.rs'
       - 'src/cryptanalysis/prime_root_bounded.rs'
       - 'research/amm_digit_perf_20261118/round31_bounded_isolated.py'
+      - 'research/amm_digit_perf_20261118/round32_verifier_isolated.py'
       - 'research/amm_digit_perf_20261118/round31_bounded_baseline.rs'
       - 'research/amm_digit_perf_20261118/round23_verifier_isolated.py'
       - 'research/amm_digit_perf_20261118/round24_verifier_isolated.py'
@@ -29,6 +30,34 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  verifier-euclid:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round32_verifier_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Check Euclid inversion and benchmark compiled verifier Rust A/B
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round32_verifier_isolated.py
+          } | tee "$RUNNER_TEMP/round32-euclid-rust.txt"
+          cat "$RUNNER_TEMP/round32-euclid-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round32-euclid-verifier-rust-bench
+          path: ${{ runner.temp }}/round32-euclid-rust.txt
+          if-no-files-found: ignore
+
   # The default crypto library is temporarily unbuildable due to unrelated
   # F4/APS diagnostics. Compile the exact production source in a tiny,
   # dependency-free test crate so field changes are still independently gated.
