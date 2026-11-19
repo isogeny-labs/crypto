@@ -25,3 +25,19 @@
 - Local runtime lacks cargo/rustc and external GitHub git connectivity. All Rust changes committed via authenticated GitHub connector; native execution must be observed through GitHub Actions, not inferred from Python.
 - Corrected an independently authored JSON checker tuple-versus-list serialization mismatch at commit `4a947654`; no count was fabricated. Fixed report support-count wording at `038b3538`.
 - Initial source-specific CI jobs were slow during monorepo checkout; updated workflow with sparse checkout at `9cd3f167`, pending validation.
+
+
+## 2026-11-19 22:39 UTC — exact-source Rust and Python CI closeout
+
+### What was done (commands, files, features)
+- Source-bound GitHub Actions [#44630431346](https://github.com/isogeny-labs/crypto/actions/runs/44630431346) on workflow head `5a0942768fd81be66cb0bb4db38f04d7200fb8a6`: original pinned Rust library **40/40**, focused S3 test **1/1**, frozen 512-case release producer strict `jq` PASS (512 finite, 4096 H, 3584 F3, 3584 K, 512 poisoned-target rejects and sign lifts), separate Python full 512-case replay PASS.
+- Evidence [artifact #14580424253](https://github.com/isogeny-labs/crypto/actions/runs/44630431346/artifacts/14580424253), original JSON SHA256 `8efc9f1a2d5d98fe3f5d2b46f844ae6a81150e80b702361017e80d029d544cdb`, independent JSON `be00dd6de9dcb67914982d7cdbc39f0986e5477fb9c55e3b0cac7e893c32523a`. Updated research report with exact failed precursor and successful evidence, checked off isolated #4812 experiment in docs/ACTIVE.md.
+
+### Decisions made (and why)
+- Successful correctness gate; retain **no public-only unknown-index extraction** and **no complete ECDLP cost advantage** status. Transfer the three representation candidates to existing #4692 for a paired F4 measurement rather than creating a duplicate solver engine. Maintain independent signed PCC outstanding.
+
+### Open threads (unfinished, pick up next time)
+- Frozen 46-positive/18-negative public-only B8 F4 extraction, exceptional projective charts, signed PCC, and full rank31/1024-Q end-to-end matched-cost benchmark if extractor passes.
+
+### Errors (what went wrong, how it was handled)
+- Before final PASS, sparse original-source checkout omitted `src/cryptanalysis/f4_fp_tower.rs` and `sig_fp_tower.rs` causing baseline compilation to fail. Added both in sparse checkout at `5a094276`, reran same frozen controls. The earlier failed run is retained as diagnostic evidence.
