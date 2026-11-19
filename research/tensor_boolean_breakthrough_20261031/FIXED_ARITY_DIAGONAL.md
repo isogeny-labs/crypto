@@ -297,7 +297,8 @@ output fibres, equal fibres make every accepted output and every pair event
 exactly uniform, and independent retries have tail-sum expectation
 `|Seed| / |accepted|`. A unique encoder/decoder law forces every fibre to have
 size one, while `|Seed| <= cap * |accepted|` bounds the expected trials by
-`cap`. [pcc:unverified]
+`cap`. Claims `PCC-20261119-d11aae`, `PCC-20261119-16f188`, and
+`PCC-20261119-4fe45b` pass their local Lean verifiers. [pcc:unverified]
 
 Section 6.2 of the pinned paper uses `2p` signed-x seeds: nonzero square roots
 use the two sign seeds and a zero root accepts one of them. This suggests one

@@ -944,4 +944,6 @@ bounds this expectation by `cap`. [pcc:unverified]
 The pinned build completed with 2,189 jobs; the proof gate reports
 `PASS 117 thm 0 trusted`, all six audited public laws use only standard Lean
 axioms, and the fresh checker exits 0. The concrete signed-x decoder and Hasse
-cardinality specialization are not claimed. [pcc:unverified]
+cardinality specialization are not claimed. Claims `PCC-20261119-d11aae`,
+`PCC-20261119-16f188`, and `PCC-20261119-4fe45b` pass their local Lean
+verifiers. [pcc:unverified]
