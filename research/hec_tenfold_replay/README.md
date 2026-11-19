@@ -391,3 +391,22 @@ The one miss on the second seed was (37,9), input 14, at 9.604× and 9.369×. It
 We also reran two earlier misses with their original input generators. On (43,5), seed 2026111929 input 9 reached 10.676× / 10.621×. On (43,7), seed 2026111931 input 31 reached 9.991× / 9.890×. These targeted repeats are separate from the two fresh panels.
 
 Run `harness/g4-packed-four.zsh` and repeat with `expanded` for the second seed. Pass a build output directory to `harness/g4-packed-four-recheck.zsh` for the historical input comparisons. Use `ruby harness/g4-packed-four.rb audit results/g4-packed-four-curves.txt` to generate the standalone C++17 exhaustive audit. The transfer medians reducer accepts `--packed-four` and the optional `--expanded` flag.
+
+### Genus-4 catalogue completion with quartics through two points
+
+We enumerated the models y² = x⁹ + x³ + cx + 1 at all nine primes from 31 through 67, taking one c per orbit under x ↦ ax with a³ = 1. Of 283 representatives, seven were singular. For the remaining models PARI/GP computed the Jacobian order from its Frobenius characteristic polynomial. We retained all 197 for which the largest prime divisor ℓ was at least 1,000 and occurred with exponent one. This allows projection to the cyclic order-ℓ subgroup by multiplication by #J/ℓ. Cube-root scaling is the only model equivalence removed.
+
+| Relation families | Catalogues reaching rank n−1 out of 197 |
+|---|---:|
+| Original three | 144 |
+| Add the family fixing 4A | 176 |
+| Also add cubics fixing 3A | 176 |
+| Four families followed, on exhaustion, by quartics fixing 3A+B | 197 |
+
+Here n counts the nonbranch rational x-coordinates in the base. For A = (h,y), z = x−h and B = (h+t,yB) with t nonzero, let T₂ be the quadratic Taylor approximation to the branch at A. Put k = (yB−T₂(t))/t³. The pencil w(z) = T₂(z) + z³[k+b(z−t)] fixes 3A+B for every b. Its monic norm f(h+z)−w(z)² has degree nine. Exact division by z³(z−t) leaves a quintic. If that quintic splits, its signed residual points together with 3A+B give a principal-divisor relation. The collector retains multiplicities at fixed points, tangencies and branch points. It starts with the full four-family matrix on exhaustion and adds rows until the rank is n−1.
+
+The 21 deficient catalogues all reached rank. For example, (53,30) rose from rank 5 to 17 on 18 columns. A separate Rust check used Cantor arithmetic to verify all 5,191 computed coordinates on the 197 models. For each curve it checked a nonzero projected anchor of order ℓ and verified each coordinate by cross-multiplying its projected place and the anchor.
+
+The exhaustive two-point implementation checked 110,643 quintics across the 21 deficient cases. The screened implementation checked 6,077. For each free parameter it counts distinct rational residual points away from A and B, and explicitly retains tangent parameters and parameters for which the residual meets A or B. A completely split quintic either has five distinct roots away from the fixed points or passes one of those exceptions. Both implementations consumed the same 341 split rows and recovered identical coordinate vectors. Across eight alternating pairs of processes, the median elapsed-time ratio was 3.65× (range 3.14–3.82×). This timing includes catalogue construction on all 21 deficient cases, row reduction, coordinate output and process startup. Input-divisor descent and final scalar verification are outside this timing.
+
+Run `harness/g4-rank-panel.zsh` to replay the model selection, all three single-point censuses, the exhaustive and screened two-point catalogues, and independent coordinate verification. The rank panel records p, c, ℓ, family mask, n, poles, accepted rows, rank and anchor. The EXT records give p, c, ℓ, n, starting and final rank, ordered pairs visited, quintics tested and split rows consumed. The raw timing file gives repetition, implementation and elapsed nanoseconds.
