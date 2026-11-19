@@ -119,7 +119,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
       - run: cargo test --bin curve_cover_check --bin curve_standards
-      - name: Replay exact catalog transition inventory
+      - name: Replay pinned historical catalog transition inventory
         run: |
           cargo test --example cover_catalog_transition_audit
           cargo run --example cover_catalog_transition_audit -- "$RUNNER_TEMP/catalog-transition.json"
