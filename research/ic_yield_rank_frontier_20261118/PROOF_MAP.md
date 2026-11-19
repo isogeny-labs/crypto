@@ -390,6 +390,35 @@ the exact eventual natural-power inequality required by
 | `eagerBirdAdjugateRingOps` | definition | same | dimension | none |
 | `eagerBirdAdjugateRingOps_le_sixth` | law | same | dimension | none |
 
+## Executable planted kernel
+
+1. **Structure above.** A unit-determinant square block `B` over `ZMod q`, a
+   rectangular remainder block `R`, the checked executable Bird inverse, and
+   Mathlib's block matrix constructors. [pcc:unverified]
+2. **Theorem used as stated.** `birdZModInverse_eq_inv`,
+   `Matrix.fromCols_mul_fromRows`, and `Matrix.nonsing_inv_mul`.
+3. **Goal below.** Replace the noncomputable `B⁻¹` in the upstream planted
+   kernel `(-R B⁻¹ | I)` by `birdZModInverse B`, prove equality with the
+   canonical planted kernel under `IsUnit B.det`, and prove both annihilation
+   and right-inverse laws directly for the executable matrix.
+4. **Assembly probe.** Rewrite the executable inverse to `B⁻¹`, expand the
+   block products, and apply the nonsingular inverse multiplication law.
+5. **Missing components only.** Algebraic binding of the executable inverse to
+   the upstream planted-kernel formula. Costs for `R * B⁻¹`, array management,
+   scalar bit operations, and the concrete upstream-module substitution remain
+   separate obligations.
+6. **Inheritance table.** `birdZModInverse_eq_inv`,
+   `Matrix.fromCols_mul_fromRows`, `Matrix.neg_mul`, `Matrix.mul_assoc`, and
+   `Matrix.nonsing_inv_mul`.
+
+| statement | kind | owner | quantified structure | hypotheses |
+|---|---|---|---|---|
+| `executableBirdPlantedKernel` | definition | `TensorBoundaryBounds`; upstream candidate for `crypto-lean` | square and rectangular matrices over `ZMod q` | none |
+| `executableBirdPlantedKernel_eq` | law | same | same | `IsUnit B.det` |
+| `executableBirdPlantedKernel_mul` | law | same | same | `IsUnit B.det` |
+| `executableBirdPlantedKernel_rightInv` | law | same | same | `IsUnit B.det` |
+| `executableBirdPlantedKernel_spec` | law | same | same | `IsUnit B.det` |
+
 ## First-moment coverage repair
 
 1. **Structure above.** A finite seed space, a natural-valued factor-base size

@@ -835,3 +835,26 @@ verifiers and retain unverified signed standing. The model counts scalar-ring
 addition, multiplication, and negation. It deliberately excludes array
 allocation, integer indexing, operand bit cost, concrete `ZMod` inversion cost,
 and the binding of the upstream planted block. [pcc:unverified]
+
+## 2026-11-19 executable planted-kernel follow-up
+
+The upstream audit showed that `L114_Phase.kerMat` is noncomputable precisely
+at the use of the canonical matrix inverse in `(-R B⁻¹ | I)`. The local
+replacement `executableBirdPlantedKernel` uses `birdZModInverse B` instead.
+Under the same hypothesis `IsUnit B.det`, Lean proves equality with the
+canonical construction, annihilation of `Matrix.fromRows B R`, and the
+identity right-block law consumed by upstream conditional uniformity.
+[pcc:unverified]
+
+The pinned project build completed with 2,189 jobs and the proof gate reported:
+
+```text
+PASS 82 thm 0 trusted research/tensor_boolean_breakthrough_20261031/lean
+```
+
+All four executable-kernel declarations have axiom set `[propext,
+Classical.choice, Quot.sound]`; the independent fresh checker exited 0. Claim
+`PCC-20261119-d0d20c` passes its local Lean verifier and retains unverified
+signed standing. Matrix-multiplication cost, array/indexing overhead, scalar
+bit costs, and the direct cross-project import adapter remain outside this
+claim. [pcc:unverified]

@@ -4,6 +4,7 @@ import Mathlib.Algebra.Field.ZMod
 import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
 import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.LinearAlgebra.Matrix.Determinant.Bird.Correctness
+import Mathlib.Data.Matrix.ColumnRowPartitioned
 
 /-!
 # Exact separator-message bounds
@@ -844,6 +845,68 @@ theorem eagerBirdAdjugateRingOps_le_sixth (n : ℕ) :
     _ ≤ (n + 1) * (n + 1) * (4 * (n + 1) ^ 4) := by
       gcongr <;> omega
     _ = 4 * (n + 1) ^ 6 := by ring
+
+/-! ### Executable planted kernel -/
+
+/-- The planted-kernel matrix with the executable Bird inverse substituted for
+Mathlib's noncomputable matrix inverse. -/
+def executableBirdPlantedKernel
+    {q f s : ℕ}
+    (B : Matrix (Fin f) (Fin f) (ZMod q))
+    (Rr : Matrix (Fin s) (Fin f) (ZMod q)) :
+    Matrix (Fin s) (Fin f ⊕ Fin s) (ZMod q) :=
+  Matrix.fromCols (-(Rr * birdZModInverse B)) 1
+
+/-- Under the planted block's unit-determinant hypothesis, the executable
+kernel is exactly the canonical `(-R B⁻¹ | I)` construction. -/
+theorem executableBirdPlantedKernel_eq
+    {q f s : ℕ}
+    (B : Matrix (Fin f) (Fin f) (ZMod q))
+    (Rr : Matrix (Fin s) (Fin f) (ZMod q))
+    (hB : IsUnit B.det) :
+    executableBirdPlantedKernel B Rr =
+      Matrix.fromCols (-(Rr * B⁻¹)) 1 := by
+  rw [executableBirdPlantedKernel, birdZModInverse_eq_inv B hB]
+
+/-- The executable planted kernel annihilates the stacked relation matrix. -/
+theorem executableBirdPlantedKernel_mul
+    {q f s : ℕ}
+    (B : Matrix (Fin f) (Fin f) (ZMod q))
+    (Rr : Matrix (Fin s) (Fin f) (ZMod q))
+    (hB : IsUnit B.det) :
+    executableBirdPlantedKernel B Rr * Matrix.fromRows B Rr = 0 := by
+  rw [executableBirdPlantedKernel_eq B Rr hB,
+    Matrix.fromCols_mul_fromRows, Matrix.neg_mul, Matrix.mul_assoc,
+    Matrix.nonsing_inv_mul _ hB]
+  simp
+
+/-- The executable planted kernel has the identity right block required by the
+upstream uniformity proof. -/
+theorem executableBirdPlantedKernel_rightInv
+    {q f s : ℕ}
+    (B : Matrix (Fin f) (Fin f) (ZMod q))
+    (Rr : Matrix (Fin s) (Fin f) (ZMod q))
+    (hB : IsUnit B.det) :
+    executableBirdPlantedKernel B Rr *
+      Matrix.fromRows (0 : Matrix (Fin f) (Fin s) (ZMod q))
+        (1 : Matrix (Fin s) (Fin s) (ZMod q)) = 1 := by
+  rw [executableBirdPlantedKernel_eq B Rr hB,
+    Matrix.fromCols_mul_fromRows]
+  simp
+
+/-- Combined executable version of the two laws consumed by the upstream
+planted-kernel and conditional-uniformity argument. -/
+theorem executableBirdPlantedKernel_spec
+    {q f s : ℕ}
+    (B : Matrix (Fin f) (Fin f) (ZMod q))
+    (Rr : Matrix (Fin s) (Fin f) (ZMod q))
+    (hB : IsUnit B.det) :
+    executableBirdPlantedKernel B Rr * Matrix.fromRows B Rr = 0 ∧
+      executableBirdPlantedKernel B Rr *
+        Matrix.fromRows (0 : Matrix (Fin f) (Fin s) (ZMod q))
+          (1 : Matrix (Fin s) (Fin s) (ZMod q)) = 1 :=
+  ⟨executableBirdPlantedKernel_mul B Rr hB,
+    executableBirdPlantedKernel_rightInv B Rr hB⟩
 
 /-- A conservative `rows^6` planted-dense cost has fixed numerator six.  This
 matches `rows^2` Bird determinant calls for the adjugate at an advertised
