@@ -470,11 +470,19 @@ impl Producer<'_> {
         self.gate.charge(5 * COPY_WORK)?;
         while b.len != 0 {
             self.gate.charge(3 * COPY_WORK)?;
+            // A nonzero constant is a unit in Fp[x]. The GCD is already 1;
+            // polynomial division and two Fermat inversions are unnecessary.
+            // Keep the loop charge/deadline check before this early return.
+            if b.len == 1 {
+                return Ok(Poly17::constant(1));
+            }
             let r = self.division(&a, &b)?.1;
             a = b;
             b = r;
         }
-        if a.len != 0 {
+        // Avoid an inverse and field multiplications for already-monic
+        // results, including a unit leading coefficient.
+        if a.len != 0 && a.coefficients[a.len as usize - 1] != 1 {
             let inv = self.inverse(a.coefficients[a.len as usize - 1])?;
             for i in 0..a.len as usize {
                 a.coefficients[i] = self.mul(a.coefficients[i], inv)?;
@@ -967,6 +975,12 @@ impl Replay {
         let mut pair = [left, right];
         while pair[1].len != 0 {
             self.gate.charge(4 * COPY_WORK)?;
+            // The independent replay can prove coprimality immediately when
+            // Euclid reaches a nonzero constant; do not invert a unit merely
+            // to normalize it after another remainder pass.
+            if pair[1].len == 1 {
+                return Ok(Poly17::constant(1));
+            }
             let next = self.remainder(pair[0], &pair[1])?;
             pair = [pair[1], next];
         }
