@@ -91,6 +91,16 @@ nagao-e2e `jv_cover` overlay, and byte-copied shims. `fetch_frozen.sh`,
 SHA-256 values are in `build/build.log`. The binary's SHA-256 is
 `3f87175c…74df`. The run outputs' hashes are in `runs/RAW.sha256`.
 
+**Custody note (artifact policy).** `runs/tally-seed389-n3415.rows.jsonl.gz`
+(92,524 bytes, SHA-256 `60401c8f036e0dbf6e16364ca45b2cae99d3e3827837898452f9374c364bbf0e`,
+listed in `runs/RAW.sha256`) exceeds the 64 KiB data-file limit in
+`tools/artifacts/artifacts.py`, so it is not committed to Git. It belongs in the
+artifact store, but the store push needs AWS credentials, which are currently
+expired. Until then it is LOCAL only, and it is reproducible: rebuild with
+`build/build.sh`, rerun the seed-389 command above (deterministic, ~30 s), gzip
+it and compare against the recorded hash. The seed-401 rows file (42 KB) and
+both summaries stay in Git.
+
 ## Results [pcc:unverified]
 
 ### Run50 stream (seed 389): 3,415 residuals, 3,419 solutions
