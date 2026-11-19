@@ -97,3 +97,20 @@ of transformed relations. The specialized Semaev relation must construct
 those inputs. The independent torsion-to-division-polynomial-root lemma,
 specialized polynomial degree/vanishing bounds, collector binding, and final
 runtime assembly also remain open. [pcc:unverified]
+
+### Division-polynomial parity correction
+
+The previously recorded auxiliary-`preΨ` transcendence endpoint is not the
+right general target for scalar torsion at even indices: Mathlib defines
+`preΨ 2 = 1`, so it cannot vanish on a nonzero two-torsion point. Lean now
+checks this obstruction explicitly. The correct univariate polynomial is
+`ΨSq n`, which includes the two-torsion factor for even `n`.
+`divisionPolynomialSq_two_vanishes_of_add_self` verifies the index-two base
+case using Mathlib's existing two-torsion theorem, and
+`divisionPolynomialSqRoot_isAlgebraic` plus
+`divisionPolynomialSq_ne_zero_at_const_mul_transcendental` establish the
+parity-correct algebraicity and transcendence contradiction for every index
+nonzero in the constant field. The still-open group-law statement must show
+`nP = 0` implies `ΨSq n` vanishes at `x(P)`; current Mathlib, including its
+latest default branch, contains definitions and degree theorems but no such
+general multiplication formula. [pcc:unverified]

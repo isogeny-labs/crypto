@@ -434,12 +434,15 @@ proves `ECDLP.L49.DilationNondeg` from one specialized polynomial family and
 its construction/nonvanishing/degree/vanishing laws; then
 `upstreamDilationPolynomialCertificate_implies_avg_energy` proves the exact
 upstream `Eng`/`Mdil` average inequality. Claims `PCC-20261119-1bad7c` and
-`PCC-20261119-a2b707` pass locally. Mathlib's division-polynomial leading-term
-theorem also yields
-`divisionPolynomial_ne_zero_at_const_mul_transcendental`: once torsion is
-shown to force division-polynomial vanishing, the corrected algebraicity
-contradiction is immediate (`PCC-20261119-a69a2d`). Thus the torsion-coordinate
-subproblem is narrowed to that exact torsion/vanishing group-law theorem.
+`PCC-20261119-a2b707` pass locally. The original auxiliary-`preΨ` endpoint
+`divisionPolynomial_ne_zero_at_const_mul_transcendental` is hash-bound by
+`PCC-20261119-a69a2d`, but a parity audit shows it cannot serve as a general
+torsion polynomial: `preΨ 2 = 1`. The corrected endpoint uses the full
+univariate squared division polynomial `ΨSq`, whose even-index definition
+retains the two-torsion factor. Lean now checks both the index-two obstruction
+and `ΨSq 2` vanishing on affine two-torsion, plus the general `ΨSq` root
+algebraicity/transcendence contradiction. Thus the remaining group-law lemma
+is specifically scalar torsion implies `ΨSq` vanishing.
 [pcc:unverified]
 
 The generic planted-diagonal root count is now kernel-checked as well.

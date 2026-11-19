@@ -3622,11 +3622,10 @@ theorem algebraic_ne_const_mul_transcendental
   rw [← equality]
   exact xAlgebraic
 
-/-- A root in an extension field of a division polynomial whose index is
-nonzero in the constant field is algebraic over that constant field.  This
-isolates the available half of the corrected torsion-coordinate argument;
-the still-missing elliptic-curve lemma is that a nonzero torsion point makes
-the corresponding division polynomial vanish at its x-coordinate. -/
+/-- A root in an extension field of the auxiliary polynomial `preΨ` whose
+index is nonzero in the constant field is algebraic over that constant
+field. For even indices, `preΨ` omits the two-torsion factor; the parity-safe
+torsion endpoint below therefore uses `ΨSq` instead. -/
 theorem divisionPolynomialRoot_isAlgebraic
     {K L : Type*} [Field K] [Field L] [Algebra K L]
     (curve : WeierstrassCurve K) (index : ℤ) (x : L)
@@ -3634,6 +3633,39 @@ theorem divisionPolynomialRoot_isAlgebraic
     (root : Polynomial.aeval x (curve.preΨ index) = 0) :
     IsAlgebraic K x := by
   exact ⟨curve.preΨ index, curve.preΨ_ne_zero indexNonzero, root⟩
+
+/-- The auxiliary polynomial `preΨ` cannot encode general even torsion:
+already at index two it is the constant polynomial one and has no root. -/
+theorem preDivisionPolynomial_two_aeval_ne_zero
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    (curve : WeierstrassCurve K) (x : L) :
+    Polynomial.aeval x (curve.preΨ 2) ≠ 0 := by
+  simp
+
+/-- The parity-correct squared division polynomial does detect affine
+two-torsion, in contrast to `preΨ`. -/
+theorem divisionPolynomialSq_two_vanishes_of_add_self
+    {K : Type*} [Field K] [DecidableEq K]
+    (curve : WeierstrassCurve K) {x y : K}
+    (nonsingular : curve.toAffine.Nonsingular x y)
+    (torsion :
+      WeierstrassCurve.Affine.Point.some x y nonsingular +
+        WeierstrassCurve.Affine.Point.some x y nonsingular = 0) :
+    Polynomial.eval x (curve.ΨSq 2) = 0 := by
+  rw [curve.ΨSq_two, curve.Ψ₂Sq_eq]
+  exact WeierstrassCurve.Affine.Point.isRoot_twoTorsionPolynomial_of_add_self
+    nonsingular torsion
+
+/-- A root of the full univariate squared division polynomial is algebraic.
+Unlike `preΨ`, `ΨSq` retains the two-torsion factor at even indices, so this
+is the polynomial appropriate for a general scalar-torsion implication. -/
+theorem divisionPolynomialSqRoot_isAlgebraic
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    (curve : WeierstrassCurve K) (index : ℤ) (x : L)
+    (indexNonzero : (index : K) ≠ 0)
+    (root : Polynomial.aeval x (curve.ΨSq index) = 0) :
+    IsAlgebraic K x := by
+  exact ⟨curve.ΨSq index, curve.ΨSq_ne_zero indexNonzero, root⟩
 
 /-- Consequently, a division polynomial with nonzero index cannot vanish at
 a nonzero constant multiple of a transcendental parameter. -/
@@ -3647,6 +3679,22 @@ theorem divisionPolynomial_ne_zero_at_const_mul_transcendental
   intro root
   have algebraic : IsAlgebraic K (algebraMap K L t * s) :=
     divisionPolynomialRoot_isAlgebraic curve index
+      (algebraMap K L t * s) indexNonzero root
+  exact (transcendental_const_mul s sTranscendental t tNonzero) algebraic
+
+/-- The full squared division polynomial cannot vanish at a nonzero constant
+multiple of a transcendental element. This is the parity-correct endpoint for
+the eventual torsion-coordinate contradiction. -/
+theorem divisionPolynomialSq_ne_zero_at_const_mul_transcendental
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    (curve : WeierstrassCurve K) (index : ℤ)
+    (indexNonzero : (index : K) ≠ 0)
+    (s : L) (sTranscendental : Transcendental K s)
+    (t : K) (tNonzero : t ≠ 0) :
+    Polynomial.aeval (algebraMap K L t * s) (curve.ΨSq index) ≠ 0 := by
+  intro root
+  have algebraic : IsAlgebraic K (algebraMap K L t * s) :=
+    divisionPolynomialSqRoot_isAlgebraic curve index
       (algebraMap K L t * s) indexNonzero root
   exact (transcendental_const_mul s sTranscendental t tNonzero) algebraic
 

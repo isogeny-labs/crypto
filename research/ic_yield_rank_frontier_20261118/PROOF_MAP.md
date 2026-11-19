@@ -818,8 +818,9 @@ nondegeneracy and average-energy endpoints. Claim `PCC-20261119-a69a2d`
 binds the division-polynomial transcendence contradiction. All three local
 verifiers pass; signed standing remains unverified. The remaining
 torsion-coordinate step is now the precise group-law lemma that a nonzero
-torsion point makes the indexed division polynomial vanish at its
-x-coordinate. [pcc:unverified]
+torsion point makes the full squared division polynomial `ΨSq` vanish at its
+x-coordinate. The auxiliary `preΨ` formulation is insufficient at even
+indices because `preΨ 2 = 1`. [pcc:unverified]
 
 ## Planted-diagonal bad shifts
 

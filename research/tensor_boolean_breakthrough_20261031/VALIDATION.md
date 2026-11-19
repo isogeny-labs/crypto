@@ -1242,12 +1242,20 @@ definitions. Claims `PCC-20261119-1bad7c` and `PCC-20261119-a2b707` pass their
 local Lean verifiers. [pcc:unverified]
 
 `divisionPolynomialRoot_isAlgebraic` uses Mathlib's nonzero leading-term
-theorem for division polynomials, and
-`divisionPolynomial_ne_zero_at_const_mul_transcendental` proves that such a
-polynomial cannot vanish at a nonzero constant multiple of a transcendental
-parameter. Claim `PCC-20261119-a69a2d` passes locally. This does not supply the
-missing group-law theorem that a nonzero torsion point forces the indexed
-division polynomial to vanish at its x-coordinate. [pcc:unverified]
+theorem for the auxiliary `preΨ` polynomials, and claim
+`PCC-20261119-a69a2d` binds the resulting transcendence contradiction. A
+later parity audit found that `preΨ` is not the correct general torsion
+polynomial at even indices: `preΨ 2 = 1`. The parity-correct replacement is
+the full univariate squared division polynomial `ΨSq`. The checked theorem
+`preDivisionPolynomial_two_aeval_ne_zero` records the obstruction, while
+`divisionPolynomialSq_two_vanishes_of_add_self` verifies that `ΨSq 2`
+detects affine two-torsion. `divisionPolynomialSqRoot_isAlgebraic` and
+`divisionPolynomialSq_ne_zero_at_const_mul_transcendental` provide the
+correct algebraicity/contradiction endpoint for every nonzero index. The
+remaining group-law theorem must prove that scalar torsion forces `ΨSq`, not
+`preΨ`, to vanish at the x-coordinate. [pcc:unverified]
+The complete pinned build succeeds with 9,086 jobs and the proof gate reports
+`PASS 314 thm 0 trusted`. [pcc:unverified]
 
 All three claim verifiers pass. The repository proof gate reports
 `PASS 233 thm 0 trusted`; a final-source independent
