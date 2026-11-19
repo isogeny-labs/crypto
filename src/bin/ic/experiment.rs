@@ -1,7 +1,7 @@
 //! Bounded experiments on internally generated, known-answer toy instances.
 use super::params::{self, Field, Fixture, Parameters};
 use clap::{Args, ValueEnum};
-use crypto_lib::binary_ecc::{BinaryPoint, F2mElement, IrreduciblePoly};
+use crypto_lib::binary_ecc::{F2mElement, IrreduciblePoly};
 use crypto_lib::cryptanalysis::curve_id;
 use crypto_lib::cryptanalysis::koblitz_factor_base_search::{
     freeze_spec, search_with_progress, Candidate, FactorBaseSpec, Family, SearchOptions,
@@ -12,10 +12,9 @@ use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     build_subgroup_orbit_factor_base_with_cost, factor_x_n_minus_1, find_irreducible_sparse,
     individual_log, individual_log_with_trace,
     koblitz_index_calculus_dlp_with_factor_base_and_trace, koblitz_point_count, order_of_2_mod_n,
-    solve_factor_base_logs, solve_factor_base_logs_with_trace, DecompositionStrategy,
-    FactorBaseLogTable, FactorBaseSelectionCost, FrobeniusFactorBase, KoblitzCurve, KoblitzIcEvent,
-    KoblitzIcOptions, LinearAlgebra, LogTableReport, LogTableStage, QueryObserver, QueryTrace,
-    MAX_N, MAX_SUBFIELD_DEGREE,
+    solve_factor_base_logs, solve_factor_base_logs_with_trace, FactorBaseSelectionCost,
+    FrobeniusFactorBase, KoblitzCurve, KoblitzIcEvent, KoblitzIcOptions, LinearAlgebra,
+    LogTableReport, LogTableStage, QueryObserver, QueryTrace, MAX_N, MAX_SUBFIELD_DEGREE,
 };
 use crypto_lib::cryptanalysis::koblitz_sparse_la::{
     BlockLanczosOptions, BlockWiedemannOptions, FilterOptions, SparseCoreSolver,
@@ -124,42 +123,7 @@ fn is_one_u32(v: &u32) -> bool {
 fn is_one_u64(v: &u64) -> bool {
     *v == 1
 }
-#[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum Solver {
-    Groebner,
-    Sat,
-    Enumerate,
-    /// Meet-in-the-middle over a precomputed pair-sum table.
-    PairTable,
-    /// Trimoska WDSat on the same Semaev ANF as `sat`.
-    Wdsat,
-    /// ALMASTY-inspired quadratic Semaev FES (`m = 2`): Gray early-exit,
-    /// Möbius all-roots, Monica past `n = 24`.
-    MqFes,
-}
-impl Solver {
-    pub fn name(self) -> &'static str {
-        match self {
-            Self::Groebner => "groebner",
-            Self::Sat => "sat",
-            Self::Enumerate => "enumerate",
-            Self::PairTable => "pair-table",
-            Self::Wdsat => "wdsat",
-            Self::MqFes => "mq-fes",
-        }
-    }
-    fn strategy(self) -> DecompositionStrategy {
-        match self {
-            Self::Groebner => DecompositionStrategy::Groebner,
-            Self::Sat => DecompositionStrategy::Sat,
-            Self::Enumerate => DecompositionStrategy::Enumerate,
-            Self::PairTable => DecompositionStrategy::PairTable,
-            Self::Wdsat => DecompositionStrategy::Wdsat,
-            Self::MqFes => DecompositionStrategy::MqFes,
-        }
-    }
-}
+pub use crypto_lib::cryptanalysis::koblitz_log_store::Solver;
 /// How the factor-base logarithm precompute solves its relation matrix.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, ValueEnum, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -633,72 +597,9 @@ pub struct SolveArgs {
     #[arg(long,value_enum,default_value_t=Solver::PairTable)]
     pub solver: Solver,
 }
-/// A serialised factor-base logarithm database, bound to its curve and
-/// factor base so it cannot be replayed on another.
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct LogTableDocument {
-    pub schema_version: u32,
-    pub degree: u32,
-    pub curve_a: u8,
-    #[serde(default = "one_u32", skip_serializing_if = "is_one_u32")]
-    pub subfield: u32,
-    #[serde(default = "one_u64", skip_serializing_if = "is_one_u64")]
-    pub curve_b: u64,
-    pub spec: FactorBaseSpec,
-    pub subgroup_order: String,
-    pub cofactor: String,
-    pub summands: u8,
-    pub solver: Solver,
-    /// `(x, y, log_G point)` per relation column; coordinates hex, log decimal.
-    pub columns: Vec<LogColumn>,
-    /// Schema 2: the generator the logarithms are taken to (hex coordinates).
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub generator: Option<GeneratorPoint>,
-    /// Schema 2: SHA-256 of the sorted materialised factor base
-    /// (`log_store::factor_base_sha256`).
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub factor_base_sha256: Option<String>,
-}
-/// A generator's affine coordinates, hex.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct GeneratorPoint {
-    pub x: String,
-    pub y: String,
-}
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct LogColumn {
-    pub x: String,
-    pub y: String,
-    pub log: String,
-}
-pub fn load_log_table(path: &Path) -> Result<LogTableDocument, String> {
-    let mut data = Vec::new();
-    File::open(path)
-        .map_err(|e| format!("{}: {e}", path.display()))?
-        .take(16_777_217)
-        .read_to_end(&mut data)
-        .map_err(|e| e.to_string())?;
-    if data.len() > 16_777_216 {
-        return Err("logarithm database exceeds 16 MiB".into());
-    }
-    let doc: LogTableDocument = serde_json::from_slice(&data)
-        .map_err(|e| format!("invalid logarithm database JSON: {e}"))?;
-    match doc.schema_version {
-        1 if doc.generator.is_none() && doc.factor_base_sha256.is_none() => {}
-        2 if doc.generator.is_some() && doc.factor_base_sha256.is_some() => {}
-        1 | 2 => {
-            return Err(
-                "logarithm database fields do not match its schema version (schema 2 alone, and always, carries generator and factor_base_sha256)"
-                    .into(),
-            )
-        }
-        _ => return Err("unsupported logarithm database schema version".into()),
-    }
-    Ok(doc)
-}
+pub use crypto_lib::cryptanalysis::koblitz_log_store::{
+    load_log_table, GeneratorPoint, LogTableDocument,
+};
 pub(crate) fn ic_options(
     strategy: Solver,
     summands: u8,
@@ -732,81 +633,9 @@ pub(crate) fn ic_options_with_descent(
         ..KoblitzIcOptions::default()
     }
 }
-/// Serialise a solved logarithm table, bound to its curve and factor base.
-pub(crate) fn log_table_to_doc(
-    c: &KoblitzCurve,
-    spec: &FactorBaseSpec,
-    summands: u8,
-    solver: Solver,
-    table: &FactorBaseLogTable,
-) -> LogTableDocument {
-    let columns: Vec<LogColumn> = table
-        .columns
-        .iter()
-        .map(|(point, log)| match point {
-            BinaryPoint::Affine { x, y } => LogColumn {
-                x: params::hex(&x.to_biguint()),
-                y: params::hex(&y.to_biguint()),
-                log: log.to_string(),
-            },
-            BinaryPoint::Infinity => unreachable!("projected columns are affine"),
-        })
-        .collect();
-    LogTableDocument {
-        schema_version: 1,
-        degree: c.n,
-        curve_a: c.a,
-        subfield: c.k,
-        curve_b: c.b_index,
-        spec: spec.clone(),
-        subgroup_order: c.subgroup_order.to_string(),
-        cofactor: c.cofactor.to_string(),
-        summands,
-        solver,
-        columns,
-        generator: None,
-        factor_base_sha256: None,
-    }
-}
-/// Rebuild a logarithm table from its document and re-verify every column
-/// against the reconstructed curve; a tampered or mismatched table is an error.
-pub(crate) fn log_table_from_doc(
-    c: &KoblitzCurve,
-    doc: &LogTableDocument,
-) -> Result<FactorBaseLogTable, String> {
-    if doc.degree != c.n
-        || doc.curve_a != c.a
-        || doc.subfield != c.k
-        || doc.curve_b != c.b_index
-        || doc.subgroup_order != c.subgroup_order.to_string()
-    {
-        return Err("logarithm database does not belong to this curve".into());
-    }
-    if let Some(g) = &doc.generator {
-        let here = match c.generator() {
-            BinaryPoint::Affine { x, y } => GeneratorPoint {
-                x: params::hex(&x.to_biguint()),
-                y: params::hex(&y.to_biguint()),
-            },
-            BinaryPoint::Infinity => return Err("the curve's generator is infinity".into()),
-        };
-        if *g != here {
-            return Err("logarithm database is taken to a different generator".into());
-        }
-    }
-    let mut columns = Vec::with_capacity(doc.columns.len());
-    for col in &doc.columns {
-        let x = F2mElement::from_biguint(&params::number(&col.x)?, c.n);
-        let y = F2mElement::from_biguint(&params::number(&col.y)?, c.n);
-        let log = params::number(&col.log)?;
-        columns.push((BinaryPoint::Affine { x, y }, log));
-    }
-    let table = FactorBaseLogTable { columns };
-    if !table.verify(c) {
-        return Err("logarithm database failed re-verification: a column log does not satisfy [x]G == point".into());
-    }
-    Ok(table)
-}
+pub(crate) use crypto_lib::cryptanalysis::koblitz_log_store::{
+    log_table_from_doc, log_table_to_doc,
+};
 /// The factor-base recipe a `logs` or store-backed `solve` names: a saved
 /// recipe for this curve, or the legacy family's index.
 fn resolve_spec(

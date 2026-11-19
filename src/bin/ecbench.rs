@@ -1320,11 +1320,20 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             let mut by: std::collections::BTreeMap<(String, String), Vec<(f64, f64, bool)>> =
                 Default::default();
             let mut log2_r: std::collections::BTreeMap<String, f64> = Default::default();
+            let mut skipped_amortized = 0usize;
             for d in &dir {
                 for r in crypto_lib::cryptanalysis::ecbench::runner::read_records(d)
                     .map_err(|e| format!("{}: {e}", d.display()))?
                 {
                     if !r.counts() || (r.arm != arm && r.arm != reference) {
+                        continue;
+                    }
+                    // A run whose factor-base logs came from a store paid
+                    // no collection or linear algebra: its reusable share
+                    // is missing, so it cannot enter a reusable +
+                    // per-target split.  Counted, never averaged in.
+                    if r.log_table_amortized() {
+                        skipped_amortized += 1;
                         continue;
                     }
                     let w = match &r.work {
@@ -1340,6 +1349,11 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         .or_default()
                         .push((f(&w.reusable_bitops), f(&w.per_target_bitops), w.complete));
                 }
+            }
+            if skipped_amortized > 0 {
+                eprintln!(
+                    "ecbench amortize: skipped {skipped_amortized} record(s) whose factor-base logs came from a store (amortized, not cold)"
+                );
             }
             let mean = |v: &[(f64, f64, bool)]| {
                 let n = v.len() as f64;

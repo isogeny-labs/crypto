@@ -738,7 +738,11 @@ fn compare_replay(
     // the same serialise-parse round trip the record's took.
     let same_gae = |phases: &[f64], total: f64| {
         (
-            Some(json_roundtrip(total).to_bits()) == r.cost.total_gae.map(f64::to_bits),
+            Some(json_roundtrip(total).to_bits())
+                == r.cost
+                    .total_gae
+                    .or(r.cost.total_gae_store)
+                    .map(f64::to_bits),
             phases
                 .iter()
                 .map(|g| json_roundtrip(*g).to_bits())
@@ -1326,8 +1330,8 @@ fn consistency_problems(
             ));
         }
     }
-    // Phases sum to the total.
-    if let Some(total) = r.cost.total_gae {
+    // Phases sum to the total (an amortized run's, under `*_store`).
+    if let Some(total) = r.cost.total_gae.or(r.cost.total_gae_store) {
         // A named pre-fix producer's class-set-up record is short of its
         // phase sum by exactly the set-up, which its replay checks
         // (`legacy_class_setup`); every other record sums to its total.
@@ -1379,7 +1383,29 @@ fn consistency_problems(
             r.outcome.status
         ));
     }
-    if !failed && r.cost.total_gae.is_none() {
+    // An amortized run (factor-base logs from a store) carries its total
+    // under `total_gae_store` with the cold fields null, never both.
+    let amortized = r.log_table_amortized();
+    if amortized
+        && (r.cost.total_gae.is_some()
+            || r.cost.s.is_some()
+            || r.boundaries.ratio_to_floor.is_some()
+            || r.cost.cost_basis.as_deref() != Some("amortized"))
+    {
+        out.push(format!(
+            "{tag}: its factor-base logs came from a store, so its cost is amortized and must not sit under the cold `total_gae`, `s` or `ratio_to_floor`"
+        ));
+    }
+    if !amortized
+        && (r.cost.total_gae_store.is_some()
+            || r.cost.s_store.is_some()
+            || r.cost.cost_basis.is_some())
+    {
+        out.push(format!(
+            "{tag}: carries an amortized cost but its log table was computed in the run"
+        ));
+    }
+    if !failed && r.cost.total_gae.or(r.cost.total_gae_store).is_none() {
         out.push(format!(
             "{tag}: status `{}` has no total, so no solve finished",
             r.outcome.status
@@ -1687,6 +1713,11 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
             && match (r.cost.total_gae, r.cost.s, r.boundaries.ratio_to_floor) {
                 (Some(t), Some(sv), Some(q)) => close(sv, t / sqrt_r) && close(q, sv / floor),
                 (None, None, None) => true,
+                _ => false,
+            }
+            && match (r.cost.total_gae_store, r.cost.s_store) {
+                (Some(t), Some(sv)) => close(sv, t / sqrt_r),
+                (None, None) => true,
                 _ => false,
             }
             && r.cost.lower_bound != r.cost.unpriced.is_empty()
