@@ -1,0 +1,19 @@
+# CT230 frozen CT229 CI transcription, generated from the two real native invocations (not the duplicated final grep echo).
+# GitHub run=44491343842 job=135447446971 head=b7c4be0e0688977cabd9939d69ebcd2158dd17c5
+# Source: https://github.com/isogeny-labs/crypto/actions/runs/44491343842
+# Two native executions within ONE hosted job; not two hosts and not signed independent PCC.
+# Run A: the separately run ct229 test before full target; Run B: filtered ct229 test later in the same job.
+# The log contains 18 CT229_PANEL_JSON lines because the final grep prints the 6 Run B records again.
+run	basis	rank	smooth	candidates	offsets	rank_complete	target_recovered	target_candidates	source_scalar	setup_ns	relations_ns	la_ns	target_ns	total_ns	bsgs_ns	cantor_adds	target_adds	model	pcc
+A	12	0	0	6540	60	false	false	0	null	110237	177311012	471	421	177422361	2184	6632	0	F101_known_answer_first_b_x_prefix	unverified
+A	18	1	3	6540	60	false	false	0	null	104255	178768353	171	240	178873499	1894	6632	0	F101_known_answer_first_b_x_prefix	unverified
+A	24	1	3	6540	60	false	false	0	null	93164	184581411	141	260	184675376	4299	6632	0	F101_known_answer_first_b_x_prefix	unverified
+A	36	34	38	6540	60	false	false	0	null	85700	191830910	130	260	191917361	1743	6632	0	F101_known_answer_first_b_x_prefix	unverified
+A	48	48	54	2213	21	true	true	10	37	93435	67678609	32230	327193	68131868	1643	2234	11	F101_known_answer_first_b_x_prefix	unverified
+A	54	54	62	1421	14	true	true	3	37	78146	44538696	36068	120155	44773335	1653	1435	4	F101_known_answer_first_b_x_prefix	unverified
+B	12	0	0	6540	60	false	false	0	null	91651	173520242	160	291	173612715	2054	6632	0	F101_known_answer_first_b_x_prefix	unverified
+B	18	1	3	6540	60	false	false	0	null	81152	177553827	140	391	177635861	1953	6632	0	F101_known_answer_first_b_x_prefix	unverified
+B	24	1	3	6540	60	false	false	0	null	79088	182393753	171	400	182473772	1543	6632	0	F101_known_answer_first_b_x_prefix	unverified
+B	36	34	38	6540	60	false	false	0	null	73578	191521030	130	271	191595389	1944	6632	0	F101_known_answer_first_b_x_prefix	unverified
+B	48	48	54	2213	21	true	true	10	37	75852	67340075	32350	326281	67774959	1663	2234	11	F101_known_answer_first_b_x_prefix	unverified
+B	54	54	62	1421	14	true	true	3	37	73689	44331137	35887	120857	44561920	1633	1435	4	F101_known_answer_first_b_x_prefix	unverified
