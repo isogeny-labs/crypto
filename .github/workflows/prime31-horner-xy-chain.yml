@@ -8,12 +8,18 @@ on:
       - 'research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs'
       - 'research/prime31_ic_20261115/native/verify_prime31_horner_xy_chain.py'
       - 'research/prime31_ic_20261115/rr9/HORNER_XY_CHAIN_PROTOCOL_20261119.md'
+      - 'research/prime31_ic_20261115/native/examples/prime31_horner_xonly_sign_lift.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_horner_xonly_sign_lift.py'
+      - 'research/prime31_ic_20261115/rr9/HORNER_XONLY_SIGN_LIFT_PROTOCOL_20261119.md'
   pull_request:
     paths:
       - '.github/workflows/prime31-horner-xy-chain.yml'
       - 'research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs'
       - 'research/prime31_ic_20261115/native/verify_prime31_horner_xy_chain.py'
       - 'research/prime31_ic_20261115/rr9/HORNER_XY_CHAIN_PROTOCOL_20261119.md'
+      - 'research/prime31_ic_20261115/native/examples/prime31_horner_xonly_sign_lift.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_horner_xonly_sign_lift.py'
+      - 'research/prime31_ic_20261115/rr9/HORNER_XONLY_SIGN_LIFT_PROTOCOL_20261119.md'
 permissions:
   contents: read
 jobs:
@@ -69,6 +75,37 @@ jobs:
             research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs \
             research/prime31_ic_20261115/native/verify_prime31_horner_xy_chain.py \
             | tee sha256.txt
+      - name: Overlay x-only sparse candidate onto pinned original Rust
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_horner_xonly_sign_lift.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_horner_xonly_sign_lift.rs
+      - name: Native Rust focused x-only polynomial and sign-lift tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_horner_xonly_sign_lift
+      - name: Exact-source x-only 1024-case experiment
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_horner_xonly_sign_lift > prime31-horner-xonly-full.json
+          jq -e '.schema=="prime31.xonly_horner_sign_lift.v1" and
+            .curve.p==2147483647 and .curve.n==2147446831 and
+            .cases_per_window==256 and .tested==1024 and .ordinary>=1000 and
+            (.ordinary+.exceptional)==1024 and
+            .poisoned_double_rejected==.ordinary and
+            .poisoned_target_rejected==.ordinary and
+            .variables_after_public_x_target==21 and
+            .equations_after_public_x_target==22 and
+            .generic_sum_table_calls==0 and
+            .public_only_unknown_index_extraction==false and
+            .complete_ecdlp_solved==false' prime31-horner-xonly-full.json
+      - name: Independent entire-cohort bigint affine and F3 replay
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_horner_xonly_sign_lift.py \
+            prime31-horner-xonly-full.json | tee prime31-horner-xonly-verified.json
+          sha256sum prime31-horner-xonly-full.json prime31-horner-xonly-verified.json \
+            research/prime31_ic_20261115/native/examples/prime31_horner_xonly_sign_lift.rs \
+            research/prime31_ic_20261115/native/verify_prime31_horner_xonly_sign_lift.py \
+            research/prime31_ic_20261115/rr9/HORNER_XONLY_SIGN_LIFT_PROTOCOL_20261119.md \
+            | tee xonly-sha256.txt
       - name: Preserve scientific artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -78,4 +115,7 @@ jobs:
             prime31-horner-xy-full.json
             prime31-horner-xy-verified.json
             sha256.txt
+            prime31-horner-xonly-full.json
+            prime31-horner-xonly-verified.json
+            xonly-sha256.txt
           if-no-files-found: warn
