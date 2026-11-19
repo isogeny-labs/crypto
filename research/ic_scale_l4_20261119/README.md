@@ -49,3 +49,5 @@ Decision (from the protocol) [pcc:unverified]: improvement over rho-neg at w = 0
 
 ## Files
 `specs/P28.json`, `specs/P32.json` (+ smoke specs), `run.sh`, `gen_specs.py`, `sessions/`, `audit-P*.json`, `compare-*`, `bitop-*`, `band-P*`, `summary.json`, `trend.py`, `trend.json`, `ecbench-trend.json`, `plot.py`, `scale_l4.{svg,png,pdf}`. Bench record `benchmarks/records/20261119T1721Z-ic-scale-l4-28-32.json`. No leaderboard row (validation gate not run).
+
+**Raw data.** The two `sessions/P*/records.jsonl` files (about 37 MB each) are not in Git. They are packed in `sessions-raw.tgz` (5.6 MB, sha256 `43d96ca6caccb2eb…`), which is committed here. That tarball is not in S3: this container has no store credentials, and the bench record lists it with `uploaded: false`. To restore the sessions, run `tar xzf sessions-raw.tgz` in this directory.
