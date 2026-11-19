@@ -21,10 +21,11 @@ pub use crypto_lib::cryptanalysis::koblitz_log_store::{
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::experiment::{self, curve, log_table_to_doc, materialize, GeneratorPoint, Solver};
+    use crate::experiment::{self, curve, log_table_to_doc, materialize, Solver};
     use crate::params;
     use crypto_lib::binary_ecc::BinaryPoint;
     use crypto_lib::cryptanalysis::koblitz_factor_base_search::FactorBaseSpec;
+    use crypto_lib::cryptanalysis::koblitz_log_store::GeneratorPoint;
     use num_bigint::BigUint;
     use std::path::PathBuf;
 

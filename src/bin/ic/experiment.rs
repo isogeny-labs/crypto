@@ -597,9 +597,7 @@ pub struct SolveArgs {
     #[arg(long,value_enum,default_value_t=Solver::PairTable)]
     pub solver: Solver,
 }
-pub use crypto_lib::cryptanalysis::koblitz_log_store::{
-    load_log_table, GeneratorPoint, LogTableDocument,
-};
+pub use crypto_lib::cryptanalysis::koblitz_log_store::{load_log_table, LogTableDocument};
 pub(crate) fn ic_options(
     strategy: Solver,
     summands: u8,
