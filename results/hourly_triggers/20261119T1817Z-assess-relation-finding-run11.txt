@@ -1,0 +1,8 @@
+Assess relation finding
+UTC: 2026-11-19T18:17:01Z
+Workflow: .github/workflows/hourly-relation-finding.yml
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Control: Koblitz GF(2^23), a=0, m=2, natural=256, planted=64, unsat=64
+Baseline: results/relation_baseline.json
+Alert threshold: >20% absolute change in throughput or success rate; failures alert
+Results: results/hourly_log.csv
