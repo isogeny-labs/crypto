@@ -1,0 +1,9 @@
+Trigger: recurring relation-finding benchmark
+Requested: 2026-11-19T05:14:38Z
+Branch: hourly-runs
+Command: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Experiment: frozen Koblitz GF(2^23), a=0, m=2; natural=256, planted=64, proven-UNSAT=64; not ECC2K-130
+CSV output: results/hourly_log.csv
+Baseline: results/relation_baseline.json
+Alert: execution failure or absolute relative change >20% in relations/second or success rate; create GitHub issue
+Local checkout: blocked by GitHub DNS in automation environment; GitHub Actions checks out repository
