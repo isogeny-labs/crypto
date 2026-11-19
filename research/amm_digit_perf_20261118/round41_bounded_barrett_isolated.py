@@ -93,7 +93,7 @@ mod round41 {
             bytes:before::STORAGE_BYTES,events:before::MAX_EVENTS,
             split_attempts:1000,degree:8}
     }
-    fn run_after(p:u64,f:&[u64],seed:u64)->(String,u64) {
+    fn run_after(p:u64,f:&[u64],seed:u64,compare:bool)->(String,u64) {
         let field=Fp64Arithmetic{p};
         let deadline=Instant::now()+Duration::from_secs(120);
         let lim=limits_after();
@@ -105,10 +105,10 @@ mod round41 {
         let mut replay=after::Replay::new(&field,f,seed,lim,lim,deadline).unwrap();
         for e in &ev {replay.push(e).unwrap()}
         let checked=replay.finish(&report).unwrap();
-        (format!("{:?} {:?} {:?}",report,ev,checked),
+        (if compare {format!("{:?} {:?} {:?}",report,ev,checked)} else {String::new()},
             black_box(report.roots[0]+u64::from(report.root_count)+ev.len() as u64))
     }
-    fn run_before(p:u64,f:&[u64],seed:u64)->(String,u64) {
+    fn run_before(p:u64,f:&[u64],seed:u64,compare:bool)->(String,u64) {
         let field=Fp64Arithmetic{p};
         let deadline=Instant::now()+Duration::from_secs(120);
         let lim=limits_before();
@@ -120,7 +120,7 @@ mod round41 {
         let mut replay=before::Replay::new(&field,f,seed,lim,lim,deadline).unwrap();
         for e in &ev {replay.push(e).unwrap()}
         let checked=replay.finish(&report).unwrap();
-        (format!("{:?} {:?} {:?}",report,ev,checked),
+        (if compare {format!("{:?} {:?} {:?}",report,ev,checked)} else {String::new()},
             black_box(report.roots[0]+u64::from(report.root_count)+ev.len() as u64))
     }
     #[test]
@@ -130,8 +130,8 @@ mod round41 {
             for degree in [1usize,2,3,4,6,8] {
                 let f=polynomial(p,degree);
                 for seed in [1u64,42,0x5291ae77] {
-                    let a=run_after(p,&f,seed);
-                    let b=run_before(p,&f,seed);
+                    let a=run_after(p,&f,seed,true);
+                    let b=run_before(p,&f,seed,true);
                     assert_eq!(a,b,"p={p} degree={degree} seed={seed}");
                     n+=1;
                 }
@@ -143,7 +143,7 @@ mod round41 {
         let begin=Instant::now();
         let mut digest=0;
         for _ in 0..reps {
-            digest+=if is_old {run_before(p,f,42).1} else {run_after(p,f,42).1};
+            digest+=if is_old {run_before(p,f,42,false).1} else {run_after(p,f,42,false).1};
         }
         black_box(digest);
         begin.elapsed().as_nanos() as f64/reps as f64
