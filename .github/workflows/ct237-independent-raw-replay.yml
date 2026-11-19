@@ -1,0 +1,55 @@
+name: CT237 independent genus-4 raw relation replay
+
+on:
+  push:
+    branches:
+      - research/ct204-odd-cover-toy-dlp-20261118
+    paths:
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct237_independent_raw_relation_replay.py"
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_extension_norm_oracle.py"
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct235_native_panel.jsonl"
+      - ".github/workflows/ct237-independent-raw-replay.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  independently-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: research/chained_jacobian_transfers_20261110/toy_dlp_ct204
+      - name: Independent source-to-source raw relations and Q73 target
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 --version
+          git rev-parse HEAD
+          cd research/chained_jacobian_transfers_20261110/toy_dlp_ct204
+          python3 ct237_independent_raw_relation_replay.py ct235_native_panel.jsonl
+      - name: Negative controls for tampered and incomplete original panels
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd research/chained_jacobian_transfers_20261110/toy_dlp_ct204
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          rows=Path('ct235_native_panel.jsonl').read_text().splitlines()
+          changed=[json.loads(r) for r in rows]
+          first=next(r for r in changed if 'basis' in r)
+          first['rank']+=1
+          Path('ct237_mutated_panel.jsonl').write_text('\n'.join(json.dumps(r) for r in changed)+'\n')
+          Path('ct237_truncated_panel.jsonl').write_text('\n'.join(rows[:-1])+'\n')
+          PY
+          if python3 ct237_independent_raw_relation_replay.py ct237_mutated_panel.jsonl; then
+            echo 'ERROR: changed-rank panel accepted'; exit 1
+          fi
+          if python3 ct237_independent_raw_relation_replay.py ct237_truncated_panel.jsonl; then
+            echo 'ERROR: omitted-record panel accepted'; exit 1
+          fi
+          echo CT237_MUTATION_CONTROLS_PASS
