@@ -4,6 +4,13 @@
 
 = Reused-setup dual-isogeny fibers on 64 public targets
 
+*Single-target priority, clarified 2026-11-18.* This is a secondary
+amortization diagnostic. Its per-target batch quotient is excluded from
+the cold single-target ECDLP comparison. In the prior 480-child cold
+study on this curve pair, direct dual had mean counted $S_"group"$ 108.137
+at $B=8$ and 2,492.134 at $B=64$, versus same-target signed rho 7.979
+and source BSGS 4.361. Complete portable $S$ remains unset there.
+
 *Measured 2026-11-18 17:01:06–17:01:11 UTC.* The frozen V1 protocol and
 pre-run V2 scheduling correction produced 18/18 complete batch children,
 18/18 independent replays, and 1,152 verified target results. The native
@@ -22,8 +29,9 @@ the prior held-out points; the other 60 are distinct.
 $S_"group"$ is all counted setup, query, and final-verification additions
 plus doublings in a child divided by $64 sqrt(229)$. Entries are means
 across three completed rounds. It is a partial operation view. The
-prespecified generic two-class *single-target* floor is
-$sqrt(pi / 4) = 0.886227$ in its corresponding single-target unit.
+prespecified generic two-class *single-target* floor
+$sqrt(pi / 4) = 0.886227$ belongs to the cold comparison, not this batch
+quotient.
 
 #table(
   columns: (2.2fr, 1fr, 1.2fr),
@@ -38,7 +46,7 @@ $sqrt(pi / 4) = 0.886227$ in its corresponding single-target unit.
 )
 
 #figure(
-  image("S_GROUP_GRAPH_V1.svg", width: 75%),
+  image("S_GROUP_GRAPH_V1.svg", width: 65%),
   caption: [Mean whole-batch counted group work per target, logarithmic axis;
   three rounds on the same 64 targets. Full precision is in
   `RUN_V1/SUMMARY_V1.json`.],

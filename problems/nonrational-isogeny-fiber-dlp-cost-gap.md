@@ -828,6 +828,8 @@ columns did not change useful relation support, rows, rank or scalar.
 The separately frozen [64-target reused-setup panel](../research/isogeny_torsion_fibers_20261012/dual_projected_base_20261118/RESULTS_V1.md)
 then completed 18/18 whole-batch children and 18/18 independent native
 replays on 64 distinct public order-229 targets in three rounds. The
+batch quotient is a secondary amortization diagnostic and is excluded from
+the cold single-target ECDLP comparison above. The
 pair audit matched 192 dual/inverse cells and 76,711 relation witnesses.
 At B=64, mean whole-batch counted group work divided by
 `64*sqrt(229)` was 1,714.111 direct dual, 1,714.442 direct inverse,

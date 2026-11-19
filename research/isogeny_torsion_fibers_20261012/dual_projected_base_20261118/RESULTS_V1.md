@@ -1,5 +1,16 @@
 # Reused-setup dual-isogeny fiber panel on 64 public targets
 
+**Single-target priority, clarified 2026-11-18 after review.** This panel is
+an amortization diagnostic only. Its per-target batch quotient is excluded
+from the cold single-target ECDLP comparison and cannot establish a
+single-target advantage. The primary [480-child cold study](../dual_projected_base_20261115/RESULTS_V1.md)
+used the same curve pair, four held-out targets, and same-target rho and BSGS
+controls. At B=8 its mean whole-child counted `S_group` was 108.137 direct
+dual, 7.979 signed rho, and 4.361 source BSGS; at B=64 the corresponding
+values were 2,492.134, 7.979, and 4.361. Complete portable `S` remains
+unset there as well. The cold result is the relevant fixed-target boundary;
+the batch result below asks only what happens when setup is shared.
+
 **Measured 2026-11-18 17:01:06–17:01:11 UTC.** The [V1 protocol](PROTOCOL_V1.md)
 and [pre-run scheduling correction](AMENDMENT_V2.md) produced 18/18 complete
 whole-batch children and 18/18 independent native replays. All 1,152 target
@@ -25,8 +36,9 @@ The first four public targets are the prior held-out points; the other 60 are
 distinct. Each arm received these same 64 targets and three rounds.
 
 The prespecified two-class generic **single-target** counting floor is
-`sqrt(pi/4)=0.886227` group operations per `sqrt(229)`. The measured
-same-target reference is signed rho; rho A/A checks deterministic control
+`sqrt(pi/4)=0.886227` group operations per `sqrt(229)` in the cold study;
+it is not an acceptance boundary for this batch quotient. Signed rho is
+rerun on the same 64 targets, and rho A/A checks deterministic control
 replay. The table's single unit, `S_group`, is each child's **whole-batch**
 setup, query, and verification additions plus doublings, divided by
 `64*sqrt(229)`, then averaged over the three completed rounds. It is a
@@ -78,8 +90,8 @@ does not edit that file. The [validation receipt](VALIDATION_V1.md) records
 both attempts and exact commands. The result therefore remains unmerged and
 does not inherit a passing full-library gate from the earlier study.
 
-**Interpretation of this measured cell:** sharing the dual construction is
-real in the runner, but the unchanged relation query dominates counted group
+**Secondary batch interpretation:** sharing the dual construction is real in
+the runner, but the unchanged relation query dominates counted group
 work for B=64 on these targets. The separately frozen complete primitive
 price, independent counter census, L2 wall timing, and larger-order
 dual/inverse trend are still open. This panel does not change the curve's
