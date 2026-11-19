@@ -1888,6 +1888,17 @@ fn normalise_param(name: &str, default: Option<&str>, value: &str) -> String {
     }
 }
 
+/// Parameters a method accepts without declaring them: absent from the
+/// registry (so no default is written and the identity of a spec without
+/// them is unchanged), hashed into the identity only when given.  Today
+/// only the factor-base log store of the Koblitz descent pipelines
+/// ([`koblitz_descent::LOG_STORE_PARAM`]), whose runs with a store hit
+/// are amortized rows, never cold ones.
+pub fn optional_param(method: &str, name: &str) -> bool {
+    name == koblitz_descent::LOG_STORE_PARAM
+        && matches!(method, "ic.koblitz_descent" | "ic.koblitz_descent_v2")
+}
+
 /// Fill defaults, normalise integer-valued parameters to canonical
 /// decimal, refuse unknown and missing parameters, hash.
 pub fn resolve(spec: &MethodSpec) -> Result<ResolvedMethod, String> {
@@ -1910,11 +1921,18 @@ pub fn resolve(spec: &MethodSpec) -> Result<ResolvedMethod, String> {
         format!("unknown method `{}`; known: {}", spec.id, ids.join(", "))
     })?;
     for k in spec.params.keys() {
-        if !d.params.iter().any(|p| p.name == k) {
+        if !d.params.iter().any(|p| p.name == k) && !optional_param(d.id, k) {
             return Err(format!("method `{}` has no parameter `{k}`", d.id));
         }
     }
     let mut params = BTreeMap::new();
+    // An optional parameter is hashed only when given, so a spec without
+    // it keeps the method identity it always had.
+    for (k, v) in &spec.params {
+        if optional_param(d.id, k) && !d.params.iter().any(|p| p.name == k) {
+            params.insert(k.clone(), v.clone());
+        }
+    }
     for p in d.params {
         match (spec.params.get(p.name), p.default) {
             (Some(v), def) => {
@@ -8455,10 +8473,15 @@ fn solve_koblitz_descent(
     let q = inst.fast.lower(target);
     let started = Instant::now();
     let top_layout = m.id == "ic.koblitz_descent_v2";
-    let out = if top_layout {
-        koblitz_descent::run_top(kc, &q, &p)?
-    } else {
-        koblitz_descent::run(kc, &q, &p)?
+    let store = koblitz_descent::log_store_dir(&m.params)?;
+    let (out, log_table) = match &store {
+        // Opt-in only: a factor-base log store (`log_store=<dir|env>`).
+        Some(dir) => {
+            let (out, prov) = koblitz_descent::run_stored(kc, &q, &p, top_layout, dir)?;
+            (out, Some(prov))
+        }
+        None if top_layout => (koblitz_descent::run_top(kc, &q, &p)?, None),
+        None => (koblitz_descent::run(kc, &q, &p)?, None),
     };
     let wall = started.elapsed().as_nanos() as u64;
     if !out.single_thread {
@@ -8567,7 +8590,16 @@ fn solve_koblitz_descent(
         nondeterminism: Vec::new(),
         solve_wall_ns: wall,
         factor_base: Some(facts),
-        detail: koblitz_filter_detail(koblitz_descent::detail_of(&out, &p), top_layout),
+        detail: {
+            let mut d = koblitz_filter_detail(koblitz_descent::detail_of(&out, &p), top_layout);
+            // Only with a store: where the log table came from.  A
+            // `log_table_source: "store"` run is amortized, and the runner
+            // moves its cost off the cold fields (`Cost::s_store`).
+            if let Some(prov) = log_table {
+                d["log_table"] = prov;
+            }
+            d
+        },
         online,
         online_error,
         // Sparse logs mod r (block Wiedemann), not a polynomial-system solve:

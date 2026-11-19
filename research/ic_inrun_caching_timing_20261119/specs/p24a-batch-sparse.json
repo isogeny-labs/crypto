@@ -1,0 +1,136 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "IC in-run caching timing (PR #4756), prime arms on icv1-fp24-tm5099-a6f137c6: batch inversion in subtract/mitm and the paired sparse-solve filter",
+  "description": "research/ic_inrun_caching_timing_20261119/PROTOCOL.md. The same bytes run under the old binary (ad2a014 + this directory only) and the new binary (PR #4756 head + this directory). batch=0 arms are the in-binary serial path on the new binary and are ignored (serial) on the old one. Engineering measurement, not a cross-method or algorithmic claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 16777199,
+        "a": 16777196,
+        "b": 31,
+        "group_order": 16782299,
+        "r": 16782299,
+        "gx": 2,
+        "gy": 5412647
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 20261119,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "sub",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=256",
+          "oracle": "subtract"
+        }
+      }
+    },
+    {
+      "name": "sub-b0",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=256",
+          "oracle": "subtract:batch=0"
+        }
+      }
+    },
+    {
+      "name": "sub-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=256",
+          "oracle": "subtract"
+        }
+      }
+    },
+    {
+      "name": "mitm",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "mitm-b0",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm:negation_folded=1,batch=0"
+        }
+      }
+    },
+    {
+      "name": "mitm-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "cado",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm:negation_folded=1,batch=0",
+          "linalg": "filter+wiedemann"
+        }
+      }
+    },
+    {
+      "name": "cado-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "oracle": "mitm:negation_folded=1,batch=0",
+          "linalg": "filter+wiedemann"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 5,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261120,
+    "isolation_required": "L2",
+    "timeout_seconds": 15
+  }
+}

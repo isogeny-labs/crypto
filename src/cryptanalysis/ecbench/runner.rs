@@ -1754,7 +1754,15 @@ fn assemble(
     };
     let sqrt_r = (w.curve.r.to_f64()).sqrt();
     let floor = floor_s(w.curve.automorphisms_available);
-    let s = report.as_ref().map(|r| r.total_gae / sqrt_r);
+    // A run whose factor-base logs came from a store is amortized: its
+    // total moves to `*_store` and the cold fields stay null.
+    let amortized = report
+        .as_ref()
+        .is_some_and(|r| crate::cryptanalysis::koblitz_log_store::detail_is_amortized(&r.detail));
+    let s = report
+        .as_ref()
+        .filter(|_| !amortized)
+        .map(|r| r.total_gae / sqrt_r);
     let placement = reaped
         .output
         .as_ref()
@@ -1800,7 +1808,7 @@ fn assemble(
         },
         cost: Cost {
             unit: UNIT.into(),
-            total_gae: report.as_ref().map(|r| r.total_gae),
+            total_gae: report.as_ref().filter(|_| !amortized).map(|r| r.total_gae),
             s,
             lower_bound: report
                 .as_ref()
@@ -1815,6 +1823,12 @@ fn assemble(
                 .as_ref()
                 .map(|r| r.nondeterminism.clone())
                 .unwrap_or_default(),
+            total_gae_store: report.as_ref().filter(|_| amortized).map(|r| r.total_gae),
+            s_store: report
+                .as_ref()
+                .filter(|_| amortized)
+                .map(|r| r.total_gae / sqrt_r),
+            cost_basis: amortized.then(|| "amortized".to_string()),
         },
         boundaries: Boundaries {
             automorphisms_available: w.curve.automorphisms_available,
@@ -1878,7 +1892,10 @@ fn assemble(
             });
     // The record's work in bitop/v1, derived from what it carries; a record
     // that cannot be priced (no report) carries none.
-    if report.is_some() {
+    // An amortized run carries none: its phases leave out the collection
+    // and linear algebra an earlier run paid, so no gate total of it may
+    // stand beside the cold ones (`ecbench amortize` skips it).
+    if report.is_some() && !amortized {
         record.work = crate::cryptanalysis::ecbench::work::price_record(&record).ok();
     }
     record
@@ -2963,5 +2980,160 @@ mod diagnostic_activation_tests {
         std::fs::remove_file(&exe).unwrap();
         assert!(validate_diagnostic_launch_before_plan(&launch, &spec, &exe).is_err());
         std::fs::remove_dir(root).unwrap();
+    }
+}
+
+#[cfg(test)]
+mod log_store_record_tests {
+    use super::*;
+
+    /// An `ic.koblitz_descent` arm with `log_store`: the miss is a cold
+    /// record like the store-less arm's, and the second target's hit is an
+    /// amortized record whose cold `S` is null.  The store-less arm's
+    /// record carries none of the store fields (4).
+    #[test]
+    fn a_store_hit_record_is_amortized_and_a_record_without_the_store_is_unchanged() {
+        let dir = std::env::temp_dir().join(format!(
+            "ecbench-log-store-record-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let params = r#""summands":"3","descent_summands":"2","collection_aim":"true","collection_window":"64","factor_base_points":"256","unit_trials":"64","units":"1","max_units":"10000","max_trials":"100000","seed":"7""#;
+        let spec = Spec::from_json(&format!(
+            r#"{{
+          "schema":"ecbench.spec/v1","label":"log store regression",
+          "workloads":{{"curves":[{{"kind":"koblitz","a":0,"n":23}}],"targets_per_curve":2,"target_seed":20261119,"target_kind":"public"}},
+          "arms":[
+            {{"name":"cold","role":"reference","method":{{"id":"ic.koblitz_descent","params":{{{params}}}}}}},
+            {{"name":"stored","role":"candidate","method":{{"id":"ic.koblitz_descent","params":{{{params},"log_store":{dir:?}}}}}}}
+          ],
+          "measurement":{{"rounds":1,"warmup":0,"seed":1,"isolation_required":"L0"}}
+        }}"#,
+            dir = dir.display().to_string()
+        ))
+        .unwrap();
+        let p = plan(spec).unwrap();
+        let capsule = capture().unwrap();
+        let thresholds = Thresholds::default();
+        let ctx = GradeContext {
+            plan: None,
+            preflight: None,
+            eviction: None,
+            runner_on_run_cpu: false,
+            thresholds: &thresholds,
+            hz: 100.0,
+        };
+        let record_for = |arm_name: &str, workload: usize| -> Record {
+            let ex = p
+                .executions
+                .iter()
+                .find(|ex| p.arms[ex.arm].name == arm_name && ex.workload == workload)
+                .expect("execution");
+            let arm = &p.arms[ex.arm];
+            let w = &p.workloads[ex.workload];
+            let input = ChildInput {
+                schema: CHILD_INPUT_SCHEMA.into(),
+                diagnostics: None,
+                diagnostic_lifecycle: None,
+                curve: w.curve_spec.clone(),
+                target_seed: w.target_seed,
+                target_index: w.target_index,
+                target_kind: w.kind(),
+                expected_workload_id: w.workload_id.clone(),
+                method: MethodSpec {
+                    id: arm.method.id.clone(),
+                    params: arm.method.params.clone(),
+                },
+                expected_method_id: arm.method.method_id.clone(),
+                algorithm_seed: ex.algorithm_seed,
+            };
+            let output = crate::cryptanalysis::ecbench::record::child_main(
+                &serde_json::to_string(&input).unwrap(),
+            );
+            assert!(output.error.is_none(), "{:?}", output.error);
+            let reaped = Reaped {
+                output: Some(output),
+                parse_error: None,
+                stderr: vec![],
+                timing: Timing::default(),
+                exit: Some("exit 0".into()),
+                reap_observed: true,
+                timed_out: false,
+                interrupted: false,
+                spawn_error: None,
+            };
+            assemble(
+                "log-store-test",
+                ex,
+                1,
+                arm,
+                w,
+                p.instance(ex.workload),
+                &capsule,
+                &reaped,
+                conditions(&[]),
+                conditions(&[]),
+                &ctx,
+            )
+        };
+        let cold_arm = p.arms.iter().find(|a| a.name == "cold").unwrap();
+        let stored_arm = p.arms.iter().find(|a| a.name == "stored").unwrap();
+        assert!(!cold_arm.method.params.contains_key("log_store"));
+        assert_ne!(cold_arm.method.method_id, stored_arm.method.method_id);
+
+        // Without the option: the cold record, no store field anywhere.
+        let cold = record_for("cold", 0);
+        assert_eq!(cold.outcome.status, "verified");
+        assert!(cold.cost.total_gae.is_some() && cold.cost.s.is_some());
+        assert!(cold.boundaries.ratio_to_floor.is_some());
+        assert_eq!(cold.cost.total_gae_store, None);
+        assert_eq!(cold.cost.s_store, None);
+        assert_eq!(cold.cost.cost_basis, None);
+        assert!(cold.work.is_some());
+        assert!(!cold.log_table_amortized());
+        let text = serde_json::to_string(&cold).unwrap();
+        for key in [
+            "total_gae_store",
+            "s_store",
+            "cost_basis",
+            "log_table",
+            "log_store",
+        ] {
+            assert!(!text.contains(key), "{key} in a store-less record");
+        }
+
+        // Miss: computed in the run, so cold, with the same cost.
+        let miss = record_for("stored", 0);
+        assert_eq!(miss.outcome.status, "verified");
+        assert_eq!(miss.detail["log_table"]["log_table_source"], "computed");
+        assert!(!miss.log_table_amortized());
+        assert_eq!(miss.cost.total_gae, cold.cost.total_gae);
+        assert_eq!(miss.cost.s, cold.cost.s);
+        assert_eq!(miss.cost.cost_basis, None);
+
+        // Hit, on the curve's second target: amortized, cold S null.
+        let hit = record_for("stored", 1);
+        assert_eq!(hit.outcome.status, "verified");
+        assert_eq!(hit.outcome.matches_target, Some(true));
+        assert_eq!(hit.detail["log_table"]["log_table_source"], "store");
+        assert!(hit.log_table_amortized());
+        assert_eq!(hit.cost.total_gae, None);
+        assert_eq!(hit.cost.s, None);
+        assert_eq!(hit.boundaries.ratio_to_floor, None);
+        assert_eq!(hit.cost.cost_basis.as_deref(), Some("amortized"));
+        let total: f64 = hit.phases.iter().map(|ph| ph.gae).sum();
+        assert_eq!(hit.cost.total_gae_store, Some(total));
+        let sqrt_r = hit.workload.curve.r.to_f64().sqrt();
+        assert_eq!(hit.cost.s_store, Some(total / sqrt_r));
+        assert!(total < cold.cost.total_gae.unwrap(), "the hit pays less");
+        assert!(hit.work.is_none(), "no gate total beside the cold ones");
+        assert!(!hit
+            .phases
+            .iter()
+            .any(|ph| ph.name == "relations" || ph.name == "linear_algebra"));
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }

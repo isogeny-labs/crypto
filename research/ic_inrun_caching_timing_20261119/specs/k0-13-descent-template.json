@@ -1,0 +1,80 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "IC in-run caching timing (PR #4756), binary arms on icv1-f2m13-t181-515ee569: descent-algebraic S_3 template and tau-slot bases",
+  "description": "research/ic_inrun_caching_timing_20261119/PROTOCOL.md. The same bytes run under the old binary (ad2a014 + this directory only) and the new binary (PR #4756 head + this directory). The template has no in-binary toggle: old vs new is the only comparison. The f4-f2 solver term is unpriced in ic.pipeline, so S is a lower bound; bitop/v1 carries the descent work. Engineering measurement, not a cross-method or algorithmic claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 20261119,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-strong",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    },
+    {
+      "name": "rho-strong-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    },
+    {
+      "name": "da",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=6",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "f4-f2",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "da-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=6",
+          "oracle": "descent-algebraic:m=2",
+          "solver": "f4-f2",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "da-slots",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=6",
+          "oracle": "descent-algebraic:m=2,slots=all",
+          "solver": "f4-f2",
+          "max_trials": "200000"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 5,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261120,
+    "isolation_required": "L2",
+    "timeout_seconds": 30
+  }
+}

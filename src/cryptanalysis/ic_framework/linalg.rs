@@ -65,6 +65,7 @@ use crate::cryptanalysis::ic_boundary::{
 };
 use crate::cryptanalysis::koblitz_sparse_la::{
     FilterOptions, FixedMul, SparseCoreSolver, SparseRows, SparseSolveOptions, SparseSolveOutcome,
+    SparseSolveReport,
 };
 
 #[cfg(test)]
@@ -787,20 +788,182 @@ fn berlekamp_massey<S: RhoScalar>(s: &[S], m: S, ops: &mut u64) -> Vec<S> {
 /// a solution is accepted only when a second solve under an independent
 /// seed returns the same vector: for a rank-deficient system the two
 /// differ by a random kernel element except with probability about
-/// `1/r`.  Both solves are charged.  Until then [`RelationSolver::rank`]
-/// reports `min(rows, cols − 1)`, a placeholder rather than a rank (the
+/// `1/r`.  Both solves are charged; the filter, which does not depend
+/// on the seed, runs once for the pair.
+///
+/// That argument needs the two solutions to be independent draws from
+/// the solution set, which block Wiedemann's homogenised kernel vectors
+/// are; block Lanczos's are not.  Unfiltered, below full rank, both
+/// seeds return the same solution, the one in the Krylov space of the
+/// right-hand side, so the pair agrees on a system that does not
+/// determine its columns (the `lanczos` arm answered wrongly at 204
+/// rows where full rank needs 253 on the covered-early planted
+/// systems).  The unfiltered `lanczos` arm therefore replaces the
+/// second solve by a **kernel probe**: draw `r` uniformly from
+/// `F_p^cols`, solve `A·y = A·r` on the same rows under the second
+/// seed, and accept the first solution only if `y = r`.  Soundness: write
+/// `r = r₀ + k` with `k` the component of `r` in `ker A`, uniform on
+/// `ker A` and independent of `A·r = A·r₀`; `y` is a function of the rows,
+/// `A·r` and the seed only, so it is independent of `k`, and
+/// `Pr[y = r] = 1/|ker A| ≤ 1/p` whenever the columns are not all
+/// determined, whatever the Krylov method returns (and `y` is checked
+/// against every row, so a full-rank system, whose only solution is
+/// `r`, passes whenever the solve returns).  The false-accept bound is
+/// the same `1/p` order as the two-seed check's, per attempt.  Its cost
+/// replaces the second solve's: one solve, plus one multiply-add per
+/// non-zero to form `A·r`, both charged to `row_ops`.
+///
+/// Until a solution is accepted [`RelationSolver::rank`] reports `min(rows, cols − 1)`, a placeholder rather than a rank (the
 /// method tracks none); at acceptance it is `cols` and the rows beyond
 /// it are counted as dependent.
 ///
 /// `work` is [`SparseSolveReport::row_ops`](crate::cryptanalysis::koblitz_sparse_la::SparseSolveReport::row_ops)
 /// summed over every solve tried, in the unit the incremental methods
 /// use, plus one per non-zero for converting each arriving row.
+///
+/// The retry interval is an [`AttemptSchedule`]; the default,
+/// [`AttemptSchedule::Fixed`], is the `max(1, cols / 32)` stride above,
+/// and only it carries the 3 % bound.
 pub struct SparseCado {
     modulus: u64,
     cols: usize,
     filter: FilterOptions,
     core: SparseCoreSolver,
+    schedule: AttemptSchedule,
+    /// A schedule was set explicitly (`with_schedule`): only then are
+    /// its counters reported, so unparameterised records are unchanged.
+    schedule_named: bool,
+    /// Confirm with a kernel probe instead of a second seed (the
+    /// unfiltered Lanczos arm; see the type's documentation).
+    kernel_probe: bool,
     state: RefCell<SparseCadoState>,
+}
+
+/// When a deferred sparse solver ([`SparseCado`]) tries its next solve
+/// after one that did not answer.  The first attempt is always at the
+/// first row count with every column covered and `rows ≥ cols`.
+///
+/// Spec syntax: `sparse-cado:schedule=fixed` (the default),
+/// `…:schedule=geometric,start=S,growth=G`, `…:schedule=predicted,margin=M`;
+/// the same parameters apply to every deferred `SparseCado` name.
+///
+/// The overshoot is the number of rows read beyond the full-rank point
+/// (the fewest rows at which the solve can answer).  A failed attempt
+/// at `r` rows shows the full-rank point is above `r` (except when a
+/// Krylov solve fails at full rank, which is rare), so each schedule's
+/// overshoot is at most its last stride:
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum AttemptSchedule {
+    /// Every `max(1, cols / 32)` rows: the documented "at most about 3 %
+    /// more relations than the full-rank point" (`cols / 32` ≈ 3.1 %).
+    Fixed,
+    /// Strides `start, ⌈start·growth⌉, …`: fewer attempts when the first
+    /// attempt is far below full rank, but the overshoot is bounded only
+    /// by the last stride, which can pass 3 % of `cols`.
+    Geometric { start: usize, growth: f64 },
+    /// After a failed attempt at `r` rows, the next is at
+    /// `r + max(1, d + margin)`, where `d` is a lower bound on the rank
+    /// deficit read off that attempt's filter report (columns the filter
+    /// left in no row, plus core columns in excess of core rows; `0` when
+    /// the filter dropped surplus rows, which can lower the rank, or when
+    /// there is no filter).  Since the full-rank point is at least
+    /// `r + d`, the overshoot is at most `margin` rows (plus a stride
+    /// after a full-rank solve failure); with `margin < cols / 32` it is
+    /// inside the 3 % bound.  The bound is usually `0`: a system short of
+    /// rank but with surplus rows has them purged by the filter, and the
+    /// unfiltered arms have none, so in practice this schedule retries
+    /// every `margin + 1` rows — less overshoot, more attempts
+    /// (`attempt_schedules_keep_answers_and_bound_overshoot`).
+    Predicted { margin: usize },
+}
+
+impl AttemptSchedule {
+    /// Read `schedule`, `start`, `growth` and `margin` from a matrix
+    /// spec's parameters; any other key, or a key the schedule does not
+    /// take, is refused.
+    pub fn from_params(params: &super::stages::Params, cols: usize) -> Result<Self, String> {
+        let allowed: &[&str] = match params.get("schedule").unwrap_or("fixed") {
+            "fixed" => &["schedule"],
+            "geometric" => &["schedule", "start", "growth"],
+            "predicted" => &["schedule", "margin"],
+            other => {
+                return Err(format!(
+                    "unknown attempt schedule `{other}`; known: fixed, geometric, predicted"
+                ))
+            }
+        };
+        if let Some(k) = params.0.keys().find(|k| !allowed.contains(&k.as_str())) {
+            return Err(format!(
+                "parameter `{k}` does not apply to this attempt schedule (allowed: {})",
+                allowed.join(", ")
+            ));
+        }
+        Ok(match params.get("schedule").unwrap_or("fixed") {
+            "fixed" => Self::Fixed,
+            "geometric" => {
+                let start = params.u64_or("start", 1)?;
+                if start == 0 || start > 1 << 32 {
+                    return Err(format!("`start` must be 1..=2^32, not {start}"));
+                }
+                let growth = match params.get("growth") {
+                    None => 2.0,
+                    Some(raw) => raw
+                        .parse::<f64>()
+                        .map_err(|_| format!("parameter `growth` is not a number: `{raw}`"))?,
+                };
+                if !(growth.is_finite() && (1.0..=16.0).contains(&growth)) {
+                    return Err(format!("`growth` must be in 1..=16, not {growth}"));
+                }
+                Self::Geometric {
+                    start: start as usize,
+                    growth,
+                }
+            }
+            _ => {
+                let margin = params.u64_or("margin", 1)?;
+                if margin > cols.max(1) as u64 {
+                    return Err(format!(
+                        "`margin` must be at most cols = {cols}, not {margin}"
+                    ));
+                }
+                Self::Predicted {
+                    margin: margin as usize,
+                }
+            }
+        })
+    }
+}
+
+/// What a deferred sparse solver's schedule did: attempts are counted
+/// once per row count tried (one filter, one or two Krylov solves).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct ScheduleStats {
+    pub attempt_points: u64,
+    pub failed_points: u64,
+    /// Rows buffered at the last failed attempt.
+    pub last_failed_rows: Option<usize>,
+    /// Rows buffered when the solve answered.
+    pub solved_rows: Option<usize>,
+}
+
+impl ScheduleStats {
+    /// Rows read at the answer beyond the most the failures exclude:
+    /// the full-rank point is above the last failed attempt (and at
+    /// least `cols`), so the overshoot is at most this.
+    pub fn overshoot_bound(&self, cols: usize) -> Option<usize> {
+        let floor = self.last_failed_rows.map_or(cols, |r| (r + 1).max(cols));
+        self.solved_rows.map(|s| s.saturating_sub(floor))
+    }
+}
+
+/// A lower bound on the rank deficit of the rows a failed attempt saw,
+/// from its filter report (see [`AttemptSchedule::Predicted`]).
+fn deficit_lower_bound(report: &SparseSolveReport) -> usize {
+    let f = &report.filter;
+    if f.excess_rows_removed > 0 {
+        return 0;
+    }
+    f.uncovered_columns + f.columns_out.saturating_sub(f.rows_out)
 }
 
 struct SparseCadoState {
@@ -809,6 +972,9 @@ struct SparseCadoState {
     uncovered: usize,
     next_attempt: usize,
     solution: Option<Vec<u64>>,
+    /// Non-zeros of the buffered rows (the cost of forming a probe's
+    /// right-hand side).
+    nnz: u64,
     /// The last solve found a contradiction; the next row reports it.
     inconsistent: bool,
     row_ops: u64,
@@ -818,6 +984,9 @@ struct SparseCadoState {
     /// a solve is tried only once it reports full structural rank.
     gate: Option<super::linalg_mixed::MatchGate>,
     gate_visits: u64,
+    /// The current stride of a geometric schedule.
+    stride: usize,
+    stats: ScheduleStats,
 }
 
 impl SparseCado {
@@ -848,6 +1017,9 @@ impl SparseCado {
             cols,
             filter,
             core,
+            schedule: AttemptSchedule::Fixed,
+            schedule_named: false,
+            kernel_probe: core == SparseCoreSolver::BlockLanczos && !filtered,
             state: RefCell::new(SparseCadoState {
                 rows: SparseRows::for_modulus(&BigUint::from(modulus))
                     .expect("a prime modulus of at most 256 bits"),
@@ -855,14 +1027,32 @@ impl SparseCado {
                 uncovered: cols,
                 next_attempt: cols,
                 solution: None,
+                nnz: 0,
                 inconsistent: false,
                 row_ops: 0,
                 dependent: 0,
                 attempts: 0,
                 gate: None,
                 gate_visits: 0,
+                stride: 1,
+                stats: ScheduleStats::default(),
             }),
         }
+    }
+
+    /// The same solver under another retry schedule.
+    pub fn with_schedule(mut self, schedule: AttemptSchedule) -> Self {
+        if let AttemptSchedule::Geometric { start, .. } = schedule {
+            self.state.get_mut().stride = start.max(1);
+        }
+        self.schedule = schedule;
+        self.schedule_named = true;
+        self
+    }
+
+    /// What the retry schedule did so far.
+    pub fn schedule_stats(&self) -> ScheduleStats {
+        self.state.borrow().stats
     }
 
     /// The same solver behind the structural-rank gate: no solve is tried
@@ -887,34 +1077,54 @@ impl SparseCado {
         if st.gate.as_ref().is_some_and(|g| g.size() < self.cols) {
             return;
         }
-        st.next_attempt = rows + (self.cols / 32).max(1);
-        let solve = |seed: u64, st: &mut SparseCadoState| {
-            let opts = SparseSolveOptions {
-                filter: self.filter,
-                solver: self.core,
-                seed,
-                ..SparseSolveOptions::default()
-            };
-            st.attempts += 1;
-            let (outcome, report) = st.rows.solve(self.cols, &opts);
-            st.row_ops += report.row_ops;
-            outcome
+        let fixed_stride = (self.cols / 32).max(1);
+        st.next_attempt = rows + fixed_stride;
+        st.stats.attempt_points += 1;
+        let opts = SparseSolveOptions {
+            filter: self.filter,
+            solver: self.core,
+            seed: 0x5350_4152_5345_4341,
+            ..SparseSolveOptions::default()
         };
-        let first = match solve(0x5350_4152_5345_4341, st) {
-            SparseSolveOutcome::Solved(x) => x,
-            SparseSolveOutcome::Undetermined => return,
-            SparseSolveOutcome::Inconsistent => {
+        // Both solves see the same rows, and the filter does not depend on
+        // the seed: it runs once, and the second solve (only tried when the
+        // first returns a solution) reuses its core under its own seed.
+        let second_seed = 0x4345_5254_4946_5932 ^ rows as u64;
+        let seeds: &[u64] = if self.kernel_probe {
+            &[opts.seed]
+        } else {
+            &[opts.seed, second_seed]
+        };
+        let solves = st.rows.solve_seeds(self.cols, &opts, seeds);
+        st.attempts += solves.len() as u64;
+        st.row_ops += solves.iter().map(|(_, r)| r.row_ops).sum::<u64>();
+        let deficit = solves.first().map_or(0, |(_, r)| deficit_lower_bound(r));
+        let mut outcomes = solves.into_iter().map(|(o, _)| o);
+        let first = match outcomes.next() {
+            Some(SparseSolveOutcome::Solved(x)) => x,
+            Some(SparseSolveOutcome::Inconsistent) => {
                 st.inconsistent = true;
                 return;
             }
+            _ => return self.failed(st, rows, deficit),
         };
-        let second = match solve(0x4345_5254_4946_5932 ^ rows as u64, st) {
-            SparseSolveOutcome::Solved(x) => x,
-            _ => return,
-        };
-        if first != second {
-            return;
+        if self.kernel_probe {
+            if !self.kernel_probe_passes(st, &opts, second_seed) {
+                // A failed probe solve, or `y ≠ r`: a kernel element
+                // (deficit ≥ 1) or, rarely, a Krylov failure.
+                return self.failed(st, rows, deficit.max(1));
+            }
+        } else {
+            let second = match outcomes.next() {
+                Some(SparseSolveOutcome::Solved(x)) => x,
+                _ => return self.failed(st, rows, deficit),
+            };
+            if first != second {
+                // Two solutions differ by a kernel element: deficit ≥ 1.
+                return self.failed(st, rows, deficit.max(1));
+            }
         }
+        st.stats.solved_rows = Some(rows);
         let modulus = BigUint::from(self.modulus);
         st.solution = Some(
             first
@@ -923,6 +1133,47 @@ impl SparseCado {
                 .collect(),
         );
         st.dependent += (rows - self.cols) as u64;
+    }
+
+    /// The kernel probe (see the type's documentation): solve
+    /// `A·y = A·r` for a pseudo-random `r` under `seed` and report
+    /// whether `y = r`, i.e. whether no kernel element showed.  Forming
+    /// `A·r` (one per non-zero) and the solve are charged to `row_ops`,
+    /// the solve to `attempts`.
+    fn kernel_probe_passes(
+        &self,
+        st: &mut SparseCadoState,
+        opts: &SparseSolveOptions,
+        seed: u64,
+    ) -> bool {
+        use rand::{rngs::StdRng, Rng, SeedableRng};
+        let mut rng = StdRng::seed_from_u64(seed ^ 0x4b45_524e_454c_5052);
+        let r: Vec<BigUint> = (0..self.cols)
+            .map(|_| BigUint::from(rng.gen_range(0..self.modulus)))
+            .collect();
+        let probe = st.rows.with_rhs_at(&r);
+        st.row_ops += st.nnz;
+        let solves = probe.solve_seeds(self.cols, &SparseSolveOptions { seed, ..*opts }, &[seed]);
+        st.attempts += solves.len() as u64;
+        st.row_ops += solves.iter().map(|(_, rep)| rep.row_ops).sum::<u64>();
+        matches!(solves.first(), Some((SparseSolveOutcome::Solved(y), _)) if *y == r)
+    }
+
+    /// Record an attempt at `rows` that did not answer, whose filter
+    /// bounds the rank deficit below by `deficit`, and set the next one.
+    fn failed(&self, st: &mut SparseCadoState, rows: usize, deficit: usize) {
+        st.stats.failed_points += 1;
+        st.stats.last_failed_rows = Some(rows);
+        match self.schedule {
+            AttemptSchedule::Fixed => {}
+            AttemptSchedule::Geometric { growth, .. } => {
+                st.next_attempt = rows + st.stride;
+                st.stride = ((st.stride as f64 * growth).ceil() as usize).max(st.stride);
+            }
+            AttemptSchedule::Predicted { margin } => {
+                st.next_attempt = rows + (deficit + margin).max(1);
+            }
+        }
     }
 }
 
@@ -977,6 +1228,7 @@ impl RelationSolver for SparseCado {
             st.gate_visits += v;
             st.row_ops += v;
         }
+        st.nnz += entries.len() as u64;
         st.rows.push_entries(&entries, &BigUint::from(rhs % m));
         RowStatus::Independent
     }
@@ -1012,6 +1264,17 @@ impl RelationSolver for SparseCado {
         if st.gate.is_some() {
             out.insert("sparse_solve_attempts".into(), st.attempts);
             out.insert("sparse_gate_visits".into(), st.gate_visits);
+        }
+        // Likewise only a named schedule reports what it did.
+        if self.schedule_named {
+            out.insert("sparse_attempt_points".into(), st.stats.attempt_points);
+            out.insert(
+                "sparse_failed_attempt_points".into(),
+                st.stats.failed_points,
+            );
+            if let Some(o) = st.stats.overshoot_bound(self.cols) {
+                out.insert("sparse_overshoot_rows_bound".into(), o as u64);
+            }
         }
         out
     }
@@ -1255,8 +1518,10 @@ pub const MATRIX_NAMES: &[(&str, &str)] = &[
 ];
 
 /// The deferred sparse solvers answer only at full column rank, so the
-/// pipeline runs them under the full-rank completion rule.
+/// pipeline runs them under the full-rank completion rule.  A spec's
+/// parameters (`sparse-cado:schedule=predicted`) do not change that.
 pub fn is_deferred_sparse(name: &str) -> bool {
+    let name = name.split_once(':').map_or(name, |(n, _)| n);
     matches!(
         name,
         "sparse-cado"
@@ -1273,11 +1538,45 @@ pub fn is_deferred_sparse(name: &str) -> bool {
 }
 
 /// Build one by name, for a matrix with `cols` columns over `Z/rZ`.
+///
+/// The `SparseCado` names (`sparse-cado`, `filter+wiedemann`,
+/// `filter+lanczos`, `wiedemann`, `lanczos` and the two `+match` arms)
+/// take an [`AttemptSchedule`] as parameters, `name:schedule=…`; no
+/// other matrix takes parameters.
 pub fn matrix_by_name(
-    name: &str,
+    spec: &str,
     cols: usize,
     modulus: u64,
 ) -> Result<Box<dyn RelationSolver>, String> {
+    if spec.contains(':') {
+        let (name, params) = super::stages::Params::parse_spec(spec)?;
+        let schedule = AttemptSchedule::from_params(&params, cols)
+            .map_err(|e| format!("relation matrix `{spec}`: {e}"))?;
+        let core = match name.as_str() {
+            "sparse-cado" | "filter+wiedemann" => SparseCado::new(cols, modulus),
+            "filter+lanczos" => {
+                SparseCado::with_core(cols, modulus, SparseCoreSolver::BlockLanczos, true)
+            }
+            "wiedemann" => {
+                SparseCado::with_core(cols, modulus, SparseCoreSolver::BlockWiedemann, false)
+            }
+            "lanczos" => {
+                SparseCado::with_core(cols, modulus, SparseCoreSolver::BlockLanczos, false)
+            }
+            "filter+wiedemann+match" => SparseCado::new(cols, modulus).with_match_gate(),
+            "filter+lanczos+match" => {
+                SparseCado::with_core(cols, modulus, SparseCoreSolver::BlockLanczos, true)
+                    .with_match_gate()
+            }
+            other => {
+                return Err(format!(
+                    "relation matrix `{other}` takes no parameters (`{spec}`)"
+                ))
+            }
+        };
+        return Ok(Box::new(core.with_schedule(schedule)));
+    }
+    let name = spec;
     match name {
         "incremental-gauss"
         | "incremental-gauss-full-rank"
@@ -1550,6 +1849,76 @@ mod tests {
         }
     }
 
+    /// The paired solve the deferred solvers confirm with filters once:
+    /// each outcome is exactly what an independent `solve` under that
+    /// seed returns, the first report is identical, and the second
+    /// charges the independent solve's work less the filter's.  Checked
+    /// on full-rank systems and on rank-deficient ones (rows short of
+    /// some columns' worth of information), with each core.
+    #[test]
+    fn paired_sparse_solve_reuses_the_filter_only() {
+        let modulus = 1_000_003u64;
+        let cols = 60usize;
+        let mut paired_seen = 0;
+        for trial in 0..6u64 {
+            let mut rng = StdRng::seed_from_u64(0x5EED_0000 + trial);
+            let x: Vec<u64> = (0..cols).map(|_| rng.gen_range(0..modulus)).collect();
+            // Odd trials leave the system a little short of full rank.
+            let count = if trial % 2 == 0 { 2 * cols } else { cols + 2 };
+            let rows = planted_rows(&mut rng, cols, count, modulus, &x);
+            let mut sparse = SparseRows::for_modulus(&BigUint::from(modulus)).unwrap();
+            for (row, rhs) in &rows {
+                let entries: Vec<(u32, BigUint)> = row
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, &v)| v != 0)
+                    .map(|(c, &v)| (c as u32, BigUint::from(v)))
+                    .collect();
+                sparse.push_entries(&entries, &BigUint::from(*rhs));
+            }
+            for core in [
+                SparseCoreSolver::BlockWiedemann,
+                SparseCoreSolver::BlockLanczos,
+            ] {
+                for filter in [FilterOptions::cado(), FilterOptions::default()] {
+                    let opts = SparseSolveOptions {
+                        filter,
+                        solver: core,
+                        seed: 0x5350_4152_5345_4341,
+                        ..SparseSolveOptions::default()
+                    };
+                    let seeds = [opts.seed, 0x4345_5254_4946_5932 ^ trial];
+                    let paired = sparse.solve_seeds(cols, &opts, &seeds);
+                    let first = sparse.solve(cols, &opts);
+                    assert_eq!(paired[0], first, "trial {trial} {core:?}");
+                    let solved = matches!(first.0, SparseSolveOutcome::Solved(_));
+                    assert_eq!(paired.len(), if solved { 2 } else { 1 });
+                    if !solved {
+                        continue;
+                    }
+                    paired_seen += 1;
+                    let second = sparse.solve(
+                        cols,
+                        &SparseSolveOptions {
+                            seed: seeds[1],
+                            ..opts
+                        },
+                    );
+                    assert_eq!(paired[1].0, second.0, "trial {trial} {core:?}");
+                    assert_eq!(
+                        paired[1].1.row_ops + first.1.filter.row_ops,
+                        second.1.row_ops,
+                        "trial {trial} {core:?}: only the filter is saved"
+                    );
+                    let mut rest = paired[1].1.clone();
+                    rest.row_ops = second.1.row_ops;
+                    assert_eq!(rest, second.1, "trial {trial} {core:?}");
+                }
+            }
+        }
+        assert!(paired_seen > 0, "no paired solve was exercised");
+    }
+
     /// Above 64 bits the pipeline's `u64` moduli cannot go, but the
     /// solvers the deferred matrices wrap pick their word width from the
     /// modulus: the same four configurations solve a planted system over
@@ -1785,6 +2154,314 @@ mod tests {
                 }
             }
         }
+    }
+
+    /// A deferred solver by its registry name, as the concrete type (so
+    /// its schedule statistics can be read).
+    fn deferred_named(name: &str, cols: usize, modulus: u64) -> SparseCado {
+        match name {
+            "sparse-cado" | "filter+wiedemann" => SparseCado::new(cols, modulus),
+            "filter+lanczos" => {
+                SparseCado::with_core(cols, modulus, SparseCoreSolver::BlockLanczos, true)
+            }
+            "wiedemann" => {
+                SparseCado::with_core(cols, modulus, SparseCoreSolver::BlockWiedemann, false)
+            }
+            "lanczos" => {
+                SparseCado::with_core(cols, modulus, SparseCoreSolver::BlockLanczos, false)
+            }
+            other => panic!("{other}"),
+        }
+    }
+
+    /// Relation-shaped planted rows: two or three factor-base non-zeros
+    /// (small signed coefficients, as a decomposition gives) plus a
+    /// random target-column entry.
+    fn ic_like_rows(
+        rng: &mut StdRng,
+        cols: usize,
+        count: usize,
+        modulus: u64,
+        x: &[u64],
+        max_terms: usize,
+    ) -> Vec<(Vec<u64>, u64)> {
+        let fb = cols - 1;
+        (0..count)
+            .map(|_| {
+                let mut row = vec![0u64; cols];
+                for _ in 0..rng.gen_range(2..=max_terms) {
+                    let c = rng.gen_range(0..fb);
+                    let v = [1u64, 2, modulus - 1, modulus - 2][rng.gen_range(0..4)];
+                    row[c] = addmod(row[c], v, modulus);
+                }
+                row[fb] = rng.gen_range(1..modulus);
+                let rhs = row.iter().zip(x).fold(0u64, |acc, (&a, &b)| {
+                    addmod(acc, mulmod(a, b, modulus), modulus)
+                });
+                (row, rhs)
+            })
+            .collect()
+    }
+
+    /// Every column covered by `cols / 2` disjoint pairs first, then
+    /// `4·cols` uniform three-term rows: coverage comes long before full
+    /// rank, so the schedule, not the coverage gate, decides.
+    fn covered_early_rows(
+        rng: &mut StdRng,
+        cols: usize,
+        modulus: u64,
+        x: &[u64],
+    ) -> Vec<(Vec<u64>, u64)> {
+        let mut rows: Vec<(Vec<u64>, u64)> = (0..cols / 2)
+            .map(|i| {
+                let mut row = vec![0u64; cols];
+                row[2 * i] = rng.gen_range(1..modulus);
+                row[(2 * i + 1) % cols] = rng.gen_range(1..modulus);
+                let rhs = row.iter().zip(x).fold(0u64, |acc, (&a, &b)| {
+                    addmod(acc, mulmod(a, b, modulus), modulus)
+                });
+                (row, rhs)
+            })
+            .collect();
+        rows.extend(planted_rows(rng, cols, 4 * cols, modulus, x));
+        rows
+    }
+
+    /// **Regression: unfiltered `lanczos` below full rank.**  On the
+    /// covered-early systems, retried after every row
+    /// (`predicted, margin = 0`), the arm never answers before the
+    /// full-rank point `structured-gauss` finds, and answers the planted
+    /// solution.  The defect it guards against is shown on the same
+    /// rows: some row count below full rank where two independently
+    /// seeded unfiltered Lanczos solves return the same wrong solution,
+    /// which the former two-seed check accepted; the kernel probe
+    /// rejects it.
+    #[test]
+    fn lanczos_waits_for_full_rank_on_covered_early_systems() {
+        let modulus = 1_000_003u64;
+        let mut fooled = 0;
+        for (cols, seed) in [(96usize, 0u64), (96, 1), (192, 0), (192, 1), (192, 2)] {
+            let mut rng = StdRng::seed_from_u64(0x5c4e_d000 ^ (seed * 7919 + cols as u64));
+            let x: Vec<u64> = (0..cols).map(|_| rng.gen_range(0..modulus)).collect();
+            let rows = covered_early_rows(&mut rng, cols, modulus, &x);
+            let mut reference = StructuredGauss::new(cols, modulus);
+            let full_rank_at = rows
+                .iter()
+                .position(|(row, rhs)| {
+                    reference.add_row(row.clone(), *rhs);
+                    RelationSolver::rank(&reference) == cols
+                })
+                .expect("the stream reaches full rank")
+                + 1;
+            let mut m = deferred_named("lanczos", cols, modulus)
+                .with_schedule(AttemptSchedule::Predicted { margin: 0 });
+            let mut fed = 0usize;
+            while m.pinned(cols - 1).is_none() {
+                assert!(fed < rows.len(), "{cols} {seed}: unsolved");
+                let (row, rhs) = &rows[fed];
+                assert!(!matches!(
+                    m.add_row(row.clone(), *rhs),
+                    RowStatus::Inconsistent
+                ));
+                fed += 1;
+            }
+            assert!(
+                fed >= full_rank_at,
+                "{cols} {seed}: answered at {fed} rows, full rank at {full_rank_at}"
+            );
+            let sol: Vec<u64> = (0..cols).map(|c| m.pinned(c).unwrap()).collect();
+            assert_eq!(sol, x, "{cols} {seed}: planted solution");
+            assert_eq!(RelationSolver::rank(&m), cols);
+            // The former acceptance rule on the same rows, below full rank.
+            let probe = SparseCado::with_core(cols, modulus, SparseCoreSolver::BlockLanczos, false);
+            let opts = SparseSolveOptions {
+                filter: probe.filter,
+                solver: probe.core,
+                seed: 0x5350_4152_5345_4341,
+                ..SparseSolveOptions::default()
+            };
+            let mut buffered = SparseRows::for_modulus(&BigUint::from(modulus)).unwrap();
+            for (n, (row, rhs)) in rows[..full_rank_at - 1].iter().enumerate() {
+                let entries: Vec<(u32, BigUint)> = row
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, &v)| v != 0)
+                    .map(|(c, &v)| (c as u32, BigUint::from(v)))
+                    .collect();
+                buffered.push_entries(&entries, &BigUint::from(*rhs));
+                if n + 1 < cols {
+                    continue;
+                }
+                let solves = buffered.solve_seeds(
+                    cols,
+                    &opts,
+                    &[opts.seed, 0x4345_5254_4946_5932 ^ (n + 1) as u64],
+                );
+                if let [(SparseSolveOutcome::Solved(a), _), (SparseSolveOutcome::Solved(b), _)] =
+                    &solves[..]
+                {
+                    if a == b && a.iter().zip(&x).any(|(v, &w)| *v != BigUint::from(w)) {
+                        fooled += 1;
+                        break;
+                    }
+                }
+            }
+        }
+        assert!(
+            fooled > 0,
+            "no system fooled the two-seed check: the regression is not exercised"
+        );
+    }
+
+    /// **Attempt schedules of the deferred solvers.**  On planted
+    /// systems of two shapes and two sizes, every schedule recovers the
+    /// planted solution (the same values as `fixed`); the exact
+    /// overshoot (rows read past the full-rank point that a reference
+    /// `structured-gauss` finds on the same stream) is at most the
+    /// schedule's bound: `max(1, cols / 32)` for `fixed`, `margin` for
+    /// `predicted`, and never more than the solver's own reported bound.
+    /// Totals per schedule are printed (`--nocapture`).
+    #[test]
+    fn attempt_schedules_keep_answers_and_bound_overshoot() {
+        let modulus = 1_000_003u64;
+        let schedules: &[(&str, AttemptSchedule)] = &[
+            ("fixed", AttemptSchedule::Fixed),
+            (
+                "geometric(1,2)",
+                AttemptSchedule::Geometric {
+                    start: 1,
+                    growth: 2.0,
+                },
+            ),
+            ("predicted(0)", AttemptSchedule::Predicted { margin: 0 }),
+            ("predicted(1)", AttemptSchedule::Predicted { margin: 1 }),
+            ("predicted(2)", AttemptSchedule::Predicted { margin: 2 }),
+        ];
+        // (shape, name, schedule) -> [systems, points, failed, row_ops, overshoot, max overshoot]
+        let mut totals: std::collections::BTreeMap<(String, String, String), [u64; 6]> =
+            Default::default();
+        for shape in ["uniform3", "ic-like", "pairs", "covered-early"] {
+            for cols in [96usize, 192] {
+                for seed in 0..3u64 {
+                    let mut rng = StdRng::seed_from_u64(0x5c4e_d000 ^ (seed * 7919 + cols as u64));
+                    let x: Vec<u64> = (0..cols).map(|_| rng.gen_range(0..modulus)).collect();
+                    let rows = match shape {
+                        "uniform3" => planted_rows(&mut rng, cols, 4 * cols, modulus, &x),
+                        "ic-like" => ic_like_rows(&mut rng, cols, 6 * cols, modulus, &x, 3),
+                        "pairs" => ic_like_rows(&mut rng, cols, 8 * cols, modulus, &x, 2),
+                        _ => covered_early_rows(&mut rng, cols, modulus, &x),
+                    };
+                    let mut reference = StructuredGauss::new(cols, modulus);
+                    let full_rank_at = rows
+                        .iter()
+                        .position(|(row, rhs)| {
+                            reference.add_row(row.clone(), *rhs);
+                            RelationSolver::rank(&reference) == cols
+                        })
+                        .expect("the stream reaches full rank")
+                        + 1;
+                    for name in DEFERRED {
+                        for (label, schedule) in schedules {
+                            let mut m =
+                                deferred_named(name, cols, modulus).with_schedule(*schedule);
+                            let mut fed = 0usize;
+                            while m.pinned(cols - 1).is_none() {
+                                assert!(fed < rows.len(), "{name} {label}: unsolved");
+                                let (row, rhs) = &rows[fed];
+                                assert!(!matches!(
+                                    m.add_row(row.clone(), *rhs),
+                                    RowStatus::Inconsistent
+                                ));
+                                fed += 1;
+                            }
+                            let sol: Vec<u64> = (0..cols).map(|c| m.pinned(c).unwrap()).collect();
+                            let stats = m.schedule_stats();
+                            assert_eq!(stats.solved_rows, Some(fed));
+                            assert_eq!(
+                                sol, x,
+                                "{shape} {cols} {seed} {name} {label}: wrong answer"
+                            );
+                            let over = fed.checked_sub(full_rank_at).unwrap_or_else(|| {
+                                panic!("{name} {label}: answered below full rank")
+                            });
+                            assert!(
+                                over <= stats.overshoot_bound(cols).unwrap(),
+                                "{shape} {cols} {seed} {name} {label}: overshoot {over} \
+                                 above the reported bound {stats:?}"
+                            );
+                            let limit = match schedule {
+                                AttemptSchedule::Fixed => (cols / 32).max(1),
+                                AttemptSchedule::Predicted { margin } => (*margin).max(1),
+                                AttemptSchedule::Geometric { .. } => usize::MAX,
+                            };
+                            assert!(
+                                over <= limit,
+                                "{shape} {cols} {seed} {name} {label}: overshoot {over} > {limit}"
+                            );
+                            let t = totals
+                                .entry((shape.to_string(), name.to_string(), label.to_string()))
+                                .or_default();
+                            t[0] += 1;
+                            t[1] += stats.attempt_points;
+                            t[2] += stats.failed_points;
+                            t[3] += m.work().0;
+                            t[4] += over as u64;
+                            t[5] = t[5].max(over as u64);
+                        }
+                    }
+                }
+            }
+        }
+        println!("| shape | matrix | schedule | correct | attempt points | failed | row_ops | overshoot rows (sum) | max |");
+        for ((shape, name, label), t) in &totals {
+            println!(
+                "| {shape} | {name} | {label} | {} | {} | {} | {} | {} | {} |",
+                t[0], t[1], t[2], t[3], t[4], t[5]
+            );
+        }
+    }
+
+    /// Schedule parameters parse through the registry, are refused when
+    /// unknown, out of range or given to a matrix without a schedule, and
+    /// keep the full-rank completion rule.
+    #[test]
+    fn attempt_schedule_parameters_are_validated() {
+        for spec in [
+            "sparse-cado:schedule=fixed",
+            "filter+wiedemann:schedule=predicted",
+            "filter+lanczos:schedule=predicted,margin=3",
+            "wiedemann:schedule=geometric",
+            "lanczos:schedule=geometric,start=2,growth=1.5",
+            "filter+wiedemann+match:schedule=predicted,margin=0",
+            "filter+lanczos+match:schedule=fixed",
+        ] {
+            assert!(matrix_by_name(spec, 40, 101).is_ok(), "{spec}");
+            assert!(is_deferred_sparse(spec), "{spec}");
+        }
+        for spec in [
+            "sparse-cado:schedule=sometimes",
+            "sparse-cado:schedule=fixed,margin=1",
+            "sparse-cado:schedule=predicted,growth=2",
+            "sparse-cado:schedule=predicted,margin=41",
+            "sparse-cado:schedule=predicted,margin=x",
+            "sparse-cado:schedule=geometric,growth=0.5",
+            "sparse-cado:schedule=geometric,growth=nan",
+            "sparse-cado:schedule=geometric,start=0",
+            "sparse-cado:stride=4",
+            "structured-gauss:schedule=fixed",
+            "mixed-peel:schedule=predicted",
+            "sparse-cado:schedule=fixed,schedule=fixed",
+        ] {
+            assert!(matrix_by_name(spec, 40, 101).is_err(), "{spec}");
+        }
+        // The default is the fixed stride, and naming it changes nothing.
+        assert_eq!(SparseCado::new(40, 101).schedule, AttemptSchedule::Fixed);
+        assert!(matrix_by_name("sparse-cado", 40, 101)
+            .unwrap()
+            .work_counters()
+            .is_empty());
+        let named = matrix_by_name("sparse-cado:schedule=fixed", 40, 101).unwrap();
+        assert_eq!(named.work_counters().get("sparse_attempt_points"), Some(&0));
     }
 
     #[test]
