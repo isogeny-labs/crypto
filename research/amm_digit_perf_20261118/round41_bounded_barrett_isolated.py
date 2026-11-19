@@ -250,3 +250,29 @@ with tempfile.TemporaryDirectory() as folder:
                     "--ignored", "--nocapture"], check=True)
     subprocess.run([str(binary), "bench_producer_replay_kernels",
                     "--ignored", "--nocapture"], check=True)
+
+    # Compile the unmodified production #[cfg(test)] module too. This
+    # validates every pair against the u128 oracle, including 2^32-5.
+    full_header = """#![allow(dead_code)]
+mod cryptanalysis {
+ pub mod fp_backend {
+  pub struct Fp64Arithmetic {pub p:u64}
+  pub struct Admission {pub field:Fp64Arithmetic}
+  impl Fp64Arithmetic {
+   pub fn p(&self)->u64{self.p}
+   pub fn try_new<F:FnMut(&())->Result<(),()>>(
+      p:u64,_work:u64,_bytes:u64,_deadline:std::time::Instant,_callback:&mut F
+   )->Result<Admission,()> {Ok(Admission{field:Self{p}})}
+  }
+ }
+ pub mod prime_root_trace { pub mod after {
+"""
+    full_tail = "\n } } }\n"
+    full_path = Path(folder) / "round41_full_tests.rs"
+    full_binary = Path(folder) / "round41_full_tests"
+    full_path.write_text(full_header + src + full_tail)
+    subprocess.run(["rustc", "--edition=2021", "-O", "--test", str(full_path),
+                    "-o", str(full_binary)], check=True)
+    subprocess.run([str(full_binary),
+                    "round41_cached_barrett_matches_reference_and_replay",
+                    "--nocapture"], check=True)
