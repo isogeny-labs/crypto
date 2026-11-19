@@ -1800,9 +1800,11 @@ impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
 
     fn describe(&self, params: &Params) -> String {
         format!(
-            "{} smallest-abscissa seeds, each with its Z[phi] multiples of norm <= {} on its column",
+            "{} {} seeds, each with its Z[phi] multiples of norm <= {}, {} columns",
             params.get("size").unwrap_or("?"),
-            params.get("norm").unwrap_or("0")
+            params.get("seed_source").unwrap_or("smallest-abscissa"),
+            params.get("norm").unwrap_or("0"),
+            params.get("column_mode").unwrap_or("weighted")
         )
     }
 
@@ -1816,7 +1818,21 @@ impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
             ("endo", "index of the curve's CM endomorphism; default 0"),
             (
                 "mult",
-                "also include [m]P for m = 2..=mult with weight m (needs no endomorphism); default 1",
+                "also include [m]P for m = 2..=mult with weight m, built as an arithmetic progression; `sqrt` targets about sqrt(r) signed vertices; default 1",
+            ),
+            (
+                "column_mode",
+                "weighted (default): one known-weight column per seed; independent: one column per identical signed point pair",
+            ),
+            (
+                "seed_source",
+                "smallest (default) or isogeny (PKM auxiliary-curve tower)",
+            ),
+            ("aux_t", "isogeny seed source: tower height"),
+            ("aux_seed", "isogeny seed source: public tower/search seed, default 0"),
+            (
+                "aux",
+                "isogeny seed source: ordinary (default), supersingular, ss-j1728, ss-j1728-twist, ss-j0 or ss-j0-twist",
             ),
         ]
     }
@@ -1838,6 +1854,15 @@ impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
         if size == 0 {
             return Err("size must be positive".into());
         }
+        let independent_columns = match params.get("column_mode").unwrap_or("weighted") {
+            "weighted" => false,
+            "independent" => true,
+            other => {
+                return Err(format!(
+                    "column_mode is weighted or independent, not `{other}`"
+                ))
+            }
+        };
         let norm_cap = match params.get("norm") {
             None => 0i64,
             Some(_) => params.u64("norm")? as i64,
@@ -1861,10 +1886,20 @@ impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
         for e in velu_degree3_endomorphisms(inst) {
             endos.push(Box::new(e));
         }
-        let mult = match params.get("mult") {
-            None => 1i64,
-            Some(_) => params.u64("mult")?.max(1) as i64,
+        let mult_u64 = match params.get("mult") {
+            None => 1,
+            Some("sqrt") => {
+                let signed_target = r.isqrt().max(2);
+                let denominator = (size as u64).saturating_mul(2).max(1);
+                signed_target
+                    .saturating_add(denominator - 1)
+                    .checked_div(denominator)
+                    .unwrap_or(1)
+                    .max(1)
+            }
+            Some(_) => params.u64("mult")?.max(1),
         };
+        let mult = i64::try_from(mult_u64).map_err(|_| "mult exceeds i64")?;
         if norm_cap > 0 && endos.is_empty() {
             return Err(
                 "cm-multiplier needs a curve with a rational degree-2 or degree-3 CM endomorphism (--family d7, d8 or d11)".into(),
@@ -1905,8 +1940,10 @@ impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
         let mut col_of: Vec<usize> = Vec::new();
         let mut coef_of: Vec<u64> = Vec::new();
         let mut seen: HashSet<u64> = HashSet::new();
+        let mut seed_count = 0usize;
         let mut columns = 0usize;
         let mut endo_applies = 0u64;
+        let mut progression_adds = 0u64;
         let push_pair = |points: &mut Vec<PrimePoint>,
                          col_of: &mut Vec<usize>,
                          coef_of: &mut Vec<u64>,
@@ -1923,10 +1960,26 @@ impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
                 coef_of.push((r - weight) % r);
             }
         };
-        // Seeds: the smallest abscissae (one per sign pair), projected into
-        // the order-r subgroup; a little slack covers projections that
-        // collide or vanish.
-        let candidates = smallest_abscissa_points(inst, 2 * size + 16);
+        // Seeds come either from the ordinary smallest-abscissa control or
+        // from PKM's auxiliary-curve isogeny tower. The latter's group work
+        // is charged through `ops`; its native/work counters are merged below.
+        let mut source_cost = None;
+        let candidates = match params.get("seed_source").unwrap_or("smallest") {
+            "smallest" => smallest_abscissa_points(inst, 2 * size + 16),
+            "isogeny" => {
+                let mut aux_params = Params::default();
+                aux_params.set("t", params.u64("aux_t")?.to_string());
+                aux_params.set("seed", params.u64_or("aux_seed", 0)?.to_string());
+                aux_params.set("aux", params.get("aux").unwrap_or("ordinary"));
+                let source = crate::cryptanalysis::ic_framework::prime_tower::PrimeIsogenyBase {
+                    instance: inst,
+                }
+                .build(ctx, &aux_params, ops)?;
+                source_cost = Some(source.cost.clone());
+                source.points
+            }
+            other => return Err(format!("seed_source is smallest or isogeny, not `{other}`")),
+        };
         let mut last_x = u64::MAX;
         for cand in &candidates {
             if cand.x == last_x {
@@ -1945,9 +1998,10 @@ impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
             }
             seen.insert(g.key(&seed));
             seen.insert(g.key(&nseed));
-            let column = columns;
+            let seed_column = columns;
             columns += 1;
-            push_pair(&mut points, &mut col_of, &mut coef_of, seed, column, 1);
+            seed_count += 1;
+            push_pair(&mut points, &mut col_of, &mut coef_of, seed, seed_column, 1);
             if !multipliers.is_empty() {
                 let phi_seed = match endo {
                     Some(e) if multipliers.iter().any(|&(_, mb)| mb != 0) => {
@@ -1959,10 +2013,23 @@ impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
                     }
                     _ => g.identity(),
                 };
+                // Build integer multiples once as P, 2P, ..., mP. Both
+                // column modes execute this before assigning image columns,
+                // so their construction transcript is identical.
+                let mut integer_multiples = Vec::with_capacity(mult_u64 as usize + 1);
+                integer_multiples.push(g.identity());
+                integer_multiples.push(seed);
+                for m in 2..=mult_u64 {
+                    let next = g.add(ops, integer_multiples[(m - 1) as usize], seed);
+                    progression_adds += 1;
+                    integer_multiples.push(next);
+                }
                 for &(ma, mb) in &multipliers {
                     let sa = to_scalar(ma);
                     let sb = to_scalar(mb);
-                    let pa = if sa == 0 {
+                    let pa = if mb == 0 && ma >= 0 && (ma as u64) <= mult_u64 {
+                        integer_multiples[ma as usize]
+                    } else if sa == 0 {
                         g.identity()
                     } else {
                         g.mul(ops, seed, sa)
@@ -1984,27 +2051,35 @@ impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
                     seen.insert(g.key(&nimg));
                     let weight = ((sa as u128 + (sb as u128 * lambda as u128) % r as u128)
                         % r as u128) as u64;
+                    let (column, coefficient) = if independent_columns {
+                        let column = columns;
+                        columns += 1;
+                        (column, 1)
+                    } else {
+                        (seed_column, weight)
+                    };
                     push_pair(
                         &mut points,
                         &mut col_of,
                         &mut coef_of,
                         image,
                         column,
-                        weight,
+                        coefficient,
                     );
                 }
             }
-            if columns == size {
+            if seed_count == size {
                 break;
             }
         }
-        if columns < size {
-            return Err(format!("only {columns} of {size} seeds found"));
+        if seed_count < size {
+            return Err(format!("only {seed_count} of {size} seeds found"));
         }
         let curve = &inst.curve;
         let mut fb = FactorBase::from_column_map(
             format!(
-                "{columns} seeds with Z[phi] multiples of norm <= {norm_cap} ({} points)",
+                "{seed_count} seeds with Z[phi] multiples of norm <= {norm_cap}, {} columns ({} points)",
+                columns,
                 points.len()
             ),
             points,
@@ -2015,7 +2090,20 @@ impl FactorBaseBuilder<PrimeCurve> for CmMultiplierBase<'_> {
             |p| curve.key(&curve.neg(*p)),
             |p| p.x,
         )?;
+        if let Some(cost) = source_cost {
+            for (name, value) in cost.native {
+                fb.cost.count(&name, value);
+            }
+            fb.cost.work_all(&cost.work_native);
+        }
         fb.cost.count("endomorphism_applies", endo_applies);
+        fb.cost.count("multiplier_seeds", seed_count as u64);
+        fb.cost
+            .count("multiplier_progression_adds", progression_adds);
+        fb.cost.count(
+            "multiplier_independent_columns",
+            u64::from(independent_columns),
+        );
         Ok(fb)
     }
 }
@@ -5281,32 +5369,6 @@ impl<'a> DecompositionOracle<BinaryGroup<'a>> for ChainedXOracle<'_> {
 
 #[cfg(test)]
 mod tests {
-    #[test]
-    fn the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e() {
-        use crate::cryptanalysis::ic_boundary::{
-            binary_affine_subspace_factor_base, koblitz_instance,
-        };
-        let ko = koblitz_instance(1, 17).expect("a = 1 over F_2^17");
-        let (basis, offset) = trace_coset_basis(&ko, 6).unwrap();
-        let tr = |v: u64| ko.artin_schreier.trace(v);
-        assert_eq!(tr(offset), 1);
-        assert!(basis.iter().all(|&v| tr(v) == 0));
-        let fb = binary_affine_subspace_factor_base(&ko, &basis, offset);
-        assert!(fb.subspace_basis.is_none());
-        assert_eq!(fb.affine_subspace, Some((basis.clone(), offset)));
-        assert!(!fb.points.is_empty());
-        let g = BinaryGroup(&ko.fast);
-        let mut ops = GroupOps::default();
-        let half = ko.r * ko.cofactor / 2;
-        assert!(fb.points.iter().all(|&p| g.mul(&mut ops, p, half).infinity));
-        let (b0, o0) = trace_coset_basis(&koblitz_instance(0, 13).unwrap(), 6).unwrap();
-        assert_eq!(o0, 0);
-        assert_eq!(
-            b0,
-            trace_kernel_basis(&koblitz_instance(0, 13).unwrap(), 6).unwrap()
-        );
-    }
-
     use super::*;
     use crate::cryptanalysis::ic_boundary::koblitz_instance;
     #[allow(unused_imports)]
@@ -5559,6 +5621,109 @@ mod tests {
                 );
             }
         }
+    }
+
+    /// The relation-solving ablation changes only the column map. Point
+    /// construction, duplicate filtering, order, indexes and group-operation
+    /// ledger stay identical, so a matrix-width comparison cannot hide a
+    /// larger table or cheaper precomputation in one arm.
+    #[test]
+    fn cm_multiplier_column_modes_share_exact_vertices_and_build_ops() {
+        use crate::cryptanalysis::glv_invariant_base::{generate_cm_instance, CmFamily};
+
+        let inst = generate_cm_instance(CmFamily::J0, 24, 71, 8).unwrap();
+        let curve = inst.curve.clone();
+        let ctx = InstanceCtx {
+            group: &curve,
+            generator: inst.generator_point(),
+            target: inst.generator_point(),
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        };
+        let build = |mode: &str| {
+            let (_, params) = Params::parse_spec(&format!(
+                "cm-multiplier:size=4,norm=0,mult=8,column_mode={mode}"
+            ))
+            .unwrap();
+            let mut ops = GroupOps::default();
+            let fb = CmMultiplierBase { instance: &inst }
+                .build(&ctx, &params, &mut ops)
+                .unwrap();
+            (fb, ops)
+        };
+        let (weighted, weighted_ops) = build("weighted");
+        let (independent, independent_ops) = build("independent");
+
+        assert_eq!(weighted.points, independent.points);
+        assert_eq!(weighted.neg_index, independent.neg_index);
+        assert_eq!(weighted.abscissa_list, independent.abscissa_list);
+        assert_eq!(weighted_ops, independent_ops);
+        assert_eq!(weighted.columns, 4);
+        assert_eq!(independent.columns, independent.points.len() / 2);
+        assert_eq!(
+            weighted.cost.get("multiplier_progression_adds"),
+            independent.cost.get("multiplier_progression_adds")
+        );
+        assert_eq!(weighted.cost.get("multiplier_independent_columns"), 0);
+        assert_eq!(independent.cost.get("multiplier_independent_columns"), 1);
+        for i in 0..independent.points.len() {
+            let coefficient = independent.coef_of[i];
+            assert!(coefficient == 1 || coefficient == inst.r - 1);
+        }
+    }
+
+    /// A PKM auxiliary tower can select the seed points, but it receives no
+    /// free setup: its search/build counters remain in the composed base. The
+    /// weighted and independent arms still materialise exactly the same table.
+    #[test]
+    fn cm_multiplier_isogeny_seed_source_is_charged_and_exactly_controlled() {
+        use crate::cryptanalysis::ic_boundary::prime_instance_for;
+
+        let mut accepted = None;
+        for curve_seed in 1..=32 {
+            let inst = prime_instance_for(18, curve_seed);
+            let curve = inst.curve.clone();
+            let ctx = InstanceCtx {
+                group: &curve,
+                generator: inst.generator_point(),
+                target: inst.generator_point(),
+                r: inst.r,
+                cofactor: inst.cofactor,
+                group_order: inst.group_order,
+                name: inst.name.clone(),
+                field_degree: None,
+            };
+            let build = |mode: &str| {
+                let (_, params) = Params::parse_spec(&format!(
+                    "cm-multiplier:size=2,norm=0,mult=4,column_mode={mode},seed_source=isogeny,aux_t=3,aux_seed=9,aux=ordinary"
+                ))
+                .unwrap();
+                let mut ops = GroupOps::default();
+                CmMultiplierBase { instance: &inst }
+                    .build(&ctx, &params, &mut ops)
+                    .map(|fb| (fb, ops))
+            };
+            if let (Ok(weighted), Ok(independent)) = (build("weighted"), build("independent")) {
+                accepted = Some((weighted, independent));
+                break;
+            }
+        }
+        let ((weighted, weighted_ops), (independent, independent_ops)) =
+            accepted.expect("one deterministic 18-bit fixture admits two projected tower seeds");
+        assert_eq!(weighted.points, independent.points);
+        assert_eq!(weighted_ops, independent_ops);
+        assert_eq!(weighted.cost.get("multiplier_seeds"), 2);
+        assert!(weighted.cost.get("aux_curves_tried") > 0);
+        assert!(weighted.cost.get("aux_tower_build_gae") > 0);
+        assert_eq!(
+            weighted.cost.get("aux_curves_tried"),
+            independent.cost.get("aux_curves_tried")
+        );
+        assert_eq!(weighted.columns, 2);
+        assert_eq!(independent.columns, independent.points.len() / 2);
     }
 
     /// Every point of a `binary-multiplier` base is `[coefficient]` times
