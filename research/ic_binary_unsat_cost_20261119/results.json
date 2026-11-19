@@ -1,0 +1,624 @@
+{
+ "status": "measured (single host, L0 development, [pcc:unverified])",
+ "raw_sha256": {
+  "a0_n13.jsonl": "2e76050629dce8d58fbca1a512ba09a208bfdd6528eef5414cea3ea507aef173",
+  "a0_n15.jsonl": "48d41c16b3a5c0aa83aed808c4f508b895ae9b293d247074125d63ca89e05251",
+  "a0_n19.jsonl": "5c9ac1cf31688d35c9c61e46199b8fd7176d660772b68b8215811562c6a94d6b",
+  "a0_n23.jsonl": "108c3c9f4d8a7e5732053b044c8f6b2eb76815b85ee1528fc5482002401454d4",
+  "a1_n15.jsonl": "f4aa1dc7fa904956a509cbfac20fa981a461ec357f7bbd776f640b1d22e4ba1e",
+  "a1_n17.jsonl": "fe4fa6a609b8334883839517034bdc4316fcce8a49834767ccccf117d45d4c3a",
+  "a1_n19.jsonl": "359a5d3b6980c32554874fa5dcb7ad9d62f7c6d3b054a62b675299845808e22b",
+  "a1_n23.jsonl": "a19397f75c4da0156641b544c34c2c9603f7b16ff08ec482d1718b5574c9a87f"
+ },
+ "attempts": 5760,
+ "cells": {
+  "a0_n13": {
+   "n": 13,
+   "a": 0,
+   "dim": 5,
+   "targets": 60,
+   "arms": {
+    "base2": {
+     "word_ops_gmean_ratio": 1.000056842138502,
+     "word_ops_ci95": [
+      0.9999674212509821,
+      1.0001473159769925
+     ],
+     "ms_gmean_ratio": 1.003821441757589,
+     "ms_ci95": [
+      0.9829768653917229,
+      1.0252217506453076
+     ],
+     "reductions_gmean_ratio": 1.0,
+     "reductions_ci95": [
+      1.0,
+      1.0
+     ],
+     "total_word_ops_ratio": 1.0000553184684005,
+     "unsat_total_word_ops_ratio": 1.0000825157213746,
+     "censored_attempts": 0,
+     "attempts": 180
+    },
+    "freq_hi": {
+     "word_ops_gmean_ratio": 35.55241137112558,
+     "word_ops_ci95": [
+      34.99956500560014,
+      36.07599978836965
+     ],
+     "ms_gmean_ratio": 40.82846676361209,
+     "ms_ci95": [
+      39.73344407716175,
+      41.8597153256886
+     ],
+     "reductions_gmean_ratio": 22.534684133384815,
+     "reductions_ci95": [
+      22.008998124012884,
+      23.021062322820963
+     ],
+     "total_word_ops_ratio": 35.579796284407784,
+     "unsat_total_word_ops_ratio": 36.280556043128804,
+     "censored_attempts": 180,
+     "attempts": 180
+    },
+    "freq_lo": {
+     "word_ops_gmean_ratio": 3.27054763336748,
+     "word_ops_ci95": [
+      3.163613970905512,
+      3.378742197774695
+     ],
+     "ms_gmean_ratio": 2.845351332262951,
+     "ms_ci95": [
+      2.723163677678644,
+      2.964264669401095
+     ],
+     "reductions_gmean_ratio": 4.12563670055222,
+     "reductions_ci95": [
+      3.9063453175633858,
+      4.360744794786767
+     ],
+     "total_word_ops_ratio": 3.289838103174747,
+     "unsat_total_word_ops_ratio": 3.3746741261261044,
+     "censored_attempts": 0,
+     "attempts": 180
+    }
+   },
+   "unsat_targets": 33,
+   "unsat_share_base_word_ops": 0.5382830173641294,
+   "base_ms_median_per_target": 7.585100000000001,
+   "base_word_ops_per_target_mean": 3024005.15,
+   "base_native_ops_repeatable": true
+  },
+  "a0_n15": {
+   "n": 15,
+   "a": 0,
+   "dim": 5,
+   "targets": 60,
+   "arms": {
+    "base2": {
+     "word_ops_gmean_ratio": 1.0000063693345536,
+     "word_ops_ci95": [
+      0.9999015609560882,
+      1.0001129437923038
+     ],
+     "ms_gmean_ratio": 1.0046833941665747,
+     "ms_ci95": [
+      0.9982627783384932,
+      1.0117769763070266
+     ],
+     "reductions_gmean_ratio": 1.0,
+     "reductions_ci95": [
+      1.0,
+      1.0
+     ],
+     "total_word_ops_ratio": 1.0000060938815976,
+     "unsat_total_word_ops_ratio": 1.0000061662323594,
+     "censored_attempts": 0,
+     "attempts": 180
+    },
+    "freq_hi": {
+     "word_ops_gmean_ratio": 13.020955307281705,
+     "word_ops_ci95": [
+      9.276366705831276,
+      17.638108436848793
+     ],
+     "ms_gmean_ratio": 12.682977783272271,
+     "ms_ci95": [
+      9.33196531272702,
+      16.86904013928886
+     ],
+     "reductions_gmean_ratio": 16.60977444509056,
+     "reductions_ci95": [
+      13.867162018079174,
+      19.590147548834977
+     ],
+     "total_word_ops_ratio": 21.61044577919355,
+     "unsat_total_word_ops_ratio": 21.439244150123532,
+     "censored_attempts": 57,
+     "attempts": 180
+    },
+    "freq_lo": {
+     "word_ops_gmean_ratio": 4.63896659631045,
+     "word_ops_ci95": [
+      4.512032617740781,
+      4.773013561457256
+     ],
+     "ms_gmean_ratio": 4.550789240638932,
+     "ms_ci95": [
+      4.436726114181519,
+      4.6782562694416585
+     ],
+     "reductions_gmean_ratio": 7.714455355775719,
+     "reductions_ci95": [
+      7.482575224510025,
+      7.9827838362368215
+     ],
+     "total_word_ops_ratio": 4.649765186038008,
+     "unsat_total_word_ops_ratio": 4.631827324459885,
+     "censored_attempts": 0,
+     "attempts": 180
+    }
+   },
+   "unsat_targets": 59,
+   "unsat_share_base_word_ops": 0.9882666176516488,
+   "base_ms_median_per_target": 5.38145,
+   "base_word_ops_per_target_mean": 2693958.9166666665,
+   "base_native_ops_repeatable": true
+  },
+  "a0_n19": {
+   "n": 19,
+   "a": 0,
+   "dim": 7,
+   "targets": 60,
+   "arms": {
+    "base2": {
+     "word_ops_gmean_ratio": 0.9999969943753089,
+     "word_ops_ci95": [
+      0.9999899855590956,
+      1.0000042165104563
+     ],
+     "ms_gmean_ratio": 1.0037577037959573,
+     "ms_ci95": [
+      0.99541902133927,
+      1.0133565459357246
+     ],
+     "reductions_gmean_ratio": 1.0,
+     "reductions_ci95": [
+      1.0,
+      1.0
+     ],
+     "total_word_ops_ratio": 0.9999969477481465,
+     "unsat_total_word_ops_ratio": 0.9999938215582075,
+     "censored_attempts": 0,
+     "attempts": 180
+    },
+    "freq_hi": {
+     "word_ops_gmean_ratio": 12.331807533910236,
+     "word_ops_ci95": [
+      12.084596096992126,
+      12.584348269225641
+     ],
+     "ms_gmean_ratio": 12.150748276847997,
+     "ms_ci95": [
+      11.9159770589267,
+      12.392353226810206
+     ],
+     "reductions_gmean_ratio": 5.567071924863715,
+     "reductions_ci95": [
+      5.52249717216826,
+      5.607696215297336
+     ],
+     "total_word_ops_ratio": 12.364047342747902,
+     "unsat_total_word_ops_ratio": 12.4672499958536,
+     "censored_attempts": 180,
+     "attempts": 180
+    },
+    "freq_lo": {
+     "word_ops_gmean_ratio": 2.8104569986321217,
+     "word_ops_ci95": [
+      2.673861516035454,
+      2.9507744518748775
+     ],
+     "ms_gmean_ratio": 2.4059693772659787,
+     "ms_ci95": [
+      2.257092366129181,
+      2.575236745365711
+     ],
+     "reductions_gmean_ratio": 5.567071924863715,
+     "reductions_ci95": [
+      5.520049623745946,
+      5.609314644531451
+     ],
+     "total_word_ops_ratio": 2.8628522912207512,
+     "unsat_total_word_ops_ratio": 2.827328820198461,
+     "censored_attempts": 180,
+     "attempts": 180
+    }
+   },
+   "unsat_targets": 24,
+   "unsat_share_base_word_ops": 0.39557090792495986,
+   "base_ms_median_per_target": 81.74035,
+   "base_word_ops_per_target_mean": 42225654.86666667,
+   "base_native_ops_repeatable": true
+  },
+  "a0_n23": {
+   "n": 23,
+   "a": 0,
+   "dim": 8,
+   "targets": 60,
+   "arms": {
+    "base2": {
+     "word_ops_gmean_ratio": 1.000000458906937,
+     "word_ops_ci95": [
+      0.9999973233894597,
+      1.0000035786827355
+     ],
+     "ms_gmean_ratio": 0.9995012970454868,
+     "ms_ci95": [
+      0.987483573131611,
+      1.0106068448835182
+     ],
+     "reductions_gmean_ratio": 1.0,
+     "reductions_ci95": [
+      1.0,
+      1.0
+     ],
+     "total_word_ops_ratio": 1.0000004765495405,
+     "unsat_total_word_ops_ratio": 0.9999994423543491,
+     "censored_attempts": 0,
+     "attempts": 180
+    },
+    "freq_hi": {
+     "word_ops_gmean_ratio": 1.3776870458709811,
+     "word_ops_ci95": [
+      0.9484361791305412,
+      1.9716772596072198
+     ],
+     "ms_gmean_ratio": 1.3777118283455296,
+     "ms_ci95": [
+      1.0039265453194164,
+      1.8824356456364266
+     ],
+     "reductions_gmean_ratio": 2.8341624465494535,
+     "reductions_ci95": [
+      2.8266708235954385,
+      2.8419791894415445
+     ],
+     "total_word_ops_ratio": 3.034156211044593,
+     "unsat_total_word_ops_ratio": 2.8669600236255732,
+     "censored_attempts": 180,
+     "attempts": 180
+    },
+    "freq_lo": {
+     "word_ops_gmean_ratio": 1.240542282292838,
+     "word_ops_ci95": [
+      1.211456969348763,
+      1.2654990012913125
+     ],
+     "ms_gmean_ratio": 1.076815701245907,
+     "ms_ci95": [
+      1.0505463494451335,
+      1.101535485642957
+     ],
+     "reductions_gmean_ratio": 2.8341624465494535,
+     "reductions_ci95": [
+      2.8259094263250857,
+      2.841252942526819
+     ],
+     "total_word_ops_ratio": 1.245209671096278,
+     "unsat_total_word_ops_ratio": 1.2627922632236213,
+     "censored_attempts": 180,
+     "attempts": 180
+    }
+   },
+   "unsat_targets": 37,
+   "unsat_share_base_word_ops": 0.6166699177882337,
+   "base_ms_median_per_target": 236.2455,
+   "base_word_ops_per_target_mean": 139824567.4,
+   "base_native_ops_repeatable": true
+  },
+  "a1_n15": {
+   "n": 15,
+   "a": 1,
+   "dim": 5,
+   "targets": 60,
+   "arms": {
+    "base2": {
+     "word_ops_gmean_ratio": 1.0000266231217143,
+     "word_ops_ci95": [
+      0.9999340102931137,
+      1.000118296768903
+     ],
+     "ms_gmean_ratio": 0.9964542121740786,
+     "ms_ci95": [
+      0.9715747402967195,
+      1.0212482356307624
+     ],
+     "reductions_gmean_ratio": 1.0,
+     "reductions_ci95": [
+      1.0,
+      1.0
+     ],
+     "total_word_ops_ratio": 1.000031200878306,
+     "unsat_total_word_ops_ratio": 1.0000523241809685,
+     "censored_attempts": 0,
+     "attempts": 180
+    },
+    "freq_hi": {
+     "word_ops_gmean_ratio": 12.279201824930759,
+     "word_ops_ci95": [
+      8.738514851709223,
+      16.716463185500416
+     ],
+     "ms_gmean_ratio": 12.287261290296186,
+     "ms_ci95": [
+      9.188195875106253,
+      16.16016830994483
+     ],
+     "reductions_gmean_ratio": 12.500813458981854,
+     "reductions_ci95": [
+      11.19341656794297,
+      13.849140527704076
+     ],
+     "total_word_ops_ratio": 21.27759373958649,
+     "unsat_total_word_ops_ratio": 23.287770645639206,
+     "censored_attempts": 81,
+     "attempts": 180
+    },
+    "freq_lo": {
+     "word_ops_gmean_ratio": 4.183235268502504,
+     "word_ops_ci95": [
+      4.04938104392831,
+      4.341774609751349
+     ],
+     "ms_gmean_ratio": 3.8500692896388977,
+     "ms_ci95": [
+      3.6825930359123875,
+      4.040085528613979
+     ],
+     "reductions_gmean_ratio": 4.521698308915306,
+     "reductions_ci95": [
+      4.356418887458458,
+      4.70338335225598
+     ],
+     "total_word_ops_ratio": 4.196829605823812,
+     "unsat_total_word_ops_ratio": 4.254722292617221,
+     "censored_attempts": 0,
+     "attempts": 180
+    }
+   },
+   "unsat_targets": 41,
+   "unsat_share_base_word_ops": 0.672671922298541,
+   "base_ms_median_per_target": 9.3787,
+   "base_word_ops_per_target_mean": 3862070.7666666666,
+   "base_native_ops_repeatable": true
+  },
+  "a1_n17": {
+   "n": 17,
+   "a": 1,
+   "dim": 6,
+   "targets": 60,
+   "arms": {
+    "base2": {
+     "word_ops_gmean_ratio": 1.000013492141363,
+     "word_ops_ci95": [
+      0.9999775873481584,
+      1.0000486191603883
+     ],
+     "ms_gmean_ratio": 1.0027552479522293,
+     "ms_ci95": [
+      0.9900732881925289,
+      1.018145935230489
+     ],
+     "reductions_gmean_ratio": 1.0,
+     "reductions_ci95": [
+      1.0,
+      1.0
+     ],
+     "total_word_ops_ratio": 1.0000141925356427,
+     "unsat_total_word_ops_ratio": 1.00001484102696,
+     "censored_attempts": 0,
+     "attempts": 180
+    },
+    "freq_hi": {
+     "word_ops_gmean_ratio": 11.590282655656965,
+     "word_ops_ci95": [
+      8.835772836694176,
+      14.743398644749224
+     ],
+     "ms_gmean_ratio": 11.111440148801757,
+     "ms_ci95": [
+      9.0533531422491,
+      13.534230780120858
+     ],
+     "reductions_gmean_ratio": 11.89732214333021,
+     "reductions_ci95": [
+      11.678676671757673,
+      12.068901306052025
+     ],
+     "total_word_ops_ratio": 16.054771487898538,
+     "unsat_total_word_ops_ratio": 15.630737483332638,
+     "censored_attempts": 174,
+     "attempts": 180
+    },
+    "freq_lo": {
+     "word_ops_gmean_ratio": 4.605743602173366,
+     "word_ops_ci95": [
+      4.319245407448735,
+      4.823195853962562
+     ],
+     "ms_gmean_ratio": 4.204496303077602,
+     "ms_ci95": [
+      3.950351430986506,
+      4.392968355644456
+     ],
+     "reductions_gmean_ratio": 7.367282119360494,
+     "reductions_ci95": [
+      6.711380745121675,
+      7.98404812772012
+     ],
+     "total_word_ops_ratio": 4.698301778840016,
+     "unsat_total_word_ops_ratio": 4.7684511067681035,
+     "censored_attempts": 33,
+     "attempts": 180
+    }
+   },
+   "unsat_targets": 41,
+   "unsat_share_base_word_ops": 0.6764466067905087,
+   "base_ms_median_per_target": 25.05135,
+   "base_word_ops_per_target_mean": 12054458.6,
+   "base_native_ops_repeatable": true
+  },
+  "a1_n19": {
+   "n": 19,
+   "a": 1,
+   "dim": 7,
+   "targets": 60,
+   "arms": {
+    "base2": {
+     "word_ops_gmean_ratio": 0.9999970284168462,
+     "word_ops_ci95": [
+      0.9999878620989006,
+      1.0000059077584742
+     ],
+     "ms_gmean_ratio": 0.9996086813253287,
+     "ms_ci95": [
+      0.986448542660714,
+      1.0104892581276406
+     ],
+     "reductions_gmean_ratio": 1.0,
+     "reductions_ci95": [
+      1.0,
+      1.0
+     ],
+     "total_word_ops_ratio": 0.9999971066702795,
+     "unsat_total_word_ops_ratio": 0.9999948474232638,
+     "censored_attempts": 0,
+     "attempts": 180
+    },
+    "freq_hi": {
+     "word_ops_gmean_ratio": 11.682152987466694,
+     "word_ops_ci95": [
+      11.480506089463445,
+      11.877238511771155
+     ],
+     "ms_gmean_ratio": 11.77186362765646,
+     "ms_ci95": [
+      11.489455235982396,
+      12.05531385050928
+     ],
+     "reductions_gmean_ratio": 6.310034826301433,
+     "reductions_ci95": [
+      6.26790961391839,
+      6.350793640763907
+     ],
+     "total_word_ops_ratio": 11.70689565896541,
+     "unsat_total_word_ops_ratio": 11.6073624841255,
+     "censored_attempts": 180,
+     "attempts": 180
+    },
+    "freq_lo": {
+     "word_ops_gmean_ratio": 3.0189925435579634,
+     "word_ops_ci95": [
+      2.8780431351686304,
+      3.168659604482843
+     ],
+     "ms_gmean_ratio": 2.617056198951516,
+     "ms_ci95": [
+      2.4503291760747015,
+      2.7916530773272106
+     ],
+     "reductions_gmean_ratio": 6.310034826301433,
+     "reductions_ci95": [
+      6.266680250226179,
+      6.350180862753461
+     ],
+     "total_word_ops_ratio": 3.0735048052801957,
+     "unsat_total_word_ops_ratio": 3.0164200415034927,
+     "censored_attempts": 180,
+     "attempts": 180
+    }
+   },
+   "unsat_targets": 36,
+   "unsat_share_base_word_ops": 0.5957763821304268,
+   "base_ms_median_per_target": 73.99095,
+   "base_word_ops_per_target_mean": 39009265.3,
+   "base_native_ops_repeatable": true
+  },
+  "a1_n23": {
+   "n": 23,
+   "a": 1,
+   "dim": 8,
+   "targets": 60,
+   "arms": {
+    "base2": {
+     "word_ops_gmean_ratio": 0.999997116539031,
+     "word_ops_ci95": [
+      0.9999938726727814,
+      1.0000006719595282
+     ],
+     "ms_gmean_ratio": 0.9817008586827007,
+     "ms_ci95": [
+      0.9669054528719501,
+      0.9944847495407827
+     ],
+     "reductions_gmean_ratio": 1.0,
+     "reductions_ci95": [
+      1.0,
+      1.0
+     ],
+     "total_word_ops_ratio": 0.9999971165813076,
+     "unsat_total_word_ops_ratio": 0.9999954989782978,
+     "censored_attempts": 0,
+     "attempts": 180
+    },
+    "freq_hi": {
+     "word_ops_gmean_ratio": 2.058182557928949,
+     "word_ops_ci95": [
+      1.4458616524325498,
+      2.8448173047638154
+     ],
+     "ms_gmean_ratio": 1.9623759703278696,
+     "ms_ci95": [
+      1.4551711288677127,
+      2.6436521864941662
+     ],
+     "reductions_gmean_ratio": 3.1413467340038816,
+     "reductions_ci95": [
+      3.1332061084339795,
+      3.1485334310170643
+     ],
+     "total_word_ops_ratio": 3.7933260135163582,
+     "unsat_total_word_ops_ratio": 3.416150822156512,
+     "censored_attempts": 180,
+     "attempts": 180
+    },
+    "freq_lo": {
+     "word_ops_gmean_ratio": 1.2664767350496633,
+     "word_ops_ci95": [
+      1.235921579763889,
+      1.295855529094995
+     ],
+     "ms_gmean_ratio": 1.1414774090873805,
+     "ms_ci95": [
+      1.1081825486945704,
+      1.1757287421106628
+     ],
+     "reductions_gmean_ratio": 3.1413467340038816,
+     "reductions_ci95": [
+      3.133368409668855,
+      3.148553620114691
+     ],
+     "total_word_ops_ratio": 1.2714821282502196,
+     "unsat_total_word_ops_ratio": 1.270909492494615,
+     "censored_attempts": 180,
+     "attempts": 180
+    }
+   },
+   "unsat_targets": 44,
+   "unsat_share_base_word_ops": 0.7322135044642373,
+   "base_ms_median_per_target": 221.98075,
+   "base_word_ops_per_target_mean": 133967132.26666667,
+   "base_native_ops_repeatable": true
+  }
+ }
+}
