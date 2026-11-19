@@ -95,3 +95,11 @@ is empty for every arm, rho included.
 - This IC is a generic combination-table index calculus with no point decomposition (no summation polynomials). Its
   single-target result says nothing about decomposition-based index calculus.
 - Wall time on one container, one binary.
+
+## Amendment A1 (2026-11-19, before any data was read)
+
+The first main run, started 17:36Z, was stopped at 17:41Z after 1,954 of 5,376 executions. During 17:37–17:41Z this
+session ran `cargo check` and `cargo clippy` builds on the other cores, and one was killed for lack of memory. That
+load could bias the timings, the memory-sensitive IC arm most. Its partial rows were set aside unread (not copied
+into this directory). The main run restarts from scratch, unchanged in every other respect: same binary, keys,
+seeds and shuffled order. No build or other heavy work runs on the container while it measures.
