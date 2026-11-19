@@ -6,6 +6,9 @@ on:
     paths:
       - '.github/workflows/prime31-horner-xy-chain.yml'
       - 'research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_family_separation.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_weighted_slot_resultants.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_weighted_slot_resultants.py'
+      - 'research/prime31_ic_20261115/rr9/WEIGHTED_SLOT_RESULTANT_PROTOCOL_20261119.md'
       - 'research/prime31_ic_20261115/native/verify_prime31_rr9_weighted_family_separation.py'
       - 'research/prime31_ic_20261115/rr9/RR9_WEIGHTED_FAMILY_SEPARATION_PROTOCOL_20261119.md'
       - 'research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs'
@@ -18,6 +21,9 @@ on:
     paths:
       - '.github/workflows/prime31-horner-xy-chain.yml'
       - 'research/prime31_ic_20261115/native/examples/prime31_rr9_weighted_family_separation.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_weighted_slot_resultants.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_weighted_slot_resultants.py'
+      - 'research/prime31_ic_20261115/rr9/WEIGHTED_SLOT_RESULTANT_PROTOCOL_20261119.md'
       - 'research/prime31_ic_20261115/native/verify_prime31_rr9_weighted_family_separation.py'
       - 'research/prime31_ic_20261115/rr9/RR9_WEIGHTED_FAMILY_SEPARATION_PROTOCOL_20261119.md'
       - 'research/prime31_ic_20261115/native/examples/prime31_horner_xy_chain.rs'
@@ -148,6 +154,36 @@ jobs:
             research/prime31_ic_20261115/native/verify_prime31_rr9_weighted_family_separation.py \
             research/prime31_ic_20261115/rr9/RR9_WEIGHTED_FAMILY_SEPARATION_PROTOCOL_20261119.md \
             | tee weighted-family-sha256.txt
+      - name: Overlay original Rust weighted slot-root resultant candidate
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_weighted_slot_resultants.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_weighted_slot_resultants.rs
+      - name: Focused original Rust slot-root resultant tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_weighted_slot_resultants
+      - name: Frozen 512 paired positive/negative original Rust slot-root gate
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_weighted_slot_resultants > prime31-slot-resultants.json
+          jq -e '.schema=="prime31.weighted_slot_resultants.v1" and
+            .curve.p==2147483647 and .curve.n==2147446831 and
+            .cases_per_window==128 and .positive==512 and .negative==512 and
+            .positive_zero_resultants==4096 and
+            .negative_only_slot0_failed==512 and
+            (.windows | length)==4 and
+            (.windows | all(.distinct_slot_roots==64)) and
+            .slot_supports_pairwise_disjoint==true and
+            .generic_sum_table_calls==0 and
+            .public_only_unknown_index_extraction==false and
+            .target_conditioned_rr9_solved==false and
+            .complete_ecdlp_solved==false' prime31-slot-resultants.json
+          python3 research/prime31_ic_20261115/native/verify_prime31_weighted_slot_resultants.py \
+            prime31-slot-resultants.json | tee prime31-slot-resultants-independent.json
+          sha256sum prime31-slot-resultants.json prime31-slot-resultants-independent.json \
+            research/prime31_ic_20261115/native/examples/prime31_weighted_slot_resultants.rs \
+            research/prime31_ic_20261115/native/verify_prime31_weighted_slot_resultants.py \
+            research/prime31_ic_20261115/rr9/WEIGHTED_SLOT_RESULTANT_PROTOCOL_20261119.md \
+            | tee prime31-slot-resultants-sha256.txt
       - name: Preserve scientific artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -163,4 +199,7 @@ jobs:
             prime31-weighted-family-separation.json
             prime31-weighted-family-verified.json
             weighted-family-sha256.txt
+            prime31-slot-resultants.json
+            prime31-slot-resultants-independent.json
+            prime31-slot-resultants-sha256.txt
           if-no-files-found: warn
