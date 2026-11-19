@@ -1056,6 +1056,35 @@ one-twelfth endpoint, and both Hasse character-sum bounds depend only on
 `lake env leanchecker --fresh TensorBoundaryBounds` replay exits 0.
 [pcc:unverified]
 
+## 2026-11-19 corrected Semaev nonvanishing components
+
+`shortCubicPolynomial_scale_eq_iff` expands the scaling identity for
+`X^3 + AX + B`, and `shortCubicPolynomial_scale_classification` derives the
+two coefficient cases used in Lemma 5.4. In the `A = 0` branch,
+`zmodNoFullCubicOrbitInShortInterval` proves that three positive
+representatives from one cubic orbit cannot all lie below `X` when `3X < p`.
+[pcc:unverified]
+
+`characterProjector_isolates_term` proves the abstract finite character
+projector: supplied orthogonality and transformed relations isolate
+`|Gamma| * n_i` times the selected point. The corrected final contradiction is
+`algebraic_ne_const_mul_transcendental`: an element algebraic over the
+constant field cannot equal a nonzero constant multiple of a transcendental
+parameter. [pcc:unverified]
+
+Hash-bound claims `PCC-20261119-603d9c`, `PCC-20261119-0f3ed3`,
+`PCC-20261119-31e2b5`, and `PCC-20261119-752c5b` pass their local Lean
+verifiers. These statements do not yet prove Lemma N': the square-product
+implication, concrete Kummer characters and orthogonality, torsion-coordinate
+algebraicity, and the CM finite-kernel specialization remain open.
+[pcc:unverified]
+
+The pinned project build completes 2,738 jobs. The repository proof gate
+reports `PASS 226 thm 0 trusted`; every new audited declaration uses only
+standard Lean axioms. A final-source independent
+`lake env leanchecker --fresh TensorBoundaryBounds` replay exits 0.
+[pcc:unverified]
+
 ## 2026-11-19 inverse-square polynomial root-count bridge
 
 `polynomialPullbackBadSetCardLe` bounds a finite bad set pulled back through a

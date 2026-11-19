@@ -693,9 +693,14 @@ layer uses these declarations:
    image, bound every fibre by two, and bound the image by the roots of
    `g_t`. This gives the exact `2D` cardinality used by upstream
    `DilationNondeg`.
-5. **Missing components only.** Construct `g_t`, prove its degree bound and
-   vanishing law, and prove `g_t != 0` for every nontrivial tuple using the
-   corrected constant-field/Kummer argument. [pcc:unverified]
+5. **Missing components only.** Construct `g_t` and prove its degree and
+   vanishing laws. For nonvanishing, the checked pieces now include the cubic
+   coefficient classification, the short-interval orbit exclusion, the
+   abstract character projector, and the corrected final transcendence
+   contradiction. Still missing are square-product-to-scaling, the actual
+   Kummer extension and character orthogonality, torsion-coordinate
+   algebraicity, and the `A = 0` CM endomorphism/finite-kernel specialization.
+   [pcc:unverified]
 
 | statement | kind | owner | quantified structure | hypotheses |
 |---|---|---|---|---|
@@ -703,9 +708,18 @@ layer uses these declarations:
 | `inverseSquareFiberCard_le_two` | law | same | nonzero elements of a finite field | none beyond field structure |
 | `InverseSquarePolynomialCertificate` | interface | same | tuple-indexed bad dilation predicates | one nonzero bounded-degree vanishing polynomial per tuple |
 | `inverseSquarePolynomialCertificate_card_le` | endpoint | same | previous row | certificate; conclusion is the exact `2D` bad-set bound |
+| `shortCubicPolynomial_scale_classification` | law | same | odd-characteristic field and short-cubic coefficients | a supplied nonzero nonidentity scaling symmetry |
+| `zmodNoFullCubicOrbitInShortInterval` | law | same | three positive residue representatives and a cubic root of unity | representatives at most `X`, `3X < p` |
+| `characterProjector_isolates_term` | law | same | finite character and point index sets, additive commutative point group | character orthogonality and every transformed relation |
+| `algebraic_ne_const_mul_transcendental` | law | same | field extension, algebraic coordinate and transcendental parameter | nonzero constant multiplier |
 
 Claim `PCC-20261119-998f26` binds the endpoint and passes its local verifier;
 signed standing remains unverified. [pcc:unverified]
+
+Claims `PCC-20261119-603d9c`, `PCC-20261119-0f3ed3`,
+`PCC-20261119-31e2b5`, and `PCC-20261119-752c5b` bind the four checked
+Lemma N' components and pass their local verifiers; signed standing remains
+unverified. [pcc:unverified]
 
 ## Planted-diagonal bad shifts
 

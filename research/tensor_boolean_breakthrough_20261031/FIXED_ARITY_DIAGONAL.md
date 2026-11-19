@@ -379,6 +379,19 @@ curve-specific certificate itself: construction, degree, vanishing, and
 especially nonvanishing of the specialized Semaev polynomial for every
 nontrivial tuple. [pcc:unverified]
 
+Four internal steps of that nonvanishing proof are now checked separately.
+`shortCubicPolynomial_scale_classification` proves the coefficient
+classification for nontrivial cubic scaling symmetries;
+`zmodNoFullCubicOrbitInShortInterval` proves the `A = 0`, `3X < p` orbit
+exclusion; `characterProjector_isolates_term` proves the finite Kummer
+projector identity; and `algebraic_ne_const_mul_transcendental` proves the
+corrected final contradiction from algebraicity rather than rationality over
+the constant field. Claims `PCC-20261119-603d9c`, `PCC-20261119-0f3ed3`,
+`PCC-20261119-31e2b5`, and `PCC-20261119-752c5b` pass their local verifiers.
+The square-product implication, concrete Kummer extension, torsion-coordinate
+algebraicity, and CM endomorphism finite-kernel argument remain open.
+[pcc:unverified]
+
 The generic planted-diagonal root count is now kernel-checked as well.
 `charpolySingularShiftCardLeDimension` proves that an `f`-dimensional square
 matrix has at most `f` candidate scalars `nu` for which `nu I - M` is

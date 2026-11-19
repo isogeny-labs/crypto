@@ -2922,6 +2922,205 @@ theorem polynomialBadValuesCardLeDegree
   rw [Polynomial.mem_roots nonzero]
   exact (Finset.mem_filter.mp valueMem).2
 
+/-! ## Cubic scaling symmetry for the Semaev/Kummer step -/
+
+/-- The monic short cubic `X³ + A X + B` used in Lemma 5.4. -/
+noncomputable def shortCubicPolynomial
+    {K : Type*} [CommRing K] (A B : K) : Polynomial K :=
+  Polynomial.X ^ 3 + Polynomial.C A * Polynomial.X + Polynomial.C B
+
+/-- Expanding the short cubic after the scaling `X ↦ rX`. -/
+theorem shortCubicPolynomial_comp_scale
+    {K : Type*} [CommRing K] (A B r : K) :
+    (shortCubicPolynomial A B).comp (Polynomial.C r * Polynomial.X) =
+      Polynomial.C (r ^ 3) * Polynomial.X ^ 3 +
+        Polynomial.C (A * r) * Polynomial.X + Polynomial.C B := by
+  simp only [shortCubicPolynomial, Polynomial.add_comp, Polynomial.mul_comp,
+    Polynomial.pow_comp, Polynomial.X_comp, Polynomial.C_comp, map_mul,
+    map_pow]
+  ring
+
+/-- Expanding the scalar multiple `r³ (X³ + AX + B)`. -/
+theorem shortCubicPolynomial_scale_mul
+    {K : Type*} [CommRing K] (A B r : K) :
+    Polynomial.C (r ^ 3) * shortCubicPolynomial A B =
+      Polynomial.C (r ^ 3) * Polynomial.X ^ 3 +
+        Polynomial.C (A * r ^ 3) * Polynomial.X +
+          Polynomial.C (B * r ^ 3) := by
+  simp only [shortCubicPolynomial, mul_add, Polynomial.C_mul]
+  ring
+
+/-- Coefficient form of the cubic scaling symmetry in Lemma 5.4. -/
+theorem shortCubicPolynomial_scale_eq_iff
+    {K : Type*} [CommRing K] (A B r : K) :
+    (shortCubicPolynomial A B).comp (Polynomial.C r * Polynomial.X) =
+        Polynomial.C (r ^ 3) * shortCubicPolynomial A B ↔
+      A * r = A * r ^ 3 ∧ B = B * r ^ 3 := by
+  rw [shortCubicPolynomial_comp_scale, shortCubicPolynomial_scale_mul]
+  constructor
+  · intro equality
+    constructor
+    · have coefficient := congrArg (fun p : Polynomial K => p.coeff 1) equality
+      simp only [Polynomial.coeff_add,
+        Polynomial.coeff_C_mul_X_pow, Polynomial.coeff_C_mul_X,
+        Polynomial.coeff_C] at coefficient
+      norm_num at coefficient
+      exact coefficient
+    · have coefficient := congrArg (fun p : Polynomial K => p.coeff 0) equality
+      simp only [Polynomial.coeff_add,
+        Polynomial.coeff_C_mul_X_pow, Polynomial.coeff_C_mul_X,
+        Polynomial.coeff_C] at coefficient
+      norm_num at coefficient
+      exact coefficient
+  · rintro ⟨hA, hB⟩
+    congr 1
+    · congr 1
+      exact congrArg (fun coefficient => Polynomial.C coefficient * Polynomial.X) hA
+    · exact congrArg Polynomial.C hB
+
+/-- Classification of nontrivial scaling symmetries of a nonsingular short
+cubic, in the coefficient form used by Lemma 5.4.  If `A ≠ 0`, a nonidentity
+nonzero symmetry forces `r = -1` and `B = 0`; if `A = 0` and `B ≠ 0`, it
+forces `r³ = 1`. -/
+theorem shortCubicPolynomial_scale_classification
+    {K : Type*} [Field K] (hK : ringChar K ≠ 2)
+    (A B r : K) (rNonzero : r ≠ 0) (rNonidentity : r ≠ 1)
+    (symmetry :
+      (shortCubicPolynomial A B).comp (Polynomial.C r * Polynomial.X) =
+        Polynomial.C (r ^ 3) * shortCubicPolynomial A B) :
+    (A ≠ 0 → B = 0 ∧ r = -1) ∧ (A = 0 → B ≠ 0 → r ^ 3 = 1) := by
+  obtain ⟨hAcoeff, hBcoeff⟩ :=
+    (shortCubicPolynomial_scale_eq_iff A B r).mp symmetry
+  constructor
+  · intro ANonzero
+    have rEqCube : r = r ^ 3 := by
+      exact mul_left_cancel₀ ANonzero hAcoeff
+    have oneEqSquare : 1 = r ^ 2 := by
+      apply mul_left_cancel₀ rNonzero
+      calc
+        r * 1 = r := mul_one r
+        _ = r ^ 3 := rEqCube
+        _ = r * r ^ 2 := by ring
+    have factorZero : (r - 1) * (r + 1) = 0 := by
+      calc
+        (r - 1) * (r + 1) = r ^ 2 - 1 := by ring
+        _ = 0 := by rw [← oneEqSquare, sub_self]
+    have rNegOne : r = -1 := by
+      rcases mul_eq_zero.mp factorZero with minusZero | plusZero
+      · exact absurd (sub_eq_zero.mp minusZero) rNonidentity
+      · exact eq_neg_of_add_eq_zero_left plusZero
+    refine ⟨?_, rNegOne⟩
+    rw [rNegOne] at hBcoeff
+    norm_num at hBcoeff
+    have twiceB : (2 : K) * B = 0 := by
+      linear_combination hBcoeff
+    exact (mul_eq_zero.mp twiceB).resolve_left (Ring.two_ne_zero hK)
+  · intro _ BNonzero
+    have oneEqCube : 1 = r ^ 3 := by
+      apply mul_left_cancel₀ BNonzero
+      simpa using hBcoeff
+    exact oneEqCube.symm
+
+/-- A positive triple of natural representatives with sum below the modulus
+cannot sum to zero in `ZMod modulus`. -/
+theorem zmodPositiveTripleSum_ne_zero
+    (modulus a b c : ℕ) (aPositive : 0 < a)
+    (sumBelow : a + b + c < modulus) :
+    (a : ZMod modulus) + (b : ZMod modulus) + (c : ZMod modulus) ≠ 0 := by
+  intro sumZero
+  have castZero : ((a + b + c : ℕ) : ZMod modulus) = 0 := by
+    simpa [Nat.cast_add] using sumZero
+  have valZero := congrArg ZMod.val castZero
+  rw [ZMod.val_natCast_of_lt sumBelow] at valZero
+  simp only [ZMod.val_zero] at valZero
+  omega
+
+/-- The `A = 0` interval repair from Lemma N': a full orbit
+`a, ωa, ω²a` cannot have three positive representatives at most `X` when
+`3X < p`.  Hence every cubic-character collision class in the interval has
+size at most two. -/
+theorem zmodNoFullCubicOrbitInShortInterval
+    (modulus X a b c : ℕ) (omega : ZMod modulus)
+    (aPositive : 0 < a) (aBound : a ≤ X) (bBound : b ≤ X) (cBound : c ≤ X)
+    (intervalShort : 3 * X < modulus)
+    (omegaRelation : omega ^ 2 + omega + 1 = 0)
+    (bOrbit : (b : ZMod modulus) = omega * (a : ZMod modulus))
+    (cOrbit : (c : ZMod modulus) = omega * (b : ZMod modulus)) : False := by
+  have sumBelow : a + b + c < modulus := by omega
+  apply zmodPositiveTripleSum_ne_zero modulus a b c aPositive sumBelow
+  rw [bOrbit, cOrbit, bOrbit]
+  linear_combination (a : ZMod modulus) * omegaRelation
+
+/-- Multiplying a transcendental element by a nonzero constant preserves
+transcendence.  This is the corrected final contradiction in Lemma N': a
+coordinate algebraic over the constant field cannot equal `t * s`. -/
+theorem transcendental_const_mul
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    (s : L) (sTranscendental : Transcendental K s)
+    (t : K) (tNonzero : t ≠ 0) :
+    Transcendental K (algebraMap K L t * s) := by
+  let polynomial : Polynomial K := Polynomial.C t * Polynomial.X
+  have degreeNonzero : polynomial.natDegree ≠ 0 := by
+    simp [polynomial, Polynomial.natDegree_C_mul_X t tNonzero]
+  have leadingNonzerodivisor :
+      polynomial.leadingCoeff ∈ nonZeroDivisors K := by
+    rw [mem_nonZeroDivisors_iff_ne_zero]
+    simpa [polynomial, Polynomial.leadingCoeff_C_mul_X] using tNonzero
+  simpa [polynomial] using
+    sTranscendental.aeval polynomial degreeNonzero leadingNonzerodivisor
+
+/-- An algebraic element cannot be a nonzero constant multiple of a
+transcendental element. -/
+theorem algebraic_ne_const_mul_transcendental
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    (x s : L) (xAlgebraic : IsAlgebraic K x)
+    (sTranscendental : Transcendental K s)
+    (t : K) (tNonzero : t ≠ 0) :
+    x ≠ algebraMap K L t * s := by
+  intro equality
+  have productTranscendental :=
+    transcendental_const_mul s sTranscendental t tNonzero
+  apply productTranscendental
+  rw [← equality]
+  exact xAlgebraic
+
+/-- Abstract Kummer-character projector. Orthogonality of the sign characters
+and the transformed zero-sum relations isolate one term and force
+`|Gamma| * n_i` times that point to vanish. -/
+theorem characterProjector_isolates_term
+    {Index Gamma Point : Type*}
+    [Fintype Index] [DecidableEq Index]
+    [Fintype Gamma] [DecidableEq Gamma] [AddCommGroup Point]
+    (character : Index → Gamma → ℤ) (coefficient : Index → ℤ)
+    (point : Index → Point) (chosen : Index)
+    (orthogonality : ∀ index,
+      (∑ gamma, character chosen gamma * character index gamma) =
+        if index = chosen then Fintype.card Gamma else 0)
+    (transformedRelation : ∀ gamma,
+      ∑ index, (character index gamma * coefficient index) • point index = 0) :
+    ((Fintype.card Gamma : ℤ) * coefficient chosen) • point chosen = 0 := by
+  have projectedZero :
+      ∑ gamma, character chosen gamma •
+        (∑ index, (character index gamma * coefficient index) • point index) = 0 := by
+    simp [transformedRelation]
+  have rearranged :
+      (∑ gamma, character chosen gamma •
+        (∑ index, (character index gamma * coefficient index) • point index)) =
+      ∑ index,
+        (((∑ gamma, character chosen gamma * character index gamma) *
+          coefficient index) • point index) := by
+    simp_rw [smul_sum, ← mul_smul]
+    rw [Finset.sum_comm]
+    apply Finset.sum_congr rfl
+    intro index _
+    rw [← Finset.sum_smul, Finset.sum_mul]
+    apply congrArg fun scalar : ℤ => scalar • point index
+    apply Finset.sum_congr rfl
+    intro gamma _
+    ring
+  rw [rearranged] at projectedZero
+  simpa [orthogonality] using projectedZero
+
 /-- A finite bad set pulled back through a map with fibres of size at most
 `multiplicity` has size at most `multiplicity * degree` when every bad point
 maps to a root of a nonzero polynomial of degree at most `degree`. -/
