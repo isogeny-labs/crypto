@@ -449,13 +449,24 @@ impl Producer<'_> {
         let mut b = *base;
         self.reduce_monic(&mut b, &monic)?;
         let mut acc = Poly17::constant(1);
-        self.reduce_monic(&mut acc, &monic)?;
+        // The identity is reduced modulo any positive-degree polynomial.
+        // A degree-zero modulus is exceptional: 1 mod c = 0.
+        if monic.len == 1 {
+            self.reduce_monic(&mut acc, &monic)?;
+        }
+        let mut acc_initialized = false;
         while exponent != 0 {
             self.gate.charge(4 * COPY_WORK)?;
             if exponent & 1 != 0 {
-                let mut product = self.product(&acc, &b)?;
-                self.reduce_monic(&mut product, &monic)?;
-                acc = product;
+                if acc_initialized {
+                    let mut product = self.product(&acc, &b)?;
+                    self.reduce_monic(&mut product, &monic)?;
+                    acc = product;
+                } else {
+                    // First set bit: 1 * b mod m == b, already reduced.
+                    acc = b;
+                    acc_initialized = true;
+                }
             }
             exponent >>= 1;
             if exponent != 0 {
@@ -530,9 +541,14 @@ impl Producer<'_> {
                 continue;
             }
             if h.len == 2 {
-                let inv = self.inverse(h.coefficients[1])?;
-                let value = self.mul(h.coefficients[0], inv)?;
-                let root = self.sub(0, value)?;
+                let root = if h.coefficients[1] == 1 {
+                    // Split factors are normally monic: x + c has root -c.
+                    self.sub(0, h.coefficients[0])?
+                } else {
+                    let inv = self.inverse(h.coefficients[1])?;
+                    let value = self.mul(h.coefficients[0], inv)?;
+                    self.sub(0, value)?
+                };
                 self.prepare_event()?;
                 self.emit(EventKind::LinearRoot {
                     polynomial: h,
@@ -955,9 +971,14 @@ impl Replay {
         let monic = self.normalized_modulus(modulus)?;
         let mut base = base;
         self.cancel_monic(&mut base, &monic)?;
-        let mut acc = Poly17::constant(1);
-        self.cancel_monic(&mut acc, &monic)?;
-        for bit in (0..64 - exponent.leading_zeros()).rev() {
+        // The top exponent bit is always 1. Initialize from the already
+        // reduced base instead of squaring 1 and multiplying by base.
+        let mut acc = if exponent == 0 { Poly17::constant(1) } else { base };
+        if exponent == 0 && monic.len == 1 {
+            self.cancel_monic(&mut acc, &monic)?;
+        }
+        let remaining_bits = (64 - exponent.leading_zeros()).saturating_sub(1);
+        for bit in (0..remaining_bits).rev() {
             self.gate.charge(4 * COPY_WORK)?;
             let mut square = self.square_diagonals(&acc)?;
             self.cancel_monic(&mut square, &monic)?;
@@ -1127,7 +1148,11 @@ impl Replay {
                 {
                     return Err(Stop::InvalidCertificate);
                 }
-                let v = self.times(polynomial.coefficients[1], root)?;
+                let v = if polynomial.coefficients[1] == 1 {
+                    root
+                } else {
+                    self.times(polynomial.coefficients[1], root)?
+                };
                 if self.plus(v, polynomial.coefficients[0])? != 0 {
                     return Err(Stop::InvalidCertificate);
                 }
