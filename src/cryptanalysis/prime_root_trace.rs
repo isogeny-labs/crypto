@@ -640,6 +640,22 @@ fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
     if a.len() <= 2 || (a.len() <= 4 && p <= u32::MAX as u64) {
         return vproduct(a, a, p);
     }
+    // (c + d*x^k)^2 needs exactly three field multiplications, and
+    // its nonzero leading coefficient makes output trimming unnecessary.
+    // This binomial shape occurs frequently in root certificates.
+    if a.len() >= 6 && a[0] != 0 && a[1] == 0 && a[2] == 0
+        && *a.last().unwrap() != 0
+        && a[3..a.len() - 1].iter().all(|&x| x == 0)
+    {
+        let k = a.len() - 1;
+        let mut result = vec![0; 2 * k + 1];
+        result[0] = vmul(a[0], a[0], p);
+        let cross = vmul(a[0], a[k], p);
+        let twice = cross + cross;
+        result[k] = if twice >= p { twice - p } else { twice };
+        result[2 * k] = vmul(a[k], a[k], p);
+        return result;
+    }
     // Preserve the previous two-term fast path exactly; it is frequent in
     // certificates and a generic three-slot scan regressed ~4% in Rust.
     // Only inspect the remainder for an additional term after a third
