@@ -283,3 +283,7 @@ fn paired_native_complete_composite_jacobian_ic_vs_direct_bsgs() {
         );
     }
 }
+
+// CT229 lives as a child module to reuse these exact validated native helpers.
+#[path = "ct229_impl/probe.rs"]
+mod ct229;
