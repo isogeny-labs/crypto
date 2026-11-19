@@ -69,7 +69,10 @@ fn f3_coefficients(op: &mut FieldOps, r: u64, u: u64) -> (u64,u64,u64) {
 }
 fn f3_value(op: &mut FieldOps, x: u64, y: u64, z: u64) -> u64 {
     let (a,b,c) = f3_coefficients(op,x,z);
-    add(add(op.mul(a,op.mul(y,y)),op.mul(b,y)),c)
+    let yy=op.mul(y,y);
+    let a_yy=op.mul(a,yy);
+    let by=op.mul(b,y);
+    add(add(a_yy,by),c)
 }
 fn base31(ar: &mut Arithmetic) -> Vec<Point> {
     let mut base=Vec::new();
@@ -185,7 +188,8 @@ fn extract_f3(ar:&mut Arithmetic,op:&mut FieldOps,base:&[Point],
             }
         } else {
             // Exact discriminant: beta^2-4*alpha*gamma=(4*s*yi)^2.
-            let discr_sqrt=op.mul(op.mul(4,s),yi);
+            let four_s=op.mul(4,s);
+            let discr_sqrt=op.mul(four_s,yi);
             for numerator in [sub(discr_sqrt,beta),sub(sub(0,beta),discr_sqrt)] {
                 let root=op.mul(numerator,inverses[i]);
                 if let Some(&j)=by_x.get(&root) {
@@ -201,7 +205,10 @@ fn extract_group_reference(ar:&mut Arithmetic,base:&[Point],
     let mut found=BTreeSet::new();
     for (i,&pi) in base.iter().enumerate() {
         // Reference only: generic affine R ± P_i, never used by the F3 extractor.
-        for candidate in [ar.add(PRIME31,q,pi), ar.add(PRIME31,q,ar.neg(PRIME31,pi))] {
+        let minus_pi=ar.neg(PRIME31,pi);
+        let plus=ar.add(PRIME31,q,pi);
+        let minus=ar.add(PRIME31,q,minus_pi);
+        for candidate in [plus,minus] {
             if let Some((x,_))=candidate {
                 if let Some(&j)=by_x.get(&x) {
                     verify_pair(ar,q,base,i,j,&mut found);
@@ -323,8 +330,12 @@ mod tests {
             for &pi in &base {
                 let (x,y)=pi.unwrap();
                 let (aa,bb,cc)=f3_coefficients(&mut ops,r,x);
-                let lhs=sub(ops.mul(bb,bb),ops.mul(ops.mul(4,aa),cc));
-                let ds=ops.mul(ops.mul(4,s),y);
+                let square_b=ops.mul(bb,bb);
+                let four_a=ops.mul(4,aa);
+                let four_a_c=ops.mul(four_a,cc);
+                let lhs=sub(square_b,four_a_c);
+                let four_s=ops.mul(4,s);
+                let ds=ops.mul(four_s,y);
                 assert_eq!(lhs,ops.mul(ds,ds));
                 if aa!=0 {
                     let inv=ops.pow(add(aa,aa),P-2);
@@ -332,7 +343,8 @@ mod tests {
                         assert_eq!(f3_value(&mut ops,x,root,r),0);
                     }
                 } else {
-                    let root=ops.mul(sub(0,cc),ops.pow(bb,P-2));
+                    let inverse=ops.pow(bb,P-2);
+                    let root=ops.mul(sub(0,cc),inverse);
                     assert_eq!(f3_value(&mut ops,x,root,r),0);
                 }
             }
