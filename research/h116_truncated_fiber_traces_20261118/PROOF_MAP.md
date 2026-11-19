@@ -146,6 +146,41 @@ for the full identity.  Thus the certificate carries eleven coefficients
 last two are derivative guards, not decoded moments.
 [pcc:unverified]
 
+## Elliptic--Prym low-coefficient factor gate
+
+This section was written after the frozen Prym panel and before adding its
+Lean declarations.
+
+1. **Structure above.**  Work over an arbitrary field.  The elliptic Weil
+   factor begins `(1,-t,p)` and the abelian-surface Prym factor begins
+   `(1,-tau,eta)`.  Only degree-one and degree-two coefficient convolution is
+   formalized.
+2. **Theorems used as stated.**  Ring normalization supplies the generic
+   convolution identities.  No curve, zeta function or isogeny implementation
+   is imported into the arithmetic statement.
+3. **Object as an instance.**  The native experiment supplies the premise
+   that the genus-three Weil polynomial factors as the elliptic polynomial
+   times the Prym polynomial.  The formal theorem then recovers
+   `tau=s1-t` and `eta=e2-p-t*tau` exactly.
+4. **Assembly probe.**  The intended theorem uses the visible coefficient
+   equations `-s1=(-t)+(-tau)` and
+   `e2=p+(-t)*(-tau)+eta`; `ring_nf` and linear combination suffice.  A
+   separate ring identity normalizes the real-Weil discriminant.
+5. **Missing components only.**  Existence of the Prym, the Jacobian isogeny,
+   equality of Weil polynomials and fixed-genus point-counting complexity stay
+   explicit geometric premises.  The theorem does not turn the measured
+   residue association into a decoder.
+6. **Inheritance table.**
+
+| Statement | Kind | Owner | Quantified structure | Hypotheses |
+| --- | --- | --- | --- | --- |
+| low product coefficients are `-(t+tau)` and `p+t*tau+eta` | generic ring law | H116 Lean module | field | none |
+| product coefficients recover `tau,eta` | generic coefficient consequence | H116 Lean module | field | two displayed coefficient equations |
+| real-Weil discriminant normalization | generic ring law | H116 Lean module | field | none |
+| `Jac(C) ~ E x Prym` supplies the product | geometric endpoint | future Prym owner | genus-three double cover of an elliptic curve | smooth cover and norm-map construction |
+
+[pcc:unverified]
+
 ## Genus-three signed-twist trace-parity obstruction gate
 
 This section was written after the frozen native result exposed exact pair

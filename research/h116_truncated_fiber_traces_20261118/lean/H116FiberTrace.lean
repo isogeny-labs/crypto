@@ -468,6 +468,44 @@ theorem oddModulus_signedTwistMutation_control :
     ((0 : ℤ) - (-1) * 1) % 3 ≠ ((0 : ℤ) - 1) % 3 := by
   norm_num
 
+/-- The degree-one and degree-two coefficient convolutions for an elliptic
+Weil factor `(1,-t,p)` and a Prym-surface factor `(1,-tau,eta)`. -/
+theorem ellipticPrym_lowCoefficient_convolution (p t tau eta : K) :
+    (-t) + (-tau) = -(t + tau) ∧
+      p + (-t) * (-tau) + eta = p + t * tau + eta := by
+  constructor <;> ring
+
+/-- If the first two coefficients of a genus-three Weil polynomial are
+supplied by the elliptic--Prym product, the two leading Prym coefficients are
+recovered by the formulas used in the native experiment.  Supplying the
+geometric isogeny and hence these coefficient equations remains an explicit
+endpoint premise. -/
+theorem prymCoefficients_of_productLowCoefficients
+    (p t s1 e2 tau eta : K)
+    (hs1 : -s1 = (-t) + (-tau))
+    (he2 : e2 = p + (-t) * (-tau) + eta) :
+    tau = s1 - t ∧ eta = e2 - p - t * (s1 - t) := by
+  have hs1' : s1 = tau + t := by
+    simpa only [neg_neg, neg_add_rev] using congrArg Neg.neg hs1
+  have htau : tau = s1 - t := by
+    calc
+      tau = (tau + t) - t := by abel
+      _ = s1 - t := by rw [← hs1']
+  have he2' : e2 = p + t * tau + eta := by
+    simpa only [neg_mul_neg] using he2
+  constructor
+  · exact htau
+  · rw [htau] at he2'
+    calc
+      eta = (p + t * (s1 - t) + eta) - p - t * (s1 - t) := by abel
+      _ = e2 - p - t * (s1 - t) := by rw [← he2']
+
+/-- The discriminant of the Prym real Weil polynomial in the two equivalent
+normal forms used by the experiment. -/
+theorem prymRealWeil_discriminant_normalized (p tau eta : K) :
+    tau ^ 2 - 4 * (eta - 2 * p) = tau ^ 2 - 4 * eta + 8 * p := by
+  ring
+
 /-- The shared normalized at-infinity series before subtracting the target
 coordinate. Under the remaining geometric bridge it represents `S(x)/x` at
 `w=1/x`. -/
@@ -4878,6 +4916,9 @@ theorem fixedPoint_frobeniusCocycle_zero
 #print axioms signedTwist_traceParity_negInvariant
 #print axioms signedTwist_traceParity_decoder_pair_failure
 #print axioms oddModulus_signedTwistMutation_control
+#print axioms ellipticPrym_lowCoefficient_convolution
+#print axioms prymCoefficients_of_productLowCoefficients
+#print axioms prymRealWeil_discriminant_normalized
 #print axioms fiberDenominatorSeries_eq_normalizedMap_sub_linear
 #print axioms fiberDenominatorSeries_sub
 #print axioms bostanDenominatorsNonzero

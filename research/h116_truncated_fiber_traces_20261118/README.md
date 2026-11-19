@@ -583,3 +583,12 @@ only 562/1,505 with no exact rule and family-wise `p=0.226263`.  The next lead
 uses the isogeny decomposition `Jac(C) ~ E x Prym(C/E)` to remove the public
 elliptic factor before scoring the Prym middle coefficient and its real-Weil
 discriminant. [pcc:unverified]
+
+The frozen [Prym-factor experiment](CHIRAL_GENUS3_PRYM_DIGIT_EXPERIMENT.md)
+removes the known elliptic factor and tests the abelian surface's middle Weil
+coefficient and real-Weil discriminant.  All 3,148 factor and Prym bounds pass.
+The selected discriminant rule scores 570/1,508, with no exact rule and
+family-wise `p=0.0622407`.  This is not a decoder, but it is the strongest
+calibrated association in the chiral sequence; the next gate therefore keeps
+the exact `[0,2,0,2]`, offset-two rule unchanged on fresh ordinary
+prime-order curves. [pcc:unverified]

@@ -6,14 +6,14 @@ Toolchain: Lean 4.34.1 with Mathlib revision
 Source SHA-256:
 
 ```text
-325c58f4d1f5e1860214f2dd4fcd9a8f08dc05e22085834130b21847af59954f  H116FiberTrace.lean
+eeebba2aa5b515747fee6c76f98ce0f592e97b6fdfe0b1d49dbab6b4de7bafaf  H116FiberTrace.lean
 ```
 
 The pinned toolchain built the explicitly tracked source, then the repository's
 `AuditAxioms.lean` transitively audited all theorem declarations:
 
 ```text
-PASS_DIRECT  228 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
+PASS_DIRECT  231 thm  0 trusted  research/h116_truncated_fiber_traces_20261118/lean
 ```
 
 Receipt SHA-256 values:
@@ -114,6 +114,9 @@ ef592d2dd12b3d0310ff9033bb2993d5878ac904ee662c8382ecd68b964512f6  receipts/kumme
 5627e74bd114ce1566597d258e9039a7f36965c25daf49aaa15b116fa315a572  receipts/division-torsor-cocycle-audit.txt
 3fde375485dc1275d81077833314cf766e0af381e4d52706ba3e8846a33dec08  receipts/genus3-trace-parity-build.txt
 d2d57acd1964aaed2dde36dc316cc35e58a836b85de0eda77e85ae67fba27c4e  receipts/genus3-trace-parity-audit.txt
+9540c6f4bd86097b36e51ecf1647f66922e87f46de37016e5f772dd233243a79  receipts/prym-factor-build.txt
+478510f938b207fc9df2aade14d601662b9ce0123a362d5d167fd329abc60021  receipts/prym-factor-audit.txt
+105ef01f16cbe7b56b8c9faf3a5e5d281825cf554a9d626bde213fd82b876d76  receipts/prym-factor-development-failures.txt
 ```
 
 The earlier repository-wide gate receipts above cover the first 64 theorems.
@@ -528,4 +531,16 @@ deterministic decoder of the complete trace-parity vector fails on one of
 modulus-three mutation confirms that odd residues escape this particular
 obstruction. The pinned 3,164-job build passes and the exact auditor reports
 228 theorems, zero failures and zero trusted/native decisions.
+[pcc:unverified]
+
+The 231-theorem checkpoint formalizes the elliptic--Prym low-coefficient
+calculation used by the frozen Prym experiment. Lean proves the first two
+coefficient convolutions, recovers `tau=s1-t` and
+`eta=e2-p-t*(s1-t)` over an arbitrary field, and normalizes the real-Weil
+discriminant. Two failed development attempts are retained: both exposed a
+tactic-generated factor of two that would not be valid in characteristic
+two. The final additive proof adds no characteristic premise. The pinned
+3,164-job build passes and the exact auditor reports 231 theorems, zero
+failures and zero trusted/native decisions. Construction of the Prym and the
+Jacobian isogeny remain explicit geometric obligations.
 [pcc:unverified]
