@@ -6,6 +6,7 @@
 //! transfer exists.
 
 #[path = "curve_cover_check/checker.rs"]
+#[allow(dead_code)]
 mod checker;
 #[path = "curve_cover_check/models.rs"]
 mod models;
@@ -28,6 +29,7 @@ use std::{
 const REQUEST_SCHEMA: &str = "curve-transfer-sweep-request/v1";
 const RESULT_SCHEMA: &str = "curve-transfer-sweep/v1";
 const VERIFY_SCHEMA: &str = "curve-transfer-sweep-verification/v1";
+const CAPABILITIES_SCHEMA: &str = "curve-transfer-sweep-capabilities/v1";
 const MAX_INPUT_BYTES: u64 = 64 * 1024 * 1024;
 const HARD_MAX_ATTEMPTS: u32 = 100_000;
 
@@ -44,6 +46,12 @@ struct Args {
 
 #[derive(Subcommand)]
 enum Command {
+    /// Report constructive families and separately routed candidate searches.
+    Capabilities {
+        /// Result path; omit for stdout.
+        #[arg(long)]
+        output: Option<PathBuf>,
+    },
     /// Resolve one target and enumerate the requested finite search space.
     Sweep {
         /// Strict JSON request, or `-` for stdin.
@@ -68,6 +76,101 @@ enum Command {
         #[arg(long)]
         output: Option<PathBuf>,
     },
+}
+
+fn capabilities() -> Value {
+    json!({
+        "schema_version": CAPABILITIES_SCHEMA,
+        "integrated_request_families": [
+            "binary_cubic_pullback_v1",
+            "prime_quadratic_pullback_v1",
+        ],
+        "families": [
+            {
+                "id": "binary_cubic_pullback_v1",
+                "routing": "integrated_constructive_sweep",
+                "shape": "genus_3_hyperelliptic_one_infinity",
+                "field_scope": "same_binary_field",
+                "map_degree": 3,
+                "construction": "explicit_equations_and_map",
+                "jacobian_arithmetic": "implemented_checked_reduced_divisors",
+                "induced_maps": "implemented_pullback_and_arbitrary_class_pushforward",
+                "subgroup_evidence": "separate_map_bound_certificate_corpus",
+                "implementation": "src/binary_ecc/cover_transfer.rs",
+                "limits": "the sweep constructs the family but does not itself certify a named subgroup or solver advantage",
+            },
+            {
+                "id": "prime_quadratic_pullback_v1",
+                "routing": "integrated_constructive_sweep",
+                "shape": "genus_2_hyperelliptic_split_two_infinity",
+                "field_scope": "odd_prime_or_declared_extension_geometry",
+                "map_degree": 2,
+                "construction": "explicit_equations_and_map",
+                "jacobian_arithmetic": "implemented_for_checked_direct_prime_models",
+                "induced_maps": "implemented_for_checked_direct_short_weierstrass_targets",
+                "subgroup_evidence": "not_verified_by_sweep",
+                "implementation": "src/prime_hyperelliptic/cover_transfer.rs",
+                "limits": "normalized targets, extension arithmetic, and primes outside the accepted proof range remain structured unsupported cases",
+            },
+            {
+                "id": "prime_bielliptic_genus2_atlas_v1",
+                "routing": "separate_bounded_constructor",
+                "shape": "genus_2_hyperelliptic_with_two_elliptic_quotients",
+                "field_scope": "bounded_odd_prime_fields",
+                "map_degree": 2,
+                "construction": "explicit_bielliptic_curve_and_quotient_maps",
+                "jacobian_arithmetic": "separate_chained_transfer_backend",
+                "induced_maps": "separate_checked_pullback_pushforward_hops",
+                "subgroup_evidence": "per_instance_only",
+                "implementation": "src/bin/transfer_atlas.rs",
+                "supporting_module": "src/cryptanalysis/chained_transfer/bielliptic.rs",
+                "limits": "not integrated into the EC1/ICV1 sweep result schema; its own finite parameters and receipts govern completeness",
+            },
+            {
+                "id": "nist_genus3_hyperelliptic_cover_v1",
+                "routing": "separate_bounded_constructor",
+                "shape": "genus_3_hyperelliptic",
+                "field_scope": "selected_odd_prime_short_weierstrass_models",
+                "map_degree": 2,
+                "construction": "explicit_cover_and_pullback",
+                "jacobian_arithmetic": "separate_genus3_backend",
+                "induced_maps": "bounded_instance_checks",
+                "subgroup_evidence": "per_instance_only",
+                "implementation": "src/bin/nist_cover_quartic_map.rs",
+                "supporting_module": "src/cryptanalysis/nist_cover_quartic.rs",
+                "limits": "not a general catalog constructor and not evidence for every odd-prime curve",
+            },
+            {
+                "id": "bielliptic_plane_quartic_diagnostic_v1",
+                "routing": "separate_diagnostic_only",
+                "shape": "genus_3_non_hyperelliptic_plane_quartic",
+                "field_scope": "prime_fields_5_through_257",
+                "map_degree": 2,
+                "construction": "explicit_quartic_cover",
+                "jacobian_arithmetic": "not_implemented_as_a_full_quartic_jacobian_group",
+                "induced_maps": "elliptic_norm_projection_only",
+                "subgroup_evidence": "not_a_full_jacobian_transfer_certificate",
+                "implementation": "src/bin/quartic_ic.rs",
+                "supporting_module": "src/cryptanalysis/bielliptic_quartic.rs",
+                "limits": "the diagnostic's passing relation tests do not establish general quartic Jacobian arithmetic or a Jacobian index_calculus solver",
+            },
+            {
+                "id": "gf2_small_genus_factor_search_v1",
+                "routing": "candidate_filter_not_transfer",
+                "shape": "hyperelliptic_genus_2_through_5_and_non_hyperelliptic_genus_3_through_4",
+                "field_scope": "curves_over_F2_with_bounded_complete_model_enumeration",
+                "map_degree": null,
+                "construction": "curve_model_enumeration_and_frobenius_polynomial_divisibility",
+                "jacobian_arithmetic": "not_supplied_by_the_factor_search",
+                "induced_maps": "not_constructed",
+                "subgroup_evidence": "not_constructed",
+                "implementation": "src/cryptanalysis/curve_construction/enumerate.rs",
+                "limits": "a matching characteristic-polynomial factor is a decomposition candidate, not an explicit cover, correspondence, or logarithm transfer",
+            },
+        ],
+        "failure_semantics": "an unsupported family or empty bounded search is not a proof that no transfer exists",
+        "claim_boundary": "this inventory distinguishes routing and implemented evidence; it does not promote a candidate filter, norm projection, or curve construction into a full Jacobian transfer or solver",
+    })
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -796,6 +899,7 @@ fn verify(saved: Value, registry_bytes: &[u8]) -> Result<Value, String> {
 
 fn execute(command: Command) -> (Value, i32, Option<PathBuf>) {
     match command {
+        Command::Capabilities { output } => (capabilities(), 0, output),
         Command::Sweep {
             request,
             registry,
@@ -885,6 +989,36 @@ mod tests {
                 max_degree: 3,
             },
         }
+    }
+
+    #[test]
+    fn capability_inventory_separates_constructors_filters_and_diagnostics() {
+        let inventory = capabilities();
+        assert_eq!(inventory["schema_version"], CAPABILITIES_SCHEMA);
+        assert_eq!(
+            inventory["integrated_request_families"]
+                .as_array()
+                .unwrap()
+                .len(),
+            2
+        );
+        let families = inventory["families"].as_array().unwrap();
+        assert_eq!(families.len(), 6);
+        let quartic = families
+            .iter()
+            .find(|family| family["id"] == "bielliptic_plane_quartic_diagnostic_v1")
+            .unwrap();
+        assert_eq!(quartic["induced_maps"], "elliptic_norm_projection_only");
+        assert_eq!(
+            quartic["jacobian_arithmetic"],
+            "not_implemented_as_a_full_quartic_jacobian_group"
+        );
+        let factor_search = families
+            .iter()
+            .find(|family| family["id"] == "gf2_small_genus_factor_search_v1")
+            .unwrap();
+        assert_eq!(factor_search["routing"], "candidate_filter_not_transfer");
+        assert_eq!(factor_search["induced_maps"], "not_constructed");
     }
 
     #[test]

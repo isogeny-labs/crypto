@@ -56,6 +56,7 @@ pub mod cover_transfer;
 pub mod curve;
 pub mod fp2;
 pub mod fp_poly;
+pub mod model_transfer;
 pub mod ops;
 pub mod primality;
 
@@ -75,6 +76,10 @@ pub use curve::{
 };
 pub use fp2::{enumerate_fp2, Fp2, Fp2ContextError, Fp2Ctx, MAX_FP2_MODULUS};
 pub use fp_poly::FpPoly;
+pub use model_transfer::{
+    PrimeMontgomeryAdapterError, PrimeMontgomeryAdapterP, PrimeMontgomeryPointP,
+    PrimeProjectivePointP,
+};
 pub use primality::{
     prime_proof_evidence, prime_proof_status, PrimeProofEvidence, PrimeProofStatus,
     DETERMINISTIC_U64_BASES, PRIME_BASES_THROUGH_53, PSI13_EXCLUSIVE_BOUND_DECIMAL,
