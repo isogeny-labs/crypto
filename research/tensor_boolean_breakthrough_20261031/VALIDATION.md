@@ -999,3 +999,25 @@ power, square-root cost, and short-curve root laws contain only `propext`,
 records (`PCC-20261119-55e0bd`, `PCC-20261119-0b3f70`, and
 `PCC-20261119-b73c0b`) omitted mandatory declaration hashes, fail closed, and
 remain uncited. [pcc:unverified]
+
+## 2026-11-19 source-pinned Atlas Hasse closure
+
+The project now pins `facebookresearch/atlas-lean` commit
+`a4557099d45c620a038e90a9c4b4d9ab08294b81`. The root project keeps its
+original Mathlib commit `cfc55fc58714a59dc06e6e79edc6d1d95140d3c2`, which
+is two days newer than Atlas's v4.35.0 Mathlib tag; no existing dependency was
+upgraded. Atlas's `HasseBoundWanted.hasse_bound` builds its Manin degree and
+twist proof and states
+`((q + 1 - #E : Int)^2 <= 4q)` for every finite-field elliptic Weierstrass
+curve. [pcc:unverified]
+
+`integerHasseGivesSamplerFour` converts that integral theorem to
+`2q+1 <= 4#E` for `q >= 16`.
+`affineFullSignedTrialExpectation_le_four_of_atlasHasse` then proves the exact
+full-curve sampler has expected retry count at most four with no curve-count
+premise in its statement. The expanded pinned build completes 2,738 jobs; the
+proof gate reports `PASS 162 thm 0 trusted`. Axiom audits of the imported Hasse
+theorem and both local compositions list only `propext`, `Classical.choice`,
+and `Quot.sound`; the seven directly imported Atlas Hasse/Manin source files
+contain no `sorry`, `admit`, user `axiom`, or `native_decide`. A fresh checker
+replay exits 0. [pcc:unverified]

@@ -101,7 +101,11 @@ square-root cost is also checked for the common `|K| = 3 mod 4` case:
 repeated squaring uses at most twice the binary length of `|K|` field
 multiplications, and on elliptic short-form curves (`a1=a3=0`) the resulting
 root satisfies the sampler's nonsingular-root interface. A pinned Hasse theorem
-and general prime-field square roots remain open.
+is now imported from Meta's Atlas development at commit
+`a4557099d45c620a038e90a9c4b4d9ab08294b81`; its Manin proof closes the
+four-trial sampler bound for every elliptic finite-field curve with at least 16
+field elements. General prime-field square roots remain open outside the
+three-mod-four case.
 The exact upstream-shaped `Ttop`/`Rint`/`nu`/`q` specialization is
 now checked locally; only integration into the external pinned tree remains.
 [pcc:unverified] See

@@ -310,8 +310,11 @@ length `(2|K|+1)/|E(K)|`. Thus the paper's factor-16 near-uniform loss is not
 needed for this sampler. The four-trial bound is reduced to the single explicit
 Hasse-form premise `2|K|+1 <= 4|E(K)|`. Lean now derives that premise, for
 `|K| >= 16`, from a trace deficit satisfying `t^2 <= 4|K|` and
-`|K|+1 <= |E(K)|+t`; the missing dependency is precisely the curve-specific
-Hasse theorem. For `|K| = 3 mod 4`, an executable binary-power square root is
+`|K|+1 <= |E(K)|+t`. Meta's Atlas development is now source-pinned at commit
+`a4557099d45c620a038e90a9c4b4d9ab08294b81`; its Manin-sequence theorem
+supplies the integral squared Hasse inequality for every elliptic finite-field
+curve, so `affineFullSignedTrialExpectation_le_four_of_atlasHasse` removes the
+Hasse premise entirely. For `|K| = 3 mod 4`, an executable binary-power square root is
 also checked: it uses at most `2 * Nat.size |K|` field multiplications, and on
 elliptic short-form curves (`a1=a3=0`) it supplies the nonsingular root required
 by the sampler. Claims `PCC-20261119-c1ad13`, `PCC-20261119-e5e1f9`, and
@@ -421,6 +424,9 @@ remove any of these fixed-`m` correctness and cost obligations.
   <https://github.com/kaarelkaarelson/fast-ecdlp/blob/d1deb5abe008e981206ed58cbd83012b6afc3740/v2/lean/ECDLPv2/L116_Main.lean>.
 - Pinned uniform-generator expectation source:
   <https://github.com/kaarelkaarelson/fast-ecdlp/blob/d1deb5abe008e981206ed58cbd83012b6afc3740/v2/lean/ECDLPv2/L118_Tot.lean>.
+- Pinned Hasse source: Meta, Atlas Lean, commit
+  `a4557099d45c620a038e90a9c4b4d9ab08294b81`,
+  <https://github.com/facebookresearch/atlas-lean/blob/a4557099d45c620a038e90a9c4b4d9ab08294b81/MathlibExt/AlgebraicGeometry/EllipticCurve/HasseBound.lean>.
 - Local source hashes: `v2/paper.pdf`
   `eacf5acb66cedbd7eb656580322c9770d72f47ad6d95412e3d4e5c87309f696d`;
   `lean/ECDLP/L104_Final.lean`

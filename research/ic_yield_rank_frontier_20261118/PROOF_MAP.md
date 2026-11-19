@@ -333,6 +333,8 @@ the exact eventual natural-power inequality required by
 | `hasseSquareImpliesHalfFieldTrace` | arithmetic bridge | same | natural field size and nonnegative trace deficit | field size at least 16 and `trace^2 <= 4 * fieldSize` |
 | `hasseTraceBoundGivesSamplerFour` | arithmetic bridge | same | natural field size, point count, and trace deficit | field size at least 16, `fieldSize + 1 <= pointCount + trace`, and `trace^2 <= 4 * fieldSize` |
 | `affineFullSignedTrialExpectation_le_four_of_hasseSquare` | endpoint | same | finite field, affine curve, and natural trace deficit | field size at least 16, `card K + 1 <= card W.Point + trace`, and `trace^2 <= 4 * card K` |
+| `integerHasseGivesSamplerFour` | arithmetic bridge | same | natural field size and point count | field size at least 16 and the integral squared Hasse inequality `((q+1-N):Int)^2 <= 4q` |
+| `affineFullSignedTrialExpectation_le_four_of_atlasHasse` | endpoint | same | finite field and elliptic affine curve | field size at least 16; imports the source-pinned Atlas Hasse theorem |
 | `threeModFourSqrt` | definition | same | finite field and field element | none |
 | `threeModFourSqrt_sq` | law | same | finite field, field element, and square witness | field cardinality is 3 modulo 4 |
 | `RingCounted.squareCached` | definition | same | counted scalar | none |
@@ -380,7 +382,9 @@ affine coordinate pair.  The coordinate sigma type is explicitly equivalent
 to nonzero affine points (via `Option` for the identity), so the successful
 seed count is the number of affine points and every conditioned pair event is
 exactly uniform.  Executable square-root cost and the Hasse inequality needed
-for the constant retry bound remain separate obligations. [pcc:unverified]
+for the constant retry bound were initially separate obligations.  The
+three-mod-four short-curve root and source-pinned Atlas Hasse theorem below
+close them on that curve class. [pcc:unverified]
 
 Adding one distinguished identity seed gives a single finite rejection sampler
 `Option (K x Bool) -> Option (Option AffineSamplerCoordinates)`.  The same
@@ -389,13 +393,15 @@ accepted seed.  Through `affineSamplerCoordinatesEquivPoint`, its accepted
 count is exactly `card W.Point`, its seed count is `2 * card K + 1`, and every
 conditioned full-curve pair event is uniform with no distortion loss.  The
 exact retry expectation is `(2 * card K + 1) / card W.Point`; a Hasse-derived
-cardinality inequality is the sole remaining premise for the checked
-four-trial corollary.  The next arithmetic bridge derives that inequality
-from the usual squared Hasse trace bound once the field has at least 16
-elements.  The pinned dependency tree supplies the point-count definition but
-not the Hasse theorem itself, so connecting a concrete curve to the bridge
-remains an explicit theorem-level obligation rather than an implicit sampler
-assumption. Claims `PCC-20261119-c1ad13`, `PCC-20261119-e5e1f9`, and
+cardinality inequality was the sole remaining premise for the checked
+four-trial corollary.  The arithmetic bridge derives that inequality from the
+usual integral squared Hasse bound once the field has at least 16 elements.
+The original Mathlib/CryptoLean tree supplied no Hasse theorem, but the project
+now pins Meta's Atlas development at
+`a4557099d45c620a038e90a9c4b4d9ab08294b81`.  Atlas's Manin proof supplies
+the squared bound, and `affineFullSignedTrialExpectation_le_four_of_atlasHasse`
+composes it into an assumption-free elliptic-curve endpoint. Claims
+`PCC-20261119-c1ad13`, `PCC-20261119-e5e1f9`, and
 `PCC-20261119-54ee4b` bind the curve-level Hasse arithmetic endpoint, counted
 square-root bit-work theorem, and short-curve root interface respectively;
 all three pass their local Lean verifiers. [pcc:unverified]

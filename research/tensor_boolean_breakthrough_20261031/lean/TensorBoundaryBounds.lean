@@ -8,6 +8,7 @@ import Mathlib.Data.Matrix.ColumnRowPartitioned
 import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.Data.Nat.Size
+import MathlibExt.AlgebraicGeometry.EllipticCurve.HasseBound
 
 /-!
 # Exact separator-message bounds
@@ -1001,6 +1002,34 @@ theorem affineFullSignedTrialExpectation_le_four_of_hasseSquare
   apply affineFullSignedTrialExpectation_le_four W
   exact hasseTraceBoundGivesSamplerFour (Fintype.card K)
     (Fintype.card W.Point) trace fieldLarge pointTrace hasseSquare
+
+/-- The integral squared form of Hasse directly implies the natural
+cardinality inequality required by the full signed-x sampler. -/
+theorem integerHasseGivesSamplerFour
+    (fieldSize pointCount : ℕ) (fieldLarge : 16 ≤ fieldSize)
+    (hasseSquare :
+      (((fieldSize : ℤ) + 1 - (pointCount : ℤ)) ^ 2 ≤
+        4 * (fieldSize : ℤ))) :
+    2 * fieldSize + 1 ≤ 4 * pointCount := by
+  have fieldLargeInt : (16 : ℤ) ≤ fieldSize := by exact_mod_cast fieldLarge
+  have pointCountNonnegative : (0 : ℤ) ≤ pointCount := by positivity
+  have targetInt :
+      2 * (fieldSize : ℤ) + 1 ≤ 4 * (pointCount : ℤ) := by
+    nlinarith [sq_nonneg ((fieldSize : ℤ) - 16)]
+  exact_mod_cast targetInt
+
+/-- The source-pinned Atlas Manin proof of Hasse closes the sampler's
+four-trial bound for elliptic curves over finite fields of size at least 16. -/
+theorem affineFullSignedTrialExpectation_le_four_of_atlasHasse
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) [W.IsElliptic]
+    (fieldLarge : 16 ≤ Fintype.card K) :
+    (2 * Fintype.card K + 1 : ℕ) / (Fintype.card W.Point : ℝ) ≤ 4 := by
+  apply affineFullSignedTrialExpectation_le_four W
+  apply integerHasseGivesSamplerFour (Fintype.card K) (Fintype.card W.Point)
+    fieldLarge
+  simpa only [Nat.card_eq_fintype_card] using
+    MathlibExt.AlgebraicGeometry.EllipticCurve.HasseBoundWanted.hasse_bound W
 
 /-- For finite fields of cardinality three modulo four, exponentiation by
 `(|K|+1)/4` is an executable square-root candidate. -/
