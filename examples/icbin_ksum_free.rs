@@ -33,7 +33,14 @@ fn main() {
     let c = &cfg["curve"];
     let g = |k: &str| c[k].as_u64().unwrap();
     let inst = binary_explicit_instance(
-        g("n") as u32, g("modulus"), g("a"), g("b"), g("group_order"), g("r"), g("gx"), g("gy"),
+        g("n") as u32,
+        g("modulus"),
+        g("a"),
+        g("b"),
+        g("group_order"),
+        g("r"),
+        g("gx"),
+        g("gy"),
     )
     .unwrap();
     let slug = cfg["slug"].as_str().unwrap();
@@ -41,11 +48,16 @@ fn main() {
     let seed_base = cfg["seed_base"].as_u64().unwrap();
     let max_trials = cfg["max_trials"].as_u64().unwrap();
     let group = BinaryGroup(&inst.fast);
-    let regime = if inst.koblitz.is_some() { "koblitz" } else { "char2" };
+    let regime = if inst.koblitz.is_some() {
+        "koblitz"
+    } else {
+        "char2"
+    };
     let targets = cfg["targets"].as_array().unwrap();
     for arm in cfg["arms"].as_array().unwrap() {
         let name = arm["name"].as_str().unwrap();
-        let (fb_name, fb_params) = Params::parse_spec(arm["factor_base"].as_str().unwrap()).unwrap();
+        let (fb_name, fb_params) =
+            Params::parse_spec(arm["factor_base"].as_str().unwrap()).unwrap();
         let (or_name, or_params) = Params::parse_spec(arm["oracle"].as_str().unwrap()).unwrap();
         assert_eq!(or_name, "ksum");
         assert_eq!(fb_name, "binary-multiplier");
@@ -79,13 +91,18 @@ fn main() {
                     name: slug.to_string(),
                     field_degree: Some(inst.n),
                 };
-                let mut calib = Calibration { ns_per_add: 1.0, ns_per_double: 1.0, ..Default::default() };
+                let mut calib = Calibration {
+                    ns_per_add: 1.0,
+                    ns_per_double: 1.0,
+                    ..Default::default()
+                };
                 calib.pin(regime, slug);
                 let base = BinaryMultiplierBase { instance: &inst };
                 let mut oracle = KSumOracle::new(ms);
                 let _ = GroupOps::default();
                 let t0 = std::time::Instant::now();
-                let res = run_pipeline_with_base(&ctx, &spec, &base, &mut oracle, u64::MAX, &calib, None);
+                let res =
+                    run_pipeline_with_base(&ctx, &spec, &base, &mut oracle, u64::MAX, &calib, None);
                 let wall = t0.elapsed().as_nanos() as u64;
                 let line = match res {
                     Ok((rep, _fb)) => json!({
@@ -104,7 +121,9 @@ fn main() {
                             "verify": phase(&rep.verify)},
                         "wall_ns": wall,
                     }),
-                    Err(e) => json!({"arm": name, "target": ti, "round": round, "ok": false, "error": e}),
+                    Err(e) => {
+                        json!({"arm": name, "target": ti, "round": round, "ok": false, "error": e})
+                    }
                 };
                 writeln!(out, "{line}").unwrap();
             }
