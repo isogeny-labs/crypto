@@ -1153,9 +1153,11 @@ proof gate reports `PASS 277 thm 0 trusted`. A final-source independent
 [pcc:unverified]
 
 This closes the radicand nonzero/pairwise-nonsquare premise only for the
-`A != 0` branch. The original lifted Semaev point relation, its exact
-nonsingularity composition, the `A = 0` collision/CM argument,
-torsion-to-division-polynomial vanishing and runtime assembly remain open.
+`A != 0` branch. At this checkpoint the original lifted Semaev point relation,
+its exact nonsingularity composition, the `A = 0` collision/CM argument,
+torsion-to-division-polynomial vanishing, and runtime assembly were open. The
+later exact-pin scalar-torsion project closes the general division-polynomial
+implication, but not the other obligations.
 [pcc:unverified]
 
 ## 2026-11-19 cubic-CM additive norm endpoint
@@ -1175,10 +1177,12 @@ specializes it: `a*P + b*zeta(P) = 0` forces
 The complete pinned project build succeeds with 9,086 jobs and the proof gate
 reports `PASS 293 thm 0 trusted`. [pcc:unverified]
 
-This removes the unproved finite-kernel shortcut from the CM step. It does
-not construct the two-coefficient relation from the `A = 0` interval
-collision, prove torsion-to-division-polynomial vanishing, construct the
-specialized Semaev polynomial, or establish the final runtime theorem.
+This removes the unproved finite-kernel shortcut from the CM step. At this
+checkpoint it did not construct the two-coefficient relation from the `A = 0`
+interval collision, prove torsion-to-division-polynomial vanishing, construct
+the specialized Semaev polynomial, or establish the final runtime theorem.
+The later interval and exact-pin scalar-torsion checkpoints close the first
+two items only under their stated hypotheses and dependency pins.
 [pcc:unverified]
 
 The complete pinned project build succeeds with 9,086 jobs. The repository
@@ -1187,9 +1191,9 @@ proof gate reports `PASS 244 thm 0 trusted`. [pcc:unverified]
 Hash-bound claims `PCC-20261119-603d9c`, `PCC-20261119-0f3ed3`,
 `PCC-20261119-31e2b5`, and `PCC-20261119-752c5b` pass their local Lean
 verifiers. These statements do not yet prove Lemma N': specialized finite
-Galois square-root data and transformed curve relations,
-torsion-to-division-polynomial vanishing, and the CM finite-kernel
-specialization remain open.
+Galois square-root data and transformed curve relations remain open. Later
+checkpoints close the general scalar-torsion-to-`ΨSq` implication and replace
+the CM finite-kernel shortcut by an explicit norm calculation.
 [pcc:unverified]
 
 The pinned project build completes 2,738 jobs. The repository proof gate
@@ -1252,8 +1256,13 @@ the full univariate squared division polynomial `ΨSq`. The checked theorem
 detects affine two-torsion. `divisionPolynomialSqRoot_isAlgebraic` and
 `divisionPolynomialSq_ne_zero_at_const_mul_transcendental` provide the
 correct algebraicity/contradiction endpoint for every nonzero index. The
-remaining group-law theorem must prove that scalar torsion forces `ΨSq`, not
-`preΨ`, to vanish at the x-coordinate. [pcc:unverified]
+standalone exact-pin theorem
+`divisionPolynomialSq_eval_eq_zero_of_zsmul_eq_zero` now proves that scalar
+torsion forces `ΨSq`, not `preΨ`, to vanish at the x-coordinate. It uses
+`WeierstrassCurve.zsmul_eq_smulEval` from open upstream Mathlib PR #41197,
+pinned at contributor-fork commit
+`f46c499f84960839eac3fdbc517a930f02b3b252`; it is therefore checked but not
+yet available under the main project's separate Mathlib pin. [pcc:unverified]
 The complete pinned build succeeds with 9,086 jobs and the proof gate reports
 `PASS 314 thm 0 trusted`. [pcc:unverified]
 Claim `PCC-20261119-487eb4` binds the parity-correct `ΨSq` transcendence
@@ -1322,5 +1331,33 @@ at `21345614` returns `FRESH_CHECKER_EXIT=0`. [pcc:unverified]
 This closes the former duplicated-versus-separated character obligation for
 the stated interval model. It still assumes the selected square roots,
 lifted-point nonsingularity, point identifications, and all Galois-transformed
-relations. The Semaev construction, torsion-to-division-polynomial vanishing,
-and final algorithm/runtime theorem remain open. [pcc:unverified]
+relations. The torsion-to-division-polynomial implication is now checked in
+the exact-pin standalone project; the Semaev construction, dependency
+integration, and final algorithm/runtime theorem remain open.
+[pcc:unverified]
+
+## 2026-11-19 scalar-torsion to `ΨSq` bridge
+
+The standalone project `lean-zsmul-torsion` pins Lean `v4.32.0-rc1` and the
+Mathlib PR #41197 contributor fork at exact commit
+`f46c499f84960839eac3fdbc517a930f02b3b252`. The pinned upstream
+`DivisionPolynomial.ZSMul` target built from source in 1,969 jobs. The new
+theorem `divisionPolynomialSq_eval_eq_zero_of_zsmul_eq_zero` then elaborated
+directly, and the packaged Lake target built successfully in 1,972 jobs. Its
+proof first turns `n • P = 0` into vanishing of the Jacobian `Z` coordinate
+`ψ n (P)`, transfers `ψ = Ψ` through the affine coordinate ring, and finally
+uses `mk_Ψ_sq` to conclude `ΨSq n (x(P)) = 0`. The proof file SHA-256 is
+`dd07b3c7faf95a39f0dd05407a0348c2ddac953443cf47bf3b61fd749c61d56d`.
+[pcc:unverified]
+
+The axiom audit reports one theorem, zero failures and zero trusted/native
+declarations; its transitive axioms are exactly `propext`,
+`Classical.choice`, and `Quot.sound`. An independent
+`leanchecker --fresh TorsionDivisionPolynomial` replay exits zero.
+[pcc:unverified]
+
+This closes the parity-safe group-law implication, including even indices.
+It does not establish Semaev construction or vanishing, relation collection,
+runtime, or a subexponential ECDLP theorem. The dependency remains an open
+WIP upstream PR, so rebasing or upstream integration is a separate obligation.
+[pcc:unverified]

@@ -441,8 +441,12 @@ torsion polynomial: `preΨ 2 = 1`. The corrected endpoint uses the full
 univariate squared division polynomial `ΨSq`, whose even-index definition
 retains the two-torsion factor. Lean now checks both the index-two obstruction
 and `ΨSq 2` vanishing on affine two-torsion, plus the general `ΨSq` root
-algebraicity/transcendence contradiction. Thus the remaining group-law lemma
-is specifically scalar torsion implies `ΨSq` vanishing.
+algebraicity/transcendence contradiction. The exact-pin standalone project
+`lean-zsmul-torsion` now also checks the general group-law implication:
+scalar torsion implies `ΨSq` vanishing at the affine x-coordinate. That proof
+uses `zsmul_eq_smulEval` from open upstream Mathlib PR #41197 at exact commit
+`f46c499f84960839eac3fdbc517a930f02b3b252`; dependency integration into the
+main pinned project remains open.
 Claim `PCC-20261119-487eb4` binds the corrected `ΨSq` transcendence endpoint
 and passes its local Lean verifier; signed standing remains unverified.
 [pcc:unverified]

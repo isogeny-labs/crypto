@@ -816,11 +816,13 @@ Galois square-root data are supplied. [pcc:unverified]
 Claims `PCC-20261119-1bad7c` and `PCC-20261119-a2b707` bind the exact upstream
 nondegeneracy and average-energy endpoints. Claim `PCC-20261119-a69a2d`
 binds the division-polynomial transcendence contradiction. All three local
-verifiers pass; signed standing remains unverified. The remaining
-torsion-coordinate step is now the precise group-law lemma that a nonzero
-torsion point makes the full squared division polynomial `ΨSq` vanish at its
-x-coordinate. The auxiliary `preΨ` formulation is insufficient at even
-indices because `preΨ 2 = 1`. [pcc:unverified]
+verifiers pass; signed standing remains unverified. The exact-pin standalone
+project now closes the torsion-coordinate group-law step: a scalar-torsion
+relation makes the full squared division polynomial `ΨSq` vanish at the
+x-coordinate. The auxiliary `preΨ` formulation remains insufficient at even
+indices because `preΨ 2 = 1`. The proof depends on open Mathlib PR #41197 at
+exact commit `f46c499f84960839eac3fdbc517a930f02b3b252`, so dependency
+integration into the main pin remains open. [pcc:unverified]
 Claim `PCC-20261119-487eb4` binds the parity-correct `ΨSq` transcendence
 endpoint and passes its local Lean verifier; signed standing remains
 unverified. [pcc:unverified]
