@@ -2,7 +2,7 @@
 //! Reuses original prime31-algebraic-ic EC arithmetic, without generic 4+4 tables.
 //! Explicitly CONDITIONAL on TWO KNOWN signed support leaves. This is not a
 //! public-only unknown-index solver and not a complete non-generic ECDLP solve.
-use prime31_algebraic_ic::{check_curve, Arithmetic, Point, PRIME31};
+use prime31_algebraic_ic::{check_curve, Arithmetic, PRIME31};
 use serde_json::{json, Value};
 use std::collections::HashSet;
 
@@ -24,7 +24,8 @@ fn poly(c:&[u64],x:u64)->u64{c.iter().rev().fold(0,|a,&b|add(mul(a,x),b))}
 fn base8(ar:&mut Arithmetic)->Vec<(u64,u64)>{
     let mut out=Vec::new();
     for x in 0..10_000 {
-        if let Some(y)=ar.sqrt(ar.rhs(PRIME31,x),P){
+        let rhs=ar.rhs(PRIME31,x);
+        if let Some(y)=ar.sqrt(rhs,P){
             if y!=0{
                 let q=(x,y.min(P-y));
                 assert!(ar.on_curve(PRIME31,Some(q)));
