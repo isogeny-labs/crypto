@@ -2569,6 +2569,10 @@ struct WalkTally {
     steps: u64,
     look_ahead_adds: u64,
     escapes: u64,
+    /// Calls to the 64-bit mix that selects the walk partition.  Historical
+    /// tuned-rho identities leave this at zero; the counted identity enables
+    /// it through a const-generic walk so their hot loop is unchanged.
+    partition_hashes: u64,
     cycles_2: u64,
     cycles_4: u64,
     cycles_other: u64,
@@ -2629,6 +2633,7 @@ impl WalkTally {
         self.steps += o.steps;
         self.look_ahead_adds += o.look_ahead_adds;
         self.escapes += o.escapes;
+        self.partition_hashes += o.partition_hashes;
         self.cycles_2 += o.cycles_2;
         self.cycles_4 += o.cycles_4;
         self.cycles_other += o.cycles_other;
@@ -2808,6 +2813,33 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
         b: u64,
         budget: u64,
     ) -> WalkEnd<G::Elt> {
+        self.walk_with_partition_tally::<false>(ops, tally, start, a, b, budget)
+    }
+
+    /// [`TunedWalker::walk`] with every partition-mix call tallied.  This is
+    /// a distinct monomorphisation so frozen tuned-rho identities do not pay
+    /// an accounting branch in their per-step loop.
+    fn walk_partition_counted(
+        &mut self,
+        ops: &mut GroupOps,
+        tally: &mut WalkTally,
+        start: G::Elt,
+        a: u64,
+        b: u64,
+        budget: u64,
+    ) -> WalkEnd<G::Elt> {
+        self.walk_with_partition_tally::<true>(ops, tally, start, a, b, budget)
+    }
+
+    fn walk_with_partition_tally<const COUNT_PARTITION_HASHES: bool>(
+        &mut self,
+        ops: &mut GroupOps,
+        tally: &mut WalkTally,
+        start: G::Elt,
+        a: u64,
+        b: u64,
+        budget: u64,
+    ) -> WalkEnd<G::Elt> {
         let (g, r) = (self.g, self.r);
         let jump_count = self.jumps.len();
         let (mut x, mut a, mut b, _) = rho_canon(
@@ -2833,6 +2865,9 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
         // checkpoint all read them.
         let mut key = g.key(&x);
         let mut h = mix(key);
+        if COUNT_PARTITION_HASHES {
+            tally.partition_hashes += 1;
+        }
         let mut checkpoint = if self.brent { key } else { 0 };
         let mut since_min = (checkpoint, x, a, b);
         let (mut since, mut power) = (0u64, 1u64);
@@ -2863,6 +2898,9 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                 tried += 1;
                 let ky = g.key(&y);
                 let hy = mix(ky);
+                if COUNT_PARTITION_HASHES {
+                    tally.partition_hashes += 1;
+                }
                 // One branch on the whole test (`flipped` alone is a coin
                 // toss, so a branch on it is mispredicted half the time);
                 // every operand is pure, so evaluating them all changes
@@ -2932,6 +2970,9 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                     b = eb;
                     key = g.key(&x);
                     h = mix(key);
+                    if COUNT_PARTITION_HASHES {
+                        tally.partition_hashes += 1;
+                    }
                     self.forget_recent();
                     if g.is_identity(&x) {
                         tally.lose(ops0, LostHow::Identity);
@@ -2989,6 +3030,9 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                     b = eb;
                     key = g.key(&x);
                     h = mix(key);
+                    if COUNT_PARTITION_HASHES {
+                        tally.partition_hashes += 1;
+                    }
                     self.forget_recent();
                     if g.is_identity(&x) {
                         tally.lose(ops0, LostHow::Identity);
@@ -3051,6 +3095,12 @@ fn tuned_counters(
         ("canonicalisations_uncharged", tally.canonicalisations),
     ] {
         counters.insert(k.to_string(), v);
+    }
+    if tally.partition_hashes > 0 {
+        counters.insert(
+            "partition_hashes_uncharged".to_string(),
+            tally.partition_hashes,
+        );
     }
     counters
 }
@@ -3251,6 +3301,29 @@ fn rho_search_from<G: CountedGroup, C: RhoClasses<G>>(
     classes: &C,
     s: RhoSetup<G>,
 ) -> RhoResult {
+    rho_search_from_with_partition_tally::<G, C, false>(g, classes, s)
+}
+
+/// [`rho_search_from`] with the tuned walk's partition-mix calls exposed as
+/// `partition_hashes_uncharged`.  Kept as a separate monomorphisation so the
+/// historical identities retain their exact hot loop.
+fn rho_search_from_partition_counted<G: CountedGroup, C: RhoClasses<G>>(
+    g: &G,
+    classes: &C,
+    s: RhoSetup<G>,
+) -> RhoResult {
+    rho_search_from_with_partition_tally::<G, C, true>(g, classes, s)
+}
+
+fn rho_search_from_with_partition_tally<
+    G: CountedGroup,
+    C: RhoClasses<G>,
+    const COUNT_PARTITION_HASHES: bool,
+>(
+    g: &G,
+    classes: &C,
+    s: RhoSetup<G>,
+) -> RhoResult {
     let RhoSetup {
         generator,
         target,
@@ -3302,9 +3375,12 @@ fn rho_search_from<G: CountedGroup, C: RhoClasses<G>>(
             }
             (sx, sa, sb)
         };
-        let WalkEnd::Distinguished(x, a, b) =
+        let end = if COUNT_PARTITION_HASHES {
+            walker.walk_partition_counted(&mut ops, &mut tally, wx, wa, wb, max_steps)
+        } else {
             walker.walk(&mut ops, &mut tally, wx, wa, wb, max_steps)
-        else {
+        };
+        let WalkEnd::Distinguished(x, a, b) = end else {
             continue;
         };
         dps += 1;
@@ -3962,6 +4038,44 @@ pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
     max_steps: u64,
     v3: RhoV3,
 ) -> RhoResult {
+    rho_walk_v3_with_partition_tally::<G, C, false>(
+        g, classes, generator, target, r, seed, max_steps, v3,
+    )
+}
+
+/// [`rho_walk_v3`] with an exact uncharged counter for every partition-mix
+/// call.  The trajectory and all charged group operations are identical.
+#[allow(clippy::too_many_arguments)]
+pub fn rho_walk_v3_partition_counted<G: CountedGroup, C: RhoClasses<G>>(
+    g: &G,
+    classes: &C,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    seed: u64,
+    max_steps: u64,
+    v3: RhoV3,
+) -> RhoResult {
+    rho_walk_v3_with_partition_tally::<G, C, true>(
+        g, classes, generator, target, r, seed, max_steps, v3,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn rho_walk_v3_with_partition_tally<
+    G: CountedGroup,
+    C: RhoClasses<G>,
+    const COUNT_PARTITION_HASHES: bool,
+>(
+    g: &G,
+    classes: &C,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    seed: u64,
+    max_steps: u64,
+    v3: RhoV3,
+) -> RhoResult {
     let start = Instant::now();
     let mut ops = GroupOps::default();
     let mut rng = StdRng::seed_from_u64(seed);
@@ -4140,32 +4254,33 @@ pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
         }
     }
     let setup = ops;
-    rho_search_from(
-        g,
-        classes,
-        RhoSetup {
-            generator,
-            target,
-            r,
-            max_steps,
-            walk,
-            policy: WalkPolicy::v2(),
-            shape,
-            jumps,
-            stride,
-            ta,
-            tb,
-            setup,
-            ops,
-            start,
-            continue_walks: v3.continue_walks,
-            verify_ladder: if v3.ladder_verify {
-                ladder_g
-            } else {
-                Vec::new()
-            },
+    let setup = RhoSetup {
+        generator,
+        target,
+        r,
+        max_steps,
+        walk,
+        policy: WalkPolicy::v2(),
+        shape,
+        jumps,
+        stride,
+        ta,
+        tb,
+        setup,
+        ops,
+        start,
+        continue_walks: v3.continue_walks,
+        verify_ladder: if v3.ladder_verify {
+            ladder_g
+        } else {
+            Vec::new()
         },
-    )
+    };
+    if COUNT_PARTITION_HASHES {
+        rho_search_from_partition_counted(g, classes, setup)
+    } else {
+        rho_search_from(g, classes, setup)
+    }
 }
 
 /// The chained jump table of [`WalkPolicy::chained_setup`]: `M_0`, `M_1`
@@ -5094,6 +5209,30 @@ pub fn signed_frobenius_rho_v3(
     let classes = SignedFrobeniusClasses::new(inst)?;
     let g = BinaryGroup(&inst.fast);
     Some(rho_walk_v3(
+        &g,
+        &classes,
+        inst.generator,
+        target,
+        inst.r,
+        seed,
+        max_steps,
+        v3,
+    ))
+}
+
+/// [`signed_frobenius_rho_v3`] with the tuned walk's partition-mix calls
+/// exposed as `partition_hashes_uncharged`; the search trajectory and charged
+/// group-operation ledger are otherwise identical.
+pub fn signed_frobenius_rho_v3_partition_counted(
+    inst: &BinaryInstance,
+    target: FastPoint,
+    seed: u64,
+    max_steps: u64,
+    v3: RhoV3,
+) -> Option<RhoResult> {
+    let classes = SignedFrobeniusClasses::new(inst)?;
+    let g = BinaryGroup(&inst.fast);
+    Some(rho_walk_v3_partition_counted(
         &g,
         &classes,
         inst.generator,

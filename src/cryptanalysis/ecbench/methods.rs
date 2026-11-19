@@ -70,9 +70,10 @@ use crate::cryptanalysis::group_op_count::OpCounts;
 use crate::cryptanalysis::ic_boundary::{
     ic_residual_batch_with, native_is_pinned, price_phase, rho_batch_with, rho_cap, rho_reference,
     rho_walk_lanes, rho_walk_v3, rho_walk_with, rho_walk_with_policy, signed_frobenius_rho_tuned,
-    signed_frobenius_rho_tuned_policy, signed_frobenius_rho_v3, BinaryGroup, BinaryInstance,
-    Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost,
-    PointClasses, PreprocessingRho, PrimeInstance, PrimePoint, PrimeRepresentation, QuarticClasses,
+    signed_frobenius_rho_tuned_policy, signed_frobenius_rho_v3,
+    signed_frobenius_rho_v3_partition_counted, BinaryGroup, BinaryInstance, Calibration,
+    CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost, PointClasses,
+    PreprocessingRho, PrimeInstance, PrimePoint, PrimeRepresentation, QuarticClasses,
     RhoBatchResult, RhoResult, RhoV3, RhoWalk, WalkPolicy,
 };
 use crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase;
@@ -1497,6 +1498,14 @@ pub fn registry() -> &'static [MethodDecl] {
             params: RHO_PARAMS,
         },
         MethodDecl {
+            id: "rho.signed_frobenius_v6",
+            family: "rho",
+            summary: "rho.signed_frobenius_v5 with every partition-mix call tallied as uncharged native work; the trajectory and charged group operations are identical; Koblitz curves only",
+            entry: "ic_boundary::signed_frobenius_rho_v3_partition_counted(RhoV3::v6(true))",
+            applies: Applies::KoblitzOnly,
+            params: RHO_PARAMS,
+        },
+        MethodDecl {
             id: "rho.negation_v5",
             family: "rho",
             summary: "rho.negation_v4 with two-rung jumps (one addition a jump, k ≈ √(√(πr/4)) jumps) (RhoV3::v5)",
@@ -1772,6 +1781,7 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
         | "rho.signed_frobenius_v3"
         | "rho.signed_frobenius_v4"
         | "rho.signed_frobenius_v5"
+        | "rho.signed_frobenius_v6"
         | "rho.signed_frobenius_full"
         | "rho.signed_frobenius_v2_full"
         | "rho.signed_frobenius_strong"
@@ -4444,6 +4454,25 @@ fn solve_inner(
             solve_strong(m, i, FastPoint::affine(tx, ty), seed)
         }
         (Instance::Binary(i), "claw") => solve_claw(m, i, FastPoint::affine(tx, ty), seed),
+        (Instance::Binary(i), _) if m.id == "rho.signed_frobenius_v6" => {
+            let t = Instant::now();
+            measurement::begin_online(Phase::RhoSolve);
+            let res = signed_frobenius_rho_v3_partition_counted(
+                i,
+                FastPoint::affine(tx, ty),
+                seed,
+                rho_cap(i.r, param_u64(m, "cap_multiple")? as f64),
+                RhoV3::v6(true),
+            )
+            .ok_or("not a Koblitz instance")?;
+            measurement::end_online();
+            Ok(rho_report_v2(
+                res,
+                t.elapsed().as_nanos() as u64,
+                None,
+                GroupOps::default(),
+            ))
+        }
         (Instance::Binary(i), _) if m.id == "rho.signed_frobenius_v5" => {
             let t = Instant::now();
             measurement::begin_online(Phase::RhoSolve);
@@ -10709,6 +10738,7 @@ mod accounting_rules_tests {
             ("rho.negation_v6", &[], true),
             ("rho.plain_v6", &[], true),
             ("rho.signed_frobenius_v5", &[], false),
+            ("rho.signed_frobenius_v6", &[], false),
             ("rho.signed_frobenius_v2", &[], false),
             ("rho.signed_frobenius_v3", &[], false),
             ("rho.signed_frobenius_strong_v2", &[], false),
@@ -10754,6 +10784,39 @@ mod accounting_rules_tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn signed_frobenius_v6_only_adds_exact_partition_accounting() {
+        let (inst, facts) = built(&CurveSpec::Koblitz { a: 0, n: 19 });
+        let old = run(
+            &method("rho.signed_frobenius_v5", &[]),
+            &inst,
+            &facts,
+            100_003,
+            71,
+        );
+        let counted = run(
+            &method("rho.signed_frobenius_v6", &[]),
+            &inst,
+            &facts,
+            100_003,
+            71,
+        );
+
+        assert_eq!(counted.recovered, old.recovered);
+        assert_eq!(counted.exhausted, old.exhausted);
+        assert_eq!(counted.total_gae, old.total_gae);
+        assert_eq!(counted.phases, old.phases);
+        assert!(!old.counters.contains_key("partition_hashes_uncharged"));
+        let hashes = counted.counters["partition_hashes_uncharged"];
+        assert!(hashes >= counted.counters["walk_operations"]);
+        assert!(counted
+            .unpriced
+            .contains(&"partition_hashes_uncharged".to_string()));
+        let mut counted_counters = counted.counters.clone();
+        counted_counters.remove("partition_hashes_uncharged");
+        assert_eq!(counted_counters, old.counters);
     }
 
     /// The verification a BSGS, kangaroo or claw run pays is the one

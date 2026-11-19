@@ -410,6 +410,7 @@ const CASES: &[(&str, Fx, P)] = &[
     ("rho.signed_frobenius_v3", Fx::K0n19, &[]),
     ("rho.signed_frobenius_v4", Fx::K0n19, &[]),
     ("rho.signed_frobenius_v5", Fx::K0n19, &[]),
+    ("rho.signed_frobenius_v6", Fx::K0n19, &[]),
     ("rho.signed_frobenius_strong", Fx::K0n19, &[]),
     ("rho.signed_frobenius_strong_legacy", Fx::K0n19, &[]),
     ("rho.signed_frobenius_strong_escape", Fx::K0n19, &[]),
