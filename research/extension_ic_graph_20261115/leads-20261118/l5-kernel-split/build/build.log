@@ -1,0 +1,54 @@
+absent cryptanalysis/f4_fp/certified.rs
+patching file /tmp/claude-0/-home-user/53beab17-35e6-5dd9-bf91-c8753a71ee81/scratchpad/l5/mini3/src/cryptanalysis/zero_dim_la.rs
+assembled /tmp/claude-0/-home-user/53beab17-35e6-5dd9-bf91-c8753a71ee81/scratchpad/l5/mini3
+     Locking 32 packages to latest compatible versions
+      Adding num-bigint v0.4.8 (available: v0.5.1)
+    Blocking waiting for file lock on build directory
+   Compiling crypto_lib v0.0.0 (/tmp/claude-0/-home-user/53beab17-35e6-5dd9-bf91-c8753a71ee81/scratchpad/l5/mini3)
+    Finished `release` profile [optimized] target(s) in 47.03s
+     Running unittests src/lib.rs (/home/user/cargo-target-round2/release/deps/crypto_lib-d2c72c6937887c99)
+
+running 10 tests
+test cryptanalysis::zero_dim_la::tests::counted_bm_hand_control ... ok
+test cryptanalysis::zero_dim_la::tests::berlekamp_massey_finds_fibonacci_mod_p ... ok
+test cryptanalysis::zero_dim_la::tests::counted_kernels_charge_their_lengths ... ok
+test cryptanalysis::zero_dim_la::tests::dot4_matches_four_dots ... ok
+test cryptanalysis::zero_dim_la::tests::counted_products_reconcile_with_the_legacy_formula ... ok
+test cryptanalysis::zero_dim_la::tests::karatsuba_and_barrett_match_the_schoolbook ... ok
+test cryptanalysis::zero_dim_la::tests::barrett_reduction_matches_the_remainder ... ok
+test cryptanalysis::zero_dim_la::tests::kernel_throughput ... ignored
+test cryptanalysis::zero_dim_la::tests::roots_in_fp_finds_planted_roots_for_small_and_large_p ... ok
+test cryptanalysis::zero_dim_la::tests::allocation_free_powering_matches_the_reference ... ok
+
+test result: ok. 9 passed; 0 failed; 1 ignored; 0 measured; 93 filtered out; finished in 0.12s
+
+    Blocking waiting for file lock on build directory
+   Compiling crypto_lib v0.0.0 (/tmp/claude-0/-home-user/53beab17-35e6-5dd9-bf91-c8753a71ee81/scratchpad/l5/mini3)
+    Finished `release` profile [optimized] target(s) in 39.64s
+     Running /home/user/crypto/research/extension_ic_graph_20261115/leads-20261118/l5-kernel-split/kernel-split/conservation_test.rs (/home/user/cargo-target-round2/release/deps/conservation-f75e8bf822b8b9b8)
+
+running 1 test
+systems 108, with roots 107, gave up 1, totals LinOps { mul: 74506, add: 83414, mac: 276584, word: 28460, probe: 7650, rng: 1128, mul_outside_legacy: 39577, legacy_overcount: 216, ring_muls: 53125 }
+test counted_linear_stage_conserves_against_the_frozen_stage ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+    Blocking waiting for file lock on build directory
+    Finished `release` profile [optimized] target(s) in 7.16s
+f4c15d1d79fe4752c32c9b46bb4fdecaebad7d41ffcaed1832dec3dc06fb28f0  src/cryptanalysis/bitops.rs
+bcb86ec1a91caa1473070320638670398504109073d1e3cc1870b3529397dcc2  src/cryptanalysis/f4_fp.rs
+9f780a50fba15900ffda9b9d43539cf3c8ba8369c63a3a5d6ae8b102a6d9a1b3  src/cryptanalysis/fx_hash.rs
+0d00d5f1a7d20840bf0a75683115f4f6e66ae06937e76519b214f3512d7efe67  src/cryptanalysis/gaudry_cubic.rs
+4f00d5e0c5fa15fed085c8cd6013d4839484ec04f3db6cd2f23a6f6d4e9cde30  src/cryptanalysis/glv_invariant_base.rs
+b74e5ccdf559bc1b52396d137b76f886637792918fc20220fe60f78ef2174600  src/cryptanalysis/groebner_f4.rs
+4f907d9df5e9ae9bd5dcba68299eb03287abbc5e1d00f722e1e40eac2b09fe0e  src/cryptanalysis/ic_measurement.rs
+03b8215cd9f6bfed125a7d32e5b2ab765a2315c49097546b65d1da9f133a41f7  src/cryptanalysis/jv_bitops.rs
+3f15f1145e24378dd90f19d5aef5cd08db3a0ddfb4ee526dccba02d4c6eb22bc  src/cryptanalysis/jv_bitops_uniform.rs
+efc554a4a7f7d8e84d06bf3860c7ef99a294721103a041b4a4dd314c30a60f17  src/cryptanalysis/jv_cover.rs
+b34a6e282c8c15d0bc13b376050c2b913d725ca74105f78d3cfc6d3b680487fc  src/cryptanalysis/mod.rs
+c9ded1f4372f54a4011757e625fd8490fe5e0d54734aa748d3a5234cc539346b  src/cryptanalysis/residual_walk.rs
+25a2a816b6e4d69ad99e26e986edbb722c55865e5c7ef8e1879c715bb238620c  src/cryptanalysis/zero_dim_la.rs
+5ae85b3458c92dd4350604830966b1a83b240e2340f584e976ae2516ac4a841d  src/cryptanalysis/zero_dim_la_orig.rs
+5a390ebeda4edc66ea483a8212d9b85301b78b121f5134aefa2bb1383394a785  Cargo.toml
+3d1cb73380f8e43d9b67d90a90cf996a22f2c380d32f74a83bba78d0c50de13f  Cargo.lock
+0c615e4c63598e428bfa701d55498d96125b79800654b98fce4f2e74b049c3cc  /home/user/cargo-target-round2/release/kernel_split_recount
