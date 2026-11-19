@@ -1,5 +1,11 @@
 # H4 RESULTS: FPPR prime-degree descent to F_2, m=3 (claim C4)
 
+**Interpretation update (2026-11-19):**
+[COST_INTERPRETATION_AMENDMENT_20261119.md](COST_INTERPRETATION_AMENDMENT_20261119.md)
+supersedes the cost-bound language below. The `2^87.4` figure sizes one
+dense Macaulay scenario; it is not a lower bound on all solvers. The
+original measurements and wording remain below for audit.
+
 Run: isolab job `exotic-h4-prime-descent-r3` (attempts r1, r2 were earlier versions of `run.py`; r2 had a worker NameError that did not affect d_ff; r3 is the reported run). Program: `run.py`. Data: `out/result.json`. Seed 20261022. Total wall 3520 s.
 
 Deviation from pre-registration: pod was **4 CPU / 8Gi**, not 16/32Gi (16 and 8 CPU pods did not schedule on Spot: DeadlineExceeded with no pod). Timing is therefore not a claim.

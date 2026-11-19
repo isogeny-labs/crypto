@@ -1,5 +1,13 @@
 # Results: six falsifiers on prime-field ECDLP hardness
 
+**H4 cost interpretation update (2026-11-19):** The former `2^87.4`
+“lower bound” and “Win excluded” language in the H4 row and discussion
+below is superseded by the
+[H4 cost amendment](H4_prime_descent/COST_INTERPRETATION_AMENDMENT_20261119.md).
+That number sizes a conditional dense Macaulay operation, while the
+recorded solving-degree trend remains censored from `n=13` onward. The
+original summary is retained below as the initial decision record.
+
 Running tally, updated as runs land. Compute: isolab (EKS/Karpenter Spot, account 104186811093,
 us-east-2), SageMath 10.10 image `isolab/tasks@sha256:9ba9edac…`. Each verdict is scored against
 the pre-registered Win/Kill in the matching `H*/PROTOCOL.md` and `PROOFS.md`. A Win would trigger

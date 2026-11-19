@@ -1,0 +1,17 @@
+{
+  "schema": "h4-n13-macaulay-followup-v1",
+  "question": "Does raising the frozen n=13 Boolean Macaulay row cap resolve one planted and one ordinary-query solving-degree profile?",
+  "source": "research/exotic_ecdlp_20261021/H4_prime_descent/run.py",
+  "source_sha256": "46fb1a8a311f36907427ac35b40066d88cc0948c7f8b522fbc87c8338682e11a",
+  "instance": {"field_degree": 13, "instance_index": 5, "seed_formula": "20261022*1000+13*10+5", "arms": ["planted", "random"], "subspace_dimension": 5, "summands": 3},
+  "method": "reuse frozen builder, exhaustive V^3 solution enumeration, and Boolean Macaulay profile with projected M4RI ranks; raise row cap from 9000 to 30000",
+  "stage_order": ["planted", "random"],
+  "per_arm_deadline_seconds": 180,
+  "process_deadline_seconds": 480,
+  "address_space_soft_limit_bytes": 12884901888,
+  "host": "local macOS, one Sage process, ordinary host; algorithmic diagnostic tier",
+  "statistics": ["solution_count", "planted_residual", "planted_in_solution_set", "degree_profiles", "d_ff", "d_solv", "last_degree_completed", "rowcap_or_timeout_status", "wall_seconds", "peak_rss_bytes"],
+  "checks": "exact exhaustive solution count for each arm; planted solution in enumerated set and zero equation residual; preserve incomplete and censored arms",
+  "claim_boundary": "stage-level diagnostic on two deterministic n=13 inputs; projected ranks are probabilistic; no measured n=131 cost, no full relation pipeline or single-target comparison",
+  "status": "frozen before execution"
+}
