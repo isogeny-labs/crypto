@@ -2117,7 +2117,7 @@ mod tests {
         }
         assert_eq!(value as u64, 172_252_358);
         assert_eq!(value.pow(4) % p as u128, p as u128 - 1);
-        assert_eq!(value.pow(8) % p as u128, 1);
+        assert_eq!((value.pow(4) % p as u128).pow(2) % p as u128, 1);
 
         let mut comparisons = 0;
         for (r0, r1) in [
