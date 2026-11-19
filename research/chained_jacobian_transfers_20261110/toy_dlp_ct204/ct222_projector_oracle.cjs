@@ -33,6 +33,7 @@ function cantor([a,b],[c,d]){
 }
 function inverseD([u,v]){return [u,rem(negp(v),u)]}
 function scalarD(d,n){let out=id,acc=d;while(n>0){if(n%2)out=cantor(out,acc);n=Math.floor(n/2);if(n)acc=cantor(acc,acc)}return out}
+function evalpoly(a,x){let v=0;for(let i=a.length-1;i>=0;i--)v=mod(v*x+a[i]);return v}
 function pointD([x,y]){let v=[mod(-x),1],w=[y];if(!valid([v,w]))throw Error('bad rational C point');return [v,w]}
 function ecadd(a,b){counts.elliptic++;if(a===null)return b;if(b===null)return a;
  const [x1,y1]=a,[x2,y2]=b;if(x1===x2&&mod(y1+y2)===0)return null;
@@ -52,11 +53,13 @@ function run(){
  check(pts.length===54,'wrong point roster '+pts.length);
  const samples=[[],...[1,2,3,4].flatMap(n=>Array.from({length:6},(_,k)=>Array.from({length:n},(_,j)=>pts[(k*7+j*11)%pts.length]))),
    [pts[0],pts[1],pts[2],pts[3],pts[4]], [pts[1],pts[10],pts[20],pts[30],pts[40],pts[50]]];
- const stats={tested:samples.length,norm_support_elliptic:0,nonzero_complements:0,full_order_checks:0,wrong_projector_rejections:0,projector_scalar_cantor:0,norm_projector_cantor:0,norm_projector_elliptic:0,norm_projector_pullbacks:0};
+ const stats={tested:samples.length,norm_support_elliptic:0,nonsplit_squarefree_classes:0,nonzero_complements:0,full_order_checks:0,wrong_projector_rejections:0,projector_scalar_cantor:0,norm_projector_cantor:0,norm_projector_elliptic:0,norm_projector_pullbacks:0};
  check(eq(egcd(f,f.map((x,i)=>i*x).slice(1))[0],one),'curve not squarefree');
  check((e%r)===1&&(e%h)===0&&((e*e-e)%order)===0,'CRT fail');
  for(let i=0;i<samples.length;i++){
    let support=samples[i],D=sumD(support);
+   const u=D[0],linearRoots=Array.from({length:p},(_,z)=>z).filter(z=>evalpoly(u,z)===0).length;
+   if(u.length>2&&linearRoots<u.length-1&&eq(egcd(u,u.map((x,i)=>i*x).slice(1))[0],one))stats.nonsplit_squarefree_classes++;
    let beforeNorm={...counts},normE=sumE(support);stats.norm_support_elliptic+=counts.elliptic-beforeNorm.elliptic;
    let before={...counts};let ed=scalarD(D,e);stats.projector_scalar_cantor+=counts.cantor-before.cantor;
    before={...counts};let en=alpha(ecmul(normE,73));
@@ -76,6 +79,7 @@ function run(){
    stats.full_order_checks++;
  }
  check(stats.nonzero_complements>0,'no kernel element tested');
+ check(stats.nonsplit_squarefree_classes===2,'unexpected nonsplit reduced-divisor coverage');
  check(stats.wrong_projector_rejections===samples.length,'mutation control failed');
  check(eq(scalarD(alpha(gE),r),id),'source 109-order failed');
  check(eq(alpha(ecmul(gE,3)),scalarD(alpha(gE),3)),'linearity failed');
