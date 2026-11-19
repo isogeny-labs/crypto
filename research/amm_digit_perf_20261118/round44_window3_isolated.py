@@ -7,14 +7,14 @@ import tempfile
 
 source = Path("src/cryptanalysis/prime_root_bounded.rs").read_text().split("\n#[cfg(test)]\n", 1)[0]
 before = source
-for name in ["PRODUCER_WINDOW_HELPER", "PRODUCER_WINDOW_SWITCH", "REPLAY_WINDOW_HELPER", "REPLAY_WINDOW_SWITCH"]:
+for name in ["PRODUCER_WINDOW_HELPER", "PRODUCER_WINDOW_SWITCH"]:
     marker = rf"(?m)^    [ ]*// R44_{name}_BEGIN\n.*?^    [ ]*// R44_{name}_END\n"
     before, count = re.subn(marker, "", before, count=1, flags=re.S | re.M)
     if count != 1:
         raise AssertionError(f"missing or duplicate round44 marker: {name}")
 assert "R44_" not in before
 assert "fn window3_power" in source
-assert "fn replay_window2" in source
+assert "fn modular_power" in source
 
 header = """#![allow(dead_code)]
 mod cryptanalysis {
