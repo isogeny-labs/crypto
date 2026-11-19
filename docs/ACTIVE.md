@@ -14,7 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
-- [ ] Isogeny P0: make sqrt-Velu actually sub-linear in the curve paths (wire the BDFLS resultant engine, degree-driven velu/sqrt-velu dispatcher, route chains through it), with correctness tests and a measured crossover; plan in isogeny-labs/workspace docs/isogeny-speedup-assessment.md (claude, started 2026-11-19, branch claude/isogeny-sqrt-velu-p0, PR #4784)
+- [x] Isogeny P0 closed without code: sqrt-Velu is already 1.6-5.6x faster than Velu from l~150-400 (isogeny_algos/docs/large-ell-20261016), chain callers use l=2,3 and sqrt-Velu in CSIDH-512 was a measured null, so a dispatcher has no consumer; trees lose even with the IFMA NTT; verdicts for all isogeny leads in isogeny-labs/workspace docs/isogeny-speedup-assessment.md (claude, 2026-11-19, branch claude/isogeny-sqrt-velu-p0, PR #4784)
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
 - [x] Prove a division-free exact subexponential decomposition oracle for the hashed prime-field networks, including fixed witness bits (Codex, completed 2026-11-18, branch codex/ecdlp-novel-oracle-20261118, PR #4668)
