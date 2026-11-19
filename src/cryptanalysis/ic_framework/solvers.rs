@@ -100,8 +100,9 @@ use crate::cryptanalysis::m4gb_oracle::{
     run_m4gb, run_m4gb_persistent, select_binary, M4gbError, M4gbOptions, M4gbRun,
 };
 use crate::cryptanalysis::pq_f4_f2::{
-    groebner_basis_f4, groebner_basis_f4_skeleton, solutions_from_reduced_basis, F4Skeleton,
-    SKELETON_DEFAULT_CAP_BYTES,
+    groebner_basis_f4, groebner_basis_f4_skeleton, groebner_basis_f4_traced,
+    solutions_from_reduced_basis, F4PairTrace, F4Skeleton, SKELETON_DEFAULT_CAP_BYTES,
+    TRACE_DEFAULT_CAP_BYTES,
 };
 use crate::cryptanalysis::pq_groebner_f2::{
     bit, groebner_basis_f2_within, mask_from64, solve_system_f2_counted, F2BoolPoly, Mask,
@@ -198,9 +199,18 @@ fn verified(points: Vec<Mask>, system: &BooleanSystem, tests: &mut u64) -> Vec<M
 /// matched a stored column map once in 11 replayed steps, a small net
 /// loss in `bitop/v1`, so the default stays the plain path (`skeleton=0`).
 /// `skeleton_mb` (default 256) caps the stored bytes.
+///
+/// Also holds an [`F4PairTrace`] (opt-in, `trace=1`): Traverso's Gröbner
+/// trace — the useful pairs of the first system of each shape, replayed on
+/// the later ones, verified by one charged F4 pass over the replayed
+/// basis's pairs and the inputs, with a fall-back to the plain path (see
+/// the test `f4_f2_trace_matches_plain_on_descent_systems` for what it
+/// measured).  `trace_mb` (default 64) caps the stored bytes.  The two
+/// options are exclusive.
 #[derive(Default)]
 pub struct F4F2 {
     skeleton: std::sync::Mutex<Option<F4Skeleton>>,
+    trace: std::sync::Mutex<Option<F4PairTrace>>,
 }
 
 impl SystemSolver for F4F2 {
@@ -223,6 +233,14 @@ impl SystemSolver for F4F2 {
                 "skeleton_mb",
                 "byte cap of the stored skeleton in MiB (default 256); past it new steps are not stored",
             ),
+            (
+                "trace",
+                "0 (default): the plain path; 1: Gröbner trace — replay the useful pairs recorded on the first system of each shape (unknowns, degree, monomial support), verify with one charged F4 pass, fall back to the plain path on failure (identical bases)",
+            ),
+            (
+                "trace_mb",
+                "byte cap of the stored traces in MiB (default 64); past it new shapes are not stored",
+            ),
         ]
     }
 
@@ -243,15 +261,29 @@ impl SystemSolver for F4F2 {
             .u64_or("skeleton_mb", SKELETON_DEFAULT_CAP_BYTES >> 20)
             .unwrap_or(SKELETON_DEFAULT_CAP_BYTES >> 20)
             .saturating_mul(1 << 20);
-        // A solve that finds the skeleton in use by another thread runs the
-        // plain path: same basis, its own (plain) count.
+        let use_trace = params.u64_or("trace", 0).unwrap_or(0) != 0;
+        let trace_cap = params
+            .u64_or("trace_mb", TRACE_DEFAULT_CAP_BYTES >> 20)
+            .unwrap_or(TRACE_DEFAULT_CAP_BYTES >> 20)
+            .saturating_mul(1 << 20);
+        // A solve that finds the skeleton (or the trace) in use by another
+        // thread runs the plain path: same basis, its own (plain) count.
         let mut guard = if use_skeleton {
             self.skeleton.try_lock().ok()
         } else {
             None
         };
-        let (gb, st) = match guard.as_deref_mut() {
-            Some(slot) => {
+        let mut trace_guard = if use_trace && !use_skeleton {
+            self.trace.try_lock().ok()
+        } else {
+            None
+        };
+        let (gb, st) = match (guard.as_deref_mut(), trace_guard.as_deref_mut()) {
+            (None, Some(slot)) => {
+                let store = slot.get_or_insert_with(|| F4PairTrace::with_cap(trace_cap));
+                groebner_basis_f4_traced(system.equations.clone(), system.n_vars, budget, store)
+            }
+            (Some(slot), _) => {
                 let skeleton = slot.get_or_insert_with(|| F4Skeleton::with_cap(cap_bytes));
                 groebner_basis_f4_skeleton(
                     system.equations.clone(),
@@ -260,9 +292,10 @@ impl SystemSolver for F4F2 {
                     skeleton,
                 )
             }
-            None => groebner_basis_f4(system.equations.clone(), system.n_vars, budget),
+            (None, None) => groebner_basis_f4(system.equations.clone(), system.n_vars, budget),
         };
         drop(guard);
+        drop(trace_guard);
         let mut tests = 0u64;
         let mut extra = BTreeMap::new();
         for (k, v) in [
@@ -320,6 +353,19 @@ impl SystemSolver for F4F2 {
             ("skeleton_columns_rebuilt", st.skeleton_columns_rebuilt),
             ("skeleton_store_refused", st.skeleton_store_refused),
             ("skeleton_bytes", st.skeleton_bytes),
+            ("trace_records", st.trace_records),
+            ("trace_replays", st.trace_replays),
+            ("trace_hits", st.trace_hits),
+            ("trace_fallbacks", st.trace_fallbacks),
+            ("trace_mismatches", st.trace_mismatches),
+            ("trace_verifications", st.trace_verifications),
+            ("trace_verify_failures", st.trace_verify_failures),
+            ("trace_verify_word_xors", st.trace_verify_word_xors),
+            ("trace_verify_divisor_tests", st.trace_verify_divisor_tests),
+            ("trace_verify_pairs", st.trace_verify_pairs),
+            ("trace_record_xors", st.trace_record_xors),
+            ("trace_pairs_dropped", st.trace_pairs_dropped),
+            ("trace_bytes", st.trace_bytes),
         ] {
             extra.insert(k.to_string(), v);
         }
@@ -365,7 +411,8 @@ impl SystemSolver for F4F2 {
                 .peak_matrix_bytes
                 .saturating_add(st.peak_table_bytes)
                 .saturating_add(st.pair_dense_scratch_bytes_max)
-                .saturating_add(st.skeleton_bytes),
+                .saturating_add(st.skeleton_bytes)
+                .saturating_add(st.trace_bytes),
             degree_reached: Some(st.degree_reached),
             solving_degree: Some(st.solving_degree),
             timed_out: st.timed_out,
@@ -1745,6 +1792,14 @@ pub fn validate_solver_params(name: &str, params: &Params) -> Result<(), String>
                 return Err("skeleton must be 0 or 1".into());
             }
             params.u64_or("skeleton_mb", SKELETON_DEFAULT_CAP_BYTES >> 20)?;
+            let trace = params.u64_or("trace", 0)?;
+            if trace > 1 {
+                return Err("trace must be 0 or 1".into());
+            }
+            if trace == 1 && params.u64_or("skeleton", 0)? == 1 {
+                return Err("skeleton and trace are exclusive".into());
+            }
+            params.u64_or("trace_mb", TRACE_DEFAULT_CAP_BYTES >> 20)?;
         }
         "sat-cdcl" => {
             sat_xor_encoding(params)?;
