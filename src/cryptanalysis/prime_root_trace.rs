@@ -586,8 +586,9 @@ fn vmonomial_product(m: &[u64], other: &[u64]) -> Option<Vec<u64>> {
     {
         return None;
     }
-    let mut result = vec![0; m.len() - 1];
-    result.extend_from_slice(other);
+    let shift = m.len() - 1;
+    let mut result = vec![0; shift + other.len()];
+    result[shift..].copy_from_slice(other);
     Some(trim(result))
 }
 fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
