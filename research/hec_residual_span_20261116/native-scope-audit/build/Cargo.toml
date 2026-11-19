@@ -1,0 +1,10 @@
+[package]
+name="hec-native-scope-audit"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../holdout/native"}
+[[bin]]
+name="native-scope-audit"
+path="../main.rs"

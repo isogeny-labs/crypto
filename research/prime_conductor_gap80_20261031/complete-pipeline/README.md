@@ -1,5 +1,10 @@
 # Complete native wiring and paired recovery controls
 
+For the later balanced baby-product implementation, guarded supplied-case CLI
+and additional development controls, see the
+[18 November continuation](../evaluator-20261118/README.md). The frozen receipts
+in this directory are unchanged.
+
 The native runner now wires four stages together: canonical coverage tracking,
 codomain moment assembly, complete point evaluation, and known-answer ECDLP
 recovery on both endpoints. Complete ordinary-curve fixtures pass independent

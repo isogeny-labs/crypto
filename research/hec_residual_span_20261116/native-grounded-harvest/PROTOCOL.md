@@ -1,0 +1,19 @@
+# Generic grounded-point feedback harvesting
+
+[pcc:unverified]. Classical relation harvesting/affine-label substitution, adapting earlier promotion-interpolation/RESULTS.md (5eligibleonecoregenus2branches, component-onlygate) to genericmixedterm curves/allg2/3/4/currentforest. No novelty claim. Priorcomponentresult isnot evidence ofcurrentcompletecostgain.
+
+## Algebra and prospective cost case
+
+A forestvertex reaching ground has an exact affine expression in the ORIGINALsmallFBlogs,targetk,constant. It doesnot acquire a knownnumericlog orbecomean independentnewsmallvariable. At eachanchor boundary buildscanindices: alloriginalm plus EVERYcatalogueLPvertexwhoseparentchainreachesthesentinel, ascendingcatalogueorder. Parenttopologywalk makes noFp assumptions orhiddenlogs. Membershipmonotone; nodesgroundedwhileprocessingananchor enter NEXTanchor only. Bucketconstruction/degreeg-1knownrootthreshold/quadratictail stayexact.
+
+Newknownroots mayberawLPcolumns butarealreadygrounded. Substitute ALLrawLPcolumns withsameweightedforest. Afterrootaggregation atmostTWOungroundedrootvariablesremain, fromquadraticresidual; assertthis invariant AFTERgroundsubstitution, notbyrejectingrawsupport>2. Atmostg+1rawrootcolumns isnotathree-LPextensionwiththreeunresolvedvariables. Originalprincipalrow/targetcoefficient/RHSunchanged. Sharedimageknownordinates andknownnonzeroanchorchecks applytoexpandedscan too. Allpromotionlookup/discovery/scans/substitutioncosts executeinsidecompletecall.
+
+Heuristic only: withaactivepoints, uniformslopeswouldyieldroughly a^(g-1)/p^(g-2) eligiblecollisions forlinearscanO(a), up toconstants/signs/earlystop. Thereforeincreasinga couldimprovequeriesperscan forg>=3;g2hasnosuchpoweradvantage. Actualslope/rankdependence isnotuniformorproved. ExistingaffinelabelsdoNOTguarantee newrelations areindependent. Completefieldcost/recovery result isfalsifier, notpromotedpointcount orrawyield. Dynamicstrategyfixedbeforeexecution: allgroundedpoints, no caps/handpickedtrigger/fallback/modelsubstitutionafteroutcomes.
+
+## Fixed gate and controls
+
+Same11initialmixedterm curves/all22samepublicfixtures/source1/17/seededtargets/512anchors. Counterdisabled syntheticweightedcycle/unarycontrol nowalsorequires scanbasissizes[2,2,5,6,6,6], provingnogroundpromotionbeforecycleclosureandall3componentverticesaftergrounding. Positiveaudit=trueeachfixture: everyqueriednorm/split/roottruth/unknownimage/principalnativeidentity checked; first128anddeterminingrawprefixes comparedtonativeFastonALLrawcolumns/targetlast. Then44freshcountcalls(2each)mustreplaynewauditReportexceptdense_audits0,repeatedFULL16vectors/lookups exact/nativeanswerverification. Reportmax_scan_basis/promoted_scans exposesnewmechanism; originalsmallunknowncount unchanged. Everyfixturemustrecoverorretainfailure; no512budgetextension.
+
+Reuse16availableoffsubgroupnegativecontrols/6unavailable, withfullauditsandfinalNone, zero/compositeall22/wrongsource16. Sourceeligibility/uniqueellcomponent/finalnativeequalityunchanged. ComparestrongstaticforestcurrentcontrolALLcases/bothfields. Allfreshprep/validation/failedsplits/newbasisdiscovery/extra scans/rows/forest/finalsolve/verificationcharged. Integer topology/maps/allocations unpricedbyfieldcounts; noelapsedtimeor10xclaimfromREDC. Existingrootcap65537remains.
+
+One600CPUprocess aftersource/import/native/protocol/controlraw/binaryhashGitfreeze/push; retainfailure/partialwithoutunchangedrerun orpostoutcometuning. Fullgenus2+10xobjectiveactive/independentreviewopen. GitcustodywhileS3down; no S3/cloud/merge/auto-merge.

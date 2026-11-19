@@ -1,0 +1,69 @@
+name: Prime31 Dickson31 batched affine complement control (Rust 1.100)
+on:
+  push:
+    branches: [automation/prime31-dickson31-batched-complement-20261117]
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs'
+      - 'research/prime31_ic_20261115/native/DICKSON31_BATCH_COMPLEMENTS_PROTOCOL_20261117.md'
+      - '.github/workflows/prime31-dickson31-batch-complements.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs'
+      - 'research/prime31_ic_20261115/native/DICKSON31_BATCH_COMPLEMENTS_PROTOCOL_20261117.md'
+      - '.github/workflows/prime31-dickson31-batch-complements.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  matched-batch-control:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout proposed exact Rust example
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs
+          sparse-checkout-cone-mode: false
+      - name: Checkout immutable original Rust arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: prime31-native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only proposed Rust example
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+      - name: Run native Rust library regression tests
+        run: cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Run matched exact 109-probe public-target batch control
+        shell: bash
+        run: |
+          set -o pipefail
+          timeout -k 10 600 cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle actual_dickson31_matched_batched_complements -- --nocapture 2>&1 | tee prime31-dickson31-batched-complements.log
+      - name: Check raw evidence gate
+        shell: bash
+        if: success()
+        run: |
+          grep -Fq 'test result: ok. 1 passed;' prime31-dickson31-batched-complements.log
+          grep -Fq 'DICKSON31_BATCH_COMPLEMENTS_JSON=' prime31-dickson31-batched-complements.log
+          grep -Fq '"complete_unknown_ecdlp_logs":0' prime31-dickson31-batched-complements.log
+          grep -Fq '"positive_witnesses":98' prime31-dickson31-batched-complements.log
+      - name: Archive raw GitHub Actions test log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-dickson31-batched-complements-raw
+          path: prime31-dickson31-batched-complements.log
+          if-no-files-found: warn
+          retention-days: 30

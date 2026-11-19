@@ -485,6 +485,10 @@ impl<'i> PkmTowerOracle<'i> {
         extra.insert("steps".into(), rep.steps as u64);
         extra.insert("max_cols".into(), rep.max_cols as u64);
         let cost = SolverCost {
+            first_fall_degree: None,
+            last_fall_degree: None,
+            degree_of_regularity_observed: None,
+            degree_trace: Vec::new(),
             ops: rep.muladds,
             op_unit: MULADD_UNIT.into(),
             wall_ns,

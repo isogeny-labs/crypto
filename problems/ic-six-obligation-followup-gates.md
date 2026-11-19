@@ -1,16 +1,23 @@
 # Index-calculus six-obligation follow-up gates
 
-- **Status:** investigating; tensor numeric audit and arity-three unit proof kernel implemented
+- **Status:** canonical attack graph ready; six technical obligations remain open
 - **Kind:** source custody, implementation, mathematical proof, and experiment-admission gaps
 - **Affected work:** [follow-up report](../research/ic_weak_assumptions_20261102/FOLLOWUP.md)
+- **Canonical queue:** [foundational attack queue](../docs/ecdlp-hardness-corpus/FOUNDATIONAL_ATTACK_QUEUE.md)
+- **Machine graph:** [`ic-six-obligations-20261117.json`](../docs/ecdlp-hardness-corpus/ic-six-obligations-20261117.json)
 - **Next action owner:** index-calculus research programme; no unattended scientific job scheduled
-- **Last updated:** 2026-11-02
+- **Last updated:** 2026-11-17
 
 ## Problem
 
 Five requested follow-ons remain incomplete after the tensor numeric guard
 audit. They are blocked for different reasons and cannot be collapsed into one
 generic “needs compute” status.
+
+Their exact claims, typed dependencies, acceptance criteria, symmetric
+outcomes and executable research targets are now consolidated in the canonical
+ECDLP corpus. This record remains the blocker summary; the canonical queue is
+the entry point for attacking each item.
 
 - The named yield batch is retained off main under an explicit no-run custody
   hold. Existing aggregate pruning records cannot recover its required

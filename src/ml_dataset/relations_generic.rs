@@ -1630,6 +1630,10 @@ pub(super) fn verify(public: &Value, base: &Value, saved: &Value) -> Result<(), 
 
 /// Structural consistency only; mathematical replay remains verify(). Used in
 /// hash-only cell verification as well as before the full replay gate.
+#[allow(
+    dead_code,
+    reason = "Original producer filter-wire validation is retained without enabling its unfinished runtime dispatcher."
+)]
 pub(super) fn verify_v2_labels(
     public: &Value,
     base: &Value,
@@ -1717,6 +1721,10 @@ pub(super) fn verify_v2_labels(
     }
     Ok(())
 }
+#[allow(
+    dead_code,
+    reason = "Original producer filter-wire validation is retained without enabling its unfinished runtime dispatcher."
+)]
 pub(super) fn expected_filter_payloads(saved: &Value) -> Result<Vec<ArtifactPayload>, String> {
     let t: TranscriptV2 =
         serde_json::from_value(saved.clone()).map_err(|e| format!("generic v2 payloads: {e}"))?;
@@ -1728,6 +1736,7 @@ mod trace_integration_tests {
     use super::*;
     fn cfg(family: &str, n: u32, twist: bool, m: usize) -> CaseConfig {
         CaseConfig {
+            channels: None,
             family: family.into(),
             n,
             m,
@@ -1741,7 +1750,6 @@ mod trace_integration_tests {
             degree_bound: 3,
             work_limit: 20_000,
             solver: "double-large-prime".into(),
-            channels: None,
         }
     }
     fn case(cfg: &CaseConfig) -> CaseData {

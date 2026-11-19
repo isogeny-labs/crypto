@@ -52,6 +52,7 @@ fn fixture(p: u64, a: u64, b: u64, r: u64) -> Result<PrimeInstance, String> {
         r,
         cofactor: 1,
         generator,
+        representation: None,
     };
     if !instance
         .curve
@@ -215,6 +216,7 @@ fn pipelines(file: &mut fs::File, rows: &mut Vec<Value>) -> Result<(), String> {
         r: 2377,
         cofactor: 1,
         generator: (0, 80),
+        representation: None,
     };
     let planted = StdRng::seed_from_u64(20261109).gen_range(1..inst.r);
     let target = inst
