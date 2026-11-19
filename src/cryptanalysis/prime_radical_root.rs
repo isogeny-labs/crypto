@@ -42,19 +42,10 @@ fn frobenius_roots(p: u64, poly: &[u64]) -> Result<Vec<u64>, String> {
 #[derive(Clone, Copy)]
 pub(crate) struct Fp {
     pub p: u64,
-    // floor(2^64/p) for the canonical 32-bit multiplication path.
-    reciprocal32: u64,
 }
 impl Fp {
     pub fn new(p: u64) -> Self {
-        Fp {
-            p,
-            reciprocal32: if p >= 2 && p <= u32::MAX as u64 {
-                ((1u128 << 64) / u128::from(p)) as u64
-            } else {
-                0
-            },
-        }
+        Fp { p }
     }
     #[inline]
     pub fn add(&self, a: u64, b: u64) -> u64 {
@@ -106,12 +97,8 @@ impl Fp {
                 folded
             }
         } else if self.p <= u32::MAX as u64 && a < self.p && b < self.p {
-            // Canonical operands have a 64-bit product; Barrett's 64-bit
-            // reciprocal underestimates the quotient by at most one.
-            let product = a * b;
-            let quotient = ((u128::from(product) * u128::from(self.reciprocal32)) >> 64) as u64;
-            let residual = product - quotient * self.p;
-            if residual >= self.p { residual - self.p } else { residual }
+            // Canonical 32-bit operands fit in a native 64-bit product.
+            (a * b) % self.p
         } else {
             ((a as u128 * b as u128) % self.p as u128) as u64
         }
@@ -3226,57 +3213,6 @@ mod tests {
                 assert_eq!(f.sub(p + 1, p + 2), p - 1);
                 assert_eq!(f.inv(p + 2), f.inv(2));
             }
-        }
-    }
-
-    #[test]
-    #[ignore = "paired compiled-Rust Barrett screening for canonical 32-bit Fp products"]
-    fn bench_round41_barrett_fp_actual_rust() {
-        use std::{hint::black_box, time::Instant};
-        fn median(mut x: Vec<f64>) -> f64 {
-            x.sort_by(f64::total_cmp);
-            x[x.len() / 2]
-        }
-        for p in [487u64, 1_000_000_007, 1_000_000_009, 4_294_967_291] {
-            let f = Fp::new(p);
-            let mut seed = 0x163e_8f1a_2026_0041;
-            let mut values = [(0u64, 0u64); 1024];
-            for entry in &mut values {
-                entry.0 = lcg(&mut seed) % p;
-                entry.1 = lcg(&mut seed) % p;
-                assert_eq!(f.mul(entry.0, entry.1), entry.0 * entry.1 % p);
-            }
-            fn measure(f: Fp, values: &[(u64, u64)], old: bool) -> f64 {
-                let start = Instant::now();
-                let mut digest = 0u64;
-                for iteration in 0..64usize {
-                    for j in 0..values.len() {
-                        let (a, b) = values[(j + iteration) % values.len()];
-                        let result = if old {
-                            black_box(a) * black_box(b) % black_box(f.p)
-                        } else {
-                            f.mul(black_box(a), black_box(b))
-                        };
-                        digest ^= result;
-                    }
-                }
-                black_box(digest);
-                start.elapsed().as_nanos() as f64 / (64 * values.len()) as f64
-            }
-            let mut before = Vec::new();
-            let mut after = Vec::new();
-            for trial in 0..13 {
-                if trial & 1 == 0 {
-                    before.push(measure(f, &values, true));
-                    after.push(measure(f, &values, false));
-                } else {
-                    after.push(measure(f, &values, false));
-                    before.push(measure(f, &values, true));
-                }
-            }
-            let b = median(before);
-            let a = median(after);
-            println!("ROUND41_RADICAL p={p} before_ns={b:.4} after_ns={a:.4} speedup={:.4}x", b / a);
         }
     }
 
