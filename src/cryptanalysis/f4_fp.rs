@@ -9994,9 +9994,14 @@ mod domain_root_tests {
                         (r1.complete, r1.stopped_early, r1.timed_out, r1.solutions_visited),
                         (r0.complete, r0.stopped_early, r0.timed_out, r0.solutions_visited)
                     );
+                    // `field_ops` is a delta of the process-wide counter (unless
+                    // `F4_FP_THREAD_OPS=1`), so tests running in parallel leak into
+                    // it; it is not compared here.  The identical branch sequence
+                    // above already fixes every F4 input, and the single-process
+                    // example `fb_domain_rootfind` asserts `field_ops` equality.
                     assert_eq!(
-                        (r1.candidates_rejected, r1.f4_runs, r1.field_ops, r1.full_field_branches),
-                        (r0.candidates_rejected, r0.f4_runs, r0.field_ops, r0.full_field_branches)
+                        (r1.candidates_rejected, r1.f4_runs, r1.full_field_branches),
+                        (r0.candidates_rejected, r0.f4_runs, r0.full_field_branches)
                     );
                     if mode == DomainRootMode::Frobenius {
                         assert_eq!(r1.domain_evaluations, 0);
