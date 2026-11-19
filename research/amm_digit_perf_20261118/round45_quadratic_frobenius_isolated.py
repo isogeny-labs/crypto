@@ -7,12 +7,13 @@ import tempfile
 
 source = Path("src/cryptanalysis/prime_root_bounded.rs").read_text().split("\n#[cfg(test)]\n", 1)[0]
 before = source
-for name in ["PRODUCER", "REPLAY"]:
-    marker = rf"(?m)^        // R45_QUADRATIC_FROBENIUS_{name}_BEGIN\n.*?^        // R45_QUADRATIC_FROBENIUS_{name}_END\n"
-    before, count = re.subn(marker, "", before, count=1, flags=re.S | re.M)
-    if count != 1:
-        raise AssertionError(f"missing/duplicate quadratic Frobenius marker {name}")
-assert "R45_QUADRATIC_FROBENIUS" not in before
+for kind in ["QUADRATIC_FROBENIUS", "QUADRATIC_GCD"]:
+    for name in ["PRODUCER", "REPLAY"]:
+        marker = rf"(?m)^[ ]*// R45_{kind}_{name}_BEGIN\n.*?^[ ]*// R45_{kind}_{name}_END\n"
+        before, count = re.subn(marker, "", before, count=1, flags=re.S | re.M)
+        if count != 1:
+            raise AssertionError(f"missing/duplicate marker {kind}/{name}")
+assert "R45_QUADRATIC_" not in before
 assert "fn modular_power" in source
 
 header = """#![allow(dead_code)]
