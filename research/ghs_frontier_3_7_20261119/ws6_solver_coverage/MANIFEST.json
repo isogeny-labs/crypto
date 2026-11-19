@@ -1,0 +1,59 @@
+{
+  "schema": "ghs.frontier.solver-census-manifest/v1",
+  "finalized_utc": "2026-11-19T18:15:30Z",
+  "source_identity": {
+    "base_commit": "2b88bdd84b2c102da686d4c589b2d6a68cea07d3",
+    "base_tree": "0024f1da25b5691d94b8e4e9025289e69d3fdaa5",
+    "inventory_fix_path": "src/cryptanalysis/ecbench/optimization.rs",
+    "inventory_fix_git_blob": "832949cc7cf69c7cff93edbfc3a19aee40cbe9aa",
+    "inventory_fix_diff_sha256": "498d3114af0daa45342f38759a16e5a3954ca1b0d436496d6b1fae2d52881337",
+    "source_closure_sha256": "f8e1df4a32dd52f520a8a6c2a0d080e6cd496d04e02ae4b98521ad8a6717ae27",
+    "test_cleanup_path": "src/cryptanalysis/ic_framework/plugins.rs",
+    "test_cleanup_git_blob": "46b8357a66986ec6ec23338df927cba9c897bbbe",
+    "test_cleanup_diff_sha256": "fcae5a5ce89543d3c78eb5998d83443b5b0028f7794a916a1f45d26ab76b5635",
+    "final_commit": null,
+    "final_commit_status": "pending parent integration commit; executable is bound to the base commit plus the exact one-file blob/diff and source closure above"
+  },
+  "compiler": {
+    "rustc": "1.100.0 (0ef1bc386 2026-11-09)",
+    "host": "x86_64-unknown-linux-gnu",
+    "llvm": "23.1.5"
+  },
+  "binary": {
+    "path": "target/release/ecbench",
+    "bytes": 101265008,
+    "sha256": "dcac1f24cd12b81a0729794aebe8c736592cbf20fe6cfd92e86da549df303476",
+    "build_command": "cargo build --release --bin ecbench"
+  },
+  "receipts": {
+    "pre_fix_inventory_sha256": "07ba82c00fd4d383d186983f9d490cadb0e34a72cb1d729aff84e009cd034abd",
+    "inventory_sha256": "eab41e25254790d625d31e31c3941d0553e59b1133f59608d1b517495193e2cb",
+    "pre_fix_audit_sha256": "c7cc63e66895361bfb112ff57ba7e9ae42526a6de735983edb651b5c97ebfa4d",
+    "audit_sha256": "8ff847bd625e855d2d3d12bc6362b96700a15b9b019366265f7e397b41dc489c",
+    "catalog_sha256": "7d250a641bbe575af74ecd33b0555040b54c5bb08edffad0d8d225aca60dbcaf",
+    "missing_coverage_sha256": "3287c02d8ce5422e377518ee6366accb9af9c17161d9dd30ce2c5018c70240b9",
+    "unit_test_sha256": "7a89e89f90e508c79c4811158f9a61cd87e305cdd3b70f0878d0e7cd403e2ed9"
+  },
+  "observed": {
+    "top_level_methods": 111,
+    "system_solvers": 21,
+    "pdp3_engines": 12,
+    "pkm_tower_engines": 4,
+    "nested_total": 37,
+    "legacy_specs_audited": 92,
+    "legacy_methods_covered": 20,
+    "legacy_nested_covered": 17,
+    "missing_methods": 91,
+    "missing_nested": 20,
+    "audit_admissible": false,
+    "corruptions_rejected": "3/3"
+  },
+  "evidence_status": {
+    "source_census": "executed-pass",
+    "inventory_fix": "implemented-and-executable-verified",
+    "exact_inventory_unit_test": "pass-1-of-1",
+    "require_all_campaign": "blocked-missing-coverage",
+    "performance_measurement": "not-attempted-in-this-lane",
+    "frontier_or_leaderboard_change": "none"
+  }
+}

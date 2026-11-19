@@ -1,0 +1,198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/isogeny-labs/crypto/research/ghs_frontier_3_7_20261119/ws7_validation_publish/manifest.schema.json",
+  "title": "GHS frontier validation bundle v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "claim_id", "test_only", "promotion_requested", "scope", "source", "lanes", "measurement", "validation", "publication", "evidence_files"],
+  "properties": {
+    "schema": {"const": "ghs.frontier.validation-bundle/v1"},
+    "claim_id": {"type": "string", "minLength": 1, "pattern": "^[ -~]+$"},
+    "test_only": {"type": "boolean"},
+    "promotion_requested": {"type": "boolean"},
+    "scope": {"$ref": "#/$defs/scope"},
+    "source": {"$ref": "#/$defs/source"},
+    "lanes": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/lane"}},
+    "measurement": {"$ref": "#/$defs/measurement"},
+    "validation": {"$ref": "#/$defs/validation"},
+    "publication": {"$ref": "#/$defs/publication"},
+    "evidence_files": {"type": "array", "items": {"$ref": "#/$defs/evidence"}}
+  },
+  "$defs": {
+    "sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "strictObject": {"type": "object", "additionalProperties": false},
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "target_count", "interval", "unit", "matched_reference", "restricted_family_wording", "generic_curve_claim"],
+      "properties": {
+        "family": {"type": "string"},
+        "target_count": {"type": "integer", "minimum": 0},
+        "interval": {"type": "string"},
+        "unit": {"type": "string"},
+        "matched_reference": {"type": "string"},
+        "restricted_family_wording": {"type": "boolean"},
+        "generic_curve_claim": {"type": "boolean"}
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "revision_published", "clean_tree", "binary_sha256", "image_digest", "spec_sha256", "protocol_sha256", "source_binary_identity_verified", "no_post_result_code_change"],
+      "properties": {
+        "revision": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+        "revision_published": {"type": "boolean"},
+        "clean_tree": {"type": "boolean"},
+        "binary_sha256": {"$ref": "#/$defs/sha256"},
+        "image_digest": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+        "spec_sha256": {"$ref": "#/$defs/sha256"},
+        "protocol_sha256": {"$ref": "#/$defs/sha256"},
+        "source_binary_identity_verified": {"type": "boolean"},
+        "no_post_result_code_change": {"type": "boolean"}
+      }
+    },
+    "lane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "evidence_count"],
+      "properties": {
+        "id": {"enum": ["ws3_parallel_rho", "ws4_composition", "ws5_matched_ghs", "ws6_solver_coverage"]},
+        "status": {"type": "string"},
+        "evidence_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "aa": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["admitted_pairs", "ratio", "ci_low", "ci_high", "outside_noise_for_claimed_wall_result"],
+      "properties": {
+        "admitted_pairs": {"type": "integer", "minimum": 0},
+        "ratio": {"type": ["number", "null"]},
+        "ci_low": {"type": ["number", "null"]},
+        "ci_high": {"type": ["number", "null"]},
+        "outside_noise_for_claimed_wall_result": {"type": "boolean"}
+      }
+    },
+    "pricing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["band_weights_gae", "every_unpriced_counter_emitted", "table_work_priced", "non_operation_bytes_not_priced_as_ops", "calibration_complete", "same_calibration_both_arms", "calibration_triples_per_seed", "calibrated_weight", "complete_cold_cost"],
+      "properties": {
+        "band_weights_gae": {"type": "array", "items": {"type": "number"}},
+        "every_unpriced_counter_emitted": {"type": "boolean"},
+        "table_work_priced": {"type": "boolean"},
+        "non_operation_bytes_not_priced_as_ops": {"type": "boolean"},
+        "calibration_complete": {"type": "boolean"},
+        "same_calibration_both_arms": {"type": "boolean"},
+        "calibration_triples_per_seed": {"type": "integer", "minimum": 0},
+        "calibrated_weight": {"type": ["number", "null"]},
+        "complete_cold_cost": {"type": "boolean"}
+      }
+    },
+    "correctness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["completed_runs", "recovered_scalars_verified", "wrong_answers", "invalid_records_accepted", "phase_sums_exact"],
+      "properties": {
+        "completed_runs": {"type": "integer", "minimum": 0},
+        "recovered_scalars_verified": {"type": "integer", "minimum": 0},
+        "wrong_answers": {"type": "integer", "minimum": 0},
+        "invalid_records_accepted": {"type": "integer", "minimum": 0},
+        "phase_sums_exact": {"type": "boolean"}
+      }
+    },
+    "replay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["audit_status", "replay_all", "deterministic_runs", "identical_replays", "receipt_sha256"],
+      "properties": {
+        "audit_status": {"type": "string"},
+        "replay_all": {"type": "boolean"},
+        "deterministic_runs": {"type": "integer", "minimum": 0},
+        "identical_replays": {"type": "integer", "minimum": 0},
+        "receipt_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "independent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["original_host_class", "validator_host_class", "both_arms_replayed", "every_recovered_scalar_checked", "receipt_sha256"],
+      "properties": {
+        "original_host_class": {"type": ["string", "null"]},
+        "validator_host_class": {"type": ["string", "null"]},
+        "both_arms_replayed": {"type": "boolean"},
+        "every_recovered_scalar_checked": {"type": "boolean"},
+        "receipt_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "measurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["session_status", "cold_one_target", "same_target_both_arms", "strongest_applicable_reference", "all_phases_charged", "all_failures_retained", "warmup_rounds", "measured_rounds", "automatic_measurement_retries", "isolation_level", "aa", "pricing", "rho_phases", "ic_phases", "correctness", "replay", "independent"],
+      "properties": {
+        "session_status": {"type": "string"},
+        "cold_one_target": {"type": "boolean"},
+        "same_target_both_arms": {"type": "boolean"},
+        "strongest_applicable_reference": {"type": "boolean"},
+        "all_phases_charged": {"type": "boolean"},
+        "all_failures_retained": {"type": "boolean"},
+        "warmup_rounds": {"type": "integer", "minimum": 0},
+        "measured_rounds": {"type": "integer", "minimum": 0},
+        "automatic_measurement_retries": {"type": "integer", "minimum": 0},
+        "isolation_level": {"type": "string"},
+        "aa": {"$ref": "#/$defs/aa"},
+        "pricing": {"$ref": "#/$defs/pricing"},
+        "rho_phases": {"type": "array", "items": {"type": "string"}},
+        "ic_phases": {"type": "array", "items": {"type": "string"}},
+        "correctness": {"$ref": "#/$defs/correctness"},
+        "replay": {"$ref": "#/$defs/replay"},
+        "independent": {"$ref": "#/$defs/independent"}
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["raw_evidence_sealed", "producer_distinct_validator", "headlines_recomputed_from_raw", "no_post_result_tuning", "validation_json_status", "pcc_standing", "claim_scope_exact"],
+      "properties": {
+        "raw_evidence_sealed": {"type": "boolean"},
+        "producer_distinct_validator": {"type": "boolean"},
+        "headlines_recomputed_from_raw": {"type": "boolean"},
+        "no_post_result_tuning": {"type": "boolean"},
+        "validation_json_status": {"type": "string"},
+        "pcc_standing": {"type": "string"},
+        "claim_scope_exact": {"type": "boolean"}
+      }
+    },
+    "publication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["benchmark_record_closed", "experiment_export_verified", "run_report_present", "result_report_present", "report_pdf_present", "figures_svg_and_png_present", "failures_timeouts_regressions_included", "frontier_rebuilt_and_checked", "leaderboard_generated_and_checked", "lab_browser_generated_and_checked", "dashboard_coverage_checked", "progress_timeline_updated_if_numeric", "no_manual_dashboard_edits"],
+      "properties": {
+        "benchmark_record_closed": {"type": "boolean"},
+        "experiment_export_verified": {"type": "boolean"},
+        "run_report_present": {"type": "boolean"},
+        "result_report_present": {"type": "boolean"},
+        "report_pdf_present": {"type": "boolean"},
+        "figures_svg_and_png_present": {"type": "boolean"},
+        "failures_timeouts_regressions_included": {"type": "boolean"},
+        "frontier_rebuilt_and_checked": {"type": "boolean"},
+        "leaderboard_generated_and_checked": {"type": "boolean"},
+        "lab_browser_generated_and_checked": {"type": "boolean"},
+        "dashboard_coverage_checked": {"type": "boolean"},
+        "progress_timeline_updated_if_numeric": {"type": "boolean"},
+        "no_manual_dashboard_edits": {"type": "boolean"}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "path", "sha256", "bytes"],
+      "properties": {
+        "role": {"type": "string", "minLength": 1},
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "bytes": {"type": "integer", "minimum": 1}
+      }
+    }
+  }
+}

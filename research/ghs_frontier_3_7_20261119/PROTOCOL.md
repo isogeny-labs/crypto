@@ -1,6 +1,8 @@
 # Common protocol for workstreams 3–7
 
-Status: prospective draft; no measurement has launched `[pcc:unverified]`.
+Status: implementation and deterministic validation are complete where stated;
+no admitted measurement has launched and the frontier is not regraded
+`[pcc:unverified]`.
 
 ## Question and boundary
 
@@ -39,8 +41,10 @@ same curve, subgroup, target, seed policy, and resource envelope.
   counter-free spellings remain paired.
 - Workstream 5: all eleven q values 4,051 through 4,194,271, seeds 1–3, frozen
   repetitions and candidate set, with the exact `ic-repeat` target policy.
-- Workstream 6: a live source-derived roster. Historical 74/11 counts are
-  controls, never hard-coded completion criteria.
+- Workstream 6: a live source-derived roster. The current census is 111
+  top-level methods and 37 nested algorithms (21 system solvers, 12 PDP3
+  engines, and 4 PKM-tower engines). Historical 74/11 counts are controls,
+  never hard-coded completion criteria.
 - Workstream 7: source, protocol, request, image, binary, session, replay,
   independent-host, pricing, correctness, and generated-output identities are
   conjunctive.
@@ -76,7 +80,9 @@ Before any paid or timed run:
 6. failures and ambiguous submissions retain their original IDs.
 
 The selected runtime currently fails the identity/checkpoint prerequisites.
-No local timing substitutes for EKS evidence.
+The offline standalone-GHS contract is deliberately non-admitting because a
+Pod-authored isolation claim cannot grade itself. No local timing substitutes
+for EKS evidence.
 
 ## Analysis and stopping rules
 
@@ -87,15 +93,28 @@ No local timing substitutes for EKS evidence.
 - Timeouts, OOMs, wrong answers, interrupted jobs, missing counters, and
   non-applicability remain rows.
 - Unlike native solver units are not cross-ranked. A common comparison needs
-  complete E2E cost or matched verified L2 wall at component scope.
+  complete E2E cost or matched verified L2 wall at component scope
+  `[pcc:unverified]`.
 - A Spot interruption invalidates the timing interval. Resume is accepted only
   through the qualified CRIU/EBS contract followed by a fresh epoch.
 - The grid is not reduced to fit budget or capacity. A prospective amendment
   leaves the original request unresolved.
 
+## Current lane disposition
+
+- WS3 is `partial`: production-math coordinator controls pass, but the path is
+  deterministic round robin rather than threaded and no L2 scaling exists.
+- WS4 is `implemented-unverified`: its fourteen-arm composition protocol and
+  corruption gate pass, with no source-bound measurements.
+- WS5 is `implemented-unverified`: its complete prospective grid and gate pass,
+  while its runner, admission route, archive hydration and results are absent.
+- WS6 is `partial`: all 111/37 live entries are inventoried; the retained frozen
+  specs cover only 20 methods and 17 nested algorithms.
+- WS7 is `implemented-unverified`: all 35 corruption controls are rejected; the
+  honest blocked fixture reports 76 unmet publication requirements.
+
 ## Status vocabulary
 
 Each item is `verified-complete`, `implemented-unverified`, `partial`,
 `blocked`, or `not-attempted`. Planning, source coverage, and deterministic
-correctness never become measured timing by wording alone.
-
+correctness never become measured timing by wording alone `[pcc:unverified]`.

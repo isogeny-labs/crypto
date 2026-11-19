@@ -961,6 +961,9 @@ const PDP3_ENGINES: &[&str] = &[
     "rootfind",
     "rootfind-window",
     "rootfind-negfold",
+    "rootfind-negfold-batch",
+    "rootfind-negfold-batch-harvest",
+    "rootfind-negfold-batch-harvest-torsion",
     "rootfind-window-negfold",
 ];
 
@@ -1388,6 +1391,13 @@ mod tests {
             assert!(keys.contains(format!("system_solver/{name}").as_str()));
         }
         for name in PDP3_ENGINES {
+            assert!(keys.contains(format!("pdp3_engine/{name}").as_str()));
+        }
+        for name in [
+            "rootfind-negfold-batch",
+            "rootfind-negfold-batch-harvest",
+            "rootfind-negfold-batch-harvest-torsion",
+        ] {
             assert!(keys.contains(format!("pdp3_engine/{name}").as_str()));
         }
         for name in PKM_TOWER_ENGINES {

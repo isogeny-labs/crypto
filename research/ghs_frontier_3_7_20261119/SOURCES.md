@@ -24,7 +24,7 @@ was reviewed before choosing the implementation or measurement design:
   square-root boundary; a table or root-finding implementation does not by
   itself establish a sub-square-root algebraic attack.
 - Gallant–Lambert–Vanstone, Math. Comp. 2000, DOI
-  `10.1090/S0025-5718-99-01119-9`: usable automorphisms belong on the matched
+  `10.1090/S0022-5718-99-01119-9`: usable automorphisms belong on the matched
   rho arm too.
 - van Oorschot–Wiener, J. Cryptology 1999, DOI `10.1007/PL00003816`:
   parallel collision search uses one transition function, distinguished-point
@@ -59,12 +59,16 @@ explicit subgroup-preserving, costed map.
   executable status of the standing frontier and its open obligations.
 - [`../ecbench_e2e_frontier_20261031/IMPLEMENTATIONS.md`](../ecbench_e2e_frontier_20261031/IMPLEMENTATIONS.md):
   historical 74-method/11-solver roster. It is a comparison point, not a
-  substitute for a live inventory.
+  substitute for the live 111-method/37-nested-algorithm inventory.
+- [`ws6_solver_coverage/catalog.json`](ws6_solver_coverage/catalog.json) and
+  [`ws6_solver_coverage/receipts/validation.txt`](ws6_solver_coverage/receipts/validation.txt):
+  source-bound live algorithm/factor-base inventory, strict frozen-spec
+  coverage gap, and zero-timing evidence receipt.
 - [`../../docs/bounds/FRONTIER.md`](../../docs/bounds/FRONTIER.md) and
   [`../../docs/ic/LEADERBOARD.md`](../../docs/ic/LEADERBOARD.md): canonical
   admitted views, unchanged until generated evidence satisfies every gate.
 - [`../../problems/ghs-strong-rho-measurement-admission.md`](../../problems/ghs-strong-rho-measurement-admission.md):
-  checkpoint, budget, pool, identity, and image blockers.
+  checkpoint, budget, pool, identity, image, and trusted-grader blockers.
 
 ## Effect on the plan
 
@@ -74,3 +78,7 @@ solver-local and end-to-end conclusions, complete pricing-band accounting,
 and restricted-family wording for every GHS win. WD-SAT remains excluded from
 promotion until its retained false-UNSAT path is repaired and replayed.
 
+The live source census corrects a reporting boundary, not a performance
+boundary: all 111 methods and 37 nested algorithms are accounted for in the
+inventory, while only 20 methods and 17 nested algorithms appear in the frozen
+development specs. No timing or ranking claim follows from reachability alone.

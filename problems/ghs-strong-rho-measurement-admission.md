@@ -4,7 +4,7 @@
 - **Kind:** access/tool limit; experimental admission gap
 - **Affected work:** [strong-rho protocol](../research/quartic_ghs_strong_rho_20261114/PROTOCOL.md), [round-A amendment](../research/quartic_ghs_strong_rho_20261114/ROUND_A.md), [frontier report](../research/ecbench_e2e_frontier_20261031/REPORT.md)
 - **Next action owner:** authorized IsoLab budget/pool operator; experiment executor after every preflight gate passes
-- **Last updated:** 2026-11-18
+- **Last updated:** 2026-11-19
 
 ## Problem
 
@@ -46,6 +46,23 @@ it must not be silently reused for Round B.
   readback. The launcher EKS group is a namespace submitter and cannot list
   all Nodes and all-namespace Pods required by `scripts/isolab_pool_check.sh`.
   [pcc:unverified]
+- **Observed:** on 2026-11-19, the frontier branch still had no AWS identity,
+  `kubectl`, registered IsoLab MCP server, or checkpoint transport. The
+  checkpoint gate exited 1 and the live pool check exited 3 before reading the
+  cluster. No build or Job was submitted. The exact receipt is in
+  `research/ghs_frontier_3_7_20261119/eks_admission/`. [pcc:unverified]
+- **Observed:** the latest main-branch manual IsoLab workflow dispatch,
+  GitHub run 44374607134 at `ad2a014c...`, failed in the `contracts` job's
+  artifact hydration; build and experiment jobs were skipped. Open PR #4695
+  adds read-only budget telemetry and draft PR #4705 changes per-job artifact
+  hydration, but neither is merged. [pcc:unverified]
+- **Implementation gap:** the current exact-source GitHub workflow builds the
+  audited ECBench payload, while the standalone GHS path uses a standard
+  command Job whose wall time is diagnostic. The R67–R83 plan requires L2 wall
+  admission but names `cpu-spot`; the maintained audited L2 path uses
+  `cpu-l2-spot`. Integrate the GHS driver with ECBench or add an equivalent
+  reviewed custom-binary L2 contract, then amend the pool binding before
+  freezing the run. [pcc:unverified]
 - **Derived or proved:** no mathematical obstruction and no performance result
   is established by these access failures.
 - **Suspected explanation:** the selected runtime intentionally exposes no
@@ -77,6 +94,9 @@ it must not be silently reused for Round B.
   verify `SHA256SUMS`. If Round B is selected as the stronger comparator, its
   new source hash, image, requests, and validation expectations must replace
   the Round A bindings prospectively; do not mix revisions.
+- [ ] The isolated worker-scaling lane has an implemented audited L2 execution
+  route and its own finite all-attempt ceiling. The existing USD 5 M3 ceiling
+  does not silently authorize the separate 180-call scaling panel.
 
 These conditions admit a launch; they do not admit a performance conclusion.
 Correctness, repetition, calibration, rho-step, replay, independent-validator,
@@ -106,5 +126,6 @@ PCC, benchmark-record, and leaderboard gates remain downstream.
 Unresolved. Opened 2026-11-14 after the implementation/protocol PR merged and
 the selected runtime's read-only access checks failed. Updated 2026-11-18 with
 the prospective five-product Round B candidate and a second checkpoint
-refusal. This record neither launches the panel nor changes the historical
-frontier.
+refusal. Updated 2026-11-19 with the exact current route audit, main-workflow
+failure, and standalone-command versus L2-contract gap. This record neither
+launches the panel nor changes the historical frontier.

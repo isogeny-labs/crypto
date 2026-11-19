@@ -1,0 +1,131 @@
+{
+  "materialization": {
+    "blocked_until": [
+      "full source revision and source-closure hashes are frozen",
+      "runner emits every required cold and online phase interval",
+      "digest-pinned image manifest is available",
+      "fresh admission receipt passes every protocol gate"
+    ],
+    "launch_ready": false,
+    "placeholders": {
+      "IMAGE_DIGEST_URI": "required ECR URI by sha256 digest",
+      "REV10": "first ten hexadecimal characters of SOURCE_REVISION",
+      "SOURCE_REVISION": "required full 40-hex Git revision"
+    },
+    "runner_contract": {
+      "l2_admission_capable": false,
+      "path": "research/ghs_frontier_3_7_20261119/ws5_matched_ghs/run_split.sh",
+      "present": false,
+      "reason": "the existing command-job bridge cannot admit custom-binary wall measurements at L2; a source-bound runner plus custom-binary L2/replay/A-A bridge is required"
+    }
+  },
+  "requests": {
+    "high": {
+      "job": {
+        "command": [
+          "/usr/bin/env",
+          "--chdir=/opt/crypto",
+          "/opt/crypto/research/ghs_frontier_3_7_20261119/ws5_matched_ghs/run_split.sh",
+          "high"
+        ],
+        "cpu": 4,
+        "image": "${IMAGE_DIGEST_URI}",
+        "isolation_profile": "standard",
+        "job_name": "ghs-m3-high-${REV10}",
+        "memory": "4Gi",
+        "retries": 0,
+        "seconds": 7200,
+        "wait_seconds": 0
+      },
+      "provenance": {
+        "harness": "isolab-eks-command-ghs-m3",
+        "protocol_id": "ghs-matched-frontier-m3-composed-v1",
+        "source_revision": "${SOURCE_REVISION}"
+      },
+      "schema": "isolab.eks.command-request/v1"
+    },
+    "low": {
+      "job": {
+        "command": [
+          "/usr/bin/env",
+          "--chdir=/opt/crypto",
+          "/opt/crypto/research/ghs_frontier_3_7_20261119/ws5_matched_ghs/run_split.sh",
+          "low"
+        ],
+        "cpu": 4,
+        "image": "${IMAGE_DIGEST_URI}",
+        "isolation_profile": "standard",
+        "job_name": "ghs-m3-low-${REV10}",
+        "memory": "4Gi",
+        "retries": 0,
+        "seconds": 3600,
+        "wait_seconds": 0
+      },
+      "provenance": {
+        "harness": "isolab-eks-command-ghs-m3",
+        "protocol_id": "ghs-matched-frontier-m3-composed-v1",
+        "source_revision": "${SOURCE_REVISION}"
+      },
+      "schema": "isolab.eks.command-request/v1"
+    },
+    "mid": {
+      "job": {
+        "command": [
+          "/usr/bin/env",
+          "--chdir=/opt/crypto",
+          "/opt/crypto/research/ghs_frontier_3_7_20261119/ws5_matched_ghs/run_split.sh",
+          "mid"
+        ],
+        "cpu": 4,
+        "image": "${IMAGE_DIGEST_URI}",
+        "isolation_profile": "standard",
+        "job_name": "ghs-m3-mid-${REV10}",
+        "memory": "4Gi",
+        "retries": 0,
+        "seconds": 3600,
+        "wait_seconds": 0
+      },
+      "provenance": {
+        "harness": "isolab-eks-command-ghs-m3",
+        "protocol_id": "ghs-matched-frontier-m3-composed-v1",
+        "source_revision": "${SOURCE_REVISION}"
+      },
+      "schema": "isolab.eks.command-request/v1"
+    },
+    "top": {
+      "job": {
+        "command": [
+          "/usr/bin/env",
+          "--chdir=/opt/crypto",
+          "/opt/crypto/research/ghs_frontier_3_7_20261119/ws5_matched_ghs/run_split.sh",
+          "top"
+        ],
+        "cpu": 4,
+        "image": "${IMAGE_DIGEST_URI}",
+        "isolation_profile": "standard",
+        "job_name": "ghs-m3-top-${REV10}",
+        "memory": "4Gi",
+        "retries": 0,
+        "seconds": 10800,
+        "wait_seconds": 0
+      },
+      "provenance": {
+        "harness": "isolab-eks-command-ghs-m3",
+        "protocol_id": "ghs-matched-frontier-m3-composed-v1",
+        "source_revision": "${SOURCE_REVISION}"
+      },
+      "schema": "isolab.eks.command-request/v1"
+    }
+  },
+  "schema": "ghs.matched-frontier.request-templates/v1",
+  "waves": [
+    [
+      "low",
+      "mid"
+    ],
+    [
+      "high",
+      "top"
+    ]
+  ]
+}
