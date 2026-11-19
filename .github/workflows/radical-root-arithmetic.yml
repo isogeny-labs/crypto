@@ -19,6 +19,7 @@ on:
       - 'research/amm_digit_perf_20261118/round44_window3_isolated.py'
       - 'research/amm_digit_perf_20261118/round45_quadratic_frobenius_isolated.py'
       - 'research/amm_digit_perf_20261118/round46_quadratic_split_isolated.py'
+      - 'research/amm_digit_perf_20261118/round47_quadratic_split_isolated.py'
       - 'research/amm_digit_perf_20261118/round31_bounded_baseline.rs'
       - 'research/amm_digit_perf_20261118/round23_verifier_isolated.py'
       - 'research/amm_digit_perf_20261118/round24_verifier_isolated.py'
@@ -41,6 +42,34 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  bounded-quadratic-split-round47:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round47_quadratic_split_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare frozen round46 root/certificate baseline against round47 in actual Rust
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round47_quadratic_split_isolated.py
+          } | tee "$RUNNER_TEMP/round47-rust.txt"
+          cat "$RUNNER_TEMP/round47-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round47-bounded-quadratic-split-rust
+          path: ${{ runner.temp }}/round47-rust.txt
+          if-no-files-found: ignore
+
   bounded-quadratic-split-round46:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
