@@ -873,16 +873,19 @@ digest
 `e7a12f60c219624b2442bb54a79bb114ad8c89cfd1d33f6f0ca4643af7bae7dd`.
 That source frame includes the binary-module re-exports and the deterministic
 primality implementation and word-sized helper used by exact-order evidence.
-Release run `44585934651`, Rust GNU job `135778928449`, passed native
-installed-layout exact replay and receipt comparison at evidence head
-`b98fb11d…`, then uploaded artifact `14560899671`; independent download of the
+Release run `44596599220`, Rust GNU job `135817148417`, passed the 21-file
+source-tree replay plus native installed-layout exact replay and receipt
+comparison at evidence head `98e4fbfe…`, then uploaded artifact `14567327688`;
+independent download of the
 artifact remains proxy-blocked. The durable job-side record is
-[`standalone-package-run-44585934651.json`](../../research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json).
+[`standalone-package-run-44596599220.json`](../../research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json).
 The repository-mode 21-file Git-tree verifier
 and receipt additionally reproduce `e7a12f60…` with replacement objects
 disabled and logical paths checked against their normalized `include_str!`
-targets. Its 8/8 local controls pass; exact-head workflow integration remains
-pending. This source receipt does not attest the executable build or supply an
+targets. Its 8/8 local controls and the exact-head release replay pass; curve
+run `44596591504` has green assessment and Lean jobs, while its first
+certificate attempt exhausted runner disk and its identical rerun remains
+active. This source receipt does not attest the executable build or supply an
 independent arithmetic check.
 The earlier `67142558…` / `e0ae0fe5…` and `f402ccd4…` / `8c61e842…` corpora
 remain historical evidence, not the current same-implementation replay target.

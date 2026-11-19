@@ -1314,7 +1314,7 @@ async function buildSourceArtifacts() {
     ),
     sourceArtifact(
       "research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json",
-      "standalone Linux GNU package-run receipt",
+      "pre-source-verifier standalone Linux GNU package-run receipt",
       freshness(
         "supported",
         "the successful Rust GNU package job and installed-layout catalog replay at evidence head b98fb11df2353c3daf0200956190ba0764c5fff7",
@@ -1322,6 +1322,20 @@ async function buildSourceArtifacts() {
         [
           "research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json",
           "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json",
+      "source-verifier standalone Linux GNU package-run receipt",
+      freshness(
+        "supported",
+        "the successful Rust GNU package job, 21-file producer-source replay, installed-layout catalog replay, and upload at evidence head 98e4fbfef3f7887bafc87900ec636d7d88f5648b",
+        "The receipt distinguishes the successful package lane from the cancelled aggregate workflow and records the repeated proxy-blocked independent download. It is same-implementation job-side evidence, not an independent artifact replay, source-to-binary attestation, mathematical oracle, solver, or advantage result.",
+        [
+          "research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json",
         ],
       ),
     ),

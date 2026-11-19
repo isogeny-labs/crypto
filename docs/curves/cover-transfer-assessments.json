@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "c786a8ce90d096d62820f19078313d535d5e07ba47d4bd9902b9dc77874e6f4d",
+      "sha256": "8f26b5237a46087cca16e249584acb2df1bdb78272f93c0d69dfc7b43abd7882",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -250,7 +250,7 @@
     {
       "path": "research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json",
       "sha256": "4dc701ef6b5c73510711cf1dded744b9d7fa8a77f6195290559a13b1b31782f1",
-      "role": "standalone Linux GNU package-run receipt",
+      "role": "pre-source-verifier standalone Linux GNU package-run receipt",
       "freshness": {
         "status": "supported",
         "scope": "the successful Rust GNU package job and installed-layout catalog replay at evidence head b98fb11df2353c3daf0200956190ba0764c5fff7",
@@ -258,6 +258,21 @@
         "evidence_refs": [
           "research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json",
           "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json"
+        ]
+      }
+    },
+    {
+      "path": "research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json",
+      "sha256": "8119e3e969effe319e4a1f1a3ca6a1351b0258067a5819b21128927dc8e014ae",
+      "role": "source-verifier standalone Linux GNU package-run receipt",
+      "freshness": {
+        "status": "supported",
+        "scope": "the successful Rust GNU package job, 21-file producer-source replay, installed-layout catalog replay, and upload at evidence head 98e4fbfef3f7887bafc87900ec636d7d88f5648b",
+        "rationale": "The receipt distinguishes the successful package lane from the cancelled aggregate workflow and records the repeated proxy-blocked independent download. It is same-implementation job-side evidence, not an independent artifact replay, source-to-binary attestation, mathematical oracle, solver, or advantage result.",
+        "evidence_refs": [
+          "research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json"
         ]
       }
     },
@@ -516,7 +531,7 @@
     },
     {
       "path": ".github/workflows/curve-covers.yml",
-      "sha256": "ba62909204ab53693fe9d04c6e92bbe7b99e955cc3aa83d5307a9c66ed2e4931",
+      "sha256": "4ace69f2f0503bac0249102d4576c98f7297ee3b70b2757d079cb9818041a186",
       "role": "exact implementation-version dependency: .github/workflows/curve-covers.yml",
       "freshness": {
         "status": "supported",
@@ -529,7 +544,7 @@
     },
     {
       "path": ".github/workflows/release.yml",
-      "sha256": "26599a31682b1fa8e0268aaa2d10f89325bcd391ac889107c1572ae8fdf1fe6a",
+      "sha256": "15b187dbbec24029f92a0d9d05d18215802af78cf4c4d019ceafc7af0b373d5b",
       "role": "exact implementation-version dependency: .github/workflows/release.yml",
       "freshness": {
         "status": "supported",
@@ -767,7 +782,7 @@
     },
     {
       "path": "docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md",
-      "sha256": "c46a66ceb2530cc4f8582ca1046a8faa3af194422d973beb3dfe9403901e8230",
+      "sha256": "3dfe49ea55d861b1f4d6c2343222832f93a91e8c1ae5b346d2699dc163632ccd",
       "role": "standalone CLI and supported-model documentation",
       "freshness": {
         "status": "supported",

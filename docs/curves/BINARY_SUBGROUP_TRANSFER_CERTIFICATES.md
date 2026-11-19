@@ -79,12 +79,16 @@ The Rust 1.98 canonical replay is retained at
 [`binary-transfer-catalog-canonical-replay-5c6e43a6.json`](../../research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json).
 It is 1,681 bytes with SHA-256
 `31df0daef4b583eeb87f9589460b83bd73345bd8a81a68c74c11ee8d0a2101d6`.
-Release run `44585934651`, Rust GNU job `135778928449`, built the exact
-`b98fb11d…` executable, passed installed-layout exact replay and byte comparison
-against this receipt, and uploaded artifact `14560899671` (104,462,060 ZIP
+Release run `44596599220`, Rust GNU job `135817148417`, built the exact
+`98e4fbfe…` executable, passed source-tree and installed-layout exact replay and
+receipt comparison, and uploaded artifact `14567327688` (104,474,147 ZIP
 bytes; GitHub digest
-`f6343d57d7a16e5c6be2269fe910e7c67f9a7b5a19e121b3b8da1d9a1f952b4e`).
+`e0c6708f5fdb593b5899fd852700abd6d402255cd92caa2c3de8c5a3d270829f`).
 The durable job-side record is
+[`standalone-package-run-44596599220.json`](../../research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json),
+6,373 bytes with SHA-256
+`8119e3e969effe319e4a1f1a3ca6a1351b0258067a5819b21128927dc8e014ae`.
+The preceding successful Rust-lane record remains at
 [`standalone-package-run-44585934651.json`](../../research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json).
 The aggregate release remained cancelled by
 unrelated package hydration and runner failures. Executor proxy policy blocked
@@ -100,10 +104,15 @@ It binds all 21 reviewed paths and their normalized `include_str!` targets to
 the exact recorded Git tree and recomputes `e7a12f60…` with Git replacement
 objects disabled. The verifier is 12,930 bytes with SHA-256
 `64e09943c4a2be2508485325fcafa3dfa3d2dc27614db149270c2b5b1894e245`; its
-8/8 local mutation and substitution controls pass. Exact-head workflow replay
-of this new receipt remains pending. Even after that replay, it does not attest
-that an executable was built from the recorded commit or widen any arithmetic,
-subgroup, solver, or advantage claim. [pcc:unverified]
+8/8 local mutation and substitution controls pass. Exact-head release run
+`44596599220` repeated all eight controls, bound the 21 Git blobs, compared this
+receipt before staging, and compared it again from the installed package tree.
+Curve run `44596591504` has green assessment and Lean jobs; its first
+certificate attempt ended in hosted-runner disk exhaustion, and its identical
+failed-job rerun remains active. The passed provenance replay does not attest
+that an executable was built from the recorded producer commit or widen any
+arithmetic, subgroup, solver, or advantage claim.
+[pcc:unverified]
 
 ## Required bindings and checks
 
