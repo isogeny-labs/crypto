@@ -22,5 +22,8 @@ The [independent replay](independent-replay.json) and
 members as data with zero archived binary executions, `target_card_created=false`,
 and null online speedup.
 
-This is a pre-card custody gate only. It does not mint an IC1 identity,
-authorize a point card, or admit a four-arm dispatch.
+The matching [source descriptor](source-descriptor.json) asserts the same
+seal, source-manifest and archive digests under
+`fresh-paired-n17-source-publication-v1` for the public-point card generator.
+This remains a pre-card custody gate only: it does not mint an IC1 identity
+or admit a four-arm dispatch.

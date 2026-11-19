@@ -215,7 +215,9 @@ target-free source publications under
 [incumbent-source-v1](../../../research/ic_candidate_tournament_20260915/goal_20260924/fresh-paired-n17-v1/incumbent-source-v1/result-v1/RESULT.md)
 and
 [rho-source-v1](../../../research/ic_candidate_tournament_20260915/goal_20260924/fresh-paired-n17-v1/rho-source-v1/result-v1/RESULT.md);
-a public point card and four-arm dispatch remain uncreated.
+the first
+[public point card](../../../research/ic_candidate_tournament_20260915/goal_20260924/fresh-paired-n17-v1/public-card-v1/RESULT.md)
+is retained, while four-arm dispatch remains uncreated.
 The [disclosed strong-rho readiness control](../../../research/ic_candidate_tournament_20260915/goal_20260924/fresh-paired-n17-v1/rho-readiness-v1/RESULT.md)
 passed scalar replay and deterministic session audit on one already exposed
 public point. It is L0, source-unpublished and unpaired. Use its exact
