@@ -24,6 +24,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_transformed_slot_f3.rs
+            research/prime31_ic_20261115/native/verify_prime31_transformed_slot_f3.py
+            research/prime31_ic_20261115/rr9/TRANSFORMED_SLOT_F3_PROTOCOL_20261119.md
       - name: Fetch pinned original Rust Arithmetic / PRIME31
         uses: actions/checkout@v4
         with:
@@ -31,6 +37,10 @@ jobs:
           ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
           path: pinned
           persist-credentials: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/
       - name: Install Rust 1.100.0
         run: rustup toolchain install 1.100.0 --profile minimal
       - name: Copy only candidate example into original pinned Rust crate
