@@ -1,0 +1,7 @@
+Trigger: assess relation finding
+UTC: 2026-11-19T17:16:00Z
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Curve: frozen Koblitz GF(2^23), a=0, m=2 (NOT ECC2K-130)
+Baseline: results/relation_baseline.json
+Threshold: absolute metric deviation >20%
+Log: results/hourly_log.csv
