@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-19T20:06:25Z",
+ "id": "PCC-20261119-2c597b",
+ "kind": "statement",
+ "producer": {
+  "commit": "8c71d21370fd541c74e5d48f9b429d1615df6c62",
+  "model": "codex",
+  "session": "conductor-rust-20261119"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/qualification-b/summary.json",
+    "sha256": "81e3b9ef3cf0b0e573da1e44b94c2d3ffe5a776457813662f48d7e72d18150b9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/qualification-b/commands.json",
+    "sha256": "3453efe991c3a43563e5a3d21b8ea9d3d4403c26fcd8b11897a3a82831f52f88"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/build-d/tests.stdout",
+    "sha256": "4b2d13138d0e903a8684254b77f2d862a0a3144d85c83888208c15cc654b2fc4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/frozen/isogeny_eval.rs",
+    "sha256": "d5ee98edc29e9a13896ec1a4752f9b37df3c8a1562adb6bca87554d9806c9556"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/frozen/flint.rs",
+    "sha256": "1ffca3e54fc235fc01c7257ae03fdd459fba006f9c8755728659a2446f99b3d8"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "rust-isogeny-small-controls",
+ "statement": "The user-requested Rust isogeny evaluator passes18 complete map controls covering470 point inputs against retained independent PARI references, across fields11/71 and square/nonsquare twists with blocked/full rectangles. Eight rejection controls and six arithmetic/coverage/parser tests pass. Map/jet/log-norm/coverage logic is Rust with unchanged repository Mont/Jac arithmetic and explicit FLINT/GMP primitive FFI; no C++ constructor is called. No large crossing or performance result is asserted by these controls."
+}

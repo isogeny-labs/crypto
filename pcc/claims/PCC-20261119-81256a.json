@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-19T20:12:58Z",
+ "id": "PCC-20261119-81256a",
+ "kind": "statement",
+ "producer": {
+  "commit": "8c71d21370fd541c74e5d48f9b429d1615df6c62",
+  "model": "codex",
+  "session": "conductor-rust-20261119"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/results/main/result.json",
+    "sha256": "43162c9b1bbf9ed99d094e02fb7c1c5288439d167b22b572f0b3f053ec7248bf"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/results/main/resources.txt",
+    "sha256": "a1daeb7b7ce76c0edc2cad37d86d2336053ee350e4a2941ca1701ee813adb1df"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/main-audit.stdout",
+    "sha256": "2f68fadbc814804f8e34f3b8d088d57707bded082fae2b5214598c2636d14ba4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/dual-audit.stdout",
+    "sha256": "c54f1142eb2e9065a75dbc18f2e37277e80eb9047146865940af6b0ff433462e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/dual-audit.gpvec",
+    "sha256": "46c212d9339e451d97155f56df5296f5b3b6e4b9806ad8bcca58d1eccdebcd47"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "rust-full33555419-map-and-dual",
+ "statement": "Actual Rust complete evaluator returns the exact33555419-degree quotient and33 original-subgroup point images after full half-kernel coverage. Independent PARI verifies33 memberships/order checks,32 scalar identities and33 normalized dual compositions on the original prime subgroup5629830654216971. Whole Rust process elapsed8.719seconds for quotient plus33 images and8.743seconds for normalized dual plus33 images at L0; no speedup or80bit completion is asserted."
+}
