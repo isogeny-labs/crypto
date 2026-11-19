@@ -73,7 +73,11 @@ concurrency:
 jobs:
   certificates:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 75
+    env:
+      # Integration-test targets pull in many large binaries. Serializing their
+      # links avoids concurrent rust-lld memory pressure on hosted runners.
+      CARGO_BUILD_JOBS: 1
     steps:
       # The full-history checkout no longer fits a hosted runner's disk
       # (checkout fails mid-clone); free the unused SDKs first (as in #2385).
