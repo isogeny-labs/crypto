@@ -64,3 +64,15 @@ The #4816 B8 7.35-ms quotient figure cannot be imported as a weighted extractor 
 4. **P3 independent scaling:** Repeat on ordinary cofactor-one prime-order curves of increasing size without deliberately weak parameters. Only a measured total advantage on Prime31 warrants a full asymptotic cost discussion.
 
 **Status:** Audited a materially important unsupported transfer between two prior programs; independently executed original-curve Python planted controls; implemented original Rust audit and CI gate. A cheaper **complete** prime-field index-calculus solver is not shown. Exact-source CI status must be checked separately before reporting Rust results as verified. [pcc:unverified]
+
+
+## Source-specific Rust CI closeout: independently replayed
+
+The frozen original-native Rust gate **completed SUCCESS** on [GitHub Actions #44609672410](https://github.com/isogeny-labs/crypto/actions/runs/44609672410) at 2026-11-19 20:35 UTC, exact candidate workflow/source commit `5cd0208b49684314365518b520c57cb352bc9b4f`. The action checks out pinned original native arithmetic at `1df714645aa683cf975bc76fcacb9842cb4780fd` and overlays only the candidate example. Toolchain Rust 1.100.0, ubuntu-24.04.
+
+- Original library **40/40**; earlier source-specific Horner x/y **2/2** and x-only/sign-lift **4/4**; new original-Rust weighted/fixed discriminator **1/1** tests all passed.
+- Rust release JSON `prime31-weighted-family-separation.json` passed frozen strict JSON gate: 512 planted weighted controls, four 256-point fixed-squarefree supports, zero weighted targets within those fixed supports, zero equal same-leaf unweighted sums, zero transformed root sets equal fixed H_B and zero weighted identity results.
+- Independently authored Python bigint affine validator replayed **all 512** source-emitted cases, the four first-case signed-point certificates, four window summaries and all four mismatch counters, with exact agreement. Independent arithmetic is **not** third-party signed PCC.
+- [Raw workflow artifact #14570834006](https://github.com/isogeny-labs/crypto/actions/runs/44609672410/artifacts/14570834006) (includes original Rust JSON, independent replay JSON and SHA256 receipt). SHA256 of original Rust result JSON: `3277673d0017c1e8bb516279dd000dd51e6767eb419decf36cbf9019243234b7`; candidate Rust source: `6b899d571fd4fd5b983bc70bd4894cf357617ecee5cc5f97784b1cea4435001e`; independent verifier: `0b20918273054933c6201cac3d901675ced6da1d203bd7de1ce45af5b6b8c8a5`; protocol: `9167acba957a62efaeec3390205ac869c5b9438b7c6d50067defcfe53d05a875`.
+
+**Validation disposition:** original-source Rust / Python independent arithmetic **passed** on the registered 512-case planted audit. The fixed/weighted language nontransfer is established for the experiment and follows directly from the algebraic witness definitions. This does not establish an efficient public-only weighted solver or a complete ECDLP advantage. [pcc:unverified]
