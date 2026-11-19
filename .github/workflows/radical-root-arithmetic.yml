@@ -14,6 +14,7 @@ on:
       - 'research/amm_digit_perf_20261118/round38_bounded_gcd_isolated.py'
       - 'research/amm_digit_perf_20261118/round39_bounded_power_isolated.py'
       - 'research/amm_digit_perf_20261118/round40_bounded_frobenius_isolated.py'
+      - 'research/amm_digit_perf_20261118/round42_mersenne_chain_isolated.py'
       - 'research/amm_digit_perf_20261118/round31_bounded_baseline.rs'
       - 'research/amm_digit_perf_20261118/round23_verifier_isolated.py'
       - 'research/amm_digit_perf_20261118/round24_verifier_isolated.py'
@@ -36,6 +37,34 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  bounded-mersenne-addition-chain:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round42_mersenne_chain_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Verify exact production Rust and benchmark all-one exponent chains
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round42_mersenne_chain_isolated.py
+          } | tee "$RUNNER_TEMP/round42-bounded-rust.txt"
+          cat "$RUNNER_TEMP/round42-bounded-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round42-mersenne-chain-rust-a-b
+          path: ${{ runner.temp }}/round42-bounded-rust.txt
+          if-no-files-found: ignore
+
   verifier-euclid:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
