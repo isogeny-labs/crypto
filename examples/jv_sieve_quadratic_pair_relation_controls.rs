@@ -11,6 +11,8 @@ pub mod quadratic_pair_graph;
 pub mod quadratic_pair_relation;
 
 /// The controls are unit tests: `cargo test --example <this example>`.
+/// Cargo.toml builds this example as `crate-type = ["lib"]`, so nothing calls `main`.
+#[allow(dead_code)]
 fn main() {}
 
 #[cfg(test)]
