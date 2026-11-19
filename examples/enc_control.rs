@@ -676,7 +676,7 @@ fn run_f4(
         .collect();
     let mut opts = F4Options::new(Ordering::Grevlex, max_degree)
         .with_budget(budget)
-        .recording_degree_falls();
+        .recording_hilbert_diagnostics();
     if runlog {
         opts = opts.capturing_run_log();
     }
@@ -711,9 +711,9 @@ fn run_f4(
         "basis_len": r.basis.len(),
         "timed_out": r.timed_out,
         "pairs_above_bound": r.pairs_above_bound,
-        "hilbert_first_fall": r.first_fall_degree,
-        "hilbert_last_fall": r.last_fall_degree,
-        "dreg_observed": r.degree_of_regularity_observed,
+        "hilbert_first_fall": r.first_hilbert_deviation_degree,
+        "hilbert_last_fall": r.last_hilbert_deviation_degree,
+        "dreg_observed": r.staircase_extinction_degree,
         "step_profile_deg_pairs_rows_new_ops": profile,
         "planted_ok": planted_ok,
         "ms": r.ms,
