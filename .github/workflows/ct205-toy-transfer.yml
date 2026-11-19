@@ -6,6 +6,7 @@ on:
       - '.github/workflows/ct205-toy-transfer.yml'
       - 'tests/prime_cover_toy_complete_dlp.rs'
       - 'tests/prime_cover_toy_cold_cost.rs'
+      - 'tests/ct226_native_genus4_transferred_ic.rs'
       - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/**'
       - 'src/prime_hyperelliptic/**'
       - 'Cargo.toml'
@@ -16,6 +17,7 @@ on:
     paths:
       - '.github/workflows/ct205-toy-transfer.yml'
       - 'tests/prime_cover_toy_cold_cost.rs'
+      - 'tests/ct226_native_genus4_transferred_ic.rs'
       - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/**'
   workflow_dispatch:
 
@@ -127,6 +129,7 @@ jobs:
             /src/
             /tests/prime_cover_toy_complete_dlp.rs
             /tests/prime_cover_toy_cold_cost.rs
+            /tests/ct226_native_genus4_transferred_ic.rs
             /.cargo/
             /build.rs
             /crates/
@@ -164,3 +167,6 @@ jobs:
           cargo test --locked --release --test prime_cover_toy_cold_cost -- --nocapture 2>&1 | tee /tmp/ct214-native.log
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct214_cost_log_validator.py /tmp/ct214-native.log
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct215_paired_cost_audit.py /tmp/ct214-native.log
+          # CT226: native composite-order J(F101) relation/LA/recovery cold cost.
+          cargo test --locked --release --test ct226_native_genus4_transferred_ic -- --nocapture 2>&1 | tee /tmp/ct226-native.log
+          test "$(grep -c 'CT226_NATIVE_PAIR_JSON' /tmp/ct226-native.log)" -eq 3
