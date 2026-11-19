@@ -150,15 +150,20 @@
       "reason": "Historical receipts disagree on direction for shared A/A setup metric identities [['ic:koblitz_setup_phase', 'setup_aa_k0n53', 'ratio'], ['ic:koblitz_setup_phase', 'setup_aa_k0n61', 'ratio']]. Preserve all six records and their raw successful/control arms; conservatively omit whole records from automated comparisons until an explicit versioned metric-identity disposition. No preferred direction or scientific invalidity is inferred.",
       "record": "benchmarks/records/20261115T0947Z-ic-fast-verify-ab.json",
       "sha256": "17d8e1e1d9b7e00114a2ef1c8a8ddbcf1ab4b24de3670387bc99343d800dab0e"
+    },
+    {
+      "reason": "Historical receipt is not in bench.record/v1 measurement form: its commands are recorded as strings with no integer exit code, and its 90 metrics are raw per-workload rows (median_batch_ns, min_batch_ns, max_batch_ns, spread) without name, value, unit or better fields. It aborts progress regeneration for every later record. Original record and its raw rows are preserved. This excludes automated comparisons; it does not decide the validity of every underlying measurement.",
+      "record": "benchmarks/records/20261117T0334Z-hec-multi-production-cold.json",
+      "sha256": "95485dfd5a3c23e120474d55320bb6eaf3c5c7557978a2e9039681f53cae6d78"
     }
   ],
-  "latest_record": "20261118T0223Z-koblitz-rho-reference-check",
-  "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 30 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
+  "latest_record": "20261119T1919Z-fb-domain-rootfind",
+  "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 31 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
-    "censored": 17,
+    "censored": 18,
     "invalid": 7,
-    "measured": 286,
-    "open": 13
+    "measured": 289,
+    "open": 16
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -21173,6 +21178,512 @@
       "unit": "ratio"
     },
     {
+      "better": "lower",
+      "first": 2914627.0,
+      "latest": 2914627.0,
+      "latest_derived": {},
+      "metric": "root_fmul_m2_p16_d256",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 16,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 2914627.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 728409.0,
+      "latest": 728409.0,
+      "latest_derived": {},
+      "metric": "root_fmul_m2_p16_d64",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 16,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 728409.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 7442442.0,
+      "latest": 7442442.0,
+      "latest_derived": {},
+      "metric": "root_fmul_m2_p20_d1024",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 8,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 7442442.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 3678558.0,
+      "latest": 3678558.0,
+      "latest_derived": {},
+      "metric": "root_fmul_m2_p20_d256",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 16,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 3678558.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 8942083.0,
+      "latest": 8942083.0,
+      "latest_derived": {},
+      "metric": "root_fmul_m2_p24_d1024",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 8,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 8942083.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 11909735.0,
+      "latest": 11909735.0,
+      "latest_derived": {},
+      "metric": "root_fmul_m2_p31_d1024",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 8,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 11909735.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 23800840.0,
+      "latest": 23800840.0,
+      "latest_derived": {},
+      "metric": "root_fmul_m2_p31_d4096",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 4,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 23800840.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 2822840.0,
+      "latest": 2822840.0,
+      "latest_derived": {},
+      "metric": "root_fmul_m3_p16_d16",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 8,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 2822840.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 10904975.0,
+      "latest": 10904975.0,
+      "latest_derived": {},
+      "metric": "root_fmul_m3_p20_d32",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 6,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 10904975.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 17434767.0,
+      "latest": 17434767.0,
+      "latest_derived": {},
+      "metric": "root_fmul_m3_p31_d32",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 6,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 17434767.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 47226203.0,
+      "latest": 47226203.0,
+      "latest_derived": {},
+      "metric": "root_fmul_m3_p31_d64",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 4,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 47226203.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 0.069,
+      "latest": 0.069,
+      "latest_derived": {},
+      "metric": "wall_s_m2_p16_d256",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 16,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 0.069
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.018,
+      "latest": 0.018,
+      "latest_derived": {},
+      "metric": "wall_s_m2_p16_d64",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 16,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 0.018
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.162,
+      "latest": 0.162,
+      "latest_derived": {},
+      "metric": "wall_s_m2_p20_d1024",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 8,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 0.162
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.074,
+      "latest": 0.074,
+      "latest_derived": {},
+      "metric": "wall_s_m2_p20_d256",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 16,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 0.074
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.185,
+      "latest": 0.185,
+      "latest_derived": {},
+      "metric": "wall_s_m2_p24_d1024",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 8,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 0.185
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.221,
+      "latest": 0.221,
+      "latest_derived": {},
+      "metric": "wall_s_m2_p31_d1024",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 8,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 0.221
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.434,
+      "latest": 0.434,
+      "latest_derived": {},
+      "metric": "wall_s_m2_p31_d4096",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 4,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 0.434
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.144,
+      "latest": 0.144,
+      "latest_derived": {},
+      "metric": "wall_s_m3_p16_d16",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 8,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 0.144
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.454,
+      "latest": 0.454,
+      "latest_derived": {},
+      "metric": "wall_s_m3_p20_d32",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 6,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 0.454
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.645,
+      "latest": 0.645,
+      "latest_derived": {},
+      "metric": "wall_s_m3_p31_d32",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 6,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 0.645
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 1.642,
+      "latest": 1.642,
+      "latest_derived": {},
+      "metric": "wall_s_m3_p31_d64",
+      "points": [
+        {
+          "commit": "aec9d3c0bafc",
+          "date": "2026-11-19",
+          "derived": {},
+          "n": 4,
+          "record": "20261119T1919Z-fb-domain-rootfind",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+          "value": 1.642
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
       "better": "higher",
       "first": 0.865,
       "latest": 0.865,
@@ -26555,6 +27066,474 @@
         }
       ],
       "problem": "mt:ic-memory",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9345,
+      "latest": 0.9345,
+      "latest_derived": {},
+      "metric": "ic_rel_over_ic_pf_2p32_t1024",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8985,
+            0.9834
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.9345
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9842,
+      "latest": 0.9842,
+      "latest_derived": {},
+      "metric": "ic_rel_over_ic_pf_2p32_t16384",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8254,
+            1.1757
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.9842
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0048,
+      "latest": 1.0048,
+      "latest_derived": {},
+      "metric": "ic_rel_over_ic_pf_2p32_t4096",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9421,
+            1.0511
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 1.0048
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8732,
+      "latest": 0.8732,
+      "latest_derived": {},
+      "metric": "ic_rel_over_ic_pf_2p36_t1024",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.6874,
+            1.0428
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.8732
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.944,
+      "latest": 0.944,
+      "latest_derived": {},
+      "metric": "ic_rel_over_ic_pf_2p36_t16384",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8586,
+            1.0143
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.944
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9471,
+      "latest": 0.9471,
+      "latest_derived": {},
+      "metric": "ic_rel_over_ic_pf_2p36_t4096",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9051,
+            1.0038
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.9471
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8876,
+      "latest": 0.8876,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_best_rho_2p32_t1024",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7824,
+            0.9351
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.8876
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9755,
+      "latest": 0.9755,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_best_rho_2p32_t16384",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8945,
+            1.0621
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.9755
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.97,
+      "latest": 0.97,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_best_rho_2p32_t4096",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9278,
+            1.1461
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.97
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.1334,
+      "latest": 1.1334,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_best_rho_2p36_t1024",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9889,
+            1.1817
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 1.1334
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.2184,
+      "latest": 1.2184,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_best_rho_2p36_t16384",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0516,
+            1.347
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 1.2184
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0585,
+      "latest": 1.0585,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_best_rho_2p36_t4096",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9947,
+            1.315
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 1.0585
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.889,
+      "latest": 0.889,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_ic_pf_2p32_t1024",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.833,
+            0.9345
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.889
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9996,
+      "latest": 0.9996,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_ic_pf_2p32_t16384",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.833,
+            1.1497
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.9996
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0552,
+      "latest": 1.0552,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_ic_pf_2p32_t4096",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9427,
+            1.1869
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 1.0552
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8356,
+      "latest": 0.8356,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_ic_pf_2p36_t1024",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.722,
+            0.9728
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.8356
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0218,
+      "latest": 1.0218,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_ic_pf_2p36_t16384",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.84,
+            1.106
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 1.0218
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9379,
+      "latest": 0.9379,
+      "latest_derived": {},
+      "metric": "ic_relcb_over_ic_pf_2p36_t4096",
+      "points": [
+        {
+          "commit": "e33d54e9c065",
+          "date": "2026-11-18",
+          "derived": {},
+          "n": 4,
+          "record": "20261115T2349Z-mt-ic-rel-2p32-2p36",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8076,
+            1.0521
+          ],
+          "summary": "Batched relation phase: IC 0.873x at 2^36 T=1024 (rel+cb 0.836x, gap to rho 1.31 -> 1.13); primary mixed (lower 4/4 in 2 of 6 cells); combinations unresolved; both cache attempts slower; 1728 executions, 0 errors [pcc:unverified]",
+          "value": 0.9379
+        }
+      ],
+      "problem": "mt:ic-relation-phase",
       "unit": "ratio"
     },
     {
