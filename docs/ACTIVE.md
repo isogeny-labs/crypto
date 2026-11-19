@@ -15,7 +15,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 ## Active items (top = next)
 - [ ] Genus-4 cost calibration: measure the real GAE price of relation and mod-r linear-algebra operations against a rho group operation (timing tier), to test whether the w = 1 pricing of the validated genus-4 results is conservative (Claude, started 2026-11-19, branch claude/hyperelliptic-index-calculus-td1fdn, PR #4693)
-- [ ] Factor-base rebalance on the elliptic IC lanes: check LA share and existing base-size tuning, then a frozen cc x SGE sweep if LA dominates (lead B; Claude, started 2026-11-19, PR #4693)
+- [x] Factor-base rebalance on the elliptic IC lanes (lead B): no-go, LA <= ~3% on every elliptic lane and bases already tuned (research/lead_b_elliptic_la_share_20261119/ASSESSMENT.md). Redirect: DL1 base-size sweep on the genus-3 quartic GHS lane (LA 34-64%) is the one place the lever could pay (Claude, 2026-11-19, PR #4693)
 - [ ] Genus-4 three-point exponent (third prime p ~ 65537) and genus 5 at matched group sizes against the ideal negation-rho bound (lead C; Claude, started 2026-11-19, PR #4693)
 - [ ] Measured transfer atlas: cover genus, base size and measured IC-vs-rho crossover for the transfer families the lab has tooling for (lead D; Claude, started 2026-11-19, PR #4693)
 
