@@ -45,6 +45,21 @@ Thus the next gain must remove enumeration or the number of extraction requests 
 
 Relevant published **prior art**: Petit–Kosters–Messeng (PKC 2016, DOI `10.1007/978-3-662-49387-8_1`), Amadori–Pintore–Sala (FFA 2018, DOI `10.1016/j.ffa.2018.01.009`), and Kudo–Yokota–Takahashi–Yasuda (CANS 2018, DOI `10.1007/978-3-030-00434-7_19`). Prime-field algebraic PDP, hybrid Gröbner and symmetry methods are established, so our contribution here is a source-traceable **operational feasibility bound**, not a novelty claim. Shared research-KB and Conductor were unavailable through the connected tool set; this audit is bounded to named GitHub lanes and those publications.
 
+## Follow-up audit: a substantially stronger historical shared-BSGS arm
+
+A prior merged **same-curve, 1,024-complete-public-log** Rust experiment, [#4532](https://github.com/isogeny-labs/crypto/pull/4532), [source-specific CI #44031618724](https://github.com/isogeny-labs/crypto/actions/runs/44031618724), measured a **2^20-baby reusable generic Shanks BSGS** arm with **103.840 ms** setup, **66.274 ms** online and **170.113 ms** fully charged batch time (independently replayed arithmetic, `[pcc:unverified]`). Reported peak memory after setup was **67,924 KiB**. Its same-runner comparison was with the older mixed-4+4 IC, at 2,221.474 ms; it was **not run alongside** #4774's W8, which used a different native-affine BSGS implementation and measured 3,342.793 ms.
+
+Thus **2.742 ms/request is not the strongest known repository frontier**, and no eventual positive result should stop at beating the #4774 affine-control arm. As a *cross-run sensitivity calculation only*, if the observed #4532 throughput were reproducible against the unchanged 1,219-call W8 workload, the analogous optimistic zero-overhead budget would be
+
+\[
+\frac{170.113\ \mathrm{ms}}{1219}=\mathbf{0.139551272\ \mathrm{ms/call}},
+\qquad \frac{170.113}{1024}=\mathbf{0.166125977\ \mathrm{ms/solved\ log}}.
+\]
+
+The raw wall-time quotient `3342.7934425/170.113 ≈ 19.6504` is **not a measured paired speed ratio**: neither common runner/source, common Q cohort, identical memory budget nor same concurrency has been established. BSGS's 2^20-entry table requires more memory than many smaller-table controls. The testable hypothesis is that reusing a larger table can shift the competitive frontier dramatically; the **next required paired benchmark must include 2^20 BSGS as a separate fully charged arm on the exact same source, runner and public targets as the new IC extractor**, with memory/RSS and precompute explicitly reported.
+
+This correction was checked against the merged original-curve #4532 source/CI and #4774's source-specific paired arm. It changes the experiment priority, not the demonstrated solver result: prefer completing #4692's nonenumerative extractor and preparing a stronger competitive baseline over further graph-chart-only tuning. Both PKM 2016 (DOI 10.1007/978-3-662-49387-8_1) and Amadori–Pintore–Sala 2018 (DOI 10.1016/j.ffa.2018.01.009) independently establish prior algebraic index-calculus approaches over prime fields; no novel complexity theorem is asserted here.
+
 ## Next falsifiable original-curve experiments (in priority order)
 
 1. **Implement public-target-only B8 unknown-index RR9 coefficient extraction in existing #4692** using the remainder-tower or F4, reusing the current Rust field/tower solvers. No generic 4+4 group-sum table, no witness-index leakage, no supplied F coefficients, no planted-only scoring. Run the sealed 46-positive/18-negative B8 corpus. For every input log exact Fp operations, Gröbner degree, matrix dimensions, memory, wall time, reconstruction validity, misses and censoring; independently verify signed EC witnesses. Require all algebraic outputs to reproduce the public target.
