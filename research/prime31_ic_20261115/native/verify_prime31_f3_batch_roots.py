@@ -128,6 +128,9 @@ def main(path):
         assert cohort["ordered_signed_witnesses"]==sum(len(a) for a in match[lo:hi])
     assert all(match[:64])
     assert j["field_ops_f3"]["inversions"]==351
+    assert j["direct_batch_field_ops"]["inversions"]==351
+    assert j["direct_batch_degenerate_linear_roots"]>=31
+    assert j["existing_prime_fast_direct_batch_method"] is True
     assert j["f3_degenerate_linear_roots"]>=31
     assert j["forbidden_group_sum_tables"]==0
     assert not j["complete_ecdlp_solved"] and not j["pcc_verified"]
@@ -135,6 +138,9 @@ def main(path):
           "cases":351,"planted_verified":64,"natural_hits":j["cohorts"]["natural"]["hits"],
           "degenerate_cases":31,"all_signed_fibres_exact":True,
           "field_inversions":j["field_ops_f3"]["inversions"],
+          "direct_batch_inversions":j["direct_batch_field_ops"]["inversions"],
+          "f3_median_ns":j["f3_median_ns"],
+          "direct_batch_median_ns":j["direct_batch_median_ns"],
           "negative_queries_fully_checked":j["cohorts"]["natural"]["misses"]},sort_keys=True))
 
 if __name__=="__main__":
