@@ -595,6 +595,14 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     if a.is_empty() || b.is_empty() {
         return vec![];
     }
+    // Scaling by a non-unit constant is a single coefficient pass, not
+    // polynomial convolution. Preserve monic/zero scalar shortcuts.
+    if a.len() == 1 || b.len() == 1 {
+        let (scalar, other) = if a.len() == 1 { (a[0], b) } else { (b[0], a) };
+        if scalar == 0 { return vec![]; }
+        if scalar == 1 { return trim(other.to_vec()); }
+        return trim(other.iter().map(|&x| vmul(x, scalar, p)).collect());
+    }
     if let Some(result) = vmonomial_product(a, b) { return result; }
     if let Some(result) = vmonomial_product(b, a) { return result; }
     let mut r = vec![0; a.len() + b.len() - 1];
@@ -632,15 +640,16 @@ fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
     if a.len() <= 2 || (a.len() <= 4 && p <= u32::MAX as u64) {
         return vproduct(a, a, p);
     }
-    // Long, sparse certificate polynomials can be squared with at most
-    // three field products. A cheap prefix guard avoids scanning dense inputs.
+    // Three-term sparse polynomial squares need six products instead of
+    // the quadratic-size dense convolution. Retain the previous one/two
+    // term specialization, and stop scanning after the fourth nonzero.
     if a.len() >= 6 && a[1] == 0 && a[2] == 0 {
-        let mut terms = [(0usize, 0u64); 2];
+        let mut terms = [(0usize, 0u64); 3];
         let mut count = 0usize;
         let mut dense = false;
         for (i, &x) in a.iter().enumerate() {
             if x != 0 {
-                if count == 2 {
+                if count == 3 {
                     dense = true;
                     break;
                 }
@@ -651,14 +660,31 @@ fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
         if !dense {
             if count == 0 { return vec![]; }
             let mut result = vec![0; 2 * a.len() - 1];
-            let (i, x) = terms[0];
-            result[2 * i] = vmul(x, x, p);
-            if count == 2 {
-                let (j, y) = terms[1];
-                result[2 * j] = vmul(y, y, p);
-                let cross = vmul(x, y, p);
-                let twice = cross + cross; // p <= 2^61-1, no overflow
-                result[i + j] = if twice >= p { twice - p } else { twice };
+            if count <= 2 {
+                let (i, x) = terms[0];
+                result[2 * i] = vmul(x, x, p);
+                if count == 2 {
+                    let (j, y) = terms[1];
+                    result[2 * j] = vmul(y, y, p);
+                    let cross = vmul(x, y, p);
+                    let twice = cross + cross;
+                    result[i + j] = if twice >= p { twice - p } else { twice };
+                }
+            } else {
+                for i in 0..3 {
+                    let (ix, x) = terms[i];
+                    result[2 * ix] = vmul(x, x, p);
+                    for j in (i + 1)..3 {
+                        let (jx, y) = terms[j];
+                        let cross = vmul(x, y, p);
+                        let twice = cross + cross;
+                        let twice = if twice >= p { twice - p } else { twice };
+                        // Cross term may coincide with another diagonal
+                        // (e.g. positions 0, 3, 6). Accumulate mod p.
+                        let sum = result[ix + jx] + twice;
+                        result[ix + jx] = if sum >= p { sum - p } else { sum };
+                    }
+                }
             }
             return trim(result);
         }
@@ -690,8 +716,14 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
     // A monic constant divisor leaves the dividend unchanged. Preserve
     // canonical quotient trimming even if a standalone caller supplies
     // trailing zero coefficients.
-    if b.len() == 1 && b[0] == 1 {
-        return Ok((trim(a.to_vec()), vec![]));
+    if b.len() == 1 {
+        if b[0] == 0 { return Err("division by zero polynomial".into()); }
+        if b[0] == 1 { return Ok((trim(a.to_vec()), vec![])); }
+        // Degree-zero division has no remainder. Avoid allocating a
+        // temporary dividend and trimming after every quotient digit.
+        let inverse = vpow(b[0], p - 2, p);
+        let quotient = a.iter().map(|&x| vmul(x, inverse, p)).collect();
+        return Ok((trim(quotient), vec![]));
     }
     // Division by x^k is a coefficient split, not a polynomial long
     // division. The guard avoids a full scan for dense divisors.
