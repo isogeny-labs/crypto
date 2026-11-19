@@ -54,6 +54,7 @@ jobs:
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct224_f101_split_factor.json
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_geometric_hom_obstruction.py
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_f101_geometric_hom.json
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct228_full_rational_base_scaling.py
       - name: Recount quotient curves, Jacobian and sextic-twist obstruction
         run: |
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/independent_quotient_oracle.py
@@ -105,6 +106,11 @@ jobs:
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_geometric_hom_obstruction.py > /tmp/ct225_hom.json
           cmp /tmp/ct225_hom.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_f101_geometric_hom.json
           sha256sum /tmp/ct225_hom.json
+          # CT228 full rational factor-base scaling, exact finite prime-order census.
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct228_full_rational_base_scaling.py --self-test
+          python3 -O research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct228_full_rational_base_scaling.py --self-test
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct228_full_rational_base_scaling.py > /tmp/ct228.json
+          echo '8ed4d9cfdcb3cc5ac21a5a45b02f70e1655f3c32dd2d84a8800d1bdf6281b131  /tmp/ct228.json' | sha256sum --check -
 
   native-toy-dlp:
     runs-on: ubuntu-latest
