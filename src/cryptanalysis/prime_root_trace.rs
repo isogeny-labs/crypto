@@ -688,8 +688,20 @@ fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
             return trim(result);
         }
         if let Some((k, z)) = third {
-            // Four or more terms fall through to the symmetric dense path.
-            if a[k + 1..].iter().all(|&x| x == 0) {
+            // The existing three-term fast path already scans the tail.
+            // Reuse that scan to recognize four-term squares without
+            // charging another pass on the common dense path.
+            let mut fourth = None;
+            let mut too_many = false;
+            for (offset, &w) in a[k + 1..].iter().enumerate() {
+                if w == 0 { continue; }
+                if fourth.is_some() {
+                    too_many = true;
+                    break;
+                }
+                fourth = Some((k + 1 + offset, w));
+            }
+            if !too_many && fourth.is_none() {
                 let (i, x) = terms[0];
                 let (j, y) = terms[1];
                 let mut result = vec![0; 2 * a.len() - 1];
@@ -710,6 +722,29 @@ fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
                 let sum = result[j + k] + twice;
                 result[j + k] = if sum >= p { sum - p } else { sum };
                 return trim(result);
+            }
+            if !too_many {
+                if let Some((l, w)) = fourth {
+                    // Four nonzero coefficients cost ten field products;
+                    // the dense symmetric path would use n(n+1)/2.
+                    // Accumulate, rather than assign, cross terms because
+                    // exponent sums can collide (e.g. 0+6 == 3+3).
+                    let nonzero = [terms[0], terms[1], (k, z), (l, w)];
+                    let mut result = vec![0; 2 * a.len() - 1];
+                    for (i, &(degree, x)) in nonzero.iter().enumerate() {
+                        let diagonal = vmul(x, x, p);
+                        let sum = result[2 * degree] + diagonal;
+                        result[2 * degree] = if sum >= p { sum - p } else { sum };
+                        for &(other_degree, y) in &nonzero[i + 1..] {
+                            let cross = vmul(x, y, p);
+                            let twice = cross + cross;
+                            let twice = if twice >= p { twice - p } else { twice };
+                            let sum = result[degree + other_degree] + twice;
+                            result[degree + other_degree] = if sum >= p { sum - p } else { sum };
+                        }
+                    }
+                    return trim(result);
+                }
             }
         }
     }
@@ -771,6 +806,27 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
                     else { value + p - product };
         }
         return Ok((trim(q), if carry == 0 { vec![] } else { vec![carry] }));
+    }
+    // A monic binomial x^k + c (k >= 3, c != 0) only changes
+    // one remainder coefficient per quotient digit.  In particular,
+    // do not multiply and subtract the k-1 known zero coefficients.
+    if b.len() >= 4 && b[0] != 0 && *b.last().unwrap() == 1
+        && b[1..b.len() - 1].iter().all(|&x| x == 0)
+    {
+        let mut r = a.to_vec();
+        let mut q = vec![0; a.len() - b.len() + 1];
+        while !r.is_empty() && r.len() >= b.len() {
+            let shift = r.len() - b.len();
+            let c = *r.last().unwrap();
+            q[shift] = c;
+            r.pop();
+            let product = vmul(c, b[0], p);
+            let old = r[shift];
+            r[shift] = if old >= product { old - product }
+                       else { old + p - product };
+            r = trim(r);
+        }
+        return Ok((trim(q), r));
     }
     let mut r = a.to_vec();
     let mut q = vec![0; a.len() - b.len() + 1];
@@ -1018,7 +1074,21 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 if state.exponent & 1 == 1 {
                     state.acc = vdiv(&vproduct(&state.acc, &state.base, p), &state.modulus, p)?.1;
                 }
-                state.base = vdiv(&vproduct(&state.base, &state.base, p), &state.modulus, p)?.1;
+                // A long monic-form binomial can be squared in three
+                // products. Keep dense bases on the fused product path:
+                // general symmetric squaring regressed in native controls.
+                let sparse_binomial = state.base.len() >= 6
+                    && state.base[0] != 0
+                    && state.base[1] == 0
+                    && state.base[2] == 0
+                    && *state.base.last().unwrap() != 0
+                    && state.base[3..state.base.len() - 1].iter().all(|&x| x == 0);
+                let product = if sparse_binomial {
+                    vsquare(&state.base, p)
+                } else {
+                    vproduct(&state.base, &state.base, p)
+                };
+                state.base = vdiv(&product, &state.modulus, p)?.1;
                 state.exponent >>= 1;
                 if (*exponent, accumulator, base) != (state.exponent, &state.acc, &state.base) {
                     return Err("modular power step failed".into());
