@@ -1,0 +1,148 @@
+name: Prime31 signed shared BSGS paired with W8 generic-table index calculus
+
+on:
+  push:
+    branches:
+      - automation/prime31-shared-bsgs-paired-20261119
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_shared_signed_bsgs.rs
+      - research/prime31_ic_20261115/native/verify_prime31_shared_signed_bsgs.py
+      - research/prime31_ic_20261115/rr9/W8_MATCHED_SIGNED_BSGS_PROTOCOL_20261119.md
+      - .github/workflows/prime31-shared-signed-bsgs.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_shared_signed_bsgs.rs
+      - research/prime31_ic_20261115/native/verify_prime31_shared_signed_bsgs.py
+      - research/prime31_ic_20261115/rr9/W8_MATCHED_SIGNED_BSGS_PROTOCOL_20261119.md
+      - .github/workflows/prime31-shared-signed-bsgs.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prime31-shared-bsgs-matched:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - name: Checkout candidate experiment source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Pin original Prime31 Rust arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Install Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only paired baseline examples, log source identities
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_shared_signed_bsgs.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_shared_signed_bsgs.rs
+          cp research/prime31_ic_20261115/native/examples/prime31_w8_weight_ab.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_w8_weight_ab.rs
+          git rev-parse HEAD
+          git -C pinned rev-parse HEAD
+          sha256sum research/prime31_ic_20261115/native/examples/prime31_shared_signed_bsgs.rs
+          sha256sum research/prime31_ic_20261115/native/examples/prime31_w8_weight_ab.rs
+      - name: Regression on original Rust library and both baseline examples
+        run: |
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_shared_signed_bsgs
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_weight_ab
+      - name: Six balanced completely charged 1024 target batches on one runner
+        run: |
+          PRIME31_WEIGHT_ARM=old cargo +1.100.0 run --quiet --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_weight_ab > old-A.json
+          PRIME31_WEIGHT_ARM=ternary cargo +1.100.0 run --quiet --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_weight_ab > ternary-A.json
+          cargo +1.100.0 run --quiet --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_shared_signed_bsgs > bsgs-A.json
+          cargo +1.100.0 run --quiet --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_shared_signed_bsgs > bsgs-B.json
+          PRIME31_WEIGHT_ARM=ternary cargo +1.100.0 run --quiet --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_weight_ab > ternary-B.json
+          PRIME31_WEIGHT_ARM=old cargo +1.100.0 run --quiet --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_weight_ab > old-B.json
+      - name: Independently verify all batches using Python BigInt curve arithmetic
+        run: |
+          for f in old-A.json ternary-A.json ternary-B.json old-B.json; do
+            python3 research/prime31_ic_20261115/native/verify_prime31_w8_weight_ab.py "$f"
+          done
+          python3 research/prime31_ic_20261115/native/verify_prime31_shared_signed_bsgs.py bsgs-A.json old-A.json ternary-A.json
+          python3 research/prime31_ic_20261115/native/verify_prime31_shared_signed_bsgs.py bsgs-B.json old-B.json ternary-B.json
+      - name: Complete cost summary and A/A deterministic audit
+        run: |
+          python3 - <<'PY'
+          import json
+          names=['old-A','ternary-A','bsgs-A','bsgs-B','ternary-B','old-B']
+          panels=[json.load(open(n+'.json',encoding='utf8')) for n in names]
+          for pos in [0,1,4,5]:
+            p=panels[pos]
+            assert p['generic_four_plus_four_grader_used'] and p['genuine_nongeneric_rr9_extractors']==0
+          for pos in [2,3]:
+            p=panels[pos]
+            assert p['generic_algorithm'] and p['genuine_nongeneric_rr9_extractors']==0
+          assert all(p['verified_target_count']==1024 for p in panels)
+          qs=[[r['public_q'] for r in p['recovered_targets']] for p in panels]
+          assert all(q==qs[0] for q in qs)
+          def remove_time(d):
+            return {k:v for k,v in d.items() if k!='times_ns'}
+          assert remove_time(panels[2])==remove_time(panels[3]),'BSGS A/A operation/answer mismatch'
+          result=[]
+          for name,p in zip(names,panels):
+            ns=sum(int(x) for x in p['times_ns'].values())
+            d={'arm':name,'time_ms':ns/1e6,
+               'setup_ms':int(p['times_ns']['setup'])/1e6,
+               'online_ms':int(p['times_ns'].get('target_recovery_and_verification',
+                             p['times_ns'].get('recovery_and_verification')))/1e6,
+               'ec_additions':p['counts']['total_ec_additions'],
+               'fp_multiplies':p['counts']['total_fp_multiplies'],
+               'fp_inversions':p['counts']['total_fp_inversions'],
+               'completed':p['verified_target_count']}
+            if 'total_giant_probes' in p: d['giant_probes']=p['total_giant_probes']
+            else:
+              d['training_ms']=int(p['times_ns']['training_and_log_verification'])/1e6
+              d['relation_queries']=p['online_queries']
+            result.append(d)
+          bsgs=sum(x['time_ms'] for x in result if x['arm'].startswith('bsgs'))/2
+          old=sum(x['time_ms'] for x in result if x['arm'].startswith('old'))/2
+          tern=sum(x['time_ms'] for x in result if x['arm'].startswith('ternary'))/2
+          summary={'schema':'prime31.signed-bsgs-w8-paired.v1',
+              'scope':'same GitHub runner; original Rust affine arithmetic for both controls; BSGS not separately frontier-optimized',
+              'status':'producer-side [pcc:unverified]',
+              'same_1024_q':True,'bsgs_aa_identical_non_timing':True,
+              'means_ms':{'bsgs':bsgs,'old_generic_ic':old,'ternary_generic_ic':tern},
+              'generic_ic_over_native_shared_bsgs':{'old':old/bsgs,'ternary':tern/bsgs},
+              'arms':result}
+          with open('matched-summary.json','w') as f:json.dump(summary,f,indent=2)
+          print(json.dumps(summary,indent=2))
+          PY
+      - name: Publish raw source-specific complete 1024-target evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-shared-signed-bsgs-w8-six-arm-1024
+          path: |
+            old-A.json
+            ternary-A.json
+            bsgs-A.json
+            bsgs-B.json
+            ternary-B.json
+            old-B.json
+            matched-summary.json
+          if-no-files-found: warn
+          retention-days: 30
