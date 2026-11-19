@@ -8,6 +8,7 @@
 - Original job log contains **15 authentic structured measurements plus 15 byte-identical `grep` replay echoes** (plus two shell-command references). Only the first 15 genuine observations are preserved in [ct241_f103_native_15_pairs.jsonl](ct241_f103_native_15_pairs.jsonl), initial raw-data freeze commit `67e725db759fd962920cc9186c334223aebebe44`. These observations were not recomputed or simulated.
 - Reproducible record check: `cd research/chained_jacobian_transfers_20261110/toy_dlp_ct204 && python3 ct241_f103_native_cost_audit.py && python3 -O ct241_f103_native_cost_audit.py`. Auditor self-tests include 16 synthetic corrupt/missing/duplicate mutations. Its success after the file freeze establishes *record consistency*, not an independent Rust solver replay.
 - A separate JavaScript extraction independently checked all 15 phase sums, signed LP ranks, fixed finite counts, wall ratios and exact equality of each original to its echo before publication.
+- **Hosted exact-source record-audit CI passed:** [GitHub Actions #44602035872](https://github.com/isogeny-labs/crypto/actions/runs/44602035872), job **135835706727**, on frozen-record commit `67e725db759fd962920cc9186c334223aebebe44`. Decoded original log shows both ordinary Python and `-O` processed **15 real rows**, each reported `CT241_RECORD_ONLY_AUDIT_PASS`, and both rejected all **16 synthetic mutations**. This is independent record adjudication, not a second timed native solve or signed PCC.
 
 ## Five-arm native cold Q73 result
 
