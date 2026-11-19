@@ -26,6 +26,12 @@ After substituting public x(Q), variables shrink **21 → 14**, equations **22 �
 
 **Boundary:** The rational-point equivalence does not assert saturated ideal equality or absence of algebraic-closure components; a Gröbner basis may encounter roots of D over extension fields. As in the original chart, suffix-infinity events need a separate branch, and sign lifting must be checked after any root is found.
 
+## Source-specific Rust validation (completed 2026-11-19)
+
+Both [push Actions run #44587413473](https://github.com/isogeny-labs/crypto/actions/runs/44587413473) and [PR Actions run #44587425573](https://github.com/isogeny-labs/crypto/actions/runs/44587425573) **completed SUCCESS** on the exact code/workflow commit `2efeb7e685fc161b1156c45db5f01e7e92f98adc`, with original native arithmetic pinned at `1df714645aa683cf975bc76fcacb9842cb4780fd`. They passed **40/40 original library tests, 2/2 original x/y tests, and 3/3 x-only tests** (including the new eliminated-rational-set test). The release protocol gate accepted **1024/1024** original-curve planted positive controls and **7168** eliminated step identities, and checked **8192** independent uniform-field triples. The separately authored Python BigInt checker within the same source-specific workflow replayed **1024/1024**, checked **16/16** stored sign certificates, all **7168** eliminated steps and all **8192** random triples, with zero chart exceptions. Logs explicitly report `pcc_signed=false`; this is not an independent signed PCC attestation.
+
+Frozen raw evidence: [artifact #14562965497](https://github.com/isogeny-labs/crypto/actions/runs/44587413473/artifacts/14562965497) (push) and [artifact #14563335008](https://github.com/isogeny-labs/crypto/actions/runs/44587425573/artifacts/14563335008) (PR). Artifact sizes 7042 bytes each. The successful Rust run is **not** a measurement of F4 unknown-index extraction or complete-log solving runtime.
+
 ## Original curve and independent experiment
 
 Frozen protocol: [HORNER_ELIMINATED_D14_PROTOCOL_20261119.md](HORNER_ELIMINATED_D14_PROTOCOL_20261119.md), committed before the source changes.
