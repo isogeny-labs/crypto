@@ -84,7 +84,8 @@ fn check_sample(x: u64, expected_class: i8, ar: &mut Arithmetic) -> (u64,u64) {
     let curve=if expected_class==1 {PRIME31} else {twist_curve()};
     // x' = d*x on E^d converts an original twist abscissa to a rational point.
     let transformed_x=if expected_class==1 {x} else {mul(NONSQUARE,x)};
-    let yy = ar.sqrt(ar.rhs(curve, transformed_x),P)
+    let public_rhs=ar.rhs(curve,transformed_x);
+    let yy = ar.sqrt(public_rhs,P)
         .expect("public x is not on its predicted curve/twist");
     let original_point: Point=Some((transformed_x,yy));
     assert!(ar.on_curve(curve, original_point));
