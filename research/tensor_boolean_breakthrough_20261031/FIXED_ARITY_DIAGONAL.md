@@ -314,7 +314,8 @@ Hasse-form premise `2|K|+1 <= 4|E(K)|`. Lean now derives that premise, for
 `a4557099d45c620a038e90a9c4b4d9ab08294b81`; its Manin-sequence theorem
 supplies the integral squared Hasse inequality for every elliptic finite-field
 curve, so `affineFullSignedTrialExpectation_le_four_of_atlasHasse` removes the
-Hasse premise entirely. For `|K| = 3 mod 4`, an executable binary-power square root is
+Hasse premise entirely. Claim `PCC-20261119-c7c015` binds this endpoint and
+passes its local Lean verifier. For `|K| = 3 mod 4`, an executable binary-power square root is
 also checked: it uses at most `2 * Nat.size |K|` field multiplications, and on
 elliptic short-form curves (`a1=a3=0`) it supplies the nonsingular root required
 by the sampler. Claims `PCC-20261119-c1ad13`, `PCC-20261119-e5e1f9`, and

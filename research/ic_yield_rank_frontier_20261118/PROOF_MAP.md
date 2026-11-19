@@ -400,7 +400,8 @@ The original Mathlib/CryptoLean tree supplied no Hasse theorem, but the project
 now pins Meta's Atlas development at
 `a4557099d45c620a038e90a9c4b4d9ab08294b81`.  Atlas's Manin proof supplies
 the squared bound, and `affineFullSignedTrialExpectation_le_four_of_atlasHasse`
-composes it into an assumption-free elliptic-curve endpoint. Claims
+composes it into an assumption-free elliptic-curve endpoint. Claim
+`PCC-20261119-c7c015` binds that endpoint and passes its local verifier. Claims
 `PCC-20261119-c1ad13`, `PCC-20261119-e5e1f9`, and
 `PCC-20261119-54ee4b` bind the curve-level Hasse arithmetic endpoint, counted
 square-root bit-work theorem, and short-curve root interface respectively;

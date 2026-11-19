@@ -1020,4 +1020,5 @@ proof gate reports `PASS 162 thm 0 trusted`. Axiom audits of the imported Hasse
 theorem and both local compositions list only `propext`, `Classical.choice`,
 and `Quot.sound`; the seven directly imported Atlas Hasse/Manin source files
 contain no `sorry`, `admit`, user `axiom`, or `native_decide`. A fresh checker
-replay exits 0. [pcc:unverified]
+replay exits 0. Hash-bound claim `PCC-20261119-c7c015` passes its local Lean
+verifier. [pcc:unverified]
