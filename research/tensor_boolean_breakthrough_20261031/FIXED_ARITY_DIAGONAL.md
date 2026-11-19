@@ -388,8 +388,21 @@ projector identity; and `algebraic_ne_const_mul_transcendental` proves the
 corrected final contradiction from algebraicity rather than rationality over
 the constant field. Claims `PCC-20261119-603d9c`, `PCC-20261119-0f3ed3`,
 `PCC-20261119-31e2b5`, and `PCC-20261119-752c5b` pass their local verifiers.
-The square-product implication, concrete Kummer extension, torsion-coordinate
-algebraicity, and CM endomorphism finite-kernel argument remain open.
+The stronger `separatingSignCharacterProjector_isolates_term` endpoint derives
+finite character orthogonality from multiplicativity, sign-square-one, and
+pairwise separation (`PCC-20261119-1ae928`). The square-product implication is
+now discharged from the actual rational-function-field hypothesis by
+`shortCubicPolynomial_fraction_square_product_classification`: it combines a
+generic UFD fraction-square conversion, an explicit cubic Bezout identity,
+squarefree divisibility, and the earlier coefficient classification
+(`PCC-20261119-fc17e6`). The concrete endpoint
+`galoisSignCharacterProjector_isolates_term` constructs the integer-valued
+signs in a supplied finite Galois extension, proves their multiplicativity,
+and derives pairwise separation from nonsquare radicand products before
+applying the projector (`PCC-20261119-545ba9`). Construction of the specialized
+splitting field and roots and proof of the transformed curve relations,
+torsion-to-division-polynomial vanishing, and the CM endomorphism finite-kernel
+argument remain open.
 [pcc:unverified]
 
 The generic certificate is now connected to the pinned upstream definitions,

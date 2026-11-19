@@ -699,10 +699,13 @@ layer uses these declarations:
    `PCC-20261119-a2b707` pass their local verifiers. [pcc:unverified]
 5. **Missing components only.** Construct `g_t` and prove its degree and
    vanishing laws. For nonvanishing, the checked pieces now include the cubic
-   coefficient classification, the short-interval orbit exclusion, the
-   abstract character projector, and the corrected final transcendence
-   contradiction. Still missing are square-product-to-scaling, the actual
-   Kummer extension and character orthogonality, torsion-to-division-polynomial
+   rational-function-square-to-scaling classification, the short-interval
+   orbit exclusion, the abstract character projector, character orthogonality
+   from pairwise sign separation, concrete Galois sign construction and
+   separation from nonsquare radicand products, and the corrected final
+   transcendence contradiction. Still missing are construction of the
+   specialized finite Galois extension and square roots, proof of the
+   transformed elliptic-curve relations, torsion-to-division-polynomial
    vanishing, and the `A = 0` CM endomorphism/finite-kernel specialization.
    [pcc:unverified]
 
@@ -717,8 +720,13 @@ layer uses these declarations:
 | `upstreamDilationPolynomialFamily_implies_nondeg` | endpoint | same | exact pinned upstream `DilationNondeg` | supplied specialized polynomial family and its four laws |
 | `upstreamDilationPolynomialCertificate_implies_avg_energy` | endpoint | same | exact pinned upstream `Eng` and `Mdil` | odd characteristic, nonsingular curve and certificate |
 | `shortCubicPolynomial_scale_classification` | law | same | odd-characteristic field and short-cubic coefficients | a supplied nonzero nonidentity scaling symmetry |
+| `polynomial_constantMulSquare_of_isSquare_fractionRing` | law | same | polynomial UFD and its fraction field | the polynomial image is a square in the fraction field |
+| `shortCubicPolynomial_fraction_square_product_classification` | endpoint | same | nonsingular short cubic over an odd-characteristic field | its product with a nontrivially scaled copy is square in the rational function field |
 | `zmodNoFullCubicOrbitInShortInterval` | law | same | three positive residue representatives and a cubic root of unity | representatives at most `X`, `3X < p` |
 | `characterProjector_isolates_term` | law | same | finite character and point index sets, additive commutative point group | character orthogonality and every transformed relation |
+| `separatingSignCharacters_orthogonality` | law | same | finite group and finite family of integer-valued characters | multiplicativity, sign-square-one and pairwise separation |
+| `separatingSignCharacterProjector_isolates_term` | endpoint | same | previous row plus an additive commutative point group | pairwise character separation and every transformed relation |
+| `galoisSignCharacterProjector_isolates_term` | endpoint | same | finite Galois extension containing indexed square roots | nonzero roots, characteristic not two, pairwise nonsquare radicand products, every transformed relation |
 | `algebraic_ne_const_mul_transcendental` | law | same | field extension, algebraic coordinate and transcendental parameter | nonzero constant multiplier |
 | `divisionPolynomial_ne_zero_at_const_mul_transcendental` | law | same | Weierstrass curve over the constant field and extension parameter | division index nonzero in the constant field, nonzero constant multiplier |
 
@@ -729,6 +737,20 @@ Claims `PCC-20261119-603d9c`, `PCC-20261119-0f3ed3`,
 `PCC-20261119-31e2b5`, and `PCC-20261119-752c5b` bind the four checked
 Lemma N' components and pass their local verifiers; signed standing remains
 unverified. [pcc:unverified]
+
+Claim `PCC-20261119-1ae928` binds the separation-to-orthogonality projector
+endpoint. Claim `PCC-20261119-545ba9` binds the concrete Galois-sign endpoint:
+given square roots in a finite Galois extension, nonsquare pair-products force
+pairwise sign separation. The remaining field-theoretic obligation is to
+instantiate that endpoint with the specialized splitting field and roots,
+not to assume a character table. [pcc:unverified]
+
+Claims `PCC-20261119-cd776f` and `PCC-20261119-fc17e6` bind respectively the
+polynomial constant-times-square and the stronger rational-function-square
+classification endpoints. Both pass their local Lean verifiers. The latter
+discharges the square-product-to-scaling obligation; the separate Galois-sign
+endpoint discharges character construction and separation after the finite
+Galois square-root data are supplied. [pcc:unverified]
 
 Claims `PCC-20261119-1bad7c` and `PCC-20261119-a2b707` bind the exact upstream
 nondegeneracy and average-energy endpoints. Claim `PCC-20261119-a69a2d`

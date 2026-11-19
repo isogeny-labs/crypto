@@ -13,6 +13,8 @@ import Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.Basic
 import Mathlib.SetTheory.Cardinal.NatCard
 import MathlibExt.AlgebraicGeometry.EllipticCurve.HasseBound
 import Mathlib.AlgebraicGeometry.EllipticCurve.DivisionPolynomial.Degree
+import Mathlib.FieldTheory.Galois.Basic
+import Mathlib.RingTheory.Localization.NumDen
 import ECDLP.L49_Main
 
 /-!
@@ -2926,10 +2928,165 @@ theorem polynomialBadValuesCardLeDegree
 
 /-! ## Cubic scaling symmetry for the Semaev/Kummer step -/
 
+/-- A base-ring element that becomes a square in its fraction field is a unit
+times a square in the base unique-factorization domain. -/
+theorem unitMulSquare_of_isSquare_algebraMap_fractionRing
+    {A Fraction : Type*} [CommRing A] [IsDomain A]
+    [UniqueFactorizationMonoid A] [Field Fraction]
+    [Algebra A Fraction] [IsFractionRing A Fraction]
+    (value : A) (squareInFraction : IsSquare (algebraMap A Fraction value)) :
+    ∃ unitFactor square : A,
+      IsUnit unitFactor ∧ value = unitFactor * square ^ 2 := by
+  obtain ⟨fractionSquare, squareInFraction⟩ := squareInFraction
+  let numerator : A := IsFractionRing.num A fractionSquare
+  let denominator : nonZeroDivisors A := IsFractionRing.den A fractionSquare
+  have fractionSquareEq :
+      IsLocalization.mk' Fraction numerator denominator = fractionSquare :=
+    IsFractionRing.mk'_num_den A fractionSquare
+  have fractionRepresentation :
+      algebraMap A Fraction value =
+        IsLocalization.mk' Fraction (numerator ^ 2) (denominator ^ 2) := by
+    calc
+      algebraMap A Fraction value = fractionSquare * fractionSquare := squareInFraction
+      _ = IsLocalization.mk' Fraction numerator denominator *
+          IsLocalization.mk' Fraction numerator denominator := by rw [fractionSquareEq]
+      _ = IsLocalization.mk' Fraction (numerator * numerator)
+          (denominator * denominator) :=
+        (IsLocalization.mk'_mul (S := Fraction) numerator numerator denominator denominator).symm
+      _ = IsLocalization.mk' Fraction (numerator ^ 2) (denominator ^ 2) := by
+        simp only [pow_two]
+  have clearedInFraction :
+      algebraMap A Fraction
+          (value * ((denominator ^ 2 : nonZeroDivisors A) : A)) =
+        algebraMap A Fraction (numerator ^ 2) := by
+    have := IsLocalization.eq_mk'_iff_mul_eq.mp fractionRepresentation
+    simpa only [map_mul] using this
+  have clearedProduct :
+      value * ((denominator ^ 2 : nonZeroDivisors A) : A) = numerator ^ 2 :=
+    (IsFractionRing.injective A Fraction) clearedInFraction
+  have cleared : value * (denominator : A) ^ 2 = numerator ^ 2 := by
+    simpa [pow_two] using clearedProduct
+  have denominatorDvdNumeratorSquare : (denominator : A) ∣ numerator ^ 2 := by
+    rw [← cleared]
+    exact (dvd_pow_self (denominator : A) two_ne_zero).mul_left value
+  have denominatorUnit : IsUnit (denominator : A) :=
+    (IsFractionRing.num_den_reduced A fractionSquare).pow_left
+      denominatorDvdNumeratorSquare dvd_rfl
+  have denominatorSquareUnit : IsUnit ((denominator : A) ^ 2) :=
+    denominatorUnit.pow 2
+  obtain ⟨inverseDenominatorSquare, inverseMul⟩ :=
+    isUnit_iff_exists_inv'.mp denominatorSquareUnit
+  have inverseUnit : IsUnit inverseDenominatorSquare :=
+    IsUnit.of_mul_eq_one ((denominator : A) ^ 2) inverseMul
+  refine ⟨inverseDenominatorSquare, numerator, inverseUnit, ?_⟩
+  calc
+    value = 1 * value := by rw [one_mul]
+    _ = (inverseDenominatorSquare * (denominator : A) ^ 2) * value := by
+      rw [inverseMul]
+    _ = inverseDenominatorSquare * (value * (denominator : A) ^ 2) := by ring
+    _ = inverseDenominatorSquare * numerator ^ 2 := by rw [cleared]
+
+/-- Polynomial specialization of the fraction-ring square-class conversion:
+a polynomial square in the rational function field is a nonzero constant
+times a polynomial square. -/
+theorem polynomial_constantMulSquare_of_isSquare_fractionRing
+    {K : Type*} [Field K] (polynomial : Polynomial K)
+    (squareInFraction :
+      IsSquare (algebraMap (Polynomial K) (FractionRing (Polynomial K)) polynomial)) :
+    ∃ constant : K, ∃ square : Polynomial K,
+      constant ≠ 0 ∧ polynomial = Polynomial.C constant * square ^ 2 := by
+  obtain ⟨unitFactor, square, unitFactorUnit, polynomialEq⟩ :=
+    unitMulSquare_of_isSquare_algebraMap_fractionRing polynomial squareInFraction
+  obtain ⟨constant, constantUnit, constantEq⟩ :=
+    Polynomial.isUnit_iff.mp unitFactorUnit
+  refine ⟨constant, square, isUnit_iff_ne_zero.mp constantUnit, ?_⟩
+  simpa [constantEq] using polynomialEq
+
 /-- The monic short cubic `X³ + A X + B` used in Lemma 5.4. -/
 noncomputable def shortCubicPolynomial
     {K : Type*} [CommRing K] (A B : K) : Polynomial K :=
   Polynomial.X ^ 3 + Polynomial.C A * Polynomial.X + Polynomial.C B
+
+/-- The short cubic is monic of degree three. -/
+theorem shortCubicPolynomial_monic
+    {K : Type*} [Field K] (A B : K) :
+    (shortCubicPolynomial A B).Monic := by
+  rw [Polynomial.Monic]
+  simpa [shortCubicPolynomial] using
+    (Polynomial.leadingCoeff_cubic (R := K) (a := (1 : K)) (b := 0) (c := A) (d := B)
+      one_ne_zero)
+
+/-- The short cubic has natural degree three. -/
+theorem shortCubicPolynomial_natDegree
+    {K : Type*} [Field K] (A B : K) :
+    (shortCubicPolynomial A B).natDegree = 3 := by
+  simpa [shortCubicPolynomial] using
+    (Polynomial.natDegree_cubic (R := K) (a := (1 : K)) (b := 0) (c := A) (d := B)
+      one_ne_zero)
+
+/-- A squarefree polynomial on the left of a product that is a unit times a
+square divides the other factor.  This is the divisibility step behind the
+root-set argument in Lemma 5.4, without passing to a splitting field. -/
+theorem squarefreePolynomial_dvd_right_of_mul_eq_unit_mul_square
+    {K : Type*} [Field K]
+    {left right coefficient square : Polynomial K}
+    (leftSquarefree : Squarefree left) (coefficientUnit : IsUnit coefficient)
+    (relation : left * right = coefficient * square ^ 2) :
+    left ∣ right := by
+  have leftDvdSquareSquared : left ∣ square ^ 2 := by
+    apply coefficientUnit.dvd_mul_left.mp
+    rw [← relation]
+    exact dvd_mul_right left right
+  have leftDvdSquare : left ∣ square :=
+    (leftSquarefree.dvd_pow_iff_dvd two_ne_zero).mp leftDvdSquareSquared
+  obtain ⟨factor, squareEq⟩ := leftDvdSquare
+  refine ⟨coefficient * factor ^ 2, ?_⟩
+  apply mul_left_cancel₀ leftSquarefree.ne_zero
+  calc
+    left * right = coefficient * square ^ 2 := relation
+    _ = left * (left * (coefficient * factor ^ 2)) := by rw [squareEq]; ring
+
+/-- Nonsingularity makes the short cubic squarefree.  The proof uses the
+explicit Bezout identity
+
+`(-18AX + 27B)ℓ + (6AX² - 9BX + 4A²)ℓ' = 4A³ + 27B²`.
+-/
+theorem shortCubicPolynomial_squarefree
+    {K : Type*} [Field K] (A B : K)
+    (nonsingular : (4 : K) * A ^ 3 + 27 * B ^ 2 ≠ 0) :
+    Squarefree (shortCubicPolynomial A B) := by
+  apply Polynomial.Separable.squarefree
+  rw [Polynomial.separable_def]
+  let discriminant : K := 4 * A ^ 3 + 27 * B ^ 2
+  let leftCoefficient : Polynomial K :=
+    Polynomial.C (-18 * A) * Polynomial.X + Polynomial.C (27 * B)
+  let rightCoefficient : Polynomial K :=
+    Polynomial.C (6 * A) * Polynomial.X ^ 2 +
+      Polynomial.C (-9 * B) * Polynomial.X + Polynomial.C (4 * A ^ 2)
+  have bezout :
+      leftCoefficient * shortCubicPolynomial A B +
+          rightCoefficient * (shortCubicPolynomial A B).derivative =
+        Polynomial.C discriminant := by
+    dsimp [leftCoefficient, rightCoefficient, discriminant, shortCubicPolynomial]
+    simp only [Polynomial.derivative_add, Polynomial.derivative_mul,
+      Polynomial.derivative_pow, Polynomial.derivative_X, Polynomial.derivative_C,
+      zero_mul, add_zero, zero_add, mul_one, map_ofNat,
+      Polynomial.C_eq_natCast, Polynomial.C_neg,
+      Polynomial.C_add, Polynomial.C_mul, Polynomial.C_pow]
+    ring
+  refine ⟨Polynomial.C discriminant⁻¹ * leftCoefficient,
+    Polynomial.C discriminant⁻¹ * rightCoefficient, ?_⟩
+  calc
+    (Polynomial.C discriminant⁻¹ * leftCoefficient) * shortCubicPolynomial A B +
+          (Polynomial.C discriminant⁻¹ * rightCoefficient) *
+            (shortCubicPolynomial A B).derivative =
+        Polynomial.C discriminant⁻¹ *
+          (leftCoefficient * shortCubicPolynomial A B +
+            rightCoefficient * (shortCubicPolynomial A B).derivative) := by ring
+    _ = Polynomial.C discriminant⁻¹ * Polynomial.C discriminant := by rw [bezout]
+    _ = 1 := by
+      rw [← Polynomial.C_mul]
+      simp [discriminant, nonsingular]
 
 /-- Expanding the short cubic after the scaling `X ↦ rX`. -/
 theorem shortCubicPolynomial_comp_scale
@@ -2941,6 +3098,51 @@ theorem shortCubicPolynomial_comp_scale
     Polynomial.pow_comp, Polynomial.X_comp, Polynomial.C_comp, map_mul,
     map_pow]
   ring
+
+/-- The missing square-product implication in Lemma 5.4.  For a nonsingular
+short cubic and nonzero scale, if the product of the cubic and its scaled
+copy is a nonzero constant times a polynomial square, then the scaled copy is
+exactly `r³` times the original cubic. -/
+theorem shortCubicPolynomial_scale_of_constant_mul_square
+    {K : Type*} [Field K] (A B r constant : K)
+    (nonsingular : (4 : K) * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (rNonzero : r ≠ 0) (constantNonzero : constant ≠ 0)
+    (squareRelation : ∃ square : Polynomial K,
+      shortCubicPolynomial A B *
+          (shortCubicPolynomial A B).comp (Polynomial.C r * Polynomial.X) =
+        Polynomial.C constant * square ^ 2) :
+    (shortCubicPolynomial A B).comp (Polynomial.C r * Polynomial.X) =
+      Polynomial.C (r ^ 3) * shortCubicPolynomial A B := by
+  obtain ⟨square, squareRelation⟩ := squareRelation
+  have divides : shortCubicPolynomial A B ∣
+      (shortCubicPolynomial A B).comp (Polynomial.C r * Polynomial.X) :=
+    squarefreePolynomial_dvd_right_of_mul_eq_unit_mul_square
+      (shortCubicPolynomial_squarefree A B nonsingular)
+      (Polynomial.isUnit_C.mpr (isUnit_iff_ne_zero.mpr constantNonzero))
+      squareRelation
+  have scaledDegree :
+      ((shortCubicPolynomial A B).comp
+        (Polynomial.C r * Polynomial.X)).natDegree = 3 := by
+    rw [shortCubicPolynomial_comp_scale]
+    simpa [add_assoc] using
+      (Polynomial.natDegree_cubic (R := K) (a := r ^ 3) (b := 0)
+        (c := A * r) (d := B) (pow_ne_zero 3 rNonzero))
+  have degreeLe :
+      ((shortCubicPolynomial A B).comp
+          (Polynomial.C r * Polynomial.X)).natDegree ≤
+        (shortCubicPolynomial A B).natDegree := by
+    rw [scaledDegree, shortCubicPolynomial_natDegree]
+  have scaledLeadingCoefficient :
+      ((shortCubicPolynomial A B).comp
+        (Polynomial.C r * Polynomial.X)).leadingCoeff = r ^ 3 := by
+    rw [shortCubicPolynomial_comp_scale]
+    simpa [add_assoc] using
+      (Polynomial.leadingCoeff_cubic (R := K) (a := r ^ 3) (b := 0)
+        (c := A * r) (d := B) (pow_ne_zero 3 rNonzero))
+  have exactAssociate :=
+    Polynomial.eq_leadingCoeff_mul_of_monic_of_dvd_of_natDegree_le
+      (shortCubicPolynomial_monic A B) divides degreeLe
+  simpa [scaledLeadingCoefficient] using exactAssociate
 
 /-- Expanding the scalar multiple `r³ (X³ + AX + B)`. -/
 theorem shortCubicPolynomial_scale_mul
@@ -3022,6 +3224,42 @@ theorem shortCubicPolynomial_scale_classification
       apply mul_left_cancel₀ BNonzero
       simpa using hBcoeff
     exact oneEqCube.symm
+
+/-- Lemma 5.4's forward classification starting from the actual
+constant-times-a-square hypothesis, rather than an assumed scaling symmetry. -/
+theorem shortCubicPolynomial_square_product_classification
+    {K : Type*} [Field K] (hK : ringChar K ≠ 2)
+    (A B r constant : K)
+    (nonsingular : (4 : K) * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (rNonzero : r ≠ 0) (rNonidentity : r ≠ 1)
+    (constantNonzero : constant ≠ 0)
+    (squareRelation : ∃ square : Polynomial K,
+      shortCubicPolynomial A B *
+          (shortCubicPolynomial A B).comp (Polynomial.C r * Polynomial.X) =
+        Polynomial.C constant * square ^ 2) :
+    (A ≠ 0 → B = 0 ∧ r = -1) ∧ (A = 0 → B ≠ 0 → r ^ 3 = 1) := by
+  apply shortCubicPolynomial_scale_classification hK A B r rNonzero rNonidentity
+  exact shortCubicPolynomial_scale_of_constant_mul_square A B r constant
+    nonsingular rNonzero constantNonzero squareRelation
+
+/-- Lemma 5.4's forward classification from a square in the actual rational
+function field.  The fraction-ring conversion produces the nonzero constant
+and polynomial square required by
+`shortCubicPolynomial_square_product_classification`. -/
+theorem shortCubicPolynomial_fraction_square_product_classification
+    {K : Type*} [Field K] (hK : ringChar K ≠ 2)
+    (A B r : K)
+    (nonsingular : (4 : K) * A ^ 3 + 27 * B ^ 2 ≠ 0)
+    (rNonzero : r ≠ 0) (rNonidentity : r ≠ 1)
+    (squareInFunctionField :
+      IsSquare (algebraMap (Polynomial K) (FractionRing (Polynomial K))
+        (shortCubicPolynomial A B *
+          (shortCubicPolynomial A B).comp (Polynomial.C r * Polynomial.X)))) :
+    (A ≠ 0 → B = 0 ∧ r = -1) ∧ (A = 0 → B ≠ 0 → r ^ 3 = 1) := by
+  obtain ⟨constant, square, constantNonzero, squareRelation⟩ :=
+    polynomial_constantMulSquare_of_isSquare_fractionRing _ squareInFunctionField
+  exact shortCubicPolynomial_square_product_classification hK A B r constant
+    nonsingular rNonzero rNonidentity constantNonzero ⟨square, squareRelation⟩
 
 /-- A positive triple of natural representatives with sum below the modulus
 cannot sum to zero in `ZMod modulus`. -/
@@ -3114,6 +3352,176 @@ theorem divisionPolynomial_ne_zero_at_const_mul_transcendental
       (algebraMap K L t * s) indexNonzero root
   exact (transcendental_const_mul s sTranscendental t tNonzero) algebraic
 
+/-- Two square roots of base-field elements in a finite Galois extension
+cannot transform with the same ratio under every automorphism unless the
+product of their radicands is already a square in the base field.  This is
+the fixed-field bridge needed to obtain pairwise separation of Kummer sign
+characters without assuming a character table. -/
+theorem exists_galoisAut_sqrt_ratio_ne_of_not_isSquare_mul
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    [FiniteDimensional K L] [IsGalois K L]
+    {a b : K} {x y : L}
+    (xNonzero : x ≠ 0) (yNonzero : y ≠ 0)
+    (xSquare : x ^ 2 = algebraMap K L a)
+    (ySquare : y ^ 2 = algebraMap K L b)
+    (productNonsquare : ¬ IsSquare (a * b)) :
+    ∃ sigma : L ≃ₐ[K] L, sigma x / x ≠ sigma y / y := by
+  by_contra noSeparator
+  push Not at noSeparator
+  have productFixed : ∀ sigma : L ≃ₐ[K] L, sigma (x * y) = x * y := by
+    intro sigma
+    have crossEquality : sigma x * y = sigma y * x :=
+      (div_eq_div_iff xNonzero yNonzero).mp (noSeparator sigma)
+    have sigmaYSquare : (sigma y) ^ 2 = y ^ 2 := by
+      calc
+        (sigma y) ^ 2 = sigma (y ^ 2) := by rw [map_pow]
+        _ = sigma (algebraMap K L b) := by rw [ySquare]
+        _ = algebraMap K L b := sigma.commutes b
+        _ = y ^ 2 := ySquare.symm
+    have sigmaX : sigma x = sigma y * x / y :=
+      (eq_div_iff yNonzero).2 crossEquality
+    calc
+      sigma (x * y) = sigma x * sigma y := map_mul sigma x y
+      _ = (sigma y * x / y) * sigma y := by rw [sigmaX]
+      _ = (sigma y) ^ 2 * x / y := by ring
+      _ = y ^ 2 * x / y := by rw [sigmaYSquare]
+      _ = x * y := by field_simp [yNonzero]
+  obtain ⟨z, zMaps⟩ :=
+    (IsGalois.mem_range_algebraMap_iff_fixed (F := K) (E := L) (x * y)).2
+      productFixed
+  apply productNonsquare
+  refine ⟨z, ?_⟩
+  apply (algebraMap K L).injective
+  calc
+    algebraMap K L (a * b) = algebraMap K L a * algebraMap K L b :=
+      map_mul (algebraMap K L) a b
+    _ = x ^ 2 * y ^ 2 := by rw [xSquare, ySquare]
+    _ = (x * y) * (x * y) := by ring
+    _ = algebraMap K L z * algebraMap K L z := by rw [zMaps]
+    _ = algebraMap K L (z * z) := (map_mul (algebraMap K L) z z).symm
+
+/-- The integer sign with which a Galois automorphism transforms a chosen
+square root. -/
+noncomputable def galoisSqrtSign
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    (x : L) (sigma : L ≃ₐ[K] L) : ℤ :=
+  by
+    classical
+    exact if sigma x = x then 1 else -1
+
+/-- A Galois automorphism acts on a square root by its selected sign. -/
+theorem galoisSqrtSign_action
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    {a : K} {x : L} (xSquare : x ^ 2 = algebraMap K L a)
+    (sigma : L ≃ₐ[K] L) :
+    sigma x = galoisSqrtSign x sigma • x := by
+  classical
+  have imageSquare : (sigma x) ^ 2 = x ^ 2 := by
+    calc
+      (sigma x) ^ 2 = sigma (x ^ 2) := by rw [map_pow]
+      _ = sigma (algebraMap K L a) := by rw [xSquare]
+      _ = algebraMap K L a := sigma.commutes a
+      _ = x ^ 2 := xSquare.symm
+  by_cases fixed : sigma x = x
+  · simp [galoisSqrtSign, fixed]
+  · have negated : sigma x = -x :=
+      (sq_eq_sq_iff_eq_or_eq_neg.mp imageSquare).resolve_left fixed
+    simp only [galoisSqrtSign]
+    simp [negated]
+
+/-- The Galois square-root sign is multiplicative.  Characteristic two is
+excluded so that the two integer signs remain distinguishable on a nonzero
+root. -/
+theorem galoisSqrtSign_multiplicative
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    {a : K} {x : L} (xNonzero : x ≠ 0) (twoNonzero : (2 : L) ≠ 0)
+    (xSquare : x ^ 2 = algebraMap K L a)
+    (left right : L ≃ₐ[K] L) :
+    galoisSqrtSign x (left * right) =
+      galoisSqrtSign x left * galoisSqrtSign x right := by
+  classical
+  have negXNe : -x ≠ x := by
+    intro negEqual
+    have addSelf : x + x = 0 := by
+      calc
+        x + x = -x + x := by rw [negEqual]
+        _ = 0 := neg_add_cancel x
+    have twoMul : (2 : L) * x = 0 := by
+      simpa [two_mul] using addSelf
+    exact (mul_ne_zero twoNonzero xNonzero) twoMul
+  by_cases leftFixed : left x = x
+  · by_cases rightFixed : right x = x
+    · have productFixed : (left * right) x = x := by
+        rw [AlgEquiv.mul_apply, rightFixed, leftFixed]
+      simp only [galoisSqrtSign]
+      simp [productFixed, leftFixed, rightFixed]
+    · have rightNeg : right x = -x := by
+        simpa [galoisSqrtSign, rightFixed] using
+          galoisSqrtSign_action xSquare right
+      have productNotFixed : (left * right) x ≠ x := by
+        rw [AlgEquiv.mul_apply, rightNeg, map_neg, leftFixed]
+        exact negXNe
+      simp only [galoisSqrtSign]
+      simp [rightNeg, leftFixed, negXNe]
+  · have leftNeg : left x = -x := by
+      simpa [galoisSqrtSign, leftFixed] using
+        galoisSqrtSign_action xSquare left
+    by_cases rightFixed : right x = x
+    · simp only [galoisSqrtSign]
+      simp [leftFixed, rightFixed]
+    · have rightNeg : right x = -x := by
+        simpa [galoisSqrtSign, rightFixed] using
+          galoisSqrtSign_action xSquare right
+      have productFixed : (left * right) x = x := by
+        rw [AlgEquiv.mul_apply, rightNeg, map_neg, leftNeg, neg_neg]
+      simp only [galoisSqrtSign]
+      simp [productFixed, leftFixed, rightFixed]
+
+/-- Every Galois square-root sign has square one. -/
+theorem galoisSqrtSign_squareOne
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    (x : L) (sigma : L ≃ₐ[K] L) :
+    galoisSqrtSign x sigma * galoisSqrtSign x sigma = 1 := by
+  classical
+  by_cases fixed : sigma x = x <;> simp [galoisSqrtSign, fixed]
+
+/-- A nonsquare product of two radicands gives an automorphism on which their
+integer-valued Galois signs have product `-1`. -/
+theorem galoisSqrtSigns_separate_of_not_isSquare_mul
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    [FiniteDimensional K L] [IsGalois K L]
+    {a b : K} {x y : L}
+    (xNonzero : x ≠ 0) (yNonzero : y ≠ 0)
+    (xSquare : x ^ 2 = algebraMap K L a)
+    (ySquare : y ^ 2 = algebraMap K L b)
+    (productNonsquare : ¬ IsSquare (a * b)) :
+    ∃ sigma : L ≃ₐ[K] L,
+      galoisSqrtSign x sigma * galoisSqrtSign y sigma = -1 := by
+  obtain ⟨sigma, ratioDifferent⟩ :=
+    exists_galoisAut_sqrt_ratio_ne_of_not_isSquare_mul
+      xNonzero yNonzero xSquare ySquare productNonsquare
+  by_cases xFixed : sigma x = x
+  · have yNotFixed : sigma y ≠ y := by
+      intro yFixed
+      apply ratioDifferent
+      rw [xFixed, yFixed]
+      simp [xNonzero, yNonzero]
+    refine ⟨sigma, ?_⟩
+    simp [galoisSqrtSign, xFixed, yNotFixed]
+  · have xNeg : sigma x = -x := by
+      simpa [galoisSqrtSign, xFixed] using
+        galoisSqrtSign_action xSquare sigma
+    have yFixed : sigma y = y := by
+      by_contra yNotFixed
+      have yNeg : sigma y = -y := by
+        simpa [galoisSqrtSign, yNotFixed] using
+          galoisSqrtSign_action ySquare sigma
+      apply ratioDifferent
+      rw [xNeg, yNeg]
+      simp [xNonzero, yNonzero]
+    refine ⟨sigma, ?_⟩
+    simp [galoisSqrtSign, xFixed, yFixed]
+
 /-- Abstract Kummer-character projector. Orthogonality of the sign characters
 and the transformed zero-sum relations isolate one term and force
 `|Gamma| * n_i` times that point to vanish. -/
@@ -3150,6 +3558,117 @@ theorem characterProjector_isolates_term
     ring
   rw [rearranged] at projectedZero
   simpa [orthogonality] using projectedZero
+
+/-- Orthogonality of a finite family of multiplicative sign characters.
+Distinct characters need only be separated by one group element on which
+their product is `-1`; translation by that element pairs every summand with
+its negative. -/
+theorem separatingSignCharacters_orthogonality
+    {Index Gamma : Type*}
+    [DecidableEq Index] [Fintype Gamma] [DecidableEq Gamma] [Group Gamma]
+    (character : Index → Gamma → ℤ)
+    (multiplicative : ∀ index left right,
+      character index (left * right) =
+        character index left * character index right)
+    (squareOne : ∀ index gamma,
+      character index gamma * character index gamma = 1)
+    (separates : ∀ left right, left ≠ right →
+      ∃ delta, character left delta * character right delta = -1) :
+    ∀ left right,
+      (∑ gamma, character left gamma * character right gamma) =
+        if right = left then Fintype.card Gamma else 0 := by
+  intro left right
+  by_cases equal : right = left
+  · subst right
+    simp [squareOne]
+  · obtain ⟨delta, separatesAtDelta⟩ := separates left right (Ne.symm equal)
+    let productCharacter : Gamma → ℤ := fun gamma =>
+      character left gamma * character right gamma
+    have translated :
+        (∑ gamma, productCharacter (delta * gamma)) =
+          ∑ gamma, productCharacter gamma := by
+      exact Equiv.sum_comp (Equiv.mulLeft delta) productCharacter
+    have translatedNeg :
+        (∑ gamma, productCharacter (delta * gamma)) =
+          -∑ gamma, productCharacter gamma := by
+      calc
+        (∑ gamma, productCharacter (delta * gamma)) =
+            ∑ gamma, -productCharacter gamma := by
+          apply Fintype.sum_congr
+          intro gamma
+          simp only [productCharacter, multiplicative]
+          rw [← neg_one_mul (productCharacter gamma), ← separatesAtDelta]
+          ring
+        _ = -∑ gamma, productCharacter gamma := by simp
+    have sumNeg :
+        (∑ gamma, productCharacter gamma) =
+          -∑ gamma, productCharacter gamma :=
+      translated.symm.trans translatedNeg
+    have sumZero : (∑ gamma, productCharacter gamma) = 0 := by omega
+    simpa [equal, productCharacter] using sumZero
+
+/-- Kummer-projector endpoint with character orthogonality discharged from
+multiplicativity, sign values, and pairwise separation. -/
+theorem separatingSignCharacterProjector_isolates_term
+    {Index Gamma Point : Type*}
+    [Fintype Index] [DecidableEq Index]
+    [Fintype Gamma] [DecidableEq Gamma] [Group Gamma] [AddCommGroup Point]
+    (character : Index → Gamma → ℤ) (coefficient : Index → ℤ)
+    (point : Index → Point) (chosen : Index)
+    (multiplicative : ∀ index left right,
+      character index (left * right) =
+        character index left * character index right)
+    (squareOne : ∀ index gamma,
+      character index gamma * character index gamma = 1)
+    (separates : ∀ left right, left ≠ right →
+      ∃ delta, character left delta * character right delta = -1)
+    (transformedRelation : ∀ gamma,
+      ∑ index, (character index gamma * coefficient index) • point index = 0) :
+    ((Fintype.card Gamma : ℤ) * coefficient chosen) • point chosen = 0 := by
+  apply characterProjector_isolates_term character coefficient point chosen
+  · intro index
+    simpa [eq_comm] using
+      separatingSignCharacters_orthogonality character multiplicative squareOne
+        separates chosen index
+  · exact transformedRelation
+
+/-- Concrete Galois-sign specialization of the Kummer projector.  Once a
+finite Galois extension containing the selected square roots is supplied,
+pairwise nonsquareness of the radicand products constructs the separating
+integer sign characters used by the projector. -/
+theorem galoisSignCharacterProjector_isolates_term
+    {K L Index Point : Type*}
+    [Field K] [Field L] [Algebra K L]
+    [FiniteDimensional K L] [IsGalois K L]
+    [Fintype Index] [DecidableEq Index] [AddCommGroup Point]
+    (radicand : Index → K) (root : Index → L)
+    (coefficient : Index → ℤ) (point : Index → Point) (chosen : Index)
+    (rootNonzero : ∀ index, root index ≠ 0)
+    (twoNonzero : (2 : L) ≠ 0)
+    (rootSquare : ∀ index,
+      root index ^ 2 = algebraMap K L (radicand index))
+    (pairwiseNonsquare : ∀ left right, left ≠ right →
+      ¬ IsSquare (radicand left * radicand right))
+    (transformedRelation : ∀ sigma : L ≃ₐ[K] L,
+      ∑ index, (galoisSqrtSign (root index) sigma * coefficient index) •
+        point index = 0) :
+    ((Fintype.card (L ≃ₐ[K] L) : ℤ) * coefficient chosen) •
+      point chosen = 0 := by
+  classical
+  apply separatingSignCharacterProjector_isolates_term
+    (fun index sigma ↦ galoisSqrtSign (root index) sigma)
+    coefficient point chosen
+  · intro index left right
+    exact galoisSqrtSign_multiplicative
+      (rootNonzero index) twoNonzero (rootSquare index) left right
+  · intro index sigma
+    exact galoisSqrtSign_squareOne (root index) sigma
+  · intro left right distinct
+    exact galoisSqrtSigns_separate_of_not_isSquare_mul
+      (rootNonzero left) (rootNonzero right)
+      (rootSquare left) (rootSquare right)
+      (pairwiseNonsquare left right distinct)
+  · exact transformedRelation
 
 /-- A finite bad set pulled back through a map with fibres of size at most
 `multiplicity` has size at most `multiplicity * degree` when every bad point

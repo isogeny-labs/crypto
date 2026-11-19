@@ -1072,11 +1072,45 @@ projector: supplied orthogonality and transformed relations isolate
 constant field cannot equal a nonzero constant multiple of a transcendental
 parameter. [pcc:unverified]
 
+`separatingSignCharacters_orthogonality` now proves the finite orthogonality
+table from multiplicativity, sign-square-one, and one separating group element
+for every distinct character pair. Composing it with the projector gives
+`separatingSignCharacterProjector_isolates_term`. Hash-bound claim
+`PCC-20261119-1ae928` passes its local Lean verifier. [pcc:unverified]
+
+`unitMulSquare_of_isSquare_algebraMap_fractionRing` proves generically over a
+unique-factorization domain that a base element square in its fraction field
+is a unit times a square. Its polynomial specialization identifies that unit
+as a nonzero constant. `shortCubicPolynomial_squarefree` checks the explicit
+Bezout identity for the cubic and its derivative, and
+`shortCubicPolynomial_fraction_square_product_classification` composes these
+facts with squarefree divisibility and the coefficient classification. Claims
+`PCC-20261119-cd776f` and `PCC-20261119-fc17e6` pass their local Lean verifiers.
+[pcc:unverified]
+
+`exists_galoisAut_sqrt_ratio_ne_of_not_isSquare_mul` uses the finite-Galois
+fixed-field theorem to prove that nonsquare `a*b` forces different Galois
+transformation ratios on chosen square roots of `a` and `b`.
+`galoisSqrtSign_multiplicative` turns those ratios into integer-valued
+multiplicative signs, and `galoisSqrtSigns_separate_of_not_isSquare_mul`
+proves pairwise separation. The endpoint
+`galoisSignCharacterProjector_isolates_term` composes these facts with the
+checked character projector. Hash-bound claim `PCC-20261119-545ba9` records
+this endpoint and passes its local Lean verifier. The complete pinned project
+build succeeds with 9,086 jobs, and the repository proof gate reports
+`PASS 251 thm 0 trusted`. A final-source independent
+`lake env leanchecker --fresh TensorBoundaryBounds` replay exits 0.
+[pcc:unverified]
+
+The complete pinned project build succeeds with 9,086 jobs. The repository
+proof gate reports `PASS 244 thm 0 trusted`. [pcc:unverified]
+
 Hash-bound claims `PCC-20261119-603d9c`, `PCC-20261119-0f3ed3`,
 `PCC-20261119-31e2b5`, and `PCC-20261119-752c5b` pass their local Lean
-verifiers. These statements do not yet prove Lemma N': the square-product
-implication, concrete Kummer characters and orthogonality, torsion-coordinate
-algebraicity, and the CM finite-kernel specialization remain open.
+verifiers. These statements do not yet prove Lemma N': specialized finite
+Galois square-root data and transformed curve relations,
+torsion-to-division-polynomial vanishing, and the CM finite-kernel
+specialization remain open.
 [pcc:unverified]
 
 The pinned project build completes 2,738 jobs. The repository proof gate

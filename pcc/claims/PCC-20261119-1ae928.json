@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T07:06:23Z",
+ "id": "PCC-20261119-1ae928",
+ "kind": "theorem",
+ "producer": {
+  "commit": "e0a4460da3d8234240f04679b31dd18f3d41ca25",
+  "model": "Codex",
+  "session": "kummer-sign-orthogonality-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "7ccf3ade86e77efa3c8b917cf9d230ddc247856c53015fe62a3e1c0cf373aa21",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.separatingSignCharacterProjector_isolates_term"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "This discharges finite sign-character orthogonality and the projector step. It does not construct the actual multiquadratic Kummer extension or prove pairwise separation from the Semaev square classes.",
+ "statement": "Finite multiplicative sign characters that square to one and separate every distinct pair are orthogonal; therefore transformed zero-sum relations isolate the selected coefficient-times-point term without an assumed orthogonality table."
+}
