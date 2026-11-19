@@ -216,10 +216,11 @@ def main() -> None:
 
     root = Path(__file__).resolve().parent
     payload = build_screen(root)
-    encoded = json.dumps(payload, indent=2, sort_keys=True) + "\n"
     if args.output:
+        encoded = json.dumps(payload, separators=(",", ":"), sort_keys=True) + "\n"
         args.output.write_text(encoded, encoding="utf-8")
     else:
+        encoded = json.dumps(payload, indent=2, sort_keys=True) + "\n"
         print(encoded, end="")
 
 

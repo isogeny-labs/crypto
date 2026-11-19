@@ -118,12 +118,12 @@ exponent without a targeted sublinear norm-preimage algorithm.
 ## Executable evidence
 
 - `SCREEN.json`, SHA-256
-  `c021fd7f9e141874d8557a2a1f8da94fe2006e2cf95d558e6d57c65b37a41afa`,
+  `76264656ece3f9bd57f617e32cd5262948d992ccb68f6b31444632a0b1772940`,
   contains exact rational formulas for every degree 5 through 31 and every
   merged arity 1 through `d`, plus the inverse-Cantor ladder and n=83 bit
   conversions.
 - `VALIDATION.json`, SHA-256
-  `6205ccdf13ac00bafa2086b872a1c463aac429579f1cfc9a72f05020527634bf`,
+  `cc139efbffef10c5198923ad3bd9983bf34273c2d3e662927c30c63b6ece0d4d`,
   reports seven passing replay groups: registration, target/rho, complete
   Riemann--Roch grid, inverse-Cantor ladder, n=83 highlights, ambient control
   and advancement decision.
