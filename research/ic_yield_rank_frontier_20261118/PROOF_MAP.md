@@ -340,13 +340,12 @@ source estimates are supplied.
    apply the finite-union cardinality bound; subtract the union from the
    candidate set and use `8 * w * f <= #candidates` to derive the exact
    division-free `7/8` survival inequality. [pcc:unverified]
-5. **Missing components only.** The generic filtered-root lemma, the
+5. **Components formalized here.** The generic filtered-root lemma, the
    characteristic-polynomial bad-shift endpoint, its pullback through an
    injective shift encoding, the bounded-natural-to-residue injection, the
    finite-union bound and the `7/8` survival arithmetic. Still missing is the
-   paper-specific proof that each failed planted diagonal is represented by
-   one of these determinant conditions and the transcript-independence premise
-   making the residual matrix independent of the sampled shift.
+   end-to-end bridge from curve coverage and the decomposition machine through
+   executable dense elimination and the expected-time restart loop.
 6. **Inheritance table.** Distinct roots:
    `Polynomial.card_le_degree_of_subset_roots`; determinant identity:
    `Matrix.eval_charpoly`; degree: `Matrix.charpoly_natDegree_eq_dim`; union
@@ -370,4 +369,9 @@ form or that successful shifts recover an ECDLP relation. The separately
 pinned upstream v2 modules `L114_Trans`, `L114_Plant`, and `L114_Main` do check
 the stronger algorithm-facing transcript, planted-kernel, round-failure and
 successful-round implications, parameterized by their explicit interfaces.
+The same pinned tree's `L116_Alg`, `L116_Chernoff`, and `L116_Main` additionally
+construct the actual row collector, prove its row relations and adaptive cap
+bound, derive tag surjectivity from generation, and discharge the prime-power
+generation hypothesis. Their targeted build and axiom audit pass; coverage,
+oracle binding, executable Howell cost and expected-time assembly remain.
 [pcc:unverified]

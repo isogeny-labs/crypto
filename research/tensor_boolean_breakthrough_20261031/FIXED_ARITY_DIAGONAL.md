@@ -127,7 +127,6 @@ The decomposition capstone stops at decomposition search, but the same pinned
 v2 tree contains a separate checked index-calculus reduction. Its modules
 `L114_Trans`, `L114_Plant`, and `L114_Main` supply:
 
-- Theorem 3: constant-probability coverage after a random isomorphic dilation.
 - Sections 6.2--6.5: checked full-group relation-lattice and exact-recovery
   algebra, parameterized by its stated round hypotheses.
 - Section 6.6: checked adaptive-transcript independence, integer
@@ -145,6 +144,18 @@ the pinned commit completed for `ECDLPv2.L114_Plant` (9,050 jobs) and
 `planted_kernel`, `double_count`, `trans_count_indep`, `round_failure_le`, and
 `round_output` is exactly `[propext, Classical.choice, Quot.sound]`.
 [pcc:unverified]
+
+The concrete follow-up modules close several of those round hypotheses.
+`L116_Alg` builds the actual first-accepted-row collector and proves its
+`RoundSpec.row_rel`; `L116_Chernoff` proves the finite adaptive-oracle cap bound;
+and `L116_Main` proves tag-evaluation surjectivity from a generating pair,
+discharges the prime-power `GenBound`, and gives an explicit lower bound for two
+uniform generators of a rank-two finite abelian group. A pinned build of
+`ECDLPv2.L116_Alg`, `ECDLPv2.L116_Chernoff`, and `ECDLPv2.L116_Main` completed
+all 9,067 jobs. Explicit axiom output for `algSpec_row_rel`, `cap_bound`,
+`gen_two_prod`, `gen_two_explicit`, `evG_surjective_of_closure`,
+`hsurj_of_pair`, and `genBound_primePow` is exactly `[propext,
+Classical.choice, Quot.sound]`. [pcc:unverified]
 
 ## Corrections and remaining obligations
 
@@ -213,9 +224,10 @@ the remaining independent obligations are:
    [pcc:unverified];
 2. bind the factor-base labels returned by the Lean oracle to the rows used by
    the arbitrary-group relation lattice;
-3. bind the checked dense relation-lattice and recovery theorems to all
-   concrete coverage, generation, cap and elimination-cost hypotheses used by
-   Theorem 5's expected-time algorithm [pcc:unverified];
+3. implement and cost the Howell/dense-elimination procedure, bind the checked
+   finite round to the concrete coverage oracle, near-uniform generator sampler
+   and expected-time restart loop, and derive Theorem 5's bit bound
+   [pcc:unverified];
 4. implement or formalize the universal interpreter, independent random tapes,
    scalar-output length cap and polynomial simulation exponent `C`.
 
@@ -237,6 +249,10 @@ remove any of these fixed-`m` correctness and cost obligations.
   <https://github.com/kaarelkaarelson/fast-ecdlp/blob/d1deb5abe008e981206ed58cbd83012b6afc3740/v2/lean/ECDLPv2/L114_Plant.lean>,
   <https://github.com/kaarelkaarelson/fast-ecdlp/blob/d1deb5abe008e981206ed58cbd83012b6afc3740/v2/lean/ECDLPv2/L114_Trans.lean>, and
   <https://github.com/kaarelkaarelson/fast-ecdlp/blob/d1deb5abe008e981206ed58cbd83012b6afc3740/v2/lean/ECDLPv2/L114_Main.lean>.
+- Pinned concrete row, cap and generation sources:
+  <https://github.com/kaarelkaarelson/fast-ecdlp/blob/d1deb5abe008e981206ed58cbd83012b6afc3740/v2/lean/ECDLPv2/L116_Alg.lean>,
+  <https://github.com/kaarelkaarelson/fast-ecdlp/blob/d1deb5abe008e981206ed58cbd83012b6afc3740/v2/lean/ECDLPv2/L116_Chernoff.lean>, and
+  <https://github.com/kaarelkaarelson/fast-ecdlp/blob/d1deb5abe008e981206ed58cbd83012b6afc3740/v2/lean/ECDLPv2/L116_Main.lean>.
 - Local source hashes: `v2/paper.pdf`
   `eacf5acb66cedbd7eb656580322c9770d72f47ad6d95412e3d4e5c87309f696d`;
   `lean/ECDLP/L104_Final.lean`
@@ -246,7 +262,13 @@ remove any of these fixed-`m` correctness and cost obligations.
   `v2/lean/ECDLPv2/L114_Trans.lean`
   `378057e83147933551ff574be80e485220f867201a1db357f682fccc4b169109`;
   `v2/lean/ECDLPv2/L114_Main.lean`
-  `f247462fc4a23d8e2f4134d768b3e7072e2aba2a263c249c2c9180c173a34b39`.
+  `f247462fc4a23d8e2f4134d768b3e7072e2aba2a263c249c2c9180c173a34b39`;
+  `v2/lean/ECDLPv2/L116_Alg.lean`
+  `6fd6e5267b98ff3c730888835c3020528713b75e3db283e74b063a2f422d6667`;
+  `v2/lean/ECDLPv2/L116_Chernoff.lean`
+  `d95c55f402b699f3e2a093d24b9d20190117dc458c6dc5567a457c5dc536ec70`;
+  `v2/lean/ECDLPv2/L116_Main.lean`
+  `e4d970303f43f75701347e50eef9f042dd9a337df7c95d1c2892fb8709f398bf`.
 
 The repository research-KB wrapper was unavailable (`research-kb: no
 executable found`). The review therefore used this exact primary-source pin,

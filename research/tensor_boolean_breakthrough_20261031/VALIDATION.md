@@ -668,3 +668,34 @@ The checked local theorem is a quantifier and natural-arithmetic conversion. It
 does not verify the paper-to-machine instantiation of Theorem 5, its concrete
 bit costs, the curve-specific coverage estimates, or the universal
 interpreter's implementation. Those remain explicit external obligations.
+
+## 2026-11-19 pinned concrete dense-round follow-up
+
+The exact pinned v2 tree contains concrete row, adaptive-cap and generation
+modules beyond the previously audited abstract round. With the pinned Mathlib
+cache, the following targets built together:
+
+```text
+lake build ECDLPv2.L116_Alg ECDLPv2.L116_Chernoff ECDLPv2.L116_Main
+# Build completed successfully (9,067 jobs).
+```
+
+An explicit audit imported those targets and printed axioms for
+`algSpec_row_rel`, `cap_bound`, `gen_two_prod`, `gen_two_explicit`,
+`evG_surjective_of_closure`, `hsurj_of_pair`, and `genBound_primePow`. Every
+declaration reports exactly `[propext, Classical.choice, Quot.sound]`. The
+source hashes are:
+
+```text
+6fd6e5267b98ff3c730888835c3020528713b75e3db283e74b063a2f422d6667  L116_Alg.lean
+d95c55f402b699f3e2a093d24b9d20190117dc458c6dc5567a457c5dc536ec70  L116_Chernoff.lean
+e4d970303f43f75701347e50eef9f042dd9a337df7c95d1c2892fb8709f398bf  L116_Main.lean
+```
+
+This checks that the actual first-accepted-row collector has the required row
+relations, the history-dependent oracle satisfies the finite Chernoff cap once
+a coverage fraction is supplied, a generating pair makes tag evaluation
+surjective, and the prime-power lattice generation hypothesis is discharged.
+It does not supply the curve-specific coverage fraction, bind the decomposition
+machine to `hOrc`, implement the `HowellSpec` procedure with bit costs, or
+formalize the expected-time outer restart loop. [pcc:unverified]
