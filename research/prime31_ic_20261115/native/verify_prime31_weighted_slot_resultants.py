@@ -86,6 +86,22 @@ def resultant(c, support):
     return product
 
 
+def jacobian_det(c, supports, roots):
+    """Row-scaled Vandermonde determinant for eight independent resultants."""
+    out = 1
+    for i, support in enumerate(supports):
+        for x in support:
+            if x != roots[i]:
+                v = 0
+                for z in reversed(c):
+                    v = (v * x + z) % P
+                out = out * v % P
+    for i in range(8):
+        for j in range(i + 1, 8):
+            out = out * (roots[j] - roots[i]) % P
+    return out
+
+
 def verify(data):
     assert data["schema"] == "prime31.weighted_slot_resultants.v1"
     assert all(data["curve"][k] == v for k, v in
@@ -99,6 +115,7 @@ def verify(data):
     assert data["slot_supports_pairwise_disjoint"] is True
     assert data["candidate_monic_degree"] == 8
     assert data["slot_membership_equations"] == 8
+    assert data["membership_geometric_quotient_dimension"] == 8 ** 8
     assert ec_mul(N, (625037715, 2100627251)) is None
 
     base = base31()
@@ -106,6 +123,7 @@ def verify(data):
     tested = 0
     zero_positives = 0
     bad_first = 0
+    nonsingular = 0
     for wi, w in enumerate(WINDOWS):
         fb = [base[j] for j in w]
         transformed = [[ec_mul(1 << i, pt) for pt in fb] for i in range(8)]
@@ -139,6 +157,9 @@ def verify(data):
             assert len(set(roots)) == 8
             rs = [resultant(c, slot) for slot in support]
             assert rs == [0] * 8
+            det = jacobian_det(c, support, roots)
+            assert det != 0
+            nonsingular += 1
             negroots = roots.copy()
             negroots[0] = support[1][(choices[1] + 1) % 8]
             assert len(set(negroots)) == 8
@@ -156,14 +177,17 @@ def verify(data):
                 assert first["positive_coefficients_c0_to_c8"] == c
                 assert first["negative_coefficients_c0_to_c8"] == negc
                 assert first["negative_slot0_resultant"] == nrs[0]
+                assert first["jacobian_det"] == det
                 assert first["weighted_target"] == list(weighted)
     assert tested == data["positive"] == data["negative"] == 512
     assert zero_positives == data["positive_zero_resultants"] == 4096
     assert bad_first == data["negative_only_slot0_failed"] == 512
+    assert nonsingular == data["jacobian_nonsingular"] == 512
     return {"schema": "prime31.weighted_slot_resultants.independent.v1",
             "replayed": tested, "disjoint_windows": 4,
             "positive_zero_resultants": zero_positives,
             "negative_only_slot0_failed": bad_first,
+            "jacobian_nonsingular": nonsingular,
             "pcc_signed": False}
 
 
