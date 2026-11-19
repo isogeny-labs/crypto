@@ -1,15 +1,7 @@
 name: Prime31 RR9 Pluecker span and bilinear-rank gate
 
 on:
-  push:
-    branches:
-      - automation/prime31-exterior4-plucker-span-20261119
-    paths:
-      - research/prime31_ic_20261115/native/examples/prime31_rr9_plucker_span.rs
-      - research/prime31_ic_20261115/native/examples/prime31_rr9_plucker_span_check.rs
-      - research/prime31_ic_20261115/rr9/RR9_PLUCKER_SPAN_PROTOCOL_20261119.md
-      - research/prime31_ic_20261115/rr9/RR9_PLUCKER_SPAN_PROTOCOL_20261119.sha256
-      - .github/workflows/prime31-rr9-plucker-span.yml
+  # The branch push trigger is armed only after the required resume checkpoint.
   workflow_dispatch:
 
 permissions:
