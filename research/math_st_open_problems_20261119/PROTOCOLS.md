@@ -100,3 +100,21 @@ Pen-and-paper, with Lean where feasible. Preregistered claims:
 **Kill (closes Q025 in the generic model).** (A)–(C) proved.
 **Lead.** A gap in (C): an oracle-model or curve-specific route to
 $\chi_k(\log P)$ faster than $r^{1/6}$.
+
+## Amendment 2026-11-19 (after the A2 run): readings applied to H2
+
+Recorded after the run, not before; the measurements do not depend on them.
+
+1. "Recovers" was undefined. $\alpha_{\max}$ is the largest grid $\alpha$ with
+   at least 10 of 20 planted roots recovered. The 20/20 and 1/20 readings
+   (in `a2_semaev_small_roots/results/summary.json`) move it by at most one
+   grid step and never past 0.14.
+2. The grid had no upper end. Each row stopped after three consecutive 0/20
+   cells; every cell below that was run.
+3. "No upward trend": $\alpha_{\max}$ for $S_3$ rises from dimension 9 to 49
+   (81 at 64 bits) and is flat at 0.14 up to 121. The kill is read as "no
+   improvement at the top of the frozen range". A reader who counts the early
+   rise as a trend would call the trend clause unmet; the lead condition is
+   unmet either way.
+4. $S_4$ has a single box lattice within dimension about 150 (dimension 125;
+   the next is 729), so its trend clause is untestable.

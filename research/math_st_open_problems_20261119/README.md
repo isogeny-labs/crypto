@@ -4,10 +4,21 @@ date: 2026-11-19
 ---
 
 
-**Status: plan.** No experiment has run under this plan. Every upstream claim
-quoted here is the upstream authors' unverified assertion [pcc:unverified];
-every claim of ours that is not marked *checked* is a triage judgement to be
-tested by the attacks below.
+**Status: attacks done (2026-11-19).** All three "attack now" items and the
+P3.3 counting check have run; each ended at its preregistered kill. Every
+upstream claim quoted here is the upstream authors' unverified assertion
+[pcc:unverified]; our results below are measurements or written proofs in the
+files named, not pcc-certified claims.
+
+| item | outcome | file |
+|---|---|---|
+| A1, P2.3 | Kill. $R(n,d)\le L(n,d)+10$ on all 1,263,300 pairs, $n<2^{16}$; generic cost $\Theta(\sqrt{n/L})$ is already met by Cheon and its base-changed form. | `a1_trinomial_roots/REPORT.pdf` |
+| A2, P1.2/Q004 | Kill. Coppersmith lattices reach $\alpha_{\max}=0.14$ for $S_3$ (wall at 0.16, matching the determinant limit $1/6$) and $<0.02$ for $S_4$, against kill lines 0.30 and 0.20. | `a2_semaev_small_roots/REPORT.pdf` |
+| A3, P5.2/Q025 | Kill. (A)–(C) proved on paper; Q025 is closed in the generic model with an endomorphism oracle. No Lean proof (no toolchain). | `A3_P5.2_Q025.pdf` |
+| P3.3 | Upstream's "pure-power penalty" is the counting bound ($N_{\ell^e}\approx p/12$); only Q099 (KLPT vs. optimum) stays open. Medians read from upstream's CSV, not regenerated. | `P3.3_counting_check.md` |
+
+None of these is an index-calculus improvement; each closes one non-generic
+route that upstream left open.
 
 ## Scope
 

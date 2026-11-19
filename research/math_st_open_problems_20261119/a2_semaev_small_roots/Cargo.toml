@@ -1,0 +1,23 @@
+[package]
+name = "a2_semaev_small_roots"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# Standalone: do not join the repository's root workspace.
+[workspace]
+
+[dependencies]
+num-bigint = "0.4"
+num-traits = "0.2"
+num-integer = "0.1"
+rand = "0.8"
+rand_chacha = "0.3"
+rayon = "1.10"
+serde_json = "1"
+
+[profile.release]
+opt-level = 3
+debug = false
+lto = "thin"
+codegen-units = 1
