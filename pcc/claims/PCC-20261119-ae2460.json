@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T09:09:22Z",
+ "id": "PCC-20261119-ae2460",
+ "kind": "theorem",
+ "producer": {
+  "commit": "ab4b8fd10b317d9e3aec365d794852df66a26f82",
+  "model": "Codex",
+  "session": "kummer-splitting-field-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "cec2c527738c8d7458c362d61a543e22d6ed25eb36b85e722e76fc796c5f30c4",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.quadraticSplittingFieldAffinePointProjector_isolates_term"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "This closes the abstract multiquadratic extension, root selection, sign-character construction, affine Galois action, and transformed-relation premises. It still assumes the specialized radicands are nonzero with pairwise nonsquare products, the lifted points are nonsingular, and the original point relation; it does not prove torsion-to-division-polynomial vanishing, the j=0 CM finite-kernel case, the specialized Semaev polynomial certificate, or the full subexponential ECDLP runtime theorem.",
+ "statement": "For nonzero radicands with pairwise nonsquare products over an odd-characteristic field, the canonical splitting field of the indexed quadratic factors, its selected roots, its Galois action on short-form affine curve points, and all character-twisted relations are constructed internally; one original zero-sum relation therefore implies that the Galois-group cardinality times the selected integer coefficient annihilates the selected point."
+}

@@ -702,11 +702,14 @@ layer uses these declarations:
    rational-function-square-to-scaling classification, the short-interval
    orbit exclusion, the abstract character projector, character orthogonality
    from pairwise sign separation, concrete Galois sign construction and
-   separation from nonsquare radicand products, and the corrected final
-   transcendence contradiction. Still missing are construction of the
-   specialized finite Galois extension and square roots, proof of the
-   transformed elliptic-curve relations, torsion-to-division-polynomial
-   vanishing, and the `A = 0` CM endomorphism/finite-kernel specialization.
+   separation from nonsquare radicand products, the canonical quadratic
+   splitting field and roots, the affine-point Galois action, derivation of all
+   transformed relations from one original relation, and the corrected final
+   transcendence contradiction. Still missing are the Semaev-specific
+   radicands and lifted original relation with proofs of radicand nonvanishing,
+   pairwise nonsquareness and point nonsingularity,
+   torsion-to-division-polynomial vanishing, and the `A = 0` CM
+   endomorphism/finite-kernel specialization.
    [pcc:unverified]
 
 | statement | kind | owner | quantified structure | hypotheses |
@@ -727,6 +730,10 @@ layer uses these declarations:
 | `separatingSignCharacters_orthogonality` | law | same | finite group and finite family of integer-valued characters | multiplicativity, sign-square-one and pairwise separation |
 | `separatingSignCharacterProjector_isolates_term` | endpoint | same | previous row plus an additive commutative point group | pairwise character separation and every transformed relation |
 | `galoisSignCharacterProjector_isolates_term` | endpoint | same | finite Galois extension containing indexed square roots | nonzero roots, characteristic not two, pairwise nonsquare radicand products, every transformed relation |
+| `quadraticRadicandSplittingField_isGalois` | law | same | canonical splitting field of indexed quadratic factors | odd characteristic, nonzero injectively indexed radicands |
+| `transformedRelations_of_addEquiv_eigenvectors` | law | same | finite additive point group with indexed eigenvectors | one original relation and the action/eigenvector identity |
+| `affinePointGaloisAddEquiv_eigenvector` | law | same | short-form affine elliptic curve after base change | selected square root and point nonsingularity |
+| `quadraticSplittingFieldAffinePointProjector_isolates_term` | endpoint | same | canonical quadratic splitting field and short-form affine points | nonzero pairwise-nonsquare radicands, point nonsingularity and one original relation |
 | `algebraic_ne_const_mul_transcendental` | law | same | field extension, algebraic coordinate and transcendental parameter | nonzero constant multiplier |
 | `divisionPolynomial_ne_zero_at_const_mul_transcendental` | law | same | Weierstrass curve over the constant field and extension parameter | division index nonzero in the constant field, nonzero constant multiplier |
 
@@ -741,9 +748,12 @@ unverified. [pcc:unverified]
 Claim `PCC-20261119-1ae928` binds the separation-to-orthogonality projector
 endpoint. Claim `PCC-20261119-545ba9` binds the concrete Galois-sign endpoint:
 given square roots in a finite Galois extension, nonsquare pair-products force
-pairwise sign separation. The remaining field-theoretic obligation is to
-instantiate that endpoint with the specialized splitting field and roots,
-not to assume a character table. [pcc:unverified]
+pairwise sign separation. Claim `PCC-20261119-ae2460` binds the stronger
+quadratic-splitting-field affine-point endpoint: the extension, roots, Galois
+action and transformed relations are constructed internally from one original
+relation. The remaining obligation is the Semaev-specific source of its
+radicands, lifted points and original relation, not a supplied extension,
+character table or transformed-relation family. [pcc:unverified]
 
 Claims `PCC-20261119-cd776f` and `PCC-20261119-fc17e6` bind respectively the
 polynomial constant-times-square and the stronger rational-function-square

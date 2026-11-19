@@ -1102,6 +1102,37 @@ build succeeds with 9,086 jobs, and the repository proof gate reports
 `lake env leanchecker --fresh TensorBoundaryBounds` replay exits 0.
 [pcc:unverified]
 
+## 2026-11-19 canonical quadratic splitting-field projector
+
+`quadraticRadicandPolynomial` is the product of the indexed factors
+`X^2 - a_i`. Lean proves each factor and their product nonzero, proves
+coprimality for distinct radicands, derives radicand injectivity from the
+pairwise nonsquare-product hypothesis, and proves the product separable in
+odd characteristic. `quadraticRadicandSplittingField_isGalois` then supplies
+the finite-Galois instance for the canonical splitting field. The selected
+`quadraticRadicandRoot` is proved to square to its indexed radicand and to be
+nonzero whenever that radicand is nonzero. [pcc:unverified]
+
+`affinePointGaloisAddEquiv` defines the additive Galois action on a base-changed
+elliptic curve, and `affinePointGaloisAddEquiv_eigenvector` proves that on a
+short-form curve each lifted point transforms by its square-root sign.
+`transformedRelations_of_addEquiv_eigenvectors` derives every character-twisted
+relation from one original zero-sum relation. The endpoint
+`quadraticSplittingFieldAffinePointProjector_isolates_term` composes these
+facts with the checked Kummer projector. Claim `PCC-20261119-ae2460` binds the
+endpoint and passes its local verifier. The complete pinned project build
+succeeds with 9,086 jobs, and the proof gate reports
+`PASS 268 thm 0 trusted`. A final-source independent
+`lake env leanchecker --fresh TensorBoundaryBounds` replay exits 0.
+[pcc:unverified]
+
+This does not prove Lemma N' or subexponential ECDLP. The remaining
+specialization must construct the Semaev radicands and lifted original point
+relation and prove radicand nonvanishing, pairwise nonsquareness and point
+nonsingularity. Torsion-to-division-polynomial vanishing, the `A = 0` CM
+finite-kernel step, specialized polynomial construction/degree/vanishing, and
+collector/runtime assembly remain open. [pcc:unverified]
+
 The complete pinned project build succeeds with 9,086 jobs. The repository
 proof gate reports `PASS 244 thm 0 trusted`. [pcc:unverified]
 

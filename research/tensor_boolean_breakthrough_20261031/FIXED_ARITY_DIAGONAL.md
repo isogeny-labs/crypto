@@ -399,10 +399,15 @@ squarefree divisibility, and the earlier coefficient classification
 `galoisSignCharacterProjector_isolates_term` constructs the integer-valued
 signs in a supplied finite Galois extension, proves their multiplicativity,
 and derives pairwise separation from nonsquare radicand products before
-applying the projector (`PCC-20261119-545ba9`). Construction of the specialized
-splitting field and roots and proof of the transformed curve relations,
-torsion-to-division-polynomial vanishing, and the CM endomorphism finite-kernel
-argument remain open.
+applying the projector (`PCC-20261119-545ba9`). The stronger
+`quadraticSplittingFieldAffinePointProjector_isolates_term` constructs the
+canonical splitting field and selected roots, proves its finite-Galois
+instance, defines the affine-point Galois action, proves the sign eigenvector
+identities, and obtains every transformed relation from one original relation
+(`PCC-20261119-ae2460`). The remaining specialization must construct the
+Semaev radicands and original lifted relation and prove radicand nonvanishing,
+pairwise nonsquareness and point nonsingularity. Torsion-to-division-polynomial
+vanishing and the CM endomorphism finite-kernel argument also remain open.
 [pcc:unverified]
 
 The generic certificate is now connected to the pinned upstream definitions,

@@ -14,6 +14,7 @@ import Mathlib.SetTheory.Cardinal.NatCard
 import MathlibExt.AlgebraicGeometry.EllipticCurve.HasseBound
 import Mathlib.AlgebraicGeometry.EllipticCurve.DivisionPolynomial.Degree
 import Mathlib.FieldTheory.Galois.Basic
+import Mathlib.FieldTheory.SplittingField.Construction
 import Mathlib.RingTheory.Localization.NumDen
 import ECDLP.L49_Main
 
@@ -3352,6 +3353,162 @@ theorem divisionPolynomial_ne_zero_at_const_mul_transcendental
       (algebraMap K L t * s) indexNonzero root
   exact (transcendental_const_mul s sTranscendental t tNonzero) algebraic
 
+/-- Product of the indexed quadratic polynomials whose splitting field is the
+multiquadratic extension used by the Kummer-sign argument. -/
+noncomputable def quadraticRadicandPolynomial
+    {K Index : Type*} [Field K] [Fintype Index]
+    (radicand : Index → K) : Polynomial K :=
+  ∏ index, (Polynomial.X ^ 2 - Polynomial.C (radicand index))
+
+/-- Every quadratic factor of `quadraticRadicandPolynomial` is nonzero. -/
+theorem quadraticRadicandFactor_ne_zero
+    {K : Type*} [Field K] (value : K) :
+    Polynomial.X ^ 2 - Polynomial.C value ≠ 0 :=
+  (Polynomial.monic_X_pow_sub_C value (by norm_num : 2 ≠ 0)).ne_zero
+
+/-- The product of the indexed monic quadratic factors is nonzero. -/
+theorem quadraticRadicandPolynomial_ne_zero
+    {K Index : Type*} [Field K] [Fintype Index]
+    (radicand : Index → K) :
+    quadraticRadicandPolynomial radicand ≠ 0 := by
+  classical
+  rw [quadraticRadicandPolynomial]
+  exact Finset.prod_ne_zero_iff.mpr fun index _ ↦
+    quadraticRadicandFactor_ne_zero (radicand index)
+
+/-- Distinct constant terms give coprime quadratic factors. -/
+theorem quadraticRadicandFactors_isCoprime
+    {K : Type*} [Field K] {left right : K} (distinct : left ≠ right) :
+    IsCoprime (Polynomial.X ^ 2 - Polynomial.C left)
+      (Polynomial.X ^ 2 - Polynomial.C right) := by
+  have differenceNonzero : right - left ≠ 0 := sub_ne_zero.mpr (Ne.symm distinct)
+  refine ⟨Polynomial.C (right - left)⁻¹,
+    -Polynomial.C (right - left)⁻¹, ?_⟩
+  calc
+    Polynomial.C (right - left)⁻¹ *
+          (Polynomial.X ^ 2 - Polynomial.C left) +
+        -Polynomial.C (right - left)⁻¹ *
+          (Polynomial.X ^ 2 - Polynomial.C right) =
+      Polynomial.C (right - left)⁻¹ * Polynomial.C (right - left) := by
+      ext degree
+      simp
+      ring
+    _ = 1 := by
+      rw [← Polynomial.C_mul, inv_mul_cancel₀ differenceNonzero]
+      simp
+
+/-- Pairwise nonsquare products force the radicands to be injectively
+indexed: equal radicands would have a square product. -/
+theorem radicand_injective_of_pairwise_not_isSquare_mul
+    {K Index : Type*} [Field K] (radicand : Index → K)
+    (pairwiseNonsquare : ∀ left right, left ≠ right →
+      ¬ IsSquare (radicand left * radicand right)) :
+    Function.Injective radicand := by
+  intro left right equal
+  by_contra distinct
+  apply pairwiseNonsquare left right distinct
+  refine ⟨radicand left, ?_⟩
+  rw [equal]
+
+/-- In odd characteristic, nonzero injectively indexed radicands make the
+product of their quadratic factors separable. -/
+theorem quadraticRadicandPolynomial_separable
+    {K Index : Type*} [Field K] [Fintype Index]
+    (radicand : Index → K) (twoNonzero : (2 : K) ≠ 0)
+    (radicandNonzero : ∀ index, radicand index ≠ 0)
+    (radicandInjective : Function.Injective radicand) :
+    Polynomial.Separable (quadraticRadicandPolynomial radicand) := by
+  classical
+  rw [quadraticRadicandPolynomial]
+  apply Polynomial.separable_prod
+  · intro left right distinct
+    exact quadraticRadicandFactors_isCoprime
+      (fun equal ↦ distinct (radicandInjective equal))
+  · intro index
+    exact Polynomial.separable_X_pow_sub_C
+      (radicand index) twoNonzero (radicandNonzero index)
+
+/-- The canonical splitting field of the indexed quadratic product is a
+finite Galois extension once the radicands are nonzero and pairwise distinct. -/
+theorem quadraticRadicandSplittingField_isGalois
+    {K Index : Type*} [Field K] [Fintype Index]
+    (radicand : Index → K) (twoNonzero : (2 : K) ≠ 0)
+    (radicandNonzero : ∀ index, radicand index ≠ 0)
+    (radicandInjective : Function.Injective radicand) :
+    IsGalois K (quadraticRadicandPolynomial radicand).SplittingField :=
+  IsGalois.of_separable_splitting_field
+    (quadraticRadicandPolynomial_separable radicand twoNonzero
+      radicandNonzero radicandInjective)
+
+/-- Every indexed quadratic factor has a root in the canonical splitting
+field of their product. -/
+theorem exists_quadraticRadicandRoot
+    {K Index : Type*} [Field K] [Fintype Index]
+    (radicand : Index → K) (index : Index) :
+    ∃ root : (quadraticRadicandPolynomial radicand).SplittingField,
+      root ^ 2 = algebraMap K _ (radicand index) := by
+  classical
+  let factor : Polynomial K :=
+    Polynomial.X ^ 2 - Polynomial.C (radicand index)
+  have factorDvd : factor ∣ quadraticRadicandPolynomial radicand := by
+    rw [quadraticRadicandPolynomial]
+    exact Finset.dvd_prod_of_mem
+      (fun i ↦ Polynomial.X ^ 2 - Polynomial.C (radicand i))
+      (Finset.mem_univ index)
+  have mappedFactorDvd :
+      factor.map (algebraMap K
+        (quadraticRadicandPolynomial radicand).SplittingField) ∣
+      (quadraticRadicandPolynomial radicand).map
+        (algebraMap K (quadraticRadicandPolynomial radicand).SplittingField) :=
+    Polynomial.map_dvd _ factorDvd
+  have factorSplits :
+      (factor.map (algebraMap K
+        (quadraticRadicandPolynomial radicand).SplittingField)).Splits :=
+    (Polynomial.SplittingField.splits (quadraticRadicandPolynomial radicand)).of_dvd
+      (Polynomial.map_ne_zero
+        (quadraticRadicandPolynomial_ne_zero radicand)) mappedFactorDvd
+  obtain ⟨root, rootEvaluation⟩ := factorSplits.exists_eval_eq_zero (by
+    dsimp [factor]
+    simp only [Polynomial.map_sub, Polynomial.map_pow,
+      Polynomial.map_X, Polynomial.map_C]
+    rw [Polynomial.degree_X_pow_sub_C (by norm_num : 0 < 2)]
+    norm_num)
+  refine ⟨root, ?_⟩
+  have : root ^ 2 - algebraMap K
+      (quadraticRadicandPolynomial radicand).SplittingField
+        (radicand index) = 0 := by
+    simpa [factor] using rootEvaluation
+  exact sub_eq_zero.mp this
+
+/-- A canonical selected root for each quadratic factor in the splitting
+field. -/
+noncomputable def quadraticRadicandRoot
+    {K Index : Type*} [Field K] [Fintype Index]
+    (radicand : Index → K) (index : Index) :
+    (quadraticRadicandPolynomial radicand).SplittingField :=
+  Classical.choose (exists_quadraticRadicandRoot radicand index)
+
+/-- The canonical selected root squares to its indexed radicand. -/
+theorem quadraticRadicandRoot_sq
+    {K Index : Type*} [Field K] [Fintype Index]
+    (radicand : Index → K) (index : Index) :
+    quadraticRadicandRoot radicand index ^ 2 =
+      algebraMap K _ (radicand index) :=
+  Classical.choose_spec (exists_quadraticRadicandRoot radicand index)
+
+/-- A selected root of a nonzero radicand is nonzero. -/
+theorem quadraticRadicandRoot_ne_zero
+    {K Index : Type*} [Field K] [Fintype Index]
+    (radicand : Index → K) (index : Index)
+    (radicandNonzero : radicand index ≠ 0) :
+    quadraticRadicandRoot radicand index ≠ 0 := by
+  intro rootZero
+  have rootSquare := quadraticRadicandRoot_sq radicand index
+  rw [rootZero, zero_pow (by norm_num : 2 ≠ 0)] at rootSquare
+  exact ((map_ne_zero (algebraMap K
+    (quadraticRadicandPolynomial radicand).SplittingField)).2
+      radicandNonzero) rootSquare.symm
+
 /-- Two square roots of base-field elements in a finite Galois extension
 cannot transform with the same ratio under every automorphism unless the
 product of their radicands is already a square in the base field.  This is
@@ -3522,6 +3679,109 @@ theorem galoisSqrtSigns_separate_of_not_isSquare_mul
     refine ⟨sigma, ?_⟩
     simp [galoisSqrtSign, xFixed, yFixed]
 
+/-- Applying an additive equivalence to one point relation produces the
+corresponding character-twisted relation when each indexed point is an
+eigenvector with the supplied integer character. -/
+theorem transformedRelations_of_addEquiv_eigenvectors
+    {Index Gamma Point : Type*}
+    [Fintype Index] [AddCommGroup Point]
+    (character : Index → Gamma → ℤ) (coefficient : Index → ℤ)
+    (point : Index → Point) (action : Gamma → Point ≃+ Point)
+    (pointAction : ∀ gamma index,
+      action gamma (point index) = character index gamma • point index)
+    (relation : ∑ index, coefficient index • point index = 0) :
+    ∀ gamma, ∑ index,
+      (character index gamma * coefficient index) • point index = 0 := by
+  intro gamma
+  have mapped := congrArg (action gamma) relation
+  have mappedRelation :
+      ∑ index, coefficient index •
+        (character index gamma • point index) = 0 := by
+    simpa [map_sum, pointAction] using mapped
+  simpa only [smul_smul, mul_comm] using mappedRelation
+
+/-- A base-field algebra automorphism acts as an additive equivalence on the
+points of a base-changed affine Weierstrass curve. -/
+noncomputable def affinePointGaloisAddEquiv
+    {K L : Type*} [Field K] [Field L] [Algebra K L] [DecidableEq L]
+    (curve : WeierstrassCurve.Affine K) [curve.IsElliptic]
+    (sigma : L ≃ₐ[K] L) :
+    (curve.baseChange L).Point ≃+ (curve.baseChange L).Point where
+  toFun := WeierstrassCurve.Affine.Point.map
+    (W' := curve) sigma.toAlgHom
+  invFun := WeierstrassCurve.Affine.Point.map
+    (W' := curve) sigma.symm.toAlgHom
+  left_inv point := by
+    rw [WeierstrassCurve.Affine.Point.map_map]
+    have composition :
+        sigma.symm.toAlgHom.comp sigma.toAlgHom = AlgHom.id K L := by
+      ext value
+      simp
+    rw [composition]
+    cases point <;> rfl
+  right_inv point := by
+    rw [WeierstrassCurve.Affine.Point.map_map]
+    have composition :
+        sigma.toAlgHom.comp sigma.symm.toAlgHom = AlgHom.id K L := by
+      ext value
+      simp
+    rw [composition]
+    cases point <;> rfl
+  map_add' left right := by
+    exact (WeierstrassCurve.Affine.Point.map
+      (W' := curve) sigma.toAlgHom).map_add left right
+
+/-- On affine coordinates, the Galois point action applies the field
+automorphism to both coordinates. -/
+theorem affinePointGaloisAddEquiv_some
+    {K L : Type*} [Field K] [Field L] [Algebra K L] [DecidableEq L]
+    (curve : WeierstrassCurve.Affine K) [curve.IsElliptic]
+    (sigma : L ≃ₐ[K] L)
+    {x y : L} (nonsingular : (curve.baseChange L).Nonsingular x y) :
+    affinePointGaloisAddEquiv curve sigma
+        (WeierstrassCurve.Affine.Point.some x y nonsingular) =
+      WeierstrassCurve.Affine.Point.some
+        (sigma.toAlgHom x) (sigma.toAlgHom y)
+        ((WeierstrassCurve.Affine.baseChange_nonsingular
+          (W := curve) (f := sigma.toAlgHom) sigma.toAlgHom.injective x y).mpr
+            nonsingular) :=
+  rfl
+
+/-- On a short-form base-changed curve, a point whose `Y`-coordinate is a
+chosen square root is an eigenvector for the Galois point action with the
+corresponding integer square-root sign. -/
+theorem affinePointGaloisAddEquiv_eigenvector
+    {K L : Type*} [Field K] [Field L] [Algebra K L] [DecidableEq L]
+    (curve : WeierstrassCurve.Affine K) [curve.IsElliptic]
+    (a₁Zero : curve.a₁ = 0) (a₃Zero : curve.a₃ = 0)
+    {x radicand : K} {y : L}
+    (ySquare : y ^ 2 = algebraMap K L radicand)
+    (nonsingular : (curve.baseChange L).Nonsingular (algebraMap K L x) y)
+    (sigma : L ≃ₐ[K] L) :
+    affinePointGaloisAddEquiv curve sigma
+        (WeierstrassCurve.Affine.Point.some
+          (algebraMap K L x) y nonsingular) =
+      galoisSqrtSign y sigma •
+        WeierstrassCurve.Affine.Point.some
+          (algebraMap K L x) y nonsingular := by
+  classical
+  by_cases fixed : sigma y = y
+  · simp only [galoisSqrtSign, if_pos fixed, one_zsmul]
+    rw [affinePointGaloisAddEquiv_some]
+    rw [WeierstrassCurve.Affine.Point.some.injEq]
+    exact ⟨sigma.commutes x, fixed⟩
+  · have negated : sigma y = -y := by
+      simpa [galoisSqrtSign, fixed] using
+        galoisSqrtSign_action ySquare sigma
+    have negatedAlgHom : sigma.toAlgHom y = -y := negated
+    simp only [galoisSqrtSign, if_neg fixed, neg_one_zsmul]
+    rw [affinePointGaloisAddEquiv_some,
+      WeierstrassCurve.Affine.Point.neg_some]
+    rw [WeierstrassCurve.Affine.Point.some.injEq]
+    refine ⟨sigma.commutes x, ?_⟩
+    rw [negatedAlgHom]
+    simp [WeierstrassCurve.Affine.negY, a₁Zero, a₃Zero]
+
 /-- Abstract Kummer-character projector. Orthogonality of the sign characters
 and the transformed zero-sum relations isolate one term and force
 `|Gamma| * n_i` times that point to vanish. -/
@@ -3669,6 +3929,141 @@ theorem galoisSignCharacterProjector_isolates_term
       (rootSquare left) (rootSquare right)
       (pairwiseNonsquare left right distinct)
   · exact transformedRelation
+
+/-- Splitting-field specialization of the Galois-sign projector.  The finite
+Galois extension and indexed square roots are constructed canonically from
+the product of the quadratic radicand polynomials, so the remaining supplied
+input is only the family of transformed point relations. -/
+theorem quadraticSplittingFieldSignProjector_isolates_term
+    {K Index Point : Type*}
+    [Field K] [Fintype Index] [DecidableEq Index] [AddCommGroup Point]
+    (radicand : Index → K) (coefficient : Index → ℤ)
+    (point : Index → Point) (chosen : Index)
+    (twoNonzero : (2 : K) ≠ 0)
+    (radicandNonzero : ∀ index, radicand index ≠ 0)
+    (pairwiseNonsquare : ∀ left right, left ≠ right →
+      ¬ IsSquare (radicand left * radicand right))
+    (transformedRelation : ∀ sigma :
+      (quadraticRadicandPolynomial radicand).SplittingField ≃ₐ[K]
+        (quadraticRadicandPolynomial radicand).SplittingField,
+      ∑ index,
+        (galoisSqrtSign (quadraticRadicandRoot radicand index) sigma *
+          coefficient index) • point index = 0) :
+    ((Fintype.card
+      ((quadraticRadicandPolynomial radicand).SplittingField ≃ₐ[K]
+        (quadraticRadicandPolynomial radicand).SplittingField) : ℤ) *
+      coefficient chosen) • point chosen = 0 := by
+  letI : IsGalois K
+      (quadraticRadicandPolynomial radicand).SplittingField :=
+    quadraticRadicandSplittingField_isGalois radicand twoNonzero
+      radicandNonzero
+      (radicand_injective_of_pairwise_not_isSquare_mul radicand
+        pairwiseNonsquare)
+  have extensionTwoNonzero :
+      (2 : (quadraticRadicandPolynomial radicand).SplittingField) ≠ 0 := by
+    intro twoZero
+    apply twoNonzero
+    apply (algebraMap K
+      (quadraticRadicandPolynomial radicand).SplittingField).injective
+    calc
+      algebraMap K (quadraticRadicandPolynomial radicand).SplittingField
+          (2 : K) = 2 := map_ofNat _ 2
+      _ = 0 := twoZero
+      _ = algebraMap K
+          (quadraticRadicandPolynomial radicand).SplittingField 0 :=
+        (map_zero _).symm
+  apply galoisSignCharacterProjector_isolates_term
+    radicand (quadraticRadicandRoot radicand) coefficient point chosen
+  · intro index
+    exact quadraticRadicandRoot_ne_zero radicand index
+      (radicandNonzero index)
+  · exact extensionTwoNonzero
+  · intro index
+    exact quadraticRadicandRoot_sq radicand index
+  · exact pairwiseNonsquare
+  · exact transformedRelation
+
+/-- Equivariant splitting-field specialization.  A single original point
+relation and the additive Galois action on its indexed summands generate all
+twisted relations required by the sign projector. -/
+theorem quadraticSplittingFieldSignProjector_of_equivariant_relation
+    {K Index Point : Type*}
+    [Field K] [Fintype Index] [DecidableEq Index] [AddCommGroup Point]
+    (radicand : Index → K) (coefficient : Index → ℤ)
+    (point : Index → Point) (chosen : Index)
+    (twoNonzero : (2 : K) ≠ 0)
+    (radicandNonzero : ∀ index, radicand index ≠ 0)
+    (pairwiseNonsquare : ∀ left right, left ≠ right →
+      ¬ IsSquare (radicand left * radicand right))
+    (action :
+      ((quadraticRadicandPolynomial radicand).SplittingField ≃ₐ[K]
+        (quadraticRadicandPolynomial radicand).SplittingField) →
+      Point ≃+ Point)
+    (pointAction : ∀ sigma index,
+      action sigma (point index) =
+        galoisSqrtSign (quadraticRadicandRoot radicand index) sigma •
+          point index)
+    (relation : ∑ index, coefficient index • point index = 0) :
+    ((Fintype.card
+      ((quadraticRadicandPolynomial radicand).SplittingField ≃ₐ[K]
+        (quadraticRadicandPolynomial radicand).SplittingField) : ℤ) *
+      coefficient chosen) • point chosen = 0 := by
+  apply quadraticSplittingFieldSignProjector_isolates_term
+    radicand coefficient point chosen twoNonzero radicandNonzero
+      pairwiseNonsquare
+  exact transformedRelations_of_addEquiv_eigenvectors
+    (fun index sigma ↦
+      galoisSqrtSign (quadraticRadicandRoot radicand index) sigma)
+    coefficient point action pointAction relation
+
+/-- Concrete short-curve splitting-field projector.  The extension, roots,
+Galois action, eigenvector identities, and all transformed relations are
+constructed internally from the indexed radicands and one original point
+relation. -/
+theorem quadraticSplittingFieldAffinePointProjector_isolates_term
+    {K Index : Type*} [Field K] [Fintype Index] [DecidableEq Index]
+    (curve : WeierstrassCurve.Affine K) [curve.IsElliptic]
+    (a₁Zero : curve.a₁ = 0) (a₃Zero : curve.a₃ = 0)
+    (radicand xCoordinate : Index → K)
+    [DecidableEq (quadraticRadicandPolynomial radicand).SplittingField]
+    (coefficient : Index → ℤ) (chosen : Index)
+    (twoNonzero : (2 : K) ≠ 0)
+    (radicandNonzero : ∀ index, radicand index ≠ 0)
+    (pairwiseNonsquare : ∀ left right, left ≠ right →
+      ¬ IsSquare (radicand left * radicand right))
+    (nonsingular : ∀ index,
+      (curve.baseChange
+        (quadraticRadicandPolynomial radicand).SplittingField).Nonsingular
+          (algebraMap K _ (xCoordinate index))
+          (quadraticRadicandRoot radicand index))
+    (relation :
+      ∑ index, coefficient index •
+        WeierstrassCurve.Affine.Point.some
+          (algebraMap K
+            (quadraticRadicandPolynomial radicand).SplittingField
+              (xCoordinate index))
+          (quadraticRadicandRoot radicand index) (nonsingular index) = 0) :
+    ((Fintype.card
+      ((quadraticRadicandPolynomial radicand).SplittingField ≃ₐ[K]
+        (quadraticRadicandPolynomial radicand).SplittingField) : ℤ) *
+      coefficient chosen) •
+        WeierstrassCurve.Affine.Point.some
+          (algebraMap K
+            (quadraticRadicandPolynomial radicand).SplittingField
+              (xCoordinate chosen))
+          (quadraticRadicandRoot radicand chosen) (nonsingular chosen) = 0 := by
+  apply quadraticSplittingFieldSignProjector_of_equivariant_relation
+    radicand coefficient
+    (fun index ↦ WeierstrassCurve.Affine.Point.some
+      (algebraMap K (quadraticRadicandPolynomial radicand).SplittingField
+        (xCoordinate index))
+      (quadraticRadicandRoot radicand index) (nonsingular index))
+    chosen twoNonzero radicandNonzero pairwiseNonsquare
+    (fun sigma ↦ affinePointGaloisAddEquiv curve sigma)
+  · intro sigma index
+    exact affinePointGaloisAddEquiv_eigenvector curve a₁Zero a₃Zero
+      (quadraticRadicandRoot_sq radicand index) (nonsingular index) sigma
+  · exact relation
 
 /-- A finite bad set pulled back through a map with fibres of size at most
 `multiplicity` has size at most `multiplicity * degree` when every bad point
