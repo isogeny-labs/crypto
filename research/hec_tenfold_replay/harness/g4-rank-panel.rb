@@ -45,6 +45,24 @@ if ARGV.include?('extend')
     ext=swap(ext,key,File.read('harness/g4-two-point-screen.inc')+key)
     ext=swap(ext,'       tested++;','       if(!candidate[b])continue;tested++;')
   end
+  if ARGV.include?('tangent')
+    a=ext.index('     int t=mod(xs[positive[bj]]-h,P);')
+    b=ext.index('       tested++;',a)
+    ext[a...b]=File.read('harness/g4-tangent.inc')
+    ext=swap(ext,'assert(divide(t));','assert(divide(t));assert(divide(t));')
+    ext=swap(ext,'row[bj]=1;', 'row[bj]=2*sign;')
+  end
+  if ARGV.include?('osculate')
+    ext=swap(ext,'std::array<int,10> f{};', 'std::array<int,11> f{};')
+    ext=swap(ext,'int w[]={y,s1,s2,mod(k-b*t,P),b};',File.read('harness/g4-osculating.inc'))
+    ext=swap(ext,'for(int i=0;i<5;i++)for(int j=0;j<5;j++)','for(int i=0;i<6;i++)for(int j=0;j<6;j++)')
+    ext=swap(ext,'int degree=9;', 'int degree=e?10:9;')
+    ext=swap(ext,'assert(divide(t));assert(divide(t));','for(int j=0;j<3;j++)assert(divide(t));')
+    ext=swap(ext,'row[bj]=2*sign;', 'row[bj]=3*sign;')
+    ext=swap(ext,'for(int i=4;i>=0;i--)','for(int i=5;i>=0;i--)')
+    # Interchanging the two triple points yields the same row up to conjugation.
+    ext=swap(ext,'if(aj!=bj){','if(aj<bj){')
+  end
   puts ext
 end
 panel=<<'CPP'
