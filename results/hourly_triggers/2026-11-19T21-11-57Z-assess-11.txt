@@ -1,0 +1,6 @@
+Hourly relation finding assessment
+Triggered: 2026-11-19T21:11:57Z
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Curve: frozen Koblitz GF(2^23), a=0, m=2 (synthetic control; not ECC2K-130)
+Output: results/hourly_log.csv on hourly-runs
+Alert: >20% change relative to results/relation_baseline.json, or failed execution.
