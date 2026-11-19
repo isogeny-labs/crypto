@@ -83,7 +83,12 @@ a = 0.988, b = 1.320 (p24) and a = 0.974, b = 1.185 (p28).
 
 - No S3 resume checkpoint and no S3 raw-data upload: the container has no AWS identity
   (`scripts/checkpoint.sh push`: "no way to upload"). Specs, protocol and sessions are
-  committed to Git instead.
+  committed to Git instead, except the two raw `sessions/*/records.jsonl` (1.5 MB
+  each), which the repository's artifact policy keeps out of Git. Their SHA-256s
+  are in `benchmarks/records/20261119T1646Z-ic-fb-size-model.json`; the counted
+  values in them are deterministic (`cost.deterministic: true`) and the
+  "Reproduce" commands regenerate them in under a minute. The derived tables
+  (`analysis/fit.json`, `analysis/*.band.txt`, `analysis/*.audit.txt`) are in Git.
 - Runs were local, not on EKS (no AWS identity).
 - `research-kb` and the `crypto-autoresearcher` lead atlas are not reachable from this
   container; prior work was located by searching this repository.

@@ -22,4 +22,4 @@ ax.set_xlabel("factor-base size |F| (prime-abscissa)"); ax.set_ylabel("S = GAE /
 ax.set_title("IC cost = |F|^2 (pair table) + N/(4|F|) (walk trials); dotted: N^(1/3)/2")
 ax.legend(fontsize=8, loc="upper center"); fig.tight_layout()
 for ext in ("svg", "png"):
-    fig.savefig(D / "figures" / f"size_sweep.{ext}", dpi=150)
+    fig.savefig(D / "figures" / f"size_sweep.{ext}", dpi=72 if ext == "png" else 150)
