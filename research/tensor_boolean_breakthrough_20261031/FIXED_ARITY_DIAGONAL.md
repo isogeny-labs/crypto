@@ -300,13 +300,16 @@ size one, while `|Seed| <= cap * |accepted|` bounds the expected trials by
 `cap`. Claims `PCC-20261119-d11aae`, `PCC-20261119-16f188`, and
 `PCC-20261119-4fe45b` pass their local Lean verifiers. [pcc:unverified]
 
-Section 6.2 of the pinned paper uses `2p` signed-x seeds: nonzero square roots
-use the two sign seeds and a zero root accepts one of them. This suggests one
-accepted seed per affine point and hence exact uniformity on nonidentity
-points, stronger than the paper's factor-16 comparison. The remaining formal
-specialization is to define that decoder over Mathlib's affine-point type,
-prove its two unique-decoding laws, and derive `2p <= 4(|E(F_p)|-1)` from the
-curve-cardinality bound. [pcc:unverified]
+Section 6.2 of the pinned paper uses signed-x seeds: nonzero square roots use
+the two sign seeds and a zero root accepts one of them. This specialization is
+now checked over Mathlib's affine Weierstrass points. `affineSignedTrial` has
+exactly one accepted `K x Bool` seed per affine point. Adding one identity seed
+gives `affineFullSignedTrial`; every full curve point has fibre one, every
+conditioned pair event is exactly uniform, and the retry tail has expected
+length `(2|K|+1)/|E(K)|`. Thus the paper's factor-16 near-uniform loss is not
+needed for this sampler. The four-trial bound is reduced to the single explicit
+Hasse-form premise `2|K|+1 <= 4|E(K)|`; executable square-root bit cost remains
+separate. [pcc:unverified]
 
 ## Corrections and remaining obligations
 

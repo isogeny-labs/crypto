@@ -305,6 +305,31 @@ the exact eventual natural-power inequality required by
 | `rejectionTrialTailHasSum` | law | same | natural total and accepted one-trial seed counts | positive accepted count and accepted count no larger than total |
 | `uniqueAcceptedSeedWeight_eq_one` | law | same | one-trial sampler and an encoder from outputs to seeds | decoding the encoded output succeeds; every successful decoding seed equals the encoded seed |
 | `rejectionTrialExpectation_le` | law | same | total, accepted, and cap | positive accepted count and `total <= cap * accepted` |
+| `affineSamplerRoot` | definition | same | Weierstrass curve over a field and x-coordinate | none; noncomputably chooses a nonsingular root when one exists |
+| `affineSamplerRoot_spec` | law | same | same plus a supplied nonsingular affine point | existence of the supplied point |
+| `AffineSamplerCoordinates` | definition | same | Weierstrass curve over a field | none |
+| `instFintypeAffineSamplerCoordinates` | instance | same | finite field and affine curve | none |
+| `affineSamplerCoordinatesEquivPoint` | equivalence | same | same | none |
+| `instFintypeAffineSamplerPoint` | instance | same | finite field and affine curve | none |
+| `affineSampler_point_card` | law | same | finite field and affine curve | none |
+| `affineSignedTrial` | definition | same | Weierstrass curve and signed-x seed | none |
+| `affineSignedEncode` | definition | same | nonsingular affine coordinates | none |
+| `affineSignedTrial_encode` | law | same | same | none |
+| `affineSignedTrial_unique` | law | same | signed-x seed and accepted affine output | the trial accepts that output |
+| `affineSignedTrial_weight_eq_one` | law | same | finite field and affine curve | none |
+| `affineSignedTrial_accepted_card` | law | same | finite field and affine curve | none |
+| `affineSignedTrial_pairEvent_uniform` | endpoint | same | finite field, affine curve, and pair event | none |
+| `affineSignedTrialTailHasSum` | law | same | finite field and affine curve | at least one affine point |
+| `affineSignedTrialExpectation_le_four` | law | same | finite field and affine curve | positive affine-point count and `2 * card K <= 4 * affinePointCount` |
+| `affineFullSignedTrial` | definition | same | finite field, affine curve, identity-or-signed-x seed | none |
+| `affineFullSignedEncode` | definition | same | full identity-or-affine coordinate output | none |
+| `affineFullSignedTrial_encode` | law | same | full curve output | none |
+| `affineFullSignedTrial_unique` | law | same | full sampler seed and accepted output | the trial accepts that output |
+| `affineFullSignedTrial_weight_eq_one` | law | same | finite field and affine curve | none |
+| `affineFullSignedTrial_pairEvent_uniform` | endpoint | same | finite field, affine curve, and full-curve pair event | none |
+| `affineFullSignedTrial_accepted_card` | law | same | finite field and affine curve | none |
+| `affineFullSignedTrialTailHasSum` | law | same | finite field and affine curve | none |
+| `affineFullSignedTrialExpectation_le_four` | law | same | finite field and affine curve | `2 * card K + 1 <= 4 * card W.Point` |
 
 The identity-inclusive adapter adds exactly `lower` seeds mapping to the
 distinguished identity.  Its total-size theorem derives the original
@@ -324,6 +349,26 @@ specialization must exhibit the finite `2p` signed-x seed type, the bijection
 between accepted seeds and affine points (including the half-accepted zero
 root), and the curve-cardinality lower bound used to make the expectation
 constant. [pcc:unverified]
+
+The concrete signed-x layer works for any Mathlib affine Weierstrass curve.
+It chooses one nonsingular y-root for each soluble x, uses `Bool` to select
+that root or `negY`, and rejects one of the two bits when the roots coincide.
+The decoder laws prove exactly one accepted `K x Bool` seed per nonsingular
+affine coordinate pair.  The coordinate sigma type is explicitly equivalent
+to nonzero affine points (via `Option` for the identity), so the successful
+seed count is the number of affine points and every conditioned pair event is
+exactly uniform.  Executable square-root cost and the Hasse inequality needed
+for the constant retry bound remain separate obligations. [pcc:unverified]
+
+Adding one distinguished identity seed gives a single finite rejection sampler
+`Option (K x Bool) -> Option (Option AffineSamplerCoordinates)`.  The same
+encoder/uniqueness method proves every full curve output has exactly one
+accepted seed.  Through `affineSamplerCoordinatesEquivPoint`, its accepted
+count is exactly `card W.Point`, its seed count is `2 * card K + 1`, and every
+conditioned full-curve pair event is uniform with no distortion loss.  The
+exact retry expectation is `(2 * card K + 1) / card W.Point`; a Hasse-derived
+cardinality inequality is the sole remaining premise for the checked
+four-trial corollary. [pcc:unverified]
 
 ## Dense cubic row-cost exponent
 

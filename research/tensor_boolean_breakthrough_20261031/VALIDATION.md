@@ -947,3 +947,21 @@ axioms, and the fresh checker exits 0. The concrete signed-x decoder and Hasse
 cardinality specialization are not claimed. Claims `PCC-20261119-d11aae`,
 `PCC-20261119-16f188`, and `PCC-20261119-4fe45b` pass their local Lean
 verifiers. [pcc:unverified]
+
+## 2026-11-19 concrete full-curve signed-x sampler
+
+The generic rejection interface is now instantiated over Mathlib affine
+Weierstrass points. A chosen nonsingular root and its `negY` consume the two
+sign seeds; when they coincide, one sign is rejected. Lean proves successful
+decoding and uniqueness, hence exactly one accepted seed per affine point.
+`Option AffineSamplerCoordinates` is explicitly equivalent to `W.Point`.
+Adding one distinguished identity seed therefore gives exactly one accepted
+seed per full curve point and exact uniformity for every pair event.
+[pcc:unverified]
+
+The full retry series has expectation `(2|K|+1)/|E(K)|`; the checked
+four-trial corollary assumes only `2|K|+1 <= 4|E(K)|`. The pinned project now
+builds 2,326 jobs. The proof gate reports `PASS 140 thm 0 trusted`, all audited
+sampler laws use only standard Lean axioms, and the fresh checker exits 0.
+Mathlib supplies no Hasse point-count theorem in this pinned tree, and an
+executable square-root bit-cost theorem remains external. [pcc:unverified]

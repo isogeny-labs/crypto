@@ -91,8 +91,11 @@ The rectangular `R * B^-1` work is no longer open: an exact counted dot-product
 implementation yields `2sf^2` charged operations and `sf` output negations.
 The sampler side now has an exact finite rejection theorem as well: equal
 accepted fibres imply uniform outputs and pair events, with expected retry
-count `total/accepted`. The concrete signed-x elliptic-curve decoder remains to
-be bound to those hypotheses.
+count `total/accepted`. The concrete signed-x elliptic-curve decoder is now
+bound to those hypotheses over Mathlib affine points, including the double-root
+half-acceptance rule and an explicit identity seed. Its full output is exactly
+uniform with expectation `(2|K|+1)/|E(K)|`; the constant bound awaits a pinned
+Hasse point-count theorem and executable square-root bit cost.
 The exact upstream-shaped `Ttop`/`Rint`/`nu`/`q` specialization is
 now checked locally; only integration into the external pinned tree remains.
 [pcc:unverified] See

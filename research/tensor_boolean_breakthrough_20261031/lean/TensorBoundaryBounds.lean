@@ -5,6 +5,7 @@ import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
 import Mathlib.Analysis.SpecificLimits.Basic
 import Mathlib.LinearAlgebra.Matrix.Determinant.Bird.Correctness
 import Mathlib.Data.Matrix.ColumnRowPartitioned
+import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
 
 /-!
 # Exact separator-message bounds
@@ -645,6 +646,323 @@ theorem rejectionTrialExpectation_le
   have acceptedRealPositive : (0 : ℝ) < accepted := by exact_mod_cast acceptedPositive
   rw [div_le_iff₀ acceptedRealPositive]
   exact_mod_cast totalLe
+
+/-! ### Concrete signed-x affine sampler -/
+
+open WeierstrassCurve WeierstrassCurve.Affine
+
+/-- Choose one nonsingular y-coordinate above `x` whenever one exists. -/
+noncomputable def affineSamplerRoot
+    {K : Type*} [Field K] (W : WeierstrassCurve.Affine K) (x : K) : K := by
+  classical
+  exact if h : ∃ y, W.Nonsingular x y then Classical.choose h else 0
+
+/-- The chosen root is nonsingular whenever any supplied root is. -/
+theorem affineSamplerRoot_spec
+    {K : Type*} [Field K] (W : WeierstrassCurve.Affine K) {x y : K}
+    (hy : W.Nonsingular x y) : W.Nonsingular x (affineSamplerRoot W x) := by
+  classical
+  rw [affineSamplerRoot, dite_eq_left ⟨y, hy⟩]
+  exact Classical.choose_spec ⟨y, hy⟩
+
+/-- Nonsingular affine coordinate pairs, excluding the point at infinity. -/
+abbrev AffineSamplerCoordinates
+    {K : Type*} [Field K] (W : WeierstrassCurve.Affine K) :=
+  Σ x : K, {y : K // W.Nonsingular x y}
+
+noncomputable instance instFintypeAffineSamplerCoordinates
+    {K : Type*} [Field K] [Fintype K] (W : WeierstrassCurve.Affine K) :
+    Fintype (AffineSamplerCoordinates W) :=
+  Fintype.ofFinite _
+
+/-- Adjoining one `none` value to affine coordinates gives exactly Mathlib's
+affine point type, with `none` corresponding to infinity. -/
+def affineSamplerCoordinatesEquivPoint
+    {K : Type*} [Field K] (W : WeierstrassCurve.Affine K) :
+    Option (AffineSamplerCoordinates W) ≃ W.Point where
+  toFun
+    | none => 0
+    | some ⟨x, ⟨y, h⟩⟩ => Point.some x y h
+  invFun
+    | .zero => none
+    | .some x y h => some ⟨x, ⟨y, h⟩⟩
+  left_inv value := by cases value <;> rfl
+  right_inv point := by cases point <;> rfl
+
+noncomputable instance instFintypeAffineSamplerPoint
+    {K : Type*} [Field K] [Fintype K] (W : WeierstrassCurve.Affine K) :
+    Fintype W.Point :=
+  Fintype.ofEquiv (Option (AffineSamplerCoordinates W))
+    (affineSamplerCoordinatesEquivPoint W)
+
+/-- The full point type consists of all affine coordinate pairs plus the point
+at infinity. -/
+theorem affineSampler_point_card
+    {K : Type*} [Field K] [Fintype K] (W : WeierstrassCurve.Affine K) :
+    Fintype.card W.Point = Fintype.card (AffineSamplerCoordinates W) + 1 := by
+  rw [← Fintype.card_congr (affineSamplerCoordinatesEquivPoint W)]
+  simp
+
+/-- One paper-style trial from an x-coordinate and a sign bit.  Soluble x's
+use the chosen root and its `negY`; when they coincide, exactly one sign is
+accepted. -/
+noncomputable def affineSignedTrial
+    {K : Type*} [Field K] (W : WeierstrassCurve.Affine K) :
+    K × Bool → Option (AffineSamplerCoordinates W) := by
+  classical
+  exact fun seed =>
+    let x := seed.1
+    let y := affineSamplerRoot W x
+    if h : W.Nonsingular x y then
+      if seed.2 then
+        if hfixed : W.negY x y = y then none
+        else some ⟨x, ⟨W.negY x y, (W.nonsingular_neg x y).2 h⟩⟩
+      else some ⟨x, ⟨y, h⟩⟩
+    else none
+
+/-- The unique signed-x seed assigned to a nonsingular affine point. -/
+noncomputable def affineSignedEncode
+    {K : Type*} [Field K] (W : WeierstrassCurve.Affine K) :
+    AffineSamplerCoordinates W → K × Bool := by
+  classical
+  exact fun point =>
+    (point.1, if point.2.1 = affineSamplerRoot W point.1 then false else true)
+
+/-- Decoding the assigned signed-x seed recovers the affine point. -/
+theorem affineSignedTrial_encode
+    {K : Type*} [Field K] (W : WeierstrassCurve.Affine K)
+    (point : AffineSamplerCoordinates W) :
+    affineSignedTrial W (affineSignedEncode W point) = some point := by
+  classical
+  obtain ⟨x, y, hy⟩ := point
+  have hr := affineSamplerRoot_spec W hy
+  by_cases heq : y = affineSamplerRoot W x
+  · subst y
+    simp [affineSignedEncode, affineSignedTrial, hr]
+  · have hneg : y = W.negY x (affineSamplerRoot W x) :=
+      (Y_eq_of_X_eq hy.1 hr.1 rfl).resolve_left heq
+    have hfixed : W.negY x (affineSamplerRoot W x) ≠ affineSamplerRoot W x := by
+      intro h
+      exact heq (hneg.trans h)
+    have hfixed' :
+        -affineSamplerRoot W x - W.a₁ * x - W.a₃ ≠ affineSamplerRoot W x := by
+      simpa only [negY] using hfixed
+    simp [affineSignedEncode, affineSignedTrial, hr, hfixed', hneg]
+
+/-- Every accepted signed-x seed is the assigned seed of its output. -/
+theorem affineSignedTrial_unique
+    {K : Type*} [Field K] (W : WeierstrassCurve.Affine K)
+    (seed : K × Bool) (point : AffineSamplerCoordinates W)
+    (hsample : affineSignedTrial W seed = some point) :
+    seed = affineSignedEncode W point := by
+  classical
+  obtain ⟨x, bit⟩ := seed
+  simp only [affineSignedTrial] at hsample
+  split at hsample <;> rename_i hr
+  · cases bit with
+    | false =>
+        simp only [Bool.false_eq_true, ↓reduceIte] at hsample
+        injection hsample with hp
+        subst point
+        simp [affineSignedEncode]
+    | true =>
+        simp only [↓reduceIte] at hsample
+        split at hsample <;> rename_i hfixed
+        · contradiction
+        · injection hsample with hp
+          subst point
+          have hfixed' :
+              -affineSamplerRoot W x - W.a₁ * x - W.a₃ ≠ affineSamplerRoot W x := by
+            simpa only [negY] using hfixed
+          simp [affineSignedEncode, hfixed']
+  · contradiction
+
+/-- Every nonsingular affine point has exactly one accepted signed-x seed. -/
+theorem affineSignedTrial_weight_eq_one
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) :
+    ∀ point, rejectionSamplerWeight (affineSignedTrial W) point = 1 := by
+  classical
+  exact uniqueAcceptedSeedWeight_eq_one (affineSignedTrial W)
+    (affineSignedEncode W) (affineSignedTrial_encode W)
+    (affineSignedTrial_unique W)
+
+/-- The successful signed-x seeds are in bijective count with all affine
+points. -/
+theorem affineSignedTrial_accepted_card
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) :
+    (rejectionSamplerAcceptedSeeds (affineSignedTrial W)).card =
+      Fintype.card (AffineSamplerCoordinates W) := by
+  classical
+  simpa using uniformAcceptedFibres_card (affineSignedTrial W) 1
+    (affineSignedTrial_weight_eq_one W)
+
+/-- Conditioning a signed-x trial on acceptance is exactly uniform for every
+pair event on affine points. -/
+theorem affineSignedTrial_pairEvent_uniform
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K)
+    (good : AffineSamplerCoordinates W × AffineSamplerCoordinates W → Prop)
+    [DecidablePred good] :
+    (∑ pair : AffineSamplerCoordinates W × AffineSamplerCoordinates W,
+        if good pair then
+          rejectionSamplerWeight (affineSignedTrial W) pair.1 *
+            rejectionSamplerWeight (affineSignedTrial W) pair.2
+        else 0) =
+      (Finset.univ.filter good).card := by
+  simpa using uniformAcceptedPairEventWeight (affineSignedTrial W) good 1
+    (affineSignedTrial_weight_eq_one W)
+
+/-- The repeated signed-x sampler has exact expected-trial tail sum
+`2|K| / #affinePoints`. -/
+theorem affineSignedTrialTailHasSum
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K)
+    (affinePointPositive : 0 < Fintype.card (AffineSamplerCoordinates W)) :
+    HasSum
+      (fun failures : ℕ =>
+        (1 - (Fintype.card (AffineSamplerCoordinates W) : ℝ) /
+          (2 * Fintype.card K : ℕ)) ^ failures)
+      ((2 * Fintype.card K : ℕ) /
+        (Fintype.card (AffineSamplerCoordinates W) : ℝ)) := by
+  have hle : Fintype.card (AffineSamplerCoordinates W) ≤ 2 * Fintype.card K := by
+    rw [← affineSignedTrial_accepted_card W]
+    calc
+      (rejectionSamplerAcceptedSeeds (affineSignedTrial W)).card ≤
+          Fintype.card (K × Bool) := Finset.card_le_univ _
+      _ = 2 * Fintype.card K := by simp [Nat.mul_comm]
+  simpa only [Nat.cast_mul, Nat.cast_ofNat] using
+    rejectionTrialTailHasSum (2 * Fintype.card K)
+      (Fintype.card (AffineSamplerCoordinates W)) affinePointPositive hle
+
+/-- The paper's `2p` signed-x trial has expected retry count at most four once
+the displayed affine-point cardinality inequality is supplied. -/
+theorem affineSignedTrialExpectation_le_four
+    {K : Type*} [Field K] [Fintype K]
+    (W : WeierstrassCurve.Affine K)
+    (affinePointPositive : 0 < Fintype.card (AffineSamplerCoordinates W))
+    (hasseForm :
+      2 * Fintype.card K ≤ 4 * Fintype.card (AffineSamplerCoordinates W)) :
+    (2 * Fintype.card K : ℕ) /
+        (Fintype.card (AffineSamplerCoordinates W) : ℝ) ≤ 4 := by
+  exact rejectionTrialExpectation_le (2 * Fintype.card K)
+    (Fintype.card (AffineSamplerCoordinates W)) 4 affinePointPositive hasseForm
+
+/-- A single full-curve rejection trial: one distinguished seed produces the
+identity and every other seed runs the signed-x affine trial. -/
+noncomputable def affineFullSignedTrial
+    {K : Type*} [Field K] (W : WeierstrassCurve.Affine K) :
+    Option (K × Bool) → Option (Option (AffineSamplerCoordinates W))
+  | none => some none
+  | some seed => (affineSignedTrial W seed).map some
+
+/-- The assigned full-curve seed: the distinguished seed for infinity and the
+assigned signed-x seed for an affine point. -/
+noncomputable def affineFullSignedEncode
+    {K : Type*} [Field K] (W : WeierstrassCurve.Affine K) :
+    Option (AffineSamplerCoordinates W) → Option (K × Bool)
+  | none => none
+  | some point => some (affineSignedEncode W point)
+
+/-- The full-curve trial decodes every assigned seed to its output. -/
+theorem affineFullSignedTrial_encode
+    {K : Type*} [Field K] (W : WeierstrassCurve.Affine K)
+    (point : Option (AffineSamplerCoordinates W)) :
+    affineFullSignedTrial W (affineFullSignedEncode W point) = some point := by
+  cases point with
+  | none => rfl
+  | some point => simp [affineFullSignedEncode, affineFullSignedTrial,
+      affineSignedTrial_encode]
+
+/-- Every accepted full-curve seed is the assigned seed of its output. -/
+theorem affineFullSignedTrial_unique
+    {K : Type*} [Field K] (W : WeierstrassCurve.Affine K)
+    (seed : Option (K × Bool)) (point : Option (AffineSamplerCoordinates W))
+    (hsample : affineFullSignedTrial W seed = some point) :
+    seed = affineFullSignedEncode W point := by
+  cases seed with
+  | none =>
+      simp [affineFullSignedTrial] at hsample
+      subst point
+      rfl
+  | some seed =>
+      cases htrial : affineSignedTrial W seed with
+      | none => simp [affineFullSignedTrial, htrial] at hsample
+      | some affinePoint =>
+          simp [affineFullSignedTrial, htrial] at hsample
+          subst point
+          simp [affineFullSignedEncode,
+            affineSignedTrial_unique W seed affinePoint htrial]
+
+/-- Every full curve point, identity included, has exactly one accepted seed. -/
+theorem affineFullSignedTrial_weight_eq_one
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) :
+    ∀ point, rejectionSamplerWeight (affineFullSignedTrial W) point = 1 := by
+  classical
+  exact uniqueAcceptedSeedWeight_eq_one (affineFullSignedTrial W)
+    (affineFullSignedEncode W) (affineFullSignedTrial_encode W)
+    (affineFullSignedTrial_unique W)
+
+/-- Conditioning the full sampler on acceptance is exactly uniform for every
+pair event on the whole curve. -/
+theorem affineFullSignedTrial_pairEvent_uniform
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K)
+    (good : Option (AffineSamplerCoordinates W) ×
+      Option (AffineSamplerCoordinates W) → Prop)
+    [DecidablePred good] :
+    (∑ pair : Option (AffineSamplerCoordinates W) ×
+        Option (AffineSamplerCoordinates W),
+      if good pair then
+        rejectionSamplerWeight (affineFullSignedTrial W) pair.1 *
+          rejectionSamplerWeight (affineFullSignedTrial W) pair.2
+      else 0) =
+      (Finset.univ.filter good).card := by
+  simpa using uniformAcceptedPairEventWeight (affineFullSignedTrial W) good 1
+    (affineFullSignedTrial_weight_eq_one W)
+
+/-- The successful full-sampler seeds are counted by the full curve points. -/
+theorem affineFullSignedTrial_accepted_card
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) :
+    (rejectionSamplerAcceptedSeeds (affineFullSignedTrial W)).card =
+      Fintype.card W.Point := by
+  rw [uniformAcceptedFibres_card (affineFullSignedTrial W) 1
+    (affineFullSignedTrial_weight_eq_one W)]
+  simpa using Fintype.card_congr (affineSamplerCoordinatesEquivPoint W)
+
+/-- The full sampler's retry tail has exact expected length
+`(2|K|+1)/|W.Point|`. -/
+theorem affineFullSignedTrialTailHasSum
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) :
+    HasSum
+      (fun failures : ℕ =>
+        (1 - (Fintype.card W.Point : ℝ) /
+          (2 * Fintype.card K + 1 : ℕ)) ^ failures)
+      ((2 * Fintype.card K + 1 : ℕ) / (Fintype.card W.Point : ℝ)) := by
+  have pointPositive : 0 < Fintype.card W.Point := Fintype.card_pos
+  have hle : Fintype.card W.Point ≤ 2 * Fintype.card K + 1 := by
+    rw [← affineFullSignedTrial_accepted_card W]
+    calc
+      (rejectionSamplerAcceptedSeeds (affineFullSignedTrial W)).card ≤
+          Fintype.card (Option (K × Bool)) := Finset.card_le_univ _
+      _ = 2 * Fintype.card K + 1 := by simp [Nat.mul_comm]
+  simpa only [Nat.cast_add, Nat.cast_mul, Nat.cast_one, Nat.cast_ofNat] using
+    rejectionTrialTailHasSum (2 * Fintype.card K + 1)
+      (Fintype.card W.Point) pointPositive hle
+
+/-- The full signed-x sampler has expected retry count at most four under the
+single displayed curve-cardinality inequality. -/
+theorem affineFullSignedTrialExpectation_le_four
+    {K : Type*} [Field K] [Fintype K]
+    (W : WeierstrassCurve.Affine K)
+    (hasseForm : 2 * Fintype.card K + 1 ≤ 4 * Fintype.card W.Point) :
+    (2 * Fintype.card K + 1 : ℕ) / (Fintype.card W.Point : ℝ) ≤ 4 := by
+  exact rejectionTrialExpectation_le (2 * Fintype.card K + 1)
+    (Fintype.card W.Point) 4 Fintype.card_pos hasseForm
 
 /-! ## Dense fixed-arity elimination exponent -/
 
