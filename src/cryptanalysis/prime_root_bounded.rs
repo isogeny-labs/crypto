@@ -808,16 +808,40 @@ impl Replay {
         if r.len < denominator.len {
             return Ok(r);
         }
-        let inverse =
-            self.reciprocal(denominator.coefficients[usize::from(denominator.len) - 1])?;
-        for high in (usize::from(denominator.len) - 1..usize::from(numerator.len)).rev() {
+        // A nonzero constant divides every polynomial exactly. This also
+        // avoids a redundant reciprocal in the final Euclidean iteration.
+        if denominator.len == 1 {
+            return Ok(Poly17::ZERO);
+        }
+        let d = usize::from(denominator.len);
+        let leading = denominator.coefficients[d - 1];
+        let monic = leading == 1;
+        let inverse = if monic { 1 } else { self.reciprocal(leading)? };
+        // Unlike Producer's trim-driven division, replay traverses a fixed
+        // descending range. The high coefficient cancels identically and
+        // must not consume a field multiplication/subtraction.
+        for high in (d - 1..usize::from(numerator.len)).rev() {
             self.gate.charge(COPY_WORK)?;
-            let c = self.times(r.coefficients[high], inverse)?;
-            let shift = high + 1 - usize::from(denominator.len);
-            for j in 0..usize::from(denominator.len) {
-                let v = self.times(c, denominator.coefficients[j])?;
-                r.coefficients[shift + j] = self.minus(r.coefficients[shift + j], v)?;
+            let high_coefficient = r.coefficients[high];
+            if high_coefficient == 0 {
+                continue;
             }
+            let c = if monic {
+                high_coefficient
+            } else {
+                self.times(high_coefficient, inverse)?
+            };
+            let shift = high + 1 - d;
+            for j in 0..d - 1 {
+                let term = denominator.coefficients[j];
+                if term == 0 {
+                    continue;
+                }
+                let product = self.times(c, term)?;
+                r.coefficients[shift + j] =
+                    self.minus(r.coefficients[shift + j], product)?;
+            }
+            r.coefficients[high] = 0;
         }
         r.trim();
         Ok(r)
@@ -877,17 +901,41 @@ impl Replay {
         let n = 2 * len - 1;
         if n > 17 { return Err(Stop::InvalidCertificate); }
         z.len = n as u8;
-        for k in 0..n {
-            self.gate.charge(32)?;
-            let start = (k + 1).saturating_sub(len);
-            let end = len.min(k + 1);
-            for i in start..end {
-                let j = k - i;
-                if i > j { break; }
+        let sparse = x.coefficients[..len].contains(&0);
+        if sparse {
+            // Sparse Frobenius powers are common; omit products with an
+            // exact-zero input while retaining diagonal replay order.
+            for k in 0..n {
                 self.gate.charge(32)?;
-                let v = self.times(x.coefficients[i], x.coefficients[j])?;
-                let term = if i == j { v } else { self.plus(v, v)? };
-                z.coefficients[k] = self.plus(z.coefficients[k], term)?;
+                let start = (k + 1).saturating_sub(len);
+                let end = len.min(k + 1);
+                for i in start..end {
+                    let j = k - i;
+                    if i > j { break; }
+                    self.gate.charge(32)?;
+                    if x.coefficients[i] == 0 || x.coefficients[j] == 0 {
+                        continue;
+                    }
+                    let v = self.times(x.coefficients[i], x.coefficients[j])?;
+                    let term = if i == j { v } else { self.plus(v, v)? };
+                    z.coefficients[k] = self.plus(z.coefficients[k], term)?;
+                }
+            }
+        } else {
+            // Preserve the previous dense traversal without a per-product
+            // zero check.
+            for k in 0..n {
+                self.gate.charge(32)?;
+                let start = (k + 1).saturating_sub(len);
+                let end = len.min(k + 1);
+                for i in start..end {
+                    let j = k - i;
+                    if i > j { break; }
+                    self.gate.charge(32)?;
+                    let v = self.times(x.coefficients[i], x.coefficients[j])?;
+                    let term = if i == j { v } else { self.plus(v, v)? };
+                    z.coefficients[k] = self.plus(z.coefficients[k], term)?;
+                }
             }
         }
         z.trim();
@@ -923,10 +971,14 @@ impl Replay {
             pair = [pair[1], next];
         }
         let mut out = pair[0];
-        if out.len > 0 {
+        // Many GCD inputs and constant-ending Euclidean sequences are
+        // already monic. A monic result is normalized without field work.
+        if out.len > 0 && out.coefficients[usize::from(out.len) - 1] != 1 {
             let inv = self.reciprocal(out.coefficients[usize::from(out.len) - 1])?;
             for i in 0..usize::from(out.len) {
-                out.coefficients[i] = self.times(out.coefficients[i], inv)?;
+                if out.coefficients[i] != 0 {
+                    out.coefficients[i] = self.times(out.coefficients[i], inv)?;
+                }
             }
         }
         Ok(out)
