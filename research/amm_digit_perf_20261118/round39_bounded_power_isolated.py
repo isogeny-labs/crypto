@@ -113,6 +113,30 @@ mod cryptanalysis {
 """
 middle = "\n  } pub mod before {\n"
 tail = "\n  }\n }\n}\n"
+probes = r"""
+pub fn round39_probe(p:u64,coefficients:&[u64],delta:u64,exponent:u64)->(Vec<u64>,Vec<u64>){
+    let field=Fp64Arithmetic{p};
+    let modulus=Poly17::from_coefficients(&field,coefficients).unwrap();
+    let mut base=Poly17::ZERO;
+    base.len=2;
+    base.coefficients[0]=delta%p;
+    base.coefficients[1]=1;
+    let limits=RootBudget{work:MAX_WORK,field_work:MAX_FIELD_WORK,
+        bytes:STORAGE_BYTES,events:MAX_EVENTS,split_attempts:1000,degree:8};
+    let deadline=Instant::now()+std::time::Duration::from_secs(120);
+    let mut observer=|_:&BoundedRootEvent|Ok(());
+    let mut producer=Producer {
+        p,gate:Gate::new(limits,deadline),observer:&mut observer,
+        unacknowledged:None,pending:[Poly17::ZERO;8],pending_len:0,
+        roots:[0;8],root_count:0
+    };
+    let generated=producer.power(&base,exponent,&modulus).unwrap();
+    let mut replay=Replay::new(&field,&[1],42,limits,limits,deadline).unwrap();
+    let checked=replay.modular_power(base,exponent,&modulus).unwrap();
+    (generated.coefficients().to_vec(),checked.coefficients().to_vec())
+}
+"""
+
 tests = r"""
 #[cfg(test)]
 mod round39 {
@@ -173,6 +197,29 @@ mod round39 {
         (black_box(digest),kinds)
     }
     #[test]
+    fn polynomial_power_edge_exponents_match_frozen() {
+        let mut comparisons=0usize;
+        for p in [17u64,487,1_000_000_007,(1u64<<61)-1] {
+            for degree in 0usize..=8 {
+                let mut m=if degree==0 {vec![3]}else{vec![0;degree+1]};
+                if degree>0 {
+                    m[0]=3;
+                    if degree>1 {m[1]=2;}
+                    m[degree]=1;
+                }
+                for delta in [0u64,1,5] {
+                    for exponent in [0u64,1,2,3,7,(p-1)/2,p] {
+                        let old=before::round39_probe(p,&m,delta,exponent);
+                        let new=after::round39_probe(p,&m,delta,exponent);
+                        assert_eq!(old,new,"p={p} deg={degree} delta={delta} exp={exponent}");
+                        comparisons+=2;
+                    }
+                }
+            }
+        }
+        println!("ROUND39_POWER_EQ producer_and_replay_checks={comparisons}");
+    }
+    #[test]
     fn roots_and_certificate_events_are_equal() {
         let mut count=0usize;
         for p in [17u64,487,1_000_000_007,(1u64<<61)-1] {
@@ -229,7 +276,8 @@ mod round39 {
 with tempfile.TemporaryDirectory() as folder:
     path=Path(folder)/"round39.rs"
     binary=Path(folder)/"round39"
-    path.write_text(header+source+middle+before+tail+tests)
+    path.write_text(header+source+probes+middle+before+probes+tail+tests)
     subprocess.run(["rustc","--edition=2021","-O","--test",str(path),"-o",str(binary)],check=True)
+    subprocess.run([str(binary),"polynomial_power_edge_exponents_match_frozen","--nocapture"],check=True)
     subprocess.run([str(binary),"roots_and_certificate_events_are_equal","--nocapture"],check=True)
     subprocess.run([str(binary),"bench_full_root_extraction","--ignored","--nocapture"],check=True)
