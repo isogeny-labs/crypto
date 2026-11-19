@@ -352,3 +352,7 @@ fn ct233_double_lp_native_panel() {
         );
     }
 }
+
+// CT235: precommitted Q73-only, four cold ABBA comparisons.
+#[path = "../ct235_impl/probe.rs"]
+mod ct235;
