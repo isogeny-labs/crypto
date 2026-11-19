@@ -11,6 +11,7 @@ pub mod quadratic_pair_graph;
 pub mod quadratic_pair_relation;
 
 /// The controls are unit tests: `cargo test --example <this example>`.
+#[allow(dead_code)] // Also imported as a module by sibling unit controls.
 fn main() {}
 
 #[cfg(test)]
