@@ -1163,15 +1163,15 @@ impl Replay {
     }
 
     // R44_REPLAY_WINDOW_HELPER_BEGIN
-    // Independent certificate arithmetic: descending bit traversal and
+    // Two-bit certificate window: cheaper precomputation than width three.\n    // Independent certificate arithmetic: descending bit traversal and
     // diagonal squaring, without calling the producer's polynomial kernels.
-    fn replay_window3(&mut self, base: &Poly17, exponent: u64, monic: &Poly17) -> Result<Poly17> {
+    fn replay_window2(&mut self, base: &Poly17, exponent: u64, monic: &Poly17) -> Result<Poly17> {
         debug_assert!(exponent > 0);
-        let mut powers = [Poly17::ZERO; 4];
+        let mut powers = [Poly17::ZERO; 2];
         powers[0] = *base;
         let mut even = self.square_diagonals(base)?;
         self.cancel_monic(&mut even, monic)?;
-        for slot in 1..4 {
+        for slot in 1..2 {
             self.gate.charge(4 * COPY_WORK)?;
             let mut product = self.convolution(&powers[slot - 1], &even)?;
             self.cancel_monic(&mut product, monic)?;
@@ -1192,7 +1192,7 @@ impl Replay {
                 cursor -= 1;
                 continue;
             }
-            let lower_bound = (cursor - 2).max(0);
+            let lower_bound = (cursor - 1).max(0);
             let mut bottom = cursor;
             for candidate in lower_bound..=cursor {
                 if (exponent >> candidate) & 1 != 0 {
@@ -1293,7 +1293,7 @@ impl Replay {
             && exponent <= u32::MAX as u64 && exponent.count_ones() >= 12
             && (exponent == self.p || exponent == (self.p - 1) / 2)
         {
-            return self.replay_window3(&base, exponent, &monic);
+            return self.replay_window2(&base, exponent, &monic);
         }
         // R44_REPLAY_WINDOW_SWITCH_END
         // Keep the former loop for large (61-bit) exponents: native and
