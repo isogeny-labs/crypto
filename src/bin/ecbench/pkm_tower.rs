@@ -374,7 +374,7 @@ impl Engine {
 }
 
 /// What one decomposition's search did, summed over the run.
-#[derive(Default)]
+#[derive(Default, Debug)]
 struct Tally {
     nodes: u64,
     refuted: u64,
@@ -1068,7 +1068,30 @@ mod tests {
 
     #[test]
     fn basis_inheritance_and_trace_replay_match_scratch_and_cut_ops() {
-        let inst = find_prime_order_curve(11, 20);
+        let (_, fb_params) = Params::parse_spec("x:t=5,seed=1").unwrap();
+        let (inst, fb) = (1..1000u64)
+            .filter_map(|seed| {
+                let c = find_prime_order_curve(20, seed);
+                if !(c.curve.p - 1).is_multiple_of(32) {
+                    return None;
+                }
+                let ctx = InstanceCtx {
+                    group: &c.curve,
+                    generator: c.generator_point(),
+                    target: c.generator_point(),
+                    r: c.r,
+                    cofactor: c.cofactor,
+                    group_order: c.group_order,
+                    name: "test".into(),
+                    field_degree: None,
+                };
+                let fb = PrimeTowerBase { instance: &c }
+                    .build(&ctx, &fb_params, &mut GroupOps::default())
+                    .ok()?;
+                (fb.points.len() >= 10).then_some((c, fb))
+            })
+            .next()
+            .expect("20-bit prime with 2^5 | p - 1 and >= 10 tower base points");
         let ctx = InstanceCtx {
             group: &inst.curve,
             generator: inst.generator_point(),
@@ -1079,10 +1102,6 @@ mod tests {
             name: "test".into(),
             field_degree: None,
         };
-        let (_, fb_params) = Params::parse_spec("x:t=5,seed=1").unwrap();
-        let fb = PrimeTowerBase { instance: &inst }
-            .build(&ctx, &fb_params, &mut GroupOps::default())
-            .unwrap();
 
         let (_, p_fast) = Params::parse_spec("x:t=5,seed=1,engine=f4,inherit=1,trace=1").unwrap();
         let (_, p_scratch) =
@@ -1104,9 +1123,10 @@ mod tests {
         let g = inst.generator_point();
         let mut hits = 0usize;
         for k in 0..24usize {
-            let pt = if k % 4 == 0 && fb.points.len() >= 2 {
-                inst.curve
-                    .add(&mut ops, fb.points[k % fb.points.len()], fb.points[(k + 1) % fb.points.len()])
+            let pt = if k % 4 == 0 && fb.points.len() >= 4 {
+                let i0 = (k / 2) % fb.points.len();
+                let i1 = (i0 + 2) % fb.points.len();
+                inst.curve.add(&mut ops, fb.points[i0], fb.points[i1])
             } else {
                 inst.curve.mul(&mut ops, g, 100 + k as u64 * 37)
             };
@@ -1152,6 +1172,13 @@ mod tests {
             scratch.totals.ops
         );
         assert!(fast.tally.inherited_children > 0);
-        assert!(fast.tally.trace_refuted > 0);
+        assert!(
+            fast.tally.trace_refuted > 0,
+            "p={}, root_trace={}, fast_tally={:?}, scratch_tally={:?}",
+            inst.curve.p,
+            fast.root_trace.is_some(),
+            fast.tally,
+            scratch.tally
+        );
     }
 }

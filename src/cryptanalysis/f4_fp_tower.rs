@@ -1261,8 +1261,7 @@ impl ScatterPlan {
 pub(crate) struct CompiledSRow {
     plan: ScatterPlan,
     expected_q_lead: u32,
-    out_elem_id: Option<u32>,
-    used_in_same_step: bool,
+    out_elem: Option<(u32, Vec<bool>)>,
 }
 
 #[derive(Clone, Debug)]
@@ -1364,7 +1363,6 @@ pub(crate) fn compile_refutation(
     let total_elems = elem_monos.len();
     let mut need_elem = vec![false; total_elems];
     let mut step_kept_u: Vec<Vec<usize>> = vec![Vec::new(); n_steps];
-    let mut step_used_in_same: Vec<Vec<bool>> = vec![Vec::new(); n_steps];
 
     // Phase 1: Backward reachability from the single `ONE` row at `n_steps - 1`.
     for t in (0..n_steps).rev() {
@@ -1375,7 +1373,6 @@ pub(crate) fn compile_refutation(
             u_of_ql.insert(ur.q_lead_l, u);
         }
         let mut need_u = vec![false; nu];
-        let mut used_same = vec![false; nu];
         if t == n_steps - 1 {
             let u_one = (0..nu).find(|&u| {
                 let ql = rs.s_useful[u].q_lead_l as usize;
@@ -1396,7 +1393,6 @@ pub(crate) fn compile_refutation(
             for &ql in &rs.s_useful[u].used_q_leads {
                 if let Some(&up) = u_of_ql.get(&ql) {
                     need_u[up] = true;
-                    used_same[up] = true;
                 }
             }
         }
@@ -1441,7 +1437,6 @@ pub(crate) fn compile_refutation(
             mark_poly(pmult, pg, Some(plead), &mut need_piv, &mut work);
         }
         step_kept_u[t] = kept_u;
-        step_used_in_same[t] = used_same;
     }
 
     // Phase 2: Forward compilation over tight reachable supports.
@@ -1590,18 +1585,33 @@ pub(crate) fn compile_refutation(
                 orig_lm,
                 &c_col_of,
             );
-            let out_elem_id = if !is_final && ur.elem_id.is_some_and(|id| need_elem[id as usize]) {
+            let out_elem = if !is_final && ur.elem_id.is_some_and(|id| need_elem[id as usize]) {
                 let id = ur.elem_id.unwrap();
-                cur_supp[id as usize] = c_q_monos[ql as usize..].to_vec();
-                Some(id)
+                let target_supp = &elem_monos[id as usize];
+                let q_tail = &c_q_monos[ql as usize..];
+                if target_supp.first() != q_tail.first() {
+                    return None;
+                }
+                let mut keep_mask = vec![false; q_tail.len()];
+                let mut ts_idx = 0usize;
+                for (q_rel, &qm) in q_tail.iter().enumerate() {
+                    if ts_idx < target_supp.len() && qm == target_supp[ts_idx] {
+                        keep_mask[q_rel] = true;
+                        ts_idx += 1;
+                    }
+                }
+                if ts_idx != target_supp.len() {
+                    return None;
+                }
+                cur_supp[id as usize] = target_supp.clone();
+                Some((id, keep_mask))
             } else {
                 None
             };
             s_rows.push(CompiledSRow {
                 plan,
                 expected_q_lead: ql,
-                out_elem_id,
-                used_in_same_step: step_used_in_same[t][u],
+                out_elem,
             });
         }
         fresh_lms.sort_unstable();
@@ -1748,8 +1758,6 @@ pub(crate) fn replay_compiled(
 
         // 2. Reduce kept S-rows by B' and run minimal intra-step echelon.
         let mut ech: Vec<(u32, Vec<u32>)> = Vec::new();
-        let mut deferred_out: Vec<(u32, Vec<u64>)> = Vec::new();
-        let mut deferred_leads: Vec<u64> = Vec::new();
 
         for (si, sr) in st.s_rows.iter().enumerate() {
             let row =
@@ -1757,11 +1765,14 @@ pub(crate) fn replay_compiled(
                     .eval_row(fp, &polys[sr.plan.elem_id as usize], st.n_cols, &mut rep.muladds);
             let mut acc = vec![0u64; st.nq];
             for (&c, &v) in row.cols.iter().zip(&row.vals) {
-                let cu = c as usize;
-                let q = st.q_of[cu];
+                let q = st.q_of[c as usize];
                 if q != NONE {
                     acc[q as usize] = u64::from(v);
-                } else {
+                }
+            }
+            for (&c, &v) in row.cols.iter().zip(&row.vals) {
+                let cu = c as usize;
+                if st.q_of[cu] == NONE {
                     let off = st.q_start[cu] as usize;
                     let j = st.pivot_of[cu] as usize;
                     rep.muladds += kern.sub(&mut acc[off..], u64::from(v), &bred[j]);
@@ -1810,50 +1821,33 @@ pub(crate) fn replay_compiled(
                 return;
             }
 
-            if sr.used_in_same_step {
-                let inv = fp.inv(lead_val);
-                let mut monic = Vec::with_capacity(st.nq - exp_l);
-                monic.push(1u32);
-                for &x in &acc[exp_l + 1..] {
-                    let rx = fp.reduce(x);
-                    if rx == 0 {
-                        monic.push(0);
-                    } else {
-                        rep.muladds += 1;
-                        monic.push(fp.mul(rx, inv) as u32);
-                    }
+            let inv = fp.inv(lead_val);
+            let mut full_monic = Vec::with_capacity(st.nq - exp_l);
+            full_monic.push(1u32);
+            for &x in &acc[exp_l + 1..] {
+                let rx = fp.reduce(x);
+                if rx == 0 {
+                    full_monic.push(0);
+                } else {
+                    rep.muladds += 1;
+                    full_monic.push(fp.mul(rx, inv) as u32);
                 }
-                if let Some(eid) = sr.out_elem_id {
-                    polys[eid as usize] = monic.clone();
-                }
-                let pos = ech.partition_point(|&(ql, _)| ql < sr.expected_q_lead);
-                ech.insert(pos, (sr.expected_q_lead, monic));
-            } else if let Some(eid) = sr.out_elem_id {
-                deferred_leads.push(lead_val);
-                deferred_out.push((eid, acc[exp_l..].to_vec()));
             }
-        }
-
-        // Batch-invert all output pivots of step `t` that didn't reduce within step `t`.
-        if !deferred_leads.is_empty() {
-            let Some(invs) = fp.batch_inv(&deferred_leads) else {
-                rep.replay_failure = Some("deferred pivot zero");
-                return;
-            };
-            rep.muladds += 3 * (deferred_leads.len().saturating_sub(1) as u64);
-            for ((eid, tail), inv) in deferred_out.into_iter().zip(invs) {
-                let mut monic = Vec::with_capacity(tail.len());
-                monic.push(1u32);
-                for &x in &tail[1..] {
-                    let rx = fp.reduce(x);
-                    if rx == 0 {
-                        monic.push(0);
-                    } else {
-                        rep.muladds += 1;
-                        monic.push(fp.mul(rx, inv) as u32);
+            if let Some((eid, ref keep_mask)) = sr.out_elem {
+                let mut compact = Vec::with_capacity(keep_mask.len());
+                for (q_rel, &val) in full_monic.iter().enumerate() {
+                    if keep_mask[q_rel] {
+                        compact.push(val);
+                    } else if val != 0 {
+                        rep.replay_failure = Some("element support widened");
+                        return;
                     }
                 }
-                polys[eid as usize] = monic;
+                polys[eid as usize] = compact;
+            }
+            if si + 1 < st.s_rows.len() {
+                let pos = ech.partition_point(|&(ql, _)| ql < sr.expected_q_lead);
+                ech.insert(pos, (sr.expected_q_lead, full_monic));
             }
         }
     }
@@ -3780,8 +3774,8 @@ fn f4_tower_cached(
                 })
                 .collect();
             if !refuted {
-                for &l in &leads {
-                    elem_monos.push(q_monos[l as usize..].to_vec());
+                for f in &fresh {
+                    elem_monos.push(f.to_rpoly().monos);
                 }
             }
             rec_steps.push(RecordedStep {
