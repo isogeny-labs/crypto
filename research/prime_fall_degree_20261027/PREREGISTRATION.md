@@ -1120,3 +1120,20 @@ Every number is `[pcc:unverified]`.
 - **Spend.** Job guards: 2 × US$51.65 (F) + 2 × US$49.92 (C decisive) + 4 × US$4.16 (C validation) = US$219.8 worst case,
   plus at most 30 min of reap lag per pod. With about US$466 already spent, that is about US$690 worst case.
 - No hypothesis, §6 rule, seed or draw changes.
+
+## Amendment 34 (2026-11-19; the `t = 13` validation cells with a longer job limit; before any row of the reruns)
+
+Every number is `[pcc:unverified]`.
+
+- **State.**
+  - Validation `t = 12`, both draws: the closure gives `d_F = 6`, uncensored, `grid_zeros = 0` (2.3 h each).
+  - Validation `t = 13`, draw 0: stopped by the 14,400 s job limit with no row (the pilot writes on completion only). Censored,
+    so its gate cell is undecided (Amendment 31). Draw 1 runs to the same limit at 01:28Z.
+  - Route F `t = 14`, draw 0: aborted with an allocation failure at degree 6 on the 256 GB pod. Censored: `d_F ≥ 7` stands.
+- **Owner instruction (2026-11-19, ~00:40Z).** The `t = 13` reruns were offered with a 12 h limit at about US$11–13 each. The
+  owner said "resume".
+- **Change.** Jobs `pfd-m2c-t13-k{0,1}-rp-v3`: stage `m2c:13:K:7:13958643712:4000000:86400`, unchanged. Same 16 vCPU / 128 GB
+  pods, same binaries and hashes. Job limit 43,200 s, cap US$40; reaped at the limit + 30 min (Amendment 33).
+  - Draw 1 is rerun only if its current job is also censored.
+- **Spend.** At most 2 × US$13.5, within the US$690 ceiling (Amendment 33).
+- Gate, readings, seeds and draws are unchanged.
