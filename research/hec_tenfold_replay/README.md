@@ -83,3 +83,16 @@ The native experiment used seed 2026111907 and 32 pairs per field. Each entry be
 The direct-row arm cleared 10× against the pencil on 126 of 128 cases in both orders. Its incremental wall-time benefit did not reproduce across orders, so the existing solver remains the default.
 
 Run `c++ -std=c++17 -O3 -DHEC_RELATION_ABLATIONS certificates.cpp -o /tmp/hec-relations && /tmp/hec-relations` here to reproduce `results/relation-ablations.txt`. For each field the first four lines beginning with `first` cover Fibonacci, alternating doublings, interleaving, and rank feedback. The next four cover triples alone and triples plus split pairs allowing zero, one, or two outside columns. Each line reports prime, arm, total probes, rows, elimination updates, censored cases, median, 95th percentile, maximum, and counts earlier, tied, or later than the first arm in its group. Run `harness/direct-pairs.zsh` to rebuild and time the native comparison. Both original process logs and their correctness audits are checked into `results/direct-pairs-*`.
+
+### Phase timing on the eight misses from seed 2026111906
+
+Separate diagnostic builds timed the same inputs in both execution orders. The following percentages are within-case medians of the phase time divided by total candidate time in each repetition. In genus 2, the six misses at p = 127 spent 72.6–92.9% in the combined relation collector and elimination kernel in forward order and 73.4–92.9% in reverse order. This measurement does not separate collection from elimination.
+
+| Genus 3 case | Quartic catalogue and rank solve | Coordinates of both divisors | Scalar verification and final field arithmetic |
+|---|---:|---:|---:|
+| p = 127, case 5 | 60.8% / 60.8% | 2.4% / 2.4% | 35.9% / 35.9% |
+| p = 257, case 1 | 76.3% / 79.5% | 1.2% / 1.2% | 22.0% / 18.0% |
+
+Both orders point to the cost of constructing enough independent relations. At p = 127, even eliminating both genus-3 coordinate evaluations would save only about 2.4% of measured candidate time. The original 9.45× reverse-order result would need a 5.5% candidate-time reduction to reach 10× at fixed reference time. Comparing those percentages assumes phase shares transfer between builds.
+
+The four compressed timing logs under `results/phase-g*` retain the original column layout. For genus 2, read arm 2 at p = 127. Its first three diagnostic columns are nanoseconds in stream setup, the relation kernel including fallback, and the final native verification. Ignore diagnostic columns on the pencil arm, which does not refresh the native counters. For genus 3, read arm 2. Its first three counters surround the quartic setup call, both coordinate evaluations, and final arithmetic plus verification. Instrumentation adds clock overhead. Use the uninstrumented comparison above for speedup claims.
