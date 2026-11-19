@@ -14,6 +14,36 @@ mod frozen {
         const TARGETS: usize = 1520;
         const REPLICATES: usize = 4096;
 
+        const OOS_CURVES: [CurveSpec; 3] = [
+            CurveSpec {
+                slug: "h116-prym-oos-fp607-a1-b7-r577",
+                p: 607,
+                a: 1,
+                b: 7,
+                order: 577,
+                trace: 31,
+                degree: 3,
+            },
+            CurveSpec {
+                slug: "h116-prym-oos-fp617-a1-b32-r647",
+                p: 617,
+                a: 1,
+                b: 32,
+                order: 647,
+                trace: -29,
+                degree: 3,
+            },
+            CurveSpec {
+                slug: "h116-prym-oos-fp631-a1-b5-r619",
+                p: 631,
+                a: 1,
+                b: 5,
+                order: 619,
+                trace: 13,
+                degree: 3,
+            },
+        ];
+
         #[derive(Clone, Copy, Debug, Eq, PartialEq)]
         struct CoverData {
             s1: i64,
@@ -272,14 +302,22 @@ mod frozen {
         }
 
         pub fn run(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, false)
+            run_with_panel(output_path, false, false)
         }
 
         pub fn run_prym(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, true)
+            run_with_panel(output_path, true, false)
         }
 
-        fn run_with_panel(output_path: &Path, prym_panel: bool) -> Result<(), String> {
+        pub fn run_prym_oos(output_path: &Path) -> Result<(), String> {
+            run_with_panel(output_path, true, true)
+        }
+
+        fn run_with_panel(
+            output_path: &Path,
+            prym_panel: bool,
+            oos_panel: bool,
+        ) -> Result<(), String> {
             let mut targets = Vec::new();
             let mut rows = BTreeMap::<String, Vec<usize>>::new();
             let mut extension_square_table_checks = 0_u64;
@@ -300,7 +338,8 @@ mod frozen {
             let mut prym_discriminant_distinguishing_targets = 0_usize;
             let mut prym_factor_checks = 0_usize;
 
-            for spec in CURVES {
+            let curve_specs: &[CurveSpec] = if oos_panel { &OOS_CURVES } else { &CURVES };
+            for &spec in curve_specs {
                 let base_field = Field::new(spec.p, 1, &[0, 1])?;
                 let base_curve = Curve {
                     field: &base_field,
@@ -563,47 +602,73 @@ mod frozen {
                 }
             }
 
-            if targets.len() != TARGETS || rows.len() != 5 {
+            let expected_targets = if oos_panel { 1840 } else { TARGETS };
+            let expected_curves = if oos_panel { OOS_CURVES.len() } else { CURVES.len() };
+            if targets.len() != expected_targets || rows.len() != expected_curves {
                 return Err("target census failed".to_string());
             }
-            if chirality_swap_checks != 2 * TARGETS {
+            if chirality_swap_checks != 2 * expected_targets {
                 return Err("chirality swap census failed".to_string());
             }
             let labels: Vec<u8> = targets.iter().map(|target| target.digit).collect();
             if labels.iter().zip(&labels).filter(|(left, right)| left == right).count()
-                != TARGETS
+                != expected_targets
             {
                 return Err("planted scorer control failed".to_string());
             }
 
-            let mut rules = Vec::with_capacity(486);
-            for observable in 0..OBSERVABLES {
-                for code in 0_u8..81 {
-                    let coefficients = decode_coefficients(code);
-                    for offset in 0..3_u8 {
-                        let predictions: Vec<u8> = targets
-                            .iter()
-                            .map(|target| {
-                                prediction(
-                                    target,
-                                    prym_panel,
-                                    observable,
-                                    &coefficients,
-                                    offset,
-                                )
-                            })
-                            .collect();
-                        let (coverage, matches) = score(&predictions, &labels);
-                        rules.push(Rule {
-                            observable,
-                            code,
-                            coefficients,
-                            offset,
-                            predictions,
-                            coverage,
-                            matches,
-                            statistic: statistic(matches, coverage),
-                        });
+            let mut rules = Vec::with_capacity(if oos_panel { 1 } else { 486 });
+            if oos_panel {
+                let observable = 1_usize;
+                let code = 60_u8;
+                let coefficients = decode_coefficients(code);
+                let offset = 2_u8;
+                let predictions: Vec<u8> = targets
+                    .iter()
+                    .map(|target| {
+                        prediction(target, true, observable, &coefficients, offset)
+                    })
+                    .collect();
+                let (coverage, matches) = score(&predictions, &labels);
+                rules.push(Rule {
+                    observable,
+                    code,
+                    coefficients,
+                    offset,
+                    predictions,
+                    coverage,
+                    matches,
+                    statistic: statistic(matches, coverage),
+                });
+            } else {
+                for observable in 0..OBSERVABLES {
+                    for code in 0_u8..81 {
+                        let coefficients = decode_coefficients(code);
+                        for offset in 0..3_u8 {
+                            let predictions: Vec<u8> = targets
+                                .iter()
+                                .map(|target| {
+                                    prediction(
+                                        target,
+                                        prym_panel,
+                                        observable,
+                                        &coefficients,
+                                        offset,
+                                    )
+                                })
+                                .collect();
+                            let (coverage, matches) = score(&predictions, &labels);
+                            rules.push(Rule {
+                                observable,
+                                code,
+                                coefficients,
+                                offset,
+                                predictions,
+                                coverage,
+                                matches,
+                                statistic: statistic(matches, coverage),
+                            });
+                        }
                     }
                 }
             }
@@ -619,7 +684,9 @@ mod frozen {
             let selected = &rules[selected_index];
             let total_exact_rules = rules
                 .iter()
-                .filter(|rule| rule.coverage == TARGETS && rule.matches == TARGETS)
+                .filter(|rule| {
+                    rule.coverage == expected_targets && rule.matches == expected_targets
+                })
                 .count();
             let covered_exact_rules = rules
                 .iter()
@@ -628,11 +695,11 @@ mod frozen {
 
             let mut exceedances = 0_usize;
             for replicate in 0..REPLICATES {
-                let mut shuffled = vec![0_u8; TARGETS];
+                let mut shuffled = vec![0_u8; expected_targets];
                 for (slug, indices) in &rows {
                     let mut values: Vec<u8> =
                         indices.iter().map(|&index| labels[index]).collect();
-                    let mut seed = 0x116_013_u64
+                    let mut seed = if oos_panel { 0x116_014_u64 } else { 0x116_013_u64 }
                         ^ (replicate as u64 + 1).wrapping_mul(0x9e3779b97f4a7c15)
                         ^ slug.bytes().map(u64::from).sum::<u64>();
                     shuffle(&mut values, &mut seed);
@@ -693,7 +760,13 @@ mod frozen {
                     "  \"familywise_empirical_p\":{:.12},\n  \"per_curve\":[{}],\n",
                     "  \"status\":\"measured\"\n}}\n"
                 ),
-                if prym_panel { "prym" } else { "zeta2" },
+                if oos_panel {
+                    "prym_oos"
+                } else if prym_panel {
+                    "prym"
+                } else {
+                    "zeta2"
+                },
                 targets.len(),
                 rows.len(),
                 rules.len(),
@@ -711,7 +784,7 @@ mod frozen {
                 chirality_swap_checks,
                 s2_distinguishing_targets,
                 e2_distinguishing_targets,
-                TARGETS,
+                expected_targets,
                 prym_factor_checks,
                 prym_eta_distinguishing_targets,
                 prym_discriminant_distinguishing_targets,
@@ -733,7 +806,13 @@ mod frozen {
             fs::write(output_path, json).map_err(|error| error.to_string())?;
             println!(
                 "chiral genus-three {} digit: observable={} coefficients=[{}] offset={} coverage={} matches={} exact={} p={:.6}",
-                if prym_panel { "prym" } else { "zeta2" },
+                if oos_panel {
+                    "prym-oos"
+                } else if prym_panel {
+                    "prym"
+                } else {
+                    "zeta2"
+                },
                 observable_name(selected.observable, prym_panel),
                 coefficient_string(&selected.coefficients),
                 selected.offset,
@@ -759,8 +838,11 @@ fn main() {
         [_, flag, output] if flag == "--run-prym" => {
             frozen::chiral_genus3_zeta2::run_prym(Path::new(output))
         }
+        [_, flag, output] if flag == "--run-prym-oos" => {
+            frozen::chiral_genus3_zeta2::run_prym_oos(Path::new(output))
+        }
         _ => Err(
-            "usage: h116_chiral_genus3_zeta2_digit --selftest | --run OUTPUT.json | --run-prym OUTPUT.json".to_string(),
+            "usage: h116_chiral_genus3_zeta2_digit --selftest | --run OUTPUT.json | --run-prym OUTPUT.json | --run-prym-oos OUTPUT.json".to_string(),
         ),
     };
     if let Err(error) = result {
