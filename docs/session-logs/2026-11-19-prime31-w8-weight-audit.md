@@ -28,3 +28,24 @@
 - Container has no GitHub DNS or Rust toolchain; used GitHub connector for source reads/writes and source-specific GitHub Actions, with pure-integer local independent precomputation only.
 - Avoided nested mutable borrow in first-x lift; loosened brittle assertions equating formal and actual EC cardinalities so unforeseen group collisions appear as measurements rather than a false test failure.
 - Shared research-KB tooling unavailable in this runtime; bounded fallback explicitly documented.
+
+
+## 2026-11-19 11:32 UTC — source-bound CI result and measured decision
+
+### What was done (commands, files, features)
+- GitHub Actions [run #44515210069](https://github.com/isogeny-labs/crypto/actions/runs/44515210069) **PASSED** on pinned original source and Rust 1.100.0: **40/40** library regressions, **2/2** focused tests, full four-window × 64 public-target grade, raw JSON uploaded as [artifact #14525571822](https://github.com/isogeny-labs/crypto/actions/runs/44515210069/artifacts/14525571822). Tested code/workflow commit `2a98e0cf52faa7fca1f5a6f7d69f46be70a1ea0d`. Raw JSON SHA-256: `8430535e90e731a5edfab09959b4f052f41146e473d4abf8529d1fb036f284b3`.
+- Exact formal count 64,737 old vs 65,536 alternative per half; 904 formal old collision pairs vs 0 alternative, independently reproduced. Old EC distinct 64,737/half all four windows; proposed alternative 65,536/half for W0/W2/W3, **65,496/half W1** (40 unforeseen actual EC coincidences). All weighted unsigned slot x sets each have 64 distinct images.
+- **256 matched natural public residuals**: old **205 hits** vs candidate **226 hits** (181 both / 24 old only / 45 candidate only / 6 neither); proposed arm +8.203125 percentage points on *this frozen cohort*. Descriptive paired McNemar exact p=0.0154323, not a preregistered multi-seed inference. Exact grader cost and per-window detailed records published in `W8_WEIGHT_SIGNATURE_AUDIT_RESULT_20261119.md` and `W8_WEIGHT_SIGNATURE_AUDIT_SUMMARY_20261119.json`.
+
+### Decisions made (and why)
+- Report component-level natural-public **generic 4+4 grading** yield improvement only; this is not public-only F4, new complete ECDLP logs, nor a cost-competitive solver. Historic optimized shared BSGS is the actual complete 1,024 target competitive frontier and must be rerun same-runner before claims.
+- Keep the draft task's source-bound passing code intact, publish the full report and frozen summary, close the task in `docs/ACTIVE.md`, mark PR ready after complete documentation.
+- Prioritize a **held-out seed** and W1 accidental EC collision analysis before any weight-promotion; this pilot alone does not establish statistical or asymptotic improvement.
+- Source-specific PASS is not a signed third-party PCC ([pcc:unverified]).
+
+### Open threads (unfinished, pick up next time)
+- Post weight-control results to nonenumerative extractor owner [#4692](https://github.com/isogeny-labs/crypto/pull/4692); test algebraic extraction of both weight choices without generic-sum tables on the original B8 46-positive/18-negative corpus, then replace grader in original rank31/1024 full Rust solver and measure strong same-runner BSGS/IC/rho.
+- Inspect W1 40 extra group coincidences between formally distinct vectors; independently rerun on fresh 1,024-target/window held-out cohort before claiming robust yield.
+
+### Errors (what went wrong, how it was handled)
+- Whole-repo Workflow files parse [run #44515209875](https://github.com/isogeny-labs/crypto/actions/runs/44515209875) failed before parser due inherited artifact-store pull failure; separate source-specific Rust study passed. No infrastructure modifications or paid compute commissioned.
