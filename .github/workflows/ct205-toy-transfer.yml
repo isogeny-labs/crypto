@@ -46,6 +46,8 @@ jobs:
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct221_zeta.py
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_projector_oracle.cjs
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_f101_projector_audit.json
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_extension_norm_oracle.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_f101_extension_norm.json
       - name: Recount quotient curves, Jacobian and sextic-twist obstruction
         run: |
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/independent_quotient_oracle.py
@@ -75,6 +77,16 @@ jobs:
           node research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_projector_oracle.cjs > /tmp/ct222_projector.json
           cmp /tmp/ct222_projector.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_f101_projector_audit.json
           sha256sum /tmp/ct222_projector.json
+          # CT223 exact non-rational F101^2 prime-divisor norm/pullback checks.
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_extension_norm_oracle.py --self-test
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_extension_norm_oracle.py > /tmp/ct223_extension_norm.json
+          cmp /tmp/ct223_extension_norm.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_f101_extension_norm.json
+          sha256sum /tmp/ct223_extension_norm.json
+          if python3 -O research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_extension_norm_oracle.py --self-test > /tmp/ct223_opt.log 2>&1; then
+            echo 'ERROR: CT223 accidentally passed with disabled asserts' >&2
+            exit 1
+          fi
+          grep -F 'CT223 requires assertions' /tmp/ct223_opt.log
 
   native-toy-dlp:
     runs-on: ubuntu-latest
