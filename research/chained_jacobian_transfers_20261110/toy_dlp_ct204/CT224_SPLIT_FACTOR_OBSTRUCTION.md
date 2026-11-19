@@ -66,6 +66,8 @@ cmp /tmp/ct224.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/c
 
 Producer-local Python 3 checks passed (normal, `-O`, compilation), yielding `CT224_SELFTEST_PASS [109, 102, 10397] [80597544, 87262021, 63328128] 3`. They independently recount rational points of `E`, `C`, and `E_0`, verify the integer factorization and irreducibility criterion, and reject three one-coefficient mutations plus a wrong scalar projector. The higher extension-field point counts and CT221's splitting premise are **inputs**, not newly proved here. Scope is exact toy arithmetic with no signed independent PCC.
 
+**Hosted exact-source check:** [GitHub Actions run #44455004668](https://github.com/isogeny-labs/crypto/actions/runs/44455004668), field-oracle job [#135327785780](https://github.com/isogeny-labs/crypto/actions/runs/44455004668/job/135327785780) completed successfully on source SHA `4777cc1f1fa8b7cfac5e29dc138009b878498164`. The decoded hosted log contains both normal and `python -O` `CT224_SELFTEST_PASS [109, 102, 10397] [80597544, 87262021, 63328128] 3`, followed by exact frozen JSON `cmp` and SHA-256 `31f05eeec67e0f683f0ef52e90e341211abb3eb4c6f07bc3050e6d59e44d071d`. The native Rust job in that run remained in progress at last inspection. This is an executed hosted producer validation, not independent PCC.
+
 ## Impact on next experiments
 
 1. **Stop proposing direct source-to-B or source-to-E_0 transfers over F101.** They must be zero; a smaller-factor index-calculus benchmark could not recover the 109-order source log.
