@@ -52,6 +52,7 @@
 - Attempt 03 used locally built GNU Time 1.9, retained the 30-minute outer cap, and applied 4 GiB limits to producer/checker processes as in the frozen workflow. Two producer outputs and two checker outputs were byte-identical; all recorded exit codes are zero and six mutations were rejected. `[pcc:unverified]`
 - Exact local result: N4, P4, N8 and P8 each report left/right/pairing rank 70/70/70 with nonzero determinant certificates. Under the frozen rule the verdict is `KILL_FIXED_LINEAR_COMPRESSION`. Claim record `PCC-20261119-50ffe2` is unverified. `[pcc:unverified]`
 - Raw attempts, `SUMMARY.json`, `RESULT.md`, `rank_gate.svg`, PNG and inspected three-page `REPORT.pdf` are under `research/prime31_ic_20261115/rr9/plucker_span_local_20261119/`. `[pcc:unverified]`
+- Merged the companion exterior-multilinearity proof and ran its corrected Rust one-slot certificate locally. It strengthens the four-case observation to every finite target except at most 64 points for this fixed support witness; claim `PCC-20261119-a9e2e9` is unverified. `[pcc:unverified]`
 
 ### Decisions made (and why)
 - Close only fixed linear compression of the registered 70-coordinate exterior-four message. Full span and restricted-pairing rank supply no smaller lossless fixed linear message on the frozen B8 fixtures. `[pcc:unverified]`

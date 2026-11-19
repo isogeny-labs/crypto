@@ -18,6 +18,38 @@ ECDLP speedup. `[pcc:unverified]`
 
 ![All three registered ranks reach the 70-dimensional ambient space in every case.](rank_gate.svg)
 
+## Analytic strengthening
+
+The merged companion argument proves that if each of four slots spans
+`F_p^8`, multilinearity makes its four-fold wedge span all
+`Lambda^4(F_p^8)`, of dimension 70. If this holds on both halves, the signed
+complement pairing is nonsingular and its restricted rank is also 70.
+`[pcc:unverified]`
+
+For four signed point pairs in one slot, the exact 8x8 row determinant is
+
+```text
+16 * product_i ((x_i-r)y_i) * product_{i<j} (x_j-x_i)^2.
+```
+
+The corrected local Rust certificate recomputed all 16 unique N/P slot
+determinants by both Gaussian elimination and this formula; every determinant
+is nonzero. B4 and B8 reuse the same first four base points, so these are 32
+case-slot certificate applications across N4/P4/N8/P8. `[pcc:unverified]`
+
+The certificate also found 32 distinct weighted support abscissae. Therefore
+the same explicit witness proves rank 70 for every finite target on this fixed
+Prime31 group except at most 64 target points, for any `B>=4` support retaining
+the canonical first four base points. Those exceptional points are unproved by
+this witness, not counterexamples. Claim record `PCC-20261119-a9e2e9` remains
+unverified. `[pcc:unverified]`
+
+The analytic Rust validation retained three preliminary failures: unformatted
+source, then two incorrect P-case frozen constants. The independently
+recomputed values and companion report exposed both transcription errors;
+attempt 04 passes the focused test and two byte-identical executions.
+`[pcc:unverified]`
+
 ## Exact observations
 
 | Case | Vectors/side | Examined L/R | Rank L | Rank R | Pairing rank |
@@ -82,6 +114,8 @@ These are operational metadata, not benchmark measurements. `[pcc:unverified]`
 - Source/output bindings: `attempt-03/SHA256SUMS`
 - Tests, exit codes, host/toolchain, and RSS: `attempt-03/`
 - Preserved failures: `attempt-01/` and `attempt-02/`
+- Analytic theorem/certificate: `../RR9_SPAN_FULLRANK_SHORTCUT_20261119.md`
+- Analytic local attempts: `../analytic_span_local_20261119/`
 - Frozen question: `../RR9_PLUCKER_SPAN_PROTOCOL_20261119.md`
 - Local waiver/amendments: `../RR9_PLUCKER_SPAN_LOCAL_RUN_*.md`
 
