@@ -1,0 +1,74 @@
+name: Prime31 W8 full-fibre multiplicity (source-specific)
+on:
+  push:
+    branches:
+      - automation/prime31-w8-collision-certificate-heldout-20261119
+    paths:
+      - ".github/workflows/prime31-w8-full-fibre.yml"
+      - "research/prime31_ic_20261115/native/examples/prime31_w8_full_fibre.rs"
+      - "research/prime31_ic_20261115/native/verify_prime31_w8_full_fibre.py"
+  pull_request:
+    paths:
+      - ".github/workflows/prime31-w8-full-fibre.yml"
+      - "research/prime31_ic_20261115/native/examples/prime31_w8_full_fibre.rs"
+      - "research/prime31_ic_20261115/native/verify_prime31_w8_full_fibre.py"
+permissions:
+  contents: read
+jobs:
+  original-prime31:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout experiment from exact PR source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout pinned original Prime31 Rust arithmetic
+        uses: actions/checkout@v4
+        with:
+          repository: isogeny-labs/crypto
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Pin Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay the new example ONLY into original-source crate
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_w8_full_fibre.rs \
+             pinned/research/prime31_ic_20261115/native/examples/prime31_w8_full_fibre.rs
+          sha256sum research/prime31_ic_20261115/native/examples/prime31_w8_full_fibre.rs
+          git rev-parse HEAD
+      - name: Original Rust library tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Focused Rust exact-fibre tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_w8_full_fibre
+      - name: Complete frozen 4-arm 1024-target full-fibre count
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_full_fibre > w8-full-fibre.json
+          jq -e '.schema=="prime31.w8.full-fibre.v1" and
+                 .curve.p==2147483647 and .curve.n==2147446831 and
+                 .samples_per_window==256 and (.per_window|length)==4 and
+                 (.pooled|length)==4 and (.certificates|length)>=16 and
+                 .generic_four_plus_four_grading_only==true and
+                 .algebraic_extraction_implemented==false and
+                 .complete_ecdlp_solved==false' w8-full-fibre.json
+      - name: Independent Python BigInt affine replay and summary reconstruction
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_w8_full_fibre.py \
+             w8-full-fibre.json | tee w8-full-fibre-independent-replay.json
+          sha256sum w8-full-fibre.json w8-full-fibre-independent-replay.json \
+              research/prime31_ic_20261115/native/examples/prime31_w8_full_fibre.rs \
+              research/prime31_ic_20261115/native/verify_prime31_w8_full_fibre.py \
+              | tee w8-full-fibre-sha256.txt
+      - name: Publish original raw result and independent replay
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-w8-full-fibre-20261119
+          path: |
+            w8-full-fibre.json
+            w8-full-fibre-independent-replay.json
+            w8-full-fibre-sha256.txt
+          if-no-files-found: warn
