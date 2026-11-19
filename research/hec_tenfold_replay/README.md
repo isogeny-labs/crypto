@@ -154,3 +154,26 @@ We tested all 15 nonempty subsets of the four families. At p = 37 every proper s
 The full solve used seed 2026111908, eight new pairs per curve, and 32 paired repetitions per case in each timing order. Columns report the median across cases of the per-case paired median. The original three-family solver and the four-family solver each reached 10× against the pencil reference on 30/32 cases in both orders. Every scalar matched its input. The fourth family improved full solve time in both orders on 22/32 cases. Results are specific to these curves and host. The default stays unchanged.
 
 From this directory, run `ruby harness/g4-fourth-pencil.rb verify | c++ -std=c++17 -O3 -x c++ - -o /tmp/g4-check && /tmp/g4-check` for the exhaustive residual check. Omitting `verify` produces the subset benchmark; run the binary with no arguments and again with `reverse`. Its columns are prime, family bit mask (8 selects the fourth family), repetition (−1 for validation), rank attained flag, rank, poles at success and pencil members visited, then nanoseconds. A zero pole count on failure denotes exhaustion. Run `harness/g4-fourth-pencil.zsh` for the complete native comparison. The timing arms are pencil reference, original optimized solver, and four-family solver respectively. The medians file stores prime, case, order, pencil/four-family and original/four-family ratios. Raw timing and audit streams are in Git.
+
+### Matching quadratic places in genus 4
+
+The first existing pencil fixes five copies of its pole. When the residual has rational support accounting for all but two degrees, consecutive synthetic divisions recover the two coefficients of the remaining monic quadratic from the leading coefficients of the norm. Its coefficients in global x coordinates index a table. A repeat of the support identifies two ordinates that agree or differ by sign in the quadratic extension. Subtracting or adding the rational parts of their equations accordingly eliminates the quadratic place. The implementation stores the first partial in compact form and computes orientations only when the support repeats. It uses the three original pencil families and adds matched rows from the first.
+
+| Field | Partial rows before stop | Matches increasing rank | Poles, original → matching | Pencil members, original → matching |
+|---:|---:|---:|---:|---:|
+| 37 | 50 | 3 | 17 → 15 | 1,796 → 1,578 |
+| 43 | 59 | 5 | 15 → 11 | 1,858 → 1,401 |
+| 59 | 81 | 4 | 18 → 16 | 3,074 → 2,790 |
+| 67 | 87 | 6 | 14 → 12 | 2,658 → 2,264 |
+
+All 18 matches increased rank. An untimed pass checked irreducibility and the curve equation modulo every residual quadratic encountered before stopping. Both catalogue arms reconstructed the same projective factor-base values. Each full solve independently verified its scalar. The complete benchmark rotates the pencil reference, the original three-family solver and the quadratic-matching solver on identical inputs. Each case has 32 repetitions in each of two opposite timing orders on one host.
+
+| Input seed | Cases faster than original in both orders | Cases at least 10× pencil in both orders, original → matching |
+|---:|---:|---:|
+| 2026111908 (previous panel) | 17/32 | 30 → 30 |
+| 2026111909 | 29/32 | 31 → 32 |
+| 2026111910 (fresh replication) | 14/32 | 31 → 31 |
+
+At p = 43 all 24 pairs improved in both orders. Across those six processes the median case speedup was 1.069–1.094×. At p = 59 and 67 the field medians fell below one in reverse order on two seeds. Reducing members visited therefore supports a collection-work saving on all four curves, with a smaller and field-dependent elapsed-time effect. The solver default stays unchanged.
+
+Run `ruby harness/g4-quadratic-places.rb | c++ -std=c++17 -O3 -x c++ - -o /tmp/g4-quadratics`, then run the binary with no arguments and again with `reverse`. Its columns are prime, repetition, matching enabled, poles, members visited, partials, matches, ramified partials checked, matches increasing rank and nanoseconds. Repetition −1 enables the extension-field checks. Run `HEC_PAIR_SEED=2026111910 harness/g4-quadratic-places.zsh` for the full benchmark; its default seed is 2026111909. Case summaries store prime, case, order and paired medians for pencil/original, pencil/matching and original/matching. The raw logs and audits for all three seeds are checked into Git.
