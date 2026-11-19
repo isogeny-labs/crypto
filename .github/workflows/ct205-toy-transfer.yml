@@ -9,6 +9,7 @@ on:
       - 'tests/ct226_native_genus4_transferred_ic.rs'
       - 'tests/ct229_impl/probe.rs'
       - 'tests/ct231_impl/probe.rs'
+      - 'tests/ct233_impl/probe.rs'
       - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/**'
       - 'src/prime_hyperelliptic/**'
       - 'Cargo.toml'
@@ -22,6 +23,7 @@ on:
       - 'tests/ct226_native_genus4_transferred_ic.rs'
       - 'tests/ct229_impl/probe.rs'
       - 'tests/ct231_impl/probe.rs'
+      - 'tests/ct233_impl/probe.rs'
       - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/**'
   workflow_dispatch:
 
@@ -142,6 +144,7 @@ jobs:
             /tests/ct226_native_genus4_transferred_ic.rs
             /tests/ct229_impl/probe.rs
             /tests/ct231_impl/probe.rs
+            /tests/ct233_impl/probe.rs
             /.cargo/
             /build.rs
             /crates/
@@ -192,3 +195,7 @@ jobs:
           cargo test --locked --release --test ct226_native_genus4_transferred_ic ct231_ -- --nocapture 2>&1 | tee /tmp/ct231-native.log
           test "$(grep -c 'CT231_PANEL_JSON' /tmp/ct231-native.log)" -eq 4
           grep 'CT231_PANEL_JSON' /tmp/ct231-native.log
+          # CT233: exact weighted 2LP graph + fresh Q73 native source-target gate.
+          cargo test --locked --release --test ct226_native_genus4_transferred_ic ct233_ -- --nocapture 2>&1 | tee /tmp/ct233-native.log
+          test "$(grep -c 'CT233_PANEL_JSON' /tmp/ct233-native.log)" -eq 4
+          grep 'CT233_PANEL_JSON' /tmp/ct233-native.log
