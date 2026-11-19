@@ -1,0 +1,27 @@
+file type curve bruteforce | deg elim sqfr generic | fieldeq_time nsol nsplit status
+msolve_runs/c1_P_1.ms P 1 0 None None None ? 600.03 0 0 TIMEOUT
+msolve_runs/c1_P_2.ms P 1 0 None None None ? 600.07 0 0 TIMEOUT
+msolve_runs/c1_P_3.ms P 1 2 None None None ? 600.04 0 0 TIMEOUT
+msolve_runs/c1_P_4.ms P 1 1 None None None ? 600.04 0 0 TIMEOUT
+msolve_runs/c1_R_1.ms R 1 0 4096 4096 4096 yes 2.64 1 0 0
+msolve_runs/c1_R_2.ms R 1 0 4096 4096 4096 yes 2.82 1 0 0
+msolve_runs/c1_R_3.ms R 1 1 4096 4096 4096 yes 2.92 1 1 0
+msolve_runs/c1_R_4.ms R 1 0 4096 4095 4095 no 2.84 0 0 status-1
+msolve_runs/c2_P_1.ms P 2 1 None None None ? 7.97 7 0 0
+msolve_runs/c2_P_2.ms P 2 2 None None None ? 600.04 0 0 TIMEOUT
+msolve_runs/c2_P_3.ms P 2 3 None None None ? 189.74 9 3 0
+msolve_runs/c2_P_4.ms P 2 1 None None None ? 600.05 0 0 TIMEOUT
+msolve_runs/c2_R_1.ms R 2 0 4096 4096 4096 yes 2.73 1 0 0
+msolve_runs/c2_R_2.ms R 2 0 4096 4096 4096 yes 2.6 0 0 status-1
+msolve_runs/c2_R_3.ms R 2 0 4096 4096 4096 yes 2.56 0 0 status-1
+msolve_runs/c2_R_4.ms R 2 0 4096 4096 4096 yes 2.06 1 0 0
+msolve_runs/c3_P_1.ms P 3 1 None None None ? 600.04 0 0 TIMEOUT
+msolve_runs/c3_P_2.ms P 3 2 None None None ? 600.03 0 0 TIMEOUT
+msolve_runs/c3_P_3.ms P 3 3 None None None ? 600.03 0 0 TIMEOUT
+msolve_runs/c3_P_4.ms P 3 5 None None None ? 600.03 0 0 TIMEOUT
+msolve_runs/c3_R_1.ms R 3 2 4096 4096 4094 yes 1.87 3 2 0
+msolve_runs/c3_R_2.ms R 3 0 None None None ? 2.03 3 0 0
+msolve_runs/c3_R_3.ms R 3 0 4096 4096 4096 yes 1.94 1 0 0
+msolve_runs/c3_R_4.ms R 3 0 4096 4096 4096 yes 1.9 0 0 status-1
+SUMMARY P: n=12 ideal deg [], elim deg [], sqfr [], generic position 0/12 | field-eq solve mean 516.51s, statuses ['0', 'TIMEOUT'], split 3 vs brute force 21
+SUMMARY R: n=12 ideal deg [4096], elim deg [4095, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096], sqfr [4094, 4095, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096, 4096], generic position 10/12 | field-eq solve mean 2.41s, statuses ['0', 'status-1'], split 3 vs brute force 3
