@@ -55,3 +55,19 @@
 
 ### Errors (what went wrong, how it was handled)
 - CI PASS; no Rust runtime or independent affine replay failures. Historical baseline #4532 is on a different runner and must never be used as a paired claim.
+
+## 2026-11-19T14:35Z — Handoff, PR readiness and merge-method blocker
+### What was done (commands, files, features)
+- Posted exact autocorrelation identity, full hit table and no-generic-table next gate to the existing nonenumerative RR9/F4 owner [PR #4692](https://github.com/isogeny-labs/crypto/pull/4692#issuecomment-7012162907).
+- Updated PR #4808 body with frozen original-run artifact, formulas, 40+4 Rust tests, 20 signed affine certificates, 512×5 observed outcomes, source links, limits and prior-lead audit.
+- Verified the remote PR has exactly eight expected changed files. Marked #4808 **ready for review** after source-specific checks passed.
+
+### Decisions made (and why)
+- This research lane is complete as an original-curve generic-control experiment, not a solution to the full nongeneric prime-field ECDLP target. #4692 continues to own unknown-index extraction.
+- Existing #4532 is the proper optimized shared-BSGS sensitivity frontier and must be rerun same-runner with any full solver candidate.
+
+### Open threads (unfinished, pick up next time)
+- Independent signed PCC remains pending. Final algorithmic gates are #4692 public-only F4 B8 46+/18−, rank31/1024 full solve and strongest BSGS/rho matched comparisons.
+
+### Errors (what went wrong, how it was handled)
+- Attempt to enable repo default auto-merge via GitHub failed: **'Merge method squash merging is not allowed on this repository'**. PR remains open ready for manual merge-method decision; no merge performed.
