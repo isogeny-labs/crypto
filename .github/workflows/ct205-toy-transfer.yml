@@ -48,6 +48,8 @@ jobs:
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct222_f101_projector_audit.json
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_extension_norm_oracle.py
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_f101_extension_norm.json
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct224_split_factor_obstruction.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct224_f101_split_factor.json
       - name: Recount quotient curves, Jacobian and sextic-twist obstruction
         run: |
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/independent_quotient_oracle.py
@@ -87,6 +89,12 @@ jobs:
             exit 1
           fi
           grep -F 'CT223 requires assertions' /tmp/ct223_opt.log
+          # CT224 splits the complementary threefold into a t=0 elliptic and a simple surface.
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct224_split_factor_obstruction.py --self-test
+          python3 -O research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct224_split_factor_obstruction.py --self-test
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct224_split_factor_obstruction.py > /tmp/ct224_factor.json
+          cmp /tmp/ct224_factor.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct224_f101_split_factor.json
+          sha256sum /tmp/ct224_factor.json
 
   native-toy-dlp:
     runs-on: ubuntu-latest
