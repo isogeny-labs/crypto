@@ -1,0 +1,17 @@
+{
+  "action": "refit dropping one design level at a time and per pass, and report the range beside the cluster-bootstrap CI; for a threshold decision also compute the model-free bound that charges all residual time to one class",
+  "created": "2026-11-19T09:41:53Z",
+  "evidence": [
+    "research/genus4_cost_calibration_20261119/validation/validator-report.md",
+    "research/genus4_cost_calibration_20261119/validation/recompute.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator",
+    "research",
+    "controlled-experiment"
+  ],
+  "trigger": "an OLS splits wall time into per-operation prices for two count classes that are strongly anti-correlated across the design (|corr| > 0.9)",
+  "why": "genus4_cost_calibration: corr(rel_ops, la_ops) = -0.94; drop-one-cc w_rel ranged -0.00004..0.0033 against a CI [0.0019, 0.0032]; model-free bounds (<= 0.042) still settled the decision"
+}
