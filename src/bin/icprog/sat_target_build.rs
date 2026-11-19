@@ -7,10 +7,12 @@ use super::{
     sat_exporter_audit, target_math,
 };
 #[path = "../prepared_sat_target_worker/contract.rs"]
-#[allow(dead_code)]
+#[allow(dead_code, clippy::duplicate_mod)]
+// Shared worker contract; also path-loaded elsewhere in icprog.
 pub(super) mod capsule;
 #[path = "../prepared_target_worker/journal.rs"]
-#[allow(dead_code)]
+#[allow(dead_code, clippy::duplicate_mod)]
+// Shared worker journal; also path-loaded elsewhere in icprog.
 pub(super) mod journal;
 
 use crypto_lib::cryptanalysis::prepared_sat_control::{canonical_sha, sha256};

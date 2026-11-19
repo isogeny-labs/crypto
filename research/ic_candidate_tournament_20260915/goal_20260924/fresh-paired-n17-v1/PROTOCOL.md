@@ -8,9 +8,13 @@ passed its independent data-only audit. The SAT arm has a
 with complete archive replay and exact-built exporter parity. The MatrixF5
 arm has a separate [target-free source publication](f5-source-v1/result-v1/RESULT.md)
 from a new, unconsumed validation capsule, with all 6,968 archived members
-independently replayed. F5 card adoption remains unexercised. The incumbent IC
-and rho arms still lack equivalent independent pre-card source publications.
-A separate [disclosed strong-rho readiness control](rho-readiness-v1/RESULT.md)
+independently replayed. F5 card adoption remains unexercised. Publisher
+commands now exist for the remaining two pre-card arms:
+[`incumbent-source-publish` / `incumbent-source-replay`](INCUMBENT_SOURCE.md)
+and [`rho-source-publish` / `rho-source-replay`](RHO_SOURCE.md). Committed,
+independently replayed publications for those arms are still required before a
+card may be drawn. A separate
+[disclosed strong-rho readiness control](rho-readiness-v1/RESULT.md)
 recovered and replayed one already exposed public point; it is neither a
 source publication nor a fresh paired arm.
 No point card, fresh target registration, four-arm result or isolated-host

@@ -216,6 +216,13 @@ passed scalar replay and deterministic session audit on one already exposed
 public point. It is L0, source-unpublished and unpaired. Use its exact
 hex/decimal curve crosswalk and unpriced-operation caveat before registering
 the rho reference for a fresh card.
+The [incumbent source publisher](../../../research/ic_candidate_tournament_20260915/goal_20260924/fresh-paired-n17-v1/INCUMBENT_SOURCE.md)
+and [rho source publisher](../../../research/ic_candidate_tournament_20260915/goal_20260924/fresh-paired-n17-v1/RHO_SOURCE.md)
+add `incumbent-source-publish`/`incumbent-source-replay` and
+`rho-source-publish`/`rho-source-replay`. They archive target-free source/build
+bytes only. Committed publications and independent repository replays remain
+required before a point card; these commands alone do not mint IC1 identities
+or authorize a four-arm dispatch.
 Do not charge child startup to the online interval by stopwatch subtraction.
 On Unix, `isolated_bench busy` serializes builds/tests against the same lock as
 the historical wrapper; macOS supports busy only. Timed affinity/reservation

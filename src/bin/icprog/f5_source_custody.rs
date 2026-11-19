@@ -221,7 +221,7 @@ pub(super) fn publish(
     replay(&publication, &source_seal, out)
 }
 
-fn verify(publication: &Path, source_seal: &str) -> Result<Value, String> {
+pub(super) fn verify(publication: &Path, source_seal: &str) -> Result<Value, String> {
     let header = load(&publication.join("SOURCE_PUBLICATION.json"))?;
     claims(&header)?;
     require(

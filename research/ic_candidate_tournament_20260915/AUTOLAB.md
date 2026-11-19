@@ -34,8 +34,12 @@ ordinary-query evidence must use each exact pipeline: the worker's built-in Rust
 SAT engine cannot qualify the separately bound CryptoMiniSat pipeline.
 New cross-method comparisons use native `ecbench`, whose merged online-window
 extension is available for review and integration. Public unplanted targets,
-IC1 identity and prepared solver admission remain open. The Python entry points below are
-historical contracts, not commands for new research.
+IC1 identity and prepared solver admission remain open. The fresh-paired
+[incumbent](goal_20260924/fresh-paired-n17-v1/INCUMBENT_SOURCE.md) and
+[rho](goal_20260924/fresh-paired-n17-v1/RHO_SOURCE.md) source publishers archive
+target-free bytes only; committed publications are still required before a
+card. The Python entry points below are historical contracts, not commands for
+new research.
 The [ordinary preparation mathematical gate](goal_20260924/native-ordinary-preparation-v1/PROTOCOL.md)
 independently checks target-free n17 input chronology, the complete geometric
 base, every witness/negative/failure, projected duplicates, rank and logs.
