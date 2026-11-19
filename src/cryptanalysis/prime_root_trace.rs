@@ -920,7 +920,6 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
     remainder.truncate(b.len() - 1);
     Ok((trim(quotient), trim(remainder)))
 }
-}
 fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, String> {
     let mut r = vdiv(&[1], m, p)?.1;
     let mut b = vdiv(base, m, p)?.1;
