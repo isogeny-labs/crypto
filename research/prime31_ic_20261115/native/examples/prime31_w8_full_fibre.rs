@@ -43,7 +43,8 @@ fn nonzero_scalar(seed: &mut u64) -> u64 {
 fn base31(ar: &mut Arithmetic) -> Vec<Point> {
     let mut points = Vec::new();
     for x in 0..10_000u64 {
-        if let Some(y) = ar.sqrt(ar.rhs(PRIME31, x), PRIME31.p) {
+        let rhs = ar.rhs(PRIME31, x);
+        if let Some(y) = ar.sqrt(rhs, PRIME31.p) {
             if y != 0 {
                 points.push(Some((x, y.min(PRIME31.p - y))));
                 if points.len() == 31 { break; }
@@ -170,7 +171,7 @@ fn study(per_window: usize) -> Value {
             for (qidx, &q) in window_qs.iter().enumerate() {
                 let (count, witness) = multiplicity(&mut ar, &h, q);
                 if qidx == 0 || (qidx > 0 && certificates.iter()
-                    .filter(|x:&&Value|x["window"] == widx && x["arm"] == LABELS[arm]).count() == 0 && count > 0) {
+                    .filter(|x:&&Value|x["window"].as_u64() == Some(widx as u64) && x["arm"].as_str() == Some(LABELS[arm])).count() == 0 && count > 0) {
                     if let Some((left,right)) = witness {
                         certificates.push(json!({"window":widx,"arm":LABELS[arm],
                             "q_index":qidx,"target":q,"left_word":left,"right_word":right,
