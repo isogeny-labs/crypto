@@ -50,6 +50,8 @@ jobs:
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_f101_extension_norm.json
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct224_split_factor_obstruction.py
             /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct224_f101_split_factor.json
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_geometric_hom_obstruction.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_f101_geometric_hom.json
       - name: Recount quotient curves, Jacobian and sextic-twist obstruction
         run: |
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/independent_quotient_oracle.py
@@ -95,6 +97,12 @@ jobs:
           python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct224_split_factor_obstruction.py > /tmp/ct224_factor.json
           cmp /tmp/ct224_factor.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct224_f101_split_factor.json
           sha256sum /tmp/ct224_factor.json
+          # CT225 global geometric non-transfer and first abstract 109-torsion crossover.
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_geometric_hom_obstruction.py --self-test
+          python3 -O research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_geometric_hom_obstruction.py --self-test
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_geometric_hom_obstruction.py > /tmp/ct225_hom.json
+          cmp /tmp/ct225_hom.json research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct225_f101_geometric_hom.json
+          sha256sum /tmp/ct225_hom.json
 
   native-toy-dlp:
     runs-on: ubuntu-latest
