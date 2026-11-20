@@ -55,6 +55,10 @@ pub fn round57_power_case(p:u64, degree:usize, delta:u64, leading:u64,
     let mut fingerprint=0u64;
     for j in 0..17 {fingerprint=fingerprint.wrapping_mul(37).wrapping_add(result.coefficients[j]);}
     digest=digest.wrapping_add(black_box(fingerprint).wrapping_add(iteration as u64));
+    // Each independent invocation gets the same fresh per-call budget;
+    // otherwise benchmark repetition falsely trips WorkLimit/FieldLimit.
+    let gate=if verify{&mut replay.gate}else{&mut producer.gate};
+    gate.metrics.work=0;gate.metrics.field_work=0;
  }
  let metrics=if verify{replay.gate.metrics}else{producer.gate.metrics};
  (digest,metrics.work,metrics.field_work)
