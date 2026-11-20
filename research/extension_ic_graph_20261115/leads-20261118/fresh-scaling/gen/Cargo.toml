@@ -1,0 +1,16 @@
+[package]
+name = "fresh_scaling_gen"
+version = "0.1.0"
+edition = "2021"
+description = "Deterministic fresh public-target generator for the restricted weak-cover E(F_{p^6}) family (lane fresh-scaling). No dependencies."
+
+[[bin]]
+name = "fresh-scaling-gen"
+path = "src/main.rs"
+
+[dependencies]
+
+[profile.release]
+debug = 0
+incremental = false
+overflow-checks = true

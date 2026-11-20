@@ -1,0 +1,16 @@
+{
+  "action": "check git ls-files for every file the script reads, reassemble in scratch with the paths substituted and compare per-file hashes with the manifest, and rerun the committed source to compare outputs byte for byte; a manifest that hashes a file does not mean the file is committed",
+  "created": "2026-11-18T17:59:38Z",
+  "evidence": [
+    "research/extension_ic_graph_20261115/leads-20261118/independent-validation/results/hashes.tsv",
+    "research/extension_ic_graph_20261115/leads-20261118/independent-validation/results/reproduction.txt"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator",
+    "research"
+  ],
+  "trigger": "a lane's build script or BUILD_MANIFEST names a lockfile, a source copy or an absolute worktree path",
+  "why": "descent-finder mini-build: build.sh copies an uncommitted Cargo.lock under set -e and hard-codes an absent worktree; BUILD_MANIFEST hashes neither the compiled traced_descent_check.rs nor commits the lock; path-substituted reassembly and an offline lock reproduced every hash and the outputs"
+}
