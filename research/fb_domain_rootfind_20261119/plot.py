@@ -3,7 +3,7 @@ example `fb_domain_rootfind`) as one figure.  It computes no result: every
 plotted number is read from the table the example printed, including the
 ratios used as bar labels.
 
-    python3 plot.py   # writes root_step.svg and root_step.png (150 dpi)
+    python3 plot.py   # writes root_step.svg and root_step.png (90 dpi)
 """
 import pathlib
 import re
@@ -63,5 +63,5 @@ fig.text(0.01, 0.005,
          fontsize=8)
 fig.tight_layout(rect=(0, 0.02, 1, 1))
 fig.savefig(HERE / "root_step.svg")
-fig.savefig(HERE / "root_step.png", dpi=150)
+fig.savefig(HERE / "root_step.png", dpi=90, pil_kwargs={"optimize": True})  # under the 64 KiB data cap
 print("wrote root_step.svg, root_step.png")
