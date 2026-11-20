@@ -1,0 +1,15 @@
+Command: ELAN_HOME=/workspace/.elan-h113 PATH=/workspace/.elan-h113/bin:$PATH lake build
+Exit: 1
+Date: 2026-11-18 UTC
+
+The first in-module integration failed because the namespace already carried
+an implicit index named `X`; Lean therefore elaborated `F[X]` as unrelated
+indexed notation rather than `Polynomial F`.  Representative diagnostics:
+
+  H116FiberTrace.lean:2478:27: Invalid field notation ... den₁ ...
+  H116FiberTrace.lean:2483:2: Tactic `apply` failed ...
+  H116FiberTrace.lean:2493:12: failed to prove index is valid ...
+
+The isolated scratch theorem had compiled.  The correction replaces only
+bracket/`X` notation by `Polynomial F` and `Polynomial.X`; the theorem's
+hypotheses, strict degree bound, and conclusion are unchanged.

@@ -1,0 +1,21 @@
+digraph H116FrobeniusBridge {
+  graph [rankdir=TB, bgcolor="white", pad="0.15", nodesep="0.34", ranksep="0.42", newrank=true, dpi=72];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10, margin="0.10,0.07"];
+  edge [fontname="DejaVu Sans", fontsize=8.5, color="#475569"];
+
+  endpoint [label="elliptic endpoint\nV + pi = [t]\nmap/sign/scaling instance OPEN", fillcolor="#fef3c7", color="#d97706"];
+  correction [label="formal parameter\nscalar input + correction X^p", fillcolor="#dbeafe", color="#2563eb"];
+  divisibility [label="Mathlib FormalGroup\nY divides F(X,Y)-X\nLEAN PROVED", fillcolor="#dcfce7", color="#16a34a"];
+  prefix [label="parameter prefix\nunchanged below p\nLEAN PROVED", fillcolor="#dcfce7", color="#16a34a"];
+  pole [label="remove leading X\ndouble-pole prefix below p-1\nLEAN PROVED", fillcolor="#dcfce7", color="#16a34a"];
+  parity [label="even z-degrees -> w\nfirst possible index (p-1)/2", fillcolor="#e0e7ff", color="#4f46e5"];
+  observed [label="p=31 frozen control\nfirst difference 15\ndelta 10 · OBSERVED", fillcolor="#dcfce7", color="#16a34a"];
+  negatives [label="controls\nomitted scale: diff 0\nwrong target: identity reject\nmutation: identity reject", fillcolor="#fee2e2", color="#dc2626"];
+
+  { rank=same; endpoint; correction; divisibility; }
+  { rank=same; prefix; pole; parity; observed; }
+  endpoint -> correction [style=dashed, label="instance needed"];
+  correction -> divisibility -> prefix;
+  prefix -> pole -> parity -> observed;
+  negatives -> observed [style=dashed, label="3/3 rejected"];
+}

@@ -1,0 +1,74 @@
+{
+  "schema": "h116.rational-separation-capacity-protocol/v1",
+  "protocol_id": "H116-RATIONAL-SEPARATION-CAPACITY-001",
+  "status": "frozen-before-implementation-and-execution",
+  "question": "How many distinct affine x-values are available in each frozen extension-field curve cell for the proved strict-degree rational-map separation certificate, and does the exact sample vanishing polynomial demonstrate the degree-equals-sample-size boundary?",
+  "parent_protocol_sha256": "36dbefbbd7d7efba055e94d1deaa427a63dc13a94ed6561bc38e1784a3efba4a",
+  "parent_result_sha256": "5c8f506a81280c650470dac6d2b32deca78c9e63a45282b1a579a6ace66368eb",
+  "fixed_loci_result_sha256": "c2661066c46778b96d7d47a98b0ee903ac0de04b638d48589efd79c8b86a2c",
+  "lean_source_sha256": "63ba08391dcf0de78d97df5b173d400c85f212cbd4f615f74d25573c6bde5588",
+  "cells": [
+    {"slug":"fp5-a2-b1-d2","p":5,"a":2,"b":1,"degree":2},
+    {"slug":"fp5-a2-b1-d3","p":5,"a":2,"b":1,"degree":3},
+    {"slug":"fp5-a2-b1-d4","p":5,"a":2,"b":1,"degree":4},
+    {"slug":"fp7-a1-b1-d2","p":7,"a":1,"b":1,"degree":2},
+    {"slug":"fp7-a1-b1-d3","p":7,"a":1,"b":1,"degree":3},
+    {"slug":"fp7-a1-b1-d4","p":7,"a":1,"b":1,"degree":4},
+    {"slug":"fp11-a1-b1-d2","p":11,"a":1,"b":1,"degree":2},
+    {"slug":"fp11-a1-b1-d3","p":11,"a":1,"b":1,"degree":3}
+  ],
+  "field_construction": {
+    "representation": "GF(p)[u] modulo the lexicographically first monic irreducible polynomial of the frozen degree",
+    "irreducibility_check": "deterministic Rabin criterion",
+    "maximum_field_size": 2401
+  },
+  "producer": {
+    "path": "h116_rational_separation_capacity.rs",
+    "build": "rustc --edition=2021 -O -D warnings",
+    "source_hash": "to be sealed by RATIONAL_SEPARATION_CAPACITY_SOURCE_GATE.md before execution"
+  },
+  "independent_verifier": {
+    "path": "h116_rational_separation_capacity_verify.py",
+    "method": "separate Python polynomial-basis field implementation; independently reconstruct affine fibers, distinct x-values, and the sample vanishing polynomial from frozen cell definitions",
+    "source_hash": "to be sealed by RATIONAL_SEPARATION_CAPACITY_SOURCE_GATE.md before execution"
+  },
+  "sample_definition": "all distinct x in GF(p^d) for which y^2=x^3+a*x+b has at least one solution in GF(p^d); infinity is excluded",
+  "vanishing_control": "construct M_S(T)=product over x in S of (T-x) in ascending coefficient order; retain the full canonical coefficient-index encoding",
+  "positive_checks": [
+    "the parent extension group order equals one plus the independently enumerated affine point count",
+    "every distinct x-fiber is either a singleton with y=0 or a two-point pair {y,-y}",
+    "affine_point_count=singleton_fibers+2*paired_fibers",
+    "distinct_x_count=singleton_fibers+paired_fibers",
+    "raw_strict_degree_capacity=distinct_x_count-1",
+    "M_S is monic, nonzero, has degree distinct_x_count, and evaluates to zero at every x in S",
+    "an independently enumerated degree-one curve supplies the base-field distinct-x count"
+  ],
+  "controls": [
+    "M_S is a nonzero degree-|S| polynomial indistinguishable from zero on exactly the complete sample set, demonstrating why the Lean bound is strict",
+    "adding one to the constant coefficient of M_S produces a nonzero evaluation at every sample x",
+    "at least one extension cell has strictly more distinct x-values than its degree-one base-field curve"
+  ],
+  "measurements": [
+    "parent group order, affine point count, singleton and paired x-fiber counts",
+    "distinct extension-field x count, independently enumerated base-field distinct-x count, and their ratio",
+    "raw strict cross-product degree capacity before excluding denominator poles",
+    "canonical full coefficient-index encoding of M_S",
+    "M_S zero-evaluation failures and constant-mutation rejections",
+    "producer polynomial-build/evaluation field-operation counts and producer/verifier elapsed nanoseconds as single-run diagnostics"
+  ],
+  "acceptance": {
+    "primary": "all positive checks pass in all eight cells and producer exact fields match the independent replay",
+    "controls": "both polynomial controls pass in every cell and extension growth occurs in at least one frozen cell",
+    "failure_policy": "retain every row and every failed invariant; do not replace a curve, degree, modulus rule, sample definition, check, or control"
+  },
+  "requirements_to_evidence": [
+    {"requirement":"strict finite-evaluation separation implication","evidence":"Lean theorem rationalMap_eq_of_eval_finset","state":"proved"},
+    {"requirement":"strict degree boundary","evidence":"Lean ZMod 3 theorem plus frozen M_S control","state":"proved and preregistered"},
+    {"requirement":"distinct-x sample capacity","evidence":"eight-cell producer and independent verifier","state":"preregistered"},
+    {"requirement":"actual H116 rational-map degree and pole audit","evidence":"none in this protocol","state":"open"}
+  ],
+  "claim_boundary": "This measures raw finite-sample capacity and the strict-degree obstruction. It does not construct the H116 rational map, identify its scheme or local-series semantics, bound its cross-product degree, remove denominator poles, solve ECDLP, or establish any runtime or asymptotic improvement.",
+  "filed_before_affected_code": true,
+  "filed_before_affected_data": true
+}
+

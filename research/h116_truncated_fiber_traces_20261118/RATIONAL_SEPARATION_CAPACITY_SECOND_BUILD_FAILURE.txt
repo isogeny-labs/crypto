@@ -1,0 +1,10 @@
+Command: rustc --edition=2021 -O -D warnings h116_rational_separation_capacity.rs
+Exit: 1
+Date: 2026-11-18 UTC
+Data status: no panel execution occurred and no result file was written.
+
+The corrected row formatter exposed an otherwise unconstrained `TryInto`
+target for the two iterator counts under Rust 1.100's deny-warnings mode.
+The correction explicitly types `vanishing_eval_failures` and
+`mutation_rejections` as `u64`, matching the frozen count schema.  No
+experimental definition or acceptance rule changed.

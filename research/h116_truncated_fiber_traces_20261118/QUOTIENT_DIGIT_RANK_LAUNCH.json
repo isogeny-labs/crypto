@@ -1,0 +1,22 @@
+{
+  "schema": "h116-quotient-digit-rank-launch/v1",
+  "protocol_id": "H116-QUOTIENT-DIGIT-RANK-001",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and the exact hashes in QUOTIENT_DIGIT_RANK_SOURCE_GATE.md",
+  "inputs": [
+    "QUOTIENT_DIGIT_OOS_MOMENTS.tsv",
+    "QUOTIENT_DIGIT_OOS_LABELS.tsv",
+    "QUOTIENT_DIGIT_OOS_RESULT.json"
+  ],
+  "commands": {
+    "build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_quotient_digit_rank.rs", "-o", "/tmp/h116_quotient_digit_rank"],
+    "selftest": ["/tmp/h116_quotient_digit_rank", "--selftest"],
+    "rank": ["/tmp/h116_quotient_digit_rank", "--rank", "QUOTIENT_DIGIT_OOS_MOMENTS.tsv", "QUOTIENT_DIGIT_OOS_LABELS.tsv", "QUOTIENT_DIGIT_RANK_RESULT.json"]
+  },
+  "replicates": 4096,
+  "outputs": [
+    "QUOTIENT_DIGIT_RANK_RESULT.json",
+    "QUOTIENT_DIGIT_RANK_RUN.txt",
+    "QUOTIENT_DIGIT_RANK_SHA256SUMS"
+  ],
+  "measurement_scope": "deterministic IX1 candidate ranks, recursive true-path survival, fixed-width search exponents, and within-row shuffle controls; no exact decoder, subexponential ECDLP, or speedup claim"
+}

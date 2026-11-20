@@ -1,0 +1,5 @@
+command: ELAN_HOME=/workspace/.elan-h113 PATH=/workspace/.elan-h113/bin:$PATH lake build
+working_directory: research/h116_truncated_fiber_traces_20261118/lean
+exit_status: 1
+failure: affinePointLocalParameter referenced shortWeierstrassLocalParameter before that existing declaration appeared in source order
+resolution: moved the total point observable and its evaluation theorem after the existing scalar local-parameter declarations; no statement or premise changed

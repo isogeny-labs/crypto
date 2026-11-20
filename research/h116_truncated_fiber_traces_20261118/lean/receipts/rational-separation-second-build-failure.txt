@@ -1,0 +1,10 @@
+Command: ELAN_HOME=/workspace/.elan-h113 PATH=/workspace/.elan-h113/bin:$PATH lake build
+Exit: 1
+Date: 2026-11-18 UTC
+
+After removing ambiguous polynomial notation, the second integration build
+resolved both theorem statements but found two unqualified polynomial lemma
+names (`eval_mul` and `natDegree_sub_eq_left_of_natDegree_lt`).  This module
+does not globally open `Polynomial`, unlike the isolated scratch file.  The
+correction namespace-qualifies those lemmas; no statement or proof obligation
+is changed.
