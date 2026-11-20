@@ -1138,9 +1138,22 @@ def validate_claim(claim: Any, reasons: list[str]) -> bool:
 
 
 def verify_claim(claim: dict[str, Any], repo: Path, kr: dict[str, Any]) -> dict[str, Any]:
+    """Apply the same registration-date type cutoff as standing and the ledger gate."""
+    dates = _claim_entry_dates(read_ledger(repo / LEDGER_PATH))
+    return _verify_claim(claim, repo, kr, dates)
+
+
+def _verify_claim(claim: dict[str, Any], repo: Path, kr: dict[str, Any],
+                  registration_dates: dict[str, str]) -> dict[str, Any]:
     reasons: list[str] = []
     results: list[dict[str, Any]] = []
-    if not validate_claim(claim, reasons):
+    valid = validate_claim(claim, reasons)
+    if valid:
+        problem = claim_type_problem(claim, registration_dates.get(str(claim.get("id")), ""))
+        if problem:
+            reasons.append(f"claim: {problem}")
+            valid = False
+    if not valid:
         return {"schema": VERDICT_SCHEMA, "claim_id": claim.get("id") if isinstance(claim, dict) else None,
                 "claim_sha256": claim_digest(claim) if isinstance(claim, dict) else None,
                 "verdict": "fail", "reasons": reasons, "proofs": results, "commit": head_commit(repo),
@@ -1496,6 +1509,14 @@ def _run_canaries(fx: Fixture) -> list[tuple[str, str, str, list[str]]]:
             got = v["verdict"]
             reasons = list(v["reasons"]) + [r for p in v["proofs"] for r in p["reasons"]]
             rows.append((name, expected, got, reasons))
+
+    def backdated_new_registration(copy: Path, claim: dict[str, Any]):
+        claim.pop("claim_type", None)
+        append_entry(copy / LEDGER_PATH, "genesis", {"repo": "fixture"})
+        append_entry(copy / LEDGER_PATH, "claim",
+                     {"claim_id": claim["id"], "claim_sha256": claim_digest(claim)})
+    check("claim: new registration cannot borrow legacy payload dates", "fail", "solve",
+          backdated_new_registration)
 
     def rewrite(copy: Path, rel: str, fn):
         p = copy / rel
@@ -2206,8 +2227,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if a.cmd == "verify-all":
         worst = 0
+        dates = _claim_entry_dates(read_ledger(repo / LEDGER_PATH))
         for p in sorted((repo / CLAIMS_DIR).glob("*.json")) if (repo / CLAIMS_DIR).is_dir() else []:
-            v = verify_claim(load_json(p), repo, kr)
+            v = _verify_claim(load_json(p), repo, kr, dates)
             _print_verdict(v, a.json, out)
             worst = max(worst, _exit_for(v["verdict"]), key=lambda x: {0: 0, 2: 1, 1: 2}[x])
         return worst

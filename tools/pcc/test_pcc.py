@@ -8,6 +8,7 @@ ledger verify with a base, standing, lint-prose) in a scratch repository.
 from __future__ import annotations
 
 import io
+import hashlib
 import json
 import os
 import shlex
@@ -15,6 +16,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -586,6 +588,90 @@ class LeanScanTests(unittest.TestCase):
             p.write_text("theorem foo (n : Nat) : n + 1 = n := by simp\n")
             _, s3 = pcc.lean_find_declaration([p], "foo")
             self.assertNotEqual(s1, s3)
+
+
+class RegistrationDateTests(unittest.TestCase):
+    setUp = RoundTripTests.setUp
+    tearDown = RoundTripTests.tearDown
+    commit = RoundTripTests.commit
+
+    def fixture(self, *, typed=False, historical_registration=False):
+        ledger = self.repo / pcc.LEDGER_PATH
+        ledger.unlink()
+        with mock.patch.object(pcc, 'utcnow', return_value='2026-11-01T00:00:00Z'):
+            pcc.append_entry(ledger, 'genesis', {'repo': 'registration-date-control'})
+        curve = pcc.Curve(pcc._SECP_P, 0, 7, pcc._SECP_N)
+        cert = {'schema': pcc.SOLVE_CERT_SCHEMA,
+                'curve': {'p': curve.p, 'a': 0, 'b': 7, 'n': curve.n},
+                'P': list(pcc._SECP_G), 'Q': list(curve.mul(17, pcc._SECP_G)), 'k': 17}
+        raw = json.dumps(cert).encode()
+        (self.repo / 'boundary-cert.json').write_bytes(raw)
+        cid = 'PCC-20261105-c0ffee'
+        claim = {'schema': pcc.CLAIM_SCHEMA, 'id': cid, 'kind': 'solve',
+                 'statement': 'Disposable certificate boundary control',
+                 'scope': 'Software test fixture',
+                 'proofs': [{'kind': 'certificate', 'path': 'boundary-cert.json',
+                             'sha256': hashlib.sha256(raw).hexdigest()}],
+                 'producer': {'commit': pcc.head_commit(self.repo), 'session': 'fixture', 'model': 'none'},
+                 'created_at': '2026-11-05T00:00:00Z'}
+        if typed:
+            claim['claim_type'] = 'data'
+        path = self.repo / pcc.CLAIMS_DIR / (cid + '.json')
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(claim))
+        body = {'claim_id': cid, 'claim_sha256': pcc.claim_digest(claim),
+                'path': path.relative_to(self.repo).as_posix()}
+        if historical_registration:
+            with mock.patch.object(pcc, 'utcnow', return_value='2026-11-05T00:00:00Z'):
+                pcc.append_entry(ledger, 'claim', body)
+        else:
+            pcc.append_entry(ledger, 'claim', body)
+        self.commit('disposable registration-date control')
+        return cid
+
+    def rejected(self, args):
+        result = run(args, self.repo)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        verdict = json.loads(result.stdout)
+        self.assertEqual(verdict['verdict'], 'fail')
+        self.assertTrue(any('claim_type' in reason for reason in verdict['reasons']), verdict)
+        self.assertEqual(verdict['proofs'], [])
+        return verdict
+
+    def test_verify_rejects_new_registration_with_backdated_untyped_payload(self):
+        cid = self.fixture()
+        self.rejected(['verify', cid, '--json'])
+
+    def test_verify_all_uses_the_registration_cutoff(self):
+        self.fixture()
+        result = run(['verify-all', '--json'], self.repo)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        verdict = json.loads(result.stdout)
+        self.assertEqual(verdict['verdict'], 'fail')
+        self.assertEqual(verdict['proofs'], [])
+
+    def test_signed_verdict_records_failure_at_the_registration_cutoff(self):
+        cid = self.fixture()
+        self.rejected(['verdict', cid, '--sign-key', str(self.key), '--key-id', 'ci-main', '--json'])
+        result = run(['standing', cid, '--json'], self.repo)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        standing = json.loads(result.stdout)
+        self.assertEqual(standing['standing'], 'failed')
+        self.assertTrue(standing['verdicts'][-1]['signed'])
+        self.assertEqual(standing['verdicts'][-1]['verdict'], 'fail')
+
+    def test_original_legacy_registration_still_passes(self):
+        cid = self.fixture(historical_registration=True)
+        result = run(['verify', cid, '--json'], self.repo)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)['verdict'], 'pass')
+
+    def test_explicitly_typed_new_registration_still_passes(self):
+        cid = self.fixture(typed=True)
+        result = run(['verify', cid, '--json'], self.repo)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)['verdict'], 'pass')
+
 
 
 if __name__ == "__main__":
