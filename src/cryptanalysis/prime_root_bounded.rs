@@ -3056,7 +3056,7 @@ mod tests {
     fn round66_unit_linear_root_stream_replays() {
         let f = field(1_000_000_007);
         // Both x-1 and x+1 divide this squarefree polynomial.
-        let coefficients = [1u64, 0, 1];
+        let coefficients = [1_000_000_006u64, 0, 1];
         let mut observed = Vec::new();
         let report = solve_bounded(
             &f, &coefficients, 29, budget(), deadline(),
