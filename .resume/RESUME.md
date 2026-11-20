@@ -1,3 +1,23 @@
+# Resume: crypto @ claude/humbert-next-leads-20261120 (PR #4848) — slope test
+
+## Goal
+Owner (2026-11-20): "Continue" — after next_leads_20261120: widen the crate to q < 2^16, stronger
+matched rho (SIMD), fast mod-r LA; measure IC vs matched rho over q = 16001..65521.
+
+## Spec
+research/humbert_genus5_cover_20261021/slope_20261120/PROTOCOL.md (frozen before data). Binary
+slope_20261120/bin/humbert-v8 sha256 08d43a4e…; rebuild with cargo build --release at the protocol
+commit. Runner: BIN=… BIN_SHA256_PREFIX=08d43a4e PRIMES=<q> slope_20261120/run_v8.sh
+slope_20261120/campaign/q<q>; resume with SEEDS=.
+
+## State
+Workflow wf_6b058b58-659 verified wide/rho/la; merged; 31 tests pass. Smoke q=65521 s1: BEST+FASTMOD
+9.1 s vs SIMD rho expected 6.5 s. Bench record benchmarks/records/20261120T2333Z-humbert-genus5-slope.json. S3 unavailable; the branch push is
+the durable copy.
+
+## Next
+Run q 16001, 32003, 48017, 65521 serially; analyze_v8.py; report/PDF; benchmarks; session log; PR body.
+
 # Resume: crypto @ claude/humbert-next-leads-20261120 (PR #4848, draft)
 
 ## Goal

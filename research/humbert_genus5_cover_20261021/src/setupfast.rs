@@ -3,7 +3,7 @@
 //! values and consume exactly the same RNG draws as the default path.
 //!
 //! * `FK`: K4 = F_p[t]/(m) arithmetic with u64 accumulators and Barrett
-//!   reduction (p < 2^15, so every product sum fits in u64). Canonical
+//!   reduction (p < 2^16, so every product sum is < 2^35 and fits in u64). Canonical
 //!   representatives in [0, p), so every value equals the K4 value.
 //! * `group_order_fast`: replays curve::group_order. That routine draws random
 //!   points P_1, P_2, ... and keeps the multiples-of-ord(P) sets intersected over
@@ -72,7 +72,7 @@ impl FK {
     }
     #[inline(always)]
     pub fn mul(&self, a: &E4, b: &E4) -> E4 {
-        // c_i <= 4 (p-1)^2 < 2^32
+        // c_i <= 4 (p-1)^2 < 2^34 (p < 2^16)
         let mut c = [0u64; 7];
         for i in 0..4 {
             for j in 0..4 {
@@ -83,7 +83,7 @@ impl FK {
         for h in 0..3 {
             let ch = self.rd(c[4 + h]);
             for i in 0..4 {
-                r[i] += ch * self.red[h][i]; // < 2^32 + 3 * 2^30
+                r[i] += ch * self.red[h][i]; // < 2^34 + 3 * 2^32
             }
         }
         [self.rd(r[0]), self.rd(r[1]), self.rd(r[2]), self.rd(r[3])]
@@ -611,7 +611,7 @@ mod tests {
     #[test]
     fn fk_matches_k4() {
         let mut rng = Rng(7);
-        for &p in &[17u64, 101, 16001, 32003] {
+        for &p in &[17u64, 101, 16001, 32003, 32771, 49999, 65521] {
             let k = loop {
                 let m = vec![rng.below(p), rng.below(p), rng.below(p), rng.below(p), 1];
                 if crate::poly::is_irreducible_quartic(&m, p) {
@@ -619,6 +619,12 @@ mod tests {
                 }
             };
             let f = FK::from_k4(&k);
+            // products of p - 1 terms (the largest accumulators: c_3 = 4 (p-1)^2)
+            let full = [p - 1; 4];
+            assert_eq!(f.mul(&full, &full), k.mul(&full, &full), "p={p}");
+            assert_eq!(f.frob(&full), k.frob(&full), "p={p}");
+            assert_eq!(f.norm(&full), k.norm(&full), "p={p}");
+            assert_eq!(f.inv(&full), k.inv(&full), "p={p}");
             for _ in 0..2000 {
                 let a = [rng.below(p), rng.below(p), rng.below(p), rng.below(p)];
                 let b = [rng.below(p), rng.below(p), rng.below(p), rng.below(p)];
@@ -718,6 +724,41 @@ mod tests {
             }
         }
         assert!(fast_hits >= 10, "fast replay decided only {fast_hits} times");
+    }
+
+    /// p < 2^16 is accepted (65521, the largest prime below 2^16, with the fast
+    /// setup), and the instance is consistent: the fast factor base equals the
+    /// reference one, count_d agrees, r is prime with r^2 not dividing #E and
+    /// the group order lies in the Hasse interval.
+    #[test]
+    fn setup_accepts_p_65521() {
+        let p = 65521u64;
+        let mut rng = Rng(2);
+        let s = Setup::new_with(p, -1, &mut rng, true);
+        let pp = p as u128;
+        assert!(s.order >= pp.pow(4) + 1 - 2 * pp * pp && s.order <= pp.pow(4) + 1 + 2 * pp * pp);
+        assert!(is_prime_u64(s.r) && s.order % s.r as u128 == 0 && (s.order / s.r as u128) % s.r as u128 != 0);
+        assert!((s.r as u128) * 128 >= pp.pow(4) && s.r < (1u64 << 62));
+        assert_eq!(factor_fast(s.order), crate::curve::factor(s.order / s.r as u128).into_iter().chain([(s.r as u128, 1)]).collect::<Vec<_>>());
+        let f = FK::from_k4(s.k());
+        assert_eq!(count_d(&f, &s.eta, &s.lams[0]), s.count_d());
+        assert_eq!(s.d_count, s.count_d());
+        let fs = FactorBase::build_slow(&s);
+        let ff = FactorBase::build_fast(&s);
+        assert_eq!((fs.xs, fs.w0, fs.xidx, fs.rows), (ff.xs, ff.w0, ff.xidx, ff.rows));
+        let c = s.curve();
+        let sq = |a: &E4| s.sqrt_k4(a);
+        let pt = crate::curve::random_point(&c, &sq, &mut rng);
+        assert!(c.mul(&pt, s.order).is_none());
+        let gen = c.mul(&pt, s.order / s.r as u128);
+        assert!(c.mul(&gen, s.r as u128).is_none());
+    }
+
+    #[test]
+    #[should_panic]
+    fn setup_rejects_p_65537() {
+        let mut rng = Rng(1);
+        Setup::new_with(65537, 1, &mut rng, true);
     }
 
     /// Setup::new fast vs default: same instance, same RNG state afterwards;

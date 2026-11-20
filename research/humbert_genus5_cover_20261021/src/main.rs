@@ -831,8 +831,8 @@ fn run_rho(
                 .collect();
             let secs: Vec<String> = pr.seconds_per_thread.iter().map(|t| format!("{t:.4}")).collect();
             let extra = format!(
-                ",\"rho_par\":{{\"threads\":{},\"batch\":{},\"neg\":{},\"fastmul\":{},\"nb\":{},\"dp_bits\":{},\"dps\":{},\"useless_collisions\":{},\"abandoned_walks\":{},\"fruitless_cycles\":{},\"fruitless_cycle_steps\":{},\"degenerate\":{},\"walk_inversions\":{},\"k4_muls_walk\":{},\"k4_muls_per_step\":{:.4},\"extra_group_ops\":{},\"expected_steps\":{exp:.1},\"steps_over_expected\":{:.4},\"steps_per_sec\":{agg:.1},\"steps_per_sec_per_thread\":[{}],\"steps_per_thread\":{:?},\"seconds_per_thread\":[{}]}}",
-                cfg.threads, cfg.batch, cfg.neg, cfg.fast, pr.nb, pr.dp_bits, pr.dps, pr.useless_collisions, pr.abandoned_walks, pr.fruitless_cycles, pr.fruitless_cycle_steps, pr.degenerate, pr.walk_inversions, pr.k4_muls_walk,
+                ",\"rho_par\":{{\"threads\":{},\"batch\":{},\"neg\":{},\"fastmul\":{},\"simd\":\"{}\",\"nb\":{},\"dp_bits\":{},\"dps\":{},\"useless_collisions\":{},\"abandoned_walks\":{},\"fruitless_cycles\":{},\"fruitless_cycle_steps\":{},\"degenerate\":{},\"walk_inversions\":{},\"k4_muls_walk\":{},\"k4_muls_per_step\":{:.4},\"extra_group_ops\":{},\"expected_steps\":{exp:.1},\"steps_over_expected\":{:.4},\"steps_per_sec\":{agg:.1},\"steps_per_sec_per_thread\":[{}],\"steps_per_thread\":{:?},\"seconds_per_thread\":[{}]}}",
+                cfg.threads, pr.batch_used, cfg.neg, pr.fast_used, pr.simd_used.map(|x| format!("{x:?}")).unwrap_or_else(|| "off".into()), pr.nb, pr.dp_bits, pr.dps, pr.useless_collisions, pr.abandoned_walks, pr.fruitless_cycles, pr.fruitless_cycle_steps, pr.degenerate, pr.walk_inversions, pr.k4_muls_walk,
                 pr.k4_muls_walk as f64 / (pr.steps - pr.fruitless_cycle_steps).max(1) as f64, pr.extra_group_ops, pr.steps as f64 / exp,
                 per_thread.join(","), pr.steps_per_thread, secs.join(",")
             );

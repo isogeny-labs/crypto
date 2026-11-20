@@ -4,7 +4,9 @@
 //! arithmetic changes:
 //!
 //! * F_p products are reduced by a Barrett step on u64 with lazy reduction
-//!   (p < 2^15, so up to 2^49 of accumulated products fit), never by u128 `%`;
+//!   (p < 2^16: the largest accumulator, `Quart::mul`, is at most
+//!   4 (p-1)^2 (1 + 3 (p-1)) < 12 p^3 < 2^52; every other sum is at most a few
+//!   products < 2^36), never by u128 `%`;
 //! * no heap allocation per candidate (fixed arrays for the 4 x 5 kernel, the
 //!   norm polynomial, the residual and the root search);
 //! * the norm N(G) = prod over the 16 sign vectors of (a - sum eps_i beta_i),
@@ -40,7 +42,8 @@ pub fn enabled() -> bool {
     std::env::var("HUMBERT_REL_FAST").map(|v| v == "1").unwrap_or(false)
 }
 
-/// Barrett reduction modulo p < 2^15 for any u64 input.
+/// Barrett reduction modulo p < 2^16 for any u64 input (the reduction itself
+/// is exact for any p; the bound is for the lazy sums of the callers).
 #[derive(Clone, Copy, Debug)]
 pub struct Fp {
     pub p: u64,
@@ -48,7 +51,7 @@ pub struct Fp {
 }
 impl Fp {
     pub fn new(p: u64) -> Fp {
-        assert!(p >= 3 && p < (1 << 15));
+        assert!(p >= 3 && p < (1 << 16));
         Fp { p, mu: ((1u128 << 64) / p as u128) as u64 }
     }
     /// a mod p for every a < 2^64 (q is floor(a/p) or one less, so r < 2p).
@@ -102,13 +105,13 @@ impl Quart {
         let mut c = [0u64; 7];
         for i in 0..4 {
             for j in 0..4 {
-                c[i + j] += a[i] * b[j]; // <= 4 products < 2^32
+                c[i + j] += a[i] * b[j]; // <= 4 products < 2^34 (p < 2^16)
             }
         }
         let mut r = [c[0], c[1], c[2], c[3]];
         for h in 0..3 {
             for i in 0..4 {
-                r[i] += c[4 + h] * self.red[h][i]; // < 2^32 + 3 * 2^47
+                r[i] += c[4 + h] * self.red[h][i]; // < 2^34 + 3 * 2^50 < 2^52
             }
         }
         [f.red(r[0]), f.red(r[1]), f.red(r[2]), f.red(r[3])]
@@ -396,7 +399,7 @@ impl RelFast {
         for i in 0..9 {
             let mut acc = 0u64;
             for t in 0..9 {
-                acc += vals[t] * self.basis[t][i]; // 9 products < 2^34
+                acc += vals[t] * self.basis[t][i]; // 9 products < 2^36
             }
             out[i] = f.red(acc);
         }
@@ -904,6 +907,125 @@ mod tests {
             assert_eq!(rf.fp_muls.get(), 4 * 28 + b + (p - 2) + p, "p={p}");
             assert_eq!(s.k().muls.get(), k4_before, "table K4 products are counted once, in fp_muls");
         }
+    }
+
+    /// p < 2^16: the Barrett step is exact on the extreme inputs, and the
+    /// lazy K4 product (the largest accumulator of this path, 4 (p-1)^2 (1 + 3 (p-1))
+    /// with every input and every reduction entry p - 1) equals the u128 product.
+    #[test]
+    fn rel_fast_lazy_bounds_hold_near_2_16() {
+        let mut rng = Rng(0x16);
+        for p in [32771u64, 49999, 65519, 65521] {
+            let f = Fp::new(p);
+            let pm = p - 1;
+            let worst = 4 * pm * pm * (1 + 3 * pm);
+            assert!(worst < 1u64 << 52, "p={p}");
+            for a in [0u64, 1, pm, p, 2 * p - 1, pm * pm, 4 * pm * pm, 9 * pm * pm, worst, worst + 1, u64::MAX, u64::MAX - 1, u64::MAX / p * p, u64::MAX / p * p - 1] {
+                assert_eq!(f.red(a), a % p, "p={p} a={a}");
+            }
+            for _ in 0..20000 {
+                let a = rng.next();
+                assert_eq!(f.red(a), a % p);
+                let b = rng.next() >> 12;
+                assert_eq!(f.red(b), b % p);
+            }
+            // all-(p-1) reduction table and inputs: exact against u128 arithmetic
+            let reference = |q: &Quart, a: &E4, b: &E4| -> E4 {
+                let mut c = [0u128; 7];
+                for i in 0..4 {
+                    for j in 0..4 {
+                        c[i + j] += a[i] as u128 * b[j] as u128;
+                    }
+                }
+                let mut r = [c[0], c[1], c[2], c[3]];
+                for h in 0..3 {
+                    for i in 0..4 {
+                        r[i] += c[4 + h] * q.red[h][i] as u128;
+                    }
+                }
+                [(r[0] % p as u128) as u64, (r[1] % p as u128) as u64, (r[2] % p as u128) as u64, (r[3] % p as u128) as u64]
+            };
+            let qmax = Quart { red: [[pm; 4]; 3] };
+            let full = [pm; 4];
+            assert_eq!(qmax.mul(&f, &full, &full), reference(&qmax, &full, &full), "p={p}");
+            for _ in 0..2000 {
+                let q = Quart::for_monic(&f, &[rng.below(p), rng.below(p), rng.below(p), rng.below(p)]);
+                let a = [rng.below(p), rng.below(p), rng.below(p), rng.below(p)];
+                let b = [rng.below(p), pm, rng.below(p), pm];
+                assert_eq!(q.mul(&f, &a, &b), reference(&q, &a, &b));
+                assert_eq!(qmax.mul(&f, &a, &b), reference(&qmax, &a, &b));
+            }
+        }
+    }
+
+    /// The fast relation search equals the reference path on an instance with
+    /// p = 65521, the largest prime below 2^16 (norm polynomials, split roots,
+    /// whole candidates with the same RNG stream and statistics).
+    #[test]
+    fn rel_fast_matches_reference_at_p_65521() {
+        let (p, tw, seed) = (65521u64, 1i32, 1u64);
+        let mut rng = Rng(seed);
+        let s = Setup::new_with(p, tw, &mut rng, true);
+        let fb = FactorBase::build(&s);
+        let nodes = Nodes::new(&s);
+        let rf = RelFast::new(&s, &nodes);
+        for _ in 0..100 {
+            let mut c = [0u64; 12];
+            for col in [0usize, 1, 2, 3, 4, 5] {
+                c[col] = if rng.next() & 3 == 0 { p - 1 } else { rng.below(p) };
+            }
+            let slow = norm_poly(&s, &nodes, &c, true);
+            let (fast, _, _) = rf.norm8(&c);
+            let mut pad = [0u64; 9];
+            pad[..slow.len()].copy_from_slice(&slow);
+            assert_eq!(pad, fast, "c={c:?}");
+        }
+        let mut fpm = 0;
+        for k in 0..100u64 {
+            let rs: Vec<u64> = if k == 0 { vec![p - 4, p - 3, p - 2, p - 1] } else {
+                let mut rs: Vec<u64> = Vec::new();
+                while rs.len() < 4 {
+                    let x = rng.below(p);
+                    if !rs.contains(&x) {
+                        rs.push(x);
+                    }
+                }
+                rs.sort();
+                rs
+            };
+            let mut m = vec![1u64];
+            for &x in &rs {
+                m = poly::mul(&m, &[(p - x) % p, 1], p);
+            }
+            assert_eq!(rf.roots_split_quartic(&[m[0], m[1], m[2], m[3]], &mut fpm), rs);
+        }
+        let (mut r1, mut r2) = (Rng(seed ^ 77), Rng(seed ^ 77));
+        let (mut st1, mut st2) = (Stats::default(), Stats::default());
+        let mut found = 0;
+        for _ in 0..400 {
+            let a = slow_relation(&s, &fb, &nodes, &mut r1, &mut st1);
+            let b = hyperplane_relation(&s, &fb, &rf, &mut r2, &mut st2);
+            assert_eq!(r1.0, r2.0);
+            match (a, b) {
+                (None, None) => {}
+                (Some(a), Some(b)) => {
+                    assert_eq!((a.pts, a.inf, a.sym), (b.pts, b.inf, b.sym));
+                    found += 1;
+                }
+                (a, b) => panic!("reference {a:?} vs fast {b:?}"),
+            }
+        }
+        assert!(found > 0);
+        assert_eq!(
+            (st1.candidates, st1.degenerate, st1.found, st1.symmetric, st1.root_hist),
+            (st2.candidates, st2.degenerate, st2.found, st2.symmetric, st2.root_hist)
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn fp_rejects_p_at_or_above_2_16() {
+        Fp::new(65537);
     }
 
     #[test]

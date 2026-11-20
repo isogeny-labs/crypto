@@ -1,4 +1,4 @@
-//! Toy finite fields: F_p (p < 2^15), K4 = F_p[t]/(m(t)) with m the
+//! Toy finite fields: F_p (p < 2^16; products here are u128), K4 = F_p[t]/(m(t)) with m the
 //! minimal polynomial of alpha = t, and L = K4[s]/(s^2 - nu) = F_{p^8}.
 //! Every element of F_{p^4} is a K4 element; every square root of a K4
 //! element lives in L.
