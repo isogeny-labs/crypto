@@ -12,6 +12,9 @@ mod frozen {
         const MULTIPLIERS: usize = 4;
         const FEATURES: usize = 2 * MULTIPLIERS;
         const RESULTANT_FEATURES: usize = FEATURES * (FEATURES - 1) / 2;
+        const TRACE_FEATURES: usize = 4;
+        const TRACE_PAIRS: [(usize, usize); TRACE_FEATURES] =
+            [(0, 2), (1, 3), (4, 6), (5, 7)];
         const TARGETS: usize = 1520;
         const REPLICATES: usize = 4096;
 
@@ -28,9 +31,11 @@ mod frozen {
         #[derive(Clone)]
         struct Target {
             slug: String,
+            digit: u8,
             parity: u8,
             bits: [i8; FEATURES],
             resultant_bits: [i8; RESULTANT_FEATURES],
+            trace_residues: [i8; TRACE_FEATURES],
         }
 
         struct Rule {
@@ -46,6 +51,16 @@ mod frozen {
             first: usize,
             second: Option<usize>,
             polarity: u8,
+            predictions: Vec<u8>,
+            coverage: usize,
+            matches: usize,
+            statistic: (u128, u128),
+        }
+
+        struct TraceRule {
+            code: u8,
+            coefficients: [u8; TRACE_FEATURES],
+            offset: u8,
             predictions: Vec<u8>,
             coverage: usize,
             matches: usize,
@@ -68,6 +83,15 @@ mod frozen {
 
         fn statistic(matches: usize, coverage: usize) -> (u128, u128) {
             let excess = 2_i128 * matches as i128 - coverage as i128;
+            if excess <= 0 {
+                (0, 1)
+            } else {
+                ((excess as u128).pow(2), coverage as u128)
+            }
+        }
+
+        fn ternary_statistic(matches: usize, coverage: usize) -> (u128, u128) {
+            let excess = 3_i128 * matches as i128 - coverage as i128;
             if excess <= 0 {
                 (0, 1)
             } else {
@@ -138,6 +162,34 @@ mod frozen {
                     return 3;
                 }
                 value ^= second_bit as u8;
+            }
+            value
+        }
+
+        fn decode_trace_coefficients(mut code: u8) -> [u8; TRACE_FEATURES] {
+            let mut coefficients = [0_u8; TRACE_FEATURES];
+            for coefficient in &mut coefficients {
+                *coefficient = code % 3;
+                code /= 3;
+            }
+            coefficients
+        }
+
+        fn trace_prediction(
+            target: &Target,
+            coefficients: &[u8; TRACE_FEATURES],
+            offset: u8,
+        ) -> u8 {
+            let mut value = offset;
+            for (feature, &coefficient) in coefficients.iter().enumerate() {
+                if coefficient == 0 {
+                    continue;
+                }
+                let residue = target.trace_residues[feature];
+                if residue < 0 {
+                    return 3;
+                }
+                value = (value + coefficient * residue as u8) % 3;
             }
             value
         }
@@ -257,6 +309,77 @@ mod frozen {
                 return Err("quadratic resultant symmetry failed".to_string());
             }
             Ok(closed)
+        }
+
+        fn branch_pair_trace(
+            left: BranchData,
+            right: BranchData,
+            spec: CurveSpec,
+            square_root_counts: &[u8],
+        ) -> Result<(i64, usize), String> {
+            let resultant = quadratic_resultant(left, right, spec.p)?;
+            if !left.smooth || !right.smooth || resultant == 0 {
+                return Err("branch-pair trace requires a smooth quartic".to_string());
+            }
+            let p = spec.p;
+            let quartic = [
+                mul_mod_u64(left.q0, right.q0, p),
+                residue(
+                    i128::from(left.q1) * i128::from(right.q0)
+                        + i128::from(right.q1) * i128::from(left.q0),
+                    p,
+                ),
+                residue(
+                    i128::from(left.q0)
+                        + i128::from(right.q0)
+                        + i128::from(left.q1) * i128::from(right.q1),
+                    p,
+                ),
+                residue(i128::from(left.q1) + i128::from(right.q1), p),
+                1,
+            ];
+            let mut character_sum = 0_i64;
+            let mut affine_count = 0_u64;
+            let mut evaluation_checks = 0_usize;
+            for x in 0..p {
+                let left_value = residue(
+                    i128::from(x) * i128::from(x)
+                        + i128::from(left.q1) * i128::from(x)
+                        + i128::from(left.q0),
+                    p,
+                );
+                let right_value = residue(
+                    i128::from(x) * i128::from(x)
+                        + i128::from(right.q1) * i128::from(x)
+                        + i128::from(right.q0),
+                    p,
+                );
+                let product_value = mul_mod_u64(left_value, right_value, p);
+                let horner_value = quartic.iter().rev().fold(0_u64, |value, coefficient| {
+                    residue(
+                        i128::from(value) * i128::from(x) + i128::from(*coefficient),
+                        p,
+                    )
+                });
+                if product_value != horner_value {
+                    return Err("branch-pair quartic evaluation control failed".to_string());
+                }
+                let signature = legendre(product_value, p);
+                character_sum += i64::from(signature);
+                affine_count += u64::from(square_root_counts[product_value as usize]);
+                evaluation_checks += 1;
+            }
+            let expected_affine = p as i64 + character_sum;
+            if affine_count as i64 != expected_affine {
+                return Err("branch-pair affine point-count control failed".to_string());
+            }
+            // A monic smooth quartic has two rational points at infinity.
+            let projective_count = affine_count + 2;
+            let trace = p as i64 + 1 - projective_count as i64;
+            if trace != -1 - character_sum || trace * trace > 4 * p as i64 {
+                return Err("branch-pair genus-one trace control failed".to_string());
+            }
+            Ok((trace, evaluation_checks))
         }
 
         fn branch_data(
@@ -449,21 +572,34 @@ mod frozen {
             assert_eq!(quadratic_resultant(trivial_left, trivial_right, 5)?, 1);
             assert_eq!(RESULTANT_FEATURES, 28);
             assert_eq!(2 * (RESULTANT_FEATURES + RESULTANT_FEATURES * 27 / 2), 812);
+            assert_eq!(decode_trace_coefficients(0), [0, 0, 0, 0]);
+            assert_eq!(decode_trace_coefficients(80), [2, 2, 2, 2]);
             println!(
-                "h116 chiral branch residual parity selftest: pass rules=512 resultant_rules=812"
+                "h116 chiral branch residual parity selftest: pass rules=512 resultant_rules=812 trace_rules=243"
             );
             Ok(())
         }
 
         pub fn run(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, false)
+            run_with_panel(output_path, false, false)
         }
 
         pub fn run_resultants(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, true)
+            run_with_panel(output_path, true, false)
         }
 
-        fn run_with_panel(output_path: &Path, resultant_panel: bool) -> Result<(), String> {
+        pub fn run_traces(output_path: &Path) -> Result<(), String> {
+            run_with_panel(output_path, false, true)
+        }
+
+        fn run_with_panel(
+            output_path: &Path,
+            resultant_panel: bool,
+            trace_panel: bool,
+        ) -> Result<(), String> {
+            if resultant_panel && trace_panel {
+                return Err("specialized branch panels are mutually exclusive".to_string());
+            }
             let mut targets = Vec::new();
             let mut rows = BTreeMap::<String, Vec<usize>>::new();
             let mut reconstruction_checks = 0_usize;
@@ -480,6 +616,10 @@ mod frozen {
             let mut resultant_smooth_features = 0_usize;
             let mut resultant_zero_abstentions = 0_usize;
             let mut resultant_distinguishing_targets = 0_usize;
+            let mut square_root_table_checks = 0_usize;
+            let mut branch_pair_trace_checks = 0_usize;
+            let mut branch_pair_quartic_evaluation_checks = 0_usize;
+            let mut branch_pair_trace_distinguishing_targets = 0_usize;
 
             for spec in CURVES {
                 let field = Field::new(spec.p, 1, &[0, 1])?;
@@ -488,6 +628,18 @@ mod frozen {
                     a: field.from_base(spec.a),
                     b: field.from_base(spec.b),
                 };
+                let mut square_root_counts = vec![0_u8; spec.p as usize];
+                for y in 0..spec.p {
+                    let square = mul_mod_u64(y, y, spec.p);
+                    square_root_counts[square as usize] += 1;
+                }
+                if square_root_counts.iter().map(|&count| usize::from(count)).sum::<usize>()
+                    != spec.p as usize
+                    || square_root_counts[0] != 1
+                {
+                    return Err("branch-pair square-root table control failed".to_string());
+                }
+                square_root_table_checks += 1;
                 let generator = first_base_point(&curve, spec.p)?;
                 if generator == Point::Infinity
                     || curve.scalar_mul(spec.order, generator)? != Point::Infinity
@@ -573,6 +725,28 @@ mod frozen {
                     if resultant_feature != RESULTANT_FEATURES {
                         return Err("resultant feature census failed".to_string());
                     }
+                    let mut trace_residues = [-1_i8; TRACE_FEATURES];
+                    for (trace_feature, &(left, right)) in TRACE_PAIRS.iter().enumerate() {
+                        let left_data = branch_features[left]
+                            .ok_or("missing trace left branch feature")?;
+                        let right_data = branch_features[right]
+                            .ok_or("missing trace right branch feature")?;
+                        let resultant =
+                            quadratic_resultant(left_data, right_data, spec.p)?;
+                        if left_data.smooth && right_data.smooth && resultant != 0 {
+                            let (trace, evaluation_checks) = branch_pair_trace(
+                                left_data,
+                                right_data,
+                                spec,
+                                &square_root_counts,
+                            )?;
+                            trace_residues[trace_feature] = trace.rem_euclid(3) as i8;
+                            branch_pair_trace_checks += 1;
+                            branch_pair_quartic_evaluation_checks += evaluation_checks;
+                        }
+                    }
+                    let trace_distinguished = trace_residues[0] != trace_residues[1]
+                        || trace_residues[2] != trace_residues[3];
                     let mut resultant_distinguished = false;
                     for left in 0..FEATURES {
                         for right in (left + 1)..FEATURES {
@@ -585,12 +759,16 @@ mod frozen {
                     distinguishing_targets += usize::from(distinguished);
                     resultant_distinguishing_targets +=
                         usize::from(resultant_distinguished);
+                    branch_pair_trace_distinguishing_targets +=
+                        usize::from(trace_distinguished);
                     let index = targets.len();
                     targets.push(Target {
                         slug: spec.slug.to_string(),
+                        digit: (scalar % 3) as u8,
                         parity: (scalar % 2) as u8,
                         bits,
                         resultant_bits,
+                        trace_residues,
                     });
                     rows.entry(spec.slug.to_string()).or_default().push(index);
                 }
@@ -611,7 +789,158 @@ mod frozen {
                 return Err("branch resultant control census failed".to_string());
             }
 
-            let labels: Vec<u8> = targets.iter().map(|target| target.parity).collect();
+            let labels: Vec<u8> = if trace_panel {
+                targets.iter().map(|target| target.digit).collect()
+            } else {
+                targets.iter().map(|target| target.parity).collect()
+            };
+            if trace_panel {
+                let mut rules = Vec::with_capacity(243);
+                for code in 0_u8..81 {
+                    let coefficients = decode_trace_coefficients(code);
+                    for offset in 0..3_u8 {
+                        let predictions: Vec<u8> = targets
+                            .iter()
+                            .map(|target| trace_prediction(target, &coefficients, offset))
+                            .collect();
+                        let (coverage, matches) = score(&predictions, &labels);
+                        rules.push(TraceRule {
+                            code,
+                            coefficients,
+                            offset,
+                            predictions,
+                            coverage,
+                            matches,
+                            statistic: ternary_statistic(matches, coverage),
+                        });
+                    }
+                }
+                if rules.len() != 243 {
+                    return Err("branch-pair trace rule census failed".to_string());
+                }
+                let selected_index = (0..rules.len())
+                    .max_by(|&left, &right| {
+                        compare_ratio(rules[left].statistic, rules[right].statistic)
+                            .then_with(|| rules[right].code.cmp(&rules[left].code))
+                            .then_with(|| rules[right].offset.cmp(&rules[left].offset))
+                    })
+                    .ok_or("no branch-pair trace rules")?;
+                let selected = &rules[selected_index];
+                let total_exact_rules = rules
+                    .iter()
+                    .filter(|rule| rule.coverage == TARGETS && rule.matches == TARGETS)
+                    .count();
+                let covered_exact_rules = rules
+                    .iter()
+                    .filter(|rule| rule.coverage > 0 && rule.matches == rule.coverage)
+                    .count();
+
+                let mut exceedances = 0_usize;
+                for replicate in 0..REPLICATES {
+                    let mut shuffled = vec![0_u8; TARGETS];
+                    for (slug, indices) in &rows {
+                        let mut values: Vec<u8> =
+                            indices.iter().map(|&index| labels[index]).collect();
+                        let mut seed = 0x116_020_u64
+                            ^ (replicate as u64 + 1).wrapping_mul(0x9e3779b97f4a7c15)
+                            ^ slug.bytes().map(u64::from).sum::<u64>();
+                        shuffle(&mut values, &mut seed);
+                        for (&index, value) in indices.iter().zip(values) {
+                            shuffled[index] = value;
+                        }
+                    }
+                    let mut maximum = (0_u128, 1_u128);
+                    for rule in &rules {
+                        let (_, matches) = score(&rule.predictions, &shuffled);
+                        let candidate = ternary_statistic(matches, rule.coverage);
+                        if compare_ratio(candidate, maximum) == Ordering::Greater {
+                            maximum = candidate;
+                        }
+                    }
+                    exceedances += usize::from(
+                        compare_ratio(maximum, selected.statistic) != Ordering::Less,
+                    );
+                }
+
+                let mut per_curve = Vec::new();
+                for (slug, indices) in &rows {
+                    let predictions: Vec<u8> = indices
+                        .iter()
+                        .map(|&index| selected.predictions[index])
+                        .collect();
+                    let curve_labels: Vec<u8> =
+                        indices.iter().map(|&index| labels[index]).collect();
+                    let (coverage, matches) = score(&predictions, &curve_labels);
+                    per_curve.push(format!(
+                        "{{\"slug\":\"{slug}\",\"targets\":{},\"coverage\":{coverage},\"matches\":{matches}}}",
+                        indices.len()
+                    ));
+                }
+
+                let excess = 3_i64 * selected.matches as i64 - selected.coverage as i64;
+                let coefficients = selected
+                    .coefficients
+                    .iter()
+                    .map(u8::to_string)
+                    .collect::<Vec<_>>()
+                    .join(",");
+                let json = format!(
+                    concat!(
+                        "{{\n  \"schema\":\"h116-chiral-branch-pair-trace-digit/v1\",\n",
+                        "  \"targets\":{},\n  \"curves\":{},\n  \"trace_features\":{},\n",
+                        "  \"rules\":{},\n  \"square_root_table_checks\":{},\n",
+                        "  \"reconstruction_checks\":{},\n  \"discriminant_checks\":{},\n",
+                        "  \"resultant_checks\":{},\n  \"branch_pair_trace_checks\":{},\n",
+                        "  \"branch_pair_quartic_evaluation_checks\":{},\n",
+                        "  \"branch_pair_trace_distinguishing_targets\":{},\n",
+                        "  \"planted_control_matches\":{},\n  \"selected_code\":{},\n",
+                        "  \"selected_coefficients\":[{}],\n  \"selected_offset\":{},\n",
+                        "  \"radix\":3,\n  \"coverage\":{},\n  \"matches\":{},\n",
+                        "  \"radix_excess\":{},\n  \"statistic_numerator\":{},\n",
+                        "  \"statistic_denominator\":{},\n  \"total_exact_rules\":{},\n",
+                        "  \"covered_exact_rules\":{},\n  \"replicates\":4096,\n",
+                        "  \"familywise_exceedances\":{},\n",
+                        "  \"familywise_empirical_p\":{:.12},\n  \"per_curve\":[{}],\n",
+                        "  \"status\":\"measured\"\n}}\n"
+                    ),
+                    targets.len(),
+                    rows.len(),
+                    TRACE_FEATURES,
+                    rules.len(),
+                    square_root_table_checks,
+                    reconstruction_checks,
+                    discriminant_checks,
+                    resultant_checks,
+                    branch_pair_trace_checks,
+                    branch_pair_quartic_evaluation_checks,
+                    branch_pair_trace_distinguishing_targets,
+                    TARGETS,
+                    selected.code,
+                    coefficients,
+                    selected.offset,
+                    selected.coverage,
+                    selected.matches,
+                    excess,
+                    selected.statistic.0,
+                    selected.statistic.1,
+                    total_exact_rules,
+                    covered_exact_rules,
+                    exceedances,
+                    (exceedances + 1) as f64 / (REPLICATES + 1) as f64,
+                    per_curve.join(",")
+                );
+                fs::write(output_path, json).map_err(|error| error.to_string())?;
+                println!(
+                    "chiral branch-pair trace digit: coefficients=[{}] offset={} coverage={} matches={} exact={} p={:.6}",
+                    coefficients,
+                    selected.offset,
+                    selected.coverage,
+                    selected.matches,
+                    total_exact_rules,
+                    (exceedances + 1) as f64 / (REPLICATES + 1) as f64
+                );
+                return Ok(());
+            }
             if resultant_panel {
                 let mut rules = Vec::with_capacity(812);
                 for first in 0..RESULTANT_FEATURES {
@@ -924,8 +1253,11 @@ fn main() {
         [_, flag, output] if flag == "--run-resultants" => {
             frozen::branch_residual::run_resultants(Path::new(output))
         }
+        [_, flag, output] if flag == "--run-traces" => {
+            frozen::branch_residual::run_traces(Path::new(output))
+        }
         _ => Err(
-            "usage: h116_chiral_branch_residual_parity --selftest | --run OUTPUT.json | --run-resultants OUTPUT.json".to_string(),
+            "usage: h116_chiral_branch_residual_parity --selftest | --run OUTPUT.json | --run-resultants OUTPUT.json | --run-traces OUTPUT.json".to_string(),
         ),
     };
     if let Err(error) = result {
