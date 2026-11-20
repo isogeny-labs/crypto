@@ -1,0 +1,14 @@
+# H4 n17 complete-solver scale check reaches the frozen wall cap
+
+Both msolve 0.11.0 arms on the frozen `n=17`, instance-0 H4 systems reached their 300-second wall caps without a completed basis. The planted and ordinary-query input systems each have six exact Boolean roots, independently confirmed over all `2^18` assignments. This moves the complete Gröbner boundary from the [finished `n=13` pair](../n13_msolve_20261120/README.md) to a censored `n=17` pair under the same one-thread solver flags and local 2-GiB observed RSS gate.
+
+| Arm | Exact input roots | Solver status | Observed wall s | Peak process-tree RSS MiB | Completed F4 rounds in retained stderr | Highest selected-pair degree seen |
+| --- | ---: | --- | ---: | ---: | ---: | ---: |
+| Planted | 6 | WALL_CAP | 300.206 | 1200.4 | 30 | 7 |
+| Ordinary query | 6 | WALL_CAP | 300.138 | 1258.8 | 32 | 7 |
+
+The retained stderr ends during an additional degree-7 round in each arm. Both basis files are empty; neither is a completed Gröbner result. The [run receipt](run-receipt.json) preserves the SIGTERM exit statuses, exact command lines, binary and input hashes, sampled process-tree RSS, and hashes of all raw artifacts under `runs/`. The [frozen protocol](PROTOCOL.md) uses the same source builder, `n=17` instance index 0, planted and ordinary-query laws, and six-root controls as the earlier [SAT follow-up](../sat_followup_20261119/README.md). The checked Sage runtime was recorded before preparation.
+
+[prepare.py](prepare.py) checks both exact solution sets and serializes seventeen source equations plus eighteen Boolean field equations per arm. The [preparation receipt](preparation.json) retains the field polynomial, subspace basis, curve coefficient, residual x-coordinate, exact assignments, and input hashes. [validate.py](validate.py) separately evaluates every one of the `2^18` Boolean assignments against each serialized input, checks all retained artifact hashes, and preserves solver censoring; its [result](validation.json) is `PARTIAL` because neither solver arm completed. The [validation protocol](validation-protocol.json) was frozen before that replay.
+
+The complete `n=13` F4 arms took 29.966 and 28.384 seconds; these `n=17` arms did not finish within 300 seconds, so the observed scale ratio is **greater than 10** under these caps for each paired input law. That is a censored solver-stage comparison, not a fitted exponent. The earlier native-XOR and CNF SAT results have different encodings and completion statuses and remain separate measurements. A next solver experiment can profile the cost of the degree-7 F4 rounds or test a changed algebraic encoding on these same frozen inputs, preserving all time and memory caps.
