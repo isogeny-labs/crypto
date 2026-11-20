@@ -13,6 +13,7 @@ mod frozen {
         const FEATURES: usize = 2 * MULTIPLIERS;
         const RESULTANT_FEATURES: usize = FEATURES * (FEATURES - 1) / 2;
         const TRACE_FEATURES: usize = 4;
+        const INVARIANT_FEATURES: usize = 2 * TRACE_FEATURES;
         const TRACE_PAIRS: [(usize, usize); TRACE_FEATURES] =
             [(0, 2), (1, 3), (4, 6), (5, 7)];
         const TARGETS: usize = 1520;
@@ -36,6 +37,7 @@ mod frozen {
             bits: [i8; FEATURES],
             resultant_bits: [i8; RESULTANT_FEATURES],
             trace_residues: [i8; TRACE_FEATURES],
+            invariant_bits: [i8; INVARIANT_FEATURES],
         }
 
         struct Rule {
@@ -194,6 +196,20 @@ mod frozen {
             value
         }
 
+        fn invariant_prediction(target: &Target, mask: u16, polarity: u8) -> u8 {
+            let mut value = polarity;
+            for (feature, &bit) in target.invariant_bits.iter().enumerate() {
+                if mask & (1_u16 << feature) == 0 {
+                    continue;
+                }
+                if bit < 0 {
+                    return 3;
+                }
+                value ^= bit as u8;
+            }
+            value
+        }
+
         fn resultant_pair_index(mut left: usize, mut right: usize) -> usize {
             if left > right {
                 std::mem::swap(&mut left, &mut right);
@@ -322,22 +338,7 @@ mod frozen {
                 return Err("branch-pair trace requires a smooth quartic".to_string());
             }
             let p = spec.p;
-            let quartic = [
-                mul_mod_u64(left.q0, right.q0, p),
-                residue(
-                    i128::from(left.q1) * i128::from(right.q0)
-                        + i128::from(right.q1) * i128::from(left.q0),
-                    p,
-                ),
-                residue(
-                    i128::from(left.q0)
-                        + i128::from(right.q0)
-                        + i128::from(left.q1) * i128::from(right.q1),
-                    p,
-                ),
-                residue(i128::from(left.q1) + i128::from(right.q1), p),
-                1,
-            ];
+            let quartic = branch_pair_quartic(left, right, p);
             let mut character_sum = 0_i64;
             let mut affine_count = 0_u64;
             let mut evaluation_checks = 0_usize;
@@ -380,6 +381,41 @@ mod frozen {
                 return Err("branch-pair genus-one trace control failed".to_string());
             }
             Ok((trace, evaluation_checks))
+        }
+
+        fn branch_pair_quartic(left: BranchData, right: BranchData, p: u64) -> [u64; 5] {
+            [
+                mul_mod_u64(left.q0, right.q0, p),
+                residue(
+                    i128::from(left.q1) * i128::from(right.q0)
+                        + i128::from(right.q1) * i128::from(left.q0),
+                    p,
+                ),
+                residue(
+                    i128::from(left.q0)
+                        + i128::from(right.q0)
+                        + i128::from(left.q1) * i128::from(right.q1),
+                    p,
+                ),
+                residue(i128::from(left.q1) + i128::from(right.q1), p),
+                1,
+            ]
+        }
+
+        fn binary_quartic_invariants(quartic: [u64; 5], p: u64) -> (u64, u64) {
+            let e = i128::from(quartic[0]);
+            let d = i128::from(quartic[1]);
+            let c = i128::from(quartic[2]);
+            let b = i128::from(quartic[3]);
+            let a = i128::from(quartic[4]);
+            let invariant_i = residue(12 * a * e - 3 * b * d + c * c, p);
+            let invariant_j = residue(
+                72 * a * c * e + 9 * b * c * d - 27 * a * d * d
+                    - 27 * b * b * e
+                    - 2 * c * c * c,
+                p,
+            );
+            (invariant_i, invariant_j)
         }
 
         fn branch_data(
@@ -574,30 +610,43 @@ mod frozen {
             assert_eq!(2 * (RESULTANT_FEATURES + RESULTANT_FEATURES * 27 / 2), 812);
             assert_eq!(decode_trace_coefficients(0), [0, 0, 0, 0]);
             assert_eq!(decode_trace_coefficients(80), [2, 2, 2, 2]);
+            let (invariant_i, invariant_j) =
+                binary_quartic_invariants([106, 0, 0, 0, 1], 107);
+            assert_eq!(invariant_i, 95);
+            assert_eq!(invariant_j, 0);
             println!(
-                "h116 chiral branch residual parity selftest: pass rules=512 resultant_rules=812 trace_rules=243"
+                "h116 chiral branch residual parity selftest: pass rules=512 resultant_rules=812 trace_rules=243 invariant_rules=512"
             );
             Ok(())
         }
 
         pub fn run(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, false, false)
+            run_with_panel(output_path, false, false, false)
         }
 
         pub fn run_resultants(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, true, false)
+            run_with_panel(output_path, true, false, false)
         }
 
         pub fn run_traces(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, false, true)
+            run_with_panel(output_path, false, true, false)
+        }
+
+        pub fn run_invariants(output_path: &Path) -> Result<(), String> {
+            run_with_panel(output_path, false, false, true)
         }
 
         fn run_with_panel(
             output_path: &Path,
             resultant_panel: bool,
             trace_panel: bool,
+            invariant_panel: bool,
         ) -> Result<(), String> {
-            if resultant_panel && trace_panel {
+            if usize::from(resultant_panel)
+                + usize::from(trace_panel)
+                + usize::from(invariant_panel)
+                > 1
+            {
                 return Err("specialized branch panels are mutually exclusive".to_string());
             }
             let mut targets = Vec::new();
@@ -620,6 +669,8 @@ mod frozen {
             let mut branch_pair_trace_checks = 0_usize;
             let mut branch_pair_quartic_evaluation_checks = 0_usize;
             let mut branch_pair_trace_distinguishing_targets = 0_usize;
+            let mut binary_quartic_invariant_checks = 0_usize;
+            let mut binary_quartic_invariant_distinguishing_targets = 0_usize;
 
             for spec in CURVES {
                 let field = Field::new(spec.p, 1, &[0, 1])?;
@@ -726,6 +777,7 @@ mod frozen {
                         return Err("resultant feature census failed".to_string());
                     }
                     let mut trace_residues = [-1_i8; TRACE_FEATURES];
+                    let mut invariant_bits = [-1_i8; INVARIANT_FEATURES];
                     for (trace_feature, &(left, right)) in TRACE_PAIRS.iter().enumerate() {
                         let left_data = branch_features[left]
                             .ok_or("missing trace left branch feature")?;
@@ -743,10 +795,49 @@ mod frozen {
                             trace_residues[trace_feature] = trace.rem_euclid(3) as i8;
                             branch_pair_trace_checks += 1;
                             branch_pair_quartic_evaluation_checks += evaluation_checks;
+                            let quartic =
+                                branch_pair_quartic(left_data, right_data, spec.p);
+                            let (invariant_i, invariant_j) =
+                                binary_quartic_invariants(quartic, spec.p);
+                            let quartic_discriminant = mul_mod_u64(
+                                mul_mod_u64(
+                                    left_data.discriminant,
+                                    right_data.discriminant,
+                                    spec.p,
+                                ),
+                                mul_mod_u64(resultant, resultant, spec.p),
+                                spec.p,
+                            );
+                            let invariant_discriminant = residue(
+                                4 * i128::from(invariant_i).pow(3)
+                                    - i128::from(invariant_j).pow(2),
+                                spec.p,
+                            );
+                            if invariant_discriminant
+                                != mul_mod_u64(27, quartic_discriminant, spec.p)
+                            {
+                                return Err(
+                                    "binary quartic invariant/discriminant control failed"
+                                        .to_string(),
+                                );
+                            }
+                            invariant_bits[2 * trace_feature] = if invariant_i == 0 {
+                                -1
+                            } else {
+                                i8::from(legendre(invariant_i, spec.p) == 1)
+                            };
+                            invariant_bits[2 * trace_feature + 1] = if invariant_j == 0 {
+                                -1
+                            } else {
+                                i8::from(legendre(invariant_j, spec.p) == 1)
+                            };
+                            binary_quartic_invariant_checks += 1;
                         }
                     }
                     let trace_distinguished = trace_residues[0] != trace_residues[1]
                         || trace_residues[2] != trace_residues[3];
+                    let invariant_distinguished = invariant_bits[0..2] != invariant_bits[2..4]
+                        || invariant_bits[4..6] != invariant_bits[6..8];
                     let mut resultant_distinguished = false;
                     for left in 0..FEATURES {
                         for right in (left + 1)..FEATURES {
@@ -761,6 +852,8 @@ mod frozen {
                         usize::from(resultant_distinguished);
                     branch_pair_trace_distinguishing_targets +=
                         usize::from(trace_distinguished);
+                    binary_quartic_invariant_distinguishing_targets +=
+                        usize::from(invariant_distinguished);
                     let index = targets.len();
                     targets.push(Target {
                         slug: spec.slug.to_string(),
@@ -769,6 +862,7 @@ mod frozen {
                         bits,
                         resultant_bits,
                         trace_residues,
+                        invariant_bits,
                     });
                     rows.entry(spec.slug.to_string()).or_default().push(index);
                 }
@@ -794,6 +888,152 @@ mod frozen {
             } else {
                 targets.iter().map(|target| target.parity).collect()
             };
+            if invariant_panel {
+                let invariant_nonzero_features: usize = targets
+                    .iter()
+                    .map(|target| {
+                        target
+                            .invariant_bits
+                            .iter()
+                            .filter(|&&bit| bit >= 0)
+                            .count()
+                    })
+                    .sum();
+                let mut rules = Vec::with_capacity(512);
+                for mask in 0_u16..(1_u16 << INVARIANT_FEATURES) {
+                    for polarity in 0..=1_u8 {
+                        let predictions: Vec<u8> = targets
+                            .iter()
+                            .map(|target| invariant_prediction(target, mask, polarity))
+                            .collect();
+                        let (coverage, matches) = score(&predictions, &labels);
+                        rules.push(Rule {
+                            mask,
+                            polarity,
+                            predictions,
+                            coverage,
+                            matches,
+                            statistic: statistic(matches, coverage),
+                        });
+                    }
+                }
+                let selected_index = (0..rules.len())
+                    .max_by(|&left, &right| {
+                        compare_ratio(rules[left].statistic, rules[right].statistic)
+                            .then_with(|| rules[right].mask.cmp(&rules[left].mask))
+                            .then_with(|| rules[right].polarity.cmp(&rules[left].polarity))
+                    })
+                    .ok_or("no binary-quartic invariant rules")?;
+                let selected = &rules[selected_index];
+                let total_exact_rules = rules
+                    .iter()
+                    .filter(|rule| rule.coverage == TARGETS && rule.matches == TARGETS)
+                    .count();
+                let covered_exact_rules = rules
+                    .iter()
+                    .filter(|rule| rule.coverage > 0 && rule.matches == rule.coverage)
+                    .count();
+
+                let mut exceedances = 0_usize;
+                for replicate in 0..REPLICATES {
+                    let mut shuffled = vec![0_u8; TARGETS];
+                    for (slug, indices) in &rows {
+                        let mut values: Vec<u8> =
+                            indices.iter().map(|&index| labels[index]).collect();
+                        let mut seed = 0x116_021_u64
+                            ^ (replicate as u64 + 1).wrapping_mul(0x9e3779b97f4a7c15)
+                            ^ slug.bytes().map(u64::from).sum::<u64>();
+                        shuffle(&mut values, &mut seed);
+                        for (&index, value) in indices.iter().zip(values) {
+                            shuffled[index] = value;
+                        }
+                    }
+                    let mut maximum = (0_u128, 1_u128);
+                    for rule in &rules {
+                        let (_, matches) = score(&rule.predictions, &shuffled);
+                        let candidate = statistic(matches, rule.coverage);
+                        if compare_ratio(candidate, maximum) == Ordering::Greater {
+                            maximum = candidate;
+                        }
+                    }
+                    exceedances += usize::from(
+                        compare_ratio(maximum, selected.statistic) != Ordering::Less,
+                    );
+                }
+
+                let mut per_curve = Vec::new();
+                for (slug, indices) in &rows {
+                    let predictions: Vec<u8> = indices
+                        .iter()
+                        .map(|&index| selected.predictions[index])
+                        .collect();
+                    let curve_labels: Vec<u8> =
+                        indices.iter().map(|&index| labels[index]).collect();
+                    let (coverage, matches) = score(&predictions, &curve_labels);
+                    per_curve.push(format!(
+                        "{{\"slug\":\"{slug}\",\"targets\":{},\"coverage\":{coverage},\"matches\":{matches}}}",
+                        indices.len()
+                    ));
+                }
+
+                let excess = 2_i64 * selected.matches as i64 - selected.coverage as i64;
+                let json = format!(
+                    concat!(
+                        "{{\n  \"schema\":\"h116-chiral-binary-quartic-invariant-parity/v1\",\n",
+                        "  \"targets\":{},\n  \"curves\":{},\n  \"quartic_models\":{},\n",
+                        "  \"invariant_features\":{},\n  \"rules\":{},\n",
+                        "  \"reconstruction_checks\":{},\n  \"discriminant_checks\":{},\n",
+                        "  \"resultant_checks\":{},\n  \"branch_pair_trace_checks\":{},\n",
+                        "  \"binary_quartic_invariant_checks\":{},\n",
+                        "  \"binary_quartic_invariant_nonzero_features\":{},\n",
+                        "  \"binary_quartic_invariant_distinguishing_targets\":{},\n",
+                        "  \"planted_control_matches\":{},\n  \"selected_mask\":{},\n",
+                        "  \"selected_polarity\":{},\n  \"coverage\":{},\n  \"matches\":{},\n",
+                        "  \"binary_excess\":{},\n  \"statistic_numerator\":{},\n",
+                        "  \"statistic_denominator\":{},\n  \"total_exact_rules\":{},\n",
+                        "  \"covered_exact_rules\":{},\n  \"replicates\":4096,\n",
+                        "  \"familywise_exceedances\":{},\n",
+                        "  \"familywise_empirical_p\":{:.12},\n  \"per_curve\":[{}],\n",
+                        "  \"status\":\"measured\"\n}}\n"
+                    ),
+                    targets.len(),
+                    rows.len(),
+                    TRACE_FEATURES,
+                    INVARIANT_FEATURES,
+                    rules.len(),
+                    reconstruction_checks,
+                    discriminant_checks,
+                    resultant_checks,
+                    branch_pair_trace_checks,
+                    binary_quartic_invariant_checks,
+                    invariant_nonzero_features,
+                    binary_quartic_invariant_distinguishing_targets,
+                    TARGETS,
+                    selected.mask,
+                    selected.polarity,
+                    selected.coverage,
+                    selected.matches,
+                    excess,
+                    selected.statistic.0,
+                    selected.statistic.1,
+                    total_exact_rules,
+                    covered_exact_rules,
+                    exceedances,
+                    (exceedances + 1) as f64 / (REPLICATES + 1) as f64,
+                    per_curve.join(",")
+                );
+                fs::write(output_path, json).map_err(|error| error.to_string())?;
+                println!(
+                    "chiral binary-quartic invariant parity: mask={} polarity={} coverage={} matches={} exact={} p={:.6}",
+                    selected.mask,
+                    selected.polarity,
+                    selected.coverage,
+                    selected.matches,
+                    total_exact_rules,
+                    (exceedances + 1) as f64 / (REPLICATES + 1) as f64
+                );
+                return Ok(());
+            }
             if trace_panel {
                 let mut rules = Vec::with_capacity(243);
                 for code in 0_u8..81 {
@@ -1256,8 +1496,11 @@ fn main() {
         [_, flag, output] if flag == "--run-traces" => {
             frozen::branch_residual::run_traces(Path::new(output))
         }
+        [_, flag, output] if flag == "--run-invariants" => {
+            frozen::branch_residual::run_invariants(Path::new(output))
+        }
         _ => Err(
-            "usage: h116_chiral_branch_residual_parity --selftest | --run OUTPUT.json | --run-resultants OUTPUT.json | --run-traces OUTPUT.json".to_string(),
+            "usage: h116_chiral_branch_residual_parity --selftest | --run OUTPUT.json | --run-resultants OUTPUT.json | --run-traces OUTPUT.json | --run-invariants OUTPUT.json".to_string(),
         ),
     };
     if let Err(error) = result {
