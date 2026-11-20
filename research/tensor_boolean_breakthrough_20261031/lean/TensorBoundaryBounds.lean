@@ -13,6 +13,7 @@ import Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.Basic
 import Mathlib.SetTheory.Cardinal.NatCard
 import MathlibExt.AlgebraicGeometry.EllipticCurve.HasseBound
 import Mathlib.AlgebraicGeometry.EllipticCurve.DivisionPolynomial.Degree
+import Mathlib.AlgebraicGeometry.EllipticCurve.DivisionPolynomial.ZSMul
 import Mathlib.FieldTheory.Galois.Basic
 import Mathlib.FieldTheory.SplittingField.Construction
 import Mathlib.RingTheory.Localization.NumDen
@@ -3656,6 +3657,85 @@ theorem divisionPolynomialSq_two_vanishes_of_add_self
   exact WeierstrassCurve.Affine.Point.isRoot_twoTorsionPolynomial_of_add_self
     nonsingular torsion
 
+open WeierstrassCurve.Jacobian in
+/-- A torsion relation at a nonsingular affine point forces the corresponding
+full squared division polynomial to vanish at its x-coordinate.  This is the
+parity-safe bridge: unlike `preΨ`, `ΨSq` retains the two-torsion factor. -/
+theorem divisionPolynomialSq_eval_eq_zero_of_zsmul_eq_zero
+    {F : Type*} [Field F] (curve : WeierstrassCurve F)
+    {x y : F} (nonsingular : curve.toAffine.Nonsingular x y) (index : ℤ)
+    (torsion : index • WeierstrassCurve.Jacobian.Point.fromAffine
+      (WeierstrassCurve.Affine.Point.some _ _ nonsingular) = 0) :
+    (curve.ΨSq index).eval x = 0 := by
+  have pointFormula := WeierstrassCurve.zsmul_eq_smulEval
+    curve nonsingular index
+  rw [torsion, WeierstrassCurve.Jacobian.Point.zero_point] at pointFormula
+  have equivalent : (![1, 1, 0] : Fin 3 → F) ≈
+      WeierstrassCurve.smulEval curve x y index :=
+    Quotient.eq.mp pointFormula
+  have psiZero : Polynomial.evalEval x y (curve.ψ index) = 0 := by
+    have zZero : (WeierstrassCurve.smulEval curve x y index) (2 : Fin 3) = 0 :=
+      (WeierstrassCurve.Jacobian.Z_eq_zero_of_equiv equivalent).mp rfl
+    simpa [WeierstrassCurve.smulEval] using zZero
+  let evaluation : curve.toAffine.CoordinateRing →+* F :=
+    AdjoinRoot.evalEval nonsingular.1
+  have psiEqualsPsi :
+      Polynomial.evalEval x y (curve.ψ index) =
+        Polynomial.evalEval x y (curve.Ψ index) := by
+    calc
+      _ = evaluation (WeierstrassCurve.Affine.CoordinateRing.mk curve
+          (curve.ψ index)) :=
+        (AdjoinRoot.evalEval_mk nonsingular.1 _).symm
+      _ = evaluation (WeierstrassCurve.Affine.CoordinateRing.mk curve
+          (curve.Ψ index)) :=
+        congrArg evaluation
+          (WeierstrassCurve.Affine.CoordinateRing.mk_ψ curve index)
+      _ = _ := AdjoinRoot.evalEval_mk nonsingular.1 _
+  have fullPsiZero : Polynomial.evalEval x y (curve.Ψ index) = 0 :=
+    psiEqualsPsi.symm.trans psiZero
+  have squareEvaluation :
+      Polynomial.evalEval x y (curve.Ψ index) ^ 2 =
+        (curve.ΨSq index).eval x := by
+    calc
+      _ = (evaluation (WeierstrassCurve.Affine.CoordinateRing.mk curve
+          (curve.Ψ index))) ^ 2 :=
+        congrArg (fun value : F => value ^ 2)
+          (AdjoinRoot.evalEval_mk nonsingular.1 _).symm
+      _ = evaluation ((WeierstrassCurve.Affine.CoordinateRing.mk curve
+          (curve.Ψ index)) ^ 2) := (map_pow evaluation _ 2).symm
+      _ = evaluation (WeierstrassCurve.Affine.CoordinateRing.mk curve
+          (Polynomial.C <| curve.ΨSq index)) :=
+        congrArg evaluation
+          (WeierstrassCurve.Affine.CoordinateRing.mk_Ψ_sq curve index)
+      _ = Polynomial.evalEval x y (Polynomial.C <| curve.ΨSq index) :=
+        AdjoinRoot.evalEval_mk nonsingular.1 _
+      _ = _ := Polynomial.evalEval_C x y _
+  rw [fullPsiZero] at squareEvaluation
+  simpa using squareEvaluation.symm
+
+/-- Affine form of the torsion-to-division-polynomial implication, obtained
+by transporting the scalar relation through the Jacobian/affine additive
+equivalence. -/
+theorem divisionPolynomialSq_eval_eq_zero_of_affine_zsmul_eq_zero
+    {F : Type*} [Field F] [DecidableEq F]
+    (curve : WeierstrassCurve F) {x y : F}
+    (nonsingular : curve.toAffine.Nonsingular x y) (index : ℤ)
+    (torsion : index • WeierstrassCurve.Affine.Point.some
+      x y nonsingular = 0) :
+    (curve.ΨSq index).eval x = 0 := by
+  apply divisionPolynomialSq_eval_eq_zero_of_zsmul_eq_zero
+    curve nonsingular index
+  let equivalence := WeierstrassCurve.Jacobian.Point.toAffineAddEquiv curve
+  calc
+    index • WeierstrassCurve.Jacobian.Point.fromAffine
+        (WeierstrassCurve.Affine.Point.some _ _ nonsingular) =
+        equivalence.symm
+          (index • WeierstrassCurve.Affine.Point.some _ _ nonsingular) := by
+            rw [map_zsmul]
+            rfl
+    _ = equivalence.symm 0 := congrArg equivalence.symm torsion
+    _ = 0 := map_zero equivalence.symm
+
 /-- A root of the full univariate squared division polynomial is algebraic.
 Unlike `preΨ`, `ΨSq` retains the two-torsion factor at even indices, so this
 is the polynomial appropriate for a general scalar-torsion implication. -/
@@ -3697,6 +3777,57 @@ theorem divisionPolynomialSq_ne_zero_at_const_mul_transcendental
     divisionPolynomialSqRoot_isAlgebraic curve index
       (algebraMap K L t * s) indexNonzero root
   exact (transcendental_const_mul s sTranscendental t tNonzero) algebraic
+
+/-- A nonsingular affine point over an extension field whose x-coordinate is
+a nonzero constant multiple of a transcendental element cannot be killed by
+an integer that remains nonzero in the constant field.  This combines the
+integer-multiplication formula with the parity-correct squared division
+polynomial, so it includes even-order torsion. -/
+theorem no_zsmul_torsion_at_const_mul_transcendental
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    (curve : WeierstrassCurve K) (index : ℤ)
+    (indexNonzero : (index : K) ≠ 0)
+    (s : L) (sTranscendental : Transcendental K s)
+    (t : K) (tNonzero : t ≠ 0) (y : L)
+    (nonsingular : (curve.map (algebraMap K L)).toAffine.Nonsingular
+      (algebraMap K L t * s) y)
+    (torsion : index • WeierstrassCurve.Jacobian.Point.fromAffine
+      (WeierstrassCurve.Affine.Point.some _ _ nonsingular) = 0) :
+    False := by
+  have root := divisionPolynomialSq_eval_eq_zero_of_zsmul_eq_zero
+    (curve.map (algebraMap K L)) nonsingular index torsion
+  apply divisionPolynomialSq_ne_zero_at_const_mul_transcendental
+    curve index indexNonzero s sTranscendental t tNonzero
+  simpa [Polynomial.aeval_def, Polynomial.eval_map] using root
+
+/-- Affine-coordinate form of
+`no_zsmul_torsion_at_const_mul_transcendental`.  The Jacobian/affine group
+equivalence transports the asserted torsion relation to the division
+polynomial multiplication formula. -/
+theorem no_affine_zsmul_torsion_at_const_mul_transcendental
+    {K L : Type*} [Field K] [Field L] [Algebra K L] [DecidableEq L]
+    (curve : WeierstrassCurve K) (index : ℤ)
+    (indexNonzero : (index : K) ≠ 0)
+    (s : L) (sTranscendental : Transcendental K s)
+    (t : K) (tNonzero : t ≠ 0) (y : L)
+    (nonsingular : (curve.map (algebraMap K L)).toAffine.Nonsingular
+      (algebraMap K L t * s) y)
+    (torsion : index • WeierstrassCurve.Affine.Point.some
+      (algebraMap K L t * s) y nonsingular = 0) :
+    False := by
+  apply no_zsmul_torsion_at_const_mul_transcendental
+    curve index indexNonzero s sTranscendental t tNonzero y nonsingular
+  let equivalence := WeierstrassCurve.Jacobian.Point.toAffineAddEquiv
+    (curve.map (algebraMap K L))
+  calc
+    index • WeierstrassCurve.Jacobian.Point.fromAffine
+        (WeierstrassCurve.Affine.Point.some _ _ nonsingular) =
+        equivalence.symm
+          (index • WeierstrassCurve.Affine.Point.some _ _ nonsingular) := by
+            rw [map_zsmul]
+            rfl
+    _ = equivalence.symm 0 := congrArg equivalence.symm torsion
+    _ = 0 := map_zero equivalence.symm
 
 /-- Product of the indexed quadratic polynomials whose splitting field is the
 multiquadratic extension used by the Kummer-sign argument. -/

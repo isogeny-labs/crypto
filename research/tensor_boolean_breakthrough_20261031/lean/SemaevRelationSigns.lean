@@ -1296,6 +1296,80 @@ def HasNonzeroZModTorsionIndex
     (modulus : ℕ) {Point : Type*} [AddCommGroup Point] (point : Point) : Prop :=
   ∃ index : ℤ, (index : ZMod modulus) ≠ 0 ∧ index • point = 0
 
+/-- A canonical short-cubic point with nonzero scale has no torsion index
+that remains nonzero in the prime field.  The proof extracts a root of the
+full squared division polynomial from the affine torsion relation, rewrites
+the function-field curve as the base change of the constant short curve, and
+contradicts transcendence of the embedded polynomial variable. -/
+theorem zmodCanonicalShortCubicPoint_no_nonzero_torsion
+    (modulus : ℕ) [Fact modulus.Prime]
+    (B : ZMod modulus)
+    [(shortCharacterCurve 0 0 B).IsElliptic]
+    {Index : Type*} [Fintype Index]
+    (scale : Index → ZMod modulus)
+    [DecidableEq (ShortCubicSplittingField (ZMod modulus) Index 0 B scale)]
+    (chosen : Index) (scaleNonzero : scale chosen ≠ 0)
+    (index : ℤ) (indexNonzero : (index : ZMod modulus) ≠ 0)
+    (torsion : index • canonicalShortCubicPoint 0 B scale chosen = 0) :
+    False := by
+  let F := ShortCubicFunctionField (ZMod modulus)
+  let L := ShortCubicSplittingField (ZMod modulus) Index 0 B scale
+  let s : L := algebraMap F L
+    (algebraMap (Polynomial (ZMod modulus)) F Polynomial.X)
+  have sTranscendental : Transcendental (ZMod modulus) s := by
+    apply (transcendental_algebraMap_iff
+      (algebraMap F L).injective).2
+    apply (transcendental_algebraMap_iff
+      (IsFractionRing.injective (Polynomial (ZMod modulus)) F)).2
+    exact Polynomial.transcendental_X (ZMod modulus)
+  have curveEq :
+      (shortCubicFunctionCurve 0 B).toAffine.baseChange L =
+        ((shortCharacterCurve 0 0 B).map
+          (algebraMap (ZMod modulus) L)).toAffine := by
+    calc
+      _ = (shortCharacterCurve 0
+          (algebraMap (ZMod modulus) L 0)
+          (algebraMap (ZMod modulus) L B)).toAffine :=
+        shortCubicFunctionCurve_baseChange_eq_shortCharacterCurve 0 B
+      _ = _ := by
+        ext <;> simp [shortCharacterCurve]
+  have curveEqCurve :
+      (shortCubicFunctionCurve 0 B).map (algebraMap F L) =
+        (shortCharacterCurve 0 0 B).map
+          (algebraMap (ZMod modulus) L) := by
+    exact curveEq
+  have xEq :
+      algebraMap F L (shortCubicScaledX (scale chosen)) =
+        algebraMap (ZMod modulus) L (scale chosen) * s := by
+    simp [shortCubicScaledX, s, F,
+      IsScalarTower.algebraMap_apply (ZMod modulus) F L]
+  have canonicalNonsingular := shortCubicRoot_nonsingular
+    0 B (scale chosen)
+    (quadraticRadicandRoot (shortCubicRadicandFamily 0 B scale) chosen)
+    (by
+      simpa [shortCubicRadicandFamily] using
+        (quadraticRadicandRoot_sq
+          (shortCubicRadicandFamily 0 B scale) chosen))
+  have torsionOld : index • WeierstrassCurve.Affine.Point.some
+      (algebraMap F L (shortCubicScaledX (scale chosen)))
+      (quadraticRadicandRoot (shortCubicRadicandFamily 0 B scale) chosen)
+      canonicalNonsingular = 0 := by
+    simpa [canonicalShortCubicPoint] using torsion
+  have rootOld :=
+    divisionPolynomialSq_eval_eq_zero_of_affine_zsmul_eq_zero
+      ((shortCubicFunctionCurve 0 B).map (algebraMap F L))
+      canonicalNonsingular index torsionOld
+  have rootDirect :
+      (((shortCharacterCurve 0 0 B).map
+        (algebraMap (ZMod modulus) L)).ΨSq index).eval
+          (algebraMap (ZMod modulus) L (scale chosen) * s) = 0 := by
+    rw [← curveEqCurve, ← xEq]
+    exact rootOld
+  apply divisionPolynomialSq_ne_zero_at_const_mul_transcendental
+    (shortCharacterCurve 0 0 B) index indexNonzero s sTranscendental
+      (scale chosen) scaleNonzero
+  simpa [Polynomial.aeval_def, Polynomial.eval_map] using rootDirect
+
 /-- Direct ordinary-branch Semaev endpoint for pairwise nonsquare canonical
 radicands. -/
 theorem zmodCanonicalSemaevPairwiseNonsquare_implies_nonzero_index_torsion
@@ -1591,6 +1665,49 @@ theorem zmodCanonicalSemaevInterval_implies_exists_nonzero_torsion
             ≃ₐ[ShortCubicFunctionField (ZMod modulus)]
           ShortCubicSplittingField (ZMod modulus) (Fin (n + 3)) 0 B scaleZ) :
           ℤ) * coefficient partner) * sign), indexNonzero, torsion⟩
+
+/-- Uniform prime-field `A = 0` nonvanishing theorem for the canonical
+scaled interval.  Under the explicit characteristic and arity bounds, a
+Semaev vanishing would produce a scalar-torsion relation whose index is
+nonzero modulo `modulus`; the transcendental division-polynomial endpoint
+rules out that relation. -/
+theorem zmodCanonicalSemaevInterval_ne_zero
+    (modulus X n : ℕ) [Fact modulus.Prime]
+    (hChar : ringChar (ZMod modulus) ≠ 2)
+    (twoNonzeroBase : (2 : ZMod modulus) ≠ 0)
+    (B : ZMod modulus)
+    [(shortCharacterCurve 0 0 B).IsElliptic]
+    (cubicNonsingular : (27 : ZMod modulus) * B ^ 2 ≠ 0)
+    (BNonzero : B ≠ 0)
+    (scale : Fin (n + 3) → ℕ)
+    [DecidableEq (ShortCubicSplittingField (ZMod modulus) (Fin (n + 3))
+      0 B (fun i ↦ (scale i : ZMod modulus)))]
+    (scalePositive : ∀ index, 0 < scale index)
+    (scaleBound : ∀ index, scale index ≤ X)
+    (scaleInjective : Function.Injective scale)
+    (intervalShort : 3 * X < modulus)
+    (arityBelow :
+      3 * (2 ^ (n + 3) * (n + 3)) ^ 2 < modulus) :
+    evalCanonical (shortCubicFunctionCurve 0 B).toAffine n
+      (fun index ↦ shortCubicScaledX (scale index : ZMod modulus)) ≠ 0 := by
+  intro vanishing
+  let scaleZ : Fin (n + 3) → ZMod modulus :=
+    fun index ↦ scale index
+  obtain ⟨chosen, index, indexNonzero, torsion⟩ :=
+    zmodCanonicalSemaevInterval_implies_exists_nonzero_torsion
+      modulus X n hChar twoNonzeroBase B cubicNonsingular BNonzero scale
+      scalePositive scaleBound scaleInjective intervalShort vanishing arityBelow
+  have scaleBelow : ∀ index, scale index < modulus := by
+    intro index
+    have := scaleBound index
+    omega
+  have chosenScaleNonzero : scaleZ chosen ≠ 0 := by
+    intro castZero
+    have values := congrArg ZMod.val castZero
+    rw [ZMod.val_natCast_of_lt (scaleBelow chosen), ZMod.val_zero] at values
+    exact (Nat.ne_of_gt (scalePositive chosen)) values
+  exact zmodCanonicalShortCubicPoint_no_nonzero_torsion
+    modulus B scaleZ chosen chosenScaleNonzero index indexNonzero torsion
 
 /-- Full finite-image relation certificate obtained from canonical Semaev
 vanishing.  For a nontrivial x-tuple and one chosen point in every used

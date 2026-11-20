@@ -50,7 +50,8 @@ The null changes only the global wiring of interior ports while preserving the v
     [`lean-zsmul-torsion/`](lean-zsmul-torsion/) proves the parity-safe
     group-law bridge `n • P = 0 -> ΨSq n (x(P)) = 0`, including even indices.
     It pins the open Mathlib PR #41197 contributor fork exactly; upstream or
-    main-project dependency integration remains open. This removes the general
+    main-project dependency integration was still open at this checkpoint and
+    is closed by item 14 below. This removes the general
     torsion-to-division-polynomial obligation, but not Semaev construction,
     curve-specific estimates, collection/runtime assembly, or the final
     subexponential theorem. [pcc:unverified]
@@ -112,12 +113,30 @@ The null changes only the global wiring of interior ports while preserving the v
     nonsquare products (ordinary Kummer projection) and an existing square
     pair (cubic-CM projection), returning a canonical point with a nonzero
     integer torsion index modulo `p` in either case. This closes the `A = 0`
-    Semaev-to-nonzero-torsion branch,
-    not the production torsion-to-division-polynomial integration, relation
-    yield, expected-runtime assembly, or a subexponential ECDLP theorem.
+    Semaev-to-nonzero-torsion branch. At this checkpoint the production
+    torsion-to-division-polynomial integration was still open; item 14 closes
+    it. Relation yield, expected-runtime assembly, and a subexponential ECDLP
+    theorem remain open.
     [pcc:unverified]
-14. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
-15. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
+14. **Kernel-checked 2026-11-20:** the parity-complete scalar-multiplication
+    formula from Mathlib PR #41197 is rebased onto the production Mathlib pin
+    as an exact source overlay. Lean now proves both affine and Jacobian
+    `n • P = 0 -> ΨSq n (x(P)) = 0`, transports the canonical short-cubic
+    curve back to its constant prime-field model, and proves that the embedded
+    function-field variable stays transcendental in the quadratic splitting
+    field. Consequently every nonzero-scale canonical point has no torsion
+    index that is nonzero modulo `p`, and
+    `zmodCanonicalSemaevInterval_ne_zero` rules out canonical Semaev vanishing
+    under the explicit bound
+    `3 * (2^(n + 3) * (n + 3))^2 < p`. The final production build completes
+    9,136 jobs and the repository proof gate reports
+    `PASS 461 thm 0 trusted`. This closes the concrete `A = 0` canonical
+    nonvanishing branch, not relation-yield/energy estimates,
+    oracle-to-coverage binding, expected-runtime assembly, universal-machine
+    bit-cost specialization, or a subexponential ECDLP algorithm.
+    [pcc:unverified]
+15. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
+16. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
 
 The current `Network` stores predicates behind `Arc<dyn Predicate>`, so closure identity cannot be serialized faithfully. E0 therefore uses a hybrid semantic representation: predicates at or below 16 ports carry their complete truth table; larger production predicates carry a strict typed operation that is also their live evaluator. Tag, parameters, truth table or typed program, port order, interface and pins are bound into one SHA-256 identity. Untagged predicates are admitted only through an explicit bounded-truth-table policy for tiny fixtures and controls. Canonicalizing graph shape alone would be insufficient.
 

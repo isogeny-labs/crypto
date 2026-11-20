@@ -1579,3 +1579,51 @@ algorithm. `lake build DilationNonzeroBounds SemaevRelationSigns` completed
 `leanchecker --fresh SemaevRelationSigns` replay was manually interrupted
 after about 25 minutes of sustained compute with no output; it is not counted
 as validation evidence. [pcc:unverified]
+
+## 2026-11-20 production `zsmul` integration and canonical nonvanishing
+
+The five division-polynomial sources needed from open Mathlib PR #41197 were
+rebased onto the production Mathlib commit
+`cfc55fc58714a59dc06e6e79edc6d1d95140d3c2`. The local source overlay retains
+the newer production `Mathlib.Data.Nat.DvdSequence` API in
+`EllipticDivisibilitySequence.lean`; the other changes are the upstream
+division-polynomial `Basic`, `Universal`, `Omega`, and `ZSMul` sources. The
+main Lake configuration installs these exact stored sources after dependency
+materialization and before each Lake action. The stored files use the
+`.lean.overlay` suffix so the repository-wide proof-gate discovery does not
+misclassify them as independent standalone Lean projects. A post-install
+SHA-256 comparison for `EllipticDivisibilitySequence.lean` was identical at
+`4efc9b525041f89e64534027289067ffdd6d2437a3c93867b1082d813e109ffa`.
+[pcc:unverified]
+
+`TensorBoundaryBounds.lean` now proves
+`divisionPolynomialSq_eval_eq_zero_of_zsmul_eq_zero` from the upstream
+integer-multiplication formula and the affine coordinate-ring identities. The
+new affine variant transports a scalar relation through the checked
+Jacobian/affine additive equivalence. The generic transcendence endpoints then
+show that a nonsingular point whose x-coordinate is a nonzero constant
+multiple of a transcendental element cannot have a scalar annihilator whose
+index remains nonzero in the constant field. These statements use the full
+univariate squared division polynomial `ΨSq`, so even torsion is included.
+[pcc:unverified]
+
+`zmodCanonicalShortCubicPoint_no_nonzero_torsion` proves that the polynomial
+variable remains transcendental after embedding the rational function field
+in the canonical quadratic splitting field, rewrites the function-field
+short curve as the base change of the constant `ZMod p` curve, and contradicts
+the resulting `ΨSq` root. Composing this with the previously checked uniform
+ordinary/cubic-CM torsion dichotomy gives
+`zmodCanonicalSemaevInterval_ne_zero`: under the interval, smoothness, and
+explicit arity hypothesis
+`3 * (2^(n + 3) * (n + 3))^2 < p`, the canonical `A = 0` Semaev evaluation on
+distinct positive interval scales is nonzero. [pcc:unverified]
+
+The final targeted command `lake build SemaevRelationSigns` completes 9,136
+jobs. The repository proof gate on the final project configuration reports
+`PASS 461 thm 0 trusted` across the nine tracked modules. The earlier failed
+local-shadowing experiment and the interrupted redundant fresh checker are not
+validation evidence. This checkpoint proves the bounded canonical
+nonvanishing theorem; it does not prove relation yield or energy estimates,
+bind an oracle to coverage and restart probabilities, assemble expected
+runtime, specialize universal-machine bit costs, or prove a subexponential
+prime-field ECDLP algorithm. [pcc:unverified]
