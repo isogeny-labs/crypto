@@ -2261,6 +2261,64 @@ mod tests {
         })
     }
     #[test]
+    fn round53_inverses_match_independent_modular_power_and_deadlines() {
+        // Independent square-and-multiply oracle; neither inversion routine
+        // uses this code path in production. Include edge cases and randoms.
+        fn reference(mut base: u64, p: u64) -> u64 {
+            let mut exponent = p - 2;
+            let mut accumulator = 1u64;
+            while exponent > 0 {
+                if exponent & 1 == 1 {
+                    accumulator =
+                        ((u128::from(accumulator) * u128::from(base)) % u128::from(p)) as u64;
+                }
+                exponent >>= 1;
+                if exponent != 0 {
+                    base = ((u128::from(base) * u128::from(base)) % u128::from(p)) as u64;
+                }
+            }
+            accumulator
+        }
+        for p in [5u64, 7, 17, 1_000_000_007, 1_000_000_009,
+                  1_000_000_021, (1u64 << 61) - 1] {
+            let f = field(p);
+            let mut observer = |_: &BoundedRootEvent| Ok(());
+            let mut producer = Producer {
+                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
+                unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
+                roots: [0; 8], root_count: 0,
+            };
+            producer.gate.admit().unwrap();
+            let mut replay = Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+            assert_eq!(producer.inverse(0), Err(Stop::InvalidInput));
+            assert_eq!(replay.reciprocal(0), Err(Stop::InvalidCertificate));
+            let mut state = p ^ 0x1a21_55b1_d1e5_1aef;
+            for i in 0..512u64 {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                let a = match i {
+                    0 => 1,
+                    1 => p - 1,
+                    2 => 2,
+                    _ => (state % (p - 1)) + 1,
+                };
+                let expected = reference(a, p);
+                let actual = producer.inverse(a).unwrap();
+                let checked = replay.reciprocal(a).unwrap();
+                assert_eq!(actual, expected, "producer p={p} a={a}");
+                assert_eq!(checked, expected, "replay p={p} a={a}");
+                assert_eq!(
+                    (u128::from(a) * u128::from(actual)) % u128::from(p),
+                    1, "product p={p} a={a}"
+                );
+            }
+            assert!(producer.gate.metrics.field_work <= budget().field_work);
+            assert!(replay.gate.metrics.field_work <= budget().field_work);
+        }
+    }
+
+    #[test]
     fn round51_scalar_and_monic_linear_products_match_wide_reference() {
         for p in [3u64, 7, 1_000_000_007, 1_000_000_009,
                   4_294_967_291, (1u64 << 61) - 1] {
