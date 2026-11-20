@@ -88304,3 +88304,12 @@ all owned through48deleted. GoalACTIVE, primarycomplete/fresh/signed parity unad
 2026-11-17 Codex deferred50integration: core98fe3e3bpublished; new separate producer/worker/complete qualifier with explicit activation_source,45/158controls/strictClippy and eight-arm transport pass. Independent flat-index replay matches108058recorded49sources/865full witnesses. Amendment45/deferred-pair-plan/RESUME_DEFERRED50.md register originalIC/table/grounded-screened/deferred-screened +4rho portfolio, worker360/wrapper3200/qualifier1800/lifetime7200/remaining6400. Protocol PDF/figures inspected. No50pod/call; publish/freeze source/native/metadata first. All owned through49deleted, goal active, claims187567/1bb597/3a7141UNVERIFIED. [pcc:unverified]
 
 2026-11-17 Codex Run50: eight matched Rust IC/rho workers recover expected scalar, original complete qualifier0; podqp4dpp4peu66x9deleted10:49:49Z DELETE204/GET404. Deferred5913875255822observed bitops/24.727sinner/27.829sprocess,5.165%lower than grounded-screened; fastest registered rho plain-b16/36.902sinner/36.908sprocess. N1exposed/incomplete/unsigned, no primary parity. All original/custody/native report data under runpod-deferred-pair-20261117-50; detailed RESUME_RUN50.md/NEXT.md. Descent3415residuals/3426280619436dominates; primary Nagao/class-domain review before cheaper/partial descent; strengthen complete/fresh/scaling/strongest-reference admission. Format-only export successor after cleanup distinguished by separate manifest. Claims7defbb/6224b9/853115/0ecee3UNVERIFIED. Goal active, no owned paid runner. [pcc:unverified]
+
+# Resume: round-2 IC leads (STACK + FEWCOL on Table B), 2026-11-18
+
+- Branch `aburan28/inspiring-dijkstra-ay05qi`, draft PR #4738. Protocol frozen in b0c61aee53: `research/ic_tableb_fewcol_20261118/PROTOCOL.md`.
+- Leads: `docs/leads/2026-11-18/ic-leads-round2/PROPOSALS.md`. L2-HRATE is closed (`HRATE.md`).
+- To run: `cargo build --release --bin ecbench`, then `python3 tools/benchrec.py run <record> -- research/ic_tableb_fewcol_20261118/run.sh`. The runner writes sessions, audits, compares and bands under that directory.
+- Afterwards: summary, graph, PDF and README; close the bench record; session log; tick ACTIVE; mark the PR ready.
+- Next leads if these hold: L2-INNER (insert depth-<5 sums, about 40 lines of Rust), L2-FREE (`free=1`), L2-WSIB.
+- Blocker carried over: main's malformed record `benchmarks/records/20261117T0334Z-hec-multi-production-cold.json` prevents `benchrec close` from rebuilding progress reports.

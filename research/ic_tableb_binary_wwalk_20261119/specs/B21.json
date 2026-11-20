@@ -1,0 +1,83 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ic_tableb_binary_wwalk_20261119 B21: C = 2 wwalk on random-binary Table B vs the k-sum incumbent",
+ "description": "L4-BINWALK measurement: wwalk ported to binary curves (commit 3a90dba6ae). Generic C = 2 track. research/ic_tableb_binary_wwalk_20261119/PROTOCOL.md. Public synthetic curves and targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "binary_explicit",
+    "n": 21,
+    "modulus": 2097157,
+    "a": 1,
+    "b": 1797947,
+    "group_order": 2094562,
+    "r": 1047281,
+    "gx": 232919,
+    "gy": 1480205
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261115211,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "bsgs-neg",
+   "role": "reference",
+   "method": {
+    "id": "bsgs.negation"
+   }
+  },
+  {
+   "name": "ksum5",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=9,mult=1",
+     "oracle": "ksum:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ww",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=2,mult=1",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,seed=run",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ww-tw",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=2,mult=1",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+     "max_trials": "13528399621"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261119521,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

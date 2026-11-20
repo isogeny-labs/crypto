@@ -3705,13 +3705,21 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
     if !prime_only {
         return Ok(());
     }
-    let Instance::Prime(i) = inst else {
-        return Err(format!(
-            "`{}` with factor base `{fb_name}` and oracle `{or_name}` runs on single-word prime curves only",
-            m.id
-        ));
+    // `wwalk` (without `sib`/`aut`, which need x-only siblings and the
+    // order-3 automorphism of a prime curve) also runs on a single-word
+    // binary curve: the walk is generic over `CountedGroup`.
+    let bin_walk = matches!(inst, Instance::Binary(_)) && or_name == "wwalk";
+    let (r, prime) = match inst {
+        Instance::Prime(i) => (i.r, Some(i)),
+        Instance::Binary(b) if bin_walk && fb_name != "prime-interval" => (b.r, None),
+        _ => {
+            return Err(format!(
+                "`{}` with factor base `{fb_name}` and oracle `{or_name}` runs on single-word prime curves only",
+                m.id
+            ));
+        }
     };
-    if fb_name == "prime-interval" {
+    if let (Some(i), "prime-interval") = (prime, fb_name.as_str()) {
         PrimeIntervalBase::interval(&fb, i.curve.p)?;
     }
     match or_name.as_str() {
@@ -3755,7 +3763,7 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
             // The target walk packs coefficients in a u128 word (62 bits a
             // seed); the plain walk table in 32 bits.
             let coef_bits = if tw > 0 { TW_COEF_BITS } else { 32 };
-            wwalk_plan_check_bits(i.r, x, jumps, opts, coef_bits)?;
+            wwalk_plan_check_bits(r, x, jumps, opts, coef_bits)?;
             let (cj, lazy) = (or.flag("cj"), or.flag("lazy"));
             if cj && tw == 0 {
                 return Err("wwalk: cj=1 needs tw=1 or tw=2".into());
@@ -3779,6 +3787,9 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
                     if tw == 0 {
                         return Err("wwalk: aut=3 needs tw=1 or tw=2".into());
                     }
+                    let Some(i) = prime else {
+                        return Err("wwalk: aut=3 runs on prime curves only".into());
+                    };
                     use crate::cryptanalysis::ic_boundary::CountedGroup;
                     let mut ops = crate::cryptanalysis::ic_boundary::GroupOps::default();
                     if i.curve
@@ -8160,6 +8171,12 @@ fn solve_ic_binary(
     let mut oracle_box: Box<dyn DecompositionOracle<BinaryGroup> + '_> = match or_name.as_str() {
         "subtract" => Box::new(SubtractOracle),
         "mitm" => Box::new(MitmOracle::new(ms)),
+        // Generic over the group: one probe a target into the negation-folded
+        // table of every signed m-sum of the base (as on prime curves).
+        // Restored: present in 2476332d22 (the binary k-sum study's build) and
+        // lost from main since, which made `ksum` refuse binary curves.
+        "ksum" => Box::new(KSumOracle::new(ms)),
+        "wwalk" => Box::new(WWalkOracle::<FastPoint>::new()),
         "mitm-frobenius" => Box::new(FrobeniusMitmOracle::new(ms, inst)),
         "mitm-frobenius-counted" => Box::new(FrobeniusMitmOracle::new_counted(ms, inst)),
         "mitm-frobenius-lazy-counted" => Box::new(FrobeniusMitmOracle::new_lazy_counted(ms, inst)),
