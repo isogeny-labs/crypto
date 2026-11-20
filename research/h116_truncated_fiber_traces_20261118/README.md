@@ -609,3 +609,12 @@ family-wise `p=0.342690`.  The next lead tests linear factors of the full
 degree-four Prym Weil polynomial, probing rational auxiliary-torsion
 Frobenius eigenlines rather than only the real quadratic discriminant.
 [pcc:unverified]
+
+The subsequent [full-Weil eigenline test](PRYM_FROBENIUS_EIGENLINE_PARITY_EXPERIMENT.md)
+passes 6,296 direct root checks and 31,480 full/real Weil quotient identities.
+Its selected rule has near-total coverage but scores only 809/1,511, no rule
+is exact, and family-wise `p=0.778130`.  Thus the splitting null is not merely
+an artifact of repeated-root abstention.  The next lead retains complete
+quartic factor-degree partitions modulo the auxiliary primes and tests whether
+their categorical tuple transports scalar parity across curves.
+[pcc:unverified]
