@@ -14,6 +14,7 @@ const G: Point = Some((625_037_715, 2_100_627_251));
 const SEED: u64 = 0x7738_4234_4238_3231;
 const TRAIN_XOR: u64 = 0x5749_4e44_4f57_5338;
 const TARGET_XOR: u64 = 0x5441_5247_4554_5338;
+const OFFSET_XOR: u64 = 0x4f46_4653_4554_5332;
 const WINDOWS: [[usize; 8]; 4] = [
     [0, 1, 2, 3, 4, 5, 6, 7],
     [8, 9, 10, 11, 12, 13, 14, 15],
@@ -52,6 +53,14 @@ fn nonzero_scalar(state: &mut u64) -> u64 {
             if k != 0 { return k; }
         }
     }
+}
+fn indexed_offset(t: usize, attempt: usize) -> u64 {
+    // Versioned natural-residual pairing: no dependency on prior misses,
+    // so both weight arms use identical Q and offset for each (t, attempt).
+    let mut state = SEED ^ TARGET_XOR ^ OFFSET_XOR
+        ^ (t as u64).wrapping_mul(0xd6e8_feb8_6659_fd93)
+        ^ (attempt as u64).wrapping_mul(0xa076_1d64_78bd_642f);
+    nonzero_scalar(&mut state)
 }
 fn canonical_base(ar: &mut Arithmetic) -> Vec<Point> {
     let mut out = Vec::with_capacity(31);
@@ -259,7 +268,7 @@ fn study(num_targets: usize, weights: [u64; 8]) -> Value {
         let q=ar.scalar(PRIME31,secret,G);
         let mut obtained=None;
         for attempt in 0..32usize {
-            let offset=nonzero_scalar(&mut target_state);
+            let offset=indexed_offset(t,attempt);
             let wi=(t+attempt)%4;
             let shift_point=ar.scalar(PRIME31,offset,G);
             let translated=ar.add(PRIME31,q,shift_point);
@@ -286,6 +295,7 @@ fn study(num_targets: usize, weights: [u64; 8]) -> Value {
     let online_add=ar.counts.group_additions-setup_add-train_add;
     json!({
         "schema":"prime31.w8.windowed-generic-oracle-full-log.v1",
+        "target_generation":"indexed-offset-v2",
         "date":"2026-11-18",
         "status":"producer-side [pcc:unverified]",
         "generic_four_plus_four_grader_used":true,
@@ -349,6 +359,16 @@ mod tests {
         assert_eq!(v["genuine_nongeneric_rr9_extractors"], 0);
         assert_eq!(v["online_queries"].as_u64().unwrap(),
                    v["failed_online_queries"].as_u64().unwrap() + 32);
+    }
+    #[test]
+    fn indexed_offsets_are_deterministic_and_nonzero() {
+        for t in 0..16 {
+            for attempt in 0..32 {
+                let x = indexed_offset(t, attempt);
+                assert!((1..N).contains(&x));
+                assert_eq!(x, indexed_offset(t, attempt));
+            }
+        }
     }
     #[test]
     fn exact_first_moment_and_31_dimensional_window_coverage() {
