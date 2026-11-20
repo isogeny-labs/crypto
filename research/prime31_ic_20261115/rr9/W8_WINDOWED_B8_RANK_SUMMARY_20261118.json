@@ -1,0 +1,150 @@
+{
+  "schema": "prime31.w8.windowed-generic-oracle-summary.v1",
+  "date": "2026-11-18",
+  "source_commit": "ffb5d89969abfa2c67901373d001f0dd5bf06028",
+  "pinned_original_arithmetic_commit": "1df714645aa683cf975bc76fcacb9842cb4780fd",
+  "source_specific_runs": [
+    {
+      "id": 44412897116,
+      "url": "https://github.com/isogeny-labs/crypto/actions/runs/44412897116",
+      "conclusion": "success"
+    },
+    {
+      "id": 44412887094,
+      "url": "https://github.com/isogeny-labs/crypto/actions/runs/44412887094",
+      "conclusion": "success"
+    }
+  ],
+  "raw_artifact_id": 14478900939,
+  "raw_artifact_url": "https://github.com/isogeny-labs/crypto/actions/runs/44412897116/artifacts/14478900939",
+  "raw_artifact_digest": "sha256:cd76ee0008805d1f53ce057aa7d225866d52f2dba9393ed2df9ed1869fb30db8",
+  "raw_artifact_retention_expires": "2026-12-18T22:38:16Z",
+  "original_curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "cofactor": 1,
+    "g": [
+      625037715,
+      2100627251
+    ]
+  },
+  "weights": [
+    1,
+    3,
+    5,
+    7,
+    11,
+    13,
+    17,
+    19
+  ],
+  "windows": [
+    [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    [
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    [
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30
+    ]
+  ],
+  "factor_log_rank": 31,
+  "natural_training_queries": 37,
+  "accepted_independent_training_relations": 31,
+  "per_window_training": [
+    {
+      "window": 0,
+      "trials": 8,
+      "hits": 8,
+      "independent": 8,
+      "cumulative_rank": 8
+    },
+    {
+      "window": 1,
+      "trials": 8,
+      "hits": 8,
+      "independent": 8,
+      "cumulative_rank": 16
+    },
+    {
+      "window": 2,
+      "trials": 10,
+      "hits": 8,
+      "independent": 8,
+      "cumulative_rank": 24
+    },
+    {
+      "window": 3,
+      "trials": 11,
+      "hits": 7,
+      "independent": 7,
+      "cumulative_rank": 31
+    }
+  ],
+  "verified_factor_logs": 31,
+  "verified_public_target_logs": 1024,
+  "target_relation_queries": 1312,
+  "unsuccessful_target_queries": 288,
+  "target_queries_per_success": 1.28125,
+  "time_ns": {
+    "setup": "182507865",
+    "training_and_log_verification": "326206728",
+    "target_recovery_and_verification": "13589425478"
+  },
+  "total_time_ns": "14098140071",
+  "ec_operations": {
+    "setup_group_additions": 560630,
+    "training_group_additions": 1036373,
+    "online_group_additions": 42919320,
+    "total_group_additions": 44516323,
+    "total_field_inversions": 44500854,
+    "total_field_multiplications": 2848160879
+  },
+  "validation": {
+    "rust_library_tests": 40,
+    "focused_rust_tests": 2,
+    "independent_python_bigint": "PASS",
+    "training_witnesses_replayed": 31,
+    "public_target_logs_replayed": 1024,
+    "signed_pcc": "unverified"
+  },
+  "generic_group_sum_tables_used": true,
+  "true_nongeneric_relation_extractor_implemented": false,
+  "measured_advantage_over_best_bsgs": false,
+  "same_runner_bsgs_comparison_performed": false,
+  "notes": "Complete original-curve generic four-plus-four index-calculus-style control. The experiment demonstrates B8-window assembly into rank31 and 1024 public logs, NOT a novel non-generic attack. Do not use these producer numbers to claim a faster ECDLP solver."
+}

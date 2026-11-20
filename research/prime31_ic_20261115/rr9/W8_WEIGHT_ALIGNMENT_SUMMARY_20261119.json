@@ -1,0 +1,91 @@
+{
+  "schema": "prime31.w8.weight-alignment.same-runner.v1",
+  "date_local": "2026-11-19",
+  "run_completed_utc": "2026-11-20T00:32:06Z",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "cofactor": 1,
+    "g": [
+      625037715,
+      2100627251
+    ]
+  },
+  "workflow_run_url": "https://github.com/isogeny-labs/crypto/actions/runs/44646124372",
+  "workflow_run_id": 44646124372,
+  "source_commit": "9cc4deaab180757630bbbca0534987eb1a1f4c88",
+  "original_arithmetic_commit": "1df714645aa683cf975bc76fcacb9842cb4780fd",
+  "artifact_id": 14589151342,
+  "artifact_url": "https://github.com/isogeny-labs/crypto/actions/runs/44646124372/artifacts/14589151342",
+  "artifact_zip_sha256": "9cebb649670921819d89d283d1120f42f3479401537b4ba864771647d9e7f659",
+  "runner": "ubuntu-24.04, Rust 1.100.0",
+  "validation": {
+    "workflow_result": "success",
+    "original_library_tests_passed": 40,
+    "original_library_tests_total": 40,
+    "focused_example_tests_passed": 3,
+    "focused_example_tests_total": 3,
+    "independent_bigint_replay_both_arms": true,
+    "learned_base_logs_each": 31,
+    "verified_public_targets_each": 1024,
+    "signed_pcc": "unverified"
+  },
+  "method": "Original Rust generic 4+4 group-sum oracle; not a non-generic F4 extractor",
+  "old_odd": {
+    "weights": [
+      1,
+      3,
+      5,
+      7,
+      11,
+      13,
+      17,
+      19
+    ],
+    "train_attempts": 37,
+    "online_attempts": 1312,
+    "online_fails": 288,
+    "total_ec_additions": 44516323,
+    "setup_ns": 142691045,
+    "training_and_log_verification_ns": 269853283,
+    "online_target_recovery_and_verification_ns": 11209975396,
+    "whole_run_charged_ns": 11622519724
+  },
+  "pow2": {
+    "weights": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32,
+      64,
+      128
+    ],
+    "train_attempts": 41,
+    "online_attempts": 1172,
+    "online_fails": 148,
+    "total_ec_additions": 34716893,
+    "setup_ns": 143748665,
+    "training_and_log_verification_ns": 356732496,
+    "online_target_recovery_and_verification_ns": 8591080026,
+    "whole_run_charged_ns": 9091561187
+  },
+  "comparison": {
+    "pow2_to_odd_total_ratio": 0.7822366752560823,
+    "pow2_to_odd_ec_additions_ratio": 0.779868835977311,
+    "pow2_to_odd_online_attempts_ratio": 0.8932926829268293,
+    "pow2_to_odd_online_time_ratio": 0.7663781339846216
+  },
+  "no_claims": {
+    "nongeneric_public_only_8slot_extraction": false,
+    "nongeneric_complete_solver_speedup": false,
+    "matched_optimized_rho_or_bsgs_in_this_workflow": false
+  },
+  "public_target_cohorts_paired": false,
+  "comparison_is_descriptive_only": true,
+  "corrective_amendment": "Protocol A1: public-target stream was affected by arm-dependent number of misses; original target cohorts diverge after the first mismatch; source-specific v2 run uses independent per-target and per-attempt offset indexing",
+  "fully_paired_target_comparison_valid": false
+}
