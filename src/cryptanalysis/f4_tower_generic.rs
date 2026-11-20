@@ -407,6 +407,498 @@ impl<F: PrimeField> GTowerRing<F> {
     }
 }
 
+/// General quadratic bitmask tower quotient ring over `F`:
+/// `F_p[z_0, ..., z_{n-1}, u_0, ...] / (z_j^2 - P_j(z))`,
+/// where every square-free mask `m_u` in `rules[j]` satisfies
+/// `z^{m_u} <_{grevlex} z_j^2` (either `popcount(m_u) < 2`, or
+/// `popcount(m_u) == 2` with highest set bit strictly above `j`).
+///
+/// Because the leading monomials `z_0^2, ..., z_{n-1}^2` are pairwise
+/// coprime under grevlex, Buchberger's first criterion guarantees that
+/// `(z_j^2 - P_j(z))_{j=0}^{n-1}` is a Gröbner basis and every polynomial
+/// has a unique square-free normal form in `z_0, ..., z_{n-1}`.
+/// This directly hosts Graeffe elementary-symmetric Kummer and Dickson /
+/// Dickson-torus PKM towers (`(e_k^(l))^2 = e_k^(l+1) + 2 sum (-1)^{r-1} e_{k-r}^(l) e_{k+r}^(l)`).
+#[derive(Clone, Debug)]
+pub struct GQuadTowerRing<F: PrimeField> {
+    pub field: F,
+    pub rules: Vec<Vec<(u64, F::Elem)>>,
+    pub n_free: usize,
+}
+
+trait TowerRingOps<F: PrimeField>: Sync {
+    fn field(&self) -> &F;
+    fn n_tower(&self) -> usize;
+    fn n_free(&self) -> usize;
+    fn check(&self);
+    fn mul_elem(&self, g: &Elem<F::Elem>, u: Mono) -> GPoly<F::Elem>;
+}
+
+impl<F: PrimeField> TowerRingOps<F> for GTowerRing<F> {
+    #[inline]
+    fn field(&self) -> &F {
+        &self.field
+    }
+    #[inline]
+    fn n_tower(&self) -> usize {
+        self.rules.len()
+    }
+    #[inline]
+    fn n_free(&self) -> usize {
+        self.n_free
+    }
+    fn check(&self) {
+        GTowerRing::check(self);
+    }
+    fn mul_elem(&self, g: &Elem<F::Elem>, u: Mono) -> GPoly<F::Elem> {
+        GTowerRing::mul_elem(self, g, u)
+    }
+}
+
+fn binom_mod<F: PrimeField>(f: &F, n: usize, k: usize) -> F::Elem {
+    if k > n {
+        return f.zero();
+    }
+    let mut c = vec![0u128; k + 1];
+    c[0] = 1;
+    for i in 1..=n {
+        for j in (1..=k.min(i)).rev() {
+            c[j] += c[j - 1];
+        }
+    }
+    let hi = (c[k] >> 64) as u64;
+    let lo = c[k] as u64;
+    if hi == 0 {
+        f.from_u64(lo)
+    } else {
+        let two64 = f.mul(f.from_u64(1u64 << 32), f.from_u64(1u64 << 32));
+        f.add(f.mul(f.from_u64(hi), two64), f.from_u64(lo))
+    }
+}
+
+impl<F: PrimeField> GQuadTowerRing<F> {
+    /// Lift an ordinary [`GTowerRing`] into a [`GQuadTowerRing`] with identical rules.
+    pub fn from_gtower_ring(ring: &GTowerRing<F>) -> Self {
+        let f = &ring.field;
+        let rules = ring
+            .rules
+            .iter()
+            .enumerate()
+            .map(|(j, r)| {
+                let mut terms = Vec::new();
+                if !f.is_zero(r.d) {
+                    terms.push((0u64, r.d));
+                }
+                if !f.is_zero(r.c) {
+                    terms.push((1u64 << j, r.c));
+                }
+                if let Some(nx) = r.next {
+                    let nx = nx as usize;
+                    if !f.is_zero(r.b) {
+                        terms.push((1u64 << nx, r.b));
+                    }
+                    if !f.is_zero(r.a) {
+                        terms.push(((1u64 << j) | (1u64 << nx), r.a));
+                    }
+                }
+                merge_masks(f, &mut terms);
+                terms
+            })
+            .collect();
+        GQuadTowerRing {
+            field: f.clone(),
+            rules,
+            n_free: ring.n_free,
+        }
+    }
+
+    /// Graeffe elementary-symmetric Kummer block (`y_{i,l+1} = y_{i,l}^2`,
+    /// `y_{i,t-1}^2 = top_c`, where `top_c = g^{2^t}` in raw `x`-coordinates
+    /// or `1` in scaled `w = x/g` coordinates) for `m` summands and depth `t`,
+    /// occupying variable indices `base .. base + m*t`.
+    pub fn kummer_symmetric_block(
+        f: &F,
+        base: usize,
+        m: usize,
+        t: usize,
+        top_c: F::Elem,
+    ) -> Vec<Vec<(u64, F::Elem)>> {
+        assert!(m >= 1 && t >= 1, "symmetric block requires m >= 1, t >= 1");
+        assert!(base + m * t <= 64, "f4_tower_generic: at most 64 tower variables");
+        let two = f.from_u64(2);
+        let mut rules = Vec::with_capacity(m * t);
+        for level in 0..t {
+            let l_off = base + level * m;
+            for k in 1..=m {
+                let mut terms: Vec<(u64, F::Elem)> = Vec::new();
+                // 2 * sum_{r=1}^{min(k, m - k)} (-1)^{r - 1} e_{k - r}^{(l)} e_{k + r}^{(l)}
+                let rmax = k.min(m - k);
+                for r in 1..=rmax {
+                    let coef = if r % 2 == 1 { two } else { f.neg(two) };
+                    let mask = if k == r {
+                        1u64 << (l_off + (k + r - 1))
+                    } else {
+                        (1u64 << (l_off + (k - r - 1))) | (1u64 << (l_off + (k + r - 1)))
+                    };
+                    terms.push((mask, coef));
+                }
+                // + e_k^{(l + 1)} (or binom(m, k) * top_c^k on the top level).
+                if level + 1 < t {
+                    let nx_off = base + (level + 1) * m;
+                    terms.push((1u64 << (nx_off + (k - 1)), f.one()));
+                } else {
+                    let c_pow = f.pow_u64(top_c, k as u64);
+                    let cst = f.mul(binom_mod(f, m, k), c_pow);
+                    if !f.is_zero(cst) {
+                        terms.push((0u64, cst));
+                    }
+                }
+                merge_masks(f, &mut terms);
+                rules.push(terms);
+            }
+        }
+        rules
+    }
+
+    /// Graeffe elementary-symmetric Dickson / Dickson-torus block
+    /// (`y_{i,l+1} = y_{i,l}^2 - 2`, `y_{i,t-1}^2 - 2 = c_val`) for `m`
+    /// summands and depth `t`, occupying variable indices `base .. base + m*t`.
+    pub fn dickson_symmetric_block(
+        f: &F,
+        base: usize,
+        m: usize,
+        t: usize,
+        c_val: F::Elem,
+    ) -> Vec<Vec<(u64, F::Elem)>> {
+        assert!(m >= 1 && t >= 1, "symmetric block requires m >= 1, t >= 1");
+        assert!(base + m * t <= 64, "f4_tower_generic: at most 64 tower variables");
+        let two = f.from_u64(2);
+        let c_plus_2 = f.add(c_val, two);
+        let mut rules = Vec::with_capacity(m * t);
+        for level in 0..t {
+            let l_off = base + level * m;
+            for k in 1..=m {
+                let mut terms: Vec<(u64, F::Elem)> = Vec::new();
+                let rmax = k.min(m - k);
+                for r in 1..=rmax {
+                    let coef = if r % 2 == 1 { two } else { f.neg(two) };
+                    let mask = if k == r {
+                        1u64 << (l_off + (k + r - 1))
+                    } else {
+                        (1u64 << (l_off + (k - r - 1))) | (1u64 << (l_off + (k + r - 1)))
+                    };
+                    terms.push((mask, coef));
+                }
+                // tilde_e_k^{(l + 1)} = e_k(y_{., l+1} + 2)
+                if level + 1 < t {
+                    let nx_off = base + (level + 1) * m;
+                    let cst = f.mul(binom_mod(f, m, k), f.pow_u64(two, k as u64));
+                    if !f.is_zero(cst) {
+                        terms.push((0u64, cst));
+                    }
+                    for s in 1..=k {
+                        let coef = f.mul(
+                            binom_mod(f, m - s, k - s),
+                            f.pow_u64(two, (k - s) as u64),
+                        );
+                        if !f.is_zero(coef) {
+                            terms.push((1u64 << (nx_off + (s - 1)), coef));
+                        }
+                    }
+                } else {
+                    let cst = f.mul(binom_mod(f, m, k), f.pow_u64(c_plus_2, k as u64));
+                    if !f.is_zero(cst) {
+                        terms.push((0u64, cst));
+                    }
+                }
+                merge_masks(f, &mut terms);
+                rules.push(terms);
+            }
+        }
+        rules
+    }
+
+    /// Construct a multi-block symmetric tower ring (e.g. `blocks = &[m]` with
+    /// `n_free = 0` for full symmetric, or `blocks = &[3, 2]` with `n_free = 1`
+    /// at `m = 5`, `blocks = &[4, 2]` with `n_free = 1` at `m = 6`).
+    pub fn symmetric_blocks(
+        field: F,
+        blocks: &[usize],
+        t: usize,
+        is_dickson: bool,
+        param: F::Elem,
+        n_free: usize,
+    ) -> Self {
+        let mut rules = Vec::new();
+        let mut base = 0usize;
+        for &bm in blocks {
+            let blk = if is_dickson {
+                Self::dickson_symmetric_block(&field, base, bm, t, param)
+            } else {
+                Self::kummer_symmetric_block(&field, base, bm, t, param)
+            };
+            base += bm * t;
+            rules.extend(blk);
+        }
+        let ring = GQuadTowerRing {
+            field,
+            rules,
+            n_free,
+        };
+        ring.check();
+        ring
+    }
+
+    pub fn n_tower(&self) -> usize {
+        self.rules.len()
+    }
+
+    pub fn n_vars(&self) -> usize {
+        self.rules.len() + self.n_free
+    }
+
+    /// Verify every rule `z_j^2 = sum c_u z^{m_u}` satisfies `z^{m_u} <_{grevlex} z_j^2`.
+    pub fn check(&self) {
+        let f = &self.field;
+        assert!(
+            self.rules.len() <= 64,
+            "f4_tower_generic: at most 64 tower variables"
+        );
+        assert!(
+            self.n_free <= MAX_FREE,
+            "f4_tower_generic: at most {MAX_FREE} free variables"
+        );
+        let n_t = self.rules.len();
+        let mask_limit = if n_t == 64 { u64::MAX } else { (1u64 << n_t) - 1 };
+        for (j, r) in self.rules.iter().enumerate() {
+            for &(m_u, c_u) in r {
+                assert!(
+                    !f.is_zero(c_u),
+                    "f4_tower_generic: zero coefficient in quad rule {j}"
+                );
+                assert_eq!(
+                    m_u & !mask_limit,
+                    0,
+                    "f4_tower_generic: rule {j} references variable >= n_tower"
+                );
+                let deg = m_u.count_ones();
+                assert!(
+                    deg <= 2,
+                    "f4_tower_generic: rule {j} has term of degree {deg} > 2"
+                );
+                if deg == 2 {
+                    let hi_var = (63 - m_u.leading_zeros()) as usize;
+                    assert!(
+                        hi_var > j,
+                        "f4_tower_generic: rule {j} degree-2 term mask {m_u:#x} does not have highest var > {j}"
+                    );
+                }
+            }
+        }
+    }
+
+    fn mul_var_into(&self, m: u64, j: usize, coef: F::Elem, out: &mut Vec<(u64, F::Elem)>) {
+        let f = &self.field;
+        if f.is_zero(coef) {
+            return;
+        }
+        let bit = 1u64 << j;
+        if m & bit == 0 {
+            out.push((m | bit, coef));
+            return;
+        }
+        let m0 = m & !bit;
+        for &(rmask, rcoef) in &self.rules[j] {
+            let c = f.mul(coef, rcoef);
+            if !f.is_zero(c) {
+                self.mask_product_into(m0, rmask, c, out);
+            }
+        }
+    }
+
+    fn mask_product_into(&self, ma: u64, mb: u64, coef: F::Elem, out: &mut Vec<(u64, F::Elem)>) {
+        if self.field.is_zero(coef) {
+            return;
+        }
+        if (ma & mb) == 0 {
+            out.push((ma | mb, coef));
+            return;
+        }
+        let mut cur = vec![(ma, coef)];
+        let mut next = Vec::new();
+        let mut bits = mb;
+        while bits != 0 {
+            let j = bits.trailing_zeros() as usize;
+            bits &= bits - 1;
+            next.clear();
+            for &(m, c) in &cur {
+                self.mul_var_into(m, j, c, &mut next);
+            }
+            merge_masks(&self.field, &mut next);
+            std::mem::swap(&mut cur, &mut next);
+        }
+        out.extend(cur);
+    }
+
+    pub fn mul_mono(&self, g: &GPoly<F::Elem>, u: Mono) -> GPoly<F::Elem> {
+        let terms = g.monos.iter().copied().zip(g.coefs.iter().copied());
+        self.mul_terms(terms, g.len(), u)
+    }
+
+    fn mul_elem(&self, g: &Elem<F::Elem>, u: Mono) -> GPoly<F::Elem> {
+        self.mul_terms(g.terms(self.field.zero()), g.len(), u)
+    }
+
+    fn mul_terms(
+        &self,
+        g: impl Iterator<Item = (Mono, F::Elem)>,
+        len: usize,
+        u: Mono,
+    ) -> GPoly<F::Elem> {
+        let (mu, fu) = (mask_of(u), free_of(u));
+        let mut terms: Vec<(Mono, F::Elem)> = Vec::with_capacity(len);
+        let mut carried = false;
+        let mut tmp: Vec<(u64, F::Elem)> = Vec::new();
+        for (m, c) in g {
+            let mm = mask_of(m);
+            let fr = add_free(free_of(m), fu);
+            if mm & mu == 0 {
+                terms.push((mono(mm | mu, fr), c));
+            } else {
+                carried = true;
+                tmp.clear();
+                self.mask_product_into(mm, mu, c, &mut tmp);
+                for &(x, cc) in &tmp {
+                    terms.push((mono(x, fr), cc));
+                }
+            }
+        }
+        if carried {
+            GPoly::from_terms(&self.field, terms)
+        } else {
+            GPoly {
+                monos: terms.iter().map(|t| t.0).collect(),
+                coefs: terms.iter().map(|t| t.1).collect(),
+            }
+        }
+    }
+
+    pub fn from_raw(&self, terms: &[(Vec<u32>, F::Elem)]) -> GPoly<F::Elem> {
+        let f = &self.field;
+        let n_t = self.n_tower();
+        let mut out: Vec<(Mono, F::Elem)> = Vec::new();
+        let mut cur: Vec<(u64, F::Elem)> = Vec::new();
+        let mut next: Vec<(u64, F::Elem)> = Vec::new();
+        for (e, c) in terms {
+            assert_eq!(e.len(), self.n_vars(), "f4_tower_generic: exponent length");
+            if f.is_zero(*c) {
+                continue;
+            }
+            let mut fr = [0u8; MAX_FREE];
+            for k in 0..self.n_free {
+                fr[k] =
+                    u8::try_from(e[n_t + k]).expect("f4_tower_generic: free exponent above 255");
+            }
+            cur.clear();
+            cur.push((0, *c));
+            for (j, &ej) in e.iter().take(n_t).enumerate() {
+                for _ in 0..ej {
+                    next.clear();
+                    for &(m, cc) in &cur {
+                        self.mul_var_into(m, j, cc, &mut next);
+                    }
+                    merge_masks(f, &mut next);
+                    std::mem::swap(&mut cur, &mut next);
+                }
+            }
+            for &(m, cc) in &cur {
+                out.push((mono(m, fr), cc));
+            }
+        }
+        GPoly::from_terms(f, out)
+    }
+
+    pub fn eval(&self, g: &GPoly<F::Elem>, x: &[F::Elem]) -> F::Elem {
+        let f = &self.field;
+        let n_t = self.n_tower();
+        let mut acc = f.zero();
+        for (&m, &c) in g.monos.iter().zip(&g.coefs) {
+            let mut t = c;
+            let mut bits = mask_of(m);
+            while bits != 0 {
+                let j = bits.trailing_zeros() as usize;
+                bits &= bits - 1;
+                t = f.mul(t, x[j]);
+            }
+            for (k, &e) in free_of(m).iter().enumerate().take(self.n_free) {
+                if e > 0 {
+                    t = f.mul(t, f.pow_u64(x[n_t + k], u64::from(e)));
+                }
+            }
+            acc = f.add(acc, t);
+        }
+        acc
+    }
+
+    /// Normal form of `g` modulo a reduced grevlex Gröbner basis `basis` in `self`.
+    pub fn reduce_mod_basis(&self, g: &GPoly<F::Elem>, basis: &[GPoly<F::Elem>]) -> GPoly<F::Elem> {
+        let f = &self.field;
+        let mut work = g.clone();
+        let mut rem_monos = Vec::new();
+        let mut rem_coefs = Vec::new();
+        while !work.monos.is_empty() {
+            let lm = work.monos[0];
+            let lc = work.coefs[0];
+            if let Some(b) = basis.iter().find(|b| b.lm().is_some_and(|blm| divides(blm, lm))) {
+                let q = quotient(lm, b.monos[0]);
+                let inv_blc = f.inv(b.coefs[0]).expect("basis leading coef non-zero");
+                let scale = f.neg(f.mul(lc, inv_blc));
+                let prod = self.mul_mono(b, q);
+                let mut terms: Vec<(Mono, F::Elem)> = work
+                    .monos
+                    .iter()
+                    .copied()
+                    .zip(work.coefs.iter().copied())
+                    .collect();
+                for (&pm, &pc) in prod.monos.iter().zip(&prod.coefs) {
+                    terms.push((pm, f.mul(scale, pc)));
+                }
+                work = GPoly::from_terms(f, terms);
+            } else {
+                rem_monos.push(lm);
+                rem_coefs.push(lc);
+                work.monos.remove(0);
+                work.coefs.remove(0);
+            }
+        }
+        GPoly {
+            monos: rem_monos,
+            coefs: rem_coefs,
+        }
+    }
+}
+
+impl<F: PrimeField> TowerRingOps<F> for GQuadTowerRing<F> {
+    #[inline]
+    fn field(&self) -> &F {
+        &self.field
+    }
+    #[inline]
+    fn n_tower(&self) -> usize {
+        self.rules.len()
+    }
+    #[inline]
+    fn n_free(&self) -> usize {
+        self.n_free
+    }
+    fn check(&self) {
+        GQuadTowerRing::check(self);
+    }
+    fn mul_elem(&self, g: &Elem<F::Elem>, u: Mono) -> GPoly<F::Elem> {
+        GQuadTowerRing::mul_elem(self, g, u)
+    }
+}
+
 /// The number of standard monomials of `R / (lms)` (tower variables
 /// square-free), or `None` above `bound` or when infinite: with a radical
 /// zero-dimensional ideal, its number of points.
@@ -1130,8 +1622,8 @@ struct RowDesc {
 }
 
 #[allow(clippy::too_many_arguments)]
-fn scan_products<F: PrimeField>(
-    ring: &GTowerRing<F>,
+fn scan_products<F: PrimeField, R: TowerRingOps<F>>(
+    ring: &R,
     polys: &[Elem<F::Elem>],
     todo: &[(Mono, u32)],
     skip: usize,
@@ -1537,14 +2029,25 @@ pub fn f4_tower_generic<F: PrimeField>(
     f4_generic_inner(input, ring, opts, None)
 }
 
-fn f4_generic_inner<F: PrimeField>(
+/// F4 over a general quadratic bitmask quotient ring [`GQuadTowerRing`],
+/// using the exact same symbolic preprocessing, Gebauer–Möller criteria,
+/// tower pairs and lazy dense elimination kernels as [`f4_tower_generic`].
+pub fn f4_quad_tower_generic<F: PrimeField>(
     input: &[GPoly<F::Elem>],
-    ring: &GTowerRing<F>,
+    ring: &GQuadTowerRing<F>,
+    opts: &TowerF4Options,
+) -> GTowerF4Report<F::Elem> {
+    f4_generic_inner(input, ring, opts, None)
+}
+
+fn f4_generic_inner<F: PrimeField, R: TowerRingOps<F>>(
+    input: &[GPoly<F::Elem>],
+    ring: &R,
     opts: &TowerF4Options,
     mut admission: Option<&mut Admission<'_>>,
 ) -> GTowerF4Report<F::Elem> {
     ring.check();
-    let f = &ring.field;
+    let f = ring.field();
     assert!(
         f.lazy_capacity() >= 1,
         "f4_tower_generic: the backend's lazy capacity is zero"
@@ -2033,7 +2536,7 @@ fn f4_generic_inner<F: PrimeField>(
         if let Some(bound) = opts.stop_staircase {
             if !s.pairs.is_empty() {
                 if let Some(count) =
-                    staircase_at_most(&s.active_lms(), ring.n_tower(), ring.n_free, bound)
+                    staircase_at_most(&s.active_lms(), ring.n_tower(), ring.n_free(), bound)
                 {
                     rep.staircase_at_stop = Some(count);
                     break;
