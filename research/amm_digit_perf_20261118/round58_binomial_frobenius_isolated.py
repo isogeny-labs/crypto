@@ -111,7 +111,7 @@ mod round58 {
          for leading in [1,p-1] {
            let before=before::round58_whole(p,degree,c,leading);
            let after=after::round58_whole(p,degree,c,leading);
-           assert_eq!(before,after,"complete stream p={p} d={degree} c={c} leading={leading}");
+           assert_eq!(format!("{before:?}"),format!("{after:?}"),"complete stream p={p} d={degree} c={c} leading={leading}");
          }
        }
      }
