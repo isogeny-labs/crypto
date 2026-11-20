@@ -50,8 +50,31 @@ use std::collections::{HashMap, HashSet};
 
 // ---------------------------------------------------------------- field
 
+/// Test-only operation counters (thread-local), used to compare op counts of
+/// alternative field-arithmetic schedules.  Compiled out of non-test builds.
+#[cfg(test)]
+pub mod opcount {
+    use std::cell::Cell;
+    thread_local! {
+        pub static MULM: Cell<u64> = const { Cell::new(0) };
+        pub static INVM: Cell<u64> = const { Cell::new(0) };
+        pub static SQRTM: Cell<u64> = const { Cell::new(0) };
+    }
+    pub fn reset() {
+        MULM.with(|c| c.set(0));
+        INVM.with(|c| c.set(0));
+        SQRTM.with(|c| c.set(0));
+    }
+    /// `(sqrtm, invm, mulm)`; mulm includes those inside powm/invm/sqrtm.
+    pub fn snapshot() -> (u64, u64, u64) {
+        (SQRTM.with(|c| c.get()), INVM.with(|c| c.get()), MULM.with(|c| c.get()))
+    }
+}
+
 #[inline]
 pub fn mulm(a: u64, b: u64, p: u64) -> u64 {
+    #[cfg(test)]
+    opcount::MULM.with(|c| c.set(c.get() + 1));
     ((a as u128 * b as u128) % p as u128) as u64
 }
 #[inline]
@@ -84,6 +107,8 @@ pub fn powm(mut a: u64, mut e: u64, p: u64) -> u64 {
     r
 }
 pub fn invm(a: u64, p: u64) -> u64 {
+    #[cfg(test)]
+    opcount::INVM.with(|c| c.set(c.get() + 1));
     assert!(!a.is_multiple_of(p), "inverse of zero");
     powm(a, p - 2, p)
 }
@@ -92,6 +117,8 @@ pub fn is_square(a: u64, p: u64) -> bool {
 }
 /// Tonelli–Shanks; `None` for a non-residue.
 pub fn sqrtm(a: u64, p: u64) -> Option<u64> {
+    #[cfg(test)]
+    opcount::SQRTM.with(|c| c.set(c.get() + 1));
     let a = a % p;
     if a == 0 {
         return Some(0);
