@@ -1072,20 +1072,51 @@ fn sparse_solve_for_k(
 /// `n` must be the prime order of `D_1`; the linear algebra inverts
 /// pivots modulo `n`.  The result is verified by scalar multiplication
 /// before it is returned.
-pub fn binary_hec_index_calculus_dlp(
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum BhecIndexCalculusStage {
+    FactorBase,
+    RelationCollection,
+    LinearAlgebra,
+    Verification,
+}
+
+/// Solve with relation labels projected through a homomorphism before the
+/// modular elimination.
+///
+/// A relation collected in the Jacobian has the form
+/// `a*D1 + b*D2 = sum(c_i*F_i)`.  If a homomorphism sends `D1` and `D2` to
+/// `label_scale*G` and `label_scale*Q`, respectively, while every image of a
+/// factor-base class lies in `<G>`, multiplying both labels by
+/// `label_scale` makes the modular system sound even when the original
+/// factor-base classes do not lie in `<D1>`.  The ordinary-binary cover
+/// adapter uses `label_scale = map_degree * source_cofactor` after
+/// pushforward and cofactor clearing.
+pub fn binary_hec_projected_index_calculus_dlp<F>(
     curve: &HyperellipticCurve,
     d1: &MumfordDivisor,
     d2: &MumfordDivisor,
     n: &BigUint,
+    label_scale: &BigUint,
     params: &BhecIndexCalculusParams,
-) -> (Option<BigUint>, HecIndexCalculusReport) {
+    mut stage: F,
+) -> (Option<BigUint>, HecIndexCalculusReport)
+where
+    F: FnMut(BhecIndexCalculusStage),
+{
     let mut report = HecIndexCalculusReport::default();
+    let label_scale = label_scale % n;
+    if label_scale.is_zero() {
+        return (None, report);
+    }
     let fb_size = if params.fb_size == 0 {
         default_factor_base_size(curve)
     } else {
         params.fb_size
     };
+    stage(BhecIndexCalculusStage::FactorBase);
+    let factor_base_started = Instant::now();
     let fb = build_factor_base(curve, fb_size, params.seed);
+    report.factor_base_wall_ns = factor_base_started.elapsed().as_nanos() as u64;
     report.factor_base_size = fb.len();
     if fb.is_empty() {
         return (None, report);
@@ -1095,16 +1126,47 @@ pub fn binary_hec_index_calculus_dlp(
     let mut answer = None;
     for _ in 0..4 {
         let wanted = m + 1 + extra;
+        stage(BhecIndexCalculusStage::RelationCollection);
+        let collection_started = Instant::now();
         let collected =
             collect_relations_parallel(curve, d1, d2, n, &fb, wanted, params, &mut report);
+        report.relation_collection_wall_ns = report
+            .relation_collection_wall_ns
+            .saturating_add(collection_started.elapsed().as_nanos() as u64);
         if collected.len() < m + 1 {
             return (None, report);
         }
+        let projected: Vec<HecRelation> = collected
+            .iter()
+            .map(|relation| HecRelation {
+                coef_a: (&relation.coef_a * &label_scale) % n,
+                coef_b: (&relation.coef_b * &label_scale) % n,
+                entries: relation.entries.clone(),
+            })
+            .collect();
+        stage(BhecIndexCalculusStage::LinearAlgebra);
         let started = Instant::now();
-        let solved = solve_for_logarithm(&collected, m, n, &params.linear_algebra, &mut report);
+        let solved = solve_for_logarithm(&projected, m, n, &params.linear_algebra, &mut report);
         report.solve_wall_ns += started.elapsed().as_nanos() as u64;
         if let Some(k) = solved {
-            if d1.scalar_mul_fast(&k, curve) == *d2 {
+            stage(BhecIndexCalculusStage::Verification);
+            let started = Instant::now();
+            let verified = d1.scalar_mul_fast(&k, curve) == *d2;
+            report.verification_wall_ns = report
+                .verification_wall_ns
+                .saturating_add(started.elapsed().as_nanos() as u64);
+            if !k.is_zero() {
+                report.verification_doubles = report
+                    .verification_doubles
+                    .saturating_add(k.bits() as usize);
+                report.verification_adds = report.verification_adds.saturating_add(
+                    k.to_u64_digits()
+                        .iter()
+                        .map(|digit| digit.count_ones() as usize)
+                        .sum::<usize>(),
+                );
+            }
+            if verified {
                 answer = Some(k);
                 break;
             }
@@ -1114,12 +1176,19 @@ pub fn binary_hec_index_calculus_dlp(
     let Some(k) = answer else {
         return (None, report);
     };
-    if d1.scalar_mul_fast(&k, curve) == *d2 {
-        report.solved = true;
-        (Some(k), report)
-    } else {
-        (None, report)
-    }
+    report.solved = true;
+    (Some(k), report)
+}
+
+/// Solve `D_2 = k*D_1` with the historical unprojected relation labels.
+pub fn binary_hec_index_calculus_dlp(
+    curve: &HyperellipticCurve,
+    d1: &MumfordDivisor,
+    d2: &MumfordDivisor,
+    n: &BigUint,
+    params: &BhecIndexCalculusParams,
+) -> (Option<BigUint>, HecIndexCalculusReport) {
+    binary_hec_projected_index_calculus_dlp(curve, d1, d2, n, &BigUint::one(), params, |_| {})
 }
 
 // ── Orders and Hasse interval ──────────────────────────────────────────

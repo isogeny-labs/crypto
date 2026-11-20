@@ -77,7 +77,7 @@ into a completed phase result. [pcc:unverified]
 | Requirement | Exact Phase 1 object or route | Implementation evidence required before admission |
 |---|---|---|
 | Direct hyperelliptic/Jacobian cell | `jcv1-g2-fp10-4c1c114a`, `J: y^2 = 706 + 731x + 331x^2 + 360x^3 + 270x^4 + x^5` over `F_769`, `#J=571017=3*190339` | pinned explicit curve and generator, 32 public targets, `rho.negation` reference, `ic.hyperelliptic_v2` candidate, source-independent answer replay, cold wall and native work retained |
-| Typed cover-transfer route | panel source `P1-K0-23`, `r=2095853`, through `C: v^2+u^2v=u^7+u` and the degree-three pullback | exact field/model binding, construction certificate, `gcd(3,r)=1` subgroup check, destination rho control, destination BSGS candidate, scalar replay on the source, and all nine exclusive cost phases |
+| Typed cover-transfer route | panel source `P1-K0-23`, `r=2095853`, through `C: v^2+u^2v=u^7+u` and the degree-three pullback | exact field/model binding, construction certificate, `gcd(3,r)=1` subgroup check, generic destination rho/BSGS controls, the transfer-aware characteristic-two genus-3 relation candidate, scalar replay on the source, and all nine exclusive cost phases |
 | Evidence boundary | both paths | planning and smoke checks are implementation evidence only; Phase 1 remains `planned_unmeasured` until the frozen 32-target specs complete and pass the protocol gates |
 
 The typed transfer assessment is

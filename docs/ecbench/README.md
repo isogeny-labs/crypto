@@ -578,6 +578,7 @@ default; the ids are:
 | `ic.tensor_contraction_v1` | ic | toy index calculus by exact sparse tensor contraction (`crates/ecdl-tensor-ic`); prime-order curves (cofactor 1), `m ≥ 2`, `max_restarts ≥ 1`, refused at plan time otherwise |
 | `ic.tensor_contraction_cofactor_v1` | ic | the same toy on a fixed-cofactor prime curve (#E = c·r, c > 1, r > c; `ecbench::tensor_cofactor`): free S_i ∈ E, A_i = [c]S_i hashed into F_i ⊂ G, preimages of each F_i listed once per draw; `m ≥ 2`, `max_restarts ≥ 1`, refused at plan time otherwise (c = 1 is `ic.tensor_contraction_v1`) |
 | `jacobian_image.rho3`, `jacobian_image.bsgs`, `…_field_tally` | rho, bsgs | rho and textbook BSGS in the genus-3 Jacobian image of the certified degree-three pullback of a binary curve; no source-GAE conversion exists, so `total_gae` is 0 and the Cantor and field work is counted `_uncharged` (the `_field_tally` ids tally the complete instrumented route and are accounting-only; their wall time includes the ledger) |
+| `jacobian_image.genus3_projected_ic_v1` | ic | characteristic-two genus-3 hyperelliptic index calculus on the exact cover image: degree-one factor-base relations and sparse elimination modulo `r`; applying `phi_*` and clearing the exact source cofactor gives every factor-base column a valid source-subgroup logarithm and scales the known labels by `3h`. Generic destination rho/BSGS remain controls. Destination native work is unpriced in source GAE; the final source replay is charged. |
 | `ic.hyperelliptic_thread` | ic | the hyperelliptic thread's index calculus (ADH/Gaudry: degree-1 places folded by ±, factor-base walk, sparse elimination mod `r`, optional single large primes) on a genus 2–4 Jacobian, `hyperelliptic_*` curves only |
 | `ic.cm_folded_native_v1`, `ic.cm_folded_recurrence_v1`, `ic.cm_folded_native_d43_v1` | ic | the CM scalar-orbit signed MITM2 controls with a native backend, prime curves only; frozen: their records carry `total_gae` 0 |
 | `ic.cm_folded_native_v2`, `ic.cm_folded_recurrence_v2`, `ic.cm_folded_native_d43_v2` | ic | the same three controls with the replay's counted operations charged (2026-10-28): `independent_replay` carries them as GAE, `total_gae` is the phase sum, and `unpriced` names the `native_*_uncharged` counters instead of a sentence |
@@ -622,6 +623,7 @@ Curves of higher genus and the transfers are described in
 | `rho.negation_v2`, `rho.signed_frobenius_v2`, `rho.signed_frobenius_strong_v2` | as the matching first-rule id under the `_v2` accounting (the Accounting v2 paragraph below); the strong id's jump table, lanes and start multiples are charged and its candidate checks are a `verification` phase | as the first-rule id; the `_v2` walk also counts the distinguished-point table queries and inserts |
 | `rho.signed_frobenius_strong` | group additions exactly; each scalar multiplication (jump table, walk start stride, candidate checks) at `1.5·log₂ r` additions, `ic_boundary::signed_frobenius_rho`'s convention | canonicalisations, partition hashes, distinguished-point table queries and inserts |
 | `jacobian_image.rho3`, `jacobian_image.bsgs` | none until a versioned conversion to source-curve GAE is certified | construction of the same-field degree-three genus-3 cover, both point-class pullbacks, Cantor additions/doublings/scalar multiplications, rho walk/restarts/collisions, BSGS table inserts/lookups; cold solve wall includes the entire route |
+| `jacobian_image.genus3_projected_ic_v1` | the final source `[d]G=Q` replay only | cover construction and pullbacks, factor-base construction, Cantor walk operations, characteristic-two smoothness calls, sparse modular row operations, and destination replay; the nine cold wall phases include all of it even where no source-GAE conversion exists |
 | `rho.negation_strong` | every `F_q` multiplication on the tower's counter (`Gf2q::muls`): the jump table and start points (`setup`), every step with its share of the batched inversion, the start additions, the escape doublings and unbatched additions (`search`), each canonicalisation at one `F_q` multiplication (`canonicalisation`: four `F_q` additions and a comparison, no multiplication, so one is an upper bound), the candidate checks (`check`); each phase's GAE is its multiplications over the curve's `fq_muls_per_add`, the divisor `solve_ic_f2m4` prices IC with | partition hashes, distinguished-point tests, table queries and inserts |
 | `rho.signed_frobenius_strong_legacy` | identical to `rho.signed_frobenius_strong`; comparison-only implementation control | identical to `rho.signed_frobenius_strong` |
 | `rho.negation_lanes` | as `rho.negation`, for every lane: walks still in flight when another lane's collision recovers the logarithm are charged too, so `S` sits a few percent above `rho.negation`'s | canonicalisations. Its `field_ops` block records the batched work actually performed: per round of `n` additions, `3(n − 1)` multiplications and one inversion for the shared inverse, then `2M + 1S` per addition |
@@ -754,17 +756,18 @@ pricing from the reported group-addition equivalents. Solver conflicts and
 other work without a pinned conversion stay visible as unpriced counters;
 the recorded `S` is therefore a lower bound on the complete pipeline cost.
 
-The `jacobian_image.*` adapters are transfer diagnostics, not source-curve
-speedup rows. They reconstruct `binary_cubic_pullback_v1`, pull the generator
-and unseen target into its exact cyclic Jacobian image, solve there without
-receiving the planted logarithm, verify the collision in `Jac(H)`, and return
-the candidate for the runner's independent source-curve replay. Their native
-phase counters are meaningful within that destination. Their `total_gae` is
-deliberately zero and their records are lower bounds because one genus-3
-Cantor operation is not one elliptic-curve addition. Use cold wall and the
-resource vector to identify implementation bottlenecks; promote a net-cost
-claim only after supplying a pinned conversion or a matched end-to-end wall
-comparison that clears the A/A and isolation gates.
+The `jacobian_image.*` adapters are transfer diagnostics until a matched
+end-to-end comparison clears the claim gates. They build the certified cover,
+pull the generator and unseen target into its exact cyclic Jacobian image,
+solve there without receiving the planted logarithm, verify any candidate in
+`Jac(H)`, and return it for source-curve replay. The projected-IC adapter also
+collects actual genus-3 relations; its `phi_*` plus cofactor-clearing equation
+makes the modular factor-base columns valid on the exact order-`r` source
+subgroup. Native phase counters are meaningful within the destination, while
+only the source replay currently contributes source GAE. The remaining native
+work makes the record a lower bound in that unit. Use the complete cold wall
+and resource vector for the algorithmic comparison; promote a net-cost claim
+only after the A/A, isolation, recovery, and complete-accounting gates clear.
 
 The standing strong-rho implementation applies paired normal-basis maps and
 paired coefficient reductions during signed-Frobenius canonicalization. The

@@ -24,11 +24,11 @@
     "edges": [
       "OrdinaryBinaryCover::new and verify_certificate",
       "pullback_point_class for generator and target",
-      "hcdlp_pollard_rho_counted or hcdlp_bsgs_counted",
+      "generic rho/BSGS control or projected characteristic-two hyperelliptic relation collection",
       "identity scalar recovery on the injective image",
       "source [k]G=Q replay"
     ],
-    "weakest_open_obligation": "run the preregistered 32-public-target Phase 1 comparison and retain its replay receipts before assessing advantage"
+    "weakest_open_obligation": "run the preregistered 32-public-target Phase 1 comparison, retaining specialized-solver exhaustion as censored evidence and retaining replay receipts for every recovered target before assessing advantage"
   },
   "algebraic_screen": {
     "dimension": {"state":"supported","evidence":["src/binary_ecc/cover_transfer.rs","docs/curves/COVERS.md"],"scope":"source dimension one; destination curve genus three; DLP group is its dimension-three Jacobian"},
@@ -44,19 +44,19 @@
     "map_correctness": {"state":"supported","evidence":["OrdinaryBinaryCover::pullback_point_class","OrdinaryBinaryCover::pull_push_composition_certificate"],"scope":"point-class pullback and degree-three composition witness on the implemented image"},
     "subgroup_preservation": {"state":"supported","evidence":["OrdinaryBinaryCover::subgroup_transfer_status","r=2095853 and gcd(3,r)=1"],"scope":"conditional on the exact registered source subgroup order, which the panel cell supplies"},
     "scalar_recovery": {"state":"supported","evidence":["src/cryptanalysis/ecbench/methods.rs:solve_jacobian_image"],"scope":"the image solver returns the same scalar modulo r and ecbench replays it on the source"},
-    "destination_solver_applicability": {"state":"supported","evidence":["jacobian_image.rho3_v2","jacobian_image.bsgs_v2","docs/ecbench/specs/n83-genus3-image-n23-extension.json"],"scope":"generic rho and BSGS operate on the exact pullback image; no specialized genus-3 index calculus is claimed"},
+    "destination_solver_applicability": {"state":"supported","evidence":["jacobian_image.rho3_v2","jacobian_image.bsgs_v2","jacobian_image.genus3_projected_ic_v1","OrdinaryBinaryCover::pushforward_arbitrary_jacobian_class","src/cryptanalysis/binary_hyperelliptic_index_calculus.rs"],"scope":"generic rho and BSGS operate on the exact pullback image; the specialized candidate collects degree-one-place relations on the exact genus-3 cover, applies phi_* to each relation, and clears the exact source cofactor so every factor-base column has a logarithm in the unique order-r source subgroup"},
     "computational_advantage": {"state":"unknown","evidence":[],"scope":"no canonical Phase 1 measurement has run"},
     "scaling_support": {"state":"unknown","evidence":["docs/ecbench/specs/n83-genus3-image-toy-panel.json"],"scope":"toy and n=23 adapters exist, but the canonical phased scaling series is unmeasured"},
     "novelty_within_boundary": {"state":"not_applicable","evidence":["docs/ecbench/specs/n83-genus3-image-n23-extension.json"],"scope":"this task integrates an existing route; it makes no novelty claim"}
   },
   "solver_assessment": {
-    "name": "Phase 1 genus-3 pullback-image generic controls",
-    "family": "generic_group",
-    "implementation": "jacobian_image.rho3_v2 and jacobian_image.bsgs_v2 in src/cryptanalysis/ecbench/methods.rs",
+    "name": "Phase 1 transfer-aware characteristic-two genus-3 index calculus",
+    "family": "hyperelliptic_index_calculus_with_pushforward_projection",
+    "implementation": "jacobian_image.genus3_projected_ic_v1 in src/cryptanalysis/ecbench/methods.rs, using src/cryptanalysis/binary_hyperelliptic_index_calculus.rs; jacobian_image.rho3_v2 and jacobian_image.bsgs_v2 remain generic destination controls",
     "applicability": {"state":"supported","evidence":["src/cryptanalysis/ecbench/methods.rs","docs/ecbench/specs/n83-genus3-image-n23-extension.json"],"scope":"binary ordinary source, exact degree-three cover, order-r image subgroup"},
-    "image_subgroup_access": {"state":"supported","evidence":["OrdinaryBinaryCover::pullback_point_class"],"scope":"both generator and target are pulled into the same image subgroup"},
-    "relation_or_search_compatibility": {"state":"supported","evidence":["hcdlp_pollard_rho_counted","hcdlp_bsgs_counted"],"scope":"generic destination search only; no relation collector is asserted"},
-    "individual_log_and_recovery": {"state":"supported","evidence":["src/cryptanalysis/ecbench/methods.rs:solve_jacobian_image"],"scope":"candidate is verified in the destination and replayed on the source"}
+    "image_subgroup_access": {"state":"supported","evidence":["OrdinaryBinaryCover::pullback_point_class","OrdinaryBinaryCover::pushforward_arbitrary_jacobian_class"],"scope":"generator and target are pulled into the same image subgroup; arbitrary relation classes have an implemented pushforward back to the exact source curve"},
+    "relation_or_search_compatibility": {"state":"supported","evidence":["binary_hec_projected_index_calculus_dlp","OrdinaryBinaryCover::pushforward_arbitrary_jacobian_class","source group order 4*r with r prime"],"scope":"for a relation a*phi^*G+b*phi^*Q=sum c_i F_i, pushforward and cofactor clearing give 12a*G+12b*Q=sum c_i*[4]phi_*F_i; every right-hand column lies in the unique order-r subgroup, so sparse elimination modulo r is sound"},
+    "individual_log_and_recovery": {"state":"supported","evidence":["binary_hec_projected_index_calculus_dlp","src/cryptanalysis/ecbench/methods.rs:solve_genus3_projected_ic"],"scope":"the target logarithm is a column of the sparse relation system, then verified in the destination and replayed on the source; budget exhaustion returns no candidate and is retained"}
   },
   "cost_comparison": {
     "accounting_complete": "unknown",
@@ -75,7 +75,7 @@
     "verified_pairs": 0,
     "scaling_sizes": 0,
     "replay_receipts": [],
-    "unpriced_work": ["destination Jacobian operations have no certified source-GAE conversion"],
+    "unpriced_work": ["destination Jacobian operations, characteristic-two smoothness calls, and modular row operations have no certified source-GAE conversion"],
     "resource_envelope": null,
     "evidence": []
   },
@@ -87,7 +87,7 @@
     {"id":"cover-methodology","uri":"docs/transfer-assessment/METHODOLOGY.md","revision":"337bb4ef2e"}
   ],
   "open_obligations": [
-    "Run the preregistered 32-public-target four-arm spec under its required L2 isolation.",
+    "Run the preregistered 32-public-target five-arm spec under its required L2 isolation and retain specialized-solver exhaustion rather than substituting a generic solve.",
     "Retain replay receipts and report wall-time comparisons separately from the still-unpriced source-GAE conversion for destination Jacobian operations."
   ],
   "verdicts": {

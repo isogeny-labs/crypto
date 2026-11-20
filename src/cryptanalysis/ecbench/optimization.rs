@@ -351,6 +351,12 @@ const POLICIES: &[PolicyDecl] = &[
         JacobianImageNative
     ),
     policy!(
+        "jacobian_image.genus3_projected_ic_v1",
+        NativeGrid,
+        SpecializedDomain,
+        JacobianImageNative
+    ),
+    policy!(
         "bsgs.textbook",
         ReplayControl,
         FrozenHistorical,

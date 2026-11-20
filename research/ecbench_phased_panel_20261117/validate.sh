@@ -84,7 +84,8 @@ jq -e '
     .route_id == "P1-K0-23-G3-COVER" and .phase == 1 and
     .source_cell == "P1-K0-23" and .map_degree == 3 and
     .source_reference == "rho.signed_frobenius_strong" and
-    .destination_methods == ["jacobian_image.rho3_v2", "jacobian_image.bsgs_v2"] and
+    .destination_methods == ["jacobian_image.rho3_v2", "jacobian_image.genus3_projected_ic_v1"] and
+    .destination_controls == ["jacobian_image.bsgs_v2"] and
     .cost_adapter == "binary_cubic_pullback_nine_phase_v2")
 ' "$panel" >/dev/null
 
@@ -116,6 +117,7 @@ jq -e '
     "rho.signed_frobenius_strong",
     "jacobian_image.rho3_v2",
     "jacobian_image.bsgs_v2",
+    "jacobian_image.genus3_projected_ic_v1",
     "rho.signed_frobenius_strong"
   ]
 ' "$transfer_spec" >/dev/null

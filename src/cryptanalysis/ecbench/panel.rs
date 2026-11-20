@@ -92,6 +92,8 @@ pub struct TransferRoute {
     pub subgroup_condition: String,
     pub source_reference: String,
     pub destination_methods: Vec<String>,
+    #[serde(default)]
+    pub destination_controls: Vec<String>,
     pub cost_adapter: String,
     pub assessment: String,
 }
@@ -451,7 +453,11 @@ impl Panel {
             || phase_one_route.map_degree != 3
             || phase_one_route.source_reference != "rho.signed_frobenius_strong"
             || phase_one_route.destination_methods
-                != ["jacobian_image.rho3_v2", "jacobian_image.bsgs_v2"]
+                != [
+                    "jacobian_image.rho3_v2",
+                    "jacobian_image.genus3_projected_ic_v1",
+                ]
+            || phase_one_route.destination_controls != ["jacobian_image.bsgs_v2"]
         {
             return Err(
                 "the Phase 1 cover-transfer route does not match its frozen contract".into(),

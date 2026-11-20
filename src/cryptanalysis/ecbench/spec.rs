@@ -478,6 +478,13 @@ fn validate_curve_policy(spec: &Spec) -> Result<(), String> {
                             ));
                         }
                     }
+                    for method in &transfer.destination_controls {
+                        if !has_arm(method, Role::Control) {
+                            return Err(format!(
+                                "transfer route `{route_id}` requires destination control arm `{method}`"
+                            ));
+                        }
+                    }
                 }
                 other => {
                     return Err(format!(
@@ -1127,8 +1134,10 @@ mod tests {
                      "method": {"id": "rho.signed_frobenius_strong"}},
                     {"name": "destination-rho", "role": "baseline",
                      "method": {"id": "jacobian_image.rho3_v2"}},
-                    {"name": "destination-bsgs", "role": "candidate",
+                    {"name": "destination-bsgs", "role": "control",
                      "method": {"id": "jacobian_image.bsgs_v2"}},
+                    {"name": "destination-genus3-ic", "role": "candidate",
+                     "method": {"id": "jacobian_image.genus3_projected_ic_v1"}},
                     {"name": "source-rho-aa", "role": "control",
                      "method": {"id": "rho.signed_frobenius_strong"}}
                 ],

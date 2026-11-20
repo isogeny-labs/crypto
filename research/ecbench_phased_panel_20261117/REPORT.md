@@ -2,7 +2,7 @@
 title: "A phased curve panel for ecbench"
 subtitle: "20-, 30-, 60-, and 80-bit subgroup gates"
 author: "Isogeny Labs research planning"
-date: "2026-11-17; lane revision 2026-11-19"
+date: "2026-11-17; lane revision 2026-11-20"
 geometry: margin=0.72in
 colorlinks: true
 linkcolor: blue
@@ -38,8 +38,9 @@ Phase 1 now pins one exact direct Jacobian cell and one exact typed cover route.
 The direct entry is an 18-bit prime subgroup of a genus-2 Jacobian with
 same-Jacobian negation rho and hyperelliptic index calculus. The transfer entry
 is a degree-three same-field pullback from `P1-K0-23` to a genus-3 Jacobian
-image with source rho, destination rho/BSGS, source replay, and nine-phase cold
-wall accounting. Phases 2–4 remain blocked. These are executable
+image with source rho, generic destination rho/BSGS controls, a
+pushforward-projected characteristic-two hyperelliptic relation candidate,
+source replay, and nine-phase cold wall accounting. Phases 2–4 remain blocked. These are executable
 preregistrations, not completed measurements or speedup results [12–15].
 
 | Lane | P1 | P2 | P3 | P4 |

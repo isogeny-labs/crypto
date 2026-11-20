@@ -52,8 +52,10 @@ cover-transfer rows now have exact executable Phase 1 entries only. The direct
 lane pins `P1-JG2-18`, an 18-bit prime subgroup in an exact genus-2 Jacobian,
 with `rho.negation` and `ic.hyperelliptic_v2`. The transfer lane pins
 `P1-K0-23-G3-COVER`, the degree-three same-field pullback into a genus-3
-Jacobian image, with source rho, destination rho/BSGS, charged source replay,
-and nine exclusive cold wall phases. Phases 2–4 still fail closed. The Phase 1
+Jacobian image, with source rho, generic destination rho/BSGS controls, a
+pushforward-projected characteristic-two hyperelliptic index-calculus
+candidate, charged source replay, and nine exclusive cold wall phases. Phases
+2–4 still fail closed. The Phase 1
 specs are preregistrations, not completed benchmarks or speedup evidence.
 
 Phase 3 is partially blocked because the degree-73 Koblitz cell uses the wide Koblitz path, where

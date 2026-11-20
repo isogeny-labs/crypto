@@ -472,6 +472,18 @@ const CASES: &[(&str, Fx, P)] = &[
     ("jacobian_image.bsgs_field_tally", Fx::K0n7, &[]),
     ("jacobian_image.rho3_v2", Fx::K0n7, &[]),
     ("jacobian_image.bsgs_v2", Fx::K0n7, &[]),
+    (
+        "jacobian_image.genus3_projected_ic_v1",
+        Fx::K0n7,
+        &[
+            ("fb_size", "32"),
+            ("extra_relations", "8"),
+            ("branches", "32"),
+            ("d_step_in", "4"),
+            ("max_trials", "200000"),
+            ("threads", "1"),
+        ],
+    ),
     ("jacobian_image.rho3", Fx::Binary11, &[]),
     ("jacobian_image.bsgs", Fx::Binary11, &[]),
     ("jacobian_image.rho3_field_tally", Fx::Binary11, &[]),
@@ -597,6 +609,7 @@ const CHECK_PHASE: &[(&str, &str)] = &[
     ("ic.koblitz_batched_v2", "verify"),
     ("jacobian_image.rho3_v2", "verification"),
     ("jacobian_image.bsgs_v2", "verification"),
+    ("jacobian_image.genus3_projected_ic_v1", "verification"),
 ];
 
 fn phase_gap(rep: &SolveReport) -> f64 {

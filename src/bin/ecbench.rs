@@ -1657,7 +1657,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         "source",
                         "degree",
                         "source reference",
-                        "destination methods"
+                        "destination methods / controls"
                     );
                     for route in route_rows {
                         println!(
@@ -1667,7 +1667,13 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                             route.source_cell,
                             route.map_degree,
                             route.source_reference,
-                            route.destination_methods.join(",")
+                            route
+                                .destination_methods
+                                .iter()
+                                .chain(route.destination_controls.iter())
+                                .cloned()
+                                .collect::<Vec<_>>()
+                                .join(",")
                         );
                     }
                 }
