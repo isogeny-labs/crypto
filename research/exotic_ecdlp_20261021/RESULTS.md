@@ -1,5 +1,12 @@
 # Results: six falsifiers on prime-field ECDLP hardness
 
+**H4 native XOR follow-up (2026-11-20 UTC):** A
+[paired four-cell diagnostic](H4_prime_descent/xor_followup_20261120/README.md)
+found verified first witnesses in 33.39 and 34.85 seconds with native XOR
+on fixed `n=17` planted and ordinary-query systems. The matched CNF arms
+were censored at 180 seconds and solved in 155.57 seconds, respectively.
+The ordinary-query solver-time ratio was 4.46× on this local host.
+
 **H2 structural follow-up (2026-11-19):** A
 [Lean-checked incidence implication and exact fibre recount](H2_hermitian/direct_map_obstruction_20261119/README.md)
 rule out a nonconstant direct regular point map from the Hermitian surface

@@ -1,5 +1,12 @@
 # H4 RESULTS: FPPR prime-degree descent to F_2, m=3 (claim C4)
 
+**Native XOR follow-up (2026-11-20 UTC):** On the same fixed `n=17`
+ordinary-query system, a native XOR-DIMACS encoding yielded a verified
+first witness in 34.85 seconds versus 155.57 seconds for the paired
+Tseitin CNF encoding (4.46× solver-time ratio on an ordinary local host).
+The native planted arm solved in 33.39 seconds; its CNF pair was censored
+at 180 seconds. See [the frozen four-cell packet](xor_followup_20261120/README.md).
+
 **Solver follow-up (2026-11-19):** A fixed `n=17` ordinary-query system
 yielded a CNF/SAT witness in 147.97 seconds, verified against the original
 equations and exact solution set; its paired planted arm was censored at
