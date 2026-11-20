@@ -93,11 +93,23 @@ The null changes only the global wiring of interior ports while preserving the v
     torsion-to-`ΨSq` implication remains open. In the cubic-CM branch, one
     equivariant relation now generates all Galois twists; equality of the
     partner x-coordinate with the CM image constructs the `±` sign and the
-    Eisenstein norm-torsion relation. Its concrete interval instantiation
-    remains open.
+    Eisenstein norm-torsion relation.
     [pcc:unverified]
-13. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
-14. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
+13. **Kernel-checked 2026-11-20:** the concrete prime-field `A = 0` interval
+    instantiation is composed. Canonical roots are proved nonsingular and
+    Galois-equivariant, repeated quadratic factors are proved to have a
+    Galois splitting field without a false injectivity premise, the interval
+    collision constructs the transported cubic-CM endomorphism and its orbit
+    relation, and canonical Semaev vanishing supplies the one ordinary signed
+    point relation. Under
+    `3 * (|Gal| * (n + 3))^2 < p`, the resulting Eisenstein index is proved
+    nonzero in `ZMod p` while its integer action annihilates the selected
+    canonical point. This closes the `A = 0` Semaev-to-nonzero-torsion branch,
+    not the production torsion-to-division-polynomial integration, relation
+    yield, expected-runtime assembly, or a subexponential ECDLP theorem.
+    [pcc:unverified]
+14. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
+15. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
 
 The current `Network` stores predicates behind `Arc<dyn Predicate>`, so closure identity cannot be serialized faithfully. E0 therefore uses a hybrid semantic representation: predicates at or below 16 ports carry their complete truth table; larger production predicates carry a strict typed operation that is also their live evaluator. Tag, parameters, truth table or typed program, port order, interface and pins are bound into one SHA-256 identity. Untagged predicates are admitted only through an explicit bounded-truth-table policy for tiny fixtures and controls. Canonicalizing graph shape alone would be insufficient.
 

@@ -1521,3 +1521,43 @@ It does not establish Semaev construction or vanishing, relation collection,
 runtime, or a subexponential ECDLP theorem. The dependency remains an open
 WIP upstream PR, so rebasing or upstream integration is a separate obligation.
 [pcc:unverified]
+
+## 2026-11-20 concrete `A = 0` canonical Semaev composition
+
+`SemaevRelationSigns.lean` now constructs the scaled short-cubic curve over
+the rational function field, proves that every selected square root gives a
+nonsingular affine point, and proves that the canonical point is an
+eigenvector for the actual splitting-field Galois action. One ordinary
+zero-sum relation therefore generates every sign-twisted relation required by
+the projector. [pcc:unverified]
+
+The transported cubic-CM endomorphism is defined on the base-changed point
+group. Its x-coordinate action and pointwise `zeta^2 + zeta + 1 = 0` orbit
+identity are checked. A square-product collision constructs the nonidentity
+cubic root of unity and proves the exact identity
+`pointX(partner) = pointX(zeta(chosen))`. The splitting field is now proved
+Galois even when the collision duplicates a quadratic factor: although the
+displayed product polynomial is then nonseparable, every root lies in a
+separable nonzero quadratic factor, and those roots still generate the
+splitting field. [pcc:unverified]
+
+`evalCanonical_shortCubicScaledX_zero_implies_canonical_relation` maps
+canonical Semaev vanishing into that splitting field and returns occurrence
+coefficients `+/-1` and the exact canonical-point relation. The direct
+prime-field endpoint
+`zmodCanonicalSemaevIntervalPairCollision_implies_nonzero_index_torsion`
+composes this relation with the `3X < p` collision separation. Under
+`3 * (|Gal| * (n + 3))^2 < p`, it proves both that the resulting Eisenstein
+index is nonzero in `ZMod p` and that its integer action annihilates the
+selected canonical point. [pcc:unverified]
+
+This closes the concrete `A = 0` Semaev-to-nonzero-torsion branch. It does not
+integrate the open-PR torsion-to-`PsiSq` theorem into the production Mathlib
+pin, prove the final torsion-coordinate contradiction, establish relation
+yield, assemble expected runtime, or prove a subexponential prime-field ECDLP
+algorithm. `lake build DilationNonzeroBounds SemaevRelationSigns` completed
+9,133 jobs, and the repository proof gate reported
+`PASS 447 thm 0 trusted` across all nine tracked modules. An additional
+`leanchecker --fresh SemaevRelationSigns` replay was manually interrupted
+after about 25 minutes of sustained compute with no output; it is not counted
+as validation evidence. [pcc:unverified]
