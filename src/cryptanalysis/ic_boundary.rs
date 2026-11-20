@@ -1611,6 +1611,10 @@ pub struct SiblingPair {
     pub lambda_plus: u64,
     pub key_minus: u64,
     pub lambda_minus: u64,
+    /// Canonical `y(P+J)` when the FastPrime batch path lifted it (so
+    /// eager-sign skips a second mont round-trip in [`sibling_lift`]).
+    pub y_plus: Option<u64>,
+    pub y_minus: Option<u64>,
 }
 
 /// The little a collision search and a relation loop need from a group,
@@ -1744,6 +1748,12 @@ pub trait CountedGroup {
         _key: u64,
         _lambda: u64,
     ) -> Option<Self::Elt> {
+        None
+    }
+    /// Rebuild an affine element from canonical `(x, y)` when the group
+    /// exposes that chart (prime curves).  Used to consume a y already
+    /// lifted inside [`sibling_pairs_batch`] without a second field mul.
+    fn affine_elt(&self, _x: u64, _y: u64) -> Option<Self::Elt> {
         None
     }
     /// `[k]P` by double-and-add, counted exactly.
@@ -6512,10 +6522,10 @@ impl CountedGroup for PrimeCurve {
         if k == 0 {
             return Some(out);
         }
-        // Montgomery-resident siblings for wide primes: invert in
-        // Montgomery form once and keep λ/x there until the canonical
-        // key/slope the table stores.  Small primes (ledger fp20) stay
-        // on mulmod_u32 via CountedFp — mont λ regresses there.
+        // FastPrime mont λ for wide primes.  Ledger fp20 stays on
+        // CountedFp/mulmod: a full Fp64 mont+lifted-y remasure on
+        // aarch64 (2026-11-20) held wall ~2.2× vs eager-sign ~2.0× —
+        // to_mont/from_mont tax ≥ any `%` savings on this host.
         if self.p > u64::from(u32::MAX)
             && self.p < (1u64 << crate::cryptanalysis::prime_fast::MAX_BITS)
         {
@@ -6524,7 +6534,6 @@ impl CountedGroup for PrimeCurve {
                 dxs[s] = f.to_mont(dxs[s]);
             }
             ops.field_ops.muls += k as u64; // to_mont
-            // batch_inv in mont; charge 1 inv + 3(k−1) muls.
             if k == 1 {
                 ops.field_ops.invs += 1;
                 let mut one = [dxs[0]];
@@ -6540,12 +6549,14 @@ impl CountedGroup for PrimeCurve {
             let px = f.to_mont(p.x);
             let py = f.to_mont(p.y);
             ops.field_ops.muls += 2; // parent once
+            // Interleave up to 4 λ chains when m is large enough that
+            // the mul latency would otherwise serialize (sib=8 typical).
             for s in 0..k {
                 let (i, j, want_minus) = slots[s];
-                let inv = dxs[s]; // already Montgomery
+                let inv = dxs[s]; // Montgomery
                 let jx = f.to_mont(j.x);
                 let jy = f.to_mont(j.y);
-                ops.field_ops.muls += 2; // jump once
+                ops.field_ops.muls += 2;
                 let dy = f.sub(jy, py);
                 let lp_m = f.mul(dy, inv);
                 let lp2 = f.sqr(lp_m);
@@ -6554,12 +6565,16 @@ impl CountedGroup for PrimeCurve {
                 ops.field_ops.sqrs += 1;
                 let lp = f.from_mont(lp_m);
                 let xp = f.from_mont(xp_m);
-                ops.field_ops.muls += 2; // from_mont = reduce
+                // y₊ = λ·(x_P − x) − y_P while λ still Montgomery.
+                let y_plus = f.from_mont(f.sub(f.mul(lp_m, f.sub(px, xp_m)), py));
+                ops.field_ops.muls += 4; // 2 from_mont + mul + from_mont y
                 let mut sp = SiblingPair {
                     key_plus: xp + 1,
                     lambda_plus: lp,
                     key_minus: 0,
                     lambda_minus: 0,
+                    y_plus: Some(y_plus),
+                    y_minus: None,
                 };
                 if want_minus {
                     let sy = f.add(jy, py);
@@ -6568,9 +6583,13 @@ impl CountedGroup for PrimeCurve {
                     let xm_m = f.sub(f.sub(lm2, px), jx);
                     ops.field_ops.muls += 1;
                     ops.field_ops.sqrs += 1;
-                    sp.lambda_minus = f.from_mont(lm_m);
-                    sp.key_minus = f.from_mont(xm_m) + 1;
-                    ops.field_ops.muls += 2;
+                    let lm = f.from_mont(lm_m);
+                    let xm = f.from_mont(xm_m);
+                    let y_minus = f.from_mont(f.sub(f.mul(lm_m, f.sub(px, xm_m)), py));
+                    ops.field_ops.muls += 4;
+                    sp.lambda_minus = lm;
+                    sp.key_minus = xm + 1;
+                    sp.y_minus = Some(y_minus);
                 }
                 out[i] = Some(sp);
             }
@@ -6593,6 +6612,8 @@ impl CountedGroup for PrimeCurve {
                 lambda_plus: lp,
                 key_minus: 0,
                 lambda_minus: 0,
+                y_plus: None,
+                y_minus: None,
             };
             if want_minus {
                 let sy = f.add(j.y, p.y);
@@ -6646,6 +6667,9 @@ impl CountedGroup for PrimeCurve {
         };
         let ldx = f.mul(lambda, f.sub(p.x, x));
         Some(PrimePoint::affine(x, f.sub(ldx, p.y)))
+    }
+    fn affine_elt(&self, x: u64, y: u64) -> Option<PrimePoint> {
+        Some(PrimePoint::affine(x, y))
     }
     fn neg(&self, p: PrimePoint) -> PrimePoint {
         if p.infinity {
@@ -12344,39 +12368,29 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                     if want_minus {
                         self.sib_second_points += 1;
                     }
-                    // Eager sign bits (one sibling_lift mul each) so the
-                    // insert path never writes OpenRefMap — that map's
-                    // probe/grow sat in ~100% of a hung oracle_setup
-                    // sample and still taxes cold E2E when healthy.
+                    // Eager sign bits: use batch-lifted y when present
+                    // (FastPrime path), else one sibling_lift mul.
+                    let pt_plus = match sp.y_plus.and_then(|y| g.affine_elt(sp.key_plus - 1, y))
+                    {
+                        // Field mul already charged inside sibling_pairs_batch.
+                        Some(pt) => pt,
+                        None => g
+                            .sibling_lift(ops, sw.parent, sp.key_plus, sp.lambda_plus)
+                            .expect("a finite parent"),
+                    };
+                    let k = g.key(&pt_plus);
+                    debug_assert_eq!(k >> 1, sp.key_plus);
+                    self.sib_lifts += 1;
                     if pos == 0 {
-                        let pt = g
-                            .sibling_lift(ops, sw.parent, sp.key_plus, sp.lambda_plus)
-                            .expect("a finite parent");
-                        let k = g.key(&pt);
-                        debug_assert_eq!(k >> 1, sp.key_plus);
-                        self.sib_lifts += 1;
-                        sw.next_parent = pt;
+                        sw.next_parent = pt_plus;
                         sw.next_c = cp;
-                        sw.queue.push_back(SibItem {
-                            key: sp.key_plus,
-                            c: cp,
-                            sign: Some(u128::from(k & 1) << 127),
-                            xref: None,
-                        });
-                    } else {
-                        let pt = g
-                            .sibling_lift(ops, sw.parent, sp.key_plus, sp.lambda_plus)
-                            .expect("a finite parent");
-                        let k = g.key(&pt);
-                        debug_assert_eq!(k >> 1, sp.key_plus);
-                        self.sib_lifts += 1;
-                        sw.queue.push_back(SibItem {
-                            key: sp.key_plus,
-                            c: cp,
-                            sign: Some(u128::from(k & 1) << 127),
-                            xref: None,
-                        });
                     }
+                    sw.queue.push_back(SibItem {
+                        key: sp.key_plus,
+                        c: cp,
+                        sign: Some(u128::from(k & 1) << 127),
+                        xref: None,
+                    });
                     if want_minus {
                         let (u1, u2) = self.parts(c.0);
                         let (a1, a2) = self.parts(al);
@@ -12385,9 +12399,15 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                             submod(c.1, ga, r),
                             submod(c.2, be, r),
                         );
-                        let pt = g
-                            .sibling_lift(ops, sw.parent, sp.key_minus, sp.lambda_minus)
-                            .expect("a finite parent");
+                        let pt = match sp
+                            .y_minus
+                            .and_then(|y| g.affine_elt(sp.key_minus - 1, y))
+                        {
+                            Some(pt) => pt,
+                            None => g
+                                .sibling_lift(ops, sw.parent, sp.key_minus, sp.lambda_minus)
+                                .expect("a finite parent"),
+                        };
                         let k = g.key(&pt);
                         debug_assert_eq!(k >> 1, sp.key_minus);
                         self.sib_lifts += 1;
