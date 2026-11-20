@@ -522,6 +522,33 @@ theorem prymWeil_eq_sq_mul_realWeil (p tau eta T : K) (hT : T ≠ 0) :
   field_simp [hT]
   ring
 
+/-- Closed form for the discriminant of the residual quadratic obtained after
+removing the known target intersection from the chiral line cubic. -/
+theorem chiralBranchResidual_discriminant_closed (a x y c : K) :
+    (x - 1) ^ 2 - 4 * (a + 2 * (x + c * y) + x ^ 2 - x) =
+      -3 * x ^ 2 - 6 * x + 1 - 4 * a - 8 * c * y := by
+  ring
+
+/-- Simultaneously negating the point and chirality preserves the residual
+branch discriminant, matching the exact native chiral-swap control. -/
+theorem chiralBranchResidual_negationSwap (a x y c : K) :
+    -3 * x ^ 2 - 6 * x + 1 - 4 * a - 8 * (-c) * (-y) =
+      -3 * x ^ 2 - 6 * x + 1 - 4 * a - 8 * c * y := by
+  ring
+
+/-- If a monic cubic is a linear factor times a monic quadratic, its
+discriminant is the square of the quadratic evaluated at the linear root times
+the quadratic discriminant.  This is the singularity gate used by the branch
+experiment. -/
+theorem linearQuadratic_discriminant_factorization (x q0 q1 : K) :
+    (q1 - x) ^ 2 * (q0 - x * q1) ^ 2
+        - 4 * (q0 - x * q1) ^ 3
+        - 4 * (q1 - x) ^ 3 * (-x * q0)
+        - 27 * (-x * q0) ^ 2
+        + 18 * (q1 - x) * (q0 - x * q1) * (-x * q0) =
+      (x ^ 2 + q1 * x + q0) ^ 2 * (q1 ^ 2 - 4 * q0) := by
+  ring
+
 /-- The shared normalized at-infinity series before subtracting the target
 coordinate. Under the remaining geometric bridge it represents `S(x)/x` at
 `w=1/x`. -/
@@ -4937,6 +4964,9 @@ theorem fixedPoint_frobeniusCocycle_zero
 #print axioms prymRealWeil_discriminant_normalized
 #print axioms prymWeil_homogenized_realWeil
 #print axioms prymWeil_eq_sq_mul_realWeil
+#print axioms chiralBranchResidual_discriminant_closed
+#print axioms chiralBranchResidual_negationSwap
+#print axioms linearQuadratic_discriminant_factorization
 #print axioms fiberDenominatorSeries_eq_normalizedMap_sub_linear
 #print axioms fiberDenominatorSeries_sub
 #print axioms bostanDenominatorsNonzero

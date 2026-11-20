@@ -628,3 +628,13 @@ The next lead leaves characteristic-polynomial summaries and measures the
 signed splitting of the residual ramification quadratic on each chiral line
 through the target.
 [pcc:unverified]
+
+The [target-tethered ramification test](CHIRAL_BRANCH_RESIDUAL_PARITY_EXPERIMENT.md)
+then removes the known target intersection from each chiral line cubic and
+measures splitting of the residual quadratic.  All 12,160 reconstruction and
+root-count controls, 24,320 discriminant controls, and 5,568 rational chord
+sums pass, but the selected rule is only 796/1,502 with `p=0.994142` and no
+exact rule.  Three new Lean identities raise the audited proof surface to 236
+theorems.  The next lead tests characters of pairwise resultants between these
+residual quadratics, retaining mutual branch-divisor geometry.
+[pcc:unverified]
