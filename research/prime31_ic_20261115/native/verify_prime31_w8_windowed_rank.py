@@ -13,11 +13,35 @@ A=847514846
 B=2087444724
 N=2147446831
 G=(625037715,2100627251)
+SEED=0x7738423442383231
+TARGET_XOR=0x5441524745545338
+OFFSET_XOR=0x4f46465345545332
+MASK=(1<<64)-1
 W_ODD=[1,3,5,7,11,13,17,19]
 W_POW2=[1,2,4,8,16,32,64,128]
 WINDOWS=[
   list(range(0,8)), list(range(8,16)),list(range(16,24)),list(range(23,31))
 ]
+
+def splitmix64(state):
+    state=(state+0x9e3779b97f4a7c15)&MASK
+    z=state
+    z=((z^(z>>30))*0xbf58476d1ce4e5b9)&MASK
+    z=((z^(z>>27))*0x94d049bb133111eb)&MASK
+    return state,z^(z>>31)
+
+def nonzero_scalar(state):
+    threshold=(((1<<64)-N) % N)
+    while True:
+        state,x=splitmix64(state)
+        if x>=threshold and x%N:
+            return state,x%N
+
+def indexed_offset(t,attempt):
+    state=(SEED ^ TARGET_XOR ^ OFFSET_XOR ^
+           ((t*0xd6e8feb86659fd93)&MASK) ^
+           ((attempt*0xa0761d6478bd642f)&MASK))
+    return nonzero_scalar(state)[1]
 
 def neg(q):
     if q is None:
@@ -123,6 +147,7 @@ def verify(data):
     assert (c["p"],c["a"],c["b"],c["n"],c["cofactor"])==(P,A,B,N,1)
     assert point(c["g"])==G
     assert data["weights"] in (W_ODD,W_POW2)
+    assert data["target_generation"] == "indexed-offset-v2"
     weights=data["weights"]
     assert data["windows"]==WINDOWS
     assert data["ordered_words_per_window"]==16**8
@@ -156,7 +181,9 @@ def verify(data):
     targets=data["recovered_targets"]
     assert data["target_count"]==len(targets)==data["verified_target_count"]==1024
     assert data["online_queries"]==len(targets)+data["failed_online_queries"]
+    target_state=SEED ^ TARGET_XOR
     for t,rec in enumerate(targets):
+        target_state,expected_secret=nonzero_scalar(target_state)
         assert rec["target_index"]==t
         wi=rec["window"]
         secret=rec["test_secret"]
@@ -164,7 +191,9 @@ def verify(data):
         q=point(rec["public_q"])
         shift=rec["offset"]
         assert q==scalar(secret,G)==scalar(recovered,G)
-        assert secret==recovered
+        assert secret==recovered==expected_secret
+        assert shift==indexed_offset(t,rec["failed_prior_queries"])
+        assert wi==(t+rec["failed_prior_queries"])%4
         assert replay(ss[wi],rec["word"])==add(q,scalar(shift,G))
         coeff=row(wi,rec["word"],weights)
         candidate=(sum(x*y for x,y in zip(coeff,logs))-shift)%N
