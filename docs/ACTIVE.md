@@ -14,7 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
-- [ ] Integrate the genus-3 HECDLP cover-reduction implementation and empirical relation-collection, sparse-linear-algebra, target-descent, and matched-rho evidence with explicit toy-scope limits (Codex, started 2026-11-20, branch codex/genus3-hecdlp-evidence-20261120, PR #4834)
+- [x] Integrate the genus-3 HECDLP cover-reduction evidence and NIST P-224/P-256 transfer status, with explicit toy-scope limits and a construction-first next goal (Codex, completed 2026-11-20, branch codex/genus3-hecdlp-evidence-20261120, PR #4834) [pcc:unverified]
 
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
