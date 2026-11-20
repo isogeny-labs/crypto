@@ -1,5 +1,11 @@
 # H4 RESULTS: FPPR prime-degree descent to F_2, m=3 (claim C4)
 
+**Solver follow-up (2026-11-19):** A fixed `n=17` ordinary-query system
+yielded a CNF/SAT witness in 147.97 seconds, verified against the original
+equations and exact solution set; its paired planted arm was censored at
+180 seconds. See [the frozen SAT follow-up](sat_followup_20261119/README.md).
+The earlier run and verdict below remain its own recorded experiment.
+
 **Interpretation update (2026-11-19):**
 [COST_INTERPRETATION_AMENDMENT_20261119.md](COST_INTERPRETATION_AMENDMENT_20261119.md)
 supersedes the cost-bound language below. The `2^87.4` figure sizes one

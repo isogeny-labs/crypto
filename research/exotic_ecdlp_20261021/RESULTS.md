@@ -1,5 +1,11 @@
 # Results: six falsifiers on prime-field ECDLP hardness
 
+**H4 solver follow-up (2026-11-19):** One fixed `n=17` ordinary-query
+decomposition was solved and independently replayed by a CNF/SAT encoding
+in 147.97 seconds of solver time; the paired planted arm was censored at
+180 seconds. The [follow-up packet](H4_prime_descent/sat_followup_20261119/README.md)
+records both inputs and costs.
+
 **H4 cost interpretation update (2026-11-19):** The former `2^87.4`
 “lower bound” and “Win excluded” language in the H4 row and discussion
 below is superseded by the
