@@ -1,0 +1,46 @@
+# Prime31 W8 ternary superincreasing signed weights: source-specific ABBA complete Rust result
+
+**Date:** 2026-11-18 UTC. **Status:** source-specific GitHub Actions PASS; Rust original library 40/40, focused tests 3/3, **4 × 1,024/1,024 complete logs and 31/31 rank**, independent original-curve Python BigInt replay of every accepted training relation, basis log and recovered target in all four executions. Producer-side `[pcc:unverified]`; independent signed validation is outstanding.
+
+**Draft PR:** [#4770](https://github.com/isogeny-labs/crypto/pull/4770), stacked on [#4728](https://github.com/isogeny-labs/crypto/pull/4728). **Exact GitHub CI:** [run #44421016999](https://github.com/isogeny-labs/crypto/actions/runs/44421016999), candidate source/workflow trigger `8e0722378b993e8d2f146e751b722a6ea61ced64`, pinned original Rust arithmetic `1df714645aa683cf975bc76fcacb9842cb4780fd`, Rust 1.100.0, Ubuntu 24.04. **Frozen raw evidence:** [artifact #14481802819](https://github.com/isogeny-labs/crypto/actions/runs/44421016999/artifacts/14481802819), 5 JSON files, ZIP SHA256 `b6252858872121cffe63009ac18382b3d46724478b97d68abbe05a15e6fd2804`, GitHub retention 30 days. [Preregistered protocol](W8_TERNARY_WEIGHT_PROTOCOL_20261118.md), [source](../native/examples/prime31_w8_weight_ab.rs), [independent BigInt replay](../native/verify_prime31_w8_weight_ab.py), [workflow](../../../.github/workflows/prime31-w8-weight-ab.yml).
+
+## Reused original curve
+
+Same ordinary, nonsingular cofactor-one prime-order elliptic curve on `F_2147483647`: `a=847514846`, `b=2087444724`, `n=2147446831`, `G=(625037715,2100627251)`. Canonical first 31 rational-x factor-base points, four B8 overlapping windows `0..7, 8..15, 16..23, 23..30`, eight independently signed slots, generic four-plus-four group-sum grader, same 31-column RREF and online shifted public target recovery; both arms solved **identical 1,024 public Q points**, checked by source-specific fail-closed matching-target assertion. No deliberately weak curve or injected target log in the candidate finder.
+
+OLD signed weights `(1,3,5,7,11,13,17,19)`; TERNARY `(1,3,9,27,81,243,729,2187)`. Source/wall arms in balanced **OLD,TERNARY,TERNARY,OLD** order:
+
+| Exact-source run | Setup (ms) | Train (ms) | Online (ms) | Charged complete total (ms) | Train queries | Shifted online queries | Total EC additions | Total Fp multiplications | Total Fp inversions | Rank | Correct logs |
+|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| OLD-A | 142.920 | 267.561 | 11,101.398 | **11,511.879** | 37 | 1,315 | 44,344,469 | 2,837,165,077 | 44,329,042 | 31/31 | 1,024/1,024 |
+| TERNARY-A | 143.182 | 374.375 | 8,612.463 | **9,130.020** | 42 | **1,177** | **35,150,980** | **2,249,470,574** | **35,146,369** | 31/31 | 1,024/1,024 |
+| TERNARY-B | 143.521 | 374.416 | 8,607.531 | **9,125.467** | 42 | **1,177** | **35,150,980** | **2,249,470,574** | **35,146,369** | 31/31 | 1,024/1,024 |
+| OLD-B | 143.147 | 267.622 | 11,109.799 | **11,520.569** | 37 | 1,315 | 44,344,469 | 2,837,165,077 | 44,329,042 | 31/31 | 1,024/1,024 |
+
+**Complete-time means across two executions each:** 11,516.224 ms OLD vs **9,127.743 ms TERNARY**, **1.2617×** OLD / TERNARY wall-time, i.e. 20.74% less fully charged time in this deterministic panel. TERNARY used **10.49% fewer online relation queries** (1,177 vs 1,315), **20.73% fewer EC additions** and **20.71% fewer field multiplies**. Its training was *worse*: 42 vs 37 natural training queries and 374.4 vs 267.6 ms; net performance improvement is driven by online group-sum lookup work. The two reverse-order timings and identical operation counts support a source-specific repeatable engineering gain; they do **not** establish portable host-wide or asymptotic advantage. Training points were deterministic public known-offset controls; they are not 31 public unknown logarithms.
+
+## Mathematical finding and support mechanism
+
+Superincreasing signed weights `w_j=3^j` ensure that all `(2B)^8` signed **integer formal coefficient vectors** are distinct: take highest differing slot j, choose a coordinate changed by its signed basis symbol, and observe magnitude at least `3^j` from that slot but lower-slot interference less than `3^j`. Thus for B8 exactly `16^8=4,294,967,296` formal vectors versus the certified older W8 count `3,240,125,537` from #4722, a **32.56% increase in formal support**. Because both exceed `n=2,147,446,831`, this alone gives no nontrivial upper/lower group-hit probability. Distinct formal coefficient vectors can still represent the same EC point.
+
+Independent **development-only** Python affine EC screen on all four windows found **65,536/65,536 distinct four-sum values per half** for TERNARY, compared with 64,737/65,536 per half for OLD. On the *first 256 archived public Q from window zero* only, generic grader old 201/256 hits vs ternary 221/256, paired old-only 28 / ternary-only 48, exact two-sided McNemar `p=0.0286267`. These observations motivated the frozen test but are NOT independent held-out Rust confirmatory coverage or a proof of uniformly random EC support.
+
+A **heuristic**, *not a theorem*, models distinct formal coefficient vectors as independent uniform EC images: `1-exp(-F/n)` yields OLD ~77.88% and TERNARY ~86.47% natural coverage. The 256-point exploratory observations are close, but the heuristic may fail on structured bases or growing curve sizes. The scored same-Q complete-Rust result is an engineering probe and does not formally establish this distribution model.
+
+## Scientific interpretation and prior-lead review
+
+**This is index-calculus-style full rank-31 learning and 1,024 complete logarithms using generic 4+4 sum tables, not a non-generic relation extractor.** It is a **measured 1.262× improvement within the generic-oracle Rust control**. Do not represent it as the requested cheaper non-generic ECDLP solver, let alone subgeneric complexity. Historical optimized 1,024-target shared BSGS in [#4532](https://github.com/isogeny-labs/crypto/pull/4532) was **170.113 ms on a different runner and target panel**, so neither this 9.13 s nor old 11.52 s is a matched new BSGS comparison. Both sit numerically well outside that reference.
+
+- [#4728](https://github.com/isogeny-labs/crypto/pull/4728): generic four-window B8 rank-31/1,024-target control; earlier 14.098 s used different target derivation; cannot use as matched weight ablation. The new A/B **same-runner/same-Q** comparison removes this confound.
+- [#4722](https://github.com/isogeny-labs/crypto/pull/4722): exact old signed formal vector census; #4714: complete six-weight M6 but failed against shared BSGS; [#4720](https://github.com/isogeny-labs/crypto/pull/4720) signed-pair projector.
+- [#4692](https://github.com/isogeny-labs/crypto/pull/4692): **draft public-only RR9/F4 unknown-index extractor**; currently the decisive unfinished component. Reuse its exact factor/resultant ideal with B8 weighted slot polynomials, not the generic oracle's hash tables.
+- `isogeny-labs/crypto-autoresearcher/experiments/semaev-alternatives-20261105/SUMMARY.md`: SA-04 RR-norm and SA-18 determinant-method negative controls under frozen metrics; SA-19/20 Edwards coordinate does not directly transfer to this cofactor-one odd-order curve without rational two-torsion. `isogeny-labs/cryptanalysis` has binary Semaev SAT instrumentation, not a validated prime31 unknown-index Rust extraction.
+- Published relevant prime-field IC: Petit–Kosters–Messeng (PKC 2016, DOI 10.1007/978-3-662-49387-8_1), Amadori–Pintore–Sala (FFA 2018, DOI 10.1016/j.ffa.2018.01.009). Shared research-KB connector/wrapper unavailable here: bounded direct sources review, no novelty clearance.
+
+## Next non-generic experiment and stop/go
+
+1. **Public-only B8 RR9/F4 weighted-selector A/B** in #4692, candidate input only public curve, target R, base polynomial/weights; **zero** generic 4+4 tables and no planted chart variables or secret. Feed frozen held-out natural positives and negatives through independent grade-only oracle, retaining timeouts as unknown. Check every signed EC witness on the original curve.
+2. Compare OLD and TERNARY unknown-index degree, coefficient sizes, sparse F4 rowcounts, memory, exact original-ideal equivalence, singular/duplicate-root branches. Ternary's largest weight 2,187 increases scalar-mult setup and may alter polynomial factor geometry, **so the 1.262× generic-grader gain does not imply faster F4**. Stop if public-only extraction fails/loses under frozen budgets, even if its generic oracle has better coverage.
+3. Only after public-only B8 extracts natural relations, reuse the verified four-window 31-column rank and full 1,024 blinded-Q Rust pipeline with no forbidden generic table fallback. Run an **entirely paired same-runner** cold 1 / 64 / 1,024 target panel versus the strongest existing mixed index calculus, cached/cold shared BSGS and optimized negation-map rho; include setup, failures, F4 work, matrix, memory, scalar recovery and independent PCC replay. Repeat at larger prime sizes before a scaling claim.
+
+**Decision:** Promote ternary W8 to a **candidate algebraic extraction arm** because its complete generic grader cost improved 1.262× on matched public Q. Keep #4770 source-verified but do not claim a cheaper genuinely non-generic prime-field solver.

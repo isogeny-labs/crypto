@@ -14,6 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
+- [x] Prime31 original-vs-superincreasing W8 signed-weight full-cost paired Rust screen (automation, started 2026-11-18, branch automation/prime31-w8-ternary-weight-screen-20261118; PR #4770; same-runner source-specific 1.262x generic-grader result, no non-generic claim)
 - [ ] Prime31 weighted-slot RR9 resultant encoding, exact Rust/independent controls and full-cost extraction gate (automation, started 2026-11-18, branch automation/prime31-rr9-weighted-resultant-20261118, PR #4728)
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
