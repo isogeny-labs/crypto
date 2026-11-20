@@ -575,6 +575,20 @@ theorem monicQuadratic_resultant_zero_of_commonRoot (a b c d r : K)
   rw [hb, hd]
   ring
 
+/-- Explicit coefficient product for the monic quartic defining an auxiliary
+branch-pair genus-one curve. -/
+theorem monicQuadratic_product_coefficients (a b c d X : K) :
+    (X ^ 2 + a * X + b) * (X ^ 2 + c * X + d) =
+      X ^ 4 + (a + c) * X ^ 3 + (b + d + a * c) * X ^ 2
+        + (a * d + c * b) * X + b * d := by
+  ring
+
+/-- A monic smooth quartic has two rational points at infinity, so an affine
+character-sum count `p+S` normalizes to Frobenius trace `-1-S`. -/
+theorem monicQuartic_trace_normalization (p S : ℤ) :
+    p + 1 - ((p + S) + 2) = -1 - S := by
+  ring
+
 /-- The shared normalized at-infinity series before subtracting the target
 coordinate. Under the remaining geometric bridge it represents `S(x)/x` at
 `w=1/x`. -/
@@ -4996,6 +5010,8 @@ theorem fixedPoint_frobeniusCocycle_zero
 #print axioms monicQuadratic_resultant_closed
 #print axioms monicQuadratic_resultant_symm
 #print axioms monicQuadratic_resultant_zero_of_commonRoot
+#print axioms monicQuadratic_product_coefficients
+#print axioms monicQuartic_trace_normalization
 #print axioms fiberDenominatorSeries_eq_normalizedMap_sub_linear
 #print axioms fiberDenominatorSeries_sub
 #print axioms bostanDenominatorsNonzero

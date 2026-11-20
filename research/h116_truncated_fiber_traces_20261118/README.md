@@ -648,3 +648,13 @@ the audited surface to 239 theorems.  The next lead forms auxiliary genus-one
 quartics from selected branch pairs and tests their Frobenius traces modulo
 three, retaining cross-ratio geometry beyond norm characters.
 [pcc:unverified]
+
+The [branch-pair genus-one trace test](CHIRAL_BRANCH_PAIR_TRACE_DIGIT_EXPERIMENT.md)
+then promotes selected quartic products to elliptic curves and measures four
+Frobenius traces modulo three.  All 5,992 point counts and 2,401,920 quartic
+evaluations pass their controls; the selected rule is 536/1,444 with positive
+excess but family-wise `p=0.253600`, and no rule is exact.  Two Lean identities
+raise the audit to 241 theorems.  The next lead tests quadratic characters of
+the classical binary-quartic invariants `I,J`, retaining isomorphism/`j`
+geometry beyond the trace.
+[pcc:unverified]
