@@ -57,6 +57,9 @@ struct Cfg {
     curve_seeds: std::collections::HashMap<u64, Vec<u64>>,
     /// Targets per admitted curve (`--targets`, default 1: the frozen grid).
     targets: u64,
+    /// First target index k (`--target-from`, default 0): targets k = from..from+targets,
+    /// so a later study can add targets to a curve without re-running earlier ones.
+    target_from: u64,
     /// Emit a timing calibration per instance (`--calibrate`).
     calibrate: bool,
     max_trials: u64,
@@ -89,6 +92,7 @@ fn parse() -> Result<Cfg, String> {
         seed_search: 600,
         curve_seeds: Default::default(),
         targets: 1,
+        target_from: 0,
         calibrate: false,
         max_trials: 50_000_000,
         restart_sqrt: false,
@@ -141,6 +145,7 @@ fn parse() -> Result<Cfg, String> {
             }
             "--curves" => c.curves = num(&v)? as usize,
             "--targets" => c.targets = num(&v)? as u64,
+            "--target-from" => c.target_from = num(&v)? as u64,
             "--seeds" => c.seeds = num(&v)? as u64,
             "--arms" => c.arms = v,
             "--cc" => c.cc = num(&v)?,
@@ -238,7 +243,7 @@ fn main() -> ExitCode {
     };
     let t0 = Instant::now();
     let mut config = json!({"kind": "config", "primes": cfg.primes, "genera": cfg.genera, "curves": cfg.curves,
-        "seeds": cfg.seeds, "arms": cfg.arms, "cc": cfg.cc, "qc": cfg.qc, "max_h": cfg.max_h,
+        "seeds": cfg.seeds, "targets": cfg.targets, "target_from": cfg.target_from, "arms": cfg.arms, "cc": cfg.cc, "qc": cfg.qc, "max_h": cfg.max_h,
         "rho_cap": cfg.rho_cap, "seed_search": cfg.seed_search, "max_trials": cfg.max_trials,
         "smith": cfg.smith, "smith_census": cfg.smith_census, "quartic": cfg.quartic,
         "threads": cfg.threads,
@@ -301,6 +306,12 @@ fn main() -> ExitCode {
                 }
                 continue;
             }
+            // Prime-order search: a reducible f has J[2](F_p) != 0, so #J is even
+            // and cannot pass --max-h 1; skip it before point counting.
+            if cfg.max_h == 1 && !gl::f_irreducible(p, &gl::random_f(p, g, cs)) {
+                *reasons.entry("f_reducible_even_order".into()).or_default() += 1;
+                continue;
+            }
             match gl::make_instance(p, g, cs, cs, cfg.max_h) {
                 Ok(inst) => {
                     admitted += 1;
@@ -311,7 +322,7 @@ fn main() -> ExitCode {
                         rec["smith"] = smith_record(&inst.curve.f_coeffs(), p, cs);
                     }
                     emit(rec);
-                    for k in 0..cfg.targets.max(1) {
+                    for k in cfg.target_from..cfg.target_from + cfg.targets.max(1) {
                         specs.lock().unwrap().push(Spec::Hyper {
                             p,
                             g,

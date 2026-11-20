@@ -1,0 +1,16 @@
+{
+  "action": "check whether replicate j draws the same index pattern in both strata; recompute any cross-stratum interval (slope, difference, ratio) with independent streams and report it beside the claimed one",
+  "created": "2026-11-18T21:59:47Z",
+  "evidence": [
+    "research/genus4_prime_order_20261118/validation/out/recompute.json",
+    "benchmarks/20261118-genus4-prime-order/validator-report.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator",
+    "controlled-experiment"
+  ],
+  "trigger": "a frozen analysis bootstraps two strata (e.g. two primes) with one seed, reseeding the generator per statistic, and both strata have the same design (curves x targets x seeds)",
+  "why": "analyze.py of genus4_prime_order_20261118 reused seed 20261124 at both primes, so its D2 slope interval paired identical resamples; PROTOCOL said independent per prime (F7)"
+}

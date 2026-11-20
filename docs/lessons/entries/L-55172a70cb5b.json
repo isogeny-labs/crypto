@@ -1,0 +1,16 @@
+{
+  "action": "treat it as in-sample: cross/actual - 1 equals (-intercept - subset mean residual)/mean wall by construction; report R^2 and the intercept share instead, or fit on held-out rows (leave-one-cc-out) before calling it a check",
+  "created": "2026-11-19T09:41:53Z",
+  "evidence": [
+    "research/genus4_cost_calibration_20261119/validation/validator-report.md",
+    "research/genus4_cost_calibration_20261119/validation/recompute.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator",
+    "research"
+  ],
+  "trigger": "a report 'cross-checks' fitted per-operation prices by re-pricing the same rows they were fitted on and comparing with the measured wall",
+  "why": "genus4_cost_calibration: the cross-check differed from R1 by +5.9..+11.1% exactly the intercept share; RESULTS read it as 'counted operations account for the wall time'"
+}
