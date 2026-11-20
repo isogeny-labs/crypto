@@ -118,7 +118,7 @@ inverts its leading coefficient.
   `S₃` holds for any `b` (`x₁²x₂² + x₁²X² + x₂²X² + x₁x₂X + b`), so the
   method should carry over with `b` replacing the constant 1.
 
-## 5. End to end: whole discrete logarithms (`raw/05`)
+## 5. End to end: whole discrete logarithms (`raw/05_*`: console output and a per-repeat JSON extract of the ledger records)
 
 `examples/binary_factored_ic_e2e.rs` runs the boundary ledger's char-2
 instance (`ic_boundary::run_char2_instance`). Each instance is a random curve
