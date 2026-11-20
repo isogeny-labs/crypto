@@ -278,6 +278,14 @@ impl Ring for Fq2 {
     }
     fn mul(&self, x: (u64, u64), y: (u64, u64)) -> (u64, u64) {
         let f = &self.f;
+        // Multiplication by an Fp scalar takes two base-field products.
+        // Preserve the fast dense Karatsuba formula for generic inputs.
+        if x.1 == 0 {
+            return (f.mul(x.0, y.0), f.mul(x.0, y.1));
+        }
+        if y.1 == 0 {
+            return (f.mul(x.0, y.0), f.mul(x.1, y.0));
+        }
         let ac = f.mul(x.0, y.0);
         let bd = f.mul(x.1, y.1);
         // The first quadratic non-residue is commonly 2 or 3.
@@ -296,6 +304,13 @@ impl Ring for Fq2 {
     // Saves additions/subtractions versus generic Karatsuba multiply.
     fn sqr(&self, x: (u64, u64)) -> (u64, u64) {
         let f = &self.f;
+        // Sparse squares lie in Fp. Avoid three full products.
+        if x.1 == 0 {
+            return (f.sqr(x.0), 0);
+        }
+        if x.0 == 0 {
+            return (self.mul_nonresidue(f.sqr(x.1)), 0);
+        }
         let aa = f.sqr(x.0);
         let bb = f.sqr(x.1);
         let nbb = match self.n {
@@ -310,6 +325,12 @@ impl Ring for Fq2 {
     // Uses four Fp products, versus six for squaring then multiplying.
     fn cube(&self, x: (u64, u64)) -> (u64, u64) {
         let f = &self.f;
+        // Pure Fp elements cube with only one square and one product.
+        // Do not branch on imaginary-only elements: local dense controls
+        // showed worse throughput with that additional check.
+        if x.1 == 0 {
+            return (f.mul(f.sqr(x.0), x.0), 0);
+        }
         let aa = f.sqr(x.0);
         let nbb = self.mul_nonresidue(f.sqr(x.1));
         let three_nbb = f.add(nbb, f.add(nbb, nbb));
