@@ -3866,7 +3866,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                             Some((branch, &ring, &rep.basis, &fixed_s0)),
                         );
                     }
-                    let sols = if self.descent {
+                    let sols = if self.use_descent_extraction() {
                         let root_v_rank = &self.prepared.as_ref().expect("prepared").v_rank;
                         gathered_sols.sort_by(|u, w| {
                             let ku: Vec<u32> = u
@@ -3894,6 +3894,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                         }
                         gathered_sols
                     } else {
+                        // `descent=0`, or adaptive tiny-`|V|^m` deferral to grid.
                         let (sols, mults) = self.grid(curve, x_r, false);
                         if let Some(snapshot) = &mut self.dataset_artifact {
                             snapshot["grid_extraction_attempted"] = serde_json::json!(true);
