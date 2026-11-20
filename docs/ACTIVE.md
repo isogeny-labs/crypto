@@ -14,7 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
-- [ ] Lead 2A: PKM Kummer vs norm-one T_2 torus tower at m >= 8 + LFD specialisation bridge (cursor, started 2026-11-19, branch cursor/pdp-lead-2a-pkm-m8-torus-20261119)
+- [x] Lead 2A: PKM Kummer vs norm-one T_2 torus tower at m >= 8 + LFD specialisation bridge (cursor, started 2026-11-19, branch cursor/pdp-lead-2a-pkm-m8-torus-20261119, PR #4824; completed via crypto#4820: KM3-SPEC-LADDER + T2 desk in prime_pkm_aux_chase; stub PR #4824 closed)
 
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
