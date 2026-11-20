@@ -10955,7 +10955,7 @@ mod accounting_rules_tests {
     fn tuned_rho_window_compares_are_priced_through_work_native() {
         use crate::cryptanalysis::ecbench::work::{price, Priceable};
         use crate::cryptanalysis::ic_boundary::{
-            BRENT_WORD_OPS, JUMP_SELECT_WORD_OPS, WINDOW_WORD_OPS,
+            BRENT_WORD_OPS, JUMP_SELECTIONS, JUMP_SELECT_WORD_OPS, WINDOW_WORD_OPS,
         };
         for (spec, id) in [
             (
@@ -10988,7 +10988,12 @@ mod accounting_rules_tests {
             let (inst, facts) = built(&spec);
             let rep = run(&method(id, &[]), &inst, &facts, 5555, 8);
             assert!(rep.recovered.is_some(), "{id}");
-            for name in [WINDOW_WORD_OPS, BRENT_WORD_OPS, JUMP_SELECT_WORD_OPS] {
+            for name in [
+                WINDOW_WORD_OPS,
+                BRENT_WORD_OPS,
+                JUMP_SELECT_WORD_OPS,
+                JUMP_SELECTIONS,
+            ] {
                 assert!(
                     !rep.counters.contains_key(name),
                     "{id}: {name} is a counter"
@@ -11017,6 +11022,20 @@ mod accounting_rules_tests {
                 .copied()
                 .unwrap_or(0);
             assert!(select >= 2 * rep.counters["steps"], "{id}: select {select}");
+            // The band's count: one per selection, behind its marker.
+            assert_eq!(
+                search.work_native.get(JUMP_SELECTIONS).copied(),
+                Some(select / 2),
+                "{id}"
+            );
+            assert_eq!(
+                search
+                    .work_native
+                    .get(&format!("counted:{JUMP_SELECTIONS}"))
+                    .copied(),
+                Some(1),
+                "{id}"
+            );
             let priced = |phases: &[PhaseRecord]| {
                 price(&Priceable {
                     method_id: id,

@@ -814,6 +814,10 @@ fn generic_rule(method: &str, counter: &str) -> Option<Rule> {
         // remainder per selection, tallied as two word operations each
         // (research/koblitz_rho_reference_20261115, section 1).
         "jump_select_word_ops" => Prims(&[(WordOp, 1)]),
+        // The same selections counted once each, for the §5a band
+        // (`band::WALK_SELECT_WORK_COUNTERS`); their word operations are
+        // priced above, so here they are shape, not work.
+        "jump_selections" => Shape,
         "canonicalisations_uncharged" if strong => {
             // canon(x), three more basis conversions, the Montgomery scalar
             // update.

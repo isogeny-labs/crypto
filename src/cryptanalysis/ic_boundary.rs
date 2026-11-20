@@ -2604,6 +2604,13 @@ struct WalkTally {
     /// 1). Reported as `work_native` like the window's compares, so
     /// committed records replay unchanged.
     jump_select_word_ops: u64,
+    /// The same selections counted once each: the per-step native operation
+    /// the §5a band prices at `w` (strong's `partition_hashes_uncharged`
+    /// is one per step). Reported behind the marker
+    /// `counted:jump_selections` (`ecbench::band`), so committed records
+    /// replay unchanged; `ecbench::work` prices its word operations through
+    /// [`JUMP_SELECT_WORD_OPS`], not again here.
+    jump_selections: u64,
 }
 
 /// How a walk that never reached a distinguished point ended.
@@ -2651,6 +2658,7 @@ impl WalkTally {
         self.window_word_ops += o.window_word_ops;
         self.brent_word_ops += o.brent_word_ops;
         self.jump_select_word_ops += o.jump_select_word_ops;
+        self.jump_selections += o.jump_selections;
     }
 
     /// The window's and Brent's word operations, as a search phase's
@@ -2667,6 +2675,10 @@ impl WalkTally {
         if self.jump_select_word_ops > 0 {
             out.insert(JUMP_SELECT_WORD_OPS.to_string(), self.jump_select_word_ops);
         }
+        if self.jump_selections > 0 {
+            out.insert(JUMP_SELECTIONS.to_string(), self.jump_selections);
+            out.insert(format!("counted:{JUMP_SELECTIONS}"), 1);
+        }
         out
     }
 }
@@ -2679,6 +2691,9 @@ pub const BRENT_WORD_OPS: &str = "brent_word_ops";
 /// `work_native` name of the tuned walk's jump-index selections (two word
 /// operations each, see [`WalkTally`]); one `word_op` each.
 pub const JUMP_SELECT_WORD_OPS: &str = "jump_select_word_ops";
+/// `work_native` name of the tuned walk's jump-index selections counted once
+/// each, behind `counted:jump_selections`: the band prices each at `w`.
+pub const JUMP_SELECTIONS: &str = "jump_selections";
 
 /// How one walk ended.
 enum WalkEnd<E> {
@@ -2855,6 +2870,7 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
             // One step, with the look-ahead when it is on.
             let j0 = self.index_of(h);
             tally.jump_select_word_ops += 2;
+            tally.jump_selections += 1;
             let mut tried = 0usize;
             let (y, ya, yb, ky, hy) = loop {
                 // `j0` and `tried` are below `jump_count`, so one
@@ -2888,6 +2904,7 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                 // charge it whenever the look-ahead is on).
                 if self.look_ahead {
                     tally.jump_select_word_ops += 2;
+                    tally.jump_selections += 1;
                 }
                 if self.look_ahead
                     & flipped

@@ -143,6 +143,15 @@ pub const TABLE_WORK_COUNTERS: &[&str] = &["table_insert_attempts"];
 /// pre-sibling counter, and a row reports it in `table_work_mean_counts`.
 pub const SIBLING_WORK_COUNTERS: &[&str] = &["sibling_second_points", "sibling_lift_products"];
 
+/// Native work a tuned rho walk (`ic_boundary::TunedWalker`, the walk of
+/// `rho.signed_frobenius_v5`) counts behind its own `counted:` marker: one
+/// jump-index selection per step and per look-ahead re-test, priced at `w`
+/// like strong's per-step `partition_hashes_uncharged`
+/// (research/koblitz_matched_reference_20261120). Read by
+/// [`table_work_counts`] where the marker is present, so no earlier record
+/// changes.
+pub const WALK_SELECT_WORK_COUNTERS: &[&str] = &["jump_selections"];
+
 /// The phase sum of each [`TABLE_WORK_COUNTERS`] counter in `r`'s
 /// `work_native` maps, present only where some phase carries the marker
 /// `counted:<name>` (the code that did the work counted it and said so).  A
@@ -150,7 +159,11 @@ pub const SIBLING_WORK_COUNTERS: &[&str] = &["sibling_second_points", "sibling_l
 /// the count is not known to be complete.
 pub fn table_work_counts(r: &Record) -> BTreeMap<String, u64> {
     let mut out = BTreeMap::new();
-    for name in TABLE_WORK_COUNTERS.iter().chain(SIBLING_WORK_COUNTERS) {
+    for name in TABLE_WORK_COUNTERS
+        .iter()
+        .chain(SIBLING_WORK_COUNTERS)
+        .chain(WALK_SELECT_WORK_COUNTERS)
+    {
         let marker = format!("counted:{name}");
         if !r.phases.iter().any(|p| p.work_native.contains_key(&marker)) {
             continue;
