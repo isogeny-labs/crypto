@@ -121,6 +121,22 @@ theorem intCast_zmod_ne_zero_of_natAbs_lt
   have lower := Nat.le_of_dvd positive natDivides
   omega
 
+/-- Nonvanishing in `ZMod p` transfers to every field of characteristic `p`.
+This is the exact form needed for the nonzero-index premise of a division
+polynomial over a rational-function field. -/
+theorem intCast_field_ne_zero_of_zmod_ne_zero
+    {K : Type*} [Field K] (modulus : ℕ) [CharP K modulus]
+    (coefficient : ℤ) (nonzero : (coefficient : ZMod modulus) ≠ 0) :
+    (coefficient : K) ≠ 0 := by
+  intro castZero
+  have mapCoefficient :
+      (ZMod.castHom (dvd_refl modulus) K) (coefficient : ZMod modulus) =
+        (coefficient : K) := by
+    rw [ZMod.castHom_apply, ZMod.cast_intCast (dvd_refl modulus)]
+  apply nonzero
+  apply ZMod.castHom_injective K
+  rw [mapCoefficient, map_zero, castZero]
+
 /-- If the arity is below the characteristic modulus, some signed fibre
 coefficient from every nontrivial tuple remains nonzero modulo that modulus. -/
 theorem exists_nonzero_fiberCoefficient_cast_of_not_triv
@@ -294,6 +310,35 @@ theorem projectedCoefficient_zmod_ne_zero
   · rw [Int.natAbs_mul, Int.natAbs_natCast]
     exact (Nat.mul_le_mul_left (Fintype.card Gamma) coefficientBound).trans_lt
       projectedBelow
+
+/-- The projected coefficient is nonzero in any field of the same
+characteristic, under the same explicit size bound. -/
+theorem projectedCoefficient_field_ne_zero
+    {K Gamma : Type*} [Field K] [Fintype Gamma] [Nonempty Gamma]
+    (modulus n : ℕ) [CharP K modulus] (coefficient : ℤ)
+    (coefficientNonzero : coefficient ≠ 0)
+    (coefficientBound : coefficient.natAbs ≤ n)
+    (projectedBelow : Fintype.card Gamma * n < modulus) :
+    (((Fintype.card Gamma : ℤ) * coefficient : ℤ) : K) ≠ 0 := by
+  apply intCast_field_ne_zero_of_zmod_ne_zero modulus
+  exact projectedCoefficient_zmod_ne_zero modulus n coefficient
+    coefficientNonzero coefficientBound projectedBelow
+
+/-- A projected torsion certificate together with its nonzero-index proof in
+the characteristic-`p` coefficient field. -/
+theorem projectedTorsion_index_ne_zero
+    {K Gamma Point : Type*} (modulus n : ℕ)
+    [Field K] [CharP K modulus]
+    [Fintype Gamma] [Nonempty Gamma] [AddCommGroup Point]
+    (coefficient : ℤ) (point : Point)
+    (coefficientNonzero : coefficient ≠ 0)
+    (coefficientBound : coefficient.natAbs ≤ n)
+    (projectedBelow : Fintype.card Gamma * n < modulus)
+    (torsion : ((Fintype.card Gamma : ℤ) * coefficient) • point = 0) :
+    (((Fintype.card Gamma : ℤ) * coefficient : ℤ) : K) ≠ 0 ∧
+      ((Fintype.card Gamma : ℤ) * coefficient) • point = 0 := by
+  exact ⟨projectedCoefficient_field_ne_zero modulus n coefficient
+    coefficientNonzero coefficientBound projectedBelow, torsion⟩
 
 /-- Direct projector input extracted from `¬TrivL`: one value has a Galois-
 projected coefficient that is nonzero modulo the prime modulus. -/

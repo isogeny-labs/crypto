@@ -300,6 +300,64 @@ theorem evalCanonical_zero_implies_projected_torsion
     (fun v ↦ fiberCoefficient xs sign v.1) chosen twoNonzero
     radicandNonzero pairwiseNonsquare nonsingular relationFintype
 
+/-- The projected Semaev torsion relation with the scalar simultaneously
+proved nonzero in the characteristic-`p` coefficient field. -/
+theorem evalCanonical_zero_implies_projected_nonzero_index_torsion
+    {K : Type*} (modulus n : ℕ)
+    [Field K] [CharP K modulus] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) [W.IsElliptic]
+    (a₁Zero : W.a₁ = 0) (a₃Zero : W.a₃ = 0)
+    (hDelta : W.Δ ≠ 0) (twoNonzero : (2 : K) ≠ 0)
+    (xs : Fin (n + 3) → K)
+    (radicand : {v // v ∈ Finset.univ.image xs} → K)
+    [DecidableEq (quadraticRadicandPolynomial radicand).SplittingField]
+    (radicandNonzero : ∀ v, radicand v ≠ 0)
+    (pairwiseNonsquare : ∀ left right, left ≠ right →
+      ¬ IsSquare (radicand left * radicand right))
+    (nonsingular : ∀ v,
+      (W.baseChange
+        (quadraticRadicandPolynomial radicand).SplittingField).Nonsingular
+          (algebraMap K _ v.1) (quadraticRadicandRoot radicand v))
+    (projectedBelow :
+      Fintype.card
+        ((quadraticRadicandPolynomial radicand).SplittingField ≃ₐ[K]
+          (quadraticRadicandPolynomial radicand).SplittingField) *
+          (n + 3) < modulus)
+    (vanishing : evalCanonical W n xs = 0)
+    (nontriv : ¬ ECDLP.L40.TrivL (List.ofFn xs)) :
+    ∃ sign : Fin (n + 3) → ℤ,
+      (∀ i, sign i = 1 ∨ sign i = -1) ∧
+      ∃ chosen : {v // v ∈ Finset.univ.image xs},
+        fiberCoefficient xs sign chosen.1 ≠ 0 ∧
+        (fiberCoefficient xs sign chosen.1).natAbs ≤ n + 3 ∧
+        let index : ℤ :=
+          (Fintype.card
+            ((quadraticRadicandPolynomial radicand).SplittingField ≃ₐ[K]
+              (quadraticRadicandPolynomial radicand).SplittingField) : ℤ) *
+            fiberCoefficient xs sign chosen.1
+        let point := WeierstrassCurve.Affine.Point.some
+          (algebraMap K
+            (quadraticRadicandPolynomial radicand).SplittingField chosen.1)
+          (quadraticRadicandRoot radicand chosen) (nonsingular chosen)
+        (index : K) ≠ 0 ∧ index • point = 0 := by
+  classical
+  obtain ⟨sign, signUnit, chosen, coefficientNonzero, coefficientBound,
+      torsion⟩ := evalCanonical_zero_implies_projected_torsion
+    W a₁Zero a₃Zero hDelta twoNonzero n xs radicand radicandNonzero
+      pairwiseNonsquare nonsingular vanishing nontriv
+  refine ⟨sign, signUnit, chosen, coefficientNonzero, coefficientBound, ?_⟩
+  exact projectedTorsion_index_ne_zero
+    (K := K)
+    (Gamma :=
+      (quadraticRadicandPolynomial radicand).SplittingField ≃ₐ[K]
+        (quadraticRadicandPolynomial radicand).SplittingField)
+    modulus (n + 3) (fiberCoefficient xs sign chosen.1)
+    (WeierstrassCurve.Affine.Point.some
+      (algebraMap K
+        (quadraticRadicandPolynomial radicand).SplittingField chosen.1)
+      (quadraticRadicandRoot radicand chosen) (nonsingular chosen))
+    coefficientNonzero coefficientBound projectedBelow torsion
+
 end
 
 end TensorBoundaryBounds

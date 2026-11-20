@@ -87,7 +87,10 @@ The null changes only the global wiring of interior ports while preserving the v
     explicit splitting field and the ordinary Kummer projector are also
     composed: a nontrivial vanishing tuple yields a bounded nonzero
     coefficient whose Galois-cardinality multiple annihilates its canonical
-    point. The production-pin torsion-to-`ΨSq` contradiction remains open.
+    point. Under `|Gamma| * arity < p`, the same scalar is now proved nonzero
+    in every characteristic-`p` coefficient field, giving the exact
+    nonzero-index/torsion input pair for `ΨSq`. The production-pin
+    torsion-to-`ΨSq` implication remains open.
     [pcc:unverified]
 13. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
 14. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.

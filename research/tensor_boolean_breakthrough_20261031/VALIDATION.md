@@ -1471,10 +1471,16 @@ one canonical square-root lift per distinct tuple value, and
 relation with `quadraticSplittingFieldAffinePointProjector_isolates_term`.
 The output coefficient is nonzero, has absolute value at most the arity, and
 its Galois-cardinality multiple annihilates the canonical point. The remaining
-ordinary-branch contradiction needs the parity-correct `zsmul → ΨSq` theorem
-currently available only in the standalone exact-pin project.
+arithmetic step is also explicit:
+`intCast_field_ne_zero_of_zmod_ne_zero` transfers modular nonvanishing into
+any field with `CharP K p`, and
+`evalCanonical_zero_implies_projected_nonzero_index_torsion` concludes both
+`(index : K) ≠ 0` and `index • P = 0` under
+`|Gamma| * arity < p`. The remaining ordinary-branch contradiction needs the
+parity-correct `zsmul → ΨSq` theorem currently available only in the standalone
+exact-pin project.
 `lake build SemaevRelationSigns` completes 9,133 jobs. The repository
-proof gate reports `PASS 403 thm 0 trusted` across all nine tracked modules.
+proof gate reports `PASS 407 thm 0 trusted` across all nine tracked modules.
 [pcc:unverified]
 
 ## 2026-11-19 scalar-torsion to `ΨSq` bridge
