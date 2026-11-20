@@ -313,9 +313,7 @@ pub fn batch_inv_u64_counted(xs: &mut [u64], p: u64, scratch: &mut Vec<u64>, ops
             continue;
         }
         seen_nonzero += 1;
-        if nonzero == 1 {
-            xs[i] = inv_acc;
-        } else if seen_nonzero == nonzero {
+        if nonzero == 1 || seen_nonzero == nonzero {
             xs[i] = inv_acc;
         } else {
             ops.muls += 1;
@@ -1436,10 +1434,8 @@ impl PairProjection {
         }
 
         let y_target = lift_canonical_counted(&self.curve, target, ops);
-        if !self.singular && y_target.is_none() {
-            if early_exit {
-                return (None, stats);
-            }
+        if !self.singular && y_target.is_none() && early_exit {
+            return (None, stats);
         }
 
         let mut batch = Vec::with_capacity(QUERY_BATCH);

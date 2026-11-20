@@ -3923,21 +3923,19 @@ pub fn collect_relations_lockstep(
     let (sa, sb, stride_pt) = fresh_combine(&mut rng);
     let (mut cur_a, mut cur_b, mut cur_pt) = fresh_combine(&mut rng);
     let mut next_start = |rng: &mut StdRng| -> (u64, u64, Pt) {
-        loop {
-            cur_a = add_mod(cur_a, sa, n);
-            cur_b = add_mod(cur_b, sb, n);
-            if cur_b != 0 {
-                if let Some(pt) = curve.add(Some(cur_pt), Some(stride_pt)) {
-                    cur_pt = pt;
-                    return (cur_a, cur_b, pt);
-                }
+        cur_a = add_mod(cur_a, sa, n);
+        cur_b = add_mod(cur_b, sb, n);
+        if cur_b != 0 {
+            if let Some(pt) = curve.add(Some(cur_pt), Some(stride_pt)) {
+                cur_pt = pt;
+                return (cur_a, cur_b, pt);
             }
-            let (na, nb, npt) = fresh_combine(rng);
-            cur_a = na;
-            cur_b = nb;
-            cur_pt = npt;
-            return (na, nb, npt);
         }
+        let (na, nb, npt) = fresh_combine(rng);
+        cur_a = na;
+        cur_b = nb;
+        cur_pt = npt;
+        (na, nb, npt)
     };
 
     scratch.rx.clear();
