@@ -1,0 +1,32 @@
+{
+  "schema": "h4-n29-shift-reliability-protocol-v1",
+  "question": "On 256 new fixed subgroup targets, how often does the immutable n29 candidate's 16-shift descent recover and verify the original scalar, and what direct-coverage and shift-count distribution results?",
+  "candidate": "research/exotic_ecdlp_20261021/H4_prime_descent/n29_full_pipeline_20261120/candidate.json",
+  "candidate_sha256": "227754bff448aff4dec737147c3cb182c424367b37cab8c0c0fd9e72a1e32553",
+  "precomputation_receipt": "research/exotic_ecdlp_20261021/H4_prime_descent/n29_full_pipeline_20261120/result.json",
+  "precomputation_receipt_sha256": "4e3843eb9db2353a732e58e96fc160df7538d28f110be072cdf04558c82dab2a",
+  "candidate_runner": "research/exotic_ecdlp_20261021/H4_prime_descent/n29_full_pipeline_20261120/run.py",
+  "candidate_runner_sha256": "73b10d478ebaba6c612d3b9e7cebcee9e1c727585646a892ee5188ff859f7681",
+  "exclusion_sources": {
+    "research/exotic_ecdlp_20261021/H4_prime_descent/n29_local_panel_20261120/fixtures.json": "5541a23bd30cab017a0bec51dfbe4984ae54f544f1a5c27cbf27c8bcf255c95a",
+    "research/exotic_ecdlp_20261021/H4_prime_descent/n29_instance1_pair_20261120/result.json": "cc1186635ca8c2a3873e5ecbd4bd93a2e5ce58dafd5744605aab4f493ade4558",
+    "research/exotic_ecdlp_20261021/H4_prime_descent/n29_instance1_yield_20261120/result.json": "8cbf73f232be4d69d5c01a223b84d76a8772bb855f6ede3d8a7a22aba3368307"
+  },
+  "fixtures_sha256": "1cfb63aa8bd34002e8cf768c3e5bdb32dca99ebca31873554280c5e1277c4fac",
+  "fixture_generator_sha256": "351304af81b5243f5716883a4f5116c96ba4eeec9da6e2b5a108134605570c4a",
+  "panel_runner_sha256": "97ff361b574f1c65e621447e645cfcecb601d9234a9268b543828e89e34ec6c2",
+  "target_count": 256,
+  "subgroup_order": 268447807,
+  "target_order": "fixture indices 0 through 255; no replacement after observing outcomes",
+  "target_law": "SHA256-derived nonzero scalar for each indexed label, excluding all prior n29 relation queries and target samples; scalar used only for point construction and independent replay",
+  "shared_setup": "rebuild exact candidate base and first-pair index and replay all 536 factor-base logs before any target clock; record once",
+  "ic": "invoke the immutable candidate ic_online on each public target; start with direct t=0, then at most 15 known-scalar shifts from frozen seed 73029, charge every exhausted scan and verify original-point scalar",
+  "statistics": ["all_256_statuses", "direct_scan_statuses", "shift_count_histogram", "exhausted_scan_count", "all_target_online_phases", "scalar_replays", "shared_setup_ns", "peak_rss_bytes", "pre_post_512_addition_calibration"],
+  "calibration": "512 fixed subgroup additions before and after panel; record ratio and flag above 1.25 for timing interpretation without dropping any correctness status",
+  "per_target_cap_seconds": 10,
+  "process_cap_seconds": 180,
+  "observed_peak_rss_bytes": 8589934592,
+  "resource_envelope": "one ordinary local macOS checked Sage process, one CPU worker, 8 GiB observed peak-RSS stop threshold",
+  "claim_boundary": "secondary reliability and phase-cost diagnostic after the primary one-target comparison; no rho arm or speedup claim in this packet",
+  "status": "frozen before execution"
+}
