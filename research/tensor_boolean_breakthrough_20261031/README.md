@@ -104,7 +104,11 @@ The null changes only the global wiring of interior ports while preserving the v
     point relation. Under
     `3 * (|Gal| * (n + 3))^2 < p`, the resulting Eisenstein index is proved
     nonzero in `ZMod p` while its integer action annihilates the selected
-    canonical point. This closes the `A = 0` Semaev-to-nonzero-torsion branch,
+    canonical point. The automorphism group is injectively encoded by one
+    fixed-root bit per selected quadratic root, proving
+    `|Gal| <= 2^(n + 3)` even with repeated radicands; consequently the
+    arity-only condition `3 * (2^(n + 3) * (n + 3))^2 < p` is sufficient.
+    This closes the `A = 0` Semaev-to-nonzero-torsion branch,
     not the production torsion-to-division-polynomial integration, relation
     yield, expected-runtime assembly, or a subexponential ECDLP theorem.
     [pcc:unverified]

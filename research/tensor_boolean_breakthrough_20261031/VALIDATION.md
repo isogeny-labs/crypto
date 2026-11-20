@@ -1549,7 +1549,14 @@ prime-field endpoint
 composes this relation with the `3X < p` collision separation. Under
 `3 * (|Gal| * (n + 3))^2 < p`, it proves both that the resulting Eisenstein
 index is nonzero in `ZMod p` and that its integer action annihilates the
-selected canonical point. [pcc:unverified]
+selected canonical point. `quadraticRootFixedBits_injective` proves that one
+fixed/not-fixed bit per selected root determines every splitting-field
+automorphism, including with repeated radicands. Therefore
+`quadraticRadicandSplittingField_card_aut_le_two_pow` gives
+`|Gal| <= 2^(n + 3)`, and
+`quadraticRadicand_norm_threshold_of_arity` proves that the explicit
+arity-only condition `3 * (2^(n + 3) * (n + 3))^2 < p` implies the exact
+threshold above. [pcc:unverified]
 
 This closes the concrete `A = 0` Semaev-to-nonzero-torsion branch. It does not
 integrate the open-PR torsion-to-`PsiSq` theorem into the production Mathlib
@@ -1557,7 +1564,7 @@ pin, prove the final torsion-coordinate contradiction, establish relation
 yield, assemble expected runtime, or prove a subexponential prime-field ECDLP
 algorithm. `lake build DilationNonzeroBounds SemaevRelationSigns` completed
 9,133 jobs, and the repository proof gate reported
-`PASS 447 thm 0 trusted` across all nine tracked modules. An additional
+`PASS 451 thm 0 trusted` across all nine tracked modules. An additional
 `leanchecker --fresh SemaevRelationSigns` replay was manually interrupted
 after about 25 minutes of sustained compute with no output; it is not counted
 as validation evidence. [pcc:unverified]
