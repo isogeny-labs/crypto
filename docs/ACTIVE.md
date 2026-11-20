@@ -98,6 +98,15 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 ## Blocked / questions for the owner
 
+- Curve-transfer infrastructure continuation (Codex, PR #4697): the scoped
+  curve workflow is green at exact implementation/workflow head `d8df2130...`,
+  but merge/shipping remain blocked on artifact-store recovery or an approved
+  replacement, classification of broad repository CI hydration failures,
+  human/PCC review and signed standing, and an independently downloadable
+  package replay. Fully hydrated browser freshness, unsupported transfer
+  backends, the projective exceptional-point-safe Edwards adapter, and the
+  separate full Jacobian index-calculus solver remain open deliverables.
+
 
 - Lazy-orbit column sweep vs strong rho (claude, 2026-11-17, branch claude/admiring-gauss-vo7kxf, PR #4565): protocol frozen (`research/ic_lead_chase_20261116/protocol.json`, sha256 19116bb1…, source 3658d3aa26), specs and analysis bound, queue registrations `experiments/queue/EXP-LAZYCOL-N{17,29,31}-001.json` filed `blocked`. Needs: live daily+monthly budget headroom in account 104186811093 (latest readback over the monthly cap; this runtime has no lab AWS identity), approved expspec records, an isolab image built from 3658d3aa26, and a perf-ipc w_cal host.
 
