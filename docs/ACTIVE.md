@@ -14,7 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
-- [ ] Cut the wall time of the tw2l target walk at k = 28 (claude, started 2026-11-19, branch perf-tw-table-20261119): profile and a 40-byte-slot prefaulted walk table cut `sel` solve wall 26% in an interleaved A/B with identical counted cost (development evidence); next: repeat in a frozen isolated `ecbench` session (owner waiver or token)
+- [ ] Cut the wall time of the tw2l target walk at k = 28 (claude, started 2026-11-19, branch perf-tw-table-20261119): profile and a 40-byte-slot prefaulted walk table cut `sel` solve wall 26% in an interleaved A/B with identical counted cost (development evidence); next: repeat in a frozen isolated `ecbench` session (blocked 2026-11-20: session AWS identity is account 590183823895, not the lab's 104186811093; needs a lab identity, owner waiver, or the change on `main`)
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
 - [x] Prove a division-free exact subexponential decomposition oracle for the hashed prime-field networks, including fixed witness bits (Codex, completed 2026-11-18, branch codex/ecdlp-novel-oracle-20261118, PR #4668)
