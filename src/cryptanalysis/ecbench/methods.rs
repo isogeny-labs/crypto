@@ -10954,7 +10954,9 @@ mod accounting_rules_tests {
     #[test]
     fn tuned_rho_window_compares_are_priced_through_work_native() {
         use crate::cryptanalysis::ecbench::work::{price, Priceable};
-        use crate::cryptanalysis::ic_boundary::{BRENT_WORD_OPS, WINDOW_WORD_OPS};
+        use crate::cryptanalysis::ic_boundary::{
+            BRENT_WORD_OPS, JUMP_SELECTIONS, JUMP_SELECT_WORD_OPS, WINDOW_WORD_OPS,
+        };
         for (spec, id) in [
             (
                 CurveSpec::PrimeSearch {
@@ -10978,11 +10980,20 @@ mod accounting_rules_tests {
                 "rho.negation_v2",
             ),
             (CurveSpec::Koblitz { a: 0, n: 19 }, "rho.signed_frobenius"),
+            (
+                CurveSpec::Koblitz { a: 0, n: 19 },
+                "rho.signed_frobenius_v5",
+            ),
         ] {
             let (inst, facts) = built(&spec);
             let rep = run(&method(id, &[]), &inst, &facts, 5555, 8);
             assert!(rep.recovered.is_some(), "{id}");
-            for name in [WINDOW_WORD_OPS, BRENT_WORD_OPS] {
+            for name in [
+                WINDOW_WORD_OPS,
+                BRENT_WORD_OPS,
+                JUMP_SELECT_WORD_OPS,
+                JUMP_SELECTIONS,
+            ] {
                 assert!(
                     !rep.counters.contains_key(name),
                     "{id}: {name} is a counter"
@@ -11001,7 +11012,30 @@ mod accounting_rules_tests {
             // Every step scans the ring and pushes into it.
             assert!(window >= 2 * rep.counters["steps"], "{id}: {window}");
             let brent = search.work_native.get(BRENT_WORD_OPS).copied().unwrap_or(0);
-            assert_eq!(brent > 0, id.ends_with("_v2"), "{id}: brent {brent}");
+            // v2 and v5 (a tuned v3 walk) run Brent's checks; the others do not.
+            let has_brent = id.ends_with("_v2") || id.ends_with("_v5");
+            assert_eq!(brent > 0, has_brent, "{id}: brent {brent}");
+            // Every step selects a jump: two word operations each, at least.
+            let select = search
+                .work_native
+                .get(JUMP_SELECT_WORD_OPS)
+                .copied()
+                .unwrap_or(0);
+            assert!(select >= 2 * rep.counters["steps"], "{id}: select {select}");
+            // The band's count: one per selection, behind its marker.
+            assert_eq!(
+                search.work_native.get(JUMP_SELECTIONS).copied(),
+                Some(select / 2),
+                "{id}"
+            );
+            assert_eq!(
+                search
+                    .work_native
+                    .get(&format!("counted:{JUMP_SELECTIONS}"))
+                    .copied(),
+                Some(1),
+                "{id}"
+            );
             let priced = |phases: &[PhaseRecord]| {
                 price(&Priceable {
                     method_id: id,
@@ -11016,7 +11050,7 @@ mod accounting_rules_tests {
             let with = priced(&rep.phases);
             // The window counters are priced (v2 keeps its own table counters
             // unpriced, as before).
-            for name in [WINDOW_WORD_OPS, BRENT_WORD_OPS] {
+            for name in [WINDOW_WORD_OPS, BRENT_WORD_OPS, JUMP_SELECT_WORD_OPS] {
                 assert!(
                     !with.unpriced.iter().any(|u| u == name),
                     "{id}: {name} unpriced"
@@ -11033,7 +11067,7 @@ mod accounting_rules_tests {
             let gates = with.widths.gates(word).expect("word_op priced");
             let diff: u128 =
                 with.bitops.parse::<u128>().unwrap() - without.bitops.parse::<u128>().unwrap();
-            assert_eq!(diff, gates * u128::from(window + brent), "{id}");
+            assert_eq!(diff, gates * u128::from(window + brent + select), "{id}");
         }
     }
 

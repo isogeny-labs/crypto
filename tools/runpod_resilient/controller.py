@@ -102,7 +102,8 @@ class Controller:
             body = {"name": self.a.name, "image": self.a.image, "disk": 20, "ports": ["8888/http"],
                     "entrypoint": ["python3", "-u", "-c"],
                     "cmd": [f"import base64;exec(compile(base64.b64decode('{sup}'),'supervisor','exec'))"],
-                    "env": {"MON_TOKEN": tok, "WORK_DIR": self.a.work_dir},
+                    "env": {"MON_TOKEN": tok, "WORK_DIR": self.a.work_dir,
+                            "SELF_STOP_GRACE": str(self.a.self_stop_grace)},
                     "cpu": {"id": flavor, "vcpuCount": self.a.vcpu},
                     "dataCenterIds": [dc] if dc else [],
                     "mounts": {"network": [{"volumeId": self.a.volume, "path": "/workspace"}]}}
@@ -202,6 +203,8 @@ def main():
     p.add_argument("--interval", type=int, default=300)
     p.add_argument("--grace", type=int, default=900)
     p.add_argument("--max-recreates", type=int, default=6)
+    p.add_argument("--self-stop-grace", type=int, default=3600,
+                   help="seconds a pod may sit with no running job before it terminates itself (-1: never)")
     Controller(p.parse_args()).run()
 
 
