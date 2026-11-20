@@ -22,7 +22,7 @@ and the log-log slope between adjacent primes.
 | g | p | gain | slope to next p |
 |---|---|---|---|
 | 6 | 31, 53, 101, 211 | 9.7, 4.4, 2.4, 1.29 | -1.48, -0.95, -0.84 |
-| 7 | 31, 53, 101 | 108, 11.8, 8.2 | -4.13, -0.56 |
+| 7 | 31, 53, 101 | 108, 11.8, 8.2 | -4.13, -0.55 |
 | 8 | 31, 53 | 94, >=195 | no decay yet (lower bound) |
 
 At the smallest p, the steep slopes come from the falling-factorial penalty on
@@ -86,3 +86,6 @@ more slowly than g!. The "g!/3 to g!/6" scaling in the table above is withdrawn,
 extrapolation to g >= 10 and g >= 12 drawn from it.
 
 A cell at g=8, p=101 is running to pin the g=8 slope down; see `../P4_followup/`.
+
+Validation (2026-11-20): `../VALIDATION_P1P2.md` re-derives this file's tables to within 0.33%
+(validated-with-errata). Erratum E7: these crossover cells used a 2e7 trial cap, against 5e6 in P1.
