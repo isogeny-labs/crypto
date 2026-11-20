@@ -26,7 +26,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 - [ ] Complete the next curve-transfer infrastructure slice: catalog-general norm replay, independent divisor-map oracle, odd two-infinity support, cryptanalysis mirror, standalone packaging, and CI evidence (Codex, started 2026-11-18; tracking PR #4683 merged; implementation continuation PR #4697; cryptanalysis continuation PR #1770; per-job artifact-hydration PR #4705)
 
-- [ ] Implement a projective exceptional-point-safe Edwards transfer adapter with proof gating and an independent small-field oracle (Codex, started 2026-11-20, branch codex/projective-edwards-transfer-20261120)
+- [ ] Implement a projective exceptional-point-safe Edwards transfer adapter with proof gating and an independent small-field oracle (Codex, started 2026-11-20, branch codex/projective-edwards-transfer-20261120, stacked PR #4835 on PR #4697)
 
 - [ ] Formalize or refute the ready yield/rank frontier obligations: population contract, solver visibility, and kernel-mode scope (Codex, started 2026-11-18, branch codex/extend-ecdlp-obligation-graph-20261118, PR #4685)
 
