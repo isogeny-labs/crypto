@@ -444,6 +444,38 @@ impl Producer<'_> {
             return Ok((quotient, remainder));
         }
         // R56_PRODUCER_MONOMIAL_DIVISION_END
+        // R59_BINOMIAL_DIVISION_BEGIN
+        // Synthetic division by x^d+c: x^d == -c, so cancel each
+        // descending high coefficient with one field update. For c=+/-1
+        // this is just subtraction/addition, not multiplication.
+        if b.len >= 3 && b.coefficients[b.len as usize - 1] == 1
+            && b.coefficients[0] != 0
+            && b.coefficients[1..b.len as usize - 1].iter().all(|&v| v == 0)
+        {
+            let d = b.len as usize - 1;
+            let c = b.coefficients[0];
+            for high in (d..a.len as usize).rev() {
+                let factor = remainder.coefficients[high];
+                if factor == 0 { continue; }
+                self.gate.charge(COPY_WORK)?;
+                let low = high - d;
+                quotient.coefficients[low] = factor;
+                remainder.coefficients[low] = if c == 1 {
+                    self.sub(remainder.coefficients[low], factor)?
+                } else if c == self.p - 1 {
+                    self.add(remainder.coefficients[low], factor)?
+                } else {
+                    let scaled = self.mul(factor, c)?;
+                    self.sub(remainder.coefficients[low], scaled)?
+                };
+                remainder.coefficients[high] = 0;
+            }
+            remainder.len = d as u8;
+            quotient.trim();
+            remainder.trim();
+            return Ok((quotient, remainder));
+        }
+        // R59_BINOMIAL_DIVISION_END
         // Most GCD and splitting factors are monic. In that case no
         // reciprocal, leading multiplication, or leading subtraction is needed.
         // For a general divisor, the leading term also cancels exactly.
@@ -518,6 +550,36 @@ impl Producer<'_> {
             return Ok(());
         }
         // R56_PRODUCER_MONOMIAL_REDUCTION_END
+        // R59_BINOMIAL_REDUCTION_BEGIN
+        // Reduce modulo monic x^d+c by a single descending coefficient
+        // fold. This avoids scanning d zero coefficients and trimming per
+        // cancellation. Each nonzero term retains a deadline/work check.
+        if modulus.len >= 3 && value.len >= modulus.len
+            && modulus.coefficients[0] != 0
+            && modulus.coefficients[1..modulus.len as usize - 1].iter().all(|&v| v == 0)
+        {
+            let d = modulus.len as usize - 1;
+            let c = modulus.coefficients[0];
+            for high in (d..value.len as usize).rev() {
+                let factor = value.coefficients[high];
+                if factor == 0 { continue; }
+                self.gate.charge(COPY_WORK)?;
+                let low = high - d;
+                value.coefficients[low] = if c == 1 {
+                    self.sub(value.coefficients[low], factor)?
+                } else if c == self.p - 1 {
+                    self.add(value.coefficients[low], factor)?
+                } else {
+                    let scaled = self.mul(factor, c)?;
+                    self.sub(value.coefficients[low], scaled)?
+                };
+                value.coefficients[high] = 0;
+            }
+            value.len = d as u8;
+            value.trim();
+            return Ok(());
+        }
+        // R59_BINOMIAL_REDUCTION_END
         // x^d+constant and x^d+... with a zero low coefficient appear
         // in sparse factor bases; avoid paying the sparse branch on dense f.
         let sparse_modulus = modulus.coefficients[0] == 0
@@ -1541,6 +1603,36 @@ impl Replay {
             return Ok(r);
         }
         // R56_REPLAY_MONOMIAL_REMAINDER_END
+        // R59_BINOMIAL_REMAINDER_BEGIN
+        // Independent descending-index polynomial remainder: for monic
+        // x^d+c the only surviving cancellation lies d slots below.
+        // Treat +/-1 as additive units, independently of producer code.
+        if d >= 3 && denominator.coefficients[d - 1] == 1
+            && denominator.coefficients[0] != 0
+            && denominator.coefficients[1..d - 1].iter().all(|&v| v == 0)
+        {
+            let c = denominator.coefficients[0];
+            let degree = d - 1;
+            for high in (degree..usize::from(numerator.len)).rev() {
+                self.gate.charge(COPY_WORK)?;
+                let factor = r.coefficients[high];
+                if factor == 0 { continue; }
+                let low = high - degree;
+                r.coefficients[low] = if c == 1 {
+                    self.minus(r.coefficients[low], factor)?
+                } else if c == self.p - 1 {
+                    self.plus(r.coefficients[low], factor)?
+                } else {
+                    let scaled = self.times(factor, c)?;
+                    self.minus(r.coefficients[low], scaled)?
+                };
+                r.coefficients[high] = 0;
+            }
+            r.len = degree as u8;
+            r.trim();
+            return Ok(r);
+        }
+        // R59_BINOMIAL_REMAINDER_END
         let leading = denominator.coefficients[d - 1];
         let monic = leading == 1;
         let inverse = if monic { 1 } else { self.reciprocal(leading)? };
@@ -1618,6 +1710,35 @@ impl Replay {
             return Ok(());
         }
         // R56_REPLAY_MONOMIAL_CANCEL_END
+        // R59_BINOMIAL_CANCEL_BEGIN
+        // Replay keeps its independent descending coefficient traversal
+        // and the same per-degree gate checks as the general cancel loop.
+        if divisor_len >= 3 && numerator.len >= denominator.len
+            && denominator.coefficients[0] != 0
+            && denominator.coefficients[1..divisor_len - 1].iter().all(|&v| v == 0)
+        {
+            let degree = divisor_len - 1;
+            let c = denominator.coefficients[0];
+            for high in (degree..usize::from(numerator.len)).rev() {
+                self.gate.charge(COPY_WORK)?;
+                let factor = numerator.coefficients[high];
+                if factor == 0 { continue; }
+                let low = high - degree;
+                numerator.coefficients[low] = if c == 1 {
+                    self.minus(numerator.coefficients[low], factor)?
+                } else if c == self.p - 1 {
+                    self.plus(numerator.coefficients[low], factor)?
+                } else {
+                    let scaled = self.times(factor, c)?;
+                    self.minus(numerator.coefficients[low], scaled)?
+                };
+                numerator.coefficients[high] = 0;
+            }
+            numerator.len = degree as u8;
+            numerator.trim();
+            return Ok(());
+        }
+        // R59_BINOMIAL_CANCEL_END
         // Independent descending-index traversal rather than producer trim loop.
         let sparse = denominator.coefficients[0] == 0
             || (divisor_len > 2 && denominator.coefficients[1] == 0);
