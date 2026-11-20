@@ -130,7 +130,7 @@ mod round65 {
    for p in [3u64,5,7,101,1_000_000_007,1_000_000_009,(1u64<<61)-1] {
      for degree in [1usize,3,4,8] {
        for leading in [1,p-1] {
-         for c in [1,p-1] {
+         for c in [1,p-1,17%p] {
            for delta in [0,1,p-1,23%p] {
              for verify in [false,true] {
                let a=after::round65_case(p,degree,c,delta,leading,verify,1);
@@ -147,7 +147,7 @@ mod round65 {
    let mut streams=0usize;
    for p in [101u64,1_000_000_007,(1u64<<61)-1] {
      for degree in [4usize,8] {
-       for c in [1,p-1] {
+       for c in [1,p-1,17%p] {
          for leading in [1,p-1] {
            let a=after::round65_whole(p,degree,c,leading);
            let b=before::round65_whole(p,degree,c,leading);
@@ -164,7 +164,7 @@ mod round65 {
  fn benchmark_frobenius_kernels() {
    for p in [1_000_000_007u64,(1u64<<61)-1] {
      for degree in [1usize,4,8] {
-       for c in [1,p-1] {
+       for c in [1,p-1,17%p] {
          for verify in [false,true] {
            let reps=128usize;
            let mut old=Vec::new();let mut new=Vec::new();
@@ -190,8 +190,8 @@ mod round65 {
  fn benchmark_complete_root_and_replay() {
    for p in [1_000_000_007u64,(1u64<<61)-1] {
      for degree in [4usize,8] {
-       for c in [1,p-1] {
-         let reps=2usize;
+       for c in [1,p-1,17%p] {
+         let reps=48usize;
          let mut old=Vec::new();let mut new=Vec::new();
          for trial in 0..13 {
            let bench=|optimized:bool|{
