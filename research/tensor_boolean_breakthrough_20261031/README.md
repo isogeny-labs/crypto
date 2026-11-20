@@ -108,7 +108,11 @@ The null changes only the global wiring of interior ports while preserving the v
     fixed-root bit per selected quadratic root, proving
     `|Gal| <= 2^(n + 3)` even with repeated radicands; consequently the
     arity-only condition `3 * (2^(n + 3) * (n + 3))^2 < p` is sufficient.
-    This closes the `A = 0` Semaev-to-nonzero-torsion branch,
+    The final uniform endpoint now splits classically between pairwise
+    nonsquare products (ordinary Kummer projection) and an existing square
+    pair (cubic-CM projection), returning a canonical point with a nonzero
+    integer torsion index modulo `p` in either case. This closes the `A = 0`
+    Semaev-to-nonzero-torsion branch,
     not the production torsion-to-division-polynomial integration, relation
     yield, expected-runtime assembly, or a subexponential ECDLP theorem.
     [pcc:unverified]

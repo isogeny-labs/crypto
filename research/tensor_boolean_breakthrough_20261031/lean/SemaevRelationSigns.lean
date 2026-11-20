@@ -921,6 +921,96 @@ theorem canonicalShortCubicPairCollision_implies_norm_torsion
   exact ⟨omega, sign, omegaRelation, omegaNonidentity, scaleRelation,
     signUnit, torsion⟩
 
+/-- Concrete ordinary Kummer branch for the canonical short-cubic point
+family. Pairwise nonsquare radicand products isolate any selected term; the
+`2^m` automorphism bound turns the arity-only characteristic inequality into
+a nonzero projected torsion index. -/
+theorem zmodCanonicalShortCubicPairwiseNonsquare_implies_nonzero_index_torsion
+    (modulus : ℕ) [Fact modulus.Prime] {Index : Type*}
+    [Fintype Index] [DecidableEq Index]
+    (B : ZMod modulus) (scale : Index → ZMod modulus)
+    [(shortCharacterCurve 0 0 B).IsElliptic]
+    [DecidableEq (ShortCubicSplittingField (ZMod modulus) Index 0 B scale)]
+    (twoNonzeroBase : (2 : ZMod modulus) ≠ 0)
+    (radicandNonzero : ∀ index,
+      shortCubicRadicandFamily 0 B scale index ≠ 0)
+    (pairwiseNonsquare : ∀ left right, left ≠ right →
+      ¬ IsSquare
+        (shortCubicRadicandFamily 0 B scale left *
+          shortCubicRadicandFamily 0 B scale right))
+    (coefficient : Index → ℤ)
+    (coefficientUnit : ∀ index,
+      coefficient index = 1 ∨ coefficient index = -1)
+    (relation : ∑ index,
+      coefficient index • canonicalShortCubicPoint 0 B scale index = 0)
+    (chosen : Index)
+    (arityBelow :
+      2 ^ Fintype.card Index * Fintype.card Index < modulus) :
+    ((((Fintype.card
+      (ShortCubicSplittingField (ZMod modulus) Index 0 B scale ≃ₐ[
+        ShortCubicFunctionField (ZMod modulus)]
+        ShortCubicSplittingField (ZMod modulus) Index 0 B scale) : ℤ) *
+      coefficient chosen : ℤ)) : ZMod modulus) ≠ 0 ∧
+    ((Fintype.card
+      (ShortCubicSplittingField (ZMod modulus) Index 0 B scale ≃ₐ[
+        ShortCubicFunctionField (ZMod modulus)]
+        ShortCubicSplittingField (ZMod modulus) Index 0 B scale) : ℤ) *
+      coefficient chosen) •
+        canonicalShortCubicPoint 0 B scale chosen = 0 := by
+  have twoNonzeroFunctionField :
+      (2 : ShortCubicFunctionField (ZMod modulus)) ≠ 0 := by
+    rw [← map_ofNat
+      (algebraMap (ZMod modulus)
+        (ShortCubicFunctionField (ZMod modulus))) 2]
+    exact (map_ne_zero
+      (algebraMap (ZMod modulus)
+        (ShortCubicFunctionField (ZMod modulus)))).2 twoNonzeroBase
+  have torsion :
+      ((Fintype.card
+        (ShortCubicSplittingField (ZMod modulus) Index 0 B scale ≃ₐ[
+          ShortCubicFunctionField (ZMod modulus)]
+          ShortCubicSplittingField (ZMod modulus) Index 0 B scale) : ℤ) *
+        coefficient chosen) •
+          canonicalShortCubicPoint 0 B scale chosen = 0 := by
+    apply quadraticSplittingFieldAffinePointProjector_isolates_term
+      (shortCubicFunctionCurve 0 B).toAffine
+      (by simp [shortCubicFunctionCurve, shortCharacterCurve])
+      (by simp [shortCubicFunctionCurve, shortCharacterCurve])
+      (shortCubicRadicandFamily 0 B scale)
+      (fun index ↦ shortCubicScaledX (scale index))
+      coefficient chosen twoNonzeroFunctionField radicandNonzero
+      pairwiseNonsquare
+      (fun index ↦ shortCubicRoot_nonsingular 0 B (scale index)
+        (quadraticRadicandRoot (shortCubicRadicandFamily 0 B scale) index)
+        (by simpa [shortCubicRadicandFamily] using
+          (quadraticRadicandRoot_sq
+            (shortCubicRadicandFamily 0 B scale) index)))
+    exact relation
+  have cardBound := quadraticRadicandSplittingField_card_aut_le_two_pow
+    (shortCubicRadicandFamily 0 B scale)
+  have projectedBelow :
+      Fintype.card
+          (ShortCubicSplittingField (ZMod modulus) Index 0 B scale ≃ₐ[
+            ShortCubicFunctionField (ZMod modulus)]
+            ShortCubicSplittingField (ZMod modulus) Index 0 B scale) *
+          Fintype.card Index < modulus :=
+    (Nat.mul_le_mul_right (Fintype.card Index) cardBound).trans_lt arityBelow
+  have chosenNonzero : coefficient chosen ≠ 0 := by
+    rcases coefficientUnit chosen with equal | equal <;> simp [equal]
+  have chosenBound : (coefficient chosen).natAbs ≤ Fintype.card Index := by
+    have cardPositive : 0 < Fintype.card Index := Fintype.card_pos_iff.mpr ⟨chosen⟩
+    have oneLe : 1 ≤ Fintype.card Index := cardPositive
+    rcases coefficientUnit chosen with equal | equal <;>
+      simpa [equal] using oneLe
+  exact projectedTorsion_index_ne_zero
+    (K := ZMod modulus)
+    (Gamma := ShortCubicSplittingField (ZMod modulus) Index 0 B scale ≃ₐ[
+      ShortCubicFunctionField (ZMod modulus)]
+      ShortCubicSplittingField (ZMod modulus) Index 0 B scale)
+    modulus (Fintype.card Index) (coefficient chosen)
+    (canonicalShortCubicPoint 0 B scale chosen) chosenNonzero chosenBound
+    projectedBelow torsion
+
 /-- Prime-field interval specialization of the canonical `A = 0` branch.
 The interval hypotheses construct every nonzero/nonsquare premise and the
 quadratic splitting field internally; the only geometric input left is one
@@ -1201,6 +1291,55 @@ theorem evalCanonical_shortCubicScaledX_zero_implies_canonical_relation
     (fun index ↦ algebraMap F L (shortCubicScaledX (scale index)))
     (canonicalShortCubicPoint 0 B scale) chosenX vanishingL
 
+/-- A point has a nonzero integer torsion index modulo `modulus`. -/
+def HasNonzeroZModTorsionIndex
+    (modulus : ℕ) {Point : Type*} [AddCommGroup Point] (point : Point) : Prop :=
+  ∃ index : ℤ, (index : ZMod modulus) ≠ 0 ∧ index • point = 0
+
+/-- Direct ordinary-branch Semaev endpoint for pairwise nonsquare canonical
+radicands. -/
+theorem zmodCanonicalSemaevPairwiseNonsquare_implies_nonzero_index_torsion
+    (modulus n : ℕ) [Fact modulus.Prime]
+    (B : ZMod modulus)
+    [(shortCharacterCurve 0 0 B).IsElliptic]
+    (scale : Fin (n + 3) → ZMod modulus)
+    [DecidableEq (ShortCubicSplittingField (ZMod modulus) (Fin (n + 3))
+      0 B scale)]
+    (twoNonzeroBase : (2 : ZMod modulus) ≠ 0)
+    (radicandNonzero : ∀ index,
+      shortCubicRadicandFamily 0 B scale index ≠ 0)
+    (pairwiseNonsquare : ∀ left right, left ≠ right →
+      ¬ IsSquare
+        (shortCubicRadicandFamily 0 B scale left *
+          shortCubicRadicandFamily 0 B scale right))
+    (chosen : Fin (n + 3))
+    (vanishing :
+      evalCanonical (shortCubicFunctionCurve 0 B).toAffine n
+        (fun index ↦ shortCubicScaledX (scale index)) = 0)
+    (arityBelow : 2 ^ (n + 3) * (n + 3) < modulus) :
+    ∃ coefficient : Fin (n + 3) → ℤ,
+      (∀ index, coefficient index = 1 ∨ coefficient index = -1) ∧
+      ((((Fintype.card
+        (ShortCubicSplittingField (ZMod modulus) (Fin (n + 3)) 0 B scale
+            ≃ₐ[ShortCubicFunctionField (ZMod modulus)]
+          ShortCubicSplittingField (ZMod modulus) (Fin (n + 3)) 0 B scale) :
+          ℤ) * coefficient chosen : ℤ)) : ZMod modulus) ≠ 0 ∧
+      ((Fintype.card
+        (ShortCubicSplittingField (ZMod modulus) (Fin (n + 3)) 0 B scale
+            ≃ₐ[ShortCubicFunctionField (ZMod modulus)]
+          ShortCubicSplittingField (ZMod modulus) (Fin (n + 3)) 0 B scale) :
+          ℤ) * coefficient chosen) •
+        canonicalShortCubicPoint 0 B scale chosen = 0 := by
+  obtain ⟨coefficient, coefficientUnit, relation⟩ :=
+    evalCanonical_shortCubicScaledX_zero_implies_canonical_relation
+      B n scale vanishing
+  have indexedTorsion :=
+    zmodCanonicalShortCubicPairwiseNonsquare_implies_nonzero_index_torsion
+      modulus B scale twoNonzeroBase radicandNonzero pairwiseNonsquare
+      coefficient coefficientUnit relation chosen (by
+        simpa using arityBelow)
+  exact ⟨coefficient, coefficientUnit, indexedTorsion⟩
+
 /-- Direct prime-field `A = 0` Semaev endpoint.  Canonical Semaev vanishing
 constructs the signed point relation; an interval square collision then
 constructs its cubic-CM partner and an explicit Eisenstein norm-torsion
@@ -1354,6 +1493,104 @@ theorem zmodCanonicalSemaevIntervalPairCollision_implies_nonzero_index_torsion
     signUnit normBelow torsion
   exact ⟨coefficient, coefficientUnit, omega, sign, omegaRelation,
     omegaNonidentity, scaleRelation, signUnit, indexedTorsion⟩
+
+/-- Uniform prime-field `A = 0` nonzero-torsion endpoint.  If every distinct
+radicand pair has nonsquare product, the ordinary Kummer projector applies.
+Otherwise a square pair exists and the interval cubic-CM projector applies.
+The stronger CM arity bound covers both branches. -/
+theorem zmodCanonicalSemaevInterval_implies_exists_nonzero_torsion
+    (modulus X n : ℕ) [Fact modulus.Prime]
+    (hChar : ringChar (ZMod modulus) ≠ 2)
+    (twoNonzeroBase : (2 : ZMod modulus) ≠ 0)
+    (B : ZMod modulus)
+    [(shortCharacterCurve 0 0 B).IsElliptic]
+    (cubicNonsingular : (27 : ZMod modulus) * B ^ 2 ≠ 0)
+    (BNonzero : B ≠ 0)
+    (scale : Fin (n + 3) → ℕ)
+    [DecidableEq (ShortCubicSplittingField (ZMod modulus) (Fin (n + 3))
+      0 B (fun i ↦ (scale i : ZMod modulus)))]
+    (scalePositive : ∀ index, 0 < scale index)
+    (scaleBound : ∀ index, scale index ≤ X)
+    (scaleInjective : Function.Injective scale)
+    (intervalShort : 3 * X < modulus)
+    (vanishing :
+      evalCanonical (shortCubicFunctionCurve 0 B).toAffine n
+        (fun index ↦
+          shortCubicScaledX (scale index : ZMod modulus)) = 0)
+    (arityBelow :
+      3 * (2 ^ (n + 3) * (n + 3)) ^ 2 < modulus) :
+    ∃ chosen : Fin (n + 3),
+      HasNonzeroZModTorsionIndex modulus
+        (canonicalShortCubicPoint 0 B
+          (fun i ↦ (scale i : ZMod modulus)) chosen) := by
+  classical
+  let scaleZ : Fin (n + 3) → ZMod modulus :=
+    fun index ↦ scale index
+  have scaleBelow : ∀ index, scale index < modulus := by
+    intro index
+    have := scaleBound index
+    omega
+  have scaleNonzero : ∀ index, scaleZ index ≠ 0 := by
+    intro index castZero
+    have values := congrArg ZMod.val castZero
+    rw [ZMod.val_natCast_of_lt (scaleBelow index), ZMod.val_zero] at values
+    exact (Nat.ne_of_gt (scalePositive index)) values
+  have radicandNonzero : ∀ index,
+      shortCubicRadicandFamily 0 B scaleZ index ≠ 0 := by
+    intro index
+    exact shortCubicFunctionRadicand_ne_zero 0 B (scaleZ index)
+      (scaleNonzero index)
+  by_cases pairwiseNonsquare : ∀ left right, left ≠ right →
+      ¬ IsSquare
+        (shortCubicRadicandFamily 0 B scaleZ left *
+          shortCubicRadicandFamily 0 B scaleZ right)
+  · let chosen : Fin (n + 3) := ⟨0, by omega⟩
+    have sizePositive : 0 < 2 ^ (n + 3) * (n + 3) := by positivity
+    have ordinaryBelow : 2 ^ (n + 3) * (n + 3) < modulus := by
+      calc
+        2 ^ (n + 3) * (n + 3) ≤
+            3 * (2 ^ (n + 3) * (n + 3)) ^ 2 := by
+              nlinarith
+        _ < modulus := arityBelow
+    obtain ⟨coefficient, -, indexNonzero, torsion⟩ :=
+      zmodCanonicalSemaevPairwiseNonsquare_implies_nonzero_index_torsion
+        modulus n B scaleZ twoNonzeroBase radicandNonzero pairwiseNonsquare
+        chosen vanishing ordinaryBelow
+    refine ⟨chosen,
+      (Fintype.card
+        (ShortCubicSplittingField (ZMod modulus) (Fin (n + 3)) 0 B scaleZ
+            ≃ₐ[ShortCubicFunctionField (ZMod modulus)]
+          ShortCubicSplittingField (ZMod modulus) (Fin (n + 3)) 0 B scaleZ) :
+          ℤ) * coefficient chosen, indexNonzero, torsion⟩
+  · push Not at pairwiseNonsquare
+    obtain ⟨chosen, partner, distinct, pairSquare⟩ := pairwiseNonsquare
+    have exactNormBelow :
+        3 * (Fintype.card
+          (ShortCubicSplittingField (ZMod modulus) (Fin (n + 3)) 0 B scaleZ
+              ≃ₐ[ShortCubicFunctionField (ZMod modulus)]
+            ShortCubicSplittingField (ZMod modulus) (Fin (n + 3)) 0 B scaleZ) *
+          (n + 3)) ^ 2 < modulus := by
+      have bound := quadraticRadicand_norm_threshold_of_arity
+        (shortCubicRadicandFamily 0 B scaleZ) modulus (by
+          simpa using arityBelow)
+      simpa only [Fintype.card_fin] using bound
+    obtain ⟨coefficient, -, omega, sign, -, -, -, -, indexNonzero, torsion⟩ :=
+      zmodCanonicalSemaevIntervalPairCollision_implies_nonzero_index_torsion
+        modulus X n hChar twoNonzeroBase B cubicNonsingular BNonzero scale
+        scalePositive scaleBound scaleInjective intervalShort chosen partner
+        distinct (by simpa [shortCubicRadicandFamily, scaleZ] using pairSquare)
+        vanishing exactNormBelow
+    refine ⟨chosen, eisensteinNorm
+      ((Fintype.card
+        (ShortCubicSplittingField (ZMod modulus) (Fin (n + 3)) 0 B scaleZ
+            ≃ₐ[ShortCubicFunctionField (ZMod modulus)]
+          ShortCubicSplittingField (ZMod modulus) (Fin (n + 3)) 0 B scaleZ) :
+          ℤ) * coefficient chosen)
+      (((Fintype.card
+        (ShortCubicSplittingField (ZMod modulus) (Fin (n + 3)) 0 B scaleZ
+            ≃ₐ[ShortCubicFunctionField (ZMod modulus)]
+          ShortCubicSplittingField (ZMod modulus) (Fin (n + 3)) 0 B scaleZ) :
+          ℤ) * coefficient partner) * sign), indexNonzero, torsion⟩
 
 /-- Full finite-image relation certificate obtained from canonical Semaev
 vanishing.  For a nontrivial x-tuple and one chosen point in every used

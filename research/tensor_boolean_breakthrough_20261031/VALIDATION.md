@@ -1558,13 +1558,24 @@ automorphism, including with repeated radicands. Therefore
 arity-only condition `3 * (2^(n + 3) * (n + 3))^2 < p` implies the exact
 threshold above. [pcc:unverified]
 
+`zmodCanonicalShortCubicPairwiseNonsquare_implies_nonzero_index_torsion`
+constructs the ordinary Kummer nonzero-index certificate on the same
+canonical point family under `2^m * m < p`. The uniform endpoint
+`zmodCanonicalSemaevInterval_implies_exists_nonzero_torsion` uses the stronger
+CM arity bound and a complete classical dichotomy: pairwise nonsquare
+products enter the ordinary projector, while failure of that premise
+supplies a distinct square pair and enters the interval cubic-CM projector.
+It returns some canonical point with a nonzero integer torsion index modulo
+`p` for every vanishing tuple satisfying the stated interval and
+characteristic hypotheses. [pcc:unverified]
+
 This closes the concrete `A = 0` Semaev-to-nonzero-torsion branch. It does not
 integrate the open-PR torsion-to-`PsiSq` theorem into the production Mathlib
 pin, prove the final torsion-coordinate contradiction, establish relation
 yield, assemble expected runtime, or prove a subexponential prime-field ECDLP
 algorithm. `lake build DilationNonzeroBounds SemaevRelationSigns` completed
 9,133 jobs, and the repository proof gate reported
-`PASS 451 thm 0 trusted` across all nine tracked modules. An additional
+`PASS 454 thm 0 trusted` across all nine tracked modules. An additional
 `leanchecker --fresh SemaevRelationSigns` replay was manually interrupted
 after about 25 minutes of sustained compute with no output; it is not counted
 as validation evidence. [pcc:unverified]
