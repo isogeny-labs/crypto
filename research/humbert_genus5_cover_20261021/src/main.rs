@@ -14,10 +14,12 @@ mod filter;
 mod filtersummary;
 mod solversummary;
 mod ghsmagic;
+mod setupfast;
 mod la;
 mod lpsummary;
 mod poly;
 mod relfast;
+mod rhopar;
 
 use cover::*;
 use curve::{invr, mulr, pollard_rho, random_point, Rng};
@@ -197,7 +199,22 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     let x_true = 1 + rng.below(r - 1);
     let q = ce.mul(&gen, x_true as u128);
     eprintln!("[setup] r={} #E={} {:.2}s", r, s.order, t.elapsed().as_secs_f64());
+    // HUMBERT_RHO_ONLY=1: skip IC, run only the rho reference (scalar, or parallel with HUMBERT_RHO_* flags)
+    if std::env::var("HUMBERT_RHO_ONLY").map(|v| v == "1").unwrap_or(false) {
+        let cfg = rhopar::ParCfg::from_env();
+        let (rho, extra) = run_rho(&ce, &gen, &q, r, &mut rng, cfg.as_ref());
+        let expected = (std::f64::consts::PI * r as f64 / 2.0).sqrt();
+        println!(
+            "{{\"kind\":\"rho\",\"p\":{p},\"twist\":{twist},\"seed\":{seed},\"E_order\":{},\"r\":{r},\"x_true\":{x_true},\"rho_solved\":{},\"rho_steps\":{},\"rho_seconds\":{:.4},\"rho_expected_steps\":{expected:.1},\"rho_expected_steps_negation\":{:.1},\"rho_k4_muls\":{},\"rho_steps_per_sec\":{:.1}{extra}}}",
+            s.order, rho.log == Some(x_true), rho.steps, rho.seconds, expected / std::f64::consts::SQRT_2, rho.k4_muls, rho.steps as f64 / rho.seconds
+        );
+        return;
+    }
+    let t_fb0 = Instant::now();
     let mut fb = FactorBase::build(&s);
+    if cover::setup_prof() {
+        eprintln!("[setup-prof] factor_base={:.4}", t_fb0.elapsed().as_secs_f64());
+    }
     if let Some(alpha) = lp_alpha {
         // small base: a seeded random subset of the x-values (its own RNG stream)
         let mut idx: Vec<usize> = (0..fb.xs.len()).collect();
@@ -211,7 +228,11 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
         fb.pick = idx;
     }
     let fb = fb;
+    let t_nodes0 = Instant::now();
     let nodes = Nodes::new(&s);
+    if cover::setup_prof() {
+        eprintln!("[setup-prof] nodes={:.4}", t_nodes0.elapsed().as_secs_f64());
+    }
     eprintln!("[fb] points={}", fb.n_points());
     let t_setup = t.elapsed().as_secs_f64();
     let k4_after_setup = s.k().muls.get();
@@ -743,10 +764,11 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
     // ---- matched rho on E(F_{q^4})[r] --------------------------------------
     // HUMBERT_SKIP_RHO=1: no rho run (the instance's rho is measured once, in its baseline arm)
     let skip_rho = std::env::var("HUMBERT_SKIP_RHO").map(|v| v == "1").unwrap_or(false);
-    let rho = if skip_rho {
-        curve::RhoResult { log: None, steps: 1, seconds: 0.0, k4_muls: 0 }
+    // HUMBERT_RHO_THREADS / _BATCH / _NEG / _FASTMUL: parallel rho (src/rhopar.rs), extra fields only then
+    let (rho, rho_par_extra) = if skip_rho {
+        (curve::RhoResult { log: None, steps: 1, seconds: 0.0, k4_muls: 0 }, String::new())
     } else {
-        pollard_rho(&ce, &gen, &q, r, &mut rng)
+        run_rho(&ce, &gen, &q, r, &mut rng, rhopar::ParCfg::from_env().as_ref())
     };
     let rho_ok = rho.log == Some(x_true);
     // HUMBERT_LA_THREADS set: record it; unset: the line is unchanged
@@ -770,12 +792,53 @@ fn attack(p: u64, twist: i32, seed: u64, arm: &str) {
         k4_after_rel - k4_after_setup, k4_after_desc - k4_after_rel,
         rho.steps, rho.seconds, expected_rho_steps / std::f64::consts::SQRT_2, rho.k4_muls, if skip_rho { 0.0 } else { t_ic / rho.seconds }, if skip_rho { 0.0 } else { t_ic / sec_per_step }
     );
+    if !rho_par_extra.is_empty() {
+        line.pop();
+        line.push_str(&rho_par_extra);
+        line.push('}');
+    }
     if let Some(rf) = &rel_fast {
         // extra fields only with the flag: the default output line is unchanged
         line.pop();
         line.push_str(&format!(",\"rel_fast\":true,\"rel_fast_fp_mulmods\":{}}}", rf.fp_muls.get()));
     }
     println!("{line}");
+}
+
+/// Scalar rho (no flags; output unchanged) or the parallel rho with its extra JSON fields.
+fn run_rho(
+    ce: &curve::Curve<field::K4>,
+    gen: &curve::Pt<field::E4>,
+    q: &curve::Pt<field::E4>,
+    r: u64,
+    rng: &mut Rng,
+    cfg: Option<&rhopar::ParCfg>,
+) -> (curve::RhoResult, String) {
+    match cfg {
+        None => (pollard_rho(ce, gen, q, r, rng), String::new()),
+        Some(cfg) => {
+            let pr = rhopar::rho_par(ce, gen, q, r, rng, cfg);
+            let mut exp = (std::f64::consts::PI * r as f64 / 2.0).sqrt();
+            if cfg.neg {
+                exp /= std::f64::consts::SQRT_2;
+            }
+            let agg = pr.steps as f64 / pr.seconds;
+            let per_thread: Vec<String> = pr
+                .steps_per_thread
+                .iter()
+                .zip(&pr.seconds_per_thread)
+                .map(|(s, t)| format!("{:.1}", *s as f64 / t))
+                .collect();
+            let secs: Vec<String> = pr.seconds_per_thread.iter().map(|t| format!("{t:.4}")).collect();
+            let extra = format!(
+                ",\"rho_par\":{{\"threads\":{},\"batch\":{},\"neg\":{},\"fastmul\":{},\"nb\":{},\"dp_bits\":{},\"dps\":{},\"useless_collisions\":{},\"abandoned_walks\":{},\"fruitless_cycles\":{},\"fruitless_cycle_steps\":{},\"degenerate\":{},\"walk_inversions\":{},\"k4_muls_walk\":{},\"k4_muls_per_step\":{:.4},\"extra_group_ops\":{},\"expected_steps\":{exp:.1},\"steps_over_expected\":{:.4},\"steps_per_sec\":{agg:.1},\"steps_per_sec_per_thread\":[{}],\"steps_per_thread\":{:?},\"seconds_per_thread\":[{}]}}",
+                cfg.threads, cfg.batch, cfg.neg, cfg.fast, pr.nb, pr.dp_bits, pr.dps, pr.useless_collisions, pr.abandoned_walks, pr.fruitless_cycles, pr.fruitless_cycle_steps, pr.degenerate, pr.walk_inversions, pr.k4_muls_walk,
+                pr.k4_muls_walk as f64 / (pr.steps - pr.fruitless_cycle_steps).max(1) as f64, pr.extra_group_ops, pr.steps as f64 / exp,
+                per_thread.join(","), pr.steps_per_thread, secs.join(",")
+            );
+            (curve::RhoResult { log: pr.log, steps: pr.steps, seconds: pr.seconds, k4_muls: pr.k4_muls }, extra)
+        }
+    }
 }
 
 #[cfg(test)]
