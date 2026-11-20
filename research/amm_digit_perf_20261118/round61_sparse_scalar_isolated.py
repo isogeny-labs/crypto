@@ -164,7 +164,7 @@ mod round61{
          for leading in [1u64,p-1] {
            let old=before::complete(p,degree,sparse,leading);
            let new=after::complete(p,degree,sparse,leading);
-           assert_eq!(old,new,"complete prime={p} degree={degree} sparse={sparse} leading={leading}");
+           assert_eq!(format!("{old:?}"),format!("{new:?}"),"complete prime={p} degree={degree} sparse={sparse} leading={leading}");
          }
        }
      }
