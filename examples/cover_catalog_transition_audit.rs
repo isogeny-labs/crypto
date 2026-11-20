@@ -1,4 +1,7 @@
-//! Audit exact membership changes before refreshing the catalog assessment pins.
+//! Replay the exact historical membership change that preceded the catalog
+//! assessment refresh.  Every compared catalog and ledger input is read from
+//! its pinned Git revision so later live-catalog growth cannot alter the
+//! historical receipt.
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::{collections::BTreeMap, error::Error, fs, io::Write, process::Command};
@@ -6,6 +9,7 @@ type Result<T> = std::result::Result<T, Box<dyn Error>>;
 const OLD: &str = "ff48e2800f62b45c746b3f391540c07b16af4e75";
 const NEW: &str = "8e4c99759fd8d9594ed207d793b07b59ebaf19f7";
 const BEFORE_LEDGER_REFRESH: &str = "05bb1e403a13ca609a2a09f0635dfbe46772e27f";
+const AFTER_LEDGER_REFRESH: &str = "18a6735fbefc53b0bffb2443a0075faa9c1ebfb0";
 fn require(ok: bool, msg: &str) -> Result<()> {
     if ok {
         Ok(())
@@ -72,10 +76,6 @@ fn audit() -> Result<Value> {
     let path = "docs/curves/registry.json";
     let old_bytes = blob(OLD, path)?;
     let new_bytes = blob(NEW, path)?;
-    require(
-        fs::read(path)? == new_bytes,
-        "current registry differs from pinned catalog",
-    )?;
     let before = models(&serde_json::from_slice(&old_bytes)?)?;
     let after = models(&serde_json::from_slice(&new_bytes)?)?;
     require(
@@ -113,15 +113,11 @@ fn audit() -> Result<Value> {
     ] {
         let old = blob(OLD, path)?;
         let new = blob(NEW, path)?;
-        require(
-            fs::read(path)? == new,
-            "current catalog file differs from pinned commit",
-        )?;
         blobs.push(json!({"path":path,"old_sha256":sha(&old),"new_sha256":sha(&new)}));
     }
     let ledger_path = "docs/curves/cover-transfer-assessments.json";
     let old_ledger: Value = serde_json::from_slice(&blob(BEFORE_LEDGER_REFRESH, ledger_path)?)?;
-    let ledger: Value = serde_json::from_slice(&fs::read(ledger_path)?)?;
+    let ledger: Value = serde_json::from_slice(&blob(AFTER_LEDGER_REFRESH, ledger_path)?)?;
     let mut changes = Vec::new();
     let mut digests = BTreeMap::new();
     for section in [

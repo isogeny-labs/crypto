@@ -24,7 +24,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 - [ ] Improve the exact Semaev projection/index-calculus lane toward cold one-target rho parity, with complete counted costs and verified recovery (Codex, started 2026-11-18, branch codex/semaev-rho-parity-20261118, PR #4682)
 
-- [ ] Complete the next curve-transfer infrastructure slice: catalog-general norm replay, independent divisor-map oracle, odd two-infinity support, cryptanalysis mirror, standalone packaging, and CI evidence (Codex, started 2026-11-18, branch codex/curve-transfer-next-phase-20261118, PR #4683)
+- [ ] Complete the next curve-transfer infrastructure slice: catalog-general norm replay, independent divisor-map oracle, odd two-infinity support, cryptanalysis mirror, standalone packaging, and CI evidence (Codex, started 2026-11-18; tracking PR #4683 merged; implementation continuation PR #4697; cryptanalysis continuation PR #1770; per-job artifact-hydration PR #4705)
 
 - [ ] Formalize or refute the ready yield/rank frontier obligations: population contract, solver visibility, and kernel-mode scope (Codex, started 2026-11-18, branch codex/extend-ecdlp-obligation-graph-20261118, PR #4685)
 
@@ -97,6 +97,15 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 - [ ] Autolab rounds 38 to 40 (claude, started 2026-11-17, branch ic-autolab-20261117b): round 39 ratchets `tw2l-x20-j16-n2` at k = 28 (0.944, counted GAE; wall time 1.236x slower; validator disposition validated for the counted claim); open: a second-host replay or human validation, a code-level lever beyond the K = 3 collision floor, and the `hashed-ecdl-tensor` standalone build failure (eight modules with no `mod` line in `lib.rs`)
 
 ## Blocked / questions for the owner
+
+- Curve-transfer infrastructure continuation (Codex, PR #4697): the scoped
+  curve workflow is green at exact implementation/workflow head `d8df2130...`,
+  but merge/shipping remain blocked on artifact-store recovery or an approved
+  replacement, classification of broad repository CI hydration failures,
+  human/PCC review and signed standing, and an independently downloadable
+  package replay. Fully hydrated browser freshness, unsupported transfer
+  backends, the projective exceptional-point-safe Edwards adapter, and the
+  separate full Jacobian index-calculus solver remain open deliverables.
 
 
 - Lazy-orbit column sweep vs strong rho (claude, 2026-11-17, branch claude/admiring-gauss-vo7kxf, PR #4565): protocol frozen (`research/ic_lead_chase_20261116/protocol.json`, sha256 19116bb1…, source 3658d3aa26), specs and analysis bound, queue registrations `experiments/queue/EXP-LAZYCOL-N{17,29,31}-001.json` filed `blocked`. Needs: live daily+monthly budget headroom in account 104186811093 (latest readback over the monthly cap; this runtime has no lab AWS identity), approved expspec records, an isolab image built from 3658d3aa26, and a perf-ipc w_cal host.

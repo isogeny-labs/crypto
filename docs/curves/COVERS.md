@@ -144,22 +144,48 @@ binary genus-three selection or its historical not-tested fields.
 
 These elementary same-field constructions establish existence. This geometry
 checker performs **no Weil descent to a smaller field**, no subgroup-map
-computation, and no relation-solving or discrete-log benchmark. Those fields
-remain `not_tested`/null. Existence carries no speedup or vulnerability label.
-The elliptic factor already accounts for part of the cover's Jacobian; its
-existence alone does not establish cheaper computation there.
+computation, and no relation-solving or discrete-log benchmark. Its graph
+fields therefore remain `not_tested`/null. Existence carries no speedup or
+vulnerability label. The elliptic factor already accounts for part of the
+cover's Jacobian; its existence alone does not establish cheaper computation
+there. The separate `hyperelliptic-cover transfer` command evaluates induced
+maps within narrower arithmetic boundaries; its results do not retroactively
+change the geometry checker's status fields.
 
 The separate generated
 [`cover-transfer-assessments.json`](cover-transfer-assessments.json) v2 ledger
-classifies transfer obligations for every current map and linked EC1
-representation. Its coverage counts are derived from exact registry and graph
-membership. The immutable October 13 report covers its dated 2,100-map,
-664-representation snapshot; it does not establish replay coverage for later
-catalog additions. The generated current-catalog
-classification does not alter this geometry catalog: it records bounded binary
-typed-transfer support,
-refutes capabilities absent from the current implementation, and leaves the
-odd-characteristic balanced-Jacobian maps and every solver-cost claim open.
+is a historical assessment bound to catalog commit
+`728304718cb0ab6df70da620a908a5f76f175293`: 15,791 maps and 979 linked EC1
+representations. It is not a classification of the live graph below, and later
+catalog additions inherit no transfer status from it. Current binary code has
+general arbitrary-class pushforward and a structured CLI. Its separate
+`transfer-catalog-export` path replays all live binary map rows and named EC1
+generators into a hash-bound corpus while keeping annihilator checks distinct
+from exact-order evidence. A separate GF(8) oracle now constructs its own
+source group from 33,856 principal divisors, all 486 reduced classes, and 233
+admissible graph places. It checks all 114,791,256 associativity triples, all
+236,196 pushforward-additivity pairs, pullback and both composition identities,
+and only then compares every class operation with production. A clean Rust
+1.98 replay binds those checks to producer commit
+`e0ae0fe5d09c0492a8b50600e88d0b9da68afef1`, its exact raw output, and a
+wrapper-level resource receipt. This closes the independent source-law gate
+for that one fixed fixture; signed standing, packaged replay, mutation
+controls, and a catalog-wide independent oracle remain open. A separate `F_2`
+control constructs all 20
+source classes independently
+from principal divisors, checks all 400 ordered sums and 8,000 associativity
+triples, and verifies the independently implemented maps and both composition
+identities before comparing with production. That exact tiny-field fixture is
+additional independent evidence rather than the basis for the 486-class
+result.
+The bounded balanced backend handles direct short-Weierstrass quadratic-cover
+maps, and their checked projective Montgomery compositions, over
+deterministically proved prime fields in the complete `u64` domain and below
+the strict Sorenson--Webster `psi_13` bound. It implements arbitrary
+balanced-class pushforward, pullback, the deck action, and both degree-two
+composition identities. Edwards exceptional-point charts, extension fields,
+moduli without a deterministic proof, solver evidence, and every
+computational-advantage claim remain unsupported or unassessed as applicable.
 
 The Rust tests enumerate all affine cover points on every nonsingular
 short Weierstrass model over F5, F7, F11 and F25 (`t^2 + 2`), on four
@@ -209,53 +235,83 @@ that map. Genus two and degree two are preserved. Small-field tests exhaust
 all nonsingular parameter choices in characteristics 5, 7 and 11 and verify
 the forward equations and inverse identities wherever affine formulas apply.
 
+The transfer library now has a typed, everywhere-defined projective
+Montgomery/short-Weierstrass isomorphism and composes it with the genus-two
+pullback/pushforward API. Adapter tests exhaust point and projective-map
+bijections for every smooth parameter choice over `p=5,7,11`, and an
+independently coded group law checks one complete `p=11`, `A=3`, `B=2` model.
+A complete composed `p=7` fixture checks all 12 Montgomery points, all 72
+balanced classes, both compositions, and both homomorphism laws. The
+standalone transfer command consumes and returns original
+Montgomery coordinates, while the sweeper replays the composed constructor.
+The six live Montgomery-normalized maps (seven named bindings) are all
+outside the accepted deterministic prime-proof range, so this adds no live
+supported binding. The Edwards charts likewise remain geometry evidence
+rather than an end-to-end induced-map implementation.
+
 The [standards importer](standards/README.md) expands the inventory, while
 [`cover-links.yaml`](cover-links.yaml) supplies exact ICV1/EC1/HC1/CV1 links.
 Pass `--links PATH` alongside custom registry/report paths. `--check` replays
 both the report and the graph. An unresolved source import is recorded in
 `standards/coverage.json` and is not evidence of cover nonexistence.
 
+## 2026-11-18 live catalog inventory
 
+The regenerated live graph binds all 22,417 registry models to 22,417 maps and
+22,415 distinct cover models. Its 1,090 EC1 representations remain exact
+identity links, not subgroup-transfer certificates.
 
+| Live profile | Maps | Linked EC1 representations |
+| --- | ---: | ---: |
+| Binary cubic | 174 | 150 |
+| Direct odd prime field | 20,808 | 909 |
+| Normalized odd prime field | 30 | 22 |
+| Odd extension field | 1,405 | 9 |
+| **Total** | **22,417** | **1,090** |
 
+A bounded pilot locally replays the five smallest degree-two extension rows
+(two over `GF(5^2)`, three over `GF(7^2)`) with implementation-separated
+finite-field arithmetic in their exact catalog polynomial bases. It verifies
+source smoothness, separability, rational points, fibers, and infinity
+geometry, but its graph regeneration uses the repository checker and its
+basis comparison is differential against `Fp2Ctx`; it is not an independent
+Jacobian implementation. Those five rows have no named EC1 binding; the
+remaining 1,400 extension maps retain structured unsupported records. This
+pilot therefore changes neither the nine linked subgroup statuses nor the
+graph's historical fields.
 
+The separate tracked `odd-transfer-catalog` corpus contains all 22,243 odd
+maps and 940 named bindings. Its 17,879,292 canonical bytes have SHA-256
+`1ecfabcdaecc3e00d78ab2ce7eebeb94607e1c2c224f261fb5718a4f53b65268`.
+It was generated by the clean producer commit
+`8c94831426fa35040fa7b38b1379299bf6e6d957` and records the framed source
+digest `a5412b92e5e027b281d79c541cc34df130e16d9c71a7034f2065c6e181d8b3ef`
+over 29 source files. Its binding partition is 675 supported direct-prime
+certificates, 240 unsupported without an accepted primality certificate, 0
+kernel-intersection rows, 15 unsupported Edwards normalized-target rows, 9
+unsupported extension rows, 1 failed invalid target generator, 0 other invalid
+rows, and 0 transfer-arithmetic failures. The seven Montgomery bindings moved
+from the historical normalized
+bucket to the proof-gated bucket because their composed backend is implemented
+but their fields or declared orders lack an accepted certificate; none is
+claimed live-supported. Exact same-implementation replay returns the expected
+incomplete status and exit `1`; repository source replay binds all 29 source
+blobs and the Lean artifact to that commit and exits `0`. The compiler label remains
+caller-supplied and unverified, and the local unsigned Lean theorem proves only
+its conditional abstract implication. Independent replay and installed-package
+replay remain separate release obligations; these receipts do not rewrite the
+graph or historical assessment and establish no solver, scaling, or
+computational-advantage claim. [pcc:unverified]
 
+The earlier 17,879,352-byte `7c60fc…` corpus from producer `e0ae0fe5…` and
+partition 675/233/22/9/1 remains immutable historical evidence.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-classifies transfer obligations for all 4,493 map rows (4,491 distinct cover
-models) and 1,004 linked EC1 representations. The population comprises 165
-binary maps and 4,328 odd-characteristic maps: 2,011 direct prime-field, 30
-normalized-target prime-field, and 2,287 extension-field maps. The EC1 links
-comprise 140 binary and 864 odd-characteristic representations. The
-[2026-10-22 catalog refresh](../../research/quadratic_twist_evidence_20261021/reports/catalog-20261022/README.md)
-records the native replay and retains the earlier dated assessment report. That
-
-
-
-
-
-
-
-
+All graph `subgroup_transport` fields remain `not_tested` with null evidence.
+The historical [2026-10-22 catalog refresh](../../research/quadratic_twist_evidence_20261021/reports/catalog-20261022/README.md)
+and the dated transfer assessment retain their original populations; neither
+is silently relabelled as live evidence. Geometry coverage, general binary
+map code, named-generator replay, and bounded direct-prime induced maps are
+separate facts. The binary certificate exporter targets all 174 binary rows,
+including 150 EC1 bindings on 147 maps and 27 maps without a named subgroup;
+its records leave exact order as separate evidence. None establishes an
+index-calculus solver, key recovery, or a computational advantage.

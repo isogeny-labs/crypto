@@ -1,0 +1,92 @@
+digraph transfer_evidence {
+  graph [
+    rankdir=TB,
+    bgcolor="white",
+    pad="0.18",
+    nodesep="0.42",
+    ranksep="0.48",
+    fontname="DejaVu Sans",
+    fontsize=11,
+    label="Implemented cover-transfer paths and the evidence boundary",
+    labelloc=t
+  ];
+  node [
+    shape=box,
+    style="rounded,filled",
+    fillcolor="#f8fafc",
+    color="#334155",
+    fontname="DejaVu Sans",
+    fontsize=9,
+    margin="0.10,0.07"
+  ];
+  edge [color="#475569", fontname="DejaVu Sans", fontsize=8];
+
+  subgraph cluster_binary {
+    label="ordinary binary family · degree 3";
+    color="#93c5fd";
+    style="rounded";
+    bin_e [label="E / F(2^m)\nnamed point G"];
+    bin_j [label="Jac(C), genus 3\none rational infinity"];
+    bin_e -> bin_j [dir=both, label="pullback phi* / norm phi_*", color="#2563eb"];
+    bin_id [label="runtime witness\nphi_* phi*(G) = [3]G\narbitrary norm = typed image", fillcolor="#dbeafe"];
+    bin_j -> bin_id [style=dashed, arrowhead=none];
+    { rank=same; bin_e; bin_j; bin_id; }
+  }
+
+  subgraph cluster_prime {
+    label="direct odd-prime family · degree 2";
+    color="#86efac";
+    style="rounded";
+    odd_e [label="E: y^2 = x^3 + Ax + B\np > 3; proved in u64 or strict psi_13 range\ntwo live 73-bit pilot rows"];
+    odd_j [label="Jac(C), genus 2\nbalanced split-sextic classes"];
+    odd_e -> odd_j [dir=both, label="pullback pi* / pushforward pi_*", color="#16a34a"];
+    odd_id [label="runtime witnesses\npi_* pi* = [2]\npi* pi_* = 1 + deck_*", fillcolor="#dcfce7"];
+    odd_j -> odd_id [style=dashed, arrowhead=none];
+    { rank=same; odd_e; odd_j; odd_id; }
+  }
+
+  premise [
+    label="named-subgroup premises\nrG = 0 and gcd(r, degree) = 1",
+    fillcolor="#fef3c7",
+    color="#d97706"
+  ];
+  recovery [
+    label="degree-inverse recovery\n=> pullback injective on <G>",
+    fillcolor="#fffbeb",
+    color="#d97706"
+  ];
+  premise -> recovery [label="checked witnesses"];
+  bin_id -> premise [style=dotted];
+  odd_id -> premise [style=dotted];
+
+  exact [
+    label="separate evidence tier\nexact order / primality",
+    fillcolor="#fff7ed",
+    color="#ea580c"
+  ];
+  recovery -> exact [style=dashed, label="not implied"];
+
+  catalog [
+    label="binary catalog export\nEC1 + ICV1 + cover/map UIDs\nwitnesses + failures + source hashes",
+    fillcolor="#ede9fe",
+    color="#7c3aed"
+  ];
+  recovery -> catalog [label="machine record"];
+  exact -> catalog [style=dashed, label="joined status"];
+  { rank=same; exact; catalog; }
+
+  boundary [
+    label="structured unsupported / open\nodd extensions and primes without proof\nnormalized target transfer (fail-closed) and nonsplit infinity\ntheorem-complete Xarles families\nfull Jacobian index calculus",
+    fillcolor="#fee2e2",
+    color="#dc2626"
+  ];
+  catalog -> boundary [style=dotted, arrowhead=none];
+
+  no_claim [
+    label="No destination solver or cost comparison\nNo computational-advantage conclusion",
+    shape=note,
+    fillcolor="#f1f5f9",
+    color="#64748b"
+  ];
+  boundary -> no_claim [style=dashed, arrowhead=none];
+}

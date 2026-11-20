@@ -132,6 +132,7 @@ test('staged Rust release inputs select the Rust package lane', () => {
     'research/p192_p224_large_degree_isogenies_20261009/PROTOCOL.md',
     'research/p192_p224_large_degree_isogenies_20261009/verification_poly.rs',
     'research/p192_p224_large_degree_isogenies_20261009/verification_kernel.rs',
+    'research/chained_jacobian_transfers_20261110/lean/ChainTransfer.lean',
   ];
   for (const file of inputs) {
     const result = classify([file]);

@@ -1,0 +1,716 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aburan28/crypto/blob/main/docs/curves/odd-subgroup-transfer-certificates.schema.json",
+  "title": "Odd-characteristic cover named-subgroup transfer corpus",
+  "description": "Structural contract for the retained odd-characteristic cover population. Supported rows bind a direct short-Weierstrass prime-field map to one exact-prime-order named generated subgroup. Unsupported proof ranges, unresolved kernel intersections, missing normalized or extension-field backends, invalid input data, and transfer-arithmetic failures remain distinct. Schema validity alone does not verify arithmetic, hashes, coverage, source provenance, or PCC standing.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_by",
+    "producer",
+    "proof_artifacts",
+    "inputs",
+    "scope",
+    "summary",
+    "membership",
+    "records"
+  ],
+  "properties": {
+    "schema_version": { "const": "odd-subgroup-transfer-certificates/v1" },
+    "generated_by": { "$ref": "#/$defs/nonemptyString" },
+    "producer": { "$ref": "#/$defs/producer" },
+    "proof_artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": { "$ref": "#/$defs/proofArtifact" }
+    },
+    "inputs": { "$ref": "#/$defs/inputs" },
+    "scope": { "$ref": "#/$defs/scope" },
+    "summary": { "$ref": "#/$defs/summary" },
+    "membership": { "$ref": "#/$defs/membership" },
+    "records": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/mapRecord" }
+    }
+  },
+  "$defs": {
+    "nonemptyString": { "type": "string", "minLength": 1 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "gitCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "ec1": {
+      "type": "string",
+      "pattern": "^EC1(?:N[0-9]+|P[0-9]+|Q[0-9]+D[0-9]+)C[a-z][a-z0-9]*h[0-9a-f]{12,64}$"
+    },
+    "curveUid": {
+      "type": "string",
+      "pattern": "^urn:ec-record:1:sha256:[0-9a-f]{64}$"
+    },
+    "coverUid": {
+      "type": "string",
+      "pattern": "^urn:hc-model:1:sha256:[0-9a-f]{64}$"
+    },
+    "mapUid": {
+      "type": "string",
+      "pattern": "^urn:curve-cover-map:1:sha256:[0-9a-f]{64}$"
+    },
+    "hexElement": { "type": "string", "pattern": "^0x[0-9a-f]+$" },
+    "decimalPositive": { "type": "string", "pattern": "^[1-9][0-9]*$" },
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "git_commit",
+        "source_sha256",
+        "source_digest_encoding",
+        "source_paths",
+        "source_files",
+        "rustc_version",
+        "rustc_version_attestation",
+        "attestation",
+        "build_provenance_source",
+        "build_git_dirty",
+        "command",
+        "command_argv"
+      ],
+      "properties": {
+        "repository": { "const": "aburan28/crypto" },
+        "git_commit": { "$ref": "#/$defs/gitCommit" },
+        "source_sha256": { "$ref": "#/$defs/sha256" },
+        "source_digest_encoding": { "const": "for each listed UTF-8 source in order: u64be(len(path_bytes))||path_bytes||u64be(len(content_bytes))||content_bytes" },
+        "source_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonemptyString" }
+        },
+        "source_files": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/sourceFile" }
+        },
+        "rustc_version": { "$ref": "#/$defs/nonemptyString" },
+        "rustc_version_attestation": { "const": "caller_supplied_unverified" },
+        "attestation": { "const": "embedded_clean_build_provenance_matches_requested_commit" },
+        "build_provenance_source": {
+          "enum": ["CRYPTO_BUILD_GIT_COMMIT", "GITHUB_SHA"]
+        },
+        "build_git_dirty": { "const": false },
+        "command": { "$ref": "#/$defs/nonemptyString" },
+        "command_argv": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/nonemptyString" }
+        }
+      }
+    },
+    "sourceFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": { "$ref": "#/$defs/nonemptyString" },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "proofArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "path",
+        "sha256",
+        "bytes",
+        "declaration",
+        "toolchain",
+        "verification_status",
+        "scope"
+      ],
+      "properties": {
+        "id": { "const": "lean:ChainedTransfer.injective_with_recovery" },
+        "path": { "const": "research/chained_jacobian_transfers_20261110/lean/ChainTransfer.lean" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "declaration": { "const": "ChainedTransfer.injective_with_recovery" },
+        "toolchain": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["lean", "lean_commit"],
+          "properties": {
+            "lean": { "const": "4.35.0" },
+            "lean_commit": { "const": "eb6cafb7290e8bd5f2937522d8d804f58f02bafc" }
+          }
+        },
+        "verification_status": { "const": "local_unsigned_unverified" },
+        "scope": { "const": "conditional structural injectivity from explicit homomorphism, annihilator, Bezout, and norm hypotheses; it does not construct or identify the concrete geometric maps" }
+      }
+    },
+    "artifactPin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "$ref": "#/$defs/nonemptyString" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["registry", "cover_graph"],
+      "properties": {
+        "registry": { "$ref": "#/$defs/artifactPin" },
+        "cover_graph": { "$ref": "#/$defs/artifactPin" }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "supported_family",
+        "source",
+        "map",
+        "map_degree",
+        "supported_claim",
+        "normalized_target_backend",
+        "extension_field_backend",
+        "independent_source_jacobian_oracle",
+        "solver_assessment",
+        "computational_advantage"
+      ],
+      "properties": {
+        "supported_family": { "const": "direct_short_weierstrass_prime_quadratic_pullback_v1" },
+        "source": { "const": "genus_2_split_sextic_with_two_rational_infinities" },
+        "map": { "const": "pi(u,v)=(u^2+c,v)" },
+        "map_degree": { "const": 2 },
+        "supported_claim": { "const": "exact-prime-order_named-generated-subgroup_pullback_is_injective_with_checked_recovery" },
+        "normalized_target_backend": {
+          "enum": [
+            "unsupported",
+            "montgomery_implemented_live_rows_primality_gated_edwards_unsupported"
+          ]
+        },
+        "extension_field_backend": { "const": "unsupported" },
+        "independent_source_jacobian_oracle": { "const": "not_provided_catalog_wide" },
+        "solver_assessment": { "const": "not_provided" },
+        "computational_advantage": { "const": "not_assessed" }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "odd_maps",
+        "direct_prime_maps",
+        "normalized_prime_maps",
+        "odd_extension_maps",
+        "maps_with_named_subgroups",
+        "maps_without_named_subgroups",
+        "named_subgroup_records",
+        "supported_named_subgroup_records",
+        "supported_ramified_repeated_support_records",
+        "supported_ordinary_fiber_records",
+        "unsupported_without_primality_certificate",
+        "unsupported_kernel_intersection",
+        "unsupported_normalized_target_transfer_backend",
+        "unsupported_odd_extension_field_transfer_backend",
+        "failed_invalid_target_generator",
+        "failed_invalid_named_subgroup_data",
+        "failed_transfer_arithmetic"
+      ],
+      "properties": {
+        "odd_maps": { "type": "integer", "minimum": 1 },
+        "direct_prime_maps": { "type": "integer", "minimum": 0 },
+        "normalized_prime_maps": { "type": "integer", "minimum": 0 },
+        "odd_extension_maps": { "type": "integer", "minimum": 0 },
+        "maps_with_named_subgroups": { "type": "integer", "minimum": 0 },
+        "maps_without_named_subgroups": { "type": "integer", "minimum": 0 },
+        "named_subgroup_records": { "type": "integer", "minimum": 0 },
+        "supported_named_subgroup_records": { "type": "integer", "minimum": 0 },
+        "supported_ramified_repeated_support_records": { "type": "integer", "minimum": 0 },
+        "supported_ordinary_fiber_records": { "type": "integer", "minimum": 0 },
+        "unsupported_without_primality_certificate": { "type": "integer", "minimum": 0 },
+        "unsupported_kernel_intersection": { "type": "integer", "minimum": 0 },
+        "unsupported_normalized_target_transfer_backend": { "type": "integer", "minimum": 0 },
+        "unsupported_odd_extension_field_transfer_backend": { "type": "integer", "minimum": 0 },
+        "failed_invalid_target_generator": { "type": "integer", "minimum": 0 },
+        "failed_invalid_named_subgroup_data": { "type": "integer", "minimum": 0 },
+        "failed_transfer_arithmetic": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "membership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonical_encoding",
+        "odd_maps_sha256",
+        "all_bindings_sha256",
+        "supported_direct_bindings_sha256",
+        "unsupported_or_failed_direct_bindings_sha256",
+        "unsupported_primality_bindings_sha256",
+        "unsupported_kernel_intersection_bindings_sha256",
+        "unsupported_normalized_bindings_sha256",
+        "unsupported_extension_bindings_sha256",
+        "failed_invalid_data_bindings_sha256",
+        "failed_transfer_arithmetic_bindings_sha256"
+      ],
+      "properties": {
+        "canonical_encoding": { "const": "C-sorted LF-terminated map UIDs and map_uid<TAB>ec1<TAB>curve_uid tuples" },
+        "odd_maps_sha256": { "$ref": "#/$defs/sha256" },
+        "all_bindings_sha256": { "$ref": "#/$defs/sha256" },
+        "supported_direct_bindings_sha256": { "$ref": "#/$defs/sha256" },
+        "unsupported_or_failed_direct_bindings_sha256": { "$ref": "#/$defs/sha256" },
+        "unsupported_primality_bindings_sha256": { "$ref": "#/$defs/sha256" },
+        "unsupported_kernel_intersection_bindings_sha256": { "$ref": "#/$defs/sha256" },
+        "unsupported_normalized_bindings_sha256": { "$ref": "#/$defs/sha256" },
+        "unsupported_extension_bindings_sha256": { "$ref": "#/$defs/sha256" },
+        "failed_invalid_data_bindings_sha256": { "$ref": "#/$defs/sha256" },
+        "failed_transfer_arithmetic_bindings_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "icv1Identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["full", "slug"],
+      "properties": {
+        "full": { "type": "string", "pattern": "^ICV1:[^\\s]+$" },
+        "slug": { "type": "string", "pattern": "^icv1-[a-z0-9-]+-[0-9a-f]{8}$" }
+      }
+    },
+    "mapRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "family",
+        "icv1_identity",
+        "model_sha256",
+        "cover_uid",
+        "map_uid",
+        "map_degree",
+        "named_subgroups",
+        "failures"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "supported_map_no_named_subgroup",
+            "supported_map_all_named_subgroups",
+            "supported_map_with_unsupported_named_subgroups",
+            "unsupported_without_primality_certificate",
+            "unsupported_normalized_target_transfer_backend",
+            "unsupported_odd_extension_field_transfer_backend",
+            "failed_invalid_map_field_data",
+            "failed_invalid_named_subgroup_data",
+            "failed_transfer_arithmetic"
+          ]
+        },
+        "family": {
+          "enum": [
+            "prime_quadratic_pullback_v1",
+            "normalized_prime_quadratic_pullback_v1",
+            "odd_extension_quadratic_pullback_v1"
+          ]
+        },
+        "icv1_identity": { "$ref": "#/$defs/icv1Identity" },
+        "model_sha256": { "$ref": "#/$defs/sha256" },
+        "cover_uid": { "$ref": "#/$defs/coverUid" },
+        "map_uid": { "$ref": "#/$defs/mapUid" },
+        "map_degree": { "const": 2 },
+        "named_subgroups": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/subgroupRecord" }
+        },
+        "failures": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/failure" }
+        }
+      }
+    },
+    "failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["obligation", "reason"],
+      "properties": {
+        "obligation": { "$ref": "#/$defs/nonemptyString" },
+        "ec1": { "$ref": "#/$defs/ec1" },
+        "reason": { "$ref": "#/$defs/nonemptyString" }
+      }
+    },
+    "subgroupRecord": {
+      "oneOf": [
+        { "$ref": "#/$defs/supportedSubgroup" },
+        { "$ref": "#/$defs/unsupportedSubgroup" },
+        { "$ref": "#/$defs/failedTargetGeneratorSubgroup" },
+        { "$ref": "#/$defs/failedInvalidNamedSubgroupData" },
+        { "$ref": "#/$defs/failedTransferArithmeticSubgroup" }
+      ]
+    },
+    "baseSubgroupProperties": {
+      "type": "object",
+      "required": ["status", "claim_scope", "ec1", "curve_uid", "failures"],
+      "properties": {
+        "status": { "$ref": "#/$defs/nonemptyString" },
+        "claim_scope": { "$ref": "#/$defs/nonemptyString" },
+        "ec1": { "$ref": "#/$defs/ec1" },
+        "curve_uid": { "$ref": "#/$defs/curveUid" },
+        "failures": { "type": "array" }
+      }
+    },
+    "point": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": { "kind": { "const": "infinity" } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "x", "y"],
+          "properties": {
+            "kind": { "const": "affine" },
+            "x": { "$ref": "#/$defs/hexElement" },
+            "y": { "$ref": "#/$defs/hexElement" }
+          }
+        }
+      ]
+    },
+    "divisor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["u", "v", "n_plus"],
+      "properties": {
+        "u": { "type": "array", "items": { "$ref": "#/$defs/hexElement" } },
+        "v": { "type": "array", "items": { "$ref": "#/$defs/hexElement" } },
+        "n_plus": { "type": "integer", "minimum": 0, "maximum": 2 }
+      }
+    },
+    "primeProofEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value_decimal",
+        "status",
+        "method",
+        "theorem_reference",
+        "configured_bases",
+        "exclusive_upper_bound_decimal"
+      ],
+      "properties": {
+        "value_decimal": { "$ref": "#/$defs/decimalPositive" },
+        "status": {
+          "enum": [
+            "proved_u64",
+            "proved_psi13",
+            "composite",
+            "unsupported_without_primality_certificate"
+          ]
+        },
+        "method": { "$ref": "#/$defs/nonemptyString" },
+        "theorem_reference": { "$ref": "#/$defs/nonemptyString" },
+        "configured_bases": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "integer", "minimum": 2 }
+        },
+        "exclusive_upper_bound_decimal": { "$ref": "#/$defs/decimalPositive" }
+      }
+    },
+    "exactOrderEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["annihilator_primality", "generated_subgroup_cardinality"],
+      "properties": {
+        "annihilator_primality": { "$ref": "#/$defs/primeProofEvidence" },
+        "generated_subgroup_cardinality": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "argument"],
+          "properties": {
+            "status": { "const": "proved" },
+            "argument": { "const": "prime annihilator plus checked nonidentity and annihilation" }
+          }
+        }
+      }
+    },
+    "supportedChecks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_cover_reconstructed_and_valid",
+        "target_generator_on_curve",
+        "target_generator_nonidentity",
+        "target_generator_coordinates_canonical",
+        "annihilator_kills_target_generator",
+        "annihilator_is_prime_and_exact_order",
+        "pullback_valid",
+        "pullback_nonidentity",
+        "annihilator_kills_pullback",
+        "pushforward_valid",
+        "pull_push_equals_degree_times_generator",
+        "degree_inverse_recovers_generator"
+      ],
+      "properties": {
+        "source_cover_reconstructed_and_valid": { "const": true },
+        "target_generator_on_curve": { "const": true },
+        "target_generator_nonidentity": { "const": true },
+        "target_generator_coordinates_canonical": { "const": true },
+        "annihilator_kills_target_generator": { "const": true },
+        "annihilator_is_prime_and_exact_order": { "const": true },
+        "pullback_valid": { "const": true },
+        "pullback_nonidentity": { "const": true },
+        "annihilator_kills_pullback": { "const": true },
+        "pushforward_valid": { "const": true },
+        "pull_push_equals_degree_times_generator": { "const": true },
+        "degree_inverse_recovers_generator": { "const": true }
+      }
+    },
+    "supportedSubgroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "claim_scope",
+        "ec1",
+        "curve_uid",
+        "generator",
+        "annihilator",
+        "map_degree",
+        "gcd_degree_annihilator",
+        "degree_inverse_mod_annihilator",
+        "fiber_kind",
+        "pullback_witness",
+        "typed_pushforward",
+        "twice_generator",
+        "recovered_generator",
+        "field_primality",
+        "exact_order_evidence",
+        "checks",
+        "proof_reference",
+        "failures"
+      ],
+      "properties": {
+        "status": { "const": "supported_on_named_generated_subgroup" },
+        "claim_scope": { "const": "named_generated_subgroup_of_exact_prime_order" },
+        "ec1": { "$ref": "#/$defs/ec1" },
+        "curve_uid": { "$ref": "#/$defs/curveUid" },
+        "generator": { "$ref": "#/$defs/point" },
+        "annihilator": { "$ref": "#/$defs/decimalPositive" },
+        "map_degree": { "const": 2 },
+        "gcd_degree_annihilator": { "const": 1 },
+        "degree_inverse_mod_annihilator": { "$ref": "#/$defs/decimalPositive" },
+        "fiber_kind": { "enum": ["ramified_repeated_support", "ordinary_degree_two_fiber"] },
+        "pullback_witness": { "$ref": "#/$defs/divisor" },
+        "typed_pushforward": { "$ref": "#/$defs/point" },
+        "twice_generator": { "$ref": "#/$defs/point" },
+        "recovered_generator": { "$ref": "#/$defs/point" },
+        "field_primality": { "$ref": "#/$defs/primeProofEvidence" },
+        "exact_order_evidence": { "$ref": "#/$defs/exactOrderEvidence" },
+        "checks": { "$ref": "#/$defs/supportedChecks" },
+        "proof_reference": { "const": "lean:ChainedTransfer.injective_with_recovery" },
+        "failures": { "type": "array", "maxItems": 0 }
+      }
+    },
+    "backendIndependentChecks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "exact_identity_join",
+        "field_and_model_binding",
+        "generator_encoding_canonical",
+        "generator_on_linked_target",
+        "generator_nonidentity",
+        "subgroup_order_encoding_canonical_nonzero",
+        "annihilator_action_checked",
+        "exact_order_established"
+      ],
+      "properties": {
+        "exact_identity_join": { "const": true },
+        "field_and_model_binding": { "const": true },
+        "generator_encoding_canonical": { "const": true },
+        "generator_on_linked_target": { "const": true },
+        "generator_nonidentity": { "const": true },
+        "subgroup_order_encoding_canonical_nonzero": { "const": true },
+        "annihilator_action_checked": { "type": "boolean" },
+        "exact_order_established": { "type": "boolean" }
+      }
+    },
+    "unsupportedSubgroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "claim_scope",
+        "ec1",
+        "curve_uid",
+        "reason",
+        "field_primality",
+        "annihilator_primality",
+        "backend_independent_checks",
+        "failures"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "unsupported_without_primality_certificate",
+            "unsupported_kernel_intersection",
+            "unsupported_normalized_target_transfer_backend",
+            "unsupported_odd_extension_field_transfer_backend"
+          ]
+        },
+        "claim_scope": { "const": "named_generated_subgroup_only" },
+        "ec1": { "$ref": "#/$defs/ec1" },
+        "curve_uid": { "$ref": "#/$defs/curveUid" },
+        "reason": { "$ref": "#/$defs/nonemptyString" },
+        "field_primality": {
+          "oneOf": [
+            { "$ref": "#/$defs/primeProofEvidence" },
+            { "type": "null" }
+          ]
+        },
+        "annihilator_primality": {
+          "oneOf": [
+            { "$ref": "#/$defs/primeProofEvidence" },
+            { "type": "null" }
+          ]
+        },
+        "backend_independent_checks": { "$ref": "#/$defs/backendIndependentChecks" },
+        "failures": { "type": "array", "maxItems": 0 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "unsupported_kernel_intersection" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "backend_independent_checks": {
+                "properties": {
+                  "annihilator_action_checked": { "const": true },
+                  "exact_order_established": { "const": true }
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "backend_independent_checks": {
+                "properties": {
+                  "annihilator_action_checked": { "const": false },
+                  "exact_order_established": { "const": false }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "failedTargetGeneratorSubgroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "claim_scope", "ec1", "curve_uid", "reason", "failures"],
+      "properties": {
+        "status": { "const": "failed_invalid_target_generator" },
+        "claim_scope": { "const": "named_generated_subgroup_only" },
+        "ec1": { "$ref": "#/$defs/ec1" },
+        "curve_uid": { "$ref": "#/$defs/curveUid" },
+        "reason": { "$ref": "#/$defs/nonemptyString" },
+        "failures": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/failure" },
+              {
+                "type": "object",
+                "properties": {
+                  "obligation": { "const": "target_generator_membership" }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "failedInvalidNamedSubgroupData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "claim_scope", "ec1", "curve_uid", "reason", "failures"],
+      "properties": {
+        "status": { "const": "failed_invalid_named_subgroup_data" },
+        "claim_scope": { "const": "named_generated_subgroup_only" },
+        "ec1": { "$ref": "#/$defs/ec1" },
+        "curve_uid": { "$ref": "#/$defs/curveUid" },
+        "reason": { "$ref": "#/$defs/nonemptyString" },
+        "failures": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/failure" },
+              {
+                "type": "object",
+                "properties": {
+                  "obligation": {
+                    "enum": [
+                      "exact_identity_join",
+                      "target_field_representation",
+                      "target_field_binding",
+                      "target_model_binding",
+                      "subgroup_order_encoding",
+                      "deterministic_primality",
+                      "annihilator_kills_target_generator"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "failedTransferArithmeticSubgroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "claim_scope", "ec1", "curve_uid", "reason", "failures"],
+      "properties": {
+        "status": { "const": "failed_transfer_arithmetic" },
+        "claim_scope": { "const": "named_generated_subgroup_only" },
+        "ec1": { "$ref": "#/$defs/ec1" },
+        "curve_uid": { "$ref": "#/$defs/curveUid" },
+        "reason": { "$ref": "#/$defs/nonemptyString" },
+        "failures": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "allOf": [
+              { "$ref": "#/$defs/failure" },
+              {
+                "type": "object",
+                "properties": {
+                  "obligation": {
+                    "enum": [
+                      "annihilator_kills_target_generator",
+                      "pull_push_composition",
+                      "pullback_nonidentity",
+                      "annihilator_kills_pullback",
+                      "kernel_intersection",
+                      "degree_inverse_recovery"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

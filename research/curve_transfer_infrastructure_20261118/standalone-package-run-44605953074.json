@@ -1,0 +1,139 @@
+{
+  "schema_version": "standalone-package-run-receipt/v1",
+  "recorded_at_utc": "2026-11-20T00:11:30Z",
+  "repository": "isogeny-labs/crypto",
+  "workflow": {
+    "path": ".github/workflows/release.yml",
+    "run_id": 44605953074,
+    "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/44605953074",
+    "head_sha": "3f4706b21cbd25d11387de6799c4200fbfad3a1f",
+    "event": "workflow_dispatch",
+    "overall_conclusion": "cancelled",
+    "overall_green": false
+  },
+  "successful_package_lane": {
+    "job_id": 135849755976,
+    "job_url": "https://github.com/isogeny-labs/crypto/actions/runs/44605953074/job/135849755976",
+    "target": "x86_64-unknown-linux-gnu",
+    "conclusion": "success",
+    "release_version": "0.1.7274",
+    "staged_archive_name": "crypto-v0.1.7274-x86_64-unknown-linux-gnu.tar.gz",
+    "checks": {
+      "release_build_passed": true,
+      "top_level_smoke_passed": true,
+      "binary_producer_source_tests_passed": true,
+      "binary_producer_source_tests_total": 8,
+      "binary_producer_git_tree_receipt_passed": true,
+      "binary_producer_git_tree_receipt_comparison_passed": true,
+      "installed_layout_staging_passed": true,
+      "binary_catalog_exact_replay_passed": true,
+      "binary_catalog_canonical_receipt_comparison_passed": true,
+      "binary_source_receipt_staged_and_compared": true,
+      "odd_catalog_expected_incomplete_replay_passed": true,
+      "odd_catalog_canonical_receipt_comparison_passed": true,
+      "odd_catalog_git_tree_source_replay_passed": true,
+      "odd_catalog_source_receipt_comparison_passed": true,
+      "prior_package_run_receipt_staged": true,
+      "prior_package_run_receipts_staged_total": 2,
+      "construction_verification_arithmetic_fixed_f8_sweep_transfer_subgroup_and_malformed_divisor_smokes_passed": true,
+      "artifact_upload_passed": true
+    }
+  },
+  "catalog_replays": {
+    "binary": {
+      "path": "docs/curves/binary-subgroup-transfer-certificates.json",
+      "bytes": 500924,
+      "sha256": "a55c7f9a0c836614281388f19b3b31fa622eeb1650ddc00c59e4e78562471392",
+      "producer_commit": "5c6e43a6f0cffe0afc4c962ff54056716cf6437e",
+      "status": "verified_complete",
+      "failed_named_subgroup_records": 0,
+      "canonical_receipt_path": "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json",
+      "canonical_receipt_matched": true,
+      "source_receipt_path": "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json",
+      "source_receipt_matched": true,
+      "source_files_checked": 21
+    },
+    "odd": {
+      "path": "docs/curves/odd-subgroup-transfer-certificates.json",
+      "bytes": 17879292,
+      "sha256": "1ecfabcdaecc3e00d78ab2ce7eebeb94607e1c2c224f261fb5718a4f53b65268",
+      "producer_commit": "8c94831426fa35040fa7b38b1379299bf6e6d957",
+      "status": "verified_named_subgroup_incomplete",
+      "expected_exit_code": 1,
+      "canonical_receipt_path": "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json",
+      "canonical_receipt_matched": true,
+      "source_receipt_path": "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json",
+      "source_receipt_matched": true,
+      "source_files_checked": 29
+    }
+  },
+  "uploaded_artifact": {
+    "name": "rust-x86_64-unknown-linux-gnu",
+    "artifact_id": 14572815365,
+    "artifact_url": "https://github.com/isogeny-labs/crypto/actions/runs/44605953074/artifacts/14572815365",
+    "outer_actions_zip_bytes": 104468194,
+    "outer_actions_zip_sha256": "5bc9e50d956b80942001107d331e018ee78ea152beadca3e159023f62c5fc290",
+    "outer_digest_source": "GitHub Actions artifact metadata and successful upload log",
+    "staged_archive_name_observed_in_successful_job_log": "crypto-v0.1.7274-x86_64-unknown-linux-gnu.tar.gz",
+    "inner_archive_sha256": null,
+    "executable_sha256s": null,
+    "direct_independent_package_replay": false
+  },
+  "independent_download": {
+    "status": "blocked_by_executor_proxy",
+    "github_redirect_reached": true,
+    "artifact_backing_host": "productionresultssa3.blob.core.windows.net",
+    "failure": "HTTP 403 Forbidden from the Azure artifact backing host",
+    "http_status": 403,
+    "methods_attempted": [
+      "GitHub CLI artifact download"
+    ],
+    "valid_downloaded_artifact": false,
+    "gap": "inner archive and executable hashes and direct execution outside the successful Actions job are not established"
+  },
+  "job_log_observation": {
+    "source": "GitHub Actions job log returned by gh run view",
+    "bytes": 252042,
+    "sha256": "de7c57a9d98810b9d77d1792463b89647df690823ac702fddffc9aa549be50cb",
+    "durability": "the receipt preserves the observed log digest and the GitHub run and job locators"
+  },
+  "other_job_classification": [
+    {
+      "conclusion": "success",
+      "jobs": [
+        "meta",
+        "scope",
+        "release-assets",
+        "cuda",
+        "isogeny-algos/x86_64-unknown-linux-gnu",
+        "isogeny-algos/x86_64-unknown-linux-musl"
+      ]
+    },
+    {
+      "conclusion": "failure",
+      "jobs": [
+        "isogeny/x86_64-unknown-linux-gnu",
+        "isogeny/x86_64-unknown-linux-musl",
+        "native"
+      ],
+      "classification": "unrelated stored-input hydration failure",
+      "reason": "required Git blobs were absent and no S3 reads were available"
+    },
+    {
+      "conclusion": "cancelled",
+      "jobs": [
+        "macos"
+      ],
+      "classification": "unsupported runner configuration"
+    },
+    {
+      "conclusion": "skipped",
+      "jobs": [
+        "release"
+      ],
+      "classification": "aggregate release publication did not run after non-package job failures and cancellation"
+    }
+  ],
+  "pcc_status": "unverified",
+  "claim_boundary": "This receipt records same-implementation GitHub Actions job-side build, source-tree replay, installed-layout catalog replay, comparison, smoke, staging, and upload observations for one Linux GNU package lane. The overall workflow was cancelled and is not green. This repository receipt was created after the run and was not included in the observed artifact; that artifact staged the two prior package-run receipts. The receipt does not independently download or execute the uploaded artifact, establish inner archive or executable hashes, attest a source-to-binary build chain, independently verify cover, Jacobian, transfer, or subgroup arithmetic, provide signed PCC standing, implement a full Jacobian index-calculus solver, or establish computational advantage."
+}
