@@ -660,6 +660,20 @@ pub struct F4Options {
     /// on it; only the work does.  The default is the domain scan, kept as the
     /// control.  See [`DomainRootMode`].
     pub domain_roots: DomainRootMode,
+    /// Batched sibling extraction in the recursive visitor: at a node that
+    /// branches over a finite domain, the children are the specialisations
+    /// of one parent generating set at each domain value.  With this set,
+    /// the parent generators are rewritten once with coefficients that are
+    /// univariates in the branch variable, each sibling is specialised by
+    /// Horner evaluation, and its system is solved without F4 by triangular
+    /// back-substitution (univariate gcd, closed-form roots for degree at
+    /// most two, the counted Frobenius root finder otherwise, the shared
+    /// domain index); a child with no univariate falls back to the F4 path.
+    /// Every candidate is still checked against the original input, so the
+    /// solution set is the scan's; the order can differ where a child needs
+    /// more than one substitution.  Off by default, and never used with a
+    /// trace sink or a trace-reuse pool.
+    pub sibling_batch: bool,
 }
 
 /// Root extraction for a univariate whose variable has a finite domain `D`.
@@ -731,7 +745,14 @@ impl F4Options {
             checkpoint_in_step: None,
             checkpoint_stop_in_rref: None,
             domain_roots: DomainRootMode::Scan,
+            sibling_batch: false,
         }
+    }
+
+    /// Turn batched sibling extraction on or off ([`F4Options::sibling_batch`]).
+    pub fn with_sibling_batch(mut self, on: bool) -> Self {
+        self.sibling_batch = on;
+        self
     }
 
     /// Select the visitor's root extraction for finite-domain variables.
@@ -6595,6 +6616,20 @@ pub struct VisitReport {
     /// transcripts are unchanged.
     #[serde(skip_serializing)]
     pub domain_scan_field_multiplications: u64,
+    /// Branching nodes whose children were extracted in one batch
+    /// ([`F4Options::sibling_batch`]); zero and omitted by default.
+    #[serde(skip_serializing_if = "is_zero_usize")]
+    pub batched_nodes: usize,
+    /// Children specialised and solved by the batched path.
+    #[serde(skip_serializing_if = "is_zero_usize")]
+    pub batched_children: usize,
+    /// Child systems with no univariate, handed back to the F4 path.
+    #[serde(skip_serializing_if = "is_zero_usize")]
+    pub batched_fallbacks: usize,
+    /// Counted multiplications of the batched path: Horner specialisation,
+    /// univariate gcds, square roots, root finding and substitution.
+    #[serde(skip_serializing_if = "is_zero_u64")]
+    pub batched_field_multiplications: u64,
 }
 
 fn is_zero_u64(v: &u64) -> bool {
@@ -6958,6 +6993,14 @@ where
         let full_field = !has_univariate && self.domains[active[var]].is_none();
         let mut remaining = active.to_vec();
         let original = remaining.remove(var);
+        if self.opts.sibling_batch
+            && !has_univariate
+            && !full_field
+            && self.sink.is_none()
+            && self.pool.is_none()
+        {
+            return self.batched_siblings(generating_set, var, original, &remaining, node_id);
+        }
         for value in values {
             if self.expired() {
                 return VisitEnd::TimedOut;
@@ -6991,6 +7034,179 @@ where
                 .filter(|g| !g.is_empty())
                 .collect();
             let end = self.walk(&sub, &remaining, Some(node_id));
+            if end != VisitEnd::Complete {
+                return end;
+            }
+        }
+        VisitEnd::Complete
+    }
+
+    /// Build the value → position index of an original variable's domain
+    /// once per traversal.
+    fn ensure_domain_index(&mut self, original: usize) {
+        if self.domain_index[original].is_none() {
+            if let Some(domain) = &self.domains[original] {
+                self.report.domain_index_entries += domain.len() as u64;
+                self.domain_index[original] = Some(domain_position_index(domain));
+            }
+        }
+    }
+
+    /// [`F4Options::sibling_batch`]: every child of a finite-domain branching
+    /// node, from one sibling family, in domain order.
+    fn batched_siblings(
+        &mut self,
+        generating_set: &[Poly],
+        var: usize,
+        original: usize,
+        remaining: &[usize],
+        node_id: usize,
+    ) -> VisitEnd {
+        let family = sibling_family(generating_set, var);
+        let domain = self.domains[original]
+            .clone()
+            .expect("batched only over a finite domain");
+        self.report.batched_nodes += 1;
+        for value in domain {
+            if self.expired() {
+                return VisitEnd::TimedOut;
+            }
+            self.assignment[original] = value;
+            let mut muls = 0u64;
+            let polys = specialise_family(&family, value, self.p, &mut muls);
+            self.report.batched_field_multiplications += muls;
+            self.report.batched_children += 1;
+            let end = self.tri_solve(polys, remaining, node_id);
+            if end != VisitEnd::Complete {
+                return end;
+            }
+        }
+        VisitEnd::Complete
+    }
+
+    /// Solve one child system without F4: repeatedly take a variable with a
+    /// univariate polynomial, extract the roots of the gcd of all its
+    /// univariates (restricted to its domain), substitute each and recurse.
+    /// A system with no univariate goes to the F4 path ([`Self::walk`]).
+    /// Leaves are checked against the original input as the walk's are.
+    fn tri_solve(&mut self, polys: Vec<SparsePoly>, vars: &[usize], node_id: usize) -> VisitEnd {
+        if self.expired() {
+            return VisitEnd::TimedOut;
+        }
+        // Constants: a nonzero one is inconsistent, a zero one says nothing.
+        let mut live: Vec<SparsePoly> = Vec::with_capacity(polys.len());
+        for g in polys {
+            if g.iter().all(|(e, _)| e.iter().all(|&k| k == 0)) {
+                if g.iter().fold(0u64, |s, (_, c)| (s + c) % self.p) != 0 {
+                    return VisitEnd::Complete;
+                }
+            } else {
+                live.push(g);
+            }
+        }
+        if vars.is_empty() {
+            let ok = self
+                .original
+                .iter()
+                .all(|g| eval(g, &self.assignment, self.p) == 0);
+            if !ok {
+                self.report.candidates_rejected += 1;
+                return VisitEnd::Complete;
+            }
+            self.report.solutions_visited += 1;
+            return if (self.visitor)(&self.assignment) {
+                VisitEnd::Stopped
+            } else {
+                VisitEnd::Complete
+            };
+        }
+        if vars
+            .iter()
+            .any(|&i| self.domains[i].as_ref().is_some_and(Vec::is_empty))
+        {
+            return VisitEnd::Complete;
+        }
+        // Univariates by local variable, as dense coefficient vectors.
+        let p = self.p;
+        let mut univariates: Vec<Vec<Vec<u64>>> = vec![Vec::new(); vars.len()];
+        for g in &live {
+            let mut support = None;
+            let mut single = true;
+            for (e, _) in g {
+                for (j, &k) in e.iter().enumerate() {
+                    if k > 0 {
+                        match support {
+                            None => support = Some(j),
+                            Some(s) if s != j => single = false,
+                            _ => {}
+                        }
+                    }
+                }
+            }
+            if let (true, Some(j)) = (single, support) {
+                let degree = g.iter().map(|(e, _)| e[j]).max().unwrap_or(0) as usize;
+                let mut dense = vec![0u64; degree + 1];
+                for (e, c) in g {
+                    let k = e[j] as usize;
+                    dense[k] = (dense[k] + c) % p;
+                }
+                univariates[j].push(dense_trim(dense));
+            }
+        }
+        let mut muls = 0u64;
+        let mut best: Option<(usize, Vec<u64>)> = None;
+        for (j, us) in univariates.iter().enumerate() {
+            if us.is_empty() {
+                continue;
+            }
+            let h = us
+                .iter()
+                .skip(1)
+                .fold(us[0].clone(), |h, u| dense_gcd(&h, u, p, &mut muls));
+            let h = dense_gcd(&h, &[], p, &mut muls);
+            if h.len() <= 1 {
+                // No common root of this variable's univariates.
+                self.report.batched_field_multiplications += muls;
+                return VisitEnd::Complete;
+            }
+            if best.as_ref().is_none_or(|(_, b)| h.len() < b.len()) {
+                best = Some((j, h));
+            }
+        }
+        let Some((z, h)) = best else {
+            self.report.batched_field_multiplications += muls;
+            self.report.batched_fallbacks += 1;
+            let normalised: Vec<Poly> = live
+                .into_iter()
+                .map(|g| normalise_owned(g, self.p, self.opts.order))
+                .filter(|g| !g.is_empty())
+                .collect();
+            return self.walk(&normalised, vars, Some(node_id));
+        };
+        let z_original = vars[z];
+        let Some(mut roots) = dense_roots_fp(&h, p, &mut muls, self.opts.deadline) else {
+            self.report.batched_field_multiplications += muls;
+            return VisitEnd::TimedOut;
+        };
+        if self.domains[z_original].is_some() {
+            self.ensure_domain_index(z_original);
+            let index = self.domain_index[z_original].as_ref().expect("built above");
+            let mut hits: Vec<(usize, u64)> = roots
+                .iter()
+                .filter_map(|r| index.get(r).map(|&pos| (pos, *r)))
+                .collect();
+            hits.sort_unstable_by_key(|&(pos, _)| pos);
+            roots = hits.into_iter().map(|(_, r)| r).collect();
+        }
+        self.report.batched_field_multiplications += muls;
+        let mut rest = vars.to_vec();
+        rest.remove(z);
+        for r in roots {
+            let mut muls = 0u64;
+            let next = substitute_var(&live, z, r, p, &mut muls);
+            self.report.batched_field_multiplications += muls;
+            self.assignment[z_original] = r;
+            let end = self.tri_solve(next, &rest, node_id);
             if end != VisitEnd::Complete {
                 return end;
             }
@@ -7240,6 +7456,246 @@ pub(crate) fn domain_roots_scan(
             }) == 0
         })
         .collect()
+}
+
+// ── Batched sibling extraction (`F4Options::sibling_batch`) ────────────────
+//
+// A sparse polynomial over the child's local variables, as the visitor's
+// `specialise` produces it (exponent vector, coefficient), without the
+// normalisation the F4 path needs.
+pub(crate) type SparsePoly = Vec<(Vec<u32>, u64)>;
+
+/// The generators of a branching node rewritten once for all its children:
+/// for each generator, its terms grouped by the exponent vector with the
+/// branch variable removed, each group's coefficient a univariate in the
+/// branch variable (low to high).  Specialising at `x = v` is one Horner
+/// evaluation per group.
+pub(crate) type SiblingFamily = Vec<Vec<(Vec<u32>, Vec<u64>)>>;
+
+pub(crate) fn sibling_family(generators: &[Poly], var: usize) -> SiblingFamily {
+    generators
+        .iter()
+        .map(|g| {
+            let mut groups: std::collections::BTreeMap<Vec<u32>, Vec<u64>> =
+                std::collections::BTreeMap::new();
+            for (e, c) in g {
+                let mut rest = e.clone();
+                let k = rest.remove(var) as usize;
+                let coeffs = groups.entry(rest).or_default();
+                if coeffs.len() <= k {
+                    coeffs.resize(k + 1, 0);
+                }
+                coeffs[k] = *c;
+            }
+            groups.into_iter().collect()
+        })
+        .collect()
+}
+
+/// The children's system at `x = v`: Horner on every coefficient group,
+/// zero terms and zero polynomials dropped.
+pub(crate) fn specialise_family(
+    family: &SiblingFamily,
+    v: u64,
+    p: u64,
+    muls: &mut u64,
+) -> Vec<SparsePoly> {
+    family
+        .iter()
+        .filter_map(|groups| {
+            let terms: SparsePoly = groups
+                .iter()
+                .filter_map(|(e, coeffs)| {
+                    let mut acc = 0u64;
+                    for &c in coeffs.iter().rev() {
+                        acc = (mulmod(acc, v, p) + c) % p;
+                    }
+                    *muls += coeffs.len().saturating_sub(1) as u64;
+                    (acc != 0).then(|| (e.clone(), acc))
+                })
+                .collect();
+            (!terms.is_empty()).then_some(terms)
+        })
+        .collect()
+}
+
+/// Substitute local variable `z = r` in every polynomial and drop it from
+/// the exponent vectors; equal monomials are merged and zero polynomials
+/// dropped.
+pub(crate) fn substitute_var(
+    polys: &[SparsePoly],
+    z: usize,
+    r: u64,
+    p: u64,
+    muls: &mut u64,
+) -> Vec<SparsePoly> {
+    polys
+        .iter()
+        .filter_map(|g| {
+            let mut merged: std::collections::BTreeMap<Vec<u32>, u64> =
+                std::collections::BTreeMap::new();
+            for (e, c) in g {
+                let mut rest = e.clone();
+                let k = u64::from(rest.remove(z));
+                let t = if k == 0 {
+                    *c
+                } else {
+                    *muls += powmod_muls(k) + 1;
+                    mulmod(*c, powmod(r, k, p), p)
+                };
+                let slot = merged.entry(rest).or_insert(0);
+                *slot = (*slot + t) % p;
+            }
+            let out: SparsePoly = merged.into_iter().filter(|(_, c)| *c != 0).collect();
+            (!out.is_empty()).then_some(out)
+        })
+        .collect()
+}
+
+fn dense_trim(mut v: Vec<u64>) -> Vec<u64> {
+    while v.last() == Some(&0) {
+        v.pop();
+    }
+    v
+}
+
+/// `a mod b` for dense polynomials (low to high), `b` trimmed and nonzero.
+fn dense_rem(a: &[u64], b: &[u64], p: u64, muls: &mut u64) -> Vec<u64> {
+    let mut r = dense_trim(a.to_vec());
+    let inv = inv_mod_u64(*b.last().expect("nonzero divisor"), p);
+    while r.len() >= b.len() {
+        let lead = mulmod(*r.last().expect("nonempty"), inv, p);
+        let shift = r.len() - b.len();
+        for (i, &bi) in b.iter().enumerate() {
+            r[shift + i] = (r[shift + i] + p - mulmod(lead, bi, p)) % p;
+        }
+        *muls += b.len() as u64 + 1;
+        r = dense_trim(r);
+    }
+    r
+}
+
+/// Monic gcd of two dense polynomials (either may be zero).
+pub(crate) fn dense_gcd(a: &[u64], b: &[u64], p: u64, muls: &mut u64) -> Vec<u64> {
+    let (mut x, mut y) = (dense_trim(a.to_vec()), dense_trim(b.to_vec()));
+    while !y.is_empty() {
+        let r = dense_rem(&x, &y, p, muls);
+        x = y;
+        y = r;
+    }
+    if let Some(&lead) = x.last() {
+        let inv = inv_mod_u64(lead, p);
+        *muls += x.len() as u64;
+        for c in &mut x {
+            *c = mulmod(*c, inv, p);
+        }
+    }
+    x
+}
+
+/// Square root modulo an odd prime (Tonelli–Shanks), multiplications
+/// counted; `None` for a non-residue.
+pub(crate) fn sqrt_mod_counted(n: u64, p: u64, muls: &mut u64) -> Option<u64> {
+    let n = n % p;
+    if n == 0 {
+        return Some(0);
+    }
+    let pw = |a: u64, e: u64, muls: &mut u64| {
+        *muls += powmod_muls(e);
+        powmod(a, e, p)
+    };
+    if pw(n, (p - 1) / 2, muls) != 1 {
+        return None;
+    }
+    if p % 4 == 3 {
+        return Some(pw(n, (p + 1) / 4, muls));
+    }
+    let (mut q, mut s) = (p - 1, 0u32);
+    while q % 2 == 0 {
+        q /= 2;
+        s += 1;
+    }
+    let mut z = 2u64;
+    while pw(z, (p - 1) / 2, muls) != p - 1 {
+        z += 1;
+    }
+    let (mut m, mut c, mut t, mut r) = (
+        s,
+        pw(z, q, muls),
+        pw(n, q, muls),
+        pw(n, q.div_ceil(2), muls),
+    );
+    while t != 1 {
+        let (mut i, mut tt) = (0u32, t);
+        while tt != 1 {
+            tt = mulmod(tt, tt, p);
+            *muls += 1;
+            i += 1;
+            if i == m {
+                return None;
+            }
+        }
+        let mut b = c;
+        for _ in 0..(m - i - 1) {
+            b = mulmod(b, b, p);
+            *muls += 1;
+        }
+        m = i;
+        c = mulmod(b, b, p);
+        t = mulmod(t, c, p);
+        r = mulmod(r, b, p);
+        *muls += 3;
+    }
+    Some(r)
+}
+
+/// All `F_p`-roots of the dense polynomial `h` (low to high, trimmed,
+/// degree at least one), ascending: closed form for degree one and, at an
+/// odd prime, two; the counted Frobenius root finder otherwise.  `None`
+/// only when the deadline expires.
+pub(crate) fn dense_roots_fp(
+    h: &[u64],
+    p: u64,
+    muls: &mut u64,
+    deadline: Option<Instant>,
+) -> Option<Vec<u64>> {
+    let mut roots = match h.len() {
+        0 | 1 => Vec::new(),
+        2 => {
+            *muls += 1;
+            vec![mulmod((p - h[0]) % p, inv_mod_u64(h[1], p), p)]
+        }
+        3 if p % 2 == 1 => {
+            let (c0, c1, c2) = (h[0], h[1], h[2]);
+            let disc = (mulmod(c1, c1, p) + p - mulmod(4 % p, mulmod(c2, c0, p), p)) % p;
+            *muls += 4;
+            let inv2a = inv_mod_u64(mulmod(2, c2, p), p);
+            match sqrt_mod_counted(disc, p, muls) {
+                None => Vec::new(),
+                Some(s) => {
+                    *muls += 2;
+                    let neg_b = (p - c1) % p;
+                    let r1 = mulmod((neg_b + s) % p, inv2a, p);
+                    let r2 = mulmod((neg_b + p - s) % p, inv2a, p);
+                    if r1 == r2 {
+                        vec![r1]
+                    } else {
+                        vec![r1, r2]
+                    }
+                }
+            }
+        }
+        _ => super::glv_invariant_base::poly_roots_fp_counted_until(
+            h,
+            p,
+            VISIT_ROOT_SEED,
+            muls,
+            deadline,
+        )?,
+    };
+    roots.sort_unstable();
+    roots.dedup();
+    Some(roots)
 }
 
 /// Roots in `F_p` of a univariate polynomial given as `(degree, coeff)`.
@@ -9801,7 +10257,7 @@ mod domain_root_tests {
             .collect()
     }
 
-    fn random_domain(rng: &mut StdRng, p: u64, size: usize, must: &[u64]) -> Vec<u64> {
+    pub(super) fn random_domain(rng: &mut StdRng, p: u64, size: usize, must: &[u64]) -> Vec<u64> {
         let mut seen = HashSet::new();
         let mut d = Vec::new();
         for &x in must {
@@ -9907,7 +10363,7 @@ mod domain_root_tests {
     /// Dense random quadrics in three variables through planted points, with
     /// finite domains on some variables: the generic F4 bases produce
     /// univariates of degree up to eight with arbitrary roots.
-    fn planted_system(rng: &mut StdRng, p: u64, n: usize) -> (Vec<Poly>, Vec<Vec<u64>>) {
+    pub(super) fn planted_system(rng: &mut StdRng, p: u64, n: usize) -> (Vec<Poly>, Vec<Vec<u64>>) {
         let points: Vec<Vec<u64>> = (0..rng.gen_range(1..=3usize))
             .map(|_| (0..n).map(|_| rng.gen_range(0..p)).collect())
             .collect();
@@ -10069,5 +10525,247 @@ mod domain_root_tests {
             F4Options::new(Ordering::Grevlex, 4).domain_roots,
             DomainRootMode::Scan
         );
+    }
+}
+
+#[cfg(test)]
+mod sibling_batch_tests {
+    //! [`F4Options::sibling_batch`]: the batched, F4-free child solve finds
+    //! the scan's solution set (and, for one-level univariate children, the
+    //! scan's exact sequence), and its arithmetic helpers are exact.
+    use super::domain_root_tests::{planted_system, random_domain};
+    use super::*;
+    use rand::rngs::StdRng;
+    use rand::{Rng, SeedableRng};
+
+    #[test]
+    fn counted_sqrt_and_dense_roots_match_brute_force() {
+        let mut rng = StdRng::seed_from_u64(0x5157);
+        for p in [3u64, 5, 7, 11, 13, 17, 101, 1009, 65_537] {
+            for _ in 0..300 {
+                let n = rng.gen_range(0..p);
+                let mut muls = 0;
+                let euler = n == 0 || powmod(n, (p - 1) / 2, p) == 1;
+                match sqrt_mod_counted(n, p, &mut muls) {
+                    Some(r) => assert_eq!(mulmod(r, r, p), n, "sqrt({n}) mod {p}"),
+                    None => assert!(!euler, "missed square root of {n} mod {p}"),
+                }
+                assert_eq!(sqrt_mod_counted(n, p, &mut muls).is_some(), euler);
+            }
+            if p > 1009 {
+                continue;
+            }
+            for _ in 0..200 {
+                let degree = rng.gen_range(1..=6usize);
+                let mut h: Vec<u64> = (0..degree).map(|_| rng.gen_range(0..p)).collect();
+                h.push(rng.gen_range(1..p));
+                let mut muls = 0;
+                let got = dense_roots_fp(&h, p, &mut muls, None).unwrap();
+                let want: Vec<u64> = (0..p)
+                    .filter(|&x| h.iter().rev().fold(0, |v, &c| (mulmod(v, x, p) + c) % p) == 0)
+                    .collect();
+                assert_eq!(got, want, "p = {p}, h = {h:?}");
+            }
+        }
+    }
+
+    /// `S₃` in the symmetric odd-characteristic expansion (as the prime-chain
+    /// builder writes it); `None` puts the target abscissa in a slot.
+    fn s3(slots: [Option<usize>; 3], n: usize, x: u64, a: u64, b: u64, p: u64) -> Poly {
+        let neg = |v: u64| (p - v % p) % p;
+        let raw: [([u32; 3], u64); 13] = [
+            ([2, 2, 0], 1),
+            ([2, 0, 2], 1),
+            ([0, 2, 2], 1),
+            ([2, 1, 1], neg(2)),
+            ([1, 2, 1], neg(2)),
+            ([1, 1, 2], neg(2)),
+            ([1, 1, 0], neg(mulmod(2, a, p))),
+            ([1, 0, 1], neg(mulmod(2, a, p))),
+            ([0, 1, 1], neg(mulmod(2, a, p))),
+            ([1, 0, 0], neg(mulmod(4, b, p))),
+            ([0, 1, 0], neg(mulmod(4, b, p))),
+            ([0, 0, 1], neg(mulmod(4, b, p))),
+            ([0, 0, 0], mulmod(a, a, p)),
+        ];
+        let terms: Vec<(Vec<u32>, u64)> = raw
+            .iter()
+            .map(|(powers, c)| {
+                let mut e = vec![0u32; n];
+                let mut c = *c;
+                for (axis, &k) in powers.iter().enumerate() {
+                    match slots[axis] {
+                        Some(v) => e[v] += k,
+                        None => c = mulmod(c, powmod(x, u64::from(k), p), p),
+                    }
+                }
+                (e, c)
+            })
+            .collect();
+        normalise(&terms, p, Ordering::Grevlex)
+    }
+
+    fn visit(
+        system: &[Poly],
+        n: usize,
+        p: u64,
+        domains: &[Option<Vec<u64>>],
+        batch: bool,
+        mode: DomainRootMode,
+        stop_after: Option<usize>,
+    ) -> (Vec<Vec<u64>>, VisitReport) {
+        let opts = F4Options::new(Ordering::Grevlex, 12)
+            .with_domain_roots(mode)
+            .with_sibling_batch(batch);
+        let mut seen = Vec::new();
+        let report = solve_visit(system, n, p, &opts, domains, |s| {
+            seen.push(s.to_vec());
+            stop_after.is_some_and(|k| seen.len() >= k)
+        })
+        .unwrap();
+        (seen, report)
+    }
+
+    fn sorted(mut v: Vec<Vec<u64>>) -> Vec<Vec<u64>> {
+        v.sort();
+        v
+    }
+
+    #[test]
+    fn one_level_children_give_the_scans_exact_sequence() {
+        let mut rng = StdRng::seed_from_u64(0xB47C);
+        let mut solutions = 0usize;
+        for round in 0..24 {
+            let p = [101u64, 103, 1009][round % 3];
+            let (a, b, x) = (
+                rng.gen_range(0..p),
+                rng.gen_range(1..p),
+                rng.gen_range(0..p),
+            );
+            let system = vec![s3([Some(0), Some(1), None], 2, x, a, b, p)];
+            let size = rng.gen_range(p as usize / 3..=p as usize);
+            let domains = vec![
+                Some(random_domain(&mut rng, p, size, &[])),
+                Some(random_domain(&mut rng, p, size, &[])),
+            ];
+            let (s0, r0) = visit(&system, 2, p, &domains, false, DomainRootMode::Scan, None);
+            for mode in [DomainRootMode::Scan, DomainRootMode::Frobenius] {
+                let (s1, r1) = visit(&system, 2, p, &domains, true, mode, None);
+                assert_eq!(s1, s0, "round {round}: sequence differs");
+                assert_eq!(r1.solutions_visited, r0.solutions_visited);
+                assert!(r1.complete);
+                assert_eq!(r1.batched_nodes, 1);
+                assert_eq!(r1.batched_children, size);
+                assert_eq!(r1.batched_fallbacks, 0);
+                assert!(r1.f4_runs < r0.f4_runs, "batched children ran F4");
+            }
+            solutions += s0.len();
+        }
+        assert!(solutions > 100, "only {solutions} solutions exercised");
+    }
+
+    #[test]
+    fn chains_and_dense_systems_give_the_scans_solution_set() {
+        let mut rng = StdRng::seed_from_u64(0xC4A1);
+        let (mut batched, mut fallbacks, mut solutions) = (0usize, 0usize, 0usize);
+        for round in 0..30 {
+            let p = [101u64, 103, 211][round % 3];
+            let (system, n, domains): (Vec<Poly>, usize, Vec<Option<Vec<u64>>>) = if round % 2 == 0
+            {
+                // m = 3 chain: S3(x0, x1, u) = 0, S3(u, x2, X) = 0, x_i in D, u free.
+                let (a, b, x) = (
+                    rng.gen_range(0..p),
+                    rng.gen_range(1..p),
+                    rng.gen_range(0..p),
+                );
+                let d = random_domain(&mut rng, p, rng.gen_range(8..=24), &[]);
+                (
+                    vec![
+                        s3([Some(0), Some(1), Some(3)], 4, x, a, b, p),
+                        s3([Some(3), Some(2), None], 4, x, a, b, p),
+                    ],
+                    4,
+                    vec![Some(d.clone()), Some(d.clone()), Some(d), None],
+                )
+            } else {
+                let n = 3;
+                let (system, points) = planted_system(&mut rng, p, n);
+                let domains = (0..n)
+                    .map(|i| {
+                        let must: Vec<u64> = points.iter().map(|pt| pt[i]).collect();
+                        Some(random_domain(
+                            &mut rng,
+                            p,
+                            rng.gen_range(must.len()..=40),
+                            &must,
+                        ))
+                    })
+                    .collect();
+                (system, n, domains)
+            };
+            let (s0, r0) = visit(&system, n, p, &domains, false, DomainRootMode::Scan, None);
+            let (s1, r1) = visit(
+                &system,
+                n,
+                p,
+                &domains,
+                true,
+                DomainRootMode::Frobenius,
+                None,
+            );
+            assert_eq!(
+                sorted(s1.clone()),
+                sorted(s0.clone()),
+                "round {round}: solution sets differ"
+            );
+            assert_eq!(
+                (r1.complete, r1.solutions_visited),
+                (r0.complete, r0.solutions_visited)
+            );
+            for s in &s1 {
+                assert!(
+                    system.iter().all(|g| eval(g, s, p) == 0),
+                    "not a solution: {s:?}"
+                );
+            }
+            batched += r1.batched_children;
+            fallbacks += r1.batched_fallbacks;
+            solutions += s0.len();
+        }
+        assert!(batched > 200, "batched path barely exercised ({batched})");
+        assert!(fallbacks > 0, "the F4 fallback was never exercised");
+        assert!(solutions > 20, "only {solutions} solutions");
+    }
+
+    #[test]
+    fn stopping_early_returns_a_genuine_solution_and_default_is_off() {
+        let p = 1009;
+        let system = vec![s3([Some(0), Some(1), None], 2, 77, 3, 11, p)];
+        let domains = vec![Some((0..p).collect()), Some((0..p).collect())];
+        let (s, r) = visit(
+            &system,
+            2,
+            p,
+            &domains,
+            true,
+            DomainRootMode::Frobenius,
+            Some(1),
+        );
+        assert_eq!(s.len(), 1);
+        assert!(r.stopped_early);
+        assert_eq!(eval(&system[0], &s[0], p), 0);
+        assert!(!F4Options::new(Ordering::Grevlex, 4).sibling_batch);
+        let json = serde_json::to_value(VisitReport::default()).unwrap();
+        for key in [
+            "batched_nodes",
+            "batched_children",
+            "batched_fallbacks",
+            "batched_field_multiplications",
+        ] {
+            assert!(
+                json.get(key).is_none(),
+                "{key} serialised under the default"
+            );
+        }
     }
 }

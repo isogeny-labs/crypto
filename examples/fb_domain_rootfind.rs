@@ -198,6 +198,7 @@ fn s3(slots: [Option<usize>; 3], n: usize, target_x: u64, c: &Curve) -> Poly {
 
 struct Row {
     mode: DomainRootMode,
+    batch: bool,
     solutions: Vec<Vec<u64>>,
     report: VisitReport,
     seconds: f64,
@@ -209,8 +210,11 @@ fn run(
     p: u64,
     domains: &[Option<Vec<u64>>],
     mode: DomainRootMode,
+    batch: bool,
 ) -> Row {
-    let opts = F4Options::new(Ordering::Grevlex, 12).with_domain_roots(mode);
+    let opts = F4Options::new(Ordering::Grevlex, 12)
+        .with_domain_roots(mode)
+        .with_sibling_batch(batch);
     let mut solutions = Vec::new();
     let t = Instant::now();
     let report = f4_fp::solve_visit(system, n, p, &opts, domains, |s| {
@@ -220,6 +224,7 @@ fn run(
     .expect("valid system");
     Row {
         mode,
+        batch,
         solutions,
         report,
         seconds: t.elapsed().as_secs_f64(),
@@ -228,6 +233,18 @@ fn run(
 
 fn root_muls(r: &VisitReport) -> u64 {
     r.domain_scan_field_multiplications + r.domain_root_field_multiplications
+}
+
+/// Every counted multiplication of a traversal: F4 row reduction, the
+/// root step, and the batched path's specialisation and child solves.
+fn total_muls(r: &VisitReport) -> u64 {
+    r.field_ops + root_muls(r) + r.batched_field_multiplications
+}
+
+fn sorted(v: &[Vec<u64>]) -> Vec<Vec<u64>> {
+    let mut v = v.to_vec();
+    v.sort();
+    v
 }
 
 fn main() {
@@ -288,6 +305,9 @@ fn main() {
         };
         let (mut scan_root, mut frob_root, mut f4_ops) = (0u64, 0u64, 0u64);
         let (mut scan_wall, mut frob_wall, mut auto_wall) = (0f64, 0f64, 0f64);
+        let (mut scan_total, mut frob_total, mut batch_total, mut batch_wall) =
+            (0u64, 0u64, 0u64, 0f64);
+        let (mut batch_children, mut batch_fallbacks) = (0usize, 0usize);
         let (mut planted_found, mut visited) = (0usize, 0usize);
         for t in 0..targets {
             let planted = t % 2 == 0;
@@ -320,9 +340,29 @@ fn main() {
                     s3([Some(3), Some(2), None], n, target_x, &curve),
                 ]
             };
-            let scan = run(&system, n, p, &domains, DomainRootMode::Scan);
-            let frob = run(&system, n, p, &domains, DomainRootMode::Frobenius);
-            let auto = run(&system, n, p, &domains, DomainRootMode::Auto);
+            let scan = run(&system, n, p, &domains, DomainRootMode::Scan, false);
+            let frob = run(&system, n, p, &domains, DomainRootMode::Frobenius, false);
+            let auto = run(&system, n, p, &domains, DomainRootMode::Auto, false);
+            let batch = run(&system, n, p, &domains, DomainRootMode::Frobenius, true);
+            // Batched children: the scan's solution set always; its exact
+            // sequence where every child is one univariate (m = 2).
+            if m == 2 {
+                assert_eq!(
+                    batch.solutions, scan.solutions,
+                    "batched sequence (m 2, p {p}, |D| {size})"
+                );
+            } else {
+                assert_eq!(
+                    sorted(&batch.solutions),
+                    sorted(&scan.solutions),
+                    "batched set (m {m}, p {p}, |D| {size})"
+                );
+            }
+            assert_eq!(batch.report.complete, scan.report.complete);
+            assert_eq!(
+                batch.report.solutions_visited,
+                scan.report.solutions_visited
+            );
             for other in [&frob, &auto] {
                 assert_eq!(
                     other.solutions, scan.solutions,
@@ -345,12 +385,19 @@ fn main() {
             scan_wall += scan.seconds;
             frob_wall += frob.seconds;
             auto_wall += auto.seconds;
+            scan_total += total_muls(&scan.report);
+            frob_total += total_muls(&frob.report);
+            batch_total += total_muls(&batch.report);
+            batch_wall += batch.seconds;
+            batch_children += batch.report.batched_children;
+            batch_fallbacks += batch.report.batched_fallbacks;
             if let Some(f) = out.as_mut() {
-                for row in [&scan, &frob, &auto] {
+                for row in [&scan, &frob, &auto, &batch] {
                     writeln!(
                         f,
-                        "{{\"m\":{m},\"p\":{p},\"bits\":{bits},\"domain\":{size},\"target\":{t},\"planted\":{planted},\"mode\":\"{:?}\",\"solutions\":{},\"field_ops\":{},\"f4_runs\":{},\"domain_evaluations\":{},\"domain_scan_field_multiplications\":{},\"domain_root_field_multiplications\":{},\"domain_frobenius_univariates\":{},\"domain_index_entries\":{},\"full_field_branches\":{},\"wall_s\":{:.9}}}",
+                        "{{\"m\":{m},\"p\":{p},\"bits\":{bits},\"domain\":{size},\"target\":{t},\"planted\":{planted},\"mode\":\"{:?}\",\"sibling_batch\":{},\"solutions\":{},\"field_ops\":{},\"f4_runs\":{},\"domain_evaluations\":{},\"domain_scan_field_multiplications\":{},\"domain_root_field_multiplications\":{},\"domain_frobenius_univariates\":{},\"domain_index_entries\":{},\"full_field_branches\":{},\"batched_nodes\":{},\"batched_children\":{},\"batched_fallbacks\":{},\"batched_field_multiplications\":{},\"wall_s\":{:.9}}}",
                         row.mode,
+                        row.batch,
                         row.solutions.len(),
                         row.report.field_ops,
                         row.report.f4_runs,
@@ -360,6 +407,10 @@ fn main() {
                         row.report.domain_frobenius_univariates,
                         row.report.domain_index_entries,
                         row.report.full_field_branches,
+                        row.report.batched_nodes,
+                        row.report.batched_children,
+                        row.report.batched_fallbacks,
+                        row.report.batched_field_multiplications,
                         row.seconds
                     )
                     .unwrap();
@@ -375,6 +426,12 @@ fn main() {
             scan_wall, frob_wall, scan_wall / frob_wall.max(1e-12),
             auto_wall / scan_wall.max(1e-12),
         );
+        println!(
+            "   batched | total fmul scan {:>12} frob {:>12} batch {:>12} | wall scan {:>8.3}s frob {:>8.3}s batch {:>8.3}s | scan/batch {:>6.1}x frob/batch {:>6.1}x | children {} fallbacks {}",
+            scan_total, frob_total, batch_total, scan_wall, frob_wall, batch_wall,
+            scan_wall / batch_wall.max(1e-12), frob_wall / batch_wall.max(1e-12),
+            batch_children, batch_fallbacks,
+        );
     }
-    println!("every mode visited the identical solution sequence on every target");
+    println!("every mode visited the identical solution sequence on every target (batched: the identical set, and the identical sequence at m = 2)");
 }
