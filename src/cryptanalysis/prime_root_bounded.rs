@@ -758,7 +758,7 @@ impl Producer<'_> {
         {
             let degree = monic.len as usize - 1;
             let quotient = self.p / degree as u64;
-            let remainder = self.p as usize % degree;
+            let remainder = (self.p % degree as u64) as usize;
             let scaled = if quotient == 0 {
                 1
             } else {
