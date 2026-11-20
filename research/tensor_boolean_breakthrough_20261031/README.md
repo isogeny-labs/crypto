@@ -81,8 +81,11 @@ The null changes only the global wiring of interior ports while preserving the v
     chosen lifts of the x-coordinates. The relation is regrouped over the
     tuple's finite image without assuming the ambient function field finite;
     for a nontrivial tuple, one grouped coefficient is nonzero and has
-    absolute value at most the arity. Descent of the chosen lifts to the
-    explicit finite splitting field remains open. [pcc:unverified]
+    absolute value at most the arity. Injectivity of elliptic-curve point base
+    change now descends the signed relation from an algebraic closure to any
+    field where the chosen lifts already exist. Instantiating consistent
+    canonical lifts in the explicit splitting field remains open.
+    [pcc:unverified]
 13. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
 14. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
 
@@ -135,7 +138,8 @@ This hybrid requirement is a pre-freeze clarification of the original tag-only d
   bounds for the ordinary and cubic-CM Galois projector branches.
 - [`lean/SemaevRelationSigns.lean`](lean/SemaevRelationSigns.lean) —
   normalization of the algebraic-closure Semaev witness to arbitrary chosen
-  x-fibre lifts and finite-image regrouping with a surviving coefficient.
+  x-fibre lifts, injective descent to their field of definition, and
+  finite-image regrouping with a surviving coefficient.
 - [`audit_s4_dilation.py`](audit_s4_dilation.py) and
   [`s4-dilation-audit-20261119.json`](s4-dilation-audit-20261119.json) —
   exhaustive bounded prime-field `S4(st)` coefficient audit.

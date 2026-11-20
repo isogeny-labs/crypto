@@ -1457,11 +1457,16 @@ The finite-image regrouping in `DilationNonzeroBounds.lean` removes the old
 `Fintype K` restriction. For a nontrivial tuple, the combined endpoint
 `evalCanonical_zero_implies_nontriv_image_certificate` returns an exact
 relation indexed by the distinct tuple values and a coefficient that is
-nonzero over the integers with absolute value at most the arity. This does not
-yet descend the chosen points from the algebraic closure into the explicit
-finite multiquadratic splitting field. `lake build DilationNonzeroBounds
-SemaevRelationSigns` completes 9,133 jobs. The correctly scoped repository
-proof gate reports `PASS 394 thm 0 trusted` across all nine tracked modules.
+nonzero over the integers with absolute value at most the arity.
+`signed_point_relation_of_mapped_relation` proves injective descent of any
+mapped signed point relation, and
+`evalCanonical_zero_implies_signed_relation` uses it to remove the
+algebraically-closed hypothesis whenever the chosen lifts exist in the
+working field. Thus the combined nontrivial-image endpoint applies directly
+over a finite splitting field; constructing a consistent canonical lift for
+each distinct tuple value and composing the projector remain open.
+`lake build SemaevRelationSigns` completes 9,133 jobs. The repository
+proof gate reports `PASS 397 thm 0 trusted` across all nine tracked modules.
 [pcc:unverified]
 
 ## 2026-11-19 scalar-torsion to `ΨSq` bridge
