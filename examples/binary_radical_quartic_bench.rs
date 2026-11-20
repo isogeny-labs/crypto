@@ -27,6 +27,8 @@ use std::time::Instant;
 
 const BUDGET: usize = 1 << 18;
 const REPS: usize = 5;
+/// Send every irrational-u pair to the gcd (validates the guard; slow).
+const CHECK_IRRATIONAL: bool = false;
 
 #[inline(always)]
 fn base_body(rows: &[Vec<[u64; 4]>], base: &QuarticSubspaceRoots, gf: &Gf2, degs: &mut Vec<u8>) {
@@ -205,8 +207,15 @@ fn factored_body(
                 got += 1;
             });
             if got == 0 {
+                // Irrational u: a rational root X would make S₃(x_R, X, ·)
+                // proportional to S₃(x₁, x₂, ·), i.e. {x_R, X} = {x₁, x₂}
+                // or {1/x₁, 1/x₂}.  Outside that guard there is none.
                 fc.irrational_u += 1;
-                lens[i] = 0xfe; // irrational u: gcd, and record roots
+                let guard =
+                    m.xr == m.x1 || m.xr == x2 || gf.mul(m.xr, m.x1) == 1 || gf.mul(m.xr, x2) == 1;
+                if guard || CHECK_IRRATIONAL {
+                    lens[i] = 0xfe; // gcd, and record whether it had roots
+                }
             }
         }
         // Stage B: X from S₃(u, x_R, X) for every rational u.
