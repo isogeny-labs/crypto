@@ -3,7 +3,7 @@
 from sage.all import *
 from sage.groups.generic import discrete_log_rho
 from collections import Counter
-import gzip
+import gzip, base64
 import hashlib, inspect, json, random
 from pathlib import Path
 
@@ -93,7 +93,10 @@ def insert(row):
     return True
 assert insert(anchor)
 trace_meta=RESULT["relation_trace"]
-trace_bytes=gzip.decompress((HERE/trace_meta["file"]).read_bytes())
+assert trace_meta["encoding"]=="canonical_json_gzip_base64"
+compressed=base64.b64decode((HERE/trace_meta["file"]).read_text(),validate=False)
+assert hashlib.sha256(compressed).hexdigest()==trace_meta["compressed_sha256"]
+trace_bytes=gzip.decompress(compressed)
 assert hashlib.sha256(trace_bytes).hexdigest()==trace_meta["sha256"]
 trace=json.loads(trace_bytes)
 assert digest(trace)==trace_meta["sha256"] and len(trace)==trace_meta["rows"]
