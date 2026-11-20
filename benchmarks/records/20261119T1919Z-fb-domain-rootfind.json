@@ -1,0 +1,329 @@
+{
+  "branch": "claude/fb-domain-rootfind-20261119",
+  "closed_utc": "2026-11-19T19:21:35+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/examples/fb_domain_rootfind"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T19:19:37+00:00",
+      "wall_s": 12.461
+    }
+  ],
+  "commit": "aec9d3c0bafc01e9317a9df2931d08ac8f220974",
+  "commit_dirty": true,
+  "created_utc": "2026-11-19T19:19:31+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261119-fb-domain-rootfind"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v653-x86_64-with-glibc2.39"
+  },
+  "id": "20261119T1919Z-fb-domain-rootfind",
+  "metrics": [
+    {
+      "baseline": 524288.0,
+      "better": "lower",
+      "n": 16,
+      "name": "root_fmul_m2_p16_d64",
+      "note": "Frobenius+domain-index root-step multiplications; baseline = domain scan, same targets, identical solution sequence",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 728409.0
+    },
+    {
+      "baseline": 0.01,
+      "better": "lower",
+      "n": 16,
+      "name": "wall_s_m2_p16_d64",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.018
+    },
+    {
+      "baseline": 8388608.0,
+      "better": "lower",
+      "n": 16,
+      "name": "root_fmul_m2_p16_d256",
+      "note": "Frobenius+domain-index root-step multiplications; baseline = domain scan, same targets, identical solution sequence",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 2914627.0
+    },
+    {
+      "baseline": 0.063,
+      "better": "lower",
+      "n": 16,
+      "name": "wall_s_m2_p16_d256",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.069
+    },
+    {
+      "baseline": 8388608.0,
+      "better": "lower",
+      "n": 16,
+      "name": "root_fmul_m2_p20_d256",
+      "note": "Frobenius+domain-index root-step multiplications; baseline = domain scan, same targets, identical solution sequence",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 3678558.0
+    },
+    {
+      "baseline": 0.054,
+      "better": "lower",
+      "n": 16,
+      "name": "wall_s_m2_p20_d256",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.074
+    },
+    {
+      "baseline": 67108864.0,
+      "better": "lower",
+      "n": 8,
+      "name": "root_fmul_m2_p20_d1024",
+      "note": "Frobenius+domain-index root-step multiplications; baseline = domain scan, same targets, identical solution sequence",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 7442442.0
+    },
+    {
+      "baseline": 0.367,
+      "better": "lower",
+      "n": 8,
+      "name": "wall_s_m2_p20_d1024",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.162
+    },
+    {
+      "baseline": 67108864.0,
+      "better": "lower",
+      "n": 8,
+      "name": "root_fmul_m2_p24_d1024",
+      "note": "Frobenius+domain-index root-step multiplications; baseline = domain scan, same targets, identical solution sequence",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 8942083.0
+    },
+    {
+      "baseline": 0.388,
+      "better": "lower",
+      "n": 8,
+      "name": "wall_s_m2_p24_d1024",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.185
+    },
+    {
+      "baseline": 67108864.0,
+      "better": "lower",
+      "n": 8,
+      "name": "root_fmul_m2_p31_d1024",
+      "note": "Frobenius+domain-index root-step multiplications; baseline = domain scan, same targets, identical solution sequence",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 11909735.0
+    },
+    {
+      "baseline": 0.363,
+      "better": "lower",
+      "n": 8,
+      "name": "wall_s_m2_p31_d1024",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.221
+    },
+    {
+      "baseline": 536870912.0,
+      "better": "lower",
+      "n": 4,
+      "name": "root_fmul_m2_p31_d4096",
+      "note": "Frobenius+domain-index root-step multiplications; baseline = domain scan, same targets, identical solution sequence",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 23800840.0
+    },
+    {
+      "baseline": 2.757,
+      "better": "lower",
+      "n": 4,
+      "name": "wall_s_m2_p31_d4096",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.434
+    },
+    {
+      "baseline": 507904.0,
+      "better": "lower",
+      "n": 8,
+      "name": "root_fmul_m3_p16_d16",
+      "note": "Frobenius+domain-index root-step multiplications; baseline = domain scan, same targets, identical solution sequence",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 2822840.0
+    },
+    {
+      "baseline": 0.098,
+      "better": "lower",
+      "n": 8,
+      "name": "wall_s_m3_p16_d16",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.144
+    },
+    {
+      "baseline": 3096576.0,
+      "better": "lower",
+      "n": 6,
+      "name": "root_fmul_m3_p20_d32",
+      "note": "Frobenius+domain-index root-step multiplications; baseline = domain scan, same targets, identical solution sequence",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 10904975.0
+    },
+    {
+      "baseline": 0.275,
+      "better": "lower",
+      "n": 6,
+      "name": "wall_s_m3_p20_d32",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.454
+    },
+    {
+      "baseline": 3096576.0,
+      "better": "lower",
+      "n": 6,
+      "name": "root_fmul_m3_p31_d32",
+      "note": "Frobenius+domain-index root-step multiplications; baseline = domain scan, same targets, identical solution sequence",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 17434767.0
+    },
+    {
+      "baseline": 0.345,
+      "better": "lower",
+      "n": 6,
+      "name": "wall_s_m3_p31_d32",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.645
+    },
+    {
+      "baseline": 16646144.0,
+      "better": "lower",
+      "n": 4,
+      "name": "root_fmul_m3_p31_d64",
+      "note": "Frobenius+domain-index root-step multiplications; baseline = domain scan, same targets, identical solution sequence",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 47226203.0
+    },
+    {
+      "baseline": 0.901,
+      "better": "lower",
+      "n": 4,
+      "name": "wall_s_m3_p31_d64",
+      "note": "L0 unisolated wall of all targets; baseline = domain scan",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 1.642
+    }
+  ],
+  "problem": "kernel:f4_fp_domain_roots",
+  "raw": [
+    {
+      "bytes": 102182,
+      "path": "research/fb_domain_rootfind_20261119/data/fb_domain_rootfind.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/59/590069f79019f9d5d96da0300062d08f8d761ede9ca884870775a67f5ed06678",
+      "sha256": "590069f79019f9d5d96da0300062d08f8d761ede9ca884870775a67f5ed06678",
+      "uploaded": false
+    },
+    {
+      "bytes": 1926,
+      "path": "research/fb_domain_rootfind_20261119/data/console.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/eb/eb75c8aa04fb8321f076690ada99b59444789924d0ebd7b9ebd0171327d3f090",
+      "sha256": "eb75c8aa04fb8321f076690ada99b59444789924d0ebd7b9ebd0171327d3f090",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261119-fb-domain-rootfind/report.pdf",
+    "png": [
+      "benchmarks/20261119-fb-domain-rootfind/root_step.png"
+    ],
+    "svg": [
+      "benchmarks/20261119-fb-domain-rootfind/root_step.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "fb-domain-rootfind",
+  "status": "measured",
+  "summary": "f4_fp visitor finite-domain root step, Frobenius+domain index vs domain scan (opt-in DomainRootMode): 22.6x fewer root-step fmul and 6.4x less L0 wall at m=2, 31-bit, |D|=4096; scan wins at small |D| and for m=3 chains with |D|<=64; identical solution sequences in every mode on 100 targets [pcc:unverified]",
+  "validation": null
+}
