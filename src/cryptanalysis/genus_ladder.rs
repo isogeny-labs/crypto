@@ -1764,7 +1764,14 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
             res.la_sge.merge(s_nat);
             res.la.merge(s_nat);
             res.sge = st;
+            // Opt-in dump of the reduced core for offline solver studies
+            // (research/block_lanczos_pretest_20261120); off unless the env var is set.
+            let dump = std::env::var("GENUS_LADDER_EXPORT_CORE").ok();
+            let (rng0, nat0) = (rng.clone(), w_nat);
             let t = wiedemann_coord(&red, rcc, rct as usize, r, &mut rng, true, &mut w_nat);
+            if let Some(path) = dump {
+                export_core(&path, &red, rcc, rct, r, rng0, w_nat, nat0, t, ext.unit_t, h_inv, inst);
+            }
             match t.map(to_log) {
                 Some(t) if certify(t, &mut ops, &mut res.verify_ops) => answer = Some(t),
                 _ => res.la_fallbacks += 1,
@@ -1873,6 +1880,44 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
     }
     res.wall_ns = start.elapsed().as_nanos() as u64;
     res
+}
+
+/// Append one JSON line with the reduced core, the square row subset
+/// `wiedemann_coord` draws from `rng0`, its counted work and the planted log.
+#[allow(clippy::too_many_arguments)]
+fn export_core(
+    path: &str,
+    red: &[Row],
+    ncols: usize,
+    ct: u32,
+    r: u64,
+    mut rng0: StdRng,
+    after: Nat,
+    before: Nat,
+    t: Option<u64>,
+    unit_t: bool,
+    h_inv: u64,
+    inst: &Instance,
+) {
+    use std::io::Write;
+    let mut idx: Vec<usize> = (0..red.len()).collect();
+    if red.len() >= ncols {
+        for i in 0..ncols {
+            let j = rng0.gen_range(i..idx.len());
+            idx.swap(i, j);
+        }
+    }
+    let rows: Vec<serde_json::Value> =
+        red.iter().map(|(e, c)| serde_json::json!([e, c])).collect();
+    let line = serde_json::json!({
+        "p": inst.p, "g": inst.genus, "r": r, "h": inst.h, "t_secret": inst.t_secret,
+        "ncols": ncols, "ct": ct, "unit_t": unit_t, "h_inv": h_inv,
+        "subset": &idx[..ncols.min(idx.len())], "rows": rows,
+        "wied_mul": after.mul - before.mul, "wied_add": after.add - before.add,
+        "coord_out": t,
+    });
+    let mut f = std::fs::OpenOptions::new().create(true).append(true).open(path).expect("export");
+    writeln!(f, "{line}").expect("export write");
 }
 
 // ── structured Gaussian elimination before Wiedemann ────────────────────
