@@ -1525,6 +1525,29 @@ impl QuarticFrobenius {
     }
 }
 
+/// The per-pair step of [`decompose`] on its own: the subspace roots of a
+/// monic quartic, for the low-order subspace `{x : x < 2^l}`, returned as
+/// `gcd(f, L_V mod f)`.  Exposed so that other root finders can be timed
+/// and checked against it on identical quartics
+/// ([`super::binary_radical_root`]); it adds no behaviour.
+pub struct QuarticSubspaceRoots {
+    horner: LvHorner,
+}
+
+impl QuarticSubspaceRoots {
+    pub fn new(l: u32, gf: &Gf2) -> Self {
+        Self {
+            horner: LvHorner::new(&subspace_poly(l, gf), gf),
+        }
+    }
+
+    /// `f` is the monic quartic's four low coefficients.
+    #[inline(always)]
+    pub fn gcd(&self, f: [u64; 4], gf: &Gf2) -> Poly {
+        roots_in_subspace_quartic(f, &self.horner, gf)
+    }
+}
+
 /// [`roots_in_subspace`] for a monic quartic, given by its four low
 /// coefficients.  Same result, coefficient for coefficient.
 #[inline(always)]

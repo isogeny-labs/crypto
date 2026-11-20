@@ -223,7 +223,7 @@ mod integration_tests {
 }
 
 /// Bounded derived rows and independent arithmetic certificates; not dataset activation.
-#[path="checked_matrix_rows.rs"]
+#[path = "checked_matrix_rows.rs"]
 pub mod matrix_rows;
 
 /// Owning counterpart: moves the checked source together with every paid prefix.
@@ -233,25 +233,59 @@ pub struct OwnedExpansion {
     attempt: sparse::Attempt,
     owner_failure: Option<Error>,
 }
-pub fn expand_owned(source: CheckedMap, limits: Limits, owner: &mut impl Admission) -> OwnedExpansion {
+pub fn expand_owned(
+    source: CheckedMap,
+    limits: Limits,
+    owner: &mut impl Admission,
+) -> OwnedExpansion {
     let map = &source.0;
     let mut bridge = Bridge { owner, last: None };
-    let attempt = sparse::expand(sparse::Source {
-        variables: map.variables, ands: &map.ands, xors: &map.xors,
-        units: &map.units, impossible: map.impossible, domain: &map.domain,
-    }, limits, &mut bridge);
-    OwnedExpansion { source, attempt, owner_failure: bridge.last }
+    let attempt = sparse::expand(
+        sparse::Source {
+            variables: map.variables,
+            ands: &map.ands,
+            xors: &map.xors,
+            units: &map.units,
+            impossible: map.impossible,
+            domain: &map.domain,
+        },
+        limits,
+        &mut bridge,
+    );
+    OwnedExpansion {
+        source,
+        attempt,
+        owner_failure: bridge.last,
+    }
 }
 impl OwnedExpansion {
-    pub fn source(&self) -> &CheckedMap { &self.source }
-    pub fn variables(&self) -> u32 { self.source.variables() }
-    pub fn equations(&self) -> &[Polynomial] { &self.attempt.equations }
-    pub fn status(&self) -> Result<(), Failure> { self.attempt.result }
-    pub fn owner_failure(&self) -> Option<Error> { self.owner_failure }
-    pub fn charged(&self) -> Charge { self.attempt.charge }
+    pub fn source(&self) -> &CheckedMap {
+        &self.source
+    }
+    pub fn variables(&self) -> u32 {
+        self.source.variables()
+    }
+    pub fn equations(&self) -> &[Polynomial] {
+        &self.attempt.equations
+    }
+    pub fn status(&self) -> Result<(), Failure> {
+        self.attempt.result
+    }
+    pub fn owner_failure(&self) -> Option<Error> {
+        self.owner_failure
+    }
+    pub fn charged(&self) -> Charge {
+        self.attempt.charge
+    }
     /// Partial rows are diagnostics, never a complete admitted generator.
     pub fn retained(&self) -> (&Polynomial, &Polynomial, Stage, usize, usize) {
-        (&self.attempt.partial, &self.attempt.scratch, self.attempt.stage, self.attempt.row, self.attempt.literal)
+        (
+            &self.attempt.partial,
+            &self.attempt.scratch,
+            self.attempt.stage,
+            self.attempt.row,
+            self.attempt.literal,
+        )
     }
 }
 

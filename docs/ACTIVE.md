@@ -90,6 +90,8 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 - [x] Unbreak main: remove the duplicate recording_degree_falls and VisitReport fall-degree fields in f4_fp.rs left by a double-restore (claude, started 2026-11-17, branch claude/fix-f4fp-dup-degree-falls-20261117)
 
+- [x] Char-2 radical root finder for binary Semaev S4 quartics vs the L_V-mod-quartic gcd in semaev_decomp (claude, started 2026-11-20, branch claude/binary-radical-quartic-20261120, PR #4839; Dickson closed form correct but 0.36–1.72×; S4 = S3(u)·S3(u') factorisation: 1.75–6.8× per pair, whole decision n≥41 stream 2.1–8.1× / pair table 3.2–12.8×, exact; constant factor only — research/binary_factored_s4_20261120/RESULTS.md)
+
 <!-- One line per task, added as the task's first step with its draft PR:
 - [ ] <task> (<runtime>, started YYYY-MM-DD, branch <branch>, PR #<n>) -->
 - [x] Gröbner solver shootout on GF(2^n) Semaev systems: local diagnostic, inherited-f4 vs msolve vs CMS (claude, started 2026-11-16, branch claude/fastest-grobner-base-algorithm-u74ipw, PR #4543; CI blocked by AWS/S3 and main breakages)

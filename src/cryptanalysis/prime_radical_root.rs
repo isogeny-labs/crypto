@@ -698,25 +698,33 @@ mod tests {
     fn old_sqrt(ctx: &RadicalRootCtx, a: u64) -> Option<u64> {
         let f = &ctx.f;
         let p = f.p;
-        if a == 0 { return Some(0); }
+        if a == 0 {
+            return Some(0);
+        }
         if p % 4 == 3 {
             let r = f.powm(a, (p + 1) / 4);
             return if f.sqr(r) == a { Some(r) } else { None };
         }
-        if f.powm(a, (p - 1) / 2) != 1 { return None; }
+        if f.powm(a, (p - 1) / 2) != 1 {
+            return None;
+        }
         let mut m = ctx.s2;
         let mut c = ctx.zc;
         let mut t = f.powm(a, ctx.t2);
         let mut r = f.powm(a, ctx.t2.div_ceil(2));
         loop {
-            if t == 1 { return Some(r); }
+            if t == 1 {
+                return Some(r);
+            }
             let mut i = 0;
             let mut temp = t;
             while temp != 1 && i < m {
                 temp = f.sqr(temp);
                 i += 1;
             }
-            if i == m { return None; }
+            if i == m {
+                return None;
+            }
             let b = f.powm(c, 1u64 << (m - i - 1));
             m = i;
             c = f.sqr(b);
@@ -727,9 +735,15 @@ mod tests {
 
     fn old_cube_root<R: Ring>(ctx: &Cube<R>, a: R::E) -> Option<R::E> {
         let r = &ctx.r;
-        if a == r.zero() { return Some(a); }
-        if ctx.s == 0 { return Some(rpow(r, a, ctx.e3)); }
-        if rpow(r, a, ctx.n / 3) != r.one() { return None; }
+        if a == r.zero() {
+            return Some(a);
+        }
+        if ctx.s == 0 {
+            return Some(rpow(r, a, ctx.e3));
+        }
+        if rpow(r, a, ctx.n / 3) != r.one() {
+            return None;
+        }
         let x0 = rpow(r, a, ctx.e3);
         let h = rpow(r, a, 3 * ctx.e3 - 1);
         let w2 = r.mul(ctx.w, ctx.w);
@@ -738,13 +752,20 @@ mod tests {
             let corr = rpow(r, ctx.c, (ctx.p3s - l) % ctx.p3s);
             let x = r.mul(h, corr);
             let z = rpow(r, x, 3u128.pow(ctx.s - 1 - j));
-            let d = if z == r.one() { 0 }
-                else if z == ctx.w { 1 }
-                else if z == w2 { 2 }
-                else { return None };
+            let d = if z == r.one() {
+                0
+            } else if z == ctx.w {
+                1
+            } else if z == w2 {
+                2
+            } else {
+                return None;
+            };
             l += d * 3u128.pow(j);
         }
-        if !l.is_multiple_of(3) { return None; }
+        if !l.is_multiple_of(3) {
+            return None;
+        }
         let y_inv = rpow(r, ctx.c, (ctx.p3s - l / 3) % ctx.p3s);
         Some(r.mul(x0, y_inv))
     }
@@ -754,8 +775,20 @@ mod tests {
         // Include high 2-adicity, high 3-adicity (487-1 = 2*3^5),
         // and large generic moduli. Both residues and non-residues.
         let mut seed = 0x8e13_d970_ac55_10b2u64;
-        for &p in &[5u64, 7, 13, 19, 97, 109, 487, 65_537,
-                    998_244_353, 1_000_000_009, 2_013_265_921, MAX_PRIME] {
+        for &p in &[
+            5u64,
+            7,
+            13,
+            19,
+            97,
+            109,
+            487,
+            65_537,
+            998_244_353,
+            1_000_000_009,
+            2_013_265_921,
+            MAX_PRIME,
+        ] {
             let f = Fp::new(p);
             let ctx = RadicalRootCtx::new(p).unwrap();
             for _ in 0..128 {
@@ -765,17 +798,25 @@ mod tests {
                 z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
                 let a = (z ^ (z >> 31)) % p;
                 assert_eq!(ctx.sqrt(a), old_sqrt(&ctx, a), "sqrt p={p} a={a}");
-                assert_eq!(ctx.cube_p.root(a), old_cube_root(&ctx.cube_p, a),
-                           "Fp AMM p={p} a={a}");
+                assert_eq!(
+                    ctx.cube_p.root(a),
+                    old_cube_root(&ctx.cube_p, a),
+                    "Fp AMM p={p} a={a}"
+                );
                 if p <= 487 {
                     let b = f.mul(a, a);
-                    assert_eq!(ctx.cube_q.root((a, b)),
-                               old_cube_root(&ctx.cube_q, (a, b)),
-                               "Fp2 AMM p={p} a={a}");
+                    assert_eq!(
+                        ctx.cube_q.root((a, b)),
+                        old_cube_root(&ctx.cube_q, (a, b)),
+                        "Fp2 AMM p={p} a={a}"
+                    );
                 }
                 let twice = f.add(a, a);
-                assert_eq!(f.add(twice, twice), f.mul(4, a),
-                           "quad discriminant p={p} c={a}");
+                assert_eq!(
+                    f.add(twice, twice),
+                    f.mul(4, a),
+                    "quad discriminant p={p} c={a}"
+                );
             }
         }
     }
@@ -800,9 +841,15 @@ mod tests {
             begin.elapsed().as_nanos() as f64 / (xs.len() * reps) as f64
         }
         fn paired<F: Fn(u64) -> u64, G: Fn(u64) -> u64>(
-            label: &str, xs: &[u64], reps: usize, before: F, after: G,
+            label: &str,
+            xs: &[u64],
+            reps: usize,
+            before: F,
+            after: G,
         ) {
-            for &x in xs { assert_eq!(before(x), after(x), "{label} input={x}"); }
+            for &x in xs {
+                assert_eq!(before(x), after(x), "{label} input={x}");
+            }
             let (mut b, mut a) = (Vec::new(), Vec::new());
             for i in 0..13 {
                 if i % 2 == 0 {
@@ -815,8 +862,12 @@ mod tests {
             }
             b.sort_by(f64::total_cmp);
             a.sort_by(f64::total_cmp);
-            println!("{label}: {:.3} -> {:.3} ns/op {:.3}x",
-                     b[6], a[6], b[6] / a[6]);
+            println!(
+                "{label}: {:.3} -> {:.3} ns/op {:.3}x",
+                b[6],
+                a[6],
+                b[6] / a[6]
+            );
         }
         let mut seed = 0x1234_86f0_d9cb_5678u64;
         for &p in &[97u64, 998_244_353, 1_000_000_009, 2_013_265_921] {
@@ -824,24 +875,40 @@ mod tests {
             let f = ctx.f;
             let mut xs = Vec::new();
             for _ in 0..2048 {
-                seed = seed.wrapping_mul(6364136223846793005)
-                           .wrapping_add(1442695040888963407);
+                seed = seed
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
                 let a = seed % p;
                 xs.push(f.sqr(a));
             }
             println!("p={p}");
-            paired("sqrt square", &xs, 2,
-                   |a| old_sqrt(&ctx, a).unwrap(),
-                   |a| ctx.sqrt(a).unwrap());
+            paired(
+                "sqrt square",
+                &xs,
+                2,
+                |a| old_sqrt(&ctx, a).unwrap(),
+                |a| ctx.sqrt(a).unwrap(),
+            );
             let cs: Vec<u64> = xs.iter().map(|&x| f.mul(x, f.sqr(x))).collect();
             if !ctx.cube_p.bijective() {
-                paired("AMM cube", &cs, 2,
-                       |a| old_cube_root(&ctx.cube_p, a).unwrap(),
-                       |a| ctx.cube_p.root(a).unwrap());
+                paired(
+                    "AMM cube",
+                    &cs,
+                    2,
+                    |a| old_cube_root(&ctx.cube_p, a).unwrap(),
+                    |a| ctx.cube_p.root(a).unwrap(),
+                );
             }
-            paired("quad 4*c", &xs, 24,
-                   |c| f.mul(4, c),
-                   |c| { let t = f.add(c, c); f.add(t, t) });
+            paired(
+                "quad 4*c",
+                &xs,
+                24,
+                |c| f.mul(4, c),
+                |c| {
+                    let t = f.add(c, c);
+                    f.add(t, t)
+                },
+            );
         }
     }
 
@@ -851,8 +918,18 @@ mod tests {
             ((a as u128 * b as u128) % p as u128) as u64
         }
         let mut seed = 0x7d3af0192ebc42u64;
-        for &p in &[5u64, 7, 11, 13, 97, 65_537, 998_244_353,
-                     1_000_000_007, 2_147_483_647, MAX_PRIME] {
+        for &p in &[
+            5u64,
+            7,
+            11,
+            13,
+            97,
+            65_537,
+            998_244_353,
+            1_000_000_007,
+            2_147_483_647,
+            MAX_PRIME,
+        ] {
             let f = Fp::new(p);
             let mut input = vec![0, 1, 2, p / 2, p - 2, p - 1];
             for _ in 0..4_096 {
@@ -872,7 +949,10 @@ mod tests {
                         assert_eq!(ref_mul(p, a, inv), 1);
                     }
                 }
-                let q = Fq2 { f, n: if i & 1 == 0 { 2 } else { 3 } };
+                let q = Fq2 {
+                    f,
+                    n: if i & 1 == 0 { 2 } else { 3 },
+                };
                 let x = (a, b);
                 let y = (input[(i + 7) % input.len()], input[(i + 13) % input.len()]);
                 let ac = ref_mul(p, x.0, y.0);
@@ -884,8 +964,8 @@ mod tests {
                     ((y.0 as u128 + y.1 as u128) % p as u128) as u64,
                 );
                 let real = ((ac as u128 + nbd as u128) % p as u128) as u64;
-                let imag = ((s as u128 + 2 * p as u128 - ac as u128 - bd as u128)
-                    % p as u128) as u64;
+                let imag =
+                    ((s as u128 + 2 * p as u128 - ac as u128 - bd as u128) % p as u128) as u64;
                 assert_eq!(q.mul(x, y), (real, imag), "Fq2 p={p} x={x:?} y={y:?}");
             }
             // Public Fp entry points previously accepted noncanonical values.
@@ -923,11 +1003,7 @@ mod tests {
             }
             acc
         }
-        fn sample<F: Fn(u64, u64) -> u64>(
-            op: &F,
-            corpus: &[(u64, u64)],
-            reps: usize,
-        ) -> f64 {
+        fn sample<F: Fn(u64, u64) -> u64>(op: &F, corpus: &[(u64, u64)], reps: usize) -> f64 {
             let mut sink = 0u64;
             let start = Instant::now();
             for _ in 0..reps {
@@ -980,14 +1056,28 @@ mod tests {
                 corpus.push((a, b));
             }
             println!("p={p}, 8192 inputs, 9 paired medians");
-            paired("add", |a, b| ((a as u128 + b as u128) % p as u128) as u64,
-                |a, b| f.add(a, b), &corpus, 32);
-            paired("sub", |a, b| ((a as u128 + p as u128 - b as u128) % p as u128) as u64,
-                |a, b| f.sub(a, b), &corpus, 32);
-            paired("mul", |a, b| frozen_mul(p, a, b),
-                |a, b| f.mul(a, b), &corpus, 32);
-            paired("inv", |a, _| frozen_inv(p, a),
-                |a, _| f.inv(a), &corpus, 2);
+            paired(
+                "add",
+                |a, b| ((a as u128 + b as u128) % p as u128) as u64,
+                |a, b| f.add(a, b),
+                &corpus,
+                32,
+            );
+            paired(
+                "sub",
+                |a, b| ((a as u128 + p as u128 - b as u128) % p as u128) as u64,
+                |a, b| f.sub(a, b),
+                &corpus,
+                32,
+            );
+            paired(
+                "mul",
+                |a, b| frozen_mul(p, a, b),
+                |a, b| f.mul(a, b),
+                &corpus,
+                32,
+            );
+            paired("inv", |a, _| frozen_inv(p, a), |a, _| f.inv(a), &corpus, 2);
         }
     }
 

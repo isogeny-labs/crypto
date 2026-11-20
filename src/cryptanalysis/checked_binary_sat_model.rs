@@ -119,13 +119,21 @@ fn prefix_matches(sum: Option<(u64, u64)>, expected_x: Option<u64>) -> bool {
 /// Exhaustion is scoped to this exact checked model and supplied signed domain.
 /// It does not refute other Boolean models, identity patterns or factor bases.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LiftVerdict { SignedRelation, ExhaustedForModel }
+pub enum LiftVerdict {
+    SignedRelation,
+    ExhaustedForModel,
+}
 
 /// Compatibility API: preserve the prior caller-visible rejection behavior.
-pub fn verify(map: &CheckedMap, model: &[bool], signed_domain: &[(u64,u64)],
-    target: Option<(u64,u64)>, p: &mut Progress,
-    o: &mut impl VerificationAdmission) -> Result<(),Error> {
-    match verify_classified(map,model,signed_domain,target,p,o)? {
+pub fn verify(
+    map: &CheckedMap,
+    model: &[bool],
+    signed_domain: &[(u64, u64)],
+    target: Option<(u64, u64)>,
+    p: &mut Progress,
+    o: &mut impl VerificationAdmission,
+) -> Result<(), Error> {
+    match verify_classified(map, model, signed_domain, target, p, o)? {
         LiftVerdict::SignedRelation => Ok(()),
         LiftVerdict::ExhaustedForModel => Err(Error::Semantics),
     }
