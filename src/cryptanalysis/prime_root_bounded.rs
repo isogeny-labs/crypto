@@ -1482,7 +1482,7 @@ impl Replay {
         // R56_REPLAY_MONOMIAL_REMAINDER_BEGIN
         // Any nonzero scalar multiple of x^d has the same remainder.
         // Replay independently charges each eliminated degree in aggregate.
-        if d >= 2 && denominator.coefficients[..d].iter().all(|&c| c == 0) {
+        if d >= 3 && denominator.coefficients[..d - 1].iter().all(|&c| c == 0) {
             let n = numerator.len as usize;
             self.gate.charge(COPY_WORK * (n - d) as u64)?;
             r.coefficients[d..n].fill(0);
