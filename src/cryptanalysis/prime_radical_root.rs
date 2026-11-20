@@ -361,8 +361,10 @@ impl Ring for Fq2 {
         // ~log2(p)-step extension-field power with one base-field inverse.
         // The adjacent 2(p-1) case needs only one additional Fp2 square.
         // Inputs are public; variable-time Euclid is intentional here.
-        if x.0 != 0 && x.1 != 0 && x.0 < f.p && x.1 < f.p
-            && (e == p - 1 || e == 2 * (p - 1))
+        // Check the rare exponent *before* testing coefficient shape:
+        // cubic/AMM powering mostly uses unrelated exponents.
+        if (e == p - 1 || e == 2 * (p - 1))
+            && x.0 != 0 && x.1 != 0 && x.0 < f.p && x.1 < f.p
         {
             let norm = f.sub(f.sqr(x.0), self.mul_nonresidue(f.sqr(x.1)));
             let conjugate = (x.0, f.neg(x.1));
