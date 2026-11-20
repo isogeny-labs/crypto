@@ -357,7 +357,14 @@ impl Producer<'_> {
         // R51_PRODUCER_PRODUCT_END
         // A zero constant term is a cheap indicator of structured/sparse
         // factors. Preserve the original dense loop on ordinary inputs.
-        if a.coefficients[0] == 0 || b.coefficients[0] == 0 {
+        // R61_PRODUCT_LINEAR_ZERO_BEGIN
+        // A missing linear coefficient is a common parity/sparse signature
+        // even when the constant coefficient is nonzero. Keep the original
+        // dense kernel for ordinary dense inputs.
+        if a.coefficients[0] == 0 || b.coefficients[0] == 0
+            || (a.len > 2 && a.coefficients[1] == 0)
+            || (b.len > 2 && b.coefficients[1] == 0) {
+        // R61_PRODUCT_LINEAR_ZERO_END
             for i in 0..a.len as usize {
                 let ai = a.coefficients[i];
                 if ai == 0 { continue; }
@@ -1009,11 +1016,24 @@ impl Producer<'_> {
     // For p == 3 (mod 4), sqrt(D) is D^((p+1)/4). Return None for any
     // unsupported/degenerate case, retaining the generic path.
     fn split_scalar_pow(&mut self, base: u64, mut exponent: u64) -> Result<u64> {
+        // R61_PRODUCER_SCALAR_IDENTITY_BEGIN
+        // 1 * factor is factor: the first set bit needs no field product.
+        // Retain the original metered operation for exponent one, so the
+        // single-operation fast path still checks its deadline.
+        if exponent == 1 {
+            return self.mul(1, base);
+        }
         let mut acc = 1u64;
         let mut factor = base;
+        let mut initialized = false;
         while exponent != 0 {
             if exponent & 1 != 0 {
-                acc = self.mul(acc, factor)?;
+                if initialized {
+                    acc = self.mul(acc, factor)?;
+                } else {
+                    acc = factor;
+                    initialized = true;
+                }
             }
             exponent >>= 1;
             if exponent != 0 {
@@ -1021,6 +1041,7 @@ impl Producer<'_> {
             }
         }
         Ok(acc)
+        // R61_PRODUCER_SCALAR_IDENTITY_END
     }
     fn quadratic_split_factor(&mut self, h: &Poly17, delta: u64) -> Result<Option<Poly17>> {
         if h.len != 3 || (self.p & 3 != 3 && self.p & 7 != 5 && self.p != 1_000_000_009) || h.coefficients[2] != 1 {
@@ -1543,7 +1564,13 @@ impl Replay {
         // R51_REPLAY_CONVOLUTION_END
         // Keep the independent output-diagonal verifier traversal; only
         // select the zero-eliding version for structured inputs.
-        let sparse = x.coefficients[0] == 0 || y.coefficients[0] == 0;
+        // R61_REPLAY_LINEAR_ZERO_BEGIN
+        // Detect missing x coefficients without a full polynomial scan.
+        // Replay remains output-diagonal rather than producer row-major.
+        let sparse = x.coefficients[0] == 0 || y.coefficients[0] == 0
+            || (x.len > 2 && x.coefficients[1] == 0)
+            || (y.len > 2 && y.coefficients[1] == 0);
+        // R61_REPLAY_LINEAR_ZERO_END
         for k in 0..n {
             self.gate.charge(32)?;
             let start = (k + 1).saturating_sub(usize::from(y.len));
@@ -2104,14 +2131,23 @@ impl Replay {
     // Certificate replay evaluates quadratic split characters independently,
     // with left-to-right scalar powering and separate field arithmetic.
     fn split_character_power(&mut self, x: u64, exponent: u64) -> Result<u64> {
-        let mut acc = 1u64;
-        for bit in (0..64 - exponent.leading_zeros()).rev() {
+        // R61_REPLAY_SCALAR_IDENTITY_BEGIN
+        // The top set bit contributes x, not (1^2)*x. Replay uses the
+        // independently implemented left-to-right square/multiply order.
+        if exponent == 1 {
+            self.gate.clock()?;
+            return Ok(x);
+        }
+        let mut acc = if exponent == 0 { 1u64 } else { x };
+        let remaining = (64 - exponent.leading_zeros()).saturating_sub(1);
+        for bit in (0..remaining).rev() {
             acc = self.times(acc, acc)?;
             if exponent & (1u64 << bit) != 0 {
                 acc = self.times(acc, x)?;
             }
         }
         Ok(acc)
+        // R61_REPLAY_SCALAR_IDENTITY_END
     }
     fn replay_quadratic_split(&mut self, f: Poly17, delta: u64) -> Result<Option<Poly17>> {
         if f.len != 3 || (self.p % 4 != 3 && self.p % 8 != 5 && self.p != 1_000_000_009) || f.coefficients[2] != 1 {
