@@ -77,6 +77,60 @@ fn equivalence() {
  println!("ROUND70_EQ count={count}");
 }
 #[test]
+fn complete_cubic_roots_match() {
+ let mut checks=0usize;
+ for p in [1_000_000_007u64,(1u64<<61)-1] {
+  let cb=before::RadicalRootCtx::new(p).unwrap();
+  let ca=after::RadicalRootCtx::new(p).unwrap();
+  let mut state=p^0x70c0b1cfecaf8817;
+  for _ in 0..128 {
+    let a=next(&mut state)%p;
+    let b=next(&mut state)%p;
+    let mut old=cb.cubic_depressed(a,b);
+    let mut new=ca.cubic_depressed(a,b);
+    old.sort_unstable();old.dedup();
+    new.sort_unstable();new.dedup();
+    assert_eq!(old,new,"p={p} a={a} b={b}");
+    checks+=1;
+  }
+ }
+ println!("ROUND70_FULL_EQ count={checks}");
+}
+#[test]
+#[ignore="full radical cubic path, 13 alternating native Rust trials"]
+fn bench_complete_cubic() {
+ for p in [1_000_000_007u64,(1u64<<61)-1] {
+  let cb=before::RadicalRootCtx::new(p).unwrap();
+  let ca=after::RadicalRootCtx::new(p).unwrap();
+  let mut state=p^0x70c0b1cfecaf8817;
+  let mut samples=Vec::new();
+  for _ in 0..128 {
+    samples.push((next(&mut state)%p,next(&mut state)%p));
+  }
+  let mut before_times=Vec::new();let mut after_times=Vec::new();
+  for trial in 0..13 {
+    let timing=|new:bool| {
+      let started=Instant::now();
+      for _ in 0..3 {
+        for &(a,b) in &samples {
+          let roots=if new {
+            ca.cubic_depressed(black_box(a),black_box(b))
+          } else {
+            cb.cubic_depressed(black_box(a),black_box(b))
+          };
+          black_box(roots);
+        }
+      }
+      started.elapsed().as_nanos() as f64/(samples.len()*3) as f64
+    };
+    if trial%2==0 {before_times.push(timing(false));after_times.push(timing(true));}
+    else {after_times.push(timing(true));before_times.push(timing(false));}
+  }
+  let old=median(before_times);let new=median(after_times);
+  println!("ROUND70_FULL_RUST p={p} cubic_before_ns={old:.3} cubic_after_ns={new:.3} speedup={:.3}x",old/new);
+ }
+}
+#[test]
 #[ignore="13 alternating native Rust A/B trials"]
 fn benchmark() {
  for (p,n) in [(1_000_000_007u64,5u64),((1u64<<61)-1,3)] {
