@@ -448,7 +448,7 @@ impl Producer<'_> {
         // Synthetic division by x^d+c: x^d == -c, so cancel each
         // descending high coefficient with one field update. For c=+/-1
         // this is just subtraction/addition, not multiplication.
-        if b.len >= 3 && b.coefficients[b.len as usize - 1] == 1
+        if b.len >= 2 && b.coefficients[b.len as usize - 1] == 1
             && (b.coefficients[0] == 1 || b.coefficients[0] == self.p - 1)
             && b.coefficients[1..b.len as usize - 1].iter().all(|&v| v == 0)
         {
@@ -554,7 +554,7 @@ impl Producer<'_> {
         // Reduce modulo monic x^d+c by a single descending coefficient
         // fold. This avoids scanning d zero coefficients and trimming per
         // cancellation. Each nonzero term retains a deadline/work check.
-        if modulus.len >= 3 && value.len >= modulus.len
+        if modulus.len >= 2 && value.len >= modulus.len
             && (modulus.coefficients[0] == 1 || modulus.coefficients[0] == self.p - 1)
             && modulus.coefficients[1..modulus.len as usize - 1].iter().all(|&v| v == 0)
         {
@@ -1607,7 +1607,7 @@ impl Replay {
         // Independent descending-index polynomial remainder: for monic
         // x^d+c the only surviving cancellation lies d slots below.
         // Treat +/-1 as additive units, independently of producer code.
-        if d >= 3 && denominator.coefficients[d - 1] == 1
+        if d >= 2 && denominator.coefficients[d - 1] == 1
             && (denominator.coefficients[0] == 1 || denominator.coefficients[0] == self.p - 1)
             && denominator.coefficients[1..d - 1].iter().all(|&v| v == 0)
         {
@@ -1713,7 +1713,7 @@ impl Replay {
         // R59_BINOMIAL_CANCEL_BEGIN
         // Replay keeps its independent descending coefficient traversal
         // and the same per-degree gate checks as the general cancel loop.
-        if divisor_len >= 3 && numerator.len >= denominator.len
+        if divisor_len >= 2 && numerator.len >= denominator.len
             && (denominator.coefficients[0] == 1 || denominator.coefficients[0] == self.p - 1)
             && denominator.coefficients[1..divisor_len - 1].iter().all(|&v| v == 0)
         {
@@ -2624,6 +2624,76 @@ mod tests {
         f.iter().rev().fold(0, |a, &c| {
             ((u128::from(a) * u128::from(x) + u128::from(c)) % u128::from(p)) as u64
         })
+    }
+
+    #[test]
+    fn round60_unit_linear_division_reduction_and_independent_replay() {
+        // A polynomial modulo x+/-1 can be canceled with one field add/sub
+        // per nonzero high coefficient. Compare all four implementations
+        // against a separate wide-integer synthetic-division oracle.
+        for p in [3u64, 5, 7, 101, 1_000_000_007, 1_000_000_009,
+                  (1u64 << 61) - 1] {
+            let f = field(p);
+            let mut observer = |_: &BoundedRootEvent| Ok(());
+            let mut producer = Producer {
+                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
+                unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
+                roots: [0; 8], root_count: 0,
+            };
+            producer.gate.admit().unwrap();
+            let mut replay =
+                Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+            for c in [1u64, p - 1] {
+                let modulus = Poly17::from_coefficients(&f, &[c, 1]).unwrap();
+                for n in [2usize, 3, 8, 17] {
+                    for seed in 0..64u64 {
+                        let mut input = vec![0u64; n];
+                        let mut state = seed.wrapping_mul(0x9E3779B97F4A7C15);
+                        for coefficient in &mut input {
+                            state = state.wrapping_mul(6364136223846793005)
+                                .wrapping_add(1442695040888963407);
+                            *coefficient = state % p;
+                        }
+                        if seed & 3 == 0 { input[0] = 0; }
+                        input[n - 1] = 1;
+                        let numerator = Poly17::from_coefficients(&f, &input).unwrap();
+
+                        let mut remainder = input.clone();
+                        let mut quotient = vec![0u64; n - 1];
+                        for high in (1..n).rev() {
+                            let factor = remainder[high];
+                            quotient[high - 1] = factor;
+                            let current = remainder[high - 1];
+                            let next = if c == 1 {
+                                ((current as u128 + p as u128 - factor as u128)
+                                    % p as u128) as u64
+                            } else {
+                                ((current as u128 + factor as u128) % p as u128) as u64
+                            };
+                            remainder[high - 1] = next;
+                            remainder[high] = 0;
+                        }
+                        let expected_q =
+                            Poly17::from_coefficients(&f, &quotient).unwrap();
+                        let expected_r =
+                            Poly17::from_coefficients(&f, &remainder[..1]).unwrap();
+                        let (q, r) = producer.division(&numerator, &modulus).unwrap();
+                        assert_eq!((q, r), (expected_q, expected_r));
+                        let mut reduced = numerator;
+                        producer.reduce_monic(&mut reduced, &modulus).unwrap();
+                        assert_eq!(reduced, expected_r);
+                        assert_eq!(replay.remainder(numerator, &modulus).unwrap(), expected_r);
+                        let mut checked = numerator;
+                        replay.cancel_monic(&mut checked, &modulus).unwrap();
+                        assert_eq!(checked, expected_r);
+                        producer.gate.metrics.work = 0;
+                        producer.gate.metrics.field_work = 0;
+                        replay.gate.metrics.work = 0;
+                        replay.gate.metrics.field_work = 0;
+                    }
+                }
+            }
+        }
     }
 
     #[test]
