@@ -28,6 +28,7 @@ on:
       - 'research/amm_digit_perf_20261118/round53_euclid_inverse_isolated.py'
       - 'research/amm_digit_perf_20261118/round54_dense_accumulators_isolated.py'
       - 'research/amm_digit_perf_20261118/round55_small_squares_isolated.py'
+      - 'research/amm_digit_perf_20261118/round56_monomial_isolated.py'
       - 'research/amm_digit_perf_20261118/round31_bounded_baseline.rs'
       - 'research/amm_digit_perf_20261118/round23_verifier_isolated.py'
       - 'research/amm_digit_perf_20261118/round24_verifier_isolated.py'
@@ -50,6 +51,34 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  bounded-monomial-round56:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round56_monomial_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Exact source Rust before/after for degree-two through degree-eight x-power reductions
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round56_monomial_isolated.py
+          } | tee "$RUNNER_TEMP/round56-native-rust.txt"
+          cat "$RUNNER_TEMP/round56-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round56-monomial-native-rust
+          path: ${{ runner.temp }}/round56-native-rust.txt
+          if-no-files-found: ignore
+
   bounded-small-squares-round55:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
