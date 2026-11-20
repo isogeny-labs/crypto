@@ -1,0 +1,52 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h35c0805412a1",
+  "label": "conductor gap ell=8209 rho retest: crater vs floor, fresh measurement seed 20261120, 16 targets",
+  "spec_id": "ECS1h00331ae3e6d4",
+  "spec_sha256": "00331ae3e6d44e73fb9742be43b541a340a007b8df94837a75ee4c6888aa8441",
+  "env_class_id": "ECBENV2h04eebefc62e8",
+  "host_sha256": "3a02d0977a7c554193e37c6a987fe69830ae6449a6f04fcb66e28d85aefb984c",
+  "plan_sha256": "2d21dbb2acd2f73d7c2fa5f5ffdb0586e9d3d9c354267447d4e4ca2ca5e07ff1",
+  "binary_sha256": "f717da8ad079f5896db084ffbe4f6d23bdde7cd7435783d1af6e438121650318",
+  "git_commit": "6a0414dfb902f641350887585d0e37b2f370da13",
+  "git_dirty": true,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/Volumes/SSD990-2/crypto/target/release/ecbench"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "62ddeaa204f37595adf8536531dcc75b8606bb06010c9ea7a58b61272dae87c1",
+  "child_env": {
+    "HOME": "/Users/adamburan",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/Users/adamburan/.cargo/bin:/opt/homebrew/bin:/usr/bin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1795199873080,
+  "finished_unix_ms": 1795199891814,
+  "status": "complete",
+  "executions_planned": 768,
+  "records_written": 768,
+  "records_sha256": "8a5dc38c68c08bc1f2af32878f30d115cc856e778e639d3eb449c3ce528dac51",
+  "status_counts": {
+    "verified": 768
+  }
+}
