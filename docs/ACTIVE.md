@@ -15,7 +15,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 ## Active items (top = next)
 
-- [ ] Prove floor-vs-crater ECDLP difference over a large prime conductor gap with Lean + matched experiments (Cursor, started 2026-11-20, branch cursor/floor-crater-ecdlp-gap-bdb7)
+- [ ] Prove floor-vs-crater ECDLP difference over a large prime conductor gap with Lean + matched experiments (Cursor, started 2026-11-20, branch cursor/floor-crater-ecdlp-gap-bdb7, PR #4841)
 
 - [x] Formalize conductor prime-gap bounds, scalar-Frobenius oracle hardness, and DLP transfer ceilings in Lean 4 (Cursor, completed 2026-11-20, branch cursor/lean-conductor-prime-gap-bounds-bdb7, PR #4815; claim PCC-20261120-70fc62 standing unverified; proof-gate PASS 125 thm)
 
