@@ -65,3 +65,24 @@ base at every prime where these Jacobians have practical size.
 - **What is new.** The structure (an optimal smoothness degree that grows with g)
   is classical (Enge-Gaudry). The measured crossover points in the lab
   instrument are the new part.
+
+## Erratum (2026-11-20): the g = 8 estimate was inflated by one atypical curve
+
+The estimate "p*(8) >~ 10^4, no decay yet" rested on p=53, where the only curve run (seed 11)
+has 19 degree-1 base columns against the usual ~p/2 = 26. The lab arm exhausted on that curve,
+so the gain recorded there (>= 195x) is a lower bound on an unusual curve, not a trend point.
+
+A new cell at g=8, p=73 (`../P4_followup/g8decay/g8_p73_cDER.jsonl`, 1 curve x 2 seeds, all
+solves certified, executed rho at 0.94 and 0.78 of its expectation) gives:
+- the lab arm at 0.26 of rho;
+- arm D at 0.0107 of rho;
+- a gain of 24x (range 23.8-24.8).
+
+From p=31 (94x) to p=73 (24x) the slope is -1.58. That puts p*(8) at about **550 (slope -1.58)
+to 1800 (slope -1)**, not >~10^4.
+
+p*(g) still grows with genus (about 270, about 830, about 550-1800 for g = 6, 7, 8), but far
+more slowly than g!. The "g!/3 to g!/6" scaling in the table above is withdrawn, and so is the
+extrapolation to g >= 10 and g >= 12 drawn from it.
+
+A cell at g=8, p=101 is running to pin the g=8 slope down; see `../P4_followup/`.
