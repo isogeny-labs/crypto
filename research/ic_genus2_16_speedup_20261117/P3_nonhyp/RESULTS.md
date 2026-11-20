@@ -2,7 +2,7 @@
 
 Run 2026-11-20 under `PROTOCOL.md` (frozen, `frozen.sha256`). Instrument: `code/l08v2.py`. Data:
 `raw/*.jsonl`, 72 files, 360 rows. Analysis: `code/analyze_p3.py` gives `raw/analysis.md`.
-Figure: `p3_cost_vs_rho.svg` / `.png`. Every number is `[pcc:unverified]`. This is one producer
+Figure: `p3_cost_vs_rho.svg` (the PNG render is not kept in Git: binary data belongs in the artifact store, which is unreachable from this session). Every number is `[pcc:unverified]`. This is one producer
 with no independent replay yet.
 
 **This is not a DLP solve.** It measures the counted cost of reaching a relation matrix of full

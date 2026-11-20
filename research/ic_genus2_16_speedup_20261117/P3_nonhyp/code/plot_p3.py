@@ -28,4 +28,4 @@ for m, c in cols.items():
 ax.set_xscale('log'); ax.set_yscale('log'); ax.set_xlabel('p'); ax.set_ylabel('counted cost (FPM)')
 ax.set_title('P3: plane-model relation phase + LA bracket against matched rho [pcc:unverified]', fontsize=9)
 ax.legend(fontsize=6.5, loc='upper left'); ax.grid(True, which='both', alpha=0.3)
-fig.tight_layout(); fig.savefig('p3_cost_vs_rho.svg'); fig.savefig('p3_cost_vs_rho.png', dpi=130)
+fig.tight_layout(); fig.savefig('p3_cost_vs_rho.svg')
