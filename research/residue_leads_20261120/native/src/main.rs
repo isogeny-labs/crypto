@@ -215,9 +215,22 @@ fn spectral(bl: &Bluestein, f: &[i8]) -> SpecStat {
         }
     }
     let sigma2 = n as f64 * (1.0 - mu * mu);
-    let t = (-(m * m) / sigma2).exp();
     let nn = ((n - 1) / 2) as f64;
+    // Amendment 3 (post-data): if f(kG) = +-f((n-k)G) for all k >= 1 the DFT is purely real (imaginary):
+    // per-frequency |S| is a real Gaussian with variance sigma^2, tail erfc(t / sqrt(2 sigma^2)).
+    let t = if symmetry(f) != 0 { erfc(m / (2.0 * sigma2).sqrt()) } else { (-(m * m) / sigma2).exp() };
     SpecStat { m_max: m, argmax: am, sigma2, p_upper: max_upper(t, nn), p_lower: max_lower(t, nn) }
+}
+/// +1 even, -1 odd, 0 neither (over k = 1..n-1)
+fn symmetry(f: &[i8]) -> i8 {
+    let n = f.len();
+    if (1..n).all(|k| f[k] == f[n - k]) {
+        1
+    } else if (1..n).all(|k| f[k] == -f[n - k]) {
+        -1
+    } else {
+        0
+    }
 }
 fn residue_chi2(f: &[i8], md: u64) -> (f64, f64, f64) {
     // contingency 2 x md over k = 1..n-1 ; returns (chi2, p, max |class mean - overall|)
@@ -257,8 +270,8 @@ fn r2(insts: &[Inst], out: &mut String, aa_out: &mut String) {
         let mut emit = |name: &str, f: &[i8], role: &str, rows: &mut Vec<String>| {
             let s = spectral(&bl, f);
             let mut r = format!(
-                "{{\"lead\":\"R2\",\"instance\":\"{}\",\"field\":\"{}\",\"n\":{n},\"log2q\":{:.4},\"predicate\":\"{name}\",\"role\":\"{role}\",\"M\":{},\"argmax_a\":{},\"M_over_sqrt_q\":{},\"M_over_sqrt_nlnn\":{},\"sigma2\":{},\"p_upper\":{},\"p_lower\":{}",
-                inst.label, inst.field, inst.q_bits, jnum(s.m_max), s.argmax, jnum(s.m_max / sqrt_q), jnum(s.m_max / rn), jnum(s.sigma2), jnum(s.p_upper), jnum(s.p_lower)
+                "{{\"lead\":\"R2\",\"instance\":\"{}\",\"field\":\"{}\",\"n\":{n},\"log2q\":{:.4},\"predicate\":\"{name}\",\"role\":\"{role}\",\"symmetry\":{},\"M\":{},\"argmax_a\":{},\"M_over_sqrt_q\":{},\"M_over_sqrt_nlnn\":{},\"sigma2\":{},\"p_upper\":{},\"p_lower\":{}",
+                inst.label, inst.field, inst.q_bits, symmetry(f), jnum(s.m_max), s.argmax, jnum(s.m_max / sqrt_q), jnum(s.m_max / rn), jnum(s.sigma2), jnum(s.p_upper), jnum(s.p_lower)
             );
             let mut minp_res: f64 = 1.0;
             r.push_str(",\"residues\":[");
@@ -317,6 +330,25 @@ fn r2(insts: &[Inst], out: &mut String, aa_out: &mut String) {
             pl.push(s.p_lower);
             p3.push(residue_chi2(&fr, 3).1);
         }
+        let (mut pue, mut puo) = (vec![], vec![]);
+        for par in [1i8, -1] {
+            for _ in 0..K_AA {
+                let mut fr = vec![1i8; n];
+                for k in 1..=(n - 1) / 2 {
+                    let v = if rng.next() & 1 == 0 { 1 } else { -1 };
+                    fr[k] = v;
+                    fr[n - k] = par * v;
+                }
+                let s = spectral(&bl, &fr);
+                if par == 1 { pue.push(s.p_upper) } else { puo.push(s.p_upper) }
+            }
+        }
+        let (kue, kuo) = (ks_uniform(pue), ks_uniform(puo));
+        aa_rows.push(format!(
+            "{{\"lead\":\"R2-sym\",\"instance\":\"{}\",\"K\":{K_AA},\"ks_p_upper_even\":{},\"ks_p_upper_odd\":{},\"null_valid\":{}}}",
+            inst.label, jnum(kue), jnum(kuo), kue <= 0.25 && kuo <= 0.25
+        ));
+        eprintln!("R2 AA-sym {}: KS even {kue:.3} odd {kuo:.3}", inst.label);
         let (ku, kl, k3) = (ks_uniform(pu.clone()), ks_uniform(pl.clone()), ks_uniform(p3.clone()));
         aa_rows.push(format!(
             "{{\"lead\":\"R2\",\"instance\":\"{}\",\"K\":{K_AA},\"ks_p_upper\":{},\"ks_p_lower\":{},\"ks_chi2_mod3\":{},\"null_valid\":{}}}",
@@ -520,10 +552,14 @@ fn r4(out: &mut String) {
             let a = (p - 35 * c % p * c % p) % p;
             let b = 98 * c % p * c % p * c % p;
             let ord = count_prime(p, a, b, &qr);
-            if !is_prime(ord) || found >= 20 {
+            // Amendment 2: ker(alpha) is the rational 2-torsion point (-7c, 0); #E is always even
+            let Some(&h) = [2u64, 4, 8].iter().find(|&&h| ord % h == 0 && is_prime(ord / h) && ord / h > 5) else {
+                continue;
+            };
+            if found >= 20 {
                 continue;
             }
-            let n = ord;
+            let n = ord / h;
             let sq = sqrt_mod(n - 7 % n, n).expect("-7 must be a square mod n");
             let inv2 = (n + 1) / 2;
             let l1 = (1 + sq) % n * inv2 % n;
@@ -535,10 +571,11 @@ fn r4(out: &mut String) {
             let o2 = mult_order(2, n);
             let sm = s_min(n, 2.0);
             rows.push(format!(
-                "{{\"claim\":\"R4-exact\",\"family\":\"D=-7 norm-2\",\"p\":{p},\"twist\":{},\"n\":{n},\"ord_lambda\":[{s1},{s2}],\"s\":{s},\"s_min_bound\":{sm},\"bound_holds\":{},\"ord_2_mod_n\":{o2},\"bound_holds_scalar2\":{},\"net_factor_at_c\":[{}]}}",
+                "{{\"claim\":\"R4-exact\",\"family\":\"D=-7 norm-2\",\"p\":{p},\"h\":{h},\"twist\":{},\"n\":{n},\"ord_lambda\":[{s1},{s2}],\"s\":{s},\"s_min_bound\":{sm},\"bound_holds\":{},\"ord_2_mod_n\":{o2},\"bound_holds_scalar2\":{},\"net_factor_at_c\":[{}]}}",
                 c != 1, s >= sm, o2 >= s_min(n, 4.0), net(s)
             ));
             found += 1;
+            eprintln!("R4 D=-7 p={p} n={n} s={s} smin={sm}");
         }
     }
     // controls j = 0 (order-6 automorphism) and j = 1728 (order 4): verify zeta(G) = lambda G exactly
@@ -555,15 +592,26 @@ fn r4(out: &mut String) {
             if !ok {
                 continue;
             }
-            for coef in 1..p {
+            // Amendment 2: y^2 = x^3 + B (resp. x^3 + Ax) has 6 (resp. 4) twist classes; cap the scan
+            for coef in 1..p.min(65) {
                 let (a, b) = if j == 0 { (0, coef) } else { (coef, 0) };
                 let ord = count_prime(p, a, b, &qr);
-                if !is_prime(ord) {
+                // Amendment 2: j = 1728 always has the 2-torsion point (0,0); allow h in {2,4} there
+                let hs: &[u64] = if j == 0 { &[1] } else { &[2, 4] };
+                let Some(&h) = hs.iter().find(|&&h| ord % h == 0 && is_prime(ord / h) && ord / h > 5) else {
                     continue;
-                }
-                let n = ord;
-                let g = first_point(p, a, b, 1);
-                let c = PCurve { p, a, b, order: ord, n, h: 1, g };
+                };
+                let n = ord / h;
+                let mut c = PCurve { p, a, b, order: ord, n, h, g: (0, 0) };
+                let mut x0 = 1;
+                let g = loop {
+                    let p0 = first_point(p, a, b, x0);
+                    if let Some(g) = pmul(&c, h, Some(p0)) {
+                        break g;
+                    }
+                    x0 = p0.0 + 1;
+                };
+                c.g = g;
                 // automorphism and eigenvalue
                 let (img, lams): ((u64, u64), Vec<u64>) = if j == 0 {
                     let beta = (2..p).map(|z| powmod(z, (p - 1) / 3, p)).find(|&v| v != 1).unwrap();
@@ -580,6 +628,7 @@ fn r4(out: &mut String) {
                     "{{\"claim\":\"R4-exact\",\"family\":\"j={j} automorphism (control)\",\"p\":{p},\"n\":{n},\"eigen_verified\":{},\"s\":{s},\"net_factor_at_c\":[{}]}}",
                     lam.is_some(), net(s)
                 ));
+                eprintln!("R4 j={j} p={p} n={n} s={s}");
                 if j == 0 { cnt0 += 1 } else { cnt1 += 1 }
                 break;
             }
@@ -673,9 +722,16 @@ fn main() {
         r4(&mut s);
         std::fs::write(format!("{outdir}/r4.json"), s).unwrap();
     }
-    if which == "r2" || which == "r3" || which == "all" || which == "r23" {
+    if which == "r2" || which == "r3" || which == "all" || which == "r23" || which == "r2v2" {
         let insts = build_instances();
         let mut aa = String::new();
+        if which == "r2v2" {
+            let mut s = String::new();
+            r2(&insts, &mut s, &mut aa);
+            std::fs::write(format!("{outdir}/r2_v2.json"), s).unwrap();
+            std::fs::write(format!("{outdir}/aa_r2_v2.json"), format!("[\n{}\n]\n", aa)).unwrap();
+            return;
+        }
         if which != "r3" {
             let mut s = String::new();
             r2(&insts, &mut s, &mut aa);
