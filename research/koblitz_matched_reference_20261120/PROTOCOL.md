@@ -41,3 +41,30 @@ with cluster-bootstrap 95% intervals (seed 20261002, 4000 resamples), as in the 
 
 L0 only; counted GAE are deterministic, wall time is not used. No change to `docs/ic/*`, the leaderboard or
 `boundary_targets.json` in this study; adopting the reference in those is a follow-up named in the report.
+
+## Amendment 1 (2026-11-20, after the first run, before any M3/M4 reading is reported)
+
+**What happened.** The first run (02:29–02:31 UTC, `ecbench` sha256 `4f26c43e…32eb`, code at `3783ff5346` plus
+the test fix `06b18504df`) priced `jump_select_word_ops` only in the bitop/v1 unit (`ecbench::work`). The §5a band,
+which every M2–M4 comparison reads, charges `w` per operation listed in `cost.unpriced` or behind a `counted:` marker
+(`ecbench::band`), and saw none of it: every v5 ÷ strong ratio equalled the audit's to three decimals at all three
+weights. That contradicts "Change under test" and M2/M4 above ("priced only at w > 0", "the tally makes v5 dearer")
+and the audit's section 5 (tally "as strong's `partition_hashes_uncharged` ... so that its band-priced S is comparable
+at w > 0"). The instrument did not do what the protocol says; it is fixed, not the predictions.
+
+**Change.** `TunedWalker` also counts `jump_selections`, one per jump-index selection (every step and every
+look-ahead re-test), in the search phase's `work_native` behind the marker `counted:jump_selections`.
+`ecbench::band::WALK_SELECT_WORK_COUNTERS` adds it to the band's priced count in the default reading, as the table and
+sibling work are (`table_work_counts`), so committed records without the marker are unchanged. In bitop/v1 it is shape:
+its word operations are already priced through `jump_select_word_ops`. Strong is unchanged.
+
+**Runs.** The first run is kept unchanged in `runs/pre-amendment-1/` (sessions, audits, logs, band tables,
+results.json) as evidence of M1 and M2 under the first instrument; it is not used for M3 or M4. All five sessions are
+run again with `run.sh` unchanged on the amended binary.
+
+**Added check M2b (mechanical, pass/fail).** For every curve and `w` in {0.1, 1}, v5's mean S(w) in the new run minus
+the audit's v5 mean S(w) equals `w · mean(jump_selections) / √r` to a relative 1e-6 (the walk, seeds and targets are
+unchanged, so the tally is the only difference). A failure invalidates the run.
+
+**Disclosure.** The analyst has seen the first run's numbers (above: equal to the audit's). M1, M2, M3 and M4 are not
+changed.

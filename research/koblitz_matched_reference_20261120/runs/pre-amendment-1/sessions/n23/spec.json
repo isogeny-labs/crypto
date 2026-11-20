@@ -1,0 +1,87 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "Koblitz matched rho reference, v5 tallied: a=1 n=23",
+ "description": "Frozen in research/koblitz_matched_reference_20261120/PROTOCOL.md before its data. v5 with its jump-index selection tallied vs strong, on the audit's targets; no IC change, no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 1,
+    "n": 23
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261115302,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-strong",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  },
+  {
+   "name": "rho-v5",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_v5"
+   }
+  },
+  {
+   "name": "rho-v5-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.signed_frobenius_v5"
+   }
+  },
+  {
+   "name": "gen-c3",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=3,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "gen-c4",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "k1-l9",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "koblitz-standard-subspace:dimension=9",
+     "oracle": "pdp3-koblitz:m=3,engine=rootfind-negfold",
+     "max_trials": "13528399621",
+     "targets": "walk"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261116302,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}
