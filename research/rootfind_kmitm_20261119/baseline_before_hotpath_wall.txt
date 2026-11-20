@@ -1,0 +1,155 @@
+    Blocking waiting for file lock on build directory
+   Compiling crypto v0.1.0 (/workspace)
+    Finished `release` profile [optimized] target(s) in 17m 41s
+     Running `target-rootfind-floor/release/examples/rootfind_kmitm_wall --bits 24 --size 12 --targets 32`
+rootfind-kmitm vs ksum  bits=24 |Fx|=12 targets=32  [pcc:unverified]
+m= 3  split 2/1  kmitm build      10269 ns  left 144      right_pre 0       probe      974.3 ns/tgt  hits 0   ksum build      77623 ns  probe       15.8 ns/tgt  ratio build/probe    7.6x /    0.0x
+m= 4  split 3/1  kmitm build      53981 ns  left 880      right_pre 0       probe      935.8 ns/tgt  hits 0   ksum build     385216 ns  probe        7.0 ns/tgt  ratio build/probe    7.1x /    0.0x
+m= 5  split 4/1  kmitm build     276386 ns  left 3960     right_pre 0       probe      938.4 ns/tgt  hits 0   ksum build    1270345 ns  probe       12.2 ns/tgt  ratio build/probe    4.6x /    0.0x
+m= 6  split 5/1  kmitm build     899683 ns  left 12672    right_pre 0       probe      922.7 ns/tgt  hits 0   ksum build    3259165 ns  probe        7.8 ns/tgt  ratio build/probe    3.6x /    0.0x
+m= 8  split 7/1  kmitm build    4316494 ns  left 50653    right_pre 0       probe     1025.1 ns/tgt  hits 0   ksum build    7821159 ns  probe       17.5 ns/tgt  ratio build/probe    1.8x /    0.0x
+m=10  split 9/1  kmitm build    5392736 ns  left 56317    right_pre 0       probe     1120.8 ns/tgt  hits 0   ksum build      n/a     probe      n/a        ratio build/probe    n/a /    n/a
+m=12  split 9/3  kmitm build    5571656 ns  left 56317    right_pre 1760    probe    26546.1 ns/tgt  hits 0   ksum build      n/a     probe      n/a        ratio build/probe    n/a /    n/a
+{
+  "abscissae": 12,
+  "bits": 24,
+  "classification": "engineering",
+  "factor_base_size": 12,
+  "pcc": "unverified",
+  "rows": [
+    {
+      "abscissae": 12,
+      "build_speedup_ksum_over_kmitm": 7.558963871847308,
+      "kmitm_build_ns": 10269.0,
+      "kmitm_hits": 0,
+      "kmitm_left_entries": 144,
+      "kmitm_probe_ns_per_target": 974.3125,
+      "kmitm_right_precomputed": 0,
+      "ksum_build_ns": 77623.0,
+      "ksum_hits": 0,
+      "ksum_insert_attempts": 880,
+      "ksum_ok": true,
+      "ksum_probe_ns_per_target": 15.84375,
+      "left_k": 2,
+      "m": 3,
+      "probe_speedup_ksum_over_kmitm": 0.01626146641862852,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 12,
+      "build_speedup_ksum_over_kmitm": 7.136140493877475,
+      "kmitm_build_ns": 53981.0,
+      "kmitm_hits": 0,
+      "kmitm_left_entries": 880,
+      "kmitm_probe_ns_per_target": 935.8125,
+      "kmitm_right_precomputed": 0,
+      "ksum_build_ns": 385216.0,
+      "ksum_hits": 0,
+      "ksum_insert_attempts": 3960,
+      "ksum_ok": true,
+      "ksum_probe_ns_per_target": 7.03125,
+      "left_k": 3,
+      "m": 4,
+      "probe_speedup_ksum_over_kmitm": 0.007513524343818874,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 12,
+      "build_speedup_ksum_over_kmitm": 4.5962711570050585,
+      "kmitm_build_ns": 276386.0,
+      "kmitm_hits": 0,
+      "kmitm_left_entries": 3960,
+      "kmitm_probe_ns_per_target": 938.4375,
+      "kmitm_right_precomputed": 0,
+      "ksum_build_ns": 1270345.0,
+      "ksum_hits": 0,
+      "ksum_insert_attempts": 12672,
+      "ksum_ok": true,
+      "ksum_probe_ns_per_target": 12.15625,
+      "left_k": 4,
+      "m": 5,
+      "probe_speedup_ksum_over_kmitm": 0.012953712953712953,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 12,
+      "build_speedup_ksum_over_kmitm": 3.62257039423886,
+      "kmitm_build_ns": 899683.0,
+      "kmitm_hits": 0,
+      "kmitm_left_entries": 12672,
+      "kmitm_probe_ns_per_target": 922.6875,
+      "kmitm_right_precomputed": 0,
+      "ksum_build_ns": 3259165.0,
+      "ksum_hits": 0,
+      "ksum_insert_attempts": 29568,
+      "ksum_ok": true,
+      "ksum_probe_ns_per_target": 7.75,
+      "left_k": 5,
+      "m": 6,
+      "probe_speedup_ksum_over_kmitm": 0.008399376820429452,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 12,
+      "build_speedup_ksum_over_kmitm": 1.8119239827508158,
+      "kmitm_build_ns": 4316494.0,
+      "kmitm_hits": 0,
+      "kmitm_left_entries": 50653,
+      "kmitm_probe_ns_per_target": 1025.125,
+      "kmitm_right_precomputed": 0,
+      "ksum_build_ns": 7821159.0,
+      "ksum_hits": 0,
+      "ksum_insert_attempts": 63360,
+      "ksum_ok": true,
+      "ksum_probe_ns_per_target": 17.5,
+      "left_k": 7,
+      "m": 8,
+      "probe_speedup_ksum_over_kmitm": 0.017071088891598585,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 12,
+      "build_speedup_ksum_over_kmitm": null,
+      "kmitm_build_ns": 5392736.0,
+      "kmitm_hits": 0,
+      "kmitm_left_entries": 56317,
+      "kmitm_probe_ns_per_target": 1120.84375,
+      "kmitm_right_precomputed": 0,
+      "ksum_build_ns": null,
+      "ksum_hits": null,
+      "ksum_insert_attempts": null,
+      "ksum_ok": false,
+      "ksum_probe_ns_per_target": null,
+      "left_k": 9,
+      "m": 10,
+      "probe_speedup_ksum_over_kmitm": null,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 12,
+      "build_speedup_ksum_over_kmitm": null,
+      "kmitm_build_ns": 5571656.0,
+      "kmitm_hits": 0,
+      "kmitm_left_entries": 56317,
+      "kmitm_probe_ns_per_target": 26546.09375,
+      "kmitm_right_precomputed": 1760,
+      "ksum_build_ns": null,
+      "ksum_hits": null,
+      "ksum_insert_attempts": null,
+      "ksum_ok": false,
+      "ksum_probe_ns_per_target": null,
+      "left_k": 9,
+      "m": 12,
+      "probe_speedup_ksum_over_kmitm": null,
+      "right_k": 3,
+      "split": "probe"
+    }
+  ],
+  "targets": 32
+}

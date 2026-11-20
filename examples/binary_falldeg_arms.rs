@@ -194,14 +194,10 @@ fn orbit_invariant_basis(
                 pick_reaches = reaches;
             }
         }
-        match pick {
-            Some(i) => {
-                used[i] = true;
-                for o in &orbits[i] {
-                    echelon_add(&mut echelon, &mut basis, o, n);
-                }
-            }
-            None => return None,
+        let i = pick?;
+        used[i] = true;
+        for o in &orbits[i] {
+            echelon_add(&mut echelon, &mut basis, o, n);
         }
     }
 }

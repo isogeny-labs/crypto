@@ -1,0 +1,11 @@
+   Compiling crypto v0.1.0 (/workspace)
+    Finished `release` profile [optimized] target(s) in 6m 01s
+     Running `target-kmitm-fast/release/examples/rootfind_kmitm_wall --bits 24 --size 12 --targets 32`
+rootfind-kmitm vs ksum  bits=24 |Fx|=12 targets=32  [pcc:unverified]
+m= 3  split 2/1  kmitm build      15844 ns  left 144      right_pre 0       probe      673.8 ns/tgt  lanes4      509.6 ns/tgt (1.32x) hits 0/0   ksum build      80854 ns  probe       15.3 ns/tgt  ratio build/probe    5.1x /    0.0x
+m= 4  split 3/1  kmitm build      80126 ns  left 880      right_pre 0       probe      677.2 ns/tgt  lanes4      449.6 ns/tgt (1.51x) hits 0/0   ksum build     381572 ns  probe        6.9 ns/tgt  ratio build/probe    4.8x /    0.0x
+m= 5  split 4/1  kmitm build     383372 ns  left 3960     right_pre 0       probe      678.7 ns/tgt  lanes4      451.3 ns/tgt (1.50x) hits 0/0   ksum build    1252234 ns  probe       11.7 ns/tgt  ratio build/probe    3.3x /    0.0x
+m= 6  split 5/1  kmitm build    1209706 ns  left 12672    right_pre 0       probe      635.4 ns/tgt  lanes4      439.0 ns/tgt (1.45x) hits 0/0   ksum build    3216674 ns  probe        9.8 ns/tgt  ratio build/probe    2.7x /    0.0x
+m= 8  split 7/1  kmitm build    5797072 ns  left 50653    right_pre 0       probe      735.0 ns/tgt  lanes4      536.5 ns/tgt (1.37x) hits 0/0   ksum build    7678933 ns  probe        9.8 ns/tgt  ratio build/probe    1.3x /    0.0x
+m=10  split 9/1  kmitm build    6960986 ns  left 56317    right_pre 0       probe      767.8 ns/tgt  lanes4      662.7 ns/tgt (1.16x) hits 0/0   ksum build      n/a     probe      n/a        ratio build/probe    n/a /    n/a
+m=12  split 9/3  kmitm build    7056165 ns  left 56317    right_pre 1760    probe    23246.9 ns/tgt  lanes4    22553.1 ns/tgt (1.03x) hits 0/0   ksum build      n/a     probe      n/a        ratio build/probe    n/a /    n/a

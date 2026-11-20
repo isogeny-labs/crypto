@@ -11,6 +11,8 @@ pub mod quadratic_pair_graph;
 pub mod quadratic_pair_relation;
 
 /// The controls are unit tests: `cargo test --example <this example>`.
+/// Built as `crate-type = ["lib"]`, so `main` is unused; keep it for harness docs.
+#[allow(dead_code)]
 fn main() {}
 
 #[cfg(test)]
@@ -304,7 +306,3 @@ pub(crate) mod tests {
         }
     }
 }
-
-/// The example is a test harness (`cargo test --example jv_sieve_quadratic_pair_relation_controls`);
-/// an empty `main` lets `cargo check --all-targets` build it.
-fn main() {}

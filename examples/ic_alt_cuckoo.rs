@@ -56,18 +56,17 @@ impl Cv {
     #[allow(non_snake_case)]
     fn add(&self, P: (u64, u64), Q: (u64, u64)) -> Option<(u64, u64)> {
         let p = self.p;
-        let l;
-        if P.0 == Q.0 {
-            if (P.1 + Q.1) % p == 0 {
+        let l = if P.0 == Q.0 {
+            if (P.1 + Q.1).is_multiple_of(p) {
                 return None;
             }
             let num = (3 * self.mul(P.0, P.0) + self.a) % p;
-            l = self.mul(num, self.inv(2 * P.1 % p));
+            self.mul(num, self.inv(2 * P.1 % p))
         } else {
             let num = (Q.1 + p - P.1) % p;
             let den = (Q.0 + p - P.0) % p;
-            l = self.mul(num, self.inv(den));
-        }
+            self.mul(num, self.inv(den))
+        };
         let x3 = (self.mul(l, l) + 2 * p - P.0 - Q.0) % p;
         let y3 = (self.mul(l, (P.0 + p - x3) % p) + p - P.1) % p;
         Some((x3, y3))
@@ -80,7 +79,7 @@ fn is_prime(n: u64) -> bool {
     }
     let mut d = 2;
     while d * d <= n {
-        if n % d == 0 {
+        if n.is_multiple_of(d) {
             return false;
         }
         d += 1;
@@ -155,13 +154,13 @@ impl Bloom {
             seed,
             m,
             k,
-            bits: vec![0; (m + 63) / 64],
+            bits: vec![0; m.div_ceil(64)],
         };
         for &x in keys {
             let h = hk(x, seed);
             let (h1, h2) = (h as u32 as u64, (h >> 32) | 1);
             for i in 0..k as u64 {
-                let p = ((h1 + i * h2) as u32 as u64 * m as u64 >> 32) as usize;
+                let p = ((((h1 + i * h2) as u32 as u64) * m as u64) >> 32) as usize;
                 b.bits[p >> 6] |= 1 << (p & 63);
             }
         }
@@ -173,8 +172,8 @@ impl Bloom {
         let h = hk(x, self.seed);
         let (h1, h2) = (h as u32 as u64, (h >> 32) | 1);
         for i in 0..self.k as u64 {
-            let p = ((h1 + i * h2) as u32 as u64 * self.m as u64 >> 32) as usize;
-            if self.bits[p >> 6] >> (p & 63) & 1 == 0 {
+            let p = ((((h1 + i * h2) as u32 as u64) * self.m as u64) >> 32) as usize;
+            if (self.bits[p >> 6] >> (p & 63)) & 1 == 0 {
                 return (false, i as u32 + 1);
             }
         }
@@ -184,7 +183,7 @@ impl Bloom {
 
 fn hashmap_bytes(n: usize) -> usize {
     // std HashMap<u32,u32> with_capacity(n): buckets = next_pow2(n*8/7), 8 B/bucket + 1 ctrl B + 16 ctrl tail
-    let b = ((n * 8 + 6) / 7).next_power_of_two();
+    let b = (n * 8).div_ceil(7).next_power_of_two();
     b * 9 + 16
 }
 
@@ -829,7 +828,7 @@ fn main() {
                     break;
                 }
                 // dynamic actions
-                if g > 0 && trials % g == 0 && fbc.len() < 200 && done_prop.is_none() {
+                if g > 0 && trials.is_multiple_of(g) && fbc.len() < 200 && done_prop.is_none() {
                     let e = fbc.len();
                     fbc.push(fbbig[e]);
                     for j in 0..e {
@@ -837,13 +836,11 @@ fn main() {
                     }
                 }
                 if k != 0
-                    && (trials
-                        % (if k > usize::MAX / 2 {
-                            (-(k as i64)) as usize
-                        } else {
-                            k
-                        })
-                        == 0)
+                    && trials.is_multiple_of(if k > usize::MAX / 2 {
+                        (-(k as i64)) as usize
+                    } else {
+                        k
+                    })
                 {
                     let least = k > usize::MAX / 2;
                     let e = if least {
