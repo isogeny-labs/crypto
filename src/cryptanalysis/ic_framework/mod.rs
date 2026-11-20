@@ -891,9 +891,11 @@ fn run_pipeline_inner<G: CountedGroup>(
         let source = match (walk_sib, source) {
             (0, s) => s,
             (m, TargetSource::StrideGenerator) => TargetSource::StrideGeneratorSib { m },
+            (m, TargetSource::StrideRenew) => TargetSource::StrideRenewSib { m, joint: false },
+            (m, TargetSource::StrideRenewJoint) => TargetSource::StrideRenewSib { m, joint: true },
             (_, s) => {
                 return Err(format!(
-                    "walk_sib needs targets=stride-generator, not {}",
+                    "walk_sib needs targets=stride-generator, stride-renew or stride-renew-joint, not {}",
                     s.name()
                 ))
             }

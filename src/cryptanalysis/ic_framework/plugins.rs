@@ -2606,6 +2606,10 @@ pub struct KSumOracle {
     free_pending: bool,
     free_checked: u64,
     free_emitted: u64,
+    /// `walk_sib=m`: the `StrideRenewSib { m }` target walk (sibling pairs
+    /// around a block centre, the minus side probed by abscissa through
+    /// [`KSumTable::probe_x`]); 0 (the default) is the incumbent walk.
+    walk_sib: u32,
 }
 
 impl KSumOracle {
@@ -2617,6 +2621,7 @@ impl KSumOracle {
             free_pending: false,
             free_checked: 0,
             free_emitted: 0,
+            walk_sib: 0,
         }
     }
 }
@@ -2645,6 +2650,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
             ("split", "1: form the last two summands of every sum from a precomputed pair-sum table (two adds per abscissa pair) instead of building the (m-1)-summand partial sums; same table, fewer build adds; not with sib=1 (default 0)"),
             ("sib", "1 (prime curves; not with split=1): the last level forms both signs x(S + P), x(S - P) of a base pair from ONE inversion; same table, keys and witnesses. Charged as ONE group addition plus one unit of the native counter sibling_second_points (sqr + 2 add), the walk's convention, so the band prices the second point at w (default 0)"),
             ("prefix", "1: also key the partial sums of fewer than m summands the build forms anyway (base points, lower-level partials, pair sums), under keys no m-sum took; no added group operation, one counted insert attempt each (default 0)"),
+            ("walk_sib", "0..=64 (needs targets=stride-renew or stride-renew-joint; default 0): the same target progression formed in blocks of 2m+1 around a centre C = A + [m+1]S, C + [i]S full and x(C - [i]S) from ONE inversion; the abscissa probed by one counted lookup and, on a hit, formed by one more addition; a pair is charged one group addition plus one sibling_second_points (priced at w); the multiples [2]S..[m+1]S (m operations) each time the stride is drawn or renewed, one addition a centre"),
         ]
     }
 
@@ -2657,6 +2663,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
     ) -> Result<(), String> {
         self.free = params.flag("free");
         self.free_pending = self.free;
+        self.walk_sib = walk_sib(params)?;
         let table = KSumTable::build_negation_folded_prefix(
             ctx.group,
             fb,
@@ -2692,6 +2699,24 @@ impl<G: CountedGroup> DecompositionOracle<G> for KSumOracle {
     ) -> Option<Vec<usize>> {
         let table = self.table.as_ref()?;
         table.probe(ctx.group, fb, ops, &mut counters.lookups, point)
+    }
+
+    fn walk_siblings(&self) -> u32 {
+        self.walk_sib
+    }
+
+    fn probe_x(
+        &mut self,
+        _ctx: &InstanceCtx<G>,
+        _fb: &FactorBase<G::Elt>,
+        counters: &mut OracleCounters,
+        x: u64,
+    ) -> Option<bool> {
+        if self.walk_sib == 0 {
+            return None;
+        }
+        let table = self.table.as_ref()?;
+        Some(table.probe_x(&mut counters.lookups, x))
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -2988,6 +3013,219 @@ mod ksum_split_tests {
                     assert!(b.scalar_mults >= 3, "k = {k} seed = {seed}");
                     assert!(b.gae() < a.gae(), "k = {k} seed = {seed}");
                     assert!(joint.total_gae < sep.total_gae);
+                }
+            }
+        }
+    }
+
+    /// `ksum_run` with extra oracle parameters, on the prime roster curve
+    /// (`binary = false`) or a binary Koblitz curve with a
+    /// `binary-multiplier` base (`binary = true`).
+    fn ksum_run_with(
+        binary: bool,
+        k: u32,
+        size: &str,
+        targets: Targets,
+        extra: &[(&str, &str)],
+        seed: u64,
+    ) -> (crate::cryptanalysis::ic_framework::RunReport, u64) {
+        let mut spec = PipelineSpec {
+            factor_base: if binary {
+                "binary-multiplier".into()
+            } else {
+                "prime-abscissa".into()
+            },
+            oracle: "ksum".into(),
+            targets,
+            max_trials: 50_000_000,
+            seed,
+            ..Default::default()
+        };
+        spec.factor_base_params.set("size", size);
+        if binary {
+            spec.factor_base_params.set("mult", "1");
+        }
+        spec.oracle_params.set("prune", "1");
+        spec.oracle_params.set("split", "1");
+        for (key, value) in extra {
+            spec.oracle_params.set(key, *value);
+        }
+        let mut oracle = KSumOracle::new(k);
+        if binary {
+            let inst = crate::cryptanalysis::ic_boundary::koblitz_instance_best(19)
+                .expect("roster Koblitz instance");
+            let group = BinaryGroup(&inst.fast);
+            let mut ops = GroupOps::default();
+            let planted = (300_011 + 7919 * seed) % inst.r;
+            let q = group.mul(&mut ops, inst.generator, planted);
+            let ctx = InstanceCtx {
+                group: &group,
+                generator: inst.generator,
+                target: q,
+                r: inst.r,
+                cofactor: inst.cofactor,
+                group_order: inst.group_order,
+                name: inst.name.clone(),
+                field_degree: Some(inst.n),
+            };
+            let base = BinaryMultiplierBase { instance: &inst };
+            let report = run_pipeline(
+                &ctx,
+                &spec,
+                &base,
+                &mut oracle,
+                planted,
+                &Calibration::default(),
+                None,
+            )
+            .expect("the configuration should run");
+            (report, planted)
+        } else {
+            let inst = roster_prime_instance(20).unwrap();
+            let g = inst.generator_point();
+            let mut ops = GroupOps::default();
+            let planted = (300_011 + 7919 * seed) % inst.r;
+            let q = CountedGroup::mul(&inst.curve, &mut ops, g, planted);
+            let ctx = InstanceCtx {
+                group: &inst.curve,
+                generator: g,
+                target: q,
+                r: inst.r,
+                cofactor: inst.cofactor,
+                group_order: inst.group_order,
+                name: inst.name.clone(),
+                field_degree: None,
+            };
+            let base = PrimeAbscissaBase { instance: &inst };
+            let report = run_pipeline(
+                &ctx,
+                &spec,
+                &base,
+                &mut oracle,
+                planted,
+                &Calibration::default(),
+                None,
+            )
+            .expect("the configuration should run");
+            (report, planted)
+        }
+    }
+
+    /// `walk_sib=m` on `stride-renew` and `stride-renew-joint`: absent and
+    /// `walk_sib=0` are the incumbent run for run; on, the targets,
+    /// relations, rank, answer, scalar multiplications and oracle set-up
+    /// are the incumbent's, and the relation phase's additions plus
+    /// doublings are exactly the incumbent's minus one addition a stride
+    /// step plus, counted, one addition a sibling pair (two for a pair
+    /// formed in full), one a block centre, one a lifted abscissa hit and
+    /// the `m` operations of the multiples each time the stride is drawn
+    /// or renewed; one `sibling_second_points` a pair.  Prime and binary.
+    #[test]
+    fn walk_sib_on_stride_renew_keeps_the_targets_and_counts_the_pairs() {
+        let cases: [(bool, u32, &str); 3] = [(false, 4, "12"), (false, 5, "10"), (true, 4, "7")];
+        for (binary, k, size) in cases {
+            for seed in [11u64, 12] {
+                for targets in [Targets::StrideRenew, Targets::StrideRenewJoint] {
+                    for prefix in ["0", "1"] {
+                        let base = [("prefix", prefix)];
+                        let (plain, planted) = ksum_run_with(binary, k, size, targets, &base, seed);
+                        let (off, _) = ksum_run_with(
+                            binary,
+                            k,
+                            size,
+                            targets,
+                            &[("prefix", prefix), ("walk_sib", "0")],
+                            seed,
+                        );
+                        let label = format!(
+                            "binary={binary} k={k} seed={seed} {targets:?} prefix={prefix}"
+                        );
+                        assert!(plain.verified, "{label}");
+                        assert_eq!(plain.recovered, Some(planted), "{label}");
+                        assert_eq!(plain.total_gae, off.total_gae, "{label}");
+                        assert_eq!(
+                            plain.decomposition.cost.native,
+                            off.decomposition.cost.native
+                        );
+                        assert_eq!(
+                            plain.decomposition.cost.work_native,
+                            off.decomposition.cost.work_native
+                        );
+                        assert_eq!(
+                            plain.decomposition.cost.group_ops.gae(),
+                            off.decomposition.cost.group_ops.gae()
+                        );
+                        assert!(!plain
+                            .decomposition
+                            .cost
+                            .native
+                            .contains_key("walk_sibling_m"));
+                        for m in [1u64, 3, 8] {
+                            let ms = m.to_string();
+                            let (on, _) = ksum_run_with(
+                                binary,
+                                k,
+                                size,
+                                targets,
+                                &[("prefix", prefix), ("walk_sib", ms.as_str())],
+                                seed,
+                            );
+                            let label = format!("{label} m={m}");
+                            assert!(on.verified, "{label}");
+                            assert_eq!(on.recovered, Some(planted), "{label}");
+                            let (p, o) = (&plain.decomposition, &on.decomposition);
+                            assert_eq!(p.targets_tried, o.targets_tried, "{label}");
+                            assert_eq!(p.relations_found, o.relations_found, "{label}");
+                            assert_eq!(
+                                plain.linear_algebra.rank, on.linear_algebra.rank,
+                                "{label}"
+                            );
+                            assert_eq!(p.setup.group_ops, o.setup.group_ops, "{label}");
+                            assert_eq!(p.setup.native, o.setup.native, "{label}");
+                            let (pn, on_) = (&p.cost.native, &o.cost.native);
+                            for c in [
+                                "stride_steps",
+                                "stride_restarts",
+                                "stride_renewals",
+                                "direct_relations_skipped",
+                            ] {
+                                assert_eq!(pn.get(c), on_.get(c), "{label}: {c}");
+                            }
+                            let get = |name: &str| on_.get(name).copied().unwrap_or(0);
+                            assert_eq!(get("walk_sibling_m"), m);
+                            let (a, b) = (&p.cost.group_ops, &o.cost.group_ops);
+                            assert_eq!(a.scalar_mults, b.scalar_mults, "{label}");
+                            let model = (a.adds + a.doubles) - pn["stride_steps"]
+                                + get("walk_sibling_pairs")
+                                + 2 * get("walk_sibling_full_pairs")
+                                + get("walk_sibling_centres")
+                                + get("walk_sibling_lifts")
+                                + get("walk_sibling_multiple_ops");
+                            assert_eq!(b.adds + b.doubles, model, "{label}: count model");
+                            // Once a stride that starts a block: the first,
+                            // and every renewal but a last one the run ends on.
+                            let mult = get("walk_sibling_multiple_ops");
+                            assert_eq!(mult % m, 0, "{label}");
+                            assert!(
+                                mult / m >= pn["stride_renewals"]
+                                    && mult / m <= pn["stride_renewals"] + 1,
+                                "{label}: multiples once a stride"
+                            );
+                            assert_eq!(
+                                o.cost.work_native.get("sibling_second_points"),
+                                Some(&get("walk_sibling_pairs")),
+                                "{label}"
+                            );
+                            assert!(get("walk_x_only_probes") >= get("walk_sibling_pairs"));
+                            assert!(
+                                on_["target_guard_probes"] < pn["target_guard_probes"],
+                                "{label}"
+                            );
+                            if m >= 3 {
+                                assert!(b.gae() < a.gae(), "{label}: cheaper at w = 0");
+                            }
+                        }
+                    }
                 }
             }
         }

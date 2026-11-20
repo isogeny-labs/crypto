@@ -1549,6 +1549,20 @@ pub trait CountedGroup {
     fn x_sibling_pair(&self, _p: Self::Elt, _j: Self::Elt) -> Option<(Self::Elt, u64)> {
         None
     }
+    /// [`CountedGroup::x_sibling_pair`] with the field work tallied into
+    /// `ops.field_ops` as performed, for a group that counts field
+    /// operations ([`CountedGroup::counts_field_ops`]); `ops.adds` is NOT
+    /// touched (the caller charges the pair).  The default is the uncounted
+    /// pair, which is right for a group whose field tally means "unknown".
+    /// The minus abscissa is a field element as a word (`x`, not `x + 1`).
+    fn x_sibling_pair_counted(
+        &self,
+        _ops: &mut GroupOps,
+        p: Self::Elt,
+        j: Self::Elt,
+    ) -> Option<(Self::Elt, u64)> {
+        self.x_sibling_pair(p, j)
+    }
     /// `[k]P` by double-and-add, counted exactly.
     fn mul(&self, ops: &mut GroupOps, p: Self::Elt, k: u64) -> Self::Elt {
         ops.scalar_mults += 1;
@@ -6368,6 +6382,19 @@ impl CountedGroup for PrimeCurve {
         let ldx = f.mul(lambda, f.sub(p.x, x));
         Some(PrimePoint::affine(x, f.sub(ldx, p.y)))
     }
+    /// `P + J` in full and the abscissa of `P − J` from ONE inversion: the
+    /// sibling pair above (inv, 2 mul, 2 sqr) and the plus child's `y`
+    /// (one mul), every field operation tallied.
+    fn x_sibling_pair_counted(
+        &self,
+        ops: &mut GroupOps,
+        p: PrimePoint,
+        j: PrimePoint,
+    ) -> Option<(PrimePoint, u64)> {
+        let pair = self.sibling_pair(ops, p, j, true)?;
+        let plus = self.sibling_lift(ops, p, pair.key_plus, pair.lambda_plus)?;
+        Some((plus, pair.key_minus - 1))
+    }
     fn neg(&self, p: PrimePoint) -> PrimePoint {
         if p.infinity {
             p
@@ -10180,6 +10207,17 @@ impl KSumTable {
             }
         }
         (rows, self.collisions.len() as u64)
+    }
+
+    /// Whether a sum equal to `±R` is stored, for a target `R` known by its
+    /// abscissa `x` only (a field element as a word): one counted lookup
+    /// of the key `x + 1` the table files every sum under (`key >> 1` of
+    /// the prime and binary point keys).  A `true` is a decomposition: the
+    /// caller forms `R` and probes it in full to name the summands and
+    /// their sign.
+    pub fn probe_x(&self, lookups: &mut u64, x: u64) -> bool {
+        *lookups += 1;
+        self.map.contains_key(&(x + 1))
     }
 
     /// Signed indices of `k` base points summing to `target`, if the table
@@ -14249,6 +14287,28 @@ pub enum TargetSource {
     /// (about `log₂ r` doublings and a quarter of the additions a
     /// multiplication pair), every one of them still counted.
     StrideRenewJoint,
+    /// `StrideRenew` (or `StrideRenewJoint` with `joint`), the same targets
+    /// in the same order, formed in blocks of `2m + 1` around a centre:
+    /// from an anchor `A` (the start, or the target a relation came from)
+    /// the next block is `C − [m]S, …, C − [1]S, C, C + [1]S, …, C + [m]S`
+    /// with `C = A + [m + 1]S`, the progression's next `2m + 1` points.
+    /// `C ± [i]S` come as a sibling pair from ONE inversion
+    /// (`CountedGroup::x_sibling_pair_counted`), `C + [i]S` full and
+    /// `C − [i]S` as an abscissa only, probed by the oracle's x-only probe
+    /// (one counted lookup); on a hit the point is formed by one counted
+    /// addition and goes through the guard and the oracle as every target
+    /// does.  A pair is charged one group addition plus one
+    /// `sibling_second_points` (priced at `w` by the band); the multiples
+    /// `[2]S..[m + 1]S` are `m` counted operations each time `S` is drawn
+    /// or renewed, the centre one addition a block, and a block's pairs
+    /// are formed as its minus side is walked, so a relation on the minus
+    /// side has paid for plus points it never uses.  Points that never
+    /// decompose are not guarded when known by their abscissa only; a
+    /// decomposing target is guarded exactly as under `StrideRenew` (the
+    /// oracle is deterministic, so an earlier copy decomposed too and was
+    /// formed and guarded), so the rows and the answer are `StrideRenew`'s.
+    /// Oracle `walk_sib=m` with `targets=stride-renew(-joint)`.
+    StrideRenewSib { m: u32, joint: bool },
 }
 
 impl TargetSource {
@@ -14267,6 +14327,8 @@ impl TargetSource {
             TargetSource::StrideGeneratorSib { .. } => "stride_generator_sib",
             TargetSource::StrideRenewDeferredGuard => "stride_renew_deferred_guard",
             TargetSource::StrideRenewJoint => "stride_renew_joint",
+            TargetSource::StrideRenewSib { joint: false, .. } => "stride_renew_sib",
+            TargetSource::StrideRenewSib { joint: true, .. } => "stride_renew_joint_sib",
         }
     }
     pub fn is_walk(&self) -> bool {
@@ -14285,6 +14347,7 @@ impl TargetSource {
             TargetSource::StrideRenew
                 | TargetSource::StrideRenewDeferredGuard
                 | TargetSource::StrideRenewJoint
+                | TargetSource::StrideRenewSib { .. }
         )
     }
     /// **Whether a target the run has already decomposed is skipped.**
@@ -14310,6 +14373,7 @@ impl TargetSource {
                 | TargetSource::StrideRenew
                 | TargetSource::StrideRenewDeferredGuard
                 | TargetSource::StrideRenewJoint
+                | TargetSource::StrideRenewSib { .. }
         )
     }
 }
@@ -14670,6 +14734,16 @@ pub enum RecoveryCheck<'a, E> {
 /// named by [`RecoveryCheck`]; `DoubleAndAdd` and `Ladder` are that
 /// function's two cases, bit for bit.
 #[allow(clippy::too_many_arguments)]
+/// Plus points of a sibling block formed but never presented when the
+/// block is left with `slot` its next slot (`0..2m + 1`): the pairs formed
+/// so far are `min(slot, m)`, the plus points presented `slot - m - 1`
+/// past the centre.
+fn sr_plus_unused(slot: usize, m: usize) -> u64 {
+    let formed = slot.min(m);
+    let presented = slot.saturating_sub(m + 1);
+    (formed - presented) as u64
+}
+
 pub fn collect_and_solve_relations_touching_check<G: CountedGroup, L: RelationSolver + ?Sized>(
     g: &G,
     generator: G::Elt,
@@ -14931,8 +15005,11 @@ fn collect_and_solve_relations_scaled_touching<
     let mut renew_by = (g.identity(), 0u64, 0u64);
     // `StrideRenewJoint`: `G + Q` once, then every `[a]G + [b]Q` of the
     // set-up is one joint double-and-add over it (same draws, same points).
-    let joint_gq = (targets == TargetSource::StrideRenewJoint)
-        .then(|| g.add(&mut rel.group_ops, generator, target));
+    let joint_gq = matches!(
+        targets,
+        TargetSource::StrideRenewJoint | TargetSource::StrideRenewSib { joint: true, .. }
+    )
+    .then(|| g.add(&mut rel.group_ops, generator, target));
     let draw_one = |rng: &mut StdRng, ops: &mut GroupOps, scale: &mut Option<&mut CoeffScale>| {
         match joint_gq {
             Some(gq) => {
@@ -15011,6 +15088,29 @@ fn collect_and_solve_relations_scaled_touching<
     let mut sw_next = 0u64;
     let (mut sw_second, mut sw_pairs, mut sw_lifts, mut sw_full_pairs, mut sw_xprobes) =
         (0u64, 0u64, 0u64, 0u64, 0u64);
+    // `StrideRenewSib`: the multiples `[1]S..[m + 1]S` of the current
+    // stride with their coefficients (`sr_ready` false after a draw or a
+    // renewal), the anchor the next block starts from, the block's centre
+    // and coefficients, its kept plus points, and the next slot `0..2m + 1`
+    // (`None` between blocks).
+    let sr_m = match targets {
+        TargetSource::StrideRenewSib { m, .. } => {
+            assert!(m >= 1, "walk_sib needs m >= 1");
+            assert!(
+                xprobe.is_some(),
+                "the sibling walk needs the oracle's x-only probe"
+            );
+            m as usize
+        }
+        _ => 0,
+    };
+    let mut sr_mults: Vec<(G::Elt, u64, u64)> = Vec::with_capacity(sr_m + 1);
+    let mut sr_ready = false;
+    let mut sr_anchor = (g.identity(), 0u64, 0u64);
+    let mut sr_centre = (g.identity(), 0u64, 0u64);
+    let mut sr_plus: Vec<Option<G::Elt>> = vec![None; sr_m + 1];
+    let mut sr_slot: Option<usize> = None;
+    let (mut sr_multiple_ops, mut sr_centres, mut sr_unused_plus) = (0u64, 0u64, 0u64);
 
     while trials < max_trials {
         if lane_config.is_some() && lane_queue.is_empty() {
@@ -15219,6 +15319,125 @@ fn collect_and_solve_relations_scaled_touching<
                 }
                 (walk_point, wa, wb, None)
             }
+            TargetSource::StrideRenewSib { .. } => {
+                let m = sr_m;
+                if walk_fresh {
+                    // The start, as `StrideRenew(Joint)` draws it.
+                    rng_draws += 2;
+                    wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
+                    wb = rng.gen_range(1..r);
+                    walk_point = match joint_gq {
+                        Some(gq) => joint_mul(g, &mut rel.group_ops, generator, target, gq, wa, wb),
+                        None => {
+                            let ag = g.mul(&mut rel.group_ops, generator, wa);
+                            let bq = g.mul(&mut rel.group_ops, target, wb);
+                            g.add(&mut rel.group_ops, ag, bq)
+                        }
+                    };
+                    walk_fresh = false;
+                    stride_restarts += 1;
+                    if let Some(slot) = sr_slot.take() {
+                        sr_unused_plus += sr_plus_unused(slot, m);
+                    }
+                    sr_anchor = (walk_point, wa, wb);
+                    if g.is_identity(&walk_point) {
+                        walk_fresh = true;
+                        direct_skipped += 1;
+                        continue;
+                    }
+                    (walk_point, wa, wb, None)
+                } else {
+                    if !sr_ready {
+                        // [1]S..[m + 1]S: one doubling and m - 1 additions.
+                        let (sp, sa, sb) = stride;
+                        sr_mults.clear();
+                        sr_mults.push((sp, sa, sb));
+                        for i in 2..=m + 1 {
+                            let (lp, la, lb) = sr_mults[i - 2];
+                            let pt = if i == 2 {
+                                g.double(&mut rel.group_ops, sp)
+                            } else {
+                                g.add(&mut rel.group_ops, lp, sp)
+                            };
+                            sr_mults.push((pt, addmod(la, sa, r), addmod(lb, sb, r)));
+                            walk_modr_adds += 2;
+                            sr_multiple_ops += 1;
+                        }
+                        sr_ready = true;
+                    }
+                    let slot = match sr_slot {
+                        Some(slot) => slot,
+                        None => {
+                            // A new block: C = A + [m + 1]S.
+                            let (ap, aa, ab) = sr_anchor;
+                            let (mp, ma, mb) = sr_mults[m];
+                            sr_centre = (
+                                g.add(&mut rel.group_ops, ap, mp),
+                                addmod(aa, ma, r),
+                                addmod(ab, mb, r),
+                            );
+                            walk_modr_adds += 2;
+                            sr_centres += 1;
+                            0
+                        }
+                    };
+                    // The block's last slot hands its point on as the anchor.
+                    sr_slot = (slot < 2 * m).then_some(slot + 1);
+                    let (cp, ca, cb) = sr_centre;
+                    stride_steps += 1;
+                    walk_modr_adds += 2;
+                    let (point, pa, pb) = if slot < m {
+                        // C − [i]S, i = m - slot: form the pair i now.
+                        let i = m - slot;
+                        let (jp, ja, jb) = sr_mults[i - 1];
+                        let (pa, pb) = (submod(ca, ja, r), submod(cb, jb, r));
+                        match g.x_sibling_pair_counted(&mut rel.group_ops, cp, jp) {
+                            Some((plus, minus_x)) => {
+                                rel.group_ops.adds += 1;
+                                sw_second += 1;
+                                sw_pairs += 1;
+                                sr_plus[i] = Some(plus);
+                                sw_xprobes += 1;
+                                let probe = xprobe.as_mut().expect("checked above");
+                                if !probe(&mut ctr, minus_x) {
+                                    trials += 1;
+                                    continue;
+                                }
+                                // A hit: the point itself, one addition.
+                                sw_lifts += 1;
+                                (g.add(&mut rel.group_ops, cp, g.neg(jp)), pa, pb)
+                            }
+                            None => {
+                                // C = ±[i]S or C = O: both signs in full.
+                                sw_full_pairs += 1;
+                                sr_plus[i] = Some(g.add(&mut rel.group_ops, cp, jp));
+                                (g.add(&mut rel.group_ops, cp, g.neg(jp)), pa, pb)
+                            }
+                        }
+                    } else if slot == m {
+                        (cp, ca, cb)
+                    } else {
+                        let i = slot - m;
+                        let (_, ja, jb) = sr_mults[i - 1];
+                        let plus = sr_plus[i].take().expect("formed with its minus side");
+                        (plus, addmod(ca, ja, r), addmod(cb, jb, r))
+                    };
+                    if sr_slot.is_none() {
+                        sr_anchor = (point, pa, pb);
+                    }
+                    if g.is_identity(&point) {
+                        walk_fresh = true;
+                        direct_skipped += 1;
+                        continue;
+                    }
+                    // A target that may yield a relation is the anchor of
+                    // the next block if it does (set below).
+                    walk_point = point;
+                    wa = pa;
+                    wb = pb;
+                    (point, pa, pb, None)
+                }
+            }
             TargetSource::StrideGenerator => {
                 if walk_fresh {
                     // R₀ = Q: a = 0, b = 1, no group work.
@@ -15374,6 +15593,16 @@ fn collect_and_solve_relations_scaled_touching<
                     break;
                 }
             }
+            if sr_m > 0 {
+                // The progression continues from this target with the new
+                // stride: the rest of the block is dropped, the next block
+                // is built around `point + [m + 1]S'`.
+                if let Some(slot) = sr_slot.take() {
+                    sr_unused_plus += sr_plus_unused(slot, sr_m);
+                }
+                sr_anchor = (point, a, b);
+                sr_ready = false;
+            }
         }
         // The relation enters the target's elimination: in this classic
         // form every relation carries the target, so the solve is the
@@ -15509,6 +15738,19 @@ fn collect_and_solve_relations_scaled_touching<
         rel.count("walk_sibling_full_pairs", sw_full_pairs);
         rel.count("walk_sibling_lifts", sw_lifts);
         rel.count("walk_x_only_probes", sw_xprobes);
+        rel.work("sibling_second_points", sw_second);
+        rel.work("counted:sibling_second_points", 1);
+    }
+    if sr_m > 0 {
+        // The renewed sibling walk's own counts (absent off the walk).
+        rel.count("walk_sibling_m", sr_m as u64);
+        rel.count("walk_sibling_pairs", sw_pairs);
+        rel.count("walk_sibling_full_pairs", sw_full_pairs);
+        rel.count("walk_sibling_lifts", sw_lifts);
+        rel.count("walk_x_only_probes", sw_xprobes);
+        rel.count("walk_sibling_multiple_ops", sr_multiple_ops);
+        rel.count("walk_sibling_centres", sr_centres);
+        rel.count("walk_sibling_unused_plus", sr_unused_plus);
         rel.work("sibling_second_points", sw_second);
         rel.work("counted:sibling_second_points", 1);
     }
