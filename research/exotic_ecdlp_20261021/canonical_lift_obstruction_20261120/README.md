@@ -17,8 +17,9 @@ positive integer. If `nP = 0`, then
 
 When `G` is finite, `n = |G|` annihilates every `P`, so this conclusion holds
 for all points. This includes a finite elliptic-curve group and a
-characteristic-zero additive target when an additive lift and an additive
-logarithm on the chosen lift group have actually been constructed. The theorem
+torsion-free additive target such as the additive group of `ℚ_p`, when an
+additive lift and an additive logarithm on the chosen lift group have actually
+been constructed. The theorem
 does not assume a particular elliptic curve, formal group, canonical-lift
 construction, or algorithm for computing a logarithm.
 
