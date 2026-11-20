@@ -157,12 +157,12 @@
       "sha256": "95485dfd5a3c23e120474d55320bb6eaf3c5c7557978a2e9039681f53cae6d78"
     }
   ],
-  "latest_record": "20261119T1919Z-fb-domain-rootfind",
+  "latest_record": "20261120T0342Z-fb-sibling-batch",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 31 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 18,
     "invalid": 7,
-    "measured": 289,
+    "measured": 290,
     "open": 16
   },
   "repo": "crypto",
@@ -21429,6 +21429,512 @@
       ],
       "problem": "kernel:f4_fp_domain_roots",
       "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 287347.0,
+      "latest": 287347.0,
+      "latest_derived": {},
+      "metric": "total_fmul_batched_m2_p16_d256",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 16,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 287347.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 71950.0,
+      "latest": 71950.0,
+      "latest_derived": {},
+      "metric": "total_fmul_batched_m2_p16_d64",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 16,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 71950.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 721176.0,
+      "latest": 721176.0,
+      "latest_derived": {},
+      "metric": "total_fmul_batched_m2_p20_d1024",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 8,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 721176.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 360588.0,
+      "latest": 360588.0,
+      "latest_derived": {},
+      "metric": "total_fmul_batched_m2_p20_d256",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 16,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 360588.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 835668.0,
+      "latest": 835668.0,
+      "latest_derived": {},
+      "metric": "total_fmul_batched_m2_p24_d1024",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 8,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 835668.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 868408.0,
+      "latest": 868408.0,
+      "latest_derived": {},
+      "metric": "total_fmul_batched_m2_p31_d1024",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 8,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 868408.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 1736732.0,
+      "latest": 1736732.0,
+      "latest_derived": {},
+      "metric": "total_fmul_batched_m2_p31_d4096",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 4,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 1736732.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 644404.0,
+      "latest": 644404.0,
+      "latest_derived": {},
+      "metric": "total_fmul_batched_m3_p16_d16",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 8,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 644404.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 2185596.0,
+      "latest": 2185596.0,
+      "latest_derived": {},
+      "metric": "total_fmul_batched_m3_p20_d32",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 6,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 2185596.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 2510460.0,
+      "latest": 2510460.0,
+      "latest_derived": {},
+      "metric": "total_fmul_batched_m3_p31_d32",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 6,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 2510460.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 6664872.0,
+      "latest": 6664872.0,
+      "latest_derived": {},
+      "metric": "total_fmul_batched_m3_p31_d64",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 4,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 6664872.0
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 0.005,
+      "latest": 0.005,
+      "latest_derived": {},
+      "metric": "wall_s_batched_m2_p16_d256",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 16,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 0.005
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.001,
+      "latest": 0.001,
+      "latest_derived": {},
+      "metric": "wall_s_batched_m2_p16_d64",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 16,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 0.001
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.01,
+      "latest": 0.01,
+      "latest_derived": {},
+      "metric": "wall_s_batched_m2_p20_d1024",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 8,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 0.01
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.005,
+      "latest": 0.005,
+      "latest_derived": {},
+      "metric": "wall_s_batched_m2_p20_d256",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 16,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 0.005
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.012,
+      "latest": 0.012,
+      "latest_derived": {},
+      "metric": "wall_s_batched_m2_p24_d1024",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 8,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 0.012
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.017,
+      "latest": 0.017,
+      "latest_derived": {},
+      "metric": "wall_s_batched_m2_p31_d1024",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 8,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 0.017
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.03,
+      "latest": 0.03,
+      "latest_derived": {},
+      "metric": "wall_s_batched_m2_p31_d4096",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 4,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 0.03
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.022,
+      "latest": 0.022,
+      "latest_derived": {},
+      "metric": "wall_s_batched_m3_p16_d16",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 8,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 0.022
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.056,
+      "latest": 0.056,
+      "latest_derived": {},
+      "metric": "wall_s_batched_m3_p20_d32",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 6,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 0.056
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.071,
+      "latest": 0.071,
+      "latest_derived": {},
+      "metric": "wall_s_batched_m3_p31_d32",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 6,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 0.071
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.175,
+      "latest": 0.175,
+      "latest_derived": {},
+      "metric": "wall_s_batched_m3_p31_d64",
+      "points": [
+        {
+          "commit": "52484bc19104",
+          "date": "2026-11-20",
+          "derived": {},
+          "n": 4,
+          "record": "20261120T0342Z-fb-sibling-batch",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "f4_fp visitor batched sibling extraction (opt-in sibling_batch: Horner per sibling + F4-free triangular child solve) vs domain scan and Frobenius: lowest total counted fmul and wall in all 11 configs; m=2 31-bit |D|=4096 107x less L0 wall than scan, 17.6x less than Frobenius; m=3 chains 4.5-5.1x vs scan; same solution set in every mode [pcc:unverified]",
+          "value": 0.175
+        }
+      ],
+      "problem": "kernel:f4_fp_domain_roots",
+      "unit": "wall_s"
     },
     {
       "better": "lower",

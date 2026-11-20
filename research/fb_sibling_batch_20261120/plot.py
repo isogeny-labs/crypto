@@ -38,7 +38,7 @@ assert len(rows) == 11, f"expected 11 configurations, read {len(rows)}"
 labels = [f"m{r['m']} {r['bits']}b\n|D|={r['d']}" for r in rows]
 x = list(range(len(rows)))
 w = 0.27
-fig, (a1, a2) = plt.subplots(2, 1, figsize=(8, 5.2), sharex=True)
+fig, (a1, a2) = plt.subplots(2, 1, figsize=(7.6, 5.0), sharex=True)
 for ax, keys, title, unit in (
     (a1, ("fs", "ff", "fb"), "Total counted multiplications (F4 + root step + batched)", "fmul"),
     (a2, ("ws", "wf", "wb"), "Wall time of all targets (L0)", "s"),
@@ -60,5 +60,5 @@ fig.text(0.01, 0.005, "Label: scan ÷ batched wall, as printed. Same solution se
          fontsize=6)
 fig.tight_layout(rect=(0, 0.02, 1, 1))
 fig.savefig(HERE / "sibling_batch.svg")
-fig.savefig(HERE / "sibling_batch.png", dpi=150)
+fig.savefig(HERE / "sibling_batch.png", dpi=150, pil_kwargs={"optimize": True})
 print("wrote sibling_batch.svg, sibling_batch.png")
