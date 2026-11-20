@@ -506,6 +506,22 @@ theorem prymRealWeil_discriminant_normalized (p tau eta : K) :
     tau ^ 2 - 4 * (eta - 2 * p) = tau ^ 2 - 4 * eta + 8 * p := by
   ring
 
+/-- The reciprocal degree-four Prym Weil polynomial is the homogenization of
+its degree-two real Weil polynomial.  This is the division-free form of the
+identity checked by the auxiliary-eigenline experiment. -/
+theorem prymWeil_homogenized_realWeil (p tau eta T : K) :
+    T ^ 4 - tau * T ^ 3 + eta * T ^ 2 - p * tau * T + p ^ 2 =
+      (T ^ 2 + p) ^ 2 - tau * T * (T ^ 2 + p) + (eta - 2 * p) * T ^ 2 := by
+  ring
+
+/-- At a nonzero auxiliary eigenvalue, the homogenized identity becomes
+`F(T)=T^2 W(T+p/T)`, exactly the quotient identity used as a native control. -/
+theorem prymWeil_eq_sq_mul_realWeil (p tau eta T : K) (hT : T ≠ 0) :
+    T ^ 4 - tau * T ^ 3 + eta * T ^ 2 - p * tau * T + p ^ 2 =
+      T ^ 2 * ((T + p / T) ^ 2 - tau * (T + p / T) + (eta - 2 * p)) := by
+  field_simp [hT]
+  ring
+
 /-- The shared normalized at-infinity series before subtracting the target
 coordinate. Under the remaining geometric bridge it represents `S(x)/x` at
 `w=1/x`. -/
@@ -4919,6 +4935,8 @@ theorem fixedPoint_frobeniusCocycle_zero
 #print axioms ellipticPrym_lowCoefficient_convolution
 #print axioms prymCoefficients_of_productLowCoefficients
 #print axioms prymRealWeil_discriminant_normalized
+#print axioms prymWeil_homogenized_realWeil
+#print axioms prymWeil_eq_sq_mul_realWeil
 #print axioms fiberDenominatorSeries_eq_normalizedMap_sub_linear
 #print axioms fiberDenominatorSeries_sub
 #print axioms bostanDenominatorsNonzero
