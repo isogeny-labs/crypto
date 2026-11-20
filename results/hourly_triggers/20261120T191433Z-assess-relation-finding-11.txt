@@ -1,0 +1,10 @@
+Relation-finding monitor trigger
+UTC: 2026-11-20T19:14:33Z
+Repository: aburan28/crypto (redirects to isogeny-labs/crypto)
+Branch: hourly-runs
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Control: frozen synthetic Koblitz GF(2^23), a=0, m=2 (NOT ECC2K-130)
+Baseline: results/relation_baseline.json
+Alert threshold: 20% absolute relative change in relations/sec or success rate, or any failure
+Log: results/hourly_log.csv
+Workflow: .github/workflows/hourly-relation-finding.yml
