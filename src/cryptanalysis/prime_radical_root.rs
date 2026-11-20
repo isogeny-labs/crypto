@@ -89,8 +89,9 @@ impl Fp {
             // p = 2^61 - 1: 2^61 == 1 mod p. The 122-bit product
             // reduces with two end-around-carry folds, no wide division.
             let product = a as u128 * b as u128;
+            // Canonical 61-bit operands give product < p^2. The first
+            // fold lies in [0, 2p), so one conditional subtraction is enough.
             let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
-            let folded = (folded & MAX_PRIME) + (folded >> 61);
             if folded >= MAX_PRIME {
                 folded - MAX_PRIME
             } else {
@@ -4937,5 +4938,83 @@ mod round37_frobenius_tests {
                     let v = q.pow(x,e); v.0 ^ v.1
                 });
         }
+    }
+}
+
+#[cfg(test)]
+mod round73_mersenne_single_fold {
+    use super::*;
+
+    // Test the actual production arithmetic against an independent wide oracle.
+    #[test]
+    fn canonical_mersenne_products_match_wide_modulo() {
+        let p = MAX_PRIME;
+        let field = Fp::new(p);
+        let edges = [0, 1, 2, p / 2, p - 2, p - 1];
+        for &a in &edges {
+            for &b in &edges {
+                assert_eq!(field.mul(a, b), ((a as u128 * b as u128) % p as u128) as u64);
+            }
+        }
+        let mut state = 0x2026_1120_0073_0001u64;
+        for _ in 0..16_384 {
+            state ^= state >> 12;
+            state ^= state << 25;
+            state ^= state >> 27;
+            let a = state % p;
+            state = state.wrapping_mul(2_685_821_657_736_338_717);
+            let b = state % p;
+            assert_eq!(field.mul(a, b), ((a as u128 * b as u128) % p as u128) as u64);
+        }
+    }
+
+    #[test]
+    #[ignore = "native Rust A/B microbenchmark; release mode recommended"]
+    fn benchmark_canonical_mersenne_fold() {
+        use std::hint::black_box;
+        use std::time::Instant;
+        let p = MAX_PRIME;
+        let f = Fp::new(p);
+        let mut state = 0x73_2026_1120_0001u64;
+        let mut xs = Vec::with_capacity(8_192);
+        for _ in 0..8_192 {
+            state = state.wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            let a = state % p;
+            state = state.wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1_442_695_040_888_963_407);
+            xs.push((a, state % p));
+        }
+        let original = |a: u64, b: u64| {
+            let product = a as u128 * b as u128;
+            let folded = ((product as u64) & p) + (product >> 61) as u64;
+            let folded = (folded & p) + (folded >> 61);
+            if folded >= p { folded - p } else { folded }
+        };
+        for &(a, b) in &xs { assert_eq!(original(a,b), f.mul(a,b)); }
+        let measure = |before: bool| -> f64 {
+            let start = Instant::now();
+            let mut checksum = 0u64;
+            for _ in 0..64 {
+                for &(a,b) in &xs {
+                    let (a,b) = (black_box(a), black_box(b));
+                    checksum ^= if before { original(a,b) } else { f.mul(a,b) };
+                }
+            }
+            black_box(checksum);
+            start.elapsed().as_nanos() as f64 / (64 * xs.len()) as f64
+        };
+        let (mut before, mut after) = (Vec::new(), Vec::new());
+        for i in 0..13 {
+            if i % 2 == 0 {
+                before.push(measure(true)); after.push(measure(false));
+            } else {
+                after.push(measure(false)); before.push(measure(true));
+            }
+        }
+        before.sort_by(f64::total_cmp);
+        after.sort_by(f64::total_cmp);
+        println!("round73 rust p={p} before_ns={} after_ns={} speedup={}",
+                 before[6], after[6], before[6] / after[6]);
     }
 }
