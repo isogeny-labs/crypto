@@ -1095,6 +1095,7 @@ jobs:
           sparse-checkout: |
             src/cryptanalysis/prime_root_bounded.rs
             research/amm_digit_perf_20261118/round62_unit_products_isolated.py
+            research/amm_digit_perf_20261118/round63_synthetic_linear_isolated.py
       - uses: dtolnay/rust-toolchain@stable
       - name: Source-exact Rust before/after, oracle comparisons, and full root certificates
         shell: bash
@@ -1104,6 +1105,7 @@ jobs:
             echo "runner=$(uname -a)"
             echo "rustc=$(rustc --version)"
             python3 research/amm_digit_perf_20261118/round62_unit_products_isolated.py
+            python3 research/amm_digit_perf_20261118/round63_synthetic_linear_isolated.py
           } | tee "$RUNNER_TEMP/round62-native-rust.txt"
           cat "$RUNNER_TEMP/round62-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
