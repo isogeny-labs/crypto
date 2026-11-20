@@ -31,6 +31,7 @@ jobs:
         with:
           ref: ${{ github.sha }}
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:
@@ -86,6 +87,7 @@ jobs:
         with:
           ref: ${{ github.sha }}
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:
@@ -144,6 +146,7 @@ jobs:
           # may follow it without changing any measured runner source.
           ref: e0fadb5ca5e99a3815c36a127fbdd1d1a5d12b43
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:

@@ -59,6 +59,7 @@ jobs:
             /tools/artifacts/
             /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:

@@ -266,6 +266,10 @@ def step_lines(indent: str, paths: list[str]) -> list[str]:
     i2 = indent + "  "
     return [
         f"{indent}- name: {STEP_NAME}",
+        # TEMPORARY store-outage fallback (2026-11-16): verified-cache misses
+        # and AllAccessDisabled/invalid AWS tokens must not fail required jobs
+        # (notably validation-gate). Remove once the store hydrates cleanly.
+        f"{i2}continue-on-error: true",
         f"{i2}shell: bash",
         f"{i2}working-directory: ${{{{ github.workspace }}}}",
         f"{i2}env:",

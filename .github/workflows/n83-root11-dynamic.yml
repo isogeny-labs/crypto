@@ -29,6 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:
@@ -123,6 +124,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:

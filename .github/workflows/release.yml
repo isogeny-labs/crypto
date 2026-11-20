@@ -70,6 +70,7 @@ jobs:
             /tools/artifacts/
             /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:
@@ -113,6 +114,7 @@ jobs:
             /tools/artifacts/
             /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:
@@ -195,6 +197,7 @@ jobs:
             /tools/artifacts/
             /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         shell: bash
         working-directory: ${{ github.workspace }}
@@ -399,6 +402,7 @@ jobs:
             /tools/artifacts/
             /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:
@@ -494,6 +498,7 @@ jobs:
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         uses: actions/checkout@v4
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         shell: bash
         working-directory: ${{ github.workspace }}
@@ -635,6 +640,7 @@ jobs:
             /tools/artifacts/
             /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         shell: bash
         working-directory: ${{ github.workspace }}
@@ -752,6 +758,7 @@ jobs:
       - if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_native != 'false'
         uses: actions/checkout@v4
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_native != 'false'
         shell: bash
         working-directory: ${{ github.workspace }}
@@ -852,6 +859,7 @@ jobs:
             /tools/artifacts/
             /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_cuda != 'false'
         shell: bash
         working-directory: ${{ github.workspace }}
@@ -925,6 +933,7 @@ jobs:
             /tools/artifacts/
             /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:
@@ -971,6 +980,7 @@ jobs:
             /tools/artifacts/
             /.artifacts/
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:

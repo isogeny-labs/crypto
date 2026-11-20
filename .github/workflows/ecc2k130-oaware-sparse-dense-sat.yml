@@ -25,6 +25,7 @@ jobs:
           fetch-depth: 0 # merge-ancestry checks include #785, #786 and #787
           filter: blob:none
       - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:
