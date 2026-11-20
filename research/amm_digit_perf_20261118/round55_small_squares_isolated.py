@@ -15,11 +15,11 @@ reverts = {
 }
 for section, original in reverts.items():
     before, n = re.subn(
-        rf"(?m)^ *// R54_{section}_BEGIN\n.*?^ *// R54_{section}_END\n",
+        rf"(?m)^ *// R55_{section}_BEGIN\n.*?^ *// R55_{section}_END\n",
         lambda _: original.replace("\\n", "\n"),
         before, count=1, flags=re.S,
     )
-    assert n == 1, f"missing R54_{section} markers"
+    assert n == 1, f"missing R55_{section} markers"
 
 header = """#![allow(dead_code)]
 mod cryptanalysis {
