@@ -271,6 +271,11 @@ impl Producer<'_> {
             ((a as u128 * b as u128) % p as u128) as u64
         })
     }
+    // R53_PRODUCER_INVERSE_BEGIN
+    // Public-input Euclidean inversion: quotient steps replace repeated
+    // Fermat powers. Use i128 coefficients so q*t cannot overflow; for
+    // 0 < value < p <= 2^61-1 their magnitudes remain below p.
+    // Each quotient step is independently budgeted and deadline checked.
     fn inverse(&mut self, value: u64) -> Result<u64> {
         if value == 0 {
             return Err(Stop::InvalidInput);
@@ -279,19 +284,23 @@ impl Producer<'_> {
         if value == 1 {
             return Ok(1);
         }
-        let (mut base, mut result, mut exponent) = (value, 1, self.p - 2);
-        while exponent != 0 {
-            self.gate.charge(32)?;
-            if exponent & 1 != 0 {
-                result = self.mul(result, base)?;
-            }
-            exponent >>= 1;
-            if exponent != 0 {
-                base = self.mul(base, base)?;
-            }
+        let (mut r0, mut r1) = (self.p, value);
+        let (mut t0, mut t1) = (0i128, 1i128);
+        while r1 != 0 {
+            self.gate.scalar()?;
+            let q = r0 / r1;
+            let next_r = r0 - q * r1;
+            let next_t = t0 - i128::from(q) * t1;
+            r0 = r1;
+            r1 = next_r;
+            t0 = t1;
+            t1 = next_t;
         }
-        Ok(result)
+        debug_assert_eq!(r0, 1);
+        let result = if t0 < 0 { t0 + i128::from(self.p) } else { t0 };
+        Ok(result as u64)
     }
+    // R53_PRODUCER_INVERSE_END
     fn product(&mut self, a: &Poly17, b: &Poly17) -> Result<Poly17> {
         self.gate.charge(3 * COPY_WORK)?;
         let mut out = Poly17::ZERO;
@@ -381,6 +390,23 @@ impl Producer<'_> {
             return Ok((quotient, remainder));
         }
         quotient.len = a.len - b.len + 1;
+        // R53_CONSTANT_DIVISION_BEGIN
+        // A nonzero constant divides the input exactly. Aggregate the
+        // fixed per-coefficient copy-work budget once, while the scalar
+        // multiplication still checks each field deadline independently.
+        if b.len == 1 {
+            self.gate.charge(COPY_WORK * u64::from(a.len))?;
+            if b.coefficients[0] == 1 {
+                return Ok((*a, Poly17::ZERO));
+            }
+            let inv = self.inverse(b.coefficients[0])?;
+            for i in 0..a.len as usize {
+                quotient.coefficients[i] = self.mul(a.coefficients[i], inv)?;
+            }
+            quotient.trim();
+            return Ok((quotient, Poly17::ZERO));
+        }
+        // R53_CONSTANT_DIVISION_END
         // R52_DIVISION_BEGIN
         // Synthetic division by x is an exact coefficient shift.
         // No finite-field operations or repeated trimming are needed.
@@ -1225,7 +1251,11 @@ impl Replay {
         self.gate.scalar()?;
         Ok(if x >= y { x - y } else { self.p - (y - x) })
     }
-    // Left-to-right scalar exponentiation, separate from producer inverse.
+    // R53_REPLAY_RECIPROCAL_BEGIN
+    // Independently implemented binary almost-inverse. The producer uses
+    // quotient Euclid; replay uses shifts/subtractions and never invokes it.
+    // All intermediates fit u64 because p <= 2^61-1. Public input only:
+    // this is variable time, not a secret-key field inversion.
     fn reciprocal(&mut self, x: u64) -> Result<u64> {
         if x == 0 {
             return Err(Stop::InvalidCertificate);
@@ -1234,17 +1264,31 @@ impl Replay {
         if x == 1 {
             return Ok(1);
         }
-        let exponent = self.p - 2;
-        let mut acc = 1;
-        for bit in (0..64 - exponent.leading_zeros()).rev() {
-            self.gate.charge(32)?;
-            acc = self.times(acc, acc)?;
-            if exponent & (1u64 << bit) != 0 {
-                acc = self.times(acc, x)?;
+        let (mut a, mut b) = (x, self.p);
+        let (mut u, mut v) = (1u64, 0u64);
+        while a != 1 && b != 1 {
+            while a & 1 == 0 {
+                self.gate.scalar()?;
+                a >>= 1;
+                u = if u & 1 == 0 { u >> 1 } else { (u + self.p) >> 1 };
+            }
+            while b & 1 == 0 {
+                self.gate.scalar()?;
+                b >>= 1;
+                v = if v & 1 == 0 { v >> 1 } else { (v + self.p) >> 1 };
+            }
+            self.gate.scalar()?;
+            if a >= b {
+                a -= b;
+                u = if u >= v { u - v } else { u + self.p - v };
+            } else {
+                b -= a;
+                v = if v >= u { v - u } else { v + self.p - u };
             }
         }
-        Ok(acc)
+        Ok(if a == 1 { u } else { v })
     }
+    // R53_REPLAY_RECIPROCAL_END
     fn convolution(&mut self, x: &Poly17, y: &Poly17) -> Result<Poly17> {
         self.gate.charge(4 * COPY_WORK)?;
         let mut z = Poly17::ZERO;
