@@ -116,7 +116,7 @@ mod round56 {
         }
       }
     }
-    println!("ROUND56_NATIVE_ORACLE 48 exact oracle cases and 48 before/after checks");
+    println!("ROUND56_NATIVE_ORACLE 24 independent oracle invocations and 48 before/after comparisons");
  }
  #[test]
  #[ignore="13 alternating Rust before/after trials"]
