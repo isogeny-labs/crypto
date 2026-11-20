@@ -53,6 +53,8 @@ run_cmd do
       `FloorObstructionAndDensity.sq_congruence_dichotomy,
       `FloorObstructionAndDensity.card_sq_congruence_window_le_two,
       `FloorObstructionAndDensity.card_sq_congruence_interval_bound,
+      `FloorObstructionAndDensity.card_residue_class_in_range,
+      `FloorObstructionAndDensity.card_residue_class_in_Icc,
       `FloorObstructionAndDensity.hasse_trace_conductor_prime_thinness,
       `ConductorGapEndpoints.prime_ecc2k130_big,
       `ConductorGapEndpoints.prime_263,

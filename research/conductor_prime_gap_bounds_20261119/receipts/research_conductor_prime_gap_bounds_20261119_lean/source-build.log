@@ -43,30 +43,6 @@ warning: ConductorGapEndpoints.lean:69:12: `if_pos` has been deprecated: Use `it
 
 Hint: Replace the deprecated name:
   i̵f̵_̵p̵o̵s̵i̲t̲e̲_̲e̲q̲_̲l̲e̲f̲t̲
-warning: ConductorGapEndpoints.lean:252:5: Variable name `h` is not explicitly referenced.
-
-Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
-  [apply] _h
-
-Note: This linter can be disabled with `set_option linter.unusedVariables false`
-warning: ConductorGapEndpoints.lean:252:59: Variable name `hd` is not explicitly referenced.
-
-Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
-  [apply] _hd
-
-Note: This linter can be disabled with `set_option linter.unusedVariables false`
-warning: ConductorGapEndpoints.lean:257:5: Variable name `h` is not explicitly referenced.
-
-Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
-  [apply] _h
-
-Note: This linter can be disabled with `set_option linter.unusedVariables false`
-warning: ConductorGapEndpoints.lean:257:59: Variable name `hd` is not explicitly referenced.
-
-Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
-  [apply] _hd
-
-Note: This linter can be disabled with `set_option linter.unusedVariables false`
 Build completed successfully (3145 jobs).
 ⚠ [3138/3138] Replayed ConductorOrthogonality
 warning: ConductorOrthogonality.lean: imports `Mathlib.Algebra.Module.Submodule.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
@@ -82,6 +58,12 @@ warning: FloorObstructionAndDensity.lean: imports `Mathlib.Data.Int.Basic` from 
 warning: FloorObstructionAndDensity.lean: imports `Mathlib.Data.Nat.Prime.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
 warning: FloorObstructionAndDensity.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
 warning: FloorObstructionAndDensity.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: FloorObstructionAndDensity.lean:108:45: Variable name `hℓ` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hℓ
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
 Build completed successfully (3140 jobs).
 ⚠ [3142/3142] Replayed HasseTransferCeiling
 warning: HasseTransferCeiling.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
@@ -118,43 +100,45 @@ warning: ScalarFrobeniusOracle.lean: imports `Mathlib.LinearAlgebra.Span.Basic` 
 warning: ScalarFrobeniusOracle.lean: imports `Mathlib.Data.Fintype.Card` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
 warning: ScalarFrobeniusOracle.lean: imports `Mathlib.Data.Fintype.Option` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
 warning: ScalarFrobeniusOracle.lean: imports `Mathlib.GroupTheory.OrderOfElement` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: ScalarFrobeniusOracle.lean: imports `Mathlib.GroupTheory.SpecificGroups.Cyclic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: ScalarFrobeniusOracle.lean: imports `Mathlib.RingTheory.IntegralDomain` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
 warning: ScalarFrobeniusOracle.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
-warning: ScalarFrobeniusOracle.lean:105:41: This simp argument is unused:
+warning: ScalarFrobeniusOracle.lean:107:41: This simp argument is unused:
   mul_inv_cancel₀ h2
 
 Hint: Omit it from the simp argument list.
   [apply] simp [Units.smul_def, smul_eq_mul]
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: ScalarFrobeniusOracle.lean:126:2: Unused tactic linter: `change ZMod ℓ ∙ scalarFrob u v = ZMod ℓ ∙ v` does nothing.
+warning: ScalarFrobeniusOracle.lean:128:2: Unused tactic linter: `change ZMod ℓ ∙ scalarFrob u v = ZMod ℓ ∙ v` does nothing.
 
 Note: This linter can be disabled with `set_option linter.unusedTactic false`
-warning: ScalarFrobeniusOracle.lean:160:37: This simp argument is unused:
+warning: ScalarFrobeniusOracle.lean:162:37: This simp argument is unused:
   smul_eq_mul
 
 Hint: Omit it from the simp argument list.
   [apply] simp
 
 Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
-warning: ScalarFrobeniusOracle.lean:156:46: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+warning: ScalarFrobeniusOracle.lean:158:46: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
 
 Note: This linter can be disabled with `set_option linter.unusedTactic false`
-warning: ScalarFrobeniusOracle.lean:160:50: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+warning: ScalarFrobeniusOracle.lean:162:50: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
 
 Note: This linter can be disabled with `set_option linter.unusedTactic false`
-warning: ScalarFrobeniusOracle.lean:156:46: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+warning: ScalarFrobeniusOracle.lean:158:46: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
 
 Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
-warning: ScalarFrobeniusOracle.lean:160:50: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+warning: ScalarFrobeniusOracle.lean:162:50: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
 
 Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
-warning: ScalarFrobeniusOracle.lean:195:0: automatically included section variable(s) unused in theorem `ScalarFrobeniusOracle.LineSearchTree.correctSet_card_le`:
+warning: ScalarFrobeniusOracle.lean:197:0: automatically included section variable(s) unused in theorem `ScalarFrobeniusOracle.LineSearchTree.correctSet_card_le`:
   [Fact (Nat.Prime ℓ)]
 consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
   omit [Fact (Nat.Prime ℓ)] in theorem ...
 
 Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
-warning: ScalarFrobeniusOracle.lean:230:0: automatically included section variable(s) unused in theorem `ScalarFrobeniusOracle.rational_torsion_curve_order_sq_dvd`:
+warning: ScalarFrobeniusOracle.lean:238:0: automatically included section variable(s) unused in theorem `ScalarFrobeniusOracle.rational_torsion_curve_order_sq_dvd`:
   [Fact (Nat.Prime ℓ)]
 consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
   omit [Fact (Nat.Prime ℓ)] in theorem ...

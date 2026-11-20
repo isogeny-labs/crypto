@@ -3,6 +3,8 @@ import Mathlib.LinearAlgebra.Span.Basic
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Fintype.Option
 import Mathlib.GroupTheory.OrderOfElement
+import Mathlib.GroupTheory.SpecificGroups.Cyclic
+import Mathlib.RingTheory.IntegralDomain
 import Mathlib.Tactic
 
 /-!
@@ -221,22 +223,43 @@ theorem scalar_frob_oracle_half_success_lower_bound
   have hle := t.correctSet_card_le hdl
   omega
 
+/-- Multiplicative rationality of a scalar Frobenius eigenvalue over `𝔽_q`. -/
 def ScalarFrobRational (u : (ZMod ℓ)ˣ) (q : ℕ) : Prop :=
   orderOf u ∣ q - 1
 
+/-- Rationality is equivalent to the Fermat relation `u^(q-1) = 1`. -/
 theorem scalar_frob_rational_iff (u : (ZMod ℓ)ˣ) (q : ℕ) :
-    ScalarFrobRational u q ↔ orderOf u ∣ q - 1 := Iff.rfl
+    ScalarFrobRational u q ↔ u ^ (q - 1) = 1 :=
+  orderOf_dvd_iff_pow_eq_one
 
-theorem rational_torsion_curve_order_sq_dvd {N : ℕ} (h : ℓ ^ 2 ∣ N) :
-    ℓ ^ 2 ∣ N := h
+/-- If Frobenius is the scalar `1` on `E[ℓ]` (so `ℓ ∣ t − 2` and `ℓ ∣ f` in the
+discriminant `t² − 4q = D · f²`), then `ℓ²` divides four times the curve order
+`q + 1 − t`. Identity: `4(q + 1 − t) = (t − 2)² − (t² − 4q)`. -/
+theorem rational_torsion_curve_order_sq_dvd (q t D f : ℤ)
+    (hdisc : t ^ 2 - 4 * q = D * f ^ 2)
+    (ht : (ℓ : ℤ) ∣ t - 2) (hf : (ℓ : ℤ) ∣ f) :
+    (ℓ : ℤ) ^ 2 ∣ 4 * (q + 1 - t) := by
+  have hid : 4 * (q + 1 - t) = (t - 2) ^ 2 - (t ^ 2 - 4 * q) := by ring
+  rw [hid, hdisc]
+  obtain ⟨a, ha⟩ := ht
+  obtain ⟨b, hb⟩ := hf
+  refine ⟨a ^ 2 - D * b ^ 2, ?_⟩
+  rw [ha, hb]
+  ring
 
 theorem scalar_frob_extension_degree_bounds (u : (ZMod ℓ)ˣ) :
     orderOf u ∣ ℓ - 1 := by
   have h := orderOf_dvd_card (x := u)
   simpa [ZMod.card_units_eq_totient, Nat.totient_prime (Fact.out : Nat.Prime ℓ)] using h
 
+/-- `(ZMod ℓ)ˣ` is cyclic of order `ℓ − 1`, so a generator attains maximal order. -/
 theorem exists_scalar_frob_attaining_max_degree :
-    ∃ u : (ZMod ℓ)ˣ, orderOf u ∣ ℓ - 1 :=
-  ⟨1, scalar_frob_extension_degree_bounds 1⟩
+    ∃ u : (ZMod ℓ)ˣ, orderOf u = ℓ - 1 := by
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := (ZMod ℓ)ˣ)
+  refine ⟨g, ?_⟩
+  rw [orderOf_eq_card_of_forall_mem_zpowers hg]
+  -- `Nat.card (ZMod ℓ)ˣ = Fintype.card (ZMod ℓ)ˣ = φ(ℓ) = ℓ − 1`
+  have hcard : Nat.card (ZMod ℓ)ˣ = Fintype.card (ZMod ℓ)ˣ := Nat.card_eq_fintype_card
+  rw [hcard, ZMod.card_units_eq_totient, Nat.totient_prime (Fact.out : Nat.Prime ℓ)]
 
 end ScalarFrobeniusOracle

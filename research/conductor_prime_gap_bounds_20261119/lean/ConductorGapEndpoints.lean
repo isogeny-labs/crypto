@@ -182,41 +182,51 @@ structure VolcanoGapCert where
   hstep : ConductorOrthogonality.ValidConductorStep f₁ f₂ ℓ
   hgap : padicValNat ℓ f₁ ≠ padicValNat ℓ f₂
 
-/-- Soundness: a gap certificate forces `ℓ ∣ ℓ` and `ℓ ≤ ℓ` on the unique step. -/
-theorem checkVolcanoGapCert_sound (c : VolcanoGapCert) :
-    ∃ d, d = c.ℓ ∧ c.ℓ ∣ d ∧ c.ℓ ≤ d := by
-  refine ⟨c.ℓ, rfl, dvd_refl _, le_rfl⟩
-
 /-- From a gap certificate, the large-step theorem applies to the one-step walk. -/
-theorem checkVolcanoGapCert_large_step (c : VolcanoGapCert) :
+theorem checkVolcanoGapCert_sound (c : VolcanoGapCert) :
     ∃ d ∈ ([c.ℓ] : List ℕ), c.ℓ ∣ d ∧ c.ℓ ≤ d := by
   let w : ConductorOrthogonality.ConductorWalk c.f₁ [c.ℓ] :=
     ConductorOrthogonality.ConductorWalk.cons c.hstep c.hℓ.ne_zero c.hf₁ c.hf₂
       (ConductorOrthogonality.ConductorWalk.singleton c.f₂ c.hf₂)
-  -- endpoint of this walk is f₂; gap is given
   have hend : w.endpoint = c.f₂ := rfl
   have hgap' : padicValNat c.ℓ c.f₁ ≠ padicValNat c.ℓ w.endpoint := by
     rw [hend]; exact c.hgap
   have : Fact c.ℓ.Prime := ⟨c.hℓ⟩
   exact ConductorOrthogonality.conductor_gap_forces_large_step w hgap'
 
+/-- Alias kept for study references. -/
+theorem checkVolcanoGapCert_large_step (c : VolcanoGapCert) :
+    ∃ d ∈ ([c.ℓ] : List ℕ), c.ℓ ∣ d ∧ c.ℓ ≤ d :=
+  checkVolcanoGapCert_sound c
+
 /-! ## Study endpoints -/
 
-/-- ECC2K-130-scale big gap: conductor jump by the prime `146505763881528721`. -/
+/-- ECC2K-130-scale big gap: conductor jump by the prime `146505763881528721`,
+forcing a large step of degree `ℓ`. -/
 theorem ecc2k130_big_gap_bounds :
     let ℓ := 146505763881528721
     Nat.Prime ℓ ∧
       ConductorOrthogonality.ValidConductorStep 1 ℓ ℓ ∧
-        padicValNat ℓ 1 ≠ padicValNat ℓ ℓ := by
-  refine ⟨prime_ecc2k130_big, ⟨?_, ?_⟩, ?_⟩
-  · simp
-  · simp
+        padicValNat ℓ 1 ≠ padicValNat ℓ ℓ ∧
+          ∃ d ∈ ([ℓ] : List ℕ), ℓ ∣ d ∧ ℓ ≤ d := by
+  refine ⟨prime_ecc2k130_big, ⟨by simp, by simp⟩, ?_, ?_⟩
   · have : Fact (Nat.Prime 146505763881528721) := ⟨prime_ecc2k130_big⟩
     have h0 : padicValNat 146505763881528721 1 = 0 :=
       padicValNat.eq_zero_of_not_dvd (by decide)
     have h1 : padicValNat 146505763881528721 146505763881528721 = 1 :=
       padicValNat_self
     omega
+  · let ℓ := 146505763881528721
+    have hprime := prime_ecc2k130_big
+    have : Fact (Nat.Prime ℓ) := ⟨hprime⟩
+    have h0 : padicValNat ℓ 1 = 0 := padicValNat.eq_zero_of_not_dvd (by decide)
+    have h1 : padicValNat ℓ ℓ = 1 := padicValNat_self
+    let c : VolcanoGapCert :=
+      { f₁ := 1, f₂ := ℓ, ℓ := ℓ
+        hf₁ := by decide, hf₂ := hprime.ne_zero, hℓ := hprime
+        hstep := ⟨by simp, by simp⟩
+        hgap := by omega }
+    exact checkVolcanoGapCert_sound c
 
 /-- The big gap prime is not a base-field rational torsion order for a
 curve of conductor 1 in the sense that `v_ℓ(1) = 0 ≠ 1 = v_ℓ(ℓ)`. -/
@@ -244,18 +254,11 @@ theorem deep_volcano_gap_bounds :
         ConductorOrthogonality.ValidConductorStep 1 631409 631409 :=
   ⟨prime_631409, rfl, ⟨by simp, by simp⟩⟩
 
-/-- P-256 crater has no vertical prime gaps of the deep-volcano form: the
-conductor-1 crater cannot jump by a prime `ℓ` while staying at conductor 1.
-Recorded as: a step with equal conductors forces the degree to be a unit
-modulo every prime (valuation unchanged). -/
-theorem p256_crater_no_vertical_gaps {ℓ d : ℕ} [Fact ℓ.Prime]
-    (h : ConductorOrthogonality.ValidConductorStep 1 1 d) (hd : d ≠ 0) :
-    padicValNat ℓ 1 = padicValNat ℓ 1 :=
-  rfl
-
-theorem p256_crater_no_vertical_gaps' {ℓ d : ℕ} [Fact ℓ.Prime]
-    (h : ConductorOrthogonality.ValidConductorStep 1 1 d) (hd : d ≠ 0) :
-    ¬ (padicValNat ℓ 1 ≠ padicValNat ℓ 1) := by
-  simp
+/-- A conductor-1 crater walk ending at conductor 1 has no valuation gap:
+`v_ℓ` is unchanged, so there is no vertical prime gap to exploit. -/
+theorem p256_crater_no_vertical_gaps {ℓ : ℕ} [Fact ℓ.Prime] {ds : List ℕ}
+    (w : ConductorOrthogonality.ConductorWalk 1 ds) (hend : w.endpoint = 1) :
+    padicValNat ℓ 1 = padicValNat ℓ w.endpoint := by
+  rw [hend]
 
 end ConductorGapEndpoints

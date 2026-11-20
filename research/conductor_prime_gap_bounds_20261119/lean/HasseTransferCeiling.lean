@@ -137,10 +137,18 @@ theorem vertical_prime_gap_dlp_ceiling {ops : MonoidOps α}
   simp [transfer_cost, DeepGap.comp_cost, IsogenyChain.costSum, hc, Nat.add_comm,
     Nat.add_left_comm]
 
-/-- Linear Vélu cost of a gap prime `ℓ` is on the Pollard-rho scale of a
-group of size `ℓ²`: `ℓ ≤ 2 · √(ℓ²)` in the squared form `ℓ² ≤ (2ℓ) · ℓ`. -/
-theorem linear_velu_gap_is_rho_scale {ℓ : ℕ} (_hℓ : 0 < ℓ) :
-    ℓ * ℓ ≤ (2 * ℓ) * ℓ := by
-  nlinarith
+/-- Linear Vélu cost scaled by a Hasse conductor: composing `3 f₀² ≤ 4 q`
+with a linear factor `2 C` yields a Pollard-rho-scale comparison
+`3 (2 C f₀)² ≤ 16 C² q`. -/
+theorem linear_velu_gap_is_rho_scale {q t D₀ f₀ C : ℤ}
+    (hdisc : t ^ 2 - 4 * q = D₀ * f₀ ^ 2) (hD : D₀ ≤ -3) (hf : 0 < f₀)
+    (_hC : 0 ≤ C) :
+    3 * (2 * C * f₀) ^ 2 ≤ 16 * C ^ 2 * q := by
+  have h := three_mul_conductor_sq_le_four_q hdisc hD hf
+  -- `3 f₀² ≤ 4 q`; multiply by `4 C² ≥ 0`.
+  have hmul : 3 * (2 * C * f₀) ^ 2 = 12 * C ^ 2 * f₀ ^ 2 := by ring
+  have hrhs : 16 * C ^ 2 * q = 4 * C ^ 2 * (4 * q) := by ring
+  have hnonneg : 0 ≤ 4 * C ^ 2 := by nlinarith [sq_nonneg C]
+  nlinarith [sq_nonneg f₀, sq_nonneg C]
 
 end HasseTransferCeiling

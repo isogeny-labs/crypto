@@ -8,8 +8,9 @@ import CryptoLean.Curve.Conductor
 # Floor endomorphism obstruction and Hasse-interval thinness
 
 Using `CryptoLean.quadraticNorm`, an element of the ideal `ℓ · O` has norm
-divisible by `ℓ²`. A quadratic congruence over a field has at most two roots,
-giving Hasse-interval thinness for conductor-prime traces.
+divisible by `ℓ²`. A quadratic congruence over a field has at most two roots;
+across a Hasse window `[-B, B]` each residue class contributes
+`O(B/ℓ)` hits, giving density `O(1/ℓ)`.
 
 **Not formalized here:** `End(E) ≃ O_f` identification.
 -/
@@ -35,8 +36,7 @@ theorem floor_endomorphism_sq_dvd_norm {ℓ : ℕ} {traceOmega normOmega a b : �
   rw [ha, hb, quadraticNorm]
   exact ⟨a' ^ 2 + traceOmega * a' * b' + normOmega * b' ^ 2, by ring⟩
 
-/-- No floor endomorphism can have norm coprime to `ℓ` (equivalently: not
-divisible by `ℓ`), since the norm is divisible by `ℓ²`. -/
+/-- No floor endomorphism can have norm coprime to `ℓ`. -/
 theorem no_coprime_cofactor_floor_endomorphism {ℓ : ℕ} {traceOmega normOmega a b : ℤ}
     (h : FloorEndomorphism ℓ a b)
     (hcop : ¬ (ℓ : ℤ) ∣ quadraticNorm traceOmega normOmega a b) : False := by
@@ -53,7 +53,6 @@ theorem no_kani_two_power_floor_endomorphism {ℓ k : ℕ} {traceOmega normOmega
   have hℓ2 : (ℓ : ℤ) ∣ (2 : ℤ) ^ k :=
     dvd_trans (dvd_pow_self (ℓ : ℤ) (by decide : (2 : ℕ) ≠ 0)) hdiv
   have hnat : ℓ ∣ 2 ^ k := Int.natCast_dvd_natCast.mp (by simpa using hℓ2)
-  -- An odd prime cannot divide a power of 2.
   have hcop : Nat.Coprime ℓ 2 := by
     rw [Nat.coprime_two_right, Nat.odd_iff]
     exact Nat.odd_iff.mp hℓodd
@@ -105,10 +104,109 @@ theorem card_sq_congruence_interval_bound {ℓ : ℕ} [Fact ℓ.Prime]
     exact Finset.mem_filter.2 ⟨Finset.mem_univ _, (Finset.mem_filter.1 hx).2⟩
   exact (Finset.card_le_card hsub).trans (card_sq_congruence_window_le_two a)
 
-/-- Hasse-interval thinness for conductor-prime trace congruences. -/
-theorem hasse_trace_conductor_prime_thinness {ℓ : ℕ} [Fact ℓ.Prime]
-    (a : ZMod ℓ) (T : Finset (ZMod ℓ)) :
-    (T.filter fun x => x ^ 2 = a).card ≤ 2 :=
-  card_sq_congruence_interval_bound a T
+/-- At most `N/ℓ + 1` naturals in `{0, …, N}` lie in a fixed residue class mod `ℓ`. -/
+theorem card_residue_class_in_range {ℓ : ℕ} (hℓ : 0 < ℓ) (r N : ℕ) :
+    ((Finset.range (N + 1)).filter fun n => n % ℓ = r % ℓ).card ≤ N / ℓ + 1 := by
+  classical
+  let S := (Finset.range (N + 1)).filter fun n => n % ℓ = r % ℓ
+  let K := S.image fun n => n / ℓ
+  have hinj : Set.InjOn (fun n : ℕ => n / ℓ) (S : Set ℕ) := by
+    intro x hx y hy hxy
+    have hxR : x % ℓ = r % ℓ := (Finset.mem_filter.1 hx).2
+    have hyR : y % ℓ = r % ℓ := (Finset.mem_filter.1 hy).2
+    have hmod : x % ℓ = y % ℓ := by simp [hxR, hyR]
+    have hdiv : x / ℓ = y / ℓ := hxy
+    calc
+      x = ℓ * (x / ℓ) + x % ℓ := (Nat.div_add_mod x ℓ).symm
+      _ = ℓ * (y / ℓ) + y % ℓ := by rw [hdiv, hmod]
+      _ = y := Nat.div_add_mod y ℓ
+  have hKcard : K.card = S.card := Finset.card_image_of_injOn hinj
+  have hk_le : ∀ k ∈ K, k ≤ N / ℓ := by
+    intro k hk
+    obtain ⟨n, hn, rfl⟩ := Finset.mem_image.1 hk
+    exact Nat.div_le_div_right (Nat.lt_succ_iff.mp (Finset.mem_range.1 (Finset.mem_filter.1 hn).1))
+  have hKsub : K ⊆ Finset.range (N / ℓ + 1) := fun k hk =>
+    Finset.mem_range.2 (Nat.lt_succ_of_le (hk_le k hk))
+  calc
+    S.card = K.card := hKcard.symm
+    _ ≤ (Finset.range (N / ℓ + 1)).card := Finset.card_le_card hKsub
+    _ = N / ℓ + 1 := Finset.card_range _
+
+/-- Shift `[-B, B]` onto `{0, …, 2B}`; each residue class has ≤ `2B/ℓ + 1` hits. -/
+theorem card_residue_class_in_Icc {ℓ : ℕ} [NeZero ℓ] (hℓ : 0 < ℓ) (r : ZMod ℓ) (B : ℕ) :
+    ((Finset.Icc (-(B : ℤ)) (B : ℤ)).filter fun t : ℤ => (t : ZMod ℓ) = r).card ≤
+      2 * B / ℓ + 1 := by
+  classical
+  let I : Finset ℤ := Finset.Icc (-(B : ℤ)) (B : ℤ)
+  let S : Finset ℤ := I.filter fun t : ℤ => (t : ZMod ℓ) = r
+  let φ : ℤ → ℕ := fun t => Int.toNat (t + (B : ℤ))
+  have hφ_spec : ∀ t ∈ I, (φ t : ℤ) = t + B ∧ φ t ≤ 2 * B := by
+    intro t ht
+    have ⟨hle, hge⟩ := Finset.mem_Icc.1 ht
+    have hnn : 0 ≤ t + (B : ℤ) := by omega
+    have hle' : t + (B : ℤ) ≤ 2 * (B : ℤ) := by omega
+    refine ⟨Int.toNat_of_nonneg hnn, ?_⟩
+    exact_mod_cast (Int.toNat_le.mpr hle')
+  have hinj : Set.InjOn φ (S : Set ℤ) := by
+    intro x hx y hy hxy
+    have ⟨hxeq, _⟩ := hφ_spec x (Finset.mem_filter.1 hx).1
+    have ⟨hyeq, _⟩ := hφ_spec y (Finset.mem_filter.1 hy).1
+    omega
+  let T := S.image φ
+  have hTcard : T.card = S.card := Finset.card_image_of_injOn hinj
+  let rB : ℕ := ZMod.val ((r : ZMod ℓ) + (B : ZMod ℓ))
+  have hTsub : T ⊆ (Finset.range (2 * B + 1)).filter fun n => n % ℓ = rB % ℓ := by
+    intro n hn
+    obtain ⟨t, ht, rfl⟩ := Finset.mem_image.1 hn
+    have htI := (Finset.mem_filter.1 ht).1
+    have htR : (t : ZMod ℓ) = r := (Finset.mem_filter.1 ht).2
+    have ⟨htEq, hle⟩ := hφ_spec t htI
+    refine Finset.mem_filter.2 ⟨Finset.mem_range.2 (Nat.lt_succ_of_le hle), ?_⟩
+    have hφZ : (φ t : ZMod ℓ) = (t : ZMod ℓ) + (B : ZMod ℓ) := by
+      have := congrArg (fun z : ℤ => (z : ZMod ℓ)) htEq
+      simpa using this
+    have heq : (φ t : ZMod ℓ) = (r : ZMod ℓ) + (B : ZMod ℓ) := by rw [hφZ, htR]
+    have hval : (φ t : ZMod ℓ).val = φ t % ℓ := ZMod.val_natCast ℓ (φ t)
+    rw [← hval, heq]
+    exact (Nat.mod_eq_of_lt (ZMod.val_lt ((r : ZMod ℓ) + (B : ZMod ℓ)))).symm
+  have hle : T.card ≤ ((Finset.range (2 * B + 1)).filter fun n => n % ℓ = rB % ℓ).card :=
+    Finset.card_le_card hTsub
+  have hbound := card_residue_class_in_range hℓ rB (2 * B)
+  calc
+    S.card = T.card := hTcard.symm
+    _ ≤ _ := hle
+    _ ≤ 2 * B / ℓ + 1 := hbound
+
+/-- Hasse-interval thinness: among traces in `[-B, B]`, the congruence
+`t² ≡ a (mod ℓ)` hits at most `2 · (2B/ℓ + 1)` integers. -/
+theorem hasse_trace_conductor_prime_thinness {ℓ : ℕ} [hp : Fact ℓ.Prime]
+    (a : ZMod ℓ) (B : ℕ) :
+    ((Finset.Icc (-(B : ℤ)) (B : ℤ)).filter fun t : ℤ => (t : ZMod ℓ) ^ 2 = a).card ≤
+      2 * (2 * B / ℓ + 1) := by
+  classical
+  let I : Finset ℤ := Finset.Icc (-(B : ℤ)) (B : ℤ)
+  let S : Finset ℤ := I.filter fun t : ℤ => (t : ZMod ℓ) ^ 2 = a
+  let R : Finset (ZMod ℓ) := Finset.univ.filter fun x : ZMod ℓ => x ^ 2 = a
+  have hR : R.card ≤ 2 := card_sq_congruence_window_le_two a
+  let fiber : ZMod ℓ → Finset ℤ := fun r => I.filter fun t : ℤ => (t : ZMod ℓ) = r
+  have hcover : S ⊆ R.biUnion fiber := by
+    intro t ht
+    have htI : t ∈ I := (Finset.mem_filter.1 ht).1
+    have htA : (t : ZMod ℓ) ^ 2 = a := (Finset.mem_filter.1 ht).2
+    refine Finset.mem_biUnion.2 ⟨(t : ZMod ℓ), Finset.mem_filter.2 ⟨Finset.mem_univ _, htA⟩,
+      Finset.mem_filter.2 ⟨htI, rfl⟩⟩
+  have hcard := Finset.card_le_card hcover
+  have hbunion := Finset.card_biUnion_le (s := R) (t := fiber)
+  have hℓpos : 0 < ℓ := Nat.Prime.pos hp.out
+  have : NeZero ℓ := ⟨ne_of_gt hℓpos⟩
+  have hfib : ∀ r ∈ R, (fiber r).card ≤ 2 * B / ℓ + 1 := fun r _ =>
+    card_residue_class_in_Icc hℓpos r B
+  have hsum : (R.sum fun r => (fiber r).card) ≤ R.card * (2 * B / ℓ + 1) :=
+    Finset.sum_le_card_nsmul _ _ _ hfib
+  calc
+    S.card ≤ (R.biUnion fiber).card := hcard
+    _ ≤ R.sum fun r => (fiber r).card := hbunion
+    _ ≤ R.card * (2 * B / ℓ + 1) := hsum
+    _ ≤ 2 * (2 * B / ℓ + 1) := Nat.mul_le_mul_right _ hR
 
 end FloorObstructionAndDensity
