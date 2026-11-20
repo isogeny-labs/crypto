@@ -35,6 +35,7 @@ on:
       - 'research/amm_digit_perf_20261118/round65_unit_frobenius_isolated.py'
       - 'research/amm_digit_perf_20261118/round66_unit_linear_isolated.py'
       - 'research/amm_digit_perf_20261118/round67_jacobi_isolated.py'
+      - 'research/amm_digit_perf_20261118/round68_rpow_sqrt_isolated.py'
       - 'research/amm_digit_perf_20261118/round31_bounded_baseline.rs'
       - 'research/amm_digit_perf_20261118/round23_verifier_isolated.py'
       - 'research/amm_digit_perf_20261118/round24_verifier_isolated.py'
@@ -57,6 +58,34 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  radical-rpow-sqrt-round68:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_radical_root.rs
+            research/amm_digit_perf_20261118/round68_rpow_sqrt_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare source-exact Rust roots, Fp2 powering and alternating A/B timings
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round68_rpow_sqrt_isolated.py
+          } | tee "$RUNNER_TEMP/round68-native-rust.txt"
+          cat "$RUNNER_TEMP/round68-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round68-rpow-sqrt-native-rust
+          path: ${{ runner.temp }}/round68-native-rust.txt
+          if-no-files-found: ignore
+
   radical-jacobi-round67:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
