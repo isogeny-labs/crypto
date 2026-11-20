@@ -2,7 +2,7 @@
 """PROTOCOL section 2: covered range and admitted h = 1 seeds per (genus, prime); writes curves.json."""
 import glob, gzip, json, os, re
 HERE = os.path.dirname(os.path.abspath(__file__))
-NEED = {(4, 60013): 3, (5, 2357): 5, (5, 4099): 3}
+NEED = {(4, 54293): 3, (5, 2357): 5, (5, 4099): 3}
 out = {}
 for (g, p), need in NEED.items():
     adm, tried, ranges = set(), 0, set()

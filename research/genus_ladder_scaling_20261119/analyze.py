@@ -42,8 +42,8 @@ for p in (16411, 32771):
         d, inst = runs_and_inst(os.path.join(PO, f"b_p{p}_{name}.jsonl*"), 4, p)
         cells[(4, p, arm)] = (d, inst, sorted({k[0] for k in d}))
 for arm, cc in (("x", "2.0"), ("x*", "1.4")):
-    d, inst = runs_and_inst(os.path.join(HERE, f"b4_p60013_cc{cc}.jsonl*"), 4, 60013)
-    cells[(4, 60013, arm)] = (d, inst, curves["g4_p60013"]["confirm"])
+    d, inst = runs_and_inst(os.path.join(HERE, f"b4_p54293_cc{cc}.jsonl*"), 4, 54293)
+    cells[(4, 54293, arm)] = (d, inst, curves["g4_p54293"]["confirm"])
 for p in (2357, 4099):
     for arm, name in (("x5", "x5"), ("x5*", "x5" if x5star_is_x5 else "x5star")):
         d, inst = runs_and_inst(os.path.join(HERE, f"b5_p{p}_{name}.jsonl*"), 5, p)
@@ -121,7 +121,7 @@ def q(v):
 
 
 # C1: three-point genus-4 fit
-P4 = [16411, 32771, 60013]
+P4 = [16411, 32771, 54293]
 out["C1"] = {}
 for arm in ("x", "x*"):
     if not all(f"g4_p{p}_{arm}" in out["cells"] for p in P4):
@@ -176,7 +176,7 @@ for k, c in out["cells"].items():
     g, p, arm = k.split("_", 2)
     L.append(f"| {g[1:]} | {p[1:]} | {arm} | {c['mean_r']:.3e} | {f3(c['neg']['0'])} | {f3(c['neg']['0.1'])} | {f3(c['neg']['1'])} | "
              f"**{c['below_all_w']}** | {c['la_share_w1']:.2f} |")
-L += ["", "## C1: genus-4 three-point fit (p = 16411, 32771, 60013)", ""]
+L += ["", "## C1: genus-4 three-point fit (p = 16411, 32771, 54293)", ""]
 for arm, v in out["C1"].items():
     L.append(f"- {arm}: slope of ln(ratio vs ideal negation, w = 1) in ln p = {v['slope_ratio_vs_neg_w1']:.3f} "
              f"[{v['slope_ci'][0]:.3f}, {v['slope_ci'][1]:.3f}]; cost exponent {v['cost_exponent']:.3f} "

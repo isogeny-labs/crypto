@@ -14,8 +14,8 @@ case "$1" in
     python3 $d/tune.py ;;
   B4)
     for cc in 2.0 1.4; do
-      $B run --primes 60013 --genera 4 --max-h 1 --curves 3 --curve-seeds 60013=$(cs g4_p60013 confirm) --targets 6 --seeds 2 \
-        --arms x --cc $cc --sge 4,1.5 --threads 4 --out $d/b4_p60013_cc$cc.jsonl > $d/b4_p60013_cc$cc.log 2>&1
+      $B run --primes 54293 --genera 4 --max-h 1 --curves 3 --curve-seeds 54293=$(cs g4_p54293 confirm) --targets 6 --seeds 2 \
+        --arms x --cc $cc --sge 4,1.5 --threads 4 --out $d/b4_p54293_cc$cc.jsonl > $d/b4_p54293_cc$cc.log 2>&1
     done ;;
   B5)
     read cc sge < <(python3 $d/tune.py)
