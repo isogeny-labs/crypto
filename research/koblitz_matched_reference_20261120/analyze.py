@@ -87,13 +87,17 @@ R["verdicts"] = {
     "M2": {"cells": m2, "verdict": v(m2_bad, m2)},
     "M2b": {"cells": m2b, "verdict": v([x for x in m2b if not x[4]], m2b)},
     "M3": {"cells": [(n, w, x["ratio"], x["lo"], x["hi"]) for n, w, x in m3], "verdict": v(m3_bad, m3)},
-    "M4": {n: C["matched"] for n, C in cur.items()},
+    "M4": {"matched": {n: C["matched"] for n, C in cur.items()},
+           "expectation_n29_genc1_w0.1_in_[1.4,1.9]": (lambda x: {**x, "verdict": "held" if 1.4 <= x["ratio"] <= 1.9
+                                                                 else "falsified"})(
+               cur["29"]["matched"]["0.1"]["gen-c1"]) if "29" in cur else None},
 }
 R["note"] = ("Moving the reference changes the distance remaining, not any IC cost. L0; counted GAE deterministic. "
              "No claim about cryptographic sizes [pcc:unverified].")
 json.dump(R, open(os.path.join(HERE, "results.json"), "w"), indent=1)
 for k in ("M1", "M2", "M2b", "M3"):
     print(k, R["verdicts"][k]["verdict"])
+print("M4 expectation", (R["verdicts"]["M4"]["expectation_n29_genc1_w0.1_in_[1.4,1.9]"] or {}).get("verdict"))
 for n, C in cur.items():
     print(f"n{n}: v5/strong " + ", ".join(f"w={w} {C['ratios']['rho-v5/rho-strong'][w]['ratio']:.3f}" for w in W)
           + " | audit " + ", ".join(f"{C['audit_ratios']['rho-v5/rho-strong'][w]['ratio']:.3f}" for w in W

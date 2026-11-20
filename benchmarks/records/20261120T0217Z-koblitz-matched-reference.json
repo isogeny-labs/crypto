@@ -11,6 +11,16 @@
       "exit": 0,
       "started_utc": "2026-11-20T02:29:41+00:00",
       "wall_s": 127.194
+    },
+    {
+      "argv": [
+        "bash",
+        "research/koblitz_matched_reference_20261120/run.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-20T03:10:50+00:00",
+      "wall_s": 129.685
     }
   ],
   "commit": "06b18504df9675af8204353850255ae394e42257",
@@ -28,9 +38,196 @@
     "platform": "Linux-6.18.44-fc-v726-x86_64-with-glibc2.39"
   },
   "id": "20261120T0217Z-koblitz-matched-reference",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 144,
+      "name": "v5_over_strong_n17_w0",
+      "note": "paired by target, cluster bootstrap 95%, band w=0; v5 jump selections band-priced",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0886,
+        0.0973
+      ],
+      "unit": "ratio",
+      "value": 0.0928
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 144,
+      "name": "v5_over_strong_n17_w1",
+      "note": "paired by target, cluster bootstrap 95%, band w=1; v5 jump selections band-priced",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.1983,
+        0.2253
+      ],
+      "unit": "ratio",
+      "value": 0.2114
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 144,
+      "name": "v5_over_strong_n23_w0",
+      "note": "paired by target, cluster bootstrap 95%, band w=0; v5 jump selections band-priced",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.2403,
+        0.2836
+      ],
+      "unit": "ratio",
+      "value": 0.261
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 144,
+      "name": "v5_over_strong_n23_w1",
+      "note": "paired by target, cluster bootstrap 95%, band w=1; v5 jump selections band-priced",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.4952,
+        0.6006
+      ],
+      "unit": "ratio",
+      "value": 0.5454
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 144,
+      "name": "v5_over_strong_n29_w0",
+      "note": "paired by target, cluster bootstrap 95%, band w=0; v5 jump selections band-priced",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0752,
+        0.083
+      ],
+      "unit": "ratio",
+      "value": 0.079
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 144,
+      "name": "v5_over_strong_n29_w1",
+      "note": "paired by target, cluster bootstrap 95%, band w=1; v5 jump selections band-priced",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.1661,
+        0.1921
+      ],
+      "unit": "ratio",
+      "value": 0.1786
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 144,
+      "name": "v5_over_strong_n31_w0",
+      "note": "paired by target, cluster bootstrap 95%, band w=0; v5 jump selections band-priced",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.1573,
+        0.1798
+      ],
+      "unit": "ratio",
+      "value": 0.1682
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 144,
+      "name": "v5_over_strong_n31_w1",
+      "note": "paired by target, cluster bootstrap 95%, band w=1; v5 jump selections band-priced",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.3518,
+        0.4162
+      ],
+      "unit": "ratio",
+      "value": 0.3827
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 144,
+      "name": "v5_over_strong_n37_w0",
+      "note": "paired by target, cluster bootstrap 95%, band w=0; v5 jump selections band-priced",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.5341,
+        0.6322
+      ],
+      "unit": "ratio",
+      "value": 0.5811
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 144,
+      "name": "v5_over_strong_n37_w1",
+      "note": "paired by target, cluster bootstrap 95%, band w=1; v5 jump selections band-priced",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.8821,
+        1.0674
+      ],
+      "unit": "ratio",
+      "value": 0.9704
+    }
+  ],
   "problem": "ecdlp:koblitz_matched_rho_reference",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 5590277,
+      "path": "research/koblitz_matched_reference_20261120/sessions/n17/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/62/62669eaac265c372c95411bda10ebe52882853bd3e760c0dfe9510ec0bb28d53",
+      "sha256": "62669eaac265c372c95411bda10ebe52882853bd3e760c0dfe9510ec0bb28d53",
+      "uploaded": false
+    },
+    {
+      "bytes": 9288879,
+      "path": "research/koblitz_matched_reference_20261120/sessions/n23/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/37/37a8d645367cb1b6313451363239741a8bdb3edfe46892537f5837d934bb9b30",
+      "sha256": "37a8d645367cb1b6313451363239741a8bdb3edfe46892537f5837d934bb9b30",
+      "uploaded": false
+    },
+    {
+      "bytes": 7368726,
+      "path": "research/koblitz_matched_reference_20261120/sessions/n29/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/33/33d785eedd3a2350cc5d4625b83b13b47b571c640e816e98f735230dfd29771f",
+      "sha256": "33d785eedd3a2350cc5d4625b83b13b47b571c640e816e98f735230dfd29771f",
+      "uploaded": false
+    },
+    {
+      "bytes": 5677038,
+      "path": "research/koblitz_matched_reference_20261120/sessions/n31/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a2/a2c30a9aafbd8709ba2774c54b75f4ff9612a725f1789d192033d279577995d4",
+      "sha256": "a2c30a9aafbd8709ba2774c54b75f4ff9612a725f1789d192033d279577995d4",
+      "uploaded": false
+    },
+    {
+      "bytes": 5715377,
+      "path": "research/koblitz_matched_reference_20261120/sessions/n37/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0c/0c5111c7088093a0648911a36952a374eac06127e6948105a4c0ce4eeede1bd7",
+      "sha256": "0c5111c7088093a0648911a36952a374eac06127e6948105a4c0ce4eeede1bd7",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
     "pdf": null,
