@@ -11,12 +11,15 @@ mod frozen {
 
         const MULTIPLIERS: usize = 4;
         const FEATURES: usize = 2 * MULTIPLIERS;
+        const RESULTANT_FEATURES: usize = FEATURES * (FEATURES - 1) / 2;
         const TARGETS: usize = 1520;
         const REPLICATES: usize = 4096;
 
         #[derive(Clone, Copy, Debug, Eq, PartialEq)]
         struct BranchData {
             bit: i8,
+            q0: u64,
+            q1: u64,
             discriminant: u64,
             smooth: bool,
             split_group_control: bool,
@@ -27,10 +30,21 @@ mod frozen {
             slug: String,
             parity: u8,
             bits: [i8; FEATURES],
+            resultant_bits: [i8; RESULTANT_FEATURES],
         }
 
         struct Rule {
             mask: u16,
+            polarity: u8,
+            predictions: Vec<u8>,
+            coverage: usize,
+            matches: usize,
+            statistic: (u128, u128),
+        }
+
+        struct ResultantRule {
+            first: usize,
+            second: Option<usize>,
             polarity: u8,
             predictions: Vec<u8>,
             coverage: usize,
@@ -105,6 +119,144 @@ mod frozen {
                 value ^= bit as u8;
             }
             value
+        }
+
+        fn resultant_prediction(
+            target: &Target,
+            first: usize,
+            second: Option<usize>,
+            polarity: u8,
+        ) -> u8 {
+            let first_bit = target.resultant_bits[first];
+            if first_bit < 0 {
+                return 3;
+            }
+            let mut value = polarity ^ first_bit as u8;
+            if let Some(second) = second {
+                let second_bit = target.resultant_bits[second];
+                if second_bit < 0 {
+                    return 3;
+                }
+                value ^= second_bit as u8;
+            }
+            value
+        }
+
+        fn resultant_pair_index(mut left: usize, mut right: usize) -> usize {
+            if left > right {
+                std::mem::swap(&mut left, &mut right);
+            }
+            assert!(left < right && right < FEATURES);
+            let mut index = 0_usize;
+            for first in 0..FEATURES {
+                for second in (first + 1)..FEATURES {
+                    if first == left && second == right {
+                        return index;
+                    }
+                    index += 1;
+                }
+            }
+            unreachable!()
+        }
+
+        fn determinant4(matrix: [[u64; 4]; 4], p: u64) -> u64 {
+            let mut determinant = 0_i128;
+            for a in 0..4 {
+                for b in 0..4 {
+                    if b == a {
+                        continue;
+                    }
+                    for c in 0..4 {
+                        if c == a || c == b {
+                            continue;
+                        }
+                        for d in 0..4 {
+                            if d == a || d == b || d == c {
+                                continue;
+                            }
+                            let permutation = [a, b, c, d];
+                            let inversions = (0..4)
+                                .flat_map(|left| ((left + 1)..4).map(move |right| (left, right)))
+                                .filter(|&(left, right)| {
+                                    permutation[left] > permutation[right]
+                                })
+                                .count();
+                            let term = (0..4).fold(1_i128, |product, row| {
+                                product * i128::from(matrix[row][permutation[row]])
+                            });
+                            determinant += if inversions % 2 == 0 { term } else { -term };
+                        }
+                    }
+                }
+            }
+            residue(determinant, p)
+        }
+
+        fn quadratic_resultant(
+            left: BranchData,
+            right: BranchData,
+            p: u64,
+        ) -> Result<u64, String> {
+            // Res(X^2+aX+b, X^2+cX+d)
+            //   = (d-b)^2 + (a-c)(a*d-b*c).
+            let a = left.q1;
+            let b = left.q0;
+            let c = right.q1;
+            let d = right.q0;
+            let closed = residue(
+                (i128::from(d) - i128::from(b)).pow(2)
+                    + (i128::from(a) - i128::from(c))
+                        * (i128::from(a) * i128::from(d)
+                            - i128::from(b) * i128::from(c)),
+                p,
+            );
+            let sylvester = [
+                [1, a, b, 0],
+                [0, 1, a, b],
+                [1, c, d, 0],
+                [0, 1, c, d],
+            ];
+            if determinant4(sylvester, p) != closed {
+                return Err("quadratic Sylvester resultant control failed".to_string());
+            }
+            let common_root = if a == c {
+                b == d
+            } else {
+                let denominator = residue(i128::from(c) - i128::from(a), p);
+                let inverse = pow_mod_u64(denominator, p - 2, p);
+                let root = mul_mod_u64(
+                    residue(i128::from(b) - i128::from(d), p),
+                    inverse,
+                    p,
+                );
+                let left_value = residue(
+                    i128::from(root) * i128::from(root)
+                        + i128::from(a) * i128::from(root)
+                        + i128::from(b),
+                    p,
+                );
+                let right_value = residue(
+                    i128::from(root) * i128::from(root)
+                        + i128::from(c) * i128::from(root)
+                        + i128::from(d),
+                    p,
+                );
+                left_value == 0 && right_value == 0
+            };
+            if (closed == 0) != common_root {
+                return Err("quadratic resultant/common-root control failed".to_string());
+            }
+            let swapped = residue(
+                (i128::from(b) - i128::from(d)).pow(2)
+                    + (i128::from(c) - i128::from(a))
+                        * (i128::from(c) * i128::from(b)
+                            - i128::from(d) * i128::from(a)),
+                p,
+            );
+            if closed != swapped {
+                return Err("quadratic resultant symmetry failed".to_string());
+            }
+            Ok(closed)
         }
 
         fn branch_data(
@@ -260,6 +412,8 @@ mod frozen {
                 } else {
                     -1
                 },
+                q0: quotient[0],
+                q1: quotient[1],
                 discriminant,
                 smooth,
                 split_group_control,
@@ -280,11 +434,36 @@ mod frozen {
             let plus = branch_data(spec, &field, &curve, point, 1)?;
             let swapped = branch_data(spec, &field, &curve, curve.neg(point), -1)?;
             assert_eq!(plus, swapped);
-            println!("h116 chiral branch residual parity selftest: pass rules=512");
+            let trivial_left = BranchData {
+                bit: 0,
+                q0: 0,
+                q1: 0,
+                discriminant: 0,
+                smooth: true,
+                split_group_control: false,
+            };
+            let trivial_right = BranchData {
+                q0: 1,
+                ..trivial_left
+            };
+            assert_eq!(quadratic_resultant(trivial_left, trivial_right, 5)?, 1);
+            assert_eq!(RESULTANT_FEATURES, 28);
+            assert_eq!(2 * (RESULTANT_FEATURES + RESULTANT_FEATURES * 27 / 2), 812);
+            println!(
+                "h116 chiral branch residual parity selftest: pass rules=512 resultant_rules=812"
+            );
             Ok(())
         }
 
         pub fn run(output_path: &Path) -> Result<(), String> {
+            run_with_panel(output_path, false)
+        }
+
+        pub fn run_resultants(output_path: &Path) -> Result<(), String> {
+            run_with_panel(output_path, true)
+        }
+
+        fn run_with_panel(output_path: &Path, resultant_panel: bool) -> Result<(), String> {
             let mut targets = Vec::new();
             let mut rows = BTreeMap::<String, Vec<usize>>::new();
             let mut reconstruction_checks = 0_usize;
@@ -296,6 +475,11 @@ mod frozen {
             let mut tangent_abstentions = 0_usize;
             let mut residual_repeat_abstentions = 0_usize;
             let mut distinguishing_targets = 0_usize;
+            let mut resultant_checks = 0_usize;
+            let mut resultant_common_root_checks = 0_usize;
+            let mut resultant_smooth_features = 0_usize;
+            let mut resultant_zero_abstentions = 0_usize;
+            let mut resultant_distinguishing_targets = 0_usize;
 
             for spec in CURVES {
                 let field = Field::new(spec.p, 1, &[0, 1])?;
@@ -313,6 +497,7 @@ mod frozen {
                 for scalar in 1..spec.order {
                     let target_point = curve.scalar_mul(scalar, generator)?;
                     let mut bits = [-1_i8; FEATURES];
+                    let mut branch_features = [None; FEATURES];
                     let mut distinguished = false;
                     for multiplier in 1..=MULTIPLIERS as u64 {
                         let point = curve.scalar_mul(multiplier, target_point)?;
@@ -326,6 +511,7 @@ mod frozen {
                             }
                             let feature = 2 * (multiplier as usize - 1) + chirality_index;
                             bits[feature] = data.bit;
+                            branch_features[feature] = Some(data);
                             reconstruction_checks += 1;
                             discriminant_checks += 2;
                             root_count_checks += 1;
@@ -362,12 +548,49 @@ mod frozen {
                         let minus = bits[2 * (multiplier as usize - 1) + 1];
                         distinguished |= plus != minus;
                     }
+                    let mut resultant_bits = [-1_i8; RESULTANT_FEATURES];
+                    let mut resultant_feature = 0_usize;
+                    for left in 0..FEATURES {
+                        for right in (left + 1)..FEATURES {
+                            let left_data = branch_features[left]
+                                .ok_or("missing left branch feature")?;
+                            let right_data = branch_features[right]
+                                .ok_or("missing right branch feature")?;
+                            let resultant =
+                                quadratic_resultant(left_data, right_data, spec.p)?;
+                            resultant_checks += 1;
+                            resultant_common_root_checks += 1;
+                            if left_data.smooth && right_data.smooth && resultant != 0 {
+                                resultant_bits[resultant_feature] =
+                                    i8::from(legendre(resultant, spec.p) == 1);
+                                resultant_smooth_features += 1;
+                            } else if resultant == 0 {
+                                resultant_zero_abstentions += 1;
+                            }
+                            resultant_feature += 1;
+                        }
+                    }
+                    if resultant_feature != RESULTANT_FEATURES {
+                        return Err("resultant feature census failed".to_string());
+                    }
+                    let mut resultant_distinguished = false;
+                    for left in 0..FEATURES {
+                        for right in (left + 1)..FEATURES {
+                            let index = resultant_pair_index(left, right);
+                            let swapped_index = resultant_pair_index(left ^ 1, right ^ 1);
+                            resultant_distinguished |=
+                                resultant_bits[index] != resultant_bits[swapped_index];
+                        }
+                    }
                     distinguishing_targets += usize::from(distinguished);
+                    resultant_distinguishing_targets +=
+                        usize::from(resultant_distinguished);
                     let index = targets.len();
                     targets.push(Target {
                         slug: spec.slug.to_string(),
                         parity: (scalar % 2) as u8,
                         bits,
+                        resultant_bits,
                     });
                     rows.entry(spec.slug.to_string()).or_default().push(index);
                 }
@@ -382,8 +605,177 @@ mod frozen {
             {
                 return Err("branch control census failed".to_string());
             }
+            if resultant_checks != TARGETS * RESULTANT_FEATURES
+                || resultant_common_root_checks != TARGETS * RESULTANT_FEATURES
+            {
+                return Err("branch resultant control census failed".to_string());
+            }
 
             let labels: Vec<u8> = targets.iter().map(|target| target.parity).collect();
+            if resultant_panel {
+                let mut rules = Vec::with_capacity(812);
+                for first in 0..RESULTANT_FEATURES {
+                    for second in std::iter::once(None).chain(
+                        ((first + 1)..RESULTANT_FEATURES).map(Some),
+                    ) {
+                        for polarity in 0..=1_u8 {
+                            let predictions: Vec<u8> = targets
+                                .iter()
+                                .map(|target| {
+                                    resultant_prediction(target, first, second, polarity)
+                                })
+                                .collect();
+                            let (coverage, matches) = score(&predictions, &labels);
+                            rules.push(ResultantRule {
+                                first,
+                                second,
+                                polarity,
+                                predictions,
+                                coverage,
+                                matches,
+                                statistic: statistic(matches, coverage),
+                            });
+                        }
+                    }
+                }
+                if rules.len() != 812 {
+                    return Err("resultant rule census failed".to_string());
+                }
+                let selected_index = (0..rules.len())
+                    .max_by(|&left, &right| {
+                        compare_ratio(rules[left].statistic, rules[right].statistic)
+                            .then_with(|| rules[right].first.cmp(&rules[left].first))
+                            .then_with(|| {
+                                rules[right]
+                                    .second
+                                    .unwrap_or(RESULTANT_FEATURES)
+                                    .cmp(&rules[left].second.unwrap_or(RESULTANT_FEATURES))
+                            })
+                            .then_with(|| {
+                                rules[right].polarity.cmp(&rules[left].polarity)
+                            })
+                    })
+                    .ok_or("no resultant rules")?;
+                let selected = &rules[selected_index];
+                let total_exact_rules = rules
+                    .iter()
+                    .filter(|rule| rule.coverage == TARGETS && rule.matches == TARGETS)
+                    .count();
+                let covered_exact_rules = rules
+                    .iter()
+                    .filter(|rule| rule.coverage > 0 && rule.matches == rule.coverage)
+                    .count();
+
+                let mut exceedances = 0_usize;
+                for replicate in 0..REPLICATES {
+                    let mut shuffled = vec![0_u8; TARGETS];
+                    for (slug, indices) in &rows {
+                        let mut values: Vec<u8> =
+                            indices.iter().map(|&index| labels[index]).collect();
+                        let mut seed = 0x116_019_u64
+                            ^ (replicate as u64 + 1).wrapping_mul(0x9e3779b97f4a7c15)
+                            ^ slug.bytes().map(u64::from).sum::<u64>();
+                        shuffle(&mut values, &mut seed);
+                        for (&index, value) in indices.iter().zip(values) {
+                            shuffled[index] = value;
+                        }
+                    }
+                    let mut maximum = (0_u128, 1_u128);
+                    for rule in &rules {
+                        let (_, matches) = score(&rule.predictions, &shuffled);
+                        let candidate = statistic(matches, rule.coverage);
+                        if compare_ratio(candidate, maximum) == Ordering::Greater {
+                            maximum = candidate;
+                        }
+                    }
+                    exceedances += usize::from(
+                        compare_ratio(maximum, selected.statistic) != Ordering::Less,
+                    );
+                }
+
+                let mut per_curve = Vec::new();
+                for (slug, indices) in &rows {
+                    let predictions: Vec<u8> = indices
+                        .iter()
+                        .map(|&index| selected.predictions[index])
+                        .collect();
+                    let curve_labels: Vec<u8> =
+                        indices.iter().map(|&index| labels[index]).collect();
+                    let (coverage, matches) = score(&predictions, &curve_labels);
+                    per_curve.push(format!(
+                        "{{\"slug\":\"{slug}\",\"targets\":{},\"coverage\":{coverage},\"matches\":{matches}}}",
+                        indices.len()
+                    ));
+                }
+
+                let excess = 2_i64 * selected.matches as i64 - selected.coverage as i64;
+                let json = format!(
+                    concat!(
+                        "{{\n  \"schema\":\"h116-chiral-branch-resultant-parity/v1\",\n",
+                        "  \"targets\":{},\n  \"curves\":{},\n  \"base_features\":{},\n",
+                        "  \"resultant_features\":{},\n  \"rules\":{},\n",
+                        "  \"reconstruction_checks\":{},\n  \"discriminant_checks\":{},\n",
+                        "  \"root_count_checks\":{},\n  \"chiral_swap_checks\":{},\n",
+                        "  \"resultant_checks\":{},\n  \"resultant_common_root_checks\":{},\n",
+                        "  \"resultant_smooth_features\":{},\n",
+                        "  \"resultant_zero_abstentions\":{},\n",
+                        "  \"resultant_distinguishing_targets\":{},\n",
+                        "  \"planted_control_matches\":{},\n",
+                        "  \"selected_first\":{},\n  \"selected_second\":{},\n",
+                        "  \"selected_polarity\":{},\n  \"coverage\":{},\n  \"matches\":{},\n",
+                        "  \"binary_excess\":{},\n  \"statistic_numerator\":{},\n",
+                        "  \"statistic_denominator\":{},\n  \"total_exact_rules\":{},\n",
+                        "  \"covered_exact_rules\":{},\n  \"replicates\":4096,\n",
+                        "  \"familywise_exceedances\":{},\n",
+                        "  \"familywise_empirical_p\":{:.12},\n  \"per_curve\":[{}],\n",
+                        "  \"status\":\"measured\"\n}}\n"
+                    ),
+                    targets.len(),
+                    rows.len(),
+                    FEATURES,
+                    RESULTANT_FEATURES,
+                    rules.len(),
+                    reconstruction_checks,
+                    discriminant_checks,
+                    root_count_checks,
+                    chiral_swap_checks,
+                    resultant_checks,
+                    resultant_common_root_checks,
+                    resultant_smooth_features,
+                    resultant_zero_abstentions,
+                    resultant_distinguishing_targets,
+                    TARGETS,
+                    selected.first,
+                    selected
+                        .second
+                        .map_or_else(|| "null".to_string(), |value| value.to_string()),
+                    selected.polarity,
+                    selected.coverage,
+                    selected.matches,
+                    excess,
+                    selected.statistic.0,
+                    selected.statistic.1,
+                    total_exact_rules,
+                    covered_exact_rules,
+                    exceedances,
+                    (exceedances + 1) as f64 / (REPLICATES + 1) as f64,
+                    per_curve.join(",")
+                );
+                fs::write(output_path, json).map_err(|error| error.to_string())?;
+                println!(
+                    "chiral branch resultant parity: first={} second={} polarity={} coverage={} matches={} exact={} p={:.6}",
+                    selected.first,
+                    selected
+                        .second
+                        .map_or_else(|| "none".to_string(), |value| value.to_string()),
+                    selected.polarity,
+                    selected.coverage,
+                    selected.matches,
+                    total_exact_rules,
+                    (exceedances + 1) as f64 / (REPLICATES + 1) as f64
+                );
+                return Ok(());
+            }
             let mut rules = Vec::with_capacity(512);
             for mask in 0_u16..(1_u16 << FEATURES) {
                 for polarity in 0..=1_u8 {
@@ -529,9 +921,11 @@ fn main() {
         [_, flag, output] if flag == "--run" => {
             frozen::branch_residual::run(Path::new(output))
         }
+        [_, flag, output] if flag == "--run-resultants" => {
+            frozen::branch_residual::run_resultants(Path::new(output))
+        }
         _ => Err(
-            "usage: h116_chiral_branch_residual_parity --selftest | --run OUTPUT.json"
-                .to_string(),
+            "usage: h116_chiral_branch_residual_parity --selftest | --run OUTPUT.json | --run-resultants OUTPUT.json".to_string(),
         ),
     };
     if let Err(error) = result {
