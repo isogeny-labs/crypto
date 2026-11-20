@@ -42,7 +42,7 @@
 //! The benchmark driver is `examples/prime_ecdlp_fast_bench.rs`.
 
 use std::collections::{HashMap, HashSet};
-use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::Mutex;
 use std::time::Instant;
 
@@ -162,7 +162,13 @@ impl Fp64 {
     /// Montgomery → canonical.
     #[inline(always)]
     pub fn from_mont(&self, a: u64) -> u64 {
-        self.reduce(a as u128)
+        // Field elements in this module are stored reduced (`a < p`); the
+        // fast path skips the final conditional subtract in `reduce`.
+        if a < self.p {
+            self.from_mont_reduced(a)
+        } else {
+            self.reduce(a as u128)
+        }
     }
 
     /// Montgomery → canonical for an already-reduced operand `a < p`.
@@ -1118,22 +1124,71 @@ pub fn rho_parallel(curve: &FastCurve, g: Pt, q: Pt, cfg: &RhoConfig) -> Option<
     let started = Instant::now();
     let n = curve.n;
     // Shared r-adding table T_j = u_j G + v_j Q.
+    // Build in lock-step batches of up to 256: one `combine_jac_with_gq` per
+    // entry sharing precomputed `G+Q`, then one `jac_to_affine_many` (single
+    // `batch_inv` over Z) per flush — the Lead 3A W=256 zero-alloc pattern.
     let mut rng = StdRng::seed_from_u64(cfg.seed ^ 0xA5A5_5A5A_1234_5678);
     let table_len = 1usize << cfg.table_bits;
     let mut table = Vec::with_capacity(table_len);
     let mut table_ops = RhoOpCounts::default();
+    const TABLE_BATCH: usize = 256;
+    let gq = curve.add(Some(g), Some(q));
+    let mut jac_buf: Vec<Jac> = Vec::with_capacity(TABLE_BATCH);
+    let mut uv_buf: Vec<(u64, u64)> = Vec::with_capacity(TABLE_BATCH);
+    let mut pt_buf: Vec<Pt> = Vec::with_capacity(TABLE_BATCH);
+    let mut z_buf: Vec<u64> = Vec::new();
+    let mut inv_scratch: Vec<u64> = Vec::new();
     while table.len() < table_len {
-        let short = if cfg.coeff_bits == 0 {
-            n
-        } else {
-            n.min(1u64 << cfg.coeff_bits).max(2)
-        };
-        let u = rng.gen_range(1..short);
-        let v = rng.gen_range(1..short);
-        let (a, d) = combine_ops(u, v);
-        table_ops.table_adds += a;
-        table_ops.table_doubles += d;
-        if let Some(pt) = curve.combine(g, q, u, v) {
+        jac_buf.clear();
+        uv_buf.clear();
+        let want = (table_len - table.len()).min(TABLE_BATCH);
+        let mut guard = 0usize;
+        while jac_buf.len() < want && guard < want.saturating_mul(8).max(8) {
+            guard += 1;
+            let short = if cfg.coeff_bits == 0 {
+                n
+            } else {
+                n.min(1u64 << cfg.coeff_bits).max(2)
+            };
+            let u = rng.gen_range(1..short);
+            let v = rng.gen_range(1..short);
+            let (a, d) = combine_ops(u, v);
+            table_ops.table_adds += a;
+            table_ops.table_doubles += d;
+            let jac = curve.combine_jac_with_gq(g, q, gq, u, v);
+            if jac.z == 0 {
+                continue;
+            }
+            jac_buf.push(jac);
+            uv_buf.push((u, v));
+        }
+        if jac_buf.is_empty() {
+            // Degenerate: fall back to scalar combine so we never spin.
+            let short = if cfg.coeff_bits == 0 {
+                n
+            } else {
+                n.min(1u64 << cfg.coeff_bits).max(2)
+            };
+            let u = rng.gen_range(1..short);
+            let v = rng.gen_range(1..short);
+            let (a, d) = combine_ops(u, v);
+            table_ops.table_adds += a;
+            table_ops.table_doubles += d;
+            if let Some(pt) = curve.combine(g, q, u, v) {
+                table.push(TableEntry { pt, u, v });
+            }
+            continue;
+        }
+        pt_buf.resize(
+            jac_buf.len(),
+            Pt {
+                x: 0,
+                y: 0,
+            },
+        );
+        curve.jac_to_affine_many(&jac_buf, &mut pt_buf, &mut z_buf, &mut inv_scratch);
+        for (i, &pt) in pt_buf.iter().enumerate() {
+            let (u, v) = uv_buf[i];
             table.push(TableEntry { pt, u, v });
         }
     }
