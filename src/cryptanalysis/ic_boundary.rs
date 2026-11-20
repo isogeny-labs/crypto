@@ -1502,6 +1502,21 @@ pub trait CountedGroup {
     ) -> Option<SiblingPair> {
         None
     }
+    /// Batched [`CountedGroup::sibling_pair`] for one parent `P` and many
+    /// jumps: Montgomery's trick on the denominators `x_J − x_P`, so `k`
+    /// valid pairs cost one inversion and `3(k−1)` multiplications instead
+    /// of `k` inversions.  Points and slopes are identical to the serial
+    /// path.  `None` means the group has no batch path (the caller falls
+    /// back to serial `sibling_pair`).  Each slot is `None` when that jump
+    /// is degenerate, matching serial.
+    fn sibling_pairs_batch(
+        &self,
+        _ops: &mut GroupOps,
+        _p: Self::Elt,
+        _js: &[(Self::Elt, bool)],
+    ) -> Option<Vec<Option<SiblingPair>>> {
+        None
+    }
     /// `λ` of `P + J` (`minus = false`) or `P − J`: one inversion and one
     /// multiplication, tallied into `ops.field_ops`.
     fn sibling_lambda(
@@ -6149,6 +6164,48 @@ impl CountedFp<'_> {
     }
 }
 
+/// Montgomery's trick on nonzero field elements, charged to `ops` exactly
+/// as performed (`1` inv and `3(k−1)` muls for `k > 1`, matching
+/// [`crate::cryptanalysis::semaev_projection::batch_inv_u64_counted`]).
+/// Used by [`PrimeCurve::sibling_pairs_batch`].
+fn batch_inv_field_ops(xs: &mut [u64], p: u64, ops: &mut FieldOps) {
+    let k = xs.len();
+    if k == 0 {
+        return;
+    }
+    if k == 1 {
+        ops.invs += 1;
+        xs[0] = invmod(xs[0], p).expect("prime field");
+        return;
+    }
+    ops.muls += 3 * (k as u64 - 1);
+    ops.invs += 1;
+    if p > 3 && p < (1u64 << crate::cryptanalysis::prime_fast::MAX_BITS) {
+        let f = Fp64::new(p);
+        for v in xs.iter_mut() {
+            *v = f.to_mont(*v);
+        }
+        let mut scratch = Vec::with_capacity(k);
+        f.batch_inv(xs, &mut scratch);
+        for v in xs.iter_mut() {
+            *v = f.from_mont(*v);
+        }
+        return;
+    }
+    let mut prefix = Vec::with_capacity(k);
+    let mut acc = 1u64;
+    for &x in xs.iter() {
+        prefix.push(acc);
+        acc = mulmod(acc, x, p);
+    }
+    let mut inv_acc = invmod(acc, p).expect("prime field");
+    for i in (0..k).rev() {
+        let xi = xs[i];
+        xs[i] = mulmod(inv_acc, prefix[i], p);
+        inv_acc = mulmod(inv_acc, xi, p);
+    }
+}
+
 impl CountedGroup for PrimeCurve {
     type Elt = PrimePoint;
     fn identity(&self) -> PrimePoint {
@@ -6190,32 +6247,62 @@ impl CountedGroup for PrimeCurve {
         j: PrimePoint,
         want_minus: bool,
     ) -> Option<SiblingPair> {
-        if p.infinity || j.infinity || p.x == j.x {
-            return None;
+        self.sibling_pairs_batch(ops, p, &[(j, want_minus)])?
+            .into_iter()
+            .next()
+            .flatten()
+    }
+    fn sibling_pairs_batch(
+        &self,
+        ops: &mut GroupOps,
+        p: PrimePoint,
+        js: &[(PrimePoint, bool)],
+    ) -> Option<Vec<Option<SiblingPair>>> {
+        let mut out = vec![None; js.len()];
+        if p.infinity || js.is_empty() {
+            return Some(out);
         }
+        let mut dxs = Vec::with_capacity(js.len());
+        let mut slots = Vec::with_capacity(js.len());
+        for (i, &(j, want_minus)) in js.iter().enumerate() {
+            if j.infinity || j.x == p.x {
+                continue;
+            }
+            let dx = submod(j.x, p.x, self.p);
+            if dx == 0 {
+                continue;
+            }
+            slots.push((i, j, want_minus));
+            dxs.push(dx);
+        }
+        if dxs.is_empty() {
+            return Some(out);
+        }
+        batch_inv_field_ops(&mut dxs, self.p, &mut ops.field_ops);
         let mut f = CountedFp {
             p: self.p,
             tally: &mut ops.field_ops,
         };
-        let dx = f.sub(j.x, p.x);
-        let inv = f.inv(dx);
-        let dy = f.sub(j.y, p.y);
-        let lp = f.mul(dy, inv);
-        let lp2 = f.sqr(lp);
-        let xp = f.sub(f.sub(lp2, p.x), j.x);
-        let mut out = SiblingPair {
-            key_plus: xp + 1,
-            lambda_plus: lp,
-            key_minus: 0,
-            lambda_minus: 0,
-        };
-        if want_minus {
-            let sy = f.add(j.y, p.y);
-            let lm = f.mul(f.sub(0, sy), inv);
-            let lm2 = f.sqr(lm);
-            let xm = f.sub(f.sub(lm2, p.x), j.x);
-            out.key_minus = xm + 1;
-            out.lambda_minus = lm;
+        for ((i, j, want_minus), &inv) in slots.into_iter().zip(dxs.iter()) {
+            let dy = f.sub(j.y, p.y);
+            let lp = f.mul(dy, inv);
+            let lp2 = f.sqr(lp);
+            let xp = f.sub(f.sub(lp2, p.x), j.x);
+            let mut sp = SiblingPair {
+                key_plus: xp + 1,
+                lambda_plus: lp,
+                key_minus: 0,
+                lambda_minus: 0,
+            };
+            if want_minus {
+                let sy = f.add(j.y, p.y);
+                let lm = f.mul(f.sub(0, sy), inv);
+                let lm2 = f.sqr(lm);
+                let xm = f.sub(f.sub(lm2, p.x), j.x);
+                sp.key_minus = xm + 1;
+                sp.lambda_minus = lm;
+            }
+            out[i] = Some(sp);
         }
         Some(out)
     }
@@ -11895,6 +11982,11 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         sw.parents_n += 1;
         self.sib_parents += 1;
         let c = sw.c;
+        // Plan each of the m jumps, then form every sibling pair from ONE
+        // batched inversion of the denominators (walk identity unchanged).
+        let mut plans: Vec<(usize, E, u128, u64, u64, bool, (u128, u64, u64))> =
+            Vec::with_capacity(m);
+        let mut js: Vec<(E, bool)> = Vec::with_capacity(m);
         for pos in 0..m {
             let h = sw.cur[pos];
             let (jp, al, ga, be) = jump_pts[h];
@@ -11905,7 +11997,20 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                 || (sw.prev2_h == Some(h) && sw.prev_h.is_some_and(|ph| sw.s_tm2.contains(&ph)));
             let want_minus = !skip_minus;
             let cp = (c.0 + al, addmod(c.1, ga, r), addmod(c.2, be, r));
-            match g.sibling_pair(ops, sw.parent, jp, want_minus) {
+            plans.push((h, jp, al, ga, be, want_minus, cp));
+            js.push((jp, want_minus));
+        }
+        let pairs = g
+            .sibling_pairs_batch(ops, sw.parent, &js)
+            .unwrap_or_else(|| {
+                js.iter()
+                    .map(|&(jp, want_minus)| g.sibling_pair(ops, sw.parent, jp, want_minus))
+                    .collect()
+            });
+        for (pos, ((h, jp, al, ga, be, want_minus, cp), sp)) in
+            plans.into_iter().zip(pairs).enumerate()
+        {
+            match sp {
                 Some(sp) => {
                     ops.adds += 1;
                     self.sib_pairs += 1;
@@ -21630,8 +21735,14 @@ mod wwalk_table_tests {
                         assert!(degenerate <= t.sib_degenerate);
                         if t.sib_degenerate == 0 {
                             assert_eq!(degenerate, 0);
-                            assert_eq!(f.invs, m as u64 * parents);
-                            assert_eq!(f.muls, (2 * m as u64 + 1) * parents - skipped);
+                            // One Montgomery batch inversion per parent
+                            // expansion (was `m` serial inversions).
+                            assert_eq!(f.invs, parents);
+                            let batch_muls = 3 * (m as u64 - 1) * parents;
+                            assert_eq!(
+                                f.muls,
+                                (2 * m as u64 + 1) * parents - skipped + batch_muls
+                            );
                             assert_eq!(f.sqrs, 2 * m as u64 * parents - skipped);
                             assert!(skipped <= 2 * parents);
                         }
