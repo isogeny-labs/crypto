@@ -374,7 +374,7 @@ impl Engine {
 }
 
 /// What one decomposition's search did, summed over the run.
-#[derive(Default)]
+#[derive(Default, Debug)]
 struct Tally {
     nodes: u64,
     refuted: u64,
@@ -384,6 +384,10 @@ struct Tally {
     geometric_group_additions: u64,
     quadratic_solves: u64,
     tower_sqrts: u64,
+    inherited_children: u64,
+    trace_replays: u64,
+    trace_refuted: u64,
+    spec_fp_mults: u64,
 }
 
 pub struct PkmTowerOracle<'i> {
@@ -395,6 +399,9 @@ pub struct PkmTowerOracle<'i> {
     budget: Option<Duration>,
     tower: Option<Kummer>,
     ring: Option<TowerRing>,
+    root_trace: Option<std::sync::Arc<f4_fp_tower::F4Trace>>,
+    use_trace: bool,
+    inherit_basis: bool,
     totals: SolverTotals,
     tally: Tally,
     shape: Option<SystemShape>,
@@ -416,6 +423,9 @@ impl<'i> PkmTowerOracle<'i> {
             budget: None,
             tower: None,
             ring: None,
+            root_trace: None,
+            use_trace: true,
+            inherit_basis: true,
             totals: SolverTotals::default(),
             tally: Tally::default(),
             shape: None,
@@ -452,11 +462,85 @@ impl<'i> PkmTowerOracle<'i> {
         input
     }
 
-    /// Decide the node's system; `true` when the engine proved it
-    /// inconsistent.
-    fn refutes(&mut self, x_r: u64, constraint: Option<(usize, u64)>) -> bool {
-        let input = self.system(x_r, constraint);
+    /// Decide the node's system; returns `(refuted, child_basis_for_inheritance)`.
+    /// When `parent_basis` is provided (under F4 / F6), specializes the parent's
+    /// reduced basis at `y_{1, level} = value` instead of rebuilding from scratch.
+    fn eval_node(
+        &mut self,
+        x_r: u64,
+        constraint: Option<(usize, u64)>,
+        parent_basis: Option<&[RPoly]>,
+    ) -> (bool, Option<Vec<RPoly>>) {
+        let can_inherit =
+            self.inherit_basis && self.engine != Engine::SigF5 && parent_basis.is_some();
+        let input = if let (true, Some((level, value)), Some(pb)) =
+            (can_inherit, constraint, parent_basis)
+        {
+            let ring = self.ring.as_ref().expect("prepared");
+            let (sp, mults) =
+                ring.specialize_basis_at_var(pb, level, value, f4_fp_tower::TowerWeights::UNIT);
+            self.tally.inherited_children += 1;
+            self.tally.spec_fp_mults += mults;
+            sp
+        } else {
+            self.system(x_r, constraint)
+        };
         let ring = self.ring.as_ref().expect("prepared");
+
+        // At the root (`constraint == None`), first attempt Schwartz–Zippel minimal-1-witness
+        // trace replay if learned during `prepare()`.
+        if constraint.is_none() && self.use_trace {
+            if let Some(tr) = self.root_trace.clone() {
+                let mut r_opts = TowerF4Options::new(self.max_degree);
+                if let Some(b) = self.budget {
+                    r_opts = r_opts.with_budget(b);
+                }
+                r_opts.replay = Some(tr);
+                let start = Instant::now();
+                let r_rep = match &self.pool {
+                    Some(pool) => pool.install(|| f4_fp_tower::f4_tower(&input, ring, &r_opts)),
+                    None => f4_fp_tower::f4_tower(&input, ring, &r_opts),
+                };
+                let r_wall = start.elapsed().as_nanos() as u64;
+                self.tally.trace_replays += 1;
+                let r_stopped = r_rep.timed_out || r_rep.oversize;
+                if r_rep.inconsistent && !r_stopped {
+                    let shape = SystemShape {
+                        n_vars: ring.rules.len(),
+                        n_equations: input.len(),
+                        degrees: input.iter().map(RPoly::degree).collect(),
+                        semi_regular_degree: None,
+                    };
+                    let mut extra = BTreeMap::new();
+                    extra.insert("steps".into(), r_rep.steps as u64);
+                    extra.insert("max_cols".into(), r_rep.max_cols as u64);
+                    let cost = SolverCost {
+                        first_fall_degree: None,
+                        last_fall_degree: None,
+                        degree_of_regularity_observed: None,
+                        degree_trace: Vec::new(),
+                        ops: r_rep.muladds,
+                        op_unit: MULADD_UNIT.into(),
+                        wall_ns: r_wall,
+                        peak_bytes: 0,
+                        degree_reached: Some(r_rep.degree_reached),
+                        solving_degree: Some(r_rep.solving_degree_max),
+                        timed_out: false,
+                        extra,
+                    };
+                    self.totals.absorb(&shape, Some(&cost), false);
+                    self.shape = Some(shape);
+                    self.tally.nodes += 1;
+                    self.tally.refuted += 1;
+                    self.tally.trace_refuted += 1;
+                    return (true, None);
+                }
+                // Non-refuted replay: charge the attempted replay muladds and fall through to full F4.
+                self.totals.ops += r_rep.muladds;
+                self.totals.wall_ns += r_wall;
+            }
+        }
+
         let mut opts = TowerF4Options::new(self.max_degree);
         if let Some(b) = self.budget {
             opts = opts.with_budget(b);
@@ -503,7 +587,8 @@ impl<'i> PkmTowerOracle<'i> {
         self.tally.nodes += 1;
         let refuted = rep.inconsistent && !stopped;
         self.tally.refuted += u64::from(refuted);
-        refuted
+        let child_basis = (!refuted && !rep.basis.is_empty()).then_some(rep.basis);
+        (refuted, child_basis)
     }
 
     /// The abscissae `x_1 = g·w` with `w^(2^k) = v`: the candidates of a
@@ -616,7 +701,8 @@ impl<'i> PkmTowerOracle<'i> {
     }
 
     /// Depth-first search below the node that fixes block 1's level
-    /// `t − depth` to `v` (the root has no constraint).
+    /// `t − depth` to `v` (the root has no constraint), inheriting and
+    /// specializing the parent's reduced `F_p` basis at each split child.
     #[allow(clippy::too_many_arguments)]
     fn search(
         &mut self,
@@ -627,6 +713,7 @@ impl<'i> PkmTowerOracle<'i> {
         point: PrimePoint,
         depth: u32,
         v: u64,
+        parent_basis: Option<&[RPoly]>,
     ) -> Option<Vec<usize>> {
         let t = self.tower.as_ref().expect("prepared").t;
         let below = t - depth;
@@ -644,7 +731,8 @@ impl<'i> PkmTowerOracle<'i> {
             return self.leaf(ctx, fb, ops, counters, mulm(g, v, p), point);
         }
         let constraint = (depth > 0).then(|| ((t - depth) as usize, v));
-        if self.refutes(point.x, constraint) {
+        let (refuted, own_basis) = self.eval_node(point.x, constraint, parent_basis);
+        if refuted {
             return None;
         }
         // Children: the square roots of v (the top level's are ±1).
@@ -658,8 +746,10 @@ impl<'i> PkmTowerOracle<'i> {
                 None => Vec::new(),
             }
         };
+        let basis_ref = own_basis.as_deref().or(parent_basis);
         for w in roots {
-            if let Some(found) = self.search(ctx, fb, ops, counters, point, depth + 1, w) {
+            if let Some(found) = self.search(ctx, fb, ops, counters, point, depth + 1, w, basis_ref)
+            {
                 return Some(found);
             }
         }
@@ -699,6 +789,14 @@ impl DecompositionOracle<PrimeCurve> for PkmTowerOracle<'_> {
                 "budget_ms",
                 "per-node solver deadline; 0 = none (default 0)",
             ),
+            (
+                "inherit",
+                "1 (default) or 0: specialize parent basis into split children",
+            ),
+            (
+                "trace",
+                "1 (default for p >= 65536) or 0: root minimal-1-witness refutation trace replay",
+            ),
         ]
     }
 
@@ -728,6 +826,9 @@ impl DecompositionOracle<PrimeCurve> for PkmTowerOracle<'_> {
         let ms = params.u64_or("budget_ms", 0)?;
         self.budget = (ms > 0).then(|| Duration::from_millis(ms));
         let p = self.curve().p;
+        self.inherit_basis = params.u64_or("inherit", 1)? != 0;
+        let default_trace = u64::from(p >= (1 << 16) && self.engine != Engine::SigF5);
+        self.use_trace = params.u64_or("trace", default_trace)? != 0;
         let tower = Kummer::from_params(p, params)?;
         let t = tower.t;
         // The base must be this tower's: every abscissa of it in V.
@@ -757,12 +858,10 @@ impl DecompositionOracle<PrimeCurve> for PkmTowerOracle<'_> {
         }
         self.tower = Some(tower);
         self.ring = Some(ring);
-        self.pool = Some(
-            rayon::ThreadPoolBuilder::new()
-                .num_threads(1)
-                .build()
-                .map_err(|e| format!("tower engine pool: {e}"))?,
-        );
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(1)
+            .build()
+            .map_err(|e| format!("tower engine pool: {e}"))?;
         self.totals = SolverTotals {
             solver: format!(
                 "pkm-tower {} (degree {})",
@@ -772,6 +871,37 @@ impl DecompositionOracle<PrimeCurve> for PkmTowerOracle<'_> {
             op_unit: MULADD_UNIT.into(),
             ..SolverTotals::default()
         };
+        self.tally = Tally::default();
+        self.root_trace = None;
+        if self.use_trace
+            && self.engine != Engine::SigF5
+            && !(self.engine == Engine::F6 && (1u64 << t) <= self.cap)
+        {
+            // Learn minimal-1-witness root refutation trace deterministically in the 1-thread pool.
+            let mut state = 0x5eed_cafe_d15c_a11bu64 ^ p;
+            for _ in 0..8 {
+                state = state
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                let xr_cal = 1 + (state >> 16) % (p - 1);
+                let cal_sys = self.system(xr_cal, None);
+                let ring_ref = self.ring.as_ref().unwrap();
+                let mut l_opts = TowerF4Options::new(self.max_degree);
+                l_opts.record_trace = true;
+                if let Some(b) = self.budget {
+                    l_opts = l_opts.with_budget(b);
+                }
+                let cal_rep = pool.install(|| f4_fp_tower::f4_tower(&cal_sys, ring_ref, &l_opts));
+                self.totals.ops += cal_rep.muladds;
+                if cal_rep.inconsistent {
+                    if let Some(tr) = cal_rep.learned {
+                        self.root_trace = Some(std::sync::Arc::new(tr));
+                        break;
+                    }
+                }
+            }
+        }
+        self.pool = Some(pool);
         Ok(())
     }
 
@@ -786,7 +916,7 @@ impl DecompositionOracle<PrimeCurve> for PkmTowerOracle<'_> {
         if point.infinity {
             return None;
         }
-        self.search(ctx, fb, ops, counters, point, 0, 1)
+        self.search(ctx, fb, ops, counters, point, 0, 1, None)
     }
 
     fn last_system(&self) -> Option<SystemShape> {
@@ -805,6 +935,10 @@ impl DecompositionOracle<PrimeCurve> for PkmTowerOracle<'_> {
             ("geometric_group_additions", x.geometric_group_additions),
             ("quadratic_solves", x.quadratic_solves),
             ("tower_sqrts", x.tower_sqrts),
+            ("inherited_children", x.inherited_children),
+            ("trace_replays", x.trace_replays),
+            ("trace_refuted", x.trace_refuted),
+            ("spec_fp_mults", x.spec_fp_mults),
         ] {
             t.extra.insert(k.into(), v);
         }
@@ -932,5 +1066,122 @@ mod tests {
             assert_eq!(powm(y0, 32, p), 1);
         }
         assert!(Kummer::new(p, 10, 1).is_err());
+    }
+
+    #[test]
+    fn basis_inheritance_and_trace_replay_match_scratch_and_cut_ops() {
+        let (_, fb_params) = Params::parse_spec("x:t=5,seed=1").unwrap();
+        let (inst, fb) = (1..1000u64)
+            .filter_map(|seed| {
+                let c = find_prime_order_curve(20, seed);
+                if !(c.curve.p - 1).is_multiple_of(32) {
+                    return None;
+                }
+                let ctx = InstanceCtx {
+                    group: &c.curve,
+                    generator: c.generator_point(),
+                    target: c.generator_point(),
+                    r: c.r,
+                    cofactor: c.cofactor,
+                    group_order: c.group_order,
+                    name: "test".into(),
+                    field_degree: None,
+                };
+                let fb = PrimeTowerBase { instance: &c }
+                    .build(&ctx, &fb_params, &mut GroupOps::default())
+                    .ok()?;
+                (fb.points.len() >= 10).then_some((c, fb))
+            })
+            .next()
+            .expect("20-bit prime with 2^5 | p - 1 and >= 10 tower base points");
+        let ctx = InstanceCtx {
+            group: &inst.curve,
+            generator: inst.generator_point(),
+            target: inst.generator_point(),
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: "test".into(),
+            field_degree: None,
+        };
+
+        let (_, p_fast) = Params::parse_spec("x:t=5,seed=1,engine=f4,inherit=1,trace=1").unwrap();
+        let (_, p_scratch) =
+            Params::parse_spec("x:t=5,seed=1,engine=f4,inherit=0,trace=0").unwrap();
+        let (_, p_enum) = Params::parse_spec("x:t=5,seed=1,engine=enum").unwrap();
+
+        let mut fast = PkmTowerOracle::new(2, &inst);
+        fast.prepare(&ctx, &fb, &p_fast, &mut GroupOps::default())
+            .unwrap();
+        let mut scratch = PkmTowerOracle::new(2, &inst);
+        scratch
+            .prepare(&ctx, &fb, &p_scratch, &mut GroupOps::default())
+            .unwrap();
+        let mut exact = PkmTowerOracle::new(2, &inst);
+        exact
+            .prepare(&ctx, &fb, &p_enum, &mut GroupOps::default())
+            .unwrap();
+
+        let mut ops = GroupOps::default();
+        let g = inst.generator_point();
+        let mut hits = 0usize;
+        for k in 0..24usize {
+            let pt = if k % 4 == 0 && fb.points.len() >= 4 {
+                let i0 = (k / 2) % fb.points.len();
+                let i1 = (i0 + 2) % fb.points.len();
+                inst.curve.add(&mut ops, fb.points[i0], fb.points[i1])
+            } else {
+                inst.curve.mul(&mut ops, g, 100 + k as u64 * 37)
+            };
+            if pt.infinity {
+                continue;
+            }
+            let r_fast = fast.decompose(
+                &ctx,
+                &fb,
+                &mut GroupOps::default(),
+                &mut OracleCounters::default(),
+                pt,
+            );
+            let r_scratch = scratch.decompose(
+                &ctx,
+                &fb,
+                &mut GroupOps::default(),
+                &mut OracleCounters::default(),
+                pt,
+            );
+            let r_exact = exact.decompose(
+                &ctx,
+                &fb,
+                &mut GroupOps::default(),
+                &mut OracleCounters::default(),
+                pt,
+            );
+            assert_eq!(r_fast.is_some(), r_exact.is_some(), "target {k}");
+            assert_eq!(r_scratch.is_some(), r_exact.is_some(), "target {k}");
+            if let Some(idx) = &r_fast {
+                let s = inst
+                    .curve
+                    .add(&mut ops, fb.points[idx[0]], fb.points[idx[1]]);
+                assert_eq!(s, pt);
+                hits += 1;
+            }
+        }
+        assert!(hits >= 4);
+        assert!(
+            fast.totals.ops < scratch.totals.ops,
+            "fast ops {} should beat scratch ops {}",
+            fast.totals.ops,
+            scratch.totals.ops
+        );
+        assert!(fast.tally.inherited_children > 0);
+        assert!(
+            fast.tally.trace_refuted > 0,
+            "p={}, root_trace={}, fast_tally={:?}, scratch_tally={:?}",
+            inst.curve.p,
+            fast.root_trace.is_some(),
+            fast.tally,
+            scratch.tally
+        );
     }
 }
