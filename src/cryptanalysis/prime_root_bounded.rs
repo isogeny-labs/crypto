@@ -258,11 +258,10 @@ impl Producer<'_> {
         self.gate.scalar()?;
         let p = self.p;
         Ok(if p == (1u64 << 61) - 1 {
-            // Mersenne reduction: 2^61 = 1 (mod p), with two folds
-            // sufficient for a product of canonical 61-bit operands.
+            // One fold suffices: canonical a,b<p imply
+            // ((a*b)&p) + ((a*b)>>61) < 2p.
             let product = a as u128 * b as u128;
             let folded = ((product as u64) & p) + (product >> 61) as u64;
-            let folded = (folded & p) + (folded >> 61);
             if folded >= p { folded - p } else { folded }
         } else if p <= u32::MAX as u64 {
             // (p-1)^2 fits in u64, including p=2^32-5.
@@ -1633,9 +1632,10 @@ impl Replay {
             let wide = u128::from(x) * u128::from(y);
             let low = wide as u64 & p;
             let high = (wide >> 61) as u64;
+            // With both operands canonical, combined < 2p. Replay
+            // performs a single correction, independently of Producer.
             let combined = low + high;
-            let reduced = (combined & p) + (combined >> 61);
-            if reduced == p { 0 } else { reduced }
+            if combined < p { combined } else { combined - p }
         } else if p <= u32::MAX as u64 {
             (x * y) % p
         } else {
