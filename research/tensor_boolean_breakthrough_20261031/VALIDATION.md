@@ -1627,3 +1627,41 @@ nonvanishing theorem; it does not prove relation yield or energy estimates,
 bind an oracle to coverage and restart probabilities, assemble expected
 runtime, specialize universal-machine bit costs, or prove a subexponential
 prime-field ECDLP algorithm. [pcc:unverified]
+
+## 2026-11-20 repeated tuples, production nondegeneracy, and average energy
+
+`TensorBoundaryBounds.lean` now contains a one-character Kummer projector
+that isolates a selected radicand while allowing arbitrary collisions among
+the unselected radicands. It also proves the required two-character local
+orthogonality and moves the repeated-factor Galois instance to the common
+projector layer. In `SemaevRelationSigns.lean`, the theorem
+`zmodCanonicalShortCubicInterval_relation_impossible` combines this ordinary
+branch with the existing cubic-CM square-pair branch. A bounded relation with
+one surviving coefficient is therefore impossible without a pairwise
+nonsquare hypothesis on every pair. [pcc:unverified]
+
+`zmodCanonicalSemaevInterval_nontriv_ne_zero` indexes the quadratic splitting
+field by the finite image of an arbitrary tuple, maps canonical Semaev
+vanishing into that field, regroups equal tuple values, and obtains a nonzero
+fibre coefficient of absolute value at most the original arity. Since the
+finite image has cardinality at most that arity, the same explicit condition
+`3 * (2^r * r)^2 < p` suffices. Repeated tuple entries are thus covered rather
+than excluded by an injectivity assumption. [pcc:unverified]
+
+The function-field result is transferred to the actual polynomial through
+`evalCanonicalTo_natural` and coefficient extension followed by evaluation
+at the embedded polynomial variable.
+`zmodCanonicalDilationPolynomial_ne_zero` then handles the production
+`Fin (2*m)` reindexing, and `zmodCanonicalDilationNondeg` discharges the exact
+upstream `ECDLP.L49.DilationNondeg` premise with degree
+`(2*m) * 2^(2*m-2)`. Finally, `zmodCanonical_avg_energy_dil` applies the
+upstream checked average-energy theorem to this certificate. The targeted
+command `lake build SemaevRelationSigns` completes 9,136 jobs. The full
+repository proof gate reports `PASS 470 thm 0 trusted`. [pcc:unverified]
+
+This closes canonical polynomial nonvanishing, production dilation
+nondegeneracy, and the curve-specific average-energy estimate for the stated
+bounded `A = 0` prime-field family. It does not yet turn that average bound
+into a sufficiently probable independent-relation collector, price retries
+and verification, assemble expected runtime, or establish bit-level
+subexponential ECDLP. [pcc:unverified]

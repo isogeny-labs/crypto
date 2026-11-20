@@ -4343,6 +4343,43 @@ theorem separatingSignCharacters_orthogonality
     have sumZero : (∑ gamma, productCharacter gamma) = 0 := by omega
     simpa [equal, productCharacter] using sumZero
 
+/-- Two multiplicative sign characters have zero inner product as soon as
+one group element separates them.  This local form avoids requiring every
+pair in a larger indexed family to be separated when a projector only needs
+to isolate one chosen term. -/
+theorem twoSignCharacters_orthogonality
+    {Gamma : Type*} [Fintype Gamma] [Group Gamma]
+    (left right : Gamma → ℤ)
+    (leftMultiplicative : ∀ a b, left (a * b) = left a * left b)
+    (rightMultiplicative : ∀ a b, right (a * b) = right a * right b)
+    (separates : ∃ delta, left delta * right delta = -1) :
+    ∑ gamma, left gamma * right gamma = 0 := by
+  obtain ⟨delta, separatesAtDelta⟩ := separates
+  let productCharacter : Gamma → ℤ := fun gamma ↦ left gamma * right gamma
+  have translated :
+      (∑ gamma, productCharacter (delta * gamma)) =
+        ∑ gamma, productCharacter gamma := by
+    exact Equiv.sum_comp (Equiv.mulLeft delta) productCharacter
+  have translatedNeg :
+      (∑ gamma, productCharacter (delta * gamma)) =
+        -∑ gamma, productCharacter gamma := by
+    calc
+      (∑ gamma, productCharacter (delta * gamma)) =
+          ∑ gamma, -productCharacter gamma := by
+        apply Fintype.sum_congr
+        intro gamma
+        simp only [productCharacter, leftMultiplicative,
+          rightMultiplicative]
+        rw [← neg_one_mul (productCharacter gamma), ← separatesAtDelta]
+        ring
+      _ = -∑ gamma, productCharacter gamma := by simp
+  have sumNeg :
+      (∑ gamma, productCharacter gamma) =
+        -∑ gamma, productCharacter gamma :=
+    translated.symm.trans translatedNeg
+  have sumZero : (∑ gamma, productCharacter gamma) = 0 := by omega
+  exact sumZero
+
 /-- Kummer-projector endpoint with character orthogonality discharged from
 multiplicativity, sign values, and pairwise separation. -/
 theorem separatingSignCharacterProjector_isolates_term
@@ -4491,6 +4528,106 @@ theorem quadraticSplittingFieldSignProjector_of_equivariant_relation
     (fun index sigma ↦
       galoisSqrtSign (quadraticRadicandRoot radicand index) sigma)
     coefficient point action pointAction relation
+
+/-- The quadratic splitting field is Galois even when radicands repeat.
+The product polynomial itself can then be nonseparable, but every one of its
+roots satisfies a separable quadratic factor; those roots still generate the
+splitting field. -/
+theorem quadraticRadicandSplittingField_isGalois_allow_repeats
+    {K Index : Type*} [Field K] [Fintype Index]
+    (radicand : Index → K) (twoNonzero : (2 : K) ≠ 0)
+    (radicandNonzero : ∀ index, radicand index ≠ 0) :
+    IsGalois K (quadraticRadicandPolynomial radicand).SplittingField := by
+  classical
+  let p := quadraticRadicandPolynomial radicand
+  let L := p.SplittingField
+  have separableExtension : Algebra.IsSeparable K L := by
+    rw [← IntermediateField.isSeparable_top,
+      ← (isSplittingField_iff_intermediateField.mp
+        (inferInstance : p.IsSplittingField K L)).2,
+      IntermediateField.isSeparable_adjoin_iff_isSeparable]
+    intro root rootMem
+    have evaluation : Polynomial.aeval root p = 0 :=
+      Polynomial.aeval_eq_zero_of_mem_rootSet rootMem
+    have factorProduct : ∏ index,
+        (root ^ 2 - algebraMap K L (radicand index)) = 0 := by
+      simpa [p, quadraticRadicandPolynomial, map_prod] using evaluation
+    obtain ⟨index, -, factorZero⟩ := Finset.prod_eq_zero_iff.mp factorProduct
+    have factorEvaluation : Polynomial.aeval root
+        (Polynomial.X ^ 2 - Polynomial.C (radicand index)) = 0 := by
+      simpa using factorZero
+    exact (Polynomial.separable_X_pow_sub_C
+      (radicand index) twoNonzero (radicandNonzero index)).of_dvd
+        (minpoly.dvd K root factorEvaluation)
+  exact
+    { to_isSeparable := separableExtension
+      to_normal := Normal.of_isSplittingField p }
+
+/-- A chosen-term variant of the quadratic sign projector.  Collisions among
+unchosen radicands are allowed: isolating `chosen` only requires its sign
+character to be separated from every other indexed sign character. -/
+theorem quadraticSplittingFieldSignProjector_isolates_chosen
+    {K Index Point : Type*}
+    [Field K] [Fintype Index] [DecidableEq Index] [AddCommGroup Point]
+    (radicand : Index → K) (coefficient : Index → ℤ)
+    (point : Index → Point) (chosen : Index)
+    (twoNonzero : (2 : K) ≠ 0)
+    (radicandNonzero : ∀ index, radicand index ≠ 0)
+    (chosenNonsquare : ∀ index, index ≠ chosen →
+      ¬ IsSquare (radicand chosen * radicand index))
+    (action :
+      ((quadraticRadicandPolynomial radicand).SplittingField ≃ₐ[K]
+        (quadraticRadicandPolynomial radicand).SplittingField) →
+      Point ≃+ Point)
+    (pointAction : ∀ sigma index,
+      action sigma (point index) =
+        galoisSqrtSign (quadraticRadicandRoot radicand index) sigma •
+          point index)
+    (relation : ∑ index, coefficient index • point index = 0) :
+    ((Fintype.card
+      ((quadraticRadicandPolynomial radicand).SplittingField ≃ₐ[K]
+        (quadraticRadicandPolynomial radicand).SplittingField) : ℤ) *
+      coefficient chosen) • point chosen = 0 := by
+  classical
+  let L := (quadraticRadicandPolynomial radicand).SplittingField
+  letI : IsGalois K L :=
+    quadraticRadicandSplittingField_isGalois_allow_repeats
+      radicand twoNonzero radicandNonzero
+  have extensionTwoNonzero : (2 : L) ≠ 0 := by
+    rw [← map_ofNat (algebraMap K L) 2]
+    exact (map_ne_zero (algebraMap K L)).2 twoNonzero
+  apply characterProjector_isolates_term
+    (fun index sigma ↦
+      galoisSqrtSign (quadraticRadicandRoot radicand index) sigma)
+    coefficient point chosen
+  · intro index
+    by_cases equal : index = chosen
+    · subst index
+      simp [galoisSqrtSign_squareOne]
+    · rw [if_neg equal]
+      apply twoSignCharacters_orthogonality
+      · intro left right
+        exact galoisSqrtSign_multiplicative
+          (quadraticRadicandRoot_ne_zero radicand chosen
+            (radicandNonzero chosen)) extensionTwoNonzero
+          (quadraticRadicandRoot_sq radicand chosen) left right
+      · intro left right
+        exact galoisSqrtSign_multiplicative
+          (quadraticRadicandRoot_ne_zero radicand index
+            (radicandNonzero index)) extensionTwoNonzero
+          (quadraticRadicandRoot_sq radicand index) left right
+      · exact galoisSqrtSigns_separate_of_not_isSquare_mul
+          (quadraticRadicandRoot_ne_zero radicand chosen
+            (radicandNonzero chosen))
+          (quadraticRadicandRoot_ne_zero radicand index
+            (radicandNonzero index))
+          (quadraticRadicandRoot_sq radicand chosen)
+          (quadraticRadicandRoot_sq radicand index)
+          (chosenNonsquare index equal)
+  · exact transformedRelations_of_addEquiv_eigenvectors
+      (fun index sigma ↦
+        galoisSqrtSign (quadraticRadicandRoot radicand index) sigma)
+      coefficient point action pointAction relation
 
 /-- Concrete short-curve splitting-field projector.  The extension, roots,
 Galois action, eigenvector identities, and all transformed relations are

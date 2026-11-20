@@ -135,8 +135,26 @@ The null changes only the global wiring of interior ports while preserving the v
     oracle-to-coverage binding, expected-runtime assembly, universal-machine
     bit-cost specialization, or a subexponential ECDLP algorithm.
     [pcc:unverified]
-15. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
-16. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
+15. **Kernel-checked 2026-11-20:** the canonical nonvanishing argument now
+    handles arbitrary repeated tuple values and reaches the exact production
+    dilation interface. The tuple is regrouped over its finite image; a
+    surviving bounded coefficient is handled either by a chosen-term Kummer
+    projector, which permits collisions among all unchosen radicands, or by
+    the cubic-CM pair projector. Lean proves the resulting function-field
+    Semaev evaluation nonzero, transfers that fact to the actual
+    simultaneous-scale polynomial, proves
+    `canonicalDilationPolynomial 0 B m t != 0` for every upstream nontrivial
+    interval tuple, and constructs `ECDLP.L49.DilationNondeg` with explicit
+    degree `(2m) * 2^(2m-2)`. This certificate is composed with the exact
+    upstream `avg_energy_dil` theorem. Thus canonical polynomial
+    nonvanishing and the curve-specific average-energy step are closed for
+    this bounded `A = 0` family. The repository proof gate reports
+    `PASS 470 thm 0 trusted`. Relation yield/coverage and restart
+    probabilities, expected-runtime assembly, and bit-complexity
+    specialization remain open; no subexponential ECDLP algorithm is yet
+    proved. [pcc:unverified]
+16. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
+17. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
 
 The current `Network` stores predicates behind `Arc<dyn Predicate>`, so closure identity cannot be serialized faithfully. E0 therefore uses a hybrid semantic representation: predicates at or below 16 ports carry their complete truth table; larger production predicates carry a strict typed operation that is also their live evaluator. Tag, parameters, truth table or typed program, port order, interface and pins are bound into one SHA-256 identity. Untagged predicates are admitted only through an explicit bounded-truth-table policy for tiny fixtures and controls. Canonicalizing graph shape alone would be insufficient.
 
