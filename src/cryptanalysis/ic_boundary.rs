@@ -949,6 +949,206 @@ pub(crate) fn fast_map<V>(capacity: usize) -> FastMap<V> {
     HashMap::with_capacity_and_hasher(capacity, BuildHasherDefault::default())
 }
 
+/// Open-addressing walk coefficient table `u64 → (u128, u64, u64)`.
+/// Multiplicative home, linear probe, `0` empty sentinel.  A full dense
+/// `p+2` array was tried on ledger fp20 and **regressed** cold-E2E wall
+/// ~10× (zeroing ~30 MB per solve); keep the compact open table.
+struct OpenCoefMap {
+    keys: Vec<u64>,
+    us: Vec<u128>,
+    zs: Vec<u64>,
+    bs: Vec<u64>,
+    mask: usize,
+    len: usize,
+}
+
+impl OpenCoefMap {
+    fn with_capacity(slots: usize) -> Self {
+        // 2× next_pow2; a 4× trial on fp20 raised cold-E2E wall (~2.7×
+        // vs ~2.3×) via cache pressure. Dense `p+2` arrays falsified.
+        let cap = (slots.max(8) * 2).next_power_of_two();
+        Self {
+            keys: vec![0; cap],
+            us: vec![0; cap],
+            zs: vec![0; cap],
+            bs: vec![0; cap],
+            mask: cap - 1,
+            len: 0,
+        }
+    }
+
+    fn with_capacity_bound(slots: usize, _key_bound: u64) -> Self {
+        // `_key_bound` retained so call sites can pass `abscissa_key_bound`
+        // without a second API; dense arrays are intentionally unused.
+        Self::with_capacity(slots)
+    }
+
+    #[inline(always)]
+    fn home(&self, key: u64) -> usize {
+        (key.wrapping_mul(0x9E37_79B9_7F4A_7C15) as usize) & self.mask
+    }
+
+    #[inline]
+    fn prefetch(&self, key: u64) {
+        prefetch_cache_line(&self.keys, self.home(key));
+    }
+
+    #[inline]
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    /// Insert if vacant; return `Err(existing)` on collision (occupied).
+    #[inline]
+    fn insert_vacant(&mut self, key: u64, val: (u128, u64, u64)) -> Result<(), (u128, u64, u64)> {
+        debug_assert!(key != 0);
+        let mut i = self.home(key);
+        loop {
+            let k = self.keys[i];
+            if k == 0 {
+                self.keys[i] = key;
+                self.us[i] = val.0;
+                self.zs[i] = val.1;
+                self.bs[i] = val.2;
+                self.len += 1;
+                if self.len * 4 > self.keys.len() * 3 {
+                    self.grow();
+                }
+                return Ok(());
+            }
+            if k == key {
+                return Err((self.us[i], self.zs[i], self.bs[i]));
+            }
+            i = (i + 1) & self.mask;
+        }
+    }
+
+    #[inline]
+    fn get(&self, key: u64) -> Option<(u128, u64, u64)> {
+        if key == 0 {
+            return None;
+        }
+        let mut i = self.home(key);
+        loop {
+            let k = self.keys[i];
+            if k == 0 {
+                return None;
+            }
+            if k == key {
+                return Some((self.us[i], self.zs[i], self.bs[i]));
+            }
+            i = (i + 1) & self.mask;
+        }
+    }
+
+    fn grow(&mut self) {
+        let cap = self.keys.len() * 2;
+        let old_keys = std::mem::replace(&mut self.keys, vec![0; cap]);
+        let old_us = std::mem::replace(&mut self.us, vec![0; cap]);
+        let old_zs = std::mem::replace(&mut self.zs, vec![0; cap]);
+        let old_bs = std::mem::replace(&mut self.bs, vec![0; cap]);
+        self.mask = cap - 1;
+        self.len = 0;
+        for (i, key) in old_keys.into_iter().enumerate() {
+            if key != 0 {
+                let _ = self.insert_vacant(key, (old_us[i], old_zs[i], old_bs[i]));
+            }
+        }
+    }
+}
+
+/// Sibling xref table `key → (parent, pool_idx, minus, own_key)` —
+/// open addressing (see [`OpenCoefMap`]; dense `p+2` falsified for cold E2E).
+struct OpenRefMap {
+    keys: Vec<u64>,
+    parents: Vec<usize>,
+    pools: Vec<usize>,
+    minus: Vec<bool>,
+    owns: Vec<u64>,
+    mask: usize,
+    len: usize,
+}
+
+impl OpenRefMap {
+    fn with_capacity_bound(slots: usize, _key_bound: u64) -> Self {
+        let cap = (slots.max(8) * 2).next_power_of_two();
+        Self {
+            keys: vec![0; cap],
+            parents: vec![0; cap],
+            pools: vec![0; cap],
+            minus: vec![false; cap],
+            owns: vec![0; cap],
+            mask: cap - 1,
+            len: 0,
+        }
+    }
+
+    #[inline(always)]
+    fn home(&self, key: u64) -> usize {
+        (key.wrapping_mul(0x9E37_79B9_7F4A_7C15) as usize) & self.mask
+    }
+
+    #[inline]
+    fn insert(&mut self, key: u64, val: (usize, usize, bool, u64)) {
+        debug_assert!(key != 0);
+        // Grow before a full table: linear probe with no empty slot
+        // loops forever (observed hang in oracle_setup on fp20).
+        if self.len * 4 >= self.keys.len() * 3 {
+            self.grow();
+        }
+        let mut i = self.home(key);
+        loop {
+            let k = self.keys[i];
+            if k == 0 || k == key {
+                if k == 0 {
+                    self.len += 1;
+                }
+                self.keys[i] = key;
+                self.parents[i] = val.0;
+                self.pools[i] = val.1;
+                self.minus[i] = val.2;
+                self.owns[i] = val.3;
+                return;
+            }
+            i = (i + 1) & self.mask;
+        }
+    }
+
+    fn grow(&mut self) {
+        let cap = self.keys.len() * 2;
+        let old_keys = std::mem::replace(&mut self.keys, vec![0; cap]);
+        let old_parents = std::mem::replace(&mut self.parents, vec![0; cap]);
+        let old_pools = std::mem::replace(&mut self.pools, vec![0; cap]);
+        let old_minus = std::mem::replace(&mut self.minus, vec![false; cap]);
+        let old_owns = std::mem::replace(&mut self.owns, vec![0; cap]);
+        self.mask = cap - 1;
+        self.len = 0;
+        for (i, key) in old_keys.into_iter().enumerate() {
+            if key != 0 {
+                self.insert(key, (old_parents[i], old_pools[i], old_minus[i], old_owns[i]));
+            }
+        }
+    }
+
+    #[inline]
+    fn get(&self, key: u64) -> Option<(usize, usize, bool, u64)> {
+        if key == 0 {
+            return None;
+        }
+        let mut i = self.home(key);
+        loop {
+            let k = self.keys[i];
+            if k == 0 {
+                return None;
+            }
+            if k == key {
+                return Some((self.parents[i], self.pools[i], self.minus[i], self.owns[i]));
+            }
+            i = (i + 1) & self.mask;
+        }
+    }
+}
+
 // ── Modular arithmetic on u64 ──────────────────────────────────────
 
 /// `a·b mod m`, the value of `(a·b) % m` on 128-bit integers exactly.
@@ -1433,6 +1633,12 @@ pub trait CountedGroup {
     }
     /// A key that identifies the element (both walks must agree on it).
     fn key(&self, p: &Self::Elt) -> u64;
+    /// Exclusive upper bound on abscissa-style table keys (`x + 1`), when
+    /// every key the walk stores is below it — enables a dense array map.
+    /// `None` (default) keeps open-addressing.
+    fn abscissa_key_bound(&self) -> Option<u64> {
+        None
+    }
     /// An opt-in addition path for the relation walk.  The closure lives for
     /// one solve, so an implementation may retain native field state between
     /// steps.  Other group operations keep their established accounting.
@@ -6168,6 +6374,10 @@ impl CountedFp<'_> {
 /// as performed (`1` inv and `3(k−1)` muls for `k > 1`, matching
 /// [`crate::cryptanalysis::semaev_projection::batch_inv_u64_counted`]).
 /// Used by [`PrimeCurve::sibling_pairs_batch`].
+///
+/// Ledger fp20 (`p < 2³²`) stays on the canonical [`mulmod`] / [`invmod`]
+/// chain: a Montgomery round-trip per element was pure tax next to
+/// `mulmod_u32`.  Wider primes use [`Fp64::batch_inv`] in Montgomery form.
 fn batch_inv_field_ops(xs: &mut [u64], p: u64, ops: &mut FieldOps) {
     let k = xs.len();
     if k == 0 {
@@ -6180,7 +6390,26 @@ fn batch_inv_field_ops(xs: &mut [u64], p: u64, ops: &mut FieldOps) {
     }
     ops.muls += 3 * (k as u64 - 1);
     ops.invs += 1;
-    if p > 3 && p < (1u64 << crate::cryptanalysis::prime_fast::MAX_BITS) {
+    // Small primes: canonical mulmod_u32 path (no to_mont/from_mont).
+    // Callers pass at most 16 denominators (sib ≤ 16); keep the prefix
+    // on the stack so oracle_setup pays no heap traffic per expand.
+    if p <= u64::from(u32::MAX) || p <= 3 {
+        debug_assert!(k <= 16);
+        let mut prefix = [1u64; 16];
+        let mut acc = 1u64;
+        for i in 0..k {
+            prefix[i] = acc;
+            acc = mulmod(acc, xs[i], p);
+        }
+        let mut inv_acc = invmod(acc, p).expect("prime field");
+        for i in (0..k).rev() {
+            let xi = xs[i];
+            xs[i] = mulmod(inv_acc, prefix[i], p);
+            inv_acc = mulmod(inv_acc, xi, p);
+        }
+        return;
+    }
+    if p < (1u64 << crate::cryptanalysis::prime_fast::MAX_BITS) {
         let f = Fp64::new(p);
         for v in xs.iter_mut() {
             *v = f.to_mont(*v);
@@ -6258,12 +6487,16 @@ impl CountedGroup for PrimeCurve {
         p: PrimePoint,
         js: &[(PrimePoint, bool)],
     ) -> Option<Vec<Option<SiblingPair>>> {
-        let mut out = vec![None; js.len()];
-        if p.infinity || js.is_empty() {
+        let n = js.len();
+        let mut out = vec![None; n];
+        if p.infinity || n == 0 {
             return Some(out);
         }
-        let mut dxs = Vec::with_capacity(js.len());
-        let mut slots = Vec::with_capacity(js.len());
+        // Stack buffers: callers pass at most 16 jumps (sib ≤ 16).
+        debug_assert!(n <= 16);
+        let mut dxs = [0u64; 16];
+        let mut slots = [(0usize, PrimePoint::INFINITY, false); 16];
+        let mut k = 0usize;
         for (i, &(j, want_minus)) in js.iter().enumerate() {
             if j.infinity || j.x == p.x {
                 continue;
@@ -6272,18 +6505,85 @@ impl CountedGroup for PrimeCurve {
             if dx == 0 {
                 continue;
             }
-            slots.push((i, j, want_minus));
-            dxs.push(dx);
+            slots[k] = (i, j, want_minus);
+            dxs[k] = dx;
+            k += 1;
         }
-        if dxs.is_empty() {
+        if k == 0 {
             return Some(out);
         }
-        batch_inv_field_ops(&mut dxs, self.p, &mut ops.field_ops);
+        // Montgomery-resident siblings for wide primes: invert in
+        // Montgomery form once and keep λ/x there until the canonical
+        // key/slope the table stores.  Small primes (ledger fp20) stay
+        // on mulmod_u32 via CountedFp — mont λ regresses there.
+        if self.p > u64::from(u32::MAX)
+            && self.p < (1u64 << crate::cryptanalysis::prime_fast::MAX_BITS)
+        {
+            let f = Fp64::new(self.p);
+            for s in 0..k {
+                dxs[s] = f.to_mont(dxs[s]);
+            }
+            ops.field_ops.muls += k as u64; // to_mont
+            // batch_inv in mont; charge 1 inv + 3(k−1) muls.
+            if k == 1 {
+                ops.field_ops.invs += 1;
+                let mut one = [dxs[0]];
+                let mut scratch = Vec::new();
+                f.batch_inv(&mut one, &mut scratch);
+                dxs[0] = one[0];
+            } else {
+                ops.field_ops.muls += 3 * (k as u64 - 1);
+                ops.field_ops.invs += 1;
+                let mut scratch = Vec::with_capacity(k);
+                f.batch_inv(&mut dxs[..k], &mut scratch);
+            }
+            let px = f.to_mont(p.x);
+            let py = f.to_mont(p.y);
+            ops.field_ops.muls += 2; // parent once
+            for s in 0..k {
+                let (i, j, want_minus) = slots[s];
+                let inv = dxs[s]; // already Montgomery
+                let jx = f.to_mont(j.x);
+                let jy = f.to_mont(j.y);
+                ops.field_ops.muls += 2; // jump once
+                let dy = f.sub(jy, py);
+                let lp_m = f.mul(dy, inv);
+                let lp2 = f.sqr(lp_m);
+                let xp_m = f.sub(f.sub(lp2, px), jx);
+                ops.field_ops.muls += 1;
+                ops.field_ops.sqrs += 1;
+                let lp = f.from_mont(lp_m);
+                let xp = f.from_mont(xp_m);
+                ops.field_ops.muls += 2; // from_mont = reduce
+                let mut sp = SiblingPair {
+                    key_plus: xp + 1,
+                    lambda_plus: lp,
+                    key_minus: 0,
+                    lambda_minus: 0,
+                };
+                if want_minus {
+                    let sy = f.add(jy, py);
+                    let lm_m = f.mul(f.neg(sy), inv);
+                    let lm2 = f.sqr(lm_m);
+                    let xm_m = f.sub(f.sub(lm2, px), jx);
+                    ops.field_ops.muls += 1;
+                    ops.field_ops.sqrs += 1;
+                    sp.lambda_minus = f.from_mont(lm_m);
+                    sp.key_minus = f.from_mont(xm_m) + 1;
+                    ops.field_ops.muls += 2;
+                }
+                out[i] = Some(sp);
+            }
+            return Some(out);
+        }
+        batch_inv_field_ops(&mut dxs[..k], self.p, &mut ops.field_ops);
         let mut f = CountedFp {
             p: self.p,
             tally: &mut ops.field_ops,
         };
-        for ((i, j, want_minus), &inv) in slots.into_iter().zip(dxs.iter()) {
+        for s in 0..k {
+            let (i, j, want_minus) = slots[s];
+            let inv = dxs[s];
             let dy = f.sub(j.y, p.y);
             let lp = f.mul(dy, inv);
             let lp2 = f.sqr(lp);
@@ -6368,6 +6668,11 @@ impl CountedGroup for PrimeCurve {
         } else {
             ((p.x + 1) << 1) | u64::from(p.y > self.p - p.y)
         }
+    }
+    fn abscissa_key_bound(&self) -> Option<u64> {
+        // Walk tables store `x + 1` (or orbit-min of that), so keys are
+        // in `1..=p + 1`.
+        Some(self.p.saturating_add(2))
     }
     fn native_walk_adder(
         &self,
@@ -11060,8 +11365,9 @@ pub const TW_AUT_MASK: u128 = 3 << TW_AUT_SHIFT;
 pub struct TargetWalk<E> {
     /// Key (abscissa and sign bit, shifted) → `(u, z, b)`; with two seeds
     /// `u = u1 << 64 | u2` (a `u128`); with `cv=0` or `lazy` bit 127 of
-    /// `u` ([`TW_SIGN_BIT`]) is the key's low bit.
-    map: FastMap<(u128, u64, u64)>,
+    /// `u` ([`TW_SIGN_BIT`]) is the key's low bit.  Open-addressing
+    /// ([`OpenCoefMap`]) — denser than [`FastMap`] on the walk hot path.
+    map: OpenCoefMap,
     /// Table accesses made by the walk (one `entry` call per non-identity
     /// step, in every mode); not emitted as a counter.
     pub table_probes: u64,
@@ -11198,11 +11504,18 @@ struct SibWalk<E> {
     /// Table key of an x-only entry → `(parent index, pool index, minus,
     /// the entry's own abscissa key)` (the table key is canonical with
     /// `aut=3`; the sign resolution needs the point's own abscissa).
-    refs: FastMap<(usize, usize, bool, u64)>,
+    refs: OpenRefMap,
 }
 
 impl<E: Copy> SibWalk<E> {
-    fn new(_m: usize, pool: usize, p1: E, c: (u128, u64, u64)) -> Self {
+    fn new(
+        _m: usize,
+        pool: usize,
+        p1: E,
+        c: (u128, u64, u64),
+        key_bound: u64,
+        table_slots: usize,
+    ) -> Self {
         Self {
             started: false,
             parent: p1,
@@ -11219,7 +11532,9 @@ impl<E: Copy> SibWalk<E> {
             parents: Vec::new(),
             parents_n: 0,
             queue: std::collections::VecDeque::new(),
-            refs: fast_map(1024),
+            // Sibling xrefs can outnumber keyed walk entries (plus+minus
+            // per parent); size like the coef table (~t) not a fixed 1k.
+            refs: OpenRefMap::with_capacity_bound(table_slots.max(1024), key_bound),
         }
     }
 }
@@ -11667,7 +11982,10 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             }
         }
         let mut tw = Self {
-            map: fast_map(t_max as usize + 1),
+            map: OpenCoefMap::with_capacity_bound(
+                t_max as usize + 1,
+                g.abscissa_key_bound().unwrap_or(0),
+            ),
             table_probes: 0,
             verify_collisions,
             unverified_collisions: 0,
@@ -11761,7 +12079,8 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         let store_sign = lazy || !verify_collisions;
         let _ = fault;
         // The sibling walk's state (only with `sib`): see "Sibling points".
-        let mut sw = sib.map(|(m, pool)| SibWalk::new(m, pool, p1, c));
+        let key_bound = g.abscissa_key_bound().unwrap_or(0);
+        let mut sw = sib.map(|(m, pool)| SibWalk::new(m, pool, p1, c, key_bound, tw.t));
         loop {
             while tw.rank < need && tw.steps < t_max {
                 if let Some(sw) = sw.as_mut() {
@@ -11786,16 +12105,19 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                     } else {
                         0
                     };
-                    let mut kept = match tw.map.entry(key) {
-                        std::collections::hash_map::Entry::Vacant(slot) => {
+                    tw.map.prefetch(key);
+                    let mut kept = match tw
+                        .map
+                        .insert_vacant(key, (item.c.0 | low | rot, item.c.1, item.c.2))
+                    {
+                        Ok(()) => {
                             debug_assert!(item.c.0 & (TW_SIGN_BIT | TW_AUT_MASK) == 0);
-                            slot.insert((item.c.0 | low | rot, item.c.1, item.c.2));
                             if let Some((pi, h, minus, _)) = item.xref {
                                 sw.refs.insert(key, (pi, h, minus, own_key));
                             }
                             continue;
                         }
-                        std::collections::hash_map::Entry::Occupied(o) => *o.get(),
+                        Err(existing) => existing,
                     };
                     let kept_rot = kept.0 & TW_AUT_MASK;
                     kept.0 &= !TW_AUT_MASK;
@@ -11804,7 +12126,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                     // entry's from its parent, the new one from its slope.
                     let mut minus = false;
                     if store_sign {
-                        let kept_low = match sw.refs.get(&key).copied() {
+                        let kept_low = match sw.refs.get(key) {
                             Some((pi, h, mn, k0)) => {
                                 tw.sib_sign(g, sw, &jump_pts, pi, h, mn, k0, None)
                             }
@@ -11852,14 +12174,14 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                 let (key, rot) = tw.canon_key(full_key >> 1, &mut walk_ops);
                 let low = u128::from(store_sign) * (u128::from(full_key & 1) << 127);
                 tw.table_probes += 1;
-                let mut kept = match tw.map.entry(key) {
-                    std::collections::hash_map::Entry::Vacant(slot) => {
+                tw.map.prefetch(key);
+                let mut kept = match tw.map.insert_vacant(key, (c.0 | low | rot, c.1, c.2)) {
+                    Ok(()) => {
                         // The bits are free: every coefficient is below 2^62.
                         debug_assert!(c.0 & (TW_SIGN_BIT | TW_AUT_MASK) == 0);
-                        slot.insert((c.0 | low | rot, c.1, c.2));
                         continue;
                     }
-                    std::collections::hash_map::Entry::Occupied(o) => *o.get(),
+                    Err(existing) => existing,
                 };
                 let kept_rot = kept.0 & TW_AUT_MASK;
                 kept.0 &= !TW_AUT_MASK;
@@ -11965,8 +12287,9 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             sw.c = sw.next_c;
             sw.prev2_h = sw.prev_h;
             sw.prev_h = Some(sw.h_t);
-            sw.s_tm2 = std::mem::take(&mut sw.s_tm1);
-            sw.s_tm1 = std::mem::take(&mut sw.cur);
+            // Rotate subset history without allocating.
+            std::mem::swap(&mut sw.s_tm2, &mut sw.s_tm1);
+            std::mem::swap(&mut sw.s_tm1, &mut sw.cur);
         }
         // A fresh uniform m-subset (partial Fisher-Yates) from the
         // point-independent stream.
@@ -11975,18 +12298,19 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             let j = rng.gen_range(i..n);
             sw.idx.swap(i, j);
         }
-        sw.cur = sw.idx[..m].to_vec();
+        sw.cur.clear();
+        sw.cur.extend_from_slice(&sw.idx[..m]);
         sw.h_t = sw.cur[0];
         let parent_idx = sw.parents.len();
         sw.parents.push(sw.parent);
         sw.parents_n += 1;
         self.sib_parents += 1;
         let c = sw.c;
-        // Plan each of the m jumps, then form every sibling pair from ONE
-        // batched inversion of the denominators (walk identity unchanged).
-        let mut plans: Vec<(usize, E, u128, u64, u64, bool, (u128, u64, u64))> =
-            Vec::with_capacity(m);
-        let mut js: Vec<(E, bool)> = Vec::with_capacity(m);
+        // Plan each of the m jumps on the stack (m ≤ 16), then form every
+        // sibling pair from ONE batched inversion of the denominators.
+        debug_assert!(m <= 16);
+        let mut plans = [(0usize, g.identity(), 0u128, 0u64, 0u64, false, (0u128, 0u64, 0u64)); 16];
+        let mut js = [(g.identity(), false); 16];
         for pos in 0..m {
             let h = sw.cur[pos];
             let (jp, al, ga, be) = jump_pts[h];
@@ -11997,18 +12321,21 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                 || (sw.prev2_h == Some(h) && sw.prev_h.is_some_and(|ph| sw.s_tm2.contains(&ph)));
             let want_minus = !skip_minus;
             let cp = (c.0 + al, addmod(c.1, ga, r), addmod(c.2, be, r));
-            plans.push((h, jp, al, ga, be, want_minus, cp));
-            js.push((jp, want_minus));
+            plans[pos] = (h, jp, al, ga, be, want_minus, cp);
+            js[pos] = (jp, want_minus);
         }
         let pairs = g
-            .sibling_pairs_batch(ops, sw.parent, &js)
+            .sibling_pairs_batch(ops, sw.parent, &js[..m])
             .unwrap_or_else(|| {
-                js.iter()
-                    .map(|&(jp, want_minus)| g.sibling_pair(ops, sw.parent, jp, want_minus))
+                (0..m)
+                    .map(|i| {
+                        let (jp, want_minus) = js[i];
+                        g.sibling_pair(ops, sw.parent, jp, want_minus)
+                    })
                     .collect()
             });
-        for (pos, ((h, jp, al, ga, be, want_minus, cp), sp)) in
-            plans.into_iter().zip(pairs).enumerate()
+        for (pos, (&(h, jp, al, ga, be, want_minus, cp), sp)) in
+            plans[..m].iter().zip(pairs).enumerate()
         {
             match sp {
                 Some(sp) => {
@@ -12017,6 +12344,10 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                     if want_minus {
                         self.sib_second_points += 1;
                     }
+                    // Eager sign bits (one sibling_lift mul each) so the
+                    // insert path never writes OpenRefMap — that map's
+                    // probe/grow sat in ~100% of a hung oracle_setup
+                    // sample and still taxes cold E2E when healthy.
                     if pos == 0 {
                         let pt = g
                             .sibling_lift(ops, sw.parent, sp.key_plus, sp.lambda_plus)
@@ -12033,11 +12364,17 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                             xref: None,
                         });
                     } else {
+                        let pt = g
+                            .sibling_lift(ops, sw.parent, sp.key_plus, sp.lambda_plus)
+                            .expect("a finite parent");
+                        let k = g.key(&pt);
+                        debug_assert_eq!(k >> 1, sp.key_plus);
+                        self.sib_lifts += 1;
                         sw.queue.push_back(SibItem {
                             key: sp.key_plus,
                             c: cp,
-                            sign: None,
-                            xref: Some((parent_idx, h, false, sp.lambda_plus)),
+                            sign: Some(u128::from(k & 1) << 127),
+                            xref: None,
                         });
                     }
                     if want_minus {
@@ -12048,11 +12385,17 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                             submod(c.1, ga, r),
                             submod(c.2, be, r),
                         );
+                        let pt = g
+                            .sibling_lift(ops, sw.parent, sp.key_minus, sp.lambda_minus)
+                            .expect("a finite parent");
+                        let k = g.key(&pt);
+                        debug_assert_eq!(k >> 1, sp.key_minus);
+                        self.sib_lifts += 1;
                         sw.queue.push_back(SibItem {
                             key: sp.key_minus,
                             c: cm,
-                            sign: None,
-                            xref: Some((parent_idx, h, true, sp.lambda_minus)),
+                            sign: Some(u128::from(k & 1) << 127),
+                            xref: None,
                         });
                     }
                 }
@@ -12600,7 +12943,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                 point_rot = i << TW_AUT_SHIFT;
             }
         }
-        let (u, z, b) = *self.map.get(&key)?;
+        let (u, z, b) = self.map.get(key)?;
         // Clear the cv=0 / lazy sign bit and the aut rotation (never set
         // otherwise).
         let entry_rot = u & TW_AUT_MASK;
