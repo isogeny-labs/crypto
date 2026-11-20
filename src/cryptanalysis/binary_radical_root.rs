@@ -163,7 +163,7 @@ impl RadicalQuartic {
     /// Needs odd `n` (the half-trace solves Artin–Schreier there).
     pub fn new(l: u32, gf: &Gf2) -> Option<Self> {
         let n = gf.n;
-        if n % 2 == 0 || n > 63 || l > n {
+        if n.is_multiple_of(2) || n > 63 || l > n {
             return None;
         }
         let basis: Vec<u64> = (0..n).map(|i| 1u64 << i).collect();
