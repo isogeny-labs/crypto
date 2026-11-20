@@ -62,6 +62,52 @@ pub fn kernel(p:u64, mode:u8, repeats:usize, verifier:bool)->(u64,u64) {
  }
  (digest,if verifier{replay.gate.metrics.field_work}else{producer.gate.metrics.field_work})
 }
+
+pub fn randomized_square_oracle(p:u64,count:usize,verifier:bool)->u64 {
+ use std::time::Duration;
+ let budget=RootBudget{work:MAX_WORK,field_work:MAX_FIELD_WORK,bytes:STORAGE_BYTES,
+   events:MAX_EVENTS,split_attempts:1000,degree:8};
+ let deadline=Instant::now()+Duration::from_secs(120);
+ let mut observer=|_:&BoundedRootEvent|Ok(());
+ let mut producer=Producer{p,gate:Gate::new(budget,deadline),observer:&mut observer,
+   unacknowledged:None,pending:[Poly17::ZERO;8],pending_len:0,
+   roots:[0;8],root_count:0};
+ producer.gate.admit().unwrap();
+ let field=super::super::fp_backend::Fp64Arithmetic{p};
+ let mut replay=Replay::new(&field,&[1,1],42,budget,budget,deadline).unwrap();
+ let mut state=p ^ 0x9e3779b97f4a7c15;
+ let mut digest=0u64;
+ for t in 0..count {
+   let len=(t%8)+1;
+   let mut f=Poly17::ZERO;f.len=len as u8;
+   for i in 0..len {
+     state=state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+     let mut v=state%p;
+     if i+1<len && (t+3*i)%7==0 {v=0;}
+     if i+1==len && v==0 {v=1;}
+     if len==2 && t%3==0 && i==1 {v=1;}
+     f.coefficients[i]=v;
+   }
+   let mut reference=Poly17::ZERO;
+   reference.len=(len*2-1) as u8;
+   for i in 0..len {
+     for j in 0..len {
+       let index=i+j;
+       reference.coefficients[index]=(
+         (reference.coefficients[index] as u128
+          + f.coefficients[i] as u128*f.coefficients[j] as u128)
+         % p as u128) as u64;
+     }
+   }
+   reference.trim();
+   let actual=if verifier {replay.square_diagonals(&f).unwrap()}
+              else {producer.square(&f).unwrap()};
+   assert_eq!(actual,reference,"p={p} trial={t} verify={verifier}");
+   digest=digest.wrapping_add(actual.coefficients[t%actual.len as usize]);
+ }
+ digest
+}
+
 """
 tests = r"""
 #[cfg(test)]
@@ -123,6 +169,17 @@ mod round55 {
              else{after::kernel(p,mode,384,verify)};
   black_box(result);
   start.elapsed().as_nanos() as f64/384.0
+ }
+ #[test]
+ fn randomized_squares_match_independent_schoolbook(){
+  for p in [1_000_000_007u64,1_000_000_009,(1u64<<61)-1] {
+   for verifier in [false,true] {
+    let a=before::randomized_square_oracle(p,1024,verifier);
+    let b=after::randomized_square_oracle(p,1024,verifier);
+    assert_eq!(a,b,"p={p} verifier={verifier}");
+   }
+  }
+  println!("ROUND55_NATIVE_ORACLE samples_per_version=6144 total=12288");
  }
  #[test]
  fn arithmetic_and_complete_event_certificate_equivalence(){
@@ -194,5 +251,6 @@ with tempfile.TemporaryDirectory() as tmp:
  p=Path(tmp)/"round55.rs";exe=Path(tmp)/"round55"
  p.write_text(header+source+helper+middle+before+helper+footer+tests)
  subprocess.run(["rustc","--edition=2021","-O","--test",str(p),"-o",str(exe)],check=True)
+ subprocess.run([str(exe),"randomized_squares_match_independent_schoolbook","--nocapture"],check=True)
  subprocess.run([str(exe),"arithmetic_and_complete_event_certificate_equivalence","--nocapture"],check=True)
  subprocess.run([str(exe),"bench_kernels_and_complete_root_extraction","--ignored","--nocapture"],check=True)
