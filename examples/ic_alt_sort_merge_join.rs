@@ -46,15 +46,14 @@ impl Ec {
             (Some(p), Some(q)) => (p, q),
         };
         self.ops += 1;
-        let l;
-        if p.0 == q.0 {
-            if (p.1 + q.1) % P == 0 {
+        let l = if p.0 == q.0 {
+            if (p.1 + q.1).is_multiple_of(P) {
                 return None;
             }
-            l = (3 * p.0 % P * p.0 + A) % P * inv(2 * p.1 % P) % P;
+            (3 * p.0 % P * p.0 + A) % P * inv(2 * p.1 % P) % P
         } else {
-            l = (q.1 + P - p.1) % P * inv((q.0 + P - p.0) % P) % P;
-        }
+            (q.1 + P - p.1) % P * inv((q.0 + P - p.0) % P) % P
+        };
         let x = (l * l % P + 2 * P - p.0 - q.0) % P;
         let y = (l * ((p.0 + P - x) % P) % P + P - p.1) % P;
         Some((x, y))
@@ -83,7 +82,7 @@ fn is_prime(n: u64) -> bool {
     }
     let mut d = 2;
     while d * d <= n {
-        if n % d == 0 {
+        if n.is_multiple_of(d) {
             return false;
         }
         d += 1;
@@ -322,7 +321,7 @@ fn radix_sort(v: &mut Vec<u64>, tmp: &mut Vec<u64>, c: &mut Cnt) {
         }
         std::mem::swap(v, tmp);
         c.words += 5 * n as u64 + 256;
-        c.lines += 3 * ((n as u64 * 8 + 63) / 64); // hist read, scatter read, scatter write (est.)
+        c.lines += 3 * (n as u64 * 8).div_ceil(64); // hist read, scatter read, scatter write (est.)
     }
 }
 
@@ -418,7 +417,7 @@ fn batch_arm(t: &Table, n: usize, seed: u64, kq: u64, bs: usize, gallop: bool) -
                 }
             }
         }
-        c.lines += (m as u64 * 8 + 63) / 64; // batch array read in merge
+        c.lines += (m as u64 * 8).div_ceil(64); // batch array read in merge
         tl += l0.elapsed().as_secs_f64();
         done += m;
     }
@@ -435,7 +434,7 @@ fn batch_arm(t: &Table, n: usize, seed: u64, kq: u64, bs: usize, gallop: bool) -
     }
 }
 
-fn median(v: &mut Vec<f64>) -> f64 {
+fn median(v: &mut [f64]) -> f64 {
     v.sort_by(|a, b| a.partial_cmp(b).unwrap());
     v[v.len() / 2]
 }
@@ -446,10 +445,9 @@ fn main() {
     let reps: usize = args.get(2).map(|s| s.parse().unwrap()).unwrap_or(15);
     let kq = 1234567u64;
     let g = Some((GX, GY));
-    assert!(
-        (GY * GY) % P == (GX * GX % P * GX + A * GX + B) % P,
-        "G on curve"
-    );
+    const {
+        assert!((GY * GY) % P == (GX * GX % P * GX + A * GX + B) % P);
+    }
     let mut ec = Ec { ops: 0 };
     assert!(ec.mul(R, g).is_none(), "r*G = O");
     let (t, f) = build_table();
