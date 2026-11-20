@@ -579,11 +579,7 @@ fn s4_univariate_in_u(
     // b0(U) = xr²·U² + (-2a·xr - 4b)·U + (a² - 4b·xr)
     let a2_sq = mul_u64(a, a, p, mults);
     let four_b_xr = mul_u64(four_b, xr, p, mults);
-    let b0 = [
-        sub_u64(a2_sq, four_b_xr, p),
-        sub_u64(0, lin_const, p),
-        xr2,
-    ];
+    let b0 = [sub_u64(a2_sq, four_b_xr, p), sub_u64(0, lin_const, p), xr2];
 
     let lin_comb = |c_left: u64, left: &[u64; 3], c_right: u64, right: &[u64; 3], m: &mut u64| {
         let mut out = [0u64; 3];
@@ -738,7 +734,9 @@ impl ParamSymmetricSemaev {
     /// Precompute `\tilde S_{m+1}(e_1, …, e_m; X_R)` once for `(m, a, b, p)`.
     pub fn build(m: usize, a: u64, b: u64, p: u64) -> Result<Self, String> {
         if !(2..=4).contains(&m) {
-            return Err(format!("ParamSymmetricSemaev: m must be 2, 3 or 4, got {m}"));
+            return Err(format!(
+                "ParamSymmetricSemaev: m must be 2, 3 or 4, got {m}"
+            ));
         }
         let xr_deg = 1usize << (m - 1); // 2, 4, 8
         let min_p = (xr_deg + m + 1) as u64;
@@ -821,7 +819,12 @@ impl ParamSymmetricSemaev {
                 let mut acc = 0u64;
                 for node_j in 0..n_nodes {
                     if row_vals[node_j] != 0 {
-                        let t = mul_u64(v_inv[deg_k * n_nodes + node_j], row_vals[node_j], p, &mut mults);
+                        let t = mul_u64(
+                            v_inv[deg_k * n_nodes + node_j],
+                            row_vals[node_j],
+                            p,
+                            &mut mults,
+                        );
                         acc = add_u64(acc, t, p);
                     }
                 }
@@ -965,7 +968,9 @@ fn rref_multi_rhs(
     for col in 0..n_piv {
         let piv = (col..n_rows)
             .find(|&r| aug[r * n_cols + col] != 0)
-            .ok_or_else(|| format!("ParamSymmetricSemaev: singular interpolation matrix at col {col}"))?;
+            .ok_or_else(|| {
+                format!("ParamSymmetricSemaev: singular interpolation matrix at col {col}")
+            })?;
         if piv != col {
             for c in col..n_cols {
                 aug.swap(piv * n_cols + c, col * n_cols + c);
@@ -1193,7 +1198,9 @@ mod tests {
             // Verify exact polynomial identity on 64 pseudo-random tuples (including repeated coordinates!).
             let mut state = 0x9e37_79b9_7f4a_7c15u64 ^ p;
             let mut next = || {
-                state = state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+                state = state
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
                 (state >> 16) % p
             };
             for t in 0..64 {

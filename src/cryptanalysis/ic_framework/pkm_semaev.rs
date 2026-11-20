@@ -706,7 +706,9 @@ pub fn t0_factor_base(
 /// and `c_top = 0`, such as `M31 = 2^31 − 1` for `1 ≤ t ≤ 29`).
 pub fn dickson_abscissae(p: u64, t: u32, lo: u64, c_top: u64) -> Result<Vec<u64>, String> {
     if t == 0 || t >= 30 {
-        return Err(format!("pkm-semaev: dickson tower height t = {t} must be in 1..30"));
+        return Err(format!(
+            "pkm-semaev: dickson tower height t = {t} must be in 1..30"
+        ));
     }
     let dummy_curve = PrimeCurve { p, a: 0, b: 1 };
     let mut layer = vec![c_top % p];
@@ -821,6 +823,10 @@ struct Prepared {
     fixed_s0_top: Vec<(usize, u64)>,
     /// Curve-once `X_R`-power-split symmetric polynomial (`PkmMode::Sym`).
     param_sym: Option<Arc<ParamSymmetricSemaev>>,
+    /// Static roots of each distinct tower square-rule `(a,b,c,d)` over `F_p`.
+    /// Filled once in `prepare` so descent DFS does not re-run Tonelli–Shanks
+    /// on every branch (the tiny-`t` Dickson `grid()` crossover).
+    rule_roots: HashMap<(u64, u64, u64, u64), Vec<u64>>,
 }
 
 /// How each summand's abscissa is tied to its `t` tower variables
@@ -1343,7 +1349,10 @@ impl PkmSemaevOracle {
         self.setup_mults = check_mults;
         self.branches = if self.guess == 0 {
             Vec::new()
-        } else if matches!(self.membership, Membership::Kummer | Membership::Dickson { .. }) {
+        } else if matches!(
+            self.membership,
+            Membership::Kummer | Membership::Dickson { .. }
+        ) {
             Self::build_dropped_tower_branches(&prep, curve, self.t as usize, self.guess as usize)?
         } else {
             (0..(1u64 << self.guess))
@@ -1525,7 +1534,7 @@ impl PkmSemaevOracle {
 
     fn tower_rule_roots(curve: &PrimeCurve, r: &SquareRule) -> Vec<u64> {
         let p = curve.p;
-        let inv2 = (p + 1) / 2;
+        let inv2 = p.div_ceil(2);
         let half_c = mulm(r.c % p, inv2, p);
         let disc = addm(mulm(half_c, half_c, p), r.d % p, p);
         if disc == 0 {
@@ -1539,6 +1548,39 @@ impl PkmSemaevOracle {
         } else {
             Vec::new()
         }
+    }
+
+    #[inline]
+    fn rule_abcd(r: &SquareRule) -> (u64, u64, u64, u64) {
+        (r.a, r.b, r.c, r.d)
+    }
+
+    /// Precompute Tonelli–Shanks roots for every distinct square-rule shape
+    /// in `ring` (and any extra rules passed in).
+    fn build_rule_root_cache(
+        curve: &PrimeCurve,
+        ring: &TowerRing,
+        extra: &[SquareRule],
+    ) -> HashMap<(u64, u64, u64, u64), Vec<u64>> {
+        let mut map = HashMap::new();
+        for r in ring.rules.iter().chain(extra.iter()) {
+            let k = Self::rule_abcd(r);
+            map.entry(k)
+                .or_insert_with(|| Self::tower_rule_roots(curve, r));
+        }
+        map
+    }
+
+    /// Look up cached roots; fall back to a one-shot Tonelli–Shanks if missing.
+    fn lookup_rule_roots(
+        cache: &HashMap<(u64, u64, u64, u64), Vec<u64>>,
+        curve: &PrimeCurve,
+        r: &SquareRule,
+    ) -> Vec<u64> {
+        cache
+            .get(&Self::rule_abcd(r))
+            .cloned()
+            .unwrap_or_else(|| Self::tower_rule_roots(curve, r))
     }
 
     /// Build `2^g` leaf `Prepared` branches for `Kummer` / `Dickson` by dropping
@@ -1555,7 +1597,7 @@ impl PkmSemaevOracle {
             let var = t - 1 - depth;
             let mut next_states = Vec::with_capacity(states.len() * 2);
             for (ring, eqs, fixed_so_far) in states {
-                let roots = Self::tower_rule_roots(curve, &ring.rules[var]);
+                let roots = Self::lookup_rule_roots(&root.rule_roots, curve, &ring.rules[var]);
                 if roots.len() != 2 {
                     return Err(format!(
                         "pkm-semaev: summand-0 tower level {var} has {} roots in F_{} instead of 2",
@@ -1577,9 +1619,10 @@ impl PkmSemaevOracle {
                                 TowerWeights::UNIT,
                             );
                             child_ring = r2;
-                            let p_poly = spec_vec
-                                .pop()
-                                .unwrap_or_else(|| RPoly { monos: Vec::new(), coefs: Vec::new() });
+                            let p_poly = spec_vec.pop().unwrap_or_else(|| RPoly {
+                                monos: Vec::new(),
+                                coefs: Vec::new(),
+                            });
                             c_parts.push(p_poly);
                         }
                         child_eqs.push(c_parts);
@@ -1602,6 +1645,7 @@ impl PkmSemaevOracle {
                 v_rank: root.v_rank.clone(),
                 fixed_s0_top,
                 param_sym: root.param_sym.clone(),
+                rule_roots: root.rule_roots.clone(),
             })
             .collect())
     }
@@ -1916,6 +1960,7 @@ impl PkmSemaevOracle {
         for (idx, &vx) in v.iter().enumerate() {
             v_rank.entry(vx).or_insert(idx as u32);
         }
+        let rule_roots = Self::build_rule_root_cache(curve, &ring, &[]);
         Prepared {
             ring,
             eqs,
@@ -1925,6 +1970,7 @@ impl PkmSemaevOracle {
             v_rank,
             fixed_s0_top: Vec::new(),
             param_sym,
+            rule_roots,
         }
     }
 
@@ -2153,8 +2199,7 @@ impl PkmSemaevOracle {
             return vec![subm(0, mulm(ga, inv, p), p)];
         }
         *mults += 36;
-        let inv_2al =
-            crate::cryptanalysis::residual_walk::pow_mod(addm(al, al, p), p - 2, p);
+        let inv_2al = crate::cryptanalysis::residual_walk::pow_mod(addm(al, al, p), p - 2, p);
         let half_neg_be = subm(0, mulm(be, inv_2al, p), p);
         let inv_al = addm(inv_2al, inv_2al, p);
         let disc = subm(mulm(half_neg_be, half_neg_be, p), mulm(ga, inv_al, p), p);
@@ -2284,12 +2329,7 @@ impl PkmSemaevOracle {
         acc
     }
 
-    fn abscissa_of_summand(
-        &self,
-        p: u64,
-        vals: &[Option<u64>],
-        mults: &mut u64,
-    ) -> Option<u64> {
+    fn abscissa_of_summand(&self, p: u64, vals: &[Option<u64>], mults: &mut u64) -> Option<u64> {
         match &self.membership {
             Membership::Kummer => {
                 *mults += 1;
@@ -2340,11 +2380,7 @@ impl PkmSemaevOracle {
                 }
                 *mults += 32;
                 let inv = crate::cryptanalysis::residual_walk::pow_mod(subm(1, y, p), p - 2, p);
-                Some(addm(
-                    mulm(addm(1, y, p), inv, p),
-                    shift.unwrap_or(0) % p,
-                    p,
-                ))
+                Some(addm(mulm(addm(1, y, p), inv, p), shift.unwrap_or(0) % p, p))
             }
         }
     }
@@ -2368,6 +2404,7 @@ impl PkmSemaevOracle {
         let t = self.t as usize;
         let root_prep = self.prepared.as_ref().expect("prepared");
         let root_v_rank = &root_prep.v_rank;
+        let rule_roots = &root_prep.rule_roots;
         let branch_v_set: Option<HashSet<u64>> = branch_idx.map(|br| {
             self.branches
                 .get(br)
@@ -2416,15 +2453,19 @@ impl PkmSemaevOracle {
                     let bit_val = ((br as u64) >> k) & 1;
                     let dummy_val = if matches!(self.membership, Membership::Isogeny { .. }) {
                         let r = &cur_ring.rules[lvl];
-                        Self::tower_rule_roots(curve, r)
+                        Self::lookup_rule_roots(rule_roots, curve, r)
                             .into_iter()
                             .next()
                             .unwrap_or(0)
                     } else {
                         bit_val
                     };
-                    let (r2, b2, _, sm) =
-                        cur_ring.specialize_drop_top_var(&cur_basis, lvl, dummy_val, TowerWeights::UNIT);
+                    let (r2, b2, _, sm) = cur_ring.specialize_drop_top_var(
+                        &cur_basis,
+                        lvl,
+                        dummy_val,
+                        TowerWeights::UNIT,
+                    );
                     mults += sm;
                     cur_ring = r2;
                     cur_basis = b2;
@@ -2448,6 +2489,7 @@ impl PkmSemaevOracle {
             x_r: u64,
             shared_lift_xs: Option<&[u64]>,
             root_v_rank: &HashMap<u64, u32>,
+            rule_roots: &HashMap<(u64, u64, u64, u64), Vec<u64>>,
             branch_v_set: &Option<HashSet<u64>>,
             mut cur_ring: TowerRing,
             mut cur_basis: Vec<RPoly>,
@@ -2463,10 +2505,7 @@ impl PkmSemaevOracle {
 
             // Step 1: Linear RREF + upward tower propagation + free-var cascade.
             loop {
-                if cur_basis
-                    .iter()
-                    .any(|g| g.len() == 1 && g.monos[0] == ONE)
-                {
+                if cur_basis.iter().any(|g| g.len() == 1 && g.monos[0] == ONE) {
                     return;
                 }
                 let n_t = cur_ring.n_tower();
@@ -2518,8 +2557,7 @@ impl PkmSemaevOracle {
                         let pv = rows[piv_row][col];
                         if pv != 1 {
                             *mults += 32;
-                            let inv =
-                                crate::cryptanalysis::residual_walk::pow_mod(pv, p - 2, p);
+                            let inv = crate::cryptanalysis::residual_walk::pow_mod(pv, p - 2, p);
                             for v in &mut rows[piv_row][col..=n_vars] {
                                 if *v != 0 {
                                     *mults += 1;
@@ -2537,8 +2575,7 @@ impl PkmSemaevOracle {
                                 let pv_c = rows[piv_row][c_idx];
                                 if pv_c != 0 {
                                     *mults += 1;
-                                    rows[r][c_idx] =
-                                        subm(rows[r][c_idx], mulm(factor, pv_c, p), p);
+                                    rows[r][c_idx] = subm(rows[r][c_idx], mulm(factor, pv_c, p), p);
                                 }
                             }
                         }
@@ -2594,11 +2631,8 @@ impl PkmSemaevOracle {
                                         break;
                                     }
                                     *mults += 32;
-                                    let inv_den = crate::cryptanalysis::residual_walk::pow_mod(
-                                        den,
-                                        p - 2,
-                                        p,
-                                    );
+                                    let inv_den =
+                                        crate::cryptanalysis::residual_walk::pow_mod(den, p - 2, p);
                                     let nxt_v = mulm(lhs, inv_den, p);
                                     chain.push((nxt, nxt_v));
                                     cur_j = nxt;
@@ -2632,15 +2666,15 @@ impl PkmSemaevOracle {
                                 continue;
                             }
                             let fk = col - n_t;
-                            if free_done[fk]
-                                || rows[pr][(col + 1)..n_vars].iter().any(|&x| x != 0)
+                            if free_done[fk] || rows[pr][(col + 1)..n_vars].iter().any(|&x| x != 0)
                             {
                                 continue;
                             }
                             let val = rows[pr][n_vars];
                             free_done[fk] = true;
-                            let (b2, sm) =
-                                PkmSemaevOracle::specialize_basis_at_free_var(p, &cur_basis, fk, val);
+                            let (b2, sm) = PkmSemaevOracle::specialize_basis_at_free_var(
+                                p, &cur_basis, fk, val,
+                            );
                             *mults += sm;
                             cur_basis = b2;
                             progressed = true;
@@ -2761,8 +2795,14 @@ impl PkmSemaevOracle {
                 })
                 .expect("at least one top tower variable exists");
 
-            let roots = PkmSemaevOracle::tower_rule_roots(curve, &cur_ring.rules[chosen_var]);
-            *mults += 34;
+            let rule = &cur_ring.rules[chosen_var];
+            let cached = rule_roots.contains_key(&PkmSemaevOracle::rule_abcd(rule));
+            let roots = PkmSemaevOracle::lookup_rule_roots(rule_roots, curve, rule);
+            // Cached prepare()-time roots cost nothing at runtime; a miss still
+            // pays a one-shot Tonelli–Shanks (~34 Fp mults on a 31-bit prime).
+            if !cached {
+                *mults += 34;
+            }
             for rt in roots {
                 let (c_ring, c_basis, _, sm) = cur_ring.specialize_drop_top_var(
                     &cur_basis,
@@ -2783,6 +2823,7 @@ impl PkmSemaevOracle {
                     x_r,
                     shared_lift_xs,
                     root_v_rank,
+                    rule_roots,
                     branch_v_set,
                     c_ring,
                     c_basis,
@@ -2804,6 +2845,7 @@ impl PkmSemaevOracle {
             x_r,
             shared_lift_xs,
             root_v_rank,
+            rule_roots,
             &branch_v_set,
             cur_ring,
             cur_basis,
@@ -2843,6 +2885,7 @@ impl PkmSemaevOracle {
     /// guess tree when running plain F4 (`!self.trace && self.inherit && self.guess > 0`).
     /// Returns all consistent leaf `(TowerRing, TowerF4Report, Vec<(usize, u64)>, bool)`
     /// lazily in branch order, or an empty `Vec` paired with the last refutation report.
+    #[allow(clippy::result_large_err)]
     fn run_inherited_guess_leaf(
         &mut self,
         curve: &PrimeCurve,
@@ -2867,7 +2910,7 @@ impl PkmSemaevOracle {
             let mut extra = BTreeMap::new();
             extra.insert("max_cols_max".to_string(), parent_rep.max_cols as u64);
             extra.insert("max_rows_max".to_string(), parent_rep.max_rows as u64);
-            extra.insert("max_nnz_max".to_string(), parent_rep.max_nnz as u64);
+            extra.insert("max_nnz_max".to_string(), parent_rep.max_nnz);
             extra.insert("steps".to_string(), parent_rep.steps as u64);
             extra.insert("refutations".to_string(), 1);
             extra.insert("staircase_stops".to_string(), 0);
@@ -2906,7 +2949,7 @@ impl PkmSemaevOracle {
                 let mut extra = BTreeMap::new();
                 extra.insert("max_cols_max".to_string(), rep.max_cols as u64);
                 extra.insert("max_rows_max".to_string(), rep.max_rows as u64);
-                extra.insert("max_nnz_max".to_string(), rep.max_nnz as u64);
+                extra.insert("max_nnz_max".to_string(), rep.max_nnz);
                 extra.insert("steps".to_string(), rep.steps as u64);
                 extra.insert("refutations".to_string(), u64::from(rep.inconsistent));
                 extra.insert(
@@ -2969,13 +3012,7 @@ impl PkmSemaevOracle {
                 }
 
                 let (sols, _, m_ext) = self.extract_solutions_from_basis(
-                    curve,
-                    None,
-                    &cur_ring,
-                    &rep.basis,
-                    &fixed_s0,
-                    x_r,
-                    None,
+                    curve, None, &cur_ring, &rep.basis, &fixed_s0, x_r, None,
                 );
                 self.bump("pkm_grid_fp_mults_uncharged", m_ext);
                 for xs in &sols {
@@ -3001,7 +3038,12 @@ impl PkmSemaevOracle {
             }
 
             let var = t - 1 - depth;
-            let mut rts = Self::tower_rule_roots(curve, &cur_ring.rules[var]);
+            let prep_roots = self
+                .prepared
+                .as_ref()
+                .map(|p| &p.rule_roots)
+                .expect("prepared");
+            let mut rts = Self::lookup_rule_roots(prep_roots, curve, &cur_ring.rules[var]);
             rts.reverse(); // push in reverse so smaller root is popped first
             for rt in rts {
                 let (c_ring, mut c_basis, _, sm) =
@@ -3582,9 +3624,8 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 if !self.trace && self.inherit && self.guess > 0 && !self.dataset_trace {
                     let shared_roots: Vec<u64> = self.shared_pts.iter().map(|t| t.x).collect();
                     let roots = self.shared.then_some(&shared_roots[..]);
-                    match self.run_inherited_guess_leaf(
-                        curve, fb, ops, counters, point, x_r, roots,
-                    ) {
+                    match self.run_inherited_guess_leaf(curve, fb, ops, counters, point, x_r, roots)
+                    {
                         Ok(res) => return res,
                         Err((rep, undecided)) => {
                             if rep.inconsistent {
@@ -3684,7 +3725,10 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                                         }
                                         let plain = f4_tower(&sys, &ring, &opts);
                                         self.bump("pkm_trace_fallbacks", 1);
-                                        self.bump("pkm_trace_fallback_plain_muladds", plain.muladds);
+                                        self.bump(
+                                            "pkm_trace_fallback_plain_muladds",
+                                            plain.muladds,
+                                        );
                                         extra_ops = r.muladds;
                                         extra_ms = r.ms;
                                         plain
@@ -3715,7 +3759,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                         let mut extra = BTreeMap::new();
                         extra.insert("max_cols_max".to_string(), rep.max_cols as u64);
                         extra.insert("max_rows_max".to_string(), rep.max_rows as u64);
-                        extra.insert("max_nnz_max".to_string(), rep.max_nnz as u64);
+                        extra.insert("max_nnz_max".to_string(), rep.max_nnz);
                         extra.insert("steps".to_string(), rep.steps as u64);
                         extra.insert("refutations".to_string(), u64::from(rep.inconsistent));
                         extra.insert(
@@ -3748,13 +3792,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                             break;
                         }
                         let (br_sols, _, m_ext) = self.extract_solutions_from_basis(
-                            curve,
-                            branch,
-                            &ring,
-                            &rep.basis,
-                            &fixed_s0,
-                            x_r,
-                            None,
+                            curve, branch, &ring, &rep.basis, &fixed_s0, x_r, None,
                         );
                         self.bump("pkm_grid_fp_mults_uncharged", m_ext);
                         // Check if any extracted tuple on this branch lifts to `fb` before stopping
@@ -3821,12 +3859,11 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                                 .iter()
                                 .map(|xs| xs.iter().map(ToString::to_string).collect::<Vec<_>>())
                                 .collect::<Vec<_>>());
-                            snapshot["grid_fp_multiplies"] = serde_json::json!(
-                                self.native
-                                    .get("pkm_grid_fp_mults_uncharged")
-                                    .copied()
-                                    .unwrap_or(0)
-                            );
+                            snapshot["grid_fp_multiplies"] = serde_json::json!(self
+                                .native
+                                .get("pkm_grid_fp_mults_uncharged")
+                                .copied()
+                                .unwrap_or(0));
                         }
                         gathered_sols
                     } else {

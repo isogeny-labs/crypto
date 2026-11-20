@@ -748,8 +748,7 @@ impl<'i> PkmTowerOracle<'i> {
         };
         let basis_ref = own_basis.as_deref().or(parent_basis);
         for w in roots {
-            if let Some(found) =
-                self.search(ctx, fb, ops, counters, point, depth + 1, w, basis_ref)
+            if let Some(found) = self.search(ctx, fb, ops, counters, point, depth + 1, w, basis_ref)
             {
                 return Some(found);
             }
@@ -874,7 +873,10 @@ impl DecompositionOracle<PrimeCurve> for PkmTowerOracle<'_> {
         };
         self.tally = Tally::default();
         self.root_trace = None;
-        if self.use_trace && self.engine != Engine::SigF5 && !(self.engine == Engine::F6 && (1u64 << t) <= self.cap) {
+        if self.use_trace
+            && self.engine != Engine::SigF5
+            && !(self.engine == Engine::F6 && (1u64 << t) <= self.cap)
+        {
             // Learn minimal-1-witness root refutation trace deterministically in the 1-thread pool.
             let mut state = 0x5eed_cafe_d15c_a11bu64 ^ p;
             for _ in 0..8 {
@@ -1109,7 +1111,8 @@ mod tests {
         let (_, p_enum) = Params::parse_spec("x:t=5,seed=1,engine=enum").unwrap();
 
         let mut fast = PkmTowerOracle::new(2, &inst);
-        fast.prepare(&ctx, &fb, &p_fast, &mut GroupOps::default()).unwrap();
+        fast.prepare(&ctx, &fb, &p_fast, &mut GroupOps::default())
+            .unwrap();
         let mut scratch = PkmTowerOracle::new(2, &inst);
         scratch
             .prepare(&ctx, &fb, &p_scratch, &mut GroupOps::default())

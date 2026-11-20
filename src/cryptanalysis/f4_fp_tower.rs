@@ -913,7 +913,11 @@ impl TowerRing {
 
         let low_mask = if var == 0 { 0u64 } else { (1u64 << var) - 1 };
         let bit = 1u64 << var;
-        let high_mask = if var == 63 { 0u64 } else { !((1u64 << (var + 1)) - 1) };
+        let high_mask = if var == 63 {
+            0u64
+        } else {
+            !((1u64 << (var + 1)) - 1)
+        };
 
         let mut child_basis = Vec::with_capacity(basis.len());
         for g in basis {
@@ -1470,11 +1474,11 @@ pub(crate) fn compile_refutation(
         }
 
         let scan_into = |mult: Mono,
-                             g: u32,
-                             skip_lead: Option<Mono>,
-                             need_piv: &mut Vec<bool>,
-                             work: &mut Vec<usize>,
-                             touched: &mut MonoMap<()>| {
+                         g: u32,
+                         skip_lead: Option<Mono>,
+                         need_piv: &mut Vec<bool>,
+                         work: &mut Vec<usize>,
+                         touched: &mut MonoMap<()>| {
             for &m_src in &cur_supp[g as usize] {
                 let single = RPoly {
                     monos: vec![m_src],
@@ -1531,7 +1535,16 @@ pub(crate) fn compile_refutation(
         let mut pivs = Vec::with_capacity(kept_piv_idx.len());
         for (new_k, &orig_j) in kept_piv_idx.iter().enumerate() {
             let (pmult, pg, plead) = rs.piv[orig_j];
-            let plan = build_scatter_plan(ring, fp, w, pg, &cur_supp[pg as usize], pmult, plead, &c_col_of);
+            let plan = build_scatter_plan(
+                ring,
+                fp,
+                w,
+                pg,
+                &cur_supp[pg as usize],
+                pmult,
+                plead,
+                &c_col_of,
+            );
             pivot_of[plan.expected_lead as usize] = new_k as u32;
             piv_leads.push(plan.expected_lead);
             pivs.push(plan);
@@ -1705,7 +1718,12 @@ pub(crate) fn replay_compiled(
         let mut to_inv_idx: Vec<usize> = Vec::new();
         let mut to_inv_vals: Vec<u64> = Vec::new();
         for (k, plan) in st.pivs.iter().enumerate() {
-            let r = plan.eval_row(fp, &polys[plan.elem_id as usize], st.n_cols, &mut rep.muladds);
+            let r = plan.eval_row(
+                fp,
+                &polys[plan.elem_id as usize],
+                st.n_cols,
+                &mut rep.muladds,
+            );
             if r.cols.first().copied() != Some(plan.expected_lead) {
                 rep.replay_failure = Some("reducer pivot vanished or shifted");
                 return;
@@ -1760,9 +1778,12 @@ pub(crate) fn replay_compiled(
         let mut ech: Vec<(u32, Vec<u32>)> = Vec::new();
 
         for (si, sr) in st.s_rows.iter().enumerate() {
-            let row =
-                sr.plan
-                    .eval_row(fp, &polys[sr.plan.elem_id as usize], st.n_cols, &mut rep.muladds);
+            let row = sr.plan.eval_row(
+                fp,
+                &polys[sr.plan.elem_id as usize],
+                st.n_cols,
+                &mut rep.muladds,
+            );
             let mut acc = vec![0u64; st.nq];
             for (&c, &v) in row.cols.iter().zip(&row.vals) {
                 let q = st.q_of[c as usize];
@@ -2700,10 +2721,8 @@ pub(crate) fn eliminate(
                         }
                     }
                 }
-                let mut out: Vec<(Option<Vec<u64>>, bool, Vec<u32>)> = residual
-                    .iter()
-                    .map(|&x| (None, x, Vec::new()))
-                    .collect();
+                let mut out: Vec<(Option<Vec<u64>>, bool, Vec<u32>)> =
+                    residual.iter().map(|&x| (None, x, Vec::new())).collect();
                 live.retain(|&r| {
                     let row = &mut acc[r * nq..(r + 1) * nq];
                     for x in row.iter_mut() {
@@ -3756,7 +3775,7 @@ fn f4_tower_cached(
             let s_useful: Vec<UsefulRecord> = st
                 .useful
                 .iter()
-                .zip(st.useful_deps.into_iter())
+                .zip(st.useful_deps)
                 .map(|(&s_idx, (ql, used_ql))| {
                     let elem_id = if !refuted {
                         let rank = leads.binary_search(&ql).expect("useful lead in leads");
@@ -3800,15 +3819,9 @@ fn f4_tower_cached(
         }
         if refuted {
             if opts.record_trace {
-                if let Some((dag, min_steps)) = compile_refutation(
-                    ring,
-                    fp,
-                    w,
-                    &init_lms,
-                    &init_monos,
-                    &elem_monos,
-                    &rec_steps,
-                ) {
+                if let Some((dag, min_steps)) =
+                    compile_refutation(ring, fp, w, &init_lms, &init_monos, &elem_monos, &rec_steps)
+                {
                     rep.learned = Some(F4Trace {
                         steps: min_steps,
                         compiled: Some(Arc::new(dag)),
@@ -5837,11 +5850,19 @@ mod tests {
         if !parent_rep.inconsistent {
             let top_var = t - 1;
             for root in [1u64, p - 1] {
-                let (child_in, _) =
-                    ring.specialize_basis_at_var(&parent_rep.basis, top_var, root, TowerWeights::UNIT);
+                let (child_in, _) = ring.specialize_basis_at_var(
+                    &parent_rep.basis,
+                    top_var,
+                    root,
+                    TowerWeights::UNIT,
+                );
                 let r_keep = f4_tower(&child_in, &ring, &TowerF4Options::new(12));
-                let (c_ring, c_basis, _, _) =
-                    ring.specialize_drop_top_var(&parent_rep.basis, top_var, root, TowerWeights::UNIT);
+                let (c_ring, c_basis, _, _) = ring.specialize_drop_top_var(
+                    &parent_rep.basis,
+                    top_var,
+                    root,
+                    TowerWeights::UNIT,
+                );
                 let r_drop = f4_tower(&c_basis, &c_ring, &TowerF4Options::new(12));
                 assert_eq!(r_keep.inconsistent, r_drop.inconsistent);
             }
