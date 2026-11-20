@@ -12,7 +12,9 @@ new_chunk = """                // Fq2 inverse and Cardano scaling: m*conj(u)/N(u
                 let scaled = f.mul(m, f.inv(nrm));
                 let v = (f.mul(u.0, scaled), f.mul(f.neg(u.1), scaled));
                 let w = self.w2;
-                let w_2 = k.w_squared;"""
+                // Cube caches w² only when v3(|Fp²*|)>=2; small fields
+                // with s=1 still require one explicit square.
+                let w_2 = if k.s >= 2 { k.w_squared } else { k.r.sqr(w) };"""
 old_chunk = """                // 1/u = conj(u)/N(u)
                 let nrm = f.sub(f.sqr(u.0), f.mul(self.n, f.sqr(u.1)));
                 let ni = f.inv(nrm);
