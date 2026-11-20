@@ -14,7 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
-- [x] Wire the prime-field Semaev summation-polynomial root paths into the production cryptanalysis library and `ic` CLI (Codex, completed 2026-11-19, branch codex/prime-field-summation-polynomials-20261119, PR #4829)
+- [ ] Extend the production prime-field summation-polynomial lane with the next literature-backed root/certificate improvement (Codex, started 2026-11-20, branch codex/prime-field-summation-polynomials-20261119, PR #4829; initial library and `ic` integration completed 2026-11-19)
 
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
