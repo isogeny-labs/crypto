@@ -1,0 +1,171 @@
+{
+  "branch": "aburan28/youthful-hopper-hfrwkd",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "-c",
+        "setsid nohup python3 run.py main > main.out 2>&1 < /dev/null &"
+      ],
+      "cwd": "../../../tmp/claude-0/-home-user/05d5cba4-82d1-5d2e-a221-22d2307e4205/scratchpad/st_payload",
+      "exit": 0,
+      "started_utc": "2026-11-19T17:36:56+00:00",
+      "wall_s": 0.002
+    },
+    {
+      "argv": [
+        "bash",
+        "-c",
+        "setsid nohup python3 run.py main > main.out 2>&1 < /dev/null &"
+      ],
+      "cwd": "../../../tmp/claude-0/-home-user/05d5cba4-82d1-5d2e-a221-22d2307e4205/scratchpad/st_payload",
+      "exit": 0,
+      "started_utc": "2026-11-19T17:46:34+00:00",
+      "wall_s": 0.003
+    }
+  ],
+  "commit": "86825b7ab2b55e8f58e297800d0e5c2986ea243e",
+  "commit_dirty": false,
+  "created_utc": "2026-11-19T17:36:56+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/mt_st_20261119"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v653-x86_64-with-glibc2.39"
+  },
+  "id": "20261119T1736Z-mt-st-2p32-2p40",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "st_ic_over_batched_rho_2p32",
+      "note": "single target: best IC (mu 1.5-3.5) / best batched st rho (16-64 lanes), mean ms over 32 targets; median of 4 instances; Xeon 2.10 GHz [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.5967,
+        4.3544
+      ],
+      "unit": "ratio",
+      "value": 3.7885
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "st_serial_rho_over_batched_rho_2p32",
+      "note": "single target: serial rhodpup / best batched st rho; median of 4 instances; Xeon 2.10 GHz [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.6041,
+        3.1278
+      ],
+      "unit": "ratio",
+      "value": 2.8462
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "st_ic_over_batched_rho_2p36",
+      "note": "single target: best IC (mu 1.5-3.5) / best batched st rho (16-64 lanes), mean ms over 32 targets; median of 4 instances; Xeon 2.10 GHz [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.4838,
+        5.7918
+      ],
+      "unit": "ratio",
+      "value": 4.9796
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "st_serial_rho_over_batched_rho_2p36",
+      "note": "single target: serial rhodpup / best batched st rho; median of 4 instances; Xeon 2.10 GHz [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.6494,
+        3.8259
+      ],
+      "unit": "ratio",
+      "value": 2.9196
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "st_ic_over_batched_rho_2p40",
+      "note": "single target: best IC (mu 1.5-3.5) / best batched st rho (16-64 lanes), mean ms over 32 targets; median of 4 instances; Xeon 2.10 GHz [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        6.2507,
+        7.165
+      ],
+      "unit": "ratio",
+      "value": 6.9456
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 4,
+      "name": "st_serial_rho_over_batched_rho_2p40",
+      "note": "single target: serial rhodpup / best batched st rho; median of 4 instances; Xeon 2.10 GHz [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.209,
+        4.1263
+      ],
+      "unit": "ratio",
+      "value": 3.9384
+    }
+  ],
+  "problem": "mt:single-target-ic-vs-rho",
+  "raw": [
+    {
+      "bytes": 4125908,
+      "path": "research/mt_st_20261119/results/main/runs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/db/db099c571911ddcfff61aede52978d9db8fe412736abda9f05e49c933dbf3e69",
+      "sha256": "db099c571911ddcfff61aede52978d9db8fe412736abda9f05e49c933dbf3e69",
+      "uploaded": false
+    },
+    {
+      "bytes": 3526,
+      "path": "research/mt_st_20261119/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/05/05ea855f57eea875e9e2912eb912c66db71191797d6bd867d5c70ef4a7a8727e",
+      "sha256": "05ea855f57eea875e9e2912eb912c66db71191797d6bd867d5c70ef4a7a8727e",
+      "uploaded": false
+    },
+    {
+      "bytes": 1583,
+      "path": "research/mt_st_20261119/check.out",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2e/2e4999283bf6e1e0228ce44aa3e4d6e23c8948cb3e42f360e6a5f47d882b7aa5",
+      "sha256": "2e4999283bf6e1e0228ce44aa3e4d6e23c8948cb3e42f360e6a5f47d882b7aa5",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "mt-st-2p32-2p40",
+  "status": "open",
+  "summary": "",
+  "validation": null
+}

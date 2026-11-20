@@ -118,7 +118,6 @@ struct Mid2 {
 #[derive(Clone, Copy)]
 // A transient Copy value on the Cantor-addition hot path: boxing `Mid` would
 // allocate once per addition, so the size difference is accepted.
-#[allow(clippy::large_enum_variant)]
 enum Stage1 {
     Done(JDiv),
     Mid(Mid1),
