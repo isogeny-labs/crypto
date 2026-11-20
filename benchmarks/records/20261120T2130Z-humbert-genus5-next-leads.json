@@ -21,6 +21,16 @@
       "exit": 0,
       "started_utc": "2026-11-20T21:34:58+00:00",
       "wall_s": 731.692
+    },
+    {
+      "argv": [
+        "research/humbert_genus5_cover_20261021/next_leads_20261120/run_v7.sh",
+        "research/humbert_genus5_cover_20261021/next_leads_20261120/campaign/q32003"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-20T21:47:09+00:00",
+      "wall_s": 919.598
     }
   ],
   "commit": "92496baf1e03749442aef0c2bb76344f1f3cdd61",
@@ -38,9 +48,137 @@
     "platform": "Linux-6.18.44-fc-v726-x86_64-with-glibc2.39"
   },
   "id": "20261120T2130Z-humbert-genus5-next-leads",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "t_ic_best_ic_over_matched_rho_q32003",
+      "note": "d35 per-instance median, rho_m expected time (4 threads, batch 64, Barrett, negation); 1.68 / 1.19 at q=16001/24001; actual-time ratio 1.19",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.769
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 15,
+      "name": "t_setup_fast_over_base_median",
+      "note": "SETUP_FAST, counted identical 30/30",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.044,
+        0.08
+      ],
+      "unit": "ratio",
+      "value": 0.06
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 5,
+      "name": "t_ic_comb7_over_comb6_q32003",
+      "note": "setup lever, paired",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.687,
+        0.849
+      ],
+      "unit": "ratio",
+      "value": 0.786
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 5,
+      "name": "t_ic_d30_over_comb7_q32003",
+      "note": "factor-base rebalance dlpf alpha 0.3 vs 0.5",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.733,
+        0.88
+      ],
+      "unit": "ratio",
+      "value": 0.827
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 15,
+      "name": "rho_m_over_rho_s_steps_per_sec",
+      "note": "matched vs scalar rho throughput",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        12.6,
+        15.1
+      ],
+      "unit": "ratio",
+      "value": 14.2
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 15,
+      "name": "rho_s_capped_runs",
+      "note": "scalar rho hit 2e8 step cap; expected time from throughput unaffected",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 7.0
+    }
+  ],
   "problem": "ic:humbert-genus5-toy",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 79500,
+      "path": "research/humbert_genus5_cover_20261021/next_leads_20261120/campaign/q16001/results/v7.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a4/a4ad5b0649e20399035c7b3e48f0f156aabc7cc45f67219da89a4816e2e4e88c",
+      "sha256": "a4ad5b0649e20399035c7b3e48f0f156aabc7cc45f67219da89a4816e2e4e88c",
+      "uploaded": false
+    },
+    {
+      "bytes": 79987,
+      "path": "research/humbert_genus5_cover_20261021/next_leads_20261120/campaign/q24001/results/v7.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/24/24374eb4b695b52c1bb7d58e49e5385eb7264a43f68bbd9ee0077fdf4be9528b",
+      "sha256": "24374eb4b695b52c1bb7d58e49e5385eb7264a43f68bbd9ee0077fdf4be9528b",
+      "uploaded": false
+    },
+    {
+      "bytes": 80197,
+      "path": "research/humbert_genus5_cover_20261021/next_leads_20261120/campaign/q32003/results/v7.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a3/a32ba649b320386aeed0e7872737371baf2b503cc96711dee1d4185c0feff088",
+      "sha256": "a32ba649b320386aeed0e7872737371baf2b503cc96711dee1d4185c0feff088",
+      "uploaded": false
+    },
+    {
+      "bytes": 1924,
+      "path": "research/humbert_genus5_cover_20261021/next_leads_20261120/results/ratios_v7.csv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2e/2e97310ca416c8778050a86f130b340fd1cba1c7d0572e25b44aebc287dc030b",
+      "sha256": "2e97310ca416c8778050a86f130b340fd1cba1c7d0572e25b44aebc287dc030b",
+      "uploaded": false
+    },
+    {
+      "bytes": 3101,
+      "path": "research/humbert_genus5_cover_20261021/next_leads_20261120/results/phases_v7.csv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a3/a3d47fae8f2f25dd24800160a08884f656386a3444d89f23cb945393bfe5ddf6",
+      "sha256": "a3d47fae8f2f25dd24800160a08884f656386a3444d89f23cb945393bfe5ddf6",
+      "uploaded": false
+    },
+    {
+      "bytes": 180,
+      "path": "research/humbert_genus5_cover_20261021/next_leads_20261120/results/band_v7.csv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/dd/dd9d9cd14aff84813055b8e99b8c16f32b6896846ca69c17277a26e779f96b98",
+      "sha256": "dd9d9cd14aff84813055b8e99b8c16f32b6896846ca69c17277a26e779f96b98",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
     "pdf": null,

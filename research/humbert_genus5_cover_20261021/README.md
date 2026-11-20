@@ -99,3 +99,14 @@ before data: all solved, and the counted fields are identical to the flag-free i
 32003. The relation phase ran at 0.042× and the LA phase at 0.29× [pcc:unverified] (L0). With
 relations cheap, lp ties dlpf, and excess with safe clique removal gives no measurable gain.
 Report: `levers_20261116/REPORT.pdf`.
+
+## Next leads and a matched rho (2026-11-20, `next_leads_20261120/`)
+
+Faster setup (`HUMBERT_SETUP_FAST`), a factor-base re-balance and a matched multi-thread rho
+(`HUMBERT_RHO_*`: distinguished points, 64 batched affine walks per thread, Barrett K4, negation map)
+were built and independently verified in workflow `wf_51f8d293-995`. The campaign was 150 runs under
+a protocol frozen before data. Setup is 0.06× and counted identical; dlpf at alpha 0.3 is 0.83× of
+alpha 0.5 at q = 32003. The matched rho runs at about 14× the scalar rho's steps per second.
+Against it, the best IC arm takes 1.68, 1.19 and 0.77 of rho's expected time at q = 16001, 24001
+and 32003 [pcc:unverified] (L0). The earlier "below rho" ratios of 0.04–0.36 were measured against
+a weak scalar rho and are superseded. Report: `next_leads_20261120/REPORT.pdf`.
