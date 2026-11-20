@@ -20,7 +20,6 @@ jobs:
           filter: blob:none
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Pull store data this workflow reads (tools/artifacts)
-        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:

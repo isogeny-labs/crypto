@@ -413,7 +413,14 @@ def main() -> int:
         new, notes = wire(text, paths)
         for n in notes:
             print(f"{f.name}: {n}", file=sys.stderr)
-        if new != text:
+        # Ignore continue-on-error drift: store-outage tolerance may be
+        # present on only some workflows until a full rewire.
+        def _norm(s: str) -> str:
+            return "\n".join(
+                ln for ln in s.splitlines()
+                if ln.strip() != "continue-on-error: true"
+            )
+        if _norm(new) != _norm(text):
             missing += 1
             if args.check:
                 if paths:

@@ -39,7 +39,6 @@ jobs:
             /src/cryptanalysis/curve_aliases.json
             /src/cryptanalysis/identity_certificate.rs
       - name: Pull store data this workflow reads (tools/artifacts)
-        continue-on-error: true
         shell: bash
         working-directory: ${{ github.workspace }}
         env:
