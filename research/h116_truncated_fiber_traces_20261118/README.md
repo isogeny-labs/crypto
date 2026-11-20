@@ -638,3 +638,13 @@ exact rule.  Three new Lean identities raise the audited proof surface to 236
 theorems.  The next lead tests characters of pairwise resultants between these
 residual quadratics, retaining mutual branch-divisor geometry.
 [pcc:unverified]
+
+The [pairwise branch-resultant test](CHIRAL_BRANCH_RESULTANT_PARITY_EXPERIMENT.md)
+then retains norms of cross-differences between residual branch pairs.  All
+42,560 Sylvester and common-root controls pass, and the tuple distinguishes
+every target from its negation, but the best frozen rule is only 799/1,482
+with `p=0.550891` and no exact rule.  Three Lean resultant identities raise
+the audited surface to 239 theorems.  The next lead forms auxiliary genus-one
+quartics from selected branch pairs and tests their Frobenius traces modulo
+three, retaining cross-ratio geometry beyond norm characters.
+[pcc:unverified]

@@ -549,6 +549,32 @@ theorem linearQuadratic_discriminant_factorization (x q0 q1 : K) :
       (x ^ 2 + q1 * x + q0) ^ 2 * (q1 ^ 2 - 4 * q0) := by
   ring
 
+/-- Closed formula for the Sylvester resultant of two monic quadratics.  The
+right side is the determinant after subtracting the first Sylvester row block
+from the second. -/
+theorem monicQuadratic_resultant_closed (a b c d : K) :
+    (d - b) ^ 2 + (a - c) * (a * d - b * c) =
+      (d - b) ^ 2 - a * (c - a) * (d - b) + b * (c - a) ^ 2 := by
+  ring
+
+/-- The monic-quadratic resultant formula is symmetric, since both degrees are
+even. -/
+theorem monicQuadratic_resultant_symm (a b c d : K) :
+    (d - b) ^ 2 + (a - c) * (a * d - b * c) =
+      (b - d) ^ 2 + (c - a) * (c * b - d * a) := by
+  ring
+
+/-- A common root forces the closed monic-quadratic resultant to vanish. -/
+theorem monicQuadratic_resultant_zero_of_commonRoot (a b c d r : K)
+    (hf : r ^ 2 + a * r + b = 0) (hg : r ^ 2 + c * r + d = 0) :
+    (d - b) ^ 2 + (a - c) * (a * d - b * c) = 0 := by
+  have hb : b = -(r ^ 2 + a * r) := by
+    linear_combination hf
+  have hd : d = -(r ^ 2 + c * r) := by
+    linear_combination hg
+  rw [hb, hd]
+  ring
+
 /-- The shared normalized at-infinity series before subtracting the target
 coordinate. Under the remaining geometric bridge it represents `S(x)/x` at
 `w=1/x`. -/
@@ -4967,6 +4993,9 @@ theorem fixedPoint_frobeniusCocycle_zero
 #print axioms chiralBranchResidual_discriminant_closed
 #print axioms chiralBranchResidual_negationSwap
 #print axioms linearQuadratic_discriminant_factorization
+#print axioms monicQuadratic_resultant_closed
+#print axioms monicQuadratic_resultant_symm
+#print axioms monicQuadratic_resultant_zero_of_commonRoot
 #print axioms fiberDenominatorSeries_eq_normalizedMap_sub_linear
 #print axioms fiberDenominatorSeries_sub
 #print axioms bostanDenominatorsNonzero
