@@ -14,7 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
-- [ ] Representation technique (Delaplace–May 2019 / DFKM 2020) in `ic bench`: results, lead specs, report and bench records for (a) descent m=4 split, (b) `rep-join`, (c) `fp2` regime (code in cryptanalysis #1877) under `research/representation_join_ic_20261120` (Claude Code, started 2026-11-20, branch claude/representation-join-ic-results-20261120) [pcc:unverified]
+- [x] Representation technique (Delaplace–May 2019 / DFKM 2020) in `ic bench`: results, lead specs, report and bench records for (a) descent m=4 split, (b) `rep-join`, (c) `fp2` regime (code in cryptanalysis #1877) under `research/representation_join_ic_20261120` (Claude Code, completed 2026-11-20, branch claude/representation-join-ic-results-20261120, PR #4840; (b) both rep-join leads FAIL phase 1, (a) no cheaper relation at l'=4..13, (c) fp2-weil 7x-284x over table mitm but S/rho 13->61) [pcc:unverified]
 
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
