@@ -1,0 +1,12 @@
+{
+  "schema": "xedni-local-residue-protocol-v1",
+  "source": "../xedni_coefficient_choice_20261120/source-rows-v2.jsonl.gz",
+  "source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "input": "the 42 ordered pairs with P1+2P2=O on the fixed order-43 E(F_47), centered integer lifts",
+  "primes_and_order_gates": [{"prime": 7, "order": 4}, {"prime": 11, "order": 6}, {"prime": 11, "order": 7}],
+  "coefficient_space": "all residue tuples (a1,a2,a3,a4,a6) in F_p^5 satisfying both lifted-point equations; enumerate a1,a2,a3, solve unique a4,a6 when x1!=x2, otherwise enumerate a4 and solve a6 when the equations agree",
+  "gates": "good reduction, two-row point-incidence rank 2, and exact curve order; count local P1+2P2=O among gate-passing residues",
+  "record": "per source pair and prime/order arm: every candidate-status count, first lexicographic gate witness, first gate-and-relation witness, complete stream SHA-256",
+  "claim_boundary": "finite local necessary-condition census; residue choices at distinct primes are independent here and global rational coefficient realizability is not asserted",
+  "resource": "complete F7 and F11 residue enumeration on 42 frozen pairs; exact arithmetic, no wall-time comparison"
+}
