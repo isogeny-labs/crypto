@@ -11453,9 +11453,15 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             g_jumps: true,
             grow: 2,
         };
-        // With `sib` the jump pool has `pool` points (up to 512), outside
+        // With `sib` the jump *alphabet* has `pool` points (up to 512), outside
         // the plain walk's jump range; the range is checked on `pool` below.
-        let plan_jumps = if sib.is_some() { 16 } else { jumps };
+        // Table size T is planned from the caller's `jumps` (same as a plain
+        // tw2l walk): previously this was hard-coded to 16 whenever `sib` was
+        // set, so `jumps=` was ignored for planning and the walk overran a
+        // longer table than the non-sib arm with the same `x`/`jumps`. Keeping
+        // the product pool at `pool` preserves the sibling walk's jump
+        // identity; honouring `jumps` for T is the setup amortization.
+        let plan_jumps = jumps;
         let (t, t_max, w, bound) = wwalk_plan_check_bits(r, x, plan_jumps, opts, TW_COEF_BITS)?;
         let (jumps, cheap) = match sib {
             None => (jumps, cheap),
@@ -14179,12 +14185,25 @@ fn collect_and_solve_relations_scaled_touching<
     // walk bit-identical trajectories and differ in exactly one thing:
     // the offsets they paid for.  `walk_pool_ops` reports that cost, so
     // the difference between the arms is checkable rather than argued.
+    //
+    // The sixteen walk jumps follow the same lazy-charge rule (§14): their
+    // `(a, b)` coefficients are drawn up front (so the RNG stream — and
+    // every later walk start — stays bit-identical), but the scalar
+    // multiplications that build the points run on first index into the
+    // jump table.  A TargetWalk / wwalk prepare that already emits full-
+    // rank free rows pins `d` on the first trial without ever taking a
+    // walk step, so those sixteen `[a]G+[b]Q` multiplications are never
+    // charged.  That is the cold-E2E setup amort that closes the ~0.9×
+    // relation-phase gap against `targets=stride-generator` while keeping
+    // `targets=walk` when a probe is still needed.
     let jump_count = 16usize;
     let pool_count = 16usize;
     let shared_jumps = targets == TargetSource::WalkSharedJumps;
     let guarded = targets.is_guarded();
     let defer_guard = targets == TargetSource::StrideRenewDeferredGuard;
     let mut jumps: Vec<(G::Elt, u64, u64)> = Vec::new();
+    let mut jump_coefs: Vec<(u64, u64)> = Vec::new();
+    let mut jumps_ready = false;
     let mut pool: Vec<(G::Elt, u64, u64)> = Vec::new();
     let mut pool_rng = StdRng::seed_from_u64(seed ^ 0x504F_4F4C_5F4F_4646);
     let mut pool_ops = GroupOps::default();
@@ -14203,6 +14222,7 @@ fn collect_and_solve_relations_scaled_touching<
     let mut segment_steps = 0u64;
     let (mut walk_steps, mut walk_restarts, mut repeats_skipped, mut guard_probes, mut walk_jumps) =
         (0u64, 0u64, 0u64, 0u64, 0u64);
+    let mut walk_jumps_materialised = 0u64;
     let lane_config = match targets {
         TargetSource::WalkPrimeLanes { lanes, batched } => Some((lanes as usize, batched)),
         _ => None,
@@ -14274,16 +14294,13 @@ fn collect_and_solve_relations_scaled_touching<
         }
     }
     if targets.is_walk() {
-        jumps = draw_jumps(
-            g,
-            generator,
-            target,
-            r,
-            &mut rng,
-            &mut rel.group_ops,
-            jump_count,
-            &mut scale,
-        );
+        // Coefficients now; points on first use (see §14 above).
+        jump_coefs.reserve(jump_count);
+        for _ in 0..jump_count {
+            let aj = scale_coeff(&mut scale, rng.gen_range(1..r), r);
+            let bj = rng.gen_range(1..r);
+            jump_coefs.push((aj, bj));
+        }
         walk_jumps += jump_count as u64;
         rng_draws += 2 * jump_count as u64;
         if !shared_jumps && pool_mode == RestartPool::Eager {
@@ -14348,6 +14365,16 @@ fn collect_and_solve_relations_scaled_touching<
                 } else {
                     let j =
                         lane.permutation[((mix(g.key(&lane.point)) >> 24) as usize) % jump_count];
+                    if !jumps_ready {
+                        jumps.reserve(jump_coefs.len());
+                        for &(aj, bj) in &jump_coefs {
+                            let ag = g.mul(&mut rel.group_ops, generator, aj);
+                            let bq = g.mul(&mut rel.group_ops, target, bj);
+                            jumps.push((g.add(&mut rel.group_ops, ag, bq), aj, bj));
+                        }
+                        walk_jumps_materialised = jump_coefs.len() as u64;
+                        jumps_ready = true;
+                    }
                     let (jump, aj, bj) = jumps[j];
                     lane_requests.push((index, lane.point, jump, j));
                     lane.a = addmod(lane.a, aj, r);
@@ -14456,6 +14483,16 @@ fn collect_and_solve_relations_scaled_touching<
                 } else {
                     let hsh = mix(g.key(&walk_point));
                     let j = jump_perm[((hsh >> 24) as usize) % jump_count];
+                    if !jumps_ready {
+                        jumps.reserve(jump_coefs.len());
+                        for &(aj, bj) in &jump_coefs {
+                            let ag = g.mul(&mut rel.group_ops, generator, aj);
+                            let bq = g.mul(&mut rel.group_ops, target, bj);
+                            jumps.push((g.add(&mut rel.group_ops, ag, bq), aj, bj));
+                        }
+                        walk_jumps_materialised = jump_coefs.len() as u64;
+                        jumps_ready = true;
+                    }
                     let (jp, aj, bj) = jumps[j];
                     walk_point = if let Some(add) = native_walk.as_mut() {
                         native_walk_calls += 1;
@@ -14711,6 +14748,7 @@ fn collect_and_solve_relations_scaled_touching<
     }
     if targets.is_walk() {
         rel.count("walk_jumps", walk_jumps + pool.len() as u64);
+        rel.count("walk_jumps_materialised", walk_jumps_materialised);
         rel.count("walk_pool_offsets", pool.len() as u64);
         rel.count("walk_pool_ops", pool_ops.adds + pool_ops.doubles);
         rel.count("walk_pool_restarts", pool_taken);
