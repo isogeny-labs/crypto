@@ -63,6 +63,7 @@ mod frozen {
             prym_residues: [[i8; FEATURES]; OBSERVABLES],
             splitting_bits: [i8; 2 * FEATURES],
             eigenline_bits: [i8; 2 * FEATURES],
+            factor_types: [i8; 2 * FEATURES],
         }
 
         struct Rule {
@@ -274,6 +275,198 @@ mod frozen {
             }))
         }
 
+        fn trim_poly(poly: &mut Vec<i64>, modulus: i64) {
+            for coefficient in poly.iter_mut() {
+                *coefficient = coefficient.rem_euclid(modulus);
+            }
+            while poly.len() > 1 && poly.last() == Some(&0) {
+                poly.pop();
+            }
+        }
+
+        fn poly_mul(left: &[i64], right: &[i64], modulus: i64) -> Vec<i64> {
+            let mut product = vec![0_i64; left.len() + right.len() - 1];
+            for (left_degree, &left_coefficient) in left.iter().enumerate() {
+                for (right_degree, &right_coefficient) in right.iter().enumerate() {
+                    let degree = left_degree + right_degree;
+                    product[degree] = (product[degree]
+                        + left_coefficient * right_coefficient)
+                        .rem_euclid(modulus);
+                }
+            }
+            trim_poly(&mut product, modulus);
+            product
+        }
+
+        fn poly_eval(poly: &[i64], value: i64, modulus: i64) -> i64 {
+            poly.iter().rev().fold(0_i64, |accumulator, &coefficient| {
+                (accumulator * value + coefficient).rem_euclid(modulus)
+            })
+        }
+
+        fn poly_div_monic(
+            dividend: &[i64],
+            divisor: &[i64],
+            modulus: i64,
+        ) -> Option<Vec<i64>> {
+            if divisor.len() <= 1 || divisor.last()?.rem_euclid(modulus) != 1 {
+                return None;
+            }
+            let mut remainder = dividend.to_vec();
+            trim_poly(&mut remainder, modulus);
+            if remainder.len() < divisor.len() {
+                return None;
+            }
+            let mut quotient = vec![0_i64; remainder.len() - divisor.len() + 1];
+            while remainder.len() >= divisor.len() && remainder != [0] {
+                let shift = remainder.len() - divisor.len();
+                let leading = *remainder.last()?;
+                quotient[shift] = leading;
+                for (degree, &coefficient) in divisor.iter().enumerate() {
+                    let index = shift + degree;
+                    remainder[index] =
+                        (remainder[index] - leading * coefficient).rem_euclid(modulus);
+                }
+                trim_poly(&mut remainder, modulus);
+            }
+            if remainder == [0] {
+                trim_poly(&mut quotient, modulus);
+                Some(quotient)
+            } else {
+                None
+            }
+        }
+
+        fn monic_polynomials(degree: usize, modulus: i64) -> Vec<Vec<i64>> {
+            let count = (0..degree).fold(1_i64, |accumulator, _| accumulator * modulus);
+            let mut polynomials = Vec::with_capacity(count as usize);
+            for mut code in 0..count {
+                let mut polynomial = Vec::with_capacity(degree + 1);
+                for _ in 0..degree {
+                    polynomial.push(code % modulus);
+                    code /= modulus;
+                }
+                polynomial.push(1);
+                polynomials.push(polynomial);
+            }
+            polynomials
+        }
+
+        fn poly_is_irreducible(poly: &[i64], modulus: i64) -> bool {
+            let degree = poly.len() - 1;
+            if degree <= 1 {
+                return true;
+            }
+            for divisor_degree in 1..=degree / 2 {
+                for divisor in monic_polynomials(divisor_degree, modulus) {
+                    if poly_div_monic(poly, &divisor, modulus).is_some() {
+                        return false;
+                    }
+                }
+            }
+            true
+        }
+
+        fn prym_weil_polynomial(
+            prym_trace: i64,
+            prym_eta: i64,
+            p: i64,
+            auxiliary_prime: i64,
+        ) -> Vec<i64> {
+            vec![p * p, -p * prym_trace, prym_eta, -prym_trace, 1]
+                .into_iter()
+                .map(|coefficient| coefficient.rem_euclid(auxiliary_prime))
+                .collect()
+        }
+
+        fn prym_factor_type(
+            prym_trace: i64,
+            prym_eta: i64,
+            p: i64,
+            auxiliary_prime: i64,
+        ) -> Result<(i8, usize), String> {
+            let original =
+                prym_weil_polynomial(prym_trace, prym_eta, p, auxiliary_prime);
+            let mut remaining = original.clone();
+            let mut factors = Vec::<Vec<i64>>::new();
+            while remaining.len() > 1 {
+                if poly_is_irreducible(&remaining, auxiliary_prime) {
+                    factors.push(remaining);
+                    break;
+                }
+                let degree = remaining.len() - 1;
+                let mut found = None;
+                'candidate: for divisor_degree in 1..=degree / 2 {
+                    for divisor in monic_polynomials(divisor_degree, auxiliary_prime) {
+                        if !poly_is_irreducible(&divisor, auxiliary_prime) {
+                            continue;
+                        }
+                        if let Some(quotient) =
+                            poly_div_monic(&remaining, &divisor, auxiliary_prime)
+                        {
+                            found = Some((divisor, quotient));
+                            break 'candidate;
+                        }
+                    }
+                }
+                let (factor, quotient) =
+                    found.ok_or("Prym quartic factorization failed")?;
+                factors.push(factor);
+                remaining = quotient;
+            }
+            let mut reconstructed = vec![1_i64];
+            for factor in &factors {
+                if !poly_is_irreducible(factor, auxiliary_prime) {
+                    return Err("Prym factor irreducibility control failed".to_string());
+                }
+                reconstructed = poly_mul(&reconstructed, factor, auxiliary_prime);
+            }
+            if reconstructed != original {
+                return Err("Prym factor reconstruction control failed".to_string());
+            }
+            let mut degrees: Vec<usize> = factors.iter().map(|factor| factor.len() - 1).collect();
+            degrees.sort_unstable();
+            let factor_type = match degrees.as_slice() {
+                [1, 1, 1, 1] => 0,
+                [1, 1, 2] => 1,
+                [1, 3] => 2,
+                [2, 2] => 3,
+                [4] => 4,
+                _ => return Err("unexpected Prym quartic degree partition".to_string()),
+            };
+            Ok((factor_type, factors.len()))
+        }
+
+        fn transport_predictions(
+            labels: &[u8],
+            group_ids: &[usize],
+            curve_ids: &[usize],
+            group_count: usize,
+            curve_count: usize,
+        ) -> Vec<u8> {
+            let mut global = vec![[0_usize; 2]; group_count];
+            let mut local = vec![[0_usize; 2]; group_count * curve_count];
+            for ((&label, &group), &curve) in labels.iter().zip(group_ids).zip(curve_ids) {
+                global[group][label as usize] += 1;
+                local[curve * group_count + group][label as usize] += 1;
+            }
+            labels
+                .iter()
+                .enumerate()
+                .map(|(index, _)| {
+                    let group = group_ids[index];
+                    let curve = curve_ids[index];
+                    let zeroes = global[group][0] - local[curve * group_count + group][0];
+                    let ones = global[group][1] - local[curve * group_count + group][1];
+                    match zeroes.cmp(&ones) {
+                        Ordering::Greater => 0,
+                        Ordering::Less => 1,
+                        Ordering::Equal => 3,
+                    }
+                })
+                .collect()
+        }
+
         fn binary_prediction(
             target: &Target,
             eigenline_panel: bool,
@@ -382,6 +575,7 @@ mod frozen {
                 prym_residues: [[1, 0, 0, 0], [2, 0, 0, 0]],
                 splitting_bits: [1, 0, 0, 0, 0, 0, 0, 0],
                 eigenline_bits: [0, 1, 0, 0, 0, 0, 0, 0],
+                factor_types: [0, 1, 2, 3, 4, 0, 1, 2],
             };
             assert_eq!(prediction(&planted, false, 0, &[1, 0, 0, 0], 0), 1);
             assert_eq!(prediction(&planted, false, 1, &[2, 0, 0, 0], 0), 1);
@@ -393,6 +587,10 @@ mod frozen {
             assert_eq!(splitting_bit(0, 5), -1);
             assert_eq!(prym_weil_value(0, 0, 1, 1, 5), 2);
             assert_eq!(prym_eigenline_bit(0, 2, 1, 5), 1);
+            assert_eq!(poly_mul(&[1, 1], &[4, 1], 5), vec![4, 0, 1]);
+            assert_eq!(poly_div_monic(&[4, 0, 1], &[1, 1], 5), Some(vec![4, 1]));
+            assert!(poly_is_irreducible(&[2, 0, 1], 5));
+            assert_eq!(prym_factor_type(0, 2, 1, 5)?, (0, 4));
             println!(
                 "h116 chiral genus-three zeta2 digit selftest: pass ternary_rules=486 binary_rules=512"
             );
@@ -400,23 +598,27 @@ mod frozen {
         }
 
         pub fn run(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, false, false, false, false)
+            run_with_panel(output_path, false, false, false, false, false)
         }
 
         pub fn run_prym(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, true, false, false, false)
+            run_with_panel(output_path, true, false, false, false, false)
         }
 
         pub fn run_prym_oos(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, true, true, false, false)
+            run_with_panel(output_path, true, true, false, false, false)
         }
 
         pub fn run_prym_splitting(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, true, false, true, false)
+            run_with_panel(output_path, true, false, true, false, false)
         }
 
         pub fn run_prym_eigenline(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, true, false, false, true)
+            run_with_panel(output_path, true, false, false, true, false)
+        }
+
+        pub fn run_prym_factor_type(output_path: &Path) -> Result<(), String> {
+            run_with_panel(output_path, true, false, false, false, true)
         }
 
         fn run_with_panel(
@@ -425,9 +627,14 @@ mod frozen {
             oos_panel: bool,
             splitting_panel: bool,
             eigenline_panel: bool,
+            factorization_panel: bool,
         ) -> Result<(), String> {
-            if splitting_panel && eigenline_panel {
-                return Err("binary panel flags are mutually exclusive".to_string());
+            if usize::from(splitting_panel)
+                + usize::from(eigenline_panel)
+                + usize::from(factorization_panel)
+                > 1
+            {
+                return Err("specialized panel flags are mutually exclusive".to_string());
             }
             let binary_panel = splitting_panel || eigenline_panel;
             let mut targets = Vec::new();
@@ -454,6 +661,11 @@ mod frozen {
             let mut prym_eigenline_polynomial_checks = 0_usize;
             let mut prym_eigenline_quotient_checks = 0_usize;
             let mut prym_eigenline_distinguishing_targets = 0_usize;
+            let mut prym_factor_type_checks = 0_usize;
+            let mut prym_factor_irreducibility_checks = 0_usize;
+            let mut prym_factor_evaluation_checks = 0_usize;
+            let mut prym_factor_type_distinguishing_targets = 0_usize;
+            let mut prym_factor_type_histogram = [0_usize; 5];
 
             let curve_specs: &[CurveSpec] = if oos_panel { &OOS_CURVES } else { &CURVES };
             for &spec in curve_specs {
@@ -713,6 +925,38 @@ mod frozen {
                                 }
                                 prym_eigenline_quotient_checks += 1;
                             }
+                            let polynomial = prym_weil_polynomial(
+                                prym_trace,
+                                prym_eta,
+                                spec.p as i64,
+                                auxiliary_prime,
+                            );
+                            for value in 0..auxiliary_prime {
+                                if poly_eval(&polynomial, value, auxiliary_prime)
+                                    != prym_weil_value(
+                                        prym_trace,
+                                        prym_eta,
+                                        spec.p as i64,
+                                        value,
+                                        auxiliary_prime,
+                                    )
+                                {
+                                    return Err(
+                                        "Prym generic/specialized evaluation control failed"
+                                            .to_string(),
+                                    );
+                                }
+                                prym_factor_evaluation_checks += 1;
+                            }
+                            let (factor_type, irreducible_factors) = prym_factor_type(
+                                prym_trace,
+                                prym_eta,
+                                spec.p as i64,
+                                auxiliary_prime,
+                            )?;
+                            prym_factor_type_histogram[factor_type as usize] += 1;
+                            prym_factor_irreducibility_checks += irreducible_factors;
+                            prym_factor_type_checks += 1;
                         }
                         prym_factor_checks += 1;
                         newton_checks += 1;
@@ -735,12 +979,14 @@ mod frozen {
                     let mut prym_residues = [[-1_i8; FEATURES]; OBSERVABLES];
                     let mut splitting_bits = [-1_i8; 2 * FEATURES];
                     let mut eigenline_bits = [-1_i8; 2 * FEATURES];
+                    let mut factor_types = [-1_i8; 2 * FEATURES];
                     let mut s2_distinguished = false;
                     let mut e2_distinguished = false;
                     let mut prym_eta_distinguished = false;
                     let mut prym_discriminant_distinguished = false;
                     let mut prym_splitting_distinguished = false;
                     let mut prym_eigenline_distinguished = false;
+                    let mut prym_factor_type_distinguished = false;
                     for multiplier in 1..=2_u64 {
                         let multiple = base_curve.scalar_mul(multiplier, target_point)?;
                         let (x, y) = point_base_coordinates(&base_field, multiple)?;
@@ -767,6 +1013,13 @@ mod frozen {
                                         spec.p as i64,
                                         auxiliary_prime,
                                     );
+                                factor_types[2 * feature + auxiliary_index] = prym_factor_type(
+                                    data.prym_trace,
+                                    data.prym_eta,
+                                    spec.p as i64,
+                                    auxiliary_prime,
+                                )?
+                                .0;
                             }
                             smooth_feature_checks += 1;
                         }
@@ -789,6 +1042,14 @@ mod frozen {
                                         spec.p as i64,
                                         auxiliary_prime,
                                     );
+                                factor_types[2 * (feature + 1) + auxiliary_index] =
+                                    prym_factor_type(
+                                        data.prym_trace,
+                                        data.prym_eta,
+                                        spec.p as i64,
+                                        auxiliary_prime,
+                                    )?
+                                    .0;
                             }
                             smooth_feature_checks += 1;
                         }
@@ -821,6 +1082,19 @@ mod frozen {
                                     spec.p as i64,
                                     auxiliary_prime,
                                 );
+                                prym_factor_type_distinguished |= prym_factor_type(
+                                    plus.prym_trace,
+                                    plus.prym_eta,
+                                    spec.p as i64,
+                                    auxiliary_prime,
+                                )?
+                                .0 != prym_factor_type(
+                                    minus.prym_trace,
+                                    minus.prym_eta,
+                                    spec.p as i64,
+                                    auxiliary_prime,
+                                )?
+                                .0;
                             }
                         }
 
@@ -840,6 +1114,8 @@ mod frozen {
                         usize::from(prym_splitting_distinguished);
                     prym_eigenline_distinguishing_targets +=
                         usize::from(prym_eigenline_distinguished);
+                    prym_factor_type_distinguishing_targets +=
+                        usize::from(prym_factor_type_distinguished);
                     let index = targets.len();
                     targets.push(Target {
                         slug: spec.slug.to_string(),
@@ -849,6 +1125,7 @@ mod frozen {
                         prym_residues,
                         splitting_bits,
                         eigenline_bits,
+                        factor_types,
                     });
                     rows.entry(spec.slug.to_string()).or_default().push(index);
                 }
@@ -862,7 +1139,7 @@ mod frozen {
             if chirality_swap_checks != 2 * expected_targets {
                 return Err("chirality swap census failed".to_string());
             }
-            let labels: Vec<u8> = if binary_panel {
+            let labels: Vec<u8> = if binary_panel || factorization_panel {
                 targets.iter().map(|target| target.parity).collect()
             } else {
                 targets.iter().map(|target| target.digit).collect()
@@ -871,6 +1148,197 @@ mod frozen {
                 != expected_targets
             {
                 return Err("planted scorer control failed".to_string());
+            }
+
+            if factorization_panel {
+                let mut group_map = BTreeMap::<[i8; 2 * FEATURES], usize>::new();
+                let mut group_ids = Vec::with_capacity(expected_targets);
+                for target in &targets {
+                    let next_group = group_map.len();
+                    let group = *group_map
+                        .entry(target.factor_types)
+                        .or_insert(next_group);
+                    group_ids.push(group);
+                }
+                let group_count = group_map.len();
+                let curve_map: BTreeMap<String, usize> = rows
+                    .keys()
+                    .enumerate()
+                    .map(|(index, slug)| (slug.clone(), index))
+                    .collect();
+                let curve_ids: Vec<usize> = targets
+                    .iter()
+                    .map(|target| curve_map[&target.slug])
+                    .collect();
+
+                let mut group_label_counts = vec![[0_usize; 2]; group_count];
+                for (&group, &label) in group_ids.iter().zip(&labels) {
+                    group_label_counts[group][label as usize] += 1;
+                }
+                let conflicting_groups = group_label_counts
+                    .iter()
+                    .filter(|counts| counts[0] > 0 && counts[1] > 0)
+                    .count();
+                let conflicting_targets: usize = group_label_counts
+                    .iter()
+                    .filter(|counts| counts[0] > 0 && counts[1] > 0)
+                    .map(|counts| counts[0] + counts[1])
+                    .sum();
+                let in_sample_lookup_matches: usize = group_label_counts
+                    .iter()
+                    .map(|counts| counts[0].max(counts[1]))
+                    .sum();
+
+                let predictions = transport_predictions(
+                    &labels,
+                    &group_ids,
+                    &curve_ids,
+                    group_count,
+                    expected_curves,
+                );
+                let (coverage, matches) = score(&predictions, &labels);
+                let selected_statistic = binary_statistic(matches, coverage);
+                let total_exact_rules =
+                    usize::from(coverage == expected_targets && matches == expected_targets);
+                let covered_exact_rules = usize::from(coverage > 0 && matches == coverage);
+
+                let mut exceedances = 0_usize;
+                for replicate in 0..REPLICATES {
+                    let mut shuffled = vec![0_u8; expected_targets];
+                    for (slug, indices) in &rows {
+                        let mut values: Vec<u8> =
+                            indices.iter().map(|&index| labels[index]).collect();
+                        let mut seed = 0x116_017_u64
+                            ^ (replicate as u64 + 1).wrapping_mul(0x9e3779b97f4a7c15)
+                            ^ slug.bytes().map(u64::from).sum::<u64>();
+                        shuffle(&mut values, &mut seed);
+                        for (&index, value) in indices.iter().zip(values) {
+                            shuffled[index] = value;
+                        }
+                    }
+                    let shuffled_predictions = transport_predictions(
+                        &shuffled,
+                        &group_ids,
+                        &curve_ids,
+                        group_count,
+                        expected_curves,
+                    );
+                    let (shuffled_coverage, shuffled_matches) =
+                        score(&shuffled_predictions, &shuffled);
+                    let shuffled_statistic =
+                        binary_statistic(shuffled_matches, shuffled_coverage);
+                    exceedances += usize::from(
+                        compare_ratio(shuffled_statistic, selected_statistic)
+                            != Ordering::Less,
+                    );
+                }
+
+                let mut per_curve = Vec::new();
+                for (slug, indices) in &rows {
+                    let curve_predictions: Vec<u8> = indices
+                        .iter()
+                        .map(|&index| predictions[index])
+                        .collect();
+                    let curve_labels: Vec<u8> =
+                        indices.iter().map(|&index| labels[index]).collect();
+                    let (curve_coverage, curve_matches) =
+                        score(&curve_predictions, &curve_labels);
+                    per_curve.push(format!(
+                        "{{\"slug\":\"{slug}\",\"targets\":{},\"coverage\":{curve_coverage},\"matches\":{curve_matches}}}",
+                        indices.len()
+                    ));
+                }
+
+                let excess = 2_i64 * matches as i64 - coverage as i64;
+                let json = format!(
+                    concat!(
+                        "{{\n  \"schema\":\"h116-prym-frobenius-factor-type/v1\",\n",
+                        "  \"panel\":\"prym_factor_type_transport\",\n",
+                        "  \"targets\":{},\n  \"curves\":{},\n  \"rules\":1,\n",
+                        "  \"extension_square_table_checks\":{},\n",
+                        "  \"extension_curve_census_checks\":{},\n  \"extension_fixed_point_checks\":{},\n",
+                        "  \"extension_affine_points\":{},\n  \"extension_histogram_checks\":{},\n",
+                        "  \"extension_rescale_checks\":{},\n  \"smooth_cover_levels\":{},\n",
+                        "  \"smooth_feature_checks\":{},\n  \"base_trace_checks\":{},\n",
+                        "  \"extension_trace_checks\":{},\n  \"newton_checks\":{},\n",
+                        "  \"chirality_swap_checks\":{},\n  \"prym_factor_checks\":{},\n",
+                        "  \"prym_splitting_checks\":{},\n  \"prym_eigenline_polynomial_checks\":{},\n",
+                        "  \"prym_eigenline_quotient_checks\":{},\n",
+                        "  \"prym_factor_type_checks\":{},\n",
+                        "  \"prym_factor_irreducibility_checks\":{},\n",
+                        "  \"prym_factor_evaluation_checks\":{},\n",
+                        "  \"prym_factor_type_histogram\":[{},{},{},{},{}],\n",
+                        "  \"prym_factor_type_codebook\":[\"1111\",\"112\",\"13\",\"22\",\"4\"],\n",
+                        "  \"prym_factor_type_distinguishing_targets\":{},\n",
+                        "  \"factor_type_groups\":{},\n  \"conflicting_groups\":{},\n",
+                        "  \"conflicting_targets\":{},\n",
+                        "  \"in_sample_lookup_matches\":{},\n",
+                        "  \"in_sample_lookup_exact\":{},\n",
+                        "  \"selected_observable\":\"complete_quartic_factor_degree_tuple_l5_l7\",\n",
+                        "  \"transport\":\"leave_one_curve_out_exact_tuple_majority\",\n",
+                        "  \"radix\":2,\n  \"coverage\":{},\n  \"matches\":{},\n",
+                        "  \"radix_excess\":{},\n  \"statistic_numerator\":{},\n",
+                        "  \"statistic_denominator\":{},\n",
+                        "  \"total_exact_rules\":{},\n  \"covered_exact_rules\":{},\n",
+                        "  \"replicates\":4096,\n  \"shuffle_exceedances\":{},\n",
+                        "  \"shuffle_empirical_p\":{:.12},\n  \"per_curve\":[{}],\n",
+                        "  \"planted_control_matches\":{},\n  \"status\":\"measured\"\n}}\n"
+                    ),
+                    targets.len(),
+                    rows.len(),
+                    extension_square_table_checks,
+                    extension_curve_census_checks,
+                    extension_fixed_point_checks,
+                    extension_affine_points,
+                    extension_histogram_checks,
+                    extension_rescale_checks,
+                    smooth_cover_levels,
+                    smooth_feature_checks,
+                    base_trace_checks,
+                    extension_trace_checks,
+                    newton_checks,
+                    chirality_swap_checks,
+                    prym_factor_checks,
+                    prym_splitting_checks,
+                    prym_eigenline_polynomial_checks,
+                    prym_eigenline_quotient_checks,
+                    prym_factor_type_checks,
+                    prym_factor_irreducibility_checks,
+                    prym_factor_evaluation_checks,
+                    prym_factor_type_histogram[0],
+                    prym_factor_type_histogram[1],
+                    prym_factor_type_histogram[2],
+                    prym_factor_type_histogram[3],
+                    prym_factor_type_histogram[4],
+                    prym_factor_type_distinguishing_targets,
+                    group_count,
+                    conflicting_groups,
+                    conflicting_targets,
+                    in_sample_lookup_matches,
+                    conflicting_groups == 0,
+                    coverage,
+                    matches,
+                    excess,
+                    selected_statistic.0,
+                    selected_statistic.1,
+                    total_exact_rules,
+                    covered_exact_rules,
+                    exceedances,
+                    (exceedances + 1) as f64 / (REPLICATES + 1) as f64,
+                    per_curve.join(","),
+                    expected_targets,
+                );
+                fs::write(output_path, json).map_err(|error| error.to_string())?;
+                println!(
+                    "chiral genus-three Prym factor-type transport: groups={} conflicting={} coverage={} matches={} exact={} p={:.6}",
+                    group_count,
+                    conflicting_groups,
+                    coverage,
+                    matches,
+                    total_exact_rules,
+                    (exceedances + 1) as f64 / (REPLICATES + 1) as f64
+                );
+                return Ok(());
             }
 
             let mut rules = Vec::with_capacity(if oos_panel {
@@ -1201,8 +1669,11 @@ fn main() {
         [_, flag, output] if flag == "--run-prym-eigenline" => {
             frozen::chiral_genus3_zeta2::run_prym_eigenline(Path::new(output))
         }
+        [_, flag, output] if flag == "--run-prym-factor-type" => {
+            frozen::chiral_genus3_zeta2::run_prym_factor_type(Path::new(output))
+        }
         _ => Err(
-            "usage: h116_chiral_genus3_zeta2_digit --selftest | --run OUTPUT.json | --run-prym OUTPUT.json | --run-prym-oos OUTPUT.json | --run-prym-splitting OUTPUT.json | --run-prym-eigenline OUTPUT.json".to_string(),
+            "usage: h116_chiral_genus3_zeta2_digit --selftest | --run OUTPUT.json | --run-prym OUTPUT.json | --run-prym-oos OUTPUT.json | --run-prym-splitting OUTPUT.json | --run-prym-eigenline OUTPUT.json | --run-prym-factor-type OUTPUT.json".to_string(),
         ),
     };
     if let Err(error) = result {
