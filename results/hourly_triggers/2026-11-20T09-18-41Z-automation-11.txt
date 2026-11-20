@@ -1,0 +1,7 @@
+Triggered: 2026-11-20T09:18:41Z
+Automation: Assess relation finding (run 11)
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Curve: frozen public-synthetic Koblitz GF(2^23), a=0, natural exact two-summand relations (not ECC2K-130)
+Output: results/hourly_log.csv
+Baseline: results/relation_baseline.json
+Alert threshold: 20% deviation or any run failure
