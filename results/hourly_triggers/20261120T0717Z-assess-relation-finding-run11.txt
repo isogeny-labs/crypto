@@ -1,0 +1,5 @@
+Request: repeat frozen public-synthetic Koblitz GF(2^23), a=0, m=2, exact two-summand natural-arm benchmark (256 natural targets; 64 planted SAT and 64 proven UNSAT correctness controls).
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Baseline: results/relation_baseline.json; alert threshold absolute relative deviation >20% for relations_per_sec or success_rate.
+Output: append results/hourly_log.csv, commit and push to hourly-runs; open a GitHub issue on any harness failure or anomaly.
+Trigger requested: 2026-11-20 07:17 UTC.
