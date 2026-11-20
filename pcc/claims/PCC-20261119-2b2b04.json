@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T02:11:27Z",
+ "id": "PCC-20261119-2b2b04",
+ "kind": "theorem",
+ "producer": {
+  "commit": "6678cfa6f0b35c936f44f3d29f42257f2d9b1759",
+  "model": "Codex",
+  "session": "eager-bird-cost-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "bbaa21a118c66f307d0c11fdea391222125df38b69f764d5dfb4fc304b75e928",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.eagerBirdDet_eq_det"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Value correctness of the eager recurrence; scalar-ring operation counts are separate and machine/runtime/bit costs are outside this claim.",
+ "statement": "Materializing every Bird recurrence state in an array-backed length-n-squared vector computes exactly the determinant of every square matrix over a commutative ring."
+}

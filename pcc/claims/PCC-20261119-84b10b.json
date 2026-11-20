@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T02:11:27Z",
+ "id": "PCC-20261119-84b10b",
+ "kind": "theorem",
+ "producer": {
+  "commit": "6678cfa6f0b35c936f44f3d29f42257f2d9b1759",
+  "model": "Codex",
+  "session": "eager-bird-cost-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "d948b022b233e96a92313be60ae60fb57840fcc1e8348446731cf1a81761486f",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.eagerBirdAdjugateRingOps_le_sixth"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Scalar-ring operation budget for the adjugate only; excludes concrete ZMod inversion, array management, integer indexing, and operand bit cost.",
+ "statement": "Computing all n-squared eager Bird cofactor determinants has scalar-ring budget at most 4(n+1)^6."
+}

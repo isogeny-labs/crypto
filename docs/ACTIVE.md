@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
+- [x] Prove or refute a uniform exponential-rank lower bound for the hashed prime-field semantic decomposition matrix (Codex, completed 2026-11-18: all-seed and nonnegligible-probability lower bounds refuted; exceptional selected seeds and the low-level BTNIR family remain open, branch codex/extend-ecdlp-obligation-graph-20261118, PR #4704)
+
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
 - [x] Prove a division-free exact subexponential decomposition oracle for the hashed prime-field networks, including fixed witness bits (Codex, completed 2026-11-18, branch codex/ecdlp-novel-oracle-20261118, PR #4668)
@@ -26,7 +28,7 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 
 - [ ] Complete the next curve-transfer infrastructure slice: catalog-general norm replay, independent divisor-map oracle, odd two-infinity support, cryptanalysis mirror, standalone packaging, and CI evidence (Codex, started 2026-11-18, branch codex/curve-transfer-next-phase-20261118, PR #4683)
 
-- [ ] Formalize or refute the ready yield/rank frontier obligations: population contract, solver visibility, and kernel-mode scope (Codex, started 2026-11-18, branch codex/extend-ecdlp-obligation-graph-20261118, PR #4685)
+- [x] Formalize or refute the ready yield/rank frontier obligations: population contract, solver visibility, and kernel-mode scope (Codex, completed 2026-11-18, branch codex/extend-ecdlp-obligation-graph-20261118, PR #4704; follows merged #4685)
 
 - [x] Split the index-calculus yield/rank frontier into attackable obligations and evidence-linked targets (Codex, completed 2026-11-18, branch codex/extend-ecdlp-obligation-graph-20261118, PR #4685)
 
@@ -102,3 +104,5 @@ Find and substantiate a classical subexponential index-calculus algorithm for or
 - Lazy-orbit column sweep vs strong rho (claude, 2026-11-17, branch claude/admiring-gauss-vo7kxf, PR #4565): protocol frozen (`research/ic_lead_chase_20261116/protocol.json`, sha256 19116bb1…, source 3658d3aa26), specs and analysis bound, queue registrations `experiments/queue/EXP-LAZYCOL-N{17,29,31}-001.json` filed `blocked`. Needs: live daily+monthly budget headroom in account 104186811093 (latest readback over the monthly cap; this runtime has no lab AWS identity), approved expspec records, an isolab image built from 3658d3aa26, and a perf-ipc w_cal host.
 
 - Vieta:504/504 primary and72/72 calibration calls completed/replayed. Canonical seed-registration360/60 failures retained; no L2 admission. Official censored-close blocked by unchanged main20261105T0828Z archive command1 lacking successful integer exit. Shared crypto-lean PR26 CI cannot start due account billing lock; no bypass/spend. Full general tower NF instance remains unverified.
+- [x] Formalize whether the semantic-rank premises imply a no-subexponential-ECDLP goal, with an explicit Lean countermodel or bridge theorem (Codex, completed 2026-11-18: implication refuted, sufficient universal-work bridge and architecture endpoint checked, real-ECDLP universal lower bound remains open, branch codex/extend-ecdlp-obligation-graph-20261118, PR #4704)
+- [ ] Audit and pursue the conditional tensor-contraction and alternative-parameter routes toward an explicit subexponential prime-field ECDLP algorithm (Codex, started 2026-11-18, branch codex/extend-ecdlp-obligation-graph-20261118, PR #4704; objective remains open until an end-to-end algorithm and proof are supplied)

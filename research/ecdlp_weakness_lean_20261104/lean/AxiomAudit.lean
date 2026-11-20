@@ -5,6 +5,8 @@ import WeaknessLean
 #print axioms LeftKernel.exists_left_kernel
 #print axioms LeftKernel.card_dot_ker_mul
 #print axioms LeftKernel.card_bad_pairs
+#print axioms KernelModeCountermodels.unused_column_gives_nonzero_right_kernel
+#print axioms KernelModeCountermodels.surplus_can_have_both_nonzero_kernels
 #print axioms HazardSeparation.survival_ge_of_marginals
 #print axioms HazardSeparation.truncated_expectation_ge_half_horizon_of_marginals
 #print axioms HazardSeparation.marginals_U

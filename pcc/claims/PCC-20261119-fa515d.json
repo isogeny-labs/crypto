@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T02:11:27Z",
+ "id": "PCC-20261119-fa515d",
+ "kind": "theorem",
+ "producer": {
+  "commit": "6678cfa6f0b35c936f44f3d29f42257f2d9b1759",
+  "model": "Codex",
+  "session": "eager-bird-cost-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "85079a8980fcc424c02e39764be6f7d1ed5baa143e37e24fb27f100bba06b05b",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.eagerBirdDetRingOps_le_quartic"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Scalar-ring operation budget only; excludes array management, integer indexing, and operand bit cost.",
+ "statement": "The eager Bird determinant scalar-ring budget is at most 4(n+1)^4."
+}

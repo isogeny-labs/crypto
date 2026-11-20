@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T01:52:45Z",
+ "id": "PCC-20261119-598c61",
+ "kind": "theorem",
+ "producer": {
+  "commit": "6042a2aab70e292e4dc5c1606d12565f4741b0cd",
+  "model": "Codex",
+  "session": "bird-planted-fallback-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "64215813d3581f898a604e1b04d205e3947e253cdd855e6f49611c8c6677849b",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.birdZModInverse_eq_inv"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Algebraic and executable-definition correctness only; no eager evaluation strategy, operation count, or bit-complexity claim. Corrected successor to PCC-20261119-46d8c7 with the required declaration hash.",
+ "statement": "For a square matrix over ZMod q with unit determinant, the executable Bird determinant-and-adjugate formula equals Mathlib canonical nonsingular matrix inverse."
+}

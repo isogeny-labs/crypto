@@ -1,0 +1,12 @@
+name = "zsmul_torsion_bridge"
+version = "0.1.0"
+defaultTargets = ["TorsionDivisionPolynomial"]
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/kbuzzard/mathlib4.git"
+rev = "f46c499f84960839eac3fdbc517a930f02b3b252"
+
+[[lean_lib]]
+name = "TorsionDivisionPolynomial"
+roots = ["TorsionDivisionPolynomial"]
