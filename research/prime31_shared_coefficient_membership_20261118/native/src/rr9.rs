@@ -7,6 +7,7 @@
 //! This module ports only that builder and independent evaluation helpers; it
 //! does not import or claim the later branch's experimental outcomes.
 
+use crate::algebra::{AffinePoint, Curve};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
@@ -477,6 +478,199 @@ pub fn verify_assignment(tower: &FrozenTower, assignment: &[u64], p: u64) -> boo
             .all(|equation| evaluate_equation(equation, assignment, p) == 0)
 }
 
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SignedFactor {
+    pub base_index: usize,
+    pub sign: i8,
+    pub multiplicity: u8,
+}
+
+fn poly_eval(polynomial: &[u64], value: u64, p: u64) -> u64 {
+    polynomial.iter().rev().fold(0, |accumulator, coefficient| {
+        add_mod(mul_mod(accumulator, value, p), *coefficient, p)
+    })
+}
+
+/// Decode one RR9 chart into a signed eight-multiset and replay its EC sum.
+///
+/// This is a consumer-side check independent of the remainder-tower
+/// auxiliaries.  Multiplicities are factored from `M`; signs are recovered
+/// from Taylor/Hermite vanishing orders of
+/// `(X-r)A(X) + (Y+s)V(X)` on the curve.  It handles repeated points,
+/// opposite pairs, and a support abscissa equal to `r`.
+pub fn decode_and_replay_chart(
+    curve: Curve,
+    base: &[AffinePoint],
+    residual: AffinePoint,
+    chart: &[u64; 7],
+) -> Result<Vec<SignedFactor>, String> {
+    curve.validate()?;
+    if !curve.on_curve(residual) {
+        return Err("RR9 residual is not on the curve".into());
+    }
+    if base.is_empty()
+        || base
+            .iter()
+            .any(|point| !curve.on_curve(*point) || point.y == 0)
+        || base
+            .iter()
+            .enumerate()
+            .any(|(index, point)| base[..index].iter().any(|old| old.x == point.x))
+    {
+        return Err("RR9 base must contain distinct nonzero-y curve points".into());
+    }
+
+    let p = curve.p;
+    let m = concrete_m(p, curve.a, (residual.x, residual.y), chart);
+    if m.len() != 9 || m[8] != 1 {
+        return Err("RR9 chart did not produce a monic degree-eight M".into());
+    }
+
+    let mut remaining = m;
+    let mut multiplicities = vec![0u8; base.len()];
+    let mut total_degree = 0u8;
+    for (index, point) in base.iter().enumerate() {
+        let factor = [curve.neg(point.x), 1];
+        loop {
+            if remaining.len() <= 1 {
+                break;
+            }
+            let (quotient, remainder) = poly_div_rem_monic(&remaining, &factor, p);
+            if remainder.iter().any(|coefficient| *coefficient != 0) {
+                break;
+            }
+            remaining = quotient;
+            multiplicities[index] = multiplicities[index]
+                .checked_add(1)
+                .ok_or_else(|| "RR9 factor multiplicity overflow".to_owned())?;
+            total_degree = total_degree
+                .checked_add(1)
+                .ok_or_else(|| "RR9 total multiplicity overflow".to_owned())?;
+        }
+    }
+    if total_degree != 8 || remaining != [1] {
+        return Err("RR9 M does not factor completely over the declared support".into());
+    }
+
+    let a = [chart[0], chart[1], chart[2], chart[3]];
+    let v = [chart[4], chart[5], chart[6], 1];
+    let vanishing_order = |x0: u64, y0: u64, cap: usize| -> Result<u8, String> {
+        let taylor_rhs = [
+            curve.mul(y0, y0),
+            curve.add(curve.mul(3, curve.mul(x0, x0)), curve.a),
+            curve.mul(3, x0),
+            1,
+        ];
+        let inverse_two_y = curve
+            .inverse(curve.mul(2, y0))
+            .ok_or_else(|| "RR9 Hermite expansion encountered zero y".to_owned())?;
+        let mut y_series = vec![0; cap + 1];
+        y_series[0] = y0;
+        for order in 1..=cap {
+            let rhs = taylor_rhs.get(order).copied().unwrap_or(0);
+            let convolution = (1..order).fold(0, |sum, index| {
+                curve.add(sum, curve.mul(y_series[index], y_series[order - index]))
+            });
+            y_series[order] = curve.mul(curve.sub(rhs, convolution), inverse_two_y);
+        }
+
+        let shift_cubic = |coefficients: &[u64; 4]| {
+            vec![
+                poly_eval(coefficients, x0, p),
+                curve.add(
+                    coefficients[1],
+                    curve.add(
+                        curve.mul(2, curve.mul(coefficients[2], x0)),
+                        curve.mul(3, curve.mul(coefficients[3], curve.mul(x0, x0))),
+                    ),
+                ),
+                curve.add(
+                    coefficients[2],
+                    curve.mul(3, curve.mul(coefficients[3], x0)),
+                ),
+                coefficients[3],
+            ]
+        };
+        let a_series = shift_cubic(&a);
+        let v_series = shift_cubic(&v);
+        y_series[0] = curve.add(y_series[0], residual.y);
+        let left = poly_mul(&[curve.sub(x0, residual.x), 1], &a_series, p);
+        let right = poly_mul(&y_series, &v_series, p);
+        for order in 0..=cap {
+            if curve.add(
+                left.get(order).copied().unwrap_or(0),
+                right.get(order).copied().unwrap_or(0),
+            ) != 0
+            {
+                return Ok(order as u8);
+            }
+        }
+        Ok((cap + 1) as u8)
+    };
+
+    let mut decoded = Vec::new();
+    let mut replay = None;
+    let mut leaves = 0u8;
+    for (index, point) in base.iter().copied().enumerate() {
+        let multiplicity = multiplicities[index];
+        if multiplicity == 0 {
+            continue;
+        }
+        let mut positive = vanishing_order(point.x, point.y, usize::from(multiplicity) + 1)?;
+        let negative_y = curve.neg(point.y);
+        let mut negative = vanishing_order(point.x, negative_y, usize::from(multiplicity) + 1)?;
+
+        // The function has one structural zero at -R; remove it before
+        // interpreting the remaining divisor as the eight selected leaves.
+        let residual_negative_y = curve.neg(residual.y);
+        if point.x == residual.x && point.y == residual_negative_y {
+            positive = positive
+                .checked_sub(1)
+                .ok_or_else(|| "RR9 chart misses its structural -R zero".to_owned())?;
+        }
+        if point.x == residual.x && negative_y == residual_negative_y {
+            negative = negative
+                .checked_sub(1)
+                .ok_or_else(|| "RR9 chart misses its structural -R zero".to_owned())?;
+        }
+        if positive + negative != multiplicity {
+            return Err(format!(
+                "RR9 sign multiplicities disagree at base index {index}"
+            ));
+        }
+        for (sign, count, selected) in [
+            (1i8, positive, point),
+            (
+                -1i8,
+                negative,
+                AffinePoint {
+                    x: point.x,
+                    y: negative_y,
+                },
+            ),
+        ] {
+            if count == 0 {
+                continue;
+            }
+            decoded.push(SignedFactor {
+                base_index: index,
+                sign,
+                multiplicity: count,
+            });
+            for _ in 0..count {
+                replay = curve.point_add(replay, Some(selected));
+            }
+            leaves += count;
+        }
+    }
+    decoded.sort_unstable();
+    if leaves != 8 || replay != Some(residual) {
+        return Err("RR9 decoded signed multiset fails independent EC replay".into());
+    }
+    Ok(decoded)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -526,5 +720,24 @@ mod tests {
         let mut mutated = assignment;
         mutated[0] = add_mod(mutated[0], 1, PRIME31_P);
         assert!(!verify_assignment(&tower, &mutated, PRIME31_P));
+
+        let base = crate::prime31_curve().canonical_base(8).unwrap();
+        let decoded = decode_and_replay_chart(
+            crate::prime31_curve(),
+            &base,
+            AffinePoint {
+                x: RESIDUAL.0,
+                y: RESIDUAL.1,
+            },
+            &CHART,
+        )
+        .unwrap();
+        assert_eq!(
+            decoded
+                .iter()
+                .map(|factor| usize::from(factor.multiplicity))
+                .sum::<usize>(),
+            8
+        );
     }
 }

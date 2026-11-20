@@ -106,19 +106,64 @@ fn parse_dimacs(text: &str) -> Instance {
     inst
 }
 
-fn out(
-    status: &str,
+struct Output<'a> {
+    status: &'a str,
     conflicts: i64,
     decisions: i64,
     propagations: i64,
     wall_ms: f64,
-    model: &str,
-    solver: &str,
-    version: &str,
-) {
+    model: &'a str,
+    solver: &'a str,
+    version: &'a str,
+    peak_rss_bytes: Option<u64>,
+    requested_conflict_budget: i64,
+    effective_conflict_budget: i64,
+    variables: usize,
+    ordinary_clauses: usize,
+    xor_rows: usize,
+}
+
+fn out(output: Output<'_>) {
+    let Output {
+        status,
+        conflicts,
+        decisions,
+        propagations,
+        wall_ms,
+        model,
+        solver,
+        version,
+        peak_rss_bytes,
+        requested_conflict_budget,
+        effective_conflict_budget,
+        variables,
+        ordinary_clauses,
+        xor_rows,
+    } = output;
+    let peak_rss = peak_rss_bytes
+        .map(|value| value.to_string())
+        .unwrap_or_else(|| "null".to_owned());
     println!(
-        "{{\"solver\":\"{solver}\",\"version\":\"{version}\",\"status\":\"{status}\",\"conflicts\":{conflicts},\"decisions\":{decisions},\"propagations\":{propagations},\"wall_ms\":{wall_ms:.3},\"model\":\"{model}\"}}"
+        "{{\"schema\":\"prime31.selector-external-solver-record/v1\",\"solver\":\"{solver}\",\"version\":\"{version}\",\"status\":\"{status}\",\"variables\":{variables},\"ordinary_clauses\":{ordinary_clauses},\"xor_rows\":{xor_rows},\"requested_conflict_budget\":{requested_conflict_budget},\"effective_conflict_budget\":{effective_conflict_budget},\"conflicts\":{conflicts},\"decisions\":{decisions},\"propagations\":{propagations},\"wall_ms\":{wall_ms:.3},\"peak_rss_bytes\":{peak_rss},\"model\":\"{model}\",\"forbidden\":{{\"secret_scalars_consumed\":0,\"witness_indices_or_signs_consumed\":0,\"pair_table_entries_consumed\":0,\"half_table_entries_consumed\":0,\"complete_selector_assignments_enumerated\":0,\"grader_records_consumed_after_target_extraction\":0}},\"pcc\":\"unverified\"}}"
     );
+}
+
+fn peak_rss_bytes() -> Option<u64> {
+    #[cfg(unix)]
+    {
+        // SAFETY: `rusage` is plain old data and `getrusage` initializes it.
+        let mut usage: libc::rusage = unsafe { std::mem::zeroed() };
+        if unsafe { libc::getrusage(libc::RUSAGE_SELF, &mut usage) } != 0 {
+            return None;
+        }
+        let raw = u64::try_from(usage.ru_maxrss).ok()?;
+        #[cfg(target_os = "macos")]
+        return Some(raw);
+        #[cfg(not(target_os = "macos"))]
+        return raw.checked_mul(1024);
+    }
+    #[cfg(not(unix))]
+    None
 }
 
 fn main() {
@@ -131,7 +176,7 @@ fn main() {
             let mut s = Solver::new();
             s.set_num_threads(1);
             s.new_vars(inst.nvars);
-            let to_lit = |l: i32| Lit::new((l.unsigned_abs() - 1) as u32, l < 0).expect("lit");
+            let to_lit = |l: i32| Lit::new(l.unsigned_abs() - 1, l < 0).expect("lit");
             if inst.empty_clause {
                 s.add_clause(&[]);
             }
@@ -156,24 +201,30 @@ fn main() {
             let mut model = String::new();
             if matches!(r, Lbool::True) {
                 let m = s.get_model();
-                for v in 0..a.model_vars.min(m.len()) {
-                    model.push(match m[v] {
+                for value in m.iter().take(a.model_vars) {
+                    model.push(match value {
                         Lbool::True => '1',
                         Lbool::False => '0',
                         Lbool::Undef => '?',
                     });
                 }
             }
-            out(
+            out(Output {
                 status,
-                s.sum_conflicts() as i64,
-                s.sum_decisions() as i64,
-                s.sum_propagations() as i64,
-                wall,
-                &model,
-                "cryptominisat",
-                "5.8.0-rust1",
-            );
+                conflicts: s.sum_conflicts() as i64,
+                decisions: s.sum_decisions() as i64,
+                propagations: s.sum_propagations() as i64,
+                wall_ms: wall,
+                model: &model,
+                solver: "cryptominisat",
+                version: "5.8.0-rust1",
+                peak_rss_bytes: peak_rss_bytes(),
+                requested_conflict_budget: a.budget,
+                effective_conflict_budget: a.budget,
+                variables: inst.nvars,
+                ordinary_clauses: inst.clauses.len() + usize::from(inst.empty_clause),
+                xor_rows: inst.xors.len(),
+            });
         }
         "cadical" => {
             use cadical_sys::{CaDiCal, Status};
@@ -215,16 +266,22 @@ fn main() {
                 c.get_statistic_value("decisions"),
                 c.get_statistic_value("propagations"),
             );
-            out(
+            out(Output {
                 status,
-                cf,
-                dc,
-                pr,
-                wall,
-                &model,
-                "cadical",
-                &CaDiCal::version(),
-            );
+                conflicts: cf,
+                decisions: dc,
+                propagations: pr,
+                wall_ms: wall,
+                model: &model,
+                solver: "cadical",
+                version: &CaDiCal::version(),
+                peak_rss_bytes: peak_rss_bytes(),
+                requested_conflict_budget: a.budget,
+                effective_conflict_budget: i64::from(budget),
+                variables: inst.nvars,
+                ordinary_clauses: inst.clauses.len() + usize::from(inst.empty_clause),
+                xor_rows: inst.xors.len(),
+            });
         }
         other => {
             eprintln!("unknown solver {other}");

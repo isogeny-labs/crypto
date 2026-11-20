@@ -561,14 +561,19 @@ impl BooleanEncoding {
                 .iter()
                 .map(|literal| literal.signed().expect("input is a variable") as u32)
                 .collect::<Vec<_>>();
-            if !base_size.is_power_of_two() {
-                builder.assert_less_than_constant(&selector, base_size)?;
-            }
             let sign = builder.input()?;
             sign_ids.push(sign.signed().expect("input is a variable") as u32);
             selector_lits.push(selector);
             selector_ids.push(ids);
             sign_lits.push(sign);
+        }
+        // Allocate every semantic bit before any range-check gate.  This makes
+        // the semantic prefix explicit and lets external wrappers return only
+        // the first 24--32 model bits without exposing auxiliary assignments.
+        if !base_size.is_power_of_two() {
+            for selector in &selector_lits {
+                builder.assert_less_than_constant(selector, base_size)?;
+            }
         }
 
         let mut selected = Vec::with_capacity(8);
@@ -686,6 +691,56 @@ impl BooleanEncoding {
             return Err("relation/circuit digest mismatch".into());
         }
         Ok(relation.replay(&witness.indices, &witness.signs) == Some(relation.target))
+    }
+
+    /// Decode the semantic model prefix emitted by the pinned external wrapper.
+    ///
+    /// The circuit allocates all index bits and signs before any auxiliary
+    /// gate.  The returned witness is still recomputed through every gate and
+    /// independently replayed on the curve; no auxiliary model bit is trusted.
+    pub fn decode_semantic_prefix(
+        &self,
+        relation: &RelationSpec,
+        prefix: &str,
+    ) -> Result<SelectorWitness, String> {
+        let expected = self.selector_ids.iter().map(Vec::len).sum::<usize>() + self.sign_ids.len();
+        if prefix.len() != expected {
+            return Err(format!(
+                "semantic model prefix has {} bits; expected {expected}",
+                prefix.len()
+            ));
+        }
+        let bits = prefix
+            .bytes()
+            .map(|byte| match byte {
+                b'0' => Ok(false),
+                b'1' => Ok(true),
+                _ => Err("semantic model prefix contains a non-binary character".to_owned()),
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let mut cursor = 0;
+        let mut witness = SelectorWitness {
+            indices: [0; 8],
+            signs: [false; 8],
+        };
+        for slot in 0..8 {
+            for bit in 0..self.selector_ids[slot].len() {
+                witness.indices[slot] |= usize::from(bits[cursor]) << bit;
+                cursor += 1;
+            }
+            witness.signs[slot] = bits[cursor];
+            cursor += 1;
+            if witness.indices[slot] >= self.base_size {
+                return Err(format!("decoded slot {slot} index is outside the base"));
+            }
+        }
+        if !self.evaluate_witness(&witness)? {
+            return Err("semantic model prefix fails complete circuit reevaluation".into());
+        }
+        if !self.replay_witness(relation, &witness)? {
+            return Err("semantic model prefix fails independent EC replay".into());
+        }
+        Ok(witness)
     }
 
     pub fn decode_solver_model(
@@ -1128,6 +1183,28 @@ mod tests {
         assert!(encoding.evaluate_witness(&witness).unwrap());
         assert!(encoding.replay_witness(&relation, &witness).unwrap());
         assert!(encoding.statistics().forbidden.all_zero());
+    }
+
+    #[test]
+    fn semantic_prefix_round_trips_for_non_power_of_two_base() {
+        let relation = prime31_weighted_relation(6, PanelTarget::Planted(3)).unwrap();
+        let encoding = BooleanEncoding::from_relation(&relation).unwrap();
+        let (indices, signs) = planted_word(6, 3);
+        let mut prefix = String::new();
+        for slot in 0..8 {
+            for bit in 0..3 {
+                prefix.push(if (indices[slot] >> bit) & 1 != 0 {
+                    '1'
+                } else {
+                    '0'
+                });
+            }
+            prefix.push(if signs[slot] { '1' } else { '0' });
+        }
+        assert_eq!(
+            encoding.decode_semantic_prefix(&relation, &prefix).unwrap(),
+            SelectorWitness { indices, signs }
+        );
     }
 
     #[test]

@@ -4,6 +4,15 @@
   "frozen_at_utc": "2026-11-20T00:54:23Z",
   "base_commit": "cd50f50fa1cc7caf40a0f13a4fa99f586d0f7016",
   "pull_request": 4692,
+  "preexecution_amendment": {
+    "amended_at_utc": "2026-11-20T01:56:56Z",
+    "registered_rows_completed_before_amendment": 0,
+    "changes": [
+      "add source-linked native CNF-XOR arm",
+      "freeze semantic-priority native branching and retain plain branching only as an explicit diagnostic control",
+      "enforce wall, memory, conflict, hash, frozen-panel, and independent-replay checks in committed runners"
+    ]
+  },
   "curve": {
     "p": 2147483647,
     "a": 847514846,
@@ -28,7 +37,12 @@
     "cryptominisat_cnf_xor",
     "cryptominisat_cnf",
     "cadical_cnf",
-    "repository_native_cdcl_cnf"
+    "repository_native_cdcl_cnf_semantic_priority",
+    "repository_native_cdcl_xor_semantic_priority"
+  ],
+  "diagnostic_controls_not_used_for_advancement": [
+    "repository_native_cdcl_cnf_plain_branching",
+    "repository_native_cdcl_xor_plain_branching"
   ],
   "separate_non_equivalent_control": "shared_rr9_f4_common_support_only",
   "generic_half_words": {"B4": 4096, "B6": 20736, "B8": 65536},
@@ -46,7 +60,7 @@
     "all_accepted_witnesses_replay",
     "all_forbidden_counters_zero",
     "all_planned_B8_rows_complete",
-    "observed_solver_work_growth_below_B4_frontier"
+    "observed_solver_work_growth_below_generic_B_to_the_four_frontier"
   ],
   "pcc": "unverified"
 }

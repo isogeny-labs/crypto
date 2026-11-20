@@ -1,0 +1,11 @@
+diff --git a/build.rs b/build.rs
+--- a/build.rs
++++ b/build.rs
+@@ -21,6 +21,7 @@ fn main() {
+                    .define("NOM4RI", "ON")
+                    .define("STATS", "OFF")
+                    .define("NOSQLITE", "ON")
++                   .define("CMAKE_DISABLE_FIND_PACKAGE_MPI", "TRUE")
+                    .cxxflag("-include")
+                    .cxxflag("cstdint")
+                    .define("NOVALGRIND", "ON")

@@ -110,8 +110,15 @@ Candidate arms, single-threaded and fresh-process:
 - CryptoMiniSat on CNF-XOR when the exporter has actual XOR rows;
 - CryptoMiniSat on ordinary CNF;
 - CaDiCaL on ordinary CNF;
-- the repository native CDCL solver on the same ordinary clauses, if its
-  public API can consume the generated formula without semantic changes.
+- the repository native CDCL solver on the same ordinary clauses with the
+  semantic selector/sign variables given branch priority; and
+- the same source-linked native solver on the exact CNF-XOR rendering.
+
+Plain native branching is retained only as an explicitly named diagnostic
+control.  It is not an alternative selected after looking at outcomes and is
+not used by itself to advance the lead.  This native-XOR arm and the committed
+resource/hash runners were added in the pre-execution amendment recorded in
+`protocol-selector-sat-v1.json`; zero registered rows had run at amendment.
 
 The RR9/F4 arm is run only on common-support instances and reported in a
 separate table.  It must never be shown as a backend for the weighted panel.
@@ -180,6 +187,12 @@ lower bound on SAT or index calculus.
 Initial caps are 900 seconds and 16 GiB per solver/case.  Smoke rows may use a
 shorter explicitly recorded cap.  Stop an arm after two consecutive rung
 timeouts or one OOM.  Do not start B31 unless every prior gate passes.
+
+The committed launchers enforce the checkpoint gate first, reject any relation
+that differs from the deterministic B4/B6/B8 panel, refuse artifact overwrite,
+apply the wall and virtual-memory caps, bind release-binary and command hashes,
+and independently replay every SAT witness.  They intentionally reject B12,
+B16, and B31 until a later committed gate decision enables those holdouts.
 
 ## Evidence and provenance
 

@@ -10,6 +10,7 @@ pub mod circuit;
 pub mod ir;
 pub mod panel;
 pub mod rr9;
+pub mod rr9_panel;
 
 pub use algebra::{AffinePoint, Curve};
 pub use circuit::{BooleanEncoding, EncodingStatistics, SelectorWitness};
