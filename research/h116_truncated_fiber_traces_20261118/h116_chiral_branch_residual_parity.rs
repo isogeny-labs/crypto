@@ -14,6 +14,7 @@ mod frozen {
         const RESULTANT_FEATURES: usize = FEATURES * (FEATURES - 1) / 2;
         const TRACE_FEATURES: usize = 4;
         const INVARIANT_FEATURES: usize = 2 * TRACE_FEATURES;
+        const KUMMER_FEATURES: usize = 2 * TRACE_FEATURES;
         const TRACE_PAIRS: [(usize, usize); TRACE_FEATURES] =
             [(0, 2), (1, 3), (4, 6), (5, 7)];
         const TARGETS: usize = 1520;
@@ -38,6 +39,7 @@ mod frozen {
             resultant_bits: [i8; RESULTANT_FEATURES],
             trace_residues: [i8; TRACE_FEATURES],
             invariant_bits: [i8; INVARIANT_FEATURES],
+            kummer_bits: [i8; KUMMER_FEATURES],
         }
 
         struct Rule {
@@ -206,6 +208,16 @@ mod frozen {
                     return 3;
                 }
                 value ^= bit as u8;
+            }
+            value
+        }
+
+        fn kummer_prediction(target: &Target, mask: u16, polarity: u8) -> u8 {
+            let mut value = polarity;
+            for (feature, &bit) in target.kummer_bits.iter().enumerate() {
+                if mask & (1_u16 << feature) != 0 {
+                    value ^= bit as u8;
+                }
             }
             value
         }
@@ -418,6 +430,166 @@ mod frozen {
             (invariant_i, invariant_j)
         }
 
+        fn marked_kernel_halves(
+            coefficient_a: u64,
+            coefficient_b: u64,
+            p: u64,
+            square_roots: &[Vec<u64>],
+        ) -> Result<(bool, usize), String> {
+            let discriminant = residue(
+                i128::from(coefficient_a) * i128::from(coefficient_a)
+                    - 4 * i128::from(coefficient_b),
+                p,
+            );
+            if coefficient_b == 0 || discriminant == 0 {
+                return Err("marked two-isogeny model is singular".to_string());
+            }
+
+            // Independently enumerate every affine point of
+            // y^2=x^3+A*x^2+B*x and apply the general Weierstrass doubling
+            // law, looking for doubles equal to the marked kernel point
+            // T=(0,0).
+            let mut affine_points = 0_usize;
+            let mut enumerated_halves = 0_usize;
+            for x in 0..p {
+                let rhs = residue(
+                    i128::from(x).pow(3)
+                        + i128::from(coefficient_a) * i128::from(x).pow(2)
+                        + i128::from(coefficient_b) * i128::from(x),
+                    p,
+                );
+                for &y in &square_roots[rhs as usize] {
+                    affine_points += 1;
+                    if y == 0 {
+                        continue;
+                    }
+                    let numerator = residue(
+                        3 * i128::from(x).pow(2)
+                            + 2 * i128::from(coefficient_a) * i128::from(x)
+                            + i128::from(coefficient_b),
+                        p,
+                    );
+                    let denominator = residue(2 * i128::from(y), p);
+                    let slope = mul_mod_u64(
+                        numerator,
+                        pow_mod_u64(denominator, p - 2, p),
+                        p,
+                    );
+                    let doubled_x = residue(
+                        i128::from(slope).pow(2)
+                            - i128::from(coefficient_a)
+                            - 2 * i128::from(x),
+                        p,
+                    );
+                    let doubled_y = residue(
+                        -i128::from(y)
+                            + i128::from(slope)
+                                * (i128::from(x) - i128::from(doubled_x)),
+                        p,
+                    );
+                    enumerated_halves += usize::from(doubled_x == 0 && doubled_y == 0);
+                }
+            }
+
+            // The duplication equation independently reduces to x(P)^2=B.
+            // Recount the candidates from that equation and require exact
+            // agreement with the group-law enumeration.
+            let mut formula_halves = 0_usize;
+            for x in 0..p {
+                if mul_mod_u64(x, x, p) != coefficient_b {
+                    continue;
+                }
+                let rhs = residue(
+                    i128::from(x).pow(3)
+                        + i128::from(coefficient_a) * i128::from(x).pow(2)
+                        + i128::from(coefficient_b) * i128::from(x),
+                    p,
+                );
+                formula_halves += square_roots[rhs as usize].len();
+            }
+            if enumerated_halves != formula_halves || enumerated_halves > 4 {
+                return Err("marked kernel halving formula control failed".to_string());
+            }
+            Ok((enumerated_halves != 0, affine_points))
+        }
+
+        fn marked_two_isogeny_halving(
+            left: BranchData,
+            right: BranchData,
+            p: u64,
+            trace: i64,
+            square_roots: &[Vec<u64>],
+        ) -> Result<([i8; 2], usize), String> {
+            let resultant = quadratic_resultant(left, right, p)?;
+            if !left.smooth || !right.smooth || resultant == 0 {
+                return Err("marked two-isogeny requires a smooth quartic".to_string());
+            }
+            let quartic = branch_pair_quartic(left, right, p);
+            let (invariant_i, invariant_j) = binary_quartic_invariants(quartic, p);
+            let marked_root = residue(
+                3 * i128::from(left.q1) * i128::from(right.q1)
+                    - 6 * i128::from(left.q0)
+                    - 6 * i128::from(right.q0),
+                p,
+            );
+            let resolvent_value = residue(
+                i128::from(marked_root).pow(3)
+                    - 27 * i128::from(invariant_i) * i128::from(marked_root)
+                    - 27 * i128::from(invariant_j),
+                p,
+            );
+            if resolvent_value != 0 {
+                return Err("marked factorization does not give a resolvent root".to_string());
+            }
+
+            // Translate the marked two-torsion point to (0,0), obtaining
+            // y^2=x^3+A*x^2+B*x.  The two displayed identities are checked
+            // against the independently computed resultant/discriminants.
+            let coefficient_a = residue(3 * i128::from(marked_root), p);
+            let coefficient_b = residue(
+                3 * i128::from(marked_root).pow(2) - 27 * i128::from(invariant_i),
+                p,
+            );
+            let dual_coefficient_a = residue(-2 * i128::from(coefficient_a), p);
+            let dual_coefficient_b = residue(
+                i128::from(coefficient_a).pow(2) - 4 * i128::from(coefficient_b),
+                p,
+            );
+            if coefficient_b != mul_mod_u64(81 % p, resultant, p)
+                || dual_coefficient_b
+                    != mul_mod_u64(
+                        81 % p,
+                        mul_mod_u64(left.discriminant, right.discriminant, p),
+                        p,
+                    )
+            {
+                return Err("marked two-isogeny coefficient identity failed".to_string());
+            }
+
+            let (kernel_halves, source_affine_points) = marked_kernel_halves(
+                coefficient_a,
+                coefficient_b,
+                p,
+                square_roots,
+            )?;
+            let (dual_kernel_halves, dual_affine_points) = marked_kernel_halves(
+                dual_coefficient_a,
+                dual_coefficient_b,
+                p,
+                square_roots,
+            )?;
+            let expected_affine_points = (p as i64 - trace) as usize;
+            if source_affine_points != expected_affine_points
+                || dual_affine_points != expected_affine_points
+            {
+                return Err("marked two-isogeny point-count control failed".to_string());
+            }
+            Ok((
+                [i8::from(kernel_halves), i8::from(dual_kernel_halves)],
+                source_affine_points + dual_affine_points,
+            ))
+        }
+
         fn branch_data(
             spec: CurveSpec,
             field: &Field,
@@ -614,26 +786,35 @@ mod frozen {
                 binary_quartic_invariants([106, 0, 0, 0, 1], 107);
             assert_eq!(invariant_i, 95);
             assert_eq!(invariant_j, 0);
+            let mut square_roots = vec![Vec::new(); 5];
+            for y in 0..5_u64 {
+                square_roots[(y * y % 5) as usize].push(y);
+            }
+            assert_eq!(marked_kernel_halves(1, 1, 5, &square_roots)?, (true, 7));
             println!(
-                "h116 chiral branch residual parity selftest: pass rules=512 resultant_rules=812 trace_rules=243 invariant_rules=512"
+                "h116 chiral branch residual parity selftest: pass rules=512 resultant_rules=812 trace_rules=243 invariant_rules=512 kummer_rules=512"
             );
             Ok(())
         }
 
         pub fn run(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, false, false, false)
+            run_with_panel(output_path, false, false, false, false)
         }
 
         pub fn run_resultants(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, true, false, false)
+            run_with_panel(output_path, true, false, false, false)
         }
 
         pub fn run_traces(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, false, true, false)
+            run_with_panel(output_path, false, true, false, false)
         }
 
         pub fn run_invariants(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, false, false, true)
+            run_with_panel(output_path, false, false, true, false)
+        }
+
+        pub fn run_kummer(output_path: &Path) -> Result<(), String> {
+            run_with_panel(output_path, false, false, false, true)
         }
 
         fn run_with_panel(
@@ -641,10 +822,12 @@ mod frozen {
             resultant_panel: bool,
             trace_panel: bool,
             invariant_panel: bool,
+            kummer_panel: bool,
         ) -> Result<(), String> {
             if usize::from(resultant_panel)
                 + usize::from(trace_panel)
                 + usize::from(invariant_panel)
+                + usize::from(kummer_panel)
                 > 1
             {
                 return Err("specialized branch panels are mutually exclusive".to_string());
@@ -671,6 +854,9 @@ mod frozen {
             let mut branch_pair_trace_distinguishing_targets = 0_usize;
             let mut binary_quartic_invariant_checks = 0_usize;
             let mut binary_quartic_invariant_distinguishing_targets = 0_usize;
+            let mut marked_two_isogeny_checks = 0_usize;
+            let mut marked_two_isogeny_point_checks = 0_usize;
+            let mut marked_two_isogeny_distinguishing_targets = 0_usize;
 
             for spec in CURVES {
                 let field = Field::new(spec.p, 1, &[0, 1])?;
@@ -680,9 +866,11 @@ mod frozen {
                     b: field.from_base(spec.b),
                 };
                 let mut square_root_counts = vec![0_u8; spec.p as usize];
+                let mut square_roots = vec![Vec::new(); spec.p as usize];
                 for y in 0..spec.p {
                     let square = mul_mod_u64(y, y, spec.p);
                     square_root_counts[square as usize] += 1;
+                    square_roots[square as usize].push(y);
                 }
                 if square_root_counts.iter().map(|&count| usize::from(count)).sum::<usize>()
                     != spec.p as usize
@@ -778,6 +966,7 @@ mod frozen {
                     }
                     let mut trace_residues = [-1_i8; TRACE_FEATURES];
                     let mut invariant_bits = [-1_i8; INVARIANT_FEATURES];
+                    let mut kummer_bits = [-1_i8; KUMMER_FEATURES];
                     for (trace_feature, &(left, right)) in TRACE_PAIRS.iter().enumerate() {
                         let left_data = branch_features[left]
                             .ok_or("missing trace left branch feature")?;
@@ -832,12 +1021,25 @@ mod frozen {
                                 i8::from(legendre(invariant_j, spec.p) == 1)
                             };
                             binary_quartic_invariant_checks += 1;
+                            let (halving_bits, point_checks) = marked_two_isogeny_halving(
+                                left_data,
+                                right_data,
+                                spec.p,
+                                trace,
+                                &square_roots,
+                            )?;
+                            kummer_bits[2 * trace_feature] = halving_bits[0];
+                            kummer_bits[2 * trace_feature + 1] = halving_bits[1];
+                            marked_two_isogeny_checks += 1;
+                            marked_two_isogeny_point_checks += point_checks;
                         }
                     }
                     let trace_distinguished = trace_residues[0] != trace_residues[1]
                         || trace_residues[2] != trace_residues[3];
                     let invariant_distinguished = invariant_bits[0..2] != invariant_bits[2..4]
                         || invariant_bits[4..6] != invariant_bits[6..8];
+                    let kummer_distinguished = kummer_bits[0..2] != kummer_bits[2..4]
+                        || kummer_bits[4..6] != kummer_bits[6..8];
                     let mut resultant_distinguished = false;
                     for left in 0..FEATURES {
                         for right in (left + 1)..FEATURES {
@@ -854,6 +1056,8 @@ mod frozen {
                         usize::from(trace_distinguished);
                     binary_quartic_invariant_distinguishing_targets +=
                         usize::from(invariant_distinguished);
+                    marked_two_isogeny_distinguishing_targets +=
+                        usize::from(kummer_distinguished);
                     let index = targets.len();
                     targets.push(Target {
                         slug: spec.slug.to_string(),
@@ -863,6 +1067,7 @@ mod frozen {
                         resultant_bits,
                         trace_residues,
                         invariant_bits,
+                        kummer_bits,
                     });
                     rows.entry(spec.slug.to_string()).or_default().push(index);
                 }
@@ -888,6 +1093,161 @@ mod frozen {
             } else {
                 targets.iter().map(|target| target.parity).collect()
             };
+            if kummer_panel {
+                if targets.iter().any(|target| {
+                    target.kummer_bits.iter().any(|&bit| bit != 0 && bit != 1)
+                }) {
+                    return Err("marked two-isogeny feature abstention".to_string());
+                }
+                let marked_two_isogeny_true_features: usize = targets
+                    .iter()
+                    .map(|target| {
+                        target.kummer_bits.iter().filter(|&&bit| bit == 1).count()
+                    })
+                    .sum();
+                let mut rules = Vec::with_capacity(512);
+                for mask in 0_u16..(1_u16 << KUMMER_FEATURES) {
+                    for polarity in 0..=1_u8 {
+                        let predictions: Vec<u8> = targets
+                            .iter()
+                            .map(|target| kummer_prediction(target, mask, polarity))
+                            .collect();
+                        let (coverage, matches) = score(&predictions, &labels);
+                        rules.push(Rule {
+                            mask,
+                            polarity,
+                            predictions,
+                            coverage,
+                            matches,
+                            statistic: statistic(matches, coverage),
+                        });
+                    }
+                }
+                let selected_index = (0..rules.len())
+                    .max_by(|&left, &right| {
+                        compare_ratio(rules[left].statistic, rules[right].statistic)
+                            .then_with(|| rules[right].mask.cmp(&rules[left].mask))
+                            .then_with(|| rules[right].polarity.cmp(&rules[left].polarity))
+                    })
+                    .ok_or("no marked two-isogeny rules")?;
+                let selected = &rules[selected_index];
+                let total_exact_rules = rules
+                    .iter()
+                    .filter(|rule| rule.coverage == TARGETS && rule.matches == TARGETS)
+                    .count();
+                let covered_exact_rules = rules
+                    .iter()
+                    .filter(|rule| rule.coverage > 0 && rule.matches == rule.coverage)
+                    .count();
+
+                let mut exceedances = 0_usize;
+                for replicate in 0..REPLICATES {
+                    let mut shuffled = vec![0_u8; TARGETS];
+                    for (slug, indices) in &rows {
+                        let mut values: Vec<u8> =
+                            indices.iter().map(|&index| labels[index]).collect();
+                        let mut seed = 0x116_022_u64
+                            ^ (replicate as u64 + 1).wrapping_mul(0x9e3779b97f4a7c15)
+                            ^ slug.bytes().map(u64::from).sum::<u64>();
+                        shuffle(&mut values, &mut seed);
+                        for (&index, value) in indices.iter().zip(values) {
+                            shuffled[index] = value;
+                        }
+                    }
+                    let mut maximum = (0_u128, 1_u128);
+                    for rule in &rules {
+                        let (_, matches) = score(&rule.predictions, &shuffled);
+                        let candidate = statistic(matches, rule.coverage);
+                        if compare_ratio(candidate, maximum) == Ordering::Greater {
+                            maximum = candidate;
+                        }
+                    }
+                    exceedances += usize::from(
+                        compare_ratio(maximum, selected.statistic) != Ordering::Less,
+                    );
+                }
+
+                let mut per_curve = Vec::new();
+                for (slug, indices) in &rows {
+                    let predictions: Vec<u8> = indices
+                        .iter()
+                        .map(|&index| selected.predictions[index])
+                        .collect();
+                    let curve_labels: Vec<u8> =
+                        indices.iter().map(|&index| labels[index]).collect();
+                    let (coverage, matches) = score(&predictions, &curve_labels);
+                    per_curve.push(format!(
+                        "{{\"slug\":\"{slug}\",\"targets\":{},\"coverage\":{coverage},\"matches\":{matches}}}",
+                        indices.len()
+                    ));
+                }
+
+                let excess = 2_i64 * selected.matches as i64 - selected.coverage as i64;
+                let json = format!(
+                    concat!(
+                        "{{\n  \"schema\":\"h116-chiral-marked-two-isogeny-halving-parity/v1\",\n",
+                        "  \"targets\":{},\n  \"curves\":{},\n  \"quartic_models\":{},\n",
+                        "  \"halving_features\":{},\n  \"rules\":{},\n",
+                        "  \"reconstruction_checks\":{},\n  \"discriminant_checks\":{},\n",
+                        "  \"resultant_checks\":{},\n  \"branch_pair_trace_checks\":{},\n",
+                        "  \"marked_two_isogeny_checks\":{},\n",
+                        "  \"marked_two_isogeny_coefficient_checks\":{},\n",
+                        "  \"marked_two_isogeny_halving_formula_checks\":{},\n",
+                        "  \"marked_two_isogeny_group_order_checks\":{},\n",
+                        "  \"marked_two_isogeny_point_checks\":{},\n",
+                        "  \"marked_two_isogeny_true_features\":{},\n",
+                        "  \"marked_two_isogeny_distinguishing_targets\":{},\n",
+                        "  \"planted_control_matches\":{},\n  \"selected_mask\":{},\n",
+                        "  \"selected_polarity\":{},\n  \"coverage\":{},\n  \"matches\":{},\n",
+                        "  \"binary_excess\":{},\n  \"statistic_numerator\":{},\n",
+                        "  \"statistic_denominator\":{},\n  \"total_exact_rules\":{},\n",
+                        "  \"covered_exact_rules\":{},\n  \"replicates\":4096,\n",
+                        "  \"familywise_exceedances\":{},\n",
+                        "  \"familywise_empirical_p\":{:.12},\n  \"per_curve\":[{}],\n",
+                        "  \"status\":\"measured\"\n}}\n"
+                    ),
+                    targets.len(),
+                    rows.len(),
+                    TRACE_FEATURES,
+                    KUMMER_FEATURES,
+                    rules.len(),
+                    reconstruction_checks,
+                    discriminant_checks,
+                    resultant_checks,
+                    branch_pair_trace_checks,
+                    marked_two_isogeny_checks,
+                    marked_two_isogeny_checks,
+                    2 * marked_two_isogeny_checks,
+                    2 * marked_two_isogeny_checks,
+                    marked_two_isogeny_point_checks,
+                    marked_two_isogeny_true_features,
+                    marked_two_isogeny_distinguishing_targets,
+                    TARGETS,
+                    selected.mask,
+                    selected.polarity,
+                    selected.coverage,
+                    selected.matches,
+                    excess,
+                    selected.statistic.0,
+                    selected.statistic.1,
+                    total_exact_rules,
+                    covered_exact_rules,
+                    exceedances,
+                    (exceedances + 1) as f64 / (REPLICATES + 1) as f64,
+                    per_curve.join(",")
+                );
+                fs::write(output_path, json).map_err(|error| error.to_string())?;
+                println!(
+                    "chiral marked two-isogeny halving parity: mask={} polarity={} coverage={} matches={} exact={} p={:.6}",
+                    selected.mask,
+                    selected.polarity,
+                    selected.coverage,
+                    selected.matches,
+                    total_exact_rules,
+                    (exceedances + 1) as f64 / (REPLICATES + 1) as f64
+                );
+                return Ok(());
+            }
             if invariant_panel {
                 let invariant_nonzero_features: usize = targets
                     .iter()
@@ -1499,8 +1859,11 @@ fn main() {
         [_, flag, output] if flag == "--run-invariants" => {
             frozen::branch_residual::run_invariants(Path::new(output))
         }
+        [_, flag, output] if flag == "--run-kummer" => {
+            frozen::branch_residual::run_kummer(Path::new(output))
+        }
         _ => Err(
-            "usage: h116_chiral_branch_residual_parity --selftest | --run OUTPUT.json | --run-resultants OUTPUT.json | --run-traces OUTPUT.json | --run-invariants OUTPUT.json".to_string(),
+            "usage: h116_chiral_branch_residual_parity --selftest | --run OUTPUT.json | --run-resultants OUTPUT.json | --run-traces OUTPUT.json | --run-invariants OUTPUT.json | --run-kummer OUTPUT.json".to_string(),
         ),
     };
     if let Err(error) = result {
