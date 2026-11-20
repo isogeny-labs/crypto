@@ -408,8 +408,18 @@ pub(crate) fn rpow<R: Ring>(r: &R, a: R::E, mut e: u128) -> R::E {
         for j in 1..8 {
             odd[j] = r.mul(odd[j - 1], a2);
         }
-        let mut acc = r.one();
+        // The most-significant window is nonzero. Initialize directly
+        // from its precomputed odd power instead of squaring and multiplying
+        // the identity up to four times.
         let mut high = bits as i32 - 1;
+        let mut low = (high - 3).max(0);
+        while ((e >> (low as u32)) & 1) == 0 {
+            low += 1;
+        }
+        let width = (high - low + 1) as u32;
+        let digit = ((e >> (low as u32)) & ((1u128 << width) - 1)) as usize;
+        let mut acc = odd[(digit - 1) / 2];
+        high = low - 1;
         while high >= 0 {
             if ((e >> (high as u32)) & 1) == 0 {
                 acc = r.sqr(acc);
@@ -929,6 +939,11 @@ impl RadicalRootCtx {
             if n != 1 || negative {
                 return None;
             }
+            // The prime-field Jacobi character +1 proves that a is a
+            // quadratic residue. For p = 3 (mod 4), r=a^((p+1)/4) is
+            // necessarily a square root. Skip sqrt()'s redundant r*r check.
+            // Only public, canonical inputs take this variable-time branch.
+            return Some(self.f.powm(a, (p + 1) / 4));
         }
         self.sqrt(a)
     }
