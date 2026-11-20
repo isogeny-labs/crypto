@@ -227,6 +227,11 @@ pub(crate) trait Ring {
     }
     fn order(&self) -> u128; // |K^*|
     fn cand(&self, k: u64) -> Self::E; // k-th nonzero candidate (for non-cube search)
+    // Optional public-input shortcut; default retains the old two-power
+    // AMM path, including rejection before computing the candidate root.
+    fn root_and_sylow(&self, _a: Self::E, _e3: u128) -> Option<(Self::E, Self::E)> {
+        None
+    }
 }
 impl Ring for Fp {
     type E = u64;
@@ -315,6 +320,24 @@ impl Ring for Fq2 {
     fn order(&self) -> u128 {
         (self.f.p as u128) * (self.f.p as u128) - 1
     }
+    // R66_FP2_INVERSE_SYLOW_BEGIN
+    // x0=a^e3; h=x0^3/a=a^(3*e3-1)=a^t or a^(2t).
+    // Fp2 inversion uses one base-field Euclid inversion, eliminating a
+    // second full Fp2 exponentiation in AMM (public inputs only).
+    fn root_and_sylow(&self, a: (u64, u64), e3: u128)
+        -> Option<((u64, u64), (u64, u64))>
+    {
+        let f = &self.f;
+        if a.0 >= f.p || a.1 >= f.p || a == (0, 0) {
+            return None;
+        }
+        let norm = f.sub(f.sqr(a.0), self.mul_nonresidue(f.sqr(a.1)));
+        let inverse = f.inv(norm);
+        let x0 = self.pow(a, e3);
+        let numerator = self.mul(self.cube(x0), (a.0, f.neg(a.1)));
+        Some((x0, (f.mul(numerator.0, inverse), f.mul(numerator.1, inverse))))
+    }
+    // R66_FP2_INVERSE_SYLOW_END
     // x^p = conjugate(x) in F_{p^2}. Write e = lo + p*hi;
     // simultaneous powering uses ~log2(p) Fp2 squares, not ~2*log2(p).
     // When lo==hi, x^e = Norm(x)^lo lives entirely in Fp.
@@ -551,16 +574,27 @@ impl<R: Ring> Cube<R> {
         // Since 3*e3-1 is either t or 2*t, this removes one
         // full-length exponentiation from the AMM hot path.
         let t = self.n / self.p3s;
-        let g = r.pow(a, t);
-        let mut residue = g;
-        for _ in 1..self.s {
-            residue = r.cube(residue);
-        }
-        if residue != r.one() {
-            return None;
-        }
-        let x0 = r.pow(a, self.e3); // x0^3 = a * h, h in the 3-Sylow
-        let h = if t % 3 == 1 { r.mul(g, g) } else { g };
+        // R66_AMM_INVERSE_SYLOW_BEGIN
+        // Keep the old residuosity-first path for base fields and generic
+        // Rings: their inversions can be slower than exponentiation.
+        let (x0, h) = if let Some((x0, h)) = r.root_and_sylow(a, self.e3) {
+            let mut residue = h;
+            for _ in 1..self.s {
+                residue = r.cube(residue);
+            }
+            if residue != r.one() { return None; }
+            (x0, h)
+        } else {
+            let g = r.pow(a, t);
+            let mut residue = g;
+            for _ in 1..self.s {
+                residue = r.cube(residue);
+            }
+            if residue != r.one() { return None; }
+            let x0 = r.pow(a, self.e3);
+            (x0, if t % 3 == 1 { r.mul(g, g) } else { g })
+        };
+        // R66_AMM_INVERSE_SYLOW_END
         // For s=1, a cube has h=1 and x0 is already a root.
         if self.s == 1 {
             return Some(x0);
@@ -1358,6 +1392,88 @@ impl RadicalRootCtx {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // Frozen two-power AMM baseline, using the same production Fq2 powering.
+    #[derive(Clone, Copy)]
+    struct Round66BaselineFq2(Fq2);
+    impl Ring for Round66BaselineFq2 {
+        type E = (u64, u64);
+        fn zero(&self) -> Self::E { self.0.zero() }
+        fn one(&self) -> Self::E { self.0.one() }
+        fn mul(&self, a: Self::E, b: Self::E) -> Self::E { self.0.mul(a, b) }
+        fn sqr(&self, a: Self::E) -> Self::E { self.0.sqr(a) }
+        fn cube(&self, a: Self::E) -> Self::E { self.0.cube(a) }
+        fn pow(&self, a: Self::E, e: u128) -> Self::E { self.0.pow(a, e) }
+        fn order(&self) -> u128 { self.0.order() }
+        fn cand(&self, k: u64) -> Self::E { self.0.cand(k) }
+    }
+    fn round66_inputs(p: u64) -> Vec<(u64, u64)> {
+        let mut out = vec![(0, 0), (1, 0), (0, 1), (p - 1, p - 1)];
+        let mut state = p ^ 0x7259_cbd4_e7ab_8713;
+        for _ in 0..96 {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            let a = state % p;
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            out.push((a, state % p));
+        }
+        out
+    }
+
+    #[test]
+    fn round66_fp2_inverse_sylow_matches_prechange() {
+        for p in [487, 17_497, 1_000_000_007, 1_000_000_009, (1u64 << 61) - 1] {
+            let f = Fp::new(p);
+            let q = Fq2 { f, n: f.first_quadratic_nonresidue() };
+            let before = Cube::new(Round66BaselineFq2(q));
+            let after = Cube::new(q);
+            for a in round66_inputs(p) {
+                let expected = before.root(a);
+                let actual = after.root(a);
+                assert_eq!(actual, expected, "p={p}, a={a:?}");
+                if let Some(root) = actual {
+                    assert_eq!(q.cube(root), a, "p={p}, a={a:?}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "paired production-Rust Fp2 AMM benchmark"]
+    fn bench_round66_fp2_amm_inverse_sylow() {
+        use std::hint::black_box;
+        use std::time::Instant;
+        for p in [487, 17_497, 1_000_000_009] {
+            let f = Fp::new(p);
+            let q = Fq2 { f, n: f.first_quadratic_nonresidue() };
+            let before = Cube::new(Round66BaselineFq2(q));
+            let after = Cube::new(q);
+            let inputs = round66_inputs(p);
+            let mut timings = [Vec::new(), Vec::new()];
+            for trial in 0..13 {
+                for j in 0..2 {
+                    let after_flag = (trial + j) % 2 == 1;
+                    let start = Instant::now();
+                    let mut checksum = 0u64;
+                    for i in 0..400 {
+                        let a = black_box(inputs[i % inputs.len()]);
+                        let result = if after_flag { after.root(a) } else { before.root(a) };
+                        if let Some(x) = result { checksum ^= x.0.wrapping_add(x.1); }
+                    }
+                    black_box(checksum);
+                    timings[after_flag as usize].push(start.elapsed().as_nanos() as f64 / 400.0);
+                }
+            }
+            for v in &mut timings { v.sort_by(|a, b| a.partial_cmp(b).unwrap()); }
+            let old = timings[0][13];
+            let new = timings[1][13];
+            println!("round66_native_fp2_amm p={p} before_ns={old:.3} after_ns={new:.3} speedup={:.3}x", old/new);
+        }
+    }
+
 
     // Frozen, previously optimized Frobenius powering for AB/BA comparisons.
     fn fp2_pow_before_sparse(q: &Fq2, x: (u64, u64), e: u128) -> (u64, u64) {
