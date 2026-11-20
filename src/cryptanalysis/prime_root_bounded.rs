@@ -323,6 +323,16 @@ impl Producer<'_> {
                 return Ok(*poly);
             }
             out.len = poly.len;
+            // R62_PRODUCER_UNIT_SCALAR_BEGIN
+            // Multiplication by -1 is field negation, not a wide product.
+            if c == self.p - 1 {
+                for i in 0..poly.len as usize {
+                    out.coefficients[i] = self.sub(0, poly.coefficients[i])?;
+                }
+                out.trim();
+                return Ok(out);
+            }
+            // R62_PRODUCER_UNIT_SCALAR_END
             for i in 0..poly.len as usize {
                 out.coefficients[i] = self.mul(c, poly.coefficients[i])?;
             }
@@ -345,6 +355,27 @@ impl Producer<'_> {
                     .copy_from_slice(&poly.coefficients[..size]);
                 return Ok(out);
             }
+            // R62_PRODUCER_UNIT_LINEAR_BEGIN
+            // (x+1)f and (x-1)f require only coefficient additions or
+            // subtractions. Keep the ordinary generic linear path intact.
+            if c == 1 || c == self.p - 1 {
+                out.coefficients[0] = if c == 1 {
+                    poly.coefficients[0]
+                } else {
+                    self.sub(0, poly.coefficients[0])?
+                };
+                for i in 1..size {
+                    out.coefficients[i] = if c == 1 {
+                        self.add(poly.coefficients[i - 1], poly.coefficients[i])?
+                    } else {
+                        self.sub(poly.coefficients[i - 1], poly.coefficients[i])?
+                    };
+                }
+                out.coefficients[size] = poly.coefficients[size - 1];
+                out.trim();
+                return Ok(out);
+            }
+            // R62_PRODUCER_UNIT_LINEAR_END
             out.coefficients[0] = self.mul(c, poly.coefficients[0])?;
             for i in 1..size {
                 let scaled = self.mul(c, poly.coefficients[i])?;
@@ -642,6 +673,26 @@ impl Producer<'_> {
             return Ok(out);
         }
         // R55_PRODUCER_SMALL_SQUARE_END
+        // R62_PRODUCER_BINOMIAL_SQUARE_BEGIN
+        // (x^d+c)^2=x^(2d)+2cx^d+c^2. No sparse convolution
+        // is necessary, and the highest coefficient remains monic.
+        if a.len >= 3 && a.coefficients[a.len as usize - 1] == 1
+            && a.coefficients[1..a.len as usize - 1].iter().all(|&v| v == 0)
+        {
+            let d = a.len as usize - 1;
+            let c = a.coefficients[0];
+            out.coefficients[2 * d] = 1;
+            if c != 0 {
+                out.coefficients[0] = if c == 1 || c == self.p - 1 {
+                    1
+                } else {
+                    self.mul(c, c)?
+                };
+                out.coefficients[d] = self.add(c, c)?;
+            }
+            return Ok(out);
+        }
+        // R62_PRODUCER_BINOMIAL_SQUARE_END
         // R43_PRODUCER_SQUARE_BEGIN
         // In dense squares, double each row coefficient once rather than
         // doubling all off-diagonal products. Each term remains canonical.
@@ -1524,6 +1575,17 @@ impl Replay {
                 return Ok(*poly);
             }
             z.len = poly.len;
+            // R62_REPLAY_UNIT_SCALAR_BEGIN
+            // Replay uses its independent subtraction routine for -f.
+            if scalar.coefficients[0] == self.p - 1 {
+                for k in 0..poly.len as usize {
+                    self.gate.charge(32)?;
+                    z.coefficients[k] = self.minus(0, poly.coefficients[k])?;
+                }
+                z.trim();
+                return Ok(z);
+            }
+            // R62_REPLAY_UNIT_SCALAR_END
             for k in 0..poly.len as usize {
                 self.gate.charge(32)?;
                 z.coefficients[k] = self.times(scalar.coefficients[0], poly.coefficients[k])?;
@@ -1547,6 +1609,27 @@ impl Replay {
                     .copy_from_slice(&poly.coefficients[..size]);
                 return Ok(z);
             }
+            // R62_REPLAY_UNIT_LINEAR_BEGIN
+            // Independently compute diagonals of (x+/-1)f by one
+            // canonical field sum/difference per interior coefficient.
+            if c == 1 || c == self.p - 1 {
+                for k in 0..=size {
+                    self.gate.charge(32)?;
+                    z.coefficients[k] = if k == 0 {
+                        if c == 1 { poly.coefficients[0] }
+                        else { self.minus(0, poly.coefficients[0])? }
+                    } else if k == size {
+                        poly.coefficients[size - 1]
+                    } else if c == 1 {
+                        self.plus(poly.coefficients[k - 1], poly.coefficients[k])?
+                    } else {
+                        self.minus(poly.coefficients[k - 1], poly.coefficients[k])?
+                    };
+                }
+                z.trim();
+                return Ok(z);
+            }
+            // R62_REPLAY_UNIT_LINEAR_END
             for k in 0..=size {
                 self.gate.charge(32)?;
                 z.coefficients[k] = if k == 0 {
@@ -1815,6 +1898,26 @@ impl Replay {
             return Ok(z);
         }
         // R55_REPLAY_SMALL_SQUARE_END
+        // R62_REPLAY_BINOMIAL_SQUARE_BEGIN
+        // The replay square is constructed by coefficient degree,
+        // independently of the producer's row-major sparse algorithm.
+        if len >= 3 && x.coefficients[len - 1] == 1
+            && x.coefficients[1..len - 1].iter().all(|&v| v == 0)
+        {
+            let d = len - 1;
+            let c = x.coefficients[0];
+            z.coefficients[2 * d] = 1;
+            if c != 0 {
+                z.coefficients[0] = if c == 1 || c == self.p - 1 {
+                    1
+                } else {
+                    self.times(c, c)?
+                };
+                z.coefficients[d] = self.plus(c, c)?;
+            }
+            return Ok(z);
+        }
+        // R62_REPLAY_BINOMIAL_SQUARE_END
         // R43_REPLAY_SQUARE_BEGIN
         // Independent diagonal traversal. Cache twice the lower-index
         // coefficient so every off-diagonal term needs only one add.
@@ -2620,6 +2723,92 @@ mod tests {
         Fp64Arithmetic::try_new(p, 131072, 4096, deadline(), &mut |_| Ok(()))
             .unwrap()
             .field
+    }
+
+    #[test]
+    fn round62_unit_coefficients_and_binomial_squares_match_wide_oracle() {
+        // Full 128-bit coefficient oracle is independent of producer/replay.
+        // Include zero, +/-1 and dense controls at both 32- and 61-bit primes.
+        fn oracle(a: &Poly17, b: &Poly17, p: u64) -> Poly17 {
+            let mut coefficients = [0u64; 17];
+            if a.len == 0 || b.len == 0 { return Poly17::ZERO; }
+            let n = (a.len + b.len - 1) as usize;
+            for i in 0..a.len as usize {
+                for j in 0..b.len as usize {
+                    coefficients[i + j] =
+                        ((coefficients[i + j] as u128
+                          + a.coefficients[i] as u128 * b.coefficients[j] as u128)
+                         % p as u128) as u64;
+                }
+            }
+            let mut result = Poly17 {
+                coefficients,
+                len: n as u8,
+            };
+            result.trim();
+            result
+        }
+        let mut comparisons = 0usize;
+        for p in [3u64, 5, 7, 101, 1_000_000_007, 1_000_000_009,
+                  (1u64 << 61) - 1] {
+            let f = field(p);
+            let mut observer = |_: &BoundedRootEvent| Ok(());
+            let mut producer = Producer {
+                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
+                unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
+                roots: [0; 8], root_count: 0,
+            };
+            producer.gate.admit().unwrap();
+            let mut replay =
+                Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+            for degree in [2usize, 3, 5, 8] {
+                for seed in 0..64u64 {
+                    let mut values = vec![0u64; degree];
+                    let mut state = seed ^ p.wrapping_mul(0x9e3779b97f4a7c15);
+                    for (i, coefficient) in values.iter_mut().enumerate() {
+                        state = state.wrapping_mul(6364136223846793005)
+                            .wrapping_add(1442695040888963407);
+                        *coefficient = if seed % 5 == 0 && i % 2 == 0 {
+                            0
+                        } else {
+                            state % p
+                        };
+                    }
+                    values[degree - 1] = 1;
+                    let polynomial = Poly17::from_coefficients(&f, &values).unwrap();
+                    for factor in [
+                        Poly17::from_coefficients(&f, &[p - 1]).unwrap(),
+                        Poly17::from_coefficients(&f, &[1, 1]).unwrap(),
+                        Poly17::from_coefficients(&f, &[p - 1, 1]).unwrap(),
+                        Poly17::from_coefficients(&f, &[2 % p, 1]).unwrap(),
+                    ] {
+                        let expected = oracle(&polynomial, &factor, p);
+                        assert_eq!(producer.product(&polynomial, &factor).unwrap(), expected);
+                        assert_eq!(replay.convolution(&polynomial, &factor).unwrap(), expected);
+                        comparisons += 2;
+                    }
+                    producer.gate.metrics.work = 0;
+                    producer.gate.metrics.field_work = 0;
+                    replay.gate.metrics.work = 0;
+                    replay.gate.metrics.field_work = 0;
+                }
+                for c in [0, 1, p - 1, 2 % p, 17 % p] {
+                    let mut coefficients = vec![0u64; degree + 1];
+                    coefficients[0] = c;
+                    coefficients[degree] = 1;
+                    let polynomial = Poly17::from_coefficients(&f, &coefficients).unwrap();
+                    let expected = oracle(&polynomial, &polynomial, p);
+                    assert_eq!(producer.square(&polynomial).unwrap(), expected);
+                    assert_eq!(replay.square_diagonals(&polynomial).unwrap(), expected);
+                    comparisons += 2;
+                    producer.gate.metrics.work = 0;
+                    producer.gate.metrics.field_work = 0;
+                    replay.gate.metrics.work = 0;
+                    replay.gate.metrics.field_work = 0;
+                }
+            }
+        }
+        println!("ROUND62_ORACLE comparisons={comparisons}");
     }
     fn run(f: &[u64], p: u64, limits: RootBudget) -> (BoundedRootReport, Vec<BoundedRootEvent>) {
         let field = field(p);
