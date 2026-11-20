@@ -15,3 +15,10 @@ The user asked to run stage 1. The Iso Lab route named in the protocol is blocke
 
 ## Log
 
+- Binary: built at the freeze commit `234e6193` in place, SHA-256 `3c04b4be2d9b79cd02632852d2402eb9ead0a00e9e11228b0926ce9ec66443f8`. A one-target local check passed: 2/2 verified, 2/2 replays reproduced.
+- 2026-11-20T22:08Z: pod `r94vjjpl59a3nh` created (`cpu5c`, 8 vCPU, USD 0.28/h, EUR-IS-1). Binary and both specs were uploaded and hash-checked.
+- The specs were launched concurrently. `ecbench` permits one timed session per host (`/tmp/crypto-bench.lock`), so the std run was refused at once (rc 2, "another benchmark holds /tmp/crypto-bench.lock"). This is a launch error on my side. std was re-queued with `--wait` as a separate job.
+- **tw completed:** `run rc=0 wall=672s`, then `ecbench verify --replay-all` gave "audit OK: 180 records, 180 verified, 150 replays reproduced, 0 problems". The packed `results.tgz` had SHA-256 `ef3592598ade31c16b184c360a227cfb5797bf91dd023a1eb23bbdf9d06871b9`.
+- **The pod disappeared before anything was fetched.** By 2026-11-20T23:00Z, `GET /v2/pods/r94vjjpl59a3nh` returned 404, and the account listed no pods at all, including another session's `replead-r1-20261116`. The REST v2 API does not show the account balance, and the cause was not established: possibly the balance running out, as on 2026-11-09, or an account-wide termination.
+- **Lost:** the tw sessions (only the audit line above survives) and the std run, which was mid-way. **Measured rows kept: 0.** The tw audit line is a receipt that the run completed. It is not a result, because its records were not preserved.
+- **Lesson:** fetch each spec's sessions as soon as that spec finishes, not at the end.
