@@ -1,0 +1,12 @@
+{
+  "row": {
+    "elapsed_s": 4.944,
+    "exit_code": 1,
+    "id": "C2",
+    "result": null,
+    "status": "error",
+    "stderr_tail": "Traceback (most recent call last):\n  File \"/Volumes/SSD990-2/crypto-worktrees/exotic-ecdlp-recovery-20261119/research/exotic_ecdlp_20261021/xedni_selected_height_diagnostic_20261120/rank_c2_pari_effort_sage.py\", line 24, in <module>\n    main()\n    ~~~~^^\n  File \"/Volumes/SSD990-2/crypto-worktrees/exotic-ecdlp-recovery-20261119/research/exotic_ecdlp_20261021/xedni_selected_height_diagnostic_20261120/rank_c2_pari_effort_sage.py\", line 17, in main\n    rank = curve.rank(use_database=False, proof=True, algorithm=\"pari\",\n                      only_use_mwrank=True, pari_effort=3)\n  File \"/Volumes/SSD990/cryptanalysis/third_party/sage-binary/local/var/lib/sage/venv-python3.14/lib/python3.14/site-packages/sage/schemes/elliptic_curves/ell_rational_field.py\", line 2071, in rank\n    raise RuntimeError(f\"rank not provably correct (lower bound: {len(ge)}, upper bound:{upper}). Hint: increase pari_effort.\")\nRuntimeError: rank not provably correct (lower bound: 2, upper bound:3). Hint: increase pari_effort.\n"
+  },
+  "schema": "xedni-selected-c2-pari-effort-v1",
+  "timeout_seconds": 90
+}

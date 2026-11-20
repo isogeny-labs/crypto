@@ -1,0 +1,33 @@
+{
+  "schema": "xedni-selected-height-protocol-v1",
+  "frozen_at": "2026-11-20",
+  "source": {
+    "path": "/Volumes/SSD990/cryptanalysis/experiments/xedni-varying-curve-selection-20261115/rows-v2.jsonl.gz",
+    "sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+    "accepted_pairs": 20,
+    "distinct_curves": 3
+  },
+  "fixtures_sha256": "7df5e375792c2c9cd0368ffd878e47ef268078bc14b42b6d1384fddf9cf3f0b7",
+  "source_sha256": {
+    "make_fixtures.py": "96334c6d36b6f8770e1913f545c919be6104863790afd18d19da3f3ce2749e33",
+    "height_sage.py": "c66d2b04959bd69ded361a4a1ea458d1b0c8d65ca07d7a56b0e863e88322d873",
+    "rank_sage.py": "60806cdec0e8bb75fda79a667e925b21d8448d2ff1f2203a38293447e8a90f2a",
+    "run_rank.py": "00940645d8ecf053e15d52de7e21bd026c082fbe832149a78010bf974f27ccf2"
+  },
+  "curve_ids": ["C0", "C1", "C2"],
+  "measurements": {
+    "point_heights": "Every distinct selected rational point, both PARI and Sage canonical-height algorithms, 128-bit precision",
+    "pair_control": "Canonical-height parallelogram residual for all 20 accepted pairs",
+    "torsion": "Sage rational torsion subgroup order on every selected curve",
+    "rank": "Sage Simon two-descent rank_bounds with known selected points and limbigprime=0",
+    "rank_timeout_seconds_per_curve": 90,
+    "host_tier": "ordinary local correctness diagnostic; no wall-time comparison"
+  },
+  "status_rules": {
+    "rank_timeout": "Preserve timeout row and leave full rank unresolved",
+    "rank_error": "Preserve error row and leave full rank unresolved",
+    "rank_interval": "Report lower and upper bounds separately unless equal",
+    "height": "PARI and Sage values are numerical estimates; retain crosscheck and parallelogram residuals",
+    "claim_boundary": "Selected 20-pair finite panel only; no uniform height bound across the xedni selection law"
+  }
+}
