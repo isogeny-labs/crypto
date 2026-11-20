@@ -10830,6 +10830,207 @@ impl<E: Copy + PartialEq> WalkTable<E> {
     }
 }
 
+/// The table of a [`TargetWalk`]: key → `(u, z, b)`, insert-or-get only.
+///
+/// It replaces a `HashMap<u64, (u128, u64, u64)>`, whose 48-byte entries
+/// (`u128` forces 16-byte alignment) in a power-of-two bucket array
+/// touched about 190 fresh pages per solve; each first touch is a page
+/// fault, 17% of the walk's samples on the profiled host (round 039
+/// profiles).  This table stores 40-byte slots at load at most 3/4 in one
+/// zeroed allocation (`calloc`: untouched zero pages) and asks the kernel
+/// to fault a table of at least 256 KiB in with one call.  Neither the
+/// layout nor the prefault changes which keys collide or the order the
+/// walk inserts them, so the counted cost is unchanged.
+///
+/// A slot is `[key + 1, u_lo, u_hi, z, b]`, with 0 in the first word for
+/// an empty slot; the one key whose `+ 1` wraps (`u64::MAX`) has its own
+/// field.  Linear probing from a multiplicative hash; if the load would
+/// pass 7/8 (the caller's size hint was too small) the table doubles.
+struct TwTable {
+    slots: Vec<[u64; 5]>,
+    special: Option<(u128, u64, u64)>,
+    len: usize,
+}
+
+/// What [`TwTable::entry`] found.
+enum TwEntry<'a> {
+    Vacant(TwVacant<'a>),
+    Occupied((u128, u64, u64)),
+}
+
+/// An empty place in a [`TwTable`] for the key just looked up.
+struct TwVacant<'a> {
+    table: &'a mut TwTable,
+    /// Slot index, or `usize::MAX` for the `u64::MAX` key's own field.
+    idx: usize,
+    key: u64,
+}
+
+impl TwVacant<'_> {
+    fn insert(self, val: (u128, u64, u64)) {
+        if self.idx == usize::MAX {
+            self.table.special = Some(val);
+        } else {
+            self.table.slots[self.idx] = [
+                self.key.wrapping_add(1),
+                val.0 as u64,
+                (val.0 >> 64) as u64,
+                val.1,
+                val.2,
+            ];
+        }
+        self.table.len += 1;
+    }
+}
+
+impl TwTable {
+    /// Room for `entries` keys at load at most 3/4.
+    fn with_capacity(entries: usize) -> Self {
+        let n = entries + entries / 3 + 8;
+        let mut slots = vec![[0u64; 5]; n];
+        Self::prefault(&mut slots);
+        Self {
+            slots,
+            special: None,
+            len: 0,
+        }
+    }
+
+    /// Fault a large table in with one `madvise` instead of one page
+    /// fault per first touch (Linux 5.14 and later; any failure is
+    /// ignored, the pages then fault in on first touch as before).
+    #[cfg(target_os = "linux")]
+    fn prefault(slots: &mut [[u64; 5]]) {
+        const MADV_POPULATE_WRITE: libc::c_int = 23;
+        const PAGE: usize = 4096;
+        let bytes = std::mem::size_of_val(slots);
+        if bytes < (256 << 10) {
+            return;
+        }
+        let start = slots.as_mut_ptr() as usize;
+        let first = (start + PAGE - 1) & !(PAGE - 1);
+        let end = (start + bytes) & !(PAGE - 1);
+        if end > first {
+            // SAFETY: [first, end) lies inside the `slots` allocation, whole
+            // pages of memory this table owns; populating them neither
+            // changes their contents (zero) nor is observable from Rust.
+            unsafe {
+                libc::madvise(first as *mut libc::c_void, end - first, MADV_POPULATE_WRITE);
+            }
+        }
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    fn prefault(_slots: &mut [[u64; 5]]) {}
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    fn unpack(slot: &[u64; 5]) -> (u128, u64, u64) {
+        (
+            u128::from(slot[1]) | (u128::from(slot[2]) << 64),
+            slot[3],
+            slot[4],
+        )
+    }
+
+    /// The stored value of `key`, if any.
+    fn get(&self, key: u64) -> Option<(u128, u64, u64)> {
+        if key == u64::MAX {
+            return self.special;
+        }
+        let want = key + 1;
+        let mut i = self.home(key);
+        // Load stays below 7/8, so an empty slot ends the probe.
+        loop {
+            let slot = &self.slots[i];
+            if slot[0] == 0 {
+                return None;
+            }
+            if slot[0] == want {
+                return Some(Self::unpack(slot));
+            }
+            i += 1;
+            if i == self.slots.len() {
+                i = 0;
+            }
+        }
+    }
+
+    /// Every stored `(key, value)`, in no particular order.
+    #[cfg(test)]
+    fn iter(&self) -> impl Iterator<Item = (u64, (u128, u64, u64))> + '_ {
+        self.slots
+            .iter()
+            .filter(|s| s[0] != 0)
+            .map(|s| (s[0] - 1, Self::unpack(s)))
+            .chain(self.special.map(|v| (u64::MAX, v)))
+    }
+
+    #[cfg(test)]
+    fn values(&self) -> impl Iterator<Item = (u128, u64, u64)> + '_ {
+        self.iter().map(|(_, v)| v)
+    }
+
+    fn home(&self, key: u64) -> usize {
+        let h = key.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15);
+        ((u128::from(h) * self.slots.len() as u128) >> 64) as usize
+    }
+
+    fn grow(&mut self) {
+        let mut bigger = Self::with_capacity(self.slots.len() * 2);
+        bigger.special = self.special;
+        bigger.len = self.len;
+        for slot in self.slots.iter().filter(|s| s[0] != 0) {
+            let mut i = bigger.home(slot[0].wrapping_sub(1));
+            while bigger.slots[i][0] != 0 {
+                i += 1;
+                if i == bigger.slots.len() {
+                    i = 0;
+                }
+            }
+            bigger.slots[i] = *slot;
+        }
+        *self = bigger;
+    }
+
+    fn entry(&mut self, key: u64) -> TwEntry<'_> {
+        if key == u64::MAX {
+            return match self.special {
+                Some(v) => TwEntry::Occupied(v),
+                None => TwEntry::Vacant(TwVacant {
+                    table: self,
+                    idx: usize::MAX,
+                    key,
+                }),
+            };
+        }
+        if (self.len + 1) * 8 > self.slots.len() * 7 {
+            self.grow();
+        }
+        let want = key + 1;
+        let mut i = self.home(key);
+        loop {
+            let slot = &self.slots[i];
+            if slot[0] == 0 {
+                return TwEntry::Vacant(TwVacant {
+                    table: self,
+                    idx: i,
+                    key,
+                });
+            }
+            if slot[0] == want {
+                return TwEntry::Occupied(Self::unpack(slot));
+            }
+            i += 1;
+            if i == self.slots.len() {
+                i = 0;
+            }
+        }
+    }
+}
+
 /// One row of a [`TargetWalk`] in the relation loop's convention
 /// `Σ coef·x = h·(a + b·d)` (`Relation::Row { columns, a, b }`).
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -10974,7 +11175,7 @@ pub struct TargetWalk<E> {
     /// Key (abscissa and sign bit, shifted) → `(u, z, b)`; with two seeds
     /// `u = u1 << 64 | u2` (a `u128`); with `cv=0` or `lazy` bit 127 of
     /// `u` ([`TW_SIGN_BIT`]) is the key's low bit.
-    map: FastMap<(u128, u64, u64)>,
+    map: TwTable,
     /// Table accesses made by the walk (one `entry` call per non-identity
     /// step, in every mode); not emitted as a counter.
     pub table_probes: u64,
@@ -11574,7 +11775,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             }
         }
         let mut tw = Self {
-            map: fast_map(t_max as usize + 1),
+            map: TwTable::with_capacity(t_max as usize + 1),
             table_probes: 0,
             verify_collisions,
             unverified_collisions: 0,
@@ -11694,7 +11895,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                         0
                     };
                     let mut kept = match tw.map.entry(key) {
-                        std::collections::hash_map::Entry::Vacant(slot) => {
+                        TwEntry::Vacant(slot) => {
                             debug_assert!(item.c.0 & (TW_SIGN_BIT | TW_AUT_MASK) == 0);
                             slot.insert((item.c.0 | low | rot, item.c.1, item.c.2));
                             if let Some((pi, h, minus, _)) = item.xref {
@@ -11702,7 +11903,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                             }
                             continue;
                         }
-                        std::collections::hash_map::Entry::Occupied(o) => *o.get(),
+                        TwEntry::Occupied(v) => v,
                     };
                     let kept_rot = kept.0 & TW_AUT_MASK;
                     kept.0 &= !TW_AUT_MASK;
@@ -11760,13 +11961,13 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                 let low = u128::from(store_sign) * (u128::from(full_key & 1) << 127);
                 tw.table_probes += 1;
                 let mut kept = match tw.map.entry(key) {
-                    std::collections::hash_map::Entry::Vacant(slot) => {
+                    TwEntry::Vacant(slot) => {
                         // The bits are free: every coefficient is below 2^62.
                         debug_assert!(c.0 & (TW_SIGN_BIT | TW_AUT_MASK) == 0);
                         slot.insert((c.0 | low | rot, c.1, c.2));
                         continue;
                     }
-                    std::collections::hash_map::Entry::Occupied(o) => *o.get(),
+                    TwEntry::Occupied(v) => v,
                 };
                 let kept_rot = kept.0 & TW_AUT_MASK;
                 kept.0 &= !TW_AUT_MASK;
@@ -12489,7 +12690,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                 point_rot = i << TW_AUT_SHIFT;
             }
         }
-        let (u, z, b) = *self.map.get(&key)?;
+        let (u, z, b) = self.map.get(key)?;
         // Clear the cv=0 / lazy sign bit and the aut rotation (never set
         // otherwise).
         let entry_rot = u & TW_AUT_MASK;
@@ -21255,13 +21456,13 @@ mod wwalk_table_tests {
                 assert_eq!(n.steps, n.insert_attempts + n.identities_skipped);
                 assert_eq!(n.entries, v.entries);
                 assert_eq!(n.map.len(), v.map.len());
-                for (key, &(u, z, b)) in &v.map {
+                for (key, (u, z, b)) in v.map.iter() {
                     assert_eq!(u & TW_SIGN_BIT, 0);
-                    let &(nu, nz, nb) = n.map.get(key).expect("same keys");
+                    let (nu, nz, nb) = n.map.get(key).expect("same keys");
                     assert_eq!((nu & !TW_SIGN_BIT, nz, nb), (u, z, b));
                 }
                 // The relation loop's probe reads the same entry in both.
-                for &(u, z, b) in v.map.values().take(8) {
+                for (u, z, b) in v.map.values().take(8) {
                     // One seed: the u128 word holds `u` itself.
                     let Some(pt) = v.eval(g, &mut cops, u as u64, 0, z, b) else {
                         continue;
@@ -21349,9 +21550,9 @@ mod wwalk_table_tests {
                 assert_eq!(n.steps_rank_three, v.steps_rank_three);
                 assert_eq!(n.table_probes, v.table_probes);
                 assert_eq!(n.map.len(), v.map.len());
-                for (key, &(u, z, b)) in &v.map {
+                for (key, (u, z, b)) in v.map.iter() {
                     assert_eq!(u & TW_SIGN_BIT, 0);
-                    let &(nu, nz, nb) = n.map.get(key).expect("same keys");
+                    let (nu, nz, nb) = n.map.get(key).expect("same keys");
                     assert_eq!((nu & !TW_SIGN_BIT, nz, nb), (u, z, b));
                 }
                 assert_eq!(n.verify_ops, GroupOps::default());
@@ -22512,5 +22713,85 @@ mod ksum_wide_index_tests {
         // 1000 points fit 10 bits, but 2^5 C(500, 6) sums are far above the entry limit.
         let wide = prime_factor_base(&inst, 500);
         assert!(msg(KSumTable::build_negation_folded(g, &wide, 6)).contains("above the limit"));
+    }
+}
+
+#[cfg(test)]
+mod tw_table_tests {
+    use super::{TwEntry, TwTable};
+    use std::collections::HashMap;
+
+    /// The table answers like a `HashMap` insert-or-get: same vacancy, same
+    /// stored value on a second insert, same length, across the edge keys
+    /// 0 and `u64::MAX`, a size hint far too small (forces growth) and a
+    /// table above the prefault threshold.
+    fn agree(hint: usize, keys: usize, seed: u64) {
+        let mut state = seed;
+        let mut next = || {
+            state = state
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            state >> 11
+        };
+        let mut table = TwTable::with_capacity(hint);
+        let mut reference: HashMap<u64, (u128, u64, u64)> = HashMap::new();
+        let mut inserted = 0usize;
+        for i in 0..keys {
+            let key = match i % 997 {
+                0 => 0,
+                1 => u64::MAX,
+                _ => next() % (3 * keys as u64 / 2 + 1),
+            };
+            let val = (
+                (u128::from(next()) << 64 | u128::from(next())) & !(1u128 << 127),
+                next(),
+                next(),
+            );
+            match (table.entry(key), reference.get(&key)) {
+                (TwEntry::Vacant(slot), None) => {
+                    slot.insert(val);
+                    reference.insert(key, val);
+                    inserted += 1;
+                }
+                (TwEntry::Occupied(got), Some(want)) => assert_eq!(got, *want, "key {key}"),
+                (TwEntry::Vacant(_), Some(_)) => panic!("key {key}: vacant, but stored"),
+                (TwEntry::Occupied(_), None) => panic!("key {key}: occupied, but never stored"),
+            }
+            assert_eq!(table.len(), inserted);
+            assert_eq!(table.len(), reference.len());
+        }
+    }
+
+    #[test]
+    fn matches_hashmap_with_exact_hint() {
+        agree(20_000, 20_000, 1);
+    }
+
+    #[test]
+    fn matches_hashmap_when_the_hint_is_too_small() {
+        agree(4, 50_000, 2);
+    }
+
+    #[test]
+    fn matches_hashmap_above_the_prefault_threshold() {
+        // 40-byte slots: 12_000 entries is about 640 KiB, above 256 KiB.
+        agree(12_000, 14_000, 3);
+    }
+
+    #[test]
+    fn edge_keys_round_trip() {
+        let mut table = TwTable::with_capacity(8);
+        for key in [0u64, 1, u64::MAX - 1, u64::MAX] {
+            let val = (u128::from(key) << 7, key ^ 5, key.rotate_left(3));
+            match table.entry(key) {
+                TwEntry::Vacant(slot) => slot.insert(val),
+                TwEntry::Occupied(_) => panic!("fresh key {key} occupied"),
+            }
+            match table.entry(key) {
+                TwEntry::Occupied(got) => assert_eq!(got, val),
+                TwEntry::Vacant(_) => panic!("key {key} lost"),
+            }
+        }
+        assert_eq!(table.len(), 4);
     }
 }

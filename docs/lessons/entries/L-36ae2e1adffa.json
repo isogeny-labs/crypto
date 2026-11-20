@@ -1,0 +1,14 @@
+{
+  "action": "run the workload as a fixed list of jobs looped inside one profiled command (160 jobs x 10) so perf gets thousands of samples, and split the folded stacks by the real solve root frame, not child_main: the first filter attributed only 12% of samples",
+  "created": "2026-11-19T16:15:20Z",
+  "evidence": [
+    "round-039/profiles/README.md; first folded-stack filter used child_main, the root was solve_ic_prime"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "profile"
+  ],
+  "trigger": "a profile of a short-lived process (a few ms per run) on a host without a PMU",
+  "why": ""
+}

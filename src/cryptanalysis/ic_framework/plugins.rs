@@ -5319,7 +5319,7 @@ mod tests {
     /// itself as affine (so linear-subspace consumers refuse it), and
     /// every point has order dividing `#E / 2`.
     #[test]
-    fn the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e() {
+    fn the_trace_coset_base_on_an_a1_curve_is_affine_and_in_two_e_dup() {
         use crate::cryptanalysis::ic_boundary::binary_affine_subspace_factor_base;
         let ko = koblitz_instance(1, 17).expect("a = 1 over F_2^17");
         let (basis, offset) = trace_coset_basis(&ko, 6).unwrap();
