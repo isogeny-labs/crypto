@@ -48,7 +48,9 @@
 //! `decompose` batches its leading coefficients; [`RadicalQuartic::solve`]
 //! is the scalar reference.
 
-use super::semaev_decomp::{quartic_in_x3, Gf2, Poly, QuarticSubspaceRoots};
+use super::semaev_decomp::{
+    eval_s4_general, quartic_in_x3, quartic_in_x3_general, Gf2, Poly, QuarticSubspaceRoots,
+};
 
 /// An `F₂`-linear map on single-word field elements, applied a byte at a
 /// time through precomputed tables.
@@ -825,6 +827,226 @@ impl FactoredOracle {
     }
 }
 
+// ── The factorisation for any subspace and any curve constant ──────────
+
+/// [`FactoredOracle`] for the general curve `y² + xy = x³ + ax² + b` and
+/// any `F₂`-subspace `V`: the drop-in counterpart of
+/// [`super::semaev_decomp::SubspaceOracle`] — same `decompose` contract
+/// (a witness of abscissae with `S₄ = 0`, and the pairs processed) — that
+/// the boundary ledger runs as its own full-DLP variant.
+///
+/// `S₃(x₁, x₂, X) = x₁²x₂² + x₁²X² + x₂²X² + x₁x₂X + b`, so
+/// `S₄(X₁, X₂, X, x_R) = 0` iff `X` is a root of `S₃(u, x_R, ·)` for a root
+/// `u = x(P₁ ± P₂)` of `S₃(X₁, X₂, ·)`, or `X = x_R` when `X₁ = X₂`
+/// (`P₁ + P₂ = O`).  Cases, each in closed form:
+///
+/// * `X₁ ≠ X₂`, `X₁X₂ ≠ 0`: an Artin–Schreier step gives `u, u'`.  If
+///   none is rational the roots are conjugate, and a rational `X` makes
+///   `S₃(x_R, X, ·) ∝ S₃(X₁, X₂, ·)`, whence (comparing coefficients, the
+///   product of the two root-products being `b`) `{x_R, X} = {X₁, X₂}` or
+///   `{√b/X₁, √b/X₂}`: those few pairs are decided by evaluation over `V`.
+/// * `X₁X₂ = 0 ≠ X₁ + X₂ = y`: `y²u² = b`, `u = √b/y`.
+/// * `X₁ = X₂ = x ≠ 0`: `u = (x⁴ + b)/x²` (the linear `S₃`), and `X = x_R`.
+/// * `X₁ = X₂ = 0`: evaluation over `V` (one pair).
+///
+/// and for each `u`: `u = x_R ≠ 0` gives `X = (u⁴ + b)/u²`; `u·x_R = 0`
+/// gives `X = √b/(u + x_R)`; otherwise one Artin–Schreier step.  Every
+/// candidate in `V` is confirmed by evaluating `S₄`, so a wrong case can
+/// only lose a witness, never invent one — and the equivalence test
+/// against `SubspaceOracle` checks that none is lost.
+pub struct FactoredSubspaceOracle {
+    pub l: u32,
+    pub b: u64,
+    sqrt_b: u64,
+    /// Every element of `V`, in `SubspaceOracle`'s order.
+    pub span: Vec<u64>,
+    /// Echelon basis `(pivot bit, vector)`, pivots descending.
+    echelon: Vec<(u32, u64)>,
+    r: RadicalQuartic,
+}
+
+impl FactoredSubspaceOracle {
+    /// `None` for even `n` (no half-trace) or a dependent basis.
+    pub fn new(basis: &[u64], b: u64, gf: &Gf2) -> Option<Self> {
+        let l = basis.len() as u32;
+        let r = RadicalQuartic::new(0, gf)?;
+        let mut span = Vec::with_capacity(1usize << l);
+        for idx in 0..(1u64 << l) {
+            let mut v = 0u64;
+            for (j, &e) in basis.iter().enumerate() {
+                if (idx >> j) & 1 == 1 {
+                    v ^= e;
+                }
+            }
+            span.push(v);
+        }
+        let mut echelon: Vec<(u32, u64)> = Vec::new();
+        for &v0 in basis {
+            let mut v = v0;
+            for &(p, e) in &echelon {
+                if v >> p & 1 == 1 {
+                    v ^= e;
+                }
+            }
+            if v == 0 {
+                return None;
+            }
+            let p = 63 - v.leading_zeros();
+            // Keep it reduced against the new pivot too, then insert sorted.
+            for e in echelon.iter_mut() {
+                if e.1 >> p & 1 == 1 {
+                    e.1 ^= v;
+                }
+            }
+            echelon.push((p, v));
+            echelon.sort_unstable_by(|a, b| b.0.cmp(&a.0));
+        }
+        Some(Self {
+            l,
+            b,
+            sqrt_b: r.sqrt(b),
+            span,
+            echelon,
+            r,
+        })
+    }
+
+    #[inline(always)]
+    pub fn contains(&self, mut x: u64) -> bool {
+        for &(p, e) in &self.echelon {
+            if x >> p & 1 == 1 {
+                x ^= e;
+            }
+        }
+        x == 0
+    }
+
+    /// The first root in `V` of `S₄(x₁, x₂, ·, x_R)` by evaluation.
+    fn by_evaluation(&self, x1: u64, x2: u64, xr: u64, gf: &Gf2) -> Option<u64> {
+        let q = quartic_in_x3_general(x1, x2, xr, self.b, gf);
+        let ev = |t: u64| {
+            (0..q.c.len())
+                .rev()
+                .fold(0u64, |v, j| gf.mul(v, t) ^ q.c[j])
+        };
+        self.span.iter().copied().find(|&t| ev(t) == 0)
+    }
+
+    /// A candidate root `X`: kept when in `V` and `S₄` vanishes there.
+    #[inline(always)]
+    fn accept(&self, x1: u64, x2: u64, x: u64, xr: u64, gf: &Gf2) -> bool {
+        self.contains(x) && eval_s4_general(x1, x2, x, xr, self.b, gf) == 0
+    }
+
+    /// Same contract as `SubspaceOracle::decompose`.
+    pub fn decompose(&self, xr: u64, gf: &Gf2) -> (Option<[u64; 3]>, u64) {
+        #[cfg(target_arch = "x86_64")]
+        if gf.folds() {
+            // SAFETY: a field folds only when `pclmulqdq` was detected.
+            return unsafe { self.decompose_clmul(xr, gf) };
+        }
+        self.decompose_body(xr, gf)
+    }
+
+    #[cfg(target_arch = "x86_64")]
+    #[target_feature(enable = "pclmulqdq")]
+    unsafe fn decompose_clmul(&self, xr: u64, gf: &Gf2) -> (Option<[u64; 3]>, u64) {
+        self.decompose_body(xr, gf)
+    }
+
+    #[inline(always)]
+    fn decompose_body(&self, xr: u64, gf: &Gf2) -> (Option<[u64; 3]>, u64) {
+        let n = self.span.len();
+        let (b, sb) = (self.b, self.sqrt_b);
+        let mut pairs = 0u64;
+        let mut inv: Vec<u64> = Vec::with_capacity(n);
+        let mut tmp: Vec<u64> = Vec::with_capacity(n);
+        let mut us: Vec<(u64, u64)> = Vec::with_capacity(2 * n);
+        let mut inv2: Vec<u64> = Vec::with_capacity(2 * n);
+        for i in 0..n {
+            let x1 = self.span[i];
+            // Stage A for the row: 1/(A₁B₁) of every generic pair.
+            inv.clear();
+            for &x2 in &self.span[i..] {
+                inv.push(gf.mul(gf.sqr(x1 ^ x2), gf.mul(x1, x2)));
+            }
+            gf.batch_inv(&mut inv, &mut tmp);
+            us.clear();
+            for (k, &x2) in self.span[i..].iter().enumerate() {
+                pairs += 1;
+                let (a1, b1) = (gf.sqr(x1 ^ x2), gf.mul(x1, x2));
+                if a1 == 0 {
+                    // X₁ = X₂: P₁ + P₂ = O gives X = x_R; the other sum's u is linear.
+                    if self.accept(x1, x2, xr, xr, gf) {
+                        return (Some([x1, x2, xr]), pairs);
+                    }
+                    if x1 == 0 {
+                        if let Some(x3) = self.by_evaluation(x1, x2, xr, gf) {
+                            return (Some([x1, x2, x3]), pairs);
+                        }
+                        continue;
+                    }
+                    let x2sq = gf.sqr(x1);
+                    us.push((x2, gf.mul(gf.sqr(x2sq) ^ b, gf.inv(x2sq))));
+                    continue;
+                }
+                if b1 == 0 {
+                    us.push((x2, gf.mul(sb, gf.inv(x1 ^ x2))));
+                    continue;
+                }
+                let c1 = gf.sqr(b1) ^ b;
+                match as_roots(a1, b1, c1, inv[k], &self.r, gf) {
+                    Some([u0, u1]) => {
+                        us.push((x2, u0));
+                        us.push((x2, u1));
+                    }
+                    None => {
+                        let guarded =
+                            xr == x1 || xr == x2 || gf.mul(xr, x1) == sb || gf.mul(xr, x2) == sb;
+                        if guarded {
+                            if let Some(x3) = self.by_evaluation(x1, x2, xr, gf) {
+                                return (Some([x1, x2, x3]), pairs);
+                            }
+                        }
+                    }
+                }
+            }
+            // Stage B for the row.
+            inv2.clear();
+            inv2.extend(
+                us.iter()
+                    .map(|&(_, u)| gf.mul(gf.sqr(u ^ xr), gf.mul(u, xr))),
+            );
+            gf.batch_inv(&mut inv2, &mut tmp);
+            for (j, &(x2, u)) in us.iter().enumerate() {
+                let (a2, b2) = (gf.sqr(u ^ xr), gf.mul(u, xr));
+                let cands: [Option<u64>; 2] = if a2 == 0 {
+                    if u == 0 {
+                        [None, None]
+                    } else {
+                        let u2 = gf.sqr(u);
+                        [Some(gf.mul(gf.sqr(u2) ^ b, gf.inv(u2))), None]
+                    }
+                } else if b2 == 0 {
+                    [Some(gf.mul(sb, gf.inv(u ^ xr))), None]
+                } else {
+                    let c2 = gf.sqr(b2) ^ b;
+                    match as_roots(a2, b2, c2, inv2[j], &self.r, gf) {
+                        Some([x0, x1r]) => [Some(x0), Some(x1r)],
+                        None => [None, None],
+                    }
+                };
+                for x in cands.into_iter().flatten() {
+                    if self.accept(x1, x2, x, xr, gf) {
+                        return (Some([x1, x2, x]), pairs);
+                    }
+                }
+            }
+        }
+        (None, pairs)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1022,6 +1244,65 @@ mod tests {
                 }
             }
             assert!(yes > 20 && no > 20, "n={n}: yes={yes} no={no}");
+        }
+    }
+    #[test]
+    fn factored_subspace_oracle_decides_as_subspace_oracle() {
+        use crate::cryptanalysis::semaev_decomp::{eval_s4_general, SubspaceOracle};
+        for (n, l) in [(13u32, 4u32), (17, 5), (19, 6), (23, 6)] {
+            let gf = field(n);
+            let mut rng = StdRng::seed_from_u64(900 + n as u64);
+            for trial in 0..3 {
+                let b = (rng.gen::<u64>() & ((1 << n) - 1)) | 1;
+                // A low-order base (the ledger's) and a random subspace.
+                let basis: Vec<u64> = if trial == 0 {
+                    (0..l).map(|i| 1u64 << i).collect()
+                } else {
+                    loop {
+                        let cand: Vec<u64> =
+                            (0..l).map(|_| rng.gen::<u64>() & ((1 << n) - 1)).collect();
+                        if let Some(_) = FactoredSubspaceOracle::new(&cand, b, &gf) {
+                            break cand;
+                        }
+                    }
+                };
+                let base = SubspaceOracle::new(&basis, b, &gf);
+                let fac = FactoredSubspaceOracle::new(&basis, b, &gf).unwrap();
+                let (mut yes, mut no) = (0, 0);
+                for i in 0..200 {
+                    // Plant targets as x of an S₄ root over the base, half the time.
+                    let xr = if i % 2 == 0 {
+                        let pick = |rng: &mut StdRng| base.span[rng.gen_range(0..base.span.len())];
+                        let (x1, x2, x3) = (pick(&mut rng), pick(&mut rng), pick(&mut rng));
+                        let q = quartic_in_x3_general(x1, x2, x3, b, &gf);
+                        let ev = |t: u64| {
+                            (0..q.c.len())
+                                .rev()
+                                .fold(0u64, |v, j| gf.mul(v, t) ^ q.c[j])
+                        };
+                        (1..1u64 << n.min(14)).find(|&t| ev(t) == 0).unwrap_or(1)
+                    } else {
+                        rng.gen::<u64>() & ((1 << n) - 1)
+                    };
+                    let (want, _) = base.decompose(xr, &gf);
+                    let (got, pairs) = fac.decompose(xr, &gf);
+                    assert_eq!(
+                        got.is_some(),
+                        want.is_some(),
+                        "n={n} l={l} b={b:#x} xr={xr:#x}"
+                    );
+                    if let Some([a, c, d]) = got {
+                        assert!(fac.contains(a) && fac.contains(c) && fac.contains(d));
+                        assert_eq!(eval_s4_general(a, c, d, xr, b, &gf), 0);
+                        yes += 1;
+                    } else {
+                        let k = base.span.len() as u64;
+                        assert_eq!(pairs, k * (k + 1) / 2);
+                        no += 1;
+                    }
+                }
+                assert!(yes > 10 && no > 10, "n={n}: yes={yes} no={no}");
+            }
         }
     }
 }

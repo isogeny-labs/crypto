@@ -110,6 +110,7 @@ use rand::{Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
 
 use crate::binary_ecc::{BinaryCurve, BinaryPoint, IrreduciblePoly};
+use crate::cryptanalysis::binary_radical_root::FactoredSubspaceOracle;
 use crate::cryptanalysis::curve_id::{self, CurveId};
 use crate::cryptanalysis::efd_representations::EfdRepresentation;
 use crate::cryptanalysis::ic_measurement as measurement;
@@ -216,6 +217,12 @@ pub struct Calibration {
     pub ns_per_as_solve: Option<f64>,
     /// One pair of the `S₄` pairs-and-solve loop, binary regimes.
     pub ns_per_s4_pair: Option<f64>,
+    /// One pair of the factored `S₄ = S₃·S₃` oracle
+    /// ([`FactoredSubspaceOracle`]), binary regimes.  Measured on the host
+    /// like `ns_per_s4_pair`; absent (and left out of the record) where
+    /// that oracle did not run.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_s4f_pair: Option<f64>,
     /// One probe into the pair table (hash lookup), measured on the real
     /// table when one is built.
     pub ns_per_lookup: f64,
@@ -13151,6 +13158,9 @@ pub enum Oracle<'a> {
     },
     /// Semaev `S₄` pairs-and-solve over a subspace (`m = 3`, binary).
     SemaevS4 { oracle: &'a SubspaceOracle },
+    /// The same decision by `S₄ = S₃(u, x_R, X)·S₃(u', x_R, X)`, one
+    /// Artin–Schreier step a pair (`m = 3`, binary, odd `n`).
+    SemaevS4Factored { oracle: &'a FactoredSubspaceOracle },
 }
 
 impl Oracle<'_> {
@@ -13161,13 +13171,14 @@ impl Oracle<'_> {
             Oracle::Mitm { m, .. } => format!("meet_in_the_middle_m{m}"),
             Oracle::MitmFrobenius { m, .. } => format!("meet_in_the_middle_m{m}_frobenius_folded"),
             Oracle::SemaevS4 { .. } => "semaev_s4_pairs_and_solve".into(),
+            Oracle::SemaevS4Factored { .. } => "semaev_s4_factored".into(),
         }
     }
     pub fn summands(&self) -> u32 {
         match self {
             Oracle::SemaevS3Roots | Oracle::Subtract => 2,
             Oracle::Mitm { m, .. } | Oracle::MitmFrobenius { m, .. } => *m,
-            Oracle::SemaevS4 { .. } => 3,
+            Oracle::SemaevS4 { .. } | Oracle::SemaevS4Factored { .. } => 3,
         }
     }
     /// The table this oracle probes, as a cost to fold into the
@@ -13188,6 +13199,8 @@ pub struct OracleCounters {
     pub sqrt_solves: u64,
     pub inversions: u64,
     pub s4_pairs: u64,
+    /// Pairs of the factored oracle, priced by `ns_per_s4f_pair`.
+    pub s4f_pairs: u64,
     pub s4_hits: u64,
     pub lift_failures: u64,
     /// Algebraic systems the solver decided satisfiable none of whose
@@ -13316,7 +13329,9 @@ fn decompose_prime(
             None
         }
         Oracle::Mitm { table, m } => decompose_mitm(curve, fb, table, *m, ops, ctr, target),
-        Oracle::MitmFrobenius { .. } | Oracle::SemaevS4 { .. } => None,
+        Oracle::MitmFrobenius { .. }
+        | Oracle::SemaevS4 { .. }
+        | Oracle::SemaevS4Factored { .. } => None,
     }
 }
 
@@ -13405,6 +13420,19 @@ fn decompose_binary(
                 }
             }
             None
+        }
+        Oracle::SemaevS4Factored { oracle } => {
+            let (witness, pairs) = oracle.decompose(target.x, &inst.gf);
+            ctr.s4f_pairs += pairs;
+            let xs = witness?;
+            ctr.s4_hits += 1;
+            match lift_abscissae(&g, fb, ops, &xs, target) {
+                Some(w) => Some(w),
+                None => {
+                    ctr.lift_failures += 1;
+                    None
+                }
+            }
         }
         Oracle::SemaevS4 { oracle } => {
             let (witness, pairs) = oracle.decompose(target.x, &inst.gf);
@@ -14691,6 +14719,9 @@ fn collect_and_solve_relations_scaled_touching<
     rel.count("sqrt_solves", ctr.sqrt_solves);
     rel.count("inversions", ctr.inversions);
     rel.count("s4_pairs", ctr.s4_pairs);
+    if ctr.s4f_pairs > 0 {
+        rel.count("s4f_pairs", ctr.s4f_pairs);
+    }
     rel.count("s4_hits", ctr.s4_hits);
     rel.count("lift_failures", ctr.lift_failures);
     rel.count("unliftable_systems", ctr.unliftable_systems);
@@ -14872,6 +14903,7 @@ pub fn price_phase(phase: &mut PhaseCost, calib: &Calibration) {
     gae += conv("sqrt_solves", calib.ns_per_sqrt);
     gae += conv("as_solves", calib.ns_per_as_solve);
     gae += conv("s4_pairs", calib.ns_per_s4_pair);
+    gae += conv("s4f_pairs", calib.ns_per_s4f_pair);
     gae += conv("lookups", Some(calib.ns_per_lookup));
     gae += conv("row_ops", Some(calib.ns_per_row_op));
     gae += conv("legendre_symbols", calib.ns_per_legendre);
@@ -15732,6 +15764,25 @@ fn calibrate_binary(inst: &BinaryInstance, calib: &mut Calibration) {
 
 /// Nanoseconds per pair of the `S₄` pairs-and-solve loop, measured on
 /// random targets of this instance.
+/// [`calibrate_s4`] for the factored oracle, on the same random targets.
+pub fn calibrate_s4f(
+    inst: &BinaryInstance,
+    oracle: &FactoredSubspaceOracle,
+    calib: &mut Calibration,
+) {
+    let mut rng = StdRng::seed_from_u64(inst.r ^ 0x54);
+    let mut pairs = 0u64;
+    let start = Instant::now();
+    let mut tries = 0;
+    while tries < 3 || (pairs < 200_000 && tries < 64) {
+        let xr = rng.gen::<u64>() & inst.gf.mask;
+        let (_, p) = oracle.decompose(xr, &inst.gf);
+        pairs += p;
+        tries += 1;
+    }
+    calib.ns_per_s4f_pair = Some(start.elapsed().as_nanos() as f64 / pairs.max(1) as f64);
+}
+
 pub fn calibrate_s4(inst: &BinaryInstance, oracle: &SubspaceOracle, calib: &mut Calibration) {
     let mut rng = StdRng::seed_from_u64(inst.r ^ 0x54);
     let mut pairs = 0u64;
@@ -16013,6 +16064,13 @@ pub fn run_char2_instance(inst: &BinaryInstance, cfg: &BoundaryConfig) -> Option
     if let Some(o) = &s4 {
         calibrate_s4(inst, o, &mut calib);
     }
+    // Its factored counterpart, where the half-trace exists (odd `n`).
+    let s4f = (m_used == 3 && inst.n <= cfg.s4_max_degree)
+        .then(|| FactoredSubspaceOracle::new(&basis, inst.b, &inst.gf))
+        .flatten();
+    if let Some(o) = &s4f {
+        calibrate_s4f(inst, o, &mut calib);
+    }
     let space = inst.group_order as f64;
     let exact_m2 = exact_decomposition_ceiling(&g, &fb.points, r, 2);
     let exact_m3 = exact_decomposition_ceiling(&g, &fb.points, r, 3);
@@ -16147,6 +16205,15 @@ pub fn run_char2_instance(inst: &BinaryInstance, cfg: &BoundaryConfig) -> Option
                     exact_m3,
                 ));
             }
+        }
+        if let Some(o) = &s4f {
+            variants.push((
+                "semaev_s4_factored_m3".into(),
+                Oracle::SemaevS4Factored { oracle: o },
+                random,
+                &fb,
+                exact_m3,
+            ));
         }
         // Round 2: the negation-folded table, walk targets, and the
         // two-summand row where it fits.
