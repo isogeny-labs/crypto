@@ -154,12 +154,17 @@ The null changes only the global wiring of interior ports while preserving the v
     `12n < |T|`, the generic-coverage inequality and the checked dilation
     transport map give at least
     `(f^(n+1)/2)^2 / (12 * meanBound)` original-curve points with a nonempty
-    generic decomposition. Thus canonical nonvanishing, average energy, and
-    this explicit constant-density coverage bound are closed for the bounded
-    `A = 0` family. Efficient decomposition extraction, independent-relation
-    collection and restart probabilities, expected-runtime assembly, and
-    bit-complexity specialization remain open; no subexponential ECDLP
-    algorithm is yet proved. [pcc:unverified]
+    generic decomposition. For the minimal-root factor base, Lean additionally
+    proves `Mdil <= C_n * p` for the explicit fixed-arity constant
+    `C_n = (2n+1)!! * 8^(n+1) + 4 * D_n * 16^(n+1)` and
+    `D_n = 2(n+1) * 2^(2(n+1)-2)`. Each good dilation consequently covers at
+    least the fixed fraction `1 / (48 * 4^(n+1) * C_n)` of the field-sized
+    scale. Thus canonical nonvanishing, average energy, and an explicit
+    constant-density coverage fraction are closed for the bounded `A = 0`
+    family. Binding the decomposition machine's labels to the row collector,
+    independent-relation collection and restart probabilities,
+    expected-runtime assembly, and bit-complexity specialization remain open;
+    no subexponential ECDLP algorithm is yet proved. [pcc:unverified]
 16. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
 17. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
 

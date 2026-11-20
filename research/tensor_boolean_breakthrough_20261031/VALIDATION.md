@@ -1692,3 +1692,29 @@ efficiently finding a decomposition for a covered point, proving the sampled
 relations are sufficiently independent, pricing failures and restarts, and
 specializing every operation to a bit-complexity bound. No subexponential
 prime-field ECDLP algorithm follows yet. [pcc:unverified]
+
+The minimal-root arithmetic is now explicit as well.
+`zmodCanonical_Mdil_le_linear` proves
+
+```text
+Mdil <= (dfac(m) * 8^m + 4 * D * 16^m) * p
+```
+
+from `(X-1)^m < p`, `X >= 2`, and `p >= 2`. The proof uses
+`X^m <= 2^m p`, `X^(2m)/(p-1) <= 2 * 4^m p`, and the exact identity
+`|(ZMod p)^x| = p-1`. With the certified degree
+`D_n = 2(n+1) * 2^(2(n+1)-2)`, the definition
+`zmodCanonicalEnergyLinearConstant` depends only on fixed arity.
+`linearMeanCoverageGivesConstantFraction` then converts the generic-coverage
+bound into the field-relative fraction
+`1 / (48 * 4^(n+1) * C_n)`. The production theorem
+`zmodCanonical_oneTwelfth_linear_decomposition_coverage` proves that at least
+one twelfth of all nonzero dilations attain this fraction. The targeted build
+again completes 9,136 jobs, and the full repository proof gate reports
+`PASS 479 thm 0 trusted` across all nine tracked modules. [pcc:unverified]
+
+This closes the concrete coverage-fraction input expected by the checked v2
+adaptive Chernoff collector. The next binding obligation is to decode and
+label the fixed-arity decomposition machine's output as the `Fin f` rows used
+by that collector, while preserving its machine cost. Independence, outer
+restart assembly, and bit complexity remain open. [pcc:unverified]

@@ -2405,6 +2405,121 @@ theorem zmodCanonical_avg_energy_dil
       cubicNonsingular BNonzero T factorBasePositive factorBaseBound
       intervalShort arityBelow)
 
+/-- The average-energy constant is linear in the field size when `X = |T|`
+is a minimal integral `m`-th root of the modulus.  The deliberately coarse
+constant is completely explicit and depends only on `m` and the certified
+dilation degree. -/
+theorem zmodCanonical_Mdil_le_linear
+    (modulus n D : ℕ) [Fact modulus.Prime]
+    (T : Finset (ZMod modulus))
+    (fieldAtLeastTwo : 2 ≤ modulus)
+    (factorBaseAtLeastTwo : 2 ≤ T.card)
+    (minimalRoot : (T.card - 1) ^ (n + 1) < modulus) :
+    ECDLP.L49.Mdil (ZMod modulus) n T D ≤
+      ((ECDLP.L40.dfac (n + 1) * 8 ^ (n + 1) +
+          4 * D * 16 ^ (n + 1)) * modulus : ℕ) := by
+  let m := n + 1
+  let X := T.card
+  have unitsCard : Fintype.card (ZMod modulus)ˣ = modulus - 1 := by
+    have cardIdentity :=
+      Fintype.card_eq_card_units_add_one (ZMod modulus)
+    simp only [ZMod.card] at cardIdentity
+    omega
+  have XLeTwicePred : X ≤ 2 * (X - 1) := by
+    dsimp [X]
+    omega
+  have XPowLe : X ^ m ≤ 2 ^ m * modulus := by
+    calc
+      X ^ m ≤ (2 * (X - 1)) ^ m :=
+        Nat.pow_le_pow_left XLeTwicePred m
+      _ = 2 ^ m * (X - 1) ^ m := by rw [mul_pow]
+      _ ≤ 2 ^ m * modulus := by
+        exact Nat.mul_le_mul_left _ minimalRoot.le
+  have XDoublePowLe : X ^ (2 * m) ≤ 4 ^ m * modulus ^ 2 := by
+    calc
+      X ^ (2 * m) = (X ^ m) ^ 2 := by
+        rw [two_mul, pow_add, pow_two]
+      _ ≤ (2 ^ m * modulus) ^ 2 := Nat.pow_le_pow_left XPowLe 2
+      _ = 4 ^ m * modulus ^ 2 := by
+        rw [mul_pow]
+        congr 1
+        calc
+          (2 ^ m) ^ 2 = 2 ^ (m * 2) := by rw [pow_mul]
+          _ = 2 ^ (2 * m) := by congr 1; omega
+          _ = (2 ^ 2) ^ m := by rw [pow_mul]
+          _ = 4 ^ m := by norm_num
+  have modulusLeTwicePred : modulus ≤ 2 * (modulus - 1) := by omega
+  have denominatorPositive : (0 : ℝ) < (modulus - 1 : ℕ) := by
+    exact_mod_cast (Nat.sub_pos_of_lt fieldAtLeastTwo)
+  have quotientBound :
+      (X : ℝ) ^ (2 * m) / (modulus - 1 : ℕ) ≤
+        2 * (4 : ℝ) ^ m * modulus := by
+    rw [div_le_iff₀ denominatorPositive]
+    have doublePowReal :
+        (X : ℝ) ^ (2 * m) ≤ (4 : ℝ) ^ m * modulus ^ 2 := by
+      exact_mod_cast XDoublePowLe
+    have modulusPredReal :
+        (modulus : ℝ) ≤ 2 * (modulus - 1 : ℕ) := by
+      exact_mod_cast modulusLeTwicePred
+    calc
+      (X : ℝ) ^ (2 * m) ≤ (4 : ℝ) ^ m * modulus ^ 2 :=
+        doublePowReal
+      _ = ((4 : ℝ) ^ m * modulus) * modulus := by ring
+      _ ≤ ((4 : ℝ) ^ m * modulus) * (2 * (modulus - 1 : ℕ)) :=
+        mul_le_mul_of_nonneg_left modulusPredReal (by positivity)
+      _ = 2 * (4 : ℝ) ^ m * modulus * (modulus - 1 : ℕ) := by ring
+  have firstTermBound :
+      (ECDLP.L40.dfac m : ℝ) * 4 ^ m * X ^ m ≤
+        ECDLP.L40.dfac m * 8 ^ m * modulus := by
+    have XPowReal : (X : ℝ) ^ m ≤ 2 ^ m * modulus := by
+      exact_mod_cast XPowLe
+    calc
+      (ECDLP.L40.dfac m : ℝ) * 4 ^ m * X ^ m ≤
+          ECDLP.L40.dfac m * 4 ^ m * (2 ^ m * modulus) := by
+        gcongr
+      _ = ECDLP.L40.dfac m * (4 ^ m * 2 ^ m) * modulus := by ring
+      _ = ECDLP.L40.dfac m * 8 ^ m * modulus := by
+        rw [← mul_pow]
+        norm_num
+  have secondTermBound :
+      (4 : ℝ) ^ m * (2 * D) * (X : ℝ) ^ (2 * m) /
+          Fintype.card (ZMod modulus)ˣ ≤
+        4 * D * 16 ^ m * modulus := by
+    rw [unitsCard]
+    calc
+      (4 : ℝ) ^ m * (2 * D) * X ^ (2 * m) /
+          ((modulus - 1 : ℕ) : ℝ) =
+          (4 : ℝ) ^ m * (2 * D) *
+            (X ^ (2 * m) / ((modulus - 1 : ℕ) : ℝ)) := by ring
+      _ ≤ (4 : ℝ) ^ m * (2 * D) *
+          (2 * 4 ^ m * modulus) := by gcongr
+      _ = 4 * D * (4 ^ m * 4 ^ m) * modulus := by ring
+      _ = 4 * D * 16 ^ m * modulus := by
+        rw [← mul_pow]
+        norm_num
+  change
+    (ECDLP.L40.dfac m : ℝ) * 4 ^ m * X ^ m +
+        4 ^ m * (2 * D) * X ^ (2 * m) /
+          Fintype.card (ZMod modulus)ˣ ≤
+      (((ECDLP.L40.dfac m * 8 ^ m + 4 * D * 16 ^ m) * modulus : ℕ) : ℝ)
+  calc
+    _ ≤ (ECDLP.L40.dfac m : ℝ) * 8 ^ m * modulus +
+        (4 : ℝ) * D * 16 ^ m * modulus :=
+      add_le_add firstTermBound secondTermBound
+    _ = (((ECDLP.L40.dfac m * 8 ^ m + 4 * D * 16 ^ m) * modulus : ℕ) : ℝ) := by
+      push_cast
+      ring
+
+/-- Certified degree used by the canonical `A = 0` dilation family with
+decomposition arity `n + 1`. -/
+def zmodCanonicalDilationDegree (n : ℕ) : ℕ :=
+  (2 * (n + 1)) * 2 ^ (2 * (n + 1) - 2)
+
+/-- Explicit fixed-arity constant in the linear `Mdil` bound. -/
+def zmodCanonicalEnergyLinearConstant (n : ℕ) : ℕ :=
+  ECDLP.L40.dfac (n + 1) * 8 ^ (n + 1) +
+    4 * zmodCanonicalDilationDegree n * 16 ^ (n + 1)
+
 /-- At least one twelfth of all nonzero dilations simultaneously have a
 factor base of size at least `|T|/2` and energy below twelve times any natural
 upper bound for `Mdil`.  This composes the checked character-sum first moment
@@ -2657,6 +2772,161 @@ theorem zmodCanonical_oneTwelfth_decomposition_coverage
     exact ⟨largeMembership,
       zmodCanonical_good_dilation_coverage modulus n meanBound B T
         TArity meanPositive u largeMembership energySmall⟩
+
+/-- If the factor-base root covers the field size and the mean energy is at
+most `C * p`, the generic-coverage lower bound is a fixed positive fraction
+of `p`.  This is the arithmetic conversion used by the production endpoint. -/
+theorem linearMeanCoverageGivesConstantFraction
+    (modulus m X f C covered : ℕ)
+    (modulusPositive : 0 < modulus)
+    (constantPositive : 0 < C)
+    (rootCovers : modulus ≤ X ^ m)
+    (factorBaseLarge : X ≤ 2 * f)
+    (coverageLower :
+      (((f : ℝ) ^ m / 2) ^ 2 / (12 * ((C * modulus : ℕ) : ℝ))) ≤
+        covered) :
+    (modulus : ℝ) / (48 * 4 ^ m * C) ≤ covered := by
+  have powerLower : modulus ≤ 2 ^ m * f ^ m := by
+    calc
+      modulus ≤ X ^ m := rootCovers
+      _ ≤ (2 * f) ^ m := Nat.pow_le_pow_left factorBaseLarge m
+      _ = 2 ^ m * f ^ m := by rw [mul_pow]
+  have squareLowerNat : modulus ^ 2 ≤ 4 ^ m * (f ^ m) ^ 2 := by
+    calc
+      modulus ^ 2 ≤ (2 ^ m * f ^ m) ^ 2 :=
+        Nat.pow_le_pow_left powerLower 2
+      _ = 4 ^ m * (f ^ m) ^ 2 := by
+        rw [mul_pow]
+        congr 1
+        calc
+          (2 ^ m) ^ 2 = 2 ^ (m * 2) := by rw [pow_mul]
+          _ = 2 ^ (2 * m) := by congr 1; omega
+          _ = (2 ^ 2) ^ m := by rw [pow_mul]
+          _ = 4 ^ m := by norm_num
+  have squareLowerReal :
+      (modulus : ℝ) ^ 2 ≤ (4 : ℝ) ^ m * ((f : ℝ) ^ m) ^ 2 := by
+    exact_mod_cast squareLowerNat
+  have denominatorLeftPositive :
+      (0 : ℝ) < 48 * 4 ^ m * C := by positivity
+  have denominatorRightPositive :
+      (0 : ℝ) < 48 * C * modulus := by positivity
+  have fractionCompare :
+      (modulus : ℝ) / (48 * 4 ^ m * C) ≤
+        ((f : ℝ) ^ m) ^ 2 / (48 * C * modulus) := by
+    rw [div_le_div_iff₀ denominatorLeftPositive denominatorRightPositive]
+    calc
+      (modulus : ℝ) * (48 * C * modulus) =
+          (48 * C) * modulus ^ 2 := by ring
+      _ ≤ (48 * C) * (4 ^ m * ((f : ℝ) ^ m) ^ 2) :=
+        mul_le_mul_of_nonneg_left squareLowerReal (by positivity)
+      _ = ((f : ℝ) ^ m) ^ 2 * (48 * 4 ^ m * C) := by ring
+  apply fractionCompare.trans
+  calc
+    ((f : ℝ) ^ m) ^ 2 /
+        ((48 : ℝ) * (C : ℝ) * (modulus : ℝ)) =
+        (((f : ℝ) ^ m / 2) ^ 2 /
+          ((12 : ℝ) * ((C * modulus : ℕ) : ℝ))) := by
+      push_cast
+      have constantNonzero : (C : ℝ) ≠ 0 := by positivity
+      have modulusNonzero : (modulus : ℝ) ≠ 0 := by positivity
+      field_simp [constantNonzero, modulusNonzero]
+      ring
+    _ ≤ (covered : ℝ) := coverageLower
+
+/-- Production coverage endpoint with no free average-energy parameter.  For
+the minimal-root factor base, the checked linear `Mdil` estimate supplies the
+explicit denominator `12 * C_n * p`, where `C_n` depends only on the fixed
+decomposition arity. -/
+theorem zmodCanonical_oneTwelfth_linear_decomposition_coverage
+    (modulus X n : ℕ) [Fact modulus.Prime]
+    (hn : 1 ≤ n)
+    (hChar : ringChar (ZMod modulus) ≠ 2)
+    (twoNonzeroBase : (2 : ZMod modulus) ≠ 0)
+    (B : ZMod modulus)
+    [(shortCharacterCurve 0 0 B).IsElliptic]
+    (hDelta : (ECDLP.L43.shortW (0 : ZMod modulus) B).Δ ≠ 0)
+    (cubicNonsingular : (27 : ZMod modulus) * B ^ 2 ≠ 0)
+    (BNonzero : B ≠ 0)
+    (T : Finset (ZMod modulus))
+    (factorBasePositive : ∀ value ∈ T, 0 < ZMod.val value)
+    (factorBaseBound : ∀ value ∈ T, ZMod.val value ≤ X)
+    (TArity : 12 * n < T.card)
+    (fieldLarge : 324 ≤ Fintype.card (ZMod modulus))
+    (factorBaseAtLeastTwo : 2 ≤ T.card)
+    (minimalRoot : (T.card - 1) ^ (n + 1) < modulus)
+    (rootCovers : modulus ≤ T.card ^ (n + 1))
+    (intervalShort : 3 * X < modulus)
+    (arityBelow :
+      3 * (2 ^ (2 * (n + 1)) * (2 * (n + 1))) ^ 2 < modulus) :
+    ∃ Good : Finset (ZMod modulus)ˣ,
+      Fintype.card (ZMod modulus)ˣ ≤ 12 * Good.card ∧
+      ∀ u ∈ Good,
+        T.card ≤ 2 *
+          (ECDLP.L43.fb
+            ((u : ZMod modulus) ^ 4 * 0)
+            ((u : ZMod modulus) ^ 6 * B) T).card ∧
+        ((((ECDLP.L43.fb
+              ((u : ZMod modulus) ^ 4 * 0)
+              ((u : ZMod modulus) ^ 6 * B) T).card : ℝ) ^ (n + 1) / 2) ^ 2 /
+            (12 * ((zmodCanonicalEnergyLinearConstant n * modulus : ℕ) : ℝ))) ≤
+          ((Finset.univ.filter fun R :
+              (ECDLP.L43.shortW (0 : ZMod modulus) B).Point =>
+            (ECDLP.L46.Dec
+              (ECDLP.L43.shortW (0 : ZMod modulus) B)
+              (fun x => (u : ZMod modulus) ^ 2 * x ∈ T) n R).Nonempty).card) ∧
+        (modulus : ℝ) /
+            (48 * 4 ^ (n + 1) * zmodCanonicalEnergyLinearConstant n) ≤
+          ((Finset.univ.filter fun R :
+              (ECDLP.L43.shortW (0 : ZMod modulus) B).Point =>
+            (ECDLP.L46.Dec
+              (ECDLP.L43.shortW (0 : ZMod modulus) B)
+              (fun x => (u : ZMod modulus) ^ 2 * x ∈ T) n R).Nonempty).card) := by
+  have fieldAtLeastTwo : 2 ≤ modulus := by
+    have : 324 ≤ modulus := by simpa [ZMod.card] using fieldLarge
+    omega
+  have degreeIdentity :
+      zmodCanonicalDilationDegree n =
+        (2 * (n + 1)) * 2 ^ (2 * (n + 1) - 2) := rfl
+  have meanBoundAbove :
+      ECDLP.L49.Mdil (ZMod modulus) n T
+          ((2 * (n + 1)) * 2 ^ (2 * (n + 1) - 2)) ≤
+        ((zmodCanonicalEnergyLinearConstant n * modulus : ℕ) : ℝ) := by
+    simpa [zmodCanonicalEnergyLinearConstant, degreeIdentity] using
+      zmodCanonical_Mdil_le_linear modulus n
+        (zmodCanonicalDilationDegree n) T fieldAtLeastTwo
+        factorBaseAtLeastTwo minimalRoot
+  have dfacPositive : 0 < ECDLP.L40.dfac (n + 1) := by
+    exact Finset.prod_pos fun i _ => by omega
+  have constantPositive : 0 < zmodCanonicalEnergyLinearConstant n := by
+    unfold zmodCanonicalEnergyLinearConstant
+    exact Nat.add_pos_left
+      (Nat.mul_pos dfacPositive (pow_pos (by omega) _)) _
+  have meanPositive :
+      0 < zmodCanonicalEnergyLinearConstant n * modulus :=
+    Nat.mul_pos constantPositive (Fact.out : modulus.Prime).pos
+  obtain ⟨Good, goodCard, goodProperty⟩ :=
+    zmodCanonical_oneTwelfth_decomposition_coverage
+    modulus X n (zmodCanonicalEnergyLinearConstant n * modulus)
+    hn hChar twoNonzeroBase B hDelta cubicNonsingular BNonzero T
+    factorBasePositive factorBaseBound TArity fieldLarge intervalShort
+    arityBelow meanPositive meanBoundAbove
+  refine ⟨Good, goodCard, ?_⟩
+  intro u hu
+  obtain ⟨factorBaseLarge, coverageLower⟩ := goodProperty u hu
+  refine ⟨factorBaseLarge, coverageLower, ?_⟩
+  exact linearMeanCoverageGivesConstantFraction
+    modulus (n + 1) T.card
+    (ECDLP.L43.fb
+      ((u : ZMod modulus) ^ 4 * 0)
+      ((u : ZMod modulus) ^ 6 * B) T).card
+    (zmodCanonicalEnergyLinearConstant n)
+    ((Finset.univ.filter fun R :
+        (ECDLP.L43.shortW (0 : ZMod modulus) B).Point =>
+      (ECDLP.L46.Dec
+        (ECDLP.L43.shortW (0 : ZMod modulus) B)
+        (fun x => (u : ZMod modulus) ^ 2 * x ∈ T) n R).Nonempty).card)
+    (Fact.out : modulus.Prime).pos constantPositive rootCovers
+    factorBaseLarge coverageLower
 
 set_option maxHeartbeats 200000
 
