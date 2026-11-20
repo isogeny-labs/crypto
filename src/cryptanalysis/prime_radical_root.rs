@@ -1468,8 +1468,8 @@ mod tests {
                 }
             }
             for v in &mut timings { v.sort_by(|a, b| a.partial_cmp(b).unwrap()); }
-            let old = timings[0][13];
-            let new = timings[1][13];
+            let old = timings[0][6];
+            let new = timings[1][6];
             println!("round66_native_fp2_amm p={p} before_ns={old:.3} after_ns={new:.3} speedup={:.3}x", old/new);
         }
     }
