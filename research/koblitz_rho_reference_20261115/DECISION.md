@@ -53,3 +53,14 @@ below 2^38, the change *increases* the reported distance to rho on these rows.
 - `research/koblitz_rho_reference_20261115/README.md` (audit, v5/strong 0.079 at n29 to 0.96 at
   n53 at w = 0), `results.json` [pcc:unverified].
 - Re-measurement with the tallied v5: `research/koblitz_v5_tally_remeasure_20261119/`.
+
+## Amendment 2026-11-20: generator-orbit section
+
+The owner approved, tentatively ("probably", in-session 2026-11-20), extending the same rule to
+the validated generator-orbit leaderboard section, whose matched reference is
+`rho.signed_frobenius_full`: below r ≈ 2^38 its matched reference becomes
+min(`rho.signed_frobenius_full`, `rho.signed_frobenius_v5`). The same conditions apply: only v5
+measured in the same session as the IC arm counts; pre-tally v5 records add `w · steps`; and no
+row changes without a VALIDATION.json. Because the approval was tentative, it is recorded here
+before any row uses it. A leaderboard change that relies on it should name this amendment in
+its PR, so the owner sees it before it lands.
