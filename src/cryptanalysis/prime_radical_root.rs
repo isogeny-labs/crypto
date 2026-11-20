@@ -42,10 +42,18 @@ fn frobenius_roots(p: u64, poly: &[u64]) -> Result<Vec<u64>, String> {
 #[derive(Clone, Copy)]
 pub(crate) struct Fp {
     pub p: u64,
+    // floor(2^64/p), computed once for canonical 32-bit residues.
+    // 0 disables the reciprocal path for larger field moduli.
+    reciprocal32: u64,
 }
 impl Fp {
     pub fn new(p: u64) -> Self {
-        Fp { p }
+        let reciprocal32 = if (2..=u32::MAX as u64).contains(&p) {
+            ((1u128 << 64) / p as u128) as u64
+        } else {
+            0
+        };
+        Fp { p, reciprocal32 }
     }
     #[inline]
     pub fn add(&self, a: u64, b: u64) -> u64 {
@@ -98,8 +106,15 @@ impl Fp {
                 folded
             }
         } else if self.p <= u32::MAX as u64 && a < self.p && b < self.p {
-            // Canonical 32-bit operands fit in a native 64-bit product.
-            (a * b) % self.p
+            // 64-bit Barrett: q=floor(ab*floor(2^64/p)/2^64) differs
+            // from floor(ab/p) by at most one when 0 <= ab < 2^64.
+            // Thus remainder < 2p and needs at most one correction.
+            // This removes runtime division from the hot Fp/Fp2
+            // multiplication, square, cube, and radical-root paths.
+            let product = a * b;
+            let quotient = ((product as u128 * self.reciprocal32 as u128) >> 64) as u64;
+            let remainder = product - quotient * self.p;
+            if remainder >= self.p { remainder - self.p } else { remainder }
         } else {
             ((a as u128 * b as u128) % self.p as u128) as u64
         }
