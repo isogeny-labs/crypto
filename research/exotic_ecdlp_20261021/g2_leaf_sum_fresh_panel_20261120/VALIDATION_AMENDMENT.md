@@ -1,0 +1,7 @@
+# Validation amendment after first replay
+
+The first frozen validator (`sha256 0f6c126e5080426a81fb99f90ba1b292247ba83714effa9faba2018eb12172a7`; validation protocol `sha256 b9bfa0cf546c5c8d6694694b20174af97bc1e4cf0e58833b5efdbe20c00c530a`) was run with `/Volumes/SSD990/cryptanalysis/sage -python .../validate.py` after all ten solver arms completed. It failed at `assert found` in the group replay after about nine seconds. That assertion required every algebraic S3 root to yield a factor-base point pair for the fixed singleton. The S3 equation only constrains x-coordinates; it does not establish that every lifted point pair lies in the factor base or sums to the specified point.
+
+The amended validator retains the original algebraic root, inverse-map, equation, and independent field-enumeration checks. It records all group-lift pairs summing to the residual and separately records those whose points both lie in the enumerated factor base. Empty pair lists remain data rather than validation failures. The source hash in `validation_protocol.json` is updated before rerunning; the solver inputs, schedule, raw outputs, and caps remain frozen.
+
+The first amended run (`sha256 c174bfab75eec1fe9574372557715cd8cc1cb6003a0d0586522d045fdc8f9b04`) reached row construction and failed with `AttributeError: 'list' object has no attribute 'items'`: an inner `pair` variable shadowed the arm dictionary. The variable was renamed and the validator hash was updated before another run.
