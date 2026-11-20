@@ -10,8 +10,10 @@ load = lambda f: json.load(open(os.path.join(RES, f)))
 plt.rcParams.update({"font.size": 9, "svg.fonttype": "none"})
 
 def save(fig, name):
-    for ext in ("svg", "png"):
-        fig.savefig(os.path.join(HERE, f"{name}.{ext}"), dpi=200, bbox_inches="tight")
+    # SVG is canonical (embedded in REPORT.pdf); the PNG preview stays under the 64 KiB
+    # artifact-store threshold for data files (tools/artifacts/artifacts.py) so it can live in Git.
+    fig.savefig(os.path.join(HERE, f"{name}.svg"), bbox_inches="tight")
+    fig.savefig(os.path.join(HERE, f"{name}.png"), dpi=90, bbox_inches="tight")
 
 # ---- Fig 1: R2 spectral maximum relative to sqrt(q) ----
 r2 = load("r2_v2.json")["rows"]
