@@ -462,6 +462,33 @@ impl Producer<'_> {
             return Ok((quotient, Poly17::constant(a.coefficients[0])));
         }
         // R52_DIVISION_END
+        // R66_PRODUCER_UNIT_LINEAR_DIVISION_BEGIN
+        // Synthetic division by x+1 or x-1. The quotient is generated
+        // while evaluating the remainder at -1 or 1. This replaces
+        // the mutable 17-coefficient cancellation buffer with one scalar.
+        // Nonzero cancellations preserve the original copy/field charges.
+        if b.len == 2 && b.coefficients[1] == 1
+            && (b.coefficients[0] == 1 || b.coefficients[0] == self.p - 1)
+        {
+            let plus = b.coefficients[0] == self.p - 1;
+            let mut current = a.coefficients[a.len as usize - 1];
+            for high in (1..a.len as usize).rev() {
+                quotient.coefficients[high - 1] = current;
+                current = if current == 0 {
+                    a.coefficients[high - 1]
+                } else {
+                    self.gate.charge(COPY_WORK)?;
+                    if plus {
+                        self.add(a.coefficients[high - 1], current)?
+                    } else {
+                        self.sub(a.coefficients[high - 1], current)?
+                    }
+                };
+            }
+            quotient.trim();
+            return Ok((quotient, Poly17::constant(current)));
+        }
+        // R66_PRODUCER_UNIT_LINEAR_DIVISION_END
         // R63_PRODUCER_SYNTHETIC_LINEAR_BEGIN
         // Synthetic division by monic x+c (non-unit c). Recurrence:
         // q[i-1] = a[i] - c*q[i]. One reverse pass avoids copying,
@@ -596,6 +623,31 @@ impl Producer<'_> {
             return Ok(());
         }
         // R52_REDUCE_END
+        // R66_PRODUCER_UNIT_LINEAR_REDUCE_BEGIN
+        // Horner evaluation at +/-1: no polynomial buffer updates or
+        // trailing-zero trims. Keep charging only nonzero cancellations
+        // as in the prior x^d+/-1 reduction.
+        if modulus.len == 2 && value.len >= 2
+            && (modulus.coefficients[0] == 1 || modulus.coefficients[0] == self.p - 1)
+        {
+            let plus = modulus.coefficients[0] == self.p - 1;
+            let mut current = value.coefficients[value.len as usize - 1];
+            for high in (1..value.len as usize).rev() {
+                current = if current == 0 {
+                    value.coefficients[high - 1]
+                } else {
+                    self.gate.charge(COPY_WORK)?;
+                    if plus {
+                        self.add(value.coefficients[high - 1], current)?
+                    } else {
+                        self.sub(value.coefficients[high - 1], current)?
+                    }
+                };
+            }
+            *value = Poly17::constant(current);
+            return Ok(());
+        }
+        // R66_PRODUCER_UNIT_LINEAR_REDUCE_END
         // R63_PRODUCER_SYNTHETIC_REDUCE_BEGIN
         // Horner evaluation at -c gives f mod (x+c) directly. The same
         // nonzero high coefficients are charged as the trim-driven loop.
@@ -1783,6 +1835,29 @@ impl Replay {
             return Ok(Poly17::constant(numerator.coefficients[0]));
         }
         // R52_REMAINDER_END
+        // R66_REPLAY_UNIT_LINEAR_REMAINDER_BEGIN
+        // Independent Horner evaluation at +/-1. Replay, unlike the
+        // producer, charges every eliminated degree, even when zero.
+        if d == 2 && denominator.coefficients[1] == 1
+            && (denominator.coefficients[0] == 1 || denominator.coefficients[0] == self.p - 1)
+        {
+            let at_plus_one = denominator.coefficients[0] == self.p - 1;
+            let mut total = numerator.coefficients[numerator.len as usize - 1];
+            for high in (1..numerator.len as usize).rev() {
+                self.gate.charge(COPY_WORK)?;
+                if total == 0 {
+                    total = numerator.coefficients[high - 1];
+                } else {
+                    total = if at_plus_one {
+                        self.plus(total, numerator.coefficients[high - 1])?
+                    } else {
+                        self.minus(numerator.coefficients[high - 1], total)?
+                    };
+                }
+            }
+            return Ok(Poly17::constant(total));
+        }
+        // R66_REPLAY_UNIT_LINEAR_REMAINDER_END
         // R63_REPLAY_HORNER_REMAINDER_BEGIN
         // Independent Horner verifier for monic x+c. Its fixed descending
         // checks preserve the original replay remainder budget semantics.
@@ -1909,6 +1984,31 @@ impl Replay {
             return Ok(());
         }
         // R52_CANCEL_END
+        // R66_REPLAY_UNIT_LINEAR_CANCEL_BEGIN
+        // Compute the scalar polynomial residue by Horner's rule.
+        // Exactly one COPY_WORK check per cancelled degree, and
+        // one field operation iff its leading term is nonzero.
+        if divisor_len == 2 && numerator.len >= 2
+            && (denominator.coefficients[0] == 1 || denominator.coefficients[0] == self.p - 1)
+        {
+            let at_plus_one = denominator.coefficients[0] == self.p - 1;
+            let mut total = numerator.coefficients[numerator.len as usize - 1];
+            for high in (1..numerator.len as usize).rev() {
+                self.gate.charge(COPY_WORK)?;
+                if total == 0 {
+                    total = numerator.coefficients[high - 1];
+                } else {
+                    total = if at_plus_one {
+                        self.plus(total, numerator.coefficients[high - 1])?
+                    } else {
+                        self.minus(numerator.coefficients[high - 1], total)?
+                    };
+                }
+            }
+            *numerator = Poly17::constant(total);
+            return Ok(());
+        }
+        // R66_REPLAY_UNIT_LINEAR_CANCEL_END
         // R63_REPLAY_HORNER_CANCEL_BEGIN
         // Replay keeps one charge, multiplication and subtraction per
         // eliminated degree, even when its high coefficient is zero.
@@ -2883,6 +2983,94 @@ mod tests {
         Fp64Arithmetic::try_new(p, 131072, 4096, deadline(), &mut |_| Ok(()))
             .unwrap()
             .field
+    }
+
+    #[test]
+    fn round66_unit_linear_synthetic_matches_wide_oracle() {
+        for p in [3u64, 5, 101, 1_000_000_007, (1u64 << 61) - 1] {
+            let field = field(p);
+            let mut observer = |_: &BoundedRootEvent| Ok(());
+            let mut producer = Producer {
+                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
+                unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
+                roots: [0; 8], root_count: 0,
+            };
+            producer.gate.admit().unwrap();
+            let mut replay =
+                Replay::new(&field, &[1, 1], 17, budget(), budget(), deadline()).unwrap();
+            for c in [1, p - 1] {
+                let divisor = Poly17::from_coefficients(&field, &[c, 1]).unwrap();
+                let x = if c == 1 { p - 1 } else { 1 };
+                for n in 2..=17 {
+                    for seed in 0..16u64 {
+                        let mut state = seed.wrapping_add(p ^ 0x9e37_79b9_7f4a_7c15);
+                        let mut values = vec![0u64; n];
+                        for (index, value) in values.iter_mut().enumerate() {
+                            state = state.wrapping_mul(6_364_136_223_846_793_005)
+                                .wrapping_add(1_442_695_040_888_963_407);
+                            *value = if (seed + index as u64) % 3 == 0 {
+                                0
+                            } else {
+                                state % p
+                            };
+                        }
+                        values[n - 1] = 1 + state % (p - 1);
+                        let a = Poly17::from_coefficients(&field, &values).unwrap();
+                        let (q, division_remainder) = producer.division(&a, &divisor).unwrap();
+                        let mut producer_remainder = a;
+                        producer.reduce_monic(&mut producer_remainder, &divisor).unwrap();
+                        let verifier_remainder = replay.remainder(a, &divisor).unwrap();
+                        let mut verifier_cancel = a;
+                        replay.cancel_monic(&mut verifier_cancel, &divisor).unwrap();
+                        let mut expected = 0u128;
+                        for &coefficient in values.iter().rev() {
+                            expected = (expected * u128::from(x) + u128::from(coefficient))
+                                % u128::from(p);
+                        }
+                        let expected = Poly17::constant(expected as u64);
+                        assert_eq!(division_remainder, expected);
+                        assert_eq!(producer_remainder, expected);
+                        assert_eq!(verifier_remainder, expected);
+                        assert_eq!(verifier_cancel, expected);
+                        // Independently verify (x+c)*q + r == a in Fp[x].
+                        let mut reconstructed = [0u128; 17];
+                        for (i, &coefficient) in q.coefficients().iter().enumerate() {
+                            reconstructed[i] = (reconstructed[i]
+                                + u128::from(coefficient) * u128::from(c)) % u128::from(p);
+                            reconstructed[i + 1] = (reconstructed[i + 1]
+                                + u128::from(coefficient)) % u128::from(p);
+                        }
+                        reconstructed[0] = (reconstructed[0]
+                            + u128::from(division_remainder.coefficients[0]))
+                            % u128::from(p);
+                        for (actual, &original) in reconstructed[..n].iter().zip(values.iter()) {
+                            assert_eq!(*actual as u64, original);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn round66_unit_linear_root_stream_replays() {
+        let f = field(1_000_000_007);
+        // Both x-1 and x+1 divide this squarefree polynomial.
+        let coefficients = [1u64, 0, 1];
+        let mut observed = Vec::new();
+        let report = solve_bounded(
+            &f, &coefficients, 29, budget(), deadline(),
+            &mut |event| { observed.push(*event); Ok(()) },
+        );
+        // No completeness assumption on randomized splitting; check every
+        // event actually emitted, including partial/limited runs.
+        let mut replay = Replay::new(
+            &f, &coefficients, 29, budget(), budget(), deadline(),
+        ).unwrap();
+        for event in &observed {
+            replay.push(event).unwrap();
+        }
+        replay.finish(&report).unwrap();
     }
 
     #[test]
