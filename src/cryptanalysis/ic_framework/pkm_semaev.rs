@@ -1561,7 +1561,11 @@ impl PkmSemaevOracle {
     const DESCENT_GRID_CROSSOVER: u64 = 512;
 
     /// Prefer legacy `grid()` extraction over basis-root descent.
+    /// `grid()` only implements `m ≤ 3`, so larger `m` always stays on descent.
     fn prefer_grid_extraction(&self) -> bool {
+        if self.m > 3 {
+            return false;
+        }
         let Some(prep) = self.prepared.as_ref() else {
             return false;
         };
