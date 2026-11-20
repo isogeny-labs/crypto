@@ -116,6 +116,9 @@ SOURCES = {
     "tableb_ksum": "research/ic_tableb_ksum_20261115/summary.json",
     "tableb_binary_ksum": "research/ic_tableb_binary_ksum_20261115/summary.json",
     "ksum_prune": "research/ic_ksum_prune_20261115/summary.json",
+    "tableb_fewcol": "research/ic_tableb_fewcol_20261118/summary.json",
+    "tableb_sib": "research/ic_tableb_sib_20261119/summary.json",
+    "tableb_sib_ablation": "research/ic_tableb_sib_20261119/ablation/summary.json",
     "d4_char2_m12": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
     "d4_char2_m14": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
     "d4_char2_cmp_m12": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
@@ -534,7 +537,10 @@ COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20
                            "benchmarks/20261115-tableb-binary-ksum",
                            "benchmarks/20261115-ksum-prune-tableb",
                            "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1",
-                           "benchmarks/20261115-tableb-ksum")
+                           "benchmarks/20261115-tableb-ksum",
+                           "research/ic_tableb_fewcol_20261118/validation",
+                           "research/ic_tableb_sib_20261119/validation",
+                           "research/ic_tableb_sib_20261119/validation/ablation")
 
 
 def gate_inputs(evidence: Path) -> set[str]:
@@ -2700,6 +2706,107 @@ def tableb_binary_ksum_html(k: dict) -> str:
             '</tbody></table></div>' + gh(SOURCES["tableb_binary_ksum"], "Analysis") + '</section>')
 
 
+TABLEB_R23 = (("fewcol", "tableb_fewcol", "research/ic_tableb_fewcol_20261118"),
+              ("sib", "tableb_sib", "research/ic_tableb_sib_20261119"),
+              ("ablation", "tableb_sib_ablation", "research/ic_tableb_sib_20261119/ablation"))
+
+
+def tableb_rounds23_component() -> dict:
+    """Table B prime rows, round 2 (prune + sib stack, FEWCOL tw2l) and round 3 (sib8-p256, with its
+    ablation addendum): counted GAE at w = 0, 0.1, 1, copied from each study's summary.json.  Each
+    study needs its validation directory's VALIDATION.json (replay certificate, validator report, matched
+    rho reference with the section 5a band)."""
+    out = {"studies": {}}
+    for key, src, study in TABLEB_R23:
+        evidence = study + "/validation" if key != "ablation" else study.replace("/ablation", "") + "/validation/ablation"
+        errs = checked_evidence_dir(REPO / evidence, REPO)
+        if errs:
+            raise SystemExit(f"{evidence}: not validated: " + "; ".join(errs))
+        out["studies"][key] = {"data": load(SOURCES[src]), "study": study + "/", "source": SOURCES[src],
+                               "evidence": evidence + "/VALIDATION.json"}
+    out["validated"] = True
+    return out
+
+
+def _f3(x) -> str:
+    return f"{x:.3f}"
+
+
+def tableb_rounds23_md(k: dict) -> list[str]:
+    st = k["studies"]
+    L = ["", "## Table B prime rows, rounds 2 and 3: FEWCOL and sibling-pool walks (2026-11-18/19, counted component improvements, outside tables A-C)", "",
+         "Three Table B prime curves (P20, P22, P24), 48 public targets each, 2 rounds, counted GAE with native work at "
+         "w = 0, 0.1, 1 (section 5a), one ecbench binary, L0. Every cell is copied from the study's `summary.json`; each study "
+         "is pinned to a `VALIDATION.json` (replay certificate, validator report, matched negation-map rho reference). "
+         "The matched-rho order does not hold across the weight band for sib8-p256, so it is reported as a distance remaining, "
+         "never as a win or a loss. [pcc:unverified]", "",
+         "### Round 2: prune + sib stack (ksum5-ps) and the C = 2 wwalk arm (tw2l)", "",
+         f"Study: [{st['fewcol']['study']}](../../{st['fewcol']['study']}); validation `{st['fewcol']['evidence']}`. "
+         "Ratios are paired `ecbench compare` ratios of recorded S (below 1 is cheaper). The headline w = 0 column "
+         "carries the 95% interval; the other weights are the band values.", "",
+         "| curve | ksum5-ps / ksum5-sib, w = 0 [95%] | w = 0.1 | w = 1 | tw2l / ksum5-sib, w = 0 [95%] | w = 0.1 | w = 1 | S rho-neg (w = 0 / 1) | S tw2l (w = 0 / 1) | distance remaining: tw2l / rho-neg, w = 0 / 0.1 / 1 |",
+         "|:--|--:|--:|--:|--:|--:|--:|:--|:--|:--|"]
+    for b in ("20", "22", "24"):
+        d = st["fewcol"]["data"][b]
+        a, f, t = d["stack"], d["fewcol"], d["tw2l_over_rho"]
+        L.append(f"| P{b} | {_f3(a['ratio'])} [{_f3(a['lo'])}, {_f3(a['hi'])}] | {_f3(a['w01'])} | {_f3(a['w1'])} | "
+                 f"{_f3(f['ratio'])} [{_f3(f['lo'])}, {_f3(f['hi'])}] | {_f3(f['w01'])} | {_f3(f['w1'])} | "
+                 f"{d['S']['rho-neg']['S0']:.2f} / {d['S']['rho-neg']['S1']:.2f} | {d['S']['tw2l']['S0']:.2f} / {d['S']['tw2l']['S1']:.2f} | "
+                 f"{t['w0']:.2f} / {t['w01']:.2f} / {t['w1']:.2f} |")
+    L += ["", "### Round 3: sibling-pool wwalk sib8-p256 against tw2l and matched rho", "",
+          f"Study: [{st['sib']['study']}](../../{st['sib']['study']}); validation `{st['sib']['evidence']}`. "
+          "sib8-p256 changes three parameters from tw2l at once (siblings, stride-generator targets, no `jumps=16`); the ablation below separates them. "
+          "The distance to matched rho is the last two columns: about 0.89-1.11x at w = 0 and 1.6-1.7x at w = 1, order unresolved inside the band at P22 and P24.", "",
+          "| curve | sib8-p256 / tw2l, w = 0 [95%] | w = 0.1 | w = 1 | band | sib8-p256 / rho-neg, w = 0 [95%] | w = 0.1 | w = 1 | band | bitop/v1 sib8-p256 / rho-neg [95%] |",
+          "|:--|--:|--:|--:|:--|--:|--:|--:|:--|:--|"]
+    for b in ("20", "22", "24"):
+        g = st["sib"]["data"][b]["gae"]; bo = st["sib"]["data"][b]["bitop"]
+        t, r, br = g["tw2l-vs-sib8-p256"], g["rho-neg-vs-sib8-p256"], bo["rho-neg-vs-sib8-p256"]
+        L.append(f"| P{b} | {_f3(t['ratio'])} [{_f3(t['lo'])}, {_f3(t['hi'])}] | {_f3(t['w01'])} | {_f3(t['w1'])} | {t['band']} | "
+                 f"{_f3(r['ratio'])} [{_f3(r['lo'])}, {_f3(r['hi'])}] | {_f3(r['w01'])} | {_f3(r['w1'])} | {r['band']} | "
+                 f"{_f3(br['ratio'])} [{_f3(br['lo'])}, {_f3(br['hi'])}] |")
+    L += ["", "S at w = 0 / w = 1:", "", "| curve | rho-neg | tw2l | sib8-p512 | sib8-p256 |", "|:--|:--|:--|:--|:--|"]
+    for b in ("20", "22", "24"):
+        S = st["sib"]["data"][b]["S"]
+        L.append(f"| P{b} | " + " | ".join(f"{S[a]['S0']:.2f} / {S[a]['S1']:.2f}" for a in ("rho-neg", "tw2l", "sib8-p512", "sib8-p256")) + " |")
+    L += ["", "### Round 3 addendum A: ablation (fresh seeds)", "",
+          f"Study: [{st['ablation']['study']}](../../{st['ablation']['study']}); validation `{st['ablation']['evidence']}`.", "",
+          "| curve | tw2l-sib / tw2l, w = 0 / 1 (band) | tw2l-sg / tw2l, w = 0 / 1 (band) | sib8-p256 / tw2l-sib, w = 0 / 1 (band) | sib8-p256 / rho-neg, w = 0 [95%] / 1 (band) | bitop/v1 sib8-p256 / rho-neg [95%] |",
+          "|:--|:--|:--|:--|:--|:--|"]
+    for b in ("20", "22", "24"):
+        g = st["ablation"]["data"][b]["gae"]; bo = st["ablation"]["data"][b]["bitop"]["rho-neg-vs-sib8-p256"]
+        def c(key):
+            x = g[key]; return f"{_f3(x['w0'])} / {_f3(x['w1'])} ({x['band']})"
+        r = g["rho-neg-vs-sib8-p256"]
+        L.append(f"| P{b} | {c('tw2l-vs-tw2l-sib')} | {c('tw2l-vs-tw2l-sg')} | {c('tw2l-sib-vs-sib8-p256')} | "
+                 f"{_f3(r['ratio'])} [{_f3(r['lo'])}, {_f3(r['hi'])}] / {_f3(r['w1'])} ({r['band']}) | {_f3(bo['ratio'])} [{_f3(bo['lo'])}, {_f3(bo['hi'])}] |")
+    L += ["", "Generic table-and-walk C = 2 track; none of these rows breaks the sqrt(r) wall. Counted cost (L0), one host. [pcc:unverified]", ""]
+    return L
+
+
+def tableb_rounds23_html(k: dict) -> str:
+    md = tableb_rounds23_md(k)
+    out, tab = [], []
+    def flush():
+        if tab:
+            hdr = [c.strip() for c in tab[0].strip("|").split("|")]
+            rows = "".join("<tr>" + "".join(f"<td>{esc(c.strip())}</td>" for c in x.strip("|").split("|")) + "</tr>" for x in tab[2:])
+            out.append('<div class="scroll"><table><thead><tr>' + "".join(f"<th>{esc(h)}</th>" for h in hdr) +
+                       '</tr></thead><tbody>' + rows + '</tbody></table></div>')
+            tab.clear()
+    for x in md:
+        if x.startswith("|"):
+            tab.append(x); continue
+        flush()
+        if x.startswith("### "):
+            out.append(f"<h3>{esc(x[4:])}</h3>")
+        elif x and not x.startswith("## "):
+            out.append(f"<p>{rich(x)}</p>")
+    flush()
+    return ('<section id="tableb-rounds23-20261118"><h2>Table B prime rows, rounds 2 and 3: FEWCOL and sibling-pool walks</h2>'
+            + "".join(out) + gh(SOURCES["tableb_sib"], "Analysis") + '</section>')
+
+
 KSUM_PRUNE_EVIDENCE = "benchmarks/20261115-ksum-prune-tableb"
 KSUM_PRUNE_STUDY = "research/ic_ksum_prune_20261115"
 
@@ -3792,6 +3899,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "tableb_ksum_component": tableb_ksum_component(),
         "tableb_binary_ksum_component": tableb_binary_ksum_component(),
         "ksum_prune_component": ksum_prune_component(),
+        "tableb_rounds23_component": tableb_rounds23_component(),
         "d4_char2_frob_roots_component": d4_char2_frob_roots_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
@@ -4269,6 +4377,7 @@ def markdown(doc: dict) -> str:
             L += tableb_ksum_markdown(doc)
             L += tableb_binary_ksum_md(doc["tableb_binary_ksum_component"])
             L += ksum_prune_md(doc["ksum_prune_component"])
+            L += tableb_rounds23_md(doc["tableb_rounds23_component"])
         f = fams[code]
         rows = [r for r in doc["board"] if r["family"] == code]
         multi = len(f["regimes"]) > 1
@@ -6632,6 +6741,7 @@ def page(doc: dict, standalone: bool) -> str:
 
     P.append(tableb_binary_ksum_html(doc["tableb_binary_ksum_component"]))
     P.append(ksum_prune_html(doc["ksum_prune_component"]))
+    P.append(tableb_rounds23_html(doc["tableb_rounds23_component"]))
     # Table B prime rows re-measured with the k = 5 sum table (outside tables A-C).
     tk = doc["tableb_ksum_component"]
     tt = tableb_ksum_text(tk)
