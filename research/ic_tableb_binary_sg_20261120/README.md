@@ -2,7 +2,7 @@
 
 Every number here is `[pcc:unverified]`. The protocol [`PROTOCOL.md`](PROTOCOL.md) was frozen in `d2e129ceac`, before any measured row.
 
-- **Code:** none changed. `ecbench` was built from `ce71cfa8f1`.
+- **Code:** none changed. `ecbench` was built from `ce71cfa8f1`. [pcc:unverified]
 - **Evidence:** 720/720 runs verified per curve, and every candidate run was replayed. The run script is `run.sh`; sessions are in `sessions/B*`, with `audit-B*.json`, `compare-*.txt` and `band-*.txt` alongside. `summary.json` and `plot.py` produce the graph `binary_sg.{svg,png,pdf}`.
 - **Bench record:** `benchmarks/records/20261120T0420Z-tableb-binary-sg.json`.
 
