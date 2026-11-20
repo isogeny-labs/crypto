@@ -200,3 +200,17 @@ cargo +1.99.1 run --offline --release \
 
 **Verdict:** the tiny-`t` crossover is **not** fixed by root caching alone. Remaining excess is specialize/DFS structural cost vs `|V|^m` grid at `|V|=8`. Prefer **adaptive policy**: use `grid()` when `|V|^m` is below a small threshold (e.g. ≤ 512), else descent. [pcc:unverified]
 
+## Adaptive grid policy confirmation (2026-11-19 22:35 PT)
+
+Policy: `descent=1` still prefers legacy `grid()` when `m ≤ 3` and `|V|^m ≤ 512`.
+
+`RESULTS_ADAPTIVE.json` / `RUN_ADAPTIVE.log` (`EXIT:0`, no negatives):
+
+| Row | before → after `grid` | Notes |
+| --- | --- | --- |
+| M13/M31 m=3 chain | 7344→7344 / 9792→9792 | deferred to grid (parity) |
+| alg-k20 | 136320→22677 (6.01×) | descent kept |
+| M13/M31 m=4..5 | after==before on charged grid counter | m>3 stays on descent |
+
+[pcc:unverified]
+
