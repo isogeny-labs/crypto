@@ -746,6 +746,36 @@ impl Producer<'_> {
             return Ok(result);
         }
         // R57_MONOMIAL_FROBENIUS_PRODUCER_END
+        // R58_BINOMIAL_FROBENIUS_PRODUCER_BEGIN
+        // In Fp[x]/(x^d+c), x^p=(-c)^(p/d)*x^(p%d).
+        // This is valid for affine x+delta by Frobenius, including p<=d,
+        // after normalizing the leading coefficient. The scalar exponent
+        // needs O(log p) field operations instead of polynomial convolution.
+        if exponent == self.p && monic.len >= 4
+            && base.len == 2 && base.coefficients[1] == 1
+            && monic.coefficients[0] != 0
+            && monic.coefficients[1..monic.len as usize - 1].iter().all(|&c| c == 0)
+        {
+            let degree = monic.len as usize - 1;
+            let quotient = self.p / degree as u64;
+            let remainder = self.p as usize % degree;
+            let scaled = if quotient == 0 {
+                1
+            } else {
+                let neg_c = self.sub(0, monic.coefficients[0])?;
+                self.split_scalar_pow(neg_c, quotient)?
+            };
+            let delta = base.coefficients[0];
+            let mut result = Poly17::constant(delta);
+            if remainder == 0 {
+                result = Poly17::constant(self.add(delta, scaled)?);
+            } else {
+                result.coefficients[remainder] = scaled;
+                result.len = (remainder + 1) as u8;
+            }
+            return Ok(result);
+        }
+        // R58_BINOMIAL_FROBENIUS_PRODUCER_END
         // Over Fp, r^p == r. In Fp[x]/(x-r), x^p is therefore r.
         // The canonical input x is the only base eligible for this path.
         if monic.len == 2 && exponent == self.p
@@ -1782,6 +1812,34 @@ impl Replay {
             return Ok(checked);
         }
         // R57_MONOMIAL_FROBENIUS_REPLAY_END
+        // R58_BINOMIAL_FROBENIUS_REPLAY_BEGIN
+        // Independent left-to-right scalar exponentiation checks the same
+        // Frobenius identity without sharing producer arithmetic.
+        if exponent == self.p && monic.len >= 4
+            && base.len == 2 && base.coefficients[1] == 1
+            && monic.coefficients[0] != 0
+            && monic.coefficients[1..usize::from(monic.len) - 1].iter().all(|&v| v == 0)
+        {
+            let degree = usize::from(monic.len) - 1;
+            let quotient = self.p / degree as u64;
+            let remainder = (self.p % degree as u64) as usize;
+            let scaled = if quotient == 0 {
+                1
+            } else {
+                let neg_c = self.minus(0, monic.coefficients[0])?;
+                self.split_character_power(neg_c, quotient)?
+            };
+            let delta = base.coefficients[0];
+            let mut checked = Poly17::constant(delta);
+            if remainder == 0 {
+                checked = Poly17::constant(self.plus(delta, scaled)?);
+            } else {
+                checked.coefficients[remainder] = scaled;
+                checked.len = (remainder + 1) as u8;
+            }
+            return Ok(checked);
+        }
+        // R58_BINOMIAL_FROBENIUS_REPLAY_END
         // Evaluate x^p at the unique root of the linear modulus using
         // Frobenius on Fp; do not call the producer's arithmetic.
         if monic.len == 2 && exponent == self.p
@@ -2445,6 +2503,69 @@ mod tests {
         f.iter().rev().fold(0, |a, &c| {
             ((u128::from(a) * u128::from(x) + u128::from(c)) % u128::from(p)) as u64
         })
+    }
+
+    #[test]
+    fn round58_binomial_frobenius_matches_independent_oracle_and_replay() {
+        // Oracle uses only u128 scalar modular arithmetic and the quotient
+        // relation x^d=-c; it never invokes either production root algorithm.
+        fn oracle_power(mut a: u64, mut n: u64, p: u64) -> u64 {
+            let mut result = 1u64;
+            while n > 0 {
+                if n & 1 != 0 {
+                    result = ((result as u128 * a as u128) % p as u128) as u64;
+                }
+                n >>= 1;
+                a = ((a as u128 * a as u128) % p as u128) as u64;
+            }
+            result
+        }
+        for p in [3u64, 5, 7, 101, 1_000_000_007, 1_000_000_009,
+                  (1u64 << 61) - 1] {
+            let f = field(p);
+            let mut observer = |_: &BoundedRootEvent| Ok(());
+            let mut producer = Producer {
+                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
+                unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
+                roots: [0; 8], root_count: 0,
+            };
+            producer.gate.admit().unwrap();
+            let mut replay =
+                Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+            for degree in 3..=8usize {
+                for leading in [1u64, p - 1] {
+                    for constant in [1u64, 2 % p, p - 1, 17 % p] {
+                        let mut coefficients = vec![0u64; degree + 1];
+                        coefficients[0] =
+                            ((constant as u128 * leading as u128) % p as u128) as u64;
+                        coefficients[degree] = leading;
+                        let modulus =
+                            Poly17::from_coefficients(&f, &coefficients).unwrap();
+                        for delta in [0u64, 1, p - 1, 23 % p] {
+                            let base = Poly17::from_coefficients(&f, &[delta, 1]).unwrap();
+                            let q = p / degree as u64;
+                            let r = (p % degree as u64) as usize;
+                            let neg_c = if constant == 0 { 0 } else { p - constant };
+                            let scaled = oracle_power(neg_c, q, p);
+                            let mut expected = vec![0u64; degree];
+                            expected[0] = delta;
+                            if r == 0 {
+                                expected[0] =
+                                    ((delta as u128 + scaled as u128) % p as u128) as u64;
+                            } else {
+                                expected[r] = scaled;
+                            }
+                            let expected =
+                                Poly17::from_coefficients(&f, &expected).unwrap();
+                            assert_eq!(producer.power(&base, p, &modulus).unwrap(), expected,
+                                "producer p={p} degree={degree} c={constant} delta={delta}");
+                            assert_eq!(replay.modular_power(base, p, &modulus).unwrap(), expected,
+                                "replay p={p} degree={degree} c={constant} delta={delta}");
+                        }
+                    }
+                }
+            }
+        }
     }
 
     #[test]
