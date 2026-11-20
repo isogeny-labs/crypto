@@ -1,0 +1,21 @@
+{
+  "schema": "h4-n31-selected-pair-protocol-v1",
+  "question": "For the first eligible H4 n31 curve, what exact cofactor-cleared prime-subgroup base and first-pair index result, and what three-sum lookup yield occurs on 32 fixed fresh subgroup targets?",
+  "source": "research/exotic_ecdlp_20261021/H4_prime_descent/run.py",
+  "source_sha256": "46fb1a8a311f36907427ac35b40066d88cc0948c7f8b522fbc87c8338682e11a",
+  "screen_result": "research/exotic_ecdlp_20261021/H4_prime_descent/n31_screen_20261120/result.json",
+  "screen_result_sha256": "3dfd0a2e1cac8f340019d97ce44149d7becf859d0b24e5fbf53ca915c6c34022",
+  "instance": {"field_degree": 31, "instance_index": 1, "subspace_dimension": 11, "selection_rule": "first index among 0,1,2 with largest prime divisor at least 2^25"},
+  "group_order": 2147394118,
+  "prime_subgroup_order": 34635389,
+  "cofactor": 62,
+  "base_rule": "reconstruct exact selected curve and 11-vector x-subspace; enumerate every curve lift, multiply by 62, remove identity and duplicates, sort encoded coordinates; retain direct eligibility and duplicate counts",
+  "index_rule": "attempt every ordered pair of cleared base points; keep first pair per distinct group sum; record pair attempts, stored sums, wall time and observed peak RSS",
+  "target_law": "32 indexed SHA256-derived nonzero scalars h4-n31-instance1-target-i modulo r, multiplied by first nonzero cleared point solely to construct public target fixtures",
+  "lookup_rule": "for each public point scan all cleared base points in sorted order, test residual in first-pair index, verify first witness by group law or record complete exhaustion; retain every outcome and lookup interval",
+  "caps": {"process_seconds": 300, "observed_peak_rss_bytes": 8589934592},
+  "host": "ordinary local macOS checked Sage; algorithmic diagnostic",
+  "statistics": ["exact_base_counts", "pair_attempts", "distinct_pair_sums", "index_wall_ns", "all_32_target_statuses", "witnesses", "lookup_wall_ns", "peak_rss_bytes"],
+  "claim_boundary": "n31 field/base/index diagnostic on a 34635389-order subgroup; subgroup order and cofactor differ from n29, so timings and yield are not a fixed-group scaling comparison",
+  "status": "frozen before execution"
+}
