@@ -66,6 +66,27 @@ The benchmark performs an additional per-case untimed equality check against
 complete MITM enumeration before timing. It validates the hit/miss classification
 and every returned mask.
 
+## Production global-negation quotient
+
+The maintained Rust path in `src/cryptanalysis/prime_summation_roots.rs` adds a
+quotient that was not present in the imported C++ target search. For a nonempty
+right half, complementing every right sign sends `R` to `-R`. The target search
+therefore fixes one right sign positive, stores one canonical representative of
+`{R,-R}`, and retains the representative's orientation. A lookup either reuses
+the stored right mask or complements every right-mask bit before replay.
+
+Consequently, `2^right_bits` nominal signed sums require exactly
+`2^(right_bits-1)` enumerated right representatives when `right_bits > 0`.
+Split selection prices that stored count, and the CLI reports both
+`right_signed_states` and `right_stored_states`. Release-mode cross-checks replay
+every distinct target root in the seven-point fixture, include an infinity
+right-sum control, and retain exact hit/miss behavior under the reduced state
+bound.
+
+This is an exact state-count and correctness result. No matched wall-time
+benchmark was run for the quotient, so no timing ratio is claimed
+`[pcc:unverified]`.
+
 ## Provisional benchmark evidence
 
 The command below ran while six optimization worktrees shared five CPUs, so these

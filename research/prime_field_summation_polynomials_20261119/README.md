@@ -170,6 +170,14 @@ Unliftable targets are exact misses. A hit includes a sign-mask certificate.
 This path can lose to full enumeration for large target sets; use
 `benchmark-target` to measure the workload-specific crossover.
 
+The maintained Rust `ic summation-roots --mode target` path additionally folds
+the right table by global negation: it stores one representative of `{R,-R}`
+and reconstructs the omitted orientation by complementing the right sign-mask
+bits. Its JSON report exposes nominal `right_signed_states` beside actual
+`right_stored_states`; the stored count is half whenever the chosen right half
+has a sign variable. This is a structural state reduction, not a wall-time
+claim `[pcc:unverified]`.
+
 ## Audit curve automorphisms
 
 For `j=0` and `j=1728` curves, audit whether a fixed input specialization is

@@ -750,10 +750,11 @@ fn display(report: &Value) {
                     report["certificate"]["sign_mask"], report["root"]
                 ),
                 Some("target") => println!(
-                    "  found {}; split {} + {} states; match {}",
+                    "  found {}; left {} states; right {} stored of {} signed states; match {}",
                     report["search"]["found"],
                     report["search"]["left_states"],
-                    report["search"]["right_states"],
+                    report["search"]["right_stored_states"],
+                    report["search"]["right_signed_states"],
                     report["match"]
                 ),
                 _ => {}

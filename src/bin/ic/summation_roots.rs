@@ -207,7 +207,10 @@ pub fn run(args: SummationRootsArgs) -> Result<Value, String> {
             report["search"] = json!({
                 "found": result.found(),
                 "left_states": result.left_count,
+                "right_signed_states": result.right_signed_count,
+                "right_stored_states": result.right_count,
                 "right_states": result.right_count,
+                "right_quotient": "global_negation",
             });
             report["match"] = match (result.matched_target_x, result.sign_mask, result.sum) {
                 (Some(target_x), Some(sign_mask), Some(sum)) => json!({
@@ -226,7 +229,8 @@ pub fn run(args: SummationRootsArgs) -> Result<Value, String> {
 mod tests {
     use super::*;
     use crypto_lib::cryptanalysis::prime_summation_roots::{
-        all_roots, coefficients_from_roots, one_root, CoefficientMethod,
+        all_roots, coefficients_from_roots, find_target_root, one_root, CoefficientMethod,
+        SummationRootWorkspace,
     };
 
     fn args(mode: Mode) -> SummationRootsArgs {
@@ -272,6 +276,12 @@ mod tests {
         let report = run(target).unwrap();
         assert_eq!(report["search"]["found"], true);
         assert_eq!(report["match"]["target_x"], root);
+        assert_eq!(
+            report["search"]["right_signed_states"].as_u64(),
+            report["search"]["right_stored_states"]
+                .as_u64()
+                .map(|stored| 2 * stored)
+        );
     }
 
     #[test]
@@ -312,6 +322,45 @@ mod tests {
                 "point count {count}"
             );
         }
+
+        let mut distinct = all_roots(&curve, &points, 64).unwrap().finite_x;
+        distinct.sort_unstable();
+        distinct.dedup();
+        let mut workspace = SummationRootWorkspace::default();
+        for &target_x in &distinct {
+            let result =
+                find_target_root(&curve, &points, &[target_x], 12, &mut workspace).unwrap();
+            assert!(result.found(), "target x={target_x}");
+            assert_eq!(result.left_count + result.right_count, 12);
+            assert_eq!(result.right_signed_count, 2 * result.right_count);
+            assert_eq!(
+                one_root(&curve, &points, result.sign_mask.unwrap())
+                    .unwrap()
+                    .unwrap()
+                    .x,
+                target_x
+            );
+        }
+        let miss = (0..curve.f.p)
+            .find(|&x| curve.lift_x(x).is_some() && distinct.binary_search(&x).is_err())
+            .unwrap();
+        let miss_result = find_target_root(&curve, &points, &[miss], 12, &mut workspace).unwrap();
+        assert!(!miss_result.found());
+        assert_eq!(miss_result.right_signed_count, 2 * miss_result.right_count);
+
+        let point = points[0];
+        let target_x = curve.canonical(point).0;
+        let degenerate = [point, points[1], points[1]];
+        let result = find_target_root(&curve, &degenerate, &[target_x], 3, &mut workspace).unwrap();
+        assert!(result.found());
+        assert_eq!(result.right_signed_count, 2 * result.right_count);
+        assert_eq!(
+            one_root(&curve, &degenerate, result.sign_mask.unwrap())
+                .unwrap()
+                .unwrap()
+                .x,
+            target_x
+        );
 
         let roots: Vec<u64> = (0..256).map(|i| (17 * i) % 1009).collect();
         let quadratic = coefficients_from_roots(&curve, &roots, CoefficientMethod::Quadratic);

@@ -56,7 +56,13 @@ pub struct SummationRootWorkspace {
     gray_left: Vec<Option<Pt>>,
     gray_right: Vec<Option<Pt>>,
     batch: BatchAddScratch,
-    right_index: HashMap<Option<Pt>, usize>,
+    right_index: HashMap<Option<Pt>, RightWitness>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+struct RightWitness {
+    sign_mask: u64,
+    canonical_negated: bool,
 }
 
 /// Coefficient construction for `prod (X - r_i)`, low degree first.
@@ -91,6 +97,9 @@ pub struct TargetSearchResult {
     pub liftable_targets: usize,
     pub unliftable_targets: usize,
     pub left_count: usize,
+    /// Nominal right-half signed sums before the global-negation quotient.
+    pub right_signed_count: usize,
+    /// Stored right-half representatives after the global-negation quotient.
     pub right_count: usize,
     pub matched_target_x: Option<u64>,
     pub sign_mask: Option<u64>,
@@ -322,7 +331,7 @@ fn target_split_bits(sign_bits: usize, targets: usize) -> usize {
     for left_bits in 0..=sign_bits {
         let right_bits = sign_bits - left_bits;
         let left = 1u128 << left_bits;
-        let right = 1u128 << right_bits;
+        let right = 1u128 << right_bits.saturating_sub(1);
         let cost = right.saturating_add(2u128.saturating_mul(targets).saturating_mul(left));
         if cost < best_cost {
             best_cost = cost;
@@ -330,6 +339,16 @@ fn target_split_bits(sign_bits: usize, targets: usize) -> usize {
         }
     }
     best
+}
+
+fn negation_key(curve: &FastCurve, point: Option<Pt>) -> (Option<Pt>, bool) {
+    match point {
+        Some(point) => {
+            let (canonical, negated) = curve.canonical_sign(point);
+            (Some(canonical), negated)
+        }
+        None => (None, false),
+    }
 }
 
 /// Search liftable target x-coordinates without materializing every root.
@@ -357,7 +376,8 @@ pub fn find_target_root(
     let left_bits = target_split_bits(sign_bits, targets.len());
     let right_bits = sign_bits - left_bits;
     let left_count = checked_state_count(left_bits, max_states)?;
-    let right_count = checked_state_count(right_bits, max_states)?;
+    let right_signed_count = 1usize << right_bits;
+    let right_count = checked_state_count(right_bits.saturating_sub(1), max_states)?;
     if left_count.saturating_add(right_count) > max_states {
         return Err(SummationRootError::StateLimit {
             requested: left_count.saturating_add(right_count),
@@ -372,18 +392,40 @@ pub fn find_target_root(
         max_states,
         &mut workspace.gray_left,
     )?;
-    enumerate_gray_into(
-        curve,
-        None,
-        &points[1 + left_bits..],
-        max_states,
-        &mut workspace.gray_right,
-    )?;
-    workspace.right_index.clear();
-    workspace.right_index.reserve(workspace.gray_right.len());
-    for (index, &point) in workspace.gray_right.iter().enumerate() {
-        workspace.right_index.entry(point).or_insert(index);
+    let right_begin = 1 + left_bits;
+    if right_bits == 0 {
+        enumerate_gray_into(curve, None, &[], max_states, &mut workspace.gray_right)?;
+    } else {
+        // Global sign complementation maps every right sum R to -R.  Fix the
+        // first right sign positive and retain its orientation so a lookup can
+        // recover either member of the pair with a mask complement.
+        enumerate_gray_into(
+            curve,
+            Some(points[right_begin]),
+            &points[right_begin + 1..],
+            max_states,
+            &mut workspace.gray_right,
+        )?;
     }
+    workspace.right_index.clear();
+    workspace
+        .right_index
+        .try_reserve(workspace.gray_right.len())
+        .map_err(|_| SummationRootError::AllocationFailed(workspace.gray_right.len()))?;
+    for (index, &point) in workspace.gray_right.iter().enumerate() {
+        let rest_gray = index ^ (index >> 1);
+        let sign_mask = if right_bits == 0 {
+            0
+        } else {
+            1 | ((rest_gray as u64) << 1)
+        };
+        let (key, canonical_negated) = negation_key(curve, point);
+        workspace.right_index.entry(key).or_insert(RightWitness {
+            sign_mask,
+            canonical_negated,
+        });
+    }
+    let right_complement = (1u64 << right_bits).wrapping_sub(1);
 
     for &(target_x, target) in &targets {
         for signed_target in [target, curve.neg(target)] {
@@ -400,12 +442,17 @@ pub fn find_target_root(
             );
             curve.add_many_batched(&mut workspace.left, &workspace.right, &mut workspace.batch);
             for (left_index, needed) in workspace.left.iter().enumerate() {
-                let Some(&right_index) = workspace.right_index.get(needed) else {
+                let (key, needed_negated) = negation_key(curve, *needed);
+                let Some(&witness) = workspace.right_index.get(&key) else {
                     continue;
                 };
                 let left_gray = left_index ^ (left_index >> 1);
-                let right_gray = right_index ^ (right_index >> 1);
-                let sign_mask = (left_gray as u64) | ((right_gray as u64) << left_bits);
+                let right_mask = if needed_negated == witness.canonical_negated {
+                    witness.sign_mask
+                } else {
+                    witness.sign_mask ^ right_complement
+                };
+                let sign_mask = (left_gray as u64) | (right_mask << left_bits);
                 let sum = one_root(curve, points, sign_mask)?;
                 debug_assert_eq!(sum.map(|p| p.x), Some(target_x));
                 return Ok(TargetSearchResult {
@@ -413,6 +460,7 @@ pub fn find_target_root(
                     liftable_targets: targets.len(),
                     unliftable_targets,
                     left_count,
+                    right_signed_count,
                     right_count,
                     matched_target_x: Some(target_x),
                     sign_mask: Some(sign_mask),
@@ -427,6 +475,7 @@ pub fn find_target_root(
         liftable_targets: targets.len(),
         unliftable_targets,
         left_count,
+        right_signed_count,
         right_count,
         matched_target_x: None,
         sign_mask: None,
@@ -686,6 +735,41 @@ mod tests {
         assert!(!result.found());
         assert_eq!(result.liftable_targets, 1);
         assert_eq!(result.unliftable_targets, 1);
+        assert_eq!(result.right_signed_count, 2 * result.right_count);
+    }
+
+    #[test]
+    fn target_negation_fold_replays_hits_and_infinity_orientation() {
+        let curve = curve();
+        let points = points(&curve, 7);
+        let mut roots = all_roots(&curve, &points, 64).unwrap();
+        roots.sort_finite();
+        roots.finite_x.dedup();
+        let mut workspace = SummationRootWorkspace::default();
+        for target_x in roots.finite_x {
+            let result =
+                find_target_root(&curve, &points, &[target_x], 64, &mut workspace).unwrap();
+            assert!(result.found(), "target x={target_x}");
+            assert_eq!(result.right_signed_count, 2 * result.right_count);
+            let replay = one_root(&curve, &points, result.sign_mask.unwrap())
+                .unwrap()
+                .unwrap();
+            assert_eq!(replay.x, target_x);
+        }
+
+        let point = points[0];
+        let target_x = curve.canonical(point).0;
+        let degenerate = [point, points[1], points[1]];
+        let result = find_target_root(&curve, &degenerate, &[target_x], 8, &mut workspace).unwrap();
+        assert!(result.found());
+        assert_eq!(result.right_signed_count, 2 * result.right_count);
+        assert_eq!(
+            one_root(&curve, &degenerate, result.sign_mask.unwrap())
+                .unwrap()
+                .unwrap()
+                .x,
+            target_x
+        );
     }
 
     #[test]
