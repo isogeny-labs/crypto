@@ -1,0 +1,6 @@
+Trigger hourly frozen n23 relation-yield benchmark
+UTC: 2026-11-20T02:17:52Z
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Baseline: results/relation_baseline.json
+Threshold: 20% (both throughput and success rate)
+Output: results/hourly_log.csv
