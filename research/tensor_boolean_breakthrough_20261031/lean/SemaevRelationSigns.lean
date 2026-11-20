@@ -152,6 +152,154 @@ theorem evalCanonical_zero_implies_nontriv_image_certificate
       xs sign signUnit chosen relation nontriv
   exact ⟨sign, signUnit, regrouped, surviving⟩
 
+/-- Projector-shaped finite-image certificate.  The chosen point family and
+the surviving coefficient are both indexed by the subtype of distinct tuple
+values, matching the finite index used to build the quadratic splitting
+field. -/
+theorem evalCanonical_zero_implies_nontriv_image_subtype_certificate
+    {K : Type*} [Field K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) (hDelta : W.Δ ≠ 0)
+    (n : ℕ) (xs : Fin (n + 3) → K)
+    (chosen : {v // v ∈ Finset.univ.image xs} → W.Point)
+    (chosenX : ∀ v, pointX (chosen v) = some v.1)
+    (vanishing : evalCanonical W n xs = 0)
+    (nontriv : ¬ ECDLP.L40.TrivL (List.ofFn xs)) :
+    ∃ sign : Fin (n + 3) → ℤ,
+      (∀ i, sign i = 1 ∨ sign i = -1) ∧
+      (∑ v ∈ (Finset.univ.image xs).attach,
+          fiberCoefficient xs sign v.1 • chosen v = 0) ∧
+      ∃ v : {v // v ∈ Finset.univ.image xs},
+        fiberCoefficient xs sign v.1 ≠ 0 ∧
+        (fiberCoefficient xs sign v.1).natAbs ≤ n + 3 := by
+  let occurrence : Fin (n + 3) → {v // v ∈ Finset.univ.image xs} :=
+    fun i ↦ ⟨xs i, Finset.mem_image.mpr ⟨i, Finset.mem_univ i, rfl⟩⟩
+  obtain ⟨sign, signUnit, relation⟩ :=
+    evalCanonical_zero_implies_signed_relation
+      W hDelta n xs (fun i ↦ chosen (occurrence i))
+      (fun i ↦ chosenX (occurrence i)) vanishing
+  obtain ⟨regrouped, surviving⟩ :=
+    nontriv_signed_relation_image_subtype_certificate
+      xs sign signUnit chosen relation nontriv
+  exact ⟨sign, signUnit, regrouped, surviving⟩
+
+/-- Canonical splitting-field lift of the Semaev relation.  One square root is
+chosen for each distinct tuple value by `quadraticRadicandRoot`; the same
+finite-image subtype indexes the resulting relation and its surviving
+coefficient. -/
+theorem evalCanonical_zero_implies_canonicalSplittingField_certificate
+    {K : Type*} [Field K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) (hDelta : W.Δ ≠ 0)
+    (n : ℕ) (xs : Fin (n + 3) → K)
+    (radicand : {v // v ∈ Finset.univ.image xs} → K)
+    [DecidableEq (quadraticRadicandPolynomial radicand).SplittingField]
+    (nonsingular : ∀ v,
+      (W.baseChange
+        (quadraticRadicandPolynomial radicand).SplittingField).Nonsingular
+          (algebraMap K _ v.1) (quadraticRadicandRoot radicand v))
+    (vanishing : evalCanonical W n xs = 0)
+    (nontriv : ¬ ECDLP.L40.TrivL (List.ofFn xs)) :
+    ∃ sign : Fin (n + 3) → ℤ,
+      (∀ i, sign i = 1 ∨ sign i = -1) ∧
+      (∑ v ∈ (Finset.univ.image xs).attach,
+        fiberCoefficient xs sign v.1 •
+          WeierstrassCurve.Affine.Point.some
+            (algebraMap K
+              (quadraticRadicandPolynomial radicand).SplittingField v.1)
+            (quadraticRadicandRoot radicand v) (nonsingular v) = 0) ∧
+      ∃ v : {v // v ∈ Finset.univ.image xs},
+        fiberCoefficient xs sign v.1 ≠ 0 ∧
+        (fiberCoefficient xs sign v.1).natAbs ≤ n + 3 := by
+  classical
+  let L := (quadraticRadicandPolynomial radicand).SplittingField
+  let point : {v // v ∈ Finset.univ.image xs} →
+      (W.baseChange L).Point := fun v ↦
+    WeierstrassCurve.Affine.Point.some
+      (algebraMap K L v.1) (quadraticRadicandRoot radicand v) (nonsingular v)
+  let occurrence : Fin (n + 3) → {v // v ∈ Finset.univ.image xs} :=
+    fun i ↦ ⟨xs i, Finset.mem_image.mpr ⟨i, Finset.mem_univ i, rfl⟩⟩
+  have hDeltaL : (W.baseChange L).Δ ≠ 0 := by
+    change (W.map (algebraMap K L)).Δ ≠ 0
+    rw [WeierstrassCurve.map_Δ]
+    exact (map_ne_zero (algebraMap K L)).2 hDelta
+  have vanishingL :
+      evalCanonical (W.baseChange L) n
+        (fun i ↦ algebraMap K L (xs i)) = 0 := by
+    have mapped := DilationSemaevBridge.map_evalCanonical
+      (algebraMap K L) W n xs
+    rw [vanishing, map_zero] at mapped
+    simpa [WeierstrassCurve.baseChange] using mapped.symm
+  have pointXOccurrence : ∀ i,
+      pointX (point (occurrence i)) =
+        some (algebraMap K L (xs i)) := by
+    intro i
+    rfl
+  obtain ⟨sign, signUnit, relation⟩ :=
+    evalCanonical_zero_implies_signed_relation
+      (W.baseChange L) hDeltaL n (fun i ↦ algebraMap K L (xs i))
+      (fun i ↦ point (occurrence i)) pointXOccurrence vanishingL
+  obtain ⟨regrouped, surviving⟩ :=
+    nontriv_signed_relation_image_subtype_certificate
+      xs sign signUnit point relation nontriv
+  exact ⟨sign, signUnit, regrouped, surviving⟩
+
+/-- Canonical Semaev relation composed with the concrete quadratic
+splitting-field projector.  A nontrivial vanishing tuple yields a bounded,
+nonzero integer coefficient whose Galois-projected multiple annihilates the
+corresponding canonical point. -/
+theorem evalCanonical_zero_implies_projected_torsion
+    {K : Type*} [Field K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) [W.IsElliptic]
+    (a₁Zero : W.a₁ = 0) (a₃Zero : W.a₃ = 0)
+    (hDelta : W.Δ ≠ 0) (twoNonzero : (2 : K) ≠ 0)
+    (n : ℕ) (xs : Fin (n + 3) → K)
+    (radicand : {v // v ∈ Finset.univ.image xs} → K)
+    [DecidableEq (quadraticRadicandPolynomial radicand).SplittingField]
+    (radicandNonzero : ∀ v, radicand v ≠ 0)
+    (pairwiseNonsquare : ∀ left right, left ≠ right →
+      ¬ IsSquare (radicand left * radicand right))
+    (nonsingular : ∀ v,
+      (W.baseChange
+        (quadraticRadicandPolynomial radicand).SplittingField).Nonsingular
+          (algebraMap K _ v.1) (quadraticRadicandRoot radicand v))
+    (vanishing : evalCanonical W n xs = 0)
+    (nontriv : ¬ ECDLP.L40.TrivL (List.ofFn xs)) :
+    ∃ sign : Fin (n + 3) → ℤ,
+      (∀ i, sign i = 1 ∨ sign i = -1) ∧
+      ∃ chosen : {v // v ∈ Finset.univ.image xs},
+        fiberCoefficient xs sign chosen.1 ≠ 0 ∧
+        (fiberCoefficient xs sign chosen.1).natAbs ≤ n + 3 ∧
+        ((Fintype.card
+          ((quadraticRadicandPolynomial radicand).SplittingField ≃ₐ[K]
+            (quadraticRadicandPolynomial radicand).SplittingField) : ℤ) *
+          fiberCoefficient xs sign chosen.1) •
+            WeierstrassCurve.Affine.Point.some
+              (algebraMap K
+                (quadraticRadicandPolynomial radicand).SplittingField
+                  chosen.1)
+              (quadraticRadicandRoot radicand chosen)
+              (nonsingular chosen) = 0 := by
+  classical
+  obtain ⟨sign, signUnit, relation, chosen, coefficientNonzero,
+      coefficientBound⟩ :=
+    evalCanonical_zero_implies_canonicalSplittingField_certificate
+      W hDelta n xs radicand nonsingular vanishing nontriv
+  letI : Fintype {v // v ∈ Finset.univ.image xs} :=
+    (Finset.univ.image xs).fintypeCoeSort
+  have relationFintype :
+      ∑ v : {v // v ∈ Finset.univ.image xs},
+        fiberCoefficient xs sign v.1 •
+          WeierstrassCurve.Affine.Point.some
+            (algebraMap K
+              (quadraticRadicandPolynomial radicand).SplittingField v.1)
+            (quadraticRadicandRoot radicand v) (nonsingular v) = 0 := by
+    rw [Finset.univ_eq_attach]
+    exact relation
+  refine ⟨sign, signUnit, chosen, coefficientNonzero, coefficientBound, ?_⟩
+  exact quadraticSplittingFieldAffinePointProjector_isolates_term
+    W a₁Zero a₃Zero radicand (fun v ↦ v.1)
+    (fun v ↦ fiberCoefficient xs sign v.1) chosen twoNonzero
+    radicandNonzero pairwiseNonsquare nonsingular relationFintype
+
 end
 
 end TensorBoundaryBounds

@@ -176,6 +176,50 @@ theorem sum_fiberCoefficient_zsmul_image
       intro i
       simp
 
+/-- Finite-image regrouping when the point family itself is indexed only by
+the values that occur in the tuple. -/
+theorem sum_fiberCoefficient_zsmul_image_subtype
+    {K G : Type*} [DecidableEq K] [AddCommGroup G]
+    {n : ℕ} (t : Fin n → K) (sign : Fin n → ℤ)
+    (point : {v // v ∈ Finset.univ.image t} → G) :
+    (∑ v ∈ (Finset.univ.image t).attach,
+        fiberCoefficient t sign v.1 • point v) =
+      ∑ i, sign i • point ⟨t i, Finset.mem_image.mpr ⟨i, Finset.mem_univ i, rfl⟩⟩ := by
+  classical
+  simp only [fiberCoefficient, Finset.sum_smul]
+  simp_rw [Finset.sum_filter]
+  rw [Finset.sum_comm]
+  apply Fintype.sum_congr
+  intro i
+  let q : {v // v ∈ Finset.univ.image t} :=
+    ⟨t i, Finset.mem_image.mpr ⟨i, Finset.mem_univ i, rfl⟩⟩
+  have qmem : q ∈ (Finset.univ.image t).attach := by simp [q]
+  rw [Finset.sum_eq_single q]
+  · simp [q]
+  · intro b hb bne
+    have hne : t i ≠ b.1 := by
+      intro equal
+      apply bne
+      apply Subtype.ext
+      exact equal.symm
+    simp [hne]
+  · exact fun absent ↦ (absent qmem).elim
+
+/-- A nonzero fibre coefficient necessarily belongs to the tuple's finite
+image. -/
+theorem mem_image_of_fiberCoefficient_ne_zero
+    {K : Type*} [DecidableEq K] {n : ℕ}
+    (t : Fin n → K) (sign : Fin n → ℤ) (v : K)
+    (nonzero : fiberCoefficient t sign v ≠ 0) :
+    v ∈ Finset.univ.image t := by
+  by_contra absent
+  apply nonzero
+  unfold fiberCoefficient
+  apply Finset.sum_eq_zero
+  intro i hi
+  exact (absent (Finset.mem_image.mpr
+    ⟨i, Finset.mem_univ i, (Finset.mem_filter.mp hi).2⟩)).elim
+
 /-- Exact certificate extracted from a nontrivial signed relation: the
 regrouped relation is zero and one coefficient survives with explicit size. -/
 theorem nontriv_signed_relation_certificate
@@ -210,6 +254,29 @@ theorem nontriv_signed_relation_image_certificate
   · rw [sum_fiberCoefficient_zsmul_image t sign point, relation]
   · exact exists_nonzero_fiberCoefficient_of_not_triv
       t sign sign_unit nontriv
+
+/-- Subtype-indexed version of the finite-image certificate.  In addition to
+the relation, the surviving coefficient is returned as an actual member of
+the finite projector index type. -/
+theorem nontriv_signed_relation_image_subtype_certificate
+    {K G : Type*} [DecidableEq K] [AddCommGroup G]
+    {n : ℕ} (t : Fin n → K) (sign : Fin n → ℤ)
+    (sign_unit : ∀ i, sign i = 1 ∨ sign i = -1)
+    (point : {v // v ∈ Finset.univ.image t} → G)
+    (relation : ∑ i, sign i •
+      point ⟨t i, Finset.mem_image.mpr ⟨i, Finset.mem_univ i, rfl⟩⟩ = 0)
+    (nontriv : ¬ ECDLP.L40.TrivL (List.ofFn t)) :
+    (∑ v ∈ (Finset.univ.image t).attach,
+        fiberCoefficient t sign v.1 • point v = 0) ∧
+      ∃ v : {v // v ∈ Finset.univ.image t},
+        fiberCoefficient t sign v.1 ≠ 0 ∧
+        (fiberCoefficient t sign v.1).natAbs ≤ n := by
+  constructor
+  · rw [sum_fiberCoefficient_zsmul_image_subtype t sign point, relation]
+  · obtain ⟨v, nonzero, bound⟩ :=
+      exists_nonzero_fiberCoefficient_of_not_triv t sign sign_unit nontriv
+    exact ⟨⟨v, mem_image_of_fiberCoefficient_ne_zero t sign v nonzero⟩,
+      nonzero, bound⟩
 
 /-- After a Galois projector sums over `Gamma`, a surviving coefficient is
 still nonzero modulo `p` under the explicit bound `|Gamma| * n < p`. -/

@@ -83,8 +83,11 @@ The null changes only the global wiring of interior ports while preserving the v
     for a nontrivial tuple, one grouped coefficient is nonzero and has
     absolute value at most the arity. Injectivity of elliptic-curve point base
     change now descends the signed relation from an algebraic closure to any
-    field where the chosen lifts already exist. Instantiating consistent
-    canonical lifts in the explicit splitting field remains open.
+    field where the chosen lifts already exist. Canonical roots in the
+    explicit splitting field and the ordinary Kummer projector are also
+    composed: a nontrivial vanishing tuple yields a bounded nonzero
+    coefficient whose Galois-cardinality multiple annihilates its canonical
+    point. The production-pin torsion-to-`ΨSq` contradiction remains open.
     [pcc:unverified]
 13. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
 14. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
@@ -139,7 +142,8 @@ This hybrid requirement is a pre-freeze clarification of the original tag-only d
 - [`lean/SemaevRelationSigns.lean`](lean/SemaevRelationSigns.lean) —
   normalization of the algebraic-closure Semaev witness to arbitrary chosen
   x-fibre lifts, injective descent to their field of definition, and
-  finite-image regrouping with a surviving coefficient.
+  finite-image regrouping with a surviving coefficient, canonical
+  splitting-field lifts, and ordinary Kummer projected torsion.
 - [`audit_s4_dilation.py`](audit_s4_dilation.py) and
   [`s4-dilation-audit-20261119.json`](s4-dilation-audit-20261119.json) —
   exhaustive bounded prime-field `S4(st)` coefficient audit.

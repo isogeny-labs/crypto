@@ -1463,10 +1463,18 @@ mapped signed point relation, and
 `evalCanonical_zero_implies_signed_relation` uses it to remove the
 algebraically-closed hypothesis whenever the chosen lifts exist in the
 working field. Thus the combined nontrivial-image endpoint applies directly
-over a finite splitting field; constructing a consistent canonical lift for
-each distinct tuple value and composing the projector remain open.
+over a finite splitting field. The subtype-indexed endpoint returns the
+surviving coefficient as an actual member of the finite projector index.
+`evalCanonical_zero_implies_canonicalSplittingField_certificate` constructs
+one canonical square-root lift per distinct tuple value, and
+`evalCanonical_zero_implies_projected_torsion` composes the resulting exact
+relation with `quadraticSplittingFieldAffinePointProjector_isolates_term`.
+The output coefficient is nonzero, has absolute value at most the arity, and
+its Galois-cardinality multiple annihilates the canonical point. The remaining
+ordinary-branch contradiction needs the parity-correct `zsmul → ΨSq` theorem
+currently available only in the standalone exact-pin project.
 `lake build SemaevRelationSigns` completes 9,133 jobs. The repository
-proof gate reports `PASS 397 thm 0 trusted` across all nine tracked modules.
+proof gate reports `PASS 403 thm 0 trusted` across all nine tracked modules.
 [pcc:unverified]
 
 ## 2026-11-19 scalar-torsion to `ΨSq` bridge
