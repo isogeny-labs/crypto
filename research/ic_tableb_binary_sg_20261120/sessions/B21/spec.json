@@ -1,0 +1,85 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ic_tableb_binary_sg_20261120 B21: stride-generator targets on the binary wwalk incumbent",
+ "description": "L5-BINSG. research/ic_tableb_binary_sg_20261120/PROTOCOL.md. Public synthetic curves and targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "binary_explicit",
+    "n": 21,
+    "modulus": 2097157,
+    "a": 1,
+    "b": 1797947,
+    "group_order": 2094562,
+    "r": 1047281,
+    "gx": 232919,
+    "gy": 1480205
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261115211,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "bsgs-neg",
+   "role": "reference",
+   "method": {
+    "id": "bsgs.negation"
+   }
+  },
+  {
+   "name": "ww-tw",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=2,mult=1",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ww-tw-sg",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=2,mult=1",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+     "max_trials": "13528399621",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "ww-sg",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=2,mult=1",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,seed=run",
+     "max_trials": "13528399621",
+     "targets": "stride-generator"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261120621,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

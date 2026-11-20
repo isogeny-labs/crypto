@@ -1,0 +1,60 @@
+ops (ok): ww-tw / rho-neg = 3.5971 [3.385, 3.823] (linearised_t, df 47) over 96 pairs on 48 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 3.5961, w=0.1: 3.4335, w=1: 2.6078): ww-tw > rho-neg at every weight; wall: admitted ns/GAE ww-tw/rho-neg 1.0482 [0.976, 1.126], no admitted A/A: not corrected for bias, noise test unavailable; end-to-end wall 3.7705 [3.535, 4.022]; ns/GAE of rho-neg is an upper bound on its cost per operation (GAE is a lower bound)
+table work priced with the unpriced counters (the default since 2026-11-08): table_insert_attempts
+measurement quality: 0 / 100; paired attempts 96, verified 96, admitted 0; levels {"L0": 96}; p95 foreign busy unknown%, p95 run queue 0.00%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2; contention telemetry is incomplete
+arm rho-neg: verified 96/96 (0 censored); max/median S 2.08, top run 2% of total; unpriced: canonicalisations_uncharged=25035; table work (priced): none
+arm ww-tw: verified 96/96 (0 censored); max/median S 1.21, top run 1% of total; unpriced: none; table work (priced): table_insert_attempts=30613
+| curve | log2 r | workloads | ww-tw / rho-neg | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-f2m18-t393-d2c04152 | 15.00 | 48 | 3.5971 | [3.3850, 3.8225] | linearised_t |
+
+| workload | curve | log2 r | rho-neg mean S | ww-tw mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W00f19ff8bcbe | icv1-f2m18-t393-d2c04152 | 15.00 | 1.0449 | 6.4009 | 6.1260 |
+| W01671bddcae7 | icv1-f2m18-t393-d2c04152 | 15.00 | 1.5535 | 6.6084 | 4.2539 |
+| W02410cef5800 | icv1-f2m18-t393-d2c04152 | 15.00 | 2.3551 | 6.7077 | 2.8482 |
+| W03597242a882 | icv1-f2m18-t393-d2c04152 | 15.00 | 1.4236 | 6.3953 | 4.4925 |
+| W0b060011291e | icv1-f2m18-t393-d2c04152 | 15.00 | 2.1201 | 6.3871 | 3.0126 |
+| W138ac0e3cd6a | icv1-f2m18-t393-d2c04152 | 15.00 | 1.9184 | 7.2440 | 3.7761 |
+| W1dc18c2f4acc | icv1-f2m18-t393-d2c04152 | 15.00 | 2.5375 | 6.8984 | 2.7186 |
+| W1f7055c58f5e | icv1-f2m18-t393-d2c04152 | 15.00 | 1.6585 | 7.0339 | 4.2411 |
+| W268e1aae7e38 | icv1-f2m18-t393-d2c04152 | 15.00 | 1.3296 | 6.9981 | 5.2634 |
+| W332238331fda | icv1-f2m18-t393-d2c04152 | 15.00 | 1.9902 | 6.8518 | 3.4427 |
+| W3ab186c912f0 | icv1-f2m18-t393-d2c04152 | 15.00 | 2.2888 | 6.9703 | 3.0454 |
+| W4c33a20aaedc | icv1-f2m18-t393-d2c04152 | 15.00 | 1.6889 | 6.0554 | 3.5853 |
+| W4dff85d9bf91 | icv1-f2m18-t393-d2c04152 | 15.00 | 1.9930 | 7.1749 | 3.6000 |
+| W5123d6e4c659 | icv1-f2m18-t393-d2c04152 | 15.00 | 1.7580 | 6.6662 | 3.7919 |
+| W545a13b9012a | icv1-f2m18-t393-d2c04152 | 15.00 | 2.1727 | 6.9261 | 3.1878 |
+| W54e0c8f57b53 | icv1-f2m18-t393-d2c04152 | 15.00 | 2.2197 | 6.4619 | 2.9112 |
+| W57b6c9632686 | icv1-f2m18-t393-d2c04152 | 15.00 | 1.2854 | 6.2295 | 4.8465 |
+| W5cb937811089 | icv1-f2m18-t393-d2c04152 | 15.00 | 2.5928 | 6.9399 | 2.6766 |
+| W5e4b6674aceb | icv1-f2m18-t393-d2c04152 | 15.00 | 2.0317 | 5.8978 | 2.9029 |
+| W617823471bce | icv1-f2m18-t393-d2c04152 | 15.00 | 1.7138 | 6.7328 | 3.9286 |
+| W657131f1fb89 | icv1-f2m18-t393-d2c04152 | 15.00 | 2.3523 | 6.3594 | 2.7034 |
+| W6bca0e1b15ed | icv1-f2m18-t393-d2c04152 | 15.00 | 2.3026 | 6.8185 | 2.9612 |
+| W702069ad0c57 | icv1-f2m18-t393-d2c04152 | 15.00 | 1.8797 | 6.3401 | 3.3730 |
+| W72a16b86f13c | icv1-f2m18-t393-d2c04152 | 15.00 | 1.3655 | 6.8625 | 5.0256 |
+| W78061fc5afc8 | icv1-f2m18-t393-d2c04152 | 15.00 | 1.9211 | 7.0148 | 3.6514 |
+| W7c06fde44cf9 | icv1-f2m18-t393-d2c04152 | 15.00 | 2.0759 | 6.2821 | 3.0262 |
+| W7d9a78e87ecb | icv1-f2m18-t393-d2c04152 | 15.00 | 2.2666 | 6.6360 | 2.9277 |
+| W8df91311de5c | icv1-f2m18-t393-d2c04152 | 15.00 | 1.7801 | 6.1687 | 3.4653 |
+| W908b84047acd | icv1-f2m18-t393-d2c04152 | 15.00 | 2.1423 | 6.9565 | 3.2473 |
+| W959496e2cd94 | icv1-f2m18-t393-d2c04152 | 15.00 | 2.0980 | 7.3241 | 3.4910 |
+| W9c254bd7d67c | icv1-f2m18-t393-d2c04152 | 15.00 | 2.0566 | 6.4727 | 3.1474 |
+| W9d77825ccff5 | icv1-f2m18-t393-d2c04152 | 15.00 | 1.5839 | 6.5363 | 4.1268 |
+| Wa3029dd6c4c7 | icv1-f2m18-t393-d2c04152 | 15.00 | 1.7221 | 7.3711 | 4.2803 |
+| Wade0afa789eb | icv1-f2m18-t393-d2c04152 | 15.00 | 1.8106 | 6.6718 | 3.6849 |
+| Wc0f1c5a32d5f | icv1-f2m18-t393-d2c04152 | 15.00 | 2.0704 | 6.2101 | 2.9995 |
+| Wcd7381a3af22 | icv1-f2m18-t393-d2c04152 | 15.00 | 1.4788 | 6.1936 | 4.1881 |
+| Wd505bd308849 | icv1-f2m18-t393-d2c04152 | 15.00 | 1.8354 | 7.1942 | 3.9196 |
+| Wd6923298ba8a | icv1-f2m18-t393-d2c04152 | 15.00 | 1.6696 | 6.9123 | 4.1401 |
+| Wdd2064040369 | icv1-f2m18-t393-d2c04152 | 15.00 | 1.2798 | 6.8100 | 5.3210 |
+| We3629b867889 | icv1-f2m18-t393-d2c04152 | 15.00 | 1.5175 | 6.6331 | 4.3709 |
+| We386db5d122d | icv1-f2m18-t393-d2c04152 | 15.00 | 1.3296 | 6.8680 | 5.1656 |
+| We45370d7a1df | icv1-f2m18-t393-d2c04152 | 15.00 | 1.5286 | 7.3379 | 4.8004 |
+| Wec663de57730 | icv1-f2m18-t393-d2c04152 | 15.00 | 2.3081 | 6.2046 | 2.6882 |
+| Wec76dcbc9611 | icv1-f2m18-t393-d2c04152 | 15.00 | 1.0006 | 6.1329 | 6.1289 |
+| Wecf21d821db7 | icv1-f2m18-t393-d2c04152 | 15.00 | 2.1533 | 7.3270 | 3.4027 |
+| Wf5f4f087e0da | icv1-f2m18-t393-d2c04152 | 15.00 | 2.2086 | 7.0394 | 3.1873 |
+| Wfbcfd56db7e8 | icv1-f2m18-t393-d2c04152 | 15.00 | 2.4159 | 6.7409 | 2.7902 |
+| Wff1fbc77d0fd | icv1-f2m18-t393-d2c04152 | 15.00 | 1.7276 | 7.1472 | 4.1370 |
