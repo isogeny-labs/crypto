@@ -26,8 +26,7 @@ per prime (3 curves × 4 seeds), with a hierarchical bootstrap.
 
 PROTOCOL §7 requires G ≥ 0.15 with the CI above 0 at every prime, and G(32771) above the A/A
 interval. Both hold. Within the S1 primary pair, cc=1 is the cheaper setting at every prime.
-The secondary sweep over cc = 0.5, 1.5 and 3.0 is still running, and this file will be updated
-when it lands.
+The secondary sweep (cc = 0.5, 1.5, 3.0) completed with no exhausted cells; see the section below.
 
 The mid band prices an inversion at I=10 and an LA product (mod r) at κ=9 F_p multiplications
 (PROTOCOL §4).
@@ -69,3 +68,31 @@ p = 8209-32771. If κ < 2.6, keep cc = 2. If κ > 3, adopt cc = 1.
 At the mid band the lab arm with cc = 2 sits at 0.63-1.31 of matched negation rho. With cc = 1
 it sits at 0.38-0.81. Under the measured κ ≈ 2 the two settings are within about 10% of each
 other, so the distance to rho is essentially unchanged by this lever.
+
+## Secondary sweep S1: the best base constant depends on the LA price (post hoc)
+
+Data: `raw/cc{0.5,1.5,3.0}_p*.jsonl`, 3 curves x 2 seeds, no exhausted cell. Rerun with the
+secondary inputs, the frozen analysis (`analysis/tables.md`, `raw/analyze.log`) gives the same
+verdict. Its S1 line compares only cc = 1 and 2.
+
+The table below is post hoc. Mean FPM over seeds 1-2 (I=10), for each base constant cc and LA
+price κ:
+
+| p | κ | cc 0.5 | cc 1 | cc 1.5 | cc 2 | cc 3 | best |
+|---|---|---|---|---|---|---|---|
+| 8209 | 1 | 6.28e7 | 3.74e7 | 3.02e7 | **2.84e7** | 3.11e7 | 2 |
+| 8209 | 2 | 6.33e7 | 3.94e7 | **3.44e7** | 3.54e7 | 4.55e7 | 1.5 |
+| 8209 | 9 | 6.74e7 | **5.35e7** | 6.35e7 | 8.42e7 | 1.46e8 | 1 |
+| 16411 | 1 | 1.58e8 | 9.34e7 | 7.54e7 | **7.02e7** | 7.74e7 | 2 |
+| 16411 | 2 | 1.60e8 | 9.85e7 | **8.60e7** | 8.82e7 | 1.15e8 | 1.5 |
+| 16411 | 9 | 1.70e8 | **1.34e8** | 1.60e8 | 2.14e8 | 3.77e8 | 1 |
+| 32771 | 1 | 3.85e8 | 2.24e8 | 1.81e8 | **1.70e8** | 1.90e8 | 2 |
+| 32771 | 2 | 3.88e8 | 2.37e8 | **2.08e8** | 2.17e8 | 2.87e8 | 1.5 |
+| 32771 | 9 | 4.13e8 | **3.26e8** | 3.97e8 | 5.42e8 | 9.66e8 | 1 |
+
+At the lab's measured κ ≈ 2, the best constant is **cc = 1.5**. It saves 2.5-4.4% against the
+lab's cc = 2: 3.44e7 against 3.54e7, 8.60e7 against 8.82e7, and 2.08e8 against 2.17e8. The
+36-40% L03 effect appears only when LA is priced far above its measured cost.
+
+**Recommendation:** keep cc = 2, or move to 1.5 for a few percent, until κ at genus 3 is measured
+directly.
