@@ -899,7 +899,7 @@ impl FactoredSubspaceOracle {
                 }
             }
             echelon.push((p, v));
-            echelon.sort_unstable_by(|a, b| b.0.cmp(&a.0));
+            echelon.sort_unstable_by_key(|e| std::cmp::Reverse(e.0));
         }
         Some(Self {
             l,
@@ -1261,7 +1261,7 @@ mod tests {
                     loop {
                         let cand: Vec<u64> =
                             (0..l).map(|_| rng.gen::<u64>() & ((1 << n) - 1)).collect();
-                        if let Some(_) = FactoredSubspaceOracle::new(&cand, b, &gf) {
+                        if FactoredSubspaceOracle::new(&cand, b, &gf).is_some() {
                             break cand;
                         }
                     }
