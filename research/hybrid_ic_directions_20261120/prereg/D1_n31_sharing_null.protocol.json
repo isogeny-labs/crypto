@@ -1,0 +1,342 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "D1-TRANSPORT-GRAPH-20261120",
+  "version": 1,
+  "created": "2026-11-20",
+  "repository": "crypto",
+  "study_dir": "research/hybrid_ic_directions_20261120",
+  "status": "DRAFT — frozen-before-data preregistration; the candidate instrument does NOT yet exist and must be implemented and sha256-frozen before any row is taken. No data. No claim. [pcc:unverified].",
+  "authors": [
+    "Claude ECDLP research lane (Fable design fork; main-session hybrid-IC sweep 2026-11-20)"
+  ],
+  "links": {
+    "design_memo": "research/hybrid_ic_directions_20261120/D1_transport_graph.md",
+    "synthesis": "research/hybrid_ic_directions_20261120/SYNTHESIS.md",
+    "sources_receipts": "research/hybrid_ic_directions_20261120/SOURCES.md",
+    "structural_template": "research/arity_completion_20261104/koblitz_m5_m6/protocol.json",
+    "success_criteria": "docs/ic/SUCCESS_CRITERIA.md",
+    "validation_gate": "docs/VALIDATION_GATE.md",
+    "band_rule": "AGENTS.md (section 5a)",
+    "existing_baseline_oracle": "src/cryptanalysis/ic_boundary.rs (FrobeniusPairTable, decompose_mitm_frobenius)",
+    "existing_multiplier_edge": "src/cryptanalysis/ic_framework/plugins.rs (compact-orbit-scan:norm=N)",
+    "existing_residual_walk": "src/cryptanalysis/ic_framework/residual.rs",
+    "heuristic_feature_origin": "docs/ic/SOLVER_SELECTION.md (selector features; NO routing headroom on 288 queries)",
+    "instrument": "examples/transport_graph_cell.rs (TO BE IMPLEMENTED before freeze; does not exist as of 2026-11-20)"
+  },
+  "question": "Does posing Koblitz index-calculus relation collection as an ordered search over a graph of canonicalised residual points — with an algebraic A* heuristic and small-norm Z[tau] multiplier edges — reduce forward node expansions per verified relation by >=2x over uniform-cost batched MITM at matched yield, and does the resulting arm beat the equal-envelope control (plain oracle on a base of size |F u D|) at all three section-5a price points, at the toy rungs n=31 and n=41 on K0 (the only rungs with a decomposition path: no n=131 path exists)? Separately, is cross-target forward-frontier sharing chance-level (preregistered NULL)?",
+  "claims": [
+    {
+      "id": "D1-SHARE",
+      "text": "Cross-target forward-frontier sharing is chance-level. The measured fraction of forward node expansions saved by expanding one shared frontier for a batch of b=32 independent targets (vs b separate frontiers) is within [0.5x, 1.5x] of the birthday prediction f_share = b*E*n/r, i.e. f_share(n=31)~0.18 and f_share(n=41)~7.6e-4. There is NO structural overlap beyond chance.",
+      "class": "comparative",
+      "preregistered_direction": "null",
+      "decided_by": ["C-share-overlap"],
+      "if_supported": "The 'frontier sharing' that names this direction contributes ~0 at n=41 and nothing asymptotically (f_share -> 0 as r -> 2^129); the sharing sub-claim is closed and only the backward table T_d (already shared by batched MITM, not novel) is shared.",
+      "if_not_supported": "Sharing is real only if measured overlap > 1.5x prediction at n=41; that would be a surprise requiring an explanation of structural (non-birthday) cone overlap before any further spend."
+    },
+    {
+      "id": "D1-ASTAR",
+      "text": "A*-on (order forward expansions by g+h, h = ONB-Hamming weight of x(rho) projected off the factor-base subspace) reduces forward node expansions per verified relation by >=2x versus uniform-cost (Dijkstra/BFS) MITM at matched verified-relation yield and matched backward table T_d, with CI-separated 95% bootstrap intervals, at n=31 and n=41.",
+      "class": "comparative",
+      "preregistered_direction": "live_but_low_confidence",
+      "decided_by": ["C-astar-expansions"],
+      "if_supported": "The algebraic heuristic carries ordering signal; proceed to D1-BEAT to see whether the ordering gain survives the equal-envelope control.",
+      "if_not_supported": "The weight heuristic is too flat to order the search — consistent with SOLVER_SELECTION's no-routing-headroom finding on the same features. Combined with D1-SHARE supported, this triggers D1-COLLAPSE."
+    },
+    {
+      "id": "D1-BEAT",
+      "text": "The best D1 arm's GAE per verified relation AND cold end-to-end one-target GAE beat the equal-envelope control (plain per-target MITM on a base of size |F u D| at matched priced field-op budget) at ALL of 0, 0.1 and 1 GAE per unpriced native operation (section-5a band).",
+      "class": "comparative",
+      "preregistered_direction": "gate",
+      "decided_by": ["C-beat-envelope"],
+      "if_supported": "D1 is a measured constant-factor improvement over the strongest matched control; report it as the distance remaining to matched rho (gap-to-rho), never as a pass. One rung, no exponent.",
+      "if_not_supported": "Any arm that wins at fixed columns but loses to the wider-base equal-envelope control at any price point is NOT an improvement — this is exactly how the double-large-prime graph was reduced to 2.1x. No priced row moves."
+    },
+    {
+      "id": "D1-COLLAPSE",
+      "text": "Kill/collapse criterion: if D1-SHARE is supported (sharing null) AND D1-ASTAR is not supported (heuristic worthless), then all four 2x2 arms equal the existing batched-MITM + compact-orbit baseline within the A/A floor, and D1 reduces to a known method with nothing new claimed.",
+      "class": "exact_computation",
+      "decided_by": ["C-share-overlap", "C-astar-expansions", "C-aa"],
+      "if_supported": "Verdict reduces_to_known: D1 == batched MITM + compact-orbit (already on main). The direction is closed; record it as a measured null so it is not reproposed.",
+      "if_not_supported": "At least one main effect is live; D1 stays open and D1-BEAT governs whether it is an improvement."
+    },
+    {
+      "id": "D1-ADMISSIBLE",
+      "text": "Secondary/descriptive: the A* heuristic h is admissible on a fraction of peels measured as (1 - rate of peels with Delta-w > w_max), reported with a Wilson interval. Admissibility is NOT required for D1-ASTAR (which is about expansion count, not optimal-path guarantee); it is measured to characterise the search.",
+      "class": "comparative",
+      "decided_by": ["C-astar-expansions"],
+      "if_supported": "h is admissible; A* retains its optimal-path guarantee where it holds.",
+      "if_not_supported": "h is inadmissible on some peels; the search is weighted-A*/greedy/beam there, still valid, but without the optimal-path guarantee. No claim depends on admissibility."
+    },
+    {
+      "id": "D1-OOS",
+      "text": "Out of scope: no complete-DLP sub-rho claim, no leaderboard or benchmarks/README.md row, no exponent or subexponential claim, and no n=131 / ECC2K-130 claim follow from this study. These are toy-rung (n<=41) relation-collection-phase cells with a matched one-target rho reported only as gap-to-rho. There is no decomposition path at n=131 (u64 FastPoint < n=64; MAX_MODULUS_BITS=63).",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "A-S0H0",
+      "role": "baseline",
+      "description": "Per-target frontier (sharing off), uniform-cost search (A* off) = the existing batched MITM pair-table (mitm-frobenius) + CADO filter. The primary baseline and the (sharing=off, heuristic=off) corner of the 2x2.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [["cargo", "build", "--release", "--example", "transport_graph_cell"]],
+        "binary_sha256": null,
+        "flags": {
+          "sharing": "off",
+          "heuristic": "off (uniform cost / BFS over the same residual graph)",
+          "oracle": "mitm-frobenius (depth-1 forward layer + shared backward table T_d)",
+          "multiplier_norm_N": "matched across all candidate arms (frozen value TBD at freeze)",
+          "factor_base": "compact-orbit-scan (signed-Frobenius orbit reps; |F| frozen per cell)",
+          "filter": "cado",
+          "batch_targets_b": 32,
+          "note": "S0H0 is the only candidate arm whose behaviour already exists on main; it anchors the A/A floor and the matched baseline."
+        },
+        "env": {"RAYON_NUM_THREADS": "1"},
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "curves": ["k0n31", "k0n41"],
+        "m": [2, 3],
+        "batch_targets_b": 32,
+        "seeds": "6 derived from root seed (see randomization)",
+        "target_kind": "public"
+      }
+    },
+    {
+      "id": "A-S0H1",
+      "role": "candidate",
+      "description": "Per-target frontier (sharing off), A* heuristic ON. Isolates the heuristic main effect.",
+      "parameters": {"sharing": "off", "heuristic": "on", "curves": ["k0n31", "k0n41"], "m": [2, 3], "batch_targets_b": 32, "target_kind": "public"},
+      "same_instrument_as": "A-S0H0"
+    },
+    {
+      "id": "A-S1H0",
+      "role": "candidate",
+      "description": "Shared frontier (sharing ON), uniform cost (A* off). Isolates the sharing main effect; the n=31 cell of this arm is the cheap sharing-null test run FIRST.",
+      "parameters": {"sharing": "on", "heuristic": "off", "curves": ["k0n31", "k0n41"], "m": [2, 3], "batch_targets_b": 32, "target_kind": "public"},
+      "same_instrument_as": "A-S0H0"
+    },
+    {
+      "id": "A-S1H1",
+      "role": "candidate",
+      "description": "Shared frontier (sharing ON), A* heuristic ON. The full hybrid; interaction cell.",
+      "parameters": {"sharing": "on", "heuristic": "on", "curves": ["k0n31", "k0n41"], "m": [2, 3], "batch_targets_b": 32, "target_kind": "public"},
+      "same_instrument_as": "A-S0H0"
+    },
+    {
+      "id": "C-equal-envelope",
+      "role": "control",
+      "description": "THE DECISIVE CONTROL. Plain per-target MITM (sharing off, heuristic off) on a WIDER orbit-union base of size |F u D|, chosen so its total PRICED field-op budget matches the candidate arms' budget. This is the control that cut the double-large-prime graph from 23.8x to 2.1x; the candidate must beat THIS, not plain fixed-column IC.",
+      "parameters": {
+        "sharing": "off", "heuristic": "off",
+        "base": "orbit-union of size |F u D| at matched priced field-op budget",
+        "curves": ["k0n31", "k0n41"], "m": [2, 3], "batch_targets_b": 32, "target_kind": "public"
+      },
+      "same_instrument_as": "A-S0H0"
+    },
+    {
+      "id": "C-positive",
+      "role": "control_positive",
+      "description": "Positive control: planted targets (target = a known sum of m factor-base reps). Every completed cell must recover a witness that re-adds in the curve group to the target. The planted scalar is NEVER solver input. Proves the instrument can find a relation that exists, per arm.",
+      "parameters": {
+        "sharing": ["off", "on"], "heuristic": ["off", "on"],
+        "curves": ["k0n31", "k0n41"], "m": [2, 3], "target_kind": "planted"
+      },
+      "same_instrument_as": "A-S0H0"
+    },
+    {
+      "id": "C-aa",
+      "role": "control_aa",
+      "description": "A/A: A-S0H0 re-run with a second derived seed, identical arguments otherwise. Counted outcomes (expansions, relations, columns) compared as the noise floor; any effect below the A/A spread is not reported.",
+      "parameters": {"sharing": "off", "heuristic": "off", "curves": ["k0n31", "k0n41"], "m": [2, 3], "batch_targets_b": 32, "target_kind": "public"},
+      "same_instrument_as": "A-S0H0"
+    },
+    {
+      "id": "R-rho",
+      "role": "reference",
+      "description": "Matched reference: rho.signed_frobenius on the SAME target, SAME process, SAME counted unit (GAE), run cold, unpriced work priced the same way across the section-5a band. Reported ONLY as gap-to-rho (best arm GAE / matched-rho GAE) as the distance remaining, never as a pass/fail gate. At these rungs IC sits ~17x rho after the large-prime round.",
+      "parameters": {
+        "kind": "rho.signed_frobenius",
+        "cheapest_config": "the cheapest registered rho variant on the same instance/targets across the band (plain, negation, signed-Frobenius-fold; with/without setup variants)",
+        "curves": ["k0n31", "k0n41"], "target_kind": "public", "same_binary_or_process": true
+      },
+      "same_instrument_as": "A-S0H0"
+    }
+  ],
+  "variable_ledger": {
+    "independent": [
+      {"name": "sharing (frontier)", "levels": ["off", "on"]},
+      {"name": "heuristic (A*)", "levels": ["off", "on"]},
+      {"name": "n (curve)", "levels": ["k0n31", "k0n41"]},
+      {"name": "m (summands)", "levels": [2, 3]}
+    ],
+    "factors": [
+      {"name": "factor base |F| and multiplier norm N", "treatment": "fixed", "how": "Frozen per cell; identical across the 2x2 and the A/A; the equal-envelope control's wider base |F u D| is sized to match the candidate priced field-op budget, which is the whole point of the control."},
+      {"name": "backward table depth d (T_d)", "treatment": "fixed", "how": "Same d on every candidate arm; T_d is target-independent and shared even by the baseline, so its sharing is not credited to D1."},
+      {"name": "batch size b", "treatment": "fixed", "value": 32, "how": "32 independent public targets per seed; sharing is measured as forward-expansion overlap across this batch."},
+      {"name": "counted instrument", "treatment": "fixed", "how": "ONE example binary (transport_graph_cell) counts GAE identically on every arm including the equal-envelope control and the matched rho; sha256 pins it at freeze."},
+      {"name": "host class and threads", "treatment": "fixed", "value": "isolab-eks native-L2 worker, RAYON_NUM_THREADS=1", "how": "One single-threaded process per cell; host facts recorded per row; timing is diagnostic only (the ranked unit is counted GAE)."},
+      {"name": "arm order", "treatment": "fixed", "value": "interleaved", "how": "The four 2x2 arms and the equal-envelope control are interleaved within a cell, not blocked, so drift cannot align with an arm."},
+      {"name": "analyst / labels", "treatment": "measured", "how": "Arm labels are MASKED during analysis; the export is frozen before unmasking (see randomization.blinding)."},
+      {"name": "spot preemption", "treatment": "measured", "how": "Worker/node/interruption recorded per row; an interrupted cell is discarded and re-run whole on an admitted worker (counted units survive; wall time is invalid after restore)."},
+      {"name": "unpriced native ops", "treatment": "measured", "how": "canonicalisation, hash probes, heuristic evaluation, matroid-greedy steps counted as named native counters and swept at 0 / 0.1 / 1 GAE each (section-5a); ranking holds only where the order holds across the band."}
+    ],
+    "comparisons": [
+      {"id": "C-share-overlap", "arms": ["A-S1H0", "A-S0H0"], "differs_in": ["sharing"], "design": "one_factor", "reason": "Measured forward-expansion overlap fraction across the b=32 batch vs the birthday prediction f_share = b*E*n/r. Decides D1-SHARE. The n=31 cell is where overlap is largest (~0.18) and is run first."},
+      {"id": "C-astar-expansions", "arms": ["A-S0H1", "A-S0H0"], "differs_in": ["heuristic"], "design": "one_factor", "reason": "Forward node expansions per verified relation, A*-on vs uniform cost, at matched yield and matched T_d; 95% bootstrap CI. Decides D1-ASTAR; admissibility rate reported (D1-ADMISSIBLE)."},
+      {"id": "C-beat-envelope", "arms": ["A-S1H1", "A-S0H1", "C-equal-envelope"], "differs_in": ["base width", "sharing", "heuristic"], "design": "gate", "reason": "Best candidate arm's GAE/relation and cold end-to-end one-target GAE vs the equal-envelope control at 0/0.1/1 GAE. Decides D1-BEAT. The ranked verdict holds only if it holds at all three price points."},
+      {"id": "C-aa", "arms": ["A-S0H0", "C-aa"], "differs_in": [], "design": "aa", "reason": "Noise floor; counted outcomes must agree within the A/A spread."},
+      {"id": "C-interaction", "arms": ["A-S0H0", "A-S0H1", "A-S1H0", "A-S1H1"], "differs_in": ["sharing", "heuristic"], "design": "factorial_2x2", "reason": "Main effects (sharing, heuristic) and their interaction; D1-COLLAPSE fires if both main effects are null within the A/A floor."},
+      {"id": "C-gap-rho", "arms": ["A-S1H1", "R-rho"], "differs_in": ["method"], "design": "reference", "reason": "Gap-to-rho = best-arm GAE / matched-rho GAE across the band; reported as distance remaining, never pass/fail."}
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "Within a cell the four 2x2 arms and the equal-envelope control run interleaved per target so host drift and preemption cannot align with one arm. Cell order runs n=31 before n=41 so the cheap sharing-null cell (n=31) resolves D1-SHARE before any n=41 spend.",
+    "seed_derivation": {
+      "method": "derived_from_root",
+      "root_seed": "TBD-at-freeze (recorded in the frozen protocol hash)",
+      "derivation": "per-seed stream = root_seed XOR (cell_index << 32) XOR (seed_index << 16); 6 seed_index values per cell; the A/A uses a 7th; targets drawn as [c]G for c uniform in 1..r, c secret (never solver input).",
+      "note": "Labels (which arm) are assigned after seeds so the analyst-masked export carries arm ids only in the sealed key."
+    },
+    "instance_sampling": {
+      "rule": "32 independent public targets per seed, [c]G with c secret; planted controls draw the target as a sum of m factor-base reps by index. The stream is a function of (root_seed, cell, seed_index, mode), independent of the arm.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": true,
+      "how": "The export carries arm ids only via a sealed key; the analysis script reads masked labels and applies the thresholds fixed in this protocol; the key is opened only after ANALYSIS.json is frozen.",
+      "unmasked_at": "after analysis_plan.outputs are written and hashed"
+    }
+  },
+  "sample_size": {
+    "instances": 32,
+    "replicates": 6,
+    "warmups": 0,
+    "power": {
+      "method": "bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 3,
+      "correction": "holm",
+      "passes": null,
+      "note": "D1-ASTAR needs a 2x expansion-ratio with a CI excluding 1.0; 32 targets x 6 seeds = 192 verified-relation samples per arm per cell gives a tight paired bootstrap at the toy rungs. Power is re-checked on the n=31 cell before committing the n=41 spend. Exact instance counts are frozen here; the stopping rule can only lower the n=41 spend."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": "NOT MEASURED. The candidate instrument (examples/transport_graph_cell.rs) does not yet exist. Preflight runtime is filled in after the instrument is implemented and before the freeze; no preflight seconds are usable as evidence (inadmissible)."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {"id": "forward_expansions_per_relation", "name": "Forward node expansions per verified relation", "unit": "expansions", "kind": "counted", "definition": "Number of forward residual-node expansions divided by verified relations, per arm per cell. The core quantity for D1-ASTAR; independent of isolation.", "aggregation": "paired_bootstrap", "resolution": "1", "uncertainty": "bootstrap_ci"},
+      {"id": "sharing_overlap_fraction", "name": "Cross-target forward-expansion overlap fraction", "unit": "fraction", "kind": "counted", "definition": "Fraction of forward expansions in the shared-frontier arm that serve >=2 of the b=32 targets, i.e. saved vs b separate frontiers. Compared to f_share = b*E*n/r. Decides D1-SHARE.", "aggregation": "per_cell", "resolution": "1e-4", "uncertainty": "bootstrap_ci"},
+      {"id": "gae_per_relation", "name": "GAE per verified relation", "unit": "GAE", "kind": "counted", "definition": "Total priced GAE / verified relations, read across the section-5a band (0, 0.1, 1 GAE per unpriced native op). For D1-BEAT.", "aggregation": "paired_bootstrap", "resolution": "1e-3", "uncertainty": "band_and_ci"},
+      {"id": "end_to_end_one_target_gae", "name": "Cold one-target end-to-end GAE", "unit": "GAE", "kind": "counted", "definition": "From instance to a verified [k]P=Q for one public target, all target-independent setup charged in full (SUCCESS_CRITERIA section 1), across the band. The headline cost for the gap-to-rho and for D1-BEAT.", "aggregation": "per_target_bootstrap", "resolution": "1e-3", "uncertainty": "band_and_ci"}
+    ],
+    "secondary": [
+      {"id": "admissibility_rate", "name": "A* heuristic admissibility rate", "unit": "fraction", "kind": "counted", "definition": "1 - (fraction of peels with Delta-w > w_max); w_max measured, not assumed. Wilson interval. Decides D1-ADMISSIBLE (descriptive).", "aggregation": "per_cell", "resolution": "1e-3", "uncertainty": "wilson"},
+      {"id": "native_op_counts", "name": "Unpriced native operation counts", "unit": "ops", "kind": "counted", "definition": "canonicalisation, hash probes, heuristic evaluations, matroid-greedy steps; the inputs to the section-5a band sweep.", "aggregation": "sum", "resolution": "1", "uncertainty": "none_exact"},
+      {"id": "gap_to_rho", "name": "Gap to matched rho", "unit": "ratio", "kind": "derived", "definition": "best-arm end_to_end_one_target_gae / matched rho.signed_frobenius GAE, per band point. Distance remaining, never a pass/fail.", "aggregation": "per_cell", "resolution": "1e-2", "uncertainty": "band_and_ci"},
+      {"id": "wall_seconds", "name": "Process wall seconds", "unit": "seconds", "kind": "timed", "definition": "Diagnostic only; the ranked unit is counted GAE. Valid only on native-L2 admission; invalid after a CRIU restore.", "aggregation": "per_row", "resolution": "1e-2", "uncertainty": "none_exact"}
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 0,
+    "order": "interleaved",
+    "clock": "monotonic",
+    "counters": ["forward expansions", "verified_relations", "GAE phases", "native op counters", "columns", "peak RSS"],
+    "record": [
+      "Protocol hash, frozen commit, binary sha256, container image digest, build identity",
+      "Exact argv, environment and cell/seed id per row; sealed arm-label key",
+      "Host: cpu model, kernel, governor, vCPUs, threads=1, isolation tier and native-L2 admission, steal, PSI",
+      "Counted GAE phase breakdown and native counters per row; wall seconds and peak RSS (diagnostic)",
+      "Raw cell JSON and sidecars; S3 object hashes verified after download"
+    ],
+    "timed_primary_justification": "The RANKED primary metrics are counted (forward expansions, GAE across the band) and need no isolation. Wall seconds are secondary/diagnostic; they are evidence only on isolab-eks native L2. The decided/collapse verdict is a count comparison against the A/A floor."
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab-eks (cluster isolab, namespace isolab): cpu-l2-spot; one frozen_command task card per (cell, arm-group) via tools/task_card.py; experiment-director compiles, executor-mechanical runs unchanged (model-tier rule).",
+    "placement": {"vcpus_per_shard": 1, "shards": null, "concurrency": null, "minimum_memory_bytes": null, "campaign_usd_ceiling": null, "campaign_usd_ceiling_note": "Set by the experiment director in the launch request before any spend (AGENTS.md section 9a); unknown until the instrument preflight.", "absolute_deadline_utc": null},
+    "measurement_class": "measurement",
+    "timeout_seconds": null,
+    "checkpoint": {"policy": "criu-on-preempt", "restore_validation": "counted-units-valid-wall-invalid", "after_restore": {"wall_time": "invalid", "counted_units": "valid"}},
+    "retries": {"infrastructure_only": true, "max_attempts": 3}
+  },
+  "stopping_rules": [
+    {"rule": "Phase 0 (cheap gate): run the n=31 cells of A-S1H0 vs A-S0H0 (and the A/A) FIRST. If the measured sharing_overlap_fraction is within [0.5x,1.5x] of f_share(n=31)~0.18 (D1-SHARE supported), the sharing sub-claim is closed; the shared-frontier arms at n=41 are still run only to confirm f_share~7.6e-4, not to find a win.", "kind": "preregistered_sequential", "preregistered": true},
+    {"rule": "Phase 1 gate on the n=41 spend: only commit the full n=41 2x2 + equal-envelope spend if the n=31 A*-on arm (C-astar-expansions) shows a point estimate >=2x forward-expansion cut. If the n=31 A* effect is below the A/A floor, record D1-ASTAR not_supported at n=31 and do NOT spend on n=41 candidate arms (run only the n=41 baseline + rho reference for the gap record).", "kind": "preregistered_sequential", "preregistered": true},
+    {"rule": "Fixed grid otherwise: 2 curves x 2 m x {4 candidate arms + equal-envelope + positive + A/A} + matched rho, 32 targets x 6 seeds per cell; interleaved; seeds derived from the frozen root seed.", "kind": "fixed_n", "preregistered": true},
+    {"rule": "Invalidation stop: a failed positive control (a completed planted cell with no verified witness), a binary sha256 different from the frozen one, or a worker without native-L2 admission for a timed row stops the affected shard for the director's assessment; no threshold is changed.", "kind": "invalidation", "preregistered": true}
+  ],
+  "invalidation_rules": [
+    "A completed planted (positive-control) cell whose witness does not re-add in the curve group to the target invalidates that (arm, cell).",
+    "A candidate cell whose verified_relations differs from its claimed relations (a witness that does not re-add) is invalid.",
+    "An A/A pair whose counted outcomes differ beyond the recorded noise floor invalidates both and halts the shard.",
+    "A binary whose sha256 differs from the frozen value, or a source tree off the frozen commit, makes the row's timing diagnostic only; counted GAE from a wrong binary is invalid.",
+    "Reading wall seconds from a run without native-L2 admission as timing evidence is inadmissible (counted GAE is still the ranked unit)."
+  ],
+  "decision_rule": {
+    "text": "D1-SHARE supported iff measured sharing_overlap_fraction is within [0.5x,1.5x] of b*E*n/r at both rungs. D1-ASTAR supported iff A*-on forward-expansions/relation <= 0.5x A*-off at matched yield with a CI excluding 1.0, at n=31 and n=41. D1-BEAT supported iff the best candidate arm's gae_per_relation AND end_to_end_one_target_gae beat C-equal-envelope at ALL of 0/0.1/1 GAE. D1-COLLAPSE fires (verdict reduces_to_known) iff D1-SHARE supported AND D1-ASTAR not supported and the 2x2 arms equal A-S0H0 within the A/A floor. Every reported ratio is accompanied by gap-to-rho as the distance remaining; nothing here is a pass/fail against rho.",
+    "comparison_ids": ["C-share-overlap", "C-astar-expansions", "C-beat-envelope", "C-interaction", "C-aa", "C-gap-rho"],
+    "threshold": "Sharing: [0.5x,1.5x] of f_share. A*: <=0.5x expansions at matched yield, CI excludes 1.0. Beat: strictly cheaper than equal-envelope at all three band points. Collapse: within A/A floor.",
+    "statistic": "Paired bootstrap (95%) on forward-expansions/relation and GAE; per-cell overlap fraction vs birthday prediction; band-wise GAE ratios.",
+    "effect_size_measure": "forward-expansion ratio (A*-off / A*-on); GAE ratio (best arm / equal-envelope) per band point; gap-to-rho.",
+    "verdict_vocabulary": ["supported", "supported_partial", "not_supported", "null_confirmed", "reduces_to_known", "improvement_constant_factor", "no_priced_row_moves", "not_evaluable", "instrument_invalid"]
+  },
+  "analysis_plan": {
+    "script": {"path": "analyze.py", "sha256": null, "note": "Written and hashed BEFORE data (frozen_before_data). Reads masked labels; opens the arm-label key only after ANALYSIS.json is frozen."},
+    "inputs": ["grid.tsv", "raw/*/*.json", "receipts/*", "sealed arm-label key (opened last)"],
+    "outputs": ["analysis.txt", "ANALYSIS.json", "table.tsv"],
+    "blinded": true,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "forward-expansions/relation by arm, n=31 and n=41, with the A/A band and the 2x cut line",
+      "sharing_overlap_fraction vs the birthday prediction f_share, both rungs",
+      "GAE/relation and end-to-end one-target GAE vs the equal-envelope control across the 0/0.1/1 band, with gap-to-rho"
+    ],
+    "report_dir": "reports",
+    "visuals_rule": "research-visuals skill: report + SVG graph + PDF per the repository rule.",
+    "gate_rule": "No leaderboard or benchmarks/README.md row from this study (D1-OOS). If a priced row ever moved it would additionally need a VALIDATION.json (replay cert + validator report + matched rho with the band) per docs/VALIDATION_GATE.md."
+  },
+  "inadmissible": [
+    "Changing any threshold, seed, batch size, factor base, multiplier norm, backward-table depth, or the heuristic definition after the freeze.",
+    "Running any candidate arm before the instrument sha256 is frozen and its preflight is recorded.",
+    "Reporting the sharing arm as a win if the overlap matches the birthday prediction (D1-SHARE is a preregistered null).",
+    "Claiming an improvement from an arm that beats fixed-column IC but loses to the equal-envelope control at any band point.",
+    "Using wall seconds from a non-L2 run, or the preflight, as evidence.",
+    "Presenting these toy-rung relation-collection cells as a complete-DLP result, a sub-rho claim, a leaderboard row, or any n=131/ECC2K-130 statement (D1-OOS).",
+    "Dropping the gap-to-rho from any reported ratio."
+  ],
+  "literature": [
+    {"ref": "research/hybrid_ic_directions_20261120/D1_transport_graph.md", "provenance": "internal", "claim": "Full D1 design: graph formulation, A* heuristic, the computed sharing null f_share=b*E*n/r, novelty vs large-prime graph / MITM / compact-orbit-scan.", "verified_by": "This study's design fork, 2026-11-20."},
+    {"ref": "docs/ic/IC_TECHNIQUE_INTEGRATION_20261012.md (section 1)", "provenance": "internal", "claim": "The equal-envelope control reduced the double-large-prime graph from 23.8x to 2.1x; the candidate must beat the wider-base control, not fixed-column IC.", "verified_by": "Repository read, 2026-11-20."},
+    {"ref": "docs/ic/SOLVER_SELECTION.md", "provenance": "internal", "claim": "The ONB x-weight / Frobenius-distance features (the A* heuristic candidate) gave the learned selector NO routing headroom on 288 queries. Preregistered as the main risk that the heuristic is too flat.", "verified_by": "Repository read, 2026-11-20."},
+    {"ref": "src/cryptanalysis/ic_framework/residual.rs", "provenance": "internal", "claim": "A residual-collision walk (nodes=residuals, edges=subtract base point, MITM meet) already exists and costs ~1 rho solve per relation; D1's increment over it is the ordering (A*) and multiplier edges.", "verified_by": "Grounding agent read, 2026-11-20."},
+    {"ref": "src/cryptanalysis/ic_framework/plugins.rs (compact-orbit-scan:norm=N)", "provenance": "internal", "claim": "Small-norm Z[tau] multiplier edges exist as a base-enlargement move (measured 9.2x one-target total vs plain-scan at n=41,m=3); D1 reuses them as search edges.", "verified_by": "Grounding agent read, 2026-11-20."},
+    {"ref": "grounding: no n=131 decomposition path", "provenance": "internal", "claim": "u64 FastPoint path stops at n<64; koblitz_sparse_la MAX_MODULUS_BITS=63; no decomposition search runs at n=131. The protocol tops out at n<=41.", "verified_by": "Grounding agent read, 2026-11-20."}
+  ],
+  "process_gates_outstanding": [
+    "Implement examples/transport_graph_cell.rs (the A*/beam search over residual states, the shared-frontier mode, the equal-envelope control, the planted control, and same-process rho.signed_frobenius), all counting GAE identically. THIS IS A PREREQUISITE; nothing runs until it is frozen.",
+    "research-kb + lead-atlas receipts recorded in SOURCES.md before the novelty wording lands in any PR.",
+    "Conductor task + scope reservation (Conductor not installed in this session; hooks warn-and-allow).",
+    "scripts/checkpoint.sh init -> .resume/RESUME.md pushed to S3 before any run (RESUME.draft.md in this dir is the draft content).",
+    "experiment-director compiles the frozen task card; executor-mechanical runs it unchanged (model-tier rule); default route isolab-eks.",
+    "bench.record/v1 + VALIDATION.json only if a priced row is ever produced (D1-OOS says none is expected)."
+  ]
+}
