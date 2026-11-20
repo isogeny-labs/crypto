@@ -286,6 +286,17 @@ impl Ring for Fq2 {
         if y.1 == 0 {
             return (f.mul(x.0, y.0), f.mul(x.1, y.0));
         }
+        // Pure-imaginary factors require just one or two Fp products
+        // instead of three Karatsuba products. This is public-input,
+        // variable-time arithmetic. Keep both real-scalar paths above.
+        if x.0 == 0 || y.0 == 0 {
+            let real = self.mul_nonresidue(f.mul(x.1, y.1));
+            if x.0 == 0 {
+                return if y.0 == 0 { (real, 0) }
+                       else { (real, f.mul(x.1, y.0)) };
+            }
+            return (real, f.mul(x.0, y.1));
+        }
         let ac = f.mul(x.0, y.0);
         let bd = f.mul(x.1, y.1);
         // The first quadratic non-residue is commonly 2 or 3.
@@ -1488,6 +1499,43 @@ impl RadicalRootCtx {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round72_imaginary_fp2_mul_matches_reference() {
+        // Independently expand (a+bi)(c+di) for canonical and zero
+        // components. The same arithmetic works for small and 61-bit p.
+        for p in [5u64, 7, 11, 17, 97, 998_244_353,
+                  1_000_000_007, MAX_PRIME] {
+            let f = Fp::new(p);
+            let q = Fq2 { f, n: f.first_quadratic_nonresidue() };
+            let mut state = p ^ 0x72ac_6c6e_34fc_0017u64;
+            for i in 0..512usize {
+                state = state.wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                let mut x = (state % p, state.rotate_left(19) % p);
+                state = state.wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                let mut y = (state % p, state.rotate_left(37) % p);
+                match i % 8 {
+                    0 => x.0 = 0,
+                    1 => y.0 = 0,
+                    2 => { x.0 = 0; y.0 = 0; },
+                    3 => x.1 = 0,
+                    4 => y.1 = 0,
+                    5 => { x.0 = 0; x.1 = 0; },
+                    _ => {}
+                }
+                let ac = f.mul(x.0, y.0);
+                let bd = f.mul(x.1, y.1);
+                let expected = (
+                    f.add(ac, q.mul_nonresidue(bd)),
+                    f.add(f.mul(x.0, y.1), f.mul(x.1, y.0)),
+                );
+                assert_eq!(q.mul(x, y), expected,
+                    "p={p} n={} i={i} x={x:?} y={y:?}", q.n);
+            }
+        }
+    }
 
     #[test]
     fn round70_frobenius_reduction_matches_independent_binary_power() {
