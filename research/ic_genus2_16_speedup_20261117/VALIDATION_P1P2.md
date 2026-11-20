@@ -20,12 +20,24 @@ The errata are listed under "Discrepancies and errata" below.
 - One concerns rounding: E6.
 - One is a minor protocol note: E7.
 
-**Not validated: discrete-log certificates.** The run records carry only the
-`certified` and `ok` booleans. There is no G, T or recovered t. So no solve
-certificate could be re-verified with code independent of the solver. Under the
-validator's certificate rule, this requirement is `insufficient_evidence`. It
-blocks admission to the leaderboard or to `VALIDATION.json`. It does not
-invalidate the counted costs. The remedy is under C1 below.
+**Update (2026-11-20), after the certificate re-check at the end of this file.**
+The verdict stays **validated-with-errata**, with two changes:
+- **Certificates now verify.** The certificate requirement moves from
+  `insufficient_evidence` to verified, for every certified c/D/E/R solve behind the
+  P1 and P2-crossover tables. All 236 certificates in the g16f re-runs pass the
+  validator's own checks. Those re-runs are identical to the committed records in
+  every counted field.
+- Still uncertified: the 30 arm-F solves of `RESULTS_F.md`. They have no
+  certificate payload.
+- **E3 is now material, not just a disclosure gap.** With the admitted curve 27
+  included, the g=10 p=11 arm D is at **1.03x** rho, not 0.72x (see E3b below).
+
+**Original finding, superseded by the certificate re-check below.** Discrete-log
+certificates were not validated. The run records carry only the `certified` and `ok`
+booleans, with no G, T or recovered t, so no solve certificate could be re-verified
+with code independent of the solver. Under the validator's certificate rule, this
+requirement was `insufficient_evidence`. It did not invalidate the counted costs.
+The remedy was given under C1.
 
 ## Frozen inputs
 
@@ -244,3 +256,118 @@ $V -I validation/mc_split.py 6 31 29 --samples 50000  > validation/mc_split_g6p3
 - **Interpretation.** Extrapolations in `RESULTS_crossover.md` (p* for g ≥ 10, and
   "g!/3 to g!/6") are interpretation, not measurement, and were not validated. The
   measured g=6 point, p* ≈ 270, is about g!/2.7.
+
+## Certificate re-check (2026-11-20)
+
+**Verdict: PASS.**
+- Every recovered t verifies with the validator's own code.
+- Every `ok`/`certified` flag agrees with that verification.
+- Every exhausted run has no t.
+- The re-runs are identical to the committed records in every counted field.
+
+### Inputs (frozen, committed)
+- **Files.** `P4_followup/certs/*_cert.jsonl`: 33 files, one per instance. They hold
+  the 32 instances validated above plus g=8 p=73 curve 1 from `P4_followup/g8decay`.
+  - 264 run records, 66 per arm (c, D, E, R).
+  - Committed in `0076b96fa61bd567dc87711d2a3730d33b554dd8`; the working tree equals
+    the HEAD blobs.
+  - Per-file hashes: `validation/CERTS_SHA256.txt`.
+- **Binary.** `/home/user/bin/genus_ladder_g16f`, sha256
+  `573993fd34ab68be6c3ca777f9e32e4299286f3fb42abd0b23a4cfd04cee07a4`. It is
+  described as g16d plus the `cert` and `recovered_t` record fields.
+- **Committed comparison set.** `P1/main`, `P1/supp`, `P2/crossover`,
+  `P2/crossover_supp` and `P4_followup/g8decay`. The P1/P2 JSONL still match
+  `validation/EVIDENCE_SHA256.txt`.
+
+### Commands
+```
+python3 -I validation/check_certs.py         > validation/check_certs.out         # CERT_CHECK PASS
+python3 -I validation/check_certs_negctl.py  > validation/check_certs_negctl.out  # NEGCTL PASS
+python3 -I validation/g10p11_with_c27.py     > validation/g10p11_with_c27.out
+```
+- **Code.** `check_certs.py` uses only `validation/hyperell.py`: the Cantor law,
+  Mumford validity, and r tested prime by Miller-Rabin and Pollard rho. Every field is
+  read with `[]`.
+- **Cost.** One core, under 2 s in total.
+
+### Counts (`validation/check_certs.out`)
+
+| Requirement | Result |
+|---|---|
+| Run records checked | 264 (c 66, D 66, E 66, R 66) |
+| `cert.f` = the file's instance `f` = the committed instance `f`; monic, degree 2g+1 | 264/264 |
+| G and T valid reduced Mumford pairs on y² = f(x) over F_p (u monic with its leading 1, deg u ≤ g, deg v < deg u, u divides v² − f) | 264/264 |
+| Records with `recovered_t` not null | 236 |
+| ... G ≠ 0, [r]G = 0 with r prime (so G has order r), [t]G = T, 0 ≤ t < r | **236/236 pass, 0 fail** |
+| `ok` true / `certified` true | 236 / 236. Each has a passing t. `certified` equals the validator's own verdict in 264/264. |
+| Exhausted records | 28, all with `recovered_t` null and `ok`/`certified` false. 26 are arm c: the 24 already in the tables, plus curve 27 at g=10 p=11. 2 are arm **E** at g=10 p=11 curve 27. |
+| R records | 66, all certified with a passing t. Rho records carry no `exhausted` field. |
+| Arms of one (curve, seed) agree on G, T and t | 66/66 |
+| Negative controls: t+1, r+2, T := G, G_v[0]+1, f[0]+1 on one certified record per file | 165/165 rejected. The 33 unperturbed records pass. |
+| Identity with committed records (all fields except `wall_ns`, `cert`, `recovered_t`) | 256 overlapping records (P1/main 184, P1/supp 40, P2/crossover 16, P2/crossover_supp 8, P4 g8decay 8), 8448 fields, **0 differences**. Instance records: 0 differences. |
+| Re-run records with no committed counterpart | 8: g=10 p=11 curve 27, never run before (E3) |
+| Committed records not re-run | 6: g=8 p=101 curve 7 (`P4_followup/g8decay`, outside this report's validated set) |
+
+### What this establishes
+**Coverage.** It covers all 224 run records behind the P1 table and all 24 behind the
+P2 crossover table:
+- For each, the g16f re-run is identical in every counted field.
+- Every non-exhausted re-run carries a certificate that the validator verified
+  independently.
+- Together these certify the solves of those tables.
+
+The 30 arm-F solves in `RESULTS_F.md` (binary g16e) are **not** covered; they remain
+flag-only. The F-pilot arm-E reruns are covered, through their identity with the P1
+E records.
+
+**Limits.**
+- **Planted log.** The instrument plants t and sets T = [t]G. A valid [t]G = T proves
+  the reported t is the discrete log of T to base G in the order-r subgroup of
+  J(F_p). It cannot prove that the solver found t without reading the planted value.
+  - The evidence that the counted work happened is the counted-cost structure itself:
+    the independent smoothness check (check 6) and determinism (check 5).
+  - A stronger form would derive T from a public seed by hashing to the group, with
+    no secret in the process.
+- **Binary provenance.**
+  - The g16f source patch is not committed.
+  - `P4_followup/certs/CELLS.log` records no binary hash.
+  - It has no line and no `.log` file for g=6 p=31 curve 11. That cert file
+    exists and verifies.
+
+  None of this weakens the certificates, which verify on their own. It leaves
+  "g16f = g16d + two fields" supported only by the 256-record identity.
+
+### New findings from the re-run data
+- **E3b (material; supersedes the disclosure-only reading of E3).** Curve 27 is the
+  third curve the g=10 p=11 cell admitted, and its #J was verified in check 2. On it:
+  - arm D costs 1.93x and 2.21x of rho;
+  - arm E exhausts its 5×10^6 trial cap on both seeds;
+  - arm c exhausts as well.
+
+  With the protocol's full 3-curve sample, the g=10 p=11 row (geometric means over 6
+  pairs, `validation/g10p11_with_c27.out`) changes as follows:
+
+  | | 4 pairs (as reported) | 6 pairs (with curve 27) |
+  |---|---|---|
+  | c / rho | >=146 | >=121 |
+  | D / rho | **0.725** | **1.03** |
+  | E / rho | 37.2 | >=52.5 (lower bound) |
+  | gain over c | >=201x | >=118x |
+
+  RESULTS.md says "At g=10, p=11, D solves at 0.73x of rho". That claim holds only
+  without the admitted curve 27. On the full sample, D is about at rho (1.03x).
+  - The curve-27 numbers come from g16f, which matches g16d on all 256 overlapping
+    records.
+- **E8 (minor).** PROTOCOL.md specifies "2 target/walk seeds". The seed changes only
+  the walk, not the target:
+  - all 248 committed run records have `target_seed` = `curve_seed`;
+  - in 33/33 cert files, both seeds share one (G, T).
+
+  Each cell's "pairs" are therefore two walks on one target per curve, not
+  independent targets.
+- **Post-validation edits.** `P1/RESULTS.md` and `P1/DESIGN.md` were edited in place in
+  `eddade9186` to fold in E1-E7.
+  - RESULTS.md sha256 went from `2a185a86…` (validated) to `8a59dd42…`.
+  - Adopted lesson L-8d86e8fc352c asks for a sibling `ERRATA.md` instead.
+  - The folded-in text was not re-validated here. Its E3 line and the g=10 "0.73x of
+    rho" sentence are superseded by E3b.
