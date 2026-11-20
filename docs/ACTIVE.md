@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
+- [ ] Add one-large-prime partial-relation pairing to the projected genus-3 cover solver, retaining exact transfer certificates, generic controls, and complete phase accounting (Codex, started 2026-11-20, branch codex/ecbench-canonical-panel-20261118, PR #4752)
+
 - [x] Implement a specialized genus-3 destination solver for the canonical Phase 1 cover-transfer route, retaining generic rho/BSGS controls and complete transfer accounting (Codex, completed 2026-11-20, branch codex/ecbench-canonical-panel-20261118, PR #4752)
 
 - [x] Implement the first phase-matched end-to-end Phase 1 hyperelliptic/Jacobian and cover/transfer benchmark adapters in the canonical phased ecbench panel (Codex, completed 2026-11-19, branch codex/ecbench-canonical-panel-20261118, PR #4752; typed lane infrastructure completed 2026-11-19)
