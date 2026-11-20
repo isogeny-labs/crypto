@@ -1,0 +1,7 @@
+Assessment trigger: 2026-11-20 08:16 UTC
+Run the frozen public-synthetic Koblitz GF(2^23), a=0, m=2 control.
+Command: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Log: results/hourly_log.csv
+Baseline: results/relation_baseline.json (20% relative anomaly threshold)
+The workflow commits its CSV and opens an issue for failures or above-threshold metrics.
+This is not an ECC2K-130 benchmark.
