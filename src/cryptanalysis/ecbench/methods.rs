@@ -83,7 +83,8 @@ use crate::cryptanalysis::ic_framework::plugins::{
     BinaryMultiplierBase, BinarySubspaceBase, CmMultiplierBase, CompactOrbitScanBase,
     CyclotomicBase, DescentAlgebraicOracle, FrobeniusMitmOracle, GlvOrbitBase, KSumOracle,
     KoblitzOrbitBase, MitmOracle, OnbWeightBase, PrimeAbscissaBase, PrimeBatchMitmOracle,
-    PrimeProjectedAbscissaBase, RootfindSubtractOracle, SubtractOracle, WSumOracle, WWalkOracle,
+    PrimeProjectedAbscissaBase, ResidualSweepOracle, RootfindSubtractOracle, SubtractOracle,
+    WSumOracle, WWalkOracle,
 };
 use crate::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crate::cryptanalysis::ic_framework::rootfind::{RootfindMitmOracle, RootfindPairsOracle};
@@ -7361,6 +7362,7 @@ fn solve_ic_prime(
     let mut rootfind_mitm_batch = RootfindMitmOracle::new_prime_batch(ms);
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
     let mut semaev_projection = SemaevProjectionOracle::new(ms);
+    let mut residual_sweep = ResidualSweepOracle::new();
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
     let mut rootfind_gpu =
         crate::cryptanalysis::ic_framework::rootfind_gpu::RootfindSubtractGpuOracle::new(ms, inst);
@@ -7389,6 +7391,7 @@ fn solve_ic_prime(
         "rootfind-mitm-prime-batch" => &mut rootfind_mitm_batch,
         "rootfind-pairs" => &mut rootfind_pairs,
         "semaev-projection" => &mut semaev_projection,
+        "residual-sweep" => &mut residual_sweep,
         "rootfind-subtract" => &mut rootfind,
         "rootfind-subtract-gpu" => &mut rootfind_gpu,
         other => match plugin_oracle.as_deref_mut() {
