@@ -1,5 +1,11 @@
 # Results: six falsifiers on prime-field ECDLP hardness
 
+**H4 scale update (2026-11-20 UTC):** The
+[paired `n=19` scale check](H4_prime_descent/xor_scale_20261120/README.md)
+censored both native-XOR and CNF solver arms at 300 seconds on a planted
+six-solution system and an ordinary zero-solution system. This limits the
+measured `n=17` component gain below to its tested degree.
+
 **H4 native XOR follow-up (2026-11-20 UTC):** A
 [paired four-cell diagnostic](H4_prime_descent/xor_followup_20261120/README.md)
 found verified first witnesses in 33.39 and 34.85 seconds with native XOR

@@ -1,5 +1,12 @@
 # H4 RESULTS: FPPR prime-degree descent to F_2, m=3 (claim C4)
 
+**Native XOR scale check (2026-11-20 UTC):** At `n=19`, both native XOR
+and Tseitin CNF reached 300-second caps on a planted six-solution system
+and an ordinary zero-solution system. The [frozen four-cell packet](xor_scale_20261120/README.md)
+retains exact enumeration controls, input hashes, resource receipts, and
+all censored statuses. The `n=17` solver-time ratio below has no measured
+`n=19` counterpart.
+
 **Native XOR follow-up (2026-11-20 UTC):** On the same fixed `n=17`
 ordinary-query system, a native XOR-DIMACS encoding yielded a verified
 first witness in 34.85 seconds versus 155.57 seconds for the paired
