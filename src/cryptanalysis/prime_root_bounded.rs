@@ -424,6 +424,26 @@ impl Producer<'_> {
             return Ok((quotient, Poly17::constant(a.coefficients[0])));
         }
         // R52_DIVISION_END
+        // R56_PRODUCER_MONOMIAL_DIVISION_BEGIN
+        // Division by x^d is a coefficient split. Preserve the original
+        // quotient/remainder and account for each nonzero high cancellation
+        // in one bounded deadline/work check, without any field operations.
+        if b.len >= 3
+            && b.coefficients[..b.len as usize - 1].iter().all(|&c| c == 0)
+            && b.coefficients[b.len as usize - 1] == 1
+        {
+            let n = a.len as usize;
+            let d = b.len as usize - 1;
+            let cancellations = a.coefficients[d..n].iter().filter(|&&c| c != 0).count();
+            self.gate.charge(COPY_WORK * cancellations as u64)?;
+            quotient.coefficients[..n - d].copy_from_slice(&a.coefficients[d..n]);
+            remainder.coefficients[d..n].fill(0);
+            remainder.len = d as u8;
+            quotient.trim();
+            remainder.trim();
+            return Ok((quotient, remainder));
+        }
+        // R56_PRODUCER_MONOMIAL_DIVISION_END
         // Most GCD and splitting factors are monic. In that case no
         // reciprocal, leading multiplication, or leading subtraction is needed.
         // For a general divisor, the leading term also cancels exactly.
@@ -480,6 +500,24 @@ impl Producer<'_> {
             return Ok(());
         }
         // R52_REDUCE_END
+        // R56_PRODUCER_MONOMIAL_REDUCTION_BEGIN
+        // f mod x^d is exactly its low d coefficients. Aggregated
+        // metering charges the same nonzero leading cancellations as the
+        // former trim-driven loop, with a single deadline check.
+        if modulus.len >= 3
+            && value.len >= modulus.len
+            && modulus.coefficients[..modulus.len as usize - 1].iter().all(|&c| c == 0)
+        {
+            let n = value.len as usize;
+            let d = modulus.len as usize - 1;
+            let cancellations = value.coefficients[d..n].iter().filter(|&&c| c != 0).count();
+            self.gate.charge(COPY_WORK * cancellations as u64)?;
+            value.coefficients[d..n].fill(0);
+            value.len = d as u8;
+            value.trim();
+            return Ok(());
+        }
+        // R56_PRODUCER_MONOMIAL_REDUCTION_END
         // x^d+constant and x^d+... with a zero low coefficient appear
         // in sparse factor bases; avoid paying the sparse branch on dense f.
         let sparse_modulus = modulus.coefficients[0] == 0
@@ -1441,6 +1479,18 @@ impl Replay {
             return Ok(Poly17::constant(numerator.coefficients[0]));
         }
         // R52_REMAINDER_END
+        // R56_REPLAY_MONOMIAL_REMAINDER_BEGIN
+        // Any nonzero scalar multiple of x^d has the same remainder.
+        // Replay independently charges each eliminated degree in aggregate.
+        if d >= 2 && denominator.coefficients[..d].iter().all(|&c| c == 0) {
+            let n = numerator.len as usize;
+            self.gate.charge(COPY_WORK * (n - d) as u64)?;
+            r.coefficients[d..n].fill(0);
+            r.len = d as u8;
+            r.trim();
+            return Ok(r);
+        }
+        // R56_REPLAY_MONOMIAL_REMAINDER_END
         let leading = denominator.coefficients[d - 1];
         let monic = leading == 1;
         let inverse = if monic { 1 } else { self.reciprocal(leading)? };
@@ -1502,6 +1552,22 @@ impl Replay {
             return Ok(());
         }
         // R52_CANCEL_END
+        // R56_REPLAY_MONOMIAL_CANCEL_BEGIN
+        // In Fp[x]/(x^d), canceling every high term is just truncation.
+        // Unlike producer's trim-driven path, replay's original loop
+        // checks every eliminated degree, including zero coefficients.
+        if divisor_len >= 3 && numerator.len >= denominator.len
+            && denominator.coefficients[..divisor_len - 1].iter().all(|&c| c == 0)
+        {
+            let n = numerator.len as usize;
+            let d = divisor_len - 1;
+            self.gate.charge(COPY_WORK * (n - d) as u64)?;
+            numerator.coefficients[d..n].fill(0);
+            numerator.len = d as u8;
+            numerator.trim();
+            return Ok(());
+        }
+        // R56_REPLAY_MONOMIAL_CANCEL_END
         // Independent descending-index traversal rather than producer trim loop.
         let sparse = denominator.coefficients[0] == 0
             || (divisor_len > 2 && denominator.coefficients[1] == 0);
@@ -2338,6 +2404,65 @@ mod tests {
             ((u128::from(a) * u128::from(x) + u128::from(c)) % u128::from(p)) as u64
         })
     }
+    #[test]
+    fn round56_monomial_quotients_remainders_and_replay_match_oracle() {
+        // The independent oracle splits coefficients at degree d rather
+        // than invoking polynomial division, modular reduction or replay.
+        for p in [7u64, 1_000_000_007, 1_000_000_009, (1u64 << 61) - 1] {
+            let f = field(p);
+            for d in 2..=8usize {
+                let mut modulus_coeffs = vec![0u64; d + 1];
+                modulus_coeffs[d] = 1;
+                let modulus = Poly17::from_coefficients(&f, &modulus_coeffs).unwrap();
+                let mut observer = |_: &BoundedRootEvent| Ok(());
+                let mut producer = Producer {
+                    p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
+                    unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
+                    roots: [0; 8], root_count: 0,
+                };
+                producer.gate.admit().unwrap();
+                let mut replay =
+                    Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+                let mut state = (p ^ 0xabcd_1234_d00d_9911).wrapping_add(d as u64);
+                for n in [d - 1, d, d + 1, (d + 3).min(16), 16] {
+                    for case in 0..32u64 {
+                        let mut coefficients = vec![0u64; n];
+                        for (i, coefficient) in coefficients.iter_mut().enumerate() {
+                            state ^= state << 13;
+                            state ^= state >> 7;
+                            state ^= state << 17;
+                            *coefficient = if case % 7 == 0 && i % 2 == 0 {
+                                0
+                            } else {
+                                state % p
+                            };
+                        }
+                        coefficients[n - 1] = 1 + (state % (p - 1));
+                        let polynomial = Poly17::from_coefficients(&f, &coefficients).unwrap();
+                        let expected_remainder =
+                            Poly17::from_coefficients(&f, &coefficients[..n.min(d)]).unwrap();
+                        let expected_quotient = if n <= d {
+                            Poly17::ZERO
+                        } else {
+                            Poly17::from_coefficients(&f, &coefficients[d..]).unwrap()
+                        };
+                        let (q, r) = producer.division(&polynomial, &modulus).unwrap();
+                        assert_eq!(q, expected_quotient, "division quotient p={p} d={d} n={n}");
+                        assert_eq!(r, expected_remainder, "division remainder p={p} d={d} n={n}");
+                        let mut reduced = polynomial;
+                        producer.reduce_monic(&mut reduced, &modulus).unwrap();
+                        assert_eq!(reduced, expected_remainder, "producer p={p} d={d} n={n}");
+                        let replay_r = replay.remainder(polynomial, &modulus).unwrap();
+                        assert_eq!(replay_r, expected_remainder, "replay remainder p={p} d={d}");
+                        let mut replay_c = polynomial;
+                        replay.cancel_monic(&mut replay_c, &modulus).unwrap();
+                        assert_eq!(replay_c, expected_remainder, "replay cancel p={p} d={d}");
+                    }
+                }
+            }
+        }
+    }
+
     #[test]
     fn round53_inverses_match_independent_modular_power_and_deadlines() {
         // Independent square-and-multiply oracle; neither inversion routine
