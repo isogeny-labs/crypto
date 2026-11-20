@@ -1555,6 +1555,25 @@ impl PkmSemaevOracle {
         (r.a, r.b, r.c, r.d)
     }
 
+    /// Exhaustive `grid()` beats algebraic descent when `|V|^m` is tiny
+    /// (measured Dickson `m=3,t=3` crossover: `|V|=8` → 512 triples still
+    /// cheaper than descent DFS even after prepare()-time root caching).
+    const DESCENT_GRID_CROSSOVER: u64 = 512;
+
+    /// Prefer legacy `grid()` extraction over basis-root descent.
+    fn prefer_grid_extraction(&self) -> bool {
+        let Some(prep) = self.prepared.as_ref() else {
+            return false;
+        };
+        let v = prep.v.len() as u64;
+        v.saturating_pow(self.m) <= Self::DESCENT_GRID_CROSSOVER
+    }
+
+    /// `descent=1` and the domain is large enough that descent wins.
+    fn use_descent_extraction(&self) -> bool {
+        self.descent && !self.prefer_grid_extraction()
+    }
+
     /// Precompute Tonelli–Shanks roots for every distinct square-rule shape
     /// in `ring` (and any extra rules passed in).
     fn build_rule_root_cache(
@@ -2974,8 +2993,11 @@ impl PkmSemaevOracle {
                     continue;
                 }
                 any_undecided |= undecided;
-                if !self.descent {
-                    // Legacy grid fallback requested (`descent=0`).
+                if !self.use_descent_extraction() {
+                    // Legacy grid: `descent=0`, or tiny `|V|^m` where grid wins.
+                    if self.descent && self.prefer_grid_extraction() {
+                        self.bump("pkm_descent_deferred_to_grid", 1);
+                    }
                     last_rep = Some((rep, undecided));
                     break;
                 }
@@ -3099,7 +3121,7 @@ impl PkmSemaevOracle {
         if rep.inconsistent {
             return Err((rep, false));
         }
-        if !self.descent {
+        if !self.use_descent_extraction() {
             return Err((rep, undec));
         }
         if any_undecided {
@@ -3129,7 +3151,9 @@ impl PkmSemaevOracle {
         let curve = ctx.group;
         let pts = self.shared_pts.clone();
         let mut any = false;
-        if let (true, Some((br_idx, ring, basis, fixed_s0))) = (self.descent, basis_info) {
+        if let (true, Some((br_idx, ring, basis, fixed_s0))) =
+            (self.use_descent_extraction(), basis_info)
+        {
             let lift_xs: Vec<u64> = pts.iter().map(|t| t.x).collect();
             let (_, per_lift, mults) = self.extract_solutions_from_basis(
                 curve,
@@ -3787,7 +3811,10 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                             continue;
                         }
                         any_undecided |= undecided;
-                        if !self.descent || !self.shared_pts.is_empty() {
+                        if !self.use_descent_extraction() || !self.shared_pts.is_empty() {
+                            if self.descent && self.prefer_grid_extraction() {
+                                self.bump("pkm_descent_deferred_to_grid", 1);
+                            }
                             last = Some((rep, ring, fixed_s0, branch, undecided));
                             break;
                         }

@@ -187,3 +187,16 @@ cargo +1.99.1 run --offline --release \
   --manifest-path research/prime_pkm_aux_chase_20261119/Cargo.toml -- \
   --suites all research/prime_pkm_aux_chase_20261119/RESULTS.json
 ```
+
+## Descent-root cache recheck (2026-11-19 22:10 PT)
+
+`prepare()` now caches Tonelli–Shanks roots of each distinct `SquareRule (a,b,c,d)` and descent DFS reuses them (`RESULTS_P0_DESCENT.json`).
+
+| Row | before → after `grid` mults (old) | after cache | Still > before? |
+| --- | --- | --- | --- |
+| M13/M17 m=3 chain | 7344 → 29954 | → **29512** | yes (~442 saved) |
+| M31 m=3 chain | 9792 → 28775 | → **28197** | yes (~578 saved) |
+| alg-k20 | 136320 → 22677 | unchanged 6.01× win | no |
+
+**Verdict:** the tiny-`t` crossover is **not** fixed by root caching alone. Remaining excess is specialize/DFS structural cost vs `|V|^m` grid at `|V|=8`. Prefer **adaptive policy**: use `grid()` when `|V|^m` is below a small threshold (e.g. ≤ 512), else descent. [pcc:unverified]
+
