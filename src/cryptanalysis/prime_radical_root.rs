@@ -1438,6 +1438,44 @@ mod tests {
     use super::*;
 
     #[test]
+    fn round68_window_power_matches_independent_binary_reference() {
+        fn binary<R: Ring>(r: &R, a: R::E, mut e: u128) -> R::E {
+            let mut acc = r.one();
+            let mut base = a;
+            while e != 0 {
+                if e & 1 != 0 { acc = r.mul(acc, base); }
+                e >>= 1;
+                if e != 0 { base = r.sqr(base); }
+            }
+            acc
+        }
+        for p in [7u64, 11, 31, 101, 1_000_000_007, (1u64 << 61) - 1] {
+            let f = Fp::new(p);
+            let q = Fq2 { f, n: f.first_quadratic_nonresidue() };
+            let mut state = p ^ 0x68e1_5ee1_0fda_1714u64;
+            for iteration in 0..64 {
+                state = state.wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                let a = (state % p, state.rotate_left(17) % p);
+                let e = match iteration % 8 {
+                    0 => 0,
+                    1 => 1,
+                    2 => 2,
+                    3 => 3,
+                    4 => (1u128 << 56) + (1u128 << 20) + 1,
+                    5 => ((state as u128) << 64) | state.rotate_left(31) as u128,
+                    6 => (1u128 << 127) | (1u128 << 64) | 17,
+                    _ => (1u128 << 20) - 1,
+                };
+                assert_eq!(rpow(&q, a, e), binary(&q, a, e),
+                    "p={p} a={a:?} e={e}");
+                assert_eq!(rpow(&f, a.0, e), binary(&f, a.0, e),
+                    "Fp p={p} a={} e={e}", a.0);
+            }
+        }
+    }
+
+    #[test]
     fn round67_discriminant_prefilter_matches_sqrt_and_quadratic_roots() {
         for p in [7u64, 11, 31, 101, 1_000_000_007, (1u64 << 61) - 1] {
             let ctx = RadicalRootCtx::new(p).unwrap();
