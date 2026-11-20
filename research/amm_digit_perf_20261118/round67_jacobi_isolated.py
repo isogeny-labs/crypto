@@ -19,7 +19,7 @@ pub mod prime_root_trace {
  pub const MAX_PRIME:u64=(1u64<<61)-1;
  pub const MAX_WORK:u64=1_000_000;
  pub struct RootLimits {pub field_work:u64,pub split_attempts:u64,pub events:u64,pub degree:usize}
- #[derive(PartialEq, Eq)] pub enum RootStop {Complete}
+ #[derive(Debug, PartialEq, Eq)] pub enum RootStop {Complete}
  pub struct RootReport {pub stop:RootStop,pub roots:Vec<u64>}
  pub struct RootEvent;
  pub fn solve(_: &[u64],_:u64,_:u64,_:RootLimits,_:&mut dyn FnMut(&RootEvent)->Result<(),String>)
