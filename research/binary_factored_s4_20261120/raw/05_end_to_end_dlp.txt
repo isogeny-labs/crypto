@@ -1,0 +1,79 @@
+config: repeats=3 rho_repeats=8 seed=0x1cb00bda7a
+n=15 icv1-f2m15-t131-ed7256f0: preflight 266 targets (88 decompose) — identical decisions
+  r=2^14.0  rho: mean S=2.01  mean wall 0.09 ms (48 walks)  | ns/pair: s4 225.4  s4f 190.5  | ledger 0.2 s
+  variant                            run   ok    trials      rels     rel ms      LA ms    total ms         S   S_wall     ×rho
+  mitm_m2_negfold                      3    3       631         8        4.0        0.0         4.1    196.26   230.75   104.78
+  mitm_m2_negfold_walk                 3    3       543        10        0.2        0.0         0.3     26.31    16.47    13.66
+  mitm_m2_negfold_walk_balanced        3    3      2530         7        0.6        0.0         0.6     30.47    33.39    16.08
+  mitm_m3                              3    3       106        15        0.9        0.0         0.9     68.98    53.84    35.83
+  mitm_m3_negfold                      3    3       106        15        0.8        0.0         0.9     67.22    50.23    34.92
+  mitm_m3_negfold_walk                 3    3       149        15        0.6        0.0         0.6     53.11    36.46    27.24
+  semaev_s4_factored_m3                3    3       117        16        7.2        0.0         7.3    649.70   413.58   339.43
+  semaev_s4_pairs_and_solve_m3         3    3       117        16       14.0        0.0        14.0   1363.98   797.94   712.65
+n=17 icv1-f2m17-tm33-872cf0bb: preflight 262 targets (113 decompose) — identical decisions
+  r=2^14.4  rho: mean S=1.80  mean wall 0.10 ms (48 walks)  | ns/pair: s4 253.7  s4f 121.3  | ledger 0.3 s
+  variant                            run   ok    trials      rels     rel ms      LA ms    total ms         S   S_wall     ×rho
+  mitm_m2_negfold                      3    3       774        16        3.7        0.0         3.9    234.97   206.38   130.59
+  mitm_m2_negfold_walk                 3    3       528        14        0.2        0.0         0.5     45.44    24.94    25.27
+  mitm_m2_negfold_walk_balanced        3    3      1591        11        0.4        0.0         0.5     23.73    26.67    13.31
+  mitm_m3                              3    3        87        37        1.0        0.1         1.4    101.33    74.66    56.70
+  mitm_m3_negfold                      3    3        87        37        1.0        0.0         1.3     91.04    67.54    50.97
+  mitm_m3_negfold_walk                 3    3        75        35        0.5        0.1         0.8     66.85    43.76    37.23
+  semaev_s4_factored_m3                3    3        89        37       21.5        0.1        21.6    926.14  1134.30   518.79
+  semaev_s4_pairs_and_solve_m3         3    3        89        37       34.9        0.1        35.1   1880.83  1841.59  1053.69
+n=19 icv1-f2m19-t197-03fcf16a: preflight 222 targets (115 decompose) — identical decisions
+  r=2^17.0  rho: mean S=1.58  mean wall 0.19 ms (48 walks)  | ns/pair: s4 281.7  s4f 132.5  | ledger 1.8 s
+  variant                            run   ok    trials      rels     rel ms      LA ms    total ms         S   S_wall     ×rho
+  mitm_m2_negfold                      3    3      3056        27       19.8        0.1        20.2    413.20   395.35   259.26
+  mitm_m2_negfold_walk                 3    3      2226        23        0.6        0.0         1.1     34.92    20.61    22.11
+  mitm_m2_negfold_walk_balanced        3    3      6608        13        1.4        0.0         1.5     26.55    28.75    16.64
+  mitm_m3                              3    3       183        48        3.2        0.1         3.9     96.98    76.87    61.37
+  mitm_m3_negfold                      3    3       183        48        3.0        0.1         3.5     90.08    67.70    57.00
+  mitm_m3_negfold_walk                 3    3       161        45        1.7        0.1         2.1     63.83    41.65    40.31
+  semaev_s4_factored_m3                3    3       181        48      123.9        0.1       124.1   3284.15  2423.35  2079.20
+  semaev_s4_pairs_and_solve_m3         3    3       181        48      387.4        0.2       387.6   6932.94  7568.78  4389.26
+n=21 icv1-f2m21-t2591-de54d72e: preflight 213 targets (45 decompose) — identical decisions
+  r=2^20.0  rho: mean S=1.36  mean wall 0.37 ms (48 walks)  | ns/pair: s4 262.1  s4f 112.7  | ledger 4.4 s
+  variant                            run   ok    trials      rels     rel ms      LA ms    total ms         S   S_wall     ×rho
+  mitm_m2_negfold                      3    3     10149        36       83.1        0.1        83.8    557.22   539.57   415.79
+  mitm_m2_negfold_walk                 3    3     11589        35        2.8        0.0         3.5     24.95    22.61    18.55
+  mitm_m2_negfold_walk_balanced        3    3     21732        23        4.8        0.0         5.0     24.39    32.34    18.31
+  mitm_m3                              3    3       407        58        9.1        0.1        10.1     80.98    65.22    59.97
+  mitm_m3_negfold                      3    3       407        58        9.6        0.1        10.4     77.35    66.93    57.27
+  mitm_m3_negfold_walk                 3    3       476        58        7.7        0.1         8.5     64.84    54.48    48.04
+  semaev_s4_factored_m3                3    3       408        58      402.7        0.2       402.9   2270.61  2594.19  1680.68
+  semaev_s4_pairs_and_solve_m3         3    3       408        58      899.5        0.3       899.8   8520.75  5793.35  6306.94
+n=23 icv1-f2m23-tm1433-efaca034: preflight 203 targets (63 decompose) — identical decisions
+  r=2^22.0  rho: mean S=1.16  mean wall 0.69 ms (48 walks)  | ns/pair: s4 294.1  s4f 118.4  | ledger 16.0 s
+  variant                            run   ok    trials      rels     rel ms      LA ms    total ms         S   S_wall     ×rho
+  mitm_m2_negfold                      3    3     13578        66      138.4        0.3       141.6    421.29   418.63   362.98
+  mitm_m2_negfold_walk                 3    3     12249        53        3.4        0.1         6.6     23.41    19.40    20.02
+  mitm_m2_negfold_walk_balanced        3    3     33632        35        8.4        0.1         9.1     21.06    26.86    17.92
+  mitm_m3                              3    3       428       124       17.4        0.4        22.9     82.87    67.82    71.84
+  mitm_m3_negfold                      3    3       428       124       19.0        0.5        22.5     74.23    66.48    64.35
+  mitm_m3_negfold_walk                 3    3       380       124       12.2        0.4        15.6     55.61    46.05    48.21
+  semaev_s4_factored_m3                3    3       428       124     1615.0        0.9      1616.0   4023.58  4776.47  3486.79
+  semaev_s4_pairs_and_solve_m3         3    3       428       124     3452.7        1.0      3453.8   9959.43 10208.54  8630.72
+n=25 icv1-f2m25-t951-3c653586: preflight 203 targets (104 decompose) — identical decisions
+  r=2^22.4  rho: mean S=1.00  mean wall 0.78 ms (48 walks)  | ns/pair: s4 311.3  s4f 122.3  | ledger 70.9 s
+  variant                            run   ok    trials      rels     rel ms      LA ms    total ms         S   S_wall     ×rho
+  mitm_m2_negfold                      3    3     31886       105      332.4        0.5       342.8    877.11   861.37   901.77
+  mitm_m2_negfold_walk                 3    3     25716       105        6.4        0.2        16.7     52.72    41.85    54.20
+  mitm_m2_negfold_walk_balanced        3    3     62662        54       16.4        0.1        18.6     35.46    46.68    36.77
+  mitm_m3                              3    3       510       222       35.4        1.6        54.5    152.67   136.97   156.56
+  mitm_m3_negfold                      3    3       510       222       32.4        1.2        43.6    127.08   109.54   130.38
+  mitm_m3_negfold_walk                 3    3       476       222       24.7        1.2        35.9    106.86    90.23   108.85
+  semaev_s4_factored_m3                3    3       512       223     6378.8        3.1      6382.2  14864.13 16035.54 15248.17
+  semaev_s4_pairs_and_solve_m3         3    3       512       223    16691.5        3.6     16695.4  37770.75 41948.00 38746.70
+n=27 icv1-f2m27-t12543-569dca8b: preflight 200 targets (30 decompose) — identical decisions
+  r=2^24.4  rho: mean S=0.97  mean wall 1.47 ms (48 walks)  | ns/pair: s4 309.8  s4f 130.1  | ledger 261.6 s
+  variant                            run   ok    trials      rels     rel ms      LA ms    total ms         S   S_wall     ×rho
+  mitm_m2_negfold                      3    3    112779       122     1372.0        0.7      1384.9   1644.65  1629.46  1696.29
+  mitm_m2_negfold_walk                 3    3     86133        90       21.7        0.3        34.1     41.70    40.18    43.77
+  mitm_m2_negfold_walk_balanced        3    3    153868        40       41.6        0.1        44.6     36.93    52.48    37.24
+  mitm_m3                              3    3      1498       245      127.5        1.3       150.4    206.05   176.99   215.29
+  mitm_m3_negfold                      3    3      1498       245      123.5        1.2       136.9    191.43   161.10   199.99
+  mitm_m3_negfold_walk                 3    3      1482       241      107.5        1.3       121.0    169.34   142.32   177.62
+  semaev_s4_factored_m3                3    3      1499       245    24454.7        3.7     24458.6  27066.59 28777.44 28272.61
+  semaev_s4_pairs_and_solve_m3         3    3      1499       245    60800.2        4.2     60804.6 115459.20 71541.29 120603.73
+records: /tmp/claude-0/-home-user/6a1edbe0-97aa-5e3a-b30a-8ea31d5deeeb/scratchpad/binary_factored_ic_e2e.jsonl

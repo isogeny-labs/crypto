@@ -117,3 +117,47 @@ inverts its leading coefficient.
   needs odd `n`), and the general-`b` curve (`quartic_in_x3_general`).
   `S₃` holds for any `b` (`x₁²x₂² + x₁²X² + x₂²X² + x₁x₂X + b`), so the
   method should carry over with `b` replacing the constant 1.
+
+## 5. End to end: whole discrete logarithms (`raw/05`)
+
+`examples/binary_factored_ic_e2e.rs` runs the boundary ledger's char-2
+instance (`ic_boundary::run_char2_instance`). Each instance is a random curve
+`y² + xy = x³ + ax² + b` over `F_{2ⁿ}` with cofactor ≤ 8, and the base is the
+low-order subspace of dimension `⌈n/3⌉`. The same relation loop, lift,
+linear algebra and verification run for every variant, on shared targets
+in each repeat, with 8 matched rho walks per repeat. `semaev_s4_factored_m3`
+(`FactoredSubspaceOracle`, any `b`) sits beside the existing
+`semaev_s4_pairs_and_solve_m3`. Before each instance, the two oracles
+were checked on about 200–270 random and planted targets: identical
+decisions, every witness verified.
+
+3 repeats per `n`. In all 21 repeat pairs the two S4 arms used the same
+trials and relations and recovered the same verified logarithm.
+
+| `n` | log₂ r | pairs-and-solve | factored | speedup (wall) | per-repeat range | factored ÷ rho (wall) | best MITM ÷ rho |
+|---|---|---|---|---|---|---|---|
+| 15 | 14.0 | 14.0 ms | 7.3 ms | 1.9× | 1.76–2.06× | ~81× | ~4× |
+| 17 | 14.4 | 35.1 ms | 21.6 ms | 1.6× | 1.42–1.78× | ~216× | ~5× |
+| 19 | 17.0 | 0.39 s | 0.12 s | 3.1× | 3.02–3.27× | ~650× | ~6× |
+| 21 | 20.0 | 0.90 s | 0.40 s | 2.2× | 1.92–2.51× | ~1,090× | ~9× |
+| 23 | 22.0 | 3.45 s | 1.62 s | 2.1× | 1.88–2.38× | ~2,340× | ~9× |
+| 25 | 22.4 | 16.7 s | 6.38 s | 2.6× | 2.47–2.77× | ~8,180× | ~21× |
+| 27 | 24.4 | 60.8 s | 24.5 s | 2.5× | 2.45–2.53× | ~16,600× | ~23× |
+
+Linear algebra is under 5 ms everywhere, so the gain is entirely in
+relation collection. The measured cost per pair is 110–190 ns factored
+against 225–310 ns for the existing loop. That is smaller than the per-pair
+gains of §3–4, because here `l = ⌈n/3⌉ ≤ 9` (the gcd's cost grows with `l`)
+and many targets decompose and exit early.
+
+**Pricing caveat.** The GAE `S` of the baseline arm can use the pinned
+`ns_per_s4_pair` for an instance while the factored arm's rate is
+host-measured. At `n = 27` the baseline `S` is 115,459 against an `s_wall`
+of 71,541. The table therefore compares wall time on one host and run.
+
+**Answer to "is it faster end to end?"** Yes, by about 1.6–3.1× (2.5× at
+`n = 27`) for IC built on the `S₄` pairs-and-solve oracle. It does not
+change the ranking. Both S4 arms are 10³–10⁴ times rho and the gap grows
+with `n` (the oracle is Θ(2ⁿ)). The meet-in-the-middle pair-table rows
+(O(B) per target) stay 4–23× rho and are better than either S4 arm by two
+to three orders of magnitude.
