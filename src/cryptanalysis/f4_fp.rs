@@ -10678,7 +10678,8 @@ mod sibling_batch_tests {
                     rng.gen_range(1..p),
                     rng.gen_range(0..p),
                 );
-                let d = random_domain(&mut rng, p, rng.gen_range(8..=24), &[]);
+                let size = rng.gen_range(8..=24);
+                let d = random_domain(&mut rng, p, size, &[]);
                 (
                     vec![
                         s3([Some(0), Some(1), Some(3)], 4, x, a, b, p),
@@ -10693,12 +10694,10 @@ mod sibling_batch_tests {
                 let domains = (0..n)
                     .map(|i| {
                         let must: Vec<u64> = points.iter().map(|pt| pt[i]).collect();
-                        Some(random_domain(
-                            &mut rng,
-                            p,
-                            rng.gen_range(must.len()..=40),
-                            &must,
-                        ))
+                        {
+                            let size = rng.gen_range(must.len()..=40);
+                            Some(random_domain(&mut rng, p, size, &must))
+                        }
                     })
                     .collect();
                 (system, n, domains)
