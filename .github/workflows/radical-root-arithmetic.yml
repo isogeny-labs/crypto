@@ -1084,3 +1084,31 @@ jobs:
           name: round61-sparse-scalar-native-rust
           path: ${{ runner.temp }}/round61-native-rust.txt
           if-no-files-found: ignore
+
+  bounded-unit-products-round62:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round62_unit_products_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Source-exact Rust before/after, oracle comparisons, and full root certificates
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round62_unit_products_isolated.py
+          } | tee "$RUNNER_TEMP/round62-native-rust.txt"
+          cat "$RUNNER_TEMP/round62-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round62-unit-products-native-rust
+          path: ${{ runner.temp }}/round62-native-rust.txt
+          if-no-files-found: ignore
