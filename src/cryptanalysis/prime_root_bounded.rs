@@ -381,6 +381,30 @@ impl Producer<'_> {
             return Ok((quotient, remainder));
         }
         quotient.len = a.len - b.len + 1;
+        // R52_DIVISION_BEGIN
+        // Synthetic division by monic (x+c). This avoids repeatedly
+        // modifying and trimming a 17-word temporary remainder.
+        // Division by x is a shift, requiring no field arithmetic.
+        if b.len == 2 && b.coefficients[1] == 1 {
+            let n = a.len as usize;
+            let c = b.coefficients[0];
+            if c == 0 {
+                quotient.coefficients[..n - 1].copy_from_slice(&a.coefficients[1..n]);
+                remainder = Poly17::constant(a.coefficients[0]);
+            } else {
+                let mut carry = a.coefficients[n - 1];
+                for k in (1..n).rev() {
+                    self.gate.charge(COPY_WORK)?;
+                    quotient.coefficients[k - 1] = carry;
+                    let term = self.mul(carry, c)?;
+                    carry = self.sub(a.coefficients[k - 1], term)?;
+                }
+                remainder = Poly17::constant(carry);
+            }
+            quotient.trim();
+            return Ok((quotient, remainder));
+        }
+        // R52_DIVISION_END
         // Most GCD and splitting factors are monic. In that case no
         // reciprocal, leading multiplication, or leading subtraction is needed.
         // For a general divisor, the leading term also cancels exactly.
@@ -430,6 +454,29 @@ impl Producer<'_> {
         if modulus.len == 0 || modulus.coefficients[modulus.len as usize - 1] != 1 {
             return Err(Stop::InvalidInput);
         }
+        // R52_REDUCE_BEGIN
+        // Remainder modulo x is just the constant coefficient. More
+        // generally, Horner evaluates the residue modulo monic (x+c).
+        // Keep the old sparse polynomial cancellation for sparse powers.
+        if modulus.len == 2 && value.len >= 2 {
+            let c = modulus.coefficients[0];
+            if c == 0 {
+                *value = Poly17::constant(value.coefficients[0]);
+                return Ok(());
+            }
+            let n = value.len as usize;
+            if !value.coefficients[..n].contains(&0) {
+                let mut carry = value.coefficients[n - 1];
+                for k in (0..n - 1).rev() {
+                    self.gate.charge(COPY_WORK)?;
+                    let term = self.mul(carry, c)?;
+                    carry = self.sub(value.coefficients[k], term)?;
+                }
+                *value = Poly17::constant(carry);
+                return Ok(());
+            }
+        }
+        // R52_REDUCE_END
         // x^d+constant and x^d+... with a zero low coefficient appear
         // in sparse factor bases; avoid paying the sparse branch on dense f.
         let sparse_modulus = modulus.coefficients[0] == 0
@@ -1322,6 +1369,27 @@ impl Replay {
             return Ok(Poly17::ZERO);
         }
         let d = usize::from(denominator.len);
+        // R52_REMAINDER_BEGIN
+        // Independent verifier: evaluate f(-c) by a descending Horner
+        // recurrence; x is a direct constant-coefficient projection.
+        // Sparse inputs keep zero-eliding long division.
+        if d == 2 && denominator.coefficients[1] == 1 {
+            let c = denominator.coefficients[0];
+            if c == 0 {
+                return Ok(Poly17::constant(numerator.coefficients[0]));
+            }
+            let n = numerator.len as usize;
+            if !numerator.coefficients[..n].contains(&0) {
+                let mut carry = numerator.coefficients[n - 1];
+                for k in (0..n - 1).rev() {
+                    self.gate.charge(COPY_WORK)?;
+                    let term = self.times(carry, c)?;
+                    carry = self.minus(numerator.coefficients[k], term)?;
+                }
+                return Ok(Poly17::constant(carry));
+            }
+        }
+        // R52_REMAINDER_END
         let leading = denominator.coefficients[d - 1];
         let monic = leading == 1;
         let inverse = if monic { 1 } else { self.reciprocal(leading)? };
@@ -1375,6 +1443,28 @@ impl Replay {
         if divisor_len == 0 || denominator.coefficients[divisor_len - 1] != 1 {
             return Err(Stop::InvalidCertificate);
         }
+        // R52_CANCEL_BEGIN
+        // Eliminate high-degree terms of a dense polynomial modulo x+c
+        // with an independent Horner recurrence; modulo x is a shift.
+        if divisor_len == 2 && numerator.len >= 2 {
+            let c = denominator.coefficients[0];
+            if c == 0 {
+                *numerator = Poly17::constant(numerator.coefficients[0]);
+                return Ok(());
+            }
+            let n = numerator.len as usize;
+            if !numerator.coefficients[..n].contains(&0) {
+                let mut result = numerator.coefficients[n - 1];
+                for k in (0..n - 1).rev() {
+                    self.gate.charge(COPY_WORK)?;
+                    let v = self.times(result, c)?;
+                    result = self.minus(numerator.coefficients[k], v)?;
+                }
+                *numerator = Poly17::constant(result);
+                return Ok(());
+            }
+        }
+        // R52_CANCEL_END
         // Independent descending-index traversal rather than producer trim loop.
         let sparse = denominator.coefficients[0] == 0
             || (divisor_len > 2 && denominator.coefficients[1] == 0);
