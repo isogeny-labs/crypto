@@ -810,6 +810,10 @@ fn generic_rule(method: &str, counter: &str) -> Option<Rule> {
         // compare each (`work_native` of the search phase, 2026-11-07;
         // research/rho_cycle_window_bitops_20261107).
         "cycle_window_word_ops" | "brent_word_ops" => Prims(&[(WordOp, 1)]),
+        // The tuned walk's jump-index selection: a shift and a mask or a
+        // remainder per selection, tallied as two word operations each
+        // (research/koblitz_rho_reference_20261115, section 1).
+        "jump_select_word_ops" => Prims(&[(WordOp, 1)]),
         "canonicalisations_uncharged" if strong => {
             // canon(x), three more basis conversions, the Montgomery scalar
             // update.
