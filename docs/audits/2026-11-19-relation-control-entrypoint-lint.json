@@ -1,0 +1,17 @@
+{
+  "schema": "engineering.lint-correction/v1",
+  "claim_status": "pcc:unverified",
+  "baseline_commit": "020e464006b31b9c28091a47bceec32190347d53",
+  "failure_run": 44611498815,
+  "failure_job": 135869205039,
+  "all_targets_compile_run": 44611503841,
+  "all_targets_compile_result": "success at e6033bef",
+  "path": "examples/jv_sieve_quadratic_pair_relation_controls.rs",
+  "change": "Allow dead_code only on the deliberately empty example entry point, which is also compiled as a nested module by sibling test controls",
+  "baseline_sha256": "db12c98a3155684dd4381fbd00deb3fc40ad86e0e7c16a81edf5f77faface39a",
+  "candidate_sha256": "6157ef05a9a381e41eeacb524cd8a002d9f38a3a70e245e68f48f32b2f3cacda",
+  "original_six_test_bodies_unchanged": true,
+  "gates_and_lint_flags_unchanged": true,
+  "performance_measurement": "none",
+  "candidate_ci": "pending"
+}

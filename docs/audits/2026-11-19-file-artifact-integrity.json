@@ -1,0 +1,51 @@
+{
+  "schema": "engineering.correctness-repair/v1",
+  "claim_status": "pcc:unverified",
+  "baseline_commit": "d446df8896929b6bee21723cdc18cc4f48475535",
+  "baseline_reader_sha256": "6d4f273c678408a97c5fda777878fb95061852b60f7d83e84592afa9890b1e36",
+  "source_review": [
+    "docs/artifacts.md: content-addressed SHA-256 storage and migration replay",
+    "tools/artifacts/artifacts.py: Remote.head, Remote.put, cmd_push, cmd_migrate",
+    "tools/artifacts/test_artifacts.py: existing corruption and write-once controls"
+  ],
+  "defects": [
+    "Existing same-size corrupt file remote accepted as stored before offloading",
+    "Changed source bytes could be published under their earlier digest",
+    "Concurrent same-process writers share a PID-only temporary filename"
+  ],
+  "change": "Hash existing file objects; use unique temporary files, validate copied size/digest and publish by atomic same-filesystem link only if absent; validate a concurrent winner and always clean temporary files",
+  "baseline_new_controls": {
+    "tests": 3,
+    "failures": 2,
+    "errors": 1,
+    "log_sha256": "e64f95c0b690e94a1da83521c00cea9c04da7b9edacf7368f7d1c8528fb4e29b"
+  },
+  "candidate_new_controls": {
+    "tests": 3,
+    "result": "pass",
+    "log_sha256": "b16af7714907ea3f5e700b417958a393a7ad81827e084f78b7bb791f8795af8e"
+  },
+  "first_full_attempt": {
+    "tests": 60,
+    "failures": 2,
+    "log_sha256": "b8125213e6a993b20f0f4a40813c43db92a11abbcbc1401a7763581d13b91720",
+    "causes": [
+      "Sparse validation fixture omitted exact committed artifact policy",
+      "Inherited no-lazy-fetch setting conflicts with original disposable file-origin blobless test"
+    ]
+  },
+  "candidate_full_suite": {
+    "tests": 60,
+    "result": "pass",
+    "seconds": 41.5,
+    "log_sha256": "fbfc391a8bb1d00a6105cbc9cf442081b0405c100ab84168452f703a1ef4f80d",
+    "harness_sha256": "73a9fe7d3bf8bc3746c624bd0faf493b5d5bc3c937455908155ad2383156de08",
+    "fixture_corrections": "Restore exact committed root policy; original blobless test alone permits lazy fetch with GIT_ALLOW_PROTOCOL=file. Original test and assertions retained."
+  },
+  "existing_migration_control": "Strengthened to assert corruption is rejected before any staged deletions; source and corrupt remote bytes both preserved",
+  "s3_implementation_changed": false,
+  "s3_contacted": false,
+  "frozen_originals_changed": false,
+  "performance_measurement": "none; integrity correction",
+  "hosted_ci": "pending; existing artifacts workflow runs the unfiltered original suite"
+}

@@ -1,0 +1,35 @@
+{
+  "schema": "engineering.pcc-identity-validation/v1",
+  "at": "2026-11-20T18:31:39.983314+00:00",
+  "baseline_commit": "c76a9d9f7ef3dbb9d42c89aa8e04f72dfcec056a",
+  "baseline_source_sha256": "79f69ea92d5ce4225b295f44e5b8e7734259af2a3cc95effa4f9f929cfb54c69",
+  "candidate_hashes": {
+    "tools/pcc/pcc.py": "19e51f7cb986b55542f192a2bcbe95dc140eac7f7f952eb6f20f9dff7ce911dd",
+    "tools/pcc/test_pcc.py": "449fc0b07dea3182293a81caf73c865e967c0fef1cdd35816cc58e32eba5aa6c"
+  },
+  "problem": "Producer commit coercion accepted JSON integers; end-anchored regex accepted trailing newline identities",
+  "behavior": "Require a string producer commit containing exactly 40 lowercase hexadecimal characters and a fully matched canonical claim ID",
+  "baseline_controls": {
+    "tests": 4,
+    "failures": 6,
+    "log_sha256": "98b7d8941ad5b9c73b55bbf042a95076235e09dab2e368c4fd62d948adff82bd"
+  },
+  "candidate_controls": {
+    "tests": 44,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 17.468,
+    "log_sha256": "c37fb4f2a17d9b12190feb927a5acff0d64a2c94f9019ba6570896b71c2a1888"
+  },
+  "retained_corpus_schema_validation": {
+    "claims": 3585,
+    "valid": 3434,
+    "rejected": 151,
+    "changed_results": 0,
+    "proof_replay": false,
+    "signed_standing": false
+  },
+  "frozen_records_changed": false,
+  "s3_accessed": false,
+  "performance_claim": null
+}

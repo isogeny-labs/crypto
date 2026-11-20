@@ -445,12 +445,12 @@ fn main() {
     let reps: usize = args.get(2).map(|s| s.parse().unwrap()).unwrap_or(15);
     let kq = 1234567u64;
     let g = Some((GX, GY));
-    const _: () = {
+    const {
         assert!(
             (GY * GY) % P == (GX * GX % P * GX + A * GX + B) % P,
             "G on curve"
         );
-    };
+    }
     let mut ec = Ec { ops: 0 };
     assert!(ec.mul(R, g).is_none(), "r*G = O");
     let (t, f) = build_table();

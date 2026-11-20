@@ -1115,9 +1115,39 @@ const FL_MIN_COLS: usize = 256;
 /// splitting and compressing the rows.
 const FL_MIN_ROWS: usize = 32;
 
+thread_local! {
+    // The admitted replay profiles predate the FL schedule (b72ff385,
+    // 2026-11-17). Their frozen logical XOR counts use the full-width
+    // elimination; a replay must not change the current kernel on other
+    // threads or cache a historical selection in the environment policy.
+    static LEGACY_FULL_WIDTH: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+pub(crate) struct LegacyFullWidth {
+    previous: bool,
+    // Dropping the guard must restore the thread that created it.
+    _thread_affinity: std::marker::PhantomData<std::rc::Rc<()>>,
+}
+
+pub(crate) fn legacy_full_width() -> LegacyFullWidth {
+    LegacyFullWidth {
+        previous: LEGACY_FULL_WIDTH.with(|selected| selected.replace(true)),
+        _thread_affinity: std::marker::PhantomData,
+    }
+}
+
+impl Drop for LegacyFullWidth {
+    fn drop(&mut self) {
+        LEGACY_FULL_WIDTH.with(|selected| selected.set(self.previous));
+    }
+}
+
 /// `F4_F2_FL=0` retains the full-width reducer cascade as a same-binary
 /// control.
 fn fl_enabled() -> bool {
+    if LEGACY_FULL_WIDTH.with(|selected| selected.get()) {
+        return false;
+    }
     static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *ENABLED.get_or_init(|| std::env::var("F4_F2_FL").as_deref() != Ok("0"))
 }
@@ -3598,6 +3628,39 @@ mod tests {
         ] {
             assert_eq!(matrix_profile_bin(rows), expected);
         }
+    }
+
+    #[test]
+    fn historical_profiles_keep_the_full_width_schedule_thread_local() {
+        let current = fl_enabled();
+        for profile in crate::cryptanalysis::ecbench::legacy::PROFILES {
+            let historical = profile.enter();
+            assert!(!fl_enabled(), "{} enabled the newer schedule", profile.name);
+            assert_eq!(std::thread::spawn(fl_enabled).join().unwrap(), current);
+            drop(historical);
+            assert_eq!(fl_enabled(), current);
+        }
+    }
+
+    #[test]
+    fn historical_full_width_selection_survives_nested_guards_and_unwinding() {
+        use crate::cryptanalysis::ecbench::legacy::{PRE_1646, PRE_2043};
+        assert!(!LEGACY_FULL_WIDTH.with(|selected| selected.get()));
+        {
+            let _outer = PRE_1646.enter();
+            {
+                let _inner = PRE_2043.enter();
+                assert!(!fl_enabled());
+            }
+            assert!(LEGACY_FULL_WIDTH.with(|selected| selected.get()));
+            let failed = std::panic::catch_unwind(|| {
+                let _inner = PRE_2043.enter();
+                panic!("historical replay interrupted");
+            });
+            assert!(failed.is_err());
+            assert!(LEGACY_FULL_WIDTH.with(|selected| selected.get()));
+        }
+        assert!(!LEGACY_FULL_WIDTH.with(|selected| selected.get()));
     }
 
     #[test]

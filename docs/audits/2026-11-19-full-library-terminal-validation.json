@@ -1,0 +1,82 @@
+{
+  "schema": "engineering.full-library-terminal-validation/v1",
+  "at": "2026-11-20T00:43:15.602558+00:00",
+  "source_head": "00128bd71f72449ad071a56c162c9005cbef7681",
+  "run": 44633841449,
+  "job": 135947202005,
+  "job_conclusion": "success",
+  "whole_workflow_conclusion": "failure",
+  "whole_workflow_failure": "Independent scope job omitted indexed gzip support; subsequently corrected atf6b4a5a and all-targets check passed there.",
+  "artifact": {
+    "id": 14585884216,
+    "name": "native-library-44633841449-1",
+    "bytes": 518603,
+    "sha256": "79b9cf376dee32eb7d7a635392cb343ecf13b18fbf1096b328c18be171f420a2"
+  },
+  "library_log_sha256": "8871f276e200c61698132b40855e58a259abaae3a5632205c3d8ed55651e4954",
+  "test_binary_sha256": "58ed5dc447c2e94d7e53d7a3764fc2a3af1cec81e6e1a90fe132682b3da59339",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "host": {
+    "kernel": "Linux 7.0.0-1017-azure",
+    "runner": "GitHub Actions 1000430036",
+    "logical_cpus": 4,
+    "required_time_interfaces_readable": true
+  },
+  "parent": {
+    "source_revision": "00128bd71f72449ad071a56c162c9005cbef7681",
+    "cargo_parent_exit_code": 0,
+    "log_writer_exit_code": 0,
+    "command": [
+      "cargo",
+      "+1.99.1",
+      "test",
+      "--release",
+      "--lib",
+      "--locked",
+      "--",
+      "--nocapture"
+    ],
+    "filters": [],
+    "ignored_test_policy": "unchanged_default",
+    "scientific_measurement": false
+  },
+  "request": {
+    "source_revision": "00128bd71f72449ad071a56c162c9005cbef7681",
+    "workflow_revision": "00128bd71f72449ad071a56c162c9005cbef7681",
+    "run_id": "44633841449",
+    "run_attempt": "1",
+    "kind": "native-development-validation",
+    "job_deadline_minutes": 150,
+    "test_deadline_minutes": 110,
+    "automatic_retries": 0,
+    "scientific_measurement": false
+  },
+  "root_summary": {
+    "total": 7720,
+    "passed": 7576,
+    "failed": 0,
+    "ignored": 144,
+    "measured": 0,
+    "filtered": 0,
+    "seconds": 2079.17
+  },
+  "child_summaries": {
+    "count": 2,
+    "passed_per_child": 1,
+    "filtered_per_child": 7719,
+    "counted_in_root": false
+  },
+  "post_run_tracked_status_empty": true,
+  "scope_limits": [
+    "A complete maintained Rust library validation, not a scientific performance measurement.",
+    "Later Rust change64ba49b only moves one documentation comment; final hosted lint still required.",
+    "PCC corpus, native proof replay, shared-owner integration, unavailable artifact custody and required merge checks remain open."
+  ],
+  "earlier_failures_and_censors_preserved": true,
+  "frozen_artifacts_changed": false,
+  "performance_claim": null,
+  "new_schedule_controls_observed_pass": [
+    "test cryptanalysis::pq_f4_f2::tests::historical_profiles_keep_the_full_width_schedule_thread_local ... ok",
+    "test cryptanalysis::pq_f4_f2::tests::historical_full_width_selection_survives_nested_guards_and_unwinding ... ok"
+  ]
+}

@@ -144,7 +144,7 @@ pub const PROFILES: [Profile; 5] = [
 
 /// A profile in force; the previous state returns when it drops.
 pub struct Guard {
-    _private: (),
+    _f4_full_width: crate::cryptanalysis::pq_f4_f2::LegacyFullWidth,
 }
 
 impl Profile {
@@ -160,7 +160,12 @@ impl Profile {
         if self.no_gate_first {
             set_gate_first(Some(false));
         }
-        Guard { _private: () }
+        // Every admitted profile predates the full-width-to-FL schedule
+        // change. Preserve its counted elimination without changing the
+        // current solver's process-wide environment policy.
+        Guard {
+            _f4_full_width: crate::cryptanalysis::pq_f4_f2::legacy_full_width(),
+        }
     }
 }
 

@@ -4836,6 +4836,12 @@ mod tests {
     /// can reduce that staircase. Neither observation is a formal degree fall.
     #[test]
     fn solve_zero_dim_records_opt_in_hilbert_observations() {
+        // Count this case without contributions from other library tests.
+        if crate::test_process::parent_runs_isolated_case(
+            "cryptanalysis::jv_cover::tests::solve_zero_dim_records_opt_in_hilbert_observations",
+        ) {
+            return;
+        }
         let p = 101u64;
         // x_i^2 - 1 in n variables.
         let quad = |i: usize, n: usize| -> f4_fp::Poly {

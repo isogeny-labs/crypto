@@ -4,5 +4,5 @@ pub use crypto_lib::cryptanalysis;
 pub mod quadratic_pair_graph;
 
 /// The controls are the unit tests of the included module: `cargo test --example <this example>`.
-#[allow(dead_code)]
+#[allow(dead_code)] // Cargo test harnesses exercise the included module instead.
 fn main() {}
