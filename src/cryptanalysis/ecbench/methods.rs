@@ -11007,7 +11007,9 @@ mod accounting_rules_tests {
             // Every step scans the ring and pushes into it.
             assert!(window >= 2 * rep.counters["steps"], "{id}: {window}");
             let brent = search.work_native.get(BRENT_WORD_OPS).copied().unwrap_or(0);
-            assert_eq!(brent > 0, id.ends_with("_v2"), "{id}: brent {brent}");
+            // v2 and v5 (a tuned v3 walk) run Brent's checks; the others do not.
+            let has_brent = id.ends_with("_v2") || id.ends_with("_v5");
+            assert_eq!(brent > 0, has_brent, "{id}: brent {brent}");
             // Every step selects a jump: two word operations each, at least.
             let select = search
                 .work_native
