@@ -372,7 +372,15 @@ impl Producer<'_> {
             for i in 0..a.len as usize {
                 for j in 0..b.len as usize {
                     let value = self.mul(a.coefficients[i], b.coefficients[j])?;
-                    out.coefficients[i + j] = self.add(out.coefficients[i + j], value)?;
+                    // R54_PRODUCER_DENSE_PRODUCT_BEGIN
+                    // The first row and final column introduce each output
+                    // coefficient exactly once. Assign rather than add zero.
+                    if i == 0 || j + 1 == b.len as usize {
+                        out.coefficients[i + j] = value;
+                    } else {
+                        out.coefficients[i + j] = self.add(out.coefficients[i + j], value)?;
+                    }
+                    // R54_PRODUCER_DENSE_PRODUCT_END
                 }
             }
         }
@@ -518,13 +526,28 @@ impl Producer<'_> {
             for i in 0..a.len as usize {
                 let ai = a.coefficients[i];
                 let diag = self.mul(ai, ai)?;
-                out.coefficients[2 * i] = self.add(out.coefficients[2 * i], diag)?;
+                // R54_PRODUCER_SQUARE_DIAG_BEGIN
+                // Only the first and last diagonal are new coefficients.
+                if i == 0 || i + 1 == a.len as usize {
+                    out.coefficients[2 * i] = diag;
+                } else {
+                    out.coefficients[2 * i] = self.add(out.coefficients[2 * i], diag)?;
+                }
+                // R54_PRODUCER_SQUARE_DIAG_END
                 if i + 1 < a.len as usize {
                     let twice_ai = self.add(ai, ai)?;
                     for j in i + 1..a.len as usize {
                         let cross = self.mul(twice_ai, a.coefficients[j])?;
-                        out.coefficients[i + j] =
-                            self.add(out.coefficients[i + j], cross)?;
+                        // R54_PRODUCER_SQUARE_CROSS_BEGIN
+                        // At row zero or the last column, this degree
+                        // has not yet been populated by an earlier pair.
+                        if i == 0 || j + 1 == a.len as usize {
+                            out.coefficients[i + j] = cross;
+                        } else {
+                            out.coefficients[i + j] =
+                                self.add(out.coefficients[i + j], cross)?;
+                        }
+                        // R54_PRODUCER_SQUARE_CROSS_END
                     }
                 }
             }
@@ -1361,7 +1384,15 @@ impl Replay {
                 let yj = y.coefficients[k - i];
                 if sparse && (xi == 0 || yj == 0) { continue; }
                 let v = self.times(xi, yj)?;
-                z.coefficients[k] = self.plus(z.coefficients[k], v)?;
+                // R54_REPLAY_CONVOLUTION_BEGIN
+                // On a dense output diagonal the first term has no
+                // predecessor. Sparse diagonals keep the old accumulation.
+                if !sparse && i == start {
+                    z.coefficients[k] = v;
+                } else {
+                    z.coefficients[k] = self.plus(z.coefficients[k], v)?;
+                }
+                // R54_REPLAY_CONVOLUTION_END
             }
         }
         z.trim();
@@ -1502,7 +1533,14 @@ impl Replay {
                     self.gate.charge(32)?;
                     let left = if i == j { x.coefficients[i] } else { doubled[i] };
                     let product = self.times(left, x.coefficients[j])?;
-                    z.coefficients[k] = self.plus(z.coefficients[k], product)?;
+                    // R54_REPLAY_SQUARE_BEGIN
+                    // The first pair initializes this output degree.
+                    if i == start {
+                        z.coefficients[k] = product;
+                    } else {
+                        z.coefficients[k] = self.plus(z.coefficients[k], product)?;
+                    }
+                    // R54_REPLAY_SQUARE_END
                 }
             }
             z.trim();
