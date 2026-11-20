@@ -42,7 +42,7 @@
 //! The benchmark driver is `examples/prime_ecdlp_fast_bench.rs`.
 
 use std::collections::{HashMap, HashSet};
-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 use std::sync::Mutex;
 use std::time::Instant;
 
@@ -165,6 +165,16 @@ impl Fp64 {
         self.reduce(a as u128)
     }
 
+    /// Montgomery → canonical for an already-reduced operand `a < p`.
+    /// Because `a <= p - 1` and `m <= 2^64 - 1`, `a + m·p <= 2^64·p - 1`,
+    /// so `(a + m·p) >> 64 <= p - 1` without a final conditional subtract.
+    #[inline(always)]
+    fn from_mont_reduced(&self, a: u64) -> u64 {
+        debug_assert!(a < self.p);
+        let m = a.wrapping_mul(self.n_inv);
+        (((a as u128) + (m as u128) * (self.p as u128)) >> 64) as u64
+    }
+
     /// Inverse of a non-zero Montgomery value, in Montgomery form.
     #[inline]
     pub fn inv(&self, a: u64) -> u64 {
@@ -198,12 +208,13 @@ impl Fp64 {
         if k >= 32 && *INTERLEAVE.get_or_init(|| std::env::var_os("NOINTERLEAVE").is_none()) {
             return self.batch_inv_x4(xs, scratch);
         }
-        scratch.clear();
-        scratch.reserve(k);
+        if scratch.len() < k {
+            scratch.resize(k, 0);
+        }
         let mut acc = self.one;
-        for &x in xs.iter() {
-            scratch.push(acc);
-            acc = self.mul(acc, x);
+        for i in 0..k {
+            scratch[i] = acc;
+            acc = self.mul(acc, xs[i]);
         }
         let mut inv_acc = self.inv(acc);
         for i in (0..k).rev() {
@@ -218,8 +229,9 @@ impl Fp64 {
     /// chains keep the multiplier busy. One inversion, same exact results.
     fn batch_inv_x4(&self, xs: &mut [u64], scratch: &mut Vec<u64>) {
         let k = xs.len();
-        scratch.clear();
-        scratch.resize(k, 0);
+        if scratch.len() < k {
+            scratch.resize(k, 0);
+        }
         let base = k / 4;
         let rem = k % 4;
         let mut start = [0usize; 4];
@@ -709,6 +721,12 @@ impl FastCurve {
     /// every walk start and every `r`-adding table entry.
     pub fn combine(&self, g: Pt, q: Pt, u: u64, v: u64) -> Option<Pt> {
         let gq = self.add(Some(g), Some(q));
+        self.jac_to_affine(self.combine_jac_with_gq(g, q, gq, u, v))
+    }
+
+    /// Jacobian `[u]G + [v]Q` given precomputed `gq = G + Q` (zero inversions).
+    #[inline]
+    fn combine_jac_with_gq(&self, g: Pt, q: Pt, gq: Option<Pt>, u: u64, v: u64) -> Jac {
         let mut acc = JAC_INFINITY;
         for i in (0..64 - (u | v).leading_zeros()).rev() {
             acc = self.jac_double(acc);
@@ -724,7 +742,40 @@ impl FastCurve {
                 (false, false) => {}
             }
         }
-        self.jac_to_affine(acc)
+        acc
+    }
+
+    /// Convert a slice of finite Jacobian points (`z != 0`) to affine `Pt`,
+    /// sharing a single `Fp64::batch_inv` across all `Z` coordinates.
+    fn jac_to_affine_many(
+        &self,
+        jacs: &[Jac],
+        out: &mut [Pt],
+        z_buf: &mut Vec<u64>,
+        scratch: &mut Vec<u64>,
+    ) {
+        debug_assert_eq!(jacs.len(), out.len());
+        let k = jacs.len();
+        if k == 0 {
+            return;
+        }
+        if z_buf.len() < k {
+            z_buf.resize(k, 0);
+        }
+        for i in 0..k {
+            debug_assert_ne!(jacs[i].z, 0);
+            z_buf[i] = jacs[i].z;
+        }
+        self.f.batch_inv(&mut z_buf[..k], scratch);
+        let f = &self.f;
+        for i in 0..k {
+            let zi = z_buf[i];
+            let zi2 = f.sqr(zi);
+            out[i] = Pt {
+                x: f.mul(jacs[i].x, zi2),
+                y: f.mul(jacs[i].y, f.mul(zi2, zi)),
+            };
+        }
     }
 
     #[inline]
