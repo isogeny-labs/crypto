@@ -9,7 +9,7 @@ For each of the 20 pairs accepted by the earlier weak gate at 7, the screen take
 | 7-order-4 and 11-order-6 | 540 | 4 | 4 | 2 | 0 |
 | 7-order-4 and 11-order-7 | 540 | 0 | 0 | 0 | 0 |
 
-The four passing choices cover two distinct rational curves up to the recorded coefficient tuples and four ordered point pairs. The reduced-event pairs are input indices 2 and 7; their selected `p₇.relation` is false. Their coefficients are respectively `[47,47,−47,20743/31,−342222/31]` and `[−47,47,47,20743/31,−342222/31]`. The other two passing pairs are indices 14 and 17. The per-choice [rows](rows.jsonl) retain all 540 statuses, including nonintegrality and bad reduction at the auxiliary primes; the [result](result.json) retains full counts and the selection map.
+The four passing choices cover two distinct rational curves up to the recorded coefficient tuples and four ordered point pairs. The reduced-event pairs are input indices 2 and 7; their selected `p₇.relation` is false. Their coefficients are respectively `[47,47,−47,20743/31,−342222/31]` and `[−47,47,47,20743/31,−342222/31]`. The other two passing pairs are indices 14 and 17. The per-choice [rows](rows.jsonl.gz) retain all 540 statuses, including nonintegrality and bad reduction at the auxiliary primes; the [result](result.json) retains full counts and the selection map. The gzip file losslessly restores the exact raw SHA-256 in the result, as checked by [package_rows.py](package_rows.py).
 
 The [protocol](protocol.json) fixed the source hash, coefficient box, gates, order of selection, and 540-choice cap before execution. The exact source bytes are bundled in [source-rows-v2.jsonl.gz](source-rows-v2.jsonl.gz); [source-amendment.json](source-amendment.json) records this portability addition without changing the selection or gates. The run used the repository's checked Sage launcher, with [runtime receipt](sage-runtime-info.json) outside the measurement. [Independent audit](audit.py) replays every rational coefficient, discriminant, finite-field order, relation, gate and selected row using Python exact fractions and separate group formulas; [audit-result.json](audit-result.json) records `PASS` for 540 rows. Stderr is empty. These timings are correctness-run durations, not performance comparisons.
 
@@ -20,6 +20,7 @@ Replay from this checkout:
 ```sh
 /Volumes/SSD990/cryptanalysis/sage --runtime-info > research/exotic_ecdlp_20261021/xedni_coefficient_choice_20261120/sage-runtime-info.json
 /Volumes/SSD990/cryptanalysis/sage -python research/exotic_ecdlp_20261021/xedni_coefficient_choice_20261120/run_sage.py > research/exotic_ecdlp_20261021/xedni_coefficient_choice_20261120/result.json 2> research/exotic_ecdlp_20261021/xedni_coefficient_choice_20261120/run.stderr
+python3 research/exotic_ecdlp_20261021/xedni_coefficient_choice_20261120/package_rows.py verify
 python3 research/exotic_ecdlp_20261021/xedni_coefficient_choice_20261120/audit.py > research/exotic_ecdlp_20261021/xedni_coefficient_choice_20261120/audit-result.json
 ```
 

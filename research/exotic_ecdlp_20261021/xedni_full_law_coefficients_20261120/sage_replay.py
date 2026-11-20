@@ -11,13 +11,17 @@ HERE = Path(__file__).resolve().parent
 PRIOR = HERE.parent / "xedni_coefficient_choice_20261120"
 
 
+def rows_bytes(path):
+    return path.read_bytes() if path.exists() else gzip.decompress(path.with_name(path.name + ".gz").read_bytes())
+
+
 def sha(data):
     return hashlib.sha256(data).hexdigest()
 
 
 def main():
     summary = json.loads((HERE / "result.json").read_text())
-    pair_bytes = (HERE / "pair-rows.jsonl").read_bytes()
+    pair_bytes = rows_bytes(HERE / "pair-rows.jsonl")
     assert summary["pair_rows_sha256"] == sha(pair_bytes)
     pair_rows = [json.loads(line) for line in pair_bytes.splitlines()]
     source = [json.loads(line) for line in gzip.decompress((PRIOR / "source-rows-v2.jsonl.gz").read_bytes()).splitlines()]

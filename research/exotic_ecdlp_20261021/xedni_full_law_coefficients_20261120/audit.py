@@ -10,6 +10,10 @@ HERE = Path(__file__).resolve().parent
 PRIOR = HERE.parent / "xedni_coefficient_choice_20261120"
 
 
+def rows_bytes(path):
+    return path.read_bytes() if path.exists() else gzip.decompress(path.with_name(path.name + ".gz").read_bytes())
+
+
 def sha(data):
     return hashlib.sha256(data).hexdigest()
 
@@ -19,7 +23,7 @@ def main():
     protocol = json.loads(protocol_bytes)
     result = json.loads((HERE / "result.json").read_text())
     source_bytes = (PRIOR / "source-rows-v2.jsonl.gz").read_bytes()
-    pair_bytes = (HERE / "pair-rows.jsonl").read_bytes()
+    pair_bytes = rows_bytes(HERE / "pair-rows.jsonl")
     assert protocol["source_sha256"] == sha(source_bytes) == result["source_sha256"]
     assert result["protocol_sha256"] == sha(protocol_bytes)
     assert result["script_sha256"] == sha((HERE / "run.py").read_bytes())

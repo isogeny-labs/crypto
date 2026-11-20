@@ -11,6 +11,10 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 
 
+def rows_bytes(path):
+    return path.read_bytes() if path.exists() else gzip.decompress(path.with_name(path.name + ".gz").read_bytes())
+
+
 def sha(data):
     return hashlib.sha256(data).hexdigest()
 
@@ -81,7 +85,7 @@ def main():
     assert sha(source) == protocol["source_sha256"]
     selected = [json.loads(line) for line in gzip.decompress(source).splitlines()
                 if json.loads(line)["accepted"]]
-    rows_data = (HERE / "rows.jsonl").read_bytes()
+    rows_data = rows_bytes(HERE / "rows.jsonl")
     rows = [json.loads(line) for line in rows_data.splitlines()]
     assert len(selected) == 20 and len(rows) == 540
     summary = json.loads((HERE / "result.json").read_text())
