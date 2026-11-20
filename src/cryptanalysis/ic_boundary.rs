@@ -12104,7 +12104,8 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         let _ = fault;
         // The sibling walk's state (only with `sib`): see "Sibling points".
         let key_bound = g.abscissa_key_bound().unwrap_or(0);
-        let mut sw = sib.map(|(m, pool)| SibWalk::new(m, pool, p1, c, key_bound, tw.t));
+        let mut sw =
+            sib.map(|(m, pool)| SibWalk::new(m, pool, p1, c, key_bound, tw.t as usize));
         loop {
             while tw.rank < need && tw.steps < t_max {
                 if let Some(sw) = sw.as_mut() {
@@ -12325,7 +12326,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         sw.cur.clear();
         sw.cur.extend_from_slice(&sw.idx[..m]);
         sw.h_t = sw.cur[0];
-        let parent_idx = sw.parents.len();
+        let _parent_idx = sw.parents.len();
         sw.parents.push(sw.parent);
         sw.parents_n += 1;
         self.sib_parents += 1;
@@ -12358,7 +12359,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                     })
                     .collect()
             });
-        for (pos, (&(h, jp, al, ga, be, want_minus, cp), sp)) in
+        for (pos, (&(_h, jp, al, ga, be, want_minus, cp), sp)) in
             plans[..m].iter().zip(pairs).enumerate()
         {
             match sp {
