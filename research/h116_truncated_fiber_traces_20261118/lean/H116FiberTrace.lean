@@ -589,6 +589,25 @@ theorem monicQuartic_trace_normalization (p S : ℤ) :
     p + 1 - ((p + S) + 2) = -1 - S := by
   ring
 
+/-- For a quartic presented as a product of two monic quadratics, the
+classical binary-quartic invariants satisfy `4 I^3-J^2=27 disc(f)`, with the
+discriminant independently factored into the two quadratic discriminants and
+the square of their resultant. -/
+theorem productMonicQuadratics_binaryQuartic_invariant_discriminant
+    (a b c d : K) :
+    let B := a + c
+    let C := b + d + a * c
+    let D := a * d + c * b
+    let E := b * d
+    let I := 12 * E - 3 * B * D + C ^ 2
+    let J := 72 * C * E + 9 * B * C * D - 27 * D ^ 2
+      - 27 * B ^ 2 * E - 2 * C ^ 3
+    4 * I ^ 3 - J ^ 2 =
+      27 * (a ^ 2 - 4 * b) * (c ^ 2 - 4 * d)
+        * ((d - b) ^ 2 + (a - c) * (a * d - b * c)) ^ 2 := by
+  dsimp
+  ring
+
 /-- The shared normalized at-infinity series before subtracting the target
 coordinate. Under the remaining geometric bridge it represents `S(x)/x` at
 `w=1/x`. -/
@@ -5012,6 +5031,7 @@ theorem fixedPoint_frobeniusCocycle_zero
 #print axioms monicQuadratic_resultant_zero_of_commonRoot
 #print axioms monicQuadratic_product_coefficients
 #print axioms monicQuartic_trace_normalization
+#print axioms productMonicQuadratics_binaryQuartic_invariant_discriminant
 #print axioms fiberDenominatorSeries_eq_normalizedMap_sub_linear
 #print axioms fiberDenominatorSeries_sub
 #print axioms bostanDenominatorsNonzero

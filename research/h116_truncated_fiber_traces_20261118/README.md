@@ -658,3 +658,13 @@ raise the audit to 241 theorems.  The next lead tests quadratic characters of
 the classical binary-quartic invariants `I,J`, retaining isomorphism/`j`
 geometry beyond the trace.
 [pcc:unverified]
+
+The [binary-quartic invariant test](CHIRAL_BINARY_QUARTIC_INVARIANT_PARITY_EXPERIMENT.md)
+then measures the ordered quadratic characters of `I,J` for those four
+target-tethered quartics.  All 5,992 independent invariant/discriminant
+identities pass and the tuple distinguishes 1,426/1,520 target signs, but the
+selected rule is only 764/1,431 with family-wise `p=0.929216` and no rule is
+exact.  One Lean identity raises the audit to 242 theorems.  The next lead
+retains the marked quartic factorization and tests its induced rational
+two-isogeny Kummer/covering class.
+[pcc:unverified]
