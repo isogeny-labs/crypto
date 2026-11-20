@@ -28,7 +28,20 @@
     "platform": "Linux-6.18.44-fc-v726-x86_64-with-glibc2.39"
   },
   "id": "20261120T2057Z-f4-small-step-bisect",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 6,
+      "name": "quad_n7_4t_par_old_over_default",
+      "note": "exploratory knob bisection, f4_fp_bench 5 at 4 threads, medians of 6 rounds: 14.141 ms (F4_FP_PAR_OLD=1) / 12.576 ms (default); sub-ms cases within noise",
+      "reference": 1.0,
+      "reference_kind": "baseline",
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.124
+    }
+  ],
   "problem": "kernel:f4_fp",
   "raw": [
     {

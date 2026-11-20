@@ -28,7 +28,23 @@
     "platform": "Linux-6.18.44-fc-v726-x86_64-with-glibc2.39"
   },
   "id": "20261120T2059Z-jv-cover-f4-dispatch-ab",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 6,
+      "name": "jv_dlp53_wall_par_old_over_default",
+      "note": "jv_cover dlp p=53, 4 threads, median wall 21.322 s (F4_FP_PAR_OLD=1) / 19.334 s (default); spread = min/max of per-arm wall ranges ratio; identical work",
+      "reference": 1.0,
+      "reference_kind": "baseline",
+      "spread": [
+        1.02,
+        1.199
+      ],
+      "unit": "ratio",
+      "value": 1.103
+    }
+  ],
   "problem": "kernel:f4_fp",
   "raw": [
     {
