@@ -8,7 +8,8 @@ use std::time::Instant;
 
 const P: u64 = 2_147_483_647;
 const N: u64 = 2_147_446_831;
-const W: [u64; 8] = [1, 3, 5, 7, 11, 13, 17, 19];
+const W_ODD: [u64; 8] = [1, 3, 5, 7, 11, 13, 17, 19];
+const W_POW2: [u64; 8] = [1, 2, 4, 8, 16, 32, 64, 128];
 const G: Point = Some((625_037_715, 2_100_627_251));
 const SEED: u64 = 0x7738_4234_4238_3231;
 const TRAIN_XOR: u64 = 0x5749_4e44_4f57_5338;
@@ -72,15 +73,16 @@ fn canonical_base(ar: &mut Arithmetic) -> Vec<Point> {
 }
 struct Oracle {
     window: [usize; 8],
+    weights: [u64; 8],
     slots: Vec<Vec<Point>>,
     left: Vec<(Point, Word4)>,
     right: HashMap<Point, Word4>,
 }
 impl Oracle {
-    fn new(ar: &mut Arithmetic, base: &[Point], window: [usize; 8]) -> Self {
+    fn new(ar: &mut Arithmetic, base: &[Point], window: [usize; 8], weights: [u64; 8]) -> Self {
         let mut slots = Vec::new();
         let mut abscissae = HashSet::new();
-        for (j, &weight) in W.iter().enumerate() {
+        for (j, &weight) in weights.iter().enumerate() {
             let pos: Vec<Point> = window.iter().map(|&i| {
                 let q = ar.scalar(PRIME31, weight, base[i]);
                 let (x, _) = q.expect("nonidentity weighted support point");
@@ -121,7 +123,7 @@ impl Oracle {
         // absent. Hash first-witness semantics remain correct with collisions.
         assert!((64_000..=65_536).contains(&right.len()),
                 "unexpectedly low four-slot support; inspect exact collisions");
-        Self {window, slots, left, right}
+        Self {window, weights, slots, left, right}
     }
     fn replay(&self, ar: &mut Arithmetic, word: Word8) -> Point {
         let mut sum = None;
@@ -152,7 +154,7 @@ impl Oracle {
         for j in 0..8 {
             let leaf = word[j] as usize;
             assert!(leaf < 16);
-            let c = if leaf < 8 {W[j]} else {N - W[j]};
+            let c = if leaf < 8 {self.weights[j]} else {N - self.weights[j]};
             let idx = self.window[leaf % 8];
             out[idx] = addn(out[idx], c);
         }
@@ -200,7 +202,7 @@ impl Rref {
         logs
     }
 }
-fn study(num_targets: usize) -> Value {
+fn study(num_targets: usize, weights: [u64; 8]) -> Value {
     assert!(num_targets > 0 && num_targets <= 1024);
     assert_eq!(PRIME31.n,N);
     let start = Instant::now();
@@ -208,7 +210,7 @@ fn study(num_targets: usize) -> Value {
     check_curve(PRIME31,&mut ar).expect("unchanged original prime-order curve");
     let base = canonical_base(&mut ar);
     let oracles: Vec<Oracle> = WINDOWS.iter().copied()
-        .map(|w| Oracle::new(&mut ar,&base,w)).collect();
+        .map(|w| Oracle::new(&mut ar,&base,w,weights)).collect();
     let setup_ns=start.elapsed().as_nanos();
     let setup_add=ar.counts.group_additions;
     let train_start=Instant::now();
@@ -291,7 +293,7 @@ fn study(num_targets: usize) -> Value {
         "claim_of_cheaper_nongeneric_solver":false,
         "curve":{"p":P,"a":PRIME31.a,"b":PRIME31.b,"n":N,
                  "cofactor":1,"g":G},
-        "weights":W,"windows":WINDOWS,
+        "weights":weights,"windows":WINDOWS,
         "base_points":base,
         "ordered_words_per_window":16u64.pow(8),
         "mean_ordered_witnesses_over_uniform_group":{
@@ -318,18 +320,35 @@ fn study(num_targets: usize) -> Value {
     })
 }
 fn main() {
-    println!("{}",serde_json::to_string_pretty(&study(1024)).unwrap());
+    let weight_arg = std::env::args().nth(1);
+    let weights = match weight_arg.as_deref() {
+        None | Some("--odd") => W_ODD,
+        Some("--powers2") => W_POW2,
+        _ => panic!("usage: prime31_w8_windowed_rank [--odd|--powers2]"),
+    };
+    println!("{}",serde_json::to_string_pretty(&study(1024, weights)).unwrap());
 }
 #[cfg(test)]
 mod tests {
     use super::*;
     #[test]
     fn original_curve_window_rank_and_public_only_oracle_32_targets() {
-        let v=study(32);
+        let v=study(32, W_ODD);
         assert_eq!(v["rank"],31);
         assert_eq!(v["verified_target_count"],32);
         assert_eq!(v["genuine_nongeneric_rr9_extractors"],0);
         assert_eq!(v["window_training"].as_array().unwrap().len(),4);
+    }
+    #[test]
+    fn powers_two_window_rank_and_public_only_oracle_32_targets() {
+        assert_ne!(W_ODD, W_POW2);
+        let v = study(32, W_POW2);
+        assert_eq!(v["rank"], 31);
+        assert_eq!(v["verified_target_count"], 32);
+        assert_eq!(v["weights"], serde_json::json!(W_POW2));
+        assert_eq!(v["genuine_nongeneric_rr9_extractors"], 0);
+        assert_eq!(v["online_queries"].as_u64().unwrap(),
+                   v["failed_online_queries"].as_u64().unwrap() + 32);
     }
     #[test]
     fn exact_first_moment_and_31_dimensional_window_coverage() {
