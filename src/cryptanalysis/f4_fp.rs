@@ -2808,6 +2808,18 @@ const FL_BLOCK: usize = 64;
 /// Columns a step needs before the Faugère–Lachartre form is used.
 const FL_MIN_COLS: usize = 256;
 
+/// [`FL_MIN_COLS`], or `F4_FP_FL_MIN_COLS` when set: a measurement knob for
+/// the size at which the Faugère–Lachartre form replaces the cascade.
+fn fl_min_cols() -> usize {
+    static C: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    *C.get_or_init(|| {
+        std::env::var("F4_FP_FL_MIN_COLS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(FL_MIN_COLS)
+    })
+}
+
 /// `F4_FP_FL=0` keeps the per-pair-row reducer cascade; a same-binary
 /// control for the Faugère–Lachartre form.
 fn fl_enabled() -> bool {
@@ -5413,7 +5425,7 @@ fn f4_with_arithmetic(
             // Tiny steps (most of `solve`'s specialised runs) keep the
             // cascade: building `B'` there costs more than it saves.
             let fl = fl_enabled()
-                && n_cols >= FL_MIN_COLS
+                && n_cols >= fl_min_cols()
                 && reducers.len().saturating_mul(free_cols.len()) <= FL_MAX_ENTRIES;
             let reduced: Option<Vec<Vec<u32>>> = if fl {
                 reduce_pairs_fl(
@@ -5851,12 +5863,13 @@ fn f4_with_arithmetic(
             }
         }
     }
-    // final interreduction of the alive basis (tails)
-    let mut reduced: Vec<Poly> = basis
-        .iter()
+    // final interreduction of the alive basis (tails); the basis is not used
+    // again, so its polynomials are moved rather than copied term by term
+    let mut reduced: Vec<Poly> = std::mem::take(&mut basis)
+        .into_iter()
         .zip(&alive)
         .filter(|(_, &a)| a)
-        .map(|(f, _)| f.clone())
+        .map(|(f, _)| f)
         .collect();
     let ti = Instant::now();
     pp_dump("steps");
