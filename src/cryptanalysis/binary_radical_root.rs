@@ -48,7 +48,7 @@
 //! `decompose` batches its leading coefficients; [`RadicalQuartic::solve`]
 //! is the scalar reference.
 
-use super::semaev_decomp::{Gf2, Poly, QuarticSubspaceRoots};
+use super::semaev_decomp::{quartic_in_x3, Gf2, Poly, QuarticSubspaceRoots};
 
 /// An `F₂`-linear map on single-word field elements, applied a byte at a
 /// time through precomputed tables.
@@ -557,6 +557,274 @@ impl RowRoots {
     }
 }
 
+// ── The factorisation S₄ = S₃(u, x_R, X)·S₃(u', x_R, X) ─────────────────
+
+/// Roots of `A·X² + B·X + C` (`A·B ≠ 0`, `ab_inv = 1/(A·B)`), by one
+/// half-trace: `X = (B/A)·t` with `t² + t = A·C/B²`.
+#[inline(always)]
+fn as_roots(a: u64, b: u64, c: u64, ab_inv: u64, r: &RadicalQuartic, gf: &Gf2) -> Option<[u64; 2]> {
+    let (inv_a, inv_b) = (gf.mul(b, ab_inv), gf.mul(a, ab_inv));
+    let w = gf.mul(gf.mul(a, c), gf.sqr(inv_b));
+    if r.trace(w) != 0 {
+        return None;
+    }
+    let k = gf.mul(b, inv_a);
+    let x0 = gf.mul(k, r.half_trace(w));
+    Some([x0, x0 ^ k])
+}
+
+/// The `m = 3` decision of [`super::semaev_decomp::decompose`] (Koblitz
+/// curve `y² + xy = x³ + x² + 1`, `V = {x < 2^l}`), without the quartic.
+///
+/// The roots of `S₄(X₁, X₂, X, x_R)` in `X` are `x(R ± P₁ ± P₂)`, so
+/// `S₄ = S₃(u, x_R, X)·S₃(u', x_R, X)` with `u, u' = x(P₁ ± P₂)` the
+/// roots of `S₃(X₁, X₂, ·)`.  A pair costs one Artin–Schreier step for
+/// `u` and one for `X` per rational `u`, with one batched inversion per
+/// row and stage.
+///
+/// When `S₃(X₁, X₂, ·)` has no root in `F_{2^n}`, `u` and `u'` are
+/// conjugate, and a rational `X` would be a root of both factors, making
+/// `S₃(x_R, X, ·)` a multiple of `S₃(X₁, X₂, ·)`; comparing coefficients,
+/// `{x_R, X} = {X₁, X₂}` or `{1/X₁, 1/X₂}`.  Such pairs are therefore
+/// skipped unless `x_R` is one of `X₁, X₂, 1/X₁, 1/X₂`, and those few, with
+/// the degenerate ones (`X₁ = X₂`, `X₁X₂ = 0`, `u = x_R`, `u·x_R = 0`), are
+/// decided by the quartic's gcd exactly as `decompose` decides them.
+///
+/// With [`Self::with_pair_table`] the `u` of every pair is computed once:
+/// it does not depend on the target, so a target then costs one
+/// Artin–Schreier step per rational `u`.
+pub struct FactoredOracle {
+    pub l: u32,
+    r: RadicalQuartic,
+    base: QuarticSubspaceRoots,
+    /// Per row `x₁`: `(x₂, u)` for every rational `u`, then the `x₂` whose
+    /// pair needs the gcd whatever the target.
+    table: Option<Vec<(Vec<(u64, u64)>, Vec<u64>)>>,
+}
+
+/// Counters for one decision.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct FactoredWork {
+    pub pairs: u64,
+    pub as_solves: u64,
+    pub gcd_fallbacks: u64,
+}
+
+#[derive(Default)]
+struct FacRow {
+    inv: Vec<u64>,
+    tmp: Vec<u64>,
+    us: Vec<(u64, u64)>,
+    special: Vec<u64>,
+}
+
+impl FactoredOracle {
+    pub fn new(l: u32, gf: &Gf2) -> Option<Self> {
+        Some(Self {
+            l,
+            r: RadicalQuartic::new(l, gf)?,
+            base: QuarticSubspaceRoots::new(l, gf),
+            table: None,
+        })
+    }
+
+    /// Precompute every pair's rational `u` (memory `≈ 2^{2l}·8` bytes).
+    pub fn with_pair_table(mut self, gf: &Gf2) -> Self {
+        let span = 1u64 << self.l;
+        let mut row = FacRow::default();
+        let table = (0..span)
+            .map(|x1| {
+                self.stage_a(x1, gf, &mut row);
+                (
+                    std::mem::take(&mut row.us),
+                    std::mem::take(&mut row.special),
+                )
+            })
+            .collect();
+        self.table = Some(table);
+        self
+    }
+
+    /// Rational `u` of every pair `(x₁, x₂ ≥ x₁)`, into `row.us`; pairs the
+    /// closed form cannot take, into `row.special`.
+    #[inline(always)]
+    fn stage_a(&self, x1: u64, gf: &Gf2, row: &mut FacRow) {
+        let span = 1u64 << self.l;
+        row.us.clear();
+        row.special.clear();
+        row.inv.clear();
+        for x2 in x1..span {
+            row.inv.push(gf.mul(gf.sqr(x1 ^ x2), gf.mul(x1, x2)));
+        }
+        gf.batch_inv(&mut row.inv, &mut row.tmp);
+        for x2 in x1..span {
+            let a1 = gf.sqr(x1 ^ x2);
+            let b1 = gf.mul(x1, x2);
+            if a1 == 0 || b1 == 0 {
+                row.special.push(x2);
+                continue;
+            }
+            let c1 = gf.sqr(b1) ^ 1;
+            if let Some([u0, u1]) = as_roots(a1, b1, c1, row.inv[(x2 - x1) as usize], &self.r, gf) {
+                row.us.push((x2, u0));
+                row.us.push((x2, u1));
+            }
+        }
+    }
+
+    /// The gcd decision of one pair, as `decompose` makes it.
+    fn pair_by_gcd(
+        &self,
+        x1: u64,
+        x2: u64,
+        xr: u64,
+        gf: &Gf2,
+        work: &mut FactoredWork,
+    ) -> Option<u64> {
+        work.gcd_fallbacks += 1;
+        let q = quartic_in_x3(x1, x2, xr, gf);
+        let span = 1u64 << self.l;
+        let eval = |t: u64| {
+            (0..q.c.len())
+                .rev()
+                .fold(0u64, |v, j| gf.mul(v, t) ^ q.c[j])
+        };
+        match q.deg() {
+            None => Some(0),
+            Some(4) => {
+                let li = gf.inv(q.c[4]);
+                let f = [0, 1, 2, 3].map(|i| gf.mul(q.c[i], li));
+                let g = self.base.gcd(f, gf);
+                match g.deg() {
+                    None | Some(0) => None,
+                    Some(1) => Some(gf.mul(g.c[0], gf.inv(g.c[1]))),
+                    Some(_) => (0..span).find(|&t| eval(t) == 0),
+                }
+            }
+            Some(_) => (0..span).find(|&t| eval(t) == 0),
+        }
+    }
+
+    /// Stage B for one row: the first `X ∈ V` of any rational `u`, then
+    /// the special and guarded pairs by gcd.
+    #[inline(always)]
+    fn stage_b(
+        &self,
+        x1: u64,
+        xr: u64,
+        us: &[(u64, u64)],
+        special: &[u64],
+        gf: &Gf2,
+        inv: &mut Vec<u64>,
+        tmp: &mut Vec<u64>,
+        work: &mut FactoredWork,
+    ) -> Option<[u64; 3]> {
+        inv.clear();
+        inv.extend(
+            us.iter()
+                .map(|&(_, u)| gf.mul(gf.sqr(u ^ xr), gf.mul(u, xr))),
+        );
+        gf.batch_inv(inv, tmp);
+        for (j, &(x2, u)) in us.iter().enumerate() {
+            let a2 = gf.sqr(u ^ xr);
+            let b2 = gf.mul(u, xr);
+            if a2 == 0 || b2 == 0 {
+                if let Some(x3) = self.pair_by_gcd(x1, x2, xr, gf, work) {
+                    return Some([x1, x2, x3]);
+                }
+                continue;
+            }
+            work.as_solves += 1;
+            let c2 = gf.sqr(b2) ^ 1;
+            if let Some(xs) = as_roots(a2, b2, c2, inv[j], &self.r, gf) {
+                if let Some(&x3) = xs.iter().find(|&&x| x >> self.l == 0) {
+                    return Some([x1, x2, x3]);
+                }
+            }
+        }
+        for &x2 in special {
+            if let Some(x3) = self.pair_by_gcd(x1, x2, xr, gf, work) {
+                return Some([x1, x2, x3]);
+            }
+        }
+        None
+    }
+
+    /// `x_R`'s pairs whose `u` is irrational but which the guard keeps:
+    /// `x_R ∈ {x₁, x₂, 1/x₁, 1/x₂}`.  At most a handful a target.
+    fn guarded(&self, xr: u64, gf: &Gf2, work: &mut FactoredWork) -> Option<[u64; 3]> {
+        let span = 1u64 << self.l;
+        let mut cands = vec![xr];
+        if xr != 0 {
+            cands.push(gf.inv(xr));
+        }
+        for &c in &cands {
+            if c >> self.l != 0 {
+                continue;
+            }
+            // c = x₁ or x₂: every pair containing c.
+            for other in 0..span {
+                let (x1, x2) = if c <= other { (c, other) } else { (other, c) };
+                if let Some(x3) = self.pair_by_gcd(x1, x2, xr, gf, work) {
+                    return Some([x1, x2, x3]);
+                }
+            }
+        }
+        None
+    }
+
+    /// Does `x_R` decompose?  Same answer as `semaev_decomp::decompose`.
+    pub fn decompose(&self, xr: u64, gf: &Gf2, work: &mut FactoredWork) -> Option<[u64; 3]> {
+        #[cfg(target_arch = "x86_64")]
+        if gf.folds() {
+            // SAFETY: a field folds only when `pclmulqdq` was detected.
+            return unsafe { self.decompose_clmul(xr, gf, work) };
+        }
+        self.decompose_body(xr, gf, work)
+    }
+
+    #[cfg(target_arch = "x86_64")]
+    #[target_feature(enable = "pclmulqdq")]
+    unsafe fn decompose_clmul(
+        &self,
+        xr: u64,
+        gf: &Gf2,
+        work: &mut FactoredWork,
+    ) -> Option<[u64; 3]> {
+        self.decompose_body(xr, gf, work)
+    }
+
+    #[inline(always)]
+    fn decompose_body(&self, xr: u64, gf: &Gf2, work: &mut FactoredWork) -> Option<[u64; 3]> {
+        let span = 1u64 << self.l;
+        work.pairs += span * (span + 1) / 2;
+        let mut row = FacRow::default();
+        for x1 in 0..span {
+            let hit = match &self.table {
+                Some(t) => {
+                    let (us, special) = &t[x1 as usize];
+                    self.stage_b(x1, xr, us, special, gf, &mut row.inv, &mut row.tmp, work)
+                }
+                None => {
+                    self.stage_a(x1, gf, &mut row);
+                    let (us, special) = (
+                        std::mem::take(&mut row.us),
+                        std::mem::take(&mut row.special),
+                    );
+                    let hit =
+                        self.stage_b(x1, xr, &us, &special, gf, &mut row.inv, &mut row.tmp, work);
+                    (row.us, row.special) = (us, special);
+                    hit
+                }
+            };
+            if hit.is_some() {
+                return hit;
+            }
+        }
+        self.guarded(xr, gf, work)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -712,5 +980,48 @@ mod tests {
             by_count.iter().filter(|&&c| c > 0).count() >= 4,
             "{by_count:?}"
         );
+    }
+    #[test]
+    fn factored_oracle_decides_exactly_as_decompose() {
+        use crate::cryptanalysis::semaev_decomp::{decompose, eval_f3};
+        for (n, l) in [(13u32, 4u32), (17, 5), (23, 6)] {
+            let gf = field(n);
+            let streaming = FactoredOracle::new(l, &gf).unwrap();
+            let tabled = FactoredOracle::new(l, &gf).unwrap().with_pair_table(&gf);
+            let mut rng = StdRng::seed_from_u64(77 + n as u64);
+            let (mut yes, mut no) = (0, 0);
+            for i in 0..300 {
+                // Plant some decomposable targets: x_R a root of a pair's quartic.
+                let xr = if i % 3 == 0 {
+                    let (x1, x2, x3) = (
+                        rng.gen_range(0..1u64 << l),
+                        rng.gen_range(0..1u64 << l),
+                        rng.gen_range(0..1u64 << l),
+                    );
+                    // any xr with eval_f3(x1,x2,x3,xr)=0, by search over a few
+                    (0..1u64 << n.min(16))
+                        .find(|&xr| eval_f3(x1, x2, x3, xr, &gf) == 0)
+                        .unwrap_or(1)
+                } else {
+                    rng.gen::<u64>() & ((1 << n) - 1)
+                };
+                let want = decompose(xr, l, &gf);
+                for o in [&streaming, &tabled] {
+                    let mut w = FactoredWork::default();
+                    let got = o.decompose(xr, &gf, &mut w);
+                    assert_eq!(got.is_some(), want.is_some(), "n={n} l={l} xr={xr:#x}");
+                    if let Some([a, b, c]) = got {
+                        assert!(a >> l == 0 && b >> l == 0 && c >> l == 0);
+                        assert_eq!(eval_f3(a, b, c, xr, &gf), 0);
+                    }
+                }
+                if want.is_some() {
+                    yes += 1
+                } else {
+                    no += 1
+                }
+            }
+            assert!(yes > 20 && no > 20, "n={n}: yes={yes} no={no}");
+        }
     }
 }
