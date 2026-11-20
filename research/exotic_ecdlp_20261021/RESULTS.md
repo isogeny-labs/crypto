@@ -1,5 +1,12 @@
 # Results: six falsifiers on prime-field ECDLP hardness
 
+**H4 group pair-index diagnostic (2026-11-20 UTC):** A
+[charged pair-index component](H4_prime_descent/pair_index_20261120/README.md)
+matched the exact six-solution planted and zero-solution ordinary `n=19`
+`S_4` sets by elliptic-curve group addition. Its 119 lifted points and
+14,161 pair entries took 0.208–0.221 seconds to build; fixed-target
+queries took 0.00134–0.00174 seconds on a local diagnostic run.
+
 **H4 scale update (2026-11-20 UTC):** The
 [paired `n=19` scale check](H4_prime_descent/xor_scale_20261120/README.md)
 censored both native-XOR and CNF solver arms at 300 seconds on a planted

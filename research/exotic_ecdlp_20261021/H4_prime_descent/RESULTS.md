@@ -1,5 +1,12 @@
 # H4 RESULTS: FPPR prime-degree descent to F_2, m=3 (claim C4)
 
+**Group pair-index diagnostic (2026-11-20 UTC):** On the deterministic
+`n=19` instance, a 14,161-entry ordered pair table matched all six
+planted `S_4` decompositions and the ordinary arm's zero-solution set
+exactly. Setup was 0.208–0.221 seconds and target lookup 0.00134–0.00174
+seconds on a local macOS host. The [frozen group-law packet](pair_index_20261120/README.md)
+records point coordinates, source/runtime hashes, and stage boundaries.
+
 **Native XOR scale check (2026-11-20 UTC):** At `n=19`, both native XOR
 and Tseitin CNF reached 300-second caps on a planted six-solution system
 and an ordinary zero-solution system. The [frozen four-cell packet](xor_scale_20261120/README.md)
