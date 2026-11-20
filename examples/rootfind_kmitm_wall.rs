@@ -124,6 +124,18 @@ fn main() {
         }
         let probe_lanes_ns = t_lanes.elapsed().as_nanos() as f64 / targets.len() as f64;
 
+        // PLAN lever 4: threads over independent targets (shared Arc tables).
+        let mut thr_ns = [0.0f64; 3];
+        let mut thr_hits = [0u64; 3];
+        for (ti, threads) in [1usize, 2, 4].into_iter().enumerate() {
+            black_box(mitm.decompose_threaded(&ctx, &fb, &targets[..targets.len().min(4)], threads));
+            let t_thr = Instant::now();
+            let out = mitm.decompose_threaded(&ctx, &fb, &targets, threads);
+            thr_ns[ti] = t_thr.elapsed().as_nanos() as f64 / targets.len() as f64;
+            thr_hits[ti] = out.iter().filter(|h| h.is_some()).count() as u64;
+            black_box(&out);
+        }
+
         let (ksum_build_ns, ksum_probe_ns, ksum_entries, ksum_hits, ksum_ok) = if m <= 9 {
             let (_, pk) = Params::parse_spec(&format!("ksum:m={m},prune=1")).unwrap();
             let mut ksum = KSumOracle::new(m);
@@ -164,11 +176,14 @@ fn main() {
         let build_ratio = ksum_build_ns.map(|k| k / build_m_ns);
         let probe_ratio = ksum_probe_ns.map(|k| k / probe_m_ns);
         let lane_speedup = probe_m_ns / probe_lanes_ns;
+        let thr2_speedup = thr_ns[0] / thr_ns[1];
+        let thr4_speedup = thr_ns[0] / thr_ns[2];
         println!(
             "m={m:>2}  split {left_k}/{right_k}  kmitm build {build_m_ns:10.0} ns  \
              left {left_entries:<8} right_pre {right_pre:<6}  \
              probe {probe_m_ns:10.1} ns/tgt  lanes4 {probe_lanes_ns:10.1} ns/tgt \
-             ({lane_speedup:4.2}x) hits {hits_m}/{hits_lanes}   \
+             ({lane_speedup:4.2}x)  thr1/2/4 {thr1:10.1}/{thr2:10.1}/{thr4:10.1} \
+             ({thr2_speedup:4.2}x/{thr4_speedup:4.2}x) hits {hits_m}/{hits_lanes}/{h1}/{h2}/{h4}   \
              ksum build {}  probe {}  ratio build/probe {} / {}",
             ksum_build_ns
                 .map(|v| format!("{v:10.0} ns"))
@@ -182,6 +197,12 @@ fn main() {
             probe_ratio
                 .map(|v| format!("{v:6.1}x"))
                 .unwrap_or_else(|| "   n/a".into()),
+            thr1 = thr_ns[0],
+            thr2 = thr_ns[1],
+            thr4 = thr_ns[2],
+            h1 = thr_hits[0],
+            h2 = thr_hits[1],
+            h4 = thr_hits[2],
         );
         rows.push(json!({
             "m": m,
@@ -195,8 +216,16 @@ fn main() {
             "kmitm_probe_ns_per_target": probe_m_ns,
             "kmitm_probe_ns_per_target_lanes4": probe_lanes_ns,
             "kmitm_lanes4_speedup": lane_speedup,
+            "kmitm_probe_ns_per_target_thr1": thr_ns[0],
+            "kmitm_probe_ns_per_target_thr2": thr_ns[1],
+            "kmitm_probe_ns_per_target_thr4": thr_ns[2],
+            "kmitm_thr2_speedup": thr2_speedup,
+            "kmitm_thr4_speedup": thr4_speedup,
             "kmitm_hits": hits_m,
             "kmitm_hits_lanes4": hits_lanes,
+            "kmitm_hits_thr1": thr_hits[0],
+            "kmitm_hits_thr2": thr_hits[1],
+            "kmitm_hits_thr4": thr_hits[2],
             "ksum_ok": ksum_ok,
             "ksum_build_ns": ksum_build_ns,
             "ksum_probe_ns_per_target": ksum_probe_ns,

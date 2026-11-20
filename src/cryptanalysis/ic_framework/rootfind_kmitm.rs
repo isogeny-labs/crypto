@@ -15,11 +15,15 @@
 //! `R = 1` batches over the factor base; `R ≥ 2` batches over the
 //! precomputed right-half sums. A word-blocked **Bloom filter** over
 //! Montgomery abscissae sits in front of a mont→witness map (no
-//! `from_mont` on the miss path; lever-3 style). Classification:
-//! engineering (wall / build size); charged group additions are the MITM's
-//! own (not equal to full `ksum`).
+//! `from_mont` on the miss path; lever-3 style). Prepared tables are
+//! `Arc`-shared so [`RootfindKMitmOracle::fork_worker`] /
+//! [`RootfindKMitmOracle::decompose_threaded`] can run PLAN lever 4
+//! (threads over targets) without rebuilding. Classification:
+//! engineering (wall / build size); charged group additions are the
+//! MITM's own (not equal to full `ksum`).
 
 use std::collections::BTreeMap;
+use std::sync::Arc;
 
 use super::plugins::table_counted;
 use super::stages::{DecompositionOracle, InstanceCtx, Params};
@@ -31,6 +35,7 @@ use crate::cryptanalysis::prime_fast::{Fp64, MAX_BITS as PRIME_FAST_MAX_BITS};
 
 /// Word-blocked Bloom filter: one 64-bit word a key, five bits in it
 /// (same layout as `rootfind-floor`).
+#[derive(Clone)]
 struct WordBloom {
     words: Vec<u64>,
     mask: usize,
@@ -170,14 +175,14 @@ pub struct RootfindKMitmOracle<'i> {
     left_k: u32,
     right_k: u32,
     balanced: bool,
-    table: Option<LeftTable>,
+    table: Option<Arc<LeftTable>>,
     /// Montgomery field for the prime batch-inv probe (lever-1 style).
     field: Option<Fp64>,
     /// Bloom filter over left-table folded keys (lever-3 style).
-    bloom: Option<WordBloom>,
+    bloom: Option<Arc<WordBloom>>,
     /// Montgomery-abscissa → packed left witness (pairs: `i<<32|j`; k-sum:
     /// native packed). Lets the probe skip `from_mont` on every bloom pass.
-    mont_left: FastMap<u64>,
+    mont_left: Arc<FastMap<u64>>,
     /// When true, `mont_left` values are pair witnesses (`i<<32|j`).
     mont_left_pairs: bool,
     /// Bits per summand for unpacking k-sum `mont_left` values.
@@ -185,11 +190,11 @@ pub struct RootfindKMitmOracle<'i> {
     /// Summand count encoded in each k-sum `mont_left` value.
     mont_left_k: u32,
     /// Precomputed right-half sums for prime probes (`right_k ≥ 2`).
-    right_prime: Vec<RightSum<PrimePoint>>,
+    right_prime: Arc<Vec<RightSum<PrimePoint>>>,
     /// Precomputed right-half sums for binary probes (`right_k ≥ 2`).
-    right_bin: Vec<RightSum<crate::cryptanalysis::koblitz_fast::FastPoint>>,
+    right_bin: Arc<Vec<RightSum<crate::cryptanalysis::koblitz_fast::FastPoint>>>,
     /// Factor-base Montgomery (x, y) for the right=1 batch probe.
-    fb_mont: Vec<(u64, u64)>,
+    fb_mont: Arc<Vec<(u64, u64)>>,
     /// Scratch for the batch-inv probe.
     diffs: Vec<u64>,
     scratch: Vec<u64>,
@@ -220,13 +225,13 @@ impl<'i> RootfindKMitmOracle<'i> {
             table: None,
             field: None,
             bloom: None,
-            mont_left: fast_map(0),
+            mont_left: Arc::new(fast_map(0)),
             mont_left_pairs: false,
             mont_left_bits: 0,
             mont_left_k: 0,
-            right_prime: Vec::new(),
-            right_bin: Vec::new(),
-            fb_mont: Vec::new(),
+            right_prime: Arc::new(Vec::new()),
+            right_bin: Arc::new(Vec::new()),
+            fb_mont: Arc::new(Vec::new()),
             diffs: Vec::new(),
             scratch: Vec::new(),
             degenerate: Vec::new(),
@@ -251,7 +256,7 @@ impl<'i> RootfindKMitmOracle<'i> {
 
     /// Left-half table entry count after [`DecompositionOracle::prepare`].
     pub fn left_entries(&self) -> u64 {
-        self.table.as_ref().map(LeftTable::entries).unwrap_or(0)
+        self.table.as_deref().map(LeftTable::entries).unwrap_or(0)
     }
 
     pub fn left_k(&self) -> u32 {
@@ -305,6 +310,86 @@ impl<'i> RootfindKMitmOracle<'i> {
                 &mut out[..n],
             );
         }
+    }
+
+    /// PLAN lever 4: independent worker sharing this oracle's prepared
+    /// tables (`Arc`). Scratch buffers and counters start empty.
+    pub fn fork_worker(&self) -> Self {
+        let n = self.diffs.len().max(1);
+        Self {
+            m: self.m,
+            instance: self.instance,
+            left_k: self.left_k,
+            right_k: self.right_k,
+            balanced: self.balanced,
+            table: self.table.clone(),
+            field: self.field,
+            bloom: self.bloom.clone(),
+            mont_left: Arc::clone(&self.mont_left),
+            mont_left_pairs: self.mont_left_pairs,
+            mont_left_bits: self.mont_left_bits,
+            mont_left_k: self.mont_left_k,
+            right_prime: Arc::clone(&self.right_prime),
+            right_bin: Arc::clone(&self.right_bin),
+            fb_mont: Arc::clone(&self.fb_mont),
+            diffs: vec![0; n],
+            scratch: vec![0; n],
+            degenerate: vec![false; n],
+            left_scratch: Vec::with_capacity(self.left_k as usize),
+            mismatches: 0,
+            probe_right_adds: 0,
+            probe_lookups: 0,
+            overlaps_rejected: 0,
+            probe_batch_inv: 0,
+            bloom_rejects: 0,
+            bloom_passes: 0,
+            bloom_false_positives: 0,
+        }
+    }
+
+    /// PLAN lever 4: probe every target across `threads` workers that share
+    /// the prepared tables (`Arc`). Uses `std::thread::scope` (no rayon pool
+    /// build). Return order matches `targets`. Engineering throughput only —
+    /// charged `S` is unchanged.
+    pub fn decompose_threaded(
+        &self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        targets: &[PrimePoint],
+        threads: usize,
+    ) -> Vec<Option<Vec<usize>>> {
+        let threads = threads.max(1).min(targets.len().max(1));
+        let mut out = vec![None; targets.len()];
+        if threads <= 1 || targets.len() <= 1 {
+            let mut worker = self.fork_worker();
+            for (slot, &t) in out.iter_mut().zip(targets) {
+                let mut ops = GroupOps::default();
+                let mut c = OracleCounters::default();
+                *slot = worker.decompose(ctx, fb, &mut ops, &mut c, t);
+            }
+            return out;
+        }
+        let chunk = targets.len().div_ceil(threads);
+        std::thread::scope(|scope| {
+            let mut rest_out = out.as_mut_slice();
+            let mut rest_tgt = targets;
+            while !rest_tgt.is_empty() {
+                let n = chunk.min(rest_tgt.len());
+                let (out_chunk, out_next) = rest_out.split_at_mut(n);
+                let (tgt_chunk, tgt_next) = rest_tgt.split_at(n);
+                rest_out = out_next;
+                rest_tgt = tgt_next;
+                scope.spawn(move || {
+                    let mut worker = self.fork_worker();
+                    for (slot, &t) in out_chunk.iter_mut().zip(tgt_chunk) {
+                        let mut ops = GroupOps::default();
+                        let mut c = OracleCounters::default();
+                        *slot = worker.decompose(ctx, fb, &mut ops, &mut c, t);
+                    }
+                });
+            }
+        });
+        out
     }
 }
 
@@ -500,10 +585,12 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
             .map(|s| s != "0")
             .unwrap_or(ctx.group.supports_siblings());
 
-        self.table = Some(build_left_table(ctx.group, fb, left_k, prune, sib, ops)?);
-        self.right_bin.clear();
-        self.right_prime.clear();
-        self.fb_mont.clear();
+        self.table = Some(Arc::new(build_left_table(
+            ctx.group, fb, left_k, prune, sib, ops,
+        )?));
+        self.right_bin = Arc::new(Vec::new());
+        self.right_prime = Arc::new(Vec::new());
+        self.fb_mont = Arc::new(Vec::new());
         let batch_ok = ctx.group.supports_siblings()
             && (3..1u64 << PRIME_FAST_MAX_BITS).contains(&ctx.group.p);
         // Lever-3: Bloom over Montgomery abscissae of every left folded key
@@ -511,9 +598,9 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
         // mont x₃ before any table lookup, so miss-dominated paths skip
         // `from_mont`. A parallel mont→witness map makes bloom-pass hits
         // avoid the affine conversion entirely.
-        let entries = self.table.as_ref().map(LeftTable::entries).unwrap_or(1) as usize;
+        let entries = self.table.as_deref().map(LeftTable::entries).unwrap_or(1) as usize;
         let mut bloom = WordBloom::new(entries.max(1));
-        self.mont_left = fast_map(0);
+        self.mont_left = Arc::new(fast_map(0));
         self.mont_left_pairs = left_k == 2;
         self.mont_left_k = left_k;
         self.mont_left_bits = if left_k >= 3 {
@@ -524,7 +611,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
         if batch_ok {
             let f = Fp64::new(ctx.group.p);
             let mut mont_left = fast_map(entries.max(1));
-            if let Some(t) = &self.table {
+            if let Some(t) = self.table.as_deref() {
                 let pairs = left_k == 2;
                 let bits = self.mont_left_bits;
                 let k = left_k as usize;
@@ -545,31 +632,34 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
                     mont_left.entry(xm).or_insert(packed);
                 });
             }
-            self.mont_left = mont_left;
-        } else if let Some(t) = &self.table {
+            self.mont_left = Arc::new(mont_left);
+        } else if let Some(t) = self.table.as_deref() {
             t.for_each_folded_key(|k| bloom.insert(k));
         }
-        self.bloom = Some(bloom);
+        self.bloom = Some(Arc::new(bloom));
         if right_k >= 2 {
-            collect_right_sums(ctx.group, fb, right_k, ops, &mut self.right_prime);
+            let mut right = Vec::new();
+            collect_right_sums(ctx.group, fb, right_k, ops, &mut right);
             if batch_ok {
                 let f = Fp64::new(ctx.group.p);
-                for e in &mut self.right_prime {
+                for e in &mut right {
                     e.mont_x = f.to_mont(e.point.x);
                     e.mont_y = f.to_mont(e.point.y);
                 }
             }
+            self.right_prime = Arc::new(right);
         }
         // Montgomery batch-inv for right=1 (over F) and right≥2 (over S).
         self.field = if batch_ok {
             let f = Fp64::new(ctx.group.p);
             let n = if right_k == 1 {
-                self.fb_mont.clear();
-                self.fb_mont.reserve(fb.points.len());
+                let mut fb_mont = Vec::with_capacity(fb.points.len());
                 for &pj in &fb.points {
-                    self.fb_mont.push((f.to_mont(pj.x), f.to_mont(pj.y)));
+                    fb_mont.push((f.to_mont(pj.x), f.to_mont(pj.y)));
                 }
-                fb.points.len()
+                let n = fb_mont.len();
+                self.fb_mont = Arc::new(fb_mont);
+                n
             } else {
                 self.right_prime.len()
             };
@@ -581,7 +671,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
             self.diffs.clear();
             self.scratch.clear();
             self.degenerate.clear();
-            self.fb_mont.clear();
+            self.fb_mont = Arc::new(Vec::new());
             None
         };
         self.mismatches = 0;
@@ -598,13 +688,13 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
     fn setup_work_native(&self) -> BTreeMap<String, u64> {
         let mut out = self
             .table
-            .as_ref()
+            .as_deref()
             .map(LeftTable::work_counters)
             .unwrap_or_default();
         out.insert("kmitm_left_k".to_string(), u64::from(self.left_k));
         out.insert("kmitm_right_k".to_string(), u64::from(self.right_k));
         out.insert("kmitm_split_balanced".to_string(), u64::from(self.balanced));
-        if let Some(t) = &self.table {
+        if let Some(t) = self.table.as_deref() {
             out.insert("kmitm_left_entries".to_string(), t.entries());
         }
         if !self.right_prime.is_empty() {
@@ -613,7 +703,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
                 self.right_prime.len() as u64,
             );
         }
-        if let Some(b) = &self.bloom {
+        if let Some(b) = self.bloom.as_deref() {
             out.insert("kmitm_bloom_words".to_string(), b.words.len() as u64);
         }
         table_counted(out)
@@ -1397,18 +1487,22 @@ impl<'a> DecompositionOracle<crate::cryptanalysis::ic_boundary::BinaryGroup<'a>>
         self.left_k = left_k;
         self.right_k = right_k;
         let prune = params.0.get("prune").map(|s| s != "0").unwrap_or(true);
-        self.table = Some(build_left_table(ctx.group, fb, left_k, prune, false, ops)?);
-        self.right_prime.clear();
-        self.right_bin.clear();
+        self.table = Some(Arc::new(build_left_table(
+            ctx.group, fb, left_k, prune, false, ops,
+        )?));
+        self.right_prime = Arc::new(Vec::new());
+        self.right_bin = Arc::new(Vec::new());
         if right_k >= 2 {
-            collect_right_sums(ctx.group, fb, right_k, ops, &mut self.right_bin);
+            let mut right = Vec::new();
+            collect_right_sums(ctx.group, fb, right_k, ops, &mut right);
+            self.right_bin = Arc::new(right);
         }
         Ok(())
     }
     fn setup_work_native(&self) -> BTreeMap<String, u64> {
         let mut out = self
             .table
-            .as_ref()
+            .as_deref()
             .map(LeftTable::work_counters)
             .unwrap_or_default();
         out.insert("kmitm_left_k".to_string(), u64::from(self.left_k));
@@ -1742,6 +1836,43 @@ mod tests {
         let mut counters = OracleCounters::default();
         oracle.decompose_lanes(&c, &fb, &mut dops, &mut counters, &targets, &mut out);
         assert!(out[0].is_some(), "lanes should recover planted sum");
+        assert_eq!(out[0].as_ref().unwrap().len(), 4);
+    }
+
+    /// PLAN lever 4: two-thread probe recovers a planted m=4 sum among decoys.
+    #[test]
+    fn kmitm_threaded_recovers_planted_m4() {
+        let inst = prime_instance_for(22, 59297);
+        let fb = prime_factor_base(&inst, 16);
+        let c = ctx(&inst);
+        let g = &inst.curve;
+        let m = 4u32;
+        let mut idxs = Vec::new();
+        for x in &fb.abscissa_list {
+            if idxs.len() == m as usize {
+                break;
+            }
+            idxs.push(fb.x_index[x][0]);
+        }
+        let mut ops = GroupOps::default();
+        let mut s = fb.points[idxs[0]];
+        for &i in &idxs[1..] {
+            s = g.add(&mut ops, s, fb.points[i]);
+        }
+        let mut state = 0xA11C_EEE5_u64;
+        let mut targets = vec![s];
+        for _ in 0..7 {
+            state = state.wrapping_mul(0x9E37_79B9_7F4A_7C15).wrapping_add(1);
+            targets.push(g.mul(&mut ops, inst.generator_point(), 1 + state % (inst.r - 1)));
+        }
+        let (_, params) = Params::parse_spec("rootfind-kmitm:m=4").unwrap();
+        let mut oracle = RootfindKMitmOracle::new_prime(m, &inst);
+        oracle
+            .prepare(&c, &fb, &params, &mut GroupOps::default())
+            .unwrap();
+        let out = oracle.decompose_threaded(&c, &fb, &targets, 2);
+        assert_eq!(out.len(), targets.len());
+        assert!(out[0].is_some(), "threaded probe should recover planted sum");
         assert_eq!(out[0].as_ref().unwrap().len(), 4);
     }
 

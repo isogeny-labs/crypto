@@ -1,4 +1,4 @@
-# `rootfind-kmitm` — probe-favoring MITM + batch-inv + Bloom (2026-11-19)
+# `rootfind-kmitm` — probe-favoring MITM + batch-inv + Bloom + threads (2026-11-19)
 
 **Decision: engineering.** New oracle id beside `ksum` / `rootfind-subtract`.
 Default split stores a table of **left** = `min(9, m−1)` sums and probes
@@ -18,6 +18,8 @@ On primes with siblings:
    batch-inv (no per-probe alloc), inline right indices.
 4. **`decompose_lanes`** — PLAN lever 2 scalar: up to four targets share
    one batch-inv; field work is interleaved across the lane.
+5. **`decompose_threaded`** — PLAN lever 4: `Arc`-shared prepared tables,
+   `fork_worker`, `std::thread::scope` over independent targets.
 
 | | |
 |---|---|
@@ -32,20 +34,31 @@ Same-host baseline → after hot-path + lanes (see `results.json`):
 
 | m | left/right | baseline probe | now probe | lanes4 | vs baseline (single / lanes4) |
 |---|---|---:|---:|---:|---|
-| 3 | 2/1 | 0.97 µs | 0.67 µs | 0.51 µs | **1.45× / 1.91×** |
-| 4 | 3/1 | 0.94 µs | 0.68 µs | 0.45 µs | **1.38× / 2.08×** |
-| 5 | 4/1 | 0.94 µs | 0.68 µs | 0.45 µs | **1.38× / 2.08×** |
-| 6 | 5/1 | 0.92 µs | 0.64 µs | 0.44 µs | **1.45× / 2.10×** |
-| 8 | 7/1 | 1.03 µs | 0.74 µs | 0.54 µs | **1.40× / 1.91×** |
-| 10 | 9/1 | 1.12 µs | 0.77 µs | 0.66 µs | **1.46× / 1.69×** |
-| 12 | 9/3 | 26.5 µs | 23.2 µs | 22.6 µs | **1.14× / 1.18×** |
+| 3 | 2/1 | 0.97 µs | 0.70 µs | 0.49 µs | **1.39× / 1.99×** |
+| 4 | 3/1 | 0.94 µs | 0.69 µs | 0.48 µs | **1.36× / 1.96×** |
+| 5 | 4/1 | 0.94 µs | 0.66 µs | 0.45 µs | **1.43× / 2.08×** |
+| 6 | 5/1 | 0.92 µs | 0.68 µs | 0.46 µs | **1.36× / 2.00×** |
+| 8 | 7/1 | 1.03 µs | 0.75 µs | 0.60 µs | **1.37× / 1.70×** |
+| 10 | 9/1 | 1.12 µs | 0.81 µs | 0.69 µs | **1.38× / 1.62×** |
+| 12 | 9/3 | 26.5 µs | 23.0 µs | 23.0 µs | **1.15× / 1.15×** |
 
 m=12 remains bound by ~1760 right-sum field ops a target; lanes amortize
-the inversion but not the arithmetic. Threads (PLAN lever 4) and AVX/IFMA
-lanes stay open.
+the inversion but not the arithmetic.
 
-Planted-sum recovery tests pass for m = 3..6, 10, 12; lanes recover a
-planted m=4 sum.
+### PLAN lever 4 — threads over targets (m=12)
+
+`right = 1` probes (~0.7 µs) stay spawn-bound: extra threads lose at this
+`|F_x|` / target count. The win is m=12 (~23 µs/target). Median of five
+wall reps at 64 targets (`m12_thread_reps.txt` / `results.json`):
+
+| threads | median ns/tgt | vs thr1 |
+|---|---:|---:|
+| 1 | 21.97 µs | 1.00× |
+| 2 | 15.92 µs | **1.38×** |
+| 4 | 7.83 µs | **2.81×** |
+
+Planted-sum recovery tests pass for m = 3..6, 10, 12; lanes and
+`decompose_threaded` recover a planted m=4 sum.
 
 ## How to read the numbers
 
@@ -54,7 +67,7 @@ planted m=4 sum.
 - Large A: left=`min(9,m−1)` grows as `C(A,L)·2^{L−1}`; use
   `split=balanced` when that table does not fit.
 - Counted `S` is the MITM's own additions. No security / sub-rho claim.
-- Remaining PLAN levers (AVX lanes, threads, table-build batching) stay in
+- Remaining PLAN lever: AVX/IFMA lanes (and table-build batching) stay in
   the #4708 prototype until parity/replay are wired.
 
 ## Reproduce
