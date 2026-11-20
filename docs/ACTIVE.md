@@ -20,12 +20,16 @@ Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hypere
 - [ ] Genus 2 end-to-end: anchored pencil relations (L01) and automorphism orbits (L02) in one complete solve against matched rho at the §5a band (Claude, 2026-11-20, PR #4693)
 - [x] Genus-4 cost calibration: measure the real GAE price of relation and mod-r linear-algebra operations against a rho group operation (timing tier), to test whether the w = 1 pricing of the validated genus-4 results is conservative (Claude, done 2026-11-19: w_rel ≈ 0.0025, w_la ≈ 0.0042–0.0045 GAE, robust bound w ≤ 0.042; w = 1 is conservative; validated-with-errata, no gate row because scalars are not independently certified; `research/genus4_cost_calibration_20261119`, PR #4693)
 - [x] Factor-base rebalance on the elliptic IC lanes (lead B): no-go, LA <= ~3% on every elliptic lane and bases already tuned (research/lead_b_elliptic_la_share_20261119/ASSESSMENT.md). Redirect: DL1 base-size sweep on the genus-3 quartic GHS lane (LA 34-64%) is the one place the lever could pay (Claude, 2026-11-19, PR #4693)
-- [ ] Genus-4 three-point exponent (third prime p ~ 65537) and genus 5 at matched group sizes against the ideal negation-rho bound (lead C; Claude, started 2026-11-19, PR #4693)
+- [ ] Genus-4 three-point exponent (third prime p = 54293, deviation D1: the binary cannot run p = 60013) and genus 5 at matched group sizes against the ideal negation-rho bound (lead C; Claude, started 2026-11-19, PR #4693)
 - [ ] Measured transfer atlas: cover genus, base size and measured IC-vs-rho crossover for the transfer families the lab has tooling for (lead D; Claude, started 2026-11-19, PR #4693)
 
 - [x] Genus-4 follow-up: more p = 16411 targets for arm x with matched plain rho, Ferrari inside the sieve (not applicable; factor-base balance instead), validator replay for the leaderboard (Claude, completed 2026-11-18, branch claude/hyperelliptic-index-calculus-td1fdn, PR #4693; validated)
 - [x] Genus-4 arm x on prime-order (h = 1) Jacobians at p = 16411 and 32771 against the ideal negation bound, with linear-algebra tuning (cc x SGE) on the h = 2 curves (Claude, completed 2026-11-18, PR #4693; validated: x* 0.876 / 0.640 of ideal negation rho at w = 1, below at all w)
 - [ ] Regenerate the IC leaderboard outputs (docs/ic/LEADERBOARD.md, leaderboard.json, ic-leaderboard.html) once artifact-store inputs can be pulled; the genus-4 section is in the builder (PR #4693)
+
+- [x] Formalize conductor prime-gap bounds, scalar-Frobenius oracle hardness, and DLP transfer ceilings in Lean 4 (Cursor, completed 2026-11-20, branch cursor/lean-conductor-prime-gap-bounds-bdb7, PR #4815; claim PCC-20261120-70fc62 standing unverified; proof-gate PASS 125 thm)
+
+- [x] Accelerate PKM Semaev and T_2-torus F4 via basis inheritance, Schwartz–Zippel refutation-trace replay, tower descent, and X_R-split ParamS5; evaluate m >= 8 T_2-torus and aligned P-256 auxiliary curve (Cursor, completed 2026-11-19, branch cursor/prime-pkm-aux-tower-3858, PR #4820; receipts in research/prime_pkm_aux_chase_20261119/{REPORT.md,RESULTS.json})
 
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 

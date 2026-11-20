@@ -160,6 +160,33 @@ impl Fp {
         assert!(!a.is_multiple_of(self.p), "f4_fp_tower: inverse of zero");
         self.pow(a, self.p - 2)
     }
+
+    /// Montgomery's trick batch inversion over `F_p`: computes `vals[i]^{-1} mod p`
+    /// for every entry using a single modular inversion and `3*(k - 1)` multiplications.
+    /// Returns `None` immediately if any entry is `0 mod p` (Schwartz–Zippel pivot check).
+    pub(crate) fn batch_inv(self, vals: &[u64]) -> Option<Vec<u64>> {
+        if vals.is_empty() {
+            return Some(Vec::new());
+        }
+        let mut prefix = Vec::with_capacity(vals.len());
+        let mut acc = 1u64;
+        for &v in vals {
+            let vr = v % self.p;
+            if vr == 0 {
+                return None;
+            }
+            prefix.push(acc);
+            acc = self.mul(acc, vr);
+        }
+        let mut inv_acc = self.inv(acc);
+        let mut out = vec![0u64; vals.len()];
+        for i in (0..vals.len()).rev() {
+            let vr = vals[i] % self.p;
+            out[i] = self.mul(inv_acc, prefix[i]);
+            inv_acc = self.mul(inv_acc, vr);
+        }
+        Some(out)
+    }
 }
 
 // ── Monomials ────────────────────────────────────────────────────────
@@ -517,6 +544,12 @@ pub struct TowerRing {
 }
 
 impl TowerRing {
+    pub fn new(p: u64, rules: Vec<SquareRule>, n_free: usize) -> Self {
+        let ring = Self { p, rules, n_free };
+        ring.check();
+        ring
+    }
+
     pub fn n_tower(&self) -> usize {
         self.rules.len()
     }
@@ -754,6 +787,171 @@ impl TowerRing {
         RPoly::from_terms(fp, out)
     }
 
+    /// Parent-to-child basis specialization in the same [`TowerRing`]: evaluates tower
+    /// variable `var` at `val mod p` in every polynomial of `basis`, merges terms in
+    /// grading `w`, and prepends the linear generator `y_{var} - val`.
+    /// Returns `(child_inputs, fp_mults)`.
+    pub fn specialize_basis_at_var(
+        &self,
+        basis: &[RPoly],
+        var: usize,
+        val: u64,
+        w: TowerWeights,
+    ) -> (Vec<RPoly>, u64) {
+        assert!(var < self.n_tower(), "f4_fp_tower: var out of range");
+        let fp = Fp::new(self.p);
+        let val = val % self.p;
+        let bit = 1u64 << var;
+        let mut mults = 0u64;
+        let mut out = Vec::with_capacity(basis.len() + 1);
+
+        // Linear branch generator `y_{var} - val`.
+        let mut lin_terms = vec![(mono_w(bit, [0; MAX_FREE], w), 1u64)];
+        if val != 0 {
+            lin_terms.push((ONE, fp.neg(val)));
+        }
+        out.push(RPoly::from_terms(fp, lin_terms));
+
+        for g in basis {
+            let mut terms = Vec::with_capacity(g.len());
+            for (&m, &c) in g.monos.iter().zip(&g.coefs) {
+                let mask = mask_of(m);
+                let free = free_of(m);
+                if (mask & bit) != 0 {
+                    if val == 0 {
+                        continue;
+                    }
+                    let cc = if val == 1 {
+                        u64::from(c)
+                    } else {
+                        mults += 1;
+                        fp.mul(u64::from(c), val)
+                    };
+                    terms.push((mono_w(mask & !bit, free, w), cc));
+                } else {
+                    terms.push((mono_w(mask, free, w), u64::from(c)));
+                }
+            }
+            let sp = RPoly::from_terms(fp, terms);
+            if sp.is_unit() {
+                return (vec![sp], mults);
+            }
+            if !sp.is_empty() {
+                out.push(sp);
+            }
+        }
+        (out, mults)
+    }
+
+    /// Surjective homomorphism specializing a top-level tower variable `var`
+    /// (`rules[var].next == None`) to `val mod p` and dropping `var` from the ring
+    /// (`n_tower - 1` tower variables). Any lower rule pointing to `var` becomes a
+    /// top-level rule with `c' = c + a·val, d' = d + b·val (mod p)`.
+    /// Returns `(child_ring, child_basis, child_weights, fp_mults)`.
+    pub fn specialize_drop_top_var(
+        &self,
+        basis: &[RPoly],
+        var: usize,
+        val: u64,
+        w: TowerWeights,
+    ) -> (TowerRing, Vec<RPoly>, TowerWeights, u64) {
+        assert!(var < self.n_tower(), "f4_fp_tower: var out of range");
+        assert!(
+            self.rules[var].next.is_none(),
+            "f4_fp_tower: specialize_drop_top_var requires a top-level variable"
+        );
+        let fp = Fp::new(self.p);
+        let val = val % self.p;
+        let mut mults = 0u64;
+
+        let mut new_rules = Vec::with_capacity(self.n_tower() - 1);
+        for (j, r) in self.rules.iter().enumerate() {
+            if j == var {
+                continue;
+            }
+            match r.next {
+                Some(nxt) if usize::from(nxt) == var => {
+                    let av = if r.a % self.p == 0 || val == 0 {
+                        0
+                    } else {
+                        mults += 1;
+                        fp.mul(r.a % self.p, val)
+                    };
+                    let bv = if r.b % self.p == 0 || val == 0 {
+                        0
+                    } else {
+                        mults += 1;
+                        fp.mul(r.b % self.p, val)
+                    };
+                    new_rules.push(SquareRule {
+                        next: None,
+                        a: 0,
+                        b: 0,
+                        c: fp.add(r.c % self.p, av),
+                        d: fp.add(r.d % self.p, bv),
+                    });
+                }
+                Some(nxt) if usize::from(nxt) > var => {
+                    new_rules.push(SquareRule {
+                        next: Some(nxt - 1),
+                        ..*r
+                    });
+                }
+                _ => new_rules.push(*r),
+            }
+        }
+        let child_ring = TowerRing::new(self.p, new_rules, self.n_free);
+        let child_w = if w.is_unit() {
+            TowerWeights::UNIT
+        } else {
+            let ws: Vec<u32> = (0..self.n_tower())
+                .filter(|&j| j != var)
+                .map(|j| w.weight(j as u32))
+                .collect();
+            TowerWeights::from_slice(&ws)
+        };
+
+        let low_mask = if var == 0 { 0u64 } else { (1u64 << var) - 1 };
+        let bit = 1u64 << var;
+        let high_mask = if var == 63 {
+            0u64
+        } else {
+            !((1u64 << (var + 1)) - 1)
+        };
+
+        let mut child_basis = Vec::with_capacity(basis.len());
+        for g in basis {
+            let mut terms = Vec::with_capacity(g.len());
+            for (&m, &c) in g.monos.iter().zip(&g.coefs) {
+                let mask = mask_of(m);
+                let free = free_of(m);
+                let new_mask = (mask & low_mask) | ((mask & high_mask) >> 1);
+                if (mask & bit) != 0 {
+                    if val == 0 {
+                        continue;
+                    }
+                    let cc = if val == 1 {
+                        u64::from(c)
+                    } else {
+                        mults += 1;
+                        fp.mul(u64::from(c), val)
+                    };
+                    terms.push((mono_w(new_mask, free, child_w), cc));
+                } else {
+                    terms.push((mono_w(new_mask, free, child_w), u64::from(c)));
+                }
+            }
+            let sp = RPoly::from_terms(fp, terms);
+            if sp.is_unit() {
+                return (child_ring, vec![sp], child_w, mults);
+            }
+            if !sp.is_empty() {
+                child_basis.push(sp);
+            }
+        }
+        (child_ring, child_basis, child_w, mults)
+    }
+
     /// `g` at a point: one value per variable, tower variables first.
     pub fn eval(&self, g: &RPoly, x: &[u64]) -> u64 {
         let fp = Fp::new(self.p);
@@ -960,10 +1158,13 @@ pub struct TowerF4Options {
 }
 
 /// What an F4 run that ended in a refutation learned about its system
-/// shape: per step, which rows to reduce. See [`TowerF4Options::replay`].
+/// shape: per step, which rows to reduce, plus a compiled minimal-1-witness
+/// linear-combination DAG for zero-overhead Schwartz–Zippel replay.
+/// See [`TowerF4Options::replay`].
 #[derive(Clone, Debug, Default)]
 pub struct F4Trace {
     pub steps: Vec<TraceStep>,
+    pub(crate) compiled: Option<Arc<CompiledRefutation>>,
 }
 
 /// One step of an [`F4Trace`].
@@ -982,6 +1183,696 @@ impl F4Trace {
     pub fn kept_rows(&self) -> usize {
         self.steps.iter().map(|s| s.kept.len()).sum()
     }
+}
+
+#[derive(Clone, Debug)]
+pub(crate) struct ScatterPlan {
+    elem_id: u32,
+    expected_lead: u32,
+    unit_moves: Vec<(u32, u32)>,
+    scaled_moves: Vec<(u32, u32, u32)>,
+}
+
+impl ScatterPlan {
+    fn eval_row(&self, fp: Fp, elem_vals: &[u32], n_cols: usize, muladds: &mut u64) -> Row {
+        if self.scaled_moves.is_empty() {
+            // Fast path when tower masks are disjoint: unit_moves are strictly ordered if
+            // monomials stay distinct, or we accumulate into a small sparse/dense buffer.
+            let mut pairs: Vec<(u32, u64)> = Vec::with_capacity(self.unit_moves.len());
+            for &(src, dst) in &self.unit_moves {
+                let v = elem_vals[src as usize];
+                if v != 0 {
+                    pairs.push((dst, u64::from(v)));
+                }
+            }
+            pairs.sort_unstable_by_key(|&(c, _)| c);
+            let mut cols = Vec::with_capacity(pairs.len());
+            let mut vals = Vec::with_capacity(pairs.len());
+            let mut i = 0;
+            while i < pairs.len() {
+                let c = pairs[i].0;
+                let mut acc = pairs[i].1;
+                i += 1;
+                while i < pairs.len() && pairs[i].0 == c {
+                    acc = fp.add(acc, pairs[i].1);
+                    i += 1;
+                }
+                if acc != 0 {
+                    cols.push(c);
+                    vals.push(acc as u32);
+                }
+            }
+            let _ = n_cols;
+            return Row { cols, vals };
+        }
+        let mut pairs: Vec<(u32, u64)> =
+            Vec::with_capacity(self.unit_moves.len() + self.scaled_moves.len());
+        for &(src, dst) in &self.unit_moves {
+            let v = elem_vals[src as usize];
+            if v != 0 {
+                pairs.push((dst, u64::from(v)));
+            }
+        }
+        for &(src, dst, factor) in &self.scaled_moves {
+            let v = elem_vals[src as usize];
+            if v != 0 {
+                *muladds += 1;
+                pairs.push((dst, fp.mul(u64::from(v), u64::from(factor))));
+            }
+        }
+        pairs.sort_unstable_by_key(|&(c, _)| c);
+        let mut cols = Vec::with_capacity(pairs.len());
+        let mut vals = Vec::with_capacity(pairs.len());
+        let mut i = 0;
+        while i < pairs.len() {
+            let c = pairs[i].0;
+            let mut acc = pairs[i].1;
+            i += 1;
+            while i < pairs.len() && pairs[i].0 == c {
+                acc = fp.add(acc, pairs[i].1);
+                i += 1;
+            }
+            if acc != 0 {
+                cols.push(c);
+                vals.push(acc as u32);
+            }
+        }
+        Row { cols, vals }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub(crate) struct CompiledSRow {
+    plan: ScatterPlan,
+    expected_q_lead: u32,
+    out_elem: Option<(u32, Vec<bool>)>,
+}
+
+#[derive(Clone, Debug)]
+pub(crate) struct CompiledStep {
+    degree: u32,
+    n_cols: usize,
+    nq: usize,
+    q_of: Vec<u32>,
+    q_start: Vec<u32>,
+    pivot_of: Vec<u32>,
+    piv_leads: Vec<u32>,
+    piv_order: Vec<u32>,
+    pivs: Vec<ScatterPlan>,
+    s_rows: Vec<CompiledSRow>,
+    is_final: bool,
+}
+
+#[derive(Clone, Debug)]
+pub(crate) struct InitElemSpec {
+    expected_lm: Mono,
+    needed: bool,
+    monos: Vec<Mono>,
+}
+
+#[derive(Clone, Debug)]
+pub(crate) struct CompiledRefutation {
+    n_elems: usize,
+    init_elems: Vec<InitElemSpec>,
+    steps: Vec<CompiledStep>,
+}
+
+pub(crate) struct UsefulRecord {
+    pub(crate) mult: Mono,
+    pub(crate) g: u32,
+    pub(crate) q_lead_l: u32,
+    pub(crate) used_q_leads: Vec<u32>,
+    pub(crate) elem_id: Option<u32>,
+}
+
+pub(crate) struct RecordedStep {
+    pub(crate) degree: u32,
+    pub(crate) cols: Vec<Mono>,
+    pub(crate) col_of: MonoMap<u32>,
+    pub(crate) pivot_of: Vec<u32>,
+    pub(crate) q_col: Vec<u32>,
+    pub(crate) n_reducers: usize,
+    pub(crate) piv: Vec<(Mono, u32, Mono)>,
+    pub(crate) s_useful: Vec<UsefulRecord>,
+}
+
+fn build_scatter_plan(
+    ring: &TowerRing,
+    fp: Fp,
+    w: TowerWeights,
+    elem_id: u32,
+    supp: &[Mono],
+    mult: Mono,
+    expected_lead_mono: Mono,
+    c_col_of: &MonoMap<u32>,
+) -> ScatterPlan {
+    let mut unit_moves = Vec::with_capacity(supp.len());
+    let mut scaled_moves = Vec::new();
+    for (src_idx, &m_src) in supp.iter().enumerate() {
+        let single = RPoly {
+            monos: vec![m_src],
+            coefs: vec![1],
+        };
+        let prod = ring.mul_mono_fp(fp, &single, mult, w);
+        for (&m_dst, &coef) in prod.monos.iter().zip(&prod.coefs) {
+            let dst_col = c_col_of[&m_dst];
+            if coef == 1 {
+                unit_moves.push((src_idx as u32, dst_col));
+            } else if coef != 0 {
+                scaled_moves.push((src_idx as u32, dst_col, coef));
+            }
+        }
+    }
+    ScatterPlan {
+        elem_id,
+        expected_lead: c_col_of[&expected_lead_mono],
+        unit_moves,
+        scaled_moves,
+    }
+}
+
+pub(crate) fn compile_refutation(
+    ring: &TowerRing,
+    fp: Fp,
+    w: TowerWeights,
+    init_lms: &[Mono],
+    init_monos: &[Vec<Mono>],
+    elem_monos: &[Vec<Mono>],
+    rec_steps: &[RecordedStep],
+) -> Option<(CompiledRefutation, Vec<TraceStep>)> {
+    if rec_steps.is_empty() {
+        return None;
+    }
+    let n_steps = rec_steps.len();
+    let total_elems = elem_monos.len();
+    let mut need_elem = vec![false; total_elems];
+    let mut step_kept_u: Vec<Vec<usize>> = vec![Vec::new(); n_steps];
+
+    // Phase 1: Backward reachability from the single `ONE` row at `n_steps - 1`.
+    for t in (0..n_steps).rev() {
+        let rs = &rec_steps[t];
+        let nu = rs.s_useful.len();
+        let mut u_of_ql: HashMap<u32, usize> = HashMap::with_capacity(nu);
+        for (u, ur) in rs.s_useful.iter().enumerate() {
+            u_of_ql.insert(ur.q_lead_l, u);
+        }
+        let mut need_u = vec![false; nu];
+        if t == n_steps - 1 {
+            let u_one = (0..nu).find(|&u| {
+                let ql = rs.s_useful[u].q_lead_l as usize;
+                rs.cols[rs.q_col[ql] as usize] == ONE
+            })?;
+            need_u[u_one] = true;
+        } else {
+            for (u, ur) in rs.s_useful.iter().enumerate() {
+                if ur.elem_id.is_some_and(|id| need_elem[id as usize]) {
+                    need_u[u] = true;
+                }
+            }
+        }
+        for u in (0..nu).rev() {
+            if !need_u[u] {
+                continue;
+            }
+            for &ql in &rs.s_useful[u].used_q_leads {
+                if let Some(&up) = u_of_ql.get(&ql) {
+                    need_u[up] = true;
+                }
+            }
+        }
+        let kept_u: Vec<usize> = (0..nu).filter(|&u| need_u[u]).collect();
+        if kept_u.is_empty() {
+            continue;
+        }
+        // Mark basis dependencies of kept S-rows and transitively reachable reducers.
+        let mut need_piv = vec![false; rs.piv.len()];
+        let mut work: Vec<usize> = Vec::new();
+        let mark_poly = |mult: Mono,
+                         g: u32,
+                         skip_lead: Option<Mono>,
+                         need_piv: &mut Vec<bool>,
+                         work: &mut Vec<usize>| {
+            let dummy = RPoly {
+                monos: elem_monos[g as usize].clone(),
+                coefs: vec![1; elem_monos[g as usize].len()],
+            };
+            let prod = ring.mul_mono_fp(fp, &dummy, mult, w);
+            for &m in &prod.monos {
+                if skip_lead == Some(m) {
+                    continue;
+                }
+                if let Some(&c) = rs.col_of.get(&m) {
+                    let pj = rs.pivot_of[c as usize];
+                    if pj != NONE && !need_piv[pj as usize] {
+                        need_piv[pj as usize] = true;
+                        work.push(pj as usize);
+                    }
+                }
+            }
+        };
+        for &u in &kept_u {
+            let ur = &rs.s_useful[u];
+            need_elem[ur.g as usize] = true;
+            mark_poly(ur.mult, ur.g, None, &mut need_piv, &mut work);
+        }
+        while let Some(pj) = work.pop() {
+            let (pmult, pg, plead) = rs.piv[pj];
+            need_elem[pg as usize] = true;
+            mark_poly(pmult, pg, Some(plead), &mut need_piv, &mut work);
+        }
+        step_kept_u[t] = kept_u;
+    }
+
+    // Phase 2: Forward compilation over tight reachable supports.
+    let mut cur_supp: Vec<Vec<Mono>> = vec![Vec::new(); total_elems];
+    let mut init_elems = Vec::with_capacity(init_lms.len());
+    for (g, &lm) in init_lms.iter().enumerate() {
+        if need_elem[g] {
+            cur_supp[g] = init_monos[g].clone();
+        }
+        init_elems.push(InitElemSpec {
+            expected_lm: lm,
+            needed: need_elem[g],
+            monos: init_monos[g].clone(),
+        });
+    }
+
+    let mut compiled_steps = Vec::new();
+    let mut minimal_trace_steps = Vec::new();
+    for t in 0..n_steps {
+        let kept_u = &step_kept_u[t];
+        if kept_u.is_empty() {
+            continue;
+        }
+        let rs = &rec_steps[t];
+        let is_final = t == n_steps - 1;
+        let mut need_piv = vec![false; rs.piv.len()];
+        let mut work: Vec<usize> = Vec::new();
+        let mut touched: MonoMap<()> = MonoMap::default();
+        if is_final {
+            touched.insert(ONE, ());
+        }
+
+        let scan_into = |mult: Mono,
+                         g: u32,
+                         skip_lead: Option<Mono>,
+                         need_piv: &mut Vec<bool>,
+                         work: &mut Vec<usize>,
+                         touched: &mut MonoMap<()>| {
+            for &m_src in &cur_supp[g as usize] {
+                let single = RPoly {
+                    monos: vec![m_src],
+                    coefs: vec![1],
+                };
+                let prod = ring.mul_mono_fp(fp, &single, mult, w);
+                for &m in &prod.monos {
+                    touched.insert(m, ());
+                    if skip_lead == Some(m) {
+                        continue;
+                    }
+                    if let Some(&c) = rs.col_of.get(&m) {
+                        let pj = rs.pivot_of[c as usize];
+                        if pj != NONE && !need_piv[pj as usize] {
+                            need_piv[pj as usize] = true;
+                            work.push(pj as usize);
+                        }
+                    }
+                }
+            }
+        };
+
+        for &u in kept_u {
+            let ur = &rs.s_useful[u];
+            let orig_lm = rs.cols[rs.q_col[ur.q_lead_l as usize] as usize];
+            touched.insert(orig_lm, ());
+            scan_into(ur.mult, ur.g, None, &mut need_piv, &mut work, &mut touched);
+        }
+        while let Some(pj) = work.pop() {
+            let (pmult, pg, plead) = rs.piv[pj];
+            touched.insert(plead, ());
+            scan_into(
+                pmult,
+                pg,
+                Some(plead),
+                &mut need_piv,
+                &mut work,
+                &mut touched,
+            );
+        }
+
+        let mut c_cols: Vec<Mono> = touched.keys().copied().collect();
+        c_cols.sort_unstable_by(|a, b| b.cmp(a));
+        let c_col_of: MonoMap<u32> = c_cols
+            .iter()
+            .enumerate()
+            .map(|(i, &m)| (m, i as u32))
+            .collect();
+        let n_cols = c_cols.len();
+
+        let kept_piv_idx: Vec<usize> = (0..rs.piv.len()).filter(|&j| need_piv[j]).collect();
+        let mut pivot_of = vec![NONE; n_cols];
+        let mut piv_leads = Vec::with_capacity(kept_piv_idx.len());
+        let mut pivs = Vec::with_capacity(kept_piv_idx.len());
+        for (new_k, &orig_j) in kept_piv_idx.iter().enumerate() {
+            let (pmult, pg, plead) = rs.piv[orig_j];
+            let plan = build_scatter_plan(
+                ring,
+                fp,
+                w,
+                pg,
+                &cur_supp[pg as usize],
+                pmult,
+                plead,
+                &c_col_of,
+            );
+            pivot_of[plan.expected_lead as usize] = new_k as u32;
+            piv_leads.push(plan.expected_lead);
+            pivs.push(plan);
+        }
+        let mut piv_order: Vec<u32> = (0..pivs.len() as u32).collect();
+        piv_order.sort_unstable_by_key(|&k| std::cmp::Reverse(piv_leads[k as usize]));
+
+        let mut q_of = vec![NONE; n_cols];
+        let mut q_start = vec![0u32; n_cols];
+        let mut c_q_monos: Vec<Mono> = Vec::new();
+        for c in 0..n_cols {
+            q_start[c] = c_q_monos.len() as u32;
+            if pivot_of[c] == NONE {
+                q_of[c] = c_q_monos.len() as u32;
+                c_q_monos.push(c_cols[c]);
+            }
+        }
+        let nq = c_q_monos.len();
+        if is_final && c_q_monos.last() != Some(&ONE) {
+            return None;
+        }
+
+        let mut s_rows = Vec::with_capacity(kept_u.len());
+        let mut kept_set: std::collections::HashSet<(Mono, u32)> =
+            std::collections::HashSet::with_capacity(kept_u.len() + kept_piv_idx.len());
+        let mut fresh_lms = Vec::with_capacity(kept_u.len());
+        for &orig_j in &kept_piv_idx {
+            if orig_j >= rs.n_reducers {
+                kept_set.insert((rs.piv[orig_j].0, rs.piv[orig_j].1));
+            }
+        }
+        for &u in kept_u {
+            let ur = &rs.s_useful[u];
+            kept_set.insert((ur.mult, ur.g));
+            let orig_lm = rs.cols[rs.q_col[ur.q_lead_l as usize] as usize];
+            fresh_lms.push(orig_lm);
+            let lead_col = *c_col_of.get(&orig_lm)?;
+            let ql = q_of[lead_col as usize];
+            if ql == NONE {
+                return None;
+            }
+            // Note: `ur.mult * LM(g)` can differ from `orig_lm` (because S-rows cancel up to `orig_lm`),
+            // so `expected_lead` of the unreduced product is meaningless; `expected_q_lead` is what matters!
+            let plan = build_scatter_plan(
+                ring,
+                fp,
+                w,
+                ur.g,
+                &cur_supp[ur.g as usize],
+                ur.mult,
+                orig_lm,
+                &c_col_of,
+            );
+            let out_elem = if !is_final && ur.elem_id.is_some_and(|id| need_elem[id as usize]) {
+                let id = ur.elem_id.unwrap();
+                let target_supp = &elem_monos[id as usize];
+                let q_tail = &c_q_monos[ql as usize..];
+                if target_supp.first() != q_tail.first() {
+                    return None;
+                }
+                let mut keep_mask = vec![false; q_tail.len()];
+                let mut ts_idx = 0usize;
+                for (q_rel, &qm) in q_tail.iter().enumerate() {
+                    if ts_idx < target_supp.len() && qm == target_supp[ts_idx] {
+                        keep_mask[q_rel] = true;
+                        ts_idx += 1;
+                    }
+                }
+                if ts_idx != target_supp.len() {
+                    return None;
+                }
+                cur_supp[id as usize] = target_supp.clone();
+                Some((id, keep_mask))
+            } else {
+                None
+            };
+            s_rows.push(CompiledSRow {
+                plan,
+                expected_q_lead: ql,
+                out_elem,
+            });
+        }
+        fresh_lms.sort_unstable();
+        minimal_trace_steps.push(TraceStep {
+            degree: rs.degree,
+            kept: kept_set,
+            fresh_lms,
+        });
+        compiled_steps.push(CompiledStep {
+            degree: rs.degree,
+            n_cols,
+            nq,
+            q_of,
+            q_start,
+            pivot_of,
+            piv_leads,
+            piv_order,
+            pivs,
+            s_rows,
+            is_final,
+        });
+    }
+
+    if compiled_steps.last().is_none_or(|st| !st.is_final) {
+        return None;
+    }
+    Some((
+        CompiledRefutation {
+            n_elems: total_elems,
+            init_elems,
+            steps: compiled_steps,
+        },
+        minimal_trace_steps,
+    ))
+}
+
+pub(crate) fn replay_compiled(
+    start: &[RPoly],
+    fp: Fp,
+    opts: &TowerF4Options,
+    dag: &CompiledRefutation,
+    rep: &mut TowerF4Report,
+) {
+    if start.len() != dag.init_elems.len() {
+        rep.replay_failure = Some("initial basis count differs");
+        return;
+    }
+    let mut polys: Vec<Vec<u32>> = vec![Vec::new(); dag.n_elems];
+    for (g, spec) in dag.init_elems.iter().enumerate() {
+        if !spec.needed {
+            continue;
+        }
+        if start[g].lm() != Some(spec.expected_lm) {
+            rep.replay_failure = Some("initial lead differs");
+            return;
+        }
+        let mut dense = vec![0u32; spec.monos.len()];
+        for (&m, &c) in start[g].monos.iter().zip(&start[g].coefs) {
+            // `spec.monos` is strictly descending (`b.cmp(&a)`).
+            match spec.monos.binary_search_by(|probe| m.cmp(probe)) {
+                Ok(idx) => dense[idx] = c,
+                Err(_) => {
+                    rep.replay_failure = Some("input support outside calibration trace");
+                    return;
+                }
+            }
+        }
+        polys[g] = dense;
+    }
+
+    let mut max_cols_so_far = 0usize;
+    let mut max_deg = 0u32;
+    for (step_idx, st) in dag.steps.iter().enumerate() {
+        if opts.deadline.is_some_and(|dl| Instant::now() >= dl) {
+            rep.timed_out = true;
+            rep.replay_failure = Some("deadline");
+            return;
+        }
+        rep.steps = step_idx + 1;
+        rep.degree_reached = rep.degree_reached.max(st.degree);
+        max_deg = max_deg.max(st.degree);
+        max_cols_so_far = max_cols_so_far.max(st.n_cols);
+        rep.max_cols = rep.max_cols.max(st.n_cols);
+        rep.max_rows = rep.max_rows.max(st.pivs.len() + st.s_rows.len());
+
+        let kern = Kernel::with_budget(fp, 2 * st.n_cols + 4);
+
+        // 1. Form kept reducer/promoted rows and batch-normalize any promoted rows whose lead != 1.
+        let n_piv = st.pivs.len();
+        let mut raw_pivs: Vec<Row> = Vec::with_capacity(n_piv);
+        let mut to_inv_idx: Vec<usize> = Vec::new();
+        let mut to_inv_vals: Vec<u64> = Vec::new();
+        for (k, plan) in st.pivs.iter().enumerate() {
+            let r = plan.eval_row(
+                fp,
+                &polys[plan.elem_id as usize],
+                st.n_cols,
+                &mut rep.muladds,
+            );
+            if r.cols.first().copied() != Some(plan.expected_lead) {
+                rep.replay_failure = Some("reducer pivot vanished or shifted");
+                return;
+            }
+            if r.vals[0] != 1 {
+                to_inv_idx.push(k);
+                to_inv_vals.push(u64::from(r.vals[0]));
+            }
+            raw_pivs.push(r);
+        }
+        if !to_inv_vals.is_empty() {
+            let Some(invs) = fp.batch_inv(&to_inv_vals) else {
+                rep.replay_failure = Some("promoted pivot zero");
+                return;
+            };
+            rep.muladds += 3 * (to_inv_vals.len().saturating_sub(1) as u64);
+            for (&k, &inv) in to_inv_idx.iter().zip(&invs) {
+                raw_pivs[k].vals[0] = 1;
+                for v in &mut raw_pivs[k].vals[1..] {
+                    rep.muladds += 1;
+                    *v = fp.mul(u64::from(*v), inv) as u32;
+                }
+            }
+        }
+
+        // Compute B' = A^{-1} B in pre-sorted rightmost-lead-first order.
+        let mut bred: Vec<Vec<u32>> = vec![Vec::new(); n_piv];
+        for &k_u32 in &st.piv_order {
+            let k = k_u32 as usize;
+            let s0 = st.q_start[st.piv_leads[k] as usize] as usize;
+            let mut acc = vec![0u64; st.nq - s0];
+            let row = &raw_pivs[k];
+            for (&c, &v) in row.cols[1..].iter().zip(&row.vals[1..]) {
+                let q = st.q_of[c as usize];
+                if q != NONE {
+                    acc[q as usize - s0] = u64::from(v);
+                }
+            }
+            for (&c, &v) in row.cols[1..].iter().zip(&row.vals[1..]) {
+                let cu = c as usize;
+                if st.q_of[cu] != NONE {
+                    continue;
+                }
+                let j = st.pivot_of[cu] as usize;
+                let off = st.q_start[cu] as usize - s0;
+                rep.muladds += kern.sub(&mut acc[off..], u64::from(v), &bred[j]);
+            }
+            bred[k] = acc.iter().map(|&x| fp.reduce(x) as u32).collect();
+        }
+
+        // 2. Reduce kept S-rows by B' and run minimal intra-step echelon.
+        let mut ech: Vec<(u32, Vec<u32>)> = Vec::new();
+
+        for (si, sr) in st.s_rows.iter().enumerate() {
+            let row = sr.plan.eval_row(
+                fp,
+                &polys[sr.plan.elem_id as usize],
+                st.n_cols,
+                &mut rep.muladds,
+            );
+            let mut acc = vec![0u64; st.nq];
+            for (&c, &v) in row.cols.iter().zip(&row.vals) {
+                let q = st.q_of[c as usize];
+                if q != NONE {
+                    acc[q as usize] = u64::from(v);
+                }
+            }
+            for (&c, &v) in row.cols.iter().zip(&row.vals) {
+                let cu = c as usize;
+                if st.q_of[cu] == NONE {
+                    let off = st.q_start[cu] as usize;
+                    let j = st.pivot_of[cu] as usize;
+                    rep.muladds += kern.sub(&mut acc[off..], u64::from(v), &bred[j]);
+                }
+            }
+            for (ql, erow) in &ech {
+                let l = *ql as usize;
+                let a = fp.reduce(acc[l]);
+                if a != 0 {
+                    rep.muladds += kern.sub(&mut acc[l..], a, erow);
+                }
+            }
+
+            let exp_l = sr.expected_q_lead as usize;
+            // Verify all columns strictly to the left of `exp_l` cancelled to 0,
+            // and `acc[exp_l]` is non-zero!
+            if acc[..exp_l].iter().any(|&x| fp.reduce(x) != 0) {
+                rep.replay_failure = Some("new leads differ from the trace");
+                rep.replay_mismatch = Some((rep.steps, si, st.s_rows.len()));
+                return;
+            }
+            let lead_val = fp.reduce(acc[exp_l]);
+            if lead_val == 0 {
+                rep.replay_failure = Some("witness pivot vanished");
+                rep.replay_mismatch = Some((rep.steps, si, st.s_rows.len()));
+                return;
+            }
+
+            if st.is_final && si + 1 == st.s_rows.len() {
+                // Exact algebraic soundness check: `exp_l == st.nq - 1` corresponds to `ONE`,
+                // all columns `0 .. st.nq - 1` are verified 0, and `lead_val != 0`, so
+                // `lead_val · 1 ∈ I(x_R)` with zero division needed!
+                if exp_l + 1 != st.nq {
+                    rep.replay_failure = Some("final row not at unit column");
+                    return;
+                }
+                rep.inconsistent = true;
+                rep.basis = vec![RPoly {
+                    monos: vec![ONE],
+                    coefs: vec![1],
+                }];
+                rep.solving_degree_max = max_deg;
+                rep.max_cols_to_solution = max_cols_so_far;
+                rep.steps_to_solution = rep.steps;
+                rep.last_productive_degree = st.degree;
+                return;
+            }
+
+            let inv = fp.inv(lead_val);
+            let mut full_monic = Vec::with_capacity(st.nq - exp_l);
+            full_monic.push(1u32);
+            for &x in &acc[exp_l + 1..] {
+                let rx = fp.reduce(x);
+                if rx == 0 {
+                    full_monic.push(0);
+                } else {
+                    rep.muladds += 1;
+                    full_monic.push(fp.mul(rx, inv) as u32);
+                }
+            }
+            if let Some((eid, ref keep_mask)) = sr.out_elem {
+                let mut compact = Vec::with_capacity(keep_mask.len());
+                for (q_rel, &val) in full_monic.iter().enumerate() {
+                    if keep_mask[q_rel] {
+                        compact.push(val);
+                    } else if val != 0 {
+                        rep.replay_failure = Some("element support widened");
+                        return;
+                    }
+                }
+                polys[eid as usize] = compact;
+            }
+            if si + 1 < st.s_rows.len() {
+                let pos = ech.partition_point(|&(ql, _)| ql < sr.expected_q_lead);
+                ech.insert(pos, (sr.expected_q_lead, full_monic));
+            }
+        }
+    }
+    rep.replay_failure = Some("trace exhausted");
 }
 
 impl TowerF4Options {
@@ -1568,8 +2459,12 @@ pub(crate) struct ElimStats {
     /// Input: form `B'` only for the reducers the S-rows reach, directly or
     /// through other reducers (a replay; the plain run forms all of it).
     pub(crate) prune_reducers: bool,
+    /// Input: record intra-step echelon dependencies for minimal-1-witness trace compilation.
+    pub(crate) record_deps: bool,
     /// Output: the S-rows (indices) that gave a new pivot, in order.
     pub(crate) useful: Vec<u32>,
+    /// Output (when `record_deps`): `(q_lead_l, used_earlier_q_leads)` per entry in `useful`.
+    pub(crate) useful_deps: Vec<(u32, Vec<u32>)>,
 }
 
 /// Forms row `k` of a set of rows on demand.
@@ -1752,11 +2647,12 @@ pub(crate) fn eliminate(
     // per row. The block's accumulators are sized to stay in cache.
     let per_task = ((1usize << 18) / (8 * nq.max(1))).clamp(4, 64);
     let chunk = per_task * 2 * rayon::current_num_threads().max(1);
-    type Reduced = (Vec<(Option<Vec<u64>>, bool)>, u64);
+    type Reduced = (Vec<(Option<Vec<u64>>, bool, Vec<u32>)>, u64);
     let all: Vec<usize> = (0..n_s).collect();
     // S-rows reduced so far. With no residual column the echelon is full
     // before the first row.
     let mut done = 0usize;
+    let rec_deps = st.record_deps;
     if nq == 0 {
         st.full_rank_after = Some(0);
     }
@@ -1808,17 +2704,25 @@ pub(crate) fn eliminate(
                     .map(|r| acc[r * nq..(r + 1) * nq].iter().any(|&x| fp.reduce(x) != 0))
                     .collect();
                 let mut live: Vec<usize> = (0..blk.len()).filter(|&r| residual[r]).collect();
+                let mut used_old: Vec<Vec<u32>> = if rec_deps {
+                    vec![Vec::new(); blk.len()]
+                } else {
+                    Vec::new()
+                };
                 for &l in &leads {
-                    let l = l as usize;
+                    let lu = l as usize;
                     for &r in &live {
-                        let a = fp.reduce(acc[r * nq + l]);
+                        let a = fp.reduce(acc[r * nq + lu]);
                         if a != 0 {
-                            work += kern.sub(&mut acc[r * nq + l..(r + 1) * nq], a, &ech[l]);
+                            if rec_deps {
+                                used_old[r].push(l);
+                            }
+                            work += kern.sub(&mut acc[r * nq + lu..(r + 1) * nq], a, &ech[lu]);
                         }
                     }
                 }
-                let mut out: Vec<(Option<Vec<u64>>, bool)> =
-                    residual.iter().map(|&x| (None, x)).collect();
+                let mut out: Vec<(Option<Vec<u64>>, bool, Vec<u32>)> =
+                    residual.iter().map(|&x| (None, x, Vec::new())).collect();
                 live.retain(|&r| {
                     let row = &mut acc[r * nq..(r + 1) * nq];
                     for x in row.iter_mut() {
@@ -1828,6 +2732,9 @@ pub(crate) fn eliminate(
                 });
                 for r in live {
                     out[r].0 = Some(acc[r * nq..(r + 1) * nq].to_vec());
+                    if rec_deps {
+                        out[r].2 = std::mem::take(&mut used_old[r]);
+                    }
                 }
                 (out, work)
             })
@@ -1839,12 +2746,12 @@ pub(crate) fn eliminate(
         // added before it (ascending); every residue already vanishes on
         // the older leads.
         let mut new_leads: Vec<u32> = Vec::new();
-        let mut residues: Vec<(Option<Vec<u64>>, bool)> = Vec::with_capacity(rows.len());
+        let mut residues: Vec<(Option<Vec<u64>>, bool, Vec<u32>)> = Vec::with_capacity(rows.len());
         for (out, work) in reduced {
             st.muladds += work;
             residues.extend(out);
         }
-        for (i, (acc, residual)) in residues.into_iter().enumerate() {
+        for (i, (acc, residual, mut used)) in residues.into_iter().enumerate() {
             if full_rank_exit && leads.len() + new_leads.len() == nq {
                 // The echelon filled up earlier in this chunk: the rest of
                 // it reduces to zero.
@@ -1854,10 +2761,13 @@ pub(crate) fn eliminate(
             st.residual_rows += usize::from(residual);
             let Some(mut acc) = acc else { continue };
             for &l in &new_leads {
-                let l = l as usize;
-                let a = fp.reduce(acc[l]);
+                let lu = l as usize;
+                let a = fp.reduce(acc[lu]);
                 if a != 0 {
-                    st.muladds += kern.sub(&mut acc[l..], a, &ech[l]);
+                    if rec_deps {
+                        used.push(l);
+                    }
+                    st.muladds += kern.sub(&mut acc[lu..], a, &ech[lu]);
                 }
             }
             let Some(l) = acc.iter().position(|&x| fp.reduce(x) != 0) else {
@@ -1871,6 +2781,9 @@ pub(crate) fn eliminate(
             let at = new_leads.partition_point(|&m| m < l as u32);
             new_leads.insert(at, l as u32);
             st.useful.push(rows[i] as u32);
+            if rec_deps {
+                st.useful_deps.push((l as u32, used));
+            }
             if leads.len() + new_leads.len() == nq {
                 st.full_rank_after = Some(done + i + 1);
             }
@@ -2459,6 +3372,13 @@ fn f4_tower_cached(
     let mut start = start;
     start.sort_by_key(|p| std::cmp::Reverse(p.lm().unwrap()));
 
+    if let Some(trace) = &opts.replay {
+        if let Some(dag) = &trace.compiled {
+            replay_compiled(&start, fp, opts, dag, &mut rep);
+            return finish(rep);
+        }
+    }
+
     let mut s = State {
         polys: Vec::new(),
         lm: Vec::new(),
@@ -2467,12 +3387,23 @@ fn f4_tower_cached(
         pairs: Vec::new(),
         w,
     };
+    let mut init_lms: Vec<Mono> = Vec::new();
+    let mut init_monos: Vec<Vec<Mono>> = Vec::new();
+    let mut elem_monos: Vec<Vec<Mono>> = Vec::new();
+    if opts.record_trace {
+        for p in &start {
+            init_lms.push(p.lm().unwrap());
+            init_monos.push(p.monos.clone());
+            elem_monos.push(p.monos.clone());
+        }
+    }
     for p in start {
         s.insert(Elem::from_rpoly(p), &mut rep);
     }
     // (solving_degree_max, max_cols_to_solution, steps_to_solution)
     let mut learned = (0u32, 0usize, 0usize);
     let mut trace_steps: Vec<TraceStep> = Vec::new();
+    let mut rec_steps: Vec<RecordedStep> = Vec::new();
     let mut max_cols_so_far = 0usize;
 
     let active_basis = |s: &State| -> Vec<RPoly> {
@@ -2746,6 +3677,7 @@ fn f4_tower_cached(
         let piv_leads: Vec<u32> = piv.iter().map(|d| col_of[&d.lead]).collect();
         let mut st = ElimStats {
             prune_reducers: rstep.is_some(),
+            record_deps: opts.record_trace,
             ..Default::default()
         };
         let result = eliminate(
@@ -2827,16 +3759,53 @@ fn f4_tower_cached(
             fresh_lms.sort_unstable();
         }
         if opts.record_trace {
-            let mut kept: std::collections::HashSet<(Mono, u32)> = st
+            let mut kept_rows_set: std::collections::HashSet<(Mono, u32)> = st
                 .useful
                 .iter()
                 .map(|&k| (s_list[k as usize].mult, s_list[k as usize].g))
                 .collect();
-            kept.extend(piv[n_reducers..].iter().map(|d| (d.mult, d.g)));
+            kept_rows_set.extend(piv[n_reducers..].iter().map(|d| (d.mult, d.g)));
             trace_steps.push(TraceStep {
                 degree: d,
-                kept,
+                kept: kept_rows_set,
                 fresh_lms: fresh_lms.clone(),
+            });
+
+            let base_elem_id = s.polys.len() as u32;
+            let s_useful: Vec<UsefulRecord> = st
+                .useful
+                .iter()
+                .zip(st.useful_deps)
+                .map(|(&s_idx, (ql, used_ql))| {
+                    let elem_id = if !refuted {
+                        let rank = leads.binary_search(&ql).expect("useful lead in leads");
+                        Some(base_elem_id + rank as u32)
+                    } else {
+                        None
+                    };
+                    UsefulRecord {
+                        mult: s_list[s_idx as usize].mult,
+                        g: s_list[s_idx as usize].g,
+                        q_lead_l: ql,
+                        used_q_leads: used_ql,
+                        elem_id,
+                    }
+                })
+                .collect();
+            if !refuted {
+                for f in &fresh {
+                    elem_monos.push(f.to_rpoly().monos);
+                }
+            }
+            rec_steps.push(RecordedStep {
+                degree: d,
+                cols,
+                col_of,
+                pivot_of,
+                q_col,
+                n_reducers,
+                piv: piv.iter().map(|d| (d.mult, d.g, d.lead)).collect(),
+                s_useful,
             });
         }
         if let Some(ts) = rstep {
@@ -2850,7 +3819,19 @@ fn f4_tower_cached(
         }
         if refuted {
             if opts.record_trace {
-                rep.learned = Some(F4Trace { steps: trace_steps });
+                if let Some((dag, min_steps)) =
+                    compile_refutation(ring, fp, w, &init_lms, &init_monos, &elem_monos, &rec_steps)
+                {
+                    rep.learned = Some(F4Trace {
+                        steps: min_steps,
+                        compiled: Some(Arc::new(dag)),
+                    });
+                } else {
+                    rep.learned = Some(F4Trace {
+                        steps: trace_steps,
+                        compiled: None,
+                    });
+                }
             }
             rep.inconsistent = true;
             rep.basis = unit();
@@ -4738,5 +5719,153 @@ mod tests {
             }
         }
         assert!(lazy_runs > 20 && eager_runs > 20 && cancelled > 100);
+    }
+
+    #[test]
+    fn compiled_refutation_and_basis_specialization_sound_and_fast() {
+        // Kummer tower of height t = 3 for m = 2 summands over p = 65537 (2^16 + 1).
+        let p = 65_537u64;
+        let t = 3usize;
+        let mut rules = Vec::new();
+        for _ in 0..2 {
+            let base = rules.len();
+            for j in 0..(t - 1) {
+                rules.push(SquareRule {
+                    next: Some((base + j + 1) as u8),
+                    a: 0,
+                    b: 1,
+                    c: 0,
+                    d: 0,
+                });
+            }
+            rules.push(SquareRule {
+                next: None,
+                a: 0,
+                b: 0,
+                c: 0,
+                d: 1,
+            });
+        }
+        let ring = TowerRing::new(p, rules, 0);
+        // S_3(3·y_0, 3·y_3, xr) on y^2 = x^3 + 7x + 11.
+        let (a, b, g) = (7u64, 11u64, 3u64);
+        let build_sys = |xr: u64| -> Vec<RPoly> {
+            // (g y0 - g y3)^2 xr^2 - 2[(g y0 + g y3)(g^2 y0 y3 + a) + 2b] xr + (g^2 y0 y3 - a)^2 - 4b(g y0 + g y3)
+            let n = ring.n_vars();
+            let var = |i: usize, c: u64| {
+                let mut e = vec![0u32; n];
+                e[i] = 1;
+                vec![(e, c)]
+            };
+            let x1 = ring.from_raw(&var(0, g));
+            let x2 = ring.from_raw(&var(t, g));
+            let mut terms = Vec::new();
+            // Sample on exact symbolic evaluation through from_raw:
+            let g2 = g * g % p;
+            let xr2 = xr * xr % p;
+            let z = vec![0u32; n];
+            let mut e0 = z.clone();
+            e0[0] = 1;
+            let mut e1 = z.clone();
+            e1[t] = 1;
+            let mut e01 = z.clone();
+            e01[0] = 1;
+            e01[t] = 1;
+            let mut e0_2 = z.clone();
+            e0_2[0] = 2;
+            let mut e1_2 = z.clone();
+            e1_2[t] = 2;
+            let mut e0_2_1 = z.clone();
+            e0_2_1[0] = 2;
+            e0_2_1[t] = 1;
+            let mut e0_1_2 = z.clone();
+            e0_1_2[0] = 1;
+            e0_1_2[t] = 2;
+            let mut e01_2 = z.clone();
+            e01_2[0] = 2;
+            e01_2[t] = 2;
+
+            // (x1 - x2)^2 xr^2 = g^2 xr^2 (y0^2 - 2 y0 y3 + y3^2)
+            let c_sq = g2 * xr2 % p;
+            terms.push((e0_2, c_sq));
+            terms.push((e1_2, c_sq));
+            terms.push((e01.clone(), (p - 2 * c_sq % p) % p));
+
+            // -2[(g(y0+y3))(g^2 y0 y3 + a) + 2b] xr
+            let neg2xr = (p - 2 * xr % p) % p;
+            let cg3 = neg2xr * (g * g2 % p) % p;
+            terms.push((e0_2_1, cg3));
+            terms.push((e0_1_2, cg3));
+            let cga = neg2xr * (g * a % p) % p;
+            terms.push((e0.clone(), cga));
+            terms.push((e1.clone(), cga));
+            terms.push((z.clone(), neg2xr * (2 * b % p) % p));
+
+            // (g^2 y0 y3 - a)^2 - 4b g(y0 + y3)
+            terms.push((e01_2, g2 * g2 % p));
+            terms.push((e01, (p - 2 * g2 % p * a % p) % p));
+            terms.push((z, a * a % p));
+            let neg4bg = (p - 4 * b % p * g % p) % p;
+            terms.push((e0, neg4bg));
+            terms.push((e1, neg4bg));
+            let _ = (x1, x2);
+            vec![ring.from_raw(&terms)]
+        };
+
+        // Calibration on xr = 12345 (generic UNSAT).
+        let mut learn_opts = TowerF4Options::new(12);
+        learn_opts.record_trace = true;
+        let cal = f4_tower(&build_sys(12_345), &ring, &learn_opts);
+        assert!(cal.inconsistent);
+        let trace = Arc::new(cal.learned.expect("learned trace"));
+        assert!(trace.compiled.is_some(), "compiled minimal-1-witness DAG");
+
+        // Replay across 32 random targets: every replay refutation MUST agree with plain F4,
+        // and replay muladds must be strictly smaller than plain F4 muladds.
+        let mut replay_opts = TowerF4Options::new(12);
+        replay_opts.replay = Some(trace);
+        let mut refuted = 0usize;
+        for xr in 100..132u64 {
+            let sys = build_sys(xr);
+            let plain = f4_tower(&sys, &ring, &TowerF4Options::new(12));
+            let fast = f4_tower(&sys, &ring, &replay_opts);
+            if fast.inconsistent {
+                assert!(plain.inconsistent, "soundness violated at xr = {xr}");
+                assert!(
+                    fast.muladds <= plain.muladds,
+                    "fast muladds {} > plain {}",
+                    fast.muladds,
+                    plain.muladds
+                );
+                refuted += 1;
+            }
+        }
+        assert!(refuted >= 28, "Schwartz-Zippel completeness: {refuted}/32");
+
+        // Test parent-to-child specialization helpers (`specialize_basis_at_var` & `specialize_drop_top_var`).
+        let sys_sat_probe = build_sys(500);
+        let mut low_opts = TowerF4Options::new(3);
+        low_opts.max_degree = 3;
+        let parent_rep = f4_tower(&sys_sat_probe, &ring, &low_opts);
+        if !parent_rep.inconsistent {
+            let top_var = t - 1;
+            for root in [1u64, p - 1] {
+                let (child_in, _) = ring.specialize_basis_at_var(
+                    &parent_rep.basis,
+                    top_var,
+                    root,
+                    TowerWeights::UNIT,
+                );
+                let r_keep = f4_tower(&child_in, &ring, &TowerF4Options::new(12));
+                let (c_ring, c_basis, _, _) = ring.specialize_drop_top_var(
+                    &parent_rep.basis,
+                    top_var,
+                    root,
+                    TowerWeights::UNIT,
+                );
+                let r_drop = f4_tower(&c_basis, &c_ring, &TowerF4Options::new(12));
+                assert_eq!(r_keep.inconsistent, r_drop.inconsistent);
+            }
+        }
     }
 }
