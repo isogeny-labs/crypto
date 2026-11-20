@@ -161,10 +161,21 @@ The null changes only the global wiring of interior ports while preserving the v
     least the fixed fraction `1 / (48 * 4^(n+1) * C_n)` of the field-sized
     scale. Thus canonical nonvanishing, average energy, and an explicit
     constant-density coverage fraction are closed for the bounded `A = 0`
-    family. Binding the decomposition machine's labels to the row collector,
-    independent-relation collection and restart probabilities,
-    expected-runtime assembly, and bit-complexity specialization remain open;
-    no subexponential ECDLP algorithm is yet proved. [pcc:unverified]
+    family. Lean now also proves that dilation preserves the concrete
+    factor-base cardinality, canonically enumerates it by `Fin f`, converts
+    every checked decomposition into exact row labels, and proves that the
+    resulting stateless oracle accepts exactly the bounded coverage set and
+    that every returned row sums to its query. The production endpoint
+    `zmodCanonical_oneTwelfth_labeled_oracle_coverage` packages label
+    dimension, explicit acceptance density, and the collector's `hOrc`
+    equation simultaneously. The targeted build completes 9,136 jobs and the
+    repository proof gate reports `PASS 493 thm 0 trusted`. This closes the
+    semantic label/coverage interface, but the oracle is defined by finite
+    choice and is not an executable cost theorem. Realizing it by the pinned
+    decomposition machine with a preserved time bound, composing it directly
+    with the separate v2 collector package, independent-relation and restart
+    assembly, and bit-complexity specialization remain open; no
+    subexponential ECDLP algorithm is yet proved. [pcc:unverified]
 16. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
 17. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
 

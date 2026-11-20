@@ -1718,3 +1718,40 @@ adaptive Chernoff collector. The next binding obligation is to decode and
 label the fixed-arity decomposition machine's output as the `Fin f` rows used
 by that collector, while preserving its machine cost. Independence, outer
 restart assembly, and bit complexity remain open. [pcc:unverified]
+
+## 2026-11-20 exact factor-base label and oracle bridge
+
+`factorBase_card_dil` proves that the point dilation is a bijection between
+the pulled-back factor base on the original curve and the concrete factor base
+on the dilated curve. `factorBase_card_eq_dilated_fb` identifies the resulting
+row-label dimension with the production `fb` cardinality exactly.
+
+`decTupleLabels` uses a canonical finite equivalence to encode every checked
+`ECDLP.L46.Dec` tuple by `Fin f`. `labeledFactorBasePoint_decTupleLabels` and
+`decTupleLabels_sum` prove exact decoding and the required row-sum equation.
+The stateless `labeledDecompositionOracle` selects one such tuple when the
+finite decomposition set is nonempty;
+`labeledDecompositionOracle_isSome_iff`,
+`labeledDecompositionOracle_sound`, and
+`labeledDecompositionOracle_acceptance_card` prove respectively exact
+acceptance, collector soundness, and zero loss between oracle acceptance and
+the previously bounded coverage event.
+
+The production theorem
+`zmodCanonical_oneTwelfth_labeled_oracle_coverage` packages, for at least one
+twelfth of all nonzero dilations, a row-label dimension of at least `|T|/2`,
+the explicit acceptance lower bound
+`p / (48 * 4^(n+1) * C_n)`, and the exact `hOrc` row equation expected by the
+checked v2 collector. The targeted command `lake build SemaevRelationSigns`
+completes 9,136 jobs. The full repository proof gate reports:
+
+```text
+PASS 493 thm 0 trusted research/tensor_boolean_breakthrough_20261031/lean
+```
+
+This is a semantic existence bridge. The oracle uses finite classical choice,
+so it does not preserve or prove the decomposition machine's running time.
+Direct composition with the separately packaged v2 `cap_bound`, an executable
+oracle realization with bit cost, independent-row success, retries, and the
+final expected-time theorem remain open. No subexponential prime-field ECDLP
+algorithm follows from this checkpoint alone. [pcc:unverified]

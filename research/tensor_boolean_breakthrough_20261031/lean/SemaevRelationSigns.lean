@@ -2833,6 +2833,175 @@ theorem linearMeanCoverageGivesConstantFraction
       ring
     _ ≤ (covered : ℝ) := coverageLower
 
+/-! ## Exact factor-base labels for the row collector -/
+
+/-- Dilation gives a cardinality-preserving bijection between the factor base
+on the original curve with the pulled-back predicate and the factor base on
+the dilated curve. -/
+theorem factorBase_card_dil
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (A B : K) (u : Kˣ) (P : K → Prop) :
+    (ECDLP.L46.fbase (ECDLP.L43.shortW A B)
+        (fun x ↦ P ((u : K) ^ 2 * x))).card =
+      (ECDLP.L46.fbase (ECDLP.L49.Eu A B u) P).card := by
+  classical
+  refine Finset.card_bij
+    (fun Q _ ↦ ECDLP.L49.dil A B u Q) ?_ ?_ ?_
+  · intro Q hQ
+    simp only [ECDLP.L46.fbase, Finset.mem_filter, Finset.mem_univ,
+      true_and] at hQ ⊢
+    obtain ⟨pointNonzero, predicateHolds⟩ := hQ
+    refine ⟨?_, ?_⟩
+    · rw [Ne, ← map_zero (ECDLP.L49.dil A B u)]
+      exact fun equality ↦
+        pointNonzero (ECDLP.L49.dil_injective A B u equality)
+    · rw [ECDLP.L49.xco_dil]
+      exact predicateHolds
+  · intro Q _ Q' _ equality
+    exact ECDLP.L49.dil_injective A B u equality
+  · intro S hS
+    obtain ⟨Q, rfl⟩ := ECDLP.L49.dil_surjective A B u S
+    refine ⟨Q, ?_, rfl⟩
+    simp only [ECDLP.L46.fbase, Finset.mem_filter, Finset.mem_univ,
+      true_and] at hS ⊢
+    obtain ⟨imageNonzero, predicateHolds⟩ := hS
+    refine ⟨?_, ?_⟩
+    · intro pointZero
+      apply imageNonzero
+      rw [pointZero, map_zero]
+    · rw [ECDLP.L49.xco_dil] at predicateHolds
+      exact predicateHolds
+
+/-- The row-label dimension on the original curve is exactly the cardinality
+of the concrete factor base on the corresponding dilated production curve. -/
+theorem factorBase_card_eq_dilated_fb
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (A B : K) (u : Kˣ) (T : Finset K) :
+    (ECDLP.L46.fbase (ECDLP.L43.shortW A B)
+        (fun x ↦ (u : K) ^ 2 * x ∈ T)).card =
+      (ECDLP.L43.fb
+        ((u : K) ^ 4 * A) ((u : K) ^ 6 * B) T).card := by
+  calc
+    (ECDLP.L46.fbase (ECDLP.L43.shortW A B)
+        (fun x ↦ (u : K) ^ 2 * x ∈ T)).card =
+        (ECDLP.L46.fbase (ECDLP.L49.Eu A B u)
+          (fun x ↦ x ∈ T)).card :=
+      factorBase_card_dil A B u (fun x ↦ x ∈ T)
+    _ = (ECDLP.L43.fb
+          ((u : K) ^ 4 * A) ((u : K) ^ 6 * B) T).card := by
+      rw [ECDLP.L46.fb_eq_fbase]
+
+/-- Canonical finite enumeration of an arbitrary factor-base finset. -/
+noncomputable def factorBaseEquivFin
+    {G : Type*} [DecidableEq G] (F : Finset G) :
+    F ≃ Fin F.card :=
+  Fintype.equivFinOfCardEq (by simp)
+
+/-- The factor-base point carrying a row index. -/
+noncomputable def labeledFactorBasePoint
+    {G : Type*} [DecidableEq G] (F : Finset G) (i : Fin F.card) : G :=
+  (factorBaseEquivFin F).symm i
+
+/-- Every member of a checked `Dec` tuple lies in the concrete factor-base
+finset used to define that decomposition. -/
+theorem decTuple_mem_factorBase
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) (P : K → Prop) (n : ℕ)
+    (R : W.Point) (t : Fin (n + 1) → W.Point)
+    (ht : t ∈ ECDLP.L46.Dec W P n R) (j : Fin (n + 1)) :
+    t j ∈ ECDLP.L46.fbase W P := by
+  have tupleMembership := (Finset.mem_filter.mp ht).1
+  have everyMember : ∀ i, t i ∈ ECDLP.L46.fbase W P := by
+    simpa [Fintype.mem_piFinset] using tupleMembership
+  exact everyMember j
+
+/-- Convert a checked point tuple into the exact `Fin f` labels expected by
+the relation-row format. -/
+noncomputable def decTupleLabels
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) (P : K → Prop) (n : ℕ)
+    (R : W.Point) (t : Fin (n + 1) → W.Point)
+    (ht : t ∈ ECDLP.L46.Dec W P n R) :
+    Fin (n + 1) → Fin (ECDLP.L46.fbase W P).card := fun j ↦
+  factorBaseEquivFin (ECDLP.L46.fbase W P)
+    ⟨t j, decTuple_mem_factorBase W P n R t ht j⟩
+
+/-- Decoding a generated label returns the original tuple point. -/
+theorem labeledFactorBasePoint_decTupleLabels
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) (P : K → Prop) (n : ℕ)
+    (R : W.Point) (t : Fin (n + 1) → W.Point)
+    (ht : t ∈ ECDLP.L46.Dec W P n R) (j : Fin (n + 1)) :
+    labeledFactorBasePoint (ECDLP.L46.fbase W P)
+        (decTupleLabels W P n R t ht j) = t j := by
+  simp [labeledFactorBasePoint, decTupleLabels, factorBaseEquivFin]
+
+/-- The multiplicity labels obtained from a `Dec` witness are a sound
+relation-row answer: their factor-base points sum to the queried point. -/
+theorem decTupleLabels_sum
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) (P : K → Prop) (n : ℕ)
+    (R : W.Point) (t : Fin (n + 1) → W.Point)
+    (ht : t ∈ ECDLP.L46.Dec W P n R) :
+    ∑ j, labeledFactorBasePoint (ECDLP.L46.fbase W P)
+        (decTupleLabels W P n R t ht j) = R := by
+  have tupleRelation := (Finset.mem_filter.mp ht).2.2
+  simpa only [labeledFactorBasePoint_decTupleLabels] using tupleRelation
+
+/-- Stateless exact oracle that returns the canonical labels of one checked
+generic decomposition when one exists. -/
+noncomputable def labeledDecompositionOracle
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) (P : K → Prop) (n : ℕ)
+    (R : W.Point) :
+    Option (Fin (n + 1) → Fin (ECDLP.L46.fbase W P).card) :=
+  if h : (ECDLP.L46.Dec W P n R).Nonempty then
+    some (decTupleLabels W P n R h.choose h.choose_spec)
+  else
+    none
+
+/-- The labeled oracle accepts exactly the points counted by `Dec`. -/
+theorem labeledDecompositionOracle_isSome_iff
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) (P : K → Prop) (n : ℕ)
+    (R : W.Point) :
+    (labeledDecompositionOracle W P n R).isSome = true ↔
+      (ECDLP.L46.Dec W P n R).Nonempty := by
+  classical
+  simp [labeledDecompositionOracle]
+
+/-- Every answer returned by the labeled oracle satisfies the row collector's
+decomposition-soundness equation. -/
+theorem labeledDecompositionOracle_sound
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) (P : K → Prop) (n : ℕ)
+    (R : W.Point)
+    (labels : Fin (n + 1) → Fin (ECDLP.L46.fbase W P).card)
+    (answer : labeledDecompositionOracle W P n R = some labels) :
+    ∑ j, labeledFactorBasePoint (ECDLP.L46.fbase W P) (labels j) = R := by
+  classical
+  unfold labeledDecompositionOracle at answer
+  split at answer <;> rename_i h
+  · injection answer with labelsIdentity
+    subst labelsIdentity
+    exact decTupleLabels_sum W P n R h.choose h.choose_spec
+  · simp at answer
+
+/-- Consequently the oracle acceptance count is definitionally tied to the
+coverage set, with no probabilistic or representation loss. -/
+theorem labeledDecompositionOracle_acceptance_card
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) (P : K → Prop) (n : ℕ) :
+    (Finset.univ.filter fun R : W.Point =>
+        (labeledDecompositionOracle W P n R).isSome = true).card =
+      (Finset.univ.filter fun R : W.Point =>
+        (ECDLP.L46.Dec W P n R).Nonempty).card := by
+  classical
+  apply congrArg Finset.card
+  ext R
+  simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+  exact labeledDecompositionOracle_isSome_iff W P n R
+
 /-- Production coverage endpoint with no free average-energy parameter.  For
 the minimal-root factor base, the checked linear `Mdil` estimate supplies the
 explicit denominator `12 * C_n * p`, where `C_n` depends only on the fixed
@@ -2927,6 +3096,81 @@ theorem zmodCanonical_oneTwelfth_linear_decomposition_coverage
         (fun x => (u : ZMod modulus) ^ 2 * x ∈ T) n R).Nonempty).card)
     (Fact.out : modulus.Prime).pos constantPositive rootCovers
     factorBaseLarge coverageLower
+
+/-- Production endpoint in the exact finite-label format used by a relation
+row collector.  For at least one twelfth of all dilations, the row-label
+dimension contains at least half the x-coordinate factor base, the stateless
+oracle accepts the same explicitly bounded set of curve points, and every
+returned label tuple decodes to a point relation summing to the query. -/
+theorem zmodCanonical_oneTwelfth_labeled_oracle_coverage
+    (modulus X n : ℕ) [Fact modulus.Prime]
+    (hn : 1 ≤ n)
+    (hChar : ringChar (ZMod modulus) ≠ 2)
+    (twoNonzeroBase : (2 : ZMod modulus) ≠ 0)
+    (B : ZMod modulus)
+    [(shortCharacterCurve 0 0 B).IsElliptic]
+    (hDelta : (ECDLP.L43.shortW (0 : ZMod modulus) B).Δ ≠ 0)
+    (cubicNonsingular : (27 : ZMod modulus) * B ^ 2 ≠ 0)
+    (BNonzero : B ≠ 0)
+    (T : Finset (ZMod modulus))
+    (factorBasePositive : ∀ value ∈ T, 0 < ZMod.val value)
+    (factorBaseBound : ∀ value ∈ T, ZMod.val value ≤ X)
+    (TArity : 12 * n < T.card)
+    (fieldLarge : 324 ≤ Fintype.card (ZMod modulus))
+    (factorBaseAtLeastTwo : 2 ≤ T.card)
+    (minimalRoot : (T.card - 1) ^ (n + 1) < modulus)
+    (rootCovers : modulus ≤ T.card ^ (n + 1))
+    (intervalShort : 3 * X < modulus)
+    (arityBelow :
+      3 * (2 ^ (2 * (n + 1)) * (2 * (n + 1))) ^ 2 < modulus) :
+    ∃ Good : Finset (ZMod modulus)ˣ,
+      Fintype.card (ZMod modulus)ˣ ≤ 12 * Good.card ∧
+      ∀ u ∈ Good,
+        T.card ≤ 2 *
+          (ECDLP.L46.fbase
+            (ECDLP.L43.shortW (0 : ZMod modulus) B)
+            (fun x ↦ (u : ZMod modulus) ^ 2 * x ∈ T)).card ∧
+        (modulus : ℝ) /
+            (48 * 4 ^ (n + 1) * zmodCanonicalEnergyLinearConstant n) ≤
+          (Finset.univ.filter fun R :
+              (ECDLP.L43.shortW (0 : ZMod modulus) B).Point ↦
+            (labeledDecompositionOracle
+              (ECDLP.L43.shortW (0 : ZMod modulus) B)
+              (fun x ↦ (u : ZMod modulus) ^ 2 * x ∈ T) n R).isSome =
+                true).card ∧
+        ∀ (R : (ECDLP.L43.shortW (0 : ZMod modulus) B).Point)
+          (labels : Fin (n + 1) →
+            Fin (ECDLP.L46.fbase
+              (ECDLP.L43.shortW (0 : ZMod modulus) B)
+              (fun x ↦ (u : ZMod modulus) ^ 2 * x ∈ T)).card),
+          labeledDecompositionOracle
+              (ECDLP.L43.shortW (0 : ZMod modulus) B)
+              (fun x ↦ (u : ZMod modulus) ^ 2 * x ∈ T) n R =
+            some labels →
+          ∑ j, labeledFactorBasePoint
+              (ECDLP.L46.fbase
+                (ECDLP.L43.shortW (0 : ZMod modulus) B)
+                (fun x ↦ (u : ZMod modulus) ^ 2 * x ∈ T)) (labels j) = R := by
+  obtain ⟨Good, goodCard, goodProperty⟩ :=
+    zmodCanonical_oneTwelfth_linear_decomposition_coverage
+      modulus X n hn hChar twoNonzeroBase B hDelta cubicNonsingular
+      BNonzero T factorBasePositive factorBaseBound TArity fieldLarge
+      factorBaseAtLeastTwo minimalRoot rootCovers intervalShort arityBelow
+  refine ⟨Good, goodCard, ?_⟩
+  intro u hu
+  obtain ⟨factorBaseLarge, _energyCoverage, constantCoverage⟩ :=
+    goodProperty u hu
+  have cardIdentity :=
+    factorBase_card_eq_dilated_fb (0 : ZMod modulus) B u T
+  refine ⟨?_, ?_, ?_⟩
+  · rw [cardIdentity]
+    exact factorBaseLarge
+  · rw [labeledDecompositionOracle_acceptance_card]
+    exact constantCoverage
+  · intro R labels answer
+    exact labeledDecompositionOracle_sound
+      (ECDLP.L43.shortW (0 : ZMod modulus) B)
+      (fun x ↦ (u : ZMod modulus) ^ 2 * x ∈ T) n R labels answer
 
 set_option maxHeartbeats 200000
 
