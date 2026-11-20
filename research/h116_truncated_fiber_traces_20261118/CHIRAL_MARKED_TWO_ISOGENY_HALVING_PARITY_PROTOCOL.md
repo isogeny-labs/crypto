@@ -1,6 +1,6 @@
 # H116 chiral marked two-isogeny halving-parity protocol
 
-Protocol ID: `H116-CHIRAL-MARKED-TWO-ISOGENY-HALVING-PARITY-001`
+Protocol ID: `H116-CHIRAL-MARKED-TWO-ISOGENY-HALVING-PARITY-002`
 
 Filed after the binary-quartic `I,J` characters were measured null and before
 evaluating any marked-kernel halving bit against scalar parity.
@@ -58,17 +58,19 @@ E'_T: y^2=x^3-2*A*x^2+(A^2-4*B)*x,
 B'=A^2-4*B=81*disc(q_1)*disc(q_2).
 ```
 
-Retain two total Boolean features per model: whether `T` has a rational half
-on `E_T(F_p)`, followed by whether the dual-kernel point has a rational half
-on `E'_T(F_p)`.  The eight-bit order is therefore
+For each smooth model, retain two Boolean features: whether `T` has a rational
+half on `E_T(F_p)`, followed by whether the dual-kernel point has a rational
+half on `E'_T(F_p)`.  A selected feature abstains when its branch-pair quartic
+is singular.  This is the same singular-model convention as the frozen trace
+and `I,J` panels.  The eight-bit order is therefore
 
 ```text
 (model0,T/2), (model0,T'/2), ..., (model3,T/2), (model3,T'/2).
 ```
 
 Test all 256 feature xors, optionally complemented: 512 affine Boolean rules
-predicting canonical scalar parity on the 1,520 nonidentity targets of the
-five frozen discovery curves.
+predicting canonical scalar parity on their covered subset of the 1,520
+nonidentity targets of the five frozen discovery curves.
 
 ## Frozen controls
 
@@ -104,5 +106,5 @@ The fixed branch construction, quartic invariants, resolvent root,
 two-isogeny coefficients and bounded halving test cost polynomial time in
 `log p` using finite-field arithmetic and division-polynomial/root tests.
 Thus a proved generic rule would be polynomial-time and hence
-subexponential.  A finite exact fit is only a candidate.  A null closes only
+subexponential.  A finite total exact fit is only a candidate.  A null closes only
 this eight-bit affine marked-halving family. [pcc:unverified]

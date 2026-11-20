@@ -216,6 +216,9 @@ mod frozen {
             let mut value = polarity;
             for (feature, &bit) in target.kummer_bits.iter().enumerate() {
                 if mask & (1_u16 << feature) != 0 {
+                    if bit < 0 {
+                        return 3;
+                    }
                     value ^= bit as u8;
                 }
             }
@@ -1094,11 +1097,12 @@ mod frozen {
                 targets.iter().map(|target| target.parity).collect()
             };
             if kummer_panel {
-                if targets.iter().any(|target| {
-                    target.kummer_bits.iter().any(|&bit| bit != 0 && bit != 1)
-                }) {
-                    return Err("marked two-isogeny feature abstention".to_string());
-                }
+                let marked_two_isogeny_nonabstaining_features: usize = targets
+                    .iter()
+                    .map(|target| {
+                        target.kummer_bits.iter().filter(|&&bit| bit >= 0).count()
+                    })
+                    .sum();
                 let marked_two_isogeny_true_features: usize = targets
                     .iter()
                     .map(|target| {
@@ -1185,7 +1189,7 @@ mod frozen {
                 let excess = 2_i64 * selected.matches as i64 - selected.coverage as i64;
                 let json = format!(
                     concat!(
-                        "{{\n  \"schema\":\"h116-chiral-marked-two-isogeny-halving-parity/v1\",\n",
+                        "{{\n  \"schema\":\"h116-chiral-marked-two-isogeny-halving-parity/v2\",\n",
                         "  \"targets\":{},\n  \"curves\":{},\n  \"quartic_models\":{},\n",
                         "  \"halving_features\":{},\n  \"rules\":{},\n",
                         "  \"reconstruction_checks\":{},\n  \"discriminant_checks\":{},\n",
@@ -1195,6 +1199,7 @@ mod frozen {
                         "  \"marked_two_isogeny_halving_formula_checks\":{},\n",
                         "  \"marked_two_isogeny_group_order_checks\":{},\n",
                         "  \"marked_two_isogeny_point_checks\":{},\n",
+                        "  \"marked_two_isogeny_nonabstaining_features\":{},\n",
                         "  \"marked_two_isogeny_true_features\":{},\n",
                         "  \"marked_two_isogeny_distinguishing_targets\":{},\n",
                         "  \"planted_control_matches\":{},\n  \"selected_mask\":{},\n",
@@ -1220,6 +1225,7 @@ mod frozen {
                     2 * marked_two_isogeny_checks,
                     2 * marked_two_isogeny_checks,
                     marked_two_isogeny_point_checks,
+                    marked_two_isogeny_nonabstaining_features,
                     marked_two_isogeny_true_features,
                     marked_two_isogeny_distinguishing_targets,
                     TARGETS,
