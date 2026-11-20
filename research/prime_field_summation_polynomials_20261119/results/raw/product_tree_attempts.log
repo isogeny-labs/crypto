@@ -1,0 +1,9 @@
+Attempted command:
+/usr/bin/time -v ./build/semaev_lab coeff-benchmark --prime 1000003 --a 2 --b 3 --seed 6000285944033488934 --min-degree 2 --max-degree 4096 --bench-cases 3 --bench-repeats 2 --output results/optimization/product_tree_p1000003.csv
+
+Observed result:
+/bin/bash: line 2: /usr/bin/time: No such file or directory
+
+Exit status: 127
+The missing wrapper did not launch the benchmark. The benchmark was rerun without
+this optional resource-measurement wrapper.
