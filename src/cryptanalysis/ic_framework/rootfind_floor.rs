@@ -9,7 +9,10 @@
 //! 2. **Abscissa only, Montgomery-resident** — form `x(R ∓ F_i)` in
 //!    Montgomery form and leave `y` unfinished until a filter hit.
 //! 3. **Word-blocked Bloom filter** — 16 bits a key in front of the
-//!    exact abscissa map, since nearly every probe misses.
+//!    exact abscissa map, since nearly every probe misses. For `m = 3`
+//!    the Bloom sits on Montgomery images of the PairTable's folded keys;
+//!    a pass looks up the PairTable directly (no second FastMap of every
+//!    pair — that doubled prepare wall and erased the e2e gain).
 //!
 //! New id: never change what `rootfind-subtract` counts. Classification
 //! is constant-factor engineering (wall / field work); charged `S` matches
@@ -86,9 +89,9 @@ pub struct RootfindFloorOracle<'i> {
     reps: Vec<FloorRep>,
     /// `m = 2`: Montgomery abscissa → (plus, minus) base indices.
     x_map: FastMap<(u32, u32)>,
-    /// `m = 3`: Montgomery pair-sum abscissa → first witness `(i, j)`.
-    pair_map: FastMap<(u32, u32)>,
     bloom: Option<WordBloom>,
+    /// `m = 3`: negation-folded pair table; bloom-pass probes look up here
+    /// (no parallel Montgomery witness map — that doubled prepare wall).
     table: Option<PairTable>,
     diffs: Vec<u64>,
     degenerate: Vec<bool>,
@@ -109,7 +112,6 @@ impl<'i> RootfindFloorOracle<'i> {
             field: None,
             reps: Vec::new(),
             x_map: fast_map(0),
-            pair_map: fast_map(0),
             bloom: None,
             table: None,
             diffs: Vec::new(),
@@ -216,34 +218,14 @@ impl DecompositionOracle<PrimeCurve> for RootfindFloorOracle<'_> {
         } else {
             let table = PairTable::build_negation_folded(ctx.group, fb);
             ops.merge(table.build_ops);
-            // Mirror the table's affine keys into Montgomery form for the
-            // x-only probe path. Witnesses match the table's first insert.
-            let mut pair_map: FastMap<(u32, u32)> = fast_map(table.entries as usize + 1);
-            let g = ctx.group;
-            let groups: Vec<&Vec<usize>> = fb
-                .abscissa_list
-                .iter()
-                .map(|x| fb.x_index.get(x).expect("listed abscissa indexed"))
-                .collect();
-            let a = groups.len();
-            for ai in 0..a {
-                let i = groups[ai][0];
-                for group in groups.iter().skip(ai) {
-                    for &j in group.iter() {
-                        let s = g.add(&mut GroupOps::default(), fb.points[i], fb.points[j]);
-                        if g.is_identity(&s) {
-                            continue;
-                        }
-                        let xm = f.to_mont(s.x);
-                        pair_map.entry(xm).or_insert((i as u32, j as u32));
-                    }
-                }
-            }
-            bloom = WordBloom::new(pair_map.len().max(1));
-            for &k in pair_map.keys() {
-                bloom.insert(k);
-            }
-            self.pair_map = pair_map;
+            // Bloom over Montgomery abscissae of the table's folded keys
+            // (x+1 → to_mont(x)). Misses skip from_mont; hits look up the
+            // PairTable directly — no second FastMap of every entry.
+            let n = table.entries.max(1) as usize;
+            bloom = WordBloom::new(n);
+            table.for_each_folded_key(|folded| {
+                bloom.insert(f.to_mont(folded.wrapping_sub(1)));
+            });
             self.table = Some(table);
         }
         self.bloom = Some(bloom);
@@ -266,13 +248,11 @@ impl DecompositionOracle<PrimeCurve> for RootfindFloorOracle<'_> {
         if let Some(b) = &self.bloom {
             out.insert("bloom_words".to_string(), b.words.len() as u64);
         }
-        let map_entries = if self.m == 2 {
-            self.x_map.len()
-        } else {
-            self.pair_map.len()
-        } as u64;
-        if map_entries > 0 {
-            out.insert("floor_map_entries".to_string(), map_entries);
+        if self.m == 2 && !self.x_map.is_empty() {
+            out.insert("floor_map_entries".to_string(), self.x_map.len() as u64);
+        }
+        if let Some(t) = &self.table {
+            out.insert("floor_table_entries".to_string(), t.entries);
         }
         table_counted(out)
     }
@@ -445,13 +425,15 @@ impl RootfindFloorOracle<'_> {
                 None
             }
             _ => {
-                let &(i, j) = self.pair_map.get(&x3)?;
-                let (i, j) = (i as usize, j as usize);
-                // Finish y only to resolve the sign against ±T.
+                // Bloom already passed: one from_mont → folded key → table.
                 let x_aff = f.from_mont(x3);
+                ops.field_ops.muls += 1;
+                let table = self.table.as_ref()?;
+                let (i, j) = table.lookup_folded(x_aff.wrapping_add(1))?;
+                // Finish y only to resolve the sign against ±T.
                 let y3 = f.sub(f.mul(lam, f.sub(f.to_mont(point.x), x3)), yr);
                 let y_aff = f.from_mont(y3);
-                ops.field_ops.muls += 3; // from_mont×2 + λ·Δx (to_mont of xr already done)
+                ops.field_ops.muls += 2; // λ·Δx + from_mont(y)
                 let t = PrimePoint::affine(x_aff, y_aff);
                 let s = g.add(ops, fb.points[i], fb.points[j]);
                 if s == t {

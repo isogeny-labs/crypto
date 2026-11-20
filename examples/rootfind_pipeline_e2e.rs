@@ -27,6 +27,7 @@ use crypto_lib::cryptanalysis::ic_boundary::{
 };
 use crypto_lib::cryptanalysis::ic_framework::plugins::{PrimeAbscissaBase, RootfindSubtractOracle};
 use crypto_lib::cryptanalysis::ic_framework::rootfind_floor::RootfindFloorOracle;
+use crypto_lib::cryptanalysis::ic_framework::rootfind_gpu::RootfindSubtractGpuOracle;
 use crypto_lib::cryptanalysis::ic_framework::rootfind_kmitm::RootfindKMitmOracle;
 use crypto_lib::cryptanalysis::ic_framework::stages::{
     DecompositionOracle, InstanceCtx, Params, Targets,
@@ -65,9 +66,14 @@ fn report_to_arm(arm: &str, r: &RunReport) -> ArmResult {
     }
 }
 
+fn parse_targets(name: &str) -> Result<Targets, String> {
+    Targets::parse(name)
+}
+
 fn run_standard(
     arm: &str,
     oracle_spec: &str,
+    targets: Targets,
     inst: &crypto_lib::cryptanalysis::ic_boundary::PrimeInstance,
     size: usize,
     seed: u64,
@@ -91,7 +97,7 @@ fn run_standard(
         factor_base: "prime-abscissa".into(),
         oracle: name.clone(),
         oracle_params: params,
-        targets: Targets::Walk,
+        targets,
         max_trials: 2_000_000,
         seed,
         ..Default::default()
@@ -126,6 +132,18 @@ fn run_standard(
         }
         "rootfind-kmitm" => {
             let mut o = RootfindKMitmOracle::new_prime(m, inst);
+            run_pipeline(
+                &ctx,
+                &spec,
+                &base,
+                &mut o,
+                planted,
+                &Calibration::default(),
+                None,
+            )?
+        }
+        "rootfind-subtract-gpu" => {
+            let mut o = RootfindSubtractGpuOracle::new(m, inst);
             run_pipeline(
                 &ctx,
                 &spec,
@@ -308,10 +326,11 @@ fn main() -> Result<(), String> {
     let size: usize = get("--size", "24").parse().unwrap();
     let repeats: usize = get("--repeats", "3").parse().unwrap();
     let seed0: u64 = get("--seed", "59297").parse().unwrap();
+    let panel = get("--panel", "all"); // all | breakthrough
 
     let inst = prime_instance_for(bits, seed0);
     println!(
-        "rootfind pipeline e2e  bits={bits} r={} |Fx|≈{size} repeats={repeats}  [pcc:unverified]",
+        "rootfind pipeline e2e  bits={bits} r={} |Fx|≈{size} repeats={repeats} panel={panel}  [pcc:unverified]",
         inst.r
     );
     println!("classification: engineering; fail-closed verify; no security claim");
@@ -331,6 +350,7 @@ fn main() -> Result<(), String> {
     let mut all_rows = Vec::new();
     let mut summary = Vec::new();
 
+    if panel != "breakthrough" {
     for &(arm, spec) in standard_arms {
         let mut walls = Vec::new();
         let mut decomp_walls = Vec::new();
@@ -339,7 +359,7 @@ fn main() -> Result<(), String> {
         for rep in 0..repeats {
             let seed = seed0.wrapping_add(rep as u64 * 0x9E37);
             let planted = 1 + (seed % (inst.r - 1));
-            let row = run_standard(arm, spec, &inst, size, seed, planted)?;
+            let row = run_standard(arm, spec, Targets::Walk, &inst, size, seed, planted)?;
             if row.verified {
                 ok += 1;
             }
@@ -445,12 +465,15 @@ fn main() -> Result<(), String> {
             "  {arm:<18} MEDIAN wall={med_wall:.4}s decomp={med_decomp:.4}s verified={ok}/{repeats}"
         );
     }
+    } // end panel != breakthrough for standard + threaded cold arms
 
     // Amortized multi-DLP: prepare once, solve many planted logs (relation
     // phase dominates). Shows floor / thread gains when setup is shared.
     let multi_n: usize = get("--multi", "16").parse().unwrap();
-    println!("\n## Amortized multi-DLP (prepare once, {multi_n} planted logs)");
     let mut amort = Vec::new();
+    let mut thr_amort = Vec::new();
+    if panel != "breakthrough" {
+    println!("\n## Amortized multi-DLP (prepare once, {multi_n} planted logs)");
     for &(arm_name, oracle_spec) in &[
         ("subtract:m=3", "rootfind-subtract:m=3"),
         ("floor:m=3", "rootfind-floor:m=3"),
@@ -500,7 +523,8 @@ fn main() -> Result<(), String> {
         for i in 0..multi_n {
             let seed = seed0.wrapping_add(10_000 + i as u64 * 0x9E37);
             let planted = 1 + (seed % (inst.r - 1));
-            let row = run_standard(arm_name, oracle_spec, &inst, size, seed, planted)?;
+            let row =
+                run_standard(arm_name, oracle_spec, Targets::Walk, &inst, size, seed, planted)?;
             if row.verified {
                 ok += 1;
             }
@@ -542,7 +566,6 @@ fn main() -> Result<(), String> {
     let t_prep = Instant::now();
     shared.prepare(&prep_ctx, &fb, &params, &mut GroupOps::default())?;
     let shared_prep_s = t_prep.elapsed().as_secs_f64();
-    let mut thr_amort = Vec::new();
     for threads in [1usize, 2, 4] {
         let t_all = Instant::now();
         let mut ok = 0usize;
@@ -588,15 +611,145 @@ fn main() -> Result<(), String> {
             "verified": ok,
         }));
     }
+    } // end panel != breakthrough for amort + shared-prepare
+
+    // Breakthrough panel: AVX-512 IFMA native sweep + walk-prime batch
+    // (PLAN lever 2) vs floor / subtract / kmitm:m=4 on the same instance.
+    println!("\n## Breakthrough panel (IFMA + walk-prime-batch vs best arms)");
+    // Default: full panel. `--breakthrough-focus prepare` skips
+    // prepare-bound kmitm:m=4 and IFMA arms for a fast floor-vs-subtract
+    // prepare/wall check (the A≥256 e2e bottleneck).
+    let focus = get("--breakthrough-focus", "full");
+    let breakthrough_arms: &[(&str, &str, &str)] = if focus == "prepare" {
+        &[
+            ("subtract:m=3/walk", "rootfind-subtract:m=3", "walk"),
+            (
+                "subtract:m=3/batch8",
+                "rootfind-subtract:m=3",
+                "walk-prime-batch-8",
+            ),
+            ("floor:m=3/walk", "rootfind-floor:m=3", "walk"),
+            ("floor:m=3/batch8", "rootfind-floor:m=3", "walk-prime-batch-8"),
+        ]
+    } else {
+        &[
+            ("subtract:m=3/walk", "rootfind-subtract:m=3", "walk"),
+            (
+                "subtract:m=3/batch8",
+                "rootfind-subtract:m=3",
+                "walk-prime-batch-8",
+            ),
+            ("floor:m=3/walk", "rootfind-floor:m=3", "walk"),
+            ("floor:m=3/batch8", "rootfind-floor:m=3", "walk-prime-batch-8"),
+            ("kmitm:m=4/walk", "rootfind-kmitm:m=4", "walk"),
+            (
+                "ifma:m=3/batch8",
+                "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+                "walk-prime-batch-8",
+            ),
+            (
+                "ifma:m=3/batch16",
+                "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+                "walk-prime-batch-16",
+            ),
+            (
+                "ifma:m=3/batch256",
+                "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+                "walk-prime-batch-256",
+            ),
+            (
+                "native:m=3/batch8",
+                "rootfind-subtract-gpu:m=3,worker=native,threads=4",
+                "walk-prime-batch-8",
+            ),
+        ]
+    };
+    let mut breakthrough = Vec::new();
+    for &(arm, spec, tgt_name) in breakthrough_arms {
+        let targets = match parse_targets(tgt_name) {
+            Ok(t) => t,
+            Err(e) => {
+                println!("  {arm:<22} SKIP parse: {e}");
+                continue;
+            }
+        };
+        let mut walls = Vec::new();
+        let mut decomp_walls = Vec::new();
+        let mut ok = 0usize;
+        let mut last_s = 0.0f64;
+        let mut err: Option<String> = None;
+        for rep in 0..repeats {
+            let seed = seed0.wrapping_add(rep as u64 * 0x9E37);
+            let planted = 1 + (seed % (inst.r - 1));
+            match run_standard(arm, spec, targets, &inst, size, seed, planted) {
+                Ok(row) => {
+                    if row.verified {
+                        ok += 1;
+                    }
+                    walls.push(row.wall_s);
+                    decomp_walls.push(row.decomp_wall_s);
+                    last_s = row.s;
+                    println!(
+                        "  {arm:<22} rep={rep} wall={:.4}s decomp={:.4}s S={:.3} targets={} verified={}",
+                        row.wall_s, row.decomp_wall_s, row.s, row.targets, row.verified
+                    );
+                    all_rows.push(json!({
+                        "arm": arm,
+                        "mode": "breakthrough",
+                        "targets": tgt_name,
+                        "rep": rep,
+                        "wall_s": row.wall_s,
+                        "decomp_wall_s": row.decomp_wall_s,
+                        "setup_wall_s": row.setup_wall_s,
+                        "s": row.s,
+                        "targets_tried": row.targets,
+                        "relations": row.relations,
+                        "verified": row.verified,
+                    }));
+                }
+                Err(e) => {
+                    err = Some(e);
+                    break;
+                }
+            }
+        }
+        if let Some(e) = err {
+            println!("  {arm:<22} FAIL {e}");
+            breakthrough.push(json!({
+                "arm": arm,
+                "oracle": spec,
+                "targets": tgt_name,
+                "error": e,
+            }));
+            continue;
+        }
+        let med_wall = median_f64(&mut walls);
+        let med_decomp = median_f64(&mut decomp_walls);
+        println!(
+            "  {arm:<22} MEDIAN wall={med_wall:.4}s decomp={med_decomp:.4}s verified={ok}/{repeats} S={last_s:.3}"
+        );
+        breakthrough.push(json!({
+            "arm": arm,
+            "oracle": spec,
+            "targets": tgt_name,
+            "median_wall_s": med_wall,
+            "median_decomp_wall_s": med_decomp,
+            "verified_reps": ok,
+            "repeats": repeats,
+            "s": last_s,
+        }));
+    }
 
     // Gains vs subtract:m=3 (best existing same-arity-ish baseline).
     let base_wall = summary
         .iter()
         .find(|r| r["arm"] == "subtract:m=3")
+        .or_else(|| breakthrough.iter().find(|r| r["arm"] == "subtract:m=3/walk"))
         .and_then(|r| r["median_wall_s"].as_f64());
     let base_decomp = summary
         .iter()
         .find(|r| r["arm"] == "subtract:m=3")
+        .or_else(|| breakthrough.iter().find(|r| r["arm"] == "subtract:m=3/walk"))
         .and_then(|r| r["median_decomp_wall_s"].as_f64());
     let thr1 = summary
         .iter()
@@ -606,9 +759,9 @@ fn main() -> Result<(), String> {
     println!("\n## Gains (median wall / decomp vs subtract:m=3; thr vs thr=1 decomp)");
     let mut gains = Vec::new();
     if let (Some(bw), Some(bd)) = (base_wall, base_decomp) {
-        for row in &summary {
-            let arm = row["arm"].as_str().unwrap_or("?");
-            let mw = row["median_wall_s"].as_f64().unwrap_or(0.0);
+        for row in summary.iter().chain(breakthrough.iter()) {
+            let Some(arm) = row["arm"].as_str() else { continue };
+            let Some(mw) = row["median_wall_s"].as_f64() else { continue };
             let md = row["median_decomp_wall_s"].as_f64().unwrap_or(0.0);
             let wall_x = if mw > 0.0 { bw / mw } else { 0.0 };
             let decomp_x = if md > 0.0 { bd / md } else { 0.0 };
@@ -618,7 +771,7 @@ fn main() -> Result<(), String> {
                 None
             };
             println!(
-                "  {arm:<18} wall_speedup={wall_x:6.2}x  decomp_speedup={decomp_x:6.2}x{}",
+                "  {arm:<22} wall_speedup={wall_x:6.2}x  decomp_speedup={decomp_x:6.2}x{}",
                 thr_x
                     .map(|x| format!("  thr_vs_1={x:5.2}x"))
                     .unwrap_or_default()
@@ -644,6 +797,7 @@ fn main() -> Result<(), String> {
         "summary": summary,
         "amortized_multi_dlp": amort,
         "threaded_amortized": thr_amort,
+        "breakthrough": breakthrough,
         "gains": gains,
         "rows": all_rows,
     });

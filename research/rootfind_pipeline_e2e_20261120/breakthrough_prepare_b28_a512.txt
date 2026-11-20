@@ -1,0 +1,265 @@
+rootfind pipeline e2e  bits=28 r=260192759 |Fx|≈512 repeats=3 panel=breakthrough  [pcc:unverified]
+classification: engineering; fail-closed verify; no security claim
+
+## Breakthrough panel (IFMA + walk-prime-batch vs best arms)
+  subtract:m=3/walk      rep=0 wall=0.0296s decomp=0.0128s S=132.271 targets=925 verified=true
+  subtract:m=3/walk      rep=1 wall=0.0282s decomp=0.0133s S=140.438 targets=970 verified=true
+  subtract:m=3/walk      rep=2 wall=0.0255s decomp=0.0131s S=138.907 targets=957 verified=true
+  subtract:m=3/walk      MEDIAN wall=0.0282s decomp=0.0131s verified=3/3 S=138.907
+  subtract:m=3/batch8    rep=0 wall=0.0248s decomp=0.0125s S=129.628 targets=911 verified=true
+  subtract:m=3/batch8    rep=1 wall=0.0272s decomp=0.0142s S=167.029 targets=997 verified=true
+  subtract:m=3/batch8    rep=2 wall=0.0256s decomp=0.0132s S=139.255 targets=951 verified=true
+  subtract:m=3/batch8    MEDIAN wall=0.0256s decomp=0.0132s verified=3/3 S=139.255
+  floor:m=3/walk         rep=0 wall=0.0294s decomp=0.0062s S=132.271 targets=925 verified=true
+  floor:m=3/walk         rep=1 wall=0.0304s decomp=0.0066s S=140.438 targets=970 verified=true
+  floor:m=3/walk         rep=2 wall=0.0301s decomp=0.0065s S=138.907 targets=957 verified=true
+  floor:m=3/walk         MEDIAN wall=0.0301s decomp=0.0065s verified=3/3 S=138.907
+  floor:m=3/batch8       rep=0 wall=0.0297s decomp=0.0064s S=129.628 targets=911 verified=true
+  floor:m=3/batch8       rep=1 wall=0.0310s decomp=0.0070s S=167.029 targets=997 verified=true
+  floor:m=3/batch8       rep=2 wall=0.0302s decomp=0.0065s S=139.255 targets=951 verified=true
+  floor:m=3/batch8       MEDIAN wall=0.0302s decomp=0.0065s verified=3/3 S=139.255
+
+## Gains (median wall / decomp vs subtract:m=3; thr vs thr=1 decomp)
+  subtract:m=3/walk      wall_speedup=  1.00x  decomp_speedup=  1.00x
+  subtract:m=3/batch8    wall_speedup=  1.10x  decomp_speedup=  0.99x
+  floor:m=3/walk         wall_speedup=  0.94x  decomp_speedup=  2.00x
+  floor:m=3/batch8       wall_speedup=  0.93x  decomp_speedup=  2.00x
+{
+  "amortized_multi_dlp": [],
+  "bits": 28,
+  "breakthrough": [
+    {
+      "arm": "subtract:m=3/walk",
+      "median_decomp_wall_s": 0.013064486,
+      "median_wall_s": 0.028179461,
+      "oracle": "rootfind-subtract:m=3",
+      "repeats": 3,
+      "s": 138.90723585321237,
+      "targets": "walk",
+      "verified_reps": 3
+    },
+    {
+      "arm": "subtract:m=3/batch8",
+      "median_decomp_wall_s": 0.013167449,
+      "median_wall_s": 0.02564016,
+      "oracle": "rootfind-subtract:m=3",
+      "repeats": 3,
+      "s": 139.25508638014725,
+      "targets": "walk-prime-batch-8",
+      "verified_reps": 3
+    },
+    {
+      "arm": "floor:m=3/walk",
+      "median_decomp_wall_s": 0.006521838,
+      "median_wall_s": 0.030059622,
+      "oracle": "rootfind-floor:m=3",
+      "repeats": 3,
+      "s": 138.90723585321237,
+      "targets": "walk",
+      "verified_reps": 3
+    },
+    {
+      "arm": "floor:m=3/batch8",
+      "median_decomp_wall_s": 0.006534537,
+      "median_wall_s": 0.030203756,
+      "oracle": "rootfind-floor:m=3",
+      "repeats": 3,
+      "s": 139.25508638014725,
+      "targets": "walk-prime-batch-8",
+      "verified_reps": 3
+    }
+  ],
+  "classification": "engineering",
+  "factor_base_size": 512,
+  "gains": [
+    {
+      "arm": "subtract:m=3/walk",
+      "decomp_speedup_vs_subtract_m3": 1.0,
+      "decomp_speedup_vs_thr1": null,
+      "wall_speedup_vs_subtract_m3": 1.0
+    },
+    {
+      "arm": "subtract:m=3/batch8",
+      "decomp_speedup_vs_subtract_m3": 0.9921804899339273,
+      "decomp_speedup_vs_thr1": null,
+      "wall_speedup_vs_subtract_m3": 1.0990360824581438
+    },
+    {
+      "arm": "floor:m=3/walk",
+      "decomp_speedup_vs_subtract_m3": 2.003190818293861,
+      "decomp_speedup_vs_thr1": null,
+      "wall_speedup_vs_subtract_m3": 0.9374522740172847
+    },
+    {
+      "arm": "floor:m=3/batch8",
+      "decomp_speedup_vs_subtract_m3": 1.9992978844560831,
+      "decomp_speedup_vs_thr1": null,
+      "wall_speedup_vs_subtract_m3": 0.9329786997352251
+    }
+  ],
+  "pcc": "unverified",
+  "r": 260192759,
+  "repeats": 3,
+  "rows": [
+    {
+      "arm": "subtract:m=3/walk",
+      "decomp_wall_s": 0.012770763,
+      "mode": "breakthrough",
+      "relations": 471,
+      "rep": 0,
+      "s": 132.27123227022162,
+      "setup_wall_s": 0.012938861,
+      "targets": "walk",
+      "targets_tried": 925,
+      "verified": true,
+      "wall_s": 0.029592293
+    },
+    {
+      "arm": "subtract:m=3/walk",
+      "decomp_wall_s": 0.013301511,
+      "mode": "breakthrough",
+      "relations": 472,
+      "rep": 1,
+      "s": 140.43762938518776,
+      "setup_wall_s": 0.011779038,
+      "targets": "walk",
+      "targets_tried": 970,
+      "verified": true,
+      "wall_s": 0.028179461
+    },
+    {
+      "arm": "subtract:m=3/walk",
+      "decomp_wall_s": 0.013064486,
+      "mode": "breakthrough",
+      "relations": 483,
+      "rep": 2,
+      "s": 138.90723585321237,
+      "setup_wall_s": 0.009403549,
+      "targets": "walk",
+      "targets_tried": 957,
+      "verified": true,
+      "wall_s": 0.025537267
+    },
+    {
+      "arm": "subtract:m=3/batch8",
+      "decomp_wall_s": 0.012483307,
+      "mode": "breakthrough",
+      "relations": 460,
+      "rep": 0,
+      "s": 129.62791543410535,
+      "setup_wall_s": 0.009421649,
+      "targets": "walk-prime-batch-8",
+      "targets_tried": 911,
+      "verified": true,
+      "wall_s": 0.024751423
+    },
+    {
+      "arm": "subtract:m=3/batch8",
+      "decomp_wall_s": 0.014206706,
+      "mode": "breakthrough",
+      "relations": 478,
+      "rep": 1,
+      "s": 167.02925540930653,
+      "setup_wall_s": 0.009413699,
+      "targets": "walk-prime-batch-8",
+      "targets_tried": 997,
+      "verified": true,
+      "wall_s": 0.027200941
+    },
+    {
+      "arm": "subtract:m=3/batch8",
+      "decomp_wall_s": 0.013167449,
+      "mode": "breakthrough",
+      "relations": 473,
+      "rep": 2,
+      "s": 139.25508638014725,
+      "setup_wall_s": 0.009459757,
+      "targets": "walk-prime-batch-8",
+      "targets_tried": 951,
+      "verified": true,
+      "wall_s": 0.02564016
+    },
+    {
+      "arm": "floor:m=3/walk",
+      "decomp_wall_s": 0.006246726,
+      "mode": "breakthrough",
+      "relations": 471,
+      "rep": 0,
+      "s": 132.27123227022162,
+      "setup_wall_s": 0.01998708,
+      "targets": "walk",
+      "targets_tried": 925,
+      "verified": true,
+      "wall_s": 0.029385278
+    },
+    {
+      "arm": "floor:m=3/walk",
+      "decomp_wall_s": 0.006621834,
+      "mode": "breakthrough",
+      "relations": 472,
+      "rep": 1,
+      "s": 140.43762938518776,
+      "setup_wall_s": 0.020576422,
+      "targets": "walk",
+      "targets_tried": 970,
+      "verified": true,
+      "wall_s": 0.03035795
+    },
+    {
+      "arm": "floor:m=3/walk",
+      "decomp_wall_s": 0.006521838,
+      "mode": "breakthrough",
+      "relations": 483,
+      "rep": 2,
+      "s": 138.90723585321237,
+      "setup_wall_s": 0.020349831,
+      "targets": "walk",
+      "targets_tried": 957,
+      "verified": true,
+      "wall_s": 0.030059622
+    },
+    {
+      "arm": "floor:m=3/batch8",
+      "decomp_wall_s": 0.006368531,
+      "mode": "breakthrough",
+      "relations": 460,
+      "rep": 0,
+      "s": 129.62791543410535,
+      "setup_wall_s": 0.020337323,
+      "targets": "walk-prime-batch-8",
+      "targets_tried": 911,
+      "verified": true,
+      "wall_s": 0.029720423
+    },
+    {
+      "arm": "floor:m=3/batch8",
+      "decomp_wall_s": 0.006950433,
+      "mode": "breakthrough",
+      "relations": 478,
+      "rep": 1,
+      "s": 167.02925540930653,
+      "setup_wall_s": 0.020296094,
+      "targets": "walk-prime-batch-8",
+      "targets_tried": 997,
+      "verified": true,
+      "wall_s": 0.030963663
+    },
+    {
+      "arm": "floor:m=3/batch8",
+      "decomp_wall_s": 0.006534537,
+      "mode": "breakthrough",
+      "relations": 473,
+      "rep": 2,
+      "s": 139.25508638014725,
+      "setup_wall_s": 0.020510307,
+      "targets": "walk-prime-batch-8",
+      "targets_tried": 951,
+      "verified": true,
+      "wall_s": 0.030203756
+    }
+  ],
+  "seed": 59297,
+  "summary": [],
+  "threaded_amortized": [],
+  "what_this_is": "Complete planted-log IC pipeline wall (factor base + prepare + relation collection + Gauss + verify). Not an oracle-only microbench."
+}
