@@ -1,0 +1,47 @@
+{
+ "instances": [
+  {
+   "curve_seed": 172,
+   "target_seed": 1000175,
+   "checks": {
+    "f": true,
+    "G": true,
+    "T": true,
+    "t": true,
+    "order_h_r": true
+   },
+   "pass": true
+  }
+ ],
+ "runs": [
+  {
+   "arm": "Q",
+   "curve_seed": 172,
+   "target_seed": 1000175,
+   "seed": 1,
+   "recovered": 6714523865044166,
+   "fields_compared": [
+    "group_ops",
+    "steps"
+   ],
+   "checks": {
+    "recovered_eq_t": true,
+    "recovered_G_eq_T": true,
+    "counts_eq_committed_row": true,
+    "certified_ok_eq_row": true
+   },
+   "pass": true
+  }
+ ],
+ "commit": "6213ecbc0da0ed4917ab75805258201d6629b477",
+ "n_instances": 1,
+ "n_runs": 1,
+ "instances_pass": 1,
+ "runs_pass": 1,
+ "runs_by_arm": {
+  "w": 0,
+  "x": 0,
+  "Q": 1
+ },
+ "all_pass": true
+}
