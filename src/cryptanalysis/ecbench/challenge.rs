@@ -50,7 +50,7 @@ use crate::cryptanalysis::ecbench::methods::MethodSpec;
 use crate::cryptanalysis::ecbench::record::Record;
 use crate::cryptanalysis::ecbench::runner::{read_records, read_session, PlanDoc};
 use crate::cryptanalysis::ecbench::spec::{
-    plan, ArmSpec, Level, Measurement, Order, Role, Spec, WorkloadPlan, SPEC_SCHEMA,
+    plan, ArmSpec, CurvePolicy, Level, Measurement, Order, Role, Spec, WorkloadPlan, SPEC_SCHEMA,
 };
 use crate::cryptanalysis::ecbench::stats::{bootstrap_ci, cluster_bootstrap_ci, mean};
 use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind};
@@ -221,6 +221,12 @@ pub fn spec_for(ch: &Challenge, candidate: &MethodSpec, epoch: u64) -> Spec {
             ch.challenge_id,
             serde_json::to_string(&ch.acceptance).unwrap_or_default()
         ),
+        curve_policy: CurvePolicy::Diagnostic {
+            off_panel_reason: format!(
+                "sealed challenge {} fixes its own curve domain",
+                ch.challenge_id
+            ),
+        },
         workloads: WorkloadPlan {
             curves: w.curves.clone(),
             targets_per_curve: w.targets_per_curve,

@@ -1,8 +1,13 @@
 # Standard benchmark panel
 
-**Frozen 2026-11-10.** New index-calculus and rho measurements use these
-curves. A result on any other curve is allowed, but it states why it left
-the panel. The data is [`standard_panel.json`](standard_panel.json).
+**Frozen 2026-11-10.** This is the historical regression and continuity panel.
+The canonical cross-family scaling/claim ladder is now the phased
+20/30/60/80-subgroup-bit panel in
+[`research/ecbench_phased_panel_20261117`](../../research/ecbench_phased_panel_20261117/README.md),
+selected in current specs by exact `panel` cell ID. These aliases remain the
+right curves for regression, exhaustive-ground-truth, and comparison with
+earlier sessions. An off-panel result states why it left the canonical ladder.
+The data is [`standard_panel.json`](standard_panel.json).
 [`scripts/build_curve_registry.py`](../../scripts/build_curve_registry.py)
 copies each alias into its registry entry as `panel_alias` and fails if a
 row disagrees with the registry.

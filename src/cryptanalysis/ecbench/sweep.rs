@@ -1,4 +1,4 @@
-//! `ecbench sweep`: one `ecbench.spec/v1` for a method × size scaling
+//! `ecbench sweep`: one policy-bearing ecbench spec for a method × size scaling
 //! study.
 //!
 //! A scaling exponent is only as good as the sizes it is fitted over, so
@@ -19,7 +19,7 @@ use std::collections::BTreeMap;
 
 use crate::cryptanalysis::ecbench::methods::{decl, MethodSpec};
 use crate::cryptanalysis::ecbench::spec::{
-    ArmSpec, Level, Measurement, Order, Role, Spec, WorkloadPlan, SPEC_SCHEMA,
+    ArmSpec, CurvePolicy, Level, Measurement, Order, Role, Spec, WorkloadPlan, SPEC_SCHEMA,
 };
 use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind};
 
@@ -285,6 +285,10 @@ pub fn generate(o: &SweepOptions) -> Result<Spec, String> {
             o.targets,
             o.rounds
         ),
+        curve_policy: CurvePolicy::Diagnostic {
+            off_panel_reason: "legacy generated method-by-size sweep uses its declared constructor ladder"
+                .into(),
+        },
         workloads: WorkloadPlan {
             curves,
             targets_per_curve: o.targets,

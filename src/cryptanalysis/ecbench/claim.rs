@@ -852,6 +852,7 @@ pub fn build(
     workload_id: &str,
     round: Option<u32>,
     independent: Option<&Independent>,
+    allow_legacy_spec: bool,
 ) -> Result<Value, String> {
     build_from_session(
         dir,
@@ -862,6 +863,7 @@ pub fn build(
         independent,
         true,
         true,
+        allow_legacy_spec,
     )
 }
 
@@ -878,6 +880,7 @@ pub fn attach_independent(
     round: Option<u32>,
     original: &Value,
     independent: &Independent,
+    allow_legacy_spec: bool,
 ) -> Result<Value, String> {
     // A claim written before `paired_rounds` existed is reconstructed
     // without it; one that has it, with it.
@@ -891,6 +894,7 @@ pub fn attach_independent(
         None,
         false,
         paired,
+        allow_legacy_spec,
     )?;
     if &reconstructed != original {
         return Err(
@@ -907,6 +911,7 @@ pub fn attach_independent(
         Some(independent),
         false,
         paired,
+        allow_legacy_spec,
     )
 }
 
@@ -1061,6 +1066,7 @@ fn build_from_session(
     independent: Option<&Independent>,
     require_recorded_binary: bool,
     paired: bool,
+    allow_legacy_spec: bool,
 ) -> Result<Value, String> {
     let session = read_session(dir)?;
     let records = read_records(dir)?;
@@ -1069,6 +1075,20 @@ fn build_from_session(
     let plan: PlanDoc =
         serde_json::from_str(&read("plan.json")?).map_err(|e| format!("plan.json: {e}"))?;
     let spec = Spec::from_json(&read("spec.json")?)?;
+    if spec.curve_policy.is_legacy() && !allow_legacy_spec {
+        return Err(
+            "a legacy v1 session is historical claim evidence; pass --allow-legacy-spec only to reconstruct it"
+                .into(),
+        );
+    }
+    if spec.schema == crate::cryptanalysis::ecbench::spec::SPEC_SCHEMA
+        && !spec.curve_policy.is_phase()
+    {
+        return Err(
+            "a current vs_rho claim needs curve_policy mode `phase`; smoke and off-panel diagnostics are not claim evidence"
+                .into(),
+        );
+    }
     if session.status != "complete" {
         return Err(format!(
             "session {} is {}, not complete",

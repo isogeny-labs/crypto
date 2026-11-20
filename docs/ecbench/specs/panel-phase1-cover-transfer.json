@@ -1,0 +1,75 @@
+{
+  "schema": "ecbench.spec/v2",
+  "label": "canonical Phase 1 degree-three cover-transfer lane",
+  "description": "Preregistered Phase 1 transfer route from P1-K0-23 into the exact image of the certified degree-three same-field genus-3 cover v^2 + u^2v = u^7 + u. The specialized candidate collects actual characteristic-two hyperelliptic relations and makes their modular columns sound by arbitrary-class pushforward plus exact source-cofactor clearing. Generic destination rho and BSGS remain controls. Every adapter checks the construction, map certificate, and gcd(3,r)=1 subgroup condition, records all nine exclusive cold wall phases, charges source replay, and leaves destination native work visibly unpriced in source GAE. This executable spec is not a completed benchmark result.",
+  "curve_policy": {
+    "mode": "phase",
+    "phase": 1,
+    "lane": "cover_transfer",
+    "route": "P1-K0-23-G3-COVER"
+  },
+  "workloads": {
+    "curves": [
+      {
+        "kind": "panel",
+        "cell": "P1-K0-23"
+      }
+    ],
+    "targets_per_curve": 32,
+    "target_seed": 202611190201,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "source-rho-strong",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    },
+    {
+      "name": "destination-rho3",
+      "role": "baseline",
+      "method": {
+        "id": "jacobian_image.rho3_v2"
+      }
+    },
+    {
+      "name": "destination-bsgs",
+      "role": "control",
+      "method": {
+        "id": "jacobian_image.bsgs_v2"
+      }
+    },
+    {
+      "name": "destination-genus3-projected-ic",
+      "role": "candidate",
+      "method": {
+        "id": "jacobian_image.genus3_projected_ic_v1",
+        "params": {
+          "fb_size": "0",
+          "extra_relations": "8",
+          "branches": "64",
+          "d_step_in": "4",
+          "max_trials": "200000",
+          "threads": "1"
+        }
+      }
+    },
+    {
+      "name": "source-rho-strong-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 4,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 202611190202,
+    "isolation_required": "L2",
+    "timeout_seconds": 600
+  }
+}

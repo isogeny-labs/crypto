@@ -1160,7 +1160,9 @@ fn spec(argv: &[String]) {
     );
     let mk = |label: &str, curves: &[Value], t: u64, arms: Value, mseed: u64| {
         json!({
-            "schema": "ecbench.spec/v1", "label": label, "description": desc,
+            "schema": "ecbench.spec/v2",
+            "curve_policy": {"mode": "diagnostic", "off_panel_reason": "conductor-gap study requires every generated curve on both exact volcanoes"},
+            "label": label, "description": desc,
             "workloads": {"curves": curves, "targets_per_curve": t, "target_seed": seed, "target_kind": "planted_shared"},
             "arms": arms,
             "measurement": {"rounds": 1, "warmup": 0, "order": "shuffle", "seed": mseed,

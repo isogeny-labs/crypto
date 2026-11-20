@@ -543,6 +543,11 @@ pub struct SessionStop {
 pub struct PlanDoc {
     pub schema: String,
     pub spec_id: String,
+    #[serde(
+        default,
+        skip_serializing_if = "crate::cryptanalysis::ecbench::spec::CurvePolicy::is_legacy"
+    )]
+    pub curve_policy: crate::cryptanalysis::ecbench::spec::CurvePolicy,
     pub arms: Vec<crate::cryptanalysis::ecbench::spec::Arm>,
     pub workloads: Vec<Workload>,
     pub executions: Vec<Execution>,
@@ -1135,6 +1140,7 @@ fn execute_session(
     let plan_doc = PlanDoc {
         schema: "ecbench.plan/v1".into(),
         spec_id: p.spec_id.clone(),
+        curve_policy: p.spec.curve_policy.clone(),
         arms: p.arms.clone(),
         workloads: p.workloads.clone(),
         executions: p.executions.clone(),

@@ -62,6 +62,7 @@ Factor bases (build with `ecbench fb`, publish to Git/`store:`, run
 | `ecbench …` | does | described in |
 |---|---|---|
 | `methods` | list every method with its parameters | §7, §11 |
+| `panel` | list/filter the canonical 20/30/60/80-subgroup-bit curve ladder and its exact cell IDs | [phased panel](../../research/ecbench_phased_panel_20261117/README.md) |
 | `optimize` | `optimize inventory [--json]` lists every registered method with its search strategy, claim scope and knob count (`--json` adds parameter roles and nested solvers/engines); `optimize audit --development SPEC... [--holdout SPEC...] [--require-all]` audits the split between adaptive development specs and fresh confirmatory holdout specs, prints a JSON report, and exits 1 when the campaign is not admissible (`--require-all` also demands that development cover the live method registry, every system solver, every PDP3 engine and every prime PKM tower engine). It runs nothing and makes no performance claim | `src/cryptanalysis/ecbench/optimization.rs` (module header) |
 | `host` | print the host capsule | §5 |
 | `plan` | validate a spec and print what it expands to; an arm its curve cannot run is refused here | §1, §3 |
@@ -95,6 +96,49 @@ and static musl), Apple silicon, and Windows. A source build is:
 ```bash
 cargo build --release --bin ecbench
 ```
+
+List the shared curve ladder before writing a scaling spec:
+
+```bash
+./target/release/ecbench panel
+./target/release/ecbench panel --phase 1 --family koblitz --json
+./target/release/ecbench panel --phase 1 --lane hyperelliptic_jacobian
+```
+
+New specs use `ecbench.spec/v2` and classify curve selection explicitly:
+
+- `{"mode":"phase","phase":1,"lane":"elliptic_generic_decomposition"}`
+  is scaling/claim evidence in one independently promoted lane. Every curve must
+  be named as `{"kind":"panel","cell":"P1-K0-23"}`, use public targets,
+  and meet the phase's target-count floor. Copied parameters, wrong-phase
+  cells, a lane whose admission state is blocked, and substitutes are refused
+  before execution. For compatibility, an omitted `lane` means
+  `elliptic_algebraic`; new specs should always name it.
+- `{"mode":"smoke"}` is for correctness and plumbing fixtures.
+- `{"mode":"diagnostic","off_panel_reason":"..."}` is for research that
+  cannot use the panel and records why.
+
+Smoke and diagnostic sessions are never current `vs_rho` claim evidence. In
+particular, tiny fields such as `F_5` may remain unit-test fixtures, but cannot
+enter a phase. Size always means `ceil(log2(r))`; field bits or binary degree
+are recorded separately. The authoritative cells are embedded from
+[`panel.json`](../../research/ecbench_phased_panel_20261117/panel.json), so a
+cell ID resolves to the same parameters and identities everywhere.
+The canonical lanes are `elliptic_algebraic`,
+`elliptic_generic_decomposition`, `hyperelliptic_jacobian`, and
+`cover_transfer`. The two decomposition tracks do not share promotion evidence.
+The current higher-genus and transfer entries are deliberately blocked until
+phase-matched objects and complete end-to-end adapters clear their listed
+obligations.
+
+An executable Phase 1 compatible-family slice is
+[`panel-phase1-k0-23.json`](specs/panel-phase1-k0-23.json). A full phase still
+requires all mandatory compatible-family specs and the promotion dossier in
+the panel protocol.
+
+Frozen `ecbench.spec/v1` files still plan, verify, and replay unchanged. A new
+`run`, `isolab-job`, or claim reconstruction refuses them unless
+`--allow-legacy-spec` is supplied explicitly for reproduction.
 
 ```bash
 ./target/release/ecbench plan --spec docs/ecbench/specs/smoke-prime.json
@@ -534,6 +578,7 @@ default; the ids are:
 | `ic.tensor_contraction_v1` | ic | toy index calculus by exact sparse tensor contraction (`crates/ecdl-tensor-ic`); prime-order curves (cofactor 1), `m ≥ 2`, `max_restarts ≥ 1`, refused at plan time otherwise |
 | `ic.tensor_contraction_cofactor_v1` | ic | the same toy on a fixed-cofactor prime curve (#E = c·r, c > 1, r > c; `ecbench::tensor_cofactor`): free S_i ∈ E, A_i = [c]S_i hashed into F_i ⊂ G, preimages of each F_i listed once per draw; `m ≥ 2`, `max_restarts ≥ 1`, refused at plan time otherwise (c = 1 is `ic.tensor_contraction_v1`) |
 | `jacobian_image.rho3`, `jacobian_image.bsgs`, `…_field_tally` | rho, bsgs | rho and textbook BSGS in the genus-3 Jacobian image of the certified degree-three pullback of a binary curve; no source-GAE conversion exists, so `total_gae` is 0 and the Cantor and field work is counted `_uncharged` (the `_field_tally` ids tally the complete instrumented route and are accounting-only; their wall time includes the ledger) |
+| `jacobian_image.genus3_projected_ic_v1` | ic | characteristic-two genus-3 hyperelliptic index calculus on the exact cover image: degree-one factor-base relations and sparse elimination modulo `r`; applying `phi_*` and clearing the exact source cofactor gives every factor-base column a valid source-subgroup logarithm and scales the known labels by `3h`. Generic destination rho/BSGS remain controls. Destination native work is unpriced in source GAE; the final source replay is charged. |
 | `ic.hyperelliptic_thread` | ic | the hyperelliptic thread's index calculus (ADH/Gaudry: degree-1 places folded by ±, factor-base walk, sparse elimination mod `r`, optional single large primes) on a genus 2–4 Jacobian, `hyperelliptic_*` curves only |
 | `ic.cm_folded_native_v1`, `ic.cm_folded_recurrence_v1`, `ic.cm_folded_native_d43_v1` | ic | the CM scalar-orbit signed MITM2 controls with a native backend, prime curves only; frozen: their records carry `total_gae` 0 |
 | `ic.cm_folded_native_v2`, `ic.cm_folded_recurrence_v2`, `ic.cm_folded_native_d43_v2` | ic | the same three controls with the replay's counted operations charged (2026-10-28): `independent_replay` carries them as GAE, `total_gae` is the phase sum, and `unpriced` names the `native_*_uncharged` counters instead of a sentence |
@@ -578,6 +623,7 @@ Curves of higher genus and the transfers are described in
 | `rho.negation_v2`, `rho.signed_frobenius_v2`, `rho.signed_frobenius_strong_v2` | as the matching first-rule id under the `_v2` accounting (the Accounting v2 paragraph below); the strong id's jump table, lanes and start multiples are charged and its candidate checks are a `verification` phase | as the first-rule id; the `_v2` walk also counts the distinguished-point table queries and inserts |
 | `rho.signed_frobenius_strong` | group additions exactly; each scalar multiplication (jump table, walk start stride, candidate checks) at `1.5·log₂ r` additions, `ic_boundary::signed_frobenius_rho`'s convention | canonicalisations, partition hashes, distinguished-point table queries and inserts |
 | `jacobian_image.rho3`, `jacobian_image.bsgs` | none until a versioned conversion to source-curve GAE is certified | construction of the same-field degree-three genus-3 cover, both point-class pullbacks, Cantor additions/doublings/scalar multiplications, rho walk/restarts/collisions, BSGS table inserts/lookups; cold solve wall includes the entire route |
+| `jacobian_image.genus3_projected_ic_v1` | the final source `[d]G=Q` replay only | cover construction and pullbacks, factor-base construction, Cantor walk operations, characteristic-two smoothness calls, sparse modular row operations, and destination replay; the nine cold wall phases include all of it even where no source-GAE conversion exists |
 | `rho.negation_strong` | every `F_q` multiplication on the tower's counter (`Gf2q::muls`): the jump table and start points (`setup`), every step with its share of the batched inversion, the start additions, the escape doublings and unbatched additions (`search`), each canonicalisation at one `F_q` multiplication (`canonicalisation`: four `F_q` additions and a comparison, no multiplication, so one is an upper bound), the candidate checks (`check`); each phase's GAE is its multiplications over the curve's `fq_muls_per_add`, the divisor `solve_ic_f2m4` prices IC with | partition hashes, distinguished-point tests, table queries and inserts |
 | `rho.signed_frobenius_strong_legacy` | identical to `rho.signed_frobenius_strong`; comparison-only implementation control | identical to `rho.signed_frobenius_strong` |
 | `rho.negation_lanes` | as `rho.negation`, for every lane: walks still in flight when another lane's collision recovers the logarithm are charged too, so `S` sits a few percent above `rho.negation`'s | canonicalisations. Its `field_ops` block records the batched work actually performed: per round of `n` additions, `3(n − 1)` multiplications and one inversion for the shared inverse, then `2M + 1S` per addition |
@@ -710,17 +756,18 @@ pricing from the reported group-addition equivalents. Solver conflicts and
 other work without a pinned conversion stay visible as unpriced counters;
 the recorded `S` is therefore a lower bound on the complete pipeline cost.
 
-The `jacobian_image.*` adapters are transfer diagnostics, not source-curve
-speedup rows. They reconstruct `binary_cubic_pullback_v1`, pull the generator
-and unseen target into its exact cyclic Jacobian image, solve there without
-receiving the planted logarithm, verify the collision in `Jac(H)`, and return
-the candidate for the runner's independent source-curve replay. Their native
-phase counters are meaningful within that destination. Their `total_gae` is
-deliberately zero and their records are lower bounds because one genus-3
-Cantor operation is not one elliptic-curve addition. Use cold wall and the
-resource vector to identify implementation bottlenecks; promote a net-cost
-claim only after supplying a pinned conversion or a matched end-to-end wall
-comparison that clears the A/A and isolation gates.
+The `jacobian_image.*` adapters are transfer diagnostics until a matched
+end-to-end comparison clears the claim gates. They build the certified cover,
+pull the generator and unseen target into its exact cyclic Jacobian image,
+solve there without receiving the planted logarithm, verify any candidate in
+`Jac(H)`, and return it for source-curve replay. The projected-IC adapter also
+collects actual genus-3 relations; its `phi_*` plus cofactor-clearing equation
+makes the modular factor-base columns valid on the exact order-`r` source
+subgroup. Native phase counters are meaningful within the destination, while
+only the source replay currently contributes source GAE. The remaining native
+work makes the record a lower bound in that unit. Use the complete cold wall
+and resource vector for the algorithmic comparison; promote a net-cost claim
+only after the A/A, isolation, recovery, and complete-accounting gates clear.
 
 The standing strong-rho implementation applies paired normal-basis maps and
 paired coefficient reductions during signed-Frobenius canonicalization. The
@@ -1266,6 +1313,16 @@ Every arm of a session runs on every curve, so a session holds one
 family; `plan` refuses an arm its curve cannot run, with the reason (no
 rational ℓ-isogeny, a negation the Jacobian does not have, a family the
 method does not take).
+
+These workload kinds and methods are implementation inventory, not automatic
+admission to the phased panel. A direct hyperelliptic run must enter the
+`hyperelliptic_jacobian` lane with an exact phase-matched Jacobian subgroup and
+same-Jacobian rho reference. A cover run must enter `cover_transfer` only after
+the typed route, subgroup preservation, destination solver, source recovery,
+three-arm control, and complete nine-phase cost obligations in
+[`docs/transfer-assessment/MEASUREMENT.md`](../transfer-assessment/MEASUREMENT.md)
+are executable. Until then, `plan` refuses those phase lanes even though smoke
+or diagnostic specs remain available.
 
 ## 8. Statistics
 

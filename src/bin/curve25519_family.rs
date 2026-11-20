@@ -21,7 +21,7 @@
 //! 2-Sylow shape, 4-torsion, embedding degree bound, trace, `j`), so the
 //! report does not rest on recalled constants.  `family` generates the
 //! miniatures, checks every property, verifies the Montgomery summation
-//! polynomial `S₃` on random point triples, and writes an `ecbench.spec/v1`
+//! polynomial `S₃` on random point triples, and writes a diagnostic `ecbench.spec/v2`
 //! curve list in short Weierstrass form (`x_W = x_M + A/3`), the form
 //! `ecbench`'s `prime_explicit` workload takes.
 //!
@@ -2281,7 +2281,8 @@ fn baseline_spec(k: u32, targets: u64, seed: u64) -> Value {
         ))
     };
     json!({
-        "schema": "ecbench.spec/v1",
+        "schema": "ecbench.spec/v2",
+        "curve_policy": {"mode": "diagnostic", "off_panel_reason": "Curve25519-family baseline requires generated miniature and cofactor-control curves"},
         "label": format!("Curve25519-family index-calculus baseline, k = {k}"),
         "description": "research/curve25519_ic_baseline_20261102/PROTOCOL.md (frozen before data). Curve 1: the k-bit Curve25519 miniature (Montgomery y^2 = x^3 + A x^2 + x, p = 5 mod 8, #E = 8r, #E' = 4r', smallest A by Curve25519's rule) in short Weierstrass form. Curve 2: cofactor-1 control, prime_search at the subgroup's bit length. Public synthetic curves and targets; no security claim.",
         "workloads": {
