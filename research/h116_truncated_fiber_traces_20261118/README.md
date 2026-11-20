@@ -618,3 +618,13 @@ an artifact of repeated-root abstention.  The next lead retains complete
 quartic factor-degree partitions modulo the auxiliary primes and tests whether
 their categorical tuple transports scalar parity across curves.
 [pcc:unverified]
+
+The [complete factor-type transport test](PRYM_FROBENIUS_FACTOR_TYPE_TRANSPORT_EXPERIMENT.md)
+then retains all irreducible-degree partitions modulo 5 and 7.  It passes
+6,296 reconstruction, 15,240 irreducibility, and 37,776 evaluation controls,
+but produces 1,492 keys for 1,520 targets; 14 repeated keys contain both
+parities.  Leave-one-curve-out exact-key transport is 16/32 with `p=1`.
+The next lead leaves characteristic-polynomial summaries and measures the
+signed splitting of the residual ramification quadratic on each chiral line
+through the target.
+[pcc:unverified]
