@@ -1,5 +1,14 @@
 # H2 results: Hermitian-surface line relations on a Legendre fibre (C2)
 
+**Direct-map follow-up (2026-11-19):** The
+[incidence proof and exact fibre recount](direct_map_obstruction_20261119/README.md)
+show that a regular surface-to-elliptic-curve map is constant on the
+Hermitian surface's rational points. Two of the three finished Legendre
+fibres also fail the necessary point-count condition for an elliptic
+quotient of a maximal Hermitian plane-section Jacobian; the third meets
+that condition. These results delimit specific direct-map and quotient
+constructions while leaving the original surrogate measurements below intact.
+
 Verdict: **KILL** (under the surrogate stated below). Job `exotic-h2-hermitian-r4` (isolab, 4 CPU / 8Gi; the protocol's 8 CPU / 16Gi did not schedule on Spot, so this is a documented deviation). Runtime 156 s. Seed 20261022. Raw data: `out/result.json`. Program: `run.py`. Earlier attempts: the base job and `-r1` never scheduled (harness bug and pending pods); `-r2` failed on a JSON serialisation error; `-r3` was OOM-killed by the p=31 brute-force point count, which was then removed.
 
 ## What was actually built (read this before the numbers)

@@ -1,5 +1,12 @@
 # Results: six falsifiers on prime-field ECDLP hardness
 
+**H2 structural follow-up (2026-11-19):** A
+[Lean-checked incidence implication and exact fibre recount](H2_hermitian/direct_map_obstruction_20261119/README.md)
+rule out a nonconstant direct regular point map from the Hermitian surface
+to the Legendre curve on rational points. The plane-section quotient count
+fails in two of the three finished H2 cells. The original surrogate rank
+result below remains scoped to its unsigned norm-circle construction.
+
 **H4 solver follow-up (2026-11-19):** One fixed `n=17` ordinary-query
 decomposition was solved and independently replayed by a CNF/SAT encoding
 in 147.97 seconds of solver time; the paired planted arm was censored at
