@@ -14,6 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
+- [ ] Koblitz matched rho reference: tally v5's jump-index selection (owner decision 2026-11-20: matched reference min(strong, v5) below 2^38), re-measure K1 n17-n37 references and the gen-orbit IC distance (claude, started 2026-11-20, branch claude/tooling-build-alq44y, PR #4742)
 - [x] EXP-PKM-IC-001: Kummer-coset factor base in the prime-field pair-sum index calculus vs small-x and random factor bases, with the distance to rho (claude, started 2026-11-19, branch claude/tooling-build-alq44y, PR #4742)
 - [x] EXP-PKM-RESULTANT-001 Amendment 1: amortise the V-only work (product tree, reciprocals; enumeration's lifting) over targets (claude, started 2026-11-19, branch claude/tooling-build-alq44y, PR #4742)
 - [x] EXP-PKM-RESULTANT-001: quasi-linear resultant / multipoint-evaluation decomposition oracle at m = 2 vs enumeration and the F4 dense oracle, S up to 2^16 (claude, started 2026-11-19, branch claude/tooling-build-alq44y, PR #4742)
