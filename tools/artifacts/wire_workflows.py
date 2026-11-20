@@ -262,10 +262,15 @@ def pulled_by(text: str) -> list[str]:
     return m.group(1).split() if m else []
 
 
-def step_lines(indent: str, paths: list[str]) -> list[str]:
+def step_lines(indent: str, paths: list[str], *, continue_on_error: bool = False) -> list[str]:
     i2 = indent + "  "
-    return [
-        f"{indent}- name: {STEP_NAME}",
+    head = [f"{indent}- name: {STEP_NAME}"]
+    # Preserve an existing soft-fail (store outage / missing Git recovery) so
+    # re-wire and --check do not strip continue-on-error from workflows that
+    # opted in. Do not invent it for newly wired steps.
+    if continue_on_error:
+        head.append(f"{i2}continue-on-error: true")
+    return head + [
         f"{i2}shell: bash",
         f"{i2}working-directory: ${{{{ github.workspace }}}}",
         f"{i2}env:",
@@ -327,6 +332,7 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
             block = add_sparse_pattern(block, indent)
         out.extend(block)
         k = next((k for k in range(j, len(lines)) if lines[k].strip()), len(lines))
+        keep_soft_fail = False
         if k < len(lines) and STEP_NAME in lines[k]:
             # A step inserted earlier: replace it, so a changed template or
             # path list regenerates (and --check flags the stale copy).
@@ -334,16 +340,22 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
             j = k + 1
             while j < len(lines) and (not lines[j].strip() or len(lines[j]) - len(lines[j].lstrip()) > len(indent)):
                 j += 1
+            old_step = lines[k:j]
+            keep_soft_fail = any(
+                re.match(rf"^{indent}  continue-on-error:\s*true\s*$", b) for b in old_step
+            )
             while j > k + 1 and not lines[j - 1].strip():
                 j -= 1
         if not paths:
             i = j
             continue
-        step = step_lines(indent, paths)
+        step = step_lines(indent, paths, continue_on_error=keep_soft_fail)
         cond = next((re.sub(rf"^{indent}(?:- |  )", "", b) for b in block
                      if re.match(rf"^{indent}(?:- |  )if: ", b)), None)
         if cond:  # skipped with its checkout, so it never runs against an empty workspace
-            step.insert(1, f"{indent}  {cond}")
+            # Keep soft-fail immediately under the name when present; then if:.
+            insert_at = 2 if keep_soft_fail else 1
+            step.insert(insert_at, f"{indent}  {cond}")
         out.extend(step)
         i = j
     return "\n".join(out), notes
