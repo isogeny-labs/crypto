@@ -102,7 +102,7 @@ pub fn round66_whole(p:u64, polynomial:&[u64]) -> String {
 tests = r"""
 #[cfg(test)]
 mod rounds {
- use cryptanalysis::bounded::{before,after};
+ use crate::cryptanalysis::bounded::{before,after};
  use std::{hint::black_box,time::Instant};
  fn median(mut values:Vec<f64>)->f64 {
      values.sort_by(|a,b|a.total_cmp(b));values[values.len()/2]
