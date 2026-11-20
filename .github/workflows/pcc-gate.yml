@@ -63,6 +63,15 @@ jobs:
         env:
           PCC_KEYRING_SHA256: ${{ vars.PCC_KEYRING_SHA256 }}
         run: python3 tools/pcc/pcc.py ledger verify
+      - name: Restore pinned rootfind raw data from exact Git recovery bundles
+        env:
+          ARTIFACTS_PULL_SOURCE: git
+          GIT_NO_LAZY_FETCH: '1'
+          ARTIFACTS_CACHE: ${{ runner.temp }}/pcc-original-cache
+        run: |
+          python3 tools/artifacts/artifacts.py pull --source git --jobs 2 \
+            research/rootfind_dense_binary_pilot_20261116/sessions/local-custody-rerun-202611160401/records.jsonl \
+            research/rootfind_k13_local_f456_screen_20261116/sessions/local-custody-repeat-202611160511/records.jsonl
       - name: Every claim verifies (exit 2, not covered, is allowed; exit 1 fails)
         env:
           PCC_KEYRING_REF: ${{ github.event_name == 'pull_request' && 'HEAD^1' || '' }}
@@ -100,6 +109,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Restore pinned rootfind raw data from exact Git recovery bundles
+        env:
+          ARTIFACTS_PULL_SOURCE: git
+          GIT_NO_LAZY_FETCH: '1'
+          ARTIFACTS_CACHE: ${{ runner.temp }}/pcc-original-cache
+        run: |
+          python3 tools/artifacts/artifacts.py pull --source git --jobs 2 \
+            research/rootfind_dense_binary_pilot_20261116/sessions/local-custody-rerun-202611160401/records.jsonl \
+            research/rootfind_k13_local_f456_screen_20261116/sessions/local-custody-repeat-202611160511/records.jsonl
       - name: Sign verdicts for claims that do not stand
         env:
           PCC_SIGNING_KEY: ${{ secrets.PCC_SIGNING_KEY }}
