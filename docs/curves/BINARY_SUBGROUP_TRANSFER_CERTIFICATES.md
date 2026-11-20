@@ -79,22 +79,30 @@ The Rust 1.98 canonical replay is retained at
 [`binary-transfer-catalog-canonical-replay-5c6e43a6.json`](../../research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json).
 It is 1,681 bytes with SHA-256
 `31df0daef4b583eeb87f9589460b83bd73345bd8a81a68c74c11ee8d0a2101d6`.
-Release run `44596599220`, Rust GNU job `135817148417`, built the exact
-`98e4fbfe…` executable, passed source-tree and installed-layout exact replay and
-receipt comparison, and uploaded artifact `14567327688` (104,474,147 ZIP
-bytes; GitHub digest
-`e0c6708f5fdb593b5899fd852700abd6d402255cd92caa2c3de8c5a3d270829f`).
-The durable job-side record is
-[`standalone-package-run-44596599220.json`](../../research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json),
-6,373 bytes with SHA-256
-`8119e3e969effe319e4a1f1a3ca6a1351b0258067a5819b21128927dc8e014ae`.
+Release run `44605953074`, Rust GNU job `135849755976`, observed successful
+executable builds at checked-out head `3f4706b2…`, passed 8/8 source controls,
+the 21-file Git-tree
+binding, source-tree and installed-layout catalog replays and receipt
+comparisons, and uploaded artifact `14572815365` (104,468,194 outer ZIP bytes;
+GitHub digest
+`5bc9e50d956b80942001107d331e018ee78ea152beadca3e159023f62c5fc290`).
+Its post-run durable job-side record is
+[`standalone-package-run-44605953074.json`](../../research/curve_transfer_infrastructure_20261118/standalone-package-run-44605953074.json),
+6,612 bytes with SHA-256
+`53495a6193d2e7efc5c61d9644497919309a1dab610987b6909ee62023803d34`.
+That receipt was created after the run and was not included in the observed
+archive; the archive staged the two prior package-run receipts, including
+[`standalone-package-run-44596599220.json`](../../research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json).
 The preceding successful Rust-lane record remains at
 [`standalone-package-run-44585934651.json`](../../research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json).
 The aggregate release remained cancelled by
 unrelated package hydration and runner failures. Executor proxy policy blocked
 independent artifact download, so inner-archive and executable hashes and a
-second direct package replay remain open. This is same-implementation evidence,
-not an independent arithmetic oracle or signed standing. [pcc:unverified]
+second direct package replay remain open. Later curve-CI and evidence commits
+do not change the packaged Rust executable source, but this remains
+implementation-equivalent same-implementation evidence rather than an exact
+current-head package, independent arithmetic oracle, or signed standing.
+[pcc:unverified]
 
 The deterministic repository-mode source receipt is
 [`binary-transfer-catalog-source-replay-5c6e43a6.json`](../../research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json),
@@ -105,17 +113,24 @@ the exact recorded Git tree and recomputes `e7a12f60…` with Git replacement
 objects disabled. The verifier is 12,930 bytes with SHA-256
 `64e09943c4a2be2508485325fcafa3dfa3d2dc27614db149270c2b5b1894e245`; its
 8/8 local mutation and substitution controls pass. Exact-head release run
-`44596599220` repeated all eight controls, bound the 21 Git blobs, compared this
+`44605953074` repeated all eight controls, bound the 21 Git blobs, compared this
 receipt before staging, and compared it again from the installed package tree.
-Curve run `44618940782` at successor head `37b9b2a6…` has green assessment and
-Lean jobs. Its disk-hardened certificate job passed the combined cover,
-Jacobian, transfer, CLI, binary source, canonical replay, optimized-oracle,
-odd-transfer, native-plan, fixed-F8, and Rust standards controls. The job then
-failed on a pre-existing global IC display input mismatch in the Python
-standards wrapper; final cover/browser checks were skipped, and a scoped
-registry/browser successor is pending. The passed provenance replay does not attest
-that an executable was built from the recorded producer commit or widen any
-arithmetic, subgroup, solver, or advantage claim.
+Scoped successor curve run `44635831391` at exact head `d8df2130…` has green
+assessment (`135953993465`), Lean (`135953993801`), and certificate
+(`135953993705`) jobs. The certificate job passed the combined cover/Jacobian/
+transfer/CLI/source/corpus controls, optimized independent oracles and
+odd-transfer controls, native-plan and fixed-F8 replays, Rust standards check,
+the 22,417-model registry-only Python join/idempotence check, final curve-cover
+check, and sparse-safe browser unit controls. Cover-report artifact
+`14584593258` is 10,085,870 outer ZIP bytes with GitHub digest
+`8245be500a890b32ffa6818cc65adc3859c6d09dc6f26aa01448c7a4af8bda82`.
+The Python gate intentionally uses `--check --registry-only`: it does not
+resolve or silently bypass the pre-existing global IC display-input mismatch.
+The browser controls do not establish freshness of the unhydrated checked-in
+browser data; a fully hydrated browser freshness replay remains open. The
+passed provenance replay does not attest that an executable was built from the
+recorded producer commit or widen any arithmetic, subgroup, solver, or
+advantage claim.
 [pcc:unverified]
 
 ## Required bindings and checks

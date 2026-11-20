@@ -63,7 +63,7 @@
     },
     {
       "path": "scripts/build_cover_transfer_assessments.mjs",
-      "sha256": "8f26b5237a46087cca16e249584acb2df1bdb78272f93c0d69dfc7b43abd7882",
+      "sha256": "01ccb81c8c11a45f7b4ffb59fadf8ac0bbce2f5624fe8fb90d421753c9560463",
       "role": "deterministic catalog-wide ledger generator",
       "freshness": {
         "status": "supported",
@@ -273,6 +273,51 @@
           "research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json",
           "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json",
           "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json"
+        ]
+      }
+    },
+    {
+      "path": "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json",
+      "sha256": "c371c4ce15eb3a279dbb58c2c5f75fcc99cbcb4de5944f6170a1f6faf1a3f50e",
+      "role": "odd transfer catalog canonical replay receipt",
+      "freshness": {
+        "status": "supported",
+        "scope": "the exact 17,879,292-byte odd corpus regeneration and its recorded 22,243-map, 940-binding supported/unsupported/failure partition",
+        "rationale": "This is a same-implementation canonical replay with an intentionally incomplete named-subgroup status. It does not independently verify catalog-wide Jacobian arithmetic, source custody, a relation solver, or computational advantage.",
+        "evidence_refs": [
+          "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json"
+        ]
+      }
+    },
+    {
+      "path": "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json",
+      "sha256": "19fb8345d4c132f4e9fca977bbb6096d0e5a67b102504d628f3b84110167b39f",
+      "role": "odd transfer producer Git-tree receipt",
+      "freshness": {
+        "status": "supported",
+        "scope": "the odd corpus framed source digest, reviewed 29-path closure, and conditional Lean artifact at producer commit 8c94831426fa35040fa7b38b1379299bf6e6d957",
+        "rationale": "The receipt binds saved source and proof-artifact bytes to the recorded Git tree. It does not provide signed standing, independently prove the concrete geometry or arithmetic, implement a solver, or establish computational advantage.",
+        "evidence_refs": [
+          "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json"
+        ]
+      }
+    },
+    {
+      "path": "research/curve_transfer_infrastructure_20261118/standalone-package-run-44605953074.json",
+      "sha256": "53495a6193d2e7efc5c61d9644497919309a1dab610987b6909ee62023803d34",
+      "role": "latest post-run standalone Linux GNU package receipt",
+      "freshness": {
+        "status": "supported",
+        "scope": "the successful Rust GNU package job, 8/8 producer-source controls, 21-file Git-tree binding, installed-layout catalog replays, two prior staged package receipts, and artifact upload at evidence head 3f4706b21cbd25d11387de6799c4200fbfad3a1f",
+        "rationale": "This receipt was created after the run and was not included in the observed archive. It distinguishes the successful package lane from the cancelled aggregate workflow and records the proxy-blocked independent download. It is same-implementation job-side evidence, not an independent artifact replay, source-to-binary attestation, mathematical oracle, solver, or advantage result.",
+        "evidence_refs": [
+          "research/curve_transfer_infrastructure_20261118/standalone-package-run-44605953074.json",
+          "research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json",
+          "research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json",
+          "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json",
+          "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json"
         ]
       }
     },
@@ -782,7 +827,7 @@
     },
     {
       "path": "docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md",
-      "sha256": "a4f6558df68688d8d23b832fe90197ad276e8f5c9b401f886c9d607ec6583702",
+      "sha256": "3e4532b469c574556291f90b713561c72717ada51ac9fb93b9551b32819c66be",
       "role": "standalone CLI and supported-model documentation",
       "freshness": {
         "status": "supported",

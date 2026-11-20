@@ -1340,6 +1340,48 @@ async function buildSourceArtifacts() {
       ),
     ),
     sourceArtifact(
+      "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json",
+      "odd transfer catalog canonical replay receipt",
+      freshness(
+        "supported",
+        "the exact 17,879,292-byte odd corpus regeneration and its recorded 22,243-map, 940-binding supported/unsupported/failure partition",
+        "This is a same-implementation canonical replay with an intentionally incomplete named-subgroup status. It does not independently verify catalog-wide Jacobian arithmetic, source custody, a relation solver, or computational advantage.",
+        [
+          "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json",
+      "odd transfer producer Git-tree receipt",
+      freshness(
+        "supported",
+        "the odd corpus framed source digest, reviewed 29-path closure, and conditional Lean artifact at producer commit 8c94831426fa35040fa7b38b1379299bf6e6d957",
+        "The receipt binds saved source and proof-artifact bytes to the recorded Git tree. It does not provide signed standing, independently prove the concrete geometry or arithmetic, implement a solver, or establish computational advantage.",
+        [
+          "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "research/curve_transfer_infrastructure_20261118/standalone-package-run-44605953074.json",
+      "latest post-run standalone Linux GNU package receipt",
+      freshness(
+        "supported",
+        "the successful Rust GNU package job, 8/8 producer-source controls, 21-file Git-tree binding, installed-layout catalog replays, two prior staged package receipts, and artifact upload at evidence head 3f4706b21cbd25d11387de6799c4200fbfad3a1f",
+        "This receipt was created after the run and was not included in the observed archive. It distinguishes the successful package lane from the cancelled aggregate workflow and records the proxy-blocked independent download. It is same-implementation job-side evidence, not an independent artifact replay, source-to-binary attestation, mathematical oracle, solver, or advantage result.",
+        [
+          "research/curve_transfer_infrastructure_20261118/standalone-package-run-44605953074.json",
+          "research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json",
+          "research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json",
+          "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json",
+          "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json",
+        ],
+      ),
+    ),
+    sourceArtifact(
       "src/bin/curve_transfer_sweep.rs",
       "parameter sweeper and runtime-constructor cross-check",
       freshness(

@@ -45,16 +45,17 @@ are:
   [--output RESPONSE.json]
 ```
 
-The source capabilities documented here are active-branch work. The release
-workflow is configured to package `hyperelliptic-cover` and
-`curve-transfer-sweep` and to smoke-test transfer, malformed-input, and bounded
-sweep requests. Workflow configuration is not package evidence. A historical
-installed-layout replay exists for a retention-bound artifact built from
-crypto revision `74752a1e`; it is neither stable publication nor a package of
-the current implementation revision. Do not attribute current commands to an
-older published archive. A fresh current-head artifact digest, stable
-publication, installed-layout replay, and direct replay of the complete live
-registry remain open release obligations.
+The source capabilities documented here are active-branch work. Release run
+`44605953074`, Rust GNU job `135849755976`, built and smoke-tested the
+implementation-equivalent `3f4706b2…` executables and replayed the binary and
+odd catalogs from the installed staging layout before uploading artifact
+`14572815365`. Later commits through `d8df2130…` change curve-CI/evidence
+scope, not the packaged Rust executable source. The aggregate release was
+cancelled, the post-run receipt was not inside the archive, and independent
+download remains proxy-blocked. Stable publication, an exact-current-head
+build, extracted independent package replay, and direct independent replay of
+the complete live registry remain open release obligations. Do not attribute
+current commands to the older retention-bound `74752a1e` archive.
 
 At the 2026-11-18 source snapshot, the regenerated geometry graph covers all
 22,417 registry models with 22,417 maps and 22,415 distinct cover models. Its
@@ -712,8 +713,8 @@ The docs-only successor head
 implementation/custody identity. The generated corpus and independent `F_2`
 source-law oracle remain crypto-owned and were not copied into cryptanalysis.
 The fixed 486-class `GF(8)` independent source-law gate passes locally and has
-a read-only mathematical review; required review, signed standing, a fresh
-current-head package and extracted-package replay, and catalog-wide
+a read-only mathematical review; required review, signed standing, an
+exact-current-head independently downloaded package replay, and catalog-wide
 independent divisor-map replay remain open. This receipt is not a Jacobian
 index-calculus solver or evidence of a speedup. The assessment does not change
 the geometry semantics or browser status fields in `covers.json` and
@@ -873,23 +874,37 @@ digest
 `e7a12f60c219624b2442bb54a79bb114ad8c89cfd1d33f6f0ca4643af7bae7dd`.
 That source frame includes the binary-module re-exports and the deterministic
 primality implementation and word-sized helper used by exact-order evidence.
-Release run `44596599220`, Rust GNU job `135817148417`, passed the 21-file
-source-tree replay plus native installed-layout exact replay and receipt
-comparison at evidence head `98e4fbfe…`, then uploaded artifact `14567327688`;
-independent download of the
-artifact remains proxy-blocked. The durable job-side record is
-[`standalone-package-run-44596599220.json`](../../research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json).
+Release run `44605953074`, Rust GNU job `135849755976`, passed 8/8 source
+controls, the 21-file source-tree replay, native installed-layout catalog
+replays and receipt comparisons at evidence head `3f4706b2…`, then uploaded
+artifact `14572815365` (104,468,194 outer ZIP bytes; SHA-256
+`5bc9e50d956b80942001107d331e018ee78ea152beadca3e159023f62c5fc290`).
+Independent download remains proxy-blocked. The post-run durable job-side
+record is
+[`standalone-package-run-44605953074.json`](../../research/curve_transfer_infrastructure_20261118/standalone-package-run-44605953074.json),
+6,612 bytes with SHA-256
+`53495a6193d2e7efc5c61d9644497919309a1dab610987b6909ee62023803d34`.
+It was created after the run and was not included in the observed archive;
+the archive staged the two prior package-run receipts.
 The repository-mode 21-file Git-tree verifier
 and receipt additionally reproduce `e7a12f60…` with replacement objects
 disabled and logical paths checked against their normalized `include_str!`
-targets. Its 8/8 local controls and the exact-head release replay pass. Curve
-run `44618940782` at successor head `37b9b2a6…` has green assessment and Lean
-jobs; its certificate job passed the combined transfer/source replay,
-optimized oracles, odd-transfer replay, native plan, fixed-F8 certificate, and
-Rust standards checks. A pre-existing global IC display input mismatch then
-failed the Python standards wrapper and skipped the final cover/browser checks;
-a scoped successor is pending. This source receipt does not attest the executable build or supply an
-independent arithmetic check.
+targets. Its 8/8 local controls and the exact-head release replay pass. Scoped
+successor curve run `44635831391` at exact head `d8df2130…` has green
+assessment (`135953993465`), Lean (`135953993801`), and certificate
+(`135953993705`) jobs. The certificate job passed the combined cover/Jacobian/
+transfer/CLI/source/corpus controls, optimized independent oracles and
+odd-transfer controls, native-plan and fixed-F8 replays, Rust standards check,
+the 22,417-model registry-only Python join/idempotence check, final curve-cover
+check, and sparse-safe browser unit controls. Cover-report artifact
+`14584593258` is 10,085,870 outer ZIP bytes with GitHub digest
+`8245be500a890b32ffa6818cc65adc3859c6d09dc6f26aa01448c7a4af8bda82`.
+The Python gate intentionally uses `--check --registry-only`: it does not
+resolve or silently bypass the pre-existing global IC display-input mismatch.
+The browser controls do not establish freshness of the unhydrated checked-in
+browser data; a fully hydrated browser freshness replay remains open. This
+source receipt does not attest the executable build or supply an independent
+arithmetic check.
 The earlier `67142558…` / `e0ae0fe5…` and `f402ccd4…` / `8c61e842…` corpora
 remain historical evidence, not the current same-implementation replay target.
 [pcc:unverified]
@@ -931,9 +946,15 @@ the extension rows still need their typed backends. The one invalid generator
 is not relabelled as a missing proof. The recorded Rust compiler label is
 caller-supplied and unverified, and the local unsigned Lean theorem proves only
 the conditional structural implication under supplied hypotheses.
-Installed-package replay, independent replay, and the remaining source-order
-certificates are separate release gates. The corpus supplies no relation
-solver, key recovery, scaling result, or computational-advantage evidence.
+Independent downloaded-package replay, exact-current-head stable publication,
+and the remaining source-order certificates are separate release gates.
+Trusted artifact migration selected this exact 17,879,292-byte corpus but
+stopped on an ambiguous S3 HTTP 403 before any upload, manifest staging, or
+remote-byte replay. Repository documentation records the configured write-once
+store as externally disabled. Store restoration and exact full-byte replay are
+therefore a custody/shipping blocker, not an arithmetic failure. The corpus
+supplies no relation solver, key recovery, scaling result, or
+computational-advantage evidence.
 [pcc:unverified]
 
 The earlier 17,879,352-byte `7c60fc…` pre-composition corpus from producer
