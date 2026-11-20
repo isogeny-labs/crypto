@@ -110,3 +110,13 @@ alpha 0.5 at q = 32003. The matched rho runs at about 14× the scalar rho's step
 Against it, the best IC arm takes 1.68, 1.19 and 0.77 of rho's expected time at q = 16001, 24001
 and 32003 [pcc:unverified] (L0). The earlier "below rho" ratios of 0.04–0.36 were measured against
 a weak scalar rho and are superseded. Report: `next_leads_20261120/REPORT.pdf`.
+
+## Slope test against a SIMD matched rho (2026-11-20, `slope_20261120/`)
+
+The crate now accepts q < 2^16. Two further flags were verified in workflow `wf_6b058b58-659`:
+the SIMD matched rho (`HUMBERT_RHO_SIMD`) and Montgomery mod-r linear algebra
+(`HUMBERT_LA_FASTMOD`). The campaign was 160 runs over q = 16001–65521; all solved, with counted
+fields identical. Against the SIMD rho, which runs at 4.5× the v7 rho's steps per second, the
+best IC arm takes 3.89, 1.97, 2.00 and 1.37 of rho's expected time. The slopes are 1.21 for IC
+and 2.00 for rho, which puts the extrapolated crossover near q ≈ 92 000 [pcc:unverified] (L0).
+Report: `slope_20261120/REPORT.pdf`.
