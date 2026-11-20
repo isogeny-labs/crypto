@@ -942,12 +942,18 @@ impl Producer<'_> {
             let degree = monic.len as usize - 1;
             let quotient = self.p / degree as u64;
             let remainder = (self.p % degree as u64) as usize;
-            let scaled = if quotient == 0 {
+            // R65_PRODUCER_UNIT_BINOMIAL_BEGIN
+            // x^d = -c; when c is +/-1 the power is a sign, not a
+            // logarithmic scalar exponentiation.
+            let scaled = if quotient == 0 || monic.coefficients[0] == self.p - 1 {
                 1
+            } else if monic.coefficients[0] == 1 {
+                if quotient & 1 == 0 { 1 } else { self.p - 1 }
             } else {
                 let neg_c = self.sub(0, monic.coefficients[0])?;
                 self.split_scalar_pow(neg_c, quotient)?
             };
+            // R65_PRODUCER_UNIT_BINOMIAL_END
             let delta = base.coefficients[0];
             let mut result = Poly17::constant(delta);
             if remainder == 0 {
@@ -959,14 +965,17 @@ impl Producer<'_> {
             return Ok(result);
         }
         // R58_BINOMIAL_FROBENIUS_PRODUCER_END
-        // Over Fp, r^p == r. In Fp[x]/(x-r), x^p is therefore r.
-        // The canonical input x is the only base eligible for this path.
+        // R65_PRODUCER_AFFINE_LINEAR_BEGIN
+        // For every affine base x+delta, Frobenius fixes the evaluation
+        // at x=-c in Fp[x]/(x+c). No polynomial powering is necessary.
         if monic.len == 2 && exponent == self.p
-            && base.len == 2 && base.coefficients[0] == 0
-            && base.coefficients[1] == 1
+            && base.len == 2 && base.coefficients[1] == 1
         {
-            return Ok(Poly17::constant(self.sub(0, monic.coefficients[0])?));
+            return Ok(Poly17::constant(
+                self.sub(base.coefficients[0], monic.coefficients[0])?
+            ));
         }
+        // R65_PRODUCER_AFFINE_LINEAR_END
         // R45_QUADRATIC_FROBENIUS_PRODUCER_BEGIN
         // In Fp[x]/(x^2+b*x+c), x^p equals x when the discriminant
         // is a nonzero square, -b-x when irreducible, and -b/2 when
@@ -2203,12 +2212,18 @@ impl Replay {
             let degree = usize::from(monic.len) - 1;
             let quotient = self.p / degree as u64;
             let remainder = (self.p % degree as u64) as usize;
-            let scaled = if quotient == 0 {
+            // R65_REPLAY_UNIT_BINOMIAL_BEGIN
+            // Independent verifier: (-1)^q is determined by q's parity,
+            // and (+1)^q is one. This remains valid when p < degree.
+            let scaled = if quotient == 0 || monic.coefficients[0] == self.p - 1 {
                 1
+            } else if monic.coefficients[0] == 1 {
+                if quotient % 2 == 0 { 1 } else { self.p - 1 }
             } else {
                 let neg_c = self.minus(0, monic.coefficients[0])?;
                 self.split_character_power(neg_c, quotient)?
             };
+            // R65_REPLAY_UNIT_BINOMIAL_END
             let delta = base.coefficients[0];
             let mut checked = Poly17::constant(delta);
             if remainder == 0 {
@@ -2220,14 +2235,17 @@ impl Replay {
             return Ok(checked);
         }
         // R58_BINOMIAL_FROBENIUS_REPLAY_END
-        // Evaluate x^p at the unique root of the linear modulus using
-        // Frobenius on Fp; do not call the producer's arithmetic.
+        // R65_REPLAY_AFFINE_LINEAR_BEGIN
+        // Separate verifier calculation: reduce affine x+delta at x=-c.
+        // The resulting field element is fixed by the p-th power map.
         if monic.len == 2 && exponent == self.p
-            && base.len == 2 && base.coefficients[0] == 0
-            && base.coefficients[1] == 1
+            && base.len == 2 && base.coefficients[1] == 1
         {
-            return Ok(Poly17::constant(self.minus(0, monic.coefficients[0])?));
+            return Ok(Poly17::constant(
+                self.minus(base.coefficients[0], monic.coefficients[0])?
+            ));
         }
+        // R65_REPLAY_AFFINE_LINEAR_END
         // R45_QUADRATIC_FROBENIUS_REPLAY_BEGIN
         // Verify quadratic Frobenius using a separate left-to-right
         // Euler-criterion implementation. Do not invoke producer code.
@@ -3259,6 +3277,84 @@ mod tests {
                                 "producer p={p} degree={degree} c={constant} delta={delta}");
                             assert_eq!(replay.modular_power(base, p, &modulus).unwrap(), expected,
                                 "replay p={p} degree={degree} c={constant} delta={delta}");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn round65_frobenius_sign_and_affine_linear_oracle() {
+        // Oracle uses the field identity a^p=a, plus an independent
+        // u128 modular exponentiation for x^d+c. Producer and replay
+        // must agree for every public affine constant and normalized
+        // nonmonic divisor, including small primes and p<degree.
+        fn pow(mut base: u64, mut exponent: u64, p: u64) -> u64 {
+            let mut acc = 1u64;
+            while exponent != 0 {
+                if exponent & 1 != 0 {
+                    acc = ((acc as u128 * base as u128) % p as u128) as u64;
+                }
+                exponent >>= 1;
+                base = ((base as u128 * base as u128) % p as u128) as u64;
+            }
+            acc
+        }
+        for p in [3u64, 5, 7, 101, 1_000_000_007, 1_000_000_009,
+                  (1u64 << 61) - 1] {
+            let f = field(p);
+            let mut observer = |_: &BoundedRootEvent| Ok(());
+            let mut producer = Producer {
+                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
+                unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
+                roots: [0; 8], root_count: 0,
+            };
+            producer.gate.admit().unwrap();
+            let mut replay =
+                Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+
+            for leading in [1u64, p - 1] {
+                for constant in [0u64, 1, p - 1, 17 % p] {
+                    let linear = Poly17::from_coefficients(
+                        &f, &[((constant as u128 * leading as u128)
+                              % p as u128) as u64, leading]
+                    ).unwrap();
+                    for delta in [0u64, 1, p - 1, 23 % p] {
+                        let base = Poly17::from_coefficients(&f, &[delta, 1]).unwrap();
+                        let expected = Poly17::constant(
+                            if delta >= constant { delta - constant }
+                            else { p - (constant - delta) }
+                        );
+                        assert_eq!(producer.power(&base, p, &linear).unwrap(), expected,
+                            "linear producer p={p} c={constant} delta={delta} leading={leading}");
+                        assert_eq!(replay.modular_power(base, p, &linear).unwrap(), expected,
+                            "linear replay p={p} c={constant} delta={delta} leading={leading}");
+                    }
+                }
+            }
+            for degree in 3..=8usize {
+                for leading in [1u64, p - 1] {
+                    for c in [1u64, p - 1] {
+                        let mut coeffs = vec![0u64; degree + 1];
+                        coeffs[0] = ((c as u128 * leading as u128) % p as u128) as u64;
+                        coeffs[degree] = leading;
+                        let modulus = Poly17::from_coefficients(&f, &coeffs).unwrap();
+                        for delta in [0u64, 1, p - 1, 23 % p] {
+                            let base = Poly17::from_coefficients(&f, &[delta, 1]).unwrap();
+                            let q = p / degree as u64;
+                            let r = (p % degree as u64) as usize;
+                            let s = pow(p - c, q, p);
+                            let mut coeffs = vec![0u64; degree];
+                            coeffs[0] = delta;
+                            if r == 0 {
+                                coeffs[0] = ((delta as u128 + s as u128) % p as u128) as u64;
+                            } else {
+                                coeffs[r] = s;
+                            }
+                            let expected = Poly17::from_coefficients(&f, &coeffs).unwrap();
+                            assert_eq!(producer.power(&base, p, &modulus).unwrap(), expected);
+                            assert_eq!(replay.modular_power(base, p, &modulus).unwrap(), expected);
                         }
                     }
                 }
