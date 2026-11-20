@@ -904,6 +904,35 @@ impl RadicalRootCtx {
             r = f.mul(r, b);
         }
     }
+    // Binary Jacobi prefilter: half of uniformly random discriminants
+    // are nonsquares. Avoid powering them when p == 3 (mod 4).
+    // This is variable-time and applies only to public coefficients.
+    #[inline]
+    fn sqrt_discriminant(&self, a: u64) -> Option<u64> {
+        let p = self.f.p;
+        if p >= (1u64 << 20) && p & 3 == 3 && a != 0 && a < p {
+            let (mut v, mut n) = (a, p);
+            let mut negative = false;
+            while v != 0 {
+                let twos = v.trailing_zeros();
+                v >>= twos;
+                if twos & 1 != 0 && (n & 7 == 3 || n & 7 == 5) {
+                    negative = !negative;
+                }
+                if v & 3 == 3 && n & 3 == 3 {
+                    negative = !negative;
+                }
+                let next = n % v;
+                n = v;
+                v = next;
+            }
+            if n != 1 || negative {
+                return None;
+            }
+        }
+        self.sqrt(a)
+    }
+
     /// Distinct roots of monic y^2 + b y + c.
     pub fn quad_monic(&self, b: u64, c: u64) -> Vec<u64> {
         let f = &self.f;
@@ -915,7 +944,7 @@ impl RadicalRootCtx {
         // generic base-field multiply (wide remainder on most p).
         let twice_c = f.add(c, c);
         let disc = f.sub(f.sqr(b), f.add(twice_c, twice_c));
-        match self.sqrt(disc) {
+        match self.sqrt_discriminant(disc) {
             None => vec![],
             Some(0) => vec![f.half(f.neg(b))],
             Some(s) => {
@@ -959,7 +988,7 @@ impl RadicalRootCtx {
         let ac = f.mul(a, c);
         let twice_ac = f.add(ac, ac);
         let disc = f.sub(f.sqr(b), f.add(twice_ac, twice_ac));
-        let s = match self.sqrt(disc) {
+        let s = match self.sqrt_discriminant(disc) {
             Some(s) => s,
             None => return vec![],
         };
@@ -1023,7 +1052,7 @@ impl RadicalRootCtx {
         }
         let nq2 = f.neg(q2);
         let m = f.neg(f.mul(pp, self.inv3));
-        match self.sqrt(d) {
+        match self.sqrt_discriminant(d) {
             Some(sg) => {
                 let u3 = f.add(nq2, sg);
                 match self.cube_p.root(u3) {
@@ -1392,6 +1421,29 @@ impl RadicalRootCtx {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round67_discriminant_prefilter_matches_sqrt_and_quadratic_roots() {
+        for p in [7u64, 11, 31, 101, 1_000_000_007, (1u64 << 61) - 1] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let mut state = 0x9e3779b97f4a7c15u64 ^ p;
+            for iteration in 0..512 {
+                state = state.wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                let a = if iteration == 0 { 0 } else if iteration == 1 { p }
+                    else if iteration == 2 { p - 1 } else { state % p };
+                assert_eq!(ctx.sqrt(a), ctx.sqrt_discriminant(a),
+                    "p={p} a={a}");
+                let root = state % p;
+                let b = (state >> 7) % p;
+                let c = ctx.f.neg(ctx.f.add(ctx.f.sqr(root), ctx.f.mul(b, root)));
+                let roots = ctx.quad_monic(b, c);
+                assert!(roots.contains(&root),
+                    "p={p} root={root} b={b} c={c}");
+            }
+        }
+    }
+
 
     // Frozen two-power AMM baseline, using the same production Fq2 powering.
     #[derive(Clone, Copy)]
