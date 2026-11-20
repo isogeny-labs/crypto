@@ -7,6 +7,7 @@ description = "Reference external SAT arms for the B0 PDP baseline: CryptoMiniSa
 [dependencies]
 cryptominisat = "5.8.0-rust1"
 cadical-sys = "=0.8.0"
+libc = "0.2"
 
 [patch.crates-io]
 cryptominisat = { path = "../../third_party/cryptominisat-rs" }
