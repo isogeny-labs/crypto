@@ -30,3 +30,17 @@ The original 31-rank/1,024-log Rust control in PR #4728 uses slot weights **[1,3
 ## Explicit status
 
 Preregistered protocol only. No new runtime results exist at the moment this protocol is committed; a later addendum must cite the successful exact-source run and independently verified outputs before claiming a pass.
+
+## Preregistered amendment A1 — immutable target-offset indexing (before v2 code)
+
+**Reason for amendment:** In the first paired-run code, `target_state` was advanced both once to choose each secret and once for every attempted online offset. The two candidate weight systems had different miss counts, so their later public target Q sequences diverged despite equal initial seeds. First-run #44646124372 remains a valid original-Rust 1024/1024 full-log result **for each arm separately** and a descriptive same-host contrast, but it is *not a fully paired public-target sample*. Do not use that comparison to claim a per-target weight advantage.
+
+**Revised exact experiment, frozen before modifying source:**
+
+1. Keep one SplitMix64 stream `SEED ^ TARGET_XOR` **only** for the 1,024 target-secret scalars, one call per target. No branch-specific consumptions.
+2. Let `OFFSET_XOR=0x4f46465345545332`. For each target index `t` and attempt index `i`, initialize `state = SEED ^ TARGET_XOR ^ OFFSET_XOR ^ ((t * 0xd6e8feb86659fd93) mod 2^64) ^ ((i * 0xa0761d6478bd642f) mod 2^64)`. Draw one nonzero scalar via the existing rejection-sampled `nonzero_scalar`. This offset depends **only** on `t,i`, never previous success or failures.
+3. Both odd and pow2 arms must therefore test exactly the same `Q_t=[d_t]G` and the same translated residual at each attempted `(t,i)`, though they may stop at different attempts. The four-window schedule remains `wi=(t+i)%4`; factor-base training streams may consume differing numbers of draws and are separately counted.
+4. Fail-closed original-Rust/Python independent replay tests verify *every* public target index, test scalar, successful offset and solution; the CI script must additionally assert 1,024/1,024 cross-arm identical Q and target secret. Retain all 32-attempt caps and all charges.
+5. Publish v2 as a **new** source-bound matched artifact; do not overwrite or disguise the first-run evidence. Both arms remain generic-equivalent 4+4 grading controls; no public-only F4 relation solver or faster non-generic ECDLP is claimed. Full BSGS/rho controls are outside this paired native two-arm run.
+
+This amendment was published before editing the deterministic target/offset generator or launching the v2 run. Signed third-party PCC remains unverified.
