@@ -145,6 +145,36 @@ mod round58 {
      }
    }
  }
+ #[test]
+ #[ignore="13 paired source-exact complete root plus replay timings"]
+ fn benchmark_complete_binomial_roots() {
+   for p in [1_000_000_007u64,(1u64<<61)-1] {
+     for degree in [4usize,8] {
+       for leading in [1u64,p-1] {
+         let mut old=Vec::new(); let mut new=Vec::new();
+         let reps=8usize;
+         for trial in 0..13 {
+           let bench=|optimized:bool| {
+             let start=Instant::now();
+             for _ in 0..reps {
+               if optimized {
+                 black_box(after::round58_whole(p,degree,17,leading));
+               } else {
+                 black_box(before::round58_whole(p,degree,17,leading));
+               }
+             }
+             start.elapsed().as_nanos() as f64 / reps as f64
+           };
+           if trial%2==0 { old.push(bench(false));new.push(bench(true)); }
+           else { new.push(bench(true));old.push(bench(false)); }
+         }
+         let a=median(old);let b=median(new);
+         println!("ROUND58_WHOLE p={p} degree={degree} leading={leading} before_ns={a:.2} after_ns={b:.2} speedup={:.3}",a/b);
+       }
+     }
+   }
+ }
+
 }
 """
 with tempfile.TemporaryDirectory() as tmp:
@@ -154,3 +184,4 @@ with tempfile.TemporaryDirectory() as tmp:
     subprocess.run(["rustc","--edition=2021","-O","--test",str(path),"-o",str(binary)],check=True)
     subprocess.run([str(binary),"binomial_frobenius_and_certificate_streams","--nocapture"],check=True)
     subprocess.run([str(binary),"benchmark_binomial_frobenius","--ignored","--nocapture"],check=True)
+    subprocess.run([str(binary),"benchmark_complete_binomial_roots","--ignored","--nocapture"],check=True)
