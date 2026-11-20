@@ -970,3 +970,31 @@ jobs:
           name: round48-tonelli-native-rust
           path: ${{ runner.temp }}/round48-tonelli-rust.txt
           if-no-files-found: ignore
+
+  bounded-binomial-frobenius-round58:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round58_binomial_frobenius_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare exact source Rust before and after, root events and independent replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round58_binomial_frobenius_isolated.py
+          } | tee "$RUNNER_TEMP/round58-native-rust.txt"
+          cat "$RUNNER_TEMP/round58-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round58-binomial-frobenius-native-rust
+          path: ${{ runner.temp }}/round58-native-rust.txt
+          if-no-files-found: ignore
