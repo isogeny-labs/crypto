@@ -78,14 +78,29 @@ solves certified, executed rho at 0.94 and 0.78 of its expectation) gives:
 - arm D at 0.0107 of rho;
 - a gain of 24x (range 23.8-24.8).
 
-From p=31 (94x) to p=73 (24x) the slope is -1.58. That puts p*(8) at about **550 (slope -1.58)
-to 1800 (slope -1)**, not >~10^4.
+From p=31 (94x) to p=73 (24x) the slope is -1.58. This is the small-p regime, where the
+falling-factorial penalty on degree-1 bases is still strong.
 
-p*(g) still grows with genus (about 270, about 830, about 550-1800 for g = 6, 7, 8), but far
-more slowly than g!. The "g!/3 to g!/6" scaling in the table above is withdrawn, and so is the
-extrapolation to g >= 10 and g >= 12 drawn from it.
+A further cell at g=8, p=101 (`../P4_followup/g8decay/g8_p101_cDER.jsonl`, 1 curve x 2 seeds,
+all certified) gives a gain of **22.6x** (range 21.4-23.8). Rho is priced from expected steps,
+3.75e7, which is over the executed-rho cap, times the g=8 step cost measured at p=73
+(2285 FPM). The arms then sit at:
+- lab arm: 0.17 of rho;
+- arm D: 0.0075 of rho;
+- arm E: 0.016 of rho.
 
-A cell at g=8, p=101 is running to pin the g=8 slope down; see `../P4_followup/`.
+From p=73 to p=101 the local slope is only -0.23.
+
+**Revised reading.** p*(8) is not pinned down. Every point is a single curve, and the lab arm's
+cost depends on the curve's count of degree-1 base points.
+- If the decay slope is no steeper than -1 from p=101 on, p*(8) is at least about 2300.
+- The p=73 to p=101 slope suggests it could be much larger.
+
+The "550-1800" estimate given first in this erratum is withdrawn along with the original one.
+The robust statement is this: p* rises with genus (about 270 at g=6, about 830 extrapolated at
+g=7, at least about 2300 at g=8 under slope -1), and at g=8 the degree-2 base is 20-25x
+cheaper than the lab arm at every p measured from 73 to 101.
+
 
 Validation (2026-11-20): `../VALIDATION_P1P2.md` re-derives this file's tables to within 0.33%
 (validated-with-errata). Erratum E7: these crossover cells used a 2e7 trial cap, against 5e6 in P1.
