@@ -1,0 +1,26 @@
+{
+  "schema": "engineering.f4-doc-placement/v1",
+  "at": "2026-11-20T00:26:35.096509+00:00",
+  "baseline_head": "71ec60f2e995637912fd4dddda1b0458619cb8d3",
+  "failed_ci": {
+    "run": 44638720062,
+    "job": 135964030128,
+    "source_head": "f6b4a5a69829d09edb09468da893c257de01c902",
+    "toolchain": "1.98.1 x86_64-unknown-linux-gnu",
+    "diagnostic": "unused doc comment before thread_local! at pq_f4_f2.rs:1118",
+    "exit": 101
+  },
+  "change": "Move the existing two-line F4_F2_FL documentation comment from the macro invocation to fl_enabled. No executable text changes.",
+  "identical_after_removing_moved_comment": true,
+  "source_sha256": "471a26ea1771b7d3da806593a94c314791ee1a5763f14dd2469eb97374c2d40f",
+  "local_control": {
+    "toolchain": "1.99.1 aarch64-apple-darwin",
+    "scope": "Exact extracted affected region, -D warnings; full CI is still required",
+    "baseline_exit": 1,
+    "candidate_compile_exit": 0,
+    "candidate_execution_exit": 0
+  },
+  "full_library_validation": "Existing00128 run retains identical executable Rust source apart from this documentation movement; no completed result claimed here.",
+  "frozen_artifact_changes": false,
+  "performance_claim": null
+}

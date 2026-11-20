@@ -1115,8 +1115,6 @@ const FL_MIN_COLS: usize = 256;
 /// splitting and compressing the rows.
 const FL_MIN_ROWS: usize = 32;
 
-/// `F4_F2_FL=0` retains the full-width reducer cascade as a same-binary
-/// control.
 thread_local! {
     // The admitted replay profiles predate the FL schedule (b72ff385,
     // 2026-11-17). Their frozen logical XOR counts use the full-width
@@ -1144,6 +1142,8 @@ impl Drop for LegacyFullWidth {
     }
 }
 
+/// `F4_F2_FL=0` retains the full-width reducer cascade as a same-binary
+/// control.
 fn fl_enabled() -> bool {
     if LEGACY_FULL_WIDTH.with(|selected| selected.get()) {
         return false;
