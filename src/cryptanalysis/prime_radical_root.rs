@@ -356,6 +356,21 @@ impl Ring for Fq2 {
                    else { (0, f.mul(x.1, power)) };
         }
         let p = self.f.p as u128;
+        // In Fp2, x^p = conjugate(x) and x * conjugate(x) = Norm(x).
+        // Thus x^(p-1) = conjugate(x)^2 / Norm(x). This replaces a
+        // ~log2(p)-step extension-field power with one base-field inverse.
+        // The adjacent 2(p-1) case needs only one additional Fp2 square.
+        // Inputs are public; variable-time Euclid is intentional here.
+        if x.0 != 0 && x.1 != 0 && x.0 < f.p && x.1 < f.p
+            && (e == p - 1 || e == 2 * (p - 1))
+        {
+            let norm = f.sub(f.sqr(x.0), self.mul_nonresidue(f.sqr(x.1)));
+            let conjugate = (x.0, f.neg(x.1));
+            let squared = self.sqr(conjugate);
+            let inv_norm = f.inv(norm);
+            let ratio = (f.mul(squared.0, inv_norm), f.mul(squared.1, inv_norm));
+            return if e == p - 1 { ratio } else { self.sqr(ratio) };
+        }
         if e < p || e >= self.order() || x == (0, 0)
             || x.0 >= self.f.p || x.1 >= self.f.p
         {
@@ -370,6 +385,17 @@ impl Ring for Fq2 {
             return (f.powm(norm, lo), 0);
         }
         let conjugate = (x.0, f.neg(x.1));
+        // x^lo * conjugate(x)^hi =
+        // x^(lo-hi) * Norm(x)^hi (or conjugate(x)^(hi-lo) * Norm(x)^lo).
+        // Only use this for nearly equal, large exponents; for random
+        // exponents the original joint-bit loop is faster.
+        let difference = lo.abs_diff(hi);
+        if f.p >= (1u64 << 20) && lo.min(hi) >= 1_024 && difference <= 256 {
+            let base = if lo > hi { x } else { conjugate };
+            let reduced = rpow(self, base, difference as u128);
+            let scale = f.powm(norm, lo.min(hi));
+            return (f.mul(reduced.0, scale), f.mul(reduced.1, scale));
+        }
         // The top nonzero joint bit can initialize the accumulator directly.
         // Avoid squaring and multiplying the identity at the first iteration.
         let bits = u64::BITS - (lo | hi).leading_zeros();
@@ -1439,6 +1465,46 @@ impl RadicalRootCtx {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round70_frobenius_reduction_matches_independent_binary_power() {
+        // Include both sides of the near-diagonal, exact p-1 and 2(p-1),
+        // canonical zero/sparse/dense inputs, and small-prime fallbacks.
+        for p in [5u64, 7, 11, 17, 31, 101, 1_000_000_007,
+                  1_000_000_009, MAX_PRIME] {
+            let f = Fp::new(p);
+            let q = Fq2 { f, n: f.first_quadratic_nonresidue() };
+            let mut state = p ^ 0x70fc_39f2_11a4_d021u64;
+            for iteration in 0..64 {
+                state = state.wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                let x = match iteration % 7 {
+                    0 => (0, 0),
+                    1 => (state % p, 0),
+                    2 => (0, state % p),
+                    3 => (p - 1, p - 1),
+                    _ => (state % p, state.rotate_left(29) % p),
+                };
+                let hi = 1 + state.rotate_left(9) % (p - 1);
+                let lo = match iteration % 4 {
+                    0 => hi,
+                    1 => (hi + 1).min(p - 1),
+                    2 => hi.saturating_sub(1),
+                    _ => (hi + 128).min(p - 1),
+                };
+                for e in [
+                    (p - 1) as u128,
+                    (2 * (p - 1)) as u128,
+                    (hi as u128) * (p as u128) + lo as u128,
+                    (lo as u128) * (p as u128) + hi as u128,
+                ] {
+                    let expected = rpow(&q, x, e);
+                    let actual = q.pow(x, e);
+                    assert_eq!(actual, expected, "p={p} x={x:?} e={e}");
+                }
+            }
+        }
+    }
 
     #[test]
     fn round68_window_power_matches_independent_binary_reference() {
