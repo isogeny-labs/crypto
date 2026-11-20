@@ -303,6 +303,49 @@ impl Producer<'_> {
             return Err(Stop::InvalidInput);
         }
         out.len = n as u8;
+        // R51_PRODUCER_PRODUCT_BEGIN
+        // Multiplication by a scalar, x, or a monic linear polynomial can
+        // bypass whole rows of zero additions and unit multiplications.
+        // The preceding COPY_WORK charge still checks the deadline.
+        if a.len == 1 || b.len == 1 {
+            let (scalar, poly) = if a.len == 1 { (a, b) } else { (b, a) };
+            let c = scalar.coefficients[0];
+            if c == 1 {
+                return Ok(*poly);
+            }
+            out.len = poly.len;
+            for i in 0..poly.len as usize {
+                out.coefficients[i] = self.mul(c, poly.coefficients[i])?;
+            }
+            out.trim();
+            return Ok(out);
+        }
+        let linear = if a.len == 2 && a.coefficients[1] == 1 {
+            Some((a, b))
+        } else if b.len == 2 && b.coefficients[1] == 1 {
+            Some((b, a))
+        } else {
+            None
+        };
+        if let Some((linear, poly)) = linear {
+            let c = linear.coefficients[0];
+            let size = poly.len as usize;
+            if c == 0 {
+                // x * f(x) is an exact coefficient shift.
+                out.coefficients[1..=size]
+                    .copy_from_slice(&poly.coefficients[..size]);
+                return Ok(out);
+            }
+            out.coefficients[0] = self.mul(c, poly.coefficients[0])?;
+            for i in 1..size {
+                let scaled = self.mul(c, poly.coefficients[i])?;
+                out.coefficients[i] = self.add(poly.coefficients[i - 1], scaled)?;
+            }
+            out.coefficients[size] = poly.coefficients[size - 1];
+            out.trim();
+            return Ok(out);
+        }
+        // R51_PRODUCER_PRODUCT_END
         // A zero constant term is a cheap indicator of structured/sparse
         // factors. Preserve the original dense loop on ordinary inputs.
         if a.coefficients[0] == 0 || b.coefficients[0] == 0 {
@@ -1197,6 +1240,54 @@ impl Replay {
             return Err(Stop::InvalidCertificate);
         }
         z.len = n as u8;
+        // R51_REPLAY_CONVOLUTION_BEGIN
+        // Independent verifier path for scalar, x, and monic-linear
+        // convolution. Traverse output coefficients rather than producer
+        // rows; each nontrivial field operation retains its gate check.
+        if x.len == 1 || y.len == 1 {
+            let (scalar, poly) = if x.len == 1 { (x, y) } else { (y, x) };
+            if scalar.coefficients[0] == 1 {
+                return Ok(*poly);
+            }
+            z.len = poly.len;
+            for k in 0..poly.len as usize {
+                self.gate.charge(32)?;
+                z.coefficients[k] = self.times(scalar.coefficients[0], poly.coefficients[k])?;
+            }
+            z.trim();
+            return Ok(z);
+        }
+        let linear = if x.len == 2 && x.coefficients[1] == 1 {
+            Some((x, y))
+        } else if y.len == 2 && y.coefficients[1] == 1 {
+            Some((y, x))
+        } else {
+            None
+        };
+        if let Some((linear, poly)) = linear {
+            let size = poly.len as usize;
+            let c = linear.coefficients[0];
+            if c == 0 {
+                // No field operations are needed to multiply by x.
+                z.coefficients[1..=size]
+                    .copy_from_slice(&poly.coefficients[..size]);
+                return Ok(z);
+            }
+            for k in 0..=size {
+                self.gate.charge(32)?;
+                z.coefficients[k] = if k == 0 {
+                    self.times(c, poly.coefficients[0])?
+                } else if k == size {
+                    poly.coefficients[size - 1]
+                } else {
+                    let scaled = self.times(c, poly.coefficients[k])?;
+                    self.plus(poly.coefficients[k - 1], scaled)?
+                };
+            }
+            z.trim();
+            return Ok(z);
+        }
+        // R51_REPLAY_CONVOLUTION_END
         // Keep the independent output-diagonal verifier traversal; only
         // select the zero-eliding version for structured inputs.
         let sparse = x.coefficients[0] == 0 || y.coefficients[0] == 0;
@@ -2093,6 +2184,65 @@ mod tests {
         f.iter().rev().fold(0, |a, &c| {
             ((u128::from(a) * u128::from(x) + u128::from(c)) % u128::from(p)) as u64
         })
+    }
+    #[test]
+    fn round51_scalar_and_monic_linear_products_match_wide_reference() {
+        for p in [3u64, 7, 1_000_000_007, 1_000_000_009,
+                  4_294_967_291, (1u64 << 61) - 1] {
+            let f = field(p);
+            let mut observer = |_: &BoundedRootEvent| Ok(());
+            let mut producer = Producer {
+                p,
+                gate: Gate::new(budget(), deadline()),
+                observer: &mut observer,
+                unacknowledged: None,
+                pending: [Poly17::ZERO; 8],
+                pending_len: 0,
+                roots: [0; 8],
+                root_count: 0,
+            };
+            producer.gate.admit().unwrap();
+            let mut replay =
+                Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+            let mut seed = 0x2026_1120_5151_0001u64;
+            let mut comparisons = 0usize;
+            for size in [2usize, 4, 8] {
+                for _ in 0..16 {
+                    let mut coefficients = [0u64; 8];
+                    for value in coefficients.iter_mut().take(size) {
+                        seed = seed.wrapping_mul(6364136223846793005)
+                            .wrapping_add(1442695040888963407);
+                        *value = (seed ^ (seed >> 29)) % p;
+                    }
+                    coefficients[size - 1] = 1 + (seed % (p - 1));
+                    let poly =
+                        Poly17::from_coefficients(&f, &coefficients[..size]).unwrap();
+                    for linear in [
+                        vec![0u64, 1], vec![1, 1], vec![p - 1, 1],
+                        vec![2 % p, 1], vec![1], vec![p - 1],
+                    ] {
+                        let factor = Poly17::from_coefficients(&f, &linear).unwrap();
+                        let mut wide = [0u128; 17];
+                        for (i, &a) in poly.coefficients().iter().enumerate() {
+                            for (j, &b) in factor.coefficients().iter().enumerate() {
+                                wide[i + j] += u128::from(a) * u128::from(b);
+                            }
+                        }
+                        let n = size + factor.len as usize - 1;
+                        let expected_coefficients: Vec<u64> = wide[..n].iter()
+                            .map(|&v| (v % u128::from(p)) as u64).collect();
+                        let expected =
+                            Poly17::from_coefficients(&f, &expected_coefficients).unwrap();
+                        assert_eq!(producer.product(&poly, &factor).unwrap(), expected);
+                        assert_eq!(producer.product(&factor, &poly).unwrap(), expected);
+                        assert_eq!(replay.convolution(&poly, &factor).unwrap(), expected);
+                        assert_eq!(replay.convolution(&factor, &poly).unwrap(), expected);
+                        comparisons += 4;
+                    }
+                }
+            }
+            assert_eq!(comparisons, 1_152, "p={p}");
+        }
     }
     // Compare both independently implemented consumers with the exact wide
     // modulo reference, including carries, zero, p-1 and random inputs.
