@@ -14,7 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find and substantiate a classical subexponential index-calculus algorithm for ordinary elliptic curves over growing prime fields, with prime subgroup order comparable on the log scale to the field size. Require expected total work `r^o(1)` in subgroup order `r`, including setup, relation generation, linear algebra, and target recovery. Document the scope of known extension-field results and independently review the assumptions behind general prime-field claims.
 
 ## Active items (top = next)
-- [x]] Execute EXP-PRIME31-RR9-D9-KERNEL-001 sparse-Wiedemann kernel extraction and 4-variable triangular reduction comparison on Prime31 RR9 (cursor, started 2026-11-19, branch cursor/pdp-lead-1c-rr9-wiedemann-20261119, PR #4822; example tests 2/2 in 95.79s [pcc:unverified])
+- [x] Execute EXP-PRIME31-RR9-D9-KERNEL-001 sparse-Wiedemann kernel extraction and 4-variable triangular reduction comparison on Prime31 RR9 (cursor, started 2026-11-19, branch cursor/pdp-lead-1c-rr9-wiedemann-20261119, PR #4822; example tests 2/2 in 95.79s [pcc:unverified])
 
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
