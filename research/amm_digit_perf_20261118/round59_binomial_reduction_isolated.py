@@ -9,7 +9,7 @@ source = Path("src/cryptanalysis/prime_root_bounded.rs").read_text().split("\n#[
 baseline = source
 for block in ("BINOMIAL_DIVISION", "BINOMIAL_REDUCTION", "BINOMIAL_REMAINDER", "BINOMIAL_CANCEL"):
     baseline, count = re.subn(
-        rf"(?m)^ *// R59_{block}_BEGIN\\n.*?^ *// R59_{block}_END\\n",
+        rf"(?m)^ *// R59_{block}_BEGIN\n.*?^ *// R59_{block}_END\n",
         "", baseline, count=1, flags=re.S,
     )
     assert count == 1, "missing R59 baseline marker " + block
