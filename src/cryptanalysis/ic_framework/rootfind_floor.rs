@@ -12,7 +12,9 @@
 //!    exact abscissa map, since nearly every probe misses. For `m = 3`
 //!    the Bloom sits on Montgomery images of the PairTable's folded keys;
 //!    a pass looks up the PairTable directly (no second FastMap of every
-//!    pair — that doubled prepare wall and erased the e2e gain).
+//!    pair — that doubled prepare wall and erased the e2e gain). The m=3
+//!    PairTable is built with [`PairTable::build_negation_folded_prime_batch`]
+//!    (PLAN lever 5) so prepare matches `rootfind-subtract:m=3` and scales.
 //!
 //! New id: never change what `rootfind-subtract` counts. Classification
 //! is constant-factor engineering (wall / field work); charged `S` matches
@@ -216,7 +218,11 @@ impl DecompositionOracle<PrimeCurve> for RootfindFloorOracle<'_> {
                 bloom.insert(k);
             }
         } else {
-            let table = PairTable::build_negation_folded(ctx.group, fb);
+            // PLAN lever 5: batched prime PairTable (one inv per abscissa
+            // row) instead of serial `build_negation_folded`. Same keys /
+            // witnesses as `rootfind-subtract:m=3` once that arm uses the
+            // same builder; prepare wall drops sharply at large |Fₓ|.
+            let table = PairTable::build_negation_folded_prime_batch(ctx.group, fb)?;
             ops.merge(table.build_ops);
             // Bloom over Montgomery abscissae of the table's folded keys
             // (x+1 → to_mont(x)). Misses skip from_mont; hits look up the

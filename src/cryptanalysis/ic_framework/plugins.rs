@@ -3638,7 +3638,10 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractOracle<'_> {
         self.reps = reps;
         self.field = Some(f);
         if self.m == 3 && !self.defer_table {
-            let table = PairTable::build_negation_folded(ctx.group, fb);
+            // Same batched builder as `rootfind-floor:m=3` (PLAN lever 5):
+            // keep decompose parity (same keys/witnesses) while cutting
+            // prepare wall at large |Fₓ|.
+            let table = PairTable::build_negation_folded_prime_batch(ctx.group, fb)?;
             ops.merge(table.build_ops);
             self.table = Some(table);
         }
