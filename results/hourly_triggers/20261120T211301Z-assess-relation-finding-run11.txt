@@ -1,0 +1,9 @@
+Scheduled relation-finding monitor invocation
+Requested UTC: 2026-11-20T21:13:01Z
+Repo: isogeny-labs/crypto (renamed from aburan28/crypto)
+Branch: hourly-runs
+Command: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Control: frozen synthetic Koblitz GF(2^23), a=0, m=2, natural=256, planted=64, proven UNSAT=64; NOT ECC2K-130.
+Output: results/hourly_log.csv; include wall_seconds, relations_per_sec, success_rate, correctness checks, CPU model.
+Baseline: results/relation_baseline.json
+Alert: open issue on failure or absolute throughput/success_rate deviation >20% from baseline.
