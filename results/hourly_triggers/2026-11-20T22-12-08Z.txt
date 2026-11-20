@@ -1,0 +1,6 @@
+UTC: 2026-11-20T22:12:08Z
+Purpose: trigger frozen Koblitz GF(2^23) m=2 relation-finding benchmark
+Command: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Baseline: results/relation_baseline.json
+Anomaly threshold: >20% change in relations_per_sec or success_rate
+Results: results/hourly_log.csv
