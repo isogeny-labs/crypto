@@ -17,6 +17,113 @@ open SemaevS3 SemaevPointListsAudit RecursiveSemaevEvaluationAudit
 open RecursiveSemaevGeometryAudit
 open scoped BigOperators
 
+/-- A single equivariant point relation suffices for the cubic-CM collision
+branch.  The Galois action generates every sign-twisted relation, the pair
+projector isolates the collision, and a supplied signed CM-partner identity
+turns the pair relation into Eisenstein norm torsion. -/
+theorem galoisPairEquivariantRelation_implies_norm_torsion
+    {K L Index Point : Type*}
+    [Field K] [Field L] [Algebra K L]
+    [FiniteDimensional K L] [IsGalois K L]
+    [Fintype Index] [DecidableEq Index] [AddCommGroup Point]
+    (radicand : Index → K) (root : Index → L)
+    (coefficient : Index → ℤ) (point : Index → Point)
+    (chosen partner : Index) (distinct : chosen ≠ partner)
+    (rootNonzero : ∀ index, root index ≠ 0)
+    (twoNonzero : (2 : L) ≠ 0)
+    (rootSquare : ∀ index,
+      root index ^ 2 = algebraMap K L (radicand index))
+    (pairSquare : IsSquare (radicand chosen * radicand partner))
+    (otherNonsquare : ∀ index,
+      index ≠ chosen → index ≠ partner →
+        ¬ IsSquare (radicand chosen * radicand index))
+    (action : (L ≃ₐ[K] L) → Point ≃+ Point)
+    (pointAction : ∀ sigma index,
+      action sigma (point index) =
+        galoisSqrtSign (root index) sigma • point index)
+    (relation : ∑ index, coefficient index • point index = 0)
+    (zeta : Point →+ Point) (cmSign : ℤ)
+    (orbitRelation :
+      zeta (zeta (point chosen)) + zeta (point chosen) + point chosen = 0)
+    (partnerRelation : point partner = cmSign • zeta (point chosen)) :
+    eisensteinNorm
+      ((Fintype.card (L ≃ₐ[K] L) : ℤ) * coefficient chosen)
+      (((Fintype.card (L ≃ₐ[K] L) : ℤ) *
+        coefficient partner) * cmSign) • point chosen = 0 := by
+  have transformedRelation : ∀ sigma : L ≃ₐ[K] L,
+      ∑ index,
+        (galoisSqrtSign (root index) sigma * coefficient index) •
+          point index = 0 :=
+    transformedRelations_of_addEquiv_eigenvectors
+      (fun index sigma ↦ galoisSqrtSign (root index) sigma)
+      coefficient point action pointAction relation
+  have pairRelation :=
+    galoisTwoCollisionSignCharacterProjector_isolates_pair_of_isSquare_mul
+      radicand root coefficient point chosen partner distinct rootNonzero
+      twoNonzero rootSquare pairSquare otherNonsquare transformedRelation
+  have linearRelation :
+      ((Fintype.card (L ≃ₐ[K] L) : ℤ) * coefficient chosen) •
+          point chosen +
+        (((Fintype.card (L ≃ₐ[K] L) : ℤ) * coefficient partner) *
+          cmSign) • zeta (point chosen) = 0 := by
+    rw [partnerRelation] at pairRelation
+    simpa only [smul_smul] using pairRelation
+  simpa only [eisensteinNorm] using
+    cubicCMRelation_implies_norm_torsion zeta (point chosen)
+      ((Fintype.card (L ≃ₐ[K] L) : ℤ) * coefficient chosen)
+      (((Fintype.card (L ≃ₐ[K] L) : ℤ) * coefficient partner) *
+        cmSign)
+      orbitRelation linearRelation
+
+/-- Coordinate-level form of the equivariant cubic-CM projector.  Equality of
+the partner x-coordinate with the CM image constructs the missing sign
+internally. -/
+theorem galoisPairEquivariantRelation_sameX_implies_norm_torsion
+    {K L F Index : Type*}
+    [Field K] [Field L] [Algebra K L]
+    [FiniteDimensional K L] [IsGalois K L]
+    [Field F] [DecidableEq F]
+    [Fintype Index] [DecidableEq Index]
+    (W : WeierstrassCurve.Affine F)
+    (radicand : Index → K) (root : Index → L)
+    (coefficient : Index → ℤ) (point : Index → W.Point)
+    (chosen partner : Index) (distinct : chosen ≠ partner)
+    (rootNonzero : ∀ index, root index ≠ 0)
+    (twoNonzero : (2 : L) ≠ 0)
+    (rootSquare : ∀ index,
+      root index ^ 2 = algebraMap K L (radicand index))
+    (pairSquare : IsSquare (radicand chosen * radicand partner))
+    (otherNonsquare : ∀ index,
+      index ≠ chosen → index ≠ partner →
+        ¬ IsSquare (radicand chosen * radicand index))
+    (action : (L ≃ₐ[K] L) → W.Point ≃+ W.Point)
+    (pointAction : ∀ sigma index,
+      action sigma (point index) =
+        galoisSqrtSign (root index) sigma • point index)
+    (relation : ∑ index, coefficient index • point index = 0)
+    (zeta : W.Point →+ W.Point)
+    (orbitRelation :
+      zeta (zeta (point chosen)) + zeta (point chosen) + point chosen = 0)
+    (partnerSameX :
+      pointX (point partner) = pointX (zeta (point chosen))) :
+    ∃ sign : ℤ, (sign = 1 ∨ sign = -1) ∧
+      eisensteinNorm
+        ((Fintype.card (L ≃ₐ[K] L) : ℤ) * coefficient chosen)
+        (((Fintype.card (L ≃ₐ[K] L) : ℤ) * coefficient partner) *
+          sign) • point chosen = 0 := by
+  have signedPartner : ∃ sign : ℤ,
+      (sign = 1 ∨ sign = -1) ∧
+      point partner = sign • zeta (point chosen) := by
+    rcases GeneralS4Audit.same_pointX_eq_or_neg W partnerSameX with equal | negated
+    · exact ⟨1, Or.inl rfl, by simpa using equal⟩
+    · exact ⟨-1, Or.inr rfl, by simpa using negated⟩
+  obtain ⟨sign, signUnit, partnerRelation⟩ := signedPartner
+  refine ⟨sign, signUnit, ?_⟩
+  exact galoisPairEquivariantRelation_implies_norm_torsion
+    radicand root coefficient point chosen partner distinct rootNonzero
+    twoNonzero rootSquare pairSquare otherNonsquare action pointAction relation
+    zeta sign orbitRelation partnerRelation
+
 /-- A signed relation of points descends along an algebra embedding.  Point
 base change is injective, so it is enough to prove the mapped relation in a
 larger field such as an algebraic closure. -/
@@ -34,6 +141,36 @@ theorem signed_point_relation_of_mapped_relation
   apply WeierstrassCurve.Affine.Point.map_injective (W' := W) f
   rw [map_zero, map_sum]
   simpa only [map_zsmul] using mappedRelation
+
+/-- Two affine elliptic-curve points in the same x-coordinate fibre differ by
+one integer sign. -/
+theorem exists_sign_smul_eq_of_pointX_eq
+    {K : Type*} [Field K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K) (left right : W.Point)
+    (sameX : pointX left = pointX right) :
+    ∃ sign : ℤ, (sign = 1 ∨ sign = -1) ∧ left = sign • right := by
+  rcases GeneralS4Audit.same_pointX_eq_or_neg W sameX with equal | negated
+  · exact ⟨1, Or.inl rfl, by simpa using equal⟩
+  · exact ⟨-1, Or.inr rfl, by simpa using negated⟩
+
+/-- A two-term relation whose partner shares the x-coordinate of a CM image
+produces a signed Eisenstein norm-torsion certificate. -/
+theorem pairRelation_sameX_implies_norm_torsion
+    {K : Type*} [Field K] [DecidableEq K]
+    (W : WeierstrassCurve.Affine K)
+    (zeta : W.Point →+ W.Point) (point partner : W.Point) (a b : ℤ)
+    (sameX : pointX partner = pointX (zeta point))
+    (orbitRelation : zeta (zeta point) + zeta point + point = 0)
+    (pairRelation : a • point + b • partner = 0) :
+    ∃ sign : ℤ, (sign = 1 ∨ sign = -1) ∧
+      eisensteinNorm a (b * sign) • point = 0 := by
+  obtain ⟨sign, signUnit, partnerRelation⟩ :=
+    exists_sign_smul_eq_of_pointX_eq W partner (zeta point) sameX
+  refine ⟨sign, signUnit, ?_⟩
+  apply cubicCMRelation_implies_norm_torsion zeta point a (b * sign)
+    orbitRelation
+  rw [partnerRelation] at pairRelation
+  simpa only [smul_smul] using pairRelation
 
 /-- A zero-sum point tuple can be rewritten using arbitrary points in the same
 x-coordinate fibres, at the cost of one sign `±1` per occurrence. -/

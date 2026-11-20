@@ -90,7 +90,11 @@ The null changes only the global wiring of interior ports while preserving the v
     point. Under `|Gamma| * arity < p`, the same scalar is now proved nonzero
     in every characteristic-`p` coefficient field, giving the exact
     nonzero-index/torsion input pair for `ΨSq`. The production-pin
-    torsion-to-`ΨSq` implication remains open.
+    torsion-to-`ΨSq` implication remains open. In the cubic-CM branch, one
+    equivariant relation now generates all Galois twists; equality of the
+    partner x-coordinate with the CM image constructs the `±` sign and the
+    Eisenstein norm-torsion relation. Its concrete interval instantiation
+    remains open.
     [pcc:unverified]
 13. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
 14. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.

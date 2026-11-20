@@ -1479,8 +1479,21 @@ any field with `CharP K p`, and
 `|Gamma| * arity < p`. The remaining ordinary-branch contradiction needs the
 parity-correct `zsmul → ΨSq` theorem currently available only in the standalone
 exact-pin project.
+
+For the cubic-CM collision branch,
+`galoisPairEquivariantRelation_implies_norm_torsion` removes the former
+requirement to supply every Galois-sign-twisted relation: a single relation
+and the actual equivariant point action generate them internally. The
+coordinate-level variant constructs the partner sign from
+`pointX(partner) = pointX(zeta(chosen))`. The characteristic lemmas
+`projectedEisensteinNorm_field_ne_zero` and
+`projectedEisensteinNorm_torsion_index_ne_zero` prove the resulting norm
+scalar nonzero in the coefficient field under
+`3 * (|Gamma| * arity)^2 < p`. The concrete `A = 0` interval/Semaev
+instantiation of these generic endpoints remains open. [pcc:unverified]
+
 `lake build SemaevRelationSigns` completes 9,133 jobs. The repository
-proof gate reports `PASS 407 thm 0 trusted` across all nine tracked modules.
+proof gate reports `PASS 414 thm 0 trusted` across all nine tracked modules.
 [pcc:unverified]
 
 ## 2026-11-19 scalar-torsion to `ΨSq` bridge

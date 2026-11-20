@@ -423,4 +423,47 @@ theorem projectedEisensteinNorm_zmod_ne_zero
     exact Nat.mul_le_mul_left (Fintype.card Gamma) partnerBound
   · exact normBelow
 
+/-- The projected cubic-CM Eisenstein scalar stays nonzero in every field of
+characteristic `p` under the same explicit norm bound. -/
+theorem projectedEisensteinNorm_field_ne_zero
+    {K Gamma : Type*} (modulus n : ℕ)
+    [Field K] [CharP K modulus] [Fintype Gamma] [Nonempty Gamma]
+    (chosen partner sign : ℤ)
+    (chosenNonzero : chosen ≠ 0)
+    (chosenBound : chosen.natAbs ≤ n)
+    (partnerBound : partner.natAbs ≤ n)
+    (signUnit : sign = 1 ∨ sign = -1)
+    (normBelow : 3 * (Fintype.card Gamma * n) ^ 2 < modulus) :
+    (eisensteinNorm
+      ((Fintype.card Gamma : ℤ) * chosen)
+      (((Fintype.card Gamma : ℤ) * partner) * sign) : K) ≠ 0 := by
+  apply intCast_field_ne_zero_of_zmod_ne_zero modulus
+  exact projectedEisensteinNorm_zmod_ne_zero modulus n chosen partner sign
+    chosenNonzero chosenBound partnerBound signUnit normBelow
+
+/-- A cubic-CM norm-torsion certificate together with nonvanishing of its
+index in the characteristic-`p` coefficient field. -/
+theorem projectedEisensteinNorm_torsion_index_ne_zero
+    {K Gamma Point : Type*} (modulus n : ℕ)
+    [Field K] [CharP K modulus] [Fintype Gamma] [Nonempty Gamma]
+    [AddCommGroup Point]
+    (chosen partner sign : ℤ) (point : Point)
+    (chosenNonzero : chosen ≠ 0)
+    (chosenBound : chosen.natAbs ≤ n)
+    (partnerBound : partner.natAbs ≤ n)
+    (signUnit : sign = 1 ∨ sign = -1)
+    (normBelow : 3 * (Fintype.card Gamma * n) ^ 2 < modulus)
+    (torsion : eisensteinNorm
+      ((Fintype.card Gamma : ℤ) * chosen)
+      (((Fintype.card Gamma : ℤ) * partner) * sign) • point = 0) :
+    (eisensteinNorm
+      ((Fintype.card Gamma : ℤ) * chosen)
+      (((Fintype.card Gamma : ℤ) * partner) * sign) : K) ≠ 0 ∧
+    eisensteinNorm
+      ((Fintype.card Gamma : ℤ) * chosen)
+      (((Fintype.card Gamma : ℤ) * partner) * sign) • point = 0 := by
+  exact ⟨projectedEisensteinNorm_field_ne_zero modulus n
+    chosen partner sign chosenNonzero chosenBound partnerBound signUnit
+    normBelow, torsion⟩
+
 end TensorBoundaryBounds
