@@ -1781,7 +1781,7 @@ impl Packed {
             );
             // a small round runs on this thread (unless `F4_FP_PAR_OLD=1`):
             // the same lookups, the same new monomials, the same order
-            let spread = par_old() || frontier.len() >= sym_par_min_frontier();
+            let spread = !build_serial() && (par_old() || frontier.len() >= sym_par_min_frontier());
             pp_add(PP_SYM_ROUNDS, 1);
             pp_add(PP_SYM_FRONTIER, frontier.len() as u64);
             if !spread {
@@ -1874,7 +1874,7 @@ impl Packed {
                 k.map(|k| (alive_idx[k], mono - self.lms[alive_idx[k]]))
             };
             let spread_next =
-                par_old() || (monos.len() - first_new) * alive_idx.len().max(1) >= PAR_WORK;
+                !build_serial() && (par_old() || (monos.len() - first_new) * alive_idx.len().max(1) >= par_work_build());
             let next: Vec<(usize, u128)> = if spread_next {
                 (first_new..monos.len())
                     .into_par_iter()
@@ -2155,6 +2155,129 @@ fn gebauer_moeller() -> bool {
 /// than the arithmetic it spreads.
 const PAR_WORK: usize = 1 << 15;
 
+// ── Inner parallelism of a nested F4 call ───────────────────────────
+//
+// An F4 call made from inside a rayon worker (for example one Nagao test of
+// `jv_cover`'s parallel decomposition batch) shares the pool with the other
+// calls of that batch, so its own parallel sections add dispatch and
+// working-set cost without adding cores.  `F4_FP_INNER` decides, per call,
+// which of its sections still spread over threads:
+//
+// - `never`: every section may spread, as before (the default);
+// - `nested-build`: when the call runs on a rayon worker, the build phases
+//   (symbolic preprocessing, sparse row construction) run on the calling
+//   thread and elimination may still spread (the GF(2) engine's Stage 190
+//   schedule, research/sat_factor_base_review_20260908);
+// - `nested`: when the call runs on a rayon worker, every section runs on the
+//   calling thread;
+// - `always`: every section runs on the calling thread (a measurement arm).
+//
+// Only the thread dispatch changes: the same rows are reduced in the same
+// order, so every output and counter is unchanged.
+
+thread_local! {
+    /// `(build phases serial, elimination serial)` for the F4 call running on
+    /// this thread, set by [`InnerSerial::enter`].
+    static INNER_SERIAL: std::cell::Cell<(bool, bool)> = const { std::cell::Cell::new((false, false)) };
+}
+
+#[cfg(test)]
+thread_local! {
+    /// Test-only: flags [`InnerSerial::enter`] uses instead of the policy.
+    static INNER_FORCE: std::cell::Cell<Option<(bool, bool)>> = const { std::cell::Cell::new(None) };
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+enum InnerPolicy {
+    Never,
+    NestedBuild,
+    Nested,
+    Always,
+}
+
+fn inner_policy() -> InnerPolicy {
+    static P: std::sync::OnceLock<InnerPolicy> = std::sync::OnceLock::new();
+    *P.get_or_init(|| match std::env::var("F4_FP_INNER").as_deref() {
+        Ok("nested-build") => InnerPolicy::NestedBuild,
+        Ok("nested") => InnerPolicy::Nested,
+        Ok("always") => InnerPolicy::Always,
+        _ => InnerPolicy::Never,
+    })
+}
+
+/// Sets this thread's [`INNER_SERIAL`] flags for one F4 call from
+/// [`inner_policy`], and restores the previous flags when dropped, so a call
+/// made inside another (`solve`'s recursion) keeps its own setting.
+struct InnerSerial((bool, bool));
+
+impl InnerSerial {
+    fn enter() -> Self {
+        let nested = rayon::current_thread_index().is_some();
+        #[allow(unused_mut)]
+        let mut flags = match inner_policy() {
+            InnerPolicy::Never => (false, false),
+            InnerPolicy::NestedBuild => (nested, false),
+            InnerPolicy::Nested => (nested, nested),
+            InnerPolicy::Always => (true, true),
+        };
+        #[cfg(test)]
+        if let Some(forced) = INNER_FORCE.with(|c| c.get()) {
+            flags = forced;
+        }
+        Self(INNER_SERIAL.with(|c| c.replace(flags)))
+    }
+}
+
+impl Drop for InnerSerial {
+    fn drop(&mut self) {
+        INNER_SERIAL.with(|c| c.set(self.0));
+    }
+}
+
+fn build_serial() -> bool {
+    INNER_SERIAL.with(|c| c.get().0)
+}
+
+fn elim_serial() -> bool {
+    INNER_SERIAL.with(|c| c.get().1)
+}
+
+/// [`PAR_WORK`] for a build-phase section, or never when the build is serial.
+fn par_work_build() -> usize {
+    if build_serial() {
+        usize::MAX
+    } else {
+        PAR_WORK
+    }
+}
+
+/// [`PAR_WORK`] for an elimination section, or never when elimination is serial.
+fn par_work_elim() -> usize {
+    if elim_serial() {
+        usize::MAX
+    } else {
+        PAR_WORK
+    }
+}
+
+/// Threads a build-phase section may use.
+fn threads_build() -> usize {
+    if build_serial() {
+        1
+    } else {
+        rayon::current_num_threads()
+    }
+}
+
+/// Threads an elimination section may use.
+fn threads_elim() -> usize {
+    if elim_serial() {
+        1
+    } else {
+        rayon::current_num_threads()
+    }
+}
+
 /// `F4_FP_PAR_OLD=1` restores the thread dispatch as it was before the
 /// f4-parallel lead: `B'` in 64-row blocks gated by their width, with the
 /// in-block finish on one thread; 64-row pair blocks behind the rows ×
@@ -2219,7 +2342,7 @@ fn fl_mode_tiles(entries: usize) -> bool {
     }) {
         1 => true,
         2 => false,
-        _ => rayon::current_num_threads() > 1 && entries <= FL_TILES_MAX_ENTRIES,
+        _ => threads_elim() > 1 && entries <= FL_TILES_MAX_ENTRIES,
     }
 }
 
@@ -2495,7 +2618,7 @@ fn rref32(
         count_norm(n_cols - c);
         let (head, tail) = rows.split_at_mut(pr + 1);
         let prow = &head[pr];
-        let parallel = tail.len() * (n_cols - c) > PAR_WORK;
+        let parallel = tail.len() * (n_cols - c) > par_work_elim();
         eliminate_rows(tail, parallel, |row| eliminate32(row, prow, c, fp));
         pivots.push(c);
         pr += 1;
@@ -2508,7 +2631,7 @@ fn rref32(
         let c = pivots[i];
         let (head, tail) = rows.split_at_mut(i);
         let prow = &tail[0];
-        let parallel = head.len() * (n_cols - c) > PAR_WORK;
+        let parallel = head.len() * (n_cols - c) > par_work_elim();
         eliminate_rows(head, parallel, |row| eliminate32(row, prow, c, fp));
     }
     Some(pivots)
@@ -2706,7 +2829,7 @@ fn rref32_deferred(
 ) -> Option<Vec<usize>> {
     let _timer = MemTimer::new(1);
     let simd = lazy_simd_kind();
-    let parallel = deferred_parallel();
+    let parallel = deferred_parallel() && !elim_serial();
     let mut known: Vec<(usize, Vec<u32>)> = Vec::new();
     let sources = std::mem::take(rows);
     let chunk_rows = if parallel { DEFERRED_CHUNK } else { 1 };
@@ -2725,7 +2848,7 @@ fn rref32_deferred(
             (acc, pending)
         };
         let o0 = pp_ops();
-        let spread = chunk.len() > 1 && chunk.len() * known.len().max(1) * n_cols > PAR_WORK;
+        let spread = chunk.len() > 1 && chunk.len() * known.len().max(1) * n_cols > par_work_elim();
         let mut reduced: Vec<(Vec<u64>, usize)> = if spread {
             chunk.par_iter().map(reduce_one).collect()
         } else {
@@ -2778,7 +2901,7 @@ fn rref32_deferred(
         acc.into_iter().map(|v| fp.reduce(v) as u32).collect()
     };
     let o0 = pp_ops();
-    let spread = parallel && known.len() * n_cols > PAR_WORK;
+    let spread = parallel && known.len() * n_cols > par_work_elim();
     let reduced: Vec<Vec<u32>> = if spread {
         (0..known.len()).into_par_iter().map(back).collect()
     } else {
@@ -2961,7 +3084,7 @@ fn reduce_pairs_fl(
         (acc, pending, later)
     };
     let row_blocks: &[usize] = if tiles_mode { &[] } else { &order };
-    let threads = rayon::current_num_threads();
+    let threads = threads_elim();
     for block in row_blocks.chunks(FL_BLOCK) {
         if deadline.is_some_and(|d| Instant::now() > d) {
             return None;
@@ -2972,11 +3095,11 @@ fn reduce_pairs_fl(
         // unless `F4_FP_PAR_OLD=1`: spread by the block's update work
         // (about half a row of `B'` per reducer entry), not its width
         let spread = if par_old() {
-            block.len() * n_free > PAR_WORK
+            block.len() * n_free > par_work_elim()
         } else {
             threads > 1
                 && block.len() > 1
-                && block.iter().map(|&k| reducers[k].len()).sum::<usize>() * n_free / 2 > PAR_WORK
+                && block.iter().map(|&k| reducers[k].len()).sum::<usize>() * n_free / 2 > par_work_elim()
         };
         let mut partial: Vec<(Vec<u64>, usize, Vec<(usize, u64)>)> = if spread {
             block
@@ -3113,7 +3236,7 @@ fn reduce_pairs_fl(
         Some(acc.iter().map(|&x| fp.reduce(x) as u32).collect())
     };
     let o0 = pp_ops();
-    let spread = pair_rows.len() * n_free > PAR_WORK;
+    let spread = pair_rows.len() * n_free > par_work_elim();
     let out: Option<Vec<Vec<u32>>> = if spread {
         pair_rows.par_iter().map(reduce_pair).collect()
     } else {
@@ -3329,7 +3452,7 @@ fn bprime_tiled(
     let total: u64 = (0..n_free)
         .map(|c| starts_at[c] * (n_free - c) as u64)
         .sum();
-    let threads = rayon::current_num_threads();
+    let threads = threads_elim();
     let parallel = threads > 1 && total as usize > fl_par_min_work();
     let want = if force_tiles > 0 {
         force_tiles
@@ -3486,13 +3609,13 @@ const FL_PAIR_TILE: usize = 256;
 /// both forms so the f4-parallel dispatch applies to either kernel.
 fn pairs_blocked_dispatch(pair_rows: &[Vec<(u32, u64)>], n_free: usize) -> (bool, usize) {
     if par_old() {
-        (pair_rows.len() * n_free > PAR_WORK, FL_PAIR_BLOCK)
+        (pair_rows.len() * n_free > par_work_elim(), FL_PAIR_BLOCK)
     } else {
         // the update work (about half a row of `B'` per entry), and
         // blocks small enough to give every thread a few of them
         let entries: usize = pair_rows.iter().map(|r| r.len()).sum();
-        let threads = rayon::current_num_threads();
-        let spread = threads > 1 && pair_rows.len() > 1 && entries * n_free / 2 > PAR_WORK;
+        let threads = threads_elim();
+        let spread = threads > 1 && pair_rows.len() > 1 && entries * n_free / 2 > par_work_elim();
         let per = if spread {
             pair_rows
                 .len()
@@ -3997,7 +4120,7 @@ fn reduce_pairs_fl_mem(
         let block_start = position[block[0]];
         let bp = &bprime;
         let mut partial: Vec<(Vec<u64>, usize, Vec<(usize, u64)>)> =
-            if block.len() * n_free > PAR_WORK {
+            if block.len() * n_free > par_work_elim() {
                 block
                     .par_iter()
                     .map(|&k| against_finished(k, block_start, bp))
@@ -4061,7 +4184,7 @@ fn reduce_pairs_fl_mem(
         }
         Some(acc.iter().map(|&x| fp.reduce(x) as u32).collect())
     };
-    if pair_rows.len() * n_free > PAR_WORK {
+    if pair_rows.len() * n_free > par_work_elim() {
         pair_rows.par_iter().map(reduce_pair).collect()
     } else {
         pair_rows.iter().map(reduce_pair).collect()
@@ -4244,7 +4367,7 @@ fn rref_ckpt(
             count_norm(ops);
             let (head, tail) = rows.split_at_mut(pr + 1);
             let prow = &head[pr];
-            let parallel = tail.len() * (n_cols - c) > PAR_WORK;
+            let parallel = tail.len() * (n_cols - c) > par_work_elim();
             match sparse_tail(prow, c) {
                 Some(nz) => eliminate_rows(tail, parallel, |row| eliminate_sparse(row, &nz, c, fp)),
                 None => eliminate_rows(tail, parallel, |row| eliminate(row, prow, c, fp)),
@@ -4276,7 +4399,7 @@ fn rref_ckpt(
         let c = pivots[i];
         let (head, tail) = rows.split_at_mut(i);
         let prow = &tail[0];
-        let parallel = head.len() * (n_cols - c) > PAR_WORK;
+        let parallel = head.len() * (n_cols - c) > par_work_elim();
         match sparse_tail(prow, c) {
             Some(nz) => eliminate_rows(head, parallel, |row| eliminate_sparse(row, &nz, c, fp)),
             None => eliminate_rows(head, parallel, |row| eliminate(row, prow, c, fp)),
@@ -4597,6 +4720,8 @@ fn f4_with_arithmetic(
     mode: u8,
     mut trace: TraceMode<'_>,
 ) -> F4Report {
+    // which sections of this call may spread over threads (`F4_FP_INNER`)
+    let _inner = InnerSerial::enter();
     let t0 = Instant::now();
     let ops0 = field_ops_now();
     // Time and field operations spent before a resumed checkpoint.
@@ -5167,7 +5292,7 @@ fn f4_with_arithmetic(
             let min_seeds = if par_old() { 64 } else { sym_par_min_seeds() };
             let t_sym = Instant::now();
             let sym_par = symbolic_parallel()
-                && rayon::current_num_threads() > 1
+                && threads_build() > 1
                 && rows_poly.len() >= min_seeds;
             pp_add(if sym_par { PP_SYM_PAR } else { PP_SYM_SEQ }, 1);
             pp_add(PP_SYM_SEEDS, rows_poly.len() as u64);
@@ -5194,7 +5319,7 @@ fn f4_with_arithmetic(
                     .map(|(c, (_, v))| (c, *v))
                     .collect()
             };
-            let sparse: Vec<Vec<(u32, u64)>> = if row_cols.len() * cols_packed.len() > PAR_WORK {
+            let sparse: Vec<Vec<(u32, u64)>> = if row_cols.len() * cols_packed.len() > par_work_build() {
                 row_cols.into_par_iter().zip(&idxs).map(to_sparse).collect()
             } else {
                 row_cols.into_iter().zip(&idxs).map(to_sparse).collect()
@@ -5275,7 +5400,7 @@ fn f4_with_arithmetic(
             };
             // small steps (most of them, and all of `solve`'s specialised
             // runs) are cheaper on one thread than dispatched
-            let parallel = rows_poly.len() * n_cols > PAR_WORK;
+            let parallel = rows_poly.len() * n_cols > par_work_build();
             let sparse: Vec<Vec<(u32, u64)>> = if parallel {
                 rows_poly.par_iter().map(to_sparse).collect()
             } else {
@@ -5284,7 +5409,7 @@ fn f4_with_arithmetic(
             (cols, sparse, tp1)
         };
         let n_cols = cols.len();
-        let parallel = rows_poly.len() * n_cols > PAR_WORK;
+        let parallel = rows_poly.len() * n_cols > par_work_build();
         let tp2 = Instant::now();
         let mut input_lm = vec![false; n_cols];
         for r in &sparse {
@@ -8757,6 +8882,25 @@ mod tests {
         assert!(!r.inconsistent && !r.timed_out);
         assert_eq!(r.pairs_above_bound, 0);
         assert!(r.max_rows * r.max_cols > PAR_WORK, "not the parallel path");
+        // the same rows in the same order under every inner-serial setting,
+        // on the calling thread and nested inside a rayon worker
+        let pool = rayon::ThreadPoolBuilder::new().num_threads(4).build().unwrap();
+        for forced in [(false, false), (true, false), (false, true), (true, true)] {
+            let run = || {
+                INNER_FORCE.with(|c| c.set(Some(forced)));
+                let s = f4(&sys, n, p, &F4Options::new(ord, 20));
+                INNER_FORCE.with(|c| c.set(None));
+                s
+            };
+            for (where_, s) in [("caller", run()), ("nested", pool.install(run))] {
+                assert_eq!(s.basis, r.basis, "basis under {forced:?} ({where_})");
+                assert_eq!(
+                    (s.steps, s.max_rows, s.max_cols, s.degree_reached),
+                    (r.steps, r.max_rows, r.max_cols, r.degree_reached),
+                    "shape under {forced:?} ({where_})"
+                );
+            }
+        }
         let g = &r.basis;
         for f in &sys {
             assert!(reduce(&normalise(f, p, ord), g, p, ord).is_empty());
