@@ -11,10 +11,11 @@
 //! `⌈m/2⌉ / ⌊m/2⌋` when the left table would be too large.
 //!
 //! On primes with siblings, probes use a Montgomery **batch inversion**
-//! plus folded-key left lookups (lever-1 style from `rootfind-floor`):
+//! plus x-only left lookups (lever-1 style from `rootfind-floor`):
 //! `R = 1` batches over the factor base; `R ≥ 2` batches over the
-//! precomputed right-half sums. A word-blocked **Bloom filter** sits in
-//! front of every folded lookup (lever-3 style). Classification:
+//! precomputed right-half sums. A word-blocked **Bloom filter** over
+//! Montgomery abscissae sits in front of a mont→witness map (no
+//! `from_mont` on the miss path; lever-3 style). Classification:
 //! engineering (wall / build size); charged group additions are the MITM's
 //! own (not equal to full `ksum`).
 
@@ -23,8 +24,8 @@ use std::collections::BTreeMap;
 use super::plugins::table_counted;
 use super::stages::{DecompositionOracle, InstanceCtx, Params};
 use crate::cryptanalysis::ic_boundary::{
-    CountedGroup, FactorBase, GroupOps, KSumTable, OracleCounters, PairTable, PrimeCurve,
-    PrimeInstance, PrimePoint, KSUM_MAX_K,
+    fast_map, CountedGroup, FactorBase, FastMap, GroupOps, KSumTable, OracleCounters, PairTable,
+    PrimeCurve, PrimeInstance, PrimePoint, KSUM_MAX_K,
 };
 use crate::cryptanalysis::prime_fast::{Fp64, MAX_BITS as PRIME_FAST_MAX_BITS};
 
@@ -140,13 +141,25 @@ impl LeftTable {
     }
 }
 
+/// Cap on right-half summand count (`m ≤ 12` ⇒ `right_k ≤ 6` under either
+/// split). Inline storage avoids a heap clone on every bloom-pass hit.
+const RIGHT_IDX_CAP: usize = 8;
+
 /// One precomputed right-half sum (used when `right_k ≥ 2`).
 struct RightSum<P> {
     point: P,
-    idxs: Vec<usize>,
+    idxs: [usize; RIGHT_IDX_CAP],
+    n_idxs: u8,
     /// Montgomery abscissa / ordinate when the prime batch-inv probe is on.
     mont_x: u64,
     mont_y: u64,
+}
+
+impl<P> RightSum<P> {
+    #[inline]
+    fn idxs_slice(&self) -> &[usize] {
+        &self.idxs[..usize::from(self.n_idxs)]
+    }
 }
 
 /// Meet-in-the-middle k-sum root finding for `m = 3..=12`.
@@ -162,13 +175,28 @@ pub struct RootfindKMitmOracle<'i> {
     field: Option<Fp64>,
     /// Bloom filter over left-table folded keys (lever-3 style).
     bloom: Option<WordBloom>,
+    /// Montgomery-abscissa → packed left witness (pairs: `i<<32|j`; k-sum:
+    /// native packed). Lets the probe skip `from_mont` on every bloom pass.
+    mont_left: FastMap<u64>,
+    /// When true, `mont_left` values are pair witnesses (`i<<32|j`).
+    mont_left_pairs: bool,
+    /// Bits per summand for unpacking k-sum `mont_left` values.
+    mont_left_bits: u32,
+    /// Summand count encoded in each k-sum `mont_left` value.
+    mont_left_k: u32,
     /// Precomputed right-half sums for prime probes (`right_k ≥ 2`).
     right_prime: Vec<RightSum<PrimePoint>>,
     /// Precomputed right-half sums for binary probes (`right_k ≥ 2`).
     right_bin: Vec<RightSum<crate::cryptanalysis::koblitz_fast::FastPoint>>,
+    /// Factor-base Montgomery (x, y) for the right=1 batch probe.
+    fb_mont: Vec<(u64, u64)>,
     /// Scratch for the batch-inv probe.
     diffs: Vec<u64>,
     scratch: Vec<u64>,
+    /// Skip mask for same-abscissa / identity slots in the batch-inv pass.
+    degenerate: Vec<bool>,
+    /// Reused left-witness buffer (avoids a Vec alloc on every bloom pass).
+    left_scratch: Vec<usize>,
     pub mismatches: u64,
     probe_right_adds: u64,
     probe_lookups: u64,
@@ -192,10 +220,17 @@ impl<'i> RootfindKMitmOracle<'i> {
             table: None,
             field: None,
             bloom: None,
+            mont_left: fast_map(0),
+            mont_left_pairs: false,
+            mont_left_bits: 0,
+            mont_left_k: 0,
             right_prime: Vec::new(),
             right_bin: Vec::new(),
+            fb_mont: Vec::new(),
             diffs: Vec::new(),
             scratch: Vec::new(),
+            degenerate: Vec::new(),
+            left_scratch: Vec::new(),
             mismatches: 0,
             probe_right_adds: 0,
             probe_lookups: 0,
@@ -229,6 +264,47 @@ impl<'i> RootfindKMitmOracle<'i> {
 
     pub fn right_precomputed(&self) -> u64 {
         self.right_prime.len().max(self.right_bin.len()) as u64
+    }
+
+    /// PLAN lever 2 (scalar): probe up to four targets behind **one** shared
+    /// Montgomery batch-inversion. `out[i]` receives the witness for
+    /// `targets[i]` (or `None`). Falls back to one-at-a-time when the
+    /// batch-inv path is off or `targets.len() ≤ 1`.
+    pub fn decompose_lanes(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        targets: &[PrimePoint],
+        out: &mut [Option<Vec<usize>>],
+    ) {
+        let n = targets.len().min(out.len());
+        for slot in out.iter_mut().take(n) {
+            *slot = None;
+        }
+        if n == 0 {
+            return;
+        }
+        if n == 1 || self.field.is_none() || self.table.is_none() {
+            for i in 0..n {
+                out[i] = self.decompose(ctx, fb, ops, counters, targets[i]);
+            }
+            return;
+        }
+        let g = ctx.group;
+        if self.right_k == 1 {
+            self.probe_right1_prime_lanes(g, fb, ops, counters, &targets[..n], &mut out[..n]);
+        } else {
+            self.probe_right_precomputed_prime_lanes(
+                g,
+                fb,
+                ops,
+                counters,
+                &targets[..n],
+                &mut out[..n],
+            );
+        }
     }
 }
 
@@ -312,9 +388,13 @@ fn collect_right_rec<G: CountedGroup>(
         if g.is_identity(&point) {
             return;
         }
+        debug_assert!(right_k <= RIGHT_IDX_CAP);
+        let mut buf = [0usize; RIGHT_IDX_CAP];
+        buf[..right_k].copy_from_slice(&idxs[..right_k]);
         out.push(RightSum {
             point,
-            idxs: idxs.to_vec(),
+            idxs: buf,
+            n_idxs: right_k as u8,
             mont_x: 0,
             mont_y: 0,
         });
@@ -421,17 +501,55 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
             .unwrap_or(ctx.group.supports_siblings());
 
         self.table = Some(build_left_table(ctx.group, fb, left_k, prune, sib, ops)?);
-        // Lever-3: Bloom over every left folded key (miss-dominated probes).
+        self.right_bin.clear();
+        self.right_prime.clear();
+        self.fb_mont.clear();
+        let batch_ok = ctx.group.supports_siblings()
+            && (3..1u64 << PRIME_FAST_MAX_BITS).contains(&ctx.group.p);
+        // Lever-3: Bloom over Montgomery abscissae of every left folded key
+        // (`folded = x+1` affine → insert `to_mont(x)`). Probe checks the
+        // mont x₃ before any table lookup, so miss-dominated paths skip
+        // `from_mont`. A parallel mont→witness map makes bloom-pass hits
+        // avoid the affine conversion entirely.
         let entries = self.table.as_ref().map(LeftTable::entries).unwrap_or(1) as usize;
         let mut bloom = WordBloom::new(entries.max(1));
-        if let Some(t) = &self.table {
+        self.mont_left = fast_map(0);
+        self.mont_left_pairs = left_k == 2;
+        self.mont_left_k = left_k;
+        self.mont_left_bits = if left_k >= 3 {
+            crate::cryptanalysis::ic_boundary::ksum_index_bits(left_k)
+        } else {
+            0
+        };
+        if batch_ok {
+            let f = Fp64::new(ctx.group.p);
+            let mut mont_left = fast_map(entries.max(1));
+            if let Some(t) = &self.table {
+                let pairs = left_k == 2;
+                let bits = self.mont_left_bits;
+                let k = left_k as usize;
+                t.for_each_folded_key(|folded| {
+                    let xm = f.to_mont(folded.wrapping_sub(1));
+                    bloom.insert(xm);
+                    let Some(left) = t.lookup_folded(folded) else {
+                        return;
+                    };
+                    let packed = if pairs {
+                        ((left[0] as u64) << 32) | (left[1] as u64)
+                    } else {
+                        left.iter()
+                            .take(k)
+                            .rev()
+                            .fold(0u64, |w, &i| (w << bits) | (i as u64))
+                    };
+                    mont_left.entry(xm).or_insert(packed);
+                });
+            }
+            self.mont_left = mont_left;
+        } else if let Some(t) = &self.table {
             t.for_each_folded_key(|k| bloom.insert(k));
         }
         self.bloom = Some(bloom);
-        self.right_bin.clear();
-        self.right_prime.clear();
-        let batch_ok = ctx.group.supports_siblings()
-            && (3..1u64 << PRIME_FAST_MAX_BITS).contains(&ctx.group.p);
         if right_k >= 2 {
             collect_right_sums(ctx.group, fb, right_k, ops, &mut self.right_prime);
             if batch_ok {
@@ -444,17 +562,26 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
         }
         // Montgomery batch-inv for right=1 (over F) and right≥2 (over S).
         self.field = if batch_ok {
+            let f = Fp64::new(ctx.group.p);
             let n = if right_k == 1 {
+                self.fb_mont.clear();
+                self.fb_mont.reserve(fb.points.len());
+                for &pj in &fb.points {
+                    self.fb_mont.push((f.to_mont(pj.x), f.to_mont(pj.y)));
+                }
                 fb.points.len()
             } else {
                 self.right_prime.len()
             };
             self.diffs.resize(n.max(1), 0);
             self.scratch.resize(n.max(1), 0);
-            Some(Fp64::new(ctx.group.p))
+            self.degenerate.resize(n.max(1), false);
+            Some(f)
         } else {
             self.diffs.clear();
             self.scratch.clear();
+            self.degenerate.clear();
+            self.fb_mont.clear();
             None
         };
         self.mismatches = 0;
@@ -642,17 +769,24 @@ impl RootfindKMitmOracle<'_> {
         if self.diffs.len() < n {
             self.diffs.resize(n, 0);
             self.scratch.resize(n, 0);
+            self.degenerate.resize(n, false);
         }
+        debug_assert_eq!(self.fb_mont.len(), n);
         let xr = f.to_mont(target.x);
         let yr = f.to_mont(target.y);
         ops.field_ops.muls += 2;
-        let mut active: Vec<usize> = Vec::with_capacity(n);
-        for (j, &pj) in fb.points.iter().enumerate() {
-            if g.is_identity(&pj) || pj.x == target.x {
-                // Same abscissa / identity: sibling path refuses; try group add.
-                if g.is_identity(&pj) {
-                    continue;
-                }
+        let mut any_active = false;
+        for j in 0..n {
+            let pj = fb.points[j];
+            if g.is_identity(&pj) {
+                self.degenerate[j] = true;
+                self.diffs[j] = f.one;
+                continue;
+            }
+            if pj.x == target.x {
+                // Same abscissa: sibling path refuses; try group add.
+                self.degenerate[j] = true;
+                self.diffs[j] = f.one;
                 let t = g.add(ops, target, g.neg(pj));
                 self.probe_right_adds += 1;
                 let mut lookups = 0u64;
@@ -676,51 +810,52 @@ impl RootfindKMitmOracle<'_> {
                 }
                 continue;
             }
-            let xj = f.to_mont(pj.x);
+            self.degenerate[j] = false;
             // dx = x_J − x_R (same as CountedGroup::sibling_pair).
-            self.diffs[j] = f.sub(xj, xr);
-            active.push(j);
+            self.diffs[j] = f.sub(self.fb_mont[j].0, xr);
+            any_active = true;
         }
-        if active.is_empty() {
+        if !any_active {
             return None;
         }
-        // Compact batch-inv over the active diffs.
-        let mut compact: Vec<u64> = active.iter().map(|&j| self.diffs[j]).collect();
-        let mut scratch = vec![0u64; compact.len()];
-        f.batch_inv(&mut compact, &mut scratch);
+        // In-place batch-inv over the full slot array (degenerate slots hold 1).
+        f.batch_inv(&mut self.diffs[..n], &mut self.scratch);
         counters.inversions += 1;
         ops.field_ops.invs += 1;
-        ops.field_ops.muls += 3 * compact.len() as u64;
+        ops.field_ops.muls += 3 * n as u64;
         self.probe_batch_inv += 1;
-        for (slot, &j) in active.iter().enumerate() {
-            let inv = compact[slot];
-            let pj = fb.points[j];
-            let xj = f.to_mont(pj.x);
-            let yj = f.to_mont(pj.y);
+        for j in 0..n {
+            if self.degenerate[j] {
+                continue;
+            }
+            let inv = self.diffs[j];
+            let (xj, yj) = self.fb_mont[j];
             let dy = f.sub(yj, yr);
             let sy = f.add(yj, yr);
             let lp = f.mul(dy, inv);
             let lm = f.mul(f.sub(0, sy), inv);
             let base = f.add(xr, xj);
-            // Folded keys are canonical `x + 1` (same as PairTable / KSumTable).
-            let xp = f.from_mont(f.sub(f.mul(lp, lp), base));
-            let xm = f.from_mont(f.sub(f.mul(lm, lm), base));
+            // Keep x₃ in Montgomery form for the Bloom check; from_mont only
+            // on a pass (folded key for the left table is still affine x+1).
+            let xp_m = f.sub(f.mul(lp, lp), base);
+            let xm_m = f.sub(f.mul(lm, lm), base);
             // One sibling pair = one charged add (matches sibling_pair callers).
             ops.adds += 1;
             self.probe_right_adds += 1;
-            // key_plus = x(R+F_j)+1 → R = left + (−F_j); key_minus → R = left + F_j.
-            let candidates = [(xp + 1, fb.neg_index[j]), (xm + 1, j)];
-            for &(folded, right_j) in &candidates {
-                if !self.bloom_maybe(folded) {
+            // key_plus = x(R+F_j) → R = left + (−F_j); key_minus → R = left + F_j.
+            let candidates = [(xp_m, fb.neg_index[j]), (xm_m, j)];
+            for &(x3_m, right_j) in &candidates {
+                if !self.bloom_maybe(x3_m) {
                     continue;
                 }
                 self.probe_lookups += 1;
                 counters.lookups += 1;
-                let Some(left) = self.table.as_ref()?.lookup_folded(folded) else {
+                if !self.lookup_mont_into(x3_m) {
                     self.bloom_false_positives += 1;
                     continue;
-                };
-                if let Some(hit) = self.finish_hit_prime(
+                }
+                let left = std::mem::take(&mut self.left_scratch);
+                let hit = self.finish_hit_prime(
                     g,
                     fb,
                     ops,
@@ -728,12 +863,40 @@ impl RootfindKMitmOracle<'_> {
                     target,
                     left,
                     std::slice::from_ref(&right_j),
-                ) {
+                );
+                // Restore scratch capacity even on a miss.
+                if self.left_scratch.capacity() == 0 {
+                    self.left_scratch = Vec::with_capacity(self.left_k as usize);
+                }
+                if let Some(hit) = hit {
                     return Some(hit);
                 }
             }
         }
         None
+    }
+
+    /// Unpack a Montgomery-abscissa left witness into [`Self::left_scratch`].
+    #[inline]
+    fn lookup_mont_into(&mut self, xm: u64) -> bool {
+        self.left_scratch.clear();
+        let Some(&packed) = self.mont_left.get(&xm) else {
+            return false;
+        };
+        if self.mont_left_pairs {
+            self.left_scratch.push((packed >> 32) as usize);
+            self.left_scratch.push((packed & 0xffff_ffff) as usize);
+        } else {
+            let bits = self.mont_left_bits;
+            let mask = (1u64 << bits) - 1;
+            let k = self.mont_left_k as usize;
+            self.left_scratch.reserve(k);
+            for d in 0..k {
+                self.left_scratch
+                    .push(((packed >> (d as u32 * bits)) & mask) as usize);
+            }
+        }
+        true
     }
 
     #[inline]
@@ -770,10 +933,7 @@ impl RootfindKMitmOracle<'_> {
         }
         let n = self.right_prime.len();
         for i in 0..n {
-            let (s, right_idxs) = {
-                let e = &self.right_prime[i];
-                (e.point, e.idxs.clone())
-            };
+            let s = self.right_prime[i].point;
             let t = g.add(ops, target, g.neg(s));
             self.probe_right_adds += 1;
             let mut lookups = 0u64;
@@ -790,8 +950,12 @@ impl RootfindKMitmOracle<'_> {
             };
             self.probe_lookups += lookups;
             counters.lookups += lookups;
+            // Copy idxs before the &mut self call (inline, no heap).
+            let mut right_buf = [0usize; RIGHT_IDX_CAP];
+            let n_r = usize::from(self.right_prime[i].n_idxs);
+            right_buf[..n_r].copy_from_slice(self.right_prime[i].idxs_slice());
             if let Some(hit) =
-                self.finish_hit_prime(g, fb, ops, counters, target, left, &right_idxs)
+                self.finish_hit_prime(g, fb, ops, counters, target, left, &right_buf[..n_r])
             {
                 return Some(hit);
             }
@@ -816,24 +980,29 @@ impl RootfindKMitmOracle<'_> {
         if self.diffs.len() < n {
             self.diffs.resize(n, 0);
             self.scratch.resize(n, 0);
+            self.degenerate.resize(n, false);
         }
         let xr = f.to_mont(target.x);
         let yr = f.to_mont(target.y);
         ops.field_ops.muls += 2;
-        let mut active: Vec<usize> = Vec::with_capacity(n);
+        let mut any_active = false;
         for i in 0..n {
             let e = &self.right_prime[i];
             if e.point.x == target.x {
                 // Same abscissa: fall back to a full group subtract.
+                self.degenerate[i] = true;
+                self.diffs[i] = f.one;
                 let t = g.add(ops, target, g.neg(e.point));
                 self.probe_right_adds += 1;
-                let right_idxs = e.idxs.clone();
+                let mut right_buf = [0usize; RIGHT_IDX_CAP];
+                let n_r = usize::from(e.n_idxs);
+                right_buf[..n_r].copy_from_slice(e.idxs_slice());
                 let mut lookups = 0u64;
                 if let Some(left) = self.table.as_ref()?.probe_left(g, fb, ops, &mut lookups, t) {
                     self.probe_lookups += lookups;
                     counters.lookups += lookups;
                     if let Some(hit) =
-                        self.finish_hit_prime(g, fb, ops, counters, target, left, &right_idxs)
+                        self.finish_hit_prime(g, fb, ops, counters, target, left, &right_buf[..n_r])
                     {
                         return Some(hit);
                     }
@@ -843,21 +1012,23 @@ impl RootfindKMitmOracle<'_> {
                 }
                 continue;
             }
+            self.degenerate[i] = false;
             self.diffs[i] = f.sub(e.mont_x, xr);
-            active.push(i);
+            any_active = true;
         }
-        if active.is_empty() {
+        if !any_active {
             return None;
         }
-        let mut compact: Vec<u64> = active.iter().map(|&i| self.diffs[i]).collect();
-        let mut scratch = vec![0u64; compact.len()];
-        f.batch_inv(&mut compact, &mut scratch);
+        f.batch_inv(&mut self.diffs[..n], &mut self.scratch);
         counters.inversions += 1;
         ops.field_ops.invs += 1;
-        ops.field_ops.muls += 3 * compact.len() as u64;
+        ops.field_ops.muls += 3 * n as u64;
         self.probe_batch_inv += 1;
-        for (slot, &i) in active.iter().enumerate() {
-            let inv = compact[slot];
+        for i in 0..n {
+            if self.degenerate[i] {
+                continue;
+            }
+            let inv = self.diffs[i];
             let (xs, ys) = {
                 let e = &self.right_prime[i];
                 (e.mont_x, e.mont_y)
@@ -866,27 +1037,314 @@ impl RootfindKMitmOracle<'_> {
             let sy = f.add(ys, yr);
             let lm = f.mul(f.sub(0, sy), inv);
             let base = f.add(xr, xs);
-            let xm = f.from_mont(f.sub(f.mul(lm, lm), base));
+            let xm_m = f.sub(f.mul(lm, lm), base);
             ops.adds += 1;
             self.probe_right_adds += 1;
-            let folded = xm + 1;
-            if !self.bloom_maybe(folded) {
+            if !self.bloom_maybe(xm_m) {
                 continue;
             }
             self.probe_lookups += 1;
             counters.lookups += 1;
-            let Some(left) = self.table.as_ref()?.lookup_folded(folded) else {
+            if !self.lookup_mont_into(xm_m) {
                 self.bloom_false_positives += 1;
                 continue;
-            };
-            let right_idxs = self.right_prime[i].idxs.clone();
-            if let Some(hit) =
-                self.finish_hit_prime(g, fb, ops, counters, target, left, &right_idxs)
-            {
+            }
+            let left = std::mem::take(&mut self.left_scratch);
+            let mut right_buf = [0usize; RIGHT_IDX_CAP];
+            let n_r = usize::from(self.right_prime[i].n_idxs);
+            right_buf[..n_r].copy_from_slice(self.right_prime[i].idxs_slice());
+            let hit = self.finish_hit_prime(g, fb, ops, counters, target, left, &right_buf[..n_r]);
+            if self.left_scratch.capacity() == 0 {
+                self.left_scratch = Vec::with_capacity(self.left_k as usize);
+            }
+            if let Some(hit) = hit {
                 return Some(hit);
             }
         }
         None
+    }
+
+    /// Shared batch-inv across `targets.len()` independent right=1 probes.
+    fn probe_right1_prime_lanes(
+        &mut self,
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        targets: &[PrimePoint],
+        out: &mut [Option<Vec<usize>>],
+    ) {
+        let Some(f) = self.field else {
+            for (i, &t) in targets.iter().enumerate() {
+                out[i] = self.probe_right1_prime(g, fb, ops, counters, t);
+            }
+            return;
+        };
+        let n = fb.points.len();
+        let t_n = targets.len();
+        debug_assert_eq!(self.fb_mont.len(), n);
+        let total = n * t_n;
+        if self.diffs.len() < total {
+            self.diffs.resize(total, 0);
+            self.scratch.resize(total, 0);
+            self.degenerate.resize(total, false);
+        }
+        let mut xr = [0u64; 4];
+        let mut yr = [0u64; 4];
+        for (t, &target) in targets.iter().enumerate() {
+            xr[t] = f.to_mont(target.x);
+            yr[t] = f.to_mont(target.y);
+        }
+        ops.field_ops.muls += 2 * t_n as u64;
+        let mut any_active = false;
+        for t in 0..t_n {
+            let target = targets[t];
+            for j in 0..n {
+                let slot = t * n + j;
+                let pj = fb.points[j];
+                if g.is_identity(&pj) {
+                    self.degenerate[slot] = true;
+                    self.diffs[slot] = f.one;
+                    continue;
+                }
+                if pj.x == target.x {
+                    self.degenerate[slot] = true;
+                    self.diffs[slot] = f.one;
+                    let tt = g.add(ops, target, g.neg(pj));
+                    self.probe_right_adds += 1;
+                    let mut lookups = 0u64;
+                    if let Some(left) = self
+                        .table
+                        .as_ref()
+                        .and_then(|tb| tb.probe_left(g, fb, ops, &mut lookups, tt))
+                    {
+                        self.probe_lookups += lookups;
+                        counters.lookups += lookups;
+                        if out[t].is_none() {
+                            if let Some(hit) = self.finish_hit_prime(
+                                g,
+                                fb,
+                                ops,
+                                counters,
+                                target,
+                                left,
+                                std::slice::from_ref(&j),
+                            ) {
+                                out[t] = Some(hit);
+                            }
+                        }
+                    } else {
+                        self.probe_lookups += lookups;
+                        counters.lookups += lookups;
+                    }
+                    continue;
+                }
+                self.degenerate[slot] = false;
+                self.diffs[slot] = f.sub(self.fb_mont[j].0, xr[t]);
+                any_active = true;
+            }
+        }
+        if !any_active {
+            return;
+        }
+        f.batch_inv(&mut self.diffs[..total], &mut self.scratch);
+        counters.inversions += 1;
+        ops.field_ops.invs += 1;
+        ops.field_ops.muls += 3 * total as u64;
+        self.probe_batch_inv += 1;
+        // Interleave targets inside the right-sum loop so multiply latency
+        // overlaps across independent probes.
+        for j in 0..n {
+            let (xj, yj) = self.fb_mont[j];
+            for t in 0..t_n {
+                if out[t].is_some() {
+                    continue;
+                }
+                let slot = t * n + j;
+                if self.degenerate[slot] {
+                    continue;
+                }
+                let inv = self.diffs[slot];
+                let dy = f.sub(yj, yr[t]);
+                let sy = f.add(yj, yr[t]);
+                let lp = f.mul(dy, inv);
+                let lm = f.mul(f.sub(0, sy), inv);
+                let base = f.add(xr[t], xj);
+                let xp_m = f.sub(f.mul(lp, lp), base);
+                let xm_m = f.sub(f.mul(lm, lm), base);
+                ops.adds += 1;
+                self.probe_right_adds += 1;
+                let candidates = [(xp_m, fb.neg_index[j]), (xm_m, j)];
+                for &(x3_m, right_j) in &candidates {
+                    if !self.bloom_maybe(x3_m) {
+                        continue;
+                    }
+                    self.probe_lookups += 1;
+                    counters.lookups += 1;
+                    if !self.lookup_mont_into(x3_m) {
+                        self.bloom_false_positives += 1;
+                        continue;
+                    }
+                    let left = std::mem::take(&mut self.left_scratch);
+                    let hit = self.finish_hit_prime(
+                        g,
+                        fb,
+                        ops,
+                        counters,
+                        targets[t],
+                        left,
+                        std::slice::from_ref(&right_j),
+                    );
+                    if self.left_scratch.capacity() == 0 {
+                        self.left_scratch = Vec::with_capacity(self.left_k as usize);
+                    }
+                    if let Some(hit) = hit {
+                        out[t] = Some(hit);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    /// Shared batch-inv across `targets.len()` independent right≥2 probes.
+    fn probe_right_precomputed_prime_lanes(
+        &mut self,
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        targets: &[PrimePoint],
+        out: &mut [Option<Vec<usize>>],
+    ) {
+        let Some(f) = self.field else {
+            for (i, &t) in targets.iter().enumerate() {
+                out[i] = self.probe_right_precomputed_prime(g, fb, ops, counters, t);
+            }
+            return;
+        };
+        let n = self.right_prime.len();
+        if n == 0 {
+            return;
+        }
+        let t_n = targets.len();
+        let total = n * t_n;
+        if self.diffs.len() < total {
+            self.diffs.resize(total, 0);
+            self.scratch.resize(total, 0);
+            self.degenerate.resize(total, false);
+        }
+        let mut xr = [0u64; 4];
+        let mut yr = [0u64; 4];
+        for (t, &target) in targets.iter().enumerate() {
+            xr[t] = f.to_mont(target.x);
+            yr[t] = f.to_mont(target.y);
+        }
+        ops.field_ops.muls += 2 * t_n as u64;
+        let mut any_active = false;
+        for t in 0..t_n {
+            let target = targets[t];
+            for i in 0..n {
+                let slot = t * n + i;
+                let e = &self.right_prime[i];
+                if e.point.x == target.x {
+                    self.degenerate[slot] = true;
+                    self.diffs[slot] = f.one;
+                    let tt = g.add(ops, target, g.neg(e.point));
+                    self.probe_right_adds += 1;
+                    let mut right_buf = [0usize; RIGHT_IDX_CAP];
+                    let n_r = usize::from(e.n_idxs);
+                    right_buf[..n_r].copy_from_slice(e.idxs_slice());
+                    let mut lookups = 0u64;
+                    if let Some(left) = self
+                        .table
+                        .as_ref()
+                        .and_then(|tb| tb.probe_left(g, fb, ops, &mut lookups, tt))
+                    {
+                        self.probe_lookups += lookups;
+                        counters.lookups += lookups;
+                        if out[t].is_none() {
+                            if let Some(hit) = self.finish_hit_prime(
+                                g,
+                                fb,
+                                ops,
+                                counters,
+                                target,
+                                left,
+                                &right_buf[..n_r],
+                            ) {
+                                out[t] = Some(hit);
+                            }
+                        }
+                    } else {
+                        self.probe_lookups += lookups;
+                        counters.lookups += lookups;
+                    }
+                    continue;
+                }
+                self.degenerate[slot] = false;
+                self.diffs[slot] = f.sub(e.mont_x, xr[t]);
+                any_active = true;
+            }
+        }
+        if !any_active {
+            return;
+        }
+        f.batch_inv(&mut self.diffs[..total], &mut self.scratch);
+        counters.inversions += 1;
+        ops.field_ops.invs += 1;
+        ops.field_ops.muls += 3 * total as u64;
+        self.probe_batch_inv += 1;
+        for i in 0..n {
+            let (xs, ys) = {
+                let e = &self.right_prime[i];
+                (e.mont_x, e.mont_y)
+            };
+            let mut right_buf = [0usize; RIGHT_IDX_CAP];
+            let n_r = usize::from(self.right_prime[i].n_idxs);
+            right_buf[..n_r].copy_from_slice(self.right_prime[i].idxs_slice());
+            for t in 0..t_n {
+                if out[t].is_some() {
+                    continue;
+                }
+                let slot = t * n + i;
+                if self.degenerate[slot] {
+                    continue;
+                }
+                let inv = self.diffs[slot];
+                let sy = f.add(ys, yr[t]);
+                let lm = f.mul(f.sub(0, sy), inv);
+                let base = f.add(xr[t], xs);
+                let xm_m = f.sub(f.mul(lm, lm), base);
+                ops.adds += 1;
+                self.probe_right_adds += 1;
+                if !self.bloom_maybe(xm_m) {
+                    continue;
+                }
+                self.probe_lookups += 1;
+                counters.lookups += 1;
+                if !self.lookup_mont_into(xm_m) {
+                    self.bloom_false_positives += 1;
+                    continue;
+                }
+                let left = std::mem::take(&mut self.left_scratch);
+                let hit = self.finish_hit_prime(
+                    g,
+                    fb,
+                    ops,
+                    counters,
+                    targets[t],
+                    left,
+                    &right_buf[..n_r],
+                );
+                if self.left_scratch.capacity() == 0 {
+                    self.left_scratch = Vec::with_capacity(self.left_k as usize);
+                }
+                if let Some(hit) = hit {
+                    out[t] = Some(hit);
+                }
+            }
+        }
     }
 }
 
@@ -1066,10 +1524,7 @@ impl RootfindKMitmOracle<'_> {
     ) -> Option<Vec<usize>> {
         let n = self.right_bin.len();
         for i in 0..n {
-            let (s, right_idxs) = {
-                let e = &self.right_bin[i];
-                (e.point, e.idxs.clone())
-            };
+            let s = self.right_bin[i].point;
             let t = g.add(ops, target, g.neg(s));
             self.probe_right_adds += 1;
             let mut lookups = 0u64;
@@ -1086,7 +1541,11 @@ impl RootfindKMitmOracle<'_> {
             };
             self.probe_lookups += lookups;
             counters.lookups += lookups;
-            if let Some(hit) = self.finish_hit_bin(g, fb, ops, counters, target, left, &right_idxs)
+            let mut right_buf = [0usize; RIGHT_IDX_CAP];
+            let n_r = usize::from(self.right_bin[i].n_idxs);
+            right_buf[..n_r].copy_from_slice(self.right_bin[i].idxs_slice());
+            if let Some(hit) =
+                self.finish_hit_bin(g, fb, ops, counters, target, left, &right_buf[..n_r])
             {
                 return Some(hit);
             }
@@ -1244,6 +1703,46 @@ mod tests {
         let mut counters = OracleCounters::default();
         let hit = oracle.decompose(&c, &fb, &mut dops, &mut counters, s);
         assert!(hit.is_some(), "m=12 should recover planted 12-sum");
+    }
+
+    /// Four-lane shared batch-inv recovers the same planted m=4 sum.
+    #[test]
+    fn kmitm_lanes_recover_planted_m4() {
+        let inst = prime_instance_for(22, 59297);
+        let fb = prime_factor_base(&inst, 16);
+        let c = ctx(&inst);
+        let g = &inst.curve;
+        let m = 4u32;
+        let mut idxs = Vec::new();
+        for x in &fb.abscissa_list {
+            if idxs.len() == m as usize {
+                break;
+            }
+            idxs.push(fb.x_index[x][0]);
+        }
+        let mut ops = GroupOps::default();
+        let mut s = fb.points[idxs[0]];
+        for &i in &idxs[1..] {
+            s = g.add(&mut ops, s, fb.points[i]);
+        }
+        // Three decoys + the planted sum.
+        let mut state = 0xC0FF_EE00_u64;
+        let mut targets = vec![s];
+        for _ in 0..3 {
+            state = state.wrapping_mul(0x9E37_79B9_7F4A_7C15).wrapping_add(1);
+            targets.push(g.mul(&mut ops, inst.generator_point(), 1 + state % (inst.r - 1)));
+        }
+        let (_, params) = Params::parse_spec("rootfind-kmitm:m=4").unwrap();
+        let mut oracle = RootfindKMitmOracle::new_prime(m, &inst);
+        oracle
+            .prepare(&c, &fb, &params, &mut GroupOps::default())
+            .unwrap();
+        let mut out = vec![None; 4];
+        let mut dops = GroupOps::default();
+        let mut counters = OracleCounters::default();
+        oracle.decompose_lanes(&c, &fb, &mut dops, &mut counters, &targets, &mut out);
+        assert!(out[0].is_some(), "lanes should recover planted sum");
+        assert_eq!(out[0].as_ref().unwrap().len(), 4);
     }
 
     /// Against full ksum at m=4: kmitm still charges fewer build adds.

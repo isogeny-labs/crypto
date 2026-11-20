@@ -87,6 +87,43 @@ fn main() {
         }
         let probe_m_ns = t0.elapsed().as_nanos() as f64 / targets.len() as f64;
 
+        // PLAN lever 2 (scalar): 4-target shared batch-inv throughput.
+        let lane = 4usize;
+        let mut lane_out = vec![None; lane];
+        for chunk in targets.chunks(lane).take(1) {
+            let mut o = GroupOps::default();
+            let mut c = OracleCounters::default();
+            mitm.decompose_lanes(
+                &ctx,
+                &fb,
+                &mut o,
+                &mut c,
+                chunk,
+                &mut lane_out[..chunk.len()],
+            );
+            black_box(&lane_out);
+        }
+        let mut hits_lanes = 0u64;
+        let t_lanes = Instant::now();
+        for chunk in targets.chunks(lane) {
+            let mut o = GroupOps::default();
+            let mut c = OracleCounters::default();
+            mitm.decompose_lanes(
+                &ctx,
+                &fb,
+                &mut o,
+                &mut c,
+                chunk,
+                &mut lane_out[..chunk.len()],
+            );
+            for slot in lane_out.iter().take(chunk.len()) {
+                if slot.is_some() {
+                    hits_lanes += 1;
+                }
+            }
+        }
+        let probe_lanes_ns = t_lanes.elapsed().as_nanos() as f64 / targets.len() as f64;
+
         let (ksum_build_ns, ksum_probe_ns, ksum_entries, ksum_hits, ksum_ok) = if m <= 9 {
             let (_, pk) = Params::parse_spec(&format!("ksum:m={m},prune=1")).unwrap();
             let mut ksum = KSumOracle::new(m);
@@ -126,10 +163,12 @@ fn main() {
 
         let build_ratio = ksum_build_ns.map(|k| k / build_m_ns);
         let probe_ratio = ksum_probe_ns.map(|k| k / probe_m_ns);
+        let lane_speedup = probe_m_ns / probe_lanes_ns;
         println!(
             "m={m:>2}  split {left_k}/{right_k}  kmitm build {build_m_ns:10.0} ns  \
              left {left_entries:<8} right_pre {right_pre:<6}  \
-             probe {probe_m_ns:10.1} ns/tgt  hits {hits_m}   \
+             probe {probe_m_ns:10.1} ns/tgt  lanes4 {probe_lanes_ns:10.1} ns/tgt \
+             ({lane_speedup:4.2}x) hits {hits_m}/{hits_lanes}   \
              ksum build {}  probe {}  ratio build/probe {} / {}",
             ksum_build_ns
                 .map(|v| format!("{v:10.0} ns"))
@@ -154,7 +193,10 @@ fn main() {
             "kmitm_left_entries": left_entries,
             "kmitm_right_precomputed": right_pre,
             "kmitm_probe_ns_per_target": probe_m_ns,
+            "kmitm_probe_ns_per_target_lanes4": probe_lanes_ns,
+            "kmitm_lanes4_speedup": lane_speedup,
             "kmitm_hits": hits_m,
+            "kmitm_hits_lanes4": hits_lanes,
             "ksum_ok": ksum_ok,
             "ksum_build_ns": ksum_build_ns,
             "ksum_probe_ns_per_target": ksum_probe_ns,
