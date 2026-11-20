@@ -39,16 +39,21 @@ checked on all eight assignments before execution.
 The local checked Sage runtime is in [`runtime-info.json`](runtime-info.json).
 CryptoMiniSat 5.14.7 was pinned by binary SHA-256
 `a3f85c3709b5e2a040bf82a4a604d1c7b9f10219bbf180a9e0f72319a2e892ac`.
-The exact generated inputs are retained as [`planted.cnf.gz`](planted.cnf.gz)
-and [`random.cnf.gz`](random.cnf.gz), with uncompressed SHA-256 digests in
-[`result.json`](result.json). The ordinary-query assignment was checked
-against all 375,650 clauses independently of the solver return code.
+The exact generated CNF inputs are reproducible from the pinned builder and
+encoder; their uncompressed SHA-256 digests are in [`result.json`](result.json).
+The local compressed CNFs remain in the experiment worktree. The repository's
+artifact migration job cannot upload them because its S3 `HeadObject` call
+returned 403, so the PR retains source, digests, the normalized solver model,
+and an independent regeneration audit. The ordinary-query assignment was
+checked against all 375,650 regenerated clauses independently of the solver
+return code.
 [`audit.py`](audit.py) replays the source and solver hashes, exact solution
 counts, original-equation witness residual, and every CNF clause;
 [`audit.json`](audit.json) records its successful output.
 [`run-output.txt`](run-output.txt) records the 330.88-second process receipt;
-the compressed per-arm solver outputs retain emitted text and the random
-arm's model. The planted timeout status is in `result.json`.
+the per-arm text outputs retain emitted text and the random arm's model, with
+only trailing line whitespace removed for Git. The planted timeout status is
+in `result.json`.
 
 Replay from this repository with the checked launcher:
 

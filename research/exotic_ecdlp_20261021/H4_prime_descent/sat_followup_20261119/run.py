@@ -165,8 +165,9 @@ for arm in SPEC["stage_order"]:
         status = "invalid_witness"
     if status == "unsat_solver_reported" and solutions:
         status = "invalid_unsat_report"
-    with gzip.open(HERE / (arm + "-solver-output.txt.gz"), "wt") as f:
-        f.write(stdout + "\nSTDERR\n" + stderr)
+    emitted = stdout + "\nSTDERR\n" + stderr
+    (HERE / (arm + "-solver-output.txt")).write_text(
+        "\n".join(line.rstrip() for line in emitted.splitlines()) + "\n")
     result["arms"][arm] = {
         "status": status, "field_degree": 17, "instance_index": 0,
         "variables": sd["N"], "equations": len(sd["eqs"]),

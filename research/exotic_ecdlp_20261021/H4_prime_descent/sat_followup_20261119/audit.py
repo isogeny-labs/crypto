@@ -29,6 +29,13 @@ assert {n.name for n in functions} == needed
 M64 = np.uint64
 SEED = 20261022
 exec(compile(ast.Module(body=functions, type_ignores=[]), str(source), "exec"), globals())
+encoder_source = HERE / "run.py"
+encoder_tree = ast.parse(encoder_source.read_text(), filename=str(encoder_source))
+encoder_functions = [n for n in encoder_tree.body
+                     if isinstance(n, ast.FunctionDef) and n.name in {"add_xor", "encode"}]
+assert {n.name for n in encoder_functions} == {"add_xor", "encode"}
+exec(compile(ast.Module(body=encoder_functions, type_ignores=[]),
+             str(encoder_source), "exec"), globals())
 
 audit = {"schema": "h4-n17-sat-followup-audit-v1", "arms": {}}
 for arm in spec["stage_order"]:
@@ -37,6 +44,14 @@ for arm in spec["stage_order"]:
     solutions = set(enumerate_solutions(system))
     assert len(solutions) == rec["exact_solution_count"]
     assert rec["variables"] == system["N"] and rec["equations"] == len(system["eqs"])
+    cnf_vars, clauses, monomials = encode(system["eqs"], system["N"])
+    assert cnf_vars == rec["cnf_vars"] and len(clauses) == rec["cnf_clauses"]
+    assert monomials == rec["shared_monomial_gates"]
+    digest = hashlib.sha256()
+    digest.update(f"p cnf {cnf_vars} {len(clauses)}\n".encode())
+    for clause in clauses:
+        digest.update((" ".join(map(str, clause)) + " 0\n").encode())
+    assert digest.hexdigest() == rec["cnf_sha256"]
     entry = {"exact_solution_count_replayed": len(solutions), "status": rec["status"]}
     if arm == "planted":
         entry["planted_residual_replayed"] = eval_eqs_at(system["eqs"], system["planted"])
@@ -44,8 +59,7 @@ for arm in spec["stage_order"]:
         assert entry["planted_residual_replayed"] == 0 and entry["planted_in_exact_set_replayed"]
     if rec["status"] == "sat_verified":
         model = {}
-        with gzip.open(HERE / (arm + "-solver-output.txt.gz"), "rt") as output:
-            lines = output.read().splitlines()
+        lines = (HERE / (arm + "-solver-output.txt")).read_text().splitlines()
         for line in lines:
             if line.startswith("v "):
                 for token in line.split()[1:]:
@@ -58,23 +72,9 @@ for arm in spec["stage_order"]:
         entry["witness_residual_replayed"] = eval_eqs_at(system["eqs"], witness)
         entry["witness_in_exact_set_replayed"] = witness in solutions
         assert entry["witness_residual_replayed"] == 0 and entry["witness_in_exact_set_replayed"]
-        with gzip.open(HERE / (arm + ".cnf.gz"), "rt") as f:
-            header = f.readline().split()
-            assert header[:2] == ["p", "cnf"]
-            assert [int(header[2]), int(header[3])] == [rec["cnf_vars"], rec["cnf_clauses"]]
-            count = 0
-            for line in f:
-                lits = [int(x) for x in line.split()]
-                assert lits[-1] == 0
-                assert any(model[abs(lit)] == (lit > 0) for lit in lits[:-1])
-                count += 1
-        assert count == rec["cnf_clauses"]
-        entry["cnf_clauses_checked"] = count
-    with gzip.open(HERE / (arm + ".cnf.gz"), "rb") as f:
-        digest = hashlib.sha256()
-        for chunk in iter(lambda: f.read(1024 * 1024), b""):
-            digest.update(chunk)
-    assert digest.hexdigest() == rec["cnf_sha256"]
+        assert all(any(model[abs(lit)] == (lit > 0) for lit in clause)
+                   for clause in clauses)
+        entry["cnf_clauses_checked"] = len(clauses)
     entry["cnf_sha256_replayed"] = digest.hexdigest()
     audit["arms"][arm] = entry
 
