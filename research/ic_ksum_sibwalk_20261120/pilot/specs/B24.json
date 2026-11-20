@@ -1,0 +1,105 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ic_ksum_sibwalk_20261120 pilot B24",
+ "description": "Pilot (not data). k-sum Table B arm (prune=1, split=1, stride-renew-joint, prefix=1 where it held): walk_sib=m forms the same target progression in blocks of 2m+1 around a centre, C+[i]S full and x(C-[i]S) from one shared inversion (one add + one sibling_second_points), x probed by one lookup. Generic decomposition track (bounded by sqrt(r); cannot beat rho). PROTOCOL.md. Public synthetic curve and targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "binary_explicit",
+    "n": 24,
+    "modulus": 16777243,
+    "a": 0,
+    "b": 6277594,
+    "group_order": 16780264,
+    "r": 2097533,
+    "gx": 11058037,
+    "gy": 14510317
+   }
+  ],
+  "targets_per_curve": 64,
+  "target_seed": 20261120506,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "inc",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=9,mult=1",
+     "oracle": "ksum:m=5,prune=1,split=1,prefix=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew-joint"
+    }
+   }
+  },
+  {
+   "name": "off",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=9,mult=1",
+     "oracle": "ksum:m=5,prune=1,split=1,prefix=1,walk_sib=0",
+     "max_trials": "13528399621",
+     "targets": "stride-renew-joint"
+    }
+   }
+  },
+  {
+   "name": "sib4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=9,mult=1",
+     "oracle": "ksum:m=5,prune=1,split=1,prefix=1,walk_sib=4",
+     "max_trials": "13528399621",
+     "targets": "stride-renew-joint"
+    }
+   }
+  },
+  {
+   "name": "sib8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=9,mult=1",
+     "oracle": "ksum:m=5,prune=1,split=1,prefix=1,walk_sib=8",
+     "max_trials": "13528399621",
+     "targets": "stride-renew-joint"
+    }
+   }
+  },
+  {
+   "name": "sib16",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=9,mult=1",
+     "oracle": "ksum:m=5,prune=1,split=1,prefix=1,walk_sib=16",
+     "max_trials": "13528399621",
+     "targets": "stride-renew-joint"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261120556,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

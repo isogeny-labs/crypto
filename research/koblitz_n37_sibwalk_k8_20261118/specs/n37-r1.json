@@ -1,0 +1,93 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "Sibling walk k=8 m=8 + reuse of formed points vs lean+sib incumbent, K1 a=0 n=37, replicate 1",
+ "description": "Frozen in research/koblitz_n37_sibwalk_k8_20261118/PROTOCOL.md before its data. Candidate sw: k=8 (incumbent columns), walk_sib=8, ladder_verify=1, orbit_key_reuse=1; rho strong and v5 references in the same session.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 0,
+    "n": 37
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261118491,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-strong",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  },
+  {
+   "name": "rho-v5",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_v5"
+   }
+  },
+  {
+   "name": "ls",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=100000000,generator_orbit=1,generator_multiples=8,multiple_doublings=5,lean_layout=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "ls-aa",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=100000000,generator_orbit=1,generator_multiples=8,multiple_doublings=5,lean_layout=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "ls-off",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=100000000,generator_orbit=1,generator_multiples=8,multiple_doublings=5,lean_layout=1,orbit_key_reuse=0",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=0,ladder_verify=0",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "sw",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=8,raw_x_cap=100000000,generator_orbit=1,generator_multiples=8,multiple_doublings=5,lean_layout=1,orbit_key_reuse=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=8,ladder_verify=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261119491,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

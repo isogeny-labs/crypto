@@ -1,0 +1,119 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "Koblitz known-log columns, addendum A1 (spread seeds): a=1 n=23",
+ "description": "Frozen in research/koblitz_known_log_columns_20261118/PROTOCOL.md addendum A1 before its data. multiple_doublings=d: known seeds [2^(d(j-1))]G.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 1,
+    "n": 23
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261118411,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-strong",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  },
+  {
+   "name": "rho-v5",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_v5"
+   }
+  },
+  {
+   "name": "gen-c4",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "gen-c4-aa",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "kl-c4",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1,generator_multiples=4",
+     "oracle": "mitm-frobenius-layout-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "sp-c4-d5",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1,generator_multiples=4,multiple_doublings=5",
+     "oracle": "mitm-frobenius-layout-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "sp-c4-d3",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=4,raw_x_cap=100000000,generator_orbit=1,generator_multiples=4,multiple_doublings=3",
+     "oracle": "mitm-frobenius-layout-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "sp-c5-d5",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=5,raw_x_cap=100000000,generator_orbit=1,generator_multiples=5,multiple_doublings=5",
+     "oracle": "mitm-frobenius-layout-counted:m=2",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261119411,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

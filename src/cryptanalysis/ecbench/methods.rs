@@ -2280,6 +2280,19 @@ pub(super) fn ops_phase(name: &str, ops: GroupOps) -> PhaseRecord {
     }
 }
 
+/// The counter `rho.signed_frobenius_v5` tallies its per-step jump-index
+/// selection under since 2026-11-19: the name the strong reference uses
+/// for its per-step partition hash, so `ecbench::work` and the §5a band
+/// price the two alike.  Records written before then lack it; their
+/// replay is matched with it removed ([`v5_pre_tally_record`]).
+pub const V5_JUMP_INDEX_COUNTER: &str = "partition_hashes_uncharged";
+
+/// A `rho.signed_frobenius_v5` record written before the per-step
+/// jump-index tally existed: it carries no [`V5_JUMP_INDEX_COUNTER`].
+pub(super) fn v5_pre_tally_record(method: &str, counters: &BTreeMap<String, u64>) -> bool {
+    method == "rho.signed_frobenius_v5" && !counters.contains_key(V5_JUMP_INDEX_COUNTER)
+}
+
 pub(super) fn unpriced_of(counters: &BTreeMap<String, u64>) -> Vec<String> {
     counters
         .iter()
@@ -4456,6 +4469,15 @@ fn solve_inner(
             )
             .ok_or("not a Koblitz instance")?;
             measurement::end_online();
+            let mut res = res;
+            // The per-step jump-index selection, tallied as the strong
+            // reference tallies its partition hash (one per step), so the
+            // §5a band prices it alike (owner decision 2026-11-19,
+            // research/koblitz_rho_reference_20261115/DECISION.md).  A
+            // native counter only: the walk, the outcome and every group
+            // operation are unchanged.
+            res.counters
+                .insert(V5_JUMP_INDEX_COUNTER.into(), res.jump_index_selections);
             Ok(rho_report_v2(
                 res,
                 t.elapsed().as_nanos() as u64,
@@ -8160,6 +8182,14 @@ fn solve_ic_binary(
     let mut oracle_box: Box<dyn DecompositionOracle<BinaryGroup> + '_> = match or_name.as_str() {
         "subtract" => Box::new(SubtractOracle),
         "mitm" => Box::new(MitmOracle::new(ms)),
+        // Generic over the group: one probe a target into the negation-folded
+        // table of every signed m-sum of the base (as on prime curves).
+        "ksum" => Box::new(KSumOracle::new(ms)),
+        // Koblitz: the same probe into a table folded by the signed
+        // Frobenius as well, over a Frobenius-closed base.
+        "ksum-frobenius" => Box::new(
+            crate::cryptanalysis::ic_framework::plugins::FrobeniusKSumOracle::new(ms, inst),
+        ),
         "mitm-frobenius" => Box::new(FrobeniusMitmOracle::new(ms, inst)),
         "mitm-frobenius-counted" => Box::new(FrobeniusMitmOracle::new_counted(ms, inst)),
         "mitm-frobenius-lazy-counted" => Box::new(FrobeniusMitmOracle::new_lazy_counted(ms, inst)),
@@ -11070,6 +11100,88 @@ mod accounting_rules_tests {
             assert!(s.distinct_jumps >= last.distinct_jumps, "{bits}");
             last = s;
         }
+    }
+
+    /// `rho.signed_frobenius_v5` tallies its per-step jump-index selection
+    /// as `partition_hashes_uncharged` (owner decision 2026-11-19): the
+    /// report is the pre-tally report (the same walk, recovered scalar,
+    /// phases, group operations, GAE and every other counter) plus that one
+    /// counter, which equals the walk steps (strong's definition: one
+    /// partition hash per step) and is listed as unpriced, so the band
+    /// prices it at `w` per step.
+    #[test]
+    fn v5_jump_index_tally_adds_one_counter_equal_to_steps_and_changes_nothing_else() {
+        let m = method("rho.signed_frobenius_v5", &[]);
+        let cap = param_u64(&m, "cap_multiple").unwrap() as f64;
+        for (a, n) in [(0u8, 13u32), (1, 17), (0, 23), (1, 29)] {
+            let (inst, facts) = built(&CurveSpec::Koblitz { a, n });
+            let Instance::Binary(bi) = &inst else {
+                unreachable!()
+            };
+            for i in 0..6u64 {
+                let k = (1_009 + 7_919 * i) % bi.r;
+                let tgt = bi.fast.mul_u64(bi.generator, k);
+                let hex = [format!("0x{:x}", tgt.x), format!("0x{:x}", tgt.y)];
+                let seed = 40 + i;
+                let tallied = solve(&m, &inst, &facts, &hex, seed).unwrap();
+                let res = signed_frobenius_rho_v3(
+                    bi,
+                    FastPoint::affine(tgt.x, tgt.y),
+                    seed,
+                    rho_cap(bi.r, cap),
+                    RhoV3::v6(true),
+                )
+                .unwrap();
+                let steps = res.steps;
+                assert_eq!(res.jump_index_selections, steps, "a={a} n={n} i={i}");
+                let before = rho_report_v2(res, 0, None, GroupOps::default());
+                assert_eq!(tallied.recovered, before.recovered);
+                assert_eq!(tallied.recovered, Some(ExactScalar::from(k)));
+                assert_eq!(tallied.exhausted, before.exhausted);
+                assert_eq!(tallied.total_gae.to_bits(), before.total_gae.to_bits());
+                assert_eq!(tallied.phases.len(), before.phases.len());
+                for (p, q) in tallied.phases.iter().zip(&before.phases) {
+                    assert_eq!(
+                        (&p.name, p.adds, p.doubles, p.scalar_mults, p.gae.to_bits()),
+                        (&q.name, q.adds, q.doubles, q.scalar_mults, q.gae.to_bits())
+                    );
+                    assert_eq!(p.native, q.native);
+                    assert_eq!(p.work_native, q.work_native);
+                }
+                assert_eq!(tallied.field_ops, before.field_ops);
+                assert_eq!(tallied.automorphisms_used, before.automorphisms_used);
+                let mut extra = tallied.counters.clone();
+                assert_eq!(extra.remove(V5_JUMP_INDEX_COUNTER), Some(steps));
+                assert_eq!(extra, before.counters, "a={a} n={n} i={i}");
+                assert_eq!(tallied.counters["steps"], steps);
+                assert!(steps > 0);
+                let mut unpriced = tallied.unpriced.clone();
+                assert!(unpriced.contains(&V5_JUMP_INDEX_COUNTER.to_string()));
+                unpriced.retain(|u| u != V5_JUMP_INDEX_COUNTER);
+                assert_eq!(unpriced, before.unpriced);
+                assert!(v5_pre_tally_record(
+                    "rho.signed_frobenius_v5",
+                    &before.counters
+                ));
+                assert!(!v5_pre_tally_record(
+                    "rho.signed_frobenius_v5",
+                    &tallied.counters
+                ));
+            }
+        }
+        // Strong's definition, for the record: one partition hash per step.
+        let (inst, facts) = built(&CurveSpec::Koblitz { a: 1, n: 17 });
+        let s = run(
+            &method("rho.signed_frobenius_strong", &[]),
+            &inst,
+            &facts,
+            4_321,
+            3,
+        );
+        assert_eq!(
+            s.counters["partition_hashes_uncharged"],
+            s.counters["walk_steps"]
+        );
     }
 
     /// The v2 strong reference's fixed set-up against the frozen one at the

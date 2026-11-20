@@ -1,0 +1,52 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | gen-c1 | 144/144 | 0.439 | 0.706 | 3.110 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | gen-c1-aa | 144/144 | 0.439 | 0.706 | 3.110 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | gen-c1-off | 144/144 | 0.439 | 0.706 | 3.110 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | lv-all | 144/144 | 0.313 | 0.433 | 1.515 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | lv-lean | 144/144 | 0.439 | 0.538 | 1.426 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | lv-sib | 144/144 | 0.367 | 0.640 | 3.106 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | lv-tau | 144/144 | 0.386 | 0.668 | 3.204 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | rho-strong | 144/144 | 4.505 | 4.611 | 5.557 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | rho-v5 | 144/144 | 0.357 | 0.388 | 0.670 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs gen-c1-aa | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs gen-c1-off | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs lv-all | lv-all < gen-c1 |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs lv-lean | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs lv-sib | lv-sib < gen-c1 |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs lv-tau | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs rho-strong | gen-c1 < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs rho-v5 | rho-v5 < gen-c1 |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-aa vs gen-c1-off | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-aa vs lv-all | lv-all < gen-c1-aa |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-aa vs lv-lean | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-aa vs lv-sib | lv-sib < gen-c1-aa |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-aa vs lv-tau | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-aa vs rho-strong | gen-c1-aa < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-aa vs rho-v5 | rho-v5 < gen-c1-aa |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-off vs lv-all | lv-all < gen-c1-off |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-off vs lv-lean | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-off vs lv-sib | lv-sib < gen-c1-off |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-off vs lv-tau | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-off vs rho-strong | gen-c1-off < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-off vs rho-v5 | rho-v5 < gen-c1-off |
+| icv1-f2m29-tm40309-30c52b96 | lv-all vs lv-lean | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | lv-all vs lv-sib | lv-all < lv-sib |
+| icv1-f2m29-tm40309-30c52b96 | lv-all vs lv-tau | lv-all < lv-tau |
+| icv1-f2m29-tm40309-30c52b96 | lv-all vs rho-strong | lv-all < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | lv-all vs rho-v5 | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | lv-lean vs lv-sib | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | lv-lean vs lv-tau | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | lv-lean vs rho-strong | lv-lean < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | lv-lean vs rho-v5 | rho-v5 < lv-lean |
+| icv1-f2m29-tm40309-30c52b96 | lv-sib vs lv-tau | lv-sib < lv-tau |
+| icv1-f2m29-tm40309-30c52b96 | lv-sib vs rho-strong | lv-sib < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | lv-sib vs rho-v5 | rho-v5 < lv-sib |
+| icv1-f2m29-tm40309-30c52b96 | lv-tau vs rho-strong | lv-tau < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | lv-tau vs rho-v5 | rho-v5 < lv-tau |
+| icv1-f2m29-tm40309-30c52b96 | rho-strong vs rho-v5 | rho-v5 < rho-strong |
