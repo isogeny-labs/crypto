@@ -23,6 +23,7 @@ on:
       - 'research/amm_digit_perf_20261118/round48_joint_tonelli_isolated.py'
       - 'research/amm_digit_perf_20261118/round49_jacobi_isolated.py'
       - 'research/amm_digit_perf_20261118/round50_quadratic_finish_isolated.py'
+      - 'research/amm_digit_perf_20261118/round51_linear_products_isolated.py'
       - 'research/amm_digit_perf_20261118/round31_bounded_baseline.rs'
       - 'research/amm_digit_perf_20261118/round23_verifier_isolated.py'
       - 'research/amm_digit_perf_20261118/round24_verifier_isolated.py'
@@ -45,6 +46,34 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  bounded-scalar-and-linear-round51:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round51_linear_products_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare R50 with exact production Rust optimized linear multiplication and replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round51_linear_products_isolated.py
+          } | tee "$RUNNER_TEMP/round51-rust.txt"
+          cat "$RUNNER_TEMP/round51-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round51-linear-producer-verifier-rust
+          path: ${{ runner.temp }}/round51-rust.txt
+          if-no-files-found: ignore
+
   bounded-quadratic-finish-round50:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
