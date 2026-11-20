@@ -62,6 +62,7 @@ mod frozen {
             residues: [[i8; FEATURES]; OBSERVABLES],
             prym_residues: [[i8; FEATURES]; OBSERVABLES],
             splitting_bits: [i8; 2 * FEATURES],
+            eigenline_bits: [i8; 2 * FEATURES],
         }
 
         struct Rule {
@@ -238,13 +239,57 @@ mod frozen {
             }
         }
 
-        fn splitting_prediction(target: &Target, mask: u16, polarity: u8) -> u8 {
+        fn prym_weil_value(
+            prym_trace: i64,
+            prym_eta: i64,
+            p: i64,
+            value: i64,
+            auxiliary_prime: i64,
+        ) -> i64 {
+            ((((value - prym_trace) * value + prym_eta) * value - p * prym_trace)
+                * value
+                + p * p)
+                .rem_euclid(auxiliary_prime)
+        }
+
+        fn prym_real_weil_value(
+            prym_trace: i64,
+            prym_eta: i64,
+            p: i64,
+            value: i64,
+            auxiliary_prime: i64,
+        ) -> i64 {
+            (value * value - prym_trace * value + prym_eta - 2 * p)
+                .rem_euclid(auxiliary_prime)
+        }
+
+        fn prym_eigenline_bit(
+            prym_trace: i64,
+            prym_eta: i64,
+            p: i64,
+            auxiliary_prime: i64,
+        ) -> i8 {
+            i8::from((0..auxiliary_prime).any(|value| {
+                prym_weil_value(prym_trace, prym_eta, p, value, auxiliary_prime) == 0
+            }))
+        }
+
+        fn binary_prediction(
+            target: &Target,
+            eigenline_panel: bool,
+            mask: u16,
+            polarity: u8,
+        ) -> u8 {
             let mut bit = polarity;
             for feature in 0..(2 * FEATURES) {
                 if mask & (1_u16 << feature) == 0 {
                     continue;
                 }
-                let value = target.splitting_bits[feature];
+                let value = if eigenline_panel {
+                    target.eigenline_bits[feature]
+                } else {
+                    target.splitting_bits[feature]
+                };
                 if value < 0 {
                     return 3;
                 }
@@ -336,14 +381,18 @@ mod frozen {
                 residues: [[1, 0, 0, 0], [2, 0, 0, 0]],
                 prym_residues: [[1, 0, 0, 0], [2, 0, 0, 0]],
                 splitting_bits: [1, 0, 0, 0, 0, 0, 0, 0],
+                eigenline_bits: [0, 1, 0, 0, 0, 0, 0, 0],
             };
             assert_eq!(prediction(&planted, false, 0, &[1, 0, 0, 0], 0), 1);
             assert_eq!(prediction(&planted, false, 1, &[2, 0, 0, 0], 0), 1);
             assert_eq!(prediction(&planted, true, 0, &[1, 0, 0, 0], 0), 1);
-            assert_eq!(splitting_prediction(&planted, 1, 0), 1);
+            assert_eq!(binary_prediction(&planted, false, 1, 0), 1);
+            assert_eq!(binary_prediction(&planted, true, 2, 0), 1);
             assert_eq!(splitting_bit(4, 5), 1);
             assert_eq!(splitting_bit(2, 5), 0);
             assert_eq!(splitting_bit(0, 5), -1);
+            assert_eq!(prym_weil_value(0, 0, 1, 1, 5), 2);
+            assert_eq!(prym_eigenline_bit(0, 2, 1, 5), 1);
             println!(
                 "h116 chiral genus-three zeta2 digit selftest: pass ternary_rules=486 binary_rules=512"
             );
@@ -351,19 +400,23 @@ mod frozen {
         }
 
         pub fn run(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, false, false, false)
+            run_with_panel(output_path, false, false, false, false)
         }
 
         pub fn run_prym(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, true, false, false)
+            run_with_panel(output_path, true, false, false, false)
         }
 
         pub fn run_prym_oos(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, true, true, false)
+            run_with_panel(output_path, true, true, false, false)
         }
 
         pub fn run_prym_splitting(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, true, false, true)
+            run_with_panel(output_path, true, false, true, false)
+        }
+
+        pub fn run_prym_eigenline(output_path: &Path) -> Result<(), String> {
+            run_with_panel(output_path, true, false, false, true)
         }
 
         fn run_with_panel(
@@ -371,7 +424,12 @@ mod frozen {
             prym_panel: bool,
             oos_panel: bool,
             splitting_panel: bool,
+            eigenline_panel: bool,
         ) -> Result<(), String> {
+            if splitting_panel && eigenline_panel {
+                return Err("binary panel flags are mutually exclusive".to_string());
+            }
+            let binary_panel = splitting_panel || eigenline_panel;
             let mut targets = Vec::new();
             let mut rows = BTreeMap::<String, Vec<usize>>::new();
             let mut extension_square_table_checks = 0_u64;
@@ -393,6 +451,9 @@ mod frozen {
             let mut prym_factor_checks = 0_usize;
             let mut prym_splitting_checks = 0_usize;
             let mut prym_splitting_distinguishing_targets = 0_usize;
+            let mut prym_eigenline_polynomial_checks = 0_usize;
+            let mut prym_eigenline_quotient_checks = 0_usize;
+            let mut prym_eigenline_distinguishing_targets = 0_usize;
 
             let curve_specs: &[CurveSpec] = if oos_panel { &OOS_CURVES } else { &CURVES };
             for &spec in curve_specs {
@@ -596,6 +657,62 @@ mod frozen {
                                 return Err("Prym real-Weil splitting control failed".to_string());
                             }
                             prym_splitting_checks += 1;
+                            if spec.p as i64 % auxiliary_prime == 0 {
+                                return Err("auxiliary prime equals curve characteristic".to_string());
+                            }
+                            let full_roots = (0..auxiliary_prime)
+                                .filter(|&value| {
+                                    prym_weil_value(
+                                        prym_trace,
+                                        prym_eta,
+                                        spec.p as i64,
+                                        value,
+                                        auxiliary_prime,
+                                    ) == 0
+                                })
+                                .count();
+                            let eigenline_bit = prym_eigenline_bit(
+                                prym_trace,
+                                prym_eta,
+                                spec.p as i64,
+                                auxiliary_prime,
+                            );
+                            if (full_roots > 0) != (eigenline_bit == 1) {
+                                return Err("Prym eigenline root control failed".to_string());
+                            }
+                            prym_eigenline_polynomial_checks += 1;
+                            for eigenvalue in 1..auxiliary_prime {
+                                let inverse = (1..auxiliary_prime)
+                                    .find(|candidate| {
+                                        (eigenvalue * candidate).rem_euclid(auxiliary_prime) == 1
+                                    })
+                                    .ok_or("auxiliary eigenvalue inverse missing")?;
+                                let real_eigenvalue = (eigenvalue
+                                    + (spec.p as i64).rem_euclid(auxiliary_prime) * inverse)
+                                    .rem_euclid(auxiliary_prime);
+                                let full_value = prym_weil_value(
+                                    prym_trace,
+                                    prym_eta,
+                                    spec.p as i64,
+                                    eigenvalue,
+                                    auxiliary_prime,
+                                );
+                                let quotient_value = (eigenvalue * eigenvalue
+                                    * prym_real_weil_value(
+                                        prym_trace,
+                                        prym_eta,
+                                        spec.p as i64,
+                                        real_eigenvalue,
+                                        auxiliary_prime,
+                                    ))
+                                    .rem_euclid(auxiliary_prime);
+                                if full_value != quotient_value {
+                                    return Err(
+                                        "Prym full/real Weil quotient identity failed".to_string(),
+                                    );
+                                }
+                                prym_eigenline_quotient_checks += 1;
+                            }
                         }
                         prym_factor_checks += 1;
                         newton_checks += 1;
@@ -617,11 +734,13 @@ mod frozen {
                     let mut residues = [[-1_i8; FEATURES]; OBSERVABLES];
                     let mut prym_residues = [[-1_i8; FEATURES]; OBSERVABLES];
                     let mut splitting_bits = [-1_i8; 2 * FEATURES];
+                    let mut eigenline_bits = [-1_i8; 2 * FEATURES];
                     let mut s2_distinguished = false;
                     let mut e2_distinguished = false;
                     let mut prym_eta_distinguished = false;
                     let mut prym_discriminant_distinguished = false;
                     let mut prym_splitting_distinguished = false;
+                    let mut prym_eigenline_distinguished = false;
                     for multiplier in 1..=2_u64 {
                         let multiple = base_curve.scalar_mul(multiplier, target_point)?;
                         let (x, y) = point_base_coordinates(&base_field, multiple)?;
@@ -641,6 +760,13 @@ mod frozen {
                             {
                                 splitting_bits[2 * feature + auxiliary_index] =
                                     splitting_bit(data.prym_discriminant, auxiliary_prime);
+                                eigenline_bits[2 * feature + auxiliary_index] =
+                                    prym_eigenline_bit(
+                                        data.prym_trace,
+                                        data.prym_eta,
+                                        spec.p as i64,
+                                        auxiliary_prime,
+                                    );
                             }
                             smooth_feature_checks += 1;
                         }
@@ -656,6 +782,13 @@ mod frozen {
                             {
                                 splitting_bits[2 * (feature + 1) + auxiliary_index] =
                                     splitting_bit(data.prym_discriminant, auxiliary_prime);
+                                eigenline_bits[2 * (feature + 1) + auxiliary_index] =
+                                    prym_eigenline_bit(
+                                        data.prym_trace,
+                                        data.prym_eta,
+                                        spec.p as i64,
+                                        auxiliary_prime,
+                                    );
                             }
                             smooth_feature_checks += 1;
                         }
@@ -677,6 +810,17 @@ mod frozen {
                                         minus.prym_discriminant,
                                         auxiliary_prime,
                                     );
+                                prym_eigenline_distinguished |= prym_eigenline_bit(
+                                    plus.prym_trace,
+                                    plus.prym_eta,
+                                    spec.p as i64,
+                                    auxiliary_prime,
+                                ) != prym_eigenline_bit(
+                                    minus.prym_trace,
+                                    minus.prym_eta,
+                                    spec.p as i64,
+                                    auxiliary_prime,
+                                );
                             }
                         }
 
@@ -694,6 +838,8 @@ mod frozen {
                         usize::from(prym_discriminant_distinguished);
                     prym_splitting_distinguishing_targets +=
                         usize::from(prym_splitting_distinguished);
+                    prym_eigenline_distinguishing_targets +=
+                        usize::from(prym_eigenline_distinguished);
                     let index = targets.len();
                     targets.push(Target {
                         slug: spec.slug.to_string(),
@@ -702,6 +848,7 @@ mod frozen {
                         residues,
                         prym_residues,
                         splitting_bits,
+                        eigenline_bits,
                     });
                     rows.entry(spec.slug.to_string()).or_default().push(index);
                 }
@@ -715,7 +862,7 @@ mod frozen {
             if chirality_swap_checks != 2 * expected_targets {
                 return Err("chirality swap census failed".to_string());
             }
-            let labels: Vec<u8> = if splitting_panel {
+            let labels: Vec<u8> = if binary_panel {
                 targets.iter().map(|target| target.parity).collect()
             } else {
                 targets.iter().map(|target| target.digit).collect()
@@ -728,17 +875,19 @@ mod frozen {
 
             let mut rules = Vec::with_capacity(if oos_panel {
                 1
-            } else if splitting_panel {
+            } else if binary_panel {
                 512
             } else {
                 486
             });
-            if splitting_panel {
+            if binary_panel {
                 for mask in 0_u16..256 {
                     for polarity in 0..=1_u8 {
                         let predictions: Vec<u8> = targets
                             .iter()
-                            .map(|target| splitting_prediction(target, mask, polarity))
+                            .map(|target| {
+                                binary_prediction(target, eigenline_panel, mask, polarity)
+                            })
                             .collect();
                         let (coverage, matches) = score(&predictions, &labels);
                         rules.push(Rule {
@@ -818,14 +967,14 @@ mod frozen {
                 .max_by(|&left, &right| {
                     compare_ratio(rules[left].statistic, rules[right].statistic)
                         .then_with(|| {
-                            if splitting_panel {
+                            if binary_panel {
                                 rules[right].splitting_mask.cmp(&rules[left].splitting_mask)
                             } else {
                                 rules[right].observable.cmp(&rules[left].observable)
                             }
                         })
                         .then_with(|| {
-                            if splitting_panel {
+                            if binary_panel {
                                 rules[right]
                                     .splitting_polarity
                                     .cmp(&rules[left].splitting_polarity)
@@ -854,7 +1003,9 @@ mod frozen {
                 for (slug, indices) in &rows {
                     let mut values: Vec<u8> =
                         indices.iter().map(|&index| labels[index]).collect();
-                    let mut seed = if splitting_panel {
+                    let mut seed = if eigenline_panel {
+                        0x116_016_u64
+                    } else if splitting_panel {
                         0x116_015_u64
                     } else if oos_panel {
                         0x116_014_u64
@@ -871,7 +1022,7 @@ mod frozen {
                 let mut maximum = (0_u128, 1_u128);
                 for rule in &rules {
                     let (_, matches) = score(&rule.predictions, &shuffled);
-                    let candidate = if splitting_panel {
+                    let candidate = if binary_panel {
                         binary_statistic(matches, rule.coverage)
                     } else {
                         statistic(matches, rule.coverage)
@@ -899,7 +1050,7 @@ mod frozen {
                 ));
             }
 
-            let radix = if splitting_panel { 2_i64 } else { 3_i64 };
+            let radix = if binary_panel { 2_i64 } else { 3_i64 };
             let excess = radix * selected.matches as i64 - selected.coverage as i64;
             let json = format!(
                 concat!(
@@ -919,6 +1070,9 @@ mod frozen {
                     "  \"prym_discriminant_distinguishing_targets\":{},\n",
                     "  \"prym_splitting_checks\":{},\n",
                     "  \"prym_splitting_distinguishing_targets\":{},\n",
+                    "  \"prym_eigenline_polynomial_checks\":{},\n",
+                    "  \"prym_eigenline_quotient_checks\":{},\n",
+                    "  \"prym_eigenline_distinguishing_targets\":{},\n",
                     "  \"selected_observable\":\"{}\",\n  \"selected_code\":{},\n",
                     "  \"selected_coefficients\":[{}],\n  \"selected_offset\":{},\n",
                     "  \"selected_mask\":{},\n  \"selected_polarity\":{},\n",
@@ -929,7 +1083,9 @@ mod frozen {
                     "  \"familywise_empirical_p\":{:.12},\n  \"per_curve\":[{}],\n",
                     "  \"status\":\"measured\"\n}}\n"
                 ),
-                if splitting_panel {
+                if eigenline_panel {
+                    "prym_eigenline"
+                } else if splitting_panel {
                     "prym_splitting"
                 } else if oos_panel {
                     "prym_oos"
@@ -961,7 +1117,12 @@ mod frozen {
                 prym_discriminant_distinguishing_targets,
                 prym_splitting_checks,
                 prym_splitting_distinguishing_targets,
-                if splitting_panel {
+                prym_eigenline_polynomial_checks,
+                prym_eigenline_quotient_checks,
+                prym_eigenline_distinguishing_targets,
+                if eigenline_panel {
+                    "prym_full_weil_linear_factor_bits_l5_l7"
+                } else if splitting_panel {
                     "prym_real_weil_splitting_bits_l5_l7"
                 } else {
                     observable_name(selected.observable, prym_panel)
@@ -984,9 +1145,10 @@ mod frozen {
                 per_curve.join(",")
             );
             fs::write(output_path, json).map_err(|error| error.to_string())?;
-            if splitting_panel {
+            if binary_panel {
                 println!(
-                    "chiral genus-three Prym splitting parity: mask={} polarity={} coverage={} matches={} exact={} p={:.6}",
+                    "chiral genus-three Prym {} parity: mask={} polarity={} coverage={} matches={} exact={} p={:.6}",
+                    if eigenline_panel { "eigenline" } else { "splitting" },
                     selected.splitting_mask,
                     selected.splitting_polarity,
                     selected.coverage,
@@ -1036,8 +1198,11 @@ fn main() {
         [_, flag, output] if flag == "--run-prym-splitting" => {
             frozen::chiral_genus3_zeta2::run_prym_splitting(Path::new(output))
         }
+        [_, flag, output] if flag == "--run-prym-eigenline" => {
+            frozen::chiral_genus3_zeta2::run_prym_eigenline(Path::new(output))
+        }
         _ => Err(
-            "usage: h116_chiral_genus3_zeta2_digit --selftest | --run OUTPUT.json | --run-prym OUTPUT.json | --run-prym-oos OUTPUT.json | --run-prym-splitting OUTPUT.json".to_string(),
+            "usage: h116_chiral_genus3_zeta2_digit --selftest | --run OUTPUT.json | --run-prym OUTPUT.json | --run-prym-oos OUTPUT.json | --run-prym-splitting OUTPUT.json | --run-prym-eigenline OUTPUT.json".to_string(),
         ),
     };
     if let Err(error) = result {
