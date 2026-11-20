@@ -15,6 +15,8 @@ mod frozen {
         const TRACE_FEATURES: usize = 4;
         const INVARIANT_FEATURES: usize = 2 * TRACE_FEATURES;
         const KUMMER_FEATURES: usize = 2 * TRACE_FEATURES;
+        const ORBIT_PREDICATES_PER_FIBER: usize = 3;
+        const ORBIT_FEATURES: usize = ORBIT_PREDICATES_PER_FIBER * KUMMER_FEATURES;
         const TRACE_PAIRS: [(usize, usize); TRACE_FEATURES] =
             [(0, 2), (1, 3), (4, 6), (5, 7)];
         const TARGETS: usize = 1520;
@@ -40,6 +42,7 @@ mod frozen {
             trace_residues: [i8; TRACE_FEATURES],
             invariant_bits: [i8; INVARIANT_FEATURES],
             kummer_bits: [i8; KUMMER_FEATURES],
+            orbit_bits: [i8; ORBIT_FEATURES],
         }
 
         struct Rule {
@@ -221,6 +224,27 @@ mod frozen {
                     }
                     value ^= bit as u8;
                 }
+            }
+            value
+        }
+
+        fn orbit_prediction(
+            target: &Target,
+            first: usize,
+            second: Option<usize>,
+            polarity: u8,
+        ) -> u8 {
+            let first_bit = target.orbit_bits[first];
+            if first_bit < 0 {
+                return 3;
+            }
+            let mut value = polarity ^ first_bit as u8;
+            if let Some(second) = second {
+                let second_bit = target.orbit_bits[second];
+                if second_bit < 0 {
+                    return 3;
+                }
+                value ^= second_bit as u8;
             }
             value
         }
@@ -516,13 +540,155 @@ mod frozen {
             Ok((enumerated_halves != 0, affine_points))
         }
 
+        fn marked_halving_orbit_type(
+            coefficient_a: u64,
+            coefficient_b: u64,
+            p: u64,
+            square_roots: &[Vec<u64>],
+            extension: &Field,
+        ) -> Result<u8, String> {
+            if extension.p != p || extension.d != 4 {
+                return Err("halving orbit control requires the quartic extension".to_string());
+            }
+            let a = extension.from_base(coefficient_a);
+            let b = extension.from_base(coefficient_b);
+            let two = extension.from_base(2);
+            let three = extension.from_base(3);
+            let Some(root_b) = extension.sqrt(b)? else {
+                return Err("marked kernel x-coordinate did not split over degree four".to_string());
+            };
+            if extension.square(root_b) != b || root_b == extension.zero() {
+                return Err("marked kernel x-coordinate square-root control failed".to_string());
+            }
+
+            let mut points = Vec::with_capacity(4);
+            for x in [root_b, extension.neg(root_b)] {
+                let x2 = extension.square(x);
+                let rhs = extension.add(
+                    extension.add(extension.mul(x2, x), extension.mul(a, x2)),
+                    extension.mul(b, x),
+                );
+                let Some(y) = extension.sqrt(rhs)? else {
+                    return Err("marked kernel y-coordinate did not split over degree four".to_string());
+                };
+                if y == extension.zero() || extension.square(y) != rhs {
+                    return Err("marked kernel y-coordinate square-root control failed".to_string());
+                }
+                points.push((x, y));
+                points.push((x, extension.neg(y)));
+            }
+            points.sort_by_key(|&(x, y)| (extension.to_index(x), extension.to_index(y)));
+            points.dedup();
+            if points.len() != 4 {
+                return Err("marked halving fiber does not contain four points".to_string());
+            }
+
+            for &(x, y) in &points {
+                let x2 = extension.square(x);
+                let numerator = extension.add(
+                    extension.add(extension.mul(three, x2), extension.mul(two, extension.mul(a, x))),
+                    b,
+                );
+                let denominator = extension.mul(two, y);
+                let slope = extension.div(numerator, denominator)?;
+                let doubled_x = extension.sub(
+                    extension.sub(extension.square(slope), a),
+                    extension.mul(two, x),
+                );
+                let doubled_y = extension.add(
+                    extension.neg(y),
+                    extension.mul(slope, extension.sub(x, doubled_x)),
+                );
+                if doubled_x != extension.zero() || doubled_y != extension.zero() {
+                    return Err("marked degree-four point does not double to the kernel".to_string());
+                }
+            }
+
+            let mut permutation = [usize::MAX; 4];
+            for (index, &(x, y)) in points.iter().enumerate() {
+                let image = (extension.frobenius(x), extension.frobenius(y));
+                permutation[index] = points
+                    .iter()
+                    .position(|&point| point == image)
+                    .ok_or("Frobenius left the marked halving fiber")?;
+            }
+            let mut image_census = permutation;
+            image_census.sort_unstable();
+            if image_census != [0, 1, 2, 3] {
+                return Err("marked halving Frobenius action is not a permutation".to_string());
+            }
+            let mut seen = [false; 4];
+            let mut cycles = Vec::new();
+            for start in 0..4 {
+                if seen[start] {
+                    continue;
+                }
+                let mut current = start;
+                let mut length = 0_usize;
+                loop {
+                    if seen[current] {
+                        if current != start {
+                            return Err("invalid marked halving Frobenius cycle".to_string());
+                        }
+                        break;
+                    }
+                    seen[current] = true;
+                    length += 1;
+                    current = permutation[current];
+                }
+                cycles.push(length);
+            }
+            cycles.sort_unstable();
+            let orbit_type = match cycles.as_slice() {
+                [1, 1, 1, 1] => 0,
+                [1, 1, 2] => 1,
+                [2, 2] => 2,
+                [4] => 3,
+                _ => return Err("unexpected marked halving Frobenius cycle type".to_string()),
+            };
+
+            // Independent character formula for the same four cycle types.
+            let dual_coefficient_b = residue(
+                i128::from(coefficient_a).pow(2) - 4 * i128::from(coefficient_b),
+                p,
+            );
+            let expected_type = if legendre(coefficient_b, p) == -1 {
+                if legendre(dual_coefficient_b, p) == 1 { 2 } else { 3 }
+            } else {
+                let mut fixed_points = 0_usize;
+                for x in 0..p {
+                    if mul_mod_u64(x, x, p) != coefficient_b {
+                        continue;
+                    }
+                    let rhs = residue(
+                        i128::from(x).pow(3)
+                            + i128::from(coefficient_a) * i128::from(x).pow(2)
+                            + i128::from(coefficient_b) * i128::from(x),
+                        p,
+                    );
+                    fixed_points += square_roots[rhs as usize].len();
+                }
+                match fixed_points {
+                    4 => 0,
+                    2 => 1,
+                    0 => 2,
+                    _ => return Err("invalid rational marked-halving census".to_string()),
+                }
+            };
+            if orbit_type != expected_type {
+                return Err("marked halving Frobenius/character control failed".to_string());
+            }
+            Ok(orbit_type)
+        }
+
         fn marked_two_isogeny_halving(
             left: BranchData,
             right: BranchData,
             p: u64,
             trace: i64,
             square_roots: &[Vec<u64>],
-        ) -> Result<([i8; 2], usize), String> {
+            extension: &Field,
+        ) -> Result<([i8; 2], [u8; 2], usize), String> {
             let resultant = quadratic_resultant(left, right, p)?;
             if !left.smooth || !right.smooth || resultant == 0 {
                 return Err("marked two-isogeny requires a smooth quartic".to_string());
@@ -581,6 +747,20 @@ mod frozen {
                 p,
                 square_roots,
             )?;
+            let source_orbit_type = marked_halving_orbit_type(
+                coefficient_a,
+                coefficient_b,
+                p,
+                square_roots,
+                extension,
+            )?;
+            let dual_orbit_type = marked_halving_orbit_type(
+                dual_coefficient_a,
+                dual_coefficient_b,
+                p,
+                square_roots,
+                extension,
+            )?;
             let expected_affine_points = (p as i64 - trace) as usize;
             if source_affine_points != expected_affine_points
                 || dual_affine_points != expected_affine_points
@@ -589,6 +769,7 @@ mod frozen {
             }
             Ok((
                 [i8::from(kernel_halves), i8::from(dual_kernel_halves)],
+                [source_orbit_type, dual_orbit_type],
                 source_affine_points + dual_affine_points,
             ))
         }
@@ -794,30 +975,40 @@ mod frozen {
                 square_roots[(y * y % 5) as usize].push(y);
             }
             assert_eq!(marked_kernel_halves(1, 1, 5, &square_roots)?, (true, 7));
+            let quartic_modulus = first_irreducible(5, 4)?;
+            let quartic_extension = Field::new(5, 4, &quartic_modulus)?;
+            assert_eq!(
+                marked_halving_orbit_type(1, 1, 5, &square_roots, &quartic_extension)?,
+                1
+            );
             println!(
-                "h116 chiral branch residual parity selftest: pass rules=512 resultant_rules=812 trace_rules=243 invariant_rules=512 kummer_rules=512"
+                "h116 chiral branch residual parity selftest: pass rules=512 resultant_rules=812 trace_rules=243 invariant_rules=512 kummer_rules=512 orbit_rules=600"
             );
             Ok(())
         }
 
         pub fn run(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, false, false, false, false)
+            run_with_panel(output_path, false, false, false, false, false)
         }
 
         pub fn run_resultants(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, true, false, false, false)
+            run_with_panel(output_path, true, false, false, false, false)
         }
 
         pub fn run_traces(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, false, true, false, false)
+            run_with_panel(output_path, false, true, false, false, false)
         }
 
         pub fn run_invariants(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, false, false, true, false)
+            run_with_panel(output_path, false, false, true, false, false)
         }
 
         pub fn run_kummer(output_path: &Path) -> Result<(), String> {
-            run_with_panel(output_path, false, false, false, true)
+            run_with_panel(output_path, false, false, false, true, false)
+        }
+
+        pub fn run_orbits(output_path: &Path) -> Result<(), String> {
+            run_with_panel(output_path, false, false, false, false, true)
         }
 
         fn run_with_panel(
@@ -826,11 +1017,13 @@ mod frozen {
             trace_panel: bool,
             invariant_panel: bool,
             kummer_panel: bool,
+            orbit_panel: bool,
         ) -> Result<(), String> {
             if usize::from(resultant_panel)
                 + usize::from(trace_panel)
                 + usize::from(invariant_panel)
                 + usize::from(kummer_panel)
+                + usize::from(orbit_panel)
                 > 1
             {
                 return Err("specialized branch panels are mutually exclusive".to_string());
@@ -860,6 +1053,8 @@ mod frozen {
             let mut marked_two_isogeny_checks = 0_usize;
             let mut marked_two_isogeny_point_checks = 0_usize;
             let mut marked_two_isogeny_distinguishing_targets = 0_usize;
+            let mut marked_halving_orbit_histogram = [0_usize; 4];
+            let mut marked_halving_orbit_distinguishing_targets = 0_usize;
 
             for spec in CURVES {
                 let field = Field::new(spec.p, 1, &[0, 1])?;
@@ -868,6 +1063,8 @@ mod frozen {
                     a: field.from_base(spec.a),
                     b: field.from_base(spec.b),
                 };
+                let orbit_modulus = first_irreducible(spec.p, 4)?;
+                let orbit_extension = Field::new(spec.p, 4, &orbit_modulus)?;
                 let mut square_root_counts = vec![0_u8; spec.p as usize];
                 let mut square_roots = vec![Vec::new(); spec.p as usize];
                 for y in 0..spec.p {
@@ -970,6 +1167,7 @@ mod frozen {
                     let mut trace_residues = [-1_i8; TRACE_FEATURES];
                     let mut invariant_bits = [-1_i8; INVARIANT_FEATURES];
                     let mut kummer_bits = [-1_i8; KUMMER_FEATURES];
+                    let mut orbit_bits = [-1_i8; ORBIT_FEATURES];
                     for (trace_feature, &(left, right)) in TRACE_PAIRS.iter().enumerate() {
                         let left_data = branch_features[left]
                             .ok_or("missing trace left branch feature")?;
@@ -1024,15 +1222,24 @@ mod frozen {
                                 i8::from(legendre(invariant_j, spec.p) == 1)
                             };
                             binary_quartic_invariant_checks += 1;
-                            let (halving_bits, point_checks) = marked_two_isogeny_halving(
+                            let (halving_bits, orbit_types, point_checks) = marked_two_isogeny_halving(
                                 left_data,
                                 right_data,
                                 spec.p,
                                 trace,
                                 &square_roots,
+                                &orbit_extension,
                             )?;
                             kummer_bits[2 * trace_feature] = halving_bits[0];
                             kummer_bits[2 * trace_feature + 1] = halving_bits[1];
+                            for side in 0..2 {
+                                let orbit_type = usize::from(orbit_types[side]);
+                                marked_halving_orbit_histogram[orbit_type] += 1;
+                                let fiber = 2 * trace_feature + side;
+                                orbit_bits[3 * fiber] = i8::from(orbit_type <= 1);
+                                orbit_bits[3 * fiber + 1] = i8::from(orbit_type == 0);
+                                orbit_bits[3 * fiber + 2] = i8::from(orbit_type == 3);
+                            }
                             marked_two_isogeny_checks += 1;
                             marked_two_isogeny_point_checks += point_checks;
                         }
@@ -1043,6 +1250,8 @@ mod frozen {
                         || invariant_bits[4..6] != invariant_bits[6..8];
                     let kummer_distinguished = kummer_bits[0..2] != kummer_bits[2..4]
                         || kummer_bits[4..6] != kummer_bits[6..8];
+                    let orbit_distinguished = orbit_bits[0..6] != orbit_bits[6..12]
+                        || orbit_bits[12..18] != orbit_bits[18..24];
                     let mut resultant_distinguished = false;
                     for left in 0..FEATURES {
                         for right in (left + 1)..FEATURES {
@@ -1061,6 +1270,8 @@ mod frozen {
                         usize::from(invariant_distinguished);
                     marked_two_isogeny_distinguishing_targets +=
                         usize::from(kummer_distinguished);
+                    marked_halving_orbit_distinguishing_targets +=
+                        usize::from(orbit_distinguished);
                     let index = targets.len();
                     targets.push(Target {
                         slug: spec.slug.to_string(),
@@ -1071,6 +1282,7 @@ mod frozen {
                         trace_residues,
                         invariant_bits,
                         kummer_bits,
+                        orbit_bits,
                     });
                     rows.entry(spec.slug.to_string()).or_default().push(index);
                 }
@@ -1096,6 +1308,170 @@ mod frozen {
             } else {
                 targets.iter().map(|target| target.parity).collect()
             };
+            if orbit_panel {
+                let marked_halving_orbit_nonabstaining_predicates: usize = targets
+                    .iter()
+                    .map(|target| target.orbit_bits.iter().filter(|&&bit| bit >= 0).count())
+                    .sum();
+                let mut rules = Vec::with_capacity(600);
+                for first in 0..ORBIT_FEATURES {
+                    for second in std::iter::once(None)
+                        .chain(((first + 1)..ORBIT_FEATURES).map(Some))
+                    {
+                        for polarity in 0..=1_u8 {
+                            let predictions: Vec<u8> = targets
+                                .iter()
+                                .map(|target| orbit_prediction(target, first, second, polarity))
+                                .collect();
+                            let (coverage, matches) = score(&predictions, &labels);
+                            rules.push(ResultantRule {
+                                first,
+                                second,
+                                polarity,
+                                predictions,
+                                coverage,
+                                matches,
+                                statistic: statistic(matches, coverage),
+                            });
+                        }
+                    }
+                }
+                if rules.len() != 600 {
+                    return Err("marked halving orbit rule census failed".to_string());
+                }
+                let selected_index = (0..rules.len())
+                    .max_by(|&left, &right| {
+                        compare_ratio(rules[left].statistic, rules[right].statistic)
+                            .then_with(|| rules[right].first.cmp(&rules[left].first))
+                            .then_with(|| rules[right].second.cmp(&rules[left].second))
+                            .then_with(|| rules[right].polarity.cmp(&rules[left].polarity))
+                    })
+                    .ok_or("no marked halving orbit rules")?;
+                let selected = &rules[selected_index];
+                let total_exact_rules = rules
+                    .iter()
+                    .filter(|rule| rule.coverage == TARGETS && rule.matches == TARGETS)
+                    .count();
+                let covered_exact_rules = rules
+                    .iter()
+                    .filter(|rule| rule.coverage > 0 && rule.matches == rule.coverage)
+                    .count();
+
+                let mut exceedances = 0_usize;
+                for replicate in 0..REPLICATES {
+                    let mut shuffled = vec![0_u8; TARGETS];
+                    for (slug, indices) in &rows {
+                        let mut values: Vec<u8> =
+                            indices.iter().map(|&index| labels[index]).collect();
+                        let mut seed = 0x116_023_u64
+                            ^ (replicate as u64 + 1).wrapping_mul(0x9e3779b97f4a7c15)
+                            ^ slug.bytes().map(u64::from).sum::<u64>();
+                        shuffle(&mut values, &mut seed);
+                        for (&index, value) in indices.iter().zip(values) {
+                            shuffled[index] = value;
+                        }
+                    }
+                    let mut maximum = (0_u128, 1_u128);
+                    for rule in &rules {
+                        let (_, matches) = score(&rule.predictions, &shuffled);
+                        let candidate = statistic(matches, rule.coverage);
+                        if compare_ratio(candidate, maximum) == Ordering::Greater {
+                            maximum = candidate;
+                        }
+                    }
+                    exceedances += usize::from(
+                        compare_ratio(maximum, selected.statistic) != Ordering::Less,
+                    );
+                }
+
+                let mut per_curve = Vec::new();
+                for (slug, indices) in &rows {
+                    let predictions: Vec<u8> = indices
+                        .iter()
+                        .map(|&index| selected.predictions[index])
+                        .collect();
+                    let curve_labels: Vec<u8> =
+                        indices.iter().map(|&index| labels[index]).collect();
+                    let (coverage, matches) = score(&predictions, &curve_labels);
+                    per_curve.push(format!(
+                        "{{\"slug\":\"{slug}\",\"targets\":{},\"coverage\":{coverage},\"matches\":{matches}}}",
+                        indices.len()
+                    ));
+                }
+
+                let excess = 2_i64 * selected.matches as i64 - selected.coverage as i64;
+                let selected_second = selected
+                    .second
+                    .map_or_else(|| "null".to_string(), |value| value.to_string());
+                let json = format!(
+                    concat!(
+                        "{{\n  \"schema\":\"h116-chiral-marked-halving-frobenius-orbit-parity/v1\",\n",
+                        "  \"targets\":{},\n  \"curves\":{},\n  \"quartic_models\":{},\n",
+                        "  \"marked_fibers\":{},\n  \"orbit_predicates\":{},\n  \"rules\":{},\n",
+                        "  \"reconstruction_checks\":{},\n  \"discriminant_checks\":{},\n",
+                        "  \"resultant_checks\":{},\n  \"branch_pair_trace_checks\":{},\n",
+                        "  \"marked_halving_orbit_checks\":{},\n",
+                        "  \"marked_halving_orbit_character_checks\":{},\n",
+                        "  \"marked_halving_orbit_frobenius_point_checks\":{},\n",
+                        "  \"marked_halving_orbit_histogram\":[{},{},{},{}],\n",
+                        "  \"marked_halving_orbit_nonabstaining_predicates\":{},\n",
+                        "  \"marked_halving_orbit_distinguishing_targets\":{},\n",
+                        "  \"planted_control_matches\":{},\n  \"selected_first\":{},\n",
+                        "  \"selected_second\":{},\n  \"selected_polarity\":{},\n",
+                        "  \"coverage\":{},\n  \"matches\":{},\n  \"binary_excess\":{},\n",
+                        "  \"statistic_numerator\":{},\n  \"statistic_denominator\":{},\n",
+                        "  \"total_exact_rules\":{},\n  \"covered_exact_rules\":{},\n",
+                        "  \"replicates\":4096,\n  \"familywise_exceedances\":{},\n",
+                        "  \"familywise_empirical_p\":{:.12},\n  \"per_curve\":[{}],\n",
+                        "  \"status\":\"measured\"\n}}\n"
+                    ),
+                    targets.len(),
+                    rows.len(),
+                    TRACE_FEATURES,
+                    KUMMER_FEATURES,
+                    ORBIT_FEATURES,
+                    rules.len(),
+                    reconstruction_checks,
+                    discriminant_checks,
+                    resultant_checks,
+                    branch_pair_trace_checks,
+                    2 * marked_two_isogeny_checks,
+                    2 * marked_two_isogeny_checks,
+                    8 * marked_two_isogeny_checks,
+                    marked_halving_orbit_histogram[0],
+                    marked_halving_orbit_histogram[1],
+                    marked_halving_orbit_histogram[2],
+                    marked_halving_orbit_histogram[3],
+                    marked_halving_orbit_nonabstaining_predicates,
+                    marked_halving_orbit_distinguishing_targets,
+                    TARGETS,
+                    selected.first,
+                    selected_second,
+                    selected.polarity,
+                    selected.coverage,
+                    selected.matches,
+                    excess,
+                    selected.statistic.0,
+                    selected.statistic.1,
+                    total_exact_rules,
+                    covered_exact_rules,
+                    exceedances,
+                    (exceedances + 1) as f64 / (REPLICATES + 1) as f64,
+                    per_curve.join(",")
+                );
+                fs::write(output_path, json).map_err(|error| error.to_string())?;
+                println!(
+                    "chiral marked-halving Frobenius orbit parity: first={} second={} polarity={} coverage={} matches={} exact={} p={:.6}",
+                    selected.first,
+                    selected_second,
+                    selected.polarity,
+                    selected.coverage,
+                    selected.matches,
+                    total_exact_rules,
+                    (exceedances + 1) as f64 / (REPLICATES + 1) as f64
+                );
+                return Ok(());
+            }
             if kummer_panel {
                 let marked_two_isogeny_nonabstaining_features: usize = targets
                     .iter()
@@ -1868,8 +2244,11 @@ fn main() {
         [_, flag, output] if flag == "--run-kummer" => {
             frozen::branch_residual::run_kummer(Path::new(output))
         }
+        [_, flag, output] if flag == "--run-orbits" => {
+            frozen::branch_residual::run_orbits(Path::new(output))
+        }
         _ => Err(
-            "usage: h116_chiral_branch_residual_parity --selftest | --run OUTPUT.json | --run-resultants OUTPUT.json | --run-traces OUTPUT.json | --run-invariants OUTPUT.json | --run-kummer OUTPUT.json".to_string(),
+            "usage: h116_chiral_branch_residual_parity --selftest | --run OUTPUT.json | --run-resultants OUTPUT.json | --run-traces OUTPUT.json | --run-invariants OUTPUT.json | --run-kummer OUTPUT.json | --run-orbits OUTPUT.json".to_string(),
         ),
     };
     if let Err(error) = result {
