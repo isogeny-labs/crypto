@@ -1665,3 +1665,30 @@ bounded `A = 0` prime-field family. It does not yet turn that average bound
 into a sufficiently probable independent-relation collector, price retries
 and verification, assemble expected runtime, or establish bit-level
 subexponential ECDLP. [pcc:unverified]
+
+The next checked layer identifies the concrete first-moment fibre count with
+`(ECDLP.L43.fb (u^4*A) (u^6*B) T).card` exactly. The proof scales the original
+curve equation at `t/u^2` by the square `u^6 = (u^3)^2` and therefore preserves
+the quadratic character. `zmodCanonical_oneTwelfth_good_dilations` combines
+this identity, the Hasse first moment, and `zmodCanonical_avg_energy_dil` to
+prove that at least one twelfth of all nonzero dilations simultaneously have
+factor-base cardinality at least `|T|/2` and energy below
+`12 * meanBound`. This avoids the stronger upstream `FactorBaseVar`
+hypothesis. [pcc:unverified]
+
+For `12*n < |T|`, `zmodCanonical_good_dilation_coverage` applies the checked
+generic-sum inequality and the exact `Gen_eq_E` dilation transport theorem.
+The capstone `zmodCanonical_oneTwelfth_decomposition_coverage` returns a set
+`Good` with `|K^x| <= 12*|Good|`; every `u` in that set has at least
+`(f_u^(n+1)/2)^2 / (12 * meanBound)` points on the original curve with a
+nonempty generic decomposition in the dilated factor-base box. The targeted
+command `lake build SemaevRelationSigns` completes 9,136 jobs. The full
+repository proof gate reports `PASS 475 thm 0 trusted` across all nine tracked
+modules. [pcc:unverified]
+
+This is a rigorous constant-density coverage theorem, not yet a relation
+oracle or an algorithmic runtime theorem. The remaining obligations include
+efficiently finding a decomposition for a covered point, proving the sampled
+relations are sufficiently independent, pricing failures and restarts, and
+specializing every operation to a bit-complexity bound. No subexponential
+prime-field ECDLP algorithm follows yet. [pcc:unverified]

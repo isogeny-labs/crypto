@@ -2405,6 +2405,259 @@ theorem zmodCanonical_avg_energy_dil
       cubicNonsingular BNonzero T factorBasePositive factorBaseBound
       intervalShort arityBelow)
 
+/-- At least one twelfth of all nonzero dilations simultaneously have a
+factor base of size at least `|T|/2` and energy below twelve times any natural
+upper bound for `Mdil`.  This composes the checked character-sum first moment
+with the canonical average-energy certificate, without assuming the stronger
+upstream variance hypothesis `FactorBaseVar`. -/
+theorem zmodCanonical_oneTwelfth_good_dilations
+    (modulus X n meanBound : ℕ) [Fact modulus.Prime]
+    (hn : 1 ≤ n)
+    (hChar : ringChar (ZMod modulus) ≠ 2)
+    (twoNonzeroBase : (2 : ZMod modulus) ≠ 0)
+    (B : ZMod modulus)
+    [(shortCharacterCurve 0 0 B).IsElliptic]
+    (hDelta : (ECDLP.L43.shortW (0 : ZMod modulus) B).Δ ≠ 0)
+    (cubicNonsingular : (27 : ZMod modulus) * B ^ 2 ≠ 0)
+    (BNonzero : B ≠ 0)
+    (T : Finset (ZMod modulus))
+    (factorBasePositive : ∀ value ∈ T, 0 < ZMod.val value)
+    (factorBaseBound : ∀ value ∈ T, ZMod.val value ≤ X)
+    (TPositive : 0 < T.card)
+    (fieldLarge : 324 ≤ Fintype.card (ZMod modulus))
+    (intervalShort : 3 * X < modulus)
+    (arityBelow :
+      3 * (2 ^ (2 * (n + 1)) * (2 * (n + 1))) ^ 2 < modulus)
+    (meanPositive : 0 < meanBound)
+    (meanBoundAbove :
+      ECDLP.L49.Mdil (ZMod modulus) n T
+        ((2 * (n + 1)) * 2 ^ (2 * (n + 1) - 2)) ≤ meanBound) :
+    Fintype.card (ZMod modulus)ˣ ≤ 12 *
+      ((Finset.univ.filter fun u : (ZMod modulus)ˣ =>
+          T.card ≤ 2 *
+            (ECDLP.L43.fb
+              ((u : ZMod modulus) ^ 4 * 0)
+              ((u : ZMod modulus) ^ 6 * B) T).card) \
+        (Finset.univ.filter fun u : (ZMod modulus)ˣ =>
+          12 * meanBound ≤
+            ECDLP.L43.Eng T n
+              ((u : ZMod modulus) ^ 4 * 0)
+              ((u : ZMod modulus) ^ 6 * B))).card := by
+  classical
+  let degree := (2 * (n + 1)) * 2 ^ (2 * (n + 1) - 2)
+  let value : (ZMod modulus)ˣ → ℕ := fun u ↦
+    (ECDLP.L43.fb
+      ((u : ZMod modulus) ^ 4 * 0)
+      ((u : ZMod modulus) ^ 6 * B) T).card
+  let energy : (ZMod modulus)ˣ → ℕ := fun u ↦
+    ECDLP.L43.Eng T n
+      ((u : ZMod modulus) ^ 4 * 0)
+      ((u : ZMod modulus) ^ 6 * B)
+  have nonsingular : ECDLP.L43.disc (0 : ZMod modulus) B ≠ 0 := by
+    simpa [ECDLP.L43.disc] using cubicNonsingular
+  have originalDelta :
+      (shortCharacterCurve 0 (0 : ZMod modulus) B).Δ ≠ 0 := by
+    simpa [shortCharacterCurve, ECDLP.L43.shortW] using hDelta
+  have factorBaseNonzero : ∀ value ∈ T, value ≠ 0 := by
+    intro element elementMem elementZero
+    subst elementZero
+    simpa using factorBasePositive 0 elementMem
+  have valueUpper : ∀ u, value u ≤ 2 * T.card := by
+    intro u
+    change (ECDLP.L43.fb
+      ((u : ZMod modulus) ^ 4 * 0)
+      ((u : ZMod modulus) ^ 6 * B) T).card ≤ 2 * T.card
+    rw [← dilationFactorBaseSize_eq_dilated_fb_card
+      hChar 0 B T u nonsingular]
+    exact dilationFactorBaseSize_le_twice hChar 0 B T
+      (⟨(u : ZMod modulus), u.ne_zero⟩ : NonzeroField (ZMod modulus))
+  have valueSum :
+      (∑ u : (ZMod modulus)ˣ, value u) =
+        ∑ u : NonzeroField (ZMod modulus),
+          dilationFactorBaseSize 0 B T u := by
+    calc
+      (∑ u : (ZMod modulus)ˣ, value u) =
+          ∑ u : (ZMod modulus)ˣ,
+            dilationFactorBaseSize 0 B T
+              (⟨(u : ZMod modulus), u.ne_zero⟩ :
+                NonzeroField (ZMod modulus)) := by
+        apply Fintype.sum_congr
+        intro u
+        exact (dilationFactorBaseSize_eq_dilated_fb_card
+          hChar 0 B T u nonsingular).symm
+      _ = _ := Equiv.sum_comp unitsEquivNeZero
+        (fun u : NonzeroField (ZMod modulus) ↦
+          dilationFactorBaseSize 0 B T u)
+  have valueTotalLower :
+      3 * T.card * Fintype.card (ZMod modulus)ˣ ≤
+        4 * ∑ u : (ZMod modulus)ˣ, value u := by
+    have firstMoment := dilationFactorBaseFirstMoment
+      hChar 0 B T factorBaseNonzero originalDelta
+      (2 * (Nat.sqrt (Fintype.card (ZMod modulus)) + 1))
+      (twiceSuccSqrt_radiusSquare (Fintype.card (ZMod modulus)))
+      (twiceSuccSqrt_density (Fintype.card (ZMod modulus)) fieldLarge)
+    rw [← Fintype.card_congr unitsEquivNeZero, ← valueSum] at firstMoment
+    exact firstMoment
+  have energyAverage := zmodCanonical_avg_energy_dil
+    modulus X n hn hChar twoNonzeroBase B hDelta cubicNonsingular BNonzero
+    T factorBasePositive factorBaseBound intervalShort arityBelow
+  have energyTotalReal :
+      (∑ u : (ZMod modulus)ˣ, (energy u : ℝ)) ≤
+        (meanBound : ℝ) * Fintype.card (ZMod modulus)ˣ := by
+    calc
+      _ ≤ ECDLP.L49.Mdil (ZMod modulus) n T degree *
+          (Fintype.card (ZMod modulus)ˣ : ℝ) := by
+        simpa [energy, degree] using energyAverage
+      _ ≤ (meanBound : ℝ) * Fintype.card (ZMod modulus)ˣ := by
+        gcongr
+  have energyTotalUpper :
+      (∑ u : (ZMod modulus)ˣ, energy u) ≤
+        meanBound * Fintype.card (ZMod modulus)ˣ := by
+    exact_mod_cast energyTotalReal
+  simpa [value, energy] using
+    (firstMomentAndEnergyGiveOneTwelfthGoodSeeds
+      value energy T.card meanBound TPositive meanPositive valueUpper
+      valueTotalLower energyTotalUpper)
+
+/-- A good dilation supplied by the first-moment/energy argument covers an
+explicit number of points on the original curve by generic decompositions.
+The strict interval-size hypothesis supplies the one unit of slack needed by
+the upstream generic-coverage estimate. -/
+theorem zmodCanonical_good_dilation_coverage
+    (modulus n meanBound : ℕ) [Fact modulus.Prime]
+    (B : ZMod modulus)
+    (T : Finset (ZMod modulus))
+    (TArity : 12 * n < T.card)
+    (meanPositive : 0 < meanBound)
+    (u : (ZMod modulus)ˣ)
+    (factorBaseLarge :
+      T.card ≤ 2 *
+        (ECDLP.L43.fb
+          ((u : ZMod modulus) ^ 4 * 0)
+          ((u : ZMod modulus) ^ 6 * B) T).card)
+    (energySmall :
+      ECDLP.L43.Eng T n
+          ((u : ZMod modulus) ^ 4 * 0)
+          ((u : ZMod modulus) ^ 6 * B) <
+        12 * meanBound) :
+    ((((ECDLP.L43.fb
+          ((u : ZMod modulus) ^ 4 * 0)
+          ((u : ZMod modulus) ^ 6 * B) T).card : ℝ) ^ (n + 1) / 2) ^ 2 /
+        (12 * meanBound : ℝ)) ≤
+      ((Finset.univ.filter fun R :
+          (ECDLP.L43.shortW (0 : ZMod modulus) B).Point =>
+        (ECDLP.L46.Dec
+          (ECDLP.L43.shortW (0 : ZMod modulus) B)
+          (fun x => (u : ZMod modulus) ^ 2 * x ∈ T) n R).Nonempty).card) := by
+  let A' : ZMod modulus := (u : ZMod modulus) ^ 4 * 0
+  let B' : ZMod modulus := (u : ZMod modulus) ^ 6 * B
+  let f := (ECDLP.L43.fb A' B' T).card
+  have factorBaseEnough : 6 * n < f := by
+    dsimp [f, A', B']
+    omega
+  have genericCoverage := ECDLP.L40.generic_coverage
+    (n := n) (ECDLP.L43.fb A' B' T)
+    (ECDLP.L43.xc (ECDLP.L43.shortW A' B'))
+    (fun a => ECDLP.L43.card_fibre_le_two _ _ a)
+  have genericCoverageReal :
+      (((f ^ (n + 1) - 3 * n * f ^ n : ℕ) : ℝ) ^ 2) ≤
+        (ECDLP.L43.Gen T n A' B' : ℝ) * ECDLP.L43.Eng T n A' B' := by
+    exact_mod_cast genericCoverage
+  have mainCoverage :=
+    (ECDLP.L43.half_le f n factorBaseEnough).trans genericCoverageReal
+  have energyUpper :
+      (ECDLP.L43.Eng T n A' B' : ℝ) ≤ 12 * (meanBound : ℝ) := by
+    exact_mod_cast energySmall.le
+  have denominatorPositive : (0 : ℝ) < 12 * meanBound := by positivity
+  rw [div_le_iff₀ denominatorPositive]
+  calc
+    (((f : ℝ) ^ (n + 1) / 2) ^ 2) ≤
+        (ECDLP.L43.Gen T n A' B' : ℝ) * ECDLP.L43.Eng T n A' B' :=
+      mainCoverage
+    _ ≤ (ECDLP.L43.Gen T n A' B' : ℝ) * (12 * meanBound) :=
+      mul_le_mul_of_nonneg_left energyUpper (by positivity)
+    _ = ((Finset.univ.filter fun R :
+          (ECDLP.L43.shortW (0 : ZMod modulus) B).Point =>
+        (ECDLP.L46.Dec
+          (ECDLP.L43.shortW (0 : ZMod modulus) B)
+          (fun x => (u : ZMod modulus) ^ 2 * x ∈ T) n R).Nonempty).card *
+          (12 * meanBound)) := by
+      rw [ECDLP.L49.Gen_eq_E]
+      congr 2
+      apply congrArg Finset.card
+      ext R
+      simp
+
+/-- For the canonical prime-field family, at least one twelfth of all
+nonzero dilations have both a factor base of size at least `|T|/2` and the
+stated explicit lower bound on the number of decomposable original-curve
+points. -/
+theorem zmodCanonical_oneTwelfth_decomposition_coverage
+    (modulus X n meanBound : ℕ) [Fact modulus.Prime]
+    (hn : 1 ≤ n)
+    (hChar : ringChar (ZMod modulus) ≠ 2)
+    (twoNonzeroBase : (2 : ZMod modulus) ≠ 0)
+    (B : ZMod modulus)
+    [(shortCharacterCurve 0 0 B).IsElliptic]
+    (hDelta : (ECDLP.L43.shortW (0 : ZMod modulus) B).Δ ≠ 0)
+    (cubicNonsingular : (27 : ZMod modulus) * B ^ 2 ≠ 0)
+    (BNonzero : B ≠ 0)
+    (T : Finset (ZMod modulus))
+    (factorBasePositive : ∀ value ∈ T, 0 < ZMod.val value)
+    (factorBaseBound : ∀ value ∈ T, ZMod.val value ≤ X)
+    (TArity : 12 * n < T.card)
+    (fieldLarge : 324 ≤ Fintype.card (ZMod modulus))
+    (intervalShort : 3 * X < modulus)
+    (arityBelow :
+      3 * (2 ^ (2 * (n + 1)) * (2 * (n + 1))) ^ 2 < modulus)
+    (meanPositive : 0 < meanBound)
+    (meanBoundAbove :
+      ECDLP.L49.Mdil (ZMod modulus) n T
+        ((2 * (n + 1)) * 2 ^ (2 * (n + 1) - 2)) ≤ meanBound) :
+    ∃ Good : Finset (ZMod modulus)ˣ,
+      Fintype.card (ZMod modulus)ˣ ≤ 12 * Good.card ∧
+      ∀ u ∈ Good,
+        T.card ≤ 2 *
+          (ECDLP.L43.fb
+            ((u : ZMod modulus) ^ 4 * 0)
+            ((u : ZMod modulus) ^ 6 * B) T).card ∧
+        ((((ECDLP.L43.fb
+              ((u : ZMod modulus) ^ 4 * 0)
+              ((u : ZMod modulus) ^ 6 * B) T).card : ℝ) ^ (n + 1) / 2) ^ 2 /
+            (12 * meanBound : ℝ)) ≤
+          ((Finset.univ.filter fun R :
+              (ECDLP.L43.shortW (0 : ZMod modulus) B).Point =>
+            (ECDLP.L46.Dec
+              (ECDLP.L43.shortW (0 : ZMod modulus) B)
+              (fun x => (u : ZMod modulus) ^ 2 * x ∈ T) n R).Nonempty).card) := by
+  let large := Finset.univ.filter fun u : (ZMod modulus)ˣ =>
+    T.card ≤ 2 *
+      (ECDLP.L43.fb
+        ((u : ZMod modulus) ^ 4 * 0)
+        ((u : ZMod modulus) ^ 6 * B) T).card
+  let high := Finset.univ.filter fun u : (ZMod modulus)ˣ =>
+    12 * meanBound ≤
+      ECDLP.L43.Eng T n
+        ((u : ZMod modulus) ^ 4 * 0)
+        ((u : ZMod modulus) ^ 6 * B)
+  refine ⟨large \ high, ?_, ?_⟩
+  · simpa [large, high] using zmodCanonical_oneTwelfth_good_dilations
+      modulus X n meanBound hn hChar twoNonzeroBase B hDelta
+      cubicNonsingular BNonzero T factorBasePositive factorBaseBound
+      (by omega) fieldLarge intervalShort arityBelow meanPositive meanBoundAbove
+  · intro u hu
+    have membership := Finset.mem_sdiff.mp hu
+    have largeMembership := (Finset.mem_filter.mp membership.1).2
+    have energySmall :
+        ECDLP.L43.Eng T n
+            ((u : ZMod modulus) ^ 4 * 0)
+            ((u : ZMod modulus) ^ 6 * B) <
+          12 * meanBound := by
+      simpa [high] using membership.2
+    exact ⟨largeMembership,
+      zmodCanonical_good_dilation_coverage modulus n meanBound B T
+        TArity meanPositive u largeMembership energySmall⟩
+
 set_option maxHeartbeats 200000
 
 end

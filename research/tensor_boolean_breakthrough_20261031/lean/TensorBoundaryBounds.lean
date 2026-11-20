@@ -2605,6 +2605,71 @@ theorem dilationFactorBaseSize_cast
   simp
   ring
 
+/-- The concrete first-moment fibre count is exactly the upstream factor-base
+cardinality on the dilated curve.  Multiplying the original equation at
+`t / u²` by the square `u⁶ = (u³)²` preserves its quadratic character and
+produces the dilated equation at `t`. -/
+theorem dilationFactorBaseSize_eq_dilated_fb_card
+    {K : Type*} [Field K] [Fintype K] [DecidableEq K]
+    (hK : ringChar K ≠ 2) (A B : K) (T : Finset K) (u : Kˣ)
+    (hOriginal : ECDLP.L43.disc A B ≠ 0) :
+    dilationFactorBaseSize A B T ⟨(u : K), u.ne_zero⟩ =
+      (ECDLP.L43.fb ((u : K) ^ 4 * A) ((u : K) ^ 6 * B) T).card := by
+  have hDilated : ECDLP.L43.disc
+      ((u : K) ^ 4 * A) ((u : K) ^ 6 * B) ≠ 0 :=
+    ECDLP.L49.disc_dil_ne A B u hOriginal
+  have hcard := ECDLP.L43.card_fb hK
+    ((u : K) ^ 4 * A) ((u : K) ^ 6 * B) hDilated T
+  have hleft :
+      (dilationFactorBaseSize A B T
+        (⟨(u : K), u.ne_zero⟩ : NonzeroField K) : ℤ) =
+        T.card + ∑ t ∈ T, quadraticChar K
+          ((t * (u : K)⁻¹ ^ 2) ^ 3 +
+            A * (t * (u : K)⁻¹ ^ 2) + B) := by
+    simpa using dilationFactorBaseSize_cast hK A B T
+      (⟨(u : K), u.ne_zero⟩ : NonzeroField K)
+  have characterTerm : ∀ t : K,
+      quadraticChar K
+          ((t * (u : K)⁻¹ ^ 2) ^ 3 + A * (t * (u : K)⁻¹ ^ 2) + B) =
+        quadraticChar K
+          (t ^ 3 + ((u : K) ^ 4 * A) * t + (u : K) ^ 6 * B) := by
+    intro t
+    have scaledEquation :
+        t ^ 3 + ((u : K) ^ 4 * A) * t + (u : K) ^ 6 * B =
+          (u : K) ^ 6 *
+            ((t * (u : K)⁻¹ ^ 2) ^ 3 +
+              A * (t * (u : K)⁻¹ ^ 2) + B) := by
+      field_simp [u.ne_zero]
+    have squareCharacter : quadraticChar K ((u : K) ^ 6) = 1 := by
+      rw [show (u : K) ^ 6 = ((u : K) ^ 3) ^ 2 by ring]
+      exact quadraticChar_sq_one' (pow_ne_zero 3 u.ne_zero)
+    rw [scaledEquation, map_mul, squareCharacter, one_mul]
+  have characterSum :
+      (∑ t ∈ T, quadraticChar K
+        ((t * (u : K)⁻¹ ^ 2) ^ 3 + A * (t * (u : K)⁻¹ ^ 2) + B)) =
+      ∑ t ∈ T, quadraticChar K
+        (t ^ 3 + ((u : K) ^ 4 * A) * t + (u : K) ^ 6 * B) := by
+    apply Finset.sum_congr rfl
+    intro t ht
+    exact characterTerm t
+  have castEquality :
+      (dilationFactorBaseSize A B T
+        (⟨(u : K), u.ne_zero⟩ : NonzeroField K) : ℤ) =
+      ((ECDLP.L43.fb ((u : K) ^ 4 * A) ((u : K) ^ 6 * B) T).card : ℤ) := by
+    calc
+      _ = T.card + ∑ t ∈ T, quadraticChar K
+          ((t * (u : K)⁻¹ ^ 2) ^ 3 +
+            A * (t * (u : K)⁻¹ ^ 2) + B) := hleft
+      _ = T.card + ∑ t ∈ T, quadraticChar K
+          (t ^ 3 + ((u : K) ^ 4 * A) * t + (u : K) ^ 6 * B) := by
+        rw [characterSum]
+      _ = ECDLP.L43.fsize T ((u : K) ^ 4 * A) ((u : K) ^ 6 * B) := by
+        unfold ECDLP.L43.fsize
+        simp only [Finset.sum_add_distrib, Finset.sum_const, nsmul_eq_mul,
+          mul_one]
+      _ = _ := hcard.symm
+  exact_mod_cast castEquality
+
 /-- Exact total of the concrete factor-base sizes across every nonzero
 dilation. -/
 theorem dilationFactorBaseSize_total

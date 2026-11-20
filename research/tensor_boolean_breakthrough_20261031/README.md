@@ -146,13 +146,20 @@ The null changes only the global wiring of interior ports while preserving the v
     `canonicalDilationPolynomial 0 B m t != 0` for every upstream nontrivial
     interval tuple, and constructs `ECDLP.L49.DilationNondeg` with explicit
     degree `(2m) * 2^(2m-2)`. This certificate is composed with the exact
-    upstream `avg_energy_dil` theorem. Thus canonical polynomial
-    nonvanishing and the curve-specific average-energy step are closed for
-    this bounded `A = 0` family. The repository proof gate reports
-    `PASS 470 thm 0 trusted`. Relation yield/coverage and restart
-    probabilities, expected-runtime assembly, and bit-complexity
-    specialization remain open; no subexponential ECDLP algorithm is yet
-    proved. [pcc:unverified]
+    upstream `avg_energy_dil` theorem. The concrete dilation fibre count is
+    then proved equal to the upstream factor-base cardinality. Combining its
+    exact first moment with Markov's inequality gives a set containing at
+    least one twelfth of all nonzero dilations on which the factor base has
+    size at least `|T|/2` and the energy is below `12 * meanBound`. For
+    `12n < |T|`, the generic-coverage inequality and the checked dilation
+    transport map give at least
+    `(f^(n+1)/2)^2 / (12 * meanBound)` original-curve points with a nonempty
+    generic decomposition. Thus canonical nonvanishing, average energy, and
+    this explicit constant-density coverage bound are closed for the bounded
+    `A = 0` family. Efficient decomposition extraction, independent-relation
+    collection and restart probabilities, expected-runtime assembly, and
+    bit-complexity specialization remain open; no subexponential ECDLP
+    algorithm is yet proved. [pcc:unverified]
 16. **Next:** add the production semantic cut generator, matched rewired-null constructor and fresh-process A/A runner; then run only scratch preflight fixtures disjoint from the declared ladder and fill binary, analysis, runtime, memory, and power fields.
 17. **Only after that:** freeze and commit `protocol.json`, derive seeds from its hash, and generate E1 data.
 
