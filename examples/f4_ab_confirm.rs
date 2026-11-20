@@ -58,7 +58,10 @@ fn env_pairs(var: &str, default: &[(&str, &str)]) -> Vec<(String, String)> {
                 (k.to_string(), v.to_string())
             })
             .collect(),
-        Err(_) => default.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect(),
+        Err(_) => default
+            .iter()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect(),
     }
 }
 
@@ -118,11 +121,19 @@ fn run_child(cell: &Cell, old: bool) -> (f64, i32, Outcome) {
             if let Some(ms) = v.get("solve_ms").and_then(Value::as_f64) {
                 vals.insert(format!("{case}:solve"), ms);
             }
-            let fp = ["basis_fp", "solve_fp", "field_ops", "solve_field_ops", "steps", "max_rows", "max_cols"]
-                .iter()
-                .map(|k| v.get(*k).map_or("-".to_string(), |x| x.to_string()))
-                .collect::<Vec<_>>()
-                .join("/");
+            let fp = [
+                "basis_fp",
+                "solve_fp",
+                "field_ops",
+                "solve_field_ops",
+                "steps",
+                "max_rows",
+                "max_cols",
+            ]
+            .iter()
+            .map(|k| v.get(*k).map_or("-".to_string(), |x| x.to_string()))
+            .collect::<Vec<_>>()
+            .join("/");
             fps.insert(case.to_string(), fp);
         } else if let Some(sys) = v.get("system").and_then(Value::as_str) {
             // koblitz_f4_kernel_bench: one summary line per system
@@ -166,11 +177,23 @@ fn main() {
     let koblitz = std::env::var("F4_AB_KOBLITZ").as_deref() != Ok("0");
     for &threads in &thread_list {
         for pair in ["DEFAULT", "AA"] {
-            cells.push(Cell { bench: "f4_fp_bench", bin: a[3].clone(), args: vec!["3".into(), tier.clone()], pair, threads });
+            cells.push(Cell {
+                bench: "f4_fp_bench",
+                bin: a[3].clone(),
+                args: vec!["3".into(), tier.clone()],
+                pair,
+                threads,
+            });
         }
         if koblitz {
             for pair in ["M4RI", "AA"] {
-                cells.push(Cell { bench: "koblitz_f4_kernel_bench", bin: a[4].clone(), args: vec!["5".into(), "x".into()], pair, threads });
+                cells.push(Cell {
+                    bench: "koblitz_f4_kernel_bench",
+                    bin: a[4].clone(),
+                    args: vec!["5".into(), "x".into()],
+                    pair,
+                    threads,
+                });
             }
         }
     }
@@ -209,7 +232,9 @@ fn main() {
                         }
                         Some(f) if f != fp => mismatches.push(format!(
                             "{} {} {} block {b}: {fp} != {f}",
-                            cell.bench, case, if old { "old" } else { "new" }
+                            cell.bench,
+                            case,
+                            if old { "old" } else { "new" }
                         )),
                         _ => {}
                     }
@@ -300,9 +325,15 @@ fn main() {
         "tier": tier, "threads": thread_list,
         "fingerprint_mismatches": mismatches, "rows": rows,
     });
-    std::fs::write(out_dir.join("summary.json"), serde_json::to_string_pretty(&summary).unwrap())
-        .expect("summary.json");
-    println!("{:<26} {:<8} {:>3} {:>9} {:>9} {:>7}  {:<18} sig", "case", "pair", "thr", "old_ms", "new_ms", "ratio", "95% CI");
+    std::fs::write(
+        out_dir.join("summary.json"),
+        serde_json::to_string_pretty(&summary).unwrap(),
+    )
+    .expect("summary.json");
+    println!(
+        "{:<26} {:<8} {:>3} {:>9} {:>9} {:>7}  {:<18} sig",
+        "case", "pair", "thr", "old_ms", "new_ms", "ratio", "95% CI"
+    );
     for r in &rows {
         if r["pair"] == "AA" && r["case"] != "SUM_f4_ms" && r["case"] != "kernel_x" {
             continue;
@@ -320,7 +351,10 @@ fn main() {
             if r["significant"] == true { "*" } else { "" },
         );
     }
-    println!("runs {seq}, failed {failures}, fingerprint mismatches {}", mismatches.len());
+    println!(
+        "runs {seq}, failed {failures}, fingerprint mismatches {}",
+        mismatches.len()
+    );
     if failures > 0 || !mismatches.is_empty() {
         for m in mismatches.iter().take(20) {
             eprintln!("MISMATCH {m}");
