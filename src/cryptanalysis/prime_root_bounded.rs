@@ -722,6 +722,20 @@ impl Producer<'_> {
             return Ok(out);
         }
         // R55_PRODUCER_SMALL_SQUARE_END
+        // R64_PRODUCER_NONMONIC_LINEAR_SQUARE_BEGIN
+        // For (a*x+b)^2, construct the three coefficients directly.
+        // The existing monic linear path remains above. Avoid touching
+        // zero-constant inputs, where sparse squaring is already cheap.
+        if a.len == 2 && a.coefficients[0] != 0 && a.coefficients[1] != 1 {
+            let constant = a.coefficients[0];
+            let linear = a.coefficients[1];
+            out.coefficients[0] = self.mul(constant, constant)?;
+            let cross = self.mul(constant, linear)?;
+            out.coefficients[1] = self.add(cross, cross)?;
+            out.coefficients[2] = self.mul(linear, linear)?;
+            return Ok(out);
+        }
+        // R64_PRODUCER_NONMONIC_LINEAR_SQUARE_END
         // R62_PRODUCER_BINOMIAL_SQUARE_BEGIN
         // (x^d+c)^2=x^(2d)+2cx^d+c^2. No sparse convolution
         // is necessary, and the highest coefficient remains monic.
@@ -1070,6 +1084,17 @@ impl Producer<'_> {
             if b.len == 1 {
                 return Ok(Poly17::constant(1));
             }
+            // R64_PRODUCER_MONIC_LINEAR_GCD_BEGIN
+            // A monic linear polynomial is irreducible: gcd(a,x+c)
+            // is x+c precisely when a(-c)=0, and 1 otherwise.
+            // A remainder-only evaluation avoids constructing the quotient
+            // and running an additional Euclidean iteration.
+            if b.len == 2 && b.coefficients[1] == 1 {
+                let mut evaluation = a;
+                self.reduce_monic(&mut evaluation, &b)?;
+                return Ok(if evaluation.len == 0 { b } else { Poly17::constant(1) });
+            }
+            // R64_PRODUCER_MONIC_LINEAR_GCD_END
             let r = self.division(&a, &b)?.1;
             a = b;
             b = r;
@@ -1989,6 +2014,19 @@ impl Replay {
             return Ok(z);
         }
         // R55_REPLAY_SMALL_SQUARE_END
+        // R64_REPLAY_NONMONIC_LINEAR_SQUARE_BEGIN
+        // Independently expand a degree-one square by doubling the
+        // constant coefficient before its cross-product.
+        if len == 2 && x.coefficients[0] != 0 && x.coefficients[1] != 1 {
+            let constant = x.coefficients[0];
+            let linear = x.coefficients[1];
+            z.coefficients[0] = self.times(constant, constant)?;
+            let doubled = self.plus(constant, constant)?;
+            z.coefficients[1] = self.times(doubled, linear)?;
+            z.coefficients[2] = self.times(linear, linear)?;
+            return Ok(z);
+        }
+        // R64_REPLAY_NONMONIC_LINEAR_SQUARE_END
         // R62_REPLAY_BINOMIAL_SQUARE_BEGIN
         // The replay square is constructed by coefficient degree,
         // independently of the producer's row-major sparse algorithm.
@@ -2284,6 +2322,19 @@ impl Replay {
             if pair[1].len == 1 {
                 return Ok(Poly17::constant(1));
             }
+            // R64_REPLAY_MONIC_LINEAR_GCD_BEGIN
+            // Independently verify whether the linear divisor divides
+            // the current dividend; no second Euclidean iteration or
+            // result normalization is needed for a monic linear divisor.
+            if pair[1].len == 2 && pair[1].coefficients[1] == 1 {
+                let residual = self.remainder(pair[0], &pair[1])?;
+                return Ok(if residual.len == 0 {
+                    pair[1]
+                } else {
+                    Poly17::constant(1)
+                });
+            }
+            // R64_REPLAY_MONIC_LINEAR_GCD_END
             let next = self.remainder(pair[0], &pair[1])?;
             pair = [pair[1], next];
         }
