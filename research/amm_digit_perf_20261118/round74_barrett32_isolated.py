@@ -147,9 +147,9 @@ fn bench_full_roots() {
     let measure=|optimized:bool| {
      let now=Instant::now();let mut checksum=0usize;
      for _ in 0..4 {for (poly,_) in &cases {
-      let roots=if optimized {ca.roots(black_box(poly)).unwrap()}
-        else {cb.roots(black_box(poly)).unwrap()};
-      checksum+=roots.roots.len();
+      let count=if optimized {ca.roots(black_box(poly)).unwrap().roots.len()}
+        else {cb.roots(black_box(poly)).unwrap().roots.len()};
+      checksum+=count;
      }}
      black_box(checksum);
      now.elapsed().as_nanos() as f64/(cases.len()*4) as f64
