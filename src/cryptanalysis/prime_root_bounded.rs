@@ -462,6 +462,32 @@ impl Producer<'_> {
             return Ok((quotient, Poly17::constant(a.coefficients[0])));
         }
         // R52_DIVISION_END
+        // R63_PRODUCER_SYNTHETIC_LINEAR_BEGIN
+        // Synthetic division by monic x+c (non-unit c). Recurrence:
+        // q[i-1] = a[i] - c*q[i]. One reverse pass avoids copying,
+        // updating, and repeatedly trimming a temporary remainder.
+        // Skip zero quotients to preserve general-division metering.
+        if b.len == 2 && b.coefficients[1] == 1
+            && b.coefficients[0] != 0
+            && b.coefficients[0] != 1
+            && b.coefficients[0] != self.p - 1
+        {
+            let c = b.coefficients[0];
+            let mut coefficient = a.coefficients[a.len as usize - 1];
+            for high in (1..a.len as usize).rev() {
+                quotient.coefficients[high - 1] = coefficient;
+                coefficient = if coefficient == 0 {
+                    a.coefficients[high - 1]
+                } else {
+                    self.gate.charge(COPY_WORK)?;
+                    let scaled = self.mul(coefficient, c)?;
+                    self.sub(a.coefficients[high - 1], scaled)?
+                };
+            }
+            quotient.trim();
+            return Ok((quotient, Poly17::constant(coefficient)));
+        }
+        // R63_PRODUCER_SYNTHETIC_LINEAR_END
         // R56_PRODUCER_MONOMIAL_DIVISION_BEGIN
         // Division by x^d is a coefficient split. Preserve the original
         // quotient/remainder and account for each nonzero high cancellation
@@ -570,6 +596,29 @@ impl Producer<'_> {
             return Ok(());
         }
         // R52_REDUCE_END
+        // R63_PRODUCER_SYNTHETIC_REDUCE_BEGIN
+        // Horner evaluation at -c gives f mod (x+c) directly. The same
+        // nonzero high coefficients are charged as the trim-driven loop.
+        if modulus.len == 2 && value.len >= 2
+            && modulus.coefficients[0] != 0
+            && modulus.coefficients[0] != 1
+            && modulus.coefficients[0] != self.p - 1
+        {
+            let c = modulus.coefficients[0];
+            let mut accumulator = value.coefficients[value.len as usize - 1];
+            for high in (1..value.len as usize).rev() {
+                accumulator = if accumulator == 0 {
+                    value.coefficients[high - 1]
+                } else {
+                    self.gate.charge(COPY_WORK)?;
+                    let scaled = self.mul(accumulator, c)?;
+                    self.sub(value.coefficients[high - 1], scaled)?
+                };
+            }
+            *value = Poly17::constant(accumulator);
+            return Ok(());
+        }
+        // R63_PRODUCER_SYNTHETIC_REDUCE_END
         // R56_PRODUCER_MONOMIAL_REDUCTION_BEGIN
         // f mod x^d is exactly its low d coefficients. Aggregated
         // metering charges the same nonzero leading cancellations as the
@@ -1700,6 +1749,28 @@ impl Replay {
             return Ok(Poly17::constant(numerator.coefficients[0]));
         }
         // R52_REMAINDER_END
+        // R63_REPLAY_HORNER_REMAINDER_BEGIN
+        // Independent Horner verifier for monic x+c. Its fixed descending
+        // checks preserve the original replay remainder budget semantics.
+        if d == 2 && denominator.coefficients[1] == 1
+            && denominator.coefficients[0] != 0
+            && denominator.coefficients[0] != 1
+            && denominator.coefficients[0] != self.p - 1
+        {
+            let c = denominator.coefficients[0];
+            let mut accumulator = numerator.coefficients[numerator.len as usize - 1];
+            for high in (1..numerator.len as usize).rev() {
+                self.gate.charge(COPY_WORK)?;
+                accumulator = if accumulator == 0 {
+                    numerator.coefficients[high - 1]
+                } else {
+                    let scaled = self.times(accumulator, c)?;
+                    self.minus(numerator.coefficients[high - 1], scaled)?
+                };
+            }
+            return Ok(Poly17::constant(accumulator));
+        }
+        // R63_REPLAY_HORNER_REMAINDER_END
         // R56_REPLAY_MONOMIAL_REMAINDER_BEGIN
         // Any nonzero scalar multiple of x^d has the same remainder.
         // Replay independently charges each eliminated degree in aggregate.
@@ -1804,6 +1875,26 @@ impl Replay {
             return Ok(());
         }
         // R52_CANCEL_END
+        // R63_REPLAY_HORNER_CANCEL_BEGIN
+        // Replay keeps one charge, multiplication and subtraction per
+        // eliminated degree, even when its high coefficient is zero.
+        // This path is deliberately distinct from Producer's skip-zero loop.
+        if divisor_len == 2 && numerator.len >= 2
+            && denominator.coefficients[0] != 0
+            && denominator.coefficients[0] != 1
+            && denominator.coefficients[0] != self.p - 1
+        {
+            let c = denominator.coefficients[0];
+            let mut accumulator = numerator.coefficients[numerator.len as usize - 1];
+            for high in (1..numerator.len as usize).rev() {
+                self.gate.charge(COPY_WORK)?;
+                let scaled = self.times(accumulator, c)?;
+                accumulator = self.minus(numerator.coefficients[high - 1], scaled)?;
+            }
+            *numerator = Poly17::constant(accumulator);
+            return Ok(());
+        }
+        // R63_REPLAY_HORNER_CANCEL_END
         // R56_REPLAY_MONOMIAL_CANCEL_BEGIN
         // In Fp[x]/(x^d), canceling every high term is just truncation.
         // Unlike producer's trim-driven path, replay's original loop
@@ -2724,6 +2815,77 @@ mod tests {
             .unwrap()
             .field
     }
+
+    #[test]
+    fn round63_general_monic_linear_matches_independent_horner_oracle() {
+        let mut compared = 0usize;
+        for p in [3u64, 5, 101, 1_000_000_007, 1_000_000_009, (1u64 << 61) - 1] {
+            let f = field(p);
+            let mut observer = |_: &BoundedRootEvent| Ok(());
+            let mut producer = Producer {
+                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
+                unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
+                roots: [0; 8], root_count: 0,
+            };
+            producer.gate.admit().unwrap();
+            let mut replay =
+                Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+            for n in 2..=17 {
+                for seed in 0..32u64 {
+                    let mut state = (seed + 1) ^ p.wrapping_mul(0x9e3779b97f4a7c15);
+                    let mut values = vec![0u64; n];
+                    for (i, v) in values.iter_mut().enumerate() {
+                        state = state.wrapping_mul(6364136223846793005)
+                            .wrapping_add(1442695040888963407);
+                        *v = if (seed + i as u64) % 5 == 0 { 0 } else { state % p };
+                    }
+                    values[n - 1] = 1;
+                    let a = Poly17::from_coefficients(&f, &values).unwrap();
+                    for c in [0, 1, p - 1, 2 % p, 17 % p, 173 % p] {
+                        let divisor=Poly17::from_coefficients(&f, &[c, 1]).unwrap();
+                        // Independent wide-arithmetic Horner oracle f(-c).
+                        let x = (p - c) % p;
+                        let mut expected = 0u128;
+                        for &v in values.iter().rev() {
+                            expected = (expected * x as u128 + v as u128) % p as u128;
+                        }
+                        let expected = Poly17::constant(expected as u64);
+                        let (quotient, remainder) = producer.division(&a, &divisor).unwrap();
+                        assert_eq!(remainder, expected, "producer division p={p} n={n} c={c}");
+                        let mut r = a;
+                        producer.reduce_monic(&mut r, &divisor).unwrap();
+                        assert_eq!(r, expected, "producer reduction p={p} n={n} c={c}");
+                        assert_eq!(replay.remainder(a, &divisor).unwrap(), expected,
+                            "replay remainder p={p} n={n} c={c}");
+                        let mut cancelled = a;
+                        replay.cancel_monic(&mut cancelled, &divisor).unwrap();
+                        assert_eq!(cancelled, expected, "replay cancel p={p} n={n} c={c}");
+                        // Independently reconstruct the dividend from quotient.
+                        let mut reconstructed = [0u64; 17];
+                        for j in 0..quotient.len as usize {
+                            reconstructed[j] =
+                                ((reconstructed[j] as u128 + c as u128
+                                  * quotient.coefficients[j] as u128) % p as u128) as u64;
+                            reconstructed[j + 1] =
+                                ((reconstructed[j + 1] as u128
+                                  + quotient.coefficients[j] as u128) % p as u128) as u64;
+                        }
+                        reconstructed[0] = ((reconstructed[0] as u128
+                            + expected.coefficients[0] as u128) % p as u128) as u64;
+                        assert_eq!(&reconstructed[..n], &values[..],
+                            "quotient reconstruction p={p} n={n} c={c}");
+                        compared += 4;
+                        producer.gate.metrics.work = 0;
+                        producer.gate.metrics.field_work = 0;
+                        replay.gate.metrics.work = 0;
+                        replay.gate.metrics.field_work = 0;
+                    }
+                }
+            }
+        }
+        println!("ROUND63_HORNER_ORACLE comparisons={compared}");
+    }
+
 
     #[test]
     fn round62_unit_coefficients_and_binomial_squares_match_wide_oracle() {
