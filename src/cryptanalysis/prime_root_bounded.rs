@@ -727,6 +727,25 @@ impl Producer<'_> {
             return Ok(Poly17::ZERO);
         }
         let monic = self.power_modulus(modulus)?;
+
+        // R57_MONOMIAL_FROBENIUS_PRODUCER_BEGIN
+        // Frobenius: (x+delta)^p = x^p+delta in characteristic p.
+        // Modulo x^d, the x^p term vanishes for p>=d; otherwise it
+        // is already reduced. No exponentiation, convolution or GCD
+        // shortcut is needed, and the LinearPart event stays unchanged.
+        if exponent == self.p && monic.len >= 3
+            && base.len == 2 && base.coefficients[1] == 1
+            && monic.coefficients[..monic.len as usize - 1].iter().all(|&c| c == 0)
+        {
+            let degree = monic.len as usize - 1;
+            let mut result = Poly17::constant(base.coefficients[0]);
+            if self.p < degree as u64 {
+                result.coefficients[self.p as usize] = 1;
+                result.len = (self.p as usize + 1) as u8;
+            }
+            return Ok(result);
+        }
+        // R57_MONOMIAL_FROBENIUS_PRODUCER_END
         // Over Fp, r^p == r. In Fp[x]/(x-r), x^p is therefore r.
         // The canonical input x is the only base eligible for this path.
         if monic.len == 2 && exponent == self.p
@@ -1741,6 +1760,28 @@ impl Replay {
             return Ok(Poly17::ZERO);
         }
         let monic = self.normalized_modulus(modulus)?;
+
+        // R57_MONOMIAL_FROBENIUS_REPLAY_BEGIN
+        // Independent certificate calculation: in Fp[x]/(x^d),
+        // Frobenius maps x+delta to delta plus x^p when p<d.
+        if exponent == self.p && monic.len >= 3
+            && base.len == 2 && base.coefficients[1] == 1
+            && monic.coefficients[..usize::from(monic.len) - 1].iter().all(|&v| v == 0)
+        {
+            let degree = usize::from(monic.len) - 1;
+            let mut checked = Poly17::ZERO;
+            if base.coefficients[0] != 0 {
+                checked.len = 1;
+                checked.coefficients[0] = base.coefficients[0];
+            }
+            if self.p < degree as u64 {
+                let power = self.p as usize;
+                checked.coefficients[power] = 1;
+                checked.len = (power + 1) as u8;
+            }
+            return Ok(checked);
+        }
+        // R57_MONOMIAL_FROBENIUS_REPLAY_END
         // Evaluate x^p at the unique root of the linear modulus using
         // Frobenius on Fp; do not call the producer's arithmetic.
         if monic.len == 2 && exponent == self.p
@@ -2405,6 +2446,66 @@ mod tests {
             ((u128::from(a) * u128::from(x) + u128::from(c)) % u128::from(p)) as u64
         })
     }
+
+    #[test]
+    fn round57_monomial_frobenius_matches_independent_oracle_and_replay() {
+        // A polynomial in Fp[x]/(x^d) is stored canonically. The oracle
+        // constructs the reduced x^p + delta directly, never invoking
+        // production polynomial multiplication or powering.
+        for p in [3u64, 5, 7, 1_000_000_007, 1_000_000_009,
+                  (1u64 << 61) - 1] {
+            let f = field(p);
+            let mut observer = |_: &BoundedRootEvent| Ok(());
+            let mut producer = Producer {
+                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
+                unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
+                roots: [0; 8], root_count: 0,
+            };
+            producer.gate.admit().unwrap();
+            let mut replay =
+                Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+            for degree in 2..=8usize {
+                for leading in [1u64, p - 1] {
+                    let mut modulus_coefficients = vec![0u64; degree + 1];
+                    modulus_coefficients[degree] = leading;
+                    let modulus =
+                        Poly17::from_coefficients(&f, &modulus_coefficients).unwrap();
+                    for delta in [0u64, 1, p - 1, 17 % p] {
+                        let base = Poly17::from_coefficients(&f, &[delta, 1]).unwrap();
+                        let mut coefficients = vec![0u64; degree];
+                        coefficients[0] = delta;
+                        if p < degree as u64 {
+                            coefficients[p as usize] = 1;
+                        }
+                        let expected =
+                            Poly17::from_coefficients(&f, &coefficients).unwrap();
+                        assert_eq!(producer.power(&base, p, &modulus).unwrap(), expected,
+                            "producer p={p} d={degree} delta={delta}");
+                        assert_eq!(replay.modular_power(base, p, &modulus).unwrap(), expected,
+                            "replay p={p} d={degree} delta={delta}");
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn round57_monomial_root_stream_matches_replay() {
+        for p in [3u64, 7, 1_000_000_007, (1u64 << 61) - 1] {
+            for degree in 2..=8usize {
+                for leading in [1u64, p - 1] {
+                    let mut coefficients = vec![0u64; degree + 1];
+                    coefficients[degree] = leading;
+                    let (report, events) = run(&coefficients, p, budget());
+                    assert_eq!(report.stop, Stop::Complete, "p={p} d={degree}");
+                    assert_eq!(&report.roots[..report.root_count as usize], &[0u64]);
+                    assert!(check(&coefficients, &report, &events).unwrap().finite_complete,
+                        "p={p} d={degree}");
+                }
+            }
+        }
+    }
+
     #[test]
     fn round56_monomial_quotients_remainders_and_replay_match_oracle() {
         // The independent oracle splits coefficients at degree d rather
