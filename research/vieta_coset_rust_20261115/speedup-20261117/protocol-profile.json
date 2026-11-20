@@ -1,0 +1,404 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "VIETA-CPU-PROFILE-20261117",
+  "version": 1,
+  "created": "2026-11-17",
+  "repository": "crypto",
+  "study_dir": "research/vieta_coset_rust_20261115",
+  "authors": [
+    "Codex"
+  ],
+  "question": "Exploratory native CPU attribution of unchanged Rust on a fixed historical target; no throughput or speedup inference.",
+  "claims": [
+    {
+      "id": "C-output",
+      "class": "exact_computation",
+      "text": "Both profiled workers return the exact complete ordered relation set for the fixed target. Profiles are attribution only, not speed evidence.",
+      "decided_by": [
+        "C-profile"
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "newton",
+      "role": "baseline",
+      "description": "Unchanged newton under GNU gprofng1ms software timer, no speed comparison.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "353f430f91b4abb5b55fc7fd5e31299b60bce01b",
+        "build": [
+          [
+            "env",
+            "CARGO_TARGET_DIR=/workspace/scratch/vieta-speedup-profile-target",
+            "CARGO_PROFILE_RELEASE_DEBUG=line-tables-only",
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speed-20261117/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "e5ce38acf5c386f16fd647db009d51c1412c3f858f1d57a1affdeb19d029cb81",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "newton"
+      }
+    },
+    {
+      "id": "half",
+      "role": "candidate",
+      "description": "Unchanged half under GNU gprofng1ms software timer, no speed comparison.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "353f430f91b4abb5b55fc7fd5e31299b60bce01b",
+        "build": [
+          [
+            "env",
+            "CARGO_TARGET_DIR=/workspace/scratch/vieta-speedup-profile-target",
+            "CARGO_PROFILE_RELEASE_DEBUG=line-tables-only",
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--offline",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/speed-20261117/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "e5ce38acf5c386f16fd647db009d51c1412c3f858f1d57a1affdeb19d029cb81",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "half"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exploratory attribution only; no comparative speed or null inference."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Attribution only; nonempty native sample output and exact worker output are required. Subsequent speed experiment will use full controls."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No comparative/statistical null inference; fixed target profile only."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "polynomial_backend",
+        "levels": [
+          "newton",
+          "half"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "representation_field_and_m",
+        "treatment": "crossed",
+        "value": [
+          [
+            "coset",
+            "word62",
+            16384
+          ]
+        ],
+        "how": "Keep configurations separate. Rational fixtures are Mobius conjugates of squaring, not auxiliary-isogeny search benchmarks. Word62 has no prime-order subgroup assertion; P224 standard curve."
+      },
+      {
+        "name": "target_population",
+        "treatment": "crossed",
+        "value": [
+          "fixed published conditioned input003"
+        ],
+        "how": "Alternating inputs, same exact target across all arms; identity separate."
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "One immutable native release binary, locked dependencies, one CPU.",
+        "how": "Source/build/binary/analysis hashes recorded before calls."
+      },
+      {
+        "name": "arm_order",
+        "treatment": "fixed",
+        "value": "newton then half",
+        "how": "Attribution discovery only; profiled clocks cannot decide speed."
+      },
+      {
+        "name": "host_environment",
+        "treatment": "measured",
+        "how": "Unmodified isolated_bench CPU4; missing PSI/unmovable host threads mean below-L2 clocks."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unblinded descriptive native analyzer",
+        "how": "Raw per-input values/ranges retained; no statistical significance test."
+      },
+      {
+        "name": "construction_backend",
+        "treatment": "fixed",
+        "value": "KaratsubaNewton for all descriptor/certification work; query backend only is changed for C-half",
+        "how": "Each arm freshly builds its descriptor. Lookup additionally builds its required point table/hash set; candidates build no unused table for finite targets. Counter phases remain separate."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-profile",
+        "arms": [
+          "newton",
+          "half"
+        ],
+        "design": "absolute",
+        "threshold": "Exact complete relation-set equality and nonempty native sampling table; no speed criterion.",
+        "differs_in": [
+          "polynomial_backend"
+        ]
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Fixed published input003 target, configuration seed in profile-inputs/config-original.json, root seed0x53500000+3=1397751811; no regenerated target."
+    },
+    "instance_sampling": {
+      "rule": "One published conditioned finite word62/m16384 target, identical across arms; no population inference.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicit unblinded deterministic descriptive analysis frozen before data; no inferential selection or posthoc dispatch.",
+      "unmasked_at": null
+    },
+    "arm_order_reason": "Fixed discovery order; profiler perturbation precludes throughput comparison."
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": false,
+      "note": "Exploratory attribution only; n1 per backend, no significance or speed inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 45,
+      "threads": 1,
+      "estimated_total_seconds": 90,
+      "measured_on": "Conservative45s per-profile planning cap, not a measured timing estimate."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "muls",
+        "name": "Fresh construction plus query field multiplications",
+        "unit": "field multiplications",
+        "kind": "counted",
+        "definition": "Every arm freshly executes descriptor/full sibling-fiber certification AND full point factor-base lifting; lookup also hashes. Primitive muls include inverse/sqrt internals. Memory/hash/sort unpriced in counts; included in clocks. Setup teardown, process startup, fixture draw and scalar verification excluded. All successful raw total_work fields equal construction_work+query_work.",
+        "source": "row.total_work.muls",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "relations",
+        "name": "Complete ordered relations",
+        "unit": "point pairs",
+        "kind": "exact",
+        "definition": "Complete ordered pair array and SHA compared across all arms, then native BigUint scalar replay.",
+        "source": "row.relations and row.result_sha256",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "elapsed",
+        "name": "Local diagnostic cold/query elapsed intervals",
+        "unit": "nanoseconds",
+        "kind": "timed",
+        "definition": "Profiled worker clocks are retained only as perturbed diagnostics, never speed observations.",
+        "source": "row.cold_ns and row.query_ns",
+        "aggregation": "per_row",
+        "resolution": "monotonic Instant, actual host resolution recorded",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "adds",
+      "muls",
+      "inversions",
+      "square_roots",
+      "polynomial_products",
+      "polynomial_divisions",
+      "split_attempts",
+      "group_adds",
+      "membership_lookups",
+      "karatsuba_nodes",
+      "newton_divisions",
+      "half_gcd_nodes",
+      "half_gcd_batches",
+      "rational_map_steps",
+      "certified_fibers"
+    ],
+    "record": [
+      "source_revision",
+      "binary_sha256",
+      "rustc",
+      "cpu_model",
+      "kernel",
+      "SMT",
+      "NUMA",
+      "memory",
+      "PSI",
+      "affinity",
+      "co_tenants",
+      "interruptions",
+      "isolation",
+      "A/A",
+      "failures"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": [
+        4
+      ],
+      "max_memory_gib": 8,
+      "cloud_spend_usd": 0,
+      "git_only_checkpoint_authorized": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 120,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "Exactly1 newton and1 half profile,45s each,120s outer, no retries."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Nonzero collection exit or wrong complete relation set stops; preserve failed bytes. Empty samples do not support attribution."
+    }
+  ],
+  "decision_rule": {
+    "text": "No speed/throughput decision. Preserve native function/sample tables and complete-set checks; choose the next optimization hypothesis only after the profile.",
+    "comparison_ids": [
+      "C-profile"
+    ],
+    "statistic": "Native GNU gprofng function and CPU sample tables, exploratory only.",
+    "interval": "Observed range, not a confidence interval.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "None; subsequent unprofiled controlled measurement decides improvement.",
+    "verdict_vocabulary": [
+      "descriptive_only",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "speedup-20261117/profile-native.sh",
+      "sha256": "9a59528027c8fc3cdb916726260d821a571e6680254d8259c003073a6289a60e"
+    },
+    "inputs": [
+      "speedup-20261117/profiles/raw-*"
+    ],
+    "outputs": [
+      "native function/statistics tables",
+      "profile report"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "Launch before source/binary/analysis/protocol Git publication",
+    "Change seeds/matrix/limits/analysis/repeats after affected calls",
+    "Pool populations/configurations/identities or calibration with main",
+    "Omit full construction or treat lookup setup as free",
+    "Promote diagnostic clocks to L2 or counters to wall speedup",
+    "Drop failures/timeouts/missing/warmups",
+    "Call Mobius-Kummer fixtures auxiliary-isogeny search costs",
+    "Self-sign general degree argument or claim complete formal tower instantiation",
+    "Paid/cloud experiments or local S3 operations"
+  ],
+  "literature": [
+    {
+      "ref": "FLINTv3.3.1 src/nmod_poly/hgcd.c and src/gr_poly/hgcd.c; src/cryptanalysis/isogeny_eval/poly.rs; ic_framework/prime_tower.rs",
+      "provenance": "retrieved",
+      "claim": "Standard recursive polynomial half reduction, counted multiplication and normalized Velu-map source assumptions. No novelty claim.",
+      "verified_by": "Producer primary/internal source read; KB MCP/wrapper unavailable."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "890a4e4ecef646e54e4b7295b1e65b546fdcf107935bd0d336d0e0955f5e5498",
+    "commit": "4e4f07913956b33d4ad4e105b4f44c0c8fce9f8b",
+    "frozen_at": "2026-11-17T07:08:50Z",
+    "filed_before_affected_data": true
+  },
+  "invalidation_rules": [
+    "Complete-set mismatch invalidates instrument; no arm omission after failure.",
+    "Local clocks remain diagnostic/wall_valid=false below L2.",
+    "A/A controls and positive detection must be reported, never silently discarded."
+  ],
+  "extensions": {
+    "profile_only": true,
+    "profile_tool": "GNU gprofng2.44,1ms software timer",
+    "prior_raw_source": "9c66263eb62f1e91685f2ac60eef92ba8c1ef4c0",
+    "local_git_only": true,
+    "no_s3_operation": true,
+    "raw_profile_cache_ignored": true,
+    "no_speed_claim": true
+  }
+}

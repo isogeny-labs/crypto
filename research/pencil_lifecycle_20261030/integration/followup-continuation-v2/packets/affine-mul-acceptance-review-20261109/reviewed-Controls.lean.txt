@@ -1,0 +1,61 @@
+-- Prospective fixed controls; not compiled.
+import MulAcceptance
+import AcceptanceControls
+import AffineControls
+namespace AffineMulAcceptanceControls
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest DivisorArrayCopy StoredInput AffineDispatch AffineMulAcceptance
+abbrev f := AffineControls.f5
+abbrev a := StoredControls.pointZero
+
+theorem initial_point : WellFormed 17 (wordsPoly 17 f) a := by
+ rw [AffineControls.f5_decode]
+ exact StoredControls.degree_one_trim.1
+
+theorem zero_trace : Run 17 f identity a 0 [] identity := Run.done identity a
+
+theorem one_trace : Run 17 f identity a 1 [.accumulate] a := by
+ exact Run.step (by decide)
+  (Acc.add 1 identity a a .leftIdentity (by decide) (Runs.left rfl))
+  (Square.skip a) (Run.done a a)
+
+theorem double_witness : ∃ d, Runs 17 f a a (classify 17 a a) d ∧
+ WellFormed 17 (wordsPoly 17 f) d := by
+ exact total_preserving_execution 17 f a a (by decide) (by decide)
+  (by simp [f, Canon, AffineControls.f5])
+  (by rw [AffineControls.f5_decode]; simp) initial_point initial_point
+
+theorem two_trace : ∃ d, Run 17 f identity a 2 [.square, .accumulate] d := by
+ obtain ⟨d, hd, hw⟩ := double_witness
+ exact ⟨d, Run.step (by decide) (Acc.skip 2 identity a (by decide))
+  (Square.add 1 a d _ (by decide) hd)
+  (Run.step (by decide) (Acc.add 1 identity d d .leftIdentity (by decide) (Runs.left rfl))
+   (Square.skip d) (Run.done d d))⟩
+
+theorem three_trace : ∃ out, Run 17 f identity a 3 [.accumulate, .square, .accumulate] out := by
+ obtain ⟨d, hd, hw⟩ := double_witness
+ obtain ⟨out, hout, hwo⟩ := total_preserving_execution 17 f a d (by decide) (by decide)
+  (by simp [f, Canon, AffineControls.f5])
+  (by rw [AffineControls.f5_decode]; simp) initial_point hw
+ exact ⟨out, Run.step (by decide)
+  (Acc.add 3 identity a a .leftIdentity (by decide) (Runs.left rfl))
+  (Square.add 1 a d _ (by decide) hd)
+  (Run.step (by decide) (Acc.add 1 a d out _ (by decide) hout)
+   (Square.skip d) (Run.done out d))⟩
+
+theorem three_return_accepted : ∃ out,
+ Run 17 f identity a 3 [.accumulate, .square, .accumulate] out ∧ StoredValidity.test 17 f out = true := by
+ obtain ⟨out, hr⟩ := three_trace
+ exact ⟨out, hr, AffineMulAcceptance.accepted_return 17 f (by decide) (by decide)
+  (by simp [f, Canon, AffineControls.f5])
+  (by rw [AffineControls.f5_decode]; simp) initial_point hr⟩
+
+theorem validator_only_not_initial_invariant :
+ StoredValidity.test 17 [] ⟨0,#[1,17,0],#[0,0]⟩ = true ∧
+ ¬WellFormed 17 (wordsPoly 17 []) ⟨0,#[1,17,0],#[0,0]⟩ :=
+ AcceptanceControls.acceptance_not_canonical
+
+theorem word_guards :
+ ((0:UInt64) >>> 1)=0 ∧ ((1:UInt64) >>> 1)=0 ∧
+ ((2:UInt64) >>> 1)=1 ∧ ((3:UInt64) >>> 1)=1 ∧
+ ((2:UInt64) &&& 1)=0 ∧ ((3:UInt64) &&& 1)≠0 := by decide
+end AffineMulAcceptanceControls

@@ -1,0 +1,389 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "bk-basefield-main-20261112",
+  "version": 1,
+  "created": "2026-11-13",
+  "repository": "crypto",
+  "study_dir": "research/bk_basefield_census_20261112",
+  "authors": [
+    "Codex; approved original14audit"
+  ],
+  "links": {
+    "source_session": "Approved original14items2/3; zero-paid local checkpoint",
+    "spec": "native/census.cpp --limit 500",
+    "note": "Basefield boundary only; no allk extension enumeration. Main includes pilot fields as part of the full universe, not heldout confirmation."
+  },
+  "question": "At k1, count actual rational prime-torsion on every general F2/F3model and every short coefficient model over primes<500, including omitted BK hypotheses and supersingular prime/composite embedding orders.",
+  "claims": [
+    {
+      "id": "B1",
+      "class": "exact_computation",
+      "text": "Complete fixed population, exact actual group counts, excluded-condition discrepancies and modular orders; no random inference.",
+      "decided_by": [
+        "fixed-population"
+      ]
+    },
+    {
+      "id": "B2",
+      "class": "theorem",
+      "text": "Scaling/alln transport and rational2/3root formula semantics are decided only by the separate Lean29gate.",
+      "decided_by": []
+    },
+    {
+      "id": "B3",
+      "class": "out_of_scope",
+      "text": "Allk extensionfield inclusion, generic all-prime geometric rank/determinant, native/compiler refinement and independent-host execution remain unestablished.",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "reference",
+      "role": "reference",
+      "description": "Exact full fixed basefield population",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b978fdd6c24e91b63fdcb05ffd75779b5c7294c5",
+        "build": [
+          [
+            "g++",
+            "-O3",
+            "-std=c++20",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "native/census.cpp",
+            "-o",
+            "/workspace/scratch/bk-base-native/census"
+          ]
+        ],
+        "binary_sha256": "a2ee50e92372d19e918b5fb035e99f83ebfd392b95391eea1b6f5c3cfc46fddb",
+        "threads": 1,
+        "flags": {
+          "assertions": "enabled",
+          "field": "polynomial-basis Field(p,1,p); every prime<limit",
+          "order": "fixed lexicographic; full population",
+          "compiled_source_pins": "evidence/build-provenance.json"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "argv": [
+          "--limit",
+          "500"
+        ]
+      }
+    },
+    {
+      "id": "aa",
+      "role": "control_aa",
+      "description": "Identical repeat; determinism only, no independent-seed variability",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "b978fdd6c24e91b63fdcb05ffd75779b5c7294c5",
+        "build": [
+          [
+            "g++",
+            "-O3",
+            "-std=c++20",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "native/census.cpp",
+            "-o",
+            "/workspace/scratch/bk-base-native/census"
+          ]
+        ],
+        "binary_sha256": "a2ee50e92372d19e918b5fb035e99f83ebfd392b95391eea1b6f5c3cfc46fddb",
+        "threads": 1,
+        "flags": {
+          "assertions": "enabled",
+          "field": "polynomial-basis Field(p,1,p); every prime<limit",
+          "order": "fixed lexicographic; full population",
+          "compiled_source_pins": "evidence/build-provenance.json"
+        },
+        "env": {}
+      },
+      "same_instrument_as": "reference",
+      "parameters": {
+        "argv": [
+          "--limit",
+          "500"
+        ]
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "repeat-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Require the separately frozen preflight controls and validated export with identical frozen source/binary before main."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Require preflight native wrong-oracle detection and copied-weight SQL CHECK failure; no new corruption of canonical main data."
+    }
+  },
+  "variable_ledger": {
+    "independent": [],
+    "factors": [
+      {
+        "name": "arm_label",
+        "treatment": "fixed",
+        "value": "Distinct output path only for reference/A/A",
+        "how": "Same source, binary, full input selector and stopping rule."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "how": "Shared local host; scientific clocks invalid."
+      },
+      {
+        "name": "population",
+        "treatment": "fixed",
+        "value": "all prime fields<500; allgeneral2/3models/allshortmodels otherwise",
+        "how": "Lexicographic exhaustive scope; no outcome-dependent selection."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unblinded exact computations",
+        "how": "Frozen SQL/native checks and explicit known controls."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "fixed-population",
+        "arms": [
+          "reference",
+          "aa"
+        ],
+        "differs_in": [
+          "population"
+        ],
+        "design": "absolute",
+        "threshold": "Exact internal and independent-native checks; report every source-prediction discrepancy."
+      },
+      {
+        "id": "repeat-aa",
+        "arms": [
+          "reference",
+          "aa"
+        ],
+        "differs_in": [
+          "arm_label"
+        ],
+        "design": "aa",
+        "threshold": "Byte-identical canonical census JSONL."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "No randomness; exhaustive deterministic enumeration."
+    },
+    "instance_sampling": {
+      "rule": "One fixed registered batch: source-known control components and the full selected population; each arm executes its declared component, not a statistical method comparison.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact algebraic counts, no fitted model or subjective inclusion."
+    },
+    "arm_order_reason": "No timing or statistical inference; complete deterministic population."
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exactly2listed native calls, no random-sample inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 900,
+      "threads": 1,
+      "estimated_total_seconds": 1800,
+      "measured_on": "Hard admission caps, not a measured time estimate; fullmain outcomes unseen."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "population_complete",
+        "name": "Complete exact native call",
+        "unit": "Boolean",
+        "kind": "exact",
+        "definition": "Child exit0 after all frozen coverage, group and oracle checks; analysis validity remains a separate gate.",
+        "source": "runs/main/*.exit",
+        "aggregation": "per_row",
+        "resolution": "integer",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "models",
+        "name": "Weighted coefficient-model population",
+        "unit": "models",
+        "kind": "exact",
+        "definition": "Native final totals; controls have their own explicit fixture counters.",
+        "source": "runs/main/*.jsonl:terminal native totals",
+        "aggregation": "per_row",
+        "resolution": "integer",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [],
+    "record": [
+      "all source/binary/SQLite/compiler hashes",
+      "full native JSONL/stderr/exits/argv",
+      "native analysis and synthetic negative-control outputs",
+      "UTC provenance times only"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 3000,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly listed calls; preserve all outcomes, no postdata retry.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Preflight caps15/15/30/30s; main900/900s; regular nativeanalysis600s, preflight negativecontrol120s.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any source/binary/protocol hash change, missing coverage, failed root/group/orbit/SQL/A/A check, failed source-known control or incomplete population invalidates a complete-census inference. Preserve every affected artifact.",
+    "Source-prediction mismatches are reported as discrepancies; do not delete them or treat them as implementation invalidity merely because they challenge a source."
+  ],
+  "decision_rule": {
+    "text": "Complete exact boundary census only when every integrity/control gate passes; report source prediction discrepancies separately.",
+    "comparison_ids": [
+      "fixed-population"
+    ],
+    "threshold": "Zero integrity discrepancies; source-hypothesis discrepancies remain observed results.",
+    "statistic": "Exact integer counts and complete finite group checks",
+    "interval": "none; full population",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "exact model/case counts",
+    "verdict_vocabulary": [
+      "census_valid",
+      "discrepancy",
+      "not_validated"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "analyze.sh",
+      "sha256": "d6f557569f9ded4720352aa2e5e1045a77ecf3c35b29117e312fa29df0a30fb0"
+    },
+    "inputs": [
+      "runs/main/*.jsonl",
+      "native/queries.sql"
+    ],
+    "outputs": [
+      "analysis/main/analysis.jsonl",
+      "analysis/main/analysis.exit"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [],
+    "report_dir": "reports/main"
+  },
+  "inadmissible": [
+    "No timing/performance/independent-host/compiled-refinement assertion.",
+    "Do not call k1 boundary checks a full extension-field/allk census.",
+    "Do not count repeated/scaled models as independent random samples."
+  ],
+  "literature": [
+    {
+      "ref": "BK1998Theorem1/proof/Remark1 printed142-143; source-review.json pins original PDFac837b8e",
+      "provenance": "retrieved",
+      "claim": "Retain rnotdivp-1/prime-to-characteristic qualifications; originalF19/#18/r3 counterexample already published."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "3c201c29aecec4756db33ee20a5eda3e97f5b16d7009651a765fd441bb7e7489",
+    "commit": "49c8a1f26d284869fc21092c0e3bd04b3a8c6518",
+    "frozen_at": "2026-11-13T00:14:30Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "original_items": [
+      2,
+      3
+    ],
+    "population_id": "bk-basefield-main-batch",
+    "exclusive_prime_limit": 500,
+    "compiled_source_commit": "b978fdd6c24e91b63fdcb05ffd75779b5c7294c5",
+    "input_manifest": {
+      "path": "inputs.sha256",
+      "sha256": "81d437c99703e455105c9cdc038afe1b39ddb92199816c9ae8dd8cfde420fb9f"
+    },
+    "build_provenance_sha256": "53cd4dd8acc0e09ebde1bc45a3335e9d6917528e86e8bd09f2b9b1865ecabfd1",
+    "analyzer_binary_sha256": "01c69adc79f35c12d228e99b46a38458535bcb3f7649e4b416958c758e1b39ec",
+    "sqlite_runtime_sha256": "14c4418a06c5c2e30f5fb57bc8add93762236ae17898c6708984cf15e680ca71",
+    "checkpoint_exception": "Approved zero-paid local checkpoint; no paid backend or agent storage upload.",
+    "in_sample": true,
+    "new_planned_calls": 2,
+    "k": 1,
+    "main_contains_pilot_fields": true,
+    "preflight": {
+      "required": true,
+      "export_sha256": "f7bfac68a26954bea988ee0d276a3f3e521ff47ea89c7ca1d97bf6128079f5d5",
+      "analysis_sha256": "3fd1285fe1dba9030cd9754785a9120f66374fc0443504e81a7d72060459a739"
+    }
+  }
+}

@@ -15,6 +15,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "87a0cf66fd1eb2fb7b822cb78370d82303750809bc6ba855f3f58e517d3238db"
 
 [[package]]
+name = "certified-relations"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "cfg-if"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -132,6 +140,7 @@ dependencies = [
 name = "relation-degree-trace"
 version = "0.1.0"
 dependencies = [
+ "certified-relations",
  "plotters",
  "serde",
  "serde_json",

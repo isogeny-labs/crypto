@@ -1,0 +1,166 @@
+-- Prospective source only: no compilation or named axiom audit. [pcc:unverified]
+import BranchNormTransport
+import Mathlib.Algebra.Polynomial.Div
+import Mathlib.Data.ENat.Monoid
+import Lean.Elab.Tactic.Omega
+
+set_option autoImplicit false
+noncomputable section
+namespace BranchRootMultiplicity
+open Polynomial Common22SeparateChartMap Common22BranchStalk
+  WeightedProjFiniteBranchDVR WeightedProjBranchPolynomialEval
+variable {K : Type*} [Field K]
+
+-- Residue evaluation on the actual affine quotient, including coefficients.
+theorem branch_scalar (a3 a2 a1 a0 a k : K)
+    (hroot : fAt a3 a2 a1 a0 a = 0) :
+    branchEval a3 a2 a1 a0 a hroot
+      (algebraMap K (AffineRing a3 a2 a1 a0) k) = k := by
+  change branchEval a3 a2 a1 a0 a hroot
+    (Ideal.Quotient.mk (affineIdeal a3 a2 a1 a0) (MvPolynomial.C k)) = k
+  simp [branchEval, preEval]
+
+theorem branch_affine_eval (a3 a2 a1 a0 a : K)
+    (hroot : fAt a3 a2 a1 a0 a = 0) (g : K[X]) :
+    branchEval a3 a2 a1 a0 a hroot
+      (ActualNonbranchNorm.affineEval a3 a2 a1 a0 g) = g.eval a := by
+  have hh : (branchEval a3 a2 a1 a0 a hroot).comp
+      (ActualNonbranchNorm.affineEval a3 a2 a1 a0) = evalRingHom a := by
+    apply Polynomial.ringHom_ext
+    · intro k
+      simpa [ActualNonbranchNorm.affineEval] using branch_scalar a3 a2 a1 a0 a k hroot
+    · simp [ActualNonbranchNorm.affineEval, branchEval_xbar]
+  exact congrArg (fun e : K[X] →+* K => e g) hh
+
+-- No arbitrary unit criterion is assumed: localization inverts exactly the
+-- complement of branchIdeal = ker(branchEval), then the ring equivalence
+-- preserves units in both directions.
+theorem rho_unit_iff (a3 a2 a1 a0 a : K)
+    (hroot : fAt a3 a2 a1 a0 a = 0) (t : AffineRing a3 a2 a1 a0) :
+    IsUnit (BranchNormTransport.rho a3 a2 a1 a0 a hroot t) ↔
+      branchEval a3 a2 a1 a0 a hroot t ≠ 0 := by
+  constructor
+  · intro hu ht
+    have hm := hu.map (branchRingEquiv a3 a2 a1 a0 a hroot).toRingHom
+    have hl : IsUnit (algebraMap (AffineRing a3 a2 a1 a0)
+        (BranchNormTransport.L a3 a2 a1 a0 a hroot) t) := by
+      simpa [BranchNormTransport.rho] using hm
+    exact ((IsLocalization.AtPrime.isUnit_to_map_iff
+      (BranchNormTransport.L a3 a2 a1 a0 a hroot)
+      (branchIdeal a3 a2 a1 a0 a hroot) t).mp hl) ht
+  · intro ht
+    have hl := (IsLocalization.AtPrime.isUnit_to_map_iff
+      (BranchNormTransport.L a3 a2 a1 a0 a hroot)
+      (branchIdeal a3 a2 a1 a0 a hroot) t).mpr ht
+    exact hl.map (branchRingEquiv a3 a2 a1 a0 a hroot).symm.toRingHom
+
+theorem polynomial_germ_unit_iff (a3 a2 a1 a0 a : K)
+    (hroot : fAt a3 a2 a1 a0 a = 0) (g : K[X]) :
+    IsUnit (BranchNormTransport.E a3 a2 a1 a0 a hroot g) ↔ g.eval a ≠ 0 := by
+  rw [BranchNormTransport.eval_eq_rho_affine, RingHom.comp_apply,
+    rho_unit_iff, branch_affine_eval]
+
+-- Nonzero g is essential: rootMultiplicity a 0 is conventionally zero,
+-- whereas the valuation of the zero germ is top.
+theorem polynomial_germ_order (a3 a2 a1 a0 a : K)
+    (hroot : fAt a3 a2 a1 a0 a = 0)
+    (hsimple : Common22BranchParameter.derivativeAt a3 a2 a1 a0 a ≠ 0)
+    (g : K[X]) (hg : g ≠ 0) :
+    let R := ProjBranchRing a3 a2 a1 a0 a hroot
+    letI := projective_branch_domain a3 a2 a1 a0 a hroot hsimple
+    letI := projective_branch_dvr a3 a2 a1 a0 a hroot hsimple
+    IsDiscreteValuationRing.addVal R (BranchNormTransport.E a3 a2 a1 a0 a hroot g) =
+      (g.rootMultiplicity a : ℕ∞) * 2 := by
+  dsimp only
+  let R := ProjBranchRing a3 a2 a1 a0 a hroot
+  letI : IsDomain R := projective_branch_domain a3 a2 a1 a0 a hroot hsimple
+  letI : IsDiscreteValuationRing R := projective_branch_dvr a3 a2 a1 a0 a hroot hsimple
+  let e := BranchNormTransport.E a3 a2 a1 a0 a hroot
+  let v := IsDiscreteValuationRing.addVal R
+  let m := g.rootMultiplicity a
+  let t := g /ₘ (X-C a)^m
+  have ht : t.eval a ≠ 0 := Polynomial.eval_divByMonic_pow_rootMultiplicity_ne_zero a hg
+  have hunit : IsUnit (e t) := (polynomial_germ_unit_iff a3 a2 a1 a0 a hroot t).mpr ht
+  have hvunit : v (e t)=0 := IsDiscreteValuationRing.addVal_eq_zero_iff.mpr hunit
+  have hx : e (X-C a)=projectiveXSubA a3 a2 a1 a0 a hroot := by
+    simpa only [e, BranchNormTransport.E, Polynomial.coe_eval₂RingHom,
+      Polynomial.eval₂_sub, Polynomial.eval₂_X, Polynomial.eval₂_C] using
+      projectiveX_sub_scalar a3 a2 a1 a0 a hroot
+  have hxorder : v (e (X-C a))=2 := by
+    rw [hx]
+    exact projectiveXSubA_order_two a3 a2 a1 a0 a hroot hsimple
+  have hf := congrArg e (Polynomial.pow_mul_divByMonic_rootMultiplicity_eq g a)
+  change e ((X-C a)^m*t)=e g at hf
+  rw [map_mul, map_pow] at hf
+  calc
+    v (e g) = v (e (X-C a)^m*e t) := congrArg v hf.symm
+    _ = m • v (e (X-C a)) + v (e t) := by
+      rw [AddValuation.map_mul, AddValuation.map_pow]
+    _ = (g.rootMultiplicity a : ℕ∞)*2 := by
+      rw [hxorder,hvunit,add_zero]
+      simp only [nsmul_eq_mul, m]
+
+theorem polynomial_germ_order_nat (a3 a2 a1 a0 a : K)
+    (hroot : fAt a3 a2 a1 a0 a = 0)
+    (hsimple : Common22BranchParameter.derivativeAt a3 a2 a1 a0 a ≠ 0)
+    (g : K[X]) (hg : g ≠ 0) :
+    let R := ProjBranchRing a3 a2 a1 a0 a hroot
+    letI := projective_branch_domain a3 a2 a1 a0 a hroot hsimple
+    letI := projective_branch_dvr a3 a2 a1 a0 a hroot hsimple
+    let v := IsDiscreteValuationRing.addVal R
+    v (BranchNormTransport.E a3 a2 a1 a0 a hroot g) ≠ ⊤ ∧
+      (v (BranchNormTransport.E a3 a2 a1 a0 a hroot g)).toNat =
+        2*g.rootMultiplicity a := by
+  dsimp only
+  have h := polynomial_germ_order a3 a2 a1 a0 a hroot hsimple g hg
+  constructor
+  · rw [h]
+    change ((g.rootMultiplicity a * 2 : ℕ) : ℕ∞) ≠ ⊤
+    exact ENat.natCast_ne_top _
+  · rw [h,ENat.toNat_mul]
+    simp [mul_comm]
+
+-- Support polynomials are proved nonzero from the finite stalk sum; this
+-- does not add them as unexplained inputs to the base multiplicity result.
+theorem support_base_multiplicity_sum (a3 a2 a1 a0 a b : K)
+    (hroot : fAt a3 a2 a1 a0 a = 0)
+    (hsimple : Common22BranchParameter.derivativeAt a3 a2 a1 a0 a ≠ 0)
+    (hb : b ≠ 0) (n u1 u2 U : K[X])
+    (hnorm : n^2-u1*u2*U=C (b^2)*WeightedProjSmoothPoints.quintic a3 a2 a1 a0)
+    (hsupport : u1.eval a*u2.eval a*U.eval a=0) :
+    u1 ≠ 0 ∧ u2 ≠ 0 ∧ U ≠ 0 ∧
+      u1.rootMultiplicity a+u2.rootMultiplicity a+U.rootMultiplicity a=1 := by
+  let R := ProjBranchRing a3 a2 a1 a0 a hroot
+  letI : IsDomain R := projective_branch_domain a3 a2 a1 a0 a hroot hsimple
+  letI : IsDiscreteValuationRing R := projective_branch_dvr a3 a2 a1 a0 a hroot hsimple
+  have hs := BranchNormTransport.support_stalk_order_two
+    a3 a2 a1 a0 a b hroot hsimple hb n u1 u2 U hnorm hsupport
+  have hu1 : u1 ≠ 0 := by
+    intro hz
+    simp [hz] at hs
+  have hu2 : u2 ≠ 0 := by
+    intro hz
+    simp [hz] at hs
+  have hU : U ≠ 0 := by
+    intro hz
+    simp [hz] at hs
+  dsimp only at hs
+  rw [polynomial_germ_order a3 a2 a1 a0 a hroot hsimple u1 hu1,
+    polynomial_germ_order a3 a2 a1 a0 a hroot hsimple u2 hu2,
+    polynomial_germ_order a3 a2 a1 a0 a hroot hsimple U hU] at hs
+  have hcast : ((u1.rootMultiplicity a*2+u2.rootMultiplicity a*2+
+      U.rootMultiplicity a*2 : ℕ) : ℕ∞)=2 := by
+    simpa only [ENat.natCast_add,ENat.natCast_mul] using hs
+  have hnat := congrArg ENat.toNat hcast
+  change u1.rootMultiplicity a*2+u2.rootMultiplicity a*2+U.rootMultiplicity a*2=2 at hnat
+  refine ⟨hu1,hu2,hU,?_⟩
+  omega
+
+#print axioms support_base_multiplicity_sum
+#print axioms branch_scalar
+#print axioms branch_affine_eval
+#print axioms rho_unit_iff
+#print axioms polynomial_germ_unit_iff
+#print axioms polynomial_germ_order
+#print axioms polynomial_germ_order_nat
+end BranchRootMultiplicity

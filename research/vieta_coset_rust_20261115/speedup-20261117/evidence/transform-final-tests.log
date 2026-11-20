@@ -1,0 +1,30 @@
+   Compiling vieta-transform-core v0.1.0 (/workspace/crypto-vieta-speedup/research/vieta_coset_rust_20261115/speedup-20261117/transform-core)
+   Compiling vieta-transform-lab v0.1.0 (/workspace/crypto-vieta-speedup/research/vieta_coset_rust_20261115/speedup-20261117/transform)
+    Finished `release` profile [optimized] target(s) in 8.37s
+     Running unittests src/lib.rs (research/vieta_coset_rust_20261115/speedup-20261117/transform/target/release/build/vieta-transform-lab/1913f04a31140dfb/out/vieta_transform_lab-1913f04a31140dfb)
+
+running 7 tests
+test ntt::tests::unsupported_roots_are_rejected ... ok
+test tests::all_toy_prime_curve_targets_and_tower_relations_survive_montgomery_ordering ... ok
+test ntt::tests::word_transform_matches_literal_schoolbook ... ok
+test tests::same_adapter_supports_existing_fixed_limb_wide_field ... ok
+test tests::shared_representation_roundtrips_and_edge_products_match_reference ... ok
+test wide_edges::actual_p224_carry_edges_and_random_products_match_biguint ... ok
+test ntt::tests::p224_transform_matches_literal_schoolbook ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running unittests src/main.rs (research/vieta_coset_rust_20261115/speedup-20261117/transform/target/release/build/vieta-transform-lab/9613450219bcdc2e/out/vieta_transform_lab-9613450219bcdc2e)
+
+running 2 tests
+test tests::worker_sets_and_double_counter_control_are_exact ... ok
+test transform_worker_tests::transform_complete_sets_and_query_setup_controls ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.56s
+
+   Doc-tests vieta_transform_lab
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

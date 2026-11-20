@@ -12,7 +12,8 @@ name: bench-records
 
 on:
   pull_request:
-    branches: [main]
+    # The hyperelliptic follow-up is stacked on its reviewed engine branch.
+    branches: [main, research/hec-native-ic-20261113, research/hec-followups-20261114]
     types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: [main]

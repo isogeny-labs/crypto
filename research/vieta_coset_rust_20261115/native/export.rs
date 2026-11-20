@@ -14,15 +14,17 @@ fn main() {
     let a: Vec<_> = std::env::args().collect();
     assert!(a.len() >= 6, "export PROTOCOL PANEL KIND OUTPUT RAW...");
     let p: Value = serde_json::from_slice(&fs::read(&a[1]).unwrap()).unwrap();
-    let base = "scale-20261115T2053Z";
-    let host = format!(
-        "{base}/{}",
-        if a[2] == "three-repair" {
-            "repair/isolation.jsonl"
-        } else {
-            "main/isolation.jsonl"
-        }
-    );
+    let base = std::env::var("VIETA_EXPORT_BASE").unwrap_or_else(|_| "scale-20261115T2053Z".into());
+    let host = std::env::var("VIETA_EXPORT_HOST").unwrap_or_else(|_| {
+        format!(
+            "{base}/{}",
+            if a[2] == "three-repair" {
+                "repair/isolation.jsonl"
+            } else {
+                "main/isolation.jsonl"
+            }
+        )
+    });
     let mut runs = vec![];
     let mut files = vec![];
     let mut completed = 0;
@@ -65,7 +67,14 @@ fn main() {
                 "succeeded"
             } else {
                 timeout += 1;
-                "timeout"
+                if r["error"]
+                    .as_str()
+                    .is_some_and(|s| s.contains("stage deadline"))
+                {
+                    "timeout"
+                } else {
+                    "failed"
+                }
             };
             let key = format!("{id}:{arm}:{warm}:{rep}");
             assert!(seen.insert(key.clone()), "duplicate execution cell");
@@ -77,11 +86,13 @@ fn main() {
         }
     }
     let planned = p["sample_size"]["instances"].as_u64().unwrap()
-        * 4
+        * p["arms"].as_array().unwrap().len() as u64
         * (p["sample_size"]["replicates"].as_u64().unwrap()
             + p["sample_size"]["warmups"].as_u64().unwrap());
     let actual = runs.len();
-    let missing = planned as usize - actual;
+    let missing = (planned as usize)
+        .checked_sub(actual)
+        .expect("more calls than protocol");
     let actual_source = if a[2] == "three-repair" {
         let receipt: Value =
             serde_json::from_slice(&fs::read(format!("{base}/repair-publication.json")).unwrap())
@@ -92,7 +103,9 @@ fn main() {
     };
     let arms:Vec<_>=p["arms"].as_array().unwrap().iter().map(|x|json!({"id":x["id"],"role":x["role"],"binary_sha256":x["instrument"]["binary_sha256"],"commit":actual_source})).collect();
     files.push(pin(&host, "host"));
-    let analysis = pin("native/analyze.rs", "analysis");
+    let analysis_path =
+        std::env::var("VIETA_EXPORT_ANALYSIS").unwrap_or_else(|_| "native/analyze.rs".into());
+    let analysis = pin(&analysis_path, "analysis");
     let e = json!({"schema":"experiment.export/v1","export_id":format!("VIETA-{}",a[2]),"created":std::env::var("VIETA_EXPORT_CREATED").expect("set actual export timestamp"),"protocol":{"path":a[1],"sha256":p["freeze"]["protocol_sha256"],"protocol_id":p["protocol_id"],"version":p["version"]},"producer":{"runtime":"codex","model":"GPT-6","session":"vieta-local-scale-20261115","role":"executor"},"source":{"repo":"crypto","commit":actual_source,"dirty":null},"backend":"local","host":{"path":host,"sha256":files.last().unwrap()["sha256"],"class_id":"local-epyc9v74-kvm-5vcpu-cpu4","summary":{"cpu_model":"AMD EPYC 9V74","logical_cpus":5,"memory_bytes":null,"kernel":"6.18.57","hypervisor":"KVM","isolation_tier_max":"L0"}},"arms":arms,"runs":runs,"flow":{"planned":actual,"attempted":actual,"completed":completed,"not_completed":timeout,"interrupted":0,"resumed":0,"excluded":[]},"files":files,"analysis":{"script":analysis,"blinded":false,"blinding_key_sha256":null,"outputs":[],"unmasked_at":null},"notes":[{"kind":"observation","by":"producer","text":format!("Frozen protocol plans {planned} rows; {actual} actual rows; {missing} missing due untimed fixture-clock failure if nonzero. Original records retained. No missing rows imputed. Local clocks diagnostic only; Git-only custody explicitly authorized. Independent signed standing pending.")}],"reviews_dir":"reviews"});
     let out = &a[4];
     assert!(!std::path::Path::new(out).exists(), "refuse replacement");

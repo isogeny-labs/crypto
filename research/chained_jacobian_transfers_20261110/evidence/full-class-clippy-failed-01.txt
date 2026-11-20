@@ -1,0 +1,46 @@
+    Checking chained-successor-preflight v0.1.0 (/workspace/crypto/research/chained_jacobian_transfers_20261110/successor-preflight)
+error: file is loaded as a module multiple times: `src/legacy_jacobian.rs`
+  --> src/full_class_group_replay.rs:9:1
+   |
+ 9 | / #[path = "legacy_jacobian.rs"]
+10 | | mod legacy;
+   | |___________^ first loaded here
+   |
+  ::: src/kernel_group_replay.rs:8:1
+   |
+ 8 | / #[path = "legacy_jacobian.rs"]
+ 9 | | mod legacy;
+   | |___________^ loaded again here
+   |
+   = help: replace all but one `mod` item with `use` items
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#duplicate_mod
+   = note: `-D clippy::duplicate-mod` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::duplicate_mod)]`
+
+error: using `chunks_exact` with a constant chunk size
+  --> src/full_class_group_replay.rs:73:28
+   |
+73 |     for row in bytes[18..].chunks_exact(5) {
+   |                            ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<5>().0`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+   = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: using `chunks_exact` with a constant chunk size
+   --> src/full_class_group_replay.rs:100:10
+    |
+100 |         .chunks_exact(2)
+    |          ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<2>().0.iter()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: using `chunks_exact` with a constant chunk size
+   --> src/full_class_group_replay.rs:309:10
+    |
+309 |         .chunks_exact(5)
+    |          ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<5>().0.iter()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: could not compile `chained-successor-preflight` (lib test) due to 4 previous errors

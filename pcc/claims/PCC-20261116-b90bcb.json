@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T13:32:51Z",
+ "id": "PCC-20261116-b90bcb",
+ "kind": "statement",
+ "producer": {
+  "commit": "a193a1bbffbc5e535cf1e66d4b2a7a19d4708738",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-second-cast-failure-03/entire-original-direct-compile.exit",
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-second-cast-failure-03/entire-original-direct-compile.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-second-cast-failure-03/entire-original-direct-compile.stdout",
+    "sha256": "18b57394b3f33fab1ccbb908dc94ccd73e313e45ac14ab991fb530b6cf0f816a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-constructor-frobenius-second-cast-failure-03/entire-second-source.lean.txt",
+    "sha256": "7dd78ede6f141393fe2f667f9b129c561c2af7f9308defa8f896317fd6ed79d2"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Second cubic constructor/Frobenius static source398 fails1 in explicit generic coefficient cast bridge: after natural-power cast rewrite, the numeral-cast rewrite fails to match the displayed coercion. Entire exact source/logs/exit and downstream sorryAx retained, never accepted. Replace only that generic closed coefficient calculation with the original standard characteristic-aware ring normalization in a distinct399 attempt, preserving all stated assumptions and results. No mathematical source/model/native/policy change or paid execution."
+}

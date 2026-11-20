@@ -149,8 +149,13 @@ def analyze(records, work_rows):
     work = {}
     for row in work_rows:
         key = row.get("record_id")
+        if not isinstance(key, str) or not key:
+            invalid.append({"record_id": key, "reasons": ["work_record_id_invalid"]})
         if key in work:
             invalid.append({"record_id": key, "reasons": ["duplicate_work_row"]})
+        result = row.get("work")
+        if not isinstance(result, dict) or set(result) not in ({"Ok"}, {"Err"}):
+            invalid.append({"record_id": key, "reasons": ["work_result_missing"]})
         work[key] = row
     work_completeness = Counter()
     unpriced = defaultdict(set)
@@ -161,6 +166,8 @@ def analyze(records, work_rows):
     workload_by_index = {}
     for record in records:
         rid = record.get("record_id")
+        if not isinstance(rid, str) or not rid:
+            invalid.append({"record_id": rid, "reasons": ["record_id_invalid"]})
         arm = record.get("arm")
         target = (record.get("workload") or {}).get("workload_id")
         round_no = record.get("round")
@@ -200,11 +207,17 @@ def analyze(records, work_rows):
                 invalid.append({"record_id": rid, "reasons": ["duplicate_measured_slot"]})
             rows[slot] = record
     expected = len(ARMS) * TARGETS * (ROUNDS + WARMUPS)
+    record_ids = [record.get("record_id") for record in records]
+    work_records_complete = (len(work_rows) == expected
+                             and len(work) == expected
+                             and len(set(record_ids)) == expected
+                             and set(record_ids) == set(work))
     expected_measured = {(arm, target, round_no) for arm in ARMS for target in workloads
                          for round_no in range(WARMUPS, WARMUPS + ROUNDS)}
     expected_warmup = {(arm, target, round_no) for arm in ARMS for target in workloads
                        for round_no in range(WARMUPS)}
-    panel_complete = (len(records) == expected and len(workloads) == TARGETS
+    panel_complete = (len(records) == expected and work_records_complete
+                      and len(workloads) == TARGETS
                       and set(workload_by_index) == set(range(TARGETS))
                       and set(rows) == expected_measured and warmup_slots == expected_warmup
                       and len(binaries) == 1 and None not in binaries
@@ -212,8 +225,8 @@ def analyze(records, work_rows):
                       and len(sessions) == 1 and None not in sessions and not invalid)
     aa = pair_summary(rows, *AA, (0.025, 0.975), SEED)
     aa_pass = (aa["complete"] and aa["interval"][0] <= 1 <= aa["interval"][1])
-    comparisons = [pair_summary(rows, base, cand, (0.005, 0.995), SEED + n + 1)
-                   for n, (base, cand) in enumerate(COMPARISONS)]
+    comparisons = [pair_summary(rows, base, cand, (0.005, 0.995), SEED)
+                   for base, cand in COMPARISONS]
     for result in comparisons:
         result["mechanical_rule_met"] = bool(panel_complete and aa_pass and result["complete"]
             and result["all_pairs_lower"] and result["interval"][1] < 1
@@ -223,11 +236,13 @@ def analyze(records, work_rows):
         "planned_executions": expected,
         "observed_executions": len(records),
         "observed_work_rows": len(work_rows),
-        "missing_work_records": sorted({r.get("record_id") for r in records} - set(work)),
+        "work_records_complete": work_records_complete,
+        "missing_work_records": sorted(set(record_ids) - set(work), key=str),
+        "extra_work_records": sorted(set(work) - set(record_ids), key=str),
         "panel_complete": panel_complete,
         "invalid_rows": invalid,
         "binary_sha256": sorted(x for x in binaries if x),
-        "nodes": sorted(x for x in nodes if x),
+        "nodes": sorted(x for x in nodes if type(x) is int and x >= 0),
         "work_complete_count_by_arm": dict(sorted(work_completeness.items())),
         "unpriced_by_arm": {key: sorted(value) for key, value in sorted(unpriced.items())},
         "aa": aa,

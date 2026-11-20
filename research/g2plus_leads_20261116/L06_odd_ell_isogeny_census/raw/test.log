@@ -1,0 +1,55 @@
+warning: methods `add`, `sub`, and `mul` are never used
+  --> src/fp.rs:50:12
+   |
+ 8 | impl Fp {
+   | ------- methods in this implementation
+...
+50 |     pub fn add(&self, a: u64, b: u64) -> u64 {
+   |            ^^^
+...
+54 |     pub fn sub(&self, a: u64, b: u64) -> u64 {
+   |            ^^^
+...
+58 |     pub fn mul(&self, a: u64, b: u64) -> u64 {
+   |            ^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `l` and `m` are never read
+   --> src/gsp.rs:108:9
+    |
+107 | pub struct Row3 {
+    |            ---- fields in this struct
+108 |     pub l: u64,
+    |         ^
+109 |     pub m: u64,
+    |         ^
+
+warning: method `deg` is never used
+  --> src/poly.rs:48:12
+   |
+17 | impl Poly {
+   | --------- method in this implementation
+...
+48 |     pub fn deg(&self) -> isize {
+   |            ^^^
+
+warning: `l06` (bin "l06" test) generated 3 warnings
+    Finished `release` profile [optimized] target(s) in 0.01s
+     Running unittests src/main.rs (target/release/deps/l06-836da2a9d669291a)
+
+running 11 tests
+test tests::t01_splitmix ... ok
+test tests::t02_x7_plus_1_over_f5 ... ok
+test tests::t03_fp_basics ... ok
+test tests::t04_miller_rabin ... ok
+test tests::t07_chi_mod2 ... ok
+test tests::t05_cantor ... ok
+test tests::t08_criterion ... ok
+test tests::t09_charpoly ... ok
+test tests::t11_lagrangians ... ok
+test tests::t10_sampler ... ok
+test tests::t06_enum_vs_cantor ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.70s
+

@@ -1,0 +1,39 @@
+import DivisionInterface
+import Product
+set_option autoImplicit false
+namespace QuotientStorage
+open Polynomial CoefficientTraversal TraversalPolynomial ScaleTrim MonicRemainder NativeDivision
+
+def put {n:Nat} (xs:State n) (j:Fin n) (c:UInt64) : State n :=
+ ⟨xs.val.set j.val c (by rw [xs.property]; exact j.isLt),by simp [xs.property]⟩
+
+theorem put_good {n:Nat} (p:UInt64) (xs:State n) (j:Fin n) (c:UInt64)
+ (hg:Good p xs) (hc:c.toNat<p.toNat) : Good p (put xs j c) := by
+ intro i
+ by_cases hi:i.val=j.val
+ · have he:i=j:=Fin.ext hi
+   subst i
+   simpa [put,CoefficientTraversal.read] using hc
+ · simpa [put,CoefficientTraversal.read,Array.getElem_set,hi,Ne.symm hi] using hg i
+
+theorem put_decode {n:Nat} (p:UInt64) [Fact p.toNat.Prime] (xs:State n) (j:Fin n) (c:UInt64) :
+ decodedPoly p (put xs j c)=writeCoeff (decodedPoly p xs) j.val (c.toNat:ZMod p.toNat) := by
+ apply Polynomial.ext
+ intro i
+ by_cases hi:i<n
+ · by_cases hj:i=j.val
+   · subst i
+     rw [write_at]
+     simp [decodedPoly,sourcePoly_coefficient,extend,put,CoefficientTraversal.read,j.isLt]
+   · rw [write_other _ j.val i _ hj]
+     simp [decodedPoly,sourcePoly_coefficient,extend,put,CoefficientTraversal.read,hi,Array.getElem_set,hj,Ne.symm hj]
+ · have hj:i≠j.val:=by intro h; subst i; exact hi j.isLt
+   rw [write_other _ j.val i _ hj]
+   simp [decodedPoly,sourcePoly_coefficient,hi]
+
+theorem allocation_bound (a b w:Nat) (hb:0<b) (ha:a<2^w) (hw:0<w) : a-b+1<2^w := by
+ have hpow:1<2^w:=by exact Nat.one_lt_pow (by omega) (by decide)
+ omega
+
+theorem current_index_bound (N b r n:Nat) (hr:r≤N) (hn:N-b<n) : r-b<n := by omega
+end QuotientStorage

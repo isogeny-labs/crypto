@@ -1,0 +1,1 @@
+/home/ec2-user/.local/bin/kubectl --namespace isolab --request-timeout=20s get jobs -o jsonpath=\{range\ .items\[\*\]\}\{.metadata.name\}\{\"\\t\"\}\{.status.conditions\[\*\].type\}\{\"\\t\"\}\{.status.conditions\[\*\].status\}\{\"\\t\"\}\{.status.active\}\{\"\\n\"\}\{end\} 

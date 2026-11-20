@@ -1,7 +1,12 @@
 /target
+research/ecbench_open_questions_20261014/native-publish/target/
 **/Cargo.lock
 /store/index.json.lock
 !/Cargo.lock
+!research/ecbench_open_questions_20261014/native-publish/Cargo.lock
+!research/ecbench_open_questions_20261014/locked/Cargo.lock
+!research/ecbench_leads_20261015/decimal-reference/Cargo.lock
+research/ecbench_leads_20261015/decimal-reference/target/
 !ecc2k130/dp-ingest/Cargo.lock
 !research/ic_candidate_tournament_20260915/goal_20260924/native-f5-control-v1/build-validation-v1/data/Cargo.lock
 
@@ -142,3 +147,11 @@ research/notes/ecc2k130/compact_frozen_source_replay_20260929/frozen-materialize
 # prepared crates.io copy, see third_party/cryptominisat-rs-patches
 third_party/cryptominisat-rs/
 tools/b0-ext-solvers/target/
+tools/optlevel/target/
+
+# second cargo target dir for solver development while frozen row binaries run
+target-dev/
+
+# B0 exported CNF instances (0.9-5 MB each) are regenerated deterministically by the frozen
+# binary from the seed; the smaller XOR-DIMACS (.xnf) files stay tracked.
+research/sat_pdp_exotic_20261115/b0/inst/**/*.cnf

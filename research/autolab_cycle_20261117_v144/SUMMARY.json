@@ -1,0 +1,130 @@
+{
+  "oracles": {
+    "out": {
+      "random_cases": 32,
+      "finite_difference_sets": 256,
+      "full_jet_lanes": 96,
+      "matrix_rhs_oracles": 2048,
+      "boundary_checks": 1,
+      "all_registered_contexts_complete": true,
+      "original_complete": false,
+      "total_seconds": 0.44297942699631676,
+      "post_exec_memory": {
+        "start": {
+          "VmSize": "36248 kB",
+          "VmHWM": "9872 kB",
+          "VmRSS": "9872 kB"
+        },
+        "finish": {
+          "VmSize": "36660 kB",
+          "VmHWM": "10716 kB",
+          "VmRSS": "10716 kB"
+        }
+      }
+    },
+    "error": null
+  },
+  "profile": {
+    "out": {
+      "full_jet_checks": 16,
+      "finite_difference_checks": 32,
+      "all_registered_contexts_complete": true,
+      "original_complete": false,
+      "total_seconds": 1.3929312739928719,
+      "post_exec_memory": {
+        "start": {
+          "VmSize": "36252 kB",
+          "VmHWM": "9916 kB",
+          "VmRSS": "9916 kB"
+        },
+        "finish": {
+          "VmSize": "37960 kB",
+          "VmHWM": "11548 kB",
+          "VmRSS": "11548 kB"
+        }
+      }
+    },
+    "actual": {
+      "scope": "conditional k3necessarynormchartonly;sampled early states,not original complete roots",
+      "ell": 16,
+      "last_precision": 23,
+      "early_rank": 24,
+      "unexhausted_early_cells": 16776960,
+      "kernel_dimension": 7,
+      "quotient_dimension": 56,
+      "kernel_hex": [
+        "0x25bc29bd1e36b336",
+        "0x5ed72c11964f52",
+        "0x9443411453d453",
+        "0x203fc8e0758104c",
+        "0x40a5db689f25b83",
+        "0x817acd622e08f08",
+        "0x10003f9d8cf98562"
+      ],
+      "rank_distribution": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 16,
+        "5": 91,
+        "6": 149,
+        "7": 0
+      },
+      "sample_minrank": 4,
+      "sample_rank6_fraction": 0.58203125,
+      "kernel_component_geomean": 42.99316272586841,
+      "development_target_met": true,
+      "global_parameter_bound": null,
+      "global_original_root_count": null
+    },
+    "error": null
+  },
+  "census": {
+    "out": {
+      "parallel_rank_oracles": 320,
+      "scalar_plane_checks": 0,
+      "complete_early_census": false,
+      "original_complete": false,
+      "conditional_parameter_upper_bound": null,
+      "global_original_root_count": null,
+      "post_exec_memory": {
+        "start": {
+          "VmSize": "36284 kB",
+          "VmHWM": "10076 kB",
+          "VmRSS": "10076 kB"
+        },
+        "finish": {
+          "VmSize": "365892 kB",
+          "VmHWM": "343308 kB",
+          "VmRSS": "339196 kB"
+        }
+      },
+      "complete": false,
+      "exact_root_count": null,
+      "all_registered_contexts_complete": false
+    },
+    "error": "AssertionError('global_unit_plane')"
+  },
+  "accepted_census": false,
+  "supervisor": {
+    "oracles": {
+      "status": "ok",
+      "wall_seconds": 0.4997919669840485,
+      "peak_process_rss_kib": 918400
+    },
+    "profile": {
+      "status": "ok",
+      "wall_seconds": 1.473125013988465,
+      "peak_process_rss_kib": 912340
+    },
+    "census": {
+      "status": "ok",
+      "wall_seconds": 2.2884097849891987,
+      "peak_process_rss_kib": 343308
+    }
+  },
+  "workers": 3,
+  "qualified_speedup": null,
+  "goal_complete": false
+}

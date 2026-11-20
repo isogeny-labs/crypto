@@ -1,0 +1,256 @@
+⚠ [3156/3204] Replayed S3Roots
+warning: S3Roots.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean: imports `Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean:137:63: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:137:63: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Roots.lean:161:55: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:161:55: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+⚠ [3157/3204] Replayed RationalCounterexample
+warning: RationalCounterexample.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [3186/3204] Replayed DescentCounterexample
+warning: DescentCounterexample.lean: imports `Mathlib.Algebra.Polynomial.SpecificDegree` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: DescentCounterexample.lean: imports `Mathlib.FieldTheory.Finiteness` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: DescentCounterexample.lean: imports `Mathlib.RingTheory.AdjoinRoot` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: DescentCounterexample.lean: imports `Mathlib.RingTheory.MvPolynomial.Homogeneous` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: DescentCounterexample.lean: imports `Mathlib.RingTheory.Regular.RegularSequence` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: DescentCounterexample.lean:44:2: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+warning: DescentCounterexample.lean:174:2: Try this: 
+  haveI̵
+
+The goal is a proposition, so `have` is preferred over `haveI`.
+The difference between `have` and `haveI` is that `haveI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+⚠ [3187/3204] Replayed S3Completion
+warning: S3Completion.lean: imports `Mathlib.FieldTheory.IsAlgClosed.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Completion.lean:25:2: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Completion.lean:25:2: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Completion.lean:67:44: This simp argument is unused:
+  zero_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [WeierstrassCurve.Affine.addX, ha1, ha2, hn, zero_mul, mul_zero, add_zero, sub_zero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [3188/3204] Replayed StructuralAudit
+warning: StructuralAudit.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: StructuralAudit.lean: imports `Mathlib.Algebra.Group.Subgroup.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: StructuralAudit.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: StructuralAudit.lean: imports `Mathlib.GroupTheory.OrderOfElement` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [3189/3204] Replayed TorsionBoundaries
+warning: TorsionBoundaries.lean: imports `Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: TorsionBoundaries.lean: imports `Mathlib.Algebra.Polynomial.SpecificDegree` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: TorsionBoundaries.lean:30:2: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+warning: TorsionBoundaries.lean:63:2: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+warning: TorsionBoundaries.lean:133:2: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+warning: TorsionBoundaries.lean:187:55: `simp` already closes the goal
+
+Hint: Use `simp` instead of `simpa`:
+  [apply] simp at hc
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+⚠ [3190/3204] Replayed SourceFSTBoundary
+warning: SourceFSTBoundary.lean: imports `Mathlib.FieldTheory.IntermediateField.Adjoin.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: SourceFSTBoundary.lean:24:2: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+warning: SourceFSTBoundary.lean:43:2: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+warning: SourceFSTBoundary.lean:91:50: This simp argument is unused:
+  zero_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [E, curve, WeierstrassCurve.baseChange, WeierstrassCurve.map, map_zero, map_one, mul_zero, zero_mul,
+    add_zero, zero_pow (by decide : (2 : ℕ) ≠ 0), one_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [3191/3204] Replayed BivariateMultiplicity
+warning: BivariateMultiplicity.lean: imports `Mathlib.RingTheory.AdjoinRoot` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: BivariateMultiplicity.lean: imports `Mathlib.Algebra.MvPolynomial.CommRing` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: BivariateMultiplicity.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [3192/3204] Replayed SolverCoefficientBoundary
+warning: SolverCoefficientBoundary.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: SolverCoefficientBoundary.lean: imports `Mathlib.Tactic.NormNum` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+ℹ [3193/3204] Replayed Refutations
+info: Refutations.lean:8:0: 'SkepticalAudit.rational_only_s3_converse_false' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:9:0: 'SkepticalAudit.extensionPolynomial_irreducible' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:10:0: 'SkepticalAudit.coordinate_constant' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:11:0: 'SkepticalAudit.actual_descended_equations' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:12:0: 'SkepticalAudit.actual_descent_not_regular' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:13:0: 'SkepticalAudit.actual_descent_top_parts_not_regular' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:14:0: 'SkepticalAudit.extension_finrank' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:15:0: 'SkepticalAudit.extension_cardinality' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:16:0: 'SkepticalAudit.target_three_torsion' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:17:0: 'SkepticalAudit.symmetrization_over_extension' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:18:0: 'SkepticalAudit.universal_descent_regularity_counterexample' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:19:0: 'SkepticalAudit.symmetrization_universal' depends on axioms: [propext, Quot.sound]
+info: Refutations.lean:20:0: 'TorsionBoundaryAudit.small_curve_cardinality' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:21:0: 'TorsionBoundaryAudit.small_curve_source_supersingular' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:22:0: 'TorsionBoundaryAudit.twoPoint_order' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:23:0: 'TorsionBoundaryAudit.literal_supersingular_k_two_false' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:24:0: 'TorsionBoundaryAudit.hasse_trace_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:25:0: 'TorsionBoundaryAudit.corrected_prime_embedding_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:26:0: 'TorsionBoundaryAudit.bkCurve_cardinality' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:27:0: 'TorsionBoundaryAudit.geometric_root_exists' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:28:0: 'TorsionBoundaryAudit.bk_geometric_nonrational_three_torsion' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:29:0: 'TorsionBoundaryAudit.bk_excluded_boundary_counterexample' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:30:0: 'FSTBoundaryAudit.curve_cardinality' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:31:0: 'FSTBoundaryAudit.curve_source_supersingular' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:32:0: 'FSTBoundaryAudit.twoPoint_order' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:33:0: 'FSTBoundaryAudit.roots2_adjoin_eq_bot' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:34:0: 'FSTBoundaryAudit.roots2_extension_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:35:0: 'FSTBoundaryAudit.two_torsion_not_all_rational' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:36:0: 'FSTBoundaryAudit.fst_algorithm3_3_r_two_counterexample' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:37:0: 'BivariateMultiplicityAudit.quotientEquiv' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:38:0: 'BivariateMultiplicityAudit.quotient_dimension_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:39:0: 'BivariateMultiplicityAudit.triangular_generators_same_ideal' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:40:0: 'BivariateMultiplicityAudit.support_is_not_multiplicity' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:41:0: 'SolverCoefficientAudit.advertised_power_outside_int32' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:42:0: 'SolverCoefficientAudit.observed_coefficient_wrong_in_five' depends on axioms: [propext, Quot.sound]
+info: Refutations.lean:43:0: 'SolverCoefficientAudit.observed_coefficient_wrong_in_five_at_first_overflow' depends on axioms: [propext, Quot.sound]
+⚠ [3194/3204] Replayed BinaryS3
+warning: BinaryS3.lean: imports `Mathlib.Algebra.CharP.Two` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: BinaryS3.lean:45:0: automatically included section variable(s) unused in theorem `BinaryS3Audit.zero_coordinate_no_root`:
+  [CharP K 2]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CharP K 2] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: BinaryS3.lean:107:0: automatically included section variable(s) unused in theorem `BinaryS3Audit.curve_equation`:
+  [CharP K 2]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CharP K 2] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: BinaryS3.lean:212:0: automatically included section variable(s) unused in theorem `BinaryS3Audit.exists_binary_y`:
+  [CharP K 2]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CharP K 2] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+info: BinaryS3.lean:268:0: 'BinaryS3Audit.binaryS3_pointX_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: BinaryS3.lean:269:0: 'BinaryS3Audit.binaryS3_zero_iff_exists_points' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [3195/3204] Replayed BinaryMisapplication
+info: BinaryMisapplication.lean:28:0: 'BinaryS3Audit.short_formula_binary_counterexample' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [3196/3204] Replayed CharacteristicTorsionBoundary
+warning: CharacteristicTorsionBoundary.lean: imports `Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: CharacteristicTorsionBoundary.lean:29:2: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+warning: CharacteristicTorsionBoundary.lean:34:12: This simp argument is unused:
+  curve
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [binaryCounterexampleCurve]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: CharacteristicTorsionBoundary.lean:169:0: 'CharacteristicTorsionAudit.characteristic_torsion_field_counterexample' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: CharacteristicTorsionBoundary.lean:170:0: 'CharacteristicTorsionAudit.geometric_two_torsion_cardinality' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: CharacteristicTorsionBoundary.lean:171:0: 'CharacteristicTorsionAudit.no_pointwise_nondegenerate_pairing' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: CharacteristicTorsionBoundary.lean:172:0: 'CharacteristicTorsionAudit.characteristic_boundary_certificate' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [3197/3204] Replayed GeneralS3
+info: GeneralS3.lean:316:0: 'GeneralS3Audit.generalS3_pointX_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: GeneralS3.lean:317:0: 'GeneralS3Audit.generalS3_zero_iff_exists_points' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [3198/3204] Replayed GeneralS3Controls
+warning: GeneralS3Controls.lean: imports `Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: GeneralS3Controls.lean:21:30: This simp argument is unused:
+  CharTwo.neg_eq
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [h4, CharTwo.sub_eq_add, BinaryS3Audit.binaryS3]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: GeneralS3Controls.lean:146:0: 'GeneralS3Audit.nonordinary_binary_extension_counterexample' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: GeneralS3Controls.lean:147:0: 'GeneralS3Audit.characteristic_three_extension_counterexample' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: GeneralS3Controls.lean:148:0: 'GeneralS3Audit.char_two_a1_zero_two_torsion_trivial' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: GeneralS3Controls.lean:149:0: 'GeneralS3Audit.char_three_short_three_torsion_trivial' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [3201/3204] Replayed GeneralS4
+warning: GeneralS4.lean: imports `Mathlib.RingTheory.Polynomial.Resultant.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: GeneralS4.lean: imports `Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+info: GeneralS4.lean:262:0: 'GeneralS4Audit.quadratic_resultant' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: GeneralS4.lean:263:0: 'GeneralS4Audit.generalS4_repeated_pairs' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: GeneralS4.lean:264:0: 'GeneralS4Audit.generalS4_zero_iff_exists_points' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: GeneralS4.lean:265:0: 'GeneralS4Audit.fixed_degree_resultant_common_root_counterexample' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [3202/3204] Replayed CompositeTorsion
+info: CompositeTorsion.lean:82:0: 'CompositeTorsionAudit.corrected_integer_embedding_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CompositeTorsion.lean:83:0: 'CompositeTorsionAudit.actual_composite_order_control' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CompositeTorsion.lean:84:0: 'CompositeTorsionAudit.composite_order_audit_certificate' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [3203/3204] Built S4Degree (14s)
+warning: S4Degree.lean: imports `Mathlib.Algebra.Polynomial.SpecificDegree` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+info: S4Degree.lean:392:0: 'S4DegreeAudit.quartic_coeff_four' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: S4Degree.lean:393:0: 'S4DegreeAudit.quartic_natDegree_four_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: S4Degree.lean:394:0: 'S4DegreeAudit.curveLast_natDegree_four_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: S4Degree.lean:395:0: 'S4DegreeAudit.fullySymbolicLast_natDegree' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: S4Degree.lean:396:0: 'S4DegreeAudit.all_four_symbolic_degrees' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: S4Degree.lean:397:0: 'S4DegreeAudit.actual_specialization_degree_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: S4Degree.lean:398:0: 'S4DegreeAudit.s4_degree_audit_certificate' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (3204 jobs).

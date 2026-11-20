@@ -1,0 +1,61 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "round 2 2026-10-22: BSGS and kangaroo, old vs new binary",
+ "description": "Old vs new binary, same spec: counted outcomes must be identical; wall time compared. Not a cross-method claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 32,
+    "seed": 59297
+   }
+  ],
+  "targets_per_curve": 4,
+  "target_seed": 20261002
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "bsgs",
+   "role": "candidate",
+   "method": {
+    "id": "bsgs.textbook"
+   }
+  },
+  {
+   "name": "bsgs-il",
+   "role": "candidate",
+   "method": {
+    "id": "bsgs.interleaved"
+   }
+  },
+  {
+   "name": "bsgs-neg",
+   "role": "candidate",
+   "method": {
+    "id": "bsgs.negation"
+   }
+  },
+  {
+   "name": "kangaroo",
+   "role": "candidate",
+   "method": {
+    "id": "kangaroo.vow"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 1,
+  "isolation_required": "L2",
+  "timeout_seconds": 300
+ }
+}

@@ -2258,6 +2258,29 @@ impl TraitFile {
 #[cfg(test)]
 mod tests {
     #[test]
+    fn compact_trait_file_keeps_every_serialized_field() {
+        use super::*;
+        let file = TraitFile {
+            schema: SCHEMA.into(),
+            generated_by: "test".into(),
+            what_this_is: "serialization check".into(),
+            catalog: cover_catalog::MANIFEST_PATH.into(),
+            catalog_rows_sha256: "abc".into(),
+            inputs: vec![],
+            factor_budget: 17,
+            default_signature: vec!["cm".into()],
+            not_evaluated_families: BTreeMap::new(),
+            curves: vec![],
+        };
+        let text = file.to_json();
+        assert_eq!(serde_json::from_str::<TraitFile>(&text).unwrap(), file);
+        assert_eq!(
+            serde_json::from_str::<Value>(&text).unwrap(),
+            serde_json::to_value(&file).unwrap()
+        );
+    }
+
+    #[test]
     fn coordinate_models_keep_exact_fields_and_available_order_certificates() {
         use super::*;
         let (montgomery, _) = parse_model(
@@ -2319,7 +2342,9 @@ mod tests {
             .iter()
             .filter(|curve| matches!(&curve.model, Model::Extension { .. }))
             .collect();
-        assert_eq!(extensions.len(), 1371); // 1324 existing + 47 frozen three-leads models.
+        // The current registry includes 62 additional extension-field rows.
+        // Every row still undergoes the field and subgroup checks below.
+        assert_eq!(extensions.len(), 1405);
         for curve in extensions {
             let Model::Extension {
                 p,

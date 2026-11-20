@@ -1,0 +1,35 @@
+/workspace/crypto/research/p256_aux_smooth_20261114/goal_dreg_half_20261117/ann_m2.cpp: In function ‘FullHilbert full_hilbert(const IntegerPolynomial&, const IntegerPolynomial&, unsigned int)’:
+/workspace/crypto/research/p256_aux_smooth_20261114/goal_dreg_half_20261117/ann_m2.cpp:100:5: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+  100 |     for(size_t i=0;i<ann.size();++i)q[i+e]+=ann[i];itrim(q);
+      |     ^~~
+/workspace/crypto/research/p256_aux_smooth_20261114/goal_dreg_half_20261117/ann_m2.cpp:100:52: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+  100 |     for(size_t i=0;i<ann.size();++i)q[i+e]+=ann[i];itrim(q);
+      |                                                    ^~~~~
+In file included from /usr/include/x86_64-linux-gnu/c++/14/bits/c++allocator.h:33,
+                 from /usr/include/c++/14/bits/allocator.h:46,
+                 from /usr/include/c++/14/string:43,
+                 from /usr/include/gmpxx.h:41,
+                 from /workspace/crypto/research/p256_aux_smooth_20261114/goal_dreg_half_20261117/../aux_base.cpp:3,
+                 from /workspace/aux-build/ann-m2-001/retained_prefix.inc:3,
+                 from /workspace/aux-build/ann-m2-001/retained_depth8_prefix.inc:3,
+                 from /workspace/crypto/research/p256_aux_smooth_20261114/goal_dreg_half_20261117/ann_m2.cpp:2:
+In member function ‘_Tp* std::__new_allocator<_Tp>::allocate(size_type, const void*) [with _Tp = std::vector<__gmp_expr<__mpz_struct [1], __mpz_struct [1]> >]’,
+    inlined from ‘constexpr _Tp* std::allocator< <template-parameter-1-1> >::allocate(std::size_t) [with _Tp = std::vector<__gmp_expr<__mpz_struct [1], __mpz_struct [1]> >]’ at /usr/include/c++/14/bits/allocator.h:196:40,
+    inlined from ‘static constexpr _Tp* std::allocator_traits<std::allocator<_CharT> >::allocate(allocator_type&, size_type) [with _Tp = std::vector<__gmp_expr<__mpz_struct [1], __mpz_struct [1]> >]’ at /usr/include/c++/14/bits/alloc_traits.h:515:28,
+    inlined from ‘constexpr std::_Vector_base<_Tp, _Alloc>::pointer std::_Vector_base<_Tp, _Alloc>::_M_allocate(std::size_t) [with _Tp = std::vector<__gmp_expr<__mpz_struct [1], __mpz_struct [1]> >; _Alloc = std::allocator<std::vector<__gmp_expr<__mpz_struct [1], __mpz_struct [1]> > >]’ at /usr/include/c++/14/bits/stl_vector.h:380:33,
+    inlined from ‘constexpr void std::_Vector_base<_Tp, _Alloc>::_M_create_storage(std::size_t) [with _Tp = std::vector<__gmp_expr<__mpz_struct [1], __mpz_struct [1]> >; _Alloc = std::allocator<std::vector<__gmp_expr<__mpz_struct [1], __mpz_struct [1]> > >]’ at /usr/include/c++/14/bits/stl_vector.h:398:44,
+    inlined from ‘constexpr std::_Vector_base<_Tp, _Alloc>::_Vector_base(std::size_t, const allocator_type&) [with _Tp = std::vector<__gmp_expr<__mpz_struct [1], __mpz_struct [1]> >; _Alloc = std::allocator<std::vector<__gmp_expr<__mpz_struct [1], __mpz_struct [1]> > >]’ at /usr/include/c++/14/bits/stl_vector.h:334:26,
+    inlined from ‘constexpr std::vector<_Tp, _Alloc>::vector(size_type, const value_type&, const allocator_type&) [with _Tp = std::vector<__gmp_expr<__mpz_struct [1], __mpz_struct [1]> >; _Alloc = std::allocator<std::vector<__gmp_expr<__mpz_struct [1], __mpz_struct [1]> > >]’ at /usr/include/c++/14/bits/stl_vector.h:571:47,
+    inlined from ‘Indicators interpolate(const Basis&, const Assignments&, const std::array<long unsigned int, 2>&)’ at /workspace/crypto/research/p256_aux_smooth_20261114/goal_dreg_half_20261117/ann_m2.cpp:31:56:
+/usr/include/c++/14/bits/new_allocator.h:151:55: error: argument 1 value ‘18446744073709551568’ exceeds maximum object size 9223372036854775807 [-Werror=alloc-size-larger-than=]
+  151 |         return static_cast<_Tp*>(_GLIBCXX_OPERATOR_NEW(__n * sizeof(_Tp)));
+      |                                                       ^
+In file included from /usr/include/c++/14/bits/stl_iterator.h:75,
+                 from /usr/include/c++/14/bits/stl_algobase.h:67,
+                 from /usr/include/c++/14/algorithm:60,
+                 from /usr/include/gmpxx.h:40:
+/usr/include/c++/14/new: In function ‘Indicators interpolate(const Basis&, const Assignments&, const std::array<long unsigned int, 2>&)’:
+/usr/include/c++/14/new:131:26: note: in a call to allocation function ‘void* operator new(std::size_t)’ declared here
+  131 | _GLIBCXX_NODISCARD void* operator new(std::size_t) _GLIBCXX_THROW (std::bad_alloc)
+      |                          ^~~~~~~~
+cc1plus: all warnings being treated as errors

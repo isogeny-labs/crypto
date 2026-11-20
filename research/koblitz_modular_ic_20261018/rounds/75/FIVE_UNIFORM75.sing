@@ -1,0 +1,81 @@
+LIB "linalg.lib";
+proc requireFive75(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dumpFive75(link out,string name,matrix M){
+ int x;int y;write(out,"matrix "+name+"["+string(nrows(M))+"]["+string(ncols(M))+"];");
+ for(x=1;x<=nrows(M);x++){for(y=1;y<=ncols(M);y++){if(M[x,y]!=0){write(out,name+"["+string(x)+","+string(y)+"]="+string(M[x,y])+";");}}}
+}
+execute(read("../../../61/runs/trace61-01/trace-polynomial61.sing"));
+execute(read("../../../52/source-data/rr-table50.sing"));
+intmat slotsFive75[32][32];int pFive75;int iFive75;int jFive75;int kFive75;int xFive75;int yFive75;int stepFive75;int bFive75;int maskFive75;int eFive75;int degreeFive75;int lengthFive75;int firstFive75;int successFive75;int powerStepFive75;int ramifiedFive75=0;int unramifiedFive75=0;int candidateFive75=0;
+for(pFive75=1;pFive75<=528;pFive75++){
+ xFive75=parents50[pFive75,1];yFive75=parents50[pFive75,2];
+ requireFive75(xFive75>=1 && xFive75<=yFive75 && yFive75<=32 && slotsFive75[xFive75,yFive75]==0,"FIVE75_UNIQUE_SOURCE_PAIR");
+ slotsFive75[xFive75,yFive75]=pFive75;slotsFive75[yFive75,xFive75]=pFive75;
+}
+for(iFive75=1;iFive75<=32;iFive75++){for(jFive75=1;jFive75<=32;jFive75++){requireFive75(slotsFive75[iFive75,jFive75]>0,"FIVE75_ALL_SOURCE_PAIRS");}}
+matrix sourceTableFive75=table50;
+execute(read("../../../74/runs/degree-five-local74-02/degree-five-local74.sing"));
+intmat masksFive75[6][1];intmat lengthsFive75[6][1];intmat degreesFive75[6][1];intmat indicesFive75[6][1];
+masksFive75[1,1]=primitiveMask1_74;masksFive75[2,1]=primitiveMask2_74;masksFive75[3,1]=primitiveMask3_74;
+masksFive75[4,1]=primitiveMask4_74;masksFive75[5,1]=primitiveMask5_74;masksFive75[6,1]=primitiveMask6_74;
+lengthsFive75[1,1]=localRank1_74;lengthsFive75[2,1]=localRank2_74;lengthsFive75[3,1]=localRank3_74;
+lengthsFive75[4,1]=localRank4_74;lengthsFive75[5,1]=localRank5_74;lengthsFive75[6,1]=localRank6_74;
+degreesFive75[1,1]=residueDegree1_74;degreesFive75[2,1]=residueDegree2_74;degreesFive75[3,1]=residueDegree3_74;
+degreesFive75[4,1]=residueDegree4_74;degreesFive75[5,1]=residueDegree5_74;degreesFive75[6,1]=residueDegree6_74;
+indicesFive75[1,1]=ramification1_74;indicesFive75[2,1]=ramification2_74;indicesFive75[3,1]=ramification3_74;
+indicesFive75[4,1]=ramification4_74;indicesFive75[5,1]=ramification5_74;indicesFive75[6,1]=ramification6_74;
+requireFive75(masksFive75[1,1]==14 && masksFive75[2,1]==15 && masksFive75[3,1]==17 && masksFive75[4,1]==22 && masksFive75[5,1]==48 && masksFive75[6,1]==52,"FIVE75_R74_MASKS");
+requireFive75(indicesFive75[1,1]==1 && indicesFive75[2,1]==1 && indicesFive75[3,1]==1 && indicesFive75[4,1]==7 && indicesFive75[5,1]==7 && indicesFive75[6,1]==1,"FIVE75_R74_RAMIFICATION_PROFILE");
+map tableToFiberFive75=tablePidCertificate50,a;map unitToFiberFive75=tracePolynomial61,a;
+matrix fiberTableFive75=tableToFiberFive75(sourceTableFive75);matrix sourceUnitFive75=unitToFiberFive75(unit61);
+requireFive75(nrows(fiberTableFive75)==32 && ncols(fiberTableFive75)==528 && nrows(sourceUnitFive75)==32 && ncols(sourceUnitFive75)==1,"FIVE75_FULL_SOURCE_SHAPES");
+matrix SFive75[32][32];for(iFive75=1;iFive75<=32;iFive75++){for(jFive75=1;jFive75<=32;jFive75++){SFive75[iFive75,jFive75]=fiberTableFive75[iFive75,slotsFive75[jFive75,jFive75]];}}
+matrix relativeFive75=unitmat(32);matrix squaredFive75[32][32];
+for(stepFive75=1;stepFive75<=5;stepFive75++){
+ for(iFive75=1;iFive75<=32;iFive75++){for(jFive75=1;jFive75<=32;jFive75++){squaredFive75[iFive75,jFive75]=relativeFive75[iFive75,jFive75]^2;}}
+ relativeFive75=SFive75*squaredFive75;
+}
+requireFive75(relativeFive75*sourceUnitFive75==sourceUnitFive75,"FIVE75_RELATIVE_SOURCE_UNIT");
+matrix idempotentFive75[32][1];matrix operatorEFive75[32][32];matrix operatorTFive75[32][32];
+matrix yVectorFive75[32][1];matrix tVectorFive75[32][1];matrix powerFive75[32][1];matrix penultimateFive75[32][1];
+matrix uniformizersFive75[32][6];
+link outFive75="ASCII:w five-uniform75.sing";open(outFive75);write(outFive75,"ring fiveUniformResult75=(2,a),(q),dp;minpoly=a^5+a^3+a^2+a+1;short=0;");
+for(bFive75=1;bFive75<=6;bFive75++){
+ maskFive75=masksFive75[bFive75,1];eFive75=indicesFive75[bFive75,1];degreeFive75=degreesFive75[bFive75,1];lengthFive75=lengthsFive75[bFive75,1];
+ for(iFive75=1;iFive75<=32;iFive75++){idempotentFive75[iFive75,1]=allIdempotents74[iFive75,maskFive75];}
+ operatorEFive75=matrix(0,32,32);
+ for(jFive75=1;jFive75<=32;jFive75++){for(iFive75=1;iFive75<=32;iFive75++){
+  if(idempotentFive75[iFive75,1]!=0){for(kFive75=1;kFive75<=32;kFive75++){operatorEFive75[kFive75,jFive75]=operatorEFive75[kFive75,jFive75]+idempotentFive75[iFive75,1]*fiberTableFive75[kFive75,slotsFive75[iFive75,jFive75]];}}
+ }}
+ requireFive75(operatorEFive75*operatorEFive75==operatorEFive75 && operatorEFive75*sourceUnitFive75==idempotentFive75 && mat_rk(operatorEFive75)==lengthFive75 && mat_rk(relativeFive75*operatorEFive75)==degreeFive75,"FIVE75_REBOUND_PRIMITIVE_LOCAL_OPERATOR");
+ requireFive75(lengthFive75==eFive75*degreeFive75,"FIVE75_LOCAL_LENGTH_IDENTITY");
+ if(eFive75==1){unramifiedFive75++;print("FIVE75_FACTOR mask="+string(maskFive75)+" e=1 residue_degree="+string(degreeFive75)+" parameter=base_prime");}
+ else{
+  firstFive75=0;successFive75=0;ramifiedFive75++;
+  for(jFive75=1;jFive75<=32;jFive75++){
+   candidateFive75++;for(iFive75=1;iFive75<=32;iFive75++){yVectorFive75[iFive75,1]=operatorEFive75[iFive75,jFive75];}
+   tVectorFive75=relativeFive75*yVectorFive75+yVectorFive75;
+   requireFive75(operatorEFive75*tVectorFive75==tVectorFive75,"FIVE75_CANDIDATE_IN_PROJECTED_FACTOR");
+   operatorTFive75=matrix(0,32,32);
+   for(yFive75=1;yFive75<=32;yFive75++){for(iFive75=1;iFive75<=32;iFive75++){
+    if(tVectorFive75[iFive75,1]!=0){for(kFive75=1;kFive75<=32;kFive75++){operatorTFive75[kFive75,yFive75]=operatorTFive75[kFive75,yFive75]+tVectorFive75[iFive75,1]*fiberTableFive75[kFive75,slotsFive75[iFive75,yFive75]];}}
+   }}
+   powerFive75=idempotentFive75;
+   for(powerStepFive75=1;powerStepFive75<=eFive75;powerStepFive75++){
+    powerFive75=operatorTFive75*powerFive75;
+    if(powerStepFive75==eFive75-1){penultimateFive75=powerFive75;}
+   }
+   requireFive75(powerFive75==matrix(0,32,1),"FIVE75_ALL_CANDIDATES_NILPOTENT_AT_E");
+   if(penultimateFive75!=matrix(0,32,1)){
+    successFive75++;if(firstFive75==0){firstFive75=jFive75;for(iFive75=1;iFive75<=32;iFive75++){uniformizersFive75[iFive75,bFive75]=tVectorFive75[iFive75,1];}}
+   }
+  }
+  requireFive75(firstFive75>=1 && successFive75>=1,"FIVE75_VALUATION_ONE_CANDIDATE_FOUND");
+  write(outFive75,"int first"+string(bFive75)+"_75="+string(firstFive75)+";int successes"+string(bFive75)+"_75="+string(successFive75)+";");
+  print("FIVE75_FACTOR mask="+string(maskFive75)+" e="+string(eFive75)+" residue_degree="+string(degreeFive75)+" first_basis="+string(firstFive75)+" successes="+string(successFive75)+" candidates=32");
+ }
+}
+requireFive75(ramifiedFive75==2 && unramifiedFive75==4 && candidateFive75==64,"FIVE75_COMPLETE_SIX_BRANCH_COHORT");
+dumpFive75(outFive75,"uniformizersFive75",uniformizersFive75);close(outFive75);
+print("FIVE75_RESULT branches=6 ramified=2 unramified=4 candidates=64 all_nilpotency_checks=1");
+print("FIVE_UNIFORM75_ALL_CHECKS_PASS");quit;

@@ -1,0 +1,230 @@
+warning: method `polynomial` is never used
+ --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-native-hgcd-roots/polynomial.rs:7:18
+  |
+7 | impl Tree{pub fn polynomial(&self)->&[u64]{&self.polynomial}}
+  | ---------        ^^^^^^^^^^
+  | |
+  | method in this implementation
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `ResultantClass` is never constructed
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-native-hgcd-roots/polynomial.rs:11:12
+   |
+11 | pub struct ResultantClass { p:u64, representative:u64 }
+   |            ^^^^^^^^^^^^^^
+
+warning: methods `combine`, `square`, `negate`, `is_zero`, and `project` are never used
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-native-hgcd-roots/polynomial.rs:16:9
+   |
+15 | impl ResultantClass{
+   | ------------------- methods in this implementation
+16 |  pub fn combine(self,other:Self)->Result<Self,Error>{if self.p!=other.p{return Err(Error::Domain);}Ok(Self{p:self.p,representative:(...
+   |         ^^^^^^^
+17 |  pub fn square(self)->Self{Self{p:self.p,representative:((self.representative as u128*self.representative as u128)%self.p as u128)as...
+   |         ^^^^^^
+18 |  pub fn negate(self)->Self{Self{p:self.p,representative:(self.p-self.representative)%self.p}}
+   |         ^^^^^^
+19 |  pub fn is_zero(&self)->bool{self.representative==0}
+   |         ^^^^^^^
+20 |  pub fn project(self)->u64{
+   |         ^^^^^^^
+
+warning: multiple methods are never used
+   --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-native-hgcd-roots/polynomial.rs:144:9
+    |
+ 35 | impl Poly{
+    | --------- methods in this implementation
+...
+144 |  pub fn resultant_class(&mut self,a:&[u64],b:&[u64])->Result<ResultantClass,Error>{
+    |         ^^^^^^^^^^^^^^^
+...
+162 |  pub fn image_class(&self,v:u64)->Result<ResultantClass,Error>{if 1u64<<(self.p-1).trailing_zeros()>4{return Err(Error::Domain);}Ok...
+    |         ^^^^^^^^^^^
+163 |  pub fn projected_resultant(&mut self,a:&[u64],b:&[u64])->Result<u64,Error>{Ok(self.resultant_class(a,b)?.project())}
+    |         ^^^^^^^^^^^^^^^^^^^
+164 |  /// Build only the product polynomial: no retained subproduct tree nodes.
+165 |  pub fn root_product(&mut self,roots:&[u64])->Result<Vec<u64>,Error>{
+    |         ^^^^^^^^^^^^
+...
+170 |  pub fn root_resultant_class(&mut self,roots:&[u64],points:&[u64])->Result<ResultantClass,Error>{let f=self.root_product(roots)?;le...
+    |         ^^^^^^^^^^^^^^^^^^^^
+171 |  pub fn root_projected_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+176 |  pub fn value_product(&mut self,a:&[u64],tree:&Tree)->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^
+...
+184 |  pub fn root_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{let source=self.product_tree(roots)?;let destinatio...
+    |         ^^^^^^^^^^^^^^
+
+warning: fields `half_batches`, `ordinary_steps`, and `recorded_transitions` are never read
+ --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-native-hgcd-roots/gcd.rs:2:50
+  |
+2 | pub struct GcdResult{pub polynomial:Vec<u64>,pub half_batches:usize,pub ordinary_steps:usize,pub recorded_transitions:usize}
+  |            --------- fields in this struct       ^^^^^^^^^^^^           ^^^^^^^^^^^^^^           ^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `GcdResult` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `labels`, `projective`, and `inverse_z` are never read
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:18:21
+   |
+18 | pub struct Grid{pub labels:Vec<u64>,pub projective:Vec<[u64;3]>,pub affine:Vec<[u64;2]>,pub inverse_z:Vec<u64>}
+   |            ----     ^^^^^^              ^^^^^^^^^^                                          ^^^^^^^^^
+   |            |
+   |            fields in this struct
+   |
+   = note: `Grid` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: struct `Prepared` is never constructed
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:64:12
+   |
+64 | pub struct Prepared<'a>{curve:&'a Curve,r:u64,base:J,public_base:[u64;2],partition:[u64;4],labels:Vec<u64>,strides:Vec<J>,affine_str...
+   |            ^^^^^^^^
+
+warning: struct `Slot` is never constructed
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:66:12
+   |
+66 | pub struct Slot{pub offset:usize,pub lane:usize,pub label:u64,pub projective:[u64;3],pub affine:[u64;2],pub inverse_z:u64}
+   |            ^^^^
+
+warning: struct `Window` is never constructed
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:68:12
+   |
+68 | pub struct Window{pub labels:Vec<u64>,pub initialization:&'static str,pub snapshots:Vec<Vec<Option<[u64;3]>>>,pub slots:Vec<Slot>,pu...
+   |            ^^^^^^
+
+warning: methods `projective_only`, `mixed`, and `prepare` are never used
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:70:5
+   |
+69 | impl Curve{
+   | ---------- methods in this implementation
+70 |  fn projective_only(&self,r:u64,q:[u64;2],width:u64,blocks:u64,s:u64,epsilon:u64)->Result<(Vec<u64>,Vec<J>),Error>{
+   |     ^^^^^^^^^^^^^^^
+...
+80 |  fn mixed(&self,a:J,b:Option<[F;2]>)->J{
+   |     ^^^^^
+...
+88 |  pub fn prepare(&self,r:u64,p:[u64;2],width:u64,blocks:u64,s:u64,epsilon:u64)->Result<Prepared<'_>,Error>{
+   |         ^^^^^^^
+
+warning: method `window` is never used
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:97:9
+   |
+94 | impl Prepared<'_>{
+   | ----------------- method in this implementation
+...
+97 |  pub fn window(&self,shifts:&[Option<[u64;2]>])->Result<Window,Error>{
+   |         ^^^^^^
+
+warning: struct `JointWindow` is never constructed
+   --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:126:12
+    |
+126 | pub struct JointWindow{pub shifts:Vec<Option<[u64;2]>>,pub geometry:Window,pub converted_points:usize}
+    |            ^^^^^^^^^^^
+
+warning: method `joint_window` is never used
+   --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:130:9
+    |
+127 | impl Prepared<'_>{
+    | ----------------- method in this implementation
+...
+130 |  pub fn joint_window(&self,q:Option<[u64;2]>,length:usize)->Result<JointWindow,Error>{
+    |         ^^^^^^^^^^^^
+
+warning: method `retained_indices` is never used
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-native-standalone-source/../feature-native-value-division/lib.rs:52:9
+   |
+25 | impl ValueDivision{
+   | ------------------ method in this implementation
+...
+52 |  pub fn retained_indices(&self)->usize{self.cache.len()}
+   |         ^^^^^^^^^^^^^^^^
+
+warning: struct `Tree` is never constructed
+ --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:6:12
+  |
+6 | pub struct Tree{p:u64,polynomial:Vec<u64>,children:Option<(Box<Tree>,Box<Tree>)>}
+  |            ^^^^
+
+warning: method `polynomial` is never used
+ --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:7:18
+  |
+7 | impl Tree{pub fn polynomial(&self)->&[u64]{&self.polynomial}}
+  | ---------        ^^^^^^^^^^
+  | |
+  | method in this implementation
+
+warning: multiple methods are never used
+   --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:87:9
+    |
+ 35 | impl Poly{
+    | --------- methods in this implementation
+...
+ 87 |  pub fn product_tree(&mut self,points:&[u64])->Result<Tree,Error>{
+    |         ^^^^^^^^^^^^
+...
+ 94 |  fn monic_remainder(&mut self,a:&[u64],b:&[u64])->Result<Vec<u64>,Error>{
+    |     ^^^^^^^^^^^^^^^
+...
+100 |  pub fn values(&mut self,a:&[u64],tree:&Tree)->Result<Vec<u64>,Error>{
+    |         ^^^^^^
+...
+163 |  pub fn projected_resultant(&mut self,a:&[u64],b:&[u64])->Result<u64,Error>{Ok(self.resultant_class(a,b)?.project())}
+    |         ^^^^^^^^^^^^^^^^^^^
+...
+171 |  pub fn root_projected_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+176 |  pub fn value_product(&mut self,a:&[u64],tree:&Tree)->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^
+...
+184 |  pub fn root_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{let source=self.product_tree(roots)?;let destinatio...
+    |         ^^^^^^^^^^^^^^
+
+warning: field `b` is never read
+ --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-orbit-local-terms/local.rs:5:34
+  |
+5 | pub struct Curve { p:u64, a:u64, b:u64 }
+  |            -----                 ^
+  |            |
+  |            field in this struct
+  |
+  = note: `Curve` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: struct `Local` is never constructed
+ --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-orbit-local-terms/local.rs:7:12
+  |
+7 | pub struct Local { pub order:i128, pub coefficient:u64 }
+  |            ^^^^^
+
+warning: multiple methods are never used
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-orbit-correlation/../feature-orbit-local-terms/local.rs:17:5
+   |
+ 8 | impl Curve {
+   | ---------- methods in this implementation
+...
+17 |  fn valid(self,t:Point){assert!(t.x<self.p&&t.y<self.p);assert_eq!(self.mul(t.y,t.y),self.add(self.add(self.pow(t.x,3),self.mul(self...
+   |     ^^^^^
+18 |  pub fn negative(self,t:Point)->Point {Point{x:t.x,y:self.neg(t.y)}}
+   |         ^^^^^^^^
+...
+25 |  fn combine(self,a:Local,b:Local,divide:bool)->Local {Local{order:if divide{a.order.checked_sub(b.order)}else{a.order.checked_add(b....
+   |     ^^^^^^^
+26 |  fn vertical(self,x:u64,t:Option<Point>)->Local {
+   |     ^^^^^^^^
+...
+30 |  fn line(self,a:Point,l:u64,t:Option<Point>)->Local {
+   |     ^^^^
+...
+42 |  fn g(self,a:Option<Point>,b:Option<Point>,t:Option<Point>)->Local {
+   |     ^
+...
+51 |  pub fn miller(self,base:Point,r:u64,t:Option<Point>)->Local {
+   |         ^^^^^^
+...
+61 |  pub fn invariant(self,z:Local,t:Point)->Local {assert_ne!(t.y,0);let b=self.mul(2,t.y);let e=u64::try_from(z.order.unsigned_abs())....
+   |         ^^^^^^^^^
+
+warning: 20 warnings emitted
+

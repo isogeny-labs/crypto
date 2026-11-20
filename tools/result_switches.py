@@ -32,11 +32,15 @@ RECORDED_EXACT = (
     "RAYON_NUM_THREADS", "OMP_NUM_THREADS", "CUDA_VISIBLE_DEVICES",
     "RUSTFLAGS", "CARGO_ENCODED_RUSTFLAGS", "CC", "CXX", "CFLAGS", "HASHCLASH_PREFIX",
     "D4_BIN_MVAR", "FES_GPU_TIMING", "PENCIL_RETAINED_INVENTORY", "SMITH_CANONICAL_SWEEP",
+    # HKY2_SIMD selects the field kernel; N83_SAT_PHASE_TRACE times solve phases (overhead).
+    "HKY2_SIMD", "N83_SAT_PHASE_TRACE",
 )
 # Read by the sources but cannot change a computed value.
 # GH_TOKEN and GITHUB_TOKEN are credentials read by `ic update`: they must never
 # be written into a run record, whatever they could change.
 NOT_RESULT_AFFECTING = frozenset({"HOSTNAME", "PATH", "TMPDIR", "CRYPTO_AUDIT_DIR", "TASKQ_TASK_ID",
+                                  "NOINTERLEAVE",  # Fp64::batch_inv chain layout: same inverses, timing only
+                                  "FASTGROUP_SMOKE_OUT",  # output path only
                                   "GH_TOKEN", "GITHUB_TOKEN"})
 
 

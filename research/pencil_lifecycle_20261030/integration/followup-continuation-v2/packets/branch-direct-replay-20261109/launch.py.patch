@@ -1,0 +1,35 @@
+--- helper/launch.py
++++ direct/launch.py
+@@ -3,7 +3,7 @@
+ from pathlib import Path
+ import argparse,hashlib,json,os,subprocess,time,signal
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-branch-helper-20261109')
++W=Path('/home/ec2-user/pencil-native-branch-direct-20261109')
+ O=Path(str(W)+'.outer')
+ DEADLINE=1794287499
+ BOOT='31b37cfb156242ff8b0ffadc5cec5a12'
+@@ -19,7 +19,7 @@
+ release_path=Path(a.release_record).resolve()
+ assert hashlib.sha256(release_path.read_bytes()).hexdigest()==a.release_sha256,'release pin'
+ release=json.loads(release_path.read_text())
+-assert release['schema']=='branch-helper-coordinator-release/v1' and release['released'] is True
++assert release['schema']=='branch-direct-coordinator-release/v1' and release['released'] is True
+ assert release['freeze_sha256']==a.freeze_sha256
+ assert release['attempt_limit']==1 and release['automatic_retry'] is False
+ assert release['campaign_total_seconds']==43200 and release['deadline']=='2026-11-10T05:11:39Z'
+@@ -144,12 +144,12 @@
+ results=[]
+ try:
+  durable('coordinator-release.json',release)
+- durable('admission.json',{'freeze_sha256':a.freeze_sha256,'start_utc_seconds':time.time(),'campaign_seconds':43200,'prior_debit_seconds':release['prior_debit_seconds'],'remaining_before_attempt_seconds':release['remaining_before_attempt_seconds'],'current_lane':'branch_helper_replay','successor_attempt_limit':1,'coordinator_release_sha256':a.release_sha256,'boot_id':BOOT,'continuation_ceiling_seconds':2400,'deadline':DEADLINE,'retries':0})
++ durable('admission.json',{'freeze_sha256':a.freeze_sha256,'start_utc_seconds':time.time(),'campaign_seconds':43200,'prior_debit_seconds':release['prior_debit_seconds'],'remaining_before_attempt_seconds':release['remaining_before_attempt_seconds'],'current_lane':'branch_direct_replay','successor_attempt_limit':1,'coordinator_release_sha256':a.release_sha256,'boot_id':BOOT,'continuation_ceiling_seconds':2400,'deadline':DEADLINE,'retries':0})
+  for phase,limit in [('pre',900),('compiler',600),('post',900)]:
+   if phase=='compiler' and not results[-1]['passed']:break
+   # Post-custody remains required after any compiler attempt, including failed attempts.
+   assert time.time()+limit<DEADLINE and time.monotonic()-start+limit<=2400,'insufficient remaining phase allowance'
+-  unit='pencil-branch-helper-20261109-'+phase
++  unit='pencil-branch-direct-20261109-'+phase
+   cmd=['sudo','-n','systemd-run','--unit='+unit,'--wait',
+    '--property=User=ec2-user','--property=WorkingDirectory='+str(P),
+    '--property=CPUQuota=100%','--property=MemoryMax=8G','--property=MemorySwapMax=0',

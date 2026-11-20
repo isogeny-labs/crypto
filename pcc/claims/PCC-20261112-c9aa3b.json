@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T18:25:49Z",
+ "id": "PCC-20261112-c9aa3b",
+ "kind": "theorem",
+ "producer": {
+  "commit": "d87fd630504090f1f8acb0ce56664d6cad6077af",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "a9c3b983974eb9170397c6fec45dc88448890bc19071202d57254e652eb8d247",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/EvenKernels.lean",
+   "theorem": "EvenKernels.cubic_homogenization"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Universal cubic homogenization in a commutative ring and exact Fin7/finite Nat scalar/count/coordinateperiod certificates. Actual elliptic/Jacobian torsion/cyclicity/Frobenius characteristic polynomial and field identification remain explicit written/native bridges,not formalAVaxioms. Localpass is not scientificsigning.",
+ "statement": "theorem cubic_homogenization {R : Type} [CommRing R] (a b c e x d : R) : a*d^3+b*(x*d)*d^2+c*(x*d)^2*d+e*(x*d)^3 = d^3*(a+b*x+c*x^2+e*x^3)"
+}

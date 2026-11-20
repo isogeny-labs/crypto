@@ -1,0 +1,44 @@
+   Compiling full-trace-zero-backend v0.1.0 (/workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend)
+   Compiling trace-zero-leads v0.1.0 (/workspace/crypto-trace/research/trace_zero_leads_20261109/native)
+   Compiling trace-zero-point-chain-validation v0.1.0 (/workspace/crypto-trace/research/trace_zero_point_chains_20261109/native)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.66s
+     Running unittests src/lib.rs (research/trace_zero_point_chains_20261109/native/target/debug/deps/trace_zero_point_chain_validation-d38571e6780f6eac)
+
+running 12 tests
+test kummer_tests::actual_wide_quadratic_models_replay_public_points_and_torsion_cosets ... KUMMER_MODEL n=83 mode=Raw variables=166 equations=86 degree=2 terms=23486 and_aux=6889
+KUMMER_MODEL n=83 mode=Compact variables=164 equations=84 degree=2 terms=23160 and_aux=6724
+KUMMER_SUBSPACE n=83 d=16 variables=98 equations=84 degree=2 terms=2338 and_aux=1312
+KUMMER_MODEL n=131 mode=Raw variables=262 equations=134 degree=2 terms=51589 and_aux=17161
+KUMMER_MODEL n=131 mode=Compact variables=260 equations=132 degree=2 terms=51071 and_aux=16900
+KUMMER_SUBSPACE n=131 d=16 variables=146 equations=132 degree=2 terms=3627 and_aux=2080
+ok
+test kummer_tests::both_boolean_models_have_one_inverse_witness_per_actual_x ... ok
+test kummer_tests::inverse_membership_matches_actual_group_trace_for_every_small_x ... KUMMER_IMAGE n=3 distinct_x=0 rational_kernel=1
+KUMMER_IMAGE n=5 distinct_x=5 rational_kernel=11
+KUMMER_IMAGE n=7 distinct_x=14 rational_kernel=29
+KUMMER_IMAGE n=9 distinct_x=63 rational_kernel=127
+ok
+test kummer_tests::inverse_sat_encoder_matches_every_small_x_and_cap_is_atomic ... ok
+test kummer_tests::inverse_trace_character_swaps_on_reciprocal_two_e_cosets ... ok
+test kummer_tests::rationality_bit_is_necessary_and_torsion_is_not_a_kummer_kernel_point ... RATIONALITY_COUNTEREXAMPLE n=3 x=z inverse=z^2+1: trace-x and second bit pass, inverse trace rejects
+ok
+test kummer_tests::wide_inverse_membership_s3_control_retains_budget_outcomes ... KUMMER_S3_CONTROL n=83 outcome=Unknown variables=21331 clauses=61791 xors=424; known singleton control, no natural-search claim
+KUMMER_S3_CONTROL n=131 outcome=Unknown variables=52531 clauses=153953 xors=664; known singleton control, no natural-search claim
+ok
+test tests::branch_paths_cover_every_small_triple_including_identity_intermediates ... ok
+test tests::complete_point_oracle_matches_all_small_targets_and_sign_restrictions ... ok
+test tests::every_small_finite_pair_has_the_exact_addition_branch_and_rejects_wrong_output ... EXACT_PAIR_BRANCHES n=5 ordered_pairs=100
+ok
+test tests::nonzero_denominator_and_identity_branch_admission_are_enforced ... ok
+test tests::wide_identity_path_replays_without_membership_ordinate_search ... FULL_POINT_IDENTITY n=83 variables=830 clauses=1820 xors=332
+FULL_POINT_IDENTITY n=131 variables=1310 clauses=2876 xors=524
+ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.76s
+
+   Doc-tests trace_zero_point_chain_validation
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

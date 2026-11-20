@@ -1,0 +1,102 @@
+{
+  "schema": "actual-finite-point-evaluation-preflight/v1",
+  "build_snapshots": 14,
+  "failed_build_states": [
+    "02",
+    "07",
+    "08",
+    "09",
+    "11"
+  ],
+  "successful_builds": [
+    "01",
+    "03",
+    "04",
+    "05",
+    "06",
+    "10",
+    "12",
+    "13",
+    "14"
+  ],
+  "state13_named_guard_advisories": [
+    "warning: EvaluationCertificate.lean:58:26: Variable name `hD` is not explicitly referenced.",
+    "warning: EvaluationCertificate.lean:63:77: Variable name `hΔ` is not explicitly referenced.",
+    "warning: EvaluationCertificate.lean:64:26: Variable name `hdeg` is not explicitly referenced.",
+    "warning: EvaluationCertificate.lean:67:7: Variable name `hfg` is not explicitly referenced."
+  ],
+  "final_build": "14/project logs no warnings/errors; one inherited frozen-auditor String.mk deprecation",
+  "gate": {
+    "archive": "research/finite_point_evaluation_audit_20261115/evidence/gate.tar.gz",
+    "files": 5,
+    "unique_objects": 5,
+    "losslessly_deduplicated": false,
+    "roundtrip_equal": true,
+    "inventory": [
+      {
+        "member": "research_finite_point_evaluation_audit_20261115_lean/audit.log",
+        "bytes": 52309,
+        "sha256": "361a2742b4eea7b35e46d1ddc21d92d421e8910d74e4de692b6a813d9c2d21ba"
+      },
+      {
+        "member": "research_finite_point_evaluation_audit_20261115_lean/build.log",
+        "bytes": 24728,
+        "sha256": "a493539c81d9afdb9a0431a63c76293f4e379930901fd3bc95712308745bff24"
+      },
+      {
+        "member": "research_finite_point_evaluation_audit_20261115_lean/cache.log",
+        "bytes": 138,
+        "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+      },
+      {
+        "member": "research_finite_point_evaluation_audit_20261115_lean/source-build.log",
+        "bytes": 24728,
+        "sha256": "18901537485665c9d623a3b75ed663fb5bcfd0bded01f1cfb91199519ece4b51"
+      },
+      {
+        "member": "research_finite_point_evaluation_audit_20261115_lean/status",
+        "bytes": 5,
+        "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+      }
+    ],
+    "declarations": 536,
+    "failing": 0,
+    "trusted_native": 0,
+    "inherited_audit_tool_deprecation_warnings": [
+      "/workspace/crypto-audit/tools/lean/AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead"
+    ]
+  },
+  "native": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "archive": {
+    "archive": "research/finite_point_evaluation_audit_20261115/evidence/attempts.tar.xz",
+    "files": 174,
+    "unique_objects": 81,
+    "losslessly_deduplicated": true,
+    "roundtrip_equal": true,
+    "inventory_member": "manifest.json"
+  },
+  "exact_reused_modules": 67,
+  "new_modules": 9,
+  "actual_local_residue_and_regular_domain": true,
+  "actual_allpoint_unit_valuation_order_bridge": true,
+  "actual_coordinate_fraction_value_formula": true,
+  "actual_disjoint_support_to_unit_domain": true,
+  "actual_guarded_divisor_product_and_scalar_laws": true,
+  "actual_geometric_degreezero_choice_forward": true,
+  "actual_total_evaluation_inverse_pole_and_totalized_product_controls": true,
+  "actual_F3_unequal_overlapping_support_control": true,
+  "source_exercise_converse_or_allcurves": false,
+  "full_scheme_localRing_Divisor_API_comparison": false,
+  "reciprocity_or_full_canonical_pairing_or_original14_completion": false,
+  "independent_implementation_or_physicalhost_validation": false,
+  "canonical_corpus_promoted": false,
+  "novelty_claim": false,
+  "paid_compute_and_agent_upload": 0
+}

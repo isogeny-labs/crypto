@@ -1,0 +1,39 @@
+LIB "linalg.lib";
+proc require60(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../mixed60-02/mixed-space60.sing"));
+execute(read("../cohort60-01/cohort-certificates60.sing"));
+matrix mixK60=imap(mixedSpace60,Kmix60);matrix mixR60=imap(mixedSpace60,Rmix60);matrix mixH60=imap(mixedSpace60,Hmix60);matrix mixC60=imap(mixedSpace60,C60);
+matrix mixS60=imap(mixedSpace60,Smix60);matrix mixN60=imap(mixedSpace60,Nmix60);matrix mixF60=imap(mixedSpace60,Fmix60);matrix fixR60=imap(mixedSpace60,Rfix60);matrix fixH60=imap(mixedSpace60,Hfix60);
+matrix profiles60=imap(mixedSpace60,profile60);matrix regular60=imap(mixedSpace60,regular60);matrix regLeft60=imap(mixedSpace60,regularLeft60);matrix odd60=imap(mixedSpace60,particular60);matrix one60=imap(mixedSpace60,one60);
+require60(mixC60*mixK60==matrix(0,64,36) && mixR60*mixK60==unitmat(36) && mixK60*mixR60+mixH60*mixC60==unitmat(100),"CHECK60_MIXED_SPLITTING");
+require60(mixS60*mixS60==unitmat(36) && mixN60==mixS60+unitmat(36),"CHECK60_INVOLUTION");
+require60(mixN60*mixF60==matrix(0,36,18) && fixR60*mixF60==unitmat(18) && mixF60*fixR60+fixH60*mixN60==unitmat(36),"CHECK60_FIXED_SPLITTING");
+require60(mixN60*odd60==one60 && regLeft60*regular60==unitmat(100),"CHECK60_ODD_AND_REGULAR");
+require60(fixed10060==mixK60*mixF60,"CHECK60_ACTUAL_FIXED_BASIS");
+int i60;int j60;int k60;int p60;int order60;int row60;int src60;int e060;int e160;int e260;int e360;int count60=0;int principal60=0;int excluded60=0;int dim60;intvec e60;
+intvec caps60=24,8,14,2;intvec old60=56,8,14,2;intvec offsets60=0,224,256,312;
+matrix bound60[96][100];matrix calculated60[96][18];matrix actual60[96][18];matrix H60[18][96];matrix K60[18][1];matrix R60[1][18];
+for(i60=1;i60<=64;i60++){for(j60=1;j60<=100;j60++){require60(mixC60[i60,j60]==profiles60[i60,j60],"CHECK60_MIXED_COEFFICIENT_BINDING");}}
+for(e160=-4;e160<=4;e160++){for(e260=-7;e260<=7;e260++){for(e360=-1;e360<=1;e360++){
+ e060=-e160-e260-e360;
+ if(e060!=0 || e160!=0 || e260!=0 || e360!=0){
+  count60++;e60=e060,e160,e260,e360;bound60=matrix(0,96,100);row60=0;
+  for(p60=1;p60<=4;p60++){for(order60=-caps60[p60];order60<2*e60[p60];order60++){
+   src60=offsets60[p60]+2*(order60+old60[p60])+1;
+   for(j60=1;j60<=100;j60++){bound60[row60+1,j60]=profiles60[src60,j60];bound60[row60+2,j60]=profiles60[src60+1,j60];}row60=row60+2;
+  }}
+  require60(row60==96,"CHECK60_FULL_LOCAL_ROWS");calculated60=bound60*fixed10060;
+  execute("actual60=Ccase"+string(count60)+";H60=Hcase"+string(count60)+";");
+  require60(actual60==calculated60,"CHECK60_INDEPENDENT_ROW_RECONSTRUCTION");dim60=18-mat_rk(actual60);
+  if(dim60==0){require60(H60*actual60==unitmat(18),"CHECK60_EXCLUSION_LEFT_INVERSE");excluded60++;}
+  else{
+   require60(dim60==1,"CHECK60_DIMENSION_BOUND");execute("K60=Kcase"+string(count60)+";R60=Rcase"+string(count60)+";");
+   require60(actual60*K60==matrix(0,96,1) && R60*K60==unitmat(1) && K60*R60+H60*actual60==unitmat(18),"CHECK60_COMPLETE_PRINCIPAL_SPLITTING");principal60++;
+  }
+ }
+}}}
+require60(count60==404 && principal60+excluded60==404,"CHECK60_COMPLETE_COHORT");
+require60(mat_rk(control60)==17 && control60*fixedOne60==matrix(0,96,1) && mat_rk(controlK60)==1,"CHECK60_REGULAR_POSITIVE_CONTROL");
+matrix wrong60=actual60;wrong60[1,1]=wrong60[1,1]+1;require60(wrong60!=calculated60,"CHECK60_CHANGED_SOURCE_ROW_REJECTED");
+print("CHECK60_RESULT patterns=404 mixed_dimension=36 fixed_dimension=18 principal_patterns="+string(principal60)+" excluded_patterns="+string(excluded60)+" complete_kernel_certificates=404 source_row_reconstructions=404 odd_trace_verified=1 changed_source_row_rejected=1");
+print("CHECK60_ALL_CHECKS_PASS");quit;

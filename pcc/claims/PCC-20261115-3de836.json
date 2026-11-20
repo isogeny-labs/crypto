@@ -1,0 +1,78 @@
+{
+ "created_at": "2026-11-15T06:50:14Z",
+ "id": "PCC-20261115-3de836",
+ "kind": "statement",
+ "producer": {
+  "commit": "be8bba41af02d64d2d63567b7f190a8424d69766",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_terminal_20261115/README.md",
+    "sha256": "c319f0e960cd3ca2106f4654d7306d0320810d0ecf6c3a0e801707c8ad595b53"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_linearized_20261115/README.md",
+    "sha256": "124d9ef124dcbe51263883dafff0eb1e5b070d19294c4f6d04c008c7aff6a7b9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_linearized_20261115/report.pdf",
+    "sha256": "51032831486fbd7a15d64039ad0f990a74595c30270580f7d335902a2e5465f0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_linearized_20261115/example-relation.json",
+    "sha256": "41d37c25b0321ae651006e30edb302c6fddce00b689d6132c200e95a966f0541"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_linearized_20261115/checks/root-check.txt",
+    "sha256": "10f5a2b5434f1d49b497761f6979cc899eb2e76f5829e0be748b21b68b6fff00"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_linearized_20261115/checks/prior20-regressions.txt",
+    "sha256": "28c76f9cf4e5b05934ec6eaf6933a02c24f60829c1d4638b9dd7f92941e1faf7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_linearized_20261115/checks/terminal-regressions.txt",
+    "sha256": "493731dbce5069a5ca85749b9a001c5545a2578f4f6be59cf78523aab0dedfee"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_linearized_20261115/checks/unit-tests-final2.txt",
+    "sha256": "3316540512646c1b5405437a01e573a868fd59f1064c8a0b42eeae1c38e52dfd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_linearized_20261115/checks/final-delivery.txt",
+    "sha256": "f6bb974cb92f0ea3d79e5c11c80054f6d1d56a4479f2f4dcdc9f8d073a904dc1"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Finite frozen known-answer panels and scoped native regression evidence only; unsigned producer attestation, no timing/full-cost/population/scaling/public-challenge recovery or signed independent verification claim.",
+ "statement": "Two new frozen local trace-zero panels complete 1336 primary executions without invalid decisions. Terminal slicing decides98 of98 per arm; symmetric residual linearization decides130 of130 in the scale arm against114 prepared SAT,110 original SAT and106 fresh pair-table. The scale panel includes planted relations on ECC2K-130 bases up to1994 points and at most35 coefficient columns. Native audits replay398 terminal and416 scale saved tuples. All25 focused production checks and library type-check pass. Three illustrated PDF pages were inspected and canonical exports accepted."
+}

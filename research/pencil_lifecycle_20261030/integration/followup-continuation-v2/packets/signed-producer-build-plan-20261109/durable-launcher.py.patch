@@ -1,0 +1,64 @@
+--- root-v4/durable-launcher.py
++++ signed-producer/durable-launcher.py
+@@ -15,7 +15,7 @@
+  return datetime.datetime.fromisoformat(normalized).astimezone(datetime.timezone.utc)
+ 
+ P=Path(__file__).resolve().parent;F=load_admission(P);START=time.monotonic()
+-UTC=datetime.datetime.now(datetime.timezone.utc); DEADLINE=parse_rfc3339(F['absolute_deadline']); END=START+min(1800,(DEADLINE-UTC).total_seconds())
++UTC=datetime.datetime.now(datetime.timezone.utc); DEADLINE=parse_rfc3339(F['absolute_deadline']); END=START+min(2400,(DEADLINE-UTC).total_seconds())
+ W=Path(F['workspace']);D=Path(F['durable_run']);OUT=D/'supervisor';UNIT=F['unit'];R={'status':'failed','unit':UNIT,'errors':[],'unit_launch_attempted':False,'observations':[]};INTERRUPTED=False;CLEANING=False;OWNED_OUTPUT=False
+ def checkpoint(phase):
+  R['phase']=phase;R['elapsed_seconds']=time.monotonic()-START
+@@ -70,6 +70,7 @@
+  if x.returncode:raise RuntimeError('command failed: '+repr(argv))
+  return x.stdout.decode()
+ def show():
++ global END
+  value=call(['/usr/bin/systemctl','show',UNIT]+['--property='+k for k in KEYS],record_checkpoint=False)
+  d=dict(line.split('=',1) for line in value.splitlines() if '=' in line)
+  if R['unit_launch_attempted'] and d.get('InvocationID'):
+@@ -78,6 +79,15 @@
+   if d.get('ControlGroup'):
+    if R.get('cgroup'):assert d['ControlGroup']==R['cgroup'],'unit cgroup changed'
+    R['cgroup']=d['ControlGroup']
++ # Worker may shorten the single attempt for its600-second execution+cleanup phase.
++ worker_path=D/'worker/worker-receipt.json'
++ if not CLEANING and worker_path.exists():
++  assert worker_path.stat().st_size<=64*1024**2,'worker receipt size'
++  wr=json.loads(worker_path.read_text())
++  if 'execution_end_monotonic' in wr:
++   assert R.get('invocation_id') and wr['invocation_id']==R['invocation_id'],'phase receipt owner'
++   bound=wr['execution_end_monotonic'];assert type(bound) in (int,float) and START<bound<=START+2400,'phase end bound'
++   END=min(END,bound);R['execution_end_monotonic']=END
+  R['observations'].append(d)
+  # Identity is captured and checked above; the durable permit records it before
+  # cumulative receipt/log flushing. Never renew for cleanup or terminal states.
+@@ -87,7 +97,7 @@
+ def permit():
+  assert R.get('invocation_id') and HB_EXPIRY is not None and not CLEANING and not INTERRUPTED
+  now=datetime.datetime.now(datetime.timezone.utc)
+- expires=min(HB_EXPIRY.timestamp()-15,now.timestamp()+F['limits']['supervisor_permit_seconds'],DEADLINE.timestamp()-40)
++ expires=min(HB_EXPIRY.timestamp()-15,now.timestamp()+F['limits']['supervisor_permit_seconds'],DEADLINE.timestamp()-40,now.timestamp()+max(0,END-time.monotonic()-40))
+  assert expires>now.timestamp() and not INTERRUPTED
+  issued=time.monotonic();sequence=R.get('permit_sequence',0)+1
+  value={'invocation_id':R['invocation_id'],'lease':F['lease'],'expires_unix':expires,'issued_unix':now.timestamp(),'sequence':sequence}
+@@ -115,14 +125,16 @@
+  try:os.fsync(fd)
+  finally:os.close(fd)
+ try:
+- assert END-START>=300,'insufficient absolute deadline margin'
++ assert END-START>=2399,'insufficient absolute deadline margin'
+  assert not D.exists(),'no duplicate durable attempt directory'
+  D.mkdir(mode=0o700);OUT.mkdir(mode=0o700);OWNED_OUTPUT=True;checkpoint('supervisor-start')
+- for name,digest in F['recipe_files'].items():assert hashlib.sha256((P/name).read_bytes()).hexdigest()==digest,name
++ assert not W.exists(),'existing private workspace; no retry'
++ W.mkdir(mode=0o700);atomic_json(W/'workspace-owner.json',{'unit':UNIT,'lease':F['lease']});R['private_workspace_created']=True
++ for name,digest in F['packet_files'].items():assert hashlib.sha256((P/name).read_bytes()).hexdigest()==digest,name
+  heartbeat(force=True)
+  before=show();assert before['LoadState']=='not-found','unit already exists'
+  precreate_unit_logs(OUT);checkpoint('caller-owned-unit-logs-created')
+- props={'User':str(F['uid']),'Group':str(F['gid']),'Type':'exec','RemainAfterExit':'yes','CPUQuota':'200%','MemoryMax':str(16*1024**3),'MemorySwapMax':'0','OOMPolicy':'stop','TasksMax':'512','KillMode':'control-group','TimeoutStopSec':'5s','RuntimeMaxSec':str(int(END-time.monotonic()-20))+'s','NoNewPrivileges':'yes','CapabilityBoundingSet':'','ProtectControlGroups':'yes','RestrictNamespaces':'yes','PrivateNetwork':'yes','PrivateTmp':'no','ProtectSystem':'strict','ProtectHome':'read-only','ReadWritePaths':str(W)+' '+str(D),'WorkingDirectory':str(W/'source'),'UMask':'0077','StandardOutput':'append:'+str(OUT/'unit.stdout'),'StandardError':'append:'+str(OUT/'unit.stderr')}
++ props={'User':str(F['uid']),'Group':str(F['gid']),'Type':'exec','RemainAfterExit':'yes','CPUQuota':'200%','MemoryMax':str(16*1024**3),'MemorySwapMax':'0','OOMPolicy':'stop','TasksMax':'512','KillMode':'control-group','TimeoutStopSec':'5s','RuntimeMaxSec':str(int(END-time.monotonic()-20))+'s','NoNewPrivileges':'yes','CapabilityBoundingSet':'','ProtectControlGroups':'yes','RestrictNamespaces':'yes','PrivateNetwork':'yes','PrivateTmp':'no','ProtectSystem':'strict','ProtectHome':'read-only','ReadWritePaths':str(W)+' '+str(D),'WorkingDirectory':str(P),'UMask':'0077','StandardOutput':'append:'+str(OUT/'unit.stdout'),'StandardError':'append:'+str(OUT/'unit.stderr')}
+  argv=['/usr/bin/sudo','-n','/usr/bin/systemd-run','--no-block','--unit='+UNIT]+['--property='+k+'='+v for k,v in props.items()]+['--setenv=PENCIL_CHECK_END_MONOTONIC='+str(END),'/usr/bin/python3','-B',str(P/'durable-worker.py')]
+  R['launch_argv']=argv;R['properties']=props;R['unit_launch_attempted']=True;checkpoint('before-unit-launch')
+  call(argv,10,record_checkpoint=False);owned=None;cgroup=None

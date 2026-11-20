@@ -1,0 +1,55 @@
+{
+  "schema": "groebner-source-system-verification/v1",
+  "source_commit": "baa4e7973c2d1994df307247aa6ed613fc7a0f9d",
+  "claim_id": "PCC-20261113-e2fbfe",
+  "actual_verdict": {
+    "claim_id": "PCC-20261113-e2fbfe",
+    "claim_sha256": "7b1c8e88cb1f3710504f3de9ee8bc886c21da53cc7d8ca5b66ef03106df08bee",
+    "commit": "baa4e7973c2d1994df307247aa6ed613fc7a0f9d",
+    "proofs": [
+      {
+        "kind": "attestation",
+        "notes": [
+          "artifact: unsigned; independence needs a keyring signature"
+        ],
+        "reasons": [],
+        "verdict": "not_covered"
+      }
+    ],
+    "reasons": [
+      "claim kind measurement is not covered: recompute; replay"
+    ],
+    "schema": "pcc.verdict/v1",
+    "verdict": "not_covered",
+    "verified_at": "2026-11-13T01:54:23Z",
+    "verifier_host": "2d18c814bc7e"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261113-e2fbfe",
+    "claim_sha256": "7b1c8e88cb1f3710504f3de9ee8bc886c21da53cc7d8ca5b66ef03106df08bee",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "native_artifacts": 176,
+  "all_pins_match": true,
+  "report": {
+    "path": "reports/run-20261113T0143Z/report.pdf",
+    "bytes": 36187,
+    "sha256": "0cd2700a375c82e5efadcbdcd9eeae1f4799ec3f4f329bd4169dcc2f455240fd",
+    "pages": 2,
+    "all_pages_visually_inspected": true
+  },
+  "flow": {
+    "planned": 18,
+    "attempted": 18,
+    "completed": 18,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "separate_formal_edwards_claim": "PCC-20261113-bc105f",
+  "full_internal_f4_degree_verified": false,
+  "independent_host": false,
+  "paid_compute_and_agent_storage_upload": 0
+}

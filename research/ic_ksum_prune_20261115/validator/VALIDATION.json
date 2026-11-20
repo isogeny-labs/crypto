@@ -1,0 +1,38 @@
+{
+ "note": "Counted-cost measurement (L0) of ksum prune=1 against prune=0 on Table B's eight curves (study research/ic_ksum_prune_20261115, validated by VAL-20261115-276156). The rho reference is the matched negation-map rho arm every session runs beside every arm. gae_band is the B27 row (ic = ksum5-p, the cheapest k-sum arm there); every row's band is in the validator report (checks.rho_reference.gae_band_all_rows). [pcc:unverified]",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "c7c780ddc220a676856fbf01a1846bec3f325a3d29b2e8aaae42cac32526582e"
+ },
+ "rho_reference": {
+  "band_source": "own-numbers.json rows.B27.mean_S (equal to research/ic_ksum_prune_20261115/band/B27.json to 1e-9)",
+  "binary_or_process": "one ecbench binary, sha256 6c60b4c931294bf770039a5b47800e39c424eb2e7f4876b426cd084f7c364d77 (built at 3a9e85e644); every arm of a session runs in it",
+  "gae_band": {
+   "0": {
+    "ic": 6.0379783707628905,
+    "rho": 1.0687426839329566
+   },
+   "0.1": {
+    "ic": 6.791376367013316,
+    "rho": 1.1677372189100694
+   },
+   "1": {
+    "ic": 13.571958333267142,
+    "rho": 2.0586880337040863
+   }
+  },
+  "kind": "negation",
+  "matches_protocol": true,
+  "order_holds_across_band": true,
+  "protocol": "matched rho.negation reference arm (role reference) in every session, same curve, targets and algorithm seeds as every k-sum arm; curves with 2 usable automorphisms, so negation is the strongest symmetry available",
+  "same_binary_or_process": true,
+  "same_unit": true,
+  "strongest_available": true,
+  "unit": "ecbench.gae (counted group operations, S = GAE/sqrt(r)); native work priced at w in {0, 0.1, 1} GAE per operation (AGENTS.md section 5a)"
+ },
+ "schema": "validation-gate/v1",
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "2a1e490897cedb15cfeb40df3c281b9b325b308ab65b84ac90a4096dbac38ab2"
+ }
+}

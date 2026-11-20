@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+study_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+repo_dir=$(CDPATH= cd -- "$study_dir/../.." && pwd)
+panel="$study_dir/panel.json"
+schema="$study_dir/panel.schema.json"
+registry="$repo_dir/docs/curves/registry.json"
+traits="$repo_dir/docs/curves/traits.json"
+
+jq empty "$panel" "$schema"
+
+jq -e '
+  [.phases[].phase] == [1, 2, 3, 4] and
+  [.phases[].nominal_subgroup_bits] == [20, 30, 60, 80] and
+  [.phases[].subgroup_bit_window] == [
+    {"minimum":18,"maximum":23},
+    {"minimum":27,"maximum":33},
+    {"minimum":56,"maximum":62},
+    {"minimum":76,"maximum":84}
+  ] and
+  ([.phases[].curves[].cell_id] | length) ==
+    ([.phases[].curves[].cell_id] | unique | length) and
+  all(.phases[];
+    .subgroup_bit_window as $window |
+    all(.curves[];
+      .size.subgroup_bits >= $window.minimum and
+      .size.subgroup_bits <= $window.maximum))
+' "$panel" >/dev/null
+
+while IFS=$'\t' read -r slug ec1 bits cofactor; do
+  jq -e --arg slug "$slug" --arg ec1 "$ec1" '
+    any(.curves[];
+      .slug == $slug and any(.representations[]; .ec1 == $ec1))
+  ' "$registry" >/dev/null
+  jq -e --arg slug "$slug" --argjson bits "$bits" --arg cofactor "$cofactor" '
+    any(.curves[];
+      .slug == $slug and .subgroup.bits == $bits and
+      .subgroup.cofactor == $cofactor and
+      .order_check.status == "proved" and .subgroup.status == "proved")
+  ' "$traits" >/dev/null
+done < <(jq -r '
+  .phases[].curves[] |
+  select(.identity.status == "registered") |
+  [.identity.icv1, .identity.ec1, .size.subgroup_bits, .cofactor] | @tsv
+' "$panel")
+
+jq -e '
+  .phases[] | select(.phase == 4) |
+  .admission_state == "blocked" and
+  all(.curves[] | select(.role == "external_anchor");
+    .identity.status == "pending_local_import" and
+    .identity.icv1 == null and .identity.ec1 == null and
+    .ecbench.status == "blocked_pending_registry_and_wide_backend" and
+    .ecbench.curve_spec == null)
+' "$panel" >/dev/null
+
+if command -v check-jsonschema >/dev/null 2>&1; then
+  check-jsonschema --schemafile "$schema" "$panel"
+fi
+
+printf '%s\n' "ecbench phased panel: identity, size-window, evidence, and readiness checks pass"

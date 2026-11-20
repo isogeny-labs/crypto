@@ -1,0 +1,72 @@
+[
+  {
+    "theorem": "ClearedChainOddSubgroup01.recover_annihilated_point",
+    "claim": "pcc/claims/PCC-20261116-e6ad94.json",
+    "normalized_statement": "theorem recover_annihilated_point {A : Type} [IntModule A] (d r u v : Int) (hbez : u*d + v*r = 1) (x : A) (hr : r \u2022 x = 0) : u \u2022 (d \u2022 x) = x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/odd-subgroup-chain-cancellation-final-02/ClearedChainOddSubgroup01.lean",
+      "theorem": "ClearedChainOddSubgroup01.recover_annihilated_point",
+      "decl_sha256": "d977e291ad23740c2bdeead2304eca66b74b133fc23dd84721d2a319379d81a9"
+    }
+  },
+  {
+    "theorem": "ClearedChainOddSubgroup01.cancel_on_annihilated_points",
+    "claim": "pcc/claims/PCC-20261116-869df9.json",
+    "normalized_statement": "theorem cancel_on_annihilated_points {A : Type} [IntModule A] (d r u v : Int) (hbez : u*d+v*r=1) (x y : A) (hx : r \u2022 x=0) (hy : r \u2022 y=0) (hclear : d \u2022 x=d \u2022 y) : x=y",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/odd-subgroup-chain-cancellation-final-02/ClearedChainOddSubgroup01.lean",
+      "theorem": "ClearedChainOddSubgroup01.cancel_on_annihilated_points",
+      "decl_sha256": "dc48d767b35beb7db2dcd85bdb0dc8894e231cfa2540ee43a61d5e2d1dc68869"
+    }
+  },
+  {
+    "theorem": "ClearedChainOddSubgroup01.cancel_cleared_maps_on_source_exponent",
+    "claim": "pcc/claims/PCC-20261116-1e7919.json",
+    "normalized_statement": "theorem cancel_cleared_maps_on_source_exponent {A B : Type} [IntModule A] [IntModule B] (f g : A \u2192 B) (fz : f 0=0) (gz : g 0=0) (fl : \u2200 (n : Int) x, f (n \u2022 x)=n \u2022 f x) (gl : \u2200 (n : Int) x, g (n \u2022 x)=n \u2022 g x) (d r u v : Int) (hbez : u*d+v*r=1) (hr : \u2200 x : A, r \u2022 x=0) (hclear : \u2200 x, d \u2022 f x=d \u2022 g x) : \u2200 x, f x=g x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/odd-subgroup-chain-cancellation-final-02/ClearedChainOddSubgroup01.lean",
+      "theorem": "ClearedChainOddSubgroup01.cancel_cleared_maps_on_source_exponent",
+      "decl_sha256": "eb75da92e00ea2a2bb9dc953e5f66da7900cde77ef72e751274e0d001174e0d1"
+    }
+  },
+  {
+    "theorem": "ClearedChainOddSubgroup01.two_hop_factorization_on_annihilated_outputs",
+    "claim": "pcc/claims/PCC-20261116-725549.json",
+    "normalized_statement": "theorem two_hop_factorization_on_annihilated_outputs {J0 J1 J2 E0 E1 E2 : Type} [IntModule J1] [IntModule J2] [IntModule E1] [IntModule E2] (f : J0 \u2192 J1) (g : J1 \u2192 J2) (h0 : J0 \u2192 E0) (k1 : E1 \u2192 J1) (h1 : J1 \u2192 E1) (k2 : E2 \u2192 J2) (a : E0 \u2192 E1) (b : E1 \u2192 E2) (hf : \u2200 x, (4 : Int) \u2022 f x=k1 (a (h0 x))) (hg : \u2200 x, (4 : Int) \u2022 g x=k2 (b (h1 x))) (hm : \u2200 e, h1 (k1 e)=(4 : Int) \u2022 e) (gl : \u2200 (n : Int) x, g (n \u2022 x)=n \u2022 g x) (bl : \u2200 (n : Int) e, b (n \u2022 e)=n \u2022 b e) (kl : \u2200 (n : Int) e, k2 (n \u2022 e)=n \u2022 k2 e) (r u v : Int) (hbez : u*4+v*r=1) (x : J0) (hleft : r \u2022 g (f x)=0) (hright : r \u2022 k2 (b (a (h0 x)))=0) : (4 : Int) \u2022 g (f x)=k2 (b (a (h0 x)))",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/odd-subgroup-chain-cancellation-final-02/ClearedChainOddSubgroup01.lean",
+      "theorem": "ClearedChainOddSubgroup01.two_hop_factorization_on_annihilated_outputs",
+      "decl_sha256": "845a30507e1505e219ea5d7161f0f450b1e67c8ada29260678aed464df4db254"
+    }
+  },
+  {
+    "theorem": "ClearedChainOddSubgroup01.quarter_order109",
+    "claim": "pcc/claims/PCC-20261116-71025c.json",
+    "normalized_statement": "theorem quarter_order109 {A : Type} [IntModule A] (x : A) (hr : (109 : Int) \u2022 x=0) : (82 : Int) \u2022 ((4 : Int) \u2022 x)=x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/odd-subgroup-chain-cancellation-final-02/ClearedChainOddSubgroup01.lean",
+      "theorem": "ClearedChainOddSubgroup01.quarter_order109",
+      "decl_sha256": "2db0eabe639df1ec9c9fe2a061f67f816c7f7d15ea74b350cd58a69cb168dabd"
+    }
+  },
+  {
+    "theorem": "ClearedChainOddSubgroup01.quarter_order113",
+    "claim": "pcc/claims/PCC-20261116-722066.json",
+    "normalized_statement": "theorem quarter_order113 {A : Type} [IntModule A] (x : A) (hr : (113 : Int) \u2022 x=0) : (85 : Int) \u2022 ((4 : Int) \u2022 x)=x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/odd-subgroup-chain-cancellation-final-02/ClearedChainOddSubgroup01.lean",
+      "theorem": "ClearedChainOddSubgroup01.quarter_order113",
+      "decl_sha256": "c97b882db7f3de79698ac8db545d1f0f1bc9799d6bc059bf62fb8e2e721d01b6"
+    }
+  },
+  {
+    "theorem": "ClearedChainOddSubgroup01.quarter_order12317",
+    "claim": "pcc/claims/PCC-20261116-65df52.json",
+    "normalized_statement": "theorem quarter_order12317 {A : Type} [IntModule A] (x : A) (hr : (12317 : Int) \u2022 x=0) : (9238 : Int) \u2022 ((4 : Int) \u2022 x)=x",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/evidence/odd-subgroup-chain-cancellation-final-02/ClearedChainOddSubgroup01.lean",
+      "theorem": "ClearedChainOddSubgroup01.quarter_order12317",
+      "decl_sha256": "fc29edc5bc3c8be83cf205f54343711ba204ee60438e291c12e00c02e2bea3fb"
+    }
+  }
+]

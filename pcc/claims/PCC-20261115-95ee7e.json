@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-15T20:44:33Z",
+ "id": "PCC-20261115-95ee7e",
+ "kind": "statement",
+ "producer": {
+  "commit": "62214e5bc8869aadb9712696dcfaa320449dd2d2",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/binary_subtract_frontier_20261115/openssl_control.cpp",
+    "sha256": "d62506166008591725a1133ce813363b6fae15c388e10e50de9cc1f6b6390333"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/binary_subtract_frontier_20261115/evidence/openssl-y-zero-control.txt",
+    "sha256": "6516735e146562b34df4b8c5ff9ce7133bea6c0fb969b6aad3b0f8752a8adddd"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/binary_subtract_frontier_20261115",
+ "statement": "Producer development observation: OpenSSL 3.5.7 EC_POINT_invert on the binary curve over GF(128) with modulus 131,a=0,b=1 leaves the affine point (1,0) unchanged, producing wrong first-witness outputs for a base containing that point. The primary ec2_smpl.c invert source returns early when Y is zero. The matched control applies affine (x,y)->(x,x+y) with OpenSSL BN field addition and then uses EC_POINT_add; its two known-answer cases return the expected outputs. This is a bounded correctness control, not an independent signed verdict or performance claim."
+}

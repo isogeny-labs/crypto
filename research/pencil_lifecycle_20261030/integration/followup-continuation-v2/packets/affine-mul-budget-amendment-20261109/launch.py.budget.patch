@@ -1,0 +1,53 @@
+--- previous/launch.py
++++ amended/launch.py
+@@ -25,7 +25,7 @@
+ assert release['campaign_total_seconds']==43200 and release['deadline']=='2026-11-10T05:11:39Z'
+ assert type(F['prior_attempt_conservative_debit_seconds']) is int, 'campaign ledger binding pending'
+ assert type(F['remaining_before_attempt_seconds']) is int
+-assert 0<=F['prior_attempt_conservative_debit_seconds']<=43200-10800
++assert 0<=F['prior_attempt_conservative_debit_seconds']<=43200-10200
+ assert F['prior_attempt_conservative_debit_seconds']+F['remaining_before_attempt_seconds']==43200
+ assert release['prior_debit_seconds']==F['prior_attempt_conservative_debit_seconds']
+ assert release['remaining_before_attempt_seconds']==F['remaining_before_attempt_seconds']
+@@ -43,7 +43,7 @@
+  assert hashlib.sha256(path.read_bytes()).hexdigest()==binding['sha256'],('release receipt',name)
+ # Coordinator authenticates these receipts and maintains the live lease throughout.
+ # Phase ownership/cgroup checks below remain the original runtime authority.
+-assert time.time()+10800<DEADLINE,'insufficient absolute deadline allowance'
++assert time.time()+10200<DEADLINE,'insufficient absolute deadline allowance'
+ assert not W.exists(),'existing native workspace; no retries'
+ O.mkdir(mode=0o700)  # exclusive admission: existing outer directory also rejects repeats
+ start=time.monotonic()
+@@ -89,7 +89,7 @@
+  durable(name+'-manager-terminal.json',{'invocation_id':invocation,'records':exact,'source':'local privileged manager journal','boot':BOOT})
+  return True
+ def phase_run(cmd,unit,phase,limit):
+- phase_start=time.monotonic();end=min(phase_start+limit,start+10800,time.monotonic()+DEADLINE-time.time())
++ phase_start=time.monotonic();end=min(phase_start+limit,start+10200,time.monotonic()+DEADLINE-time.time())
+  errors=[];invocation=None;proc=None;rc=None;terminal=False;timed_out=False
+  log_out=O/(phase+'-systemd.stdout');log_err=O/(phase+'-systemd.stderr')
+  try:
+@@ -144,11 +144,11 @@
+ results=[]
+ try:
+  durable('coordinator-release.json',release)
+- durable('admission.json',{'freeze_sha256':a.freeze_sha256,'start_utc_seconds':time.time(),'campaign_seconds':43200,'prior_debit_seconds':release['prior_debit_seconds'],'remaining_before_attempt_seconds':release['remaining_before_attempt_seconds'],'historical_campaign_debit_seconds':5400,'historical_norm_attempts_consumed':3,'historical_norm_attempt_ceiling':3,'current_lane':'affine_mul_replay','successor_attempt_limit':1,'coordinator_release_sha256':a.release_sha256,'boot_id':BOOT,'continuation_ceiling_seconds':10800,'deadline':DEADLINE,'retries':0})
+- for phase,limit in [('pre',900),('compiler',9000),('post',900)]:
++ durable('admission.json',{'freeze_sha256':a.freeze_sha256,'start_utc_seconds':time.time(),'campaign_seconds':43200,'prior_debit_seconds':release['prior_debit_seconds'],'remaining_before_attempt_seconds':release['remaining_before_attempt_seconds'],'historical_campaign_debit_seconds':5400,'historical_norm_attempts_consumed':3,'historical_norm_attempt_ceiling':3,'current_lane':'affine_mul_replay','successor_attempt_limit':1,'coordinator_release_sha256':a.release_sha256,'boot_id':BOOT,'continuation_ceiling_seconds':10200,'deadline':DEADLINE,'retries':0})
++ for phase,limit in [('pre',900),('compiler',8400),('post',900)]:
+   if phase=='compiler' and not results[-1]['passed']:break
+   # Post-custody remains required after any compiler attempt, including failed attempts.
+-  assert time.time()+limit<DEADLINE and time.monotonic()-start+limit<=10800,'insufficient remaining phase allowance'
++  assert time.time()+limit<DEADLINE and time.monotonic()-start+limit<=10200,'insufficient remaining phase allowance'
+   unit='pencil-affine-mul-20261109-'+phase
+   cmd=['sudo','-n','systemd-run','--unit='+unit,'--wait',
+    '--property=User=ec2-user','--property=WorkingDirectory='+str(P),
+@@ -166,7 +166,7 @@
+   if not row['terminal_owner_confirmed']:break
+   # No automatic retry. A failed pre ends here; compiler failure still gets post custody.
+   if phase=='pre' and not passed:break
+- passed=len(results)==3 and all(r['passed'] for r in results) and time.monotonic()-start<10800 and time.time()<DEADLINE
++ passed=len(results)==3 and all(r['passed'] for r in results) and time.monotonic()-start<10200 and time.time()<DEADLINE
+  durable('completion.json',{'status':'passed' if passed else 'failed','phases':results,'elapsed_seconds':time.monotonic()-start,'machine_review_complete':passed,'costs_are_worker_wall_not_cpu':True})
+  raise SystemExit(0 if passed else 1)
+ except Exception as e:

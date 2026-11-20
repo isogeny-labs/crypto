@@ -1,0 +1,270 @@
+[
+    {
+        "Id": "5f48c1f183a8ceddf88e91b526392d5d8637b0433b0b8755cd6b5c9666f06238",
+        "Created": "2026-11-16T15:25:30.876096603Z",
+        "Path": "sh",
+        "Args": [
+            "-ec",
+            "\n    test \"$(uname -m)\" = aarch64\n    test \"$(cat /sys/fs/cgroup/memory.max)\" = 2147483648\n    test \"$(cat /sys/fs/cgroup/memory.swap.max)\" = 0\n    test \"$(cat /sys/fs/cgroup/cpu.max)\" = \"100000 100000\"\n    test \"$(cat /sys/fs/cgroup/pids.max)\" = 128\n    test \"$(sha256sum \"$INPUT_ROOT/good/objects/3e85c9e419fcddd3c9faed3c84470bf96fcad9178e48e1d73629369335841ecf.jsonl.gz\" | cut -d \" \" -f 1)\" = 3e85c9e419fcddd3c9faed3c84470bf96fcad9178e48e1d73629369335841ecf\n    \"$BINARY_PATH\" primary-v5-retained-binding-check 26960859236 \"$INPUT_ROOT/good\" > \"$OUTPUT_ROOT/exact.json\" 2> \"$OUTPUT_ROOT/exact.stderr\"\n    set +e\n    \"$BINARY_PATH\" primary-v5-retained-binding-check 26960859237 \"$INPUT_ROOT/good\" > \"$OUTPUT_ROOT/adjacent.stdout\" 2> \"$OUTPUT_ROOT/adjacent.stderr\"\n    adjacent=$?\n    \"$BINARY_PATH\" primary-v5-retained-binding-check 26960859236 \"$INPUT_ROOT/bad-manifest\" > \"$OUTPUT_ROOT/bad-manifest.stdout\" 2> \"$OUTPUT_ROOT/bad-manifest.stderr\"\n    bad_manifest=$?\n    set -e\n    printf \"%s\\n\" \"$adjacent\" > \"$OUTPUT_ROOT/adjacent.exit\"\n    printf \"%s\\n\" \"$bad_manifest\" > \"$OUTPUT_ROOT/bad-manifest.exit\"\n    test \"$adjacent\" -ne 0 && test \"$bad_manifest\" -ne 0\n    grep -Fq \"no retained v5 adapter for this ordinal\" \"$OUTPUT_ROOT/adjacent.stderr\"\n    grep -Fq \"retained K600 store manifest differs\" \"$OUTPUT_ROOT/bad-manifest.stderr\"\n  "
+        ],
+        "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-11-16T15:25:30.898908149Z",
+            "FinishedAt": "2026-11-16T15:25:30.989770919Z"
+        },
+        "Image": "sha256:2d67b100bee2048d32ea8feb5170be2b13c61d6c70949fbc21c0ffbbff1a4573",
+        "ResolvConfPath": "/var/lib/docker/containers/5f48c1f183a8ceddf88e91b526392d5d8637b0433b0b8755cd6b5c9666f06238/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/5f48c1f183a8ceddf88e91b526392d5d8637b0433b0b8755cd6b5c9666f06238/hostname",
+        "HostsPath": "/var/lib/docker/containers/5f48c1f183a8ceddf88e91b526392d5d8637b0433b0b8755cd6b5c9666f06238/hosts",
+        "LogPath": "/var/lib/docker/containers/5f48c1f183a8ceddf88e91b526392d5d8637b0433b0b8755cd6b5c9666f06238/5f48c1f183a8ceddf88e91b526392d5d8637b0433b0b8755cd6b5c9666f06238-json.log",
+        "Name": "/n83-v5-linux-binding-20261116-attempt-1",
+        "RestartCount": 0,
+        "Driver": "overlayfs",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "docker-default",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "none",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "CapAdd": null,
+            "CapDrop": [
+                "ALL"
+            ],
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": true,
+            "SecurityOpt": [
+                "no-new-privileges"
+            ],
+            "Tmpfs": {
+                "/tmp": "rw,size=64m"
+            },
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 2147483648,
+            "NanoCpus": 1000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": [],
+            "BlkioDeviceWriteBps": [],
+            "BlkioDeviceReadIOps": [],
+            "BlkioDeviceWriteIOps": [],
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 2147483648,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": 128,
+            "Ulimits": [],
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "Mounts": [
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-v5-exporter-source-20261116",
+                    "Target": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-v5-exporter-source-20261116",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/private/tmp/n83-v5-colima-output-20261116/attempt-5/target/release/examples/koblitz_n83_factor_base_export",
+                    "Target": "/private/tmp/n83-v5-colima-output-20261116/attempt-5/target/release/examples/koblitz_n83_factor_base_export",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990-2/tmp/n83-colima-output/v5-linux-binding-20261116/attempt-1/input",
+                    "Target": "/Volumes/SSD990-2/tmp/n83-colima-output/v5-linux-binding-20261116/attempt-1/input",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990-2/tmp/n83-colima-output/v5-linux-binding-20261116/attempt-1/run",
+                    "Target": "/Volumes/SSD990-2/tmp/n83-colima-output/v5-linux-binding-20261116/attempt-1/run"
+                }
+            ],
+            "MaskedPaths": [
+                "/proc/acpi",
+                "/proc/asound",
+                "/proc/interrupts",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/sys/devices/virtual/powercap",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "Storage": {
+            "RootFS": {
+                "Snapshot": {
+                    "Name": "overlayfs"
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-v5-exporter-source-20261116",
+                "Destination": "/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-v5-exporter-source-20261116",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/private/tmp/n83-v5-colima-output-20261116/attempt-5/target/release/examples/koblitz_n83_factor_base_export",
+                "Destination": "/private/tmp/n83-v5-colima-output-20261116/attempt-5/target/release/examples/koblitz_n83_factor_base_export",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990-2/tmp/n83-colima-output/v5-linux-binding-20261116/attempt-1/input",
+                "Destination": "/Volumes/SSD990-2/tmp/n83-colima-output/v5-linux-binding-20261116/attempt-1/input",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990-2/tmp/n83-colima-output/v5-linux-binding-20261116/attempt-1/run",
+                "Destination": "/Volumes/SSD990-2/tmp/n83-colima-output/v5-linux-binding-20261116/attempt-1/run",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "5f48c1f183a8",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "ICV1_FROZEN_SOURCE_DIR=/Volumes/SSD990-2/tmp/n83-colima-inputs/n83-v5-exporter-source-20261116",
+                "BINARY_PATH=/private/tmp/n83-v5-colima-output-20261116/attempt-5/target/release/examples/koblitz_n83_factor_base_export",
+                "INPUT_ROOT=/Volumes/SSD990-2/tmp/n83-colima-output/v5-linux-binding-20261116/attempt-1/input",
+                "OUTPUT_ROOT=/Volumes/SSD990-2/tmp/n83-colima-output/v5-linux-binding-20261116/attempt-1/run",
+                "RAYON_NUM_THREADS=1",
+                "PATH=/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "RUSTUP_HOME=/usr/local/rustup",
+                "CARGO_HOME=/usr/local/cargo",
+                "RUST_VERSION=1.99.1"
+            ],
+            "Cmd": [
+                "sh",
+                "-ec",
+                "\n    test \"$(uname -m)\" = aarch64\n    test \"$(cat /sys/fs/cgroup/memory.max)\" = 2147483648\n    test \"$(cat /sys/fs/cgroup/memory.swap.max)\" = 0\n    test \"$(cat /sys/fs/cgroup/cpu.max)\" = \"100000 100000\"\n    test \"$(cat /sys/fs/cgroup/pids.max)\" = 128\n    test \"$(sha256sum \"$INPUT_ROOT/good/objects/3e85c9e419fcddd3c9faed3c84470bf96fcad9178e48e1d73629369335841ecf.jsonl.gz\" | cut -d \" \" -f 1)\" = 3e85c9e419fcddd3c9faed3c84470bf96fcad9178e48e1d73629369335841ecf\n    \"$BINARY_PATH\" primary-v5-retained-binding-check 26960859236 \"$INPUT_ROOT/good\" > \"$OUTPUT_ROOT/exact.json\" 2> \"$OUTPUT_ROOT/exact.stderr\"\n    set +e\n    \"$BINARY_PATH\" primary-v5-retained-binding-check 26960859237 \"$INPUT_ROOT/good\" > \"$OUTPUT_ROOT/adjacent.stdout\" 2> \"$OUTPUT_ROOT/adjacent.stderr\"\n    adjacent=$?\n    \"$BINARY_PATH\" primary-v5-retained-binding-check 26960859236 \"$INPUT_ROOT/bad-manifest\" > \"$OUTPUT_ROOT/bad-manifest.stdout\" 2> \"$OUTPUT_ROOT/bad-manifest.stderr\"\n    bad_manifest=$?\n    set -e\n    printf \"%s\\n\" \"$adjacent\" > \"$OUTPUT_ROOT/adjacent.exit\"\n    printf \"%s\\n\" \"$bad_manifest\" > \"$OUTPUT_ROOT/bad-manifest.exit\"\n    test \"$adjacent\" -ne 0 && test \"$bad_manifest\" -ne 0\n    grep -Fq \"no retained v5 adapter for this ordinal\" \"$OUTPUT_ROOT/adjacent.stderr\"\n    grep -Fq \"retained K600 store manifest differs\" \"$OUTPUT_ROOT/bad-manifest.stderr\"\n  "
+            ],
+            "Image": "sha256:2d67b100bee2048d32ea8feb5170be2b13c61d6c70949fbc21c0ffbbff1a4573",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "Labels": {
+                "org.opencontainers.image.source": "https://github.com/rust-lang/docker-rust"
+            }
+        },
+        "NetworkSettings": {
+            "SandboxID": "",
+            "SandboxKey": "",
+            "Ports": {},
+            "Networks": {
+                "none": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "DriverOpts": null,
+                    "GwPriority": 0,
+                    "NetworkID": "d9e04ab857b7fb4a36efbe7e93e3a45eb4739d4ab7f7d9b14c89eb7cd444f4c2",
+                    "EndpointID": "",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "MacAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:08323aa37a9a6bdf87c250655aae3a1cfa3cbd09f3b30caf3561f0bfc6ad942d",
+            "size": 1449,
+            "platform": {
+                "architecture": "arm64",
+                "os": "linux"
+            }
+        }
+    }
+]

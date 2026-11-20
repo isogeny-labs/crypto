@@ -1,0 +1,14 @@
+[package]
+name="hec-hyperedge"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../crates/hec-native-ic"}
+[[bin]]
+name="hyperedge-rank"
+path="main.rs"
+
+[[bin]]
+name="hyperedge-first-verify"
+path="verify.rs"

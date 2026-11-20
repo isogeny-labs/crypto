@@ -1,0 +1,7 @@
+# Source and claim boundaries
+
+Gaudry, Theriault, Thome author-hosted February2005draft, sections2/3: https://cacr.uwaterloo.ca/techreports/2004/corr2004-29.pdf . Known large-prime/full-matrix indexcalculus; later2007publishedversion includes Diem. Reviewed source before the complete-solver gate.
+
+Current priorart/code: ../hec_hyperedge_20261116/RESULTS.md and protocols; ../hec_anchor_relations_20261114/{anchor.rs,dense.rs,compact.rs,orbit.rs}; ../../crates/hec-native-ic/src/{ic.rs,solve.rs}; historical table pipeline and documented local compatibility clone. Independent algorithms share native field/curve primitives; no independently signed result claimed.
+
+Next-family literature screen (not implemented here): D'Andrea/Krick/Szanto, Subresultants,Sylvester sums and rational interpolation, https://arxiv.org/html/1211.6895v3 . Introduction distinguishes ordinary distinct-node interpolation and osculatory rational interpolation with multiplicities; section4/theorem4.2 gives determinant formulas. Prior distinct-anchor constructor used sections2/3; repeated-anchor construction would need its own proof/gate, including denominator nonvanishing, primitive factors and branch uniformizers. Primary CONICETrepositoryURL initially returned restricted-fetch failure; arXivauthorpaper accessed successfully. Classical Hermite/rational interpolation is not new, and a local text search is not a novelty proof.

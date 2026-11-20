@@ -1,0 +1,83 @@
+{
+  "schema": "actual-function-divisor-verification/v1",
+  "source_commit": "1d301907f045de402aff98cb5aac7d240ae4abe5",
+  "claim_id": "PCC-20261115-c81d29",
+  "declaration_sha256": "f4c0c971036efced202ba6da453857cdaaaa70f6e116619f5839ce5d10ad1b1b",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 42,
+  "gate_declarations": 334,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 220,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-c81d29",
+    "claim_sha256": "64bd644baa209f4aedd2687837093e047d5caa864d8b6a39a94de0a421c8ffa0",
+    "commit": "1d301907f045de402aff98cb5aac7d240ae4abe5",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/function_divisor_finiteness_audit_20261115/lean (FunctionDivisorCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T07:24:51Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-c81d29",
+    "claim_sha256": "64bd644baa209f4aedd2687837093e047d5caa864d8b6a39a94de0a421c8ffa0",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46987,
+    "sha256": "47bce0510c48584468bfe53ba65ce2cbfd63fd74aacc950a9ec6dd1dc811b00f",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 334,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "exact_reused_credited_modules": 33,
+    "new_modules": 6,
+    "actual_every_nonzero_function_finiteness": true,
+    "actual_divisor_homomorphism_and_principal_subgroup": true,
+    "actual_miller_compatibility": true,
+    "actual_nonconstant_normalized_F3_zero_rational_point_divisor_counter": true,
+    "arbitrary_field_scope": "ActualnonsingularKpoints; ellipticmodeloveralgclosedK includesallgeometricpoints. F3counterdeliberatelyrational-only.",
+    "geometric_degree_zero_or_constant_kernel": false,
+    "chosen_function_uniqueness_or_binary_refinement": false,
+    "mathlib_projective_Scheme_localRing_Divisor_comparison": false,
+    "algebraic_closure_basechange_or_canonical_pairing": false,
+    "full_original14_completion": false,
+    "independent_implementation_or_physicalhost_validation": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

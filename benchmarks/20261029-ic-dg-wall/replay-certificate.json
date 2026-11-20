@@ -1,0 +1,396 @@
+{
+ "schema": "replay-certificate/v1",
+ "id": "VAL-20261029-2e37e7-replay",
+ "experiment": "XP-20261029-dg-wall",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "replayer": "Validator subagent (claude-opus-5-5): not the protocol author, director, executor or analyst",
+ "method": "ecbench verify --dir <copy> --replay-all --exit-code --out <audit.json> on a byte-identical copy of each committed session (host.json, plan.json, records.jsonl, session.json, spec.json; hashes equal to the job's SHA256SUMS and to the S3 originals), on the validator host. --replay-all re-executes every measured deterministic run and requires identical counted scalars (GAE, phase counts, native counters, recovered logarithm); it also re-checks every record seal, the plan, host and spec hashes and the session's completeness.",
+ "binary": {
+  "path": "/dev/shm/isolab-build/ecbench",
+  "sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+  "note": "the same binary as the image (no other binary contains these targets); the replay host differs from the measuring pods"
+ },
+ "replay_host": {
+  "kernel": "6.18.44-fc-v185",
+  "machine": "x86_64",
+  "cpus": 4,
+  "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz"
+ },
+ "measuring_host_class": "EKS c8a.2xlarge pods, env class ECBENV3hc1c5e5126853",
+ "what_is_not_replayable": "wall time. The replay verifies counted scalars only; the wall statistic's admissibility rests on the in-job L2 grading, the native A/A admission and the validator's recompute from records.jsonl.",
+ "runs": [
+  {
+   "size": "P24",
+   "session_kind": "wall",
+   "job": "ic-dgw-p24-20261029",
+   "pod_uid": "cf67b9ea-0711-4cb3-ae80-b07bcfc23a1d",
+   "session_id": "ECBS1h70619e799ebb",
+   "session_status": "complete",
+   "records": 1680,
+   "verified_records": 1680,
+   "measured_runs": 1440,
+   "replays": 1440,
+   "replays_identical": 1440,
+   "problems": 0,
+   "ok": true,
+   "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "host_hash": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "replays": true,
+    "session_complete": true,
+    "spec_id": true,
+    "workloads": true
+   },
+   "auditor_binary_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+   "auditor_env_class_id": "ECBENV3h13e37662a118",
+   "auditor_hardware_class_id": "ECBHW1he9e33daae9e7",
+   "audited_unix_ms": 1793271329589,
+   "replay_audit_path": "replay/P24-wall/audit.json",
+   "replay_audit_sha256": "fac4d94df73cab69546569b0a1e250b2742b260f45f2761997e7c16ffecfc5a9",
+   "verify_log": [
+    "start 2026-10-29T10:55:00Z cpu=4 binary=88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+    "end rc=0 2026-10-29T10:55:29Z",
+    ""
+   ],
+   "verify_stderr": [
+    "receipt sha256 fac4d94df73cab69546569b0a1e250b2742b260f45f2761997e7c16ffecfc5a9",
+    "audit OK: 1680 records, 1680 verified, 1440 replays reproduced, 0 problems"
+   ],
+   "session_files_sha256_before": [
+    "6a09cd08585f46c27b98a19da1ea12bbc2c0aef28c87678b25276f9aa4a828ca  host.json",
+    "1c0af0d2ce79d3e2c9250b3f84998d530ba8fd4f32ad1c2d3e20991a53b822c3  plan.json",
+    "2439e97e4f108a384ca1ea70fdc2b4be5aad5f97b15377ffabeaa4842df02490  records.jsonl",
+    "bfc88554d1b791497c2e89cf0d27034cd11062f3acbd491c6ecbe71e974b5a1a  session.json",
+    "cd7d7721a278a89285d16befe125f826dd34a7fdb15f0923c57a43e5c2cecf4c  spec.json"
+   ],
+   "session_files_unchanged_after": true,
+   "session_files_equal_committed_SHA256SUMS": true,
+   "producer_in_job_audit_sha256": "26549df55b8de3d4c7dc9c2e7f8a3c27ff22f1dd919f42fdf4443349f8cedc4d",
+   "session_records_sha256": "2439e97e4f108a384ca1ea70fdc2b4be5aad5f97b15377ffabeaa4842df02490",
+   "pass": true
+  },
+  {
+   "size": "P24",
+   "session_kind": "counted",
+   "job": "ic-dgw-rho-p24-20261029",
+   "pod_uid": "99417436-ee70-41ec-beab-bb3d726f1edd",
+   "session_id": "ECBS1h0c9a2859026c",
+   "session_status": "complete",
+   "records": 1344,
+   "verified_records": 1344,
+   "measured_runs": 1152,
+   "replays": 1152,
+   "replays_identical": 1152,
+   "problems": 0,
+   "ok": true,
+   "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "host_hash": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "replays": true,
+    "session_complete": true,
+    "spec_id": true,
+    "workloads": true
+   },
+   "auditor_binary_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+   "auditor_env_class_id": "ECBENV3h13e37662a118",
+   "auditor_hardware_class_id": "ECBHW1he9e33daae9e7",
+   "audited_unix_ms": 1793271318557,
+   "replay_audit_path": "replay/P24-counted/audit.json",
+   "replay_audit_sha256": "c2f970ecf89d460b4f78a273747eee525978db5fbbf068408fb4e9520ee1e220",
+   "verify_log": [
+    "start 2026-10-29T10:55:00Z cpu=4 binary=88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+    "end rc=0 2026-10-29T10:55:18Z",
+    ""
+   ],
+   "verify_stderr": [
+    "receipt sha256 c2f970ecf89d460b4f78a273747eee525978db5fbbf068408fb4e9520ee1e220",
+    "audit OK: 1344 records, 1344 verified, 1152 replays reproduced, 0 problems"
+   ],
+   "session_files_sha256_before": [
+    "0171fce234a20504ee4b038f6d6c780a13e6058f240048435d3b9d4cd9bd5e4f  host.json",
+    "ae8f8228a3b6404ea072bff8b6d9cb8c71a2e34b84945764bd9df9b347798c60  plan.json",
+    "e993154378dcd52a857208c6e837cb7d01fe7ccc5f37d1d2358037bc49c5da0f  records.jsonl",
+    "6287f25eceb2163bc1af178fec27122a437bcbf8cab9fa5e9a73a168284f1602  session.json",
+    "58d7459c2e8e0fd2989d1b0a81015ba8f42034db14a26fa74f311278c6448155  spec.json"
+   ],
+   "session_files_unchanged_after": true,
+   "session_files_equal_committed_SHA256SUMS": true,
+   "producer_in_job_audit_sha256": "ba8724a526ed244dd9067231603f171b552f381bd4bd675b5396b7f6e8bf6d7b",
+   "session_records_sha256": "e993154378dcd52a857208c6e837cb7d01fe7ccc5f37d1d2358037bc49c5da0f",
+   "pass": true
+  },
+  {
+   "size": "P28",
+   "session_kind": "wall",
+   "job": "ic-dgw-p28-20261029",
+   "pod_uid": "e20f20c1-238e-4834-914e-d7e68c059d6a",
+   "session_id": "ECBS1h1ef145fb521c",
+   "session_status": "complete",
+   "records": 1680,
+   "verified_records": 1680,
+   "measured_runs": 1440,
+   "replays": 1440,
+   "replays_identical": 1440,
+   "problems": 0,
+   "ok": true,
+   "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "host_hash": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "replays": true,
+    "session_complete": true,
+    "spec_id": true,
+    "workloads": true
+   },
+   "auditor_binary_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+   "auditor_env_class_id": "ECBENV3h13e37662a118",
+   "auditor_hardware_class_id": "ECBHW1he9e33daae9e7",
+   "audited_unix_ms": 1793271419492,
+   "replay_audit_path": "replay/P28-wall/audit.json",
+   "replay_audit_sha256": "8a335637dd84c7c61947bd5123607a768e337f75c0950c117f9bb65931132fc8",
+   "verify_log": [
+    "start 2026-10-29T10:55:29Z cpu=4 binary=88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+    "end rc=0 2026-10-29T10:56:59Z",
+    ""
+   ],
+   "verify_stderr": [
+    "receipt sha256 8a335637dd84c7c61947bd5123607a768e337f75c0950c117f9bb65931132fc8",
+    "audit OK: 1680 records, 1680 verified, 1440 replays reproduced, 0 problems"
+   ],
+   "session_files_sha256_before": [
+    "b218bee511195ab0a39a02e9c85c096834ef993b78471a9c263ff46e7a41c067  host.json",
+    "d6b8bf112b03ac2676fa86f346bc7d65fd5c40600f4c0208aa7829063a8c8c01  plan.json",
+    "c21aca6cd0ef0147fc6c83ad7dcfda32c324a2191ba5338bd4dd9d907ef3dee6  records.jsonl",
+    "7c0a019161d04ff63b5c665a4c33bec1a010b4e0668c5ce964cbba66920f3855  session.json",
+    "9a15d997a487cc3195740c5d0f213da0e8aaf929e30e256456083343a3268ec0  spec.json"
+   ],
+   "session_files_unchanged_after": true,
+   "session_files_equal_committed_SHA256SUMS": true,
+   "producer_in_job_audit_sha256": "dbc6db30336fd1791a9548e14a496b8c2b981ccb0adc9e9dba10a89d003c254d",
+   "session_records_sha256": "c21aca6cd0ef0147fc6c83ad7dcfda32c324a2191ba5338bd4dd9d907ef3dee6",
+   "pass": true
+  },
+  {
+   "size": "P28",
+   "session_kind": "counted",
+   "job": "ic-dgw-rho-p28-20261029",
+   "pod_uid": "9b4236aa-613e-435b-b1ed-e28a07f64a23",
+   "session_id": "ECBS1h6f4f2f3b72ab",
+   "session_status": "complete",
+   "records": 1344,
+   "verified_records": 1344,
+   "measured_runs": 1152,
+   "replays": 1152,
+   "replays_identical": 1152,
+   "problems": 0,
+   "ok": true,
+   "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "host_hash": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "replays": true,
+    "session_complete": true,
+    "spec_id": true,
+    "workloads": true
+   },
+   "auditor_binary_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+   "auditor_env_class_id": "ECBENV3h13e37662a118",
+   "auditor_hardware_class_id": "ECBHW1he9e33daae9e7",
+   "audited_unix_ms": 1793271373359,
+   "replay_audit_path": "replay/P28-counted/audit.json",
+   "replay_audit_sha256": "e76c3d00cb3d8249b8869bf06b0a953e7d0d96c008bc7159106fb9791400fb13",
+   "verify_log": [
+    "start 2026-10-29T10:55:29Z cpu=4 binary=88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+    "end rc=0 2026-10-29T10:56:13Z",
+    ""
+   ],
+   "verify_stderr": [
+    "receipt sha256 e76c3d00cb3d8249b8869bf06b0a953e7d0d96c008bc7159106fb9791400fb13",
+    "audit OK: 1344 records, 1344 verified, 1152 replays reproduced, 0 problems"
+   ],
+   "session_files_sha256_before": [
+    "5b2193f913228bf748e15e9384960aac2f9a818adbdd9b461927a6f1ae865b62  host.json",
+    "089cccb06bec6f1eb01295d6703e1b96d44faca8b888c18b24ca6578289bf3d4  plan.json",
+    "a1e906cdd2cda363cf53283968b6fe2d5679bc744962149ca7a2f95f98710a6a  records.jsonl",
+    "bfac828ee5b7b361099a9737219d01d9421dfe90a469132d37741527019d35a4  session.json",
+    "b87d2c855e92051640401ec1c810dafb97d996be4ca8ea3ad1b421ecda12d901  spec.json"
+   ],
+   "session_files_unchanged_after": true,
+   "session_files_equal_committed_SHA256SUMS": true,
+   "producer_in_job_audit_sha256": "2febe46d7d1c8886df52edee579618be256847b642f6ac27cb1eb1e410c95ab7",
+   "session_records_sha256": "a1e906cdd2cda363cf53283968b6fe2d5679bc744962149ca7a2f95f98710a6a",
+   "pass": true
+  },
+  {
+   "size": "P32",
+   "session_kind": "wall",
+   "job": "ic-dgw-p32-20261029",
+   "pod_uid": "0a2c6cc8-9100-4049-b2d0-5dafe097721d",
+   "session_id": "ECBS1h353fffc21b5e",
+   "session_status": "complete",
+   "records": 1680,
+   "verified_records": 1680,
+   "measured_runs": 1440,
+   "replays": 1440,
+   "replays_identical": 1440,
+   "problems": 0,
+   "ok": true,
+   "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "host_hash": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "replays": true,
+    "session_complete": true,
+    "spec_id": true,
+    "workloads": true
+   },
+   "auditor_binary_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+   "auditor_env_class_id": "ECBENV3h13e37662a118",
+   "auditor_hardware_class_id": "ECBHW1he9e33daae9e7",
+   "audited_unix_ms": 1793272210182,
+   "replay_audit_path": "replay/P32-wall/audit.json",
+   "replay_audit_sha256": "627fdee48f24f94e083e924f3579bff8d79a09d2c0487050571b9b55abaf424b",
+   "verify_log": [
+    "start 2026-10-29T10:56:59Z cpu=4 binary=88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+    "end rc=0 2026-10-29T11:10:10Z",
+    ""
+   ],
+   "verify_stderr": [
+    "receipt sha256 627fdee48f24f94e083e924f3579bff8d79a09d2c0487050571b9b55abaf424b",
+    "audit OK: 1680 records, 1680 verified, 1440 replays reproduced, 0 problems"
+   ],
+   "session_files_sha256_before": [
+    "c4666d4e407c99bb5397b86a9e9162bdee75930d29de963386b7afbb1eacdad9  host.json",
+    "9971e33c7a2e8cdb3a8aad7868824caefa7d1c6540fd04b68f4f263267c9117a  plan.json",
+    "4946437c845951705bae6fea87fed298f7aeaf32f16bce0bc6374c8243ddf586  records.jsonl",
+    "096e13783be507a84caf0068e8bc95839e014f13899f6ade0c971efd7168a908  session.json",
+    "145a3efc3f561e9cb1b010f570e54b27a801d4156a246c171e3ad3fe6933944c  spec.json"
+   ],
+   "session_files_unchanged_after": true,
+   "session_files_equal_committed_SHA256SUMS": true,
+   "producer_in_job_audit_sha256": "b06948d81306a138ad566fbffe19f0cef79f87d11c04fffbe423071eda5a59e5",
+   "session_records_sha256": "4946437c845951705bae6fea87fed298f7aeaf32f16bce0bc6374c8243ddf586",
+   "pass": true
+  },
+  {
+   "size": "P32",
+   "session_kind": "counted",
+   "job": "ic-dgw-rho-p32-20261029",
+   "pod_uid": "e4ad7560-2a77-415f-af82-a36450565d40",
+   "session_id": "ECBS1hcadcd05e97ab",
+   "session_status": "complete",
+   "records": 1344,
+   "verified_records": 1344,
+   "measured_runs": 1152,
+   "replays": 1152,
+   "replays_identical": 1152,
+   "problems": 0,
+   "ok": true,
+   "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "host_hash": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "replays": true,
+    "session_complete": true,
+    "spec_id": true,
+    "workloads": true
+   },
+   "auditor_binary_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+   "auditor_env_class_id": "ECBENV3h13e37662a118",
+   "auditor_hardware_class_id": "ECBHW1he9e33daae9e7",
+   "audited_unix_ms": 1793271737915,
+   "replay_audit_path": "replay/P32-counted/audit.json",
+   "replay_audit_sha256": "1724ffafb61913fd854b682373096abc1097c0fbb4379555732066e1ae6bcaca",
+   "verify_log": [
+    "start 2026-10-29T10:56:59Z cpu=4 binary=88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c",
+    "end rc=0 2026-10-29T11:02:18Z",
+    ""
+   ],
+   "verify_stderr": [
+    "receipt sha256 1724ffafb61913fd854b682373096abc1097c0fbb4379555732066e1ae6bcaca",
+    "audit OK: 1344 records, 1344 verified, 1152 replays reproduced, 0 problems"
+   ],
+   "session_files_sha256_before": [
+    "32f40ddcb6bd1e1d47a71a2727becc178eaee33b1b3265aef9961bc8bd4bb69c  host.json",
+    "31a801c9ba5a5ce0795d7e8b1e6ec046b2fd64ea78a3c1e092b49198ea931104  plan.json",
+    "c4570adc05a7152046b95d2034dbae95e36418c2199701b746525d8b330047a5  records.jsonl",
+    "9f0db5ce9488f4ca4f847971614bb8136f51c4a856fd2b9791614eb2efeb3c35  session.json",
+    "aede9622b9c80c69aea8aade286c630c7057a7ad40cbd5ebd23a4eb937e7b272  spec.json"
+   ],
+   "session_files_unchanged_after": true,
+   "session_files_equal_committed_SHA256SUMS": true,
+   "producer_in_job_audit_sha256": "0b9cfb7c889dd432eb410c5775401bedf0f6e183d16bcb9fe89451322055c9c9",
+   "session_records_sha256": "c4570adc05a7152046b95d2034dbae95e36418c2199701b746525d8b330047a5",
+   "pass": true
+  }
+ ],
+ "totals": {
+  "sessions": 6,
+  "replays": 7776,
+  "replays_identical": 7776,
+  "problems": 0
+ },
+ "independent_answer_check": {
+  "what": "[d]G = Q with the validator's own short-Weierstrass arithmetic on every record; a, b solved from G and each target, unique per curve, reproducing the ICV1 j-invariant, r G = O",
+  "by_session": {
+   "P24/wall": {
+    "records": 1680,
+    "dG_eq_Q": 1680
+   },
+   "P24/counted": {
+    "records": 1344,
+    "dG_eq_Q": 1344
+   },
+   "P28/wall": {
+    "records": 1680,
+    "dG_eq_Q": 1680
+   },
+   "P28/counted": {
+    "records": 1344,
+    "dG_eq_Q": 1344
+   },
+   "P32/wall": {
+    "records": 1680,
+    "dG_eq_Q": 1680
+   },
+   "P32/counted": {
+    "records": 1344,
+    "dG_eq_Q": 1344
+   }
+  }
+ }
+}

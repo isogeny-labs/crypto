@@ -4,7 +4,9 @@
 """
 
 import base64
+import gzip
 import shlex
+import shutil
 from unittest import mock
 import hashlib
 import json
@@ -54,6 +56,115 @@ class RoundTrip(unittest.TestCase):
 
     def art(self, *a, check=True, cwd=None):
         return sh(cwd or self.repo, sys.executable, str(TOOL), *a, check=check, env=self.env)
+
+    def test_s3_default_recovers_exact_git_bytes_without_aws(self):
+        self.art("push", "research")
+        self.git("add", "-A")
+        self.git("commit", "-qm", "move data to pointers")
+        self.env["ARTIFACTS_REMOTE"] = "s3://disabled-bucket/store"
+        self.env["ARTIFACTS_AWS"] = "/does-not-exist/aws"
+        self.env["ARTIFACTS_CACHE"] = str(self.repo / "cold-cache")
+        path = "research/r1/runs/a.jsonl"
+        (self.repo / path).unlink()
+        self.art("pull", path)
+        self.assertEqual((self.repo / path).read_bytes(), self.big)
+
+    def test_git_source_refuses_same_size_wrong_historical_bytes(self):
+        self.art("push", "research")
+        self.git("add", "-A")
+        self.git("commit", "-qm", "move data to pointers")
+        manifest = self.repo / "research/r1/runs/.artifacts.json"
+        data = json.loads(manifest.read_text())
+        data["files"]["a.jsonl"]["sha256"] = hashlib.sha256(b"z" * len(self.big)).hexdigest()
+        manifest.write_text(json.dumps(data))
+        (self.repo / "research/r1/runs/a.jsonl").unlink()
+        self.env["ARTIFACTS_CACHE"] = str(self.repo / "cold-cache")
+        result = self.art("pull", "--source", "git", "research/r1/runs/a.jsonl", check=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("no Git-history object matches", result.stderr)
+        self.assertIn("S3 was not contacted", result.stderr)
+        self.assertFalse((self.repo / "research/r1/runs/a.jsonl").exists())
+
+    def test_git_source_finds_older_version_and_reuses_verified_cache(self):
+        path = self.repo / "research/r1/runs/a.jsonl"
+        path.write_bytes(b"z" * len(self.big))
+        self.git("add", "-A")
+        self.git("commit", "-qm", "new same-size version")
+        cfg = artifacts.Config(root=self.repo, remote="s3://disabled/store", endpoint=None,
+                               read_url=None, cache=self.repo / "cold-cache", aws="/no/aws")
+        digest = hashlib.sha256(self.big).hexdigest()
+        reader = artifacts.GitHistory(cfg, path, len(self.big))
+        cached = artifacts.ensure_cached(cfg, reader, digest, len(self.big))
+        self.assertEqual(cached.read_bytes(), self.big)
+        with mock.patch.object(reader, "get", side_effect=AssertionError("cache must avoid Git")):
+            self.assertEqual(artifacts.ensure_cached(cfg, reader, digest, len(self.big)), cached)
+
+    def test_git_source_follows_history_hidden_by_merge_simplification(self):
+        self.git("switch", "-qc", "historical-data")
+        path = self.repo / "research/side-only.jsonl"
+        path.write_bytes(self.big)
+        self.git("add", "-A")
+        self.git("commit", "-qm", "side branch artifact")
+        self.git("switch", "-q", "main")
+        self.git("merge", "-q", "-s", "ours", "historical-data", "-m", "retain ancestry without data")
+        self.assertEqual(self.git("rev-list", "HEAD", "--", "research/side-only.jsonl"), "")
+        cfg = artifacts.Config(root=self.repo, remote="s3://disabled/store", endpoint=None,
+                               read_url=None, cache=self.repo / "cold-cache", aws="/no/aws")
+        digest = hashlib.sha256(self.big).hexdigest()
+        cached = artifacts.ensure_cached(cfg, artifacts.GitHistory(cfg, path, len(self.big)), digest, len(self.big))
+        self.assertEqual(cached.read_bytes(), self.big)
+
+    def test_git_recovery_bundle_and_blob_still_require_manifest_digest(self):
+        cfg = artifacts.Config(root=self.repo, remote="s3://disabled/store", endpoint=None,
+                               read_url=None, cache=self.repo / "cold-cache", aws="/no/aws")
+        source = self.repo / "missing-at-original-path.jsonl"
+        recovery = self.repo / ".artifacts/recovery"
+        recovery.mkdir(parents=True)
+        digest = hashlib.sha256(self.big).hexdigest()
+        oid = self.git("rev-parse", "HEAD:research/r1/runs/a.jsonl").strip()
+        for entry, payload, valid in [
+            ({"gzip": "data.gz"}, self.big, True),
+            ({"git_blob": oid}, None, True),
+            ({"gzip": "data.gz"}, b"z" * len(self.big), False),
+            ({"gzip": "data.gz"}, self.big + b"extra", False),
+            ({"gzip": "../outside.gz"}, self.big, False),
+        ]:
+            with self.subTest(entry=entry, valid=valid):
+                shutil.rmtree(cfg.cache, ignore_errors=True)
+                (recovery / "index.json").write_text(json.dumps({"schema": "artifacts.recovery/v1", "objects": {digest: entry}}))
+                if payload is not None:
+                    (recovery / "data.gz").write_bytes(gzip.compress(payload, mtime=0))
+                reader = artifacts.GitHistory(cfg, source, len(self.big))
+                if valid:
+                    cached = artifacts.ensure_cached(cfg, reader, digest, len(self.big))
+                    self.assertEqual(cached.read_bytes(), self.big)
+                else:
+                    with mock.patch("sys.stderr"), self.assertRaises(SystemExit):
+                        artifacts.ensure_cached(cfg, reader, digest, len(self.big))
+                    self.assertFalse(artifacts.cache_path(cfg, digest).exists())
+
+    def test_push_refuses_unmerged_index_without_changing_stages(self):
+        path = "research/r1/runs/a.jsonl"
+        oids = []
+        for payload in (self.big, self.big + b"ours\n", self.big + b"theirs\n"):
+            result = subprocess.run(["git", "hash-object", "-w", "--stdin"], cwd=self.repo,
+                                    input=payload, capture_output=True, check=True, env=self.env)
+            oids.append(result.stdout.decode().strip())
+        self.assertEqual(len(set(oids)), 3)
+        self.git("update-index", "--force-remove", path)
+        rows = "".join(f"100644 {oid} {stage}\t{path}\n" for stage, oid in enumerate(oids, 1))
+        subprocess.run(["git", "update-index", "--index-info"], cwd=self.repo,
+                       input=rows, text=True, check=True, env=self.env)
+        original_index = self.git("ls-files", "--stage")
+        for arguments in (("push", path), ("push", "research"), ("push", "--dry-run", path)):
+            with self.subTest(arguments=arguments):
+                result = self.art(*arguments, check=False)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("unresolved Git index conflicts", result.stderr)
+                self.assertEqual(self.git("ls-files", "--stage"), original_index)
+                self.assertEqual((self.repo / path).read_bytes(), self.big)
+                self.assertFalse(self.remote.exists())
+                self.assertFalse((self.repo / "research/r1/runs/.artifacts.json").exists())
 
     def test_pull_preserves_tracked_successor_and_unstaged_edits(self):
         self.art("push", "research")
@@ -625,6 +736,44 @@ class S3Argv(unittest.TestCase):
     def test_rejects_non_digest(self):
         with self.assertRaises(SystemExit):
             artifacts.object_key("../../etc/passwd")
+
+    def test_get_uses_exact_object_without_head_preflight(self):
+        self.assertEqual(self.r.get_args(self.d, Path("download")),
+                         ["aws", "s3api", "get-object", "--bucket", "bucket",
+                          "--key", f"store/sha256/{self.d[:2]}/{self.d}", "download"])
+        self.r.cfg.endpoint = "https://store.example.invalid"
+        self.assertEqual(self.r.get_args(self.d, Path("download"))[-2:],
+                         ["--endpoint-url", self.r.cfg.endpoint])
+
+    def test_download_failures_remove_partial_bytes_and_explain_cause(self):
+        cases = [
+            ("AllAccessDisabled", "bucket owner must restore access"),
+            ("NoSuchKey", "restore the exact manifest SHA-256"),
+            ("AccessDenied", "do not treat it as absence"),
+            ("(403) Forbidden", "do not treat it as absence"),
+        ]
+        for error, hint in cases:
+            with self.subTest(error=error), tempfile.TemporaryDirectory() as tmp:
+                dest = Path(tmp) / "partial"
+                dest.write_bytes(b"partial response")
+                result = subprocess.CompletedProcess([], 1, "", error)
+                with mock.patch.object(self.r, "_run", return_value=result), \
+                     mock.patch("sys.stderr") as stderr, self.assertRaises(SystemExit):
+                    self.r.get(self.d, dest)
+                self.assertFalse(dest.exists())
+                message = "".join(call.args[0] for call in stderr.write.call_args_list)
+                self.assertIn(hint, message)
+                self.assertIn("s3://bucket/store", message)
+
+    def test_direct_download_still_rejects_corrupt_object(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.r.cfg.cache = Path(tmp) / "cache"
+            def corrupt_get(digest, dest):
+                dest.write_bytes(b"y")  # same size, different SHA-256
+            with mock.patch.object(self.r, "get", side_effect=corrupt_get), \
+                 mock.patch("sys.stderr"), self.assertRaises(SystemExit):
+                artifacts.ensure_cached(self.r.cfg, self.r, self.d, 1)
+            self.assertFalse(artifacts.cache_path(self.r.cfg, self.d).exists())
 
 
 class WorkflowBootstrap(unittest.TestCase):

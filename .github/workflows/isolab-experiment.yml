@@ -93,6 +93,7 @@ jobs:
           taskq/deploy/eks-karpenter/remote/test-contract.sh
           taskq/deploy/eks-karpenter/remote/test-build-verification.sh
           taskq/deploy/eks-karpenter/remote/test-publish-image.sh
+          bash taskq/deploy/eks-karpenter/test-checkpoint-source.sh
           taskq/deploy/eks-karpenter/remote/test-launch-remote.sh
           taskq/deploy/eks-karpenter/remote/test-launch-remote-command.sh
           taskq/deploy/eks-karpenter/test-censored-gates.sh
@@ -257,6 +258,36 @@ jobs:
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
           python3 tools/artifacts/artifacts.py pull --jobs 16 research/five_leads_e2e_20261019 research/pencil_large_prime_20261029 taskq/deploy/eks-karpenter
+      - name: Check out the tested norm-branch checkpoint inputs
+        if: inputs.norm_branch_census
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ env.SOURCE_REVISION }}
+          path: norm-branch-checkpoint-source
+          persist-credentials: false
+          sparse-checkout: |
+            scripts
+            research/prime_leads_chase_20261113/norm-branch-census
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/five_leads_e2e_20261019 research/pencil_large_prime_20261029 taskq/deploy/eks-karpenter
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: isolab-build-${{ github.run_id }}-${{ github.run_attempt }}
@@ -302,6 +333,26 @@ jobs:
           role-duration-seconds: 7200
           aws-region: ${{ env.AWS_REGION }}
           mask-aws-account-id: true
+      - name: Checkpoint the frozen norm-branch work before publication or launch
+        if: inputs.norm_branch_census
+        working-directory: norm-branch-checkpoint-source
+        env:
+          CHECKPOINT_AWS_PROFILE: github-oidc-ambient
+          CHECKPOINT_AWS_REGION: ${{ env.AWS_REGION }}
+          CHECKPOINT_BUCKET: ${{ env.ISOLAB_BUCKET }}
+          CHECKPOINT_PREFIX: checkpoints
+          CHECKPOINT_SESSION: github-actions-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_REVISION"
+          git update-ref refs/remotes/origin/checkpoint-source "$SOURCE_REVISION"
+          install -d -m755 .resume
+          install -m644 research/prime_leads_chase_20261113/norm-branch-census/launch/RESUME.md .resume/RESUME.md
+          printf '\nWorkflow run: `%s/%s`; exact tested source: `%s`.\n' \
+            "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" "$SOURCE_REVISION" >> .resume/RESUME.md
+          scripts/checkpoint.sh gate
+          install -m644 .resume/.last-push "$RUNNER_TEMP/norm-branch-checkpoint.txt"
+          grep -F "s3://$CHECKPOINT_BUCKET/$CHECKPOINT_PREFIX/" "$RUNNER_TEMP/norm-branch-checkpoint.txt"
       - name: Publish the commit image and resolve its immutable digest
         run: taskq/deploy/eks-karpenter/publish-image "$RUNNER_TEMP/isolab-build" "$SOURCE_REVISION" "$RUNNER_TEMP/isolab-image.json"
       - name: Publish the frozen norm-branch payload as a digest-pinned layer
@@ -459,6 +510,7 @@ jobs:
         with:
           name: isolab-norm-branch-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
+            ${{ runner.temp }}/norm-branch-checkpoint.txt
             ${{ runner.temp }}/norm-branch-image.json
             ${{ runner.temp }}/norm-branch-request.json
             ${{ runner.temp }}/norm-branch-artifacts

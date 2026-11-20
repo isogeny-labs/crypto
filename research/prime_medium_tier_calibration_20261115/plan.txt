@@ -1,0 +1,48 @@
+spec ECS1he8e77a3c8c63 (calibration: prime medium tier, matched rho and BSGS at log2 r 32-48): 480 executions
+  arm rho-neg          reference  ECM1hefea4e0ebe79 rho.negation {"cap_multiple": "64"}
+  arm rho-neg-v2       baseline   ECM1h0de59de796c1 rho.negation_v2 {"cap_multiple": "64"}
+  arm rho-plain        baseline   ECM1hb367476fce6c rho.plain {"cap_multiple": "64"}
+  arm bsgs-neg         candidate  ECM1h87f6341629c3 bsgs.negation {}
+  arm bsgs-neg-v2      candidate  ECM1hbe3f1815f72a bsgs.negation_v2 {}
+  arm rho-neg-aa       control    ECM1hefea4e0ebe79 rho.negation {"cap_multiple": "64"}
+  workload Wba21979db35c icv1-fp32-tm47255-7313689a r=2^31.91 A=2 registered=false ec1=-
+  workload W1e176e1af89d icv1-fp32-tm47255-7313689a r=2^31.91 A=2 registered=false ec1=-
+  workload Wb02909af4fd0 icv1-fp32-tm47255-7313689a r=2^31.91 A=2 registered=false ec1=-
+  workload Wa68ac94b3687 icv1-fp32-tm47255-7313689a r=2^31.91 A=2 registered=false ec1=-
+  workload We271aa76be60 icv1-fp32-tm47255-7313689a r=2^31.91 A=2 registered=false ec1=-
+  workload W8207c74e02ef icv1-fp32-tm47255-7313689a r=2^31.91 A=2 registered=false ec1=-
+  workload Wb8bdc6f70546 icv1-fp32-tm47255-7313689a r=2^31.91 A=2 registered=false ec1=-
+  workload Wc692b6709fe5 icv1-fp32-tm47255-7313689a r=2^31.91 A=2 registered=false ec1=-
+  workload Wc45669df7022 icv1-fp36-tm180029-078f3621 r=2^35.29 A=2 registered=false ec1=-
+  workload W033e6ffb8a5c icv1-fp36-tm180029-078f3621 r=2^35.29 A=2 registered=false ec1=-
+  workload Wdd0a64261640 icv1-fp36-tm180029-078f3621 r=2^35.29 A=2 registered=false ec1=-
+  workload Wa648be795a35 icv1-fp36-tm180029-078f3621 r=2^35.29 A=2 registered=false ec1=-
+  workload Wa3d6a91a43bd icv1-fp36-tm180029-078f3621 r=2^35.29 A=2 registered=false ec1=-
+  workload W13050cfb241e icv1-fp36-tm180029-078f3621 r=2^35.29 A=2 registered=false ec1=-
+  workload W56456e6899aa icv1-fp36-tm180029-078f3621 r=2^35.29 A=2 registered=false ec1=-
+  workload W3cfc1df9fdf1 icv1-fp36-tm180029-078f3621 r=2^35.29 A=2 registered=false ec1=-
+  workload W218e3cf81f97 icv1-fp40-t1210237-db47e12f r=2^39.24 A=2 registered=false ec1=-
+  workload W812bad2ed670 icv1-fp40-t1210237-db47e12f r=2^39.24 A=2 registered=false ec1=-
+  workload Waab0701d2179 icv1-fp40-t1210237-db47e12f r=2^39.24 A=2 registered=false ec1=-
+  workload W11aef1ca11b4 icv1-fp40-t1210237-db47e12f r=2^39.24 A=2 registered=false ec1=-
+  workload W626cd99d072e icv1-fp40-t1210237-db47e12f r=2^39.24 A=2 registered=false ec1=-
+  workload W31b057c4c02f icv1-fp40-t1210237-db47e12f r=2^39.24 A=2 registered=false ec1=-
+  workload Wedf6eec9f5a1 icv1-fp40-t1210237-db47e12f r=2^39.24 A=2 registered=false ec1=-
+  workload Wcd8b16663c18 icv1-fp40-t1210237-db47e12f r=2^39.24 A=2 registered=false ec1=-
+  workload Wdbbb5bdcc673 icv1-fp44-tm285419-232aba99 r=2^43.20 A=2 registered=false ec1=-
+  workload W7aeb12a7ed5d icv1-fp44-tm285419-232aba99 r=2^43.20 A=2 registered=false ec1=-
+  workload W671e8ac59c4b icv1-fp44-tm285419-232aba99 r=2^43.20 A=2 registered=false ec1=-
+  workload W41790c325283 icv1-fp44-tm285419-232aba99 r=2^43.20 A=2 registered=false ec1=-
+  workload Wba8175fd9267 icv1-fp44-tm285419-232aba99 r=2^43.20 A=2 registered=false ec1=-
+  workload W341e2ba9e24a icv1-fp44-tm285419-232aba99 r=2^43.20 A=2 registered=false ec1=-
+  workload W2616f933ce9a icv1-fp44-tm285419-232aba99 r=2^43.20 A=2 registered=false ec1=-
+  workload W12133e6557a5 icv1-fp44-tm285419-232aba99 r=2^43.20 A=2 registered=false ec1=-
+  workload W5b39409cc793 icv1-fp48-t1415809-1e54c864 r=2^47.59 A=2 registered=false ec1=-
+  workload W03d13a0e7f6b icv1-fp48-t1415809-1e54c864 r=2^47.59 A=2 registered=false ec1=-
+  workload Wf5e6cac83628 icv1-fp48-t1415809-1e54c864 r=2^47.59 A=2 registered=false ec1=-
+  workload W8fb832265caf icv1-fp48-t1415809-1e54c864 r=2^47.59 A=2 registered=false ec1=-
+  workload W4971b881e7c3 icv1-fp48-t1415809-1e54c864 r=2^47.59 A=2 registered=false ec1=-
+  workload W4754cf877615 icv1-fp48-t1415809-1e54c864 r=2^47.59 A=2 registered=false ec1=-
+  workload Wf2f29315795e icv1-fp48-t1415809-1e54c864 r=2^47.59 A=2 registered=false ec1=-
+  workload Wc5b929376b16 icv1-fp48-t1415809-1e54c864 r=2^47.59 A=2 registered=false ec1=-
+note: 40 slug(s) are not in docs/curves/registry.json; register before citing them in prose (AGENTS.md §11)

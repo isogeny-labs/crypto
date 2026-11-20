@@ -5,7 +5,14 @@ The active path has no Python dependency. It imports custom equations, builds
 certified redundant consequences, and traces individual additions, removals,
 and greedy selection on the same affine ideal.
 
-The completed follow-up is in [FINAL_REPORT.md](FINAL_REPORT.md). Five of six
+The current [compact-certificate follow-up](COMPACT_REPORT.md) integrates the
+real Rust F4 codebase and freezes a [three-arm 15x target](COMPACT_SPEED_PROTOCOL.md).
+The existing six-variable case retains 442 local cofactor terms instead of
+20852 expanded final-basis terms, with the same complete basis on both fields.
+This is a storage/correctness observation; the new runtime comparison has not
+run `[pcc:unverified]`.
+
+The earlier standalone result is in [FINAL_REPORT.md](FINAL_REPORT.md). Five of six
 predeclared fresh four-variable cases pass the per-case tenfold rule, with
 23.4–23.9× native checked-wall median ratios. One failed A/A control is excluded.
 These are local producer component observations, pending signed independent
@@ -23,6 +30,16 @@ maps and the complete basis without a reference-basis oracle. Its
 [future timing protocol](QUOTIENT_SPEED_PROTOCOL.md) uses the best existing
 native route as baseline. No quotient speed ratio has been measured; see
 `quotient-development/` for the checked scope and limits `[pcc:unverified]`.
+
+The algorithms now live in the shared `crates/certified-relations` Rust crate.
+This study reexports that implementation, and the main codebase exposes it
+through `crypto_lib::cryptanalysis::f4_fp::certified`. The default F4 engine
+keeps its existing behavior. `LEADS.md` is the exact frozen early claim subject;
+use LEAD_STATUS.md for current notes. See INTEGRATION_HYPOTHESIS.md for the
+codebase integration hypothesis and qualification scope.
+
+[INTEGRATION_REPORT.md](INTEGRATION_REPORT.md) records the tested native API,
+the retained proof-budget failures and the fixed-cap breadth-first result.
 
 ## Run
 
@@ -223,3 +240,6 @@ backend after the user's instruction to continue. No cloud run was launched.
 Supported Singular and msolve basis replays are complete on the fresh panel;
 their diagnostic clocks and checking obligations differ from native charged
 wall intervals. No fastest-solver claim is made.
+
+[Current native Rust handoff](RUST_INTEGRATION_RESUME.md) records the integrated
+API qualification and the remaining matched-runtime gate.

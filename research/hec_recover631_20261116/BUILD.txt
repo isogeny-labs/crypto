@@ -1,0 +1,23 @@
+   Compiling hec-recover631 v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_recover631_20261116)
+warning: function `eval` is never used
+   --> verify_poly.rs:103:4
+    |
+103 | fn eval(a: &[u64], x: u64) -> u64 {
+    |    ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `deriv` is never used
+   --> verify_poly.rs:106:4
+    |
+106 | fn deriv(a: &[u64]) -> U {
+    |    ^^^^^
+
+warning: function `reduce` is never used
+   --> verify_poly.rs:115:4
+    |
+115 | fn reduce(a: &[u64], m: &[u64]) -> U {
+    |    ^^^^^^
+
+warning: `hec-recover631` (bin "recover631") generated 3 warnings
+    Finished `release` profile [optimized] target(s) in 2.08s

@@ -953,9 +953,13 @@ pub struct FrobeniusCanon {
     /// The same map as GFNI affine matrices, for [`Self::coords16_gfni`]:
     /// `gfni[i]`'s lane `k` is the 8 × 8 block from byte `i` of the field
     /// element to byte `k` of its coordinates.
+    #[cfg_attr(not(target_arch = "x86_64"), allow(dead_code))]
+    // ISA-specific table, preserving build-work identity.
     gfni: [[u64; 8]; 8],
     /// The inverse map, normal coordinates to field element, as GFNI
     /// affine matrices in the same layout, for [`Self::frobenius_reps`].
+    #[cfg_attr(not(target_arch = "x86_64"), allow(dead_code))]
+    // ISA-specific table, preserving build-work identity.
     gfni_back: [[u64; 8]; 8],
 }
 
@@ -1620,8 +1624,16 @@ impl FrobeniusCanon {
                 };
                 chunk.copy_from_slice(&mins);
             }
-            for x in chunks.into_remainder() {
-                *x = self.canon(*x);
+            // The tail runs as one padded block: the scalar key costs
+            // several times a vector lane inside a scan, and a window is
+            // rarely a multiple of sixteen. Padding repeats a real key, so
+            // the extra lanes compute a canonical name that is dropped.
+            let rest = chunks.into_remainder();
+            if let Some(&last) = rest.last() {
+                let mut block = [last; 16];
+                block[..rest.len()].copy_from_slice(rest);
+                self.canon_in_place(&mut block);
+                rest.copy_from_slice(&block[..rest.len()]);
             }
             return;
         }
@@ -2036,6 +2048,7 @@ unsafe fn least_rotation16_funnel_one_chain_avx512(c: &[u64; 16], n: u32) -> [u6
 /// faster but did not establish it against the same session's A/A, so the
 /// default stays one chain
 /// (`research/ic_tool_program/explorations/key-chains-20261114/`).
+#[cfg(target_arch = "x86_64")]
 fn key_chains_split() -> bool {
     static SPLIT: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *SPLIT.get_or_init(|| std::env::var("KIC_KEY_CHAINS").as_deref() == Ok("2"))
@@ -2083,8 +2096,10 @@ pub struct BatchScratch {
     #[cfg_attr(not(target_arch = "x86_64"), allow(dead_code))]
     qy: Vec<u64>,
     /// The folding kernel's prefix products, a vector of eight per group.
+    #[cfg(target_arch = "x86_64")]
     pre: Vec<u64>,
     /// The folding kernel's lane products, inverted together.
+    #[cfg(target_arch = "x86_64")]
     lanes: Vec<u64>,
 }
 

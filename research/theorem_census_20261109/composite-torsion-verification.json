@@ -1,0 +1,44 @@
+{
+  "schema": "composite-torsion-verification/v1",
+  "created": "2026-11-09T16:46:03.131Z",
+  "formal_source_commit": "631edd39ad959c6d9d2b422f3ce2e3ca4e3efb0e",
+  "source": "research/theorem_census_20261109/lean/CompositeTorsion.lean",
+  "source_sha256": "698df1ced84b01b56fb2fe9731c1587d45f3646b2496d279ead59dac6c5921e2",
+  "binding": "CompositeTorsionAudit.composite_order_audit_certificate",
+  "decl_sha256": "36a9c9d42459388be7737fb65fa60cdc8ad5f131330f3f8d14ef219541aaf53e",
+  "gate": {
+    "path": "evidence/composite-torsion-gate.log",
+    "sha256": "ad2bcd02fdc17125ea444b7064cde4b52d2c092586f456c6e7ac4af0a5888df2",
+    "declarations": 205,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "packet": {
+    "id": "PCC-20261109-10789d",
+    "path": "evidence/pcc-composite-torsion-check.json",
+    "sha256": "a216db189f999e1a7d2b4909a37d1e38c98f86bb9bb3cb10f01b84615e8b3a35",
+    "verdict": "pass",
+    "verified_at": "2026-11-09T16:44:10Z",
+    "standing": "Unsigned producer check; no separate-host or signed promotion"
+  },
+  "conditional_scope": "Source trace definition, primep>=5, nonsingular model, explicit Hasse premise, any integer r>2 dividing actual point count; modular order2.",
+  "actual_positive_control": {
+    "field": 7,
+    "curve": "y^2=x^3+x",
+    "rational_points": 8,
+    "point": [
+      3,
+      3
+    ],
+    "point_order": 8,
+    "modular_embedding_order": 2
+  },
+  "unproved_bridges": [
+    "General Hasse bound",
+    "General trace/p-rank/geometric supersingularity equivalence",
+    "Cyclotomic-field/full-geometric-torsion equivalences"
+  ],
+  "new_native_curve_population": false,
+  "frozen_prior_data_changed": false,
+  "paid_spend": 0
+}

@@ -1,0 +1,42 @@
+# Targeted multiplicity strata and exact row equivalence
+
+## Complete frozen partition screen
+
+Enumerated all integer multiplicity partitions at the two fixed pole levels:63familyarms,112admission-policyrecords. Fixedcells:genus2/F1009/H8,genus3/F503/H9,genus4/F127/H10, firstHnonbranchcanonicalplaces. d0usesM=g+1,d2usesM=g+4. EveryprofilepassesvalidatedGaussianconfluentconstruction,independentHermiteCRT/EEAprimitiveagreement,norm/degreechecks;everyuniqueadmittedrowpassesfullJacobianidentity;independentfinalfull/offGaussianranksagreeinallpolicies. Fixedcaps/exhaustionsretainedinSCREEN.txt. Firstpositionsareincremental-eliminationobservations,notseparatelyverifiedearliest-prefixrankcertificates. Reusedcurves/singletrainingseed,noholdouts/populationestimate.
+
+63familiesinclude6all-onesdistinctcontrolsand57repeated-supportfamilies(12atg2,18atg3,27atg4). BESTrepeatedpatternselectionispost-screenTRAININGSELECTIONunderapreregisteredmin-countcriterion,notindependentvalidation. The fixed optimistic tenfold-density gate assumes equal construction cost; no completed comparison meets it.
+
+|Genus|Policy|maximally favorable repeated pattern|d|First full anchor rank|Best complete distinct first rank|Density-only 10x threshold|
+|---|---:|---|---:|---:|---:|---|
+|2|2LP|4+1+1|2|634|701|fails|
+|3|3LP|2+2+1+1+1|2|1412|1417|fails|
+|4|4LP|2+2+2+2|2|1334|1501|fails|
+
+Genus3/4two-LPcontrolsandtargetedfamiliesdonotcompleteinthisscreen;theircomparisonisunrankable,notaninfinitegain. Best distinctcontrolcancomefromeitherd0ord2;genus4'scontrolisd0M5whiletherepeatedcandidateisd2M8. Constructionworkdiffersandmustnotbetreatedasequalactualcost. Selectionamongmanypatternsalsomakesmodestcountdifferencesunsuitableasheld-outimprovements. Everypolicy,failedrankarmandcapremainsinrawoutput;nonewcurve/seed/patternissubstituted.
+
+The screen falsifies the tested tenfold DENSITY-ONLY explanation on this panel. Itdoesnotproveuniversalimpossibilityoftargetedmultiplicitiesoratenfoldarithmeticgainfromadifferentconstructor. No complete-solver/timingcampaign follows solelyfromtheseweaktrainingcountdifferences. Established78completecontrolresultsremainthereferenceforeventualtotalcostcomparisons.
+
+## Stronger constructive equivalence
+
+A post-screen divisor derivation strengthens the previously checked surviving-weight residual equality. For NONBRANCHinputs,letDbeoriginalweightedinput,D'itsguaranteedsurvivingsupportafterprimitivecancellation,andL=D-D'. Thezero divisorofcommonpolynomialhdecomposesasL+conjugate(L)+V',withV'vertical. Henceoriginalinterpolationresidualisconjugate(L)+primitive_residual+V'. Removingverticalpairsandusinguniquenessofdegree<=greducedMumfordrepresentativesproves:
+
+    original_input_signed_row + signed(Cantor_reduce(-original_input))
+    = surviving_input_signed_row + signed(primitive_interpolation_residual).
+
+EqualityisofEXACTINTEGRALcanonicalrational-placevectorsaftermerging,includingbranchoutputcolumns. No modularrescaling,droppingcolumnsorknownscalarisneeded. Nonrationalresidualfactorscannotcancelagainstrationalinputanchors,sobothresidualssplitoverFpiffoneanotherdoes. Inputbranchmultiplicitiesarenotinthislemma;originalandprimitiveresidualDIVISORSneednotequalincancellationcases. ROW-EQUIVALENCE.mdcontainsassumptionsandproof,notanoveltyclaim.
+
+ThisprovidesaconstructiverowgeneratorusingweightedJacobianaddition/reductioninsteadofGaussian/Hermiteinterpolation.Itpreservesrowsandsmoothness,notnecessarilyconstructorcostorfunctiondeduppolicy. Distribution/yieldwouldstillhavetobechangedbynewmathematicalstructure;merelyrenaminginterpolationasreductiondoesnotcreateindependentrelations.
+
+## Separately frozen equivalence replay
+
+Extendfirst64constructedfunctionsperpartition,aspreregistered:3694original-weightCantorchecks. Allsmoothnessdecisionsmatch;622splitcaseshaveexactintegralrowequality;3072nonsplitcasesmatch. Existingkept-weightresidualchecksalsoremain. DirectedF101genus2fixtureA=x^3+x^2+x+60,B=(x^2-1)(x^2-4)(x^2-9),f=A^2-Bhassixnonbranchinputsandcommonfactorxatabranchpointexternaltotheinput. PrimitivepairA,1andconstantresidualareverified;thiscoversverticalcancellationwithoutignoringbranchcoordinates.
+
+OriginalSCREEN.txtreplaysbyte-for-byteafterfilteringonlynewDIRECTED_ROW/ROW_EQUIVALENCElines;REPLAY-COMPARE.txtis0. Bothscientificexecutionsonce,exit0/emptystderr. Algorithms share field/Jacobianprimitives;thegroupreductioncheckisindependentoftheinterpolationconstructor,notanindependentcurveimplementation.
+
+## Custody, source and decision
+
+Partitionfreeze9dabb35afe93/checkpoint20261116T053157Z;row-proof/protocolamendmentf14b327342b2/checkpoint054136Z;verifierfreeze873fee89826a/checkpoint054326Z. Source/lock/import/native/binaryhashescommittedandcheckpoint-gatedbeforeexecution. No scientific/build/watchdogfailure. Dead-codewarningsretained. No timingledgerrecordbecauseonlycorrectness/countsareasserted.
+
+Primary interpolation priorart:D'Andrea/Krick/Szanto,https://arxiv.org/html/1211.6895v3 ,sections2/4,theorem4.2. Reduction/addition/interpolationrelationship:Bernatska/Kopeliovich2020,https://arxiv.org/pdf/1912.13277 ,introductionread;itscomplex/non-specialsettingisnotusedasafinite-fieldimplementationcertificate. Cantor1987AMSprimaryPDFreturned403andwasnotread;existingnativeCantorcodeandthelocalproof/gatesaretheapplicationevidence. No mathematicaloriginalityclaim.
+
+Keep the exact row-equivalence lemma and tested constructor alternative. Reject targeted bounded-profile density as the current tenfold case on this reusedpanel. A future implementationcanremoveGaussianreconstruction,butmustchargecompletecostandcompareexistingnative/compactcontrols;componentarithmeticaloneisnotgoalcompletion. Fullmathematical10xgoalactive,PRunmerged,unrelated.resumeedituntouched. Shared dailylogT6448reservationisrespected;SESSION.mdrecordsprojecthandoff.

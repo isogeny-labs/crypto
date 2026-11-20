@@ -1,0 +1,48 @@
+{
+  "schema": "pencil.independent-source-review/v1",
+  "recorded_utc": "2026-11-11T02:21:46.464591+00:00",
+  "reviewer": "branch_specialization",
+  "producer": "ci_audit",
+  "status": "source_closure_supported_pending_runtime",
+  "source_manifest": {
+    "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v6-20261111/manifest.json",
+    "sha256": "37a383eacaafee48f25729cb7d11467e370d8aeae9188b49e155c09156a07258"
+  },
+  "sha256sums": "e0442f3c2cb0727ba4059b12df49a6dd62dbae96908f11004a39ee16f0b3ea70",
+  "worker_sha256": "064beefe07ad549f49af488d977b3ab360d64ddb61179c4313079858a0d75e1f",
+  "checks": {
+    "all_semantic_manifest_members_match": true,
+    "admission_packet_pins_match": true,
+    "actual_overlay_files_read_and_hashed": 8,
+    "all_overlay_sizes_match": true,
+    "all_overlays_directly_bound_in_manifest_and_admission": true,
+    "external_driver_sources_read_and_hashed": 50,
+    "literal_P_relative_inputs_checked": true,
+    "final_admission_intentionally_absent": true,
+    "strict_lstat_worker_unchanged": true,
+    "six_panel_source_inputs_unchanged": true,
+    "fresh_runtime_identities_consistent": true,
+    "total_build_execution_seconds": [
+      2400,
+      1800,
+      600
+    ],
+    "cpu": 2,
+    "memory_bytes": 17179869184,
+    "attempts": 1,
+    "automatic_retry": false
+  },
+  "retained_prior_review_omission": {
+    "prior_review": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/combined-v5-independent-review-20261111/review.json",
+    "finding": "Prior review compared overlay index bytes but failed to check that the referenced overlay subtree existed. Native v5 materialization failed before compilation on missing relation_stream.rs. That review omission and failed attempt remain preserved; v6 now restores and directly seals all eight referenced overlay files."
+  },
+  "limitations": [
+    "Source closure review is not runtime qualification.",
+    "External driver files are hash-checked but retain their existing source locations.",
+    "Final publication, current ledger, serial reconciliation, live owner and admission require separate coordinator bindings."
+  ],
+  "reviewer_compiled": false,
+  "reviewer_executed_payload": false,
+  "reviewer_ran_tests": false,
+  "blockers": []
+}

@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T15:08:59Z",
+ "id": "PCC-20261116-a1a45d",
+ "kind": "statement",
+ "producer": {
+  "commit": "88bc2ae5439de484d827698858d7444a815a6f10",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-binding-and-render-correction-11/ADDITIVE_CORRECTION.md",
+    "sha256": "740b2d94e5ce14b5060287f724d23a75ae12c379f0892471f4ba2d66156036ca"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-binding-and-render-correction-11/actual-first-render-failure.txt",
+    "sha256": "b07d03b59d791dbcf13e499dfb6ab15c0d9c3850bcacc0fafee45442709d6357"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/full-cubic-frobenius-binding-and-render-correction-11/original-six-truncated-binding-records.json",
+    "sha256": "551bbb5dccca7964c7102bb92feb3fb99a154d6fb929d9324c9a84ca886c8f97"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Additive correction to d5a397: complete02 original dual24/0 audits remain, but six original PCC records truncate at a named argument in the declaration type, so only five of eleven bind full statements. Six original records and claims retained immutable; no signed standing or full-binding claim for them. Next additive03 adds six transparently derived typed corollaries whose whole statements the unchanged extractor can bind, and derives basis injectivity under original gate limits. Frozen02 source/old claims/ledger/verifiers/keyring/policy unchanged. First report render and system fitz probe fail on missing fitz before PDF compile; use existing typst and installed Poppler without installs."
+}

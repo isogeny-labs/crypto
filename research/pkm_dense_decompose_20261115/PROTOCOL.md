@@ -79,3 +79,43 @@ Predictions, frozen with this amendment before any row:
   dense count is reported beside `P1`'s.
 
 A cell that hits its budget or the pod's memory is censored and reported as a lower bound.
+
+### Amendment 2 (2026-11-15T08:05Z, during the pod run): stopping rule
+
+Seen before writing this: the first `P3`, `m = 2`, `S = 2^13` dense target hit the 1,800 s budget (censored, 8.4·10⁹
+multiplications at the cutoff). Wall time per target has grown ≈ 7.4× per doubling of `S` (42 s at `2^11`, 310 s at
+`2^12`), faster than the counted metric (4×), so every remaining `m = 2` cell at `S ≥ 2^13` is projected to be censored.
+The pod supervisor cannot stop one lane. Rule, fixed now, before any further row of those cells is seen: the pod is
+deleted as soon as the `m = 3`, `S = 2^7` cell ends (completed or censored at its 86,400 s budget). Any `m = 2` cell
+not finished by then is reported as *not run*, never imputed. Rows already written stay and are reported. No other
+change.
+
+### Amendment 3 (2026-11-15T18:00Z, after pod loss): rerun on resilient infrastructure
+
+What happened: pod `y8fnixt44o3ziv` (on-demand, not interruptible) was removed by RunPod between 16:00Z and 17:26Z
+(API: "pod not found"; this session did not delete it). Rows had been copied off the pod once, at 07:01Z, and
+everything written after that is lost with it. The run's own record then holds complete rows for `P3`-`m2`-`t8`,
+`t11` (both kinds), `t12` (dense) and `P1`-`m2`-`t9` (both kinds), and partial rows of `m2-t10-both` (3 of 6) and
+`m3-t6-dense` (2 of 6). Numbers read from the lost rows in this session are not evidence and are not reported as
+results.
+
+Rerun, fixed before any new row is seen:
+
+- *Cells.* `m2-t10-both`, `m2-t10-random`, `P3-m2-t12-random`, `P3-m2-t{13,14,15}-{dense,random}`,
+  `m3-t6-{dense,random}`, `m3-t7-dense`. Same arguments, seed, `dmax` and budgets as Amendment 1, in four lanes of
+  4 threads (`remote/run_resilient_remote.sh`).
+- *Resilience.* Rows go to a RunPod network volume that outlives the pod. The supervisor
+  (`tools/runpod_resilient/supervisor.py`) restarts the runner when a replacement pod boots. The oracle's new
+  `--resume 1` redraws the same targets from the same seed and skips indices already written, so a pod loss costs
+  only the targets in flight. A client-side controller (`tools/runpod_resilient/controller.py`) mirrors rows every
+  5 minutes and replaces a lost pod (at most 6 times).
+- *Instrument change.* `--resume` only skips work. A resumed run must write exactly the rows an uninterrupted
+  run writes; that is tested locally before the run (rows equal except `ms`).
+- *Pod-loss accounting.* A target that was in flight when a pod is lost is computed again from scratch, and its
+  row records only the last attempt. Each attempt's wall time is kept in the cell's `.rss.jsonl`. The `m3-t7`
+  budget (86,400 s) applies per attempt. If the cell has not ended after 48 h of total wall time across
+  attempts, it is reported as *censored by infrastructure* at the longest attempt's length, never imputed.
+- *A/A across pods.* The 3 `m2-t10-both` rows and 2 `m3-t6-dense` rows that survived are compared with the rerun
+  rows of the same index (equal on every field except `ms`). Any difference invalidates the rerun.
+- *Stopping rule.* Amendment 2 stands: the pod is deleted when `m3-t7-dense` ends. `m = 2` cells unfinished then
+  are reported as *not run*.

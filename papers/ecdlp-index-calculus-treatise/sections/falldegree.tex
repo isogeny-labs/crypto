@@ -968,21 +968,29 @@ shown it); $t=12$ ($N=24$), $d_F=6$ on both draws, ``holds'', the cap-6 runs
 taking $1{,}824.0$ and $1{,}762.8$\,s and $42{,}213{,}325{,}264{,}923$ and
 $42{,}213{,}325{,}353{,}310$ multiply-adds
 (\art{research/pkm_falldegree_unblock_20261107/RESULTS_T12_BRACKET.md}); $t=13$,
-$d_F=6$ on draw 1 and only $d_F\ge6$ on draw 0, whose cap-6 run was killed
-by three EC2 Spot interruptions, so ``undecided''
-(\art{research/pkm_falldegree_unblock_20261107/RESULTS_T13_BRACKET.md});
-$t=14$, where $c^*=7$, has no bracket. Every draw has \texttt{grid\_zeros}
+$d_F=6$ on draw 1 in the bracket run
+(\art{research/pkm_falldegree_unblock_20261107/RESULTS_T13_BRACKET.md}) and
+on draw 0 in a RunPod re-run of 15 November, whose cap-6 closure refutes
+after $12{,}372$\,s, so ``holds''
+(\art{research/pkm_falldegree_unblock_20261107/RESULTS_STAGE_B.md});
+$t=14$, where $c^*=7$, gives $d_F\ge7$ on both draws: a first cap-6 attempt
+stopped oversize at degree 6, and re-runs on larger pods (Amendment 14)
+complete cap 6 without refuting; the cap-7 runs are pending
+(\art{research/prime_fall_degree_20261027/reports/growth-law-20261115/README.md}). Every draw has \texttt{grid\_zeros}
 $=0$, so none is decomposable. Since $c^*(12)=c^*(11)$, the $t=12$ cell
-cannot tell the C-step law from a flat 6. Further $t=13$ and $t=14$
-attempts await non-Spot capacity (owner decision 10,
-\art{research/ic_lead_queue_20261114/README.md}). A RunPod route was
-revised four times by 15 November and is not frozen; nothing ran
-(\art{research/pkm_falldegree_unblock_20261107/runpod_capped/}). Stage C
+cannot tell the C-step law from a flat 6, nor can $t=13$; the $t=14$ bound
+is the first cell that rules out a flat 6. These cells ran on RunPod after
+owner decision 10 (\art{research/ic_lead_queue_20261114/README.md}) moved
+them off EC2 Spot. Stage C
 of the same relaunch read ``grows in $m$'' on all six fixed-$t$ ladders
 ($t=2,3$; Kummer and 2-isogeny towers; $m$ from 2 up to the largest exact
 median), the median $d_F$ rising by 2 or 3 between $m=2$ and that $m$
 (\art{research/pkm_falldegree_unblock_20261107/RESULTS_STAGE_C.md}). All of
-these are \texttt{[pcc:unverified]}.
+these are \texttt{[pcc:unverified]}. Since 15 November the $\FF_p$-tower closure
+instrument (\art{src/cryptanalysis/hky_fp_tower.rs}, PR~\#4332) writes each
+closure $V_{F,c}$ to a progress file as it finishes, so a run stopped by a
+timeout keeps its decided degrees and resumes at the first undecided one;
+it changes no measured value.
 
 \paragraph{The no-fall degree at $m=3$.} For the two-$\Sem3$ chain on
 Kummer towers at $m=3$, the Nullstellensatz degree in the tower ring

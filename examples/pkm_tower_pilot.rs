@@ -115,6 +115,8 @@ use crypto_lib::cryptanalysis::f4_tower_generic::{f4_tower_generic, GPoly, GTowe
 use crypto_lib::cryptanalysis::fp_backend::{Fp224, Fp256, Fp32, Fp64, FpP192, FpWide, PrimeField};
 use crypto_lib::cryptanalysis::fp_backend_ifma::Fp52;
 use crypto_lib::cryptanalysis::hky_fp_tower::{self, HkyLimits, HkyRing};
+use crypto_lib::cryptanalysis::hky_fp_tower_fast::{self, FastOptions, QueueOrder};
+use crypto_lib::cryptanalysis::hky_fp_tower_fast2::{self, Fast2Options};
 use crypto_lib::cryptanalysis::ic_boundary::{CountedGroup, GroupOps, PrimeCurve, PrimePoint};
 use crypto_lib::cryptanalysis::sig_fp_tower;
 use num_bigint::BigUint;
@@ -2125,7 +2127,83 @@ fn measure_hky(
             cell.t, target_index, cl.c, cl.contains_one, cl.censored, cl.ms
         );
     };
-    let fd = hky_fp_tower::fall_degrees_with(&ring, &gens, c_min, a.hky_cmax, &limits, progress);
+    let fast = matches!(a.engine, Engine::Hky2 | Engine::Hky3);
+    let fast2 = a.engine == Engine::Hky3;
+    let mut fast_stats: Vec<Value> = Vec::new();
+    let fd = if fast2 {
+        let mut opts = a.hky3.clone();
+        opts.symmetry = if a.hky2_sym && cell.control != Control::Naive {
+            hky_fp_tower_fast::swap_first_two_blocks(tower.t, cell.m)
+        } else {
+            None
+        };
+        hky_fp_tower_fast2::fall_degrees_fast2_with(
+            &ring,
+            &gens,
+            c_min,
+            a.hky_cmax,
+            &limits,
+            &opts,
+            |cl, st| {
+                progress(cl);
+                eprintln!(
+                    "hky3 c={} sym={} parts={:?} rank={:?} par={:.2}s second={:.2}s serial={:.2}s ir={:.2}s batches={} rounds={} irs={} muladds={} ir_muladds={} products={} zero={} reducers={} dense={} sparse={} words={} peak_words={}",
+                    cl.c, st.symmetry, st.part_cols, st.part_rank, st.parallel_s, st.second_s,
+                    st.serial_s, st.interreduce_s, st.batches, st.rounds, st.interreductions,
+                    st.muladds, st.interreduce_muladds, st.products, st.zero, st.reducers,
+                    st.dense_rows, st.sparse_rows, st.stored_words, st.peak_words
+                );
+                fast_stats.push(json!({
+                    "c": cl.c, "symmetry": st.symmetry, "part_cols": st.part_cols,
+                    "part_rank": st.part_rank, "setup_s": st.setup_s,
+                    "parallel_s": st.parallel_s, "second_s": st.second_s,
+                    "serial_s": st.serial_s, "interreduce_s": st.interreduce_s,
+                    "batches": st.batches, "rounds": st.rounds,
+                    "interreductions": st.interreductions,
+                    "interreduce_muladds": st.interreduce_muladds,
+                    "second_muladds": st.second_muladds, "products": st.products,
+                    "zero": st.zero, "reducers": st.reducers,
+                    "dense_rows": st.dense_rows, "sparse_rows": st.sparse_rows,
+                    "stored_words": st.stored_words, "peak_words": st.peak_words,
+                    "threads": st.threads, "simd": st.simd,
+                }));
+            },
+        )
+    } else if fast {
+        let mut opts = a.hky2.clone();
+        opts.symmetry = if a.hky2_sym && cell.control != Control::Naive {
+            hky_fp_tower_fast::swap_first_two_blocks(tower.t, cell.m)
+        } else {
+            None
+        };
+        hky_fp_tower_fast::fall_degrees_fast_with(
+            &ring,
+            &gens,
+            c_min,
+            a.hky_cmax,
+            &limits,
+            &opts,
+            |cl, st| {
+                progress(cl);
+                eprintln!(
+                    "hky2 c={} sym={} parts={:?} rank={:?} par={:.2}s seq={:.2}s mul_cpu={:.2}s batches={} dense={} sparse={} words={}",
+                    cl.c, st.symmetry, st.part_cols, st.part_rank, st.parallel_s, st.sequential_s,
+                    st.multiply_cpu_s, st.batches, st.dense_rows, st.sparse_rows, st.stored_words
+                );
+                fast_stats.push(json!({
+                    "c": cl.c, "symmetry": st.symmetry, "part_cols": st.part_cols,
+                    "part_rank": st.part_rank, "setup_s": st.setup_s,
+                    "parallel_s": st.parallel_s, "sequential_s": st.sequential_s,
+                    "multiply_cpu_s": st.multiply_cpu_s, "batches": st.batches,
+                    "dense_rows": st.dense_rows, "sparse_rows": st.sparse_rows,
+                    "stored_words": st.stored_words, "threads": st.threads, "batch": st.batch,
+                    "simd": st.simd,
+                }));
+            },
+        )
+    } else {
+        hky_fp_tower::fall_degrees_with(&ring, &gens, c_min, a.hky_cmax, &limits, progress)
+    };
     let ms = started.elapsed().as_secs_f64() * 1e3;
     let closures: Vec<Value> = fd
         .closures
@@ -2152,6 +2230,35 @@ fn measure_hky(
         censored_at,
         ms
     );
+    let mut extra = json!({
+        "engine": if fast2 { "hky_fp_tower_fast2" } else if fast { "hky_fp_tower_fast" } else { "hky_fp_tower" },
+        "nf_degrees": nf_degrees,
+        "hky_cmin": c_min,
+        "hky_cmax": a.hky_cmax,
+        "last_fall_degree": fd.last_fall,
+        "first_fall_degree": fd.first_fall,
+        "falls": fd.falls,
+        "censored_at": censored_at,
+        "muladds": fd.closures.iter().map(|c| c.muladds).sum::<u64>(),
+        "muladds_last_closure": fd.closures.last().map(|c| c.muladds),
+        "closures": closures,
+    });
+    if fast2 {
+        let o = &a.hky3;
+        extra["hky3"] = json!({"sym": a.hky2_sym, "batch_min": o.batch_min,
+            "batch_max": o.batch_max, "target_pivots": o.target_pivots,
+            "interreduce": o.interreduce, "interreduce_min": o.interreduce_min,
+            "interreduce_block": o.interreduce_block, "rebucket": o.rebucket,
+            "par_second": o.par_second, "bitmap": o.bitmap, "fault": o.fault,
+            "deg_weight": o.deg_weight,
+            "dense": [o.dense_num, o.dense_den], "stats": fast_stats});
+    } else if fast {
+        // Only rows of the fast instrument carry its options and timers.
+        extra["hky2"] = json!({"level": a.hky2.level, "sym": a.hky2_sym, "batch": a.hky2.batch,
+            "order": format!("{:?}", a.hky2.order), "fault": a.hky2.fault,
+            "lead_only": a.hky2.lead_only, "sparse_width": a.hky2.sparse_width,
+            "dense": [a.hky2.dense_num, a.hky2.dense_den], "stats": fast_stats});
+    }
     Outcome {
         solving_degree_max: 0,
         last_productive_degree: 0,
@@ -2170,19 +2277,7 @@ fn measure_hky(
         pairs_above_bound: 0,
         staircase_at_stop: None,
         planted_ok,
-        extra: json!({
-            "engine": "hky_fp_tower",
-            "nf_degrees": nf_degrees,
-            "hky_cmin": c_min,
-            "hky_cmax": a.hky_cmax,
-            "last_fall_degree": fd.last_fall,
-            "first_fall_degree": fd.first_fall,
-            "falls": fd.falls,
-            "censored_at": censored_at,
-            "muladds": fd.closures.iter().map(|c| c.muladds).sum::<u64>(),
-            "muladds_last_closure": fd.closures.last().map(|c| c.muladds),
-            "closures": closures,
-        }),
+        extra,
     }
 }
 
@@ -2604,6 +2699,12 @@ struct Args {
     /// synced, so a run stopped during a later closure keeps every decided
     /// degree. Resume with `--hky-cmin` at the first undecided degree.
     hky_progress: Option<String>,
+    /// `--engine hky2` only: the instrument's options; `hky2_sym` asks for
+    /// the split by the swap of the first two towers (proved per system).
+    hky2: FastOptions,
+    hky2_sym: bool,
+    /// `--engine hky3` only (`research/hky_engine_speed2_20261117/`).
+    hky3: Fast2Options,
     /// `--radix 2^k` (`f4_fp_tower` only): grade every block of `k` tower
     /// levels with weights `1, 2, …, 2^{k−1}`, the radix-`2^k` presentation
     /// of the same tower (`TowerWeights`). `k = 1`, radix 2, is the unit
@@ -2623,6 +2724,13 @@ enum Engine {
     /// read off them (`research/prime_fall_degree_20261027/`). No F4 runs;
     /// the naive control runs too (free variables only).
     Hky,
+    /// `hky_fp_tower_fast`: the same closures on the faster instrument
+    /// (`research/hky_engine_speed_20261117/`), `--hky2-level`,
+    /// `--hky2-sym`, `--hky2-batch`, `--hky2-order`.
+    Hky2,
+    /// `hky_fp_tower_fast2`: the second speed pass (`--hky3-*` options;
+    /// `--hky2-sym` applies to it too).
+    Hky3,
 }
 
 /// The prime-field backend of `--engine generic`. `Auto` picks by the
@@ -2788,6 +2896,9 @@ fn parse_args() -> Args {
         hky_cmin: None,
         hky_cmax: 6,
         hky_progress: None,
+        hky2: FastOptions::default(),
+        hky2_sym: true,
+        hky3: Fast2Options::default(),
         hky_max_cols: 2_000_000,
         hky_max_entries: 600_000_000,
         radix_k: 1,
@@ -2921,6 +3032,8 @@ fn parse_args() -> Args {
                     "sig" | "f4_fp_tower_sig" => Engine::Sig,
                     "generic" | "f4_tower_generic" => Engine::Generic,
                     "hky" | "hky_fp_tower" => Engine::Hky,
+                    "hky2" | "hky_fp_tower_fast" => Engine::Hky2,
+                    "hky3" | "hky_fp_tower_fast2" => Engine::Hky3,
                     other => panic!("unknown engine `{other}`"),
                 }
             }
@@ -2942,6 +3055,54 @@ fn parse_args() -> Args {
             "--hky-cmin" => a.hky_cmin = Some(v.parse().expect("--hky-cmin")),
             "--hky-progress" => a.hky_progress = Some(v.clone()),
             "--hky-cmax" => a.hky_cmax = v.parse().expect("--hky-cmax"),
+            "--hky3-batch-min" => a.hky3.batch_min = v.parse().expect("--hky3-batch-min"),
+            "--hky3-batch-max" => a.hky3.batch_max = v.parse().expect("--hky3-batch-max"),
+            "--hky3-target-pivots" => {
+                a.hky3.target_pivots = v.parse().expect("--hky3-target-pivots")
+            }
+            "--hky3-interreduce" => a.hky3.interreduce = v.parse().expect("--hky3-interreduce"),
+            "--hky3-interreduce-min" => {
+                a.hky3.interreduce_min = v.parse().expect("--hky3-interreduce-min")
+            }
+            "--hky3-interreduce-block" => {
+                a.hky3.interreduce_block = v.parse().expect("--hky3-interreduce-block")
+            }
+            "--hky3-rebucket" => a.hky3.rebucket = v == "on",
+            "--hky3-par-second" => a.hky3.par_second = v == "on",
+            "--hky3-bitmap" => a.hky3.bitmap = v == "on",
+            "--hky3-deg-weight" => a.hky3.deg_weight = v.parse().expect("--hky3-deg-weight"),
+            "--hky3-fault" => a.hky3.fault = v.parse().expect("--hky3-fault"),
+            "--hky3-trace" => a.hky3.trace = Some(v.clone()),
+            "--hky3-dense" => {
+                let (n, d) = v.split_once('/').expect("--hky3-dense NUM/DEN");
+                a.hky3.dense_num = n.parse().expect("--hky3-dense");
+                a.hky3.dense_den = d.parse().expect("--hky3-dense");
+            }
+            "--hky2-level" => a.hky2.level = v.parse().expect("--hky2-level"),
+            "--hky2-batch" => a.hky2.batch = v.parse().expect("--hky2-batch"),
+            "--hky2-sparse-width" => a.hky2.sparse_width = v.parse().expect("--hky2-sparse-width"),
+            "--hky2-lead-only" => a.hky2.lead_only = v == "on",
+            "--hky2-fault" => a.hky2.fault = v.parse().expect("--hky2-fault"),
+            "--hky2-dense" => {
+                let (n, d) = v.split_once('/').expect("--hky2-dense NUM/DEN");
+                a.hky2.dense_num = n.parse().expect("--hky2-dense");
+                a.hky2.dense_den = d.parse().expect("--hky2-dense");
+            }
+            "--hky2-sym" => {
+                a.hky2_sym = match v.as_str() {
+                    "on" => true,
+                    "off" => false,
+                    other => panic!("--hky2-sym on|off, not `{other}`"),
+                }
+            }
+            "--hky2-order" => {
+                a.hky2.order = match v.as_str() {
+                    "lifo" => QueueOrder::Lifo,
+                    "low-degree-first" => QueueOrder::LowDegreeFirst,
+                    "sparse-first" => QueueOrder::SparseFirst,
+                    other => panic!("--hky2-order lifo|low-degree-first, not `{other}`"),
+                }
+            }
             "--hky-max-cols" => a.hky_max_cols = v.parse().expect("--hky-max-cols"),
             "--hky-max-entries" => a.hky_max_entries = v.parse().expect("--hky-max-entries"),
             "--sig-order" => {
@@ -3116,11 +3277,20 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
             a.null_width,
             &mut rng,
         );
-        if !matches!(a.engine, Engine::F4 | Engine::Hky) && cell.control == Control::Naive {
+        if !matches!(
+            a.engine,
+            Engine::F4 | Engine::Hky | Engine::Hky2 | Engine::Hky3
+        ) && cell.control == Control::Naive
+        {
             // The naive control has no tower to rewrite by.
             continue;
         }
-        if cell.control == Control::Multiples && !matches!(a.engine, Engine::F4 | Engine::Hky) {
+        if cell.control == Control::Multiples
+            && !matches!(
+                a.engine,
+                Engine::F4 | Engine::Hky | Engine::Hky2 | Engine::Hky3
+            )
+        {
             // The extra free variables u'_k are not in the tower engines' rings.
             eprintln!(
                 "-- multiples runs under --engine f4 and --engine hky only; skipping {} m={} t={}",
@@ -3172,7 +3342,7 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
                 ));
                 (out, Dumpable::Ring(basis))
             }
-            Engine::Hky => {
+            Engine::Hky | Engine::Hky2 | Engine::Hky3 => {
                 let out = measure_hky(&eqs, &tower, cell, k, n, p, sol.as_deref(), a);
                 (out, Dumpable::Raw(Vec::new()))
             }
@@ -3261,7 +3431,7 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
             for (k, v) in extra {
                 obj.insert(k.clone(), v.clone());
             }
-            if a.engine == Engine::Hky {
+            if matches!(a.engine, Engine::Hky | Engine::Hky2 | Engine::Hky3) {
                 // No F4 ran: keep only the fields the closure measured.
                 for k in [
                     "solving_degree_max",

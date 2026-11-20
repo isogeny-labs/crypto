@@ -442,6 +442,167 @@ Neither version changes the order against rho: the algebraic arm with seed 1093 
 $18\times$ negation rho at $w=0$ and about $4\cdot10^6\times$ at $w=1$. The corrections chapter records the
 failed V2 (Table~\ref{tab:corr-transfer}).
 
+\paragraph{What makes a seed good.} The base-comparison study of
+14 November measured the isogeny base at $k=20$, $t=5$, $G=3$, $m=2$ over
+tower seeds 0--20 in the F4 engine, with no rho arm (\S\ref{sec:ladder5}).
+A re-analysis of its 42 engine runs, with no new runs and a protocol frozen
+before any correlation was computed, asked why the seeds differ
+(\art{research/curve25519_isogeny_seed_cause_20261115/README.md}). The
+per-seed rate (hits per $10^9$ counted F4 multiply-adds, blind and lifts
+pooled, $n=21$) has Spearman $+0.959$ (permutation $p<5\cdot10^{-5}$) with
+the number of the 32 $x$-values of $V$ that lie on the miniature curve.
+That number runs from 10 (seed 13, rate $0.88$) to 21 (seed 17, rate
+$4.72$). The engine's base-point count is twice it in all 21 seeds, so the
+three features that reach $+0.959$ are one quantity. The descent-class mix
+($+0.077$, $p=0.74$), the 2-adic valuation of the auxiliary order
+($-0.334$, $p=0.14$) and its distance from $p+1$ ($+0.204$, $p=0.37$) do
+not explain the rate. All values are \texttt{[pcc:unverified]}.
+
+\paragraph{Screening seeds by on-curve count.} Three frozen studies of
+15 November used that count, read from the tower before any F4 work, to
+choose seeds (Table~\ref{tab:iso-seed-screen}). The first scored 40 fresh
+seeds (21--60) for $107{,}041$ tower operations in total and ran the 8
+highest (19--22 of 32 on the curve) and the 8 lowest (10--14) blind, at
+$3.54\cdot10^9$ multiply-adds per arm
+(\art{research/curve25519_isogeny_seed_screen_20261115/README.md}). The top
+group's rate is $2.86\times$ the bottom's (one-sided exact $p=4\cdot10^{-12}$)
+and $1.77\times$ the unscreened rate of seeds 1--20; the bottom group is at
+$0.62\times$. Its hypothesis H15 failed: a model with hits proportional to
+base points, fitted on seeds 0--20, predicts 104.7 hits for the top group
+(interval 85--125) against 146 observed. This contradicts the re-analysis's
+exploratory reading that blind hits are proportional to base points. A
+post-hoc fit of the rate as $b^k$ in the base-point count $b$ gives
+$k=1.95$ $[1.45,2.40]$ on 37 blind arms.
+
+The lifts arms on the same 16 seeds were frozen with a model fitted on
+seeds 0--20 alone, hits $=0.0022857\times\text{exposure}\times b^{2.05}$
+(\art{research/curve25519_isogeny_seed_screen_lifts_20261115/README.md}).
+It predicts $1021.8$ hits (interval 960--1085) for the top group against
+1014 observed, and $376.7$ (339--415) for the bottom against 368. Lifts
+against blind on these 16 seeds is $0.879$ (two-sided $p=0.093$), so
+neutrality is not rejected and a small lifts penalty is not excluded; a
+lifts target costs $1.4117$--$1.4156\cdot10^6$ multiply-adds, about eight
+times a blind one.
+
+\paragraph{The pairs law, depth $t$ and a deeper screen.} The next frozen
+study stated the law $\text{hits per target}=b(b-1)/(2\#E)$, $\#E=1{,}049{,}624$,
+with no fitted constant
+(\art{research/curve25519_isogeny_scaling_20261115/README.md}). It holds,
+inside the Poisson 95\% interval, for blind seeds 0--20 (218 against
+$206.2$), the bottom 8, eight unscreened seeds at $t=6$ (315 against
+$306.7$) and the out-of-sample seed 1550 (30 against $25.3$). It fails for
+the top 8 blind (146 against $122.2$, interval 101--144). Every one of the
+six $t=5$ group totals, blind and lifts, is $2$--$20\%$ above the law. At
+$t=6$ hits per target rise $3.82\times$ and multiply-adds per target
+$17.3\times$, so the rate falls to $0.22\times$ the $t=5$ rate; hypotheses
+H23 (the rate rises) and H25 (cost within $2\times$) failed. A deeper
+screen of 3{,}000 candidates ($7{,}725{,}157$ tower operations) found seed
+1550 with 26 of 32 on the curve; its one arm gives $8.476$
+$[5.719,12.101]$.
+
+\paragraph{Lower depth.} A frozen study at $t=4$ and $t=3$ scored 40
+fresh seeds per depth and ran the top 4 and the bottom 4 of each;
+amendment A1, made before any arm, records that the engine requires
+$G<t$, so $G=4$ cannot run below $t=5$
+(\art{research/curve25519_isogeny_lower_t_20261115/README.md}). The
+$t=4$, $G=3$ cell gives $9.167$ $[7.653,10.892]$ and the $t=3$, $G=2$
+cell $12.340$ $[9.690,15.492]$ ($t=3$ above $t=4$, one-sided $p=0.026$).
+At $t=4$ the $G=2$ and $G=3$ cells have the same 129 hits on the same
+targets and seeds, and $G=3$ costs $2.95\times$ less per target; the
+source states that the conditional binomial $p$ between them is not
+meaningful. Screening still separates groups at $t=4$, $G=3$: $15.777$
+for the top 4 against $2.558$ for the bottom 4 ($6.2\times$,
+$p=7.7\cdot10^{-18}$). The pairs law fails at $t=4$ (129 against $99.5$,
+interval 80--119) and sits at the edge of its interval at $t=3$ (74 in
+44--74); seed 214 alone had 38 hits against $22.01$ expected.
+Figure~\ref{fig:iso-seed-t} plots the rate and the cost per target
+against $t$.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llllrlrr@{}}
+\toprule
+$t$, $G$ & Seeds & Arm & Study & Hits & Rate $[95\%]$ & law o/e & mul-adds/target \\
+\midrule
+5, 3 & 1--20, unscreened & blind & 14 Nov & 206 & $2.909$ $[2.525,3.334]$ & -- & $1.7702$--$1.7710\cdot10^5$ \\
+5, 3 & top 8 of 40 & blind & screen & 146 & $5.155$ $[4.353,6.062]$ & $1.195$ & -- \\
+5, 3 & bottom 8 of 40 & blind & screen & 51 & $1.800$ $[1.340,2.367]$ & $1.125$ & -- \\
+5, 3 & top 8 of 40 & lifts & lifts & 1014 & $4.488$ $[4.216,4.773]$ & $1.040$ & $1.4117$--$1.4156\cdot10^6$ \\
+5, 3 & bottom 8 of 40 & lifts & lifts & 368 & $1.625$ $[1.463,1.800]$ & $1.016$ & (both groups) \\
+5, 3 & 1550, best of 3{,}000 & blind & scaling & 30 & $8.476$ $[5.719,12.101]$ & $1.187$ & -- \\
+6, 3 & 101--108, unscreened & blind & scaling & 315 & $0.643$ $[0.574,0.718]$ & $1.027$ & $3.0612$--$3.0635\cdot10^6$ \\
+4, 3 & top 4 + bottom 4 of 40 & blind & lower $t$ & 129 & $9.167$ $[7.653,10.892]$ & $1.297$ & $1.759\cdot10^4$ \\
+4, 2 & top 4 + bottom 4 of 40 & blind & lower $t$ & 129 & $3.103$ $[2.591,3.687]$ & $1.297$ & $5.196\cdot10^4$ \\
+3, 2 & top 4 + bottom 4 of 40 & blind & lower $t$ & 74 & $12.340$ $[9.690,15.492]$ & $1.261$ & $3{,}748$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Isogeny seeds on the $k=20$ Curve25519 miniature, F4 engine,
+$m=2$, 20{,}000 targets per arm. Rate: hits per $10^9$ counted F4
+multiply-adds, exact Poisson interval; law o/e: observed hits over the
+pairs law $b(b-1)/(2\#E)$ per target (for lifts, times the $7.98$--$7.99$
+lift targets per target). Screened seeds are ranked by the number of
+$x$-values of $V$ on the curve. No arm has a rho partner. Sources:
+\art{research/curve25519_isogeny_seeds_20261114/summary.txt} and the
+\texttt{summary.txt} of the four 15 November studies named in the text;
+all \texttt{[pcc:unverified]}, no validation file.}
+\label{tab:iso-seed-screen}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-u16xfer-c25519-t.pdf}
+\caption[]{Isogeny base on the $k=20$ Curve25519 miniature against tower
+depth $t$, blind arm. Left: hits per $10^9$ counted F4 multiply-adds with
+exact Poisson 95\% intervals. Right: F4 multiply-adds per target. The
+$t=5$ point pools unscreened seeds 1--20 and the $t=6$ point unscreened
+seeds 101--108; the $t=3$ and $t=4$ points pool the top 4 and the bottom 4
+of 40 screened seeds, so they are not random samples of seeds. No rho arm.
+Data: \art{figures/data-u16xfer-c25519-t.json}, from the summaries of
+Table~\ref{tab:iso-seed-screen}; \texttt{[pcc:unverified]}.}
+\label{fig:iso-seed-t}
+\end{figure}
+
+\paragraph{Indicative distance to rho.} No study above ran a matched rho
+arm. The lower-$t$ study did not rerun one (its session's AWS identity was
+invalid) and computed an indicative $S$ against the lab's replay-audited
+T12 negation rho, $S=1.544$, $1.654$ and $2.651$ at $w=0$, $0.1$ and $1$
+(Table~\ref{tab:iso-seed-gap}). Its $S$ charges the counted tower
+operations at one GAE each plus $w$ times $(\text{columns}+1)$ times
+multiply-adds per hit, over $\sqrt N=362.2$; it is not an ecbench $S$, and
+a multiply-add is not a group addition. Its hypothesis H34, an indicative
+gap at $w=0.1$ below the atlas's measured best arm, failed: $6.76\cdot10^4$
+at $t=3$ against $1.83\cdot10^4$. Lowering $t$ from 5 to 3 moves the
+indicative $w=0.1$ gap from $5.3\cdot10^5$ to $6.8\cdot10^4$, measured in
+F4 work on this engine. The $w=0$ column charges one seed's tower only;
+charging the 40-candidate screen ($82{,}384$ and $47{,}075$ operations)
+would add about 227 and 130 to $S$, so it is not comparable with the
+atlas's $27.9$. The scaling study's own estimate for seed 1550,
+$3.19\cdot10^9$ F4 multiply-adds for 27 relations against 321 expected rho
+group operations, a ratio of $9.92\cdot10^6$, mixes the same two units.
+None of these is a leaderboard row: there is no paired rho run, replay
+certificate, validator report or \texttt{pcc} claim. The distance to rho
+stays four to five orders of magnitude at $w=0.1$.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrrrl@{}}
+\toprule
+Cell & $w=0$ & $w=0.1$ & $w=1$ & Standing \\
+\midrule
+$t=5$, $G=3$, seed 1550 (recomputed) & $3.4$ & $5.3\cdot10^5$ & $3.3\cdot10^6$ & indicative \\
+$t=4$, $G=3$, 8 screened seeds & $3.6$ & $1.55\cdot10^5$ & $9.7\cdot10^5$ & indicative \\
+$t=3$, $G=2$, 8 screened seeds & $2.7$ & $6.8\cdot10^4$ & $4.2\cdot10^5$ & indicative \\
+\addlinespace
+Atlas best ($t=4$, $G=3$, seed 1193, trace replay) & $27.9$ & $1.83\cdot10^4$ & $1.13\cdot10^5$ & ecbench \\
+\bottomrule
+\end{tabular}
+\caption[]{Indicative gap to the T12 negation rho on the $k=20$
+Curve25519 miniature (arm $S$ over rho $S$). The first three rows are not
+ecbench sessions and are \texttt{[pcc:unverified]}; the last is the measured arm of \S\ref{sec:c25519}. Its validator report passes with errata.
+Source: \art{research/curve25519_isogeny_lower_t_20261115/README.md}.}
+\label{tab:iso-seed-gap}
+\end{table}
+
 \section{Isogeny computation as tooling}\label{sec:iso-tooling}
 
 Several studies built isogeny machinery without an ECDLP claim; they are
@@ -923,7 +1084,9 @@ Each rejects only its frozen family; none establishes a lower bound.
 Silverman's xedni calculus lifts $(E,P,Q)$ to a curve over $\mathbb{Q}$ or a
 number field and hopes that the lifts satisfy a short Mordell--Weil
 relation. The obstruction chapter gives the exact function-field lift
-probability. Three items refine the global case.
+probability. Three items refine the global case. The cross-characteristic
+torsion bridges of 12--14 November, and the bounds on them, are in
+\S\ref{sec:obs-open}.
 
 \paragraph{The JKSST theorem, audited in Lean.} Jacobson, Koblitz,
 Silverman, Stein and Teske's analysis derives the classic bound under

@@ -1,0 +1,22 @@
+    Checking cubic-graph-analysis v0.1.0 (/workspace/crypto/research/extension_ic_graph_20261115/native_analysis)
+error: the loop variable `j` is only used to index `a[r]`
+  --> src/bin/two-lp-component-analysis.rs:90:18
+   |
+90 |         for j in c..columns {
+   |                  ^^^^^^^^^^
+   |
+note: for this index operation
+  --> src/bin/two-lp-component-analysis.rs:91:27
+   |
+91 |             a[r][j] = mul(a[r][j], inv, p);
+   |                           ^^^^^^^
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#needless_range_loop
+   = note: `-D clippy::needless-range-loop` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::needless_range_loop)]`
+help: consider using an iterator
+   |
+90 -         for j in c..columns {
+90 +         for <item> in a[r].iter_mut().take(columns).skip(c) {
+   |
+
+error: could not compile `cubic-graph-analysis` (bin "two-lp-component-analysis") due to 1 previous error

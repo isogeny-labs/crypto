@@ -1,0 +1,154 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      },
+      "name": "rho-strong",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=4",
+          "max_trials": "1000000",
+          "oracle": "pdp3-binary:m=2,engine=matrix-f4,degree=3,node_budget=20000,matrix_runtime=baseline"
+        }
+      },
+      "name": "f4-baseline",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=4",
+          "max_trials": "1000000",
+          "oracle": "pdp3-binary:m=2,engine=matrix-f4,degree=3,node_budget=20000,matrix_runtime=baseline"
+        }
+      },
+      "name": "f4-aa",
+      "role": "control"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=4",
+          "max_trials": "1000000",
+          "oracle": "pdp3-binary:m=2,engine=matrix-f4,degree=3,node_budget=20000,matrix_runtime=quadratic-tail"
+        }
+      },
+      "name": "f4-tail",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=4",
+          "max_trials": "1000000",
+          "oracle": "pdp3-binary:m=2,engine=matrix-f5,degree=3,node_budget=20000,matrix_runtime=baseline"
+        }
+      },
+      "name": "f5-baseline",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=4",
+          "max_trials": "1000000",
+          "oracle": "pdp3-binary:m=2,engine=matrix-f5,degree=3,node_budget=20000,matrix_runtime=baseline"
+        }
+      },
+      "name": "f5-aa",
+      "role": "control"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=4",
+          "max_trials": "1000000",
+          "oracle": "pdp3-binary:m=2,engine=matrix-f5,degree=3,node_budget=20000,matrix_runtime=quadratic-tail"
+        }
+      },
+      "name": "f5-tail",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=4",
+          "max_trials": "1000000",
+          "oracle": "pdp3-binary:m=2,engine=f6-ic,degree=3,node_budget=20000,kernel_runtime=native-v1"
+        }
+      },
+      "name": "f6-native",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=4",
+          "max_trials": "1000000",
+          "oracle": "pdp3-binary:m=2,engine=generalized,work_budget=256"
+        }
+      },
+      "name": "generalized-typed",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=4",
+          "max_trials": "1000000",
+          "oracle": "rootfind-mitm:m=2,batch_setup=1"
+        }
+      },
+      "name": "semaev-batched",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=4",
+          "max_trials": "1000000",
+          "oracle": "pdp3-binary:m=2,engine=rootfind"
+        }
+      },
+      "name": "semaev-full-table",
+      "role": "candidate"
+    }
+  ],
+  "description": "Every arm recovers one public DLP target cold. Same standard polynomial subspace within this session, distinct from the component study's Frobenius-invariant base. Baseline includes previously qualified GF2 kernels. New tail and generalized Gray work is counted unpriced; no ratio of lower bounds is promoted to full-cost S. No scaling claim.",
+  "label": "F4/F5 continuation: complete cold recovery n11 d4 plumbing",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 1,
+    "seed": 230,
+    "timeout_seconds": 120,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 1,
+        "kind": "koblitz",
+        "n": 11
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 20261019,
+    "targets_per_curve": 2
+  }
+}

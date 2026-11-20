@@ -406,3 +406,29 @@ Dense quotient writes are explicitly outside the sparse coefficient-update
 counter; modular-product/inversion counters are not GAE. Original raw evidence
 and prior standings are unchanged. Timing remains blocked by the required
 S3 checkpoint upload; the complete nonsecret handoff is in LEAD_RESUME.md.
+
+## Native Rust API integration and fixed-cap six-variable qualification
+
+The implementation now lives once in crates/certified-relations. The study
+reexports it, and the real crypto_lib F4 module exposes an opt-in certified
+polynomial adapter and degree tracer. Exact complete F4 basis controls on
+the fixed 31-bit three-/four-variable cases, wide-field arithmetic/certificate
+checks, malformed-input/report rejection and incomplete-trace status pass in
+a separately copied immutable native qualifier `[pcc:unverified]`.
+
+Six variables initially exceeded the proof cap at input rewrite, then after
+lean polynomial-only containment exceeded it at change of order. The failures
+and all prior qualifier bytes are retained. Breadth-first dependency waves
+reduce the fixed cycle's derivation depth from 4 to 3; both requested fields
+now return full checked six-variable bases under the same caps. Final stored
+basis proof size is at most 8336 terms, with stored certificate product degree
+40 and final basis degree 2. These are not solving-degree or runtime results
+`[pcc:unverified]`.
+
+See INTEGRATION_REPORT.md, the three hypothesis files and integration-development/
+for source commits, pre/post manifests, raw results, failed builds and executable
+archives. The original LEADS.md claim subject is restored byte-for-byte;
+current notes live in LEAD_STATUS.md. Concurrent parent-branch main/ledger
+merges advanced while the work ran. Publication therefore uses a focused
+follow-on branch preserving the qualified commit history; no frozen ledger
+side is selected or rewritten.

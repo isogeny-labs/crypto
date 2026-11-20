@@ -1,0 +1,60 @@
+    Checking isogeny_algos v0.1.0 (/workspace/relation-root-recovery/isogeny_algos)
+    Checking factor-base v0.1.0 (/workspace/relation-root-recovery/tools/factor-base)
+    Checking hashed-ecdl-tensor v0.1.0 (/workspace/relation-root-recovery/crates/hashed-ecdl-tensor)
+    Checking ecdl-tensor-ic v0.1.0 (/workspace/relation-root-recovery/crates/ecdl-tensor-ic)
+    Checking pencil-symbolic-graph v0.1.0 (/workspace/relation-root-recovery/research/pencil_large_prime_20261029)
+    Checking certified-relations v0.1.0 (/workspace/relation-root-recovery/crates/certified-relations)
+    Checking relation-replay-checker v0.1.0 (/workspace/relation-root-recovery/crates/relation-replay-checker)
+warning: function `work` is never used
+   --> crates/hashed-ecdl-tensor/src/metrics.rs:170:15
+    |
+170 | pub(crate) fn work(n: u64) -> Result<()> {
+    |               ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `hashed-ecdl-tensor` (lib) generated 1 warning
+    Checking volcano-cli v0.1.0 (/workspace/relation-root-recovery/tools/volcano-cli)
+    Checking crypto v0.1.0 (/workspace/relation-root-recovery)
+error: mismatched closing delimiter: `}`
+   --> src/ml_dataset/custody.rs:573:21
+    |
+572 |         .filter(|m| {
+    |                     - closing delimiter possibly meant for this
+573 |             matches!(
+    |                     ^ unclosed delimiter
+...
+576 |         })
+    |         ^ mismatched closing delimiter
+
+error: this file contains an unclosed delimiter
+   --> src/ml_dataset/custody.rs:874:2
+    |
+ 33 | pub enum CustodyCommand {
+    |                         - unclosed delimiter
+...
+ 48 |     Verify {
+    |            - unclosed delimiter
+ 49 |     /// Materialize a verified bundle into a fresh directory and replay the run.
+ 50 |     Restore {
+    |             - unclosed delimiter
+...
+ 53 |     Publish {
+    |             - unclosed delimiter
+...
+ 58 |     RestoreRemote {
+    |                   - unclosed delimiter
+...
+ 63 | struct Member {
+    |               - another 111 unclosed delimiters begin from here
+...
+368 |         &json!({"schema":"crypto.ml-dataset.custody-publication/v1",
+    |                - this delimiter might not be properly closed...
+369 |             "custody_manifest_sha256":custody_manifest.sha256,
+370 |             "artifacts":objects}),
+    |                                - ...as it matches this but it has different indentation
+...
+874 |
+    | ^
+
+error: could not compile `crypto` (lib) due to 2 previous errors

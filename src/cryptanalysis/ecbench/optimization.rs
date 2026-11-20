@@ -108,6 +108,25 @@ macro_rules! policy {
 // Deliberately explicit.  A new method must choose a search strategy and a
 // claim/accounting scope; the registry-exhaustiveness test fails otherwise.
 const POLICIES: &[PolicyDecl] = &[
+    policy!("ic.orbit_rank_v1", NativeGrid, DiagnosticOnly, StandardBand),
+    policy!(
+        "ic.hashed_native_v1",
+        NativeGrid,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
+        "hec.ic_fb_walk",
+        NativeGrid,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "hec.rho_full_width",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
     policy!(
         "ic.prime_orbit_relations_v1",
         NativeGrid,
@@ -205,6 +224,18 @@ const POLICIES: &[PolicyDecl] = &[
         "rho.frozen_reference",
         ReplayControl,
         FrozenHistorical,
+        StandardBand
+    ),
+    policy!(
+        "rho.curve25519_bounded",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "ic.curve25519_pair_v1",
+        NativeGrid,
+        SpecializedDomain,
         StandardBand
     ),
     policy!("rho.plain", ReplayControl, FrozenHistorical, StandardBand),
@@ -710,10 +741,27 @@ const POLICIES: &[PolicyDecl] = &[
     ),
 ];
 
-fn parameter_role(name: &str) -> Option<ParameterRole> {
+fn parameter_role(method: &str, name: &str) -> Option<ParameterRole> {
     use ParameterRole::*;
+    if method == "ic.hashed_native_v1" {
+        return Some(match name {
+            "backend" | "m" | "threshold" | "derive_last" | "smallest_first" | "cache_entries"
+            | "outer_multiplier" => Knob,
+            "trials" | "columns" | "steps" | "vector" | "bits" | "rank" | "slices" | "attempts" => {
+                ResourceEnvelope
+            }
+            _ => return None,
+        });
+    }
+    if method == "ic.orbit_rank_v1" {
+        return Some(match name {
+            "columns" | "table_mode" => Knob,
+            "raw_x_cap" | "max_trials" | "max_pair_visits" => ResourceEnvelope,
+            _ => return None,
+        });
+    }
     Some(match name {
-        "base_seed" | "fb_seed" | "rank_seed" | "seed" | "table_seed" => Seed,
+        "base_seed" | "fb_seed" | "rank_seed" | "seed" | "table_seed" | "fixed_seed" => Seed,
         "batch" => WorkloadScope,
         "backend" => ExternalBinding,
         "backend_sha256" | "c4" => IdentityOrPrice,
@@ -727,6 +775,8 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "max_ops"
         | "max_restarts"
         | "max_states"
+        | "max_steps"
+        | "max_scan"
         | "max_sums"
         | "max_trials"
         | "max_u"
@@ -748,6 +798,7 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "batch_trials"
         | "base"
         | "base_multiplier"
+        | "base_size"
         | "base_scale"
         | "beta"
         | "branches"
@@ -843,7 +894,7 @@ fn profile(method: &'static MethodDecl) -> Result<MethodProfile<'static>, String
         .params
         .iter()
         .map(|p| {
-            let role = parameter_role(p.name).ok_or_else(|| {
+            let role = parameter_role(method.id, p.name).ok_or_else(|| {
                 format!(
                     "method `{}` parameter `{}` has no optimization role",
                     method.id, p.name
@@ -872,6 +923,9 @@ fn profile(method: &'static MethodDecl) -> Result<MethodProfile<'static>, String
 pub fn profiles() -> Result<Vec<MethodProfile<'static>>, String> {
     let registry_ids: BTreeSet<_> = methods::registry().iter().map(|m| m.id).collect();
     let policy_ids: BTreeSet<_> = POLICIES.iter().map(|p| p.id).collect();
+    if registry_ids.len() != methods::registry().len() || policy_ids.len() != POLICIES.len() {
+        return Err("duplicate method or optimization policy registry id".into());
+    }
     if registry_ids != policy_ids {
         let missing: Vec<_> = registry_ids.difference(&policy_ids).copied().collect();
         let stale: Vec<_> = policy_ids.difference(&registry_ids).copied().collect();
@@ -1112,7 +1166,7 @@ fn audit_spec(path: &Path, stage: Stage) -> Result<(Spec, SpecAudit), String> {
                 methods::resolve(&candidate.method),
             ) {
                 for key in baseline_method.params.keys() {
-                    if parameter_role(key) != Some(ParameterRole::Knob)
+                    if parameter_role(&candidate_method.id, key) != Some(ParameterRole::Knob)
                         && baseline_method.params.get(key) != candidate_method.params.get(key)
                     {
                         errors.push(format!(
@@ -1344,6 +1398,7 @@ mod tests {
     #[test]
     fn censoring_and_seeds_cannot_be_tuning_knobs() {
         for name in [
+            "max_steps",
             "max_trials",
             "trial_cap",
             "solver_budget_seconds",
@@ -1352,7 +1407,7 @@ mod tests {
             "base_seed",
             "rank_seed",
         ] {
-            assert_ne!(parameter_role(name), Some(ParameterRole::Knob));
+            assert_ne!(parameter_role("", name), Some(ParameterRole::Knob));
         }
     }
 }

@@ -1,0 +1,409 @@
+{
+  "sources": [
+    {
+      "id": "S-IC-SIX-OBLIGATIONS-2026",
+      "title": "Six-obligation follow-up: first attacks and hard gates",
+      "kind": "repository_synthesis",
+      "verification": "repository_read",
+      "citation": "crypto repository, research/ic_weak_assumptions_20261102/FOLLOWUP.md (2026-11-02)",
+      "repository_path": "research/ic_weak_assumptions_20261102/FOLLOWUP.md",
+      "notes": "Source-level audit and scoped integration record for tensor admission, fixed-population yield/rank, arity-three proof explanations, PKM dual certificates, Wagner bucket variance and xedni selected lifts."
+    },
+    {
+      "id": "S-TENSOR-D4-NATIVE-2026",
+      "title": "Native exact Appendix D.4 numeric admission audit",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "crypto repository, crates/hashed-ecdl-tensor/src/admission.rs",
+      "repository_path": "crates/hashed-ecdl-tensor/src/admission.rs",
+      "notes": "Arbitrary-precision mirror of the numeric recursion guards only; it deliberately does not certify predicate or aggregate cost hypotheses."
+    },
+    {
+      "id": "S-ARITY3-TRAIL-NATIVE-2026",
+      "title": "Native source-bound finite-field unit-explanation checker",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "crypto repository, research/prime_shared_coefficient_sat_20261031/native/src/trail.rs",
+      "repository_path": "research/prime_shared_coefficient_sat_20261031/native/src/trail.rs",
+      "notes": "Independently replays one-equation nonzero-constant conflicts and one-affine-unknown propagations against the canonical IR hash."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "COND-HASHED-ECDL-TENSOR-BOUND",
+      "label": "Hashed-ECDL Boolean tensor contraction bound",
+      "kind": "conditional_attack",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "statement": "The hashed factor-base route gives the stated subexponential ECDLP bound only when the exact tensor contraction theorem, predicate-description and entry-evaluation hypotheses, aggregate construction and space bounds, relation yield, rank and complete-cost composition all hold for one parameter family.",
+      "scope": "Conditional theorem chain for the pinned hashed-ECDL construction. Bounded forced-recursion controls and the numeric admission audit do not establish its asymptotic runtime or a practical attack.",
+      "assumptions": [
+        "Polynomial-size typed predicate descriptions",
+        "Uniform predicate-entry evaluation bound",
+        "Aggregate construction and polynomial-space accounting",
+        "Required relation yield and rank",
+        "Complete end-to-end cost composition"
+      ],
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"],
+      "tags": ["hashed-ecdl", "tensor-contraction", "conditional-attack", "prime-field"],
+      "formula": "2^{O(b/(log b)^(1/4))} under the complete source hypotheses",
+      "evidence_class": "conditional_theorem",
+      "non_implications": [
+        "The live usize dispatcher does not execute the asymptotic recursive branch on a 64-bit host",
+        "The exact numeric guard audit does not certify predicate or aggregate cost"
+      ]
+    },
+    {
+      "id": "THM-TENSOR-D4-NUMERIC-BOUNDARY",
+      "label": "Exact D.4 numeric recursion boundary",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "For even subdivided source sizes, the first root size with nonzero D.4 scale u=floor(ceil(log2 s)/131072) is s=2^131071+2; at degree two the mirrored numeric guards pass with lambda=131072, u=1, a=2, L=4 and D=2^24, while no 64-bit usize host can represent s.",
+      "scope": "Exact integer guard calculation and native regression tests. This is a representation/admission fact, not the tensor theorem or a runtime measurement.",
+      "assumptions": ["The pinned Appendix D.4 parameter formulas", "Even size after public Boolean-network subdivision"],
+      "source_refs": ["S-TENSOR-D4-NATIVE-2026", "S-IC-SIX-OBLIGATIONS-2026"],
+      "source_locations": ["crates/hashed-ecdl-tensor/src/admission.rs"],
+      "tags": ["hashed-ecdl", "tensor-contraction", "numeric-admission", "native-exact"],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "native_exact",
+        "artifacts": [{"path": "crates/hashed-ecdl-tensor/src/admission.rs"}],
+        "notes": "BigUint calculation with boundary, host-width and fail-closed degree tests."
+      },
+      "cited_by": [
+        {"path": "research/ic_weak_assumptions_20261102/FOLLOWUP.md", "use": "reports"},
+        {"path": "problems/hashed-ecdl-tensor-backend.md", "use": "reports"}
+      ]
+    },
+    {
+      "id": "GAP-TENSOR-PREDICATE-COST-CERTIFICATE",
+      "label": "Typed tensor predicate-cost certificate",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "The public opaque predicate closure has no machine-checkable certificate of polynomial description size or the uniform entry-evaluation bound required by the contraction theorem.",
+      "scope": "A typed canonical predicate family must expose a description-size measure and a compositional operation bound; a Boolean assertion or development meter is not such a certificate.",
+      "assumptions": [],
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026", "S-TENSOR-D4-NATIVE-2026"],
+      "tags": ["hashed-ecdl", "tensor-contraction", "predicate-cost", "open-obligation"],
+      "evidence_class": "open"
+    },
+    {
+      "id": "GAP-TENSOR-AGGREGATE-COST-CERTIFICATE",
+      "label": "Tensor aggregate construction and space certificate",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "No source-level certificate currently composes local packet, child, precision and recovery allocations into the aggregate construction-time and polynomial-space bounds required by the tensor theorem.",
+      "scope": "Depth-first execution and bounded local tests are useful controls but do not prove the asymptotic aggregate bound for an admitted instance family.",
+      "assumptions": [],
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026", "S-TENSOR-D4-NATIVE-2026"],
+      "tags": ["hashed-ecdl", "tensor-contraction", "space-bound", "construction-cost", "open-obligation"],
+      "evidence_class": "open"
+    },
+    {
+      "id": "GAP-PRIME-YIELD-RANK-POPULATION",
+      "label": "Fixed-population prime-field yield and rank evidence",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "repository_measurement",
+      "statement": "The prime-field corpus lacks a write-once, fixed-budget natural-target population that simultaneously retains every decomposition count, solver failure, verified relation row and incremental-rank/support observation past the first recovery point.",
+      "scope": "The historical named batch is under an explicit custody hold, and stopped aggregate records cannot reconstruct zero mass, variance, multiplicity or terminal rank. A clean successor must use public fixtures and a new identity.",
+      "assumptions": [],
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"],
+      "tags": ["prime-field", "yield", "relation-rank", "fixed-budget", "custody", "open-obligation"],
+      "evidence_class": "open",
+      "failure_modes": ["Adaptive stopping", "Missing zero-count targets", "Discarded solver failures", "Rank computed from a different population", "Unreconciled fixture custody"]
+    },
+    {
+      "id": "THM-ARITY3-FP-UNIT-EXPLANATION",
+      "label": "Source-bound Fp unit-equation explanation checker",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "Against an exact canonical-IR hash and one named source equation, the native checker independently accepts only a nonzero constant conflict or a unique affine residual a*x+b with invertible a, and rejects changed conclusions, nonlinear residuals, multiple unknowns, malformed premises and changed source IR.",
+      "scope": "One finite-field lemma class. It is not a Boolean clause proof, a CaDiCaL external propagator, a complete algebraic proof log or a solver-scaling result.",
+      "assumptions": ["Canonical IR validation", "Prime-field arithmetic represented by the native IR"],
+      "source_refs": ["S-ARITY3-TRAIL-NATIVE-2026", "S-IC-SIX-OBLIGATIONS-2026"],
+      "source_locations": ["research/prime_shared_coefficient_sat_20261031/native/src/trail.rs"],
+      "tags": ["arity-three", "finite-field", "proof-explanation", "native-exact"],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "native_exact",
+        "artifacts": [{"path": "research/prime_shared_coefficient_sat_20261031/native/src/trail.rs"}],
+        "notes": "Three focused tests cover propagation, conflict, mutation and nonlinear rejection."
+      },
+      "cited_by": [
+        {"path": "research/ic_weak_assumptions_20261102/FOLLOWUP.md", "use": "reports"},
+        {"path": "research/prime_shared_coefficient_sat_20261031/README.md", "use": "reports"}
+      ]
+    },
+    {
+      "id": "GAP-ARITY3-BOOLEAN-BINDING",
+      "label": "Bind Fp explanations to Boolean trail literals",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "The checked field assignments and conclusions are not yet translated into the exact Boolean selector literals that form a SAT trail premise and propagated clause.",
+      "scope": "The binding must preserve canonical variable/value semantics and fail closed on ambiguous or incomplete encodings.",
+      "assumptions": [],
+      "source_refs": ["S-ARITY3-TRAIL-NATIVE-2026", "S-IC-SIX-OBLIGATIONS-2026"],
+      "tags": ["arity-three", "finite-field", "SAT", "Boolean-binding", "open-obligation"],
+      "evidence_class": "open"
+    },
+    {
+      "id": "GAP-ARITY3-PROOF-COMPOSITION",
+      "label": "Compose finite-field and Boolean proof logs",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "No production external propagator currently emits clauses whose field consequence is replayed by the native kernel and whose Boolean consequence is composed with a pinned solver proof log.",
+      "scope": "Stronger field lemmas such as equation combinations and guarded inversions require separate checked certificate rules before use.",
+      "assumptions": [],
+      "source_refs": ["S-ARITY3-TRAIL-NATIVE-2026", "S-IC-SIX-OBLIGATIONS-2026"],
+      "tags": ["arity-three", "finite-field", "CaDiCaL", "proof-log", "open-obligation"],
+      "evidence_class": "open"
+    },
+    {
+      "id": "DEF-PKM-CLOSURE-DUAL-CERTIFICATE",
+      "label": "PKM closure-dual lower-bound certificate",
+      "kind": "definition",
+      "status": "definition",
+      "model": "mathematical",
+      "statement": "For the degree-c closure matrix A_c with its constant column distinguished, a vector ell satisfying A_c*ell=0 and ell_constant=1 is a finite certificate that 1 is not in the generated closure and hence the closure degree is greater than c.",
+      "scope": "The matrix basis, coefficient field, closure rules and constant column must be canonical and independently replayable. One certificate proves one finite lower bound, not an asymptotic family or a matrix-width bound.",
+      "assumptions": [],
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"],
+      "tags": ["PKM", "closure-degree", "dual-certificate", "definition"],
+      "formula": "A_c ell = 0; ell_constant = 1",
+      "evidence_class": "definition"
+    },
+    {
+      "id": "GAP-PKM-GROWING-DUAL-CERTIFICATE",
+      "label": "Growing PKM closure-dual certificate family",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "No verified family of PKM closure-dual certificates is known for degrees c(t) growing with the tower parameter t.",
+      "scope": "A bounded collection of finite certificates is evidence for those cells only. A useful theorem must specify the tower family and prove the dual construction for growing t.",
+      "assumptions": [],
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"],
+      "tags": ["PKM", "closure-degree", "lower-bound", "open-obligation"],
+      "evidence_class": "open"
+    },
+    {
+      "id": "GAP-PKM-MATRIX-WIDTH-BRIDGE",
+      "label": "PKM closure degree to matrix-width bridge",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "A closure- or solving-degree lower bound does not by itself lower-bound every representation's column support, nonzeros, peak frontier, memory or sparse arithmetic work; PKM lacks that representation-aware bridge.",
+      "scope": "The bridge must name the canonical normal-form basis and actual work model. Projected high-memory cells are secondary checks, not a proof.",
+      "assumptions": [],
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"],
+      "tags": ["PKM", "matrix-width", "memory", "work-bound", "open-obligation"],
+      "evidence_class": "open"
+    },
+    {
+      "id": "DEF-WAGNER-BUCKET-VARIANCE",
+      "label": "Relative Wagner bucket variance W",
+      "kind": "definition",
+      "status": "definition",
+      "model": "mathematical",
+      "statement": "For bucket weights q_c, global agreement rate delta and target-bucket rates pi_c, the relative bucket second moment is W=sum_c q_c*(pi_c/delta-1)^2.",
+      "scope": "This is the statistic required to distinguish a nearly uniform filter from a bucket-concentrated signal; a first moment or aggregate agreement rate cannot recover it.",
+      "assumptions": ["delta is nonzero", "The buckets and weights form the frozen estimator partition"],
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"],
+      "tags": ["Wagner", "bucket-variance", "second-moment", "definition"],
+      "formula": "W=sum_c q_c*(pi_c/delta-1)^2",
+      "evidence_class": "definition"
+    },
+    {
+      "id": "GAP-WAGNER-W-SCALING",
+      "label": "Wagner bucket-variance scaling law",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "repository_measurement",
+      "statement": "No admitted native scaling panel determines how W varies with the group prime p and bucket count M for the proposed elliptic-curve representation filters.",
+      "scope": "The requested panel needs exact whole-group anchors, a frozen prime/M ladder, positive and matched-marginal null controls, bias checks, checkpointing and independent replay.",
+      "assumptions": [],
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"],
+      "tags": ["Wagner", "bucket-variance", "scaling", "native-producer", "open-obligation"],
+      "evidence_class": "open",
+      "formula": "candidate fit W=Theta(M^a*p^(-1/2)); proof-repair direction requires a<1/2 at M=p^(1/3)"
+    },
+    {
+      "id": "GAP-WAGNER-FILTER-GAIN-BRIDGE",
+      "label": "Wagner variance to useful filter-gain bridge",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "Even a large or nondecaying W is only a concentration signal until a theorem converts it into an enumerable, sufficiently dense, non-generic relation filter with complete setup, memory, yield and verification costs.",
+      "scope": "Small W supports a proof that the proposed filtering gain is bounded; large W breaks that repair but does not itself provide an ECDLP attack.",
+      "assumptions": [],
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"],
+      "tags": ["Wagner", "filter-gain", "non-generic-interface", "open-obligation"],
+      "evidence_class": "open"
+    },
+    {
+      "id": "COND-WAGNER-ECDLP-FILTER-GAIN",
+      "label": "Wagner-style ECDLP representation-filter gain",
+      "kind": "conditional_attack",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "statement": "A Wagner-style elliptic-curve filter improves relation search only if its bucket variance scales favorably and the concentrated buckets can be enumerated and verified at the required density with a non-generic interface and complete costs.",
+      "scope": "Conditional route distinct from Wagner's four-sum heuristic itself. No present W measurement or filter-gain theorem establishes this route.",
+      "assumptions": ["Favorable W scaling", "Subquadratic qualifying-pair enumeration", "Non-generic interface witness", "Complete relation yield and memory accounting"],
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"],
+      "tags": ["Wagner", "representation-filter", "conditional-attack"],
+      "evidence_class": "conditional_theorem"
+    },
+    {
+      "id": "GAP-XEDNI-SELECTOR-TERMINATION",
+      "label": "Explicit terminating xedni lift selector",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "No explicit xedni selector is proved to terminate uniformly on every finite-field input in a declared public lift family while preserving the intended sampling process.",
+      "scope": "Enumerating rational lifts in increasing certified height boxes defines a partial search rule until termination is proved or an explicit nonterminating family is retained.",
+      "assumptions": [],
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"],
+      "tags": ["xedni", "lift-selector", "termination", "open-obligation"],
+      "evidence_class": "open"
+    },
+    {
+      "id": "GAP-XEDNI-MINIMAL-MODEL-HEIGHT",
+      "label": "Selected-lift height versus global minimal discriminant",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "No uniform theorem bounds the heights of the points selected by an explicit xedni lift algorithm against the global minimal discriminant of the selected rational curve family.",
+      "scope": "An arbitrary integral model is not intrinsic: admissible scaling changes its discriminant by a twelfth power. The theorem must normalize to a global minimal model and quantify over selected, not all, rational multiples.",
+      "assumptions": [],
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"],
+      "tags": ["xedni", "height", "global-minimal-discriminant", "open-obligation"],
+      "evidence_class": "open"
+    },
+    {
+      "id": "GAP-XEDNI-REDUCTION-CORRESPONDENCE",
+      "label": "Xedni selected-lift reduction and subgroup correspondence",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "The selected rational lifts are not yet proved to reduce to the intended finite-field points with the required prime-subgroup sampling, useful nonzero denominators and bounded cofactor uniformly across the family.",
+      "scope": "Good reduction alone does not compose selector output with the finite xedni core or the adaptive trial process.",
+      "assumptions": [],
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"],
+      "tags": ["xedni", "good-reduction", "subgroup", "open-obligation"],
+      "evidence_class": "open"
+    }
+  ],
+  "edges": [
+    {"id": "IC6-E-001", "from": "GAP-TENSOR-PREDICATE-COST-CERTIFICATE", "to": "COND-HASHED-ECDL-TENSOR-BOUND", "relation": "conditions", "statement": "The claimed contraction bound requires a typed predicate description and entry-evaluation cost certificate.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-002", "from": "GAP-TENSOR-AGGREGATE-COST-CERTIFICATE", "to": "COND-HASHED-ECDL-TENSOR-BOUND", "relation": "conditions", "statement": "The claimed contraction bound requires aggregate construction-time and polynomial-space accounting.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-003", "from": "GAP-END-TO-END-IC-EXPONENT", "to": "COND-HASHED-ECDL-TENSOR-BOUND", "relation": "conditions", "statement": "The hashed route remains conditional until every end-to-end phase is composed under one parameter family.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-004", "from": "HEUR-DECOMPOSITION-PROBABILITY", "to": "COND-HASHED-ECDL-TENSOR-BOUND", "relation": "conditions", "statement": "The relation-count route still needs its target-distribution and usable-yield hypotheses.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-005", "from": "HEUR-RELATION-RANK", "to": "COND-HASHED-ECDL-TENSOR-BOUND", "relation": "conditions", "statement": "Collected relations must meet the route's rank requirement.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-006", "from": "THM-TENSOR-D4-NUMERIC-BOUNDARY", "to": "COND-HASHED-ECDL-TENSOR-BOUND", "relation": "qualifies", "statement": "The numeric recursion begins beyond the public host representation, so practical fallback execution neither validates nor refutes the asymptotic bound.", "source_refs": ["S-TENSOR-D4-NATIVE-2026", "S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-007", "from": "COND-HASHED-ECDL-TENSOR-BOUND", "to": "GAP-COORDINATE-ALGEBRAIC", "relation": "instantiates", "statement": "The hashed Boolean tensor route is a representation-specific coordinate-algebraic candidate outside a generic table interface.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+
+    {"id": "IC6-E-008", "from": "GAP-PRIME-YIELD-RANK-POPULATION", "to": "HEUR-DECOMPOSITION-PROBABILITY", "relation": "leaves_open", "statement": "Without a fixed complete target population, the prime-field distribution shape cannot be measured without stopping bias.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-009", "from": "GAP-PRIME-YIELD-RANK-POPULATION", "to": "HEUR-RELATION-RANK", "relation": "leaves_open", "statement": "Without the same immutable relation population, terminal rank and support defects cannot be inferred from early independent rows.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+
+    {"id": "IC6-E-010", "from": "THM-ARITY3-FP-UNIT-EXPLANATION", "to": "GAP-ARITY3-BOOLEAN-BINDING", "relation": "enables", "statement": "The checked field consequence supplies the theory-side object that must be bound to exact Boolean trail literals.", "source_refs": ["S-ARITY3-TRAIL-NATIVE-2026"]},
+    {"id": "IC6-E-011", "from": "GAP-ARITY3-BOOLEAN-BINDING", "to": "GAP-ARITY3-PROOF-COMPOSITION", "relation": "conditions", "statement": "A combined proof log cannot be checked until each field premise and conclusion has an unambiguous Boolean encoding.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-012", "from": "GAP-ARITY3-PROOF-COMPOSITION", "to": "GAP-RP-SAT-SCALING", "relation": "conditions", "statement": "A proof-eligible arity-three solver scaling claim needs replayable composition of its theory lemmas and Boolean proof log.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-013", "from": "GAP-ARITY3-PROOF-COMPOSITION", "to": "GAP-END-TO-END-IC-EXPONENT", "relation": "instantiates", "statement": "The missing proof-eligible solver is one concrete solver/interface gate in the end-to-end exponent obligation.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+
+    {"id": "IC6-E-014", "from": "DEF-PKM-CLOSURE-DUAL-CERTIFICATE", "to": "GAP-PKM-GROWING-DUAL-CERTIFICATE", "relation": "defines", "statement": "The dual nullspace certificate is the finite object whose growing family would prove closure-degree lower bounds.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-015", "from": "GAP-PKM-GROWING-DUAL-CERTIFICATE", "to": "GAP-PKM-SOLVING-DEGREE", "relation": "instantiates", "statement": "A growing dual family is one precise proof route into the broader PKM solving-degree question.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-016", "from": "GAP-PKM-MATRIX-WIDTH-BRIDGE", "to": "GAP-PKM-SOLVING-DEGREE", "relation": "qualifies", "statement": "Even resolving degree growth does not settle representation-aware matrix width, memory or sparse work.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-017", "from": "FACT-GROEBNER-COST-DEPENDENCE", "to": "GAP-PKM-MATRIX-WIDTH-BRIDGE", "relation": "leaves_open", "statement": "General degree-dependent cost facts do not supply the missing PKM-specific width lower bound.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-018", "from": "THM-PF-REPO-KUMMER-FFD-FOUR", "to": "GAP-PKM-MATRIX-WIDTH-BRIDGE", "relation": "qualifies", "statement": "Constant first-fall degree does not certify bounded matrix width or arithmetic work.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+
+    {"id": "IC6-E-019", "from": "DEF-WAGNER-BUCKET-VARIANCE", "to": "GAP-WAGNER-W-SCALING", "relation": "defines", "statement": "The W statistic is the precise second moment whose scaling the native panel must determine.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-020", "from": "GAP-WAGNER-W-SCALING", "to": "COND-WAGNER-ECDLP-FILTER-GAIN", "relation": "conditions", "statement": "The proposed filter gain requires a favorable scaling law for bucket concentration.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-021", "from": "GAP-WAGNER-FILTER-GAIN-BRIDGE", "to": "COND-WAGNER-ECDLP-FILTER-GAIN", "relation": "conditions", "statement": "Bucket concentration must be converted into enumerable useful relations with a non-generic witness and complete costs.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-022", "from": "HEUR-WAGNER-FOUR-SUM", "to": "COND-WAGNER-ECDLP-FILTER-GAIN", "relation": "conditions", "statement": "The elliptic-curve proposal inherits Wagner-style list and representation hypotheses in addition to its curve-specific bridge.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-023", "from": "GAP-END-TO-END-IC-EXPONENT", "to": "COND-WAGNER-ECDLP-FILTER-GAIN", "relation": "conditions", "statement": "Any filter gain must survive complete setup, relation, rank, memory and verification accounting.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-024", "from": "COND-WAGNER-ECDLP-FILTER-GAIN", "to": "GAP-COORDINATE-ALGEBRAIC", "relation": "instantiates", "statement": "A useful representation filter would be one concrete coordinate-algebraic escape candidate.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+
+    {"id": "IC6-E-025", "from": "GAP-XEDNI-SELECTOR-TERMINATION", "to": "GAP-XEDNI-END-TO-END", "relation": "instantiates", "statement": "Termination of one explicit selector is a concrete component of the broad xedni end-to-end gap.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-026", "from": "GAP-XEDNI-MINIMAL-MODEL-HEIGHT", "to": "GAP-XEDNI-END-TO-END", "relation": "instantiates", "statement": "The selected-height/global-minimal-discriminant comparison is a concrete component of the broad xedni gap.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-027", "from": "GAP-XEDNI-REDUCTION-CORRESPONDENCE", "to": "GAP-XEDNI-END-TO-END", "relation": "instantiates", "statement": "Reduction and subgroup correspondence are concrete components of the broad xedni gap.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-028", "from": "GAP-XEDNI-SELECTOR-TERMINATION", "to": "OBSTRUCTION-XEDNI-HEIGHT", "relation": "conditions", "statement": "The conditional obstruction needs an actual uniformly terminating selected-lift process.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-029", "from": "GAP-XEDNI-MINIMAL-MODEL-HEIGHT", "to": "OBSTRUCTION-XEDNI-HEIGHT", "relation": "conditions", "statement": "The height obstruction requires an intrinsic bound for selected lifts against global minimal discriminants.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-030", "from": "GAP-XEDNI-REDUCTION-CORRESPONDENCE", "to": "OBSTRUCTION-XEDNI-HEIGHT", "relation": "conditions", "statement": "The rational-point bound must compose with the intended finite subgroup, useful denominator and cofactor process.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]},
+    {"id": "IC6-E-031", "from": "THEOREM-XEDNI-FINITE-CORE", "to": "GAP-XEDNI-REDUCTION-CORRESPONDENCE", "relation": "leaves_open", "statement": "The finite core is checked under explicit hypotheses but does not prove that selector outputs satisfy them.", "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]}
+  ],
+  "research_targets": [
+    {
+      "id": "RT-TENSOR-TYPED-COST-CERTIFICATION",
+      "label": "Certify hashed-tensor predicate and aggregate costs",
+      "status": "ready",
+      "priority": 1,
+      "objective": "Replace opaque predicate admission with a typed canonical family carrying checkable description and per-operation bounds, then compose local allocations into the source construction-time and polynomial-space theorem.",
+      "depends_on": ["COND-HASHED-ECDL-TENSOR-BOUND", "GAP-TENSOR-PREDICATE-COST-CERTIFICATE", "GAP-TENSOR-AGGREGATE-COST-CERTIFICATE", "THM-TENSOR-D4-NUMERIC-BOUNDARY"],
+      "acceptance": "A versioned certificate schema, fail-closed checker, theorem-to-code matrix and proof that every admitted network meets the source predicate-evaluation, construction and aggregate-space hypotheses; arbitrary closures remain ineligible.",
+      "next_step": "Define the canonical predicate-family cost algebra and check it against every live hashed-tensor predicate before attempting the aggregate recursion proof.",
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026", "S-TENSOR-D4-NATIVE-2026"]
+    },
+    {
+      "id": "RT-PRIME-YIELD-RANK-WRITEONCE",
+      "label": "Fixed-budget write-once yield and rank population",
+      "status": "blocked",
+      "priority": 1,
+      "objective": "Measure the complete target-wise decomposition-count distribution and incremental relation-rank/support law from one immutable natural-target population without adaptive stopping.",
+      "depends_on": ["GAP-PRIME-YIELD-RANK-POPULATION", "HEUR-DECOMPOSITION-PROBABILITY", "HEUR-RELATION-RANK"],
+      "acceptance": "A clean native successor namespace with public fixture derivation, fixed ordered targets and budget, all zero and failed counts, every replayed sparse row, rank after each row, dead columns, components, 2-core and frozen random-base/graph nulls; all source, binary, protocol and output hashes retained.",
+      "next_step": "Resolve fixture provenance by deriving a public successor identity; do not rerun, reclaim or relabel the held historical batch.",
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"],
+      "notes": "Blocked on clean fixture custody, not on compute availability."
+    },
+    {
+      "id": "RT-ARITY3-PROOF-COMPOSITION",
+      "label": "Compose arity-three Fp and Boolean proofs",
+      "status": "ready",
+      "priority": 1,
+      "objective": "Turn the native unit-equation checker into a production proof-eligible external propagator by binding canonical field assignments to Boolean literals and composing every emitted consequence with a pinned Boolean proof log.",
+      "depends_on": ["THM-ARITY3-FP-UNIT-EXPLANATION", "GAP-ARITY3-BOOLEAN-BINDING", "GAP-ARITY3-PROOF-COMPOSITION", "GAP-RP-SAT-SCALING"],
+      "acceptance": "Mutation-tested bidirectional literal/value encoding, CaDiCaL integration, independent replay of every field explanation and Boolean clause, and explicit checked certificate types for each stronger lemma rule before the natural/planted/UNSAT scaling panel is frozen.",
+      "next_step": "Implement and exhaustively test the canonical field-value to selector-literal binding without adding a stronger algebraic lemma class.",
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026", "S-ARITY3-TRAIL-NATIVE-2026"]
+    },
+    {
+      "id": "RT-PKM-DUAL-WIDTH-CERTIFICATES",
+      "label": "PKM dual lower bounds and matrix-width bridge",
+      "status": "ready",
+      "priority": 1,
+      "objective": "Implement an independent closure-dual verifier, search for a structured family of growing certificates, and prove what that family implies for the canonical PKM matrix representation's width, memory and work.",
+      "depends_on": ["DEF-PKM-CLOSURE-DUAL-CERTIFICATE", "GAP-PKM-GROWING-DUAL-CERTIFICATE", "GAP-PKM-MATRIX-WIDTH-BRIDGE", "GAP-PKM-SOLVING-DEGREE"],
+      "acceptance": "Canonical A_c construction; independently checked A_c*ell=0 and ell_constant=1 certificates on all claimed cells; a proof for growing c(t), or a preserved bounded failure; and a separate theorem or counterexample connecting the result to column support, nonzeros, peak frontier, memory and sparse work.",
+      "next_step": "Build the finite exact verifier and replay it on small measured tower cells before searching the popcount/carry structured ansatz.",
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]
+    },
+    {
+      "id": "RT-WAGNER-W-NATIVE",
+      "label": "Native Wagner bucket-variance scaling panel",
+      "status": "ready",
+      "priority": 1,
+      "objective": "Implement and validate the exact W estimator, determine its scaling on the frozen p/M ladder, and separately decide whether any observed concentration yields an enumerable non-generic relation filter.",
+      "depends_on": ["DEF-WAGNER-BUCKET-VARIANCE", "GAP-WAGNER-W-SCALING", "GAP-WAGNER-FILTER-GAIN-BRIDGE", "COND-WAGNER-ECDLP-FILTER-GAIN", "HEUR-WAGNER-FOUR-SUM"],
+      "acceptance": "Native Rust producer and replay; exact whole-group anchors at the two smallest primes; frozen eight-prime and M ladder; discrete-log-interval positive control; SHA and matched-marginal nulls; jackknife/bias checks; checkpointed admitted execution; and symmetric reporting of small-W and large-W outcomes without upgrading concentration into an attack.",
+      "next_step": "Implement the exact-anchor and estimator-replay path in Rust, then freeze the finite budget before requesting EKS Spot execution.",
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]
+    },
+    {
+      "id": "RT-XEDNI-SELECTOR-MINIMAL-HEIGHT",
+      "label": "Xedni selector, minimal model and reduction bridge",
+      "status": "ready",
+      "priority": 1,
+      "objective": "Specify one public lift family and explicit selector, then prove termination, selected-height/global-minimal-discriminant control and reduction/subgroup correspondence, or retain the first explicit counterfamily.",
+      "depends_on": ["GAP-XEDNI-SELECTOR-TERMINATION", "GAP-XEDNI-MINIMAL-MODEL-HEIGHT", "GAP-XEDNI-REDUCTION-CORRESPONDENCE", "GAP-XEDNI-END-TO-END", "OBSTRUCTION-XEDNI-HEIGHT"],
+      "acceptance": "A total selector or explicit nontermination witness; certified global-minimal-model normalization; a uniform selected-point height ratio theorem or unbounded counterfamily; and good-reduction, prime-subgroup, useful-denominator and cofactor correspondence with exact quantifiers.",
+      "next_step": "Define the increasing-certified-height-box selector and one public curve/lift family, then separate the termination proof from the minimal-model height inequality.",
+      "source_refs": ["S-IC-SIX-OBLIGATIONS-2026"]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+digraph G {
+  graph [rankdir=TB,bgcolor="white",nodesep=0.3,ranksep=0.35];
+  node [shape=box,style="rounded,filled",fillcolor="#eef4fa",fontname="DejaVu Sans",fontsize=11,margin="0.15,0.09"];
+  edge [fontname="DejaVu Sans",fontsize=10,color="#53677c"];
+  a [label="Existing Nagao solver\nS=(C^2 H-A^2)/u_R in Fp[x], degree 6"];
+  b [label="Six supported Fp roots\nexisting checked descent",fillcolor="#e8f2e7"];
+  c [label="Four supported roots + irreducible U\ncurrently rejected"];
+  d [label="Proposed exact norm / coprime / V proof\nindependent Cantor equation"];
+  e [label="Lookup full signed (U,V) class\nretained principal-relation anchor"];
+  f [label="Replay signed cancellation witness\nproject known eta=dot(row,h)\naffine row (eta,-b), RHS a",fillcolor="#fff1db"];
+  a -> b; a -> c; c -> d; d -> e; e -> f; b -> f;
+}

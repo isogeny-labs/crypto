@@ -1,0 +1,55 @@
+{
+  "card_changed": false,
+  "card_id": "CARD-n83-sat-boundary-20261019-free",
+  "card_path": "/home/ec2-user/scratch/n83-sat-boundary-20261019/cards/free.json",
+  "card_sha256": "a0b36e43d1946c5bf7297db452265e1a321fc627248f86e9f18692dbf15fbadd",
+  "commands": [
+    {
+      "argv": [
+        "/home/ec2-user/scratch/n83-sat-boundary-20261019/runner-target/release/n83-sweep-runner",
+        "run",
+        "/home/ec2-user/scratch/n83-sat-boundary-20261019/specs/free.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 1,
+          "seconds": 168.365765951,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 1,
+      "id": "free",
+      "index": 1,
+      "outputs": {
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/audit.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/config.json": "852019ef91a9caa42aeb990578cc94545ae91d633702372526d7e3600b261c4d",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/custody.json": "923fc5142908f4cbe8230f6ded9cd15fe4efb4237efe3ccd78cd45ee21d51a37",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/inspect-final.json": "b39a3064d87e25c613f146434d7e79dfaf28e3c0643c4346af6d763f1a9d6ff3",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/inspect-live.json": "ca1b163972d5cafcd939b9058c824808b5fc07023c65e7ec420fa2faec440b3f",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/outer.json": "a8cb8cb9ff4f3bd6c893593d1baaa599aac9ae076822473eece5d1c90ff458f0",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/spec.json": "af01dc384d0098c0e7e3d94aed3c45a356efcc336036a907bd5b7411255be5e6",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/stderr.log": "fdc1899c78713529ca06b1aae0f38d4d708d44b630172a6419de9e9b6b9b752c",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v4/free/stdout.log": "a47f5d1b97e08971db74247d381ff779f603edb2ce7fe9506fcec082936f81d7"
+      },
+      "seconds": 168.365765951,
+      "stderr_sha256": "baa8738932d86bea6a370ed415d830697b8e9dd21e1d5f531e0f4fbfc5de955a",
+      "stderr_tail": [
+        "Error: \"free-selector positive terminal requires independent decoded selector replay; preserved but not admitted\""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 1,
+  "commit": "5e9ee5d4b1aa6ca22368213e5bc05b343e00bfb4",
+  "dirty_after": "",
+  "dirty_before": "",
+  "native_executor": "n83-sweep-runner strict frozen-command subset/v1",
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 1"
+}

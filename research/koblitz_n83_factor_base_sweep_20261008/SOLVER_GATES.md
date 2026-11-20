@@ -1,5 +1,40 @@
 # N83 solver availability and capacity gates
 
+The [native free-selector follow-up](verification/native-selector-export-20261019/RESULT.md)
+passes the original control at 787 conflicts / 167.34 s under the unchanged
+5000-conflict/180 s envelope. Actual domain indices/phases and original-group
+sum replay independently. Initial propagation finishes at 192.85 ms; XOR
+propagation records 167.10 s. This resolves the exact witness control;
+the earlier stage descriptions below retain their historical scope.
+
+## Native phase and terminal gate, 2026-10-19
+
+The [fully native continuation](verification/native-phase-20261019-v3/RESULT.md)
+returned checked terminal receipts for both retained bases on the same public
+query: 1,000 conflicts, zero models, zero relations and rank zero each.
+Closure-relative domain completion was 494.015683 ms for K2048 and
+1245.847022 ms for K4096; both emitted solver entry and return. This resolves
+the bounded observability requirement. Internal preprocessing/search costs,
+natural useful rank and full cold runtime remain unknown. The separate
+[free-selector known-witness control](../../problems/n83-free-selector-known-witness-search.md)
+was wall-censored at that stage; the later follow-up above resolves its
+exact scope. Fully pinned controls remain a different workload. No
+factor-base or performance winner is selected.
+
+## Native guarded continuation, 2026-10-18
+
+The [restored Docker gate](verification/cloud-matched-k2048-k4096-20261018/RESULT.md)
+installed the retained K4096 all-affine five-summand model with 131,958
+variables and 2,021,197 clauses under one CPU, 4 GiB, zero swap and no
+network. The two 100,000-conflict attempts were outer-wall censored at
+600 seconds; final counters are unknown. A separate K2048 short control
+completed at 1,000 conflicts with zero models, relations and rank. K4096's
+short control was wall-censored at 180 seconds. The next step at that stage
+was [K4096 phase/counter observability](../../problems/n83-native-k4096-terminal-observability.md),
+not a completed natural-yield or full-runtime factor-base ranking.
+
+## Historical source inventory
+
 This is a source audit, not a timed solver result. The backend-availability comparison distinguishes the inspected main snapshot `c70c32d486a3ac7531fe27f7193d9f09caa58344` from the isolated study branch at `001acc47870e935a17f4d8155c2cb934ace58284`. The latter builds the retained primary base and exact enumeration runner; subsequent study-branch code adds a wide-word enumeration path. The inspected main snapshot contained additional backends absent from that pinned study revision. Reproduce this historical distinction with `git ls-tree -r --name-only REV -- src/cryptanalysis` at each pinned revision; `verification/solver-gates-source-check.log` records the corresponding blob identities and source-width assertions. The current integrated-source status is recorded at the end of this document. A path in the prior-art inventory is not proof that an N83 run can execute it.
 
 | Backend | Pinned source fact | N83 consequence |
@@ -9,7 +44,7 @@ This is a source audit, not a timed solver result. The backend-availability comp
 | Original native SAT S4 | `binary_semaev_s4.rs::S4System` uses `3l` x variables and `6l-3` symmetric-function variables. `semaev_sat.rs::encode_semaev_s4_with` adds `2l` lex-order auxiliaries by default and one auxiliary per distinct non-linear ANF monomial. The degree-83 coordinate-domain trie now retains all bits. | At `n=l=83`, this encoder needs **at least 593,364 SAT variables and 2,349,149 AND-definition clauses**, before e-space auxiliaries, parity machinery and three finite-coordinate-domain tries. |
 | Experimental factored SAT S4 | `encode_semaev_s4_factored_with` shares the three pair-product coefficient arrays and builds the e-space equations without materializing the cubic x-ANF. It accepts native XOR only. `SatDecompositionOptions::factored_s4` now selects it for ambient-basis three-summand unions; other shapes return inconclusive. Complete small x-assignment equivalence, a positive n=15 scalar S4 round trip and a small explicit-orbit group-lifting comparison pass. | At `n=l=83`, source structure gives **at most 158,032 SAT variables and 469,881 AND-definition clauses**, before finite-domain constraints and ordering clauses. The later retained K=64 construction measured 127,404 variables, 1,490,138 clauses and a 642,768,896-byte cgroup peak; solver search/lifting and cold runtime remain unmeasured. This encoding is outside the frozen v1 grid and the primary CLI still gates `sat-m3`. |
 | Balanced-S5 SAT example | `koblitz_s5_sat_instance.rs` contains four-summand native-XOR, orbit-factorized and pair-domain encodings, but admits only n=7,11,13,17,19,23,37,41,53, with `u64` point/label/rank paths and `pair_sum_trie` capped at n<=53. | Requires full-width field, point, domain and rank transfer with original group/model replay. It is not an executable N83 SAT arm on this branch. |
-| Wide compact-orbit four-sum runner | `koblitz_orbit_dlp_fast.rs` has a u128 S3 index at n=83 but uses `KoblitzCurve::new`'s polynomial basis, a different point-defined-base JSONL schema and u64 subgroup order/rank arithmetic. Historical n=83 `a=1` online clocks exclude reusable preparation. | Pinned study objects use a different polynomial basis; the primary a=0 order is 81 bits. See `S5_CAPACITY.md` for the source-derived `83K²` index-state count and guarded-transfer sequence. No stored N83 base has run through this producer. |
+| Wide compact-orbit four-sum runner | `koblitz_orbit_dlp_fast.rs` has a u128 S3 index at n=83 but uses `KoblitzCurve::new`'s polynomial basis, a different point-defined-base JSONL schema and u64 subgroup order/rank arithmetic. Historical n=83 `a=1` online clocks exclude reusable preparation. | Pinned study objects use a different polynomial basis; the primary a=0 order is 81 bits. The study-local adapter has now completed guarded one-query compact-index probes on exact retained K64 and K256 S3 bases, both with `MISS` and independent audit. These capacity results do not supply natural yield or rank; see `S5_CAPACITY.md`. |
 | WDSat, inspected main only | `wdsat_oracle.rs::model_to_u64` returns `None` for a model longer than 64 bits. Its ANF comes from the single-word `F2BoolPoly` path. | An ambient three-summand model has 249 x bits; the pinned adapter cannot lift it. A split/reduced representation needs a sealed complete-system verifier and capacity receipt. |
 | FES and Gray, inspected main only | `mq_fes.rs` requires quadratic forms. Its Möbius routine admits at most 24 variables and 64 equations; Gray variants have their own small limits. `mq_monica.rs::monica_search` refuses more than 40 variables or 128 equations. | The full ambient S4 model has cubic x/e correspondence and at least 910 core variables. These kernels can only serve a justified split/filter with verification against the complete original equations. |
 | Double large primes | Inspected main's `ecbench_large_prime.rs` imports the field modulus, points, subgroup order and cofactor through `u64` corpus fields. The isolated branch has a separate `koblitz_large_prime.rs` exact BigUint eliminator with signed-Frobenius residual keys, source coefficients, group replay, explicit caps and a full-rank matrix bridge. | The bridge accepts verified subgroup-point partials and verifies solved orbit and target logs. It does not discover partials or run the retained N83 base. A source-pinned producer, cofactor-policy decision, measured graph/rank behavior and matched cold run are still required. |
@@ -33,7 +68,7 @@ The standard dimension-18 geometric subspace in [prior art](PRIOR_ART.md#earlier
 | Retained K=64 | 10,624 | 64 | 0.000000467 | 1,851,925 domain clauses; one trial capped at 10,000 conflicts |
 | Retained K=256 | 42,496 | 256 | 0.000478 | 7,195,450 domain clauses; one trial capped at 10,000 conflicts |
 | Retained K=1,182 | 196,212 | 1,182 | 1.0024 | 32,142,830 required domain clauses exceeded the frozen 12M cap |
-| Retained K=2,048 | 339,968 | 2,048 | 15.653 | Explicit-coordinate trie: 55,017,910 m=5 domain clauses. The orbit-phase encoding built the all-affine m=5 model under a 4 GiB cap: 111,478 variables, 1,140,557 clauses, 4,980 XOR rows and 335,839,232-byte cgroup peak. Solver search remains unexecuted |
+| Retained K=2,048 | 339,968 | 2,048 | 15.653 | Explicit-coordinate trie: 55,017,910 m=5 domain clauses. The orbit-phase encoding built the all-affine m=5 model under a 4 GiB cap: 111,478 variables, 1,140,557 clauses and 4,980 XOR rows. One later public-point search reached `UNKNOWN_solver_cap` at 100,000 conflicts after 2,846.703 s outer wall, with zero models or relations and rank zero |
 | Dimension-12 projected Frobenius closure | 332,166 | 2,001 | 13.937 | S3 replay and exact five-summand model construction PASS: 111,008 variables, 1,120,347 clauses, 4,980 XOR rows. One search trial returned `UNKNOWN_solver_cap` after 10,000 conflicts, with zero models or relations |
 | Standard subspace, dimension 18 | 261,444 | 130,722 | 4.2102 | Compact source equations; four ordinary 120-second SAT calls timed out |
 
@@ -42,6 +77,8 @@ The K=64 and K=256 five-sum counting ceilings are tiny, so their capped one-tria
 The replay-bound primary adapter exposes `primary-orbit-chain-build` and `primary-orbit-chain-cold` as explicit opt-in commands for retained ordinary signed-Frobenius bases, including K=2,048. For `n=83`, `m=5` and 2,048 distinct x representatives, the exact source formula gives 26,735 added variables, 892,470 domain clauses and 3,320 domain XOR rows. The all-affine chained-S3 core contributes 84,743 variables. The earlier [source-only admission](verification/k2048-orbit-domain-admission-20261010/RESULT.md) projected 111,478 total variables and 1,140,557 clauses. The authorized [Linux capacity gate](verification/k2048-orbit-capacity-20261011/RESULT.md) then imported the S3-retained base and installed exactly those counts, plus 4,980 total XOR rows. Its 4 GiB cgroup peak was 335,839,232 bytes. The first launched attempt omitted the committed public-corpus sidecar and failed before model construction; the corrected run and independent audit pass. The worker had one CPU, no network, zero swap and a 180-second outer wall cap. It stopped before solver search or relation collection.
 
 The 900-second extension was conservatively charged in full, bringing the cumulative local charge to **9,900 of 9,900 seconds**. This construction pass admits a bounded same-target search comparison, but it does not establish natural relation yield, independent rank, sparse linear-algebra cost, individual-log cost or a minimum complete cold runtime. The exact object, compressed-byte SHA-256, source and image identities, worker counts and cleanup receipts are retained in the capacity-gate directory.
+
+A later, separately frozen [100,000-conflict K2048 search](verification/k2048-natural-highcap-20261018/RESULT.md) reused the exact S3 object and public point. Its one solver call reached `UNKNOWN_solver_cap` after 2,840.815 s of worker solver time, with zero models, zero relations and rank zero; the outer supervisor used 2,846.703 s and the cgroup peak was 1,160,802,304 bytes. Independent custody, original-curve query replay, and a forged-success rejection passed. This is a larger censored solver cap, not a relation-yield estimate or a complete-runtime score.
 
 The K=2,048 count came from a read-only S3 stream of the retained object in `verification/remaining-budget-k2048-20261010/manifest.json`. Its 10,313,647 compressed bytes matched SHA-256 `aacb62784dee0c9f5e06328dbb85a4b6a1c7243e778328da82900e7284f3a74a`. Decompression gave the expected 339,968 point records and 169,984 distinct x-coordinates. An independent sorted-prefix traversal, matching `finite_domain_clause_count`'s missing-child recurrence, counted 11,003,582 clauses per summand and **55,017,910** for m=5. The Python stream and traversal took 40.071 seconds of process wall. This was an exploratory exact count, not a frozen solver timing or model-construction memory measurement; the full 12-million-clause admission cap would reject it before installing a model. A conservative 120-second charge for this check and its preparation brings the local two-hour pilot audit to **6,802.092994294 of 7,200 seconds**, leaving **397.907005706 seconds**. The prior immutable budget receipts remain unchanged.
 
@@ -82,8 +119,8 @@ revisions identified content conflicts in `Cargo.toml`,
 integration must resolve and retest those contracts before importing a
 current-main backend. The next runtime-relevant implementation gate is a
 full-width producer for m>=5 or verified partial relations, with a complete
-finite-base model and independent group replay. A guarded K=64 four-sum
-probe remains useful for capacity and correctness, but the one-row uniform
+finite-base model and independent group replay. Guarded K64 and K256
+four-sum probes now pass one-query capacity and input-custody checks, but the one-row uniform
 rank screen in `RANK_QUERY_SCREEN.md` rules out treating it as a likely
 full-rank comparison within a short pilot. This is a necessary-condition
 screen for that oracle model, not a lower bound on every IC algorithm.

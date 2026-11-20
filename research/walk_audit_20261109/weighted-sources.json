@@ -1,0 +1,37 @@
+{
+  "schema": "weighted-rho-source-plan/v1",
+  "created": "2026-11-10T00:50:32.196674+00:00",
+  "status": "Whole kernel gate passed; preissue source plan, no new packet issued yet.",
+  "formal": {
+    "project": "research/walk_audit_20261109/lean",
+    "theorem": "WalkWeightedAudit.weighted_variance_audit_certificate",
+    "statement": "theorem weighted_variance_audit_certificate : Fintype.card Hash=8 \u2227 Function.Injective (fun i : Fin 2=>((i.val:ZMod 3)+1)) \u2227 (\u2200 i : Fin 2,((i.val:ZMod 3)+1)\u22600) \u2227 (\u2200 (a : \u211d) (ha : 0\u2264a) (ha1 : a\u22641), (\u2211 h : Hash,(hashLaw a ha ha1 h).toReal*inDegree h)=1 \u2227 (\u2211 h : Hash,(hashLaw a ha ha1 h).toReal*(inDegree h-1)^2)= 1-(a^2+(1-a)^2)) \u2227 (\u2211 h : Hash,(unequalLaw h).toReal*inDegree h)=1 \u2227 (\u2211 h : Hash,(unequalLaw h).toReal*(inDegree h-1)^2)=3/8",
+    "decl_sha256": "1444b26c13cfb84accd07ff49d360d7a3253ee8dedeefe8475c7855d44cebb89",
+    "sources": [
+      {
+        "path": "research/walk_audit_20261109/lean/WalkBoundary.lean",
+        "bytes": 8391,
+        "sha256": "a612deeb8573dbd76dcc7f76bf0396ea5da1a7da0b5eed6aacc274b71c6bce1c"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkWeighted.lean",
+        "bytes": 5280,
+        "sha256": "036f4d438b4a09fd46d937c1983c4e4a3a2435193d33ff05b50a41fd6f0636a4"
+      }
+    ],
+    "gate": {
+      "path": "evidence/weighted-gate-02.log",
+      "declarations": 43,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Actual8hashes on Z3/two distinct nonzero increments; product label probabilitiesa,1-a with0<=a<=1; normalized genuine PMF, exact in-degree mean1/variance1-(a2+(1-a)2)at vertex0. Unequal3/4control variance3/8. No collision-time/asymptotic/practical-hash conclusion."
+  },
+  "literature": {
+    "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch14.pdf",
+    "sha256": "ab59d8013db88ca145a101ddf9a9e28876fc4d10c76aac115d11da7bbbe1fada",
+    "read_scope": "Section14.2.5/book296-297: ideal random function assumption, reciprocal-variance sentence and separate conjectural collision constants."
+  },
+  "native_data": "No new native experiment. Existing source/protocol/native data remain frozen; target-list addition is outside native pins.",
+  "paid_compute": 0
+}

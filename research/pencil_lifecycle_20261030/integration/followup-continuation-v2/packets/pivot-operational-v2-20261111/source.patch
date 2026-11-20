@@ -1,0 +1,47 @@
+--- v1/launch.py
++++ v2/launch.py
+@@ -3,7 +3,7 @@
+ from pathlib import Path
+ import argparse,hashlib,json,os,subprocess,time,signal
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-pivot-operational-binding-20261111')
++W=Path('/home/ec2-user/pencil-native-pivot-operational-v2-20261111')
+ O=Path(str(W)+'.outer')
+ DEADLINE=1794398400
+ BOOT='31b37cfb156242ff8b0ffadc5cec5a12'
+@@ -13,6 +13,7 @@
+ assert a.execute,'Preparation only; explicit execution required after independent review and publication'
+ assert hashlib.sha256((P/'freeze.json').read_bytes()).hexdigest()==a.freeze_sha256,'freeze mismatch'
+ F=json.loads((P/'freeze.json').read_text())
++assert str(W)==F['workspace'],'workspace binding mismatch'
+ for name,digest in F['files'].items():assert hashlib.sha256((P/name).read_bytes()).hexdigest()==digest,('frozen input',name)
+ assert Path('/proc/sys/kernel/random/boot_id').read_text().strip().replace('-','')==BOOT,'boot changed'
+ # Existing coordinator release binds this exact successor after serial reconciliation.
+@@ -150,7 +151,7 @@
+   if phase=='compiler' and not results[-1]['passed']:break
+   # Post-custody remains required after any compiler attempt, including failed attempts.
+   assert time.time()+limit<DEADLINE and time.monotonic()-start+limit<=2400,'insufficient remaining phase allowance'
+-  unit='pencil-pivot-operational-binding-20261111-'+phase
++  unit='pencil-pivot-operational-v2-20261111-'+phase
+   cmd=['sudo','-n','systemd-run','--unit='+unit,'--wait',
+    '--property=User=ec2-user','--property=WorkingDirectory='+str(P),
+    '--property=CPUQuota=100%','--property=MemoryMax=8G','--property=MemorySwapMax=0',
+--- v1/replay.py
++++ v2/replay.py
+@@ -1,7 +1,7 @@
+ from pathlib import Path
+ import os,sys,json,hashlib,time,signal,subprocess,resource,re,shutil
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-pivot-swap-proof-successor-20261111')
++W=Path('/home/ec2-user/pencil-native-pivot-operational-v2-20261111')
+ ABSOLUTE_DEADLINE=1794398400  # 2026-11-11T12:00:00Z
+ OWNED=False
+ progress={'phase':None,'stage':'initialization','checked_files':0,'checked_bytes':0,'current_path':None,'current_bytes_read':0,'declared_files':16736,'declared_bytes':3111892318}
+@@ -83,6 +83,7 @@
+  assert shutil.disk_usage(W).free>=1024**3
+  assert sha(P/'freeze.json')==EXPECTED_FREEZE,'freeze pin mismatch'
+  F=json.loads((P/'freeze.json').read_text())
++ assert str(W)==F['workspace'],'workspace binding mismatch'
+  for n,h in F['files'].items():assert sha(P/n)==h,('frozen input',n)
+  if mode in ('pre','post'):
+   C=Path(F['closure']['path']);B=Path(F['baseline']['path'])

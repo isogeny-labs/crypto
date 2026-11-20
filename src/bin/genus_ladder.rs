@@ -18,6 +18,9 @@
 //! elimination before Wiedemann (`w_max = W`, `fill_max = F`), named
 //! `<arm>+sge(W,F)`; the arm without it runs and is recorded unchanged.
 //! Protocol of the merge: `research/genus_ladder_sge_20261115/PROTOCOL.md`.
+//! Arm `s` is arm `w` with the merge: `--sge W,F` (default 4,1.5) reduces the
+//! peeled core, then the coordinate Wiedemann solves the reduced matrix; the
+//! arm is named `...+sgecoord+sge(W,F)` and only runs merged.
 //! One JSON object per line.  Protocol:
 //! `research/genus_ladder_20261114/PROTOCOL.md`.  All figures are
 //! `[pcc:unverified]`.
@@ -30,9 +33,11 @@ use std::time::Instant;
 
 use crypto_lib::cryptanalysis::genus_ladder as gl;
 use crypto_lib::cryptanalysis::genus_ladder::{Arm, IcParams};
+use crypto_lib::cryptanalysis::ic_boundary::{RhoWalk, WalkPolicy};
 use crypto_lib::cryptanalysis::quartic_ladder as ql;
 use crypto_lib::cryptanalysis::smith_prop24 as smith;
 use serde_json::{json, Value};
+use std::hint::black_box;
 
 struct Cfg {
     primes: Vec<u64>,
@@ -46,6 +51,17 @@ struct Cfg {
     threads: usize,
     rho_cap: f64,
     seed_search: u64,
+    /// `--curve-seeds p=s1/s2/...,p=...`: evaluate only these curve seeds in
+    /// the hyperelliptic cells of `p` (to re-run admitted instances of an
+    /// earlier study without its seed search).  Same admission path.
+    curve_seeds: std::collections::HashMap<u64, Vec<u64>>,
+    /// Targets per admitted curve (`--targets`, default 1: the frozen grid).
+    targets: u64,
+    /// First target index k (`--target-from`, default 0): targets k = from..from+targets,
+    /// so a later study can add targets to a curve without re-running earlier ones.
+    target_from: u64,
+    /// Emit a timing calibration per instance (`--calibrate`).
+    calibrate: bool,
     max_trials: u64,
     restart_sqrt: bool,
     smith: bool,
@@ -74,6 +90,10 @@ fn parse() -> Result<Cfg, String> {
         threads: 4,
         rho_cap: 3.0e7,
         seed_search: 600,
+        curve_seeds: Default::default(),
+        targets: 1,
+        target_from: 0,
+        calibrate: false,
         max_trials: 50_000_000,
         restart_sqrt: false,
         smith: false,
@@ -100,6 +120,11 @@ fn parse() -> Result<Cfg, String> {
             i += 1;
             continue;
         }
+        if flag == "--calibrate" {
+            c.calibrate = true;
+            i += 1;
+            continue;
+        }
         let v = a
             .get(i + 1)
             .cloned()
@@ -119,6 +144,8 @@ fn parse() -> Result<Cfg, String> {
                     .collect::<Result<_, _>>()?
             }
             "--curves" => c.curves = num(&v)? as usize,
+            "--targets" => c.targets = num(&v)? as u64,
+            "--target-from" => c.target_from = num(&v)? as u64,
             "--seeds" => c.seeds = num(&v)? as u64,
             "--arms" => c.arms = v,
             "--cc" => c.cc = num(&v)?,
@@ -127,6 +154,19 @@ fn parse() -> Result<Cfg, String> {
             "--threads" => c.threads = num(&v)? as usize,
             "--rho-cap" => c.rho_cap = num(&v)?,
             "--seed-search" => c.seed_search = num(&v)? as u64,
+            "--curve-seeds" => {
+                for cell in v.split(',') {
+                    let (p, ss) = cell
+                        .split_once('=')
+                        .ok_or(format!("--curve-seeds wants p=s1/s2,..., not {cell}"))?;
+                    let p: u64 = p.parse().map_err(|e| format!("--curve-seeds p: {e}"))?;
+                    let ss = ss
+                        .split('/')
+                        .map(|x| x.parse::<u64>().map_err(|e| format!("--curve-seeds: {e}")))
+                        .collect::<Result<Vec<_>, _>>()?;
+                    c.curve_seeds.insert(p, ss);
+                }
+            }
             "--max-trials" => c.max_trials = num(&v)? as u64,
             "--smith-census" => c.smith_census = num(&v)? as u64,
             "--sge" => {
@@ -158,6 +198,9 @@ enum Spec {
         p: u64,
         g: u32,
         curve_seed: u64,
+        /// The target's seed: the curve seed for the first target (the
+        /// frozen instrument), then `curve_seed + k · 1_000_003` (`--targets`).
+        target_seed: u64,
         order: u64,
         h: u64,
         r: u64,
@@ -200,7 +243,7 @@ fn main() -> ExitCode {
     };
     let t0 = Instant::now();
     let mut config = json!({"kind": "config", "primes": cfg.primes, "genera": cfg.genera, "curves": cfg.curves,
-        "seeds": cfg.seeds, "arms": cfg.arms, "cc": cfg.cc, "qc": cfg.qc, "max_h": cfg.max_h,
+        "seeds": cfg.seeds, "targets": cfg.targets, "target_from": cfg.target_from, "arms": cfg.arms, "cc": cfg.cc, "qc": cfg.qc, "max_h": cfg.max_h,
         "rho_cap": cfg.rho_cap, "seed_search": cfg.seed_search, "max_trials": cfg.max_trials,
         "smith": cfg.smith, "smith_census": cfg.smith_census, "quartic": cfg.quartic,
         "threads": cfg.threads,
@@ -231,7 +274,16 @@ fn main() -> ExitCode {
         let mut tried = 0u64;
         let mut reasons: std::collections::BTreeMap<String, u64> = Default::default();
         let ts = Instant::now();
-        for cs in 1..=cfg.seed_search {
+        let listed = if g == 0 {
+            None
+        } else {
+            cfg.curve_seeds.get(&p)
+        };
+        let seeds: Vec<u64> = match listed {
+            Some(v) => v.clone(),
+            None => (1..=cfg.seed_search).collect(),
+        };
+        for cs in seeds {
             if admitted >= cfg.curves {
                 break;
             }
@@ -254,6 +306,12 @@ fn main() -> ExitCode {
                 }
                 continue;
             }
+            // Prime-order search: a reducible f has J[2](F_p) != 0, so #J is even
+            // and cannot pass --max-h 1; skip it before point counting.
+            if cfg.max_h == 1 && !gl::f_irreducible(p, &gl::random_f(p, g, cs)) {
+                *reasons.entry("f_reducible_even_order".into()).or_default() += 1;
+                continue;
+            }
             match gl::make_instance(p, g, cs, cs, cfg.max_h) {
                 Ok(inst) => {
                     admitted += 1;
@@ -264,14 +322,17 @@ fn main() -> ExitCode {
                         rec["smith"] = smith_record(&inst.curve.f_coeffs(), p, cs);
                     }
                     emit(rec);
-                    specs.lock().unwrap().push(Spec::Hyper {
-                        p,
-                        g,
-                        curve_seed: cs,
-                        order: inst.order,
-                        h: inst.h,
-                        r: inst.r,
-                    });
+                    for k in cfg.target_from..cfg.target_from + cfg.targets.max(1) {
+                        specs.lock().unwrap().push(Spec::Hyper {
+                            p,
+                            g,
+                            curve_seed: cs,
+                            target_seed: cs + k * 1_000_003,
+                            order: inst.order,
+                            h: inst.h,
+                            r: inst.r,
+                        });
+                    }
                 }
                 Err(e) => *reasons.entry(reason_class(&e)).or_default() += 1,
             }
@@ -321,6 +382,7 @@ fn main() -> ExitCode {
             p,
             g,
             curve_seed,
+            target_seed,
             order,
             h,
             r,
@@ -328,25 +390,150 @@ fn main() -> ExitCode {
             let curve = gl::JCurve::new(*p, *g, &gl::random_f(*p, *g, *curve_seed))
                 .expect("admitted curve");
             let inst =
-                gl::instance_from(curve, *order, *h, *r, *curve_seed).expect("admitted instance");
+                gl::instance_from(curve, *order, *h, *r, *target_seed).expect("admitted instance");
             let head = json!({"family": "hyperelliptic", "p": p, "g": g, "curve_seed": curve_seed,
-                "seed": seed, "r": r, "h": h});
+                "target_seed": target_seed, "seed": seed, "r": r, "h": h});
+            if cfg.calibrate && *target_seed == *curve_seed && *seed == 1 {
+                emit(calibrate(&inst, *p, *g, *curve_seed));
+            }
             for ch in cfg.arms.chars() {
-                let (arm, pre) = match ch {
-                    'A' => (Arm::Full, false),
-                    'a' => (Arm::Full, true),
-                    'C' => (Arm::DoubleLp, false),
-                    'c' => (Arm::DoubleLp, true),
-                    'R' => {
-                        let expect = (std::f64::consts::PI * *r as f64 / 4.0).sqrt();
+                // v: c + coordinate Wiedemann on a square row subset;
+                // w: v + the capped unit-T walk (gl::IcExt).
+                let no_ext = gl::IcExt::default();
+                let (arm, pre, ext) = match ch {
+                    'A' => (Arm::Full, false, no_ext),
+                    'a' => (Arm::Full, true, no_ext),
+                    'C' => (Arm::DoubleLp, false, no_ext),
+                    'c' => (Arm::DoubleLp, true, no_ext),
+                    'v' => (
+                        Arm::DoubleLp,
+                        true,
+                        gl::IcExt {
+                            coord_square: true,
+                            unit_t: false,
+                            ferrari: false,
+                            sge_coord: false,
+                        },
+                    ),
+                    'f' => (
+                        Arm::DoubleLp,
+                        true,
+                        gl::IcExt {
+                            coord_square: true,
+                            unit_t: true,
+                            ferrari: true,
+                            sge_coord: false,
+                        },
+                    ),
+                    // s: w + structured Gaussian elimination, then the
+                    // coordinate solve on the reduced matrix (needs --sge;
+                    // without it the single setting 4,1.5 is used).
+                    'x' => (
+                        // arm w + Ferrari quartic test + SGE before coordinate Wiedemann
+                        Arm::DoubleLp,
+                        true,
+                        gl::IcExt {
+                            coord_square: true,
+                            unit_t: true,
+                            ferrari: true,
+                            sge_coord: true,
+                        },
+                    ),
+                    's' => (
+                        Arm::DoubleLp,
+                        true,
+                        gl::IcExt {
+                            coord_square: true,
+                            unit_t: true,
+                            ferrari: false,
+                            sge_coord: true,
+                        },
+                    ),
+                    'w' => (
+                        Arm::DoubleLp,
+                        true,
+                        gl::IcExt {
+                            coord_square: true,
+                            unit_t: true,
+                            ferrari: false,
+                            sge_coord: false,
+                        },
+                    ),
+                    'z' => {
+                        // Sieved relation search (genus_ladder_sieve), two large
+                        // primes. Native work is reported in the same fields as
+                        // the IC arms: rel_* includes the individual-log phase.
+                        use crypto_lib::cryptanalysis::genus_ladder_sieve as gs;
+                        let nb = gl::fb_size_2lp(*p, *g, cfg.cc);
+                        let x = gs::run_sieve_ic(&inst, gs::SieveParams::new(nb, *seed, 2));
                         let mut rec = head.clone();
-                        rec["arm"] = json!("R_rho_neg");
+                        rec["kind"] = json!("run");
+                        rec["arm"] = json!("Z_sieve_lp2");
+                        rec["certified"] = json!(x.certified);
+                        rec["exhausted"] = json!(x.exhausted);
+                        rec["ok"] = json!(x.recovered == Some(inst.t_secret));
+                        rec["group_ops"] = json!(x.group_ops());
+                        rec["ind_group_ops"] = json!(x.ind_group_ops);
+                        rec["verify_ops"] = json!(x.verify_ops);
+                        rec["cantor_mul"] = json!(x.cantor_mul);
+                        rec["cantor_inv"] = json!(x.cantor_inv);
+                        rec["rel_mul"] = json!(x.rel.mul + x.ind.mul);
+                        rec["rel_add"] = json!(x.rel.add + x.ind.add);
+                        rec["ind_mul"] = json!(x.ind.mul);
+                        rec["ind_add"] = json!(x.ind.add);
+                        rec["la_mul"] = json!(x.la.mul);
+                        rec["la_add"] = json!(x.la.add);
+                        rec["la_wied_mul"] = json!(x.la_wied.mul);
+                        rec["la_fallbacks"] = json!(x.la_fallbacks);
+                        rec["fb_cols"] = json!(x.fb_cols);
+                        rec["lp_max_eff"] = json!(x.lp_max_eff);
+                        rec["families"] = json!(x.families);
+                        rec["relations"] = json!(x.relations);
+                        rec["rels_by_lp"] = json!(x.rels_by_lp);
+                        rec["sieve_hits"] = json!(x.sieve_hits);
+                        rec["ind_rows"] = json!(x.ind_rows);
+                        rec["ind_families"] = json!(x.ind_families);
+                        rec["core_rows"] = json!(x.core_rows);
+                        rec["core_cols"] = json!(x.core_cols);
+                        rec["attempts"] = json!(x.attempts);
+                        rec["wall_ns"] = json!(x.wall_ns);
+                        emit(rec);
+                        continue;
+                    }
+                    'R' | 'P' | 'B' | 'Q' => {
+                        // R: negation-map rho; P: plain rho (walk on points).
+                        // B: negation rho, no per-step window, Brent cycle
+                        // detection (WalkPolicy::v2). Q: plain rho, no window.
+                        let plain = ch == 'P' || ch == 'Q';
+                        let expect = (std::f64::consts::PI * *r as f64
+                            / if plain { 2.0 } else { 4.0 })
+                        .sqrt();
+                        let mut rec = head.clone();
+                        rec["arm"] = json!(match ch {
+                            'P' => "R_rho_plain",
+                            'Q' => "R_rho_plain_nowin",
+                            'B' => "R_rho_neg_brent",
+                            _ => "R_rho_neg",
+                        });
                         if expect > cfg.rho_cap {
                             rec["kind"] = json!("skip");
                             rec["reason"] = json!("rho_cap");
                             rec["expected_steps"] = json!(expect);
                         } else {
-                            let o = gl::run_rho(&inst, *seed);
+                            let mut walk = if plain {
+                                RhoWalk::plain()
+                            } else {
+                                RhoWalk::negation()
+                            };
+                            let policy = if ch == 'B' {
+                                WalkPolicy::v2()
+                            } else {
+                                WalkPolicy::legacy()
+                            };
+                            if ch == 'B' || ch == 'Q' {
+                                walk.cycle_window = 0;
+                            }
+                            let o = gl::run_rho_policy(&inst, *seed, walk, policy);
                             rec["kind"] = json!("run");
                             rec["certified"] = json!(o.certified);
                             rec["ok"] = json!(o.recovered == Some(inst.t_secret));
@@ -356,6 +543,12 @@ fn main() -> ExitCode {
                             rec["cantor_inv"] = json!(o.cantor_inv);
                             rec["native"] = json!(o.native);
                             rec["steps"] = json!(o.steps);
+                            // Per-step work the walk does not emit, in closed
+                            // form: one partition hash and two coefficient
+                            // additions modulo r per step (symmetric pricing).
+                            rec["compares_uncharged"] = json!(o.compares);
+                            rec["hash_uncharged"] = json!(o.steps);
+                            rec["coef_adds_uncharged"] = json!(2 * o.steps);
                             rec["wall_ns"] = json!(o.wall_ns);
                         }
                         emit(rec);
@@ -363,9 +556,23 @@ fn main() -> ExitCode {
                     }
                     _ => continue,
                 };
-                let settings = std::iter::once(None).chain(cfg.sge.iter().copied().map(Some));
+                let settings: Vec<Option<gl::SgeParams>> = if ext.sge_coord {
+                    // arm s has no unmerged run: the merge is the arm
+                    if cfg.sge.is_empty() {
+                        vec![Some(gl::SgeParams {
+                            w_max: 4,
+                            fill_max: 1.5,
+                        })]
+                    } else {
+                        cfg.sge.iter().copied().map(Some).collect()
+                    }
+                } else {
+                    std::iter::once(None)
+                        .chain(cfg.sge.iter().copied().map(Some))
+                        .collect()
+                };
                 for sge in settings {
-                    let o = gl::run_ic(
+                    let o = gl::run_ic_ext(
                         &inst,
                         IcParams {
                             arm,
@@ -381,6 +588,7 @@ fn main() -> ExitCode {
                             verify_relations: false,
                             sge,
                         },
+                        ext,
                     );
                     let suffix = match sge {
                         None => String::new(),
@@ -389,11 +597,21 @@ fn main() -> ExitCode {
                     let mut rec = head.clone();
                     rec["kind"] = json!("run");
                     rec["arm"] = json!(format!(
-                        "{}{}{}",
+                        "{}{}{}{}{}{}{}",
                         o.arm,
                         if pre { "+pre" } else { "" },
+                        if ext.coord_square || ext.sge_coord {
+                            "+coord"
+                        } else {
+                            ""
+                        },
+                        if ext.unit_t { "+unitT" } else { "" },
+                        if ext.ferrari { "+ferrari" } else { "" },
+                        if ext.sge_coord { "+sgecoord" } else { "" },
                         suffix
                     ));
+                    rec["la_fallbacks"] = json!(o.la_fallbacks);
+                    rec["ferrari_undecided"] = json!(o.ferrari_undecided);
                     rec["certified"] = json!(o.certified);
                     rec["exhausted"] = json!(o.exhausted);
                     rec["ok"] = json!(o.recovered == Some(inst.t_secret));
@@ -556,4 +774,74 @@ fn smith_record(f: &[u64], p: u64, seed: u64) -> Value {
             "full_success_twist": o.full_success(true),
         }),
     }
+}
+
+/// Informational timing (never part of a verdict): ns per Cantor addition,
+/// per multiplication and addition modulo p, and per multiplication modulo r
+/// (u128 reduction, as the linear algebra uses for r >= 2^50), best of 5.
+fn calibrate(inst: &gl::Instance, p: u64, g: u32, curve_seed: u64) -> serde_json::Value {
+    use std::time::Instant;
+    let best = |f: &mut dyn FnMut() -> u64, n: u64| -> f64 {
+        let mut b = f64::MAX;
+        for _ in 0..5 {
+            let t = Instant::now();
+            black_box(f());
+            b = b.min(t.elapsed().as_nanos() as f64 / n as f64);
+        }
+        b
+    };
+    let mut st = curve_seed ^ 0x5eed;
+    let (d1, d2) = (
+        inst.curve.random_divisor(&mut st),
+        inst.curve.random_divisor(&mut st),
+    );
+    let n_add = 20_000u64;
+    let ns_cantor = best(
+        &mut || {
+            let mut a = d1;
+            for _ in 0..n_add {
+                a = inst.curve.cantor(a, d2);
+            }
+            a.deg as u64
+        },
+        n_add,
+    );
+    let n = 20_000_000u64;
+    let ns_mul_p = best(
+        &mut || {
+            let mut a = 3u64;
+            for i in 0..n {
+                a = black_box(a * (i | 1) % p);
+            }
+            a
+        },
+        n,
+    );
+    let ns_add_p = best(
+        &mut || {
+            let mut a = 3u64;
+            for i in 0..n {
+                let s = a + (i % p);
+                a = black_box(if s >= p { s - p } else { s });
+            }
+            a
+        },
+        n,
+    );
+    let r = inst.r;
+    let ns_mul_r = best(
+        &mut || {
+            let mut a = 3u64;
+            for i in 0..n {
+                a = black_box(((a as u128 * (i | 1) as u128) % r as u128) as u64);
+            }
+            a
+        },
+        n,
+    );
+    json!({"kind": "calibration", "p": p, "g": g, "curve_seed": curve_seed, "r": r,
+        "ns_cantor_add": ns_cantor, "ns_mulmod_p": ns_mul_p, "ns_addmod_p": ns_add_p,
+        "ns_mulmod_r": ns_mul_r,
+        "w_cal_mul_p": ns_mul_p / ns_cantor, "w_cal_add_p": ns_add_p / ns_cantor,
+        "w_cal_mul_r": ns_mul_r / ns_cantor})
 }

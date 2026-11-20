@@ -1,0 +1,71 @@
+#pragma once
+#include "backmap_relations_arithmetic.hpp"
+using CFPoly=Poly<Z>;
+CFPoly cf_derivative(const CFPoly& p){std::vector<Z> c;for(int i=1;i<=p.degree();++i)c.push_back(p.at(i)*Z(i));return CFPoly(c);}
+CFPoly cf_gcd(const CFPoly& a,const CFPoly& b){return std::get<0>(xgcd(a,b));}
+Z cf_power(Z a,int n){Z out(1);for(int i=0;i<n;++i)out=out*a;return out;}
+std::vector<CFPoly> cf_y_coefficients(const EBPoly& p){int degree=-1;for(auto& term:p.terms)degree=std::max(degree,term.first[1]);std::vector<CFPoly> out(size_t(degree+1));for(auto& [e,c]:p.terms){std::vector<Z> monomial(size_t(e[0]+1),Z(0));monomial[e[0]]=c;out[e[1]]=out[e[1]]+CFPoly(monomial);}while(!out.empty()&&out.back().degree()<0)out.pop_back();return out;}
+CFPoly cf_determinant(std::vector<std::vector<CFPoly>> matrix){
+    int n=int(matrix.size());require(n>0,"nonempty Sylvester matrix");for(auto& row:matrix)require(int(row.size())==n,"square Sylvester matrix");CFPoly previous{Z(1)};Z sign(1);
+    for(int k=0;k<n-1;++k){int pivot=k;while(pivot<n&&matrix[pivot][k].degree()<0)++pivot;if(pivot==n)return {};if(pivot!=k){std::swap(matrix[pivot],matrix[k]);sign=-sign;}CFPoly diagonal=matrix[k][k];
+        for(int i=k+1;i<n;++i){for(int j=k+1;j<n;++j)matrix[i][j]=(diagonal*matrix[i][j]-matrix[i][k]*matrix[k][j]).exact(previous);matrix[i][k]=CFPoly{};}previous=diagonal;
+    }
+    return matrix[n-1][n-1].scale(sign);
+}
+CFPoly cf_resultant(const EBPoly& f,const EBPoly& g){
+    auto a=cf_y_coefficients(f),b=cf_y_coefficients(g);require(!a.empty()&&!b.empty(),"nonzero resultant inputs");int m=int(a.size())-1,n=int(b.size())-1;require(m+n>0,"nonconstant resultant pair");std::vector<std::vector<CFPoly>> matrix(size_t(m+n),std::vector<CFPoly>(size_t(m+n)));
+    for(int shift=0;shift<n;++shift){for(int j=0;j<=m;++j)matrix[shift][shift+j]=a[m-j];}
+    for(int shift=0;shift<m;++shift){for(int j=0;j<=n;++j)matrix[n+shift][shift+j]=b[n-j];}
+    return cf_determinant(matrix);
+}
+CFPoly cf_evaluate(const EBPoly& p,const CFPoly& u,const CFPoly& v){CFPoly x{Z(0),Z(1)},out;for(auto& [e,c]:p.terms){CFPoly term{c};for(int i=0;i<e[0];++i)term=(term*x)%u;for(int j=0;j<e[1];++j)term=(term*v)%u;out=(out+term)%u;}return out;}
+struct CFSplit:std::exception {
+    CFPoly factor;
+    explicit CFSplit(const CFPoly& f):factor(f){}
+    const char* what()const noexcept override{return "exact nonunit residue coefficient exposes support factor";}
+};
+struct CFResidue {
+    inline static CFPoly support;
+    CFPoly a;
+    CFResidue(long n=0):a(CFPoly{Z(n)}%support){}
+    explicit CFResidue(const CFPoly& p):a(p%support){}
+    CFResidue operator+(const CFResidue& b)const{return CFResidue(a+b.a);}
+    CFResidue operator-()const{return CFResidue(-a);}
+    CFResidue operator-(const CFResidue& b)const{return CFResidue(a-b.a);}
+    CFResidue operator*(const CFResidue& b)const{return CFResidue((a*b.a)%support);}
+    CFResidue inv()const{require(a.degree()>=0,"nonzero residue coefficient inversion");auto[g,s,t]=xgcd(a,support);if(g.degree()>0&&g.degree()<support.degree())throw CFSplit(g);require(g.degree()==0,"residue coefficient unit");return CFResidue(s);}
+    CFResidue operator/(const CFResidue& b)const{return *this*b.inv();}
+    bool operator==(const CFResidue& b)const{return a==b.a;}
+    bool operator!=(const CFResidue& b)const{return !(*this==b);}
+};
+Poly<CFResidue> cf_residue_y(const EBPoly& p){std::vector<CFResidue> coefficients;for(auto& c:cf_y_coefficients(p))coefficients.emplace_back(c);return Poly<CFResidue>(coefficients);}
+CFPoly cf_crt(const CFPoly& p,const CFPoly& a,const CFPoly& q,const CFPoly& b){auto[g,s,t]=xgcd(p,q);require(g.degree()==0,"coprime support CRT factors");CFPoly out=(a*q*t+b*p*s)%(p*q);require(out%p==a%p&&out%q==b%q,"exact residue support CRT");return out;}
+struct ClosedFiber {CFPoly u,v;EC source,norm;int saturation_steps=0;};
+struct ClosedFiberSolver {
+    const BRMap& map;
+    CFPoly normB;
+    int resultants=0,splits=0,Frobenius_checks=0;
+    std::vector<CFPoly> split_factors;
+    explicit ClosedFiberSolver(const BRMap& m):map(m){normB=cf_resultant(map.curve,map.B);++resultants;require(normB.degree()>=0,"nonzero map denominator norm");}
+    CFPoly recover_y(const CFPoly& u,const EBPoly& g,const EBPoly& h,int depth=0){
+        require(depth<=6,"residue splitting depth bound");CFResidue::support=u;
+        try{auto a=cf_residue_y(map.curve),b=cf_residue_y(g),c=cf_residue_y(h);auto d=std::get<0>(xgcd(a,b));auto all=std::get<0>(xgcd(d,c));require(all.degree()==1,"fiber linear-y support chart");return (-all.at(0)/all.at(1)).a;}
+        catch(const CFSplit& split){auto p=split.factor.monic();auto q=u.exact(p).monic();require(p.degree()>0&&q.degree()>0,"proper residue support split");++splits;split_factors.push_back(p);auto vp=recover_y(p,g,h,depth+1);auto vq=recover_y(q,g,h,depth+1);return cf_crt(p,vp,q,vq);}
+    }
+    EC validate(const ClosedFiber& fiber)const{
+        require(fiber.u.degree()==6&&fiber.u.c.back()==Z(1)&&fiber.v.degree()<6,"degree6 closed fiber shape");require(cf_gcd(fiber.u,cf_derivative(fiber.u)).degree()==0,"squarefree fiber support");require(cf_evaluate(map.curve,fiber.u,fiber.v).degree()<0,"closed fiber original curve equation");auto av=cf_evaluate(map.A,fiber.u,fiber.v),bv=cf_evaluate(map.B,fiber.u,fiber.v),vv=cf_evaluate(map.V,fiber.u,fiber.v),mv=cf_evaluate(map.M,fiber.u,fiber.v);auto[gb,ib,tb]=xgcd(bv,fiber.u);auto[gm,im,tm]=xgcd(mv,fiber.u);require(gb.degree()==0&&gm.degree()==0,"closed fiber actual denominator units");auto x=(av*ib)%fiber.u,y=(vv*im)%fiber.u;require(x.degree()<=0&&y.degree()<=0,"constant closed-fiber map coordinates");EC actual(F(CFPoly{x.at(0)}),F(CFPoly{y.at(0)}));require(actual==fiber.source,"computed fiber image equals public point");return actual;
+    }
+    ClosedFiber fiber(const EC& public_point){
+        require(!public_point.zero,"finite public fiber chart");Z x=scalar(public_point.x),y=scalar(public_point.y);auto g=map.A-map.B.scale(x),h=map.V-map.M.scale(y);auto rx=cf_resultant(map.curve,g),ry=cf_resultant(map.curve,h);resultants+=2;require(rx.degree()>=0&&ry.degree()>=0,"nonzero public fiber resultants");ClosedFiber out;out.source=public_point;out.u=cf_gcd(rx,ry).monic();
+        for(int attempt=0;attempt<64;++attempt){auto common=cf_gcd(out.u,normB);if(common.degree()==0)break;int before=out.u.degree();out.u=out.u.exact(common).monic();require(out.u.degree()<before,"strict denominator saturation progress");++out.saturation_steps;}
+        require(cf_gcd(out.u,normB).degree()==0,"complete map-denominator saturation");require(out.u.degree()==6&&cf_gcd(out.u,cf_derivative(out.u)).degree()==0,"complete finite squarefree degree6 fiber");out.v=recover_y(out.u,g,h);require(cf_evaluate(g,out.u,out.v).degree()<0&&cf_evaluate(h,out.u,out.v).degree()<0,"both public fiber equations");auto actual=validate(out);out.norm=times(actual,6);require(out.norm==times(public_point,6),"computed fiber norm is six times source point");
+        for(auto& p:std::array<CFPoly,2>{out.u,out.v}){for(auto& c:p.c){mpz_class f;mpz_powm(f.get_mpz_t(),c.x.get_mpz_t(),prime.get_mpz_t(),prime.get_mpz_t());require(f==c.x,"closed fiber prime-Frobenius coefficient");++Frobenius_checks;}}
+        return out;
+    }
+};
+void cf_controls(const BRMap& map){
+    EBPoly f,g;f.add({0,2},Z(1));f.add({1,0},Z(-1));g.add({0,1},Z(1));g.add({0,0},Z(-2));auto r=cf_resultant(f,g);require(r==CFPoly{Z(4),Z(-1)},"quadratic-linear resultant control");rejects([&]{require(r+CFPoly{Z(1)}==CFPoly{Z(4),Z(-1)},"altered resultant control");},"altered resultant control");EBPoly linear;linear.add({0,1},Z(1));linear.add({0,0},Z(-3));CFPoly expected;for(auto& [e,c]:map.curve.terms){std::vector<Z> term(size_t(e[0]+1),Z(0));term[e[0]]=c*cf_power(Z(3),e[1]);expected=expected+CFPoly(term);}require(cf_resultant(map.curve,linear)==expected,"actual quartic-linear resultant evaluation control");
+    CFPoly p{Z(-1),Z(1)},q{Z(-2),Z(1)};CFResidue::support=p*q;bool detected=false;try{CFResidue bad(p);bad.inv();}catch(const CFSplit& split){require(split.factor==p,"exact zero-divisor support factor");detected=true;}require(detected,"nonunit support factor detected");auto combined=cf_crt(p,CFPoly{Z(7)},q,CFPoly{Z(11)});require(combined.eval(Z(1))==Z(7)&&combined.eval(Z(2))==Z(11),"fixed support CRT control");rejects([&]{require((combined+CFPoly{Z(1)})%p==CFPoly{Z(7)},"altered support CRT value");},"altered support CRT value");
+}
+void cf_emit_poly(const CFPoly& p){std::cout<<'[';for(int i=0;i<=p.degree();++i)std::cout<<(i?",":"")<<'"'<<p.at(i).x<<'"';std::cout<<']';}
+void cf_emit_fiber(const ClosedFiber& f){std::cout<<"{\"source_point\":";br_emit_point(f.source);std::cout<<",\"U\":";cf_emit_poly(f.u);std::cout<<",\"V\":";cf_emit_poly(f.v);std::cout<<",\"norm\":";br_emit_point(f.norm);std::cout<<",\"saturation_steps\":"<<f.saturation_steps<<'}';}

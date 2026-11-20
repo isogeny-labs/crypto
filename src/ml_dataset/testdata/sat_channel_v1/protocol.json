@@ -1,0 +1,539 @@
+{
+  "amendments": [],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": true,
+    "inputs": [
+      "commands/*/receipt.json",
+      "plan.json",
+      "run/**",
+      "export/**",
+      "report/**"
+    ],
+    "outputs": [
+      "analysis.json",
+      "inventory.json",
+      "experiment.export.json"
+    ],
+    "script": {
+      "path": "/var/tmp/boolean-cli-training-acceptance-20261102-v1/analyze.py",
+      "sha256": "84b5e675b9949aedb1b03b8c74931252cbc245fac8664997448a2043145846b6"
+    }
+  },
+  "arms": [
+    {
+      "description": "Actual original-bound ordinary binary m3 f4 Boolean production/replay/export; absolute software contract, no inter-engine performance comparison.",
+      "id": "f4",
+      "instrument": {
+        "binary_sha256": "c5582791c4c62c79df1a478229dd55820e03a275d4ad4e67aa64df3f8594dfcd",
+        "build": [
+          [
+            "cargo",
+            "+1.98",
+            "build",
+            "--release",
+            "--bin",
+            "crypto",
+            "--locked",
+            "--offline"
+          ]
+        ],
+        "commit": "3a3f8fa7205405207e73ae303f35523cd44e8258",
+        "env": {
+          "LANG": "C",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "profile": "release",
+          "toolchain": "1.98"
+        },
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "solver": "f4"
+      },
+      "role": "control_positive"
+    },
+    {
+      "description": "Actual original-bound ordinary binary m3 f5 Boolean production/replay/export; absolute software contract, no inter-engine performance comparison.",
+      "id": "f5",
+      "instrument": {
+        "binary_sha256": "c5582791c4c62c79df1a478229dd55820e03a275d4ad4e67aa64df3f8594dfcd",
+        "build": [
+          [
+            "cargo",
+            "+1.98",
+            "build",
+            "--release",
+            "--bin",
+            "crypto",
+            "--locked",
+            "--offline"
+          ]
+        ],
+        "commit": "3a3f8fa7205405207e73ae303f35523cd44e8258",
+        "env": {
+          "LANG": "C",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "profile": "release",
+          "toolchain": "1.98"
+        },
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "solver": "f5"
+      },
+      "role": "candidate",
+      "same_instrument_as": "f4"
+    }
+  ],
+  "authors": [
+    "Codex; user-authorized dataset implementation software validation"
+  ],
+  "claims": [
+    {
+      "id": "C1",
+      "class": "exact_computation",
+      "decided_by": [
+        "absolute-f4",
+        "absolute-f5"
+      ],
+      "text": "All four frozen original cases produce an actual nonzero retained-row Boolean certificate, independently replayed by V9, and emit joined typed source-only training features and restricted target/proof records through the real CLI."
+    },
+    {
+      "id": "C2",
+      "class": "exact_computation",
+      "decided_by": [
+        "absolute-f4",
+        "absolute-f5"
+      ],
+      "text": "Exact source/protocol/config/capture custody, limits, requested unsupported SAT status and original-source public allowlists survive plan/generate/verify/export; failures remain visible."
+    },
+    {
+      "id": "C3",
+      "class": "out_of_scope",
+      "decided_by": [],
+      "text": "No comparative cost, timing, population sampling, full higher-arity source support, SAT search admission, scientific-cloud production or new spend claim."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": null,
+      "not_applicable_reason": "No clock/performance claim; no second Generate. Repeat independent read-only verification/export on existing artifacts is a determinism/custody check, not A/A timing.",
+      "present": false
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "No additional generated negative cells. Required prerequisite source-gate receipts cover malformed/sticky-budget/source/capture/proof/unsupported routing controls; four real cells also request SAT and must receive explicit unsupported. Full m2..15/policy cohort is retained in a plan-only control, never mislabeled as executed.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "present": true,
+      "arm": "f4",
+      "expected_detection": "The frozen genuine original16384 identities previously passed the strict native producer gate; both f4 and f5 with both twists must now yield actual nonzero identity and typed export. Refusal does not satisfy this detector. No planted or substituted target.",
+      "not_applicable_reason": null
+    }
+  },
+  "created": "2026-11-02",
+  "decision_rule": {
+    "comparison_ids": [
+      "absolute-f4",
+      "absolute-f5"
+    ],
+    "effect_size_measure": "Not applicable; no effect-size or performance claim",
+    "interval": "Not applicable to an exact finite software contract",
+    "multiple_comparison_correction": "none",
+    "statistic": "Exact conjunction, with planned/attempted/completed/failed/interrupted/unattempted counts",
+    "text": "PASS only for conjunction of four cell contracts and the global pipeline contract. Otherwise report FAIL for an observed contract violation, INTERRUPTED for infrastructure interruption, or NOT_EXECUTED for unmet preconditions; retain evidence and do not repeat automatically.",
+    "threshold": "4 of4 cell contracts plus every global command/custody/export assertion pass",
+    "verdict_vocabulary": [
+      "PASS",
+      "FAIL",
+      "INTERRUPTED",
+      "NOT_EXECUTED"
+    ]
+  },
+  "execution": {
+    "backend": "local",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": null,
+      "interval_seconds": null,
+      "policy": "none",
+      "restore_validation": "none"
+    },
+    "measurement_class": "throughput",
+    "placement": {
+      "cloud_launch": false,
+      "filesystem_parent": "/var/tmp",
+      "fresh_nonexisting_fixture_required": true,
+      "local_file_backend_publication": false,
+      "remote_publish": false
+    },
+    "queue": null,
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 1800
+  },
+  "extensions": {
+    "scope": "software acceptance only",
+    "fixed_input_files": [
+      "channels.json",
+      "factor-base-policies.json",
+      "schedule.json",
+      "limits.json"
+    ],
+    "candidate_binding_pending": false,
+    "required_dependencies": {
+      "v9_manifest": "93a1aec392f78351fe4fd7841c9f5923c0b1bc1f6cf8b50f9a4cbff9717fe5a9",
+      "cli_patch": "655db0b5ec6b4fb2bd3304235d593a6593458ef6577eb6dc3e6214b2856e3e88",
+      "export_v2_patch": "d7565a02eca31387c7ffe03858c08dc4ffd098445642bae8b7e1558a87dbd47b",
+      "protocol_extension_patch": "43068081071edabdb5d909ad7e119ffa2ebb6293cd578607b1f20eba14932782"
+    },
+    "source_binary_and_gate_receipts": {
+      "source_commit": "3a3f8fa7205405207e73ae303f35523cd44e8258",
+      "source_tree": "4ef568b90ddaa79a26b40a03919b0ec9e597004b",
+      "binary_sha256": "c5582791c4c62c79df1a478229dd55820e03a275d4ad4e67aa64df3f8594dfcd",
+      "exact_gate_receipts": [
+        {
+          "path": "/home/ec2-user/ml-dataset-resume-20261029/boolean-cli-exact-gate-attestations-20261102/release_binary.json",
+          "sha256": "495cccf3997e4a44aad947766ffb718694a894fa570c31e6ba0059b69aa11520"
+        },
+        {
+          "path": "/home/ec2-user/ml-dataset-resume-20261029/boolean-cli-exact-gate-attestations-20261102/full_library.json",
+          "sha256": "0667930747e6a6422ba914ad1befe41ca11cf482c3a516c18288c02fbc38377f"
+        }
+      ]
+    },
+    "local_software_authorized": true,
+    "production_cloud_authorized": false,
+    "prior_54_cell_draft_replaced": false,
+    "donor_sha256": "91104212f1b6228462bf11f0ad92c6d30653c29a20519ba28cc0e5a36b737620",
+    "dataset_channels": {
+      "schema": "crypto.ml-dataset.channel-requests/v1",
+      "boolean_consequence": {
+        "mode": "produce",
+        "row_index": 0
+      },
+      "sat_initial": {
+        "mode": "capture_and_check_initial"
+      }
+    },
+    "execution_driver": {
+      "file": "driver.py",
+      "sha256": "4402e90f352444d02a363f8f04b5275d35180fbb8c5411ab316f5153f578645f"
+    }
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "d8b360aaf04087fb641902effbf7fd201a45dc1d3fed003c8cbe5d57c988ec55",
+    "commit": "3a3f8fa7205405207e73ae303f35523cd44e8258",
+    "frozen_at": "2026-11-02T19:36:43Z",
+    "filed_before_affected_data": true
+  },
+  "inadmissible": [
+    "Generating or building while unrelated source validation is active or without source/binary/gate reconciliation.",
+    "Freezing a template containing unresolved hashes, mutable source/binary/analysis paths, or fabricated software gate receipts.",
+    "Reusing interrupted output, renewing original deadlines, rerunning Generate, adding cells, or changing seed/resources after outcomes.",
+    "Calling the hidden worker directly in place of actual Generate supervisor coverage.",
+    "Treating scientific_corpus_rows or verified_cloud_cells as positive; both remain0 for this local software smoke.",
+    "Interpreting runtime, PMU, modeled ledgers or native counters as comparative or complete instruction evidence.",
+    "Publishing remote datasets, changing cloud permissions, or treating checkpoint archives as scientific dataset uploads."
+  ],
+  "invalidation_rules": [
+    "Source/binary mismatch, dirty embedded provenance, stale validation gates, missing original binding, wrong adapter, missing/duplicate canonical artifacts, failed replay, expired/interrupted worker, or missing command receipt invalidates all-success.",
+    "Failure and timeout rows are retained and charged as attempts; no exclusion creates success. Unattempted remaining cells are explicitly reported.",
+    "Unavailable or multiplexed counters are preserved under actual scope; they cannot be promoted to complete hardware instruction measurements."
+  ],
+  "literature": [
+    {
+      "ref": "src/ml_dataset/solvers.rs::verified_worker_original_tests::Fixture::with_ordinary_limits_shape and with_family_policy_profile",
+      "claim": "Actual fixed mathematical inputs and original launch limits, software source contract.",
+      "provenance": "internal"
+    },
+    {
+      "ref": "src/ml_dataset/curves.rs::generate",
+      "claim": "Solver-independent seed42 curve/generator/key construction; no target substitution.",
+      "provenance": "internal"
+    },
+    {
+      "ref": "boolean-causal-export-proposal-20261102-v2/SCHEMA.md",
+      "claim": "Reviewed Boolean quotient/source-only feature semantics; no novelty claim.",
+      "provenance": "internal"
+    }
+  ],
+  "measurement": {
+    "clock": "none",
+    "counters": [],
+    "isolation_required": "none",
+    "order": "sequential",
+    "record": [
+      "source_commit",
+      "binary_sha256_before",
+      "binary_sha256_after",
+      "command_argv",
+      "command_exit",
+      "attempt_binding",
+      "original_execution_context",
+      "host_descriptors",
+      "actual_telemetry_scope",
+      "artifact_sha256"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "per_row",
+        "definition": "One only if actual original-bound nonzero Boolean identity, V9 independent replay, original limits and typed exported feature/label joins all pass for that cell; partial/unknown/missing fails the positive contract.",
+        "id": "cell_contract_pass",
+        "kind": "exact",
+        "name": "native CLI cell contract",
+        "resolution": "one exact boolean",
+        "source": "analysis.json cells; sealed cell manifests, result.json, worker-process.json, execution-context.json, native and parent artifacts, command verification receipts",
+        "uncertainty": "none_exact",
+        "unit": "boolean 0 or 1"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "per_row",
+        "definition": "One only if exact4 cells, source/binary/protocol/limits,4 nonzero restricted records,2 source-only features paired across engines, unsupported SAT dispositions, manifest hashes and all command/check obligations pass.",
+        "id": "pipeline_contract_pass",
+        "kind": "exact",
+        "name": "global CLI custody/export contract",
+        "resolution": "one exact boolean",
+        "source": "analysis.json; commands/*/receipt.json; plan/preflight/status/export/report outputs and inventory.json",
+        "uncertainty": "none_exact",
+        "unit": "boolean 0 or 1"
+      }
+    ]
+  },
+  "protocol_id": "boolean-original-cli-training-acceptance-20261102-v1",
+  "question": "Do the exact four genuine original16384 cases traverse real CLI generation, independent V9 replay and typed source-equation/restricted-target export under unchanged limits?",
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Reproduce exact CLI index mapping; no timing/performance conclusion is drawn from order.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact machine assertions need explicit solver/twist and path identities; no subjective ranking or statistical selection.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "The two actual-twist instances per solver are a finite profile-coverage set from the same frozen plan; no statistical independence or population-generalization claim. Curve/generator/key construction does not depend on solver arm."
+    },
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "nonce": null,
+      "note": "crypto DatasetPlan::cell and curves::generate use frozen seed42 and one curve/generator/key per twist; no protocol-hash-derived replacement seeds.",
+      "seeds": [
+        42
+      ]
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [
+      "Finite four-cell pass/fail custody table; no statistical or performance plot"
+    ],
+    "report_dir": "report",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 2,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "min_attainable_two_sided_p": null,
+      "note": "Two arms times two twist cases equals four exact coverage checks. passes describes adequacy for this finite conjunction, not a run outcome or statistical power. Alpha is schema-required and unused; no p-values or effect detection.",
+      "passes": true,
+      "rank_test_n": null,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 1800,
+      "fixed_seconds": null,
+      "measured_on": null,
+      "per_sample_seconds": null,
+      "threads": 1
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "Exactly four generated cells, one Generate; then registered verify/status/export/report, repeat export and plan-only broad control; no further generated cases."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Stop immediately on nonzero command or failed prerequisite/assertion; preserve all completed and partial artifacts. No automatic rerun, timeout renewal or resampling."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "Per-cell original60s, Generate wrapper300s plus explicit bounded kill grace, short commands45s and verify/export/report120s, total driver1800s. No new cloud/S3 production spend; original overall200USD cap remains unchanged."
+    }
+  ],
+  "study_dir": "/home/ec2-user/ml-dataset-resume-20261029/boolean-cli-frozen-custody-20261102-v1",
+  "variable_ledger": {
+    "aa_not_applicable": "No clock, speed, stochastic performance, or comparative claim. Each finite command/artifact assertion is exact; repeated A/A executions would add samples outside this four-cell functional check.",
+    "comparisons": [
+      {
+        "arms": [
+          "f4"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "absolute-f4",
+        "reason": "Exact functional assertion only; not an inter-arm comparison.",
+        "threshold": "Both twist cells pass every cell assertion and all global plan/verify/export/report assertions pass."
+      },
+      {
+        "arms": [
+          "f5"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "absolute-f5",
+        "reason": "Exact functional assertion only; not an inter-arm comparison.",
+        "threshold": "Both twist cells pass every cell assertion and all global plan/verify/export/report assertions pass."
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "One immutable retained clean build; verify its embedded provenance and SHA-256 before/after each command; no shared target executable after prepare.",
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": {
+          "binary_sha256": "c5582791c4c62c79df1a478229dd55820e03a275d4ad4e67aa64df3f8594dfcd",
+          "source_commit": "3a3f8fa7205405207e73ae303f35523cd44e8258"
+        }
+      },
+      {
+        "how": "Frozen read-only analyzer validates command/custody receipts, exact schedule, paired source features, restricted joins, output hashes and repeat export; no subprocess or repair.",
+        "name": "analysis",
+        "treatment": "fixed",
+        "value": {
+          "path": "/var/tmp/boolean-cli-training-acceptance-20261102-v1/analyze.py",
+          "sha256": "84b5e675b9949aedb1b03b8c74931252cbc245fac8664997448a2043145846b6"
+        }
+      },
+      {
+        "how": "Both absolute functional arms; solver is fastest-changing plan digit; no solver speed/rank comparison.",
+        "name": "solver",
+        "treatment": "crossed",
+        "value": [
+          "f4",
+          "f5"
+        ]
+      },
+      {
+        "how": "Both actual curve models retained; compare actual manifest configurations to frozen mapping.",
+        "name": "actual_twist",
+        "treatment": "crossed",
+        "value": [
+          false,
+          true
+        ]
+      },
+      {
+        "how": "Plan and seeded curve/key rules selected before data; no resampling of partial or failed cells.",
+        "name": "input_axes",
+        "treatment": "fixed",
+        "value": {
+          "family": "binary",
+          "n": 23,
+          "m": 3,
+          "curve_seeds": 1,
+          "generators": 1,
+          "keys": 1,
+          "seed": 42,
+          "factor_base_size": 4,
+          "factor_base_policy": {
+            "kind": "legacy"
+          },
+          "degree_bound": 3,
+          "work_limit": 16384
+        }
+      },
+      {
+        "how": "Supervisor creates immutable attempt/execution contexts; native/checking work shares the original budget; no renewed deadline at replay.",
+        "name": "original_resources",
+        "treatment": "fixed",
+        "value": {
+          "memory_mib": 256,
+          "seconds_per_case": 60,
+          "threads": 1,
+          "trace_mib": 128,
+          "work_limit": 16384
+        }
+      },
+      {
+        "how": "Retain actual host/process/telemetry descriptors. No timing, operation-cost, or retired-instruction comparison; no host isolation assertion.",
+        "name": "host_and_environment",
+        "treatment": "measured",
+        "value": "cpu, kernel, hypervisor, co-tenants, memory pressure, filesystem, isolation, actual PMU availability"
+      },
+      {
+        "how": "No allocation-layout or RSS cost claim. Preserve existing telemetry semantics and missing values.",
+        "name": "allocation_layout",
+        "treatment": "measured",
+        "value": "actual RSS and process limits when reported"
+      },
+      {
+        "how": "One deterministic attempt per exact cell. No warming, interleaved repetition, or retries.",
+        "name": "order_and_warmup",
+        "treatment": "fixed",
+        "value": "F4/plain, F5/plain, F4/twist, F5/twist; zero warmups"
+      },
+      {
+        "how": "No blinding needed for exact functional checks; all outcomes including failures remain visible and retained.",
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "deterministic frozen artifact assertions"
+      },
+      {
+        "how": "Stop and preserve partial evidence on interruption; no resume/replacement generator or new seed.",
+        "name": "preemption_and_interruptions",
+        "treatment": "measured",
+        "value": "actual interruption/exit receipts"
+      }
+    ],
+    "independent": [
+      {
+        "levels": [
+          "f4",
+          "f5"
+        ],
+        "name": "solver"
+      },
+      {
+        "levels": [
+          false,
+          true
+        ],
+        "name": "actual_twist"
+      }
+    ]
+  },
+  "version": 1
+}

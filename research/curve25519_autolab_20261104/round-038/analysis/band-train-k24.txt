@@ -1,0 +1,13 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | inc | 16/16 | 1.887 | 2.047 | 3.487 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | rho-neg | 16/16 | 1.089 | 1.186 | 2.058 | — |
+| icv1-fp24-tm1578-e83ed1b2 | 21.00 | wwalkGg-x09-sr-n2 | 16/16 | 2.055 | 2.229 | 3.787 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp24-tm1578-e83ed1b2 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp24-tm1578-e83ed1b2 | inc vs wwalkGg-x09-sr-n2 | inc < wwalkGg-x09-sr-n2 |
+| icv1-fp24-tm1578-e83ed1b2 | rho-neg vs wwalkGg-x09-sr-n2 | rho-neg < wwalkGg-x09-sr-n2 |

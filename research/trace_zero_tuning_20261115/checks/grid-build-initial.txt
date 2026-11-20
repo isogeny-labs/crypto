@@ -1,0 +1,26 @@
+   Compiling trace-zero-tuning v0.1.0 (/workspace/crypto-trace/research/trace_zero_tuning_20261115/native)
+error[E0057]: this function takes 2 arguments but 4 arguments were supplied
+  --> src/bin/audit_tuning.rs:95:23
+   |
+95 |             .abs_diff(get("tuned-eager",
+   |                       ^^^
+96 |         "tuned-lazy",
+97 |         "projected-eager-aa", "instructions")) as f64
+   |         --------------------  -------------- unexpected argument #4 of type `&'static str`
+   |         |
+   |         unexpected argument #3 of type `&'static str`
+   |
+note: closure defined here
+  --> src/bin/audit_tuning.rs:85:19
+   |
+85 |         let get = |arm: &str, m: &str| {
+   |                   ^^^^^^^^^^^^^^^^^^^^
+help: remove the extra arguments
+   |
+96 -         "tuned-lazy",
+97 -         "projected-eager-aa", "instructions")) as f64
+96 +         "tuned-lazy")) as f64
+   |
+
+For more information about this error, try `rustc --explain E0057`.
+error: could not compile `trace-zero-tuning` (bin "audit_tuning") due to 1 previous error

@@ -1,0 +1,17 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\begin{document}
+\section*{R96 marked-23 discriminant: rejected attempt}
+The frozen \texttt{discriminant96-01} run was rejected. Singular
+reported \texttt{deg(poly,poly) failed}: the source supplied a variable
+where \texttt{deg} requires a weight vector. The process exited zero
+and printed a pass marker, but the strict driver detected native errors.
+
+\begin{center}\includegraphics[width=.9\textwidth]{diagram.pdf}\end{center}
+
+The partial export is diagnostic only. A new frozen attempt will use
+explicit x- and y-weight vectors and repeat the complete source-bound
+resultant and factorization. The 16 raw members passed fresh-readback
+hash checks; see \texttt{CM.md} for the custody digest and claim scope.
+\end{document}

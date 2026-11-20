@@ -1,0 +1,64 @@
+{
+  "schema": "twist-phase2-migration-reconciliation/v1",
+  "observed_utc": "2026-10-25T01:16:42Z",
+  "receipt": {
+    "path": "/srv/experiments/agent-migration/handoff-receipt.json",
+    "sha256": "a16037f61139810dcb13bea313349a2f9d4f1a43471c7ffc04ea3e1828dac0c1",
+    "source": "i-01f85a6c905181498",
+    "original_source_disk_retained": true,
+    "matches_previous_saved_receipt": true
+  },
+  "diem": {
+    "native_state_path": "/run/spot-legacy/diem.json",
+    "state": "deadline-expired",
+    "durable_records": 50,
+    "expected_records": 52,
+    "deadline_utc": 1792521741.993407,
+    "pending": false,
+    "launcher_pid": null,
+    "owner_service": "spot-diem-recovery.service",
+    "owner_state": "inactive/dead",
+    "duplicate_generator_launched": false
+  },
+  "legacy_freeze_followup": {
+    "task": "T-8",
+    "saved_task_state": "cancelled",
+    "original_objective": "Wait for the existing generator, validate all 52 saved records and commit the frozen list without repeating generation.",
+    "script_repository": "/home/ec2-user/crypto-w2a-diem-freeze-20261019",
+    "script_path": "research/diem_quartic_relations_20261018/resume-validation-20261019/diem-freeze-followup.py",
+    "saved_script_git_blob": "bc200ff668b8d8a825489b425bdb756b1e11084b",
+    "saved_output_state": "waiting_for_grid",
+    "saved_output_started_at": "2026-10-19T22:00:44.791296+00:00",
+    "saved_steps": [],
+    "saved_gate": "generation_complete and exactly 52 records and no live generator",
+    "historical_refusal": "incomplete grid: 46/52 (historical log, not current record count)",
+    "gate_currently_satisfied": false,
+    "action": "Leave quiesced; no script execution or new authorization inferred."
+  },
+  "eks": {
+    "overview_jobs": 28,
+    "overview_succeeded": 18,
+    "overview_failed": 10,
+    "overview_nonterminal": 0,
+    "prior_probe_name": "twist-joint-capability-20261024-v1",
+    "named_probe_current_status": "NotFound",
+    "prior_saved_probe_status": "DeadlineExceeded",
+    "action": "No submission, repetition, role change or new instance."
+  },
+  "panel": {
+    "service": "twist-zero-pipeline-panel-v1.service",
+    "main_pid": 3372809,
+    "original_started_utc": "2026-10-25T00:31:20Z",
+    "observed_state": "active/running",
+    "terminal_marker_present": false,
+    "registered_configurations": 85,
+    "registered_candidate_executions": 255,
+    "recorded_candidate_exits_at_followup_check": 59,
+    "recorded_exit_statuses_at_followup_check": "59 exit 0",
+    "compiled_producer_source_seals": "all checked OK",
+    "compiled_metadata_source_seals": "all checked OK",
+    "action": "Existing owner continues, including common-reservation waits. No restart or new attempt deadline."
+  },
+  "followup_observed_utc": "2026-10-25T01:27:55Z",
+  "scope": "Infrastructure reconciliation. Historical completed studies were not rerun. New accounting is read-only analysis, outside both frozen producer source lists."
+}

@@ -1,0 +1,94 @@
+{
+  "branch": "aburan28/inspiring-dijkstra-ay05qi",
+  "closed_utc": "2026-11-15T17:10:00+00:00",
+  "commands": [
+    {
+      "argv": [
+        "target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ic_c1_headroom_20261115/spec-k32.json",
+        "--out",
+        "research/ic_c1_headroom_20261115/session-k32",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--wait"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T17:08:18+00:00",
+      "wall_s": 9.971
+    }
+  ],
+  "commit": "ded279c285cbb37bf6fd7771738db00a976a24dc",
+  "commit_dirty": false,
+  "created_utc": "2026-11-15T17:08:17+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T1708Z-c1-headroom-k32-rerun",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 120,
+      "name": "c1_s_k32",
+      "note": "C = 1 wwalk mean S, rerun of frozen spec; floor 1.329",
+      "reference": 0.928,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 1.545
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 120,
+      "name": "c1_setup_share_k32",
+      "note": "table build part of C = 1 S",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "S",
+      "value": 0.949
+    }
+  ],
+  "problem": "ecdlp-prime-single-target",
+  "raw": [
+    {
+      "bytes": 4470636,
+      "path": "research/ic_c1_headroom_20261115/session-k32/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5b/5b827e95ccc920d3130e882bacc12d9d02a75a75824d3b884d8309513bac094b",
+      "sha256": "5b827e95ccc920d3130e882bacc12d9d02a75a75824d3b884d8309513bac094b",
+      "uploaded": false
+    },
+    {
+      "bytes": 2054,
+      "path": "research/ic_c1_headroom_20261115/session-k32/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ac/ac44db22912574170a1b0b2b8de283bdc40e876057e67239a0146f65b2bd719b",
+      "sha256": "ac44db22912574170a1b0b2b8de283bdc40e876057e67239a0146f65b2bd719b",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_c1_headroom_20261115/c1_phases.pdf",
+    "png": [],
+    "svg": [
+      "research/ic_c1_headroom_20261115/c1_phases.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "c1-headroom-k32-rerun",
+  "status": "measured",
+  "summary": "Rerun reproduces C = 1 S = 1.545 at k = 32; 0.949 table build + 0.595 walk; floor 1.329 reachable only as two-target rho",
+  "validation": null
+}

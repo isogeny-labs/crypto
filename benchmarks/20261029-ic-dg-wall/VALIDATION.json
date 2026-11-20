@@ -1,0 +1,236 @@
+{
+ "schema": "validation-gate/v1",
+ "rows": [
+  "icv1-fp24-tm1297-6f714a52",
+  "icv1-fp24-tm2281-0469151f",
+  "icv1-fp28-t14677-349132c0",
+  "icv1-fp28-t22749-960afa7f",
+  "icv1-fp32-t16357-dd50743c",
+  "icv1-fp32-tm94829-d5c5f997"
+ ],
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "677bfe5cd5d933fb622e526a254f69faa64fcc0da7fbf8e0d829ff7eff6a0a64"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "fbfefe437dee24b1bcc6bc57ea7b00deeed376e3b8283de1babdf821c66eb430"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "PROTOCOL.md section 2 (E1) counted session, arm rho-neg: rho.negation (cap_multiple 64) in job ic-dgw-rho-p<b>-20261029 per size, on the same two curves, the same 24 public targets per curve, the same rounds and the same algorithm seeds as srenew and dg (the counted session's srenew and dg records are identical in GAE, unpriced counts and seeds to the wall session's, pair by pair)",
+  "unit": "ecbench.gae / sqrt(r) (S), cold, whole pipeline; unpriced native operations priced at w GAE each (AGENTS.md section 5a): IC lookups, sqrt solves, row ops, Legendre symbols, target guard probes; rho canonicalisations",
+  "binary_or_process": "ecbench sha256 88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c (isolab image cf0dcc8b, source be2969ce); rho and IC arms in one counted session per size; replayed by the same binary on another host",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "strongest_available_basis": "All six curves are prime-order curves over prime fields (p and r prime, r = p + 1 - t, validator check on the ICV1 strings) with j not 0 or 1728 (j read from ICV1 and reproduced from a, b solved from G and the targets), so Aut(E) = {+-1}: negation is the only automorphism fold and no Frobenius fold exists; records show automorphisms_used 2.",
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band_row": "icv1-fp24-tm1297-6f714a52: ic = dg (candidate, N_inc) mean S over its 144 measured runs, rho = rho-neg mean S over the same 144 (target, round) pairs; every row in gae_band_by_row; the srenew baseline in gae_band_baseline_by_row",
+  "gae_band": {
+   "0": {
+    "ic": 13.58073792337625,
+    "rho": 1.1039578827871388
+   },
+   "0.1": {
+    "ic": 14.246145282792279,
+    "rho": 1.2041434162262017
+   },
+   "1": {
+    "ic": 20.234811517536556,
+    "rho": 2.105813217177769
+   }
+  },
+  "gae_band_by_row": {
+   "icv1-fp24-tm1297-6f714a52": {
+    "0": {
+     "ic": 13.58073792337625,
+     "rho": 1.1039578827871388
+    },
+    "0.1": {
+     "ic": 14.246145282792279,
+     "rho": 1.2041434162262017
+    },
+    "1": {
+     "ic": 20.234811517536556,
+     "rho": 2.105813217177769
+    }
+   },
+   "icv1-fp24-tm2281-0469151f": {
+    "0": {
+     "ic": 13.974010569904305,
+     "rho": 1.0945513532280862
+    },
+    "0.1": {
+     "ic": 14.535986348643469,
+     "rho": 1.1917583617093273
+    },
+    "1": {
+     "ic": 19.593768357295936,
+     "rho": 2.0666214380404986
+    }
+   },
+   "icv1-fp28-t14677-349132c0": {
+    "0": {
+     "ic": 21.611269922567505,
+     "rho": 0.990832432680333
+    },
+    "0.1": {
+     "ic": 22.41974103904376,
+     "rho": 1.0867533489924506
+    },
+    "1": {
+     "ic": 29.695981087330058,
+     "rho": 1.9500415958015067
+    }
+   },
+   "icv1-fp28-t22749-960afa7f": {
+    "0": {
+     "ic": 20.731276361840063,
+     "rho": 1.0060792865526125
+    },
+    "0.1": {
+     "ic": 21.550579449734524,
+     "rho": 1.1037608836270387
+    },
+    "1": {
+     "ic": 28.924307240784692,
+     "rho": 1.9828952572968757
+    }
+   },
+   "icv1-fp32-t16357-dd50743c": {
+    "0": {
+     "ic": 32.68068643369125,
+     "rho": 0.9251213853131096
+    },
+    "0.1": {
+     "ic": 33.98992529679281,
+     "rho": 1.0168879384332281
+    },
+    "1": {
+     "ic": 45.77307506470683,
+     "rho": 1.8427869165142943
+    }
+   },
+   "icv1-fp32-tm94829-d5c5f997": {
+    "0": {
+     "ic": 32.136289404190194,
+     "rho": 0.9006792578143776
+    },
+    "0.1": {
+     "ic": 33.6278244766676,
+     "rho": 0.9900931467539953
+    },
+    "1": {
+     "ic": 47.05164012896418,
+     "rho": 1.7948181472105549
+    }
+   }
+  },
+  "gae_band_baseline_by_row": {
+   "icv1-fp24-tm1297-6f714a52": {
+    "0": {
+     "ic": 13.580716899283992,
+     "rho": 1.1039578827871388
+    },
+    "0.1": {
+     "ic": 14.863190349409487,
+     "rho": 1.2041434162262017
+    },
+    "1": {
+     "ic": 26.405451400538936,
+     "rho": 2.105813217177769
+    }
+   },
+   "icv1-fp24-tm2281-0469151f": {
+    "0": {
+     "ic": 13.973985227681137,
+     "rho": 1.0945513532280862
+    },
+    "0.1": {
+     "ic": 15.040772101972639,
+     "rho": 1.1917583617093273
+    },
+    "1": {
+     "ic": 24.641853970596138,
+     "rho": 2.0666214380404986
+    }
+   },
+   "icv1-fp28-t14677-349132c0": {
+    "0": {
+     "ic": 21.611262996373657,
+     "rho": 0.990832432680333
+    },
+    "0.1": {
+     "ic": 23.192934914678332,
+     "rho": 1.0867533489924506
+    },
+    "1": {
+     "ic": 37.42798217942041,
+     "rho": 1.9500415958015067
+    }
+   },
+   "icv1-fp28-t22749-960afa7f": {
+    "0": {
+     "ic": 20.731269947611157,
+     "rho": 1.0060792865526125
+    },
+    "0.1": {
+     "ic": 22.338611942337653,
+     "rho": 1.1037608836270387
+    },
+    "1": {
+     "ic": 36.804689894876084,
+     "rho": 1.9828952572968757
+    }
+   },
+   "icv1-fp32-t16357-dd50743c": {
+    "0": {
+     "ic": 32.680684996607056,
+     "rho": 0.9251213853131096
+    },
+    "0.1": {
+     "ic": 35.279791872961155,
+     "rho": 1.0168879384332281
+    },
+    "1": {
+     "ic": 58.67175376014806,
+     "rho": 1.8427869165142943
+    }
+   },
+   "icv1-fp32-tm94829-d5c5f997": {
+    "0": {
+     "ic": 32.13628837041226,
+     "rho": 0.9006792578143776
+    },
+    "0.1": {
+     "ic": 35.102129032398125,
+     "rho": 0.9900931467539953
+    },
+    "1": {
+     "ic": 61.79469499027089,
+     "rho": 1.7948181472105549
+    }
+   }
+  },
+  "order_holds_across_band": true,
+  "order_note": "rho-neg < dg and rho-neg < srenew at w = 0, 0.1 and 1 on every row (order_holds_across_band for the baseline: True). dg against srenew in counted units is NOT ordered across the band: dg charges +1 GAE on the pairs where a repeated target decomposes, so Sum S_dg > Sum S_srenew at w = 0 on every curve and dg < srenew at w = 0.1 and 1; the improvement this file admits is the wall-clock one (ns per charged GAE), not a counted ranking."
+ },
+ "verdict": "passed",
+ "size_verdict": {
+  "P24": "pass",
+  "P28": "pass_with_caveats",
+  "P32": "pass"
+ },
+ "caveats": [
+  "24 and 32 bits: pass. Wall-clock improvement of dg over srenew at N_inc, corrected dg/srenew ns per GAE 0.9128 [0.9099, 0.9157] at 24 bits and 0.8486 [0.8451, 0.8521] at 32 bits, as a component speed-up outside tables A-C. 28 bits: pass with caveats, 0.8862 [0.8837, 0.8887], but E6 condition 2 fails, so srenew stays the 28-bit baseline.",
+  "Not a counted improvement: dg charges +1 GAE per late-caught repeated target (about 7% of pairs), so dg/srenew is about 1.000002 at w = 0 and below 1 at w = 0.1 and 1. The two are not ordered across the band in counted units.",
+  "ns per GAE is an upper bound per operation for both arms, on EKS c8a.2xlarge only. The wall time is not replayable; the counted scalars are, with 7,776 of 7,776 runs identical on another host.",
+  "Two fresh curves per size, 24 targets x 6 rounds. The per-curve ratios differ beyond their intervals at 24 and 32 bits.",
+  "dg always ran at the middle position of the alternate order. The within-run null (oracle_setup wall ratio within 0.2% of 1) and the probe dose-response bound any position effect far below the measured gain."
+ ],
+ "promotion_blockers": [],
+ "promotion_note": "No evidence blocker known to the validator remains for the 24- and 32-bit rows. For the 28-bit rows the evidence is admissible, but the protocol gives no placement for a 28-bit component speed-up when E6 fails, and srenew stays the 28-bit baseline. Before the gate is used, commit the research-visuals outputs (README, figure, PDF) and the section 8 post-verdict table, which are working-tree only at f1e65b1c74. Promotion is the Coordinator's decision: this file records evidence admissibility, not authorization.",
+ "draft_note": "Draft written by the validator outside the repository. Place it as research/ic_dg_wall_20261029/VALIDATION.json with the validator files under research/ic_dg_wall_20261029/validation/ (replay-certificate.json, validator-report.json and the rest); the two pinned sha256 values hold only if those files are copied byte for byte.",
+ "evidence_note": "replay-certificate.json is a copy of research/ic_dg_wall_20261029/validation/replay-certificate.json; validator-report.json is a copy of that directory's validator-report.json with raw_data paths rebased to this directory (../../research/ic_dg_wall_20261029/...); raw data is under research/ic_dg_wall_20261029/P24, P28 and P32"
+}

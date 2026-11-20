@@ -1,0 +1,20 @@
+// Strict process/byte/sentinel admission only. Mathematical checks run in Rust/GP.
+import fs from 'node:fs';import crypto from 'node:crypto';
+const v='research/twist_routes_1_3_20261021/execution-v15';const dir=process.argv[2]||v;
+const sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+const native=JSON.parse(fs.readFileSync(v+'/runs/producer-transport.json'));
+const prefix=dir+'/runs/pari-v1/RECEIPT';const gp=JSON.parse(fs.readFileSync(prefix+'.json'));
+const stdout=fs.readFileSync(prefix+'.stdout','utf8');const stderr=fs.readFileSync(prefix+'.stderr','utf8');
+const allowed='***   Warning: new maximum stack size = 4000002048 (3814.699 Mbytes).';
+const issues=[];
+if(native.exit_code!==0||native.signal)issues.push('native producer process failed');
+if(gp.exit_code!==0||gp.signal)issues.push('reference process failed');
+if(stdout.trim()!=='ALL_COLD_INPUTS_OK 28')issues.push('reference sole marker absent/extra stdout');
+if(stderr.trim()!==''&&stderr.trim()!==allowed)issues.push('reference stderr contains undeclared errors');
+if(sha(prefix+'.stdout')!==gp.stdout_sha256||sha(prefix+'.stderr')!==gp.stderr_sha256)issues.push('reference output hashes changed');
+if(sha(gp.argv.at(-1))!==gp.script_sha256)issues.push('reference script bytes changed');
+if(sha(v+'/runs/producer-transport.stdout')!==native.stdout_sha256||sha(v+'/runs/producer-transport.stderr')!==native.stderr_sha256)issues.push('native output hashes changed');
+if(fs.readFileSync(v+'/runs/inputs-v1/gp.stderr','utf8').trim()!=='')issues.push('producer backend stderr not empty');
+const output={schema:'twist.cold-input-admission/v1',created:new Date().toISOString(),status:issues.length?'rejected-reference':'native-and-independent-reference-verified',verified_models:issues.length?null:28,issues,native_execution:v+'/runs/producer-transport.json',reference_execution:prefix+'.json',source_native_reused:dir!==v,fixture_manifest_sha256:sha(v+'/runs/inputs-v1/FIXTURES.json'),candidate_manifest_sha256:sha(v+'/runs/inputs-v1/CANDIDATES.json'),native_and_reference_are_not_independent_targets:true,stderr_policy:'Empty or exact declared stack-size warning only; process0/sentinel alone insufficient.'};
+fs.writeFileSync(dir+'/ADMISSION.json',JSON.stringify(output,null,2)+'\n',{flag:'wx'});
+console.log(JSON.stringify({status:output.status,verified_models:output.verified_models,issues}));

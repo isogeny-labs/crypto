@@ -1,0 +1,195 @@
+{
+  "branch": "leads-ff",
+  "closed_utc": "2026-11-16T07:54:37+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/humbert_genus5_cover_20261021/levers_20261116/run_v6.sh",
+        "research/humbert_genus5_cover_20261021/levers_20261116/campaign/q16001"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T07:12:47+00:00",
+      "wall_s": 406.575
+    },
+    {
+      "argv": [
+        "research/humbert_genus5_cover_20261021/levers_20261116/run_v6.sh",
+        "research/humbert_genus5_cover_20261021/levers_20261116/campaign/q24001"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T07:19:42+00:00",
+      "wall_s": 768.056
+    },
+    {
+      "argv": [
+        "research/humbert_genus5_cover_20261021/levers_20261116/run_v6.sh",
+        "research/humbert_genus5_cover_20261021/levers_20261116/campaign/q32003"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T07:32:45+00:00",
+      "wall_s": 1041.851
+    }
+  ],
+  "commit": "7236ede46b6d96539cc0fe61a98bf518fc6eda36",
+  "commit_dirty": true,
+  "created_utc": "2026-11-16T07:12:27+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261116-humbert-genus5-levers"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261116T0712Z-humbert-genus5-levers",
+  "metrics": [
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 5,
+      "name": "t_ic_comb_over_base_q32003",
+      "note": "paired median, base = dlpf50_l1 incumbent; L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.163,
+        0.192
+      ],
+      "unit": "ratio",
+      "value": 0.17
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 15,
+      "name": "t_rel_rel_over_base_median",
+      "note": "REL_FAST, same candidates/relations; L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.038,
+        0.049
+      ],
+      "unit": "ratio",
+      "value": 0.042
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 15,
+      "name": "t_la_la4_over_base_median",
+      "note": "LA_THREADS=4, same x and la_mulmods; L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.277,
+        0.35
+      ],
+      "unit": "ratio",
+      "value": 0.292
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 75,
+      "name": "counted_mismatches_flagged_vs_base",
+      "note": "R0: rel/la4/comb/comb_aa vs base, lp_comb vs v5 lp50_l1",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "ic_over_rho_comb_q32003",
+      "note": "median t_ic / expected-steps time of this crate's single-thread scalar rho; comb uses 4 threads",
+      "reference": 1.0,
+      "reference_kind": "unmatched_rho",
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.072
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 45,
+      "name": "dlpxs_precheck_violations",
+      "note": "X3 as frozen; both at q24001 s3 where plain dlpf needs 115 extensions",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 2.0
+    }
+  ],
+  "problem": "ic:humbert-genus5-toy",
+  "raw": [
+    {
+      "bytes": 82929,
+      "path": "research/humbert_genus5_cover_20261021/levers_20261116/campaign/q16001/results/v6.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2d/2d9e432355e5db030847905cabd0a9a9508ef1c6e8edd8962416bbd1c4f5a4aa",
+      "sha256": "2d9e432355e5db030847905cabd0a9a9508ef1c6e8edd8962416bbd1c4f5a4aa",
+      "uploaded": false
+    },
+    {
+      "bytes": 83543,
+      "path": "research/humbert_genus5_cover_20261021/levers_20261116/campaign/q24001/results/v6.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/cb/cb4268948832bf6df7a383eb454746404ce88ac1eaf370c57905a3845221baab",
+      "sha256": "cb4268948832bf6df7a383eb454746404ce88ac1eaf370c57905a3845221baab",
+      "uploaded": false
+    },
+    {
+      "bytes": 83707,
+      "path": "research/humbert_genus5_cover_20261021/levers_20261116/campaign/q32003/results/v6.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/18/18c4f06e1c8e7c8e1af4a0104ac347dd8d93aa530741c778ee84f22a56675ecc",
+      "sha256": "18c4f06e1c8e7c8e1af4a0104ac347dd8d93aa530741c778ee84f22a56675ecc",
+      "uploaded": false
+    },
+    {
+      "bytes": 1701,
+      "path": "research/humbert_genus5_cover_20261021/levers_20261116/results/ratios_v6.csv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/88/88efb81d95d26e1fdc20611cfb882166cdf8fa644452d119de36e5a3f1345cfc",
+      "sha256": "88efb81d95d26e1fdc20611cfb882166cdf8fa644452d119de36e5a3f1345cfc",
+      "uploaded": false
+    },
+    {
+      "bytes": 3220,
+      "path": "research/humbert_genus5_cover_20261021/levers_20261116/results/phases_v6.csv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a4/a44a7963b7cee8167ef75c151105e9832a7abea66c6cbfbd52d28fe508ffae54",
+      "sha256": "a44a7963b7cee8167ef75c151105e9832a7abea66c6cbfbd52d28fe508ffae54",
+      "uploaded": false
+    },
+    {
+      "bytes": 15509,
+      "path": "research/humbert_genus5_cover_20261021/levers_20261116/results/instances_v6.csv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ac/acef6d3652bc2fc35954a495d0a70e23fd93a1100eb30da7af67a323afedd873",
+      "sha256": "acef6d3652bc2fc35954a495d0a70e23fd93a1100eb30da7af67a323afedd873",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261116-humbert-genus5-levers/report.pdf",
+    "png": [
+      "benchmarks/20261116-humbert-genus5-levers/levers_tic.png"
+    ],
+    "svg": [
+      "benchmarks/20261116-humbert-genus5-levers/levers_tic.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "humbert-genus5-levers",
+  "status": "measured",
+  "summary": "Genus-5 cover IC: REL_FAST + LA_THREADS=4 on the dlpf50_l1 incumbent, identical counted fields (75/75), paired t_ic 0.184/0.182/0.170x at q=16001/24001/32003 (L0, unverified); relations 0.042x, LA 0.29x; safe clique removal ends the dlpx loop but excess gives no gain; 135/135 runs pass e2e",
+  "validation": null
+}

@@ -1,0 +1,99 @@
+{
+  "schema": "p1-tame-reciprocity-verification/v1",
+  "source_commit": "acea7e88f5c5f0c92205bcb9b6cdd307a9fd3b41",
+  "claim_id": "PCC-20261116-22c62d",
+  "declaration_sha256": "1d1d356599cb566e6abb9c15552e91e5ed1adad3bc6ca96c5f1fdbbe78e60f15",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 313,
+  "gate_declarations": 88,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 401,
+  "actual_verdict": {
+    "claim_id": "PCC-20261116-22c62d",
+    "claim_sha256": "cb9079959f3454f8f84b4b7b96a88fb7e4a12c7a0bfa4eeaa75ea802a23c313d",
+    "commit": "acea7e88f5c5f0c92205bcb9b6cdd307a9fd3b41",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/p1_tame_reciprocity_audit_20261116/lean (P1Certificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-16T04:54:24Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261116-22c62d",
+    "claim_sha256": "cb9079959f3454f8f84b4b7b96a88fb7e4a12c7a0bfa4eeaa75ea802a23c313d",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47110,
+    "sha256": "f7acc52c5c6dd5a5755f39713a71c0731e7a7fdfba9a0cf0b66daa92a07bc4e9",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "all316pins_checked_every_state_and_gate": true,
+    "exact_source_roots_from01": true,
+    "all_failed_states_and_default_limit_failures_retained": true,
+    "known_source_methods_credited": true,
+    "actual_canonical_finite_residue_without_realizing_point": true,
+    "actual_auxiliary_nonsingular_local_split_model": true,
+    "auxiliary_global_nonsingularity_claim": false,
+    "actual_polynomial_residue_evaluation": true,
+    "actual_finite_infinity_symbol_laws": true,
+    "actual_constant_linear_generator_values": true,
+    "actual_polynomial_unit_factorization": true,
+    "actual_split_function_finite_root_cover_reciprocity": true,
+    "actual_finite_support_before_finprod": true,
+    "actual_algebraically_closed_rational_function_reciprocity": true,
+    "actual_inverse_convention_reciprocity": true,
+    "actual_F5_omitted_infinity_product_two_counter": true,
+    "actual_F5_unsigned_product_four_counter": true,
+    "actual_binary_ternary_positives": true,
+    "general_closed_point_residue_norms": false,
+    "elliptic_global_reciprocity": false,
+    "arbitrary_divisor_representative_independence": false,
+    "multiplication_isogeny_comparison": false,
+    "general_geometric_descent_canonical_Tate_MOV_FR": false,
+    "full14complete": false,
+    "qualified_source_refuted": false,
+    "novelty_claim": false,
+    "paid_compute_and_agent_upload": 0,
+    "gate_declarations": 88,
+    "new_modules": 11,
+    "new_concrete_modules": 10,
+    "official_import_bridge_modules": 1,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "same_host_prover": true,
+    "signed_standing": "unverified",
+    "pinned_custom_source_modules": 247,
+    "actually_imported_custom_modules": 229,
+    "actually_imported_frozen_modules": 218
+  }
+}
