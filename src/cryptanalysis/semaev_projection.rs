@@ -189,11 +189,7 @@ pub fn quadratic_root_keys(q: [u64; 3], p: u64) -> QuadraticRoots {
 }
 
 /// Reference `quadratic_root_keys` with exact `F_p` operation accounting.
-pub fn quadratic_root_keys_counted(
-    q: [u64; 3],
-    p: u64,
-    ops: &mut FpOpCounts,
-) -> QuadraticRoots {
+pub fn quadratic_root_keys_counted(q: [u64; 3], p: u64, ops: &mut FpOpCounts) -> QuadraticRoots {
     let [c0, c1, c2] = q.map(|x| x % p);
     if c2 == 0 {
         if c1 == 0 {
@@ -362,7 +358,10 @@ pub fn s3_pair_roots_rational_batched(
         ConstAll,
         ConstNone,
         Fallback([u64; 3]),
-        DiagLinear { c0: u64, denom_idx: usize },
+        DiagLinear {
+            c0: u64,
+            denom_idx: usize,
+        },
         RationalOffDiag {
             minus_c1: u64,
             four_y1y2: u64,
@@ -393,11 +392,7 @@ pub fn s3_pair_roots_rational_batched(
                     let c1 = subm(0, mulm(4 % p, y1_sq, p), p);
                     let x1_sq = mulm(x1, x1, p);
                     let shifted = subm(x1_sq, a, p);
-                    let c0 = subm(
-                        mulm(shifted, shifted, p),
-                        mulm(8 % p, mulm(b, x1, p), p),
-                        p,
-                    );
+                    let c0 = subm(mulm(shifted, shifted, p), mulm(8 % p, mulm(b, x1, p), p), p);
                     if c1 == 0 {
                         slots.push(if c0 == 0 {
                             Slot::ConstAll
@@ -605,7 +600,10 @@ pub fn s3_pair_roots_biguint_rational_batched(
         ConstAll,
         ConstNone,
         Fallback(BigUint, BigUint),
-        DiagLinear { c0: FieldElement, idx: usize },
+        DiagLinear {
+            c0: FieldElement,
+            idx: usize,
+        },
         Rational {
             minus_c1: FieldElement,
             four_y1y2: FieldElement,
@@ -714,9 +712,11 @@ pub fn s3_pair_roots_biguint_rational_batched(
             BigSlot::ConstAll => BigQuadraticRoots::All,
             BigSlot::ConstNone => BigQuadraticRoots::None,
             BigSlot::Fallback(x1, x2) => s3_pair_roots_biguint_reference(p, a, b, &x1, &x2),
-            BigSlot::DiagLinear { c0, idx } => BigQuadraticRoots::Finite(vec![
-                BigQuadraticRootKey::Base(c0.neg().mul(&denoms[idx]).value),
-            ]),
+            BigSlot::DiagLinear { c0, idx } => {
+                BigQuadraticRoots::Finite(vec![BigQuadraticRootKey::Base(
+                    c0.neg().mul(&denoms[idx]).value,
+                )])
+            }
             BigSlot::Rational {
                 minus_c1,
                 four_y1y2,
@@ -786,11 +786,7 @@ impl PairProjection {
     }
 
     /// Same as [`PairProjection::build`], recording exact counted `F_p` operations.
-    pub fn build_counted(
-        curve: Curve,
-        base: &[u64],
-        ops: &mut FpOpCounts,
-    ) -> Result<Self, String> {
+    pub fn build_counted(curve: Curve, base: &[u64], ops: &mut FpOpCounts) -> Result<Self, String> {
         if curve.p <= 2 {
             return Err("projection join requires an odd prime field".into());
         }
@@ -1022,50 +1018,47 @@ impl PairProjection {
             // s3_pair_roots_rational_batched.
             let mut batch = Vec::with_capacity(BUILD_BATCH);
             let mut coords = Vec::with_capacity(BUILD_BATCH);
-            let mut flush_gen =
-                |batch: &mut Vec<(u64, Option<u64>, u64, Option<u64>)>,
-                 coords: &mut Vec<(u64, u64)>,
-                 stats: &mut BuildStats,
-                 ops: &mut FpOpCounts| {
-                    if batch.is_empty() {
-                        return;
-                    }
-                    let roots_vec = s3_pair_roots_rational_batched(&norm_curve, batch, ops);
-                    for ((x1, x2), roots) in coords.drain(..).zip(roots_vec) {
-                        match roots {
-                            QuadraticRoots::None => {}
-                            QuadraticRoots::All => {
-                                stats.universal_pairs += 1;
-                                universal_pair.get_or_insert((x1, x2));
-                            }
-                            QuadraticRoots::Finite(keys) => {
-                                for key in keys {
-                                    stats.root_keys += 1;
-                                    match key {
-                                        QuadraticRootKey::Base(root) => {
-                                            stats.base_field_root_keys += 1;
-                                            if let std::collections::hash_map::Entry::Vacant(e) =
-                                                finite_witnesses.entry(root)
-                                            {
-                                                e.insert((x1, x2));
-                                                let yu = lift_canonical_counted(
-                                                    &norm_curve, root, ops,
-                                                )
+            let mut flush_gen = |batch: &mut Vec<(u64, Option<u64>, u64, Option<u64>)>,
+                                 coords: &mut Vec<(u64, u64)>,
+                                 stats: &mut BuildStats,
+                                 ops: &mut FpOpCounts| {
+                if batch.is_empty() {
+                    return;
+                }
+                let roots_vec = s3_pair_roots_rational_batched(&norm_curve, batch, ops);
+                for ((x1, x2), roots) in coords.drain(..).zip(roots_vec) {
+                    match roots {
+                        QuadraticRoots::None => {}
+                        QuadraticRoots::All => {
+                            stats.universal_pairs += 1;
+                            universal_pair.get_or_insert((x1, x2));
+                        }
+                        QuadraticRoots::Finite(keys) => {
+                            for key in keys {
+                                stats.root_keys += 1;
+                                match key {
+                                    QuadraticRootKey::Base(root) => {
+                                        stats.base_field_root_keys += 1;
+                                        if let std::collections::hash_map::Entry::Vacant(e) =
+                                            finite_witnesses.entry(root)
+                                        {
+                                            e.insert((x1, x2));
+                                            let yu = lift_canonical_counted(&norm_curve, root, ops)
                                                 .unwrap_or(0);
-                                                finite_list.push((root, yu, (x1, x2)));
-                                            }
-                                        }
-                                        QuadraticRootKey::Irreducible { .. } => {
-                                            stats.irreducible_root_keys += 1;
+                                            finite_list.push((root, yu, (x1, x2)));
                                         }
                                     }
-                                    witnesses.entry(key).or_insert((x1, x2));
+                                    QuadraticRootKey::Irreducible { .. } => {
+                                        stats.irreducible_root_keys += 1;
+                                    }
                                 }
+                                witnesses.entry(key).or_insert((x1, x2));
                             }
                         }
                     }
-                    batch.clear();
-                };
+                }
+                batch.clear();
+            };
 
             for i in 0..m {
                 for j in i..m {
@@ -1728,12 +1721,16 @@ mod tests {
         // including 2-torsion y_i = 0, diagonals x1 = x2, off-curve twist points, and singular curves),
         // Prime31 (p = 2^31 - 1), and 61-bit / 62-bit primes.
         let exhaustive_curves = [
-            Curve { p: 3, a: 1, b: 0 },      // p = 3, 2-torsion at x = 0
-            Curve { p: 5, a: 1, b: 0 },      // 2-torsion at x = 0, 2, 3
-            Curve { p: 101, a: 2, b: 3 },    // standard nonsingular
-            Curve { p: 101, a: 100, b: 0 },  // y^2 = x^3 - x, three 2-torsion points (0, 1, 100)
-            Curve { p: 101, a: 0, b: 0 },    // singular cusp (universal_pair at x = 0)
-            Curve { p: 257, a: 3, b: 0 },    // 2-torsion + Fermat prime
+            Curve { p: 3, a: 1, b: 0 },   // p = 3, 2-torsion at x = 0
+            Curve { p: 5, a: 1, b: 0 },   // 2-torsion at x = 0, 2, 3
+            Curve { p: 101, a: 2, b: 3 }, // standard nonsingular
+            Curve {
+                p: 101,
+                a: 100,
+                b: 0,
+            }, // y^2 = x^3 - x, three 2-torsion points (0, 1, 100)
+            Curve { p: 101, a: 0, b: 0 }, // singular cusp (universal_pair at x = 0)
+            Curve { p: 257, a: 3, b: 0 }, // 2-torsion + Fermat prime
         ];
         for c in exhaustive_curves {
             let ys: Vec<Option<u64>> = (0..c.p)
@@ -1816,9 +1813,30 @@ mod tests {
     #[test]
     fn pair_projection_build_and_queries_match_reference_and_cut_fp_ops() {
         let curves = [
-            (Curve { p: 1009, a: 1006, b: 0 }, 48u64), // includes 2-torsion
-            (Curve { p: 2_147_483_647, a: 2_147_483_644, b: 7 }, 160u64), // Prime31
-            (Curve { p: (1u64 << 61) - 1, a: 3, b: 5 }, 120u64), // 61-bit Mersenne
+            (
+                Curve {
+                    p: 1009,
+                    a: 1006,
+                    b: 0,
+                },
+                48u64,
+            ), // includes 2-torsion
+            (
+                Curve {
+                    p: 2_147_483_647,
+                    a: 2_147_483_644,
+                    b: 7,
+                },
+                160u64,
+            ), // Prime31
+            (
+                Curve {
+                    p: (1u64 << 61) - 1,
+                    a: 3,
+                    b: 5,
+                },
+                120u64,
+            ), // 61-bit Mersenne
         ];
         for (c, bound) in curves {
             let base = interval_factor_base(&c, bound);

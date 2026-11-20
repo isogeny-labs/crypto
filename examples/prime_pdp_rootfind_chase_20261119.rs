@@ -38,9 +38,9 @@ use crypto_lib::cryptanalysis::ecbench::wcal::{self, BEST_OF_N};
 use crypto_lib::cryptanalysis::pkm_smooth_tower::Curve;
 use crypto_lib::cryptanalysis::prime_fast::{
     find_a3_curve, find_roots_fp64_cz, ic_solve, ic_solve_lockstep, ic_solve_table,
-    poly_mul_mont, poly_rem_monic_mont, point_order_hasse, rho_parallel,
-    FactorBaseSubproductTree, FastCurve, Fp64, LockStepMode, MulModN, RhoConfig,
-    SubproductBatchScratch, DEFAULT_BATCH_SUBPRODUCT_CROSSOVER_B, DEFAULT_MULTIPOINT_CROSSOVER_B,
+    point_order_hasse, poly_mul_mont, poly_rem_monic_mont, rho_parallel, FactorBaseSubproductTree,
+    FastCurve, Fp64, LockStepMode, MulModN, RhoConfig, SubproductBatchScratch,
+    DEFAULT_BATCH_SUBPRODUCT_CROSSOVER_B, DEFAULT_MULTIPOINT_CROSSOVER_B,
 };
 use crypto_lib::cryptanalysis::research_bench::bench_curves_a_minus_3;
 use crypto_lib::cryptanalysis::residual_walk::is_prime_u64;
@@ -184,9 +184,8 @@ fn run_p0_1a() -> P01aReceipt {
             PairProjection::build_reference_counted(curve, &base_xs, &mut FpOpCounts::default())
                 .unwrap()
         });
-        let (opt_build_ms, _, proj_opt) = best_of_n_ms(rounds, || {
-            PairProjection::build(curve, &base_xs).unwrap()
-        });
+        let (opt_build_ms, _, proj_opt) =
+            best_of_n_ms(rounds, || PairProjection::build(curve, &base_xs).unwrap());
 
         // Construct interleaved planted 4-decomposable targets + random F_p targets
         // so any prefix slice has an exact 50/50 mix of planted and random queries.
@@ -213,7 +212,9 @@ fn run_p0_1a() -> P01aReceipt {
         let mut ref_d3_ops = FpOpCounts::default();
         let mut opt_d3_ops = FpOpCounts::default();
         for &xr in &queries {
-            let r_ref = proj_ref.decompose_three_reference_counted(xr, &mut ref_d3_ops).0;
+            let r_ref = proj_ref
+                .decompose_three_reference_counted(xr, &mut ref_d3_ops)
+                .0;
             let r_opt = proj_opt.decompose_three_counted(xr, &mut opt_d3_ops).0;
             if r_ref.is_some() != r_opt.is_some() {
                 mismatches += 1;
@@ -247,7 +248,9 @@ fn run_p0_1a() -> P01aReceipt {
         let mut opt_d4_ops = FpOpCounts::default();
         let mut planted_hits_d4 = 0usize;
         for &xr in d4_query_slice {
-            let r_ref = proj_ref.decompose_four_reference_counted(xr, &mut ref_d4_ops).0;
+            let r_ref = proj_ref
+                .decompose_four_reference_counted(xr, &mut ref_d4_ops)
+                .0;
             let r_opt = proj_opt.decompose_four_counted(xr, &mut opt_d4_ops).0;
             if r_ref.is_some() != r_opt.is_some() {
                 mismatches += 1;
@@ -319,8 +322,18 @@ fn run_p0_1a() -> P01aReceipt {
     .unwrap();
     let mut multilimb_cells = Vec::new();
     for (label, p, a, b) in [
-        ("Mersenne127 (2^127-1)", &p127, &(&p127 - BigUint::from(3u8)), &BigUint::from(5u8)),
-        ("secp256k1 (256-bit)", &p256, &BigUint::from(0u8), &BigUint::from(7u8)),
+        (
+            "Mersenne127 (2^127-1)",
+            &p127,
+            &(&p127 - BigUint::from(3u8)),
+            &BigUint::from(5u8),
+        ),
+        (
+            "secp256k1 (256-bit)",
+            &p256,
+            &BigUint::from(0u8),
+            &BigUint::from(7u8),
+        ),
     ] {
         let exp = (p + BigUint::from(1u8)) >> 2usize;
         let mut pts = Vec::new();
@@ -358,16 +371,19 @@ fn run_p0_1a() -> P01aReceipt {
             .iter()
             .zip(want.iter())
             .filter(|(g, w)| {
-                let norm = |r: &crypto_lib::cryptanalysis::semaev_projection::BigQuadraticRoots| {
-                    match r {
-                        crypto_lib::cryptanalysis::semaev_projection::BigQuadraticRoots::Finite(v) => {
+                let norm =
+                    |r: &crypto_lib::cryptanalysis::semaev_projection::BigQuadraticRoots| match r {
+                        crypto_lib::cryptanalysis::semaev_projection::BigQuadraticRoots::Finite(
+                            v,
+                        ) => {
                             let mut s = v.clone();
                             s.sort();
-                            crypto_lib::cryptanalysis::semaev_projection::BigQuadraticRoots::Finite(s)
+                            crypto_lib::cryptanalysis::semaev_projection::BigQuadraticRoots::Finite(
+                                s,
+                            )
                         }
                         other => other.clone(),
-                    }
-                };
+                    };
                 norm(g) != norm(w)
             })
             .count();
@@ -459,8 +475,7 @@ fn run_p0_1b() -> P01bReceipt {
             let base_xs: Vec<u64> = (1..=b_size as u64).collect();
             let (prepare_ms, _, tree_gated) =
                 best_of_n_ms(5, || FactorBaseSubproductTree::prepare(f, &base_xs));
-            let tree_ungated =
-                FactorBaseSubproductTree::prepare_with_crossovers(f, &base_xs, 1, 1);
+            let tree_ungated = FactorBaseSubproductTree::prepare_with_crossovers(f, &base_xs, 1, 1);
             let tree_horner_only = FactorBaseSubproductTree::prepare_with_crossovers(
                 f,
                 &base_xs,
@@ -637,8 +652,12 @@ fn run_p0_1b() -> P01bReceipt {
 
     // Lock-step multi-walker batch inversion benchmarks (16, 20, 24, 28 bits).
     let mut lockstep_cells = Vec::new();
-    for &(bits, fb_size, trials) in &[(16u32, 64usize, 6usize), (20, 100, 5), (24, 160, 4), (28, 256, 3)]
-    {
+    for &(bits, fb_size, trials) in &[
+        (16u32, 64usize, 6usize),
+        (20, 100, 5),
+        (24, 160, 4),
+        (28, 256, 3),
+    ] {
         let (fc, g) = if bits <= 24 {
             let (_, c) = bench_curves_a_minus_3()
                 .into_iter()
@@ -680,8 +699,7 @@ fn run_p0_1b() -> P01bReceipt {
             swp_ms += rep_sw.total_ms;
 
             let (d_tb, rep_tb) =
-                ic_solve_table(&fc, g, q, fb_size, 16, 100_000_000, 100 + t as u64)
-                    .expect("table");
+                ic_solve_table(&fc, g, q, fb_size, 16, 100_000_000, 100 + t as u64).expect("table");
             all_ok &= d_tb == secret;
             tbl_ms += rep_tb.total_ms;
             tbl_rel_ms += rep_tb.relations_ms;
@@ -856,7 +874,14 @@ struct P28Receipt {
     rho_negation_cells: Vec<RhoNegationRatioCell>,
 }
 
-fn find_prime_order_curve_at_p(p: u64) -> (FastCurve, crypto_lib::cryptanalysis::prime_fast::Pt, u64, u64) {
+fn find_prime_order_curve_at_p(
+    p: u64,
+) -> (
+    FastCurve,
+    crypto_lib::cryptanalysis::prime_fast::Pt,
+    u64,
+    u64,
+) {
     let a = p - 3;
     let f = Fp64::new(p);
     let am = f.to_mont(a);
@@ -951,7 +976,12 @@ fn or_bit_range(dst: &mut [u64], dst_bit: usize, src: &[u64], src_bit: usize, le
 /// abscissa slice `abscissa_dlogs`: each element is the positive-sign discrete log
 /// `t in 1..r` of a curve-rational abscissa `x' in [1, X]` (`2*t != 0 mod r` since `r`
 /// is an odd prime, so each abscissa contributes `{t, r - t}`).
-fn eval_box_stats(abscissa_dlogs: &[u32], r: usize, m: u32, r2_buf: &mut [u32]) -> (usize, usize, usize, u64) {
+fn eval_box_stats(
+    abscissa_dlogs: &[u32],
+    r: usize,
+    m: u32,
+    r2_buf: &mut [u32],
+) -> (usize, usize, usize, u64) {
     let a_len = abscissa_dlogs.len();
     let fb_pts = 2 * a_len;
     if a_len == 0 {
@@ -1044,12 +1074,7 @@ fn eval_box_stats(abscissa_dlogs: &[u32], r: usize, m: u32, r2_buf: &mut [u32]) 
         }
     }
 
-    (
-        fb_pts,
-        full_cov_cnt,
-        bitset_popcount(&dist_s3_bits),
-        e2,
-    )
+    (fb_pts, full_cov_cnt, bitset_popcount(&dist_s3_bits), e2)
 }
 
 fn run_kaarelson_coverage() -> Vec<KaarelsonCoverageCell> {
@@ -1111,7 +1136,9 @@ fn run_kaarelson_coverage() -> Vec<KaarelsonCoverageCell> {
                     if m == 2 {
                         for &p1 in &direct_pts {
                             for &p2 in &direct_pts {
-                                sum_set.insert(fc_u.add(Some(p1), Some(p2)).map(|q| fc_u.canonical(q)));
+                                sum_set.insert(
+                                    fc_u.add(Some(p1), Some(p2)).map(|q| fc_u.canonical(q)),
+                                );
                             }
                         }
                     } else {
@@ -1119,7 +1146,8 @@ fn run_kaarelson_coverage() -> Vec<KaarelsonCoverageCell> {
                             for &p2 in &direct_pts {
                                 let s12 = fc_u.add(Some(p1), Some(p2));
                                 for &p3 in &direct_pts {
-                                    sum_set.insert(fc_u.add(s12, Some(p3)).map(|q| fc_u.canonical(q)));
+                                    sum_set
+                                        .insert(fc_u.add(s12, Some(p3)).map(|q| fc_u.canonical(q)));
                                 }
                             }
                         }
@@ -1137,7 +1165,10 @@ fn run_kaarelson_coverage() -> Vec<KaarelsonCoverageCell> {
                         crosscheck_mismatches += 1;
                     }
                 }
-                assert_eq!(crosscheck_mismatches, 0, "E_u isomorphism mismatch at p=1009 m={m}");
+                assert_eq!(
+                    crosscheck_mismatches, 0,
+                    "E_u isomorphism mismatch at p=1009 m={m}"
+                );
             }
 
             // Evaluate ALL `s in (F_p*)^2` in parallel across worker threads!
@@ -1368,7 +1399,9 @@ fn run_wcal_and_rho_ratios() -> (Vec<WCalExtendedCell>, Vec<RhoNegationRatioCell
             let mut xs = Vec::with_capacity(w);
             let mut ys = Vec::with_capacity(w);
             for k in 0..w {
-                let pt = fc.mul(Some(g), (k as u64 + 1) * 101 + rng.gen_range(1..1000)).unwrap();
+                let pt = fc
+                    .mul(Some(g), (k as u64 + 1) * 101 + rng.gen_range(1..1000))
+                    .unwrap();
                 xs.push(pt.x);
                 ys.push(pt.y);
             }
@@ -1410,8 +1443,12 @@ fn run_wcal_and_rho_ratios() -> (Vec<WCalExtendedCell>, Vec<RhoNegationRatioCell
 
         // 5. Subproduct-tree remainder step (`deg 255 mod monic deg 128`) & `B=1024` batch:
         let mut rng_sp = StdRng::seed_from_u64(p ^ 0x5A17);
-        let dividend: Vec<u64> = (0..256).map(|_| f.to_mont(rng_sp.gen_range(0..p))).collect();
-        let mut divisor: Vec<u64> = (0..128).map(|_| f.to_mont(rng_sp.gen_range(0..p))).collect();
+        let dividend: Vec<u64> = (0..256)
+            .map(|_| f.to_mont(rng_sp.gen_range(0..p)))
+            .collect();
+        let mut divisor: Vec<u64> = (0..128)
+            .map(|_| f.to_mont(rng_sp.gen_range(0..p)))
+            .collect();
         divisor.push(f.one);
         let mut rem_u128 = Vec::with_capacity(260);
         let mut rem_out = Vec::with_capacity(128);
@@ -1419,13 +1456,20 @@ fn run_wcal_and_rho_ratios() -> (Vec<WCalExtendedCell>, Vec<RhoNegationRatioCell
         let (rem_ms, _, _) = best_of_n_ms(7, || {
             let mut acc = 0u64;
             for _ in 0..rem_iters {
-                poly_rem_monic_mont(&f, black_box(&dividend), black_box(&divisor), &mut rem_u128, &mut rem_out);
+                poly_rem_monic_mont(
+                    &f,
+                    black_box(&dividend),
+                    black_box(&divisor),
+                    &mut rem_u128,
+                    &mut rem_out,
+                );
                 acc ^= rem_out.first().copied().unwrap_or(0);
             }
             acc
         });
         // 128 quotient steps * 128 divisor terms = 16,384 coeff MACs per remainder call:
-        let subproduct_rem_step_deg128_ns_per_coeff = (rem_ms * 1e6) / (rem_iters as f64 * 128.0 * 128.0);
+        let subproduct_rem_step_deg128_ns_per_coeff =
+            (rem_ms * 1e6) / (rem_iters as f64 * 128.0 * 128.0);
 
         let base_1024: Vec<u64> = (1..=1024u64).collect();
         let tree_1024 = FactorBaseSubproductTree::prepare(f, &base_1024);
@@ -1455,7 +1499,9 @@ fn run_wcal_and_rho_ratios() -> (Vec<WCalExtendedCell>, Vec<RhoNegationRatioCell
             }
             border_mont[i] = fr.to_mont(rng_sp.gen_range(1..r));
         }
-        let mut vec_in: Vec<u64> = (0..dim).map(|_| fr.to_mont(rng_sp.gen_range(0..r))).collect();
+        let mut vec_in: Vec<u64> = (0..dim)
+            .map(|_| fr.to_mont(rng_sp.gen_range(0..r)))
+            .collect();
         let mut vec_out = vec![0u64; dim];
         let spmv_iters = 500usize;
         let (spmv_ms, _, _) = best_of_n_ms(7, || {
@@ -1576,7 +1622,9 @@ fn main() {
     let skip_p01a = std::env::var_os("SKIP_P01A").is_some();
 
     if !skip_p01a {
-        println!("=== [1/3] Running Lead P0-1a (semaev_projection rational batch_inv & early exit) ===");
+        println!(
+            "=== [1/3] Running Lead P0-1a (semaev_projection rational batch_inv & early exit) ==="
+        );
         let p01a = run_p0_1a();
         fs::write(
             out_dir.join("p0_1a_semaev_projection_bench.json"),
@@ -1640,7 +1688,9 @@ fn main() {
         );
     }
 
-    println!("\n=== [3/3] Running Lead P2-8 (Kaarelson Theorem 3 + Open Problem 1 & §5a w_cal) ===");
+    println!(
+        "\n=== [3/3] Running Lead P2-8 (Kaarelson Theorem 3 + Open Problem 1 & §5a w_cal) ==="
+    );
     let cov = run_kaarelson_coverage();
     let (wcal_cells, rho_cells) = run_wcal_and_rho_ratios();
     let p28 = P28Receipt {

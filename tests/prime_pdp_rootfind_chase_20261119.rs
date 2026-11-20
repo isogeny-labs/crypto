@@ -14,9 +14,8 @@ use crypto_lib::cryptanalysis::prime_fast::{
 };
 use crypto_lib::cryptanalysis::research_bench::bench_curves_a_minus_3;
 use crypto_lib::cryptanalysis::semaev_projection::{
-    quadratic_root_keys, s3_pair_roots_biguint_rational_batched,
-    s3_pair_roots_biguint_reference, s3_pair_roots_rational_batched, s3_quadratic,
-    BigQuadraticRoots, FpOpCounts, PairProjection,
+    quadratic_root_keys, s3_pair_roots_biguint_rational_batched, s3_pair_roots_biguint_reference,
+    s3_pair_roots_rational_batched, s3_quadratic, BigQuadraticRoots, FpOpCounts, PairProjection,
 };
 use crypto_lib::ecc::field::FieldElement;
 use num_bigint::BigUint;
@@ -27,21 +26,14 @@ fn lift_canonical_ref(curve: &Curve, x: u64) -> Option<u64> {
     let p = curve.p;
     let x128 = (x % p) as u128;
     let p128 = p as u128;
-    let rhs = ((x128 * x128 % p128 * x128
-        + (curve.a % p) as u128 * x128
-        + (curve.b % p) as u128)
+    let rhs = ((x128 * x128 % p128 * x128 + (curve.a % p) as u128 * x128 + (curve.b % p) as u128)
         % p128) as u64;
     let f = Fp64::new(p);
     let y = f.from_mont(f.sqrt(f.to_mont(rhs))?);
     Some(y.min(p - y))
 }
 
-fn check_valid_four_witness(
-    curve: &Curve,
-    base_xs: &[u64],
-    xr: u64,
-    w: [u64; 4],
-) -> bool {
+fn check_valid_four_witness(curve: &Curve, base_xs: &[u64], xr: u64, w: [u64; 4]) -> bool {
     let f = Fp64::new(curve.p);
     let fc = FastCurve::new("chk", curve.p, curve.a, curve.b, 1);
     for &xi in &w {
@@ -81,7 +73,7 @@ fn check_valid_four_witness(
 fn p0_1a_exhaustive_grid_zero_root_mismatches_with_torsion_and_diagonals() {
     // Includes 2-torsion y_i = 0, singular curve, x_1 = x_2 diagonals, and p = 1 mod 4 / 3 mod 4.
     let curves = [
-        Curve { p: 17, a: 0, b: 0 }, // singular + y=0 at x=0
+        Curve { p: 17, a: 0, b: 0 },  // singular + y=0 at x=0
         Curve { p: 19, a: 18, b: 0 }, // three rational 2-torsion points x in {0, 1, 18}
         Curve { p: 29, a: 4, b: 20 },
         Curve { p: 41, a: 3, b: 0 }, // p = 1 mod 4 with y = 0 at x = 0
@@ -100,15 +92,13 @@ fn p0_1a_exhaustive_grid_zero_root_mismatches_with_torsion_and_diagonals() {
         }
         let mut ops = FpOpCounts::default();
         let got = s3_pair_roots_rational_batched(&curve, &pairs, &mut ops);
-        let norm_qr = |r: &crypto_lib::cryptanalysis::semaev_projection::QuadraticRoots| {
-            match r {
-                crypto_lib::cryptanalysis::semaev_projection::QuadraticRoots::Finite(v) => {
-                    let mut s = v.clone();
-                    s.sort();
-                    crypto_lib::cryptanalysis::semaev_projection::QuadraticRoots::Finite(s)
-                }
-                other => other.clone(),
+        let norm_qr = |r: &crypto_lib::cryptanalysis::semaev_projection::QuadraticRoots| match r {
+            crypto_lib::cryptanalysis::semaev_projection::QuadraticRoots::Finite(v) => {
+                let mut s = v.clone();
+                s.sort();
+                crypto_lib::cryptanalysis::semaev_projection::QuadraticRoots::Finite(s)
             }
+            other => other.clone(),
         };
         assert_eq!(got.len(), expected.len());
         for (idx, (g, e)) in got.iter().zip(expected.iter()).enumerate() {
@@ -163,8 +153,7 @@ fn p0_1a_prime31_and_61bit_pair_projection_and_early_exit_parity() {
         let mut build_opt_ops = FpOpCounts::default();
         let proj_ref =
             PairProjection::build_reference_counted(curve, &base_xs, &mut build_ref_ops).unwrap();
-        let proj_opt =
-            PairProjection::build_counted(curve, &base_xs, &mut build_opt_ops).unwrap();
+        let proj_opt = PairProjection::build_counted(curve, &base_xs, &mut build_opt_ops).unwrap();
         let stats_ref = proj_ref.build_stats();
         let stats_opt = proj_opt.build_stats();
 
@@ -212,13 +201,21 @@ fn p0_1a_prime31_and_61bit_pair_projection_and_early_exit_parity() {
             let d3_opt = proj_opt
                 .decompose_three_counted(xr, &mut FpOpCounts::default())
                 .0;
-            assert_eq!(d3_opt.is_some(), d3_ref.is_some(), "d3 existence mismatch p={p} xr={xr}");
+            assert_eq!(
+                d3_opt.is_some(),
+                d3_ref.is_some(),
+                "d3 existence mismatch p={p} xr={xr}"
+            );
 
             let d4_ref = proj_ref
                 .decompose_four_reference_counted(xr, &mut ref_d4_ops)
                 .0;
             let d4_opt = proj_opt.decompose_four_counted(xr, &mut opt_d4_ops).0;
-            assert_eq!(d4_opt.is_some(), d4_ref.is_some(), "d4 existence mismatch p={p} xr={xr}");
+            assert_eq!(
+                d4_opt.is_some(),
+                d4_ref.is_some(),
+                "d4 existence mismatch p={p} xr={xr}"
+            );
             if let Some(w) = d4_opt {
                 assert!(
                     check_valid_four_witness(&curve, &base_xs, xr, w.x),
@@ -322,7 +319,11 @@ fn p0_1b_subproduct_tree_multipoint_and_batched_roots_zero_mismatches() {
                 for &c in big_poly.iter().rev() {
                     acc = f.add(f.mul(acc, xm), f.to_mont(c));
                 }
-                assert_eq!(vals[i], f.from_mont(acc), "eval_all mismatch p={p} B={b_size} i={i}");
+                assert_eq!(
+                    vals[i],
+                    f.from_mont(acc),
+                    "eval_all mismatch p={p} B={b_size} i={i}"
+                );
             }
 
             // 2. Verify single & batched factor-base root-finding against `find_roots_fp_fast`
@@ -346,11 +347,15 @@ fn p0_1b_subproduct_tree_multipoint_and_batched_roots_zero_mismatches() {
                         };
                         let lin = [f.neg(f.to_mont(root)), f.one];
                         let mut next = Vec::new();
-                        crypto_lib::cryptanalysis::prime_fast::poly_mul_mont(&f, &acc, &lin, &mut next);
+                        crypto_lib::cryptanalysis::prime_fast::poly_mul_mont(
+                            &f, &acc, &lin, &mut next,
+                        );
                         acc = next;
                     }
                     let lead = f.to_mont(rng.gen_range(1..p));
-                    acc.into_iter().map(|c| f.from_mont(f.mul(c, lead))).collect()
+                    acc.into_iter()
+                        .map(|c| f.from_mont(f.mul(c, lead)))
+                        .collect()
                 } else {
                     let mut c: Vec<u64> = (0..deg).map(|_| rng.gen_range(0..p)).collect();
                     c.push(rng.gen_range(1..p));
@@ -391,7 +396,10 @@ fn p0_1b_subproduct_tree_multipoint_and_batched_roots_zero_mismatches() {
                     "fp_all not subset of cz_all: fp={fp_all:?} cz={cz_all:?}"
                 );
                 if cz_all.len() <= 2 {
-                    assert_eq!(cz_all, fp_all, "find_roots_fp64_cz mismatch p={p} idx={idx}");
+                    assert_eq!(
+                        cz_all, fp_all,
+                        "find_roots_fp64_cz mismatch p={p} idx={idx}"
+                    );
                 }
 
                 // Exact ground-truth roots in V via direct Horner evaluation over `tree.xs`:
@@ -408,11 +416,12 @@ fn p0_1b_subproduct_tree_multipoint_and_batched_roots_zero_mismatches() {
                         val == 0
                     })
                     .collect();
-                let cz_in_v: Vec<u64> = cz_all
-                    .into_iter()
-                    .filter(|&r| tree.contains_x(r))
-                    .collect();
-                assert_eq!(cz_in_v, want_in_v, "cz_in_v != horner p={p} B={b_size} idx={idx}");
+                let cz_in_v: Vec<u64> =
+                    cz_all.into_iter().filter(|&r| tree.contains_x(r)).collect();
+                assert_eq!(
+                    cz_in_v, want_in_v,
+                    "cz_in_v != horner p={p} B={b_size} idx={idx}"
+                );
                 let single_got = tree.roots_in_base(poly);
                 assert_eq!(
                     single_got, want_in_v,

@@ -3359,10 +3359,7 @@ impl FactorBaseSubproductTree {
 
         let mut levels: Vec<Vec<Vec<u64>>> = Vec::new();
         if !xs_mont.is_empty() {
-            let lvl0: Vec<Vec<u64>> = xs_mont
-                .iter()
-                .map(|&xm| vec![f.neg(xm), f.one])
-                .collect();
+            let lvl0: Vec<Vec<u64>> = xs_mont.iter().map(|&xm| vec![f.neg(xm), f.one]).collect();
             levels.push(lvl0);
             while levels.last().unwrap().len() > 1 {
                 let prev = levels.last().unwrap();
@@ -3461,15 +3458,7 @@ impl FactorBaseSubproductTree {
             &mut rem_u128,
             &mut root_rem,
         );
-        self.eval_subtree_mont(
-            top_level,
-            0,
-            0,
-            b,
-            &root_rem,
-            &mut rem_u128,
-            out_canonical,
-        );
+        self.eval_subtree_mont(top_level, 0, 0, b, &root_rem, &mut rem_u128, out_canonical);
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -3491,7 +3480,9 @@ impl FactorBaseSubproductTree {
             out_canonical[leaf_lo..leaf_hi].fill(0);
             return;
         }
-        if span <= MULTIPOINT_LEAF_WIDTH || poly_mont.len() <= MULTIPOINT_LEAF_WIDTH + 1 || level == 0
+        if span <= MULTIPOINT_LEAF_WIDTH
+            || poly_mont.len() <= MULTIPOINT_LEAF_WIDTH + 1
+            || level == 0
         {
             for idx in leaf_lo..leaf_hi {
                 let v = poly_eval_horner_mont(&self.f, poly_mont, self.xs_mont[idx]);
@@ -3998,7 +3989,9 @@ pub fn collect_relations_lockstep(
                                 continue;
                             };
                             let tau = if r.y == pjk.y { 1i8 } else { -1 };
-                            scratch.found.push(SmallEntries::two(j, tau, k as u32, tau * sigma));
+                            scratch
+                                .found
+                                .push(SmallEntries::two(j, tau, k as u32, tau * sigma));
                         }
                     }
                     if !scratch.found.is_empty() {
@@ -4097,12 +4090,9 @@ pub fn collect_relations_lockstep(
                                         let y = f.sub(f.mul(lam, f.sub(r.x, x3)), r.y);
                                         y3 = Some(y);
                                         let tau = if y == fb.pts[j].y { 1i8 } else { -1 };
-                                        scratch.found.push(SmallEntries::two(
-                                            i as u32,
-                                            eps,
-                                            j as u32,
-                                            tau,
-                                        ));
+                                        scratch
+                                            .found
+                                            .push(SmallEntries::two(i as u32, eps, j as u32, tau));
                                     }
                                 }
                                 if let Some(pairs_ref) = pairs {
@@ -5055,10 +5045,11 @@ mod tests {
                             cur = next;
                         }
                         let scale = f.to_mont(rng.gen_range(1..p));
-                        cur.into_iter().map(|c| f.from_mont(f.mul(c, scale))).collect()
+                        cur.into_iter()
+                            .map(|c| f.from_mont(f.mul(c, scale)))
+                            .collect()
                     } else {
-                        let mut coeffs: Vec<u64> =
-                            (0..deg).map(|_| rng.gen_range(0..p)).collect();
+                        let mut coeffs: Vec<u64> = (0..deg).map(|_| rng.gen_range(0..p)).collect();
                         coeffs.push(rng.gen_range(1..p));
                         coeffs
                     };
