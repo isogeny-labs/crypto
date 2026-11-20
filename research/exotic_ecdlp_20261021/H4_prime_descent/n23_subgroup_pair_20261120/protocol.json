@@ -1,0 +1,18 @@
+{
+  "schema": "h4-n23-subgroup-pair-v1",
+  "question": "On deterministic H4 n23 instance 0, how many original x-subspace lifts survive direct prime-subgroup filtering, what cofactor-cleared base results, and what is its exact uniform subgroup three-sum coverage and one-target pair-lookup cost?",
+  "source": "research/exotic_ecdlp_20261021/H4_prime_descent/run.py",
+  "source_sha256": "46fb1a8a311f36907427ac35b40066d88cc0948c7f8b522fbc87c8338682e11a",
+  "instance": {"field_degree": 23, "instance_index": 0, "subspace_dimension": 8, "python_seed_formula": "20261022*1000+23*10+0", "sage_seed_formula": "20261022+23*10+0"},
+  "known_order_from_screen": 8384076,
+  "prime_subgroup_order": 232891,
+  "cofactor": 36,
+  "one_target_law": "SHA256 of ASCII h4-n23-subgroup-target-0, reduced to 1..r-1, times the first nonzero cleared base point in deterministic x/lift order; scalar is fixture data outside query timing",
+  "coverage_law": "exact uniform distribution on all r-1 nonidentity points of the prime-order subgroup, evaluated by full scalar-coordinate census after the one-target lookup",
+  "stage_order": ["curve_and_subspace_fixture", "lift_base", "direct_membership", "cofactor_clear", "pair_index_build", "one_target_lookup", "scalar_coordinate_audit_and_full_coverage"],
+  "method": "Reproduce the frozen H4 curve/base law. Build a first-pair index from every ordered pair of cleared nonidentity base points, allowing equal summands; query the frozen target with R-C until one verified witness or exhaustion. Only after this lookup, enumerate the subgroup by repeated addition to assign scalar coordinates for an exact coverage audit. Retain direct-membership and zero-yield counts.",
+  "cap_seconds": 180,
+  "host": "local macOS checked Sage; ordinary algorithmic diagnostic tier",
+  "claim_boundary": "fixed-curve component and exact subgroup yield; scalar-coordinate census is an audit oracle outside candidate timing; no complete IC candidate or matched rho speedup",
+  "status": "frozen before execution"
+}
