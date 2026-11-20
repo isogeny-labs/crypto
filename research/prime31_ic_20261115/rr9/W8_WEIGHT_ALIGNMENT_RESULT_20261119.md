@@ -58,3 +58,41 @@ For intuition only, if uniform natural-target multiplicities happened to obey an
 The original repository sources were checked as above, plus Yokoyama, Yasuda, Takahashi and Kogure, *Complexity bounds on Semaev's naive index calculus method for ECDLP*, J. Math. Cryptology (2020), DOI 10.1515/jmc-2019-0029; summation-polynomial S3 is classical. Cross-repository search covered `crypto-autoresearcher` and `cryptanalysis` and is not proof of novelty. Shared research-KB MCP was unavailable, and the runtime container has no Rust cargo or GitHub DNS; the exact original Rust code is executed via GitHub Actions instead.
 
 **Scientific status at initial check-in:** A concrete cross-lane incompatibility was corrected in source and a measured, independently replayed original-Rust bridge was launched. No new non-generic public-only relation extractor or cheaper complete Prime31 ECDLP solver is claimed.
+
+---
+
+## Definitive same-public-target matched original-Rust result (A1 v2; 2026-11-20 00:40 UTC)
+
+**Original-source GitHub Actions [run #44647181215](https://github.com/isogeny-labs/crypto/actions/runs/44647181215) completed SUCCESS** on workflow source commit `06466affc6c7783356cc4add23d9900597025084` (plus original arithmetic pinned at `1df714645aa683cf975bc76fcacb9842cb4780fd`). The original Rust library **40/40** and focused original-Rust example **4/4** tests passed. Both independent Python BigInt replays passed, each verifying all 31 training relations, 31 derived base logs and all **1,024 recovered public discrete logarithms**. The CI comparison gate *explicitly asserted 1,024/1,024 identical public Q and target secrets* between the arms, closing the initial target-stream mismatch.
+
+Frozen fully reproducible record: [matched summary JSON](W8_WEIGHT_ALIGNMENT_MATCHED_SUMMARY_20261119.json) and [raw two-arm artifact #14589242786](https://github.com/isogeny-labs/crypto/actions/runs/44647181215/artifacts/14589242786), ZIP SHA256 `c2229a454bcc7b8167a23b30ee152a77e2e5ce4da6114b3a430e858d24399452`. Producer metrics are exact-source but **[pcc:unverified]** (independent BigInt verifier ≠ signed independent PCC attestation).
+
+| Same GitHub runner and same 1024 public Q | Odd `[1,3,5,7,11,13,17,19]` | Powers2 `[1,2,4,8,16,32,64,128]` |
+|---|---:|---:|
+| Natural training attempts to full rank **31** | 37 | 41 |
+| Factor-base logs independently verified | 31/31 | 31/31 |
+| Public logs independently verified | 1024/1024 | 1024/1024 |
+| Online relation attempts (including failures) | **1,312** | **1,151** |
+| Online misses | 288 | **127** |
+| Observed relation successes/attempt | 78.05% | **88.97%** |
+| Group additions, fully charged | 43,394,777 | **33,570,241** |
+| Setup / four-window table building (ms) | 145.999 | 146.331 |
+| Training and learned-log verification (ms) | 267.123 | 354.370 |
+| Online 1024-target solving + verification (ms) | 10,915.140 | **8,240.181** |
+| **Total end-to-end time, ms** | **11,328.262** | **8,740.883** |
+
+**Observed powers2 / odd fully charged ratio = 0.77160**, a **22.84% lower** total *generic-control* wall clock on this runner and paired target set, with **22.64% fewer** EC additions. This establishes a measurable same-target weight-choice benefit in the existing group-sum grading architecture. Because all odd runs precede pow2 runs and no ABBA/A-A noise-floor confidence intervals exist, it is **not** a statistically validated stable wall-time speed factor; the deterministic group-operation difference and complete correctness are much firmer.
+
+### Relation language and extrapolation
+
+This validates the previously missing **powers2-to-B31 assembly bridge**: with original source and same 31-coordinate factor base, weighted powers2 B8 relations across four windows can generate full rank and recover 1,024 public logarithms using the *generic 4+4 oracle*. It does **not** show a 14-variable F3 extractor can recover unknown signs/indices in reasonable time; the successful solver here is still generic-equivalent group-table enumeration.
+
+The observed 1,151 calls impose an additional **necessary-only** extraction budget against the separately recorded historical ~170.113ms/1024 shared-BSGS control. Even granting *zero* cost for all non-extractor work, a candidate replacement must average **strictly less than 147.80 microseconds per attempted natural residual** to beat that historical numeric control. Actual allowed cost is lower after setup, linear algebra, failed F4 searches, and verification. That BSGS result was not measured on this exact CI runner, so **no matched BSGS/rho comparison is claimed**. The current powers2 generic oracle itself costs 8.741 seconds, **51.38x** the historical 170.113ms BSGS figure numerically across different runs, and is not a competitiveness result.
+
+### Methodological limitations and next falsifier
+
+- A1 corrected the earlier unpaired target-stream flaw. The first-run #44646124372 and `W8_WEIGHT_ALIGNMENT_SUMMARY_20261119.json` remain retained as **individually valid original-Rust recovery evidence but unpaired**; this v2 is the target-matched evaluation.
+- Precomputed 4+4 tables are explicitly a **generic** ECDLP relation oracle; no claim of a novel non-generic solving algorithm or asymptotic advance is allowed.
+- The next decisive original-Rust experiment is to replace the powers2 grader **without altering the four windows, natural residuals or target sequence** using #4692's public-Q-only 14-var F3 / actual F4 extraction. Use 46-positive/18-negative frozen B8 with hidden witnesses withheld; add natural unseen targets, charge *every* timeout/UNSAT/root, elimination degree, sparse fill, peak memory, and negative queries. Demand independent proof `[d]G=Q` at rank31/1024 and same-runner fully charged comparisons vs optimized shared BSGS, strongest existing non-generic index-calculus frontier, and negation-map rho.
+- Run a reverse-order / ABBA and A/A timing replication if interpreting the 0.77160 wall-clock ratio as an optimization result outside this runner. The correctness and operation-count comparisons already have a frozen exact source and are independently replayed.
+- Relevant literature constraint: Yokoyama et al. (2020), DOI `10.1515/jmc-2019-0029`, derive bounds for *naive* Semaev index calculus under explicit structural/statistical assumptions; this study is a finite-size B8 weighted chart and cannot claim to bypass those assumptions without a concrete extraction-cost analysis. See Kousidis–Wiemers (2019), DOI `10.1515/jmc-2017-0022`, for Weil-descended first-fall-degree bounds. Both papers were rechecked on 2026-11-19; neither establishes a fast full prime-field RR9/F3 extractor here.
