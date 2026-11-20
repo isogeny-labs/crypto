@@ -1102,13 +1102,14 @@ impl RadicalRootCtx {
                     None => return vec![],
                     Some(u) => u,
                 };
-                // 1/u = conj(u)/N(u)
-                let nrm = f.sub(f.sqr(u.0), f.mul(self.n, f.sqr(u.1)));
-                let ni = f.inv(nrm);
-                let uinv = (f.mul(u.0, ni), f.mul(f.neg(u.1), ni));
-                let v = (f.mul(m, uinv.0), f.mul(m, uinv.1));
+                // Fq2 inverse and Cardano scaling: m*conj(u)/N(u).
+                // Scale once before multiplying the two conjugate components.
+                // The Sylow context already caches w^2; avoid a fresh Fq2 multiply.
+                let nrm = f.sub(f.sqr(u.0), k.r.mul_nonresidue(f.sqr(u.1)));
+                let scaled = f.mul(m, f.inv(nrm));
+                let v = (f.mul(u.0, scaled), f.mul(f.neg(u.1), scaled));
                 let w = self.w2;
-                let w_2 = k.r.mul(w, w);
+                let w_2 = k.w_squared;
                 let mut out = vec![];
                 let (mut uk, mut vk) = (u, v);
                 for kk in 0..3 {
