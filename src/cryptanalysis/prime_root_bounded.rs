@@ -519,10 +519,31 @@ impl Producer<'_> {
         let n = 2 * a.len as usize - 1;
         if n > 17 { return Err(Stop::InvalidInput); }
         out.len = n as u8;
+        // R55_PRODUCER_SMALL_SQUARE_BEGIN
+        // Scalar squares and (x+c)^2 need only one multiplication and,
+        // for monic linear inputs, one modular doubling. In particular,
+        // squaring x is a coefficient shift instead of a generic loop.
+        if a.len == 1 {
+            out.coefficients[0] = self.mul(a.coefficients[0], a.coefficients[0])?;
+            return Ok(out);
+        }
+        if a.len == 2 && a.coefficients[1] == 1 {
+            let c = a.coefficients[0];
+            out.coefficients[0] = self.mul(c, c)?;
+            out.coefficients[1] = self.add(c, c)?;
+            out.coefficients[2] = 1;
+            return Ok(out);
+        }
+        // R55_PRODUCER_SMALL_SQUARE_END
         // R43_PRODUCER_SQUARE_BEGIN
         // In dense squares, double each row coefficient once rather than
         // doubling all off-diagonal products. Each term remains canonical.
-        if a.len >= 5 && !a.coefficients[..a.len as usize].contains(&0) {
+        // R55_PRODUCER_DENSE_THRESHOLD_BEGIN
+        // For dense degree-two through degree-four inputs, the already
+        // tested symmetric algorithm avoids redundant cross-products and
+        // additions just as it does for larger inputs.
+        if a.len >= 2 && !a.coefficients[..a.len as usize].contains(&0) {
+        // R55_PRODUCER_DENSE_THRESHOLD_END
             for i in 0..a.len as usize {
                 let ai = a.coefficients[i];
                 let diag = self.mul(ai, ai)?;
@@ -1515,10 +1536,29 @@ impl Replay {
         let n = 2 * len - 1;
         if n > 17 { return Err(Stop::InvalidCertificate); }
         z.len = n as u8;
+        // R55_REPLAY_SMALL_SQUARE_BEGIN
+        // Independent closed-form squaring for scalar and monic linear
+        // polynomials; replay still uses its own metered field operations.
+        if len == 1 {
+            z.coefficients[0] = self.times(x.coefficients[0], x.coefficients[0])?;
+            return Ok(z);
+        }
+        if len == 2 && x.coefficients[1] == 1 {
+            let c = x.coefficients[0];
+            z.coefficients[0] = self.times(c, c)?;
+            z.coefficients[1] = self.plus(c, c)?;
+            z.coefficients[2] = 1;
+            return Ok(z);
+        }
+        // R55_REPLAY_SMALL_SQUARE_END
         // R43_REPLAY_SQUARE_BEGIN
         // Independent diagonal traversal. Cache twice the lower-index
         // coefficient so every off-diagonal term needs only one add.
-        if len >= 5 && !x.coefficients[..len].contains(&0) {
+        // R55_REPLAY_DENSE_THRESHOLD_BEGIN
+        // For small dense polynomials use diagonal symmetric products
+        // without repeated additions into zero-initialized coefficients.
+        if len >= 2 && !x.coefficients[..len].contains(&0) {
+        // R55_REPLAY_DENSE_THRESHOLD_END
             let mut doubled = [0u64; 17];
             for i in 0..len - 1 {
                 doubled[i] = self.plus(x.coefficients[i], x.coefficients[i])?;
