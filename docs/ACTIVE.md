@@ -27,7 +27,7 @@ Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hypere
 - [x] Genus-4 arm x on prime-order (h = 1) Jacobians at p = 16411 and 32771 against the ideal negation bound, with linear-algebra tuning (cc x SGE) on the h = 2 curves (Claude, completed 2026-11-18, PR #4693; validated: x* 0.876 / 0.640 of ideal negation rho at w = 1, below at all w)
 - [ ] Regenerate the IC leaderboard outputs (docs/ic/LEADERBOARD.md, leaderboard.json, ic-leaderboard.html) once artifact-store inputs can be pulled; the genus-4 section is in the builder (PR #4693)
 
-- [ ] F4 over F_p, follow-up to #4473: measure the shipped f4-parallel default on a real IC consumer (jv_cover's F4 systems), gate tiny steps onto one thread to remove the 4-thread small-system regression (quart_n3 0.81x, cubic_n4 0.87x), and time quad_n10/n11/cubic_n6 against the old path; pre-registered same-binary A/B (Claude, started 2026-11-20, branch claude/funny-brown-735uvs)
+- [x] F4 over F_p, follow-up to #4473, on the real consumer jv_cover (Claude, done 2026-11-20, PR #4851): shipped f4-parallel default 1.10x on jv_cover dlp; nested-dispatch and FL-threshold levers null; glibc malloc ~30% of F4; opt-in `--features jemalloc` 1.256x wall / 1.251x CPU end to end, pre-registered, 8/8 rounds [pcc:unverified]; records open pending the malformed hec-multi record on main; research/f4_inner_dispatch_20261120
 
 - [x] Formalize conductor prime-gap bounds, scalar-Frobenius oracle hardness, and DLP transfer ceilings in Lean 4 (Cursor, completed 2026-11-20, branch cursor/lean-conductor-prime-gap-bounds-bdb7, PR #4815; claim PCC-20261120-70fc62 standing unverified; proof-gate PASS 125 thm)
 
