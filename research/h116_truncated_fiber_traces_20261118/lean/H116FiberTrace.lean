@@ -608,6 +608,32 @@ theorem productMonicQuadratics_binaryQuartic_invariant_discriminant
   dsimp
   ring
 
+/-- A factorization of a monic binary quartic into two quadratics marks a
+rational root of the classical resolvent cubic.  After translating that
+two-torsion point to `(0,0)`, the source and dual two-isogeny coefficients are
+respectively 81 times the quadratic resultant and 81 times the product of the
+quadratic discriminants. -/
+theorem productMonicQuadratics_markedTwoIsogeny_coefficients
+    (a b c d : K) :
+    let quarticB := a + c
+    let quarticC := b + d + a * c
+    let quarticD := a * d + c * b
+    let quarticE := b * d
+    let I := 12 * quarticE - 3 * quarticB * quarticD + quarticC ^ 2
+    let J := 72 * quarticC * quarticE + 9 * quarticB * quarticC * quarticD
+      - 27 * quarticD ^ 2 - 27 * quarticB ^ 2 * quarticE - 2 * quarticC ^ 3
+    let markedRoot := 3 * a * c - 6 * b - 6 * d
+    let sourceA := 3 * markedRoot
+    let sourceB := 3 * markedRoot ^ 2 - 27 * I
+    let resultant := (d - b) ^ 2 + (a - c) * (a * d - b * c)
+    markedRoot ^ 3 - 27 * I * markedRoot - 27 * J = 0 ∧
+      sourceB = 81 * resultant ∧
+      sourceA ^ 2 - 4 * sourceB = 81 * (a ^ 2 - 4 * b) * (c ^ 2 - 4 * d) := by
+  dsimp
+  constructor
+  · ring
+  constructor <;> ring
+
 /-- The shared normalized at-infinity series before subtracting the target
 coordinate. Under the remaining geometric bridge it represents `S(x)/x` at
 `w=1/x`. -/
@@ -5032,6 +5058,7 @@ theorem fixedPoint_frobeniusCocycle_zero
 #print axioms monicQuadratic_product_coefficients
 #print axioms monicQuartic_trace_normalization
 #print axioms productMonicQuadratics_binaryQuartic_invariant_discriminant
+#print axioms productMonicQuadratics_markedTwoIsogeny_coefficients
 #print axioms fiberDenominatorSeries_eq_normalizedMap_sub_linear
 #print axioms fiberDenominatorSeries_sub
 #print axioms bostanDenominatorsNonzero

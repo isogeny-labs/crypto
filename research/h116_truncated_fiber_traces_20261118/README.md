@@ -668,3 +668,13 @@ exact.  One Lean identity raises the audit to 242 theorems.  The next lead
 retains the marked quartic factorization and tests its induced rational
 two-isogeny Kummer/covering class.
 [pcc:unverified]
+
+The [marked two-isogeny halving test](CHIRAL_MARKED_TWO_ISOGENY_HALVING_PARITY_EXPERIMENT.md)
+then asks whether the marked source and dual kernel points have rational
+halves.  All 5,992 resolvent/coefficient controls, 11,984 halving-formula and
+group-order controls, and 4,818,424 exhaustive point doublings pass; the
+tuple distinguishes 1,376/1,520 target signs, but the selected rule is only
+762/1,444 with family-wise `p=0.997803` and no rule is exact.  One Lean
+identity raises the audit to 243 theorems.  The next lead retains the complete
+Frobenius cycle type on each four-point halving fiber.
+[pcc:unverified]
