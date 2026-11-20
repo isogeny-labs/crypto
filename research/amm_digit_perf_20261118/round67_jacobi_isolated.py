@@ -85,7 +85,7 @@ mod checks {
      let x=before::RadicalRootCtx::new(p).unwrap();
      let y=after::RadicalRootCtx::new(p).unwrap();
      let mut s=p^0xda17_a37e_501c_9871;
-     for op in [0usize,1]{
+     for op in [0usize,1,2]{
        for known_root in [false,true]{
          let mut inputs=Vec::new();
          for _ in 0..256{
@@ -96,9 +96,12 @@ mod checks {
               if op==0 {
                 let term=x.f.mul(r,x.f.add(r,b));
                 x.f.neg(term)
-              }else{
+              }else if op==1{
                 let sq=x.f.mul(a,x.f.sqr(r));
                 x.f.neg(x.f.add(sq,x.f.mul(b,r)))
+              }else{
+                let cubic=x.f.mul(r,x.f.sqr(r));
+                x.f.neg(x.f.add(cubic,x.f.mul(b,r)))
               }
            }else{next(&mut s)%p};
            inputs.push((a,b,c));
@@ -110,10 +113,10 @@ mod checks {
              for _ in 0..4{
                for &(a,b,c) in &inputs{
                  if optimized {
-                   let roots=if op==0{y.quad_monic(b,c)}else{y.quad_roots(a,b,c)};
+                   let roots=match op{0=>y.quad_monic(b,c),1=>y.quad_roots(a,b,c),_=>y.cubic_depressed(b,c)};
                    black_box(roots);
                  }else{
-                   let roots=if op==0{x.quad_monic(b,c)}else{x.quad_roots(a,b,c)};
+                   let roots=match op{0=>x.quad_monic(b,c),1=>x.quad_roots(a,b,c),_=>x.cubic_depressed(b,c)};
                    black_box(roots);
                  }
                }
