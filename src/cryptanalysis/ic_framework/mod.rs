@@ -80,6 +80,7 @@ pub mod registry;
 pub mod residual;
 pub mod rootfind;
 pub mod rootfind_gpu;
+pub mod semaev_projection_oracle;
 pub mod shared_rank;
 pub mod solver_units;
 pub mod solvers;
