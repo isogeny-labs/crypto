@@ -1484,9 +1484,10 @@ impl Replay {
         // Replay independently charges each eliminated degree in aggregate.
         if d >= 3 && denominator.coefficients[..d - 1].iter().all(|&c| c == 0) {
             let n = numerator.len as usize;
-            self.gate.charge(COPY_WORK * (n - d) as u64)?;
-            r.coefficients[d..n].fill(0);
-            r.len = d as u8;
+            let degree = d - 1;
+            self.gate.charge(COPY_WORK * (n - degree) as u64)?;
+            r.coefficients[degree..n].fill(0);
+            r.len = degree as u8;
             r.trim();
             return Ok(r);
         }
