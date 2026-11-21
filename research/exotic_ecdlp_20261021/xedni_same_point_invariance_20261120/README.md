@@ -41,4 +41,4 @@ python3 research/exotic_ecdlp_20261021/xedni_same_point_invariance_20261120/scre
 python3 research/exotic_ecdlp_20261021/xedni_same_point_invariance_20261120/audit.py > research/exotic_ecdlp_20261021/xedni_same_point_invariance_20261120/audit-result.json
 ```
 
-The next coefficient-height experiment should search additional higher-digit choices for the **1,632 compatible** witness pairs, with a frozen height bound and exact relation check. The incompatible 21,096 pairs require changing their local `a1,a2,a3` witness residues or the source input law; adding digits while keeping those residues cannot change the tangent constraint.
+The 1,632 tangent-compatible witness pairs belong to 32 source pairs whose fixed reduction at 47 does not satisfy `P + 2Q = O`. Every curve constructed here has good reduction to that fixed model at 47, so a rational relation on those source points would contradict its reduced sum. Higher-digit searches for this relation should instead focus on source pairs that pass the fixed-prime relation gate. The tangent-incompatible 21,096 pairs additionally cannot be repaired by preserving their local `a1,a2,a3` residues.
