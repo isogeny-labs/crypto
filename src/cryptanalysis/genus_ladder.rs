@@ -652,21 +652,36 @@ impl JCurve {
         }
         let nu = (2..p).find(|&a| !sq[a as usize]).expect("a non-residue");
         let f = &self.f;
+        assert!(p < (1 << 31), "count_points(2) wants p < 2^31");
+        // Horner over F_p[√ν] with one Barrett reduction per coordinate and
+        // step (the reference is `count_points2_reference` in the tests).
+        let m = u64::MAX / p;
+        let red = |x: u64| -> u64 {
+            let q = ((u128::from(x) * u128::from(m)) >> 64) as u64;
+            let r = x - q * p;
+            if r >= p {
+                r - p
+            } else {
+                r
+            }
+        };
+        let nub: Vec<u64> = (0..=(p - 1) / 2).map(|b| nu * b % p).collect();
         let mut n = 1u64;
         for a in 0..p {
             for b in 0..=(p - 1) / 2 {
                 let (mut ra, mut rb) = (0u64, 0u64);
+                let nb_ = nub[b as usize];
                 for i in (0..f.n).rev() {
-                    let na = (ra * a + nu * (rb * b % p)) % p;
-                    let nb = (ra * b + rb * a) % p;
-                    ra = (na + f.c[i]) % p;
+                    let na = red(ra * a + rb * nb_ + f.c[i]);
+                    let nb = red(ra * b + rb * a);
+                    ra = na;
                     rb = nb;
                 }
                 let w = if b == 0 { 1 } else { 2 };
                 if ra == 0 && rb == 0 {
                     n += w;
                 } else {
-                    let norm = (ra * ra % p + p - nu * (rb * rb % p) % p) % p;
+                    let norm = red(ra * ra + p * p - nu * red(rb * rb));
                     if sq[norm as usize] {
                         n += 2 * w;
                     }
@@ -676,18 +691,20 @@ impl JCurve {
         n
     }
 
-    /// `#J(F_p)`: the first `min(g − 1, 2)` coefficients of `L(T)` from
-    /// `N_1` (and `N_2` for `g ≥ 3`), then baby-step giant-step over the
-    /// window the Weil bounds leave for the remaining ones; every candidate
-    /// is checked on 32 random divisors and exactly one must survive.
+    /// `#J(F_p)` by the enumeration route: [`OrderMethod::Enumerate`].
     pub fn jacobian_order(&self, seed: u64) -> Result<u64, String> {
+        self.jacobian_order_with(OrderMethod::Enumerate, seed)
+    }
+
+    /// `#J(F_p)`: the first `known` coefficients of `L(T)` from point counts
+    /// (`known = min(g − 1, 2)` for `Enumerate` and `Bsgs2`, `min(g − 1, 1)`
+    /// for `Bsgs1`), then baby-step giant-step over the window the Weil
+    /// bounds leave for the remaining ones; every candidate is checked on 32
+    /// random divisors and exactly one must survive.
+    pub fn jacobian_order_with(&self, method: OrderMethod, seed: u64) -> Result<u64, String> {
         let g = self.genus as usize;
         let p = i128::from(self.k.p);
-        let known = match g {
-            1 => 0,
-            2 => 1,
-            _ => 2,
-        };
+        let known = known_coefficients(g, method);
         let s: Vec<i128> = (1..=known as u32)
             .map(|k| self.count_points(k) as i128 - p.pow(k) - 1)
             .collect();
@@ -708,17 +725,7 @@ impl JCurve {
             }
         };
         let base: i128 = (0..=known).map(|i| c[i] * coef(i)).sum();
-        let mut bound = 1i128;
-        for i in known + 1..=g {
-            let binom = (0..i as i128).fold(1i128, |acc, j| acc * (2 * g as i128 - j) / (j + 1));
-            let w = (binom as f64 * (p as f64).powf(i as f64 / 2.0)).ceil() as i128 + 1;
-            bound += w * coef(i);
-        }
-        let sp = (p as f64).sqrt();
-        let lo = ((sp - 1.0).powi(2 * g as i32) * (1.0 - 1e-9))
-            .floor()
-            .max(1.0) as i128;
-        let hi = ((sp + 1.0).powi(2 * g as i32) * (1.0 + 1e-9)).ceil() as i128;
+        let (bound, lo, hi) = weil_window(self.k.p, g, known);
         let from = (base - bound).max(lo).max(1);
         let to = (base + bound).min(hi);
         if to < from {
@@ -726,7 +733,7 @@ impl JCurve {
         }
         let width = (to - from) as u64;
         let m = (((width + 1) as f64).sqrt().ceil() as u64).max(1);
-        if m > (1 << 26) {
+        if m > MAX_BSGS_TABLE {
             return Err(format!(
                 "order window too wide for baby-step giant-step (m = {m})"
             ));
@@ -791,6 +798,86 @@ impl JCurve {
             many => Err(format!("ambiguous: {} candidates", many.len())),
         }
     }
+}
+
+/// How `#J(F_p)` is obtained: which point counts are enumerated before the
+/// baby-step giant-step over the window the Weil bounds leave.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum OrderMethod {
+    /// `N_1`, and `N_2` for `g ≥ 3` (O(p²) enumeration over `F_{p²}`).
+    Enumerate,
+    /// `N_1` only; the window covers every remaining coefficient.
+    Bsgs1,
+    /// `N_1` and `N_2` (the `Enumerate` window; the same counts).
+    Bsgs2,
+}
+
+impl OrderMethod {
+    pub fn parse(s: &str) -> Result<Self, String> {
+        match s {
+            "enumerate" => Ok(Self::Enumerate),
+            "bsgs1" => Ok(Self::Bsgs1),
+            "bsgs2" => Ok(Self::Bsgs2),
+            _ => Err(format!(
+                "--order-method wants enumerate, bsgs1 or bsgs2, not {s}"
+            )),
+        }
+    }
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Enumerate => "enumerate",
+            Self::Bsgs1 => "bsgs1",
+            Self::Bsgs2 => "bsgs2",
+        }
+    }
+}
+
+/// The most baby steps held in the table (`2^26` entries).
+pub const MAX_BSGS_TABLE: u64 = 1 << 26;
+
+fn known_coefficients(g: usize, method: OrderMethod) -> usize {
+    let enumerated = match g {
+        1 => 0,
+        2 => 1,
+        _ => 2,
+    };
+    match method {
+        OrderMethod::Enumerate | OrderMethod::Bsgs2 => enumerated,
+        OrderMethod::Bsgs1 => enumerated.min(1),
+    }
+}
+
+/// `(bound, lo, hi)`: the half-width the Weil bounds leave for `#J` once the
+/// first `known` coefficients are fixed, and the absolute range of `#J`.
+fn weil_window(p: u64, g: usize, known: usize) -> (i128, i128, i128) {
+    let p = i128::from(p);
+    let coef = |i: usize| -> i128 {
+        if i < g {
+            1 + p.pow((g - i) as u32)
+        } else {
+            1
+        }
+    };
+    let mut bound = 1i128;
+    for i in known + 1..=g {
+        let binom = (0..i as i128).fold(1i128, |acc, j| acc * (2 * g as i128 - j) / (j + 1));
+        let w = (binom as f64 * (p as f64).powf(i as f64 / 2.0)).ceil() as i128 + 1;
+        bound += w * coef(i);
+    }
+    let sp = (p as f64).sqrt();
+    let lo = ((sp - 1.0).powi(2 * g as i32) * (1.0 - 1e-9))
+        .floor()
+        .max(1.0) as i128;
+    let hi = ((sp + 1.0).powi(2 * g as i32) * (1.0 + 1e-9)).ceil() as i128;
+    (bound, lo, hi)
+}
+
+/// The baby-step table size `m` of the widest window (centre ignored, Weil
+/// range not binding) for `(p, g, method)`: the memory bound of the route.
+pub fn bsgs_table_size(p: u64, g: usize, method: OrderMethod) -> u64 {
+    let (bound, lo, hi) = weil_window(p, g, known_coefficients(g, method));
+    let width = (2 * bound).min(hi - lo) as f64;
+    (width + 1.0).sqrt().ceil() as u64
 }
 
 impl CountedGroup for JCurve {
@@ -934,8 +1021,27 @@ pub fn make_instance(
     target_seed: u64,
     max_h: u64,
 ) -> Result<Instance, String> {
+    make_instance_with(
+        p,
+        genus,
+        curve_seed,
+        target_seed,
+        max_h,
+        OrderMethod::Enumerate,
+    )
+}
+
+/// [`make_instance`] with the group order found by `method`.
+pub fn make_instance_with(
+    p: u64,
+    genus: u32,
+    curve_seed: u64,
+    target_seed: u64,
+    max_h: u64,
+    method: OrderMethod,
+) -> Result<Instance, String> {
     let curve = JCurve::new(p, genus, &random_f(p, genus, curve_seed))?;
-    let order = curve.jacobian_order(curve_seed)?;
+    let order = curve.jacobian_order_with(method, curve_seed)?;
     let (h, r) = split_order(order, max_h).ok_or_else(|| format!("#J = {order} is not h*r"))?;
     instance_from(curve, order, h, r, target_seed)
 }
@@ -1986,7 +2092,7 @@ impl SgeCols {
 /// multiplication (unless the multiplier is `±1`) and one addition per
 /// merged row; the index bookkeeping one addition per entry touched, as
 /// `peel` does.
-fn sge_reduce(
+pub(crate) fn sge_reduce(
     rows: &[Row],
     ncols: usize,
     tcol: u32,
@@ -3195,6 +3301,212 @@ mod tests {
             assert_eq!(rho.recovered, Some(inst.t_secret));
             assert!(rho.cantor_mul > 0);
         }
+    }
+
+    // ── order methods (fast order study, 2026-11-21) ────────────────────
+
+    /// The enumeration of `count_points(2)` as it was before the Barrett
+    /// reduction: the reference every new count is compared with.
+    fn count_points2_reference(c: &JCurve) -> u64 {
+        let p = c.k.p;
+        let mut sq = vec![false; p as usize];
+        for y in 1..p {
+            sq[(y * y % p) as usize] = true;
+        }
+        let nu = (2..p).find(|&a| !sq[a as usize]).expect("a non-residue");
+        let f = &c.f;
+        let mut n = 1u64;
+        for a in 0..p {
+            for b in 0..=(p - 1) / 2 {
+                let (mut ra, mut rb) = (0u64, 0u64);
+                for i in (0..f.n).rev() {
+                    let na = (ra * a + nu * (rb * b % p)) % p;
+                    let nb = (ra * b + rb * a) % p;
+                    ra = (na + f.c[i]) % p;
+                    rb = nb;
+                }
+                let w = if b == 0 { 1 } else { 2 };
+                if ra == 0 && rb == 0 {
+                    n += w;
+                } else {
+                    let norm = (ra * ra % p + p - nu * (rb * rb % p) % p) % p;
+                    if sq[norm as usize] {
+                        n += 2 * w;
+                    }
+                }
+            }
+        }
+        n
+    }
+
+    #[test]
+    fn count_points2_matches_reference() {
+        for (p, g, cs) in [
+            (67u64, 3u32, 1u64),
+            (257, 3, 2),
+            (1031, 3, 3),
+            (1031, 4, 4),
+            (2053, 2, 5),
+        ] {
+            let c = JCurve::new(p, g, &random_f(p, g, cs)).unwrap();
+            assert_eq!(
+                c.count_points(2),
+                count_points2_reference(&c),
+                "p={p} g={g}"
+            );
+        }
+    }
+
+    /// `Ok(order)` or the class of the error, for comparing routes.
+    fn order_outcome(c: &JCurve, m: OrderMethod, seed: u64) -> String {
+        match c.jacobian_order_with(m, seed) {
+            Ok(n) => format!("ok {n}"),
+            Err(e) => format!("err {}", e.split(':').next().unwrap_or("")),
+        }
+    }
+
+    fn json_instances(src: &str) -> Vec<(u64, Vec<u64>, u64, u64)> {
+        let v: serde_json::Value = serde_json::from_str(src).unwrap();
+        v["instances"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|i| i["g"] == 3 && i["family"] == "hyperelliptic")
+            .map(|i| {
+                (
+                    i["p"].as_u64().unwrap(),
+                    i["f"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .map(|x| x.as_u64().unwrap())
+                        .collect(),
+                    i["order"].as_u64().unwrap(),
+                    i["curve_seed"].as_u64().unwrap(),
+                )
+            })
+            .collect()
+    }
+
+    fn check_recorded(src: &str, p_max: u64, p_min: u64) -> usize {
+        let mut n = 0;
+        for (p, f, order, cs) in json_instances(src) {
+            if p > p_max || p < p_min {
+                continue;
+            }
+            let c = JCurve::new(p, 3, &f).unwrap();
+            assert_eq!(
+                c.jacobian_order_with(OrderMethod::Bsgs1, cs),
+                Ok(order),
+                "bsgs1 p={p} cs={cs}"
+            );
+            assert_eq!(
+                c.jacobian_order_with(OrderMethod::Enumerate, cs),
+                Ok(order),
+                "enum p={p} cs={cs}"
+            );
+            if p <= 1031 {
+                assert_eq!(c.jacobian_order_with(OrderMethod::Bsgs2, cs), Ok(order));
+            }
+            n += 1;
+        }
+        n
+    }
+
+    #[test]
+    fn bsgs1_matches_enumerate_on_recorded_instances() {
+        let a = check_recorded(
+            include_str!("../../research/genus_ladder_20261114/analysis.json"),
+            4099,
+            0,
+        );
+        assert_eq!(a, 28);
+    }
+
+    #[test]
+    #[ignore = "minutes: enumerates p = 8209, 16411 and 32771"]
+    fn bsgs1_matches_enumerate_on_scale_instances() {
+        let b = check_recorded(
+            include_str!("../../research/genus_ladder_scale_20261115/g3_analysis.json"),
+            32771,
+            0,
+        );
+        assert_eq!(b, 9);
+    }
+
+    #[test]
+    fn bsgs1_matches_enumerate_on_random_curves() {
+        let p = 1031u64;
+        let (mut ok, mut err, mut tested) = (0, 0, 0);
+        for cs in 9000..9050u64 {
+            let Ok(c) = JCurve::new(p, 3, &random_f(p, 3, cs)) else {
+                continue;
+            };
+            tested += 1;
+            let e = order_outcome(&c, OrderMethod::Enumerate, cs);
+            let b = order_outcome(&c, OrderMethod::Bsgs1, cs);
+            let b2 = order_outcome(&c, OrderMethod::Bsgs2, cs);
+            println!("RANDOM cs={cs} enumerate={e} bsgs1={b} bsgs2={b2}");
+            assert_eq!(e, b, "cs={cs}");
+            assert_eq!(e, b2, "cs={cs}");
+            if e.starts_with("ok") {
+                ok += 1;
+            } else {
+                err += 1;
+            }
+        }
+        println!("RANDOM tested={tested} ok={ok} err={err}");
+        assert!(tested >= 45);
+    }
+
+    #[test]
+    fn bsgs_table_size_is_monotone_and_bounded() {
+        assert!(bsgs_table_size(131101, 3, OrderMethod::Bsgs1) < MAX_BSGS_TABLE);
+        assert!(
+            bsgs_table_size(131101, 3, OrderMethod::Bsgs1)
+                < bsgs_table_size(262147, 3, OrderMethod::Bsgs1)
+        );
+    }
+
+    /// Timing probe: `PROBE_ORDER=p,g,method,cs cargo test --release --lib
+    /// order_probe -- --ignored --nocapture`.
+    #[test]
+    #[ignore = "manual timing probe"]
+    fn order_probe() {
+        let v = std::env::var("PROBE_ORDER").expect("PROBE_ORDER=p,g,method,cs");
+        let a: Vec<&str> = v.split(',').collect();
+        let (p, g, cs): (u64, u32, u64) = (
+            a[0].parse().unwrap(),
+            a[1].parse().unwrap(),
+            a[3].parse().unwrap(),
+        );
+        let c = JCurve::new(p, g, &random_f(p, g, cs)).unwrap();
+        if a[2] == "count2" {
+            let t = std::time::Instant::now();
+            let n = c.count_points(2);
+            println!(
+                "PROBE p={p} g={g} count_points(2)={n} wall_s={:.3}",
+                t.elapsed().as_secs_f64()
+            );
+            if a.len() > 4 {
+                let t = std::time::Instant::now();
+                let r = count_points2_reference(&c);
+                println!(
+                    "PROBE reference={r} wall_s={:.3}",
+                    t.elapsed().as_secs_f64()
+                );
+            }
+            return;
+        }
+        let m = OrderMethod::parse(a[2]).unwrap();
+        let t = std::time::Instant::now();
+        let r = c.jacobian_order_with(m, cs);
+        println!(
+            "PROBE p={p} g={g} method={} cs={cs} result={r:?} table_bound={} wall_s={:.3}",
+            m.name(),
+            bsgs_table_size(p, g as usize, m),
+            t.elapsed().as_secs_f64()
+        );
     }
 
     /// The legacy policy is `run_rho_walk` count for count; the window-free
