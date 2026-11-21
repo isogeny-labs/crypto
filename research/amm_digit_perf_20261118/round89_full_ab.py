@@ -22,19 +22,6 @@ baseline = subprocess.check_output(
     cwd=repo, text=True
 )
 candidate = (repo / source_path).read_text()
-ablation = os.environ.get("ROOTFIND_REPLAY_ABLATION", "both")
-if ablation == "square_only":
-    old = "std::mem::replace(&mut state.1, verified_r)"
-    new = "std::mem::replace(&mut state.1, remainder.clone())"
-    assert candidate.count(old) == 1
-    candidate = candidate.replace(old, new)
-elif ablation == "gcd_only":
-    old = "vdiv(&vsquare(&state.base, p), &state.modulus, p)?.1"
-    new = "vdiv(&vproduct(&state.base, &state.base, p), &state.modulus, p)?.1"
-    assert candidate.count(old) == 1
-    candidate = candidate.replace(old, new)
-else:
-    assert ablation == "both", ablation
 cargo = """[package]
 name="rootfind-isolated-ab"
 version="0.1.0"
