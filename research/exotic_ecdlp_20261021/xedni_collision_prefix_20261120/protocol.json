@@ -1,0 +1,16 @@
+{
+  "schema": "xedni-collision-prefix-protocol-v1",
+  "box_rows_raw_sha256": "7edbcede5787ad2c07a61fe56b841c04250d01e3ff8ca8ec0959d8502a397706",
+  "curve_coefficients": [94, 0, 188, 1738, 3805],
+  "Q": [-4, 19],
+  "R": ["52242961/137641", "-1907191742616/51064811"],
+  "reduction_prime": 47,
+  "subgroup_order": 43,
+  "input_law": "all 42 nonidentity reduced points, one supplied public point per independent search; neither selection nor stop reads its scalar",
+  "candidate_order": "all 80 nonidentity coefficient-box pairs, ascending max(abs(a),abs(b)), then ascending a, then ascending b",
+  "online_interval": "one rational aQ+bR point construction and reduction per prefix entry; Q,R, curve and input point are supplied; stop after target's scalar is derived and verified",
+  "collision_rule": "first two distinct rational points with identical finite reduction and nonzero difference in b determine lambda=-delta_a/delta_b mod43",
+  "stop_rule": "target is solved at its first b=0 lift, or after both its first lift and the first collision are present, whichever happens first",
+  "work": "record exact rational point evaluations, reductions, dictionary lookups, prefix coordinate bit maximum, first collision index, first target hit and per-target stop; no wall-time comparison",
+  "claim_boundary": "finite prefix operation-count diagnostic; a matched rho and calibrated complete pipeline are separate measurements"
+}
