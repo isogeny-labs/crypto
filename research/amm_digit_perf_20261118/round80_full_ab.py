@@ -115,6 +115,9 @@ with tempfile.TemporaryDirectory(prefix="root79-full-") as tmp:
                             "--","--nocapture"],cwd=folder,check=True)
         if label == "after":
             subprocess.run(["cargo","test","--release","--quiet",
+                            "smallest_odd_primes_and_constant_modulus_preserve_certificates",
+                            "--","--nocapture"],cwd=folder,check=True)
+            subprocess.run(["cargo","test","--release","--quiet",
                             "limited_work_and_sink_failures_remain_verifiable",
                             "--","--nocapture"],cwd=folder,check=True)
             subprocess.run(["cargo","test","--release","--quiet",
