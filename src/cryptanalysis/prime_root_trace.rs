@@ -823,7 +823,9 @@ fn vroot_product(roots: &[u64], p: u64) -> Result<Vec<u64>, String> {
         previous = Some(root);
         let c = if root == 0 { 0 } else { p - root };
         let n = product.len();
-        product.push(0);
+        // The new leading coefficient is the old leading coefficient;
+        // no zero multiplication or modular reduction is necessary.
+        product.push(product[n - 1]);
         if c == 0 {
             product.copy_within(0..n, 1);
             product[0] = 0;
@@ -831,7 +833,7 @@ fn vroot_product(roots: &[u64], p: u64) -> Result<Vec<u64>, String> {
         }
         // Descending updates preserve the old coefficients until read.
         // The sum is < 2p <= 2^62, so one conditional subtraction suffices.
-        for i in (1..=n).rev() {
+        for i in (1..n).rev() {
             let sum = product[i - 1] + vmul(product[i], c, p);
             product[i] = if sum >= p { sum - p } else { sum };
         }
