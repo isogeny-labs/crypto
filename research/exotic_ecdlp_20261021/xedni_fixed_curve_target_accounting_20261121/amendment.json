@@ -1,0 +1,9 @@
+{
+  "schema": "xedni-fixed-curve-target-accounting-amendment-v1",
+  "amends": "protocol.json setup_policy and result.json table_cold_median_ns interpretation",
+  "observation": "The runner rebuilds its application-level rational relation list, matrix, solution, and lookup table for each of three repetitions, but all repetitions execute inside one checked Sage process. Native and Sage first-use caches persist after repetition 1.",
+  "evidence": "Raw setup intervals are 81005958, 5490750, and 5504959 ns. The first setup includes 36365542 ns of curve setup and 33876375 ns of relation LA, while later setups have much smaller values.",
+  "corrected_label": "The result field table_cold_median_ns is setup-plus-online within one Sage process. It is not a process-fresh cold-start estimate.",
+  "preservation": "The original protocol, result schema, all raw arm rows, and first-use timings remain unchanged.",
+  "next_measurement": "If process-fresh cold cost is needed, freeze separate checked-Sage processes per repetition and charge all target-independent initialization explicitly."
+}
