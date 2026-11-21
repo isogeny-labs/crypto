@@ -804,6 +804,32 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
         if scalar == 1 { return trim(other.to_vec()); }
         return trim(other.iter().map(|&x| vmul(x, scalar, p)).collect());
     }
+    // A monic linear factor (x + c) is common in completeness proofs.
+    // For f(x)*(x+c), coefficient k is c*f[k] + f[k-1].
+    // This needs one field product per coefficient, not two convolution
+    // products, and has no inner-loop allocation or degree dispatch.
+    if (a.len() == 2 && a[1] == 1) || (b.len() == 2 && b[1] == 1) {
+        let (linear, other) = if a.len() == 2 && a[1] == 1 {
+            (a, b)
+        } else {
+            (b, a)
+        };
+        let mut result = vec![0; other.len() + 1];
+        let c = linear[0];
+        if c == 0 {
+            result[1..].copy_from_slice(other);
+            return trim(result);
+        }
+        result[0] = vmul(other[0], c, p);
+        for i in 1..other.len() {
+            // Both summands are canonical, and p <= 2^61-1, so u64
+            // addition cannot overflow and needs one correction.
+            let sum = vmul(other[i], c, p) + other[i - 1];
+            result[i] = if sum >= p { sum - p } else { sum };
+        }
+        result[other.len()] = *other.last().unwrap();
+        return trim(result);
+    }
     if let Some(result) = vmonomial_product(a, b) { return result; }
     if let Some(result) = vmonomial_product(b, a) { return result; }
     let mut r = vec![0; a.len() + b.len() - 1];
@@ -1146,7 +1172,13 @@ fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, Strin
     // The independent verifier keeps separate arithmetic, but skips
     // identities that cannot affect any residue.
     let mut r = if m.len() > 1 { vec![1] } else { vdiv(&[1], m, p)?.1 };
-    let mut b = vdiv(base, m, p)?.1;
+    // Degree-short canonical inputs are already their own residues.
+    // Do not allocate quotient/remainder vectors for these bases.
+    let mut b = if base.len() < m.len() {
+        trim(base.to_vec())
+    } else {
+        vdiv(base, m, p)?.1
+    };
     while e > 0 {
         if e & 1 == 1 {
             r = if r == [1] {
@@ -1329,8 +1361,16 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 powers.insert(
                     *id,
                     PowerState {
-                        acc: vdiv(&[1], modulus, p)?.1,
-                        base: vdiv(base, modulus, p)?.1,
+                        acc: if modulus.len() > 1 {
+                            vec![1]
+                        } else {
+                            vdiv(&[1], modulus, p)?.1
+                        },
+                        base: if base.len() < modulus.len() {
+                            trim(base.clone())
+                        } else {
+                            vdiv(base, modulus, p)?.1
+                        },
                         exponent: *exponent,
                         modulus: modulus.clone(),
                     },
@@ -1443,7 +1483,14 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 canonical(polynomial, p)?;
                 if polynomial.len() != 2
                     || *root >= p
-                    || { let sum = vmul(polynomial[1], *root, p) + polynomial[0]; sum != 0 && sum != p }
+                    || (if polynomial[1] == 1 {
+                        // For x+c, root == -c mod p. Compare the
+                        // independent identity without a field product.
+                        *root != if polynomial[0] == 0 { 0 } else { p - polynomial[0] }
+                    } else {
+                        let sum = vmul(polynomial[1], *root, p) + polynomial[0];
+                        sum != 0 && sum != p
+                    })
                 {
                     return Err("linear root identity failed".into());
                 }
@@ -1541,6 +1588,51 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round81_monic_linear_certificate_product_matches_convolution() {
+        let mut seed = 0x8120_2611_2020_0001u64;
+        for p in [3, 17, 65_521, 1_000_000_007, MAX_PRIME] {
+            for degree in 1..=8 {
+                for _ in 0..128 {
+                    let mut other = vec![0u64; degree + 1];
+                    for coefficient in &mut other {
+                        seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                        *coefficient = seed % p;
+                    }
+                    other[degree] = 1;
+                    // Includes a pure x factor, x+1, and general x+c.
+                    for c in [0, 1, p - 1, 2 % p] {
+                        let linear = [c, 1u64];
+                        let mut reference = vec![0u64; other.len() + 1];
+                        for (i, &a) in other.iter().enumerate() {
+                            for (j, &b) in linear.iter().enumerate() {
+                                reference[i + j] = ((reference[i + j] as u128
+                                    + a as u128 * b as u128) % p as u128) as u64;
+                            }
+                        }
+                        let reference = trim(reference);
+                        assert_eq!(vproduct(&other, &linear, p), reference);
+                        assert_eq!(vproduct(&linear, &other, p), reference);
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn round81_linear_and_quartic_certificates_still_verify() {
+        for p in [17, 65_521, 1_000_000_007, MAX_PRIME] {
+            let a = vproduct(&[p - 3, 1], &[p - 5, 1], p);
+            let quartic = vproduct(&a, &[1, 0, 1], p);
+            for polynomial in [vec![p - 3, 1], a, quartic] {
+                let report = run(&polynomial, p);
+                assert!(report.complete(), "p={p} stop={:?}", report.stop);
+                verify(&report).unwrap();
+                assert!(report.roots.contains(&3));
+            }
+        }
+    }
 
     #[test]
     fn round76_identity_pruning_preserves_root_certificates() {

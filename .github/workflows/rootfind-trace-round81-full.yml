@@ -1,0 +1,39 @@
+name: Rootfind round81 verifier monic-linear A/B
+on:
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_root_trace.rs'
+      - 'research/amm_digit_perf_20261118/round81_full_ab.py'
+      - '.github/workflows/rootfind-trace-round81-full.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full-solve-verify-ab:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round81_full_ab.py
+            research/amm_digit_perf_20261118/round81_ablation.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Source-exact producer and independent verifier A/B
+        run: |
+          set -euo pipefail
+          cargo --version
+          python3 research/amm_digit_perf_20261118/round81_full_ab.py
+      - name: Isolated verifier hot-path ablation
+        run: |
+          set -euo pipefail
+          python3 research/amm_digit_perf_20261118/round81_ablation.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round81-full-solve-verify-raw-csv
+          path: |
+            research/amm_digit_perf_20261118/round81_full_ab_results.csv
+            research/amm_digit_perf_20261118/round81_ablation_results.csv
