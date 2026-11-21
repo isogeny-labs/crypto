@@ -9,6 +9,7 @@
 //!     [--arms AaCcR] [--cc 2.0] [--max-h 64] [--threads 4] [--rho-cap 3e7]
 //!     [--seed-search 600] [--max-trials 5e7] [--smith] [--smith-census N]
 //!     [--quartic] [--qc 3.0] [--restart-sqrt] [--sge W,F]... --out FILE.jsonl
+//!     [--quartic-arms full,2lp,2lp-alg,2lp-new] [--quartic-seeds p=s1/s2,...]
 //! ```
 //!
 //! Arms: `A` full base, `a` full base with the parity prefilter, `C` double
@@ -67,6 +68,15 @@ struct Cfg {
     smith: bool,
     smith_census: u64,
     quartic: bool,
+    /// `--quartic-arms full,2lp,2lp-alg,2lp-new`: the quartic arms to run
+    /// (default `full,2lp`, the frozen pair).  `2lp-alg` is the algebraic
+    /// descent with the frozen solve, `2lp-new` the algebraic descent with
+    /// the linked solve policy (`ql::QSolve::Linked`).  Any value other than
+    /// the default adds descent / solve fields to the quartic records.
+    quartic_arms: Vec<String>,
+    /// `--quartic-seeds p=s1/s2/...,...`: evaluate only these curve seeds in
+    /// the quartic cell of `p` (same admission path, no seed search).
+    quartic_seeds: std::collections::HashMap<u64, Vec<u64>>,
     sge: Vec<gl::SgeParams>,
     out: String,
 }
@@ -99,6 +109,8 @@ fn parse() -> Result<Cfg, String> {
         smith: false,
         smith_census: 0,
         quartic: false,
+        quartic_arms: vec!["full".into(), "2lp".into()],
+        quartic_seeds: Default::default(),
         sge: Vec::new(),
         out: String::new(),
     };
@@ -168,6 +180,27 @@ fn parse() -> Result<Cfg, String> {
                 }
             }
             "--max-trials" => c.max_trials = num(&v)? as u64,
+            "--quartic-arms" => {
+                c.quartic_arms = v.split(',').map(String::from).collect();
+                for a in &c.quartic_arms {
+                    if !["full", "2lp", "2lp-alg", "2lp-new"].contains(&a.as_str()) {
+                        return Err(format!("--quartic-arms: unknown arm {a}"));
+                    }
+                }
+            }
+            "--quartic-seeds" => {
+                for cell in v.split(',') {
+                    let (p, ss) = cell
+                        .split_once('=')
+                        .ok_or(format!("--quartic-seeds wants p=s1/s2,..., not {cell}"))?;
+                    let p: u64 = p.parse().map_err(|e| format!("--quartic-seeds p: {e}"))?;
+                    let ss = ss
+                        .split('/')
+                        .map(|x| x.parse::<u64>().map_err(|e| format!("--quartic-seeds: {e}")))
+                        .collect::<Result<Vec<_>, _>>()?;
+                    c.quartic_seeds.insert(p, ss);
+                }
+            }
             "--smith-census" => c.smith_census = num(&v)? as u64,
             "--sge" => {
                 let (w, fm) = v
@@ -256,6 +289,11 @@ fn main() -> ExitCode {
             .map(|s| json!({"w_max": s.w_max, "fill_max": s.fill_max}))
             .collect::<Vec<_>>());
     }
+    if cfg.quartic_arms != ["full", "2lp"] || !cfg.quartic_seeds.is_empty() {
+        // Only with the flags, so a run without them writes the frozen layout.
+        config["quartic_arms"] = json!(cfg.quartic_arms);
+        config["quartic_seeds"] = json!(cfg.quartic_seeds);
+    }
     emit(config);
 
     // ── instance search, one cell per (p, g) and one per quartic prime ──
@@ -275,7 +313,7 @@ fn main() -> ExitCode {
         let mut reasons: std::collections::BTreeMap<String, u64> = Default::default();
         let ts = Instant::now();
         let listed = if g == 0 {
-            None
+            cfg.quartic_seeds.get(&p)
         } else {
             cfg.curve_seeds.get(&p)
         };
@@ -668,14 +706,28 @@ fn main() -> ExitCode {
                 .expect("admitted quartic");
             let head = json!({"family": "quartic", "p": q, "g": 3, "curve_seed": curve_seed,
                 "seed": seed, "r": inst.r, "h": inst.h});
-            for (arm, nb) in [
-                (ql::QArm::Full, 0usize),
-                (
-                    ql::QArm::DoubleLp,
-                    (cfg.qc * f64::from(*q).sqrt()).ceil() as usize,
-                ),
-            ] {
-                let o = ql::run_diem(
+            let nb2 = (cfg.qc * f64::from(*q).sqrt()).ceil() as usize;
+            let ext = cfg.quartic_arms != ["full", "2lp"];
+            for name in &cfg.quartic_arms {
+                let (arm, nb, descent, solve, suffix) = match name.as_str() {
+                    "full" => (ql::QArm::Full, 0usize, ql::QDescent::Scan, ql::QSolve::Legacy, ""),
+                    "2lp" => (ql::QArm::DoubleLp, nb2, ql::QDescent::Scan, ql::QSolve::Legacy, ""),
+                    "2lp-alg" => (
+                        ql::QArm::DoubleLp,
+                        nb2,
+                        ql::QDescent::Algebraic,
+                        ql::QSolve::Legacy,
+                        "_alg",
+                    ),
+                    _ => (
+                        ql::QArm::DoubleLp,
+                        nb2,
+                        ql::QDescent::Algebraic,
+                        ql::QSolve::Linked,
+                        "_new",
+                    ),
+                };
+                let o = ql::run_diem_with(
                     &inst,
                     ql::QIcParams {
                         arm,
@@ -684,10 +736,27 @@ fn main() -> ExitCode {
                         max_lines: cfg.max_trials,
                         verify_relations: false,
                     },
+                    ql::QDiemOpts {
+                        descent,
+                        solve,
+                        diag: false,
+                    },
                 );
                 let mut rec = head.clone();
                 rec["kind"] = json!("run");
-                rec["arm"] = json!(format!("Q_{}", o.arm));
+                rec["arm"] = json!(format!("Q_{}{}", o.arm, suffix));
+                if ext {
+                    rec["descent"] = json!(format!("{descent:?}"));
+                    rec["solve"] = json!(format!("{solve:?}"));
+                    rec["rel_decomp_mul"] = json!(o.rel_decomp.mul);
+                    rec["rel_decomp_add"] = json!(o.rel_decomp.add);
+                    rec["rel_enum_mul"] = json!(o.rel_enum.mul);
+                    rec["decomp_relations"] = json!(o.decomp_relations);
+                    rec["decomp_fallbacks"] = json!(o.decomp_fallbacks);
+                    rec["inhom_linked"] = json!(o.inhom_linked);
+                    rec["la_skipped"] = json!(o.la_skipped);
+                    rec["lines_tried"] = json!(o.lines_tried);
+                }
                 rec["certified"] = json!(o.certified);
                 rec["exhausted"] = json!(o.exhausted);
                 rec["ok"] = json!(o.recovered == Some(inst.t_secret));
