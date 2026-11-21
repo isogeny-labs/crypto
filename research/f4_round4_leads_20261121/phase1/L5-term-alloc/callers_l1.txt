@@ -1,0 +1,76 @@
+== _rjem_malloc 1701849
+    1701849    46595951 __rustc::__rust_alloc
+== __rustc::__rust_alloc 914258
+     408630    12671741 <crypto_lib::cryptanalysis::f4_fp::Cols>::get
+     114096     8015956 <crypto_lib::cryptanalysis::f4_fp::Packed>::symbolic
+     109936    13109642 <alloc::vec::Vec<(u32, u64)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(u32, u64), core::iter::adapters::map::Map<core::iter::adapters::zip::Zip<alloc::vec::into_iter::IntoIter<u32>, core::slice::iter::Iter<(alloc::
+      77165     3698455 crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic
+      33279     1933109 crypto_lib::cryptanalysis::f4_fp::rref32_deferred
+      31292     4371390 <core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<u32>>, crypto_lib::cryptanalysis::f4_fp::rref32_deferred::{closure#1}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::It
+      27871     1466624 <alloc::vec::Vec<u32> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<u32, core::iter::adapters::map::Map<core::slice::iter::Iter<usize>, crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#41}::{closure#1}>>>:
+      24026     1921986 <alloc::vec::Vec<u32> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<u32, core::iter::adapters::map::Map<alloc::vec::into_iter::IntoIter<u64>, crypto_lib::cryptanalysis::f4_fp::rref32_deferred::{closure#7}::{closure#0}>>
+      20910      423047 <alloc::vec::Vec<(alloc::vec::Vec<u32>, u64)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(alloc::vec::Vec<u32>, u64), core::iter::adapters::cloned::Cloned<core::iter::adapters::filter::Filter<core::slice::iter::Iter<
+      19450      751637 <core::iter::adapters::map::Map<core::ops::range::Range<usize>, crypto_lib::cryptanalysis::f4_fp::rref32_deferred::{closure#7}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_eac
+      15216      371075 <alloc::raw_vec::RawVecInner>::finish_grow
+       6036      291407 <alloc::vec::Vec<f64> as alloc::vec::spec_from_elem::SpecFromElem>::from_elem::<alloc::alloc::Global>
+       5940      633096 <hashbrown::raw::RawTableInner>::fallible_with_capacity::<alloc::alloc::Global>
+       4266      170427 <alloc::vec::Vec<(usize, alloc::vec::Vec<u32>, u128)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(usize, alloc::vec::Vec<u32>, u128), core::iter::adapters::map::Map<alloc::vec::into_iter::IntoIter<(usize, u128)>, cry
+       4159      141329 <alloc::vec::Vec<(alloc::vec::Vec<u32>, u64)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(alloc::vec::Vec<u32>, u64), core::iter::adapters::map::Map<core::iter::adapters::filter::Filter<core::iter::adapters::enumerat
+== _rjem_sdallocx 1760945
+    1760945    58186481 __rustc::__rust_dealloc
+== __rustc::__rust_dealloc 749663
+     423350    42698672 crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic
+     109936     6429594 <alloc::vec::Vec<(u32, u64)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(u32, u64), core::iter::adapters::map::Map<core::iter::adapters::zip::Zip<alloc::vec::into_iter::IntoIter<u32>, core::slice::iter::Iter<(alloc::
+     100045     7333180 crypto_lib::cryptanalysis::f4_fp::rref32_deferred
+      24026     1104653 <alloc::vec::Vec<u32> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<u32, core::iter::adapters::map::Map<alloc::vec::into_iter::IntoIter<u64>, crypto_lib::cryptanalysis::f4_fp::rref32_deferred::{closure#7}::{closure#0}>>
+      20049      154651 <&crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#41} as core::ops::function::FnMut<(&alloc::vec::Vec<(u32, u64)>,)>>::call_mut
+      11427       68021 core::ptr::drop_glue::<alloc::vec::Vec<alloc::vec::Vec<u32>>>
+       8945     1650394 core::ptr::drop_glue::<crypto_lib::cryptanalysis::f4_fp::Packed>
+       7822      359533 <core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<(u32, u64)>>, crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#41}> as core::iter::traits::iterator::Iterator>::try_fold::<(), <core::iter::adap
+       6512      446084 <alloc::vec::Vec<alloc::vec::Vec<u32>> as rayon::iter::ParallelExtend<alloc::vec::Vec<u32>>>::par_extend::<rayon::iter::while_some::WhileSome<rayon::iter::inspect::Inspect<rayon::iter::map::Map<rayon::slice::Iter<alloc::vec::Vec<(
+       5198      190144 <hashbrown::map::HashMap<(usize, alloc::vec::Vec<u32>), (), core::hash::BuildHasherDefault<crypto_lib::cryptanalysis::fx_hash::FxHasher>>>::insert
+       4351      647257 <alloc::vec::Vec<alloc::vec::Vec<char>> as core::ops::drop::Drop>::drop
+       4160      372926 core::ptr::drop_glue::<<crypto_lib::cryptanalysis::f4_fp::Packed>::symbolic::Interned>
+       4159      149724 <alloc::vec::Vec<(usize, alloc::vec::Vec<u32>)> as core::ops::drop::Drop>::drop
+       4159      659434 <alloc::vec::Vec<alloc::vec::Vec<(f64, f64)>> as core::ops::drop::Drop>::drop
+       4087      395412 crypto_lib::cryptanalysis::f4_fp::reduce_pairs_fl
+== _rjem_realloc 80001
+      80001    23678274 __rustc::__rust_realloc
+== _rjem_calloc 59132
+      59132     3287169 __rustc::__rust_alloc_zeroed
+== <alloc::raw_vec::RawVecInner>::finish_grow 86613
+      50488    16531647 <alloc::raw_vec::RawVecInner<_>>::reserve::do_reserve_and_handle::<alloc::alloc::Global>
+      18309     2623258 <alloc::raw_vec::RawVec<(usize, u128)>>::grow_one
+       8643     2925802 <alloc::raw_vec::RawVec<[usize; 4]>>::grow_one
+       2917      946697 <alloc::raw_vec::RawVec<[f64; 3]>>::grow_one
+       2301     1758065 <alloc::raw_vec::RawVec<[u64; 3]>>::grow_one
+       1860      620920 <alloc::raw_vec::RawVec<&str>>::grow_one
+       1566      555451 <alloc::raw_vec::RawVec<i128>>::grow_one
+        422        3216 <alloc::raw_vec::RawVec<bool>>::grow_one
+        104      192637 <alloc::raw_vec::RawVec<&mut [u64]>>::grow_one
+          3        1891 <alloc::raw_vec::RawVec<i32>>::grow_one
+== __memcpy_avx_unaligned_erms 391275
+     111312     1447056 <hashbrown::raw::RawTable<((usize, alloc::vec::Vec<u32>), ())>>::reserve_rehash::<hashbrown::map::make_hasher<(usize, alloc::vec::Vec<u32>), (), core::hash::BuildHasherDefault<crypto_lib::cryptanalysis::fx_hash::FxHasher>>::{closu
+     100458     1305954 <hashbrown::map::HashMap<(usize, alloc::vec::Vec<u32>), (), core::hash::BuildHasherDefault<crypto_lib::cryptanalysis::fx_hash::FxHasher>>>::insert
+      80000     2400783 _rjem_je_arena_ralloc
+      33486      368346 crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic
+      19662      100826 <alloc::vec::Vec<(alloc::vec::Vec<u32>, u64)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(alloc::vec::Vec<u32>, u64), core::iter::adapters::cloned::Cloned<core::iter::adapters::filter::Filter<core::slice::iter::Iter<
+      17706      534071 _rjem_je_tcache_bin_flush_small
+      11322      509302 crypto_lib::cryptanalysis::f4_fp::rref32_deferred
+       5785      496630 <alloc::vec::Vec<f64> as alloc::vec::spec_from_elem::SpecFromElem>::from_elem::<alloc::alloc::Global>
+       3256       75980 <alloc::vec::Vec<alloc::vec::Vec<u32>> as rayon::iter::ParallelExtend<alloc::vec::Vec<u32>>>::par_extend::<rayon::iter::while_some::WhileSome<rayon::iter::inspect::Inspect<rayon::iter::map::Map<rayon::slice::Iter<alloc::vec::Vec<(
+       2490       49800 rayon_core::join::join_context::<rayon::iter::plumbing::bridge_producer_consumer::helper<rayon::iter::zip::ZipProducer<rayon::vec::DrainProducer<alloc::vec::Vec<u32>>, rayon::slice::IterProducer<usize>>, rayon::iter::map::MapConsu
+       1660       37350 rayon_core::registry::in_worker::<rayon_core::join::join_context<rayon::iter::plumbing::bridge_producer_consumer::helper<rayon::iter::zip::ZipProducer<rayon::vec::DrainProducer<alloc::vec::Vec<u32>>, rayon::slice::IterProducer<usi
+       1248        6864 <core::iter::adapters::cloned::Cloned<core::iter::adapters::filter::Filter<core::slice::iter::Iter<(alloc::vec::Vec<u32>, u64)>, crypto_lib::cryptanalysis::f4_fp::normalise::{closure#0}>> as core::iter::traits::iterator::Iterator>
+        830       24900 <rayon_core::registry::Registry>::in_worker_cold::<rayon_core::join::join_context<rayon::iter::plumbing::bridge_producer_consumer::helper<rayon::iter::zip::ZipProducer<rayon::vec::DrainProducer<alloc::vec::Vec<u32>>, rayon::slice:
+        830       12450 rayon_core::registry::in_worker::<rayon_core::join::join_context<rayon::iter::plumbing::bridge_producer_consumer::helper<rayon::iter::zip::ZipProducer<rayon::vec::DrainProducer<alloc::vec::Vec<u32>>, rayon::slice::IterProducer<usi
+        624        6864 <core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<(alloc::vec::Vec<u32>, u64)>>, crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#5}> as core::iter::traits::iterator::Iterator>::fold::<(), core:
+== __memset_avx2_unaligned_erms 82476
+      59132     1328009 _rjem_calloc
+      15616      146824 _rjem_je_bitmap_init
+       5940       95348 <hashbrown::raw::RawTableInner>::fallible_with_capacity::<alloc::alloc::Global>
+        838     6914886 <crypto_lib::cryptanalysis::f4_fp::MonoTable>::with_capacity
+        728       41177 crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic
+        112        5103 crypto_lib::cryptanalysis::f4_fp::reduce_pairs_fl
+        104        1248 <alloc::vec::Vec<bool>>::extend_with
+          6          36 0x000000000498b740

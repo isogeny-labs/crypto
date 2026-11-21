@@ -1,0 +1,40 @@
+--------------------------------------------------------------------------------
+Profile data file 's1/A.cg' (creator: callgrind-3.22.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 505416592
+Trigger: Program termination
+Profiled target:  new3/jv_cover --exp ccov --sizes 53 --seeds 1 --residuals 100 --constructed 4 --oracle-base 0 --stop hilbert:16 --json A.json (PID 1730, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+Ir                     
+--------------------------------------------------------------------------------
+1,096,195,667 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                    file:function
+--------------------------------------------------------------------------------
+140,265,141 (12.80%)  ???:<<crypto_lib::cryptanalysis::f4_fp::Packed>::symbolic::Interned>::id [new3/jv_cover]
+132,529,340 (12.09%)  ???:<core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<(u32, u64)>>, crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#41}> as core::iter::traits::iterator::Iterator>::try_fold::<(), <core::iter::adapters::GenericShunt<core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<(u32, u64)>>, crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#41}>, core::option::Option<core::convert::Infallible>> as core::iter::traits::iterator::Iterator>::try_fold<(), core::iter::traits::iterator::Iterator::try_for_each::call<alloc::vec::Vec<u32>, core::ops::control_flow::ControlFlow<alloc::vec::Vec<u32>>, core::ops::control_flow::ControlFlow<alloc::vec::Vec<u32>>::Break>::{closure#0}, core::ops::control_flow::ControlFlow<alloc::vec::Vec<u32>>>::{closure#0}, core::ops::control_flow::ControlFlow<core::ops::control_flow::ControlFlow<alloc::vec::Vec<u32>>>> [new3/jv_cover]
+113,198,602 (10.33%)  ???:<crypto_lib::cryptanalysis::f4_fp::Packed>::symbolic [new3/jv_cover]
+100,271,045 ( 9.15%)  ???:crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic [new3/jv_cover]
+ 65,980,647 ( 6.02%)  ???:crypto_lib::cryptanalysis::f4_fp::rref32_deferred [new3/jv_cover]
+ 55,243,895 ( 5.04%)  ???:<alloc::vec::Vec<u32> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<u32, core::iter::adapters::map::Map<alloc::vec::into_iter::IntoIter<u64>, crypto_lib::cryptanalysis::f4_fp::rref32_deferred::{closure#7}::{closure#0}>>>::from_iter [new3/jv_cover]
+ 38,041,180 ( 3.47%)  ???:<crypto_lib::cryptanalysis::f4_fp::Cols>::get [new3/jv_cover]
+ 36,907,791 ( 3.37%)  ???:<alloc::vec::Vec<(u128, u32)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(u128, u32), core::iter::adapters::map::Map<core::iter::adapters::enumerate::Enumerate<core::slice::iter::Iter<u128>>, <crypto_lib::cryptanalysis::f4_fp::Packed>::symbolic::{closure#8}>>>::from_iter [new3/jv_cover]
+ 27,734,773 ( 2.53%)  ???:crypto_lib::cryptanalysis::f4_fp::add_lazy_avx2 [new3/jv_cover]
+ 22,642,015 ( 2.07%)  ???:_rjem_sdallocx [new3/jv_cover]
+ 20,721,347 ( 1.89%)  ???:crypto_lib::cryptanalysis::groebner_f4::cmp_monomial [new3/jv_cover]
+ 19,268,147 ( 1.76%)  ???:_rjem_malloc [new3/jv_cover]
+ 18,089,895 ( 1.65%)  ???:<alloc::vec::Vec<(alloc::vec::Vec<u32>, u64)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(alloc::vec::Vec<u32>, u64), core::iter::adapters::map::Map<core::iter::adapters::filter::Filter<core::iter::adapters::enumerate::Enumerate<core::slice::iter::Iter<u32>>, crypto_lib::cryptanalysis::f4_fp::interreduce_linear_with::{closure#14}::{closure#0}>, crypto_lib::cryptanalysis::f4_fp::interreduce_linear_with::{closure#14}::{closure#1}>>>::from_iter [new3/jv_cover]
+ 16,245,416 ( 1.48%)  ???:<&crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#41} as core::ops::function::FnMut<(&alloc::vec::Vec<(u32, u64)>,)>>::call_mut [new3/jv_cover]
+ 15,576,240 ( 1.42%)  ???:_rjem_je_tcache_bin_flush_small [new3/jv_cover]
