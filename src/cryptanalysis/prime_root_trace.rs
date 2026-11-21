@@ -1707,7 +1707,6 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::collections::HashMap;
 
     #[test]
     fn round84_indexed_replay_rejects_forged_computation_ids() {
@@ -2291,6 +2290,7 @@ mod round77_producer_regression {
 #[cfg(test)]
 mod round79_terminal_power_regression {
     use super::*;
+    use std::collections::HashMap;
 
     #[test]
     fn terminal_base_elision_preserves_results_and_legacy_certificates() {
