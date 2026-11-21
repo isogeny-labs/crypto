@@ -1,0 +1,10 @@
+Hourly relation-finding assessment trigger
+UTC: 2026-11-21T23:14:43Z
+Repository: isogeny-labs/crypto (redirected from aburan28/crypto)
+Branch: hourly-runs
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Scope: frozen Koblitz GF(2^23), a=0, m=2, 256 natural, 64 planted-SAT, 64 proven-UNSAT
+Log: results/hourly_log.csv
+Baseline: results/relation_baseline.json
+Alert when: run fails or abs(metric deviation) > 20 percent for relations_per_sec or success_rate
+Record run result and push CSV to hourly-runs. Do not interpret as ECC2K130.
