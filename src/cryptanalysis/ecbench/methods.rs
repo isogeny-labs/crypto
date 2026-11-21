@@ -13013,18 +13013,19 @@ mod curve25519_pair_dispatch_tests {
             .unwrap();
             let ic_rep = solve(&ic, &inst, &facts, &coords, 3).unwrap();
             let rho_rep = solve(&rho, &inst, &facts, &coords, 3).unwrap();
+            let d_exact = crate::cryptanalysis::ecbench::exact_scalar::ExactScalar::from(d);
             eprintln!(
                 "PKM bits={} t={} ic_ok={} ic_gae={:.3e} rho_ok={} rho_gae={:.3e} speedup={:.3}",
                 bits,
                 t,
-                ic_rep.recovered == Some(d),
+                ic_rep.recovered == Some(d_exact),
                 ic_rep.total_gae,
-                rho_rep.recovered == Some(d),
+                rho_rep.recovered == Some(d_exact),
                 rho_rep.total_gae,
                 rho_rep.total_gae / ic_rep.total_gae.max(1.0),
             );
-            assert_eq!(ic_rep.recovered, Some(d));
-            assert_eq!(rho_rep.recovered, Some(d));
+            assert_eq!(ic_rep.recovered, Some(d_exact));
+            assert_eq!(rho_rep.recovered, Some(d_exact));
         }
     }
 }

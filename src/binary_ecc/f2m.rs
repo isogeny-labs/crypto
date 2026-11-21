@@ -1023,7 +1023,7 @@ fn reduce_bitwise(value: &mut [u64], irreducible: &IrreduciblePoly) {
 /// Spread the low 32 bits of `x` so that bit `i` lands at bit `2i`:
 /// squaring in characteristic 2 before reduction.
 #[inline(always)]
-fn spread32(x: u64) -> u64 {
+pub(crate) fn spread32(x: u64) -> u64 {
     let mut x = x & 0xFFFF_FFFF;
     x = (x | (x << 16)) & 0x0000_FFFF_0000_FFFF;
     x = (x | (x << 8)) & 0x00FF_00FF_00FF_00FF;
@@ -1445,7 +1445,7 @@ unsafe fn sqr4_k_aarch64(a: &[u64], k: u32, m: usize, fast: FastMod) -> [u64; 4]
 /// `out ^= a · b` over `F_2[z]`, word-level schoolbook with one
 /// carry-less multiply per pair of limbs.  `out` must hold at least
 /// `a.len() + b.len()` words.
-fn mul_words_into(a: &[u64], b: &[u64], out: &mut [u64]) {
+pub(crate) fn mul_words_into(a: &[u64], b: &[u64], out: &mut [u64]) {
     debug_assert!(out.len() >= a.len() + b.len());
     #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
     if has_hw_clmul() {
@@ -1504,7 +1504,7 @@ unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
 /// Every NIST and SECG field satisfies `m − deg r ≥ 64`.  The toy fields
 /// (`m = 8, 16`) and dense tails do not, and take [`reduce_chunked`].
 /// Both are tested against the bit-at-a-time `reduce_bitwise`.
-fn reduce_words(value: &mut [u64], irreducible: &IrreduciblePoly) {
+pub(crate) fn reduce_words(value: &mut [u64], irreducible: &IrreduciblePoly) {
     let m = irreducible.degree as usize;
     let terms = &irreducible.low_terms;
     let t_max = terms.iter().copied().max().unwrap_or(0) as usize;

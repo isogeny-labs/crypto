@@ -715,7 +715,13 @@ fn rho(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens) ->
 ///
 /// Round-4 audit: `BATCH = 64` was bit-exact on walk length but regressed
 /// ~3–4× ns/op on Apple Silicon (DP `HashMap` working set dominates the
-/// saved inversions). Kept at 16 pending a denser DP table.
+/// saved inversions). Kept at 16.
+///
+/// Round-5: flat SoA/`DenseDp` linear tables were bit-exact on median iters
+/// but measured ~2% slower ALL ns/op at `BATCH = 16`, and `BATCH = 64` still
+/// ~3.6× ns/op worse. `HashMap` + `BATCH = 16` stays on the measured frontier
+/// pending a cache-friendly shared DP representation that does not enlarge
+/// the per-walker working set.
 fn rho_batch_jobs<'arm, FInst>(
     f: &Fp,
     jobs: &[(usize, u64)],

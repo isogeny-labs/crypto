@@ -340,14 +340,14 @@ pub struct FixedMul {
 
 impl FixedMul {
     #[inline]
-    fn new(w: u64, m: u64) -> Self {
+    pub(crate) fn new(w: u64, m: u64) -> Self {
         debug_assert!(w < m, "a fixed multiplier must be reduced");
         let ws = (m >> U64_MODULUS_BITS == 0).then(|| (((w as u128) << 64) / m as u128) as u64);
         Self { w, ws }
     }
 
     #[inline]
-    fn mul(self, t: u64, m: u64) -> u64 {
+    pub(crate) fn mul(self, t: u64, m: u64) -> u64 {
         match self.ws {
             Some(ws) => mulmod_shoup(self.w, ws, t, m),
             None => mulmod(self.w, t, m),
@@ -358,7 +358,7 @@ impl FixedMul {
     /// with the subtraction as a conditional move too
     /// (`a − p + m ∈ [1, 2m)` for residues `a`, `p`).
     #[inline]
-    fn sub_from(self, a: u64, t: u64, m: u64) -> u64 {
+    pub(crate) fn sub_from(self, a: u64, t: u64, m: u64) -> u64 {
         match self.ws {
             Some(ws) => fold_once(
                 a.wrapping_sub(mulmod_shoup(self.w, ws, t, m))
@@ -3408,6 +3408,15 @@ pub struct SparseSolveReport {
     /// Columns recovered by back-substitution, propagation and the
     /// residual dense solve after the core.
     pub reconstructed_columns: usize,
+    /// Multiply-subtracts on a matrix entry over the whole solve, in the
+    /// unit the incremental plug-ins report as `row_ops`: the filter's
+    /// merges, the folding, the sparse products of every Krylov run that
+    /// returned (`non-zeros × lanes`, the homogenising column included),
+    /// the core and final checks and the reconstruction.  The `block × block`
+    /// arithmetic of the approximant basis or the Lanczos recurrences is not
+    /// counted, as the dense plug-in does not count its column scans.
+    #[serde(default, skip_serializing_if = "is_default")]
+    pub row_ops: u64,
 }
 
 /// Outcome of [`solve_sparse_system`].

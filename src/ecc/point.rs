@@ -190,6 +190,87 @@ impl Point {
         self.scalar_mul(k, a)
     }
 
+    /// `k·self + l·other` in **variable time**, for public points and
+    /// scalars: exactly `self.scalar_mul_vartime(k, a)` plus
+    /// `other.scalar_mul_vartime(l, a)`.
+    ///
+    /// When `p` fits a word the sum is one interleaved (Shamir) pass in
+    /// Jacobian coordinates with `self + other` precomputed, about
+    /// `max(bits)` doublings and three quarters as many mixed additions,
+    /// and a single inversion for the whole sum; the two ladders and the
+    /// final addition cost three.  Above one word the same pass runs on
+    /// `BigUint` Jacobian points; an identity operand falls back to the two
+    /// ladders and an addition.
+    pub fn double_scalar_mul_vartime(
+        &self,
+        k: &BigUint,
+        other: &Point,
+        l: &BigUint,
+        a: &FieldElement,
+    ) -> Point {
+        if let (Point::Affine { x: x1, y: y1 }, Point::Affine { x: x2, y: y2 }) = (self, other) {
+            let m = &x1.modulus;
+            if let Some(w) = Word::of(m) {
+                if let Some([x1, y1, x2, y2, a]) = w.get([x1, y1, x2, y2, a]) {
+                    let both = w.affine_add((x1, y1), (x2, y2), a);
+                    let mut acc: Option<WordJacobian> = None;
+                    for i in (0..k.bits().max(l.bits())).rev() {
+                        if let Some(j) = acc {
+                            acc = w.jacobian_double(j, a);
+                        }
+                        let add = match (k.bit(i), l.bit(i)) {
+                            (true, true) => both,
+                            (true, false) => Some((x1, y1)),
+                            (false, true) => Some((x2, y2)),
+                            (false, false) => None,
+                        };
+                        if let Some(p) = add {
+                            acc = match acc {
+                                None => Some(WordJacobian {
+                                    x: p.0,
+                                    y: p.1,
+                                    z: 1,
+                                }),
+                                Some(j) => w.jacobian_add_affine(j, p, a),
+                            };
+                        }
+                    }
+                    return w.point(acc.map(|j| w.jacobian_to_affine(j)), m);
+                }
+            }
+            // Above one word: the same interleaved pass on `BigUint` Jacobian
+            // points, one inversion for the whole sum.
+            let both = self.add_vartime(other, a);
+            let mut acc: Option<Jacobian> = None;
+            for i in (0..k.bits().max(l.bits())).rev() {
+                if let Some(j) = &acc {
+                    acc = j.double(a);
+                }
+                let add = match (k.bit(i), l.bit(i)) {
+                    (true, true) => match &both {
+                        Point::Affine { x, y } => Some((x, y)),
+                        Point::Infinity => None,
+                    },
+                    (true, false) => Some((x1, y1)),
+                    (false, true) => Some((x2, y2)),
+                    (false, false) => None,
+                };
+                if let Some((x, y)) = add {
+                    acc = match &acc {
+                        None => Some(Jacobian::from_affine(x, y)),
+                        Some(j) => j.add_affine(x, y, a),
+                    };
+                }
+            }
+            return match acc {
+                None => Point::Infinity,
+                Some(j) => j.to_affine(),
+            };
+        }
+        self.scalar_mul_vartime(k, a)
+            .add_vartime(&other.scalar_mul_vartime(l, a), a)
+    }
+
     /// The least `k < bound` with `k·self = target`, trying
     /// `k = 0, 1, 2, …` in turn — a linear discrete-log search, as in a
     /// Pohlig–Hellman digit — or `None` if there is none below `bound`.
@@ -919,6 +1000,56 @@ mod tests {
                 assert_eq!(p.add_vartime(&q.neg(), &a), p.add(&q.neg(), &a));
             }
         }
+    }
+
+    /// Shamir `k·P + l·Q` matches two independent vartime ladders + add
+    /// on a small curve, a word-edge curve, and P-256.
+    #[test]
+    fn double_scalar_mul_vartime_matches_two_ladders() {
+        let (points, a) = f97_points();
+        let order = points.len() as u32;
+        for (i, p) in points.iter().enumerate() {
+            let q = &points[(i * 5 + 1) % points.len()];
+            for k in 0..(order + 2) {
+                for l in 0..(order + 2) {
+                    let kk = BigUint::from(k);
+                    let ll = BigUint::from(l);
+                    let shamir = p.double_scalar_mul_vartime(&kk, q, &ll, &a);
+                    let two = p
+                        .scalar_mul_vartime(&kk, &a)
+                        .add_vartime(&q.scalar_mul_vartime(&ll, &a), &a);
+                    assert_eq!(shamir, two, "f97 k={k} l={l}");
+                }
+            }
+        }
+        let (g, a) = word_edge_curve();
+        let h = g.scalar_mul_vartime(&BigUint::from(7u32), &a);
+        let mut k = BigUint::from(1u32);
+        let mut l = BigUint::from(3u32);
+        for _ in 0..40 {
+            let shamir = g.double_scalar_mul_vartime(&k, &h, &l, &a);
+            let two = g
+                .scalar_mul_vartime(&k, &a)
+                .add_vartime(&h.scalar_mul_vartime(&l, &a), &a);
+            assert_eq!(shamir, two, "word-edge k={k} l={l}");
+            k = &k * 3u32 + 1u32;
+            l = &l * 5u32 + 2u32;
+        }
+        let curve = crate::ecc::curve::CurveParams::p256();
+        let a = curve.a_fe();
+        let g = curve.generator();
+        let q = g.scalar_mul_vartime(&BigUint::from(0x1111_2222_3333_4444u64), &a);
+        let k = BigUint::from(0xfeed_beef_dead_f00du64).pow(2);
+        let l = BigUint::from(0xcafe_babe_u64).pow(3);
+        let shamir = g.double_scalar_mul_vartime(&k, &q, &l, &a);
+        let two = g
+            .scalar_mul_vartime(&k, &a)
+            .add_vartime(&q.scalar_mul_vartime(&l, &a), &a);
+        assert_eq!(shamir, two);
+        assert_eq!(
+            g.double_scalar_mul_vartime(&curve.n, &q, &BigUint::from(0u32), &a),
+            Point::Infinity
+        );
     }
 
     /// `scalar_mul_vartime` is `scalar_mul`: every point and scalar up to
