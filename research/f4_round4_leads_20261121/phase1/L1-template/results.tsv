@@ -1,0 +1,12 @@
+run	command	key numbers	source
+dlp full nt	jv_cover --exp dlp --sizes 53 --seeds 1 --rho-runs 0 --threads 1	C_cov 9.397e5; 19065 F4 runs; sum rows 19,384,584; restarts 0	dlp_nt.out, census2.py dlp_nt.err
+dlp full trace	same + --trace	C_cov 1.173e6 (+24.8%); 15870 replayed 3142 mismatches; sum rows 32,226,433 (+66%); 17631 runs restart at degree 2	dlp_tr.out, census2.py dlp_tr.err
+dlp stop64 nt	--stop 64	C_cov 9.024e5; sum rows 15,966,657	dlp_64_nt.out
+dlp stop64 trace	--stop 64 --trace	C_cov 5.689e5 (-37%); 15870 replayed 3142 mismatches; sum rows 14,641,826; restarts 1403	dlp_64_tr.out
+dlp hilbert nt	--stop hilbert	C_cov 3.621e5; 38130 F4 runs (lead check + main); 1,433,704 steps	dlp_hilbert_nt.out
+dlp hilbert trace	--stop hilbert --trace	C_cov 1.173e6 = identical to full+trace (Hilbert bypassed by f4_record/f4_replay)	dlp_hilbert_tr.out
+ccov400 f4/test	--exp ccov --residuals 400 --constructed 4 --oracle-base 0	full 7.279e5; full+trace 9.735e5; stop64 6.921e5; stop64+trace 3.609e5; hilbert 1.506e5	ccov_modes.txt
+callgrind ccov100 F4 Ir	toggle-collect f4_with_arithmetic	stop64 1.050G; stop64+trace 0.856G (-18.5%); hilbert 1.933G (symbolic incl 1.195G = 61.8%, rref32_deferred incl 0.122G = 6.3%)	cg_s64_nt.cg cg_s64_tr.cg cg_hil.cg
+shape census full nt	census2.py / census.py	growth-key 11 distinct, top 95.5%, 3 cover 99.6%; dims-key 249 distinct, top 64.2%, 10 cover 90%, 96 cover 99%	dlp_nt.err
+shape census hilbert main	census3.py	growth-key 61 distinct, top 85.0%, 8 cover 97.1%; dims-key 14817 distinct (top 1.7%)	dlp_hilbert_nt.err
+support spread	union.py	top group: p95/mean rows*cols 1.004-1.012; max/mean 1.29-1.60	dlp_*_nt.err

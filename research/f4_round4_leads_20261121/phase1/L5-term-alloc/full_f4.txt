@@ -1,0 +1,8 @@
+F4 self-weighted total (main+worker): 1.769e+09
+  memset            7646068   0.43%
+  memcpy            8586061   0.49%
+  jemalloc        134068987   7.58%
+  rust shims       14670703   0.83%
+  RawVec grow       6057110   0.34%
+  sum 171028930 9.67%
+F4 alloc calls (main+worker): {'alloc': 941500, 'dealloc': 771182, 'zalloc': 36223, 'realloc': 71348} per call {'alloc': 9053, 'dealloc': 7415, 'zalloc': 348, 'realloc': 686}
