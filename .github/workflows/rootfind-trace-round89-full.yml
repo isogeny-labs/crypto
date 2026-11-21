@@ -44,6 +44,14 @@ jobs:
         run: |
           set -euo pipefail
           python3 research/amm_digit_perf_20261118/round89_full_ab.py
+      - name: Isolate round93 producer division against frozen round92
+        shell: bash
+        env:
+          ROOTFIND_BASELINE_REF: e5627625ea6aff183dec5ec64f371ad8dd7b3c9d
+          ROOTFIND_AB_OUTPUT: research/amm_digit_perf_20261118/round93_incremental_ab_results.csv
+        run: |
+          set -euo pipefail
+          python3 research/amm_digit_perf_20261118/round89_full_ab.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -52,3 +60,4 @@ jobs:
             research/amm_digit_perf_20261118/round89_full_ab_results.csv
             research/amm_digit_perf_20261118/round90_replay_ab_results.csv
             research/amm_digit_perf_20261118/round91_ab_results.csv
+            research/amm_digit_perf_20261118/round93_incremental_ab_results.csv
