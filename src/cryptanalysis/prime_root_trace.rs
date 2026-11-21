@@ -406,7 +406,14 @@ impl Engine<'_> {
         while exponent != 0 {
             if exponent & 1 == 1 {
                 let product = self.mul(&acc, &b)?;
-                acc = self.div(&product, modulus)?.1;
+                // If the product degree is below the modulus degree, its
+                // remainder is already the product. Avoid allocating a
+                // quotient and emitting a redundant Division event.
+                acc = if product.len() < modulus.len() {
+                    product
+                } else {
+                    self.div(&product, modulus)?.1
+                };
             }
             // Round 92: the final modular square is never consumed after
             // the exponent becomes zero. Save one traced multiplication and
@@ -416,7 +423,11 @@ impl Engine<'_> {
             exponent >>= 1;
             if exponent != 0 {
                 let product = self.mul(&b, &b)?;
-                b = self.div(&product, modulus)?.1;
+                b = if product.len() < modulus.len() {
+                    product
+                } else {
+                    self.div(&product, modulus)?.1
+                };
             }
             self.event(RootEvent::PowerStep {
                 id,
@@ -450,10 +461,14 @@ impl Engine<'_> {
             a = b;
             b = r;
         }
+        // A monic Euclidean result is already normalized. Avoid the
+        // otherwise redundant inverse ceremony and coefficient multiplies.
         if let Some(&lead) = a.last() {
-            let inv = self.inv(lead)?;
-            for c in &mut a {
-                *c = self.field(FieldOp::Mul, *c, inv)?;
+            if lead != 1 {
+                let inv = self.inv(lead)?;
+                for c in &mut a {
+                    *c = self.field(FieldOp::Mul, *c, inv)?;
+                }
             }
         }
         self.event(RootEvent::GcdEnd {
@@ -491,9 +506,15 @@ impl Engine<'_> {
             match h.len() {
                 0 | 1 => {}
                 2 => {
-                    let inv = self.inv(h[1])?;
-                    let product = self.field(FieldOp::Mul, h[0], inv)?;
-                    let root = self.field(FieldOp::Sub, 0, product)?;
+                    // Splitting a monic polynomial leaves monic linear
+                    // factors; their root is simply -constant (mod p).
+                    let negated_constant = if h[1] == 1 {
+                        h[0]
+                    } else {
+                        let inv = self.inv(h[1])?;
+                        self.field(FieldOp::Mul, h[0], inv)?
+                    };
+                    let root = self.field(FieldOp::Sub, 0, negated_constant)?;
                     self.event(RootEvent::LinearRoot {
                         polynomial: h,
                         root,
@@ -1938,6 +1959,60 @@ mod round89_column_accumulators {
                 assert!(report.complete(), "incomplete p={p} poly={polynomial:?}");
                 verify(&report).unwrap();
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod round94_noop_reductions {
+    use super::*;
+
+    #[test]
+    fn monic_roots_and_power_shortcuts_preserve_independent_certificates() {
+        let limits = RootLimits {
+            field_work: MAX_WORK,
+            split_attempts: 1000,
+            events: MAX_EVENTS,
+            degree: MAX_DEGREE,
+        };
+        for p in [7u64, 13, 65_521, 1_000_000_007, MAX_PRIME] {
+            let linear = vec![p - 3, 1];
+            let quadratic = vproduct(&linear, &[p - 5, 1], p);
+            for (polynomial, expected) in [
+                (linear, vec![3]),
+                (quadratic, vec![3, 5]),
+            ] {
+                for seed in [7u64, 19u64] {
+                    let report = solve(&polynomial, p, seed, limits.clone(),
+                        &mut |_| Ok(())).unwrap();
+                    assert!(report.complete(),
+                        "p={p} seed={seed} stop={:?}", report.stop);
+                    verify(&report).unwrap();
+                    assert_eq!(report.roots, expected,
+                        "p={p} seed={seed} polynomial={polynomial:?}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn short_modular_power_products_need_no_division_events() {
+        let limits = RootLimits {
+            field_work: MAX_WORK,
+            split_attempts: 1000,
+            events: MAX_EVENTS,
+            degree: MAX_DEGREE,
+        };
+        // For degree-eight moduli, the first several binary powering
+        // products have smaller degree than the modulus and need no
+        // polynomial reduction. The verifier independently recomputes them.
+        for p in [13u64, 65_521] {
+            let polynomial = vec![1, 1, 0, 0, 0, 0, 0, 0, 1];
+            let report = solve(&polynomial, p, 11, limits.clone(),
+                &mut |_| Ok(())).unwrap();
+            verify(&report).unwrap();
+            assert!(report.events.iter().any(|event|
+                matches!(event, RootEvent::PowerBegin { .. })));
         }
     }
 }
