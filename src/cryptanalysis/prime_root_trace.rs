@@ -1127,10 +1127,29 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
 #[inline]
 fn vpower_reduce(product: Vec<u64>, modulus: &[u64], p: u64) -> Result<Vec<u64>, String> {
     if !modulus.is_empty() && product.len() < modulus.len() {
-        Ok(product)
-    } else {
-        Ok(vdiv(&product, modulus, p)?.1)
+        return Ok(product);
     }
+    // The normalized modulus is monic. Modular powering and replay need
+    // the remainder only: avoid allocating a quotient for every reduction.
+    // Preserve the existing synthetic linear/quadratic division fast paths.
+    if modulus.len() >= 4 && modulus.last() == Some(&1) {
+        let degree = modulus.len() - 1;
+        let mut remainder = product;
+        for shift in (0..remainder.len() - degree).rev() {
+            let high = remainder[shift + degree];
+            if high == 0 { continue; }
+            remainder[shift + degree] = 0;
+            for (i, &coefficient) in modulus[..degree].iter().enumerate() {
+                if coefficient == 0 { continue; }
+                let term = vmul(high, coefficient, p);
+                let old = remainder[shift + i];
+                remainder[shift + i] = if old >= term { old - term } else { old + p - term };
+            }
+        }
+        remainder.truncate(degree);
+        return Ok(trim(remainder));
+    }
+    Ok(vdiv(&product, modulus, p)?.1)
 }
 fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, String> {
     // F_p[x] / (c + d*x) is F_p. Reduce the base by Horner evaluation at
@@ -2183,6 +2202,38 @@ mod round94_noop_reductions {
             verify(&report).unwrap();
             assert!(report.events.iter().any(|event|
                 matches!(event, RootEvent::PowerBegin { .. })));
+        }
+    }
+}
+
+#[cfg(test)]
+mod round97_remainder_tests {
+    use super::*;
+    #[test]
+    fn round97_quotient_free_power_reduction_matches_division_remainder() {
+        let mut seed=0x97f0_2026_1121_0001u64;
+        for p in [65_521u64, 1_000_000_007, MAX_PRIME] {
+            for degree in [3usize,4,8] {
+                for case in 0..1536 {
+                    let mut modulus=vec![0u64;degree+1];
+                    for c in &mut modulus[..degree] {
+                        seed=seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                        *c=seed%p;
+                    }
+                    modulus[degree]=1;
+                    if case%4==0 { for c in &mut modulus[1..degree] { *c=0; } }
+                    if case%4==1 { for c in &mut modulus[..degree] { *c=0; } }
+                    let mut product=vec![0u64;case%(2*degree+3)];
+                    for c in &mut product {
+                        seed=seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                        *c=seed%p;
+                    }
+                    if case%5==0 && !product.is_empty() { *product.last_mut().unwrap()=0; }
+                    let expected=vdiv(&product,&modulus,p).unwrap().1;
+                    let actual=vpower_reduce(product,&modulus,p).unwrap();
+                    assert_eq!(actual,expected,"p={p} degree={degree} case={case}");
+                }
+            }
         }
     }
 }
