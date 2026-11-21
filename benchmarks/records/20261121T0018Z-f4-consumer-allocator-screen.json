@@ -39,6 +39,19 @@
       "exit": 0,
       "started_utc": "2026-11-21T00:33:45+00:00",
       "wall_s": 109.875
+    },
+    {
+      "argv": [
+        "research/f4_alloc_round3_20261121/scripts/quartic_shipped.sh",
+        "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/base/jv_quartic",
+        "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/new3/jv_quartic",
+        "4",
+        "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/qship"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-21T01:08:55+00:00",
+      "wall_s": 62.11
     }
   ],
   "commit": "7f3bbb4efc1393775078379a40b1e68bc606f349",
@@ -54,9 +67,120 @@
     "platform": "Linux-6.18.44-fc-v726-x86_64-with-glibc2.39"
   },
   "id": "20261121T0018Z-f4-consumer-allocator-screen",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 4,
+      "name": "jv_quartic_cprime_wall_glibc_over_jemalloc",
+      "note": "LD_PRELOAD jemalloc; median wall ~9.1 s / ~6.5 s; 4/4 rounds; identical F4 multiplications and relations",
+      "reference": 1.0,
+      "reference_kind": "baseline",
+      "spread": [
+        1.385,
+        1.427
+      ],
+      "unit": "ratio",
+      "value": 1.4
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 4,
+      "name": "jv_quintic_weierstrass_wall_glibc_over_jemalloc",
+      "note": "jemalloc slower 0/4; system time 3.1 s vs 0.85 s; MALLOC_CONF decay -1 and oversize_threshold:0 did not remove it (data/quintic_conf)",
+      "reference": 1.0,
+      "reference_kind": "baseline",
+      "spread": [
+        0.878,
+        0.965
+      ],
+      "unit": "ratio",
+      "value": 0.94
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 4,
+      "name": "jv_quartic_cprime_wall_main_over_shipped",
+      "note": "main binary (glibc) vs this branch (jemalloc built in + f4_fp changes); 4/4; identical work",
+      "reference": 1.0,
+      "reference_kind": "baseline",
+      "spread": [
+        1.441,
+        1.455
+      ],
+      "unit": "ratio",
+      "value": 1.45
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 4,
+      "name": "jv_quartic_wall_main_over_shipped",
+      "note": "main binary (glibc) vs this branch (jemalloc built in + f4_fp changes); 4/4; identical work",
+      "reference": 1.0,
+      "reference_kind": "baseline",
+      "spread": [
+        1.441,
+        1.455
+      ],
+      "unit": "ratio",
+      "value": 1.45
+    }
+  ],
   "problem": "kernel:f4_fp",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 2800,
+      "path": "research/f4_alloc_round3_20261121/data/screen/runs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/46/46a7c9619ceee7a012c8d323be99b245c1598ec116d443c09839596c6521c766",
+      "sha256": "46a7c9619ceee7a012c8d323be99b245c1598ec116d443c09839596c6521c766",
+      "uploaded": false
+    },
+    {
+      "bytes": 2713,
+      "path": "research/f4_alloc_round3_20261121/data/quintic_conf/runs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fa/fab787d61cbfde733746f1d5afa57012b49d3c9d14a6f1e453195b4d094a2a2c",
+      "sha256": "fab787d61cbfde733746f1d5afa57012b49d3c9d14a6f1e453195b4d094a2a2c",
+      "uploaded": false
+    },
+    {
+      "bytes": 1146,
+      "path": "research/f4_alloc_round3_20261121/data/quartic_shipped/runs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/14/145da80faeba84a734644eec134b7b7b52640dca4ef24a162c9cfe96c47f498d",
+      "sha256": "145da80faeba84a734644eec134b7b7b52640dca4ef24a162c9cfe96c47f498d",
+      "uploaded": false
+    },
+    {
+      "bytes": 1420,
+      "path": "research/f4_alloc_round3_20261121/scripts/consumer_screen.sh",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a4/a4700fe0b09906d431a9c05fe003ad837724492664049cc3af93947059f75422",
+      "sha256": "a4700fe0b09906d431a9c05fe003ad837724492664049cc3af93947059f75422",
+      "uploaded": false
+    },
+    {
+      "bytes": 1335,
+      "path": "research/f4_alloc_round3_20261121/scripts/quintic_conf.sh",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2e/2e1ad9b6e41e5cc1fab12177236b25d8a388c651d6ea6c97e08740cdcfb10619",
+      "sha256": "2e1ad9b6e41e5cc1fab12177236b25d8a388c651d6ea6c97e08740cdcfb10619",
+      "uploaded": false
+    },
+    {
+      "bytes": 807,
+      "path": "research/f4_alloc_round3_20261121/scripts/quartic_shipped.sh",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/78/78209d27b40faf45684bdeb8c26d1a63d46492f22a7b56c7ea7f871585b4486c",
+      "sha256": "78209d27b40faf45684bdeb8c26d1a63d46492f22a7b56c7ea7f871585b4486c",
+      "uploaded": false
+    },
+    {
+      "bytes": 809,
+      "path": "research/f4_alloc_round3_20261121/data/binaries.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/73/7324812caa24edd004accbe91a31e26d049265bb1961ff9df6e640e0b77eb299",
+      "sha256": "7324812caa24edd004accbe91a31e26d049265bb1961ff9df6e640e0b77eb299",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
     "pdf": null,

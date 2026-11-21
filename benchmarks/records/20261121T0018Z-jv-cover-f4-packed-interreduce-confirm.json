@@ -1,7 +1,21 @@
 {
   "branch": "claude/funny-brown-735uvs",
   "closed_utc": null,
-  "commands": [],
+  "commands": [
+    {
+      "argv": [
+        "research/f4_alloc_round3_20261121/scripts/jv_confirm.sh",
+        "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/base/jv_cover",
+        "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/new3/jv_cover",
+        "12",
+        "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/confirm"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-21T01:00:34+00:00",
+      "wall_s": 481.066
+    }
+  ],
   "commit": "7f3bbb4efc1393775078379a40b1e68bc606f349",
   "commit_dirty": true,
   "created_utc": "2026-11-21T00:18:35+00:00",
@@ -15,9 +29,85 @@
     "platform": "Linux-6.18.44-fc-v726-x86_64-with-glibc2.39"
   },
   "id": "20261121T0018Z-jv-cover-f4-packed-interreduce-confirm",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 12,
+      "name": "jv_dlp53_wall_b0_over_b1",
+      "note": "pre-registered band [1.02,1.10] met; 11/12 rounds; median 13.93 s -> 12.86 s; A/A median 1.0045, median |dev| 0.8%; identical work in 36 runs",
+      "reference": 1.0,
+      "reference_kind": "baseline",
+      "spread": [
+        0.99,
+        1.098
+      ],
+      "unit": "ratio",
+      "value": 1.09
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 12,
+      "name": "jv_dlp53_cpu_b0_over_b1",
+      "note": "user+system; 11/12; 52.6 s -> 48.4 s",
+      "reference": 1.0,
+      "reference_kind": "baseline",
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.091
+    },
+    {
+      "baseline": 1316805419.0,
+      "better": "lower",
+      "n": 1,
+      "name": "f4_callgrind_ir_ccov53",
+      "note": "F4-only callgrind, 104 Nagao tests, 1 thread; -13.6%; whole program 3.506 G -> 3.331 G; output identical",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ir",
+      "value": 1137381291.0
+    }
+  ],
   "problem": "kernel:f4_fp",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 5046,
+      "path": "research/f4_alloc_round3_20261121/data/confirm/runs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5a/5a9f25e9a65323319f63b78ab2335a9b24a86b32647b1de6914f3430e7da1419",
+      "sha256": "5a9f25e9a65323319f63b78ab2335a9b24a86b32647b1de6914f3430e7da1419",
+      "uploaded": false
+    },
+    {
+      "bytes": 755,
+      "path": "research/f4_alloc_round3_20261121/scripts/jv_confirm.sh",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/10/10f6d54e51bffdb9e0713c2832b2af03ea9d45fd38e033388dcc7a937de54def",
+      "sha256": "10f6d54e51bffdb9e0713c2832b2af03ea9d45fd38e033388dcc7a937de54def",
+      "uploaded": false
+    },
+    {
+      "bytes": 2313,
+      "path": "research/f4_alloc_round3_20261121/CONFIRM_PROTOCOL.md",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c3/c3088587bf02e82d381518569e87018ab7c9d8de2de9293f9c95f8e9d706defa",
+      "sha256": "c3088587bf02e82d381518569e87018ab7c9d8de2de9293f9c95f8e9d706defa",
+      "uploaded": false
+    },
+    {
+      "bytes": 721,
+      "path": "research/f4_alloc_round3_20261121/data/callgrind/instructions.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5a/5acb74e1363873b8b614ba5be089a1542d2a819375493b8643a5097f00595b48",
+      "sha256": "5acb74e1363873b8b614ba5be089a1542d2a819375493b8643a5097f00595b48",
+      "uploaded": false
+    },
+    {
+      "bytes": 809,
+      "path": "research/f4_alloc_round3_20261121/data/binaries.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/73/7324812caa24edd004accbe91a31e26d049265bb1961ff9df6e640e0b77eb299",
+      "sha256": "7324812caa24edd004accbe91a31e26d049265bb1961ff9df6e640e0b77eb299",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
     "pdf": null,
