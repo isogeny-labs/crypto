@@ -173,7 +173,7 @@ rec B01 $? "exit 3, no create" "exit $rc, creates $(creates)" "a pkm-x- pod is l
 ID=B02; mksb; study_ready; echo '{"availability":"NONE","id":"cpu5m","price":{"securePerVcpu":0.065,"serverlessPerVcpu":0},"ramGbPerVcpu":8,"vcpu":{"max":32,"min":2}}' > "$ST/catalog.json"
 rc=$(run ./run.sh $BASE $STG); [ "$rc" = 10 ] && [ "$(creates)" = 0 ] && [ ! -d "$R/receipts/$BASE" ]
 rec B02 $? "exit 10, no create, no receipts dir" "exit $rc, creates $(creates), dir $([ -d "$R/receipts/$BASE" ] && echo yes || echo no)" "catalog availability NONE for cpu5m at 16 vCPU: no attempt"
-ID=B03; mksb; study_ready; echo '{"availability":"HIGH","id":"cpu5m","price":{"securePerVcpu":0.066,"serverlessPerVcpu":0},"ramGbPerVcpu":8,"vcpu":{"max":32,"min":2}}' > "$ST/catalog.json"
+ID=B03; mksb; study_ready; echo '{"availability":"HIGH","dataCenters":[{"availability":"HIGH","id":"EUR-IS-1"}],"id":"cpu5m","price":{"securePerVcpu":0.066,"serverlessPerVcpu":0},"ramGbPerVcpu":8,"vcpu":{"max":32,"min":2}}' > "$ST/catalog.json"
 rc=$(run ./run.sh $BASE $STG); [ "$rc" = 3 ] && [ "$(creates)" = 0 ] && grep -q 'cost guard' "$OUTD/B03.txt"
 rec B03 $? "exit 3 (per-job guard), no create" "exit $rc, creates $(creates)" "price 0.066 x 32 = 2.112/h x 30.8 h = US\$65.05 > US\$65"
 ID=B04; mksb; study_ready; printf 'test-row/x\ttest\ttest\tclosed\t30.9400\ttest\n' >> "$R/ledger.tsv"

@@ -81,14 +81,22 @@ The reading uses the row's `inconsistent`, `oversize`, `timed_out` and `degree_r
 |:--|:--|
 | ADMITTED, `inconsistent true` (refutes at cap 7) | `d_F = 7` |
 | ADMITTED, degree 7 completed: `inconsistent false`, `oversize false`, `timed_out false`, `degree_reached 7` | `d_F >= 8` (projected out of reach, section 7) |
-| ADMITTED, `oversize true` at 54·10⁹ with stop line `oversize`; or class OOM (section 4.2) | censored at the new size; `d_F >= 7` stands |
-| ADMITTED, `oversize false`, `timed_out true`, stop line `budget`; or class LIMIT | censored; `d_F >= 7` stands |
+| ADMITTED, `oversize true` at 54·10⁹ and no contrary stop line; or class OOM (section 4.2) | censored at the new size; `d_F >= 7` stands |
+| ADMITTED, `oversize false`, `timed_out true` and no contrary stop line (a deadline caught at the top of the step loop prints none, `f4_fp_tower.rs:2435-2438`); or class LIMIT | censored; `d_F >= 7` stands |
 | ADMITTED but no case above (for example the row and the stop line disagree) | no reading; owner |
 | LOST, ABORTED, NO_EVIDENCE, NOT_ADMITTED, NOT_AN_ATTEMPT | no row (section 4) |
 
 A draw-0 `d_F = 7` with draw 1 not run reads "undecided at `t = 14`" under Amendment 7 D.5, which needs both draws. No
 further bracket step follows from this amendment; cap 8 is not registered (its first degree-8 step alone is projected at
 3.6 to 15 TiB, `t14_bigmem/MEMORY.md` section 4).
+
+- **Decomposable draws (Amendment 7 C).** The reading table does not read the grid-zeros output. For this system the
+  certificate already exists: the 2026-11-17 snapshot records grid zeros 0 for `t = 14` draw 0 (`results/SNAPSHOT_20261117/
+  README.md`; the `-m112` tree's `X-m2-t14-k0-c7.gridzeros.jsonl` holds `{"decomposable":false,"grid_zeros":0}`, review 4
+  S5), and the run's own gridzeros line is checked by admission rule 3.
+- **The relaunch is nearly vacuous (review 4 S6).** `-r1` passes the US$595 guard only if the ledger, with the base
+  attempt's actual cost, leaves room for another 64.06: 595 − 64.06 − 503.19 = US$27.75, a base pod life of at most about
+  13 h. A loss later than that sends the cell to the owner in practice.
 
 ## 2. What changes
 
@@ -98,8 +106,10 @@ further bracket step follows from this amendment; cap 8 is not registered (its f
    `python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b`, 20 GB disk, cloud tier
    `SECURE` [pcc:unverified]. RunPod REST v2 has no interruptible or spot field for pods, so such a pod is on-demand.
    `cpu3m` also has 256 GB at 32 vCPU, on CPUs no study file records; it is not a fallback (it would be a second
-   deviation and could put the two draws on different generations, `t14_bigmem/HOSTS.md` section 2). If `cpu5m` at
-   32 vCPU shows no stock, `run.sh` exits 10 without creating anything and the owner decides. The 32 vCPUs are bought
+   deviation and could put the two draws on different generations, `t14_bigmem/HOSTS.md` section 2). If the catalog
+   shows `cpu5m` at 32 vCPU with availability `NONE` or an empty `dataCenters` list (as at 20:45Z), `run.sh` exits 10
+   without creating anything and the owner decides; if the catalog shows stock but the create fails, the run exits 4
+   with no pod and no cost (review 4 M5e). The 32 vCPUs are bought
    for memory (RunPod sells 8 GB per vCPU); with 12 rayon threads the other 20 do no F4 work. The create body (REST v2,
    main's `runpod/rp.sh` shape): `{name, cloud: "SECURE", cpu: {id: "cpu5m", vcpuCount: 32}, image, disk: 20, ports,
    env: {RUNNER_TOKEN}, entrypoint: ["bash", "-c"], cmd: [<boot script>]}`.
@@ -111,12 +121,20 @@ further bracket step follows from this amendment; cap 8 is not registered (its f
      (exit 4). v1 to v2 field mapping: `V2_FIELDS.md`.
    - **The pod's cgroup memory limit is read before start (S4).** The boot loop copies the cgroup files into
      `/results/cgroup/` before anything else exists there; `run.sh` fetches that tree once before `/start` and records
-     the limit in `cgroup-prestart.json`. **It must be `max` or at least 256,000,000,000 bytes (238.42 GiB)**: the
-     `B'` cap 4 × 54·10⁹ = 216·10⁹ bytes (201.17 GiB) plus the design's 36 GiB headroom (basis up to 24 GiB, residue
-     echelon 4.7 GiB, remainder 1 GiB, about 5 GiB margin) and 1.25 GiB more; the design's worst-case process peak
-     under the cap is 230.9 GiB, 7.5 GiB below it (`t14_bigmem/MEMORY.md` sections 3 and 5). The 128 GB smoke pods
-     showed `memory.max` 128,000,000,000, and the 256 GB pods of Amendment 31 reported `memory_bytes 256000000000`.
-     Otherwise, or with no limit file, the pod is deleted before start (NOT_AN_ATTEMPT; owner).
+     the limit in `cgroup-prestart.json`. **For the study names it must be at least 256,000,000,000 bytes
+     (238.42 GiB); `max` is accepted only for development names** (review 4 S3; smoke3 showed exactly 256,000,000,000):
+     the `B'` cap 4 × 54·10⁹ = 216·10⁹ bytes (201.17 GiB) plus the design's 36 GiB headroom (basis up to 24 GiB, residue
+     echelon 4.7 GiB, remainder 1 GiB, about 5 GiB margin) and 1.25 GiB more. Otherwise, or with no limit file, the pod
+     is deleted before start (NOT_AN_ATTEMPT; owner).
+   - **The design's 230.9 GiB is a projection of the process peak under stated assumptions, not a bound**
+     (`t14_bigmem/MEMORY.md` sections 3 and 5; review 4 M5d). It assumes a basis of at most 24 GiB and the echelon of a
+     step with `nq` at most 50,256, and leaves out kernel page tables charged to the cgroup (about 0.45 GiB), allocator
+     page rounding per `B'` row (about 1.3 GiB at 686k rows) and a later step with a larger `nq` (a near-full echelon
+     at `nq` = 83k is about 12.8 GiB); any of these with a 24 GiB basis can use up the 7.5 GiB between it and the
+     limit. A peak above the limit reads as an OOM, censored, the same reading as an `oversize` stop: the risk is spend
+     and classification clarity, not a wrong reading. The boot loop and `cgroup-prestart.json` also record
+     `memory.oom.group`, `memory.swap.max` and `vm.max_map_count` (review 4 S1; recorded only, no rule reads them;
+     section 4.2 says how a group OOM or an allocation abort is classified).
 2. **Threads (S13).** `rayon 12` on a pod whose affinity gives `nproc 32`. `muladds` does not depend on the pod
    (the F4 chunk size is set from the rayon thread count, `src/cryptanalysis/f4_fp_tower.rs:1694` at `f13a690df0`);
    wall time can.
@@ -141,14 +159,32 @@ further bracket step follows from this amendment; cap 8 is not registered (its f
    The pod waits at most 2 h for it, never past the hard deadline, then is deleted regardless. The run's
    `bench.record/v1` stays a Git record with no S3 upload; the resume note is committed and pushed before the launch and
    after every check-in.
-6. **Time limit and the backstop (decision D3, owner decision 14).** Run deadline = the runner's recorded start +
-   90,000 s; hard deadline = creation + 26 h; the runner starts within 55 minutes of creation. No information is never
-   a loss (N2): it is retried until the hard deadline, then the pod is deleted for cost (NO_EVIDENCE). Check-ins about
-   4 h after start, then at most every 4 h, at the run deadline and once between it and the hard deadline. **`reap.sh`**
-   deletes a `pkm-x-` pod only past its hard deadline (through `fetch.sh` first), takes the per-name lock, logs each
-   delete before the API call, and runs at intervals of at most 4 h while a study pod exists. **One worst-case pod life
-   (S7): 30 h, US$62.40 at US$2.08/h.** Enforcement is by session check-ins and the scheduled reaper only (owner
-   decision 14); Amendment 32's loss (pods nothing deleted) is the case this guards against.
+6. **Time limit and the backstop (decision D3; owner decisions 25 and 26).** Run deadline = the runner's recorded
+   start + 90,000 s; hard deadline = creation + 26 h; the runner starts within 55 minutes of creation. No information is
+   never a loss (N2): it is retried until the hard deadline, then the pod is deleted for cost (NO_EVIDENCE).
+   - **Who deletes the pod.** (a) `fetch.sh`, when it collects a completed run: through the git gate, at most 2 h after
+     the collection, never past the hard deadline. (b) `fetch.sh` at the hard deadline, whatever it has. (c) `reap.sh`
+     past the hard deadline, from two places: the main session's passes, and **an hourly scheduled task that starts a
+     fresh cloud session independent of this one** (owner decision 25, which supersedes decision 14 for this job). Its
+     stored prompt is `INDEPENDENT_REAPER.md`; it runs `reap.sh` in a fresh checkout with an empty `RPC_STATE` (the token
+     comes from the v2 record, the key from the environment), commits what the pass wrote under `runpod_capped/`, and
+     never launches, never touches another pod and never deletes before the hard deadline. When the pod list cannot be
+     read, `reap.sh` exits 1 with `REAPER BLIND` and the scheduled session reports it.
+   - **Fetches.** While the job runs, `watch.sh` runs `fetch.sh` every 900 s (Amendment 29's 15-minute fetch, owner
+     decision 26), in background segments of at most 2 h that the session restarts; it deletes nothing itself, and it
+     stops when `fetch.sh` reports a collection (the git gate is then the session's), a delete, or the owner.
+   - **Amendment 32's relaunch precondition** ("the client deletes each pod when its job ends, and no batch starts unless
+     a check-in is scheduled within the shortest job limit"): the job's end is seen within 15 minutes by `watch.sh`; the
+     pod is deleted through the git gate within at most 2 h after the collection, or at the hard deadline; the hourly
+     independent reaper covers a session outage. The session creates that task right after `run.sh` returns and confirms
+     its first pass; `run.sh` does not check for it (procedure, not code).
+   - **Amendment 29** (frozen: owner balance confirmation per batch, fetches every 15 minutes): owner decision 26 is
+     this job's per-batch confirmation (the shared balance covers US$62.40), and `watch.sh` is the 15-minute fetch. A
+     capped run's partial tree is never read for a rule, so the fetches add loss evidence and receipts only.
+   - **Worst-case pod life and cost.** With the hourly reaper: 26 h + 1 h between passes + about 0.8 h for one pass =
+     about 27.8 h, US$57.82. If the hourly task missed passes and only the session's 4-hourly pass ran: 26 + 4 + 0.8 =
+     **30.8 h, US$64.06**, the figure every cost check uses (`common.sh` `WORST_HOURS`; review 4 M5f). If both the
+     session and the scheduled task stopped, nothing on RunPod's side stops the bill (v2 has no pod lifetime field).
 7. **Host lines.** The pod id, flavor, `cost`, data center and CPU model (from `host.txt`) are recorded with the row;
    `cpu5m` does not pin the CPU model (the Amendment 31 pods ran on a Threadripper 7960X and an EPYC 9575F).
 
@@ -162,14 +198,17 @@ further bracket step follows from this amendment; cap 8 is not registered (its f
   11.4 GiB before step 35 (`t14_bigmem/MEMORY.md` section 3). **Why it is the same measurement:** same binaries,
   system, seed, cap, budget, thread count and entry script; `--max-dense` is read once per step as a check before `B'`
   is allocated (`src/cryptanalysis/f4_fp_tower.rs:1577-1580`) and steers nothing else; steps 1-30 are identical at
-  12.8·10⁹ and 27.9·10⁹, and steps 1-34 on two CPU models and both draws. **Disclosure:** 54·10⁹ was chosen after
+  12.8·10⁹ and 27.9·10⁹, and steps 1-34 are structurally identical on two CPU models and both draws (rows, columns,
+  `B'`, fresh, basis and pair counts; `muladds` differ at steps 28 and 30-32 and one `nnz` by one, review 4 S9).
+  **Disclosure:** 54·10⁹ was chosen after
   seeing that step 35 asks for 33.96·10⁹; the limit cannot change what the run computes, only whether it may finish.
 - **Owner decision 15's 112 GiB step is not used.** It mirrored an EKS 112Gi request on a larger pod; here the limit is
   the pod's own, and OOM means cgroup `oom_kill > 0` or a peak above the pod's `memory.max` (section 4.2).
 - **RunPod REST v2 in place of v1** (v1 answered 502; Amendment 32). The host-side relaunch evidence loses one form
   (section 4.3).
 - **Git in place of S3** (owner decision 22; section 2.5).
-- **Per-job cap US$65 and study guard US$535** (owner decision 24; section 5), above the US$40 and US$510 of decisions 4
+- **Per-job cap US$65, study guard US$595 and ceiling US$600** (owner decisions 24 and 27; section 5), above the US$40
+  and US$510 / US$540 of decisions 4
   and 21.
 
 ## 4. Outcome classes, relaunch and limits
@@ -217,6 +256,12 @@ start line.
   `runs/<cell>.log`, its `VmHWM` in MiB × 1,048,576), else the cgroup's (`memory.peak`, else v1
   `memory.max_usage_in_bytes`); with `memory.max` reading `max` and no numeric limit before start, P2p cannot fire.
   `VmHWM` covers only the pilot and is printed when an F4 step ends, so it can miss a final rise (S5).
+  How the other two failure shapes are classified (review 4 S1): if `memory.oom.group` is 1, an OOM kills the runner
+  with the pilot, the container exits, and the result reads LOST (relaunch owner) or NO_EVIDENCE, not OOM, because the
+  last `memory.events` copy predates the kill; an allocation failure (for example a refused `mmap` near
+  `vm.max_map_count`) aborts the pilot with exit 134 and reads P2e NOT_ADMITTED. Both go to the owner; neither gives a
+  wrong reading. An OOM whose peak is under 90 percent of the pod's `memory.max` carries `oom_note` in `outcome.json`:
+  a host-level or group kill is likely, not a sign that 54·10⁹ is too small (review 4 S8).
 - **LIMIT**: censored, not re-run, no relaunch (an EKS job killed at its time limit; the deadline counts from the
   runner's start, at most 55 minutes after the pod's).
 - **LOST**: nothing admitted or analysed; relaunch `auto` or `owner` (section 4.3).
@@ -232,18 +277,22 @@ check-in that saw the runner alive under `s0`, or at the first-loss check-in, an
 runner seen `done` before the loss sends the relaunch to the owner. v1's other form, a RunPod-side `lastStatusChange`,
 has no v2 field and never counts (fail closed).
 
-## 5. Cost guard (owner decision 24)
+## 5. Cost guard (owner decisions 24, 26 and 27)
 
 - **Price** (catalog 2026-11-21): US$2.08/h. `run.sh` reads it before the create (`price.jsonl`); the pod's `cost` must
   equal it.
-- **Per job:** refused before create if price × 30 h > US$65. Worst case today 2.08 × 30 = US$62.40. Expected (derived,
-  `t14_bigmem/HOSTS.md` section 4): about US$44 if it refutes near 70,000 s, about US$53 if the budget stops it.
-- **Study: guard US$535, ceiling US$540.** `ledger.tsv` sums to 465.8424 (EKS rows; RunPod's own billing per pod from
-  REST v2 `GET /billing/pods`, `billing_v2_20261121.tsv`; the Amendment 31 batch, US$370.84; one row bringing the
-  pre-Amendment-31 spend to Amendment 32's US$95; `ledger_SOURCES.md` section 5). `run.sh` refuses if the sum plus the
-  job's worst case exceeds US$535: today 465.84 + 62.40 = 528.24. Two snapshot pods of unclear attribution (US$72.96,
-  UNKNOWN-5) are not rows; counted, 538.80 + 62.40 = 601.20 would exceed both. A draw-1 job later would need the
-  ceiling raised (465.84 + 124.80 = 590.64).
+- **Per job:** refused before create if price × 30.8 h > US$65 (the worst-case pod life of section 2.6). Worst case
+  today 2.08 × 30.8 = US$64.06. Expected (derived, `t14_bigmem/HOSTS.md` section 4): about US$44 if it refutes near
+  70,000 s, about US$53 if the budget stops it.
+- **Study: guard US$595, ceiling US$600** (owner decision 27). `ledger.tsv` sums to 503.1885: EKS rows; RunPod's own
+  billing per pod from REST v2 `GET /billing/pods` (`billing_v2_20261121.tsv`); the Amendment 31 batch, US$370.84; one
+  row bringing the pre-Amendment-31 spend to Amendment 32's US$95; smoke3 (0.0896); and `pkm-dense-rerun-20261115`
+  (37.2565, counted as this study by owner decision 27). `bdr-growthlaw` (35.7037) stays outside: another study
+  (`docs/session-logs/2026-11-15.md:4536`, benchmark record `20261115T1952Z-growth-law-cells-rerun`). `run.sh` refuses if
+  the sum plus the job's worst case exceeds US$595: today 503.19 + 64.06 = 567.25 (`ledger_SOURCES.md` section 5). A
+  draw-1 job later would need 503.19 + 2 × 64.06 = 631.31, above the ceiling: a further owner decision.
+- **Balance** (Amendment 29): owner decision 26 confirms the shared balance covers US$62.40, the job's worst case at the
+  route's earlier 30 h figure; the 30.8 h figure adds US$1.66.
 
 ## 6. Admission and receipts
 
@@ -284,7 +333,10 @@ API records drop `env`, `args`, `cmd`, `entrypoint`, `ssh` and any account ident
 - **Time (derived; `t14_bigmem/HOSTS.md` section 3).** Steps 1-34 take about 21,000-22,000 s at 12 threads; step 35
   ends 27,600 to 66,000 s after the F4 start. The low band finishes inside the 86,400 s budget; the central band needs a
   second all-pairs degree-7 step and is projected at 90,000-140,000 s, so the budget would stop it (censored). Pods of
-  one CPU model differed by 1.27× and 1.56× on identical runs, as large as the low band's margin.
+  one CPU model differed by 1.27× and 1.56× on identical runs, as large as the low band's margin. Two corrections
+  (review 4 S14): the "fast exit" lower end ignores that filling the echelon needs at least `nq` = 50,256 reduced S-rows,
+  about 2,200 s more; and the low band's upper end, 70,000 s, times the 1.27 host spread is about 89,000 s, past the
+  budget, so even the low band can be censored by time on a slow host.
 - **Risks.** The projection rests on four degree-6 analogues, one (`t = 11`) without a trace; the basis could grow past
   about 30 GiB and bring a memory kill before a clean `oversize` stop (both censored); the wall budget at 12 threads.
 - `t14_bigmem/project.py` is an analysis script that re-derives these numbers; it is not part of the route and runs no
@@ -298,15 +350,22 @@ API records drop `env`, `args`, `cmd`, `entrypoint`, `ssh` and any account ident
 
 ## 9. Points settled, checks that need a pod, and disclosure
 
-1. Owner decisions 13 (relaunch), 14 (enforcement by check-ins and the reaper), 20 (one cell), 21 (superseded in its
-   guard by 24), 22 (no S3), 24 (this probe, its caps).
-2. Checks made on a pod (two smokes of 2026-11-14 and 15, REST v1, 16 vCPU / 128 GB; `SMOKE.md`): the start command,
-   the runner, cgroup v2 with `memory.max` 128,000,000,000. **Not yet seen, to be recorded at a development smoke at
-   t <= 8 on a 32-vCPU `cpu5m` pod** (about US$0.50): the v2 create response (HTTP code, `cloud`, `cpu`, `cost`,
-   `dataCenterId`), the live GET record (`cpu.memory` 256, `status`, `startedAt`, `env`), the runner through the proxy
-   with the bash entrypoint and the pinned image, the cgroup `memory.max` of a 256 GB pod, `DELETE` (204), the list
-   afterwards and a GET of the deleted pod (404). `V2_FIELDS.md` lists them.
-3. Offline tests: `tests/README.md`.
+1. Owner decisions 13 (relaunch), 20 (one cell), 22 (no S3), 24 (this probe), 25 (the independent hourly reaper; it
+   supersedes decision 14 for this job), 26 (Amendment 29's balance confirmation; 15-minute fetches), 27 (the ledger's
+   unattributed pod counted; ceiling US$600, guard US$595). Decision 21's guard and ceiling are superseded by 24 and 27.
+2. Checks made on a pod. Smokes 1 and 2 (2026-11-14 and 15, REST v1, 16 vCPU / 128 GB): the start command, the runner,
+   cgroup v2 with `memory.max` 128,000,000,000. **Smoke 3** (2026-11-21, REST v2, the job's 32 vCPU / 256 GB `cpu5m`
+   pod, `receipts_dev/pkm-x-dev-smoke3/`; [pcc:unverified]): create 201 with `cloud` `SECURE`, `cpu` 32 vCPU / 256 GB and `cost` 2.08;
+   the GET and ready records (`RUNNING`, `EUR-IS-1`, already set at create); the runner through the proxy with the bash
+   entrypoint and the pinned image; `memory.max` 256,000,000,000 before start; classifier P2d; the git gate; `DELETE`
+   204 and the pod gone from the list; about US$0.09. A later read-only GET of the deleted pod answered 404 (review 4).
+   **Still unobserved:** token recovery from the record's `env` (offline tests only), `startedAt` and `status` on a
+   container restart, and `memory.oom.group` and `vm.max_map_count` on such a pod (recorded from now on).
+3. Offline tests: `tests/README.md` (counts with and without the image layer).
+4. Not done from review 4 (listed in `DECISIONS_ROUTE.md`): the reaper's fallback to known pod ids when the list is
+   unreadable (S7; it reports instead), the unpriced pod after a timed-out create and the unconfirmed pre-start delete
+   (S7, round-3 S5), and an exercise of token recovery on a pod (S10). Main's numbering is to be checked again at the
+   freeze (S12).
 
 **Disclosure (what the registering sessions have seen).** Every committed row of this study before 2026-11-21: all
 `t = 12` and `t = 13` rows, the partial log of the lost third `t = 13` draw 0 attempt, the `t = 14` cap 5 and cap 6 rows
@@ -317,17 +376,20 @@ section 1.1 is fixed by Amendment 7 B and does not depend on it.
 
 ## 10. Script hashes at this revision
 
-Recorded again at the freeze, after the development smoke. At the freeze the first four lines go into the
-preregistration as `sha256sum` output; `run.sh` and `fetch.sh` refuse study runs otherwise.
+Recorded again at the freeze. At the freeze the first four lines go into the preregistration as `sha256sum` output;
+`run.sh` and `fetch.sh` refuse study runs otherwise. `watch.sh` and `INDEPENDENT_REAPER.md` are procedure files: their
+hashes are recorded here, and no script checks them.
 
 | file | SHA-256 |
 |:--|:--|
-| `common.sh` | `a54e02d5c6daa09fd980a9e4fcccb747fd432fd75c9fd5a66dc847fab150ac84` |
-| `run.sh` | `87e0a3b3b3e29dc246f4b78d9d36a7fea2daa567ccce0e9c67b6e49043c8bd77` |
-| `fetch.sh` | `afb7aaffda98b31f232eede3f65ffbb41df1a5521f3c1ed71ec7fecdf568dab2` |
-| `reap.sh` | `2a289e60c5ae7c3fe98c757dd90ccea0975e0c5965165b433d23d2d0224ace8b` |
-| `make_requests_d54.sh` | `b5e5c65570ce7b4cd228352d0ade8a571deac3d8c62813ae917ab6a11b155cb2` |
+| `common.sh` | `@SHA_common.sh@` |
+| `run.sh` | `@SHA_run.sh@` |
+| `fetch.sh` | `@SHA_fetch.sh@` |
+| `reap.sh` | `@SHA_reap.sh@` |
+| `watch.sh` | `@SHA_watch.sh@` |
+| `INDEPENDENT_REAPER.md` | `@SHA_INDEPENDENT_REAPER.md@` |
+| `make_requests_d54.sh` | `@SHA_make_requests_d54.sh@` |
 | `requests_d54/pfd-x-t14-k0-c7-d54.json` | `089176f2a75dc228a817dc1b88852cd1953fbfcd63e0452189acd4765f70d025` |
 | `rp_pinned.sh` | `b4b6019934e02ffa32043e2e6b9aee4eb4dcc53b42442b2e01d1b30ccf536c5d` (= main's `runpod/rp.sh` at `d2a16c723d`) |
 | `server_pinned.py` | `f56fd08e01318512713f8ee392d8539fb94dc969444d45234179789930d86550` (= `runpod/server.py` at `d2a16c723d`) |
-| retired: `make_requests_m112.sh`, `requests_m112/pfd-x-t14-k0-c7-m112.json` | `dd75c92a7d86ba0927886c0926f2b25f59fd4645cd22a8a7a9713af4b62ddd8d`, `44e009f18d19a9c61e5a281e0c2a6a219c4f3cc3252ca63bff71049fdef4c7f9` |
+| retired: `make_requests_m112.sh`, `requests_m112/pfd-x-t14-k0-c7-m112.json` | `@SHA_make_requests_m112.sh@`, `44e009f18d19a9c61e5a281e0c2a6a219c4f3cc3252ca63bff71049fdef4c7f9` |
