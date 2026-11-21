@@ -27,6 +27,8 @@ The [independent SymPy audit](audit.py) recomputes the full Weierstrass group la
 
 The [protocol](protocol.json) fixed the input digests, post-run selection, coefficient shift, necessary polynomial, prime search cap, status rules, and claim boundary before execution. The [result](result.json) includes raw and packed hashes for both streams. The [runtime receipt](sage-runtime-info.json) records the accepted local Sage build. The [Lean build](formal/build.sh) pins `v4.35.0-rc4` and Mathlib revision `021c46bdd042f67b538b9f9871d556a93713a9a9`; [output](formal/build-output.txt) lists only `propext` and `Quot.sound` under `#print axioms`. No reported theorem uses `sorry`, `admit`, a custom claim axiom, or native evaluation. `lean4checker --fresh` is unavailable on this host.
 
+The 646 KB coefficient stream is retained in Git through an exact-path artifact-policy entry. The configured object store rejected its upload with `AllAccessDisabled`; the checked-in stream preserves the independently audited bytes and digest for replay.
+
 The next algebraic screen should vary `k1,k2` within the same local residue class or change the auxiliary-prime policy. Those variations change the generic numerator and need a new frozen certificate and cost record. A complete unknown-target pipeline also needs relation selection, novel rank, descent, and same-point rho timing under the repository measurement contract.
 
 ## Replay
