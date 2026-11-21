@@ -28,8 +28,11 @@ cluster is left out of `GET /pods` unless `includeClusterPods=true`; this route 
 
 Field names of `GET /pods/{id}` on an existing CPU pod (keys only; [pcc:unverified]): `actions`, `args`, `cloud`, `cost`, `cpu`,
 `createdAt`, `cudaVersion`, `dataCenterId`, `disk`, `env`, `globalNetworking`, `id`, `image`, `locked`, `mounts`, `name`,
-`ports`, `registry`, `runtime`, `ssh`, `startedAt`, `status`, `tags`, `template`. A list entry has the same keys except
-`env` and `args`, and `runtime` is null there. Example values on an exited `cpu5m` pod: `cloud` `SECURE`, `cost` 0.52,
+`ports`, `registry`, `runtime`, `ssh`, `startedAt`, `status`, `tags`, `template`. A list entry of `GET /pods` has the
+same keys, `env` and `args` included (review 4 read all 26 entries: `env` is an object, `args` a string, so every pod's
+environment, a runner token included, is in the list response), and `runtime` is null there. `list_pkm` keeps only
+`{id, name, status, cost, createdAt, startedAt}` of each entry, so nothing else is held or saved. (Revision 5 of this file
+said list entries lack `env` and `args`; that was wrong.) Example values on an exited `cpu5m` pod: `cloud` `SECURE`, `cost` 0.52,
 `cpu` `{id: cpu5m, memory: 64, vcpuCount: 8}`, `dataCenterId` `EU-RO-1`, `status` `EXITED`, `actions`
 `[start, terminate]`, `createdAt` `2026-10-19T14:24:35.226Z` (ISO 8601 with milliseconds; v1 wrote
 `2026-11-14 23:24:47.000 +0000 UTC`).
@@ -38,14 +41,14 @@ Field names of `GET /pods/{id}` on an existing CPU pod (keys only; [pcc:unverifi
 |:--|:--|:--|
 | `machine.secureCloud` (true) | `cloud` (`SECURE` or `COMMUNITY`) | D7 check and admission rule 7: `cloud == "SECURE"` on the create response and the GET record |
 | `costPerHr` | `cost` (USD per hour; returned in every status) | equal, to 4 decimals, to the catalog price read before create; cost receipts (`cost_per_hr`) |
-| `cpuFlavorId`, `vcpuCount`, `memoryInGb` | `cpu.id`, `cpu.vcpuCount`, `cpu.memory` (GB) | D7 and rule 7: `cpu5m`, 16, at least 121 GB (112 GiB) |
-| `machine.dataCenterId` | `dataCenterId` (null until the scheduler assigns one) | checked non-empty on the record read once the runner answers (`pod-record-ready.json`), before upload |
+| `cpuFlavorId`, `vcpuCount`, `memoryInGb` | `cpu.id`, `cpu.vcpuCount`, `cpu.memory` (GB) | D7 and rule 7: `cpu5m`, 32, at least 256 GB (owner decision 24) |
+| `machine.dataCenterId` | `dataCenterId` (documented as assigned by the scheduler; smoke3 had it at create) | checked non-empty on the record read once the runner answers (`pod-record-ready.json`), before upload |
 | `machineId`, `machine {...}` | none | not recorded any more; the CPU model still comes from `host.txt` |
 | `desiredStatus` (`RUNNING`, `EXITED`, `TERMINATED`) | `status` (`PROVISIONING`, `STARTING`, `RUNNING`, `EXITED`, `ERROR`, `TERMINATED`) | loss evidence: an HTTP 200 record whose `status` is not `RUNNING` (P3/P6) |
 | `lastStartedAt` | `startedAt` | recorded at every check-in; a change alone is never evidence (S1) |
 | `lastStatusChange` (for example "Rented by User: …") | **none** | v1's first form of host-side evidence ("a RunPod-side status change") cannot be observed. It never counts: a LOST gets relaunch `auto` only from the second form, the pod gone from a successful list with GET 404. Fail closed: fewer automatic relaunches, more cases for the owner. |
 | `interruptible` (request; the record returned null) | **none** in the request or the record | v2 has no spot or interruptible pod field: the spec's `CreatePodRequest` has none and unknown fields are refused, so a v2 pod in `cloud: SECURE` is on-demand. `pod-request.json` must not contain the key (rule 7). |
-| `env` (GET, used for token recovery) | `env` (GET of one pod; not in the list) | the token recovery of decision N6 reads `.env.RUNNER_TOKEN` into `RPC_STATE` only; the observed CPU pod returned `env` with key `PUBLIC_KEY` |
+| `env` (GET, used for token recovery) | `env` (GET of one pod, and in every list entry) | the token recovery of decision N6 reads `.env.RUNNER_TOKEN` into `RPC_STATE` only; the observed CPU pod returned `env` with key `PUBLIC_KEY` |
 | `consumerUserId` | none | the saved records drop `env`, `args`, `cmd`, `entrypoint`, `ssh` and `consumerUserId` |
 | list: bare array | `{pods, pagination}` | every page is read |
 
@@ -66,16 +69,21 @@ the pod's own token) do not use the REST API, so the v1 to v2 change does not re
 v1 `create`, `pod` and `delete` commands; the route never calls them (offline test G-rpuse). Main's current `rp.sh`
 `start` reads the pod's price over REST; the pinned copy's `start` does not.
 
-## What only a pod can show
+## What a pod has shown, and what is still unobserved
 
-To be recorded at the development smoke at t = 8 that the main session runs after review:
-- the create response (HTTP 201): whether it carries `cloud`, `cpu.id`, `cpu.vcpuCount` and `cost` (the route refuses
-  and deletes the pod if any is missing), and whether `dataCenterId` is null there;
-- the GET record of a live CPU pod: `cpu.memory` (expected 256 on the 32-vCPU pod), `status` `RUNNING`, `dataCenterId`, `startedAt`, and
-  `env.RUNNER_TOKEN` (token recovery);
-- the proxy URL and the runner behind it, with the v2-created pod and the bash entrypoint;
-- the cgroup files (`memory.max` at least 112 GiB);
-- `DELETE` (204) and the list afterwards (the pod gone), and `GET` of the deleted pod (404 is what the host-side rule
-  assumes);
+The third development smoke (`pkm-x-dev-smoke3`, pod `klogu58zoe2owr`, 2026-11-21, `receipts_dev/pkm-x-dev-smoke3/`,
+t = 8, not data) showed with REST v2 [pcc:unverified]:
+- the create answered HTTP 201 with `cloud` `SECURE`, `cpu` `{id: cpu5m, memory: 256, vcpuCount: 32}`, `cost` 2.08
+  (equal to the catalog price) and `dataCenterId` `EUR-IS-1` already set (so the value may be set at create; the route
+  still reads it from the record taken when the runner answers);
+- the GET record and the ready record: the same `cpu`, `status` `RUNNING`, `dataCenterId` `EUR-IS-1`, `startedAt`;
+- the runner answered through the proxy URL on the v2-created pod, with the bash entrypoint and the pinned image;
+- the cgroup `memory.max` before start: 256,000,000,000 bytes;
+- the git gate passed, `DELETE` answered 204 and the pod was gone from the list; pod life 155 s, about US$0.09;
+- a later read-only GET of the deleted pod answered 404 with `{"detail":"pod not found",...}` (review 4).
+
+Still unobserved on a pod:
+- token recovery from `GET /pods/{id}` `env.RUNNER_TOKEN` (offline tests C17 and F10 only);
 - whether `startedAt` changes on a container restart, and which `status` a pod shows while RunPod restarts or migrates
-  it (not provoked by a smoke).
+  it (no smoke provokes either);
+- `memory.oom.group` and `vm.max_map_count` on a 256 GB pod (recorded from now on in `cgroup-prestart.json`).

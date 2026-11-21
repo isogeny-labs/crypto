@@ -1,0 +1,5 @@
+# Fixture ledger for the offline tests (review 4 M4): the tests never read the live ledger.tsv. One row of US$500.0000,
+# so the budget boundaries are exact: 500 + x + 64.064 (2.08 x 30.8 h) against the US$595 guard.
+# complete_as_of	never
+job	route	authority	state	usd	source
+fixture-base/x	fixture	tests	closed	500.0000	tests/fixtures/ledger_fixture.tsv

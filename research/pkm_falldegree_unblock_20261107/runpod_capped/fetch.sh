@@ -45,8 +45,9 @@ here=$(cd "$(dirname "$0")" && pwd); . "$here/common.sh"
 #       P2d admission rules hold                                                          -> ADMITTED, with a reading
 #       P2e otherwise                                                                     -> NOT_ADMITTED
 #   Reading of an ADMITTED row at cap C (Amendment 7 B; owner decision 24): inconsistent true -> d_F = C; degree C
-#   completed with inconsistent, oversize and timed_out all false -> d_F >= C+1; oversize true (stop line "oversize")
-#   -> censored by size, d_F >= C stands; timed_out true without oversize (stop line "budget") -> censored by the
+#   completed with inconsistent, oversize and timed_out all false -> d_F >= C+1; oversize true (no contrary stop line)
+#   -> censored by size, d_F >= C stands; timed_out true without oversize (no contrary stop line: a deadline caught at
+#   the top of the step loop prints none) -> censored by the
 #   budget; anything else -> no reading (owner). OOM and LIMIT read as censored, d_F >= C stands.
 #   P3  positive loss evidence dated before the run deadline                              -> LOST
 #   P4  a check-in at or after the run deadline shows the runner running, or done after the deadline, under s0 -> LIMIT

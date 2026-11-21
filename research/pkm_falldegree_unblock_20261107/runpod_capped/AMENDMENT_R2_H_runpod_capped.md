@@ -1,6 +1,6 @@
 # DRAFT Amendment 33: the capped RunPod route (REST v2, results in git) and one probe, `t = 14` draw 0 cap 7 at `--max-dense 54000000000` on a 256 GB pod
 
-**Status: draft revision 6, NOT frozen (2026-11-21).** One amendment for two things: the reviewed capped-run route in
+**Status: draft revision 7, NOT frozen (2026-11-21).** One amendment for two things: the reviewed capped-run route in
 `runpod_capped/` (ported to RunPod REST v2) and the one job it runs, owner decision 24's probe designed in
 `t14_bigmem/` (whose `DRAFT_AMENDMENT.md`, "proposed Amendment 34", is merged here and not frozen separately). When
 frozen it is appended to `research/prime_fall_degree_20261027/PREREGISTRATION.md` as Amendment 33 (main ends at
@@ -30,7 +30,17 @@ refuses the study names until the preregistration has the heading `## Amendment 
   32's "No row was fetched" is superseded by those archives. Revision 5 was not launched.
 - **2026-11-21: owner decision 24.** After the bigger-memory design (`t14_bigmem/`): draw 0 only, as a probe, stage
   `cap:14:0:7:54000000000` on a 32 vCPU / 256 GB reserved pod; per-job cap US$65, study guard US$535, ceiling US$540.
-  Draw 1 needs a later decision from draw 0's outcome. This revision implements it.
+  Draw 1 needs a later decision from draw 0's outcome. Revision 6 implemented it.
+- **2026-11-21: the third development smoke** (`receipts_dev/pkm-x-dev-smoke3/`, pod `klogu58zoe2owr`, t = 8, not
+  data) on the 32 vCPU / 256 GB `cpu5m` pod with REST v2: create 201, `cloud` `SECURE`, `cpu` 32 vCPU / 256 GB, `cost`
+  2.08, data center `EUR-IS-1`, cgroup `memory.max` 256,000,000,000, classified ADMITTED, the git gate passed, `DELETE`
+  204 and the pod gone from the list; about US$0.09 [pcc:unverified].
+- **2026-11-21: the fourth independent review** (`reviews/REVIEW_4_red_team_A33.md`, of `a5c6d89147`; verdict "freeze
+  with corrections"; M1-M5, S1-S14) and **owner decisions 25-27**: an independent hourly reaper in a fresh cloud session
+  while the pod exists, superseding decision 14 for this job (25); the shared balance covers US$62.40, Amendment 29's
+  per-batch confirmation, and results are fetched every 15 minutes (26); `pkm-dense-rerun-20261115` is study spend,
+  ceiling US$600 and guard US$595, per-job cap US$65 (27). This revision (7) answers the review and implements them
+  (`DECISIONS_ROUTE.md`).
 
 ## 1. The job, its relaunch and the request
 

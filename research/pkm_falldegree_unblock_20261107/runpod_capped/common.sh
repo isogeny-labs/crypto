@@ -28,7 +28,7 @@ DEADLINE_S=90000                          # the registered job time limit (reque
 START_WITHIN_S=3300                       # the runner must start within 55 min of creation, so start + 25 h <= creation + 26 h
 HARD_S=93600                              # 26 h after creation: the reaper deletes any pkm-x- pod older than this
 PUSH_WAIT_S=7200                          # a completed run's pod waits at most 2 h for the git gate (decision 22)
-CLASSIFIER_VERSION=a33-r2                 # recorded in every outcome.json with the SHA-256 of fetch.sh and common.sh (S3)
+CLASSIFIER_VERSION=a33-r3                 # recorded in every outcome.json with the SHA-256 of fetch.sh and common.sh (S3)
 # The frozen image, pinned here rather than read from the mutable image/*.json files (S3); run.sh checks they agree.
 LAYER_DIGEST=a0f7e28eb0759ddefc4b906974866d2a2215d4705e25e9fd1fca45513b8b1971
 BIN_SHA_PINS='pkm_tower_pilot f78f39599d75859a693d3177272e95cae79559eebb10c1ac528e0cb13e4fcee7

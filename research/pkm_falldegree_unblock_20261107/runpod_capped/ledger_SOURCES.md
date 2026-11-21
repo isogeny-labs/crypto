@@ -76,13 +76,17 @@ the EKS rows (3-17) are unchanged. Every figure is `[pcc:unverified]`.
   session's study pods of that morning. The row `a32-remainder/unitemised` (31.6714) brings the pre-Amendment-31 total
   to Amendment 32's US$95: it stands in for the pods of this study whose ids are in no study file (UNKNOWN-4 in the
   ledger). With it the ledger sum is 465.8424, Amendment 32's "about US$466".
-- **Not rows: attribution unknown (UNKNOWN-5).** `bdr-growthlaw` (billed 35.7037) and `pkm-dense-rerun-20261115`
-  (37.2565) are listed by the 2026-11-17 snapshot among the pods "of this study". If they are, the ledger is US$538.80
-  and the guard refuses this route's launch (538.80 + 31.20 > 510). The owner decides.
+- **UNKNOWN-5 (two snapshot pods), as it stood at this update.** `bdr-growthlaw` (billed 35.7037) and
+  `pkm-dense-rerun-20261115` (37.2565) were listed by the 2026-11-17 snapshot among the pods "of this study" and were
+  not rows. Settled by owner decision 27 below.
 - **Check at this update.** `ledger_sum` 465.8424; this route's worst case 31.2000 (1.04 x 30 h); 497.0424 <= 510.
 - **Owner decision 24 (2026-11-21, later the same day).** The guard is US$535 and the ceiling US$540; the per-job cap
   is US$65. With the ledger unchanged at 465.8424 and the new job's worst case 2.08 × 30 = 62.40, the check is
   528.2424 <= 535. With the UNKNOWN-5 pods counted it would be 601.20, above both.
-- **Owner decision 24 (2026-11-21, later the same day).** The guard is US$535 and the ceiling US$540; the per-job cap
-  is US$65. With the ledger unchanged at 465.8424 and the new job's worst case 2.08 × 30 = 62.40, the check is
-  528.2424 <= 535. With the UNKNOWN-5 pods counted it would be 601.20, above both.
+- **Smoke3 (2026-11-21).** The third development smoke closed its own row at 0.0896 (`receipts_dev/pkm-x-dev-smoke3/
+  cost.json`); the sum became 465.9320.
+- **Owner decision 27 (2026-11-21, about 23:00Z).** `pkm-dense-rerun-20261115` (`bjs0g3ugkgvx3c`, billed 37.2565) is a
+  closed row, counted as this study. `bdr-growthlaw` stays outside: another study (`docs/session-logs/2026-11-15.md:4536`
+  launched it under the benchmark record `20261115T1952Z-growth-law-cells-rerun`; review 4 M3). Study ceiling US$600,
+  guard US$595, per-job cap US$65. Ledger sum 503.1885; the job's worst case is 2.08 × 30.8 h = 64.0640 (review 4 M5f);
+  503.1885 + 64.0640 = 567.2525 <= 595.

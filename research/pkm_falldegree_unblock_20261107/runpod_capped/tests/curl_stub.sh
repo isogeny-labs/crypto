@@ -55,6 +55,8 @@ case $url in
       [ -f "$S/create-response-patch.jq" ] && { jq -f "$S/create-response-patch.jq" "$S/pod-$id.json" > "$S/x" && mv "$S/x" "$S/pod-$id.json"; }
       [ -f "$S/record-patch.jq" ] && { jq -f "$S/record-patch.jq" "$S/pod-$id.json.rec" > "$S/x" && mv "$S/x" "$S/pod-$id.json.rec"; }
       if [ -e "$S/create-timeout" ]; then echo "curl: (28) Operation timed out" >&2; [ -n "$wfmt" ] && printf '000'; exit 28; fi
+      if [ -e "$S/create-error-html" ]; then rm -f "$S/pod-$id.json" "$S/pod-$id.json.rec"; echo '[]' > "$S/pods.json"
+        emit 502 - <<<"<html>502 Bad Gateway, request was: $(tr -d '\n' < "$S/create-body.json")</html>"; fi   # a non-JSON error that echoes the body
       if [ -e "$S/create-error" ]; then rm -f "$S/pod-$id.json" "$S/pod-$id.json.rec"; echo '[]' > "$S/pods.json"
         emit 400 - <<<'{"detail":"no instances available","status":400,"title":"Bad Request"}'; fi
       emit "${STUB_CREATE_CODE:-201}" "$S/pod-$id.json"
