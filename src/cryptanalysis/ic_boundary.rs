@@ -3934,10 +3934,19 @@ impl RhoV3 {
 /// step.  On fp28, the unrounded weight-2 optimum is ≈120: a non-power
 /// of two that raised measured ns/GAE by ≈9 % against `rho.negation`'s
 /// 16-jump table and left wall ≈1.02× after S had already cleared 0.95×.
+///
+/// Weight-2 tables are further capped at 64: the GAE-optimal `k ≈ √F`
+/// reaches 128 (fp28) / 256 (fp32), and those sizes reopen wall CI even
+/// after the mask fix (fp28 expanded: wall 0.965× [0.905, 1.029]).
 pub fn rho_v3_jumps_for(r: u64, automorphisms: u32, weight: u32) -> usize {
     let f = generic_floor_ops(r as f64, automorphisms.max(1) as f64);
     let k = (f / (weight.max(2) - 1) as f64).sqrt().round() as usize;
-    round_jumps_pow2(k.clamp(4, 4096))
+    let k = round_jumps_pow2(k.clamp(4, 4096));
+    if weight <= 2 {
+        k.min(64)
+    } else {
+        k
+    }
 }
 
 /// Nearest power of two in `[4, 4096]`; on a tie, the larger (more jumps
@@ -16945,6 +16954,9 @@ mod tests {
                 let k = rho_v3_jumps_for(r, 2, w);
                 assert!(k.is_power_of_two(), "bits={bits} w={w} k={k}");
                 assert!((4..=4096).contains(&k), "bits={bits} w={w} k={k}");
+                if w <= 2 {
+                    assert!(k <= 64, "bits={bits} w={w} k={k} exceeds weight-2 cap");
+                }
             }
         }
     }
