@@ -253,16 +253,39 @@ fn field_value(op: &FieldOp, a: u64, b: u64, p: u64) -> u64 {
 // all noncanonical inputs. Only canonical operands take the Barrett path.
 #[inline]
 fn field_value_cached(op: &FieldOp, a: u64, b: u64, p: u64, reciprocal32: u64) -> u64 {
-    if reciprocal32 != 0 && a < p && b < p
-        && matches!(op, FieldOp::Mul | FieldOp::Square)
-    {
-        let product = a * b; // a,b < p <= 2^32-1, hence no overflow
-        let quotient = ((product as u128 * reciprocal32 as u128) >> 64) as u64;
-        let remainder = product - quotient * p;
-        // The quotient can underestimate floor(product/p) by at most one.
-        if remainder >= p { remainder - p } else { remainder }
-    } else {
-        field_value(op, a, b, p)
+    // Dispatch once by operation; the 61-bit Mersenne fast path must not
+    // take an extra wrapper call or reciprocal guard on every field event.
+    match op {
+        FieldOp::Add => {
+            if a < p && b < p {
+                let sum = a + b;
+                if sum >= p { sum - p } else { sum }
+            } else {
+                ((a as u128 + b as u128) % p as u128) as u64
+            }
+        }
+        FieldOp::Sub => {
+            if a < p && b < p {
+                if a >= b { a - b } else { a + p - b }
+            } else {
+                ((a as u128 + p as u128 - b as u128) % p as u128) as u64
+            }
+        }
+        FieldOp::Mul | FieldOp::Square => {
+            if p == MAX_PRIME && a < p && b < p {
+                let product = a as u128 * b as u128;
+                let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
+                if folded >= MAX_PRIME { folded - MAX_PRIME } else { folded }
+            } else if reciprocal32 != 0 && a < p && b < p {
+                let product = a * b; // canonical p <= 2^32-1
+                let quotient = ((product as u128 * reciprocal32 as u128) >> 64) as u64;
+                let remainder = product - quotient * p;
+                // The quotient underestimates floor(product/p) by at most 1.
+                if remainder >= p { remainder - p } else { remainder }
+            } else {
+                ((a as u128 * b as u128) % p as u128) as u64
+            }
+        }
     }
 }
 
