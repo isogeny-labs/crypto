@@ -798,6 +798,21 @@ fn vmonomial_product(m: &[u64], other: &[u64]) -> Option<Vec<u64>> {
 // The independent verifier still checks this product against f or the
 // Frobenius/GCD certificate; this is not an acceptance shortcut.
 fn vroot_product(roots: &[u64], p: u64) -> Result<Vec<u64>, String> {
+    // Native Rust A/B showed short-degree verifier regressions with the
+    // in-place recurrence; preserve the prior multiplication path for up to
+    // three roots. Most of the allocation reduction is at degree four/eight.
+    if roots.len() <= 3 {
+        let mut product = vec![1];
+        let mut previous = None;
+        for &root in roots {
+            if root >= p || previous.is_some_and(|a| a >= root) {
+                return Err("noncanonical or repeated root".into());
+            }
+            previous = Some(root);
+            product = vproduct(&product, &[(p - root) % p, 1], p);
+        }
+        return Ok(product);
+    }
     let mut product = Vec::with_capacity(roots.len() + 1);
     product.push(1);
     let mut previous = None;
@@ -1436,15 +1451,11 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 // unchanged terminal base. On new traces we avoid the costly
                 // polynomial square/division during independent replay too.
                 if state.exponent != 1 || base != &state.base {
-                    // Repeated squaring is symmetric. Reuse the verifier's
-                    // independently checked square kernel for longer bases;
-                    // retain the old product path for short-degree inputs.
-                    let square = if state.base.len() >= 5 {
-                        vsquare(&state.base, p)
-                    } else {
-                        vproduct(&state.base, &state.base, p)
-                    };
-                    state.base = vdiv(&square, &state.modulus, p)?.1;
+                    // Independent replay keeps the established general
+                    // product here: symmetric dispatch regressed on octet
+                    // complete-solver workloads in two source-exact A/B runs.
+                    state.base =
+                        vdiv(&vproduct(&state.base, &state.base, p), &state.modulus, p)?.1;
                 }
                 state.exponent >>= 1;
                 if (*exponent, accumulator, base) != (state.exponent, &state.acc, &state.base) {
