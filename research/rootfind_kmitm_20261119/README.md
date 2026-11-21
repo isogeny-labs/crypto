@@ -16,8 +16,9 @@ On primes with siblings:
    Montgomery abscissae (no `from_mont` on the miss path).
 3. **Hot-path hygiene** — precomputed FB Montgomery coords, in-place
    batch-inv (no per-probe alloc), inline right indices.
-4. **`decompose_lanes`** — PLAN lever 2 scalar: up to four targets share
-   one batch-inv; field work is interleaved across the lane.
+4. **`decompose_lanes`** — PLAN lever 2: up to eight targets share one
+   batch-inv (scalar) or an AVX-512 IFMA lockstep when prepared
+   (`right=1`, `p < 2^52`); see `research/rootfind_10x_exponent_20261121/IFMA_ATTEMPT.md`.
 5. **`decompose_threaded`** — PLAN lever 4: `Arc`-shared prepared tables,
    `fork_worker`, `std::thread::scope` over independent targets.
 
@@ -67,8 +68,9 @@ Planted-sum recovery tests pass for m = 3..6, 10, 12; lanes and
 - Large A: left=`min(9,m−1)` grows as `C(A,L)·2^{L−1}`; use
   `split=balanced` when that table does not fit.
 - Counted `S` is the MITM's own additions. No security / sub-rho claim.
-- Remaining PLAN lever: AVX/IFMA lanes (and table-build batching) stay in
-  the #4708 prototype until parity/replay are wired.
+- AVX/IFMA kmitm lockstep landed for `right=1` (modest win at m=3–4;
+  loses at large left tables). Table-build batching for kmitm left sums
+  remains open.
 
 ## Reproduce
 

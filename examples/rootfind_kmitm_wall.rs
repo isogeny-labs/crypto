@@ -115,42 +115,58 @@ fn main() {
         }
         let probe_m_ns = t0.elapsed().as_nanos() as f64 / targets.len() as f64;
 
-        // PLAN lever 2 (scalar): 4-target shared batch-inv throughput.
-        let lane = 4usize;
+        // PLAN lever 2: 8-wide lanes — scalar vs IFMA when prepared.
+        let lane = 8usize;
         let mut lane_out = vec![None; lane];
-        for chunk in targets.chunks(lane).take(1) {
-            let mut o = GroupOps::default();
-            let mut c = OracleCounters::default();
-            mitm.decompose_lanes(
-                &ctx,
-                &fb,
-                &mut o,
-                &mut c,
-                chunk,
-                &mut lane_out[..chunk.len()],
-            );
-            black_box(&lane_out);
-        }
-        let mut hits_lanes = 0u64;
-        let t_lanes = Instant::now();
-        for chunk in targets.chunks(lane) {
-            let mut o = GroupOps::default();
-            let mut c = OracleCounters::default();
-            mitm.decompose_lanes(
-                &ctx,
-                &fb,
-                &mut o,
-                &mut c,
-                chunk,
-                &mut lane_out[..chunk.len()],
-            );
-            for slot in lane_out.iter().take(chunk.len()) {
-                if slot.is_some() {
-                    hits_lanes += 1;
+        let mut time_lanes = |oracle: &mut RootfindKMitmOracle<'_>, hits: &mut u64| -> f64 {
+            for chunk in targets.chunks(lane).take(1) {
+                let mut o = GroupOps::default();
+                let mut c = OracleCounters::default();
+                oracle.decompose_lanes(
+                    &ctx,
+                    &fb,
+                    &mut o,
+                    &mut c,
+                    chunk,
+                    &mut lane_out[..chunk.len()],
+                );
+                black_box(&lane_out);
+            }
+            *hits = 0;
+            let t_lanes = Instant::now();
+            for chunk in targets.chunks(lane) {
+                let mut o = GroupOps::default();
+                let mut c = OracleCounters::default();
+                oracle.decompose_lanes(
+                    &ctx,
+                    &fb,
+                    &mut o,
+                    &mut c,
+                    chunk,
+                    &mut lane_out[..chunk.len()],
+                );
+                for slot in lane_out.iter().take(chunk.len()) {
+                    if slot.is_some() {
+                        *hits += 1;
+                    }
                 }
             }
-        }
-        let probe_lanes_ns = t_lanes.elapsed().as_nanos() as f64 / targets.len() as f64;
+            t_lanes.elapsed().as_nanos() as f64 / targets.len() as f64
+        };
+        mitm.set_ifma_enabled(false);
+        let mut hits_lanes = 0u64;
+        let probe_lanes_ns = time_lanes(&mut mitm, &mut hits_lanes);
+        let ifma_prepared = mitm.ifma_prepared();
+        let (probe_ifma_ns, hits_ifma, ifma_speedup_vs_scalar) = if ifma_prepared {
+            mitm.set_ifma_enabled(true);
+            let mut hits_ifma = 0u64;
+            let probe_ifma_ns = time_lanes(&mut mitm, &mut hits_ifma);
+            let speedup = probe_lanes_ns / probe_ifma_ns;
+            (Some(probe_ifma_ns), Some(hits_ifma), Some(speedup))
+        } else {
+            (None, None, None)
+        };
+        mitm.set_ifma_enabled(true);
 
         // PLAN lever 4: threads over independent targets (shared Arc tables).
         let mut thr_ns = [0.0f64; 3];
@@ -208,11 +224,15 @@ fn main() {
         let lane_speedup = probe_m_ns / probe_lanes_ns;
         let thr2_speedup = thr_ns[0] / thr_ns[1];
         let thr4_speedup = thr_ns[0] / thr_ns[2];
+        let ifma_note = match (probe_ifma_ns, ifma_speedup_vs_scalar) {
+            (Some(ns), Some(x)) => format!(" ifma8 {ns:10.1} ns/tgt ({x:4.2}x vs scalar8)"),
+            _ => String::new(),
+        };
         println!(
             "m={m:>2}  split {left_k}/{right_k}  kmitm build {build_m_ns:10.0} ns  \
              left {left_entries:<8} right_pre {right_pre:<6}  \
-             probe {probe_m_ns:10.1} ns/tgt  lanes4 {probe_lanes_ns:10.1} ns/tgt \
-             ({lane_speedup:4.2}x)  thr1/2/4 {thr1:10.1}/{thr2:10.1}/{thr4:10.1} \
+             probe {probe_m_ns:10.1} ns/tgt  lanes8 {probe_lanes_ns:10.1} ns/tgt \
+             ({lane_speedup:4.2}x){ifma_note}  thr1/2/4 {thr1:10.1}/{thr2:10.1}/{thr4:10.1} \
              ({thr2_speedup:4.2}x/{thr4_speedup:4.2}x) hits {hits_m}/{hits_lanes}/{h1}/{h2}/{h4}   \
              ksum build {}  probe {}  ratio build/probe {} / {}",
             ksum_build_ns
@@ -244,15 +264,19 @@ fn main() {
             "kmitm_left_entries": left_entries,
             "kmitm_right_precomputed": right_pre,
             "kmitm_probe_ns_per_target": probe_m_ns,
-            "kmitm_probe_ns_per_target_lanes4": probe_lanes_ns,
-            "kmitm_lanes4_speedup": lane_speedup,
+            "kmitm_probe_ns_per_target_lanes8_scalar": probe_lanes_ns,
+            "kmitm_lanes8_scalar_speedup": lane_speedup,
+            "kmitm_ifma_prepared": ifma_prepared,
+            "kmitm_probe_ns_per_target_lanes8_ifma": probe_ifma_ns,
+            "kmitm_ifma_vs_scalar8_speedup": ifma_speedup_vs_scalar,
             "kmitm_probe_ns_per_target_thr1": thr_ns[0],
             "kmitm_probe_ns_per_target_thr2": thr_ns[1],
             "kmitm_probe_ns_per_target_thr4": thr_ns[2],
             "kmitm_thr2_speedup": thr2_speedup,
             "kmitm_thr4_speedup": thr4_speedup,
             "kmitm_hits": hits_m,
-            "kmitm_hits_lanes4": hits_lanes,
+            "kmitm_hits_lanes8_scalar": hits_lanes,
+            "kmitm_hits_lanes8_ifma": hits_ifma,
             "kmitm_hits_thr1": thr_hits[0],
             "kmitm_hits_thr2": thr_hits[1],
             "kmitm_hits_thr4": thr_hits[2],

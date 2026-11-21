@@ -1,0 +1,204 @@
+warning: field `c` is never read
+   --> src/cryptanalysis/prime_radical_root.rs:465:5
+    |
+460 | pub(crate) struct Cube<R: Ring> {
+    |                   ---- field in this struct
+...
+465 |     c: R::E,
+    |     ^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `inv2` and `n` are never read
+   --> src/cryptanalysis/prime_radical_root.rs:787:5
+    |
+785 | pub struct RadicalRootCtx {
+    |            -------------- fields in this struct
+786 |     pub(crate) f: Fp,
+787 |     inv2: u64,
+    |     ^^^^
+...
+792 |     n: u64, // quadratic non-residue
+    |     ^
+
+warning: function `vpow` is never used
+   --> src/cryptanalysis/prime_root_trace.rs:566:4
+    |
+566 | fn vpow(mut a: u64, mut e: u64, p: u64) -> u64 {
+    |    ^^^^
+
+warning: `crypto` (lib) generated 3 warnings
+    Finished `release` profile [optimized] target(s) in 0.41s
+     Running `target-kmitm-fast/release/examples/rootfind_kmitm_wall --bits 32 --size 32 --targets 128 --skip-ksum`
+rootfind-kmitm vs ksum  bits=32 |Fx|=32 targets=128  [pcc:unverified]
+m= 3  split 2/1  kmitm build     112250 ns  left 1024     right_pre 0       probe     1351.7 ns/tgt  lanes8     1276.7 ns/tgt (1.06x) ifma8      870.8 ns/tgt (1.47x vs scalar8)  thr1/2/4     1340.5/    3227.0/    2441.2 (0.42x/0.55x) hits 0/0/0/0/0   ksum build      n/a     probe      n/a        ratio build/probe    n/a /    n/a
+m= 4  split 3/1  kmitm build    2236765 ns  left 19840    right_pre 0       probe     1301.1 ns/tgt  lanes8     1226.8 ns/tgt (1.06x) ifma8      891.8 ns/tgt (1.38x vs scalar8)  thr1/2/4     1300.1/    2615.0/    2513.6 (0.50x/0.52x) hits 0/0/0/0/0   ksum build      n/a     probe      n/a        ratio build/probe    n/a /    n/a
+m= 5  split 4/1  kmitm build   51450304 ns  left 287660   right_pre 0       probe     2142.3 ns/tgt  lanes8     1311.4 ns/tgt (1.63x) ifma8     1275.4 ns/tgt (1.03x vs scalar8)  thr1/2/4     1358.1/    4088.0/    1739.3 (0.33x/0.78x) hits 0/0/0/0/0   ksum build      n/a     probe      n/a        ratio build/probe    n/a /    n/a
+m= 6  split 5/1  kmitm build  963094932 ns  left 3218798  right_pre 0       probe     6008.0 ns/tgt  lanes8     3142.2 ns/tgt (1.91x) ifma8     4879.0 ns/tgt (0.64x vs scalar8)  thr1/2/4     3228.5/    7104.4/    4385.8 (0.45x/0.74x) hits 3/3/3/3/3   ksum build      n/a     probe      n/a        ratio build/probe    n/a /    n/a
+m= 8  skip m=8: estimated left table ~34359738368 over |Fx|=32 (host OOM guard)
+m=10  skip m=10: estimated left table ~35184372088832 over |Fx|=32 (host OOM guard)
+m=12  skip m=12: estimated left table ~35184372088832 over |Fx|=32 (host OOM guard)
+{
+  "abscissae": 32,
+  "bits": 32,
+  "classification": "engineering",
+  "factor_base_size": 32,
+  "pcc": "unverified",
+  "rows": [
+    {
+      "abscissae": 32,
+      "build_speedup_ksum_over_kmitm": null,
+      "kmitm_build_ns": 112250.0,
+      "kmitm_hits": 0,
+      "kmitm_hits_lanes8_ifma": 0,
+      "kmitm_hits_lanes8_scalar": 0,
+      "kmitm_hits_thr1": 0,
+      "kmitm_hits_thr2": 0,
+      "kmitm_hits_thr4": 0,
+      "kmitm_ifma_prepared": true,
+      "kmitm_ifma_vs_scalar8_speedup": 1.4661056484604895,
+      "kmitm_lanes8_scalar_speedup": 1.0587634165147046,
+      "kmitm_left_entries": 1024,
+      "kmitm_probe_ns_per_target": 1351.7265625,
+      "kmitm_probe_ns_per_target_lanes8_ifma": 870.8125,
+      "kmitm_probe_ns_per_target_lanes8_scalar": 1276.703125,
+      "kmitm_probe_ns_per_target_thr1": 1340.453125,
+      "kmitm_probe_ns_per_target_thr2": 3227.0078125,
+      "kmitm_probe_ns_per_target_thr4": 2441.21875,
+      "kmitm_right_precomputed": 0,
+      "kmitm_thr2_speedup": 0.4153857700026873,
+      "kmitm_thr4_speedup": 0.5490917702479551,
+      "ksum_build_ns": null,
+      "ksum_hits": null,
+      "ksum_insert_attempts": null,
+      "ksum_ok": false,
+      "ksum_probe_ns_per_target": null,
+      "left_k": 2,
+      "m": 3,
+      "probe_speedup_ksum_over_kmitm": null,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 32,
+      "build_speedup_ksum_over_kmitm": null,
+      "kmitm_build_ns": 2236765.0,
+      "kmitm_hits": 0,
+      "kmitm_hits_lanes8_ifma": 0,
+      "kmitm_hits_lanes8_scalar": 0,
+      "kmitm_hits_thr1": 0,
+      "kmitm_hits_thr2": 0,
+      "kmitm_hits_thr4": 0,
+      "kmitm_ifma_prepared": true,
+      "kmitm_ifma_vs_scalar8_speedup": 1.37562855891371,
+      "kmitm_lanes8_scalar_speedup": 1.0605942889166264,
+      "kmitm_left_entries": 19840,
+      "kmitm_probe_ns_per_target": 1301.1171875,
+      "kmitm_probe_ns_per_target_lanes8_ifma": 891.796875,
+      "kmitm_probe_ns_per_target_lanes8_scalar": 1226.78125,
+      "kmitm_probe_ns_per_target_thr1": 1300.0546875,
+      "kmitm_probe_ns_per_target_thr2": 2614.9921875,
+      "kmitm_probe_ns_per_target_thr4": 2513.5703125,
+      "kmitm_right_precomputed": 0,
+      "kmitm_thr2_speedup": 0.4971543294524661,
+      "kmitm_thr4_speedup": 0.5172143707438063,
+      "ksum_build_ns": null,
+      "ksum_hits": null,
+      "ksum_insert_attempts": null,
+      "ksum_ok": false,
+      "ksum_probe_ns_per_target": null,
+      "left_k": 3,
+      "m": 4,
+      "probe_speedup_ksum_over_kmitm": null,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 32,
+      "build_speedup_ksum_over_kmitm": null,
+      "kmitm_build_ns": 51450304.0,
+      "kmitm_hits": 0,
+      "kmitm_hits_lanes8_ifma": 0,
+      "kmitm_hits_lanes8_scalar": 0,
+      "kmitm_hits_thr1": 0,
+      "kmitm_hits_thr2": 0,
+      "kmitm_hits_thr4": 0,
+      "kmitm_ifma_prepared": true,
+      "kmitm_ifma_vs_scalar8_speedup": 1.0282196563658081,
+      "kmitm_lanes8_scalar_speedup": 1.633562092671361,
+      "kmitm_left_entries": 287660,
+      "kmitm_probe_ns_per_target": 2142.2890625,
+      "kmitm_probe_ns_per_target_lanes8_ifma": 1275.4296875,
+      "kmitm_probe_ns_per_target_lanes8_scalar": 1311.421875,
+      "kmitm_probe_ns_per_target_thr1": 1358.0703125,
+      "kmitm_probe_ns_per_target_thr2": 4088.015625,
+      "kmitm_probe_ns_per_target_thr4": 1739.3359375,
+      "kmitm_right_precomputed": 0,
+      "kmitm_thr2_speedup": 0.3322077108010075,
+      "kmitm_thr4_speedup": 0.780798167404047,
+      "ksum_build_ns": null,
+      "ksum_hits": null,
+      "ksum_insert_attempts": null,
+      "ksum_ok": false,
+      "ksum_probe_ns_per_target": null,
+      "left_k": 4,
+      "m": 5,
+      "probe_speedup_ksum_over_kmitm": null,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 32,
+      "build_speedup_ksum_over_kmitm": null,
+      "kmitm_build_ns": 963094932.0,
+      "kmitm_hits": 3,
+      "kmitm_hits_lanes8_ifma": 3,
+      "kmitm_hits_lanes8_scalar": 3,
+      "kmitm_hits_thr1": 3,
+      "kmitm_hits_thr2": 3,
+      "kmitm_hits_thr4": 3,
+      "kmitm_ifma_prepared": true,
+      "kmitm_ifma_vs_scalar8_speedup": 0.6440197593332426,
+      "kmitm_lanes8_scalar_speedup": 1.9120437593237196,
+      "kmitm_left_entries": 3218798,
+      "kmitm_probe_ns_per_target": 6008.0,
+      "kmitm_probe_ns_per_target_lanes8_ifma": 4879.0234375,
+      "kmitm_probe_ns_per_target_lanes8_scalar": 3142.1875,
+      "kmitm_probe_ns_per_target_thr1": 3228.4609375,
+      "kmitm_probe_ns_per_target_thr2": 7104.40625,
+      "kmitm_probe_ns_per_target_thr4": 4385.8203125,
+      "kmitm_right_precomputed": 0,
+      "kmitm_thr2_speedup": 0.4544307889909871,
+      "kmitm_thr4_speedup": 0.7361133624874195,
+      "ksum_build_ns": null,
+      "ksum_hits": null,
+      "ksum_insert_attempts": null,
+      "ksum_ok": false,
+      "ksum_probe_ns_per_target": null,
+      "left_k": 5,
+      "m": 6,
+      "probe_speedup_ksum_over_kmitm": null,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 32,
+      "kmitm_ok": false,
+      "kmitm_prepare_error": "skip m=8: estimated left table ~34359738368 over |Fx|=32 (host OOM guard)",
+      "m": 8
+    },
+    {
+      "abscissae": 32,
+      "kmitm_ok": false,
+      "kmitm_prepare_error": "skip m=10: estimated left table ~35184372088832 over |Fx|=32 (host OOM guard)",
+      "m": 10
+    },
+    {
+      "abscissae": 32,
+      "kmitm_ok": false,
+      "kmitm_prepare_error": "skip m=12: estimated left table ~35184372088832 over |Fx|=32 (host OOM guard)",
+      "m": 12
+    }
+  ],
+  "targets": 128
+}

@@ -98,6 +98,8 @@ bits moves when switching subtract:m=3 → kmitm:m=4/5 with recipe retuning.
 | kmitm:m=5@32/lanes8 | 0.24 s | ~6.5× |
 | ifma:m=3@64/batch16 | 1.18 s | ~1.3× |
 
-PLAN lever 2: scalar 8-wide `decompose_lanes` landed; AVX/IFMA lockstep for
-kmitm still open. G3 still fail-closed (`G3_ATTEMPT.md`). Still `[pcc:unverified]`
+PLAN lever 2: scalar 8-wide `decompose_lanes` + AVX-512 IFMA lockstep for
+`right=1` kmitm lanes landed. IFMA beats scalar8 by ~1.1–1.5× at m=3–4
+(oracle ns/target); loses at large left tables (m≥6) — see `IFMA_ATTEMPT.md`.
+G3 still fail-closed (`G3_ATTEMPT.md`). Still `[pcc:unverified]`
 (no isolated runner in this environment).

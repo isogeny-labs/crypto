@@ -11,6 +11,7 @@ pair-table floor (~1) at polynomial memory, with exact verdicts.
 | Charge adds only on Bloom passes | Accounting diverges from sibling_pair equivalence; field work still Θ(\|F\|) — not a PROTOCOL advance |
 | 8-wide scalar lanes (lever 2) | Wall/throughput only; charged adds/target unchanged → slope stays ~1 |
 | IFMA subtract-gpu | Constant-factor wall on same m=3 search; same S / same floor |
+| IFMA kmitm lockstep (`IFMA_ATTEMPT.md`) | Wall/throughput only (≤~1.5× vs scalar8 at m=3–4); charged adds unchanged → slope stays ~1 |
 | Higher m (kmitm:m=5) | Lower absolute e2e S at fixed recipes; oracle adds/target still ~2\|F\| on misses |
 
 ## Still open for a true pass
