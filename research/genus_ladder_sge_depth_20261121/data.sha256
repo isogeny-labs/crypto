@@ -17,3 +17,8 @@ daf222f80a9d4775a6ef7d9264b418e4c2022f3d4b3ac7a0325a9264cefda848  paired.json
 24d4a393d47f98a082b736c686b1513deec000c9d2a511d3fa9c380829ef2d9c  join.py
 4653851968572fa9e8fac1addf9b480b665f73ea28a0dd3cbaefa0dfe3d4a346  model_check.py
 1a7352a19aa9941eedbc3f90e1e5d8786ac893bd50f082db41e07eb8dc1f2298  RESULTS.md
+# g4.jsonl and joined.jsonl are stored gzip-compressed (gzip -9 -n) because the
+# artifact-store migration in CI is blocked (S3 403); the hashes above are of the
+# decompressed files: verify with `gzip -dk g4.jsonl.gz joined.jsonl.gz` first.
+948155844a01f11e6a837c11d3ad9e4ab237d7f6355c41292783d22148a7296f  g4.jsonl.gz
+a2aeba50a1a32cf34fe2e3a781f64aaa8649f80a7c6dcaf6defc29da201c8307  joined.jsonl.gz
