@@ -1,0 +1,8 @@
+Relation-finding benchmark trigger
+UTC: 2026-11-21T18:11:44Z
+Requested branch: hourly-runs
+Command: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Curve/scope: frozen Koblitz GF(2^23), a=0, m=2, natural=256, planted=64, UNSAT=64 (synthetic control; NOT ECC2K-130)
+CSV: results/hourly_log.csv
+Baseline: results/relation_baseline.json
+Alert: failure or absolute deviation >20% in relations/sec or success rate; GitHub issue
