@@ -144,13 +144,32 @@ curves in an arm is dropped from that arm and disclosed.
   `rel_enum_mul`, `la_mul`, `N_all`, `GAE_w`), and of `ln(IC/rho)`, with the same cluster
   bootstrap. Sensitivity: the fit without the top prime. The reference has slope 1.5 by
   construction (`r ~ p^3`).
+- **Per-component exponents** (validator F9/F11 of pre-check 2): `group_ops`,
+  `decomp_trials`, `group_ops / decomp_trials`, `relations`, `attempts`, `idx_points`, besides
+  the totals, so that a slope diluted by fixed per-trial Pic work is visible.
 - **Extrapolated crossover** `p*` where the fitted `IC/rho` reaches 1, for every `w` whose
-  slope is negative, with the bootstrap interval of `log2 p*`. An extrapolation, reported as a
-  prediction only.
+  ratio slope is negative AND whose implied IC exponent (ratio slope + 1.5) is at least 1. A
+  sub-1 IC slope is never extrapolated (validator F11); the crossover is then withheld and
+  flagged. Reported with the bootstrap interval of `log2 p*`, as a prediction only.
+- Every pooled ratio is reported with its `w = 0` reading beside it (validator F9).
 - **Step A (paired).** For each (curve, seed) certified in both arms, `sfb / new` for FPM mid,
   `rel_mul`, `rel_enum_mul`, `la_mul`, `N_all`, `GAE_w`, `relations`, `attempts`,
   `decomp_trials`, `group_ops`; curve geometric mean; per-prime geometric mean with cluster
   bootstrap; pooled; slope of the ln ratio on `ln p`.
+
+## 6b. Record content and binding (validator findings on pre-check 2)
+
+- **F3.** With `2lp-sfb` among the arms, every `run` row carries the instance in full (`f`,
+  `p0`, `order`, `r`, `h`, `t_secret`, and the classes `G` and `T` as printed by the
+  instrument) and the `recovered` logarithm (IC and rho rows), so a certificate `[t]G = T` can
+  be re-checked independently of the booleans. (This required a second build of the binary
+  before freeze; the hash in `binary.sha256` is of that build.)
+- **F1.** This session does not commit. Binding is by `frozen.sha256` (this file and
+  `analyze.py`), `source.sha256` and `binary.sha256`, written before the measured runs; the
+  hash of this file is copied into a line of `RESULTS.md`. Development data are kept in
+  `dev/` of this study (curves at `p = 4093, 8191`, not grid primes, not in any fit).
+- The pre-check-2 validator found the T kick alone not significant; the linked policy carries
+  the retry cut. Both arms here keep the pre-check-2 settings (kick and linked policy) unchanged.
 
 ## 7. Predictions (written before the data, from pre-check 2's numbers)
 

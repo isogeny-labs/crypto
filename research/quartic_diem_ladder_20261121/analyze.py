@@ -49,6 +49,8 @@ def metrics(r):
         "relations": r["relations"],
         "attempts": max(r["attempts"], 1),
         "decomp_trials": max(r["decomp_trials"], 1),
+        "ops_per_trial": go / max(r["decomp_trials"], 1),
+        "idx_points": max(r.get("idx_points", 1), 1),
     }
     for w in WS:
         m[f"gae_all_{w}"] = go + w * native_all(r)
@@ -205,14 +207,16 @@ def main():
                 bb, aa = sl.pop("_boot")
                 # extrapolated crossover ln p* = -a / b (only if slope < 0)
                 cross = None
-                if sl["slope"] < 0:
+                ic_slope = sl["slope"] + 1.5   # IC exponent = ratio slope + reference slope 1.5
+                if sl["slope"] < 0 and ic_slope >= 1.0:
                     xs = [-a / b for a, b in zip(aa, bb) if b < 0]
                     pstar = math.exp(-sl["intercept"] / sl["slope"])
                     cross = {"p_star": pstar, "log2_p_star": math.log2(pstar),
                              "ci95_log2": [math.log2(math.exp(x)) for x in pct(xs)] if xs else None,
                              "frac_boot_negative_slope": float(np.mean(bb < 0))}
                 tables[arm][lab] = {"per_prime": {str(p): bp[p] for p in sorted(bp)},
-                                    "slope_ln_ratio": sl, "crossover": cross}
+                                    "slope_ln_ratio": sl, "crossover": cross,
+                                    "crossover_withheld_sub1_ic_slope": sl["slope"] < 0 and ic_slope < 1.0}
         # frozen verdict per prime: band all-native, w = 0, 0.1, 1
         verdict[arm] = {}
         for p in sorted(use):
@@ -234,7 +238,9 @@ def main():
         use = usable(arm)
         expo[arm] = {}
         for name in ["fpm_mid", "rel_mul", "rel_enum_mul", "la_mul", "native_all",
-                     "gae_all_0.0", "gae_all_0.1", "gae_all_1.0", "gae_mul_0.1", "gae_mul_1.0"]:
+                     "gae_all_0.0", "gae_all_0.1", "gae_all_1.0", "gae_mul_0.1", "gae_mul_1.0",
+                     "group_ops", "decomp_trials", "ops_per_trial", "relations", "attempts",
+                     "idx_points"]:
             vals = {p: [curve_metric(arm, p, c, name) for c in use[p]] for p in use}
             sl = boot_slope(vals)
             sl.pop("_boot")
