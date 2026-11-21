@@ -37,7 +37,7 @@ mod cryptanalysis {
         // The benchmark and regression-test p values are known primes; admission/primality cost
         // is deliberately excluded from this arithmetic throughput study.
         pub fn is_prime_u64(p: u64) -> bool {
-            matches!(p,3|5|7|11|17|101|65521|1000000007|2305843009213693951)
+            matches!(p,3|5|7|11|13|17|101|65521|1000000007|2305843009213693951)
         }
     }
     pub mod prime_root_trace;
