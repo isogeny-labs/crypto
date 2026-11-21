@@ -90,7 +90,7 @@ def main():
             "protocol_sha256": sha(protocol_raw), "script_sha256": sha((HERE / "run_sage.py").read_bytes()),
             "source_packed_sha256": sha(source_raw), "baseline_raw_sha256": sha(baseline_raw),
             "box_rows_raw_sha256": sha(row_raw), "comparison_rows_raw_sha256": sha(compare_raw),
-            "rank_bounds": list(rank_bounds), "R_reduced": [int(Rbar[0]),int(Rbar[1])],
+            "rank_bounds": [int(v) for v in rank_bounds], "R_reduced": [int(Rbar[0]),int(Rbar[1])],
             "R_reduced_scalar_relative_to_G": 9,
             "box_points": len(rows), "nonidentity_box_points": len(rows)-1,
             "distinct_nonidentity_reductions": len(buckets),
