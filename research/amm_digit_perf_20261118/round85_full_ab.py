@@ -143,7 +143,7 @@ try:
 except (AttributeError, OSError) as exc:
     print(f"CPU affinity unavailable: {exc}", flush=True)
 
-with tempfile.TemporaryDirectory(prefix="root84-full-") as tmp:
+with tempfile.TemporaryDirectory(prefix="root85-full-") as tmp:
     tmp = Path(tmp)
     bins = {}
     for label, source in [("before",baseline),("after",candidate)]:
@@ -158,7 +158,7 @@ with tempfile.TemporaryDirectory(prefix="root84-full-") as tmp:
         subprocess.run(["cargo","build","--release","--quiet"],cwd=folder,check=True)
         if label == "after":
             subprocess.run(["cargo","test","--release","--quiet",
-                            "round85_indexed_replay_rejects_forged_computation_ids",
+                            "round84_indexed_replay_rejects_forged_computation_ids",
                             "--","--nocapture"],cwd=folder,check=True)
             subprocess.run(["cargo","test","--release","--quiet",
                             "round85_fixed_division_matches_independent_euclidean_remainder",
