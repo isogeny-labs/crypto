@@ -16,17 +16,17 @@ SERVER="$here/server_pinned.py"
 SERVER_SHA=f56fd08e01318512713f8ee392d8539fb94dc969444d45234179789930d86550   # = runpod/server.py at d2a16c723d
 API=https://api.runpod.io/v2             # RunPod REST v2 (the v1 host answered 502; Amendment 32)
 IMAGE='python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b'  # as main's runpod/rp.sh (v2)
-FLAVOR=cpu5m VCPU=16 RAM_GB=128           # the one pinned flavor (decision D8): 16 vCPU, 128 GB; no fallback
+FLAVOR=cpu5m VCPU=32 RAM_GB=256           # the one pinned flavor (decision D8, owner decision 24): 32 vCPU, 256 GB; no fallback
 INSTANCE="$FLAVOR-$VCPU-$RAM_GB"
-MEM_FLOOR_GB=121                          # 112 GiB = 120.26 GB (Amendment 14 -m112): the pod record's cpu.memory floor
-WORST_HOURS=30 CEIL_USD=40                # owner decision 4: US$40 per job. One worst-case pod life for every cost
+MEM_FLOOR_GB=256                          # the pod record's cpu.memory floor (GB): the 256 GB pod of t14_bigmem/DRAFT_AMENDMENT.md
+WORST_HOURS=30 CEIL_USD=65                # owner decision 24: US$65 per job (30 h x 2.08 = 62.40). One worst-case pod life for every cost
                                           # figure (S7): hard deadline (26 h) + one reaper interval (4 h) = 30 h
-STUDY_GUARD_USD=510 STUDY_CEILING_USD=540 # owner decision 21: ledger sum + this job's worst case must stay <= the guard
+STUDY_GUARD_USD=535 STUDY_CEILING_USD=540 # owner decision 24 (was 510/540, decision 21): ledger sum + this job's worst case must stay <= the guard
 DEADLINE_S=90000                          # the registered job time limit (requests: seconds 90000), from the runner's start
 START_WITHIN_S=3300                       # the runner must start within 55 min of creation, so start + 25 h <= creation + 26 h
 HARD_S=93600                              # 26 h after creation: the reaper deletes any pkm-x- pod older than this
 PUSH_WAIT_S=7200                          # a completed run's pod waits at most 2 h for the git gate (decision 22)
-CLASSIFIER_VERSION=a33-r1                 # recorded in every outcome.json with the SHA-256 of fetch.sh and common.sh (S3)
+CLASSIFIER_VERSION=a33-r2                 # recorded in every outcome.json with the SHA-256 of fetch.sh and common.sh (S3)
 # The frozen image, pinned here rather than read from the mutable image/*.json files (S3); run.sh checks they agree.
 LAYER_DIGEST=a0f7e28eb0759ddefc4b906974866d2a2215d4705e25e9fd1fca45513b8b1971
 BIN_SHA_PINS='pkm_tower_pilot f78f39599d75859a693d3177272e95cae79559eebb10c1ac528e0cb13e4fcee7
@@ -35,19 +35,21 @@ hky_fp_tower_check c36d324e8a60b0d8e827982baf7e07e0ce155664c67ce8c11b4debc410b95
 pfd_grid_zeros 962833611e13e78a3dc5fbb9ab6bfc498fde9cccab255c704ed6e2ff12a03354
 entry_r2.sh 25b01841573334d1942de72e84aa55f60d4f238682fba33a41aa2bcd8962ea49
 run.sh c35ea88e7007198b9e9a026812a9bcb0ce55bc4082ba3627564c67f0fbab6eeb'
-M112_LIMIT_BYTES=120259084288             # 112 GiB: the pod's cgroup memory.max must be at least this, or "max" (S4)
+POD_LIMIT_BYTES=256000000000              # the 256 GB pod's cgroup memory.max must be at least this (238.42 GiB = 4 x 54e9 bytes
+                                          # (201.17 GiB) + the design's 36 GiB headroom + 1.25 GiB), or "max" (S4); it holds the
+                                          # design's worst-case process peak, 230.9 GiB, with 7.5 GiB spare (t14_bigmem/MEMORY.md section 5)
 LEDGER_FRESH_S=86400                      # the ledger's complete_as_of line must be at most 24 h old for a study launch
 POLL_S=${RPC_POLL_S:-10}                  # seconds between API polls (only the tests shorten it)
 RAYON=12                                  # Amendment 9; rp_pinned.sh start sends rayon 12
 REC_ROOT="$here/receipts" DEV_ROOT="$here/receipts_dev" OUT_ROOT="$here/results" REAP_DIR="$here/reaper"
 LEDGER="$here/ledger.tsv"
-# The one cell (owner decisions 20 and 23): t = 14, draw 0, cap 7, at Amendment 14's -m112 setting. Its one relaunch
+# The one cell (owner decisions 20 and 24): t = 14, draw 0, cap 7, at --max-dense 54000000000. Its one relaunch
 # (owner decision 13) runs only after a LOST with positive host-side evidence.
-STUDY_STAGE=cap:14:0:7:27900000000
-STUDY_NAMES=(pkm-x-t14-k0-c7-m112 pkm-x-t14-k0-c7-m112-r1)
+STUDY_STAGE=cap:14:0:7:54000000000
+STUDY_NAMES=(pkm-x-t14-k0-c7-d54 pkm-x-t14-k0-c7-d54-r1)   # the c7-m112 names of decision 23 are retired (cell measured)
 STUDY_SRC_REL=requests_r2i/pfd-x-t14-k0-c6.json                      # the frozen request it is derived from
-STUDY_REQUEST="$here/requests_m112/pfd-x-t14-k0-c7-m112.json"         # written by make_requests_m112.sh
-STUDY_REQUEST_SHA=44e009f18d19a9c61e5a281e0c2a6a219c4f3cc3252ca63bff71049fdef4c7f9   # pinned; see make_requests_m112_output.txt
+STUDY_REQUEST="$here/requests_d54/pfd-x-t14-k0-c7-d54.json"           # written by make_requests_d54.sh
+STUDY_REQUEST_SHA=089176f2a75dc228a817dc1b88852cd1953fbfcd63e0452189acd4765f70d025   # pinned; see make_requests_d54_output.txt
 
 now() { date -u +%FT%TZ; }
 bin_sha() { awk -v f="$1" '$1 == f { print $2 }' <<<"$BIN_SHA_PINS"; }
@@ -63,18 +65,20 @@ epoch() { date -u -d "$1" +%s; }
 is_study() { local n; for n in "${STUDY_NAMES[@]}"; do [ "$1" = "$n" ] && return 0; done; return 1; }
 is_dev() { [[ $1 =~ ^pkm-x-dev-[a-z0-9]+(-[a-z0-9]+)*$ ]]; }
 rec_dir() { if is_study "$1"; then echo "$REC_ROOT/$1"; elif is_dev "$1"; then echo "$DEV_ROOT/$1"; else return 1; fi; }
-# The cap-7 -m112 request (Amendment 7 B next step, cap 6 -> 7; Amendment 14 -m112: 112Gi, --max-dense 27900000000,
-# job-name suffix -m112), derived from the frozen r2i cap-6 request of the same draw. Every other field,
-# provenance.protocol_sha256 included, is copied unchanged; one sentence is appended to the note (the note stays within
-# the validator's 2048-character limit for provenance strings).
-c7_m112_request() {
+# The d54 request (owner decision 24): cap 7 (Amendment 7 B next step, cap 6 -> 7) at --max-dense 54000000000 on the
+# 256 GB pod, a new --max-dense step (a disclosed deviation from Amendment 14's last step, t14_bigmem/DRAFT_AMENDMENT.md
+# section 3), derived from the frozen r2i cap-6 request of the same draw: command[1] the stage, memory 238Gi (the
+# 256 GB pod is 238.42 GiB; 4 x 54e9 bytes = 201.2 GiB plus the design's 36 GiB headroom is 237.2 GiB), job-name suffix
+# c7-d54. Every other field, provenance.protocol_sha256 included, is copied unchanged; one sentence is appended to the
+# note (within the validator's 2048-character limit for provenance strings).
+d54_request() {
   local src=$1 rel; rel=${src#"$study/"}
   jq -e '.job.memory == "56Gi" and .job.command == ["/usr/local/bin/entry.sh", "cap:14:0:6:12800000000"]
          and (.job.job_name | startswith("pfd-x-t14-k0-c6-"))' "$src" >/dev/null || return 1
-  jq --arg rel "$rel" --arg st "$STUDY_STAGE" '.job.job_name |= sub("^pfd-x-t14-k0-c6"; "pfd-x-t14-k0-c7-m112")
-    | .job.memory = "112Gi"
+  jq --arg rel "$rel" --arg st "$STUDY_STAGE" '.job.job_name |= sub("^pfd-x-t14-k0-c6"; "pfd-x-t14-k0-c7-d54")
+    | .job.memory = "238Gi"
     | .job.command[1] = $st
-    | .provenance.note += " Amendment 33: cap 7 (Amendment 7 B next step) at Amendment 14 -m112 (112Gi, --max-dense 27900000000, name suffix -m112), derived from \($rel) by runpod_capped/make_requests_m112.sh; other fields unchanged."' "$src"
+    | .provenance.note += " Amendment 33 (owner decision 24): cap 7 at --max-dense 54000000000 on a 256 GB pod (238Gi), a new size step, not Amendment 14 -m112; derived from \($rel) by runpod_capped/make_requests_d54.sh; other fields unchanged."' "$src"
 }
 
 # Network setup. Called only by the modes that talk to RunPod (the offline classifier does not need it).
@@ -127,7 +131,7 @@ outcome_of() {
 # resolve the cell for the owner.
 lostauto() { [ "$2" = LOST ] && jq -e '.relaunch == "auto"' "$REC_ROOT/$1/outcome.json" >/dev/null 2>&1; }
 # next_allowed: the only study name run.sh may launch now, BLOCKED:<name>, or ALL_RESOLVED. The attempt here is the
-# cell's -m112 attempt itself (the 56Gi attempt was the other session's, Amendment 30), so no size step follows it.
+# cell's d54 attempt itself (owner decision 24); no size step follows it from this amendment.
 next_allowed() {
   local b=${STUDY_NAMES[0]} r=${STUDY_NAMES[1]} o
   o=$(outcome_of "$b")

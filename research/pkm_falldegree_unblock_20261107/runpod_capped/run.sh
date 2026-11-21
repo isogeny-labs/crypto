@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # run.sh NAME STAGE  -- start ONE capped F4 run on a reserved RunPod CPU pod (Amendment 33 draft,
 # AMENDMENT_R2_H_runpod_capped.md, sections 3-5). Shell only. RunPod REST v2.
-#   NAME   pkm-x-t14-k0-c7-m112, or its one relaunch pkm-x-t14-k0-c7-m112-r1 (only after a LOST with relaunch "auto";
+#   NAME   pkm-x-t14-k0-c7-d54, or its one relaunch pkm-x-t14-k0-c7-d54-r1 (only after a LOST with relaunch "auto";
 #          next_allowed in common.sh), or pkm-x-dev-<word> for a development check (t <= 10 only; receipts in
 #          receipts_dev/; not data).
-#   STAGE  cap:T:K:C:DENSE; for a study name it must be cap:14:0:7:27900000000, which is command[1] of the pinned request.
+#   STAGE  cap:T:K:C:DENSE; for a study name it must be cap:14:0:7:54000000000, which is command[1] of the pinned request.
 # Env: RPC_STATE (private scratch dir outside the worktree), RPC_BIN (dir with the four study binaries and entry_r2.sh),
 #      RPC_LAYER (the image layer tarball; required for study names), RUNPOD_API_KEY (else the proxy-injected placeholder).
 #      SHA_FILE must be unset.
@@ -35,12 +35,12 @@ npre=$(compgen -G "$REC.prestart-*" | wc -l || true)
 [[ $STAGE =~ ^cap:([0-9]+):([01]):([0-9]+):([0-9]+)$ ]] || refuse "stage $STAGE is not cap:T:K:C:DENSE"
 T=${BASH_REMATCH[1]} DENSE=${BASH_REMATCH[4]}
 if is_study "$NAME"; then
-  [ "$STAGE" = "$STUDY_STAGE" ] || refuse "stage $STAGE: the only stage of $NAME is $STUDY_STAGE (owner decision 23)"
+  [ "$STAGE" = "$STUDY_STAGE" ] || refuse "stage $STAGE: the only stage of $NAME is $STUDY_STAGE (owner decision 24)"
   req=$STUDY_REQUEST; [ -f "$req" ] || refuse "no request $req"
   [ "$(sha256sum "$req" | cut -d' ' -f1)" = "$STUDY_REQUEST_SHA" ] || refuse "$req sha256 differs from the pin $STUDY_REQUEST_SHA"
-  want=$(c7_m112_request "$study/$STUDY_SRC_REL") || refuse "cannot derive the request from $STUDY_SRC_REL"
-  jq -e --argjson w "$want" '. == $w' "$req" >/dev/null || refuse "$req differs from the request derived from $STUDY_SRC_REL (Amendments 7 B, 14)"
-  jq -e --arg s "$STAGE" '.job.command == ["/usr/local/bin/entry.sh", $s] and .job.memory == "112Gi"' "$req" >/dev/null \
+  want=$(d54_request "$study/$STUDY_SRC_REL") || refuse "cannot derive the request from $STUDY_SRC_REL"
+  jq -e --argjson w "$want" '. == $w' "$req" >/dev/null || refuse "$req differs from the request derived from $STUDY_SRC_REL (Amendment 7 B, owner decision 24)"
+  jq -e --arg s "$STAGE" '.job.command == ["/usr/local/bin/entry.sh", $s] and .job.memory == "238Gi"' "$req" >/dev/null \
     || refuse "stage $STAGE differs from $req command"
   log "cell request ${req#"$study/"} sha256 $STUDY_REQUEST_SHA (pinned)"
   nxt=$(next_allowed)
@@ -49,7 +49,7 @@ if is_study "$NAME"; then
   frozen_ok common.sh run.sh fetch.sh reap.sh || refuse "a route script's SHA-256 is not in the frozen amendment in $PREREG (S3)"
 else
   [ "$T" -le 10 ] || refuse "development check with t = $T > 10"
-  [ "$DENSE" = 12800000000 ] || [ "$DENSE" = 27900000000 ] || refuse "development check with --max-dense $DENSE (use 12800000000 or 27900000000)"
+  case $DENSE in 12800000000|27900000000|54000000000) ;; *) refuse "development check with --max-dense $DENSE (use 12800000000, 27900000000 or 54000000000)" ;; esac
   log "DEVELOPMENT CHECK, NOT DATA: $NAME $STAGE"
 fi
 floor=$MEM_FLOOR_GB
@@ -126,7 +126,7 @@ jq -e --argjson h $WORST_HOURS --argjson c $CEIL_USD '.price * $h <= $c' <<<"$pr
   || refuse "cost guard: $INSTANCE $price/h x $WORST_HOURS h > US\$$CEIL_USD"
 worst=$(awk -v p="$price" -v h=$WORST_HOURS 'BEGIN{printf "%.4f", p * h}')
 awk -v s="$lsum" -v w="$worst" -v c=$STUDY_GUARD_USD 'BEGIN{exit !(s + w <= c)}' \
-  || refuse "study guard: ledger US\$$lsum + this run's worst case US\$$worst > US\$$STUDY_GUARD_USD (owner decision 21)"
+  || refuse "study guard: ledger US\$$lsum + this run's worst case US\$$worst > US\$$STUDY_GUARD_USD (owner decision 24)"
 
 # 6. Cleanup for any failure before the runner starts: delete the pod (found by id, or by name when the create call
 #    failed or timed out), confirm it is gone, record the cost, and move the receipts aside (not an attempt).
@@ -261,8 +261,8 @@ done
 log "pod-side sha256 of the 7 uploaded files equal the local ones"
 
 # 10b. The pod's cgroup memory limit, read before start (S4): the boot loop has copied it into /results/cgroup, which
-#      holds nothing else yet. It must be "max" or at least 112 GiB, so that an OOM kill here means what it means at
-#      Amendment 14's -m112 size. Otherwise the pod is deleted before start (the case goes to the owner).
+#      holds nothing else yet. It must be "max" or at least 256,000,000,000 bytes (238.42 GiB: 4 x 54e9 bytes plus the
+#      design's 36 GiB headroom), the 256 GB pod's own limit. Otherwise the pod is deleted before start (owner).
 mm=""
 for i in 1 2 3; do
   pre="$RPC_STATE/$NAME.precheck"; rm -rf "$pre"; mkdir -p "$pre"
@@ -273,8 +273,8 @@ for i in 1 2 3; do
   rm -rf "$pre"; [ -n "$mm" ] && break; sleep "$POLL_S"
 done
 jq -n --arg v "$mm" --arg s "${mmsrc:-none}" '{cgroup_memory_limit:$v, source:$s}' > "$REC/cgroup-prestart.json"
-{ [ "$mm" = max ] || { [[ $mm =~ ^[0-9]+$ ]] && [ "$mm" -ge "$M112_LIMIT_BYTES" ]; }; } \
-  || { log "REFUSED cgroup memory limit '${mm:-unobservable}' (${mmsrc:-no file}): must be max or >= $M112_LIMIT_BYTES bytes; owner"; exit 4; }
+{ [ "$mm" = max ] || { [[ $mm =~ ^[0-9]+$ ]] && [ "$mm" -ge "$POD_LIMIT_BYTES" ]; }; } \
+  || { log "REFUSED cgroup memory limit '${mm:-unobservable}' (${mmsrc:-no file}): must be max or >= $POD_LIMIT_BYTES bytes; owner"; exit 4; }
 log "cgroup memory limit $mm ($mmsrc)"
 
 # 11. Deadlines written before start (S6, decision D3), then start.
