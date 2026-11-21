@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Source-exact before/after native Rust benchmark for Mersenne monic division.
+"""Source-exact before/after native Rust benchmark for terminal-square omission.
 
 The full producer/verifier Rust file is identical to the frozen Round91 commit
 or the current branch. Only bounded.rs and prime admission are stubbed.
@@ -138,7 +138,7 @@ with tempfile.TemporaryDirectory(prefix="root92-rust-") as temp:
         if label=="after":
             subprocess.run([
                 "cargo","test","--release","--quiet",
-                "round92_mersenne_dense_synthetic_division_reconstructs_dividend",
+                "round92_skips_terminal_power_squares_but_preserves_complete_certificates",
                 "--","--nocapture"
             ],cwd=directory,check=True)
             subprocess.run([
