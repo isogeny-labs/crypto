@@ -1,0 +1,26 @@
+name: Rootfind round77 square and unit paths (source-exact Rust)
+on:
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_root_trace.rs'
+      - 'research/amm_digit_perf_20261118/round77_trace_isolated.py'
+      - '.github/workflows/rootfind-trace-round77.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-source-exact-ab:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round77_trace_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Check Rust polynomial outputs and benchmark 13 paired AB trials
+        run: |
+          set -euo pipefail
+          rustc --version
+          python3 research/amm_digit_perf_20261118/round77_trace_isolated.py
