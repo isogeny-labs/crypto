@@ -1,0 +1,6 @@
+Assess relation-finding hourly run
+UTC scheduled invocation: 2026-11-21T21:20:19Z
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Scope: Koblitz GF(2^23), a=0, m=2 frozen synthetic control, not ECC2K-130.
+Baseline: results/relation_baseline.json, threshold: >20% deviation.
+CSV: results/hourly_log.csv.
