@@ -505,9 +505,14 @@ impl Engine<'_> {
                 let product = self.mul(&acc, &b)?;
                 acc = self.div(&product, modulus)?.1;
             }
-            let product = self.square(&b)?;
-            b = self.div(&product, modulus)?.1;
             exponent >>= 1;
+            // The base is dead after the final exponent bit. Avoid the last
+            // polynomial square, reduction, and their field/certificate events.
+            // PowerStep records the unchanged base when exponent reaches zero.
+            if exponent != 0 {
+                let product = self.square(&b)?;
+                b = self.div(&product, modulus)?.1;
+            }
             self.event(RootEvent::PowerStep {
                 id,
                 exponent,
@@ -1309,7 +1314,14 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 if state.exponent & 1 == 1 {
                     state.acc = vdiv(&vproduct(&state.acc, &state.base, p), &state.modulus, p)?.1;
                 }
-                state.base = vdiv(&vproduct(&state.base, &state.base, p), &state.modulus, p)?.1;
+                // At the terminal bit the base is never read again.
+                // Accept both the legacy squared terminal base and the new
+                // unchanged terminal base. On new traces we avoid the costly
+                // polynomial square/division during independent replay too.
+                if state.exponent != 1 || base != &state.base {
+                    state.base =
+                        vdiv(&vproduct(&state.base, &state.base, p), &state.modulus, p)?.1;
+                }
                 state.exponent >>= 1;
                 if (*exponent, accumulator, base) != (state.exponent, &state.acc, &state.base) {
                     return Err("modular power step failed".into());
@@ -1924,6 +1936,66 @@ mod round77_producer_regression {
                         ((acc as u128 * root as u128 + c as u128) % p as u128) as u64
                     ), 0, "not a root at p={p}");
                 }
+            }
+        }
+    }
+}
+
+
+#[cfg(test)]
+mod round79_terminal_power_regression {
+    use super::*;
+
+    #[test]
+    fn terminal_base_elision_preserves_results_and_legacy_certificates() {
+        for p in [101, 65_521, 1_000_000_007, MAX_PRIME] {
+            let limits = RootLimits {
+                field_work: MAX_WORK,
+                split_attempts: 512,
+                events: MAX_EVENTS,
+                degree: MAX_DEGREE,
+            };
+            let polynomials = [
+                vec![p - 2, 1],
+                vproduct(&[p - 2, 1], &[p - 3, 1], p),
+                vec![p - 1, 0, 0, 1],
+            ];
+            for f in polynomials {
+                let report = solve(&f, p, 79, limits.clone(), &mut |_| Ok(())).unwrap();
+                assert!(report.complete(), "incomplete p={p} f={f:?}");
+                verify(&report).unwrap();
+
+                let mut moduli = HashMap::new();
+                let mut legacy = report.clone();
+                let mut terminal_steps = 0;
+                for event in &mut legacy.events {
+                    match event {
+                        RootEvent::PowerBegin { id, modulus, .. } => {
+                            moduli.insert(*id, modulus.clone());
+                        }
+                        RootEvent::PowerStep { id, exponent: 0, base, .. } => {
+                            terminal_steps += 1;
+                            let modulus = moduli.get(id).unwrap();
+                            // Reconstruct the historical v1 terminal step.
+                            *base = vdiv(&vproduct(base, base, p), modulus, p).unwrap().1;
+                        }
+                        _ => {}
+                    }
+                }
+                assert!(terminal_steps > 0);
+                // Old stored certificates still pass, despite the optimized
+                // producer no longer spending work on dead terminal squares.
+                verify(&legacy).unwrap();
+
+                // An unrelated terminal base is not a valid certificate.
+                let mut malformed = report.clone();
+                let target = malformed.events.iter_mut().find(|event| matches!(
+                    event, RootEvent::PowerStep { exponent: 0, .. }
+                )).unwrap();
+                if let RootEvent::PowerStep { base, .. } = target {
+                    base.push(1);
+                }
+                assert!(verify(&malformed).is_err());
             }
         }
     }
