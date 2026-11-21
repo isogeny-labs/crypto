@@ -8,15 +8,20 @@
 # before the API call. A pod whose deadline cannot be read is not deleted: it is reported (exit 1). It takes the same
 # per-name lock as run.sh and fetch.sh; a pod whose lock is held is skipped for this pass and the skip is recorded. Every pass appends
 # one JSON line per pkm-x- pod to reaper/reap-YYYYMMDD.jsonl. It never touches a pod outside pkm-x-.
-# The main session runs it as a scheduled check-in at most every 4 h (section 2.6).
-# Exit: 0 no due pod remains listed; 1 the pod list, or a pod's deadline, could not be read; 7 a due pod is still listed.
+# It runs from two places (section 2.6): an hourly scheduled task that starts a fresh cloud session in a fresh checkout
+# with an empty RPC_STATE (owner decision 25; INDEPENDENT_REAPER.md), and the main session's check-ins. It needs no
+# earlier state: rpc_init creates RPC_STATE, the locks are created on first use, and fetch.sh recovers a missing pod
+# token from the REST v2 record's env.
+# Exit: 0 no due pod remains listed; 1 the pod list, or a pod's deadline, could not be read (nothing was checked or
+# deleted: the caller reports it); 7 a due pod is still listed.
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd); . "$here/common.sh"
 DRY=0; [ "${1:-}" = --dry-run ] && DRY=1
 rpc_init; trap rpc_cleanup EXIT
 mkdir -p "$REAP_DIR"; rlog="$REAP_DIR/reap-$(date -u +%Y%m%d).jsonl"
 note() { jq -nc --arg at "$(now)" "$@" >> "$rlog"; }
-pods=$(list_pkm) || { note --arg e "pod list not readable" '{at:$at, error:$e}'; echo "pod list not readable" >&2; exit 1; }
+pods=$(list_pkm) || { note --arg e "pod list not readable" '{at:$at, error:$e}'
+  echo "REAPER BLIND: the RunPod pod list (GET $API/pods) could not be read; no pod was checked or deleted. Report this to the owner; the next pass retries." >&2; exit 1; }
 [ -n "$pods" ] || { note '{at:$at, pkm_x_pods:0}'; echo "no pkm-x- pod"; exit 0; }
 left=0 errs=0 locked=0
 while read -r p; do

@@ -103,8 +103,9 @@ if is_study "$NAME"; then
 fi
 log "ledger sum US\$$lsum (complete_as_of $asof)"
 
-# 5. RunPod: no live pkm-x- pod (serial rule), then the catalog price and stock of the one pinned flavor at 16 vCPU
-#    (REST v2 GET /catalog/cpus/{id}?include=AVAILABILITY&product=POD&vcpuCount=16; price = price.securePerVcpu x 16).
+# 5. RunPod: no live pkm-x- pod (serial rule), then the catalog price and stock of the one pinned flavor at 32 vCPU
+#    (REST v2 GET /catalog/cpus/{id}?include=AVAILABILITY&product=POD&vcpuCount=32; price = price.securePerVcpu x 32).
+#    Out of stock (exit 10, nothing created) is availability NONE or an empty dataCenters list (review 4 M5e).
 rpc_init; trap 'rm -rf "$upd" "$STAGELOG"; rpc_cleanup' EXIT
 exec 9>"$RPC_STATE/$NAME.lock"; flock -n 9 || refuse "another run.sh, fetch.sh or reap.sh holds $NAME"
 live=$(list_pkm) || refuse "pod list not readable"
@@ -112,14 +113,14 @@ live=$(list_pkm) || refuse "pod list not readable"
 q=$(mktemp); trap 'rm -rf "$upd" "$STAGELOG" "$q" "$q.err"; rpc_cleanup' EXIT
 c=$(api_code GET "$API/catalog/cpus/$FLAVOR?include=AVAILABILITY&product=POD&vcpuCount=$VCPU" "$q")
 price_line=$(jq -c --arg i "$INSTANCE" --arg at "$(now)" --arg c "$c" --argjson v $VCPU \
-  '{at:$at, instance:$i, http:($c|tonumber), id, availability, ramGbPerVcpu, vcpu, securePerVcpu:.price.securePerVcpu,
+  '{at:$at, instance:$i, http:($c|tonumber), id, availability, dataCenters:[(.dataCenters // [])[] | {id, availability}], ramGbPerVcpu, vcpu, securePerVcpu:.price.securePerVcpu,
     price:(if (.price.securePerVcpu | type) == "number" then ((.price.securePerVcpu * $v * 10000 | round) / 10000) else null end)}' "$q" 2>/dev/null \
   || jq -nc --arg i "$INSTANCE" --arg at "$(now)" --arg c "$c" '{at:$at, instance:$i, http:$c, unreadable:true}')
 log "price $price_line"
 jq -e --arg f "$FLAVOR" --argjson r $((RAM_GB / VCPU)) --argjson v $VCPU '.http == 200 and .id == $f and .ramGbPerVcpu == $r
    and .vcpu.min <= $v and .vcpu.max >= $v' <<<"$price_line" >/dev/null 2>&1 \
   || refuse "catalog record of $FLAVOR unreadable or not $((RAM_GB / VCPU)) GB per vCPU at $VCPU vCPU: $price_line"
-jq -e '(.availability // "NONE") != "NONE" and (.price // 0) > 0' <<<"$price_line" >/dev/null 2>&1 \
+jq -e '(.availability // "NONE") != "NONE" and (.dataCenters | length) > 0 and (.price // 0) > 0' <<<"$price_line" >/dev/null 2>&1 \
   || { log "NOT IN STOCK or no price: $INSTANCE ($price_line). Nothing created; no attempt."; exit 10; }
 price=$(jq -r '.price' <<<"$price_line")
 jq -e --argjson h $WORST_HOURS --argjson c $CEIL_USD '.price * $h <= $c' <<<"$price_line" >/dev/null \
@@ -180,7 +181,7 @@ tokf="$RPC_STATE/$NAME.token" bodyf="$RPC_STATE/$NAME.body"
 read -r -d '' BOOT <<'EOF' || true
 mkdir -p /results/cgroup
 cgsnap() {
-  for f in memory.max memory.peak memory.events memory/memory.limit_in_bytes memory/memory.max_usage_in_bytes memory/memory.oom_control memory/memory.failcnt; do
+  for f in memory.max memory.peak memory.events memory.oom.group memory.swap.max memory/memory.limit_in_bytes memory/memory.max_usage_in_bytes memory/memory.oom_control memory/memory.failcnt; do
     if [ -r "/sys/fs/cgroup/$f" ]; then
       cat "/sys/fs/cgroup/$f" > /tmp/cgsnap.tmp 2>/dev/null && mv -f /tmp/cgsnap.tmp "/results/cgroup/$(echo "$f" | tr / _)"
     fi
@@ -189,6 +190,7 @@ cgsnap() {
 }
 ( cat /proc/self/cgroup > /results/cgroup/proc-self-cgroup 2>/dev/null
   stat -fc %T /sys/fs/cgroup > /results/cgroup/fstype 2>/dev/null
+  cat /proc/sys/vm/max_map_count > /results/cgroup/max_map_count 2>/dev/null
   n=0
   while :; do
     if [ -e /results/runner_state.json ]; then cgsnap; date -u +%FT%TZ > /results/cgroup/final-at; exit 0; fi
@@ -215,7 +217,7 @@ cat "$RPC_STATE/$NAME.create.err" >> "$REC/run.log" 2>/dev/null || true
 id=$(jq -r '.id // empty' "$RPC_STATE/$NAME.create" 2>/dev/null || true)
 if [ -n "$id" ]; then redact < "$RPC_STATE/$NAME.create" > "$REC/pod-create.json"; fi
 if [ "$cc" != 201 ] || [ -z "$id" ]; then
-  log "create failed or timed out (HTTP $cc): $(redact < "$RPC_STATE/$NAME.create" 2>/dev/null | jq -c . 2>/dev/null || head -c 500 "$RPC_STATE/$NAME.create" 2>/dev/null)"
+  log "create failed or timed out (HTTP $cc): $(redact < "$RPC_STATE/$NAME.create" 2>/dev/null | jq -c . 2>/dev/null || echo "non-JSON response of $(wc -c < "$RPC_STATE/$NAME.create" 2>/dev/null || echo 0) bytes, not copied (review 4 S13)")"
   rm -f "$RPC_STATE/$NAME.create" "$RPC_STATE/$NAME.create.err"; exit 4
 fi
 rm -f "$RPC_STATE/$NAME.create" "$RPC_STATE/$NAME.create.err"
@@ -265,16 +267,20 @@ log "pod-side sha256 of the 7 uploaded files equal the local ones"
 #      design's 36 GiB headroom), the 256 GB pod's own limit. Otherwise the pod is deleted before start (owner).
 mm=""
 for i in 1 2 3; do
-  pre="$RPC_STATE/$NAME.precheck"; rm -rf "$pre"; mkdir -p "$pre"
+  pre="$RPC_STATE/$NAME.precheck"; rm -rf "$pre"; mkdir -p "$pre"; extra=""
   if timeout 120 "$RP" fetch "$id" "$pre/p.tar.gz" >/dev/null 2>&1 && tar -xzf "$pre/p.tar.gz" -C "$pre" 2>/dev/null; then
     for f in memory.max memory_memory.limit_in_bytes; do [ -z "$mm" ] && [ -s "$pre/results/cgroup/$f" ] && mm=$(tr -d '\n' < "$pre/results/cgroup/$f") && mmsrc=$f; done
+    # recorded only (review 4 S1): how an OOM or an allocation failure would look; no rule reads them
+    for f in memory.oom.group memory.swap.max max_map_count; do [ -s "$pre/results/cgroup/$f" ] && extra="${extra:-}$(jq -nc --arg k "$f" --rawfile v "$pre/results/cgroup/$f" '{($k): ($v | rtrimstr("\n"))}')"; done
     find "$pre/results" -type f -printf '%P\n' | LC_ALL=C sort > "$REC/prestart-results-files.txt"
   fi
   rm -rf "$pre"; [ -n "$mm" ] && break; sleep "$POLL_S"
 done
-jq -n --arg v "$mm" --arg s "${mmsrc:-none}" '{cgroup_memory_limit:$v, source:$s}' > "$REC/cgroup-prestart.json"
-{ [ "$mm" = max ] || { [[ $mm =~ ^[0-9]+$ ]] && [ "$mm" -ge "$POD_LIMIT_BYTES" ]; }; } \
-  || { log "REFUSED cgroup memory limit '${mm:-unobservable}' (${mmsrc:-no file}): must be max or >= $POD_LIMIT_BYTES bytes; owner"; exit 4; }
+jq -n --arg v "$mm" --arg s "${mmsrc:-none}" --argjson x "$(printf '%s' "${extra:-}" | jq -s 'add // {}')" '{cgroup_memory_limit:$v, source:$s, recorded:$x}' > "$REC/cgroup-prestart.json"
+# "max" (no numeric limit) is accepted for development names only: a study run needs the numeric limit the design's
+# headroom and rule P2p are computed against (review 4 S3).
+{ { [ "$mm" = max ] && ! is_study "$NAME"; } || { [[ $mm =~ ^[0-9]+$ ]] && [ "$mm" -ge "$POD_LIMIT_BYTES" ]; }; } \
+  || { log "REFUSED cgroup memory limit '${mm:-unobservable}' (${mmsrc:-no file}): must be >= $POD_LIMIT_BYTES bytes (max only for development names); owner"; exit 4; }
 log "cgroup memory limit $mm ($mmsrc)"
 
 # 11. Deadlines written before start (S6, decision D3), then start.

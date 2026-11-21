@@ -19,9 +19,11 @@ IMAGE='python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365d
 FLAVOR=cpu5m VCPU=32 RAM_GB=256           # the one pinned flavor (decision D8, owner decision 24): 32 vCPU, 256 GB; no fallback
 INSTANCE="$FLAVOR-$VCPU-$RAM_GB"
 MEM_FLOOR_GB=256                          # the pod record's cpu.memory floor (GB): the 256 GB pod of t14_bigmem/DRAFT_AMENDMENT.md
-WORST_HOURS=30 CEIL_USD=65                # owner decision 24: US$65 per job (30 h x 2.08 = 62.40). One worst-case pod life for every cost
-                                          # figure (S7): hard deadline (26 h) + one reaper interval (4 h) = 30 h
-STUDY_GUARD_USD=535 STUDY_CEILING_USD=540 # owner decision 24 (was 510/540, decision 21): ledger sum + this job's worst case must stay <= the guard
+WORST_HOURS=30.8 CEIL_USD=65              # owner decision 24: US$65 per job (30.8 h x 2.08 = 64.06). One worst-case pod life for every
+                                          # cost figure (S7): hard deadline (26 h) + 4 h between reaper passes if the hourly independent
+                                          # reaper (owner decision 25) misses passes and only the session's 4-hourly pass runs + 0.8 h for
+                                          # one pass (review 3 S2, review 4 M5f). With the hourly reaper running: 26 + 1 + 0.8 = 27.8 h.
+STUDY_GUARD_USD=595 STUDY_CEILING_USD=600 # owner decision 27 (was 535/540, decision 24): ledger sum + this job's worst case must stay <= the guard
 DEADLINE_S=90000                          # the registered job time limit (requests: seconds 90000), from the runner's start
 START_WITHIN_S=3300                       # the runner must start within 55 min of creation, so start + 25 h <= creation + 26 h
 HARD_S=93600                              # 26 h after creation: the reaper deletes any pkm-x- pod older than this
@@ -36,8 +38,9 @@ pfd_grid_zeros 962833611e13e78a3dc5fbb9ab6bfc498fde9cccab255c704ed6e2ff12a03354
 entry_r2.sh 25b01841573334d1942de72e84aa55f60d4f238682fba33a41aa2bcd8962ea49
 run.sh c35ea88e7007198b9e9a026812a9bcb0ce55bc4082ba3627564c67f0fbab6eeb'
 POD_LIMIT_BYTES=256000000000              # the 256 GB pod's cgroup memory.max must be at least this (238.42 GiB = 4 x 54e9 bytes
-                                          # (201.17 GiB) + the design's 36 GiB headroom + 1.25 GiB), or "max" (S4); it holds the
-                                          # design's worst-case process peak, 230.9 GiB, with 7.5 GiB spare (t14_bigmem/MEMORY.md section 5)
+                                          # (201.17 GiB) + the design's 36 GiB headroom + 1.25 GiB); "max" only for dev names (review 4 S3); it holds the
+                                          # design's projected process peak under the cap, 230.9 GiB (a projection under stated
+                                          # assumptions, not a bound; t14_bigmem/MEMORY.md section 5; a peak above it reads as OOM)
 LEDGER_FRESH_S=86400                      # the ledger's complete_as_of line must be at most 24 h old for a study launch
 POLL_S=${RPC_POLL_S:-10}                  # seconds between API polls (only the tests shorten it)
 RAYON=12                                  # Amendment 9; rp_pinned.sh start sends rayon 12
@@ -141,7 +144,7 @@ next_allowed() {
   case $o in NONE) echo "$r" ;; INFLIGHT|NOT_AN_ATTEMPT|PENDING) echo "BLOCKED:$r" ;; *) echo ALL_RESOLVED ;; esac
 }
 
-# Study-wide cost ledger (owner decision 21: guard US$510, ceiling US$540). Rows: job route authority state usd source
+# Study-wide cost ledger (owner decision 27: guard US$595, ceiling US$600). Rows: job route authority state usd source
 # (tab-separated); usd is the actual cost when state is closed, the worst case when open. Prints the sum; fails if malformed.
 ledger_sum() {
   [ -f "$LEDGER" ] || { echo "no ledger $LEDGER" >&2; return 1; }

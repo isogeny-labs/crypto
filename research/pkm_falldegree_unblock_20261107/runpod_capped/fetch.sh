@@ -250,6 +250,10 @@ decide() { jq -c --arg ver "$CLASSIFIER_VERSION" --arg fsha "$(sha256sum "$here/
       else $base + {class:"PENDING", rule:"P8", why:"not collected yet"}
       end
     end
+  # An OOM with the peak well under the pod's limit points at a kill from outside this run's size (review 4 S8): noted.
+  | if .class == "OOM" and (.memory.peak_bytes_used // null) != null and $f.tree.limit_bytes != null
+         and .memory.peak_bytes_used < 0.9 * $f.tree.limit_bytes
+    then . + {oom_note:"peak below 90 percent of memory.max: a host-level or group kill is likely, not a sign that this --max-dense is too small"} else . end
   # The reading (Amendment 7 B at cap C; owner decision 24), from the class and the row only.
   | ([ $f.stage | capture("^cap:[0-9]+:[01]:(?<c>[0-9]+):")? | .c | tonumber ] | first) as $cap
   | . + (if $cap == null then {} else {reading:(
