@@ -104,7 +104,7 @@ fn calculate(e:&mut Engine,case:&str,a:&[u64],b:&[u64],fast:bool)->Vec<u64>{
  }
 }
 fn sample(p:u64,case:&str,xs:&[(Vec<u64>,Vec<u64>)],fast:bool)->(f64,u64){
- let start=Instant::now();let mut hash=0;let mut count=0;
+ let start=Instant::now();let mut hash=0u64;let mut count=0u64;
  for _ in 0..80{for (a,b) in xs {
  let mut e=Engine::new(p);
  let c=calculate(&mut e,case,black_box(a),black_box(b),fast);
