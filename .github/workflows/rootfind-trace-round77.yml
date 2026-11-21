@@ -15,6 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           sparse-checkout: |
             src/cryptanalysis/prime_root_trace.rs
             research/amm_digit_perf_20261118/round77_trace_isolated.py
