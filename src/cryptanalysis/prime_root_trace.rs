@@ -808,7 +808,9 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     // For f(x)*(x+c), coefficient k is c*f[k] + f[k-1].
     // This needs one field product per coefficient, not two convolution
     // products, and has no inner-loop allocation or degree dispatch.
-    if (a.len() == 2 && a[1] == 1) || (b.len() == 2 && b[1] == 1) {
+    if (a.len() == 2 && a[1] == 1 && b.len() >= 5)
+        || (b.len() == 2 && b[1] == 1 && a.len() >= 5)
+    {
         let (linear, other) = if a.len() == 2 && a[1] == 1 {
             (a, b)
         } else {
@@ -1342,7 +1344,8 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 for v in [a, b, quotient, remainder] {
                     canonical(v, p)?;
                 }
-                if vdiv(a, b, p)? != (quotient.clone(), remainder.clone()) {
+                let (verified_quotient, verified_remainder) = vdiv(a, b, p)?;
+                if verified_quotient != *quotient || verified_remainder != *remainder {
                     return Err("division identity failed".into());
                 }
             }
@@ -1432,7 +1435,8 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 canonical(quotient, p)?;
                 canonical(remainder, p)?;
                 let state = gcds.get_mut(id).ok_or("missing gcd begin")?;
-                if vdiv(&state.0, &state.1, p)? != (quotient.clone(), remainder.clone()) {
+                let (verified_quotient, verified_remainder) = vdiv(&state.0, &state.1, p)?;
+                if verified_quotient != *quotient || verified_remainder != *remainder {
                     return Err("Euclidean step failed".into());
                 }
                 *state = (state.1.clone(), remainder.clone());
@@ -1470,11 +1474,16 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 s[0] = (s[0] + p - 1) % p;
                 let g = vgcd(h.clone(), trim(s), p)?;
                 let valid = g.len() > 1 && g.len() < h.len();
+                let quotient_matches = if valid {
+                    let (verified_quotient, verified_remainder) = vdiv(&h, &g, p)?;
+                    verified_remainder.is_empty() && verified_quotient == *quotient
+                } else {
+                    quotient.is_empty()
+                };
                 if h != *polynomial
                     || g != *factor
                     || valid != *accepted
-                    || (valid && vdiv(&h, &g, p)? != (quotient.clone(), vec![]))
-                    || (!valid && !quotient.is_empty())
+                    || !quotient_matches
                 {
                     return Err("split identity failed".into());
                 }
@@ -1533,14 +1542,13 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     {
                         return Err("invalid finite-root certificate".into());
                     }
-                    let xp = vpower(&[0, 1], p, &report.polynomial, p)?;
-                    if xp != *xp_mod_f {
-                        return Err("X^p residue certificate failed".into());
-                    }
-                    let mut xm = xp;
-                    xm.resize(xm.len().max(2), 0);
-                    xm[1] = (xm[1] + p - 1) % p;
-                    let g = vgcd(report.polynomial.clone(), trim(xm), p)?;
+                    // First independently reconstruct the distinct linear factors.
+                    // If they account for the entire polynomial, Frobenius is
+                    // determined algebraically: X^p == X modulo a square-free
+                    // product of distinct F_p-linear factors. This avoids a
+                    // redundant polynomial exponentiation and Euclidean GCD
+                    // during certificate verification, without trusting the
+                    // producer's claimed xp_mod_f or linear_part.
                     let mut product = vec![1];
                     let mut previous = None;
                     for &r in roots {
@@ -1550,8 +1558,42 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                         previous = Some(r);
                         product = vproduct(&product, &[(p - r) % p, 1], p);
                     }
-                    if g != *linear_part || product != g {
-                        return Err("distinct-root completeness failed".into());
+                    let completely_split = report.polynomial.len() >= 2
+                        && roots.len() + 1 == report.polynomial.len()
+                        && report.polynomial.last().is_some_and(|&lead| {
+                            lead != 0
+                                && (if lead == 1 {
+                                    product == report.polynomial
+                                } else {
+                                    product.iter().zip(report.polynomial.iter())
+                                        .all(|(&c, &original)| vmul(c, lead, p) == original)
+                                })
+                        });
+                    if completely_split {
+                        // For degree one, X mod f is the unique root. For
+                        // degree >= 2, the polynomial X is already reduced.
+                        let expected_xp = if report.polynomial.len() == 2 {
+                            if roots[0] == 0 { vec![] } else { vec![roots[0]] }
+                        } else {
+                            vec![0, 1]
+                        };
+                        if *xp_mod_f != expected_xp || *linear_part != product {
+                            return Err("completely split root certificate failed".into());
+                        }
+                    } else {
+                        // Preserve the general independent Frobenius and GCD
+                        // proof for irreducible cofactors or repeated roots.
+                        let xp = vpower(&[0, 1], p, &report.polynomial, p)?;
+                        if xp != *xp_mod_f {
+                            return Err("X^p residue certificate failed".into());
+                        }
+                        let mut xm = xp;
+                        xm.resize(xm.len().max(2), 0);
+                        xm[1] = (xm[1] + p - 1) % p;
+                        let g = vgcd(report.polynomial.clone(), trim(xm), p)?;
+                        if g != *linear_part || product != g {
+                            return Err("distinct-root completeness failed".into());
+                        }
                     }
                 }
                 finished = true;
@@ -1588,6 +1630,42 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round82_full_split_frobenius_certificate_and_tampering() {
+        // A full split proves X^p-X divisibility, including nonmonic f.
+        // Sparse, repeated-root, and partial-split certificates still use
+        // the general Frobenius/GCD replay and must continue verifying.
+        for p in [3, 17, 65_521, 1_000_000_007, MAX_PRIME] {
+            let cases = if p == 3 {
+                vec![vec![p - 1, 1], vec![0, 1]]
+            } else {
+                let split = [2u64, 3, 5, 7].iter().fold(vec![1], |a, &r| {
+                    vproduct(&a, &[(p - r) % p, 1], p)
+                });
+                let scaled = split.iter().map(|&x| vmul(x, 3, p)).collect();
+                vec![vec![p - 1, 1], vec![0, 1], split, scaled]
+            };
+            for polynomial in cases {
+                let report = solve(&polynomial, p, 7, RootLimits {
+                    field_work: MAX_WORK, split_attempts: 1000,
+                    events: MAX_EVENTS, degree: MAX_DEGREE,
+                }, &mut |_| Ok(())).unwrap();
+                assert!(report.complete(), "p={p} polynomial={polynomial:?}");
+                verify(&report).unwrap();
+                let mut forged = report.clone();
+                if let Some(RootEvent::Finish { xp_mod_f, .. }) = forged.events.last_mut() {
+                    *xp_mod_f = vec![p - 1];
+                }
+                assert!(verify(&forged).is_err(), "forged Frobenius at p={p}");
+                let mut forged = report.clone();
+                if let Some(RootEvent::Finish { linear_part, .. }) = forged.events.last_mut() {
+                    *linear_part = vec![1];
+                }
+                assert!(verify(&forged).is_err(), "forged linear part at p={p}");
+            }
+        }
+    }
 
     #[test]
     fn round81_monic_linear_certificate_product_matches_convolution() {
