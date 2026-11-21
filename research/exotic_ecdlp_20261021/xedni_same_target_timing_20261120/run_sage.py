@@ -56,7 +56,7 @@ def rho_solve(Ep,G,T,pair_index):
     start = time.monotonic_ns()
     updates = 0
     for restart in range(1,44):
-        seed = pair_index*43+restart
+        seed = pair_index*17+restart
         a = seed%43
         b = (7*seed+3)%43
         X = a*G+b*T
@@ -83,7 +83,7 @@ def rho_solve(Ep,G,T,pair_index):
             k = (fast[1]-slow[1])*pow(den,-1,43)%43
             assert k*G == T
             stop = time.monotonic_ns()
-            return {"scalar":k,"walk_updates":updates,"iterations":iteration,
+            return {"scalar":k,"seed_mod_43":seed%43,"walk_updates":updates,"iterations":iteration,
                     "restarts":restart-1,"start_ns":start,"stop_ns":stop,
                     "online_ns":stop-start,"status":"verified"}
     stop = time.monotonic_ns()

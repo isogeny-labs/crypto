@@ -14,7 +14,7 @@
   "height_pairing_matrix": [["0.76115383900892333903295666575543006507", "-0.76008758370207971153917082321179783517"], ["-0.76008758370207971153917082321179783517", "16.600741728784049454515529725637870238"]],
   "lift_candidate_order": "nonzero (a,b) in [-4,4]^2 sorted by Decimal quadratic height score,a,b; no precomputed rational candidates",
   "lift_stop": "first target lift with b=0, or both a target lift and an equal-reduction collision from two distinct rational candidates; derive R/G from the collision, then verify scalar multiplication",
-  "rho": "Floyd rho on the same target with x-mod-3 walk partition, deterministic per-pair seeds and restart on degenerate collision, cap 10000 iterations per seed",
+  "rho": "Floyd rho on the same target with x-mod-3 walk partition; seed=17*pair_index+restart (then mod43), restart on degenerate collision, cap 10000 iterations per seed",
   "pairs": 5,
   "pair_order": "alternate lift,rho and rho,lift",
   "timing": "monotonic_ns starts before first target-dependent point operation and stops after scalar replay; process launch, curve construction, Q/R import, height pairing and coefficient sorting recorded as separate setup",
