@@ -312,12 +312,12 @@ preregistration as `sha256sum` output; `run.sh` and `fetch.sh` refuse study runs
 
 | file | SHA-256 |
 |:--|:--|
-| `common.sh` | `@SHA_common.sh@` |
-| `run.sh` | `@SHA_run.sh@` |
-| `fetch.sh` | `@SHA_fetch.sh@` |
-| `reap.sh` | `@SHA_reap.sh@` |
-| `make_requests_d54.sh` | `@SHA_make_requests_d54.sh@` |
+| `common.sh` | `a54e02d5c6daa09fd980a9e4fcccb747fd432fd75c9fd5a66dc847fab150ac84` |
+| `run.sh` | `87e0a3b3b3e29dc246f4b78d9d36a7fea2daa567ccce0e9c67b6e49043c8bd77` |
+| `fetch.sh` | `afb7aaffda98b31f232eede3f65ffbb41df1a5521f3c1ed71ec7fecdf568dab2` |
+| `reap.sh` | `2a289e60c5ae7c3fe98c757dd90ccea0975e0c5965165b433d23d2d0224ace8b` |
+| `make_requests_d54.sh` | `b5e5c65570ce7b4cd228352d0ade8a571deac3d8c62813ae917ab6a11b155cb2` |
 | `requests_d54/pfd-x-t14-k0-c7-d54.json` | `089176f2a75dc228a817dc1b88852cd1953fbfcd63e0452189acd4765f70d025` |
 | `rp_pinned.sh` | `b4b6019934e02ffa32043e2e6b9aee4eb4dcc53b42442b2e01d1b30ccf536c5d` (= main's `runpod/rp.sh` at `d2a16c723d`) |
 | `server_pinned.py` | `f56fd08e01318512713f8ee392d8539fb94dc969444d45234179789930d86550` (= `runpod/server.py` at `d2a16c723d`) |
-| retired: `make_requests_m112.sh`, `requests_m112/pfd-x-t14-k0-c7-m112.json` | `@SHA_make_requests_m112.sh@`, `44e009f18d19a9c61e5a281e0c2a6a219c4f3cc3252ca63bff71049fdef4c7f9` |
+| retired: `make_requests_m112.sh`, `requests_m112/pfd-x-t14-k0-c7-m112.json` | `dd75c92a7d86ba0927886c0926f2b25f59fd4645cd22a8a7a9713af4b62ddd8d`, `44e009f18d19a9c61e5a281e0c2a6a219c4f3cc3252ca63bff71049fdef4c7f9` |
