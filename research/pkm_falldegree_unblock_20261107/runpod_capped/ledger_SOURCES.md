@@ -51,3 +51,32 @@ Every figure is `[pcc:unverified]`. Paths are relative to `research/pkm_falldegr
 - The 24 h freshness line is left `never`; set `complete_as_of` only after reviewing rows, the open `pfd-b-rp` row, and whether further RunPod pods of the study (R3 decisive cells) exist.
 - A `closed` EKS row carries a bound, not an invoice; the launcher's own convention ('actual or best derived when closed') is met by 'derived', but the rows are conservative by design. Replace with measured spend if an AWS Cost Explorer reading by job tag is available.
 - Whole draft vs launcher: the file passes `ledger_sum`'s awk check (6 tab fields, state open/closed, numeric usd).
+
+## 5. Update of 2026-11-21 (Amendment 33 port)
+
+Owner decision 21 sets the guard US$510 and the ceiling US$540. The update replaces rows 1, 2 and 18 above and adds rows;
+the EKS rows (3-17) are unchanged. Every figure is `[pcc:unverified]`.
+
+- **Measured RunPod rows.** `billing_v2_20261121.tsv` holds RunPod's own billing per pod, read-only
+  `GET https://api.runpod.io/v2/billing/pods` for 2026-11-14 to 2026-11-22 in daily buckets, summed per pod
+  (`totalAmount`). The account is shared with other studies (180 pods billed in that window), so only pods whose id
+  appears in a study file are listed; the file names that file for each pod. Rows 1 and 2 (the two development smokes)
+  now carry the billed figures (0.0141, 0.0541) instead of the derived ones, and row 18 (`pfd-b-rp`, open at the
+  US$40 cap) is closed at its billed 13.0428.
+- **The Amendment 31 batch (PREREGISTRATION.md Amendment 32: US$370.84).** Eight rows: route F `pfd-x-t14-k0-c7-m112-rp`
+  (`z8etqr6jgg6jlh`) 63.4011 and `pfd-x-t14-k1-c7-m112-rp` (`vj7gjatk8lm6le`) 63.4016; route C `pfd-m2c-t14-k0-rp`
+  (`6m8yac6n96khdv`) 63.4019 and `pfd-m2c-t14-k1-rp` (`yzyabb71rh7n5e`) 53.6615; validation `pfd-m2c-t12-k0-rp`,
+  `-t12-k1-`, `-t13-k0-`, `-t13-k1-` 31.7438, 31.7440, 31.7442, 31.7443. Sum 370.8424, equal to Amendment 32's figure.
+  The pod ids come from `results/SNAPSHOT_20261117/<job>/snapshot.json`.
+- **Spend before Amendment 31 ("about US$95", Amendment 32).** Itemised here: the EKS rows (19.3324) and 31 billed
+  RunPod pods named in study files (43.9962 with the smokes and `pfd-b-rp`). Names marked "inferred" in the billing
+  file: `ta5f081df7skpe` and `1tvdt8uv14lpm9` are the cap 7 attempt 2 pods per the 2026-11-15 session log ("t = 14 cap
+  7 (draws 0, 1) running on pods ta5f081df7skpe and 1tvdt8uv14lpm9"); `t0bqkj2h4g2dgo` and `y8dxu6qiiykumx` are the
+  two pods `results/RUNPOD_LOSSES_20261115.md` saw billed but not created by that session, probably the other
+  session's study pods of that morning. The row `a32-remainder/unitemised` (31.6714) brings the pre-Amendment-31 total
+  to Amendment 32's US$95: it stands in for the pods of this study whose ids are in no study file (UNKNOWN-4 in the
+  ledger). With it the ledger sum is 465.8424, Amendment 32's "about US$466".
+- **Not rows: attribution unknown (UNKNOWN-5).** `bdr-growthlaw` (billed 35.7037) and `pkm-dense-rerun-20261115`
+  (37.2565) are listed by the 2026-11-17 snapshot among the pods "of this study". If they are, the ledger is US$538.80
+  and the guard refuses this route's launch (538.80 + 31.20 > 510). The owner decides.
+- **Check at this update.** `ledger_sum` 465.8424; this route's worst case 31.2000 (1.04 x 30 h); 497.0424 <= 510.

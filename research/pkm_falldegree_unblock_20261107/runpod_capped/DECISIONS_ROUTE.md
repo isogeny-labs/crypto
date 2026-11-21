@@ -1,4 +1,4 @@
-# Decisions behind the capped RunPod route (draft Amendment 18)
+# Decisions behind the capped RunPod route (Amendment 33 draft; draft Amendment 18 until 2026-11-15)
 
 This file records the decisions that `AMENDMENT_R2_H_runpod_capped.md` and the route scripts rely on, so that a reader
 can find them in a committed file (second review, S13). Owner decisions are the owner's answers, recorded in full in
@@ -17,6 +17,10 @@ decision, not results. Every entry is `[pcc:unverified]`.
 | 13 | 2026-11-15 | One relaunch per t = 14 cell on positive host-side evidence of loss only; an abort, a no-evidence outcome or a loss without host-side evidence goes to the owner; t = 13 gets none. | Section 4.3; `fetch.sh` `relaunch`; `common.sh` `cell_next`. |
 | 14 | 2026-11-15 | The deadline and the cost cap are enforced by session check-ins and a scheduled reaper; no enforcement independent of Claude sessions. | Section 2.6; `reap.sh`. |
 | 15 | 2026-11-15 | A 112 GiB attempt whose own process peak exceeds 112 GiB counts as OOM (censored). | Rule P2p. |
+| 20 | 2026-11-21 | Run exactly one cell on this route, within the budget. | The allow-list holds one study name and its one relaunch (`common.sh` `STUDY_NAMES`). |
+| 21 | 2026-11-21 | Study ceiling US$540, study spend guard US$510 (Amendment 20 had US$500 and US$470); the per-job cap stays US$40. | `common.sh` `STUDY_GUARD_USD`, `STUDY_CEILING_USD`, `CEIL_USD`; `run.sh` step 5. |
+| 22 | 2026-11-21 | Run without S3 (this session's AWS credentials are invalid): results come back to the session and go into git; no S3 raw upload and no S3 resume checkpoint. A disclosed deviation. | `fetch.sh --delete REF` (the git gate); `.gitignore`; amendment sections 2.5 and 6. |
+| 23 | 2026-11-21 | The cell is t = 14, draw 0, cap 7 at Amendment 14's -m112 setting, stage `cap:14:0:7:27900000000` (Amendment 31 route F). Reading: refutes, d_F = 7; completes without refuting, d_F >= 8; oversize or a memory kill at 112Gi, censored and d_F >= 7 stands. | `common.sh` `STUDY_STAGE`; `run.sh` step 1; amendment section 1. |
 
 ## Main-session decisions
 
@@ -43,3 +47,24 @@ decision, not results. Every entry is `[pcc:unverified]`.
 | N3a aligned | 2026-11-15 | Host-side evidence for an automatic relaunch is either form the owner's question for decision 13 named: a RunPod-side status change, or the pod gone from the list with GET 404, each recorded before any logged session action. | Aligns the route with owner decision 13 as answered, including its caveat that RunPod keeps no record of who ended a pod. |
 | round 3 (R1-R3, S1) | 2026-11-15 | Host-side evidence counts only when tied to the loss (between the last check-in that saw the runner alive and the first loss; a user-named status at the loss check-in, or a runner seen done before the loss, sends the relaunch to the owner); the text is brought up to date with the second smoke (cgroup v2, two CPU models under `cpu5m`); `reap.sh` takes the per-name lock and skips a held pod; classifier `a18-r4`. | The third review found host-side evidence not tied to the loss, a loss after an observed completion getting an automatic relaunch, stale text, and a reaper without the lock. |
 | tests | 2026-11-15 | The test suite writes into the repository only with `--write`. | The reviewer had to run it on an archive copy because it rewrote committed files. |
+
+## Port decisions (2026-11-21, Amendment 33 draft)
+
+Taken by the port session on the main session's instructions of 2026-11-21. Records of a decision, not results; every
+entry is `[pcc:unverified]`.
+
+| id | date | decision | reason (one line) |
+|:--|:--|:--|:--|
+| P1 allow-list | 2026-11-21 | The allow-list is `pkm-x-t14-k0-c7-m112` and `pkm-x-t14-k0-c7-m112-r1` (owner decision 13: only after a LOST with relaunch `auto`); `pkm-x-dev-*` (t <= 10) stays. Every draft Amendment 18 name is removed. `next_allowed` reduces to base, then the relaunch. | Owner decisions 20 and 23: one cell. |
+| P2 request | 2026-11-21 | No frozen `pfd-x-t14-k0-c7-m112` request exists on main (searched `requests*/`, `runpod/`, `results/` and the study's text files). `make_requests_m112.sh` derives it from `requests_r2i/pfd-x-t14-k0-c6.json`: command[1] `cap:14:0:7:27900000000`, memory 112Gi, job name `pfd-x-t14-k0-c7-m112-20261108`, one sentence appended to the note; every other field copied. Its SHA-256 `44e009f1…` is pinned in `common.sh`; `run.sh` checks the pin and re-derives it. It passes the validator the r2i requests passed. The three cap-6 `-m112` requests were removed. | Amendment 7 B (cap 6 to 7) and Amendment 14 (-m112) define every changed field. |
+| P3 stage | 2026-11-21 | `run.sh` refuses any stage other than `cap:14:0:7:27900000000` for a study name; development stages take `--max-dense` 12800000000 or 27900000000. | One stage per name; a development check may exercise the -m112 stage shape. |
+| P4 REST v2 | 2026-11-21 | Every REST call moves to `api.runpod.io/v2` (price from the CPU catalog, create, get, list with its envelope and cursor pages, delete), with main's `runpod/rp.sh` create body and the v2 field names of `V2_FIELDS.md`. The create must answer 201. | REST v1 answers 502 from here (Amendment 32); v2 answers 200. |
+| P5 lastStatusChange | 2026-11-21 | v2 has no `lastStatusChange`, so the host-side form "a RunPod-side status change" can no longer be seen and never counts. Host-side evidence is only the pod gone from a successful list with GET 404. Classifier `a33-r1`. | Fail closed: a missing field must not open an automatic relaunch. |
+| P6 interruptible | 2026-11-21 | v2 has no interruptible field in the request or the record; rule 7 requires `cloud` `SECURE` on the create response and GET record and no `interruptible` key in `pod-request.json`. | The not-interruptible fact now rests on v2 having no spot pod field (spec `CreatePodRequest`). |
+| P7 data center | 2026-11-21 | The data center id is checked on a GET record taken once the runner answers (`pod-record-ready.json`), not on the create response. | v2 documents `dataCenterId` as assigned by the scheduler; it may be null at create. |
+| P8 image | 2026-11-21 | The pod image is main's pinned digest `python:3.12-slim@sha256:5e2bdb1b…` (the smokes used the tag `python:3.12-slim`). | Main's v2 smoke reached the runner with it; a digest cannot move. |
+| P9 runner | 2026-11-21 | `run.sh` embeds `server_pinned.py`, a vendored copy of `runpod/server.py` at `d2a16c723d` (SHA-256 `f56fd08e…`), not main's current `runpod/server.py` (`c6d8afb1…`). | This route was reviewed with that runner; main's file changed. |
+| P10 git gate | 2026-11-21 | `fetch.sh NAME --delete REF` replaces the bench-record gate: the pod is deleted only when every file of the kept tree, `outcome.json` and `local-sha256-<k>.txt` are in commit REF with the blob hash of the local file, each local file still has its manifest SHA-256, and REF is an ancestor of a branch head that `git ls-remote --heads origin` lists now. The study results trees are not git-ignored; development trees are. The hard deadline still deletes regardless (2 h wait at most). | Owner decision 22: no S3; git is the durable copy. |
+| P11 ledger | 2026-11-21 | `ledger.tsv` takes RunPod's own billing per pod (`GET /v2/billing/pods`, `billing_v2_20261121.tsv`) for every study pod whose id is in a study file, the eight Amendment 31 pods (US$370.84, Amendment 32), and one row `a32-remainder/unitemised` that brings the pre-Amendment-31 spend to Amendment 32's US$95. Sum 465.8424. Two snapshot pods of unclear study (US$72.96) are listed as unknown, not as rows. | Owner decision 21 rests on Amendment 32's total of about US$466. |
+| P12 memory | 2026-11-21 | The 56 GiB step of the memory rule is removed (P2m and `as_m112`): the attempt here is the cell's -m112 attempt itself (the 56Gi attempt was the other session's, Amendment 30). P2p (owner decision 15) and the pre-start cgroup check (at least 112 GiB or `max`) stay; the GET record's `cpu.memory` floor is 121 GB for every name. | One attempt size; owner decision 15 already covers it. |
+| P13 bench record | 2026-11-21 | The run's `bench.record/v1` stays a Git record without S3 upload; the RESUME note is committed and pushed instead of the S3 checkpoint. | Owner decision 22. |

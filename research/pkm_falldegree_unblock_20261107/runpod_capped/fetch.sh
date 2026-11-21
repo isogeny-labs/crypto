@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
-# fetch.sh -- check in on, collect, classify and delete one run started by run.sh (draft Amendment 18,
-# AMENDMENT_R2_H_runpod_capped.md, sections 3, 4 and 6). Shell only. It holds the route's single outcome classifier.
+# fetch.sh -- check in on, collect, classify and delete one run started by run.sh (Amendment 33 draft,
+# AMENDMENT_R2_H_runpod_capped.md, sections 3, 4 and 6). Shell only. RunPod REST v2. It holds the route's single
+# outcome classifier.
 #   fetch.sh NAME                    check in; collect, classify and delete when the outcome table says so
 #   fetch.sh NAME --abort            session abort: collect what exists and delete now (ABORTED unless the run is done,
 #                                    has positive evidence of loss or of the limit; aborting never buys a relaunch)
-#   fetch.sh NAME --delete RECORD    after a completed collection: check that RECORD (bench.record/v1) lists every file
-#                                    of the kept tree as uploaded, then delete the pod
+#   fetch.sh NAME --delete REF       after a completed collection: the git gate (owner decision 22, no S3). REF is a git
+#                                    commit or ref; the pod is deleted only when (a) every file of the kept tree, and the
+#                                    receipts' outcome.json and local-sha256-<k>.txt, are in REF with the blob hash of
+#                                    the local file, (b) each local file still has its manifest SHA-256, and (c) REF is
+#                                    an ancestor of a branch head that origin lists now (git ls-remote --heads origin)
 #   fetch.sh --classify-dir REC RES  offline: print the outcome table's verdict for a receipts dir and the run's
 #                                    results dir (which holds collect-<k>/ trees)
 # Deadlines: the run deadline is the runner's recorded start + 90,000 s; the hard deadline is creation + 26 h. "No
@@ -16,9 +20,9 @@
 # overwritten or removed. Every delete the session makes is logged, with its reason, before the API call.
 # Exit: 0 collected (or nothing to collect) and pod deleted, confirmed gone; 41 nothing to do yet (pod untouched);
 #       2 usage; 6 transfer check failed before the hard deadline (pod kept; run again); 7 pod still listed after delete
-#       (run again, or reap.sh); 8 collected, pod kept until the raw upload is confirmed (at most 2 h, never past the
-#       hard deadline); 9 refused: this run is finished (cost.json exists); 12 a receipt is unparsable or two
-#       collections disagree: owner (pod kept until the hard deadline).
+#       (run again, or reap.sh); 8 collected, pod kept until the git gate passes (at most 2 h, never past the hard
+#       deadline); 9 refused: this run is finished (cost.json exists); 12 a receipt is unparsable or two collections
+#       disagree: owner (pod kept until the hard deadline).
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd); . "$here/common.sh"
 
@@ -33,10 +37,6 @@ here=$(cd "$(dirname "$0")" && pwd); . "$here/common.sh"
 #       under the recorded start, no loss evidence up to that check-in, the tree's runner_state agreeing, one start
 #       line):
 #       P2a ended after the run deadline                                                  -> LIMIT
-#       P2m a 56Gi attempt with memory peak > 56 GiB AND row oversize false: the 56Gi attempt counts as OOM
-#           (Amendment 14) and this run is the cell's -m112 attempt (.memory.as_m112 true):
-#           P2m1 peak > 112 GiB, or exit 137 with oom_kill > 0 -> OOM (censored); P2m2 exit 137 without oom
-#           evidence -> LOST; P2m3 admission rules hold -> ADMITTED (the cell's -m112 row); P2m4 otherwise -> NOT_ADMITTED
 #       P2b an end line exit 137 and oom_kill > 0                                         -> OOM (Amendment 14)
 #       P2c an end line exit 137, no oom evidence                                         -> LOST
 #       P2p a 112Gi attempt whose memory peak exceeds 112 GiB                             -> OOM (owner decision 15)
@@ -49,13 +49,13 @@ here=$(cd "$(dirname "$0")" && pwd); . "$here/common.sh"
 #   P6  positive loss evidence dated at or after the run deadline                         -> LOST
 #   P7  collected (at the hard deadline) with none of the above                           -> NO_EVIDENCE
 #   P8  not collected yet                                                                 -> PENDING
-# Positive loss evidence: the runner, reachable, reports idle or a start other than s0; the REST record (HTTP 200)
-# shows desiredStatus other than RUNNING; the pod is missing from a successful list AND its GET returns 404; the tree
-# shows a second start. A changed lastStartedAt alone is recorded but is not evidence. A LOST is relaunched
-# automatically (relaunch "auto") only on host-side evidence tied to the loss (owner decision 13; see decide()): a
-# lastStatusChange that differs from its value at start and does not name the user ("by User"), or the pod gone from a
-# successful list with GET 404, recorded between the last check-in that saw the runner alive and the first loss, before
-# any action the session logged. Every other LOST has relaunch "owner".
+# Positive loss evidence: the runner, reachable, reports idle or a start other than s0; the REST v2 record (HTTP 200)
+# shows status other than RUNNING; the pod is missing from a successful list AND its GET returns 404; the tree shows a
+# second start. A changed startedAt alone is recorded but is not evidence. A LOST is relaunched automatically (relaunch
+# "auto") only on host-side evidence tied to the loss (owner decision 13; see decide()): the pod gone from a successful
+# list with GET 404, recorded between the last check-in that saw the runner alive and the first loss, before any action
+# the session logged. v1's other form, a RunPod-side lastStatusChange, has no REST v2 field: it can no longer be
+# observed, so it never counts (fail closed). Every other LOST has relaunch "owner".
 # The memory peak is the pilot's own field (largest "memory R MB (peak P MB)" in runs/<cell>.log: VmHWM in MiB,
 # x 1,048,576), else the cgroup figure (v2 memory.peak, else v1 memory.max_usage_in_bytes). Both are recorded.
 # ---------------------------------------------------------------------------------------------------------------------
@@ -64,10 +64,10 @@ jsonok() { [ -s "$1" ] && jq -e . "$1" >/dev/null 2>&1; }
 jsonlok() { [ ! -s "$1" ] || jq -e -s . "$1" >/dev/null 2>&1; }
 
 facts() {
-  local R=$1 RES=$2 bad="" f stage cell s0 L0 LSC0 ck acts cols K col O rs nstart pexit gexit oom cgp mmax man row floor
+  local R=$1 RES=$2 bad="" f stage cell s0 L0 ck acts cols K col O rs nstart pexit gexit oom cgp mmax man row floor
   local r1 r2 r3 r4 r5 r6 r7 cgb cgsrc logmib limit disagree
   # P0: every receipt the classifier reads must parse (fail closed).
-  for f in "$R"/pod-create.json "$R"/pod-state.json "$R"/pod-record-start.json "$R"/collect-[0-9]*.json "$R"/collect-started-*.json "$R"/transfer-*.json; do
+  for f in "$R"/pod-create.json "$R"/pod-record.json "$R"/pod-state.json "$R"/pod-record-start.json "$R"/collect-[0-9]*.json "$R"/collect-started-*.json "$R"/transfer-*.json; do
     [ -e "$f" ] || continue; jsonok "$f" || bad="$bad ${f##*/}"
   done
   [ -e "$R/start.json" ] && [ -s "$R/start.json" ] && ! jsonok "$R/start.json" && bad="$bad start.json"
@@ -93,10 +93,9 @@ facts() {
   s0=$(jq -r 'select(.state == "running") | .started // empty' "$R/start.json" 2>/dev/null || true)
   [ -n "$s0" ] || s0=$(jq -r '[.[] | .live.started // empty] | first // empty' <<<"$ck")
   [ -n "$s0" ] || s0=$(jq -r '.started // empty' "$O/runner_state.json" 2>/dev/null || true)
-  L0=$(jq -r '.lastStartedAt // empty' "$R/pod-record-start.json" 2>/dev/null || true)
-  [ -n "$L0" ] || L0=$(jq -r '.lastStartedAt // empty' "$R/pod-create.json" 2>/dev/null || true)
-  LSC0=$(jq -r '.lastStatusChange // empty' "$R/pod-record-start.json" 2>/dev/null || true)
-  [ -n "$LSC0" ] || LSC0=$(jq -r '.lastStatusChange // empty' "$R/pod-create.json" 2>/dev/null || true)
+  # REST v2 startedAt replaces v1 lastStartedAt (recorded, never evidence). v1 lastStatusChange has no v2 field.
+  L0=$(jq -r '.startedAt // empty' "$R/pod-record-start.json" 2>/dev/null || true)
+  [ -n "$L0" ] || L0=$(jq -r '.startedAt // empty' "$R/pod-create.json" 2>/dev/null || true)
   rs=$(jq -c '{state,exit,started,ended}' "$O/runner_state.json" 2>/dev/null || echo null)
   nstart=0 pexit=null gexit=null
   if [ -f "$O/progress.txt" ] && [ -n "$cell" ]; then
@@ -113,7 +112,7 @@ facts() {
   [ -n "$oom" ] || oom=null
   [ -f "$O/cgroup/memory.max" ] && mmax=$(jq -n --rawfile f "$O/cgroup/memory.max" '$f | rtrimstr("\n")')
   [ "$mmax" = null ] && [ -f "$O/cgroup/memory_memory.limit_in_bytes" ] && mmax=$(jq -n --rawfile f "$O/cgroup/memory_memory.limit_in_bytes" '$f | rtrimstr("\n")')
-  # Memory peaks (P2m, P2p, P2u): the pilot's VmHWM field (MiB; primary) and the cgroup figure (bytes; fallback).
+  # Memory peaks (P2p, P2u): the pilot's VmHWM field (MiB; primary) and the cgroup figure (bytes; fallback).
   cgb=null cgsrc=null logmib=null limit=null
   for f in memory.peak:cgroup_v2_memory.peak memory_memory.max_usage_in_bytes:cgroup_v1_memory.max_usage_in_bytes; do
     if [ "$cgb" = null ] && [ -f "$O/cgroup/${f%%:*}" ] && grep -qxE '[0-9]+' "$O/cgroup/${f%%:*}"; then cgb=$(cat "$O/cgroup/${f%%:*}"); cgsrc="\"${f#*:}\""; fi
@@ -137,18 +136,22 @@ facts() {
   if [ -n "$K" ] && [ -d "$O" ] && [ -f "$R/local-sha256-$K.txt" ] && cmp -s "$R/local-sha256-$K.txt" <(manifest "$O"); then man=true; fi
   if [ "$man" = true ] && jq -e '.transfer_ok == true' <<<"$col" >/dev/null 2>&1; then r6=true; fi
   floor=$(jq -r '.mem_floor_gb // empty' "$R/pod-state.json" 2>/dev/null || true); floor=${floor:-$MEM_FLOOR_GB}
-  if jq -e --slurpfile p <(jq -s '.' "$R/price.jsonl" 2>/dev/null || echo '[]') --argjson v $VCPU --argjson m "$floor" --arg f "$FLAVOR" \
-       '.machine.secureCloud == true and .cpuFlavorId == $f and .vcpuCount == $v and .memoryInGb >= $m
-        and ($p[0] | length) > 0 and .costPerHr == ($p[0] | last | .securePrice)' "$R/pod-create.json" >/dev/null 2>&1 \
-     && jq -e --arg f "$FLAVOR" '.interruptible == false and .cloudType == "SECURE" and .cpuFlavorIds == [$f]' "$R/pod-request.json" >/dev/null 2>&1; then r7=true; fi
+  # Rule 7 on REST v2 fields: the create response (cloud, cpu.id, cpu.vcpuCount, cost = the catalog price read before
+  # create), the GET record after create (cpu.memory >= the floor), the request record (cloud SECURE, cpu {id,
+  # vcpuCount}, no interruptible field: v2 has none, so an interruptible pod cannot be requested).
+  if jq -e --slurpfile p <(jq -s '.' "$R/price.jsonl" 2>/dev/null || echo '[]') --argjson v $VCPU --arg f "$FLAVOR" \
+       '.cloud == "SECURE" and .cpu.id == $f and .cpu.vcpuCount == $v and ($p[0] | length) > 0 and ($p[0] | last | .price | type) == "number"
+        and ((.cost * 10000 | round) == ($p[0] | last | .price * 10000 | round))' "$R/pod-create.json" >/dev/null 2>&1 \
+     && jq -e --argjson m "$floor" '.cpu.memory >= $m' "$R/pod-record.json" >/dev/null 2>&1 \
+     && jq -e --arg f "$FLAVOR" --argjson v $VCPU '.cloud == "SECURE" and .cpu == {id:$f, vcpuCount:$v} and (has("interruptible") | not)' "$R/pod-request.json" >/dev/null 2>&1; then r7=true; fi
   jq -n --arg bad "$bad" --argjson dis "$disagree" --arg stage "$stage" --arg cell "$cell" --arg s0 "$s0" --arg L0 "$L0" \
-    --arg LSC0 "$LSC0" --argjson ck "$ck" --argjson acts "$acts" --argjson col "$col" --argjson ncol "$(jq length <<<"$cols")" \
+    --argjson ck "$ck" --argjson acts "$acts" --argjson col "$col" --argjson ncol "$(jq length <<<"$cols")" \
     --argjson rs "$rs" --argjson nstart "$nstart" --argjson pexit "$pexit" --argjson gexit "$gexit" --argjson oom "$oom" \
     --argjson cgp "$cgp" --argjson mmax "$mmax" --argjson row "$row" --argjson dls $DEADLINE_S \
     --argjson cgb "$cgb" --argjson cgsrc "$cgsrc" --argjson logmib "$logmib" --argjson size "$limit" \
     --argjson adm "{\"r1\":$r1,\"r2\":$r2,\"r3\":$r3,\"r4\":$r4,\"r5\":$r5,\"r6\":$r6,\"r7\":$r7}" \
     '{unparsable:$bad, collections_disagree:$dis, stage:$stage, cell:$cell, s0:(if $s0 == "" then null else $s0 end),
-      L0:(if $L0 == "" then null else $L0 end), LSC0:(if $LSC0 == "" then null else $LSC0 end),
+      L0:(if $L0 == "" then null else $L0 end),
       checkins:$ck, actions:$acts, collect:$col, collections:$ncol,
       tree:{runner_state:$rs, start_lines:$nstart, pilot_exit:$pexit, gridzeros_exit:$gexit,
       cgroup_present:$cgp, oom_kill:$oom, memory_max:$mmax}, row:$row, admission:$adm,
@@ -161,7 +164,7 @@ decide() { jq -c --arg ver "$CLASSIFIER_VERSION" --arg fsha "$(sha256sum "$here/
   def lossev($c; $s0):
     [ (if $c.live != null and $c.live.state == "idle" then "runner reachable and idle after its start (container restarted)" else empty end),
       (if $c.live != null and $c.live.started != null and $c.live.started != $s0 then "runner reports a start other than start.json (a second start)" else empty end),
-      (if $c.rest != null and $c.rest.http == 200 and ($c.rest.desiredStatus // "RUNNING") != "RUNNING" then "REST record shows desiredStatus \($c.rest.desiredStatus)" else empty end),
+      (if $c.rest != null and $c.rest.http == 200 and ($c.rest.status // "RUNNING") != "RUNNING" then "REST record shows status \($c.rest.status)" else empty end),
       (if $c.listed == false and $c.rest != null and $c.rest.http == 404 then "pod missing from the list and GET returns 404" else empty end) ];
   . as $f | $f.s0 as $s0
   | {classifier:{version:$ver, fetch_sha256:$fsha, common_sha256:$csha}} as $cl
@@ -180,27 +183,19 @@ decide() { jq -c --arg ver "$CLASSIFIER_VERSION" --arg fsha "$(sha256sum "$here/
     # loss evidence (or the collection, for a loss read from the tree). A host-side record counts only from a check-in
     # strictly after the last check-in that saw the runner alive under s0, or from the first-loss check-in itself; at or
     # before the first loss; and before any action the session logged for this pod (every session delete is logged
-    # before its API call). Forms: a RunPod-side status change (not naming the user), or the pod gone from a successful
-    # list with GET 404. Relaunch goes to the owner if the status at the first-loss check-in names the user (R1), or if any
-    # check-in before the first loss saw the runner done under s0 (R2).
+    # before its API call). The one form REST v2 can show: the pod gone from a successful list with GET 404. The v1 form
+    # "a RunPod-side lastStatusChange" has no v2 field and never counts (fail closed: relaunch owner). Relaunch goes to
+    # the owner also if any check-in before the first loss saw the runner done under s0 (R2).
     | ([ $f.actions[] | .at | ep ] | min) as $act0
     | (([ $ev[] | .at | ep ] | min) // ($f.collect.at | ep)) as $loss0
     | ([ $ck[] | select($loss0 != null and (.at | ep) <= $loss0 and .live != null and .live.started == $s0
            and (.live.state == "running" or .live.state == "done")) | .at | ep ] | max) as $alive
-    | ([ $ck[] | select($loss0 != null and (.at | ep) == $loss0) ] | first) as $lossck
     | ([ $ck[] | select($loss0 != null and (.at | ep) < $loss0 and .live != null and .live.started == $s0 and .live.state == "done") ] | first) as $sawdone
     | ([ $ck[] | select($loss0 != null and (.at | ep) <= $loss0 and ($alive == null or (.at | ep) > $alive or (.at | ep) == $loss0)
-           and ($act0 == null or (.at | ep) < $act0) and .rest != null and
-           ((.rest.http == 200 and .rest.lastStatusChange != null and .rest.lastStatusChange != $f.LSC0
-             and (.rest.lastStatusChange | test("by user"; "i") | not))
-            or (.listed == false and .rest.http == 404))) ] | last) as $hs
-    | ($lossck != null and $lossck.rest != null and $lossck.rest.http == 200 and $lossck.rest.lastStatusChange != null
-       and ($lossck.rest.lastStatusChange | test("by user"; "i"))) as $lossuser
+           and ($act0 == null or (.at | ep) < $act0) and .rest != null and .listed == false and .rest.http == 404) ] | last) as $hs
     | (if $sawdone != null then {relaunch:"owner", host_side:null, relaunch_note:"a check-in at \($sawdone.at) saw the runner done before the loss"}
-       elif $lossuser then {relaunch:"owner", host_side:null, relaunch_note:"the loss check-in'"'"'s status names the user"}
        elif $hs == null then {relaunch:"owner", host_side:null}
-       elif $hs.rest.http == 404 then {relaunch:"auto", host_side:"pod gone from the list and GET 404 at \($hs.at), before any logged session action"}
-       else {relaunch:"auto", host_side:"lastStatusChange \"\($hs.rest.lastStatusChange)\" at \($hs.at)"} end) as $rl
+       else {relaunch:"auto", host_side:"pod gone from the list and GET 404 at \($hs.at), before any logged session action"} end) as $rl
     | ($f.collect.prefetch // null) as $pre
     | ($f.collect != null and $f.collect.reason == "done" and $f.collect.transfer_ok == true and $pre != null
        and $pre.live != null and $pre.live.state == "done" and $pre.live.started == $s0
@@ -208,23 +203,17 @@ decide() { jq -c --arg ver "$CLASSIFIER_VERSION" --arg fsha "$(sha256sum "$here/
        and $f.tree.runner_state != null and $f.tree.runner_state.state == "done" and $f.tree.runner_state.started == $s0
        and $f.tree.runner_state.exit == $pre.live.exit and $f.tree.start_lines == 1) as $secured
     | ($f.tree.pilot_exit == 137 or $f.tree.gridzeros_exit == 137) as $k137
-    | 60129542144 as $G56 | 120259084288 as $G112
+    | 120259084288 as $G112
     | (if $f.mem.pilot_peak_mib != null then $f.mem.pilot_peak_mib * 1048576 else null end) as $pilotb
     | (if $pilotb != null then {peak_bytes:$pilotb, source:"pilot_log_VmHWM_MiB"}
        elif $f.mem.cgroup_peak_bytes != null then {peak_bytes:$f.mem.cgroup_peak_bytes, source:$f.mem.cgroup_peak_source}
        else {peak_bytes:null, source:null} end) as $pk
     | {size:$f.mem.size, peak_bytes_used:$pk.peak_bytes, source_used:$pk.source, pilot_peak_bytes:$pilotb,
-       cgroup_peak_bytes:$f.mem.cgroup_peak_bytes, cgroup_peak_source:$f.mem.cgroup_peak_source, as_m112:false} as $mem
+       cgroup_peak_bytes:$f.mem.cgroup_peak_bytes, cgroup_peak_source:$f.mem.cgroup_peak_source} as $mem
     | (($f.tree.oom_kill // 0) > 0) as $oomk
     | ($cl + {deadline:($dl | todate), secured:$secured}) as $base
     | if $secured then
         if ($f.tree.runner_state.ended | ep) > $dl then $base + {class:"LIMIT", rule:"P2a", why:"the runner ended at \($f.tree.runner_state.ended), after the run deadline", memory:$mem}
-        elif $f.mem.size == "56Gi" and $pk.peak_bytes != null and $pk.peak_bytes > $G56 and $f.row != null and $f.row.oversize == false then
-          ($base + {memory:($mem + {as_m112:true}), why56:"the 56Gi attempt counts as OOM (Amendment 14): memory peak \($pk.peak_bytes) bytes (\($pk.source)) > 56 GiB, row oversize false"})
-          + (if $pk.peak_bytes > $G112 or ($k137 and $oomk) then {class:"OOM", rule:"P2m1", why:"the cell'"'"'s -m112 attempt: OOM at -m112 (peak \($pk.peak_bytes) bytes, oom_kill \($f.tree.oom_kill // "absent")); censored"}
-             elif $k137 then {class:"LOST", rule:"P2m2", why:"the cell'"'"'s -m112 attempt: exit 137 without oom evidence"} + $rl
-             elif ($f.admission | all(.[]; . == true)) then {class:"ADMITTED", rule:"P2m3", why:"the cell'"'"'s -m112 attempt: peak within 112 GiB, admission rules 1-7 hold", row:$f.row}
-             else {class:"NOT_ADMITTED", rule:"P2m4", why:"the cell'"'"'s -m112 attempt: admission rules failed: \([$f.admission | to_entries[] | select(.value != true) | .key] | join(","))"} end)
         elif $k137 and $oomk then $base + {class:"OOM", rule:"P2b", memory:$mem, why:"exit 137 with cgroup oom_kill \($f.tree.oom_kill) (Amendment 14 OOMKilled)"}
         elif $k137 then $base + {class:"LOST", rule:"P2c", memory:$mem, why:"exit 137 without oom evidence (oom_kill \($f.tree.oom_kill // "absent"))"} + $rl
         elif $f.mem.size == "112Gi" and $pk.peak_bytes != null and $pk.peak_bytes > $G112 then $base + {class:"OOM", rule:"P2p", why:"-m112 attempt with memory peak \($pk.peak_bytes) bytes (\($pk.source)) > 112 GiB; censored (owner decision 15)", memory:$mem}
@@ -246,7 +235,7 @@ decide() { jq -c --arg ver "$CLASSIFIER_VERSION" --arg fsha "$(sha256sum "$here/
       else $base + {class:"PENDING", rule:"P8", why:"not collected yet"}
       end
     end
-  + {facts:{tree:$f.tree, admission:$f.admission, mem:$f.mem, L0:$f.L0, LSC0:$f.LSC0, s0:$f.s0, cell:$f.cell, collections:$f.collections}}'; }
+  + {facts:{tree:$f.tree, admission:$f.admission, mem:$f.mem, L0:$f.L0, s0:$f.s0, cell:$f.cell, collections:$f.collections}}'; }
 classify() { facts "$1" "$2" | decide; }
 
 if [ "${1:-}" = --classify-dir ]; then
@@ -255,10 +244,10 @@ if [ "${1:-}" = --classify-dir ]; then
 fi
 
 # ---------------------------------------------------------------------------------------------------------------------
-[ $# -ge 1 ] || { echo "usage: fetch.sh NAME [--abort | --delete RECORD]" >&2; exit 2; }
-NAME=$1 MODE=${2:-} RECORD=${3:-}
-case $MODE in ""|--abort) ;; --delete) [ -n "$RECORD" ] || { echo "usage: fetch.sh NAME --delete RECORD" >&2; exit 2; } ;;
-  *) echo "usage: fetch.sh NAME [--abort | --delete RECORD]" >&2; exit 2 ;; esac
+[ $# -ge 1 ] || { echo "usage: fetch.sh NAME [--abort | --delete REF]" >&2; exit 2; }
+NAME=$1 MODE=${2:-} GREF=${3:-}
+case $MODE in ""|--abort) ;; --delete) [ -n "$GREF" ] || { echo "usage: fetch.sh NAME --delete REF" >&2; exit 2; } ;;
+  *) echo "usage: fetch.sh NAME [--abort | --delete REF]" >&2; exit 2 ;; esac
 REC=$(rec_dir "$NAME") || { echo "unknown name $NAME" >&2; exit 2; }
 [ -d "$REC" ] || { echo "no receipts $REC" >&2; exit 2; }
 [ ! -f "$REC/cost.json" ] || { echo "REFUSED: $NAME is finished ($REC/cost.json exists); nothing is collected or deleted again" >&2; exit 9; }
@@ -270,11 +259,11 @@ exec 9>"$RPC_STATE/$NAME.lock"; flock -w 900 9 || { echo "another run.sh, fetch.
 id=$(jq -r '.id // empty' "$REC/pod-create.json" 2>/dev/null || true)
 [ -n "$id" ] || { echo "no pod id in $REC/pod-create.json" >&2; exit 2; }
 nowe() { date +%s; }
-created_e=$(epoch "$(jq -r '.createdAt' "$REC/pod-create.json" | sed 's/ UTC$//')")
+created_e=$(epoch "$(jq -r '.createdAt' "$REC/pod-create.json")")
 hard=$(jq -r '.hard_deadline // empty' "$REC/pod-state.json" 2>/dev/null || true)
 if [ -n "$hard" ]; then hard=$(epoch "$hard"); else hard=$(( created_e + HARD_S )); fi
 
-# --- a missing pod token is recovered from the REST record's env (N6); it goes to RPC_STATE only, never to receipts
+# --- a missing pod token is recovered from the REST v2 record's env (N6; GET /pods/{id} returns env, V2_FIELDS.md); it goes to RPC_STATE only, never to receipts
 if [ ! -s "$RPC_STATE/$id.token" ]; then
   c=$(api_code GET "$API/pods/$id" "$RPC_STATE/$NAME.tok.tmp")
   t=""; [ "$c" = 200 ] && t=$(jq -r '.env.RUNNER_TOKEN // empty' "$RPC_STATE/$NAME.tok.tmp" 2>/dev/null || true)
@@ -291,7 +280,7 @@ checkin() { # checkin PHASE: one live status, one REST record and one list membe
   [ -n "$live" ] || live=null
   c=$(api_code GET "$API/pods/$id" "$RPC_STATE/$NAME.rest.tmp")
   if [ "$c" = 200 ] && jsonok "$RPC_STATE/$NAME.rest.tmp"; then redact < "$RPC_STATE/$NAME.rest.tmp" > "$REC/rest-$stamp.json"
-    rest=$(jq -c --argjson c "$c" '{http:$c, desiredStatus, lastStartedAt, lastStatusChange}' "$REC/rest-$stamp.json")
+    rest=$(jq -c --argjson c "$c" '{http:$c, status, startedAt}' "$REC/rest-$stamp.json")
   else rest="{\"http\":${c:-0}}"; fi
   rm -f "$RPC_STATE/$NAME.rest.tmp" "$RPC_STATE/$NAME.rest.tmp.err"
   if l=$(list_pkm 2>/dev/null); then listed=$(jq -s --arg i "$id" 'any(.[]; .id == $i)' <<<"$l"); else listed=null; fi
@@ -320,13 +309,13 @@ delete_phase() { # $1 reason. Log the action, delete, confirm by listing, write 
   [ "$gone" = 1 ] || { log "POD $id STILL LISTED (or the list is unreadable) after delete; run fetch.sh $NAME again or reap.sh"; exit 7; }
   [ -n "$deleted" ] || { deleted=$(now); ub=true; }
   local p s usd
-  p=$(jq -r '.costPerHr' "$REC/pod-create.json")
+  p=$(jq -r '.cost' "$REC/pod-create.json")
   s=$(( $(epoch "$deleted") - created_e )); usd=$(awk -v p="$p" -v s="$s" 'BEGIN{printf "%.4f", p * s / 3600}')
   jq -n --arg id "$id" --arg c "$(date -u -d "@$created_e" +%FT%TZ)" --arg d "$deleted" --argjson s "$s" --argjson p "$p" --argjson u "$usd" \
     --argjson ub "$ub" --arg r "$1" --arg cl "$(jq -r '.class // "unclassified"' "$REC/outcome.json" 2>/dev/null || echo unclassified)" \
-    '{pod:$id, created:$c, deleted:$d, deleted_time_is_upper_bound:$ub, seconds:$s, costPerHr:$p, usd_derived:$u,
+    '{pod:$id, created:$c, deleted:$d, deleted_time_is_upper_bound:$ub, seconds:$s, cost_per_hr:$p, usd_derived:$u,
       delete_reason:$r, class:$cl, confirmed_gone:true}' > "$REC/cost.json"
-  log "pod $id deleted and no longer listed; cost (derived: costPerHr x pod lifetime) US\$$usd over $s s at $p/h"
+  log "pod $id deleted and no longer listed; cost (derived: cost per hour x pod lifetime) US\$$usd over $s s at $p/h"
   rm -f "$REC/delete-pending"
   if [ "$(jq -r '.class' "$REC/outcome.json" 2>/dev/null || true)" = NOT_AN_ATTEMPT ]; then
     local k=1; while [ -e "$REC.prestart-$k" ]; do k=$((k + 1)); done
@@ -336,15 +325,32 @@ delete_phase() { # $1 reason. Log the action, delete, confirm by listing, write 
   exit 0
 }
 
-verify_upload() { # every file of the classified tree is in RECORD's raw[] with uploaded true (benchrec add-raw + upload)
-  local miss K
+git_gate() { # the git gate (owner decision 22: no S3). 0 when the kept tree of the latest collection, outcome.json and
+  # local-sha256-<k>.txt are in commit GREF with the blob hash of each local file, each local file of the tree still has
+  # its manifest SHA-256, and GREF is an ancestor of a branch head origin lists now. Every check is logged.
+  local K top c rr rq h onorigin=0 n=0 bad=0 sha p f want got
   K=$(ls "$REC"/collect-[0-9]*.json 2>/dev/null | sed 's/.*collect-\([0-9]*\)\.json/\1/' | sort -n | tail -1 || true)
-  [ -f "$RECORD" ] && [ -n "$K" ] && [ -f "$REC/local-sha256-$K.txt" ] || return 1
-  miss=$(comm -23 <(awk '{ print $1 }' "$REC/local-sha256-$K.txt" | sort -u) \
-                  <(jq -r '.raw[]? | select(.uploaded == true) | .sha256' "$RECORD" | sort -u))
-  { echo "$(now) record $RECORD sha256 $(sha256sum "$RECORD" | cut -d' ' -f1) collection $K"
-    echo "files in the kept tree: $(wc -l < "$REC/local-sha256-$K.txt"); not uploaded: $(printf '%s' "$miss" | grep -c . || true)"; } >> "$REC/upload-check.txt"
-  [ -z "$miss" ]
+  [ -n "$K" ] && [ -f "$REC/local-sha256-$K.txt" ] && [ -d "$RES/collect-$K" ] && [ -f "$REC/outcome.json" ] || return 1
+  top=$(git -C "$here" rev-parse --show-toplevel 2>/dev/null) || return 1; top=$(realpath "$top")
+  c=$(git -C "$top" rev-parse --verify -q "$GREF^{commit}" 2>/dev/null) || { echo "$(now) ref $GREF: not a commit here" >> "$REC/git-gate.txt"; return 1; }
+  rr=$(realpath --relative-to="$top" "$RES/collect-$K") rq=$(realpath --relative-to="$top" "$REC")
+  declare -A blob=()
+  while IFS=$'\t' read -r meta p; do blob[$p]=${meta##* }; done < <(git -C "$top" ls-tree -r --full-tree "$c" -- "$rr" "$rq/outcome.json" "$rq/local-sha256-$K.txt")
+  while read -r sha p; do
+    n=$((n + 1)); f="$RES/collect-$K/$p"
+    [ -f "$f" ] && [ "$(sha256sum "$f" | cut -d' ' -f1)" = "$sha" ] || { bad=$((bad + 1)); echo "  manifest mismatch or missing: $p" >> "$REC/git-gate.txt"; continue; }
+    want=$(git -C "$top" hash-object -- "$f"); got=${blob[$rr/$p]:-}
+    [ "$got" = "$want" ] || { bad=$((bad + 1)); echo "  not in $c with this content: $rr/$p" >> "$REC/git-gate.txt"; }
+  done < "$REC/local-sha256-$K.txt"
+  for f in outcome.json "local-sha256-$K.txt"; do
+    want=$(git -C "$top" hash-object -- "$REC/$f"); got=${blob[$rq/$f]:-}
+    [ "$got" = "$want" ] || { bad=$((bad + 1)); echo "  not in $c with this content: $rq/$f" >> "$REC/git-gate.txt"; }
+  done
+  for h in $(git -C "$top" ls-remote --heads origin 2>/dev/null | awk '{ print $1 }'); do
+    git -C "$top" cat-file -e "$h^{commit}" 2>/dev/null && git -C "$top" merge-base --is-ancestor "$c" "$h" 2>/dev/null && { onorigin=1; break; }
+  done
+  echo "$(now) ref $GREF commit $c collection $K: files in the kept tree $n, mismatches $bad, on an origin branch head now: $onorigin" >> "$REC/git-gate.txt"
+  [ "$n" -gt 0 ] && [ "$bad" = 0 ] && [ "$onorigin" = 1 ]
 }
 
 # --- a delete that was not confirmed earlier resumes first
@@ -368,18 +374,18 @@ last=$(checkin regular)
 [ -n "$s0" ] || s0=$(jq -r '.live.started // empty' <<<"$last")
 dl=""; [ -n "$s0" ] && dl=$(( $(epoch "$s0") + DEADLINE_S ))
 
-# --- collected with the runner done: wait for the raw upload (at most UPLOAD_WAIT_S, never past the hard deadline)
+# --- collected with the runner done: wait for the git gate (at most PUSH_WAIT_S, never past the hard deadline)
 lastK=$(ls "$REC"/collect-[0-9]*.json 2>/dev/null | sed 's/.*collect-\([0-9]*\)\.json/\1/' | sort -n | tail -1 || true)
 if [ -n "$lastK" ] && jq -e '.reason == "done" and .transfer_ok == true' "$REC/collect-$lastK.json" >/dev/null 2>&1; then
   [ -f "$REC/outcome.json" ] || { classify "$REC" "$RES" > "$REC/outcome.json"; log "OUTCOME (late) $(jq -c '{class,rule,why}' "$REC/outcome.json")"; }
   if [ "$MODE" = --delete ]; then
-    if verify_upload; then log "raw upload confirmed for every file of the kept tree"; delete_phase "completed; raw upload confirmed"; fi
-    log "the record does not list every file of the kept tree as uploaded"
+    if git_gate; then log "git gate passed: the kept tree is committed in $GREF and on origin"; delete_phase "completed; git gate passed ($GREF)"; fi
+    log "git gate not passed for $GREF (git-gate.txt)"
   fi
-  until_e=$(( $(epoch "$(jq -r .at "$REC/collect-$lastK.json")") + UPLOAD_WAIT_S )); [ "$until_e" -le "$hard" ] || until_e=$hard
-  [ "$(nowe)" -ge "$until_e" ] && { log "upload wait over: deleting without a confirmed upload (the tree is local)"; delete_phase "completed; upload wait over"; }
-  [ "$MODE" = --abort ] && { log "abort: deleting without a confirmed upload (the collected tree is local)"; delete_phase "completed; session abort before upload"; }
-  log "collected; pod kept until the raw upload is confirmed (fetch.sh $NAME --delete RECORD) or $(date -u -d "@$until_e" +%FT%TZ)"; exit 8
+  until_e=$(( $(epoch "$(jq -r .at "$REC/collect-$lastK.json")") + PUSH_WAIT_S )); [ "$until_e" -le "$hard" ] || until_e=$hard
+  [ "$(nowe)" -ge "$until_e" ] && { log "push wait over: deleting without the git gate (the tree is local)"; delete_phase "completed; push wait over"; }
+  [ "$MODE" = --abort ] && { log "abort: deleting without the git gate (the collected tree is local)"; delete_phase "completed; session abort before the git gate"; }
+  log "collected; pod kept until the git gate passes (fetch.sh $NAME --delete REF) or $(date -u -d "@$until_e" +%FT%TZ)"; exit 8
 fi
 
 # --- no runner start on record: a launch in progress, or a launcher that died before start
@@ -451,7 +457,7 @@ jq --argjson f "$fetched" --argjson t "$tok" '. + {fetched:$f, transfer_ok:$t}' 
 [ -f "$REC/outcome.json" ] || classify "$REC" "$RES" > "$REC/outcome.json"
 log "OUTCOME $(jq -c '{class,rule,relaunch,why}' "$REC/outcome.json")"
 if [ "$reason" = done ] && [ "$tok" = true ] && [ "$(nowe)" -lt "$hard" ] && [ "$MODE" != --abort ]; then
-  log "upload the kept tree (tools/benchrec.py add-raw RECORD $RES/collect-$k/...; tools/benchrec.py upload RECORD), then fetch.sh $NAME --delete RECORD (pod kept at most $((UPLOAD_WAIT_S / 3600)) h)"
+  log "commit and push the kept tree and the receipts (git add ${RES#"$here/"}/collect-$k ${REC#"$here/"}; git commit; git push), then fetch.sh $NAME --delete <pushed commit> (pod kept at most $((PUSH_WAIT_S / 3600)) h)"
   exit 8
 fi
 delete_phase "collected: reason $reason"

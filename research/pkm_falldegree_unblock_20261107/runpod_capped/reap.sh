@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# reap.sh [--dry-run]  -- the backstop for the per-job ceiling (draft Amendment 18, section 2.4). Shell only. Idempotent.
-# Lists the account's pods. A pod whose name starts with pkm-x- is due only when it is past its hard deadline: the
+# reap.sh [--dry-run]  -- the backstop for the per-job ceiling (Amendment 33 draft, section 2.6). Shell only. Idempotent.
+# Lists the account's pods (REST v2 GET /pods, every page). A pod whose name starts with pkm-x- is due only when it is past its hard deadline: the
 # hard_deadline in its receipts' pod-state.json, or creation + 26 h when no deadline was recorded (owner decision 14,
 # main-session decision N3c). It never deletes a pod before that, whatever fetch.sh says. For a due pod with receipts it
 # runs fetch.sh NAME, which at the hard deadline collects what it can and deletes the pod (it recovers a missing pod
@@ -27,7 +27,7 @@ while read -r p; do
   done
   [ -n "$rec" ] && hd=$(jq -r '.hard_deadline // empty' "$rec/pod-state.json" 2>/dev/null || true)
   if [ -n "$hd" ] && hde=$(epoch "$hd" 2>/dev/null); then src="pod-state.json hard_deadline"
-  elif hde=$(epoch "$(jq -r '.createdAt // empty' <<<"$p" | sed 's/ UTC$//')" 2>/dev/null) && [ -n "$(jq -r '.createdAt // empty' <<<"$p")" ]; then
+  elif hde=$(epoch "$(jq -r '.createdAt // empty' <<<"$p")" 2>/dev/null) && [ -n "$(jq -r '.createdAt // empty' <<<"$p")" ]; then
     hde=$(( hde + HARD_S )); src="creation + 26 h"
   else err=1; hde=""; src="unreadable"; fi
   age=null; due=0; why=""

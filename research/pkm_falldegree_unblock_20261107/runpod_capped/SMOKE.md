@@ -142,3 +142,22 @@ Every number is `[pcc:unverified]`.
 - `reap.sh` read the live list afterwards: no `pkm-x-` pod, nothing touched.
 - Not checked: whether `lastStartedAt` changes on a container restart (no restart was provoked), whether the pod sees
   `RUNPOD_POD_ID` or a pod-scoped key (S12), and whether `GET /pods` is complete for large accounts.
+
+## The Amendment 33 port (2026-11-21): what the two smokes above do not cover
+
+Both smokes above ran with REST v1 and the GraphQL price read, the route's earlier names and the runner at
+`runpod/server.py`. The port changes, none of them exercised on a pod yet (offline tests only, `tests/README.md`):
+- every REST call is REST v2 (`api.runpod.io/v2`): the price from the CPU catalog, the create body of main's
+  `runpod/rp.sh` (`cloud`, `cpu {id, vcpuCount}`, `image`, `disk`, `ports`, `env`, `entrypoint`, `cmd`), the GET record,
+  the paginated list and the delete; the field mapping is in `V2_FIELDS.md`;
+- the image is main's pinned digest of `python:3.12-slim`; the runner is `server_pinned.py`, byte-identical to the
+  `runpod/server.py` the smokes ran (`f56fd08e…`);
+- the create must answer 201; the data center is read from a record taken once the runner answers;
+- the git gate replaces the bench-record gate before a completed pod is deleted (owner decision 22).
+
+The development smoke at t = 8 that the main session runs after review should record, with REST v2: the create
+response (HTTP code and its `cloud`, `cpu`, `cost`, `dataCenterId`), the live GET record (`cpu.memory`, `status`,
+`dataCenterId`, `startedAt`, and whether `env` carries `RUNNER_TOKEN`), the runner answering through the proxy with the
+bash entrypoint and the pinned image, the cgroup files before start, the git gate on a committed and pushed tree (a
+development tree is git-ignored, so it is added with `git add -f` for the check), `DELETE` (204), the list afterwards
+and a GET of the deleted pod (404). Every statement here is `[pcc:unverified]`.
