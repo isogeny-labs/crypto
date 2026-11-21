@@ -77,7 +77,9 @@ subtract; that is why wall moves, not a changed oracle exponent.
 - 10× is a **wall-time** engineering result at a fixed synthetic recipe.
 - G3 remains on the floor; do not promote ledger rows as exponent advances.
 - Multi-target / shared-prepare numbers stay secondary.
-- Replay: rebuild the example and re-run the command above.
+- At **bits=32** (miss-heavy ladder, `probe_b32_g3.txt`) every arm sits on the floor (slopes ≈1.000 / 0.993); the bits=28 m=5 dip to 0.956 was hit-rate flattening, not a G3 pass.
+
+Replay: rebuild the example and re-run the command above.
 
 ## Files
 
