@@ -34,6 +34,7 @@ Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hypere
 - [x] Formalize conductor prime-gap bounds, scalar-Frobenius oracle hardness, and DLP transfer ceilings in Lean 4 (Cursor, completed 2026-11-20, branch cursor/lean-conductor-prime-gap-bounds-bdb7, PR #4815; claim PCC-20261120-70fc62 standing unverified; proof-gate PASS 125 thm)
 
 - [x] Accelerate PKM Semaev and T_2-torus F4 via basis inheritance, Schwartz–Zippel refutation-trace replay, tower descent, and X_R-split ParamS5; evaluate m >= 8 T_2-torus and aligned P-256 auxiliary curve (Cursor, completed 2026-11-19, branch cursor/prime-pkm-aux-tower-3858, PR #4820; receipts in research/prime_pkm_aux_chase_20261119/{REPORT.md,RESULTS.json})
+- [x] Matched-|V| prime aux-family ablation (j1728 / j0 / Montgomery / twist) on M19; twist wins lift 0.625 vs j1728 0.500, j1728 keeps only working isogeny oracle (Cursor, completed 2026-11-21, branch cursor/prime-aux-family-ablation-3858; receipts in research/prime_aux_family_ablation_20261121/{REPORT.md,RESULTS.json})
 
 - [x] Implement order-free prime-field hyperelliptic index calculus (Codex, started 2026-11-18, branch codex/order-free-prime-hyperelliptic-ic-20261118, PR #4676)
 
