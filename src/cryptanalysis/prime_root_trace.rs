@@ -5,7 +5,6 @@
 //! A separate arithmetic checker verifies the certificate without root finding.
 //! Counters measure native field operations, including inverse exponentiation;
 //! primality validation, serialization, and certificate replay are excluded.
-use std::collections::HashMap;
 
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
@@ -1275,6 +1274,14 @@ struct PowerState {
     modulus: Vec<u64>,
 }
 
+// Computation identifiers are consecutive and bounded by the event limit.
+// A flat slot table avoids hashing every modular-power step while retaining
+// the original live-state checks (and detecting wrong-kind or reused IDs).
+enum TraceComputation {
+    Power(PowerState),
+    Gcd((Vec<u64>, Vec<u64>)),
+}
+
 /// Checks each supplied arithmetic state, the terminal distinct-root certificate,
 /// canonical inputs, recorded-event counter tallies and caps. This is not a proof
 /// that every operation in a native execution was recorded. Incomplete reports
@@ -1298,8 +1305,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
     }
     let p = report.p;
     let mut counters = RootCounters::default();
-    let mut powers: HashMap<u64, PowerState> = HashMap::new();
-    let mut gcds: HashMap<u64, (Vec<u64>, Vec<u64>)> = HashMap::new();
+    let mut computations: Vec<Option<TraceComputation>> = Vec::new();
     let mut next_id = 0;
     let mut inverse = None;
     let mut split: Option<(Vec<u64>, u64)> = None;
@@ -1402,9 +1408,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     return Err("nonconsecutive computation id".into());
                 }
                 next_id += 1;
-                powers.insert(
-                    *id,
-                    PowerState {
+                computations.push(Some(TraceComputation::Power(PowerState {
                         acc: if modulus.len() > 1 {
                             vec![1]
                         } else {
@@ -1417,8 +1421,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                         },
                         exponent: *exponent,
                         modulus: modulus.clone(),
-                    },
-                );
+                    })));
             }
             RootEvent::PowerStep {
                 id,
@@ -1428,7 +1431,11 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             } => {
                 canonical(accumulator, p)?;
                 canonical(base, p)?;
-                let state = powers.get_mut(id).ok_or("missing power begin")?;
+                let Some(Some(TraceComputation::Power(state))) =
+                    computations.get_mut(*id as usize)
+                else {
+                    return Err("missing power begin".into());
+                };
                 if state.exponent == 0 {
                     return Err("power continued after completion".into());
                 }
@@ -1457,7 +1464,12 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             }
             RootEvent::PowerEnd { id, value } => {
                 canonical(value, p)?;
-                let state = powers.remove(id).ok_or("missing power begin")?;
+                let state = computations.get_mut(*id as usize)
+                    .and_then(Option::take)
+                    .ok_or("missing power begin")?;
+                let TraceComputation::Power(state) = state else {
+                    return Err("missing power begin".into());
+                };
                 if state.exponent != 0 || state.acc != *value {
                     return Err("incomplete power chain".into());
                 }
@@ -1469,7 +1481,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     return Err("nonconsecutive computation id".into());
                 }
                 next_id += 1;
-                gcds.insert(*id, (a.clone(), b.clone()));
+                computations.push(Some(TraceComputation::Gcd((a.clone(), b.clone()))));
             }
             RootEvent::GcdStep {
                 id,
@@ -1478,7 +1490,11 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             } => {
                 canonical(quotient, p)?;
                 canonical(remainder, p)?;
-                let state = gcds.get_mut(id).ok_or("missing gcd begin")?;
+                let Some(Some(TraceComputation::Gcd(state))) =
+                    computations.get_mut(*id as usize)
+                else {
+                    return Err("missing gcd begin".into());
+                };
                 let (verified_quotient, verified_remainder) = vdiv(&state.0, &state.1, p)?;
                 if verified_quotient != *quotient || verified_remainder != *remainder {
                     return Err("Euclidean step failed".into());
@@ -1487,7 +1503,12 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             }
             RootEvent::GcdEnd { id, value } => {
                 canonical(value, p)?;
-                let (a, b) = gcds.remove(id).ok_or("missing gcd begin")?;
+                let state = computations.get_mut(*id as usize)
+                    .and_then(Option::take)
+                    .ok_or("missing gcd begin")?;
+                let TraceComputation::Gcd((a, b)) = state else {
+                    return Err("missing gcd begin".into());
+                };
                 if !b.is_empty() || vmonic(a, p) != *value {
                     return Err("incomplete Euclidean chain".into());
                 }
@@ -1560,7 +1581,9 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 for v in [xp_mod_f, linear_part] {
                     canonical(v, p)?;
                 }
-                if !powers.is_empty() || !gcds.is_empty() || inverse.is_some() || split.is_some() {
+                if computations.iter().any(Option::is_some)
+                    || inverse.is_some() || split.is_some()
+                {
                     return Err("unfinished native computation".into());
                 }
                 let acknowledged = index < report.events.len();
@@ -1684,6 +1707,28 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round84_indexed_replay_rejects_forged_computation_ids() {
+        for p in [17, 65_521, 1_000_000_007, MAX_PRIME] {
+            let polynomial = vproduct(&[p - 2, 1], &[p - 5, 1], p);
+            let report = run(&polynomial, p);
+            assert!(report.complete(), "p={p}, stop={:?}", report.stop);
+            verify(&report).unwrap();
+            for target in 0..4 {
+                let mut forged = report.clone();
+                let changed = forged.events.iter_mut().find_map(|event| match (target, event) {
+                    (0, RootEvent::PowerStep { id, .. })
+                    | (1, RootEvent::PowerEnd { id, .. })
+                    | (2, RootEvent::GcdStep { id, .. })
+                    | (3, RootEvent::GcdEnd { id, .. }) => { *id = u64::MAX; Some(()) },
+                    _ => None,
+                });
+                assert!(changed.is_some());
+                assert!(verify(&forged).is_err(), "forged id accepted p={p} target={target}");
+            }
+        }
+    }
 
     #[test]
     fn round83_inplace_roots_and_square_replay_equivalence() {
