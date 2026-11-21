@@ -73,3 +73,32 @@ None of the predicted rows is a result until measured.
 - **The exponent.** Earlier studies found that root finding's gap to rho is
   set by its exponent (`SURVEY.md`). A 100x constant moves the crossover by
   a few bits of group size and does not close the gap at cryptographic sizes.
+
+## Status, 2026-11-18 (levers 2–4 tested)
+
+Measured in `research/rootfind_levers_20261118/RESULTS.md` (`[pcc:unverified]`,
+shared host, 10 runs, library arms re-measured on the same host):
+
+- Lever 2: falsified in scalar-target code (4 lanes 4.92 ns > 4 ns), but an
+  AVX-512 build with 16 targets in lockstep reaches 1.89 ns/point arithmetic,
+  inside the predicted 1–2 ns.
+- Lever 3: confirmed. The 8-bit/key 1 MiB filter probes in 2.29 ns against
+  5.99 ns for the 16-bit/key 2 MiB one, at A = 1024.
+- Lever 4: confirmed, 3.9x on 4 threads.
+- Stack at A = 1024 on that host: 1.685 ns/point, which is 65x the default
+  `rootfind-mitm` (109.9 ns) and 20.7x `rootfind-subtract` (34.9 ns). The
+  prediction was about 1 ns.
+- The probe is now the bound (arithmetic is 1.9 of 6.2 ns on one thread).
+  Probe-side rounds 2–3 found that prefetch is slower and a 32-bit prefix
+  array is minor, but a one-multiply filter hash gives 1.32x. The stack is
+  now 1.365 ns/point on 4 threads: 80.5x `rootfind-mitm` and 25.5x
+  `rootfind-subtract`. The probe is instruction-bound.
+- Round 4 vectorizes the probe with AVX-512 (hash, gather and compare 8 keys
+  at a time). On 4 threads, against library arms re-measured at the same
+  time, it reaches 0.867 ns/point at A = 256 (116x `rootfind-mitm`, 22.4x
+  `rootfind-subtract`) and 1.172 ns at A = 1024 (96.6x and 32.8x). The
+  median crosses 100x at A = 256. The run spread (about 75–120x) and the
+  4-thread against 1-thread comparison mean it is not settled.
+- Next: a smaller or partitioned filter at large A (the 1 MiB gather is
+  L2-latency bound), the explicit-intrinsics arithmetic, then step 1 of the
+  order of work (oracle id, witness recovery, parity test).
