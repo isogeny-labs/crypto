@@ -158,7 +158,7 @@ with tempfile.TemporaryDirectory(prefix="root86-full-") as tmp:
         subprocess.run(["cargo","build","--release","--quiet"],cwd=folder,check=True)
         if label == "after":
             subprocess.run(["cargo","test","--release","--quiet",
-                            "round86_monic_shift_and_dense_linear_match_independent_products",
+                            "round86_monic_shift_and_linear_match_independent_products",
                             "--","--nocapture"],cwd=folder,check=True)
             subprocess.run(["cargo","test","--release","--quiet",
                             "round82_full_split_frobenius_certificate_and_tampering",
