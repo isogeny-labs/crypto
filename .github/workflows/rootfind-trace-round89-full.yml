@@ -36,6 +36,14 @@ jobs:
         run: |
           set -euo pipefail
           python3 research/amm_digit_perf_20261118/round89_full_ab.py
+      - name: Measure round91 binomial and zero-quotient optimizations against frozen round90
+        shell: bash
+        env:
+          ROOTFIND_BASELINE_REF: 323fe79e7f96af69bdfba3630e65b4f2d94a4c00
+          ROOTFIND_AB_OUTPUT: research/amm_digit_perf_20261118/round91_ab_results.csv
+        run: |
+          set -euo pipefail
+          python3 research/amm_digit_perf_20261118/round89_full_ab.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -43,3 +51,4 @@ jobs:
           path: |
             research/amm_digit_perf_20261118/round89_full_ab_results.csv
             research/amm_digit_perf_20261118/round90_replay_ab_results.csv
+            research/amm_digit_perf_20261118/round91_ab_results.csv
