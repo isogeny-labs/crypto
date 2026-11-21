@@ -359,6 +359,17 @@ impl Engine<'_> {
         Ok(acc)
     }
     fn mul(&mut self, a: &[u64], b: &[u64]) -> Work<Vec<u64>> {
+        // Multiplying by the constant polynomial one copies coefficients.
+        // Keep the Product certificate event, but avoid all field events.
+        if a == [1] || b == [1] {
+            let product = trim(if a == [1] { b.to_vec() } else { a.to_vec() });
+            self.event(RootEvent::Product {
+                a: a.to_vec(),
+                b: b.to_vec(),
+                product: product.clone(),
+            })?;
+            return Ok(product);
+        }
         let mut product = if a.is_empty() || b.is_empty() {
             vec![]
         } else {
@@ -392,8 +403,56 @@ impl Engine<'_> {
         })?;
         Ok(product)
     }
+    /// Polynomial squaring uses symmetry: coefficient i*j equals j*i.
+    /// Off-diagonal products are doubled with one field addition, while
+    /// diagonals use the field-square operation. The independently checked
+    /// Product event is identical to generic polynomial multiplication.
+    fn square(&mut self, a: &[u64]) -> Work<Vec<u64>> {
+        let mut product = if a.is_empty() {
+            vec![]
+        } else {
+            vec![0; 2 * a.len() - 1]
+        };
+        for (i, &x) in a.iter().enumerate() {
+            if x == 0 { continue; }
+            for (j, &y) in a.iter().enumerate().skip(i) {
+                if y == 0 { continue; }
+                let z = if i == j {
+                    self.field(FieldOp::Square, x, x)?
+                } else {
+                    let xy = self.field(FieldOp::Mul, x, y)?;
+                    self.field(FieldOp::Add, xy, xy)?
+                };
+                let previous = product[i + j];
+                product[i + j] = if previous == 0 {
+                    z
+                } else {
+                    self.field(FieldOp::Add, previous, z)?
+                };
+            }
+        }
+        let product = trim(product);
+        self.event(RootEvent::Product {
+            a: a.to_vec(),
+            b: a.to_vec(),
+            product: product.clone(),
+        })?;
+        Ok(product)
+    }
     fn div(&mut self, a: &[u64], b: &[u64]) -> Work<(Vec<u64>, Vec<u64>)> {
         debug_assert!(!b.is_empty());
+        // Euclidean GCD often ends with a unit divisor; dividing by 1
+        // is a coefficient copy, not a degree-by-degree long division.
+        if b == [1] {
+            let quotient = trim(a.to_vec());
+            self.event(RootEvent::Division {
+                a: a.to_vec(),
+                b: b.to_vec(),
+                quotient: quotient.clone(),
+                remainder: vec![],
+            })?;
+            return Ok((quotient, vec![]));
+        }
         let mut r = a.to_vec();
         let mut q = vec![0; a.len().saturating_sub(b.len()) + 1];
         if a.len() >= b.len() {
@@ -446,7 +505,7 @@ impl Engine<'_> {
                 let product = self.mul(&acc, &b)?;
                 acc = self.div(&product, modulus)?.1;
             }
-            let product = self.mul(&b, &b)?;
+            let product = self.square(&b)?;
             b = self.div(&product, modulus)?.1;
             exponent >>= 1;
             self.event(RootEvent::PowerStep {
@@ -487,7 +546,10 @@ impl Engine<'_> {
             if lead != 1 {
                 let inv = self.inv(lead)?;
                 for c in &mut a {
-                    *c = self.field(FieldOp::Mul, *c, inv)?;
+                    // Zero coefficients stay zero under monic scaling.
+                    if *c != 0 {
+                        *c = self.field(FieldOp::Mul, *c, inv)?;
+                    }
                 }
             }
         }
@@ -1834,5 +1896,35 @@ mod tests {
         .unwrap();
         report.limits.events = report.events.len() as u64;
         assert!(verify(&report).is_err());
+    }
+}
+
+#[cfg(test)]
+mod round77_producer_regression {
+    use super::*;
+
+    #[test]
+    fn symmetric_squaring_unit_products_and_divisions_verify_at_all_field_sizes() {
+        let limits = RootLimits {
+            field_work: MAX_WORK, split_attempts: 512,
+            events: MAX_EVENTS, degree: MAX_DEGREE,
+        };
+        for p in [7, 13, 101, 65_521, 1_000_000_007, MAX_PRIME] {
+            let linear = vec![p - 2, 1];
+            let quadratic = vproduct(&linear, &[(p - (17 % p)) % p, 1], p);
+            for f in [linear, quadratic, vec![1, 0, 1]] {
+                let report = solve(&f, p, 77, limits.clone(), &mut |_| Ok(())).unwrap();
+                assert!(report.complete(), "incomplete p={p} f={f:?}");
+                verify(&report).unwrap();
+                assert!(report.events.iter().any(|event| matches!(
+                    event, RootEvent::Product { a, b, .. } if a == b
+                )), "missing square certificate at p={p}");
+                for &root in &report.roots {
+                    assert_eq!(f.iter().rev().fold(0u64, |acc, &c|
+                        ((acc as u128 * root as u128 + c as u128) % p as u128) as u64
+                    ), 0, "not a root at p={p}");
+                }
+            }
+        }
     }
 }
