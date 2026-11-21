@@ -147,6 +147,14 @@ const GROWING_ARITY_PARAMS: &[ParamDecl] = &[
     },
 ];
 
+const AUX_TOWER_SOLVER_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "bits",
+        default: Some("16"),
+        help: "prime-order curve bit size for prime_instance_for (14..=36); AUX prime-isogeny + rootfind-mitm",
+    },
+];
+
 const DIEM_KGROW_PARAMS: &[ParamDecl] = &[
     ParamDecl {
         name: "p",
@@ -789,6 +797,14 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ecbench::growing_arity::solve",
             applies: Applies::Any,
             params: GROWING_ARITY_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.aux_tower_solver",
+            family: "ic",
+            summary: "AUX prime-isogeny tower FB + algebraic rootfind-mitm:m=3 on prime_instance_for(bits); t from schedule capped at T_MAX; matched S_ρ=√(π/2), [d]G=Q — not ksum, not absolute-F_p extension-IC",
+            entry: "ecbench::aux_tower_solver::solve",
+            applies: Applies::Any,
+            params: AUX_TOWER_SOLVER_PARAMS,
         },
         MethodDecl {
             id: "rho.cubic",
@@ -3571,6 +3587,10 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
         let _ = (m, inst, curve);
         return Ok(());
     }
+    if id == "ic.aux_tower_solver" {
+        let _ = (m, inst, curve);
+        return Ok(());
+    }
     if id == NEG_STRONG {
         if !matches!(inst, Instance::F2m4(_)) {
             return Err(neg_strong_refusal(curve));
@@ -4041,6 +4061,10 @@ pub fn solve_measured(
     if m.id == "ic.growing_arity" {
         let _ = (inst, curve, target, oracle);
         return super::growing_arity::solve(m, seed);
+    }
+    if m.id == "ic.aux_tower_solver" {
+        let _ = (inst, curve, target, oracle);
+        return super::aux_tower_solver::solve(m, seed);
     }
     if m.id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
         return Err("CM folded controls require a prime-field instance".into());
@@ -11556,6 +11580,7 @@ mod accounting_rules_tests {
             "ic.k4_gaudry",           // curves over F_{p^4}: ecbench::fp4 tests
             "ic.diem_kgrow",          // self-hosted E(F_{p^k}) charged cell + ladder example
             "ic.growing_arity",       // growing-m ksum on prime_instance_for
+            "ic.aux_tower_solver",    // AUX prime-isogeny + rootfind-mitm ladder
             "ic.cm_folded_native_v1", // native backend binary
             "ic.cm_folded_recurrence_v1",
             "ic.cm_folded_native_d43_v1",

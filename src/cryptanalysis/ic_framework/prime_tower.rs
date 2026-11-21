@@ -779,6 +779,118 @@ pub struct PrimeIsogenyBase<'i> {
     pub instance: &'i PrimeInstance,
 }
 
+/// Use a tower already constructed for the decomposition oracle.  The
+/// construction ledger is transferred to the factor-base phase exactly once.
+pub struct PrebuiltPrimeIsogenyBase<'i> {
+    pub instance: &'i PrimeInstance,
+    pub tower: &'i IsogenyTower,
+    pub tower_ops: GroupOps,
+    pub tower_wall_ns: u64,
+    pub seed: u64,
+}
+
+impl FactorBaseBuilder<PrimeCurve> for PrebuiltPrimeIsogenyBase<'_> {
+    fn name(&self) -> &str {
+        "prime-isogeny"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        PrimeIsogenyBase {
+            instance: self.instance,
+        }
+        .describe(params)
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            ("t", "tower height: |V| = 2^t; no condition on p"),
+            ("seed", "public seed of the auxiliary-curve search, default 0"),
+            (
+                "aux",
+                "ordinary (default: the charged search), supersingular (y² = x³ + x when p ≡ 3 mod 4, \
+                 else y² = x³ + 1 when p ≡ 2 mod 3; #E' = p + 1, no search), ss-j1728, \
+                 ss-j1728-twist, ss-j0, ss-j0-twist",
+            ),
+        ]
+    }
+
+    fn build(
+        &self,
+        _ctx: &InstanceCtx<PrimeCurve>,
+        params: &Params,
+        ops: &mut GroupOps,
+    ) -> Result<FactorBase<PrimePoint>, String> {
+        let p = self.instance.curve.p;
+        let t = params.u64("t")? as u32;
+        let seed = params.u64_or("seed", 0)?;
+        let kind = AuxKind::parse(params.get("aux").unwrap_or("ordinary"), p)?;
+        if kind != AuxKind::Ordinary || self.tower.p != p || self.tower.t != t || self.seed != seed
+        {
+            return Err("prebuilt isogeny tower does not match factor-base parameters".into());
+        }
+        let mut fb = build_isogeny_base(self.instance, self.tower, kind, t, seed)?;
+        fb.cost.wall_ns = fb.cost.wall_ns.saturating_add(self.tower_wall_ns);
+        ops.merge(self.tower_ops);
+        Ok(fb)
+    }
+}
+
+fn build_isogeny_base(
+    instance: &PrimeInstance,
+    tower: &IsogenyTower,
+    kind: AuxKind,
+    t: u32,
+    seed: u64,
+) -> Result<FactorBase<PrimePoint>, String> {
+    let mut xs = tower.v.clone();
+    xs.sort_unstable();
+    let (aa, ab, an, tried) = (
+        tower.aux.a,
+        tower.aux.b,
+        tower.aux_order,
+        tower.cost.curves_tried,
+    );
+    let mut fb = lift_abscissae(instance, &xs, |columns| {
+        if kind == AuxKind::Ordinary {
+            format!(
+                "isogeny tower t = {t}, seed = {seed}, E' = (a' {aa}, b' {ab}), #E' = {an}, \
+                 {tried} auxiliary curves tried, {columns} of 2^{t} abscissae on the curve"
+            )
+        } else {
+            format!(
+                "isogeny tower t = {t}, seed = {seed}, supersingular E' = {} (a' {aa}, b' {ab}), \
+                 #E' = p + 1 = {an}, no search, {columns} of 2^{t} abscissae on the curve",
+                kind.name()
+            )
+        }
+    })?;
+    let c = &tower.cost;
+    fb.cost.count("legendre_symbols", c.legendre_symbols);
+    fb.cost.count("sqrt_solves", c.sqrt_solves);
+    for (name, v) in [
+        ("aux_curves_tried", c.curves_tried),
+        ("aux_curves_singular", c.singular),
+        ("aux_curves_filtered_out", c.filtered_out),
+        ("aux_orders_computed", c.orders_computed),
+        ("aux_filter_false_positives", c.filter_false_positives),
+        ("aux_orders_undetermined", c.orders_undetermined),
+        ("aux_two_sylow_rejected", c.two_sylow_rejected),
+        ("aux_search_gae", c.search_gae),
+        ("aux_count_gae", c.count_gae),
+        ("aux_tower_build_gae", c.build_gae),
+        ("aux_legendre_symbols", c.legendre_symbols),
+        ("aux_sqrt_solves", c.sqrt_solves),
+        ("aux_bsgs_table_entries", c.bsgs_table_entries),
+        ("velu_evaluations_uncharged", c.velu_evaluations),
+    ] {
+        fb.cost.count(name, v);
+    }
+    if kind != AuxKind::Ordinary {
+        fb.cost.count("aux_supersingular", 1);
+    }
+    Ok(fb)
+}
+
 impl FactorBaseBuilder<PrimeCurve> for PrimeIsogenyBase<'_> {
     fn name(&self) -> &str {
         "prime-isogeny"
@@ -836,52 +948,7 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeIsogenyBase<'_> {
         } else {
             supersingular_tower(p, t, seed, kind, &mut aux_ops)?
         };
-        let mut xs = tower.v.clone();
-        xs.sort_unstable();
-        let (aa, ab, an, tried) = (
-            tower.aux.a,
-            tower.aux.b,
-            tower.aux_order,
-            tower.cost.curves_tried,
-        );
-        let mut fb = lift_abscissae(self.instance, &xs, |columns| {
-            if kind == AuxKind::Ordinary {
-                format!(
-                    "isogeny tower t = {t}, seed = {seed}, E' = (a' {aa}, b' {ab}), #E' = {an}, \
-                     {tried} auxiliary curves tried, {columns} of 2^{t} abscissae on the curve"
-                )
-            } else {
-                format!(
-                    "isogeny tower t = {t}, seed = {seed}, supersingular E' = {} (a' {aa}, b' {ab}), \
-                     #E' = p + 1 = {an}, no search, {columns} of 2^{t} abscissae on the curve",
-                    kind.name()
-                )
-            }
-        })?;
-        let c = &tower.cost;
-        fb.cost.count("legendre_symbols", c.legendre_symbols);
-        fb.cost.count("sqrt_solves", c.sqrt_solves);
-        for (name, v) in [
-            ("aux_curves_tried", c.curves_tried),
-            ("aux_curves_singular", c.singular),
-            ("aux_curves_filtered_out", c.filtered_out),
-            ("aux_orders_computed", c.orders_computed),
-            ("aux_filter_false_positives", c.filter_false_positives),
-            ("aux_orders_undetermined", c.orders_undetermined),
-            ("aux_two_sylow_rejected", c.two_sylow_rejected),
-            ("aux_search_gae", c.search_gae),
-            ("aux_count_gae", c.count_gae),
-            ("aux_tower_build_gae", c.build_gae),
-            ("aux_legendre_symbols", c.legendre_symbols),
-            ("aux_sqrt_solves", c.sqrt_solves),
-            ("aux_bsgs_table_entries", c.bsgs_table_entries),
-            ("velu_evaluations_uncharged", c.velu_evaluations),
-        ] {
-            fb.cost.count(name, v);
-        }
-        if kind != AuxKind::Ordinary {
-            fb.cost.count("aux_supersingular", 1);
-        }
+        let fb = build_isogeny_base(self.instance, &tower, kind, t, seed)?;
         ops.merge(aux_ops);
         Ok(fb)
     }
@@ -1040,7 +1107,26 @@ mod tests {
             .build(&ctx, &params, &mut ops)
             .unwrap();
         let p = inst.curve.p;
-        let tower = isogeny_tower(p, t, 2, &mut GroupOps::default()).unwrap();
+        let mut tower_ops = GroupOps::default();
+        let tower = isogeny_tower(p, t, 2, &mut tower_ops).unwrap();
+        let mut prebuilt_ops = GroupOps::default();
+        let prebuilt = PrebuiltPrimeIsogenyBase {
+            instance: &inst,
+            tower: &tower,
+            tower_ops,
+            tower_wall_ns: 7,
+            seed: 2,
+        }
+        .build(&ctx, &params, &mut prebuilt_ops)
+        .unwrap();
+        assert_eq!(prebuilt.abscissa_list, fb.abscissa_list);
+        assert_eq!(prebuilt.points, fb.points);
+        assert_eq!(
+            prebuilt.cost.get("aux_search_gae"),
+            fb.cost.get("aux_search_gae")
+        );
+        assert_eq!(prebuilt_ops, ops);
+        assert!(prebuilt.cost.wall_ns >= 7);
         let lifting: Vec<u64> = {
             let mut v: Vec<u64> = tower
                 .v
