@@ -798,21 +798,6 @@ fn vmonomial_product(m: &[u64], other: &[u64]) -> Option<Vec<u64>> {
 // The independent verifier still checks this product against f or the
 // Frobenius/GCD certificate; this is not an acceptance shortcut.
 fn vroot_product(roots: &[u64], p: u64) -> Result<Vec<u64>, String> {
-    // Native Rust A/B showed short-degree verifier regressions with the
-    // in-place recurrence; preserve the prior multiplication path for up to
-    // three roots. Most of the allocation reduction is at degree four/eight.
-    if roots.len() <= 3 {
-        let mut product = vec![1];
-        let mut previous = None;
-        for &root in roots {
-            if root >= p || previous.is_some_and(|a| a >= root) {
-                return Err("noncanonical or repeated root".into());
-            }
-            previous = Some(root);
-            product = vproduct(&product, &[(p - root) % p, 1], p);
-        }
-        return Ok(product);
-    }
     let mut product = Vec::with_capacity(roots.len() + 1);
     product.push(1);
     let mut previous = None;
@@ -1602,7 +1587,25 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     // redundant polynomial exponentiation and Euclidean GCD
                     // during certificate verification, without trusting the
                     // producer's claimed xp_mod_f or linear_part.
-                    let product = vroot_product(roots, p)?;
+                    // The in-place recurrence wins at the maximum
+                    // supported degree. For smaller root sets retain the
+                    // old verifier's low-overhead short-product loop: two
+                    // A/B runs showed small-workload regressions when it
+                    // was replaced indiscriminately.
+                    let product = if roots.len() >= MAX_DEGREE {
+                        vroot_product(roots, p)?
+                    } else {
+                        let mut product = vec![1];
+                        let mut previous = None;
+                        for &r in roots {
+                            if r >= p || previous.is_some_and(|a| a >= r) {
+                                return Err("noncanonical or repeated root".into());
+                            }
+                            previous = Some(r);
+                            product = vproduct(&product, &[(p - r) % p, 1], p);
+                        }
+                        product
+                    };
                     let completely_split = report.polynomial.len() >= 2
                         && roots.len() + 1 == report.polynomial.len()
                         && report.polynomial.last().is_some_and(|&lead| {
