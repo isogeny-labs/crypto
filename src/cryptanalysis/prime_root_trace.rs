@@ -2084,6 +2084,18 @@ mod round80_identity_arithmetic {
     }
 
     #[test]
+    fn smallest_odd_primes_and_constant_modulus_preserve_certificates() {
+        for p in [3u64, 5, 7, 11] {
+            for f in [vec![p - 2, 1], vec![1], vec![0, 1]] {
+                let mut sink = |_event: &RootEvent| Ok(());
+                let report = solve(&f, p, 4, test_limits(), &mut sink).unwrap();
+                assert!(report.complete(), "p={p} f={f:?}");
+                verify(&report).unwrap();
+            }
+        }
+    }
+
+    #[test]
     fn limited_work_and_sink_failures_remain_verifiable() {
         for p in [65_521, MAX_PRIME] {
             let mut sink = |_event: &RootEvent| Ok(());
