@@ -825,6 +825,21 @@ These are partial operation and descriptive CPU comparisons, not a
 complete portable or isolated wall result. Transport of the same
 columns did not change useful relation support, rows, rank or scalar.
 
+The separately frozen [64-target reused-setup panel](../research/isogeny_torsion_fibers_20261012/dual_projected_base_20261118/RESULTS_V1.md)
+then completed 18/18 whole-batch children and 18/18 independent native
+replays on 64 distinct public order-229 targets in three rounds. The
+batch quotient is a secondary amortization diagnostic and is excluded from
+the cold single-target ECDLP comparison above. The
+pair audit matched 192 dual/inverse cells and 76,711 relation witnesses.
+At B=64, mean whole-batch counted group work divided by
+`64*sqrt(229)` was 1,714.111 direct dual, 1,714.442 direct inverse,
+1,712.437 destination direct, 1.659 BSGS, and 6.654 signed rho.
+One dual setup used 12,180 counted operations against inverse's 12,501;
+the shared relation query used 1,646,809 per batch in both arms.
+Inverse/dual was 1.000193 and dual/rho was 257.621 in this partial
+unit. The output and replay hashes verified. This measures genuine
+setup reuse but neither a complete portable price nor isolated wall.
+
 The remaining exit criteria are a disjoint count and calibrated conversion
 of every native primitive (including square-root internals, polynomial
 and table work, allocation and I/O), an independent counter checker,
@@ -834,11 +849,11 @@ cap. The projected-base paired comparison has now met its order-229
 correctness and relation-equality gates. Its complete portable price
 remains blocked by unconverted primitive and process costs; the next
 discriminating gate is a disjoint native counter census with an
-independent counter checker and calibrated conversion on this exact
-480-child workload. The separately frozen 64-target genuinely
-reused-setup panel and a larger-order dual-versus-inverse comparison
-are still unexecuted; the latter needs a versioned parameter/cap
-amendment. A changed factor base must remain a new arm with its own
+independent counter checker and calibrated conversion on the frozen
+480-child cold workload and the new 18-child reused-setup workload.
+The larger-order dual-versus-inverse comparison is still unexecuted;
+it needs a versioned parameter/cap amendment. A changed factor base
+must remain a new arm with its own
 support and costs. The Linux L1 replay and hard-cap resource questions
 are resolved within their frozen bounds; they do not resolve the
 remaining portable-price or isolation requirements.
