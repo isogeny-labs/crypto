@@ -333,7 +333,7 @@ impl Bloom {
             let h = hk(x, seed);
             let (h1, h2) = (h as u32 as u64, (h >> 32) | 1);
             for i in 0..k as u64 {
-                let p = ((((h1 + i * h2) as u32 as u64) * m as u64) >> 32) as usize;
+                let p = (((h1 + i * h2) as u32 as u64 * m as u64) >> 32) as usize;
                 b.bits[p >> 6] |= 1 << (p & 63);
             }
         }
@@ -345,8 +345,8 @@ impl Bloom {
         let h = hk(x, self.seed);
         let (h1, h2) = (h as u32 as u64, (h >> 32) | 1);
         for i in 0..self.k as u64 {
-            let p = ((((h1 + i * h2) as u32 as u64) * self.m as u64) >> 32) as usize;
-            if (self.bits[p >> 6] >> (p & 63)) & 1 == 0 {
+            let p = (((h1 + i * h2) as u32 as u64 * self.m as u64) >> 32) as usize;
+            if self.bits[p >> 6] >> (p & 63) & 1 == 0 {
                 return (false, i as u32 + 1);
             }
         }
@@ -415,7 +415,7 @@ fn run(name: &str, c: Cv, fsize: usize, nq: usize, nbuilds: usize) {
     let _ = neg;
     println!("exact std HashMap<u32,u32>: est bytes={} bits/key={:.2}; packed-ideal bits/key={} (ceil log2 p + value bits {})",
         hashmap_bytes(n), hashmap_bytes(n) as f64 * 8.0 / n as f64,
-        64 - (c.p).leading_zeros(), 2 * (64 - ((fsize - 1) as u64).leading_zeros()) + 1);
+        (64 - (c.p).leading_zeros()), 2 * (64 - ((fsize - 1) as u64).leading_zeros()) + 1);
     {
         let t = Instant::now();
         let mut h = 0usize;

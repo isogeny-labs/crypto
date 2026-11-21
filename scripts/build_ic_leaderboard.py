@@ -159,6 +159,10 @@ SOURCES = {
     "s5_c4_component": "research/s5_plain_c4_options_20261019/raw/summary_r13.json",
     "pkm_symmetric_component": "research/pkm_symmetric_lead1_20261026/rows_m4_uncontended.jsonl",
     "mt_fieldops_component": "research/mt_fieldops_v5_20261112/results/holdout/summary.json",
+    "genus4_followup": "research/genus4_followup_20261118/analysis.json",
+    "genus4_followup_sens": "research/genus4_followup_20261118/sensitivity.json",
+    "genus4_followup_curves": "research/genus4_followup_20261118/per_curve.json",
+    "genus4_prime_order": "research/genus4_prime_order_20261118/analysis.json",
     "fes_then_batched": "research/fes_then_batched_20261112/validation/headline.json",
     "fes_then_batched_readme": "research/fes_then_batched_20261112/README.md",
     "gpu_fes_e2e": "research/ic_gpu_e2e_20261113/results.json",
@@ -534,7 +538,9 @@ COMPONENT_EVIDENCE_DIRS = ("benchmarks/20261029-ic-aimed-gather", "benchmarks/20
                            "benchmarks/20261115-tableb-binary-ksum",
                            "benchmarks/20261115-ksum-prune-tableb",
                            "research/ml_cryptanalysis_pt_lgrow_k1_20261114/fb-pt-lgrow-k1",
-                           "benchmarks/20261115-tableb-ksum")
+                           "benchmarks/20261115-tableb-ksum",
+                           "benchmarks/20261118-genus4-followup",
+                           "benchmarks/20261118-genus4-prime-order")
 
 
 def gate_inputs(evidence: Path) -> set[str]:
@@ -2171,6 +2177,52 @@ def mt_fieldops_component() -> dict:
             "validated": not errs}
 
 
+GENUS4_FOLLOWUP_EVIDENCE = "benchmarks/20261118-genus4-followup"
+
+
+def genus4_followup_component() -> dict:
+    """Genus-4 hyperelliptic IC (genus_ladder arm x: double large prime, parity prefilter, coordinate Wiedemann,
+    unit-T walk, Ferrari quartic test, SGE; arm w without Ferrari and SGE) against window-free plain rho measured in
+    the same binary and against the ideal negation-rho bound sqrt(pi r/4), at p = 16411 on 54 targets of 3 curves
+    (research/genus4_followup_20261118, frozen protocol; validator: benchmarks/20261118-genus4-followup).  Ratios at
+    w GAE per native F_p operation; the frozen Q3 reading, the post-hoc closed-form references and the per-curve
+    split (validator finding F7) are copied from the study's JSON."""
+    an = load(SOURCES["genus4_followup"])
+    sens = load(SOURCES["genus4_followup_sens"])
+    pc = load(SOURCES["genus4_followup_curves"])
+    errs = checked_evidence_dir(REPO / GENUS4_FOLLOWUP_EVIDENCE, REPO)
+    if an.get("n_keys") != 108 or not all(an["gates"].values()):
+        raise SystemExit(f"{SOURCES['genus4_followup']}: expected 108 keys and passing gates")
+    arms = {}
+    for a in ("x", "w"):
+        v = an["arms"][a]
+        arms[a] = {"q3": {n: v[f"Q3_w{n}"] for n in ("0", "0.1", "1")}, "q4_w1": v["Q4_w1"],
+                   "plain_theory_w1": sens[a]["vs_plain_theory_w1"], "neg_ideal": {n: sens[a][f"vs_neg_ideal_w{n}"] for n in ("0.1", "1")},
+                   "seed_stability": sens[a]["q3_w1_hi_over_50_seeds"], "la_share": v["share_la"]}
+    po = load(SOURCES["genus4_prime_order"])
+    po_errs = checked_evidence_dir(REPO / "benchmarks/20261118-genus4-prime-order", REPO)
+    prime_order = {"validated": not po_errs, "tune": po["tune"], "rows": [], "slope": po["slope"],
+                   "study": "research/genus4_prime_order_20261118/",
+                   "results": "research/genus4_prime_order_20261118/RESULTS.md",
+                   "errata": "research/genus4_prime_order_20261118/ERRATA.md",
+                   "validator": "benchmarks/20261118-genus4-prime-order/validator-report.md"}
+    for pr, cell in po["primes"].items():
+        for arm, v in cell["arms"].items():
+            prime_order["rows"].append({"p": int(pr), "arm": arm,
+                                        "neg": {n: v[f"neg_w{n}"] for n in ("0", "0.1", "1")},
+                                        "below_all_w": v["below_neg_all_w"]})
+    return {"prime_order": prime_order, "arms": arms, "curves": pc["curves"], "n_targets": an["n_targets"], "n_keys": an["n_keys"],
+            "q_over_theory": an["q_mean_over_theory"], "cc_star": an["cc_star"],
+            "study": "research/genus4_followup_20261118/", "report": "research/genus4_followup_20261118/REPORT.pdf",
+            "results": "research/genus4_followup_20261118/RESULTS.md", "source": SOURCES["genus4_followup"],
+            "validator": f"{GENUS4_FOLLOWUP_EVIDENCE}/validator-report.md",
+            "class": "algorithmic variant (relation test and linear algebra)",
+            "validation": (f"validated: replay certificate, validator report and the ideal negation-rho bound with the "
+                           f"§5a band ({GENUS4_FOLLOWUP_EVIDENCE}/VALIDATION.json)") if not errs else
+                          f"not validated: the gate refuses {GENUS4_FOLLOWUP_EVIDENCE}/VALIDATION.json",
+            "validated": not errs}
+
+
 def nov13_frontier_diagnostics() -> dict:
     """Dated reconciliation of live implementations and recent diagnostics.
 
@@ -3797,6 +3849,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "pair_table_component": pair_table_component(),
         "aimed_gather_component": aimed_gather_component(),
         "mt_fieldops_component": mt_fieldops_component(),
+        "genus4_followup_component": genus4_followup_component(),
         "nov13_frontier_diagnostics": nov13_frontier_diagnostics(),
         "quartic_twist_pair_component": quartic_twist_pair_component(),
         "quartic_dense_component": quartic_dense_component(),
@@ -4015,6 +4068,96 @@ def hec_text(h: dict) -> dict:
         "slopes_note": ("Per genus: least-squares slope of log2(IC/rho) in bitop/v1 on log2 N, with a two-stage "
                         "bootstrap 95% interval."),
     }
+
+
+def genus4_followup_lead(g: dict) -> str:
+    x = g["arms"]["x"]
+    st = x["seed_stability"]
+    return (f"Genus-4 hyperelliptic Jacobians over F_p, p = 16411 (group orders about 2^56), {g['n_targets']} targets on 3 "
+            f"curves, 2 solver seeds each ({g['n_keys']} paired runs per arm). Every run certified; one binary "
+            "(`genus_ladder`) for both IC arms and the window-free plain rho. Arm x is the double-large-prime walk with "
+            "the parity prefilter, coordinate Wiedemann, the unit-T walk, the Ferrari quartic splitting test and "
+            "structured Gaussian elimination; arm w is the same without Ferrari and SGE. Costs are group operations "
+            "plus w GAE per native F_p operation (§5a). Frozen reading Q3 against the measured plain rho; post hoc "
+            "against its expectation sqrt(pi r/2) (measured mean "
+            f"{g['q_over_theory']:.3f}x of it) and against the ideal negation bound sqrt(pi r/4), the strongest "
+            "available reference, which nothing below beats at w = 1. The frozen \"below rho at w = 1\" verdict for "
+            f"arm x is fragile: its upper bound is below 1 for only {round(st['frac_below_1'] * 50)} of 50 bootstrap "
+            "seeds. Per curve, arm x is at parity with plain rho on the two cofactor-2 curves and 0.71x on the "
+            "prime-order curve, where it equals the ideal negation bound.")
+
+
+def genus4_followup_markdown(g: dict) -> list[str]:
+    f = lambda v: f"{v['ratio']:.3f} [{v['lo']:.3f}, {v['hi']:.3f}]"
+    L = ["## Genus-4 hyperelliptic IC against plain and negation rho at p = 16411, outside tables A–C", "",
+         genus4_followup_lead(g) + f" Class: {g['class']}. {g['validation'].rstrip('.')}.", "",
+         "| arm | Q3 w=0.1 | Q3 w=1 (frozen) | Q4 w=1 | vs sqrt(pi r/2), w=1 | vs ideal negation, w=0.1 | vs ideal negation, w=1 |",
+         "|:--|--:|--:|--:|--:|--:|--:|"]
+    for a, name in (("x", "x (Ferrari + SGE)"), ("w", "w (baseline)")):
+        v = g["arms"][a]
+        L.append(f"| {name} | {f(v['q3']['0.1'])} | {f(v['q3']['1'])} | {f(v['q4_w1'])} | {f(v['plain_theory_w1'])} | "
+                 f"{f(v['neg_ideal']['0.1'])} | {f(v['neg_ideal']['1'])} |")
+    L += ["", "Per curve, arm x at w = 1 (post hoc, validator finding F7):", "",
+          "| curve seed | h | r | / sqrt(pi r/2) | / ideal negation | / measured plain rho |", "|--:|--:|--:|--:|--:|--:|"]
+    for c in g["curves"]:
+        x = c["x"]
+        L.append(f"| {c['curve_seed']} | {c['h']} | {c['r']:.3e} | {x['vs_plain_theory_w1']:.3f} | {x['vs_neg_ideal_w1']:.3f} | "
+                 f"{x['vs_measured_q_q3_w1']:.3f} |")
+    L += ["", f"Distance remaining: IC / ideal negation rho at w = 1. Factor-base size retuned on p = 8209 (frozen rule): "
+          f"cc* = {g['cc_star']}, the existing setting. Study: [{g['study']}](../../{g['study']}); "
+          f"[results](../../{g['results']}); [report](../../{g['report']}); [validator report](../../{g['validator']}).", ""]
+    po = g["prime_order"]
+    L += ["### Prime-order Jacobians at p = 16411 and 32771 (" + ("validated" if po["validated"] else "not validated") + ")", "",
+          "Five prime-order curves per prime (#J about 2^56 and 2^60), 6 targets x 2 seeds each. x is arm x at the lab "
+          f"factor base (cc 2.0); x* is arm x at cc {po['tune']['cc']}, tuned on held-out cofactor-2 curves. Ratio of IC cost "
+          "to the ideal negation-rho bound sqrt(pi r/4), every emitted native operation at w GAE; the walk's per-step "
+          "hash and coefficient additions are not counted (charging them moves x* at p = 16411 from 0.876 to 0.885). "
+          "Confirms known asymptotics (double large prime, genus 4) on this implementation; not an elliptic-curve result.", "",
+          "| p | arm | w=0 | w=0.1 | w=1 | below at all w |", "|--:|:--|--:|--:|--:|:--|"]
+    for r in po["rows"]:
+        L.append(f"| {r['p']} | {r['arm']} | {f(r['neg']['0'])} | {f(r['neg']['0.1'])} | {f(r['neg']['1'])} | {r['below_all_w']} |")
+    L += ["", f"Slope of ln(x*/ideal negation rho) in ln p: {po['slope']['x*']['ratio_vs_neg_w1']['slope']:.3f} (two primes). "
+          f"Study: [{po['study']}](../../{po['study']}); [results](../../{po['results']}); [errata](../../{po['errata']}); "
+          f"[validator report](../../{po['validator']}).", ""]
+    return L
+
+
+def genus4_followup_html(g: dict) -> str:
+    f = lambda v: f'{v["ratio"]:.3f} <span class="muted">[{v["lo"]:.3f}, {v["hi"]:.3f}]</span>'
+    gh = "https://github.com/aburan28/crypto/blob/main/"
+    rows = "".join(f'<tr><td>{esc(n)}</td><td>{f(g["arms"][a]["q3"]["0.1"])}</td><td>{f(g["arms"][a]["q3"]["1"])}</td>'
+                   f'<td>{f(g["arms"][a]["q4_w1"])}</td><td>{f(g["arms"][a]["plain_theory_w1"])}</td>'
+                   f'<td>{f(g["arms"][a]["neg_ideal"]["0.1"])}</td><td>{f(g["arms"][a]["neg_ideal"]["1"])}</td></tr>'
+                   for a, n in (("x", "x (Ferrari + SGE)"), ("w", "w (baseline)")))
+    crow = "".join(f'<tr><td class="n">{c["curve_seed"]}</td><td class="n">{c["h"]}</td><td class="n">{c["r"]:.3e}</td>'
+                   f'<td class="n">{c["x"]["vs_plain_theory_w1"]:.3f}</td><td class="n">{c["x"]["vs_neg_ideal_w1"]:.3f}</td>'
+                   f'<td class="n">{c["x"]["vs_measured_q_q3_w1"]:.3f}</td></tr>' for c in g["curves"])
+    return ('<section class="card" id="genus4-followup"><h2>Genus-4 hyperelliptic IC against plain and negation rho at '
+            'p = 16411, outside the priced tables</h2>'
+            f'<p>{esc(genus4_followup_lead(g))} Class: {esc(g["class"])}. {esc(g["validation"].rstrip("."))}.</p>'
+            '<table><thead><tr><th>arm</th><th>Q3 w=0.1</th><th>Q3 w=1 (frozen)</th><th>Q4 w=1</th>'
+            '<th>vs sqrt(&pi; r/2), w=1</th><th>vs ideal negation, w=0.1</th><th>vs ideal negation, w=1</th></tr></thead>'
+            f'<tbody>{rows}</tbody></table>'
+            '<p>Per curve, arm x at w = 1 (post hoc, validator finding F7):</p>'
+            '<table><thead><tr><th class="n">curve seed</th><th class="n">h</th><th class="n">r</th><th class="n">/ sqrt(&pi; r/2)</th>'
+            f'<th class="n">/ ideal negation</th><th class="n">/ measured plain rho</th></tr></thead><tbody>{crow}</tbody></table>'
+            f'<p>Distance remaining: IC / ideal negation rho at w = 1. Factor-base size retuned on p = 8209: cc* = {esc(g["cc_star"])}. '
+            f'<a href="{gh}{esc(g["study"])}">Study</a>; <a href="{gh}{esc(g["results"])}">results</a>; '
+            f'<a href="{gh}{esc(g["report"])}">report</a>; <a href="{gh}{esc(g["validator"])}">validator report</a>.</p>'
+            + genus4_prime_order_html(g["prime_order"], f, gh) + '</section>')
+
+
+def genus4_prime_order_html(po: dict, f, gh: str) -> str:
+    rows = "".join(f'<tr><td class="n">{r["p"]}</td><td>{esc(r["arm"])}</td><td>{f(r["neg"]["0"])}</td><td>{f(r["neg"]["0.1"])}</td>'
+                   f'<td>{f(r["neg"]["1"])}</td><td>{esc(str(r["below_all_w"]))}</td></tr>' for r in po["rows"])
+    return ('<h3>Prime-order Jacobians at p = 16411 and 32771 (' + ("validated" if po["validated"] else "not validated") + ')</h3>'
+            f'<p>Five prime-order curves per prime; x at cc 2.0, x* at cc {esc(po["tune"]["cc"])} (tuned on held-out curves). '
+            'IC cost over the ideal negation-rho bound sqrt(&pi; r/4), every emitted native operation at w GAE (per-step walk '
+            'hash and coefficient additions not counted). Confirms known asymptotics on this implementation; not an '
+            'elliptic-curve result.</p><table><thead><tr><th class="n">p</th><th>arm</th><th>w=0</th><th>w=0.1</th><th>w=1</th>'
+            f'<th>below at all w</th></tr></thead><tbody>{rows}</tbody></table>'
+            f'<p><a href="{gh}{esc(po["study"])}">Study</a>; <a href="{gh}{esc(po["results"])}">results</a>; '
+            f'<a href="{gh}{esc(po["errata"])}">errata</a>; <a href="{gh}{esc(po["validator"])}">validator report</a>.</p>')
 
 
 def markdown(doc: dict) -> str:
@@ -4891,6 +5034,7 @@ def markdown(doc: dict) -> str:
           f"v4, without native work priced: [{mt['v4']}](../../{mt['v4']}). "
           f"Earlier rows were measured against a rho without retention: IC5 (v3, [{mt['previous']}](../../{mt['previous']}); "
           f"its validated result is IC5 cheaper than IC4 in all 36 decisions) and IC4 (v2, [{mt['correction']}](../../{mt['correction']})).", ""]
+    L += genus4_followup_markdown(doc["genus4_followup_component"])
     d13 = doc["nov13_frontier_diagnostics"]
     census = d13["live_census"]
     ftb = d13["fes_then_batched"]
@@ -6434,6 +6578,7 @@ def page(doc: dict, standalone: bool) -> str:
              f'v4 without native work priced: <a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["v4"])}">v4</a>; '
              f'earlier rows against a rho without retention: <a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["previous"])}">IC5 (v3)</a>, '
              f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(mt["correction"])}">IC4 (v2)</a>.</p></section>')
+    P.append(genus4_followup_html(doc["genus4_followup_component"]))
     d13 = doc["nov13_frontier_diagnostics"]
     census, ftb = d13["live_census"], d13["fes_then_batched"]
     gpu, gcomp = d13["gpu_fes_e2e"], d13["gpu_components"]

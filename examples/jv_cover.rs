@@ -13,6 +13,12 @@
 use std::env;
 use std::fs;
 
+/// With `--features jemalloc`: F4's per-term allocations go to jemalloc
+/// instead of glibc (see the `jemalloc` feature in Cargo.toml).
+#[cfg(feature = "jemalloc")]
+#[global_allocator]
+static GLOBAL: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
+
 use crypto_lib::cryptanalysis::jv_cover::{
     run_cover_ccov_mode, run_cover_dlp_mode, run_rho_dp, CcovReport, CoverDlpReport, RhoDpReport,
     StopMode,

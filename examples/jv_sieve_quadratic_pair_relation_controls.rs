@@ -11,7 +11,6 @@ pub mod quadratic_pair_graph;
 pub mod quadratic_pair_relation;
 
 /// The controls are unit tests: `cargo test --example <this example>`.
-/// Built as `crate-type = ["lib"]`, so `main` is unused; keep it for harness docs.
 #[allow(dead_code)]
 fn main() {}
 

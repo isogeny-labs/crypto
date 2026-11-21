@@ -160,7 +160,7 @@ impl Bloom {
             let h = hk(x, seed);
             let (h1, h2) = (h as u32 as u64, (h >> 32) | 1);
             for i in 0..k as u64 {
-                let p = ((((h1 + i * h2) as u32 as u64) * m as u64) >> 32) as usize;
+                let p = (((h1 + i * h2) as u32 as u64 * m as u64) >> 32) as usize;
                 b.bits[p >> 6] |= 1 << (p & 63);
             }
         }
@@ -172,8 +172,8 @@ impl Bloom {
         let h = hk(x, self.seed);
         let (h1, h2) = (h as u32 as u64, (h >> 32) | 1);
         for i in 0..self.k as u64 {
-            let p = ((((h1 + i * h2) as u32 as u64) * self.m as u64) >> 32) as usize;
-            if (self.bits[p >> 6] >> (p & 63)) & 1 == 0 {
+            let p = (((h1 + i * h2) as u32 as u64 * self.m as u64) >> 32) as usize;
+            if self.bits[p >> 6] >> (p & 63) & 1 == 0 {
                 return (false, i as u32 + 1);
             }
         }

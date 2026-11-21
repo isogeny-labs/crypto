@@ -1,0 +1,15 @@
+instance g=6 p=31 curve=11; L(t) from PARI hyperellcharpoly; L(1)=1148886056; sum_(n<=g) A_n = 1148886056 (must equal L(1))
+exact: n1=18 z1=1 n2=253 z2=1 A_g=1111826321
+exact (any): P(1-smooth)=0.0032637  P(2-smooth)=0.13753  ratio=42.14
+exact (sqf): P(1-smooth)=0.0013152  P(2-smooth)=0.12054  ratio=91.65
+MC: 50000 walk samples, 48346 with deg u = g
+MC (any): 1-smooth 142 (0.0029372 +- 0.00025)  2-smooth 6636 (0.13726)  ratio=46.73
+MC (sqf): 1-smooth 54 (0.0011169 +- 0.00015)  2-smooth 5832 (0.12063)  ratio=108
+producer records (arm, seed): (trials, relations, rels_by_lp, exhausted)
+   ('C_double_lp+pre', 1) (22663, 27, [27, 0, 0], False)
+   ('C_double_lp+pre', 2) (17268, 27, [27, 0, 0], False)
+   ('D_deg2_full', 1) (2336, 272, [272, 0, 0], False)
+   ('D_deg2_full', 2) (2115, 272, [272, 0, 0], False)
+   ('E_deg2_lp', 1) (2015, 201, [1, 52, 148], False)
+   ('E_deg2_lp', 2) (1751, 202, [3, 49, 150], False)
+producer trials/relation: c=732.7 D=8.172 ratio c/D=89.66

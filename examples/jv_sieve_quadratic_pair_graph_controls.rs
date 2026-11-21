@@ -4,6 +4,5 @@ pub use crypto_lib::cryptanalysis;
 pub mod quadratic_pair_graph;
 
 /// The controls are the unit tests of the included module: `cargo test --example <this example>`.
-/// Built as `crate-type = ["lib"]`, so `main` is unused; keep it for harness docs.
 #[allow(dead_code)]
 fn main() {}
