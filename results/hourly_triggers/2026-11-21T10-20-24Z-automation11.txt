@@ -1,0 +1,5 @@
+Requested relation-finding monitor run at 2026-11-21T10:20:24Z.
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Baseline: results/relation_baseline.json
+Threshold: 20% absolute relative change in throughput or success rate.
+The workflow appends results/hourly_log.csv and opens an issue for failures/anomalies.
