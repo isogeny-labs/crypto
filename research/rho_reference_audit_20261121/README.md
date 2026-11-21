@@ -1,10 +1,11 @@
-# Rho-reference audit (draft, 2026-11-21)
+# Rho-reference audit (2026-11-21)
 
-DRAFT, work in progress. `AUDIT.md` enumerates 37 rows (0–36) of this lab's IC-at-or-below-rho
-results, with the rho reference each used. An independent verifier accepted the enumeration
-except row 31, which is being corrected. Classification (robust / at risk / already reversed),
-plausible strong-rho factors and rerun plans are still to come. Nothing here is a finding yet
+This audit covers 37 of the lab's IC-at-or-below-rho rows. For each it records the rho reference
+used, a plausible strong-rho factor and a class. The class counts are 5 ROBUST, 3 AT-RISK,
+11 ALREADY-REVERSED, 16 NOT-A-CLAIM and 2 UNKNOWN. No generic prime-order or standard Koblitz
+row is robust. Every number is copied from cited files and is an unverified assertion
 [pcc:unverified].
 
-Motivation: in `research/humbert_genus5_cover_20261021` the sub-rho result disappeared twice when
-the rho reference was made honest (slope_20261120/REPORT.pdf).
+Files: `AUDIT.md` (revision 5, full table and rerun plans A–C), `REPORT.typ` / `REPORT.pdf`,
+`figures/audit_classes.{svg,png}`. An independent verifier reviewed revisions 2–4. Revision 5
+applies its last findings without a further check.

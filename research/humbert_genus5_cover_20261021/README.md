@@ -120,3 +120,12 @@ fields identical. Against the SIMD rho, which runs at 4.5× the v7 rho's steps p
 best IC arm takes 3.89, 1.97, 2.00 and 1.37 of rho's expected time. The slopes are 1.21 for IC
 and 2.00 for rho, which puts the extrapolated crossover near q ≈ 92 000 [pcc:unverified] (L0).
 Report: `slope_20261120/REPORT.pdf`.
+
+## Crossover test at q < 2^17 (2026-11-21, `crossover_20261121/`)
+
+The crate now accepts q < 2^17. The campaign was 150 runs over q = 65521–131071, all solved. The
+crossover extrapolated from `slope_20261120` (q ≈ 92 000) is falsified: the best IC arm's
+per-instance ratio to the SIMD rho's expected time rises from 1.21 to 2.00 [pcc:unverified]. Two
+causes are measured: LA is quadratic in q at fixed alpha, and the r < 2^62 rule makes r ≪ q^4,
+which flattens rho. Report: `crossover_20261121/REPORT.pdf`. A lab-wide audit of rho references
+followed: `research/rho_reference_audit_20261121`.

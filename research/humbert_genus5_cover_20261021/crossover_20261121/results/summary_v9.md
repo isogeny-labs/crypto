@@ -1,17 +1,49 @@
 # Summary v9 (crossover_20261121)
 
-3 runs; q = [65521]
+150 runs; q = [65521, 81001, 98009, 115001, 131071]
 
-**Z:** 3/3 solved; failures: []
+**Z:** 150/150 solved; failures: []
 - rho runs at the cap: []
 
-**C0 (q=65521 vs v8):** identical 1/1; differing (instance changed or defect): []
-**C0' (d35_aa == d35):** 1/1; diffs []
+**C0 (q=65521 vs v8):** identical 10/10; differing (instance changed or defect): []
+**C0' (d35_aa == d35):** 25/25; diffs []
 
 | q | arm | median t_ic | median IC/rho_exp | range | median IC/rho_actual | wins (IC < rho_exp) |
 |:--|:--|:--|:--|:--|:--|:--|
+| 65521 | d20 | 14.06 | 1.918 | [0.965, 3.587] | 2.667 | 1/5 |
+| 65521 | d25 | 11.34 | 1.393 | [0.770, 2.895] | 2.148 | 1/5 |
+| 65521 | d35 | 9.55 | 1.211 | [0.690, 2.436] | 1.792 | 1/5 |
+| 65521 | d35_aa | 9.75 | 1.190 | [0.666, 2.487] | 1.879 | 1/5 |
+| 65521 | d50 | 10.33 | 1.603 | [0.741, 2.637] | 1.952 | 1/5 |
+| 81001 | d20 | 18.11 | 1.963 | [1.224, 3.106] | 1.836 | 0/5 |
+| 81001 | d25 | 14.67 | 1.631 | [1.021, 2.515] | 1.531 | 0/5 |
+| 81001 | d35 | 12.95 | 1.478 | [0.913, 2.221] | 1.370 | 1/5 |
+| 81001 | d35_aa | 13.54 | 1.461 | [0.923, 2.321] | 1.385 | 1/5 |
+| 81001 | d50 | 14.86 | 1.710 | [1.001, 2.530] | 1.502 | 0/5 |
+| 98009 | d20 | 21.87 | 2.236 | [1.667, 2.354] | 3.066 | 0/5 |
+| 98009 | d25 | 18.64 | 1.830 | [1.395, 1.991] | 2.498 | 0/5 |
+| 98009 | d35 | 17.11 | 1.680 | [1.282, 1.827] | 2.292 | 0/5 |
+| 98009 | d35_aa | 17.02 | 1.683 | [1.279, 1.818] | 2.297 | 0/5 |
+| 98009 | d50 | 20.05 | 2.054 | [1.524, 2.187] | 2.803 | 0/5 |
+| 115001 | d20 | 26.22 | 2.067 | [2.007, 3.002] | 1.549 | 0/5 |
+| 115001 | d25 | 22.82 | 1.855 | [1.755, 2.606] | 1.354 | 0/5 |
+| 115001 | d35 | 22.24 | 1.787 | [1.718, 2.502] | 1.331 | 0/5 |
+| 115001 | d35_aa | 21.97 | 1.740 | [1.680, 2.511] | 1.297 | 0/5 |
+| 115001 | d50 | 82.92 | 6.845 | [2.068, 14.038] | 5.281 | 0/5 |
+| 131071 | d20 | 32.27 | 2.343 | [1.952, 2.705] | 2.766 | 0/5 |
+| 131071 | d25 | 28.01 | 2.052 | [1.689, 2.444] | 2.383 | 0/5 |
+| 131071 | d35 | 27.24 | 2.003 | [1.713, 2.440] | 2.309 | 0/5 |
+| 131071 | d35_aa | 26.46 | 1.999 | [1.674, 2.366] | 2.286 | 0/5 |
+| 131071 | d50 | 67.70 | 4.874 | [2.132, 31.682] | 6.097 | 0/5 |
 
+- rho q=65521: steps/s median 1.215e+08, expected time median 7.75 s, actual median 5.14 s, steps/expected median 0.93, r/q^4 median 0.0500
+- rho q=81001: steps/s median 1.120e+08, expected time median 8.69 s, actual median 9.99 s, steps/expected median 0.67, r/q^4 median 0.0278
+- rho q=98009: steps/s median 1.121e+08, expected time median 9.96 s, actual median 7.02 s, steps/expected median 0.73, r/q^4 median 0.0167
+- rho q=115001: steps/s median 1.161e+08, expected time median 12.11 s, actual median 15.70 s, steps/expected median 1.30, r/q^4 median 0.0147
+- rho q=131071: steps/s median 1.147e+08, expected time median 13.89 s, actual median 10.97 s, steps/expected median 0.75, r/q^4 median 0.0104
 
-**X (q=131071, best arm median IC/rho_exp < 1?):** no data
-- best arm per q: 
-- load1 median 1.44, max 1.62
+**X (q=131071, best arm median IC/rho_exp < 1?):** d35 2.003 [1.713, 2.440] -> falsified
+- best arm per q: 65521: d35 1.211, 81001: d35 1.478, 98009: d35 1.680, 115001: d35 1.787, 131071: d35 2.003
+- Y slopes over q: best-arm median t_ic 1.51; rho expected 0.85; d20 1.16; d25 1.29; d35 1.51; d50 3.13
+- phase slopes (d35): rel 1.05, LA 1.98
+- load1 median 2.37, max 3.85
