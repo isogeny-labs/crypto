@@ -46,6 +46,7 @@ enum RootEvent{
  Product{a:Vec<u64>,b:Vec<u64>,product:Vec<u64>},
  Division{a:Vec<u64>,b:Vec<u64>,quotient:Vec<u64>,remainder:Vec<u64>}
 }
+#[derive(Debug)]
 enum RootStop{WorkLimit}
 type Work<T>=Result<T,RootStop>;
 fn trim(mut v:Vec<u64>)->Vec<u64>{while v.last()==Some(&0){v.pop();}v}
