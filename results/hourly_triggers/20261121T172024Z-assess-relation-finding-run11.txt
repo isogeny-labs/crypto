@@ -1,0 +1,9 @@
+Hourly relation-finding benchmark trigger
+UTC: 2026-11-21T17:20:24Z
+Workflow: .github/workflows/hourly-relation-finding.yml
+Command: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Curve: frozen public-synthetic Koblitz GF(2^23), a=0, m=2 (not ECC2K-130)
+CSV: results/hourly_log.csv
+Baseline: results/relation_baseline.json
+Threshold: >20% absolute change in throughput or success rate
+Failure policy: create GitHub issue with details
