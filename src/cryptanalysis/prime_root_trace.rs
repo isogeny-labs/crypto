@@ -410,33 +410,45 @@ impl Engine<'_> {
             })?;
             return Ok(product);
         }
-        // On dense polynomials, multiplication by a monic linear factor
-        // (X+c) needs n instead of 2n finite-field multiplies. Dispatch
-        // only for lengths that amortize the shape check; leave sparse
-        // coefficients on the established, zero-pruning implementation.
-        let monic_linear = if a.len() == 2 && a[1] == 1 && a[0] != 0 && b.len() >= 5 {
+        // A monic linear factor (X+c) can be multiplied in one coefficient
+        // pass, using at most n finite-field multiplies, rather than 2n.
+        // Avoid scalar operations on zeros and preserve the separate Product
+        // certificate, which the independent verifier checks by convolution.
+        // Only use this for lengths large enough to amortize dispatch.
+        let monic_linear = if a.len() == 2 && a[1] == 1 && a[0] != 0 && b.len() >= 7 {
             Some((a[0], b))
-        } else if b.len() == 2 && b[1] == 1 && b[0] != 0 && a.len() >= 5 {
+        } else if b.len() == 2 && b[1] == 1 && b[0] != 0 && a.len() >= 7 {
             Some((b[0], a))
         } else {
             None
         };
         if let Some((constant, other)) = monic_linear {
-            if other.iter().all(|&coefficient| coefficient != 0) {
-                let mut product = vec![0; other.len() + 1];
+            let mut product = vec![0; other.len() + 1];
+            if other[0] != 0 {
                 product[0] = self.field(FieldOp::Mul, constant, other[0])?;
-                for i in 1..other.len() {
-                    let scaled = self.field(FieldOp::Mul, constant, other[i])?;
-                    product[i] = self.field(FieldOp::Add, scaled, other[i - 1])?;
-                }
-                product[other.len()] = *other.last().unwrap();
-                let product = trim(product);
-                self.event(RootEvent::Product {
-                    a: a.to_vec(), b: b.to_vec(), product: product.clone(),
-                })?;
-                return Ok(product);
             }
+            for i in 1..other.len() {
+                let scaled = if other[i] != 0 {
+                    self.field(FieldOp::Mul, constant, other[i])?
+                } else {
+                    0
+                };
+                product[i] = if scaled == 0 {
+                    other[i - 1]
+                } else if other[i - 1] == 0 {
+                    scaled
+                } else {
+                    self.field(FieldOp::Add, scaled, other[i - 1])?
+                };
+            }
+            product[other.len()] = *other.last().unwrap();
+            let product = trim(product);
+            self.event(RootEvent::Product {
+                a: a.to_vec(), b: b.to_vec(), product: product.clone(),
+            })?;
+            return Ok(product);
         }
+        // General polynomial convolution with zero coefficient pruning.
         let mut product = if a.is_empty() || b.is_empty() {
             vec![]
         } else {
@@ -1691,7 +1703,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn round86_monic_shift_and_dense_linear_match_independent_products() {
+    fn round86_monic_shift_and_linear_match_independent_products() {
         // Directly exercise the source-exact traced producer arithmetic.
         // In particular, a shift must not charge scalar arithmetic events.
         for p in [3, 17, 65_521, 1_000_000_007, MAX_PRIME] {
@@ -1711,8 +1723,8 @@ mod tests {
                     ((1u128 << 64) / p as u128) as u64
                 } else { 0 },
             };
-            let dense = vec![1, 2 % p, 3 % p, 4 % p, 5 % p, 6 % p];
-            let sparse = vec![1, 0, 2 % p, 0, 3 % p, 1];
+            let dense = vec![1, 2 % p, 3 % p, 4 % p, 5 % p, 6 % p, 7 % p, 8 % p];
+            let sparse = vec![1, 0, 2 % p, 0, 3 % p, 0, 4 % p, 1];
             for other in [&dense, &sparse] {
                 for shift in 1..=4 {
                     let mut monomial = vec![0; shift + 1];
