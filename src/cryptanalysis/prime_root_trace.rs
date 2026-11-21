@@ -632,6 +632,29 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     }
     if let Some(result) = vmonomial_product(a, b) { return result; }
     if let Some(result) = vmonomial_product(b, a) { return result; }
+    // A wide dense convolution can accumulate each output coefficient in u64
+    // and perform ONE modular reduction per coefficient, not one per pair.
+    // The bound is checked in u128, so no intermediate u64 overflow is possible.
+    // Keep the sparse and small-product paths untouched: their zero skipping
+    // beats the extra column and density checks on typical short certificates.
+    if a.len() >= 8 && b.len() >= 8 && p <= u32::MAX as u64
+        && a[1] != 0 && b[1] != 0 && a[2] != 0 && b[2] != 0
+        && (a.len().min(b.len()) as u128) * ((p - 1) as u128).pow(2)
+            <= u64::MAX as u128
+        && a.iter().chain(b).all(|&x| x != 0 && x < p)
+    {
+        let mut result = vec![0; a.len() + b.len() - 1];
+        for (k, coefficient) in result.iter_mut().enumerate() {
+            let low = (k + 1).saturating_sub(b.len());
+            let high = (k + 1).min(a.len());
+            let mut sum = 0u64;
+            for i in low..high {
+                sum += a[i] * b[k - i];
+            }
+            *coefficient = sum % p;
+        }
+        return trim(result);
+    }
     let mut r = vec![0; a.len() + b.len() - 1];
     for (i, &x) in a.iter().enumerate() {
         // Sparse root polynomials often have zero middle coefficients.
@@ -666,6 +689,31 @@ fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
     // and for 61-bit arithmetic where its crossover occurs earlier.
     if a.len() <= 2 || (a.len() <= 4 && p <= u32::MAX as u64) {
         return vproduct(a, a, p);
+    }
+    // Dense symmetric squaring: collect every diagonal coefficient once,
+    // reducing modulo p once per output coefficient. For off-diagonal
+    // terms, add 2*a[i]*a[j]. The same bound as convolution covers all
+    // ordered products and therefore guarantees u64 accumulation safety.
+    if a.len() >= 8 && p >= 1_000_000 && p <= u32::MAX as u64
+        && a[1] != 0 && a[2] != 0
+        && (a.len() as u128) * ((p - 1) as u128).pow(2)
+            <= u64::MAX as u128
+        && a.iter().all(|&x| x != 0 && x < p)
+    {
+        let mut result = vec![0; 2 * a.len() - 1];
+        for (k, coefficient) in result.iter_mut().enumerate() {
+            let low = (k + 1).saturating_sub(a.len());
+            let high = (k + 1).min(a.len());
+            let mut sum = 0u64;
+            for i in low..high {
+                let j = k - i;
+                if i > j { break; }
+                let term = a[i] * a[j];
+                sum += if i == j { term } else { term + term };
+            }
+            *coefficient = sum % p;
+        }
+        return trim(result);
     }
     // (c + d*x^k)^2 needs exactly three field multiplications, and
     // its nonzero leading coefficient makes output trimming unnecessary.
@@ -1130,7 +1178,8 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 for v in [a, b, quotient, remainder] {
                     canonical(v, p)?;
                 }
-                if vdiv(a, b, p)? != (quotient.clone(), remainder.clone()) {
+                let (verified_q, verified_r) = vdiv(a, b, p)?;
+                if verified_q != *quotient || verified_r != *remainder {
                     return Err("division identity failed".into());
                 }
             }
@@ -1201,10 +1250,17 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 canonical(quotient, p)?;
                 canonical(remainder, p)?;
                 let state = gcds.get_mut(id).ok_or("missing gcd begin")?;
-                if vdiv(&state.0, &state.1, p)? != (quotient.clone(), remainder.clone()) {
+                let (verified_q, verified_r) = vdiv(&state.0, &state.1, p)?;
+                if verified_q != *quotient || verified_r != *remainder {
                     return Err("Euclidean step failed".into());
                 }
-                *state = (state.1.clone(), remainder.clone());
+                // Move the prior divisor into the new dividend; a deep clone
+                // of that polynomial was previously performed every GCD step.
+                // The exact remainder has already been independently computed
+                // and compared to the certificate. Move that owned vector into
+                // the state instead of allocating a second copy of the event.
+                let previous_b = std::mem::replace(&mut state.1, verified_r);
+                state.0 = previous_b;
             }
             RootEvent::GcdEnd { id, value } => {
                 canonical(value, p)?;
@@ -1640,5 +1696,67 @@ mod tests {
         .unwrap();
         report.limits.events = report.events.len() as u64;
         assert!(verify(&report).is_err());
+    }
+}
+
+#[cfg(test)]
+mod round89_column_accumulators {
+    use super::*;
+
+    // Independent wide-arithmetic oracle. Never uses vproduct or vsquare.
+    fn reference_product(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+        if a.is_empty() || b.is_empty() { return vec![]; }
+        let mut out = vec![0; a.len() + b.len() - 1];
+        for (i, &x) in a.iter().enumerate() {
+            for (j, &y) in b.iter().enumerate() {
+                out[i + j] =
+                    ((out[i + j] as u128 + x as u128 * y as u128) % p as u128) as u64;
+            }
+        }
+        trim(out)
+    }
+
+    #[test]
+    fn column_convolution_and_squaring_match_u128_reference() {
+        use rand::Rng;
+        let mut rng = StdRng::seed_from_u64(0x2026_1121_0089);
+        for p in [65_521, 1_000_000_007, 1_400_000_009,
+                  4_294_967_291, MAX_PRIME] {
+            for width in [2, 3, 5, 8, 12] {
+                for case in 0..120 {
+                    let mut a: Vec<u64> = (0..width).map(|_| rng.gen_range(0..p)).collect();
+                    let mut b: Vec<u64> = (0..width).map(|_| rng.gen_range(0..p)).collect();
+                    if case % 3 == 0 {
+                        for index in (0..width).step_by(3) { a[index] = 0; }
+                        for index in (1..width).step_by(3) { b[index] = 0; }
+                    } else if case % 3 == 1 {
+                        a[0] = p - 1;
+                        b[width - 1] = p - 1;
+                    }
+                    assert_eq!(vproduct(&a, &b, p), reference_product(&a, &b, p),
+                        "product: p={p}, width={width}, case={case}");
+                    assert_eq!(vsquare(&a, p), reference_product(&a, &a, p),
+                        "square: p={p}, width={width}, case={case}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn certificate_replay_matches_solver_after_clone_elimination() {
+        let limits = RootLimits {
+            field_work: MAX_WORK,
+            split_attempts: 1000,
+            events: MAX_EVENTS,
+            degree: MAX_DEGREE,
+        };
+        for p in [65_521, 1_000_000_007, MAX_PRIME] {
+            for polynomial in [vec![p - 3, 1], vec![6, p - 5, 1]] {
+                let report = solve(&polynomial, p, 13, limits.clone(),
+                    &mut |_| Ok(())).unwrap();
+                assert!(report.complete(), "incomplete p={p} poly={polynomial:?}");
+                verify(&report).unwrap();
+            }
+        }
     }
 }
