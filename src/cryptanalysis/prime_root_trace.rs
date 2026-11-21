@@ -1707,6 +1707,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::collections::HashMap;
 
     #[test]
     fn round84_indexed_replay_rejects_forged_computation_ids() {
