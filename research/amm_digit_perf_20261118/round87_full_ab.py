@@ -187,9 +187,9 @@ with tempfile.TemporaryDirectory(prefix="root87-full-") as tmp:
         # vremainder. Neither variant's production source is edited.
         helper = ("vdiv(a, m, p).unwrap().1" if label == "before"
                   else "vremainder(a, m, p).unwrap()")
-        source = source + ("\\n#[doc(hidden)]\\npub fn round87_remainder_probe("
+        source = source + ("\n#[doc(hidden)]\npub fn round87_remainder_probe("
                            "a: &[u64], m: &[u64], p: u64) -> Vec<u64> {"
-                           + helper + "}\\n")
+                           + helper + "}\n")
         (folder / "src/cryptanalysis/prime_root_trace.rs").write_text(source)
         (folder / "src/cryptanalysis/prime_root_bounded.rs").write_text(
             "// The bounded API is out of scope for this exact producer+verifier benchmark.\n"
