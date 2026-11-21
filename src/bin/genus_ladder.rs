@@ -7,8 +7,8 @@
 //! ```text
 //! genus_ladder run --primes 131,257 --genera 2,3,4,5 --curves 4 --seeds 3
 //!     [--arms AaCcR] [--cc 2.0] [--max-h 64] [--threads 4] [--rho-cap 3e7]
-//!     [--seed-search 600] [--max-trials 5e7] [--smith] [--smith-census N]
-//!     [--quartic] [--qc 3.0] [--restart-sqrt] [--sge W,F]... --out FILE.jsonl
+//!     [--seed-search 600] [--order-method enumerate|bsgs1|bsgs2] [--max-trials 5e7] [--smith] [--smith-census N]
+//!     [--quartic] [--quartic-alg] [--qc 3.0] [--restart-sqrt] [--sge W,F]... --out FILE.jsonl
 //! ```
 //!
 //! Arms: `A` full base, `a` full base with the parity prefilter, `C` double
@@ -67,7 +67,9 @@ struct Cfg {
     smith: bool,
     smith_census: u64,
     quartic: bool,
+    quartic_alg: bool,
     sge: Vec<gl::SgeParams>,
+    order_method: gl::OrderMethod,
     out: String,
 }
 
@@ -99,7 +101,9 @@ fn parse() -> Result<Cfg, String> {
         smith: false,
         smith_census: 0,
         quartic: false,
+        quartic_alg: false,
         sge: Vec::new(),
+        order_method: gl::OrderMethod::Enumerate,
         out: String::new(),
     };
     let mut i = 1;
@@ -112,6 +116,11 @@ fn parse() -> Result<Cfg, String> {
         }
         if flag == "--restart-sqrt" {
             c.restart_sqrt = true;
+            i += 1;
+            continue;
+        }
+        if flag == "--quartic-alg" {
+            c.quartic_alg = true;
             i += 1;
             continue;
         }
@@ -180,6 +189,7 @@ fn parse() -> Result<Cfg, String> {
                 }
                 c.sge.push(gl::SgeParams { w_max, fill_max });
             }
+            "--order-method" => c.order_method = gl::OrderMethod::parse(&v)?,
             "--out" => c.out = v,
             _ => return Err(format!("unknown flag {flag}")),
         }
@@ -248,6 +258,10 @@ fn main() -> ExitCode {
         "smith": cfg.smith, "smith_census": cfg.smith_census, "quartic": cfg.quartic,
         "threads": cfg.threads,
         "restart": if cfg.restart_sqrt { json!("min(4096, max(16, sqrt(r)/2))") } else { json!(gl::RESTART) }});
+    if cfg.quartic_alg {
+        // Only with the flag, so a run without it writes the frozen layout.
+        config["quartic_alg"] = json!(true);
+    }
     if !cfg.sge.is_empty() {
         // Only with the flag, so a run without it writes the frozen layout.
         config["sge"] = json!(cfg
@@ -255,6 +269,10 @@ fn main() -> ExitCode {
             .iter()
             .map(|s| json!({"w_max": s.w_max, "fill_max": s.fill_max}))
             .collect::<Vec<_>>());
+    }
+    if cfg.order_method != gl::OrderMethod::Enumerate {
+        // Only with the flag, so a run without it writes the frozen layout.
+        config["order_method"] = json!(cfg.order_method.name());
     }
     emit(config);
 
@@ -312,12 +330,16 @@ fn main() -> ExitCode {
                 *reasons.entry("f_reducible_even_order".into()).or_default() += 1;
                 continue;
             }
-            match gl::make_instance(p, g, cs, cs, cfg.max_h) {
+            let t_inst = Instant::now();
+            match gl::make_instance_with(p, g, cs, cs, cfg.max_h, cfg.order_method) {
                 Ok(inst) => {
                     admitted += 1;
                     let mut rec = json!({"kind": "instance", "family": "hyperelliptic", "p": p, "g": g,
                         "curve_seed": cs, "f": inst.curve.f_coeffs(), "order": inst.order,
                         "h": inst.h, "r": inst.r});
+                    if cfg.order_method != gl::OrderMethod::Enumerate {
+                        rec["order_search_wall_s"] = json!(t_inst.elapsed().as_secs_f64());
+                    }
                     if cfg.smith && g == 3 {
                         rec["smith"] = smith_record(&inst.curve.f_coeffs(), p, cs);
                     }
@@ -707,7 +729,79 @@ fn main() -> ExitCode {
                 rec["core_cols"] = json!(o.core_cols);
                 rec["attempts"] = json!(o.attempts);
                 rec["wall_ns"] = json!(o.wall_ns);
+                if cfg.quartic_alg {
+                    rec["rel_enum_mul"] = json!(o.rel_enum.mul);
+                    rec["rel_decomp_mul"] = json!(o.rel_decomp.mul);
+                }
                 emit(rec);
+            }
+            if cfg.quartic_alg {
+                // Algebraic decomposition, without and with the merge, on the
+                // same instance and seed as the scan arm `Q_diem_2lp`.
+                let nb = (cfg.qc * f64::from(*q).sqrt()).ceil() as usize;
+                let settings = [
+                    ("+alg", None),
+                    (
+                        "+alg+sge(8,3)",
+                        Some(gl::SgeParams {
+                            w_max: 8,
+                            fill_max: 3.0,
+                        }),
+                    ),
+                ];
+                for (suffix, sge) in settings {
+                    let o = ql::run_diem_opts(
+                        &inst,
+                        ql::QIcParams {
+                            arm: ql::QArm::DoubleLp,
+                            nb,
+                            seed: *seed,
+                            max_lines: cfg.max_trials,
+                            verify_relations: false,
+                        },
+                        ql::QIcOpts {
+                            decomp: ql::Decomp::Algebraic,
+                            sge,
+                        },
+                    );
+                    let mut rec = head.clone();
+                    rec["kind"] = json!("run");
+                    rec["arm"] = json!(format!("Q_{}{}", o.arm, suffix));
+                    rec["certified"] = json!(o.certified);
+                    rec["exhausted"] = json!(o.exhausted);
+                    rec["ok"] = json!(o.recovered == Some(inst.t_secret));
+                    rec["group_ops"] = json!(o.group_ops);
+                    rec["cantor_mul"] = json!(o.pic_mul);
+                    rec["cantor_inv"] = json!(o.pic_inv);
+                    rec["rel_mul"] = json!(o.rel.mul);
+                    rec["rel_add"] = json!(o.rel.add);
+                    rec["rel_enum_mul"] = json!(o.rel_enum.mul);
+                    rec["rel_decomp_mul"] = json!(o.rel_decomp.mul);
+                    rec["la_mul"] = json!(o.la.mul);
+                    rec["la_add"] = json!(o.la.add);
+                    rec["la_sge_mul"] = json!(o.la_sge.mul);
+                    rec["la_sge_add"] = json!(o.la_sge.add);
+                    rec["fb_cols"] = json!(o.fb_cols);
+                    rec["trials"] = json!(o.lines_tried);
+                    rec["relations"] = json!(o.relations);
+                    rec["rels_by_lp"] = json!(o.rels_by_lp);
+                    rec["decomp_trials"] = json!(o.decomp_trials);
+                    rec["decomp_relations"] = json!(o.decomp_relations);
+                    rec["decomp_fallbacks"] = json!(o.decomp_fallbacks);
+                    rec["core_rows"] = json!(o.core_rows);
+                    rec["core_cols"] = json!(o.core_cols);
+                    rec["attempts"] = json!(o.attempts);
+                    if sge.is_some() {
+                        rec["sge_rows_in"] = json!(o.sge.rows_in);
+                        rec["sge_cols_in"] = json!(o.sge.cols_in);
+                        rec["sge_rows_out"] = json!(o.sge.rows_out);
+                        rec["sge_cols_out"] = json!(o.sge.cols_out);
+                        rec["sge_nnz_in"] = json!(o.sge.nnz_in);
+                        rec["sge_nnz_out"] = json!(o.sge.nnz_out);
+                    }
+                    rec["wall_ns"] = json!(o.wall_ns);
+                    emit(rec);
+                }
             }
             let expect = (std::f64::consts::PI * inst.r as f64 / 4.0).sqrt();
             let mut rec = head.clone();
