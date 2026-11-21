@@ -99,6 +99,18 @@ impl<const L: usize> Fe<L> {
     pub fn montgomery_limbs(&self) -> &[u64; L] {
         &self.0 .0
     }
+
+    /// Constant-time conditional move (`cond` in `{0, 1}`).
+    #[inline]
+    pub fn cmov(&mut self, other: &Self, cond: u64) {
+        self.0 = Uint::cmov(&self.0, &other.0, subtle::Choice::from(cond as u8));
+    }
+
+    /// Constant-time conditional swap (`swap` in `{0, 1}`).
+    #[inline]
+    pub fn cswap(a: &mut Self, b: &mut Self, swap: u64) {
+        Uint::cswap(&mut a.0, &mut b.0, subtle::Choice::from(swap as u8));
+    }
 }
 
 /// An odd prime field `F_p` with `p < 2^(64·L)`, with its Montgomery

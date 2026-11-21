@@ -402,6 +402,16 @@ pub fn find_roots_fp_fast(coeffs: &[FieldElement], p: &BigUint) -> Vec<FieldElem
     if p.bits() <= 20 {
         return find_roots_fp(coeffs, p);
     }
+    // Stack-resident u64 Shoup Cantor-Zassenhaus fast path for p < 2^63 and deg <= 8
+    // (eliminates all BigUint / Vec<FieldElement> heap allocations in S3/S4 IC sieving).
+    if p.bits() <= 63 && coeffs.len() <= 9 {
+        if let Some(roots_u64) = find_roots_fp_u64_stack(coeffs, p) {
+            return roots_u64
+                .into_iter()
+                .map(|r| FieldElement::new(BigUint::from(r), p.clone()))
+                .collect();
+        }
+    }
     // Normalize to a canonical coefficient slice with nonzero lead.
     let mut f: Vec<FieldElement> = coeffs.to_vec();
     while let Some(last) = f.last() {
@@ -528,6 +538,373 @@ pub fn find_roots_fp_fast(coeffs: &[FieldElement], p: &BigUint) -> Vec<FieldElem
     }
     roots.dedup_by(|a, b| a.value == b.value);
     roots
+}
+
+/// Stack-resident `[u64; 9]` polynomial Cantor–Zassenhaus root-finder for odd primes
+/// `2^20 < p < 2^63` and `deg(f) <= 8`, using division-free Montgomery arithmetic.
+fn find_roots_fp_u64_stack(coeffs: &[FieldElement], p_big: &BigUint) -> Option<Vec<u64>> {
+    let digits = p_big.to_u64_digits();
+    if digits.len() != 1 {
+        return None;
+    }
+    let p = digits[0];
+    if p <= 3 || (p & 1) == 0 || (p >> 63) != 0 {
+        return None;
+    }
+
+    // Single-word Montgomery context (`R = 2^64`, `-p^-1 mod 2^64`):
+    let mut pinv = 1u64;
+    for _ in 0..6 {
+        pinv = pinv.wrapping_mul(2u64.wrapping_sub(p.wrapping_mul(pinv)));
+    }
+    let neg_pinv = pinv.wrapping_neg();
+    let r_mod_p = (((1u128 << 64) % (p as u128)) as u64) % p;
+    let r2_mod_p = (((r_mod_p as u128) * (r_mod_p as u128)) % (p as u128)) as u64;
+
+    #[inline(always)]
+    fn mmul(a: u64, b: u64, p: u64, neg_pinv: u64) -> u64 {
+        let t = (a as u128) * (b as u128);
+        let m = (t as u64).wrapping_mul(neg_pinv);
+        let u = ((t + (m as u128) * (p as u128)) >> 64) as u64;
+        if u >= p { u - p } else { u }
+    }
+    #[inline(always)]
+    fn madd(a: u64, b: u64, p: u64) -> u64 {
+        let s = a + b;
+        if s >= p { s - p } else { s }
+    }
+    #[inline(always)]
+    fn msub(a: u64, b: u64, p: u64) -> u64 {
+        if a >= b { a - b } else { a + (p - b) }
+    }
+    #[inline(always)]
+    fn mneg(a: u64, p: u64) -> u64 {
+        if a == 0 { 0 } else { p - a }
+    }
+    #[inline]
+    fn mpow(mut base: u64, mut exp: u64, p: u64, neg_pinv: u64, one_m: u64) -> u64 {
+        let mut acc = one_m;
+        while exp > 0 {
+            if exp & 1 == 1 {
+                acc = mmul(acc, base, p, neg_pinv);
+            }
+            exp >>= 1;
+            if exp > 0 {
+                base = mmul(base, base, p, neg_pinv);
+            }
+        }
+        acc
+    }
+    #[inline]
+    fn minv(a_mont: u64, p: u64, neg_pinv: u64, r2: u64) -> Option<u64> {
+        if a_mont == 0 {
+            return None;
+        }
+        let a_can = mmul(a_mont, 1, p, neg_pinv);
+        let (mut old_r, mut r) = (a_can, p);
+        let (mut old_s, mut s) = (1i64, 0i64);
+        while r != 0 {
+            let q = old_r / r;
+            (old_r, r) = (r, old_r - q * r);
+            (old_s, s) = (s, old_s - (q as i64) * s);
+        }
+        if old_r != 1 {
+            return None;
+        }
+        let inv_can = if old_s < 0 {
+            (old_s + p as i64) as u64
+        } else {
+            old_s as u64
+        };
+        Some(mmul(inv_can, r2, p, neg_pinv))
+    }
+
+    #[derive(Clone, Copy)]
+    struct StackPoly {
+        c: [u64; 9],
+        len: usize,
+    }
+    impl StackPoly {
+        #[inline(always)]
+        fn zero() -> Self {
+            Self { c: [0; 9], len: 1 }
+        }
+        #[inline(always)]
+        fn trim(&mut self) {
+            while self.len > 1 && self.c[self.len - 1] == 0 {
+                self.len -= 1;
+            }
+        }
+        #[inline(always)]
+        fn deg(&self) -> usize {
+            self.len - 1
+        }
+        #[inline(always)]
+        fn is_zero(&self) -> bool {
+            self.len == 1 && self.c[0] == 0
+        }
+    }
+
+    let poly_mul_mod_monic = |a: &StackPoly, b: &StackPoly, m: &StackPoly| -> StackPoly {
+        let md = m.deg();
+        let mut prod = [0u64; 18];
+        for i in 0..a.len {
+            let ai = a.c[i];
+            if ai == 0 {
+                continue;
+            }
+            for j in 0..b.len {
+                prod[i + j] = madd(prod[i + j], mmul(ai, b.c[j], p, neg_pinv), p);
+            }
+        }
+        let top = (a.len + b.len - 1).min(17);
+        for k in (md..=top).rev() {
+            let lead = prod[k];
+            if lead == 0 {
+                continue;
+            }
+            prod[k] = 0;
+            let sh = k - md;
+            for i in 0..md {
+                prod[sh + i] = msub(prod[sh + i], mmul(lead, m.c[i], p, neg_pinv), p);
+            }
+        }
+        let mut out = StackPoly {
+            c: [0; 9],
+            len: md.max(1),
+        };
+        out.c[..md].copy_from_slice(&prod[..md]);
+        out.trim();
+        out
+    };
+
+    let poly_pow_mod_monic = |mut base: StackPoly, mut exp: u64, m: &StackPoly| -> StackPoly {
+        let mut acc = StackPoly::zero();
+        acc.c[0] = r_mod_p;
+        while exp > 0 {
+            if exp & 1 == 1 {
+                acc = poly_mul_mod_monic(&acc, &base, m);
+            }
+            exp >>= 1;
+            if exp > 0 {
+                base = poly_mul_mod_monic(&base, &base, m);
+            }
+        }
+        acc
+    };
+
+    let poly_gcd_monic = |mut a: StackPoly, mut b: StackPoly| -> Option<StackPoly> {
+        a.trim();
+        b.trim();
+        while !b.is_zero() {
+            let bd = b.deg();
+            if bd == 0 {
+                let mut one_p = StackPoly::zero();
+                one_p.c[0] = r_mod_p;
+                return Some(one_p);
+            }
+            let binv = minv(b.c[bd], p, neg_pinv, r2_mod_p)?;
+            while !a.is_zero() && a.deg() >= bd {
+                let ad = a.deg();
+                let factor = mmul(a.c[ad], binv, p, neg_pinv);
+                let sh = ad - bd;
+                a.c[ad] = 0;
+                for i in 0..bd {
+                    a.c[sh + i] = msub(a.c[sh + i], mmul(factor, b.c[i], p, neg_pinv), p);
+                }
+                a.trim();
+            }
+            core::mem::swap(&mut a, &mut b);
+        }
+        let ad = a.deg();
+        let ainv = minv(a.c[ad], p, neg_pinv, r2_mod_p)?;
+        for i in 0..=ad {
+            a.c[i] = mmul(a.c[i], ainv, p, neg_pinv);
+        }
+        Some(a)
+    };
+
+    let poly_div_exact_monic = |mut a: StackPoly, b: &StackPoly| -> StackPoly {
+        let bd = b.deg();
+        let mut q = StackPoly {
+            c: [0; 9],
+            len: a.deg() - bd + 1,
+        };
+        while !a.is_zero() && a.deg() >= bd {
+            let ad = a.deg();
+            let sh = ad - bd;
+            let factor = a.c[ad]; // b is monic (`b.c[bd] == r_mod_p`)
+            q.c[sh] = factor;
+            a.c[ad] = 0;
+            for i in 0..bd {
+                a.c[sh + i] = msub(a.c[sh + i], mmul(factor, b.c[i], p, neg_pinv), p);
+            }
+            a.trim();
+        }
+        q.trim();
+        q
+    };
+
+    let sqrt_mont = |n_m: u64| -> Option<u64> {
+        if n_m == 0 {
+            return Some(0);
+        }
+        if mpow(n_m, (p - 1) >> 1, p, neg_pinv, r_mod_p) != r_mod_p {
+            return None;
+        }
+        if p & 3 == 3 {
+            return Some(mpow(n_m, (p + 1) >> 2, p, neg_pinv, r_mod_p));
+        }
+        let s = (p - 1).trailing_zeros();
+        let q = (p - 1) >> s;
+        let mut z = madd(r_mod_p, r_mod_p, p);
+        let minus_one = p - r_mod_p;
+        while mpow(z, (p - 1) >> 1, p, neg_pinv, r_mod_p) != minus_one {
+            z = madd(z, r_mod_p, p);
+        }
+        let mut m_ts = s;
+        let mut c = mpow(z, q, p, neg_pinv, r_mod_p);
+        let mut t = mpow(n_m, q, p, neg_pinv, r_mod_p);
+        let mut r = mpow(n_m, (q + 1) >> 1, p, neg_pinv, r_mod_p);
+        while t != r_mod_p {
+            let mut i = 1u32;
+            let mut tt = mmul(t, t, p, neg_pinv);
+            while tt != r_mod_p {
+                tt = mmul(tt, tt, p, neg_pinv);
+                i += 1;
+            }
+            let mut b = c;
+            for _ in 0..(m_ts - i - 1) {
+                b = mmul(b, b, p, neg_pinv);
+            }
+            m_ts = i;
+            c = mmul(b, b, p, neg_pinv);
+            t = mmul(t, c, p, neg_pinv);
+            r = mmul(r, b, p, neg_pinv);
+        }
+        Some(r)
+    };
+
+    let mut f = StackPoly {
+        c: [0; 9],
+        len: coeffs.len(),
+    };
+    for (idx, fe) in coeffs.iter().enumerate() {
+        let v = if fe.value.is_zero() {
+            0u64
+        } else {
+            let d = fe.value.to_u64_digits();
+            if d.len() > 1 {
+                return None;
+            }
+            d[0] % p
+        };
+        f.c[idx] = mmul(v, r2_mod_p, p, neg_pinv);
+    }
+    f.trim();
+    if f.is_zero() || f.deg() == 0 {
+        return Some(Vec::new());
+    }
+    let lead_inv = minv(f.c[f.deg()], p, neg_pinv, r2_mod_p)?;
+    for i in 0..f.len {
+        f.c[i] = mmul(f.c[i], lead_inv, p, neg_pinv);
+    }
+
+    if f.deg() == 1 {
+        let root_m = mneg(f.c[0], p);
+        return Some(vec![mmul(root_m, 1, p, neg_pinv)]);
+    }
+
+    // X^p mod f(X)
+    let x_poly = if f.deg() > 1 {
+        let mut xp = StackPoly { c: [0; 9], len: 2 };
+        xp.c[1] = r_mod_p;
+        xp
+    } else {
+        let mut xp = StackPoly::zero();
+        xp.c[0] = mneg(f.c[0], p);
+        xp
+    };
+    let mut x_pow_p = poly_pow_mod_monic(x_poly, p, &f);
+    if x_pow_p.len < 2 {
+        x_pow_p.len = 2;
+    }
+    x_pow_p.c[1] = msub(x_pow_p.c[1], r_mod_p, p);
+    x_pow_p.trim();
+
+    let g = poly_gcd_monic(f, x_pow_p)?;
+    if g.deg() == 0 {
+        return Some(Vec::new());
+    }
+
+    let mut roots_m = [0u64; 8];
+    let mut n_roots = 0usize;
+    let mut queue = [StackPoly::zero(); 16];
+    let mut q_len = 1usize;
+    queue[0] = g;
+    let half_pm1 = (p - 1) >> 1;
+    let inv2_m = minv(madd(r_mod_p, r_mod_p, p), p, neg_pinv, r2_mod_p)?;
+
+    while q_len > 0 {
+        q_len -= 1;
+        let h = queue[q_len];
+        let hd = h.deg();
+        if hd == 0 {
+            continue;
+        }
+        if hd == 1 {
+            roots_m[n_roots] = mneg(h.c[0], p);
+            n_roots += 1;
+            continue;
+        }
+        if hd == 2 {
+            let qb = h.c[1];
+            let qc = h.c[0];
+            let four_qc = {
+                let two_qc = madd(qc, qc, p);
+                madd(two_qc, two_qc, p)
+            };
+            let disc = msub(mmul(qb, qb, p, neg_pinv), four_qc, p);
+            if let Some(sq) = sqrt_mont(disc) {
+                let nqb = mneg(qb, p);
+                roots_m[n_roots] = mmul(madd(nqb, sq, p), inv2_m, p, neg_pinv);
+                roots_m[n_roots + 1] = mmul(msub(nqb, sq, p), inv2_m, p, neg_pinv);
+                n_roots += 2;
+            }
+            continue;
+        }
+        let mut split_opt = None;
+        for c_u32 in 1u64..64 {
+            let c_m = mmul(c_u32 % p, r2_mod_p, p, neg_pinv);
+            let mut xc = StackPoly { c: [0; 9], len: 2 };
+            xc.c[0] = c_m;
+            xc.c[1] = r_mod_p;
+            let mut pow = poly_pow_mod_monic(xc, half_pm1, &h);
+            pow.c[0] = msub(pow.c[0], r_mod_p, p);
+            pow.trim();
+            if let Some(d) = poly_gcd_monic(h, pow) {
+                if d.deg() > 0 && d.deg() < hd {
+                    split_opt = Some(d);
+                    break;
+                }
+            }
+        }
+        if let Some(d) = split_opt {
+            let q_poly = poly_div_exact_monic(h, &d);
+            queue[q_len] = d;
+            queue[q_len + 1] = q_poly;
+            q_len += 2;
+        }
+    }
+
+    let mut out = Vec::with_capacity(n_roots);
+    for &rm in &roots_m[..n_roots] {
+        let rc = mmul(rm, 1, p, neg_pinv);
+        if !out.contains(&rc) {
+            out.push(rc);
+        }
+    }
+    Some(out)
 }
 
 /// Polynomial remainder `a mod modulus` over `F_p` (any nonzero lead).

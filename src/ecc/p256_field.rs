@@ -13,10 +13,104 @@
 //! See [`crate::ecc::secp256k1_field`] for the design rationale and a
 //! more thorough writeup of the Montgomery-form invariants.
 
-use crate::ct_bignum::{compute_minv64, Uint, U256};
-use crate::ecc::mont_vt::ct_mont_mul4;
+use crate::ct_bignum::{compute_minv64, mul_wide_4, sqr_wide_4, Uint, U256};
 use num_bigint::BigUint;
 use subtle::{Choice, ConstantTimeEq};
+
+/// Zero-multiplication constant-time Montgomery reduction `T · 2^(-256) mod p`
+/// exploiting NIST P-256's Solinas structure `p = 2^256 - 2^224 + 2^192 + 2^96 - 1`:
+/// - `p[0] = 2^64 - 1  ⇒  -p[0]^(-1) ≡ 1 (mod 2^64)`, so `m_i = s_i` (0 multiplies)
+/// - `carry(s_i + m_i·p[0]) + m_i·p[1] = m_i + m_i·(2^32 - 1) = m_i << 32` (1 shift)
+/// - `p[2] = 0` (0 ops)
+/// - `m_i·p[3] = (m_i << 64) - (m_i << 32) + m_i` (shifts + add/sub only)
+#[inline(always)]
+fn p256_mont_reduce_wide(t: &[u64; 8]) -> U256 {
+    const MASK64: u128 = u64::MAX as u128;
+    let s0 = t[0];
+    let s1 = t[1] as u128;
+    let mut s2 = t[2] as u128;
+    let mut s3 = t[3] as u128;
+    let mut s4 = t[4] as u128;
+    let mut s5 = t[5] as u128;
+    let mut s6 = t[6] as u128;
+    let mut s7 = t[7] as u128;
+
+    // Step 0 (m = s0)
+    let m = s0 as u128;
+    let mp1 = m << 32;
+    let mp3 = (m << 64) - mp1 + m;
+    let acc1 = s1 + (mp1 & MASK64);
+    let m1 = acc1 as u64;
+    let acc2 = s2 + (mp1 >> 64) + (acc1 >> 64);
+    s2 = acc2 & MASK64;
+    let acc3 = s3 + (mp3 & MASK64) + (acc2 >> 64);
+    s3 = acc3 & MASK64;
+    let acc4 = s4 + (mp3 >> 64) + (acc3 >> 64);
+    s4 = acc4 & MASK64;
+    s5 += acc4 >> 64;
+
+    // Step 1 (m = m1)
+    let m = m1 as u128;
+    let mp1 = m << 32;
+    let mp3 = (m << 64) - mp1 + m;
+    let acc2 = s2 + (mp1 & MASK64);
+    let m2 = acc2 as u64;
+    let acc3 = s3 + (mp1 >> 64) + (acc2 >> 64);
+    s3 = acc3 & MASK64;
+    let acc4 = s4 + (mp3 & MASK64) + (acc3 >> 64);
+    s4 = acc4 & MASK64;
+    let acc5 = s5 + (mp3 >> 64) + (acc4 >> 64);
+    s5 = acc5 & MASK64;
+    s6 += acc5 >> 64;
+
+    // Step 2 (m = m2)
+    let m = m2 as u128;
+    let mp1 = m << 32;
+    let mp3 = (m << 64) - mp1 + m;
+    let acc3 = s3 + (mp1 & MASK64);
+    let m3 = acc3 as u64;
+    let acc4 = s4 + (mp1 >> 64) + (acc3 >> 64);
+    s4 = acc4 & MASK64;
+    let acc5 = s5 + (mp3 & MASK64) + (acc4 >> 64);
+    s5 = acc5 & MASK64;
+    let acc6 = s6 + (mp3 >> 64) + (acc5 >> 64);
+    s6 = acc6 & MASK64;
+    s7 += acc6 >> 64;
+
+    // Step 3 (m = m3)
+    let m = m3 as u128;
+    let mp1 = m << 32;
+    let mp3 = (m << 64) - mp1 + m;
+    let acc4 = s4 + (mp1 & MASK64);
+    let r0 = acc4 as u64;
+    let acc5 = s5 + (mp1 >> 64) + (acc4 >> 64);
+    let r1 = acc5 as u64;
+    let acc6 = s6 + (mp3 & MASK64) + (acc5 >> 64);
+    let r2 = acc6 as u64;
+    let acc7 = s7 + (mp3 >> 64) + (acc6 >> 64);
+    let r3 = acc7 as u64;
+    let r4 = (acc7 >> 64) as u64;
+
+    // Constant-time conditional subtraction of P
+    let (d0, b1) = r0.overflowing_sub(P.0[0]);
+    let (d1, b2) = r1.overflowing_sub(P.0[1]);
+    let (d1, b2b) = d1.overflowing_sub(b1 as u64);
+    let br = (b2 | b2b) as u64;
+    let (d2, b3) = r2.overflowing_sub(br);
+    let br = b3 as u64;
+    let (d3, b4) = r3.overflowing_sub(P.0[3]);
+    let (d3, b4b) = d3.overflowing_sub(br);
+    let borrow = (b4 | b4b) as u64;
+
+    let need_sub = (r4 | (borrow ^ 1)) & 1;
+    let mask = core::hint::black_box(0u64.wrapping_sub(need_sub));
+    Uint([
+        r0 ^ (mask & (r0 ^ d0)),
+        r1 ^ (mask & (r1 ^ d1)),
+        r2 ^ (mask & (r2 ^ d2)),
+        r3 ^ (mask & (r3 ^ d3)),
+    ])
+}
 
 /// P-256 prime modulus, as little-endian limbs.
 ///
@@ -49,14 +143,6 @@ pub const R_SQUARED_MOD_P: U256 = Uint([
     0x0000_0004_FFFF_FFFD,
 ]);
 
-/// `a·b·R⁻¹ mod p` (the value of `U256::mont_mul(a, b, &P, P_INV_LOW)`
-/// for `a, b < p`) by the interleaved constant-time pass of
-/// [`crate::ecc::mont_vt::ct_mont_mul4`].
-#[inline(always)]
-fn mm(a: &U256, b: &U256) -> U256 {
-    Uint(ct_mont_mul4(&a.0, &b.0, &P.0, P_INV_LOW))
-}
-
 /// A field element over P-256's prime, stored in Montgomery form.
 #[derive(Copy, Clone, Debug)]
 pub struct P256FieldElement(U256);
@@ -66,11 +152,11 @@ impl P256FieldElement {
     pub const ONE: P256FieldElement = P256FieldElement(R_MOD_P);
 
     pub fn from_canonical(a: &U256) -> Self {
-        P256FieldElement(mm(a, &R_SQUARED_MOD_P))
+        P256FieldElement(U256::mont_mul(a, &R_SQUARED_MOD_P, &P, P_INV_LOW))
     }
 
     pub fn to_canonical(&self) -> U256 {
-        mm(&self.0, &U256::ONE)
+        U256::mont_mul(&self.0, &U256::ONE, &P, P_INV_LOW)
     }
 
     pub fn from_biguint(v: &BigUint) -> Self {
@@ -99,40 +185,47 @@ impl P256FieldElement {
         P256FieldElement(self.0.sub_mod(&other.0, &P))
     }
 
+    #[inline]
     pub fn mul(&self, other: &Self) -> Self {
-        P256FieldElement(mm(&self.0, &other.0))
+        P256FieldElement(p256_mont_reduce_wide(&mul_wide_4(&self.0 .0, &other.0 .0)))
     }
 
+    #[inline]
     pub fn sqr(&self) -> Self {
-        P256FieldElement(mm(&self.0, &self.0))
+        P256FieldElement(p256_mont_reduce_wide(&sqr_wide_4(&self.0 .0)))
     }
 
     pub fn neg(&self) -> Self {
         P256FieldElement(U256::ZERO.sub_mod(&self.0, &P))
     }
 
-    /// Multiplicative inverse via Fermat: `a^(p-2) mod p`.  Same
-    /// cmov-driven Montgomery ladder as
-    /// [`crate::ecc::secp256k1_field::SecpFieldElement::inv`], but over
-    /// P-256's prime.
-    pub fn inv(&self) -> Self {
-        // exp = p - 2.  P[0] = 0xFFFF...FFFF, so subtract 2 from the
-        // low limb without affecting the higher ones.
-        let exp = Uint([P.0[0].wrapping_sub(2), P.0[1], P.0[2], P.0[3]]);
-        let mut r0 = P256FieldElement::ONE;
-        let mut r1 = *self;
-        for i in (0..256).rev() {
-            let limb = i / 64;
-            let bit_in_limb = i % 64;
-            let bit = (exp.0[limb] >> bit_in_limb) & 1;
-            let choice = Choice::from(bit as u8);
-            let prod = r0.mul(&r1);
-            let r0_sq = r0.sqr();
-            let r1_sq = r1.sqr();
-            r0 = P256FieldElement::cmov(&r0_sq, &prod, choice);
-            r1 = P256FieldElement::cmov(&prod, &r1_sq, choice);
+    #[inline]
+    fn sqr_n(&self, n: usize) -> Self {
+        let mut r = *self;
+        for _ in 0..n {
+            r = r.sqr();
         }
-        r0
+        r
+    }
+
+    /// Multiplicative inverse via Fermat: `a^(p-2) mod p` using a fixed
+    /// constant-time addition chain (255 squarings + 12 multiplications,
+    /// zero secret-dependent branches; maps `0 → 0`).
+    pub fn inv(&self) -> Self {
+        let f1 = *self;
+        let f2 = f1.sqr().mul(&f1);
+        let f4 = f2.sqr_n(2).mul(&f2);
+        let f8 = f4.sqr_n(4).mul(&f4);
+        let f16 = f8.sqr_n(8).mul(&f8);
+        let f32 = f16.sqr_n(16).mul(&f16);
+        let acc = f32.sqr_n(32).mul(&f1);
+        let acc = acc.sqr_n(128).mul(&f32);
+        let acc = acc.sqr_n(32).mul(&f32);
+        let acc = acc.sqr_n(16).mul(&f16);
+        let acc = acc.sqr_n(8).mul(&f8);
+        let acc = acc.sqr_n(4).mul(&f4);
+        let acc = acc.sqr_n(2).mul(&f2);
+        acc.sqr_n(2).mul(&f1)
     }
 
     pub fn ct_eq(&self, other: &Self) -> Choice {
@@ -145,6 +238,11 @@ impl P256FieldElement {
 
     pub fn cmov(a: &Self, b: &Self, choice: Choice) -> Self {
         P256FieldElement(U256::cmov(&a.0, &b.0, choice))
+    }
+
+    #[inline]
+    pub fn cswap(a: &mut Self, b: &mut Self, choice: Choice) {
+        U256::cswap(&mut a.0, &mut b.0, choice);
     }
 
     #[inline]

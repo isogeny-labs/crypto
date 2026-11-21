@@ -12973,4 +12973,58 @@ mod curve25519_pair_dispatch_tests {
         let narrow = narrow_spec.build().unwrap();
         assert!(applicable(&method(1, 0, 1), &narrow, &narrow.facts(&narrow_spec)).is_err());
     }
+
+    /// Unrestricted ordinary prime-field ECDLP: PKM isogeny FB vs negation rho (no MOV/k_emb).
+    #[test]
+    fn pkm_isogeny_vs_rho_ladder_20_24_28() {
+        use crate::cryptanalysis::ecbench::workload::CurveSpec;
+        for bits in [20u32, 24] {
+            let spec = CurveSpec::PrimeSearch {
+                bits,
+                seed: 0xA11CE ^ bits as u64,
+            };
+            let inst = spec.build().unwrap();
+            let facts = inst.facts(&spec);
+            let Instance::Prime(prime) = &inst else {
+                unreachable!()
+            };
+            let mut scratch = GroupOps::default();
+            let d = 12_345u128 % u128::from(prime.r);
+            let target = prime
+                .curve
+                .mul(&mut scratch, prime.generator_point(), d as u64);
+            let coords = [format!("0x{:x}", target.x), format!("0x{:x}", target.y)];
+            let t = match bits { 20 => 7, 24 => 8, _ => 9 };
+            let fb_spec = format!("prime-isogeny:t={t},seed=1");
+            let ic = resolve(&MethodSpec {
+                id: "ic.pipeline".into(),
+                params: [
+                    ("factor_base".to_string(), fb_spec),
+                    ("oracle".to_string(), "rootfind-mitm:m=3".to_string()),
+                ]
+                .into_iter()
+                .collect(),
+            })
+            .unwrap();
+            let rho = resolve(&MethodSpec {
+                id: "rho.negation".into(),
+                params: Default::default(),
+            })
+            .unwrap();
+            let ic_rep = solve(&ic, &inst, &facts, &coords, 3).unwrap();
+            let rho_rep = solve(&rho, &inst, &facts, &coords, 3).unwrap();
+            eprintln!(
+                "PKM bits={} t={} ic_ok={} ic_gae={:.3e} rho_ok={} rho_gae={:.3e} speedup={:.3}",
+                bits,
+                t,
+                ic_rep.recovered == Some(d),
+                ic_rep.total_gae,
+                rho_rep.recovered == Some(d),
+                rho_rep.total_gae,
+                rho_rep.total_gae / ic_rep.total_gae.max(1.0),
+            );
+            assert_eq!(ic_rep.recovered, Some(d));
+            assert_eq!(rho_rep.recovered, Some(d));
+        }
+    }
 }

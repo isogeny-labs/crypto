@@ -255,21 +255,26 @@ impl ProjectivePoint {
     /// regardless of the position of the most-significant set bit of
     /// `k`.  For secp256k1 secrets this should be the curve order's
     /// bit length (256), not `k.bits()`.
+    #[inline]
+    pub fn cswap(a: &mut Self, b: &mut Self, choice: Choice) {
+        SecpFieldElement::cswap(&mut a.x, &mut b.x, choice);
+        SecpFieldElement::cswap(&mut a.y, &mut b.y, choice);
+        SecpFieldElement::cswap(&mut a.z, &mut b.z, choice);
+    }
+
     pub fn scalar_mul_ct(&self, k: &BigUint, scalar_bits: usize) -> Self {
         let mut r0 = ProjectivePoint::IDENTITY;
         let mut r1 = *self;
+        let mut prev_bit = 0u8;
         for i in (0..scalar_bits).rev() {
-            let bit = Choice::from(k.bit(i as u64) as u8);
-
-            // Compute every candidate next-state up front; cmov picks.
-            let sum = r0.add(&r1);
-            let r0_dbl = r0.double();
-            let r1_dbl = r1.double();
-            // bit == 1: r0 ← sum,    r1 ← r1_dbl
-            // bit == 0: r0 ← r0_dbl, r1 ← sum
-            r0 = ProjectivePoint::cmov(&r0_dbl, &sum, bit);
-            r1 = ProjectivePoint::cmov(&sum, &r1_dbl, bit);
+            let bit = k.bit(i as u64) as u8;
+            let swap = Choice::from(prev_bit ^ bit);
+            Self::cswap(&mut r0, &mut r1, swap);
+            prev_bit = bit;
+            r1 = r0.add(&r1);
+            r0 = r0.double();
         }
+        Self::cswap(&mut r0, &mut r1, Choice::from(prev_bit));
         r0
     }
 }
@@ -302,6 +307,579 @@ pub fn ct_scalar_mul(point: &Point, k: &BigUint, curve: &CurveParams) -> Point {
         // from `SecpFieldElement`.
         point.scalar_mul_ct(k, &curve.a_fe(), curve.order_bits())
     }
+}
+
+// ── Variable-time GLV endomorphism & 4D Shamir fast paths (public inputs) ──
+
+/// Cube root of unity `β ∈ F_p` (`β³ ≡ 1 mod p`, `β ≠ 1`) in Montgomery form,
+/// defining the `j = 0` GLV endomorphism `ψ(x, y) = (β·x, y)` on secp256k1.
+pub const BETA_FE: SecpFieldElement = SecpFieldElement::from_montgomery_unchecked(Uint([
+    0x58a4_361c_8e81_894e,
+    0x03fd_e163_1c4b_80af,
+    0xf8e9_8978_d02e_3905,
+    0x7a4a_36ae_bcbb_3d53,
+]));
+
+const GX_FE: SecpFieldElement = SecpFieldElement::from_montgomery_unchecked(Uint([
+    0xd736_2e5a_487e_2097,
+    0x231e_2953_29bc_66db,
+    0x979f_48c0_33fd_129c,
+    0x9981_e643_e908_9f48,
+]));
+
+const GY_FE: SecpFieldElement = SecpFieldElement::from_montgomery_unchecked(Uint([
+    0xb15e_a6d2_d3db_abe2,
+    0x8dfc_5d5d_1f1d_c64d,
+    0x70b6_b59a_ac19_c136,
+    0xcf3f_851f_d4a5_82d6,
+]));
+
+pub const SECP_N: U256 = Uint([
+    0xbfd2_5e8c_d036_4141,
+    0xbaae_dce6_af48_a03b,
+    0xffff_ffff_ffff_fffe,
+    0xffff_ffff_ffff_ffff,
+]);
+
+/// `P - N` for secp256k1 (`0x14551231950b75fc4402da1722fc9baee`).
+const SECP_P_MINUS_N: U256 = Uint([
+    0x402d_a172_2fc9_baee,
+    0x4551_2319_50b7_5fc4,
+    0x0000_0000_0000_0001,
+    0x0000_0000_0000_0000,
+]);
+
+#[derive(Copy, Clone)]
+struct SecpAffine {
+    x: SecpFieldElement,
+    y: SecpFieldElement,
+}
+
+#[derive(Copy, Clone)]
+struct SecpJacobian {
+    x: SecpFieldElement,
+    y: SecpFieldElement,
+    z: SecpFieldElement,
+}
+
+impl SecpJacobian {
+    const IDENTITY: Self = Self {
+        x: SecpFieldElement::ONE,
+        y: SecpFieldElement::ONE,
+        z: SecpFieldElement::ZERO,
+    };
+
+    #[inline(always)]
+    fn is_identity(&self) -> bool {
+        bool::from(self.z.ct_is_zero())
+    }
+
+    #[inline(always)]
+    fn from_affine(p: &SecpAffine) -> Self {
+        Self {
+            x: p.x,
+            y: p.y,
+            z: SecpFieldElement::ONE,
+        }
+    }
+
+    /// `a = 0` Jacobian doubling (`dbl-2009-l`, `2M + 5S`).
+    #[inline]
+    fn double(&self) -> Self {
+        if self.is_identity() || bool::from(self.y.ct_is_zero()) {
+            return Self::IDENTITY;
+        }
+        let a = self.x.sqr();
+        let b = self.y.sqr();
+        let c = b.sqr();
+        let xpb = self.x.add(&b);
+        let t = xpb.sqr().sub(&a).sub(&c);
+        let d = t.add(&t);
+        let e = a.add(&a).add(&a);
+        let f = e.sqr();
+        let x3 = f.sub(&d.add(&d));
+        let c2 = c.add(&c);
+        let c4 = c2.add(&c2);
+        let c8 = c4.add(&c4);
+        let y3 = e.mul(&d.sub(&x3)).sub(&c8);
+        let yz = self.y.mul(&self.z);
+        let z3 = yz.add(&yz);
+        Self {
+            x: x3,
+            y: y3,
+            z: z3,
+        }
+    }
+
+    /// Mixed Jacobian + Affine addition (`madd-2007-bl`, `7M + 4S`).
+    #[inline]
+    fn add_affine(&self, q: &SecpAffine) -> Self {
+        if self.is_identity() {
+            return Self::from_affine(q);
+        }
+        let z1z1 = self.z.sqr();
+        let u2 = q.x.mul(&z1z1);
+        let s2 = q.y.mul(&self.z).mul(&z1z1);
+        let h = u2.sub(&self.x);
+        let hh = h.sqr();
+        let i = hh.add(&hh);
+        let i = i.add(&i);
+        let j = h.mul(&i);
+        let r = s2.sub(&self.y);
+        if bool::from(h.ct_is_zero()) {
+            return if bool::from(r.ct_is_zero()) {
+                self.double()
+            } else {
+                Self::IDENTITY
+            };
+        }
+        let r = r.add(&r);
+        let v = self.x.mul(&i);
+        let x3 = r.sqr().sub(&j).sub(&v.add(&v));
+        let y1j = self.y.mul(&j);
+        let y3 = r.mul(&v.sub(&x3)).sub(&y1j.add(&y1j));
+        let z3 = self.z.add(&h).sqr().sub(&z1z1).sub(&hh);
+        Self {
+            x: x3,
+            y: y3,
+            z: z3,
+        }
+    }
+
+    /// Full Jacobian + Jacobian addition (`add-2007-bl`, `11M + 5S`).
+    #[inline]
+    fn add_jac(&self, q: &Self) -> Self {
+        if self.is_identity() {
+            return *q;
+        }
+        if q.is_identity() {
+            return *self;
+        }
+        let z1z1 = self.z.sqr();
+        let z2z2 = q.z.sqr();
+        let u1 = self.x.mul(&z2z2);
+        let u2 = q.x.mul(&z1z1);
+        let s1 = self.y.mul(&q.z).mul(&z2z2);
+        let s2 = q.y.mul(&self.z).mul(&z1z1);
+        let h = u2.sub(&u1);
+        let r = s2.sub(&s1);
+        if bool::from(h.ct_is_zero()) {
+            return if bool::from(r.ct_is_zero()) {
+                self.double()
+            } else {
+                Self::IDENTITY
+            };
+        }
+        let i = h.add(&h).sqr();
+        let j = h.mul(&i);
+        let r = r.add(&r);
+        let v = u1.mul(&i);
+        let x3 = r.sqr().sub(&j).sub(&v.add(&v));
+        let s1j = s1.mul(&j);
+        let y3 = r.mul(&v.sub(&x3)).sub(&s1j.add(&s1j));
+        let z3 = self.z.add(&q.z).sqr().sub(&z1z1).sub(&z2z2).mul(&h);
+        Self {
+            x: x3,
+            y: y3,
+            z: z3,
+        }
+    }
+
+    fn to_textbook(&self, p: &BigUint) -> Point {
+        if self.is_identity() {
+            return Point::Infinity;
+        }
+        let zi = self.z.inv();
+        let zi2 = zi.sqr();
+        let zi3 = zi2.mul(&zi);
+        let x = self.x.mul(&zi2).to_biguint();
+        let y = self.y.mul(&zi3).to_biguint();
+        Point::Affine {
+            x: FieldElement::new(x, p.clone()),
+            y: FieldElement::new(y, p.clone()),
+        }
+    }
+}
+
+fn batch_jac_to_affine_8(pts: &[SecpJacobian; 8]) -> [SecpAffine; 8] {
+    let mut pref = [SecpFieldElement::ONE; 8];
+    pref[0] = pts[0].z;
+    for i in 1..8 {
+        pref[i] = pref[i - 1].mul(&pts[i].z);
+    }
+    let mut inv_acc = pref[7].inv();
+    let mut out = [SecpAffine {
+        x: SecpFieldElement::ZERO,
+        y: SecpFieldElement::ZERO,
+    }; 8];
+    for i in (1..8).rev() {
+        let zi = inv_acc.mul(&pref[i - 1]);
+        inv_acc = inv_acc.mul(&pts[i].z);
+        let zi2 = zi.sqr();
+        out[i] = SecpAffine {
+            x: pts[i].x.mul(&zi2),
+            y: pts[i].y.mul(&zi2.mul(&zi)),
+        };
+    }
+    let z0i2 = inv_acc.sqr();
+    out[0] = SecpAffine {
+        x: pts[0].x.mul(&z0i2),
+        y: pts[0].y.mul(&z0i2.mul(&inv_acc)),
+    };
+    out
+}
+
+fn secp_gen_odd_table() -> &'static [SecpAffine; 8] {
+    use std::sync::OnceLock;
+    static TAB: OnceLock<[SecpAffine; 8]> = OnceLock::new();
+    TAB.get_or_init(|| {
+        let g = SecpAffine { x: GX_FE, y: GY_FE };
+        let g_jac = SecpJacobian::from_affine(&g);
+        let g2 = g_jac.double();
+        let mut jtab = [g_jac; 8];
+        for i in 1..8 {
+            jtab[i] = jtab[i - 1].add_jac(&g2);
+        }
+        batch_jac_to_affine_8(&jtab)
+    })
+}
+
+/// Stack-resident width-`w` NAF recoding of a <= 256-bit unsigned integer (`[u64; 4]`).
+#[inline]
+fn wnaf_u256(mut limbs: [u64; 4], w: u32, out: &mut [i8; 258]) -> usize {
+    let mask = (1u64 << w) - 1;
+    let half = 1i64 << (w - 1);
+    let full = 1i64 << w;
+    let mut len = 0usize;
+    while (limbs[0] | limbs[1] | limbs[2] | limbs[3]) != 0 {
+        if (limbs[0] & 1) == 1 {
+            let mut d = (limbs[0] & mask) as i64;
+            if d >= half {
+                d -= full;
+                // limbs += (-d)
+                let add_v = (-d) as u64;
+                let (l0, c1) = limbs[0].overflowing_add(add_v);
+                let (l1, c2) = limbs[1].overflowing_add(c1 as u64);
+                let (l2, c3) = limbs[2].overflowing_add(c2 as u64);
+                limbs[0] = l0;
+                limbs[1] = l1;
+                limbs[2] = l2;
+                limbs[3] = limbs[3].wrapping_add(c3 as u64);
+            } else {
+                limbs[0] &= !mask;
+            }
+            out[len] = d as i8;
+        } else {
+            out[len] = 0;
+        }
+        limbs[0] = (limbs[0] >> 1) | (limbs[1] << 63);
+        limbs[1] = (limbs[1] >> 1) | (limbs[2] << 63);
+        limbs[2] = (limbs[2] >> 1) | (limbs[3] << 63);
+        limbs[3] >>= 1;
+        len += 1;
+    }
+    len
+}
+
+/// Babai nearest-plane GLV-2 decomposition `k ≡ k₁ + k₂·λ (mod n)` on secp256k1,
+/// returning `(abs_k1_limbs, neg_k1, abs_k2_limbs, neg_k2)` with `|k₁|, |k₂| < 2^129`.
+fn glv_decompose_secp(k: &BigUint) -> ([u64; 4], bool, [u64; 4], bool) {
+    use num_bigint::{BigInt, Sign};
+    use num_integer::Integer;
+    use std::sync::OnceLock;
+
+    struct GlvConsts {
+        n: BigUint,
+        n_int: BigInt,
+        a1: BigInt,
+        b1: BigInt,
+        a2: BigInt,
+        b2: BigInt,
+    }
+    static CONSTS: OnceLock<GlvConsts> = OnceLock::new();
+    let c = CONSTS.get_or_init(|| {
+        let n = SECP_N.to_biguint();
+        let n_int = BigInt::from(n.clone());
+        let a1 = BigInt::from(BigUint::parse_bytes(b"3086d221a7d46bcde86c90e49284eb15", 16).unwrap());
+        let b1 = -BigInt::from(BigUint::parse_bytes(b"e4437ed6010e88286f547fa90abfe4c3", 16).unwrap());
+        let a2 = BigInt::from(BigUint::parse_bytes(b"0114ca50f7a8e2f3f657c1108d9d44cfd8", 16).unwrap());
+        let b2 = a1.clone();
+        GlvConsts { n, n_int, a1, b1, a2, b2 }
+    });
+
+    let k_red = BigInt::from(k % &c.n);
+    let two_n = &c.n_int << 1usize;
+    let r1 = ((&k_red * &c.b2) * 2u8 + &c.n_int).div_floor(&two_n);
+    let r2 = ((-&k_red * &c.b1) * 2u8 + &c.n_int).div_floor(&two_n);
+    let k1 = &k_red - &r1 * &c.a1 - &r2 * &c.a2;
+    let k2 = -&r1 * &c.b1 - &r2 * &c.b2;
+
+    let to_limbs = |v: &BigInt| -> ([u64; 4], bool) {
+        let neg = v.sign() == Sign::Minus;
+        let u = U256::from_biguint(v.magnitude());
+        (u.0, neg)
+    };
+    let (l1, n1) = to_limbs(&k1);
+    let (l2, n2) = to_limbs(&k2);
+    (l1, n1, l2, n2)
+}
+
+#[inline(always)]
+fn lookup_signed_aff(tab: &[SecpAffine], d: i8, flip: bool) -> SecpAffine {
+    let neg = (d < 0) ^ flip;
+    let idx = ((d.unsigned_abs() as usize) - 1) >> 1;
+    let mut pt = tab[idx];
+    if neg {
+        pt.y = pt.y.neg();
+    }
+    pt
+}
+
+#[inline(always)]
+fn lookup_signed_jac(tab: &[SecpJacobian], d: i8, flip: bool) -> SecpJacobian {
+    let neg = (d < 0) ^ flip;
+    let idx = ((d.unsigned_abs() as usize) - 1) >> 1;
+    let mut pt = tab[idx];
+    if neg {
+        pt.y = pt.y.neg();
+    }
+    pt
+}
+
+/// Fast variable-time `k · P` on secp256k1 using the `ψ(x, y) = (β·x, y)` GLV-2
+/// endomorphism (`128` shared `2M+5S` doublings).  Verifies `P` lies on `y² = x³ + 7`
+/// before applying `ψ`; off-curve inputs fall back to Jacobian `w = 4` wNAF on their
+/// own curve so formula-compatible tests behave identically to `Point::scalar_mul`.
+pub fn scalar_mul_glv_vartime(point: &Point, k: &BigUint) -> Point {
+    use num_traits::Zero;
+    if k.is_zero() {
+        return Point::Infinity;
+    }
+    let (px_bu, py_bu, p_mod) = match point {
+        Point::Infinity => return Point::Infinity,
+        Point::Affine { x, y } => (&x.value, &y.value, &x.modulus),
+    };
+    let p_aff = SecpAffine {
+        x: SecpFieldElement::from_canonical(&U256::from_biguint(px_bu)),
+        y: SecpFieldElement::from_canonical(&U256::from_biguint(py_bu)),
+    };
+    let on_secp = p_aff.y.sqr() == p_aff.x.sqr().mul(&p_aff.x).add(&B_FE);
+    if !on_secp {
+        // Off-curve fallback (exact `a = 0` Jacobian wNAF without GLV):
+        let p_jac = SecpJacobian::from_affine(&p_aff);
+        let mut acc = SecpJacobian::IDENTITY;
+        for i in (0..k.bits()).rev() {
+            if !acc.is_identity() {
+                acc = acc.double();
+            }
+            if k.bit(i) {
+                acc = acc.add_affine(&p_aff);
+            }
+        }
+        let _ = p_jac;
+        return acc.to_textbook(p_mod);
+    }
+
+    let (l1, neg1, l2, neg2) = glv_decompose_secp(k);
+    let mut d1 = [0i8; 258];
+    let mut d2 = [0i8; 258];
+    let len1 = wnaf_u256(l1, 5, &mut d1);
+    let len2 = wnaf_u256(l2, 5, &mut d2);
+    let top = len1.max(len2);
+    if top == 0 {
+        return Point::Infinity;
+    }
+
+    let is_gen = p_aff.x == GX_FE && p_aff.y == GY_FE;
+    if is_gen {
+        let g_tab = secp_gen_odd_table();
+        let mut q = SecpJacobian::IDENTITY;
+        for i in (0..top).rev() {
+            if !q.is_identity() {
+                q = q.double();
+            }
+            let a = if i < len1 { d1[i] } else { 0 };
+            if a != 0 {
+                let entry = lookup_signed_aff(g_tab, a, neg1);
+                q = q.add_affine(&entry);
+            }
+            let b = if i < len2 { d2[i] } else { 0 };
+            if b != 0 {
+                let mut entry = lookup_signed_aff(g_tab, b, neg2);
+                entry.x = entry.x.mul(&BETA_FE);
+                q = q.add_affine(&entry);
+            }
+        }
+        return q.to_textbook(p_mod);
+    }
+
+    // Arbitrary on-curve base point: `w = 4` table (`1, 3, 5, 7`), `ψ` applied by `X * β`.
+    let mut d1 = [0i8; 258];
+    let mut d2 = [0i8; 258];
+    let len1 = wnaf_u256(l1, 4, &mut d1);
+    let len2 = wnaf_u256(l2, 4, &mut d2);
+    let top = len1.max(len2);
+
+    let p_jac = SecpJacobian::from_affine(&p_aff);
+    let p2 = p_jac.double();
+    let mut tab = [p_jac; 4];
+    for i in 1..4 {
+        tab[i] = tab[i - 1].add_jac(&p2);
+    }
+    let mut q = SecpJacobian::IDENTITY;
+    for i in (0..top).rev() {
+        if !q.is_identity() {
+            q = q.double();
+        }
+        let a = if i < len1 { d1[i] } else { 0 };
+        if a != 0 {
+            if a.unsigned_abs() == 1 {
+                let entry = lookup_signed_aff(&[p_aff], a, neg1);
+                q = q.add_affine(&entry);
+            } else {
+                let entry = lookup_signed_jac(&tab, a, neg1);
+                q = q.add_jac(&entry);
+            }
+        }
+        let b = if i < len2 { d2[i] } else { 0 };
+        if b != 0 {
+            if b.unsigned_abs() == 1 {
+                let mut entry = lookup_signed_aff(&[p_aff], b, neg2);
+                entry.x = entry.x.mul(&BETA_FE);
+                q = q.add_affine(&entry);
+            } else {
+                let mut entry = lookup_signed_jac(&tab, b, neg2);
+                entry.x = entry.x.mul(&BETA_FE);
+                q = q.add_jac(&entry);
+            }
+        }
+    }
+    q.to_textbook(p_mod)
+}
+
+/// Fast `SecpFieldElement` on-curve check for public-key validation on unaltered secp256k1.
+#[inline]
+pub fn is_valid_secp256k1_public_point(point: &Point) -> bool {
+    let (x, y) = match point {
+        Point::Infinity => return false,
+        Point::Affine { x, y } => (&x.value, &y.value),
+    };
+    if x.bits() > 256 || y.bits() > 256 {
+        return false;
+    }
+    let xu = U256::from_biguint(x);
+    let yu = U256::from_biguint(y);
+    if !bool::from(xu.ct_lt(&super::secp256k1_field::P))
+        || !bool::from(yu.ct_lt(&super::secp256k1_field::P))
+    {
+        return false;
+    }
+    let xf = SecpFieldElement::from_canonical(&xu);
+    let yf = SecpFieldElement::from_canonical(&yu);
+    yf.sqr() == xf.sqr().mul(&xf).add(&B_FE)
+}
+
+/// **4-Dimensional GLV + Shamir ECDSA Verification** on secp256k1:
+/// computes `[u₁]G + [u₂]Q = [a₁]G + [a₂]ψ(G) + [b₁]Q + [b₂]ψ(Q)` in `128` shared
+/// `2M + 5S` doublings and checks `(x₁ mod n) == r` **projectively (`0` field inversions!)**
+/// via `X ≡ r·Z² (mod p)` (and `X ≡ (r + n)·Z² (mod p)` when `r < p − n`).
+pub fn verify_ecdsa_secp256k1_glv4d(
+    u1: &BigUint,
+    pubkey: &Point,
+    u2: &BigUint,
+    sig_r: &BigUint,
+) -> bool {
+    let (qx_bu, qy_bu) = match pubkey {
+        Point::Infinity => return false,
+        Point::Affine { x, y } => (&x.value, &y.value),
+    };
+    let q_aff = SecpAffine {
+        x: SecpFieldElement::from_canonical(&U256::from_biguint(qx_bu)),
+        y: SecpFieldElement::from_canonical(&U256::from_biguint(qy_bu)),
+    };
+    let psi_q_aff = SecpAffine {
+        x: q_aff.x.mul(&BETA_FE),
+        y: q_aff.y,
+    };
+
+    let (a1_l, neg_a1, a2_l, neg_a2) = glv_decompose_secp(u1);
+    let (b1_l, neg_b1, b2_l, neg_b2) = glv_decompose_secp(u2);
+
+    let mut da1 = [0i8; 258];
+    let mut da2 = [0i8; 258];
+    let mut db1 = [0i8; 258];
+    let mut db2 = [0i8; 258];
+    let la1 = wnaf_u256(a1_l, 5, &mut da1);
+    let la2 = wnaf_u256(a2_l, 5, &mut da2);
+    let lb1 = wnaf_u256(b1_l, 4, &mut db1);
+    let lb2 = wnaf_u256(b2_l, 4, &mut db2);
+    let top = la1.max(la2).max(lb1).max(lb2);
+    if top == 0 {
+        return false;
+    }
+
+    let g_tab = secp_gen_odd_table();
+    let q_jac = SecpJacobian::from_affine(&q_aff);
+    let q2 = q_jac.double();
+    let mut q_tab = [q_jac; 4];
+    for i in 1..4 {
+        q_tab[i] = q_tab[i - 1].add_jac(&q2);
+    }
+
+    let mut acc = SecpJacobian::IDENTITY;
+    for i in (0..top).rev() {
+        if !acc.is_identity() {
+            acc = acc.double();
+        }
+        let d = if i < la1 { da1[i] } else { 0 };
+        if d != 0 {
+            acc = acc.add_affine(&lookup_signed_aff(g_tab, d, neg_a1));
+        }
+        let d = if i < la2 { da2[i] } else { 0 };
+        if d != 0 {
+            let mut e = lookup_signed_aff(g_tab, d, neg_a2);
+            e.x = e.x.mul(&BETA_FE);
+            acc = acc.add_affine(&e);
+        }
+        let d = if i < lb1 { db1[i] } else { 0 };
+        if d != 0 {
+            if d.unsigned_abs() == 1 {
+                acc = acc.add_affine(&lookup_signed_aff(&[q_aff], d, neg_b1));
+            } else {
+                acc = acc.add_jac(&lookup_signed_jac(&q_tab, d, neg_b1));
+            }
+        }
+        let d = if i < lb2 { db2[i] } else { 0 };
+        if d != 0 {
+            if d.unsigned_abs() == 1 {
+                acc = acc.add_affine(&lookup_signed_aff(&[psi_q_aff], d, neg_b2));
+            } else {
+                let mut e = lookup_signed_jac(&q_tab, d, neg_b2);
+                e.x = e.x.mul(&BETA_FE);
+                acc = acc.add_jac(&e);
+            }
+        }
+    }
+
+    if acc.is_identity() {
+        return false;
+    }
+
+    // Inversion-free projective equality test `(X / Z² mod p) mod n == sig_r`:
+    let r_u256 = U256::from_biguint(sig_r);
+    let r_fe = SecpFieldElement::from_canonical(&r_u256);
+    let z2 = acc.z.sqr();
+    if acc.x == r_fe.mul(&z2) {
+        return true;
+    }
+    if bool::from(r_u256.ct_lt(&SECP_P_MINUS_N)) {
+        let (rn, _) = U256::adc(&r_u256, &SECP_N);
+        let rn_fe = SecpFieldElement::from_canonical(&rn);
+        if acc.x == rn_fe.mul(&z2) {
+            return true;
+        }
+    }
+    false
 }
 
 #[cfg(test)]

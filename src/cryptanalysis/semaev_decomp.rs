@@ -104,6 +104,8 @@
 //!   polynomials and subspace polynomials.
 
 use crate::binary_ecc::{F2mElement, IrreduciblePoly};
+#[cfg(target_arch = "aarch64")]
+use std::arch::aarch64::uint64x2_t;
 #[cfg(target_arch = "x86_64")]
 use std::arch::x86_64::__m128i;
 
@@ -244,11 +246,16 @@ impl Gf2 {
         // above `zⁿ` of degree at most `deg t − 2`, whose product with
         // `t` has degree at most `2·deg t − 2` and must land below `zⁿ`.
         // Every modulus `find_irreducible_sparse` picks for `n ≤ 63`
-        // qualifies (its tails have degree 8 or less).  Only the x86-64
-        // path is written and measured; AArch64 keeps the table.
+        // qualifies (its tails have degree 8 or less).  Both x86-64
+        // (`pclmulqdq`) and AArch64 (`pmull`/`vmull_p64`) fold in vector
+        // registers without touching the byte table.
         let tail = bits ^ (1u64 << n);
         let short_tail = tail != 0 && 2 * (63 - tail.leading_zeros()) <= n + 1;
-        let fold_tail = if cfg!(target_arch = "x86_64") && fold && has_clmul && short_tail {
+        let fold_tail = if cfg!(any(target_arch = "x86_64", target_arch = "aarch64"))
+            && fold
+            && has_clmul
+            && short_tail
+        {
             tail << (64 - n)
         } else {
             0
@@ -310,7 +317,10 @@ impl Gf2 {
     /// instruction.
     ///
     /// Only the x86-64 paths ask; elsewhere the tests alone do.
-    #[cfg_attr(not(target_arch = "x86_64"), allow(dead_code))]
+    #[cfg_attr(
+        not(any(target_arch = "x86_64", target_arch = "aarch64")),
+        allow(dead_code)
+    )]
     #[inline(always)]
     pub fn folds(&self) -> bool {
         self.fold_tail != 0
@@ -319,10 +329,10 @@ impl Gf2 {
     /// Fold a `< 2^{2n−1}` carry-less product back into the field.
     #[inline(always)]
     fn reduce(&self, w: u128) -> u64 {
-        #[cfg(target_arch = "x86_64")]
+        #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
         if self.folds() {
-            // SAFETY: `fold_tail` is non-zero only when `pclmulqdq` was
-            // detected at construction.
+            // SAFETY: `fold_tail` is non-zero only when `pclmulqdq`/`aes`
+            // was detected at construction.
             return unsafe { self.reduce_fold(w) };
         }
         self.reduce_table(w)
@@ -429,6 +439,46 @@ impl Gf2 {
         low ^ ((w as u64) & self.mask)
     }
 
+    #[cfg(target_arch = "aarch64")]
+    #[inline]
+    #[target_feature(enable = "aes,neon")]
+    unsafe fn mul_fold(&self, a: u64, b: u64) -> u64 {
+        use std::arch::aarch64::*;
+        let s = 64 - self.n;
+        let zero = vdupq_n_u64(0);
+        let r = self.fold_shifted(vsetq_lane_u64::<0>(a, zero), vsetq_lane_u64::<0>(b << s, zero));
+        vgetq_lane_u64::<0>(r) >> s
+    }
+
+    #[cfg(target_arch = "aarch64")]
+    #[inline]
+    #[target_feature(enable = "aes,neon")]
+    unsafe fn fold_shifted(&self, a: uint64x2_t, b: uint64x2_t) -> uint64x2_t {
+        use std::arch::aarch64::*;
+        let tail2 = vreinterpretq_p64_u64(vdupq_n_u64(self.fold_tail));
+        let p: uint64x2_t =
+            std::mem::transmute(vmull_p64(vgetq_lane_u64::<0>(a), vgetq_lane_u64::<0>(b)));
+        let f: uint64x2_t =
+            std::mem::transmute(vmull_high_p64(vreinterpretq_p64_u64(p), tail2));
+        let g: uint64x2_t =
+            std::mem::transmute(vmull_high_p64(vreinterpretq_p64_u64(f), tail2));
+        veorq_u64(veorq_u64(p, f), g)
+    }
+
+    #[cfg(target_arch = "aarch64")]
+    #[inline]
+    #[target_feature(enable = "aes,neon")]
+    unsafe fn reduce_fold(&self, w: u128) -> u64 {
+        use std::arch::aarch64::*;
+        let tail = self.fold_tail;
+        let tail2 = vreinterpretq_p64_u64(vdupq_n_u64(tail));
+        let f: uint64x2_t = std::mem::transmute(vmull_p64((w >> self.n) as u64, tail));
+        let g: uint64x2_t =
+            std::mem::transmute(vmull_high_p64(vreinterpretq_p64_u64(f), tail2));
+        let low = vgetq_lane_u64::<0>(veorq_u64(f, g)) >> (64 - self.n);
+        low ^ ((w as u64) & self.mask)
+    }
+
     #[inline(always)]
     fn clmul(&self, a: u64, b: u64) -> u128 {
         #[cfg(target_arch = "x86_64")]
@@ -464,10 +514,10 @@ impl Gf2 {
     /// it keeps an ordinary inlining hint.
     #[inline(always)]
     pub fn mul(&self, a: u64, b: u64) -> u64 {
-        #[cfg(target_arch = "x86_64")]
+        #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
         if self.folds() {
-            // SAFETY: `fold_tail` is non-zero only when `pclmulqdq` was
-            // detected at construction.
+            // SAFETY: `fold_tail` is non-zero only when `pclmulqdq`/`aes`
+            // was detected at construction.
             return unsafe { self.mul_fold(a, b) };
         }
         self.mul_table(a, b)
@@ -490,7 +540,7 @@ impl Gf2 {
     /// Always inlined, as [`Self::mul`] is.
     #[inline(always)]
     pub fn sqr(&self, a: u64) -> u64 {
-        #[cfg(target_arch = "x86_64")]
+        #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
         if self.folds() {
             // SAFETY: as in `mul`.
             return unsafe { self.mul_fold(a, a) };
@@ -550,7 +600,7 @@ impl Gf2 {
     /// `a^(2^k)`.
     #[inline(always)]
     pub fn sqr_k(&self, mut a: u64, k: u32) -> u64 {
-        #[cfg(target_arch = "x86_64")]
+        #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
         if self.folds() {
             // SAFETY: as in `mul`.
             return unsafe { self.sqr_k_fold(a, k) };
@@ -590,6 +640,98 @@ impl Gf2 {
         (_mm_cvtsi128_si64(x) as u64) >> s
     }
 
+    #[cfg(target_arch = "aarch64")]
+    #[inline]
+    #[target_feature(enable = "aes,neon")]
+    unsafe fn sqr_k_fold(&self, a: u64, k: u32) -> u64 {
+        use std::arch::aarch64::*;
+        if k == 0 {
+            return a;
+        }
+        let s = 64 - self.n;
+        let down = vdupq_n_s64(-(s as i64));
+        let mut x = vsetq_lane_u64::<0>(a << s, vdupq_n_u64(0));
+        for _ in 0..k {
+            x = self.fold_shifted(vshlq_u64(x, down), x);
+        }
+        vgetq_lane_u64::<0>(x) >> s
+    }
+
+    /// Smallest element `(best_x, best_k)` over `{x0^{2^{k·frob_deg}} : 0 ≤ k < orbit_len}`,
+    /// breaking ties by smallest `k`.  When the field folds, keeps `x` shifted in a vector
+    /// register across the whole orbit scan.
+    #[inline]
+    pub(crate) fn min_frobenius_orbit(&self, x0: u64, orbit_len: u32, frob_deg: u32) -> (u64, u32) {
+        #[cfg(target_arch = "x86_64")]
+        if self.folds() {
+            return unsafe { self.min_frobenius_orbit_x86(x0, orbit_len, frob_deg) };
+        }
+        #[cfg(target_arch = "aarch64")]
+        if self.folds() {
+            return unsafe { self.min_frobenius_orbit_neon(x0, orbit_len, frob_deg) };
+        }
+        let mut x = x0;
+        let mut best_x = x;
+        let mut best_k = 0u32;
+        for k in 1..orbit_len {
+            x = self.sqr_k(x, frob_deg);
+            if x < best_x {
+                best_x = x;
+                best_k = k;
+            }
+        }
+        (best_x, best_k)
+    }
+
+    #[cfg(target_arch = "x86_64")]
+    #[target_feature(enable = "pclmulqdq")]
+    unsafe fn min_frobenius_orbit_x86(&self, x0: u64, orbit_len: u32, frob_deg: u32) -> (u64, u32) {
+        use std::arch::x86_64::*;
+        let s = 64 - self.n;
+        let down = _mm_cvtsi32_si128(s as i32);
+        let mut x = _mm_cvtsi64_si128((x0 << s) as i64);
+        let mut best_x = x0;
+        let mut best_k = 0u32;
+        for k in 1..orbit_len {
+            for _ in 0..frob_deg {
+                x = self.fold_shifted(_mm_srl_epi64(x, down), x);
+            }
+            let cand = (_mm_cvtsi128_si64(x) as u64) >> s;
+            if cand < best_x {
+                best_x = cand;
+                best_k = k;
+            }
+        }
+        (best_x, best_k)
+    }
+
+    #[cfg(target_arch = "aarch64")]
+    #[target_feature(enable = "aes,neon")]
+    unsafe fn min_frobenius_orbit_neon(
+        &self,
+        x0: u64,
+        orbit_len: u32,
+        frob_deg: u32,
+    ) -> (u64, u32) {
+        use std::arch::aarch64::*;
+        let s = 64 - self.n;
+        let down = vdupq_n_s64(-(s as i64));
+        let mut x = vsetq_lane_u64::<0>(x0 << s, vdupq_n_u64(0));
+        let mut best_x = x0;
+        let mut best_k = 0u32;
+        for k in 1..orbit_len {
+            for _ in 0..frob_deg {
+                x = self.fold_shifted(vshlq_u64(x, down), x);
+            }
+            let cand = vgetq_lane_u64::<0>(x) >> s;
+            if cand < best_x {
+                best_x = cand;
+                best_k = k;
+            }
+        }
+        (best_x, best_k)
+    }
+
     /// Itoh–Tsujii addition chain: with `β_k = a^{2^k − 1}`, walk the
     /// bits of `n − 1` using `β_{2k} = β_k^{2^k} · β_k` and
     /// `β_{k+1} = β_k² · a`, then square once.  That is `n − 1`
@@ -597,7 +739,7 @@ impl Gf2 {
     /// multiplications, against `n − 2` for square-and-multiply —
     /// 7 instead of 22 at `n = 24`.
     pub fn inv(&self, a: u64) -> u64 {
-        #[cfg(target_arch = "x86_64")]
+        #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
         if self.folds() {
             // SAFETY: the field folds, as just checked.
             return unsafe { self.inv_clmul(a) };
@@ -605,13 +747,14 @@ impl Gf2 {
         self.inv_inline(a)
     }
 
-    /// [`Self::inv`] compiled with `pclmulqdq`; see [`Self::batch_inv_clmul`].
+    /// [`Self::inv`] compiled with `pclmulqdq` / `aes,neon`; see [`Self::batch_inv_clmul`].
     ///
     /// # Safety
     ///
     /// The field must fold.
-    #[cfg(target_arch = "x86_64")]
-    #[target_feature(enable = "pclmulqdq")]
+    #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+    #[cfg_attr(target_arch = "x86_64", target_feature(enable = "pclmulqdq"))]
+    #[cfg_attr(target_arch = "aarch64", target_feature(enable = "aes,neon"))]
     unsafe fn inv_clmul(&self, a: u64) -> u64 {
         // SAFETY: the caller's contract.
         unsafe { std::hint::assert_unchecked(self.folds()) };
@@ -659,7 +802,7 @@ impl Gf2 {
     /// arrays in the `pclmulqdq` copy), so the loops carry no bounds
     /// checks and no `Vec` growth checks.
     pub fn batch_inv(&self, xs: &mut [u64], scratch: &mut Vec<u64>) {
-        #[cfg(target_arch = "x86_64")]
+        #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
         if self.folds() {
             // SAFETY: the field folds, as just checked.
             return unsafe { self.batch_inv_clmul(xs, scratch) };
@@ -759,6 +902,50 @@ impl Gf2 {
         for (xc, pc) in xh.iter_mut().zip(ph.iter()).rev() {
             for l in 0..LANES {
                 backward(&mut xc[l], pc[l], &mut inv_acc[l]);
+            }
+        }
+    }
+
+    #[cfg(target_arch = "aarch64")]
+    #[target_feature(enable = "aes,neon")]
+    unsafe fn batch_inv_clmul(&self, xs: &mut [u64], scratch: &mut Vec<u64>) {
+        use std::arch::aarch64::*;
+        unsafe { std::hint::assert_unchecked(self.folds()) };
+        const LANES: usize = 4;
+        let s = 64 - self.n;
+        let zero = vdupq_n_u64(0);
+        let plain = |v: uint64x2_t| vgetq_lane_u64::<0>(v) >> s;
+        let shifted = |v: u64| vsetq_lane_u64::<0>(v << s, zero);
+        scratch.truncate(xs.len());
+        scratch.resize(xs.len(), 0);
+        let mut acc = [shifted(1); LANES];
+        for (xc, pc) in xs.chunks(LANES).zip(scratch.chunks_mut(LANES)) {
+            for ((&x, prefix), a) in xc.iter().zip(pc.iter_mut()).zip(acc.iter_mut()) {
+                *prefix = plain(*a);
+                if x != 0 {
+                    *a = self.fold_shifted(vsetq_lane_u64::<0>(x, zero), *a);
+                }
+            }
+        }
+        let [a0, a1, a2, a3] = acc.map(plain);
+        let p01 = self.mul(a0, a1);
+        let p23 = self.mul(a2, a3);
+        let inv_all = self.inv(self.mul(p01, p23));
+        let i01 = self.mul(inv_all, p23);
+        let i23 = self.mul(inv_all, p01);
+        let mut inv_acc = [
+            shifted(self.mul(i01, a1)),
+            shifted(self.mul(i01, a0)),
+            shifted(self.mul(i23, a3)),
+            shifted(self.mul(i23, a2)),
+        ];
+        for (xc, pc) in xs.chunks_mut(LANES).zip(scratch.chunks(LANES)).rev() {
+            for ((x, &prefix), ia) in xc.iter_mut().zip(pc.iter()).zip(inv_acc.iter_mut()) {
+                if *x != 0 {
+                    let xi = vsetq_lane_u64::<0>(*x, zero);
+                    *x = plain(self.fold_shifted(vsetq_lane_u64::<0>(prefix, zero), *ia));
+                    *ia = self.fold_shifted(xi, *ia);
+                }
             }
         }
     }
@@ -1703,17 +1890,18 @@ pub fn quartic_in_x3(x1: u64, x2: u64, xr: u64, gf: &Gf2) -> Poly {
 /// what lets every polynomial division below be inversion-free.
 pub fn decompose(xr: u64, l: u32, gf: &Gf2) -> Option<[u64; 3]> {
     // Dispatched like [`SubspaceOracle::decompose`], for the same reason.
-    #[cfg(target_arch = "x86_64")]
+    #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
     if gf.has_clmul {
-        // SAFETY: `has_clmul` records `is_x86_feature_detected!("pclmulqdq")`.
-        return unsafe { decompose_pclmulqdq(xr, l, gf) };
+        // SAFETY: `has_clmul` records `pclmulqdq` (x86_64) or `aes` (aarch64).
+        return unsafe { decompose_clmul(xr, l, gf) };
     }
     decompose_body(xr, l, gf)
 }
 
-#[cfg(target_arch = "x86_64")]
-#[target_feature(enable = "pclmulqdq")]
-unsafe fn decompose_pclmulqdq(xr: u64, l: u32, gf: &Gf2) -> Option<[u64; 3]> {
+#[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+#[cfg_attr(target_arch = "x86_64", target_feature(enable = "pclmulqdq"))]
+#[cfg_attr(target_arch = "aarch64", target_feature(enable = "aes,neon"))]
+unsafe fn decompose_clmul(xr: u64, l: u32, gf: &Gf2) -> Option<[u64; 3]> {
     decompose_body(xr, l, gf)
 }
 
@@ -1981,17 +2169,18 @@ impl SubspaceOracle {
         // product would be a call.  So where the CPU has the instruction
         // the whole loop is compiled with it enabled, and the same body
         // runs as ordinary code on the portable path.
-        #[cfg(target_arch = "x86_64")]
+        #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
         if gf.has_clmul {
-            // SAFETY: `has_clmul` records `is_x86_feature_detected!("pclmulqdq")`.
-            return unsafe { self.decompose_pclmulqdq(xr, gf) };
+            // SAFETY: `has_clmul` records `pclmulqdq` (x86_64) or `aes` (aarch64).
+            return unsafe { self.decompose_clmul(xr, gf) };
         }
         self.decompose_body(xr, gf)
     }
 
-    #[cfg(target_arch = "x86_64")]
-    #[target_feature(enable = "pclmulqdq")]
-    unsafe fn decompose_pclmulqdq(&self, xr: u64, gf: &Gf2) -> (Option<[u64; 3]>, u64) {
+    #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+    #[cfg_attr(target_arch = "x86_64", target_feature(enable = "pclmulqdq"))]
+    #[cfg_attr(target_arch = "aarch64", target_feature(enable = "aes,neon"))]
+    unsafe fn decompose_clmul(&self, xr: u64, gf: &Gf2) -> (Option<[u64; 3]>, u64) {
         self.decompose_body(xr, gf)
     }
 
@@ -2156,7 +2345,7 @@ mod tests {
             let table = Gf2::with_kernels(&irr, fast.has_clmul, false);
             let portable = Gf2::portable(&irr);
             assert!(!table.folds() && !portable.folds());
-            #[cfg(target_arch = "x86_64")]
+            #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
             assert_eq!(fast.folds(), fast.has_clmul, "n = {n}: a sparse tail folds");
             let wide = (1u128 << (2 * n - 1)) - 1;
             for _ in 0..2000 {
@@ -2224,7 +2413,7 @@ mod tests {
             assert!(is_irreducible_f2(fast.irr), "n = {n}, {low:?}");
             let portable = Gf2::portable(&irr);
             let t = *low.last().unwrap();
-            #[cfg(target_arch = "x86_64")]
+            #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
             assert_eq!(
                 fast.folds(),
                 fast.has_clmul && 2 * t <= n + 1,
@@ -3286,7 +3475,7 @@ mod tests {
                 };
                 let new = Gf2::new(&irr);
                 let old = OldGf2::new(&irr, new.has_clmul);
-                #[cfg(target_arch = "x86_64")]
+                #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
                 {
                     let d = 63 - tail.leading_zeros();
                     assert_eq!(new.folds(), new.has_clmul && 2 * d <= n + 1, "n = {n}");

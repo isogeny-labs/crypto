@@ -657,3 +657,19 @@ name = "ecbench_open_questions_replay_failures"
 path = "examples/maintained/wide/ecbench_open_questions_replay_failures.rs"
 test = true
 
+
+# Go-style benchmarks (`testing.B` auto-scaled b.N) in the Go benchmark
+# format, so `benchstat` can compare them with any other Go/benchfmt
+# producer.  See src/benchfmt.rs.
+[[bench]]
+name = "go_bench"
+path = "benches/go_bench.rs"
+harness = false
+
+[[bin]]
+name = "volcano_rho"
+path = "src/bin/volcano_rho.rs"
+
+[[example]]
+name = "hw_counter_ab_bench"
+path = "examples/hw_counter_ab_bench.rs"

@@ -14,10 +14,8 @@
 //!    the edge maps to every curve, so each curve holds the same discrete
 //!    log `k` (`ℓ ∤ n`, so every map is injective on `⟨P⟩`).  Every edge is
 //!    checked: image on the codomain, `φ(P + Q) = φ(P) + φ(Q)`, `n·φ(P) = O`.
-//! 4. Run single-walker distinguished-point Pollard rho (32-adding walk on
-//!    the classes `{R, −R}`: the negation map with the Wiener–Zuccherato
-//!    look-ahead and short-cycle escape by doubling; `--negation off` walks
-//!    on points as before 2026-10-20) on every curve with the same trial seeds, plus
+//! 4. Run single-walker distinguished-point Pollard rho (32-adding walk,
+//!    no negation map) on every curve with the same trial seeds, plus
 //!    isomorphic re-scalings of the root as a representation control, and
 //!    record group operations and wall time per solve.
 //!
@@ -29,10 +27,8 @@ use std::fs;
 use std::path::PathBuf;
 use std::time::Instant;
 
-use crypto_lib::cryptanalysis::ic_boundary::invmod;
 use crypto_lib::cryptanalysis::isogeny_walk::field::Field;
 use crypto_lib::cryptanalysis::isogeny_walk::poly;
-use crypto_lib::cryptanalysis::prime_fast::MulModN;
 use num_bigint::BigUint;
 use rand::rngs::SmallRng;
 use rand::seq::SliceRandom;
@@ -42,42 +38,46 @@ use serde_json::json;
 
 // ---------------------------------------------------------------- F_p, p < 2^62
 
-/// `F_p` for a prime `5 ≤ p < 2^62`.  Products go through
-/// [`MulModN`] (Montgomery, no `__umodti3` library call) and inverses
-/// through `ic_boundary::invmod` (word-division Euclid).  Both return the
-/// value the earlier `u128 %` and `i128` Euclid returned for every input
-/// (the remainder and the inverse are unique; out-of-range operands take
-/// the old code), so every walk, `iters`, `k` and log line is unchanged;
-/// only wall time (`ns`) differs, so rows from before and after this
-/// change must not be pooled on time (assessment 2026-11-10, R1).
 #[derive(Clone, Copy)]
 struct Fp {
     p: u64,
-    mm: MulModN,
+    r64: u64,
+    r64_shoup: u64,
+    one_shoup: u64,
+}
+
+#[inline(always)]
+fn fold_once(x: u64, m: u64) -> u64 {
+    x.min(x.wrapping_sub(m))
+}
+
+#[inline(always)]
+fn shoup_mul(w: u64, ws: u64, t: u64, m: u64) -> u64 {
+    let q = ((ws as u128 * t as u128) >> 64) as u64;
+    fold_once(w.wrapping_mul(t).wrapping_sub(q.wrapping_mul(m)), m)
 }
 
 impl Fp {
     fn new(p: u64) -> Self {
-        Fp {
+        let r64 = ((1u128 << 64) % p as u128) as u64;
+        let r64_shoup = (((r64 as u128) << 64) / p as u128) as u64;
+        let one_shoup = ((1u128 << 64) / p as u128) as u64;
+        Self {
             p,
-            mm: MulModN::new(p),
+            r64,
+            r64_shoup,
+            one_shoup,
         }
     }
+    #[inline(always)]
     fn add(&self, a: u64, b: u64) -> u64 {
-        let s = a + b;
-        if s >= self.p {
-            s - self.p
-        } else {
-            s
-        }
+        fold_once(a.wrapping_add(b), self.p)
     }
+    #[inline(always)]
     fn sub(&self, a: u64, b: u64) -> u64 {
-        if a >= b {
-            a - b
-        } else {
-            a + self.p - b
-        }
+        fold_once(a.wrapping_sub(b).wrapping_add(self.p), self.p)
     }
+    #[inline(always)]
     fn neg(&self, a: u64) -> u64 {
         if a == 0 {
             0
@@ -85,8 +85,12 @@ impl Fp {
             self.p - a
         }
     }
+    #[inline(always)]
     fn mul(&self, a: u64, b: u64) -> u64 {
-        self.mm.mul(a, b)
+        let v = a as u128 * b as u128;
+        let high = shoup_mul(self.r64, self.r64_shoup, (v >> 64) as u64, self.p);
+        let low = shoup_mul(1, self.one_shoup, v as u64, self.p);
+        fold_once(high + low, self.p)
     }
     fn sm(&self, k: u64, a: u64) -> u64 {
         self.mul(k % self.p, a)
@@ -102,6 +106,7 @@ impl Fp {
         }
         r
     }
+    #[inline(always)]
     fn inv(&self, a: u64) -> u64 {
         inv_mod(a, self.p)
     }
@@ -141,18 +146,23 @@ impl Fp {
     }
 }
 
-/// `a⁻¹ mod m` by `ic_boundary::invmod` (word-division Euclid; 32-bit
-/// steps for a modulus below 2^32), falling back to the `i128` Euclid
-/// below only for a non-invertible `a`, to keep its panic.  The inverse
-/// is unique, so both give the same value.
+#[inline(always)]
 fn inv_mod(a: u64, m: u64) -> u64 {
-    if let Some(x) = invmod(a, m) {
-        return x;
+    if m < (1u64 << 63) {
+        let (mut r0, mut r1) = (m, a);
+        let (mut s0, mut s1) = (0i64, 1i64);
+        while r1 != 0 {
+            let q = r0 / r1;
+            (r0, r1) = (r1, r0 - q * r1);
+            (s0, s1) = (s1, s0.wrapping_sub((q as i64).wrapping_mul(s1)));
+        }
+        assert_eq!(r0, 1, "not invertible");
+        return if s0 < 0 {
+            (s0 + m as i64) as u64
+        } else {
+            s0 as u64
+        };
     }
-    inv_mod_i128(a, m)
-}
-
-fn inv_mod_i128(a: u64, m: u64) -> u64 {
     let (mut r0, mut r1) = (m as i128, a as i128);
     let (mut s0, mut s1) = (0i128, 1i128);
     while r1 != 0 {
@@ -166,36 +176,6 @@ fn inv_mod_i128(a: u64, m: u64) -> u64 {
 
 fn mulmod(a: u64, b: u64, m: u64) -> u64 {
     ((a as u128 * b as u128) % m as u128) as u64
-}
-
-/// `(a + b) % n`, by one compare-and-subtract when both are reduced (the
-/// walk coefficients always are); the same value for every input.
-#[inline(always)]
-fn add_n(a: u64, b: u64, n: u64) -> u64 {
-    if a < n && b < n {
-        let s = a + b;
-        if s >= n {
-            s - n
-        } else {
-            s
-        }
-    } else {
-        (a + b) % n
-    }
-}
-
-/// `(n - a) % n` without the division when `a` is reduced.
-#[inline(always)]
-fn neg_n(a: u64, n: u64) -> u64 {
-    if a < n {
-        if a == 0 {
-            0
-        } else {
-            n - a
-        }
-    } else {
-        (n - a) % n
-    }
 }
 
 fn powmod(mut a: u64, mut e: u64, m: u64) -> u64 {
@@ -349,15 +329,91 @@ impl Curve {
         Some((x3, f.sub(f.mul(l, f.sub(x1, x3)), y1)))
     }
     fn mul(&self, f: &Fp, p: Pt, k: u64) -> Pt {
-        let (mut r, mut b, mut k) = (None, p, k);
-        while k > 0 {
-            if k & 1 == 1 {
-                r = self.add(f, r, b);
-            }
-            b = self.add(f, b, b);
-            k >>= 1;
+        let Some((px, py)) = p else {
+            return None;
+        };
+        if k == 0 {
+            return None;
         }
-        r
+        if k == 1 {
+            return Some((px, py));
+        }
+        // Jacobian `(X : Y : Z)` (`x = X/Z²`, `y = Y/Z³`) with 1 inversion at the end.
+        let mut jx = px;
+        let mut jy = py;
+        let mut jz = 1u64;
+        let top = 63 - k.leading_zeros();
+        for bit in (0..top).rev() {
+            // Jacobian doubling (`dbl-2007-bl`)
+            if jz == 0 || jy == 0 {
+                jx = 1;
+                jy = 1;
+                jz = 0;
+            } else {
+                let xx = f.mul(jx, jx);
+                let yy = f.mul(jy, jy);
+                let yyyy = f.mul(yy, yy);
+                let zz = f.mul(jz, jz);
+                let s_tmp = f.sub(f.sub(f.mul(f.add(jx, yy), f.add(jx, yy)), xx), yyyy);
+                let s = f.add(s_tmp, s_tmp);
+                let m = f.add(f.sm(3, xx), f.mul(self.a, f.mul(zz, zz)));
+                let x3 = f.sub(f.mul(m, m), f.add(s, s));
+                let yz = f.mul(jy, jz);
+                jz = f.add(yz, yz);
+                jy = f.sub(f.mul(m, f.sub(s, x3)), f.sm(8, yyyy));
+                jx = x3;
+            }
+            if (k >> bit) & 1 == 1 {
+                if jz == 0 {
+                    jx = px;
+                    jy = py;
+                    jz = 1;
+                } else {
+                    // Mixed Jacobian + affine addition (`madd-2007-bl`)
+                    let z1z1 = f.mul(jz, jz);
+                    let u2 = f.mul(px, z1z1);
+                    let s2 = f.mul(py, f.mul(jz, z1z1));
+                    let h = f.sub(u2, jx);
+                    let r = f.sub(s2, jy);
+                    if h == 0 {
+                        if r == 0 {
+                            // Equal points: rare fallback to affine double after normalizing
+                            let zi = f.inv(jz);
+                            let zi2 = f.mul(zi, zi);
+                            let ax = f.mul(jx, zi2);
+                            let ay = f.mul(jy, f.mul(zi2, zi));
+                            match self.add(f, Some((ax, ay)), Some((px, py))) {
+                                Some((nx, ny)) => {
+                                    jx = nx;
+                                    jy = ny;
+                                    jz = 1;
+                                }
+                                None => jz = 0,
+                            }
+                        } else {
+                            jz = 0;
+                        }
+                    } else {
+                        let hh = f.mul(h, h);
+                        let i4 = f.sm(4, hh);
+                        let j_cub = f.mul(h, i4);
+                        let r2 = f.add(r, r);
+                        let v = f.mul(jx, i4);
+                        let x3 = f.sub(f.sub(f.mul(r2, r2), j_cub), f.add(v, v));
+                        let jz_h = f.sub(f.sub(f.mul(f.add(jz, h), f.add(jz, h)), z1z1), hh);
+                        jy = f.sub(f.mul(r2, f.sub(v, x3)), f.sm(2, f.mul(jy, j_cub)));
+                        jx = x3;
+                        jz = jz_h;
+                    }
+                }
+            }
+        }
+        if jz == 0 {
+            return None;
+        }
+        let zi = f.inv(jz);
+        let zi2 = f.mul(zi, zi);
+        Some((f.mul(jx, zi2), f.mul(jy, f.mul(zi2, zi))))
     }
     fn neg(f: &Fp, p: Pt) -> Pt {
         p.map(|(x, y)| (x, f.neg(y)))
@@ -558,177 +614,12 @@ struct Instance {
     q: (u64, u64),
 }
 
+#[derive(Clone, Copy)]
 struct Solve {
     k: Option<u64>,
-    /// Group additions of the walk, the look-ahead's discarded additions and
-    /// the escapes' doublings included.
     iters: u64,
     restarts: u32,
     ns: u128,
-    look_ahead: u64,
-    escapes: u64,
-}
-
-/// The walk the native engine runs: [`rho_neg`] or, with `--negation off`,
-/// [`rho`] on points.
-fn rho_native(
-    f: &Fp,
-    inst: &Instance,
-    n: u64,
-    seed: u64,
-    dp_bits: u32,
-    lens: &Lens,
-    negation: bool,
-) -> Solve {
-    if negation {
-        rho_neg(f, inst, n, seed, dp_bits, lens)
-    } else {
-        rho(f, inst, n, seed, dp_bits, lens)
-    }
-}
-
-/// Points of a short cycle the negation walk watches for.
-const CYCLE_WINDOW: usize = 16;
-
-/// [`rho`] on the classes `{R, −R}` (`A = 2`, about `√(πn/4)` steps).  The
-/// class representative is the one whose lens image has `y ≤ (p − 1)/2`;
-/// every lens map is a group homomorphism, so `read(−R) = −read(R)` and
-/// the choice is one sign test on the coordinates the walk already reads.
-/// The jump index and the distinguished-point test read only `x`, which the
-/// two share.  As in `ic_boundary::RhoWalk::negation()`, a step whose
-/// result was flipped and would take the same jump again (the fruitless
-/// 2-cycle) takes the next jump instead, and a repeat among the last
-/// [`CYCLE_WINDOW`] points is left by doubling the cycle's member of
-/// smallest `x`; a walk that meets the same cycle twice restarts.  Both
-/// guards' additions count as iterations.
-fn rho_neg(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens) -> Solve {
-    let e = &inst.curve;
-    let (p, q) = (Some(inst.p), Some(inst.q));
-    let half = (f.p - 1) / 2;
-    let mut rng = SmallRng::seed_from_u64(seed);
-    let t0 = Instant::now();
-    let steps: Vec<(u64, u64, (u64, u64))> = (0..32)
-        .map(|_| loop {
-            let (a, b) = (rng.gen_range(0..n), rng.gen_range(0..n));
-            if let Some(r) = e.add(f, e.mul(f, p, a), e.mul(f, q, b)) {
-                break (a, b, r);
-            }
-        })
-        .collect();
-    let jump = |x: u64| (x.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 59) as usize;
-    // The representative of {x, −x} and its coefficients, read through the lens.
-    let canon = |x: (u64, u64), a: u64, b: u64| {
-        let c = lens.read(f, x);
-        if c.1 > half {
-            (
-                (x.0, f.neg(x.1)),
-                (c.0, f.neg(c.1)),
-                neg_n(a, n),
-                neg_n(b, n),
-                true,
-            )
-        } else {
-            (x, c, a, b, false)
-        }
-    };
-    let found = |k: u64, iters, restarts, look_ahead, escapes| Solve {
-        k: Some(k),
-        iters,
-        restarts,
-        ns: t0.elapsed().as_nanos(),
-        look_ahead,
-        escapes,
-    };
-    let mut table: HashMap<u64, (u64, u64, u64)> = HashMap::new();
-    let (mut iters, mut restarts, mut look_ahead, mut escapes) = (0u64, 0u32, 0u64, 0u64);
-    let dp_mask = (1u64 << dp_bits) - 1;
-    let max_run = 40u64 << dp_bits;
-    'restart: loop {
-        let (a0, b0) = (rng.gen_range(0..n), rng.gen_range(0..n));
-        let Some(x0) = e.add(f, e.mul(f, p, a0), e.mul(f, q, b0)) else {
-            restarts += 1;
-            continue;
-        };
-        let (mut x, mut c, mut a, mut b, _) = canon(x0, a0, b0);
-        let mut run = 0u64;
-        let mut recent: VecDeque<(u64, (u64, u64), u64, u64)> = VecDeque::new();
-        let mut last_escape: Option<u64> = None;
-        loop {
-            let mut j = jump(c.0);
-            let mut tried = 0usize;
-            loop {
-                let s = &steps[j];
-                iters += 1;
-                run += 1;
-                tried += 1;
-                let (na, nb) = (add_n(a, s.0, n), add_n(b, s.1, n));
-                let Some(nx) = e.add(f, Some(x), Some(s.2)) else {
-                    // naP + nbQ = O.
-                    if nb != 0 {
-                        let k = mulmod(n - na % n, inv_mod(nb, n), n) % n;
-                        return found(k, iters, restarts, look_ahead, escapes);
-                    }
-                    restarts += 1;
-                    continue 'restart;
-                };
-                let (yx, yc, ya, yb, flipped) = canon(nx, na, nb);
-                if flipped && tried < steps.len() && jump(yc.0) == j {
-                    look_ahead += 1;
-                    j = (j + 1) % steps.len();
-                    continue;
-                }
-                (x, c, a, b) = (yx, yc, ya, yb);
-                break;
-            }
-            // A short cycle: this point is one of the last CYCLE_WINDOW.
-            if let Some(pos) = recent.iter().position(|r| r.0 == c.0) {
-                let &(mk, mx, ma, mb) = recent
-                    .iter()
-                    .skip(pos)
-                    .min_by_key(|r| r.0)
-                    .expect("a cycle has members");
-                if last_escape == Some(mk) {
-                    restarts += 1;
-                    continue 'restart;
-                }
-                last_escape = Some(mk);
-                iters += 1;
-                escapes += 1;
-                let Some(d) = e.add(f, Some(mx), Some(mx)) else {
-                    restarts += 1;
-                    continue 'restart;
-                };
-                (x, c, a, b, _) = canon(d, add_n(ma, ma, n), add_n(mb, mb, n));
-                recent.clear();
-            }
-            recent.push_back((c.0, x, a, b));
-            if recent.len() > CYCLE_WINDOW {
-                recent.pop_front();
-            }
-            if c.0.wrapping_mul(0xC2B2_AE3D_27D4_EB4F) >> 40 & dp_mask == 0 {
-                if let Some(&(y2, a2, b2)) = table.get(&c.0) {
-                    // Same point: (a − a2)P = (b2 − b)Q; opposite: (a + a2)P = −(b + b2)Q.
-                    let (num, den) = if y2 == c.1 {
-                        ((a + n - a2) % n, (b2 + n - b) % n)
-                    } else {
-                        ((n - (a + a2) % n) % n, (b + b2) % n)
-                    };
-                    if den != 0 {
-                        let k = mulmod(num, inv_mod(den, n), n);
-                        return found(k, iters, restarts, look_ahead, escapes);
-                    }
-                    restarts += 1;
-                    continue 'restart;
-                }
-                table.insert(c.0, (c.1, a, b));
-                run = 0;
-            }
-            if run > max_run {
-                restarts += 1;
-                continue 'restart;
-            }
-        }
-    }
 }
 
 fn rho(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens) -> Solve {
@@ -760,8 +651,8 @@ fn rho(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens) ->
             let s = &steps[(c.0.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 59) as usize];
             iters += 1;
             run += 1;
-            a = add_n(a, s.0, n);
-            b = add_n(b, s.1, n);
+            a = fold_once(a + s.0, n);
+            b = fold_once(b + s.1, n);
             match e.add(f, Some(x), Some(s.2)) {
                 Some(nx) => {
                     x = nx;
@@ -776,8 +667,6 @@ fn rho(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens) ->
                             iters,
                             restarts,
                             ns: t0.elapsed().as_nanos(),
-                            look_ahead: 0,
-                            escapes: 0,
                         };
                     }
                     restarts += 1;
@@ -799,8 +688,6 @@ fn rho(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens) ->
                             iters,
                             restarts,
                             ns: t0.elapsed().as_nanos(),
-                            look_ahead: 0,
-                            escapes: 0,
                         };
                     }
                     restarts += 1;
@@ -815,6 +702,280 @@ fn rho(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens) ->
             }
         }
     }
+}
+
+/// Batched simultaneous-inversion Distinguished-Point Pollard rho across a slice
+/// of `(arm_idx, trial_seed)` jobs sharing the base field `f`.
+///
+/// Up to `BATCH = 16` active walkers advance in lockstep, sharing **one** `f.inv`
+/// per step via Montgomery's trick (`1` `inv_mod` + `3(B − 1)` Shoup muls) and
+/// immediately refilling any completed lane from `jobs`.  Every `(arm, seed)`
+/// follows the exact same RNG stream, 32-adding table, `iters`, `restarts`, and
+/// recovered discrete logarithm `k` as [`rho`].
+fn rho_batch_jobs<'arm, FInst>(
+    f: &Fp,
+    jobs: &[(usize, u64)],
+    get_arm: FInst,
+    n: u64,
+    seed_base: u64,
+    dp_bits: u32,
+) -> Vec<(usize, u64, Solve)>
+where
+    FInst: Fn(usize) -> (&'arm Instance, &'arm Lens),
+{
+    const BATCH: usize = 16;
+    struct Walker<'a> {
+        job_idx: usize,
+        arm_idx: usize,
+        trial_s: u64,
+        inst: &'a Instance,
+        lens: &'a Lens,
+        rng: SmallRng,
+        steps: [(u64, u64, (u64, u64)); 32],
+        table: HashMap<u64, (u64, u64, u64)>,
+        a: u64,
+        b: u64,
+        x: (u64, u64),
+        c: (u64, u64),
+        iters: u64,
+        restarts: u32,
+        run: u64,
+        t0: Instant,
+    }
+
+    impl<'a> Walker<'a> {
+        fn init(
+            f: &Fp,
+            job_idx: usize,
+            arm_idx: usize,
+            trial_s: u64,
+            inst: &'a Instance,
+            lens: &'a Lens,
+            n: u64,
+            seed: u64,
+        ) -> Self {
+            let e = &inst.curve;
+            let (p, q) = (Some(inst.p), Some(inst.q));
+            let mut rng = SmallRng::seed_from_u64(seed);
+            let t0 = Instant::now();
+            let steps: [(u64, u64, (u64, u64)); 32] = std::array::from_fn(|_| loop {
+                let (a, b) = (rng.gen_range(0..n), rng.gen_range(0..n));
+                if let Some(r) = e.add(f, e.mul(f, p, a), e.mul(f, q, b)) {
+                    break (a, b, r);
+                }
+            });
+            let mut restarts = 0u32;
+            let (a, b, x) = loop {
+                let (a, b) = (rng.gen_range(0..n), rng.gen_range(0..n));
+                if let Some(pt) = e.add(f, e.mul(f, p, a), e.mul(f, q, b)) {
+                    break (a, b, pt);
+                }
+                restarts += 1;
+            };
+            let c = lens.read(f, x);
+            Self {
+                job_idx,
+                arm_idx,
+                trial_s,
+                inst,
+                lens,
+                rng,
+                steps,
+                table: HashMap::new(),
+                a,
+                b,
+                x,
+                c,
+                iters: 0,
+                restarts,
+                run: 0,
+                t0,
+            }
+        }
+
+        #[inline]
+        fn restart(&mut self, f: &Fp, n: u64) {
+            let e = &self.inst.curve;
+            let (p, q) = (Some(self.inst.p), Some(self.inst.q));
+            loop {
+                self.restarts += 1;
+                let (a, b) = (self.rng.gen_range(0..n), self.rng.gen_range(0..n));
+                if let Some(pt) = e.add(f, e.mul(f, p, a), e.mul(f, q, b)) {
+                    self.a = a;
+                    self.b = b;
+                    self.x = pt;
+                    self.c = self.lens.read(f, pt);
+                    self.run = 0;
+                    return;
+                }
+            }
+        }
+    }
+
+    let dp_mask = (1u64 << dp_bits) - 1;
+    let max_run = 40u64 << dp_bits;
+    let mut out: Vec<Option<(usize, u64, Solve)>> = vec![None; jobs.len()];
+    let mut next_job = 0usize;
+    let mut active: Vec<Walker<'_>> = Vec::with_capacity(BATCH.min(jobs.len()));
+
+    while next_job < jobs.len() && active.len() < BATCH {
+        let (a_idx, s) = jobs[next_job];
+        let (inst, lens) = get_arm(a_idx);
+        active.push(Walker::init(
+            f,
+            next_job,
+            a_idx,
+            s,
+            inst,
+            lens,
+            n,
+            seed_base ^ s,
+        ));
+        next_job += 1;
+    }
+
+    let mut nums = [0u64; BATCH];
+    let mut dens = [1u64; BATCH];
+    let mut x2s = [0u64; BATCH];
+    let mut is_inf = [false; BATCH];
+    let mut prefix = [1u64; BATCH];
+
+    while !active.is_empty() {
+        let len = active.len();
+        // 1. Prepare chord/tangent slopes for all active walkers:
+        for l in 0..len {
+            let w = &mut active[l];
+            let s = &w.steps[(w.c.0.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 59) as usize];
+            w.iters += 1;
+            w.run += 1;
+            w.a = fold_once(w.a + s.0, n);
+            w.b = fold_once(w.b + s.1, n);
+            let (x1, y1) = w.x;
+            let (x2, y2) = s.2;
+            x2s[l] = x2;
+            if x1 == x2 {
+                if f.add(y1, y2) == 0 {
+                    is_inf[l] = true;
+                    nums[l] = 0;
+                    dens[l] = 1;
+                } else {
+                    is_inf[l] = false;
+                    nums[l] = f.add(f.sm(3, f.mul(x1, x1)), w.inst.curve.a);
+                    dens[l] = f.add(y1, y1);
+                }
+            } else {
+                is_inf[l] = false;
+                nums[l] = f.sub(y2, y1);
+                dens[l] = f.sub(x2, x1);
+            }
+        }
+
+        // 2. Simultaneous Montgomery inversion of `dens[0..len]`:
+        prefix[0] = dens[0];
+        for l in 1..len {
+            prefix[l] = f.mul(prefix[l - 1], dens[l]);
+        }
+        let mut inv_acc = f.inv(prefix[len - 1]);
+        for l in (1..len).rev() {
+            let d_orig = dens[l];
+            dens[l] = f.mul(inv_acc, prefix[l - 1]);
+            inv_acc = f.mul(inv_acc, d_orig);
+        }
+        dens[0] = inv_acc;
+
+        // 3. Complete point additions, DP table checks, and refill solved lanes:
+        let mut l = 0usize;
+        while l < active.len() {
+            let solved_opt = {
+                let w = &mut active[l];
+                if is_inf[l] {
+                    if w.b != 0 {
+                        let k = mulmod(n - w.a % n, inv_mod(w.b, n), n) % n;
+                        Some(Solve {
+                            k: Some(k),
+                            iters: w.iters,
+                            restarts: w.restarts,
+                            ns: w.t0.elapsed().as_nanos(),
+                        })
+                    } else {
+                        w.restart(f, n);
+                        None
+                    }
+                } else {
+                    let lam = f.mul(nums[l], dens[l]);
+                    let x1 = w.x.0;
+                    let y1 = w.x.1;
+                    let x3 = f.sub(f.sub(f.mul(lam, lam), x1), x2s[l]);
+                    let y3 = f.sub(f.mul(lam, f.sub(x1, x3)), y1);
+                    w.x = (x3, y3);
+                    w.c = w.lens.read(f, w.x);
+
+                    if (w.c.0.wrapping_mul(0xC2B2_AE3D_27D4_EB4F) >> 40) & dp_mask == 0 {
+                        if let Some(&(y2, a2, b2)) = w.table.get(&w.c.0) {
+                            let (num, den) = if y2 == w.c.1 {
+                                ((w.a + n - a2) % n, (b2 + n - w.b) % n)
+                            } else {
+                                ((n - (w.a + a2) % n) % n, (w.b + b2) % n)
+                            };
+                            if den != 0 {
+                                let k = mulmod(num, inv_mod(den, n), n);
+                                Some(Solve {
+                                    k: Some(k),
+                                    iters: w.iters,
+                                    restarts: w.restarts,
+                                    ns: w.t0.elapsed().as_nanos(),
+                                })
+                            } else {
+                                w.restart(f, n);
+                                None
+                            }
+                        } else {
+                            w.table.insert(w.c.0, (w.c.1, w.a, w.b));
+                            w.run = 0;
+                            None
+                        }
+                    } else if w.run > max_run {
+                        w.restart(f, n);
+                        None
+                    } else {
+                        None
+                    }
+                }
+            };
+
+            if let Some(solve) = solved_opt {
+                let w_done = &active[l];
+                out[w_done.job_idx] = Some((w_done.arm_idx, w_done.trial_s, solve));
+                if next_job < jobs.len() {
+                    let (a_idx, s) = jobs[next_job];
+                    let (inst, lens) = get_arm(a_idx);
+                    active[l] = Walker::init(
+                        f,
+                        next_job,
+                        a_idx,
+                        s,
+                        inst,
+                        lens,
+                        n,
+                        seed_base ^ s,
+                    );
+                    next_job += 1;
+                } else {
+                    // Swap-remove and ALSO keep `nums/dens/x2s/is_inf` aligned for remaining `l..`!
+                    let last = active.len() - 1;
+                    active.swap_remove(l);
+                    nums[l] = nums[last];
+                    dens[l] = dens[last];
+                    x2s[l] = x2s[last];
+                    is_inf[l] = is_inf[last];
+                    continue;
+                }
+            }
+            l += 1;
+        }
+    }
+
+    out.into_iter().map(|e| e.expect("all jobs solved")).collect()
 }
 
 /// One solve by the cryptanalysis repository's `ca solve --alg rho`:
@@ -847,8 +1008,6 @@ fn rho_ca(ca: &str, extra: &[String], f: &Fp, inst: &Instance, n: u64, seed: u64
         iters: v["ops"].as_u64().unwrap_or(0),
         restarts: 0,
         ns: (v["seconds"].as_f64().unwrap_or(0.0) * 1e9) as u128,
-        look_ahead: 0,
-        escapes: 0,
     }
 }
 
@@ -1148,7 +1307,7 @@ fn instance_study(
                 };
                 let q = e0.mul(f, Some(p), k).expect("1 <= k < n");
                 let inst = Instance { curve: e0, p, q };
-                let s = rho_native(f, &inst, n, walk, dp_bits, &lens, args.negation);
+                let s = rho(f, &inst, n, walk, dp_bits, &lens);
                 (walk, k, p, s)
             })
             .collect();
@@ -1197,18 +1356,13 @@ fn instance_study(
             "welch_z": (m - bm) / se, "ks_d": d, "ks_p": p,
         });
     }
-    let expected = (std::f64::consts::PI * n as f64 / if args.negation { 4.0 } else { 2.0 }).sqrt();
+    let expected = (std::f64::consts::PI * n as f64 / 2.0).sqrt();
     let result = json!({
         "schema": "volcano-rho.instance-study/v1",
         "curve": {"p": f.p, "a": e0.a, "b": e0.b, "order": n * cof, "n": n},
         "P": [p0.0, p0.1], "k": k0, "seed": args.seed, "trials_per_arm": args.trials,
         "fixed_walk_seed": fixed_walk, "dp_bits": dp_bits,
-        "rho": {"walk": if args.negation {
-                    "native single-walker 32-adding DP on {R, -R}: negation map, look-ahead, short-cycle escape by doubling"
-                } else {
-                    "native single-walker 32-adding DP, no negation map"
-                },
-                "negation": args.negation,
+        "rho": {"walk": "native single-walker 32-adding DP, no negation map",
                 "expected_iters": expected,
                 "expected_iters_r32": expected / (1.0 - 1.0 / 32.0f64).sqrt()},
         "arms": out_arms, "seconds": t0.elapsed().as_secs_f64(),
@@ -1246,9 +1400,6 @@ struct Args {
     j1728: bool,
     /// `p,a,b`: measure this curve instead of searching for one.
     curve: Option<(u64, u64, u64)>,
-    /// `x,y`: the generator `P` on the root (a point of order `n`), e.g. one
-    /// carried there by an isogeny from another volcano; drawn when absent.
-    generator: Option<(u64, u64)>,
     /// `#E(F_p)` for `--curve`; counted when absent.
     order: Option<u64>,
     /// `native` (this binary's walk) or `ca` (`ca solve --alg rho`).
@@ -1256,9 +1407,6 @@ struct Args {
     /// `native` (each curve hashes its own x) or `pullback` (every curve
     /// hashes the root's canonical point, so walks coincide across curves).
     walk: String,
-    /// The native walk runs on `{R, −R}` (`--negation on`, the default) or on
-    /// points (`--negation off`, the walk before 2026-10-20).
-    negation: bool,
     ca: String,
     ca_args: Vec<String>,
     controls: usize,
@@ -1300,11 +1448,9 @@ fn parse_args() -> Args {
         j0: false,
         j1728: false,
         curve: None,
-        generator: None,
         order: None,
         engine: "native".into(),
         walk: "native".into(),
-        negation: true,
         ca: "ca".into(),
         ca_args: Vec::new(),
         controls: 3,
@@ -1403,20 +1549,6 @@ fn parse_args() -> Args {
                 }
                 a.curve = Some((v[0], v[1], v[2]));
             }
-            "--generator" => {
-                let v: Vec<u64> = val
-                    .split(',')
-                    .map(|x| {
-                        x.trim()
-                            .parse()
-                            .unwrap_or_else(|_| die("--generator takes X,Y in decimal"))
-                    })
-                    .collect();
-                if v.len() != 2 {
-                    die("--generator takes X,Y");
-                }
-                a.generator = Some((v[0], v[1]));
-            }
             "--order" => {
                 a.order = Some(
                     val.parse()
@@ -1428,35 +1560,25 @@ fn parse_args() -> Args {
             "--ca" => a.ca = val.clone(),
             "--ca-arg" => a.ca_args.push(val.clone()),
             "--controls" => a.controls = val.parse().unwrap(),
-            "--negation" => {
-                a.negation = match val.as_str() {
-                    "on" => true,
-                    "off" => false,
-                    _ => die("--negation takes on or off"),
-                }
-            }
             "--out" => a.out = PathBuf::from(val),
             "-h" | "--help" => {
                 println!(
                     "volcano-rho: one ECDLP instance carried to every level of an ell-isogeny volcano,
 Pollard rho measured on each curve.
 
-  your curve:   volcano-rho --curve P,A,B [--order N] [--generator X,Y] [options]
+  your curve:   volcano-rho --curve P,A,B [--order N] [options]
   search one:   volcano-rho [--bits 40] [--depth 3] [--crater any|split|inert|ramified] [--j0|--j1728]
                             [--max-cofactor 64] [options]
 
 options: [--ell 3] [--seed 1] [--trials 100] [--per-level 10] [--controls 3]
-         [--dp-bits auto] [--engine native|ca] [--walk native|pullback] [--negation on|off] [--ca PATH] [--ca-arg ARG]... [--out DIR]
+         [--dp-bits auto] [--engine native|ca] [--walk native|pullback] [--ca PATH] [--ca-arg ARG]... [--out DIR]
          [--instance-study] [--ecbench DIR [--models 1] [--crater-models M] [--level-caps C0,C1,..]
                         [--aa-model0] [--targets 64] [--ic-size 32]]
 
 --curve takes y^2 = x^3 + Ax + B over F_P, P prime < 2^62, in decimal. The
 generator (cofactor times a seeded random point) and the secret k are drawn
-from --seed; --generator X,Y fixes the generator instead (a point of order n
-on the curve, e.g. one carried there by an isogeny, as volcano-gap does). --engine ca runs `ca solve --alg rho` from the cryptanalysis
+from --seed. --engine ca runs `ca solve --alg rho` from the cryptanalysis
 repository on every curve (--ca-arg passes extra options, e.g. --no-negation).
-The native walk runs on {{R, -R}} (negation map, look-ahead, short-cycle escape
-by doubling); --negation off walks on points, as before 2026-10-20.
 Writes results.json, trials.csv and instances.jsonl to --out.
 
 --instance-study skips the walk and measures the root curve alone, --trials
@@ -1760,24 +1882,16 @@ fn main() {
     // The instance: P of order n, Q = kP.
     let e0 = found.root;
     let cof = found.order / n;
-    let p0 = match args.generator {
-        Some(g) => {
-            if !e0.on(&f, Some(g)) || e0.mul(&f, Some(g), n).is_some() {
-                die("--generator is not a point of order n on the curve");
-            }
-            g
+    let p0 = loop {
+        if let Some(pt) = e0.mul(&f, Some(e0.random_point(&f, &mut rng)), cof) {
+            break pt;
         }
-        None => loop {
-            if let Some(pt) = e0.mul(&f, Some(e0.random_point(&f, &mut rng)), cof) {
-                break pt;
-            }
-        },
     };
     assert!(e0.mul(&f, Some(p0), n).is_none());
-    let k_planted = rng.gen_range(1..n);
-    let q0 = e0.mul(&f, Some(p0), k_planted).unwrap();
+    let k_secret = rng.gen_range(1..n);
+    let q0 = e0.mul(&f, Some(p0), k_secret).unwrap();
     if args.instance_study {
-        instance_study(&args, &f, e0, n, cof, p0, k_planted, dp_bits);
+        instance_study(&args, &f, e0, n, cof, p0, k_secret, dp_bits);
         return;
     }
 
@@ -2024,7 +2138,7 @@ fn main() {
             "arm": a.label, "vertex": a.vertex, "level": a.level, "group": "ec",
             "p": f.p, "a": a.inst.curve.a, "b": a.inst.curve.b, "order": n,
             "g": format!("{},{}", a.inst.p.0, a.inst.p.1),
-            "h": format!("{},{}", a.inst.q.0, a.inst.q.1), "x": k_planted,
+            "h": format!("{},{}", a.inst.q.0, a.inst.q.1), "x": k_secret,
         })
         .to_string();
         jl.push('\n');
@@ -2084,28 +2198,25 @@ fn main() {
         jobs.len()
     );
     let t_rho = Instant::now();
-    let results: Vec<(usize, u64, Solve)> = jobs
-        .par_iter()
-        .map(|&(a, s)| {
-            let inst = &arms[a].inst;
-            let r = if args.engine == "ca" {
-                rho_ca(&args.ca, &args.ca_args, &f, inst, n, seed_base ^ s)
-            } else {
-                rho_native(
-                    &f,
-                    inst,
-                    n,
-                    seed_base ^ s,
-                    dp_bits,
-                    &arms[a].lens,
-                    args.negation,
-                )
-            };
-            (a, s, r)
-        })
-        .collect();
+    let results: Vec<(usize, u64, Solve)> = if args.engine == "ca" {
+        jobs.par_iter()
+            .map(|&(a, s)| {
+                let inst = &arms[a].inst;
+                let r = rho_ca(&args.ca, &args.ca_args, &f, inst, n, seed_base ^ s);
+                (a, s, r)
+            })
+            .collect()
+    } else {
+        let n_threads = rayon::current_num_threads().max(1);
+        let chunk_sz = jobs.len().div_ceil(n_threads).max(16);
+        jobs.par_chunks(chunk_sz)
+            .flat_map_iter(|chunk| {
+                rho_batch_jobs(&f, chunk, |a| (&arms[a].inst, &arms[a].lens), n, seed_base, dp_bits)
+            })
+            .collect()
+    };
     let rho_s = t_rho.elapsed().as_secs_f64();
-    let wrong = results.iter().filter(|r| r.2.k != Some(k_planted)).count();
+    let wrong = results.iter().filter(|r| r.2.k != Some(k_secret)).count();
     if wrong > 0 {
         die(&format!(
             "{wrong} rho solves returned no or the wrong logarithm"
@@ -2219,16 +2330,14 @@ fn main() {
         "command": std::env::args().collect::<Vec<_>>().join(" "),
         "params": {"bits": args.bits, "ell": ell, "depth": args.depth, "seed": args.seed, "crater": args.crater,
                    "curve": args.curve.map(|(p, a, b)| [p, a, b]), "order": args.order,
-                   "generator": args.generator.map(|(x, y)| [x, y]),
                    "engine": args.engine, "walk": args.walk, "ca": (args.engine == "ca").then_some(&args.ca), "ca_args": args.ca_args,
-                   "engine": args.engine, "walk": args.walk, "negation": args.negation, "ca": (args.engine == "ca").then_some(&args.ca), "ca_args": args.ca_args,
                    "trials": args.trials, "per_level": args.per_level, "dp_bits": dp_bits,
                    "max_cofactor": args.max_cofactor, "controls": args.controls},
         "host": {"cpu": host, "threads": rayon::current_num_threads()},
         "problem": {"p": f.p, "root": {"a": e0.a, "b": e0.b}, "order": found.order, "n": n,
                     "cofactor": found.order / n, "trace": found.t, "disc": -(found.d_abs as i64),
                     "fundamental_disc": dk, "conductor": cond, "volcano_depth": depth,
-                    "crater": crater, "given": args.curve.is_some(), "P": [p0.0, p0.1], "Q": [q0.0, q0.1], "k": k_planted,
+                    "crater": crater, "given": args.curve.is_some(), "P": [p0.0, p0.1], "Q": [q0.0, q0.1], "k": k_secret,
                     "search_curves_tried": found.tried, "search_s": search_s},
         "walk": {"radius_measured": r_meas, "radius_explored": r_explore, "vertices": vs.len(),
                  "edges_verified": edges_checked, "special_j_skipped": skipped_special,
@@ -2237,14 +2346,9 @@ fn main() {
                      "seeds_identical_on_every_curve": identical_seeds, "seeds": seed_iters.len()},
         "rho": {"walk": if args.engine == "ca" {
                     "ca solve --alg rho (cryptanalysis repository; its defaults plus ca_args); iters = its reported ops, time = its reported seconds"
-                } else if args.negation {
-                    "32-adding (Teske), single walker, distinguished points, on {R, -R}: negation map with look-ahead and short-cycle escape by doubling"
                 } else {
                     "32-adding (Teske), single walker, distinguished points, no negation map"
                 },
-                "negation": args.engine != "ca" && args.negation,
-                "look_ahead_adds": results.iter().map(|r| r.2.look_ahead).sum::<u64>(),
-                "escapes": results.iter().map(|r| r.2.escapes).sum::<u64>(),
                 "expected_iters_sqrt_pi_n_over_2": expected,
                 "expected_iters_negation_sqrt_pi_n_over_4": (std::f64::consts::PI * n as f64 / 4.0).sqrt(), "solves": results.len(),
                 "all_correct": wrong == 0, "wall_s": rho_s},
@@ -2260,7 +2364,7 @@ fn main() {
     )
     .unwrap();
 
-    println!("\nPollard rho on one instance (k = {k_planted}, n = {n}) across the {ell}-volcano");
+    println!("\nPollard rho on one instance (k = {k_secret}, n = {n}) across the {ell}-volcano");
     println!(
         "engine {}: expected iterations ~ sqrt(pi n / 2) = {expected:.0}, with a negation map sqrt(pi n / 4) = {:.0}",
         args.engine,
@@ -2304,69 +2408,4 @@ fn main() {
         row("CTRL", "iso~".into(), &out["controls"]);
     }
     eprintln!("wrote {}", args.out.display());
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    /// The registered prime-order curve `find_prime_order_curve(16, 59297)`.
-    fn instance(k: u64) -> (Fp, Instance, u64) {
-        let f = Fp::new(53411);
-        let curve = Curve { a: 4589, b: 186 };
-        let p = (43982, 22687);
-        let q = curve.mul(&f, Some(p), k).expect("1 <= k < n");
-        (f, Instance { curve, p, q }, 53117)
-    }
-
-    #[test]
-    fn both_walks_recover_the_logarithm() {
-        for k in [1, 2, 777, 31_337, 53_116] {
-            let (f, inst, n) = instance(k);
-            for seed in 0..8 {
-                for negation in [true, false] {
-                    let s = rho_native(&f, &inst, n, seed, 2, &Lens::native(), negation);
-                    assert_eq!(
-                        s.k,
-                        Some(k),
-                        "k = {k}, seed = {seed}, negation = {negation}"
-                    );
-                    if !negation {
-                        assert_eq!((s.look_ahead, s.escapes), (0, 0));
-                    }
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn the_negation_walk_is_shorter_on_average() {
-        // A 28-bit prime-order curve (research/rho_negation_audit_20261020,
-        // #E counted by this binary): the 32-jump negation walk needs a group
-        // well above 2^16 before its look-ahead and escapes stop showing.
-        let f = Fp::new(259_182_139);
-        let curve = Curve {
-            a: 256_310_742,
-            b: 86_097_094,
-        };
-        let (g, n) = ((45_628_166, 174_691_488), 259_206_671);
-        let (mut neg, mut plain) = (0u64, 0u64);
-        for seed in 0..200u64 {
-            let k = 1 + seed.wrapping_mul(0x9E37_79B9) % (n - 1);
-            let q = curve.mul(&f, Some(g), k).expect("1 <= k < n");
-            let inst = Instance { curve, p: g, q };
-            let (a, b) = (
-                rho_native(&f, &inst, n, seed, 6, &Lens::native(), true),
-                rho_native(&f, &inst, n, seed, 6, &Lens::native(), false),
-            );
-            assert_eq!((a.k, b.k), (Some(k), Some(k)));
-            neg += a.iters;
-            plain += b.iters;
-        }
-        // Expected ratio sqrt(2); 200 paired solves put it well above 1.15.
-        assert!(
-            plain as f64 / neg as f64 > 1.15,
-            "plain {plain}, negation {neg}"
-        );
-    }
 }

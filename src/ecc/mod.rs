@@ -22,6 +22,7 @@ pub mod endo_generic_point;
 mod f25519;
 pub mod field;
 pub mod gost_3410_2012;
+pub mod isogeny_scalar_mul;
 pub mod keys;
 mod mont_vt;
 pub mod p256_field;

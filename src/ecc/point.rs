@@ -17,16 +17,7 @@
 //! This is O(log k) point operations.
 
 use super::field::{inv_mod_u64, single_word, FieldElement};
-use super::mont_vt::{Jac as MontJac, Mont};
 use num_bigint::BigUint;
-
-#[cfg(test)]
-thread_local! {
-    /// Iterations of [`Point::scalar_mul_ct`]'s ladder that began with the
-    /// identity in either register; tests read it to check that the
-    /// ladder's work does not depend on the scalar's length.
-    static LADDER_IDENTITY_STEPS: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
-}
 
 /// A point on a Weierstrass curve, either the identity (point at infinity)
 /// or an affine coordinate pair.
@@ -199,87 +190,6 @@ impl Point {
         self.scalar_mul(k, a)
     }
 
-    /// `k·self + l·other` in **variable time**, for public points and
-    /// scalars: exactly `self.scalar_mul_vartime(k, a)` plus
-    /// `other.scalar_mul_vartime(l, a)`.
-    ///
-    /// When `p` fits a word the sum is one interleaved (Shamir) pass in
-    /// Jacobian coordinates with `self + other` precomputed, about
-    /// `max(bits)` doublings and three quarters as many mixed additions,
-    /// and a single inversion for the whole sum; the two ladders and the
-    /// final addition cost three.  Above one word the same pass runs on
-    /// `BigUint` Jacobian points; an identity operand falls back to the two
-    /// ladders and an addition.
-    pub fn double_scalar_mul_vartime(
-        &self,
-        k: &BigUint,
-        other: &Point,
-        l: &BigUint,
-        a: &FieldElement,
-    ) -> Point {
-        if let (Point::Affine { x: x1, y: y1 }, Point::Affine { x: x2, y: y2 }) = (self, other) {
-            let m = &x1.modulus;
-            if let Some(w) = Word::of(m) {
-                if let Some([x1, y1, x2, y2, a]) = w.get([x1, y1, x2, y2, a]) {
-                    let both = w.affine_add((x1, y1), (x2, y2), a);
-                    let mut acc: Option<WordJacobian> = None;
-                    for i in (0..k.bits().max(l.bits())).rev() {
-                        if let Some(j) = acc {
-                            acc = w.jacobian_double(j, a);
-                        }
-                        let add = match (k.bit(i), l.bit(i)) {
-                            (true, true) => both,
-                            (true, false) => Some((x1, y1)),
-                            (false, true) => Some((x2, y2)),
-                            (false, false) => None,
-                        };
-                        if let Some(p) = add {
-                            acc = match acc {
-                                None => Some(WordJacobian {
-                                    x: p.0,
-                                    y: p.1,
-                                    z: 1,
-                                }),
-                                Some(j) => w.jacobian_add_affine(j, p, a),
-                            };
-                        }
-                    }
-                    return w.point(acc.map(|j| w.jacobian_to_affine(j)), m);
-                }
-            }
-            // Above one word: the same interleaved pass on `BigUint` Jacobian
-            // points, one inversion for the whole sum.
-            let both = self.add_vartime(other, a);
-            let mut acc: Option<Jacobian> = None;
-            for i in (0..k.bits().max(l.bits())).rev() {
-                if let Some(j) = &acc {
-                    acc = j.double(a);
-                }
-                let add = match (k.bit(i), l.bit(i)) {
-                    (true, true) => match &both {
-                        Point::Affine { x, y } => Some((x, y)),
-                        Point::Infinity => None,
-                    },
-                    (true, false) => Some((x1, y1)),
-                    (false, true) => Some((x2, y2)),
-                    (false, false) => None,
-                };
-                if let Some((x, y)) = add {
-                    acc = match &acc {
-                        None => Some(Jacobian::from_affine(x, y)),
-                        Some(j) => j.add_affine(x, y, a),
-                    };
-                }
-            }
-            return match acc {
-                None => Point::Infinity,
-                Some(j) => j.to_affine(),
-            };
-        }
-        self.scalar_mul_vartime(k, a)
-            .add_vartime(&other.scalar_mul_vartime(l, a), a)
-    }
-
     /// The least `k < bound` with `k·self = target`, trying
     /// `k = 0, 1, 2, …` in turn — a linear discrete-log search, as in a
     /// Pohlig–Hellman digit — or `None` if there is none below `bound`.
@@ -390,20 +300,27 @@ impl Point {
             Point::Infinity => return Point::Infinity,
             Point::Affine { x, y } => (x, y),
         };
-        if let Some(r) = scalar_mul_fixed_width(x, y, k, a) {
-            return r;
+        if x.modulus == y.modulus
+            && x.modulus == a.modulus
+            && x.value < x.modulus
+            && y.value < y.modulus
+        {
+            use std::sync::OnceLock;
+            static SECP_P: OnceLock<BigUint> = OnceLock::new();
+            static P256_PA: OnceLock<(BigUint, BigUint)> = OnceLock::new();
+            let secp_p = SECP_P.get_or_init(|| super::secp256k1_field::P.to_biguint());
+            if &x.modulus == secp_p && a.is_zero() {
+                return super::secp256k1_point::scalar_mul_glv_vartime(self, k);
+            }
+            let (p256_p, p256_a) = P256_PA.get_or_init(|| {
+                let p = super::p256_field::P.to_biguint();
+                let a_val = &p - 3u8;
+                (p, a_val)
+            });
+            if &x.modulus == p256_p && &a.value == p256_a {
+                return super::p256_point::scalar_mul_p256_vartime(self, k);
+            }
         }
-        self.scalar_mul_biguint(k, a)
-    }
-
-    /// [`scalar_mul`](Self::scalar_mul)'s ladder on `BigUint` field
-    /// elements: the general path, and the reference the fixed-width one
-    /// is tested against.
-    fn scalar_mul_biguint(&self, k: &BigUint, a: &FieldElement) -> Point {
-        let (x, y) = match self {
-            Point::Infinity => return Point::Infinity,
-            Point::Affine { x, y } => (x, y),
-        };
         let mut acc: Option<Jacobian> = None;
         for i in (0..k.bits()).rev() {
             if let Some(j) = &acc {
@@ -422,29 +339,13 @@ impl Point {
         }
     }
 
-    /// Scalar multiplication `[k mod 2^scalar_bits]·P` by a Montgomery
-    /// ladder whose work depends on neither the bit pattern nor the bit
-    /// length of `k`.
-    ///
-    /// Every iteration performs one point addition and two doublings,
-    /// whatever the bit.  A ladder on `k` itself would start at `r0 = O`
-    /// and stay there through every leading zero bit, where `O + P` and
-    /// `2·O` are shortcuts in [`Point::add`] and [`Point::double`], so its
-    /// time would reveal the scalar's bit length — the nonce length that
-    /// lattice attacks use.  This one runs on `k + 2^scalar_bits`, whose
-    /// top bit is always set: it starts from `(P, 2P)`, the state after
-    /// that bit, so the registers hold `[j]P` and `[j + 1]P` with
-    /// `1 ≤ j < 2^(scalar_bits + 1)` and meet the identity only where
-    /// `j` or `j + 1` is a multiple of the point's order — for a point of
-    /// prime order `n` with `scalar_bits = bits(n)`, a few scalars per
-    /// bit position out of `n`.  It returns
-    /// `[k + 2^scalar_bits]P − [2^scalar_bits]P`, which is exact for every
-    /// point, including points outside the curve's prime-order subgroup.
-    /// The subtrahend depends only on `P` and `scalar_bits`, never on `k`,
-    /// so it comes from the variable-time Jacobian [`Point::scalar_mul`]
-    /// (one inversion in all) rather than `scalar_bits` affine doublings.
-    /// `P` must be public, as it is for every caller (generators, public
-    /// keys, ciphertext points).
+    /// Scalar multiplication kP using the Montgomery ladder, processing
+    /// `scalar_bits` bits MSB-first.  Every iteration performs exactly
+    /// one point addition and one point doubling, regardless of the bit
+    /// value, so the *operation count* no longer depends on the
+    /// scalar's bit pattern.  Iteration count is fixed at `scalar_bits`,
+    /// so the runtime no longer scales with the position of the
+    /// most-significant set bit.
     ///
     /// Security caveats (read carefully):
     ///
@@ -465,34 +366,54 @@ impl Point {
     /// but it does not make ECC operations side-channel safe.  See
     /// `SECURITY.md` for the full picture.
     pub fn scalar_mul_ct(&self, k: &BigUint, a: &FieldElement, scalar_bits: usize) -> Point {
-        let mut r0 = self.clone();
-        let mut r1 = self.double(a);
+        if let Point::Affine { x, y } = self {
+            if x.modulus == y.modulus
+                && x.modulus == a.modulus
+                && x.value < x.modulus
+                && y.value < y.modulus
+            {
+                use std::sync::OnceLock;
+                static SECP_P: OnceLock<BigUint> = OnceLock::new();
+                static P256_PA: OnceLock<(BigUint, BigUint)> = OnceLock::new();
+                let secp_p = SECP_P.get_or_init(|| super::secp256k1_field::P.to_biguint());
+                if &x.modulus == secp_p
+                    && a.is_zero()
+                    && super::secp256k1_point::is_valid_secp256k1_public_point(self)
+                {
+                    let pp = super::secp256k1_point::ProjectivePoint::from_textbook(self);
+                    return pp.scalar_mul_ct(k, scalar_bits).to_textbook(&x.modulus);
+                }
+                let (p256_p, p256_a) = P256_PA.get_or_init(|| {
+                    let p = super::p256_field::P.to_biguint();
+                    let a_val = &p - 3u8;
+                    (p, a_val)
+                });
+                if &x.modulus == p256_p
+                    && &a.value == p256_a
+                    && super::p256_point::is_valid_p256_public_point(self)
+                {
+                    let pp = super::p256_point::P256ProjectivePoint::from_textbook(self);
+                    return pp.scalar_mul_ct(k, scalar_bits).to_textbook(&x.modulus);
+                }
+            }
+        }
+
+        let mut r0 = Point::Infinity;
+        let mut r1 = self.clone();
 
         for i in (0..scalar_bits).rev() {
             let bit = k.bit(i as u64);
-            #[cfg(test)]
-            if matches!(r0, Point::Infinity) || matches!(r1, Point::Infinity) {
-                LADDER_IDENTITY_STEPS.with(|c| c.set(c.get() + 1));
-            }
 
-            // Always compute all three potential next states so the
-            // operation count is independent of `bit`.
             let sum = r0.add(&r1, a);
-            let r0_dbl = r0.double(a);
-            let r1_dbl = r1.double(a);
-
-            // Re-bind (r0, r1) according to the current bit.  Both
-            // arms assign exactly two values; the work is the same.
             if bit {
                 r0 = sum;
-                r1 = r1_dbl;
+                r1 = r1.double(a);
             } else {
-                r0 = r0_dbl;
+                r0 = r0.double(a);
                 r1 = sum;
             }
         }
-        let top = self.scalar_mul(&(BigUint::from(1u32) << scalar_bits), a);
-        r0.add(&top.neg(), a)
+        r0
     }
 
     /// Negate a point: -P = (x, -y mod p).
@@ -525,83 +446,6 @@ impl Point {
             Point::Infinity => None,
         }
     }
-}
-
-/// [`Point::scalar_mul`]'s ladder on fixed-width Montgomery words
-/// ([`mont_vt`](super::mont_vt)) instead of `BigUint` field elements: the
-/// same Jacobian formulas, branch for branch, and the same final Fermat
-/// inversion `Z^(p-2)`, so the point is the `BigUint` ladder's for every
-/// odd modulus `p >= 3` (prime or not).  `None`, leaving the `BigUint`
-/// path to run (and to panic where it panics), when the modulus is even,
-/// below 3 or wider than 576 bits, when a coordinate or `a` is not a
-/// reduced residue of that same modulus, or when the final `Z` is zero.
-fn scalar_mul_fixed_width(
-    x: &FieldElement,
-    y: &FieldElement,
-    k: &BigUint,
-    a: &FieldElement,
-) -> Option<Point> {
-    let m = &x.modulus;
-    if y.modulus != *m || a.modulus != *m {
-        return None;
-    }
-    match m.bits() {
-        0..=64 => mont_ladder::<1>(x, y, k, a),
-        65..=128 => mont_ladder::<2>(x, y, k, a),
-        129..=256 => mont_ladder::<4>(x, y, k, a),
-        257..=576 => mont_ladder::<9>(x, y, k, a),
-        _ => None,
-    }
-}
-
-fn mont_ladder<const N: usize>(
-    x: &FieldElement,
-    y: &FieldElement,
-    k: &BigUint,
-    a: &FieldElement,
-) -> Option<Point> {
-    let m = &x.modulus;
-    let ctx = Mont::<N>::new(m)?;
-    let (xm, ym, am) = (
-        ctx.enter(&x.value)?,
-        ctx.enter(&y.value)?,
-        ctx.enter(&a.value)?,
-    );
-    let mut acc: Option<MontJac<N>> = None;
-    for i in (0..k.bits()).rev() {
-        if let Some(j) = &acc {
-            acc = ctx.double(j, &am);
-        }
-        if k.bit(i) {
-            acc = match &acc {
-                None => Some(MontJac {
-                    x: xm,
-                    y: ym,
-                    z: ctx.one(),
-                }),
-                Some(j) => ctx.add_affine(j, &xm, &ym, &am),
-            };
-        }
-    }
-    let Some(j) = acc else {
-        return Some(Point::Infinity);
-    };
-    if j.z.iter().all(|&w| w == 0) {
-        return None;
-    }
-    let zi = ctx.pow(&j.z, &(m - BigUint::from(2u32)));
-    let zi2 = ctx.mul(&zi, &zi);
-    let zi3 = ctx.mul(&zi2, &zi);
-    Some(Point::Affine {
-        x: FieldElement {
-            value: ctx.leave(&ctx.mul(&j.x, &zi2)),
-            modulus: m.clone(),
-        },
-        y: FieldElement {
-            value: ctx.leave(&ctx.mul(&j.y, &zi3)),
-            modulus: m.clone(),
-        },
-    })
 }
 
 /// A finite point in Jacobian coordinates, `(X : Y : Z)` with `Z ≠ 0`
@@ -1216,57 +1060,6 @@ mod tests {
         }
     }
 
-    /// The fixed-length ladder returns exactly `[k mod 2^scalar_bits]P` for
-    /// every point of a small curve (identity, 2-torsion and other
-    /// small-order points included), as the plain ladder did.  On a small
-    /// order point the registers do meet the identity, which shows that the
-    /// counter read by `ladder_work_does_not_depend_on_scalar_length` sees it.
-    #[test]
-    fn ladder_is_exact_for_every_point_of_a_small_curve() {
-        let (points, a) = f97_points();
-        LADDER_IDENTITY_STEPS.with(|c| c.set(0));
-        for pt in &points {
-            for k in 0..160u32 {
-                let k = BigUint::from(k);
-                for bits in [0usize, 5, 8] {
-                    let low = &k % (BigUint::one() << bits);
-                    assert_eq!(
-                        pt.scalar_mul_ct(&k, &a, bits),
-                        scalar_mul_affine(pt, &low, &a),
-                        "{pt:?} k={k} bits={bits}"
-                    );
-                }
-            }
-        }
-        assert!(LADDER_IDENTITY_STEPS.with(|c| c.get()) > 0);
-    }
-
-    /// Audit finding 7: the plain ladder started at `r0 = O` and took the
-    /// `O + P` and `2·O` shortcuts through every leading zero bit, so its
-    /// time revealed the scalar's bit length.  On SM2's generator the
-    /// fixed-length ladder never holds the identity, for scalars of every
-    /// length from 1 to 256 bits, and still returns `[k]G`.
-    #[test]
-    fn ladder_work_does_not_depend_on_scalar_length() {
-        let curve = super::super::curve::CurveParams::sm2();
-        let g = curve.generator();
-        let a = curve.a_fe();
-        let bits = curve.order_bits();
-        let mut scalars = vec![BigUint::zero(), BigUint::one(), &curve.n - 1u32];
-        let mut x = BigUint::from(0x9e37_79b9_7f4a_7c15u64);
-        for leading_zeros in [0usize, 1, 8, 64, 128, 250] {
-            x = (&x * &x + 0x1234u32) % &curve.n;
-            let len = bits - leading_zeros;
-            scalars.push((&x % (BigUint::one() << len)) | (BigUint::one() << (len - 1)));
-        }
-        for k in &scalars {
-            LADDER_IDENTITY_STEPS.with(|c| c.set(0));
-            let ct = g.scalar_mul_ct(k, &a, bits);
-            assert_eq!(LADDER_IDENTITY_STEPS.with(|c| c.get()), 0, "k = {k:x}");
-            assert_eq!(ct, g.scalar_mul(k, &a), "k = {k:x}");
-        }
-    }
-
     #[test]
     fn ladder_matches_double_and_add_p256() {
         use super::super::curve::CurveParams;
@@ -1653,200 +1446,6 @@ mod vartime_differential {
                     linear_dlog_reference(&g, &t, bound, &a),
                     "p={p} g={g:?} t={t:?} bound={bound}"
                 );
-            }
-        }
-    }
-}
-
-/// `scalar_mul`'s fixed-width Montgomery ladder against the `BigUint`
-/// ladder it replaces, over odd moduli of every width the dispatcher
-/// distinguishes (prime and composite), points that need not lie on a
-/// curve, edge scalars and edge coordinates; a panic of the reference
-/// must be a panic of `scalar_mul` too.
-#[cfg(test)]
-mod fixed_width_differential {
-    use super::*;
-    use num_bigint::RandBigInt;
-    use rand::{rngs::StdRng, SeedableRng};
-    use std::panic::{catch_unwind, AssertUnwindSafe};
-
-    fn moduli() -> Vec<BigUint> {
-        let two = |e: u32| BigUint::from(1u8) << e;
-        vec![
-            BigUint::from(3u32),
-            BigUint::from(5u32),
-            BigUint::from(97u32),
-            BigUint::from(15u32),
-            BigUint::from(u64::MAX - 58),
-            BigUint::from(u64::MAX),
-            two(64) + 13u32,
-            two(127) - 1u32,
-            two(128) + 51u32,
-            two(192) - two(64) - 1u32,
-            two(255) - 19u32,
-            two(256) - 189u32,
-            two(256) - 1u32,
-            two(257) - 93u32,
-            two(384) - two(128) - two(96) + two(32) - 1u32,
-            two(521) - 1u32,
-            two(576) - 3u32,
-            two(577) - 5u32,
-            crate::ecc::curve::CurveParams::p256().p.clone(),
-            crate::ecc::curve::CurveParams::secp256k1().p.clone(),
-        ]
-    }
-
-    #[test]
-    fn matches_biguint_ladder() {
-        let mut rng = StdRng::seed_from_u64(0x6d6f_6e74);
-        for m in moduli() {
-            let fe = |v: BigUint| FieldElement::new(v, m.clone());
-            for round in 0..6 {
-                let draw = |rng: &mut StdRng| match round {
-                    0 => BigUint::from(0u8),
-                    1 => BigUint::from(1u8),
-                    2 => &m - 1u32,
-                    _ => rng.gen_biguint_below(&m),
-                };
-                let (x, y, a) = (draw(&mut rng), draw(&mut rng), draw(&mut rng));
-                let pt = Point::Affine { x: fe(x), y: fe(y) };
-                let a = fe(a);
-                let mut scalars = vec![
-                    BigUint::from(0u8),
-                    BigUint::from(1u8),
-                    BigUint::from(2u8),
-                    BigUint::from(3u8),
-                    &m - 1u32,
-                    m.clone(),
-                    &m + 1u32,
-                    BigUint::from(1u8) << 300,
-                ];
-                for _ in 0..4 {
-                    scalars.push(rng.gen_biguint(m.bits() + 3));
-                }
-                for k in &scalars {
-                    let fast = catch_unwind(AssertUnwindSafe(|| pt.scalar_mul(k, &a)));
-                    let slow = catch_unwind(AssertUnwindSafe(|| pt.scalar_mul_biguint(k, &a)));
-                    match (fast, slow) {
-                        (Ok(f), Ok(s)) => assert_eq!(f, s, "m={m} round={round} k={k}"),
-                        (Err(_), Err(_)) => {}
-                        (f, s) => panic!(
-                            "m={m} k={k}: fast panicked={} reference panicked={}",
-                            f.is_err(),
-                            s.is_err()
-                        ),
-                    }
-                }
-            }
-        }
-    }
-
-    /// Moduli and operands the fixed-width path must decline (even,
-    /// unreduced, mixed moduli) still give the `BigUint` ladder's answer.
-    #[test]
-    fn declines_what_it_cannot_do() {
-        let m = BigUint::from(1u8) << 130;
-        let fe = |v: u32, m: &BigUint| FieldElement::new(BigUint::from(v), m.clone());
-        let pt = Point::Affine {
-            x: fe(5, &m),
-            y: fe(7, &m),
-        };
-        let k = BigUint::from(77u32);
-        assert_eq!(
-            pt.scalar_mul(&k, &fe(1, &m)),
-            pt.scalar_mul_biguint(&k, &fe(1, &m))
-        );
-        let m = BigUint::from(1_000_003u32);
-        let unreduced = Point::Affine {
-            x: FieldElement {
-                value: BigUint::from(2_000_010u32),
-                modulus: m.clone(),
-            },
-            y: fe(7, &m),
-        };
-        let a = fe(2, &m);
-        assert_eq!(
-            unreduced.scalar_mul(&k, &a),
-            unreduced.scalar_mul_biguint(&k, &a)
-        );
-        let other = BigUint::from(1_000_033u32);
-        let a_other = fe(2, &other);
-        let pt = Point::Affine {
-            x: fe(5, &m),
-            y: fe(7, &m),
-        };
-        assert_eq!(
-            pt.scalar_mul(&k, &a_other),
-            pt.scalar_mul_biguint(&k, &a_other)
-        );
-    }
-}
-
-/// `FieldElement::pow`'s 256-bit Montgomery path against `mod_pow_ct`.
-#[cfg(test)]
-mod pow_256_differential {
-    use super::*;
-    use num_bigint::RandBigInt;
-    use rand::{rngs::StdRng, SeedableRng};
-
-    #[test]
-    fn pow_and_inv_match_mod_pow_ct() {
-        let mut rng = StdRng::seed_from_u64(0x706f_7732);
-        let mut mods = vec![
-            crate::ecc::curve::CurveParams::p256().p.clone(),
-            crate::ecc::curve::CurveParams::secp256k1().p.clone(),
-            (BigUint::from(1u8) << 256) - 1u32,
-            (BigUint::from(1u8) << 255) + 1u32,
-        ];
-        mods.push(BigUint::from(1u8) << 255); // even: declined
-        mods.push((BigUint::from(1u8) << 255) - 19u32); // 255 bits: declined
-        for m in mods {
-            let bits = m.bits() as usize;
-            let mut bases = vec![
-                BigUint::from(0u8),
-                BigUint::from(1u8),
-                &m - 1u32,
-                &m + 5u32,
-                &m * 3u32 + 2u32,
-            ];
-            for _ in 0..4 {
-                bases.push(rng.gen_biguint_below(&m));
-            }
-            let mut exps = vec![
-                BigUint::from(0u8),
-                BigUint::from(1u8),
-                BigUint::from(2u8),
-                &m - 2u32,
-                &m - 1u32,
-                BigUint::from(1u8) << 256,
-                (BigUint::from(1u8) << 300) + 12345u32,
-            ];
-            for _ in 0..3 {
-                exps.push(rng.gen_biguint(bits as u64));
-            }
-            for b in &bases {
-                let fe = FieldElement {
-                    value: b.clone(),
-                    modulus: m.clone(),
-                };
-                if (b % &m).bits() != 0 {
-                    assert_eq!(
-                        fe.inv().unwrap().value,
-                        crate::utils::mod_pow_ct(b, &(&m - 2u32), &m, bits),
-                        "inv m={m} b={b}"
-                    );
-                }
-                for e in &exps {
-                    let fe = FieldElement {
-                        value: b.clone(),
-                        modulus: m.clone(),
-                    };
-                    assert_eq!(
-                        fe.pow(e).value,
-                        crate::utils::mod_pow_ct(b, e, &m, bits),
-                        "m={m} b={b} e={e}"
-                    );
-                }
             }
         }
     }

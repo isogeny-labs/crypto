@@ -153,7 +153,9 @@ use crate::cryptanalysis::fx_hash::{FxMap, FxSet};
 use crate::cryptanalysis::group_op_count;
 use crate::cryptanalysis::ic_boundary::MixHasher;
 use crate::cryptanalysis::ic_measurement::{self as measurement, Phase};
-use crate::cryptanalysis::koblitz_fast::{BatchScratch, FastCurve, FastPoint, FrobeniusCanon};
+use crate::cryptanalysis::koblitz_fast::{
+    BatchScratch, FastCurve, FastPoint, FrobeniusCanon, FrobeniusPowers,
+};
 use crate::cryptanalysis::koblitz_fast_arith::{pack_fast, FastPoint as ArithFastPoint};
 use crate::cryptanalysis::koblitz_fast_arith::{FastBinaryCurve, FastBinaryCurve128, FastPoint128};
 use crate::cryptanalysis::koblitz_groebner::{
@@ -14134,6 +14136,34 @@ struct FastRhoState {
     coefficient_b: u64,
 }
 
+/// Precomputed Shoup multiplier `(w, floor(w · 2^64 / m))` for `m < 2^63`.
+#[derive(Clone, Copy)]
+struct ShoupFactor {
+    w: u64,
+    ws: Option<u64>,
+}
+
+impl ShoupFactor {
+    #[inline]
+    fn new(w: u64, m: u64) -> Self {
+        let w = w % m;
+        let ws = (m >> 63 == 0).then(|| (((w as u128) << 64) / m as u128) as u64);
+        Self { w, ws }
+    }
+
+    #[inline(always)]
+    fn mul(self, x: u64, m: u64) -> u64 {
+        match self.ws {
+            Some(ws) => {
+                let q = ((ws as u128 * x as u128) >> 64) as u64;
+                let r = self.w.wrapping_mul(x).wrapping_sub(q.wrapping_mul(m));
+                r.min(r.wrapping_sub(m))
+            }
+            None => mulmod_u64(x, self.w, m),
+        }
+    }
+}
+
 /// The walk's constants: the curve, the subgroup order and `±λ^k mod r`
 /// for every `k < n`.
 struct FastRhoWalk<'a> {
@@ -14141,7 +14171,9 @@ struct FastRhoWalk<'a> {
     frobenius_degree: u32,
     orbit_length: u32,
     modulus: u64,
-    lambda_pow: Vec<u64>,
+    lambda_pos: Vec<ShoupFactor>,
+    lambda_neg: Vec<ShoupFactor>,
+    frob_powers: FrobeniusPowers,
     /// A point is stored when the mixed bits of its coordinates end in
     /// this many zeros, so the table holds about `2^16` of them however
     /// long the walk is.
@@ -14217,37 +14249,25 @@ impl FastRhoWalk<'_> {
         // pick the sign there.  Same representative as comparing every
         // `(x, y)` pair, at a little over half the squarings.
         let field = &self.fc.field;
-        let mut x = state.point.x;
-        let mut best_x = x;
-        let mut best_k = 0u32;
-        for k in 1..self.orbit_length {
-            x = field.sqr_k(x, self.frobenius_degree);
-            if x < best_x {
-                best_x = x;
-                best_k = k;
-            }
-        }
+        let (best_x, best_k) =
+            field.min_frobenius_orbit(state.point.x, self.orbit_length, self.frobenius_degree);
         charges.frobenius_maps += u64::from(self.orbit_length);
         charges.negations_examined += u64::from(self.orbit_length);
-        let y = field.sqr_k(state.point.y, best_k * self.frobenius_degree);
+        let shift = (best_k * self.frobenius_degree) % self.fc.n;
+        let y = self.frob_powers.apply(shift, state.point.y);
         let negated_y = best_x ^ y;
-        let lambda_k = self.lambda_pow[best_k as usize];
         let (point, factor) = if negated_y < y {
             (
                 FastPoint::affine(best_x, negated_y),
-                if lambda_k == 0 {
-                    0
-                } else {
-                    self.modulus - lambda_k
-                },
+                self.lambda_neg[best_k as usize],
             )
         } else {
-            (FastPoint::affine(best_x, y), lambda_k)
+            (FastPoint::affine(best_x, y), self.lambda_pos[best_k as usize])
         };
         FastRhoState {
             point,
-            coefficient_a: mulmod_u64(state.coefficient_a, factor, self.modulus),
-            coefficient_b: mulmod_u64(state.coefficient_b, factor, self.modulus),
+            coefficient_a: factor.mul(state.coefficient_a, self.modulus),
+            coefficient_b: factor.mul(state.coefficient_b, self.modulus),
         }
     }
 
@@ -14408,10 +14428,13 @@ fn signed_rho_fast(
         .first()
         .copied()
         .unwrap_or(0);
-    let mut lambda_pow = Vec::with_capacity(curve.n as usize);
+    let mut lambda_pos = Vec::with_capacity(curve.n as usize);
+    let mut lambda_neg = Vec::with_capacity(curve.n as usize);
     let mut current = 1u64;
     for _ in 0..curve.n {
-        lambda_pow.push(current);
+        lambda_pos.push(ShoupFactor::new(current, modulus));
+        let neg_cur = if current == 0 { 0 } else { modulus - current };
+        lambda_neg.push(ShoupFactor::new(neg_cur, modulus));
         current = mulmod_u64(current, lambda, modulus);
     }
     let walk = FastRhoWalk {
@@ -14419,7 +14442,9 @@ fn signed_rho_fast(
         frobenius_degree: curve.k,
         orbit_length: curve.n,
         modulus,
-        lambda_pow,
+        lambda_pos,
+        lambda_neg,
+        frob_powers: FrobeniusPowers::new(&fc.field, fc.n),
         trail_mask: rho_trail_mask(rho_expected_steps(modulus, curve.n)),
     };
     let g = fc.lift(curve.generator());

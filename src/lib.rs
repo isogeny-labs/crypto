@@ -7,6 +7,7 @@
 //! | `ecc`          | secp256k1/P-256/SM2/GOST-3410-2012 field ops, ECDSA, ECDH, SM2 sig/enc, GOST sig |
 //! | `symmetric`    | AES, ChaCha20-Poly1305, Serpent, Threefish, SM4, Kuznyechik, GOST Magma |
 //! | `asymmetric`   | RSA (keygen/enc/sig, CRT-CT), Paillier + ElGamal + EC-ElGamal HE |
+//! | `benchfmt`     | Go benchmark format reader/writer + `testing.B`-style harness |
 //! | `hash`         | SHA-256, SHA-3 (Keccak), BLAKE3, SM3, Streebog          |
 //! | `kdf`          | HKDF-SHA256, PBKDF2-HMAC-SHA256                         |
 //! | `pqc`          | Simplified Kyber/ML-KEM and binary-Goppa McEliece       |
@@ -18,6 +19,7 @@
 //! | `zk`           | Schnorr ZKP, Pedersen commitments, Chaum-Pedersen, Merkle tree |
 
 pub mod asymmetric;
+pub mod benchfmt;
 pub mod binary_ecc;
 pub mod bls12_381;
 pub mod build_provenance;
