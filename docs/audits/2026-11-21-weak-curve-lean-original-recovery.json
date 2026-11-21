@@ -22,11 +22,20 @@
     "restored_bytes": 346379,
     "s3_read": false
   },
+  "hosted_control": {
+    "head": "537d7f19254372bb30d73d20164cf0823c66f7af",
+    "workflow": "Workflow files parse",
+    "run": 44940920564,
+    "pull_step": "success: hydrated 1 file (0.3 MB), 0 already present, no S3 reads",
+    "workflow_parse_tests": "success",
+    "whole_job": "failure at draft_tier_gate.py --check after pull and parser tests",
+    "interpretation": "Original missing-input failure is repaired at this head; the workflow remains red for a separate draft-tier policy failure"
+  },
   "original_manifest_changed": false,
   "original_bytes_changed": false,
   "measurement_claim": null,
   "remaining": [
-    "Exact-head CI on the recovery candidate",
+    "Full workflow-parse job after draft-tier policy repair",
     "Other PR #4842 PCC and curve-name gate failures"
   ]
 }
