@@ -39,10 +39,15 @@ here=$(cd "$(dirname "$0")" && pwd); . "$here/common.sh"
 #       P2a ended after the run deadline                                                  -> LIMIT
 #       P2b an end line exit 137 and oom_kill > 0                                         -> OOM (Amendment 14)
 #       P2c an end line exit 137, no oom evidence                                         -> LOST
-#       P2p a 112Gi attempt whose memory peak exceeds 112 GiB                             -> OOM (owner decision 15)
+#       P2k cgroup oom_kill > 0, whatever the exit codes                                  -> OOM (censored at this size)
+#       P2p the memory peak exceeds the pod's numeric cgroup memory.max                   -> OOM (censored at this size)
 #       P2u no memory peak observable                                                     -> NOT_ADMITTED
-#       P2d admission rules hold                                                          -> ADMITTED
+#       P2d admission rules hold                                                          -> ADMITTED, with a reading
 #       P2e otherwise                                                                     -> NOT_ADMITTED
+#   Reading of an ADMITTED row at cap C (Amendment 7 B; owner decision 24): inconsistent true -> d_F = C; degree C
+#   completed with inconsistent, oversize and timed_out all false -> d_F >= C+1; oversize true (stop line "oversize")
+#   -> censored by size, d_F >= C stands; timed_out true without oversize (stop line "budget") -> censored by the
+#   budget; anything else -> no reading (owner). OOM and LIMIT read as censored, d_F >= C stands.
 #   P3  positive loss evidence dated before the run deadline                              -> LOST
 #   P4  a check-in at or after the run deadline shows the runner running, or done after the deadline, under s0 -> LIMIT
 #   P5  collected on --abort                                                              -> ABORTED
@@ -65,7 +70,7 @@ jsonlok() { [ ! -s "$1" ] || jq -e -s . "$1" >/dev/null 2>&1; }
 
 facts() {
   local R=$1 RES=$2 bad="" f stage cell s0 L0 ck acts cols K col O rs nstart pexit gexit oom cgp mmax man row floor
-  local r1 r2 r3 r4 r5 r6 r7 cgb cgsrc logmib limit disagree
+  local r1 r2 r3 r4 r5 r6 r7 cgb cgsrc logmib limit disagree lim stop
   # P0: every receipt the classifier reads must parse (fail closed).
   for f in "$R"/pod-create.json "$R"/pod-record.json "$R"/pod-state.json "$R"/pod-record-start.json "$R"/collect-[0-9]*.json "$R"/collect-started-*.json "$R"/transfer-*.json; do
     [ -e "$f" ] || continue; jsonok "$f" || bad="$bad ${f##*/}"
@@ -112,6 +117,16 @@ facts() {
   [ -n "$oom" ] || oom=null
   [ -f "$O/cgroup/memory.max" ] && mmax=$(jq -n --rawfile f "$O/cgroup/memory.max" '$f | rtrimstr("\n")')
   [ "$mmax" = null ] && [ -f "$O/cgroup/memory_memory.limit_in_bytes" ] && mmax=$(jq -n --rawfile f "$O/cgroup/memory_memory.limit_in_bytes" '$f | rtrimstr("\n")')
+  # The numeric memory limit the run had (P2p): the tree's cgroup memory.max, else the one read before start.
+  lim=$(jq -rn --argjson m "$mmax" '$m | if type == "string" and test("^[0-9]+$") then tonumber else null end')
+  if [ "$lim" = null ]; then lim=$(jq -r '(.cgroup_memory_limit // "") | if test("^[0-9]+$") then tonumber else null end' "$R/cgroup-prestart.json" 2>/dev/null || echo null); fi
+  [ -n "$lim" ] || lim=null
+  # The stop line of the cell's log ("budget" or "oversize"), read for the reading of section 2.
+  stop=null
+  if [ -n "$cell" ] && [ -f "$O/runs/$cell.log" ]; then
+    stop=$(grep -oE 'tower stop in step [0-9]+ \((budget|oversize)' "$O/runs/$cell.log" | tail -1 | sed -E 's/.*\(//' || true)
+    if [ -n "$stop" ]; then stop="\"$stop\""; else stop=null; fi
+  fi
   # Memory peaks (P2p, P2u): the pilot's VmHWM field (MiB; primary) and the cgroup figure (bytes; fallback).
   cgb=null cgsrc=null logmib=null limit=null
   for f in memory.peak:cgroup_v2_memory.peak memory_memory.max_usage_in_bytes:cgroup_v1_memory.max_usage_in_bytes; do
@@ -121,9 +136,9 @@ facts() {
     logmib=$(grep -oE 'memory [0-9]+ MB \(peak [0-9]+ MB\)' "$O/runs/$cell.log" | sed -E 's/.*peak ([0-9]+) MB\)/\1/' | sort -n | tail -1 || true)
     [ -n "$logmib" ] || logmib=null
   fi
-  case $stage in *:12800000000) limit='"56Gi"' ;; *:27900000000) limit='"112Gi"' ;; esac
+  case $stage in *:12800000000) limit='"56Gi"' ;; *:27900000000) limit='"112Gi"' ;; *:54000000000) limit='"238Gi"' ;; esac
   row=null
-  [ -n "$cell" ] && [ -f "$O/runs/$cell.jsonl" ] && row=$(jq -cs '[.[] | select(has("oversize"))] | first // null | if . == null then null else {oversize, timed_out} end' "$O/runs/$cell.jsonl" 2>/dev/null || echo null)
+  [ -n "$cell" ] && [ -f "$O/runs/$cell.jsonl" ] && row=$(jq -cs '[.[] | select(has("oversize"))] | first // null | if . == null then null else {oversize, timed_out, inconsistent, degree_reached} end' "$O/runs/$cell.jsonl" 2>/dev/null || echo null)
   [ -n "$row" ] || row=null
   # Admission rules 1-7 (section 6), against the binary hashes pinned in common.sh.
   r1=false r2=false r3=false r4=false r5=false r6=false r7=false
@@ -147,14 +162,14 @@ facts() {
   jq -n --arg bad "$bad" --argjson dis "$disagree" --arg stage "$stage" --arg cell "$cell" --arg s0 "$s0" --arg L0 "$L0" \
     --argjson ck "$ck" --argjson acts "$acts" --argjson col "$col" --argjson ncol "$(jq length <<<"$cols")" \
     --argjson rs "$rs" --argjson nstart "$nstart" --argjson pexit "$pexit" --argjson gexit "$gexit" --argjson oom "$oom" \
-    --argjson cgp "$cgp" --argjson mmax "$mmax" --argjson row "$row" --argjson dls $DEADLINE_S \
+    --argjson cgp "$cgp" --argjson mmax "$mmax" --argjson row "$row" --argjson dls $DEADLINE_S --argjson lim "$lim" --argjson stop "$stop" \
     --argjson cgb "$cgb" --argjson cgsrc "$cgsrc" --argjson logmib "$logmib" --argjson size "$limit" \
     --argjson adm "{\"r1\":$r1,\"r2\":$r2,\"r3\":$r3,\"r4\":$r4,\"r5\":$r5,\"r6\":$r6,\"r7\":$r7}" \
     '{unparsable:$bad, collections_disagree:$dis, stage:$stage, cell:$cell, s0:(if $s0 == "" then null else $s0 end),
       L0:(if $L0 == "" then null else $L0 end),
       checkins:$ck, actions:$acts, collect:$col, collections:$ncol,
       tree:{runner_state:$rs, start_lines:$nstart, pilot_exit:$pexit, gridzeros_exit:$gexit,
-      cgroup_present:$cgp, oom_kill:$oom, memory_max:$mmax}, row:$row, admission:$adm,
+      cgroup_present:$cgp, oom_kill:$oom, memory_max:$mmax, limit_bytes:$lim, stop:$stop}, row:$row, admission:$adm,
       mem:{size:$size, cgroup_peak_bytes:$cgb, cgroup_peak_source:$cgsrc, pilot_peak_mib:$logmib}, deadline_s:$dls}'
 }
 
@@ -203,7 +218,6 @@ decide() { jq -c --arg ver "$CLASSIFIER_VERSION" --arg fsha "$(sha256sum "$here/
        and $f.tree.runner_state != null and $f.tree.runner_state.state == "done" and $f.tree.runner_state.started == $s0
        and $f.tree.runner_state.exit == $pre.live.exit and $f.tree.start_lines == 1) as $secured
     | ($f.tree.pilot_exit == 137 or $f.tree.gridzeros_exit == 137) as $k137
-    | 120259084288 as $G112
     | (if $f.mem.pilot_peak_mib != null then $f.mem.pilot_peak_mib * 1048576 else null end) as $pilotb
     | (if $pilotb != null then {peak_bytes:$pilotb, source:"pilot_log_VmHWM_MiB"}
        elif $f.mem.cgroup_peak_bytes != null then {peak_bytes:$f.mem.cgroup_peak_bytes, source:$f.mem.cgroup_peak_source}
@@ -216,7 +230,8 @@ decide() { jq -c --arg ver "$CLASSIFIER_VERSION" --arg fsha "$(sha256sum "$here/
         if ($f.tree.runner_state.ended | ep) > $dl then $base + {class:"LIMIT", rule:"P2a", why:"the runner ended at \($f.tree.runner_state.ended), after the run deadline", memory:$mem}
         elif $k137 and $oomk then $base + {class:"OOM", rule:"P2b", memory:$mem, why:"exit 137 with cgroup oom_kill \($f.tree.oom_kill) (Amendment 14 OOMKilled)"}
         elif $k137 then $base + {class:"LOST", rule:"P2c", memory:$mem, why:"exit 137 without oom evidence (oom_kill \($f.tree.oom_kill // "absent"))"} + $rl
-        elif $f.mem.size == "112Gi" and $pk.peak_bytes != null and $pk.peak_bytes > $G112 then $base + {class:"OOM", rule:"P2p", why:"-m112 attempt with memory peak \($pk.peak_bytes) bytes (\($pk.source)) > 112 GiB; censored (owner decision 15)", memory:$mem}
+        elif $oomk then $base + {class:"OOM", rule:"P2k", memory:$mem, why:"cgroup oom_kill \($f.tree.oom_kill) (no exit 137 in the end lines); censored at this size"}
+        elif $pk.peak_bytes != null and $f.tree.limit_bytes != null and $pk.peak_bytes > $f.tree.limit_bytes then $base + {class:"OOM", rule:"P2p", why:"memory peak \($pk.peak_bytes) bytes (\($pk.source)) above the pod'"'"'s cgroup memory.max \($f.tree.limit_bytes); censored at this size", memory:$mem}
         elif $pk.peak_bytes == null then $base + {class:"NOT_ADMITTED", rule:"P2u", why:"no memory peak observable (no pilot VmHWM field and no cgroup peak file)", memory:$mem}
         elif ($f.admission | all(.[]; . == true)) then $base + {class:"ADMITTED", rule:"P2d", why:"completed; admission rules 1-7 hold", row:$f.row, memory:$mem}
         else $base + {class:"NOT_ADMITTED", rule:"P2e", why:"completed, but admission rules failed: \([$f.admission | to_entries[] | select(.value != true) | .key] | join(","))", memory:$mem}
@@ -235,6 +250,18 @@ decide() { jq -c --arg ver "$CLASSIFIER_VERSION" --arg fsha "$(sha256sum "$here/
       else $base + {class:"PENDING", rule:"P8", why:"not collected yet"}
       end
     end
+  # The reading (Amendment 7 B at cap C; owner decision 24), from the class and the row only.
+  | ([ $f.stage | capture("^cap:[0-9]+:[01]:(?<c>[0-9]+):")? | .c | tonumber ] | first) as $cap
+  | . + (if $cap == null then {} else {reading:(
+      if .class == "ADMITTED" then (.row // {}) as $r
+        | if $r.inconsistent == true then {d_F:"= \($cap)", why:"refutes at cap \($cap)"}
+          elif $r.oversize == true and ($f.tree.stop // "oversize") == "oversize" then {d_F:">= \($cap)", censored:"size", why:"stopped oversize at this --max-dense; censored, the bound from the earlier caps stands"}
+          elif $r.oversize == false and $r.timed_out == true and ($f.tree.stop // "budget") == "budget" then {d_F:">= \($cap)", censored:"budget", why:"stopped by the wall budget; censored, the bound from the earlier caps stands"}
+          elif $r.inconsistent == false and $r.oversize == false and $r.timed_out == false and $r.degree_reached == $cap then {d_F:">= \($cap + 1)", why:"degree \($cap) completed without refuting"}
+          else {d_F:null, why:"no reading: the row and the stop line do not match a case of the table; owner"} end
+      elif .class == "OOM" then {d_F:">= \($cap)", censored:"memory", why:"memory kill or a peak above the limit; censored, the bound from the earlier caps stands"}
+      elif .class == "LIMIT" then {d_F:">= \($cap)", censored:"time limit", why:"stopped at the job time limit; censored, the bound from the earlier caps stands"}
+      else null end)} end)
   + {facts:{tree:$f.tree, admission:$f.admission, mem:$f.mem, L0:$f.L0, s0:$f.s0, cell:$f.cell, collections:$f.collections}}'; }
 classify() { facts "$1" "$2" | decide; }
 

@@ -20,7 +20,7 @@ HAVE_LAYER=0
 if [ -f "$RPC_LAYER_SRC" ] && [ "$(sha256sum "$RPC_LAYER_SRC" | cut -d' ' -f1)" = a0f7e28eb0759ddefc4b906974866d2a2215d4705e25e9fd1fca45513b8b1971 ] \
    && [ -f "$RPC_BIN_SRC/pkm_tower_pilot" ]; then HAVE_LAYER=1; fi
 echo "image layer available: $HAVE_LAYER"
-BASE=pkm-x-t14-k0-c7-m112 R1=pkm-x-t14-k0-c7-m112-r1 STG=cap:14:0:7:27900000000
+BASE=pkm-x-t14-k0-c7-d54 R1=pkm-x-t14-k0-c7-d54-r1 STG=cap:14:0:7:54000000000
 
 rec() { # rec ID OK(0|1) EXPECTED OBSERVED DESCRIPTION
   local r=PASS; [ "$2" = 0 ] || r=FAIL
@@ -36,14 +36,14 @@ G() { git -C "$SB/repo" -c user.email=t@t -c user.name=t -c push.negotiate=false
 mksb() { # fresh sandbox; sets SB, R (route dir), ST (stub dir), and the environment of the scripts
   SB=$(mktemp -d "$WORK/sb.XXXX"); local s="$SB/repo/research/pkm_falldegree_unblock_20261107"
   R="$s/runpod_capped"; mkdir -p "$R" "$SB/repo/research/prime_fall_degree_20261027"
-  cp -a "$RC"/{common.sh,run.sh,fetch.sh,reap.sh,rp_pinned.sh,server_pinned.py,ledger.tsv,make_requests_m112.sh,requests_m112,.gitignore} "$R/"
+  cp -a "$RC"/{common.sh,run.sh,fetch.sh,reap.sh,rp_pinned.sh,server_pinned.py,ledger.tsv,make_requests_d54.sh,requests_d54,.gitignore} "$R/"
   cp -a "$STUDY/image" "$STUDY/requests_r2i" "$s/"
   cp -a "$STUDY/../prime_fall_degree_20261027/PREREGISTRATION.md" "$STUDY/../prime_fall_degree_20261027/run.sh" "$SB/repo/research/prime_fall_degree_20261027/"
   git init -q -b main "$SB/repo" && G add -A && G commit -qm sandbox
   git init -q --bare "$SB/origin.git" && G remote add origin "$SB/origin.git" && G push -q origin main 2>/dev/null
   ST="$SB/stub"; mkdir -p "$ST" "$SB/bin" "$SB/state" "$ST/pretree/cgroup"; cp "$T/curl_stub.sh" "$SB/bin/curl"
-  echo 128000000000 > "$ST/pretree/cgroup/memory.max"     # what the second smoke pod's boot loop copied before start
-  jq -n '{cost:1.04, cloud:"SECURE", cpu:{id:"cpu5m", vcpuCount:16, memory:128}, dataCenterId:"EU-RO-1", disk:20,
+  echo 256000000000 > "$ST/pretree/cgroup/memory.max"     # a 256 GB pod (the 128 GB smoke pod showed 128000000000)
+  jq -n '{cost:2.08, cloud:"SECURE", cpu:{id:"cpu5m", vcpuCount:32, memory:256}, dataCenterId:"EU-RO-1", disk:20,
           locked:false, mounts:{}, globalNetworking:{enabled:false}, registry:null, template:null, cudaVersion:null,
           runtime:null, ssh:{proxy:"stub"}}' > "$ST/create-template.json"
   echo '[]' > "$ST/pods.json"
@@ -89,10 +89,10 @@ s_stale() { freeze; sed -i "s/^# complete_as_of\t.*/# complete_as_of\t$(date -u 
 s_malformed() { study_ready; printf 'broken line\n' >> "$R/ledger.tsv"; }
 s_stateinside() { study_ready; export RPC_STATE="$R/state-inside"; }
 s_prestart2() { study_ready; mkdir -p "$R/receipts/$BASE.prestart-1" "$R/receipts/$BASE.prestart-2"; }
-s_reqedit() { study_ready; jq '.job.seconds = 90001' "$R/requests_m112/pfd-x-t14-k0-c7-m112.json" > "$SB/x" && mv "$SB/x" "$R/requests_m112/pfd-x-t14-k0-c7-m112.json"; }
+s_reqedit() { study_ready; jq '.job.seconds = 90001' "$R/requests_d54/pfd-x-t14-k0-c7-d54.json" > "$SB/x" && mv "$SB/x" "$R/requests_d54/pfd-x-t14-k0-c7-d54.json"; }
 s_reqedit_pin() { # the request edited AND its pin updated: the re-derivation catches it
-  jq '.job.seconds = 90001' "$R/requests_m112/pfd-x-t14-k0-c7-m112.json" > "$SB/x" && mv "$SB/x" "$R/requests_m112/pfd-x-t14-k0-c7-m112.json"
-  sed -i "s/^STUDY_REQUEST_SHA=[0-9a-f]*/STUDY_REQUEST_SHA=$(sha256sum "$R/requests_m112/pfd-x-t14-k0-c7-m112.json" | cut -d' ' -f1)/" "$R/common.sh"; study_ready; }
+  jq '.job.seconds = 90001' "$R/requests_d54/pfd-x-t14-k0-c7-d54.json" > "$SB/x" && mv "$SB/x" "$R/requests_d54/pfd-x-t14-k0-c7-d54.json"
+  sed -i "s/^STUDY_REQUEST_SHA=[0-9a-f]*/STUDY_REQUEST_SHA=$(sha256sum "$R/requests_d54/pfd-x-t14-k0-c7-d54.json" | cut -d' ' -f1)/" "$R/common.sh"; study_ready; }
 s_r1lost() { study_ready; outcome $BASE LOST; outcome $R1 LOST; }
 s_ledgerrow() { study_ready; printf '%s/oldpod\trunpod_capped\tAmendment 33\tclosed\t1.0000\treceipts/%s\n' $BASE $BASE >> "$R/ledger.tsv"; }
 s_imgdisagree() { study_ready; jq '.layer.digest = "sha256:0000000000000000000000000000000000000000000000000000000000000000"' "$R/../image/image.json" > "$SB/x" && mv "$SB/x" "$R/../image/image.json"; }
@@ -106,8 +106,8 @@ deny_case A06 "order: -r1 requested with no base run" s_ready $R1 $STG
 deny_case A07 "order: -r1 requested when the base is ADMITTED" s_admitted $R1 $STG
 deny_case A08 "order: -r1 requested when the base is LOST with relaunch owner" s_lostowner $R1 $STG
 deny_case A09 "order: -r1 requested while the base is in flight (receipts, no outcome)" s_inflight $R1 $STG
-deny_case A10 "stage cap 6 at -m112 for the base name (only cap:14:0:7:27900000000)" s_ready $BASE cap:14:0:6:27900000000
-deny_case A11 "stage cap 7 at the 56Gi --max-dense for the base name" s_ready $BASE cap:14:0:7:12800000000
+deny_case A10 "stage cap 7 at the -m112 --max-dense for the base name (only cap:14:0:7:54000000000)" s_ready $BASE cap:14:0:7:27900000000
+deny_case A11 "stage cap 6 at --max-dense 54e9 for the base name" s_ready $BASE cap:14:0:6:54000000000
 deny_case A12 "'## Amendment 33' not in PREREGISTRATION.md" s_nofreeze $BASE $STG
 deny_case A13 "rp_pinned.sh modified (one line appended)" s_rpmod $BASE $STG
 deny_case A14 "server_pinned.py modified (one line appended)" s_srvmod $BASE $STG
@@ -132,7 +132,8 @@ deny_case A28 "S3: image.json layer digest disagrees with the pin in common.sh" 
 deny_case A29 "development stage with --max-dense 999" s_none pkm-x-dev-a cap:8:0:5:999
 deny_case A30 "a draft Amendment 18 name (pkm-x-t14-k1-c6)" s_ready pkm-x-t14-k1-c6 cap:14:1:6:12800000000
 deny_case A31 "a draft Amendment 18 name (pkm-x-t13-k0-c6-r3)" s_ready pkm-x-t13-k0-c6-r3 cap:13:0:6:12800000000
-deny_case A32 "draw 1 of the same cap (not this route's cell)" s_ready pkm-x-t14-k1-c7-m112 cap:14:1:7:27900000000
+deny_case A32 "draw 1 of the same cap (needs a later owner decision)" s_ready pkm-x-t14-k1-c7-d54 cap:14:1:7:54000000000
+deny_case A33 "the retired name of owner decision 23 (pkm-x-t14-k0-c7-m112)" s_ready pkm-x-t14-k0-c7-m112 cap:14:0:7:27900000000
 
 # ===================================================================== B, C, F helpers (need the layer)
 mktree() { # mktree DIR STAGE STARTED ENDED PILOT_EXIT GZ_EXIT OOM_KILL|none [START_LINES] [CG_PEAK_BYTES|v1:BYTES|-] [LOG: keep|strip|MiB] [OVERSIZE]
@@ -146,7 +147,7 @@ mktree() { # mktree DIR STAGE STARTED ENDED PILOT_EXIT GZ_EXIT OOM_KILL|none [ST
   local rx=0; [ "$pe" = 0 ] && [ "$ge" = 0 ] || rx=1
   jq -nc --arg s "$s0" --arg e "$en" --arg st "$st" --argjson x $rx '{state:"done",exit:$x,started:$s,ended:$e,stages:[$st]}' > "$d/runner_state.json"
   jq --arg st "$st" '.stages = [$st]' "$d/runner_request.json" > "$d/rr" && mv "$d/rr" "$d/runner_request.json"
-  if [ "$ok" != none ]; then mkdir -p "$d/cgroup"; echo 128000000000 > "$d/cgroup/memory.max"; printf 'low 0\nhigh 0\nmax 0\noom %s\noom_kill %s\n' "$ok" "$ok" > "$d/cgroup/memory.events"; echo "$en" > "$d/cgroup/final-at"; fi
+  if [ "$ok" != none ]; then mkdir -p "$d/cgroup"; echo 256000000000 > "$d/cgroup/memory.max"; printf 'low 0\nhigh 0\nmax 0\noom %s\noom_kill %s\n' "$ok" "$ok" > "$d/cgroup/memory.events"; echo "$en" > "$d/cgroup/final-at"; fi
   case $cgpk in -) ;; v1:*) mkdir -p "$d/cgroup"; echo "${cgpk#v1:}" > "$d/cgroup/memory_memory.max_usage_in_bytes" ;; *) mkdir -p "$d/cgroup"; echo "$cgpk" > "$d/cgroup/memory.peak" ;; esac
   case $lg in keep) ;; strip) sed -i -E 's/, memory [0-9]+ MB \(peak [0-9]+ MB\)//' "$d/runs/$cell.log" ;;
     *) echo "tower step 99: degree 6, synthetic test line, memory 100 MB (peak $lg MB)" >> "$d/runs/$cell.log" ;; esac
@@ -166,21 +167,21 @@ startrun() { ID=$1; mksb; run ./run.sh pkm-x-dev-c cap:8:0:5:12800000000 >/dev/n
 
 if [ "$HAVE_LAYER" = 1 ]; then
 # ===================================================================== B. launch paths against the stub
-ID=B01; mksb; study_ready; jq -n --arg c "$(isod $(( $(date +%s) - 600 )))" '[{id:"other1",name:"pkm-x-dev-zzz",status:"RUNNING",cost:1.04,createdAt:$c}]' > "$ST/pods.json"
+ID=B01; mksb; study_ready; jq -n --arg c "$(isod $(( $(date +%s) - 600 )))" '[{id:"other1",name:"pkm-x-dev-zzz",status:"RUNNING",cost:2.08,createdAt:$c}]' > "$ST/pods.json"
 rc=$(run ./run.sh $BASE $STG); [ "$rc" = 3 ] && [ "$(creates)" = 0 ] && [ ! -d "$R/receipts/$BASE" ]
 rec B01 $? "exit 3, no create" "exit $rc, creates $(creates)" "a pkm-x- pod is live (serial rule)"
 ID=B02; mksb; study_ready; echo '{"availability":"NONE","id":"cpu5m","price":{"securePerVcpu":0.065,"serverlessPerVcpu":0},"ramGbPerVcpu":8,"vcpu":{"max":32,"min":2}}' > "$ST/catalog.json"
 rc=$(run ./run.sh $BASE $STG); [ "$rc" = 10 ] && [ "$(creates)" = 0 ] && [ ! -d "$R/receipts/$BASE" ]
 rec B02 $? "exit 10, no create, no receipts dir" "exit $rc, creates $(creates), dir $([ -d "$R/receipts/$BASE" ] && echo yes || echo no)" "catalog availability NONE for cpu5m at 16 vCPU: no attempt"
-ID=B03; mksb; study_ready; echo '{"availability":"HIGH","id":"cpu5m","price":{"securePerVcpu":0.084,"serverlessPerVcpu":0},"ramGbPerVcpu":8,"vcpu":{"max":32,"min":2}}' > "$ST/catalog.json"
+ID=B03; mksb; study_ready; echo '{"availability":"HIGH","id":"cpu5m","price":{"securePerVcpu":0.068,"serverlessPerVcpu":0},"ramGbPerVcpu":8,"vcpu":{"max":32,"min":2}}' > "$ST/catalog.json"
 rc=$(run ./run.sh $BASE $STG); [ "$rc" = 3 ] && [ "$(creates)" = 0 ] && grep -q 'cost guard' "$OUTD/B03.txt"
-rec B03 $? "exit 3 (per-job guard), no create" "exit $rc, creates $(creates)" "price 0.084 x 16 = 1.344/h x 30 h = US\$40.32 > US\$40"
-ID=B04; mksb; study_ready; printf 'test-row/x\ttest\ttest\tclosed\t13.0000\ttest\n' >> "$R/ledger.tsv"
+rec B03 $? "exit 3 (per-job guard), no create" "exit $rc, creates $(creates)" "price 0.068 x 32 = 2.176/h x 30 h = US\$65.28 > US\$65"
+ID=B04; mksb; study_ready; printf 'test-row/x\ttest\ttest\tclosed\t6.7700\ttest\n' >> "$R/ledger.tsv"
 rc=$(run ./run.sh $BASE $STG); [ "$rc" = 3 ] && [ "$(creates)" = 0 ] && grep -q 'study guard' "$OUTD/B04.txt"
-rec B04 $? "exit 3 (study guard)" "exit $rc, creates $(creates)" "ledger US\$465.84 + 13.00 = 478.84, + worst case US\$31.20 = 510.04 > US\$510"
-ID=B04b; mksb; study_ready; printf 'test-row/x\ttest\ttest\tclosed\t12.9000\ttest\n' >> "$R/ledger.tsv"
+rec B04 $? "exit 3 (study guard)" "exit $rc, creates $(creates)" "ledger US\$465.84 + 6.77 = 472.61, + worst case US\$62.40 = 535.01 > US\$535"
+ID=B04b; mksb; study_ready; printf 'test-row/x\ttest\ttest\tclosed\t6.7500\ttest\n' >> "$R/ledger.tsv"
 rc=$(run ./run.sh $BASE $STG); [ "$rc" = 0 ] && [ "$(creates)" = 1 ]
-rec B04b $? "exit 0 (started)" "exit $rc, creates $(creates)" "ledger US\$478.74 + worst case US\$31.20 = 509.94 <= US\$510"
+rec B04b $? "exit 0 (started)" "exit $rc, creates $(creates)" "ledger US\$472.59 + worst case US\$62.40 = 534.99 <= US\$535"
 ID=B05; mksb; study_ready; echo '.cloud = "COMMUNITY"' > "$ST/create-response-patch.jq"
 rc=$(run ./run.sh $BASE $STG)
 [ "$rc" = 4 ] && grep -q 'DELETE https://api.runpod.io/v2/pods/stubpod1' "$ST/calls.log" && [ -d "$R/receipts/$BASE.prestart-1" ] && [ ! -e "$R/receipts/$BASE" ] \
@@ -189,7 +190,7 @@ rc=$(run ./run.sh $BASE $STG)
 rec B05 $? "exit 4, delete logged then made, receipts -> .prestart-1, ledger row closed" "exit $rc, pods left $(pods)" "create response cloud COMMUNITY (not the SECURE tier)"
 ID=B06; mksb; study_ready; echo '.cost = 0.98' > "$ST/create-response-patch.jq"
 rc=$(run ./run.sh $BASE $STG); [ "$rc" = 4 ] && [ "$(pods)" = 0 ] && [ -d "$R/receipts/$BASE.prestart-1" ]
-rec B06 $? "exit 4, pod deleted" "exit $rc, pods left $(pods)" "create response cost 0.98 differs from the catalog price (0.065 x 16 = 1.04)"
+rec B06 $? "exit 4, pod deleted" "exit $rc, pods left $(pods)" "create response cost 0.98 differs from the catalog price (0.065 x 32 = 2.08)"
 ID=B07; mksb; study_ready; touch "$ST/create-timeout"
 rc=$(run ./run.sh $BASE $STG); [ "$rc" = 4 ] && [ "$(pods)" = 0 ] && [ -d "$R/receipts/$BASE.prestart-1" ] && grep -q 'pre-start delete pod stubpod1' "$OUTD/B07.txt"
 rec B07 $? "exit 4, pod found by name and deleted" "exit $rc, pods left $(pods)" "create call timed out but the pod exists (trap set before create)"
@@ -202,15 +203,15 @@ rec B09 $? "exit 5, pod deleted, not an attempt" "exit $rc" "runner would start 
 unset STUB_CREATED_AGO
 ID=B10; mksb; rc=$(run ./run.sh pkm-x-dev-t1 cap:8:0:5:12800000000); D="$R/receipts_dev/pkm-x-dev-t1"; tok=$(cat "$SB/state/pkm-x-dev-t1.token")
 ok=1; [ "$rc" = 0 ] && [ -f "$D/start.json" ] && [ -f "$D/pod-state.json" ] && jq -e '.run_deadline_provisional and .hard_deadline' "$D/pod-state.json" >/dev/null \
-  && jq -e '.env.RUNNER_TOKEN == "<withheld>" and .cloud == "SECURE" and .cpu == {id:"cpu5m", vcpuCount:16} and .entrypoint == ["bash","-c"]
+  && jq -e '.env.RUNNER_TOKEN == "<withheld>" and .cloud == "SECURE" and .cpu == {id:"cpu5m", vcpuCount:32} and .entrypoint == ["bash","-c"]
             and (has("interruptible") | not) and (.image | test("^python:3.12-slim@sha256:5e2bdb1b"))' "$D/pod-request.json" >/dev/null \
   && jq -e 'keys == ["cloud","cmd","cpu","disk","entrypoint","env","image","name","ports"] and (.env | keys) == ["RUNNER_TOKEN"]' "$ST/create-body.json" >/dev/null \
   && ! grep -rqF "$tok" "$D" && ! grep -F -- '-X POST https://api.runpod.io/v2/pods' "$ST/calls.log" | grep -qF "$tok" && ! grep -qF dummy-test-key "$ST/calls.log" \
   && ! grep -rqE '"(args|env|ssh)"' "$D"/pod-create.json "$D"/pod-record*.json \
-  && jq -e '.cgroup_memory_limit == "128000000000"' "$D/cgroup-prestart.json" >/dev/null \
-  && jq -e '.price == 1.04 and .availability == "HIGH" and .http == 200' "$D/price.jsonl" >/dev/null \
+  && jq -e '.cgroup_memory_limit == "256000000000"' "$D/cgroup-prestart.json" >/dev/null \
+  && jq -e '.price == 2.08 and .availability == "HIGH" and .http == 200' "$D/price.jsonl" >/dev/null \
   && jq -e '.dataCenterId == null' "$D/pod-create.json" >/dev/null && jq -e '.dataCenterId == "EU-RO-1" and .status == "RUNNING"' "$D/pod-record-ready.json" >/dev/null \
-  && grep -q 'cgsnap' "$D/boot-template.sh" && grep -qP '^pkm-x-dev-t1/stubpod1\t.*\topen\t31.2000' "$R/ledger.tsv" && grep -q 'COMMIT AND PUSH NOW' "$OUTD/B10.txt" \
+  && grep -q 'cgsnap' "$D/boot-template.sh" && grep -qP '^pkm-x-dev-t1/stubpod1\t.*\topen\t62.4000' "$R/ledger.tsv" && grep -q 'COMMIT AND PUSH NOW' "$OUTD/B10.txt" \
   && ! grep -qE 'rest\.runpod\.io|graphql' "$ST/calls.log" && ok=0
 rec B10 $ok "exit 0; v2 create body keys only; token and key absent from receipts and create argv; command and env dropped from saved records; cgroup limit read before start; data center read when ready; ledger row at 30 h; no v1 or GraphQL call" \
   "exit $rc; X-Token argv lines (rp_pinned.sh, disclosed): $(grep -cF "$tok" "$ST/calls.log")" "development launch end to end against the v2 stub"
@@ -218,7 +219,7 @@ cp "$ST/create-body.json" "$WORK/b10-create-body.json"
 ID=B11; mksb; study_ready; rc=$(run ./run.sh $BASE $STG)
 rc2=$( ( cd "$R" && ./run.sh $R1 $STG ) > "$OUTD/B11b.txt" 2>&1; echo $?)
 [ "$rc" = 0 ] && [ "$rc2" = 3 ] && grep -q "BLOCKED:$BASE" "$OUTD/B11b.txt" && grep -q 'RPC_BIN files are the files of image layer' "$OUTD/B11.txt" && grep -q 'git HEAD [0-9a-f]\{40\}' "$OUTD/B11.txt" \
-  && grep -q 'cell request runpod_capped/requests_m112/pfd-x-t14-k0-c7-m112.json sha256 44e009f1' "$OUTD/B11.txt" \
+  && grep -q 'cell request runpod_capped/requests_d54/pfd-x-t14-k0-c7-d54.json sha256 089176f2' "$OUTD/B11.txt" \
   && jq -e --arg s "$STG" '.stages == [$s]' "$ST/start-body.json" >/dev/null
 rec B11 $? "the study run starts with stage $STG and the pinned request (exit 0); its -r1 is refused while it is in flight (exit 3)" "exit $rc then $rc2" "study launch $BASE, then $R1"
 ID=B12; jq -r '.cmd[0]' "$WORK/b10-create-body.json" > "$WORK/boot.sh"; bash -n "$WORK/boot.sh" > "$OUTD/B12.txt" 2>&1; r=$?
@@ -231,9 +232,9 @@ sed -n '1,/^exec python3/p' "$WORK/boot.sh" | sed '$d' | sed "s#/sys/fs/cgroup#$
 ( bash "$L/loop.sh"; sleep 1; echo '{"state":"done"}' > "$L/res/runner_state.json"; sleep 7 ) > "$OUTD/B13.txt" 2>&1
 [ -f "$L/res/cgroup/memory.max" ] && [ -f "$L/res/cgroup/memory.events" ] && [ -f "$L/res/cgroup/final-at" ] && grep -q 'oom_kill 1' "$L/res/cgroup/memory.events"
 rec B13 $? "memory.max, memory.events and final-at copied" "$(ls "$L/res/cgroup" 2>/dev/null | tr '\n' ' ')" "the boot loop copies cgroup v2 files and writes its final copy after runner_state.json"
-ID=B14; mksb; echo 60000000000 > "$ST/pretree/cgroup/memory.max"; rc=$(run ./run.sh pkm-x-dev-small cap:8:0:5:12800000000)
+ID=B14; mksb; echo 255999999999 > "$ST/pretree/cgroup/memory.max"; rc=$(run ./run.sh pkm-x-dev-small cap:8:0:5:54000000000)
 [ "$rc" = 4 ] && [ "$(pods)" = 0 ] && [ -d "$R/receipts_dev/pkm-x-dev-small.prestart-1" ] && ! grep -q '/start' "$ST/calls.log"
-rec B14 $? "exit 4 before start, pod deleted" "exit $rc" "S4: cgroup memory.max 60,000,000,000 bytes (< 112 GiB)"
+rec B14 $? "exit 4 before start, pod deleted" "exit $rc" "S4: cgroup memory.max 255,999,999,999 bytes (one byte under the 256,000,000,000 floor)"
 ID=B15; mksb; rm -f "$ST/pretree/cgroup/memory.max"; rc=$(run ./run.sh pkm-x-dev-nocg cap:8:0:5:12800000000)
 [ "$rc" = 4 ] && [ "$(pods)" = 0 ] && ! grep -q '/start' "$ST/calls.log"
 rec B15 $? "exit 4 before start, pod deleted" "exit $rc" "S4: no cgroup memory limit file before start (unobservable: owner)"
@@ -241,13 +242,13 @@ ID=B16; mksb; rc=$(run ./run.sh pkm-x-dev-r cap:8:0:5:12800000000); rm -rf "$R/r
 rc2=$( (cd "$R" && ./run.sh pkm-x-dev-r cap:8:0:5:12800000000) > "$OUTD/B16b.txt" 2>&1; echo $?)
 [ "$rc" = 0 ] && [ "$rc2" = 3 ] && grep -q 'already has a row' "$OUTD/B16b.txt"
 rec B16 $? "exit 0, then exit 3 (ledger row)" "exit $rc then $rc2" "N6: receipts and token lost after a launch, pod gone: the same name is refused"
-ID=B17; mksb; echo '.cpu.memory = 64' > "$ST/record-patch.jq"; rc=$(run ./run.sh pkm-x-dev-mem cap:8:0:5:27900000000)
+ID=B17; mksb; echo '.cpu.memory = 128' > "$ST/record-patch.jq"; rc=$(run ./run.sh pkm-x-dev-mem cap:8:0:5:27900000000)
 [ "$rc" = 4 ] && [ "$(pods)" = 0 ] && ! grep -q '/start' "$ST/calls.log" && grep -q 'REFUSED pod record' "$OUTD/B17.txt"
-rec B17 $? "exit 4 before start, pod deleted" "exit $rc" "GET record cpu.memory 64 GB, below the 121 GB floor (112 GiB)"
+rec B17 $? "exit 4 before start, pod deleted" "exit $rc" "GET record cpu.memory 128 GB, below the 256 GB floor"
 ID=B18; mksb; echo '.dataCenterId = null' > "$ST/record-patch.jq"; rc=$(run ./run.sh pkm-x-dev-dc cap:8:0:5:12800000000)
 [ "$rc" = 4 ] && [ "$(pods)" = 0 ] && ! grep -q '/upload' "$ST/calls.log" && grep -q 'REFUSED pod record when ready' "$OUTD/B18.txt"
 rec B18 $? "exit 4 before upload, pod deleted" "exit $rc" "the record read when the runner answers has no data center id"
-ID=B19; mksb; study_ready; jq -n --arg c "$(isod $(( $(date +%s) - 600 )))" '[{id:"pg2",name:"pkm-x-dev-p2",status:"RUNNING",cost:1.04,createdAt:$c}]' > "$ST/pods-page2.json"
+ID=B19; mksb; study_ready; jq -n --arg c "$(isod $(( $(date +%s) - 600 )))" '[{id:"pg2",name:"pkm-x-dev-p2",status:"RUNNING",cost:2.08,createdAt:$c}]' > "$ST/pods-page2.json"
 rc=$(run ./run.sh $BASE $STG); [ "$rc" = 3 ] && [ "$(creates)" = 0 ] && grep -q 'data-urlencode cursor=c2' "$ST/calls.log" && grep -q 'pkm-x-dev-p2' "$OUTD/B19.txt"
 rec B19 $? "exit 3, the second page was read" "exit $rc, creates $(creates)" "v2 list pagination: a live pkm-x- pod on page 2 (serial rule)"
 ID=B20; mksb; export STUB_CREATE_CODE=202; rc=$(run ./run.sh pkm-x-dev-q cap:8:0:5:12800000000); unset STUB_CREATE_CODE
@@ -268,7 +269,7 @@ G push -q origin main; rc4=$(fetch pkm-x-dev-c --delete "$C"); rc5=$(fetch pkm-x
 [ "$rc" = 8 ] && [ "$c1" = "ADMITTED P2d" ] && [ "$rc2" = 8 ] && [ "$rc3" = 8 ] && [ "$rc4" = 0 ] && [ "$rc5" = 9 ] && [ -f "$D/cost.json" ] && [ "$(pods)" = 0 ] \
   && grep -qP '^pkm-x-dev-c/stubpod1\t.*\tclosed\t' "$R/ledger.tsv" && [ -d "$RD/collect-1" ] && grep -q 'largest pilot memory peak' "$D/admission-lines-1.txt" \
   && grep -q 'on an origin branch head now: 0' "$D/git-gate.txt" && grep -q 'mismatches 0, on an origin branch head now: 1' "$D/git-gate.txt" \
-  && jq -e '.classifier.version == "a33-r1" and (.classifier.fetch_sha256 | length) == 64' "$D/outcome.json" >/dev/null && jq -e '.cost_per_hr == 1.04' "$D/cost.json" >/dev/null
+  && jq -e '.classifier.version == "a33-r2" and (.classifier.fetch_sha256 | length) == 64' "$D/outcome.json" >/dev/null && jq -e '.cost_per_hr == 2.08' "$D/cost.json" >/dev/null
 rec C02 $? "exit 8 ADMITTED; gate: uncommitted 8, committed but not pushed 8, pushed 0; re-run 9" "exit $rc $c1; $rc2; $rc3; $rc4; $rc5" "completed run: collect, the git gate (decision 22), delete, refuse re-collection"
 startrun C02b 1000; E=$(iso $(( $(epoch "$S0") + 60 ))); mktree "$ST/tree" cap:8:0:5:12800000000 "$S0" "$E" 0 0 0; status_done "$S0" "$E" 0
 rc=$(fetch pkm-x-dev-c); G add -f "$RD/collect-1" "$D/outcome.json" "$D/local-sha256-1.txt" && G commit -qm kept && G push -q origin main; C=$(G rev-parse HEAD)
@@ -344,12 +345,12 @@ else skip C01 C02 C02b C02c C03 C04 C05 C06 C07 C08 C08b C09 C10 C11 C12 C13 C14
 S0E=$(( $(date +%s) - 200000 )); S0=$(iso $S0E); DLE=$(( S0E + 90000 )); L0="2026-11-10T10:00:00.000Z"
 mkset() { # mkset DIR: a receipts dir with the launch receipts (REST v2 field names) of a run started at S0
   local d=$1; rm -rf "$d"; mkdir -p "$d"
-  jq -n --arg l "$L0" '{id:"p1", name:"pkm-x-dev-d", cloud:"SECURE", cpu:{id:"cpu5m", vcpuCount:16, memory:128}, cost:1.04, startedAt:$l, createdAt:$l, status:"RUNNING", dataCenterId:null}' > "$d/pod-create.json"
-  jq -n --arg l "$L0" '{id:"p1", cloud:"SECURE", cpu:{id:"cpu5m", vcpuCount:16, memory:128}, cost:1.04, startedAt:$l, status:"RUNNING", dataCenterId:"EU-RO-1"}' > "$d/pod-record.json"
+  jq -n --arg l "$L0" '{id:"p1", name:"pkm-x-dev-d", cloud:"SECURE", cpu:{id:"cpu5m", vcpuCount:32, memory:256}, cost:2.08, startedAt:$l, createdAt:$l, status:"RUNNING", dataCenterId:null}' > "$d/pod-create.json"
+  jq -n --arg l "$L0" '{id:"p1", cloud:"SECURE", cpu:{id:"cpu5m", vcpuCount:32, memory:256}, cost:2.08, startedAt:$l, status:"RUNNING", dataCenterId:"EU-RO-1"}' > "$d/pod-record.json"
   jq -n --arg l "$L0" '{startedAt:$l, status:"RUNNING", dataCenterId:"EU-RO-1"}' > "$d/pod-record-start.json"
-  jq -n '{name:"pkm-x-dev-d", cloud:"SECURE", cpu:{id:"cpu5m", vcpuCount:16}, image:"x", disk:20, ports:["8000/http"], env:{RUNNER_TOKEN:"<withheld>"}, entrypoint:["bash","-c"], cmd:["<boot>"]}' > "$d/pod-request.json"
-  echo '{"at":"2026-11-10T09:59:00Z","instance":"cpu5m-16-128","http":200,"id":"cpu5m","availability":"HIGH","ramGbPerVcpu":8,"vcpu":{"min":2,"max":32},"securePerVcpu":0.065,"price":1.04}' > "$d/price.jsonl"
-  jq -n '{stage:"cap:8:0:5:12800000000", mem_floor_gb:121}' > "$d/pod-state.json"
+  jq -n '{name:"pkm-x-dev-d", cloud:"SECURE", cpu:{id:"cpu5m", vcpuCount:32}, image:"x", disk:20, ports:["8000/http"], env:{RUNNER_TOKEN:"<withheld>"}, entrypoint:["bash","-c"], cmd:["<boot>"]}' > "$d/pod-request.json"
+  echo '{"at":"2026-11-10T09:59:00Z","instance":"cpu5m-32-256","http":200,"id":"cpu5m","availability":"HIGH","ramGbPerVcpu":8,"vcpu":{"min":2,"max":32},"securePerVcpu":0.065,"price":2.08}' > "$d/price.jsonl"
+  jq -n '{stage:"cap:8:0:5:12800000000", mem_floor_gb:256}' > "$d/pod-state.json"
   jq -nc --arg s "$S0" '{state:"running",exit:null,started:$s,ended:null,stages:["cap:8:0:5:12800000000"]}' > "$d/start.json"
   : > "$d/checkins.jsonl"
 }
@@ -399,9 +400,9 @@ nd D20; mktree "$TD" cap:8:0:5:12800000000 "$(iso $((S0E + 30)))" "$okE" 0 0 0; 
 nd D21; mktree "$TD" cap:8:0:5:12800000000 "$S0" "$okE" 0 0 0; ck "$DR" $((S0E + 93600)) prefetch done "$S0" "$okE" 0 200 RUNNING "$L0" true; collect "$DR" "$DO" hard false $((S0E + 93610)); dcase D21 "NO_EVIDENCE P7" "N2: completed in time but the transfer check still failed at the hard deadline"
 nd D22; done_set; echo tampered >> "$TD/host.txt"; dcase D22 "NOT_ADMITTED P2e" "a file of the kept tree changed after collection (rule 6)"
 nd D23; done_set; jq '.cloud = "COMMUNITY"' "$DR/pod-create.json" > "$DR/c" && mv "$DR/c" "$DR/pod-create.json"; dcase D23 "NOT_ADMITTED P2e" "create response cloud COMMUNITY (rule 7)"
-nd D23b; done_set; jq '.cpu.memory = 64' "$DR/pod-record.json" > "$DR/c" && mv "$DR/c" "$DR/pod-record.json"; dcase D23b "NOT_ADMITTED P2e" "GET record cpu.memory 64, below the 121 GB floor (rule 7)"
+nd D23b; done_set; jq '.cpu.memory = 64' "$DR/pod-record.json" > "$DR/c" && mv "$DR/c" "$DR/pod-record.json"; dcase D23b "NOT_ADMITTED P2e" "GET record cpu.memory 64, below the 256 GB floor (rule 7)"
 nd D23c; done_set; jq '. + {interruptible:true}' "$DR/pod-request.json" > "$DR/c" && mv "$DR/c" "$DR/pod-request.json"; dcase D23c "NOT_ADMITTED P2e" "request record with an interruptible field (rule 7)"
-nd D23d; done_set; jq '.cost = 1.05' "$DR/pod-create.json" > "$DR/c" && mv "$DR/c" "$DR/pod-create.json"; dcase D23d "NOT_ADMITTED P2e" "create response cost 1.05 differs from the catalog price 1.04 (rule 7)"
+nd D23d; done_set; jq '.cost = 2.09' "$DR/pod-create.json" > "$DR/c" && mv "$DR/c" "$DR/pod-create.json"; dcase D23d "NOT_ADMITTED P2e" "create response cost 2.09 differs from the catalog price 2.08 (rule 7)"
 nd D23e; done_set; rm "$DR/pod-record.json"; dcase D23e "NOT_ADMITTED P2e" "no GET record after create: cpu.memory unobservable (rule 7 fails closed)"
 nd D24; ck "$DR" $((S0E + 4000)) regular null "" "" null 404 "" "" false; collect "$DR" "$DO" lost false $((S0E + 4010)); dcase D24 "LOST P3" "owner decision 13: pod gone from the list and v2 GET 404, before any logged session action" auto
 nd D24c; printf '{"at":"%s","action":"DELETE","pod":"p1","reason":"x"}\n' "$(iso $((S0E + 3000)))" > "$DR/session-actions.jsonl"; ck "$DR" $((S0E + 4000)) regular null "" "" null 404 "" "" false; collect "$DR" "$DO" lost false $((S0E + 4010)); dcase D24c "LOST P3" "pod gone and GET 404 after a logged session delete" owner
@@ -422,23 +423,49 @@ mcase() { # mcase ID STAGE PILOT_EXIT OOM CG_PEAK LOG EXPECTED DESCRIPTION [EXPE
   local got; got=$( (cd "$RC" && ./fetch.sh --classify-dir "$DR" "$DO") 2> "$OUTD/$1.err" | tee "$OUTD/$1.txt" | jq -r '.class + " " + .rule + " source=" + (.memory.source_used // "none")')
   local want="$7 source=${9:-pilot_log_VmHWM_MiB}"; [ "$got" = "$want" ]; rec "$1" $? "$want" "$got" "$8"
 }
-G1=1073741824; S56=cap:8:0:5:12800000000; S112=cap:8:0:5:27900000000
+G1=1073741824; S56=cap:8:0:5:12800000000; S112=cap:8:0:5:27900000000; S54=cap:8:0:5:54000000000
 # Fixtures state both figures: "pilot N MiB" is a VmHWM line in the F4 log (the fixture log's own lines peak at 64 MiB),
-# "cgroup N GiB" is a memory.peak file (or v1 max_usage_in_bytes). The pilot figure is used when present. The 56Gi step
-# of draft Amendment 18 is gone: the attempt here is the -m112 attempt itself.
-mcase D25 $S56 0 0 - 30720 "ADMITTED P2d" "memory: development size 56Gi, pilot 30 GiB"
-mcase D26 $S56 0 0 - 71680 "ADMITTED P2d" "memory: development size 56Gi, pilot 70 GiB: no 56 GiB step any more"
-mcase D27 $S112 0 0 - 128000 "OOM P2p" "memory: -m112 attempt, pilot 125 GiB (> 112 GiB): OOM, censored (owner decision 15)"
-mcase D28 $S112 0 0 $((120 * G1)) keep "ADMITTED P2d" "memory: -m112, pilot 64 MiB and cgroup 120 GiB -> pilot (primary); cgroup ignored"
-mcase D28b $S112 0 0 $((120 * G1)) strip "OOM P2p" "memory: -m112, no pilot line, cgroup v2 120 GiB -> cgroup fallback, > 112 GiB" cgroup_v2_memory.peak
-mcase D29 $S112 0 0 - strip "NOT_ADMITTED P2u" "memory: no pilot line, no cgroup file -> none" none
-mcase D30 $S112 0 0 v1:$((100 * G1)) strip "ADMITTED P2d" "memory: -m112, no pilot line, cgroup v1 max_usage 100 GiB -> v1 fallback" cgroup_v1_memory.max_usage_in_bytes
-mcase D31 $S112 0 0 - 115712 "OOM P2p" "memory: -m112, pilot 113 GiB -> OOM (owner decision 15)"
-mcase D32 $S112 0 0 - 102400 "ADMITTED P2d" "memory: -m112, pilot 100 GiB"
-mcase D33 $S112 0 0 - 114688 "ADMITTED P2d" "memory: -m112, pilot exactly 112 GiB (not above)"
-mcase D34 $S112 137 0 - 71680 "LOST P2c" "memory: -m112, exit 137, oom_kill 0"
-mcase D36 $S112 137 1 - 30720 "OOM P2b" "memory: -m112, pilot 30 GiB but exit 137 with oom_kill 1 -> OOM whatever the peak"
-mcase D37 $S112 0 0 - 102400 "ADMITTED P2d" "-m112 row with oversize true: admitted as a row; the reading treats it as censored (Amendments 7 B, 14)" pilot_log_VmHWM_MiB true
+# "cgroup N GiB" is a memory.peak file (or v1 max_usage_in_bytes). The pilot figure is used when present. The tree's
+# cgroup memory.max is 256000000000 (the 256 GB pod) whenever the fixture has cgroup files. Owner decision 24: the 112 GiB
+# step (owner decision 15) is gone; OOM is cgroup oom_kill > 0 (P2b, P2k) or a peak above the pod's memory.max (P2p).
+mcase D25 $S54 0 0 - 30720 "ADMITTED P2d" "memory: pilot 30 GiB under the 256,000,000,000-byte limit"
+mcase D26 $S54 0 0 - 245760 "OOM P2p" "memory: pilot 245,760 MiB (257,698,037,760 bytes) above memory.max 256,000,000,000: censored"
+mcase D27 $S54 0 0 - 244140 "ADMITTED P2d" "memory: pilot 244,140 MiB (255,999,836,160 bytes), just under memory.max"
+mcase D28 $S54 0 0 $((250 * G1)) keep "ADMITTED P2d" "memory: pilot 64 MiB and cgroup 250 GiB -> pilot (primary); cgroup ignored"
+mcase D28b $S54 0 0 257000000000 strip "OOM P2p" "memory: no pilot line, cgroup v2 peak 257,000,000,000 above memory.max -> cgroup fallback" cgroup_v2_memory.peak
+mcase D29 $S54 0 0 - strip "NOT_ADMITTED P2u" "memory: no pilot line, no cgroup peak file -> none" none
+mcase D30 $S54 0 0 v1:$((100 * G1)) strip "ADMITTED P2d" "memory: no pilot line, cgroup v1 max_usage 100 GiB -> v1 fallback" cgroup_v1_memory.max_usage_in_bytes
+mcase D31 $S54 0 1 - 30720 "OOM P2k" "memory: cgroup oom_kill 1 with exit 0 in the end lines -> OOM, censored"
+mcase D32 $S112 0 0 - 115712 "ADMITTED P2d" "memory: a 112Gi-shaped stage with pilot 113 GiB is no longer OOM (owner decision 15's step removed)"
+mcase D34 $S54 137 0 - 71680 "LOST P2c" "memory: exit 137, oom_kill 0" 
+mcase D36 $S54 137 1 - 30720 "OOM P2b" "memory: exit 137 with oom_kill 1 -> OOM whatever the peak"
+nd D33; done_set; echo max > "$TD/cgroup/memory.max"; echo "tower step 99: degree 6, synthetic test line, memory 100 MB (peak 300000 MB)" >> "$TD/runs/X-m2-t8-k0-c5.log"; collect "$DR" "$DO" done true $((okEe + 200)); dcase D33 "ADMITTED P2d" "memory: memory.max 'max' (no numeric limit) and pilot 300,000 MiB: P2p cannot fire"
+nd D37; mktree "$TD" $S54 "$S0" "$okE" 0 0 none 1 - 245760; jq --arg st $S54 '.stage = $st' "$DR/pod-state.json" > "$DR/x" && mv "$DR/x" "$DR/pod-state.json"; echo '{"cgroup_memory_limit":"256000000000","source":"memory.max"}' > "$DR/cgroup-prestart.json"
+ck "$DR" $P2E prefetch done "$S0" "$okE" 0 200 RUNNING "$L0" true; collect "$DR" "$DO" done true $PCOL; dcase D37 "OOM P2p" "memory: no cgroup files in the tree; the limit read before start (cgroup-prestart.json) is used for P2p"
+
+# ===================================================================== R. the reading of an ADMITTED (or censored) row at cap 7 (owner decision 24)
+rcase() { # rcase ID ROW_JQ STOP(oversize|budget|-) PILOT_EXIT OOM EXPECTED(class rule d_F censored) DESCRIPTION
+  nd "$1"; mktree "$TD" "$STG" "$S0" "$okE" "$4" 0 "$5" 1 - keep
+  jq -c "if has(\"oversize\") then $2 else . end" "$TD/runs/X-m2-t14-k0-c7.jsonl" > "$TD/x" && mv "$TD/x" "$TD/runs/X-m2-t14-k0-c7.jsonl"
+  [ "$3" = - ] || echo "tower stop in step 36 ($3$([ "$3" = oversize ] && echo ': --max-nnz')): degree 7, synthetic test line, memory 100 MB (peak 200 MB)" >> "$TD/runs/X-m2-t14-k0-c7.log"
+  jq --arg st "$STG" '.stage = $st' "$DR/pod-state.json" > "$DR/x" && mv "$DR/x" "$DR/pod-state.json"
+  local rx=0; [ "$4" = 0 ] || rx=1
+  ck "$DR" $P2E prefetch done "$S0" "$okE" $rx 200 RUNNING "$L0" true; collect "$DR" "$DO" done true $PCOL
+  local got; got=$( (cd "$RC" && ./fetch.sh --classify-dir "$DR" "$DO") 2> "$OUTD/$1.err" | tee "$OUTD/$1.txt" | jq -r '"\(.class) \(.rule) d_F=\(.reading.d_F // "none") censored=\(.reading.censored // "-")"')
+  [ "$got" = "$6" ]; rec "$1" $? "$6" "$got" "$7"
+}
+rcase R01 '.' - 0 0 "ADMITTED P2d d_F== 7 censored=-" "refutes at cap 7 (inconsistent true) -> d_F = 7"
+rcase R02 '.inconsistent = false | .degree_reached = 7' - 0 0 "ADMITTED P2d d_F=>= 8 censored=-" "degree 7 completed without refuting, oversize and timed_out false -> d_F >= 8"
+rcase R03 '.inconsistent = false | .degree_reached = 7 | .oversize = true | .timed_out = true' oversize 0 0 "ADMITTED P2d d_F=>= 7 censored=size" "oversize at 54e9 (stop line oversize) -> censored, d_F >= 7 stands"
+rcase R04 '.inconsistent = false | .degree_reached = 7 | .timed_out = true' budget 0 0 "ADMITTED P2d d_F=>= 7 censored=budget" "stopped by the wall budget (stop line budget) -> censored"
+rcase R05 '.inconsistent = false | .degree_reached = 7 | .oversize = true | .timed_out = true' budget 0 0 "ADMITTED P2d d_F=none censored=-" "row oversize true but the stop line says budget -> no reading (owner)"
+rcase R06 '.inconsistent = false | .degree_reached = 6' - 0 0 "ADMITTED P2d d_F=none censored=-" "degree 6 reached, nothing stopped it -> no reading (owner)"
+rcase R07 '.inconsistent = false | .degree_reached = 7' - 0 1 "OOM P2k d_F=>= 7 censored=memory" "cgroup oom_kill 1 -> OOM, censored at the new size"
+rcase R08 '.inconsistent = false | .degree_reached = 7' - 137 1 "OOM P2b d_F=>= 7 censored=memory" "exit 137 with oom_kill 1 -> OOM, censored"
+nd R09; E=$(iso $(( S0E + 90050 ))); mktree "$TD" "$STG" "$S0" "$E" 0 0 0; jq --arg st "$STG" '.stage = $st' "$DR/pod-state.json" > "$DR/x" && mv "$DR/x" "$DR/pod-state.json"
+ck "$DR" $((S0E + 90100)) prefetch done "$S0" "$E" 0 200 RUNNING "$L0" true; collect "$DR" "$DO" done true $((S0E + 90200))
+got=$( (cd "$RC" && ./fetch.sh --classify-dir "$DR" "$DO") 2> "$OUTD/R09.err" | tee "$OUTD/R09.txt" | jq -r '"\(.class) \(.rule) d_F=\(.reading.d_F // "none") censored=\(.reading.censored // "-")"')
+[ "$got" = "LIMIT P2a d_F=>= 7 censored=time limit" ]; rec R09 $? "LIMIT P2a d_F=>= 7 censored=time limit" "$got" "runner ended after the run deadline -> LIMIT, censored"
 nd D38; ck "$DR" $((S0E + 4000)) regular idle "" "" null 200 EXITED "$L0" true; collect "$DR" "$DO" lost false $((S0E + 4010)); dcase D38 "LOST P3" "runner idle and status EXITED" owner
 nd D39; printf '{"at":"%s","action":"DELETE","pod":"p1","reason":"x"}\n' "$(iso $((S0E + 3000)))" > "$DR/session-actions.jsonl"; ck "$DR" $((S0E + 4000)) regular null "" "" null 200 EXITED "$L0" true; collect "$DR" "$DO" lost false $((S0E + 4010)); dcase D39 "LOST P3" "status EXITED after the session logged a delete" owner
 nd D40; ck "$DR" $((S0E + 4000)) regular idle "" "" null 200 RUNNING "$L0" true; printf '{"at":"broken' >> "$DR/checkins.jsonl"; dcase D40 "NO_EVIDENCE P0" "S2: a truncated check-in line fails closed"
@@ -471,9 +498,9 @@ ecase E14 ALL_RESOLVED "base LOST auto, relaunch ADMITTED" $BASE:LOST $R1:ADMITT
 
 # ===================================================================== F. reap.sh against the stub
 ID=F01; mksb; old=$(isod $(( $(date +%s) - 27 * 3600 ))); young=$(isod $(( $(date +%s) - 3600 )))
-jq -n --arg o "$old" --arg y "$young" --arg b $BASE '[{id:"old1",name:$b,status:"RUNNING",cost:1.04,createdAt:$o,startedAt:$o},
-  {id:"young1",name:"pkm-x-dev-y",status:"RUNNING",cost:1.04,createdAt:$y,startedAt:$y},
-  {id:"other1",name:"pfd-b-rp",status:"RUNNING",cost:1.04,createdAt:$o,startedAt:$o}]' > "$ST/pods.json"
+jq -n --arg o "$old" --arg y "$young" --arg b $BASE '[{id:"old1",name:$b,status:"RUNNING",cost:2.08,createdAt:$o,startedAt:$o},
+  {id:"young1",name:"pkm-x-dev-y",status:"RUNNING",cost:2.08,createdAt:$y,startedAt:$y},
+  {id:"other1",name:"pfd-b-rp",status:"RUNNING",cost:2.08,createdAt:$o,startedAt:$o}]' > "$ST/pods.json"
 rc=$(run ./reap.sh); left=$(jq -c '[.[].id]' "$ST/pods.json"); rc2=$( (cd "$R" && ./reap.sh) >> "$OUTD/F01.txt" 2>&1; echo $?)
 left2=$(jq -c '[.[].id]' "$ST/pods.json"); lines=$(cat "$R"/reaper/reap-*.jsonl | wc -l)
 [ "$rc" = 0 ] && [ "$left" = '["young1","other1"]' ] && [ "$rc2" = 0 ] && [ "$left2" = '["young1","other1"]' ] && grep -q '"due":true' "$R"/reaper/reap-*.jsonl && grep -q '"action":"DELETE"' "$R/reaper/session-actions.jsonl" \
@@ -511,7 +538,7 @@ rec F06 $? "pod untouched" "exit $rc, pods $(pods)" "N3c: past the run deadline 
 else skip F02 F04 F05 F06; fi
 
 # ===================================================================== G. syntax, pins, request, no REST v1 or GraphQL
-for f in common.sh run.sh fetch.sh reap.sh rp_pinned.sh make_requests_m112.sh tests/run_tests.sh tests/curl_stub.sh; do
+for f in common.sh run.sh fetch.sh reap.sh rp_pinned.sh make_requests_d54.sh make_requests_m112.sh tests/run_tests.sh tests/curl_stub.sh; do
   bash -n "$RC/$f" 2> "$OUTD/G-${f##*/}.txt"; r=$?; rec "G-${f##*/}" $r "bash -n ok" "rc $r" "syntax of $f"
 done
 sha256sum "$RC/rp_pinned.sh" | grep -q '^b4b6019934e02ffa32043e2e6b9aee4eb4dcc53b42442b2e01d1b30ccf536c5d'; rec G-pin $? "rp_pinned.sh sha256 b4b60199..." "$(sha256sum "$RC/rp_pinned.sh" | cut -c1-8)" "pinned client copy unchanged"
@@ -520,10 +547,10 @@ for f in common.sh run.sh fetch.sh reap.sh; do grep -v -e '^ *#' "$RC/$f" | grep
 rec G-v2 $? "no REST v1 or GraphQL URL and no v1 field name in the route's code" "$(wc -l < "$OUTD/G-v2.txt") hits" "REST v2 port (comments excluded)"
 ! grep -nE '"\$RP" (create|pod|delete)' "$RC"/run.sh "$RC"/fetch.sh "$RC"/reap.sh > "$OUTD/G-rpuse.txt"
 rec G-rpuse $? "rp_pinned.sh used only for upload, start, status, fetch (its v1 create, pod, delete are never called)" "$(wc -l < "$OUTD/G-rpuse.txt") hits" "pod-proxy calls only through the pinned client"
-want=$(cd "$RC" && bash -c '. ./common.sh; c7_m112_request "$study/$STUDY_SRC_REL"'); pin=$(cd "$RC" && bash -c '. ./common.sh; echo $STUDY_REQUEST_SHA')
-[ "$(sha256sum "$RC/requests_m112/pfd-x-t14-k0-c7-m112.json" | cut -d' ' -f1)" = "$pin" ] && jq -e --argjson w "$want" '. == $w' "$RC/requests_m112/pfd-x-t14-k0-c7-m112.json" >/dev/null \
-  && grep -q "^$pin  requests_m112/pfd-x-t14-k0-c7-m112.json  changed: \"job.job_name job.command.1 job.memory provenance.note\"" "$RC/make_requests_m112_output.txt"
-rec G-request $? "request sha256 = pin = make_requests output; equals its derivation; four changed paths" "pin ${pin:0:8}" "the one request (Amendments 7 B and 14)"
+want=$(cd "$RC" && bash -c '. ./common.sh; d54_request "$study/$STUDY_SRC_REL"'); pin=$(cd "$RC" && bash -c '. ./common.sh; echo $STUDY_REQUEST_SHA')
+[ "$(sha256sum "$RC/requests_d54/pfd-x-t14-k0-c7-d54.json" | cut -d' ' -f1)" = "$pin" ] && jq -e --argjson w "$want" '. == $w' "$RC/requests_d54/pfd-x-t14-k0-c7-d54.json" >/dev/null \
+  && grep -q "^$pin  requests_d54/pfd-x-t14-k0-c7-d54.json  changed: \"job.job_name job.command.1 job.memory provenance.note\"" "$RC/make_requests_d54_output.txt"
+rec G-request $? "request sha256 = pin = make_requests output; equals its derivation; four changed paths" "pin ${pin:0:8}" "the one request (Amendment 7 B, owner decision 24)"
 ntot=$((npass + nfail + nskip)); nlayer=$(echo A15 A16 A17 A18 A19 B01 B02 B03 B04 B04b B05 B06 B07 B08 B09 B10 B11 B12 B13 B14 B15 B16 B17 B18 B19 B20 C01 C02 C02b C02c C03 C04 C05 C06 C07 C08 C08b C09 C10 C11 C12 C13 C14 C15 C16 C17 C18 C18b C19 F02 F04 F05 F06 | wc -w)
 
 if [ "$WRITE" = 1 ]; then
