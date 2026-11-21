@@ -54,23 +54,24 @@ def main():
     for i, row in enumerate(source):
         (x1, y1), (x2, y2) = row["lifted_points"]
         lines.append(f"  ⟨{x1}, {x2}, {y1}, {y2}⟩, -- source {i}")
+    survivor_coords = []
+    for i in survivors:
+        (x1, y1), (x2, y2) = source[i]["lifted_points"]
+        survivor_coords.append(f"({x1}, {x2}, {y1}, {y2})")
     lines.extend([
         "]",
         "theorem sourceTable_length : sourceTable.length = 1722 := by decide",
         "def sourceCase (i : Fin 1722) : Coords :=",
         "  sourceTable.get ⟨i.val, by rw [sourceTable_length]; exact i.isLt⟩",
-        "def survivor (i : Fin 1722) : Prop :=",
-        "  i.val ∈ ([201, 243, 425, 467, 511, 553] : List ℕ)",
-        "def blocked (i : Fin 1722) : Prop :=",
-        "  ((sourceCase i).x1 = (sourceCase i).x2 ∧",
-        "    (sourceCase i).y1 ≠ (sourceCase i).y2) ∨",
-        "  (((sourceCase i).x1-(sourceCase i).x2)^2*",
-        "    ((sourceCase i).x1+2*(sourceCase i).x2)-",
-        "    ((sourceCase i).y1-(sourceCase i).y2)^2) % 47 ≠ 0 ∨",
-        "  ((sourceCase i).y1-(sourceCase i).y2)^2 %",
-        "    ((sourceCase i).x1-(sourceCase i).x2) ≠ 0 ∨",
-        "  survivor i",
-        "theorem exhaustive : ∀ i : Fin 1722, blocked i := by",
+        "def survivor (c : Coords) : Prop :=",
+        "  (c.x1, c.x2, c.y1, c.y2) ∈",
+        "    ([" + ", ".join(survivor_coords) + "] : List (ℤ × ℤ × ℤ × ℤ))",
+        "def blocked (c : Coords) : Prop :=",
+        "  (c.x1 = c.x2 ∧ c.y1 ≠ c.y2) ∨",
+        "  ((c.x1-c.x2)^2*(c.x1+2*c.x2)-(c.y1-c.y2)^2) % 47 ≠ 0 ∨",
+        "  (c.y1-c.y2)^2 % (c.x1-c.x2) ≠ 0 ∨",
+        "  survivor c",
+        "theorem exhaustive : ∀ c ∈ sourceTable, blocked c := by",
         "  dsimp only [blocked, survivor]",
         "  decide",
         "",
@@ -85,8 +86,9 @@ def main():
         "      (WeierstrassCurve.Affine.Point.some ((sourceCase i).x2 : ℚ)",
         "      ((sourceCase i).y2 : ℚ) hQ) +",
         "      (WeierstrassCurve.Affine.Point.some ((sourceCase i).x2 : ℚ)",
-        "      ((sourceCase i).y2 : ℚ) hQ) = 0) : survivor i := by",
-        "  rcases exhaustive i with hsame | hmod | hrem | hs",
+        "      ((sourceCase i).y2 : ℚ) hQ) = 0) : survivor (sourceCase i) := by",
+        "  have hall := exhaustive (sourceCase i) (List.get_mem sourceTable _)",
+        "  rcases hall with hsame | hmod | hrem | hs",
         "  · rcases hsame with ⟨hx, hy⟩",
         "    have hxq : ((sourceCase i).x1 : ℚ) = ((sourceCase i).x2 : ℚ) := by exact_mod_cast hx",
         "    have hyq : ((sourceCase i).y1 : ℚ) ≠ ((sourceCase i).y2 : ℚ) := by exact_mod_cast hy",
