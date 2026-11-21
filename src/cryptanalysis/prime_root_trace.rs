@@ -1422,8 +1422,11 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 // unchanged terminal base. On new traces we avoid the costly
                 // polynomial square/division during independent replay too.
                 if state.exponent != 1 || base != &state.base {
+                    // PowerStep verifies an actual square, not a general
+                    // product. Reuse the independent symmetric-square checker
+                    // already exercised by standalone vpower replay.
                     state.base =
-                        vdiv(&vproduct(&state.base, &state.base, p), &state.modulus, p)?.1;
+                        vdiv(&vsquare(&state.base, p), &state.modulus, p)?.1;
                 }
                 state.exponent >>= 1;
                 if (*exponent, accumulator, base) != (state.exponent, &state.acc, &state.base) {
