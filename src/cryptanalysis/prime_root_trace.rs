@@ -341,15 +341,19 @@ impl Engine<'_> {
             self.event(RootEvent::InverseEnd { value, inverse: 1 })?;
             return Ok(1);
         }
-        let mut exponent = self.report.p - 2;
-        let (mut acc, mut base) = (1, value);
+        // p is odd, hence p-2 is odd. Consume its least-significant
+        // set bit up front: the accumulator is value, not 1*value.
+        // Unlike a per-bit identity branch, this has no cost in the
+        // remaining modular-power loop.
+        let mut exponent = (self.report.p - 2) >> 1;
+        let mut acc = value;
+        let mut base = value;
+        if exponent != 0 {
+            base = self.field(FieldOp::Square, base, base)?;
+        }
         while exponent > 0 {
             if exponent & 1 == 1 {
-                // 1 * base is base: avoid a redundant field operation
-                // and its certificate event without changing the inverse.
-                acc = if acc == 1 { base } else {
-                    self.field(FieldOp::Mul, acc, base)?
-                };
+                acc = self.field(FieldOp::Mul, acc, base)?;
             }
             exponent >>= 1;
             if exponent != 0 {
