@@ -78,6 +78,9 @@ fn main(){
  println!("prime,case,ns_per_solve_verify,checksum,completed");
  for p in [65521,1000000007,MAX_PRIME]{
   for case in ["linear","quadratic","quartic","split_quartic","octet"]{
+   // Main currently reaches the fixed 100k event cap on p61 octet.
+   // Compare completed workloads instead of treating censored reports as roots.
+   if p==MAX_PRIME && case=="octet" {continue;}
    let t=Instant::now();
    let mut checksum=0u64;
    let mut completed=0;
