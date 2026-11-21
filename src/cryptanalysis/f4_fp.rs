@@ -1276,33 +1276,199 @@ pub struct TraceStep {
     pub degree: u32,
     pub rows: Vec<(usize, Vec<u32>)>,
     pub new_lms: Vec<Vec<u32>>,
-    /// The step's symbolic preprocessing, frozen by the first replay that
-    /// runs it (packed runs only).  Its output depends only on the seed rows
-    /// (the recorded `rows`), the alive leading monomials (equal on every
-    /// replay that reached this step: each earlier step's new leading
-    /// monomials were checked) and the supports of the basis elements it
-    /// touches, which a later replay compares before reusing it; on a
-    /// different support the step runs symbolic preprocessing as before.
+    /// The step's symbolic preprocessing, frozen by a replay
+    /// ([`FrozenStep`]); never serialized.
     #[serde(skip)]
-    frozen: std::sync::OnceLock<FrozenStep>,
+    frozen: FrozenSlot,
 }
 
-/// One step's frozen symbolic preprocessing ([`TraceStep::frozen`]).
-#[derive(Clone, Debug, Default)]
+/// A step's frozen symbolic preprocessing, shared by the replays of one
+/// trace (they run on several threads).
+#[derive(Default, Debug)]
+struct FrozenSlot(std::sync::RwLock<Option<std::sync::Arc<FrozenStep>>>);
+
+impl Clone for FrozenSlot {
+    fn clone(&self) -> Self {
+        FrozenSlot(std::sync::RwLock::new(self.0.read().unwrap().clone()))
+    }
+}
+
+/// One replayed step's symbolic preprocessing, kept to rebuild the step's
+/// matrix on later systems without hashing a monomial.
+///
+/// Symbolic preprocessing on a replayed step depends only on the seed rows
+/// (the recorded rows, the same on every replay), the alive leading
+/// monomials (the same on every replay that reached the step: each earlier
+/// step's new leading monomials were checked) and the terms of the basis
+/// elements it reaches.  The frozen copy is taken on a system whose
+/// supports contain the current system's (term by term, a subsequence), so
+/// every monomial and reducer the current system reaches is in it, with the
+/// same column order and the same reducer (the first alive divisor of the
+/// monomial, a function of the leading monomials alone).  Walking the frozen
+/// columns from the current seed rows' terms through the frozen reducers of
+/// the columns reached gives exactly the monomials and reducer rows
+/// symbolic preprocessing would find; the columns not reached are dropped.
+/// Only the reducer rows' order can differ, and the reductions key reducers
+/// by their leading column.
+#[derive(Debug)]
 struct FrozenStep {
     /// Every basis element the rows use, with its packed terms when frozen.
     support: Vec<(usize, Vec<u128>)>,
-    /// The reducer rows symbolic preprocessing added, after the seed rows.
-    extra: Vec<(usize, u128)>,
+    /// The seed rows: basis element and, per frozen term, its column.
+    seeds: Vec<(usize, Vec<u32>)>,
+    /// The reducer rows: basis element, packed multiplier, column per term.
+    reducers: Vec<(usize, u128, Vec<u32>)>,
     /// The columns, packed, in decreasing order.
     cols: Vec<u128>,
-    /// Every row (seed rows, then reducer rows) as column indices.
-    row_cols: Vec<Vec<u32>>,
+    /// Per column, the reducer row with that leading column (`u32::MAX`: none).
+    reducer_of: Vec<u32>,
+}
+
+/// The positions of `actual` within `frozen` when it is a subsequence of
+/// it (both in the polynomial's term order), else `None`.
+fn subsequence_positions(frozen: &[u128], actual: &[u128]) -> Option<Vec<u32>> {
+    let mut out = Vec::with_capacity(actual.len());
+    let mut j = 0;
+    for &t in actual {
+        while j < frozen.len() && frozen[j] != t {
+            j += 1;
+        }
+        if j == frozen.len() {
+            return None;
+        }
+        out.push(j as u32);
+        j += 1;
+    }
+    Some(out)
+}
+
+/// One step's symbolic preprocessing: reducer rows, packed columns, and
+/// every row as column indices (as [`Packed::symbolic`] returns it).
+type Symbolic = (Vec<(usize, u128)>, Vec<u128>, Vec<Vec<u32>>);
+
+impl FrozenStep {
+    fn from_symbolic(
+        terms: &[Vec<u128>],
+        seeds: &[(usize, Vec<u32>)],
+        extra: &[(usize, u128)],
+        cols: &[u128],
+        row_cols: &[Vec<u32>],
+    ) -> Self {
+        let n = seeds.len();
+        let mut reducer_of = vec![u32::MAX; cols.len()];
+        for (r, rc) in row_cols[n..].iter().enumerate() {
+            reducer_of[rc[0] as usize] = r as u32;
+        }
+        let mut used: Vec<usize> = seeds
+            .iter()
+            .map(|(i, _)| *i)
+            .chain(extra.iter().map(|&(i, _)| i))
+            .collect();
+        used.sort_unstable();
+        used.dedup();
+        FrozenStep {
+            support: used.iter().map(|&i| (i, terms[i].clone())).collect(),
+            seeds: seeds
+                .iter()
+                .zip(row_cols)
+                .map(|((i, _), rc)| (*i, rc.clone()))
+                .collect(),
+            reducers: extra
+                .iter()
+                .zip(&row_cols[n..])
+                .map(|(&(i, m), rc)| (i, m, rc.clone()))
+                .collect(),
+            cols: cols.to_vec(),
+            reducer_of,
+        }
+    }
+
+    /// Whether `other` contains this copy's supports, element by element.
+    fn covered_by(&self, other: &FrozenStep) -> bool {
+        self.support.iter().all(|(i, t)| {
+            other
+                .support
+                .binary_search_by_key(i, |(j, _)| *j)
+                .is_ok_and(|k| subsequence_positions(&other.support[k].1, t).is_some())
+        })
+    }
+
+    /// The step's symbolic preprocessing for the current terms, or `None`
+    /// when some element has a term the frozen copy lacks.
+    fn rebuild(&self, terms: &[Vec<u128>]) -> Option<Symbolic> {
+        let top = self.support.last().map_or(0, |(i, _)| i + 1);
+        let mut pos: Vec<Vec<u32>> = vec![Vec::new(); top];
+        for (i, frozen) in &self.support {
+            pos[*i] = subsequence_positions(frozen, terms.get(*i)?)?;
+        }
+        let map = |i: usize, fcols: &[u32]| -> Vec<u32> {
+            pos[i].iter().map(|&k| fcols[k as usize]).collect()
+        };
+        let nc = self.cols.len();
+        let mut reached = vec![false; nc];
+        let mut done = vec![false; nc];
+        let mut stack: Vec<u32> = Vec::new();
+        let mut rows: Vec<Vec<u32>> = Vec::with_capacity(self.seeds.len() + self.reducers.len());
+        for (i, fc) in &self.seeds {
+            let rc = map(*i, fc);
+            done[rc[0] as usize] = true;
+            for &c in &rc {
+                if !reached[c as usize] {
+                    reached[c as usize] = true;
+                    stack.push(c);
+                }
+            }
+            rows.push(rc);
+        }
+        let mut used: Vec<u32> = Vec::new();
+        while let Some(c) = stack.pop() {
+            let c = c as usize;
+            if done[c] {
+                continue;
+            }
+            done[c] = true;
+            let r = self.reducer_of[c];
+            if r == u32::MAX {
+                continue;
+            }
+            let (i, _, fc) = &self.reducers[r as usize];
+            let rc = map(*i, fc);
+            for &x in &rc {
+                if !reached[x as usize] {
+                    reached[x as usize] = true;
+                    stack.push(x);
+                }
+            }
+            used.push(r);
+            rows.push(rc);
+        }
+        let mut new_index = vec![u32::MAX; nc];
+        let mut cols = Vec::new();
+        for c in 0..nc {
+            if reached[c] {
+                new_index[c] = cols.len() as u32;
+                cols.push(self.cols[c]);
+            }
+        }
+        for row in &mut rows {
+            for x in row.iter_mut() {
+                *x = new_index[*x as usize];
+            }
+        }
+        let extra = used
+            .iter()
+            .map(|&r| {
+                let (i, m, _) = &self.reducers[r as usize];
+                (*i, *m)
+            })
+            .collect();
+        Some((extra, cols, rows))
+    }
 }
 
 static FROZEN_HITS: AtomicU64 = AtomicU64::new(0);
 
-/// Replayed steps that reused frozen symbolic preprocessing, process-wide.
+/// Replayed steps that rebuilt their matrix from frozen preprocessing.
 pub fn frozen_steps_total() -> u64 {
     FROZEN_HITS.load(AtomicOrdering::Relaxed)
 }
@@ -5617,45 +5783,39 @@ fn f4_with_arithmetic(
                 && rows_poly.len() >= min_seeds;
             pp_add(if sym_par { PP_SYM_PAR } else { PP_SYM_SEQ }, 1);
             pp_add(PP_SYM_SEEDS, rows_poly.len() as u64);
-            // a replayed step reuses its frozen preprocessing when every
-            // basis element it touches has the support it was frozen with
+            // A replayed step rebuilds its matrix from frozen preprocessing
+            // when the current terms fit the frozen ones ([`FrozenStep`]).
             let slot = match &trace {
                 TraceMode::Replay(t) if freeze_enabled() => Some(&t.steps[replay_step - 1].frozen),
                 _ => None,
             };
-            let hit = slot.and_then(|f| f.get()).filter(|fz| {
-                fz.support
-                    .iter()
-                    .all(|(i, terms)| pk.terms.get(*i).is_some_and(|t| t == terms))
-            });
-            let computed;
-            let (extra, cols_packed, row_cols): (&[(usize, u128)], &[u128], &[Vec<u32>]) =
-                if let Some(fz) = hit {
-                    FROZEN_HITS.fetch_add(1, AtomicOrdering::Relaxed);
-                    (&fz.extra, &fz.cols, &fz.row_cols)
+            let frozen = slot.and_then(|f| f.0.read().unwrap().clone());
+            let rebuilt = frozen.as_ref().and_then(|fz| fz.rebuild(&pk.terms));
+            let (extra, cols_packed, row_cols) = if let Some(r) = rebuilt {
+                FROZEN_HITS.fetch_add(1, AtomicOrdering::Relaxed);
+                r
+            } else {
+                let computed = if sym_par {
+                    pk.symbolic_par(&rows_poly, &alive)
                 } else {
-                    computed = if sym_par {
-                        pk.symbolic_par(&rows_poly, &alive)
-                    } else {
-                        pk.symbolic(&rows_poly, &alive, true)
-                    };
-                    if let Some(f) = slot.filter(|f| f.get().is_none()) {
-                        let mut used: Vec<usize> = rows_poly
-                            .iter()
-                            .map(|(i, _)| *i)
-                            .chain(computed.0.iter().map(|&(i, _)| i))
-                            .collect();
-                        used.sort_unstable();
-                        used.dedup();
-                        let _ = f.set(FrozenStep {
-                            support: used.iter().map(|&i| (i, pk.terms[i].clone())).collect(),
-                            extra: computed.0.clone(),
-                            cols: computed.1.clone(),
-                            row_cols: computed.2.clone(),
-                        });
-                    }
-                    (&computed.0, &computed.1, &computed.2)
+                    pk.symbolic(&rows_poly, &alive, true)
                 };
+                if let Some(f) = slot {
+                    // keep the copy with the wider supports
+                    let new = FrozenStep::from_symbolic(
+                        &pk.terms,
+                        &rows_poly,
+                        &computed.0,
+                        &computed.1,
+                        &computed.2,
+                    );
+                    let mut w = f.0.write().unwrap();
+                    if w.as_ref().is_none_or(|old| old.covered_by(&new)) {
+                        *w = Some(std::sync::Arc::new(new));
+                    }
+                }
+                computed
+            };
             pp_add(PP_SYM_NS, pp_ns(t_sym));
             let tp1 = Instant::now();
             let idxs: Vec<usize> = rows_poly
@@ -5672,19 +5832,19 @@ fn f4_with_arithmetic(
             // runs) are cheaper on one thread than handed to the pool: the
             // hand-off wakes a worker and waits for it, which costs more than
             // building a few short rows.
-            let to_sparse = |(rc, &idx): (&Vec<u32>, &usize)| -> Vec<(u32, u64)> {
-                rc.iter()
+            let to_sparse = |(rc, &idx): (Vec<u32>, &usize)| -> Vec<(u32, u64)> {
+                rc.into_iter()
                     .zip(&basis[idx])
-                    .map(|(&c, (_, v))| (c, *v))
+                    .map(|(c, (_, v))| (c, *v))
                     .collect()
             };
             let sparse: Vec<Vec<(u32, u64)>> = if row_cols.len() * cols_packed.len() > PAR_WORK {
-                row_cols.par_iter().zip(&idxs).map(to_sparse).collect()
+                row_cols.into_par_iter().zip(&idxs).map(to_sparse).collect()
             } else {
-                row_cols.iter().zip(&idxs).map(to_sparse).collect()
+                row_cols.into_iter().zip(&idxs).map(to_sparse).collect()
             };
             // columns stay packed: only the terms of new polynomials are unpacked
-            (Cols::Packed(cols_packed.to_vec(), n_vars), sparse, tp1)
+            (Cols::Packed(cols_packed, n_vars), sparse, tp1)
         } else {
             let mut monomials: FxSet<Vec<u32>> = FxSet::default();
             let mut done: FxSet<Vec<u32>> = FxSet::default();
