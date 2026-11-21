@@ -373,8 +373,21 @@ impl Engine<'_> {
             exponent,
             modulus: modulus.to_vec(),
         })?;
-        let mut b = self.div(base, modulus)?.1;
-        let mut acc = self.div(&[1], modulus)?.1;
+        // A smaller-degree polynomial is already reduced. Recording a
+        // zero-quotient division allocates a certificate and runs the event
+        // sink without doing any field work. PowerBegin already binds the
+        // exact modulus and base, and the independent verifier recomputes
+        // both initial residues, so these no-op divisions are unnecessary.
+        let mut b = if base.len() < modulus.len() {
+            base.to_vec()
+        } else {
+            self.div(base, modulus)?.1
+        };
+        let mut acc = if modulus.len() > 1 {
+            vec![1]
+        } else {
+            self.div(&[1], modulus)?.1
+        };
         while exponent != 0 {
             if exponent & 1 == 1 {
                 let product = self.mul(&acc, &b)?;
