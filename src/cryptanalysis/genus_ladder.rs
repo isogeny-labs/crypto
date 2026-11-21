@@ -3468,12 +3468,12 @@ mod tests {
         );
     }
 
-    /// Timing probe: `ORDER_PROBE=p,g,method,cs cargo test --release --lib
+    /// Timing probe: `PROBE_ORDER=p,g,method,cs cargo test --release --lib
     /// order_probe -- --ignored --nocapture`.
     #[test]
     #[ignore = "manual timing probe"]
     fn order_probe() {
-        let v = std::env::var("ORDER_PROBE").expect("ORDER_PROBE=p,g,method,cs");
+        let v = std::env::var("PROBE_ORDER").expect("PROBE_ORDER=p,g,method,cs");
         let a: Vec<&str> = v.split(',').collect();
         let (p, g, cs): (u64, u32, u64) = (
             a[0].parse().unwrap(),
