@@ -111,6 +111,55 @@ theorem seven_independent_relation_annihilators :
   exact ⟨masked_log_annihilates_relation, masked_log_is_odd,
     masked_modes_independent⟩
 
+def wordConsistent (f : K → K) : Prop :=
+  ∀ a b : K, a + 6*b = 0 → f a + 6*f b = 0
+
+def signConsistent (f : K → K) : Prop :=
+  ∀ x : K, f (-x) = -f x
+
+def actualLog (x : K) : K := x
+
+def alternateLog (x : K) : K := x + maskedLog 2 x
+
+theorem actual_word_consistent : wordConsistent actualLog := by
+  intro a b h
+  simpa [actualLog] using h
+
+theorem alternate_word_consistent : wordConsistent alternateLog := by
+  intro a b h
+  have hm := masked_log_annihilates_relation (2 : K) (by decide) a b h
+  dsimp [alternateLog]
+  linear_combination h + hm
+
+theorem actual_sign_consistent : signConsistent actualLog := by
+  intro x
+  simp [actualLog]
+
+theorem alternate_sign_consistent : signConsistent alternateLog := by
+  intro x
+  have hm := masked_log_is_odd (2 : K) (by decide) x
+  simp only [alternateLog, hm]
+  ring
+
+theorem same_anchor : actualLog 1 = 1 ∧ alternateLog 1 = 1 := by decide
+
+theorem different_at_two : actualLog 2 ≠ alternateLog 2 := by decide
+
+theorem six_other_seeds : (seeds.erase 1).card = 6 := by decide
+
+theorem six_modes_preserve_anchor :
+    ∀ s ∈ seeds, s ≠ 1 → maskedLog s 1 = 0 := by decide
+
+theorem coefficient_six_word_does_not_determine_all_logs :
+    ∃ f g : K → K,
+      wordConsistent f ∧ wordConsistent g ∧
+      signConsistent f ∧ signConsistent g ∧
+      f 1 = 1 ∧ g 1 = 1 ∧ f 2 ≠ g 2 := by
+  refine ⟨actualLog, alternateLog, actual_word_consistent,
+    alternate_word_consistent, actual_sign_consistent,
+    alternate_sign_consistent, same_anchor.1, same_anchor.2,
+    different_at_two⟩
+
 #print axioms multiplier_six
 #print axioms multiplier_half_turn
 #print axioms seven_orbits_cover
@@ -129,5 +178,14 @@ theorem seven_independent_relation_annihilators :
 #print axioms masked_modes_separate
 #print axioms masked_modes_independent
 #print axioms seven_independent_relation_annihilators
+#print axioms actual_word_consistent
+#print axioms alternate_word_consistent
+#print axioms actual_sign_consistent
+#print axioms alternate_sign_consistent
+#print axioms same_anchor
+#print axioms different_at_two
+#print axioms six_other_seeds
+#print axioms six_modes_preserve_anchor
+#print axioms coefficient_six_word_does_not_determine_all_logs
 
 end XedniRelationWord6Orbits

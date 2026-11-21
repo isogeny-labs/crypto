@@ -14,11 +14,17 @@ Over \(\mathbb Z/43\mathbb Z\), multiplication by \(-6\) has order six, with \((
 
 The pinned [Lean module](formal/Orbit.lean) proves the multiplier order, seven-orbit partition, sign-folded three-column partition, relation-word implication for any additive abelian group, orbit preservation for scalar relations, and the masked-mode annihilation, oddness and independence theorem `XedniRelationWord6Orbits.seven_independent_relation_annihilators`. The actual [build output](formal/build-output.txt) records `#print axioms` for every reported declaration and lists only standard Lean foundations; build stderr is empty.
 
+The strengthened Lean theorem `coefficient_six_word_does_not_determine_all_logs` constructs two distinct sign-compatible assignments to the scalar-indexed log variables. Both satisfy **every** equation \(f(a)+6f(b)=0\) with \(a+6b=0\), both assign 1 to the anchored generator scalar 1, and they differ at scalar 2. The first assignment is \(f(x)=x\); the second adds the orbit-2 masked mode. Lean also checks that the other six orbit modes vanish at scalar 1. This is a nonuniqueness theorem for the stated relation equations and sign constraint; it specifies exactly which equations the coefficient-six-only linear system supplies.
+
+The frozen [assignment replay](assignment-protocol.json) maps the scalar construction to the concrete curve using the lexicographically first nonidentity point \(G=(2,2)\). Its [checked-Sage result](assignment-result.json) verifies both assignments against all 42 saved rows and the folded matrix, with common value 1 at \(G\) and different values 2 and 4 at \(2G=(30,15)\). The separate runtime receipt and empty stderr are retained.
+
 | Result | Lean declaration or receipt | Status |
 | --- | --- | --- |
 | \(P+6Q=0\Rightarrow P=-6Q\) | `relation_forces_neg_six` | Lean checked for any additive abelian group |
 | Seven disjoint multiplier orbits and seven three-column folded components | `seven_orbits_cover`, `seven_orbits_disjoint`, `folded_orbit_card_three`, `folded_orbits_disjoint`, `folded_orbits_cover` | Lean checked for `ZMod 43` |
 | Seven independent odd annihilators of every scalar coefficient-six relation | `seven_independent_relation_annihilators` | Lean checked for `ZMod 43` |
+| Two sign-compatible solutions with the same generator anchor and different values at scalar 2 | `coefficient_six_word_does_not_determine_all_logs`, `six_modes_preserve_anchor` | Lean checked for the exact coefficient-six scalar relation system |
+| Mapping those assignments onto every concrete curve row | [assignment replay](assignment-result.json) | Checked Sage, 42 of 42 rows |
 | Concrete curve-to-scalar identification and direct Lean matrix-rank theorem | Exact 42-row runner and checked-Sage audit | Formalization partial; these two Lean bridges remain open |
 
 This is an upper envelope for **one relation word on one fixed subgroup**. The earlier rational-lift and local-bridge packets explain which of these rows their concrete constructions can supply; the upper envelope grants all rows regardless. The next proof step is to formalize the concrete curve-to-scalar isomorphism and sign-folded matrix, then state `Matrix.rank = 14` directly in Lean. The next construction step is to find a distinct relation word that connects the seven components and to charge its full selection cost.
@@ -29,5 +35,6 @@ This is an upper envelope for **one relation word on one fixed subgroup**. The e
 python3 research/exotic_ecdlp_20261021/xedni_relation_word6_orbits_20261121/run.py
 /Volumes/SSD990/cryptanalysis/sage --runtime-info
 /Volumes/SSD990/cryptanalysis/sage -python research/exotic_ecdlp_20261021/xedni_relation_word6_orbits_20261121/sage_audit.py
+/Volumes/SSD990/cryptanalysis/sage -python research/exotic_ecdlp_20261021/xedni_relation_word6_orbits_20261121/assignment_sage.py
 sh research/exotic_ecdlp_20261021/xedni_relation_word6_orbits_20261121/formal/build.sh
 ```
