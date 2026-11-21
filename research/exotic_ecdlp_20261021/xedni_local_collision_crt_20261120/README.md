@@ -22,6 +22,8 @@ Of the 336 input pairs, 140 have no local gate at one auxiliary prime; the other
 
 The [independent audit](audit.py) enumerates local coefficients separately, counts local curve points by direct `(x,y)` enumeration, reconstructs the rational CRT curve from each coefficient triple, and evaluates `P1 + 2P2 = O` using an independent tangent formula. It matches the 39,672 local witness pairs, all 18,576 candidate rows, all 336 source statuses, and the zero relation count. Its [receipt](audit-result.json) is `PASS` with empty stderr.
 
+The three compressed row files are retained directly in Git through exact-path exceptions in `.artifacts/config.json`. This delivery amendment follows the frozen run: the artifact migration job received an S3 `403 Forbidden` while probing the new candidate-row object. The exception changes storage only; the protocol, runner, measured rows, and their digests remain the original run artifacts.
+
 The prior locally distinct-x rule found 8 relations among 32,256 constructed curves on a different source stratum. These exact rates describe their respective frozen rules; the strata have different local geometry, and this census does not establish a universal relation probability. The one-extra-digit rule also leaves the 42 same-rational-x pairs and alternative multi-coefficient or wider-height CRT policies open. This packet measures target-independent curve selection; a one-target ECDLP comparison would require target acquisition, relation extraction and linear algebra, full charged setup, and matched same-point rho.
 
 ## Replay
