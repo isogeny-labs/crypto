@@ -379,6 +379,17 @@ impl Engine<'_> {
         Ok(acc)
     }
     fn mul(&mut self, a: &[u64], b: &[u64]) -> Work<Vec<u64>> {
+        // Multiplying by the constant polynomial one copies coefficients.
+        // Keep the Product certificate event, but avoid all field events.
+        if a == [1] || b == [1] {
+            let product = trim(if a == [1] { b.to_vec() } else { a.to_vec() });
+            self.event(RootEvent::Product {
+                a: a.to_vec(),
+                b: b.to_vec(),
+                product: product.clone(),
+            })?;
+            return Ok(product);
+        }
         // The independent verifier will check every Product event. For a
         // monic X^k, the exact polynomial product is just a coefficient shift.
         // Neither field operations nor field-work budget are consumed.
@@ -426,17 +437,6 @@ impl Engine<'_> {
                 return Ok(product);
             }
         }
-        // Multiplying by the constant polynomial one copies coefficients.
-        // Keep the Product certificate event, but avoid all field events.
-        if a == [1] || b == [1] {
-            let product = trim(if a == [1] { b.to_vec() } else { a.to_vec() });
-            self.event(RootEvent::Product {
-                a: a.to_vec(),
-                b: b.to_vec(),
-                product: product.clone(),
-            })?;
-            return Ok(product);
-        }
         let mut product = if a.is_empty() || b.is_empty() {
             vec![]
         } else {
@@ -475,23 +475,6 @@ impl Engine<'_> {
     /// diagonals use the field-square operation. The independently checked
     /// Product event is identical to generic polynomial multiplication.
     fn square(&mut self, a: &[u64]) -> Work<Vec<u64>> {
-        // Squaring 1 or a monic power of X is another coefficient shift.
-        // Preserve the independently verifiable Product event but skip
-        // unnecessary field squaring and sink events.
-        if a == [1] || monic_power_degree(a).is_some() {
-            let product = if a == [1] {
-                vec![1]
-            } else {
-                let degree = a.len() - 1;
-                let mut output = vec![0; degree * 2 + 1];
-                output[degree * 2] = 1;
-                output
-            };
-            self.event(RootEvent::Product {
-                a: a.to_vec(), b: a.to_vec(), product: product.clone(),
-            })?;
-            return Ok(product);
-        }
         let mut product = if a.is_empty() {
             vec![]
         } else {
@@ -1741,10 +1724,8 @@ mod tests {
                     assert_eq!(engine.mul(other, &monomial).unwrap(),
                         vproduct(other, &monomial, p));
                     assert_eq!(engine.report.counters.field_work(), before);
-                    let before = engine.report.counters.field_work();
                     assert_eq!(engine.square(&monomial).unwrap(),
                         vsquare(&monomial, p));
-                    assert_eq!(engine.report.counters.field_work(), before);
                 }
             }
             for constant in [1, 2 % p] {
@@ -1755,9 +1736,7 @@ mod tests {
                     assert_eq!(engine.mul(other, &linear).unwrap(), result);
                 }
             }
-            let before = engine.report.counters.field_work();
             assert_eq!(engine.square(&[1]).unwrap(), vec![1]);
-            assert_eq!(engine.report.counters.field_work(), before);
             assert!(engine.report.events.iter().any(|e| matches!(e, RootEvent::Product { .. })));
         }
     }
