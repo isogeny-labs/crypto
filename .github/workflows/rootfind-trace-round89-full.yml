@@ -36,6 +36,24 @@ jobs:
         run: |
           set -euo pipefail
           python3 research/amm_digit_perf_20261118/round89_full_ab.py
+      - name: Isolate symmetric-square verifier replay
+        shell: bash
+        env:
+          ROOTFIND_BASELINE_REF: fb1011afad75de2bbe473cc5ed18405fb1e1983a
+          ROOTFIND_AB_OUTPUT: research/amm_digit_perf_20261118/round90_square_only_ab.csv
+          ROOTFIND_REPLAY_ABLATION: square_only
+        run: |
+          set -euo pipefail
+          python3 research/amm_digit_perf_20261118/round89_full_ab.py
+      - name: Isolate verified-GCD-remainder reuse
+        shell: bash
+        env:
+          ROOTFIND_BASELINE_REF: fb1011afad75de2bbe473cc5ed18405fb1e1983a
+          ROOTFIND_AB_OUTPUT: research/amm_digit_perf_20261118/round90_gcd_only_ab.csv
+          ROOTFIND_REPLAY_ABLATION: gcd_only
+        run: |
+          set -euo pipefail
+          python3 research/amm_digit_perf_20261118/round89_full_ab.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -43,3 +61,5 @@ jobs:
           path: |
             research/amm_digit_perf_20261118/round89_full_ab_results.csv
             research/amm_digit_perf_20261118/round90_replay_ab_results.csv
+            research/amm_digit_perf_20261118/round90_square_only_ab.csv
+            research/amm_digit_perf_20261118/round90_gcd_only_ab.csv
