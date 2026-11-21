@@ -1,0 +1,23 @@
+{
+  "schema": "xedni-same-target-timing-protocol-v1",
+  "study_tier": "ordinary-host exploratory correctness and stage-cost diagnostic; no Tier 0 or Tier 1 speedup gate",
+  "target": [2, 2],
+  "target_selection": "preexisting non-direct public point from the frozen height-order census; reused during method development",
+  "reduction_prime": 47,
+  "subgroup_order": 43,
+  "reduced_curve_coefficients": [0, 0, 0, 46, 45],
+  "reduced_generator": [43, 19],
+  "rational_curve_coefficients": [94, 0, 188, 1738, 3805],
+  "Q": [-4, 19],
+  "R": ["52242961/137641", "-1907191742616/51064811"],
+  "height_pairing_precision_bits": 128,
+  "height_pairing_matrix": [["0.76115383900892333903295666575543006507", "-0.76008758370207971153917082321179783517"], ["-0.76008758370207971153917082321179783517", "16.600741728784049454515529725637870238"]],
+  "lift_candidate_order": "nonzero (a,b) in [-4,4]^2 sorted by Decimal quadratic height score,a,b; no precomputed rational candidates",
+  "lift_stop": "first target lift with b=0, or both a target lift and an equal-reduction collision from two distinct rational candidates; derive R/G from the collision, then verify scalar multiplication",
+  "rho": "Floyd rho on the same target with x-mod-3 walk partition, deterministic per-pair seeds and restart on degenerate collision, cap 10000 iterations per seed",
+  "pairs": 5,
+  "pair_order": "alternate lift,rho and rho,lift",
+  "timing": "monotonic_ns starts before first target-dependent point operation and stops after scalar replay; process launch, curve construction, Q/R import, height pairing and coefficient sorting recorded as separate setup",
+  "resource": "one process, one thread, no resource isolation or enforced memory cap; record host/runtime and raw pairs",
+  "claim_boundary": "exploratory same-target timing on a reused 43-point input; no online speedup or extrapolation claim"
+}
