@@ -4,7 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from sage.all import EllipticCurve, GF, QQ
+from sage.all import EllipticCurve, GF, QQ, prime_range
 
 HERE = Path(__file__).resolve().parent
 
@@ -23,6 +23,18 @@ def evaluate(coeffs, t):
     for c in reversed(coeffs):
         y = y*t+c
     return y
+
+
+def roots_mod(coeffs, p):
+    residues = [c % p for c in coeffs]
+    roots = []
+    for t in range(p):
+        y = 0
+        for c in reversed(residues):
+            y = (y*t+c) % p
+        if y == 0:
+            roots.append(t)
+    return roots
 
 
 def local(E, p):
@@ -44,6 +56,10 @@ def main():
     assert (row["u"], row["v"], row["status"]) == (-5, -8, "unresolved")
     coeffs = [int(x) for x in row["coefficients"]]
     roots = [t for t in range(-10000, 10001) if evaluate(coeffs, t) == 0]
+    extended_certificate = None
+    if not roots:
+        extended_certificate = next((int(p) for p in prime_range(13, 2004)
+                                     if not roots_mod(coeffs, int(p))), None)
     replays = []
     for t in roots:
         k1, k2, k3 = -3+77*row["u"], -11+77*row["v"], 1+77*t
@@ -59,7 +75,9 @@ def main():
                         "local_7": local(E, 7), "local_11": local(E, 11)})
     print(json.dumps({"schema": "xedni-bridge6-wide-sieve-survivor-result-v1",
                       "status": "PASS", "cell": [-5, -8], "scan_t": [-10000, 10000],
-                      "integer_roots": roots, "replays": replays}, sort_keys=True, indent=2))
+                      "integer_roots": roots, "extended_prime_cap": 2003,
+                      "extended_certificate_prime": extended_certificate,
+                      "replays": replays}, sort_keys=True, indent=2))
 
 
 if __name__ == "__main__":
