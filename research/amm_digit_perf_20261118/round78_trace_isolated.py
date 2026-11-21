@@ -37,7 +37,7 @@ def linear_branch(source, suffix):
 div_sig = "fn div(&mut self, a: &[u64], b: &[u64])"
 old_div = extract(before, div_sig).replace("fn div(", "fn div_old(", 1)
 new_div = extract(after, div_sig).replace("fn div(", "fn div_new(", 1)
-inv = extract(after, "fn inv(&mut self, value: u64)")
+inv = extract(after, "fn inv(&mut self, value: u64)").replace("self.report.p", "self.p")
 cached = extract(after, "fn field_value_cached(op: &FieldOp, a: u64, b: u64, p: u64, reciprocal32: u64)")
 monomial = extract(after, "fn monic_x_shift(a: &[u64])")
 linear_old = linear_branch(before, "old")
