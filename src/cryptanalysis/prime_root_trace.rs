@@ -1118,19 +1118,40 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
     remainder.truncate(b.len() - 1);
     Ok((trim(quotient), trim(remainder)))
 }
+// Quotient-free ownership for a residue already below the modulus degree.
+// In particular, initial 1 and x+delta need no allocation or division when
+// their degrees are smaller. A nonempty modulus is required in both paths.
+#[inline]
+fn vpower_reduce(product: Vec<u64>, modulus: &[u64], p: u64) -> Result<Vec<u64>, String> {
+    if !modulus.is_empty() && product.len() < modulus.len() {
+        Ok(product)
+    } else {
+        Ok(vdiv(&product, modulus, p)?.1)
+    }
+}
 fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, String> {
-    let mut r = vdiv(&[1], m, p)?.1;
-    let mut b = vdiv(base, m, p)?.1;
+    // Polynomial remainder is invariant under scaling the modulus by a
+    // nonzero field element. Normalize a nonmonic modulus ONCE rather than
+    // redoing extended-Euclid inversion at every vdiv in the exponent loop.
+    // Leave monic inputs borrowed, avoiding an extra clone on the hot path.
+    let normalized;
+    let m = if m.last().is_some_and(|&lead| lead != 1) {
+        normalized = vmonic(m.to_vec(), p);
+        normalized.as_slice()
+    } else {
+        m
+    };
+    let mut r = vpower_reduce(vec![1], m, p)?;
+    let mut b = vpower_reduce(base.to_vec(), m, p)?;
     while e > 0 {
         if e & 1 == 1 {
-            r = vdiv(&vproduct(&r, &b, p), m, p)?.1;
+            r = vpower_reduce(vproduct(&r, &b, p), m, p)?;
         }
         e >>= 1;
-        // No subsequent iteration reads b after the final exponent bit.
-        // Skipping the last modular square saves a polynomial product
-        // and a polynomial division in the verifier's independent replay.
+        // Preserve the omitted terminal square and the independent
+        // symmetric verifier squaring algorithm.
         if e != 0 {
-            b = vdiv(&vsquare(&b, p), m, p)?.1;
+            b = vpower_reduce(vsquare(&b, p), m, p)?;
         }
     }
     Ok(r)
@@ -1297,13 +1318,19 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     return Err("nonconsecutive computation id".into());
                 }
                 next_id += 1;
+                // Replay with the same residue classes and original event
+                // values; a unit-scaled monic modulus reduces the same
+                // polynomials, but avoids repeated lead inversions.
+                let monic = vmonic(modulus.clone(), p);
+                let acc = vpower_reduce(vec![1], &monic, p)?;
+                let reduced_base = vpower_reduce(base.clone(), &monic, p)?;
                 powers.insert(
                     *id,
                     PowerState {
-                        acc: vdiv(&[1], modulus, p)?.1,
-                        base: vdiv(base, modulus, p)?.1,
+                        acc,
+                        base: reduced_base,
                         exponent: *exponent,
-                        modulus: modulus.clone(),
+                        modulus: monic,
                     },
                 );
             }
@@ -1320,7 +1347,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     return Err("power continued after completion".into());
                 }
                 if state.exponent & 1 == 1 {
-                    state.acc = vdiv(&vproduct(&state.acc, &state.base, p), &state.modulus, p)?.1;
+                    state.acc = vpower_reduce(vproduct(&state.acc, &state.base, p), &state.modulus, p)?;
                 }
                 let next_exponent = state.exponent >> 1;
                 // Either the original fully traced terminal square, or the
@@ -1329,7 +1356,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 // exactly matches the previously verified base. Every
                 // nonterminal square is still independently recomputed.
                 if next_exponent != 0 || base.as_slice() != state.base.as_slice() {
-                    state.base = vdiv(&vproduct(&state.base, &state.base, p), &state.modulus, p)?.1;
+                    state.base = vpower_reduce(vproduct(&state.base, &state.base, p), &state.modulus, p)?;
                 }
                 state.exponent = next_exponent;
                 if (*exponent, accumulator, base) != (state.exponent, &state.acc, &state.base) {
@@ -1624,6 +1651,69 @@ mod tests {
             ((a as u128 * x as u128 + b as u128) % p as u128) as u64
         })
     }
+    #[test]
+    fn round95_nonmonic_power_reduction_matches_legacy_reference() {
+        // Frozen reference performs every reduction using the original
+        // (possibly nonmonic) modulus and always materializes quotient pairs.
+        fn legacy(base: &[u64], mut exponent: u64, modulus: &[u64], p: u64)
+            -> Result<Vec<u64>, String>
+        {
+            let mut acc = vdiv(&[1], modulus, p)?.1;
+            let mut b = vdiv(base, modulus, p)?.1;
+            while exponent != 0 {
+                if exponent & 1 == 1 {
+                    acc = vdiv(&vproduct(&acc, &b, p), modulus, p)?.1;
+                }
+                exponent >>= 1;
+                if exponent != 0 {
+                    b = vdiv(&vsquare(&b, p), modulus, p)?.1;
+                }
+            }
+            Ok(acc)
+        }
+        let mut seed = 0x524f_4f54_2026_1195u64;
+        for p in [7u64, 65_521, 1_000_000_007, MAX_PRIME] {
+            for degree in [1usize, 2, 4, 8] {
+                for case in 0..24u64 {
+                    let mut modulus = vec![0u64; degree + 1];
+                    for coefficient in &mut modulus {
+                        seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                        *coefficient = seed % p;
+                    }
+                    modulus[degree] = if case & 1 == 0 { 1 } else { 2 + seed % (p - 2) };
+                    if case % 3 == 0 {
+                        for coefficient in &mut modulus[1..degree] {
+                            *coefficient = 0;
+                        }
+                    }
+                    let base = vec![seed.wrapping_add(case) % p, 1];
+                    for exponent in [0, 1, 17, (p - 1) / 2] {
+                        assert_eq!(
+                            vpower(&base, exponent, &modulus, p).unwrap(),
+                            legacy(&base, exponent, &modulus, p).unwrap(),
+                            "p={p}, degree={degree}, case={case}, exponent={exponent}"
+                        );
+                    }
+                }
+            }
+        }
+        assert!(vpower(&[1], 13, &[], 7).is_err());
+    }
+
+    #[test]
+    fn round95_verify_nonmonic_root_certificates() {
+        for p in [7u64, 13, 65_521, 1_000_000_007, MAX_PRIME] {
+            for mut polynomial in [vec![1, 2, 3], vec![2, 0, 3, 2], vec![3, 1, 0, 2]] {
+                for coefficient in &mut polynomial {
+                    *coefficient %= p;
+                }
+                let report = run(&polynomial, p);
+                verify(&report).unwrap();
+                assert!(report.complete(), "p={p}, polynomial={polynomial:?}");
+            }
+        }
+    }
+
     #[test]
     fn round93_traced_division_matches_independent_quotient_remainder() {
         // Exhaust both monic and nonmonic cases, with sparse and dense
