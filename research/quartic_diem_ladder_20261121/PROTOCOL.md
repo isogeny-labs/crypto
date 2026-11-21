@@ -81,7 +81,10 @@ genus_ladder.qsfb run --primes 1031,2053,4099,8209,16411,32771,65537 --genera 2 
   --qc 3.0 --max-h 1 --curves 5 --seeds 2 --rho-cap 2e8 --threads 2 --out raw/run.jsonl
 ```
 
-(`a..b` is written out in full on the command line; `65537` continues the odd list after 57,
+The exact command lines, with every seed written out, are `run_main.sh`,
+`run_131101_odd.sh` and `run_131101_even.sh` (hashed in `frozen.sha256`); they are run in that
+order, the main session first (2 threads) and then the two 131101 processes together (1 thread
+each), so at most 2 threads run at any time. (`a..b` is written out in full on the command line; `65537` continues the odd list after 57,
 since pre-check 2 tried odd seeds to 57 and even seeds to 166.) `--rho-cap 2e8` runs the
 measured negation rho `Q_rho_neg` exactly where `sqrt(pi r / 4) <= 2e6`, that is at
 `p <= 16411`, on every (curve, seed).
@@ -170,6 +173,14 @@ curves in an arm is dropped from that arm and disclosed.
   `dev/` of this study (curves at `p = 4093, 8191`, not grid primes, not in any fit).
 - The pre-check-2 validator found the T kick alone not significant; the linked policy carries
   the retry cut. Both arms here keep the pre-check-2 settings (kick and linked policy) unchanged.
+
+## 6c. Interruption before freeze (disclosed)
+
+The container restarted at about 04:30 UTC on 2026-11-21, before this protocol was frozen and
+before any measured run. The build directory (on tmpfs) was lost and the binary was rebuilt from
+the same working tree; the development smoke run in `dev/` is from the first build (identical
+library source, binary without the F3 record fields). No measured data existed, so nothing was
+discarded.
 
 ## 7. Predictions (written before the data, from pre-check 2's numbers)
 
