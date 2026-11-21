@@ -36,7 +36,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 research/amm_digit_perf_20261118/round89_full_ab.py
-      - name: Measure round91 binomial and zero-quotient optimizations against frozen round90
+      - name: Measure round91 isolated certificate-binomial replay against frozen round90
         shell: bash
         env:
           ROOTFIND_BASELINE_REF: 323fe79e7f96af69bdfba3630e65b4f2d94a4c00
