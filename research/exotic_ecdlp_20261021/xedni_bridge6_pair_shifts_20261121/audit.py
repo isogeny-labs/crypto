@@ -92,7 +92,10 @@ def main():
                    for q in primes[:primes.index(p)])
         assert all(mod_value(coeff, z, p) != 0 for z in range(p))
         prime_counts[p] += 1
-    lean_text = (HERE / "formal" / "PairShifts.lean").read_text()
+    lean_raw = (HERE / "formal" / "PairShifts.lean").read_bytes()
+    lean_receipt = json.loads((HERE / "formal" / "source-result.json").read_text())
+    assert sha(lean_raw) == lean_receipt["lean_sha256"]
+    lean_text = lean_raw.decode()
     lean_lists = re.findall(r"def coeffs(\d{3}) : List ℤ := \[(.*?)\]", lean_text, re.S)
     assert len(lean_lists) == 22
     for i, (label, body) in enumerate(lean_lists):
@@ -100,7 +103,10 @@ def main():
         assert tuple(map(int, re.findall(r"-?\d+", body))) == tuple(
             map(int, rows[i]["numerator_coefficients"]))
     build_output = (HERE / "formal" / "build-output.txt").read_text()
-    assert build_output.count("depends on axioms:") == 44
+    build_lines = build_output.splitlines()
+    assert len(build_lines) == 44
+    assert all("depends on axioms: [propext, Classical.choice, Quot.sound]" in x
+               for x in build_lines)
     assert "sorryAx" not in build_output and "error:" not in build_output
     assert not (HERE / "formal" / "build-stderr.txt").read_text()
     print(json.dumps({"schema": "xedni-bridge6-pair-shifts-audit-v1",
