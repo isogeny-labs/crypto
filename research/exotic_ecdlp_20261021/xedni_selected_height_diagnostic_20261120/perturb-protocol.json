@@ -1,0 +1,11 @@
+{
+  "schema": "xedni-selected-c2-simon-perturb-protocol-v1",
+  "reason": "The C2 Simon (3,3) result supplied four points comprising only two inverse pairs and returned two points; compare equivalent known-point inputs.",
+  "fixtures_sha256": "7df5e375792c2c9cd0368ffd878e47ef268078bc14b42b6d1384fddf9cf3f0b7",
+  "simon_witness_result_sha256": "543c34a2a5d87d3c3fa95844294870a79b6167062e22e178d66468528b78763f",
+  "source_sha256": "b479c964d007d0e073a1f0ba4cb99ab8dd7b41919597d2ba40c3d3af028a11e5",
+  "curve_id": "C2",
+  "arms": ["none", "one independent selected point", "two independent selected points", "all four selected points including inverses"],
+  "algorithm": "Sage simon_two_descent with limbigprime=0",
+  "interpretation_gate": "If lower/upper bounds change with redundant inverse inputs, retain each row and do not claim a rank theorem from that API without an independent certificate"
+}

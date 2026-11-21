@@ -1,0 +1,18 @@
+{
+  "schema": "xedni-coefficient-choice-protocol-v1",
+  "source": "/Volumes/SSD990/cryptanalysis/experiments/xedni-varying-curve-selection-20261115/rows-v2.jsonl.gz",
+  "source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "input_rule": "all 20 rows accepted by the frozen p=7 weak-order short-Weierstrass gate",
+  "curve_family": "a1=47*k1, a2=47*k2, a3=47*k3 for each k in {-1,0,1}; solve a4,a6 exactly from both centered lifted point equations; scan lexicographic (k1,k2,k3)",
+  "coefficient_choices_per_pair": 27,
+  "reduction": "require all coefficients integral at 47, 7 and 11, good reduction at all three primes, and equality to the fixed source curve y^2=x^3-x-2 at 47",
+  "auxiliary_gates": {
+    "7": "point-incidence rank 2 and curve order 4",
+    "11_strict": "point-incidence rank 2 and curve order 6",
+    "11_weak": "point-incidence rank 2 and curve order 7"
+  },
+  "relation": "check P1+2*P2 in E(Q), E(F_47), E(F_7), E(F_11) whenever defined; retain every candidate status",
+  "selection": "first lexicographic candidate satisfying both p=7 and p=11 gates per input pair, separately for strict and weak p=11 arms",
+  "resource": "complete 540-candidate exact screen, no wall-time performance comparison",
+  "interpretation": "finite coefficient-choice family on the prior accepted 20-pair panel; not an unrestricted CRT search"
+}

@@ -1,0 +1,27 @@
+{
+  "schema": "xedni-selected-rank-proof-protocol-v1",
+  "reason": "The first frozen Simon two-descent pass returned equal rank bounds (3,3) for all three curves; check with independent proof-enabled rank algorithms.",
+  "fixtures_sha256": "7df5e375792c2c9cd0368ffd878e47ef268078bc14b42b6d1384fddf9cf3f0b7",
+  "first_rank_result_sha256": "c9433e28e78bcb72ec7479b18e4ae37db3433c4b2f50ec2d0989bc6a0e34a3b8",
+  "first_height_result_sha256": "7705af7aaaadb0f33f04f654e438703dc5920b34e314f9adfc3f819416ce20de",
+  "source_sha256": {
+    "rank_proof_sage.py": "813325af299f39fcb2c1748a0fb3d63ab2ac7e26852a7fabe68563c1e474649d",
+    "run_rank_proof.py": "4999e2a6dd3d9ea4685cbf3f1ab320486d411bfee3d47724fb8947b28768790b"
+  },
+  "arms": [
+    ["C0", "pari"], ["C0", "mwrank_lib"],
+    ["C1", "pari"], ["C1", "mwrank_lib"],
+    ["C2", "pari"], ["C2", "mwrank_lib"]
+  ],
+  "arguments": {
+    "use_database": false,
+    "proof": true,
+    "only_use_mwrank": true,
+    "timeout_seconds_per_arm": 90
+  },
+  "status_rules": {
+    "complete": "Save the returned rank and exact algorithm name",
+    "timeout": "Preserve censored arm and the prior rank interval",
+    "error": "Preserve error and the prior rank interval"
+  }
+}

@@ -1,0 +1,3 @@
+# Lossless input packaging after the frozen screen
+
+The frozen screen generated four transformed `.ms` files of about 1.4 MiB each. After the screen result and null selection were recorded, each file was compressed with deterministic gzip (`mtime=0`) and base64-encoded as wrapped text for Git custody. `packaging.json` retains both raw and encoded SHA-256 digests and sizes. The source inputs, transformation, term counts, selection rule, and decision were not changed. The raw files remain regenerable by the pinned `screen.py` and are ignored by Git; `package.py` verifies byte-for-byte round-trip recovery.

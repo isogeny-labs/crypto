@@ -1,0 +1,13 @@
+{
+  "schema": "xedni-residue10-k3-polynomial-protocol-v1",
+  "source_checks_sha256": "bdb75efc5d21658b01a48a36cdebf0daa0a9c29e1f2566d9c4005a26eb79e104",
+  "point_source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "input_law": "all 1488 locally selected centered CRT curves in the frozen coefficient-10 rational-check packet; retain every reduced-compatible and incompatible status",
+  "selection": "post-run diagnostic: compute P+10Q in the fixed E(F47) group and retain its 32 compatible rows for the polynomial screen; this is not a free unknown-target selector",
+  "shift_law": "for each compatible centered class fix k1,k2, set k3'=k3+77t for arbitrary integer t, and reconstruct a4,a6 exactly from the two source-point equations",
+  "necessary_polynomial": "primitive integer numerator of the generic rational function x(10Q)-x(P) over QQ(t), after cancellation in its fraction field; a nonsingular specialization with P+10Q=O must give a root",
+  "certificate": "search the primes in [13,257] in increasing order; record the first modulus for which the integer numerator has no root in the residue field, or retain unresolved",
+  "expected_selected": 32,
+  "resource": "complete finite 1488-row reduced-compatibility audit plus 32 exact function-field constructions; retain producer failures and unresolved polynomial cells; no timing comparison",
+  "claim_boundary": "all integer k3 shifts of the 32 fixed-k1/k2 classes only; k1/k2 shifts, different local witnesses, changed point lifts, and changed auxiliary policies remain separate"
+}

@@ -1,0 +1,7 @@
+# G2 Frobenius lead audit, frozen before replay
+
+Read five immutable N31 experiment receipts from the cryptanalysis checkout. Check their SHA-256 digests before parsing. Assert the two archived target parameters have full length-31 Frobenius orbits, covariance under leaf squaring, and distinct same-leaf equation streams. Check full degree-four row counts, ranks, and nonzero counts for both leaf bases. Check all held-out pivot projections, including failed cases and their full-rank controls.
+
+The result is an archive-consistency and lead-selection diagnostic. It does not time a new solver. A surviving G2 method must process one fixed public target, preserve the complete S3 solution set, and reduce charged target-dependent specialization, elimination, reconstruction, and point-check work against the direct method. Freeze the target point and query law, setup policy, implementation hashes, resource limits, and paired run order before that measurement.
+
+The next cheapest implementation gate is adaptive information-set repair on the archived 16 fresh coordinates. Start from the frozen 15,856-column training union. For each coordinate, rank the projection, then add columns from a full-width echelon profile until rank equals the full-width rank. Record added columns, target-dependent rank checks, elimination, reconstruction, and point checks. A reduction in column count alone is a structural diagnostic; solver wall-time improvement requires the full charged comparison.

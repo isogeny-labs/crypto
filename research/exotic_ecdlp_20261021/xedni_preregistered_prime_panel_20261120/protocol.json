@@ -1,0 +1,17 @@
+{
+  "schema": "xedni-preregistered-prime-panel-protocol-v1",
+  "rational_curve_coefficients": [94, 0, 188, 1738, 3805],
+  "Q": [-4, 19],
+  "R": ["52242961/137641", "-1907191742616/51064811"],
+  "prime_windows_lower_inclusive_upper_exclusive": [[1500, 1750], [1750, 2000], [2000, 2250], [2250, 2500], [2500, 2750]],
+  "selection_rule": "within each window, test ascending rational primes and select the first with good reduction, R-coordinate denominators invertible, prime #E(Fp), and nonidentity reduced Q; retain every tested prime and status; a window with none remains no_eligible_prime",
+  "selection_boundary": "prime/order eligibility and window bounds only; never inspect R/G scalar, relation index, coverage or coordinate peak during selection",
+  "coefficient_cap": "B=floor(sqrt(q))+2 for selected prime group order q; enumerate all nonzero (a,b) in [-B,B]^2",
+  "height_pairing_precision_bits": 128,
+  "height_pairing_matrix": [["0.76115383900892333903295666575543006507", "-0.76008758370207971153917082321179783517"], ["-0.76008758370207971153917082321179783517", "16.600741728784049454515529725637870238"]],
+  "candidate_order": "ascending Decimal quadratic height score hQQ*a^2+2*hQR*a*b+hRR*b^2, then a,b; point construction follows sorting",
+  "relation_event": "first nonzero rational aQ+bR reducing to identity, or first two distinct rational candidates with equal nonidentity reduction; derive R/G scalar from coefficient difference and verify it",
+  "coverage": "stop each selected prime on coverage of all q-1 nonidentity reduced points or at the full coefficient cap; retain capped and unselected windows",
+  "work": "record all selection decisions, first relation and coverage indices, exact rational coordinate bit peaks, distinct reductions and status; share exact rational point cache only inside this structural panel and report its construction count",
+  "claim_boundary": "preregistered finite panel on one rational curve; no timed single-target or random-curve generalization"
+}

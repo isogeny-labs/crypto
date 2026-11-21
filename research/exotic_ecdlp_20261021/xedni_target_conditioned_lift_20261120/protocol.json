@@ -1,0 +1,12 @@
+{
+  "schema": "xedni-target-conditioned-lift-protocol-v1",
+  "source_packed_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "curve_coefficients": [94, 0, 188, 1738, 3805],
+  "reduction_prime": 47,
+  "input_law": "all 42 nonidentity E(F47) points, sorted by (x,y); no scalar labels read by selector",
+  "height_cap": 1024,
+  "enumeration_order": "increasing H=max(abs(a),b), then increasing b and a; b>=1, gcd(abs(a),b)=1, x=a/b^2",
+  "target_filter": "for public target (xt,yt), generate only a congruent to xt*b^2 mod47; test the integral curve discriminant and both y roots, stop on the first reduction equal to (xt,yt)",
+  "work": "record b-loop steps, residue candidate pairs, coprime discriminant tests, rational point roots inspected, success height and exact lift or height_cap_exhausted",
+  "claim_boundary": "exact finite-law target-conditioned search for one curve and cap; does not imply coverage or speed for other curves or heights"
+}

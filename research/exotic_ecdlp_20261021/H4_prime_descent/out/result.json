@@ -1,0 +1,3849 @@
+{
+ "experiment": "H4",
+ "degree_method": "d_ff and d_solv are measured with an in-house Boolean Macaulay-matrix profile (squarefree monomials, field equations built in). For D=d_min.. we form all multiples m*f_i with deg(m)+deg(f_i)<=D, rank r_D (random GF(2) column projection to rows+48 dims, exact M4RI rank, failure prob ~2^-48) and r_top (rank of degree-D block). Degree fall F_D = r_D - r_top - r_{D-1}; d_ff = first D with F_D>0. d_solv = first D with Q_D = dim P_{<=D} - r_D equal to the true number of Boolean solutions s (s by exhaustive enumeration over V^3 for l<=8, else not available -> d_solv censored). PolyBoRi groebner_basis()+variety() is used for the correctness control (planted solution recovered) for n<=19; PolyBoRi exposes no step degrees. Chained S_3 with the single intermediate abscissa u eliminated by resultant gives S_4 (m=3 needs one intermediate, not two; two would be m=4/S_5). No FGHR 4-torsion symmetrization (random curves, E[4] not rational): raw system.",
+ "ns_planned": [
+  11,
+  13,
+  17,
+  19,
+  23,
+  29,
+  31,
+  37,
+  41
+ ],
+ "seed": 20261022,
+ "cells": {
+  "11": {
+   "n": 11,
+   "l": 4,
+   "nvars": 12,
+   "n_instances": 10,
+   "planted_solved": true,
+   "planted_checked": 5,
+   "d_first_fall": 7.0,
+   "d_solving": 12.0,
+   "d_ff_all": [
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7
+   ],
+   "d_solv_all": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   "macaulay_cols_at_solv": 4096,
+   "time_s": 1.3958253860473633,
+   "budget_s": 600,
+   "max_D_completed": 7,
+   "instances": [
+    {
+     "inst": 0,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 12,
+      "l": 4,
+      "neq": 11,
+      "build_s": 0.014508962631225586,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 523,
+      "planted_residual": 0,
+      "n_solutions": 3,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 11,
+       "cols": 2510,
+       "rank": 11,
+       "rank_top": 11,
+       "fall": 0,
+       "Q": 2499,
+       "t": 0.007035493850708008
+      },
+      {
+       "D": 7,
+       "rows": 143,
+       "cols": 3302,
+       "rank": 143,
+       "rank_top": 66,
+       "fall": 66,
+       "Q": 3159,
+       "t": 0.03062605857849121
+      }
+     ],
+     "gb": {
+      "gb_time": 0.8662149906158447,
+      "build": 0.056139230728149414,
+      "gb_len": 11,
+      "inconsistent": false,
+      "n_solutions": 3,
+      "planted_in_variety": true,
+      "max_gb_deg": 2
+     },
+     "time": 0.10225605964660645
+    },
+    {
+     "inst": 0,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 12,
+      "l": 4,
+      "neq": 11,
+      "build_s": 0.018101930618286133,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 533,
+      "n_solutions": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 11,
+       "cols": 2510,
+       "rank": 11,
+       "rank_top": 11,
+       "fall": 0,
+       "Q": 2499,
+       "t": 0.006462812423706055
+      },
+      {
+       "D": 7,
+       "rows": 143,
+       "cols": 3302,
+       "rank": 143,
+       "rank_top": 66,
+       "fall": 66,
+       "Q": 3159,
+       "t": 0.030721664428710938
+      }
+     ],
+     "gb": null,
+     "time": 0.10492300987243652
+    },
+    {
+     "inst": 1,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 12,
+      "l": 4,
+      "neq": 11,
+      "build_s": 0.016459226608276367,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 536,
+      "planted_residual": 0,
+      "n_solutions": 6,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 11,
+       "cols": 2510,
+       "rank": 11,
+       "rank_top": 11,
+       "fall": 0,
+       "Q": 2499,
+       "t": 0.006444692611694336
+      },
+      {
+       "D": 7,
+       "rows": 143,
+       "cols": 3302,
+       "rank": 143,
+       "rank_top": 66,
+       "fall": 66,
+       "Q": 3159,
+       "t": 0.029327392578125
+      }
+     ],
+     "gb": {
+      "gb_time": 1.0081045627593994,
+      "build": 0.056610822677612305,
+      "gb_len": 13,
+      "inconsistent": false,
+      "n_solutions": 6,
+      "planted_in_variety": true,
+      "max_gb_deg": 2
+     },
+     "time": 0.10193061828613281
+    },
+    {
+     "inst": 1,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 12,
+      "l": 4,
+      "neq": 11,
+      "build_s": 0.017870664596557617,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 550,
+      "n_solutions": 6
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 11,
+       "cols": 2510,
+       "rank": 11,
+       "rank_top": 11,
+       "fall": 0,
+       "Q": 2499,
+       "t": 0.006242036819458008
+      },
+      {
+       "D": 7,
+       "rows": 143,
+       "cols": 3302,
+       "rank": 143,
+       "rank_top": 66,
+       "fall": 66,
+       "Q": 3159,
+       "t": 0.029806137084960938
+      }
+     ],
+     "gb": null,
+     "time": 0.10342192649841309
+    },
+    {
+     "inst": 2,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 12,
+      "l": 4,
+      "neq": 11,
+      "build_s": 0.013243675231933594,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 533,
+      "planted_residual": 0,
+      "n_solutions": 6,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 11,
+       "cols": 2510,
+       "rank": 11,
+       "rank_top": 11,
+       "fall": 0,
+       "Q": 2499,
+       "t": 0.0074155330657958984
+      },
+      {
+       "D": 7,
+       "rows": 143,
+       "cols": 3302,
+       "rank": 143,
+       "rank_top": 66,
+       "fall": 66,
+       "Q": 3159,
+       "t": 0.030711650848388672
+      }
+     ],
+     "gb": null,
+     "time": 0.10157966613769531
+    },
+    {
+     "inst": 2,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 12,
+      "l": 4,
+      "neq": 11,
+      "build_s": 0.017775535583496094,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 541,
+      "n_solutions": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 11,
+       "cols": 2510,
+       "rank": 11,
+       "rank_top": 11,
+       "fall": 0,
+       "Q": 2499,
+       "t": 0.006762027740478516
+      },
+      {
+       "D": 7,
+       "rows": 143,
+       "cols": 3302,
+       "rank": 143,
+       "rank_top": 66,
+       "fall": 66,
+       "Q": 3159,
+       "t": 0.030741214752197266
+      }
+     ],
+     "gb": null,
+     "time": 0.10534191131591797
+    },
+    {
+     "inst": 3,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 12,
+      "l": 4,
+      "neq": 11,
+      "build_s": 0.01624608039855957,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 532,
+      "planted_residual": 0,
+      "n_solutions": 3,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 11,
+       "cols": 2510,
+       "rank": 11,
+       "rank_top": 11,
+       "fall": 0,
+       "Q": 2499,
+       "t": 0.006606578826904297
+      },
+      {
+       "D": 7,
+       "rows": 143,
+       "cols": 3302,
+       "rank": 143,
+       "rank_top": 66,
+       "fall": 66,
+       "Q": 3159,
+       "t": 0.02989363670349121
+      }
+     ],
+     "gb": null,
+     "time": 0.10282707214355469
+    },
+    {
+     "inst": 3,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 12,
+      "l": 4,
+      "neq": 11,
+      "build_s": 0.01809096336364746,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 538,
+      "n_solutions": 6
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 11,
+       "cols": 2510,
+       "rank": 11,
+       "rank_top": 11,
+       "fall": 0,
+       "Q": 2499,
+       "t": 0.0061304569244384766
+      },
+      {
+       "D": 7,
+       "rows": 143,
+       "cols": 3302,
+       "rank": 143,
+       "rank_top": 66,
+       "fall": 66,
+       "Q": 3159,
+       "t": 0.02772045135498047
+      }
+     ],
+     "gb": null,
+     "time": 0.10133790969848633
+    },
+    {
+     "inst": 4,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 12,
+      "l": 4,
+      "neq": 11,
+      "build_s": 0.015996694564819336,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 540,
+      "planted_residual": 0,
+      "n_solutions": 6,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 11,
+       "cols": 2510,
+       "rank": 11,
+       "rank_top": 11,
+       "fall": 0,
+       "Q": 2499,
+       "t": 0.006916522979736328
+      },
+      {
+       "D": 7,
+       "rows": 143,
+       "cols": 3302,
+       "rank": 143,
+       "rank_top": 66,
+       "fall": 66,
+       "Q": 3159,
+       "t": 0.029366731643676758
+      }
+     ],
+     "gb": null,
+     "time": 0.10099172592163086
+    },
+    {
+     "inst": 4,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 12,
+      "l": 4,
+      "neq": 11,
+      "build_s": 0.01807713508605957,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 531,
+      "n_solutions": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 11,
+       "cols": 2510,
+       "rank": 11,
+       "rank_top": 11,
+       "fall": 0,
+       "Q": 2499,
+       "t": 0.006575822830200195
+      },
+      {
+       "D": 7,
+       "rows": 143,
+       "cols": 3302,
+       "rank": 143,
+       "rank_top": 66,
+       "fall": 66,
+       "Q": 3159,
+       "t": 0.0291595458984375
+      }
+     ],
+     "gb": null,
+     "time": 0.10203862190246582
+    }
+   ],
+   "censored": true,
+   "censored_what": "d_solv",
+   "d_solv_lower_bound": 8,
+   "d_solv_method": "macaulay_Q=s (deep pass, 1 instance/arm)"
+  },
+  "13": {
+   "n": 13,
+   "l": 5,
+   "nvars": 15,
+   "n_instances": 10,
+   "planted_solved": true,
+   "planted_checked": 5,
+   "d_first_fall": 7.0,
+   "d_solving": null,
+   "d_ff_all": [
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7
+   ],
+   "d_solv_all": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   "macaulay_cols_at_solv": null,
+   "time_s": 89.50640749931335,
+   "budget_s": 600,
+   "max_D_completed": 7,
+   "instances": [
+    {
+     "inst": 0,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 15,
+      "l": 5,
+      "neq": 13,
+      "build_s": 0.018152952194213867,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 1736,
+      "planted_residual": 0,
+      "n_solutions": 6,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 13,
+       "cols": 9949,
+       "rank": 13,
+       "rank_top": 13,
+       "fall": 0,
+       "Q": 9936,
+       "t": 0.006852149963378906
+      },
+      {
+       "D": 7,
+       "rows": 208,
+       "cols": 16384,
+       "rank": 208,
+       "rank_top": 117,
+       "fall": 78,
+       "Q": 16176,
+       "t": 0.0688471794128418
+      }
+     ],
+     "gb": {
+      "gb_time": 82.04660320281982,
+      "build": 0.16839861869812012,
+      "gb_len": 16,
+      "inconsistent": false,
+      "n_solutions": 6,
+      "planted_in_variety": true,
+      "max_gb_deg": 2
+     },
+     "time": 0.21466398239135742
+    },
+    {
+     "inst": 0,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 15,
+      "l": 5,
+      "neq": 13,
+      "build_s": 0.020700454711914062,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 1733,
+      "n_solutions": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 13,
+       "cols": 9949,
+       "rank": 13,
+       "rank_top": 13,
+       "fall": 0,
+       "Q": 9936,
+       "t": 0.006486654281616211
+      },
+      {
+       "D": 7,
+       "rows": 208,
+       "cols": 16384,
+       "rank": 208,
+       "rank_top": 117,
+       "fall": 78,
+       "Q": 16176,
+       "t": 0.06844663619995117
+      }
+     ],
+     "gb": null,
+     "time": 0.2152557373046875
+    },
+    {
+     "inst": 1,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 15,
+      "l": 5,
+      "neq": 13,
+      "build_s": 0.019327640533447266,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 1742,
+      "planted_residual": 0,
+      "n_solutions": 18,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 13,
+       "cols": 9949,
+       "rank": 13,
+       "rank_top": 13,
+       "fall": 0,
+       "Q": 9936,
+       "t": 0.00649261474609375
+      },
+      {
+       "D": 7,
+       "rows": 208,
+       "cols": 16384,
+       "rank": 208,
+       "rank_top": 117,
+       "fall": 78,
+       "Q": 16176,
+       "t": 0.06771516799926758
+      }
+     ],
+     "gb": {
+      "gb_time": 88.66890120506287,
+      "build": 0.16936373710632324,
+      "gb_len": 36,
+      "inconsistent": false,
+      "n_solutions": 18,
+      "planted_in_variety": true,
+      "max_gb_deg": 3
+     },
+     "time": 0.21407318115234375
+    },
+    {
+     "inst": 1,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 15,
+      "l": 5,
+      "neq": 13,
+      "build_s": 0.02118682861328125,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 1718,
+      "n_solutions": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 13,
+       "cols": 9949,
+       "rank": 13,
+       "rank_top": 13,
+       "fall": 0,
+       "Q": 9936,
+       "t": 0.0062673091888427734
+      },
+      {
+       "D": 7,
+       "rows": 208,
+       "cols": 16384,
+       "rank": 208,
+       "rank_top": 117,
+       "fall": 78,
+       "Q": 16176,
+       "t": 0.06728005409240723
+      }
+     ],
+     "gb": null,
+     "time": 0.2143552303314209
+    },
+    {
+     "inst": 2,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 15,
+      "l": 5,
+      "neq": 13,
+      "build_s": 0.018672466278076172,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 1746,
+      "planted_residual": 0,
+      "n_solutions": 18,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 13,
+       "cols": 9949,
+       "rank": 13,
+       "rank_top": 13,
+       "fall": 0,
+       "Q": 9936,
+       "t": 0.0068666934967041016
+      },
+      {
+       "D": 7,
+       "rows": 208,
+       "cols": 16384,
+       "rank": 208,
+       "rank_top": 117,
+       "fall": 78,
+       "Q": 16176,
+       "t": 0.06839847564697266
+      }
+     ],
+     "gb": null,
+     "time": 0.21413230895996094
+    },
+    {
+     "inst": 2,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 15,
+      "l": 5,
+      "neq": 13,
+      "build_s": 0.02239513397216797,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 1731,
+      "n_solutions": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 13,
+       "cols": 9949,
+       "rank": 13,
+       "rank_top": 13,
+       "fall": 0,
+       "Q": 9936,
+       "t": 0.006303548812866211
+      },
+      {
+       "D": 7,
+       "rows": 208,
+       "cols": 16384,
+       "rank": 208,
+       "rank_top": 117,
+       "fall": 78,
+       "Q": 16176,
+       "t": 0.06851482391357422
+      }
+     ],
+     "gb": null,
+     "time": 0.21680665016174316
+    },
+    {
+     "inst": 3,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 15,
+      "l": 5,
+      "neq": 13,
+      "build_s": 0.019102096557617188,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 1750,
+      "planted_residual": 0,
+      "n_solutions": 24,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 13,
+       "cols": 9949,
+       "rank": 13,
+       "rank_top": 13,
+       "fall": 0,
+       "Q": 9936,
+       "t": 0.006464958190917969
+      },
+      {
+       "D": 7,
+       "rows": 208,
+       "cols": 16384,
+       "rank": 208,
+       "rank_top": 117,
+       "fall": 78,
+       "Q": 16176,
+       "t": 0.06819653511047363
+      }
+     ],
+     "gb": null,
+     "time": 0.21378517150878906
+    },
+    {
+     "inst": 3,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 15,
+      "l": 5,
+      "neq": 13,
+      "build_s": 0.02193474769592285,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 1719,
+      "n_solutions": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 13,
+       "cols": 9949,
+       "rank": 13,
+       "rank_top": 13,
+       "fall": 0,
+       "Q": 9936,
+       "t": 0.006154060363769531
+      },
+      {
+       "D": 7,
+       "rows": 208,
+       "cols": 16384,
+       "rank": 208,
+       "rank_top": 117,
+       "fall": 78,
+       "Q": 16176,
+       "t": 0.06714701652526855
+      }
+     ],
+     "gb": null,
+     "time": 0.21478509902954102
+    },
+    {
+     "inst": 4,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 15,
+      "l": 5,
+      "neq": 13,
+      "build_s": 0.01580357551574707,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 1737,
+      "planted_residual": 0,
+      "n_solutions": 6,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 13,
+       "cols": 9949,
+       "rank": 13,
+       "rank_top": 13,
+       "fall": 0,
+       "Q": 9936,
+       "t": 0.0068471431732177734
+      },
+      {
+       "D": 7,
+       "rows": 208,
+       "cols": 16384,
+       "rank": 208,
+       "rank_top": 117,
+       "fall": 78,
+       "Q": 16176,
+       "t": 0.06592917442321777
+      }
+     ],
+     "gb": null,
+     "time": 0.20720219612121582
+    },
+    {
+     "inst": 4,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 15,
+      "l": 5,
+      "neq": 13,
+      "build_s": 0.02161407470703125,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 1705,
+      "n_solutions": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 13,
+       "cols": 9949,
+       "rank": 13,
+       "rank_top": 13,
+       "fall": 0,
+       "Q": 9936,
+       "t": 0.006473541259765625
+      },
+      {
+       "D": 7,
+       "rows": 208,
+       "cols": 16384,
+       "rank": 208,
+       "rank_top": 117,
+       "fall": 78,
+       "Q": 16176,
+       "t": 0.0649101734161377
+      }
+     ],
+     "gb": null,
+     "time": 0.21091485023498535
+    }
+   ],
+   "censored": true,
+   "censored_what": "d_solv",
+   "d_solv_lower_bound": 10
+  },
+  "17": {
+   "n": 17,
+   "l": 6,
+   "nvars": 18,
+   "n_instances": 6,
+   "planted_solved": true,
+   "planted_checked": 3,
+   "d_first_fall": 7.0,
+   "d_solving": null,
+   "d_ff_all": [
+    7,
+    7,
+    7,
+    7,
+    7,
+    7
+   ],
+   "d_solv_all": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   "macaulay_cols_at_solv": null,
+   "time_s": 601.7542247772217,
+   "budget_s": 600,
+   "max_D_completed": 7,
+   "instances": [
+    {
+     "inst": 0,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 18,
+      "l": 6,
+      "neq": 17,
+      "build_s": 0.02457594871520996,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 4663,
+      "planted_residual": 0,
+      "n_solutions": 6,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 17,
+       "cols": 31180,
+       "rank": 17,
+       "rank_top": 17,
+       "fall": 0,
+       "Q": 31163,
+       "t": 0.011284351348876953
+      },
+      {
+       "D": 7,
+       "rows": 323,
+       "cols": 63004,
+       "rank": 323,
+       "rank_top": 204,
+       "fall": 102,
+       "Q": 62681,
+       "t": 0.20076346397399902
+      }
+     ],
+     "gb": null,
+     "time": 0.5891046524047852
+    },
+    {
+     "inst": 0,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 18,
+      "l": 6,
+      "neq": 17,
+      "build_s": 0.030205249786376953,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 4684,
+      "n_solutions": 6
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 17,
+       "cols": 31180,
+       "rank": 17,
+       "rank_top": 17,
+       "fall": 0,
+       "Q": 31163,
+       "t": 0.010451078414916992
+      },
+      {
+       "D": 7,
+       "rows": 323,
+       "cols": 63004,
+       "rank": 323,
+       "rank_top": 204,
+       "fall": 102,
+       "Q": 62681,
+       "t": 0.2007462978363037
+      }
+     ],
+     "gb": null,
+     "time": 0.6040456295013428
+    },
+    {
+     "inst": 1,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 18,
+      "l": 6,
+      "neq": 17,
+      "build_s": 0.025664091110229492,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 4697,
+      "planted_residual": 0,
+      "n_solutions": 9,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 17,
+       "cols": 31180,
+       "rank": 17,
+       "rank_top": 17,
+       "fall": 0,
+       "Q": 31163,
+       "t": 0.01114034652709961
+      },
+      {
+       "D": 7,
+       "rows": 323,
+       "cols": 63004,
+       "rank": 323,
+       "rank_top": 204,
+       "fall": 102,
+       "Q": 62681,
+       "t": 0.19864845275878906
+      }
+     ],
+     "gb": null,
+     "time": 0.5906929969787598
+    },
+    {
+     "inst": 1,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 18,
+      "l": 6,
+      "neq": 17,
+      "build_s": 0.028573989868164062,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 4680,
+      "n_solutions": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 17,
+       "cols": 31180,
+       "rank": 17,
+       "rank_top": 17,
+       "fall": 0,
+       "Q": 31163,
+       "t": 0.010246753692626953
+      },
+      {
+       "D": 7,
+       "rows": 323,
+       "cols": 63004,
+       "rank": 323,
+       "rank_top": 204,
+       "fall": 102,
+       "Q": 62681,
+       "t": 0.20064854621887207
+      }
+     ],
+     "gb": null,
+     "time": 0.6024396419525146
+    },
+    {
+     "inst": 2,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 18,
+      "l": 6,
+      "neq": 17,
+      "build_s": 0.026021480560302734,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 4686,
+      "planted_residual": 0,
+      "n_solutions": 12,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 17,
+       "cols": 31180,
+       "rank": 17,
+       "rank_top": 17,
+       "fall": 0,
+       "Q": 31163,
+       "t": 0.011384725570678711
+      },
+      {
+       "D": 7,
+       "rows": 323,
+       "cols": 63004,
+       "rank": 323,
+       "rank_top": 204,
+       "fall": 102,
+       "Q": 62681,
+       "t": 0.20130205154418945
+      }
+     ],
+     "gb": null,
+     "time": 0.5892620086669922
+    },
+    {
+     "inst": 2,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 18,
+      "l": 6,
+      "neq": 17,
+      "build_s": 0.02948474884033203,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 4721,
+      "n_solutions": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 17,
+       "cols": 31180,
+       "rank": 17,
+       "rank_top": 17,
+       "fall": 0,
+       "Q": 31163,
+       "t": 0.01062917709350586
+      },
+      {
+       "D": 7,
+       "rows": 323,
+       "cols": 63004,
+       "rank": 323,
+       "rank_top": 204,
+       "fall": 102,
+       "Q": 62681,
+       "t": 0.20000672340393066
+      }
+     ],
+     "gb": null,
+     "time": 0.5898828506469727
+    }
+   ],
+   "censored": true,
+   "censored_what": "d_solv",
+   "d_solv_lower_bound": 9
+  },
+  "19": {
+   "n": 19,
+   "l": 7,
+   "nvars": 21,
+   "n_instances": 6,
+   "planted_solved": true,
+   "planted_checked": 3,
+   "d_first_fall": 7.0,
+   "d_solving": null,
+   "d_ff_all": [
+    7,
+    7,
+    7,
+    7,
+    7,
+    7
+   ],
+   "d_solv_all": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   "macaulay_cols_at_solv": null,
+   "time_s": 600.3193869590759,
+   "budget_s": 600,
+   "max_D_completed": 7,
+   "instances": [
+    {
+     "inst": 0,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 21,
+      "l": 7,
+      "neq": 19,
+      "build_s": 0.05522465705871582,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 11054,
+      "planted_residual": 0,
+      "n_solutions": 6,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 19,
+       "cols": 82160,
+       "rank": 19,
+       "rank_top": 19,
+       "fall": 0,
+       "Q": 82141,
+       "t": 0.018381357192993164
+      },
+      {
+       "D": 7,
+       "rows": 418,
+       "cols": 198440,
+       "rank": 418,
+       "rank_top": 285,
+       "fall": 114,
+       "Q": 198022,
+       "t": 0.5268833637237549
+      }
+     ],
+     "gb": null,
+     "time": 1.8790512084960938
+    },
+    {
+     "inst": 0,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 21,
+      "l": 7,
+      "neq": 19,
+      "build_s": 0.08138871192932129,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 11066,
+      "n_solutions": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 19,
+       "cols": 82160,
+       "rank": 19,
+       "rank_top": 19,
+       "fall": 0,
+       "Q": 82141,
+       "t": 0.016892433166503906
+      },
+      {
+       "D": 7,
+       "rows": 418,
+       "cols": 198440,
+       "rank": 418,
+       "rank_top": 285,
+       "fall": 114,
+       "Q": 198022,
+       "t": 0.542250394821167
+      }
+     ],
+     "gb": null,
+     "time": 2.0470430850982666
+    },
+    {
+     "inst": 1,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 21,
+      "l": 7,
+      "neq": 19,
+      "build_s": 0.07367086410522461,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 11051,
+      "planted_residual": 0,
+      "n_solutions": 6,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 19,
+       "cols": 82160,
+       "rank": 19,
+       "rank_top": 19,
+       "fall": 0,
+       "Q": 82141,
+       "t": 0.01764202117919922
+      },
+      {
+       "D": 7,
+       "rows": 418,
+       "cols": 198440,
+       "rank": 418,
+       "rank_top": 285,
+       "fall": 114,
+       "Q": 198022,
+       "t": 0.535142183303833
+      }
+     ],
+     "gb": null,
+     "time": 2.0223278999328613
+    },
+    {
+     "inst": 1,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 21,
+      "l": 7,
+      "neq": 19,
+      "build_s": 0.06886029243469238,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 11063,
+      "n_solutions": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 19,
+       "cols": 82160,
+       "rank": 19,
+       "rank_top": 19,
+       "fall": 0,
+       "Q": 82141,
+       "t": 0.018357276916503906
+      },
+      {
+       "D": 7,
+       "rows": 418,
+       "cols": 198440,
+       "rank": 418,
+       "rank_top": 285,
+       "fall": 114,
+       "Q": 198022,
+       "t": 0.5267817974090576
+      }
+     ],
+     "gb": null,
+     "time": 1.913299560546875
+    },
+    {
+     "inst": 2,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 21,
+      "l": 7,
+      "neq": 19,
+      "build_s": 0.03687334060668945,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 11066,
+      "planted_residual": 0,
+      "n_solutions": 12,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 19,
+       "cols": 82160,
+       "rank": 19,
+       "rank_top": 19,
+       "fall": 0,
+       "Q": 82141,
+       "t": 0.018327713012695312
+      },
+      {
+       "D": 7,
+       "rows": 418,
+       "cols": 198440,
+       "rank": 418,
+       "rank_top": 285,
+       "fall": 114,
+       "Q": 198022,
+       "t": 0.5375058650970459
+      }
+     ],
+     "gb": null,
+     "time": 1.8378326892852783
+    },
+    {
+     "inst": 2,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 21,
+      "l": 7,
+      "neq": 19,
+      "build_s": 0.043009281158447266,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 11105,
+      "n_solutions": 6
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 19,
+       "cols": 82160,
+       "rank": 19,
+       "rank_top": 19,
+       "fall": 0,
+       "Q": 82141,
+       "t": 0.01863384246826172
+      },
+      {
+       "D": 7,
+       "rows": 418,
+       "cols": 198440,
+       "rank": 418,
+       "rank_top": 285,
+       "fall": 114,
+       "Q": 198022,
+       "t": 0.5115060806274414
+      }
+     ],
+     "gb": null,
+     "time": 1.814371109008789
+    }
+   ],
+   "censored": true,
+   "censored_what": "d_solv",
+   "d_solv_lower_bound": 9
+  },
+  "23": {
+   "n": 23,
+   "l": 8,
+   "nvars": 24,
+   "n_instances": 6,
+   "planted_solved": true,
+   "planted_checked": 3,
+   "d_first_fall": 7.0,
+   "d_solving": null,
+   "d_ff_all": [
+    7,
+    7,
+    7,
+    7,
+    7,
+    7
+   ],
+   "d_solv_all": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   "macaulay_cols_at_solv": null,
+   "time_s": 19.1709725856781,
+   "budget_s": 900,
+   "max_D_completed": 7,
+   "instances": [
+    {
+     "inst": 0,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 24,
+      "l": 8,
+      "neq": 23,
+      "build_s": 0.0716238021850586,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 23430,
+      "planted_residual": 0,
+      "n_solutions": 18,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 23,
+       "cols": 190051,
+       "rank": 23,
+       "rank_top": 23,
+       "fall": 0,
+       "Q": 190028,
+       "t": 0.03641772270202637
+      },
+      {
+       "D": 7,
+       "rows": 575,
+       "cols": 536155,
+       "rank": 575,
+       "rank_top": 414,
+       "fall": 138,
+       "Q": 535580,
+       "t": 1.7771193981170654
+      }
+     ],
+     "gb": null,
+     "time": 11.144262790679932
+    },
+    {
+     "inst": 0,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 24,
+      "l": 8,
+      "neq": 23,
+      "build_s": 0.11760759353637695,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 23451,
+      "n_solutions": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 23,
+       "cols": 190051,
+       "rank": 23,
+       "rank_top": 23,
+       "fall": 0,
+       "Q": 190028,
+       "t": 0.03874778747558594
+      },
+      {
+       "D": 7,
+       "rows": 575,
+       "cols": 536155,
+       "rank": 575,
+       "rank_top": 414,
+       "fall": 138,
+       "Q": 535580,
+       "t": 1.5730602741241455
+      }
+     ],
+     "gb": null,
+     "time": 11.351178169250488
+    },
+    {
+     "inst": 1,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 24,
+      "l": 8,
+      "neq": 23,
+      "build_s": 0.08531904220581055,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 23529,
+      "planted_residual": 0,
+      "n_solutions": 6,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 23,
+       "cols": 190051,
+       "rank": 23,
+       "rank_top": 23,
+       "fall": 0,
+       "Q": 190028,
+       "t": 0.03784966468811035
+      },
+      {
+       "D": 7,
+       "rows": 575,
+       "cols": 536155,
+       "rank": 575,
+       "rank_top": 414,
+       "fall": 138,
+       "Q": 535580,
+       "t": 1.7867603302001953
+      }
+     ],
+     "gb": null,
+     "time": 11.206818103790283
+    },
+    {
+     "inst": 1,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 24,
+      "l": 8,
+      "neq": 23,
+      "build_s": 0.0903322696685791,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 23429,
+      "n_solutions": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 23,
+       "cols": 190051,
+       "rank": 23,
+       "rank_top": 23,
+       "fall": 0,
+       "Q": 190028,
+       "t": 0.034816741943359375
+      },
+      {
+       "D": 7,
+       "rows": 575,
+       "cols": 536155,
+       "rank": 575,
+       "rank_top": 414,
+       "fall": 138,
+       "Q": 535580,
+       "t": 1.765326976776123
+      }
+     ],
+     "gb": null,
+     "time": 11.113741874694824
+    },
+    {
+     "inst": 2,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 24,
+      "l": 8,
+      "neq": 23,
+      "build_s": 0.05557107925415039,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 23460,
+      "planted_residual": 0,
+      "n_solutions": 12,
+      "planted_in_solutions": true
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 23,
+       "cols": 190051,
+       "rank": 23,
+       "rank_top": 23,
+       "fall": 0,
+       "Q": 190028,
+       "t": 0.023407936096191406
+      },
+      {
+       "D": 7,
+       "rows": 575,
+       "cols": 536155,
+       "rank": 575,
+       "rank_top": 414,
+       "fall": 138,
+       "Q": 535580,
+       "t": 1.1071891784667969
+      }
+     ],
+     "gb": null,
+     "time": 8.00833797454834
+    },
+    {
+     "inst": 2,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 24,
+      "l": 8,
+      "neq": 23,
+      "build_s": 0.06203007698059082,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 23301,
+      "n_solutions": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 23,
+       "cols": 190051,
+       "rank": 23,
+       "rank_top": 23,
+       "fall": 0,
+       "Q": 190028,
+       "t": 0.02348160743713379
+      },
+      {
+       "D": 7,
+       "rows": 575,
+       "cols": 536155,
+       "rank": 575,
+       "rank_top": 414,
+       "fall": 138,
+       "Q": 535580,
+       "t": 1.0852093696594238
+      }
+     ],
+     "gb": null,
+     "time": 7.966630220413208
+    }
+   ],
+   "censored": true,
+   "censored_what": "d_solv",
+   "d_solv_lower_bound": 8
+  },
+  "29": {
+   "n": 29,
+   "l": 10,
+   "nvars": 30,
+   "n_instances": 6,
+   "planted_solved": false,
+   "planted_checked": 0,
+   "d_first_fall": 7.0,
+   "d_solving": null,
+   "d_ff_all": [
+    7,
+    7,
+    7,
+    7,
+    7,
+    7
+   ],
+   "d_solv_all": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   "macaulay_cols_at_solv": null,
+   "time_s": 21.502056121826172,
+   "budget_s": 900,
+   "max_D_completed": 7,
+   "instances": [
+    {
+     "inst": 0,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 30,
+      "l": 10,
+      "neq": 29,
+      "build_s": 0.16246581077575684,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 83482,
+      "planted_residual": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 29,
+       "cols": 768212,
+       "rank": 29,
+       "rank_top": 29,
+       "fall": 0,
+       "Q": 768183,
+       "t": 0.13737106323242188
+      },
+      {
+       "D": 7,
+       "rows": 899,
+       "cols": 2804012,
+       "rank": 899,
+       "rank_top": 696,
+       "fall": 174,
+       "Q": 2803113,
+       "t": 12.844553709030151
+      }
+     ],
+     "gb": null,
+     "time": 13.155045747756958
+    },
+    {
+     "inst": 0,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 30,
+      "l": 10,
+      "neq": 29,
+      "build_s": 0.16112208366394043,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 83283
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 29,
+       "cols": 768212,
+       "rank": 29,
+       "rank_top": 29,
+       "fall": 0,
+       "Q": 768183,
+       "t": 0.13833832740783691
+      },
+      {
+       "D": 7,
+       "rows": 899,
+       "cols": 2804012,
+       "rank": 899,
+       "rank_top": 696,
+       "fall": 174,
+       "Q": 2803113,
+       "t": 12.730615377426147
+      }
+     ],
+     "gb": null,
+     "time": 13.038034439086914
+    },
+    {
+     "inst": 1,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 30,
+      "l": 10,
+      "neq": 29,
+      "build_s": 0.16271686553955078,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 83514,
+      "planted_residual": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 29,
+       "cols": 768212,
+       "rank": 29,
+       "rank_top": 29,
+       "fall": 0,
+       "Q": 768183,
+       "t": 0.1364147663116455
+      },
+      {
+       "D": 7,
+       "rows": 899,
+       "cols": 2804012,
+       "rank": 899,
+       "rank_top": 696,
+       "fall": 174,
+       "Q": 2803113,
+       "t": 12.843356609344482
+      }
+     ],
+     "gb": null,
+     "time": 13.153148651123047
+    },
+    {
+     "inst": 1,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 30,
+      "l": 10,
+      "neq": 29,
+      "build_s": 0.1665503978729248,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 83349
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 29,
+       "cols": 768212,
+       "rank": 29,
+       "rank_top": 29,
+       "fall": 0,
+       "Q": 768183,
+       "t": 0.13769316673278809
+      },
+      {
+       "D": 7,
+       "rows": 899,
+       "cols": 2804012,
+       "rank": 899,
+       "rank_top": 696,
+       "fall": 174,
+       "Q": 2803113,
+       "t": 13.059948444366455
+      }
+     ],
+     "gb": null,
+     "time": 13.371587753295898
+    },
+    {
+     "inst": 2,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 30,
+      "l": 10,
+      "neq": 29,
+      "build_s": 0.142333984375,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 83275,
+      "planted_residual": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 29,
+       "cols": 768212,
+       "rank": 29,
+       "rank_top": 29,
+       "fall": 0,
+       "Q": 768183,
+       "t": 0.1268918514251709
+      },
+      {
+       "D": 7,
+       "rows": 899,
+       "cols": 2804012,
+       "rank": 899,
+       "rank_top": 696,
+       "fall": 174,
+       "Q": 2803113,
+       "t": 7.892684698104858
+      }
+     ],
+     "gb": null,
+     "time": 8.169161558151245
+    },
+    {
+     "inst": 2,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 30,
+      "l": 10,
+      "neq": 29,
+      "build_s": 0.1149132251739502,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 83306
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 29,
+       "cols": 768212,
+       "rank": 29,
+       "rank_top": 29,
+       "fall": 0,
+       "Q": 768183,
+       "t": 0.0911712646484375
+      },
+      {
+       "D": 7,
+       "rows": 899,
+       "cols": 2804012,
+       "rank": 899,
+       "rank_top": 696,
+       "fall": 174,
+       "Q": 2803113,
+       "t": 8.11750078201294
+      }
+     ],
+     "gb": null,
+     "time": 8.327865839004517
+    }
+   ],
+   "censored": true,
+   "censored_what": "d_solv",
+   "d_solv_lower_bound": 8
+  },
+  "31": {
+   "n": 31,
+   "l": 11,
+   "nvars": 33,
+   "n_instances": 6,
+   "planted_solved": false,
+   "planted_checked": 0,
+   "d_first_fall": 7.0,
+   "d_solving": null,
+   "d_ff_all": [
+    7,
+    7,
+    7,
+    7,
+    7,
+    7
+   ],
+   "d_solv_all": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   "macaulay_cols_at_solv": null,
+   "time_s": 51.23329758644104,
+   "budget_s": 900,
+   "max_D_completed": 7,
+   "instances": [
+    {
+     "inst": 0,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 33,
+      "l": 11,
+      "neq": 31,
+      "build_s": 0.2795572280883789,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 144088,
+      "planted_residual": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 31,
+       "cols": 1391842,
+       "rank": 31,
+       "rank_top": 31,
+       "fall": 0,
+       "Q": 1391811,
+       "t": 0.24683213233947754
+      },
+      {
+       "D": 7,
+       "rows": 1054,
+       "cols": 5663890,
+       "rank": 1054,
+       "rank_top": 837,
+       "fall": 186,
+       "Q": 5662836,
+       "t": 29.931058168411255
+      }
+     ],
+     "gb": null,
+     "time": 30.48102378845215
+    },
+    {
+     "inst": 0,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 33,
+      "l": 11,
+      "neq": 31,
+      "build_s": 0.2838869094848633,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 143909
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 31,
+       "cols": 1391842,
+       "rank": 31,
+       "rank_top": 31,
+       "fall": 0,
+       "Q": 1391811,
+       "t": 0.24848341941833496
+      },
+      {
+       "D": 7,
+       "rows": 1054,
+       "cols": 5663890,
+       "rank": 1054,
+       "rank_top": 837,
+       "fall": 186,
+       "Q": 5662836,
+       "t": 30.482645273208618
+      }
+     ],
+     "gb": null,
+     "time": 31.030792474746704
+    },
+    {
+     "inst": 1,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 33,
+      "l": 11,
+      "neq": 31,
+      "build_s": 0.28054237365722656,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 143895,
+      "planted_residual": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 31,
+       "cols": 1391842,
+       "rank": 31,
+       "rank_top": 31,
+       "fall": 0,
+       "Q": 1391811,
+       "t": 0.2456212043762207
+      },
+      {
+       "D": 7,
+       "rows": 1054,
+       "cols": 5663890,
+       "rank": 1054,
+       "rank_top": 837,
+       "fall": 186,
+       "Q": 5662836,
+       "t": 29.927233695983887
+      }
+     ],
+     "gb": null,
+     "time": 30.47597074508667
+    },
+    {
+     "inst": 1,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 33,
+      "l": 11,
+      "neq": 31,
+      "build_s": 0.28974246978759766,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 143930
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 31,
+       "cols": 1391842,
+       "rank": 31,
+       "rank_top": 31,
+       "fall": 0,
+       "Q": 1391811,
+       "t": 0.24850940704345703
+      },
+      {
+       "D": 7,
+       "rows": 1054,
+       "cols": 5663890,
+       "rank": 1054,
+       "rank_top": 837,
+       "fall": 186,
+       "Q": 5662836,
+       "t": 30.48165011405945
+      }
+     ],
+     "gb": null,
+     "time": 31.03461194038391
+    },
+    {
+     "inst": 2,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 33,
+      "l": 11,
+      "neq": 31,
+      "build_s": 0.26857757568359375,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 143906,
+      "planted_residual": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 31,
+       "cols": 1391842,
+       "rank": 31,
+       "rank_top": 31,
+       "fall": 0,
+       "Q": 1391811,
+       "t": 0.2475137710571289
+      },
+      {
+       "D": 7,
+       "rows": 1054,
+       "cols": 5663890,
+       "rank": 1054,
+       "rank_top": 837,
+       "fall": 186,
+       "Q": 5662836,
+       "t": 19.741503715515137
+      }
+     ],
+     "gb": null,
+     "time": 20.27616596221924
+    },
+    {
+     "inst": 2,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 33,
+      "l": 11,
+      "neq": 31,
+      "build_s": 0.2819480895996094,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 143963
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 31,
+       "cols": 1391842,
+       "rank": 31,
+       "rank_top": 31,
+       "fall": 0,
+       "Q": 1391811,
+       "t": 0.2470080852508545
+      },
+      {
+       "D": 7,
+       "rows": 1054,
+       "cols": 5663890,
+       "rank": 1054,
+       "rank_top": 837,
+       "fall": 186,
+       "Q": 5662836,
+       "t": 20.185564279556274
+      }
+     ],
+     "gb": null,
+     "time": 20.728067874908447
+    }
+   ],
+   "censored": true,
+   "censored_what": "d_solv",
+   "d_solv_lower_bound": 8
+  },
+  "37": {
+   "n": 37,
+   "l": 13,
+   "nvars": 39,
+   "n_instances": 6,
+   "planted_solved": false,
+   "planted_checked": 0,
+   "d_first_fall": 7.0,
+   "d_solving": null,
+   "d_ff_all": [
+    7,
+    7,
+    7,
+    7,
+    7,
+    7
+   ],
+   "d_solv_all": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   "macaulay_cols_at_solv": null,
+   "time_s": 239.80426788330078,
+   "budget_s": 1500,
+   "max_D_completed": 7,
+   "instances": [
+    {
+     "inst": 0,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 39,
+      "l": 13,
+      "neq": 37,
+      "build_s": 0.8552694320678711,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 376948,
+      "planted_residual": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 37,
+       "cols": 3930551,
+       "rank": 37,
+       "rank_top": 37,
+       "fall": 0,
+       "Q": 3930514,
+       "t": 0.7747631072998047
+      },
+      {
+       "D": 7,
+       "rows": 1480,
+       "cols": 19311488,
+       "rank": 1480,
+       "rank_top": 1221,
+       "fall": 222,
+       "Q": 19310008,
+       "t": 149.71161341667175
+      }
+     ],
+     "gb": null,
+     "time": 151.4194211959839
+    },
+    {
+     "inst": 0,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 39,
+      "l": 13,
+      "neq": 37,
+      "build_s": 0.8784754276275635,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 376847
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 37,
+       "cols": 3930551,
+       "rank": 37,
+       "rank_top": 37,
+       "fall": 0,
+       "Q": 3930514,
+       "t": 0.7747893333435059
+      },
+      {
+       "D": 7,
+       "rows": 1480,
+       "cols": 19311488,
+       "rank": 1480,
+       "rank_top": 1221,
+       "fall": 222,
+       "Q": 19310008,
+       "t": 148.8228907585144
+      }
+     ],
+     "gb": null,
+     "time": 150.52712035179138
+    },
+    {
+     "inst": 1,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 39,
+      "l": 13,
+      "neq": 37,
+      "build_s": 0.8755123615264893,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 376633,
+      "planted_residual": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 37,
+       "cols": 3930551,
+       "rank": 37,
+       "rank_top": 37,
+       "fall": 0,
+       "Q": 3930514,
+       "t": 0.7742648124694824
+      },
+      {
+       "D": 7,
+       "rows": 1480,
+       "cols": 19311488,
+       "rank": 1480,
+       "rank_top": 1221,
+       "fall": 222,
+       "Q": 19310008,
+       "t": 149.94404006004333
+      }
+     ],
+     "gb": null,
+     "time": 151.6687994003296
+    },
+    {
+     "inst": 1,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 39,
+      "l": 13,
+      "neq": 37,
+      "build_s": 0.847801923751831,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 376961
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 37,
+       "cols": 3930551,
+       "rank": 37,
+       "rank_top": 37,
+       "fall": 0,
+       "Q": 3930514,
+       "t": 0.7755663394927979
+      },
+      {
+       "D": 7,
+       "rows": 1480,
+       "cols": 19311488,
+       "rank": 1480,
+       "rank_top": 1221,
+       "fall": 222,
+       "Q": 19310008,
+       "t": 145.98942232131958
+      }
+     ],
+     "gb": null,
+     "time": 147.6659173965454
+    },
+    {
+     "inst": 2,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 39,
+      "l": 13,
+      "neq": 37,
+      "build_s": 0.8961081504821777,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 377097,
+      "planted_residual": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 37,
+       "cols": 3930551,
+       "rank": 37,
+       "rank_top": 37,
+       "fall": 0,
+       "Q": 3930514,
+       "t": 0.7105562686920166
+      },
+      {
+       "D": 7,
+       "rows": 1480,
+       "cols": 19311488,
+       "rank": 1480,
+       "rank_top": 1221,
+       "fall": 222,
+       "Q": 19310008,
+       "t": 90.0263283252716
+      }
+     ],
+     "gb": null,
+     "time": 91.69402027130127
+    },
+    {
+     "inst": 2,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 39,
+      "l": 13,
+      "neq": 37,
+      "build_s": 0.8526723384857178,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 376830
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 37,
+       "cols": 3930551,
+       "rank": 37,
+       "rank_top": 37,
+       "fall": 0,
+       "Q": 3930514,
+       "t": 0.9370503425598145
+      },
+      {
+       "D": 7,
+       "rows": 1480,
+       "cols": 19311488,
+       "rank": 1480,
+       "rank_top": 1221,
+       "fall": 222,
+       "Q": 19310008,
+       "t": 87.39637923240662
+      }
+     ],
+     "gb": null,
+     "time": 89.24675440788269
+    }
+   ],
+   "censored": true,
+   "censored_what": "d_solv",
+   "d_solv_lower_bound": 8
+  },
+  "41": {
+   "n": 41,
+   "l": 14,
+   "nvars": 42,
+   "n_instances": 6,
+   "planted_solved": false,
+   "planted_checked": 0,
+   "d_first_fall": 7.0,
+   "d_solving": null,
+   "d_ff_all": [
+    7,
+    7,
+    7,
+    7,
+    7,
+    7
+   ],
+   "d_solv_all": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   "macaulay_cols_at_solv": null,
+   "time_s": 537.00275182724,
+   "budget_s": 1500,
+   "max_D_completed": 7,
+   "instances": [
+    {
+     "inst": 0,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 42,
+      "l": 14,
+      "neq": 41,
+      "build_s": 1.5956165790557861,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 578944,
+      "planted_residual": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 41,
+       "cols": 6220768,
+       "rank": 41,
+       "rank_top": 41,
+       "fall": 0,
+       "Q": 6220727,
+       "t": 1.326012372970581
+      },
+      {
+       "D": 7,
+       "rows": 1763,
+       "cols": 33199096,
+       "rank": 1763,
+       "rank_top": 1476,
+       "fall": 246,
+       "Q": 33197333,
+       "t": 353.3010230064392
+      }
+     ],
+     "gb": null,
+     "time": 356.3676311969757
+    },
+    {
+     "inst": 0,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 42,
+      "l": 14,
+      "neq": 41,
+      "build_s": 1.5112929344177246,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 578825
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 41,
+       "cols": 6220768,
+       "rank": 41,
+       "rank_top": 41,
+       "fall": 0,
+       "Q": 6220727,
+       "t": 1.3333923816680908
+      },
+      {
+       "D": 7,
+       "rows": 1763,
+       "cols": 33199096,
+       "rank": 1763,
+       "rank_top": 1476,
+       "fall": 246,
+       "Q": 33197333,
+       "t": 334.9722442626953
+      }
+     ],
+     "gb": null,
+     "time": 337.920871257782
+    },
+    {
+     "inst": 1,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 42,
+      "l": 14,
+      "neq": 41,
+      "build_s": 1.5901720523834229,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 579088,
+      "planted_residual": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 41,
+       "cols": 6220768,
+       "rank": 41,
+       "rank_top": 41,
+       "fall": 0,
+       "Q": 6220727,
+       "t": 1.3261420726776123
+      },
+      {
+       "D": 7,
+       "rows": 1763,
+       "cols": 33199096,
+       "rank": 1763,
+       "rank_top": 1476,
+       "fall": 246,
+       "Q": 33197333,
+       "t": 353.3230662345886
+      }
+     ],
+     "gb": null,
+     "time": 356.38394689559937
+    },
+    {
+     "inst": 1,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 42,
+      "l": 14,
+      "neq": 41,
+      "build_s": 1.515657663345337,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 579352
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 41,
+       "cols": 6220768,
+       "rank": 41,
+       "rank_top": 41,
+       "fall": 0,
+       "Q": 6220727,
+       "t": 1.3316144943237305
+      },
+      {
+       "D": 7,
+       "rows": 1763,
+       "cols": 33199096,
+       "rank": 1763,
+       "rank_top": 1476,
+       "fall": 246,
+       "Q": 33197333,
+       "t": 334.90134048461914
+      }
+     ],
+     "gb": null,
+     "time": 337.83876609802246
+    },
+    {
+     "inst": 2,
+     "arm": "planted",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 42,
+      "l": 14,
+      "neq": 41,
+      "build_s": 1.440246343612671,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 579232,
+      "planted_residual": 0
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 41,
+       "cols": 6220768,
+       "rank": 41,
+       "rank_top": 41,
+       "fall": 0,
+       "Q": 6220727,
+       "t": 1.319608211517334
+      },
+      {
+       "D": 7,
+       "rows": 1763,
+       "cols": 33199096,
+       "rank": 1763,
+       "rank_top": 1476,
+       "fall": 246,
+       "Q": 33197333,
+       "t": 196.25260758399963
+      }
+     ],
+     "gb": null,
+     "time": 199.1311423778534
+    },
+    {
+     "inst": 2,
+     "arm": "random",
+     "status": "exited",
+     "done": true,
+     "fail": null,
+     "info": {
+      "N": 42,
+      "l": 14,
+      "neq": 41,
+      "build_s": 1.4421498775482178,
+      "eq_deg": [
+       6
+      ],
+      "eq_terms": 579398
+     },
+     "d_ff": 7,
+     "d_solv": null,
+     "d_solv_method": null,
+     "last_D_completed": 7,
+     "cols_at_solv": null,
+     "profile": [
+      {
+       "D": 6,
+       "rows": 41,
+       "cols": 6220768,
+       "rank": 41,
+       "rank_top": 41,
+       "fall": 0,
+       "Q": 6220727,
+       "t": 1.3195557594299316
+      },
+      {
+       "D": 7,
+       "rows": 1763,
+       "cols": 33199096,
+       "rank": 1763,
+       "rank_top": 1476,
+       "fall": 246,
+       "Q": 33197333,
+       "t": 191.39792156219482
+      }
+     ],
+     "gb": null,
+     "time": 194.24126315116882
+    }
+   ],
+   "censored": true,
+   "censored_what": "d_solv",
+   "d_solv_lower_bound": 8
+  }
+ },
+ "d_ff": {
+  "11": 7.0,
+  "13": 7.0,
+  "17": 7.0,
+  "19": 7.0,
+  "23": 7.0,
+  "29": 7.0,
+  "31": 7.0,
+  "37": 7.0,
+  "41": 7.0
+ },
+ "d_solv": {
+  "11": 12.0
+ },
+ "notes": [],
+ "validation": {
+  "S3_relation_verified": true,
+  "S3_checks": 45,
+  "planted_residual_zero": null,
+  "planted_solved_per_n": {
+   "11": true,
+   "13": true,
+   "17": true,
+   "19": true,
+   "23": true,
+   "29": false,
+   "31": false,
+   "37": false,
+   "41": false
+  },
+  "planted_residual_by_n": {
+   "11": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "13": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "17": [
+    0,
+    0,
+    0
+   ],
+   "19": [
+    0,
+    0,
+    0
+   ],
+   "23": [
+    0,
+    0,
+    0
+   ],
+   "29": [
+    0,
+    0,
+    0
+   ],
+   "31": [
+    0,
+    0,
+    0
+   ],
+   "37": [
+    0,
+    0,
+    0
+   ],
+   "41": [
+    0,
+    0,
+    0
+   ]
+  },
+  "planted_solved_all_completed": false
+ },
+ "deep": {
+  "11": {
+   "planted": {
+    "N": 12,
+    "n_solutions": 3,
+    "profile": [
+     {
+      "D": 6,
+      "rows": 11,
+      "cols": 2510,
+      "rank": 11,
+      "rank_top": 11,
+      "fall": 0,
+      "Q": 2499,
+      "t": 0.006971120834350586
+     },
+     {
+      "D": 7,
+      "rows": 143,
+      "cols": 3302,
+      "rank": 143,
+      "rank_top": 66,
+      "fall": 66,
+      "Q": 3159,
+      "t": 0.03264284133911133
+     },
+     {
+      "D": 8,
+      "rows": 869,
+      "cols": 3797,
+      "rank": 869,
+      "rank_top": 165,
+      "fall": 561,
+      "Q": 2928,
+      "t": 0.6901404857635498
+     },
+     {
+      "D": 9,
+      "rows": 3289,
+      "cols": 4017,
+      "rank": 3279,
+      "rank_top": 180,
+      "fall": 2230,
+      "Q": 738,
+      "t": 8.306533813476562
+     },
+     {
+      "D": 10,
+      "rows": 8734,
+      "cols": 4083,
+      "rank": 4053,
+      "rank_top": 66,
+      "fall": 708,
+      "Q": 30,
+      "t": 52.69684648513794
+     },
+     {
+      "D": 11,
+      "rows": 17446,
+      "cols": 4095,
+      "rank": 4089,
+      "rank_top": 12,
+      "fall": 24,
+      "Q": 6,
+      "t": 112.26425170898438
+     },
+     {
+      "D": 12,
+      "rows": 27610,
+      "cols": 4096,
+      "rank": 4093,
+      "rank_top": 1,
+      "fall": 3,
+      "Q": 3,
+      "t": 278.5896005630493
+     }
+    ],
+    "status": "exited",
+    "stop_notes": [],
+    "finished": true,
+    "d_ff": 7,
+    "d_solv": 12,
+    "max_D_completed": 12,
+    "Q_at_max_D": 3,
+    "d_solv_lower_bound": null
+   },
+   "random": {
+    "N": 12,
+    "n_solutions": 0,
+    "profile": [
+     {
+      "D": 6,
+      "rows": 11,
+      "cols": 2510,
+      "rank": 11,
+      "rank_top": 11,
+      "fall": 0,
+      "Q": 2499,
+      "t": 0.006491899490356445
+     },
+     {
+      "D": 7,
+      "rows": 143,
+      "cols": 3302,
+      "rank": 143,
+      "rank_top": 66,
+      "fall": 66,
+      "Q": 3159,
+      "t": 0.032536983489990234
+     },
+     {
+      "D": 8,
+      "rows": 869,
+      "cols": 3797,
+      "rank": 869,
+      "rank_top": 165,
+      "fall": 561,
+      "Q": 2928,
+      "t": 0.6899979114532471
+     },
+     {
+      "D": 9,
+      "rows": 3289,
+      "cols": 4017,
+      "rank": 3279,
+      "rank_top": 180,
+      "fall": 2230,
+      "Q": 738,
+      "t": 8.230522632598877
+     },
+     {
+      "D": 10,
+      "rows": 8734,
+      "cols": 4083,
+      "rank": 4050,
+      "rank_top": 66,
+      "fall": 705,
+      "Q": 33,
+      "t": 50.522810220718384
+     },
+     {
+      "D": 11,
+      "rows": 17446,
+      "cols": 4095,
+      "rank": 4092,
+      "rank_top": 12,
+      "fall": 30,
+      "Q": 3,
+      "t": 90.25396394729614
+     },
+     {
+      "D": 12,
+      "rows": 27610,
+      "cols": 4096,
+      "rank": 4096,
+      "rank_top": 1,
+      "fall": 3,
+      "Q": 0,
+      "t": 277.8839509487152
+     }
+    ],
+    "status": "exited",
+    "stop_notes": [],
+    "finished": true,
+    "d_ff": 7,
+    "d_solv": 12,
+    "max_D_completed": 12,
+    "Q_at_max_D": 0,
+    "d_solv_lower_bound": null
+   }
+  },
+  "13": {
+   "planted": {
+    "N": 15,
+    "n_solutions": 6,
+    "profile": [
+     {
+      "D": 6,
+      "rows": 13,
+      "cols": 9949,
+      "rank": 13,
+      "rank_top": 13,
+      "fall": 0,
+      "Q": 9936,
+      "t": 0.007044315338134766
+     },
+     {
+      "D": 7,
+      "rows": 208,
+      "cols": 16384,
+      "rank": 208,
+      "rank_top": 117,
+      "fall": 78,
+      "Q": 16176,
+      "t": 0.07037878036499023
+     },
+     {
+      "D": 8,
+      "rows": 1573,
+      "cols": 22819,
+      "rank": 1573,
+      "rank_top": 468,
+      "fall": 897,
+      "Q": 21246,
+      "t": 2.384579658508301
+     },
+     {
+      "D": 9,
+      "rows": 7488,
+      "cols": 27824,
+      "rank": 7488,
+      "rank_top": 1079,
+      "fall": 4836,
+      "Q": 20336,
+      "t": 51.26501393318176
+     }
+    ],
+    "status": "exited",
+    "stop_notes": [
+     {
+      "D": 10,
+      "status": "rowcap",
+      "rows": 25233
+     }
+    ],
+    "finished": true,
+    "d_ff": 7,
+    "d_solv": null,
+    "max_D_completed": 9,
+    "Q_at_max_D": 20336,
+    "d_solv_lower_bound": 10
+   },
+   "random": {
+    "N": 15,
+    "n_solutions": 0,
+    "profile": [
+     {
+      "D": 6,
+      "rows": 13,
+      "cols": 9949,
+      "rank": 13,
+      "rank_top": 13,
+      "fall": 0,
+      "Q": 9936,
+      "t": 0.006795644760131836
+     },
+     {
+      "D": 7,
+      "rows": 208,
+      "cols": 16384,
+      "rank": 208,
+      "rank_top": 117,
+      "fall": 78,
+      "Q": 16176,
+      "t": 0.07022762298583984
+     },
+     {
+      "D": 8,
+      "rows": 1573,
+      "cols": 22819,
+      "rank": 1573,
+      "rank_top": 468,
+      "fall": 897,
+      "Q": 21246,
+      "t": 2.423696279525757
+     },
+     {
+      "D": 9,
+      "rows": 7488,
+      "cols": 27824,
+      "rank": 7488,
+      "rank_top": 1079,
+      "fall": 4836,
+      "Q": 20336,
+      "t": 51.23430061340332
+     }
+    ],
+    "status": "exited",
+    "stop_notes": [
+     {
+      "D": 10,
+      "status": "rowcap",
+      "rows": 25233
+     }
+    ],
+    "finished": true,
+    "d_ff": 7,
+    "d_solv": null,
+    "max_D_completed": 9,
+    "Q_at_max_D": 20336,
+    "d_solv_lower_bound": 10
+   }
+  },
+  "17": {
+   "planted": {
+    "N": 18,
+    "n_solutions": 6,
+    "profile": [
+     {
+      "D": 6,
+      "rows": 17,
+      "cols": 31180,
+      "rank": 17,
+      "rank_top": 17,
+      "fall": 0,
+      "Q": 31163,
+      "t": 0.020810604095458984
+     },
+     {
+      "D": 7,
+      "rows": 323,
+      "cols": 63004,
+      "rank": 323,
+      "rank_top": 204,
+      "fall": 102,
+      "Q": 62681,
+      "t": 0.3791043758392334
+     },
+     {
+      "D": 8,
+      "rows": 2924,
+      "cols": 106762,
+      "rank": 2924,
+      "rank_top": 1122,
+      "fall": 1479,
+      "Q": 103838,
+      "t": 11.375848293304443
+     }
+    ],
+    "status": "exited",
+    "stop_notes": [
+     {
+      "D": 9,
+      "status": "rowcap",
+      "rows": 16796
+     }
+    ],
+    "finished": true,
+    "d_ff": 7,
+    "d_solv": null,
+    "max_D_completed": 8,
+    "Q_at_max_D": 103838,
+    "d_solv_lower_bound": 9
+   }
+  },
+  "19": {
+   "planted": {
+    "N": 21,
+    "n_solutions": 6,
+    "profile": [
+     {
+      "D": 6,
+      "rows": 19,
+      "cols": 82160,
+      "rank": 19,
+      "rank_top": 19,
+      "fall": 0,
+      "Q": 82141,
+      "t": 0.01627326011657715
+     },
+     {
+      "D": 7,
+      "rows": 418,
+      "cols": 198440,
+      "rank": 418,
+      "rank_top": 285,
+      "fall": 114,
+      "Q": 198022,
+      "t": 0.45894956588745117
+     },
+     {
+      "D": 8,
+      "rows": 4408,
+      "cols": 401930,
+      "rank": 4408,
+      "rank_top": 1995,
+      "fall": 1995,
+      "Q": 397522,
+      "t": 51.920833349227905
+     }
+    ],
+    "status": "exited",
+    "stop_notes": [
+     {
+      "D": 9,
+      "status": "rowcap",
+      "rows": 29678
+     }
+    ],
+    "finished": true,
+    "d_ff": 7,
+    "d_solv": null,
+    "max_D_completed": 8,
+    "Q_at_max_D": 397522,
+    "d_solv_lower_bound": 9
+   }
+  }
+ },
+ "fit": {
+  "d_ff_slope": 0.0,
+  "d_ff_intercept": 7.0,
+  "d_ff_slope_95ci": [
+   0.0,
+   0.0
+  ],
+  "d_ff_points": {
+   "11": 7.0,
+   "13": 7.0,
+   "17": 7.0,
+   "19": 7.0,
+   "23": 7.0,
+   "29": 7.0,
+   "31": 7.0,
+   "37": 7.0,
+   "41": 7.0
+  },
+  "extrapolated_d_ff_131": 7.0,
+  "extrapolated_d_ff_131_band": [
+   7.0,
+   7.0
+  ],
+  "alt_log_fit": {
+   "a": 7.0,
+   "b": 0.0,
+   "b_95ci": [
+    0.0,
+    0.0
+   ],
+   "extrapolated_d_ff_131": 7.0
+  },
+  "d_solv_method": "d_ff extrapolation + mean(d_solv-d_ff) offset (fewer than 3 d_solv points)",
+  "extrapolated_d_solv_131": 12.0,
+  "extrapolated_solve_cost_bits_131": 130.5944533823525,
+  "cost_bits_at_d_ff_131_lower_bound": 87.35795910667623,
+  "cost_bits_if_d_ff_slope_zero_at_last_n": 87.35795910667623,
+  "N_vars_131": 132,
+  "omega": 2.37,
+  "gap_bits_to_2e21": 109.5944533823525,
+  "gap_bits_to_rho_2e65": 65.5944533823525,
+  "gap_bits_lower_bound_to_2e21": 66.35795910667623,
+  "cost_bits_131_at_lower_band_d_ff": 87.35795910667623
+ },
+ "verdict": "inconclusive",
+ "total_time_s": 2615.1012439727783
+}

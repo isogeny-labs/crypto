@@ -1,0 +1,10 @@
+{
+  "schema": "xedni-same-x-screen-protocol-v1",
+  "source": "../xedni_coefficient_choice_20261120/source-rows-v2.jsonl.gz",
+  "source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "input_law": "all 1722 ordered distinct nonidentity source pairs; select pairs with equal exact rational x coordinates, without consulting accepted or relation flags",
+  "classification": "count equal-x/equal-y and equal-x/distinct-y source pairs; record ordered source indices and exact coordinate pairs; check y opposition only as a source-law diagnostic",
+  "mathematical_result": "for every elliptic Weierstrass curve over a field that contains both affine points, equal x and distinct y imply P+Q+Q is nonzero",
+  "decision": "if every selected pair has distinct y, rule out the P+2Q=O construction for all selected pairs on any admissible elliptic rational curve; retain equal-y cases separately if present",
+  "claim_boundary": "conditional on both coordinates defining nonsingular affine points on the same elliptic Weierstrass curve; no coefficient construction or timing comparison"
+}

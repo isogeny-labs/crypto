@@ -1,0 +1,11 @@
+{
+  "schema": "xedni-fixed-lift-map-protocol-v1",
+  "source_packed_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "rational_curve_coefficients": [94, 0, 188, 1738, 3805],
+  "rational_generator_lift": [-4, 19],
+  "reduced_curve_coefficients_mod_47": [0, 0, 0, 46, 45],
+  "input_law": "the 42 distinct nonidentity E(F47) points from the frozen full ordered-pair source law",
+  "experiment": "compute kQ over Q for k=1..42 on the fixed Lean-checked rational witness; reduce every coordinate at 47; record each exact rational-coordinate hash and numerator/denominator bit length; compare the reduced points to the full source set",
+  "resource": "complete finite 42-multiple enumeration on the accepted Sage build; timing is not a performance claim",
+  "claim_boundary": "shows coverage and coordinate growth of this known-lift enumeration; does not assert that an arbitrary public target can be lifted without finding its coefficient"
+}

@@ -1,0 +1,11 @@
+{
+  "schema": "xedni-bridge6-aux8-protocol-v1",
+  "source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "arithmetic_source_sha256": "e48588d2c40121d5a415dcbd80ecc5925ece74590d727ee67f06f2f640688a16",
+  "input": "frozen source pair index 31, lifted points [[2,2],[-16,17]], selected as the first reduced coefficient-six pair solely for this correctness control",
+  "local_search_7": "enumerate every (k1,k2,k3) in {-3,-2,-1,0,1,2,3}^3 lexicographically; construct rational coefficients; retain every status; choose the first nonsingular curve with good reduction, #E(F7)=4 and P+6Q=O",
+  "local_search_11": "enumerate every (k1,k2,k3) in {-5,-4,-3,-2,-1,0,1,2,3,4,5}^3 lexicographically; construct rational coefficients; retain every status; choose the first nonsingular curve with good reduction, #E(F11)=8 and P+6Q=O",
+  "crt": "combine each selected k coordinate modulo 7 and 11, choose its unique centered representative in [-38,38], reconstruct a4,a6, and verify both local gates and rational P+6Q exactly",
+  "resource": "343 plus 1331 local coefficient constructions, one CRT rational curve, no wall-time comparison",
+  "claim_boundary": "one frozen reduced-compatible source pair as a correctness control; the coefficient search and source-pair choice are not an unknown-target selection algorithm; a local bridge is not a rational relation or relation-rank gain"
+}

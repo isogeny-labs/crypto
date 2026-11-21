@@ -1,0 +1,11 @@
+{
+  "schema": "xedni-bridge6-source-policy-protocol-v1",
+  "source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "arithmetic_sha256": "e48588d2c40121d5a415dcbd80ecc5925ece74590d727ee67f06f2f640688a16",
+  "source_law": "all 1722 frozen lifted pairs, select every pair with P+6Q=O on the fixed F47 curve [0,0,0,46,45]",
+  "local_policy": "for each selected pair, enumerate k triples lexicographically in [-3,3]^3 at F7 seeking good reduction, order 4, P+6Q=O; enumerate [-5,5]^3 at F11 seeking good reduction, order 8, P+6Q=O; retain every attempt and first passing triple at each prime",
+  "crt": "when both local gates pass, combine k coordinates modulo 77 and use centered representatives in [-38,38]; verify both local gates and exact rational P+6Q on the CRT curve",
+  "output": "per-pair outcome rows, chunked full attempt records below 48000 bytes each, deterministic raw digests and total counts including no-local-bridge cases",
+  "resource": "300-second local pure-Python process cap; no wall-time comparison or target-dependent algorithm claim",
+  "claim_boundary": "source-pair policy sweep for the fixed coefficient-six word, local orders and finite coefficient boxes; first passing CRT curve is a diagnostic representative, not exhaustive over its full integer congruence class"
+}

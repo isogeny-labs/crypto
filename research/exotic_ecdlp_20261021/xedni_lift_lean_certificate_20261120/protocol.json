@@ -1,0 +1,11 @@
+{
+  "schema": "xedni-lift-lean-certificate-protocol-v1",
+  "source_fixtures": "research/exotic_ecdlp_20261021/xedni_small_scalar_ladder_20261120/target-fixtures.jsonl",
+  "source_fixtures_sha256": "349217874ed6ad44e9ecb5a47fb46eec1012ace100c1507bd246b01cc61c8361",
+  "source_arms": "research/exotic_ecdlp_20261021/xedni_small_scalar_ladder_20261120/arm-rows.jsonl",
+  "source_arms_sha256": "320c89cacda7a26b0bf3620eaf52b20c08536a61cbec490fb7b19305ac0e5bb4",
+  "instance": {"p":1009,"t":9,"q":1033,"k":3,"public_target":[744,244],"height_cap":64},
+  "canonical_coordinates": "x=a/b^2,y=c/b^3 with a,c in Z, b in positive naturals, gcd(abs(a),b)=1, |a|<=64, b<=64; exact equation c^2=a^3+9*a*b^4+b^6; reductions a=744*b^2 and c=244*b^3 modulo 1009",
+  "lean_result": "no_canonical_lift_height64 proves contradiction from the exact canonical-coordinate and reduction hypotheses; x_candidates enumerates four x-compatible pairs; the only coprime pair with nonnegative equation right side has nonsquare residue 2 modulo 3",
+  "formalization_boundary": "height-64 finite instance only; the measured height-4096 exclusion and the general rational-point-to-canonical-coordinate bridge remain outside this Lean theorem"
+}
