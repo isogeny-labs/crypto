@@ -242,6 +242,10 @@ with tempfile.TemporaryDirectory(prefix="root89-full-") as tmp:
             subprocess.run(["cargo","test","--release","--quiet",
                             "exhaustive_quadratics_over_f7_match_direct_evaluation",
                             "--","--nocapture"],cwd=folder,check=True)
+        if label == "after":
+            subprocess.run(["cargo","test","--release","--quiet",
+                            "round94_noop_reductions",
+                            "--","--nocapture"],cwd=folder,check=True)
         bins[label] = folder / "target/release/rootfind-isolated-ab"
     rows = []
     for trial in range(13):
