@@ -1,0 +1,14 @@
+{
+  "action": "check r prime and r | #J (and [order]D = 0 on random D), not order == #J: the shared-r rule stores an exponent multiple in 'order' (14 of 32 instances here, #J/order in {2,4,8}); compute #J with PARI hyperellcharpoly after pari.allocatemem(1<<30) (the 8 MB default stack overflows at g=6 p=211)",
+  "created": "2026-11-20T21:27:31Z",
+  "evidence": [
+    "research/ic_genus2_16_speedup_20261117/validation/summarize_orders.out; validation/orders_chunk22.out"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "when validating genus_ladder (g16*) instances at genus >= 6",
+  "why": "a naive order == #J test would fail 14 valid instances; the default PARI stack aborts the run mid-way"
+}
