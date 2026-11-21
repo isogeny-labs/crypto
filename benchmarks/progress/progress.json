@@ -1,12 +1,12 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261115T0317Z-genus-ladder-scale",
+  "latest_record": "20261115T0609Z-genus-ladder-sge-scale",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 6,
     "invalid": 4,
-    "measured": 179,
-    "open": 2
+    "measured": 180,
+    "open": 1
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -4021,6 +4021,38 @@
           ],
           "summary": "Genus ladder scaling: genus 2 to 2^24 (no crossing, both exponents 1), genus 3 to 2^15 (2LP exponent 1.344, 0.54 of rho at 32771); 234 runs all certified; unverified pre-gate.",
           "value": 0.537
+        }
+      ],
+      "problem": "hcdlp:genus_ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.283,
+      "latest": 0.283,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.283
+      },
+      "metric": "fpm_mid_2lp_pre_sge_over_rho_g3_p32771",
+      "points": [
+        {
+          "commit": "64e5c0e415e0",
+          "date": "2026-11-21",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.283
+          },
+          "n": 6,
+          "record": "20261115T0609Z-genus-ladder-sge-scale",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.221,
+            0.361
+          ],
+          "summary": "Genus 3 p = 8209..32771: 2LP + prefilter + SGE(8,3) at 0.29/0.38/0.28 of rho (FPM primary), below across the FPM band; 36 runs all certified; unverified pre-gate.",
+          "value": 0.283
         }
       ],
       "problem": "hcdlp:genus_ladder",

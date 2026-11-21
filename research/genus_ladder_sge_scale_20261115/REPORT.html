@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Genus 3 SGE composition</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+<style>body{font-family:system-ui,sans-serif;font-size:10.5pt;line-height:1.4;max-width:1000px;margin:auto;color:#0b0b0b}table{border-collapse:collapse;margin:8px 0;font-size:9pt}th,td{border:1px solid #d8d7d2;padding:3px 6px}th{background:#f1f0ec}img{max-width:100%}code{font-size:9pt;background:#f4f3ef;padding:0 2px}h1{font-size:17pt}h2{font-size:13.5pt;margin-top:18px}header{display:none}</style></head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Genus 3 SGE composition</h1>
+</header>
+<h1
+id="genus-3-at-p-8209-32771-2lp-prefilter-sge-against-rho-results-2026-11-21">Genus
+3 at p = 8209 … 32771: 2LP + prefilter + SGE against rho — results
+(2026-11-21)</h1>
+<p>Status: <code>[pcc:unverified]</code> (shared host, no independent
+replay). Protocol <a href="PROTOCOL.md"><code>PROTOCOL.md</code></a>
+(frozen before data, <code>frozen.sha256</code>); binary
+<code>binary.sha256</code>; data <code>sge_g3.jsonl</code>, joined with
+the scaling study’s <code>scale_g3.jsonl</code> (rho rows) into
+<code>joined_analysis.json</code>; <code>tables.md</code>;
+<code>data.sha256</code>; bench record
+<code>benchmarks/records/20261115T0609Z-genus-ladder-sge-scale.json</code>.</p>
+<h2 id="run">Run</h2>
+<p>36 runs (3 primes × 3 curves × 2 seeds × {unmerged, SGE(8,3)}), all
+certified with the planted t. The nine instances are the scaling study’s
+(9/9 instance lines identical) and the unmerged arm’s 18 rows are
+identical to the scaling study’s field for field, so the rho rows of
+that study are the matched reference (same instances, same seeds).</p>
+<figure>
+<img src="fig_ratio.png" alt="ratio" />
+<figcaption aria-hidden="true">ratio</figcaption>
+</figure>
+<h2 id="result">Result</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">p</th>
+<th style="text-align: right;">2LP+pre / rho</th>
+<th style="text-align: right;">2LP+pre+SGE(8,3) / rho</th>
+<th style="text-align: right;">SGE arm’s <code>la_mul</code> /
+unmerged</th>
+<th>FPM band (SGE arm)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">8209</td>
+<td style="text-align: right;">0.591 [0.457, 0.846]</td>
+<td style="text-align: right;"><strong>0.290 [0.224,
+0.428]</strong></td>
+<td style="text-align: right;">0.32</td>
+<td>below</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">16411</td>
+<td style="text-align: right;">0.741 [0.534, 1.175]</td>
+<td style="text-align: right;"><strong>0.383 [0.266,
+0.726]</strong></td>
+<td style="text-align: right;">0.36</td>
+<td>below</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">32771</td>
+<td style="text-align: right;">0.537 [0.422, 0.687]</td>
+<td style="text-align: right;"><strong>0.283 [0.221,
+0.361]</strong></td>
+<td style="text-align: right;">0.39</td>
+<td>below</td>
+</tr>
+</tbody>
+</table>
+<p>Exponents (FPM primary, three primes): unmerged 1.344 [1.335, 1.356];
+SGE arm 1.398 [1.385, 1.410]; rho 1.413 [1.143, 1.740]. The SGE arm’s
+exponent is higher than the unmerged arm’s because the merge removes a
+smaller share of the linear algebra as the core grows (<code>la</code>
+ratio 0.32 → 0.39): with <code>w_max = 8</code> fixed, the fraction of
+columns light enough to merge falls with the core size. GAE band:
+unresolved at every prime (at <code>w = 1</code> the arm is 10–14× rho;
+at <code>w = 0</code> it is 0.07–0.10).</p>
+<p>Scorecard: Z1 held (9/9, 18/18); Z2 held (36/36); Z3 held (0.283 in
+[0.22, 0.42]; below across the FPM band at all three primes); Z4 held
+(0.31–0.39 in [0.20, 0.40]); Z5 held.</p>
+<h2 id="reading">Reading</h2>
+<p>This is the best measured arm of the program at genus 3 over F_p:
+about 0.3 of negation-map rho on the primary cross-genus reading, with
+the whole stack (double large primes, parity prefilter, structured
+elimination) certified on every run and the baseline path byte-identical
+to the frozen studies. Under the §5a GAE band the comparison with rho
+stays unresolved, because that band prices a native multiplication like
+a group operation at <code>w = 1</code>. Distance remaining to rho at
+<code>w = 1</code>: about 10×. The next knob is the merge depth (the
+<code>la</code> ratio drifts up with <code>p</code>).</p>
+<h2 id="limits">Limits</h2>
+<p>Three primes, nine instances, two seeds; shared 4-vCPU host; no
+independent replay; the FPM prices are stated conventions.</p>
+</body>
+</html>

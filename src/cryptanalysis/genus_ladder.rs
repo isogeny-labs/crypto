@@ -1651,7 +1651,7 @@ impl SgeCols {
 /// multiplication (unless the multiplier is `±1`) and one addition per
 /// merged row; the index bookkeeping one addition per entry touched, as
 /// `peel` does.
-fn sge_reduce(
+pub(crate) fn sge_reduce(
     rows: &[Row],
     ncols: usize,
     tcol: u32,
