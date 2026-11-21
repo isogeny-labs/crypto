@@ -13,8 +13,9 @@
 use std::env;
 use std::fs;
 
-/// With `--features jemalloc`: F4's per-term allocations go to jemalloc
-/// instead of glibc (see the `jemalloc` feature in Cargo.toml).
+/// jemalloc is the global allocator under the default `jemalloc` feature: F4's
+/// per-term allocations go to jemalloc instead of glibc (1.256x on `--exp dlp`;
+/// see the feature in Cargo.toml). `--no-default-features` restores glibc.
 #[cfg(feature = "jemalloc")]
 #[global_allocator]
 static GLOBAL: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
