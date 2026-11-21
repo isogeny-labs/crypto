@@ -1,0 +1,923 @@
+{
+  "all_verified": true,
+  "calibration": {
+    "ns_per_add": 61.93979,
+    "ns_per_as_solve": null,
+    "ns_per_canon": null,
+    "ns_per_double": 66.98825452374001,
+    "ns_per_frobenius": null,
+    "ns_per_inversion": 46.69554052394,
+    "ns_per_legendre": 34.02315500826,
+    "ns_per_lookup": 0.8028016181900001,
+    "ns_per_row_op": 1.07075314973,
+    "ns_per_s4_pair": null,
+    "ns_per_sqrt": 49.59785326397,
+    "ns_per_word_xor": 0.14518686776,
+    "pinned_units": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_sqrt",
+      "ns_per_word_xor",
+      "ns_per_legendre",
+      "ns_per_inversion"
+    ]
+  },
+  "calibration_pins": {
+    "measured": [],
+    "pinned": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_sqrt",
+      "ns_per_word_xor",
+      "ns_per_legendre",
+      "ns_per_inversion"
+    ]
+  },
+  "configurations_run": 3,
+  "configurations_skipped": [],
+  "cost_qualification": "partial_counted_cost: genroot charges each S3 fiber as two group additions; the root-finding inside a fiber (genroot_field_muls, genroot_field_invs, in arbitrary-precision arithmetic) is counted but not priced; total-cost and speedup unknown",
+  "elapsed_seconds": 44.28432025,
+  "instance": "icv1-fp20-t1293-3c2999ba",
+  "markdown": "Rows with a cost qualification report partial counted cost only; total-cost and speedup claims are unavailable.\n\n| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|\n| icv1-fp20-t1293-3c2999ba | prime-abscissa[size=16] + genroot[m=4] + — + walk | 32 | 16 | 2.0 | 0.044 | 386 | 17 | 17 | — | — | 399.534 | — | yes |\n| icv1-fp20-t1293-3c2999ba | prime-abscissa[size=16] + genroot[m=4] + — + walk | 32 | 16 | 2.0 | 0.054 | 315 | 17 | 17 | — | — | 328.724 | — | yes |\n| icv1-fp20-t1293-3c2999ba | prime-abscissa[size=16] + genroot[m=4] + — + walk | 32 | 16 | 2.0 | 0.031 | 521 | 16 | 16 | — | — | 538.328 | — | yes |\n\n- **icv1-fp20-t1293-3c2999ba / prime-abscissa[size=16] + genroot[m=4] + — + walk**: partial_counted_cost: genroot charges each S3 fiber as two group additions; the root-finding inside a fiber (genroot_field_muls, genroot_field_invs, in arbitrary-precision arithmetic) is counted but not priced; total-cost and speedup unknown\n\n- **icv1-fp20-t1293-3c2999ba / prime-abscissa[size=16] + genroot[m=4] + — + walk**: partial_counted_cost: genroot charges each S3 fiber as two group additions; the root-finding inside a fiber (genroot_field_muls, genroot_field_invs, in arbitrary-precision arithmetic) is counted but not priced; total-cost and speedup unknown\n\n- **icv1-fp20-t1293-3c2999ba / prime-abscissa[size=16] + genroot[m=4] + — + walk**: partial_counted_cost: genroot charges each S3 fiber as two group additions; the root-finding inside a fiber (genroot_field_muls, genroot_field_invs, in arbitrary-precision arithmetic) is counted but not priced; total-cost and speedup unknown\n",
+  "operation": "bench",
+  "plan": null,
+  "regime": "prime",
+  "rho_reference": {
+    "all_verified": true,
+    "automorphisms": 2,
+    "max_s": 1.8832526239707938,
+    "mean_s": 0.9981263339487139,
+    "mean_s_walk": 0.8085916656760952,
+    "method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+    "min_s": 0.2599611821360826,
+    "per_run": [
+      {
+        "planted": 879493,
+        "s": 0.5091720898229287,
+        "s_walk": 0.32641742418590824,
+        "seed": 124055164282,
+        "steps": 309,
+        "steps_over_expected": 0.3683226212283578,
+        "verified": true
+      },
+      {
+        "planted": 919996,
+        "s": 1.8832526239707938,
+        "s_walk": 1.671179028017674,
+        "seed": 124055164283,
+        "steps": 1608,
+        "steps_over_expected": 1.8857235997020712,
+        "verified": true
+      },
+      {
+        "planted": 960499,
+        "s": 1.751317437548346,
+        "s_walk": 1.536311948563616,
+        "seed": 124055164280,
+        "steps": 1463,
+        "steps_over_expected": 1.733542396919097,
+        "verified": true
+      },
+      {
+        "planted": 879493,
+        "s": 1.127801519492629,
+        "s_walk": 0.9274554956659489,
+        "seed": 124055164281,
+        "steps": 891,
+        "steps_over_expected": 1.0465214597176993,
+        "verified": true
+      },
+      {
+        "planted": 919996,
+        "s": 1.1043463752397493,
+        "s_walk": 0.9079095421218825,
+        "seed": 124055164286,
+        "steps": 858,
+        "steps_over_expected": 1.024466212937558,
+        "verified": true
+      },
+      {
+        "planted": 960499,
+        "s": 1.081868528664073,
+        "s_walk": 0.8844543978690028,
+        "seed": 124055164287,
+        "steps": 832,
+        "steps_over_expected": 0.9979999168013886,
+        "verified": true
+      },
+      {
+        "planted": 879493,
+        "s": 1.207939929023301,
+        "s_walk": 1.026162561063484,
+        "seed": 124055164284,
+        "steps": 951,
+        "steps_over_expected": 1.1579004559574122,
+        "verified": true
+      },
+      {
+        "planted": 919996,
+        "s": 0.44564774080471303,
+        "s_walk": 0.276575242648539,
+        "seed": 124055164285,
+        "steps": 257,
+        "steps_over_expected": 0.31208174193899774,
+        "verified": true
+      },
+      {
+        "planted": 960499,
+        "s": 0.9919571423613678,
+        "s_walk": 0.8043159883383307,
+        "seed": 124055164274,
+        "steps": 768,
+        "steps_over_expected": 0.9075734050028097,
+        "verified": true
+      },
+      {
+        "planted": 879493,
+        "s": 0.8307030256228204,
+        "s_walk": 0.6508802530174098,
+        "seed": 124055164275,
+        "steps": 632,
+        "steps_over_expected": 0.7344397177787014,
+        "verified": true
+      },
+      {
+        "planted": 919996,
+        "s": 1.0730728495692432,
+        "s_walk": 0.8864089932234095,
+        "seed": 124055164272,
+        "steps": 852,
+        "steps_over_expected": 1.0002054414794026,
+        "verified": true
+      },
+      {
+        "planted": 960499,
+        "s": 0.7720651649906213,
+        "s_walk": 0.5814921179359742,
+        "seed": 124055164273,
+        "steps": 559,
+        "steps_over_expected": 0.6561435917092002,
+        "verified": true
+      },
+      {
+        "planted": 879493,
+        "s": 1.2265085848901642,
+        "s_walk": 1.0222533703546708,
+        "seed": 124055164278,
+        "steps": 960,
+        "steps_over_expected": 1.1534894066013839,
+        "verified": true
+      },
+      {
+        "planted": 919996,
+        "s": 0.2599611821360826,
+        "s_walk": 0.09186598165711189,
+        "seed": 124055164279,
+        "steps": 89,
+        "steps_over_expected": 0.10365965986666356,
+        "verified": true
+      },
+      {
+        "planted": 960499,
+        "s": 1.0271398587406873,
+        "s_walk": 0.8453624907808701,
+        "seed": 124055164276,
+        "steps": 797,
+        "steps_over_expected": 0.9538894232411063,
+        "verified": true
+      },
+      {
+        "planted": 879493,
+        "s": 0.6772672903018995,
+        "s_walk": 0.49842181537369223,
+        "seed": 124055164277,
+        "steps": 475,
+        "steps_over_expected": 0.5624087928936002,
+        "verified": true
+      }
+    ],
+    "runs": 16
+  },
+  "rho_reference_candidates": [],
+  "rho_reference_plain": {
+    "all_verified": true,
+    "automorphisms": 1,
+    "max_s": 13.154426735156662,
+    "mean_s": 3.369233742158438,
+    "mean_s_walk": 2.272461423917015,
+    "method": "r-adding walk, distinguished points, 16 jumps",
+    "min_s": 1.1209604357522058,
+    "per_run": [
+      {
+        "planted": 879493,
+        "s": 2.661181575024635,
+        "s_walk": 1.3848308085971017,
+        "seed": 124055164282,
+        "steps": 1417,
+        "steps_over_expected": 1.1049351215037755,
+        "verified": true
+      },
+      {
+        "planted": 919996,
+        "s": 3.647274931322783,
+        "s_walk": 2.003460238266802,
+        "seed": 124055164283,
+        "steps": 2050,
+        "steps_over_expected": 1.5985299922955114,
+        "verified": true
+      },
+      {
+        "planted": 960499,
+        "s": 1.262668598946687,
+        "s_walk": 0.6244932157329203,
+        "seed": 124055164280,
+        "steps": 639,
+        "steps_over_expected": 0.4982734951594301,
+        "verified": true
+      },
+      {
+        "planted": 879493,
+        "s": 4.702756422702366,
+        "s_walk": 3.6707300755756624,
+        "seed": 124055164281,
+        "steps": 3756,
+        "steps_over_expected": 2.9288188541765563,
+        "verified": true
+      },
+      {
+        "planted": 919996,
+        "s": 1.7044071490425867,
+        "s_walk": 0.8404760023948535,
+        "seed": 124055164286,
+        "steps": 860,
+        "steps_over_expected": 0.6706028260361657,
+        "verified": true
+      },
+      {
+        "planted": 960499,
+        "s": 7.841836561879424,
+        "s_walk": 6.519552804623335,
+        "seed": 124055164287,
+        "steps": 6671,
+        "steps_over_expected": 5.201850526147979,
+        "verified": true
+      },
+      {
+        "planted": 879493,
+        "s": 13.154426735156662,
+        "s_walk": 11.442201204696447,
+        "seed": 124055164284,
+        "steps": 11708,
+        "steps_over_expected": 9.129555682827242,
+        "verified": true
+      },
+      {
+        "planted": 919996,
+        "s": 1.1219377334294092,
+        "s_walk": 0.3909190708813272,
+        "seed": 124055164285,
+        "steps": 400,
+        "steps_over_expected": 0.31190829117961194,
+        "verified": true
+      },
+      {
+        "planted": 960499,
+        "s": 2.5673609980131165,
+        "s_walk": 1.6272006325435246,
+        "seed": 124055164274,
+        "steps": 1665,
+        "steps_over_expected": 1.2983182620351348,
+        "verified": true
+      },
+      {
+        "planted": 879493,
+        "s": 1.8998666844832504,
+        "s_walk": 0.9509106399188285,
+        "seed": 124055164275,
+        "steps": 973,
+        "steps_over_expected": 0.7587169182944061,
+        "verified": true
+      },
+      {
+        "planted": 919996,
+        "s": 1.1209604357522058,
+        "s_walk": 0.344008782375568,
+        "seed": 124055164272,
+        "steps": 352,
+        "steps_over_expected": 0.2744792962380585,
+        "verified": true
+      },
+      {
+        "planted": 960499,
+        "s": 3.1771947485879872,
+        "s_walk": 1.5714946649429355,
+        "seed": 124055164273,
+        "steps": 1608,
+        "steps_over_expected": 1.2538713305420401,
+        "verified": true
+      },
+      {
+        "planted": 879493,
+        "s": 1.5675854742341222,
+        "s_walk": 0.765224081250198,
+        "seed": 124055164278,
+        "steps": 783,
+        "steps_over_expected": 0.6105604799840905,
+        "verified": true
+      },
+      {
+        "planted": 919996,
+        "s": 2.1168267688223867,
+        "s_walk": 1.164938831226355,
+        "seed": 124055164279,
+        "steps": 1192,
+        "steps_over_expected": 0.9294867077152437,
+        "verified": true
+      },
+      {
+        "planted": 960499,
+        "s": 3.145921222917481,
+        "s_walk": 1.9379812938941796,
+        "seed": 124055164276,
+        "steps": 1983,
+        "steps_over_expected": 1.5462853535229264,
+        "verified": true
+      },
+      {
+        "planted": 879493,
+        "s": 2.2155338342199222,
+        "s_walk": 1.1209604357522058,
+        "seed": 124055164277,
+        "steps": 1147,
+        "steps_over_expected": 0.8943970249575373,
+        "verified": true
+      }
+    ],
+    "runs": 16
+  },
+  "rho_reference_rule": "negation map (A = 2): the only eligible automorphism of this curve",
+  "rows": [
+    {
+      "cost_qualification": "partial_counted_cost: genroot charges each S3 fiber as two group additions; the root-finding inside a fiber (genroot_field_muls, genroot_field_invs, in arbitrary-precision arithmetic) is counted but not priced; total-cost and speedup unknown",
+      "decomposition": {
+        "cost": {
+          "gae": 408471.25059400004,
+          "group_ops": {
+            "adds": 402685,
+            "doubles": 618,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "genroot_cache_hits": 3104,
+            "genroot_fibers": 200704,
+            "genroot_lift_failures": 0,
+            "genroot_probes": 395264,
+            "genroot_solutions": 17,
+            "genroot_truncated": 0,
+            "genroot_unknown": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 398368,
+            "relations": 17,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "sqrt_solves": 0,
+            "target_guard_probes": 386,
+            "trials": 386,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 385
+          },
+          "wall_ns": 13800513877,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "genroot_field_invs": 23016864,
+            "genroot_field_muls": 952234608,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 385,
+            "walk_modr_adds": 770
+          }
+        },
+        "description": "generalized root-finder: the exact all-roots S3 chain over the base's abscissae, m = 4, meeting in the middle after 2 source(s); each fiber is found by exact root-finding and charged as two group additions (its field work is reported, not priced)",
+        "gae_before_solver": 408471.25059400004,
+        "hit_rate": 0.04404145077720207,
+        "name": "genroot",
+        "relations_found": 17,
+        "setup": {
+          "gae": 272.0,
+          "group_ops": {
+            "adds": 272,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "genroot_left_records": 496,
+            "genroot_setup_fibers": 136,
+            "genroot_setup_field_invs": 13621,
+            "genroot_setup_field_muls": 559909
+          },
+          "wall_ns": 8452000
+        },
+        "solver": null,
+        "summands": 4,
+        "system": null,
+        "targets_tried": 386
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 16,
+        "columns": 16,
+        "cost": {
+          "gae": 30.389295999999998,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 32,
+            "legendre_symbols": 32,
+            "sqrt_solves": 16
+          },
+          "wall_ns": 24458,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 48,
+            "index_point_negations": 16,
+            "index_sort_word_ops": 96
+          }
+        },
+        "description": "the 16 smallest abscissae carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 32
+      },
+      "group_order": 1046999,
+      "instance": "icv1-fp20-t1293-3c2999ba",
+      "label": "prime-abscissa[size=16] + genroot[m=4] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 12.066326,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 17,
+            "pinned_by_repeated_row": 0,
+            "rank": 17,
+            "repeated_column_rows": 0,
+            "row_ops": 698,
+            "rows": 17,
+            "single_column_rows": 0,
+            "two_column_rows": 0
+          },
+          "wall_ns": 71748,
+          "work_native": {
+            "column_part_inserts": 17,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1479,
+            "pivot_inversion_steps": 680,
+            "row_build_modr_adds": 85,
+            "row_build_modr_muls": 34,
+            "row_build_words": 833,
+            "row_key_mixes": 61
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 17,
+        "rows": 17,
+        "work": 698,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 19.99782863366001,
+      "r": 1046999,
+      "recovered": 879493,
+      "rho_s": 0.9981263339487139,
+      "s": 399.5336627914537,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "size": "16"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 2000000,
+        "oracle": "genroot",
+        "oracle_params": {
+          "m": "4"
+        },
+        "seed": 123212651130,
+        "solver": null,
+        "solver_budget_seconds": 120,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 408814.706216,
+      "verified": true,
+      "verify": {
+        "gae": 29.0,
+        "group_ops": {
+          "adds": 10,
+          "doubles": 19,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1958
+      },
+      "wall_seconds": 13.809146375
+    },
+    {
+      "cost_qualification": "partial_counted_cost: genroot charges each S3 fiber as two group additions; the root-finding inside a fiber (genroot_field_muls, genroot_field_invs, in arbitrary-precision arithmetic) is counted but not priced; total-cost and speedup unknown",
+      "decomposition": {
+        "cost": {
+          "gae": 336016.372955,
+          "group_ops": {
+            "adds": 331206,
+            "doubles": 609,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "genroot_cache_hits": 1280,
+            "genroot_fibers": 165040,
+            "genroot_lift_failures": 0,
+            "genroot_probes": 322560,
+            "genroot_solutions": 17,
+            "genroot_truncated": 0,
+            "genroot_unknown": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 323840,
+            "relations": 17,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "sqrt_solves": 0,
+            "target_guard_probes": 315,
+            "trials": 315,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 314
+          },
+          "wall_ns": 11613616999,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "genroot_field_invs": 18904275,
+            "genroot_field_muls": 782098412,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 314,
+            "walk_modr_adds": 628
+          }
+        },
+        "description": "generalized root-finder: the exact all-roots S3 chain over the base's abscissae, m = 4, meeting in the middle after 2 source(s); each fiber is found by exact root-finding and charged as two group additions (its field work is reported, not priced)",
+        "gae_before_solver": 336016.372955,
+        "hit_rate": 0.05396825396825397,
+        "name": "genroot",
+        "relations_found": 17,
+        "setup": {
+          "gae": 272.0,
+          "group_ops": {
+            "adds": 272,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "genroot_left_records": 496,
+            "genroot_setup_fibers": 136,
+            "genroot_setup_field_invs": 13621,
+            "genroot_setup_field_muls": 559909
+          },
+          "wall_ns": 8985875
+        },
+        "solver": null,
+        "summands": 4,
+        "system": null,
+        "targets_tried": 315
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 16,
+        "columns": 16,
+        "cost": {
+          "gae": 30.389295999999998,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 32,
+            "legendre_symbols": 32,
+            "sqrt_solves": 16
+          },
+          "wall_ns": 29042,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 48,
+            "index_point_negations": 16,
+            "index_sort_word_ops": 96
+          }
+        },
+        "description": "the 16 smallest abscissae carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 32
+      },
+      "group_order": 1046999,
+      "instance": "icv1-fp20-t1293-3c2999ba",
+      "label": "prime-abscissa[size=16] + genroot[m=4] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 13.743165,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 17,
+            "pinned_by_repeated_row": 0,
+            "rank": 17,
+            "repeated_column_rows": 0,
+            "row_ops": 795,
+            "rows": 17,
+            "single_column_rows": 0,
+            "two_column_rows": 1
+          },
+          "wall_ns": 59334,
+          "work_native": {
+            "column_part_inserts": 17,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1530,
+            "pivot_inversion_steps": 680,
+            "row_build_modr_adds": 85,
+            "row_build_modr_muls": 34,
+            "row_build_words": 833,
+            "row_key_mixes": 60
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 17,
+        "rows": 17,
+        "work": 795,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 19.99782863366001,
+      "r": 1046999,
+      "recovered": 919996,
+      "rho_s": 0.9981263339487139,
+      "s": 328.72434064599094,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "size": "16"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 2000000,
+        "oracle": "genroot",
+        "oracle_params": {
+          "m": "4"
+        },
+        "seed": 123212691633,
+        "solver": null,
+        "solver_budget_seconds": 120,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 336360.505416,
+      "verified": true,
+      "verify": {
+        "gae": 28.0,
+        "group_ops": {
+          "adds": 9,
+          "doubles": 19,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1792
+      },
+      "wall_seconds": 11.622758
+    },
+    {
+      "cost_qualification": "partial_counted_cost: genroot charges each S3 fiber as two group additions; the root-finding inside a fiber (genroot_field_muls, genroot_field_invs, in arbitrary-precision arithmetic) is counted but not priced; total-cost and speedup unknown",
+      "decomposition": {
+        "cost": {
+          "gae": 550488.6709990001,
+          "group_ops": {
+            "adds": 542894,
+            "doubles": 617,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "genroot_cache_hits": 4368,
+            "genroot_fibers": 270704,
+            "genroot_lift_failures": 0,
+            "genroot_probes": 533470,
+            "genroot_solutions": 16,
+            "genroot_truncated": 0,
+            "genroot_unknown": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 537838,
+            "relations": 16,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "sqrt_solves": 0,
+            "target_guard_probes": 521,
+            "trials": 521,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 520
+          },
+          "wall_ns": 18800182624,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "genroot_field_invs": 30993012,
+            "genroot_field_muls": 1282231057,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 520,
+            "walk_modr_adds": 1040
+          }
+        },
+        "description": "generalized root-finder: the exact all-roots S3 chain over the base's abscissae, m = 4, meeting in the middle after 2 source(s); each fiber is found by exact root-finding and charged as two group additions (its field work is reported, not priced)",
+        "gae_before_solver": 550488.6709990001,
+        "hit_rate": 0.030710172744721688,
+        "name": "genroot",
+        "relations_found": 16,
+        "setup": {
+          "gae": 272.0,
+          "group_ops": {
+            "adds": 272,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "genroot_left_records": 496,
+            "genroot_setup_fibers": 136,
+            "genroot_setup_field_invs": 13621,
+            "genroot_setup_field_muls": 559909
+          },
+          "wall_ns": 7891625
+        },
+        "solver": null,
+        "summands": 4,
+        "system": null,
+        "targets_tried": 521
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 16,
+        "columns": 16,
+        "cost": {
+          "gae": 30.389295999999998,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 32,
+            "legendre_symbols": 32,
+            "sqrt_solves": 16
+          },
+          "wall_ns": 27458,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 48,
+            "index_point_negations": 16,
+            "index_sort_word_ops": 96
+          }
+        },
+        "description": "the 16 smallest abscissae carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 32
+      },
+      "group_order": 1046999,
+      "instance": "icv1-fp20-t1293-3c2999ba",
+      "label": "prime-abscissa[size=16] + genroot[m=4] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 10.303052,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 17,
+            "pinned_by_repeated_row": 0,
+            "rank": 16,
+            "repeated_column_rows": 0,
+            "row_ops": 596,
+            "rows": 16,
+            "single_column_rows": 0,
+            "two_column_rows": 2
+          },
+          "wall_ns": 82418,
+          "work_native": {
+            "column_part_inserts": 16,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1416,
+            "pivot_inversion_steps": 640,
+            "row_build_modr_adds": 80,
+            "row_build_modr_muls": 32,
+            "row_build_words": 784,
+            "row_key_mixes": 59
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 16,
+        "rows": 16,
+        "work": 596,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 19.99782863366001,
+      "r": 1046999,
+      "recovered": 960499,
+      "rho_s": 0.9981263339487139,
+      "s": 538.3281665251145,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "size": "16"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 2000000,
+        "oracle": "genroot",
+        "oracle_params": {
+          "m": "4"
+        },
+        "seed": 123212732136,
+        "solver": null,
+        "solver_budget_seconds": 120,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 550833.3633470001,
+      "verified": true,
+      "verify": {
+        "gae": 32.0,
+        "group_ops": {
+          "adds": 13,
+          "doubles": 19,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 2333
+      },
+      "wall_seconds": 18.808296542
+    }
+  ],
+  "schema_version": 1,
+  "software": {
+    "arch": "aarch64",
+    "binary_blake3": "a91c01d8fa3bfe7f3a2c939962729cfdec0cf0bf197a46d464e672361f152587",
+    "git_commit": null,
+    "git_commit_source": null,
+    "git_dirty": null,
+    "os": "macos",
+    "version": "0.1.0"
+  },
+  "status": "complete",
+  "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with counted phase costs in group-addition equivalents divided by sqrt(r); consult cost_qualification for unpriced work.",
+  "what_this_is_not": [
+    "not a speed claim: a configuration on a known-answer instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
+    "not a wall-clock benchmark: operation counts are the metric, wall time rides along",
+    "not a claim about any deployed curve"
+  ]
+}
