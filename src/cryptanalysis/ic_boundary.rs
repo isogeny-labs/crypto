@@ -3928,10 +3928,32 @@ impl RhoV3 {
 /// `F/k` more (the adding walk's `√(k/(k−1))` and, under negation, the
 /// look-ahead's `1/(2k)` additions a step) and `(weight − 1)·k` to build,
 /// so `k ≈ √(F/(weight − 1))`.
+///
+/// The result is rounded to a power of two so [`TunedWalker::index_of`]
+/// (and the lockstep walker) take a mask instead of a division every
+/// step.  On fp28, the unrounded weight-2 optimum is ≈120: a non-power
+/// of two that raised measured ns/GAE by ≈9 % against `rho.negation`'s
+/// 16-jump table and left wall ≈1.02× after S had already cleared 0.95×.
 pub fn rho_v3_jumps_for(r: u64, automorphisms: u32, weight: u32) -> usize {
     let f = generic_floor_ops(r as f64, automorphisms.max(1) as f64);
     let k = (f / (weight.max(2) - 1) as f64).sqrt().round() as usize;
-    k.clamp(4, 4096)
+    round_jumps_pow2(k.clamp(4, 4096))
+}
+
+/// Nearest power of two in `[4, 4096]`; on a tie, the larger (more jumps
+/// cut the look-ahead and `√(k/(k−1))` excess).
+pub fn round_jumps_pow2(k: usize) -> usize {
+    let k = k.clamp(4, 4096);
+    if k.is_power_of_two() {
+        return k;
+    }
+    let hi = k.next_power_of_two().min(4096);
+    let lo = (hi >> 1).max(4);
+    if k - lo < hi - k {
+        lo
+    } else {
+        hi
+    }
 }
 
 /// Rungs per ladder for `jumps` jumps: `2·⌈log₂ k⌉ + 4` bits a side, so
@@ -16908,6 +16930,22 @@ mod tests {
                 v += m as i128;
             }
             Some(v as u64)
+        }
+    }
+
+    #[test]
+    fn rho_v3_jump_counts_are_powers_of_two() {
+        assert_eq!(round_jumps_pow2(120), 128);
+        assert_eq!(round_jumps_pow2(85), 64);
+        assert_eq!(round_jumps_pow2(16), 16);
+        assert_eq!(round_jumps_pow2(3), 4);
+        for bits in [20u32, 24, 28, 32] {
+            let r = (1u64 << (bits - 1)) | 1;
+            for w in [2u32, 3] {
+                let k = rho_v3_jumps_for(r, 2, w);
+                assert!(k.is_power_of_two(), "bits={bits} w={w} k={k}");
+                assert!((4..=4096).contains(&k), "bits={bits} w={w} k={k}");
+            }
         }
     }
 
