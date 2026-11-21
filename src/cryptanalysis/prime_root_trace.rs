@@ -373,7 +373,15 @@ impl Engine<'_> {
                 // execute multiplication/addition by a zero coefficient.
                 if y == 0 { continue; }
                 let z = self.field(FieldOp::Mul, x, y)?;
-                product[i + j] = self.field(FieldOp::Add, product[i + j], z)?;
+                // A zero accumulator has no previous contribution. Avoid
+                // an Add field event (and its sink/serialization overhead).
+                // The product certificate remains checked independently.
+                let previous = product[i + j];
+                product[i + j] = if previous == 0 {
+                    z
+                } else {
+                    self.field(FieldOp::Add, previous, z)?
+                };
             }
         }
         let product = trim(product);
@@ -389,18 +397,27 @@ impl Engine<'_> {
         let mut r = a.to_vec();
         let mut q = vec![0; a.len().saturating_sub(b.len()) + 1];
         if a.len() >= b.len() {
-            let inv = self.inv(*b.last().unwrap())?;
+            // For monic divisors the quotient leading term is already
+            // canonical; no inversion or multiplication by one is needed.
+            let lead = *b.last().unwrap();
+            let inv = if lead == 1 { 1 } else { self.inv(lead)? };
             while r.len() >= b.len() {
                 let shift = r.len() - b.len();
-                let c = self.field(FieldOp::Mul, *r.last().unwrap(), inv)?;
+                let highest = *r.last().unwrap();
+                let c = if lead == 1 {
+                    highest
+                } else {
+                    self.field(FieldOp::Mul, highest, inv)?
+                };
                 q[shift] = c;
-                for (k, &v) in b.iter().enumerate() {
-                    // Zero divisor terms leave the remainder unchanged.
-                    // This also avoids two trace events for each zero term.
+                // The leading term cancels *exactly* by the definition of
+                // c. Do not multiply c by lead and subtract highest again.
+                for (k, &v) in b[..b.len() - 1].iter().enumerate() {
                     if v == 0 { continue; }
                     let product = self.field(FieldOp::Mul, c, v)?;
                     r[shift + k] = self.field(FieldOp::Sub, r[shift + k], product)?;
                 }
+                r[shift + b.len() - 1] = 0;
                 r = trim(r);
             }
         }
@@ -465,9 +482,13 @@ impl Engine<'_> {
             b = r;
         }
         if let Some(&lead) = a.last() {
-            let inv = self.inv(lead)?;
-            for c in &mut a {
-                *c = self.field(FieldOp::Mul, *c, inv)?;
+            // Most split GCDs are monic already. Emit no inverse or field
+            // multiplications when normalization is the identity.
+            if lead != 1 {
+                let inv = self.inv(lead)?;
+                for c in &mut a {
+                    *c = self.field(FieldOp::Mul, *c, inv)?;
+                }
             }
         }
         self.event(RootEvent::GcdEnd {
@@ -1405,6 +1426,31 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round76_identity_pruning_preserves_root_certificates() {
+        // Exercise monic and nonmonic divisors, dense products, sparse
+        // products, and monic GCD normalization through the full solver.
+        for p in [17, 65521, 1_000_000_007, MAX_PRIME] {
+            let a = vproduct(&[p - 1, 1], &[p - 2, 1], p);
+            let polynomials = [
+                a.clone(),
+                vproduct(&a, &[1, 0, 0, 1], p),
+                vproduct(&a, &[1, 2, 3], p),
+            ];
+            for f in polynomials {
+                let report = run(&f, p);
+                assert!(report.complete(), "p={p} f={f:?} stop={:?}", report.stop);
+                verify(&report).unwrap();
+                assert!(report.roots.contains(&1) && report.roots.contains(&2));
+                // First nonzero convolution term is assigned rather than
+                // charged as an addition of zero.
+                assert!(!report.events.iter().any(|e| matches!(
+                    e, RootEvent::Field {op: FieldOp::Add, a: 0, ..}
+                )));
+            }
+        }
+    }
 
     #[test]
     fn round75_cached_barrett_matches_frozen_field_and_noncanonical_fallback() {
