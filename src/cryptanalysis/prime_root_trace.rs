@@ -792,6 +792,27 @@ fn vmonomial_product(m: &[u64], other: &[u64]) -> Option<Vec<u64>> {
     result[shift..].copy_from_slice(other);
     Some(trim(result))
 }
+// Keep the wide 32-bit arithmetic in its own cold-to-other-fields code
+// region. Inlining it into the generic verifier perturbs even the unchanged
+// 61-bit hot path and gave measurable code-layout regressions.
+#[inline(never)]
+fn vproduct_barrett32(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    debug_assert!(p > 1 && p <= u32::MAX as u64);
+    let reciprocal = u64::MAX / p;
+    let mut result = vec![0; a.len() + b.len() - 1];
+    for (i, &x) in a.iter().enumerate() {
+        if x == 0 { continue; }
+        for (j, &y) in b.iter().enumerate() {
+            if y == 0 { continue; }
+            let term = result[i + j] + x * y;
+            let quotient = ((term as u128 * reciprocal as u128) >> 64) as u64;
+            let remainder = term - quotient * p;
+            result[i + j] = if remainder >= p { remainder - p } else { remainder };
+        }
+    }
+    trim(result)
+}
+
 fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     if a.is_empty() || b.is_empty() {
         return vec![];
@@ -834,26 +855,10 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     }
     if let Some(result) = vmonomial_product(a, b) { return result; }
     if let Some(result) = vmonomial_product(b, a) { return result; }
-    let mut r = vec![0; a.len() + b.len() - 1];
-    // For wide polynomial products over a 32-bit prime, amortize one
-    // reciprocal across all coefficient multiplications and additions.
-    // Canonical operands give term < p^2 <= 2^64. The estimated quotient
-    // undercounts by at most one, so one conditional subtraction is exact.
-    // Short products use the existing path to avoid reciprocal setup costs.
     if p <= u32::MAX as u64 && a.len() >= 8 && b.len() >= 8 {
-        let reciprocal = u64::MAX / p;
-        for (i, &x) in a.iter().enumerate() {
-            if x == 0 { continue; }
-            for (j, &y) in b.iter().enumerate() {
-                if y == 0 { continue; }
-                let term = r[i + j] + x * y;
-                let quotient = ((term as u128 * reciprocal as u128) >> 64) as u64;
-                let remainder = term - quotient * p;
-                r[i + j] = if remainder >= p { remainder - p } else { remainder };
-            }
-        }
-        return trim(r);
+        return vproduct_barrett32(a, b, p);
     }
+    let mut r = vec![0; a.len() + b.len() - 1];
     for (i, &x) in a.iter().enumerate() {
         // Sparse root polynomials often have zero middle coefficients.
         // Multiplying those coefficients cannot change the accumulator.
@@ -1422,11 +1427,8 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 // unchanged terminal base. On new traces we avoid the costly
                 // polynomial square/division during independent replay too.
                 if state.exponent != 1 || base != &state.base {
-                    // PowerStep verifies an actual square, not a general
-                    // product. Reuse the independent symmetric-square checker
-                    // already exercised by standalone vpower replay.
                     state.base =
-                        vdiv(&vsquare(&state.base, p), &state.modulus, p)?.1;
+                        vdiv(&vproduct(&state.base, &state.base, p), &state.modulus, p)?.1;
                 }
                 state.exponent >>= 1;
                 if (*exponent, accumulator, base) != (state.exponent, &state.acc, &state.base) {
