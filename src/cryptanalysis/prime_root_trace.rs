@@ -466,6 +466,18 @@ impl Engine<'_> {
             })?;
             return Ok((quotient, vec![]));
         }
+        // A degree-short dividend has zero quotient and no field operations.
+        // This occurs at the start of modular powers and in GCD tails.
+        if a.len() < b.len() {
+            let remainder = trim(a.to_vec());
+            self.event(RootEvent::Division {
+                a: a.to_vec(),
+                b: b.to_vec(),
+                quotient: vec![],
+                remainder: remainder.clone(),
+            })?;
+            return Ok((vec![], remainder));
+        }
         // Division by X^k is a coefficient split. Keep the Division event,
         // which the independent verifier checks as a Euclidean identity.
         if let Some(shift) = monic_x_shift(b) {
@@ -481,18 +493,6 @@ impl Engine<'_> {
                 remainder: remainder.clone(),
             })?;
             return Ok((quotient, remainder));
-        }
-        // A degree-short dividend has zero quotient and no field operations.
-        // This occurs at the start of modular powers and in GCD tails.
-        if a.len() < b.len() {
-            let remainder = trim(a.to_vec());
-            self.event(RootEvent::Division {
-                a: a.to_vec(),
-                b: b.to_vec(),
-                quotient: vec![],
-                remainder: remainder.clone(),
-            })?;
-            return Ok((vec![], remainder));
         }
         // Synthetic division by a monic linear factor. The running
         // coefficient avoids a mutable polynomial and repeated tail scans.
