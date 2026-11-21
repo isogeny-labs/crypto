@@ -11,6 +11,7 @@ in the two studies); everything else is a single producer's measurement.
 |---|---|--:|--:|---|---|
 | 2, hyperelliptic | 2LP + prefilter | 3–5 | 2^24 | none (no lead targeted it) | `genus_ladder_scale_20261115` |
 | 3, hyperelliptic | 2LP + prefilter + SGE(16,3) | 0.255 | 32771 | C1: w_max 16 (was 0.283 with SGE(8,3)); the LA drift 0.32→0.39 stops at 0.31–0.32 | `genus_ladder_sge_depth_20261121` |
+| 3, hyperelliptic | 2LP + prefilter + SGE(8,3) | 0.416 [0.336, 0.678] / 0.507 [0.354, 0.823] / 0.293 [0.167, 0.623] | 65537 / 131101 / 262147 | C4: orders by BSGS from N_1 alone (order search 6.5 s instead of 204 s at 8209; genus 3 reaches p ≈ 2·10^6); the ratio stops falling; exponents over 8209…131101: SGE arm 1.418 [1.411, 1.425], rho 1.243 [1.069, 1.421] | `genus_ladder_fast_order_20261121` |
 | 3, hyperelliptic | same, cc 1.5 | 0.368 | 16411 | C2: cc 1.5 gains 0.8–3.7 % over cc 2.0; not a lever | `genus_ladder_cc_sweep_20261121` |
 | 3, plane quartic (random) | Diem 2LP + algebraic decomposition + SGE(8,3) | 0.0070 [0.0037, 0.0133] | 8209 | C3: decomposition by conic resultant (`rel_mul` 0.20 of the scan), FPM 0.54 of the old arm (was 0.013 of quartic rho); arm now LA-bound | `quartic_diem_alg_20261121` |
 | 4, hyperelliptic | 2LP + prefilter + SGE(8,3) | 0.0198 | 4099 | C2: first SGE point at genus 4, p = 4099 (was 0.0375 without SGE); C1: w_max 16 is worse at genus 4 | `genus_ladder_cc_sweep_20261121` |
@@ -31,11 +32,18 @@ in the two studies); everything else is a single producer's measurement.
 - **Genus 3 at p = 32771 is replayed** (C5): 36 IC rows, 18 unmerged, 18 rho rows, 9 instances with
   0 mismatches; the analyzer double-counted the unmerged arm (intervals too narrow, means unchanged;
   errata in both studies).
-- Pending: C4 (exact orders by BSGS from N_1 alone; genus-3 extension to 65537 and 131101).
+- **The genus-3 ratio does not keep falling** (C4). With the order search made cheap (BSGS over the
+  one-dimensional Weil window from N_1; `count_points(2)` 2.3–2.5× faster by Barrett reduction,
+  counts unchanged), genus 3 was extended to p = 262147: SGE arm over rho 0.416, 0.507, 0.293 at
+  65537, 131101, 262147 with wide intervals (3 curves × 2 seeds), and the SGE arm's exponent
+  (1.418) sits above the rho fit (1.243 [1.069, 1.421]) over 8209…131101. The campaign target
+  ≤ 0.25 at 2^17 is missed (O2 falsified). At genus 4 the N_1-only BSGS is 4.4–4.5× slower than
+  the N_1 + N_2 route: a negative; genus 4 reaches about 2^15.7 with the faster count only.
 
 ## Distance remaining and next levers
-At genus 3 the arm sits at about a quarter of rho in the FPM reading with exponent 1.40 against rho's
-1.41: no exponent gain, a constant-factor gain. The linear algebra after the merge is now the whole
+At genus 3 the arm sits at a quarter to a half of rho in the FPM reading, and over 8209…131101 its
+exponent (1.42) is above the rho fit (1.24, wide): a constant-factor gain that shrinks with p unless
+more curves per prime say otherwise. The linear algebra after the merge is now the whole
 lever at genus 3 and on quartics: block Wiedemann with a wider block, or a sparse solver that
 exploits the two-large-prime structure before the merge (the core's generic entries dominate the
 cost, per C1's model check). The relation phase's Cantor steps are the lever at genus 2, where no
