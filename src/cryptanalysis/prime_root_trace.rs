@@ -1578,7 +1578,8 @@ mod tests {
     #[test]
     fn round92_skips_terminal_power_squares_but_preserves_complete_certificates() {
         for p in [7u64, 13u64, 65_521, 1_000_000_007, MAX_PRIME] {
-            for f in [vec![1, 1], vec![1, 0, 1], vec![4, 9, 1]] {
+            for mut f in [vec![1, 1], vec![1, 0, 1], vec![4, 9, 1]] {
+                for coefficient in &mut f { *coefficient %= p; }
                 let report = run(&f, p);
                 assert!(report.complete(), "incomplete p={p}, f={f:?}");
                 verify(&report).unwrap();
