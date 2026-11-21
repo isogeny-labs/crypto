@@ -34,7 +34,7 @@ Stored points per sqrt(r) of a `sib8` arm within 10 percent of its no-sibling ar
 ## 4. Falsification (frozen)
 
 - The mechanism is dead on the main track if the upper end of `tw2cj-lazy-sib8` / `tw2cj-lazy` in bit-ops is at or above 0.80 at two of k = 24, 28, 32; dead on the boundary track by the same rule for the C = 1 pair.
-- Any record not `verified`, any failed replay, or stored points above 1.10 x the no-sibling arm at two sizes kills the panel's claim.
+- Any record whose audit status is not `verified` [pcc:unverified], any failed replay, or stored points above 1.10 x the no-sibling arm at two sizes kills the panel's claim.
 - A prediction outside its interval stays recorded as missed; no interval is widened after data.
 
 ## 5. Reporting
