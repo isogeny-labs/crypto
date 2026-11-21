@@ -75,13 +75,24 @@ def hydrate(key):
     return verify(key)
 
 
+def dehydrate(key):
+    directory, stem, _, raw_sha, _, whole, parts = paths(key)
+    assert whole.exists() and parts, key
+    verify(key)
+    whole.unlink()
+    return verify(key)
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("action", choices=("shard", "hydrate", "verify"))
+    parser.add_argument("action", choices=("shard", "hydrate", "dehydrate", "verify"))
     parser.add_argument("--stream", choices=tuple(STREAMS))
     args = parser.parse_args()
     keys = (args.stream,) if args.stream else tuple(STREAMS)
     result = [globals()[args.action](key) for key in keys]
+    manifest = BASE / "xedni_local_selector_20261120/storage-result.json"
+    if args.action != "shard" and manifest.exists() and len(keys) == len(STREAMS):
+        assert result == json.loads(manifest.read_text())["streams"]
     print(json.dumps({"schema": "xedni-stream-storage-v1", "status": "PASS",
                       "action": args.action, "streams": result}, sort_keys=True, indent=2))
 

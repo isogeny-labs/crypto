@@ -21,6 +21,8 @@ The independent [checked-Sage audit](sage_audit.py) reconstructs and checks ever
 
 The [Lean local-period theorem](../xedni_periodic_coefficient_20261120/formal/LocalPeriodicity.lean) explains why the same curve's local tests depend only on `k mod 12` under the order-4/order-6 annihilation hypotheses. The exact `{2,10}` pattern and 72-input coverage are computational census results, not consequences of that theorem alone. They apply to this field, point law, centered CRT representative, and auxiliary-prime gates. A rational-relation experiment on the newly selected residue-10 arm is the next concrete test; it must count the coefficient rule and preserve every zero and excluded pair. The preexisting 2,249,856 local coefficient-residue checks and 32,256 curve constructions remain part of the curve-selection work when assessing total cost.
 
+For a fresh checkout, [hydrate the sharded candidate stream](REPLAY_STORAGE.md) before these frozen replay commands, then dehydrate the temporary whole-file copy afterward. The decompressed row digest is unchanged.
+
 Replay:
 
 ```sh

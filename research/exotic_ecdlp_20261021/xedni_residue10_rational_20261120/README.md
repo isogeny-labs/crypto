@@ -16,6 +16,8 @@ The exact [Sage result](result.json), [runtime receipt](sage-runtime-info.json),
 
 The [variable-coefficient Lean theorem](../xedni_variable_coefficient_20261120/formal/VariableCoefficient.lean) proves that any rational `P+kQ=O` relation must reduce to `T=-kG`, so the post-run reduced check is a necessary condition. The theorem does not imply a rational relation for the 32 compatible curves. The [local-selector census](../xedni_local_selector_20261120/README.md) supplies the full 32,256-candidate selection and independent Sage audit. This result is exact for coefficient 10 and the frozen centered CRT representatives. The preexisting 2,249,856 local coefficient-residue examinations, 32,256 CRT constructions, and 177,408 local relation tests remain part of any total-cost assessment using this selector.
 
+For a fresh checkout, [hydrate the sharded local candidate stream](../xedni_local_selector_20261120/REPLAY_STORAGE.md) before these frozen replay commands, then dehydrate the temporary whole-file copies afterward. The decompressed row digest is unchanged.
+
 Replay:
 
 ```sh

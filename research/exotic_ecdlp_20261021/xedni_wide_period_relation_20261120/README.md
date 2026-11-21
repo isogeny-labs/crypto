@@ -22,6 +22,8 @@ The [pinned Lean theorem](formal/NewPairWitness.lean) `XedniWidePeriodWitness.ra
 
 The wider gates improve **rational relation construction** on this complete finite input law and centered representative policy. They also require 215,040 CRT constructions, 2,249,856 local coefficient-residue examinations, and 618,240 local relation tests before the 13,440 rational checks. For a fixed public generator, the coefficient-2 relation still applies only to target `T=-2G`; its reduced-group test is directly available. An unknown-target calculus needs a coefficient and relation-collection policy that recovers arbitrary targets, with all stages charged and paired with same-target rho. The next mathematical gate is to determine whether relation records for varied coefficients on these curves form an independent system rather than repeated certificates of the same reduced equality.
 
+For a fresh checkout, [hydrate the sharded candidate and rational-check streams](../xedni_local_selector_20261120/REPLAY_STORAGE.md) before these frozen replay commands, then dehydrate the temporary whole-file copies afterward. The decompressed row digests are unchanged.
+
 Replay:
 
 ```sh

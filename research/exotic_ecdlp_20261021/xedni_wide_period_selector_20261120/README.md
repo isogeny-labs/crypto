@@ -26,6 +26,8 @@ The pinned [Lean theorem](formal/WidePeriod.lean) `coefficient_unique` proves th
 
 The coefficient period solves ambiguity **within one curve**, while the 160 curves per eligible pair yield eleven different coefficients after union. Compared with the earlier order-4/order-6 selector's 32,256 CRT curves, this policy constructs 215,040. Its covered true-coefficient inputs rise from 72 to 372, but the selected union rises from seven on 372 pairs to eleven on all 1,344 eligible pairs. These are paired finite-census counts on the same source law; they do not establish a rational relation yield or an ECDLP speedup. The next construction test is to check all selected coefficient-2 curves for rational relations and charge the enlarged candidate stream.
 
+For a fresh checkout, [hydrate the sharded candidate streams](../xedni_local_selector_20261120/REPLAY_STORAGE.md) before these frozen replay commands, then dehydrate the temporary whole-file copies afterward. The decompressed row digests are unchanged.
+
 Replay:
 
 ```sh
