@@ -1159,6 +1159,67 @@ fn vpower_reduce(product: Vec<u64>, modulus: &[u64], p: u64) -> Result<Vec<u64>,
     }
     Ok(vdiv(&product, modulus, p)?.1)
 }
+// A monic quadratic quotient ring has only two coefficients. Fusing the
+// product/square with reduction avoids temporary polynomial products,
+// quotient vectors, and repeated length/trimming scans during verifier
+// modular exponentiation. Independent of Engine::pow and its event trace.
+// Variable-time arithmetic: coefficients here are public certificate data.
+#[inline]
+fn quadratic_sub(a: u64, b: u64, p: u64) -> u64 {
+    if a >= b { a - b } else { a + p - b }
+}
+#[inline]
+fn quadratic_mul(a: (u64, u64), b: (u64, u64), c: u64, d: u64, p: u64)
+    -> (u64, u64)
+{
+    // x^2 = -d*x-c in F_p[x]/(x^2+d*x+c).
+    let high = vmul(a.1, b.1, p);
+    let low = quadratic_sub(vmul(a.0, b.0, p), vmul(c, high, p), p);
+    let cross = vmul(a.0, b.1, p) + vmul(a.1, b.0, p);
+    let cross = if cross >= p { cross - p } else { cross };
+    let linear = quadratic_sub(cross, vmul(d, high, p), p);
+    (low, linear)
+}
+#[inline]
+fn quadratic_square(a: (u64, u64), c: u64, d: u64, p: u64) -> (u64, u64) {
+    let high = vmul(a.1, a.1, p);
+    let low = quadratic_sub(vmul(a.0, a.0, p), vmul(c, high, p), p);
+    let cross = vmul(a.0, a.1, p);
+    let cross = if cross + cross >= p { cross + cross - p } else { cross + cross };
+    (low, quadratic_sub(cross, vmul(d, high, p), p))
+}
+fn vpower_quadratic(base: &[u64], mut exponent: u64, modulus: &[u64], p: u64)
+    -> Result<Vec<u64>, String>
+{
+    debug_assert_eq!(modulus.len(), 3);
+    let lead = modulus[2];
+    if lead == 0 { return Err("division by zero leading coefficient".into()); }
+    let inverse = if lead == 1 { 1 } else { vinv(lead, p) };
+    let c = if lead == 1 { modulus[0] } else { vmul(modulus[0], inverse, p) };
+    let d = if lead == 1 { modulus[1] } else { vmul(modulus[1], inverse, p) };
+    // Horner reduction also handles degree >2 bases, without an allocated
+    // quotient: (a+b*x)*x+v = (v-b*c)+(a-b*d)*x.
+    let (mut a, mut b) = (0, 0);
+    for &value in base.iter().rev() {
+        let next_a = quadratic_sub(value, vmul(b, c, p), p);
+        let next_b = quadratic_sub(a, vmul(b, d, p), p);
+        a = next_a;
+        b = next_b;
+    }
+    let mut residue = (1, 0);
+    let mut power = (a, b);
+    while exponent != 0 {
+        if exponent & 1 == 1 {
+            residue = quadratic_mul(residue, power, c, d, p);
+        }
+        exponent >>= 1;
+        if exponent != 0 {
+            power = quadratic_square(power, c, d, p);
+        }
+    }
+    Ok(trim(vec![residue.0, residue.1]))
+}
+
 fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, String> {
     // F_p[x] / (c + d*x) is F_p. Reduce the base by Horner evaluation at
     // -c/d, then use a scalar power rather than repeatedly allocating
@@ -1182,6 +1243,11 @@ fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, Strin
         }
         let result = vpow(value, e, p);
         return Ok(if result == 0 { vec![] } else { vec![result] });
+    }
+    // Specialized quadratic modular arithmetic; producer and verifier remain
+    // independent. Applies to both monic and nonmonic quadratic certificates.
+    if m.len() == 3 {
+        return vpower_quadratic(base, e, m, p);
     }
     // Polynomial remainder is invariant under scaling the modulus by a
     // nonzero field element. Normalize a nonmonic modulus ONCE rather than
@@ -1703,6 +1769,58 @@ mod tests {
             ((a as u128 * x as u128 + b as u128) % p as u128) as u64
         })
     }
+
+    #[test]
+    fn round98_quadratic_power_matches_independent_long_division() {
+        fn reference(base: &[u64], mut e: u64, m: &[u64], p: u64)
+            -> Result<Vec<u64>, String>
+        {
+            let mut acc = vdiv(&[1], m, p)?.1;
+            let mut value = vdiv(base, m, p)?.1;
+            while e > 0 {
+                if e & 1 == 1 {
+                    acc = vdiv(&vproduct(&acc, &value, p), m, p)?.1;
+                }
+                e >>= 1;
+                if e > 0 {
+                    value = vdiv(&vsquare(&value, p), m, p)?.1;
+                }
+            }
+            Ok(acc)
+        }
+        let mut state = 0x524f_4f54_2026_1198u64;
+        for p in [7u64, 65_521, 1_000_000_007, MAX_PRIME] {
+            for case in 0..160usize {
+                let mut next = || {
+                    state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+                    state % p
+                };
+                let constant = if case % 7 == 0 { 0 } else { next() };
+                let linear = if case % 11 == 0 { 0 } else { next() };
+                let lead = if case % 2 == 0 { 1 } else { 1 + next() % (p - 1) };
+                let modulus = vec![constant, linear, lead];
+                let mut base: Vec<u64> = (0..case % 10).map(|_| next()).collect();
+                if case % 13 == 0 { base.fill(0); }
+                for exponent in [0, 1, 2, 17, (p - 1) / 2, p, u64::MAX] {
+                    let before = reference(&base, exponent, &modulus, p).unwrap();
+                    let after = vpower(&base, exponent, &modulus, p).unwrap();
+                    assert_eq!(after, before,
+                               "p={p} case={case} e={exponent} m={modulus:?} base={base:?}");
+                }
+            }
+        }
+        assert!(vpower(&[1], 5, &[1, 2, 0], 7).is_err());
+    }
+    #[test]
+    fn round98_quadratic_certificate_replay() {
+        for p in [7u64, 65_521, 1_000_000_007, MAX_PRIME] {
+            for polynomial in [vec![p - 1, 0, 1], vec![1, 1, 1], vec![2, 1, 2]] {
+                let report = run(&polynomial, p);
+                verify(&report).unwrap();
+            }
+        }
+    }
+
     #[test]
     fn round96_linear_modulus_scalar_power_matches_independent_polynomial_arithmetic() {
         // Freeze the polynomial-ring method as an independent oracle for
