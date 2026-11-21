@@ -33,10 +33,10 @@ main = r"""
 #![allow(dead_code)]
 mod cryptanalysis {
     pub mod residual_walk {
-        // The three benchmark p are known primes; admission/primality cost
+        // The benchmark and regression-test p values are known primes; admission/primality cost
         // is deliberately excluded from this arithmetic throughput study.
         pub fn is_prime_u64(p: u64) -> bool {
-            matches!(p,65521|1000000007|2305843009213693951)
+            matches!(p,17|65521|1000000007|2305843009213693951)
         }
     }
     pub mod prime_root_trace;
