@@ -27,6 +27,9 @@ fn main() {
     let bits: u32 = get("--bits", "24").parse().unwrap();
     let size: usize = get("--size", "14").parse().unwrap();
     let n_targets: usize = get("--targets", "64").parse().unwrap();
+    // Full ksum tables are Θ(|Fx|^⌊m/2⌋); skip above this |Fx| (or with
+    // --skip-ksum) so large-A kmitm walls do not OOM the host.
+    let skip_ksum = args.iter().any(|a| a == "--skip-ksum") || size > 64;
 
     let inst = prime_instance_for(bits, 59297);
     let fb = prime_factor_base(&inst, size);
@@ -59,11 +62,36 @@ fn main() {
 
     let mut rows = Vec::new();
     for m in [3u32, 4, 5, 6, 8, 10, 12] {
+        // Avoid OOM before prepare's own limit: left≈min(9,m-1) packed sums.
+        let left_est = (m as usize - 1).min(9);
+        let est = (a as u128).saturating_pow(left_est as u32);
+        if est > 2_000_000_000u128 {
+            let msg = format!(
+                "skip m={m}: estimated left table ~{est} over |Fx|={a} (host OOM guard)"
+            );
+            println!("m={m:>2}  {msg}");
+            rows.push(json!({
+                "m": m,
+                "abscissae": a,
+                "kmitm_ok": false,
+                "kmitm_prepare_error": msg,
+            }));
+            continue;
+        }
         let (_, pm) = Params::parse_spec(&format!("rootfind-kmitm:m={m}")).unwrap();
         let mut mitm = RootfindKMitmOracle::new_prime(m, &inst);
         let mut bm = GroupOps::default();
         let t_build_m = Instant::now();
-        mitm.prepare(&ctx, &fb, &pm, &mut bm).unwrap();
+        if let Err(e) = mitm.prepare(&ctx, &fb, &pm, &mut bm) {
+            println!("m={m:>2}  kmitm prepare refused: {e}");
+            rows.push(json!({
+                "m": m,
+                "abscissae": a,
+                "kmitm_ok": false,
+                "kmitm_prepare_error": e,
+            }));
+            continue;
+        }
         let build_m_ns = t_build_m.elapsed().as_nanos() as f64;
         let left_entries = mitm.left_entries();
         let left_k = mitm.left_k();
@@ -136,7 +164,9 @@ fn main() {
             black_box(&out);
         }
 
-        let (ksum_build_ns, ksum_probe_ns, ksum_entries, ksum_hits, ksum_ok) = if m <= 9 {
+        let (ksum_build_ns, ksum_probe_ns, ksum_entries, ksum_hits, ksum_ok) =
+            if m <= 9 && !skip_ksum
+        {
             let (_, pk) = Params::parse_spec(&format!("ksum:m={m},prune=1")).unwrap();
             let mut ksum = KSumOracle::new(m);
             let mut bk = GroupOps::default();

@@ -356,41 +356,59 @@ fn main() -> Result<(), String> {
         let mut decomp_walls = Vec::new();
         let mut ok = 0usize;
         let mut last: Option<ArmResult> = None;
+        let mut skipped: Option<String> = None;
         for rep in 0..repeats {
             let seed = seed0.wrapping_add(rep as u64 * 0x9E37);
             let planted = 1 + (seed % (inst.r - 1));
-            let row = run_standard(arm, spec, Targets::Walk, &inst, size, seed, planted)?;
-            if row.verified {
-                ok += 1;
+            match run_standard(arm, spec, Targets::Walk, &inst, size, seed, planted) {
+                Ok(row) => {
+                    if row.verified {
+                        ok += 1;
+                    }
+                    walls.push(row.wall_s);
+                    decomp_walls.push(row.decomp_wall_s);
+                    println!(
+                        "  {arm:<14} rep={rep} wall={:.4}s decomp={:.4}s setup={:.4}s S={:.3} targets={} rels={} verified={}",
+                        row.wall_s,
+                        row.decomp_wall_s,
+                        row.setup_wall_s,
+                        row.s,
+                        row.targets,
+                        row.relations,
+                        row.verified
+                    );
+                    all_rows.push(json!({
+                        "arm": arm,
+                        "mode": "run_pipeline",
+                        "rep": rep,
+                        "wall_s": row.wall_s,
+                        "decomp_wall_s": row.decomp_wall_s,
+                        "setup_wall_s": row.setup_wall_s,
+                        "s": row.s,
+                        "total_gae": row.total_gae,
+                        "targets": row.targets,
+                        "relations": row.relations,
+                        "verified": row.verified,
+                        "exhausted": row.exhausted,
+                        "recovered": row.recovered,
+                    }));
+                    last = Some(row);
+                }
+                Err(e) => {
+                    println!("  {arm:<14} SKIP: {e}");
+                    skipped = Some(e);
+                    break;
+                }
             }
-            walls.push(row.wall_s);
-            decomp_walls.push(row.decomp_wall_s);
-            println!(
-                "  {arm:<14} rep={rep} wall={:.4}s decomp={:.4}s setup={:.4}s S={:.3} targets={} rels={} verified={}",
-                row.wall_s,
-                row.decomp_wall_s,
-                row.setup_wall_s,
-                row.s,
-                row.targets,
-                row.relations,
-                row.verified
-            );
-            all_rows.push(json!({
+        }
+        if let Some(e) = skipped {
+            summary.push(json!({
                 "arm": arm,
                 "mode": "run_pipeline",
-                "rep": rep,
-                "wall_s": row.wall_s,
-                "decomp_wall_s": row.decomp_wall_s,
-                "setup_wall_s": row.setup_wall_s,
-                "s": row.s,
-                "total_gae": row.total_gae,
-                "targets": row.targets,
-                "relations": row.relations,
-                "verified": row.verified,
-                "exhausted": row.exhausted,
-                "recovered": row.recovered,
+                "skipped": true,
+                "skip_reason": e,
             }));
-            last = Some(row);
+            continue;
         }
         let med_wall = median_f64(&mut walls);
         let med_decomp = median_f64(&mut decomp_walls);
@@ -415,40 +433,59 @@ fn main() -> Result<(), String> {
         let mut walls = Vec::new();
         let mut decomp_walls = Vec::new();
         let mut ok = 0usize;
+        let mut skipped: Option<String> = None;
         for rep in 0..repeats {
             let seed = seed0.wrapping_add(rep as u64 * 0x9E37);
             let planted = 1 + (seed % (inst.r - 1));
-            let row = run_kmitm_threaded_collect(
+            match run_kmitm_threaded_collect(
                 &arm, 12, threads, &inst, size, seed, planted,
-            )?;
-            if row.verified {
-                ok += 1;
+            ) {
+                Ok(row) => {
+                    if row.verified {
+                        ok += 1;
+                    }
+                    walls.push(row.wall_s);
+                    decomp_walls.push(row.decomp_wall_s);
+                    println!(
+                        "  {arm:<18} rep={rep} wall={:.4}s decomp={:.4}s setup={:.4}s targets={} rels={} verified={}",
+                        row.wall_s,
+                        row.decomp_wall_s,
+                        row.setup_wall_s,
+                        row.targets,
+                        row.relations,
+                        row.verified
+                    );
+                    all_rows.push(json!({
+                        "arm": arm,
+                        "mode": "threaded_collect",
+                        "threads": threads,
+                        "rep": rep,
+                        "wall_s": row.wall_s,
+                        "decomp_wall_s": row.decomp_wall_s,
+                        "setup_wall_s": row.setup_wall_s,
+                        "targets": row.targets,
+                        "relations": row.relations,
+                        "verified": row.verified,
+                        "exhausted": row.exhausted,
+                        "recovered": row.recovered,
+                    }));
+                }
+                Err(e) => {
+                    println!("  {arm:<18} SKIP: {e}");
+                    skipped = Some(e);
+                    break;
+                }
             }
-            walls.push(row.wall_s);
-            decomp_walls.push(row.decomp_wall_s);
-            println!(
-                "  {arm:<18} rep={rep} wall={:.4}s decomp={:.4}s setup={:.4}s targets={} rels={} verified={}",
-                row.wall_s,
-                row.decomp_wall_s,
-                row.setup_wall_s,
-                row.targets,
-                row.relations,
-                row.verified
-            );
-            all_rows.push(json!({
+        }
+        if let Some(e) = skipped {
+            summary.push(json!({
                 "arm": arm,
                 "mode": "threaded_collect",
                 "threads": threads,
-                "rep": rep,
-                "wall_s": row.wall_s,
-                "decomp_wall_s": row.decomp_wall_s,
-                "setup_wall_s": row.setup_wall_s,
-                "targets": row.targets,
-                "relations": row.relations,
-                "verified": row.verified,
-                "exhausted": row.exhausted,
-                "recovered": row.recovered,
+                "skipped": true,
+                "skip_reason": e,
             }));
+            continue;
         }
         let med_wall = median_f64(&mut walls);
         let med_decomp = median_f64(&mut decomp_walls);
@@ -480,8 +517,22 @@ fn main() -> Result<(), String> {
         ("kmitm:m=4", "rootfind-kmitm:m=4"),
         ("kmitm:m=12", "rootfind-kmitm:m=12"),
     ] {
-        let (name, params) = Params::parse_spec(oracle_spec)?;
-        let m = params.u64_or("m", 2)? as u32;
+        let (name, params) = match Params::parse_spec(oracle_spec) {
+            Ok(v) => v,
+            Err(e) => {
+                println!("  {arm_name:<14} SKIP: {e}");
+                amort.push(json!({"arm": arm_name, "skipped": true, "skip_reason": e}));
+                continue;
+            }
+        };
+        let m = match params.u64_or("m", 2) {
+            Ok(v) => v as u32,
+            Err(e) => {
+                println!("  {arm_name:<14} SKIP: {e}");
+                amort.push(json!({"arm": arm_name, "skipped": true, "skip_reason": e}));
+                continue;
+            }
+        };
         let fb = prime_factor_base(&inst, size);
         let mut prep_ops = GroupOps::default();
         let dummy_ctx = {
@@ -498,20 +549,25 @@ fn main() -> Result<(), String> {
             }
         };
         let t_prep = Instant::now();
-        match name.as_str() {
+        let prep_res = match name.as_str() {
             "rootfind-subtract" => {
                 let mut o = RootfindSubtractOracle::new(m, &inst);
-                o.prepare(&dummy_ctx, &fb, &params, &mut prep_ops)?;
+                o.prepare(&dummy_ctx, &fb, &params, &mut prep_ops)
             }
             "rootfind-floor" => {
                 let mut o = RootfindFloorOracle::new(m, &inst);
-                o.prepare(&dummy_ctx, &fb, &params, &mut prep_ops)?;
+                o.prepare(&dummy_ctx, &fb, &params, &mut prep_ops)
             }
             "rootfind-kmitm" => {
                 let mut o = RootfindKMitmOracle::new_prime(m, &inst);
-                o.prepare(&dummy_ctx, &fb, &params, &mut prep_ops)?;
+                o.prepare(&dummy_ctx, &fb, &params, &mut prep_ops)
             }
-            _ => {}
+            _ => Ok(()),
+        };
+        if let Err(e) = prep_res {
+            println!("  {arm_name:<14} SKIP prepare: {e}");
+            amort.push(json!({"arm": arm_name, "skipped": true, "skip_reason": e}));
+            continue;
         }
         let prep_s = t_prep.elapsed().as_secs_f64();
         // Re-prepare inside each solve via run_pipeline (honest cold amort
@@ -519,16 +575,28 @@ fn main() -> Result<(), String> {
         // total/N plus a separate shared-prepare threaded collect).
         let mut walls = Vec::new();
         let mut ok = 0usize;
+        let mut skipped: Option<String> = None;
         let t_all = Instant::now();
         for i in 0..multi_n {
             let seed = seed0.wrapping_add(10_000 + i as u64 * 0x9E37);
             let planted = 1 + (seed % (inst.r - 1));
-            let row =
-                run_standard(arm_name, oracle_spec, Targets::Walk, &inst, size, seed, planted)?;
-            if row.verified {
-                ok += 1;
+            match run_standard(arm_name, oracle_spec, Targets::Walk, &inst, size, seed, planted) {
+                Ok(row) => {
+                    if row.verified {
+                        ok += 1;
+                    }
+                    walls.push(row.wall_s);
+                }
+                Err(e) => {
+                    skipped = Some(e);
+                    break;
+                }
             }
-            walls.push(row.wall_s);
+        }
+        if let Some(e) = skipped {
+            println!("  {arm_name:<14} SKIP: {e}");
+            amort.push(json!({"arm": arm_name, "skipped": true, "skip_reason": e}));
+            continue;
         }
         let total = t_all.elapsed().as_secs_f64();
         let per = total / multi_n as f64;
@@ -564,7 +632,10 @@ fn main() -> Result<(), String> {
         field_degree: None,
     };
     let t_prep = Instant::now();
-    shared.prepare(&prep_ctx, &fb, &params, &mut GroupOps::default())?;
+    if let Err(e) = shared.prepare(&prep_ctx, &fb, &params, &mut GroupOps::default()) {
+        println!("  shared m=12 SKIP prepare: {e}");
+        thr_amort.push(json!({"skipped": true, "skip_reason": e}));
+    } else {
     let shared_prep_s = t_prep.elapsed().as_secs_f64();
     for threads in [1usize, 2, 4] {
         let t_all = Instant::now();
@@ -611,6 +682,7 @@ fn main() -> Result<(), String> {
             "verified": ok,
         }));
     }
+    } // end shared m=12 prepare ok
     } // end panel != breakthrough for amort + shared-prepare
 
     // Breakthrough panel: AVX-512 IFMA native sweep + walk-prime batch
