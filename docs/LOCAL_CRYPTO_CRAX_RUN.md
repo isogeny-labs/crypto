@@ -4,21 +4,19 @@ Install Rust/Cargo, a C/C++ compiler, CMake, Python 3 and the GitHub CLI.
 Authenticate `gh` for the repositories. The S3 check near the end also needs
 the AWS CLI and an AWS profile with access to the approved bucket.
 
-Until crypto PR #2117 merges, use its PR head for the new crypto commands and
-the merged `main` branch of cryptanalysis:
+Use the merged `main` branches of both repositories:
 
 ```sh
 mkdir -p /path/to/cli-work
 cd /path/to/cli-work
 gh repo clone isogeny-labs/crypto
 gh repo clone isogeny-labs/cryptanalysis
-(cd crypto && gh pr checkout 2117)
+(cd crypto && git switch main && git pull --ff-only)
 (cd cryptanalysis && git switch main && git pull --ff-only)
 ```
 
-After #2117 merges, use `git switch main && git pull --ff-only` in `crypto`
-as well. Record `git rev-parse HEAD` in both checkouts beside any acceptance
-results so the binaries can be tied to their exact source revisions.
+Record `git rev-parse HEAD` in both checkouts beside any acceptance results so
+the binaries can be tied to their exact source revisions.
 
 Use a checkout of this repository for `CRYPTO_REPO` and a checkout of
 `isogeny-labs/cryptanalysis` for `CRAX_REPO`. The latter builds the Rust `crax`
@@ -28,8 +26,13 @@ revision produced it.
 
 The commands below use separate Cargo target directories on an external volume
 because each repository has a large build. Change the paths to suit your Mac.
+For the crypto build, install Rust 1.99.1 and set `RUSTC` explicitly. On a Mac
+with Homebrew Cargo earlier on `PATH`, `rustup run` alone can still invoke an
+older Homebrew `rustc`; the current AWS dependencies require Rust 1.94.1 or
+newer. The commands below were checked with Rust 1.99.1.
 
 ```sh
+rustup toolchain install 1.99.1
 export CRYPTO_REPO=/path/to/crypto
 export CRAX_REPO=/path/to/cryptanalysis
 export BUILD_TMP=/path/to/build-tmp
@@ -38,7 +41,8 @@ export CRAX_TARGET_DIR=/path/to/crax-target
 mkdir -p "$BUILD_TMP" "$CRYPTO_TARGET_DIR" "$CRAX_TARGET_DIR"
 
 (cd "$CRYPTO_REPO" && TMPDIR="$BUILD_TMP" CARGO_TARGET_DIR="$CRYPTO_TARGET_DIR" \
-  cargo build --release --locked \
+  RUSTC="$(rustup which --toolchain 1.99.1 rustc)" \
+  rustup run 1.99.1 cargo build --release --locked \
   --bin crypto --bin ic --bin icx --bin ecdlp-nist --bin isogeny_walk)
 (cd "$CRAX_REPO" && tools/bootstrap_crypto_analysis_core.sh && \
   TMPDIR="$BUILD_TMP" CARGO_TARGET_DIR="$CRAX_TARGET_DIR" \
