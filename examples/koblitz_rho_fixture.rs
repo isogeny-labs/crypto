@@ -654,22 +654,33 @@ fn solve_fixture(
                 .expect("KIC_RHO_FIXED_TARGET_SCALAR must be an integer")
         });
     let mut rng = StdRng::seed_from_u64(fixture_seed);
-    let d0 = fixed_target.unwrap_or_else(|| rng.gen_range(1..modulus));
-    assert!(
-        (1..modulus).contains(&d0),
-        "fixed target scalar must be in [1,r)"
-    );
+    // Historical SeededScalar path draws one discarded scalar before the
+    // published fixture scalar so walk RNGs stay byte-identical when the
+    // env override is absent. When KIC_RHO_FIXED_TARGET_SCALAR is set,
+    // that override is the published target (autolab IC/rho pairing).
+    let _discarded_seeded_draw = rng.gen_range(1..modulus);
     let generated_scalar = rng.gen_range(1..modulus);
     let target_generation_started = Instant::now();
     let (known_scalar, q, fixture_scalar_source, public_hash_seed, public_hash_counter) =
         match fixture_target {
-            FixtureTarget::SeededScalar => (
-                Some(generated_scalar),
-                curve.mul(curve.generator(), &BigUint::from(generated_scalar)),
-                "seeded_fixture_scalar",
-                None,
-                None,
-            ),
+            FixtureTarget::SeededScalar => {
+                let scalar = fixed_target.unwrap_or(generated_scalar);
+                assert!(
+                    (1..modulus).contains(&scalar),
+                    "fixed target scalar must be in [1,r)"
+                );
+                (
+                    Some(scalar),
+                    curve.mul(curve.generator(), &BigUint::from(scalar)),
+                    if fixed_target.is_some() {
+                        "env_fixed_target_scalar"
+                    } else {
+                        "seeded_fixture_scalar"
+                    },
+                    None,
+                    None,
+                )
+            }
             FixtureTarget::ExplicitScalar(scalar) => (
                 Some(scalar),
                 curve.mul(curve.generator(), &BigUint::from(scalar)),
@@ -790,7 +801,6 @@ fn solve_fixture(
         },
         "fixture_index":fixture_index,
         "fixture_seed":fixture_seed,
-        "published_fixture_scalar":d0,
         "target_generation_ms_excluded":target_generation_ms,
         "published_fixture_scalar":known_scalar,
         "fixture_scalar_source":fixture_scalar_source,
@@ -859,22 +869,32 @@ fn solve_fixture_packed(
                 .expect("KIC_RHO_FIXED_TARGET_SCALAR must be an integer")
         });
     let mut rng = StdRng::seed_from_u64(fixture_seed);
-    let d0 = fixed_target.unwrap_or_else(|| rng.gen_range(1..modulus));
-    assert!(
-        (1..modulus).contains(&d0),
-        "fixed target scalar must be in [1,r)"
-    );
+    // See solve_fixture: keep the discarded SeededScalar draw for walk
+    // byte-identity when the env override is absent; honor the override
+    // for autolab same-point IC/rho pairing.
+    let _discarded_seeded_draw = rng.gen_range(1..modulus);
     let generated_scalar = rng.gen_range(1..modulus);
     let target_generation_started = Instant::now();
     let (known_scalar, reference_q, fixture_scalar_source, public_hash_seed, public_hash_counter) =
         match fixture_target {
-            FixtureTarget::SeededScalar => (
-                Some(generated_scalar),
-                curve.mul(curve.generator(), &BigUint::from(generated_scalar)),
-                "seeded_fixture_scalar",
-                None,
-                None,
-            ),
+            FixtureTarget::SeededScalar => {
+                let scalar = fixed_target.unwrap_or(generated_scalar);
+                assert!(
+                    (1..modulus).contains(&scalar),
+                    "fixed target scalar must be in [1,r)"
+                );
+                (
+                    Some(scalar),
+                    curve.mul(curve.generator(), &BigUint::from(scalar)),
+                    if fixed_target.is_some() {
+                        "env_fixed_target_scalar"
+                    } else {
+                        "seeded_fixture_scalar"
+                    },
+                    None,
+                    None,
+                )
+            }
             FixtureTarget::ExplicitScalar(scalar) => (
                 Some(scalar),
                 curve.mul(curve.generator(), &BigUint::from(scalar)),
@@ -1000,7 +1020,6 @@ fn solve_fixture_packed(
         },
         "fixture_index":fixture_index,
         "fixture_seed":fixture_seed,
-        "published_fixture_scalar":d0,
         "target_generation_ms_excluded":target_generation_ms,
         "published_fixture_scalar":known_scalar,
         "fixture_scalar_source":fixture_scalar_source,
@@ -1082,18 +1101,36 @@ fn solve_fixture_strong(
     let modulus = rho.modulus();
     let lambda = rho.lambda();
     let precompute_ms = setup_started.elapsed().as_secs_f64() * 1000.0;
+    let fixed_target = std::env::var("KIC_RHO_FIXED_TARGET_SCALAR")
+        .ok()
+        .map(|value| {
+            value
+                .parse::<u64>()
+                .expect("KIC_RHO_FIXED_TARGET_SCALAR must be an integer")
+        });
     let mut rng = StdRng::seed_from_u64(fixture_seed);
     let generated_scalar = rng.gen_range(1..modulus);
     let target_generation_started = Instant::now();
     let (known_scalar, reference_q, fixture_scalar_source, public_hash_seed, public_hash_counter) =
         match fixture_target {
-            FixtureTarget::SeededScalar => (
-                Some(generated_scalar),
-                curve.mul(curve.generator(), &BigUint::from(generated_scalar)),
-                "seeded_fixture_scalar",
-                None,
-                None,
-            ),
+            FixtureTarget::SeededScalar => {
+                let scalar = fixed_target.unwrap_or(generated_scalar);
+                assert!(
+                    (1..modulus).contains(&scalar),
+                    "fixed target scalar must be in [1,r)"
+                );
+                (
+                    Some(scalar),
+                    curve.mul(curve.generator(), &BigUint::from(scalar)),
+                    if fixed_target.is_some() {
+                        "env_fixed_target_scalar"
+                    } else {
+                        "seeded_fixture_scalar"
+                    },
+                    None,
+                    None,
+                )
+            }
             FixtureTarget::ExplicitScalar(scalar) => (
                 Some(scalar),
                 curve.mul(curve.generator(), &BigUint::from(scalar)),
