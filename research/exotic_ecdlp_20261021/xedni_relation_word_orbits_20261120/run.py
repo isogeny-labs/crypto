@@ -66,6 +66,8 @@ def main():
         assert point == start
         cycles.append(cycle)
     cycle_colsets = [{col[P] for P in cycle} for cycle in cycles]
+    assert all(sum(any(row[j] for j in columns) for columns in cycle_colsets) == 1
+               for row in matrix)
     block_ranks = []
     for columns in cycle_colsets:
         block = [[row[j] for j in sorted(columns)] for row in matrix
