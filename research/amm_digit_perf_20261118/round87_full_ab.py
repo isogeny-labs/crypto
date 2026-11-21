@@ -133,6 +133,36 @@ fn main(){
    println!("{p},verify_only_{case},{ns:.3},{checksum},{verified}");
   }
  }
+ // Dedicated kernel comparison with identical inputs and checksum.
+ // This distinguishes verifier arithmetic cost from changes in the
+ // apparently unchanged producer/layout in complete solve + verify.
+ for p in [65521_u64, 1000000007_u64, MAX_PRIME] {
+  for degree in [3_usize, 4, 8] {
+   for sparse in [false, true] {
+    let mut modulus: Vec<u64> = (0..degree)
+      .map(|i| (17_u64 + (i as u64)*19) % p).collect();
+    if sparse { for i in 1..degree { modulus[i] = 0; } }
+    modulus.push(1);
+    let mut numerator: Vec<u64> = (0..2*degree - 1)
+      .map(|i| (41_u64 + (i as u64)*37) % p).collect();
+    let repeats = if degree == 8 {12000_u64} else {24000_u64};
+    let mut checksum = 0_u64;
+    let started = Instant::now();
+    for i in 0..repeats {
+      let pos = (i as usize) % numerator.len();
+      numerator[pos] = (numerator[pos]+31) % p;
+      let rem = cryptanalysis::prime_root_trace::round87_remainder_probe(
+          black_box(&numerator), black_box(&modulus), black_box(p));
+      checksum = checksum.wrapping_mul(33);
+      for v in rem { checksum = checksum.wrapping_add(v); }
+    }
+    let ns = started.elapsed().as_nanos() as f64 / repeats as f64;
+    println!("{p},kernel_{}_d{degree},{ns:.3},{checksum},{repeats}",
+              if sparse {"sparse"} else {"dense"});
+   }
+  }
+ }
+
 }
 """
 
@@ -151,6 +181,15 @@ with tempfile.TemporaryDirectory(prefix="root87-full-") as tmp:
         (folder / "src/cryptanalysis").mkdir(parents=True)
         (folder / "Cargo.toml").write_text(cargo)
         (folder / "src/main.rs").write_text(main)
+        # Compile source-exact verifier helpers inside each version's own
+        # module, exposing only a dedicated arithmetic probe entry point.
+        # Baseline must call its existing vdiv, while the candidate calls
+        # vremainder. Neither variant's production source is edited.
+        helper = ("vdiv(a, m, p).unwrap().1" if label == "before"
+                  else "vremainder(a, m, p).unwrap()")
+        source = source + ("\\n#[doc(hidden)]\\npub fn round87_remainder_probe("
+                           "a: &[u64], m: &[u64], p: u64) -> Vec<u64> {"
+                           + helper + "}\\n")
         (folder / "src/cryptanalysis/prime_root_trace.rs").write_text(source)
         (folder / "src/cryptanalysis/prime_root_bounded.rs").write_text(
             "// The bounded API is out of scope for this exact producer+verifier benchmark.\n"
