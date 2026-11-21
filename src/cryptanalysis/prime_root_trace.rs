@@ -652,6 +652,18 @@ fn vbinomial_product(binomial: &[u64], other: &[u64], p: u64) -> Option<Vec<u64>
     }
     Some(trim(out))
 }
+// Used only for independently replaying recorded Product events. Do not
+// alter the generic vproduct hot path: production Rust A/B showed 5-12%
+// regressions from even guarded binomial dispatch on ordinary operands.
+fn vverified_product(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    if a.len() >= 6 && a[1] == 0 && a[2] == 0 {
+        if let Some(result) = vbinomial_product(a, b, p) { return result; }
+    }
+    if b.len() >= 6 && b[1] == 0 && b[2] == 0 {
+        if let Some(result) = vbinomial_product(b, a, p) { return result; }
+    }
+    vproduct(a, b, p)
+}
 fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     if a.is_empty() || b.is_empty() {
         return vec![];
@@ -666,17 +678,6 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     }
     if let Some(result) = vmonomial_product(a, b) { return result; }
     if let Some(result) = vmonomial_product(b, a) { return result; }
-    // A non-monomial binomial (c + d*x^k) is common in modular-power
-    // certificates. Only two coefficient columns contribute, so do not
-    // scan the k-1 zero middle coefficients once per multiplicand term.
-    // Keep the common dense/small-operand path in its original hot block.
-    // Only check the rare sparse shape when a candidate has zero x/x^2 terms.
-    if a.len() >= 6 && a[1] == 0 && a[2] == 0 {
-        if let Some(result) = vbinomial_product(a, b, p) { return result; }
-    }
-    if b.len() >= 6 && b[1] == 0 && b[2] == 0 {
-        if let Some(result) = vbinomial_product(b, a, p) { return result; }
-    }
     // A wide dense convolution can accumulate each output coefficient in u64
     // and perform ONE modular reduction per coefficient, not one per pair.
     // The bound is checked in u128, so no intermediate u64 overflow is possible.
@@ -1210,7 +1211,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 for v in [a, b, product] {
                     canonical(v, p)?;
                 }
-                if vproduct(a, b, p) != *product {
+                if vverified_product(a, b, p) != *product {
                     return Err("polynomial product identity failed".into());
                 }
             }
@@ -1803,9 +1804,9 @@ mod round89_column_accumulators {
                         for i in (0..width).step_by(3) { other[i] = 0; }
                     }
                     let expected = reference_product(&binomial, &other, p);
-                    assert_eq!(vproduct(&binomial, &other, p), expected,
+                    assert_eq!(vverified_product(&binomial, &other, p), expected,
                         "left binomial p={p} width={width} case={case}");
-                    assert_eq!(vproduct(&other, &binomial, p), expected,
+                    assert_eq!(vverified_product(&other, &binomial, p), expected,
                         "right binomial p={p} width={width} case={case}");
                 }
             }
