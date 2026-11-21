@@ -1,8 +1,21 @@
-# F4 speed-up round 4: six leads, phase 1 (measurement and design), 2026-11-21
+# F4 speed-up round 4: six leads, 2026-11-21
 
-**Standing.** `[pcc:unverified]`. Six parallel read-only agents on one shared 4-vCPU VM. They took only contention-insensitive measurements (callgrind instruction counts, counted operations, fault and allocation counts), with no source edits and no wall-time claims. Full per-lead results: `phase1/leads.json`. Scripts and outputs: `phase1/L*/`.
+**Standing.** `[pcc:unverified]`. One shared 4-vCPU VM, isolation L0, no PMU. PR #4859.
 
-## Verdicts
+## Result
+
+Pre-registered (`CONFIRM_PROTOCOL.md`, frozen at `b5795d4061`), on `jv_cover --exp dlp`, p = 53:
+
+- `--stop hilbert:16 --trace` on this branch against `--stop hilbert:16` before it:
+  - wall **1.231×** (9.97 → 8.14 s, 10/10 rounds) and CPU 1.235×;
+  - counted S about 1.32× (9.62 G → 7.24–7.30 G oracle multiplications);
+  - 31 relations and a correct logarithm in every run.
+- Full F4: 1.060× median, 8/10 rounds. That fails the pre-registered 9/10 sign rule, so it is not significant.
+- Counted operations under `--trace` with 4 threads **vary with scheduling** (0.9 %). The protocol predicted them deterministic; that prediction failed.
+
+Report: `reports/run-20261121T0500Z/` (REPORT.pdf, confirm.svg, instructions.svg). Record: `benchmarks/records/20261121T0437Z-jv-cover-f4-round4-confirm.json`.
+
+## Phase 1: the six leads, measured and designed in parallel
 
 | lead | verdict | key measurement | estimated gain (estimate) |
 |:--|:--|:--|:--|
@@ -13,11 +26,21 @@
 | L5 remaining per-term allocations | pursue-small | 408,630 unpack calls; byte-wise pack/unpack; Pair lcm Vec; no pre-sized emitted Poly. | ~5 % of F4 (cheap set); the full `Poly` change does not pay for 56 files |
 | L6 zero reductions / early abort | pursue-small | 0/104 systems have 1 in the ideal, so an early "no root" abort gains ~0. A signature (F5-style) criterion's upper bound is 54.5 % of reduced rows. | F5-style criterion: 1.1–1.2× C_cov plausible, upper bound 1.33× |
 
-## Findings outside the six leads
+Per-lead details: `phase1/leads.json`, `phase1/L*/`.
 
-- **`--trace` is a regression by construction in Full mode.**
-  - Cause: a replay never consumes pairs. After the recorded steps, the run continues as a full run over all accumulated pairs, so pair rows rise 66 % (f4_fp.rs ~5074–5101, 5228). This explains the pilot (11.0 → 14.5 s; +25 % counted ops).
-  - `--trace --stop hilbert` silently runs Full mode: `f4_record` and `f4_replay` bypass `f4_hilbert_guarded` (f4_fp.rs:1378–1408, 4425–4429).
-- **The Hilbert stop rule is not the default for `jv_cover --exp dlp`/`ccov`.**
-  - It was validated in `benchmarks/20261029-jv-cover-hilbert-stop`: S 1.85× lower at p = 53–503, identical relations.
-  - Phase 1 measured it at 2.42× on F4 counted ops and 1.82× on C_cov.
+## Phase 2: what was built (callgrind F4 instructions, 104 Nagao tests)
+
+| step | change | effect |
+|:--|:--|:--|
+| 1 | trace through `f4_hilbert_guarded`; `jv_cover` refuses `--trace` without a stop rule; recording runs charged | Hilbert 1.096 G → Hilbert+trace 0.979 G; counted S 392.3 → 298.1 |
+| 3 | u32 accumulators (p ≤ 4097), byte pack/unpack, u64 divisor scan, pre-size (≈ 0) | full 1.138 → 0.998 G; Hilbert 1.096 → 0.966 G; output and counted ops byte-identical |
+| 2 | frozen replay steps, a superset template widened by support union and rebuilt by integer reachability (`F4_FP_FREEZE=0` turns it off) | 0.859 → 0.774 G (−9.8 %); identical output and counted ops |
+| 4 | signature criterion | deferred: branch traces target the diverged replays (about 47 % of counted F4, an estimate) more directly |
+
+Lead 4 had no code change. jemalloc stays per consumer (round 3).
+
+## Open
+
+- Branch traces: record the continuation at a replay divergence.
+- Deterministic trace recording under parallel batches.
+- Hilbert as `jv_cover`'s default: an owner decision, not made.

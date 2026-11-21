@@ -1,7 +1,21 @@
 {
   "branch": "claude/funny-brown-735uvs",
   "closed_utc": null,
-  "commands": [],
+  "commands": [
+    {
+      "argv": [
+        "research/f4_round4_leads_20261121/scripts/jv_confirm.sh",
+        "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/new3/jv_cover",
+        "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/step2c/jv_cover",
+        "10",
+        "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/confirm4"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-21T04:55:43+00:00",
+      "wall_s": 486.745
+    }
+  ],
   "commit": "b5795d406107c8346a53c4f1714923c434884f15",
   "commit_dirty": false,
   "created_utc": "2026-11-21T04:37:48+00:00",
@@ -15,9 +29,88 @@
     "platform": "Linux-6.18.44-fc-v726-x86_64-with-glibc2.39"
   },
   "id": "20261121T0437Z-jv-cover-f4-round4-confirm",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 10,
+      "name": "jv_dlp53_wall_hilbert_over_hilbert_trace",
+      "note": "pre-registered [1.15,1.50] met, 10/10; 9.97 s -> 8.14 s; A/A 0.988 (median |dev| 2.2%); 31 relations, correct log in all 50 runs; H1 counted ops vary 7.240-7.303 G with thread scheduling (predicted deterministic: failed)",
+      "reference": 1.0,
+      "reference_kind": "baseline",
+      "spread": [
+        1.147,
+        1.241
+      ],
+      "unit": "ratio",
+      "value": 1.231
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 10,
+      "name": "jv_dlp53_wall_full_old_over_new",
+      "note": "8/10 rounds; below the pre-registered 9/10 sign rule: not significant; counted ops identical 17,873,891,895",
+      "reference": 1.0,
+      "reference_kind": "baseline",
+      "spread": [
+        0.947,
+        1.172
+      ],
+      "unit": "ratio",
+      "value": 1.06
+    },
+    {
+      "baseline": 1096195667.0,
+      "better": "lower",
+      "n": 1,
+      "name": "f4_callgrind_ir_ccov53_hilbert_trace",
+      "note": "Hilbert before round 4 1.096 G -> Hilbert+trace+step3+frozen 0.774 G; frozen on/off identical output and counted ops",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ir",
+      "value": 774222391.0
+    }
+  ],
   "problem": "kernel:f4_fp",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 7987,
+      "path": "research/f4_round4_leads_20261121/data/confirm/runs.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f3/f35b658ad85a0fbe5d1f3a78d8c943197e688e03b267005aeecd580474e94cc8",
+      "sha256": "f35b658ad85a0fbe5d1f3a78d8c943197e688e03b267005aeecd580474e94cc8",
+      "uploaded": false
+    },
+    {
+      "bytes": 2534,
+      "path": "research/f4_round4_leads_20261121/CONFIRM_PROTOCOL.md",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/73/73b53e95b9c021d62e6094beb49983a437d8da89d051b3b450fa91f07a01aa6c",
+      "sha256": "73b53e95b9c021d62e6094beb49983a437d8da89d051b3b450fa91f07a01aa6c",
+      "uploaded": false
+    },
+    {
+      "bytes": 859,
+      "path": "research/f4_round4_leads_20261121/scripts/jv_confirm.sh",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/18/180c9fae1110fb8e7ce5e6169764b31335ceaa252c2768497f15a0bada21f40d",
+      "sha256": "180c9fae1110fb8e7ce5e6169764b31335ceaa252c2768497f15a0bada21f40d",
+      "uploaded": false
+    },
+    {
+      "bytes": 1051,
+      "path": "research/f4_round4_leads_20261121/data/instructions.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c2/c274ca7e87d38b23778e67a0801c3a538c101e19adcb7064265ab7a34e2fd833",
+      "sha256": "c274ca7e87d38b23778e67a0801c3a538c101e19adcb7064265ab7a34e2fd833",
+      "uploaded": false
+    },
+    {
+      "bytes": 324,
+      "path": "research/f4_round4_leads_20261121/data/binaries.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/37/37ad0ca36f32ae529014a750a5b0617bb779eac1585b6632492c8bb22aed244b",
+      "sha256": "37ad0ca36f32ae529014a750a5b0617bb779eac1585b6632492c8bb22aed244b",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
     "pdf": null,
