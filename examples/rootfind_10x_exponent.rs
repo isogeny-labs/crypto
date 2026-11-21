@@ -4,7 +4,10 @@
 //! `[pcc:unverified]`. No security / sub-rho claim.
 //!
 //!     cargo run --release --example rootfind_10x_exponent -- \
-//!         --bits 20,24,28 --sizes 16,32,64 --multi 16 --repeats 3
+//!         --bits 32 --sizes 32,64 --multi 8 --repeats 5
+//!
+//! Pinned 32-bit recipes (from the best-|F| grid): `kmitm:m=5` @ |F|≈32 and
+//! `kmitm:m=4` @ |F|≈64 vs `subtract:m=3`.
 
 use std::time::Instant;
 
@@ -531,10 +534,10 @@ fn main() -> Result<(), String> {
             .and_then(|i| args.get(i + 1).cloned())
             .unwrap_or_else(|| d.to_string())
     };
-    let bits_list = list_u32(&get("--bits", "20,24,28"));
-    let sizes = list_usize(&get("--sizes", "16,32,64"));
-    let multi: usize = get("--multi", "16").parse().unwrap();
-    let repeats: usize = get("--repeats", "3").parse().unwrap();
+    let bits_list = list_u32(&get("--bits", "32"));
+    let sizes = list_usize(&get("--sizes", "32,64"));
+    let multi: usize = get("--multi", "8").parse().unwrap();
+    let repeats: usize = get("--repeats", "5").parse().unwrap();
     let seed0: u64 = get("--seed", "59297").parse().unwrap();
     let focus_bits = *bits_list.last().unwrap_or(&28);
     let focus_size = *sizes.last().unwrap_or(&64);

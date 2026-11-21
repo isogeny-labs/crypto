@@ -291,5 +291,19 @@
       ]
     }
   },
-  "claim_hygiene": "no security/sub-rho/key-recovery; G3 (adds/target vs |Fx|) remains fail-closed on the pair-table floor; exponent claim is e2e planted-log charged-S and wall vs group bits with per-arm best |F| \u2014 relative advantage grows with bits (not a constant factor); multi-target amort secondary"
+  "claim_hygiene": "no security/sub-rho/key-recovery; G3 (adds/target vs |Fx|) remains fail-closed on the pair-table floor; exponent claim is e2e planted-log charged-S and wall vs group bits with per-arm best |F| \u2014 relative advantage grows with bits (not a constant factor); multi-target amort secondary",
+  "recipe_pin_panel": {
+    "bits": 32,
+    "repeats": 5,
+    "verified_all": true,
+    "subtract_walk_s": 1.546752347,
+    "kmitm_m5_A32_wall_x": 22.690293332420296,
+    "kmitm_m4_A64_wall_x": 17.14518135118323,
+    "kmitm_m5_lanes8_wall_x": 6.499793217171933,
+    "kmitm_m4_lanes8_wall_x": 4.697722400030615,
+    "ifma_batch16_wall_x": 1.3159520145179264,
+    "lever2_note": "8-wide scalar lanes landed; single-DLP cold walk still faster than lanes collect (batch overhead); IFMA subtract-gpu does not beat kmitm at this recipe",
+    "g3_note": "still fail-closed; see G3_ATTEMPT.md",
+    "pcc": "unverified"
+  }
 }

@@ -83,3 +83,21 @@ bits moves when switching subtract:m=3 → kmitm:m=4/5 with recipe retuning.
 | `probe_b32_g3.txt` | G3 fail-closed @ bits=32 |
 | `e2e_s_ladder.json` | S vs \|F\| @ bits=28 (secondary) |
 | `examples/rootfind_10x_exponent.rs` | Harness |
+
+## Pinned recipe panel (re-run)
+
+`--panel recipe` on `examples/rootfind_pipeline_e2e.rs` (5 reps, bits=32):
+
+| Arm | Median wall | vs subtract@64/walk |
+|---|---:|---:|
+| subtract:m=3@64/walk | 1.55 s | 1× |
+| floor:m=3@64/walk | 0.81 s | ~1.9× |
+| **kmitm:m=4@64/walk** | **0.090 s** | **~17×** |
+| **kmitm:m=5@32/walk** | **0.068 s** | **~23×** |
+| kmitm:m=4@64/lanes8 | 0.33 s | ~4.7× |
+| kmitm:m=5@32/lanes8 | 0.24 s | ~6.5× |
+| ifma:m=3@64/batch16 | 1.18 s | ~1.3× |
+
+PLAN lever 2: scalar 8-wide `decompose_lanes` landed; AVX/IFMA lockstep for
+kmitm still open. G3 still fail-closed (`G3_ATTEMPT.md`). Still `[pcc:unverified]`
+(no isolated runner in this environment).

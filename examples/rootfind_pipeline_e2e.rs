@@ -8,14 +8,19 @@
 //! Arms:
 //! - `rootfind-subtract:m=2|3` — best existing CPU rootfind
 //! - `rootfind-floor:m=2|3` — PLAN lever 1
-//! - `rootfind-kmitm:m=3|4|6|10|12` — MITM + hot-path (pipeline uses single
+//! - `rootfind-kmitm:m=3|4|5|6|10|12` — MITM + hot-path (pipeline uses single
 //!   `decompose`; charged `S` unchanged vs its own search)
 //! - `kmitm-thr:m=12,threads=1|2|4` — same search, but relation collection
 //!   probes independent walk targets via `decompose_threaded` (PLAN lever 4)
+//! - `kmitm-lanes:m=4|5,lanes=8` — PLAN lever 2 scalar 8-wide batch-inv collect
+//! - `--panel recipe` — pinned 32-bit best recipes (kmitm:m=5@|F|≈32,
+//!   kmitm:m=4@|F|≈64) vs subtract/floor/IFMA on the same host
 //!
 //! ```bash
 //! cargo run --release --example rootfind_pipeline_e2e -- \
 //!   --bits 20 --size 24 --repeats 3
+//! cargo run --release --example rootfind_pipeline_e2e -- \
+//!   --panel recipe --repeats 5
 //! ```
 
 use std::hint::black_box;
@@ -265,6 +270,140 @@ fn collect_kmitm_threaded(
     })
 }
 
+/// Relation collection via PLAN lever 2 `decompose_lanes` (≤8-wide shared
+/// batch-inv chunks). Prepare is outside this call.
+fn collect_kmitm_lanes(
+    arm: &str,
+    oracle: &mut RootfindKMitmOracle<'_>,
+    fb: &crypto_lib::cryptanalysis::ic_boundary::FactorBase<
+        crypto_lib::cryptanalysis::ic_boundary::PrimePoint,
+    >,
+    inst: &crypto_lib::cryptanalysis::ic_boundary::PrimeInstance,
+    lanes: usize,
+    seed: u64,
+    planted: u64,
+) -> Result<ArmResult, String> {
+    let wall0 = Instant::now();
+    let mut ops = GroupOps::default();
+    let g = inst.generator_point();
+    let q = inst.curve.mul(&mut ops, g, planted);
+    let ctx = InstanceCtx {
+        group: &inst.curve,
+        generator: g,
+        target: q,
+        r: inst.r,
+        cofactor: inst.cofactor,
+        group_order: inst.group_order,
+        name: inst.name.clone(),
+        field_degree: None,
+    };
+    let mut matrix = IncrementalGauss::new(fb.columns + 1, ctx.r);
+    let mut state = seed ^ 0xA11C_EEE5_u64;
+    let mut targets_tried = 0u64;
+    let mut relations = 0u64;
+    let mut decomp_wall_s = 0.0f64;
+    let batch = lanes.max(1).min(8) * 4;
+    let max_trials = 2_000_000u64;
+    let h = ctx.cofactor % ctx.r;
+    'outer: while targets_tried < max_trials {
+        let n = batch.min((max_trials - targets_tried) as usize);
+        let mut pts = Vec::with_capacity(n);
+        let mut metas = Vec::with_capacity(n);
+        for _ in 0..n {
+            state = state.wrapping_mul(0x9E37_79B9_7F4A_7C15).wrapping_add(1);
+            let a = 1 + state % (ctx.r - 1);
+            state = state.wrapping_mul(0x9E37_79B9_7F4A_7C15).wrapping_add(1);
+            let b = 1 + state % (ctx.r - 1);
+            let ag = ctx.group.mul(&mut ops, ctx.generator, a);
+            let bq = ctx.group.mul(&mut ops, ctx.target, b);
+            pts.push(ctx.group.add(&mut ops, ag, bq));
+            metas.push((a, b));
+        }
+        let mut out = vec![None; n];
+        let mut dops = GroupOps::default();
+        let mut counters = crypto_lib::cryptanalysis::ic_boundary::OracleCounters::default();
+        let t0 = Instant::now();
+        oracle.decompose_lanes(&ctx, fb, &mut dops, &mut counters, &pts, &mut out);
+        decomp_wall_s += t0.elapsed().as_secs_f64();
+        targets_tried += n as u64;
+        black_box(&out);
+        for (i, hit) in out.into_iter().enumerate() {
+            let Some(idxs) = hit else { continue };
+            let mut row = vec![0u64; fb.columns + 1];
+            for &pi in &idxs {
+                let col = fb.col_of[pi];
+                let coef = fb.coef_of[pi];
+                row[col] = (row[col] + coef) % ctx.r;
+            }
+            let (a, b) = metas[i];
+            row[fb.columns] = (ctx.r - (h * b % ctx.r)) % ctx.r;
+            let rhs = (h * a) % ctx.r;
+            match matrix.add_row(row, rhs) {
+                RowStatus::Independent => {
+                    relations += 1;
+                    if matrix.pinned(fb.columns).is_some() {
+                        break 'outer;
+                    }
+                }
+                RowStatus::Dependent => {}
+                RowStatus::Inconsistent => {
+                    return Err("inconsistent relation in lanes collect".into());
+                }
+            }
+        }
+    }
+    let d = matrix
+        .pinned(fb.columns)
+        .ok_or_else(|| format!("{arm}: exhausted without pinning target column"))?;
+    let verified = ctx.group.mul(&mut ops, ctx.generator, d) == ctx.target;
+    Ok(ArmResult {
+        arm: arm.to_string(),
+        verified,
+        exhausted: !verified,
+        wall_s: wall0.elapsed().as_secs_f64(),
+        s: 0.0,
+        total_gae: 0.0,
+        setup_wall_s: 0.0,
+        decomp_wall_s,
+        targets: targets_tried,
+        relations,
+        recovered: verified.then_some(d),
+    })
+}
+
+/// Full IC solve with PLAN lever 2 `decompose_lanes` relation phase.
+fn run_kmitm_lanes_collect(
+    arm: &str,
+    m: u32,
+    lanes: usize,
+    inst: &crypto_lib::cryptanalysis::ic_boundary::PrimeInstance,
+    size: usize,
+    seed: u64,
+    planted: u64,
+) -> Result<ArmResult, String> {
+    let fb = prime_factor_base(inst, size);
+    let (_, params) = Params::parse_spec(&format!("rootfind-kmitm:m={m}"))?;
+    let g = inst.generator_point();
+    let prep_ctx = InstanceCtx {
+        group: &inst.curve,
+        generator: g,
+        target: g,
+        r: inst.r,
+        cofactor: inst.cofactor,
+        group_order: inst.group_order,
+        name: inst.name.clone(),
+        field_degree: None,
+    };
+    let t_prep = Instant::now();
+    let mut oracle = RootfindKMitmOracle::new_prime(m, inst);
+    oracle.prepare(&prep_ctx, &fb, &params, &mut GroupOps::default())?;
+    let prep_s = t_prep.elapsed().as_secs_f64();
+    let mut row = collect_kmitm_lanes(arm, &mut oracle, &fb, inst, lanes, seed, planted)?;
+    row.setup_wall_s = prep_s;
+    row.wall_s += prep_s;
+    Ok(row)
+}
+
 /// Full IC solve whose relation phase probes walk targets in parallel via
 /// [`RootfindKMitmOracle::decompose_threaded`] (PLAN lever 4). Same search /
 /// charged adds as serial kmitm; wall only.
@@ -322,11 +461,21 @@ fn main() -> Result<(), String> {
             .and_then(|i| args.get(i + 1).cloned())
             .unwrap_or_else(|| d.to_string())
     };
-    let bits: u32 = get("--bits", "20").parse().unwrap();
-    let size: usize = get("--size", "24").parse().unwrap();
+    let panel = get("--panel", "all"); // all | breakthrough | recipe
+    // Pinned 32-bit best recipes from research/rootfind_10x_exponent_20261121/.
+    let (bits, size) = if panel == "recipe" {
+        (
+            get("--bits", "32").parse().unwrap_or(32),
+            get("--size", "64").parse().unwrap_or(64),
+        )
+    } else {
+        (
+            get("--bits", "20").parse().unwrap(),
+            get("--size", "24").parse().unwrap(),
+        )
+    };
     let repeats: usize = get("--repeats", "3").parse().unwrap();
     let seed0: u64 = get("--seed", "59297").parse().unwrap();
-    let panel = get("--panel", "all"); // all | breakthrough
 
     let inst = prime_instance_for(bits, seed0);
     println!(
@@ -342,6 +491,7 @@ fn main() -> Result<(), String> {
         ("floor:m=3", "rootfind-floor:m=3"),
         ("kmitm:m=3", "rootfind-kmitm:m=3"),
         ("kmitm:m=4", "rootfind-kmitm:m=4"),
+        ("kmitm:m=5", "rootfind-kmitm:m=5"),
         ("kmitm:m=6", "rootfind-kmitm:m=6"),
         ("kmitm:m=10", "rootfind-kmitm:m=10"),
         ("kmitm:m=12", "rootfind-kmitm:m=12"),
@@ -349,6 +499,151 @@ fn main() -> Result<(), String> {
 
     let mut all_rows = Vec::new();
     let mut summary = Vec::new();
+
+    // ----- pinned recipe panel (32-bit best |F| per arm) -----
+    if panel == "recipe" {
+        println!("\n## Pinned recipe panel (32-bit best-|F| from 10x scoreboard)");
+        // (arm_label, oracle_spec, |F|, targets_name)
+        let recipe_arms: &[(&str, &str, usize, &str)] = &[
+            ("subtract:m=3@64/walk", "rootfind-subtract:m=3", 64, "walk"),
+            (
+                "subtract:m=3@64/batch8",
+                "rootfind-subtract:m=3",
+                64,
+                "walk-prime-batch-8",
+            ),
+            ("floor:m=3@64/walk", "rootfind-floor:m=3", 64, "walk"),
+            ("floor:m=3@64/batch8", "rootfind-floor:m=3", 64, "walk-prime-batch-8"),
+            ("kmitm:m=4@64/walk", "rootfind-kmitm:m=4", 64, "walk"),
+            ("kmitm:m=5@32/walk", "rootfind-kmitm:m=5", 32, "walk"),
+            (
+                "ifma:m=3@64/batch8",
+                "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+                64,
+                "walk-prime-batch-8",
+            ),
+            (
+                "ifma:m=3@64/batch16",
+                "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",
+                64,
+                "walk-prime-batch-16",
+            ),
+        ];
+        let mut recipe_summary = Vec::new();
+        for &(arm, spec, a_size, tgt_name) in recipe_arms {
+            let targets = match parse_targets(tgt_name) {
+                Ok(t) => t,
+                Err(e) => {
+                    println!("  {arm:<28} SKIP parse: {e}");
+                    continue;
+                }
+            };
+            let mut walls = Vec::new();
+            let mut ss = Vec::new();
+            let mut ok = 0usize;
+            let mut err = None;
+            for rep in 0..repeats {
+                let seed = seed0.wrapping_add(rep as u64 * 0x9E37);
+                let planted = 1 + (seed % (inst.r - 1));
+                match run_standard(arm, spec, targets, &inst, a_size, seed, planted) {
+                    Ok(row) => {
+                        if row.verified {
+                            ok += 1;
+                        }
+                        walls.push(row.wall_s);
+                        ss.push(row.s);
+                        println!(
+                            "  {arm:<28} rep={rep} wall={:.4}s S={:.3} verified={}",
+                            row.wall_s, row.s, row.verified
+                        );
+                        all_rows.push(json!({
+                            "arm": arm, "mode": "recipe", "size": a_size,
+                            "targets": tgt_name, "rep": rep,
+                            "wall_s": row.wall_s, "s": row.s, "verified": row.verified,
+                        }));
+                    }
+                    Err(e) => {
+                        err = Some(e);
+                        break;
+                    }
+                }
+            }
+            if let Some(e) = err {
+                println!("  {arm:<28} FAIL {e}");
+                recipe_summary.push(json!({"arm": arm, "error": e}));
+                continue;
+            }
+            let med_w = median_f64(&mut walls);
+            let med_s = median_f64(&mut ss);
+            println!(
+                "  {arm:<28} MEDIAN wall={med_w:.4}s S={med_s:.3} verified={ok}/{repeats}"
+            );
+            recipe_summary.push(json!({
+                "arm": arm, "oracle": spec, "size": a_size, "targets": tgt_name,
+                "median_wall_s": med_w, "median_S": med_s,
+                "verified_reps": ok, "repeats": repeats,
+            }));
+        }
+        // PLAN lever 2: 8-wide lanes collect for pinned kmitm recipes
+        println!("\n## Pinned recipe — kmitm lanes collect (lever 2, 8-wide)");
+        for &(arm, m, a_size) in &[
+            ("kmitm:m=4@64/lanes8", 4u32, 64usize),
+            ("kmitm:m=5@32/lanes8", 5u32, 32usize),
+        ] {
+            let mut walls = Vec::new();
+            let mut ok = 0usize;
+            let mut err = None;
+            for rep in 0..repeats {
+                let seed = seed0.wrapping_add(rep as u64 * 0x9E37);
+                let planted = 1 + (seed % (inst.r - 1));
+                match run_kmitm_lanes_collect(arm, m, 8, &inst, a_size, seed, planted) {
+                    Ok(row) => {
+                        if row.verified {
+                            ok += 1;
+                        }
+                        walls.push(row.wall_s);
+                        println!(
+                            "  {arm:<28} rep={rep} wall={:.4}s decomp={:.4}s targets={} verified={}",
+                            row.wall_s, row.decomp_wall_s, row.targets, row.verified
+                        );
+                        all_rows.push(json!({
+                            "arm": arm, "mode": "recipe_lanes", "size": a_size,
+                            "rep": rep, "wall_s": row.wall_s,
+                            "decomp_wall_s": row.decomp_wall_s, "verified": row.verified,
+                        }));
+                    }
+                    Err(e) => {
+                        err = Some(e);
+                        break;
+                    }
+                }
+            }
+            if let Some(e) = err {
+                println!("  {arm:<28} FAIL {e}");
+                recipe_summary.push(json!({"arm": arm, "error": e}));
+                continue;
+            }
+            let med_w = median_f64(&mut walls);
+            println!(
+                "  {arm:<28} MEDIAN wall={med_w:.4}s verified={ok}/{repeats}"
+            );
+            recipe_summary.push(json!({
+                "arm": arm, "lanes": 8, "size": a_size,
+                "median_wall_s": med_w, "verified_reps": ok, "repeats": repeats,
+            }));
+        }
+        let out = json!({
+            "pcc": "unverified",
+            "panel": "recipe",
+            "bits": bits,
+            "host_note": "pinned 32-bit best recipes; lever-2 8-wide lanes; IFMA subtract-gpu",
+            "recipe_summary": recipe_summary,
+            "rows": all_rows,
+            "claim_hygiene": "no security/sub-rho; G3 not claimed here",
+        });
+        println!("{}", serde_json::to_string_pretty(&out).unwrap());
+        return Ok(());
+    }
 
     if panel != "breakthrough" {
     for &(arm, spec) in standard_arms {
@@ -714,6 +1009,7 @@ fn main() -> Result<(), String> {
             ("floor:m=3/walk", "rootfind-floor:m=3", "walk"),
             ("floor:m=3/batch8", "rootfind-floor:m=3", "walk-prime-batch-8"),
             ("kmitm:m=4/walk", "rootfind-kmitm:m=4", "walk"),
+            ("kmitm:m=5/walk", "rootfind-kmitm:m=5", "walk"),
             (
                 "ifma:m=3/batch8",
                 "rootfind-subtract-gpu:m=3,worker=native,simd=ifma,threads=4",

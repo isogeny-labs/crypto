@@ -271,10 +271,11 @@ impl<'i> RootfindKMitmOracle<'i> {
         self.right_prime.len().max(self.right_bin.len()) as u64
     }
 
-    /// PLAN lever 2 (scalar): probe up to four targets behind **one** shared
-    /// Montgomery batch-inversion. `out[i]` receives the witness for
-    /// `targets[i]` (or `None`). Falls back to one-at-a-time when the
-    /// batch-inv path is off or `targets.len() ≤ 1`.
+    /// PLAN lever 2 (scalar): probe up to eight targets behind **one** shared
+    /// Montgomery batch-inversion per chunk of ≤8. `out[i]` receives the
+    /// witness for `targets[i]` (or `None`). Falls back to one-at-a-time when
+    /// the batch-inv path is off or `targets.len() ≤ 1`. Larger slices are
+    /// processed in successive 8-wide chunks (AVX/IFMA lockstep still open).
     pub fn decompose_lanes(
         &mut self,
         ctx: &InstanceCtx<PrimeCurve>,
@@ -298,17 +299,30 @@ impl<'i> RootfindKMitmOracle<'i> {
             return;
         }
         let g = ctx.group;
-        if self.right_k == 1 {
-            self.probe_right1_prime_lanes(g, fb, ops, counters, &targets[..n], &mut out[..n]);
-        } else {
-            self.probe_right_precomputed_prime_lanes(
-                g,
-                fb,
-                ops,
-                counters,
-                &targets[..n],
-                &mut out[..n],
-            );
+        const LANE_CAP: usize = 8;
+        let mut base = 0;
+        while base < n {
+            let end = (base + LANE_CAP).min(n);
+            if self.right_k == 1 {
+                self.probe_right1_prime_lanes(
+                    g,
+                    fb,
+                    ops,
+                    counters,
+                    &targets[base..end],
+                    &mut out[base..end],
+                );
+            } else {
+                self.probe_right_precomputed_prime_lanes(
+                    g,
+                    fb,
+                    ops,
+                    counters,
+                    &targets[base..end],
+                    &mut out[base..end],
+                );
+            }
+            base = end;
         }
     }
 
@@ -1179,8 +1193,9 @@ impl RootfindKMitmOracle<'_> {
             self.scratch.resize(total, 0);
             self.degenerate.resize(total, false);
         }
-        let mut xr = [0u64; 4];
-        let mut yr = [0u64; 4];
+        debug_assert!(t_n <= 8, "lane chunk cap is 8");
+        let mut xr = [0u64; 8];
+        let mut yr = [0u64; 8];
         for (t, &target) in targets.iter().enumerate() {
             xr[t] = f.to_mont(target.x);
             yr[t] = f.to_mont(target.y);
@@ -1324,8 +1339,9 @@ impl RootfindKMitmOracle<'_> {
             self.scratch.resize(total, 0);
             self.degenerate.resize(total, false);
         }
-        let mut xr = [0u64; 4];
-        let mut yr = [0u64; 4];
+        debug_assert!(t_n <= 8, "lane chunk cap is 8");
+        let mut xr = [0u64; 8];
+        let mut yr = [0u64; 8];
         for (t, &target) in targets.iter().enumerate() {
             xr[t] = f.to_mont(target.x);
             yr[t] = f.to_mont(target.y);
@@ -1799,7 +1815,7 @@ mod tests {
         assert!(hit.is_some(), "m=12 should recover planted 12-sum");
     }
 
-    /// Four-lane shared batch-inv recovers the same planted m=4 sum.
+    /// Eight-lane shared batch-inv recovers the same planted m=4 sum.
     #[test]
     fn kmitm_lanes_recover_planted_m4() {
         let inst = prime_instance_for(22, 59297);
@@ -1819,10 +1835,10 @@ mod tests {
         for &i in &idxs[1..] {
             s = g.add(&mut ops, s, fb.points[i]);
         }
-        // Three decoys + the planted sum.
+        // Seven decoys + the planted sum (8-wide lever-2 chunk).
         let mut state = 0xC0FF_EE00_u64;
         let mut targets = vec![s];
-        for _ in 0..3 {
+        for _ in 0..7 {
             state = state.wrapping_mul(0x9E37_79B9_7F4A_7C15).wrapping_add(1);
             targets.push(g.mul(&mut ops, inst.generator_point(), 1 + state % (inst.r - 1)));
         }
@@ -1831,7 +1847,7 @@ mod tests {
         oracle
             .prepare(&c, &fb, &params, &mut GroupOps::default())
             .unwrap();
-        let mut out = vec![None; 4];
+        let mut out = vec![None; 8];
         let mut dops = GroupOps::default();
         let mut counters = OracleCounters::default();
         oracle.decompose_lanes(&c, &fb, &mut dops, &mut counters, &targets, &mut out);
