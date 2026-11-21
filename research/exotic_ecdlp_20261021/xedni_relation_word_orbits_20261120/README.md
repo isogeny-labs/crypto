@@ -25,7 +25,7 @@ The [protocol](protocol.json) was committed before the census. It fixes the sour
 
 The [pinned Lean build](formal/build.sh) uses `v4.35.0-rc4` and Mathlib revision `021c46bdd042f67b538b9f9871d556a93713a9a9`. Its [output](formal/build-output.txt) lists only standard `propext`, `Classical.choice`, and `Quot.sound` foundations under `#print axioms`; no reported theorem uses `sorry`, `admit`, a custom claim axiom, or native evaluation. `lean4checker --fresh` is unavailable on this host.
 
-The next construction experiment should add a relation word that crosses the three multiplier components, or specify target-dependent operations that do so, then measure novel row rank and target coverage before attempting a full IC workload. Any complete candidate must retain the one-target online and cold costs and a same-point rho reference under the repository measurement contract.
+The next construction experiment must address the existing coefficient screens. The [coefficient-10 packet](../xedni_residue10_rational_20261120/README.md) checked 1,488 locally selected centered CRT curves and found zero rational `P+10Q` relations; the [coefficient-14 packet](../xedni_periodic_coefficient_20261120/README.md) checked 48 centered curves that passed both auxiliary relation tests and also found zero rational relations. A new bridge-word proposal should first derive its rational lift condition and cost, then vary coefficient representatives or the auxiliary-prime policy under a frozen protocol. Measure novel row rank and target coverage alongside relation yield before attempting a full IC workload. Any complete candidate must retain the one-target online and cold costs and a same-point rho reference under the repository measurement contract.
 
 ## Replay
 
