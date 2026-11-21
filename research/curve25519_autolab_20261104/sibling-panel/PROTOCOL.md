@@ -43,4 +43,7 @@ Stored points per sqrt(r) of a `sib8` arm within 10 percent of its no-sibling ar
 
 ## 6. Amendments
 
-None yet.
+- 2026-11-21, after data, clarifications only (no number, interval or rule changed); raised by the red-team lane:
+  - Section 2 says "five fresh sibling curves per size". The curves are the c1 confirmation curves (`../c1/confirm-curves.json`), which the SNC panel and the two smokes also used; what is new here is the target seed and the measurement seed. The smokes that calibrated the predictions ran on two of these curves. The cheapest falsification left is the same specs on curves not used by any earlier study (section 5 of the red-team record, in `README.md`).
+  - At k = 32 the ledger incumbent (`tw2l-x20-j16-n2`) is the control arm `tw2cj-lazy` itself, so the pair (`inc`, `tw2cj-lazy-sib8`) duplicates (`tw2cj-lazy`, `tw2cj-lazy-sib8`) there and `inc` / `rho-neg` duplicates `tw2cj-lazy` / `rho-neg`; at k = 24 `inc` is the jumps = 32 sibling of the control. The k = 32 `inc` row carries no independent evidence.
+  - The frozen section 3 table was internally inconsistent: the rho-neg rows were centred at 0.77 x the 1.69 baseline while the pair rows were centred at 0.68, so both could not be hit at centre. The misses (four cells, all in the cheaper direction) stay recorded as misses under section 4, line 3.
