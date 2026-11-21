@@ -1911,7 +1911,7 @@ mod round77_producer_regression {
         };
         for p in [7, 13, 101, 65_521, 1_000_000_007, MAX_PRIME] {
             let linear = vec![p - 2, 1];
-            let quadratic = vproduct(&linear, &[p - 17, 1], p);
+            let quadratic = vproduct(&linear, &[(p - (17 % p)) % p, 1], p);
             for f in [linear, quadratic, vec![1, 0, 1]] {
                 let report = solve(&f, p, 77, limits.clone(), &mut |_| Ok(())).unwrap();
                 assert!(report.complete(), "incomplete p={p} f={f:?}");
