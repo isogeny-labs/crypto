@@ -1620,7 +1620,7 @@ mod tests {
                 }
                 a[alen - 1] = 1 + a[alen - 1] % (p - 1);
                 b[blen - 1] = if case & 1 == 0 { 1 } else { p - 1 };
-                if case % 3 == 0 {
+                if blen > 2 && case % 3 == 0 {
                     for coefficient in &mut b[1..blen - 1] {
                         *coefficient = 0;
                     }
