@@ -638,6 +638,7 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     // Keep the sparse and small-product paths untouched: their zero skipping
     // beats the extra column and density checks on typical short certificates.
     if a.len() >= 8 && b.len() >= 8 && p <= u32::MAX as u64
+        && a[1] != 0 && b[1] != 0 && a[2] != 0 && b[2] != 0
         && (a.len().min(b.len()) as u128) * ((p - 1) as u128).pow(2)
             <= u64::MAX as u128
         && a.iter().chain(b).all(|&x| x != 0 && x < p)
@@ -694,6 +695,7 @@ fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
     // terms, add 2*a[i]*a[j]. The same bound as convolution covers all
     // ordered products and therefore guarantees u64 accumulation safety.
     if a.len() >= 8 && p >= 1_000_000 && p <= u32::MAX as u64
+        && a[1] != 0 && a[2] != 0
         && (a.len() as u128) * ((p - 1) as u128).pow(2)
             <= u64::MAX as u128
         && a.iter().all(|&x| x != 0 && x < p)
