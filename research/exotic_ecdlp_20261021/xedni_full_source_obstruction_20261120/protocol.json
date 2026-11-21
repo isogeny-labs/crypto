@@ -1,0 +1,13 @@
+{
+  "schema": "xedni-full-source-obstruction-v1",
+  "source": "../xedni_coefficient_choice_20261120/source-rows-v2.jsonl.gz",
+  "source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "input_law": "all 1722 ordered source pairs with exact centered integer coordinates, including equal-x and local-collision rows",
+  "coefficient_law": "a1 and a2 are integer multiples of 47; a3, a4 and a6 are unrestricted subject to an elliptic rational Weierstrass curve through both points",
+  "relation_word": "P+Q+Q=0",
+  "classification_order": ["same rational x with distinct y", "nonzero tangent residue modulo 47", "nonzero squared-y residue modulo x difference", "surviving pair"],
+  "proof_target": "for each exact source index, the rational point relation implies membership in the surviving index set",
+  "expected_classification_counts": {"same_x": 42, "mod47": 1638, "divisibility": 36, "surviving_pair": 6},
+  "expected_surviving_indices": [201, 243, 425, 467, 511, 553],
+  "claim_boundary": "necessary condition for the frozen point law, coefficient law and relation word; surviving indices are not asserted to have a rational relation for every coefficient choice"
+}
