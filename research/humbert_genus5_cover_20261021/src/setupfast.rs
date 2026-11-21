@@ -3,7 +3,7 @@
 //! values and consume exactly the same RNG draws as the default path.
 //!
 //! * `FK`: K4 = F_p[t]/(m) arithmetic with u64 accumulators and Barrett
-//!   reduction (p < 2^16, so every product sum is < 2^35 and fits in u64). Canonical
+//!   reduction (p < 2^17, so every product sum is < 7 p^2 < 2^37 and fits in u64). Canonical
 //!   representatives in [0, p), so every value equals the K4 value.
 //! * `group_order_fast`: replays curve::group_order. That routine draws random
 //!   points P_1, P_2, ... and keeps the multiples-of-ord(P) sets intersected over
@@ -72,7 +72,7 @@ impl FK {
     }
     #[inline(always)]
     pub fn mul(&self, a: &E4, b: &E4) -> E4 {
-        // c_i <= 4 (p-1)^2 < 2^34 (p < 2^16)
+        // c_i <= 4 (p-1)^2 < 2^36 (p < 2^17)
         let mut c = [0u64; 7];
         for i in 0..4 {
             for j in 0..4 {
@@ -83,7 +83,7 @@ impl FK {
         for h in 0..3 {
             let ch = self.rd(c[4 + h]);
             for i in 0..4 {
-                r[i] += ch * self.red[h][i]; // < 2^34 + 3 * 2^32
+                r[i] += ch * self.red[h][i]; // < 2^36 + 3 * 2^34
             }
         }
         [self.rd(r[0]), self.rd(r[1]), self.rd(r[2]), self.rd(r[3])]
@@ -534,10 +534,156 @@ fn split(n: u64, out: &mut Vec<u64>) {
     split(d, out);
     split(n / d, out);
 }
-/// Same output as curve::factor (ascending primes with exponents).
+// ---- u128 factoring for 2^64 <= n < 2^78 (group orders for p >= 2^16) ----------
+//
+// Bound for the u128 path: n < 2^78. Then every residue is < 2^78, `mulmod128`
+// shifts a residue by 32 bits (< 2^110) and adds a residue times a 32-bit limb
+// (< 2^110), so nothing overflows u128; and the twelve prime bases 2..37 make
+// Miller-Rabin deterministic below 3.18 * 10^23 > 2^78 (Sorenson-Webster, psi_12).
+// Group orders for p < 2^17 are below p^4 + 2 p^2 + 1 < 2^68.
+
+/// Largest n (exclusive) for the u128 factoring path.
+pub const FACTOR128_MAX: u128 = 1u128 << 78;
+
+/// a b mod n for n < 2^78 and a, b < n (b in three 32-bit limbs, Horner).
+fn mulmod128(a: u128, b: u128, n: u128) -> u128 {
+    debug_assert!(n < FACTOR128_MAX && a < n && b < n);
+    let mut r = 0u128;
+    for sh in [64u32, 32, 0] {
+        r = (r << 32) % n;
+        r = (r + a * ((b >> sh) & 0xFFFF_FFFF)) % n;
+    }
+    r
+}
+fn powmod128(mut a: u128, mut e: u128, n: u128) -> u128 {
+    let mut r = 1 % n;
+    a %= n;
+    while e > 0 {
+        if e & 1 == 1 {
+            r = mulmod128(r, a, n);
+        }
+        a = mulmod128(a, a, n);
+        e >>= 1;
+    }
+    r
+}
+/// Deterministic Miller-Rabin for n < 2^78 (the u64 test below 2^64).
+pub fn is_prime_u128(n: u128) -> bool {
+    assert!(n < FACTOR128_MAX);
+    if n < (1u128 << 64) {
+        return is_prime_u64(n as u64);
+    }
+    for &sp in &[2u128, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
+        if n % sp == 0 {
+            return false;
+        }
+    }
+    let s = (n - 1).trailing_zeros();
+    let d = (n - 1) >> s;
+    'outer: for &a in &[2u128, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
+        let mut x = powmod128(a, d, n);
+        if x == 1 || x == n - 1 {
+            continue;
+        }
+        for _ in 1..s {
+            x = mulmod128(x, x, n);
+            if x == n - 1 {
+                continue 'outer;
+            }
+        }
+        return false;
+    }
+    true
+}
+fn gcd128(mut a: u128, mut b: u128) -> u128 {
+    while b != 0 {
+        let t = a % b;
+        a = b;
+        b = t;
+    }
+    a
+}
+/// A non-trivial factor of composite odd n, 2^64 <= n < 2^78 (Pollard-Brent rho).
+fn rho_factor128(n: u128) -> u128 {
+    let mut c = 1u128;
+    loop {
+        let f = |x: u128| (mulmod128(x, x, n) + c) % n;
+        let (mut x, mut y, mut g, mut r, mut q) = (2u128, 2u128, 1u128, 1u64, 1u128);
+        let mut ys = 2u128;
+        let mm = 128u64;
+        while g == 1 {
+            x = y;
+            for _ in 0..r {
+                y = f(y);
+            }
+            let mut k = 0;
+            while k < r && g == 1 {
+                ys = y;
+                for _ in 0..mm.min(r - k) {
+                    y = f(y);
+                    q = mulmod128(q, x.abs_diff(y), n);
+                }
+                g = gcd128(q, n);
+                k += mm;
+            }
+            r *= 2;
+        }
+        if g == n {
+            loop {
+                ys = f(ys);
+                g = gcd128(x.abs_diff(ys), n);
+                if g > 1 {
+                    break;
+                }
+            }
+        }
+        if g != n {
+            return g;
+        }
+        c += 1;
+    }
+}
+fn split128(n: u128, out: &mut Vec<u128>) {
+    if n < (1u128 << 64) {
+        let mut v = Vec::new();
+        split(n as u64, &mut v);
+        out.extend(v.into_iter().map(|x| x as u128));
+        return;
+    }
+    if is_prime_u128(n) {
+        out.push(n);
+        return;
+    }
+    let d = rho_factor128(n);
+    split128(d, out);
+    split128(n / d, out);
+}
+
+/// Same output as curve::factor (ascending primes with exponents). n < 2^64: the
+/// u64 path (unchanged); 2^64 <= n < 2^78: the u128 path; larger n: trial division.
 pub fn factor_fast(n: u128) -> Vec<(u128, u32)> {
-    if n >= (1u128 << 64) {
+    if n >= FACTOR128_MAX {
         return crate::curve::factor(n);
+    }
+    if n >= (1u128 << 64) {
+        let mut n = n;
+        let mut ps: Vec<u128> = Vec::new();
+        for d in [2u128, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
+            while n % d == 0 {
+                ps.push(d);
+                n /= d;
+            }
+        }
+        split128(n, &mut ps);
+        ps.sort();
+        let mut out: Vec<(u128, u32)> = Vec::new();
+        for x in ps {
+            match out.last_mut() {
+                Some((q, e)) if *q == x => *e += 1,
+                _ => out.push((x, 1)),
+            }
+        }
+        return out;
     }
     let mut n = n as u64;
     let mut ps: Vec<u64> = Vec::new();
@@ -611,7 +757,7 @@ mod tests {
     #[test]
     fn fk_matches_k4() {
         let mut rng = Rng(7);
-        for &p in &[17u64, 101, 16001, 32003, 32771, 49999, 65521] {
+        for &p in &[17u64, 101, 16001, 32003, 32771, 49999, 65521, 65537, 115001, 131071] {
             let k = loop {
                 let m = vec![rng.below(p), rng.below(p), rng.below(p), rng.below(p), 1];
                 if crate::poly::is_irreducible_quartic(&m, p) {
@@ -756,9 +902,144 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn setup_rejects_p_65537() {
+    fn setup_rejects_p_131101() {
+        // the smallest prime above 2^17
         let mut rng = Rng(1);
-        Setup::new_with(65537, 1, &mut rng, true);
+        Setup::new_with(131101, 1, &mut rng, true);
+    }
+
+    /// 2^64 <= n < 2^78 (group orders for p >= 2^16): the u128 path equals trial
+    /// division where trial division is affordable (second-largest prime factor
+    /// and the square root of the largest below ~2^25), and equals the known
+    /// factorization of products of large primes (each prime certified by the u64
+    /// Miller-Rabin of the old path) where it is not. Boundaries 2^64 - 1 .. 2^64 + 1
+    /// and the smallest prime above 2^64.
+    #[test]
+    fn factor_fast_u128_matches_trial_division_and_known_factors() {
+        let mut rng = Rng(0x78);
+        let next_prime = |lo: u64| -> u64 {
+            let mut x = lo | 1;
+            while !is_prime_u64(x) {
+                x += 2;
+            }
+            x
+        };
+        // affordable for curve::factor
+        let mut cheap: Vec<u128> = vec![(1u128 << 64) - 1, 1u128 << 64, (1u128 << 64) + 1, 1u128 << 77, 3u128.pow(48)];
+        for _ in 0..12 {
+            let a = next_prime((rng.next() >> 41) | (1 << 22)) as u128; // 2^22..2^23
+            let b = next_prime((rng.next() >> 41) | (1 << 22)) as u128;
+            let c = next_prime((rng.next() >> 39) | (1 << 24)) as u128; // 2^24..2^25: n in [2^68, 2^78)
+            let h = [1u128, 4, 12, 112, 128][rng.below(5) as usize];
+            let n = a * b * c * h;
+            assert!(n >= 1u128 << 64 && n < FACTOR128_MAX, "n={n}");
+            cheap.push(n);
+        }
+        for n in cheap {
+            assert!(n < FACTOR128_MAX);
+            assert_eq!(factor_fast(n), crate::curve::factor(n), "n={n}");
+        }
+        // products of large primes (trial division would take minutes)
+        for i in 0..40 {
+            let mut fs: Vec<u128> = match i % 4 {
+                // cofactor h * prime ~2^61 (the shape of a group order near p = 2^17)
+                0 => vec![[64u128, 112, 120, 126][rng.below(4) as usize], next_prime((rng.next() >> 3) | (1 << 60)) as u128],
+                // two ~2^33 primes and a ~2^5 cofactor (balanced split for rho)
+                1 => vec![next_prime((rng.next() >> 31) | (1 << 32)) as u128, next_prime((rng.next() >> 31) | (1 << 32)) as u128, 41],
+                // a prime square times a large prime
+                2 => {
+                    let a = next_prime((rng.next() >> 44) | (1 << 19)) as u128;
+                    vec![a, a, next_prime((rng.next() >> 31) | (1 << 32)) as u128, 6]
+                }
+                // three ~2^22 primes and 2^3
+                _ => vec![next_prime((rng.next() >> 42) | (1 << 21)) as u128, next_prime((rng.next() >> 42) | (1 << 21)) as u128, next_prime((rng.next() >> 42) | (1 << 21)) as u128, 2u128.pow(3)],
+            };
+            let n: u128 = fs.iter().product();
+            if n < (1u128 << 64) || n >= FACTOR128_MAX {
+                continue;
+            }
+            // expected list: the large primes as built, the small cofactors by trial division
+            let mut ps: Vec<u128> = Vec::new();
+            for f in fs.drain(..) {
+                if f < (1 << 40) {
+                    for (q, e) in crate::curve::factor(f) {
+                        ps.extend(std::iter::repeat(q).take(e as usize));
+                    }
+                } else {
+                    ps.push(f);
+                }
+            }
+            ps.sort();
+            let mut want: Vec<(u128, u32)> = Vec::new();
+            for x in ps {
+                match want.last_mut() {
+                    Some((q, e)) if *q == x => *e += 1,
+                    _ => want.push((x, 1)),
+                }
+            }
+            let got = factor_fast(n);
+            assert_eq!(got, want, "n={n}");
+            assert!(got.iter().all(|&(q, _)| is_prime_u128(q)));
+        }
+        // primality at the 2^64 boundary: 2^64 + 13 is the smallest prime above 2^64
+        assert!(is_prime_u128((1u128 << 64) + 13));
+        assert!((1..13).all(|d| !is_prime_u128((1u128 << 64) + d)));
+        assert_eq!(factor_fast((1u128 << 64) + 13), vec![((1u128 << 64) + 13, 1)]);
+        // mulmod128 on extreme residues: (n - 1)^2 = 1 and (n - 1)(n - 2) = 2 mod n for
+        // the largest n of the path; Fermat for the prime 2^64 + 13
+        let n = FACTOR128_MAX - 1;
+        assert_eq!(mulmod128(n - 1, n - 1, n), 1);
+        assert_eq!(mulmod128(n - 1, n - 2, n), 2);
+        let q = (1u128 << 64) + 13;
+        assert_eq!(powmod128(3, q - 1, q), 1);
+    }
+
+    /// p = 131071 (the largest prime below 2^17): Setup accepts it (fast setup), and
+    /// the instance is consistent as at 65521; r < 2^62 (the LA bound), so the
+    /// cofactor is at least p^4 / 2^62 > 64.
+    #[test]
+    fn setup_accepts_p_131071() {
+        let p = 131071u64;
+        let mut rng = Rng(1);
+        let s = Setup::new_with(p, 1, &mut rng, true);
+        let pp = p as u128;
+        assert!(s.order >= pp.pow(4) + 1 - 2 * pp * pp && s.order <= pp.pow(4) + 1 + 2 * pp * pp);
+        assert!(s.order >= 1u128 << 64, "the u128 factoring path is the one used");
+        assert!(is_prime_u64(s.r) && s.order % s.r as u128 == 0 && (s.order / s.r as u128) % s.r as u128 != 0);
+        assert!((s.r as u128) * 128 >= pp.pow(4) && s.r < (1u64 << 62));
+        assert!(s.order / s.r as u128 > 64 && s.order / s.r as u128 <= 128);
+        assert_eq!(factor_fast(s.order), crate::curve::factor(s.order / s.r as u128).into_iter().chain([(s.r as u128, 1)]).collect::<Vec<_>>());
+        let f = FK::from_k4(s.k());
+        assert_eq!(count_d(&f, &s.eta, &s.lams[0]), s.count_d());
+        assert_eq!(s.d_count, s.count_d());
+        let fs = FactorBase::build_slow(&s);
+        let ff = FactorBase::build_fast(&s);
+        assert_eq!((fs.xs, fs.w0, fs.xidx, fs.rows), (ff.xs, ff.w0, ff.xidx, ff.rows));
+        let c = s.curve();
+        let sq = |a: &E4| s.sqrt_k4(a);
+        let pt = crate::curve::random_point(&c, &sq, &mut rng);
+        assert!(c.mul(&pt, s.order).is_none());
+        let gen = c.mul(&pt, s.order / s.r as u128);
+        assert!(c.mul(&gen, s.r as u128).is_none());
+        // the fast BSGS replay at this size agrees with the order the setup found
+        let fk = FK::from_k4(s.k());
+        let s4 = Sqrt4::new(&fk, &s.l.nu);
+        let fc = FCurve { f: &fk, a2: s.a2, a4: s.a4, a6: s.a6 };
+        let pt2 = fc.random_point(&s4, &mut rng);
+        assert!(fc.mul(&pt2, s.order).is_none());
+    }
+
+    /// Setup at the first prime above 2^16, both setup paths: the same instance.
+    #[test]
+    fn setup_fast_identical_at_p_65537() {
+        let p = 65537u64;
+        let (mut r1, mut r2) = (Rng(3), Rng(3));
+        let a = Setup::new_with(p, 1, &mut r1, false);
+        let b = Setup::new_with(p, 1, &mut r2, true);
+        assert_eq!(r1.0, r2.0);
+        assert_eq!((a.order, a.r, a.d_count), (b.order, b.r, b.d_count));
+        assert_eq!((a.eta, a.lams, a.mu, a.a2, a.a4, a.a6, a.gamma), (b.eta, b.lams, b.mu, b.a2, b.a4, b.a6, b.gamma));
+        assert!(a.r < (1u64 << 62));
     }
 
     /// Setup::new fast vs default: same instance, same RNG state afterwards;

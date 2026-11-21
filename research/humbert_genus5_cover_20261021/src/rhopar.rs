@@ -12,13 +12,21 @@
 //! operation is counted.
 //!
 //! HUMBERT_RHO_SIMD (1|auto|avx512|avx2|portable): the batched walk step runs in
-//! a lane kernel, LANES walks at once in f64 lanes (exact for p < 2^16, AVX-512 /
+//! a lane kernel, LANES walks at once in f64 lanes (exact for p < 2^17, AVX-512 /
 //! AVX2+FMA by runtime detection, portable fallback). Same walk, same start
 //! sequence, same negation map and DP rule: with one thread it takes exactly the
 //! steps of the per-walk path. The batch is rounded up to a multiple of LANES.
 //! HUMBERT_RHO_CAP: total step cap (default 2e9). HUMBERT_RHO_PROF=1 (with SIMD):
-//! per-phase ns per step on stderr. rho_par needs p < 2^16 (16-bit packed keys);
-//! FASTMUL (Barrett) is exact there, so it always runs when requested.
+//! per-phase ns per step on stderr. rho_par needs p < 2^17; FASTMUL (Barrett) is
+//! exact there, so it always runs when requested.
+//!
+//! p < 2^17 (was 2^16). The walk hash, DP test, fruitless-cycle test and escape
+//! choice read `pk(x)` = x0 + x1 2^16 + x2 2^32 + x3 2^48 mod 2^64, which is the
+//! old injective 16-bit packing for p < 2^16 and a (non-injective) hash above it.
+//! Everything that needs the point itself uses the injective `fullkey` (32 bits per
+//! coefficient, u128): the DP table key and the stored y. The canonical sign of y
+//! compares the highest nonzero coefficient (the order pk induced for p < 2^16).
+//! So every q < 2^16 walk, DP and collision is unchanged.
 use crate::curve::{mulr, invr, Curve, Pt, Rng};
 use crate::field::{FieldOps, E4, K4};
 use std::collections::HashMap;
@@ -140,7 +148,7 @@ pub struct ParResult {
     pub degenerate: u64,
     pub steps_per_thread: Vec<u64>,
     pub seconds_per_thread: Vec<f64>,
-    /// fast (Barrett) scalar arithmetic actually ran (FASTMUL requested and p < 2^16)
+    /// fast (Barrett) scalar arithmetic actually ran (FASTMUL requested and p < 2^17)
     pub fast_used: bool,
     /// lane kernel that actually ran (None: per-walk arithmetic)
     pub simd_used: Option<Simd>,
@@ -148,9 +156,19 @@ pub struct ParResult {
     pub batch_used: usize,
 }
 
+/// Walk/DP hash input: x0 + x1 2^16 + x2 2^32 + x3 2^48 mod 2^64. For p < 2^16 the
+/// terms occupy disjoint bits, so this is the injective packing x0 | x1 << 16 | ...
+/// (unchanged); for 2^16 <= p < 2^17 it is a hash (bit 16 of x3 is dropped and
+/// neighbouring terms carry into each other). The lane kernel computes the same
+/// value as (x0 + x1 2^16) + ((x2 + x3 2^16) << 32), wrapping.
 #[inline]
 fn pk(x: &E4) -> u64 {
-    x[0] | (x[1] << 16) | (x[2] << 32) | (x[3] << 48)
+    x[0].wrapping_add(x[1] << 16).wrapping_add(x[2] << 32).wrapping_add(x[3] << 48)
+}
+/// Injective key of a field element (coefficients < 2^32): DP table key and stored y.
+#[inline]
+fn fullkey(x: &E4) -> u128 {
+    x[0] as u128 | (x[1] as u128) << 32 | (x[2] as u128) << 64 | (x[3] as u128) << 96
 }
 #[inline]
 fn mix(mut z: u64) -> u64 {
@@ -160,7 +178,7 @@ fn mix(mut z: u64) -> u64 {
 }
 
 /// K4 arithmetic with its own counters. `fast`: u64 products + Barrett reduction
-/// (valid for p < 2^16: every product sum stays below 2^36); otherwise the crate's K4::mul / K4::inv.
+/// (valid for p < 2^17: every product sum stays below 7 p^2 < 2^37); otherwise the crate's K4::mul / K4::inv.
 pub struct Ar<'a> {
     pub k: &'a K4,
     p: u64,
@@ -172,7 +190,7 @@ pub struct Ar<'a> {
 
 impl<'a> Ar<'a> {
     pub fn new(k: &'a K4, fast: bool) -> Ar<'a> {
-        let fast = fast && k.p < (1 << 16);
+        let fast = fast && k.p < (1 << 17);
         Ar { k, p: k.p, bm: u64::MAX / k.p, fast, muls: 0, invs: 0 }
     }
     #[inline(always)]
@@ -278,6 +296,18 @@ impl<'a> Ar<'a> {
 // t^4..t^6 terms folded in unreduced) uses the round-to-nearest magic constant,
 // leaving |remainder| < 0.62 p, fixed with one conditional add. The results are
 // the canonical representatives, i.e. bit-for-bit the elements K4::mul returns.
+//
+// 2^16 <= p < 2^17 (`Fk::wide`, kernels instantiated with W = true): folding
+// c4..c6 unreduced would reach (p-1)^2 (4 + 6 (p-1)) ~ 1.35e16 > 2^53 near 2^17
+// (exact only up to p ~ 114500). With W the largest high term c4 <= 3 (p-1)^2 is
+// reduced first, so a folded sum is at most 4 (p-1)^2 + (p-1)^2 + (2 + 1) (p-1)^3
+// = (p-1)^2 (5 + 3 (p-1)) < 6.76e15 < 2^53 (every partial sum and product too),
+// and `fred` is exact for 0 <= n < 2^53: n pinv < 2^37, so MAGIC + n pinv rounds
+// to an integer (ulp 1 in [2^52, 2^53)) within 1/2 + 2^-15 of n/p (pinv and, without
+// FMA, the product add 2^-16 each), so |n - q p| <= p (1/2 + 2^-15) < 0.62 p, and
+// q p <= n + 0.62 p < 2^53 and n - q p are exact. One extra
+// reduction per product (5 instead of 4); the p < 2^16 kernels (W = false) are
+// the unchanged code.
 // ---------------------------------------------------------------------------
 pub const LANES: usize = 8;
 /// salt of the distinguished-point hash (the same in `walker` and `walker_v`)
@@ -302,6 +332,8 @@ type VE = [V; 4];
 
 #[derive(Clone, Copy)]
 struct Fk {
+    /// 2^16 <= p < 2^17: the W = true kernels (c4 reduced before the fold)
+    wide: bool,
     p: f64,
     pinv: f64,
     /// t^4, t^5, t^6 reduced
@@ -311,14 +343,14 @@ struct Fk {
 
 impl Fk {
     fn new(k: &K4, a2: &E4) -> Fk {
-        assert!(k.p < (1 << 16), "lane kernel needs p < 2^16");
+        assert!(k.p < (1 << 17), "lane kernel needs p < 2^17");
         let mut red = [[0.0; 4]; 3];
         for h in 0..3 {
             for i in 0..4 {
                 red[h][i] = k.red[h][i] as f64;
             }
         }
-        Fk { p: k.p as f64, pinv: 1.0 / k.p as f64, red, a2: [a2[0] as f64, a2[1] as f64, a2[2] as f64, a2[3] as f64] }
+        Fk { wide: k.p >= (1 << 16), p: k.p as f64, pinv: 1.0 / k.p as f64, red, a2: [a2[0] as f64, a2[1] as f64, a2[2] as f64, a2[3] as f64] }
     }
 }
 
@@ -338,7 +370,7 @@ fn ma<const F: bool>(a: f64, b: f64, c: f64) -> f64 {
 
 #[inline(always)]
 fn fred<const F: bool>(n: f64, p: f64, pinv: f64) -> f64 {
-    // n integer, 0 <= n < 2^52: q = nearest(n/p) up to rounding, |n - q p| < 0.62 p
+    // n integer, 0 <= n < 2^53 (p < 2^17): q = nearest(n/p) up to rounding, |n - q p| < 0.62 p
     let q = ma::<F>(n, pinv, MAGIC) - MAGIC;
     let r = ma::<F>(-q, p, n);
     if r < 0.0 {
@@ -352,9 +384,17 @@ fn fred<const F: bool>(n: f64, p: f64, pinv: f64) -> f64 {
 fn fold<const F: bool>(c: [f64; 7], k: &Fk, i: usize) -> f64 {
     fred::<F>(ma::<F>(c[6], k.red[2][i], ma::<F>(c[5], k.red[1][i], ma::<F>(c[4], k.red[0][i], c[i]))), k.p, k.pinv)
 }
+/// the four output coefficients; W: reduce c4 first (2^16 <= p < 2^17)
+#[inline(always)]
+fn fold4<const F: bool, const W: bool>(mut c: [f64; 7], k: &Fk) -> [f64; 4] {
+    if W {
+        c[4] = fred::<F>(c[4], k.p, k.pinv);
+    }
+    [fold::<F>(c, k, 0), fold::<F>(c, k, 1), fold::<F>(c, k, 2), fold::<F>(c, k, 3)]
+}
 
 #[inline(always)]
-fn vmul<const F: bool>(a: &VE, b: &VE, k: &Fk) -> VE {
+fn vmul<const F: bool, const W: bool>(a: &VE, b: &VE, k: &Fk) -> VE {
     let mut o = [[0.0; LANES]; 4];
     for l in 0..LANES {
         let (a0, a1, a2, a3) = (a[0][l], a[1][l], a[2][l], a[3][l]);
@@ -368,22 +408,24 @@ fn vmul<const F: bool>(a: &VE, b: &VE, k: &Fk) -> VE {
             ma::<F>(a2, b3, a3 * b2),
             a3 * b3,
         ];
+        let f = fold4::<F, W>(c, k);
         for i in 0..4 {
-            o[i][l] = fold::<F>(c, k, i);
+            o[i][l] = f[i];
         }
     }
     o
 }
 
 #[inline(always)]
-fn vsq<const F: bool>(a: &VE, k: &Fk) -> VE {
+fn vsq<const F: bool, const W: bool>(a: &VE, k: &Fk) -> VE {
     let mut o = [[0.0; LANES]; 4];
     for l in 0..LANES {
         let (a0, a1, a2, a3) = (a[0][l], a[1][l], a[2][l], a[3][l]);
         let (d0, d1, d2) = (a0 + a0, a1 + a1, a2 + a2);
         let c = [a0 * a0, d0 * a1, ma::<F>(d0, a2, a1 * a1), ma::<F>(d0, a3, d1 * a2), ma::<F>(d1, a3, a2 * a2), d2 * a3, a3 * a3];
+        let f = fold4::<F, W>(c, k);
         for i in 0..4 {
-            o[i][l] = fold::<F>(c, k, i);
+            o[i][l] = f[i];
         }
     }
     o
@@ -416,7 +458,7 @@ fn vsubc(a: &VE, b: &[f64; 4], p: f64) -> VE {
 
 /// Forward pass: dx = tx - x (bad lanes -> 1, flagged), prefix products per lane.
 #[inline(always)]
-fn kfwd_body<const F: bool>(k: &Fk, xs: &[VE], tx: &[VE], dx: &mut [VE], pre: &mut [VE], bad: &mut [bool]) {
+fn kfwd_body<const F: bool, const W: bool>(k: &Fk, xs: &[VE], tx: &[VE], dx: &mut [VE], pre: &mut [VE], bad: &mut [bool]) {
     let ng = xs.len();
     for g in 0..ng {
         let mut d = vsub(&tx[g], &xs[g], k.p);
@@ -429,7 +471,7 @@ fn kfwd_body<const F: bool>(k: &Fk, xs: &[VE], tx: &[VE], dx: &mut [VE], pre: &m
             }
         }
         dx[g] = d;
-        pre[g] = if g == 0 { d } else { vmul::<F>(&pre[g - 1], &d, k) };
+        pre[g] = if g == 0 { d } else { vmul::<F, W>(&pre[g - 1], &d, k) };
     }
 }
 
@@ -441,30 +483,31 @@ fn kfwd_body<const F: bool>(k: &Fk, xs: &[VE], tx: &[VE], dx: &mut [VE], pre: &m
 /// its DP hash mix(pk(x) ^ DPSALT), computed in the lanes.
 #[allow(clippy::too_many_arguments)]
 #[inline(always)]
-fn kback_body<const F: bool>(k: &Fk, neg: bool, inv0: VE, xs: &mut [VE], ys: &mut [VE], tx: &[VE], ty: &[VE], dx: &[VE], pre: &[VE], out: &mut [LaneOut]) {
+fn kback_body<const F: bool, const W: bool>(k: &Fk, neg: bool, inv0: VE, xs: &mut [VE], ys: &mut [VE], tx: &[VE], ty: &[VE], dx: &[VE], pre: &[VE], out: &mut [LaneOut]) {
     let mut inv = inv0;
     let p = k.p;
     for g in (0..xs.len()).rev() {
         let ig = if g > 0 {
-            let v = vmul::<F>(&inv, &pre[g - 1], k);
-            inv = vmul::<F>(&inv, &dx[g], k);
+            let v = vmul::<F, W>(&inv, &pre[g - 1], k);
+            inv = vmul::<F, W>(&inv, &dx[g], k);
             v
         } else {
             inv
         };
         let (x1, y1) = (xs[g], ys[g]);
         let dy = vsub(&ty[g], &y1, p);
-        let lam = vmul::<F>(&dy, &ig, k);
-        let l2 = vsq::<F>(&lam, k);
+        let lam = vmul::<F, W>(&dy, &ig, k);
+        let l2 = vsq::<F, W>(&lam, k);
         let x3 = vsub(&vsub(&vsubc(&l2, &k.a2, p), &x1, p), &tx[g], p);
         let t = vsub(&x1, &x3, p);
-        let ly = vmul::<F>(&lam, &t, k);
+        let ly = vmul::<F, W>(&lam, &t, k);
         let y3 = vsub(&ly, &y1, p);
         xs[g] = x3;
         for l in 0..LANES {
             let lo = x3[0][l] + x3[1][l] * 65536.0;
             let hi = x3[2][l] + x3[3][l] * 65536.0;
-            let px = ((hi as u64) << 32) | lo as u64;
+            // = pk(x3): lo, hi < 2^34; for p < 2^16 lo < 2^32 and this is the old `|`
+            let px = ((hi as u64) << 32).wrapping_add(lo as u64);
             out[g].pkx[l] = px;
             out[g].hj[l] = mix(px);
             out[g].hd[l] = mix(px ^ DPSALT);
@@ -499,78 +542,102 @@ fn kback_body<const F: bool>(k: &Fk, neg: bool, inv0: VE, xs: &mut [VE], ys: &mu
 
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "avx512f,avx512dq,avx512vl,avx2,fma")]
-unsafe fn kfwd_512(k: &Fk, xs: &[VE], tx: &[VE], dx: &mut [VE], pre: &mut [VE], bad: &mut [bool]) {
-    kfwd_body::<true>(k, xs, tx, dx, pre, bad)
+unsafe fn kfwd_512<const W: bool>(k: &Fk, xs: &[VE], tx: &[VE], dx: &mut [VE], pre: &mut [VE], bad: &mut [bool]) {
+    kfwd_body::<true, W>(k, xs, tx, dx, pre, bad)
 }
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "avx2,fma")]
-unsafe fn kfwd_256(k: &Fk, xs: &[VE], tx: &[VE], dx: &mut [VE], pre: &mut [VE], bad: &mut [bool]) {
-    kfwd_body::<true>(k, xs, tx, dx, pre, bad)
+unsafe fn kfwd_256<const W: bool>(k: &Fk, xs: &[VE], tx: &[VE], dx: &mut [VE], pre: &mut [VE], bad: &mut [bool]) {
+    kfwd_body::<true, W>(k, xs, tx, dx, pre, bad)
 }
 #[cfg(target_arch = "x86_64")]
 #[allow(clippy::too_many_arguments)]
 #[target_feature(enable = "avx512f,avx512dq,avx512vl,avx2,fma")]
-unsafe fn kback_512(k: &Fk, neg: bool, inv0: VE, xs: &mut [VE], ys: &mut [VE], tx: &[VE], ty: &[VE], dx: &[VE], pre: &[VE], out: &mut [LaneOut]) {
-    kback_body::<true>(k, neg, inv0, xs, ys, tx, ty, dx, pre, out)
+unsafe fn kback_512<const W: bool>(k: &Fk, neg: bool, inv0: VE, xs: &mut [VE], ys: &mut [VE], tx: &[VE], ty: &[VE], dx: &[VE], pre: &[VE], out: &mut [LaneOut]) {
+    kback_body::<true, W>(k, neg, inv0, xs, ys, tx, ty, dx, pre, out)
 }
 #[cfg(target_arch = "x86_64")]
 #[allow(clippy::too_many_arguments)]
 #[target_feature(enable = "avx2,fma")]
-unsafe fn kback_256(k: &Fk, neg: bool, inv0: VE, xs: &mut [VE], ys: &mut [VE], tx: &[VE], ty: &[VE], dx: &[VE], pre: &[VE], out: &mut [LaneOut]) {
-    kback_body::<true>(k, neg, inv0, xs, ys, tx, ty, dx, pre, out)
+unsafe fn kback_256<const W: bool>(k: &Fk, neg: bool, inv0: VE, xs: &mut [VE], ys: &mut [VE], tx: &[VE], ty: &[VE], dx: &[VE], pre: &[VE], out: &mut [LaneOut]) {
+    kback_body::<true, W>(k, neg, inv0, xs, ys, tx, ty, dx, pre, out)
 }
 
-fn kfwd(s: Simd, k: &Fk, xs: &[VE], tx: &[VE], dx: &mut [VE], pre: &mut [VE], bad: &mut [bool]) {
+fn kfwd_w<const W: bool>(s: Simd, k: &Fk, xs: &[VE], tx: &[VE], dx: &mut [VE], pre: &mut [VE], bad: &mut [bool]) {
     match s {
         // SAFETY: `s` comes from Simd::resolve, which checked the CPU features
         #[cfg(target_arch = "x86_64")]
-        Simd::Avx512 => unsafe { kfwd_512(k, xs, tx, dx, pre, bad) },
+        Simd::Avx512 => unsafe { kfwd_512::<W>(k, xs, tx, dx, pre, bad) },
         #[cfg(target_arch = "x86_64")]
-        Simd::Avx2 => unsafe { kfwd_256(k, xs, tx, dx, pre, bad) },
-        _ => kfwd_body::<false>(k, xs, tx, dx, pre, bad),
+        Simd::Avx2 => unsafe { kfwd_256::<W>(k, xs, tx, dx, pre, bad) },
+        _ => kfwd_body::<false, W>(k, xs, tx, dx, pre, bad),
+    }
+}
+fn kfwd(s: Simd, k: &Fk, xs: &[VE], tx: &[VE], dx: &mut [VE], pre: &mut [VE], bad: &mut [bool]) {
+    if k.wide {
+        kfwd_w::<true>(s, k, xs, tx, dx, pre, bad)
+    } else {
+        kfwd_w::<false>(s, k, xs, tx, dx, pre, bad)
+    }
+}
+#[allow(clippy::too_many_arguments)]
+fn kback_w<const W: bool>(s: Simd, k: &Fk, neg: bool, inv0: VE, xs: &mut [VE], ys: &mut [VE], tx: &[VE], ty: &[VE], dx: &[VE], pre: &[VE], out: &mut [LaneOut]) {
+    match s {
+        // SAFETY: as in kfwd
+        #[cfg(target_arch = "x86_64")]
+        Simd::Avx512 => unsafe { kback_512::<W>(k, neg, inv0, xs, ys, tx, ty, dx, pre, out) },
+        #[cfg(target_arch = "x86_64")]
+        Simd::Avx2 => unsafe { kback_256::<W>(k, neg, inv0, xs, ys, tx, ty, dx, pre, out) },
+        _ => kback_body::<false, W>(k, neg, inv0, xs, ys, tx, ty, dx, pre, out),
     }
 }
 #[allow(clippy::too_many_arguments)]
 fn kback(s: Simd, k: &Fk, neg: bool, inv0: VE, xs: &mut [VE], ys: &mut [VE], tx: &[VE], ty: &[VE], dx: &[VE], pre: &[VE], out: &mut [LaneOut]) {
-    match s {
-        // SAFETY: as in kfwd
-        #[cfg(target_arch = "x86_64")]
-        Simd::Avx512 => unsafe { kback_512(k, neg, inv0, xs, ys, tx, ty, dx, pre, out) },
-        #[cfg(target_arch = "x86_64")]
-        Simd::Avx2 => unsafe { kback_256(k, neg, inv0, xs, ys, tx, ty, dx, pre, out) },
-        _ => kback_body::<false>(k, neg, inv0, xs, ys, tx, ty, dx, pre, out),
+    if k.wide {
+        kback_w::<true>(s, k, neg, inv0, xs, ys, tx, ty, dx, pre, out)
+    } else {
+        kback_w::<false>(s, k, neg, inv0, xs, ys, tx, ty, dx, pre, out)
     }
 }
 
 #[cfg(all(test, target_arch = "x86_64"))]
 #[target_feature(enable = "avx512f,avx512dq,avx512vl,avx2,fma")]
-unsafe fn tmul_512(a: &VE, b: &VE, k: &Fk, sq: bool) -> VE {
+unsafe fn tmul_512<const W: bool>(a: &VE, b: &VE, k: &Fk, sq: bool) -> VE {
     if sq {
-        vsq::<true>(a, k)
+        vsq::<true, W>(a, k)
     } else {
-        vmul::<true>(a, b, k)
+        vmul::<true, W>(a, b, k)
     }
 }
 #[cfg(all(test, target_arch = "x86_64"))]
 #[target_feature(enable = "avx2,fma")]
-unsafe fn tmul_256(a: &VE, b: &VE, k: &Fk, sq: bool) -> VE {
+unsafe fn tmul_256<const W: bool>(a: &VE, b: &VE, k: &Fk, sq: bool) -> VE {
     if sq {
-        vsq::<true>(a, k)
+        vsq::<true, W>(a, k)
     } else {
-        vmul::<true>(a, b, k)
+        vmul::<true, W>(a, b, k)
     }
 }
-/// test hook: one lane product (or squaring of a) with the kernel `s`
+/// test hook: one lane product (or squaring of a) with the kernel `s` and the
+/// fold variant W (`tmul` picks the one the walk uses for `k`)
 #[cfg(test)]
-fn tmul(s: Simd, a: &VE, b: &VE, k: &Fk, sq: bool) -> VE {
+fn tmul_w<const W: bool>(s: Simd, a: &VE, b: &VE, k: &Fk, sq: bool) -> VE {
     match s {
         // SAFETY: `s` comes from Simd::resolve
         #[cfg(target_arch = "x86_64")]
-        Simd::Avx512 => unsafe { tmul_512(a, b, k, sq) },
+        Simd::Avx512 => unsafe { tmul_512::<W>(a, b, k, sq) },
         #[cfg(target_arch = "x86_64")]
-        Simd::Avx2 => unsafe { tmul_256(a, b, k, sq) },
-        _ if sq => vsq::<false>(a, k),
-        _ => vmul::<false>(a, b, k),
+        Simd::Avx2 => unsafe { tmul_256::<W>(a, b, k, sq) },
+        _ if sq => vsq::<false, W>(a, k),
+        _ => vmul::<false, W>(a, b, k),
+    }
+}
+#[cfg(test)]
+fn tmul(s: Simd, a: &VE, b: &VE, k: &Fk, sq: bool) -> VE {
+    if k.wide {
+        tmul_w::<true>(s, a, b, k, sq)
+    } else {
+        tmul_w::<false>(s, a, b, k, sq)
     }
 }
 
@@ -645,12 +712,22 @@ impl<'a, 'b> G<'a, 'b> {
     }
 }
 
-/// canonical representative of {P, -P}: the y with the smaller packed value.
+/// canonical representative of {P, -P}: the y that is smaller in the order of
+/// (y3, y2, y1, y0), i.e. -y when the highest nonzero coefficient c has p - c < c
+/// (the lane kernel's rule; for p < 2^16 this is the old "smaller pk(y)").
 #[inline(always)]
 fn canon(ar: &Ar, y: &E4) -> (E4, bool) {
-    let ny = ar.neg(y);
-    if pk(&ny) < pk(y) {
-        (ny, true)
+    let top = if y[3] != 0 {
+        y[3]
+    } else if y[2] != 0 {
+        y[2]
+    } else if y[1] != 0 {
+        y[1]
+    } else {
+        y[0]
+    };
+    if top != 0 && ar.p - top < top {
+        (ar.neg(y), true)
     } else {
         (*y, false)
     }
@@ -658,7 +735,8 @@ fn canon(ar: &Ar, y: &E4) -> (E4, bool) {
 
 struct Shared {
     done: AtomicBool,
-    table: Mutex<HashMap<u64, (u64, u64, u64)>>,
+    /// DP table: fullkey(x) -> (a, b, fullkey(y)) (injective keys for every p < 2^17)
+    table: Mutex<HashMap<u128, (u64, u64, u128)>>,
     result: Mutex<Option<u64>>,
 }
 
@@ -692,8 +770,9 @@ fn dp_bits_auto(r: u64, w: usize, neg: bool) -> u32 {
 /// Parallel DP rho for x with q = x * gen, gen of prime order r.
 pub fn rho_par(c: &Curve<K4>, gen: &Pt<E4>, q: &Pt<E4>, r: u64, rng: &mut Rng, cfg: &ParCfg) -> ParResult {
     let t0 = std::time::Instant::now();
-    // pk() packs the four coefficients in 16 bits each (hash, DP key, canonical sign)
-    assert!(c.f.p < (1 << 16), "rho_par needs p < 2^16");
+    // pk() (walk and DP hash) is injective below 2^16 and a hash below 2^17; the DP
+    // table uses the injective fullkey(); the f64 lane kernel is exact below 2^17
+    assert!(c.f.p < (1 << 17), "rho_par needs p < 2^17");
     // HUMBERT_RHO_SIMD: resolve the kernel and round the batch up to whole lane groups
     let simd_used = cfg.simd.map(|s| s.resolve());
     let mut cfg_eff = cfg.clone();
@@ -1071,8 +1150,8 @@ fn walker(
             let h = mix(pk(&wx[i]) ^ 0xD15C_0DE5_A5A5_0F0F);
             if (h >> 20) & dp_mask == 0 {
                 st.dps += 1;
-                let key = pk(&wx[i]);
-                let (a1, b1, y1p) = (wa[i], wb[i], pk(&wy[i]));
+                let key = fullkey(&wx[i]);
+                let (a1, b1, y1p) = (wa[i], wb[i], fullkey(&wy[i]));
                 let prev = {
                     let mut t = sh.table.lock().unwrap();
                     match t.get(&key) {
@@ -1462,8 +1541,8 @@ fn walker_v(
             // ---- distinguished point? (same rule as `walker`) ----
             if (hdp >> 20) & dp_mask == 0 {
                 st.dps += 1;
-                let key = hx[i];
-                let (a1, b1, y1p) = (wa[i], wb[i], pk(&vget(&ys, i)));
+                let key = fullkey(&vget(&xs, i));
+                let (a1, b1, y1p) = (wa[i], wb[i], fullkey(&vget(&ys, i)));
                 let prev = {
                     let mut t = sh.table.lock().unwrap();
                     match t.get(&key) {
@@ -1719,7 +1798,7 @@ mod tests {
         }
     }
 
-    /// p = 65521 (Setup is limited to p < 2^15): a random curve through a chosen
+    /// p = 65521 (a random curve, no Setup needed): a random curve through a chosen
     /// point; capped single-thread walks of the original and the lane walker agree
     /// in every counter (the group order is unknown, so nothing is solved).
     #[test]
@@ -1746,6 +1825,166 @@ mod tests {
                 let key = |r: &ParResult| (r.steps, r.dps, r.useless_collisions, r.fruitless_cycles, r.fruitless_cycle_steps, r.abandoned_walks, r.degenerate, r.walk_inversions, r.extra_group_ops);
                 assert_eq!(key(&r1), key(&r0), "neg={neg} {s:?}");
                 assert!(r1.steps >= 200_000);
+            }
+        }
+    }
+
+    /// 2^16 <= p < 2^17: FASTMUL and every lane kernel (now the W = true fold) equal
+    /// K4::mul / K4::inv on random and edge-valued elements, up to p = 131071.
+    #[test]
+    fn lane_and_barrett_arith_match_k4_up_to_2_17() {
+        for &p in &[65537u64, 81001, 98009, 114593, 115001, 131063, 131071] {
+            assert!(crate::setupfast::is_prime_u64(p), "p={p}");
+            let mut rng = Rng(p ^ 0x17);
+            for _rep in 0..3 {
+                let k = random_k4(p, &mut rng);
+                let mut ar = Ar::new(&k, true);
+                assert!(ar.fast, "p={p}");
+                let edge = [0, 1, 2, p / 2, p / 2 + 1, p - 2, p - 1];
+                let el = |rng: &mut Rng| -> E4 {
+                    std::array::from_fn(|_| if rng.below(3) == 0 { edge[rng.below(edge.len() as u64) as usize] } else { rng.below(p) })
+                };
+                let fk = Fk::new(&k, &el(&mut rng));
+                assert!(fk.wide, "p={p}");
+                for it in 0..300 {
+                    let a: [E4; LANES] = std::array::from_fn(|l| if it == 0 && l == 0 { [p - 1; 4] } else { el(&mut rng) });
+                    let b: [E4; LANES] = std::array::from_fn(|l| if it == 0 && l == 0 { [p - 1; 4] } else { el(&mut rng) });
+                    let mut va = vec![[[0.0; LANES]; 4]];
+                    let mut vb = vec![[[0.0; LANES]; 4]];
+                    for l in 0..LANES {
+                        vset(&mut va, l, &a[l]);
+                        vset(&mut vb, l, &b[l]);
+                        assert_eq!(ar.mul(&a[l], &b[l]), k.mul(&a[l], &b[l]), "p={p}");
+                        if a[l] != [0; 4] {
+                            assert_eq!(ar.inv(&a[l]), k.inv(&a[l]), "p={p}");
+                        }
+                    }
+                    for s in kernels() {
+                        let pr = vec![tmul(s, &va[0], &vb[0], &fk, false)];
+                        let sq = vec![tmul(s, &va[0], &vb[0], &fk, true)];
+                        for l in 0..LANES {
+                            assert_eq!(vget(&pr, l), k.mul(&a[l], &b[l]), "p={p} {s:?}");
+                            assert_eq!(vget(&sq, l), k.mul(&a[l], &a[l]), "p={p} {s:?} sq");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// The W = true fold at the extreme: p = 131071 with every reduction-table
+    /// entry and every input p - 1 (and random inputs near p - 1) against an exact
+    /// u128 reference, on every kernel. Also the arithmetic of the bound: the
+    /// unreduced fold (p-1)^2 (4 + 6 (p-1)) exceeds 2^53 there, the W fold
+    /// (p-1)^2 (5 + 3 (p-1)) does not, and the unreduced one is fine below 2^16.
+    #[test]
+    fn lane_fold_exact_on_extreme_inputs_near_2_17() {
+        let two53 = 1u128 << 53;
+        let w = |p: u128| (p - 1) * (p - 1) * (4 + 6 * (p - 1));
+        let wr = |p: u128| (p - 1) * (p - 1) * (5 + 3 * (p - 1));
+        assert!(w(65521) < 1u128 << 51 && w(131071) > two53 && wr(131071) < two53);
+        for &p in &[65537u64, 115001, 131071] {
+            let pm = p - 1;
+            let red = [[pm; 4]; 3];
+            let fk = Fk { wide: true, p: p as f64, pinv: 1.0 / p as f64, red: red.map(|r| r.map(|v| v as f64)), a2: [0.0; 4] };
+            let reference = |a: &E4, b: &E4| -> E4 {
+                let mut c = [0u128; 7];
+                for i in 0..4 {
+                    for j in 0..4 {
+                        c[i + j] += a[i] as u128 * b[j] as u128;
+                    }
+                }
+                std::array::from_fn(|i| ((c[i] + c[4] * red[0][i] as u128 + c[5] * red[1][i] as u128 + c[6] * red[2][i] as u128) % p as u128) as u64)
+            };
+            let mut rng = Rng(p);
+            let mut narrow_wrong = 0;
+            for it in 0..400 {
+                let a: [E4; LANES] = std::array::from_fn(|l| if it == 0 && l == 0 { [pm; 4] } else { std::array::from_fn(|_| p - 1 - rng.below(64)) });
+                let b: [E4; LANES] = std::array::from_fn(|l| if it == 0 && l == 0 { [pm; 4] } else { std::array::from_fn(|_| if rng.below(2) == 0 { p - 1 - rng.below(64) } else { rng.below(p) }) });
+                let mut va = vec![[[0.0; LANES]; 4]];
+                let mut vb = vec![[[0.0; LANES]; 4]];
+                for l in 0..LANES {
+                    vset(&mut va, l, &a[l]);
+                    vset(&mut vb, l, &b[l]);
+                }
+                for s in kernels() {
+                    let pr = vec![tmul_w::<true>(s, &va[0], &vb[0], &fk, false)];
+                    let sq = vec![tmul_w::<true>(s, &va[0], &vb[0], &fk, true)];
+                    let nr = vec![tmul_w::<false>(s, &va[0], &vb[0], &fk, false)];
+                    for l in 0..LANES {
+                        assert_eq!(vget(&pr, l), reference(&a[l], &b[l]), "p={p} {s:?}");
+                        assert_eq!(vget(&sq, l), reference(&a[l], &a[l]), "p={p} {s:?} sq");
+                        narrow_wrong += (vget(&nr, l) != reference(&a[l], &b[l])) as u32;
+                    }
+                }
+            }
+            // the old (unreduced) fold is not exact there: W is needed
+            if p == 131071 {
+                assert!(narrow_wrong > 0, "p={p}: the unreduced fold was exact on every input");
+            }
+        }
+    }
+
+    /// pk is the old 16-bit packing and canon the old "smaller pk(y)" rule for every
+    /// coefficient < 2^16; above 2^16 canon picks the smaller of y, -y in the order
+    /// (y3, y2, y1, y0), and fullkey is injective.
+    #[test]
+    fn pk_canon_fullkey_contract() {
+        let mut rng = Rng(0xC0DE);
+        for &p in &[17u64, 32003, 65521, 65537, 131071] {
+            let k = random_k4(p, &mut rng);
+            let ar = Ar::new(&k, true);
+            for _ in 0..20000 {
+                let y: E4 = std::array::from_fn(|_| if rng.below(4) == 0 { 0 } else { rng.below(p) });
+                let (c, fl) = canon(&ar, &y);
+                let ny = ar.neg(&y);
+                assert_eq!(c, if fl { ny } else { y });
+                let rev = |v: &E4| [v[3], v[2], v[1], v[0]];
+                assert_eq!(fl, rev(&ny) < rev(&y), "p={p} y={y:?}");
+                assert_eq!(fullkey(&y), y[0] as u128 + ((y[1] as u128) << 32) + ((y[2] as u128) << 64) + ((y[3] as u128) << 96));
+                if p < (1 << 16) {
+                    let old = y[0] | (y[1] << 16) | (y[2] << 32) | (y[3] << 48);
+                    assert_eq!(pk(&y), old);
+                    assert_eq!(fl, pk(&ny) < pk(&y));
+                }
+                // the lane kernel's packing formula
+                let lo = y[0] as f64 + y[1] as f64 * 65536.0;
+                let hi = y[2] as f64 + y[3] as f64 * 65536.0;
+                assert_eq!(((hi as u64) << 32).wrapping_add(lo as u64), pk(&y));
+            }
+        }
+    }
+
+    /// p = 115001 and 131071 (both use the W fold; 115001 is above the ~114500 limit
+    /// of the unreduced fold): capped single-thread walks of the original and the lane
+    /// walker agree in every counter, with and without the negation map.
+    #[test]
+    fn simd_walk_identical_near_2_17_capped() {
+        for &p in &[115001u64, 131071] {
+            let mut rng = Rng(77);
+            let k = random_k4(p, &mut rng);
+            let el = |rng: &mut Rng| -> E4 { std::array::from_fn(|_| rng.below(p)) };
+            let (a2, a4, x0, y0) = (el(&mut rng), el(&mut rng), el(&mut rng), el(&mut rng));
+            let x2 = k.mul(&x0, &x0);
+            let rhs = k.add(&k.add(&k.mul(&x2, &x0), &k.mul(&a2, &x2)), &k.mul(&a4, &x0));
+            let a6 = k.sub(&k.mul(&y0, &y0), &rhs);
+            let c = Curve { f: &k, a2, a4, a6 };
+            let gen = Some((x0, y0));
+            let q = c.mul(&gen, 987_654_321);
+            let r = (1u64 << 61) - 1; // bookkeeping modulus only (prime, as large as a real r)
+            for neg in [false, true] {
+                let base = ParCfg { cap: 200_000, dp_bits: Some(6), ..cfg(1, 64, neg, true) };
+                let r0 = rho_par(&c, &gen, &q, r, &mut Rng(5), &base);
+                assert!(r0.fast_used);
+                for s in kernels() {
+                    let r1 = rho_par(&c, &gen, &q, r, &mut Rng(5), &ParCfg { simd: Some(s), ..base.clone() });
+                    let key = |r: &ParResult| (r.steps, r.dps, r.useless_collisions, r.fruitless_cycles, r.fruitless_cycle_steps, r.abandoned_walks, r.degenerate, r.walk_inversions, r.extra_group_ops);
+                    assert_eq!(key(&r1), key(&r0), "p={p} neg={neg} {s:?}");
+                    assert!(r1.steps >= 200_000);
+                }
+                if neg {
+                    assert!(r0.fruitless_cycles > 0, "p={p}: the negation-map cycle path is exercised");
+                }
             }
         }
     }

@@ -70,10 +70,13 @@ impl Setup {
     /// with src/setupfast.rs (fast group-order replay, fast factoring, count_d
     /// only for candidates that pass the other tests).
     pub fn new_with(p: u64, twist: i32, rng: &mut Rng, fast: bool) -> Setup {
-        // p < 2^16 (was 2^15): every F_p product here is u128 (field.rs) or a short
-        // u64 sum of products of values < p (relfast.rs, setupfast.rs: < 12 p^3 < 2^52);
-        // p^4 < 2^64 keeps factor_fast on its u64 path, and rhopar packs x in 16 bits.
-        assert!(p >= 17 && p < (1 << 16));
+        // p < 2^17 (was 2^16, before that 2^15): every F_p product here is u128 (field.rs)
+        // or a short u64 sum of products of values < p (relfast.rs: < 12 p^3 < 2^55;
+        // setupfast.rs: < 7 p^2 < 2^37). For p >= 2^16, p^4 >= 2^64: factor_fast takes its
+        // u128 path (n < 2^78), rhopar hashes x with a wrapping 16-bit-shift sum and keys
+        // its DP table on the full x, and r < 2^62 (below) is a real filter (cofactor
+        // >= p^4 / 2^62, i.e. > 64 near 2^17) instead of always true.
+        assert!(p >= 17 && p < (1 << 17));
         let prof = setup_prof();
         let mut cand = 0u32;
         loop {

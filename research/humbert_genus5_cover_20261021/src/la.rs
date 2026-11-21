@@ -1,5 +1,10 @@
 //! Dense Gaussian elimination mod a prime r < 2^62, skipping zero entries
 //! (relation rows start with at most 9 non-zeros).
+//!
+//! r < 2^62 is enforced where instances are made (cover::Setup rejects a candidate
+//! with r >= 2^62; for q < 2^16 that never fires since 4 | #E, for 2^16 <= q < 2^17
+//! it is a cofactor floor #E / r >= q^4 / 2^62). The plain paths here need only
+//! r < 2^63 (sums of two residues in u64); the Montgomery path needs r < 2^62.
 use crate::curve::{invr, mulr};
 
 pub struct Solve {
@@ -1260,6 +1265,46 @@ mod tests {
             let c = kernel_lanczos_mt_with(&rows, 30, r, 7, 4, Some(f));
             assert_eq!((&a.x, a.mulmods, a.kernel_dim), (&b.x, b.mulmods, b.kernel_dim));
             assert_eq!((&a.x, a.mulmods, a.kernel_dim), (&c.x, c.mulmods, c.kernel_dim));
+        }
+    }
+
+    /// q < 2^17: the setup keeps the pre-existing rule r < 2^62 (Mont needs it; r is a
+    /// u64 everywhere). For q < 2^16 it never fires (4 | #E: the cubic splits over
+    /// K4, so r <= #E / 4 < 2^62); above 2^16 it is a cofactor floor
+    /// h >= q^4 / 2^62 (64.0 at q = 131071). Real instances near the guard,
+    /// including seeds whose earlier candidates the guard rejected (81001/3,
+    /// 115001/4, 131071/5, r = 2^62 - 1.4e14), all get the Montgomery context, and
+    /// the FASTMOD Krylov solvers equal the plain ones bit for bit mod their r.
+    #[test]
+    fn la_guard_and_fastmod_hold_for_instances_up_to_2_17() {
+        let cases: [(u64, u64, u64); 4] = [
+            (81001, 3, 827862438335945137),
+            (115001, 4, 2572157479453334777),
+            (131071, 1, 2635168732917757219),
+            (131071, 5, 4611545282766078037),
+        ];
+        for &(q, seed, want_r) in &cases {
+            let tw = if seed % 2 == 1 { 1 } else { -1 };
+            let mut rng = Rng(seed);
+            let s = crate::cover::Setup::new_with(q, tw, &mut rng, true);
+            assert_eq!(s.r, want_r, "q={q} seed={seed}: instance selection changed");
+            let h = s.order / s.r as u128;
+            assert!(s.r < 1u64 << 62 && h <= 128 && h * (1u128 << 62) >= (q as u128).pow(4), "q={q} h={h}");
+            let r = s.r;
+            let f = Mont::new(r).expect("accepted r has a Montgomery context");
+            let worst = 16u128 * ((r - 1) as u128 * (r - 1) as u128);
+            let u = f.fold(worst);
+            assert!(u < r && mulr(u, f.r1, r) as u128 == worst % r as u128);
+            let rows = corank1(120, 5, seed, r);
+            let ls = kernel_lanczos_serial_with(&rows, 120, r, 13, None);
+            assert!(ls.x.is_some(), "q={q}");
+            let lf = kernel_lanczos_serial_with(&rows, 120, r, 13, Some(f));
+            assert_eq!((&lf.x, lf.mulmods, lf.rank), (&ls.x, ls.mulmods, ls.rank), "q={q}");
+            let lm = kernel_lanczos_mt_with(&rows, 120, r, 13, 4, Some(f));
+            assert_eq!((&lm.x, lm.mulmods, lm.rank), (&ls.x, ls.mulmods, ls.rank), "q={q} mt");
+            let ws = kernel_wiedemann_serial_with(&rows, 120, r, 11, None);
+            let wf = kernel_wiedemann_mt_with(&rows, 120, r, 11, 4, Some(f));
+            assert_eq!((&wf.x, wf.mulmods, wf.rank), (&ws.x, ws.mulmods, ws.rank), "q={q} wiedemann");
         }
     }
 

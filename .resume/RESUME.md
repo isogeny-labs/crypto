@@ -1,3 +1,20 @@
+# Resume: crypto @ claude/humbert-next-leads-20261120 (PR #4848) — crossover at q < 2^17 + rho audit
+
+## Goal
+Owner (2026-11-21): "1-2" — (1) rho-reference audit of the lab's IC-below-rho rows, (2) measure the genus-5
+IC/rho crossover at q < 2^17.
+
+## Spec
+research/humbert_genus5_cover_20261021/crossover_20261121/PROTOCOL.md (frozen). Binary crossover_20261121/bin/humbert-v9
+sha256 26f1620a…; runner run_v9.sh (BIN_SHA256_PREFIX=26f1620a, PRIMES=<q>, resume with SEEDS=).
+Audit: research/rho_reference_audit_20261121/AUDIT.md (revision 5).
+
+## State
+q<2^17 patch merged (42 tests). Bench record benchmarks/records/20261121T0118Z-humbert-genus5-crossover.json. S3 unavailable.
+
+## Next
+Run q 65521, 81001, 98009, 115001, 131071; analyze; report; audit write-up; PR body.
+
 # Resume: crypto @ claude/humbert-next-leads-20261120 (PR #4848) — slope test
 
 ## Goal
