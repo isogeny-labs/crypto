@@ -16,8 +16,9 @@ import os
 
 repo = Path(__file__).resolve().parents[2]
 source_path = "src/cryptanalysis/prime_root_trace.rs"
+baseline_ref = os.environ.get("ROOTFIND_BASELINE_REF", "8f33a645b4e73da3295b90aeb58b03225fc5f1a5")
 baseline = subprocess.check_output(
-    ["git", "show", "8f33a645b4e73da3295b90aeb58b03225fc5f1a5:" + source_path],
+    ["git", "show", baseline_ref + ":" + source_path],
     cwd=repo, text=True
 )
 candidate = (repo / source_path).read_text()
@@ -217,7 +218,9 @@ with tempfile.TemporaryDirectory(prefix="root89-full-") as tmp:
                 "before_ns":a["ns_per_solve_verify"],
                 "after_ns":b["ns_per_solve_verify"]
             })
-    out = repo / "research/amm_digit_perf_20261118/round89_full_ab_results.csv"
+    out = repo / os.environ.get(
+        "ROOTFIND_AB_OUTPUT",
+        "research/amm_digit_perf_20261118/round89_full_ab_results.csv")
     with out.open("w",newline="") as stream:
         w=csv.DictWriter(stream,fieldnames=list(rows[0]))
         w.writeheader();w.writerows(rows)
