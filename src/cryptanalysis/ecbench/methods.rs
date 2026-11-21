@@ -170,6 +170,11 @@ const DIEM_KGROW_PARAMS: &[ParamDecl] = &[
         default: Some("2"),
         help: "number of planted k-summand targets per cell",
     },
+    ParamDecl {
+        name: "oracle",
+        default: Some("semaev"),
+        help: "`semaev` = LineOracle/LineS4Oracle; `brute` = exhaustive k-summand control",
+    },
 ];
 
 const K4_PARAMS: &[ParamDecl] = &[
@@ -764,7 +769,7 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "ic.diem_kgrow",
             family: "ic",
-            summary: "Selectable-k Diem extension-IC lab cell: charged brute k-summand factor-base decomp on self-hosted E(F_{p^k}) from params (p,k), matched Pollard-ρ with [d]G=Q check; for growing (p,k(p)) ladders / α-vs-√r discrimination — not absolute F_p same-target, not a Gröbner Semaev solver",
+            summary: "Selectable-k Diem extension-IC lab cell: Semaev-line decomp (LineOracle S3 / LineS4Oracle Macaulay) on self-hosted E(F_{p^k}) from params (p,k), matched Pollard-ρ with [d]G=Q check; for growing (p,k(p)) ladders / α-vs-√r — not absolute F_p same-target",
             entry: "ecbench::diem_kgrow::solve",
             applies: Applies::Any,
             params: DIEM_KGROW_PARAMS,

@@ -35,9 +35,9 @@
 //! - **Is:** selectable `k`, `k_of_p`, charged `k`-decomp (group-add
 //!   counted), matched Pollard-ρ baseline with `[d]G=Q` check, ABBA
 //!   ladder + α-fit helper for growing `(p,k)`.
-//! - **Is not:** Gröbner Semaev solver, full ecbench `CurveSpec` (points
-//!   are not `Copy`, so `CountedGroup` wiring is a follow-up), or a
-//!   proven \(L_p[\alpha]\) claim.
+//! - **Is not:** a new standalone Semaev/Gröbner engine (algebraic path
+//!   reuses `line_oracle` / `line_s4_oracle`), full ecbench `CurveSpec`
+//!   on Vec-backed `Pt`, or a proven \(L_p[\alpha]\) claim.
 
 use crate::cryptanalysis::diem_descent::{build_factor_base, ECurveFpk, Fpk, Pt};
 use num_bigint::BigUint;
@@ -327,6 +327,9 @@ pub struct CellRequest {
     pub trial_budget: u64,
     pub planted_decompositions: u32,
     pub seed: u64,
+    /// `"semaev"` (default): `line_oracle` / `line_s4_oracle`.
+    /// `"brute"`: exhaustive \(k\)-summand search (already FAIL_FOR_GOAL_α).
+    pub oracle: String,
 }
 
 impl Default for CellRequest {
@@ -339,6 +342,7 @@ impl Default for CellRequest {
             trial_budget: 2_000_000,
             planted_decompositions: 8,
             seed: 1,
+            oracle: "semaev".into(),
         }
     }
 }
@@ -476,6 +480,18 @@ pub fn run_cell(req: &CellRequest) -> Result<CellReport, String> {
 
 /// Charged cell: IC group-adds + matched ρ with `[d]G = Q` check.
 pub fn run_cell_charged(req: &CellRequest) -> Result<ChargedCellReport, String> {
+    let oracle = req.oracle.as_str();
+    if oracle == "semaev" || oracle == "semaev-line" || oracle.is_empty() {
+        return crate::cryptanalysis::diem_kgrow_semaev::run_semaev_cell(req);
+    }
+    if oracle != "brute" {
+        return Err(format!("unknown diem_kgrow oracle `{oracle}` (use semaev|brute)"));
+    }
+    run_cell_charged_brute(req)
+}
+
+/// Brute \(k\)-summand charged cell (control / prior FAIL_FOR_GOAL_α class).
+pub fn run_cell_charged_brute(req: &CellRequest) -> Result<ChargedCellReport, String> {
     let schedule = k_of_p(req.p, req.k_min, req.k_max);
     let (k, from_sched) = match req.k {
         Some(k) => (k, false),
@@ -564,7 +580,7 @@ pub fn run_cell_charged(req: &CellRequest) -> Result<ChargedCellReport, String> 
         log2_rho_pred,
         log2_ic_obs,
         log2_rho_obs,
-        note: "Charged k-decomp + matched rho on extension target. Absolute F_p gate closed.",
+        note: "Charged brute k-decomp + matched rho on extension target. Absolute F_p gate closed.",
     })
 }
 
@@ -587,6 +603,7 @@ pub fn run_charged_ladder(rungs: &[(u64, u32)], trial_budget: u64) -> Result<Lad
             planted_decompositions: 2,
             trial_budget,
             seed: 7,
+            oracle: "semaev".into(),
             ..CellRequest::default()
         };
         // AB: IC first (already inside run_cell_charged), BA: run twice with seed flip.
@@ -638,7 +655,7 @@ pub fn run_charged_ladder(rungs: &[(u64, u32)], trial_budget: u64) -> Result<Lad
         )
     } else {
         format!(
-            "FAIL_FOR_GOAL_α: OLS α={} ; largest beats_ρ={} — brute k-decomp class falsified at this scale; need Gröbner/Semaev instrument",
+            "FAIL_FOR_GOAL_α: OLS α={} ; largest beats_ρ={} — Semaev-line class falsified at this scale; open next successor",
             alpha_ols
                 .map(|a| format!("{a:.3}"))
                 .unwrap_or_else(|| "n/a".into()),
@@ -653,14 +670,15 @@ pub fn run_charged_ladder(rungs: &[(u64, u32)], trial_budget: u64) -> Result<Lad
         rungs: out,
         alpha_ols,
         beta_ols,
-        acceptance: "≥3 recovered rungs; OLS α<1/2 AND largest-rung observed IC < matched ρ to survive; else falsify brute class → Semaev successor",
+        acceptance: "≥3 recovered rungs; OLS α<1/2 AND largest-rung observed IC < matched ρ to survive; else falsify Semaev-line class → named successor",
         verdict,
     })
 }
 
-/// Default tiny discriminating ladder: `(5,2), (7,2), (7,3), (11,2)`.
+/// Discriminating Semaev ladder: k=2 pairs-and-S₃ on growing p, plus one
+/// k=3 `LineS4Oracle` rung (`p≡1 mod 3`, `p≥13`).
 pub fn default_ladder_rungs() -> Vec<(u64, u32)> {
-    vec![(5, 2), (7, 2), (7, 3), (11, 2)]
+    vec![(5, 2), (11, 2), (17, 2), (13, 3)]
 }
 
 fn ols_alpha_beta(pts: &[(f64, f64)]) -> (Option<f64>, Option<f64>) {
@@ -713,16 +731,17 @@ mod tests {
     }
 
     #[test]
-    fn selectable_k3_recovers_planted() {
+    fn selectable_k3_recovers_planted_brute() {
         let req = CellRequest {
             p: 7,
             k: Some(3),
             planted_decompositions: 4,
             trial_budget: 2_000_000,
             seed: 1,
+            oracle: "brute".into(),
             ..CellRequest::default()
         };
-        let rep = run_cell(&req).expect("k=3 cell");
+        let rep = run_cell(&req).expect("k=3 brute cell");
         assert_eq!(rep.k, 3);
         assert!(
             rep.recovered >= 1,
@@ -736,30 +755,49 @@ mod tests {
             p: 7,
             k: None,
             k_min: 2,
-            k_max: 3,
+            k_max: 2,
             planted_decompositions: 2,
             trial_budget: 2_000_000,
             seed: 2,
+            oracle: "semaev".into(),
             ..CellRequest::default()
         };
         let rep = run_cell(&req).expect("schedule cell");
         assert!(rep.k_from_schedule);
-        assert!((2..=3).contains(&rep.k));
+        assert_eq!(rep.k, 2);
     }
 
     #[test]
-    fn charged_cell_counts_adds() {
+    fn charged_cell_counts_adds_brute() {
         let req = CellRequest {
             p: 5,
             k: Some(2),
             planted_decompositions: 2,
             trial_budget: 200_000,
             seed: 3,
+            oracle: "brute".into(),
             ..CellRequest::default()
         };
-        let rep = run_cell_charged(&req).expect("charged cell");
+        let rep = run_cell_charged(&req).expect("charged brute cell");
         assert!(rep.ic_group_adds > 0);
         assert!(rep.recovered >= 1);
+    }
+
+    #[test]
+    fn charged_cell_semaev_k2_recovers() {
+        let req = CellRequest {
+            p: 5,
+            k: Some(2),
+            planted_decompositions: 2,
+            trial_budget: 200_000,
+            seed: 3,
+            oracle: "semaev".into(),
+            ..CellRequest::default()
+        };
+        let rep = run_cell_charged(&req).expect("semaev k2 cell");
+        assert_eq!(rep.k, 2);
+        assert!(rep.ic_group_adds > 0);
+        assert!(rep.recovered >= 1, "semaev should recover planted: {rep:?}");
     }
 
     #[test]

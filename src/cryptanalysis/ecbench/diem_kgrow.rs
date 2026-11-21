@@ -5,9 +5,9 @@
 //! \(\mathbb{F}_p\) same-target remains gated; this arm is for growing
 //! `(p, k(p))` ladders only.
 //!
-//! Group additions in the brute `k`-decomp and the matched ρ walk are
-//! charged into `SolveReport` counters.  Full `CountedGroup` wiring is
-//! blocked while `Pt` is not `Copy`.
+//! Semaev-line decomp (`line_oracle` / `line_s4_oracle`) plus matched ρ
+//! are charged into `SolveReport` counters.  Full `CountedGroup` wiring
+//! on Vec-backed `Pt` remains a follow-up.
 
 use super::exact_scalar::ExactScalar;
 use super::methods::{param_u64, PhaseRecord, ResolvedMethod, SolveReport};
@@ -48,6 +48,11 @@ pub fn request_from_method(m: &ResolvedMethod, seed: u64) -> Result<CellRequest,
         .get("planted")
         .and_then(|s| s.parse().ok())
         .unwrap_or(2);
+    let oracle = m
+        .params
+        .get("oracle")
+        .cloned()
+        .unwrap_or_else(|| "semaev".into());
     Ok(CellRequest {
         p,
         k,
@@ -56,6 +61,7 @@ pub fn request_from_method(m: &ResolvedMethod, seed: u64) -> Result<CellRequest,
         trial_budget,
         planted_decompositions: planted,
         seed,
+        oracle,
     })
 }
 

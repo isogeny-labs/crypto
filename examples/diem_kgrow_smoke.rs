@@ -17,24 +17,27 @@ fn main() {
             planted_decompositions: 6,
             trial_budget: 200_000,
             seed: 3,
+            oracle: "semaev".into(),
             ..CellRequest::default()
         },
         CellRequest {
-            p: 7,
+            p: 13,
             k: Some(3),
-            planted_decompositions: 6,
+            planted_decompositions: 2,
             trial_budget: 2_000_000,
             seed: 1,
+            oracle: "semaev".into(),
             ..CellRequest::default()
         },
         CellRequest {
             p: 7,
             k: None,
             k_min: 2,
-            k_max: 3,
+            k_max: 2,
             planted_decompositions: 4,
             trial_budget: 2_000_000,
             seed: 2,
+            oracle: "semaev".into(),
             ..CellRequest::default()
         },
     ];
