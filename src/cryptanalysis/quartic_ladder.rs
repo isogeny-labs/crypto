@@ -1276,13 +1276,17 @@ pub enum QSolve {
     /// runs Wiedemann whenever the core is large enough.
     #[default]
     Legacy,
-    /// A decomposition relation counts towards the inhomogeneous rows only
-    /// if it closes a cycle in the component of the vertex "1" of the
-    /// large-prime graph at the moment it is found (its large primes are
-    /// already linked to the factor base), i.e. it reaches the cycle
-    /// matrix; others are still kept as edges.  Before Wiedemann, an
-    /// attempt whose core has no row in the `t` column (so `t` cannot be
-    /// determined) is skipped and charged only its structural pass.
+    /// Descent last: decompositions start only once the line relations
+    /// give enough cycles (the frozen cycle check), and a decomposition
+    /// relation counts towards the inhomogeneous rows only if it closes a
+    /// cycle in the component of the vertex "1" of the large-prime graph
+    /// when it is found (its large primes are already linked to the factor
+    /// base), i.e. it reaches the cycle matrix; others are still kept as
+    /// edges.  Line relations alone leave the degree direction
+    /// (`lambda_P + c`, `lambda_kappa + 4c`) and `t` undetermined; two
+    /// linked decomposition rows fix both.  Before Wiedemann, an attempt
+    /// whose core has no row in the `t` column is skipped and charged only
+    /// its structural pass.
     Linked,
 }
 
@@ -1294,6 +1298,15 @@ pub struct QDiemOpts {
     /// Per-attempt diagnostics (dense rank of the core over `F_r`,
     /// uncounted, test / diagnosis only).
     pub diag: bool,
+    /// Inhomogeneous rows wanted before the first attempt (0: the frozen 8);
+    /// every failed attempt adds 4, as in the frozen instrument.
+    pub inhom_rows: u64,
+    /// Step the decomposition walk by `G + T` instead of `G` (frozen), so
+    /// that consecutive rows carry different `T`-coefficients.  With the
+    /// `G` step all rows of one batch share `b`, and with the degree
+    /// direction left free by the line relations, `e_t + h b v_deg` is in
+    /// the kernel: `t` is undetermined until a second batch arrives.
+    pub step_gt: bool,
 }
 
 /// One counted attempt's diagnosis (only with [`QDiemOpts::diag`]).
@@ -1436,7 +1449,7 @@ pub fn run_diem_with(inst: &QInstance, prm: QIcParams, opts: QDiemOpts) -> QIcRe
     let mut seen_lines: HashSet<[u32; 4]> = HashSet::new();
     let margin = |k: usize| 8 + k / 100;
     let mut next_check = nunk as u64;
-    let mut want_inhom = 8u64;
+    let mut want_inhom = if opts.inhom_rows == 0 { 8 } else { opts.inhom_rows };
     let mut ninhom = 0u64;
     let mut pair = (1usize, 0usize);
     let mut pairs_done = false;
@@ -1528,107 +1541,128 @@ pub fn run_diem_with(inst: &QInstance, prm: QIcParams, opts: QDiemOpts) -> QIcRe
             res.line_relations += 1;
         }
 
-        // ── inhomogeneous rows: x = [a]G + [b]T, a stepped by G ──
-        if ninhom < want_inhom {
-            let mut a = rng.gen_range(1..r);
-            let b = rng.gen_range(1..r);
-            let ag = cmul(&pq, &mut ops, &g, a);
-            let bt = cmul(&pq, &mut ops, &tgt, b);
-            let mut x = pq.add(&ag, &bt);
-            ops.adds += 1;
-            while ninhom < want_inhom {
-                if res.decomp_trials >= max_decomp {
-                    res.exhausted = true;
-                    break 'outer;
-                }
-                res.decomp_trials += 1;
-                if let PicClass::Typ(m) = &x {
-                    let dec = match opts.descent {
-                        QDescent::Scan => ctx.decompose(m, &mut res.rel_decomp),
-                        QDescent::Algebraic => {
-                            match ctx.decompose_alg(m, &mut drs, &mut res.rel_decomp) {
-                                Ok(d) => d,
-                                Err(()) => {
-                                    res.decomp_fallbacks += 1;
-                                    ctx.decompose(m, &mut res.rel_decomp)
+        // Legacy: decompositions, then the cycle check (the frozen order).
+        // Linked: the cycle check first, decompositions once the factor-base
+        // logarithms are determined up to the degree direction (descent last).
+        for stage in 0..2u8 {
+            let inhom_now = (stage == 0) == (opts.solve == QSolve::Legacy);
+            // ── inhomogeneous rows: x = [a]G + [b]T, a stepped by G ──
+            if inhom_now && ninhom < want_inhom {
+                let mut a = rng.gen_range(1..r);
+                let mut b = rng.gen_range(1..r);
+                let ag = cmul(&pq, &mut ops, &g, a);
+                let bt = cmul(&pq, &mut ops, &tgt, b);
+                let mut x = pq.add(&ag, &bt);
+                ops.adds += 1;
+                // step G (frozen) or G + T (every row its own T-coefficient)
+                let step = if opts.step_gt {
+                    ops.adds += 1;
+                    pq.add(&g, &tgt)
+                } else {
+                    g.clone()
+                };
+                while ninhom < want_inhom {
+                    if res.decomp_trials >= max_decomp {
+                        res.exhausted = true;
+                        break 'outer;
+                    }
+                    res.decomp_trials += 1;
+                    if let PicClass::Typ(m) = &x {
+                        let dec = match opts.descent {
+                            QDescent::Scan => ctx.decompose(m, &mut res.rel_decomp),
+                            QDescent::Algebraic => {
+                                match ctx.decompose_alg(m, &mut drs, &mut res.rel_decomp) {
+                                    Ok(d) => d,
+                                    Err(()) => {
+                                        res.decomp_fallbacks += 1;
+                                        ctx.decompose(m, &mut res.rel_decomp)
+                                    }
                                 }
                             }
-                        }
-                    };
-                    if let Some(qs) = dec {
-                        let tcoef = subm(0, mulmod(h, b, r), r);
-                        let rhs = mulmod(h, a, r);
-                        if let Some((rel, lps)) = make_rel(&qs, tcoef, rhs, &col) {
-                            let good =
-                                !prm.verify_relations || ver.check(&pq, &mut ctx, &qs, true, &x);
-                            if good {
-                                // does the edge close a cycle in the component of "1"?
-                                // (counted DSU finds under Linked; an uncounted,
-                                // non-compressing read under Legacy, so the
-                                // frozen instrument's counts are unchanged)
-                                let linked = if opts.solve == QSolve::Linked {
-                                    let r0 = dsu.find(0);
-                                    lps.iter().all(|k| match vid.get(k) {
-                                        Some(&v) => dsu.find(v) == r0,
-                                        None => false,
-                                    })
+                        };
+                        if let Some(qs) = dec {
+                            let tcoef = subm(0, mulmod(h, b, r), r);
+                            let rhs = mulmod(h, a, r);
+                            if let Some((rel, lps)) = make_rel(&qs, tcoef, rhs, &col) {
+                                let good =
+                                    !prm.verify_relations || ver.check(&pq, &mut ctx, &qs, true, &x);
+                                if good {
+                                    // does the edge close a cycle in the component of "1"?
+                                    // (counted DSU finds under Linked; an uncounted,
+                                    // non-compressing read under Legacy, so the
+                                    // frozen instrument's counts are unchanged)
+                                    let linked = if opts.solve == QSolve::Linked {
+                                        let r0 = dsu.find(0);
+                                        lps.iter().all(|k| match vid.get(k) {
+                                            Some(&v) => dsu.find(v) == r0,
+                                            None => false,
+                                        })
+                                    } else {
+                                        let r0 = dsu_root(&dsu, 0);
+                                        lps.iter().all(|k| match vid.get(k) {
+                                            Some(&v) => dsu_root(&dsu, v) == r0,
+                                            None => false,
+                                        })
+                                    };
+                                    push_rel(rel, &lps, &mut vid, &mut dsu, &mut rels, &mut res);
+                                    res.decomp_relations += 1;
+                                    if linked {
+                                        res.inhom_linked += 1;
+                                    }
+                                    if linked || opts.solve == QSolve::Legacy {
+                                        ninhom += 1;
+                                    }
                                 } else {
-                                    let r0 = dsu_root(&dsu, 0);
-                                    lps.iter().all(|k| match vid.get(k) {
-                                        Some(&v) => dsu_root(&dsu, v) == r0,
-                                        None => false,
-                                    })
-                                };
-                                push_rel(rel, &lps, &mut vid, &mut dsu, &mut rels, &mut res);
-                                res.decomp_relations += 1;
-                                if linked {
-                                    res.inhom_linked += 1;
+                                    res.bad_relations += 1;
                                 }
-                                if linked || opts.solve == QSolve::Legacy {
-                                    ninhom += 1;
-                                }
-                            } else {
-                                res.bad_relations += 1;
                             }
                         }
                     }
+                    x = pq.add(&x, &step);
+                    ops.adds += 1;
+                    a = if a + 1 == r { 0 } else { a + 1 };
+                    if opts.step_gt {
+                        b = if b + 1 == r { 0 } else { b + 1 };
+                    }
                 }
-                x = pq.add(&x, &g);
-                ops.adds += 1;
-                a = if a + 1 == r { 0 } else { a + 1 };
+            }
+
+            if stage == 1 {
+                continue;
+            }
+            let out_of_lines = pairs_done || res.lines_tried >= prm.max_lines;
+
+            // ── is a solve worth trying? ──
+            if prm.arm == QArm::DoubleLp {
+                let need = (nunk + margin(nunk)) as i64;
+                let cyc = dsu.cycles0();
+                if cyc < need {
+                    if out_of_lines {
+                        res.exhausted = true;
+                        break 'outer;
+                    }
+                    next_check = rels.len() as u64 + (need - cyc).max(1) as u64;
+                    continue 'outer;
+                }
+            } else {
+                let nver = dsu.parent.len();
+                let mut scratch = Nat::default();
+                let mut rows = build_rows(&rels, nver, tcol, r, &mut scratch);
+                strip_zeros(&mut rows);
+                let (core, cc, _) = peel(&rows, nunk, tcol, &mut scratch);
+                if core.len() < cc + margin(cc) {
+                    if out_of_lines {
+                        res.exhausted = true;
+                        break 'outer;
+                    }
+                    next_check = rels.len() as u64 + (nunk as u64 / 32).max(8);
+                    continue 'outer;
+                }
             }
         }
 
         let out_of_lines = pairs_done || res.lines_tried >= prm.max_lines;
-
-        // ── is a solve worth trying? ──
         let nver = dsu.parent.len();
-        if prm.arm == QArm::DoubleLp {
-            let need = (nunk + margin(nunk)) as i64;
-            let cyc = dsu.cycles0();
-            if cyc < need {
-                if out_of_lines {
-                    res.exhausted = true;
-                    break;
-                }
-                next_check = rels.len() as u64 + (need - cyc).max(1) as u64;
-                continue;
-            }
-        } else {
-            let mut scratch = Nat::default();
-            let mut rows = build_rows(&rels, nver, tcol, r, &mut scratch);
-            strip_zeros(&mut rows);
-            let (core, cc, _) = peel(&rows, nunk, tcol, &mut scratch);
-            if core.len() < cc + margin(cc) {
-                if out_of_lines {
-                    res.exhausted = true;
-                    break;
-                }
-                next_check = rels.len() as u64 + (nunk as u64 / 32).max(8);
-                continue;
-            }
-        }
-
         // ── counted attempt ──
         res.attempts += 1;
         let mut rows = build_rows(&rels, nver, tcol, r, &mut res.la);
@@ -2155,6 +2189,8 @@ mod tests {
                         descent: QDescent::Algebraic,
                         solve: QSolve::Linked,
                         diag: false,
+                        inhom_rows: 0,
+                        step_gt: true,
                     },
                 );
                 assert!(o.certified, "q={q} seed={seed}: {o:?}");
@@ -2198,6 +2234,8 @@ mod tests {
                                 descent: QDescent::Algebraic,
                                 solve,
                                 diag: true,
+                                inhom_rows: 0,
+                                step_gt: solve == QSolve::Linked,
                             },
                         );
                         eprintln!(

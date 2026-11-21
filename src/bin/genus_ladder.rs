@@ -77,6 +77,12 @@ struct Cfg {
     /// `--quartic-seeds p=s1/s2/...,...`: evaluate only these curve seeds in
     /// the quartic cell of `p` (same admission path, no seed search).
     quartic_seeds: std::collections::HashMap<u64, Vec<u64>>,
+    /// `--quartic-diag`: per-attempt rank diagnosis in the quartic records
+    /// (dense rank of the core over `F_r`, uncounted).
+    quartic_diag: bool,
+    /// `--quartic-inhom N`: inhomogeneous rows wanted by the `2lp-new` arm
+    /// before its first attempt (default 8, the frozen constant).
+    quartic_inhom: u64,
     sge: Vec<gl::SgeParams>,
     out: String,
 }
@@ -111,6 +117,8 @@ fn parse() -> Result<Cfg, String> {
         quartic: false,
         quartic_arms: vec!["full".into(), "2lp".into()],
         quartic_seeds: Default::default(),
+        quartic_diag: false,
+        quartic_inhom: 8,
         sge: Vec::new(),
         out: String::new(),
     };
@@ -129,6 +137,11 @@ fn parse() -> Result<Cfg, String> {
         }
         if flag == "--quartic" {
             c.quartic = true;
+            i += 1;
+            continue;
+        }
+        if flag == "--quartic-diag" {
+            c.quartic_diag = true;
             i += 1;
             continue;
         }
@@ -180,10 +193,11 @@ fn parse() -> Result<Cfg, String> {
                 }
             }
             "--max-trials" => c.max_trials = num(&v)? as u64,
+            "--quartic-inhom" => c.quartic_inhom = num(&v)? as u64,
             "--quartic-arms" => {
                 c.quartic_arms = v.split(',').map(String::from).collect();
                 for a in &c.quartic_arms {
-                    if !["full", "2lp", "2lp-alg", "2lp-new"].contains(&a.as_str()) {
+                    if !["full", "2lp", "2lp-alg", "2lp-gt", "2lp-new"].contains(&a.as_str()) {
                         return Err(format!("--quartic-arms: unknown arm {a}"));
                     }
                 }
@@ -709,23 +723,13 @@ fn main() -> ExitCode {
             let nb2 = (cfg.qc * f64::from(*q).sqrt()).ceil() as usize;
             let ext = cfg.quartic_arms != ["full", "2lp"];
             for name in &cfg.quartic_arms {
-                let (arm, nb, descent, solve, suffix) = match name.as_str() {
-                    "full" => (ql::QArm::Full, 0usize, ql::QDescent::Scan, ql::QSolve::Legacy, ""),
-                    "2lp" => (ql::QArm::DoubleLp, nb2, ql::QDescent::Scan, ql::QSolve::Legacy, ""),
-                    "2lp-alg" => (
-                        ql::QArm::DoubleLp,
-                        nb2,
-                        ql::QDescent::Algebraic,
-                        ql::QSolve::Legacy,
-                        "_alg",
-                    ),
-                    _ => (
-                        ql::QArm::DoubleLp,
-                        nb2,
-                        ql::QDescent::Algebraic,
-                        ql::QSolve::Linked,
-                        "_new",
-                    ),
+                use ql::{QArm as A, QDescent as D, QSolve as S};
+                let (arm, nb, descent, solve, step_gt, suffix) = match name.as_str() {
+                    "full" => (A::Full, 0usize, D::Scan, S::Legacy, false, ""),
+                    "2lp" => (A::DoubleLp, nb2, D::Scan, S::Legacy, false, ""),
+                    "2lp-alg" => (A::DoubleLp, nb2, D::Algebraic, S::Legacy, false, "_alg"),
+                    "2lp-gt" => (A::DoubleLp, nb2, D::Algebraic, S::Legacy, true, "_gt"),
+                    _ => (A::DoubleLp, nb2, D::Algebraic, S::Linked, true, "_new"),
                 };
                 let o = ql::run_diem_with(
                     &inst,
@@ -739,15 +743,27 @@ fn main() -> ExitCode {
                     ql::QDiemOpts {
                         descent,
                         solve,
-                        diag: false,
+                        diag: cfg.quartic_diag,
+                        inhom_rows: if solve == ql::QSolve::Linked { cfg.quartic_inhom } else { 8 },
+                        step_gt,
                     },
                 );
                 let mut rec = head.clone();
+                if cfg.quartic_diag {
+                    rec["diag"] = json!(o
+                        .diag
+                        .iter()
+                        .map(|d| json!({"core_rows": d.core_rows, "core_cols": d.core_cols,
+                            "t_weight": d.t_weight, "rank": d.rank, "rank_no_t": d.rank_no_t,
+                            "outcome": d.outcome, "inhom": d.inhom, "inhom_linked": d.inhom_linked}))
+                        .collect::<Vec<_>>());
+                }
                 rec["kind"] = json!("run");
                 rec["arm"] = json!(format!("Q_{}{}", o.arm, suffix));
                 if ext {
                     rec["descent"] = json!(format!("{descent:?}"));
                     rec["solve"] = json!(format!("{solve:?}"));
+                    rec["step_gt"] = json!(step_gt);
                     rec["rel_decomp_mul"] = json!(o.rel_decomp.mul);
                     rec["rel_decomp_add"] = json!(o.rel_decomp.add);
                     rec["rel_enum_mul"] = json!(o.rel_enum.mul);
@@ -755,6 +771,7 @@ fn main() -> ExitCode {
                     rec["decomp_fallbacks"] = json!(o.decomp_fallbacks);
                     rec["inhom_linked"] = json!(o.inhom_linked);
                     rec["la_skipped"] = json!(o.la_skipped);
+                    rec["inhom_rows"] = json!(if solve == ql::QSolve::Linked { cfg.quartic_inhom } else { 8 });
                     rec["lines_tried"] = json!(o.lines_tried);
                 }
                 rec["certified"] = json!(o.certified);

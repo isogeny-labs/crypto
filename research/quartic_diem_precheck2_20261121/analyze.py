@@ -17,6 +17,7 @@ import numpy as np
 PRIMARY = "Q_diem_2lp_new"
 OLD = "Q_diem_2lp"
 ALG = "Q_diem_2lp_alg"
+GT = "Q_diem_2lp_gt"
 PREV = "../quartic_diem_precheck_20261120/raw/run.jsonl"
 T975 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306}
 B = 4000
@@ -182,6 +183,29 @@ def paired(runs, num, den, rng):
     return out
 
 
+def same_relations(runs):
+    """ALG must see exactly OLD's relations: every field but rel_* equal."""
+    keys = ["group_ops", "cantor_mul", "cantor_inv", "la_mul", "la_add", "relations",
+            "rels_by_lp", "decomp_trials", "attempts", "core_rows", "core_cols", "certified",
+            "ok", "rel_enum_mul", "decomp_relations"]
+    old = {(r["p"], r["curve_seed"], r["seed"]): r for r in runs if r["arm"] == OLD}
+    n, same, diffs = 0, 0, []
+    for r in runs:
+        if r["arm"] != ALG:
+            continue
+        o = old.get((r["p"], r["curve_seed"], r["seed"]))
+        if o is None:
+            continue
+        n += 1
+        d = [k for k in keys if r.get(k) != o.get(k)]
+        if d:
+            diffs.append({"key": [r["p"], r["curve_seed"], r["seed"]], "fields": d})
+        else:
+            same += 1
+    return {"compared": n, "identical": same, "differing": diffs,
+            "fallbacks": int(sum(r.get("decomp_fallbacks", 0) for r in runs))}
+
+
 def repro(runs):
     try:
         prev = [json.loads(l) for l in open(PREV) if l.strip()]
@@ -219,7 +243,10 @@ def main(paths):
         out["arms"][arm] = arm_block([r for r in runs if r["arm"] == arm], rng)
     out["paired_new_over_old"] = paired(runs, PRIMARY, OLD, rng)
     out["paired_alg_over_old"] = paired(runs, ALG, OLD, rng)
+    out["paired_gt_over_alg"] = paired(runs, GT, ALG, rng)
+    out["paired_new_over_gt"] = paired(runs, PRIMARY, GT, rng)
     out["paired_new_over_alg"] = paired(runs, PRIMARY, ALG, rng)
+    out["alg_same_relations_as_old"] = same_relations(runs)
     out["old_arm_reproduces_20261120"] = repro(runs)
     a = out["arms"].get(PRIMARY)
     if a and "la_mul" in a["exponents"]:
