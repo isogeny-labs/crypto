@@ -1,25 +1,295 @@
 {
   "pcc": "unverified",
-  "recipe": {
-    "bits": 28,
-    "size": 40,
-    "baseline": "rootfind-subtract:m=3",
-    "winner": "rootfind-kmitm:m=4"
-  },
   "wall_10x": "pass",
-  "paired_median_wall_ratio_9rep": 14.119047619047619,
-  "paired_median_wall_ratio_7rep_m5_campaign": {
-    "arm": "kmitm:m=4",
-    "x": 13.687385718940696
+  "g3_oracle_adds_vs_Fx": "fail",
+  "e2e_cost_exponent_vs_bits": "moved",
+  "recipe_note": "best |F| per arm per bits from measured grid; planted-log verified",
+  "paired_wall_A40_bits28_kmitm_m4": 14.12,
+  "best_recipe_speedup_vs_best_subtract": {
+    "20": {
+      "subtract": {
+        "size": 32,
+        "wall_s": 0.001074926,
+        "S": 63.569304711367025
+      },
+      "challengers": [
+        {
+          "arm": "kmitm:m=4",
+          "size": 16,
+          "wall_x": 1.2762204178455203,
+          "S_x": 2.4087542586283512,
+          "wall_s": 0.000842273,
+          "S": 26.3909464751984
+        },
+        {
+          "arm": "kmitm:m=5",
+          "size": 16,
+          "wall_x": 0.6911565098244212,
+          "S_x": 4.021391035548686,
+          "wall_s": 0.001555257,
+          "S": 15.80778992876367
+        },
+        {
+          "arm": "floor:m=3",
+          "size": 32,
+          "wall_x": 1.9116694558213896,
+          "S_x": 1.0,
+          "wall_s": 0.000562297,
+          "S": 63.569304711367025
+        }
+      ]
+    },
+    "24": {
+      "subtract": {
+        "size": 64,
+        "wall_s": 0.005899103,
+        "S": 157.39752885640976
+      },
+      "challengers": [
+        {
+          "arm": "kmitm:m=4",
+          "size": 32,
+          "wall_x": 1.9185366299454956,
+          "S_x": 8.165146959764733,
+          "wall_s": 0.003074793,
+          "S": 19.276753943562206
+        },
+        {
+          "arm": "kmitm:m=5",
+          "size": 24,
+          "wall_x": 0.6300228466069072,
+          "S_x": 8.049429379825071,
+          "wall_s": 0.009363316,
+          "S": 19.553874123165524
+        },
+        {
+          "arm": "floor:m=3",
+          "size": 48,
+          "wall_x": 1.318014410992571,
+          "S_x": 0.7555239686131102,
+          "wall_s": 0.00447575,
+          "S": 208.32896823291932
+        }
+      ]
+    },
+    "28": {
+      "subtract": {
+        "size": 64,
+        "wall_s": 0.081823666,
+        "S": 598.8177766212527
+      },
+      "challengers": [
+        {
+          "arm": "kmitm:m=4",
+          "size": 48,
+          "wall_x": 5.3942007753931565,
+          "S_x": 18.654880836303768,
+          "wall_s": 0.015168821,
+          "S": 32.09979103462882
+        },
+        {
+          "arm": "kmitm:m=5",
+          "size": 32,
+          "wall_x": 1.6085689595171884,
+          "S_x": 31.60890230546957,
+          "wall_s": 0.050867366,
+          "S": 18.944592597182154
+        },
+        {
+          "arm": "floor:m=3",
+          "size": 64,
+          "wall_x": 1.8571744322979715,
+          "S_x": 1.0,
+          "wall_s": 0.044058148,
+          "S": 598.8177766212527
+        }
+      ]
+    },
+    "32": {
+      "subtract": {
+        "size": 64,
+        "wall_s": 1.8859325550000001,
+        "S": 2892.683119929605
+      },
+      "challengers": [
+        {
+          "arm": "kmitm:m=4",
+          "size": 64,
+          "wall_x": 20.764215584658206,
+          "S_x": 41.903343579675756,
+          "wall_s": 0.090826092,
+          "S": 69.03227458280044
+        },
+        {
+          "arm": "kmitm:m=5",
+          "size": 32,
+          "wall_x": 25.296787195816048,
+          "S_x": 89.32069277823109,
+          "wall_s": 0.074552256,
+          "S": 32.38536368175817
+        },
+        {
+          "arm": "floor:m=3",
+          "size": 64,
+          "wall_x": 1.8147404836337604,
+          "S_x": 1.0,
+          "wall_s": 1.039229891,
+          "S": 2892.683119929605
+        }
+      ]
+    }
   },
-  "g3_exponent": "fail",
-  "g3_any_below_pair_table_floor": false,
-  "classification": "engineering",
-  "e2e_S_slope_log2_vs_log2A": {
-    "floor:m=3": -1.0445259889947134,
-    "kmitm:m=4": -2.1455694481403857,
-    "kmitm:m=4,balanced": -1.1707774715923775,
-    "subtract:m=3": -1.0445259889947134
+  "slopes_log2_cost_vs_log2_bits_best_A": {
+    "floor:m=3": {
+      "wall_vs_log2bits": 15.705794087382916,
+      "S_vs_log2bits": 7.92202170469558,
+      "best_points": [
+        {
+          "bits": 20,
+          "size": 32,
+          "wall": 0.000562297,
+          "S": 63.569304711367025
+        },
+        {
+          "bits": 24,
+          "size": 48,
+          "wall": 0.00447575,
+          "S": 208.32896823291932
+        },
+        {
+          "bits": 28,
+          "size": 64,
+          "wall": 0.044058148,
+          "S": 598.8177766212527
+        },
+        {
+          "bits": 32,
+          "size": 64,
+          "wall": 1.039229891,
+          "S": 2892.683119929605
+        }
+      ]
+    },
+    "kmitm:m=4": {
+      "wall_vs_log2bits": 9.899498799792683,
+      "S_vs_log2bits": 2.0507916916032367,
+      "best_points": [
+        {
+          "bits": 20,
+          "size": 16,
+          "wall": 0.000842273,
+          "S": 26.3909464751984
+        },
+        {
+          "bits": 24,
+          "size": 32,
+          "wall": 0.003074793,
+          "S": 19.276753943562206
+        },
+        {
+          "bits": 28,
+          "size": 48,
+          "wall": 0.015168821,
+          "S": 32.09979103462882
+        },
+        {
+          "bits": 32,
+          "size": 64,
+          "wall": 0.090826092,
+          "S": 69.03227458280044
+        }
+      ]
+    },
+    "kmitm:m=4,balanced": {
+      "wall_vs_log2bits": 15.36491679918167,
+      "S_vs_log2bits": 7.7432969007311545,
+      "best_points": [
+        {
+          "bits": 20,
+          "size": 32,
+          "wall": 0.001647023,
+          "S": 88.98881729542533
+        },
+        {
+          "bits": 24,
+          "size": 64,
+          "wall": 0.011264391,
+          "S": 209.13959253691118
+        },
+        {
+          "bits": 28,
+          "size": 64,
+          "wall": 0.135621452,
+          "S": 746.3926893561934
+        },
+        {
+          "bits": 32,
+          "size": 64,
+          "wall": 2.365580769,
+          "S": 3489.123707616498
+        }
+      ]
+    },
+    "kmitm:m=5": {
+      "wall_vs_log2bits": 8.599353383876776,
+      "S_vs_log2bits": 1.31913147419871,
+      "best_points": [
+        {
+          "bits": 20,
+          "size": 16,
+          "wall": 0.001555257,
+          "S": 15.80778992876367
+        },
+        {
+          "bits": 24,
+          "size": 24,
+          "wall": 0.009363316,
+          "S": 19.553874123165524
+        },
+        {
+          "bits": 28,
+          "size": 32,
+          "wall": 0.050867366,
+          "S": 18.944592597182154
+        },
+        {
+          "bits": 32,
+          "size": 32,
+          "wall": 0.074552256,
+          "S": 32.38536368175817
+        }
+      ]
+    },
+    "subtract:m=3": {
+      "wall_vs_log2bits": 15.786731785836999,
+      "S_vs_log2bits": 8.069978888443721,
+      "best_points": [
+        {
+          "bits": 20,
+          "size": 32,
+          "wall": 0.001074926,
+          "S": 63.569304711367025
+        },
+        {
+          "bits": 24,
+          "size": 64,
+          "wall": 0.005899103,
+          "S": 157.39752885640976
+        },
+        {
+          "bits": 28,
+          "size": 64,
+          "wall": 0.081823666,
+          "S": 598.8177766212527
+        },
+        {
+          "bits": 32,
+          "size": 64,
+          "wall": 1.8859325550000001,
+          "S": 2892.683119929605
+        }
+      ]
+    }
   },
-  "claim_hygiene": "no security/sub-rho/key-recovery; G3 fail-closed; 10x is wall-only at recipe"
+  "claim_hygiene": "no security/sub-rho/key-recovery; G3 (adds/target vs |Fx|) remains fail-closed on the pair-table floor; exponent claim is e2e planted-log charged-S and wall vs group bits with per-arm best |F| \u2014 relative advantage grows with bits (not a constant factor); multi-target amort secondary"
 }
