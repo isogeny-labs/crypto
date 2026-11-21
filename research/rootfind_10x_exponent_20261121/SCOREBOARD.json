@@ -1,0 +1,25 @@
+{
+  "pcc": "unverified",
+  "recipe": {
+    "bits": 28,
+    "size": 40,
+    "baseline": "rootfind-subtract:m=3",
+    "winner": "rootfind-kmitm:m=4"
+  },
+  "wall_10x": "pass",
+  "paired_median_wall_ratio_9rep": 14.119047619047619,
+  "paired_median_wall_ratio_7rep_m5_campaign": {
+    "arm": "kmitm:m=4",
+    "x": 13.687385718940696
+  },
+  "g3_exponent": "fail",
+  "g3_any_below_pair_table_floor": false,
+  "classification": "engineering",
+  "e2e_S_slope_log2_vs_log2A": {
+    "floor:m=3": -1.0445259889947134,
+    "kmitm:m=4": -2.1455694481403857,
+    "kmitm:m=4,balanced": -1.1707774715923775,
+    "subtract:m=3": -1.0445259889947134
+  },
+  "claim_hygiene": "no security/sub-rho/key-recovery; G3 fail-closed; 10x is wall-only at recipe"
+}
