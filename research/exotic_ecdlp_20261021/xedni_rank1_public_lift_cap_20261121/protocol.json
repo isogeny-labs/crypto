@@ -1,0 +1,17 @@
+{
+  "schema": "xedni-rank1-public-lift-cap-protocol-v1",
+  "source_lift_class_sha256": "d7e599026feb648a2a95b24829c1c6ea484cb87f47dc43e8bcf401552961ef2e",
+  "source_same_target_rho_sha256": "72c17f13ff0d2789ce47a27996b492dac0e4f833c5b8e7f53c9e75cbdd2cf0c2",
+  "rational_curve": "y^2=x^3-47*x^2+751*x-3997",
+  "reduction_prime": 47,
+  "target_public_xy": [10, 1],
+  "positive_control_public_xy": [17, 10],
+  "target_height_cap": 4096,
+  "control_height_cap": 32,
+  "height_law": "x=a/b^2 and y=c/b^3 with integers a,c and b>0, gcd(a,b)=1, b not divisible by 47, H=max(abs(a),b); enumerate (H,b,a) ascending",
+  "modular_filter": "a/b^2 mod 47 must equal public x; then test c^2=a^3-47*a^2*b^2+751*a*b^4-3997*b^6 and public y congruence",
+  "timing": "start immediately before target-dependent candidate enumeration; stop after first verified rational lift or after height cap; record candidate counts and control/target times separately",
+  "checkpoint_interval_heights": 256,
+  "wall_cap_seconds": 120,
+  "status_law": "retain found or height-cap-exhausted for each arm; every aborted run retains completed height checkpoints; a capped lift search is a censored stage, not a scalar recovery"
+}
