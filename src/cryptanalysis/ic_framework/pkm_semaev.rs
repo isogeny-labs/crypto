@@ -4216,7 +4216,32 @@ mod tests {
                 }
                 got.is_some()
             };
+            let before_disagreements = f4
+                .relation_counters()
+                .get("pkm_crosscheck_disagreements")
+                .copied()
+                .unwrap_or(0);
             let (a, c) = (run(&mut f4), run(&mut grid));
+            let after_disagreements = f4
+                .relation_counters()
+                .get("pkm_crosscheck_disagreements")
+                .copied()
+                .unwrap_or(0);
+            if after_disagreements > before_disagreements {
+                if let Membership::T0Bits { q: Some(q), .. } = f4.membership {
+                    let x_r = addm(q.w_of(target.x).unwrap(), q.s, curve.p);
+                    let (raw, _) = f4.grid(curve, x_r, false);
+                    let liftable = raw.iter().any(|xs| {
+                        f4.t0_lift(curve, fb, &mut GroupOps::default(), &q, xs, target)
+                            .is_some()
+                    });
+                    eprintln!(
+                        "t0 crosscheck diagnostic: {label} k={k} target_x={} raw_solutions={} liftable={liftable} f4={a} grid={c}",
+                        target.x,
+                        raw.len()
+                    );
+                }
+            }
             assert_eq!(a, c, "{label}: F4 against the grid, target {k}");
             assert_eq!(
                 c,
