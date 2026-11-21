@@ -454,8 +454,8 @@ impl Engine<'_> {
     }
     fn div(&mut self, a: &[u64], b: &[u64]) -> Work<(Vec<u64>, Vec<u64>)> {
         debug_assert!(!b.is_empty());
-        // Euclidean GCD often ends with a unit divisor; dividing by 1
-        // is a coefficient copy, not a degree-by-degree long division.
+        // A unit divisor and a smaller-degree dividend require no field
+        // arithmetic or quotient buffer; keep the Division certificate.
         if b == [1] {
             let quotient = trim(a.to_vec());
             self.event(RootEvent::Division {
@@ -466,33 +466,58 @@ impl Engine<'_> {
             })?;
             return Ok((quotient, vec![]));
         }
-        let mut r = a.to_vec();
-        let mut q = vec![0; a.len().saturating_sub(b.len()) + 1];
-        if a.len() >= b.len() {
-            // For monic divisors the quotient leading term is already
-            // canonical; no inversion or multiplication by one is needed.
-            let lead = *b.last().unwrap();
-            let inv = if lead == 1 { 1 } else { self.inv(lead)? };
-            while r.len() >= b.len() {
-                let shift = r.len() - b.len();
-                let highest = *r.last().unwrap();
-                let c = if lead == 1 {
-                    highest
-                } else {
-                    self.field(FieldOp::Mul, highest, inv)?
-                };
-                q[shift] = c;
-                // The leading term cancels *exactly* by the definition of
-                // c. Do not multiply c by lead and subtract highest again.
-                for (k, &v) in b[..b.len() - 1].iter().enumerate() {
-                    if v == 0 { continue; }
-                    let product = self.field(FieldOp::Mul, c, v)?;
-                    r[shift + k] = self.field(FieldOp::Sub, r[shift + k], product)?;
-                }
-                r[shift + b.len() - 1] = 0;
-                r = trim(r);
-            }
+        if a.len() < b.len() {
+            let remainder = trim(a.to_vec());
+            self.event(RootEvent::Division {
+                a: a.to_vec(),
+                b: b.to_vec(),
+                quotient: vec![],
+                remainder: remainder.clone(),
+            })?;
+            return Ok((vec![], remainder));
         }
+        // Division by X^k is a coefficient split. Neither long division
+        // nor synthetic field operations are necessary.
+        if b.len() > 1 && b[0] == 0 && *b.last().unwrap() == 1
+            && b[1..b.len() - 1].iter().all(|&x| x == 0)
+        {
+            let shift = b.len() - 1;
+            let quotient = trim(a[shift..].to_vec());
+            let remainder = trim(a[..shift].to_vec());
+            self.event(RootEvent::Division {
+                a: a.to_vec(),
+                b: b.to_vec(),
+                quotient: quotient.clone(),
+                remainder: remainder.clone(),
+            })?;
+            return Ok((quotient, remainder));
+        }
+        let mut r = a.to_vec();
+        let mut q = vec![0; a.len() - b.len() + 1];
+        let lead = *b.last().unwrap();
+        let inv = if lead == 1 { 1 } else { self.inv(lead)? };
+        // Descending fixed-degree elimination avoids repeated tail scans
+        // and allocations from trim(r) for every quotient coefficient.
+        // A zero high term would already have been trimmed by the old
+        // implementation; skip it without emitting field events.
+        for shift in (0..q.len()).rev() {
+            let highest = r[shift + b.len() - 1];
+            if highest == 0 { continue; }
+            let c = if lead == 1 {
+                highest
+            } else {
+                self.field(FieldOp::Mul, highest, inv)?
+            };
+            q[shift] = c;
+            for (k, &v) in b[..b.len() - 1].iter().enumerate() {
+                if v == 0 { continue; }
+                let product = self.field(FieldOp::Mul, c, v)?;
+                r[shift + k] = self.field(FieldOp::Sub, r[shift + k], product)?;
+            }
+            r[shift + b.len() - 1] = 0;
+        }
+        r.truncate(b.len() - 1);
+        let r = trim(r);
         let q = trim(q);
         self.event(RootEvent::Division {
             a: a.to_vec(),
@@ -1707,6 +1732,62 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round85_fixed_division_matches_independent_euclidean_remainder() {
+        // Test degrees, sparse/monomial/linear and nonmonic divisors,
+        // including short dividends and the maximum admitted field.
+        for p in [3, 17, 65_521, 1_000_000_007, MAX_PRIME] {
+            for da in 0..=8usize {
+                for db in 0..=8usize {
+                    for variant in 0..4u64 {
+                        let mut a: Vec<u64> = (0..=da)
+                            .map(|i| ((i as u64 * 13 + variant * 17 + 1) % p)).collect();
+                        if da == 0 && variant == 3 { a.clear(); }
+                        if !a.is_empty() && *a.last().unwrap() == 0 {
+                            *a.last_mut().unwrap() = 1;
+                        }
+                        let mut b: Vec<u64> = (0..=db)
+                            .map(|i| ((i as u64 * 7 + variant * 11 + 1) % p)).collect();
+                        if variant == 0 {
+                            b.fill(0);
+                            b[db] = 1; // X^db, with constant one at db=0
+                        } else if variant == 1 && db > 0 {
+                            b.fill(0);
+                            b[0] = 1;
+                            b[db] = 1; // monic binomial
+                        } else if *b.last().unwrap() == 0 {
+                            *b.last_mut().unwrap() = 1;
+                        }
+                        let expected = vdiv(&a, &b, p).unwrap();
+                        let mut sink = |_| Ok(());
+                        let mut engine = Engine {
+                            report: RootReport {
+                                schema: "prime-root-trace/v1".into(),
+                                p, polynomial: vec![1], seed: 0,
+                                limits: RootLimits {
+                                    field_work: MAX_WORK, split_attempts: MAX_EVENTS,
+                                    events: MAX_EVENTS, degree: MAX_DEGREE,
+                                },
+                                stop: RootStop::Complete,
+                                counters: RootCounters::default(), events: vec![],
+                                unacknowledged: None, sink_error: None, roots: vec![],
+                            },
+                            sink: &mut sink, next_id: 0,
+                            reciprocal32: if p <= u32::MAX as u64 {
+                                ((1u128 << 64) / p as u128) as u64
+                            } else { 0 },
+                        };
+                        let actual = engine.div(&a, &b).unwrap();
+                        assert_eq!(actual, expected, "p={p}, a={a:?}, b={b:?}");
+                        assert!(matches!(engine.report.events.last(),
+                            Some(RootEvent::Division {..})));
+                    }
+                }
+            }
+        }
+    }
+
 
     #[test]
     fn round84_indexed_replay_rejects_forged_computation_ids() {
