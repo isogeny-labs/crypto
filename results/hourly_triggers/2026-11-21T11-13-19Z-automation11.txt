@@ -1,0 +1,6 @@
+Requested relation-finding monitor run at 2026-11-21T11:13:19Z.
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Curve: frozen Koblitz GF(2^23), a=0, m=2, 256 natural trials, 64 planted-SAT and 64 proven-UNSAT controls.
+Baseline: results/relation_baseline.json
+Threshold: 20% absolute relative change in throughput or success rate.
+The workflow appends results/hourly_log.csv and opens an issue for failures/anomalies.
