@@ -34,15 +34,18 @@ Raw: `kmitm_ifma_wall_b24.txt`, `kmitm_ifma_wall_b32_a32.txt`,
 
 ## Reading
 
-- **Win band:** low-m / modest left tables (m=3–4, and m=5 at small A) —
-  arithmetic latency-bound; IFMA overlaps the sibling-pair muls.
-- **Loss band:** large left tables (m≥6, or m=5 at \|Fₓ\|=64) — Bloom / map /
-  cache dominate; IFMA's extra prefix-inv + candidate materialization loses.
-- Default `decompose_lanes` still prefers IFMA when prepared (correctness
-  parity with scalar). Callers that care about the loss band can
-  `set_ifma_enabled(false)`.
+- **Win band (after batch Mont-inv of the IFMA prefix, 2026-11-21 tick1):**
+  m=3–4 at A≤64, and m=5 at modest A — oracle wall IFMA vs scalar8 ≈**1.5–1.8×**
+  (bits32 A32); see `research/rootfind_optlevel_20261121/`.
+- **Loss band:** very large left tables (m=6 at A=64, left ≳10⁸) — Bloom /
+  map / cache dominate; auto-disable when left > ~500k entries.
+- Default `decompose_lanes` prefers IFMA when prepared and left is not huge.
+  Callers can `set_ifma_enabled(false)`.
 - Does **not** move e2e single-DLP cold wall (lanes collect already lost to
   walk at the pinned recipe). Does **not** pass G3.
+
+Optlevel (T-timing, honest IFMA lane-mul count): kmitm:m=4 IFMA A_single ≈**0.97**
+(grade A) on this host — near the compute roof for counted mont muls.
 
 ## Claim hygiene
 

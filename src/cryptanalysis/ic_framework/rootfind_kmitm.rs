@@ -793,6 +793,13 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
             self.ifma = super::rootfind_kmitm_ifma::IfmaRight1::new(ctx.group.p, &xs, &ys)
                 .map(Arc::new);
             self.ifma_prefix.clear();
+            // Very large left tables can still be Bloom/cache-bound
+            // (`IFMA_ATTEMPT.md`). After batch Mont-inv of the IFMA prefix,
+            // the win band extends past 80k; keep scalar only above ~500k.
+            let left_n = self.canon_left.len();
+            if self.ifma.is_some() && left_n > 500_000 {
+                self.ifma_enabled = false;
+            }
         }
         self.mismatches = 0;
         self.probe_right_adds = 0;
@@ -1497,32 +1504,43 @@ impl RootfindKMitmOracle<'_> {
                 }
             }
         }
-        // (lane, right_j, x_canon); one sibling-pair add charged per (lane, j).
+        // Bloom-pass candidates only (reject inside the IFMA callback).
         let mut cands: Vec<(usize, usize, u64)> = Vec::new();
         let mut adds = 0u64;
+        let mut bloom_rejects = 0u64;
+        let mut bloom_passes = 0u64;
         let skip: [bool; 8] = std::array::from_fn(|i| i < t_n && out[i].is_some());
-        {
+        let bloom = self.canon_bloom.clone();
+        let muls = {
             let prefix = &mut self.ifma_prefix;
             ifma.for_each_sibling_pair(targets, prefix, |lane, j, xp, xm| {
                 if skip[lane] {
                     return;
                 }
                 adds += 1;
-                cands.push((lane, fb.neg_index[j], xp));
-                cands.push((lane, j, xm));
-            });
-        }
+                for (x, right_j) in [(xp, fb.neg_index[j]), (xm, j)] {
+                    let pass = bloom.as_ref().map(|b| b.maybe(x)).unwrap_or(true);
+                    if pass {
+                        bloom_passes += 1;
+                        cands.push((lane, right_j, x));
+                    } else {
+                        bloom_rejects += 1;
+                    }
+                }
+            })
+        };
         self.probe_batch_inv += 1;
         counters.inversions += 1;
         ops.field_ops.invs += 1;
-        ops.field_ops.muls += 3 * (n_fb * t_n) as u64;
+        // Honest IFMA Montgomery muls (vector lane-ops + batch-inv Fermat).
+        ops.field_ops.muls += muls;
+        let _ = n_fb; // reserved for future intensity notes
         ops.adds += adds;
         self.probe_right_adds += adds;
+        self.bloom_rejects += bloom_rejects;
+        self.bloom_passes += bloom_passes;
         for &(lane, right_j, x_canon) in &cands {
             if out[lane].is_some() {
-                continue;
-            }
-            if !self.bloom_maybe_canon(x_canon) {
                 continue;
             }
             self.probe_lookups += 1;

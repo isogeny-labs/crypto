@@ -79,12 +79,15 @@ impl IfmaRight1 {
     /// For each live lane `l < n_live`, call `on_pair(l, j, x_plus, x_minus)`
     /// with canonical abscissae of `R±F_j`. Degenerate lanes (same abscissa
     /// as `F_j`, or padded) are skipped for that `j`.
+    ///
+    /// Returns the number of lane-Montgomery multiplications performed
+    /// (each vector `mm` counts `n_live` ops).
     pub fn for_each_sibling_pair(
         &self,
         pts: &[PrimePoint],
         prefix: &mut Vec<[u64; LANES]>,
         mut on_pair: impl FnMut(usize, usize, u64, u64),
-    ) {
+    ) -> u64 {
         debug_assert!(!pts.is_empty() && pts.len() <= LANES);
         let n_live = pts.len();
         let mut xr = [0u64; LANES];
@@ -95,18 +98,45 @@ impl IfmaRight1 {
             yr[l] = mulmod(q.y, self.r, self.p);
         }
         // SAFETY: `new` returned `Some` only where the CPU has IFMA.
-        unsafe {
-            self.sweep_avx(&xr, &yr, n_live, prefix, &mut on_pair);
+        unsafe { self.sweep_avx(&xr, &yr, n_live, prefix, &mut on_pair) }
+    }
+
+    /// Scalar Montgomery product, `R = 2^52` (same reduction as the vector `mm`).
+    #[inline(always)]
+    fn mont_mul(&self, a: u64, b: u64) -> u64 {
+        let t = a as u128 * b as u128;
+        let lo = (t as u64) & M52;
+        let hi = (t >> 52) as u64;
+        let m = lo.wrapping_mul(self.pinv) & M52;
+        let mp = m as u128 * self.p as u128;
+        let carry = (lo as u128 + (mp & M52 as u128)) >> 52;
+        let u = hi
+            .wrapping_add((mp >> 52) as u64)
+            .wrapping_add(carry as u64);
+        if u >= self.p {
+            u - self.p
+        } else {
+            u
         }
     }
 
-    /// `a⁻¹·R` from `a·R`, per lane (scalar Fermat).
-    fn inv_lanes(&self, v: [u64; LANES]) -> [u64; LANES] {
-        let mut o = [0u64; LANES];
-        for l in 0..LANES {
-            o[l] = mulmod(self.r2, powmod(v[l], self.p - 2, self.p), self.p);
+    /// Batch `a⁻¹·R` from eight `a·R` values: one Fermat of the product,
+    /// Montgomery trick for the rest (was eight independent Fermats).
+    fn inv_lanes(&self, mut v: [u64; LANES]) -> [u64; LANES] {
+        let mut scratch = [0u64; LANES];
+        let mut acc = self.r; // Montgomery 1
+        for i in 0..LANES {
+            scratch[i] = acc;
+            acc = self.mont_mul(acc, v[i]);
         }
-        o
+        // Same closed form as the previous per-lane Fermat, on the product.
+        let mut inv_acc = mulmod(self.r2, powmod(acc, self.p - 2, self.p), self.p);
+        for i in (0..LANES).rev() {
+            let xi = v[i];
+            v[i] = self.mont_mul(inv_acc, scratch[i]);
+            inv_acc = self.mont_mul(inv_acc, xi);
+        }
+        v
     }
 
     #[target_feature(enable = "avx512f,avx512ifma")]
@@ -117,7 +147,7 @@ impl IfmaRight1 {
         n_live: usize,
         prefix: &mut Vec<[u64; LANES]>,
         on_pair: &mut impl FnMut(usize, usize, u64, u64),
-    ) {
+    ) -> u64 {
         let ld = |a: &[u64; LANES]| _mm512_loadu_si512(a.as_ptr() as *const _);
         let st = |v: __m512i| {
             let mut a = [0u64; LANES];
@@ -129,7 +159,10 @@ impl IfmaRight1 {
         let z = _mm512_setzero_si512();
         let one_r = _mm512_set1_epi64(self.r as i64);
         let one = _mm512_set1_epi64(1);
-        let mm = |a: __m512i, b: __m512i| {
+        let live = n_live as u64;
+        let mut vec_muls = 0u64;
+        let mut mm = |a: __m512i, b: __m512i| {
+            vec_muls += live;
             let lo = _mm512_madd52lo_epu64(z, a, b);
             let hi = _mm512_madd52hi_epu64(z, a, b);
             let m = _mm512_madd52lo_epu64(z, lo, pinv);
@@ -161,7 +194,12 @@ impl IfmaRight1 {
             acc = mm(acc, diff(j).0);
             prefix.push(st(acc));
         }
-        let mut inv = ld(&self.inv_lanes(st(acc)));
+        // Batch inv of the 8 lane products (one Fermat + Montgomery trick).
+        // Charge ~2·LANES mont muls for the product tree + back-sub, plus the
+        // single Fermat (~1.5·log₂(p) mulmods, counted as mont-equivalents).
+        let inv_arr = self.inv_lanes(st(acc));
+        let fermat_muls = 2 * LANES as u64 + ((64 - self.p.leading_zeros()) as u64 * 3 / 2);
+        let mut inv = ld(&inv_arr);
         for j in (1..k).rev() {
             let inv_j = mm(inv, ld(&prefix[j - 1]));
             inv = mm(inv, diff(j).0);
@@ -180,8 +218,10 @@ impl IfmaRight1 {
             let lm = mm(sub(z, add(yj, vyr)), inv_j);
             let base = add(vxr, xj);
             // ×1 (canonical) strips the Montgomery factor.
-            let xp = st(mm(sub(mm(lp, lp), base), one));
-            let xm = st(mm(sub(mm(lm, lm), base), one));
+            let lp2 = mm(lp, lp);
+            let lm2 = mm(lm, lm);
+            let xp = st(mm(sub(lp2, base), one));
+            let xm = st(mm(sub(lm2, base), one));
             for l in 0..n_live {
                 if zm & (1 << l) != 0 {
                     continue;
@@ -189,5 +229,6 @@ impl IfmaRight1 {
                 on_pair(l, j, xp[l], xm[l]);
             }
         }
+        vec_muls + fermat_muls
     }
 }

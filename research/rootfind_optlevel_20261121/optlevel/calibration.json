@@ -1,0 +1,641 @@
+{
+ "build": {
+  "c": null,
+  "exe": "/workspace/tools/optlevel/target/release/optlevel",
+  "exe_sha256": "0a46b323f9b75b567a6db93b293b3df25971c814247d6f76350ee4265d7a7e5a",
+  "isas": [
+   "avx512",
+   "avx2",
+   "scalar"
+  ],
+  "kernels": "rust (tools/optlevel/src/kernels.rs, inside the optlevel binary; one variant per isa, selected at run time)",
+  "source_sha256": "a550c606bf4c47759d8d69e3f3c48b7d5ea41f22a25658657ea9b9056138889b"
+ },
+ "ceiling_rule": "max over repeats and over builds of the summed rate of k pinned copies; the median is kept as the low end",
+ "clock_hz_effective": {
+  "max": 3953224758.650491,
+  "median": 3948976777.344025,
+  "min": 3915834157.8934474,
+  "n": 3
+ },
+ "compute": {
+  "fma_f64": {
+   "best_variant": "fma_f64_reg@avx512",
+   "definition": "a <- a*s + b in binary64 (one fused multiply-add; float-encoded modular arithmetic)",
+   "scalar_ops_per_s": 3795822503.8744855,
+   "simd_ops_per_s": 63415450078.04912,
+   "total_ops_per_s": {
+    "1": {
+     "max": 63415450078.04912,
+     "median": 63412261070.633156,
+     "min": 63337413101.463196,
+     "n": 3
+    },
+    "2": {
+     "max": 126690364207.1355,
+     "median": 126648077235.4981,
+     "min": 126415809394.83694,
+     "n": 3
+    },
+    "4": {
+     "max": 253398202489.8624,
+     "median": 253223652006.81934,
+     "min": 253174290994.67883,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "fma_f64@avx2": {
+     "max": 17560311811.025455,
+     "median": 17555773286.982216,
+     "min": 17541456560.170612,
+     "n": 3
+    },
+    "fma_f64@avx512": {
+     "max": 28570711856.10994,
+     "median": 28555580896.66123,
+     "min": 28553374369.03344,
+     "n": 3
+    },
+    "fma_f64@scalar": {
+     "max": 3795822503.8744855,
+     "median": 3795154526.421196,
+     "min": 2460021858.4266257,
+     "n": 3
+    },
+    "fma_f64_reg@avx2": {
+     "max": 31754940709.32832,
+     "median": 31743431231.479767,
+     "min": 31738033829.499603,
+     "n": 3
+    },
+    "fma_f64_reg@avx512": {
+     "max": 63415450078.04912,
+     "median": 63412261070.633156,
+     "min": 63337413101.463196,
+     "n": 3
+    }
+   }
+  },
+  "modmuladd_p31": {
+   "best_variant": "modmuladd_p31@avx2",
+   "definition": "a <- a + m*b mod p, p < 2^31 (Montgomery, 32x32->64 multiplies)",
+   "scalar_ops_per_s": 944922660.0767772,
+   "simd_ops_per_s": 5188184565.025872,
+   "total_ops_per_s": {
+    "1": {
+     "max": 5188184565.025872,
+     "median": 5187115146.922595,
+     "min": 5161133973.127578,
+     "n": 3
+    },
+    "2": {
+     "max": 10401586143.878328,
+     "median": 10397026574.49995,
+     "min": 10381008373.659433,
+     "n": 3
+    },
+    "4": {
+     "max": 20724493592.062958,
+     "median": 18957016202.11956,
+     "min": 10935513028.244518,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "modmuladd_p31@avx2": {
+     "max": 5188184565.025872,
+     "median": 5187115146.922595,
+     "min": 5161133973.127578,
+     "n": 3
+    },
+    "modmuladd_p31@avx512": {
+     "max": 4937144174.048824,
+     "median": 4932775459.918224,
+     "min": 4894876399.787872,
+     "n": 3
+    },
+    "modmuladd_p31@scalar": {
+     "max": 944922660.0767772,
+     "median": 944282423.8269446,
+     "min": 943231780.8645579,
+     "n": 3
+    }
+   }
+  },
+  "modmuladd_p62": {
+   "best_variant": "modmuladd_p62@scalar",
+   "definition": "a <- a + m*b mod p, p < 2^62 (Montgomery, 64x64->128 multiplies)",
+   "scalar_ops_per_s": 944786560.6603167,
+   "simd_ops_per_s": 542954943.0432634,
+   "total_ops_per_s": {
+    "1": {
+     "max": 944786560.6603167,
+     "median": 941571523.648111,
+     "min": 941346470.5559918,
+     "n": 3
+    },
+    "2": {
+     "max": 1883912845.0140493,
+     "median": 1881849158.6403975,
+     "min": 1880663814.5419235,
+     "n": 3
+    },
+    "4": {
+     "max": 3779161808.3405123,
+     "median": 3776588505.151728,
+     "min": 3719694512.4144073,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "modmuladd_p62@avx2": {
+     "max": 542881087.2904586,
+     "median": 539741381.4169378,
+     "min": 538427993.2311668,
+     "n": 3
+    },
+    "modmuladd_p62@avx512": {
+     "max": 542954943.0432634,
+     "median": 542761874.8388282,
+     "min": 540070660.6133744,
+     "n": 3
+    },
+    "modmuladd_p62@scalar": {
+     "max": 944786560.6603167,
+     "median": 941571523.648111,
+     "min": 941346470.5559918,
+     "n": 3
+    }
+   }
+  },
+  "muladd_u32": {
+   "best_variant": "muladd_u32@avx512",
+   "definition": "a <- a*m + c on 32-bit words (wrapping)",
+   "scalar_ops_per_s": 3516951782.721272,
+   "simd_ops_per_s": 38868660583.78684,
+   "total_ops_per_s": {
+    "1": {
+     "max": 38868660583.78684,
+     "median": 38810830567.20567,
+     "min": 38002758768.726814,
+     "n": 3
+    },
+    "2": {
+     "max": 78276384124.93549,
+     "median": 78250440734.29187,
+     "min": 78010868666.89159,
+     "n": 3
+    },
+    "4": {
+     "max": 156417104070.4387,
+     "median": 156412935324.4433,
+     "min": 154895851510.04596,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "muladd_u32@avx2": {
+     "max": 23354514028.90366,
+     "median": 23274317153.990967,
+     "min": 23161030058.450302,
+     "n": 3
+    },
+    "muladd_u32@avx512": {
+     "max": 38868660583.78684,
+     "median": 38810830567.20567,
+     "min": 38002758768.726814,
+     "n": 3
+    },
+    "muladd_u32@scalar": {
+     "max": 3516951782.721272,
+     "median": 3375002954.6292677,
+     "min": 2961914925.9797015,
+     "n": 3
+    }
+   }
+  },
+  "muladd_u64": {
+   "best_variant": "muladd_u64@avx512",
+   "definition": "a <- a*m + c on 64-bit words (wrapping)",
+   "scalar_ops_per_s": 3808201211.1561184,
+   "simd_ops_per_s": 15373212441.140089,
+   "total_ops_per_s": {
+    "1": {
+     "max": 15373212441.140089,
+     "median": 15358996549.793934,
+     "min": 15196630669.228857,
+     "n": 3
+    },
+    "2": {
+     "max": 30574647631.221672,
+     "median": 30474161595.984093,
+     "min": 30407971680.585526,
+     "n": 3
+    },
+    "4": {
+     "max": 59328567623.31369,
+     "median": 59031438013.133575,
+     "min": 58516866602.63199,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "muladd_u64@avx2": {
+     "max": 5522017149.294272,
+     "median": 5512104201.660008,
+     "min": 5486421307.063405,
+     "n": 3
+    },
+    "muladd_u64@avx512": {
+     "max": 15373212441.140089,
+     "median": 15358996549.793934,
+     "min": 15196630669.228857,
+     "n": 3
+    },
+    "muladd_u64@scalar": {
+     "max": 3808201211.1561184,
+     "median": 3765988726.515195,
+     "min": 3765811167.499777,
+     "n": 3
+    }
+   }
+  },
+  "mulwide_u64": {
+   "best_variant": "mulwide_u64@scalar",
+   "definition": "a <- hi64(a*m) + c: one 64x64->128 multiply per operation",
+   "scalar_ops_per_s": 2574329025.3036633,
+   "simd_ops_per_s": 1763966306.0439906,
+   "total_ops_per_s": {
+    "1": {
+     "max": 2574329025.3036633,
+     "median": 2573702170.2762446,
+     "min": 2559103737.8428326,
+     "n": 3
+    },
+    "2": {
+     "max": 5166351001.80752,
+     "median": 5165932325.56452,
+     "min": 5159778055.084005,
+     "n": 3
+    },
+    "4": {
+     "max": 10074415028.091808,
+     "median": 10004105915.886229,
+     "min": 9995575705.683924,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "mulwide_u64@avx2": {
+     "max": 1763966306.0439906,
+     "median": 1763749743.1700017,
+     "min": 1762907457.233014,
+     "n": 3
+    },
+    "mulwide_u64@avx512": {
+     "max": 1384069758.9247744,
+     "median": 1383794872.4602497,
+     "min": 1380189111.0780482,
+     "n": 3
+    },
+    "mulwide_u64@scalar": {
+     "max": 2574329025.3036633,
+     "median": 2573702170.2762446,
+     "min": 2559103737.8428326,
+     "n": 3
+    }
+   }
+  },
+  "popcnt_u64": {
+   "best_variant": "popcnt_u64@avx512",
+   "definition": "popcount(a and b) on 64-bit words",
+   "scalar_ops_per_s": 2628723233.0854893,
+   "simd_ops_per_s": 19175228421.436092,
+   "total_ops_per_s": {
+    "1": {
+     "max": 19175228421.436092,
+     "median": 19129263338.250397,
+     "min": 19121448778.256138,
+     "n": 3
+    },
+    "2": {
+     "max": 38232587762.98465,
+     "median": 38185222247.319916,
+     "min": 38140715412.8757,
+     "n": 3
+    },
+    "4": {
+     "max": 76710666703.66573,
+     "median": 76618303203.81927,
+     "min": 76579139197.85432,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "popcnt_u64@avx2": {
+     "max": 5110310591.629224,
+     "median": 5110231537.724643,
+     "min": 5107589037.037445,
+     "n": 3
+    },
+    "popcnt_u64@avx512": {
+     "max": 19175228421.436092,
+     "median": 19129263338.250397,
+     "min": 19121448778.256138,
+     "n": 3
+    },
+    "popcnt_u64@scalar": {
+     "max": 2628723233.0854893,
+     "median": 2621368978.848298,
+     "min": 2584809371.8519144,
+     "n": 3
+    }
+   }
+  },
+  "ptr_hop": {
+   "best_variant": "chase@scalar",
+   "definition": "one dependent pointer dereference",
+   "scalar_ops_per_s": 798050623.7565395,
+   "simd_ops_per_s": 797700369.4840518,
+   "total_ops_per_s": {
+    "1": {
+     "max": 798050623.7565395,
+     "median": 797455952.1474066,
+     "min": 796963381.505826,
+     "n": 3
+    },
+    "2": {
+     "max": 1594292140.3825035,
+     "median": 1590730453.7304966,
+     "min": 1590524491.658342,
+     "n": 3
+    },
+    "4": {
+     "max": 3184115161.3433304,
+     "median": 3165291519.656027,
+     "min": 3143668195.986723,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "chase@avx2": {
+     "max": 797684534.5770185,
+     "median": 797592370.7034173,
+     "min": 796013166.6966263,
+     "n": 3
+    },
+    "chase@avx512": {
+     "max": 797700369.4840518,
+     "median": 797433921.4245721,
+     "min": 787602952.5008745,
+     "n": 3
+    },
+    "chase@scalar": {
+     "max": 798050623.7565395,
+     "median": 797455952.1474066,
+     "min": 796963381.505826,
+     "n": 3
+    }
+   }
+  },
+  "xor_u64": {
+   "best_variant": "xor_u64@avx512",
+   "definition": "a <- a xor b on 64-bit words (one F_2 row-add word)",
+   "scalar_ops_per_s": 3798996697.470858,
+   "simd_ops_per_s": 25455050510.72724,
+   "total_ops_per_s": {
+    "1": {
+     "max": 25455050510.72724,
+     "median": 25393668898.502686,
+     "min": 25374883545.37731,
+     "n": 3
+    },
+    "2": {
+     "max": 50954209610.556694,
+     "median": 50703159107.88907,
+     "min": 50550496719.66356,
+     "n": 3
+    },
+    "4": {
+     "max": 102158734592.57118,
+     "median": 100473156364.43462,
+     "min": 98679839555.53624,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "xor_u64@avx2": {
+     "max": 14342792644.557251,
+     "median": 14316530512.661062,
+     "min": 14128944463.660355,
+     "n": 3
+    },
+    "xor_u64@avx512": {
+     "max": 25455050510.72724,
+     "median": 25393668898.502686,
+     "min": 25374883545.37731,
+     "n": 3
+    },
+    "xor_u64@scalar": {
+     "max": 3798996697.470858,
+     "median": 3792339661.3944674,
+     "min": 3780485379.820131,
+     "n": 3
+    }
+   }
+  }
+ },
+ "conditions": {
+  "loadavg_1m_after": 2.06,
+  "loadavg_1m_before": 1.01,
+  "other_cpu_cores": 0.12012204636333058,
+  "psi_cpu_some_avg10_before": 0.45,
+  "steal_cores": 0.00007966531479126524,
+  "thermal_throttle_events": null
+ },
+ "created_utc": "2026-11-21T22:42:51Z",
+ "device": "cpu",
+ "flags": [
+  "VIRTUALIZED"
+ ],
+ "host": {
+  "affinity_cpus": 4,
+  "allowed_cpus": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "arch": "x86_64",
+  "caches_bytes": {
+   "L1d": 49152,
+   "L1i": 32768,
+   "L2": 2097152,
+   "L3": 335544320
+  },
+  "cgroup_cpu_max": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor",
+  "cpu_quota_cores": null,
+  "cpu_quota_source": null,
+  "cpufreq_boost": null,
+  "cpufreq_governor": null,
+  "event_sources": [
+   "breakpoint",
+   "kprobe",
+   "msr",
+   "power",
+   "software",
+   "tracepoint",
+   "uprobe"
+  ],
+  "fingerprint": "d0efb1838c03e9e3",
+  "hypervisor": true,
+  "isa": [
+   "adx",
+   "avx",
+   "avx2",
+   "avx512_vpopcntdq",
+   "avx512bw",
+   "avx512dq",
+   "avx512f",
+   "avx512ifma",
+   "avx512vl",
+   "bmi2",
+   "fma",
+   "gfni",
+   "pclmulqdq",
+   "popcnt",
+   "sse4_2",
+   "vpclmulqdq"
+  ],
+  "kernel": "6.12.113+",
+  "logical_cpus": 4,
+  "mem_total_bytes": 16780623872,
+  "numa_nodes": 1,
+  "perf_event_paranoid": "2",
+  "smt_active": "0",
+  "thread_siblings_cpu0": "0",
+  "turbo_disabled": null,
+  "usable_cpus": 4,
+  "usable_cpus_basis": "affinity mask (4 CPUs)"
+ },
+ "memory": {
+  "bandwidth_bytes_per_s": {
+   "1": {
+    "kernel": "xor_u64",
+    "max": 28385704024.714863,
+    "median": 28031300066.64815,
+    "min": 26966688345.221046,
+    "n": 3
+   },
+   "2": {
+    "kernel": "xor_u64",
+    "max": 53087144328.92392,
+    "median": 52741666560.62217,
+    "min": 45836890626.363594,
+    "n": 3
+   },
+   "4": {
+    "kernel": "xor_u64",
+    "max": 98635217685.39839,
+    "median": 97156678979.72714,
+    "min": 94365925801.79092,
+    "n": 3
+   }
+  },
+  "bandwidth_variants": {
+   "1": {
+    "popcnt_u64": {
+     "max": 17826039656.397865,
+     "median": 17754561621.07803,
+     "min": 17362128755.026,
+     "n": 3
+    },
+    "triad": {
+     "max": 21170733045.505714,
+     "median": 21026912699.365303,
+     "min": 19839118070.818825,
+     "n": 3
+    },
+    "xor_u64": {
+     "max": 28385704024.714863,
+     "median": 28031300066.64815,
+     "min": 26966688345.221046,
+     "n": 3
+    }
+   },
+   "2": {
+    "popcnt_u64": {
+     "max": 34062146430.093708,
+     "median": 33551501130.92469,
+     "min": 30276784237.63202,
+     "n": 3
+    },
+    "triad": {
+     "max": 40357998537.43102,
+     "median": 40250929462.15873,
+     "min": 40001191612.95818,
+     "n": 3
+    },
+    "xor_u64": {
+     "max": 53087144328.92392,
+     "median": 52741666560.62217,
+     "min": 45836890626.363594,
+     "n": 3
+    }
+   },
+   "4": {
+    "popcnt_u64": {
+     "max": 64517799427.92269,
+     "median": 63307055939.04506,
+     "min": 62892298606.721176,
+     "n": 3
+    },
+    "triad": {
+     "max": 76489969819.17392,
+     "median": 76466857850.04803,
+     "min": 72593821216.47801,
+     "n": 3
+    },
+    "xor_u64": {
+     "max": 98635217685.39839,
+     "median": 97156678979.72714,
+     "min": 94365925801.79092,
+     "n": 3
+    }
+   }
+  },
+  "bytes_convention": "bytes moved over arrays above the LLC: loads + stores + write-allocate reads (triad 32 B/element, xor 24, popcount 16); the ceiling is the best of the three",
+  "latency_definition": "ns per dependent load over a random cycle of 64-byte nodes the size of one triad array",
+  "latency_ns": {
+   "max": 153.21713690186792,
+   "median": 150.53117348922683,
+   "min": 147.94953049057574,
+   "n": 3
+  },
+  "llc_bytes": 335544320,
+  "triad_array_bytes": 499694387
+ },
+ "schema": "optlevel.calibration/v1",
+ "settings": {
+  "c_kernels": false,
+  "repeats": 3,
+  "scale_points": [
+   1,
+   2,
+   4
+  ],
+  "seconds_per_kernel": 0.5
+ },
+ "tool_version": "2.0.0"
+}
