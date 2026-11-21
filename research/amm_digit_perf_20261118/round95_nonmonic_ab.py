@@ -63,8 +63,9 @@ fn main(){
     let mut result=0u64;
     for _ in 0..24 {
         for (b,e,m) in &cases {
-            for &value in black_box(benchmark_power(black_box(b),black_box(*e),
-                black_box(m),black_box(p)).unwrap()){
+            let values=black_box(benchmark_power(black_box(b),black_box(*e),
+                black_box(m),black_box(p)).unwrap());
+            for &value in &values {
                 result=result.wrapping_mul(33).wrapping_add(value);
             }
         }
