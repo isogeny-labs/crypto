@@ -4,6 +4,7 @@ import gzip
 import hashlib
 import itertools
 import json
+import re
 from collections import Counter
 from fractions import Fraction as F
 from pathlib import Path
@@ -156,9 +157,24 @@ def main():
         else:
             assert row["status"] == "no_local_bridge_in_boxes"
     assert bridge_count == result["outcome_counts"]["local_bridge"] == 22
+    lean_raw = (HERE / "formal" / "Census.lean").read_bytes()
+    lean_receipt = json.loads((HERE / "formal" / "source-result.json").read_text())
+    assert sha(lean_raw) == lean_receipt["lean_sha256"]
+    lean = lean_raw.decode()
+    selected_lean = [int(x) for x in re.search(r"def selected : List ℕ := \[(.*?)\]", lean).group(1).split(", ")]
+    bridge_lean = [x == "true" for x in re.search(r"def bridge : List Bool := \[(.*?)\]", lean).group(1).split(", ")]
+    rational_lean = [x == "true" for x in re.search(r"def rational : List Bool := \[(.*?)\]", lean).group(1).split(", ")]
+    assert selected_lean == selected
+    assert bridge_lean == [x["status"] == "local_bridge" for x in outcomes]
+    assert rational_lean == [bool(x.get("crt_rational_relation")) for x in outcomes]
+    lean_output = (HERE / "formal" / "build-output.txt").read_text().splitlines()
+    assert len(lean_output) == 3
+    assert all("does not depend on any axioms" in x for x in lean_output)
+    assert not (HERE / "formal" / "build-stderr.txt").read_text()
     print(json.dumps({"schema": "xedni-bridge6-source-policy-audit-v1",
                       "status": "PASS", "selected_pairs": len(selected),
                       "attempts_replayed": len(attempts), "local_bridges": bridge_count,
+                      "lean_census_bound": True,
                       "attempts_raw_sha256": result["attempts_raw_sha256"]}, sort_keys=True, indent=2))
 
 
