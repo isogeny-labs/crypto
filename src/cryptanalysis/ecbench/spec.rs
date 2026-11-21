@@ -18,6 +18,9 @@ use crate::cryptanalysis::ecbench::methods::{
     applicable, decl, resolve, Applies, MethodSpec, ResolvedMethod,
 };
 use crate::cryptanalysis::ecbench::workload::{CurveSpec, Instance, TargetKind, Workload};
+use crate::cryptanalysis::semaev_field_profile::{
+    canonical_semaev_groebner_profile, CANONICAL_SEMAEV_GROEBNER_PROFILE_ID,
+};
 
 pub const SPEC_SCHEMA: &str = "ecbench.spec/v1";
 
@@ -145,6 +148,10 @@ pub struct Spec {
     pub label: String,
     #[serde(default)]
     pub description: String,
+    /// Exact field/curve identity required by a benchmark policy. Omission is
+    /// retained only so sealed historical sessions can still be replayed.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub field_profile: Option<String>,
     pub workloads: WorkloadPlan,
     pub arms: Vec<ArmSpec>,
     pub measurement: Measurement,
@@ -208,13 +215,79 @@ impl Spec {
     }
 
     pub(crate) fn identity_view(&self) -> Value {
-        json!({
+        let mut view = json!({
             "schema": self.schema,
             "workloads": serde_json::to_value(&self.workloads).unwrap_or(Value::Null),
             "arms": serde_json::to_value(&self.arms).unwrap_or(Value::Null),
             "measurement": serde_json::to_value(&self.measurement).unwrap_or(Value::Null),
-        })
+        });
+        if let Some(profile) = &self.field_profile {
+            view["field_profile"] = json!(profile);
+        }
+        view
     }
+}
+
+fn is_binary_semaev_groebner_method(method: &ResolvedMethod) -> bool {
+    if method.id != "ic.pipeline" {
+        return false;
+    }
+    let oracle = method
+        .params
+        .get("oracle")
+        .map(String::as_str)
+        .unwrap_or("");
+    let solver = method
+        .params
+        .get("solver")
+        .map(String::as_str)
+        .unwrap_or("");
+    let semaev = oracle.contains("descent-algebraic")
+        || oracle.contains("pdp3-koblitz")
+        || oracle.contains("pdp3-binary")
+        || oracle.contains("semaev");
+    let groebner = [
+        "f4", "f5", "m4gb", "msolve", "singular", "magma", "fgb", "openf4",
+    ]
+    .iter()
+    .any(|tag| solver.contains(tag));
+    semaev || groebner
+}
+
+fn validate_field_profile(plan: &Plan, require_for_new_run: bool) -> Result<(), String> {
+    let has_binary_workload = plan
+        .instances
+        .iter()
+        .any(|instance| matches!(instance, Instance::Binary(_)));
+    let governed = has_binary_workload
+        && plan
+            .arms
+            .iter()
+            .any(|arm| is_binary_semaev_groebner_method(&arm.method));
+    let Some(profile_id) = plan.spec.field_profile.as_deref() else {
+        if governed && require_for_new_run {
+            return Err(format!(
+                "new binary Gröbner/Semaev runs must set `field_profile` to `{CANONICAL_SEMAEV_GROEBNER_PROFILE_ID}`"
+            ));
+        }
+        return Ok(());
+    };
+    if profile_id != CANONICAL_SEMAEV_GROEBNER_PROFILE_ID {
+        return Err(format!(
+            "unknown field profile `{profile_id}`; canonical binary Gröbner/Semaev runs use `{CANONICAL_SEMAEV_GROEBNER_PROFILE_ID}`"
+        ));
+    }
+    let profile = canonical_semaev_groebner_profile();
+    for instance in &plan.instances {
+        let Instance::Binary(binary) = instance else {
+            return Err(format!(
+                "field profile `{profile_id}` applies only to the canonical binary curve {}",
+                profile.curve.icv1_slug
+            ));
+        };
+        profile.validate_instance(binary)?;
+    }
+    Ok(())
 }
 
 /// Why a spec's arm order cannot be balanced over its measured rounds, if
@@ -387,7 +460,7 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
     }
     let (spec_id, spec_sha256) = short_id("ECS1", &spec.identity_view())?;
     let warnings = order_warnings(&spec.measurement);
-    Ok(Plan {
+    let plan = Plan {
         spec,
         spec_id,
         spec_sha256,
@@ -397,7 +470,23 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
         instances,
         curve_of,
         executions,
-    })
+    };
+    // A pinned profile is always binding, including during historical
+    // replay. Missing profiles remain replayable and are refused only by
+    // `plan_for_new_run`.
+    validate_field_profile(&plan, false)?;
+    Ok(plan)
+}
+
+/// Validate and expand a spec that is about to create new evidence.
+///
+/// Sealed historical sessions call [`plan`] so an old unpinned spec remains
+/// replayable. Every new plan, run and Iso Lab request goes through this
+/// stricter boundary.
+pub fn plan_for_new_run(spec: Spec) -> Result<Plan, String> {
+    let plan = plan(spec)?;
+    validate_field_profile(&plan, true)?;
+    Ok(plan)
 }
 
 #[cfg(test)]
@@ -712,5 +801,59 @@ mod tests {
     fn koblitz_only_arm_on_a_prime_curve_is_refused() {
         assert!(plan(spec(&[("f", "rho.signed_frobenius")])).is_err());
         assert!(plan(spec(&[("a", "rho.plain"), ("a", "rho.plain")])).is_err());
+    }
+
+    fn binary_groebner_spec(field_profile: Option<&str>, n: u32) -> Spec {
+        let mut value = json!({
+            "schema": SPEC_SCHEMA,
+            "label": "canonical binary Groebner fixture",
+            "workloads": {
+                "curves": [{"kind": "koblitz", "a": 1, "n": n}],
+                "targets_per_curve": 1,
+                "target_seed": 17
+            },
+            "arms": [{
+                "name": "f4",
+                "role": "candidate",
+                "method": {
+                    "id": "ic.pipeline",
+                    "params": {
+                        "factor_base": "koblitz-orbit:divisor=0;1",
+                        "oracle": "descent-algebraic:m=2",
+                        "solver": "f4-f2",
+                        "max_trials": "1"
+                    }
+                }
+            }],
+            "measurement": {"rounds": 1, "warmup": 0, "seed": 19}
+        });
+        if let Some(profile) = field_profile {
+            value["field_profile"] = json!(profile);
+        }
+        Spec::from_json(&value.to_string()).unwrap()
+    }
+
+    #[test]
+    fn new_binary_groebner_runs_require_the_canonical_field_profile() {
+        let legacy = binary_groebner_spec(None, 17);
+        // Sealed evidence remains replayable under the historical planner.
+        assert!(plan(legacy.clone()).is_ok());
+        let err = plan_for_new_run(legacy).err().expect("new run refused");
+        assert!(err.contains(CANONICAL_SEMAEV_GROEBNER_PROFILE_ID), "{err}");
+
+        let wrong_field = binary_groebner_spec(Some(CANONICAL_SEMAEV_GROEBNER_PROFILE_ID), 19);
+        let err = plan_for_new_run(wrong_field)
+            .err()
+            .expect("different field refused");
+        assert!(
+            err.contains("requires curve") || err.contains("GF(2^17)"),
+            "{err}"
+        );
+
+        plan_for_new_run(binary_groebner_spec(
+            Some(CANONICAL_SEMAEV_GROEBNER_PROFILE_ID),
+            17,
+        ))
+        .expect("canonical profile plans");
     }
 }

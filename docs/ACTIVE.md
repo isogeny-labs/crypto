@@ -39,7 +39,7 @@ Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hypere
 
 - [x] Prove a division-free exact subexponential decomposition oracle for the hashed prime-field networks, including fixed witness bits (Codex, completed 2026-11-18, branch codex/ecdlp-novel-oracle-20261118, PR #4668)
 
-- [ ] Benchmark the Boolean Faugère–Lachartre F4 split on matched Semaev systems (Codex, started 2026-11-18, branch codex/semaev-fl-benchmark-20261118, PR #4679)
+- [ ] Benchmark the Boolean Faugère–Lachartre F4 split and enforce canonical binary-field profiles across Gröbner/Semaev workloads (Codex, started 2026-11-18, branch codex/semaev-fl-benchmark-20261118, PR #4710)
 
 - [ ] Execute the frozen ecbench Phase-1 panel through the cold one-target IC-versus-rho gates, starting with the smallest runnable Koblitz and prime cells (Codex, started 2026-11-18, branch codex/ecbench-phase1-e2e-20261118, PR #4681)
 

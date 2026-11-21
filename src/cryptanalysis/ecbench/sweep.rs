@@ -285,6 +285,7 @@ pub fn generate(o: &SweepOptions) -> Result<Spec, String> {
             o.targets,
             o.rounds
         ),
+        field_profile: None,
         workloads: WorkloadPlan {
             curves,
             targets_per_curve: o.targets,
