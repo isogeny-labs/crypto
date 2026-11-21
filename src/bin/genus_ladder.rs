@@ -722,8 +722,17 @@ fn main() -> ExitCode {
         Spec::Quartic { q, curve_seed } => {
             let inst = ql::make_instance(*q, *curve_seed, *curve_seed, cfg.max_h)
                 .expect("admitted quartic");
-            let head = json!({"family": "quartic", "p": q, "g": 3, "curve_seed": curve_seed,
+            let mut head = json!({"family": "quartic", "p": q, "g": 3, "curve_seed": curve_seed,
                 "seed": seed, "r": inst.r, "h": inst.h});
+            if cfg.quartic_arms.iter().any(|a| a == "2lp-sfb") {
+                // the instance in full, so certificates can be re-checked independently
+                head["f"] = json!(inst.f.to_vec());
+                head["p0"] = json!(inst.p0.to_vec());
+                head["order"] = json!(inst.order);
+                head["t_secret"] = json!(inst.t_secret);
+                head["g_class"] = json!(format!("{:?}", inst.g));
+                head["target_class"] = json!(format!("{:?}", inst.target));
+            }
             let nb2 = (cfg.qc * f64::from(*q).sqrt()).ceil() as usize;
             let ext = cfg.quartic_arms != ["full", "2lp"];
             for name in &cfg.quartic_arms {
@@ -797,6 +806,9 @@ fn main() -> ExitCode {
                     }
                 }
                 rec["certified"] = json!(o.certified);
+                if ext {
+                    rec["recovered"] = json!(o.recovered);
+                }
                 rec["exhausted"] = json!(o.exhausted);
                 rec["ok"] = json!(o.recovered == Some(inst.t_secret));
                 rec["group_ops"] = json!(o.group_ops);
@@ -828,6 +840,9 @@ fn main() -> ExitCode {
             } else {
                 let o = ql::run_rho(&inst, *seed);
                 rec["kind"] = json!("run");
+                if ext {
+                    rec["recovered"] = json!(o.recovered);
+                }
                 rec["certified"] = json!(o.certified);
                 rec["ok"] = json!(o.recovered == Some(inst.t_secret));
                 rec["group_ops"] = json!(o.group_ops);

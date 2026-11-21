@@ -2291,7 +2291,7 @@ mod tests {
         ] {
             let (pq, pts) = curve(q, seed);
             let mut nat = Nat::default();
-            let ctx = Ctx::new(q, pq.coefficients(), &mut nat);
+            let mut ctx = Ctx::new(q, pq.coefficients(), &mut nat);
             let mut rng = StdRng::seed_from_u64(seed ^ 0xABCD);
             let mut rs = 12345u64;
             let (mut ns, mut na) = (Nat::default(), Nat::default());
