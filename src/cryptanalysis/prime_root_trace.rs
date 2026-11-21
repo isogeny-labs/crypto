@@ -1742,13 +1742,13 @@ mod tests {
                 for db in 0..=8usize {
                     for variant in 0..4u64 {
                         let mut a: Vec<u64> = (0..=da)
-                            .map(|i| ((i as u64 * 13 + variant * 17 + 1) % p)).collect();
+                            .map(|i| (i as u64 * 13 + variant * 17 + 1) % p).collect();
                         if da == 0 && variant == 3 { a.clear(); }
                         if !a.is_empty() && *a.last().unwrap() == 0 {
                             *a.last_mut().unwrap() = 1;
                         }
                         let mut b: Vec<u64> = (0..=db)
-                            .map(|i| ((i as u64 * 7 + variant * 11 + 1) % p)).collect();
+                            .map(|i| (i as u64 * 7 + variant * 11 + 1) % p).collect();
                         if variant == 0 {
                             b.fill(0);
                             b[db] = 1; // X^db, with constant one at db=0
@@ -1760,7 +1760,7 @@ mod tests {
                             *b.last_mut().unwrap() = 1;
                         }
                         let expected = vdiv(&a, &b, p).unwrap();
-                        let mut sink = |_| Ok(());
+                        let mut sink = |_: &RootEvent| Ok(());
                         let mut engine = Engine {
                             report: RootReport {
                                 schema: "prime-root-trace/v1".into(),
