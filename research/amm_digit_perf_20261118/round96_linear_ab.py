@@ -26,7 +26,7 @@ MAIN = r'''
 mod cryptanalysis {
     pub mod residual_walk {
         pub fn is_prime_u64(p:u64)->bool {
-            matches!(p,7|65521|1000000007|2305843009213693951)
+            matches!(p,7|13|65521|1000000007|2305843009213693951)
         }
     }
     pub mod prime_root_trace;
