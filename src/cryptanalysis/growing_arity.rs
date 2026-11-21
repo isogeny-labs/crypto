@@ -4,14 +4,15 @@
 //! `GROWING_ARITY_ORACLE_TARGET.md`: arity `m = m(L)` grows with
 //! `L = ln r`, factor-base size follows `B ≤ C m exp(L/m)` (capped for
 //! the existing [`KSumOracle`] table), and the lab's `ic_framework`
-//! pipeline (`prime-abscissa` + `ksum:m`) runs with matched ρ (`S_ρ =
-//! √(π/2)`), planted `[d]G=Q` verification, and ABBA seed pairing.
+//! pipeline (`prime-abscissa` + `ksum:m`) runs with an analytic generic-ρ
+//! expectation (`S_ρ = √(π/2)`), planted `[d]G=Q` verification, and
+//! paired IC seeds. It does not run a rho arm.
 //!
 //! This is **not** absolute-\(\mathbb{F}_p\) extension-IC, and **not** a
 //! claim that a proved coverage law exists — it measures whether this
 //! concrete growing-\(m\) ksum class clears \(\alpha < 1/2\) vs \(\sqrt{r}\).
 
-use crate::cryptanalysis::diem_kgrow::{ols_alpha_beta, LadderReport, LadderRung};
+use crate::cryptanalysis::diem_kgrow::ols_alpha_beta;
 use crate::cryptanalysis::ic_boundary::{
     prime_instance_for, Calibration, CountedGroup, GroupOps, PrimeInstance,
 };
@@ -89,11 +90,47 @@ pub struct GrowingArityCell {
     pub note: &'static str,
 }
 
+/// One rung. The rho columns are analytic expectations, not rho observations.
+#[derive(Clone, Debug, Serialize)]
+pub struct GrowingArityLadderRung {
+    pub p: u64,
+    pub m: u32,
+    pub b_schedule: u64,
+    pub b_used: u64,
+    pub capped: bool,
+    pub ic_adds_seed_a: u64,
+    pub ic_adds_seed_b: u64,
+    pub rho_expected_adds_seed_a: u64,
+    pub rho_expected_adds_seed_b: u64,
+    pub log2_ic_observed_mean: f64,
+    pub log2_rho_expected_mean: f64,
+    pub below_rho_expectation: bool,
+    pub recovered_ok: bool,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct GrowingArityLadderReport {
+    pub schema: &'static str,
+    pub standing: &'static str,
+    pub comparison: &'static str,
+    pub rungs: Vec<GrowingArityLadderRung>,
+    /// Fit of log2(IC additions) against log2(p); not an L_p[alpha] fit.
+    pub local_power_slope_ols: Option<f64>,
+    pub local_power_intercept_ols: Option<f64>,
+    pub acceptance: &'static str,
+    pub verdict: String,
+}
+
 fn rho_s_ref() -> f64 {
     (std::f64::consts::PI / 2.0).sqrt()
 }
 
-fn ctx_planted(inst: &PrimeInstance) -> (InstanceCtx<'_, crate::cryptanalysis::ic_boundary::PrimeCurve>, u64) {
+fn ctx_planted(
+    inst: &PrimeInstance,
+) -> (
+    InstanceCtx<'_, crate::cryptanalysis::ic_boundary::PrimeCurve>,
+    u64,
+) {
     let g = inst.generator_point();
     let mut ops = GroupOps::default();
     let planted = 30_011 % inst.r;
@@ -169,7 +206,7 @@ pub fn run_growing_arity_cell(bits: u32, seed: u64) -> Result<GrowingArityCell, 
         s_over_rho: report.s_over_rho.unwrap_or(f64::INFINITY),
         recovered: report.recovered,
         planted,
-        note: "Growing-m ksum on prime-abscissa; B capped to KSumOracle; matched S_ρ=√(π/2). Not a proved coverage law.",
+        note: "Ksum on prime-abscissa; B capped to KSumOracle; analytic generic-rho expectation S_ρ=√(π/2), not a measured rho arm. No proved coverage law.",
     })
 }
 
@@ -178,8 +215,11 @@ pub fn default_growing_arity_bits() -> Vec<u32> {
     vec![16, 20, 24, 28]
 }
 
-/// ABBA ladder: for each bit size, seed and seed+1.
-pub fn run_growing_arity_ladder(bits: &[u32], seed: u64) -> Result<LadderReport, String> {
+/// Paired IC seeds for each bit size, with an analytic rho expectation.
+pub fn run_growing_arity_ladder(
+    bits: &[u32],
+    seed: u64,
+) -> Result<GrowingArityLadderReport, String> {
     let mut out = Vec::with_capacity(bits.len());
     for &b in bits {
         let ab = run_growing_arity_cell(b, seed)?;
@@ -193,24 +233,19 @@ pub fn run_growing_arity_ladder(bits: &[u32], seed: u64) -> Result<LadderReport,
         };
         let log2_ic = ic_mean.log2();
         let log2_rho = rho_gae_mean.log2();
-        let p_mean = ((ab.p as f64) + (ba.p as f64)) / 2.0;
-        out.push(LadderRung {
+        out.push(GrowingArityLadderRung {
             p: ab.p,
-            k: ab.m, // arity m rides in the `k` field for JSON reuse
-            ic_adds_ab: ab.total_gae.round() as u64,
-            ic_adds_ba: ba.total_gae.round() as u64,
-            rho_adds_ab: (ab.rho_s * (ab.r as f64).sqrt()).round() as u64,
-            rho_adds_ba: (ba.rho_s * (ba.r as f64).sqrt()).round() as u64,
-            log2_ic_obs_mean: log2_ic,
-            log2_rho_obs_mean: log2_rho,
-            log2_ic_pred: (ab.l / f64::from(ab.m)).log2() + ab.m as f64, // rough
-            log2_rho_pred: log2_rho,
-            alpha_proxy: if p_mean.log2() > 0.0 {
-                log2_ic / p_mean.log2()
-            } else {
-                f64::INFINITY
-            },
-            beats_sqrt_r_obs: ab.s_over_rho < 1.0 && ba.s_over_rho < 1.0,
+            m: ab.m,
+            b_schedule: ab.b_schedule,
+            b_used: ab.b_used,
+            capped: ab.capped,
+            ic_adds_seed_a: ab.total_gae.round() as u64,
+            ic_adds_seed_b: ba.total_gae.round() as u64,
+            rho_expected_adds_seed_a: (ab.rho_s * (ab.r as f64).sqrt()).round() as u64,
+            rho_expected_adds_seed_b: (ba.rho_s * (ba.r as f64).sqrt()).round() as u64,
+            log2_ic_observed_mean: log2_ic,
+            log2_rho_expected_mean: log2_rho,
+            below_rho_expectation: ab.s_over_rho < 1.0 && ba.s_over_rho < 1.0,
             recovered_ok: ab.verified && ba.verified,
         });
     }
@@ -218,35 +253,29 @@ pub fn run_growing_arity_ladder(bits: &[u32], seed: u64) -> Result<LadderReport,
     let pts: Vec<(f64, f64)> = out
         .iter()
         .filter(|r| r.recovered_ok)
-        .map(|r| ((r.p as f64).log2(), r.log2_ic_obs_mean))
+        .map(|r| ((r.p as f64).log2(), r.log2_ic_observed_mean))
         .collect();
-    let (alpha_ols, beta_ols) = ols_alpha_beta(&pts);
+    let (local_power_slope_ols, local_power_intercept_ols) = ols_alpha_beta(&pts);
     let largest = out.last().expect("nonempty");
     let verdict = if pts.len() < 2 {
-        "INCONCLUSIVE: <2 verified rungs for α fit".into()
-    } else if alpha_ols.unwrap_or(f64::INFINITY) < 0.5 && largest.beats_sqrt_r_obs {
-        format!(
-            "SURVIVES_SLICE: OLS α={:.3} < 1/2 and largest rung S < S_ρ (not a verified L_p claim; B may be capped)",
-            alpha_ols.unwrap()
-        )
+        "INCONCLUSIVE: fewer than two verified rungs for local slope".into()
+    } else if largest.below_rho_expectation {
+        "SURVIVES_BOUNDED_SLICE: largest rung below analytic rho expectation; growing-arity and L_p claims untested".into()
     } else {
         format!(
-            "FAIL_FOR_GOAL_α: OLS α={} ; largest beats_ρ={} — growing-arity ksum class falsified at this scale; open next successor",
-            alpha_ols
-                .map(|a| format!("{a:.3}"))
-                .unwrap_or_else(|| "n/a".into()),
-            largest.beats_sqrt_r_obs
+            "FAIL_BOUNDED_SLICE: m={} ksum with B={}/{} exceeds analytic rho expectation on largest rung; uncapped growing-arity and L_p claims untested",
+            largest.m, largest.b_used, largest.b_schedule
         )
     };
 
-    Ok(LadderReport {
-        schema: "growing-arity.ladder/v1",
+    Ok(GrowingArityLadderReport {
+        schema: "growing-arity.ladder/v2",
         standing: "[pcc:unverified]",
-        order: "ABBA+BAAB (seed-paired prime_instance_for + ksum:m(L))",
+        comparison: "paired IC seeds; analytic generic-rho expectation sqrt(pi*r/2); no rho arm",
         rungs: out,
-        alpha_ols,
-        beta_ols,
-        acceptance: "≥2 verified rungs; OLS α<1/2 AND largest-rung S<S_ρ to survive; else falsify growing-arity ksum class → named successor",
+        local_power_slope_ols,
+        local_power_intercept_ols,
+        acceptance: "bounded-slice diagnostic only: verified IC and absolute cost vs analytic rho expectation; no L_p inference",
         verdict,
     })
 }
