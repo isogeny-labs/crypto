@@ -210,6 +210,20 @@ fn trim(mut v: Vec<u64>) -> Vec<u64> {
     }
     v
 }
+/// Return k for the canonical monomial X^k (k>=1).
+/// Most dense polynomials fail the cheap first/last coefficient check.
+#[inline]
+fn monic_x_shift(a: &[u64]) -> Option<usize> {
+    if a.len() < 2 || a[0] != 0 || *a.last().unwrap() != 1 {
+        return None;
+    }
+    if a[1..a.len() - 1].iter().all(|&c| c == 0) {
+        Some(a.len() - 1)
+    } else {
+        None
+    }
+}
+
 /// Accelerated arithmetic for canonical public field elements emitted by
 /// the trace engine. Keep the general u128 fallback so event values remain
 /// identical even for noncanonical internal callers.
@@ -441,8 +455,7 @@ impl Engine<'_> {
     }
     fn div(&mut self, a: &[u64], b: &[u64]) -> Work<(Vec<u64>, Vec<u64>)> {
         debug_assert!(!b.is_empty());
-        // Euclidean GCD often ends with a unit divisor; dividing by 1
-        // is a coefficient copy, not a degree-by-degree long division.
+        // Constant-unit division preserves the quotient without field work.
         if b == [1] {
             let quotient = trim(a.to_vec());
             self.event(RootEvent::Division {
@@ -453,41 +466,89 @@ impl Engine<'_> {
             })?;
             return Ok((quotient, vec![]));
         }
-        let mut r = a.to_vec();
-        let mut q = vec![0; a.len().saturating_sub(b.len()) + 1];
-        if a.len() >= b.len() {
-            // For monic divisors the quotient leading term is already
-            // canonical; no inversion or multiplication by one is needed.
-            let lead = *b.last().unwrap();
-            let inv = if lead == 1 { 1 } else { self.inv(lead)? };
-            while r.len() >= b.len() {
-                let shift = r.len() - b.len();
-                let highest = *r.last().unwrap();
-                let c = if lead == 1 {
-                    highest
-                } else {
-                    self.field(FieldOp::Mul, highest, inv)?
-                };
-                q[shift] = c;
-                // The leading term cancels *exactly* by the definition of
-                // c. Do not multiply c by lead and subtract highest again.
-                for (k, &v) in b[..b.len() - 1].iter().enumerate() {
-                    if v == 0 { continue; }
-                    let product = self.field(FieldOp::Mul, c, v)?;
-                    r[shift + k] = self.field(FieldOp::Sub, r[shift + k], product)?;
-                }
-                r[shift + b.len() - 1] = 0;
-                r = trim(r);
-            }
+        // A degree-short dividend has zero quotient and no field operations.
+        // This occurs at the start of modular powers and in GCD tails.
+        if a.len() < b.len() {
+            let remainder = trim(a.to_vec());
+            self.event(RootEvent::Division {
+                a: a.to_vec(),
+                b: b.to_vec(),
+                quotient: vec![],
+                remainder: remainder.clone(),
+            })?;
+            return Ok((vec![], remainder));
         }
-        let q = trim(q);
+        // Division by X^k is a coefficient split. Keep the Division event,
+        // which the independent verifier checks as a Euclidean identity.
+        if let Some(shift) = monic_x_shift(b) {
+            let (quotient, remainder) = if a.len() > shift {
+                (trim(a[shift..].to_vec()), trim(a[..shift].to_vec()))
+            } else {
+                (vec![], trim(a.to_vec()))
+            };
+            self.event(RootEvent::Division {
+                a: a.to_vec(),
+                b: b.to_vec(),
+                quotient: quotient.clone(),
+                remainder: remainder.clone(),
+            })?;
+            return Ok((quotient, remainder));
+        }
+        // Synthetic division by a monic linear factor. The running
+        // coefficient avoids a mutable polynomial and repeated tail scans.
+        if b.len() == 2 && b[1] == 1 {
+            let mut quotient = vec![0; a.len() - 1];
+            let mut carry = *a.last().unwrap();
+            for index in (1..a.len()).rev() {
+                if carry != 0 {
+                    quotient[index - 1] = carry;
+                    let product = self.field(FieldOp::Mul, carry, b[0])?;
+                    carry = self.field(FieldOp::Sub, a[index - 1], product)?;
+                } else {
+                    carry = a[index - 1];
+                }
+            }
+            let quotient = trim(quotient);
+            let remainder = if carry == 0 { vec![] } else { vec![carry] };
+            self.event(RootEvent::Division {
+                a: a.to_vec(),
+                b: b.to_vec(),
+                quotient: quotient.clone(),
+                remainder: remainder.clone(),
+            })?;
+            return Ok((quotient, remainder));
+        }
+        // Keep the established general long-division loop: source-exact
+        // Rust A/B found a 5-10% regression for the fixed-degree variant.
+        let mut remainder = a.to_vec();
+        let mut quotient = vec![0; a.len() - b.len() + 1];
+        let lead = *b.last().unwrap();
+        let inv = if lead == 1 { 1 } else { self.inv(lead)? };
+        while remainder.len() >= b.len() {
+            let shift = remainder.len() - b.len();
+            let highest = *remainder.last().unwrap();
+            let c = if lead == 1 {
+                highest
+            } else {
+                self.field(FieldOp::Mul, highest, inv)?
+            };
+            quotient[shift] = c;
+            for (k, &v) in b[..b.len() - 1].iter().enumerate() {
+                if v == 0 { continue; }
+                let product = self.field(FieldOp::Mul, c, v)?;
+                remainder[shift + k] = self.field(FieldOp::Sub, remainder[shift + k], product)?;
+            }
+            remainder[shift + b.len() - 1] = 0;
+            remainder = trim(remainder);
+        }
+        let quotient = trim(quotient);
         self.event(RootEvent::Division {
             a: a.to_vec(),
             b: b.to_vec(),
-            quotient: q.clone(),
-            remainder: r.clone(),
+            quotient: quotient.clone(),
+            remainder: remainder.clone(),
         })?;
-        Ok((q, r))
+        Ok((quotient, remainder))
     }
     fn pow(&mut self, base: &[u64], mut exponent: u64, modulus: &[u64]) -> Work<Vec<u64>> {
         let id = self.next_id;
@@ -588,8 +649,15 @@ impl Engine<'_> {
             match h.len() {
                 0 | 1 => {}
                 2 => {
-                    let inv = self.inv(h[1])?;
-                    let product = self.field(FieldOp::Mul, h[0], inv)?;
+                    // GCD normalization and monic factor division normally
+                    // produce monic linear factors. Avoid InverseBegin/End
+                    // events and multiplication by one on that hot path.
+                    let product = if h[1] == 1 {
+                        h[0]
+                    } else {
+                        let inv = self.inv(h[1])?;
+                        self.field(FieldOp::Mul, h[0], inv)?
+                    };
                     let root = self.field(FieldOp::Sub, 0, product)?;
                     self.event(RootEvent::LinearRoot {
                         polynomial: h,
@@ -1488,6 +1556,72 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round78_division_paths_match_independent_euclid_and_certify() {
+        for p in [17, 65521, 1_000_000_007, MAX_PRIME] {
+            let dividends = [
+                vec![1, 2, 3, 4, 5, 6, 7, 8, 1],
+                vec![3, 5],
+                vec![1, 0, 0, 0, 1],
+                vec![],
+            ];
+            let divisors = [
+                vec![1], vec![0, 1], vec![0, 0, 1],
+                vec![2, 1], vec![p - 1, 1], vec![1, 2, 3, 1],
+                vec![1, 2, 3, 4, 5], vec![1, 0, 0, 0, 1],
+            ];
+            for dividend in &dividends {
+                for divisor in &divisors {
+                    let mut sink = |_: &RootEvent| Ok(());
+                    let mut engine = Engine {
+                        report: RootReport {
+                            schema: "prime-root-trace/v1".into(),
+                            p,
+                            polynomial: vec![],
+                            seed: 0,
+                            limits: RootLimits {
+                                field_work: MAX_WORK,
+                                split_attempts: 1000,
+                                events: MAX_EVENTS,
+                                degree: MAX_DEGREE,
+                            },
+                            stop: RootStop::WorkLimit,
+                            counters: RootCounters::default(),
+                            events: vec![],
+                            unacknowledged: None,
+                            sink_error: None,
+                            roots: vec![],
+                        },
+                        sink: &mut sink,
+                        next_id: 0,
+                        reciprocal32: if p <= u32::MAX as u64 {
+                            ((1u128 << 64) / p as u128) as u64
+                        } else { 0 },
+                    };
+                    let actual = engine.div(dividend, divisor).unwrap();
+                    let expected = vdiv(dividend, divisor, p).unwrap();
+                    assert_eq!(actual, expected, "p={p} a={dividend:?} b={divisor:?}");
+                    assert!(matches!(
+                        engine.report.events.last(),
+                        Some(RootEvent::Division { quotient, remainder, .. })
+                        if (quotient, remainder) == (&actual.0, &actual.1)
+                    ));
+                }
+            }
+            // Full producer and independent verifier, including linear roots.
+            for f in [
+                vec![p - 1, 1],
+                vproduct(&[p - 1, 1], &[p - 2, 1], p),
+                vproduct(&[p - 1, 1], &[1, 0, 0, 1], p),
+            ] {
+                let report = run(&f, p);
+                assert!(report.complete(), "p={p}, f={f:?}, stop={:?}", report.stop);
+                verify(&report).unwrap();
+                assert!(report.roots.contains(&1));
+            }
+        }
+    }
 
     #[test]
     fn round76_identity_pruning_preserves_root_certificates() {
