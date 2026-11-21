@@ -1,0 +1,39 @@
+{
+  "schema": "cover.sieve.local-validation/v1",
+  "backend": "local_user_authorized",
+  "source_revision": "8ab624189bd8743f4857658d275e15aa8315d1ba",
+  "binary_sha256": "aecadb5d9deccf7526a96867ff97c66ef53a0b8f758762ef2c5c06ad7fdebb69",
+  "driver_kind": "cover-sieve-validation",
+  "candidate_primes": [
+    127,
+    523,
+    751,
+    1009,
+    1039
+  ],
+  "selection": "first_m9_model_at_least_1.25_times_p",
+  "primes": [
+    1009
+  ],
+  "seeds": [
+    251
+  ],
+  "retained_percent": 75,
+  "max_small_weight": 4096,
+  "max_sources": 4096,
+  "rounds": 1,
+  "warmup_rounds": 0,
+  "timeout_seconds": 1900,
+  "worker_timeout_seconds": 900,
+  "memory_gib": 8,
+  "automatic_retries": 0,
+  "record_start_events": true,
+  "allow_comparative_claims": false,
+  "sieve_recipe": "incidence_shared",
+  "purpose": "public_input_full_recovery_validation_only",
+  "component_hashes": "validation/cover-validation-source.sha256",
+  "recorded_timing": "outer_cold_child_process_wall_diagnostic_only",
+  "legacy_arithmetic_counters": "incomplete_graph_and_wrapper_work_omitted",
+  "child_environment": "clear_JV_then_progress_incidence_shared_F4_defaults_RAYON_OMP_1",
+  "pinned_cpu": "0"
+}

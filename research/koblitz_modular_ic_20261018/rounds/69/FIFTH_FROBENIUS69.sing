@@ -1,0 +1,146 @@
+LIB "linalg.lib";
+proc require69(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump69(link out,string name,matrix M){
+ int a;int b;write(out,"matrix "+name+"["+string(nrows(M))+"]["+string(ncols(M))+"];");
+ for(a=1;a<=nrows(M);a++){for(b=1;b<=ncols(M);b++){if(M[a,b]!=0){write(out,name+"["+string(a)+","+string(b)+"]="+string(M[a,b])+";");}}}
+}
+execute(read("../../../68/runs/fourth-frobenius68-01/fourth-lattice-polynomial68.sing"));
+require69(nrows(inclusion68)==32 && ncols(inclusion68)==32 && nrows(basisV468)==32 && ncols(basisV468)==32,"FROB69_SAVED_POLYNOMIAL_SHAPES");
+matrix inclusion69=lift(module(basisV468),module(inclusion68));
+require69(basisV468*inclusion69==inclusion68,"FROB69_COMPLETE_ORDER_INCLUSION");
+module quotientGB69=std(module(inclusion69));int quotientLength69=vdim(quotientGB69);
+require69(quotientLength69==4,"FROB69_COMPLETE_V4_ORDER_QUOTIENT");
+module quotientModule69=kbase(quotientGB69);matrix quotientQ69=matrix(quotientModule69);
+require69(nrows(quotientQ69)==32 && ncols(quotientQ69)==4,"FROB69_ALL_4_QUOTIENT_CLASSES");
+link quotientOut69="ASCII:w quotient-basis69.sing";open(quotientOut69);
+write(quotientOut69,"ring fifthPolynomial69=2,(u),dp;short=0;");
+dump69(quotientOut69,"inclusion69",inclusion69);dump69(quotientOut69,"quotientQ69",quotientQ69);close(quotientOut69);
+execute(read("../../../68/runs/fourth-frobenius68-01/fourth-lattice-field68.sing"));
+map polyToField69=fourthLatticePolynomial68,u;
+matrix inclusionField69=polyToField69(inclusion69);
+matrix Qfield69=polyToField69(quotientQ69);
+require69(V4coordinates68*V4inverse68==unitmat(32) && V4inverse68*V4coordinates68==unitmat(32),"FROB69_SAVED_V4_TWO_SIDED_INVERSE");
+require69(V4inverse68==inclusionField69,"FROB69_SAVED_POLYNOMIAL_INCLUSION_MATCH");
+execute(read("../../../52/source-data/rr-table50.sing"));
+intmat squareSlots69[32][1];int p69;int i69;int j69;int k69;
+for(p69=1;p69<=528;p69++){
+ if(parents50[p69,1]==parents50[p69,2]){j69=parents50[p69,1];require69(j69>=1 && j69<=32 && squareSlots69[j69,1]==0,"FROB69_UNIQUE_SQUARE_SLOTS");squareSlots69[j69,1]=p69;}
+}
+matrix squareSource69[32][32];
+for(j69=1;j69<=32;j69++){
+ require69(squareSlots69[j69,1]>0,"FROB69_ALL_SQUARE_SLOTS");
+ for(i69=1;i69<=32;i69++){squareSource69[i69,j69]=table50[i69,squareSlots69[j69,1]];}
+}
+setring fourthLatticeField68;
+map tableToField69=tablePidCertificate50,u;
+matrix square69=tableToField69(squareSource69);
+matrix sourceColumns69=V4coordinates68*Qfield69;
+matrix sourceSquares69[32][4];
+for(i69=1;i69<=32;i69++){for(j69=1;j69<=4;j69++){sourceSquares69[i69,j69]=sourceColumns69[i69,j69]^2;}}
+matrix squareImage69=V4inverse68*square69*sourceSquares69;
+string rationalCode69="matrix numeratorRows69[32][4];matrix denominatorRows69[32][4];";
+number coefficient69;int nonzero69=0;
+for(i69=1;i69<=32;i69++){for(j69=1;j69<=4;j69++){
+ require69(diff(squareImage69[i69,j69],q)==0,"FROB69_SCALAR_RATIONAL_COORDINATE");
+ if(squareImage69[i69,j69]!=0){
+  coefficient69=leadcoef(squareImage69[i69,j69]);
+  require69(numerator(coefficient69)/denominator(coefficient69)==coefficient69,"FROB69_RATIONAL_NUMERATOR_DENOMINATOR");
+  rationalCode69=rationalCode69+"numeratorRows69["+string(i69)+","+string(j69)+"]="+string(numerator(coefficient69))+";denominatorRows69["+string(i69)+","+string(j69)+"]="+string(denominator(coefficient69))+";";
+  nonzero69++;
+ }
+}}
+ring binaryRing69=2,(u),dp;short=0;execute(rationalCode69);
+matrix remainderRows69[32][4];list denominators69;intvec offsets69;
+poly common69;poly den69;poly exactQuotient69;poly numerator69;poly remainder69;ideal principal69;
+int rows69=0;int degree69;
+for(i69=1;i69<=32;i69++){
+ common69=1;
+ for(j69=1;j69<=4;j69++){
+  if(numeratorRows69[i69,j69]!=0){den69=denominatorRows69[i69,j69];require69(den69!=0,"FROB69_NONZERO_DENOMINATOR");common69=(common69*den69)/gcd(common69,den69);}
+ }
+ require69(common69!=0,"FROB69_NONZERO_COMMON_DENOMINATOR");
+ denominators69[i69]=common69;offsets69[i69]=rows69;degree69=deg(common69);
+ if(common69!=1){principal69=std(ideal(common69));}
+ for(j69=1;j69<=4;j69++){
+  remainder69=0;
+  if(numeratorRows69[i69,j69]!=0){
+   den69=denominatorRows69[i69,j69];exactQuotient69=common69/den69;
+   require69(exactQuotient69*den69==common69,"FROB69_EXACT_ROW_CLEARING");
+   numerator69=numeratorRows69[i69,j69]*exactQuotient69;
+   if(common69!=1){remainder69=reduce(numerator69,principal69);}
+  }
+  require69(remainder69==0 || deg(remainder69)<degree69,"FROB69_COMPLETE_REMAINDER_BOUND");
+  remainderRows69[i69,j69]=remainder69;
+ }
+ rows69=rows69+degree69;
+}
+matrix binaryMap69[rows69+1][4];matrix terms69;poly rebuilt69;int exponent69;
+for(i69=1;i69<=32;i69++){for(j69=1;j69<=4;j69++){
+ remainder69=remainderRows69[i69,j69];rebuilt69=0;
+ if(remainder69!=0){terms69=coef(remainder69,u);for(k69=1;k69<=ncols(terms69);k69++){
+  exponent69=deg(terms69[1,k69]);
+  require69(terms69[1,k69]==u^exponent69 && terms69[2,k69]==1,"FROB69_BINARY_MONOMIAL_COEFFICIENTS");
+  binaryMap69[offsets69[i69]+exponent69+1,j69]=1;
+  rebuilt69=rebuilt69+terms69[1,k69]*terms69[2,k69];
+ }}
+ require69(rebuilt69==remainder69,"FROB69_EVERY_REMAINDER_RECONSTRUCTION");
+}}
+int rank69=mat_rk(binaryMap69);int kernelDimension69=4-rank69;
+require69(rank69>=0 && kernelDimension69>=0,"FROB69_BINARY_RANK_BOUND");
+link kernelOut69="ASCII:w square-kernel69.sing";open(kernelOut69);
+write(kernelOut69,"ring fifthBinary69=2,(u),dp;short=0;");
+dump69(kernelOut69,"numeratorRows69",numeratorRows69);dump69(kernelOut69,"denominatorRows69",denominatorRows69);
+dump69(kernelOut69,"remainderRows69",remainderRows69);dump69(kernelOut69,"binaryMap69",binaryMap69);
+write(kernelOut69,"int rank69="+string(rank69)+";int kernelDimension69="+string(kernelDimension69)+";");
+matrix kernelBasis69=matrix(syz(module(binaryMap69)));
+require69(nrows(kernelBasis69)==4 && ncols(kernelBasis69)==kernelDimension69 && mat_rk(kernelBasis69)==kernelDimension69,"FROB69_COMPLETE_KERNEL_DIMENSION");
+require69(binaryMap69*kernelBasis69==matrix(0,rows69+1,kernelDimension69),"FROB69_ALL_KERNEL_PRODUCTS");
+for(i69=1;i69<=4;i69++){for(j69=1;j69<=kernelDimension69;j69++){require69(kernelBasis69[i69,j69]==0 || kernelBasis69[i69,j69]==1,"FROB69_KERNEL_OVER_F2");}}
+int changedKernel69=0;
+if(rank69>0 && kernelDimension69>0){
+ int changeColumn69=0;
+ for(i69=1;i69<=rows69+1;i69++){for(j69=1;j69<=4;j69++){if(changeColumn69==0 && binaryMap69[i69,j69]!=0){changeColumn69=j69;}}}
+ require69(changeColumn69>0,"FROB69_NONZERO_CHANGED_KERNEL_COLUMN");
+ matrix badKernel69=kernelBasis69;badKernel69[changeColumn69,1]=badKernel69[changeColumn69,1]+1;
+ require69(binaryMap69*badKernel69!=matrix(0,rows69+1,kernelDimension69),"FROB69_CHANGED_KERNEL_REJECTED");changedKernel69=1;
+}
+dump69(kernelOut69,"kernelBasis69",kernelBasis69);close(kernelOut69);
+map polyToBinary69=fourthLatticePolynomial68,u;
+matrix Jbinary69=polyToBinary69(inclusion69);matrix Qbinary69=polyToBinary69(quotientQ69);
+matrix survivorPoly69=Qbinary69*kernelBasis69;
+matrix combined69[32][32+kernelDimension69];
+for(i69=1;i69<=32;i69++){
+ for(j69=1;j69<=32;j69++){combined69[i69,j69]=Jbinary69[i69,j69];}
+ for(j69=1;j69<=kernelDimension69;j69++){combined69[i69,32+j69]=survivorPoly69[i69,j69];}
+}
+module moduleV569=std(module(combined69));int quotientLength569=vdim(moduleV569);
+require69(quotientLength569==rank69,"FROB69_KERNEL_LATTICE_LENGTH_IDENTITY");
+matrix basisV569=matrix(moduleV569);
+require69(nrows(basisV569)==32 && ncols(basisV569)==32,"FROB69_FULL_FIFTH_PID_BASIS");
+require69(mat_rk(matrix(reduce(module(combined69),moduleV569)))==0 && mat_rk(matrix(reduce(module(basisV569),std(module(combined69)))))==0,"FROB69_BOTH_FIFTH_MODULE_INCLUSIONS");
+link polynomialOut69="ASCII:w fifth-lattice-polynomial69.sing";open(polynomialOut69);
+write(polynomialOut69,"ring fifthLatticePolynomial69=2,(u),dp;short=0;");
+dump69(polynomialOut69,"inclusion69",Jbinary69);dump69(polynomialOut69,"quotientQ69",Qbinary69);
+dump69(polynomialOut69,"kernelBasis69",kernelBasis69);dump69(polynomialOut69,"basisV569",basisV569);close(polynomialOut69);
+setring fourthLatticeField68;
+map binaryToField69=binaryRing69,u;
+matrix V5basisField69=binaryToField69(basisV569);
+matrix V5coordinates69=V4coordinates68*V5basisField69;
+matrix V5inverse69=lift(module(V5coordinates69),module(unitmat(32)));
+require69(V5coordinates69*V5inverse69==unitmat(32) && V5inverse69*V5coordinates69==unitmat(32),"FROB69_BOTH_FIFTH_BASIS_INVERSES");
+for(i69=1;i69<=32;i69++){for(j69=1;j69<=32;j69++){
+ if(V5inverse69[i69,j69]!=0){coefficient69=leadcoef(V5inverse69[i69,j69]);require69(denominator(coefficient69)==1,"FROB69_ORDER_INSIDE_FIFTH_LATTICE");}
+}}
+matrix V5squared69[32][32];for(i69=1;i69<=32;i69++){for(j69=1;j69<=32;j69++){V5squared69[i69,j69]=V5coordinates69[i69,j69]^2;}}
+matrix squareInV469=V4inverse68*square69*V5squared69;
+for(i69=1;i69<=32;i69++){for(j69=1;j69<=32;j69++){
+ if(squareInV469[i69,j69]!=0){coefficient69=leadcoef(squareInV469[i69,j69]);require69(denominator(coefficient69)==1,"FROB69_EVERY_V5_BASIS_SQUARE_IN_V4");}
+}}
+matrix changedInverse69=V5inverse69;changedInverse69[1,1]=changedInverse69[1,1]+1;
+require69(V5coordinates69*changedInverse69!=unitmat(32),"FROB69_CHANGED_INVERSE_REJECTED");
+link fieldOut69="ASCII:w fifth-lattice-field69.sing";open(fieldOut69);
+write(fieldOut69,"ring fifthLatticeField69=(2,u),(q),dp;short=0;");
+dump69(fieldOut69,"V5coordinates69",V5coordinates69);dump69(fieldOut69,"V5inverse69",V5inverse69);
+dump69(fieldOut69,"squareInV469",squareInV469);close(fieldOut69);
+print("FROB69_RESULT order_rank=32 old_quotient=4 square_columns=4 binary_rows="+string(rows69)+" square_rank="+string(rank69)+" survivor_dimension="+string(kernelDimension69)+" new_quotient_length="+string(quotientLength569)+" rational_nonzero_entries="+string(nonzero69)+" fifth_basis_columns=32 changed_kernel_rejected="+string(changedKernel69)+" changed_inverse_rejected=1");
+print("FIFTH_FROBENIUS69_ALL_CHECKS_PASS");quit;

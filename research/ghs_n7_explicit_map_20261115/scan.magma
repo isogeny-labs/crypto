@@ -1,0 +1,14 @@
+P<x> := PolynomialRing(GF(2));
+K<z> := ext<GF(2) | x^7+x+1>;
+E := EllipticCurve([K | 1, 1, 0, 0, z^3]);
+assert #E eq 138;
+assert Order(z) eq 127;
+for i in [0..126] do
+    c := z^i;
+    try
+        g := WeilDescentGenus(E, GF(2), c);
+        print i, g;
+    catch err
+        print i, "ERR";
+    end try;
+end for;

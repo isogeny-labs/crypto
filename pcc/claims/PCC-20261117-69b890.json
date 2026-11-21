@@ -1,0 +1,35 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T11:07:13Z",
+ "id": "PCC-20261117-69b890",
+ "kind": "theorem",
+ "producer": {
+  "commit": "fe5d0da839e0f9496f7b0326feebbedb9b80cc64",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "lean",
+   "path": "research/chained_cubic_inverse_20261117/formal/Inverse15.lean",
+   "sha256": "15de587a93c033b99933dd81a9f762506a5d4967d78b89da74728cd2830b0cdf"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_inverse_20261117/first-frozen-15B-success-02/19-first-frozen-Lean-proof.stdout",
+    "sha256": "06f449c29df4bb7d1ab1715c5972994cdf9ed90bde8f8ae8ab52560e230748b7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_inverse_20261117/first-frozen-15B-success-02/ACTUAL_FIRST15B_SUCCESS.json",
+    "sha256": "b56bc761e5c6cb0e6c878a9113f7806a657e29058dfb9977adba9d589a690a4a"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "ChainedCubicInverse15.norm_cubic, inverse_by_square and cubic_inverse_pair compile with the pinned Lean4.35.0 and default proof limits. For an arbitrary standard Lean.Grind.Field K and nonzero a, the original norm pair at (a,0) equals (a inverse,0). All three print only propext, Classical.choice and Quot.sound. This is conditional standard-field algebra, without a Rust cubic Field instance or general Picard bridge; producer remains unsigned."
+}

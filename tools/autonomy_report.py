@@ -22,12 +22,14 @@ id. Entries are never edited or deleted; a later fact is a new entry.
 
 Intervention classes (each human message after the first prompt):
   redirect  agent was wrong, stuck, off-scope, or the human rescued it; counts against autonomy
+  nudge     agent stopped with work left and the human restarted it ("continue", "keep going,
+            do X next"); counts against autonomy, reported apart (owner decision 2026-11-15)
   unblock   access, credentials, budget, an owner decision the agent lacked authority for
   approve, new_task, question   neutral
   hook      automated hook feedback (for example a stop hook); neutral, reported apart
 
 Episode state (derived, never stored):
-  fail                 any redirect; result fail/blocked/abandoned; reverted true;
+  fail                 any redirect or nudge; result fail/blocked/abandoned; reverted true;
                        validator_blocking true; merged with CI not green
   unsupervised_success result success, no redirect, PR merged, CI green at merge,
                        reverted checked false, validator_blocking not true
@@ -56,7 +58,9 @@ KINDS = ("episode", "intervention", "check")
 PREFIX = {"episode": "E", "intervention": "I", "check": "C"}
 TASK_CLASSES = ("ci-repair", "measurement", "lean", "docs-tooling", "research", "blocked", "other")
 RESULTS = ("success", "partial", "fail", "blocked", "abandoned")
-CLASSES = ("redirect", "unblock", "approve", "new_task", "question", "hook")
+CLASSES = ("redirect", "nudge", "unblock", "approve", "new_task", "question", "hook")
+# Later labels from a higher-ranked classifier override lower ones for the same message.
+CLASSIFIER_RANK = {"rule": 0, "haiku": 1, "sonnet": 2, "opus": 3, "human": 4}
 CLASSIFIERS = ("haiku", "sonnet", "opus", "human", "rule")
 CHECKS = ("reverted", "validator_blocking")
 RECOVERY = ("SELF", "HUMAN")
@@ -137,16 +141,17 @@ def require_episode(eid: str, entries: dict[str, dict]) -> None:
 # ---------------------------------------------------------------------------
 
 def effective_interventions(entries: dict[str, dict], eid: str) -> list[dict]:
-    """One row per (episode, message hash). A human label overrides a machine label."""
+    """One row per (episode, message hash). The highest-ranked classifier wins
+    (human > opus > sonnet > haiku > rule); within a rank, the latest label wins."""
     groups: dict[str, list[tuple[str, dict]]] = {}
     for iid, e in entries.items():
         if e.get("kind") == "intervention" and e.get("episode") == eid:
             groups.setdefault(e["text_sha256"], []).append((iid, e))
     out = []
     for rows in groups.values():
-        rows.sort(key=lambda r: (r[1].get("created", ""), r[0]))
-        humans = [r for r in rows if r[1].get("classifier") == "human"]
-        out.append((humans or rows)[-1][1])
+        rows.sort(key=lambda r: (CLASSIFIER_RANK.get(r[1].get("classifier"), 0),
+                                 r[1].get("created", ""), r[0]))
+        out.append(rows[-1][1])
     return out
 
 
@@ -174,6 +179,8 @@ def episode_state(eid: str, entries: dict[str, dict], at: dt.datetime | None = N
     reverted = checks.get("reverted")
     if counts["redirect"] > 0:
         state, why = "fail", "redirect"
+    elif counts["nudge"] > 0:
+        state, why = "fail", "nudge"
     elif reverted is True:
         state, why = "fail", "reverted"
     elif checks.get("validator_blocking") is True:
@@ -222,6 +229,7 @@ def summarize(entries: dict[str, dict], since: str | None = None, at: dt.datetim
     for tc in sorted({e["task_class"] for e in eps.values()}):
         by_class[tc] = rate_row([st[i]["state"] for i, e in eps.items() if e["task_class"] == tc])
     redirects = [s["counts"]["redirect"] for s in st.values()]
+    nudges = [s["counts"]["nudge"] for s in st.values()]
     unblocks = [s["counts"]["unblock"] for s in st.values()]
     hooks = sum(s["counts"]["hook"] for s in st.values())
     inc_total = inc_self = 0
@@ -245,7 +253,7 @@ def summarize(entries: dict[str, dict], since: str | None = None, at: dt.datetim
     series = [{"week": w, **rate_row(s)} for w, s in sorted(weeks.items())]
     acc = classifier_accuracy(entries, eps)
     return {"episodes": len(eps), "states": {i: s for i, s in st.items()}, "overall": overall,
-            "by_class": by_class, "redirects": redirects, "unblocks": unblocks, "hooks": hooks,
+            "by_class": by_class, "redirects": redirects, "nudges": nudges, "unblocks": unblocks, "hooks": hooks,
             "incidents": {"total": inc_total, "self": inc_self, "ci": wilson(inc_self, inc_total)},
             "cost": cost, "series": series, "classifier_accuracy": acc}
 
@@ -301,6 +309,7 @@ def render_markdown(s: dict, since: str | None, until: str | None = None) -> str
     inc = s["incidents"]
     lines += ["", "## Interventions and recovery", "",
               f"- Redirects per episode: {mean_median(s['redirects'])}",
+              f"- Nudges per episode (agent stopped, human restarted it; counted against): {mean_median(s['nudges'])}",
               f"- Unblocks per episode: {mean_median(s['unblocks'])} (reported apart, not counted against)",
               f"- Hook messages: {s['hooks']} (neutral)",
               f"- Self-recovery: {inc['self']}/{inc['total']} incidents fixed without a human message"
@@ -547,6 +556,8 @@ PR's merge or close. For each human message, choose exactly one class:
 redirect  The agent was wrong, stuck or off-scope, or the human had to rescue or
           correct it (for example "that is not what I asked", "undo that",
           "you missed the failing test", "stop doing X"). Counts against autonomy.
+nudge     The agent stopped while work remained and the human restarted it
+          ("continue", "resume", "keep going, do X next"). Counts against autonomy.
 unblock   The agent lacked access, credentials, budget, or an owner decision it
           had no authority to make (for example "here is the token", "yes, you
           may spend up to N", "use option B"). Reported apart; not against autonomy.

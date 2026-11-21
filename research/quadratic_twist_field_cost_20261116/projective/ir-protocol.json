@@ -1,0 +1,575 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-ir-counter-engineering-preflight-20261116",
+  "version": 1,
+  "created": "2026-11-16",
+  "repository": "crypto",
+  "study_dir": "research/quadratic_twist_field_cost_20261116/projective",
+  "authors": [
+    "producer"
+  ],
+  "question": "Validate external instruction-counter boundaries and native self-cost/source-scalar replay on a fixed nine-call engineering preflight. No method speed verdict.",
+  "claims": [
+    {
+      "id": "exact-coverage",
+      "text": "Exact external counter graph/accounting/boundary and original-source scalar checks on all9fixed calls per fresh process; no signed standing",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-coverage"
+      ]
+    },
+    {
+      "id": "speed-regularity",
+      "text": "Speed comparison, full instruction census, CPU-cycle/GAE pricing, total attack cost and intrinsic regularity are outside this preflight",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "cpp-build",
+      "role": "reference",
+      "description": "External-counter engineering stage cpp-build",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "instruction_tool": "Valgrind3.28.0 Callgrind Ir only",
+          "preflight_only": "true"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "rust-build",
+      "role": "reference",
+      "description": "External-counter engineering stage rust-build",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "instruction_tool": "Valgrind3.28.0 Callgrind Ir only",
+          "preflight_only": "true"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "count-A",
+      "role": "candidate",
+      "description": "External-counter engineering stage count-A",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "instruction_tool": "Valgrind3.28.0 Callgrind Ir only",
+          "preflight_only": "true"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "audit-A",
+      "role": "control_positive",
+      "description": "External-counter engineering stage audit-A",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "instruction_tool": "Valgrind3.28.0 Callgrind Ir only",
+          "preflight_only": "true"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "count-B",
+      "role": "control_aa",
+      "description": "External-counter engineering stage count-B",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "instruction_tool": "Valgrind3.28.0 Callgrind Ir only",
+          "preflight_only": "true"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "audit-B",
+      "role": "reference",
+      "description": "External-counter engineering stage audit-B",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "instruction_tool": "Valgrind3.28.0 Callgrind Ir only",
+          "preflight_only": "true"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0
+      }
+    },
+    {
+      "id": "reject-cost",
+      "role": "control_negative",
+      "description": "External-counter engineering stage reject-cost",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "instruction_tool": "Valgrind3.28.0 Callgrind Ir only",
+          "preflight_only": "true"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-raw-summary",
+      "role": "control_negative",
+      "description": "External-counter engineering stage reject-raw-summary",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "instruction_tool": "Valgrind3.28.0 Callgrind Ir only",
+          "preflight_only": "true"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-missing",
+      "role": "control_negative",
+      "description": "External-counter engineering stage reject-missing",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "instruction_tool": "Valgrind3.28.0 Callgrind Ir only",
+          "preflight_only": "true"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    },
+    {
+      "id": "reject-source",
+      "role": "control_negative",
+      "description": "External-counter engineering stage reject-source",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": null,
+        "binary_sha256": null,
+        "threads": 2,
+        "flags": {
+          "clock_valid": "false",
+          "instruction_tool": "Valgrind3.28.0 Callgrind Ir only",
+          "preflight_only": "true"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "determinism",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "audit-A",
+      "expected_detection": "Planted extra counted loop produces >10000additional Ir above every baseline/A-A/negative count, exact semantic result unchanged",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "reject-raw-summary",
+      "null_population": {
+        "description": "Four changed false native counter/source payload categories plus outside-counter loop matched on the actual recovery",
+        "generator": "Frozen ir-run.py.txt file/hash mutation; native raw self-cost/source checks",
+        "n": 4,
+        "why_n": "Fixed semantic categories, no random-population inference",
+        "matched_on": [
+          "actual source/target",
+          "native recovery",
+          "external profiler",
+          "all unmodified bytes"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "counter_placement",
+        "levels": [
+          "plain recover_cold",
+          "same extra loop inside",
+          "same extra loop outside"
+        ]
+      },
+      {
+        "name": "payload_truth",
+        "levels": [
+          "original",
+          "one changed false payload category"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "All source/protocol/helper and external profiler binaries/libraries pinned",
+        "how": "Samebranch GitHub checkpoint before affected launch"
+      },
+      {
+        "name": "process_repeat",
+        "treatment": "measured",
+        "value": [
+          "A",
+          "B"
+        ],
+        "how": "Fresh processes, retain every actual Ir/A-A difference; no clock inference"
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "One actual Qpoint, policy0, all3roles and2caps, plus3counter controls",
+        "how": "Lexicographic fixture selection before counter data, not selected from an observed instruction win"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": "3/4/5roles eachcap3/4,thenA/A,inside-positive,outside-negative",
+        "how": "Instrument engineering boundary check, no method speed statistic"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-coverage",
+        "arms": [
+          "cpp-build",
+          "rust-build",
+          "count-A",
+          "audit-A",
+          "count-B",
+          "audit-B",
+          "reject-cost",
+          "reject-raw-summary",
+          "reject-missing",
+          "reject-source"
+        ],
+        "differs_in": [
+          "payload_truth"
+        ],
+        "design": "absolute",
+        "threshold": "All fixed9cases per stream have exact expected source semantics and native self-cost sum matches external summary/totals; positive/negative criteria and all false controls pass"
+      },
+      {
+        "id": "determinism",
+        "arms": [
+          "count-A",
+          "count-B"
+        ],
+        "differs_in": [
+          "process_repeat"
+        ],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": false,
+    "transfer_obligations": [
+      {
+        "domain": "Actual F61/r31 cyclic source points and actual twist-assisted reduced Tate images",
+        "check": "Independent full group/image homomorphism, point/domain checks, legitimate admitted public logs and original scalar check; no generic twist map claim"
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Dependency-ordered exact finite enumeration and adversarial controls; no clock statistic",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "note": "Deterministic census; seed0 records no randomness"
+    },
+    "instance_sampling": {
+      "rule": "One full finite bundle; no sampling or independent-challenge interpretation",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicit algorithms and semantic attacks; exact equality criteria frozen before full data"
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Fixed9call engineering detector, no p-value/method speed claim"
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 30,
+      "per_sample_seconds": 30,
+      "threads": 2,
+      "estimated_total_seconds": 300,
+      "measured_on": "Existing uninstrumented native execution plus ordinary profiler smoke informs a conservative engineering budget; new counted crypto calls unrun before freeze"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "exit_code",
+        "name": "Native exit code",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Native exit code; no timing or pricing inference",
+        "source": "*.exit",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "instruction_reads",
+        "name": "user-space instruction reads",
+        "unit": "Ir",
+        "kind": "exact",
+        "definition": "External Callgrind complete recover_cold interval with written exclusions/client overhead; independently sum function self costs",
+        "source": "raw counter part files and native audit records",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "audited_theorems",
+      "failing_axioms",
+      "trusted_native"
+    ],
+    "record": [
+      "actual published source head",
+      "exact true/false sources",
+      "compiler release/binary SHA",
+      "Mathlib/dependency identities and cache inventory",
+      "gate/auditor/trust-file SHA",
+      "all commands/exits/build/audit/status logs"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 3600,
+    "placement": {
+      "outer_seconds": 3600,
+      "per_stage_seconds": 600,
+      "max_local_workers": 2,
+      "paid_resources": false
+    },
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "All10engineering/build/control stages or first unexpected failure;600s stage, absolute05:25UTC, no favorable prefix or source/criterion weakening",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stage600seconds and outer3600seconds; any cap means incomplete, not a null",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Native self-cost/raw external count/source checks and fixed boundary controls decide instrument validity only",
+    "comparison_ids": [
+      "exact-coverage"
+    ],
+    "threshold": "All fixed9cases per stream have exact expected source semantics and native self-cost sum matches external summary/totals; positive/negative criteria and all false controls pass",
+    "statistic": "Exact raw graph sum, source equality and fixed positive/negative detector thresholds",
+    "interval": "none; finite deterministic enumeration",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Counter validity, not method speed or total work price",
+    "verdict_vocabulary": [
+      "counter_engineering_consistent_unsigned",
+      "failed",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/quadratic_twist_field_cost_20261116/projective/ir-audit.rs",
+      "sha256": "bb3f2f608631a85743927834d525fa3f335641d3a67cb3c2b37ef24f695d5b51"
+    },
+    "inputs": [
+      "Exact nine-call outputs per A/B process",
+      "Every external raw Ir dump and pinned prior independent source replay receipt"
+    ],
+    "outputs": [
+      "Native source check and independently summed self costs",
+      "A/A,inside-positive,outside-negative engineering detector outcomes only"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Coordinate/exception-domain diagram only if proofs complete; no quantitative solver graph without data"
+    ],
+    "report_dir": "reports/kernel-20261115"
+  },
+  "inadmissible": [
+    "Change full population/caps/criteria after data",
+    "Feed reference point enumeration into candidate stopping",
+    "Use target scalar labels or unadmitted public logs in recovery",
+    "Turn cap-unknown into a certified root",
+    "Claim named chart degree is original witness degree or intrinsic regularity",
+    "Infer speed from unisolated clocks or incomplete cost vectors",
+    "Discard ties/losses/blocked setups/failed queries",
+    "Upload denied findings/assets or use paid resources/credential fallback"
+  ],
+  "literature": [
+    {
+      "ref": "https://www.math.uci.edu/~asilverb/bibliography/ceilidh.pdf",
+      "provenance": "retrieved",
+      "claim": "Indexed primary section5.2 equations inspected; fullPDF inaccessible403/502/503, reciprocal chart is established not novel"
+    },
+    {
+      "ref": "https://hackmd.io/@yelhousni/emulated-pairing",
+      "provenance": "retrieved",
+      "claim": "Primary author torus compression/operations and exceptional±1 section read; SNARK inverse cost not native CPU price"
+    },
+    {
+      "ref": "https://doi.org/10.1007/11535218_5",
+      "provenance": "retrieved",
+      "claim": "Primary institutional record confirms established rational-torus IC; no extension-field/prime-field security inference"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "332c1088d498a92dda117feaaf2047cae1a2fe671cd70936cf715212119a9718",
+    "commit": "c690d8b1933ecc0a13153c4ca6cb3b8b4c33e8fd",
+    "frozen_at": "2026-11-16T04:56:25Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "preflight": true,
+    "window": "within04:25-05:25UTC2026-11-16",
+    "records_per_process": 9,
+    "processes": [
+      "A",
+      "B"
+    ],
+    "single_actual_target_repeated": true,
+    "no_method_speed_claim": true,
+    "original_source_receipt": {
+      "path": "/workspace/twist-projective-run03-20261116/audit.json",
+      "sha256": "9e48248cede5094609574f2ff78bf4f85901ae04a931bcd08755520f032ef95b"
+    },
+    "external_tool_source_sha256": "9f7a18d128f05d3a80fea53e6953f34aad7200a425ceaee46099a8a798a7dd9c",
+    "source_files_sha256": {
+      "ir.cpp": "b76c157fb4bc1beb2efd1ce4843fecbfba3320ace428761bb4c8c5f24dbeee22",
+      "ir-audit.rs": "bb3f2f608631a85743927834d525fa3f335641d3a67cb3c2b37ef24f695d5b51",
+      "ir-audit/Cargo.toml": "f99cd11a4f73ffcfa2c07ee4e543ffbaf1fa98d8537956999dc5cf9531be6041",
+      "ir-audit/Cargo.lock": "963804c677c6d0360cc0ea8200ce9e9984f2065c81239d3eca6d7a0c149811c3",
+      "ir-run.py.txt": "70fe1b3065ca9b62fc05ca2247d8629801ad0cb8730c9eab7191f6c11d4d21b7",
+      "IR_PREFLIGHT.md": "349be1dc5c3e15de26c64ba3f80c8bd7cf6650e773eac710267fa5fb5c47ab0a",
+      "projective.cpp": "b84d80ad1391ceeec531565c27cd86bcc14e9ba84d0eff9fbe3a57df5342737b",
+      "audit.rs": "579b600d7555b7783a9c653286a39593c3d0d694da912a14a30de37f0f4de5d1"
+    },
+    "current_canonical_guide": "encrypted/unreadable; explicit historical guide fallback plus current checker/schema"
+  }
+}

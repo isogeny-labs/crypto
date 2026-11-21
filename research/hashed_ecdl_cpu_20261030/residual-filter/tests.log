@@ -1,0 +1,56 @@
+   Compiling hashed-ecdl-tensor v0.1.0 (/home/ec2-user/hashed-ecdl-cpu-residual-filter/source/crates/hashed-ecdl-tensor)
+   Compiling hashed-ecdl-cpu v0.1.0 (/home/ec2-user/hashed-ecdl-cpu-residual-filter/source/crates/hashed-ecdl-cpu)
+    Finished `release` profile [optimized] target(s) in 15.62s
+     Running unittests src/lib.rs (/home/ec2-user/hashed-ecdl-cpu-round22/target/release/deps/hashed_ecdl_cpu-c032eeeb75c4abdc)
+
+running 48 tests
+test paper::tests::deferred_dependency_matches_eager_reference ... ok
+test paper::tests::collected_relation_reuses_target_but_full_replay_recomputes_it ... ok
+test paper::tests::bounded_inverse_tables_match_independent_references ... ok
+test certificate::tests::archived_public_recovery_replays_and_rejects_corruption ... ok
+test paper::tests::cached_affine_fixed_pair_matches_projective_tables_and_evaluation ... ok
+test paper::tests::exhausted_trials_and_empty_bases_are_not_successes ... ok
+test paper::tests::grouped_hash_validation_matches_standalone_enumeration ... ok
+test checked_sum::tests::checked_sums_reject_noncanonical_and_off_curve_points ... ok
+test paper::tests::field63_full_hash_and_hasse_boundaries ... ok
+test paper::tests::identity_and_bounds_are_explicit ... ok
+test paper::tests::streamed_incidence_validates_rows_after_first_dependency ... ok
+test paper::tests::oracle_matches_cartesian_sum_for_every_target ... ok
+test tests::caps_and_bad_bases_fail_closed ... ok
+test paper::tests::explicit_query_budget_preserves_default_and_bounds_exhaustion ... ok
+test paper::tests::order_witness_and_square_roots_match_exhaustive_constructor ... ok
+test paper::tests::small_curve_all_logarithms_and_uninformative_dependency ... ok
+test tests::suffix_index_preserves_duplicates_identity_and_collision_chains ... ok
+test tests::batch_endpoints_handle_exceptional_prefixes_and_scratch_reuse ... ok
+test paper::tests::projective_equality_and_replay_match_independent_affine_targets ... ok
+test paper::tests::jacobian_mixed_add_matches_affine_with_nonunit_scales ... ok
+test paper::tests::validates_curve_and_canonical_points ... ok
+test tests::complete_certificates_match_frozen_preoptimization_records ... ok
+test tests::equivalent_validated_curve_representations_reuse_tables ... ok
+test tests::batched_subtraction_matches_every_group_pair ... ok
+test paper::tests::streamed_incidence_matches_dense_dependencies ... ok
+test tests::full_recovery_certificates_equal_original ... ok
+test paper::tests::optional_profile_preserves_queries_certificates_and_stats ... ok
+test paper::tests::euclidean_inverses_match_fermat_reference ... ok
+test paper::tests::solves_and_replays_seeded_known_answers ... ok
+test paper::tests::inverse_hash_progression_matches_direct_products ... ok
+test paper::tests::rejects_corrupt_oracle_instead_of_accepting_a_relation ... ok
+test paper::tests::finite_difference_constructor_matches_exhaustive_reference ... ok
+test checked_sum::tests::checked_sums_match_independent_affine_sequences ... ok
+test paper::tests::twelve_slot_replay_and_bounded_oracle ... ok
+test tests::wide_field_batch_and_tuple_witnesses_match_checked_reference ... ok
+test tests::filtered_residuals_match_affine_reference_and_reuse ... ok
+test tests::residual_multiplication_matches_independent_remainder ... ok
+test paper::tests::wide_arithmetic_and_certified_40_bit_curve ... ok
+test paper::tests::rejects_corrupt_accelerated_base_before_relation_queries ... ok
+test paper::tests::overlapping_slots_keep_separate_columns ... ok
+test paper::tests::inverse_hash_enumeration_matches_complete_group_scan ... ok
+test paper::tests::reciprocal_products_match_wide_remainders ... ok
+test paper::tests::cached_curve_arithmetic_matches_independent_remainders ... ok
+test tests::suffix_filter_collisions_never_accept_absent_points ... ok
+test paper::tests::cached_square_roots_match_uncached_reference ... ok
+test tests::exact_lexicographic_witnesses_all_targets_and_resets ... ok
+test paper::tests::projective_relation_sums_match_affine_with_cancellation_and_doubling ... ok
+test paper::tests::fixed_pair_matches_independent_binary_multiplication ... ok
+
+test result: ok. 48 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.39s

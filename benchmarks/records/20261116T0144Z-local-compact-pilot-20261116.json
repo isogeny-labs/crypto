@@ -1,0 +1,410 @@
+{
+  "branch": "codex/native-certified-relation-integration-20261115",
+  "closed_utc": "2026-11-16T02:04:50+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/workspace/relation-native-qualifiers/pilot-driver-e069707f6-01",
+        "prepare",
+        "/workspace/local-compact-pilot-inputs-e069707f6-01",
+        "pilot"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T01:45:19+00:00",
+      "wall_s": 0.005
+    },
+    {
+      "argv": [
+        "/workspace/relation-native-qualifiers/pilot-driver-e069707f6-01",
+        "run",
+        "/workspace/local-compact-pilot-inputs-e069707f6-01",
+        "/workspace/local-compact-pilot-results-e069707f6-01",
+        "/workspace/relation-native-qualifiers/selected-worker-e060f3ee6-01",
+        "/workspace/relation-native-qualifiers/pilot-singular-e069707f6-01",
+        "/workspace/relation-native-qualifiers/pilot-msolve-e069707f6-01",
+        "0"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T01:45:19+00:00",
+      "wall_s": 20.208
+    }
+  ],
+  "commit": "f806fb7b8b443a1c45c5d44bb9bcd1785dccd9cf",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T01:44:20+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "bc0ac39ff549",
+    "isolation": "L0",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261116T0144Z-local-compact-pilot-20261116",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n3-s911.f4_over_compact.native",
+      "note": "Unsigned L0; scope=native; adjusted 1/720 lower=0.633838693484831; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.6691730135058159,
+        0.7519073204041866
+      ],
+      "unit": "ratio",
+      "value": 0.740754627601471
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n3-s911.f4_over_compact.full_cost",
+      "note": "Unsigned L0; scope=full_cost; adjusted 1/720 lower=0.9453459008913949; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9488179376837657,
+        0.9645396206979763
+      ],
+      "unit": "ratio",
+      "value": 0.9615105114836052
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n3-s911.certified_over_compact.native",
+      "note": "Unsigned L0; scope=native; adjusted 1/720 lower=1.8142820386554592; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.867188750990117,
+        1.997200491234557
+      ],
+      "unit": "ratio",
+      "value": 1.9126611670293088
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n3-s911.certified_over_compact.full_cost",
+      "note": "Unsigned L0; scope=full_cost; adjusted 1/720 lower=1.1221989558078205; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.1279102114790096,
+        1.1465564568878814
+      ],
+      "unit": "ratio",
+      "value": 1.134580985745042
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n4-s307.f4_over_compact.native",
+      "note": "Unsigned L0; scope=native; adjusted 1/720 lower=0.5830715936810829; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.5914785114005147,
+        0.6515716108934161
+      ],
+      "unit": "ratio",
+      "value": 0.6062788308136391
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n4-s307.f4_over_compact.full_cost",
+      "note": "Unsigned L0; scope=full_cost; adjusted 1/720 lower=0.8980252464360011; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9094641080270607,
+        0.9242939895825033
+      ],
+      "unit": "ratio",
+      "value": 0.9118649221876192
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n4-s307.certified_over_compact.native",
+      "note": "Unsigned L0; scope=native; adjusted 1/720 lower=4.9466950622514325; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.984705525277452,
+        5.378943699537246
+      ],
+      "unit": "ratio",
+      "value": 5.098956672960251
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n4-s307.certified_over_compact.full_cost",
+      "note": "Unsigned L0; scope=full_cost; adjusted 1/720 lower=1.8782385862494848; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.8919814506700348,
+        1.9414760605501606
+      ],
+      "unit": "ratio",
+      "value": 1.9037225002778593
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n6-s101.f4_over_compact.native",
+      "note": "Unsigned L0; scope=native; adjusted 1/720 lower=0.5506081144383799; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.5645624117314502,
+        0.6451074273220965
+      ],
+      "unit": "ratio",
+      "value": 0.6035460922884811
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n6-s101.f4_over_compact.full_cost",
+      "note": "Unsigned L0; scope=full_cost; adjusted 1/720 lower=0.9174720002877389; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9235091586524697,
+        0.9370397711226801
+      ],
+      "unit": "ratio",
+      "value": 0.9305264764850315
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n6-s101.certified_over_compact.native",
+      "note": "Unsigned L0; scope=native; adjusted 1/720 lower=10.279782638288978; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        10.79205049954551,
+        11.95976902143974
+      ],
+      "unit": "ratio",
+      "value": 11.236573296919188
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n6-s101.certified_over_compact.full_cost",
+      "note": "Unsigned L0; scope=full_cost; adjusted 1/720 lower=2.7128643385348954; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.7401308918428846,
+        2.9150021849960854
+      ],
+      "unit": "ratio",
+      "value": 2.779571682828057
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n6-s307.f4_over_compact.native",
+      "note": "Unsigned L0; scope=native; adjusted 1/720 lower=0.5331942074068713; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.5344204253238449,
+        0.580332834238367
+      ],
+      "unit": "ratio",
+      "value": 0.5699146330524363
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n6-s307.f4_over_compact.full_cost",
+      "note": "Unsigned L0; scope=full_cost; adjusted 1/720 lower=0.9284588235911094; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9306324673467294,
+        0.940231468786926
+      ],
+      "unit": "ratio",
+      "value": 0.9347705884015607
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n6-s307.certified_over_compact.native",
+      "note": "Unsigned L0; scope=native; adjusted 1/720 lower=10.113037924876451; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        10.231729133920291,
+        11.226262636211048
+      ],
+      "unit": "ratio",
+      "value": 10.881315287822542
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n6-s307.certified_over_compact.full_cost",
+      "note": "Unsigned L0; scope=full_cost; adjusted 1/720 lower=2.401291569129039; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.4056734442318652,
+        2.451904200375415
+      ],
+      "unit": "ratio",
+      "value": 2.4284593376199815
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n6-s911.f4_over_compact.native",
+      "note": "Unsigned L0; scope=native; adjusted 1/720 lower=0.5230416532996047; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.5582703999060982,
+        0.6030027230356605
+      ],
+      "unit": "ratio",
+      "value": 0.5766866113993436
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n6-s911.f4_over_compact.full_cost",
+      "note": "Unsigned L0; scope=full_cost; adjusted 1/720 lower=0.90500473830884; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9068970272912462,
+        0.924640029614431
+      ],
+      "unit": "ratio",
+      "value": 0.9161383782659324
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n6-s911.certified_over_compact.native",
+      "note": "Unsigned L0; scope=native; adjusted 1/720 lower=10.787801739185618; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        10.890003569353684,
+        11.626183082904507
+      ],
+      "unit": "ratio",
+      "value": 11.18171412824098
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 21,
+      "name": "n6-s911.certified_over_compact.full_cost",
+      "note": "Unsigned L0; scope=full_cost; adjusted 1/720 lower=2.9317472709516186; full 10x/15x target not met; F4 remains faster.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.9459898802896114,
+        3.0287612296012663
+      ],
+      "unit": "ratio",
+      "value": 2.9856499284268874
+    }
+  ],
+  "problem": "kernel:relation_complete_grevlex_basis",
+  "raw": [
+    {
+      "bytes": 104104,
+      "path": "research/relation_degree_trace_20261115/local-pilot-01/raw-data.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b8/b8d0ea9b3848ae98d968af7a50c99ac1f75e569187ebb0d5a347c2b24036e73f",
+      "sha256": "b8d0ea9b3848ae98d968af7a50c99ac1f75e569187ebb0d5a347c2b24036e73f",
+      "uploaded": false
+    },
+    {
+      "bytes": 8401,
+      "path": "research/relation_degree_trace_20261115/local-pilot-01/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/db/dbf31cae12fe3949f9c1f9d3168e79b308c4e3011f09644d04d056d1ff098ee4",
+      "sha256": "dbf31cae12fe3949f9c1f9d3168e79b308c4e3011f09644d04d056d1ff098ee4",
+      "uploaded": false
+    },
+    {
+      "bytes": 549,
+      "path": "research/relation_degree_trace_20261115/local-pilot-01/post-call.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/92/927117bc9ed02e1d12daa67ca40155e23047878b5e815b3c070701b24c749809",
+      "sha256": "927117bc9ed02e1d12daa67ca40155e23047878b5e815b3c070701b24c749809",
+      "uploaded": false
+    },
+    {
+      "bytes": 1476,
+      "path": "research/relation_degree_trace_20261115/local-pilot-01/report-02/conditional-ceilings.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c5/c539ac0d2fcd2f7ae557ebb878ad9e5442c475d0cd772e27b15dfd05d0855ef0",
+      "sha256": "c539ac0d2fcd2f7ae557ebb878ad9e5442c475d0cd772e27b15dfd05d0855ef0",
+      "uploaded": false
+    },
+    {
+      "bytes": 43851348,
+      "path": "research/relation_degree_trace_20261115/local-pilot-01/executables-and-libraries.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2b/2b24531d1673f2dc2fc792fd41cbf6972dc2cd6d1f8bae4c50ce24c8db4f7f6d",
+      "sha256": "2b24531d1673f2dc2fc792fd41cbf6972dc2cd6d1f8bae4c50ce24c8db4f7f6d",
+      "uploaded": false
+    },
+    {
+      "bytes": 11021,
+      "path": "research/relation_degree_trace_20261115/local-pilot-01/archive-envelope.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/46/46d641f9472f2bdbf2adfea88575290b266b0cdf4a3d2f9a99548714d95640c3",
+      "sha256": "46d641f9472f2bdbf2adfea88575290b266b0cdf4a3d2f9a99548714d95640c3",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/relation_degree_trace_20261115/local-pilot-01/report-02/report.pdf",
+    "png": [
+      "research/relation_degree_trace_20261115/local-pilot-01/report-02/ratios.png"
+    ],
+    "svg": [
+      "research/relation_degree_trace_20261115/local-pilot-01/report-02/ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "local-compact-pilot-20261116",
+  "status": "measured",
+  "summary": "Producer L0 pilot: 5/9 cases admitted, 4 A/A failures retained. n6 compact improves worker calls 10.88-11.24x over expanded certificates but paid full cost only 2.43-2.99x; optimized F4 remains faster. Full 10x/15x target not met; no fresh-family or independent replay claim.",
+  "validation": null
+}

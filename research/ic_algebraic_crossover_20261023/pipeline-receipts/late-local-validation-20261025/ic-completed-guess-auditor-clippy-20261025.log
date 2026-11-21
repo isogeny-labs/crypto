@@ -1,0 +1,30 @@
+    Checking crypto v0.1.0 (/workspace/crypto-integration-2550)
+error: enclosing `Some` and `?` operator are unneeded
+  --> examples/ic_guess_completed_audit.rs:51:13
+   |
+51 |             Some(s.checked_add(g["all_branch_solver_word_ops"].as_u64()?)?)
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_question_mark
+   = note: `-D clippy::needless-question-mark` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::needless_question_mark)]`
+help: remove the enclosing `Some` and `?` operator
+   |
+51 -             Some(s.checked_add(g["all_branch_solver_word_ops"].as_u64()?)?)
+51 +             s.checked_add(g["all_branch_solver_word_ops"].as_u64()?)
+   |
+
+error: enclosing `Some` and `?` operator are unneeded
+  --> examples/ic_guess_completed_audit.rs:62:13
+   |
+62 |             Some(s.checked_add(g["all_branch_solver_word_ops"].as_u64()?)?)
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_question_mark
+help: remove the enclosing `Some` and `?` operator
+   |
+62 -             Some(s.checked_add(g["all_branch_solver_word_ops"].as_u64()?)?)
+62 +             s.checked_add(g["all_branch_solver_word_ops"].as_u64()?)
+   |
+
+error: could not compile `crypto` (example "ic_guess_completed_audit") due to 2 previous errors

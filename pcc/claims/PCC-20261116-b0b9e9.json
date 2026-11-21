@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T05:00:58Z",
+ "id": "PCC-20261116-b0b9e9",
+ "kind": "statement",
+ "producer": {
+  "commit": "88112c5a930009c883059c1c2e3c6c92c4b23f18",
+  "model": "",
+  "session": "codex-20261116-nist-three"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/modules.jsonl",
+    "sha256": "f55fb1f897c09d607e61ce28b49e715fd6c122dcf5d06ca54ae52ee791935d56"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/p192-kernels.jsonl",
+    "sha256": "0847547ff5d517cc8b27c84524afa2f375e3cabf94b76535d04d3af5a00cfbad"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/module_audit.cpp",
+    "sha256": "e18ffdb208dd29acec8c329e22f109c1b76baf5ad3e9c2d2dd8db21e86920944"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "Native static module replay matches isotropic kernel counts and Frobenius orders for306 archived modules. P-192 candidate139 d7 has eight stable maximal isotropic kernels, each intersects the elliptic factor trivially and has full point field degree8; four have one rational element and four have three. Conditional finite-module replay, not fresh curve point counting or quotient construction."
+}

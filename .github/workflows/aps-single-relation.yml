@@ -8,6 +8,11 @@ on:
       - 'src/cryptanalysis/aps_single_relation.rs'
       - 'src/cryptanalysis/aps_single_relation/**'
       - 'src/cryptanalysis/f4_fp.rs'
+      - 'src/cryptanalysis/f4_fp/**'
+      - 'tests/aps_cost_leads.rs'
+      - 'examples/aps_scalar_check.rs'
+      - 'tools/aps-export/**'
+      - 'research/aps_cost_leads_20261106/**'
       - 'src/cryptanalysis/glv_invariant_base.rs'
       - 'src/cryptanalysis/prime_fast.rs'
       - 'examples/aps_single_relation_check.rs'
@@ -21,6 +26,11 @@ on:
       - 'src/cryptanalysis/aps_single_relation.rs'
       - 'src/cryptanalysis/aps_single_relation/**'
       - 'src/cryptanalysis/f4_fp.rs'
+      - 'src/cryptanalysis/f4_fp/**'
+      - 'tests/aps_cost_leads.rs'
+      - 'examples/aps_scalar_check.rs'
+      - 'tools/aps-export/**'
+      - 'research/aps_cost_leads_20261106/**'
       - 'src/cryptanalysis/glv_invariant_base.rs'
       - 'src/cryptanalysis/prime_fast.rs'
       - 'examples/aps_single_relation_check.rs'
@@ -42,7 +52,10 @@ jobs:
     name: rust (${{ matrix.lane }})
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|aps-single-relation.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|aps-single-relation.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
-    timeout-minutes: 25
+    # A cold release build of the lib-test target exceeds 25 min on a
+    # 2-core runner, and a timed-out job never saves its cache, so every
+    # run would stay cold. Same tests; only the compile budget changes.
+    timeout-minutes: 50
     strategy:
       fail-fast: false
       matrix:
@@ -64,6 +77,8 @@ jobs:
             /build.rs
             /src/
             /examples/
+            /tests/
+            /tools/aps-export/
             /tools/volcano-cli/
             /isogeny_algos/
             /.github/scripts/
@@ -79,6 +94,11 @@ jobs:
       - name: Public fixture runner and identity certificate
         if: matrix.lane == 'example'
         run: cargo test --release --locked --example aps_single_relation_check
+      - name: Producer-to-independent-reader lead contracts and scalar checker
+        if: matrix.lane == 'example'
+        run: |
+          cargo test --release --locked --test aps_cost_leads -- --test-threads=2
+          cargo test --release --locked --example aps_scalar_check
       - name: Streaming substitution, exact domains and rational-factor roots
         if: matrix.lane == 'library'
         run: |
@@ -106,6 +126,7 @@ jobs:
           sparse-checkout: |
             research/aps_extensions_20261026/lean
             research/aps_followup_20261028/lean
+            research/aps_cost_leads_20261106/lean
             tools/lean
       - name: Install the pinned core-only Lean toolchain
         run: |
@@ -114,7 +135,7 @@ jobs:
           sh /tmp/elan-init.sh -y --default-toolchain "$toolchain"
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - name: Build and audit coefficient lemmas
-        run: tools/lean/proof-gate.sh --out /tmp/aps-lean research/aps_extensions_20261026/lean/Coefficients.lean research/aps_followup_20261028/lean/Line.lean
+        run: tools/lean/proof-gate.sh --out /tmp/aps-lean research/aps_extensions_20261026/lean/Coefficients.lean research/aps_followup_20261028/lean/Line.lean research/aps_cost_leads_20261106/lean/Frontier.lean
       - uses: actions/upload-artifact@v4
         if: always()
         with:

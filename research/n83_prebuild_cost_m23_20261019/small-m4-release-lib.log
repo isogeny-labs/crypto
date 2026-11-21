@@ -1,0 +1,105 @@
+    Blocking waiting for file lock on artifact directory
+   Compiling crypto v0.1.0 (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-resume-20261019)
+error: couldn't read `/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-resume-20261019/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/binary_field_basis.rs:281:62
+    |
+281 |           let frozen: serde_json::Value = serde_json::from_str(include_str!(concat!(
+    |  ______________________________________________________________^
+282 | |             env!("CARGO_MANIFEST_DIR"),
+283 | |             "/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json"
+284 | |         )))
+    | |__________^
+
+error: couldn't read `/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-resume-20261019/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl`: No such file or directory (os error 2)
+   --> src/cryptanalysis/binary_field_basis.rs:349:22
+    |
+349 |           let points = include_str!(concat!(
+    |  ______________________^
+350 | |             env!("CARGO_MANIFEST_DIR"),
+351 | |             "/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl"
+352 | |         ));
+    | |__________^
+
+error: couldn't read `/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-resume-20261019/research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz`: No such file or directory (os error 2)
+    --> src/cryptanalysis/binary_velu.rs:1560:21
+     |
+1560 |           let bytes = include_bytes!(concat!(
+     |  _____________________^
+1561 | |             env!("CARGO_MANIFEST_DIR"),
+1562 | |             "/research/koblitz_isogeny_descent_37_results_20260925/raw.json.gz"
+1563 | |         ));
+     | |__________^
+
+error: couldn't read `/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-resume-20261019/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/binary_velu.rs:1659:62
+     |
+1659 |           let frozen: serde_json::Value = serde_json::from_str(include_str!(concat!(
+     |  ______________________________________________________________^
+1660 | |             env!("CARGO_MANIFEST_DIR"),
+1661 | |             "/research/notes/ecc2k130/disjoint_cold_v2_20261001/FROZEN.json"
+1662 | |         )))
+     | |__________^
+
+error: couldn't read `/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-resume-20261019/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl`: No such file or directory (os error 2)
+    --> src/cryptanalysis/binary_velu.rs:1740:22
+     |
+1740 |           let points = include_str!(concat!(
+     |  ______________________^
+1741 | |             env!("CARGO_MANIFEST_DIR"),
+1742 | |             "/research/notes/ecc2k130/disjoint_cold_v2_20261001/fixtures/n37_L1024_b00.points.jsonl"
+1743 | |         ));
+     | |__________^
+
+error: couldn't read `/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-resume-20261019/research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json`: No such file or directory (os error 2)
+    --> src/cryptanalysis/binary_velu.rs:1836:71
+     |
+1836 |           let frozen_manifest: serde_json::Value = serde_json::from_str(include_str!(concat!(
+     |  _______________________________________________________________________^
+1837 | |             env!("CARGO_MANIFEST_DIR"),
+1838 | |             "/research/notes/ecc2k130/n37_native_basis_bridge_20261002/NATIVE42.json"
+1839 | |         )))
+     | |__________^
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl`: No such file or directory (os error 2)
+    --> src/cryptanalysis/ecbench/claim.rs:1839:36
+     |
+1839 |           let records: Vec<Record> = include_str!(
+     |  ____________________________________^
+1840 | |             "../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl"
+1841 | |         )
+     | |_________^
+     |
+help: there is a file with the same name in a different directory
+     |
+1840 |             "../../../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl"
+     |                       ++++++
+
+error: couldn't read `src/cryptanalysis/ecbench/../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl`: No such file or directory (os error 2)
+   --> src/cryptanalysis/ecbench/runner.rs:919:27
+    |
+919 |           let record_line = include_str!(
+    |  ___________________________^
+920 | |             "../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl"
+921 | |         )
+    | |_________^
+    |
+help: there is a file with the same name in a different directory
+    |
+920 |             "../../../../../research/ecbench_n41_n53_shared_rank_20261005/sessions/mac-l0/records.jsonl"
+    |                       ++++++
+
+error: couldn't read `src/cryptanalysis/../../research/f4_linear_algebra_20260914/contract.json`: No such file or directory (os error 2)
+   --> src/cryptanalysis/f4_rref_tests.rs:808:60
+    |
+808 |       let contract: serde_json::Value = serde_json::from_str(include_str!(
+    |  ____________________________________________________________^
+809 | |         "../../research/f4_linear_algebra_20260914/contract.json"
+810 | |     ))
+    | |_____^
+    |
+help: there is a file with the same name in a different directory
+    |
+809 |         "../../../../research/f4_linear_algebra_20260914/contract.json"
+    |                ++++++
+
+error: could not compile `crypto` (lib test) due to 9 previous errors

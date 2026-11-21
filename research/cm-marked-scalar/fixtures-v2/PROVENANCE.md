@@ -1,0 +1,9 @@
+# Five-curve native fixture custody
+
+P-192, P-224 and P-256 were constructed by the published native C++/OpenSSL source at commit 047da426a780bffd5450ed20e471156b8173db05, under extension-scope-v4.json. The per-curve construction commands, source/binary/publication receipts, prior failures, polynomial certificates and point checks remain under qualification/extension-v*/. P-192 uses the exact published explicit prime-field model because this OpenSSL build omits its named-curve entry. No Python producer was run for these three curves.
+
+P-384 and P-521 retain the historical input/certificate provenance in ../fixtures/PROVENANCE.md. Their closure files are copied byte for byte. The bundle tool preserves all integer tokens exactly when combining the curve and marked records; it never converts the historical JSON numeric tokens to binary64. Those historical producer counts remain historical and are not native timing results.
+
+The native constructor extracts kernels by signed Frobenius gcd in the full division-polynomial torsion algebra, constructs the normalized Velu maps, and supplies the endpoint scaling. A separate verifier path uses full polynomial curve and scalar-composition identities, signed kernel actions, integer norms/congruences and point/orbit checks. These are native producer-side exact checks; no independent signed scientific review is implied. The global noninteger quotient has a much larger degree than the implemented rational-subgroup evaluator; its residual polynomials remain unexpanded.
+
+Verify hashes from the repository root with `sha256sum -c research/cm-marked-scalar/fixtures-v2/manifest.sha256`. Replay with `/tmp/cm-marked-scalar-build/native --qualify research/cm-marked-scalar/fixtures-v2`. The bundle's source and replay receipt are in qualification/native-v17/.

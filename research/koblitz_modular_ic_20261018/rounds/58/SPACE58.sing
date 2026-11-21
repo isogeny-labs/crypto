@@ -1,0 +1,137 @@
+LIB "linalg.lib";
+proc require58(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump58(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){require58(A[i,j]==1,"SPACE58_EXPORTED_BINARY_MATRIX_ENTRY");write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
+execute(read("../../../57/source-data/rr-literals57.sing"));
+list terms58;list oneTerms58;poly remaining58;int ti58;intvec exp58;
+for(ti58=1;ti58<=68;ti58++){
+ remaining58=original57[ti58];oneTerms58=list();
+ while(remaining58!=0){exp58=leadexp(remaining58);oneTerms58=insert(oneTerms58,exp58,size(oneTerms58));remaining58=remaining58-lead(remaining58);}
+ terms58[ti58]=oneTerms58;
+}
+ring spaceJets58=(2,a),(w),dp;minpoly=a^2+a+1;short=0;
+execute(read("../../source-data/laurent-helper58.sing"));
+short=1;execute(read("../../../57/source-data/r27-charts.sing"));execute(read("../../../57/source-data/r27-sigma.sing"));short=0;
+execute(read("../../source-data/pairs58.sing"));
+proc cache58(list coordinates,list uu,list vv){
+ list np;list ll;list vp;list up;list ans;int i;int j;int k;int m;int ix;
+ np[1]=lc(1);ll[1]=lc(1);vp[1]=lc(1);vp[2]=vv;up[1]=lc(1);
+ for(i=1;i<=3;i++){np[i+1]=lm(np[i],coordinates[1]);ll[i+1]=lm(ll[i],coordinates[2]);}
+ for(i=1;i<=48;i++){up[i+1]=lm(up[i],uu);}
+ list cacheDen58=lm(lpw(uu,16),lpw(la(uu,lc(1)),16));list invden=li(cacheDen58);list common;
+ for(k=0;k<=1;k++){for(j=0;j<=3;j++){for(i=0;i<=3;i++){
+  common=lm(lm(lm(np[i+1],ll[j+1]),vp[k+1]),invden);
+  for(m=0;m<=48;m++){ix=1+m+49*(i+4*j+16*k);ans[ix]=lm(common,up[m+1]);}
+ }}}
+ return(ans);
+}
+proc eval58(list termList,list cache){
+ list ans=lc(0);int i;int ix;intvec ex;
+ for(i=1;i<=size(termList);i++){ex=termList[i];ix=1+ex[4]+49*(ex[1]+4*ex[2]+16*ex[3]);ans=la(ans,cache[ix]);}
+ return(ans);
+}
+proc scale58(list x,number q){return(lnrm(q*x[1],x[2],x[3]));}
+proc conjugate58(list x){
+ poly pp=x[1];poly ans=0;int i;
+ for(i=1;i<=size(pp);i++){ans=ans+leadcoef(pp[i])^2*w^deg(pp[i]);}
+ return(lnrm(ans,x[2],x[3]));
+}
+proc coefficient58(list x,int exponent){
+ if(x[3]<=exponent){ERROR("SPACE58_COEFFICIENT_PRECISION_INSUFFICIENT");return(number(0));}
+ if(x[1]==0 || exponent<x[2]){return(number(0));}
+ poly pp=x[1];int i;
+ for(i=1;i<=size(pp);i++){if(deg(pp[i])+x[2]==exponent){return(leadcoef(pp[i]));}}
+ return(number(0));
+}
+proc real58(number q){number im=q^2+q;number re=q+a*im;require58((re==0 || re==1) && (im==0 || im==1),"SPACE58_REAL_IMAG_BINARY");return(re);}
+proc imag58(number q){number im=q^2+q;require58(im==0 || im==1,"SPACE58_IMAG_BINARY");return(im);}
+list sigmaSupports58;list support58;poly column58;int i58;int j58;int k58;
+matrix sigmaOld58[68][68];
+for(j58=1;j58<=68;j58++){
+ column58=sigmaColumns[j58];support58=list();
+ for(k58=1;k58<=size(column58);k58++){i58=deg(column58[k58])+1;support58=insert(support58,i58,size(support58));sigmaOld58[i58,j58]=1;}
+ sigmaSupports58[j58]=support58;
+}
+require58(sigmaOld58*sigmaOld58==unitmat(68),"SPACE58_OLD_SIGMA_SQUARE");
+matrix constraints58[96][196];matrix jets58[514][196];matrix sigmaJets58[514][196];matrix controlJets58[514][3];
+int ch58;int cusp58;int ram58;int bound58;int selected58;int offset58;int width58;int order58;
+int selectedOne58=0;int selectedSeven58=0;int evaluations58=0;int conjugates58=0;
+list chart58;list coordinates58;list uu58;list vv58;list cached58;list oldValues58;list sigValues58;list values58;list sigmaValues58;list val58;list sigVal58;list check58;list controls58;
+number coeff58;
+for(ch58=1;ch58<=20;ch58++){
+ chart58=charts[ch58];coordinates58=chart58[1];uu58=chart58[2];vv58=chart58[3];ram58=chart58[4];cusp58=chart58[5];
+ cached58=cache58(coordinates58,uu58,vv58);bound58=0;
+ if(cusp58==1){bound58=7*ram58;}if(cusp58==4){bound58=ram58;}
+ oldValues58=list();sigValues58=list();values58=list();sigmaValues58=list();
+ for(j58=1;j58<=68;j58++){oldValues58[j58]=eval58(terms58[j58],cached58);}
+ for(j58=1;j58<=68;j58++){
+  val58=lc(0);support58=sigmaSupports58[j58];
+  for(k58=1;k58<=size(support58);k58++){val58=la(val58,oldValues58[support58[k58]]);}
+  sigValues58[j58]=val58;
+  values58[j58]=la(val58,scale58(la(oldValues58[j58],val58),a));
+  sigmaValues58[j58]=la(oldValues58[j58],scale58(la(oldValues58[j58],val58),a));
+  val58=values58[j58];require58(val58[3]>0 && (val58[1]==0 || val58[2]>=-bound58),"SPACE58_ACTUAL_DESCENDED_AMBIENT_BOUND");
+  check58=la(conjugate58(val58),sigmaValues58[j58]);require58(check58[1]==0 && check58[3]>0,"SPACE58_BOTH_RESIDUE_ORIENTATIONS");conjugates58++;
+ }
+ selected58=0;if(cusp58==1 && coordinates58[2][2]==-4*ram58){selected58=1;}
+ if(selected58){
+  require58(ram58==1 || ram58==7,"SPACE58_Q0_RAMIFICATION");
+  if(ram58==1){selectedOne58++;offset58=0;width58=6;}else{selectedSeven58++;offset58=12;width58=42;}
+ }
+ for(j58=1;j58<=196;j58++){
+  val58=lm(values58[pairs58[j58,1]],values58[pairs58[j58,2]]);evaluations58++;
+  require58(val58[3]>0 && (val58[1]==0 || val58[2]>=-2*bound58),"SPACE58_ALL_QUADRATIC_AMBIENT_BOUNDS");
+  if(ch58==1){
+   sigVal58=lm(sigmaValues58[pairs58[j58,1]],sigmaValues58[pairs58[j58,2]]);
+   require58(val58[3]>=257 && sigVal58[3]>=257 && (val58[1]==0 || val58[2]>=0) && (sigVal58[1]==0 || sigVal58[2]>=0),"SPACE58_257_JET_PRECISION");
+   for(k58=0;k58<=256;k58++){
+    coeff58=coefficient58(val58,k58);jets58[2*k58+1,j58]=real58(coeff58);jets58[2*k58+2,j58]=imag58(coeff58);
+    coeff58=coefficient58(sigVal58,k58);sigmaJets58[2*k58+1,j58]=real58(coeff58);sigmaJets58[2*k58+2,j58]=imag58(coeff58);
+   }
+  }
+  if(selected58){
+   for(k58=0;k58<width58;k58++){
+    order58=-14*ram58+k58;coeff58=coefficient58(val58,order58);
+    constraints58[offset58+2*k58+1,j58]=real58(coeff58);constraints58[offset58+2*k58+2,j58]=imag58(coeff58);
+   }
+  }
+ }
+ if(ch58==1){
+  controls58=list(lc(1),lpw(la(lc(1),coordinates58[4]),2),lpw(coordinates58[3],2));
+  for(j58=1;j58<=3;j58++){
+   val58=controls58[j58];require58(val58[3]>=257,"SPACE58_CONTROL_JET_PRECISION");
+   for(k58=0;k58<=256;k58++){coeff58=coefficient58(val58,k58);controlJets58[2*k58+1,j58]=real58(coeff58);controlJets58[2*k58+2,j58]=imag58(coeff58);}
+  }
+ }
+ print("SPACE58_CHART "+string(ch58)+" cusp="+string(cusp58)+" e="+string(ram58)+" actual_products=196 conjugates=68");
+}
+require58(selectedOne58==1 && selectedSeven58==1 && evaluations58==3920 && conjugates58==1360,"SPACE58_COMPLETE_CHART_COUNTS");
+int ambientRank58=mat_rk(jets58);print("SPACE58_AMBIENT_RANK "+string(ambientRank58));
+require58(ambientRank58==196,"SPACE58_COMPLETE_AMBIENT_INDEPENDENCE_GATE");
+matrix controlColumns58=lift(module(jets58),module(controlJets58));
+require58(jets58*controlColumns58==controlJets58,"SPACE58_CONTROL_RECONSTRUCTION");
+matrix controlImages58=constraints58*controlColumns58;
+for(j58=1;j58<=2;j58++){for(k58=1;k58<=96;k58++){require58(controlImages58[k58,j58]==0,"SPACE58_1_A_SQUARED_POSITIVE_CONTROLS");}}
+int negativeRows58=0;for(k58=1;k58<=96;k58++){if(controlImages58[k58,3]!=0){negativeRows58++;}}
+require58(negativeRows58>0,"SPACE58_B_SQUARED_NEGATIVE_CONTROL");
+matrix sigma58=lift(module(jets58),module(sigmaJets58));
+require58(jets58*sigma58==sigmaJets58 && sigma58*sigma58==unitmat(196),"SPACE58_ACTUAL_QUADRATIC_INVOLUTION");
+matrix kernel58=matrix(syz(module(constraints58)));int dimension58=ncols(kernel58);int rank58=mat_rk(constraints58);
+require58(dimension58==196-rank58 && mat_rk(kernel58)==dimension58,"SPACE58_COMPLETE_KERNEL_DIMENSION");
+for(i58=1;i58<=196;i58++){
+ for(j58=1;j58<=196;j58++){require58(sigma58[i58,j58]==0 || sigma58[i58,j58]==1,"SPACE58_BINARY_INVOLUTION");}
+ for(j58=1;j58<=dimension58;j58++){require58(kernel58[i58,j58]==0 || kernel58[i58,j58]==1,"SPACE58_BINARY_KERNEL");}
+}
+matrix zero58[96][dimension58];require58(constraints58*kernel58==zero58,"SPACE58_KERNEL_PRODUCT");
+matrix recovery58=transpose(lift(module(transpose(kernel58)),module(unitmat(dimension58))));
+require58(recovery58*kernel58==unitmat(dimension58),"SPACE58_KERNEL_LEFT_INVERSE");
+matrix residual58=unitmat(196)+kernel58*recovery58;
+matrix homotopy58=transpose(lift(module(transpose(constraints58)),module(transpose(residual58))));
+require58(kernel58*recovery58+homotopy58*constraints58==unitmat(196),"SPACE58_FULL_KERNEL_SPLITTING");
+matrix sigmaRestricted58=recovery58*sigma58*kernel58;
+require58(sigma58*kernel58==kernel58*sigmaRestricted58 && sigmaRestricted58*sigmaRestricted58==unitmat(dimension58),"SPACE58_RESTRICTED_INVOLUTION");
+matrix smallControls58=recovery58*controlColumns58;
+link out58="ASCII:w complete-space58.sing";open(out58);write(out58,"ring completeSpace58=2,(w),dp;short=0;");
+dump58(out58,"constraints58",constraints58);dump58(out58,"kernel58",kernel58);dump58(out58,"recovery58",recovery58);dump58(out58,"homotopy58",homotopy58);dump58(out58,"jets58",jets58);dump58(out58,"sigmaJets58",sigmaJets58);dump58(out58,"controlJets58",controlJets58);dump58(out58,"controlColumns58",controlColumns58);dump58(out58,"sigma58",sigma58);dump58(out58,"sigmaRestricted58",sigmaRestricted58);dump58(out58,"smallControls58",smallControls58);close(out58);
+print("SPACE58_RESULT ambient=196 ambient_degree=256 jet_orders=257 binary_jet_rows=514 local_conditions=96 constraint_rank="+string(rank58)+" complete_dimension="+string(dimension58)+" target_degree=160 cusp_products=3920 conjugate_checks=1360 complete_splitting=1 negative_b_squared_rows="+string(negativeRows58)+" sigma_nilpotent_rank="+string(mat_rk(sigmaRestricted58+unitmat(dimension58))));
+require58(dimension58==100,"SPACE58_RR_DIMENSION_CONSISTENCY");
+print("SPACE58_ALL_CHECKS_PASS");quit;

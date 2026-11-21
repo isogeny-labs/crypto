@@ -1,0 +1,76 @@
+{
+  "binary_oracle": {
+    "out": {
+      "exhaustive_F": 32768,
+      "bounded_pairs": 512,
+      "planted_multisets": 212,
+      "random_reference_cases": 48,
+      "reference_factor_candidates": 13824,
+      "counterexample_checked": true,
+      "original_complete": false
+    },
+    "error": null
+  },
+  "actual_profile": {
+    "out": {
+      "small_boolean_assignments": 64,
+      "actual_controls": 48,
+      "original_complete": false,
+      "inputs": 63,
+      "variables": 34322,
+      "clauses": 123820,
+      "gate_kinds": {
+        "false": 1,
+        "true": 1,
+        "input": 63,
+        "not": 15,
+        "xor": 20820,
+        "and": 13424
+      },
+      "constraint_wires": 272,
+      "graph_sha256": "ac5a98921c9ce82f7fae048e98f0ab1327da8797377cea764deebf8038868b20",
+      "total_seconds": 0.378303773002699,
+      "scope": "conditional k3factorizationonly;nofactorsupport/search/originalrootcompletion"
+    },
+    "error": null
+  },
+  "odd_oracle": {
+    "out": {
+      "contexts": [
+        {
+          "p": 3,
+          "degree": 1,
+          "q": 3
+        },
+        {
+          "p": 5,
+          "degree": 1,
+          "q": 5
+        },
+        {
+          "p": 3,
+          "degree": 2,
+          "q": 9
+        },
+        {
+          "p": 5,
+          "degree": 2,
+          "q": 25
+        },
+        {
+          "p": 3,
+          "degree": 3,
+          "q": 27
+        }
+      ],
+      "planted_pairs": 80,
+      "random_reference_cases": 36,
+      "linear_blocks": 160,
+      "field_inverse_checks": 64,
+      "original_complete": false
+    },
+    "error": null
+  },
+  "qualified_speedup": null,
+  "original_complete": false
+}

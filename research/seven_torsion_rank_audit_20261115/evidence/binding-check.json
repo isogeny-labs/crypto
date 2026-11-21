@@ -1,0 +1,36 @@
+{
+  "schema": "seven-rank-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "seven-torsion-rank-certificate",
+      "expected_decl_sha256": "1846d4084e69a4dc55b87caa81922228875456387d79d874638524e22fd54cc9",
+      "full_characters": 1611,
+      "full_decl_sha256": "1846d4084e69a4dc55b87caa81922228875456387d79d874638524e22fd54cc9",
+      "full_normalized_signature": "theorem actual_geometric_seven_certificate : (∀ (R : Type) [CommRing R] (W : WeierstrassCurve R), psiSeven W=FiveTorsionRankAudit.psiFive W*W.Ψ₃^3-W.Ψ₂Sq^2*W.preΨ₄^3 ∧ (psiSeven W).derivative=7*W.Ψ₂Sq*sevenAux W) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (x y : K) (hN : W.Nonsingular x y), (7:ℕ) • Point.some x y hN=0 ↔ (psiSeven W).IsRoot x) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [IsAlgClosed K] [NeZero (7:K)] (W : WeierstrassCurve.Affine K), W.Δ≠0 → (psiSeven W).Separable ∧ (psiSeven W).natDegree=24 ∧ Nat.card (SevenRoot W)=24 ∧ Finite (SevenTorsion W) ∧ Nat.card (SevenTorsion W)=49 ∧ Nat.card {P : W.Point // addOrderOf P=7}=48 ∧ finrank (ZMod 7) (SevenTorsion W)=2 ∧ Nonempty (Basis (Fin 2) (ZMod 7) (SevenTorsion W))) ∧ (CharP BinaryClosure 2 ∧ binaryCurve.Δ≠0 ∧ Nat.card (SevenTorsion binaryCurve)=49 ∧ finrank (ZMod 7) (SevenTorsion binaryCurve)=2) ∧ (CharP CharThreeClosure 3 ∧ (short (-1:CharThreeClosure) 0).Δ≠0 ∧ Nat.card (SevenTorsion (short (-1:CharThreeClosure) 0))=49 ∧ finrank (ZMod 7) (SevenTorsion (short (-1:CharThreeClosure) 0))=2) ∧ (CharP QuinaryClosure 5 ∧ (FiveTorsionRankAudit.charFiveCurve QuinaryClosure).Δ≠0 ∧ Nat.card (SevenTorsion (FiveTorsionRankAudit.charFiveCurve QuinaryClosure))=49 ∧ finrank (ZMod 7) (SevenTorsion (FiveTorsionRankAudit.charFiveCurve QuinaryClosure))=2) ∧ (CharP SeptenaryClosure 7 ∧ (charSevenCurve SeptenaryClosure).Δ≠0 ∧ Nat.card (SevenTorsion (charSevenCurve SeptenaryClosure))≤47 ∧ Nat.card (SevenTorsion (charSevenCurve SeptenaryClosure))≠49 ∧ finrank (ZMod 7) (SevenTorsion (charSevenCurve SeptenaryClosure))≠2)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "actual_geometric_seven_certificate",
+        "end_byte": 2075,
+        "file": "/workspace/scratch/seven-rank-binding-input01/SevenCertificate.lean",
+        "qualified_decl_id": "SevenTorsionRankAudit.actual_geometric_seven_certificate",
+        "signature": "theorem actual_geometric_seven_certificate :\n    (∀ (R : Type) [CommRing R] (W : WeierstrassCurve R),\n      psiSeven W=FiveTorsionRankAudit.psiFive W*W.Ψ₃^3-W.Ψ₂Sq^2*W.preΨ₄^3 ∧\n      (psiSeven W).derivative=7*W.Ψ₂Sq*sevenAux W) ∧\n    (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K)\n      (x y : K) (hN : W.Nonsingular x y),\n      (7:ℕ) • Point.some x y hN=0 ↔ (psiSeven W).IsRoot x) ∧\n    (∀ (K : Type) [Field K] [DecidableEq K] [IsAlgClosed K] [NeZero (7:K)]\n      (W : WeierstrassCurve.Affine K), W.Δ≠0 →\n      (psiSeven W).Separable ∧ (psiSeven W).natDegree=24 ∧ Nat.card (SevenRoot W)=24 ∧\n      Finite (SevenTorsion W) ∧ Nat.card (SevenTorsion W)=49 ∧\n      Nat.card {P : W.Point // addOrderOf P=7}=48 ∧ finrank (ZMod 7) (SevenTorsion W)=2 ∧\n      Nonempty (Basis (Fin 2) (ZMod 7) (SevenTorsion W))) ∧\n    (CharP BinaryClosure 2 ∧ binaryCurve.Δ≠0 ∧ Nat.card (SevenTorsion binaryCurve)=49 ∧\n      finrank (ZMod 7) (SevenTorsion binaryCurve)=2) ∧\n    (CharP CharThreeClosure 3 ∧ (short (-1:CharThreeClosure) 0).Δ≠0 ∧\n      Nat.card (SevenTorsion (short (-1:CharThreeClosure) 0))=49 ∧\n      finrank (ZMod 7) (SevenTorsion (short (-1:CharThreeClosure) 0))=2) ∧\n    (CharP QuinaryClosure 5 ∧ (FiveTorsionRankAudit.charFiveCurve QuinaryClosure).Δ≠0 ∧\n      Nat.card (SevenTorsion (FiveTorsionRankAudit.charFiveCurve QuinaryClosure))=49 ∧\n      finrank (ZMod 7) (SevenTorsion (FiveTorsionRankAudit.charFiveCurve QuinaryClosure))=2) ∧\n    (CharP SeptenaryClosure 7 ∧ (charSevenCurve SeptenaryClosure).Δ≠0 ∧\n      Nat.card (SevenTorsion (charSevenCurve SeptenaryClosure))≤47 ∧\n      Nat.card (SevenTorsion (charSevenCurve SeptenaryClosure))≠49 ∧\n      finrank (ZMod 7) (SevenTorsion (charSevenCurve SeptenaryClosure))≠2)",
+        "start_byte": 233
+      },
+      "recorded_statement": "theorem actual_geometric_seven_certificate : (∀ (R : Type) [CommRing R] (W : WeierstrassCurve R), psiSeven W=FiveTorsionRankAudit.psiFive W*W.Ψ₃^3-W.Ψ₂Sq^2*W.preΨ₄^3 ∧ (psiSeven W).derivative=7*W.Ψ₂Sq*sevenAux W) ∧ (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (x y : K) (hN : W.Nonsingular x y), (7:ℕ) • Point.some x y hN=0 ↔ (psiSeven W).IsRoot x) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [IsAlgClosed K] [NeZero (7:K)] (W : WeierstrassCurve.Affine K), W.Δ≠0 → (psiSeven W).Separable ∧ (psiSeven W).natDegree=24 ∧ Nat.card (SevenRoot W)=24 ∧ Finite (SevenTorsion W) ∧ Nat.card (SevenTorsion W)=49 ∧ Nat.card {P : W.Point // addOrderOf P=7}=48 ∧ finrank (ZMod 7) (SevenTorsion W)=2 ∧ Nonempty (Basis (Fin 2) (ZMod 7) (SevenTorsion W))) ∧ (CharP BinaryClosure 2 ∧ binaryCurve.Δ≠0 ∧ Nat.card (SevenTorsion binaryCurve)=49 ∧ finrank (ZMod 7) (SevenTorsion binaryCurve)=2) ∧ (CharP CharThreeClosure 3 ∧ (short (-1:CharThreeClosure) 0).Δ≠0 ∧ Nat.card (SevenTorsion (short (-1:CharThreeClosure) 0))=49 ∧ finrank (ZMod 7) (SevenTorsion (short (-1:CharThreeClosure) 0))=2) ∧ (CharP QuinaryClosure 5 ∧ (FiveTorsionRankAudit.charFiveCurve QuinaryClosure).Δ≠0 ∧ Nat.card (SevenTorsion (FiveTorsionRankAudit.charFiveCurve QuinaryClosure))=49 ∧ finrank (ZMod 7) (SevenTorsion (FiveTorsionRankAudit.charFiveCurve QuinaryClosure))=2) ∧ (CharP SeptenaryClosure 7 ∧ (charSevenCurve SeptenaryClosure).Δ≠0 ∧ Nat.card (SevenTorsion (charSevenCurve SeptenaryClosure))≤47 ∧ Nat.card (SevenTorsion (charSevenCurve SeptenaryClosure))≠49 ∧ finrank (ZMod 7) (SevenTorsion (charSevenCurve SeptenaryClosure))≠2)",
+      "recorded_text_sha256": "1846d4084e69a4dc55b87caa81922228875456387d79d874638524e22fd54cc9",
+      "source_plan": "research/seven_torsion_rank_audit_20261115/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "SevenTorsionRankAudit.actual_geometric_seven_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Frozen procedural writtenheadercheck, not kernel parser/hash/compiler/physicalhost refinement. Fullheadercheckaftercompletedgate; no prefix/verifierchange."
+}

@@ -1,0 +1,267 @@
+{
+  "time": "2026-11-16T21:14:25.116522+00:00",
+  "repo": "crypto",
+  "local_component": "eb3e882c3c8a1525ba57100f1469f6a50cd92809",
+  "original_last_observed_source": "278339b4b8da4ab25654a3d4bea97e6116b066cb",
+  "actual_merge": "f9905c5eecc4fedfc86619050747142dd8be79a2",
+  "closed_head": "5e581972670f158162e67c8016005c80328b5b45",
+  "observed_main": "3994878d2953234d0d70cc0dfcdc0f482ed3ab3b",
+  "ancestry_exit_codes": {
+    "original_source_in_merged": 0,
+    "merged_in_main": 0,
+    "local_component_in_main": 1,
+    "main_in_local_component": 1
+  },
+  "whole_ledger_comparisons": [
+    {
+      "base": "original",
+      "target": "merged",
+      "whole_byte_prefix": false,
+      "common_initial_whole_lines": 274,
+      "base_lines": 1599,
+      "target_lines": 1215
+    },
+    {
+      "base": "original",
+      "target": "main",
+      "whole_byte_prefix": false,
+      "common_initial_whole_lines": 274,
+      "base_lines": 1599,
+      "target_lines": 1215
+    },
+    {
+      "base": "local",
+      "target": "merged",
+      "whole_byte_prefix": false,
+      "common_initial_whole_lines": 274,
+      "base_lines": 1656,
+      "target_lines": 1215
+    },
+    {
+      "base": "local",
+      "target": "main",
+      "whole_byte_prefix": false,
+      "common_initial_whole_lines": 274,
+      "base_lines": 1656,
+      "target_lines": 1215
+    },
+    {
+      "base": "main",
+      "target": "local",
+      "whole_byte_prefix": false,
+      "common_initial_whole_lines": 274,
+      "base_lines": 1215,
+      "target_lines": 1656
+    },
+    {
+      "base": "merged",
+      "target": "main",
+      "whole_byte_prefix": true,
+      "common_initial_whole_lines": 1215,
+      "base_lines": 1215,
+      "target_lines": 1215
+    }
+  ],
+  "working_original_ledger_verifier_exit": 1,
+  "working_ledger_sha256": "3669d9c517a7cd46e405264fd66e086a166cdd696d4532fb8ec8e30816c3a91b",
+  "commands": [
+    {
+      "name": "original_source_in_merged",
+      "argv": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "merge-base",
+        "--is-ancestor",
+        "278339b4b8da4ab25654a3d4bea97e6116b066cb",
+        "f9905c5eecc4fedfc86619050747142dd8be79a2"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "merged_in_main",
+      "argv": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "merge-base",
+        "--is-ancestor",
+        "f9905c5eecc4fedfc86619050747142dd8be79a2",
+        "3994878d2953234d0d70cc0dfcdc0f482ed3ab3b"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "local_component_in_main",
+      "argv": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "merge-base",
+        "--is-ancestor",
+        "eb3e882c3c8a1525ba57100f1469f6a50cd92809",
+        "3994878d2953234d0d70cc0dfcdc0f482ed3ab3b"
+      ],
+      "exit": 1
+    },
+    {
+      "name": "main_in_local_component",
+      "argv": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "merge-base",
+        "--is-ancestor",
+        "3994878d2953234d0d70cc0dfcdc0f482ed3ab3b",
+        "eb3e882c3c8a1525ba57100f1469f6a50cd92809"
+      ],
+      "exit": 1
+    },
+    {
+      "name": "local-entire-ledger",
+      "argv": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "show",
+        "eb3e882c3c8a1525ba57100f1469f6a50cd92809:pcc/ledger.jsonl"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "original-entire-ledger",
+      "argv": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "show",
+        "278339b4b8da4ab25654a3d4bea97e6116b066cb:pcc/ledger.jsonl"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "merged-entire-ledger",
+      "argv": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "show",
+        "f9905c5eecc4fedfc86619050747142dd8be79a2:pcc/ledger.jsonl"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "closed_head-entire-ledger",
+      "argv": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "show",
+        "5e581972670f158162e67c8016005c80328b5b45:pcc/ledger.jsonl"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "main-entire-ledger",
+      "argv": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "show",
+        "3994878d2953234d0d70cc0dfcdc0f482ed3ab3b:pcc/ledger.jsonl"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "original-current-working-ledger-verifier-against-main",
+      "argv": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "ledger",
+        "verify",
+        "--base",
+        "3994878d2953234d0d70cc0dfcdc0f482ed3ab3b"
+      ],
+      "exit": 1
+    },
+    {
+      "name": "whole-observed-main-AGENTS",
+      "argv": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "show",
+        "3994878d2953234d0d70cc0dfcdc0f482ed3ab3b:AGENTS.md"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "main-AGENTS-vs-local-diff",
+      "argv": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "diff",
+        "eb3e882c3c8a1525ba57100f1469f6a50cd92809",
+        "3994878d2953234d0d70cc0dfcdc0f482ed3ab3b",
+        "--",
+        "AGENTS.md"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "whole-target-scope-tree-diff",
+      "argv": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "diff",
+        "--name-status",
+        "eb3e882c3c8a1525ba57100f1469f6a50cd92809",
+        "3994878d2953234d0d70cc0dfcdc0f482ed3ab3b",
+        "--",
+        "research/chained_jacobian_transfers_20261110"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "specific-main-component-tree",
+      "argv": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "ls-tree",
+        "3994878d2953234d0d70cc0dfcdc0f482ed3ab3b",
+        "--",
+        "research/chained_jacobian_transfers_20261110/lean/CubicFiniteNorm22308.lean",
+        "research/chained_jacobian_transfers_20261110/lean/CubicNativeNormEuclid22309.lean",
+        "research/chained_jacobian_transfers_20261110/lean/CubicCofactorWordBridge22307.lean",
+        "research/chained_jacobian_transfers_20261110/native-cubic-cofactor-inverse-06/src/lib.rs"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "exact-parent-instruction-paths",
+      "argv": [
+        "git",
+        "-c",
+        "gc.auto=0",
+        "ls-tree",
+        "-r",
+        "--name-only",
+        "3994878d2953234d0d70cc0dfcdc0f482ed3ab3b",
+        "--",
+        "AGENTS.md",
+        "research/AGENTS.md",
+        "research/chained_jacobian_transfers_20261110/AGENTS.md",
+        "experiments/AGENTS.md",
+        "experiments/chained-transfer-lp-presentation-01/AGENTS.md",
+        "tools/AGENTS.md",
+        "tools/pcc/AGENTS.md",
+        ".github/AGENTS.md"
+      ],
+      "exit": 0
+    }
+  ],
+  "scope": "read-only full custody/ancestry preflight. No working index/source/ledger/ref repair or reset/rechain/force/merge."
+}

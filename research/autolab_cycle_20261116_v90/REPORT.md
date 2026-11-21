@@ -1,0 +1,25 @@
+# C90: exact polynomial bridge and sparse chain comparisons
+
+Three executed frozen experiments passed,one core,4096MiB per worker,90s timeout each. Initial C90manifest was rejected before worker registration because it hashed baseline paths outside projectroot. Preserved originalsource/manifest;C90b copies exact unchanged baselinebinary/source inside root,verifies bytehashes,and uses fresh planIDs. No rejected worker execution or algorithmicfailure is claimed. All C88errors,pending plans and earlier evidence unchanged.
+
+Hypothesis: source finite-domain products plus all original S3factors/field equations permit a genuine all-roots comparison;the sparse chain admits suffix-state pruning without losing nonrational point-lift roots. Implemented a field-generic sparse polynomial encoder,exact Boolean descent,and a backward finite-state blocksolver. All original source/intermediate coordinates kept. Codec uses division-free binary or symmetricodd S3,exact declared polynomialbasis coefficients,and X^q-X on every variable. Thus encoding preserves unrestricted polynomial roots within the declared source domain,including repetitions,torsion and ghost branches. No curve-point-only assumption.
+
+Independent direct S3enumeration matched encoded exhaustive roots on9cases overF3,F5,F7,GF4,GF8,GF9,GF27,including arity5. These37fullroots also matched the blocksolver;4binarycases additionally matched all Booleanassignments(up to16bits). Domain-product equality checked at every field element. FiveNISTprime-field encodings andGF83A0/A1fixtures retain a known root vector each;membership only,no hard solve/completenessclaim. BinaryA0/A1S3identicalequationhash verified and not counted asdistinct hardinstances.
+
+The Boolean bridge feeds unchanged genuine repository MatrixF4/MatrixF5 adapters,source revision3d737486869d1ca77e14ad56bdaf376916eecce7. Each freshPythonwrapper receives the originalfieldcase,constructs codec/ANF,launchesfreshnativeprocess,decodes allcoordinates,verifies originalequations andserializesfullroots. Candidate wrapper also receives originalfieldcase and pays codec/blocksetup/verification/output. Native5stime,node200000,degree6,output100000;supervisor8schargesfullwrapperlifetime.27coldruns=3cases*3methods*3repetitions. Allmatchcomplete roots(3percase),including allintermediates.
+
+|Case|Block solver seconds|Genuine F4 seconds|Genuine F5 seconds|Fastest F4/F5 divided by block|
+|---|---:|---:|---:|---:|
+|codec_0|0.032631197|0.035349016|0.039667669|1.083|
+|codec_2|0.034133022|0.044072704|0.045899138|1.291|
+|codec_3|0.032702904|0.05266983|0.050623624|1.548|
+
+Observed wait4peak12672–12800KiB(12.375–12.5MiB),with rawCPU,walltime,childselfRSS,nativeJSON/diagnostics and complete outputs. Per-process4096MiB cap inherited by native descendants;RSSisprocesshigh-water,not concurrentfamily sum. These are tiny exposed calibrations,fastestbaseline farbelow1s;noF6,noA/Aorqualifiedisolation,no20hardpanel. These modest matched F4/F5ratios are not release evidence and not the50xtarget.
+
+The direct state-table solver is explicitly q<=32;O(q^2|D|)tables cannot scale to2^83. That limitation yielded a changed third hypothesis:exact affine subspace polynomials avoid exponential source-domain products. Implemented established p-linearized recurrence Lnew=Lold^p-Lold(b)^(p-1)Lold,with affineconstant correction. Fiveindependent smallprime/binaryextension cases match explicit product polynomials coefficient-for-coefficient and allfieldmembership;48original roots retained. ActualGF83D18annihilator has19nonzeroFrobenius terms for262144domain elements. Exact83x83F2map rank65,kerneldimension18,first18coordinatebasisvectors killed. This proves theexactdomain,not aheuristicfilter.
+
+Actualsymbolic fivechain encodedin9366bytes:8fieldvariables,664rawbinarycoordinates,325independent sourceconstraints,339coordinates aftersourceelimination,and332originalS3coordinateequations. This recovers theexisting339/332layout rather than reducingit. Fixedtarget1234567onlyforsymbolicdiagnostic;noactualrootsearch performed,rootcount unset. Dense domainproduct not materialized. No samefieldbyte-sizegain confused with solving speed.
+
+Novelty assessment:finite-state constraint joining,subspacepolynomials andWeil/coordinate descent are established. Primary native source confirms actual F4/F5frontend identities;this is engineering/proofprogress toward matched comparisons,not a newlycleared generalalgorithm. Source-identified full matchingF6 and big-prime/oddextension solverinterfaces remain separate streams.
+
+Next:fresh structuralFrobenius ANFcompiler substitutes D18sourcebits beforeproducts,verifies all332originalcoordinatepolynomials globally against frozenmaininstance,and joins the genuinewidebaselineport without calling a modifiedport fulloptimizedF6. Use support/quotient blocks with compressedexactstates instead of qenumeration. Primefields require separate exactinterval/integerlift machinery;there is no nontrivial properFp-linear subspace ofFp. RestoreC84certifiedresidue-cover search in parallel researchqueue,not as an excuse to stop. Goalactive,50xunproved,frozenreleasegateunchanged.

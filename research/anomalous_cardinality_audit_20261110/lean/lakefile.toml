@@ -1,0 +1,15 @@
+name = "anomalous_cardinality"
+version = "0.1.0"
+defaultTargets = ["CardinalityAudit"]
+
+[[require]]
+name = "anomalous_known_answer"
+path = "../../anomalous_curve_audit_20261110/lean"
+
+[[require]]
+name = "supersingular_small_characteristic"
+path = "../../supersingular_small_characteristic_20261110/lean"
+
+[[lean_lib]]
+name = "CardinalityAudit"
+roots = ["ShortPointCount", "MissingFiber", "CardinalityControls", "AnomalousCardinality"]

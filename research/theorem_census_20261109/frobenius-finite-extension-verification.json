@@ -1,0 +1,76 @@
+{
+  "schema": "theorem-audit-verification/v1",
+  "recorded_at": "2026-11-10T05:54:42.230582+00:00",
+  "source_commit": "3c660a402960486c12c900c00360e18561d36df0",
+  "source_plan_sha256": "428b36484989dd3158183e263a5bfe3ad813a4ce6cd6ebb2f9ec2d63cdc33d2f",
+  "source_bytes_equal_commit": true,
+  "formal": {
+    "project": "research/theorem_census_20261109/lean",
+    "theorem": "FrobeniusFiniteExtensionAudit.finite_extension_audit_certificate",
+    "statement": "theorem finite_extension_audit_certificate : ∀ (F K B : Type*) [Field F] [Fintype F] [Field K] [Fintype K] [Field B] [Algebra F K] [Algebra F B] [Algebra K B] [IsScalarTower F K B] [DecidableEq K] [DecidableEq B], Fintype.card K=Fintype.card F^Module.finrank F K ∧ ∀ W : WeierstrassCurve.Affine F, (∀ P : (W.baseChange B).Point, (pointFrobenius W)^[Module.finrank F K] P=P ↔ ∃ Q : (W.baseChange K).Point, WeierstrassCurve.Affine.Point.map (W'",
+    "decl_sha256": "632f7b213dce07f0800397055bf7d66be985ffe17099c7d3d44224f2f8ddb746",
+    "sources": [
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusFiniteExtension.lean",
+        "bytes": 8610,
+        "sha256": "71cc43700fceabc138db6ad52f4e41449c1a7b440f92054d582836e2571eeb9a"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusPointDescent.lean",
+        "bytes": 6808,
+        "sha256": "772180baf24ea48b16ba3cae5c2039e2cf21d925ed1e7f1370b906711d60dc72"
+      }
+    ],
+    "gate": {
+      "path": "evidence/frobenius-finite-extension-gate.log",
+      "declarations": 490,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Every actual finite-field tower F⊆K⊆B with B any field extension, explicit compatible algebra/scalar-tower data, every general Weierstrass model WoverF: actual point PoverB comes from actual W(K) iff [K:F]iterations of actual F-Frobenius fix P. Same equivalence for every actual r-torsion set. Actual |K|=|F|^[K:F]proved, and explicit kforms derived from |K|=|F|^k. Chosen embedded finite extension, not a construction of a canonical subfield in a fixed closure. Geometric torsion rank/determinant and Weil necessity remain open for qualified BK."
+  },
+  "proof_packet": {
+    "id": "PCC-20261110-a496b9",
+    "local_verdict": {
+      "claim_id": "PCC-20261110-a496b9",
+      "claim_sha256": "9fbedf3f75d5d0b1df8a2c68dcf9c2ff05b93efb34ce38e996c0e15af79273c2",
+      "commit": "3c660a402960486c12c900c00360e18561d36df0",
+      "proofs": [
+        {
+          "kind": "lean",
+          "notes": [
+            "lean: proof gate PASS for research/theorem_census_20261109/lean (FrobeniusFiniteExtension.lean)"
+          ],
+          "reasons": [],
+          "verdict": "pass"
+        }
+      ],
+      "reasons": [],
+      "schema": "pcc.verdict/v1",
+      "verdict": "pass",
+      "verified_at": "2026-11-10T05:53:48Z",
+      "verifier_host": "762f5fc120c9"
+    },
+    "standing": {
+      "claim_id": "PCC-20261110-a496b9",
+      "claim_sha256": "9fbedf3f75d5d0b1df8a2c68dcf9c2ff05b93efb34ce38e996c0e15af79273c2",
+      "standing": "unverified",
+      "verdicts": []
+    }
+  },
+  "report": {
+    "path": "reports/proof-20261110-frobenius-extension/report.pdf",
+    "bytes": 61113,
+    "sha256": "c87af876618e35de374e8ea5db69feebd12141e04aed1d59dcca29074ace006c",
+    "pages": 2,
+    "all_pages_visually_inspected": true,
+    "diagram_inspected": true
+  },
+  "scope": "Every actual finite-field tower F⊆K⊆B with B any field extension, explicit compatible algebra/scalar-tower data, every general Weierstrass model WoverF: actual point PoverB comes from actual W(K) iff [K:F]iterations of actual F-Frobenius fix P. Same equivalence for every actual r-torsion set. Actual |K|=|F|^[K:F]proved, and explicit kforms derived from |K|=|F|^k. Chosen embedded finite extension, not a construction of a canonical subfield in a fixed closure. Geometric torsion rank/determinant and Weil necessity remain open for qualified BK.",
+  "paid_compute": 0,
+  "commands": [
+    "timeout 180s lake env lean -o .lake/build/lib/lean/FrobeniusFiniteExtension.olean FrobeniusFiniteExtension.lean",
+    "tools/lean/proof-gate.sh --out research/theorem_census_20261109/evidence/frobenius-finite-extension-gate research/theorem_census_20261109/lean",
+    "python3 tools/pcc/pcc.py verify PCC-20261110-a496b9 --json"
+  ]
+}

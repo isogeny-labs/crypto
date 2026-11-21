@@ -1,0 +1,77 @@
+{
+  "schema": "walk-character-verification/v1",
+  "source_commit": "e7f40958333289c0cce72fa8052b56126e26832b",
+  "claim_id": "PCC-20261114-c4aad9",
+  "declaration_sha256": "5aa92485a1a41a58f879a300b849daef3d3f6c899cecd962c688d629e0196b8c",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 19,
+  "gate_declarations": 37,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 79,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-c4aad9",
+    "claim_sha256": "64ea69b84bb90aa84370281b5a49c2e4a004a35035001cddd21428db37761029",
+    "commit": "e7f40958333289c0cce72fa8052b56126e26832b",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/walk_character_audit_20261114/lean (CharacterCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T12:00:51Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-c4aad9",
+    "claim_sha256": "64ea69b84bb90aa84370281b5a49c2e4a004a35035001cddd21428db37761029",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47556,
+    "sha256": "27b77ecba647cd8d77914b534339e530d11fb7456c06bdddd7c88edb18f4fe9b",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 37,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "actual_independent_character_power_law": true,
+    "actual_complex_expectation_bind_derived": true,
+    "actual_squared_moment_power_law": true,
+    "normalized_unit_phase_variance_derived": true,
+    "quantitative_character_pair_and_alignment_derived": true,
+    "actual_prime_nonzero_mode_strict_contraction": true,
+    "actual_zero_frequency_and_zero_weight_and_composite_controls": true,
+    "full_source_minimum_cutoff_closed": false,
+    "parseval_tv_upper_bound_closed": false,
+    "stronger_expected_random_support_mixing_closed": false,
+    "qualified_theorem_one_or_two_refuted": false,
+    "full_later_preprint_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "time": "2026-11-17T00:33:56.893149+00:00",
+  "state": "prospective/no new adapter code, compilation or calls",
+  "primary_sources": [
+    {
+      "repository": "/workspace/cryptanalysis",
+      "head": "e079927b84c5045201a96a8540e4fe569a5f5d7e",
+      "path": "experiments/chained-transfer-reference/src/balanced.rs",
+      "git_blob": "df2bb1b4e9d4e1554d5ca45f30326a6448ae65eb",
+      "copy": "entire-balanced.rs.txt",
+      "bytes": 33771,
+      "sha256": "732058d65ced0d1d5567ac0e2c9625bbf5237891c179f45223e574437bf934c9"
+    },
+    {
+      "repository": "/workspace/cryptanalysis",
+      "head": "e079927b84c5045201a96a8540e4fe569a5f5d7e",
+      "path": "suite/src/prime_hyperelliptic/fp_poly.rs",
+      "git_blob": "7b6da8f85e473ad9a04da537b71d5835d1ca97c9",
+      "copy": "entire-fp_poly.rs.txt",
+      "bytes": 11867,
+      "sha256": "44f7af14d22bed78d85c4bd009ccce7197fa9257e7ff56164c8d891303e49590"
+    },
+    {
+      "repository": "/workspace/cryptanalysis",
+      "head": "e079927b84c5045201a96a8540e4fe569a5f5d7e",
+      "path": "suite/src/prime_hyperelliptic/fp2.rs",
+      "git_blob": "aa38cd2908c1ab9e82785e3596ff2a5c89c0888e",
+      "copy": "entire-fp2.rs.txt",
+      "bytes": 12739,
+      "sha256": "b833bdff5247f2eea0cde7feb89d0378cfe8305671f9065d2dae7ab538c03e55"
+    },
+    {
+      "repository": "/workspace/cryptanalysis",
+      "head": "e079927b84c5045201a96a8540e4fe569a5f5d7e",
+      "path": "experiments/chained-transfer-reference/BALANCED.md",
+      "git_blob": "153f640fb416f70ae028738844a6a0784fc189d2",
+      "copy": "BALANCED.md",
+      "bytes": 6771,
+      "sha256": "71a8d3694f8205f9d4afb6edf462d112972ffbccd6f1dc72c4340e33d87652e2"
+    },
+    {
+      "repository": "/workspace/crypto",
+      "head": "eb3e882c3c8a1525ba57100f1469f6a50cd92809",
+      "path": "research/chained_jacobian_transfers_20261110/lean/BalancedDivisors.lean",
+      "git_blob": "7ba3e40bb11a690b1c0008641e4aa678d1400eaa",
+      "copy": "BalancedDivisors.lean.txt",
+      "bytes": 1513,
+      "sha256": "e800aa6210658f1d06a0042e329b9c3e5b6328a0a6419509992e773bcb7e72b7"
+    },
+    {
+      "repository": "/workspace/crypto",
+      "head": "eb3e882c3c8a1525ba57100f1469f6a50cd92809",
+      "path": "research/chained_jacobian_transfers_20261110/lean/BalancedChart.lean",
+      "git_blob": "ce975554cf6f0ef40cc3be6ae416cb4a9d352b61",
+      "copy": "BalancedChart.lean.txt",
+      "bytes": 1212,
+      "sha256": "5d3451ea0e7900a8465808adb46309f72bc80a7277a562dbf70a3e12d8e27b5d"
+    },
+    {
+      "repository": "/workspace/crypto",
+      "head": "eb3e882c3c8a1525ba57100f1469f6a50cd92809",
+      "path": "research/chained_jacobian_transfers_20261110/lean/KernelChart.lean",
+      "git_blob": "2c76b415629a451e1ce13244b44dbe57959d5154",
+      "copy": "KernelChart.lean.txt",
+      "bytes": 1523,
+      "sha256": "7c1a70a61d224a188a50416f94924b07a8c64f4664f61c1bc2b39862be100c13"
+    },
+    {
+      "repository": "/workspace/crypto",
+      "head": "eb3e882c3c8a1525ba57100f1469f6a50cd92809",
+      "path": "research/chained_jacobian_transfers_20261110/lean/IndependentMapChart.lean",
+      "git_blob": "3f2986d652288395aa92e0bd01338ae9f4dfbe33",
+      "copy": "IndependentMapChart.lean.txt",
+      "bytes": 1682,
+      "sha256": "84a0d6596ecf66cc8205f2554f9617b1d0009de4e66cc55efd938f91110926e8"
+    },
+    {
+      "repository": "/workspace/crypto",
+      "head": "eb3e882c3c8a1525ba57100f1469f6a50cd92809",
+      "path": "research/chained_jacobian_transfers_20261110/lean/RichelotAlgebra.lean",
+      "git_blob": "cdc17004ae291bc3bf3299ff09b68dd2fc5a0fb7",
+      "copy": "RichelotAlgebra.lean.txt",
+      "bytes": 2194,
+      "sha256": "e2efe44d44f48bf70b08bf852618ccfd39d7375d3162fa07d43303a9ebcda975"
+    }
+  ],
+  "fixture_csv_sha256": "c959041cf52d0cf095e019c47ab0e1227ff8a7231a641639d1ff42de1e9a6716",
+  "fixed_models": "twelve monic vectors copied from native audit11 recorded output; auxiliary x6+1 explicitly separate",
+  "papers": [
+    {
+      "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch10.pdf",
+      "sha256": "dd5b456fb8a9a12a5dcb781c0bf5ec55422a39f397f4379cf71581263142a43a",
+      "read": "Definition10.4.9/Lemma10.4.10 full argument/Lemma10.4.14/Theorem10.4.19 full relevant proof"
+    },
+    {
+      "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch8.pdf",
+      "sha256": "9580b1eda23b976137861405ac545559f75051dadcc0db657d564f98ba9ff8a4",
+      "read": "Theorem8.3.8 with full proof/Corollary8.3.10/Exercise8.3.11"
+    }
+  ],
+  "scope": "reuse existing arithmetic/conditional algebraic laws; no new Lean or independently authored trusted verifier; canonical trust/fork/store/paid constraints persist"
+}

@@ -1,0 +1,42 @@
+{
+  "schema": "pencil.combined-predecessor-terminal/v1",
+  "predecessor": "signed-kummer-combined-runner-v6-20261111",
+  "source_publication_commit": "21f4458fd5d8bdefed6b82a269b4563ff58cd1cf",
+  "caller": {
+    "path": "/var/tmp/pencil-combined-v6-caller-20261111/caller-result.json",
+    "sha256": "6a4194c12c7911365e18d9fc63b49a020666ca6b35484860a368c460061d2572",
+    "exit_code": 1,
+    "elapsed_seconds": 94.96023184404476
+  },
+  "completion": {
+    "path": "/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v6-20261111/completion.json",
+    "sha256": "8bc865aacd5883012d243316fbce4944ecce4e7fbd76ec6b68aa223c96c2a969",
+    "status": "failed",
+    "seal_status": "passed",
+    "elapsed_seconds": 94.8206544239656
+  },
+  "terminal_output_manifest": {
+    "path": "/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v6-20261111/terminal-output-manifest.json",
+    "sha256": "7ac526a93c5b1f1445b415a85d742b8a3967bf2c3cd8671ff31e402d57e746e7",
+    "sealed_after_owned_cgroup_empty": true
+  },
+  "worker_receipt": {
+    "path": "/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v6-20261111/worker/worker-receipt.json",
+    "sha256": "ae3483a69e566e0faf17e9fecba81c31a8c2582f1e986816b8226a46f4519ddc",
+    "materialize_exit_code": 0,
+    "compile_exit_code": 101,
+    "tests_run": 0
+  },
+  "failure": {
+    "stage": "cached_build_script_execution_before_source_compilation",
+    "stderr_sha256": "dc92cb63471a37425329212277d5e0b32c293f314210626d3890dd3016dffdf9",
+    "message": "proc-macro2 cached build-script permission denied",
+    "file_sha256": "81e840a61de4638c14ed53e2d5a5d22971c22645d1b59478c1bd1e273e5f3271",
+    "bytes": 602768,
+    "donor_mode": "0700",
+    "copied_mode": "0600"
+  },
+  "automatic_retry": false,
+  "compiler_reached_rust_source": false,
+  "scientific_payload_executed": false
+}

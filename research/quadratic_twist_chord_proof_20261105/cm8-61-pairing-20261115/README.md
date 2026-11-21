@@ -1,0 +1,9 @@
+# Executed F61 actual twist-assisted pairing preflight
+
+Source checkpoint6d81f0b09 precedes the23:12:07–23:12:12UTC native run. C++ binary Miller versus independent Rust linear Miller reconstruct ALL961 actual source/twist pairings,900 nontrivial/shifted comparisons,961 source-addition and961 twist-embedding-addition identities. All31 source points (30 nonidentity) recover ORIGINAL E/P scalars using point input alone, generic finite-field BSGS versus independent linear field-log reference. Two fresh streams/receipts agree; all30 build/data/control stages complete. [pcc:unverified]
+
+Actual E/F61 A21B39, delta59 twist A23B54, P=(0,10),U=(37,14),r31; twist embedding chi(U)=(12,34i) with i²=59. Primitive Weil value23+23i; same-source pairing1, direct formula pole and non31-torsion partner explicit. Twelve altered payload controls reject101/no receipt, including falsely assigning matrix degree0. Matrix degree is NULL, NOT0. No measured lower algebraic degree, total-cost/speed gain, new Lean/IDC or signed PCC assertion. [pcc:unverified]
+
+All81 raw logs/payloads/bindings archived locally in11516bytes, SHA25609e1934c457dc6cbdc7adc97ae8f29cca062410e7199ecb4b98b7cf07f6a648f. Actual restore/hash/repack equality, editable graph/PDF and source build hashes local under /workspace/twist-cm8-61-pairing-evidence-20261115/. No raw/PDF/archive uploaded. All false payloads retained, no failed native stage. Report initial0.86pt line overflow retained then corrected. [pcc:unverified]
+
+Next actual algebraic question: on the mapped finite-field subgroup use sign branches of cubic base membership and reciprocal product membership, certify gcd via bounded Bezout BEFORE root extraction; preserve all source policies/public setup/unknown-point workloads and pairing/setup/expanded-source costs. That polynomial solver is prospective, not measured here. The checked finite reduction makes it testable; generic field BSGS itself is not algebraic progress. [pcc:unverified]

@@ -1,0 +1,85 @@
+import Init.Grind.Module.Basic
+import Init.Grind.Ring.Basic
+
+/-! Feasible structural parts of actual four-gluing and the six-surface
+distinction. Actual varieties,connected quotient Tate modules,finite
+cardinalities,polarizations and their realization are written bridges. -/
+set_option autoImplicit false
+namespace QuarticGluing
+open Lean.Grind
+
+theorem duplication_ordinate_numerator {R : Type} [CommRing R] (x a b : R) :
+    -8*(x^3+a*x+b)^2+12*x*(x^3+a*x+b)*(3*x^2+a)-(3*x^2+a)^3 =
+    x^6+5*a*x^4+20*b*x^3-5*a^2*x^2-4*a*b*x-8*b^2-a^3 := by
+  grind
+
+theorem sum_kernel_projection_injective {E F A : Type} [IntModule A]
+    (e : E → A) (f : F → A) (hf : Function.Injective f)
+    (p : E) (q r : F) (hq : e p+f q=0) (hr : e p+f r=0) : q=r := by
+  apply hf
+  grind
+
+def Kernel {E F A : Type} (s : E → F → A) (z : A) :=
+  {p : E × F // s p.1 p.2=z}
+
+def Bijective {A B : Type} (f : A → B) :=
+  Function.Injective f ∧ ∀ y, ∃ x, f x=y
+
+def transport {E F A E' F' A' : Type}
+    (s : E → F → A) (t : E' → F' → A') (z : A) (w : A')
+    (e : E → E') (f : F → F') (u : A → A')
+    (uz : u z=w) (comm : ∀ p q, u (s p q)=t (e p) (f q)) :
+    Kernel s z → Kernel t w := fun p =>
+  ⟨(e p.val.1,f p.val.2), by rw [← comm,p.property,uz]⟩
+
+theorem kernel_transport_bijective {E F A E' F' A' : Type}
+    (s : E → F → A) (t : E' → F' → A') (z : A) (w : A')
+    (e : E → E') (f : F → F') (u : A → A')
+    (he : Bijective e) (hf : Bijective f)
+    (hu : Function.Injective u) (uz : u z=w)
+    (comm : ∀ p q, u (s p q)=t (e p) (f q)) :
+    Bijective (transport s t z w e f u uz comm) := by
+  constructor
+  · intro p q h
+    apply Subtype.ext
+    apply Prod.ext
+    · apply he.1
+      exact congrArg (fun v : Kernel t w => v.val.1) h
+    · apply hf.1
+      exact congrArg (fun v : Kernel t w => v.val.2) h
+  · intro q
+    obtain ⟨a,ha⟩ := he.2 q.val.1
+    obtain ⟨b,hb⟩ := hf.2 q.val.2
+    have hk : s a b=z := by
+      apply hu
+      rw [comm,ha,hb,q.property,uz]
+    refine ⟨⟨(a,b),hk⟩,?_⟩
+    apply Subtype.ext
+    exact Prod.ext ha hb
+
+theorem quotient_kernel_saturated {M Q : Type} [IntModule M] [IntModule Q]
+    (q : M → Q) (linear : ∀ n : Int, ∀ a, q (n • a)=n • q a)
+    (torsionfree : ∀ n : Int, n≠0 → ∀ b : Q, n • b=0 → b=0)
+    (n : Int) (hn : n≠0) (a : M) (ha : q (n • a)=0) : q a=0 := by
+  apply torsionfree n hn
+  rw [← linear]
+  exact ha
+
+theorem saturated_equal_rational_span {M : Type} [IntModule M]
+    (L W : M → Prop) (included : ∀ a, L a → W a)
+    (saturated : ∀ a n, n≠(0 : Int) → L (n • a) → L a)
+    (sameSpan : ∀ a, W a → ∃ n : Int, n≠0 ∧ L (n • a)) :
+    ∀ a, L a ↔ W a := by
+  intro a
+  constructor
+  · exact included a
+  · intro h
+    obtain ⟨n,hn,ha⟩ := sameSpan a h
+    exact saturated a n hn ha
+
+end QuarticGluing
+#print axioms QuarticGluing.duplication_ordinate_numerator
+#print axioms QuarticGluing.sum_kernel_projection_injective
+#print axioms QuarticGluing.kernel_transport_bijective
+#print axioms QuarticGluing.quotient_kernel_saturated
+#print axioms QuarticGluing.saturated_equal_rational_span

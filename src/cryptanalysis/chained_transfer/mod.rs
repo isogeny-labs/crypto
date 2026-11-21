@@ -47,5 +47,6 @@ pub mod measure;
 pub mod negation_remeasure;
 pub mod pushforward;
 pub mod pushforward_deg3;
+pub mod quartic_ic;
 pub mod small_de;
 pub mod tower;

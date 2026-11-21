@@ -1,0 +1,22 @@
+# Runpod45: batch-counted Rust IC kernels
+
+Batching reduces the two observed Lanczos inner elapsed times while every non-wall worker field remains exactly equal to the scalar implementation. All eight solves return the same independently verified normalized kernel at actual rank508. Counted RREF remains faster on both matrices in this single cold round. This is development evidence on the same exposed matrices, with incomplete native accounting and no complete-cost, external-fastest or full-pipeline claim. [pcc:unverified]
+
+| Solver | Full-smooth inner ms | Quadratic-remainder inner ms |
+|---|---:|---:|
+| Counted RREF | 19.515 | 19.735 |
+| Existing library Wiedemann | 75.329 | 100.692 |
+| Scalar Lanczos | 55.866 | 68.049 |
+| Batched Lanczos | 38.861 | 45.972 |
+
+Scalar and batched Lanczos have identical observed incomplete primitive subtotals:279,594,191,456and323,862,876,186. RREF has671,875,466,644and693,059,581,316; library Wiedemann has375,539,648,234and474,980,536,224. Exact kernel SHA2563ef4c7f5668558cdba39c76631d29d5e608be05df329b2bc188497275d4ccfea is common to all eight cells. The [native table](report/table.md) and [onepage PDF](report/report.pdf) retain every observation. Timing comparisons use fresh processes on45's host;44used another allocation. No timing ratio or statistical claim is supplied. [pcc:unverified]
+
+The backend is integrated as public Rust API jv_sieve::two_large_prime::sparse_kernel. Matrix, counted RREF, existing Wiedemann and full randomized Lanczos interfaces are in src/cryptanalysis/jv_sparse_kernel.rs. The native example compiles that exact source against the frozen production IC library. Deterministic sparse/vector loops aggregate identical product/addition/word events. The existing independent44checker verifies the firstthree fresh arms; a separate Rust helper requires exact equality of every non-wall output before qualifying the batch arm. It compares complete random preconditioners, recurrence/refusal histories, kernels, counts, uniform events, phase totals and metadata. All original workers/unchanged qualifier/equality checker exit0; foreign and other-modulus events0; all iterative first attempts succeed. [pcc:unverified]
+
+Sourceeffca7bbb646a3642e1c278247546646c83b4dbe was published in regularPR4483and immutable measure/batched-kernel45-source before allocation and solePOST202at2026-11-17T02:52:47Z. AMENDMENT40registers one cold round, seed443, at most3outer preconditioners, zero warmups/automatic retries/exclusions. All25source blobs reconstruct identically from returned archive and immutable Git; source44/45hashes still match. Complete measured wrapper0.594s is practicality only. SourcePCC-20261117-00a1b4is UNVERIFIED. [pcc:unverified]
+
+Original untruncated files remain LOCAL at/workspace/ic-runpod-runs/runpod-batched-kernel-20261117-45/returned/task/run and its parent artifacts.tar.gz. local-originals.sha256 binds every original and archive. Small raws/metadata are copied verbatim here; full scalar/batched traces,169136Binput, binaries and source archives remain local/hash-bound. Portable manifests/private-pattern checks pass. Collection02:53:30Zprecedes owned-pod otcnd3x7pg2y1y DELETE204and independentGET40402:53:31Z;5400second guardian marked. All owned paid pods32–45deleted. Final native PDF/SVG/150dpiPNG inspected without clipping; exact benchmark copies and hashes included. [pcc:unverified]
+
+Input admission/read, relation collection/filtering, output serialization and independent verification are outside the component interval. Integer division/setup, allocation/control/index work and PRNG internals lack full native coverage. Complete_cost=false, complete totals/ratios null. Mathematical and counter software replay is not an independent signed execution proof. Existing collection already performs incremental RREF; realizing a production phase benefit requires replacing that rank computation with a certified sparse checkpoint, rather than adding another final solve. [pcc:unverified]
+
+Whole-root Cargo remains blocked by eight unchanged hashed-ecdl-tensor crate::metrics errors. The source-head CI failures inspected also occur before our formatter/compiler, from unrelated missing N83source, artifact-store403and unchanged unrecorded environment switches. SeeCI_BLOCKERS.md; no gate bypass or all-green claim. The PR's normal auto-merge remains subject to those gates. [pcc:unverified]

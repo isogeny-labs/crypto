@@ -1,0 +1,14 @@
+Finset.sum_erase_add.{u_1, u_4} {ι : Type u_1} {M : Type u_4} [AddCommMonoid M] [DecidableEq ι] (s : Finset ι)
+  (f : ι → M) {a : ι} (h : a ∈ s) : ∑ x ∈ s.erase a, f x + f a = ∑ x ∈ s, f x
+/workspace/scratch/partite-coverage-declarations001.lean:3:7: error(lean.unknownIdentifier): Unknown constant `Finset.sum_eq_add_sum_diff_singleton`
+Finset.sum_mul_sum.{u_1, u_2, u_4} {ι : Type u_1} {κ : Type u_2} {R : Type u_4} [NonUnitalNonAssocSemiring R]
+  (s : Finset ι) (t : Finset κ) (f : ι → R) (g : κ → R) : (∑ i ∈ s, f i) * ∑ j ∈ t, g j = ∑ i ∈ s, ∑ j ∈ t, f i * g j
+/workspace/scratch/partite-coverage-declarations001.lean:5:7: error(lean.unknownIdentifier): Unknown constant `Finset.sum_pow_two`
+Nat.le_of_mul_le_mul_left {a b c : ℕ} (h : c * a ≤ c * b) (hc : 0 < c) : a ≤ b
+Nat.le_of_mul_le_mul_right {a b c : ℕ} (h : a * c ≤ b * c) (hc : 0 < c) : a ≤ b
+Fintype.card_pos_iff.{u_1} {α : Type u_1} [Fintype α] : 0 < Fintype.card α ↔ Nonempty α
+Nat.pow_pos {a n : ℕ} (h : 0 < a) : 0 < a ^ n
+Nat.mul_le_mul_left {n m : ℕ} (k : ℕ) (h : n ≤ m) : k * n ≤ k * m
+Nat.mul_le_mul_right {n m : ℕ} (k : ℕ) (h : n ≤ m) : n * k ≤ m * k
+Finset.card_erase_of_mem.{u_1} {α : Type u_1} {s : Finset α} {a : α} [DecidableEq α] :
+  a ∈ s → (s.erase a).card = s.card - 1

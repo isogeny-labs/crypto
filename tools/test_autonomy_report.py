@@ -84,6 +84,19 @@ class AutonomyTest(unittest.TestCase):
         self.assertNotEqual(code, 0)
         self.assertTrue(b.startswith("E-"))
 
+    def test_nudge_fails_and_classifier_rank(self):
+        a = self.episode()
+        self.check(a, "reverted", "false")
+        self.assertEqual(self.state(a), "unsupervised_success")
+        self.iv(a, "redirect", "continue", "haiku")
+        self.assertEqual(self.state(a), "fail")
+        self.iv(a, "approve", "continue", "opus")     # opus outranks haiku
+        self.assertEqual(self.state(a), "unsupervised_success")
+        self.iv(a, "nudge", "continue", "sonnet")     # sonnet does not outrank opus
+        self.assertEqual(self.state(a), "unsupervised_success")
+        self.iv(a, "nudge", "continue", "human")      # human outranks all
+        self.assertEqual(self.state(a), "fail")
+
     def test_evidence_required(self):
         code, _ = run(self.d, "add-episode", "--session", "s", "--task", "t", "--task-class", "other",
                       "--started", "2026-11-15T00:00:00Z", "--ended", "2026-11-15T01:00:00Z",

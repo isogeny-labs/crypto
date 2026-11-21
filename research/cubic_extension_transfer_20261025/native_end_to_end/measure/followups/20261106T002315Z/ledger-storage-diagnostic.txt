@@ -1,0 +1,38 @@
+Unsigned local diagnostic; not a scientific experiment or CI verdict.
+All observations have unverified standing. [pcc:unverified]
+
+Artifact-bot commit: d732452c3f4d95e926ae4c59c9ef0bbdde5c1e5a
+Sole parent: 961234654878944d120fff45138080c041abf4c8
+Changed paths: pcc/.artifacts.json, pcc/.gitignore, pcc/ledger.jsonl
+Parent ledger size: 65851 bytes
+Manifest and parent ledger SHA-256:
+b17a36101ed15ac778e8f8c3f8cec4785e591c1738d506dceb26c59e847d8340
+
+Local copy rehydrated from exact parent (not downloaded from remote store):
+$ python3 tools/artifacts/artifacts.py verify pcc/ledger.jsonl
+1 entries: 1 hydrated, 0 not pulled, 0 problems
+$ python3 tools/pcc/pcc.py ledger verify --base origin/main
+ledger: 155 entries, chain ok
+
+Temporary fixture, using the existing unmodified PCC CLI and PCC_REPO:
+1. Initialize a small temporary Git repository with main ff30ef0e's ledger
+   as its committed baseline (150 entries).
+2. Remove that working ledger and install the bot's manifest/ignore rule.
+3. Run ledger verify --base <fixture-baseline>:
+   ledger: head has 0 entries, base has 150 (history removed)
+   ledger: 0 entries, BROKEN
+   exit status: 1
+4. Restore the exact 155-entry parent ledger; repeat the same verifier:
+   ledger: 155 entries, chain ok
+   exit status: 0
+[pcc:unverified]
+
+Scope: reproduces the existing CLI's missing-file behavior without changing
+the verifier, canonical ledger, workflow, or trusted signing configuration.
+The GitHub workflow was inspected at main ff30ef0e: no artifact pull precedes
+the ledger check or signing, and signing stages pcc/ledger.jsonl directly.
+Remote object accessibility, actual CI execution and artifact-aware signed
+publication were not tested. Existing source and measurement records remain
+outside this diagnostic's scope. Fresh claim registration is pending safe
+artifact-backed canonical ledger publication; no verified standing is claimed.
+[pcc:unverified]

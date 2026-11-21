@@ -1,0 +1,14 @@
+{
+  "status": "build in progress; no outcome asserted",
+  "command": "CARGO_BUILD_JOBS=1 CARGO_TARGET_DIR=/workspace/crypto-integrate/target RUST_TEST_THREADS=1 cargo test --release --manifest-path research/relation_fusion_20261117/root-integration/Cargo.toml --test packed_replay",
+  "qualification_scope": "36 fixed combinations within two test functions; no timing admission",
+  "affinity": "cargo and live compiler pinned toCPU0 after initial dependency compilation, before test execution",
+  "baseline_source_pins": "ROOT_BASELINE_CHECK_141.json",
+  "additional_pins": {
+    "src/cryptanalysis/f4_fp/certified.rs": "344f77fa57433ebebcf92ecea5d5b4ff9d564f5971939f6983d4a8587f325381",
+    "research/relation_fusion_20261117/root-integration/tests/packed_replay.rs": "0c6c610768c0d061a22da1ca2065706bca96043cd1669d79be51924146ad8bc5",
+    "research/relation_fusion_20261117/root-integration/Cargo.lock": "296bfe22031f958faac74de16061f961779178f3652b0fd82f7bcc8b385dff14",
+    "Cargo.lock": "430a56316353412d28492dc9e3f9d77bd6e1243442c663a5dcbea6b5028e46ba"
+  },
+  "no_runtime_source_mutation_during_build": true
+}

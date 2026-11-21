@@ -1,0 +1,46 @@
+--- a/src/ml_dataset/owned_search_capture_publication.rs
++++ b/src/ml_dataset/owned_search_capture_publication.rs
+@@ -58,15 +58,10 @@
+  fn check(&mut self)->Result<(),()>{if let Err(s)=self.budget.check(Instant::now()){self.fail(s)}else{Ok(())}}
+  fn publish(&mut self,i:u64,b:&[u8])->Result<(),()>{match self.publish_inner(i,b){Ok(())=>Ok(()),Err(s)=>self.fail(s)}}
+ }
+-impl OwnedAttempt{
+- /// Actual checkpoint boundary. No stopped original budget receives new supply.
+- /// Multiple successful snapshots have distinct indices and an exact head chain.
+- pub(in crate::ml_dataset::solvers) fn checkpoint_capture(&mut self)->Result<(),Stop>{
+-  if let Some(s)=self.publication.failure{return Err(s)}
+-  let mut publication=std::mem::take(&mut self.publication);
+-  let limits=self.original.capture_limits.clone();
+-  // CaptureLimits is fixed-size numeric metadata; cloning it allocates nothing.
+-  let result=encoding::with_parts(self,|source,budget,sink|->Result<(),Stop>{
++/// Borrowed publication uses only the authentic owner split and original sink.
++pub(super) fn checkpoint_parts(source:&encoding::EncodingSource<'_>,budget:&mut Budget,sink:&mut capture::CaptureEmitter,publication:&mut Publication,limits:&capture::CaptureLimits)->Result<(),Stop>{
++ if let Some(s)=publication.failure{return Err(s)}
++ let result=(||->Result<(),Stop>{
+    let entries=publication.snapshots.len().checked_add(1).ok_or(Stop::Overflow)?;
+    let growth=u64::try_from(entries.checked_mul(size_of::<Snapshot>()).ok_or(Stop::Overflow)?).map_err(|_|Stop::Overflow)?;
+    budget.reserve_checking(8192u64.checked_add(entries as u64).ok_or(Stop::Overflow)?,growth.checked_add(65536).ok_or(Stop::Overflow)?,Instant::now())?;
+@@ -96,10 +91,19 @@
+    if !byte_summary.0||byte_summary.1!=byte_summary.2||byte_summary.1!=retained_bytes{return Err(Stop::Observer)}
+    bridge.budget.check(Instant::now())?;
+    bridge.snapshot.complete=true;Ok(())
+-  });
+-  // Both successful and failed encoder attempts and all real chunk receipts
+-  // return to owning storage before the error is interpreted.
+-  if let Err(s)=result{publication.failure=Some(s);if let Some(last)=publication.snapshots.last_mut(){if !last.complete{last.failure.get_or_insert(s);}}}
++ })();
++ if let Err(s)=result{publication.failure=Some(s);if let Some(last)=publication.snapshots.last_mut(){if !last.complete{last.failure.get_or_insert(s);}}let _:Result<(),Stop>=budget.fail(s);}
++ result
++}
++impl OwnedAttempt{
++ /// Actual checkpoint boundary. No stopped original budget receives new supply.
++ /// Multiple successful snapshots have distinct indices and an exact head chain.
++ pub(in crate::ml_dataset::solvers) fn checkpoint_capture(&mut self)->Result<(),Stop>{
++  if let Some(s)=self.publication.failure{return Err(s)}
++  let mut publication=std::mem::take(&mut self.publication);
++  let limits=self.original.capture_limits.clone();
++  // CaptureLimits is fixed-size numeric metadata; cloning it allocates nothing.
++  let result=encoding::with_parts(self,|source,budget,sink|checkpoint_parts(source,budget,sink,&mut publication,&limits));
+   self.publication=publication;
+   if let Err(s)=result{if self.failure.is_none(){self.fail(OwnerFailure::Publication(s),s);}return Err(s)}
+   Ok(())

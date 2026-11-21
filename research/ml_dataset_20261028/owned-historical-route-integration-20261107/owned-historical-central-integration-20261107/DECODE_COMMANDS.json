@@ -1,0 +1,28 @@
+[
+  {
+    "command": [
+      "rustc",
+      "+1.98",
+      "--edition=2021",
+      "--test",
+      "decode_tests.rs",
+      "-L",
+      "dependency=/var/tmp/crypto-ml-search-recovery-target-20261107/release/deps",
+      "--extern",
+      "hex=/var/tmp/crypto-ml-search-recovery-target-20261107/release/deps/libhex-1a24ad8e658c37ff.rlib",
+      "-C",
+      "link-arg=-Wl,--threads=1",
+      "-o",
+      "decode_tests"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.7177597709960537
+  },
+  {
+    "command": [
+      "./decode_tests"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.04744110399042256
+  }
+]

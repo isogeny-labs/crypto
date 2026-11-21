@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T03:36:15Z",
+ "id": "PCC-20261117-70521d",
+ "kind": "statement",
+ "producer": {
+  "commit": "36b85f8634f4ed34d972ba07ebf5221921993c77",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/monomial-cancellation-v1/REPORT_CITATION_REVISION.json",
+    "sha256": "996ffb2ea6275d7b6a81a3ec03d881303718818459949cc15edbc10bd1966eaa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/reports/monomial-cancellation-v1/report-cited.md",
+    "sha256": "2d7e1ec51ce3787b9eeefb6901aee9154da0f2e4657f27f9536a8737df95c0ff"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/monomial-cancellation-v1/development/report-prose-lint-refusal.log",
+    "sha256": "c96597d2af4e7d6be12b944d32c80446396e1b0542843a961e5b1f39df7080e6"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "additive report standing citation revision only",
+ "statement": "Current report-cited.md adds the missing unverified standing tag to one Markdown line; frozen original report PDF/TeX/Markdown/plot and all old claim subjects remain unchanged. No native source change or rerun; this is producer metadata, not signed validation."
+}

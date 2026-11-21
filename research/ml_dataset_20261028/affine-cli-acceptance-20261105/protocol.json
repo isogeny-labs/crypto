@@ -1,0 +1,659 @@
+{
+  "amendments": [],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": true,
+    "inputs": [
+      "commands/*/receipt.json",
+      "run/**",
+      "replay/**",
+      "bundle/**",
+      "restored/**",
+      "export/**",
+      "report/**",
+      "export-repeat/**",
+      "s3-readback/**",
+      "post-verify-inventory.json",
+      "attempt-result.json"
+    ],
+    "outputs": [
+      "analysis.json",
+      "attempt-result.json",
+      "attempt-inventory.json",
+      "post-verify-inventory.json",
+      "/var/tmp/affine-cli-custody-acceptance-20261105-v3-export-v1/experiment.export.json",
+      "/var/tmp/affine-cli-custody-acceptance-20261105-v3-export-v1/experiment.export.validation.json"
+    ],
+    "script": {
+      "path": "driver.py",
+      "sha256": "a1b022d71f791cf68a9970a7b00e643a087b1314176f1bdcd8bb25f465cb8aa0"
+    }
+  },
+  "arms": [
+    {
+      "description": "Real binary affine finite-identity path, both twists, exact functional acceptance.",
+      "id": "affine-plain",
+      "instrument": {
+        "binary_sha256": "08cbb98342408e57b63016f16f46b5cf44a600a0be8afd7e88a22f59ae0719bc",
+        "build": [
+          [
+            "cargo",
+            "+1.98",
+            "build",
+            "--release",
+            "--bin",
+            "crypto",
+            "--locked",
+            "--offline"
+          ]
+        ],
+        "commit": "802444fa9dc94194b2ae525d9cd3ad14fe1b9b52",
+        "env": {
+          "LANG": "C",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "profile": "release",
+          "toolchain": "1.98"
+        },
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "solver": "f4",
+        "twist": false
+      },
+      "role": "control_positive"
+    },
+    {
+      "description": "Real binary affine finite-identity path, both twists, exact functional acceptance.",
+      "id": "affine-twist",
+      "instrument": {
+        "binary_sha256": "08cbb98342408e57b63016f16f46b5cf44a600a0be8afd7e88a22f59ae0719bc",
+        "build": [
+          [
+            "cargo",
+            "+1.98",
+            "build",
+            "--release",
+            "--bin",
+            "crypto",
+            "--locked",
+            "--offline"
+          ]
+        ],
+        "commit": "802444fa9dc94194b2ae525d9cd3ad14fe1b9b52",
+        "env": {
+          "LANG": "C",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {
+          "profile": "release",
+          "toolchain": "1.98"
+        },
+        "repo": "isogeny-labs/crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "solver": "f4",
+        "twist": true
+      },
+      "role": "candidate",
+      "same_instrument_as": "affine-plain"
+    }
+  ],
+  "authors": [
+    "Codex; user-authorized dataset implementation software validation"
+  ],
+  "claims": [
+    {
+      "id": "C1",
+      "class": "exact_computation",
+      "decided_by": [
+        "absolute-plain",
+        "absolute-twist"
+      ],
+      "text": "Both fixed cells independently verify an original-bound affine finite identity with partial status, pattern1 row0 and no solver/scalar completion; all twelve registered CLI commands, repeated restricted-export equality, private S3 readback verification, and restore of the downloaded bundle pass."
+    },
+    {
+      "id": "C2",
+      "class": "out_of_scope",
+      "decided_by": [],
+      "text": "No complete F4/F5/SAT search, UNSAT proof, scalar recovery, causal operation trajectory, hardware instruction-count/degree label, comparative performance, population inference, or full requested corpus completion is established by this two-cell software acceptance."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": null,
+      "not_applicable_reason": "No statistical/performance claim; no second Generate.",
+      "present": false
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "No additional generated cells. Required exact-source test gates include real payload corruption and sticky same-owner rejection controls. No independent CLI negative-generator arm.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "present": true,
+      "arm": "affine-plain",
+      "expected_detection": "Genuine checked finite identity on both twists; refusal, incomplete and hash-only outcomes do not meet the positive detector.",
+      "not_applicable_reason": null
+    }
+  },
+  "created": "2026-11-05",
+  "decision_rule": {
+    "comparison_ids": [
+      "absolute-plain",
+      "absolute-twist"
+    ],
+    "effect_size_measure": "Not applicable; no effect-size or performance claim",
+    "interval": "Not applicable to an exact finite software contract",
+    "multiple_comparison_correction": "none",
+    "statistic": "Exact conjunction, with planned/attempted/completed/failed/interrupted/unattempted counts",
+    "text": "PASS only if all two cells and twelve primary CLI commands plus actual S3 readback custody verification satisfy exact native, custody and source checks; every failure remains retained with no retry.",
+    "threshold": "Exactly 2 of 2 genuine finite-identity cells; all12 primary CLI commands; both S3 helper/readback-verification commands; repeated export byte equality; original/downloaded/restored custody identity checks.",
+    "verdict_vocabulary": [
+      "PASS",
+      "FAIL",
+      "INTERRUPTED",
+      "NOT_EXECUTED"
+    ]
+  },
+  "execution": {
+    "backend": "local",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": null,
+      "interval_seconds": null,
+      "policy": "none",
+      "restore_validation": "none"
+    },
+    "measurement_class": "throughput",
+    "placement": {
+      "cloud_launch": false,
+      "filesystem_parent": "/var/tmp",
+      "fresh_nonexisting_fixture_required": true,
+      "local_file_backend_publication": false,
+      "remote_publish": true,
+      "remote_publish_scope": "existing private S3 custody of this acceptance bundle only",
+      "scientific_compute_launches": 0,
+      "source_publication": "existing public GitHub source repository before execution",
+      "new_cloud_infrastructure": false
+    },
+    "queue": null,
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 1800
+  },
+  "extensions": {
+    "scope": "bounded local native software correctness acceptance with existing privately authorized S3 artifact custody; zero scientific compute launches",
+    "candidate_binding_pending": false,
+    "source_binary_and_gate_receipts": {
+      "source_commit": "802444fa9dc94194b2ae525d9cd3ad14fe1b9b52",
+      "source_tree": "2be22b9a41fbb9d03fff9ead76936676f337bd41",
+      "binary_sha256": "08cbb98342408e57b63016f16f46b5cf44a600a0be8afd7e88a22f59ae0719bc",
+      "release_binary": {
+        "path": "/home/ec2-user/ml-dataset-resume-20261029/affine-final-acceptance-composition-20261105/local-readiness/release_binary.attestation.json",
+        "sha256": "7670abb9e71687345c4c21a3de9261debce8b3651486282fac39547b2156c915",
+        "bytes": 2528
+      },
+      "full_library": {
+        "path": "/home/ec2-user/ml-dataset-resume-20261029/affine-final-acceptance-composition-20261105/local-readiness/full_library.attestation.json",
+        "sha256": "4e4e5529c1eb05b6b57b32bb2eab18aea4abcfc0a1659f378003eab8913b8b42",
+        "bytes": 313737
+      },
+      "native_regressions": {
+        "path": "/home/ec2-user/ml-dataset-resume-20261029/affine-final-acceptance-composition-20261105/local-readiness/native_regressions.attestation.json",
+        "sha256": "956db88f60adccf52361b485a2a3bccfa0d7b277bb38f8c3a03a7bbbb2e62351",
+        "bytes": 330332
+      },
+      "semantics": "full library/native gates derive post-test commit identity from verified tested content, not historical clean test checkouts"
+    },
+    "dataset_channels": {
+      "schema": "crypto.ml-dataset.channel-requests/v3",
+      "affine_boolean_row": {
+        "mode": "affine_unit_row",
+        "pattern": 1,
+        "row_index": 0
+      }
+    },
+    "execution_driver": {
+      "file": "driver.py",
+      "path": "driver.py",
+      "sha256": "a1b022d71f791cf68a9970a7b00e643a087b1314176f1bdcd8bb25f465cb8aa0"
+    },
+    "fixed_input_files": [
+      "channels.json",
+      "factor-base-policies.json",
+      "schedule.json",
+      "limits.json",
+      "commands.json",
+      "s3_custody.py",
+      "public_projection.py",
+      "required-regressions.json"
+    ],
+    "local_software_authorized": true,
+    "production_cloud_authorized": false,
+    "replay_policy": {
+      "attempts": 1,
+      "producer_work": 16384,
+      "producer_seconds_per_case": 60,
+      "producer_memory_mib": 256,
+      "producer_trace_mib": 128,
+      "driver_seconds": 1800,
+      "replay_seconds_per_command": 300,
+      "replay_work_per_cell": 1000000000000,
+      "replay_bytes_per_cell": 8000000000,
+      "replay_stream_bytes_per_cell": 134217728,
+      "replay_payload_bytes_per_cell": 134217728,
+      "replay_aggregate_work_per_command": 2000001000000,
+      "replay_aggregate_bytes_per_command": 16001000000,
+      "replay_invocations": 9,
+      "total_attempts": 1,
+      "local_cpu_threads": 1,
+      "local_cloud_launches": 0,
+      "s3_max_bytes": 1073741824,
+      "s3_max_files": 10000,
+      "s3_attempts": 1,
+      "scientific_compute_launches": 0,
+      "s3_max_requests": 20000
+    },
+    "sat_training_admission": false,
+    "correctness_acceptance_only": true,
+    "full_matrix_scope_preserved": true,
+    "canonical_export_adapter_pending": false,
+    "canonical_export_binding": {
+      "tooling_pins_sha256": "abfd287091aca67240f537e02ec07bf2aa3f08ef018090b03ff0e1155cc2ced8",
+      "canonical_checker_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+      "outside_sealed_run": true,
+      "output_dir": "/var/tmp/affine-cli-custody-acceptance-20261105-v3-export-v1",
+      "executed_during_composition": false
+    },
+    "source_publication": {
+      "repository": "isogeny-labs/crypto",
+      "visibility": "public",
+      "scope": "source_protocol_configuration_only",
+      "publication_receipt": null,
+      "restricted_dataset_artifacts": "private S3 custody only; no raw/restricted generated records in source publication",
+      "visibility_evidence": "Parent reported live gh repo view confirming PUBLIC; no publication receipt is asserted by this draft.",
+      "source_pull_request": "https://github.com/isogeny-labs/crypto/pull/3490",
+      "reported_head": "e78384e2ac26518ef0d06998a44465e1549c1a42",
+      "publication_receipt_required": true
+    },
+    "custody": {
+      "provider": "existing private S3 prefix",
+      "authorization_template": "custody-authorization.template.json",
+      "deadline": null,
+      "remaining_custody_usd": null,
+      "max_cost_usd": null,
+      "max_requests": 20000,
+      "max_bytes": 1073741824,
+      "max_files": 10000,
+      "attempts": 1,
+      "new_scientific_cloud_authority": false
+    },
+    "draft_revision": {
+      "based_on": "/home/ec2-user/ml-dataset-resume-20261029/affine-cli-acceptance-plan-20261105-v3",
+      "based_on_protocol_sha256": "22ecc264a98887a999a1446498b6e0670661d6e5ce3aeda77037d54b0f58e080",
+      "edited_before_affected_data": true,
+      "status": "unbound draft; no execution/freeze/publication"
+    },
+    "fixed_input_bindings": {
+      "driver.py": "a1b022d71f791cf68a9970a7b00e643a087b1314176f1bdcd8bb25f465cb8aa0",
+      "commands.json": "abaa76559aefdab9236dd61a5132dda612404cf03fdb14428f99c550177bf6ac",
+      "channels.json": "cf98634757141cdc90857f92742334059fd212c663a236d76a863d5325eb055e",
+      "factor-base-policies.json": "1b830d9fcdcd021e085d63c8ce5ca3a587b4ee3d978d6995cef3e6f2cd57f398",
+      "schedule.json": "6060ddc6be43e6ca0473eea01403975ed62ed6845066cff6172e11633a784963",
+      "limits.json": "1d55da1c02793ca6c5e82031948644488e8a467073cc3804f771f0c72c15c52d",
+      "s3_custody.py": "f5bbc2494788c73d4644e307aae31b9f886f2fadc405ac39840c5d117f7348da",
+      "public_projection.py": "55406134dbcd1e1f45271258f1ba8950a279b9c78db61143e6ebadbcf4aa5193",
+      "required-regressions.json": "86fb69d2c156f0f3953e438c46b72585824664ce402df1335f26374f3a3d02ac"
+    },
+    "canonical_export_adapter": {
+      "path": "export_actual.py",
+      "sha256": "4ef58315bd5aa7022716f937355cc2fef4e8eb93df7833e423234d8f0b8f2e15"
+    },
+    "post_verify_inventory": {
+      "path": "post-verify-inventory.json",
+      "captured": "after successful native verify before later commands",
+      "terminal_anchor": "attempt-result.json post_verify_inventory_sha256",
+      "source": "driver source increment",
+      "native_generation": false
+    },
+    "composition_status": "Prepared externally; runtime readiness and publication receipts are separate gates"
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "e4f5c0d4c12cb12cf9ac679778e620660719b7df1dc689412568aaa14d916bdf",
+    "commit": "802444fa9dc94194b2ae525d9cd3ad14fe1b9b52",
+    "frozen_at": "2026-11-05T18:40:32Z",
+    "filed_before_affected_data": true
+  },
+  "inadmissible": [
+    "Unresolved exact source/binary/full-library gates or draft protocol at execution.",
+    "Second Generate or replacement samples after outcomes.",
+    "Calling hidden worker directly instead of supervisor.",
+    "Promoting finite-identity partial evidence to completed solver or SAT training export.",
+    "New scientific compute jobs, new cloud infrastructure, renewed/expanded budget or production deadline, or S3 operations outside the existing private custody grant, request/byte/cost limits and original absolute deadline.",
+    "Publishing restricted generated dataset records to the public source repository.",
+    "Claiming canonical experiment.export delivery from dataset export alone; a bound adapter and canonical file verification are required."
+  ],
+  "invalidation_rules": [
+    "Any source/binary/input/protocol mutation, wrong cell identity, failed command or interrupted worker prevents PASS.",
+    "Failures and unattempted cells remain visible; local restored bytes must match originals."
+  ],
+  "literature": [
+    {
+      "ref": "src/cryptanalysis/checked_affine_domain.rs#sha256=1d3903834bfbedead4f74b086b5643d2cb0d29b3df20c299f0e9fd1493afa819",
+      "claim": "Distinct checked affine-domain constructor and canonical encoding identity; raw encoding is unchanged. Internal source inspection; runtime readiness is a separate unresolved binding.",
+      "provenance": "internal"
+    },
+    {
+      "ref": "src/cryptanalysis/checked_affine_domain_audit.rs#sha256=6eed28963145c29b4e787d39c0e3145443b1446f655b6cb79dbe10385682cca2",
+      "claim": "Independent rank/cardinality and original-prefix audit required before affine row reduction. Internal source inspection; runtime readiness is a separate unresolved binding.",
+      "provenance": "internal"
+    },
+    {
+      "ref": "src/cryptanalysis/checked_affine_matrix_rows.rs#sha256=c1493dd8e4cbb7a5b7137d6a7443891c617d43956902a32e45277241880673b9",
+      "claim": "Source-bound finite unit-span row certificate and independently reconstructed affine replay. Internal source inspection; runtime readiness is a separate unresolved binding.",
+      "provenance": "internal"
+    },
+    {
+      "ref": "src/ml_dataset/original_affine_rows.rs#sha256=67c3381b8187adb69016b305d7e8521678983e3532187111a905ca8ce648f44b",
+      "claim": "Actual original-ledger producer, publication acknowledgement, retained failures and both-twist controls. Internal source inspection; runtime readiness is a separate unresolved binding.",
+      "provenance": "internal"
+    },
+    {
+      "ref": "src/ml_dataset/affine_row_central.rs#sha256=8de2461f5b3027875762f20fe3dd9e9fc580a21deaa9560379ac325bfbbb2f80",
+      "claim": "Exact affine request/receipt/source/terminal joins and same-owner revalidation. Internal source inspection; runtime readiness is a separate unresolved binding.",
+      "provenance": "internal"
+    },
+    {
+      "ref": "src/ml_dataset/affine_replay_caller.rs#sha256=efdac8a39128556eb3fb654f12c719373e8914f582f19569476bbdb72a4aa26c",
+      "claim": "Explicit cumulative per-invocation replay authority; sticky failures and restricted projection ownership. Internal source inspection; runtime readiness is a separate unresolved binding.",
+      "provenance": "internal"
+    },
+    {
+      "ref": "src/ml_dataset/export.rs#sha256=4c57244c9182094248d94355d7555a1b402821886b9937d070b7a6da9daafc56",
+      "claim": "Restricted finite-identity projection and structural public-input projection constraints. Internal source inspection; runtime readiness is a separate unresolved binding.",
+      "provenance": "internal"
+    },
+    {
+      "ref": "/home/ec2-user/ml-dataset-resume-20261029/affine-acceptance-protocol-cleanup-draft-20261105/s3_custody.py#sha256=f5bbc2494788c73d4644e307aae31b9f886f2fadc405ac39840c5d117f7348da",
+      "claim": "Existing private S3 scope, original-deadline request bounds, streaming inventory hashes and actual download equality; no execution claimed.",
+      "provenance": "internal"
+    }
+  ],
+  "measurement": {
+    "clock": "none",
+    "counters": [],
+    "isolation_required": "none",
+    "order": "sequential",
+    "record": [
+      "source_commit",
+      "binary_sha256_before",
+      "binary_sha256_after",
+      "command_argv",
+      "command_exit",
+      "attempt_binding",
+      "original_execution_context",
+      "host_descriptors",
+      "actual_telemetry_scope",
+      "artifact_sha256"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "per_row",
+        "definition": "One if the actual sealed native outcome is a successful partial finite identity for the fixed request row0/pattern1, exact original configuration/plan/run/protocol bindings hold, and the pre-custody generate and verify commands plus their actual cumulative replay invocation receipts pass. A later export or custody failure does not erase this gate. Zero means this acceptance gate is not established. No degree or solver-completion inference.",
+        "id": "cell_contract_pass",
+        "kind": "exact",
+        "name": "native CLI cell contract",
+        "resolution": "one exact boolean",
+        "source": "sealed manifest/config/attempt bindings; commands/generate and commands/verify receipts; replay/generate.json and replay/verify.json with exact pre-command policies; exported per-cell gate result and diagnostic in canonical observations; post-verify inventory plus original terminal digest",
+        "uncertainty": "none_exact",
+        "unit": "boolean 0 or 1"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "per_row",
+        "definition": "One if every registered CLI command, repeated export equality, exact source/binary identity, existing private S3 upload/readback and restoration from downloaded bundle pass; no causal or completed-solver training assertion.",
+        "id": "pipeline_contract_pass",
+        "kind": "exact",
+        "name": "global CLI custody/export contract",
+        "resolution": "one exact boolean",
+        "source": "analysis.json, primary and S3 command receipts, replay receipts, S3 readback inventory, downloaded/restored bundle bytes",
+        "uncertainty": "none_exact",
+        "unit": "boolean 0 or 1"
+      }
+    ]
+  },
+  "protocol_id": "affine-cli-finite-identity-custody-acceptance-20261105-v1",
+  "question": "Do the two fixed genuine ordinary-binary n23 m3 affine F4 cells, one per twist, preserve checked finite identities through the registered CLI commands, repeated restricted export, and existing private S3 custody readback/restore? This is bounded software correctness acceptance, with no new scientific or comparative measurements.",
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Reproduce exact CLI index mapping; no timing/performance conclusion is drawn from order.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact machine assertions need explicit solver/twist and path identities; no subjective ranking or statistical selection.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "Fixed two-twist software coverage from seed42; no population inference."
+    },
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "nonce": null,
+      "note": "crypto DatasetPlan::cell and curves::generate use frozen seed42 and one curve/generator/key per twist; no protocol-hash-derived replacement seeds.",
+      "seeds": [
+        42
+      ]
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [
+      "Two-cell exact outcome table; no performance plots"
+    ],
+    "report_dir": "report",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 1,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "min_attainable_two_sided_p": null,
+      "note": "Two exact twist cases; no statistical power claim.",
+      "passes": true,
+      "rank_test_n": null,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 1800,
+      "fixed_seconds": null,
+      "measured_on": null,
+      "per_sample_seconds": null,
+      "threads": 1
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "Exactly two cells in one Generate, followed by fixed command inventory; no retries or new samples."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Stop on first command failure; preserve raw and partial outputs; unresolved worker ownership prohibits further work."
+    }
+  ],
+  "study_dir": "/home/ec2-user/ml-dataset-resume-20261029/affine-acceptance-protocol-cleanup-draft-20261105",
+  "variable_ledger": {
+    "aa_not_applicable": "No comparative/timing claim or repeated Generate.",
+    "comparisons": [
+      {
+        "arms": [
+          "affine-plain"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "absolute-plain",
+        "reason": "Exact actual-twist contract, no inter-arm performance comparison.",
+        "threshold": "Actual twist cell and global all-command contract pass."
+      },
+      {
+        "arms": [
+          "affine-twist"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "absolute-twist",
+        "reason": "Exact actual-twist contract, no inter-arm performance comparison.",
+        "threshold": "Actual twist cell and global all-command contract pass."
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "One immutable retained clean build; verify its embedded provenance and SHA-256 before/after each command; no shared target executable after prepare.",
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": {
+          "binary_sha256": null,
+          "source_commit": null
+        }
+      },
+      {
+        "how": "Frozen driver analyzes retained actual native outcomes and all command/custody receipts.",
+        "name": "analysis",
+        "treatment": "fixed",
+        "value": {
+          "path": "driver.py",
+          "sha256": "a1b022d71f791cf68a9970a7b00e643a087b1314176f1bdcd8bb25f465cb8aa0"
+        }
+      },
+      {
+        "how": "Only affine finite-row dispatch; no cross-engine comparison.",
+        "name": "solver",
+        "treatment": "fixed",
+        "value": "f4"
+      },
+      {
+        "how": "Both actual curve models retained; compare actual manifest configurations to frozen mapping.",
+        "name": "actual_twist",
+        "treatment": "crossed",
+        "value": [
+          false,
+          true
+        ]
+      },
+      {
+        "how": "Plan and seeded curve/key rules selected before data; no resampling of partial or failed cells.",
+        "name": "input_axes",
+        "treatment": "fixed",
+        "value": {
+          "family": "binary",
+          "n": 23,
+          "m": 3,
+          "curve_seeds": 1,
+          "generators": 1,
+          "keys": 1,
+          "seed": 42,
+          "factor_base_size": 4,
+          "factor_base_policy": {
+            "kind": "legacy"
+          },
+          "degree_bound": 3,
+          "work_limit": 16384
+        }
+      },
+      {
+        "how": "Original producer caps unchanged; historical replay has its separately explicit finite per-command policy.",
+        "name": "original_resources",
+        "treatment": "fixed",
+        "value": {
+          "memory_mib": 256,
+          "seconds_per_case": 60,
+          "threads": 1,
+          "trace_mib": 128,
+          "work_limit": 16384
+        }
+      },
+      {
+        "how": "Retain actual host/process/telemetry descriptors. No timing, operation-cost, or retired-instruction comparison; no host isolation assertion.",
+        "name": "host_and_environment",
+        "treatment": "measured",
+        "value": "cpu, kernel, hypervisor, co-tenants, memory pressure, filesystem, isolation, actual PMU availability"
+      },
+      {
+        "how": "No allocation-layout or RSS cost claim. Preserve existing telemetry semantics and missing values.",
+        "name": "allocation_layout",
+        "treatment": "measured",
+        "value": "actual RSS and process limits when reported"
+      },
+      {
+        "how": "Fixed native plan digit order; no retry.",
+        "name": "order_and_warmup",
+        "treatment": "fixed",
+        "value": "affine/plain, affine/twist; zero warmups"
+      },
+      {
+        "how": "No blinding needed for exact functional checks; all outcomes including failures remain visible and retained.",
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "deterministic frozen artifact assertions"
+      },
+      {
+        "how": "Stop and preserve partial evidence on interruption; no resume/replacement generator or new seed.",
+        "name": "preemption_and_interruptions",
+        "treatment": "measured",
+        "value": "actual interruption/exit receipts"
+      },
+      {
+        "name": "artifact_custody_and_publication",
+        "treatment": "fixed",
+        "value": {
+          "source_repository": "isogeny-labs/crypto",
+          "source_repository_visibility": "public",
+          "s3_bucket": "setec-astronomy-artifacts",
+          "s3_region": "us-east-2",
+          "max_requests": 20000,
+          "max_bytes": 1073741824,
+          "max_files": 10000,
+          "attempts": 1,
+          "absolute_deadline": null,
+          "cost_cap_usd": null
+        },
+        "how": "Publish source/protocol/config before local acceptance; retain generated/restricted records in existing private S3 scope. Bound finite custody funds/deadline to actual grant before execution; no new scientific cloud jobs."
+      }
+    ],
+    "independent": [
+      {
+        "name": "actual_twist",
+        "levels": [
+          false,
+          true
+        ]
+      }
+    ]
+  },
+  "version": 1
+}

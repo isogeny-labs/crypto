@@ -1,0 +1,7 @@
+{
+  "schema": "n83.runner-error/v1",
+  "exit_code": 101,
+  "line": 99,
+  "command": "RUST_BACKTRACE=1 strace -f -e trace=openat,openat2 -s 256 -o \"$HERE/pdp-openat.log\" timeout --signal=TERM --kill-after=30 12400 \"$BIN/pdp\" generate \"$INPUTS\" \"$BASE_LOCAL/data\" \"$MATCHED\" spike38 > \"$HERE/generate.log\" 2>&1",
+  "utc": "2026-11-05T18:36:59.461767+00:00"
+}

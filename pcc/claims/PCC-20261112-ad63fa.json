@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T22:56:40Z",
+ "id": "PCC-20261112-ad63fa",
+ "kind": "theorem",
+ "producer": {
+  "commit": "5bec81e36ac9b6f7b91ddc5437766248bf7aacfe",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "b5983ba0d60bf1fedea11efa101965ef3ddadf956c2e719ead0c23be81d30358",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/T20DirectNorms.lean",
+   "theorem": "T20DirectNorms.linear_image_sum"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Faithful cleared ring identities/conditional IntModule norm4/recovery/explicit scalar and raw monic normalization constants;actual curves/jets/Picard/polarization/descent remain explicit written/native bridges. Local Lean pass is not scientific signature.",
+ "statement": "theorem linear_image_sum {K : Type} [CommRing K] (z1 z2 a A B : K) (hs : z1+z2 = -a) : (A+B*z1)+(A+B*z2)=2*A-a*B"
+}

@@ -26,6 +26,7 @@
 
 use crate::hash::sha256::sha256;
 use crate::utils::random::random_bytes_vec;
+use zeroize::Zeroize;
 
 // ── Parameters (Kyber-512) ────────────────────────────────────────────────────
 
@@ -249,18 +250,24 @@ pub struct KyberPublicKey {
 }
 
 /// Kyber private key: the secret vector s.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct KyberPrivateKey {
     pub s: PolyVec,
     pub public: KyberPublicKey,
 }
 
+impl std::fmt::Debug for KyberPrivateKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("KyberPrivateKey")
+            .field("secret", &"[REDACTED]")
+            .finish_non_exhaustive()
+    }
+}
+
 impl Drop for KyberPrivateKey {
     fn drop(&mut self) {
         for poly in self.s.iter_mut() {
-            for c in poly.0.iter_mut() {
-                *c = 0;
-            }
+            poly.0.zeroize();
         }
     }
 }

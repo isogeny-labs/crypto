@@ -1,0 +1,126 @@
+--- branch-v2/replay.py
++++ affine-mul/replay.py
+@@ -1,7 +1,7 @@
+ from pathlib import Path
+ import os,sys,json,hashlib,time,signal,subprocess,resource,re,shutil
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-branch-coefficient-v2-20261109')
++W=Path('/home/ec2-user/pencil-native-affine-mul-20261109')
+ ABSOLUTE_DEADLINE=1794287499  # 2026-11-10T05:11:39Z
+ OWNED=False
+ progress={'phase':None,'stage':'initialization','checked_files':0,'checked_bytes':0,'current_path':None,'current_bytes_read':0,'declared_files':16736,'declared_bytes':3111892318}
+@@ -12,7 +12,7 @@
+ # Reject repeat attempts before entering receipt-writing cleanup, preserving prior receipts.
+ if (mode=='pre' and W.exists()) or (W/(mode+'.started')).exists():
+  raise SystemExit('existing workspace/phase attempt; no retry, original evidence preserved')
+-start=time.monotonic();limit=1800 if mode=='compiler' else 900;work=limit-20
++start=time.monotonic();limit=9000 if mode=='compiler' else 900;work=limit-20
+ progress['phase']=mode
+ resource.setrlimit(resource.RLIMIT_AS,(8*1024**3,8*1024**3))
+ resource.setrlimit(resource.RLIMIT_STACK,(10*1024**2,10*1024**2))
+@@ -32,7 +32,7 @@
+ def boundary():
+  checkpoint()
+  assert time.time()<ABSOLUTE_DEADLINE,'absolute deadline'
+- assert campaign_start is None or time.monotonic()-campaign_start<3580,'campaign work deadline'
++ assert campaign_start is None or time.monotonic()-campaign_start<10780,'campaign work deadline'
+  assert not pending,'pending signal'
+  assert time.monotonic()-start<work,'work deadline'
+ def sha(p):
+@@ -74,7 +74,7 @@
+  if mode=='pre':
+   W.mkdir(mode=0o700);OWNED=True
+   campaign_start=start
+-  durable(W/'campaign-start.json',{'monotonic':start,'absolute_deadline':ABSOLUTE_DEADLINE,'total_seconds':3600})
++  durable(W/'campaign-start.json',{'monotonic':start,'absolute_deadline':ABSOLUTE_DEADLINE,'total_seconds':10800})
+  assert W.is_dir() and not W.is_symlink()
+  marker=W/(mode+'.started');fd=os.open(marker,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600);os.close(fd)
+  OWNED=True
+@@ -90,6 +90,8 @@
+   cp=json.loads(C.read_text());baseline=json.loads(B.read_text())
+   files={f['path']:f for v in cp['done'].values() for f in v['files']}
+   assert set(files)==set(baseline) and len(files)==16736
++  for module,entry in F['external_cached_modules'].items():
++   assert entry['path'] in files and baseline[entry['path']]['sha256']==entry['sha256'],('external import custody',module)
+   done={}
+   progress['stage']='native_dependencies'
+   for name,v in sorted(files.items()):
+@@ -110,8 +112,6 @@
+   progress['stage']='compiler'
+   pre=json.loads((W/'pre-receipt.json').read_text());assert pre['status']=='passed'
+   roots=F['lean_roots'];lean=F['lean']
+-  for n in F['modules']:
+-   (W/(n+'.lean')).write_bytes((P/(n+'.lean.txt')).read_bytes())
+   env={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','LEAN_SYSROOT':str(Path(lean).parent.parent),'LEAN_PATH':':'.join([str(W)]+roots),'TMPDIR':str(W)}
+   assert {k:sha(k) for k in F['runtime']}==F['runtime']
+   # Parser controls exercise missing, duplicated and forbidden-axiom records before Lean.
+@@ -119,8 +119,18 @@
+    try:audit(bad,['x'])
+    except AssertionError:pass
+    else:raise AssertionError('audit accepted malformed evidence')
++  compiled=set()
++  module_imports=json.loads((P/'imports.json').read_text())
+   for name in F['modules']:
+-   boundary();cmd=[lean,'-j1','-M3500','-s16384','-o',str(W/(name+'.olean')),str(W/(name+'.lean'))]
++   boundary()
++   for dependency in module_imports[name]:
++    assert dependency in compiled or dependency in F['external_cached_modules'],('unresolved import',name,dependency)
++   source=P/F['source_files'][name]
++   assert sha(source)==F['files'][F['source_files'][name]]
++   with (W/(name+'.lean')).open('xb') as staged:
++    staged.write(source.read_bytes());staged.flush();os.fsync(staged.fileno())
++   module_start=time.monotonic()
++   cmd=[lean,'-j1','-M3500','-s16384','-o',str(W/(name+'.olean')),str(W/(name+'.lean'))]
+    row={'module':name,'argv':cmd,'expected_exit':1 if name=='ExpectedFailure' else 0};rows.append(row)
+    with (W/(name+'.stdout')).open('xb') as so,(W/(name+'.stderr')).open('xb') as se:
+     oldmask=signal.pthread_sigmask(signal.SIG_BLOCK,{signal.SIGTERM,signal.SIGINT})
+@@ -133,15 +143,20 @@
+     finally:signal.pthread_sigmask(signal.SIG_SETMASK,oldmask)
+     durable(W/'commands.json',rows)
+     while True:
+-     boundary();output_size()
+-     try:row['exit']=child.wait(timeout=min(1,work-(time.monotonic()-start)));row['reaped']=True;break
++     boundary();output_size();assert time.monotonic()-module_start<120,'per-module120second ceiling'
++     try:row['exit']=child.wait(timeout=max(.01,min(1,work-(time.monotonic()-start),120-(time.monotonic()-module_start))));row['reaped']=True;break
+      except subprocess.TimeoutExpired:pass
+     row['end_seconds']=time.monotonic()-start;row['remaining_group']=group_members(child.pid);durable(W/'commands.json',rows)
+     assert not row['remaining_group'],'descendants remain'
++    assert time.monotonic()-module_start<120,'per-module120second completion ceiling'
+     assert row['exit']==row['expected_exit'],row
+    raw=(W/(name+'.stdout')).read_text()+(W/(name+'.stderr')).read_text()
+-   if name!='ExpectedFailure':assert 'sorry' not in raw.lower(),'sorry warning'
+-  names=json.loads((P/'names.json').read_text());got=audit((W/'Readback.stdout').read_text(),names['producer']+names['reviewer'])
++   if name!='ExpectedFailure':
++    assert 'sorry' not in raw.lower(),'sorry warning'
++    assert (W/(name+'.olean')).is_file(),'missing compiled module'
++    row['olean_sha256']=sha(W/(name+'.olean'));compiled.add(name)
++    durable(W/'commands.json',rows)
++  names=json.loads((P/'names.json').read_text());got=audit((W/'Readback.stdout').read_text(),names)
+   neg=(W/'ExpectedFailure.stdout').read_text()
+   errs=[line for line in neg.splitlines() if 'error:' in line]
+   assert len(errs)==1 and 'unsolved goals' in errs[0], 'not the intended single mathematical rejection'
+@@ -153,7 +168,7 @@
+   assert not any(x in neg.lower() for x in forbidden), 'negative syntax/elaboration/environment failure'
+   assert not (W/'ExpectedFailure.stderr').read_text().strip(),'unexpected negative stderr'
+   durable(W/'axioms.json',{'names':got,'allowed':['propext','Classical.choice','Quot.sound']})
+-  for n in F['modules']:assert sha(W/(n+'.lean'))==F['files'][n+'.lean.txt']
++  for n in F['modules']:assert sha(W/(n+'.lean'))==F['files'][F['source_files'][n]]
+   assert {k:sha(k) for k in F['runtime']}==F['runtime']
+  for n,h in F['files'].items():assert sha(P/n)==h
+  assert sha(P/'freeze.json')==EXPECTED_FREEZE,'final freeze pin mismatch'
+@@ -172,13 +187,13 @@
+    remains=group_members(child.pid)
+    if remains:errors.append('remaining group '+repr(remains))
+   except BaseException as e:errors.append('cleanup '+repr(e))
+- if errors or pending or time.monotonic()-start>=limit-5 or time.time()>=ABSOLUTE_DEADLINE or (campaign_start is not None and time.monotonic()-campaign_start>=3600):status='failed'
++ if errors or pending or time.monotonic()-start>=limit-5 or time.time()>=ABSOLUTE_DEADLINE or (campaign_start is not None and time.monotonic()-campaign_start>=10800):status='failed'
+  result={'phase':mode,'status':status,'errors':errors,'pending_signals':pending,'elapsed_seconds':time.monotonic()-start,'commands':rows,'compiler_invocations':len(rows),'workspace':str(W),'dependency_files_declared':16736,'dependency_bytes_declared':3111892318,'checked_dependency_files':progress['checked_files'],'checked_dependency_bytes':progress['checked_bytes'],'hash_progress':dict(progress),'machine_review_complete':False,'post_custody_required':True,'scientific_execution':False,'independent_binary_kernel_rechecker':False,'trust':'Pinned shared caches; pre/post checks do not exclude transient concurrent changes.'}
+  try:
+   if not OWNED:raise RuntimeError('workspace/phase not owned; no receipt overwrite')
+   checkpoint(force=True)
+   durable(W/(mode+'-receipt.json'),result)
+-  if pending or time.monotonic()-start>=limit-5 or time.time()>=ABSOLUTE_DEADLINE or (campaign_start is not None and time.monotonic()-campaign_start>=3600):
++  if pending or time.monotonic()-start>=limit-5 or time.time()>=ABSOLUTE_DEADLINE or (campaign_start is not None and time.monotonic()-campaign_start>=10800):
+    status='failed';result['status']='failed';result['late_boundary_failed']=True;durable(W/(mode+'-receipt.json'),result)
+  except BaseException as e:status='failed';print('receipt failure '+repr(e),file=sys.stderr)
+  print(json.dumps(result));sys.exit(0 if status=='passed' else 1)

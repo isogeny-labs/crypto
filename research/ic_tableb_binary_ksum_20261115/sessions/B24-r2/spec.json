@@ -1,0 +1,126 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ic_tableb_binary_ksum_20261115 random-binary-n24-b5fc9da replicate 2",
+ "description": "Generic decomposition track (bounded by sqrt(r); cannot beat rho). PROTOCOL.md. Public synthetic curve and targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "binary_explicit",
+    "n": 24,
+    "modulus": 16777243,
+    "a": 0,
+    "b": 6277594,
+    "group_order": 16780264,
+    "r": 2097533,
+    "gx": 11058037,
+    "gy": 14510317
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261115242,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "bsgs-neg",
+   "role": "reference",
+   "method": {
+    "id": "bsgs.negation"
+   }
+  },
+  {
+   "name": "inc-tb",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-subspace:dimension=7",
+     "oracle": "mitm:m=2,negation_folded=1",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "inc-n56",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=56,mult=1",
+     "oracle": "mitm:m=2,negation_folded=1",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "inc-n67",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=67,mult=1",
+     "oracle": "mitm:m=2,negation_folded=1",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "inc-n80",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=80,mult=1",
+     "oracle": "mitm:m=2,negation_folded=1",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=12,mult=1",
+     "oracle": "ksum:m=4",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum5",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=9,mult=1",
+     "oracle": "ksum:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261115342,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

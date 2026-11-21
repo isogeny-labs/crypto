@@ -244,6 +244,13 @@ pub const FIELD_ARITHMETIC_COUNTERS: &[&str] = &[
     "solver_F_p_multiplications_(grid)_uncharged",
     "solver_F_p_multiply-adds_(elimination_only)_uncharged",
     "solver_F_p_multiply-adds_(tower_F4_elimination)_uncharged",
+    // F4 report.field_ops counts F_p multiplications, including elimination.
+    "f4_field_muls_uncharged",
+    // One mod-r multiplication in each nonzero RREF multiply-subtract;
+    // This calibration is a multiplication reading, not a complete arithmetic count.
+    "matrix_multiply_subtracts_uncharged",
+    "linalg_muls_uncharged",
+    "scalar_modular_muls_uncharged",
 ];
 
 /// Counters whose name looks like a multiplication or squaring but that are
@@ -253,6 +260,7 @@ pub const FIELD_ARITHMETIC_COUNTERS: &[&str] = &[
 pub const FIELD_ARITHMETIC_EXCLUSIONS: &[(&str, &str)] = &[
     ("aps_core_scalar_mults_uncharged", "scalar multiplication of a curve point: a group operation"),
     ("aps_core_square_roots_uncharged", "a square root, not a multiplication: left to the band"),
+    ("factor_base_sqrt_calls_uncharged", "a square-root call, not a single multiplication: left to the band"),
     ("sqrt_mod_p_calls_uncharged", "a square root, not a multiplication: left to the band"),
     ("sqrt_solves_uncharged", "a square root, not a multiplication: left to the band"),
     ("fp2_mul_uncharged", "a multiplication in F_{p^2}, an extension field, not the base field"),
@@ -439,7 +447,7 @@ pub fn priced_s(r: &Record, w: f64) -> Result<Option<f64>, String> {
 
 /// [`priced_s`] under `pricing`.
 pub fn priced_s_with(r: &Record, w: f64, pricing: Pricing) -> Result<Option<f64>, String> {
-    let sq = (r.workload.curve.r as f64).sqrt();
+    let sq = (r.workload.curve.r.to_f64()).sqrt();
     Ok(priced_gae_with(r, w, pricing)?.map(|g| g / sq))
 }
 
@@ -585,7 +593,12 @@ pub fn priced_s_split(
     }
     let rr = &r;
     let t = split_sums(&[rr], pricing)?;
-    Ok(split_mean_s(&t, (r.workload.curve.r as f64).sqrt(), wf, wo))
+    Ok(split_mean_s(
+        &t,
+        (r.workload.curve.r.to_f64()).sqrt(),
+        wf,
+        wo,
+    ))
 }
 
 /// The calibrated reading of one pair of arms pooled over matched runs
@@ -854,7 +867,7 @@ pub fn band_with_wcal(
         }
         rows.push(BandRow {
             curve: curve.clone(),
-            log2_r: (rs[0].workload.curve.r as f64).log2(),
+            log2_r: (rs[0].workload.curve.r.to_f64()).log2(),
             arm: arm.clone(),
             runs: rs.len() as u64,
             verified: ok.len() as u64,
@@ -905,8 +918,12 @@ pub fn band_with_wcal(
                 };
                 let (sa, sb) = (sums(a)?, sums(b)?);
                 let complete = a.verified == a.runs && b.verified == b.runs;
-                let sqrt_r =
-                    (by[&(a.curve.clone(), a.arm.clone())][0].workload.curve.r as f64).sqrt();
+                let sqrt_r = (by[&(a.curve.clone(), a.arm.clone())][0]
+                    .workload
+                    .curve
+                    .r
+                    .to_f64())
+                .sqrt();
                 let mut order_at = BTreeMap::new();
                 let mut dirs = Vec::new();
                 for (label, wf) in [("0", 0.0), ("w_cal", w.w_cal), ("10*w_cal", 10.0 * w.w_cal)] {

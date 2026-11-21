@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T08:42:49Z",
+ "id": "PCC-20261116-2cbd9b",
+ "kind": "measurement",
+ "producer": {
+  "commit": "cc7036352e9c5f4c5e8b82ae59bf21788445647d",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/native-export-development/tests-default-01.log",
+    "sha256": "4af85e4996b1a881e590ffb12d7f3a3b030fb0d53333f51ac8f5887e85331023"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/native-export-development/tests-scale-01.log",
+    "sha256": "ef4e37a49178af1b6c5f6de62d563176474c4461f1b9ab409ce3c890aea31729"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/native-export-development/tests-counter-01.log",
+    "sha256": "2eb40b55d7eaf8fd081fa14d789ca53c8ca2a1b6a948681d1bc0b7f7dbf539e1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/native-export-development/clippy-01.log",
+    "sha256": "036ab78dddc26c074220beea1cdffd64ccf55b885472c2578ac9175cf3f7a697"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Native-owned completion export modes pass47 default,48 scale,49 scale+counter release tests and strict all-target/all-feature clippy. New tests compare exact two/one/no-export wire bytes through16 variables and reject unsupported pending consumer scope; no speed inference."
+}

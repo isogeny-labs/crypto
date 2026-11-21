@@ -1,0 +1,32 @@
+{
+  "schema": "n83.d18-import-negative-controls/v1",
+  "controls": [
+    {
+      "mode": "manifest",
+      "changed_sha256": "2f700a0cd65c4ccfb3ce3c16ac9904f7998b7c13597a9636123cd18fda14e3a2",
+      "exit_code": 1,
+      "expected_rejection": "d18 export and committed evidence copies differ",
+      "observed": "Error: \"d18 export and committed evidence copies differ\"",
+      "output_absent": true,
+      "pass": true
+    },
+    {
+      "mode": "custody",
+      "changed_sha256": "b18a9ea8c00906d14ee937fe39228a83f4f021b2028795cee8ef348d532d6b6b",
+      "exit_code": 1,
+      "expected_rejection": "d18 export, replay or S3 custody binding differs",
+      "observed": "Error: \"d18 export, replay or S3 custody binding differs\"",
+      "output_absent": true,
+      "pass": true
+    },
+    {
+      "mode": "archive",
+      "changed_sha256": "c4257fc9dacc18c018a546b531ac4032dd26dfc4156a39085940fef8dd15a442",
+      "exit_code": 1,
+      "expected_rejection": "d18 archive length or SHA-256 differs",
+      "observed": "Error: \"d18 archive length or SHA-256 differs\"",
+      "output_absent": true,
+      "pass": true
+    }
+  ]
+}

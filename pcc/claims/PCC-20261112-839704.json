@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T07:14:00Z",
+ "id": "PCC-20261112-839704",
+ "kind": "statement",
+ "producer": {
+  "commit": "33e8ef7524c2dddec08f1e61447933ae3fbbd500",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-endpoint-native-22.txt",
+    "sha256": "acac81be9dee65ab42be92db3248e36b8601d1d5aa1deef2553f5dad2c5eb8e3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-endpoint-clippy-22.txt",
+    "sha256": "3582b55432fc9160ee247fd0fab17728fc9a2b642992340034ff04936f411412"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-endpoint-source-22.sha256",
+    "sha256": "30c92bfe53ce7f37fa33ca957ec08b7dc23a09cfbc8e5fdc547409b74abee2af"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-endpoint-ct29_source_control-22.rs",
+    "sha256": "91d3a203368f73cbc80f2160f8ebd384c7984fae24e7d387bbd6cf6a26f16fd1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-endpoint-ct28_prime_psi-22.rs",
+    "sha256": "e34107fd2f4391f0ad9901bc9a54f2bd38a4788d27dcb436e807b1028221cb22"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-endpoint-ct28_pullback-22.rs",
+    "sha256": "c5ed650766fded592f98dbc381823e0dfc24a472ebf6a0fad96396eff2522208"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned isolated endpoint22 strictClippy and one named native test pass:all109/113 original elliptic points,exact PsiK0=K1alpha endpoints,injectivity,all source scalars,target4alpha,reverse28 and public recovery74/109,wrong-quarter rejection. Explicit integer inverse assertions added. Corrected written c2b7c9 supersedes only recovery39 in frozen d55462;failed21/122fda and earlier cache/static failures retained. Existing arithmetic/global proofs reused;no whole-Jacobian collapse or timing claim."
+}

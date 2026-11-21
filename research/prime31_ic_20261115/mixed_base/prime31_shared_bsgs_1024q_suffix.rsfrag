@@ -1,0 +1,226 @@
+
+// Complete shared-precomputation *generic* BSGS for matched PRIME31 1024-Q frontier.
+// APPENDED ONLY to the immutable existing Rust prime31_aps_one_relation.rs:
+// jac_mixed / normalize_jac_batch / Arithmetic / rho remain source-identical.
+// The caller's known k never enters bsgs_solve. Protocol:
+// SHARED_BSGS_1024Q_PROTOCOL_20261117.md. [pcc:unverified]
+
+struct SharedBabyTable {
+    m: u64,
+    baby: HashMap<(u64, u64), u64>,
+    minus_mg: (u64, u64),
+    setup_ns: u128,
+    baby_batches: u64,
+    rss_after_setup_kib: Option<u64>,
+}
+
+fn bsgs_rss_kib() -> Option<u64> {
+    std::fs::read_to_string("/proc/self/status").ok()?
+        .lines().find(|s| s.starts_with("VmRSS:"))?
+        .split_whitespace().nth(1)?.parse().ok()
+}
+
+fn bsgs_setup(m: u64) -> Result<SharedBabyTable, String> {
+    const BATCH: usize = 256;
+    if !(2..N).contains(&m) {
+        return Err(format!("bad registered BSGS baby length {m}"));
+    }
+    let start = Instant::now();
+    let mut ar = Arithmetic::default();
+    check_curve(PRIME31, &mut ar)?;
+    let mut baby = HashMap::with_capacity((m - 1) as usize);
+    let mut block: Vec<(JacPoint, u64, u64)> = Vec::with_capacity(BATCH);
+    let mut point = jac_affine(PRIME31.g);
+    let mut batches = 0u64;
+    // j=0 is the group identity and is deliberately handled separately.
+    for j in 1..m {
+        if point.z == 0 { return Err("premature baby group identity".into()); }
+        block.push((point, j, 0));
+        if block.len() == BATCH || j + 1 == m {
+            for normalized in normalize_jac_batch(&block)? {
+                if baby.insert(normalized.pt, normalized.a).is_some() {
+                    return Err("collision before known group order in baby table".into());
+                }
+            }
+            batches += 1;
+            block.clear();
+        }
+        if j + 1 < m { point = jac_mixed(point, PRIME31.g); }
+    }
+    if baby.len() as u64 != m - 1 {
+        return Err("shortened baby table".into());
+    }
+    let positive = ar.scalar(PRIME31, m, Some(PRIME31.g))
+        .ok_or("unexpected [m]G identity")?;
+    let minus_mg = ar.neg(PRIME31, Some(positive))
+        .ok_or("unexpected inverse step identity")?;
+    let setup_ns = start.elapsed().as_nanos();
+    let rss_after_setup_kib = bsgs_rss_kib();
+    Ok(SharedBabyTable {m, baby, minus_mg, setup_ns, baby_batches: batches, rss_after_setup_kib})
+}
+
+fn bsgs_solve(prep: &SharedBabyTable, q: (u64,u64))
+    -> Result<serde_json::Value, String>
+{
+    const BATCH: usize = 256;
+    let cold = Instant::now();
+    let mut verifier = Arithmetic::default();
+    if !verifier.on_curve(PRIME31, Some(q)) {
+        return Err("BSGS input not on original prime31 curve".into());
+    }
+    let mut giant = jac_affine(q);
+    let mut normalized_batches = 0u64;
+    let mut visited = 0u64;
+    let mut block: Vec<(JacPoint, u64, u64)> = Vec::with_capacity(BATCH);
+    let mut solution = None;
+    // k in [0,n); write k=i*m+j, 0<=j<m.
+    let max_i = (N-1) / prep.m;
+    for i in 0..=max_i {
+        visited += 1;
+        if giant.z == 0 {
+            // j=0 is the identity; never feed it into projective normalization.
+            solution = Some((i*prep.m)%N);
+            break;
+        }
+        block.push((giant, i, 0));
+        if block.len() == BATCH || i == max_i {
+            for p in normalize_jac_batch(&block)? {
+                if let Some(&j) = prep.baby.get(&p.pt) {
+                    solution = Some((p.a*prep.m+j)%N);
+                    break;
+                }
+            }
+            normalized_batches += 1;
+            block.clear();
+            if solution.is_some() {break;}
+        }
+        if i < max_i {
+            giant = jac_mixed(giant, prep.minus_mg);
+        }
+    }
+    let k = solution.ok_or("no BSGS collision over complete registered range")?;
+    if verifier.scalar(PRIME31, k, Some(PRIME31.g)) != Some(q) {
+        return Err("BSGS candidate scalar fails original-curve replay".into());
+    }
+    let online_ns = cold.elapsed().as_nanos();
+    Ok(json!({
+        "status":"complete",
+        "public_Q":q,
+        "target_log":k,
+        "online_with_scalar_replay_ns":online_ns.to_string(),
+        "giant_steps_visited":visited,
+        "giant_normalization_batches":normalized_batches,
+        "original_curve_replay":true,
+        "known_answer_used_by_solver":false
+    }))
+}
+
+fn main() -> Result<(), String> {
+    const TARGETS: usize = 1024;
+    const ARMS: [u64;3] = [46_341, 262_144, 1_048_576];
+    let input = std::env::args().nth(1)
+        .ok_or("usage: prime31_shared_bsgs_1024q <complete_ic_1024_input.json>")?;
+    let bytes = std::fs::read_to_string(input).map_err(|e| e.to_string())?;
+    let ic: serde_json::Value = serde_json::from_str(&bytes)
+        .map_err(|e| format!("invalid original IC JSON: {e}"))?;
+    if ic["schema"] != "prime31.mixed_4p4_amortized_complete_ic.v1"
+        || ic["target_count"] != TARGETS
+        || ic["completed_unknown_target_logs"] != TARGETS
+        || ic["setup_rank"] != 61
+        || ic["base_log_point_replays"] != 61
+        || ic["is_nongeneric_s9_extraction"] != false
+    {
+        return Err("mismatched or incomplete 1024Q original IC".into());
+    }
+    let targets = ic["targets"].as_array()
+        .ok_or("no IC targets in original record")?;
+    if targets.len() != TARGETS {return Err("wrong original target count".into());}
+    let ic_setup: u128 = ic["setup_ns"].as_str()
+        .ok_or("missing IC setup")?.parse().map_err(|_| "bad IC setup")?;
+    let ic_online: u128 = ic["descent_total_ns"].as_str()
+        .ok_or("missing IC online")?.parse().map_err(|_| "bad IC online")?;
+    let mut results = Vec::new();
+    for m in ARMS {
+        let prep = bsgs_setup(m)?;
+        let mut online_ns = 0u128;
+        let mut completed = 0usize;
+        let mut cases = Vec::with_capacity(TARGETS);
+        for (i, target) in targets.iter().enumerate() {
+            if target["solver"]["case"] != i
+                || target["solver"]["status"] != "complete"
+                || target["caller_check"] != true
+            {
+                return Err(format!("source IC target {i} incomplete"));
+            }
+            let q: (u64,u64) = serde_json::from_value(
+                target["solver"]["public_q"].clone()
+            ).map_err(|e| format!("malformed public Q {i}: {e}"))?;
+            let known = target["caller_only_scalar"].as_u64()
+                .ok_or_else(|| format!("no caller-held known answer {i}"))?;
+            // Only q is passed to the actual BSGS solver.
+            let answer = bsgs_solve(&prep, q)?;
+            let got = answer["target_log"].as_u64()
+                .ok_or("completed BSGS missing logarithm")?;
+            if got != known {return Err(format!("wrong BSGS target log case {i}"));}
+            let charged: u128 = answer["online_with_scalar_replay_ns"].as_str()
+                .ok_or("missing BSGS charged time")?
+                .parse().map_err(|_| "bad BSGS online wall")?;
+            online_ns += charged;
+            completed += 1;
+            cases.push(json!({
+                "case":i, "public_Q":q, "caller_only_k_for_audit":known,
+                "answer":answer,
+                "caller_k_and_original_curve_match":true
+            }));
+        }
+        let full_ns = prep.setup_ns + online_ns;
+        results.push(json!({
+            "m":m,
+            "algorithm":"classical generic Shanks BSGS, reused baby table",
+            "baby_entries":prep.baby.len(),
+            "baby_hash_capacity":prep.baby.capacity(),
+            "baby_normalization_batches":prep.baby_batches,
+            "rss_after_setup_kib":prep.rss_after_setup_kib,
+            "rss_scope":"process sample, not isolated-arm peak",
+            "fully_charged_setup_ns":prep.setup_ns.to_string(),
+            "online_total_ns":online_ns.to_string(),
+            "fully_charged_complete_batch_ns":full_ns.to_string(),
+            "complete_logs":completed,
+            "ratio_bsgs_over_ic_complete":full_ns as f64/(ic_setup+ic_online) as f64,
+            "cases":cases
+        }));
+    }
+    let output = json!({
+        "schema":"prime31.shared_precomputed_generic_bsgs_1024q.v1",
+        "standing":"[pcc:unverified]",
+        "n":N, "p":P, "cofactor":1,
+        "target_count":TARGETS,
+        "source":"byte-identical original prime31_aps_one_relation.rs Jacobian plus wrapper",
+        "fixed_m_arms":ARMS,
+        "charged_IC_setup_ns":ic_setup.to_string(),
+        "charged_IC_online_ns":ic_online.to_string(),
+        "charged_IC_full_batch_ns":(ic_setup+ic_online).to_string(),
+        "full_known_answer_replay":true,
+        "claims_nongeneric_algebraic_extraction":false,
+        "arms":results
+    });
+    println!("{}",output);
+    Ok(())
+}
+
+#[cfg(test)]
+mod shared_bsgs_tests {
+    use super::*;
+    #[test]
+    fn bsgs_shared_baby_and_identity_giant_control() {
+        let prep = bsgs_setup(257).unwrap();
+        assert_eq!(prep.baby.len(), 256);
+        let mut ar=Arithmetic::default();
+        for &k in &[1u64, 7, 256, 257, 514, 522] {
+            let q=ar.scalar(PRIME31,k,Some(PRIME31.g)).unwrap();
+            let out=bsgs_solve(&prep,q).unwrap();
+            assert_eq!(out["target_log"].as_u64(),Some(k));
+            assert_eq!(out["original_curve_replay"],true);
+        }
+    }
+}

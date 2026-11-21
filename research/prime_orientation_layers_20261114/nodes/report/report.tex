@@ -1,0 +1,194 @@
+\documentclass[10pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,graphicx,hyperref,array}
+\usepackage[margin=0.75in]{geometry}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\begin{document}
+\begin{center}
+{\Large Constructed factors at every retained crossing node}\\[4pt]
+14 November 2026; 42 authored Lean statements\\
+Source \texttt{708762cbcabfba2c185ae8d19c53e539901b1369}
+\end{center}
+\textbf{Actual scope.} The same completed auxiliary orientation polynomial
+has graded crossing-entry bounds at every retained nonzero source node,
+explicit first-jet precision factors, and polynomial lowest-layer factors.
+Local build exits 0 without warnings. The pinned shared audit covers 44 declarations with zero extra trusted
+axioms. Import-inclusive fresh replay is running; no completed exit is claimed. All records are unsigned
+[pcc:unverified].
+
+\textbf{Node and coefficient conventions.} Let $L=2^a$ and
+$S=\{-L,\ldots,L-1\}\subset\mathbb Q$. Take an actual nonzero integer
+source node $t\in S$ with $v_2(t)=i<u\le a$, and actual ports $x,y<L$
+with equal bit $i$. Use the same completed $W_{xy}(T)$ and natural retained
+multiplicities $m_j$. Define
+\[
+ G_i=m_i-\sum_{j<u}(j-i)_+m_j,\quad
+ P_{xy}(Z)=W_{xy}(t+2^{a+1}Z).
+\]
+The actual nonzero reference $c$ remains the first diagonal jet at the
+\emph{negative} pole $-2^i$, with $w=v_2(c)=a+1-i+G_i$.
+It is not the potentially zero first coefficient at $t$.
+
+For a polynomial define
+\[
+ \operatorname{Graded}(k,P)\iff
+ \forall n\ge0:\ v_2([Z^n]P)\ge k+n,
+\]
+with a zero coefficient admitted at every weight. Finite sums, products,
+powers and scalar polynomials have explicit closure lemmas. In particular
+$Z$ has grade $-1$ [pcc:unverified].
+
+\textbf{Direct bounds that permit zeros.} The actual affine anchor factor
+has grade
+\[
+ \left(\begin{cases}i+1&j=i,\\\min(i,j)&j\ne i\end{cases}\right)
+ -v_2(2^j-\delta),\qquad\delta=y-x.
+\]
+The constant coefficient follows from the integer numerator divisibility;
+the coefficient of $Z$ has the additional degree weight. The strict $i<a$
+ensures this slope bound even at $j=i$. No division by an anchor numerator
+or its local value occurs. Derived selected-denominator valuations and the
+actual bit mask give correction grade at least $G_i$ [pcc:unverified].
+
+The actual crossing bits exclude $\delta=t$ and imply
+$v_2(t-\delta)\le i$. The literal signed-grid bridge then gives base grade
+$a-i$, so
+\[
+ \operatorname{Graded}(w-1,P_{xy}),\qquad
+ \operatorname{Graded}(-1,P_{xy}/c).
+\]
+Thus normalized coefficient $n+1$ has weight at least $n$. The actual nodal
+value makes its constant zero [pcc:unverified].
+
+\newpage
+\begin{center}{\Large Actual row comparison and constructed matrix factors}\end{center}
+Let $i<u\le v\le a$ and $x\equiv z\pmod{2^v}$. Their actual retained
+masks agree. Write $F_{xy}$ for the actual masked correction.
+For an arbitrary value $T$, including an anchor zero, the
+literal product identity is
+\[
+ F_{xy}(T)=F_{zy}(T)\prod_{j\in M_{xy}}
+ \left(\frac{2^j-\delta(z,y)}{2^j-\delta(x,y)}\right)^{m_j}.
+\]
+Only the actual nonzero selected denominators are cancelled.
+At the source node $t$, multiply this ratio by
+\[
+ \frac{t-\delta(z,y)}{t-\delta(x,y)}
+\]
+to obtain $Q_t(x,z,y)$. Actual congruence and the derived denominator bounds
+give $v_2(Q_t-1)\ge v-u+1$. Writing $J_{xy}(t)=[Z]P_{xy}$,
+\[
+ J_{xy}(t)/c=(J_{zy}(t)/c)Q_t,\quad
+ v_2\bigl(J_{xy}(t)/c-J_{zy}(t)/c\bigr)\ge v-u+1.
+\]
+The prototype's integrality follows from the graded entry theorem. These
+statements do not assume positive multiplicities or a nonzero local jet
+[pcc:unverified].
+
+\textbf{Literal factors.} Let $R_t$ be $J_{xy}(t)/c$ on the crossing block
+and zero elsewhere. For $r\in\mathrm{Fin}(2^v)$, use the actual port with
+value $r$, justified by $v\le a$, and set
+\[
+ A_{xr}=[x\bmod2^v=r],\qquad B_{ry}=R_t(r,y).
+\]
+The finite matrix product selects exactly that representative. Both factors
+are integral and
+\[
+ v_2\bigl((R_t-AB)_{xy}\bigr)\ge v-u+1.
+\]
+All $2^v$ labels are charged. At $v=a$ this product is exactly $R_t$,
+providing a full-row control, not a cheaper factorization claim
+[pcc:unverified].
+
+\textbf{Whole polynomial lowest layer.} At $v=u$, normalized entries obey
+$P_{xy}/c\equiv (J_{xy}(t)/c)Z\pmod2$ coefficientwise. Set
+$\widetilde A=C(A)$ and $\widetilde B=C(B)Z$, using the same $2^u$ labels.
+Then the normalized polynomial crossing matrix has error of content at least one from
+$\widetilde A\widetilde B$. Scaling the left by the actual $C(c)$ gives
+row content $w$ and absolute residual $w+1$. The scaled left is integral
+when $w\ge0$, through the unchanged parent lemma. The matrices explicitly
+zero noncrossing entries; no rank assertion about all of $W$ follows
+[pcc:unverified].
+
+\newpage
+\begin{center}{\Large Anchor zeros and the remaining cost interface}\end{center}
+\textbf{Symbolic zero case.} At a positive retained anchor $t=2^i$, the
+actual crossing mask contains $i$. If $m_i>0$, its correction value is zero.
+The base value at this other source node is also zero, so the product
+rule gives $J_{xy}(2^i)=0$. The all-node bounds retain this case; they do not
+assume a decomposition $P=JZU$ with a nonzero local $J$. Positivity is
+required here, not for the general factor construction [pcc:unverified].
+
+\begin{center}
+\includegraphics[width=0.95\linewidth,height=3.5in,keepaspectratio]{dependencies.pdf}
+\end{center}
+\textbf{Costs not supplied by a factor count.} The reviewed primary proof
+uses $D_i=L/2^i$, at most $3M/L$ packets, and at most $6M/D_i$ modes per
+weight. The residue construction retains every $2^u$ class or $2^v$
+refinement label. This is an extension of node and hypothesis scope,
+not an original mode-density improvement or an empirical speed result
+[pcc:unverified].
+
+The polynomial result is the lowest precision layer of every required
+crossing chart. The refinement precision statement concerns first jets.
+It does not supply arbitrary-precision factors for the whole polynomial.
+Next: construct those actual higher-chart moments and price all coefficient,
+entry, bit, degree, precision, recovery and recursion work. The actual
+elliptic relation map, public finder, field/scalar extraction, retries and
+complete expected bit cost remain separate proof obligations.
+
+\newpage
+\begin{center}{\Large Proof map, reproducibility and validation status}\end{center}
+\textbf{Current checks.} The isolated project builds 42 authored statements
+without warnings. The pinned shared audit exits 0: 44 declarations, zero extra trusted
+axioms. Import-inclusive fresh replay is running at this snapshot,
+not called passed. The completed parent component
+remains 57 authored statements, gate59/0 and fresh exit0; its source,
+claims, report/checkpoint/final hashes are preserved [pcc:unverified].
+
+\textbf{Central source bindings.} Full statements and all 42 new unsigned
+claim records are in \path{../evidence/claim-pins.json}.
+\begin{center}\small
+\begin{tabular}{p{0.62\linewidth}p{0.26\linewidth}}
+\texttt{actual\_node\_coefficient\_weight} & PCC-20261114-75d18d\\
+\texttt{positive\_anchor\_first\_zero} & PCC-20261114-c74b5e\\
+\texttt{actual\_node\_precision\_comparison} & PCC-20261114-538559\\
+\texttt{actual\_node\_precision\_factorization} & PCC-20261114-b2f99f\\
+\texttt{actual\_node\_chart\_factorization} & PCC-20261114-64b8cc\\
+\texttt{actual\_node\_weighted\_chart\_factorization} & PCC-20261114-28bc8e
+\end{tabular}
+\end{center}
+The complete Lean statement governs each hypothesis. There is no supplied
+good content, integral basis or rank witness [pcc:unverified].
+
+\textbf{Pins.} Lean 4.35.0, CryptoLean and Mathlib revisions:
+\begin{center}\small
+\texttt{148f5dc389b341401e06d76abe7783c4ccf42f2e}\\
+\texttt{cfc55fc58714a59dc06e6e79edc6d1d95140d3c2}
+\end{center}
+Source, manifest, gate, audit and trust bytes are listed in
+\path{../evidence/source-freeze.json}. Only the standard foundations
+\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound} appear in
+printed central dependencies. Gate data is PCC-20261114-59b70f; generated declarations are
+\begin{center}\small
+\texttt{OrientationGradedNode.nodeRight.congr\_simp}\\
+\texttt{OrientationGradedNode.nodePolyRight.congr\_simp}.
+\end{center}
+All are unsigned; fresh exit remains pending [pcc:unverified].
+
+\textbf{Sources checked.} KB unavailable as recorded in the journal;
+reviewed exact all-node numerator/content, selected-denominator, actual
+first-jet and row-refinement source proofs before extending them. Read the
+pinned primary D.4.3--7 and prior contraction-cost/precision/source-triage
+reviews. Standard algebra and refinement are reused without a novelty claim.
+All failed generic prototypes and raw outputs stay under the parent completion
+evidence directory. No native cryptographic, solver, timing, scaling, cloud
+or paid experiment ran. The old norm fixture remains unlaunched under its
+unchanged transport blocker.
+
+The separate local cost5 and prior additive-FB source review are not part of
+these 42 statements or a new benchmark. No new measured data changes the
+canonical IC graphs/leaderboards. The graphic is a symbolic dependency map.
+PR4118 protected concurrent ledger histories still need legitimate canonical
+reconciliation; auto-merge stays off. No protected history or claim is rewritten.
+\end{document}

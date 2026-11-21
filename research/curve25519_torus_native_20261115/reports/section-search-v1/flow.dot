@@ -1,0 +1,12 @@
+digraph flow {
+graph [rankdir=TB,bgcolor="white",pad="0.18",nodesep="0.4",ranksep="0.38"];
+node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=12,fillcolor="#EDF4FA",color="#40739A",margin="0.17,0.12"];
+edge [color="#526777",fontname="Helvetica",fontsize=10];
+seed [label="Missing: target-conditioned coefficients\nBound every attempted section",style="rounded,dashed,filled",fillcolor="#FFF0E5",color="#B36032"];
+norm [label="Given section + public target fibre\nNorm sextic S; keep local signs/multiplicities"];
+query [label="Derived quotient query\nFinite-field support + geometric products",style="rounded,dashed,filled"];
+restrict [label="Derived interval restriction\ngcd(S, H_J^6); recover coset labels",style="rounded,dashed,filled"];
+replay [label="Required original witness extraction\nRaw t / signs / distinctness / [8] / target replay",style="rounded,dashed,filled"];
+seed -> norm [style=dashed,label="search gap"];
+norm -> query -> restrict -> replay;
+}

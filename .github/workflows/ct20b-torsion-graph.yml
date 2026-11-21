@@ -1,0 +1,34 @@
+name: CT20b two-torsion graph regression
+on:
+  pull_request:
+    paths:
+      - 'research/chained_jacobian_transfers_20261110/ct20_two_torsion_graph.py'
+      - 'research/chained_jacobian_transfers_20261110/CT20B_GLOBAL_FACTOR_CERTIFICATE.md'
+      - '.github/workflows/ct20b-torsion-graph.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  symbolic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/chained_jacobian_transfers_20261110/ct20_two_torsion_graph.py
+      - name: Check complete branch-pair incidence and bad-matching control
+        run: |
+          set -euo pipefail
+          source=research/chained_jacobian_transfers_20261110/ct20_two_torsion_graph.py
+          python3 -S "$source" | tee "$RUNNER_TEMP/ct20b-symbolic.txt"
+          python3 -m py_compile "$source"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ct20b-symbolic-${{ github.sha }}
+          path: ${{ runner.temp }}/ct20b-symbolic.txt
+          if-no-files-found: ignore

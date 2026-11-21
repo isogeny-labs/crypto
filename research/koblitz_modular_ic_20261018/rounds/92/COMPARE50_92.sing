@@ -1,0 +1,22 @@
+proc require92c(int ok,string tag){if(!ok){print("COMPARE92_FATAL "+tag);exit;}}
+execute(read("rr-table50.sing"));
+setring tablePidCertificate50;
+matrix oldTable92=table50;
+intmat oldParents92=parents50;
+require92c(nrows(oldTable92)==32 && ncols(oldTable92)==528,"R50_TABLE_SHAPE");
+ring compareField92=(2,u),(c),dp;
+map oldMap92=tablePidCertificate50,u;
+matrix oldC92=oldMap92(oldTable92);
+execute(read("multiplication92.sing"));
+require92c(nrows(productC92)==32 && ncols(productC92)==528,"R92_TABLE_SHAPE");
+int p92c;int r92c;
+for(p92c=1;p92c<=528;p92c++){
+ require92c(oldParents92[p92c,1]==pairA92[p92c] && oldParents92[p92c,2]==pairB92[p92c],"PAIR_INDEX_"+string(p92c));
+ for(r92c=1;r92c<=32;r92c++){
+  require92c(oldC92[r92c,p92c]==productC92[r92c,p92c],"COEFFICIENT_"+string(p92c)+"_"+string(r92c));
+ }
+}
+require92c(oldC92==productC92,"FULL_MATRIX");
+print("COMPARE50_92_RESULT pairs=528 coefficients=16896 exact_equal=1");
+print("COMPARE50_92_PASS");
+quit;

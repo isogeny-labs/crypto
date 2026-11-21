@@ -1,0 +1,9 @@
+# P-192 mixed-3 quotient and relation test
+
+**Blocked; no job submitted.** Continue the [native development study](../../research/nist_cover_three_tests_20261116/README.md) under its [protocol](../../research/nist_cover_three_tests_20261116/PROTOCOL.md). The [named problem](../../problems/nist-mixed-three-quotient-and-relation-solver.md) contains exact exit conditions.
+
+The recorded kernel3 now has all26 principal witnesses and a written degree27/polarization3 quotient proof supported by two exact height algorithms. See [POLARIZED_QUOTIENT.md](../../research/nist_cover_three_tests_20261116/POLARIZED_QUOTIENT.md),PCC-20261116-3f440b,PCC-20261116-ce4a7b and PCC-20261116-8559fc. The source evaluator,public bridge and six restricted setup relations are executed. Generic transpose-dual execution,exceptional-chart interfaces and projected individual descent remain separate implementation work. All results have unsigned producer standing. [pcc:unverified]
+
+This card covers the original target-map/solver/performance campaign. Its `/usr/bin/false` sentinel is deliberately blocked. Separate native functional runners are `check-e2e.sh` and `check-geometry-e2e.sh` in the study directory; these are not this card's paid launch command. Replace the sentinel and supply its independent checker/frozen commit only when the original requirements are ready. Funding0 reserves no priority and authorizes no spend. The proposed first admitted construction envelope is2CPU/8GiB/1800s and USD5 inclusive of build/idle/storage; no measured cost estimate exists. The live lab allowance, source-image custody and S3 checkpoint gates still apply. Do not launch while budget headroom is unknown/exhausted.
+
+Completion requires the quotient/map/solver and full comparison, not publication of this card. A null, construction failure or timeout must return to the research directory with its exact scope.

@@ -1,0 +1,5 @@
+# Independent source-fidelity review plan
+
+Review the exact DispatchAcceptance theorem and five controls together with AffineDispatch/Unique and StoredValidity dependencies and retained Rust source. Inspect prime, p<2^31, canonical storage, quintic degree and n=1/no-table restrictions. Check universal Runs scope and classifier-selected existence without assuming output validity. Read original successful and failed compiler/axiom/control receipts without rerunning a compiler. Verify source hashes and enumerate missing custody facts rather than infer them.
+
+Review nonvacuity through actual fallback constructors plus invalid identity and inactive noncanonical acceptance controls. Keep source fidelity separate from recorded machine outcomes. The accepted-representation layer does not imply global divisor class or scalar equivalence. No official evidence promotion or fresh kernel replay is performed. Publish scoped PDF/SVG/JSON and exact bindings; preserve prior failed attempts. Reviewer is a separate team agent and has the parent's broader context but did not author these historical theorem sources.

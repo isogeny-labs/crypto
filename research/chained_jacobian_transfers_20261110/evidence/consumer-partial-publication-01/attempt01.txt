@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/workspace/scratch/publish_checkpoint_objects.py", line 71, in <module>
+    tree=api('git/trees',dict(base_tree=base_tree,tree=entries))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/publish_checkpoint_objects.py", line 28, in api
+    raise RuntimeError(p.stderr.strip())
+RuntimeError: gh: Sorry, your request timed out.  It's likely that your input was too large to process.  Consider building the tree incrementally, or building the commits you need in a local clone of the repository and then pushing them to GitHub. (HTTP 422)

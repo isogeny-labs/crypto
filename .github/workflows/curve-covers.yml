@@ -14,6 +14,7 @@ on:
       - 'src/bin/curve_cover_check.rs'
       - 'src/bin/curve_cover_check/**'
       - 'src/bin/hyperelliptic_cover.rs'
+      - 'examples/cover_catalog_transition_audit.rs'
       - 'src/bin/ecdlp_audit.rs'
       - 'src/bin/ecdlp_audit/**'
       - 'src/binary_ecc/**'
@@ -33,6 +34,7 @@ on:
       - 'scripts/update_curve_standards.py'
       - 'scripts/build_curve_registry.py'
       - 'scripts/build_cover_transfer_assessments.mjs'
+      - 'scripts/test_cover_transfer_assessment.mjs'
       - 'scripts/catalog_snapshot.mjs'
       - 'scripts/test_catalog_snapshot.mjs'
       - 'research/cover_transfer_assessment_20261013/**'
@@ -89,7 +91,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013 research/hyperelliptic_cover_infrastructure_20261006
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.98'
@@ -114,6 +116,11 @@ jobs:
           if-no-files-found: error
           retention-days: 7
       - run: cargo test --bin curve_cover_check --bin curve_standards
+      - name: Replay exact catalog transition inventory
+        run: |
+          cargo test --example cover_catalog_transition_audit
+          cargo run --example cover_catalog_transition_audit -- "$RUNNER_TEMP/catalog-transition.json"
+          cmp "$RUNNER_TEMP/catalog-transition.json" research/cover_transfer_assessment_20261013/catalog-transition-20261020-v2.json
       - name: Cover, Jacobian, transfer, and CLI controls
         run: |
           cargo test --lib hyperelliptic
@@ -186,7 +193,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013 research/hyperelliptic_cover_infrastructure_20261006
       - name: Retain immutable inputs for local assessment replay
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
@@ -213,11 +220,15 @@ jobs:
           AWS_DEFAULT_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
         run: python3 tools/artifacts/artifacts.py pull research/cover_transfer_assessment_20261013
       - name: Check deterministic catalog-wide assessment generation
+        run: node scripts/build_cover_transfer_assessments.mjs --check
+      - name: Reject incomplete and incorrect catalog memberships
         run: |
+          node --test scripts/test_cover_transfer_assessment.mjs
           node --test scripts/test_catalog_snapshot.mjs
-          node scripts/build_cover_transfer_assessments.mjs --check
       - name: Validate the assessment schema
         run: python -m jsonschema -i docs/curves/cover-transfer-assessments.json docs/curves/cover-transfer-assessment.schema.json
+      - name: Install native PDF metadata reader
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends poppler-utils
       - name: Verify typed map, subgroup, and evidence bindings
         run: node research/cover_transfer_assessment_20261013/verify_assessment.mjs
 
@@ -266,7 +277,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013
+          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves research/cover_transfer_assessment_20261013 research/hyperelliptic_cover_infrastructure_20261006
       - name: Build the conditional injectivity theorem and replay it in a fresh kernel
         uses: leanprover/lean-action@v1
         with:

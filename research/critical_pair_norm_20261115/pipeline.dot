@@ -1,0 +1,10 @@
+digraph critical {
+ graph [rankdir=TB,bgcolor="white",pad="0.12",nodesep="0.15",ranksep="0.25"];
+ node [shape=box,style="rounded,filled",fillcolor="#eef5fa",fontname="DejaVu Sans",fontsize=11,margin="0.14,0.09"];
+ source [label="Original projected quartics\n8 variables, public target point"];
+ producer [label="Bounded critical-pair producer\nsource / variable-product / linear-combination DAG"];
+ checker [label="Unchanged separate native checker\nDAG identities + all S-pairs + original inclusion"];
+ quotient [label="Quotient extraction and original-equation lifts\ncomplete set compared with reference"];
+ replay [label="Independent OpenSSL replay\ncompleted sets and retained unknown statuses"];
+ source -> producer -> checker -> quotient -> replay;
+}

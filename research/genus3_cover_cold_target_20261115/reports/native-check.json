@@ -1,0 +1,69 @@
+{
+  "headline": [
+    {
+      "claimed": 0.05663239334374559,
+      "name": "cover_mean_seconds",
+      "recomputed": 0.05663239334374559
+    },
+    {
+      "claimed": 0.07878538950000369,
+      "name": "direct_mean_seconds",
+      "recomputed": 0.07878538950000369
+    },
+    {
+      "claimed": 0.05609523699996544,
+      "name": "cover_median_seconds",
+      "recomputed": 0.05609523699996544
+    },
+    {
+      "claimed": 0.07782574550003574,
+      "name": "direct_median_seconds",
+      "recomputed": 0.07782574550003574
+    },
+    {
+      "claimed": 1.3911718161334716,
+      "name": "speedup_ratio_of_means",
+      "recomputed": 1.3911718161334716
+    },
+    {
+      "claimed": 52,
+      "name": "cover_faster_trials",
+      "recomputed": 52
+    }
+  ],
+  "native_scalar_replays": 64,
+  "not_checked": [
+    "historical execution or isolation",
+    "timing provenance",
+    "the producer's NumPy bootstrap samples",
+    "signed independent PCC validation",
+    "full native cover solver or matched counted Pollard rho"
+  ],
+  "pcc_standing": "unverified",
+  "primality_and_order_witness_checked": true,
+  "raw_data": [
+    {
+      "path": "../historical/cold_target_audit_q1061_v65.json",
+      "sha256": "e7bd82ad42a8c02e942b068e0a495eefa606ece331bdc378e6535c03cfae9573"
+    }
+  ],
+  "raw_sha256": "e7bd82ad42a8c02e942b068e0a495eefa606ece331bdc378e6535c03cfae9573",
+  "recomputed": {
+    "cover_faster_trials": 52,
+    "cover_mean_seconds": 0.05663239334374559,
+    "cover_median_seconds": 0.05609523699996544,
+    "direct_mean_seconds": 0.07878538950000369,
+    "direct_median_seconds": 0.07782574550003574,
+    "speedup_ratio_of_means": 1.3911718161334716
+  },
+  "schema": "genus3.historical-audit-check/v1",
+  "source_hashes_checked": {
+    "cold_target.py": "e55c08f81e0b2fef7b3c7712031e7b474d2b96d93fdc3061c9cfd711c242dbb1",
+    "cold_target_audit.py": "862d1a8b175f973980dbcc9e60329c911fd22d15500cd25307ef1a2b4b9213fb",
+    "descent_dlp.py": "fb0695dd08e1fe1a83fd777a6359b00527857db2a5190c2513a2da90e9790793",
+    "smaller_field_descent.py": "c23ed5977df5b89072986d36755013a19a939a6968bd9746147dadef4168adee",
+    "speedup.py": "b00db1ef7d7146e062e3c061b38753da27c1febd83c98fa9720ad0162db4fe71"
+  },
+  "status": "pass",
+  "status_scope": "local self-check only; unsigned and not independent PCC validation"
+}

@@ -1,0 +1,49 @@
+{
+  "schema": "experiment.export/v1",
+  "experiment_id": "KOBLITZ-R70-SIXTH-FROBENIUS",
+  "claim_class": "exact_computation",
+  "protocols": [
+    {
+      "attempt": "sixth-frobenius70-01",
+      "path": "runs/sixth-frobenius70-01/protocol.json",
+      "sha256": "bd58e8cd5357f7d8e557ad86a65bd16e0c4e025419129d241aa4d76a8165a2a4",
+      "frozen_revision": "4c8745c527d475ec55c63162393d4ee474dcdeba"
+    },
+    {
+      "attempt": "sixth-frobenius70-02",
+      "path": "runs/sixth-frobenius70-02/protocol.json",
+      "sha256": "4327ece327e2b23d41b3c9233aa055f87188a262b73f5b3cebf6f80086942c42",
+      "frozen_revision": "c5495873dd255fc03b3d77d4012b1fa9e602f015"
+    },
+    {
+      "attempt": "frobenius-lean70-01",
+      "path": "runs/frobenius-lean70-01/LEAN-PROTOCOL.md",
+      "sha256": "607d45b6b0492bce0712e369accfc5832223c3f5192148ab560b7044314a4a76",
+      "frozen_revision": "a3bb3ed31843a67cca9869329d11006e4e226531"
+    },
+    {
+      "attempt": "frobenius-lean70-02",
+      "path": "runs/frobenius-lean70-02/LEAN-PROTOCOL.md",
+      "sha256": "16f381af4c53d9eed0c61ed86e33309f11f20c41cb23db7b408b9cd485bee0b8",
+      "frozen_revision": "1e1f4b55a9daaffc0ce1c703eb172cca0817b50e"
+    },
+    {
+      "attempt": "frobenius-lean70-03",
+      "path": "runs/frobenius-lean70-03/LEAN-PROTOCOL.md",
+      "sha256": "db8c38d4040144743ee6ec9b2062d02dc11f4ecb609d12cfde449c7084858ab9",
+      "frozen_revision": "59dddeddc2ed9a4cf6540c542d2fe93cd332023d"
+    }
+  ],
+  "raw_archive": "runs.tar.xz; content address in .artifacts.json after custody publication",
+  "results": {
+    "path": "results.json",
+    "sha256": "dbd9ec81b148247ddb15ee359868cbfcabfcec2a8eb2b4b045cddbb42429da47"
+  },
+  "flow": {
+    "accepted": 3,
+    "rejected": 2,
+    "interrupted": 0
+  },
+  "canonical_schema_validation": "unavailable in selected Git index and disk; manual contract/source-byte checks only",
+  "notes": "Full two-class square map rank2; zero survivors; V6=old order and stable under its checked multiplication. First late-marker native run and first Lean compile rejected; six conditional authored Lean implications compile and audit, including the direct six-step containment theorem."
+}

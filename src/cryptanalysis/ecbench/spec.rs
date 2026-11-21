@@ -53,7 +53,9 @@ pub struct WorkloadPlan {
     /// `planted` (the default: `Q = [k]G`, checked against `k`),
     /// `planted_shared` (the same `k` on every curve of one order, for
     /// paired quotient statistics) or `public` (`Q` hashed to the
-    /// subgroup, checked by `[d]G = Q`): what a `vs_rho` claim needs.
+    /// subgroup, checked by `[d]G = Q`): what a `vs_rho` claim needs;
+    /// `planted_hec_thread` reproduces the hyperelliptic thread's fixed
+    /// target on a `hec_thread` curve.
     /// Not serialised when planted, so a spec written before the field
     /// keeps its id.
     #[serde(default, skip_serializing_if = "TargetKind::is_plain_planted")]
@@ -80,34 +82,7 @@ pub enum Order {
     AlternateMeasured,
 }
 
-/// The isolation level a wall-clock figure needs (`docs/ecbench/README.md`).
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-pub enum Level {
-    L0,
-    L1,
-    L2,
-    L3,
-}
-
-impl Level {
-    pub fn name(self) -> &'static str {
-        match self {
-            Level::L0 => "L0",
-            Level::L1 => "L1",
-            Level::L2 => "L2",
-            Level::L3 => "L3",
-        }
-    }
-    pub fn parse(s: &str) -> Option<Self> {
-        match s {
-            "L0" => Some(Level::L0),
-            "L1" => Some(Level::L1),
-            "L2" => Some(Level::L2),
-            "L3" => Some(Level::L3),
-            _ => None,
-        }
-    }
-}
+pub use super::isolation::Level;
 
 fn default_warmup() -> u32 {
     1

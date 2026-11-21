@@ -1,0 +1,9 @@
+digraph checks {
+ rankdir=LR; node [shape=box,fontname="Helvetica",fontsize=11];
+ input [label="Original equations\np=2147483647, seed 7"];
+ rows [label="Two direct cubic identities\noriginal-generator coefficients"];
+ rust [label="Strict Rust exact identity check\nno basis receipt"];
+ singular [label="Fresh Singular identity check\nmatched comparison"];
+ solve [label="Native F4 solve\ncomplete original 3-CAS equality"];
+ input->rows; rows->rust; rows->singular; rust->solve;singular->solve;
+}

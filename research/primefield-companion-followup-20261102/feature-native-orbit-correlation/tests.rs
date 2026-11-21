@@ -1,0 +1,37 @@
+use super::*;
+fn chi(a:u64,r:u64)->i8{if a==0{0}else{if pow(a,(r-1)/2,r)==1{1}else{-1}}}
+fn root(r:u64,m:usize)->u64{(1..r).find(|&z|(1..m).all(|i|pow(z,i as u64,r)!=1)&&pow(z,m as u64,r)==1).unwrap()}
+fn eval(v:&[u64],x:u64,r:u64)->u64{v.iter().rev().fold(0,|a,&b|(mul(a,x,r)+b)%r)}
+fn dense(r:u64,a:u64)->Vec<u64>{let mut c=vec![1];let q=[a,(r-1-a)%r,1];for _ in 0..(r-1)/2{let mut next=vec![0;c.len()+2];for(i,&v)in c.iter().enumerate(){for(j,&w)in q.iter().enumerate(){next[i+j]=(next[i+j]+mul(v,w,r))%r}}c=next}c}
+#[test]fn dense_coefficients_orbit_values_and_sets(){
+ let(mut compiled,mut values,mut rootsets,mut strict,mut m2equal)=(0,0,0,0,0);
+ for r in [7,13,17,31,41,97]{for m in 2..=8{if(r-1)%m as u64!=0{continue}let f=Fold::new(r,m,root(r,m),8,100).unwrap();let cs:Vec<_>=(0..m).map(|lag|Correlation::compile(&f,lag,8,100).unwrap()).collect();
+  for c in &cs{let v=dense(r,pow(f.zeta,c.lag as u64,r));let expected:Vec<_>=v.iter().step_by(m).map(|&v|mul(m as u64,v,r)).collect();assert_eq!(c.coefficients(),expected);let orientation=pow(pow(f.zeta,c.lag as u64,r),(r-1)/2,r);for j in 0..=f.d{assert_eq!(c.coefficients[j],mul(orientation,c.coefficients[f.d-j],r));}compiled+=1;}
+  for k in 0..r{for b in [1,2,3]{let signs:Vec<_>=f.offsets(1,b).unwrap().iter().map(|&a|chi((k+a)%r,r)).collect();let z=pow((k+1)%r,m as u64,r);
+   for c in &cs{assert_eq!(eval(&c.constraint(b,&signs).unwrap(),z,r),0);values+=1}
+   let mut state=f.initial().unwrap();let product=signs.iter().copied().product();f.observe(&mut state,b,product).unwrap();let initial=state.moments().count;
+   let expected:Vec<_>=(0..r).filter(|&z|eval(state.polynomial(),z,r)==0&&cs.iter().all(|c|eval(&c.constraint(b,&signs).unwrap(),z,r)==0)).collect();
+   for c in &cs{c.observe(&mut state,b,&signs).unwrap();}
+   let got:Vec<_>=(0..r).filter(|&z|eval(state.polynomial(),z,r)==0).collect();assert_eq!(got,expected);assert!(got.contains(&z));assert_eq!(got.len(),state.moments().count as usize);if state.moments().count<initial{strict+=1}if m==2{assert_eq!(state.moments().count,initial);m2equal+=1}rootsets+=1;
+  }}
+ }}assert!(strict>0);println!("dense_compilers={compiled} orbit_values={values} exact_image_sets={rootsets} strict_refinements={strict} quadratic_redundancy={m2equal}");
+}
+#[test]fn large_stride_stream_reference_and_caps(){
+ let r=65537;let mut cases=0;let mut fast=false;
+ for m in [64,128,256,512,1024]{let zeta=pow(3,(r-1)/m as u64,r);let f=Fold::new(r,m,zeta,1024,1025).unwrap();for lag in [0,1,m/2]{let c=Correlation::compile(&f,lag,1024,1024).unwrap();let a=pow(zeta,lag as u64,r);let h=(r-1)/2;let(mut prev,mut cur)=(0,pow(a,h,r));let mut expected=vec![mul(m as u64,cur,r)];
+  for j in 0..r-1{let numerator=(mul(mul((j+r-h)%r,(1+a)%r,r),cur,r)+mul((r-j)%r,prev,r))%r;let next=mul(numerator,pow(mul(a,j+1,r),r-2,r),r);prev=cur;cur=next;if(j+1)%m as u64==0{expected.push(mul(m as u64,cur,r))}}
+  assert_eq!(c.coefficients(),expected);fast|=c.karatsuba_calls>0&&c.newton_steps>0;cases+=1;
+ }}assert!(fast);println!("large_stride_cases={cases} largest_prime=65537 block_widths=64,128,256,512,1024");
+ let f=Fold::new(13,3,3,3,5).unwrap();assert!(matches!(Correlation::compile(&f,1,2,4),Err(Error::Limit)));assert!(matches!(Correlation::compile(&f,1,3,3),Err(Error::Limit)));assert!(Correlation::compile(&f,3,3,4).is_err());let c=Correlation::compile(&f,1,3,4).unwrap();assert!(c.constraint(0,&[1,1,1]).is_err());assert!(c.constraint(1,&[1,1]).is_err());assert!(c.constraint(1,&[1,2,1]).is_err());
+}
+#[test]fn public_correlated_recovery(){let(mut total,mut recovered,mut unresolved,mut retained,mut calls)=(0,0,0,0,0);
+ for(r,p,a,b,base,m,zeta,rounds)in[(13,7,0,3,[1,2],3,3,6),(13,7,0,3,[1,2],6,4,6),(479,509,2,10,[3,68],2,478,20)]{
+  let single=SingleRecovery::new(PublicRecovery::new(p,a,b,r,base,m,zeta,8,300,64,[0,1],rounds,1000).unwrap(),200,&[0,1,2,3,4,5,6]).unwrap();let runner=CorrelatedRecovery::new(single,&[1],1,8,300).unwrap();
+  let targets:Vec<_>=if r==13{(0..r).map(|k|{let mut c=Counts::default();(k,PublicRecovery::pair(runner.base.inner.multiple(k,&mut c)))}).collect()}else{include_str!("../feature-native-monomial-recovery/recovery.tsv").lines().skip(1).map(|s|{let v:Vec<_>=s.split('\t').collect();let k=v[0].parse::<u64>().unwrap();(k,if k==0{None}else{Some([v[1].parse().unwrap(),v[2].parse().unwrap()])})}).collect()};
+  for(k,t)in targets{total+=1;match runner.recover(t).unwrap(){FiberOutcome::Recovered{value,route,stats}=>{assert_eq!(value,k);recovered+=1;if route=="retained-signs"{retained+=1}calls+=stats.outer.source_calls},FiberOutcome::Unresolved{stats,..}=>{unresolved+=1;calls+=stats.outer.source_calls}}}
+ }assert_eq!(total,46);println!("public_cases={total} recovered={recovered} unresolved={unresolved} retained_routes={retained} source_calls={calls}");}
+
+#[test]fn reciprocal_image_ambiguity(){let mut cases=0;let mut nontrivial=0;
+ for(r,m)in [(17,2),(17,4),(41,4),(97,4),(97,8)]{let f=Fold::new(r,m,root(r,m),8,100).unwrap();assert_eq!(f.d%2,0);let cs:Vec<_>=(0..m).map(|l|Correlation::compile(&f,l,8,100).unwrap()).collect();
+  for b in [1,2,3]{for y in 1..r{let yp=mul(mul(b,b,r),pow(y,r-2,r),r);let signs=|x:u64|{let mut t=b;(0..m).map(|_|{let s=chi((x+r-t)%r,r);t=mul(t,f.zeta,r);s}).collect::<Vec<_>>()};let left=signs(y);let right=signs(yp);assert_eq!(left.iter().copied().product::<i8>(),right.iter().copied().product::<i8>());for c in &cs{assert_eq!(c.observed(&left).unwrap(),c.observed(&right).unwrap());}if pow(y,m as u64,r)!=pow(yp,m as u64,r){nontrivial+=1}cases+=1;}}
+ }assert!(nontrivial>0);println!("reciprocal_controls={cases} distinct_image_pairs={nontrivial}");}

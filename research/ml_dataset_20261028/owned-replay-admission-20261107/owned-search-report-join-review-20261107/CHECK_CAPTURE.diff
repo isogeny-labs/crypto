@@ -1,0 +1,11 @@
+--- frozen/check_capture.py
++++ proposed/check_capture.py
+@@ -100,7 +100,7 @@
+         ack={k:md.get(('map_ack',k)) for k in positions[seq]}
+         require(integer(ack['event_count']) and integer(ack['byte_end']),'map receipt numeric types')
+         require(a['role']=='sat-original-gate-map' and a['encoding']=='json' and a['sha256']==inspector.map_sha and ack==positions[seq] and seq<chunks[0][0],'map receipt binding')
+-        if on_snapshot is not None: on_snapshot(inspector, {'pattern':pattern,'snapshot':index,'sha256':result['sha256']})
++        if on_snapshot is not None: on_snapshot(inspector, {'pattern':pattern,'snapshot':index,'sha256':result['sha256'],'chunks':len(chunks),'ack':dict(positions[chunks[-1][0]])})
+         snapshots.append({'pattern':pattern,'snapshot':index,'chunks':len(chunks),'bytes':result['bytes'],'sha256':result['sha256'],'producer_status':result['producer_status']})
+     return {'schema':'owned-search-capture-offline-check/v1','committed_prefix_verified':True,'snapshot_count':len(snapshots),'snapshots':snapshots,'event_count':count,'payload_bytes':total,'trusted_binding_sha256':binding,'trusted_source_hashes':expected_sources,'mathematical_replay':False,'producer_authentication_verified':False,'s3_custody_verified':False,'uncommitted_suffix_ignored':True}
+ def main():

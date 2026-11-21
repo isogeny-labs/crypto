@@ -1,0 +1,52 @@
+[
+  {
+    "name": "QuarticGluing.duplication_ordinate_numerator",
+    "claim_path": "pcc/claims/PCC-20261112-d6878f.json",
+    "statement": "theorem duplication_ordinate_numerator {R : Type} [CommRing R] (x a b : R) : -8*(x^3+a*x+b)^2+12*x*(x^3+a*x+b)*(3*x^2+a)-(3*x^2+a)^3 = x^6+5*a*x^4+20*b*x^3-5*a^2*x^2-4*a*b*x-8*b^2-a^3",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/QuarticGluing.lean",
+      "theorem": "QuarticGluing.duplication_ordinate_numerator",
+      "decl_sha256": "775bd55eac808c0ada771391a5cc8fb03cca5a7713905f040d62e578629203a1"
+    }
+  },
+  {
+    "name": "QuarticGluing.sum_kernel_projection_injective",
+    "claim_path": "pcc/claims/PCC-20261112-8b6f8c.json",
+    "statement": "theorem sum_kernel_projection_injective {E F A : Type} [IntModule A] (e : E \u2192 A) (f : F \u2192 A) (hf : Function.Injective f) (p : E) (q r : F) (hq : e p+f q=0) (hr : e p+f r=0) : q=r",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/QuarticGluing.lean",
+      "theorem": "QuarticGluing.sum_kernel_projection_injective",
+      "decl_sha256": "e60508bddc136f674af5dbf2ebd0a7fd51d5408eb796e33a9899de47321f3133"
+    }
+  },
+  {
+    "name": "QuarticGluing.kernel_transport_bijective",
+    "claim_path": "pcc/claims/PCC-20261112-c7cd22.json",
+    "statement": "theorem kernel_transport_bijective {E F A E' F' A' : Type} (s : E \u2192 F \u2192 A) (t : E' \u2192 F' \u2192 A') (z : A) (w : A') (e : E \u2192 E') (f : F \u2192 F') (u : A \u2192 A') (he : Bijective e) (hf : Bijective f) (hu : Function.Injective u) (uz : u z=w) (comm : \u2200 p q, u (s p q)=t (e p) (f q)) : Bijective (transport s t z w e f u uz comm)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/QuarticGluing.lean",
+      "theorem": "QuarticGluing.kernel_transport_bijective",
+      "decl_sha256": "46f64c42bdf87a5245680623c31f7576432cf7ea33458c08bcb1d1df13465914"
+    }
+  },
+  {
+    "name": "QuarticGluing.quotient_kernel_saturated",
+    "claim_path": "pcc/claims/PCC-20261112-47fb74.json",
+    "statement": "theorem quotient_kernel_saturated {M Q : Type} [IntModule M] [IntModule Q] (q : M \u2192 Q) (linear : \u2200 n : Int, \u2200 a, q (n \u2022 a)=n \u2022 q a) (torsionfree : \u2200 n : Int, n\u22600 \u2192 \u2200 b : Q, n \u2022 b=0 \u2192 b=0) (n : Int) (hn : n\u22600) (a : M) (ha : q (n \u2022 a)=0) : q a=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/QuarticGluing.lean",
+      "theorem": "QuarticGluing.quotient_kernel_saturated",
+      "decl_sha256": "cb1d768f1c08e59714c7121ef7f29f16055257be73ccce244ce8fa69c9497c28"
+    }
+  },
+  {
+    "name": "QuarticGluing.saturated_equal_rational_span",
+    "claim_path": "pcc/claims/PCC-20261112-0669e7.json",
+    "statement": "theorem saturated_equal_rational_span {M : Type} [IntModule M] (L W : M \u2192 Prop) (included : \u2200 a, L a \u2192 W a) (saturated : \u2200 a n, n\u2260(0 : Int) \u2192 L (n \u2022 a) \u2192 L a) (sameSpan : \u2200 a, W a \u2192 \u2203 n : Int, n\u22600 \u2227 L (n \u2022 a)) : \u2200 a, L a \u2194 W a",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/QuarticGluing.lean",
+      "theorem": "QuarticGluing.saturated_equal_rational_span",
+      "decl_sha256": "5919e86f176ac016347f19860a8576c3b9576cbb9a8de8330819568511eaaf80"
+    }
+  }
+]

@@ -1,0 +1,149 @@
+--- branch-helper-cast-successor-20261109/launch.py
++++ branch-helper-cast-renewal-20261110/launch.py
+@@ -3,9 +3,9 @@
+ from pathlib import Path
+ import argparse,hashlib,json,os,subprocess,time,signal
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-branch-helper-cast-20261109')
++W=Path('/home/ec2-user/pencil-native-branch-helper-cast-renewal-20261110')
+ O=Path(str(W)+'.outer')
+-DEADLINE=1794287499
++DEADLINE=1794398400
+ BOOT='31b37cfb156242ff8b0ffadc5cec5a12'
+ ap=argparse.ArgumentParser();ap.add_argument('--execute',action='store_true');ap.add_argument('--freeze-sha256',required=True)
+ ap.add_argument('--release-record',required=True);ap.add_argument('--release-sha256',required=True)
+@@ -22,11 +22,12 @@
+ assert release['schema']=='branch-helper-cast-coordinator-release/v1' and release['released'] is True
+ assert release['freeze_sha256']==a.freeze_sha256
+ assert release['attempt_limit']==1 and release['automatic_retry'] is False
+-assert release['campaign_total_seconds']==43200 and release['deadline']=='2026-11-10T05:11:39Z'
++assert release['campaign_total_seconds']==129600 and release['deadline']=='2026-11-11T12:00:00Z'
+ assert type(F['prior_attempt_conservative_debit_seconds']) is int, 'campaign ledger binding pending'
+ assert type(F['remaining_before_attempt_seconds']) is int
+-assert 0<=F['prior_attempt_conservative_debit_seconds']<=43200-600
+-assert F['prior_attempt_conservative_debit_seconds']+F['remaining_before_attempt_seconds']==43200
++assert F['prior_attempt_conservative_debit_seconds']==0
++assert F['remaining_before_attempt_seconds']==129600
++assert F['prior_attempt_conservative_debit_seconds']+F['remaining_before_attempt_seconds']==129600
+ assert release['prior_debit_seconds']==F['prior_attempt_conservative_debit_seconds']
+ assert release['remaining_before_attempt_seconds']==F['remaining_before_attempt_seconds']
+ assert type(F['materializer_conservative_debit_seconds']) is int and F['materializer_conservative_debit_seconds']>=0
+@@ -144,12 +145,12 @@
+ results=[]
+ try:
+  durable('coordinator-release.json',release)
+- durable('admission.json',{'freeze_sha256':a.freeze_sha256,'start_utc_seconds':time.time(),'campaign_seconds':43200,'prior_debit_seconds':release['prior_debit_seconds'],'remaining_before_attempt_seconds':release['remaining_before_attempt_seconds'],'current_lane':'branch_helper_cast_replay','successor_attempt_limit':1,'coordinator_release_sha256':a.release_sha256,'boot_id':BOOT,'continuation_ceiling_seconds':600,'deadline':DEADLINE,'retries':0})
++ durable('admission.json',{'freeze_sha256':a.freeze_sha256,'start_utc_seconds':time.time(),'campaign_seconds':129600,'prior_debit_seconds':release['prior_debit_seconds'],'remaining_before_attempt_seconds':release['remaining_before_attempt_seconds'],'current_lane':'branch_helper_cast_replay','successor_attempt_limit':1,'coordinator_release_sha256':a.release_sha256,'boot_id':BOOT,'continuation_ceiling_seconds':600,'deadline':DEADLINE,'retries':0})
+  for phase,limit in [('pre',180),('compiler',240),('post',180)]:
+   if phase=='compiler' and not results[-1]['passed']:break
+   # Post-custody remains required after any compiler attempt, including failed attempts.
+   assert time.time()+limit<DEADLINE and time.monotonic()-start+limit<=600,'insufficient remaining phase allowance'
+-  unit='pencil-branch-helper-cast-20261109-'+phase
++  unit='pencil-branch-helper-cast-renewal-20261110-'+phase
+   cmd=['sudo','-n','systemd-run','--unit='+unit,'--wait',
+    '--property=User=ec2-user','--property=WorkingDirectory='+str(P),
+    '--property=CPUQuota=100%','--property=MemoryMax=8G','--property=MemorySwapMax=0',
+--- branch-helper-cast-successor-20261109/replay.py
++++ branch-helper-cast-renewal-20261110/replay.py
+@@ -1,8 +1,8 @@
+ from pathlib import Path
+ import os,sys,json,hashlib,time,signal,subprocess,resource,re,shutil
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-branch-helper-cast-20261109')
+-ABSOLUTE_DEADLINE=1794287499  # 2026-11-10T05:11:39Z
++W=Path('/home/ec2-user/pencil-native-branch-helper-cast-renewal-20261110')
++ABSOLUTE_DEADLINE=1794398400  # 2026-11-11T12:00:00Z
+ OWNED=False
+ progress={'phase':None,'stage':'initialization','checked_files':0,'checked_bytes':0,'current_path':None,'current_bytes_read':0,'declared_files':16736,'declared_bytes':3111892318}
+ last_progress=0.0
+--- branch-helper-cast-successor-20261109/PLAN.md
++++ branch-helper-cast-renewal-20261110/PLAN.md
+@@ -1,11 +1,11 @@
+-# Helper cast normalization successor — prospective only
++# Helper cast normalization renewal — prospective source only
+ 
+-The predecessor reached the final hcast proof and failed because the simplifier left a Nat numeral2 cast into ENat. Add exactly Nat.cast_ofNat to the existing simp-only list. The pinned Mathlib/Data/Nat/Cast/Defs.lean lines58-59 declare this theorem for NatCast R and Nat.AtLeastTwo n; ENat/Monoid supplies the semiring/nat cast structure. No theorem statement, hypothesis, control, axiom allowance or proof route changes.
++This packet preserves the reviewed five-call branch-helper-cast replay machinery and its mathematical inputs. It changes only the packet, private workspace and systemd unit identities; the confirmed campaign deadline and ceiling; and the fresh campaign ledger binding. The one-lemma `Nat.cast_ofNat` correction, theorem statements, hypotheses, controls, expected rejection, five-call order, thirteen-name readback, retained imports, runtime pins, resource envelope and no-retry rule are unchanged.
+ 
+-Compile the same five modules in the same order: corrected helper, unchanged coefficient theorem, unchanged rational controls, separate thirteen-name readback, expected False rejection. Reuse only the thirteen successful predecessor-v2 prerequisite artifacts and their sources. Do not copy any .olean emitted by the failed helper attempt. All16736 baseline dependency files and runtime pins retain full pre/post custody; fresh private retained imports retain their checks.
++The single attempt remains bounded to 600 active-worker seconds, split as 180 seconds pre-custody, 240 seconds shared compiler work and 180 seconds post-custody. It remains limited to 1 CPU, 8 GiB address space, no swap and 128 tasks. The new campaign ceiling is 129,600 seconds, with zero prior charged seconds and 129,600 seconds remaining before this attempt. The absolute deadline is 2026-11-11T12:00:00Z. The separate campaign ledger reserves 600 seconds and admits no execution.
+ 
+-Proposed single serial envelope600seconds:180pre,240shared compiler,180post;1CPU8GiB/no swap,128tasks. The predecessor native phases observed47.4172277seconds pre,35.5724325 compiler (failed first module),27.1384598post. These observations motivate a finite proposal; they do not predict completion of the remaining four calls. Full dependency checking and controls are not sampled or reduced.
++The current boot identity is bound because the launcher uses boot-local systemd and journal ownership evidence. The fresh private workspace is `/home/ec2-user/pencil-native-branch-helper-cast-renewal-20261110`; unit names are `pencil-branch-helper-cast-renewal-20261110-{pre,compiler,post}`. Existing workspaces or units reject execution. Automatic retry remains disabled.
+ 
+-New workspace/unit names and false release template; campaign ledger fields remain null. No reservation, publication admission, compile or runtime is performed by this source preparation. Coordinator chooses allocation within43200seconds and the unchanged2026-11-10T05:11:39Z deadline. Publish exact source/freeze/review before any one manual attempt.
++`release-template.json` deliberately remains `released: false` with null freeze, lease, publication, independent-review and receipt bindings. No compile, test, materialization, launch or scientific payload is performed by this source preparation. Root must bind reviewed, published evidence and current live custody before one explicit execution.
+ 
+-Sources checked: exact failed native compiler stdout/receipt, prior scoped helper review, pinned Mathlib numeral-cast declaration and ENat instances. KB unavailable; exact primary source fallback. Preserve failed attempt and its cost separately.
++The exact delta from `branch-helper-cast-successor-20261109` is retained in `source-delta.patch`; `renewal-bindings.json` binds the reviewed predecessor and the confirmed campaign authorization and reservation. The predecessor packet remains unchanged.
+--- branch-helper-cast-successor-20261109/SESSION.md
++++ branch-helper-cast-renewal-20261110/SESSION.md
+@@ -1,8 +1,11 @@
+ ## What was done
+-Bound failed helper stdout and receipts; prepared one-lemma simp-only correction and same-five-call600second prospective successor.
++Prepared a fresh source-only replay successor with a new packet, workspace and unit identity, the confirmed 129,600-second campaign ceiling, zero prior debit, and the 2026-11-11T12:00:00Z deadline.
++
+ ## Decisions made
+-No failed .olean reuse; full custody and13readbacks unchanged.
++Preserved the five calls, thirteen names, theorem and control sources, retained imports, runtime pins, 180/240/180 phase limits, 1 CPU, 8 GiB, 128 tasks, and no-retry behavior. Kept release and evidence bindings null or false pending publication and independent review.
++
+ ## Open threads
+-Independent source review and coordinator allocation/publication.
++Independent exact-delta review, source publication, final coordinator release binding and one explicit attempt remain with root.
++
+ ## Errors
+-Original cast normalization failure and sorryAx output preserved; no new execution.
++No compile, test, materialization or launch was performed. The predecessor packet and its execution evidence were not modified.
+--- branch-helper-cast-successor-20261109/release-template.json
++++ branch-helper-cast-renewal-20261110/release-template.json
+@@ -4,8 +4,8 @@
+   "freeze_sha256": null,
+   "attempt_limit": 1,
+   "automatic_retry": false,
+-  "campaign_total_seconds": 43200,
+-  "deadline": "2026-11-10T05:11:39Z",
++  "campaign_total_seconds": 129600,
++  "deadline": "2026-11-11T12:00:00Z",
+   "prior_debit_seconds": null,
+   "remaining_before_attempt_seconds": null,
+   "materializer_conservative_debit_seconds": 900,
+--- /dev/null
++++ branch-helper-cast-renewal-20261110/renewal-bindings.json
+@@ -0,0 +1,37 @@
++{
++  "schema": "branch-helper-cast-renewal-bindings/v1",
++  "reviewed_predecessor": {
++    "prospective_freeze": {
++      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/branch-helper-cast-successor-20261109/final-binding/prospective-freeze.json",
++      "sha256": "58215d2fd5767ed316c2a9c8762c6ae9a4ea70a403523c4de3dce4e263d6da1e",
++      "bytes": 6188
++    },
++    "producer_manifest": {
++      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/branch-helper-cast-successor-20261109/manifest.json",
++      "sha256": "732fca661505cc6c93e862863105c4f8795d505a9173c73f8bb24df38074b0ad",
++      "bytes": 3365
++    },
++    "source_review": {
++      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/branch-helper-cast-review-20261109/review.json",
++      "sha256": "c0bfcf74bcfcca779b83314bb71cb1013e7e7fc002ff33413b6734d1cc5b2db1",
++      "bytes": 1769
++    },
++    "review_manifest": {
++      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/branch-helper-cast-review-20261109/manifest.json",
++      "sha256": "725456623afa198029b8fd0e1b1bbbddfba8ae74eb568fdf834aa213f8f46e9b",
++      "bytes": 867
++    }
++  },
++  "campaign": {
++    "authorization": {
++      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/campaign-renewal-20261110/authorization-confirmed.json",
++      "sha256": "e7528c379ccef5e44bf41f63d8007ae8625618de5b5db4362ccc330f2c4926d8",
++      "bytes": 953
++    },
++    "reservation": {
++      "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/campaign-renewal-20261110/ledger-cast-reserved.json",
++      "sha256": "d89c8143cfda44303960ac519d165bfa068cfa1330503d1e7257aa0c450e47bb",
++      "bytes": 463
++    }
++  }
++}

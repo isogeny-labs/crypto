@@ -1,5 +1,7 @@
 # DRAFT Amendment R2-H (proposed number 18): the capped runs at t = 14 and the further t = 13 draw 0 attempt on reserved RunPod CPU pods
 
+**Superseded, not to be launched (2026-11-15T07:50Z).** At 04:16-04:23Z another session committed its own Amendments 18-20 on PR #4173 ("t=13 draw 0 and t=14 capped cells on reserved RunPod pods", the m = 4 cells, and a US$500 study ceiling, each marked "owner instruction") and launched pods `pfd-x-t13-k0-c6-rp` (04:16Z), `pfd-x-t14-k0-c6-m112-rp` and `pfd-x-t14-k1-c6-m112-rp` (06:50Z) for the same cells. Running this route as well would run the decisive cells twice, so this session does not launch it, whatever owner decision 16 said; the conflict is with the owner. The route, its three reviews and the validation stay as a reviewed record. `run.sh` cannot launch a study name from this file: it requires its own script hashes in the preregistration and a ledger `complete_as_of` date, neither of which exists. Every number here is `[pcc:unverified]`.
+
 **Status: draft revision 4, NOT frozen.** Revised 2026-11-15 after the third independent review (round 3, of commit
 `a1c9a4b79c`; verdict "freeze with corrections"; corrections R1-R3 and the reaper lock, S1). Revision 3 answered the
 second review (`7305d2ee8d`, N1-N6), revision 2 the first (`59e487150f`, M1-M7). When

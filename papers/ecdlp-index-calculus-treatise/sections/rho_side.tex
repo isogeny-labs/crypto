@@ -239,6 +239,22 @@ same-binary negation rho.
 \item \emph{The pair claw} of a sibling repository is randomised BSGS on
   signed-Frobenius classes; it is treated with the memory methods in
   \S\ref{sec:rv-memory}.
+\item \emph{A table-free $2+1$ decision on binary curves}
+  (\art{research/groebner_free_matched_20261113/README.md}; one session, L0,
+  \texttt{[pcc:unverified]}, a stage diagnostic with no comparison to rho).
+  For each base point $P_3$ the arm \texttt{lin21-ht} solves the
+  $\FF_2$-affine system $\Sem3(x_1,x_2,x(R-P_3))$ in $(x_1+x_2,x_1x_2)$ after
+  eliminating the product, and it agrees with the pair-table floor on all
+  16{,}384 pool targets where the floor runs. Its counted trials per relation
+  grow with the floor's group additions to within $0.0006$ $[-0.0004,0.0016]$
+  in the slope of $\log_2$ work per bit ($n=13$--41). It costs
+  $2.89$--$10.87\times$ the floor's online wall time per relation, peaks at
+  $15.7$\,MB at $n=41$ against the floor's $2{,}558.1$\,MB, and runs to $n=59$
+  at $518.7$\,MB. It scans every base point as third summand, so it cannot
+  grow more slowly than the floor; under the frozen 14 October rule
+  \texttt{lin21-ht} grows faster than the floor (slope $0.324$ against
+  $0.275$, $\Delta$ $[0.040,0.057]$), as does F4 on the $\Sem3$ chain
+  ($0.533$ against $0.193$).
 \end{itemize}
 
 \paragraph{The end-to-end census.} The frontier refresh of 31 October
@@ -260,6 +276,57 @@ both classified away from the generic boundary:
 A current-binary audit reproduced only 72 of 144 historical F4/F5/F6 rows,
 so those solver counts stay bound to the binary that produced them. The
 census's 92 planning shards had not run at the time of writing.
+
+A reconciliation of 14 November
+(\art{research/ecbench_e2e_frontier_20261031/REPORT.md}, ``14 November
+live-source reconciliation''; source census and committed diagnostics, no new
+run) counts 104 top-level method identifiers and 33 nested algorithms (20
+system-solver backends, nine PDP3 engines, four PKM-tower engines) in the
+live source. The frozen 74/11 census above describes its own binary and is
+not rewritten. Table~\ref{tab:gf-recon} lists the later workstreams it
+reconciles; none moves Tables~A--C. The GHS-weak exception keeps its
+historical standing: a stronger same-family rho (\texttt{strong-b8}) is
+implemented and frozen but not run (Chapter~\ref{sec:transfer}), so the
+14 November label is ``historically admitted IC-led exception; optimized
+matched-rho re-establishment pending'' \texttt{[pcc:unverified]}. Three
+engineering studies on that family changed CPU time at identical counted
+work and leave its distance to rho unchanged. The validated open-addressing
+and compiled square-root change is in Chapter~\ref{sec:frontier}. The
+compiled square root alone is below 1 in all 15 cells of relation-stage CPU
+(cell geometric means $0.773$--$0.910$) but not separated from its $16\%$
+A/A floor (\art{research/ic_gw_sqrt_compiled_20261114/README.md}), and
+incremental factor-base growth is null under its frozen rule, $0.933$--$1.044$
+of the reference in counted cost (seed geometric means over the pricing
+grid), with the descent phase growing
+$1.3$--$2.7\times$ (\art{research/ic_gw_fbgrow_20261114/README.md}); both
+are \texttt{[pcc:unverified]} and L0. A standalone driver that takes a
+public target and checks the recovered scalar in PARI/GP was prepared for
+the combined change (\art{research/cold_combo_replay_20261115/README.md}); it
+holds no measurement.
+
+\begin{table}[t]
+\centering\footnotesize
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{2.7cm}>{\raggedright}X>{\raggedright}p{3.3cm}l@{}}
+\toprule
+Workstream & observed change & reading against rho & standing \\
+\midrule
+FES then batched elimination & $0.739$--$0.889$ of inherited F4 at six calibration points & $35.24$--$3{,}012.56\times$ matched rho there & validator arithmetic agrees; no row \\
+GPU FES kernel & Gray code $18.6$--$25.8\times$ the old kernel; block-six $3.88\times$ ($n=30$), $4.11\times$ ($n=32$) & counted $S$ $20{,}054$--$3{,}270{,}693\times$ rho (one pod) & unverified \\
+prime root-find batch & wall $0.486$ $[0.468,0.504]$\,ns/GAE; counted $S$ unchanged & no rank change & unverified, L0 \\
+rho negation lanes & 8 lanes: $1.043$ ops, $0.761$ wall; 32 lanes: $1.149$ ops, $0.639$ wall & base negation rho wins every band decision & unverified, L0 \\
+transfer re-measurement & 156 of 162 rows above, 6 unresolved lower bounds & 0 of 162 below & validated (\S\ref{sec:mr-negaudit}) \\
+whole-Jacobian IC & both arms above band in 7 of 7 stage-one cells; least ratio $17.96$ & unresolved: both slope tests fail & validated with caveats \\
+table-free \texttt{lin21-ht} & $15.656$ against $2{,}558.132$\,MB at $n=41$ & online work $2.89$--$10.87\times$ the pair floor & unverified \\
+\bottomrule
+\end{tabularx}
+\caption[]{Workstreams reconciled into the ecbench frontier on 14 November,
+as the frontier report states them. ``Validated'' names a
+\texttt{VALIDATION.json}: \art{research/negation_remeasure_20261113/} and
+\art{research/full_jacobian_ic_20261113/} (\art{research/validation_20261114/REPORT.md},
+target A). Source:
+\art{research/ecbench_e2e_frontier_20261031/REPORT.md}.}
+\label{tab:gf-recon}
+\end{table}
 
 \paragraph{Engineering towards parity on a toy suite.} Before ecbench, a
 September study pursued full-cost parity with signed-Frobenius rho on ten
@@ -523,6 +590,80 @@ every reference at once.
   (\art{crypto-autoresearcher:knowledge/leads/ecdlp/generic/LEAD-RHO-cheaper-step-primitives.yaml}).
 \end{itemize}
 
+\section{Relation sources that never see the target}\label{sec:gf-target}
+
+A search round of 13 November asked whether elliptic nets, division
+polynomials or isogeny relations could replace the subfield that Weil descent
+supplies over $\FF_{q^n}$
+(\art{research/non_semaev_decomposition_20261113/README.md}; desk analysis,
+no run, \texttt{[pcc:unverified]}). Over $\FF_{q^n}$ the subfield does two
+jobs: it gives the factor base a short presentation, and its descended
+system contains the target, so every solution decomposes it. All three
+structures had been tried in the programme and closed at the exponent
+level. Elliptic nets reduce to the rank-one elliptic divisibility sequence,
+which Lauter and Stange show equivalent to ECDLP. Division polynomials meet
+an exact obstruction: prime order makes $E(\FF_p)[m]=\{O\}$ and $[m]$ an
+automorphism. The pull-back of $\Sem3$ under an isogeny is a product of
+kernel-twisted $\Sem3$, and the PKM isogeny tower costs $1.00$--$1.33\times$ a
+plain base of the same size.
+
+The round's new statement covers the second job. \emph{Lemma~T} (written
+argument, not formalised): Hecke correspondences, Heegner and Kolyvagin norm
+relations, isogeny-graph identities and elliptic-net identities produce
+relations among factor-base points only, so at best a base of $B$ points with
+known logarithms. Attaching a target generically then costs at least
+$n/(2B)$ group operations, and with $c$ group operations per known-log base
+point the total is at least $cB+n/(2B)\ge\sqrt{2cn}$. The exponent stays
+$\tfrac12$ whatever the relations cost. Against negation rho at about
+$0.886\sqrt n$ such a route wins only if $c<0.39$ group operations per base
+point, linear algebra included, and unstructured linear algebra alone raises
+the cost to $n^{2/3}$. This closes the Hecke and CM class-point relations,
+recorded until then as ``open, not promising, unpriced'', before any
+pricing. The one class the round leaves open is an algebraic solver whose
+working degree stays bounded on a membership tower
+(\S\ref{sec:pa-pkm}).
+
+\paragraph{Division polynomials of arbitrary isogenies.} Stange's division
+polynomials for isogenies whose kernel does not sum to $O$ were recorded as
+a lead on 13 November (\art{research/stange_torsion_division_20261113/LEAD.md};
+abstract-level reading, not run). They give a checkable certificate for an
+isogeny edge, with a chain rule for walks, and nothing that maps a target
+$[k]P$ to a relation carrying $k$; evaluating them at a target is still a
+zero or value oracle that a generic algorithm simulates. The same day the
+programme found that \texttt{volcano-rho} checks each recorded V\'elu edge
+only by sampled tests on two points and never re-tests $\psi_\ell(x_0)=0$: on
+$y^2=x^3+x+3$ over $\FF_{31}$ the non-kernel abscissa $x_0=17$ gives the
+identity map and passes all three tests. An independent certifier for
+$\ell\in\{2,3\}$ edges was added
+(\art{research/stange_torsion_division_20261113/CERTIFICATION.md}); it
+changes no measurement. The toy prime-field encodings that followed on 15 November are
+in \S\ref{sec:gb-toy15}.
+
+\paragraph{Iwasawa-type leads.} Fourteen Iwasawa-flavoured ideas were sorted
+on 13 November against four obstructions: the torsion wall (on a smooth lift
+with $p\nmid n$, $E(\FF_p)$ is torsion and every homomorphism to
+$(\mathbb{Q}_p,+)$ kills it), MOV, the freedom of global lifts, and the field
+degree of $n$-torsion (\art{research/iwasawa_leads_20261113/REPORT.md};
+derivations and two toy measurements, \texttt{[pcc:unverified]}). Three
+leads were chased and closed by derivation: Euler-system classes need
+auxiliary primes $\ell\ge(\sqrt n-1)^2$, so one class costs $\Omega(n)$
+field operations; specialised Ulmer sections miss $\FF_p$ (at most four of
+them lie in $E(\FF_p)$); and no non-constant $\ZZ_n$-tower over $\FF_p(t)$
+exists, the question reducing to MOV. The audit that followed tested the one map class the
+torsion wall does not cover, the non-homomorphic invariant
+$\psi(Q)=\log(nL(Q))/(np)\bmod p$ of the Hensel lift $L(Q)$ to $\tilde
+E(\ZZ/p^2)$. Its positive control on 4 anomalous curves recovered every
+logarithm. On 12 curves with $n\ne p$, $p\in[2^{13},2^{14}]$, the
+preregistered statistics stayed inside their null bounds: 1--5 exact affine
+matches (bound 10), carry cocycles uniform by $\chi^2$, single-bit $\chi^2$
+maxima $7.53$--$17.59$ (bound $20.8$), and full degree of $\psi/y$ in $x$ on
+all 12 curves at $p\in[2^{11},2^{12}]$. A correction of 15 November, after
+the lead atlas became readable, scopes three statements: the $\psi$ tests
+replicate the closed atlas lead on non-homomorphic $p$-adic sections; the
+two-point small-height lemma does not cover xedni's $r$-point lifts, so the
+global small-height lift lead stays open (\S\ref{sec:pa-closure}); and the
+Ulmer argument bounds only generic searches.
+
 \chapter{The matched rho reference}\label{ch:matchedrho}
 
 The validation gate of \S\ref{sec:gate} asks every row for ``a matched rho
@@ -776,6 +917,36 @@ references themselves are unresolved the row is ranked against each. A row
 ranked against one weight's winner alone overstates index calculus at the
 other weights.
 
+\paragraph{A calibrated field weight.} Since 13 November ecbench can read a
+second, narrower grid beside the band
+(\art{research/band_wcal_20261113/NOTE.md}; tooling, evidence by unit
+tests, \texttt{[pcc:unverified]}). A named class of counters, the base-field
+and mod-$r$ multiplications and squarings left unpriced, is weighted at $0$,
+$w_{\rm cal}$ and $10\,w_{\rm cal}$, where $w_{\rm cal}$ is the measured price
+of one multiplication in group additions; every other native counter keeps
+the band weights $0$, $0.1$ and~1. A pair is ``ranked at the calibrated
+price'' only if one strict order holds at all three field weights. The band
+verdict is printed beside it and is not changed, and the 0/0.1/1 band still
+governs the leaderboard. A reading carries its method (\texttt{perf-ipc} or
+best-of-$N$ timing) and host; the built-in helper times a mulmod and an
+affine addition in one process and never claims \texttt{perf-ipc}. On one
+shared VM it printed $w_{\rm cal}=0.0285$ for $p=2^{31}-1$ with a $3.6\times$
+spread in the multiplication timing, so the value is informational. The
+reading reaches \texttt{band}, single and pooled \texttt{compare}, the
+procedure-2 \texttt{challenge} verdict and \texttt{bound fit}; pooled
+sessions whose readings differ by more than 10\% get no pooled grid. A
+validator admitted the wiring with caveats
+(\art{research/validation_20261114/REPORT.md}, target B; no
+\texttt{VALIDATION.json}, since it is tooling): on committed sessions without
+a $w_{\rm cal}$, 21 of 23 outputs were byte-identical before and after and
+the other two differ only in audit timestamps and binary hash, and a hand
+check reproduced all nine grid cells to $10^{-12}$. Of its five findings,
+three were fixed on 15 November: a procedure-1 verdict no longer reads a
+$w_{\rm cal}$ sidecar, the procedure-2 calibrated block has an end-to-end
+test, and the committed procedure-1 verdict for
+\texttt{prime-toy-reference-e1} re-derives byte for byte again after an
+interval method had drifted since 23 October.
+
 \section{References that lacked the negation map}\label{sec:mr-negaudit}
 
 The negation-map audit of 20 October
@@ -813,6 +984,32 @@ An earlier fix in the collaborative walker
 negation-map 2-cycle test compared an unflipped sum with a normalised
 point and never fired; dead trails fell from 353 to 16 across three
 curves once it compared after the flip.
+
+\paragraph{Transfer rows re-measured against the negation walk.} The
+chained-transfer rows of Chapter~\ref{ch:jacobians} were first ranked
+against a plain rho. A validator pass of 13 November
+(\art{research/validation_20261112/REPORT.md}) reproduced all four of its
+targets but refused admission to three, the v3 chain, \texttt{tower\_large}
+and \texttt{cover\_pushforward}, because their reference was plain rho
+($A=1$) where the negation map exists and rho's native work was not emitted.
+It admitted the fourth, the small-discriminant endomorphism base, with
+caveats: index calculus is above the best matched rho (plain, negation or
+automorphism) in 120 of 120 arm-cells at $0$, $0.1$ and $1$\,GAE, with
+smallest ratios $2.325$, $7.616$ and $40.156$. The re-measurement against the
+tuned negation walk in the same process, with the walk's native work
+emitted and priced, is validated
+(\art{research/negation_remeasure_20261113/RESULTS.md},
+\art{research/validation_20261113/REPORT.md}; \texttt{[pcc:unverified]}, no
+claim id) and its rows are in \S\ref{sec:jac-chain}. For the reference
+itself it shows three things. The plain walk spent about 400 operations on
+set-up where the negation walk spends 50--80, and its totals are
+$4.35$--$9.22\times$ the negation walk's. The 15 cover rows that had read
+below plain rho at $p=211$--3203 (ratios $0.17$--$0.85$) were that set-up,
+not a property of the cover; of 162 arm-rows none is below the negation rho
+at all three prices. And once the negation walk's canonicalisations are
+priced, the genus-3 tower distance at $w=1$ shrinks by the factor $0.62$, so
+the plain reference did not understate every gap at every price. This is an
+accounting correction of the reference, not an index-calculus change.
 
 \begin{figure}[t]
 \centering
@@ -1321,6 +1518,28 @@ The third round is an accounting correction against index calculus: the
 8-bit reference walk was slow at large $N$, so the early genus-2 to -4
 ratios that read below rho are lower bounds (Chapter~\ref{sec:transfer}).
 
+\paragraph{Which genus-3 Jacobians reach a plane quartic.} The genus-3
+transfer rows are ranked against a rho on the Jacobian only when a
+hyperelliptic Jacobian can be carried to a plane quartic, and Smith's
+explicit $(2,2,2)$-isogeny does that only when his conditions pass. The
+first genus-ladder run saw 1 of 28 admitted near-prime curves pass. A census
+frozen before data (\art{research/smith_near_prime_20261114/RESULTS.md};
+7{,}702 squarefree curves $y^2=f(x)$, $\deg f=7$, over five primes
+$p=67$--$1031$, one session, \texttt{[pcc:unverified]}) found the pass rate
+$0.173$ $[0.165,0.182]$ over all curves, $0.108$ $[0.088,0.132]$ over curves
+with cofactor $h\le8$ and $0.051$ $[0.030,0.087]$ with $h\le2$ (Wilson 95\%
+intervals). The number $k$ of irreducible factors of $f$ explains the drop:
+the pass rate is $0$, $0.128$, $0.198$, $0.287$ and $0.505$ for $k=1$--5
+over all curves, and a mixture of these rates with the admitted
+$k$-distribution predicts $0.119$ against the measured $0.108$. For $k=1$
+the Jacobian has no rational 2-torsion, so no tractable subgroup exists; 0
+of 1{,}110 such curves passed, as the theorem requires. A prime-order
+odd-degree genus-3 Jacobian therefore has no Smith isogeny in this model,
+it stays open for cofactors divisible by 2 at the rates above. For
+cryptographic instances the published $18.57\%$ overstates the share by a
+factor of 2 to~3. All six frozen
+predictions held. Even-degree models were not measured.
+
 \section{Kangaroo, BSGS, the pair claw and store-all schedules}\label{sec:rv-memory}
 
 \paragraph{Kangaroo.} \texttt{kangaroo.vow} is never an operations
@@ -1422,6 +1641,60 @@ the fastest in 30 of 36 configurations. There a canonicalisation plus a
 hash costs $0.005$--$0.009$\,GAE and a step index $0.002$--$0.006$\,GAE,
 while a hash-table lookup costs up to $0.85$\,GAE at $2^{24}$ entries
 (\art{research/mt_timed_20261112/RESULTS.md}).
+
+\paragraph{Restarts and distinguished points on $j=0$ curves.} The E-222
+campaign's $j=0$ line (\S\ref{sec:pt-e222}) built a multi-target rho folded
+by the order-6 automorphism group and found two defects in it, each of which
+had made a symmetric multi-target index calculus look ahead
+(\art{research/ic_e222_m221_20261106/RESULTS_prime_fast_j0_sym.md}; one
+local host, wall time, \texttt{[pcc:unverified]}). An unbatched walk was
+replaced by 128 lock-step lanes with one batch inversion per round. New
+walks were drawn from all $T$ targets, solved or not, so the last unknown
+logarithms were reached coupon-collector style; with Kuhn--Struik restarts
+from unsolved targets only, rho is faster than the symmetric IC in every
+cell at 26--30 bits ($T=20$--3000), and the earlier reading of the IC
+$2.0$--$2.5\times$ ahead at $T=3000$ is withdrawn. A distinguished-point
+rule $\mathrm{dp}=\mathrm{round}(\log_2(W/T)-1.5)$ with
+$W=\sqrt{2nT/6}$, tuned on held-out targets, then cut rho's time to
+$0.38$--$0.97$ of the old rule and left it at $1.45$--$3.31\,W$ steps. An
+interleaved study frozen before its rows (six rounds per cell, fresh shared
+targets, all six arm orders, an A/A arm) compared that rho with a
+multi-target BSGS folded by the same group
+(\art{research/ic_e222_m221_20261106/interleaved_rho_bsgs/README.md}).
+Table~\ref{tab:rv-j0-bsgs} gives the cells: BSGS is faster at 26--28 bits,
+the two are tied at 30, and rho is faster at 32 bits with $T=3000$ and at 34
+bits with $T\ge1000$. Memory traffic of the BSGS table (up to $2.93$M
+13-byte slots) is a plausible cause that was not profiled. Both generic arms
+are well ahead of index calculus at every size.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrrll@{}}
+\toprule
+bits & $T$ & rho ms & BSGS ms & rho/BSGS [95\%] & verdict \\
+\midrule
+26 & 200 & 9.3 & 5.0 & $1.98$ $[1.80,2.22]$ & BSGS faster \\
+26 & 1000 & 23.6 & 13.4 & $1.76$ $[1.68,1.81]$ & BSGS faster \\
+28 & 200 & 15.8 & 12.2 & $1.31$ $[1.18,1.46]$ & BSGS faster \\
+28 & 1000 & 34.4 & 27.2 & $1.27$ $[1.20,1.34]$ & BSGS faster \\
+28 & 3000 & 88.0 & 62.3 & $1.43$ $[1.35,1.54]$ & BSGS faster \\
+30 & 200 & 26.4 & 27.4 & $0.97$ $[0.88,1.06]$ & unresolved \\
+30 & 1000 & 60.8 & 63.2 & $0.99$ $[0.92,1.04]$ & unresolved \\
+30 & 3000 & 126.8 & 125.2 & $1.00$ $[0.93,1.07]$ & unresolved \\
+32 & 3000 & 208.5 & 287.5 & $0.75$ $[0.71,0.79]$ & rho faster \\
+34 & 1000 & 208.4 & 349.2 & $0.61$ $[0.56,0.64]$ & rho faster \\
+34 & 3000 & 361.8 & 611.9 & $0.59$ $[0.57,0.62]$ & rho faster \\
+\bottomrule
+\end{tabular}
+\caption[]{Multi-target rho against multi-target BSGS, both folded by the
+order-6 automorphism group of $j=0$ curves; wall ms per problem, six
+interleaved rounds per cell, 2 curves $\times$ 2 instances. Cells whose A/A
+interval excludes 1 carry no verdict and are omitted (26 bits $T=20$; 32
+bits $T=200$, 1000; 34 bits $T=200$). Local host, not isolated, no band,
+\texttt{[pcc:unverified]}. Source:
+\art{research/ic_e222_m221_20261106/interleaved_rho_bsgs/README.md}.}
+\label{tab:rv-j0-bsgs}
+\end{table}
 
 \section{Advice tables}\label{sec:rv-advice}
 

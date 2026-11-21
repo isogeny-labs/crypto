@@ -1,0 +1,26 @@
+# Binary comparison (validator, 2026-11-18T21:32:38Z)
+producer binary (copied and hashed at dispatch 2026-11-18T21:15:08Z, before any validator build): 493ee2942473b8708a0b52f40ab10095c4da83ab0f0755ed3e5dbc02771b6921  size 7667848
+binary.sha256 (frozen at 6da1e3c5b2): 493ee2942473b8708a0b52f40ab10095c4da83ab0f0755ed3e5dbc02771b6921  genus_ladder at ca72267899 (f_irreducible prefilter)
+validator rebuild from git archive ca72267899 (paths.py, 5521 paths, list sha256 9fcf42d1ffe03d82ac46aaf3e81b539d329ca354dd707a2269c9c8ec015226eb): ac1dc60d8cf2d18956ec78ae381471069d3199ee6b7f77192f8505890845c276  size 7667880
+toolchain: rustc 1.97.0 (2d8144b78 2026-07-07); cargo 1.97.0 (c980f4866 2026-06-30)
+build log:    Compiling crypto v0.1.0 (/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/val4po/src_ca72267899) /     Finished `release` profile [optimized] target(s) in 13m 12s
+
+## allocated sections (objcopy -O binary --only-section, sha256 prefix)
+.text prod=ec82aab26ca2f6a3 val=ec82aab26ca2f6a3 SAME
+.rodata prod=f47b13caf3ab0416 val=f47b13caf3ab0416 SAME
+.data prod=48b1cd2d439541d7 val=48b1cd2d439541d7 SAME
+.data.rel.ro prod=57937a4fed7c2888 val=57937a4fed7c2888 SAME
+.eh_frame prod=93122f49e678425b val=93122f49e678425b SAME
+.eh_frame_hdr prod=ff566153eeb4390f val=ff566153eeb4390f SAME
+.gcc_except_table prod=e0337689c502563c val=e0337689c502563c SAME
+.init_array prod=374708fff7719dd5 val=374708fff7719dd5 SAME
+.got prod=f91e5a26850bcaed val=f91e5a26850bcaed SAME
+.note.gnu.build-id prod=7cbe5c0fe1611655 val=efbec412bc0d0012 DIFF
+
+## section size table diff (readelf -SW name size)
+36c36
+< .strtab 1724a8
+---
+> .strtab 1724cc
+
+## symbols: 57320 / 57320; address+type columns differ in 0 lines; names differ in 36 symbols; differing names with the .llvm.<hash> suffix removed: 0

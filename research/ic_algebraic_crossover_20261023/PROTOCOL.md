@@ -308,3 +308,23 @@ elements, their strong-rho canonical forms and the literal source-pinned
 four-bit distinguished-point predicate. This is a post-outcome diagnosis,
 not a new timing comparison, parameter selection or replacement of the
 failed panel. Preserve its complete JSON, exact source hashes and report.
+
+## Amendment 6: correction of the earlier pricing explanation (2026-10-25)
+
+The prior disclosure that completed n=13/n=23 raw S includes solver wall time
+was incorrect. Their raw records explicitly say priced_by=pinned; integer
+word counts use fixed GAE rates. The n=7 measured solver estimate is removed
+by ic_report. The presence of SolverCost.wall_ns does not establish a wall
+charge. The earlier protocol text and PDFs remain historical evidence of
+that mistake, superseded by this amendment and the corrected reports.
+
+PRICING_AUDIT_PROTOCOL.md and native ic_campaign_pricing_audit independently
+rebuild available IC costs from group/native counts and named fixed prices.
+The audit also reconstructs the quartic adapter's deterministic virtual
+F_q-operation conversions. The ordinary band tool refuses the new quartic
+curves because those virtual rows are absent from its global table; preserve
+that refusal. A compatibility reconstruction and an additional all-native
+solver scenario are labeled separately; neither changes old records or
+represents a new algorithmic gain. Uncounted work remains missing, and no
+complete-price promotion follows. Experiment parameters and the original
+requirement register are unchanged.

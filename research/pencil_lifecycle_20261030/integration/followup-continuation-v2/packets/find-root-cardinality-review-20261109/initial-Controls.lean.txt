@@ -1,0 +1,29 @@
+-- Prospective finite controls, not compiled.
+import FindRootCardinality
+import Mathlib.Tactic.NormNum
+namespace FindRootCardinalityControls
+open FindRootCardinality GraphFind SignedGraphAlgebra
+def chain : GraphFind.State ℚ 3 :=
+  ⟨fun i => if i = 2 then 1 else 0, fun _ => GraphFind.ident⟩
+def rho : Fin 3 → Fin 3 := fun _ => 0
+def q : Potential ℚ := SignedGraphAlgebra.compose (chain.pot 1) GraphFind.ident
+def middle : GraphFind.State ℚ 3 := GraphFind.compress chain 1 0 q
+def outPot : Potential ℚ := SignedGraphAlgebra.compose (middle.pot 2) q
+def compressed : GraphFind.State ℚ 3 := GraphFind.compress middle 2 0 outPot
+theorem actual_run : Run chain 2 compressed 0 outPot := by
+  apply Run.step chain middle 2 0 q (by decide)
+  change Run chain 1 middle 0 q
+  exact Run.step chain chain 1 0 GraphFind.ident (by decide) (Run.root chain 0 (by decide))
+def sizes : UnionSize.Sizes 3 := ⟨#[3, 2, 1], by decide⟩
+theorem original_root_map : RootMap chain rho := by decide
+theorem compressed_root_map : RootMap compressed rho := by decide
+theorem component_has_three : (component rho 0).card = 3 := by decide
+theorem root_size_is_three (h : System.Platform.numBits = 64) : (UnionSize.sizeAt sizes 0).toNat = 3 := by
+  simp [UnionSize.sizeAt, sizes, USize.toNat_ofNat, USize.size, h]
+theorem stale_child_not_component_size (h : System.Platform.numBits = 64) :
+  (UnionSize.sizeAt sizes 1).toNat ≠ (component rho 0).card := by
+  rw [component_has_three]
+  simp [UnionSize.sizeAt, sizes, USize.toNat_ofNat, USize.size, h]
+theorem unrelated_root_fails_map :
+  ¬RootMap chain (fun _ => 2) := by decide
+end FindRootCardinalityControls

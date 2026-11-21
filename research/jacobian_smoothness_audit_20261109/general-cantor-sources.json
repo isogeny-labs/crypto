@@ -1,0 +1,36 @@
+{
+  "schema": "general-cantor-source-plan/v1",
+  "status": "Preissue source/plan. No witness-generator curve call yet.",
+  "formal": {
+    "project": "research/jacobian_smoothness_audit_20261109/lean",
+    "theorem": "MumfordStollGeneralAudit.run_output_unique",
+    "decl_sha256": "2ee5cb96672a164abe1937a0c8023cdb4986b286e32b23db0775f82bbca4491b",
+    "statement": "theorem run_output_unique (a b c : K[X]) (P Q R S : ReducedPair) (hR : GeneralCantorRun a b c P Q R) (hS : GeneralCantorRun a b c P Q S) : R=S",
+    "source": {
+      "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordStollGeneral.lean",
+      "bytes": 4225,
+      "sha256": "18251bbe5736ac0e5759b9127799ac726f58e299ddd59d0af82cb3c7e3fb4775"
+    },
+    "gate": {
+      "path": "evidence/stoll-general-gate.log",
+      "declarations": 352,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Fixed Bezout algorithm choices determine actual polynomial run output uniquely, with arbitrary nonzero reduction-normalization unit. No full100existence or ambient/Picard group assertion."
+  },
+  "native_plan": {
+    "source_plan": "stoll-witness-v1/sources.json",
+    "protocol_draft": "stoll-witness-v1/protocol.json",
+    "calls": 0,
+    "arms": [
+      "cycle25",
+      "full100"
+    ],
+    "input": "existing C++checked fixed model1/F3raw table; reference hashes in protocol",
+    "source_commit_required_before_calls": true,
+    "frozen_protocol_commit_required_before_calls": true
+  },
+  "prior_sources": "stoll-sources.json primary Stoll2014Theorem4.18and pinned native curve471\u2013563/fp_poly190\u2013287read",
+  "paid_spend": 0
+}

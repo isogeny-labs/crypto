@@ -1,0 +1,27 @@
+✖ [3331/3331] Building CryptoLean.Group.SubsetFourier (2.7s)
+warning: CryptoLean/Group/SubsetFourier.lean: imports `Mathlib.Analysis.Fourier.FiniteAbelian.PontryaginDuality` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: CryptoLean/Group/SubsetFourier.lean: imports `Mathlib.Combinatorics.Additive.Convolution` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: CryptoLean/Group/SubsetFourier.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/workspace/scratch/mathlib4/.lake/packages/Cli/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/batteries/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/Qq/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/aesop/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/packages/plausible/.lake/build/lib/lean:/workspace/scratch/mathlib4/.lake/build/lib/lean:/workspace/scratch/crypto-lean/.lake/build/lib/lean /home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean /workspace/scratch/crypto-lean/CryptoLean/Group/SubsetFourier.lean -o /workspace/scratch/crypto-lean/.lake/build/lib/lean/CryptoLean/Group/SubsetFourier.olean -i /workspace/scratch/crypto-lean/.lake/build/lib/lean/CryptoLean/Group/SubsetFourier.ilean -c /workspace/scratch/crypto-lean/.lake/build/ir/CryptoLean/Group/SubsetFourier.c --setup /workspace/scratch/crypto-lean/.lake/build/ir/CryptoLean/Group/SubsetFourier.setup.json --json
+warning: CryptoLean/Group/SubsetFourier.lean:105:12: This simp argument is unused:
+  norm_mul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [norm_pow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+error: CryptoLean/Group/SubsetFourier.lean:137:29: Invalid field `mp`: The environment does not contain `Function.mp`, so it is not possible to project the field `mp` from an expression
+  mul_le_mul_left ?m.207
+of type
+  ∀ (a : ?m.201), ?m.202 * a ≤ ?m.203 * a
+error: CryptoLean/Group/SubsetFourier.lean:137:25: Application type mismatch: The argument
+  hr
+has type
+  0 < ↑(Fintype.card G)
+but is expected to have type
+  ?m.202 ≤ ?m.203
+in the application
+  mul_le_mul_left hr
+Some required targets logged failures:
+- CryptoLean.Group.SubsetFourier
+error: build failed

@@ -1,0 +1,22 @@
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+GeneralS4.lean:19:27: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+a b c d e f : K
+hm : (quadratic a b c).sylvester (quadratic d e f) 2 2 = !![f, 0, c, 0; e, f, b, c; d, e, a, b; 0, d, 0, a]
+⊢ -(f * a * b * e) - f * a * d * c + f * b ^ 2 * d - f * d * c * ![0, d, 0, a] (Fin.succAbove 2 2) + f ^ 2 * a ^ 2 -
+          e * d * c * ![d, e, a, b] (Fin.succAbove 2 2) +
+        e ^ 2 * c * ![0, d, 0, a] (Fin.succAbove 2 2) +
+      d ^ 2 * c * ![e, f, b, c] (Fin.succAbove 2 2) =
+    -(f * a * b * e) - f * a * d * c * 2 + f * b ^ 2 * d + f ^ 2 * a ^ 2 + a * e ^ 2 * c - b * e * d * c + d ^ 2 * c ^ 2
+'GeneralS4Audit.quadratic_resultant' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'GeneralS4Audit.generalS4_repeated_pairs' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+GeneralS4.lean:75:0: error: Unexpected name `GeneralS4Audit` after `end`: The current section is unnamed
+
+Hint: Delete the name `GeneralS4Audit` to end the current unnamed scope; outer named scopes can then be closed using additional `end` command(s):
+  end ̵G̵e̵n̵e̵r̵a̵l̵S̵4̵A̵u̵d̵i̵t̵

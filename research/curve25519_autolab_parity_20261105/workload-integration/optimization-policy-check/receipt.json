@@ -1,0 +1,37 @@
+{
+  "argv": [
+    "rustc",
+    "--edition=2021",
+    "--test",
+    "-O",
+    "/tmp/curve25519-optimization-policy-check/harness.rs",
+    "-L",
+    "dependency=/tmp/curve25519-autolab-target/release/deps",
+    "-o",
+    "/tmp/curve25519-optimization-policy-check/tests",
+    "--extern",
+    "crypto_lib=/tmp/curve25519-autolab-target/release/deps/libcrypto_lib-bd818e59d6c43732.rlib",
+    "--extern",
+    "serde=/tmp/curve25519-autolab-target/release/deps/libserde-0bf82e85196bd177.rlib",
+    "--extern",
+    "serde_json=/tmp/curve25519-autolab-target/release/deps/libserde_json-458049281485fb75.rlib"
+  ],
+  "source_sha256": "78ffffa9723a53e7c47fb700ce3960a46825e51f860854148ed2c0080891a051",
+  "dependencies": {
+    "crypto_lib": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libcrypto_lib-bd818e59d6c43732.rlib",
+      "sha256": "bd70542534c0486e94f928f5866db0eef6c8da874d2a067b12b5fe758a7f92af"
+    },
+    "serde": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libserde-0bf82e85196bd177.rlib",
+      "sha256": "cbac69b55153b66829730eadf96cebdab42790a455f762d476b44f4113f14168"
+    },
+    "serde_json": {
+      "path": "/tmp/curve25519-autolab-target/release/deps/libserde_json-458049281485fb75.rlib",
+      "sha256": "688d29f94eb42520a78a31271704f90a8b370dbce6f8c65551fc1cf41b002019"
+    }
+  },
+  "build_exit": 0,
+  "test_exit": 0,
+  "scope": "patched optimization module against actual compiled crate registry"
+}

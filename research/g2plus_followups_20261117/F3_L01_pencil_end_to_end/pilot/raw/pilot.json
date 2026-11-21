@@ -1,0 +1,253 @@
+{
+ "order_method": {
+  "pass": true,
+  "study_size": {
+   "J": 66919357,
+   "a1": 23,
+   "a2": 15291,
+   "bsgs_group_ops": 459,
+   "p": 8191,
+   "s": 1,
+   "weil_hi": 68574961,
+   "weil_lo": 62742241
+  },
+  "tiny": [
+   {
+    "Jcheap": 200,
+    "Jref": 200,
+    "match": true,
+    "p": 13,
+    "s": 1
+   },
+   {
+    "Jcheap": 200,
+    "Jref": 200,
+    "match": true,
+    "p": 17,
+    "s": 1
+   },
+   {
+    "Jcheap": 236,
+    "Jref": 236,
+    "match": true,
+    "p": 19,
+    "s": 1
+   },
+   {
+    "Jcheap": 386,
+    "Jref": 386,
+    "match": true,
+    "p": 23,
+    "s": 1
+   },
+   {
+    "Jcheap": 732,
+    "Jref": 732,
+    "match": true,
+    "p": 29,
+    "s": 1
+   },
+   {
+    "Jcheap": 1300,
+    "Jref": 1300,
+    "match": true,
+    "p": 37,
+    "s": 1
+   },
+   {
+    "Jcheap": 2860,
+    "Jref": 2860,
+    "match": true,
+    "p": 53,
+    "s": 1
+   },
+   {
+    "Jcheap": 10276,
+    "Jref": 10276,
+    "match": true,
+    "p": 101,
+    "s": 1
+   }
+  ],
+  "tiny_mismatches": 0
+ },
+ "pencil_arm_gate": {
+  "g2_p131": {
+   "J": 19816,
+   "L_determined": 74,
+   "L_mismatch": 0,
+   "N": [
+    150,
+    17394
+   ],
+   "consistent": true,
+   "curve_seed": 1,
+   "descent_rows": 6,
+   "g": 2,
+   "h": 8,
+   "hom_rank": 73,
+   "labelled_rels": 50,
+   "labelled_rels_bad": 0,
+   "n_cols": 74,
+   "order_check_ok": true,
+   "p": 131,
+   "pass": true,
+   "pencil_rows": 228,
+   "pencil_rows_bad": 0,
+   "pf_status": "ok",
+   "r": 2477,
+   "schema": "L01.gate/v1",
+   "seeds_tried": 1,
+   "status": "ok",
+   "t_planted": 29,
+   "t_recovered": 29
+  },
+  "g2_p257": {
+   "J": 66485,
+   "L_determined": 129,
+   "L_mismatch": 0,
+   "N": [
+    259,
+    66403
+   ],
+   "consistent": true,
+   "curve_seed": 1,
+   "descent_rows": 6,
+   "g": 2,
+   "h": 5,
+   "hom_rank": 128,
+   "labelled_rels": 50,
+   "labelled_rels_bad": 0,
+   "n_cols": 129,
+   "order_check_ok": true,
+   "p": 257,
+   "pass": true,
+   "pencil_rows": 418,
+   "pencil_rows_bad": 0,
+   "pf_status": "ok",
+   "r": 13297,
+   "schema": "L01.gate/v1",
+   "seeds_tried": 1,
+   "status": "ok",
+   "t_planted": 12740,
+   "t_recovered": 12740
+  }
+ },
+ "pencil_arm_pass": true,
+ "pencil_split_rate": {
+  "model_per_tuple": 1365.1666666666667,
+  "n_cols": 4054,
+  "obs_per_tuple": 1332.75,
+  "p": 8191,
+  "pass": true,
+  "per_tuple": [
+   1337,
+   1334,
+   1339,
+   1321
+  ],
+  "ratio_obs_over_model": 0.9762544255890611,
+  "s": 3,
+  "tuples": 4
+ },
+ "rho_recover_tiny": {
+  "pass": true,
+  "rows": [
+   {
+    "group_ops": 44,
+    "p": 131,
+    "r": 2477,
+    "steps": 40,
+    "t": 1004,
+    "t_rec": 1004,
+    "verify": true
+   },
+   {
+    "group_ops": 148,
+    "p": 257,
+    "r": 13297,
+    "steps": 146,
+    "t": 10559,
+    "t_rec": 10559,
+    "verify": true
+   },
+   {
+    "group_ops": 443,
+    "p": 521,
+    "r": 66739,
+    "steps": 432,
+    "t": 56847,
+    "t_rec": 56847,
+    "verify": true
+   }
+  ]
+ },
+ "rho_step_calibration": {
+  "all_verify": true,
+  "expected_sqrt_pi_r_2": 3629.9796448219186,
+  "mean_steps_over_expected": 1.2947042297342035,
+  "p": 8191,
+  "r": 8388581,
+  "runs": [
+   {
+    "group_ops": 4589,
+    "seed": 1,
+    "steps": 4520,
+    "steps_over_expected": 1.2451860457255386,
+    "t_rec": 6363195,
+    "verify": true
+   },
+   {
+    "group_ops": 2837,
+    "seed": 2,
+    "steps": 2790,
+    "steps_over_expected": 0.7685993512332417,
+    "t_rec": 6363195,
+    "verify": true
+   },
+   {
+    "group_ops": 5546,
+    "seed": 3,
+    "steps": 5480,
+    "steps_over_expected": 1.5096503386229982,
+    "t_rec": 6363195,
+    "verify": true
+   },
+   {
+    "group_ops": 6102,
+    "seed": 4,
+    "steps": 6009,
+    "steps_over_expected": 1.6553811833550358,
+    "t_rec": 6363195,
+    "verify": true
+   }
+  ],
+  "s": 10,
+  "t_planted": 6363195
+ },
+ "walk_arm_recover": {
+  "consistent": true,
+  "n_cols": 132,
+  "order_check": true,
+  "p": 251,
+  "pass": true,
+  "r": 2087,
+  "rows_collected": 138,
+  "s": 2,
+  "t": 409,
+  "t_rec": 409
+ },
+ "walk_split_rate": {
+  "J": 67295732,
+  "cand": 15000,
+  "model": 0.5011712184065402,
+  "n_cols": 4107,
+  "obs": 0.5069333333333333,
+  "p": 8191,
+  "pass": true,
+  "ratio_obs_over_model": 1.0114972981591273,
+  "s": 5,
+  "splits": 7604
+ },
+ "wall_seconds": 76.0
+}

@@ -1,0 +1,23 @@
+[package]
+name = "g6-large-m"
+version = "0.1.0"
+edition = "2021"
+description = "Cell G6: profile-matched exact-enumeration census of Frobenius-structured (normal-basis) versus generic slot partitions at m = 9..20, plus the iota identity audit and exact encoding-size formulas"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "g6census"
+path = "src/main.rs"
+
+[dependencies]
+
+[profile.release]
+opt-level = 3
+debug = false
+
+[profile.test]
+opt-level = 2
+
+[workspace]

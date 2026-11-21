@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T06:25:11Z",
+ "id": "PCC-20261117-e9f39d",
+ "kind": "statement",
+ "producer": {
+  "commit": "c5cbb67b19fe39864da7f8c9b29726696ba01580",
+  "model": "",
+  "session": "codex-nagao-e2e-20261117"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "pcc/claims/PCC-20261117-6432aa.json",
+    "sha256": "fdefe103661540ed14bc9de03728f7143c71c4651cca630c2f443fb802a8ac6f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/nagao-e2e/results/original-ledger-fork.jsonl",
+    "sha256": "a013b6a32cb68f2fb64607261542180d445340cf9226511385f7b14f303c9a3a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/nagao-e2e/results/summary.json",
+    "sha256": "e2263bb4fe0584c5852585ba2959eed613baf844f293896c3981a030ff880b28"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/nagao-e2e/results/local-custody.json",
+    "sha256": "b57f18b33959a49ed5586210bce35d5720e386ea368bab21c9b9414cf162984d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/nagao-e2e/report.pdf",
+    "sha256": "e95d537d1ce4ad22e901f0bce59df6ead08ca42ea39c26f4418acb24bd339c89"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "extension-ic/nagao-e2e",
+ "statement": "Canonical fixed-case E2E data registration retaining original proposal feaf31 and data6432aa unchanged. All24fresh recoveries, independent checks and local isolation/A/A controls pass. Five measurement calls per method yield complete worker-process medians20.714492434s existing graph IC,21.101767406s unit-eliminated graph IC,111.402041183s registered native rho. Paired candidate/baseline geometric ratio0.998319646, bootstrap95 interval0.967250591..1.027166362, does not demonstrate E2E improvement. Known-answer weak Fp6 case only; no general parity or complete-operation-price assertion. All109raw members remain untruncated in hash-bound LOCAL custody, no authenticated artifact-store upload identity available."
+}

@@ -1,0 +1,23 @@
+warning: field `basis` is never read
+  --> scheduler.rs:50:26
+   |
+50 | pub struct Reducer { pub basis:usize, pub multiplier:Monomial, pub row:usize }
+   |            -------       ^^^^^
+   |            |
+   |            field in this struct
+   |
+   = note: `Reducer` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `degree` is never read
+  --> scheduler.rs:55:6
+   |
+54 | pub struct Batch {
+   |            ----- field in this struct
+55 |  pub degree:usize, pub tasks:Vec<Task>, pub initial:Vec<Row>, pub matrix:Vec<Row>,
+   |      ^^^^^^
+   |
+   = note: `Batch` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: 2 warnings emitted
+

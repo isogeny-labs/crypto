@@ -15,17 +15,43 @@ pub(super) struct Arithmetic {
     pub sqrt_calls: u64,
 }
 thread_local! { static COUNTS: Cell<Arithmetic> = const { Cell::new(Arithmetic { additions: 0, subtractions: 0, multiplications: 0, inverse_calls: 0, sqrt_calls: 0 }) }; }
+thread_local! { static COUNTER_OVERFLOW: Cell<bool> = const { Cell::new(false) }; }
 pub(super) fn counts() -> Arithmetic {
     COUNTS.with(Cell::get)
 }
-fn tick(f: impl FnOnce(&mut Arithmetic)) {
+fn increment(counter: &mut u64) -> bool {
+    let (next, overflowed) = counter.overflowing_add(1);
+    *counter = next;
+    overflowed
+}
+fn tick(f: impl FnOnce(&mut Arithmetic) -> bool) {
     COUNTS.with(|c| {
         let mut v = c.get();
-        f(&mut v);
+        if f(&mut v) {
+            COUNTER_OVERFLOW.with(|flag| flag.set(true));
+        }
         c.set(v);
     });
 }
 impl Arithmetic {
+    pub fn checked_add(self, other: Self) -> Option<Self> {
+        Some(Self {
+            additions: self.additions.checked_add(other.additions)?,
+            subtractions: self.subtractions.checked_add(other.subtractions)?,
+            multiplications: self.multiplications.checked_add(other.multiplications)?,
+            inverse_calls: self.inverse_calls.checked_add(other.inverse_calls)?,
+            sqrt_calls: self.sqrt_calls.checked_add(other.sqrt_calls)?,
+        })
+    }
+    fn checked_since(self, old: Self) -> Option<Self> {
+        Some(Self {
+            additions: self.additions.checked_sub(old.additions)?,
+            subtractions: self.subtractions.checked_sub(old.subtractions)?,
+            multiplications: self.multiplications.checked_sub(old.multiplications)?,
+            inverse_calls: self.inverse_calls.checked_sub(old.inverse_calls)?,
+            sqrt_calls: self.sqrt_calls.checked_sub(old.sqrt_calls)?,
+        })
+    }
     pub fn since(self, old: Self) -> Self {
         Self {
             additions: self.additions - old.additions,
@@ -36,16 +62,69 @@ impl Arithmetic {
         }
     }
 }
+
+/// Synchronous current-thread helper calls only. Captures must be disjoint;
+/// inverse/sqrt diagnostics overlap expanded multiplication children.
+#[derive(Clone, Copy, Debug, serde::Serialize, PartialEq, Eq)]
+pub(super) struct Work {
+    pub arithmetic: Option<Arithmetic>,
+    pub calls: Option<u64>,
+    pub failures: Option<u64>,
+}
+impl Default for Work {
+    fn default() -> Self {
+        Self {
+            arithmetic: Some(Arithmetic::default()),
+            calls: Some(0),
+            failures: Some(0),
+        }
+    }
+}
+impl Work {
+    pub fn merge(&mut self, other: Self) {
+        self.arithmetic = self
+            .arithmetic
+            .zip(other.arithmetic)
+            .and_then(|(a, b)| a.checked_add(b));
+        self.calls = self
+            .calls
+            .zip(other.calls)
+            .and_then(|(a, b)| a.checked_add(b));
+        self.failures = self
+            .failures
+            .zip(other.failures)
+            .and_then(|(a, b)| a.checked_add(b));
+        if self.calls.is_none() || self.failures.is_none() {
+            self.arithmetic = None;
+        }
+    }
+    pub fn capture<T, E>(&mut self, operation: impl FnOnce() -> Result<T, E>) -> Result<T, E> {
+        let before = counts();
+        let already_overflowed = COUNTER_OVERFLOW.with(Cell::get);
+        let result = operation();
+        let delta = if already_overflowed || COUNTER_OVERFLOW.with(Cell::get) {
+            None
+        } else {
+            counts().checked_since(before)
+        };
+        self.merge(Self {
+            arithmetic: delta,
+            calls: Some(1),
+            failures: Some(u64::from(result.is_err())),
+        });
+        result
+    }
+}
 pub(super) fn mulm(a: u64, b: u64, p: u64) -> u64 {
-    tick(|c| c.multiplications += 1);
+    tick(|c| increment(&mut c.multiplications));
     ((a as u128 * b as u128) % p as u128) as u64
 }
 pub(super) fn addm(a: u64, b: u64, p: u64) -> u64 {
-    tick(|c| c.additions += 1);
+    tick(|c| increment(&mut c.additions));
     (a + b) % p
 }
 pub(super) fn subm(a: u64, b: u64, p: u64) -> u64 {
-    tick(|c| c.subtractions += 1);
+    tick(|c| increment(&mut c.subtractions));
     (a + p - b) % p
 }
 pub(super) fn powm(mut a: u64, mut e: u64, p: u64) -> u64 {
@@ -60,12 +139,12 @@ pub(super) fn powm(mut a: u64, mut e: u64, p: u64) -> u64 {
     r
 }
 pub(super) fn invm(a: u64, p: u64) -> u64 {
-    tick(|c| c.inverse_calls += 1);
+    tick(|c| increment(&mut c.inverse_calls));
     powm(a, p - 2, p)
 }
 /// Tonelli–Shanks; `None` for a non-residue.
 pub(super) fn sqrtm(a: u64, p: u64) -> Option<u64> {
-    tick(|c| c.sqrt_calls += 1);
+    tick(|c| increment(&mut c.sqrt_calls));
     if a == 0 {
         return Some(0);
     }
@@ -680,4 +759,76 @@ pub(super) fn validate_parameters(inst: &Instance, m: usize) -> Result<(), Strin
         return Err("singular curve".into());
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod helper_work_tests {
+    use super::*;
+
+    #[test]
+    fn result_errors_keep_helper_work_without_charging_calls_between_scopes() {
+        let mut first = Work::default();
+        let result: Result<u64, &str> = first.capture(|| Ok(mulm(2, 3, 17)));
+        assert_eq!(result, Ok(6));
+        let _unscoped = mulm(7, 8, 17);
+        let mut refused = Work::default();
+        let result = refused.capture(|| {
+            assert_eq!(invm(2, 17), 9);
+            assert_eq!(addm(1, 2, 17), 3);
+            assert_eq!(subm(3, 1, 17), 2);
+            Err::<(), _>("late refusal")
+        });
+        assert_eq!(result, Err("late refusal"));
+        first.merge(refused);
+        assert_eq!(first.calls, Some(2));
+        assert_eq!(first.failures, Some(1));
+        assert_eq!(
+            first.arithmetic,
+            Some(Arithmetic {
+                additions: 1,
+                subtractions: 1,
+                multiplications: 9,
+                inverse_calls: 1,
+                sqrt_calls: 0,
+            })
+        ); // inverse diagnostic overlaps its eight multiplication children
+    }
+
+    #[test]
+    fn helper_counter_and_aggregate_overflow_are_unavailable_without_changing_math() {
+        std::thread::spawn(|| {
+            COUNTS.with(|counts| {
+                counts.set(Arithmetic {
+                    multiplications: u64::MAX,
+                    ..Arithmetic::default()
+                })
+            });
+            let mut work = Work::default();
+            let value: Result<u64, &str> = work.capture(|| Ok(mulm(2, 3, 17)));
+            assert_eq!(value, Ok(6));
+            assert!(work.arithmetic.is_none());
+            assert_eq!(work.calls, Some(1));
+            let mut later = Work::default();
+            let value: Result<u64, &str> = later.capture(|| Ok(addm(1, 2, 17)));
+            assert_eq!(value, Ok(3));
+            assert!(later.arithmetic.is_none()); // sticky underlying overflow
+        })
+        .join()
+        .unwrap(); // isolated thread cannot taint other tests' counters
+        let mut aggregate = Work {
+            arithmetic: Some(Arithmetic {
+                additions: u64::MAX,
+                ..Arithmetic::default()
+            }),
+            ..Work::default()
+        };
+        aggregate.merge(Work {
+            arithmetic: Some(Arithmetic {
+                additions: 1,
+                ..Arithmetic::default()
+            }),
+            ..Work::default()
+        });
+        assert!(aggregate.arithmetic.is_none());
+    }
 }

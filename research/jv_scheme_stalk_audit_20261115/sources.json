@@ -1,0 +1,427 @@
+{
+  "schema": "jv-scheme-source-plan/v1",
+  "created": "2026-11-15T14:39:10.896762+00:00",
+  "formal": {
+    "project": "research/jv_scheme_stalk_audit_20261115/lean",
+    "theorem": "JVSchemeStalkAudit.jv_scheme_stalk_certificate",
+    "statement": "theorem jv_scheme_stalk_certificate : Nonempty (OriginLocalization ≃ₐ[A] OriginStalk) ∧ (∀ a : A, canonicalStalkEquiv a = actualGermMap a) ∧ Function.Bijective (algebraMap A OriginStalk) ∧ Module.length OriginStalk OriginStalk = 8 ∧ IsLocalRing OriginStalk ∧ Nonempty (ActualStalkResidue ≃+* F) ∧ ¬ AlgebraicGeometry.IsReduced coneScheme ∧ (∀ p : coneScheme, p = schemeOrigin) ∧ IsOpen ({schemeOrigin} : Set coneScheme) ∧ Nat.card coneScheme = 1 ∧ IsEmpty firstChartScheme ∧ IsEmpty firstOpenScheme ∧ Nonempty secondChartScheme ∧ Nonempty secondOpenScheme ∧ (firstBasicOpen : Set coneScheme) = ∅ ∧ (secondBasicOpen : Set secondConeScheme).Nonempty ∧ Module.length OriginStalk OriginStalk ≠ Nat.card coneScheme",
+    "decl_sha256": "5f1d089fa3b6f010c51f4116714864ac15ade8c81061c64ca244732aa64dea06",
+    "scope": "Actual affine scheme Spec(A), for the literal first JV homogeneous F101 quotient. Actual origin structure-sheaf stalk, official categorical and algebra stalk/prime-localization comparisons, actual canonical coefficient map equals actual global-section germ map, canonical map bijective, actual stalk own self-module length8/locality/canonical residue field F101. Actual nonreduced scheme and actual unique isolated origin. Actual first h=1 quotient and principal-open localization schemes empty; explicit second literal source-root-induced quotient/open/cone primepoints and actual second schemes nonempty. Actual first principal basic open empty/second basic open contains actual evaluated source point. Actual stalk length8 differs from the known one scheme point. All ring/localization facts and point populations credited predecessor facts, not new populations. No supplied stalk/localization compatibility, length, locality, residue or reducedness conclusion as premise. Four new modules(three concrete andone modern import-only adapter),24frozen local dependency modules/0copies/42oldformalconfigs/59oldformal-artifactpins checked before/after each numbered state. Established official comparison/affine reducedness/scalar length methods credited. Qualified Diem n!d^n with multiplicities unrefuted; ordinary cone not its product-projective instance. No general cycles/intersection/positive-dimensional isolated components/projective bound/RojasC refinement, no explicit localized-Spec/basic-open scheme isomorphism, no source second root uniqueness/wholecurve/order/scalar/decomposition claim. Defaultlimits/standardfoundations/no holes/customaxioms/nativeproofeval/raisedlimits/flags/waivers/frozenedits/cryptoPython/spend/upload. No new solver/cryptographic experiment/host/compiler independence/novelty/canonicalpromotion/full14 claim.",
+    "sources": [
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/CanonicalPieces.lean",
+        "bytes": 3989,
+        "sha256": "4d43f6ad60e25982f57184aaf3743f7a932fb2df0e30e19765db043e6aa32b56"
+      },
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/GradedBasis.lean",
+        "bytes": 4758,
+        "sha256": "452b39f6ada2f9440a0b5f5227d23e06b4ea7c66b20eb87fd1cbbfd0a8c8fbc3"
+      },
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/GradedCertificate.lean",
+        "bytes": 1401,
+        "sha256": "0df13f8f45cb4a5e3da6917bb009a37082c9e6f75158ed03e21b9bd7e92ad4f6"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/CubicDual.lean",
+        "bytes": 3956,
+        "sha256": "98eed2dc8c32352381e1b546dd59866f4102c20f8be0cf897f9e3493f38bc274"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/DualBasis.lean",
+        "bytes": 3137,
+        "sha256": "9da34ce7da5810aed405ce5d79e7a3a4e10c33509c047fe259a39419b35dfe7a"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/QuotientBasis.lean",
+        "bytes": 9044,
+        "sha256": "fce18061d53ae6d02800947e9602a0312f82e0058c7488919f00e9fd27c32666"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/SharpCutoff.lean",
+        "bytes": 2430,
+        "sha256": "735ab1b0f042c5dec927b36a60417d090c5024a75285a9a960f7c5cfc50e5648"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/ActualIdeal.lean",
+        "bytes": 2914,
+        "sha256": "6f71f8014dee9a161b4a85efdacc7200611463f675c2d25893247f04c37c74c5"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/CubicNormalForms.lean",
+        "bytes": 4508,
+        "sha256": "c4fddf97dfcee2b00c4b1113282f57c83fca4d7eefbd89506912af036ae24615"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/LiteralQuadratics.lean",
+        "bytes": 2125,
+        "sha256": "51196e6a76de350be0ece641393f58240beff5eff9903e6d31bca85f75893ecb"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/MacaulayCertificate.lean",
+        "bytes": 4097,
+        "sha256": "b3c3f41025759c5c212cd858d7f43fc21da223b3287b133301b9d86cc160f5aa"
+      },
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/lakefile.toml",
+        "bytes": 286,
+        "sha256": "9bd69ed91399c89671fb786dac49e4c7be64635cc7e211a34bf244e96d1158c7"
+      },
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3692,
+        "sha256": "7aaef10cdce5986ff39f1dc481e8b3eb58bf476d4e73dff7f7117178d6559c20"
+      },
+      {
+        "path": "research/jv_graded_hilbert_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/lakefile.toml",
+        "bytes": 284,
+        "sha256": "56ba6962a29ea7af7943e194fdc07e807dd30b945f007f365668c4046721ab85"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/lake-manifest.json",
+        "bytes": 3831,
+        "sha256": "21f977f9eb39b2d00119a8a77dd8e2f2a9d4287ca1b8498e0e7eb1e92628dfdd"
+      },
+      {
+        "path": "research/jv_hilbert_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/lakefile.toml",
+        "bytes": 367,
+        "sha256": "f18793a72f079915913fa45693b8eabe5a0e33c7c04ad51353ddcc1726517fc0"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/lake-manifest.json",
+        "bytes": 3557,
+        "sha256": "21b41c4e076c955374b730d6cc0a6c09033563089eab25dd0989b5084ff43c91"
+      },
+      {
+        "path": "research/jv_macaulay_certificate_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/Bivariate.lean",
+        "bytes": 5748,
+        "sha256": "9a88d8e710b0681b31574c3d5094c123046da9bd14ddedb5724ae02a2399276e"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/Solutions.lean",
+        "bytes": 2996,
+        "sha256": "2ea90976a4f54837acb810ef91f7d25b099c05debf311bfae1eaa43ee09fcd38"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/Thickening.lean",
+        "bytes": 3021,
+        "sha256": "05cdaa45ad42e17ec286d390c91fb1f1a53f93f7155ca32b979b8e2f3f8abfac"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/LocalLengthCertificate.lean",
+        "bytes": 1497,
+        "sha256": "8fce3febd13be9cc84409e0f3b634a65061a88fc817d3e9babb85a914c5574b1"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/PowerBasisLength.lean",
+        "bytes": 5142,
+        "sha256": "c44d00a3f7098707c541bb8577eceef3f4d9d923fb4b1efe577121fe47db7f1b"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/ResidueDegreeControl.lean",
+        "bytes": 924,
+        "sha256": "3a4725e219e694124003ada1c55f71f39cb41cbda83dc03ab0748b0c5443bdaa"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/TruncatedLocal.lean",
+        "bytes": 4184,
+        "sha256": "ea8166ea9807e75e168ae6dd1b7e4d687232950f73057f0ecd3156c6853e7bdb"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/lakefile.toml",
+        "bytes": 342,
+        "sha256": "0f21c3133e3fdc0eb5ec0133f4563f7a3efa9dc5297ae89b7f6817ae08036164"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3423,
+        "sha256": "2fdad587ea840838497a8629ecae4b91a3c634e467be281ec21e3068e283d670"
+      },
+      {
+        "path": "research/local_algebra_length_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/lakefile.toml",
+        "bytes": 366,
+        "sha256": "9833ac9c49c342d6153d0cab3c3613aa29007d4e928c39e4e0b463df95f0f065"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3244,
+        "sha256": "24ef2554ad6ad3a76d566d53e4022fdfc6cf0600e07371448d626eea6ebd6169"
+      },
+      {
+        "path": "research/coordinate_length_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVCharts.lean",
+        "bytes": 5395,
+        "sha256": "140f704e7ac69e3abde29b250de59bb8b3144369c6481e143f9898e1980fa563"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVConePoints.lean",
+        "bytes": 1491,
+        "sha256": "62e32c10dcae8da22000b925f98aa59cc3dee2704c5687e83ab0370181f05709"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVLocalCertificate.lean",
+        "bytes": 2053,
+        "sha256": "944c2f9cfa15172ea016fde42ccada8350c26777a5727ec26164fd92fbba1789"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVLocalization.lean",
+        "bytes": 3767,
+        "sha256": "83d29f444c93257cba26620369146ad5b52dfceba4cca121d739ec7a7fb62652"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVOrigin.lean",
+        "bytes": 6372,
+        "sha256": "ad8f1a5eea6636d44e054ea87590c71abca9a5317f9e09199aaea6c29346d13d"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/JVTailFlags.lean",
+        "bytes": 4396,
+        "sha256": "fb620161b8992489cdc2bef096caa70511ace58cf7dc5faf6bfcbe3012d82a71"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/lakefile.toml",
+        "bytes": 457,
+        "sha256": "e4af3e1d76959877c22b43466098993996b44e04d7eb971df4439951a71b3b93"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/lake-manifest.json",
+        "bytes": 4959,
+        "sha256": "aafc7b4aa1f7ac945cd926288bc9024a2126acb8fce8a858de00aaf74081a352"
+      },
+      {
+        "path": "research/jv_local_multiplicity_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/jv_scheme_stalk_audit_20261115/lean/JVSchemeCertificate.lean",
+        "bytes": 1634,
+        "sha256": "7c1daf231623eecca1cd4ba6ab3d39bcdb47f983c31bdd2067c42c5ccd043890"
+      },
+      {
+        "path": "research/jv_scheme_stalk_audit_20261115/lean/JVSchemeCharts.lean",
+        "bytes": 2550,
+        "sha256": "98c5c6fed01c5c356ed82f6a8d874005469a420c70bad93558121a6355bac680"
+      },
+      {
+        "path": "research/jv_scheme_stalk_audit_20261115/lean/JVSchemeImports.lean",
+        "bytes": 58,
+        "sha256": "970d16756c84fd01a06f4a90f2697c389fd49de0429a5d462530395cd27787eb"
+      },
+      {
+        "path": "research/jv_scheme_stalk_audit_20261115/lean/JVSchemeStalk.lean",
+        "bytes": 3723,
+        "sha256": "cd982e76e0e1bae5ece2ca765e55d3058716affd586bde4201fba7c2aa449d48"
+      },
+      {
+        "path": "research/jv_scheme_stalk_audit_20261115/lean/lakefile.toml",
+        "bytes": 324,
+        "sha256": "360300ee8a997ea16b5f2e69ca8fa5fa9db21e5c6cc25a7003c47c7a4e944034"
+      },
+      {
+        "path": "research/jv_scheme_stalk_audit_20261115/lean/lake-manifest.json",
+        "bytes": 5241,
+        "sha256": "6cdccb78bf37a303ba86e13d83c2a55ba76b7d49faaf25596403a5e0d6fb67f5"
+      },
+      {
+        "path": "research/jv_scheme_stalk_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "ActualIdeal",
+    "Bivariate",
+    "CanonicalPieces",
+    "CubicDual",
+    "CubicNormalForms",
+    "DualBasis",
+    "GradedBasis",
+    "GradedCertificate",
+    "JVCharts",
+    "JVConePoints",
+    "JVLocalCertificate",
+    "JVLocalization",
+    "JVOrigin",
+    "JVSchemeCertificate",
+    "JVSchemeCharts",
+    "JVSchemeImports",
+    "JVSchemeStalk",
+    "JVTailFlags",
+    "LiteralQuadratics",
+    "LocalLengthCertificate",
+    "MacaulayCertificate",
+    "PowerBasisLength",
+    "QuotientBasis",
+    "ResidueDegreeControl",
+    "SharpCutoff",
+    "Solutions",
+    "Thickening",
+    "TruncatedLocal"
+  ],
+  "artifacts": [
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 18148,
+      "sha256": "c099211bd764886a56f642008b9ab3d03081335e463fe881532ca249751ad20d"
+    },
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "7f6bcdf04f9e4e4dde7aa5c39fc12d4180a967d70769c2d7ffb55e45a15043fc"
+    },
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/evidence/attempts.json",
+      "bytes": 224,
+      "sha256": "6b9b057a468c756cd0c4746c4fa0e14c2adc0a4c05404ec81d79feb27d4ea6bc"
+    },
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 2284,
+      "sha256": "a3cbcf7aee10b40539b4480aafa7ff9c364f4a04eb335e87257e872c11f32468"
+    },
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/evidence/gate.json",
+      "bytes": 9240,
+      "sha256": "b1dfce0559dd3d836a142d46f49dbf8fe8242eddc0755510096d39cb939d6385"
+    },
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/evidence/source-review.json",
+      "bytes": 6633,
+      "sha256": "0d50ae33ee89a49413a35e87ba1b2fba9129535822300192b971230beb4de1ad"
+    },
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/evidence/binding-check.json",
+      "bytes": 3761,
+      "sha256": "87bf4232c9479b4f00bb6c5f1ebfede888033b668ef8925a197faf243d598677"
+    },
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/proof-map.json",
+      "bytes": 7851,
+      "sha256": "2ae5eb96a3b49473f1177cea1220f716a33638a86d1a4e9169d7e4d213ec5834"
+    },
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/render_report.py",
+      "bytes": 8206,
+      "sha256": "c17cd5a24411faad7c11b0ffcaf33a5fbeade3c5ba8f140f45323495802ca606"
+    },
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/export_binding_input.py",
+      "bytes": 1727,
+      "sha256": "cb8518ffcc2fec1d8e542f9941520535652279bf221980a546f4d6d099b3d457"
+    },
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/PROTOCOL.md",
+      "bytes": 6627,
+      "sha256": "10c3f3e7a6efd41fd4181ee51549a9fa5af6734ed709a1c56367bc1a05fafc62"
+    },
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/reports/jv-scheme.svg",
+      "bytes": 1420,
+      "sha256": "74506e06c3e1d1a159e262897125f98a98a6a7928078b45b5a008075b2647899"
+    },
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/reports/layout.json",
+      "bytes": 334,
+      "sha256": "8548fee57bd69f120a7e0d02214b35b806491d3dfa346814236f56f1a38fa3fd"
+    },
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/reports/report.pdf",
+      "bytes": 47974,
+      "sha256": "2b46591e6b832c93a86f08b87da9bb6ebbe0afe43907c692bc27dc281ac9696b"
+    },
+    {
+      "path": "research/jv_local_multiplicity_audit_20261115/sources.json",
+      "bytes": 18027,
+      "sha256": "2e0d463a6499be1a8e7e3437ba0beccad452e3e76bcab6ac1135208c6b4d3739"
+    },
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/evidence/report-drafts.tar.xz",
+      "bytes": 49128,
+      "sha256": "af162cea6954a33a91f88d43c54b358a9e91b58d8787bf1b5a18ee9149bfade1"
+    },
+    {
+      "path": "research/jv_scheme_stalk_audit_20261115/evidence/report-drafts.json",
+      "bytes": 227,
+      "sha256": "221e37a1fa90c5a54c10b4b59e7126b4913e8d7afba78973fb34c9f45aa19cff"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 21,
+    "fresh_project_modules": 4,
+    "new_concrete_modules": 3,
+    "import_only_adapter": 1,
+    "credited_dependency_modules": 24,
+    "credited_predecessor_gate": 73,
+    "copied_modules": 0,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "new_source_warnings": 0,
+    "inherited_module_advisories_per_build": 12,
+    "inherited_auditor_String_mk_deprecation": 1,
+    "all42dependency_formal_configs_pinned": true,
+    "all59predecessor_pins_checked_each_state": true,
+    "actual_Spec_origin_stalk": true,
+    "official_categorical_and_algebra_comparison": true,
+    "actual_coefficient_equals_global_section_germ": true,
+    "actual_stalk_self_module_length8": true,
+    "actual_stalk_canonical_residue_F101": true,
+    "actual_Spec_nonreduced": true,
+    "actual_first_chart_localization_schemes_empty": true,
+    "actual_second_root_induced_chart_localization_scheme_points": true,
+    "actual_first_basicopen_empty_second_nonempty": true,
+    "known_population_credited": true,
+    "qualified_Diem_bound_refuted": false,
+    "general_cycle_intersection_or_positive_components": false,
+    "explicit_localized_Spec_basicopen_scheme_isomorphism": false,
+    "second_unique_root_or_wholecurve_order_scalar_decomposition": false,
+    "new_native_solver_experiment": false,
+    "new_host_or_compiler_independence": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

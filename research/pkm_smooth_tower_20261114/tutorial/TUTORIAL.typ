@@ -354,7 +354,9 @@ quoted from their reports. They have no pcc claim id yet [pcc:unverified].
 polynomial $product_(v in V) (x - v)$ of degree $|V|$. F4 then refutes the same systems with 0.05 down to 0.001
 times the tower's work at $m = 2$ ($|V| = 16 dots 256$), and 0.54 down to 0.04 times at $m = 3$
 ($|V| = 4 dots 16$). The smooth coset $g mu_S$ costs the same as a random set in this form. The tower makes $V$
-easy to *describe*; it does not make the system easier to *solve*. The study also found that:
+easy to *describe*; it does not make the system easier to *solve*. The same holds when the target *does* decompose and
+every relation must be found (EXP-PKM-DENSE-DEC-001): the dense oracle costs 0.05 down to 0.001 times the tower's,
+but both still lose to enumerating $V$. The study also found that:
 
 - On $j = 0$ curves, $omega: (x, y) |-> (zeta_3 x, y)$ maps a coset with $3 | S$ to itself, so the linear algebra
   needs $|F|/6$ columns instead of $|F|/2$.

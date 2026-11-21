@@ -1,0 +1,51 @@
+'AnchorBudget.penalty_ge_sum' depends on axioms: [propext, Quot.sound]
+'AnchorBudget.mass_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AnchorBudget.fibonacci_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+../evidence/budget-draft-002.lean.txt:80:77: error: unsolved goals
+r m : ℕ
+ms : List ℕ
+ih :
+  Feasible 0 (ms ++ [r]) →
+    Nat.fib (2 * ms.length + 1) * r ≤ (ms ++ [r]).sum ∧ Nat.fib (2 * ms.length + 2) * r ≤ penalty (ms ++ [r])
+ht : Feasible 0 (ms.append [r])
+hm : 0 + penalty (ms.append [r]) ≤ m
+hs : Nat.fib (2 * ms.length + 1) * r ≤ (ms ++ [r]).sum
+hp : Nat.fib (2 * ms.length + 2) * r ≤ penalty (ms ++ [r])
+h2 : Nat.fib (2 * (ms.length + 1) + 1) = Nat.fib (2 * ms.length + 1) + Nat.fib (2 * ms.length + 2)
+⊢ Nat.fib (2 * ms.length + 2) + Nat.fib (2 * ms.length + 2 + 1) =
+    Nat.fib (2 * ms.length + 2) + Nat.fib (2 * (ms.length + 1) + 1)
+../evidence/budget-draft-002.lean.txt:85:22: error: linarith failed to find a contradiction
+case cons.cons.left
+r m : ℕ
+ms : List ℕ
+ih :
+  Feasible 0 (ms ++ [r]) →
+    Nat.fib (2 * ms.length + 1) * r ≤ (ms ++ [r]).sum ∧ Nat.fib (2 * ms.length + 2) * r ≤ penalty (ms ++ [r])
+ht : Feasible 0 (ms.append [r])
+hs : Nat.fib (2 * ms.length + 1) * r ≤ (ms ++ [r]).sum
+hp : Nat.fib (2 * ms.length + 2) * r ≤ penalty (ms ++ [r])
+h2 : Nat.fib (2 * (ms.length + 1) + 1) = Nat.fib (2 * ms.length + 1) + Nat.fib (2 * ms.length + 2)
+h3 : Nat.fib (2 * (ms.length + 1) + 2) = Nat.fib (2 * ms.length + 2) + Nat.fib (2 * (ms.length + 1) + 1)
+hm : penalty (ms.append [r]) ≤ m
+a✝ : m + (ms ++ [r]).sum < (Nat.fib (2 * ms.length + 1) + Nat.fib (2 * ms.length + 2)) * r
+⊢ False
+failed
+../evidence/budget-draft-002.lean.txt:85:22: error: linarith failed to find a contradiction
+case cons.cons.right
+r m : ℕ
+ms : List ℕ
+ih :
+  Feasible 0 (ms ++ [r]) →
+    Nat.fib (2 * ms.length + 1) * r ≤ (ms ++ [r]).sum ∧ Nat.fib (2 * ms.length + 2) * r ≤ penalty (ms ++ [r])
+ht : Feasible 0 (ms.append [r])
+hs : Nat.fib (2 * ms.length + 1) * r ≤ (ms ++ [r]).sum
+hp : Nat.fib (2 * ms.length + 2) * r ≤ penalty (ms ++ [r])
+h2 : Nat.fib (2 * (ms.length + 1) + 1) = Nat.fib (2 * ms.length + 1) + Nat.fib (2 * ms.length + 2)
+h3 : Nat.fib (2 * (ms.length + 1) + 2) = Nat.fib (2 * ms.length + 2) + Nat.fib (2 * (ms.length + 1) + 1)
+hm : penalty (ms.append [r]) ≤ m
+a✝ :
+  m + penalty (ms ++ [r]) + (ms ++ [r]).sum <
+    (Nat.fib (2 * ms.length + 2) + (Nat.fib (2 * ms.length + 1) + Nat.fib (2 * ms.length + 2))) * r
+⊢ False
+failed
+'AnchorBudget.terminal_fibonacci_bound' depends on axioms: [propext, sorryAx]

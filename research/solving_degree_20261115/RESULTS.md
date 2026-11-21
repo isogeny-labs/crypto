@@ -52,13 +52,30 @@ exception; the k = 1 case with the four coefficients 91, 81, 81, 95).
   (prime, m = 2) where the mutant / iterated closure reaches d_lf ≤ k+2 and about k/4 in practice;
   the semi-regular yardstick under-predicts the binary static degree by 4–5 at k = 8.
 
+## 3b. Independent validation (2026-11-15, after the lanes; validator agent, own code only)
+
+Report: ml-cryptanalysis `experiments/ic-bounds-solving/validation/VALIDATOR_REPORT.md` (frozen
+dispatch commits crypto ef468c885b, ml-cryptanalysis bc98cdc7; producer files pinned by sha256).
+
+| statement | disposition | basis |
+|---|---|---|
+| (a) sd^stat = δ + maxwt(supp g^{-1}) | **validated** (k ≤ 5 for m = 2, k = 2 for m = 3) | proof re-derived, no gap; own literal ordinary-ring brute force vs own inverse DFT: 344/344 agree (7 primes), incl. 6 exceptions and 5 locus instances; sd = δ + mk ⇔ c_top ≠ 0 in all 344 |
+| (b) sd^stat = 2k+2 (m = 2, k = 3..13), 3k+6 (m = 3, k = 2..8) | **validated** (theorem-backed beyond brute force) | own g^{-1} on 36 lane-A rows (36/36), 17 lane-B rows and 12 fresh m = 3 instances (29/29); Rust binary rebuilt, 7/7 CHECK_LIST rows reproduce |
+| (c) d_lf = 4, 4, 4, 5 (k = 3..6), 7 (m = 3, k = 2) | **validated**; k = 7, 8 insufficient evidence (not recomputed) | own iterated closure, 15/15 + 1 + 3/3 |
+| (d) binary d_full ∈ {k+1, k+2} | **validated** on 5 recomputed systems (k ≤ 6) and as a recount of the 185-row table; k = 7, 8 insufficient evidence | own GF(2) rank, identical rank profiles |
+
+Validator findings, all non-numerical: the branches moved while validation ran (dispositions apply to
+the dispatch commits); 33 duplicate rows in lane A's `all_instances.json`; a wording slip in SD1
+Corollary 4.3's proof ("≤ 1" for "≥ 1", fixed); lane C's d_full is "first D with the condition"
+where SD1 says "least D₀ from which it holds" (equal on the systems checked). pcc claim id: [pcc:PCC-20261115-514b4a] (statement kind; see §4).
+
 ## 4. Not done / open
 
 * No Lean statement of SD1 (no Lean toolchain in this container); the chain-to-group-algebra
   bridge it needs exists in `formal/ICFallDegrees/ChainTranslation.lean`.
 * c_top ≢ 0 for every nonsingular curve is open (candidate certificate: the 1/t coefficient at t = ∞).
 * d_lf at k = 9..14 (prime) is taken from the repository's recorded exact runs, not re-measured here; binary d_full exact only to k = 8 (k = 9 extension running).
-* No validator report, no pcc claim id; no leaderboard or benchmarks rows (no cost measurement).
+* The validator report is unsigned (no keyring key in this session), so a `measurement` claim with a `recompute` proof would stand `scoped`; the claim recorded for this study is `[pcc:PCC-20261115-514b4a]` (kind statement, attestation of `validation/VALIDATOR_REPORT.md`; standing unverified by construction). No leaderboard or benchmarks rows (no cost measurement).
 * Research-kb: catalog snapshot (sha256 8bc55122…, revision a340f056…) queried by FTS for "solving
   degree", "static Macaulay", "group algebra inverse": prior entries KR-IC-58213c (CG Thm 3.1) and
   KR-IC-fbdb61; no record of the inverse-support formula. The live MCP server was unreachable.

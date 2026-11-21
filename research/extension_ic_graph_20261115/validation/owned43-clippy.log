@@ -1,0 +1,11 @@
+error: function `prepare` is never used
+  --> examples/../research/extension_ic_graph_20261115/anchored_input.rs:78:8
+   |
+78 | pub fn prepare(worker_path: &Path, output_path: &Path) -> Result<Value, String> {
+   |        ^^^^^^^
+   |
+   = note: `-D dead-code` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[expect(dead_code)]` or `#[allow(dead_code)]`
+
+error: aborting due to 1 previous error
+

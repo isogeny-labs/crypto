@@ -1,0 +1,6140 @@
+{
+ "schema": "replay-certificate/v1",
+ "study": "research/ic_gw_nrm_lz_20261115",
+ "claim_under_test": "CAND = BLR1 (research/ic_gw_bl_reuse_20261115/amendment-1/src, sha256 e236855d7fef...) plus NRM=1 (ic2.rs find_relations_2lp: skip the products by a first coordinate equal to 1 and by b0^2, 4*g1 as two additions) and LZ_REUSE=1 (la2.rs lanczos: v^T v_prev = s, w_i^T y by the three-term recurrence). With both: counted output equal to REF except relations.mul/add (all arms) and D, DL1 linear_algebra.lmul/ladd; every BOTH/REF ratio < 1 at all 30 (q, seed) cells and w_add 0, 0.5, 1 for DL (geomean 0.957-0.961 / 0.979 / 0.987), DL1 (0.835-0.850 / 0.915-0.921 / 0.939-0.944) and D (0.971-0.978); relations, graph, matrix and logs unchanged; k = 22 DL IC/rho 0.00213 / 0.00199 / 0.00168 at w = 0 / 0.1 / 1. [pcc:unverified], L0 local.",
+ "status": "verified",
+ "independent": true,
+ "independence_note": "Validator subagent with its own context, nonce, sample, runner, comparators, oracle build, mutants, stress harness and recompute script; the producer's analyze.py, plot.py and gen-report.py were not read or imported (only hashed). Same Claude Code session family and container as the producer: independence of reasoning and code, not of host or organization; no keyring signature.",
+ "scalars_verified": true,
+ "validated_snapshot": {
+  "repository": "/home/user/crypto (branch claude/f4-f5-algorithm-speed-bvp7qd)",
+  "data_commit": "be6570bbcb46b646f3ea8a9c362ccb607581ada1 (2026-11-15T05:57:03Z; results, report, benchrec record)",
+  "protocol_freeze_commit": "851b8da629837ffa6e27fdb318fddcd1cadb4f9d (2026-11-15T05:39:39Z: PROTOCOL.md, analyze.py, make-units.sh, run-local.sh, units.tsv, src/; producer run.log start 05:39:53Z)",
+  "read_from": "git archive be6570bbcb (the working tree was briefly on another branch during this validation; nothing was read from it)",
+  "freeze_integrity": "PROTOCOL.md, analyze.py, make-units.sh, run-local.sh, units.tsv and src/*.rs byte-identical between 851b8da629 and be6570bbcb; REF source research/ic_gw_bl_reuse_20261115/amendment-1/src unchanged since its freeze 98a4fc6639; shared includes research/quartic_n4_20261019/{common,ghs,ic,solver}.rs and src/cryptanalysis/plane_quartic_pic.rs unchanged since 9a63c9161b",
+  "head_at_write": "e87d1ee9f7 (branch head when the reports were written; git diff be6570bbcb..HEAD is empty for research/ic_gw_nrm_lz_20261115, benchmarks/20261115-ic-gw-nrm-lz, the REF source, the shared includes, summary.json and the BLR1 VALIDATION.json)",
+  "dirty_tree": "git status clean for every path read"
+ },
+ "binaries": {
+  "REF": {
+   "sha256": "e236855d7fef58d1c6618b25c399e462c7099bcb1f634047a7258e5f5d074035",
+   "recorded": "e236855d7fef58d1c6618b25c399e462c7099bcb1f634047a7258e5f5d074035",
+   "matches_recorded": true,
+   "build": "cd research/ic_gw_bl_reuse_20261115/amendment-1/src && rustc --edition 2021 -O v3.rs --cfg combo (rustc 1.97.0, from git archive be6570bbcb)"
+  },
+  "CAND": {
+   "sha256": "a7e4ad7a41e5a8a61466791af069af75914c2ed883c61b0d0f18d6ef67d23577",
+   "recorded": "a7e4ad7a41e5a8a61466791af069af75914c2ed883c61b0d0f18d6ef67d23577",
+   "matches_recorded": true,
+   "build": "cd research/ic_gw_nrm_lz_20261115/src && rustc --edition 2021 -O v3.rs --cfg combo"
+  },
+  "ORACLE": {
+   "sha256": "e37858d6bea7da776390445c4a59883074fdaff55ff387a6a96443c7d24e256b",
+   "build": "CAND src edited by scripts/make_oracle.py (uncounted u128 checks only), same rustc flags"
+  },
+  "MUT_LZWY": {
+   "sha256": "50c0e38644f8edce9fcfbd7da172b490edfcb7ca57d916b49d78bf94935208f3",
+   "build": "scripts/make_mutants.py: w_{i+1}^T y recurrence without the b1 term"
+  },
+  "MUT_LZVV": {
+   "sha256": "89f5049463b1fa6da750004998635e275c224d849826c274de18db232c22b128",
+   "build": "scripts/make_mutants.py: v^T v_prev taken as v^T v"
+  },
+  "MUT_NRM": {
+   "sha256": "94f4af0478c4c262f78abe2d79588294adc50fd51a22b5a34106271c1b281863",
+   "build": "scripts/make_mutants.py: g3 also skips the product by b[1] (operand not 1)"
+  },
+  "producer_binary_sha256_file": "binary.sha256 inside runs-nrmlz-20261115.tar.gz lists the same two hashes"
+ },
+ "nonce": {
+  "value": "8c307315f1cea7f30b82a3805c8074643ac9c809d0d79108041842a4455a1472",
+  "derivation": "sha256 of the UTF-8 string '03eae5198688e9059625882a79ebff552b9c3b85 2026-11-15T06:02:23.897914259Z' = (origin main from `git ls-remote origin refs/heads/main`) + ' ' + (`date -u +%Y-%m-%dT%H:%M:%S.%NZ`), drawn after the data commit be6570bbcb and after scripts/select_units.py was written, before any unit was selected or run",
+  "remote_main_head": "03eae5198688e9059625882a79ebff552b9c3b85",
+  "utc_time": "2026-11-15T06:02:23.897914259Z"
+ },
+ "selection_rule": "scripts/select_units.py: universe q in {262111, 524287, 1048507, 2097091, 4194271} x seed 1..12, ranked by sha256('<nonce>:<q>:<seed>'); first 6, extended until >= 2 seeds in 7..12, >= 2 units with q >= 2097091 and >= 2 seeds in 1..6 (no extension needed). A/A: the first two sampled units with seed in 1..6. Plus: one unit at c_D = 1.55 (q 524287 seed 7), the oracle build on all 27 producer cells not sampled (all 30 audited), a small-q sweep (q 223..32719, seeds 1-5) and 6 negative-control mutant runs.",
+ "sample": [
+  {
+   "rank": 0,
+   "key": "09b496436259277e8ea266b1a7719d04214c97b7694914eb7278a1c8ab7a0f16",
+   "q": 4194271,
+   "seed": 11
+  },
+  {
+   "rank": 1,
+   "key": "169821367d18bdbee4428cfa3d6604ccea440aeffbf9434ad182fa7afb19c41b",
+   "q": 4194271,
+   "seed": 4
+  },
+  {
+   "rank": 2,
+   "key": "169fdb7de32c18bdc0a0a599c01feade9c9a1cb351be31e3b2dcee4ac5670703",
+   "q": 524287,
+   "seed": 5
+  },
+  {
+   "rank": 3,
+   "key": "1d8d1d1a5cecbee1e8d15efde277081cc24786fadf9acf2808b4302c260788d6",
+   "q": 4194271,
+   "seed": 10
+  },
+  {
+   "rank": 4,
+   "key": "1dfd47ac898c1e36a1334efb0510567f7f889d7b4a54a26f53c941c86229d3d2",
+   "q": 262111,
+   "seed": 11
+  },
+  {
+   "rank": 5,
+   "key": "20f93ecc9b95eb52a548007145c13c19be87599daf6dfdd5b3c29d3493acd934",
+   "q": 1048507,
+   "seed": 3
+  }
+ ],
+ "aa_units": [
+  {
+   "q": 4194271,
+   "seed": 4
+  },
+  {
+   "q": 524287,
+   "seed": 5
+  }
+ ],
+ "commands": {
+  "unit": "env -u NRM -u LZ_REUSE [NRM=1 LZ_REUSE=1] <BIN> ic <q> <seed> D 3.0 <c_D> (c_D 1.7; 1.55 for the extra unit)",
+  "runner": "scripts/replay.sh (xargs -P 3; counted work only), plans from scripts/make_plan.py and make_plan2.py"
+ },
+ "comparison_rule": "counted fields = every key of every ic record except those ending in wall or cpu, load1 and s.controls*; key lists equal in order; record (arm, attempt) lists equal. BOTH vs REF: only relations.mul/add (D, DL1, DL) and linear_algebra.lmul/ladd (D, DL1) may differ, and all of them must. A0 vs REF and ORACLE vs BOTH: every counted field equal. Replayed vs committed (seeds 1-6): every counted field equal. stderr equal after masking wall=\u2026s and removing ORACLE lines.",
+ "fields_compared": 57444,
+ "coverage": {
+  "sampled_REF_BOTH_pairs": 6,
+  "pairs_with_seed_outside_1_6": 3,
+  "pairs_with_q_ge_2097091": 3,
+  "aa_units": 2,
+  "extra_c_D_1_55_units": 3,
+  "producer_cells_audited_by_oracle": 30,
+  "oracle_runs_production_sizes": 34,
+  "small_q_units": 120,
+  "negative_control_runs": 6,
+  "units_total": 176
+ },
+ "runs": [
+  {
+   "unit": "1_cnt_REF_4194271_11_c1.7.jsonl",
+   "idx": 1,
+   "role": "cnt",
+   "arm": "REF",
+   "q": 4194271,
+   "seed": 11,
+   "c_D": 1.7,
+   "command": "ref ic 4194271 11 D 3.0 1.7",
+   "env": "",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:04:23Z",
+   "loadavg_before": "0.65 1.25 1.60 3/116 5520",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [],
+   "verified": true,
+   "log_equal_ref_mod_wall": null,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "2_cnt_BOTH_4194271_11_c1.7.jsonl",
+   "idx": 2,
+   "role": "cnt",
+   "arm": "BOTH",
+   "q": 4194271,
+   "seed": 11,
+   "c_D": 1.7,
+   "command": "cand ic 4194271 11 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:04:23Z",
+   "loadavg_before": "0.65 1.25 1.60 3/116 5521",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "replayed REF (only NRM+LZ allowed fields may differ; all must)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "3_orc_ORACLE_4194271_11_c1.7.jsonl",
+   "idx": 3,
+   "role": "orc",
+   "arm": "ORACLE",
+   "q": 4194271,
+   "seed": 11,
+   "c_D": 1.7,
+   "command": "oracle ic 4194271 11 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:04:23Z",
+   "loadavg_before": "0.65 1.25 1.60 2/116 5521",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "replayed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 36367863,
+     "oracle_skipped_mul": 36367863,
+     "d_rel_add": -6060417,
+     "oracle_add_delta": -6060417,
+     "d_la_lmul": 24227759,
+     "d_la_ladd": 24227759,
+     "oracle_pred_lmul_saving": 24227759,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 36367863,
+     "oracle_skipped_mul": 36367863,
+     "d_rel_add": -6060417,
+     "oracle_add_delta": -6060417,
+     "d_la_lmul": 24227759,
+     "d_la_ladd": 24227759,
+     "oracle_pred_lmul_saving": 24227759,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 36367863,
+     "oracle_skipped_mul": 36367863,
+     "d_rel_add": -6060417,
+     "oracle_add_delta": -6060417,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "4_cnt_REF_4194271_4_c1.7.jsonl",
+   "idx": 4,
+   "role": "cnt",
+   "arm": "REF",
+   "q": 4194271,
+   "seed": 4,
+   "c_D": 1.7,
+   "command": "ref ic 4194271 4 D 3.0 1.7",
+   "env": "",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:05:12Z",
+   "loadavg_before": "2.00 1.53 1.68 3/114 5543",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed REF (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true,
+   "log_equal_ref_mod_wall": null,
+   "log_equal_committed_mod_wall": true
+  },
+  {
+   "unit": "5_cnt_BOTH_4194271_4_c1.7.jsonl",
+   "idx": 5,
+   "role": "cnt",
+   "arm": "BOTH",
+   "q": 4194271,
+   "seed": 4,
+   "c_D": 1.7,
+   "command": "cand ic 4194271 4 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:05:13Z",
+   "loadavg_before": "2.08 1.55 1.69 3/117 5554",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "replayed REF (only NRM+LZ allowed fields may differ; all must)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "6_orc_ORACLE_4194271_4_c1.7.jsonl",
+   "idx": 6,
+   "role": "orc",
+   "arm": "ORACLE",
+   "q": 4194271,
+   "seed": 4,
+   "c_D": 1.7,
+   "command": "oracle ic 4194271 4 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:05:13Z",
+   "loadavg_before": "2.08 1.55 1.69 3/117 5562",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "replayed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 36356500,
+     "oracle_skipped_mul": 36356500,
+     "d_rel_add": -6060417,
+     "oracle_add_delta": -6060417,
+     "d_la_lmul": 24227759,
+     "d_la_ladd": 24227759,
+     "oracle_pred_lmul_saving": 24227759,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 36356500,
+     "oracle_skipped_mul": 36356500,
+     "d_rel_add": -6060417,
+     "oracle_add_delta": -6060417,
+     "d_la_lmul": 24213839,
+     "d_la_ladd": 24213839,
+     "oracle_pred_lmul_saving": 24213839,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 36356500,
+     "oracle_skipped_mul": 36356500,
+     "d_rel_add": -6060417,
+     "oracle_add_delta": -6060417,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "7_cnt_REF_524287_5_c1.7.jsonl",
+   "idx": 7,
+   "role": "cnt",
+   "arm": "REF",
+   "q": 524287,
+   "seed": 5,
+   "c_D": 1.7,
+   "command": "ref ic 524287 5 D 3.0 1.7",
+   "env": "",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:05:50Z",
+   "loadavg_before": "2.49 1.72 1.74 3/117 5587",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed REF (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true,
+   "log_equal_ref_mod_wall": null,
+   "log_equal_committed_mod_wall": true
+  },
+  {
+   "unit": "8_cnt_BOTH_524287_5_c1.7.jsonl",
+   "idx": 8,
+   "role": "cnt",
+   "arm": "BOTH",
+   "q": 524287,
+   "seed": 5,
+   "c_D": 1.7,
+   "command": "cand ic 524287 5 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:05:50Z",
+   "loadavg_before": "2.49 1.72 1.74 3/117 5595",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "replayed REF (only NRM+LZ allowed fields may differ; all must)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "9_orc_ORACLE_524287_5_c1.7.jsonl",
+   "idx": 9,
+   "role": "orc",
+   "arm": "ORACLE",
+   "q": 524287,
+   "seed": 5,
+   "c_D": 1.7,
+   "command": "oracle ic 524287 5 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:05:51Z",
+   "loadavg_before": "2.49 1.72 1.74 3/117 5603",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "replayed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 4542324,
+     "oracle_skipped_mul": 4542324,
+     "d_rel_add": -757063,
+     "oracle_add_delta": -757063,
+     "d_la_lmul": 3023339,
+     "d_la_ladd": 3023339,
+     "oracle_pred_lmul_saving": 3023339,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 4542324,
+     "oracle_skipped_mul": 4542324,
+     "d_rel_add": -757063,
+     "oracle_add_delta": -757063,
+     "d_la_lmul": 3023339,
+     "d_la_ladd": 3023339,
+     "oracle_pred_lmul_saving": 3023339,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 4542324,
+     "oracle_skipped_mul": 4542324,
+     "d_rel_add": -757063,
+     "oracle_add_delta": -757063,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "10_cnt_REF_4194271_10_c1.7.jsonl",
+   "idx": 10,
+   "role": "cnt",
+   "arm": "REF",
+   "q": 4194271,
+   "seed": 10,
+   "c_D": 1.7,
+   "command": "ref ic 4194271 10 D 3.0 1.7",
+   "env": "",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:05:55Z",
+   "loadavg_before": "2.53 1.74 1.75 3/114 5612",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [],
+   "verified": true,
+   "log_equal_ref_mod_wall": null,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "11_cnt_BOTH_4194271_10_c1.7.jsonl",
+   "idx": 11,
+   "role": "cnt",
+   "arm": "BOTH",
+   "q": 4194271,
+   "seed": 10,
+   "c_D": 1.7,
+   "command": "cand ic 4194271 10 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:05:55Z",
+   "loadavg_before": "2.53 1.74 1.75 3/114 5620",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "replayed REF (only NRM+LZ allowed fields may differ; all must)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "12_orc_ORACLE_4194271_10_c1.7.jsonl",
+   "idx": 12,
+   "role": "orc",
+   "arm": "ORACLE",
+   "q": 4194271,
+   "seed": 10,
+   "c_D": 1.7,
+   "command": "oracle ic 4194271 10 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:05:56Z",
+   "loadavg_before": "2.53 1.74 1.75 3/114 5628",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "replayed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 36371000,
+     "oracle_skipped_mul": 36371000,
+     "d_rel_add": -6060419,
+     "oracle_add_delta": -6060419,
+     "d_la_lmul": 24227759,
+     "d_la_ladd": 24227759,
+     "oracle_pred_lmul_saving": 24227759,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 36371000,
+     "oracle_skipped_mul": 36371000,
+     "d_rel_add": -6060419,
+     "oracle_add_delta": -6060419,
+     "d_la_lmul": 24227759,
+     "d_la_ladd": 24227759,
+     "oracle_pred_lmul_saving": 24227759,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 36371000,
+     "oracle_skipped_mul": 36371000,
+     "d_rel_add": -6060419,
+     "oracle_add_delta": -6060419,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "13_cnt_REF_262111_11_c1.7.jsonl",
+   "idx": 13,
+   "role": "cnt",
+   "arm": "REF",
+   "q": 262111,
+   "seed": 11,
+   "c_D": 1.7,
+   "command": "ref ic 262111 11 D 3.0 1.7",
+   "env": "",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:06:28Z",
+   "loadavg_before": "2.74 1.88 1.80 3/112 5645",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [],
+   "verified": true,
+   "log_equal_ref_mod_wall": null,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "14_cnt_BOTH_262111_11_c1.7.jsonl",
+   "idx": 14,
+   "role": "cnt",
+   "arm": "BOTH",
+   "q": 262111,
+   "seed": 11,
+   "c_D": 1.7,
+   "command": "cand ic 262111 11 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:06:28Z",
+   "loadavg_before": "2.74 1.88 1.80 4/112 5653",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "replayed REF (only NRM+LZ allowed fields may differ; all must)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "15_orc_ORACLE_262111_11_c1.7.jsonl",
+   "idx": 15,
+   "role": "orc",
+   "arm": "ORACLE",
+   "q": 262111,
+   "seed": 11,
+   "c_D": 1.7,
+   "command": "oracle ic 262111 11 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:06:29Z",
+   "loadavg_before": "2.74 1.88 1.80 3/112 5661",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "replayed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 2274774,
+     "oracle_skipped_mul": 2274774,
+     "d_rel_add": -378877,
+     "oracle_add_delta": -378877,
+     "d_la_lmul": 1512059,
+     "d_la_ladd": 1512059,
+     "oracle_pred_lmul_saving": 1512059,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 2274774,
+     "oracle_skipped_mul": 2274774,
+     "d_rel_add": -378877,
+     "oracle_add_delta": -378877,
+     "d_la_lmul": 1512059,
+     "d_la_ladd": 1512059,
+     "oracle_pred_lmul_saving": 1512059,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 2274774,
+     "oracle_skipped_mul": 2274774,
+     "d_rel_add": -378877,
+     "oracle_add_delta": -378877,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "16_cnt_REF_1048507_3_c1.7.jsonl",
+   "idx": 16,
+   "role": "cnt",
+   "arm": "REF",
+   "q": 1048507,
+   "seed": 3,
+   "c_D": 1.7,
+   "command": "ref ic 1048507 3 D 3.0 1.7",
+   "env": "",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:06:33Z",
+   "loadavg_before": "2.76 1.90 1.80 3/113 5687",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed REF (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true,
+   "log_equal_ref_mod_wall": null,
+   "log_equal_committed_mod_wall": true
+  },
+  {
+   "unit": "17_cnt_BOTH_1048507_3_c1.7.jsonl",
+   "idx": 17,
+   "role": "cnt",
+   "arm": "BOTH",
+   "q": 1048507,
+   "seed": 3,
+   "c_D": 1.7,
+   "command": "cand ic 1048507 3 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:06:33Z",
+   "loadavg_before": "2.76 1.90 1.80 4/113 5695",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "replayed REF (only NRM+LZ allowed fields may differ; all must)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "18_orc_ORACLE_1048507_3_c1.7.jsonl",
+   "idx": 18,
+   "role": "orc",
+   "arm": "ORACLE",
+   "q": 1048507,
+   "seed": 3,
+   "c_D": 1.7,
+   "command": "oracle ic 1048507 3 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:06:35Z",
+   "loadavg_before": "2.76 1.90 1.80 4/113 5703",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "replayed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 9091235,
+     "oracle_skipped_mul": 9091235,
+     "d_rel_add": -1514670,
+     "oracle_add_delta": -1514670,
+     "d_la_lmul": 6051719,
+     "d_la_ladd": 6051719,
+     "oracle_pred_lmul_saving": 6051719,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 9091235,
+     "oracle_skipped_mul": 9091235,
+     "d_rel_add": -1514670,
+     "oracle_add_delta": -1514670,
+     "d_la_lmul": 6051719,
+     "d_la_ladd": 6051719,
+     "oracle_pred_lmul_saving": 6051719,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 9091235,
+     "oracle_skipped_mul": 9091235,
+     "d_rel_add": -1514670,
+     "oracle_add_delta": -1514670,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "19_aa_A0_4194271_4_c1.7.jsonl",
+   "idx": 19,
+   "role": "aa",
+   "arm": "A0",
+   "q": 4194271,
+   "seed": 4,
+   "c_D": 1.7,
+   "command": "cand ic 4194271 4 D 3.0 1.7",
+   "env": "",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:06:47Z",
+   "loadavg_before": "2.80 1.93 1.82 3/116 5751",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "replayed REF (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "committed A0 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "20_aa_A0_524287_5_c1.7.jsonl",
+   "idx": 20,
+   "role": "aa",
+   "arm": "A0",
+   "q": 524287,
+   "seed": 5,
+   "c_D": 1.7,
+   "command": "cand ic 524287 5 D 3.0 1.7",
+   "env": "",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:06:47Z",
+   "loadavg_before": "2.80 1.93 1.82 3/116 5767",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "replayed REF (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "committed A0 (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    }
+   ],
+   "verified": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "21_cd_REF_524287_7_c1.55.jsonl",
+   "idx": 21,
+   "role": "cd",
+   "arm": "REF",
+   "q": 524287,
+   "seed": 7,
+   "c_D": 1.55,
+   "command": "ref ic 524287 7 D 3.0 1.55",
+   "env": "",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:06:48Z",
+   "loadavg_before": "2.81 1.95 1.82 3/116 5775",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [],
+   "verified": true,
+   "log_equal_ref_mod_wall": null,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "22_cd_BOTH_524287_7_c1.55.jsonl",
+   "idx": 22,
+   "role": "cd",
+   "arm": "BOTH",
+   "q": 524287,
+   "seed": 7,
+   "c_D": 1.55,
+   "command": "cand ic 524287 7 D 3.0 1.55",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:06:52Z",
+   "loadavg_before": "2.81 1.95 1.82 4/116 5783",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "replayed REF (only NRM+LZ allowed fields may differ; all must)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "23_cd_ORACLE_524287_7_c1.55.jsonl",
+   "idx": 23,
+   "role": "cd",
+   "arm": "ORACLE",
+   "q": 524287,
+   "seed": 7,
+   "c_D": 1.55,
+   "command": "oracle ic 524287 7 D 3.0 1.55",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:06:57Z",
+   "loadavg_before": "2.91 1.99 1.83 3/112 5791",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "replayed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 3778364,
+     "oracle_skipped_mul": 3778364,
+     "d_rel_add": -630001,
+     "oracle_add_delta": -630001,
+     "d_la_lmul": 2515523,
+     "d_la_ladd": 2515523,
+     "oracle_pred_lmul_saving": 2515523,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 3778364,
+     "oracle_skipped_mul": 3778364,
+     "d_rel_add": -630001,
+     "oracle_add_delta": -630001,
+     "d_la_lmul": 2515523,
+     "d_la_ladd": 2515523,
+     "oracle_pred_lmul_saving": 2515523,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 3778364,
+     "oracle_skipped_mul": 3778364,
+     "d_rel_add": -630001,
+     "oracle_add_delta": -630001,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "24_orcp_ORACLE_262111_1_c1.7.jsonl",
+   "idx": 24,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 262111,
+   "seed": 1,
+   "c_D": 1.7,
+   "command": "oracle ic 262111 1 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:01Z",
+   "loadavg_before": "2.92 2.00 1.84 3/113 5804",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 2275074,
+     "oracle_skipped_mul": 2275074,
+     "d_rel_add": -378875,
+     "oracle_add_delta": -378875,
+     "d_la_lmul": 1512059,
+     "d_la_ladd": 1512059,
+     "oracle_pred_lmul_saving": 1512059,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 2275074,
+     "oracle_skipped_mul": 2275074,
+     "d_rel_add": -378875,
+     "oracle_add_delta": -378875,
+     "d_la_lmul": 1512059,
+     "d_la_ladd": 1512059,
+     "oracle_pred_lmul_saving": 1512059,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 2275074,
+     "oracle_skipped_mul": 2275074,
+     "d_rel_add": -378875,
+     "oracle_add_delta": -378875,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "25_orcp_ORACLE_262111_2_c1.7.jsonl",
+   "idx": 25,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 262111,
+   "seed": 2,
+   "c_D": 1.7,
+   "command": "oracle ic 262111 2 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:04Z",
+   "loadavg_before": "2.92 2.02 1.85 3/113 5812",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 2273377,
+     "oracle_skipped_mul": 2273377,
+     "d_rel_add": -378881,
+     "oracle_add_delta": -378881,
+     "d_la_lmul": 1512059,
+     "d_la_ladd": 1512059,
+     "oracle_pred_lmul_saving": 1512059,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 2273377,
+     "oracle_skipped_mul": 2273377,
+     "d_rel_add": -378881,
+     "oracle_add_delta": -378881,
+     "d_la_lmul": 1508583,
+     "d_la_ladd": 1508583,
+     "oracle_pred_lmul_saving": 1508583,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 2273377,
+     "oracle_skipped_mul": 2273377,
+     "d_rel_add": -378881,
+     "oracle_add_delta": -378881,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "26_orcp_ORACLE_262111_3_c1.7.jsonl",
+   "idx": 26,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 262111,
+   "seed": 3,
+   "c_D": 1.7,
+   "command": "oracle ic 262111 3 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:06Z",
+   "loadavg_before": "2.92 2.02 1.85 3/113 5820",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 2272778,
+     "oracle_skipped_mul": 2272778,
+     "d_rel_add": -378883,
+     "oracle_add_delta": -378883,
+     "d_la_lmul": 1512059,
+     "d_la_ladd": 1512059,
+     "oracle_pred_lmul_saving": 1512059,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 2272778,
+     "oracle_skipped_mul": 2272778,
+     "d_rel_add": -378883,
+     "oracle_add_delta": -378883,
+     "d_la_lmul": 1512059,
+     "d_la_ladd": 1512059,
+     "oracle_pred_lmul_saving": 1512059,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 2272778,
+     "oracle_skipped_mul": 2272778,
+     "d_rel_add": -378883,
+     "oracle_add_delta": -378883,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "27_orcp_ORACLE_262111_4_c1.7.jsonl",
+   "idx": 27,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 262111,
+   "seed": 4,
+   "c_D": 1.7,
+   "command": "oracle ic 262111 4 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:07Z",
+   "loadavg_before": "2.92 2.02 1.85 3/113 5828",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 2272817,
+     "oracle_skipped_mul": 2272817,
+     "d_rel_add": -378883,
+     "oracle_add_delta": -378883,
+     "d_la_lmul": 1512059,
+     "d_la_ladd": 1512059,
+     "oracle_pred_lmul_saving": 1512059,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 2272817,
+     "oracle_skipped_mul": 2272817,
+     "d_rel_add": -378883,
+     "oracle_add_delta": -378883,
+     "d_la_lmul": 1512059,
+     "d_la_ladd": 1512059,
+     "oracle_pred_lmul_saving": 1512059,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 2272817,
+     "oracle_skipped_mul": 2272817,
+     "d_rel_add": -378883,
+     "oracle_add_delta": -378883,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "28_orcp_ORACLE_262111_5_c1.7.jsonl",
+   "idx": 28,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 262111,
+   "seed": 5,
+   "c_D": 1.7,
+   "command": "oracle ic 262111 5 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:10Z",
+   "loadavg_before": "2.93 2.04 1.85 3/113 5836",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 2273880,
+     "oracle_skipped_mul": 2273880,
+     "d_rel_add": -378879,
+     "oracle_add_delta": -378879,
+     "d_la_lmul": 1512059,
+     "d_la_ladd": 1512059,
+     "oracle_pred_lmul_saving": 1512059,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 2273880,
+     "oracle_skipped_mul": 2273880,
+     "d_rel_add": -378879,
+     "oracle_add_delta": -378879,
+     "d_la_lmul": 1512059,
+     "d_la_ladd": 1512059,
+     "oracle_pred_lmul_saving": 1512059,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 2273880,
+     "oracle_skipped_mul": 2273880,
+     "d_rel_add": -378879,
+     "oracle_add_delta": -378879,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "29_orcp_ORACLE_262111_6_c1.7.jsonl",
+   "idx": 29,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 262111,
+   "seed": 6,
+   "c_D": 1.7,
+   "command": "oracle ic 262111 6 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:12Z",
+   "loadavg_before": "2.93 2.04 1.85 4/113 5844",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 2271812,
+     "oracle_skipped_mul": 2271812,
+     "d_rel_add": -378885,
+     "oracle_add_delta": -378885,
+     "d_la_lmul": 1512059,
+     "d_la_ladd": 1512059,
+     "oracle_pred_lmul_saving": 1512059,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 2271812,
+     "oracle_skipped_mul": 2271812,
+     "d_rel_add": -378885,
+     "oracle_add_delta": -378885,
+     "d_la_lmul": 1512059,
+     "d_la_ladd": 1512059,
+     "oracle_pred_lmul_saving": 1512059,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 2271812,
+     "oracle_skipped_mul": 2271812,
+     "d_rel_add": -378885,
+     "oracle_add_delta": -378885,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "30_orcp_ORACLE_524287_1_c1.7.jsonl",
+   "idx": 30,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 524287,
+   "seed": 1,
+   "c_D": 1.7,
+   "command": "oracle ic 524287 1 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:13Z",
+   "loadavg_before": "3.02 2.07 1.87 3/116 5855",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 4541857,
+     "oracle_skipped_mul": 4541857,
+     "d_rel_add": -757065,
+     "oracle_add_delta": -757065,
+     "d_la_lmul": 3023339,
+     "d_la_ladd": 3023339,
+     "oracle_pred_lmul_saving": 3023339,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 4541857,
+     "oracle_skipped_mul": 4541857,
+     "d_rel_add": -757065,
+     "oracle_add_delta": -757065,
+     "d_la_lmul": 3023339,
+     "d_la_ladd": 3023339,
+     "oracle_pred_lmul_saving": 3023339,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 4541857,
+     "oracle_skipped_mul": 4541857,
+     "d_rel_add": -757065,
+     "oracle_add_delta": -757065,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "31_orcp_ORACLE_524287_2_c1.7.jsonl",
+   "idx": 31,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 524287,
+   "seed": 2,
+   "c_D": 1.7,
+   "command": "oracle ic 524287 2 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:22Z",
+   "loadavg_before": "3.01 2.09 1.87 3/116 5863",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 4542957,
+     "oracle_skipped_mul": 4542957,
+     "d_rel_add": -757059,
+     "oracle_add_delta": -757059,
+     "d_la_lmul": 3023339,
+     "d_la_ladd": 3023339,
+     "oracle_pred_lmul_saving": 3023339,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 4542957,
+     "oracle_skipped_mul": 4542957,
+     "d_rel_add": -757059,
+     "oracle_add_delta": -757059,
+     "d_la_lmul": 3023339,
+     "d_la_ladd": 3023339,
+     "oracle_pred_lmul_saving": 3023339,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 4542957,
+     "oracle_skipped_mul": 4542957,
+     "d_rel_add": -757059,
+     "oracle_add_delta": -757059,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "32_orcp_ORACLE_524287_3_c1.7.jsonl",
+   "idx": 32,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 524287,
+   "seed": 3,
+   "c_D": 1.7,
+   "command": "oracle ic 524287 3 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:25Z",
+   "loadavg_before": "3.01 2.10 1.88 3/113 5871",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 4539349,
+     "oracle_skipped_mul": 4539349,
+     "d_rel_add": -757063,
+     "oracle_add_delta": -757063,
+     "d_la_lmul": 3023339,
+     "d_la_ladd": 3023339,
+     "oracle_pred_lmul_saving": 3023339,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 4539349,
+     "oracle_skipped_mul": 4539349,
+     "d_rel_add": -757063,
+     "oracle_add_delta": -757063,
+     "d_la_lmul": 3023339,
+     "d_la_ladd": 3023339,
+     "oracle_pred_lmul_saving": 3023339,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 4539349,
+     "oracle_skipped_mul": 4539349,
+     "d_rel_add": -757063,
+     "oracle_add_delta": -757063,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "33_orcp_ORACLE_524287_4_c1.7.jsonl",
+   "idx": 33,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 524287,
+   "seed": 4,
+   "c_D": 1.7,
+   "command": "oracle ic 524287 4 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:28Z",
+   "loadavg_before": "3.01 2.12 1.88 3/112 5879",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 4538635,
+     "oracle_skipped_mul": 4538635,
+     "d_rel_add": -757055,
+     "oracle_add_delta": -757055,
+     "d_la_lmul": 3023339,
+     "d_la_ladd": 3023339,
+     "oracle_pred_lmul_saving": 3023339,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 4538635,
+     "oracle_skipped_mul": 4538635,
+     "d_rel_add": -757055,
+     "oracle_add_delta": -757055,
+     "d_la_lmul": 3018423,
+     "d_la_ladd": 3018423,
+     "oracle_pred_lmul_saving": 3018423,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 4538635,
+     "oracle_skipped_mul": 4538635,
+     "d_rel_add": -757055,
+     "oracle_add_delta": -757055,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "34_orcp_ORACLE_524287_6_c1.7.jsonl",
+   "idx": 34,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 524287,
+   "seed": 6,
+   "c_D": 1.7,
+   "command": "oracle ic 524287 6 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:32Z",
+   "loadavg_before": "3.01 2.12 1.88 4/113 5888",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 4546225,
+     "oracle_skipped_mul": 4546225,
+     "d_rel_add": -757063,
+     "oracle_add_delta": -757063,
+     "d_la_lmul": 3023339,
+     "d_la_ladd": 3023339,
+     "oracle_pred_lmul_saving": 3023339,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 4546225,
+     "oracle_skipped_mul": 4546225,
+     "d_rel_add": -757063,
+     "oracle_add_delta": -757063,
+     "d_la_lmul": 3023339,
+     "d_la_ladd": 3023339,
+     "oracle_pred_lmul_saving": 3023339,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 4546225,
+     "oracle_skipped_mul": 4546225,
+     "d_rel_add": -757063,
+     "oracle_add_delta": -757063,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "35_orcp_ORACLE_1048507_1_c1.7.jsonl",
+   "idx": 35,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 1048507,
+   "seed": 1,
+   "c_D": 1.7,
+   "command": "oracle ic 1048507 1 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:33Z",
+   "loadavg_before": "3.01 2.13 1.89 3/113 5897",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 9087145,
+     "oracle_skipped_mul": 9087145,
+     "d_rel_add": -1514666,
+     "oracle_add_delta": -1514666,
+     "d_la_lmul": 6051719,
+     "d_la_ladd": 6051719,
+     "oracle_pred_lmul_saving": 6051719,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 9087145,
+     "oracle_skipped_mul": 9087145,
+     "d_rel_add": -1514666,
+     "oracle_add_delta": -1514666,
+     "d_la_lmul": 6051719,
+     "d_la_ladd": 6051719,
+     "oracle_pred_lmul_saving": 6051719,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 9087145,
+     "oracle_skipped_mul": 9087145,
+     "d_rel_add": -1514666,
+     "oracle_add_delta": -1514666,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "36_orcp_ORACLE_1048507_2_c1.7.jsonl",
+   "idx": 36,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 1048507,
+   "seed": 2,
+   "c_D": 1.7,
+   "command": "oracle ic 1048507 2 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:37Z",
+   "loadavg_before": "3.01 2.13 1.89 3/113 5905",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 9088261,
+     "oracle_skipped_mul": 9088261,
+     "d_rel_add": -1514668,
+     "oracle_add_delta": -1514668,
+     "d_la_lmul": 6051719,
+     "d_la_ladd": 6051719,
+     "oracle_pred_lmul_saving": 6051719,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 9088261,
+     "oracle_skipped_mul": 9088261,
+     "d_rel_add": -1514668,
+     "oracle_add_delta": -1514668,
+     "d_la_lmul": 6051719,
+     "d_la_ladd": 6051719,
+     "oracle_pred_lmul_saving": 6051719,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 9088261,
+     "oracle_skipped_mul": 9088261,
+     "d_rel_add": -1514668,
+     "oracle_add_delta": -1514668,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "37_orcp_ORACLE_1048507_4_c1.7.jsonl",
+   "idx": 37,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 1048507,
+   "seed": 4,
+   "c_D": 1.7,
+   "command": "oracle ic 1048507 4 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:38Z",
+   "loadavg_before": "3.01 2.15 1.90 3/113 5913",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 9087378,
+     "oracle_skipped_mul": 9087378,
+     "d_rel_add": -1514670,
+     "oracle_add_delta": -1514670,
+     "d_la_lmul": 6051719,
+     "d_la_ladd": 6051719,
+     "oracle_pred_lmul_saving": 6051719,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 9087378,
+     "oracle_skipped_mul": 9087378,
+     "d_rel_add": -1514670,
+     "oracle_add_delta": -1514670,
+     "d_la_lmul": 6051719,
+     "d_la_ladd": 6051719,
+     "oracle_pred_lmul_saving": 6051719,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 9087378,
+     "oracle_skipped_mul": 9087378,
+     "d_rel_add": -1514670,
+     "oracle_add_delta": -1514670,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "38_orcp_ORACLE_1048507_5_c1.7.jsonl",
+   "idx": 38,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 1048507,
+   "seed": 5,
+   "c_D": 1.7,
+   "command": "oracle ic 1048507 5 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:46Z",
+   "loadavg_before": "3.09 2.18 1.91 3/116 5929",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 9088333,
+     "oracle_skipped_mul": 9088333,
+     "d_rel_add": -1514668,
+     "oracle_add_delta": -1514668,
+     "d_la_lmul": 6051719,
+     "d_la_ladd": 6051719,
+     "oracle_pred_lmul_saving": 6051719,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 9088333,
+     "oracle_skipped_mul": 9088333,
+     "d_rel_add": -1514668,
+     "oracle_add_delta": -1514668,
+     "d_la_lmul": 6051719,
+     "d_la_ladd": 6051719,
+     "oracle_pred_lmul_saving": 6051719,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 9088333,
+     "oracle_skipped_mul": 9088333,
+     "d_rel_add": -1514668,
+     "oracle_add_delta": -1514668,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "39_orcp_ORACLE_1048507_6_c1.7.jsonl",
+   "idx": 39,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 1048507,
+   "seed": 6,
+   "c_D": 1.7,
+   "command": "oracle ic 1048507 6 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:49Z",
+   "loadavg_before": "3.08 2.19 1.91 3/116 5937",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 9084747,
+     "oracle_skipped_mul": 9084747,
+     "d_rel_add": -1514668,
+     "oracle_add_delta": -1514668,
+     "d_la_lmul": 6051719,
+     "d_la_ladd": 6051719,
+     "oracle_pred_lmul_saving": 6051719,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 9084747,
+     "oracle_skipped_mul": 9084747,
+     "d_rel_add": -1514668,
+     "oracle_add_delta": -1514668,
+     "d_la_lmul": 6051719,
+     "d_la_ladd": 6051719,
+     "oracle_pred_lmul_saving": 6051719,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 9084747,
+     "oracle_skipped_mul": 9084747,
+     "d_rel_add": -1514668,
+     "oracle_add_delta": -1514668,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "40_orcp_ORACLE_2097091_1_c1.7.jsonl",
+   "idx": 40,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 2097091,
+   "seed": 1,
+   "c_D": 1.7,
+   "command": "oracle ic 2097091 1 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:53Z",
+   "loadavg_before": "3.07 2.20 1.92 3/114 5945",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 18176253,
+     "oracle_skipped_mul": 18176253,
+     "d_rel_add": -3029489,
+     "oracle_add_delta": -3029489,
+     "d_la_lmul": 12108119,
+     "d_la_ladd": 12108119,
+     "oracle_pred_lmul_saving": 12108119,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 18176253,
+     "oracle_skipped_mul": 18176253,
+     "d_rel_add": -3029489,
+     "oracle_add_delta": -3029489,
+     "d_la_lmul": 12108119,
+     "d_la_ladd": 12108119,
+     "oracle_pred_lmul_saving": 12108119,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 18176253,
+     "oracle_skipped_mul": 18176253,
+     "d_rel_add": -3029489,
+     "oracle_add_delta": -3029489,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "41_orcp_ORACLE_2097091_2_c1.7.jsonl",
+   "idx": 41,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 2097091,
+   "seed": 2,
+   "c_D": 1.7,
+   "command": "oracle ic 2097091 2 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:07:57Z",
+   "loadavg_before": "3.07 2.20 1.92 3/112 5954",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 18179142,
+     "oracle_skipped_mul": 18179142,
+     "d_rel_add": -3029485,
+     "oracle_add_delta": -3029485,
+     "d_la_lmul": 12108119,
+     "d_la_ladd": 12108119,
+     "oracle_pred_lmul_saving": 12108119,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 18179142,
+     "oracle_skipped_mul": 18179142,
+     "d_rel_add": -3029485,
+     "oracle_add_delta": -3029485,
+     "d_la_lmul": 12108119,
+     "d_la_ladd": 12108119,
+     "oracle_pred_lmul_saving": 12108119,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 18179142,
+     "oracle_skipped_mul": 18179142,
+     "d_rel_add": -3029485,
+     "oracle_add_delta": -3029485,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "42_orcp_ORACLE_2097091_3_c1.7.jsonl",
+   "idx": 42,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 2097091,
+   "seed": 3,
+   "c_D": 1.7,
+   "command": "oracle ic 2097091 3 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:08:06Z",
+   "loadavg_before": "3.06 2.23 1.93 3/116 5975",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 18178032,
+     "oracle_skipped_mul": 18178032,
+     "d_rel_add": -3029489,
+     "oracle_add_delta": -3029489,
+     "d_la_lmul": 12108119,
+     "d_la_ladd": 12108119,
+     "oracle_pred_lmul_saving": 12108119,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 18178032,
+     "oracle_skipped_mul": 18178032,
+     "d_rel_add": -3029489,
+     "oracle_add_delta": -3029489,
+     "d_la_lmul": 12108119,
+     "d_la_ladd": 12108119,
+     "oracle_pred_lmul_saving": 12108119,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 18178032,
+     "oracle_skipped_mul": 18178032,
+     "d_rel_add": -3029489,
+     "oracle_add_delta": -3029489,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "43_orcp_ORACLE_2097091_4_c1.7.jsonl",
+   "idx": 43,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 2097091,
+   "seed": 4,
+   "c_D": 1.7,
+   "command": "oracle ic 2097091 4 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:08:18Z",
+   "loadavg_before": "3.05 2.27 1.95 3/116 6062",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 18172356,
+     "oracle_skipped_mul": 18172356,
+     "d_rel_add": -3029487,
+     "oracle_add_delta": -3029487,
+     "d_la_lmul": 12108119,
+     "d_la_ladd": 12108119,
+     "oracle_pred_lmul_saving": 12108119,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 18172356,
+     "oracle_skipped_mul": 18172356,
+     "d_rel_add": -3029487,
+     "oracle_add_delta": -3029487,
+     "d_la_lmul": 12108119,
+     "d_la_ladd": 12108119,
+     "oracle_pred_lmul_saving": 12108119,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 18172356,
+     "oracle_skipped_mul": 18172356,
+     "d_rel_add": -3029487,
+     "oracle_add_delta": -3029487,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "44_orcp_ORACLE_2097091_5_c1.7.jsonl",
+   "idx": 44,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 2097091,
+   "seed": 5,
+   "c_D": 1.7,
+   "command": "oracle ic 2097091 5 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:08:28Z",
+   "loadavg_before": "3.04 2.28 1.96 3/112 6070",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 18181398,
+     "oracle_skipped_mul": 18181398,
+     "d_rel_add": -3029489,
+     "oracle_add_delta": -3029489,
+     "d_la_lmul": 12108119,
+     "d_la_ladd": 12108119,
+     "oracle_pred_lmul_saving": 12108119,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 18181398,
+     "oracle_skipped_mul": 18181398,
+     "d_rel_add": -3029489,
+     "oracle_add_delta": -3029489,
+     "d_la_lmul": 12108119,
+     "d_la_ladd": 12108119,
+     "oracle_pred_lmul_saving": 12108119,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 18181398,
+     "oracle_skipped_mul": 18181398,
+     "d_rel_add": -3029489,
+     "oracle_add_delta": -3029489,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "45_orcp_ORACLE_2097091_6_c1.7.jsonl",
+   "idx": 45,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 2097091,
+   "seed": 6,
+   "c_D": 1.7,
+   "command": "oracle ic 2097091 6 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:08:38Z",
+   "loadavg_before": "3.03 2.32 1.97 3/113 6090",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 18179881,
+     "oracle_skipped_mul": 18179881,
+     "d_rel_add": -3029489,
+     "oracle_add_delta": -3029489,
+     "d_la_lmul": 12108119,
+     "d_la_ladd": 12108119,
+     "oracle_pred_lmul_saving": 12108119,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 18179881,
+     "oracle_skipped_mul": 18179881,
+     "d_rel_add": -3029489,
+     "oracle_add_delta": -3029489,
+     "d_la_lmul": 12108119,
+     "d_la_ladd": 12108119,
+     "oracle_pred_lmul_saving": 12108119,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 18179881,
+     "oracle_skipped_mul": 18179881,
+     "d_rel_add": -3029489,
+     "oracle_add_delta": -3029489,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "46_orcp_ORACLE_4194271_1_c1.7.jsonl",
+   "idx": 46,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 4194271,
+   "seed": 1,
+   "c_D": 1.7,
+   "command": "oracle ic 4194271 1 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:08:40Z",
+   "loadavg_before": "3.03 2.32 1.97 3/113 6101",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 36358917,
+     "oracle_skipped_mul": 36358917,
+     "d_rel_add": -6060421,
+     "oracle_add_delta": -6060421,
+     "d_la_lmul": 24227759,
+     "d_la_ladd": 24227759,
+     "oracle_pred_lmul_saving": 24227759,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 36358917,
+     "oracle_skipped_mul": 36358917,
+     "d_rel_add": -6060421,
+     "oracle_add_delta": -6060421,
+     "d_la_lmul": 24227759,
+     "d_la_ladd": 24227759,
+     "oracle_pred_lmul_saving": 24227759,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 36358917,
+     "oracle_skipped_mul": 36358917,
+     "d_rel_add": -6060421,
+     "oracle_add_delta": -6060421,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "47_orcp_ORACLE_4194271_2_c1.7.jsonl",
+   "idx": 47,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 4194271,
+   "seed": 2,
+   "c_D": 1.7,
+   "command": "oracle ic 4194271 2 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:08:50Z",
+   "loadavg_before": "3.11 2.36 1.99 18/138 6141",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 36362975,
+     "oracle_skipped_mul": 36362975,
+     "d_rel_add": -6060419,
+     "oracle_add_delta": -6060419,
+     "d_la_lmul": 24227759,
+     "d_la_ladd": 24227759,
+     "oracle_pred_lmul_saving": 24227759,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 36362975,
+     "oracle_skipped_mul": 36362975,
+     "d_rel_add": -6060419,
+     "oracle_add_delta": -6060419,
+     "d_la_lmul": 24227759,
+     "d_la_ladd": 24227759,
+     "oracle_pred_lmul_saving": 24227759,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 36362975,
+     "oracle_skipped_mul": 36362975,
+     "d_rel_add": -6060419,
+     "oracle_add_delta": -6060419,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "48_orcp_ORACLE_4194271_3_c1.7.jsonl",
+   "idx": 48,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 4194271,
+   "seed": 3,
+   "c_D": 1.7,
+   "command": "oracle ic 4194271 3 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:09:11Z",
+   "loadavg_before": "5.77 3.01 2.22 5/122 6218",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 36350993,
+     "oracle_skipped_mul": 36350993,
+     "d_rel_add": -6060419,
+     "oracle_add_delta": -6060419,
+     "d_la_lmul": 24227759,
+     "d_la_ladd": 24227759,
+     "oracle_pred_lmul_saving": 24227759,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 36350993,
+     "oracle_skipped_mul": 36350993,
+     "d_rel_add": -6060419,
+     "oracle_add_delta": -6060419,
+     "d_la_lmul": 24227759,
+     "d_la_ladd": 24227759,
+     "oracle_pred_lmul_saving": 24227759,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 36350993,
+     "oracle_skipped_mul": 36350993,
+     "d_rel_add": -6060419,
+     "oracle_add_delta": -6060419,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "49_orcp_ORACLE_4194271_5_c1.7.jsonl",
+   "idx": 49,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 4194271,
+   "seed": 5,
+   "c_D": 1.7,
+   "command": "oracle ic 4194271 5 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:09:39Z",
+   "loadavg_before": "6.31 3.44 2.38 3/112 6295",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 36356721,
+     "oracle_skipped_mul": 36356721,
+     "d_rel_add": -6060421,
+     "oracle_add_delta": -6060421,
+     "d_la_lmul": 24227759,
+     "d_la_ladd": 24227759,
+     "oracle_pred_lmul_saving": 24227759,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 36356721,
+     "oracle_skipped_mul": 36356721,
+     "d_rel_add": -6060421,
+     "oracle_add_delta": -6060421,
+     "d_la_lmul": 24227759,
+     "d_la_ladd": 24227759,
+     "oracle_pred_lmul_saving": 24227759,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 36356721,
+     "oracle_skipped_mul": 36356721,
+     "d_rel_add": -6060421,
+     "oracle_add_delta": -6060421,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "50_orcp_ORACLE_4194271_6_c1.7.jsonl",
+   "idx": 50,
+   "role": "orcp",
+   "arm": "ORACLE",
+   "q": 4194271,
+   "seed": 6,
+   "c_D": 1.7,
+   "command": "oracle ic 4194271 6 D 3.0 1.7",
+   "env": "NRM=1,LZ_REUSE=1",
+   "exit_code": 0,
+   "start_utc": "2026-11-15T06:09:56Z",
+   "loadavg_before": "5.58 3.41 2.39 3/111 6306",
+   "ic_records": 3,
+   "ic_arms_attempts": [
+    [
+     "D",
+     1
+    ],
+    [
+     "DL1",
+     1
+    ],
+    [
+     "DL",
+     1
+    ]
+   ],
+   "k_found_equals_k_and_ok": true,
+   "checks": [
+    {
+     "against": "committed BOTH (every counted field)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0
+    },
+    {
+     "against": "REF (replayed, or committed for producer cells; only NRM+LZ allowed fields)",
+     "fields_compared": 286,
+     "mismatches": [],
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    }
+   ],
+   "verified": true,
+   "reconciliation": {
+    "D": {
+     "d_rel_mul": 36368244,
+     "oracle_skipped_mul": 36368244,
+     "d_rel_add": -6060415,
+     "oracle_add_delta": -6060415,
+     "d_la_lmul": 24227759,
+     "d_la_ladd": 24227759,
+     "oracle_pred_lmul_saving": 24227759,
+     "exact": true
+    },
+    "DL1": {
+     "d_rel_mul": 36368244,
+     "oracle_skipped_mul": 36368244,
+     "d_rel_add": -6060415,
+     "oracle_add_delta": -6060415,
+     "d_la_lmul": 24227759,
+     "d_la_ladd": 24227759,
+     "oracle_pred_lmul_saving": 24227759,
+     "exact": true
+    },
+    "DL": {
+     "d_rel_mul": 36368244,
+     "oracle_skipped_mul": 36368244,
+     "d_rel_add": -6060415,
+     "oracle_add_delta": -6060415,
+     "d_la_lmul": 0,
+     "d_la_ladd": 0,
+     "oracle_pred_lmul_saving": 0,
+     "exact": true
+    }
+   },
+   "oracle_clean": true,
+   "log_equal_ref_mod_wall": true,
+   "log_equal_committed_mod_wall": null
+  },
+  {
+   "unit": "small-q q=223 seed=1 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 223,
+   "seed": 1,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 610,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 610,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 3,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=223 seed=2 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 223,
+   "seed": 2,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 610,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 610,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 3,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=223 seed=3 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 223,
+   "seed": 3,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 610,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 610,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 3,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=223 seed=4 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 223,
+   "seed": 4,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 772,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 772,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 4,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=223 seed=5 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 223,
+   "seed": 5,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 610,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 610,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 3,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=499 seed=1 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 499,
+   "seed": 1,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 2,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=499 seed=2 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 499,
+   "seed": 2,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 2,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=499 seed=3 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 499,
+   "seed": 3,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 2,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=499 seed=4 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 499,
+   "seed": 4,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 610,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 610,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 3,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=499 seed=5 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 499,
+   "seed": 5,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 2,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=991 seed=1 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 991,
+   "seed": 1,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 2,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=991 seed=2 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 991,
+   "seed": 2,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 2,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=991 seed=3 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 991,
+   "seed": 3,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 2,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=991 seed=4 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 991,
+   "seed": 4,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 2,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=991 seed=5 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 991,
+   "seed": 5,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 2,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=2011 seed=1 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 2011,
+   "seed": 1,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 2,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=2011 seed=2 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 2011,
+   "seed": 2,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 2,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=2011 seed=3 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 2011,
+   "seed": 3,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 2,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=2011 seed=4 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 2011,
+   "seed": 4,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 2,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=2011 seed=5 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 2011,
+   "seed": 5,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 2,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=4051 seed=1 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 4051,
+   "seed": 1,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=4051 seed=2 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 4051,
+   "seed": 2,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=4051 seed=3 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 4051,
+   "seed": 3,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 2,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=4051 seed=4 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 4051,
+   "seed": 4,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=4051 seed=5 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 4051,
+   "seed": 5,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 448,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 2,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=8191 seed=1 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 8191,
+   "seed": 1,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=8191 seed=2 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 8191,
+   "seed": 2,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=8191 seed=3 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 8191,
+   "seed": 3,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=8191 seed=4 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 8191,
+   "seed": 4,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=8191 seed=5 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 8191,
+   "seed": 5,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=16363 seed=1 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 16363,
+   "seed": 1,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=16363 seed=2 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 16363,
+   "seed": 2,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=16363 seed=3 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 16363,
+   "seed": 3,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=16363 seed=4 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 16363,
+   "seed": 4,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=16363 seed=5 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 16363,
+   "seed": 5,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=32719 seed=1 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 32719,
+   "seed": 1,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=32719 seed=2 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 32719,
+   "seed": 2,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=32719 seed=3 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 32719,
+   "seed": 3,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=32719 seed=4 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 32719,
+   "seed": 4,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  },
+  {
+   "unit": "small-q q=32719 seed=5 (REF, BOTH, ORACLE)",
+   "role": "small",
+   "q": 32719,
+   "seed": 5,
+   "c_D": 1.7,
+   "checks": [
+    {
+     "against": "BOTH vs REF",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": [
+      "D linear_algebra.ladd",
+      "D linear_algebra.lmul",
+      "D relations.add",
+      "D relations.mul",
+      "DL relations.add",
+      "DL relations.mul",
+      "DL1 linear_algebra.ladd",
+      "DL1 linear_algebra.lmul",
+      "DL1 relations.add",
+      "DL1 relations.mul"
+     ]
+    },
+    {
+     "against": "ORACLE vs BOTH",
+     "fields_compared": 286,
+     "n_mismatches": 0,
+     "allowed_fields_changed": []
+    }
+   ],
+   "oracle_attempts": 1,
+   "verified": true
+  }
+ ],
+ "total_mismatches": 0,
+ "mismatches": [],
+ "all_exit_codes_zero": true,
+ "all_ok_and_k_found_equals_k": true,
+ "oracle_audit": {
+  "production_sizes": {
+   "nrm_used": [
+    83572922,
+    83572922,
+    83572922,
+    83572870,
+    83570007,
+    83569954
+   ],
+   "nrm_bad": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "b0zero_pairs": 0,
+   "p0zero_resid": 56,
+   "full_value_bad": 0,
+   "lz_calls": 68,
+   "vvp_used": 135221,
+   "vvp_bad": 0,
+   "wy_used": 135221,
+   "wy_bad": 0,
+   "wA0_nonzero": 0,
+   "reconciled_units": 34,
+   "reconcile_fail": []
+  },
+  "small_q": {
+   "attempts": 69,
+   "multi_attempt_units": 22,
+   "failed_attempt_records": 87,
+   "b0zero_pairs": 134,
+   "p0zero_resid": 158,
+   "nrm_bad": 0,
+   "full_value_bad": 0,
+   "lz_calls": 80,
+   "vvp_used": 10069,
+   "wy_used": 10069,
+   "lz_bad": 0,
+   "reconciled_records": 207,
+   "reconcile_fail": []
+  },
+  "nrm_site_order": [
+   "g3",
+   "g1",
+   "g2",
+   "disc",
+   "lin",
+   "normaliser"
+  ],
+  "meaning": "Every skipped multiplication had an operand equal to 1 (or was the exact 4*g1 = 2(g1+g1) rewrite) and every full value (g3, g1, g2, disc, residual points, normalised points) equals REF's; every reused v^T v_prev and w^T y equals the direct dot and every w_i^T A w_0 (i >= 1) is 0; the counted differences REF - CAND equal the oracle's skip/reuse counts exactly in every record (34 production-size units incl. all 30 producer cells, 207 small-q records incl. failed attempts)."
+ },
+ "identity_proofs": {
+  "NRM": {
+   "arithmetic": "Fp::mul(a, b) = a*b mod q, Fp::add reduces; every operand at the skipped sites is already reduced (< q): ga, gb from Fp::add, ha[0] and mb[0] from Fp::mul, u from Fp::mul. So mul(x, 1) = x and add(0, x) = x exactly.",
+   "sites": {
+    "g3": "skips mul(ga[0], b[0]) iff b[0] == 1 (operand tested directly)",
+    "g1": "skips mul(gb[0], a[0]) iff a[0] == 1",
+    "g2": "replaces add(0, mul(ha[0], mb[0])) by ha[0] iff b[0] == 1; mb[0] = local_data mo[0] = mul(b0, b0) = 1 then; also drops the add of the initial 0 (exact)",
+    "disc": "4*g1 = (g1+g1)+(g1+g1) mod q: one mul -> two adds, always when NRM=1",
+    "lin": "skips mul(u, a[0]) iff a[0] == 1",
+    "normaliser": "pv = 1/(first nonzero coordinate); when p[0] != 0 that coordinate is p[0], so p[0]*pv = 1; p[0] == 0 takes the full three-multiplication path (counted, including 0*pv)"
+   },
+   "first_coordinate_zero": "points with first coordinate 0 never take a skip: a[0]/b[0] == 0 fails the == 1 test, p[0] == 0 fails the != 0 test. Exercised: 56 residual points with p[0] = 0 in the production-size oracle runs, 134 factor-base pairs with b[0] = 0 and 158 such residual points in the small-q sweep, all exact.",
+   "moved_work": "none: the only new code are comparisons on values already computed, uncounted exactly as REF's own g3 == 0, disc == 0 and pv[k] != 1 tests; local_data, batch_inv, the fb normalisation (pnorm) and the kind-1 point formula are unchanged (fb.* identical in every unit; kind-1 still multiplies by a[0]).",
+   "count_identity": "REF - CAND relations.mul = number of skips (6 sites); REF - CAND relations.add = #g2 skips - 2 #disc. Holds exactly in every oracle run."
+  },
+  "LZ": {
+   "setup": "A = R^T D R (matvec_b0 and matvec_pm1 compute the same field values: acc_coef replaces a*v by v or -v only when a = 1 or ell - 1), symmetric. w_0 = y = A b; at iteration i with s_i = w_i^T A w_i != 0: v_i = A w_i, a_i = v_i^T v_i / s_i, b_i = v_i^T v_{i-1} / s_{i-1} (i >= 1), w_{i+1} = v_i - a_i w_i - b_i w_{i-1} (no b term at i = 0). Arithmetic exact in F_ell.",
+   "P": "P(i): w_i^T A w_{i-1} = 0. P(1) = v_0^T v_0 - a_0 s_0 = 0; P(i+1) = v_i^T v_i - a_i s_i - b_i w_{i-1}^T A w_i = 0 by P(i) and symmetry. a_i is always a direct dot, so P holds in both modes.",
+   "identity_1": "v_i^T v_{i-1} = w_i^T A v_{i-1} = w_i^T A (w_i + a_{i-1} w_{i-1} + b_{i-1} w_{i-2}) = s_i + a_{i-1} P(i) + b_{i-1} Q(i), Q(i) = w_i^T A w_{i-2} = v_{i-1}^T v_{i-2} - a_{i-1} P(i-1) - b_{i-1} s_{i-2} = 0 whenever b_{i-1} was exact; at i = 1 there is no w_{-1} term. By induction from i = 1 identity 1 is exact at every iteration, including when it is itself used (LZ) to form every b.",
+   "identity_2": "w_{i+1}^T y = (A w_i)^T w_0 - a_i w_i^T y - b_i w_{i-1}^T y. (A w_0)^T w_0 = s_0 gives the first-iteration form s0 - a_0 wy_0 (wy_0 = y^T y is a direct dot). For i >= 1, w_i^T A w_0 = 0 by full A-orthogonality: for k <= i-2, w_{i+1}^T A w_k = w_i^T A (w_{k+1} + a_k w_k + b_k w_{k-1}) - 0 - 0 = 0 (standard Lanczos induction, exact over a field; scalar Lanczos never narrows, so unlike the block case no column is ever dropped).",
+   "breakdown": "s == 0 returns None before wy or vvp of that iteration is used, in both modes; s_prev is a previously checked nonzero s; the w == 0 break and the n + 5 iteration cap see identical iterates. So results, None cases and iteration counts are identical; the no-env path computes both dots exactly as REF (diff and A/A).",
+   "count_identity": "per call with I iterations passing the s check, REF - LZ = (I - 1)(2n - 2) - 1 lmul and the same ladd (two n-term dots removed per iteration after the first; 2 lmul + 2 ladd added there and 1 + 1 at the first). Holds exactly for every call in every oracle run and in the stress harness."
+  }
+ },
+ "stress_test": {
+  "what": "scripts/lzstress.rs drives la2::lanczos directly (CAND la2.rs without and with LZ_REUSE, REF la2.rs, oracle la2.rs) on random sparse matrices, ell in {2, 3, 5, 7, 11, 13, 101, 65537, 4501899029752451}, n 2..41, rows 1..2n+4, coefficients 1 / ell-1 / random, pm1 random, seed 20261115",
+  "summary_200k": "STRESS trials=200000 noenv_equals_ref=200000 lz_result_equal=200000 lz_count_formula=200000 bad=0 some=49319 none=150681 lz_cheaper=143176",
+  "summary_20k": "STRESS trials=20000 noenv_equals_ref=20000 lz_result_equal=20000 lz_count_formula=20000 bad=0 some=4859 none=15141 lz_cheaper=14498",
+  "oracle_200k": "1437027 reused v^T v_prev and 1437027 reused w^T y, 0 differing from the direct dot, 0 nonzero w_i^T A w_0; results: 49319 some, 44967 zero vector, 105714 None (45073 of them after >= 3 iterations, i.e. breakdown after the identities were in use)",
+  "meaning": "the no-env path equals REF in result and counts on every trial; LZ gives the identical result (incl. every None) on every trial and its count saving follows (I-1)(2n-2)-1 exactly, also at ell = 2, 3, 5 where breakdown is frequent"
+ },
+ "negative_controls": [
+  {
+   "unit": "221_neg_MUTLZWY_262111_1_c1.7.jsonl",
+   "arm": "MUTLZWY",
+   "q": 262111,
+   "seed": 1,
+   "rc": 0,
+   "records": [
+    [
+     "D",
+     1,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     1,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL",
+     1,
+     true,
+     ""
+    ],
+    [
+     "D",
+     2,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     2,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "D",
+     3,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     3,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "D",
+     4,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     4,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "D",
+     5,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     5,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "D",
+     6,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     6,
+     false,
+     "linear algebra failed"
+    ]
+   ],
+   "vs_REF_outside_allowed": 1,
+   "first": [
+    "record arms/attempts differ: [('D', 1, True), ('DL1', 1, True), ('DL', 1, True)] vs [('D', 1, False), ('DL1', 1, False), ('DL', 1, True), ('D', 2, False), ('DL1', 2, False), ('D', 3, False), ('DL1', 3, False), ('D', 4, False), ('DL1', 4, False), ('D', 5, False), ('DL1', 5, False), ('D', 6, False), ('DL1', 6, False)]"
+   ],
+   "vs_committed_BOTH": 1,
+   "first_vs_BOTH": [
+    "record arms/attempts differ: [('D', 1, True), ('DL1', 1, True), ('DL', 1, True)] vs [('D', 1, False), ('DL1', 1, False), ('DL', 1, True), ('D', 2, False), ('DL1', 2, False), ('D', 3, False), ('DL1', 3, False), ('D', 4, False), ('DL1', 4, False), ('D', 5, False), ('DL1', 5, False), ('D', 6, False), ('DL1', 6, False)]"
+   ],
+   "detected": true
+  },
+  {
+   "unit": "222_neg_MUTLZVV_262111_1_c1.7.jsonl",
+   "arm": "MUTLZVV",
+   "q": 262111,
+   "seed": 1,
+   "rc": 0,
+   "records": [
+    [
+     "D",
+     1,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     1,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL",
+     1,
+     true,
+     ""
+    ],
+    [
+     "D",
+     2,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     2,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "D",
+     3,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     3,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "D",
+     4,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     4,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "D",
+     5,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     5,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "D",
+     6,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     6,
+     false,
+     "linear algebra failed"
+    ]
+   ],
+   "vs_REF_outside_allowed": 1,
+   "first": [
+    "record arms/attempts differ: [('D', 1, True), ('DL1', 1, True), ('DL', 1, True)] vs [('D', 1, False), ('DL1', 1, False), ('DL', 1, True), ('D', 2, False), ('DL1', 2, False), ('D', 3, False), ('DL1', 3, False), ('D', 4, False), ('DL1', 4, False), ('D', 5, False), ('DL1', 5, False), ('D', 6, False), ('DL1', 6, False)]"
+   ],
+   "vs_committed_BOTH": 1,
+   "first_vs_BOTH": [
+    "record arms/attempts differ: [('D', 1, True), ('DL1', 1, True), ('DL', 1, True)] vs [('D', 1, False), ('DL1', 1, False), ('DL', 1, True), ('D', 2, False), ('DL1', 2, False), ('D', 3, False), ('DL1', 3, False), ('D', 4, False), ('DL1', 4, False), ('D', 5, False), ('DL1', 5, False), ('D', 6, False), ('DL1', 6, False)]"
+   ],
+   "detected": true
+  },
+  {
+   "unit": "223_neg_MUTNRM_262111_1_c1.7.jsonl",
+   "arm": "MUTNRM",
+   "q": 262111,
+   "seed": 1,
+   "rc": 101,
+   "records": [],
+   "vs_REF_outside_allowed": 1,
+   "first": [
+    "record arms/attempts differ: [('D', 1, True), ('DL1', 1, True), ('DL', 1, True)] vs []"
+   ],
+   "vs_committed_BOTH": 1,
+   "first_vs_BOTH": [
+    "record arms/attempts differ: [('D', 1, True), ('DL1', 1, True), ('DL', 1, True)] vs []"
+   ],
+   "detected": true
+  },
+  {
+   "unit": "224_neg_MUTLZWY_524287_5_c1.7.jsonl",
+   "arm": "MUTLZWY",
+   "q": 524287,
+   "seed": 5,
+   "rc": 0,
+   "records": [
+    [
+     "D",
+     1,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     1,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL",
+     1,
+     true,
+     ""
+    ],
+    [
+     "D",
+     2,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     2,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "D",
+     3,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     3,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "D",
+     4,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     4,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "D",
+     5,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     5,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "D",
+     6,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     6,
+     false,
+     "linear algebra failed"
+    ]
+   ],
+   "vs_REF_outside_allowed": 1,
+   "first": [
+    "record arms/attempts differ: [('D', 1, True), ('DL1', 1, True), ('DL', 1, True)] vs [('D', 1, False), ('DL1', 1, False), ('DL', 1, True), ('D', 2, False), ('DL1', 2, False), ('D', 3, False), ('DL1', 3, False), ('D', 4, False), ('DL1', 4, False), ('D', 5, False), ('DL1', 5, False), ('D', 6, False), ('DL1', 6, False)]"
+   ],
+   "vs_committed_BOTH": 1,
+   "first_vs_BOTH": [
+    "record arms/attempts differ: [('D', 1, True), ('DL1', 1, True), ('DL', 1, True)] vs [('D', 1, False), ('DL1', 1, False), ('DL', 1, True), ('D', 2, False), ('DL1', 2, False), ('D', 3, False), ('DL1', 3, False), ('D', 4, False), ('DL1', 4, False), ('D', 5, False), ('DL1', 5, False), ('D', 6, False), ('DL1', 6, False)]"
+   ],
+   "detected": true
+  },
+  {
+   "unit": "225_neg_MUTLZVV_524287_5_c1.7.jsonl",
+   "arm": "MUTLZVV",
+   "q": 524287,
+   "seed": 5,
+   "rc": 0,
+   "records": [
+    [
+     "D",
+     1,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     1,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL",
+     1,
+     true,
+     ""
+    ],
+    [
+     "D",
+     2,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     2,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "D",
+     3,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     3,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "D",
+     4,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     4,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "D",
+     5,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     5,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "D",
+     6,
+     false,
+     "linear algebra failed"
+    ],
+    [
+     "DL1",
+     6,
+     false,
+     "linear algebra failed"
+    ]
+   ],
+   "vs_REF_outside_allowed": 1,
+   "first": [
+    "record arms/attempts differ: [('D', 1, True), ('DL1', 1, True), ('DL', 1, True)] vs [('D', 1, False), ('DL1', 1, False), ('DL', 1, True), ('D', 2, False), ('DL1', 2, False), ('D', 3, False), ('DL1', 3, False), ('D', 4, False), ('DL1', 4, False), ('D', 5, False), ('DL1', 5, False), ('D', 6, False), ('DL1', 6, False)]"
+   ],
+   "vs_committed_BOTH": 1,
+   "first_vs_BOTH": [
+    "record arms/attempts differ: [('D', 1, True), ('DL1', 1, True), ('DL', 1, True)] vs [('D', 1, False), ('DL1', 1, False), ('DL', 1, True), ('D', 2, False), ('DL1', 2, False), ('D', 3, False), ('DL1', 3, False), ('D', 4, False), ('DL1', 4, False), ('D', 5, False), ('DL1', 5, False), ('D', 6, False), ('DL1', 6, False)]"
+   ],
+   "detected": true
+  },
+  {
+   "unit": "226_neg_MUTNRM_524287_5_c1.7.jsonl",
+   "arm": "MUTNRM",
+   "q": 524287,
+   "seed": 5,
+   "rc": 101,
+   "records": [],
+   "vs_REF_outside_allowed": 1,
+   "first": [
+    "record arms/attempts differ: [('D', 1, True), ('DL1', 1, True), ('DL', 1, True)] vs []"
+   ],
+   "vs_committed_BOTH": 1,
+   "first_vs_BOTH": [
+    "record arms/attempts differ: [('D', 1, True), ('DL1', 1, True), ('DL', 1, True)] vs []"
+   ],
+   "detected": true
+  }
+ ],
+ "negative_controls_note": "Each mutant makes one reuse/skip inexact: MUT_LZWY and MUT_LZVV make D and DL1 linear algebra fail (6 attempts instead of 1) and are flagged by the comparator; MUT_NRM produces residual points off the curve and panics in plane_quartic_pic.rs (exit 101, flagged by the exit-code and record checks). So the G1-style comparison has power against an inexact skip or reuse.",
+ "ratios_record": [
+  {
+   "q": 4194271,
+   "seed": 11,
+   "c_D": 1.7,
+   "BOTH_over_REF": {
+    "D": {
+     "0.0": 0.9733371020118697,
+     "0.5": 0.9761816400285681,
+     "1.0": 0.9781064898237841
+    },
+    "D_wh": {
+     "0.1": 0.9746861822342324,
+     "1.0": 0.9826067169073363
+    },
+    "DL1": {
+     "0.0": 0.8383940730758287,
+     "0.5": 0.9193604477593014,
+     "1.0": 0.9429254298945096
+    },
+    "DL1_wh": {
+     "0.1": 0.8778507746299316,
+     "1.0": 0.9617971388818887
+    },
+    "DL": {
+     "0.0": 0.9569241573906491,
+     "0.5": 0.9789525787516552,
+     "1.0": 0.9869566070355918
+    },
+    "DL_wh": {
+     "0.1": 0.9641483199106409,
+     "1.0": 0.9857128864301345
+    }
+   },
+   "all_below_1": true
+  },
+  {
+   "q": 4194271,
+   "seed": 4,
+   "c_D": 1.7,
+   "BOTH_over_REF": {
+    "D": {
+     "0.0": 0.9738787394013498,
+     "0.5": 0.9766664735955265,
+     "1.0": 0.9785527115483712
+    },
+    "D_wh": {
+     "0.1": 0.9751740874433873,
+     "1.0": 0.9828349774734182
+    },
+    "DL1": {
+     "0.0": 0.8379038971334392,
+     "0.5": 0.9202685549478854,
+     "1.0": 0.9438021505780105
+    },
+    "DL1_wh": {
+     "0.1": 0.8775610985498706,
+     "1.0": 0.9617602093381166
+    },
+    "DL": {
+     "0.0": 0.9568294318836835,
+     "0.5": 0.9791168207585298,
+     "1.0": 0.9871054606458441
+    },
+    "DL_wh": {
+     "0.1": 0.9640798380709055,
+     "1.0": 0.9856979027108304
+    }
+   },
+   "all_below_1": true
+  },
+  {
+   "q": 524287,
+   "seed": 5,
+   "c_D": 1.7,
+   "BOTH_over_REF": {
+    "D": {
+     "0.0": 0.971091623877063,
+     "0.5": 0.9741341870223109,
+     "1.0": 0.9762060527363672
+    },
+    "D_wh": {
+     "0.1": 0.9725908708158635,
+     "1.0": 0.9813131239778825
+    },
+    "DL1": {
+     "0.0": 0.8331838335789237,
+     "0.5": 0.9131540791810696,
+     "1.0": 0.9378168642126882
+    },
+    "DL1_wh": {
+     "0.1": 0.8732053333285446,
+     "1.0": 0.9598652517118903
+    },
+    "DL": {
+     "0.0": 0.9573229321527488,
+     "0.5": 0.9783004751575143,
+     "1.0": 0.9863512211252071
+    },
+    "DL_wh": {
+     "0.1": 0.9642283086738349,
+     "1.0": 0.9854364488534476
+    }
+   },
+   "all_below_1": true
+  },
+  {
+   "q": 4194271,
+   "seed": 10,
+   "c_D": 1.7,
+   "BOTH_over_REF": {
+    "D": {
+     "0.0": 0.9738101275171316,
+     "0.5": 0.976605890073419,
+     "1.0": 0.9784975166248461
+    },
+    "D_wh": {
+     "0.1": 0.975113370955351,
+     "1.0": 0.9828113465285008
+    },
+    "DL1": {
+     "0.0": 0.8382010083478215,
+     "0.5": 0.920210751099644,
+     "1.0": 0.9437194216975698
+    },
+    "DL1_wh": {
+     "0.1": 0.8777510563227673,
+     "1.0": 0.9617966627821443
+    },
+    "DL": {
+     "0.0": 0.9568894227151765,
+     "0.5": 0.9791156091390968,
+     "1.0": 0.9870976155630413
+    },
+    "DL_wh": {
+     "0.1": 0.9641260902948013,
+     "1.0": 0.9857119679306052
+    }
+   },
+   "all_below_1": true
+  },
+  {
+   "q": 262111,
+   "seed": 11,
+   "c_D": 1.7,
+   "BOTH_over_REF": {
+    "D": {
+     "0.0": 0.9717385944192889,
+     "0.5": 0.9746110757768116,
+     "1.0": 0.9765886628088729
+    },
+    "D_wh": {
+     "0.1": 0.9731330321322246,
+     "1.0": 0.9813949215423194
+    },
+    "DL1": {
+     "0.0": 0.8519703685505391,
+     "0.5": 0.9177646757450073,
+     "1.0": 0.9399474939607978
+    },
+    "DL1_wh": {
+     "0.1": 0.8836111236654121,
+     "1.0": 0.9601914401909196
+    },
+    "DL": {
+     "0.0": 0.9616593217582683,
+     "0.5": 0.9796867589116073,
+     "1.0": 0.9870132734037733
+    },
+    "DL_wh": {
+     "0.1": 0.9673022646375069,
+     "1.0": 0.985934104796736
+    }
+   },
+   "all_below_1": true
+  },
+  {
+   "q": 1048507,
+   "seed": 3,
+   "c_D": 1.7,
+   "BOTH_over_REF": {
+    "D": {
+     "0.0": 0.9724734612579027,
+     "0.5": 0.9753442345579031,
+     "1.0": 0.9773001388823666
+    },
+    "D_wh": {
+     "0.1": 0.9738612537058069,
+     "1.0": 0.9820197632977956
+    },
+    "DL1": {
+     "0.0": 0.8425261457022549,
+     "0.5": 0.917954734592153,
+     "1.0": 0.9412171680835559
+    },
+    "DL1_wh": {
+     "0.1": 0.8792134106703713,
+     "1.0": 0.9609958588956525
+    },
+    "DL": {
+     "0.0": 0.9583700087812895,
+     "0.5": 0.9789830411403291,
+     "1.0": 0.9868160842351181
+    },
+    "DL_wh": {
+     "0.1": 0.9650307212996768,
+     "1.0": 0.9856682190986129
+    }
+   },
+   "all_below_1": true
+  },
+  {
+   "q": 524287,
+   "seed": 7,
+   "c_D": 1.55,
+   "BOTH_over_REF": {
+    "D": {
+     "0.0": 0.984556917794433,
+     "0.5": 0.9862566063709087,
+     "1.0": 0.9874035892617647
+    },
+    "D_wh": {
+     "0.1": 0.9849875554724659,
+     "1.0": 0.9879993498955929
+    },
+    "DL1": {
+     "0.0": 0.8765209302195133,
+     "0.5": 0.9468374325675866,
+     "1.0": 0.963862711286955
+    },
+    "DL1_wh": {
+     "0.1": 0.8995583490426129,
+     "1.0": 0.9625095289939489
+    },
+    "DL": {
+     "0.0": 0.9648891946078462,
+     "0.5": 0.9851196509971875,
+     "1.0": 0.9912027991277531
+    },
+    "DL_wh": {
+     "0.1": 0.9696255309243886,
+     "1.0": 0.9862811704178083
+    }
+   },
+   "all_below_1": true
+  }
+ ],
+ "raw_replay_files": {
+  "tarball": "replay/replay-runs-nrmlz-20261115.tar.gz",
+  "sha256": "a191758b908824b10ec3fcef43907e08f6d99da0d28c6c837fabbe8618d552b6",
+  "inner_sums": "replay/SHA256SUMS.inner",
+  "contents": "replay/ (plan 1: 50 units), replay2/ (plan 2: 120 small-q units + 6 mutant runs, mutants.sha256), stress/*.out, plan.tsv, plan2.tsv, sample.json, nonce.json"
+ },
+ "notes": [
+  "Units ran up to 3 at a time on the 4-vCPU session container (L0); only counted fields are compared, wall/CPU are not.",
+  "The extra c_D = 1.55 unit (q 524287 seed 7) has heavier relation rows; BOTH/REF there is DL 0.9649 / 0.9851 / 0.9912, DL1 0.8765 / 0.9468 / 0.9639, D 0.9846 / 0.9863 / 0.9874 at w_add 0 / 0.5 / 1 (outside the protocol's grid; descriptive)."
+ ]
+}

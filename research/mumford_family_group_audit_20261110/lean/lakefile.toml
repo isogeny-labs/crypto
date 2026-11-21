@@ -1,0 +1,11 @@
+name = "mumford_family_group_audit"
+version = "0.1.0"
+defaultTargets = ["MumfordFamilyGroupAudit"]
+
+[[require]]
+name = "mumford_family_audit"
+path = "../../mumford_family_audit_20261110/lean"
+
+[[lean_lib]]
+name = "MumfordFamilyGroupAudit"
+roots = ["AllPairRuns", "IndexArithmetic", "PairwiseOutput", "VerifiedFamilyGroup", "GeneratorAgreement"]

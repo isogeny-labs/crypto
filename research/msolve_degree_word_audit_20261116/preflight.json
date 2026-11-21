@@ -1,0 +1,132 @@
+{
+  "schema": "msolve-degree-preflight/v1",
+  "build_snapshots": 7,
+  "failed_states": [
+    "01",
+    "02",
+    "03",
+    "05"
+  ],
+  "successful_states": [
+    "04",
+    "06",
+    "07"
+  ],
+  "gate": {
+    "declarations": 68,
+    "failing": 0,
+    "trusted_native": 0,
+    "new_modules": 6,
+    "new_concrete_modules": 5,
+    "official_import_bridge_modules": 1,
+    "count_includes_generated_equation_declarations": true,
+    "new_source_warnings": 0,
+    "inherited_advisories": {
+      "msolve-degree-builds/07/build.log": [
+        "warning: SolvingDegreeBound.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: F4ExpectedOutputs.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+      ],
+      "msolve-degree-gate01/research_msolve_degree_word_audit_20261116_lean/build.log": [
+        "warning: SolvingDegreeBound.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: F4ExpectedOutputs.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+      ],
+      "msolve-degree-gate01/research_msolve_degree_word_audit_20261116_lean/source-build.log": [
+        "warning: SolvingDegreeBound.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: F4ExpectedOutputs.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+      ]
+    },
+    "archive": {
+      "path": "research/msolve_degree_word_audit_20261116/evidence/gate.tar.gz",
+      "bytes": 1827,
+      "sha256": "388ef4fd3e2c8d7880b655c171d6f27c661a54460560282fc2edeaca0821efaf"
+    }
+  },
+  "bindings": {
+    "positive": {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    },
+    "legacy": {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 0,
+      "summary": true,
+      "truncated_prefixes": 1,
+      "unresolved": 0
+    }
+  },
+  "archive": {
+    "logical_archive_name": "attempts.tar.xz",
+    "compressed_bytes": 196748,
+    "logical_sha256": "2c68eab9ca872a8695ed3a79fdca8caaf5a2a4269dd3251f60cfed8db5c525f0",
+    "physical_files": [
+      {
+        "path": "research/msolve_degree_word_audit_20261116/evidence/attempts.tar.xz.part01",
+        "bytes": 64000,
+        "sha256": "7c3a77ff5231232ac9bee8cdefe0cc3590f4dd4f487fb32934bc941c62832147"
+      },
+      {
+        "path": "research/msolve_degree_word_audit_20261116/evidence/attempts.tar.xz.part02",
+        "bytes": 64000,
+        "sha256": "d3096986bbd3e06f3956e34c8aac5618f48b906ce2030c7d23af2a2d6ae96c7e"
+      },
+      {
+        "path": "research/msolve_degree_word_audit_20261116/evidence/attempts.tar.xz.part03",
+        "bytes": 64000,
+        "sha256": "9ea675298c805a7f63326dc9bfde746497cbdae2680c5eeb603aa361adfbc697"
+      },
+      {
+        "path": "research/msolve_degree_word_audit_20261116/evidence/attempts.tar.xz.part04",
+        "bytes": 4748,
+        "sha256": "f08d8f07239d3205db93c78e70bacae9abc2b8a4428f66d50fdb0428e7fc7213"
+      }
+    ],
+    "files": 282,
+    "unique_objects": 141,
+    "losslessly_deduplicated": true,
+    "roundtrip_equal": true,
+    "inventory_member": "manifest.json",
+    "multipart": true,
+    "parts": 4,
+    "physical_part_limit": 65536,
+    "copyright_or_regenerable_PNG_included": false
+  },
+  "published_preservation_entries": 6260,
+  "all_checked_entries": 6306,
+  "frozen_plans": 51,
+  "native_preservation_pins": 46,
+  "manifest_packages": 11,
+  "copied_Lean_modules": 0,
+  "hydrated_Lean_modules": 0,
+  "lake_update": false,
+  "registered_roots_from01": [
+    "DegreeCertificate",
+    "DegreeFamily",
+    "DegreeImports",
+    "DegreeWords",
+    "F4Boundary",
+    "NativeWitness"
+  ],
+  "native_protocol_hash": "e36c897190211f1824a1c3baebfb766660a0d82be55d5f6cb6f007daaaf95796",
+  "native_calls": 2,
+  "native_control_exit": 0,
+  "native_boundary_exit": 124,
+  "native_boundary_validated": false,
+  "native_scope": "Captured written set/log prefix, not normal completion/full execution trace",
+  "export_flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 1,
+    "not_completed": 1,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "signed_standing": "unverified",
+  "full14complete": false,
+  "paid_compute": 0
+}

@@ -1,0 +1,24 @@
+proc require103(int ok,string tag){if(!ok){print("DIRECT_NORM103_FATAL "+tag);exit;}}
+execute(read("marked23-triangular51.sing"));
+poly linearCoefficient103=diff(G51,l);
+require103(linearCoefficient103!=0,"GENERIC_LINEAR_COEFFICIENT_NONZERO");
+require103(subst(linearCoefficient103,l,0)==linearCoefficient103 && subst(linearCoefficient103,n,0)==linearCoefficient103,"DERIVATIVE_BASE_ONLY");
+intvec lambdaWeight103=0,1,0;intvec baseWeight103=0,0,1;
+require103(deg(G51,lambdaWeight103)==16 && deg(f51,baseWeight103)==7,"SOURCE_DEGREES");
+poly directNorm103=resultant(f51,linearCoefficient103,y);
+require103(directNorm103!=0 && subst(directNorm103,n,0)==directNorm103 && subst(directNorm103,l,0)==directNorm103 && subst(directNorm103,y,0)==directNorm103,"DIRECT_NORM_BASE_FIELD");
+number directCoefficient103=leadcoef(directNorm103);
+execute(read("norm99.sing"));
+number fullNorm103=normNumerator99/normDenominator99;
+require103(directCoefficient103^16==fullNorm103,"DIRECT_NORM_SIXTEENTH_POWER");
+require103(directCoefficient103^16+1!=fullNorm103,"CHANGED_NORM_REJECTED");
+number directNumerator103=numerator(directCoefficient103);
+number directDenominator103=denominator(directCoefficient103);
+link output103="ASCII:w direct-norm103.sing";open(output103);
+write(output103,"// Direct norm of dG51/dl through actual f51.");
+write(output103,"number directNumerator103="+string(directNumerator103)+";");
+write(output103,"number directDenominator103="+string(directDenominator103)+";");
+close(output103);
+print("DIRECT_NORM103_RESULT numerator_chars="+string(size(string(directNumerator103)))+" denominator="+string(directDenominator103));
+print("DIRECT_NORM103_ALL_CHECKS_PASS");
+quit;

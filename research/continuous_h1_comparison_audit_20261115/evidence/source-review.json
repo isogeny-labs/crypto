@@ -1,0 +1,131 @@
+{
+  "schema": "continuous-h1-primary-and-formal-source-review/v1",
+  "source": {
+    "author": "Peter Bruin",
+    "title": "The Tate pairing for Abelian varieties over finite fields",
+    "year": 2011,
+    "doi": "10.5802/jtnb.764",
+    "url": "https://www.numdam.org/article/JTNB_2011__23_2_323_0.pdf",
+    "bytes": 649044,
+    "sha256": "528b63797f936e094861c98a65da5eb1615dc46747960ba3444516197fbf49a7",
+    "read_scope": "All six article pages read and all seven PDF pages visually inspected in the earlier packet; current selected printed325/PDF4 Galois-Cartier character definition, equation2.1 and Lemma2.1 rechecked before approach."
+  },
+  "target": "Actual Mathlib continuousCohomology1 (homogeneous complex), actual all-crossed-cocycle/principal quotient and finite-Galois perfect pairing with all equivariant algebraic-closure unit characters.",
+  "source_result": "Bruin2011 finite-module Lemma2.1 displayed pairing is proved on actual canonical continuous H1 for the constructed coefficient TopRep, with actual homology-projection representative formula. Exponent divides #K-1; deleting annihilation is refuted by actual characteristic2 M2/trivial-action family.",
+  "official_sources": {
+    "mathlib_rev": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "files": [
+      "Mathlib/RepresentationTheory/Homological/ContCohomology/Basic.lean",
+      "Mathlib/RepresentationTheory/Homological/ContCohomology/LowDegree.lean",
+      "Mathlib/RepresentationTheory/Continuous/Basic.lean",
+      "Mathlib/RepresentationTheory/Continuous/TopRep.lean",
+      "Mathlib/Algebra/Category/ModuleCat/Topology/Homology.lean",
+      "Mathlib/Algebra/Homology/ShortComplex/LeftHomology.lean",
+      "Mathlib/Algebra/Homology/ShortComplex/Homology.lean",
+      "Mathlib/Algebra/Homology/ShortComplex/HomologicalComplex.lean",
+      "Mathlib/LinearAlgebra/Quotient/Defs.lean",
+      "Mathlib/LinearAlgebra/Quotient/Basic.lean",
+      "Mathlib/LinearAlgebra/Isomorphisms.lean"
+    ],
+    "read_scope": "Definitions and relevant kernel/cokernel, homology data/index/comparison, differential/coinduction and quotient APIs read; no claim that every line of every API file was read."
+  },
+  "method": "Actual d0/d1 values; actual homogeneous kernel/crossed-cocycle linear equivalence via F(1,g) and rho(x)c(x^-1*y); derive actual d0 image equals all principals; actual categorical kernel/cokernel and index isomorphisms identify existing H1; actual homologyπ representative map and source formula proved. Derive actual joint continuity for Additive M from original continuous action into discrete MulAut M; whole original class quotient and finite Frobenius coinvariants; compose prior duality and guard counterexample.",
+  "reuse": {
+    "copies": [
+      {
+        "origin": "research/procyclic_galois_cocycle_audit_20261115/lean/GaloisGenerator.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/GaloisGenerator.lean",
+        "sha256": "a5288bdb05416d3f6c450c5368df741353adc2b8dea41d1f1406a5c9ca6486db",
+        "bytes": 3939,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/procyclic_galois_cocycle_audit_20261115/lean/FiniteQuotients.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/FiniteQuotients.lean",
+        "sha256": "3814a32c42a4a12516889d23e78daf97e009440688d6a861ed63bce3c7025adb",
+        "bytes": 4324,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/procyclic_galois_cocycle_audit_20261115/lean/FiniteCocycles.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/FiniteCocycles.lean",
+        "sha256": "5b1d532721a575ede866588a03fd4d874b344555a24e40d76fe91068ca30c867",
+        "bytes": 5449,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/procyclic_galois_cocycle_audit_20261115/lean/CocycleClasses.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/CocycleClasses.lean",
+        "sha256": "c321b70efd4c340af8b1a7308471a25539b56736c5e0b8b1de05eabeba262ef7",
+        "bytes": 4491,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/galois_character_pairing_audit_20261115/lean/FieldCharacterRoots.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/FieldCharacterRoots.lean",
+        "sha256": "32579d797877c0657c0708ac02b29b7f175d2e6cde9ed57c4dec07483866994b",
+        "bytes": 1459,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/galois_character_pairing_audit_20261115/lean/CoinvariantCharacters.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/CoinvariantCharacters.lean",
+        "sha256": "4ad1669833b5b28e8c0ad62a6dec0bf9eb22fe44dd1ca7c9dc8921bdc82a080e",
+        "bytes": 2859,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/galois_character_pairing_audit_20261115/lean/PerfectEvaluation.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/PerfectEvaluation.lean",
+        "sha256": "ce8bf9ce8e9a137730b5b4a9feed3543632eb2eb76a4638594303ec8d8ee6faa",
+        "bytes": 3197,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/galois_character_pairing_audit_20261115/lean/GaloisUnits.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/GaloisUnits.lean",
+        "sha256": "e6ae41090a9d89a7defaed7dc816b19e4b7aa748ceb5d8e7c393307e4c97ad83",
+        "bytes": 3718,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/galois_character_pairing_audit_20261115/lean/GaloisCharacters.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/GaloisCharacters.lean",
+        "sha256": "ae45b926cfb3b38aff8e630ff4ed6a487624b299e4526c2441362ce62b2ddfcb",
+        "bytes": 5156,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/galois_character_pairing_audit_20261115/lean/PerfectCocyclePairing.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/PerfectCocyclePairing.lean",
+        "sha256": "39bf43cdbf0a3267319cb508f39a3121de64b20aed009d6b42d8b2e1a36236fc",
+        "bytes": 4885,
+        "byte_identical": true
+      },
+      {
+        "origin": "research/galois_character_pairing_audit_20261115/lean/CharTwoGaloisControl.lean",
+        "copy": "research/continuous_h1_comparison_audit_20261115/lean/CharTwoGaloisControl.lean",
+        "sha256": "70eb368514f9785f149a8ab0cf07d0df6c32eee9c137e5cf417319955d76a376",
+        "bytes": 3510,
+        "byte_identical": true
+      }
+    ],
+    "prior_claim": "PCC-20261115-ed6495",
+    "prior_all_23_pins_match": true,
+    "originals_unchanged": true,
+    "prior_galois_pairing_claim": "PCC-20261115-4711ad",
+    "prior_all_29_pairing_pins_match": true,
+    "copy_count": 11
+  },
+  "correction": "Two inherited unused-section-variable warnings are retained byte-identical. Prior Galois-pairing advisory-free report wording is corrected outside its frozen pinset in corrections.json; no prior issued file edited.",
+  "KB": "MCP absent; fresh status/two mechanism-negative searches/theorem wrapper all127; prior/primary/official fallback before approach/code; Conductor127.",
+  "scope_boundary": [
+    "Natural joint-action continuity is an explicit hypothesis of the general arbitrary-TopRep comparison; it is derived from the original continuous finite-field action in the application.",
+    "K and M have an explicitly common ambient universe; closed main covers all ordinary finite fields/modules.",
+    "No isogeny-kernel/Lang/Cartier group scheme/Jacobian/divisor realization or complete MOV/Frey–Rück theorem.",
+    "Original FR94/Serre/Lang/Mumford primaries remain unread; Bruin is a separately read primary.",
+    "No novelty claim, canonical corpus promotion or completion of all fourteen items."
+  ],
+  "copyright": "Primary source PDFs/text/images local only.",
+  "signed_standing": "unverified"
+}

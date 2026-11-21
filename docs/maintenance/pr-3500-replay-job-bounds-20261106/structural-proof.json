@@ -1,0 +1,18 @@
+{
+  "schema": "maintenance.replay-budget-controls/v1",
+  "parent": "8eeb260af550e84da48372fce238f249174d57ae",
+  "production_edits": [
+    "exhaustive_replay: explicit workflow_dispatch/schedule event conjunct, matching existing replay_plan admission",
+    "replay_sentinels_pr: tighten job bound30 to25minutes; all replay commands/assertions intact"
+  ],
+  "all_other_yaml_semantics_exact_parent": true,
+  "audit_job_exact_parent": true,
+  "canonical_checker_unchanged": true,
+  "original_workflow_violations": 10,
+  "repaired_workflow_violations": 0,
+  "canonical_policy_regressions_passed": 15,
+  "actionlint_exit": 0,
+  "external_shellcheck_pyflakes_absent": true,
+  "scope": "Focused metadata policy check for exact ecbench workflow, not full543 workflows or native/scientific/real replay execution.",
+  "actual_new_ci": "PENDING"
+}

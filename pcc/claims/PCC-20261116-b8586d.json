@@ -1,0 +1,48 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T00:43:53Z",
+ "id": "PCC-20261116-b8586d",
+ "kind": "theorem",
+ "producer": {
+  "commit": "43bb330419a234fbf2010fd4b31970e95b59c238",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "275d615e148878dada7bfd5789ae9a5b2592bf2c78b213fb6cc7818e7f99063b",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean/Arithmetic.lean",
+   "theorem": "Curve25519TorusArithmetic.birthday_minimum"
+  },
+  {
+   "decl_sha256": "0a1e30b02c2b4031469548a3a18d744704dfac3bd397ba8e362b8e1594ed0cc4",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean/Arithmetic.lean",
+   "theorem": "Curve25519TorusArithmetic.birthday_completeness"
+  },
+  {
+   "decl_sha256": "f16da6928b13e829b2fdb06bb7169eb984f47407721b891d47dd8022168b7b15",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean/Arithmetic.lean",
+   "theorem": "Curve25519TorusArithmetic.birthday_soundness"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean/Arithmetic.lean",
+    "sha256": "18823ef1f9a367db737228d2d89e40ed77b04863d38bcd08f1efd1aa3a98e867"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/energy-test-v1/arithmetic-gate-v1/audit.log",
+    "sha256": "2b4e9d313f413a998bfc66a76e1b2bb64339847f6eaaa66cff1d7f3c7a5ef2e5"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Concrete Core arithmetic for the actual-instance birthday diagnostic: n>=2, 1600*n^2<=W0 and W0<=2304*(n-1)^2 for n=268951465398242860562463204936310 and the existing torus W0. Producer proof gate passes all seven file declarations without axioms or native exceptions. These three new arithmetic endpoints are not a probability, sampling, geometry or solver-cost theorem."
+}

@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/tmp/rootfinding_recovery_20261116_v86/research/kernel_lift_solver_20261116_v88/oracles.py", line 6, in <module>
+    from research.isogeny_root_solver_20261116_v87b.oracles import literal
+  File "/tmp/rootfinding_recovery_20261116_v86/research/isogeny_root_solver_20261116_v87b/oracles.py", line 30, in <module>
+    finish(out,error,START,'Complete originalS3root sets match independent tiny polynomial enumeration and actual-width reference/auxiliary solves.','Run frozen cold comparison with full setup/fiber/output costs;this changed-domain calibration is not a hard original-prefix benchmark.')
+  File "/tmp/rootfinding_recovery_20261116_v86/research/isogeny_root_solver_20261116_v87b/common.py", line 9, in finish
+    with(P/(sys.argv[2]+'.json')).open('xb')as f:f.write(raw)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileExistsError: [Errno 17] File exists: '/tmp/rootfinding_recovery_20261116_v86/research/isogeny_root_solver_20261116_v87b/oracles_raw.json'

@@ -1,0 +1,47 @@
+{
+  "schema": "n83.build_artifact_readback/v1",
+  "checked_utc": "2026-11-16T07:32:10Z",
+  "aws_profile": "ecc-challenges-new",
+  "aws_identity_arn": "arn:aws:iam::104186811093:user/coreuser",
+  "artifact_remote": "s3://setec-astronomy-artifacts/store",
+  "source_commit": "ba620214684e41def8bc6caddf2e782f43920218",
+  "artifact_bot_commit": "3139c5e2f12b1a96ba39885993020baeb47b98d0",
+  "method": "aws s3api get-object then local shasum -a 256 and wc -c",
+  "files": {
+    "arm-supervisor": {
+      "sha256": "e3fcc0da60417838bdbd8dcf33b28d3c35e4be495533890404e32e5f54d8d906",
+      "bytes": 1764136,
+      "s3_key": "store/sha256/e3/e3fcc0da60417838bdbd8dcf33b28d3c35e4be495533890404e32e5f54d8d906",
+      "sha256_checked": true,
+      "bytes_checked": true
+    },
+    "exporter": {
+      "sha256": "44ab0d6927ee3ab5c79afbaf62b6922cb98591c739e5af87a06a445d367a9852",
+      "bytes": 9770336,
+      "s3_key": "store/sha256/44/44ab0d6927ee3ab5c79afbaf62b6922cb98591c739e5af87a06a445d367a9852",
+      "sha256_checked": true,
+      "bytes_checked": true
+    },
+    "preflight-supervisor": {
+      "sha256": "867f36e7e65610260f9d3413ddcccbf19f4b0df984fa655bc45892baa86b901f",
+      "bytes": 1696440,
+      "s3_key": "store/sha256/86/867f36e7e65610260f9d3413ddcccbf19f4b0df984fa655bc45892baa86b901f",
+      "sha256_checked": true,
+      "bytes_checked": true
+    },
+    "solver": {
+      "sha256": "1aaec2a6ffdfd215075ce8cc7c093e2d884904a161fbf3b77db70c82fc478444",
+      "bytes": 5133168,
+      "s3_key": "store/sha256/1a/1aaec2a6ffdfd215075ce8cc7c093e2d884904a161fbf3b77db70c82fc478444",
+      "sha256_checked": true,
+      "bytes_checked": true
+    },
+    "worker": {
+      "sha256": "d6aad2f3737eff25e2d3759e204b6714e83c58212017b39a650414c7b6ac269b",
+      "bytes": 2655768,
+      "s3_key": "store/sha256/d6/d6aad2f3737eff25e2d3759e204b6714e83c58212017b39a650414c7b6ac269b",
+      "sha256_checked": true,
+      "bytes_checked": true
+    }
+  }
+}

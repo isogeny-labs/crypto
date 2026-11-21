@@ -1,0 +1,56 @@
+ring generic49=(2,u),(n,l,v,g),dp;
+poly rn49=(u+1)*v+1;poly cn49=rn49+u^3;
+poly b49=rn49*cn49/u^7;poly c49=cn49/u^4;
+if(u*c49^2+b49+c49!=0 || (u+1)*v*c49+b49*u^3+c49!=0){ERROR("PREP49_PLANE_INVERSE");}
+poly base49=v^2+v+u^3+u;poly gamma49=g^2+g+1;
+ideal baseRel49=std(ideal(base49,gamma49));
+map physical49=original49,n+b49*g,l+(1+c49)*g,b49,c49;
+ideal raw49=physical49(sourceS49);ideal units49=physical49(sourceU49);
+if(reduce(raw49[1],baseRel49)!=0 || reduce(raw49[2],baseRel49)!=0){ERROR("PREP49_TATE_BASE");}
+ideal qr49=reduce(ideal(raw49[3],raw49[4],raw49[5]),baseRel49);
+ideal physicalIdeal49=qr49,base49,gamma49;
+ideal desc49;int i49;int k49=1;desc49[1]=base49;
+for(i49=1;i49<=3;i49++){
+ poly part049=subst(qr49[i49],g,0);poly part149=(qr49[i49]+part049)/g;
+ if(part049+g*part149!=qr49[i49] || subst(part149,g,0)!=part149){ERROR("PREP49_GAMMA_SPLIT");}
+ if(part049!=0){k49++;desc49[k49]=part049;}
+ if(part149!=0){k49++;desc49[k49]=part149;}
+}
+ideal descGamma49=desc49,gamma49;
+print("PREP49_STAGE generic_descent_Groebner_begin=true");
+ideal physicalStd49=std(physicalIdeal49);ideal descStd49=std(descGamma49);
+if(vdim(physicalStd49)!=64 || vdim(descStd49)!=64){ERROR("PREP49_GENERIC_DIMENSION");}
+print("PREP49_IDEAL_REMAINDER_SIZES "+string(size(reduce(physicalIdeal49,descStd49)))+","+string(size(reduce(descGamma49,physicalStd49))));
+if(size(reduce(physicalIdeal49,descStd49))!=0 || size(reduce(descGamma49,physicalStd49))!=0){ERROR("PREP49_DESCENT_IDEAL_EQUALITY");}
+print("PREP49_STAGE physical_and_descended_ideals_equal=true degree_over_F2u_with_gamma=64");
+for(i49=1;i49<=8;i49++){
+ ideal unitInput49=descStd49,units49[i49];ideal unitStd49=std(unitInput49);
+ if(unitStd49[1]!=1){ERROR("PREP49_GENERIC_REGISTERED_UNIT");}
+ print("PREP49_GENERIC_UNIT index="+string(i49)+" verified=true");
+}
+link out49="ASCII:w cleared-source49.sing";open(out49);
+write(out49,"ring affine49=2,(n,l,v,u),dp;ideal clearedSource49;");
+for(i49=1;i49<=size(desc49);i49++){
+ poly cleared49=u^128*desc49[i49];int term49;
+ for(term49=1;term49<=size(cleared49);term49++){if(denominator(leadcoef(cleared49[term49]))!=1){ERROR("PREP49_UNCLEARED_COEFFICIENT");}}
+ write(out49,"clearedSource49["+string(i49)+"]="+string(cleared49)+";");
+}
+close(out49);execute(read("cleared-source49.sing"));
+ideal sourceIdeal49;int j49;int exponent49;int count49=0;
+for(j49=1;j49<=size(clearedSource49);j49++){
+ poly primitive49=clearedSource49[j49];exponent49=0;
+ while(primitive49!=0 && subst(primitive49,u,0)==0){primitive49=primitive49/u;exponent49++;}
+ if(u^exponent49*primitive49!=clearedSource49[j49]){ERROR("PREP49_CONTENT_DIVISION");}
+ if(primitive49!=0){count49++;sourceIdeal49[count49]=primitive49;}
+ print("PREP49_INPUT_GENERATOR index="+string(j49)+" removed_u_power="+string(exponent49)+" terms="+string(size(primitive49)));
+}
+link inputOut49="ASCII:w integral-input49.sing";open(inputOut49);
+write(inputOut49,"ring affine49=2,(n,l,v,u),dp;ideal sourceIdeal49;");
+for(j49=1;j49<=size(sourceIdeal49);j49++){write(inputOut49,"sourceIdeal49["+string(j49)+"]="+string(sourceIdeal49[j49])+";");}
+close(inputOut49);
+ring fieldCheck49=(2,u),(n,l,v),dp;
+map check49=affine49,n,l,v,u;
+ideal genericSource49=std(check49(sourceIdeal49));
+if(vdim(genericSource49)!=32){ERROR("PREP49_FINAL_GENERIC_DIMENSION");}
+print("PREP49_RESULT characteristic=2 coefficient_descent=checked registered_units=8 input_generic_degree=32 field_size_assumed=false normalization_performed=false");
+print("PREP49_ALL_CHECKS_PASS");quit;

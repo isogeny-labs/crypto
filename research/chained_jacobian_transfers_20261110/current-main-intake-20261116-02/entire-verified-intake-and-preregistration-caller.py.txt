@@ -1,0 +1,81 @@
+"""Verified-base intake closure and prospective Rust chart unit protocol."""
+from pathlib import Path
+from datetime import datetime,timezone
+import hashlib,json,lzma,os,shutil,subprocess
+r=Path('/workspace/crypto-chained-main-validated');p=r/'research/chained_jacobian_transfers_20261110';i=p/'current-main-intake-20261116-02';base='90ea6cb42434698be3fac9d2d012a579f298b961'
+assert Path('/workspace/scratch/ct598-exact-materialized-base-original-prefix.exit').read_text().strip()=='0'
+assert len((r/'pcc/ledger.jsonl').read_text().splitlines())==1253
+def blob(path,data):
+ x=subprocess.check_output(['git','ls-tree',base,'--',path],cwd=r,text=True).split()
+ assert len(x)==4 and hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()==x[2],path
+ return x[2]
+for name,src in [('AGENTS.md','/workspace/scratch/ct573-current-main-AGENTS.md'),('docs/session-logs/2026-11-16.md','/workspace/scratch/ct575-entire-current-main-session-log.md'),('tools/lessons.py','/workspace/crypto-chained-main/tools/lessons.py'),('tools/autonomy_report.py','/workspace/crypto-chained-main/tools/autonomy_report.py')]:
+ data=Path(src).read_bytes();blob(name,data);dst=r/name;dst.parent.mkdir(parents=True,exist_ok=True)
+ if dst.exists():assert dst.read_bytes()==data
+ else:dst.write_bytes(data)
+for n in ['.gitignore','.gitattributes','.artifacts/config.json','.artifacts.json','.benchrec.json','.resume/RESUME.md']:
+ data=(r/n).read_bytes();blob(n,data);dst=r/n;dst.parent.mkdir(parents=True,exist_ok=True)
+ if dst.exists():assert dst.read_bytes()==data
+ else:dst.write_bytes(data)
+# Whole rejected attempt, all negative records/index, and current replay kept without editing.
+bad=i/'whole-rejected-incomplete-intake';shutil.copytree('/workspace/scratch/ct592-entire-incomplete-sparse-intake',bad)
+for source in ['/dev/shm/ct597-new-transport-failure-custody','/dev/shm/ct596-entire-new-validated-index']:
+ d=Path(source);target=i/d.name;target.mkdir()
+ for f in d.iterdir():
+  if f.is_file()and f.name!='index':shutil.copyfile(f,target/f.name)
+shutil.copytree('/workspace/scratch/ct588-current-Root-auditor-replay',i/'retained-current-Root-auditor-replay')
+shutil.copyfile('/workspace/scratch/ct588_replay_current_Root_auditor.sh',i/'entire-retained-current-replay-caller.sh.txt')
+for n in ['ct598-exact-materialized-base-original-prefix.exit','ct598-exact-materialized-base-original-prefix.stdout.txt','ct598-exact-materialized-base-original-prefix.stderr.txt','ct599-validated-intake.exit','ct599-validated-intake.stdout.txt','ct599-validated-intake.stderr.txt']:
+ shutil.copyfile('/workspace/scratch/'+n,i/n)
+correction=dict(time=datetime.now(timezone.utc).isoformat(),base=base,original_base_rows=1216,original_base_blob=blob('pcc/ledger.jsonl',Path('/dev/shm/ct596-exact-current-main-ledger.jsonl').read_bytes()),base_keyring_blob=blob('pcc/keyring.json',(r/'pcc/keyring.json').read_bytes()),base_before_claims_original_gate=0,new_canonical_bindings=37,post_intake_original_gate=0,rejected_intake='01 started from an incompletely hydrated sparse tree. Its38 rows and all source/evidence are retained whole, not rechained/deleted. Earlier canonical labels934bce are rejected for that attempt; mathematical sources/type bindings/replays are independent and retained. This02 uses exact full1216-row base and keyring BEFORE claims.',transport='A new limited git archive caused an unindexed718823423B transport cache/earlyEOF143, recorded and only that new reproducible cache removed after fullSHA/no-live-Git checks; no original scientific output/old partial/indexed object removed. Inherited automatic GC in the new clone completed before stop, now disabled. Raw old-pack byte retention is not claimed for that automatic repack.',index='Only exact new68332745B index moved whole to RAM with original path retained by symlink; original Root/Consumer indices unchanged.',instance_gate='Stronger quotient-field/native composition remains incomplete as documented. No new Lean declaration or rederivation.',scope='Archival proof/source intake with new properly based canonical records; no legacy fork reconciliation, full field/compiler/Jacobian/runtime/cost/signed promotion.')
+(i/'ACTUAL_VERIFIED_BASE_INTAKE_AND_CORRECTION.json').write_text(json.dumps(correction,indent=2)+'\n')
+mp=i/'PROOF_MAP.md';mp.write_text('The rejected incomplete-hydration01 attempt and its38-entry fork are retained whole in this intake. Its earlier canonical labels do not establish a valid base prefix. This02 checked the exact full1216-row main ledger and keyring before creating any new records, then passed the same original prefix check after37 new bindings. This is a fresh intake, not reconciliation or a rechain of either prior fork. [pcc:unverified]\n\n'+mp.read_text())
+for source,count in [('CubicFiniteNorm22308',37),('CubicNativeNormEuclid22309',66)]:
+ e=i/'retained-current-Root-auditor-replay';assert(e/(source+'.exit')).read_text().strip()=='0';logs=list((e/source).rglob('audit.log'));assert len(logs)==1 and f'audited {count} theorems'in logs[0].read_text()and'0 failing, 0 trusted'in logs[0].read_text()
+def claim(statement,proofs,kind='statement',ctype='data'):
+ a=['python3','tools/pcc/pcc.py','claim','new','--kind',kind,'--claim-type',ctype,'--statement',statement]
+ for f in proofs:a+=['--proof','attestation:'+str(f.relative_to(r))]
+ q=subprocess.run(a,cwd=r,capture_output=True,text=True);assert q.returncode==0,(q.stdout,q.stderr);return q.stdout.strip()
+c=claim('Verified-base02 intake: exact90ea main ledger1216 rows and keyring byte-verified, original prefix0 BEFORE new claims;37 new canonical complete statement bindings and original post-prefix0. Entire frozen274 files/685126B/e12 andeb3 proofs/reports/negative sources unchanged, retained original37/66 dual and independent current-Root37/66 zero-failure replay records. Prior sparse01 missing-base/keyring38-row fork/934bce canonical-label error preserved whole and rejected for prefix; no rechain/reset/drop or legacy reconciliation. Current gate script bytes unchanged/current auditor one comment changed, exact dependency diff/pins retained. Full merged13ZIP924member21log custody/queue/tag correction retained. Only new reproducible failed unindexed Git transport cache removed after fullSHA/error record; original science/objects/old partials intact. Stronger shared-field/native instance gate explicitly incomplete, no new Lean declaration/compiler/Jacobian/runtime/cost/paid/signed promotion.',[i/'ACTUAL_VERIFIED_BASE_INTAKE_AND_CORRECTION.json',i/'ACTUAL_FROZEN_SOURCE_INTAKE.json',i/'exact-thirty-seven-new-canonical-bindings.json',i/'PROOF_MAP.md'])
+(i/'actual-verified-intake-data-claim.stdout.txt').write_text(c+'\n');print('verified intake',c,flush=True)
+# Prospective finite unit scope is frozen before implementation.
+n=p/'native-richelot-chart-boundary-10';n.mkdir()
+fixtures='''name,h0,h1,h2,h3,h4,h5,h6
+source_Cpi1,52,0,25,0,77,0,84
+source_Cpi2,72,0,85,0,14,0,93
+source_C10,89,0,93,0,8,0,61
+source_C20,40,0,45,0,75,0,18
+target_Cpi1_shift1,46,8,49,99,4,78,54
+target_Cpi1_shift2,46,93,49,2,4,23,54
+target_Cpi2_shift1,77,81,100,16,0,40,71
+target_Cpi2_shift2,77,20,100,85,0,61,71
+target_C10_shift1,49,17,85,87,33,9,10
+target_C10_shift2,49,84,85,14,33,92,10
+target_C20_shift1,25,98,69,38,52,39,76
+target_C20_shift2,25,3,69,63,52,62,76
+'''
+(n/'fixtures-10.csv').write_text(fixtures)
+primary=n/'primary-inputs';primary.mkdir()
+for name,src in [('CT49_NONSPLIT_RICHELOT.md','ct578-current-Consumer-CT49.md'),('CT50_BIDUAL_RETURN.md','ct578-current-Consumer-CT50.md'),('entire-nonsplit_map.rs.txt','ct580-current-Consumer-nonsplit_map.rs')]:shutil.copyfile('/workspace/scratch/'+src,primary/name)
+protocol='''# Prospective Richelot infinity-chart correctness unit10
+
+This is a bounded Rust development unit, not a benchmark or a completed divisor correspondence. Primary inputs are the entire CT49/CT50 reports and native nonsplit_map.rs at Consumer7f8208a51fb5474d3acdfe1551e073fedc3ca6dd. KB/Conductor unavailable127 as retained; no novelty or absence inference. The12 literal sextics above are frozen before code, including every one of the8 forward targets. [pcc:unverified]
+
+The current native constructor requires a monic source product and rejects a nonsquare target leading coefficient unless a split-infinity chart is supplied. It also requires every source-infinity fibre to be completed. These are distinct implementation boundaries. The proposed unit addresses only an independently reversible change of curve model; carrying it through Richelot factors, balanced divisor classes and the dual orientation remains separate. [pcc:unverified]
+
+For H(x) of degree6 over F101, choose the first a in0..100 and the smallest positive b with b^2=H(a)!=0. Define u=1/(x-a), v=y*u^3/b and F(u)=u^6*H(a+1/u)/b^2. Proposed inverse: x=a+1/u, y=b*v/u^3. Points(a,+/-b) map to the two signed new infinities; old infinities map to u=0 with v=+/-sqrt(h6)/b when rational. A nonsquare h6 gives no rational old infinity or u=0 point. This algebraic derivation is not a new generic Lean proof. The stronger instance/inheritance gate is unfinished; no new study-local field laws are to be written. [pcc:unverified]
+
+Declare before implementation:
+- Standard-library-only Rust, no research Python, no paid run, no solver or scalar labels.
+- Exactly all12 frozen fixtures; reject malformed/noncanonical input, zero/degree-drop/non-squarefree sextics and a curve with no admissible unramified rational chart.
+- Construct coefficients by a binomial shift/reversal. Independently compare homogeneous evaluation H(a*U+V,U)/b^2 against the new sextic on all102 normalized projective F101 arguments.
+- Enumerate finite rational curve points and rational infinities; map both ways, check equations, signed chart boundaries, injectivity/surjectivity and inverse roundtrips for all of them. Independently count via quadratic characters. The8 target counts120 are frozen prior-report checks; source counts are observations, not assumed.
+- Wrong coefficient/reversal/normalization and lost infinity cases must be rejected by controls. Test invalid/noncanonical a/b and zero denominators explicitly.
+- Changing the sign of b gives another legitimate curve isomorphism. Curve equations and bijectivity cannot certify the Richelot dual sign. Preserve this orientation limitation; do not design a false sign-rejection claim.
+- One compiler worker, locked/offline standalone Cargo package,120s development test cap. Freeze source/executable/fixture hashes before any execution and preserve complete outputs/exits. Run new-package format and strict Clippy without editing original references.
+
+No original LP60/240/62,360/witness/seven controls/feedback/post workload is substituted or launched. No full12317-class Jacobian map, nontrivial chain, homomorphism/dual[2], extension-divisor coverage, ECDLP preservation/cost advantage, cold qualification or signed result is established by this unit. Full map/field/compiler and admitted strongest-baseline cost work remain queued. [pcc:unverified]
+'''
+(n/'PROTOCOL_10.md').write_text(protocol)
+pr=claim('Prospective Rust Richelot chart development unit10 frozen before code: all12 literal F101 sextics from retained CT49/50 and current native constructor boundary; deterministic unramified shift/reciprocal/square normalization, full102 projective coefficient identity tests and rational point/infinity roundtrips plus independent character counts and malformed/mutation controls planned. Sign of a curve isomorphism cannot establish Richelot dual orientation; explicit limitation. Standard-library Rust/j1/120s bounded correctness only, no implementation/execution result yet, no full Jacobian/DLP/cost/paid/signed promotion.',[n/'PROTOCOL_10.md',n/'fixtures-10.csv',primary/'CT49_NONSPLIT_RICHELOT.md',primary/'CT50_BIDUAL_RETURN.md',primary/'entire-nonsplit_map.rs.txt'])
+(n/'actual-preregistration-claim.stdout.txt').write_text(pr+'\n');print('chart prereg',pr,flush=True)

@@ -1,0 +1,38 @@
+{
+ "note": "Engineering change (wall time only) to the Koblitz IC set-up and the prime-field rho walk; counted results unchanged. The rho reference is the rho.negation reference arm each ecbench session runs beside every other arm, and the in-process rho reference of each ic price run for the Koblitz rows.",
+ "replay_certificate": {
+  "path": "../../research/ecbench_perf_round2_20261022/replay-certificate.json",
+  "sha256": "1e3f7e077254e44c6c43fc5a3f1808450c971052a39fa87818214449073c5a76"
+ },
+ "rho_reference": {
+  "band_source": "../../research/ecbench_perf_round2_20261022/band/prime-ic-28-new.json (ic.pipeline mitm-prime-batch vs rho.negation, 28-bit prime-order curve, 3 sessions)",
+  "binary_or_process": "ecbench 3213bca03 (this change) for the new sessions; every arm of a session runs in that session's binary. Koblitz rows: ic price runs its rho reference in the same process",
+  "gae_band": {
+   "0": {
+    "ic": 24.427370843124397,
+    "rho": 1.0486351208524551
+   },
+   "0.1": {
+    "ic": 26.04845596944179,
+    "rho": 1.1511211480494543
+   },
+   "1": {
+    "ic": 40.63822210629837,
+    "rho": 2.0734953928224447
+   }
+  },
+  "kind": "negation",
+  "matches_protocol": true,
+  "order_holds_across_band": true,
+  "protocol": "each spec's rho.negation reference arm (role reference), run in every session on the same curve and targets as every other arm; prime-order curves (A = 2), so negation is the strongest symmetry available",
+  "same_binary_or_process": true,
+  "same_unit": true,
+  "strongest_available": true,
+  "unit": "ecbench.gae (counted group operations, S = GAE/sqrt(r))"
+ },
+ "schema": "validation-gate/v1",
+ "validator_report": {
+  "path": "../../research/ecbench_perf_round2_20261022/validator-report.json",
+  "sha256": "f63204bb60846289e68528b046eed5f2c0e63ab0173a686aaa9b7c47622a1a31"
+ }
+}

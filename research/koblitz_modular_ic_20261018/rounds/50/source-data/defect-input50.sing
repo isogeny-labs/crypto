@@ -1,0 +1,54 @@
+ring relativeFinite50=2,(t,v,u),wp(4,2,1);short=0;ideal relativeIdeal50;relativeIdeal50[1]=v^2+v+u^3+u;relativeIdeal50[2]=t^16+(u^8+1)*t^8*v+(u^32+u^24+u^20+u^14+u^11+u^10+u^9+u^6+u^4+u^3+u^2+u+1)*t^8+(u^41+u^39+u^37+u^32+u^31+u^30+u^19+u^17+u^16+u^14+u^13+u^11)*t^4*v+(u^42+u^39+u^37+u^34+u^31+u^28+u^26+u^25+u^24+u^23+u^22+u^21+u^19+u^18+u^17+u^16+u^15+u^14+u^12+u^11)*t^4+(u^53+u^52+u^51+u^50+u^48+u^45+u^41+u^38+u^36+u^35+u^32+u^31+u^30+u^29+u^28+u^27+u^26+u^25+u^21+u^15+u^12+u^11)*t*v+(u^54+u^47+u^46+u^43+u^42+u^41+u^34+u^33+u^31+u^30+u^28+u^23+u^22+u^20+u^15+u^11)*t+(u^54+u^53+u^50+u^49+u^48+u^45+u^43+u^40+u^39+u^38+u^36+u^30+u^24+u^21+u^19+u^18+u^17+u^16+u^15+u^14+u^13+u^12+u^8+1)*v+(u^64+u^56+u^55+u^53+u^52+u^51+u^50+u^49+u^45+u^44+u^40+u^37+u^35+u^33+u^32+u^31+u^29+u^28+u^26+u^25+u^24+u^22+u^20+u^17+u^16+u^12+u^11+u^10+u^9+u^6+u^4+u^3+u^2+u+1);poly relativeB50=(u^8+1)*t^8+(u^41+u^39+u^37+u^32+u^31+u^30+u^19+u^17+u^16+u^14+u^13+u^11)*t^4+(u^53+u^52+u^51+u^50+u^48+u^45+u^41+u^38+u^36+u^35+u^32+u^31+u^30+u^29+u^28+u^27+u^26+u^25+u^21+u^15+u^12+u^11)*t+(u^54+u^53+u^50+u^49+u^48+u^45+u^43+u^40+u^39+u^38+u^36+u^30+u^24+u^21+u^19+u^18+u^17+u^16+u^15+u^14+u^13+u^12+u^8+1);
+
+ring relativeInfinity50=2,(T,V,z),wp(4,2,1);short=0;ideal relativeInfinityIdeal50;relativeInfinityIdeal50[1]=V^2+(z^2)*V+(z^3+z);relativeInfinityIdeal50[2]=T^16+(z^30+z^22)*T^8*V+(z^32+z^31+z^30+z^29+z^28+z^26+z^23+z^22+z^21+z^18+z^12+z^8+1)*T^8+(z^35+z^33+z^32+z^30+z^29+z^27+z^16+z^15+z^14+z^9+z^7+z^5)*T^4*V+(z^37+z^36+z^34+z^33+z^32+z^31+z^30+z^29+z^27+z^26+z^25+z^24+z^23+z^22+z^20+z^17+z^14+z^11+z^9+z^6)*T^4+(z^47+z^46+z^43+z^37+z^33+z^32+z^31+z^30+z^29+z^28+z^27+z^26+z^23+z^22+z^20+z^17+z^13+z^10+z^8+z^7+z^6+z^5)*T*V+(z^49+z^45+z^40+z^38+z^37+z^32+z^30+z^29+z^27+z^26+z^19+z^18+z^17+z^14+z^13+z^6)*T+(z^62+z^54+z^50+z^49+z^48+z^47+z^46+z^45+z^44+z^43+z^41+z^38+z^32+z^26+z^24+z^23+z^22+z^19+z^17+z^14+z^13+z^12+z^9+z^8)*V+(z^64+z^63+z^62+z^61+z^60+z^58+z^55+z^54+z^53+z^52+z^48+z^47+z^44+z^42+z^40+z^39+z^38+z^36+z^35+z^33+z^32+z^31+z^29+z^27+z^24+z^20+z^19+z^15+z^14+z^13+z^12+z^11+z^9+z^8+1);
+
+short=0;option(redSB);
+// Two independently computed chart module lengths must match the actual
+// diagonal-transition Euler-characteristic difference.
+int planeWeightSum50=0;int refinedWeightSum50=0;int i50;int j50;
+for(i50=0;i50<32;i50++){planeWeightSum50=planeWeightSum50+4*i50;}
+for(i50=0;i50<16;i50++){for(j50=0;j50<2;j50++){refinedWeightSum50=refinedWeightSum50+4*i50+2*j50;}}
+int expectedLength50=planeWeightSum50-refinedWeightSum50;
+if(expectedLength50!=992){ERROR("DEFECT50_WEIGHT_SUM");quit;}
+ring defectFinite50=2,(t,u),wp(4,1);
+map finiteCoefficients50=relativeFinite50,t,0,u;
+ideal finiteCoefficientValues50=finiteCoefficients50(relativeIdeal50);
+poly finiteA50=finiteCoefficientValues50[2];
+poly finiteB50=finiteCoefficients50(relativeB50);
+ideal finiteDefect50=finiteA50,finiteB50;ideal finiteStd50=std(finiteDefect50);
+int finiteLength50=vdim(finiteStd50);
+if(finiteLength50<128 || size(reduce(finiteDefect50,finiteStd50))!=0){ERROR("DEFECT50_FINITE_SOURCE_LENGTH");quit;}
+print("DEFECT50_STAGE finite_length="+string(finiteLength50)+" infinity_begin=true");
+link out50="ASCII:w defect-lengths50.sing";open(out50);
+write(out50,"ring defectFiniteCertificate50=2,(t,u),wp(4,1);ideal finiteDefect50;ideal finiteStd50;int finiteLength50="+string(finiteLength50)+";");
+for(i50=1;i50<=size(finiteDefect50);i50++){write(out50,"finiteDefect50["+string(i50)+"]="+string(finiteDefect50[i50])+";");}
+for(i50=1;i50<=size(finiteStd50);i50++){write(out50,"finiteStd50["+string(i50)+"]="+string(finiteStd50[i50])+";");}
+close(out50);
+ring defectInfinity50=2,(T,z),wp(4,1);
+map infinityCoefficients50=relativeInfinity50,T,0,z;
+ideal infinityCoefficientValues50=infinityCoefficients50(relativeInfinityIdeal50);
+poly infinityA50=infinityCoefficientValues50[2];
+setring relativeInfinity50;
+poly infinityBSource50=(relativeInfinityIdeal50[2]-subst(relativeInfinityIdeal50[2],V,0))/V;
+if(subst(infinityBSource50,V,0)!=infinityBSource50){ERROR("DEFECT50_INFINITY_LINEAR_V");quit;}
+setring defectInfinity50;
+poly infinityB50=infinityCoefficients50(infinityBSource50);
+ideal infinityDefect50=infinityA50,infinityB50;
+int exponent50=1;int previous50=-1;int localLength50=-1;ideal localStd50;ideal truncation50;
+for(i50=0;i50<12;i50++){
+ truncation50=infinityDefect50,z^exponent50;localStd50=std(truncation50);
+ localLength50=vdim(localStd50);
+ if(localLength50<0){ERROR("DEFECT50_LOCAL_NOT_FINITE");quit;}
+ print("DEFECT50_INFINITY_TRUNCATION exponent="+string(exponent50)+" F2_dimension="+string(localLength50));
+ if(localLength50==previous50){break;}
+ previous50=localLength50;exponent50=2*exponent50;
+}
+if(i50==12 || localLength50<0){ERROR("DEFECT50_LOCAL_NOT_STABILIZED");quit;}
+if(finiteLength50+localLength50!=expectedLength50){ERROR("DEFECT50_GLOBAL_LENGTH_MISMATCH");quit;}
+link infinityOut50="ASCII:a defect-lengths50.sing";open(infinityOut50);
+write(infinityOut50,"ring defectInfinityCertificate50=2,(T,z),wp(4,1);ideal infinityDefect50;ideal localStd50;int exponent50="+string(exponent50)+";int localLength50="+string(localLength50)+";");
+for(i50=1;i50<=size(infinityDefect50);i50++){write(infinityOut50,"infinityDefect50["+string(i50)+"]="+string(infinityDefect50[i50])+";");}
+for(i50=1;i50<=size(localStd50);i50++){write(infinityOut50,"localStd50["+string(i50)+"]="+string(localStd50[i50])+";");}
+close(infinityOut50);
+print("DEFECT50_RESULT finite_F2_length="+string(finiteLength50)+" infinity_local_F2_length="+string(localLength50)+" global_F2_length="+string(expectedLength50)+" plane_arithmetic_genus="+string(planeWeightSum50-31)+" refined_arithmetic_genus="+string(refinedWeightSum50-31));
+print("DEFECT50_ALL_CHECKS_PASS");quit;
