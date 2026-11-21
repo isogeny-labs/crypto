@@ -1,0 +1,6 @@
+Assess relation finding, 2026-11-21 20:14 UTC.
+Workflow: .github/workflows/hourly-relation-finding.yml
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Curve: frozen public-synthetic Koblitz n=23, a=0, m=2 (not ECC2K-130)
+Metrics: results/hourly_log.csv
+Baseline: results/relation_baseline.json; alert threshold 20 percent
