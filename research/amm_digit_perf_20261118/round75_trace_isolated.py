@@ -69,7 +69,7 @@ fn main(){
         before.sort_by(f64::total_cmp);after.sort_by(f64::total_cmp);
         println!("{p},{:.4},{:.4},{:.3}",before[6],after[6],before[6]/after[6]);
     }
-    println!("native Rust: 196608 exact field-operation comparisons passed");
+    println!("native Rust: 393216 exact field-operation comparisons passed");
 }
 """
 rust = main.replace("@@FIELD@@", old).replace("@@CACHED@@", new)
