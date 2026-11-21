@@ -654,6 +654,12 @@ class WorkflowPullStep(unittest.TestCase):
         stale = once.replace("pull --jobs 16 docs/x", "pull docs/old")
         self.assertEqual(wire_workflows.wire(stale, ["docs/x"])[0], once)
 
+    def test_validation_gate_pull_is_fail_closed_after_rewiring(self):
+        source = self.WF.replace("- run: make", "- run: python3 scripts/validation_gate.py check")
+        once, _ = wire_workflows.wire(source, ["docs/x"])
+        self.assertNotIn("continue-on-error: true", once)
+        self.assertEqual(wire_workflows.wire(once, ["docs/x"])[0], once)
+
 
 class WorkflowStalePullEntries(unittest.TestCase):
     """The generated pull line is output, not a reference: entries it names
@@ -705,6 +711,16 @@ class WorkflowStalePullEntries(unittest.TestCase):
             self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
             self.assertNotIn("research/study_b_20261031", wf.read_text())
             self.assertEqual(self._main(wf, "--check").returncode, 0)
+
+    def test_check_rejects_soft_fail_reintroduced_in_validation_gate(self):
+        source = self.BEFORE.replace("python3 build.py", "python3 scripts/validation_gate.py check")
+        wired = wire_workflows.wire(source, self._paths(source))[0]
+        self.assertNotIn("continue-on-error: true", wired)
+        stale = wired.replace("        shell: bash", "        continue-on-error: true\n        shell: bash", 1)
+        with tempfile.TemporaryDirectory() as d:
+            wf = Path(d) / "wf.yml"
+            wf.write_text(stale)
+            self.assertEqual(self._main(wf, "--check").returncode, 1)
 
     def test_declared_runtime_inputs_survive_and_stale_declarations_do_not(self):
         bare = ("# tools/artifacts pull: research/study_b_20261031 research/gone_20261031\n"

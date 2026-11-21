@@ -262,14 +262,10 @@ def pulled_by(text: str) -> list[str]:
     return m.group(1).split() if m else []
 
 
-def step_lines(indent: str, paths: list[str]) -> list[str]:
+def step_lines(indent: str, paths: list[str], *, soft_fail: bool = True) -> list[str]:
     i2 = indent + "  "
-    return [
+    lines = [
         f"{indent}- name: {STEP_NAME}",
-        # TEMPORARY store-outage fallback (2026-11-16): verified-cache misses
-        # and AllAccessDisabled/invalid AWS tokens must not fail required jobs
-        # (notably validation-gate). Remove once the store hydrates cleanly.
-        f"{i2}continue-on-error: true",
         f"{i2}shell: bash",
         f"{i2}working-directory: ${{{{ github.workspace }}}}",
         f"{i2}env:",
@@ -291,6 +287,11 @@ def step_lines(indent: str, paths: list[str]) -> list[str]:
         f"{i2}  fi",
         f"{i2}  python3 tools/artifacts/artifacts.py pull --jobs 16 {' '.join(paths)}",
     ]
+    # Other workflows still tolerate store outages. The validation gate must
+    # report failure when its evidence cannot be hydrated.
+    if soft_fail:
+        lines.insert(1, f"{i2}continue-on-error: true")
+    return lines
 
 
 def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
@@ -343,7 +344,7 @@ def wire(text: str, paths: list[str]) -> tuple[str, list[str]]:
         if not paths:
             i = j
             continue
-        step = step_lines(indent, paths)
+        step = step_lines(indent, paths, soft_fail=not reads_validation_gate(text))
         cond = next((re.sub(rf"^{indent}(?:- |  )", "", b) for b in block
                      if re.match(rf"^{indent}(?:- |  )if: ", b)), None)
         if cond:  # skipped with its checkout, so it never runs against an empty workspace
@@ -420,7 +421,9 @@ def main() -> int:
                 ln for ln in s.splitlines()
                 if ln.strip() != "continue-on-error: true"
             )
-        if _norm(new) != _norm(text):
+        # Do not normalize away a reintroduced soft-fail in the validation
+        # gate: that would hide a change to the gate's actual verdict.
+        if (new != text if reads_validation_gate(text) else _norm(new) != _norm(text)):
             missing += 1
             if args.check:
                 if paths:
