@@ -1,0 +1,13 @@
+{
+  "schema": "xedni-relation-word6-orbits-protocol-v1",
+  "source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "arithmetic_source_sha256": "1605edd1e877873111b992a297760f9a7dd451ee391394262925646bf107fe4a",
+  "source_policy_result_sha256": "82c1eacc112e5948ade1ae806a2ce562389250225fb72cc15af9501ad5d3ef55",
+  "curve": {"field_prime": 47, "weierstrass_coefficients": [0, 0, 0, 46, 45], "group_order": 43, "subgroup_order": 43},
+  "envelope": "every one of 42 nonidentity Q on E(F47), P=-6Q, one verified finite-field row P+6Q=O; this grants all rows regardless of rational-lift availability",
+  "matrix": "fold points by sign into 21 columns, insert coefficients 1 at P and 6 at Q with sign, compute all 42 rows over F43, partition columns into multiplier -6 orbits, and compute each block rank and full rank",
+  "expected_rows": 42,
+  "prediction": "-6 has order six mod 43 and contains negation at step three; seven sign-folded three-column cycles imply seven components and a rank ceiling of 14",
+  "resource": "exact local group arithmetic and matrix elimination; no timing comparison",
+  "claim_boundary": "fixed order-43 curve, full sign-folded base, coefficient-six relation word; other words, target descent and rational-lift selection are not covered"
+}
