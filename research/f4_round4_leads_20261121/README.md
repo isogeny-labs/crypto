@@ -43,4 +43,8 @@ Lead 4 had no code change. jemalloc stays per consumer (round 3).
 
 - Branch traces: record the continuation at a replay divergence.
 - Deterministic trace recording under parallel batches.
-- Hilbert as `jv_cover`'s default: an owner decision, not made.
+- Done (owner approved, 2026-11-21): `--stop hilbert:16` is `jv_cover`'s default.
+  - `--stop full` (or `--stop 0`) restores full F4.
+  - Check, dlp p = 53: no flag gives `hilbert:16` (9,623,663,419 oracle multiplications, S 392.28); `--stop full` gives 17,873,891,895 (S 727.12). Both find 31 relations and a correct logarithm (`data/default_switch/`).
+  - The confirmation script in `scripts/` predates this change. Its full-F4 arms rely on the old default, so a rerun with a newer binary needs `--stop full`.
+  - `--trace` stays opt-in: its counted cost depends on thread scheduling.
