@@ -210,6 +210,18 @@ fn trim(mut v: Vec<u64>) -> Vec<u64> {
     }
     v
 }
+// A monic power X^k has exactly one nonzero coefficient. Its products
+// are coefficient shifts, requiring no finite-field arithmetic.
+#[inline]
+fn monic_power_degree(poly: &[u64]) -> Option<usize> {
+    if poly.len() < 2 || poly[0] != 0 || *poly.last()? != 1
+        || poly[1..poly.len() - 1].iter().any(|&c| c != 0)
+    {
+        return None;
+    }
+    Some(poly.len() - 1)
+}
+
 /// Accelerated arithmetic for canonical public field elements emitted by
 /// the trace engine. Keep the general u128 fallback so event values remain
 /// identical even for noncanonical internal callers.
@@ -378,6 +390,65 @@ impl Engine<'_> {
             })?;
             return Ok(product);
         }
+        // The independent verifier will check every Product event. For a
+        // monic X^k, the exact polynomial product is just a coefficient shift.
+        // Neither field operations nor field-work budget are consumed.
+        if let Some(shift) = monic_power_degree(a).or_else(|| monic_power_degree(b)) {
+            let other = if monic_power_degree(a).is_some() { b } else { a };
+            let mut product = if other.is_empty() {
+                Vec::new()
+            } else {
+                let mut output = vec![0; shift + other.len()];
+                output[shift..].copy_from_slice(other);
+                output
+            };
+            product = trim(product);
+            self.event(RootEvent::Product {
+                a: a.to_vec(),
+                b: b.to_vec(),
+                product: product.clone(),
+            })?;
+            return Ok(product);
+        }
+        // A monic linear factor (X+c) can be multiplied in one coefficient
+        // pass, using at most n finite-field multiplies, rather than 2n.
+        // Avoid scalar operations on zeros and preserve the separate Product
+        // certificate, which the independent verifier checks by convolution.
+        // Only use this for lengths large enough to amortize dispatch.
+        let monic_linear = if a.len() == 2 && a[1] == 1 && a[0] != 0 && b.len() >= 7 {
+            Some((a[0], b))
+        } else if b.len() == 2 && b[1] == 1 && b[0] != 0 && a.len() >= 7 {
+            Some((b[0], a))
+        } else {
+            None
+        };
+        if let Some((constant, other)) = monic_linear {
+            let mut product = vec![0; other.len() + 1];
+            if other[0] != 0 {
+                product[0] = self.field(FieldOp::Mul, constant, other[0])?;
+            }
+            for i in 1..other.len() {
+                let scaled = if other[i] != 0 {
+                    self.field(FieldOp::Mul, constant, other[i])?
+                } else {
+                    0
+                };
+                product[i] = if scaled == 0 {
+                    other[i - 1]
+                } else if other[i - 1] == 0 {
+                    scaled
+                } else {
+                    self.field(FieldOp::Add, scaled, other[i - 1])?
+                };
+            }
+            product[other.len()] = *other.last().unwrap();
+            let product = trim(product);
+            self.event(RootEvent::Product {
+                a: a.to_vec(), b: b.to_vec(), product: product.clone(),
+            })?;
+            return Ok(product);
+        }
+        // General polynomial convolution with zero coefficient pruning.
         let mut product = if a.is_empty() || b.is_empty() {
             vec![]
         } else {
@@ -1630,6 +1701,57 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round86_monic_shift_and_linear_match_independent_products() {
+        // Directly exercise the source-exact traced producer arithmetic.
+        // In particular, a shift must not charge scalar arithmetic events.
+        for p in [3, 17, 65_521, 1_000_000_007, MAX_PRIME] {
+            let mut sink = |_event: &RootEvent| Ok(());
+            let mut engine = Engine {
+                report: RootReport {
+                    schema: "prime-root-trace/v1".into(), p,
+                    polynomial: vec![1, 1], seed: 7,
+                    limits: RootLimits {field_work: MAX_WORK, split_attempts: 1000,
+                        events: MAX_EVENTS, degree: MAX_DEGREE},
+                    stop: RootStop::WorkLimit,
+                    counters: RootCounters::default(), events: Vec::new(),
+                    unacknowledged: None, sink_error: None, roots: Vec::new(),
+                },
+                sink: &mut sink, next_id: 0,
+                reciprocal32: if p <= u32::MAX as u64 {
+                    ((1u128 << 64) / p as u128) as u64
+                } else { 0 },
+            };
+            let dense = vec![1, 2 % p, 3 % p, 4 % p, 5 % p, 6 % p, 7 % p, 8 % p];
+            let sparse = vec![1, 0, 2 % p, 0, 3 % p, 0, 4 % p, 1];
+            for other in [&dense, &sparse] {
+                for shift in 1..=4 {
+                    let mut monomial = vec![0; shift + 1];
+                    monomial[shift] = 1;
+                    let before = engine.report.counters.field_work();
+                    assert_eq!(engine.mul(&monomial, other).unwrap(),
+                        vproduct(&monomial, other, p));
+                    assert_eq!(engine.report.counters.field_work(), before);
+                    assert_eq!(engine.mul(other, &monomial).unwrap(),
+                        vproduct(other, &monomial, p));
+                    assert_eq!(engine.report.counters.field_work(), before);
+                    assert_eq!(engine.square(&monomial).unwrap(),
+                        vsquare(&monomial, p));
+                }
+            }
+            for constant in [1, 2 % p] {
+                let linear = [constant, 1];
+                for other in [&dense, &sparse] {
+                    let result = engine.mul(&linear, other).unwrap();
+                    assert_eq!(result, vproduct(&linear, other, p));
+                    assert_eq!(engine.mul(other, &linear).unwrap(), result);
+                }
+            }
+            assert_eq!(engine.square(&[1]).unwrap(), vec![1]);
+            assert!(engine.report.events.iter().any(|e| matches!(e, RootEvent::Product { .. })));
+        }
+    }
 
     #[test]
     fn round82_full_split_frobenius_certificate_and_tampering() {
