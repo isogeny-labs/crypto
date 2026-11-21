@@ -109,29 +109,33 @@ fn main(){
  // Direct source-exact verifier polynomial product microbenchmark. The only
  // source addition in temporary crates is a thin accessor for private vproduct.
  for p in [65521u64, 1_000_000_007, 4_294_967_291, MAX_PRIME] {
-  for degree in [4usize,8,12] {
-   let mut seed=0x55e0_119a_8897_ab32u64 ^ p ^ (degree as u64);
-   let mut inputs=Vec::new();
-   for _ in 0..2048 {
-    let mut a=vec![0u64;degree];let mut b=vec![0u64;degree];
-    for x in a.iter_mut().chain(b.iter_mut()) {
-      seed=seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
-      *x=seed%p;
+  for sparse in [false,true] {
+   for degree in [4usize,8,12] {
+    let mut seed=0x55e0_119a_8897_ab32u64 ^ p ^ (degree as u64);
+    let mut inputs=Vec::new();
+    for _ in 0..2048 {
+     let mut a=vec![0u64;degree];let mut b=vec![0u64;degree];
+     for x in a.iter_mut().chain(b.iter_mut()) {
+       seed=seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+       *x=if sparse && ((seed>>27)&1)==0 {0} else {seed%p};
+     }
+     if sparse {a[degree-1]=1;b[degree-1]=1;}
+     inputs.push((a,b));
     }
-    inputs.push((a,b));
-   }
-   let start=Instant::now();let mut checksum=0u64;let mut count=0usize;
-   for _ in 0..2 {
-    for (a,b) in &inputs {
+    let start=Instant::now();let mut checksum=0u64;let mut count=0usize;
+    for _ in 0..2 {
+     for (a,b) in &inputs {
       let result=cryptanalysis::prime_root_trace::benchmark_product(
        black_box(a),black_box(b),black_box(p));
       checksum=checksum.wrapping_mul(33).wrapping_add(result[degree-1]);
-      black_box(result);
-      count+=1;
+      black_box(result);count+=1;
+     }
     }
+    let ns=start.elapsed().as_nanos() as f64 / count as f64;
+    let name=if sparse {format!("product_sparse_{degree}")}
+         else {format!("product_{degree}")};
+    println!("{p},{name},{ns:.3},{checksum},{count}");
    }
-   let ns=start.elapsed().as_nanos() as f64 / count as f64;
-   println!("{p},product_{degree},{ns:.3},{checksum},{count}");
   }
  }
 }
