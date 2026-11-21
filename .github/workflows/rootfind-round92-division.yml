@@ -1,4 +1,4 @@
-name: Rootfind Round92 source-exact Rust division A/B
+name: Rootfind Round92 source-exact Rust power-step A/B
 on:
   push:
     branches:
@@ -29,8 +29,15 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - name: Compare frozen Round91 against Round92 production Rust
         run: python3 research/amm_digit_perf_20261118/round92_division_ab.py
+      - name: Isolate removal of trivial power initialization divisions
+        env:
+          ROOTFIND_BASELINE_REF: 0f45b31c6ff62f2de3afbd407c11dbfb948474d8
+          ROOTFIND_AB_OUTPUT: research/amm_digit_perf_20261118/round92_incremental_ab_results.csv
+        run: python3 research/amm_digit_perf_20261118/round92_division_ab.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: round92-division-source-exact-ab
-          path: research/amm_digit_perf_20261118/round92_ab_results.csv
+          path: |
+            research/amm_digit_perf_20261118/round92_ab_results.csv
+            research/amm_digit_perf_20261118/round92_incremental_ab_results.csv
