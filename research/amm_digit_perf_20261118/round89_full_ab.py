@@ -236,6 +236,10 @@ with tempfile.TemporaryDirectory(prefix="root89-full-") as tmp:
                             "--","--nocapture"],cwd=folder,check=True)
         if label == "after":
             subprocess.run(["cargo","test","--release","--quiet",
+                            "round93_traced_division_matches_independent_quotient_remainder",
+                            "--","--nocapture"],cwd=folder,check=True)
+        if label == "after":
+            subprocess.run(["cargo","test","--release","--quiet",
                             "exhaustive_quadratics_over_f7_match_direct_evaluation",
                             "--","--nocapture"],cwd=folder,check=True)
         bins[label] = folder / "target/release/rootfind-isolated-ab"
