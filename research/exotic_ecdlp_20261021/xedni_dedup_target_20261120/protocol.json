@@ -1,0 +1,27 @@
+{
+  "schema": "xedni-dedup-target-protocol-v1",
+  "source_panel_protocol": "research/exotic_ecdlp_20261021/xedni_preregistered_prime_panel_20261120/protocol.json",
+  "source_threshold_result": "research/exotic_ecdlp_20261021/xedni_radius_threshold_20261120/result.json",
+  "source_threshold_result_raw_sha256": "63c6021c256d0382e003f0a4e38560441d28274af8519f3620a94696fa2b0322",
+  "source_first_hit_result": "research/exotic_ecdlp_20261021/xedni_first_hit_distribution_20261120/result.json",
+  "source_first_hit_result_raw_sha256": "9e3efe76c5fb178f0c54181b0e682963219f4c1141f76643ada57bf4c3d6ceb3",
+  "source_solver": "research/exotic_ecdlp_20261021/xedni_fresh_target_pair_20261120/run_sage.py",
+  "source_solver_raw_sha256": "b35b225581e7994121e60277c1956c37eaa0b132ab8a84c3fbf50da3344b2907",
+  "previous_target_fixtures": "research/exotic_ecdlp_20261021/xedni_fresh_target_pair_20261120/target-fixtures.jsonl",
+  "previous_target_fixtures_raw_sha256": "d9c4cb1663bc6abf387747b367aaeaa7d402d840732f62ccae530da4fa264967",
+  "cells": [
+    {"p": 1531, "q": 1553, "R_over_Q": 11, "radius": 65},
+    {"p": 2287, "q": 2251, "R_over_Q": 1238, "radius": 54}
+  ],
+  "target_seed": "xedni-dedup-target-v1-20261120",
+  "targets_per_cell": 3,
+  "target_rule": "k=1+int(SHA256(UTF8(seed+':'+p+':'+j)).hexdigest(),16) mod (q-1), j=0,1,2; require distinct targets within each cell and none in prior six fixtures; construct T=k*Qbar outside timing and pass only T to solvers",
+  "candidate_order": "all nonzero (a,b) in [-B,B]^2 sorted by frozen 128-bit Decimal height score then (a,b)",
+  "dedup_rule": "after source lambda is ready, scan full sorted list before target input; keep only first label for each nonzero residue (a+lambda*b) mod q; discard identity and later duplicate residues; charge ordering and filtering as setup",
+  "arms": "baseline rational scan and deduplicated rational scan call the same pinned rational solver with full or filtered label sequence; rho calls the same pinned deterministic Floyd solver on the identical public point",
+  "arm_order_by_target_index": [["baseline","dedup","rho"],["rho","baseline","dedup"],["dedup","rho","baseline"]],
+  "time_cap_per_arm_seconds": 120,
+  "online_interval": "start before first target-dependent rational construction or rho walk and stop after scalar and independent public-point verification; include failed candidates/restarts; exclude source-lambda discovery, curve/pairing/label/filter setup, fixture construction, process startup",
+  "status_policy": "retain verified, candidate_cap_exhausted, rho_cap_exhausted, wall_cap_exhausted, and error rows with started/completed work and online interval",
+  "claim_boundary": "ordinary-host diagnostic on newly seeded same-point triples, with source lambda supplied; no Tier 0/1 speedup promotion; cold setup excludes source-lambda discovery and remains separate"
+}
