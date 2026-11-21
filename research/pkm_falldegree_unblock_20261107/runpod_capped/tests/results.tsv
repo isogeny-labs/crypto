@@ -35,9 +35,9 @@ A32	PASS	exit 3, 0 API calls	exit 3, 0 API calls	draw 1 of the same cap (needs a
 A33	PASS	exit 3, 0 API calls	exit 3, 0 API calls	the retired name of owner decision 23 (pkm-x-t14-k0-c7-m112)
 B01	PASS	exit 3, no create	exit 3, creates 0	a pkm-x- pod is live (serial rule)
 B02	PASS	exit 10, no create, no receipts dir	exit 10, creates 0, dir no	catalog availability NONE for cpu5m at 16 vCPU: no attempt
-B03	PASS	exit 3 (per-job guard), no create	exit 3, creates 0	price 0.068 x 32 = 2.176/h x 30 h = US$65.28 > US$65
-B04	PASS	exit 3 (study guard)	exit 3, creates 0	ledger US$465.84 + 6.77 = 472.61, + worst case US$62.40 = 535.01 > US$535
-B04b	PASS	exit 0 (started)	exit 0, creates 1	ledger US$472.59 + worst case US$62.40 = 534.99 <= US$535
+B03	PASS	exit 3 (per-job guard), no create	exit 3, creates 0	price 0.066 x 32 = 2.112/h x 30.8 h = US$65.05 > US$65
+B04	PASS	exit 3 (study guard)	exit 3, creates 0	fixture ledger US$500 + 30.94, + worst case US$64.064 (2.08 x 30.8 h) = 595.004 > US$595
+B04b	PASS	exit 0 (started)	exit 0, creates 1	fixture ledger US$500 + 30.93, + worst case US$64.064 = 594.994 <= US$595
 B05	PASS	exit 4, delete logged then made, receipts -> .prestart-1, ledger row closed	exit 4, pods left 0	create response cloud COMMUNITY (not the SECURE tier)
 B06	PASS	exit 4, pod deleted	exit 4, pods left 0	create response cost 0.98 differs from the catalog price (0.065 x 32 = 2.08)
 B07	PASS	exit 4, pod found by name and deleted	exit 4, pods left 0	create call timed out but the pod exists (trap set before create)
@@ -46,7 +46,7 @@ B09	PASS	exit 5, pod deleted, not an attempt	exit 5	runner would start more than
 B10	PASS	exit 0; v2 create body keys only; token and key absent from receipts and create argv; command and env dropped from saved records; cgroup limit read before start; data center read when ready; ledger row at 30 h; no v1 or GraphQL call	exit 0; X-Token argv lines (rp_pinned.sh, disclosed): 13	development launch end to end against the v2 stub
 B11	PASS	the study run starts with stage cap:14:0:7:54000000000 and the pinned request (exit 0); its -r1 is refused while it is in flight (exit 3)	exit 0 then 3	study launch pkm-x-t14-k0-c7-d54, then pkm-x-t14-k0-c7-d54-r1
 B12	PASS	bash -n ok; embedded runner sha256 f56fd08e...	bash -n 0; embedded sha256 f56fd08e	the pod start command parses and carries server_pinned.py (= runpod/server.py at d2a16c723d)
-B13	PASS	memory.max, memory.events and final-at copied	final-at fstype memory.events memory.max proc-self-cgroup snapshot-at 	the boot loop copies cgroup v2 files and writes its final copy after runner_state.json
+B13	PASS	memory.max, memory.events and final-at copied	final-at fstype max_map_count memory.events memory.max proc-self-cgroup snapshot-at 	the boot loop copies cgroup v2 files and writes its final copy after runner_state.json
 B14	PASS	exit 4 before start, pod deleted	exit 4	S4: cgroup memory.max 255,999,999,999 bytes (one byte under the 256,000,000,000 floor)
 B15	PASS	exit 4 before start, pod deleted	exit 4	S4: no cgroup memory limit file before start (unobservable: owner)
 B16	PASS	exit 0, then exit 3 (ledger row)	exit 0 then 3	N6: receipts and token lost after a launch, pod gone: the same name is refused
@@ -54,6 +54,10 @@ B17	PASS	exit 4 before start, pod deleted	exit 4	GET record cpu.memory 128 GB, b
 B18	PASS	exit 4 before upload, pod deleted	exit 4	the record read when the runner answers has no data center id
 B19	PASS	exit 3, the second page was read	exit 3, creates 0	v2 list pagination: a live pkm-x- pod on page 2 (serial rule)
 B20	PASS	exit 4, pod deleted	exit 4	create answered 202 (queued) instead of 201: not accepted
+B02b	PASS	exit 10, no create	exit 10, creates 0	catalog availability HIGH with an empty dataCenters list counts as no stock (review 4 M5e)
+B21	PASS	exit 4 before start, pod deleted	exit 4	study run on a pod whose memory.max reads max: refused (review 4 S3)
+B22	PASS	exit 0; memory.oom.group and max_map_count recorded in cgroup-prestart.json	exit 0	development run with memory.max max is accepted; the S1 settings are recorded (no rule reads them)
+B23	PASS	exit 4; run.log names the size of the non-JSON body; the token is in no receipt	exit 4	a failed create's response body is copied to run.log only as redacted JSON (review 4 S13)
 C01	PASS	exit 41, pod kept, one check-in with v2 status and startedAt	exit 41	running before the deadline
 C02	PASS	exit 8 ADMITTED; gate: uncommitted 8, committed but not pushed 8, pushed 0; re-run 9	exit 8 ADMITTED P2d; 8; 8; 0; 9	completed run: collect, the git gate (decision 22), delete, refuse re-collection
 C02b	PASS	exit 8, pod kept	exit 8 then 8	git gate: a kept file changed after the commit (manifest mismatch)
@@ -142,6 +146,9 @@ R06	PASS	ADMITTED P2d d_F=none censored=-	ADMITTED P2d d_F=none censored=-	degre
 R07	PASS	OOM P2k d_F=>= 7 censored=memory	OOM P2k d_F=>= 7 censored=memory	cgroup oom_kill 1 -> OOM, censored at the new size
 R08	PASS	OOM P2b d_F=>= 7 censored=memory	OOM P2b d_F=>= 7 censored=memory	exit 137 with oom_kill 1 -> OOM, censored
 R09	PASS	LIMIT P2a d_F=>= 7 censored=time limit	LIMIT P2a d_F=>= 7 censored=time limit	runner ended after the run deadline -> LIMIT, censored
+R10	PASS	ADMITTED P2d d_F=>= 7 censored=size	ADMITTED P2d d_F=>= 7 censored=size	review 4 S4: oversize true with no stop line (no contrary stop line) -> censored by size
+R11	PASS	ADMITTED P2d d_F=>= 7 censored=budget	ADMITTED P2d d_F=>= 7 censored=budget	review 4 S4: a deadline caught at the top of the step loop prints no stop line -> censored by the budget
+D31b	PASS	oom_note present	peak below 90 percent of memory.max: a h	review 4 S8: an OOM with the peak (30 GiB) under 90 percent of memory.max is annotated as a likely host-level or group kill
 D38	PASS	LOST P3 relaunch=owner	LOST P3 relaunch=owner	runner idle and status EXITED
 D39	PASS	LOST P3 relaunch=owner	LOST P3 relaunch=owner	status EXITED after the session logged a delete
 D40	PASS	NO_EVIDENCE P0	NO_EVIDENCE P0	S2: a truncated check-in line fails closed
@@ -167,16 +174,25 @@ E14	PASS	ALL_RESOLVED	ALL_RESOLVED	base LOST auto, relaunch ADMITTED
 F01	PASS	pod past creation + 26 h deleted through v2 (logged first); young and non-pkm-x pods kept; second pass changes nothing	exit 0, left ["young1","other1"]; exit 0, left ["young1","other1"]; 3 receipt lines	reaper: 27 h old pod without receipts, 1 h old pod, other session's pod
 F08	PASS	pod untouched, skip recorded	exit 0, pods 1	S1: a due pod whose per-name lock is held by another process
 F03	PASS	exit 1	exit 1	reaper: pod list unreadable (network blocked)
+F03b	PASS	message names the blind pass	REAPER BLIND: the RunPod pod list (GET https://api.runpod.io	review 4 / owner decision 25: an unreadable pod list is reported, not silent
+F11	PASS	exit 0, pod deleted, RPC_STATE created	exit 0, pods 0	owner decision 25: reaper in a fresh checkout with an RPC_STATE that does not exist yet (no token, no lock files)
 F07	PASS	exit 1, nothing deleted	exit 1, pods 2	S6: unparsable createdAt and a null name: reported, not deleted
 F09	PASS	the page-2 pod is seen and a delete is sent (the stub keeps page 2, so it stays listed: exit 7)	exit 7	v2 list pagination in the reaper
 F02	PASS	pod collected by fetch.sh (LIMIT P4) and deleted	exit 0 LIMIT P4	reaper: a run past its hard deadline, with receipts
 F04	PASS	pod deleted through fetch.sh, NOT_AN_ATTEMPT	exit 0	reaper: launcher died, no deadline recorded, creation + 26 h passed
 F05	PASS	pod untouched; the next fetch.sh waits (41)	exit 0, pods 1, fetch 41	N3c, the review's probe: start.json missing, runner running, created 90 min ago
 F06	PASS	pod untouched	exit 0, pods 1	N3c: past the run deadline but before the hard deadline, runner unreachable
+F10	PASS	exit 0; fetch.sh recovers the token from the v2 record into the new RPC_STATE, collects and deletes	exit 0 LIMIT P4	owner decision 25: the hourly reaper in a fresh checkout, a run past its hard deadline
+W01	PASS	exit 20 (segment over), pod kept, two or more check-ins	exit 20, check-ins 3	a running job: watch.sh calls fetch.sh at its interval until MAX_WALL_S
+W02	PASS	exit 8 at once (collected; the git gate is the session's), pod kept	exit 8 ADMITTED P2d	a completed job: watch.sh stops for the git gate and deletes nothing
+W04	PASS	exit 0, LIMIT P4, deleted by fetch.sh	exit 0 LIMIT P4	past the hard deadline: fetch.sh collects and deletes; watch.sh ends
+W03	PASS	exit 2	exit 2	watch.sh refuses an interval above 900 s
+W05	PASS	exit 2	exit 2	watch.sh refuses a segment longer than 2 h
 G-common.sh	PASS	bash -n ok	rc 0	syntax of common.sh
 G-run.sh	PASS	bash -n ok	rc 0	syntax of run.sh
 G-fetch.sh	PASS	bash -n ok	rc 0	syntax of fetch.sh
 G-reap.sh	PASS	bash -n ok	rc 0	syntax of reap.sh
+G-watch.sh	PASS	bash -n ok	rc 0	syntax of watch.sh
 G-rp_pinned.sh	PASS	bash -n ok	rc 0	syntax of rp_pinned.sh
 G-make_requests_d54.sh	PASS	bash -n ok	rc 0	syntax of make_requests_d54.sh
 G-make_requests_m112.sh	PASS	bash -n ok	rc 0	syntax of make_requests_m112.sh

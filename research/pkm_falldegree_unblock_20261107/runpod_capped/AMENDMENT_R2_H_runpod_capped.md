@@ -382,14 +382,14 @@ hashes are recorded here, and no script checks them.
 
 | file | SHA-256 |
 |:--|:--|
-| `common.sh` | `@SHA_common.sh@` |
-| `run.sh` | `@SHA_run.sh@` |
-| `fetch.sh` | `@SHA_fetch.sh@` |
-| `reap.sh` | `@SHA_reap.sh@` |
-| `watch.sh` | `@SHA_watch.sh@` |
-| `INDEPENDENT_REAPER.md` | `@SHA_INDEPENDENT_REAPER.md@` |
-| `make_requests_d54.sh` | `@SHA_make_requests_d54.sh@` |
+| `common.sh` | `e6b716a5f862d5c9056e295b7ba057bc152855c8198edb27964113d21de79e23` |
+| `run.sh` | `5476bca055eadbe8c1b98baf3316c2c8967c86d561d27bde5bc926ff9ca02bbb` |
+| `fetch.sh` | `3027d1bb25bd19d0686aed8b1fe4caaefc51a948d86d419f5149af72f41391d5` |
+| `reap.sh` | `90f3fbe7be95dac868d248b9a2321eea8d400fb0a06d4aff0defe65ca0e4becd` |
+| `watch.sh` | `cea7bf4d774b289505fddd6d3a4c377d862c706f43a9dd24a4a91bfd8185fb73` |
+| `INDEPENDENT_REAPER.md` | `efe1afbf99b59803e7110f31d9a7fd4b6ff0cf0d45da5ddfdce307ddf9e542a5` |
+| `make_requests_d54.sh` | `b5e5c65570ce7b4cd228352d0ade8a571deac3d8c62813ae917ab6a11b155cb2` |
 | `requests_d54/pfd-x-t14-k0-c7-d54.json` | `089176f2a75dc228a817dc1b88852cd1953fbfcd63e0452189acd4765f70d025` |
 | `rp_pinned.sh` | `b4b6019934e02ffa32043e2e6b9aee4eb4dcc53b42442b2e01d1b30ccf536c5d` (= main's `runpod/rp.sh` at `d2a16c723d`) |
 | `server_pinned.py` | `f56fd08e01318512713f8ee392d8539fb94dc969444d45234179789930d86550` (= `runpod/server.py` at `d2a16c723d`) |
-| retired: `make_requests_m112.sh`, `requests_m112/pfd-x-t14-k0-c7-m112.json` | `@SHA_make_requests_m112.sh@`, `44e009f18d19a9c61e5a281e0c2a6a219c4f3cc3252ca63bff71049fdef4c7f9` |
+| retired: `make_requests_m112.sh`, `requests_m112/pfd-x-t14-k0-c7-m112.json` | `dd75c92a7d86ba0927886c0926f2b25f59fd4645cd22a8a7a9713af4b62ddd8d`, `44e009f18d19a9c61e5a281e0c2a6a219c4f3cc3252ca63bff71049fdef4c7f9` |

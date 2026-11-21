@@ -84,3 +84,27 @@ entry is `[pcc:unverified]`.
 | Q5 memory rule | 2026-11-21 | P2p (a 112Gi attempt with a peak above 112 GiB) is replaced: OOM is cgroup `oom_kill > 0` with exit 137 (P2b) or without (P2k), or a memory peak above the pod's numeric `memory.max` (P2p; the tree's value, else the one read before start). All are censored at the new size. Classifier `a33-r2`. | Owner decision 15 mirrored an EKS 112Gi request; here the limit is the pod's own. |
 | Q6 reading | 2026-11-21 | The classifier writes a `reading` into `outcome.json` from the class, the row and the log's stop line: refutes, `d_F = 7`; degree 7 completed without refuting, `d_F >= 8`; oversize (stop line `oversize`), budget (stop line `budget`), OOM or LIMIT, censored with `d_F >= 7` standing; anything else, no reading (owner). | The pilot writes `timed_out = timed_out || oversize`, so the row alone does not tell the two stops apart. |
 | Q7 amendment | 2026-11-21 | The route draft and the design's "proposed Amendment 34" are merged into one draft Amendment 33; `t14_bigmem/project.py` is an analysis script, not part of the route. | One frozen text for the route and its one job. |
+
+## Owner decisions 25-27 and the fourth review (2026-11-21, Amendment 33 draft revision 7)
+
+| # | date | decision | where it acts |
+|:--|:--|:--|:--|
+| 25 (owner) | 2026-11-21 | While the pod exists, a scheduled task starts a fresh cloud session every hour that runs the route's reaper, independently of this session; removed when the pod is gone. Supersedes decision 14 for this job. | `INDEPENDENT_REAPER.md` (the stored prompt); `reap.sh` header and `REAPER BLIND` exit; amendment section 2.6. |
+| 26 (owner) | 2026-11-21 | The shared balance covers US$62.40: Amendment 29's per-batch confirmation for this job; results are fetched every 15 minutes while it runs. | `watch.sh`; amendment sections 2.6 and 5. |
+| 27 (owner) | 2026-11-21 | `pkm-dense-rerun-20261115` (US$37.26) is study spend; study ceiling US$600, guard US$595; per-job cap stays US$65. | `ledger.tsv` row; `common.sh` `STUDY_GUARD_USD`, `STUDY_CEILING_USD`; amendment section 5. |
+
+| id | date | change | reason (one line) |
+|:--|:--|:--|:--|
+| R4-M1 | 2026-11-21 | Section 2.6 rewritten: who deletes the pod (fetch.sh through the git gate, fetch.sh at the hard deadline, reap.sh from the session and from the hourly independent task), how Amendment 32's relaunch precondition is met, and the worst-case pod life with each cadence. | The old sentence claimed a backstop that shared Amendment 32's root cause. |
+| R4-M2 | 2026-11-21 | Amendment 29 applied: decision 26 is the balance confirmation; `watch.sh` is the 15-minute fetch (every 900 s, segments of at most 2 h, deletes nothing itself). | Frozen precondition not addressed before. |
+| R4-M3 | 2026-11-21 | Settled by decision 27; `bdr-growthlaw` stays outside (another study, `docs/session-logs/2026-11-15.md:4536`). | Ledger attribution. |
+| R4-M4 | 2026-11-21 | The tests read `tests/fixtures/ledger_fixture.tsv` (one row of US$500), never the live ledger; B03/B04/B04b boundaries computed against it (65.05 > 65; 595.004 > 595; 594.994 <= 595). | The live ledger moved under the fixed increments. |
+| R4-M5 | 2026-11-21 | `V2_FIELDS.md`: list entries carry `env` and `args` (only six fields are kept); 32 vCPU / 256 GB floors; smoke3 results and what is still unobserved. `run.sh` comment at step 5. The 230.9 GiB peak is called a projection with the review's extra terms. The stock sentence matches the code (exit 10 also on an empty `dataCenters` list). Worst-case pod life 30.8 h, US$64.06, used by every cost check (`WORST_HOURS=30.8`). | Text the smoke and the API contradicted. |
+| R4-S1 | 2026-11-21 | The boot loop and `cgroup-prestart.json` record `memory.oom.group`, `memory.swap.max` and `vm.max_map_count`; section 4.2 says how a group OOM and an allocation abort are classified. | Record only; no rule reads them. |
+| R4-S3 | 2026-11-21 | `memory.max` `max` refused for study names (allowed for development names). | The headroom and P2p need the numeric limit. |
+| R4-S4 | 2026-11-21 | The reading table says "no contrary stop line"; tests R10 and R11 for a missing stop line. | The code already accepted it; a deadline at the step loop prints no stop line. |
+| R4-S5, S6, S9, S14 | 2026-11-21 | Text: the existing grid-zeros certificate for draw 0; the relaunch fits the guard only after a base pod life of about 13 h or less; "structurally identical" traces; the time-band corrections. | Disclosure. |
+| R4-S8 | 2026-11-21 | An OOM with the peak under 90 percent of `memory.max` carries `oom_note` (likely a host-level or group kill). Classifier `a33-r3`. | So it is not read as "54·10⁹ is too small". |
+| R4-S11 | 2026-11-21 | Stale "guard US$510" comments in `common.sh` and `ledger.tsv` fixed; the repeated paragraph in `ledger_SOURCES.md` removed. | Hygiene. |
+| R4-S13 | 2026-11-21 | A failed create's non-JSON response is not copied to `run.log`; only its size is. | It could echo the body with the pod token. |
+| Not done | 2026-11-21 | S7 (reaper fallback to known pod ids when the list is unreadable; a pod after a timed-out create without a ledger row; the unconfirmed pre-start delete), S10 (token recovery on a real pod), S12 (main's numbering, to check at the freeze), the request's inherited first note sentence (S11, documentary). | Larger changes or not doable offline; the reaper now reports a blind pass instead. |

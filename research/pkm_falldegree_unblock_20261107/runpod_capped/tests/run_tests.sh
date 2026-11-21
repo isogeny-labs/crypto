@@ -605,7 +605,7 @@ made: \`curl_stub.sh\` is installed as \`curl\` first on \`PATH\` and answers in
 \`../V2_FIELDS.md\` (pod list envelope with cursor pages, create with HTTP 201, GET, DELETE with 204 or 404, the CPU
 catalog) and as the pod proxy; it has no route for REST v1 or GraphQL. \`HTTPS_PROXY\` points at a dead local port, and in
 the A cases the stub fails every call, so "0 API calls" means the refusal came before any call.
-\`fixtures/smoke_tree/\` is the results tree of the first development smoke pod (\`cap:8:0:5\`, t = 8, not data).
+\`fixtures/smoke_tree/\` is the results tree of the first development smoke pod (\`cap:8:0:5\`, t = 8, not data). \`fixtures/ledger_fixture.tsv\` (one row of US\$500) stands in for the ledger, so no case reads the live \`ledger.tsv\`.
 
 **Runs.** \`bash tests/run_tests.sh\` from \`runpod_capped/\` writes nothing in the repository and prints the results;
 \`bash tests/run_tests.sh --write\` also replaces \`tests/out/\`, \`tests/results.tsv\` and this file.
@@ -619,7 +619,7 @@ it gives $ntot results.
 Groups: A refusals before any API call (allow-list, order, the one stage cap:14:0:7:54000000000, the pinned request); B launch paths on the 32 vCPU / 256 GB pod (v2 create
 body and checks, the study guard, pagination); C \`fetch.sh\` flows, with the git gate in C02-C02c; D the outcome
 classifier alone (\`fetch.sh --classify-dir\`) on synthetic receipt sets with v2 field names, with the memory rule of owner decision 24 in D25-D37; R the reading at cap 7; E the order
-(\`next_allowed\`); F \`reap.sh\`; G syntax, pins, the request and the absence of v1 calls. Per-case output:
+(\`next_allowed\`); F \`reap.sh\` (F10, F11: a fresh \`RPC_STATE\`, the independent reaper of owner decision 25); W \`watch.sh\` (owner decision 26); G syntax, pins, the request and the absence of v1 calls. Per-case output:
 \`out/<id>.txt\`. Machine-readable table: \`results.tsv\`. Every result here is \`[pcc:unverified]\`.
 
 | id | result | case | expected | observed |

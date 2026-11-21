@@ -1,0 +1,8 @@
+2026-11-21T23:33:53Z watch pkm-x-dev-c: segment start: every 1 s, at most 30 s
+2026-11-21T23:33:53Z collecting: reason done (live state done)
+2026-11-21T23:33:53Z results in /tmp/rpc-tests.S2nv/sb.PM7h/repo/research/pkm_falldegree_unblock_20261107/runpod_capped/results/pkm-x-dev-c/collect-1: 15 files; transfer check true
+2026-11-21T23:33:53Z OUTCOME {"class":"ADMITTED","rule":"P2d","relaunch":null,"why":"completed; admission rules 1-7 hold"}
+2026-11-21T23:33:53Z commit and push the kept tree and the receipts (git add results/pkm-x-dev-c/collect-1 receipts_dev/pkm-x-dev-c; git commit; git push), then fetch.sh pkm-x-dev-c --delete <pushed commit> (pod kept at most 2 h)
+COMMIT AND PUSH NOW: receipts_dev/pkm-x-dev-c runpod_capped/ledger.tsv (git add, commit, push; the session does this)
+2026-11-21T23:33:53Z watch pkm-x-dev-c: fetch.sh exit 8
+2026-11-21T23:33:53Z watch pkm-x-dev-c: collected; waiting for the git gate: commit and push the kept tree, then fetch.sh pkm-x-dev-c --delete REF

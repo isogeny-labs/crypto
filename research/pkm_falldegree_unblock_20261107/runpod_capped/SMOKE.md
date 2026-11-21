@@ -169,3 +169,14 @@ The route's one flavor is now `cpu5m` at 32 vCPU and 256 GB (US$2.08/h), so the 
 cgroup `memory.max` of a 256 GB pod (the pre-start check needs `max` or at least 256,000,000,000 bytes) and the GET
 record's `cpu.memory` (the floor is 256). A development stage may use `--max-dense` 54000000000. Every statement here is
 `[pcc:unverified]`.
+
+## Third development smoke (2026-11-21, REST v2, 32 vCPU / 256 GB)
+
+Pod `pkm-x-dev-smoke3` (`klogu58zoe2owr`), stage `cap:8:0:5:12800000000` (t = 8, not data), receipts in
+`receipts_dev/pkm-x-dev-smoke3/` [pcc:unverified]: create HTTP 201 with `cloud` `SECURE`, `cpu` `{cpu5m, 32, 256}`,
+`cost` 2.08 equal to the catalog price, `dataCenterId` `EUR-IS-1` already at create; GET and ready records `RUNNING`;
+the runner answered through the proxy with the bash entrypoint and the pinned image; `memory.max` 256,000,000,000
+before start; classified ADMITTED P2d; the git gate passed on commit `88b64ac5d5`; `DELETE` 204 and the pod gone from
+the list; pod life 155 s, about US$0.09. Not exercised: token recovery from the record's `env`, and `startedAt` and
+`status` on a container restart. `memory.oom.group` and `vm.max_map_count` were not yet recorded (they are from
+revision 7 on).
