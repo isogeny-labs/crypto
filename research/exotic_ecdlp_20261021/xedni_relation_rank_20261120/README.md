@@ -22,6 +22,7 @@ The [protocol](protocol.json) freezes the 264-row source hash, exact field and c
 | --- | --- | --- | --- |
 | Sign mirror | `XedniRelationRank.mirror_row` | Explicit 264×21 matrix with first 132 rows `e₅+2e₈` and last 132 their negatives over `ZMod 43` | Lean checked |
 | Row-space structure | `XedniRelationRank.relationMatrix_row_span`, `baseRow_ne_zero` | Entire row span equals the span of a nonzero base row | Lean checked |
+| Missing-column obstruction | `XedniRelationRank.uncovered_column`, `row_span_not_full` | Every column other than 5 and 8 is zero in all 264 rows; the row span is a proper subspace of the 21-column space | Lean checked |
 | Numeric matrix rank | [result](result.json), [Sage audit](sage-audit-result.json) | All 264 frozen rows, 21 columns, arithmetic modulo 43 | Rank 1 independently replayed |
 | Direct Lean `Matrix.rank = 1` declaration | Standard `Matrix.rank_eq_finrank_span_row` and `finrank_span_singleton` composition | Same explicit matrix | Formalization partial: elaboration exceeded 200,000 heartbeats and a subsequent uncapped attempt exceeded two minutes at about 3 GB RSS; the row-span equality and nonzero theorem build cleanly |
 

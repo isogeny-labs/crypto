@@ -57,8 +57,28 @@ theorem relationMatrix_row_span :
     exact (base_row 0 (by decide)).symm
   exact le_antisymm hspan_le hle_span
 
+theorem uncovered_column (i : Fin 264) (j : Fin 21)
+    (h5 : j ≠ 5) (h8 : j ≠ 8) : relationMatrix i j = 0 := by
+  by_cases hi : i.val < 132
+  · simp [relationMatrix, baseRow, hi, h5, h8]
+  · simp [relationMatrix, baseRow, hi, h5, h8]
+
+theorem row_span_not_full :
+    Submodule.span K (Set.range relationMatrix.row) ≠ ⊤ := by
+  intro htop
+  let e0 : Fin 21 → K := fun j => if j = 0 then 1 else 0
+  have he : e0 ∈ K ∙ baseRow := by
+    rw [← relationMatrix_row_span, htop]
+    exact Submodule.mem_top
+  rcases Submodule.mem_span_singleton.mp he with ⟨a, ha⟩
+  have h0 := congrArg (fun f : Fin 21 → K => f 0) ha
+  simp [e0, baseRow] at h0
+  exact (by decide : (0 : K) ≠ 1) h0
+
 #print axioms mirror_row
 #print axioms relationMatrix_row_span
 #print axioms baseRow_ne_zero
+#print axioms uncovered_column
+#print axioms row_span_not_full
 
 end XedniRelationRank
