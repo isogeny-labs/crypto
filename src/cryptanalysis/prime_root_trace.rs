@@ -1220,7 +1220,10 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 if state.exponent & 1 == 1 {
                     state.acc = vdiv(&vproduct(&state.acc, &state.base, p), &state.modulus, p)?.1;
                 }
-                state.base = vdiv(&vproduct(&state.base, &state.base, p), &state.modulus, p)?.1;
+                // Squaring a polynomial is algebraically identical to multiplying
+                // it by itself, but the independent verifier's specialized
+                // arithmetic avoids computing symmetric off-diagonal pairs twice.
+                state.base = vdiv(&vsquare(&state.base, p), &state.modulus, p)?.1;
                 state.exponent >>= 1;
                 if (*exponent, accumulator, base) != (state.exponent, &state.acc, &state.base) {
                     return Err("modular power step failed".into());
@@ -1256,7 +1259,10 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 }
                 // Move the prior divisor into the new dividend; a deep clone
                 // of that polynomial was previously performed every GCD step.
-                let previous_b = std::mem::replace(&mut state.1, remainder.clone());
+                // The exact remainder has already been independently computed
+                // and compared to the certificate. Move that owned vector into
+                // the state instead of allocating a second copy of the event.
+                let previous_b = std::mem::replace(&mut state.1, verified_r);
                 state.0 = previous_b;
             }
             RootEvent::GcdEnd { id, value } => {
