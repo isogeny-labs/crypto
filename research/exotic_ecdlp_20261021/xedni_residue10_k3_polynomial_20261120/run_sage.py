@@ -88,7 +88,7 @@ def main():
             for prime in primes:
                 f = numerator.change_ring(GF(prime))
                 if not any(f(z) == 0 for z in GF(prime)):
-                    certificate = prime
+                    certificate = int(prime)
                     break
             record.update({"numerator_degree": int(numerator.degree()),
                            "denominator_degree": int(denominator.degree()),
