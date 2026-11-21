@@ -1,0 +1,7 @@
+Scheduled relation-finding benchmark trigger
+UTC: 2026-11-21T19:15:00Z
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Scope: frozen synthetic Koblitz GF(2^23), n=23, a=0, m=2
+Baseline: results/relation_baseline.json
+Deviation threshold: 20%
+Output: results/hourly_log.csv
