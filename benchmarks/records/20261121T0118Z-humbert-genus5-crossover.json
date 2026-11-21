@@ -1,0 +1,169 @@
+{
+  "branch": "claude/humbert-next-leads-20261120",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "research/humbert_genus5_cover_20261021/crossover_20261121/run_v9.sh",
+        "research/humbert_genus5_cover_20261021/crossover_20261121/campaign/q65521"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-21T01:18:18+00:00",
+      "wall_s": 320.748
+    },
+    {
+      "argv": [
+        "research/humbert_genus5_cover_20261021/crossover_20261121/run_v9.sh",
+        "research/humbert_genus5_cover_20261021/crossover_20261121/campaign/q81001"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-21T01:23:39+00:00",
+      "wall_s": 422.756
+    },
+    {
+      "argv": [
+        "research/humbert_genus5_cover_20261021/crossover_20261121/run_v9.sh",
+        "research/humbert_genus5_cover_20261021/crossover_20261121/campaign/q98009"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-21T01:30:42+00:00",
+      "wall_s": 508.867
+    },
+    {
+      "argv": [
+        "research/humbert_genus5_cover_20261021/crossover_20261121/run_v9.sh",
+        "research/humbert_genus5_cover_20261021/crossover_20261121/campaign/q115001"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-21T01:39:11+00:00",
+      "wall_s": 967.865
+    },
+    {
+      "argv": [
+        "research/humbert_genus5_cover_20261021/crossover_20261121/run_v9.sh",
+        "research/humbert_genus5_cover_20261021/crossover_20261121/campaign/q131071"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-21T01:55:19+00:00",
+      "wall_s": 1360.54
+    }
+  ],
+  "commit": "833e09be0d4a9538ee0bb6072d4320737dcd98c3",
+  "commit_dirty": true,
+  "created_utc": "2026-11-21T01:18:00+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261121-humbert-genus5-crossover"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v726-x86_64-with-glibc2.39"
+  },
+  "id": "20261121T0118Z-humbert-genus5-crossover",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "t_ic_best_over_simd_rho_q131071",
+      "note": "d35 per-instance median vs rho expected; 1.21/1.48/1.68/1.79 at q=65521..115001; prediction X (below 1) falsified",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        1.713,
+        2.44
+      ],
+      "unit": "ratio",
+      "value": 2.003
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 25,
+      "name": "la_time_slope_d35",
+      "note": "log-log slope of median t_LA over q=65521..131071; relations 1.05",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.98
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 25,
+      "name": "rho_expected_time_slope",
+      "note": "flattened by r/q^4 falling 0.050 -> 0.0104 under the r < 2^62 rule",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.85
+    }
+  ],
+  "problem": "ic:humbert-genus5-toy",
+  "raw": [
+    {
+      "bytes": 51527,
+      "path": "research/humbert_genus5_cover_20261021/crossover_20261121/campaign/q65521/results/v9.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/43/4364740a7b398f62123e41afabcc2c76cfcf0af425f6cd60c7abf79386951720",
+      "sha256": "4364740a7b398f62123e41afabcc2c76cfcf0af425f6cd60c7abf79386951720",
+      "uploaded": false
+    },
+    {
+      "bytes": 51644,
+      "path": "research/humbert_genus5_cover_20261021/crossover_20261121/campaign/q81001/results/v9.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5c/5c73c20b784ba7231199098eb9183771259c27756384aea9fb099a25811d97a5",
+      "sha256": "5c73c20b784ba7231199098eb9183771259c27756384aea9fb099a25811d97a5",
+      "uploaded": false
+    },
+    {
+      "bytes": 51753,
+      "path": "research/humbert_genus5_cover_20261021/crossover_20261121/campaign/q98009/results/v9.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/60/60a4fd20b530bcbb45dec8dc82a7d36c85078e3c9d0d36e1c83572eb57eb05ec",
+      "sha256": "60a4fd20b530bcbb45dec8dc82a7d36c85078e3c9d0d36e1c83572eb57eb05ec",
+      "uploaded": false
+    },
+    {
+      "bytes": 51990,
+      "path": "research/humbert_genus5_cover_20261021/crossover_20261121/campaign/q115001/results/v9.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/20/20266ecbb02b0da7df84fee1eb339b7cd229a7a5b96838d62b08e1737f88a1cd",
+      "sha256": "20266ecbb02b0da7df84fee1eb339b7cd229a7a5b96838d62b08e1737f88a1cd",
+      "uploaded": false
+    },
+    {
+      "bytes": 51991,
+      "path": "research/humbert_genus5_cover_20261021/crossover_20261121/campaign/q131071/results/v9.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/79/7967996f3c2afc46c0d9251ddbe70b9f46e2b8fab8b59ebd6cf12277c0b4d1c4",
+      "sha256": "7967996f3c2afc46c0d9251ddbe70b9f46e2b8fab8b59ebd6cf12277c0b4d1c4",
+      "uploaded": false
+    },
+    {
+      "bytes": 3251,
+      "path": "research/humbert_genus5_cover_20261021/crossover_20261121/results/ratios_v9.csv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/42/4201cef6d9efbaa122e4c15f1dace8a882b026db8e89fff18a3ca3531724862a",
+      "sha256": "4201cef6d9efbaa122e4c15f1dace8a882b026db8e89fff18a3ca3531724862a",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "humbert-genus5-crossover",
+  "status": "open",
+  "summary": "",
+  "validation": null
+}

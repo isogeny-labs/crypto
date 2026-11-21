@@ -14,6 +14,11 @@ use crate::curve::{factor, group_order, Curve, Pt, Rng};
 use crate::field::{addm, legendre, mulm, subm, FieldOps, Gfk, E4, EL, K4, L};
 use crate::poly::{self, Interp};
 
+/// HUMBERT_SETUP_PROF=1: per-step setup timing lines on stderr (stdout unchanged).
+pub fn setup_prof() -> bool {
+    std::env::var("HUMBERT_SETUP_PROF").map(|v| v == "1").unwrap_or(false)
+}
+
 pub struct Setup {
     pub p: u64,
     pub l: L,
@@ -58,8 +63,25 @@ impl Setup {
     /// Build a random instance: alpha of degree 4, eta with quadratic character
     /// `twist`, and r = the largest prime factor of #E(F_{p^4}) (required: cofactor <= 128, r^2 not | #E, r not | #D).
     pub fn new(p: u64, twist: i32, rng: &mut Rng) -> Setup {
-        assert!(p >= 17 && p < (1 << 15));
+        Self::new_with(p, twist, rng, crate::setupfast::setup_fast())
+    }
+
+    /// `fast` (HUMBERT_SETUP_FAST=1): same instance and same RNG draws, computed
+    /// with src/setupfast.rs (fast group-order replay, fast factoring, count_d
+    /// only for candidates that pass the other tests).
+    pub fn new_with(p: u64, twist: i32, rng: &mut Rng, fast: bool) -> Setup {
+        // p < 2^17 (was 2^16, before that 2^15): every F_p product here is u128 (field.rs)
+        // or a short u64 sum of products of values < p (relfast.rs: < 12 p^3 < 2^55;
+        // setupfast.rs: < 7 p^2 < 2^37). For p >= 2^16, p^4 >= 2^64: factor_fast takes its
+        // u128 path (n < 2^78), rhopar hashes x with a wrapping 16-bit-shift sum and keys
+        // its DP table on the full x, and r < 2^62 (below) is a real filter (cofactor
+        // >= p^4 / 2^62, i.e. > 64 near 2^17) instead of always true.
+        assert!(p >= 17 && p < (1 << 17));
+        let prof = setup_prof();
+        let mut cand = 0u32;
         loop {
+            cand += 1;
+            let tc = std::time::Instant::now();
             let m: Vec<u64> = vec![rng.below(p), rng.below(p), rng.below(p), rng.below(p), 1];
             if !poly::is_irreducible_quartic(&m, p) {
                 continue;
@@ -125,15 +147,42 @@ impl Setup {
                 r: 0,
                 d_count: 0,
             };
+            let t_build = tc.elapsed().as_secs_f64();
+            let tg = std::time::Instant::now();
             let order = {
                 let c = s.curve();
                 let sq = |a: &E4| s.sqrt_k4(a);
-                group_order(&c, &sq, rng)
+                if fast {
+                    crate::setupfast::group_order(s.k(), &c, &sq, &s.l.nu, rng)
+                } else {
+                    group_order(&c, &sq, rng)
+                }
             };
-            let fs = factor(order);
+            let t_go = tg.elapsed().as_secs_f64();
+            let tf = std::time::Instant::now();
+            let fs = if fast { crate::setupfast::factor_fast(order) } else { factor(order) };
+            let t_fac = tf.elapsed().as_secs_f64();
             let (r, e) = *fs.last().unwrap();
-            s.d_count = s.count_d();
-            if r * 128 < (p as u128).pow(4) || e != 1 || r >= (1u128 << 62) || s.d_count as u128 % r == 0 {
+            let td = std::time::Instant::now();
+            let reject = if fast {
+                // count_d draws no randomness: skip it when the order alone rejects
+                let pre = r * 128 < (p as u128).pow(4) || e != 1 || r >= (1u128 << 62);
+                if !pre {
+                    let f = crate::setupfast::FK::from_k4(s.k());
+                    s.d_count = crate::setupfast::count_d(&f, &s.eta, &s.lams[0]);
+                }
+                pre || s.d_count as u128 % r == 0
+            } else {
+                s.d_count = s.count_d();
+                r * 128 < (p as u128).pow(4) || e != 1 || r >= (1u128 << 62) || s.d_count as u128 % r == 0
+            };
+            let t_d = td.elapsed().as_secs_f64();
+            if prof {
+                eprintln!(
+                    "[setup-prof] cand={cand} build={t_build:.4} group_order={t_go:.4} factor={t_fac:.4} count_d={t_d:.4} order={order} r={r} e={e} reject={reject}"
+                );
+            }
+            if reject {
                 continue;
             }
             s.order = order;
@@ -213,6 +262,83 @@ pub struct FactorBase {
 
 impl FactorBase {
     pub fn build(s: &Setup) -> FactorBase {
+        if crate::setupfast::setup_fast() {
+            Self::build_fast(s)
+        } else {
+            Self::build_slow(s)
+        }
+    }
+
+    /// Same factor base as build_slow, computed in K4 with fast arithmetic:
+    /// square roots by Tonelli-Shanks in K4 (the root is normalised to
+    /// min(w, -w), so the choice of root does not matter), basis12 evaluated
+    /// on K4 values (for a rational point every coordinate is in K4 and the L
+    /// operations on embedded K4 elements are exactly the K4 operations), and
+    /// the "-" row is the "+" row with the four linear coordinates 2..5 negated
+    /// (basis12 is linear in w there and quadratic elsewhere).
+    pub fn build_fast(s: &Setup) -> FactorBase {
+        use crate::setupfast::{Sqrt4, FK};
+        let f = FK::from_k4(s.k());
+        let sq = Sqrt4::new(&f, &s.l.nu);
+        let p = s.p;
+        let mut xs = Vec::new();
+        let mut w0s = Vec::new();
+        let mut xidx = vec![usize::MAX; p as usize];
+        let mut rows = Vec::new();
+        let gam_f = f.frob(&s.gamma);
+        for x in 0..p {
+            let z = f.mul(&s.eta, &f.sub(&[x, 0, 0, 0], &s.lams[0]));
+            if f.chi(&z) != 1 {
+                continue;
+            }
+            let mut w = sq.sqrt(&f, &z).unwrap();
+            let wn = f.neg(&w);
+            if wn < w {
+                w = wn;
+            }
+            xidx[x as usize] = xs.len();
+            xs.push(x);
+            w0s.push(w);
+            let mut wi = [w; 4];
+            for i in 1..4 {
+                wi[i] = f.frob(&wi[i - 1]);
+            }
+            let mut g = [[0u64; 4]; 12];
+            g[0] = [1, 0, 0, 0];
+            g[1] = [x, 0, 0, 0];
+            let ww: [E4; 4] = [f.mul(&wi[0], &wi[1]), f.mul(&wi[1], &wi[2]), f.mul(&wi[2], &wi[3]), f.mul(&wi[3], &wi[0])];
+            for j in 0..4 {
+                let mut s1 = [0u64; 4];
+                let mut s2 = [0u64; 4];
+                for i in 0..4 {
+                    let c = &s.tconj[j][i];
+                    s1 = f.add(&s1, &f.mul(c, &wi[i]));
+                    s2 = f.add(&s2, &f.mul(c, &ww[i]));
+                }
+                g[2 + j] = s1;
+                g[6 + j] = s2;
+            }
+            let w02 = f.mul(&wi[0], &wi[2]);
+            let w13 = f.mul(&wi[1], &wi[3]);
+            g[10] = f.add(&w02, &w13);
+            g[11] = f.add(&f.mul(&s.gamma, &w02), &f.mul(&gam_f, &w13));
+            let mut row = [0u64; 12];
+            for c in 0..12 {
+                assert!(K4::is_fp(&g[c]), "basis function not F_p-valued at a rational point");
+                row[c] = g[c][0];
+            }
+            let mut rowm = row;
+            for c in 2..6 {
+                rowm[c] = (p - row[c]) % p;
+            }
+            rows.push(row);
+            rows.push(rowm);
+        }
+        let pick = (0..xs.len()).collect();
+        FactorBase { xs, w0: w0s, xidx, rows, pick }
+    }
+
+    pub fn build_slow(s: &Setup) -> FactorBase {
         let k = s.k();
         let p = s.p;
         let mut xs = Vec::new();
