@@ -9,7 +9,7 @@
 //!     [--arms AaCcR] [--cc 2.0] [--max-h 64] [--threads 4] [--rho-cap 3e7]
 //!     [--seed-search 600] [--max-trials 5e7] [--smith] [--smith-census N]
 //!     [--quartic] [--qc 3.0] [--restart-sqrt] [--sge W,F]... --out FILE.jsonl
-//!     [--quartic-arms full,2lp,2lp-alg,2lp-kick,2lp-new] [--quartic-seeds p=s1/s2,...]
+//!     [--quartic-arms full,2lp,2lp-alg,2lp-kick,2lp-new,2lp-sfb] [--quartic-seeds p=s1/s2,...]
 //! ```
 //!
 //! Arms: `A` full base, `a` full base with the parity prefilter, `C` double
@@ -73,7 +73,9 @@ struct Cfg {
     /// descent with the frozen solve; `2lp-kick` adds the `T` kick after
     /// each decomposition row (`ql::QDiemOpts::kick_t`); `2lp-new` is the
     /// algebraic descent, the kick and the linked solve policy
-    /// (`ql::QSolve::Linked`, `--quartic-inhom` rows).  Any value other
+    /// (`ql::QSolve::Linked`, `--quartic-inhom` rows); `2lp-sfb` is `2lp-new`
+    /// with the sampled factor base and a point index of seen points only
+    /// (`ql::QFactorBase::Sampled`, no point enumeration).  Any value other
     /// than the default adds descent / solve fields to the quartic records.
     quartic_arms: Vec<String>,
     /// `--quartic-seeds p=s1/s2/...,...`: evaluate only these curve seeds in
@@ -199,7 +201,7 @@ fn parse() -> Result<Cfg, String> {
             "--quartic-arms" => {
                 c.quartic_arms = v.split(',').map(String::from).collect();
                 for a in &c.quartic_arms {
-                    if !["full", "2lp", "2lp-alg", "2lp-kick", "2lp-new"].contains(&a.as_str()) {
+                    if !["full", "2lp", "2lp-alg", "2lp-kick", "2lp-new", "2lp-sfb"].contains(&a.as_str()) {
                         return Err(format!("--quartic-arms: unknown arm {a}"));
                     }
                 }
@@ -731,7 +733,13 @@ fn main() -> ExitCode {
                     "2lp" => (A::DoubleLp, nb2, D::Scan, S::Legacy, false, ""),
                     "2lp-alg" => (A::DoubleLp, nb2, D::Algebraic, S::Legacy, false, "_alg"),
                     "2lp-kick" => (A::DoubleLp, nb2, D::Algebraic, S::Legacy, true, "_kick"),
+                    "2lp-sfb" => (A::DoubleLp, nb2, D::Algebraic, S::Linked, true, "_sfb"),
                     _ => (A::DoubleLp, nb2, D::Algebraic, S::Linked, true, "_new"),
+                };
+                let fb = if name == "2lp-sfb" {
+                    ql::QFactorBase::Sampled
+                } else {
+                    ql::QFactorBase::Enumerated
                 };
                 let o = ql::run_diem_with(
                     &inst,
@@ -748,6 +756,7 @@ fn main() -> ExitCode {
                         diag: cfg.quartic_diag,
                         inhom_rows: if solve == ql::QSolve::Linked { cfg.quartic_inhom } else { 8 },
                         kick_t,
+                        fb,
                     },
                 );
                 let mut rec = head.clone();
@@ -775,6 +784,17 @@ fn main() -> ExitCode {
                     rec["la_skipped"] = json!(o.la_skipped);
                     rec["inhom_rows"] = json!(if solve == ql::QSolve::Linked { cfg.quartic_inhom } else { 8 });
                     rec["lines_tried"] = json!(o.lines_tried);
+                    if cfg.quartic_arms.iter().any(|a| a == "2lp-sfb") {
+                        rec["fb_mode"] = json!(format!("{fb:?}"));
+                        rec["idx_lookups"] = json!(o.idx_lookups);
+                        rec["idx_inserts"] = json!(o.idx_inserts);
+                        rec["idx_points"] = json!(o.idx_points);
+                        rec["fb_samples"] = json!(o.fb_samples);
+                        rec["n_points"] = json!(inst.n_points);
+                        rec["rel_enum_add"] = json!(o.rel_enum.add);
+                        rec["la_skipped_attempts"] = json!(o.la_skipped);
+                        rec["rels_line"] = json!(o.line_relations);
+                    }
                 }
                 rec["certified"] = json!(o.certified);
                 rec["exhausted"] = json!(o.exhausted);
