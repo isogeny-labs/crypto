@@ -1342,6 +1342,30 @@ fn subsequence_positions(frozen: &[u128], actual: &[u128]) -> Option<Vec<u32>> {
     Some(out)
 }
 
+/// The union of two term lists of one polynomial, both in decreasing term
+/// order under `key`.
+fn merge_terms(a: &[u128], b: &[u128], key: impl Fn(u128) -> u128) -> Vec<u128> {
+    let mut out = Vec::with_capacity(a.len().max(b.len()));
+    let (mut i, mut j) = (0, 0);
+    while i < a.len() && j < b.len() {
+        let (ka, kb) = (key(a[i]), key(b[j]));
+        if ka == kb {
+            out.push(a[i]);
+            i += 1;
+            j += 1;
+        } else if ka > kb {
+            out.push(a[i]);
+            i += 1;
+        } else {
+            out.push(b[j]);
+            j += 1;
+        }
+    }
+    out.extend_from_slice(&a[i..]);
+    out.extend_from_slice(&b[j..]);
+    out
+}
+
 /// One step's symbolic preprocessing: reducer rows, packed columns, and
 /// every row as column indices (as [`Packed::symbolic`] returns it).
 type Symbolic = (Vec<(usize, u128)>, Vec<u128>, Vec<Vec<u32>>);
@@ -1381,16 +1405,6 @@ impl FrozenStep {
             cols: cols.to_vec(),
             reducer_of,
         }
-    }
-
-    /// Whether `other` contains this copy's supports, element by element.
-    fn covered_by(&self, other: &FrozenStep) -> bool {
-        self.support.iter().all(|(i, t)| {
-            other
-                .support
-                .binary_search_by_key(i, |(j, _)| *j)
-                .is_ok_and(|k| subsequence_positions(&other.support[k].1, t).is_some())
-        })
     }
 
     /// The step's symbolic preprocessing for the current terms, or `None`
@@ -5186,7 +5200,7 @@ fn f4_hilbert_guarded(
     let fallback = match &mut trace {
         TraceMode::Record(t) => {
             **t = F4Trace::default();
-            TraceMode::Record(&mut **t)
+            TraceMode::Record(t)
         }
         _ => TraceMode::Off,
     };
@@ -5794,6 +5808,34 @@ fn f4_with_arithmetic(
             let (extra, cols_packed, row_cols) = if let Some(r) = rebuilt {
                 FROZEN_HITS.fetch_add(1, AtomicOrdering::Relaxed);
                 r
+            } else if let (Some(f), Some(old)) = (slot, frozen.as_ref()) {
+                // Widen the frozen copy to the union of its supports and the
+                // current ones (each element's terms merged in term order),
+                // preprocess that once, and rebuild the current step from it.
+                // The supports converge to the generic ones in a few systems.
+                let mut terms = pk.terms.clone();
+                for (i, ft) in &old.support {
+                    terms[*i] = merge_terms(ft, &pk.terms[*i], |x| pk.grevlex_key(x));
+                }
+                let wide = Packed {
+                    n: pk.n,
+                    guard: pk.guard,
+                    terms,
+                    lms: pk.lms.clone(),
+                };
+                let union = wide.symbolic(&rows_poly, &alive, true);
+                let new = FrozenStep::from_symbolic(
+                    &wide.terms,
+                    &rows_poly,
+                    &union.0,
+                    &union.1,
+                    &union.2,
+                );
+                let r = new
+                    .rebuild(&pk.terms)
+                    .expect("the union contains the current supports");
+                *f.0.write().unwrap() = Some(std::sync::Arc::new(new));
+                r
             } else {
                 let computed = if sym_par {
                     pk.symbolic_par(&rows_poly, &alive)
@@ -5801,7 +5843,6 @@ fn f4_with_arithmetic(
                     pk.symbolic(&rows_poly, &alive, true)
                 };
                 if let Some(f) = slot {
-                    // keep the copy with the wider supports
                     let new = FrozenStep::from_symbolic(
                         &pk.terms,
                         &rows_poly,
@@ -5809,10 +5850,7 @@ fn f4_with_arithmetic(
                         &computed.1,
                         &computed.2,
                     );
-                    let mut w = f.0.write().unwrap();
-                    if w.as_ref().is_none_or(|old| old.covered_by(&new)) {
-                        *w = Some(std::sync::Arc::new(new));
-                    }
+                    *f.0.write().unwrap() = Some(std::sync::Arc::new(new));
                 }
                 computed
             };
