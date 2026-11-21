@@ -88364,7 +88364,7 @@ Re-measure inc (ic.pipeline wwalk x=0.9, the ledger incumbent wwalkGg-x09-sr-n2)
 4. Push records.jsonl/plan.json to the artifact store (tools/artifacts), report/graph/PDF, benchmarks entry, benchrec close, PR; update treatise §12.7.
 
 ## Runs in flight
-None. Sibling-points panel landed as PR #4888 (claim PCC-20261121-abc3ad, record 20261121T1920Z-c25519-sibling-panel): in bitop/v1 per sqrt(r), sib8 is 0.80/0.69/0.62/0.63 of the C=2 control and 0.84/0.70/0.67/0.65 of the C=1 control at k=20/24/28/32; C=1 sib8 vs rho-neg 1.04/0.88/0.90/0.91 (whole CI below 1 at k>=24), C=2 sib8 vs rho-neg 1.27/1.07/1.05/1.14; GAE band unresolved at w=1. Open: owner unit ruling (bitop/v1 vs band) before any ledger ratchet; red-team follow-up on five curves unused by earlier studies at k=28/32; raw records are in the PR because the artifact-store upload failed (expired AWS identity; checkpoint upload also failing, the pushed branch is the durable copy); git fetch hangs while push works. Goal 0.75x unmet.
+None. PR #4888 (claude/sibling-panel, merged with main 2026-11-21): sibling-points panel (PCC-20261121-abc3ad) and the round-41 ledger ratchet under the owner's bitop/v1 unit ruling (PCC-20261121-d57a1c): generic incumbents at k = 20-32 are tw2l-x20-j16-sib8-n2 at 1.27 / 1.07 / 1.05 / 1.14 of rho-neg in bit-ops; c1-boundary track c1-lazy-sib8-n1 at 1.04 / 0.88 / 0.90 / 0.91. Open: migrate check red (store credentials lack s3:ListBucket); next test is a frozen pool=256 panel on the ledger sizes plus the five-unused-curve falsification. Goal 0.75x unmet.
 
 ## Stop and success conditions
 - Budget: USD 5 ceiling for both replicates and any failed attempt; stop if the remainder is unknown.

@@ -834,6 +834,30 @@
       "source": "round-040/train",
       "target_seed": 2026150420,
       "targets": 64
+    },
+    {
+      "size": 20,
+      "source": "sibling-panel (five c1 confirmation curves, 12 targets each)",
+      "target_seed": 20261151,
+      "targets": 60
+    },
+    {
+      "size": 24,
+      "source": "sibling-panel (five c1 confirmation curves, 12 targets each)",
+      "target_seed": 20261155,
+      "targets": 60
+    },
+    {
+      "size": 28,
+      "source": "sibling-panel (five c1 confirmation curves, 12 targets each)",
+      "target_seed": 20261159,
+      "targets": 60
+    },
+    {
+      "size": 32,
+      "source": "sibling-panel (five c1 confirmation curves, 12 targets each)",
+      "target_seed": 20261163,
+      "targets": 60
     }
   ],
   "family": "curve25519",
@@ -1760,6 +1784,342 @@
         }
       },
       "track": "generic"
+    },
+    {
+      "ci95": [
+        0.7165711674559345,
+        0.7940724667824253
+      ],
+      "from": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wsum2g-b15",
+        "n": 2,
+        "name": "wsum2g-b15-n2",
+        "oracle": "wsum:coef=15,free=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "ratio": 0.7538675153751837,
+      "round": 41,
+      "s_from": [
+        2.6759941274466192,
+        2.9352078210268475,
+        5.268131063248889
+      ],
+      "s_to": [
+        1.740976066521572,
+        2.036164746674818,
+        4.6928628680540285
+      ],
+      "session": "ECBS1hcae3d8febd36",
+      "size": 20,
+      "to": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16-sib8",
+        "n": 2,
+        "name": "tw2l-x20-j16-sib8-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run,sib=8,pool=64",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "track": "generic",
+      "unit": "bitop/v1 per sqrt(r); s_from and s_to are GAE band means on the panel curves"
+    },
+    {
+      "ci95": [
+        0.8143906400091466,
+        0.8638577931280679
+      ],
+      "from": {
+        "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+        "family": "c1-lazy",
+        "n": 1,
+        "name": "c1-lazy-n1",
+        "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "ratio": 0.8382474541845802,
+      "round": 41,
+      "s_from": [
+        1.957846182943231,
+        2.1024273813541567,
+        3.4036581670524866
+      ],
+      "s_to": [
+        1.4529578897254187,
+        1.6922521361828047,
+        3.8459003542992782
+      ],
+      "session": "ECBS1hcae3d8febd36",
+      "size": 20,
+      "to": {
+        "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+        "family": "c1-lazy-sib8",
+        "n": 1,
+        "name": "c1-lazy-sib8-n1",
+        "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run,sib=8,pool=64",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "track": "c1-boundary",
+      "unit": "bitop/v1 per sqrt(r); s_from and s_to are GAE band means on the panel curves"
+    },
+    {
+      "ci95": [
+        0.6515232142044676,
+        0.6987351340111322
+      ],
+      "from": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j32",
+        "n": 2,
+        "name": "tw2l-x20-j32-n2",
+        "oracle": "wwalk:x=2.0,jumps=32,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "ratio": 0.6738293197667167,
+      "round": 41,
+      "s_from": [
+        2.009734099973939,
+        2.181966807272672,
+        3.7320611729612656
+      ],
+      "s_to": [
+        1.1385442359403875,
+        1.4179963404806966,
+        3.9330652813434783
+      ],
+      "session": "ECBS1haa5a3cbbfec2",
+      "size": 24,
+      "to": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16-sib8",
+        "n": 2,
+        "name": "tw2l-x20-j16-sib8-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run,sib=8,pool=64",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "track": "generic",
+      "unit": "bitop/v1 per sqrt(r); s_from and s_to are GAE band means on the panel curves"
+    },
+    {
+      "ci95": [
+        0.6735115425256513,
+        0.7229862046267427
+      ],
+      "from": {
+        "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+        "family": "c1-lazy",
+        "n": 1,
+        "name": "c1-lazy-n1",
+        "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "ratio": 0.6988254473000276,
+      "round": 41,
+      "s_from": [
+        1.5854706064504727,
+        1.728271505458141,
+        3.0134795965271577
+      ],
+      "s_to": [
+        0.9358720490775703,
+        1.1619805702960242,
+        3.1969572612621118
+      ],
+      "session": "ECBS1haa5a3cbbfec2",
+      "size": 24,
+      "to": {
+        "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+        "family": "c1-lazy-sib8",
+        "n": 1,
+        "name": "c1-lazy-sib8-n1",
+        "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run,sib=8,pool=64",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "track": "c1-boundary",
+      "unit": "bitop/v1 per sqrt(r); s_from and s_to are GAE band means on the panel curves"
+    },
+    {
+      "ci95": [
+        0.6029872766998517,
+        0.646537442947079
+      ],
+      "from": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "ratio": 0.6236824613767289,
+      "round": 41,
+      "s_from": [
+        1.8221233850466079,
+        1.9980304920271075,
+        3.581194454851604
+      ],
+      "s_to": [
+        0.9384232246850444,
+        1.2064457256579522,
+        3.6186482344141213
+      ],
+      "session": "ECBS1h761c71b6ad3f",
+      "size": 28,
+      "to": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16-sib8",
+        "n": 2,
+        "name": "tw2l-x20-j16-sib8-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run,sib=8,pool=64",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "track": "generic",
+      "unit": "bitop/v1 per sqrt(r); s_from and s_to are GAE band means on the panel curves"
+    },
+    {
+      "ci95": [
+        0.6422104719340146,
+        0.6956932958714169
+      ],
+      "from": {
+        "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+        "family": "c1-lazy",
+        "n": 1,
+        "name": "c1-lazy-n1",
+        "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "ratio": 0.668641229872345,
+      "round": 41,
+      "s_from": [
+        1.456054148556831,
+        1.5969523352259782,
+        2.8650360152483025
+      ],
+      "s_to": [
+        0.8055517169452606,
+        1.0345661755064401,
+        3.0956963025570565
+      ],
+      "session": "ECBS1h761c71b6ad3f",
+      "size": 28,
+      "to": {
+        "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+        "family": "c1-lazy-sib8",
+        "n": 1,
+        "name": "c1-lazy-sib8-n1",
+        "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run,sib=8,pool=64",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "track": "c1-boundary",
+      "unit": "bitop/v1 per sqrt(r); s_from and s_to are GAE band means on the panel curves"
+    },
+    {
+      "ci95": [
+        0.605339527634999,
+        0.6501071212936761
+      ],
+      "from": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "ratio": 0.6273200378921973,
+      "round": 41,
+      "s_from": [
+        1.774583335636367,
+        1.9502215208226172,
+        3.5309651874988655
+      ],
+      "s_to": [
+        0.9140970798162928,
+        1.1891845376826673,
+        3.664971658480039
+      ],
+      "session": "ECBS1h26f412a396bb",
+      "size": 32,
+      "to": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16-sib8",
+        "n": 2,
+        "name": "tw2l-x20-j16-sib8-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run,sib=8,pool=64",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "track": "generic",
+      "unit": "bitop/v1 per sqrt(r); s_from and s_to are GAE band means on the panel curves"
+    },
+    {
+      "ci95": [
+        0.6150921427123353,
+        0.6804506109427686
+      ],
+      "from": {
+        "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+        "family": "c1-lazy",
+        "n": 1,
+        "name": "c1-lazy-n1",
+        "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "ratio": 0.6461995941865434,
+      "round": 41,
+      "s_from": [
+        1.3757485919461412,
+        1.5119735553370102,
+        2.7379982258548248
+      ],
+      "s_to": [
+        0.730571784942995,
+        0.9497272705699131,
+        2.9221266412121727
+      ],
+      "session": "ECBS1h26f412a396bb",
+      "size": 32,
+      "to": {
+        "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+        "family": "c1-lazy-sib8",
+        "n": 1,
+        "name": "c1-lazy-sib8-n1",
+        "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run,sib=8,pool=64",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "track": "c1-boundary",
+      "unit": "bitop/v1 per sqrt(r); s_from and s_to are GAE band means on the panel curves"
     }
   ],
   "notes": [
@@ -1769,7 +2129,8 @@
     "Algebraic track k = 20: the PKM isogeny tower with the J-selected seed 1093 (T4/T5), the cheapest algebraic arm in every measured cell; band s1093 < seed 0 at every weight, paired interval includes 1.",
     "Exposures list every ecbench target_seed used on this family so far (baseline, ratchet round 1, m = 3, algebraic ecbench, isogeny seed T5, frame and torsion leads), so a round never reuses a target seed.",
     "Round 9 (k = 32) was stopped by the operator after 10 train records because its panel held rootfind-pairs:m=3 at N = 179; the round is censored, not assessed, and its target seeds count as exposed.",
-    "2026-11-04: Re-baseline PCC-20261104-d91a51: generic incumbents at k = 24, 28, 32 moved to their seed=run arms (fresh wwalk table per run); see rebaseline-seedrun/README.md"
+    "2026-11-04: Re-baseline PCC-20261104-d91a51: generic incumbents at k = 24, 28, 32 moved to their seed=run arms (fresh wwalk table per run); see rebaseline-seedrun/README.md",
+    "2026-11-21: owner ruling: the ratchet reads bitop/v1 per sqrt(r) (field-operation counters priced exactly); the GAE band stays reported for non-field native work. Sibling-points panel PCC-20261121-abc3ad (sibling-panel/, recorded as round 41; rounds 38-40 on main came first): generic incumbents at k = 20, 24, 28, 32 move to tw2l-x20-j16-sib8-n2 (sib=8,pool=64); a c1-boundary track records c1-lazy-sib8 (C = 1, classification not ruled). Evidence is on the five c1 confirmation curves per size, not the ledger curve; s and rho_s remain GAE band means."
   ],
   "rounds": [
     {
@@ -2162,6 +2523,18 @@
       ],
       "status": "ratcheted",
       "track": "generic"
+    },
+    {
+      "dir": "sibling-panel",
+      "round": 41,
+      "sizes": [
+        20,
+        24,
+        28,
+        32
+      ],
+      "status": "ratcheted (frozen sibling-points panel under bench record 20261121T1920Z-c25519-sibling-panel, not an autolab round; read in bitop/v1 per the owner ruling of 2026-11-21)",
+      "track": "generic"
     }
   ],
   "schema": "ic_autolab.ledger/v1",
@@ -2272,162 +2645,504 @@
         "since_round": 0
       }
     },
+    "c1-boundary": {
+      "20": {
+        "arm": {
+          "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+          "family": "c1-lazy-sib8",
+          "n": 1,
+          "name": "c1-lazy-sib8-n1",
+          "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run,sib=8,pool=64",
+          "params": {
+            "targets": "stride-generator"
+          }
+        },
+        "evidence": {
+          "band_verdict": "unresolved (sib8 below c1-lazy at w = 0 and 0.1, above at w = 1; the second sibling point is a whole addition at w = 1 and 0.200 of one in bitop/v1)",
+          "binary_sha256": "797f4b589ae6ac5b466b65e6a1abcc4e9a56d8222cb3e95623ffde3aafc150fa",
+          "bitops_per_sqrt_r": {
+            "control_c1_lazy": 54376.34504647158,
+            "rho_neg": 43721.41950813685,
+            "sel": 45580.8328030671
+          },
+          "boundary": "C = 1 (one seed plus the target): a boundary row, recorded under the 2026-11-21 ruling; whether a C = 1 walk counts as index calculus has not been ruled (c1/README.md, claim PCC-20261107-301dd8)",
+          "ci95_bitops": [
+            0.8143906400091466,
+            0.8638577931280679
+          ],
+          "ci95_to_rho_neg_bitops": [
+            1.0068680108509596,
+            1.0796032847724322
+          ],
+          "ci95_w0": [
+            0.7206477770428422,
+            0.765094356516674
+          ],
+          "claim": "PCC-20261121-abc3ad",
+          "curves": "the five c1 confirmation curves of the size (c1/confirm-curves.json), 12 targets x 8 rounds each; not the ledger curve",
+          "dir": "sibling-panel",
+          "paired_ratio_bitops": 0.8382474541845802,
+          "paired_ratio_w0": 0.7421205518511093,
+          "pairs": 480,
+          "ratio_to_rho_neg_bitops": 1.0425286579404005,
+          "round": 41,
+          "route": "local",
+          "session_id": "ECBS1hcae3d8febd36",
+          "spec_sha256": "a583ceac02a5880e06a56eb07c880c3050b3886105043a34b6b4377f0899840c",
+          "unit": "bitop/v1 per sqrt(r) (owner ruling 2026-11-21); GAE band reported alongside",
+          "validation_gate": "none (development evidence)",
+          "verify_receipt_sha256": "cf3050d40018efcebb289416a855666a9b1191cc18db6865ae0c995b188d8751"
+        },
+        "rho_s": [
+          1.5539222738112737,
+          1.6658179724814246,
+          2.672879260512786
+        ],
+        "s": [
+          1.4529578897254187,
+          1.6922521361828047,
+          3.8459003542992782
+        ],
+        "since_round": 41
+      },
+      "24": {
+        "arm": {
+          "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+          "family": "c1-lazy-sib8",
+          "n": 1,
+          "name": "c1-lazy-sib8-n1",
+          "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run,sib=8,pool=64",
+          "params": {
+            "targets": "stride-generator"
+          }
+        },
+        "evidence": {
+          "band_verdict": "unresolved (sib8 below c1-lazy at w = 0 and 0.1, above at w = 1; the second sibling point is a whole addition at w = 1 and 0.200 of one in bitop/v1)",
+          "binary_sha256": "797f4b589ae6ac5b466b65e6a1abcc4e9a56d8222cb3e95623ffde3aafc150fa",
+          "bitops_per_sqrt_r": {
+            "control_c1_lazy": 61043.88911517755,
+            "rho_neg": 48726.56918345163,
+            "sel": 42659.02311584722
+          },
+          "boundary": "C = 1 (one seed plus the target): a boundary row, recorded under the 2026-11-21 ruling; whether a C = 1 walk counts as index calculus has not been ruled (c1/README.md, claim PCC-20261107-301dd8)",
+          "ci95_bitops": [
+            0.6735115425256513,
+            0.7229862046267427
+          ],
+          "ci95_to_rho_neg_bitops": [
+            0.8326984615109789,
+            0.91961545891945
+          ],
+          "ci95_w0": [
+            0.5686835829664525,
+            0.6107981021171258
+          ],
+          "claim": "PCC-20261121-abc3ad",
+          "curves": "the five c1 confirmation curves of the size (c1/confirm-curves.json), 12 targets x 8 rounds each; not the ledger curve",
+          "dir": "sibling-panel",
+          "paired_ratio_bitops": 0.6988254473000276,
+          "paired_ratio_w0": 0.5902802898205632,
+          "pairs": 480,
+          "ratio_to_rho_neg_bitops": 0.8754776671273415,
+          "round": 41,
+          "route": "local",
+          "session_id": "ECBS1haa5a3cbbfec2",
+          "spec_sha256": "a5b8db107d944de4d1a523511baaf37b4b57d808a2446ef26035acb5698cfda2",
+          "unit": "bitop/v1 per sqrt(r) (owner ruling 2026-11-21); GAE band reported alongside",
+          "validation_gate": "none (development evidence)",
+          "verify_receipt_sha256": "328cff00f229668af1fcfb9361cd82a18e43ffb4eb7e30a24a7a9d800eacd186"
+        },
+        "rho_s": [
+          1.2341612772510087,
+          1.3458257545363392,
+          2.350806050104314
+        ],
+        "s": [
+          0.9358720490775703,
+          1.1619805702960242,
+          3.1969572612621118
+        ],
+        "since_round": 41
+      },
+      "28": {
+        "arm": {
+          "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+          "family": "c1-lazy-sib8",
+          "n": 1,
+          "name": "c1-lazy-sib8-n1",
+          "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run,sib=8,pool=64",
+          "params": {
+            "targets": "stride-generator"
+          }
+        },
+        "evidence": {
+          "band_verdict": "unresolved (sib8 below c1-lazy at w = 0 and 0.1, above at w = 1; the second sibling point is a whole addition at w = 1 and 0.200 of one in bitop/v1)",
+          "binary_sha256": "797f4b589ae6ac5b466b65e6a1abcc4e9a56d8222cb3e95623ffde3aafc150fa",
+          "bitops_per_sqrt_r": {
+            "control_c1_lazy": 74865.3117831476,
+            "rho_neg": 55516.55176347838,
+            "sel": 50058.034145460355
+          },
+          "boundary": "C = 1 (one seed plus the target): a boundary row, recorded under the 2026-11-21 ruling; whether a C = 1 walk counts as index calculus has not been ruled (c1/README.md, claim PCC-20261107-301dd8)",
+          "ci95_bitops": [
+            0.6422104719340146,
+            0.6956932958714169
+          ],
+          "ci95_to_rho_neg_bitops": [
+            0.8621480092248018,
+            0.9407380473160336
+          ],
+          "ci95_w0": [
+            0.5313101616376587,
+            0.5755015274820033
+          ],
+          "claim": "PCC-20261121-abc3ad",
+          "curves": "the five c1 confirmation curves of the size (c1/confirm-curves.json), 12 targets x 8 rounds each; not the ledger curve",
+          "dir": "sibling-panel",
+          "paired_ratio_bitops": 0.668641229872345,
+          "paired_ratio_w0": 0.5532429667836758,
+          "pairs": 480,
+          "ratio_to_rho_neg_bitops": 0.901677653877472,
+          "round": 41,
+          "route": "local",
+          "session_id": "ECBS1h761c71b6ad3f",
+          "spec_sha256": "32bd802ab7ca08c5c14e08737939b9fd958dc4a37bf58ca83fe385aff71fda2d",
+          "unit": "bitop/v1 per sqrt(r) (owner ruling 2026-11-21); GAE band reported alongside",
+          "validation_gate": "none (development evidence)",
+          "verify_receipt_sha256": "adbc132cd89758c75c7002d3b503a28fef0cfa9a115040b7fd198f5d4c062bac"
+        },
+        "rho_s": [
+          1.0479253183508361,
+          1.1462530448882808,
+          2.03120258372528
+        ],
+        "s": [
+          0.8055517169452606,
+          1.0345661755064401,
+          3.0956963025570565
+        ],
+        "since_round": 41
+      },
+      "32": {
+        "arm": {
+          "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+          "family": "c1-lazy-sib8",
+          "n": 1,
+          "name": "c1-lazy-sib8-n1",
+          "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run,sib=8,pool=64",
+          "params": {
+            "targets": "stride-generator"
+          }
+        },
+        "evidence": {
+          "band_verdict": "unresolved (sib8 below c1-lazy at w = 0 and 0.1, above at w = 1; the second sibling point is a whole addition at w = 1 and 0.200 of one in bitop/v1)",
+          "binary_sha256": "797f4b589ae6ac5b466b65e6a1abcc4e9a56d8222cb3e95623ffde3aafc150fa",
+          "bitops_per_sqrt_r": {
+            "control_c1_lazy": 91490.42941109539,
+            "rho_neg": 64839.90996481294,
+            "sel": 59121.07835740246
+          },
+          "boundary": "C = 1 (one seed plus the target): a boundary row, recorded under the 2026-11-21 ruling; whether a C = 1 walk counts as index calculus has not been ruled (c1/README.md, claim PCC-20261107-301dd8)",
+          "ci95_bitops": [
+            0.6150921427123353,
+            0.6804506109427686
+          ],
+          "ci95_to_rho_neg_bitops": [
+            0.8588548696157582,
+            0.971097223054329
+          ],
+          "ci95_w0": [
+            0.5054653777267708,
+            0.5591632124926332
+          ],
+          "claim": "PCC-20261121-abc3ad",
+          "curves": "the five c1 confirmation curves of the size (c1/confirm-curves.json), 12 targets x 8 rounds each; not the ledger curve",
+          "dir": "sibling-panel",
+          "paired_ratio_bitops": 0.6461995941865434,
+          "paired_ratio_w0": 0.5310358224023505,
+          "pairs": 480,
+          "ratio_to_rho_neg_bitops": 0.9118007472478922,
+          "round": 41,
+          "route": "local",
+          "session_id": "ECBS1h26f412a396bb",
+          "spec_sha256": "54fbb34ce4cb87dc62014171ee9ee98b93cc6b39f7a20c92d401b61425fc097c",
+          "unit": "bitop/v1 per sqrt(r) (owner ruling 2026-11-21); GAE band reported alongside",
+          "validation_gate": "none (development evidence)",
+          "verify_receipt_sha256": "af0701f486e1af9d692415c8e6921aef7db666b62739b97f9e4b4bcc5a2df2ec"
+        },
+        "rho_s": [
+          0.9501522925678012,
+          1.0434962958827263,
+          1.883592325717057
+        ],
+        "s": [
+          0.730571784942995,
+          0.9497272705699131,
+          2.9221266412121727
+        ],
+        "since_round": 41
+      }
+    },
     "generic": {
       "20": {
         "arm": {
           "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
-          "family": "wsum2g-b15",
+          "family": "tw2l-x20-j16-sib8",
           "n": 2,
-          "name": "wsum2g-b15-n2",
-          "oracle": "wsum:coef=15,free=1",
+          "name": "tw2l-x20-j16-sib8-n2",
+          "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run,sib=8,pool=64",
           "params": {
             "targets": "stride-generator"
           }
         },
         "evidence": {
-          "band_verdict": "sel < inc",
-          "binary_sha256": "6229f85b81f9a2e8f2811d675f77f4f830ca536422a1e92680a382183450a62c",
-          "ci95_w0": [
-            0.47436637197517206,
-            0.5588081424226906
+          "band_verdict": "unresolved (sib8 below the incumbent at w = 0 and 0.1, above at w = 1; the second sibling point is a whole addition at w = 1 and 0.200 of one in bitop/v1)",
+          "binary_sha256": "797f4b589ae6ac5b466b65e6a1abcc4e9a56d8222cb3e95623ffde3aafc150fa",
+          "bitops_per_sqrt_r": {
+            "control_tw2cj_lazy": 69101.56472777922,
+            "inc": 73780.86100930504,
+            "rho_neg": 43721.41950813685,
+            "sel": 55620.99437132648
+          },
+          "ci95_bitops": [
+            0.7165711674559345,
+            0.7940724667824253
           ],
-          "dir": "round-028",
-          "paired_ratio_w0": 0.5148590012335771,
-          "round": 28,
+          "ci95_to_control_bitops": [
+            0.7862537889686088,
+            0.8237762295183227
+          ],
+          "ci95_to_rho_neg_bitops": [
+            1.233359920641479,
+            1.313853062551275
+          ],
+          "ci95_w0": [
+            0.6176161965691702,
+            0.6864372206509799
+          ],
+          "claim": "PCC-20261121-abc3ad",
+          "curves": "the five c1 confirmation curves of the size (c1/confirm-curves.json), 12 targets x 8 rounds each; not the ledger curve",
+          "dir": "sibling-panel",
+          "incumbent_arm_in_panel": "inc",
+          "paired_ratio_bitops": 0.7538675153751837,
+          "paired_ratio_w0": 0.6505903913110518,
+          "pairs": 480,
+          "ratio_to_control_bitops": 0.8049165686832346,
+          "ratio_to_rho_neg_bitops": 1.272168081390292,
+          "round": 41,
           "route": "local",
-          "session_id": "ECBS1hedb8cab33622",
-          "spec_sha256": "31d58ece51b9f5adce749866dc1cf1c79dab8fe17509eec999e62b3cae0a5242",
-          "validation_gate": "none (development loop)",
-          "verify_receipt_sha256": "d1fb88594a6510e05d9d954c155267d2ddf2d53679834041230a703bb5374c71"
+          "session_id": "ECBS1hcae3d8febd36",
+          "spec_sha256": "a583ceac02a5880e06a56eb07c880c3050b3886105043a34b6b4377f0899840c",
+          "unit": "bitop/v1 per sqrt(r) (owner ruling 2026-11-21); GAE band reported alongside",
+          "validation_gate": "none (development evidence)",
+          "verify_receipt_sha256": "cf3050d40018efcebb289416a855666a9b1191cc18db6865ae0c995b188d8751"
         },
         "rho_s": [
-          1.4627264868788148,
-          1.5654568277470773,
-          2.4900298955614355
+          1.5539222738112737,
+          1.6658179724814246,
+          2.672879260512786
         ],
         "s": [
-          2.5745780660849693,
-          2.691211404585748,
-          3.740911451092766
+          1.740976066521572,
+          2.036164746674818,
+          4.6928628680540285
         ],
-        "since_round": 28
+        "since_round": 41
       },
       "24": {
         "arm": {
           "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
-          "family": "tw2l-x20-j32",
+          "family": "tw2l-x20-j16-sib8",
           "n": 2,
-          "name": "tw2l-x20-j32-n2",
-          "oracle": "wwalk:x=2.0,jumps=32,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+          "name": "tw2l-x20-j16-sib8-n2",
+          "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run,sib=8,pool=64",
           "params": {
             "targets": "stride-generator"
           }
         },
         "evidence": {
-          "band_verdict": "sel < inc",
-          "binary_sha256": "1163f6b35d27ec8853455f6d88dfb9fb1d824745068df4dfd065bf6ada23b859",
-          "ci95_w0": [
-            0.8568522666275187,
-            0.9959314277082901
+          "band_verdict": "unresolved (sib8 below the incumbent at w = 0 and 0.1, above at w = 1; the second sibling point is a whole addition at w = 1 and 0.200 of one in bitop/v1)",
+          "binary_sha256": "797f4b589ae6ac5b466b65e6a1abcc4e9a56d8222cb3e95623ffde3aafc150fa",
+          "bitops_per_sqrt_r": {
+            "control_tw2cj_lazy": 75960.8979411126,
+            "inc": 77695.04469905459,
+            "rho_neg": 48726.56918345163,
+            "sel": 52353.199118808654
+          },
+          "ci95_bitops": [
+            0.6515232142044676,
+            0.6987351340111322
           ],
-          "dir": "round-036",
-          "paired_ratio_w0": 0.9237781666814978,
-          "round": 36,
+          "ci95_to_control_bitops": [
+            0.668760658010318,
+            0.7089922714693954
+          ],
+          "ci95_to_rho_neg_bitops": [
+            1.0253347372035353,
+            1.125149572625273
+          ],
+          "ci95_w0": [
+            0.5475947165258231,
+            0.5875935716109205
+          ],
+          "claim": "PCC-20261121-abc3ad",
+          "curves": "the five c1 confirmation curves of the size (c1/confirm-curves.json), 12 targets x 8 rounds each; not the ledger curve",
+          "dir": "sibling-panel",
+          "incumbent_arm_in_panel": "inc",
+          "paired_ratio_bitops": 0.6738293197667167,
+          "paired_ratio_w0": 0.5665148618193581,
+          "pairs": 480,
+          "ratio_to_control_bitops": 0.6892124834990052,
+          "ratio_to_rho_neg_bitops": 1.0744281815061323,
+          "round": 41,
           "route": "local",
-          "session_id": "ECBS1hbefb5a60befd",
-          "spec_sha256": "2884b3fddbf2652e41dbe1654766277ec58241ff317af3f9c231285d279a84a8",
-          "validation_gate": "none (development loop)",
-          "verify_receipt_sha256": "9c7f9c918ae01d295cc7dd4dc6bb46386c864ce3d4699a1cd70a14010e1e7a68"
+          "session_id": "ECBS1haa5a3cbbfec2",
+          "spec_sha256": "a5b8db107d944de4d1a523511baaf37b4b57d808a2446ef26035acb5698cfda2",
+          "unit": "bitop/v1 per sqrt(r) (owner ruling 2026-11-21); GAE band reported alongside",
+          "validation_gate": "none (development evidence)",
+          "verify_receipt_sha256": "328cff00f229668af1fcfb9361cd82a18e43ffb4eb7e30a24a7a9d800eacd186"
         },
         "rho_s": [
-          1.1253988220502746,
-          1.2261613374494649,
-          2.1330239760421765
+          1.2341612772510087,
+          1.3458257545363392,
+          2.350806050104314
         ],
         "s": [
-          2.016048700383613,
-          2.188772264813193,
-          3.7432843446794113
+          1.1385442359403875,
+          1.4179963404806966,
+          3.9330652813434783
         ],
-        "since_round": 36
+        "since_round": 41
       },
       "28": {
         "arm": {
           "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
-          "family": "tw2l-x20-j16",
+          "family": "tw2l-x20-j16-sib8",
           "n": 2,
-          "name": "tw2l-x20-j16-n2",
-          "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+          "name": "tw2l-x20-j16-sib8-n2",
+          "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run,sib=8,pool=64",
           "params": {
             "targets": "stride-generator"
           }
         },
         "evidence": {
-          "band_verdict": "sel < inc",
-          "binary_sha256": "581b3c6f1db53678871712f94cf5a4bb28650d1b02de78474716aeeb208da738",
-          "ci95_w0": [
-            0.9188400969443025,
-            0.9695946696360329
+          "band_verdict": "unresolved (sib8 below the incumbent at w = 0 and 0.1, above at w = 1; the second sibling point is a whole addition at w = 1 and 0.200 of one in bitop/v1)",
+          "binary_sha256": "797f4b589ae6ac5b466b65e6a1abcc4e9a56d8222cb3e95623ffde3aafc150fa",
+          "bitops_per_sqrt_r": {
+            "control_tw2cj_lazy": 93813.35044941174,
+            "inc": 93813.35044941174,
+            "rho_neg": 55516.55176347838,
+            "sel": 58509.74131828679
+          },
+          "ci95_bitops": [
+            0.6029872766998517,
+            0.646537442947079
           ],
-          "dir": "round-039",
-          "paired_ratio_w0": 0.9438762949905322,
-          "round": 39,
+          "ci95_to_control_bitops": [
+            0.6029872766998517,
+            0.646537442947079
+          ],
+          "ci95_to_rho_neg_bitops": [
+            1.0064528413683578,
+            1.1042956681860143
+          ],
+          "ci95_w0": [
+            0.49788571856873026,
+            0.5339561864970517
+          ],
+          "claim": "PCC-20261121-abc3ad",
+          "curves": "the five c1 confirmation curves of the size (c1/confirm-curves.json), 12 targets x 8 rounds each; not the ledger curve",
+          "dir": "sibling-panel",
+          "incumbent_arm_in_panel": "tw2cj-lazy (the panel's inc arm at k = 28 was the pre-round-39 incumbent wwalkGg-x09-sr-n2; the round-39 incumbent is the panel's control arm)",
+          "paired_ratio_bitops": 0.6236824613767289,
+          "paired_ratio_w0": 0.5150162894490484,
+          "pairs": 480,
+          "ratio_to_control_bitops": 0.6236824613767289,
+          "ratio_to_rho_neg_bitops": 1.0539152641821226,
+          "round": 41,
           "route": "local",
-          "session_id": "ECBS1h48b12649df44",
-          "spec_sha256": "e1bc85d98790b5660452be187da8ffcbc70f7f5ff737d0f17935c88d6b8ce287",
-          "validation_gate": "none (development loop)",
-          "verify_receipt_sha256": "0a3b6584d17ec063ebbb06bd332db77424d21649ef40d4d9df4c248ecf53914f"
+          "session_id": "ECBS1h761c71b6ad3f",
+          "spec_sha256": "32bd802ab7ca08c5c14e08737939b9fd958dc4a37bf58ca83fe385aff71fda2d",
+          "unit": "bitop/v1 per sqrt(r) (owner ruling 2026-11-21); GAE band reported alongside",
+          "validation_gate": "none (development evidence)",
+          "verify_receipt_sha256": "adbc132cd89758c75c7002d3b503a28fef0cfa9a115040b7fd198f5d4c062bac"
         },
         "rho_s": [
-          1.0370991472472852,
-          1.1343520513694083,
-          2.009628188468489
+          1.0479253183508361,
+          1.1462530448882808,
+          2.03120258372528
         ],
         "s": [
-          1.7961840230498045,
-          1.969563539005328,
-          3.529979182605034
+          0.9384232246850444,
+          1.2064457256579522,
+          3.6186482344141213
         ],
-        "since_round": 39
+        "since_round": 41
       },
       "32": {
         "arm": {
           "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
-          "family": "tw2l-x20-j16",
+          "family": "tw2l-x20-j16-sib8",
           "n": 2,
-          "name": "tw2l-x20-j16-n2",
-          "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+          "name": "tw2l-x20-j16-sib8-n2",
+          "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run,sib=8,pool=64",
           "params": {
             "targets": "stride-generator"
           }
         },
         "evidence": {
-          "band_verdict": "sel < inc",
-          "binary_sha256": "1163f6b35d27ec8853455f6d88dfb9fb1d824745068df4dfd065bf6ada23b859",
-          "ci95_w0": [
-            0.8635497190921531,
-            0.9686333993291368
+          "band_verdict": "unresolved (sib8 below the incumbent at w = 0 and 0.1, above at w = 1; the second sibling point is a whole addition at w = 1 and 0.200 of one in bitop/v1)",
+          "binary_sha256": "797f4b589ae6ac5b466b65e6a1abcc4e9a56d8222cb3e95623ffde3aafc150fa",
+          "bitops_per_sqrt_r": {
+            "control_tw2cj_lazy": 118053.15773809003,
+            "inc": 118053.15773809003,
+            "rho_neg": 64839.90996481294,
+            "sel": 74057.11138555213
+          },
+          "ci95_bitops": [
+            0.605339527634999,
+            0.6501071212936761
           ],
-          "dir": "round-037",
-          "paired_ratio_w0": 0.9145835663808709,
-          "round": 37,
+          "ci95_to_control_bitops": [
+            0.605339527634999,
+            0.6501071212936761
+          ],
+          "ci95_to_rho_neg_bitops": [
+            1.0859743291794985,
+            1.2074262280316534
+          ],
+          "ci95_w0": [
+            0.4970444386540098,
+            0.5338129318837999
+          ],
+          "claim": "PCC-20261121-abc3ad",
+          "curves": "the five c1 confirmation curves of the size (c1/confirm-curves.json), 12 targets x 8 rounds each; not the ledger curve",
+          "dir": "sibling-panel",
+          "incumbent_arm_in_panel": "tw2cj-lazy",
+          "paired_ratio_bitops": 0.6273200378921973,
+          "paired_ratio_w0": 0.5151051863611109,
+          "pairs": 480,
+          "ratio_to_control_bitops": 0.6273200378921973,
+          "ratio_to_rho_neg_bitops": 1.1421532112820834,
+          "round": 41,
           "route": "local",
-          "session_id": "ECBS1h879b9a8f4677",
-          "spec_sha256": "5179e3d4da7d4cd61820c4c5ffdf3e6142f6350512e2795abad5afc0364c5417",
-          "validation_gate": "none (development loop)",
-          "verify_receipt_sha256": "6eef034fb7e60d80946bc3d7c95acaa129ab59adaa71c798c2ed2b910e45ef91"
+          "session_id": "ECBS1h26f412a396bb",
+          "spec_sha256": "54fbb34ce4cb87dc62014171ee9ee98b93cc6b39f7a20c92d401b61425fc097c",
+          "unit": "bitop/v1 per sqrt(r) (owner ruling 2026-11-21); GAE band reported alongside",
+          "validation_gate": "none (development evidence)",
+          "verify_receipt_sha256": "af0701f486e1af9d692415c8e6921aef7db666b62739b97f9e4b4bcc5a2df2ec"
         },
         "rho_s": [
-          0.9659350879401662,
-          1.060853752962088,
-          1.9151217381593832
+          0.9501522925678012,
+          1.0434962958827263,
+          1.883592325717057
         ],
         "s": [
-          1.7146582107763975,
-          1.8842625305055205,
-          3.410701408067641
+          0.9140970798162928,
+          1.1891845376826673,
+          3.664971658480039
         ],
-        "since_round": 37
+        "since_round": 41
       }
     }
   },
@@ -14717,7 +15432,447 @@
       "stage": "train",
       "status": "verified",
       "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wsum2g-b15",
+        "n": 2,
+        "name": "wsum2g-b15-n2",
+        "oracle": "wsum:coef=15,free=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        2.6759941274466192,
+        2.9352078210268475,
+        5.268131063248889
+      ],
+      "size": 20,
+      "stage": "panel",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        2.4585760001359995,
+        2.636252130402883,
+        4.235337302804834
+      ],
+      "size": 20,
+      "stage": "panel",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16-sib8",
+        "n": 2,
+        "name": "tw2l-x20-j16-sib8-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run,sib=8,pool=64",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        1.740976066521572,
+        2.036164746674818,
+        4.6928628680540285
+      ],
+      "size": 20,
+      "stage": "panel",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+        "family": "c1-lazy",
+        "n": 1,
+        "name": "c1-lazy-n1",
+        "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        1.957846182943231,
+        2.1024273813541567,
+        3.4036581670524866
+      ],
+      "size": 20,
+      "stage": "panel",
+      "status": "verified",
+      "track": "c1-boundary"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+        "family": "c1-lazy-sib8",
+        "n": 1,
+        "name": "c1-lazy-sib8-n1",
+        "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run,sib=8,pool=64",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        1.4529578897254187,
+        1.6922521361828047,
+        3.8459003542992782
+      ],
+      "size": 20,
+      "stage": "panel",
+      "status": "verified",
+      "track": "c1-boundary"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j32",
+        "n": 2,
+        "name": "tw2l-x20-j32-n2",
+        "oracle": "wwalk:x=2.0,jumps=32,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        2.009734099973939,
+        2.181966807272672,
+        3.7320611729612656
+      ],
+      "size": 24,
+      "stage": "panel",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        1.963698309292819,
+        2.1390993911939846,
+        3.7177091283044748
+      ],
+      "size": 24,
+      "stage": "panel",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16-sib8",
+        "n": 2,
+        "name": "tw2l-x20-j16-sib8-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run,sib=8,pool=64",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        1.1385442359403875,
+        1.4179963404806966,
+        3.9330652813434783
+      ],
+      "size": 24,
+      "stage": "panel",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+        "family": "c1-lazy",
+        "n": 1,
+        "name": "c1-lazy-n1",
+        "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        1.5854706064504727,
+        1.728271505458141,
+        3.0134795965271577
+      ],
+      "size": 24,
+      "stage": "panel",
+      "status": "verified",
+      "track": "c1-boundary"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+        "family": "c1-lazy-sib8",
+        "n": 1,
+        "name": "c1-lazy-sib8-n1",
+        "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run,sib=8,pool=64",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        0.9358720490775703,
+        1.1619805702960242,
+        3.1969572612621118
+      ],
+      "size": 24,
+      "stage": "panel",
+      "status": "verified",
+      "track": "c1-boundary"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wwalkGg-x09-sr",
+        "n": 2,
+        "name": "wwalkGg-x09-sr-n2",
+        "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        1.9157692951932386,
+        2.0973779894024185,
+        3.7318562372850392
+      ],
+      "size": 28,
+      "stage": "panel",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        1.8221233850466079,
+        1.9980304920271075,
+        3.581194454851604
+      ],
+      "size": 28,
+      "stage": "panel",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16-sib8",
+        "n": 2,
+        "name": "tw2l-x20-j16-sib8-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run,sib=8,pool=64",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        0.9384232246850444,
+        1.2064457256579522,
+        3.6186482344141213
+      ],
+      "size": 28,
+      "stage": "panel",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+        "family": "c1-lazy",
+        "n": 1,
+        "name": "c1-lazy-n1",
+        "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        1.456054148556831,
+        1.5969523352259782,
+        2.8650360152483025
+      ],
+      "size": 28,
+      "stage": "panel",
+      "status": "verified",
+      "track": "c1-boundary"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+        "family": "c1-lazy-sib8",
+        "n": 1,
+        "name": "c1-lazy-sib8-n1",
+        "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run,sib=8,pool=64",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        0.8055517169452606,
+        1.0345661755064401,
+        3.0956963025570565
+      ],
+      "size": 28,
+      "stage": "panel",
+      "status": "verified",
+      "track": "c1-boundary"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        1.774583335636367,
+        1.9502215208226172,
+        3.5309651874988655
+      ],
+      "size": 32,
+      "stage": "panel",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        1.774583335636367,
+        1.9502215208226172,
+        3.5309651874988655
+      ],
+      "size": 32,
+      "stage": "panel",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16-sib8",
+        "n": 2,
+        "name": "tw2l-x20-j16-sib8-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run,sib=8,pool=64",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        0.9140970798162928,
+        1.1891845376826673,
+        3.664971658480039
+      ],
+      "size": 32,
+      "stage": "panel",
+      "status": "verified",
+      "track": "generic"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+        "family": "c1-lazy",
+        "n": 1,
+        "name": "c1-lazy-n1",
+        "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        1.3757485919461412,
+        1.5119735553370102,
+        2.7379982258548248
+      ],
+      "size": 32,
+      "stage": "panel",
+      "status": "verified",
+      "track": "c1-boundary"
+    },
+    {
+      "arm": {
+        "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+        "family": "c1-lazy-sib8",
+        "n": 1,
+        "name": "c1-lazy-sib8-n1",
+        "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run,sib=8,pool=64",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "round": 41,
+      "s": [
+        0.730571784942995,
+        0.9497272705699131,
+        2.9221266412121727
+      ],
+      "size": 32,
+      "stage": "panel",
+      "status": "verified",
+      "track": "c1-boundary"
     }
   ],
-  "updated": "2026-11-17T15:18:29Z"
+  "updated": "2026-11-21T20:59:10Z"
 }

@@ -2,7 +2,7 @@
 
 Claim `PCC-20261121-abc3ad`, standing `unverified`.
 
-Write-up of the panel frozen in [`PROTOCOL.md`](PROTOCOL.md) (2026-11-21, before any data). Every number on this page is an unverified assertion of the lane that produced it and is tagged [pcc:unverified]; no pcc claim has been filed for it yet. Nothing here changes the ledger: the ratchet waits for the owner's unit ruling (protocol, section 5).
+Write-up of the panel frozen in [`PROTOCOL.md`](PROTOCOL.md) (2026-11-21, before any data). Every number on this page is an unverified assertion of the lane that produced it and is tagged [pcc:unverified]; no pcc claim has been filed for it yet. The ledger change waited for the owner's unit ruling (protocol, section 5); the ruling came on 2026-11-21 and the ratchet is recorded in the last section of this page.
 
 ## What was run
 
@@ -97,12 +97,27 @@ So the panel's claim survives its own kill lines, and the within-track effect of
 
 The 0.75x goal is not approached. In the harness's exact unit, the closest any arm comes to `rho-neg` is `c1-lazy-sib8` at k = 24, 0.875 [0.833, 0.920] of `rho-neg`'s bit-ops per sqrt(r); at k = 28 and 32 it is 0.902 and 0.912, and at k = 20 it is above `rho-neg` (1.043). `tw2cj-lazy-sib8` is above `rho-neg` at every size (1.054 to 1.272). The w = 0 GAE reading puts `c1-lazy-sib8` at 0.758 to 0.769 of `rho-neg` for k >= 24, but that reading prices the sibling second point at nothing, the band verdict for the pair is unresolved on 19 of 20 curves, and at w = 1 the arm is 1.36 to 1.55 x `rho-neg`. Section 1 of the protocol said this before data: the mechanism cannot reach 0.75x for any K >= 2, and the panel measures the gain it gives, which is the within-track ratio above [pcc:unverified]. The distance remaining to the matched rho, in bit-ops, is a factor 1.04 to 1.27 for the two `sib8` arms across the four sizes.
 
+## Ratchet under the owner ruling of 2026-11-21
+
+The owner ruled on 2026-11-21 that the ratchet reads `bitop/v1` per sqrt(r): field-operation counters are priced at their exact bit-op weight, and the w band stays for native work that is not a field operation and is reported alongside (AGENTS.md §5a, bullet of that date; `../README.md`, "Owner ruling on the ratchet unit"). Under that reading the decision rule is the paired `sel / inc` interval in bit-ops below 1, and the panel's Table 1 is the evidence. Recorded in `../ledger.json` as round 41 (rounds 38 to 40 landed on `main` while this panel ran; round 39 made the panel's control arm `tw2cj-lazy` the k = 28 incumbent, so at k = 28 and 32 the pair against the incumbent is the within-track pair). All numbers [pcc:unverified], from `pairs-k*.json`:
+
+| k | incumbent before | incumbent after | sel / inc, bit-ops per sqrt(r) [ci95] | to rho-neg, after (before) | band verdict |
+|--:|:--|:--|:--|:--|:--|
+| 20 | `wsum2g-b15-n2` | `tw2l-x20-j16-sib8-n2` | 0.754 [0.717, 0.794] | 1.272 (1.688) | unresolved |
+| 24 | `tw2l-x20-j32-n2` | `tw2l-x20-j16-sib8-n2` | 0.674 [0.652, 0.699] | 1.074 (1.595) | unresolved |
+| 28 | `tw2l-x20-j16-n2` (round 39) | `tw2l-x20-j16-sib8-n2` | 0.624 [0.603, 0.647] | 1.054 (1.690) | unresolved |
+| 32 | `tw2l-x20-j16-n2` | `tw2l-x20-j16-sib8-n2` | 0.627 [0.605, 0.650] | 1.142 (1.821) | unresolved |
+
+A new `c1-boundary` track holds `c1-lazy-sib8-n1` at 1.043 [1.007, 1.080], 0.875 [0.833, 0.920], 0.902 [0.862, 0.941] and 0.912 [0.859, 0.971] of rho-neg (k = 20, 24, 28, 32); C = 1 is one seed plus the target and has not been classified as index calculus, so the row is a boundary row and never a generic incumbent. The ledger's `s` and `rho_s` stay GAE band means on the panel curves; each incumbent's `evidence` carries the bit-op means, ratios, intervals, session id, spec and receipt hashes. The ledger curve itself was not run: the evidence is the five c1 confirmation curves per size. Development evidence under the autolab's rule: no validation gate, no leaderboard row, no change to the rho-neg reference.
+
+What the ruling does not change: the 0.75x goal is unmet (the nearest arm is 0.875 of rho-neg at k = 24 on the C = 1 boundary track, and the generic incumbents are 1.05 to 1.27 of rho-neg); the band verdicts recorded above stay as recorded. Next candidates already measured on other curves by the sibling stages (`../siblings/stage1-eks`, `stage2-primefield`, `stage3-scaling`, `stage4b-aut3`, all [pcc:unverified], no claim): `pool=256` and `pool=512` arms at 0.45 to 0.55 of `tw2cj-lazy` at w = 0, below it at every weight in 12 of 18 scaling cells, and the `aut=3` keys on j = 0 curves; a frozen five-curve panel of `sib=8,pool=256` against `tw2l-x20-j16-sib8-n2` on the ledger sizes is the cheapest next ratchet test, with the red-team's falsification (same specs at k = 28 and 32 on five curves no earlier study used) run in the same session.
+
 ## Limits
 
 - Single binary, single host: one build (`797f4b58...c150fa`), run and audited on the same machine (`env_class_id ECBENV3he484bb335352`, process affinity cores 0 to 3), through the local route rather than `isolab-eks`; no second host, no independent replay certificate from another machine.
 - The audit is the harness's own `ecbench verify --replay 8` on the producing host: 8 of 2880 measured records replayed per size. There is no signed replay and no third-party replay certificate; the k = 32 validator agreement is recorded but its numbers were not delivered to this page.
 - At k = 32 the ledger incumbent `tw2l-x20-j16` has the same oracle string as `tw2cj-lazy` (`wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run`), so `inc` and `tw2cj-lazy` are the same configuration with the same seeds and produced identical records (identical means in Table 1 and Table 2); the `inc` / `tw2cj-lazy-sib8` entry at k = 32 is the within-track pair restated, not a third comparison.
-- Which unit the ratchet reads, bit-ops or GAE at some w, is pending the owner's ruling (protocol section 2 and 5); the two units disagree on whether `c1-lazy-sib8` is below `rho-neg` at k >= 24, and the band leaves the sibling pairs unresolved on 17 of 20 curves.
+- Which unit the ratchet reads, bit-ops or GAE at some w, was pending the owner's ruling when this page was written (protocol section 2 and 5; ruled 2026-11-21: bit-ops, see the ratchet section); the two units disagree on whether `c1-lazy-sib8` is below `rho-neg` at k >= 24, and the band leaves the sibling pairs unresolved on 17 of 20 curves.
 - No pcc claim, no bench record close-out, no PDF and no row in `../README.md` are part of this page; every figure here is an unverified assertion until the gate steps in section 5 of the protocol are done.
 - No A/A arm: ecbench seeds runs by workload and round, so the noise floor is read from the bootstrap intervals, not from a same-arm pair.
 
@@ -113,4 +128,4 @@ The 0.75x goal is not approached. In the harness's exact unit, the closest any a
 - At k = 32 the ledger incumbent is the control arm itself (same oracle string, byte-identical records), so the k = 32 `inc` rows duplicate the `tw2cj-lazy` rows; at k = 24 `inc` is the jumps = 32 variant of the control.
 - Four of the sixteen pre-registered bit-op cells missed their interval, all in the cheaper-than-predicted direction (`tw2cj-lazy-sib8` / rho-neg at k = 24, 28, 32; `c1-lazy-sib8` / rho-neg at k = 24 by 0.0045); the frozen table's rho-neg rows and pair rows were not mutually consistent (0.77 x against 0.68 x the baseline). They are recorded as misses.
 - Independent validation: a second lane recomputed all 32 bit-op ratios and the GAE ratios from `records.jsonl` with its own code and agreed within 6e-5 relative at every size; the red-team reconstructed a k = 28 `oracle_setup` phase's bit-op total exactly from its primitive counts (3,214 group additions x 51,044 + ... = 206,777,900) and confirmed rho-neg is priced with the same 51,044 per addition on the same binary.
-- The unit disagreement between bit-ops and the band is structural: a second point is 0.200 of an addition in `bitop/v1` and 1.0 at w = 1 in the band, so the band verdict is unresolved at every size while the bit-op ratio is below 1 at k >= 24 for the C = 1 arm. The owner's unit ruling decides which reading the ledger takes.
+- The unit disagreement between bit-ops and the band is structural: a second point is 0.200 of an addition in `bitop/v1` and 1.0 at w = 1 in the band, so the band verdict is unresolved at every size while the bit-op ratio is below 1 at k >= 24 for the C = 1 arm. The owner's unit ruling decides which reading the ledger takes (ruled 2026-11-21: bit-ops).

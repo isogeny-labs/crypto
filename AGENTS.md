@@ -1345,6 +1345,25 @@ Every cross-method comparison and every ranking must:
   `work_native` maps, `cost.unpriced` and the phase `native` maps are
   written as before, and committed sessions replay "identical". The
   numbers under both readings: `research/ecbench_table_work_pricing_20261108/`.
+- **Field-operation counters are priced exactly, in `bitop/v1`; the ratchet
+  reads bit-ops** (owner, 2026-11-21). A native counter whose operation is a
+  fixed number of field operations (today the sibling-points counters
+  `sibling_second_points`, one squaring and two field additions per point,
+  and `sibling_lift_products`; `SIBLING_WORK_COUNTERS` in
+  `src/cryptanalysis/ecbench/band.rs`) is charged at its `bitop/v1` weight
+  (`docs/units/BITOPS.md`), not at `w` group additions per operation. The
+  index-calculus ledgers' ratchet (`ic_autolab`, `research/*/ledger.json`)
+  reads bit-ops per sqrt(r) from the records (`work.bitops`; `ecbench compare
+  --unit bitop/v1`), for every arm and the rho reference alike. The `w` band
+  stays in force, and is reported next to the bit-op reading, for native work
+  that is not a counted field operation (table inserts and lookups,
+  canonicalisations, hashes); a pair that is ordered in bit-ops and
+  unresolved in the band is reported with both readings and ratchets on the
+  bit-op one. Ruled on the sibling-points panel
+  (`research/curve25519_autolab_20261104/sibling-panel/`, claim
+  `PCC-20261121-abc3ad`), where a second x-only point is 0.200 of an addition
+  in bit-ops and a whole addition at w = 1. Frozen evidence and band verdicts
+  recorded before this date are not rewritten.
 
 This applies to `ecbench compare` read-outs, tables, frontier syntheses,
 ledger rows, papers and PR descriptions. A ratio produced before this rule
