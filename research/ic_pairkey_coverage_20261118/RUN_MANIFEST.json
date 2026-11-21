@@ -1,0 +1,25 @@
+{
+  "pr": "https://github.com/isogeny-labs/crypto/pull/4766",
+  "protocol_commit": "10e6338b123e563c4359e2f66a783f32157f66a8",
+  "source_local_sha256": {
+    "run": "0c4aa98b02f429dfde9669a0d1ad4b4744d550558a3e64f594eb1aaf3c153115",
+    "run_r4": "7e3de3ca1f36d1221f4b023070215c6501ad06bbad17a49dcbd0a658c81817ae",
+    "audit_base": "60dab4a399fe6ede96d433f2e3640f0cf295ffe0c7d66f0a40d5bc112e07fd77",
+    "audit_r4": "97d5642841df386cb2b219d400862546821ea8123b724acf246397d555460736"
+  },
+  "raw_sha256": {
+    "b24": "42170275d6ab947a5c07b387ed65efa9dd6eee7d71ac2ed37c67833148dc4025",
+    "b32": "5b895036d4f101396338b51bf841bca99e7d3fd296aaa2bd677edd907f171ebf",
+    "b40": "d57212e2c114d7110590da1d7b5761dc05edc730c3ba310c668bb41ca06c3770"
+  },
+  "run_errors": [],
+  "censored": [],
+  "negative_mutation": "One B24 unique arm row scalar altered; independent auditor exited 1 with relation mismatch.",
+  "commands": [
+    "python3 run_r4.py --base 24 --seeds 24 --seed0 0x1c2026111880 --out raw/r4_primary_b24.json",
+    "python3 run_r4.py --base 32 --seeds 8 --seed0 0x1c20261118a0 --out raw/r4_sensitivity_b32.json",
+    "python3 run_r4.py --base 40 --seeds 8 --seed0 0x1c20261118b0 --out raw/r4_sensitivity_b40.json",
+    "python3 audit_r4.py raw/r4_primary_b24.json raw/r4_sensitivity_b32.json raw/r4_sensitivity_b40.json"
+  ],
+  "notes": "Remote copied source may differ in comments from local audited source; exact original local archive retained."
+}
