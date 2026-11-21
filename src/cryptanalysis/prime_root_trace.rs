@@ -341,13 +341,7 @@ impl Engine<'_> {
     fn div(&mut self, a: &[u64], b: &[u64]) -> Work<(Vec<u64>, Vec<u64>)> {
         debug_assert!(!b.is_empty());
         let mut r = a.to_vec();
-        // An already-reduced dividend produces an empty quotient. Avoid
-        // allocating a one-element zero vector only to trim it away.
-        let mut q = if a.len() < b.len() {
-            Vec::new()
-        } else {
-            vec![0; a.len() - b.len() + 1]
-        };
+        let mut q = vec![0; a.len().saturating_sub(b.len()) + 1];
         if a.len() >= b.len() {
             let inv = self.inv(*b.last().unwrap())?;
             while r.len() >= b.len() {
@@ -626,6 +620,8 @@ fn vmonomial_product(m: &[u64], other: &[u64]) -> Option<Vec<u64>> {
 }
 // Fast path for c + d*x^k (k >= 5), with c,d both nonzero. This is
 // separate from monomial multiplication, which is handled earlier.
+#[cold]
+#[inline(never)]
 fn vbinomial_product(binomial: &[u64], other: &[u64], p: u64) -> Option<Vec<u64>> {
     if binomial.len() < 6 || binomial[0] == 0
         || binomial[1] != 0 || binomial[2] != 0
@@ -673,8 +669,14 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     // A non-monomial binomial (c + d*x^k) is common in modular-power
     // certificates. Only two coefficient columns contribute, so do not
     // scan the k-1 zero middle coefficients once per multiplicand term.
-    if let Some(result) = vbinomial_product(a, b, p) { return result; }
-    if let Some(result) = vbinomial_product(b, a, p) { return result; }
+    // Keep the common dense/small-operand path in its original hot block.
+    // Only check the rare sparse shape when a candidate has zero x/x^2 terms.
+    if a.len() >= 6 && a[1] == 0 && a[2] == 0 {
+        if let Some(result) = vbinomial_product(a, b, p) { return result; }
+    }
+    if b.len() >= 6 && b[1] == 0 && b[2] == 0 {
+        if let Some(result) = vbinomial_product(b, a, p) { return result; }
+    }
     // A wide dense convolution can accumulate each output coefficient in u64
     // and perform ONE modular reduction per coefficient, not one per pair.
     // The bound is checked in u128, so no intermediate u64 overflow is possible.
