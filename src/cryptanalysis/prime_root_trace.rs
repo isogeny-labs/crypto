@@ -341,7 +341,13 @@ impl Engine<'_> {
     fn div(&mut self, a: &[u64], b: &[u64]) -> Work<(Vec<u64>, Vec<u64>)> {
         debug_assert!(!b.is_empty());
         let mut r = a.to_vec();
-        let mut q = vec![0; a.len().saturating_sub(b.len()) + 1];
+        // An already-reduced dividend produces an empty quotient. Avoid
+        // allocating a one-element zero vector only to trim it away.
+        let mut q = if a.len() < b.len() {
+            Vec::new()
+        } else {
+            vec![0; a.len() - b.len() + 1]
+        };
         if a.len() >= b.len() {
             let inv = self.inv(*b.last().unwrap())?;
             while r.len() >= b.len() {
@@ -618,6 +624,38 @@ fn vmonomial_product(m: &[u64], other: &[u64]) -> Option<Vec<u64>> {
     result[shift..].copy_from_slice(other);
     Some(trim(result))
 }
+// Fast path for c + d*x^k (k >= 5), with c,d both nonzero. This is
+// separate from monomial multiplication, which is handled earlier.
+fn vbinomial_product(binomial: &[u64], other: &[u64], p: u64) -> Option<Vec<u64>> {
+    if binomial.len() < 6 || binomial[0] == 0
+        || binomial[1] != 0 || binomial[2] != 0
+        || *binomial.last().unwrap() == 0
+        || binomial[3..binomial.len() - 1].iter().any(|&x| x != 0)
+    {
+        return None;
+    }
+    let shift = binomial.len() - 1;
+    let low = binomial[0];
+    let high = binomial[shift];
+    let mut out = vec![0; binomial.len() + other.len() - 1];
+    for (i, &x) in other.iter().enumerate() {
+        if x == 0 { continue; }
+        // All caller coefficients are canonical. Two additions cannot
+        // overflow u64 because p <= 2^61 - 1.
+        let product = vmul(x, low, p);
+        let sum = out[i] + product;
+        out[i] = if sum >= p { sum - p } else { sum };
+        if high == 1 {
+            let sum = out[i + shift] + x;
+            out[i + shift] = if sum >= p { sum - p } else { sum };
+        } else {
+            let product = vmul(x, high, p);
+            let sum = out[i + shift] + product;
+            out[i + shift] = if sum >= p { sum - p } else { sum };
+        }
+    }
+    Some(trim(out))
+}
 fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     if a.is_empty() || b.is_empty() {
         return vec![];
@@ -632,6 +670,11 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     }
     if let Some(result) = vmonomial_product(a, b) { return result; }
     if let Some(result) = vmonomial_product(b, a) { return result; }
+    // A non-monomial binomial (c + d*x^k) is common in modular-power
+    // certificates. Only two coefficient columns contribute, so do not
+    // scan the k-1 zero middle coefficients once per multiplicand term.
+    if let Some(result) = vbinomial_product(a, b, p) { return result; }
+    if let Some(result) = vbinomial_product(b, a, p) { return result; }
     // A wide dense convolution can accumulate each output coefficient in u64
     // and perform ONE modular reduction per coefficient, not one per pair.
     // The bound is checked in u128, so no intermediate u64 overflow is possible.
@@ -1737,6 +1780,31 @@ mod round89_column_accumulators {
                         "product: p={p}, width={width}, case={case}");
                     assert_eq!(vsquare(&a, p), reference_product(&a, &a, p),
                         "square: p={p}, width={width}, case={case}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn binomial_products_match_independent_arithmetic_oracle() {
+        let mut rng = StdRng::seed_from_u64(0x2026_1121_0091);
+        for p in [65_521, 1_000_000_007, MAX_PRIME] {
+            for width in [6, 8, 12, 16] {
+                for case in 0..160 {
+                    let mut binomial = vec![0; width];
+                    binomial[0] = rng.gen_range(1..p);
+                    binomial[width - 1] =
+                        if case % 2 == 0 { 1 } else { rng.gen_range(1..p) };
+                    let mut other: Vec<u64> =
+                        (0..width).map(|_| rng.gen_range(0..p)).collect();
+                    if case % 3 == 0 {
+                        for i in (0..width).step_by(3) { other[i] = 0; }
+                    }
+                    let expected = reference_product(&binomial, &other, p);
+                    assert_eq!(vproduct(&binomial, &other, p), expected,
+                        "left binomial p={p} width={width} case={case}");
+                    assert_eq!(vproduct(&other, &binomial, p), expected,
+                        "right binomial p={p} width={width} case={case}");
                 }
             }
         }
