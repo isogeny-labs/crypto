@@ -345,7 +345,11 @@ impl Engine<'_> {
         let (mut acc, mut base) = (1, value);
         while exponent > 0 {
             if exponent & 1 == 1 {
-                acc = self.field(FieldOp::Mul, acc, base)?;
+                // 1 * base is base: avoid a redundant field operation
+                // and its certificate event without changing the inverse.
+                acc = if acc == 1 { base } else {
+                    self.field(FieldOp::Mul, acc, base)?
+                };
             }
             exponent >>= 1;
             if exponent != 0 {
@@ -498,12 +502,29 @@ impl Engine<'_> {
             exponent,
             modulus: modulus.to_vec(),
         })?;
-        let mut b = self.div(base, modulus)?.1;
-        let mut acc = self.div(&[1], modulus)?.1;
+        // A polynomial of smaller degree is already reduced modulo the
+        // divisor, and 1 is its own residue for positive-degree moduli.
+        // Omitting these divisions removes certificate event allocations.
+        let mut b = if base.len() < modulus.len() {
+            trim(base.to_vec())
+        } else {
+            self.div(base, modulus)?.1
+        };
+        let mut acc = if modulus.len() > 1 {
+            vec![1]
+        } else {
+            self.div(&[1], modulus)?.1
+        };
         while exponent != 0 {
             if exponent & 1 == 1 {
-                let product = self.mul(&acc, &b)?;
-                acc = self.div(&product, modulus)?.1;
+                // Both operands are reduced; the first multiplication
+                // by the identity is also already reduced.
+                if acc == [1] {
+                    acc = b.clone();
+                } else {
+                    let product = self.mul(&acc, &b)?;
+                    acc = self.div(&product, modulus)?.1;
+                }
             }
             exponent >>= 1;
             // The base is dead after the final exponent bit. Avoid the last
@@ -593,9 +614,15 @@ impl Engine<'_> {
             match h.len() {
                 0 | 1 => {}
                 2 => {
-                    let inv = self.inv(h[1])?;
-                    let product = self.field(FieldOp::Mul, h[0], inv)?;
-                    let root = self.field(FieldOp::Sub, 0, product)?;
+                    let root = if h[1] == 1 {
+                        // GCD and its monic quotients yield monic linear
+                        // factors. No inverse or multiplication is needed.
+                        self.field(FieldOp::Sub, 0, h[0])?
+                    } else {
+                        let inv = self.inv(h[1])?;
+                        let product = self.field(FieldOp::Mul, h[0], inv)?;
+                        self.field(FieldOp::Sub, 0, product)?
+                    };
                     self.event(RootEvent::LinearRoot {
                         polynomial: h,
                         root,
@@ -1112,11 +1139,17 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
     Ok((trim(quotient), trim(remainder)))
 }
 fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, String> {
-    let mut r = vdiv(&[1], m, p)?.1;
+    // The independent verifier keeps separate arithmetic, but skips
+    // identities that cannot affect any residue.
+    let mut r = if m.len() > 1 { vec![1] } else { vdiv(&[1], m, p)?.1 };
     let mut b = vdiv(base, m, p)?.1;
     while e > 0 {
         if e & 1 == 1 {
-            r = vdiv(&vproduct(&r, &b, p), m, p)?.1;
+            r = if r == [1] {
+                b.clone()
+            } else {
+                vdiv(&vproduct(&r, &b, p), m, p)?.1
+            };
         }
         e >>= 1;
         // No subsequent iteration reads b after the final exponent bit.
@@ -1312,7 +1345,11 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     return Err("power continued after completion".into());
                 }
                 if state.exponent & 1 == 1 {
-                    state.acc = vdiv(&vproduct(&state.acc, &state.base, p), &state.modulus, p)?.1;
+                    state.acc = if state.acc == [1] {
+                        state.base.clone()
+                    } else {
+                        vdiv(&vproduct(&state.acc, &state.base, p), &state.modulus, p)?.1
+                    };
                 }
                 // At the terminal bit the base is never read again.
                 // Accept both the legacy squared terminal base and the new
@@ -1997,6 +2034,67 @@ mod round79_terminal_power_regression {
                 }
                 assert!(verify(&malformed).is_err());
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod round80_identity_arithmetic {
+    use super::*;
+
+    fn test_limits() -> RootLimits {
+        RootLimits {
+            field_work: MAX_WORK,
+            split_attempts: 1000,
+            events: MAX_EVENTS,
+            degree: MAX_DEGREE,
+        }
+    }
+
+    #[test]
+    fn identity_reduction_and_first_power_bit_preserve_verified_roots() {
+        for p in [17, 65_521, 1_000_000_007, MAX_PRIME] {
+            // Include a monic linear, split quadratic, irreducible
+            // quadratic, and a quartic with two known distinct roots.
+            let polynomials = [
+                vec![p - 3, 1],
+                vec![6, p - 5, 1],
+                vec![1, 0, 1],
+                vec![6, p - 5, 7, p - 5, 1],
+                vec![1],
+            ];
+            for (i, f) in polynomials.iter().enumerate() {
+                let mut sink = |_event: &RootEvent| Ok(());
+                let report = solve(f, p, 0x8080 + i as u64, test_limits(), &mut sink).unwrap();
+                assert!(report.complete(), "p={p} f={f:?}: {:?}", report.stop);
+                verify(&report).expect("full independent certificate");
+                for &r in &report.roots {
+                    let mut value = 0u64;
+                    for &c in f.iter().rev() {
+                        value = ((value as u128 * r as u128 + c as u128) % p as u128) as u64;
+                    }
+                    assert_eq!(value, 0, "root must satisfy polynomial");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn limited_work_and_sink_failures_remain_verifiable() {
+        for p in [65_521, MAX_PRIME] {
+            let mut sink = |_event: &RootEvent| Ok(());
+            let limited = RootLimits { field_work: 12, ..test_limits() };
+            let r = solve(&[6, p - 5, 1], p, 123, limited, &mut sink).unwrap();
+            assert_eq!(r.stop, RootStop::WorkLimit);
+            verify(&r).expect("work-limit prefix");
+            let mut received = 0usize;
+            let mut failing = |_event: &RootEvent| {
+                received += 1;
+                if received == 3 { Err("sink failed".into()) } else { Ok(()) }
+            };
+            let s = solve(&[6, p - 5, 1], p, 123, test_limits(), &mut failing).unwrap();
+            assert_eq!(s.stop, RootStop::SinkFailure);
+            verify(&s).expect("failed-sink prefix");
         }
     }
 }
