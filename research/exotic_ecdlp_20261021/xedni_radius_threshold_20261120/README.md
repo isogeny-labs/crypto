@@ -16,15 +16,18 @@ The [protocol](protocol.json) and [runner](run.py) were pushed in
 their verified reduced scalars, the source-row digest, and every integer
 radius from 0 through 128. Each row enumerates the complete scalar image of
 `(a,b)∈[-B,B]²`, including zero. The retained
-[258 radius rows](radius-rows.jsonl) include all incomplete widths.
+[258 compressed radius rows](radius-rows.jsonl.gz) include all incomplete widths.
 
 | p | q | `R̄/Q̄` | Prior B and nonidentity coverage | Last incomplete B | Missing at last incomplete B | First full B | Pairs including zero at first full B |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | 1531 | 1553 | 11 | 41: 984 / 1,552 | 64 | 16 | 65 | 17,161 |
 | 2287 | 2251 | 1238 | 49: 2,058 / 2,250 | 53 | 24 | 54 | 11,881 |
 
-The [result](result.json) records the protocol, script, source, and raw-row
-SHA-256 digests. Complete coverage is monotone in the radius because each
+The [result](result.json) records the protocol, script, source, compressed-file,
+and decompressed-row SHA-256 digests. The deterministic gzip serialization is
+an artifact-size amendment after the first run; the 258 rows and their raw
+digest `23fdd8855c6d3d427f1807373d2907f37fc1ef979b6b307e91b81c2097e0c48e`
+are unchanged. Complete coverage is monotone in the radius because each
 box is contained in the next. Thus a full image at B and an incomplete image
 at B−1 identify the first full integer radius. The [checked Sage
 audit](audit-result.json) independently reduces the supplied rational `Q,R`,

@@ -2,6 +2,7 @@
 """Independent elliptic-curve audit at the two measured radius boundaries."""
 
 import hashlib
+import gzip
 import json
 from pathlib import Path
 
@@ -18,7 +19,9 @@ def sha(raw):
 def main():
     protocol = json.loads((HERE / "protocol.json").read_bytes())
     result = json.loads((HERE / "result.json").read_bytes())
-    raw = (HERE / "radius-rows.jsonl").read_bytes()
+    compressed = (HERE / "radius-rows.jsonl.gz").read_bytes()
+    assert sha(compressed) == result["rows_gzip_sha256"]
+    raw = gzip.decompress(compressed)
     assert sha(raw) == result["rows_sha256"]
     rows = {(r["p"],r["radius"]):r for r in map(json.loads,raw.splitlines())}
     assert len(rows) == result["radius_rows"] == 258

@@ -2,6 +2,7 @@
 """Exact coefficient-box scalar-image sweep frozen in protocol.json."""
 
 import hashlib
+import gzip
 import json
 from pathlib import Path
 
@@ -47,10 +48,12 @@ def main():
         thresholds.append({"p":p,"q":q,"first_full_radius":first,
                            "status":"full_coverage_found" if first is not None else "radius_cap_exhausted"})
     raw = "".join(json.dumps(row,sort_keys=True)+"\n" for row in all_rows).encode()
-    (HERE / "radius-rows.jsonl").write_bytes(raw)
+    compressed = gzip.compress(raw,mtime=0)
+    (HERE / "radius-rows.jsonl.gz").write_bytes(compressed)
     return {"schema":"xedni-radius-threshold-result-v1","status":"PASS",
             "protocol_sha256":sha(protocol_raw),"script_sha256":sha((HERE/"run.py").read_bytes()),
             "source_panel_raw_sha256":sha(source_raw),"rows_sha256":sha(raw),
+            "rows_gzip_sha256":sha(compressed),
             "radius_rows":len(all_rows),"thresholds":thresholds}
 
 
