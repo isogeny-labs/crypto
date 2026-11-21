@@ -157,6 +157,7 @@ pub mod descent_lowgamma;
 pub mod descent_treewidth;
 pub mod diem_descent;
 pub mod diem_kgrow;
+pub mod diem_kgrow_linelog;
 pub mod diem_kgrow_semaev;
 pub mod diem_quartic;
 pub mod ec_index_calculus;

@@ -681,7 +681,8 @@ pub fn default_ladder_rungs() -> Vec<(u64, u32)> {
     vec![(5, 2), (11, 2), (17, 2), (13, 3)]
 }
 
-fn ols_alpha_beta(pts: &[(f64, f64)]) -> (Option<f64>, Option<f64>) {
+/// Ordinary least-squares fit of `y ≈ α x + β` (used by ladders).
+pub fn ols_alpha_beta(pts: &[(f64, f64)]) -> (Option<f64>, Option<f64>) {
     if pts.len() < 2 {
         return (None, None);
     }
