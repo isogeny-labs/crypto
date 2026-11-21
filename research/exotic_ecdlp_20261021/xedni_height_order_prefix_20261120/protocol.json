@@ -1,0 +1,18 @@
+{
+  "schema": "xedni-height-order-prefix-protocol-v1",
+  "box_rows_raw_sha256": "7edbcede5787ad2c07a61fe56b841c04250d01e3ff8ca8ec0959d8502a397706",
+  "radius_target_rows_raw_sha256": "e5e2a1900f7dcc19d1bdc62f7dd2dd7db21d6f11bec78013a453d30dddb0d02d",
+  "curve_coefficients": [94, 0, 188, 1738, 3805],
+  "Q": [-4, 19],
+  "R": ["52242961/137641", "-1907191742616/51064811"],
+  "reduction_prime": 47,
+  "subgroup_order": 43,
+  "height_pairing_precision_bits": 128,
+  "height_pairing_matrix": [["0.76115383900892333903295666575543006507", "-0.76008758370207971153917082321179783517"], ["-0.76008758370207971153917082321179783517", "16.600741728784049454515529725637870238"]],
+  "candidate_order": "for each nonidentity coefficient pair (a,b) in [-4,4]^2, compute Decimal score hQQ*a^2+2*hQR*a*b+hRR*b^2 from the frozen pairing strings, then sort by score,a,b; no rational candidate point is constructed for sorting",
+  "input_law": "all 42 nonidentity reduced public points, one independent target per search",
+  "online_interval": "one rational aQ+bR construction and reduction per prefix entry; Q,R and the height-pairing score are supplied setup inputs",
+  "collision_and_stop_rule": "same first equal-reduction collision and first direct-generator-multiple or target-lift-plus-collision stop as the frozen radius-order packet",
+  "measurement": "exact candidate evaluations, prefix coordinate peaks and per-target stops paired with the radius-order input points; full pairing computation is separate setup",
+  "claim_boundary": "finite order comparison on one curve; no calibrated wall or rho comparison"
+}
