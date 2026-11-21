@@ -518,17 +518,15 @@ impl Engine<'_> {
             })?;
             return Ok((quotient, remainder));
         }
-        // Fixed descending quotient degree avoids repeated trimming of the
-        // remainder, and skips zero quotient digits without field events.
+        // Keep the established general long-division loop: source-exact
+        // Rust A/B found a 5-10% regression for the fixed-degree variant.
         let mut remainder = a.to_vec();
         let mut quotient = vec![0; a.len() - b.len() + 1];
         let lead = *b.last().unwrap();
         let inv = if lead == 1 { 1 } else { self.inv(lead)? };
-        for shift in (0..quotient.len()).rev() {
-            let highest = remainder[shift + b.len() - 1];
-            if highest == 0 {
-                continue;
-            }
+        while remainder.len() >= b.len() {
+            let shift = remainder.len() - b.len();
+            let highest = *remainder.last().unwrap();
             let c = if lead == 1 {
                 highest
             } else {
@@ -541,10 +539,9 @@ impl Engine<'_> {
                 remainder[shift + k] = self.field(FieldOp::Sub, remainder[shift + k], product)?;
             }
             remainder[shift + b.len() - 1] = 0;
+            remainder = trim(remainder);
         }
-        remainder.truncate(b.len() - 1);
         let quotient = trim(quotient);
-        let remainder = trim(remainder);
         self.event(RootEvent::Division {
             a: a.to_vec(),
             b: b.to_vec(),
