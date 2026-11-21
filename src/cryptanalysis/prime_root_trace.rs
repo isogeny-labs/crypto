@@ -1125,6 +1125,28 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
 // In particular, initial 1 and x+delta need no allocation or division when
 // their degrees are smaller. A nonempty modulus is required in both paths.
 #[inline]
+// Keep the general cubic-and-higher reduction out of the linear/quadratic
+// modular-power hot path. The verifier has many repeated calls with tiny
+// moduli; inlining this loop there enlarges the entire exponentiation body.
+#[inline(never)]
+fn vpower_monic_remainder(mut remainder: Vec<u64>, modulus: &[u64], p: u64) -> Vec<u64> {
+    debug_assert!(modulus.len() >= 4 && modulus.last() == Some(&1));
+    let degree = modulus.len() - 1;
+    for shift in (0..remainder.len() - degree).rev() {
+        let high = remainder[shift + degree];
+        if high == 0 { continue; }
+        remainder[shift + degree] = 0;
+        for (i, &coefficient) in modulus[..degree].iter().enumerate() {
+            if coefficient == 0 { continue; }
+            let term = vmul(high, coefficient, p);
+            let old = remainder[shift + i];
+            remainder[shift + i] = if old >= term { old - term } else { old + p - term };
+        }
+    }
+    remainder.truncate(degree);
+    trim(remainder)
+}
+
 fn vpower_reduce(product: Vec<u64>, modulus: &[u64], p: u64) -> Result<Vec<u64>, String> {
     if !modulus.is_empty() && product.len() < modulus.len() {
         return Ok(product);
@@ -1133,21 +1155,7 @@ fn vpower_reduce(product: Vec<u64>, modulus: &[u64], p: u64) -> Result<Vec<u64>,
     // the remainder only: avoid allocating a quotient for every reduction.
     // Preserve the existing synthetic linear/quadratic division fast paths.
     if modulus.len() >= 4 && modulus.last() == Some(&1) {
-        let degree = modulus.len() - 1;
-        let mut remainder = product;
-        for shift in (0..remainder.len() - degree).rev() {
-            let high = remainder[shift + degree];
-            if high == 0 { continue; }
-            remainder[shift + degree] = 0;
-            for (i, &coefficient) in modulus[..degree].iter().enumerate() {
-                if coefficient == 0 { continue; }
-                let term = vmul(high, coefficient, p);
-                let old = remainder[shift + i];
-                remainder[shift + i] = if old >= term { old - term } else { old + p - term };
-            }
-        }
-        remainder.truncate(degree);
-        return Ok(trim(remainder));
+        return Ok(vpower_monic_remainder(product, modulus, p));
     }
     Ok(vdiv(&product, modulus, p)?.1)
 }
