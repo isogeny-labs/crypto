@@ -25,6 +25,30 @@ theorem covered_target_count_le {α : Type*} [DecidableEq α]
     covered.card ≤ 2 * M * C :=
   (Finset.card_le_card hcovered).trans (endpoint_card_le M C endpoint)
 
+theorem uniform_hit_fraction_le {α : Type*} [DecidableEq α]
+    (M C : ℕ) (endpoint : Fin M × Fin C × Bool → α)
+    (covered targets : Finset α)
+    (hcovered : covered ⊆ Finset.univ.image endpoint) :
+    (covered.card : ℚ) / (targets.card : ℚ) ≤
+      ((2 * M * C : ℕ) : ℚ) / (targets.card : ℚ) := by
+  have hcount := covered_target_count_le M C endpoint covered hcovered
+  exact div_le_div_of_nonneg_right (by exact_mod_cast hcount) (by positivity)
+
+theorem uniform_hit_fraction_le_min {α : Type*} [DecidableEq α]
+    (M C : ℕ) (endpoint : Fin M × Fin C × Bool → α)
+    (covered targets : Finset α)
+    (hcovered : covered ⊆ Finset.univ.image endpoint)
+    (htarget : covered ⊆ targets)
+    (hpositive : 0 < targets.card) :
+    (covered.card : ℚ) / (targets.card : ℚ) ≤
+      min 1 (((2 * M * C : ℕ) : ℚ) / (targets.card : ℚ)) := by
+  apply le_min
+  · have hcard : (covered.card : ℚ) ≤ (targets.card : ℚ) := by
+      exact_mod_cast Finset.card_le_card htarget
+    have hden : (0 : ℚ) < (targets.card : ℚ) := by exact_mod_cast hpositive
+    exact (div_le_iff₀ hden).2 (by simpa using hcard)
+  · exact uniform_hit_fraction_le M C endpoint covered targets hcovered
+
 def coefficient43 (c : Fin 3) : ZMod 43 :=
   if c.val = 0 then 1 else if c.val = 1 then 2 else 6
 
@@ -44,6 +68,8 @@ theorem prefix14_covers_nonzero :
 
 #print axioms endpoint_card_le
 #print axioms covered_target_count_le
+#print axioms uniform_hit_fraction_le
+#print axioms uniform_hit_fraction_le_min
 #print axioms prefix13_covered_count
 #print axioms prefix14_covered_count
 #print axioms prefix14_covers_nonzero
