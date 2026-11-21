@@ -792,6 +792,39 @@ fn vmonomial_product(m: &[u64], other: &[u64]) -> Option<Vec<u64>> {
     result[shift..].copy_from_slice(other);
     Some(trim(result))
 }
+// Build the monic product of distinct linear factors in place. Completing
+// root certificates previously allocated an intermediate Vec at every root,
+// even though multiplying by (X-r) needs only a backward coefficient pass.
+// The independent verifier still checks this product against f or the
+// Frobenius/GCD certificate; this is not an acceptance shortcut.
+fn vroot_product(roots: &[u64], p: u64) -> Result<Vec<u64>, String> {
+    let mut product = Vec::with_capacity(roots.len() + 1);
+    product.push(1);
+    let mut previous = None;
+    for &root in roots {
+        if root >= p || previous.is_some_and(|a| a >= root) {
+            return Err("noncanonical or repeated root".into());
+        }
+        previous = Some(root);
+        let c = if root == 0 { 0 } else { p - root };
+        let n = product.len();
+        product.push(0);
+        if c == 0 {
+            product.copy_within(0..n, 1);
+            product[0] = 0;
+            continue;
+        }
+        // Descending updates preserve the old coefficients until read.
+        // The sum is < 2p <= 2^62, so one conditional subtraction suffices.
+        for i in (1..n).rev() {
+            let sum = product[i - 1] + vmul(product[i], c, p);
+            product[i] = if sum >= p { sum - p } else { sum };
+        }
+        product[0] = vmul(product[0], c, p);
+    }
+    Ok(product)
+}
+
 fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     if a.is_empty() || b.is_empty() {
         return vec![];
@@ -1403,8 +1436,15 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 // unchanged terminal base. On new traces we avoid the costly
                 // polynomial square/division during independent replay too.
                 if state.exponent != 1 || base != &state.base {
-                    state.base =
-                        vdiv(&vproduct(&state.base, &state.base, p), &state.modulus, p)?.1;
+                    // Repeated squaring is symmetric. Reuse the verifier's
+                    // independently checked square kernel for longer bases;
+                    // retain the old product path for short-degree inputs.
+                    let square = if state.base.len() >= 5 {
+                        vsquare(&state.base, p)
+                    } else {
+                        vproduct(&state.base, &state.base, p)
+                    };
+                    state.base = vdiv(&square, &state.modulus, p)?.1;
                 }
                 state.exponent >>= 1;
                 if (*exponent, accumulator, base) != (state.exponent, &state.acc, &state.base) {
@@ -1549,15 +1589,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     // redundant polynomial exponentiation and Euclidean GCD
                     // during certificate verification, without trusting the
                     // producer's claimed xp_mod_f or linear_part.
-                    let mut product = vec![1];
-                    let mut previous = None;
-                    for &r in roots {
-                        if r >= p || previous.is_some_and(|a| a >= r) {
-                            return Err("noncanonical or repeated root".into());
-                        }
-                        previous = Some(r);
-                        product = vproduct(&product, &[(p - r) % p, 1], p);
-                    }
+                    let product = vroot_product(roots, p)?;
                     let completely_split = report.polynomial.len() >= 2
                         && roots.len() + 1 == report.polynomial.len()
                         && report.polynomial.last().is_some_and(|&lead| {
@@ -1630,6 +1662,41 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round83_inplace_roots_and_square_replay_equivalence() {
+        // Compare against the established independent polynomial operations,
+        // including X factors, full degree-eight products and sparse squares.
+        for p in [3, 17, 65_521, 1_000_000_007, MAX_PRIME] {
+            for degree in 0..=MAX_DEGREE {
+                if degree as u64 > p { continue; }
+                for seed in 0..64u64 {
+                    let mut roots: Vec<_> = (0..degree as u64)
+                        .map(|j| (seed * 137 + j * 31) % p).collect();
+                    roots.sort_unstable();
+                    roots.dedup();
+                    let expected = roots.iter().fold(vec![1], |f, &r| {
+                        vproduct(&f, &[(p - r) % p, 1], p)
+                    });
+                    assert_eq!(vroot_product(&roots, p).unwrap(), expected,
+                               "p={p} degree={degree} seed={seed}");
+                }
+            }
+            assert!(vroot_product(&[p], p).is_err());
+            assert!(vroot_product(&[1, 1], p).is_err());
+            assert!(vroot_product(&[2, 1], p).is_err());
+            for degree in 1..=MAX_DEGREE {
+                for seed in 0..64u64 {
+                    let mut f: Vec<_> = (0..=degree)
+                        .map(|j| ((seed * 127 + j as u64 * 71) % p)).collect();
+                    if f[degree] == 0 { f[degree] = 1; }
+                    for j in (1..degree).step_by(3) { f[j] = 0; }
+                    assert_eq!(vsquare(&f, p), vproduct(&f, &f, p),
+                               "square p={p} degree={degree} seed={seed}");
+                }
+            }
+        }
+    }
 
     #[test]
     fn round82_full_split_frobenius_certificate_and_tampering() {
