@@ -1038,6 +1038,65 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
             return Ok((trim(quotient), trim(remainder)));
         }
     }
+    // Round 92: fixed-shape synthetic division for dense monic cubics and
+    // quintics in F_(2^61-1). Avoid the general divisor iterator, per-term
+    // zero checks and dynamic indexing on these measured hot paths. The
+    // leading coefficient cancels exactly; each lower update stays canonical.
+    // Keep all other shapes/fields on the established paths.
+    if p == MAX_PRIME && b.len() == 4
+        && b[0] != 0 && b[1] != 0 && b[2] != 0 && b[3] == 1
+    {
+        let (c0, c1, c2) = (b[0], b[1], b[2]);
+        let mut remainder = a.to_vec();
+        let mut quotient = vec![0; a.len() - 3];
+        for shift in (0..quotient.len()).rev() {
+            let c = remainder[shift + 3];
+            if c == 0 { continue; }
+            quotient[shift] = c;
+            remainder[shift + 3] = 0;
+            let z = vmul(c, c0, p);
+            let old = remainder[shift];
+            remainder[shift] = if old >= z { old - z } else { old + p - z };
+            let z = vmul(c, c1, p);
+            let old = remainder[shift + 1];
+            remainder[shift + 1] = if old >= z { old - z } else { old + p - z };
+            let z = vmul(c, c2, p);
+            let old = remainder[shift + 2];
+            remainder[shift + 2] = if old >= z { old - z } else { old + p - z };
+        }
+        remainder.truncate(3);
+        return Ok((trim(quotient), trim(remainder)));
+    }
+    if p == MAX_PRIME && b.len() == 6
+        && b[..5].iter().all(|&x| x != 0) && b[5] == 1
+    {
+        let (c0, c1, c2, c3, c4) = (b[0], b[1], b[2], b[3], b[4]);
+        let mut remainder = a.to_vec();
+        let mut quotient = vec![0; a.len() - 5];
+        for shift in (0..quotient.len()).rev() {
+            let c = remainder[shift + 5];
+            if c == 0 { continue; }
+            quotient[shift] = c;
+            remainder[shift + 5] = 0;
+            let z = vmul(c, c0, p);
+            let old = remainder[shift];
+            remainder[shift] = if old >= z { old - z } else { old + p - z };
+            let z = vmul(c, c1, p);
+            let old = remainder[shift + 1];
+            remainder[shift + 1] = if old >= z { old - z } else { old + p - z };
+            let z = vmul(c, c2, p);
+            let old = remainder[shift + 2];
+            remainder[shift + 2] = if old >= z { old - z } else { old + p - z };
+            let z = vmul(c, c3, p);
+            let old = remainder[shift + 3];
+            remainder[shift + 3] = if old >= z { old - z } else { old + p - z };
+            let z = vmul(c, c4, p);
+            let old = remainder[shift + 4];
+            remainder[shift + 4] = if old >= z { old - z } else { old + p - z };
+        }
+        remainder.truncate(5);
+        return Ok((trim(quotient), trim(remainder)));
+    }
     // General long division: a descending fixed degree removes both the
     // per-iteration pop/trim scan and multiplications by zero divisor
     // coefficients. The top term cancels algebraically for every step.
@@ -1560,6 +1619,49 @@ mod tests {
             ((a as u128 * x as u128 + b as u128) % p as u128) as u64
         })
     }
+    #[test]
+    fn round92_mersenne_dense_synthetic_division_reconstructs_dividend() {
+        // Independent u128 polynomial identity, including zero quotient digits,
+        // equal degrees, short dividends and deliberately nonmatching shapes.
+        let mut seed = 0x92_2026_1121_00u64;
+        for p in [65_521u64, 1_000_000_007, MAX_PRIME] {
+            for degree in [3usize, 5] {
+                for width in [degree - 1, degree + 1, degree + 2, 8, 12, 16] {
+                    for trial in 0..384 {
+                        let mut a = vec![0u64; width];
+                        let mut b = vec![0u64; degree + 1];
+                        for x in a.iter_mut().chain(b.iter_mut()) {
+                            seed = seed.wrapping_mul(6364136223846793005)
+                                .wrapping_add(1442695040888963407);
+                            *x = 1 + (seed % (p - 1));
+                        }
+                        // Exercise skipped quotient digits and fallback shapes.
+                        if trial % 7 == 0 && a.len() > 3 { a[1] = 0; }
+                        if trial % 11 == 0 && a.len() > 4 { a[3] = 0; }
+                        if trial % 13 == 0 { b[1] = 0; }
+                        b[degree] = if trial % 17 == 0 { 2 } else { 1 };
+                        let (q, r) = vdiv(&a, &b, p).unwrap();
+                        assert!(r.len() < b.len(), "bad remainder degree");
+                        assert!(q.last() != Some(&0) && r.last() != Some(&0));
+                        let mut recomposed = vec![0u64; a.len().max(q.len() + b.len())];
+                        for (i, &x) in q.iter().enumerate() {
+                            for (j, &y) in b.iter().enumerate() {
+                                let z = recomposed[i + j] as u128
+                                    + x as u128 * y as u128;
+                                recomposed[i + j] = (z % p as u128) as u64;
+                            }
+                        }
+                        for (i, &x) in r.iter().enumerate() {
+                            recomposed[i] =
+                                ((recomposed[i] as u128 + x as u128) % p as u128) as u64;
+                        }
+                        assert_eq!(trim(recomposed), trim(a), "p={p}, degree={degree}, trial={trial}");
+                    }
+                }
+            }
+        }
+    }
+
     #[test]
     fn exhaustive_quadratics_over_f7_match_direct_evaluation() {
         for a in 0..7 {
