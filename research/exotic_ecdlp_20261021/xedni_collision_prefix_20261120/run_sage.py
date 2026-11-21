@@ -105,9 +105,11 @@ def main():
             "target_rows_raw_sha256":target_sha,"candidate_points":len(prefix),
             "distinct_reduced_targets":len(seen),"full_coverage_index":max(v[0] for v in first_hit.values()),
             "first_collision":first_collision,"targets":len(rows),
-            "direct_before_collision":sum(row["stop_reason"]=="direct_generator_multiple" for row in rows),
+            "direct_generator_multiple_stops":sum(row["stop_reason"]=="direct_generator_multiple" for row in rows),
             "target_stop_min":min(stops),"target_stop_median":statistics.median(stops),
-            "target_stop_max":max(stops),"sum_independent_target_point_evaluations":sum(stops)}
+            "target_stop_max":max(stops),"sum_independent_target_point_evaluations":sum(stops),
+            "target_stop_prefix_height_median_bits":statistics.median(row["prefix_max_height_bits"] for row in rows),
+            "target_stop_prefix_height_max_bits":max(row["prefix_max_height_bits"] for row in rows)}
 
 
 if __name__ == "__main__":
