@@ -80,3 +80,9 @@ the EKS rows (3-17) are unchanged. Every figure is `[pcc:unverified]`.
   (37.2565) are listed by the 2026-11-17 snapshot among the pods "of this study". If they are, the ledger is US$538.80
   and the guard refuses this route's launch (538.80 + 31.20 > 510). The owner decides.
 - **Check at this update.** `ledger_sum` 465.8424; this route's worst case 31.2000 (1.04 x 30 h); 497.0424 <= 510.
+- **Owner decision 24 (2026-11-21, later the same day).** The guard is US$535 and the ceiling US$540; the per-job cap
+  is US$65. With the ledger unchanged at 465.8424 and the new job's worst case 2.08 × 30 = 62.40, the check is
+  528.2424 <= 535. With the UNKNOWN-5 pods counted it would be 601.20, above both.
+- **Owner decision 24 (2026-11-21, later the same day).** The guard is US$535 and the ceiling US$540; the per-job cap
+  is US$65. With the ledger unchanged at 465.8424 and the new job's worst case 2.08 × 30 = 62.40, the check is
+  528.2424 <= 535. With the UNKNOWN-5 pods counted it would be 601.20, above both.

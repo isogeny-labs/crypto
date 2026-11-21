@@ -161,3 +161,11 @@ response (HTTP code and its `cloud`, `cpu`, `cost`, `dataCenterId`), the live GE
 bash entrypoint and the pinned image, the cgroup files before start, the git gate on a committed and pushed tree (a
 development tree is git-ignored, so it is added with `git add -f` for the check), `DELETE` (204), the list afterwards
 and a GET of the deleted pod (404). Every statement here is `[pcc:unverified]`.
+
+## Owner decision 24 (2026-11-21): the smoke moves to the 32-vCPU pod
+
+The route's one flavor is now `cpu5m` at 32 vCPU and 256 GB (US$2.08/h), so the development smoke runs on that size
+(a `t <= 8` stage costs under US$0.50 for under 15 minutes). In addition to the list above it should record the
+cgroup `memory.max` of a 256 GB pod (the pre-start check needs `max` or at least 256,000,000,000 bytes) and the GET
+record's `cpu.memory` (the floor is 256). A development stage may use `--max-dense` 54000000000. Every statement here is
+`[pcc:unverified]`.

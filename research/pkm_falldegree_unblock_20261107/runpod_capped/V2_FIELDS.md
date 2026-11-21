@@ -13,7 +13,7 @@ REST v1 (`rest.runpod.io/v1`) answered with a proxy 502 from this container; v2 
 
 | purpose | v1 (draft Amendment 18) | v2 (Amendment 33) | observed |
 |:--|:--|:--|:--|
-| price and stock | GraphQL `cpuFlavors { ramMultiplier }`, `specifics { stockStatus securePrice }` | `GET /catalog/cpus/cpu5m?include=AVAILABILITY&product=POD&vcpuCount=16` | 200: `availability` `HIGH`, `ramGbPerVcpu` 8, `vcpu` `{min 2, max 32}`, `price.securePerVcpu` 0.065, so 16 vCPU cost 1.04 per hour |
+| price and stock | GraphQL `cpuFlavors { ramMultiplier }`, `specifics { stockStatus securePrice }` | `GET /catalog/cpus/cpu5m?include=AVAILABILITY&product=POD&vcpuCount=32` (16 until owner decision 24) | 200: `availability` `HIGH`, `ramGbPerVcpu` 8, `vcpu` `{min 2, max 32}`, `price.securePerVcpu` 0.065, so 16 vCPU cost 1.04 and 32 vCPU 2.08 per hour; at 32 vCPU the data centers `EU-RO-1` and `EUR-IS-1` were listed at about 21:30Z |
 | create | `POST /v1/pods` | `POST /pods` | not called (paid); the spec answers 201 (created) or 202 (queued, only with the `queue` option) |
 | pod record | `GET /v1/pods/{id}` | `GET /pods/{id}` | 200 on an existing pod; 404 with body `{"detail":"pod not found","status":404,"title":"Not Found"}` on an unknown id |
 | list | `GET /v1/pods`, a bare array | `GET /pods` | 200: `{"pods":[...], "pagination":{"hasNextPage":false, "nextCursor":null}}`; 26 pods, all `EXITED`, none named `pkm-x-` or `pfd-` |
@@ -51,7 +51,7 @@ Field names of `GET /pods/{id}` on an existing CPU pod (keys only; [pcc:unverifi
 
 ## Create body
 
-`run.sh` sends main's v2 shape [pcc:unverified]: `{name, cloud: "SECURE", cpu: {id: "cpu5m", vcpuCount: 16}, image, disk: 20,
+`run.sh` sends main's v2 shape [pcc:unverified]: `{name, cloud: "SECURE", cpu: {id: "cpu5m", vcpuCount: 32}, image, disk: 20,
 ports: ["8000/http"], env: {RUNNER_TOKEN}, entrypoint: ["bash", "-c"], cmd: [<boot script>]}`. The image is main's pinned
 digest `python:3.12-slim@sha256:5e2bdb1b…` (same tag as the two development smokes, now by digest). The spec says
 `entrypoint` and `cmd` are encoded into `args`, which the record returns as one string; the route never reads `args`
@@ -71,7 +71,7 @@ v1 `create`, `pod` and `delete` commands; the route never calls them (offline te
 To be recorded at the development smoke at t = 8 that the main session runs after review:
 - the create response (HTTP 201): whether it carries `cloud`, `cpu.id`, `cpu.vcpuCount` and `cost` (the route refuses
   and deletes the pod if any is missing), and whether `dataCenterId` is null there;
-- the GET record of a live CPU pod: `cpu.memory` (expected 128), `status` `RUNNING`, `dataCenterId`, `startedAt`, and
+- the GET record of a live CPU pod: `cpu.memory` (expected 256 on the 32-vCPU pod), `status` `RUNNING`, `dataCenterId`, `startedAt`, and
   `env.RUNNER_TOKEN` (token recovery);
 - the proxy URL and the runner behind it, with the v2-created pod and the bash entrypoint;
 - the cgroup files (`memory.max` at least 112 GiB);
