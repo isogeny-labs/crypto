@@ -48,3 +48,23 @@ lever at genus 3 and on quartics: block Wiedemann with a wider block, or a spars
 exploits the two-large-prime structure before the merge (the core's generic entries dominate the
 cost, per C1's model check). The relation phase's Cantor steps are the lever at genus 2, where no
 arm is below rho.
+
+## Round 2 opening analysis (2026-11-21, main session, from C4's rows) [pcc:unverified]
+
+**Cost shares of the genus-3 SGE(8,3) arm** (FPM_mid): the linear-algebra share rises 0.48, 0.53,
+0.57, 0.60, 0.64, 0.68 from p = 8209 to 262147 while the Cantor walk falls 0.24 → 0.13 and the
+smoothness test 0.22 → 0.16. Over the 32× range of p: `la_mul` scales as p^1.52, the relation
+phase (`cantor_mul`) as p^1.25, `core_cols` as p^0.69 (theory 2/3), so the average weight of the
+merged core grows about p^0.15. The LA, not the relation phase, caps the ratio.
+
+**Expected-rho reference.** Replacing the six measured rho runs per prime by the expected
+negation-rho cost (0.886·√r steps × the measured 219 `cantor_mul` and the measured inversions per
+step) gives SGE arm / expected rho = 0.333, 0.546, 0.388, 0.434, 0.358, 0.342 at p = 8209, 16411,
+32771, 65537, 131101, 262147. Measured rho ran at 1.15, 1.43, 1.37, 1.04, 0.71, 1.16 of its
+expectation, which is what produced 0.290 at 8209 and 0.507 at 131101. The de-noised line is flat
+at 0.33–0.43 across a 32× range of p where the asymptotic p^{−1/6} would predict a fall by 1.8×.
+
+**Round 2 leads.** R2: 9 curves per prime at 65537–262147 to pin both exponents (with the expected
+reference as a second reading). R3: relation excess with lightest-row selection before SGE, to cut
+the merged core's weight (the only lever the shares point at). Not pursued: deeper merge (C1) and
+the base constant (C2), both closed.
