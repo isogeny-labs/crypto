@@ -1,0 +1,40 @@
+--------------------------------------------------------------------------------
+Profile data file 's1/C.cg' (creator: callgrind-3.22.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 464548223
+Trigger: Program termination
+Profiled target:  step1/jv_cover --exp ccov --sizes 53 --seeds 1 --residuals 100 --constructed 4 --oracle-base 0 --stop hilbert:16 --trace --json C.json (PID 1733, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+Ir                   
+--------------------------------------------------------------------------------
+979,078,770 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                    file:function
+--------------------------------------------------------------------------------
+126,395,732 (12.91%)  ???:<core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<(u32, u64)>>, crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#41}> as core::iter::traits::iterator::Iterator>::try_fold::<(), <core::iter::adapters::GenericShunt<core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<(u32, u64)>>, crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic::{closure#41}>, core::option::Option<core::convert::Infallible>> as core::iter::traits::iterator::Iterator>::try_fold<(), core::iter::traits::iterator::Iterator::try_for_each::call<alloc::vec::Vec<u32>, core::ops::control_flow::ControlFlow<alloc::vec::Vec<u32>>, core::ops::control_flow::ControlFlow<alloc::vec::Vec<u32>>::Break>::{closure#0}, core::ops::control_flow::ControlFlow<alloc::vec::Vec<u32>>>::{closure#0}, core::ops::control_flow::ControlFlow<core::ops::control_flow::ControlFlow<alloc::vec::Vec<u32>>>> [step1/jv_cover]
+117,809,017 (12.03%)  ???:<<crypto_lib::cryptanalysis::f4_fp::Packed>::symbolic::Interned>::id [step1/jv_cover]
+102,228,134 (10.44%)  ???:<crypto_lib::cryptanalysis::f4_fp::Packed>::symbolic [step1/jv_cover]
+ 99,867,843 (10.20%)  ???:crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic [step1/jv_cover]
+ 55,972,117 ( 5.72%)  ???:crypto_lib::cryptanalysis::f4_fp::rref32_deferred [step1/jv_cover]
+ 52,230,413 ( 5.33%)  ???:<alloc::vec::Vec<u32> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<u32, core::iter::adapters::map::Map<alloc::vec::into_iter::IntoIter<u64>, crypto_lib::cryptanalysis::f4_fp::rref32_deferred::{closure#7}::{closure#0}>>>::from_iter [step1/jv_cover]
+ 38,041,180 ( 3.89%)  ???:<crypto_lib::cryptanalysis::f4_fp::Cols>::get [step1/jv_cover]
+ 34,141,518 ( 3.49%)  ???:<alloc::vec::Vec<(u128, u32)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(u128, u32), core::iter::adapters::map::Map<core::iter::adapters::enumerate::Enumerate<core::slice::iter::Iter<u128>>, <crypto_lib::cryptanalysis::f4_fp::Packed>::symbolic::{closure#8}>>>::from_iter [step1/jv_cover]
+ 22,105,475 ( 2.26%)  ???:crypto_lib::cryptanalysis::f4_fp::add_lazy_avx2 [step1/jv_cover]
+ 20,600,518 ( 2.10%)  ???:_rjem_sdallocx [step1/jv_cover]
+ 18,089,895 ( 1.85%)  ???:<alloc::vec::Vec<(alloc::vec::Vec<u32>, u64)> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<(alloc::vec::Vec<u32>, u64), core::iter::adapters::map::Map<core::iter::adapters::filter::Filter<core::iter::adapters::enumerate::Enumerate<core::slice::iter::Iter<u32>>, crypto_lib::cryptanalysis::f4_fp::interreduce_linear_with::{closure#14}::{closure#0}>, crypto_lib::cryptanalysis::f4_fp::interreduce_linear_with::{closure#14}::{closure#1}>>>::from_iter [step1/jv_cover]
+ 17,397,648 ( 1.78%)  ???:_rjem_malloc [step1/jv_cover]
+ 14,002,622 ( 1.43%)  ./string/../sysdeps/x86_64/multiarch/memset-vec-unaligned-erms.S:__memset_avx2_unaligned_erms [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 13,689,027 ( 1.40%)  ???:_rjem_je_tcache_bin_flush_small [step1/jv_cover]
+ 13,279,735 ( 1.36%)  ???:crypto_lib::cryptanalysis::groebner_f4::cmp_monomial [step1/jv_cover]

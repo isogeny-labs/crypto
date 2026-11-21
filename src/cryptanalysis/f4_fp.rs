@@ -1276,6 +1276,42 @@ pub struct TraceStep {
     pub degree: u32,
     pub rows: Vec<(usize, Vec<u32>)>,
     pub new_lms: Vec<Vec<u32>>,
+    /// The step's symbolic preprocessing, frozen by the first replay that
+    /// runs it (packed runs only).  Its output depends only on the seed rows
+    /// (the recorded `rows`), the alive leading monomials (equal on every
+    /// replay that reached this step: each earlier step's new leading
+    /// monomials were checked) and the supports of the basis elements it
+    /// touches, which a later replay compares before reusing it; on a
+    /// different support the step runs symbolic preprocessing as before.
+    #[serde(skip)]
+    frozen: std::sync::OnceLock<FrozenStep>,
+}
+
+/// One step's frozen symbolic preprocessing ([`TraceStep::frozen`]).
+#[derive(Clone, Debug, Default)]
+struct FrozenStep {
+    /// Every basis element the rows use, with its packed terms when frozen.
+    support: Vec<(usize, Vec<u128>)>,
+    /// The reducer rows symbolic preprocessing added, after the seed rows.
+    extra: Vec<(usize, u128)>,
+    /// The columns, packed, in decreasing order.
+    cols: Vec<u128>,
+    /// Every row (seed rows, then reducer rows) as column indices.
+    row_cols: Vec<Vec<u32>>,
+}
+
+static FROZEN_HITS: AtomicU64 = AtomicU64::new(0);
+
+/// Replayed steps that reused frozen symbolic preprocessing, process-wide.
+pub fn frozen_steps_total() -> u64 {
+    FROZEN_HITS.load(AtomicOrdering::Relaxed)
+}
+
+/// `F4_FP_FREEZE=0` makes every replay run its steps' symbolic
+/// preprocessing (the path before 2026-11-21), a same-binary control.
+fn freeze_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_FREEZE").as_deref() != Ok("0"))
 }
 
 /// The trace of one run (Joux–Vitse's "F4 remake": the useful rows of
@@ -1326,6 +1362,10 @@ fn tracked_rref_contributors(rows: &[Vec<u64>], p: u64) -> Vec<(usize, Vec<usize
         for v in m[r].iter_mut() {
             *v = ((*v as u128 * inv as u128) % p as u128) as u64;
         }
+        // Charged to the recording run like any other row operation (since
+        // 2026-11-21; before, the tracked elimination a recording adds was
+        // not counted at all).
+        count_ops(ncols);
         let pivot_row = m[r].clone();
         let pivot_who = who[r].clone();
         for i in 0..n {
@@ -1335,6 +1375,7 @@ fn tracked_rref_contributors(rows: &[Vec<u64>], p: u64) -> Vec<(usize, Vec<usize
                 for (x, &y) in m[i].iter_mut().zip(&pivot_row) {
                     *x = ((*x as u128 + neg as u128 * y as u128) % p as u128) as u64;
                 }
+                count_ops(ncols);
                 for (a, &b) in who[i].iter_mut().zip(&pivot_who) {
                     *a |= b;
                 }
@@ -1374,17 +1415,38 @@ enum TraceMode<'a> {
     Replay(&'a F4Trace),
 }
 
+impl TraceMode<'_> {
+    /// The same mode for one more run, borrowing the trace again.
+    fn reborrow(&mut self) -> TraceMode<'_> {
+        match self {
+            TraceMode::Off => TraceMode::Off,
+            TraceMode::Record(t) => TraceMode::Record(t),
+            TraceMode::Replay(t) => TraceMode::Replay(t),
+        }
+    }
+}
+
+/// One F4 run with the run's stop rule: through [`f4_hilbert_guarded`] when
+/// `opts.stop_hilbert` is set, else [`f4_with_arithmetic`].  Recording and
+/// replaying go through here, so a traced run keeps the Hilbert rule (before
+/// 2026-11-21 they called the engine directly and silently ran without it).
+fn f4_dispatch(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    trace: TraceMode,
+) -> F4Report {
+    match opts.stop_hilbert {
+        Some(chunk) => f4_hilbert_guarded(input, n_vars, p, opts, chunk, trace),
+        None => f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), trace),
+    }
+}
+
 /// [`f4`] recording the trace of the run.
 pub fn f4_record(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> (F4Report, F4Trace) {
     let mut trace = F4Trace::default();
-    let r = f4_with_arithmetic(
-        input,
-        n_vars,
-        p,
-        opts,
-        arithmetic_mode(),
-        TraceMode::Record(&mut trace),
-    );
+    let r = f4_dispatch(input, n_vars, p, opts, TraceMode::Record(&mut trace));
     (r, trace)
 }
 
@@ -1398,14 +1460,7 @@ pub fn f4_replay(
     opts: &F4Options,
     trace: &F4Trace,
 ) -> F4Report {
-    f4_with_arithmetic(
-        input,
-        n_vars,
-        p,
-        opts,
-        arithmetic_mode(),
-        TraceMode::Replay(trace),
-    )
+    f4_dispatch(input, n_vars, p, opts, TraceMode::Replay(trace))
 }
 
 fn arithmetic_mode() -> u8 {
@@ -1620,13 +1675,33 @@ fn rref_blocked<T: Copy + Default + PartialEq + Send>(
 /// monomials whose degree stays below 128 is the sum of their packings,
 /// and the top bit of every field is free to guard divisibility tests.
 fn pack(e: &[u32]) -> u128 {
-    e.iter()
-        .enumerate()
-        .fold(0u128, |acc, (i, &x)| acc | (x as u128) << (8 * i))
+    // byte per field (exponents are below 128 on the packed path, so the
+    // truncation is exact); one load instead of a shift-or per field
+    let mut b = [0u8; 16];
+    for (d, &x) in b.iter_mut().zip(e) {
+        *d = x as u8;
+    }
+    u128::from_le_bytes(b)
 }
 
 fn unpack(x: u128, n: usize) -> Vec<u32> {
-    (0..n).map(|i| ((x >> (8 * i)) & 0xff) as u32).collect()
+    x.to_le_bytes()[..n].iter().map(|&b| b as u32).collect()
+}
+
+/// The position of the first of `lms` (packed leading monomials, in basis
+/// order) that divides `m`, as `lms.iter().position(|&a| divides(a, m))`
+/// under the guard `guard`.  With at most 8 variables every field lies in
+/// the low word, so the test runs on `u64`: exponents below 128 cannot
+/// borrow across fields, and the high words are zero.  Same position, so the
+/// same reducer, rows and probe count.
+#[inline]
+fn first_alive_divisor(lms: &[u128], guard: u128, m: u128) -> Option<usize> {
+    if guard >> 64 == 0 {
+        let (g, mg) = (guard as u64, (m | guard) as u64);
+        lms.iter().position(|&a| mg.wrapping_sub(a as u64) & g == g)
+    } else {
+        lms.iter().position(|&a| ((m | guard) - a) & guard == guard)
+    }
 }
 
 /// The columns of one F4 matrix, in decreasing monomial order: packed when
@@ -1828,13 +1903,6 @@ impl Packed {
         }
     }
 
-    /// Does `a` divide `b`?  Each field of `b | guard` minus `a`'s keeps
-    /// its guard bit exactly when it does not borrow.
-    #[inline]
-    fn divides(&self, a: u128, b: u128) -> bool {
-        ((b | self.guard) - a) & self.guard == self.guard
-    }
-
     /// A key ordered as `cmp_monomial(·, ·, Grevlex)`: the degree above
     /// `127 − e_i` with the last variable most significant (a smaller last
     /// exponent is the larger monomial).
@@ -1866,6 +1934,7 @@ impl Packed {
     ) -> (Vec<(usize, u128)>, Vec<u128>, Vec<Vec<u32>>) {
         const UNKNOWN: u32 = u32::MAX;
         let alive_idx: Vec<usize> = (0..self.lms.len()).filter(|&i| alive[i]).collect();
+        let alive_lms: Vec<u128> = alive_idx.iter().map(|&i| self.lms[i]).collect();
         let mut ids: PkMap<u128, u32> = PkMap::default();
         let mut monos: Vec<u128> = Vec::new();
         let mut is_lead: Vec<bool> = Vec::new();
@@ -1968,9 +2037,7 @@ impl Packed {
                     return None;
                 }
                 let mono = monos[id];
-                let k = alive_idx
-                    .iter()
-                    .position(|&i| self.divides(self.lms[i], mono));
+                let k = first_alive_divisor(&alive_lms, self.guard, mono);
                 count_native(k.map_or(alive_idx.len(), |k| k + 1) as u64);
                 k.map(|k| (alive_idx[k], mono - self.lms[alive_idx[k]]))
             };
@@ -2069,6 +2136,8 @@ impl Packed {
             rows.push(row);
         }
         let alive_idx: Vec<usize> = (0..self.lms.len()).filter(|&i| alive[i]).collect();
+        // the alive leading monomials contiguous, for the reducer scan
+        let alive_lms: Vec<u128> = alive_idx.iter().map(|&i| self.lms[i]).collect();
         let mut extra: Vec<(usize, u128)> = Vec::new();
         while let Some(id) = t.queue.pop() {
             if t.done[id as usize] {
@@ -2076,9 +2145,7 @@ impl Packed {
             }
             t.done[id as usize] = true;
             let mono = t.monos[id as usize];
-            let found = alive_idx
-                .iter()
-                .position(|&i| self.divides(self.lms[i], mono));
+            let found = first_alive_divisor(&alive_lms, self.guard, mono);
             count_native(found.map_or(alive_idx.len(), |k| k + 1) as u64);
             if let Some(idx) = found.map(|k| alive_idx[k]) {
                 let m = mono - self.lms[idx];
@@ -2816,6 +2883,9 @@ fn rref32_deferred(
     fp: Barrett,
     deadline: Option<Instant>,
 ) -> Option<Vec<usize>> {
+    if let Some(every) = narrow_acc_interval(fp.p) {
+        return rref32_deferred_n32(rows, fp32, fp, deadline, every);
+    }
     let _timer = MemTimer::new(1);
     let simd = lazy_simd_kind();
     let parallel = deferred_parallel();
@@ -2888,6 +2958,243 @@ fn rref32_deferred(
         let mut pending = 0usize;
         reduce_lazy_by(&mut acc, &known[i + 1..], fp, simd, &mut pending);
         acc.into_iter().map(|v| fp.reduce(v) as u32).collect()
+    };
+    let o0 = pp_ops();
+    let spread = parallel && known.len() * n_cols > PAR_WORK;
+    let reduced: Vec<Vec<u32>> = if spread {
+        (0..known.len()).into_par_iter().map(back).collect()
+    } else {
+        (0..known.len()).map(back).collect()
+    };
+    pp_add(
+        if spread {
+            PP_DEF_BACK_PAR
+        } else {
+            PP_DEF_BACK_SER
+        },
+        pp_ops() - o0,
+    );
+    let pivots = known.iter().map(|(c, _)| *c).collect();
+    *rows = reduced;
+    Some(pivots)
+}
+
+/// For small primes the deferred elimination keeps its accumulators in
+/// 32-bit lanes: `Some(k)` when `(p - 1) + k (p - 1)^2 < 2^32` with
+/// `k >= 256`, i.e. `p <= 4097`, normalising every `k` updates (none at all
+/// on rows shorter than that).  Each value stays exact over the integers,
+/// so the reduced echelon form, and every counted operation, is the one the
+/// 64-bit accumulators give.  `F4_FP_NARROW_ACC=0` keeps the 64-bit path
+/// (also kept under `F4_FP_MEM=1`, whose fused kernel is 64-bit).
+fn narrow_acc_interval(p: u64) -> Option<usize> {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    let on = *ON.get_or_init(|| std::env::var("F4_FP_NARROW_ACC").as_deref() != Ok("0"));
+    if !on || mem_site(0) {
+        return None;
+    }
+    narrow_acc_interval_for(p)
+}
+
+/// The interval of [`narrow_acc_interval`] for `p`, ignoring the toggles.
+fn narrow_acc_interval_for(p: u64) -> Option<usize> {
+    if !(2..=1 << 16).contains(&p) {
+        return None;
+    }
+    let q = (p - 1) * (p - 1);
+    let k = (u64::from(u32::MAX) - (p - 1)) / q.max(1);
+    (k >= 256).then_some(k as usize)
+}
+
+#[inline(always)]
+fn add_lazy32_scalar(acc: &mut [u32], pivot: &[u32], from: usize, factor: u32) {
+    for (x, &y) in acc[from..].iter_mut().zip(&pivot[from..]) {
+        *x += factor * y;
+    }
+}
+
+/// Eight 32-bit products accumulated in 32-bit lanes; the caller's
+/// normalisation interval keeps every lane below 2^32.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn add_lazy32_avx2(acc: &mut [u32], pivot: &[u32], from: usize, factor: u32) {
+    use std::arch::x86_64::{
+        __m256i, _mm256_add_epi32, _mm256_loadu_si256, _mm256_mullo_epi32, _mm256_set1_epi32,
+        _mm256_storeu_si256,
+    };
+    let (acc, pivot) = (&mut acc[from..], &pivot[from..]);
+    let multiplier = _mm256_set1_epi32(factor as i32);
+    let mut i = 0;
+    while i + 8 <= acc.len() {
+        // SAFETY: the bounds cover eight entries of both slices; the loads
+        // and the store accept unaligned pointers.
+        let values = unsafe { _mm256_loadu_si256(pivot.as_ptr().add(i) as *const __m256i) };
+        let current = unsafe { _mm256_loadu_si256(acc.as_ptr().add(i) as *const __m256i) };
+        let updated = _mm256_add_epi32(current, _mm256_mullo_epi32(values, multiplier));
+        unsafe { _mm256_storeu_si256(acc.as_mut_ptr().add(i) as *mut __m256i, updated) };
+        i += 8;
+    }
+    for (x, &y) in acc[i..].iter_mut().zip(&pivot[i..]) {
+        *x += factor * y;
+    }
+}
+
+/// Sixteen 32-bit products accumulated in 32-bit lanes.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx512f")]
+unsafe fn add_lazy32_avx512(acc: &mut [u32], pivot: &[u32], from: usize, factor: u32) {
+    use std::arch::x86_64::{
+        __m512i, _mm512_add_epi32, _mm512_loadu_si512, _mm512_mullo_epi32, _mm512_set1_epi32,
+        _mm512_storeu_si512,
+    };
+    let (acc, pivot) = (&mut acc[from..], &pivot[from..]);
+    let multiplier = _mm512_set1_epi32(factor as i32);
+    let mut i = 0;
+    while i + 16 <= acc.len() {
+        // SAFETY: as in `add_lazy32_avx2`, for sixteen entries.
+        let values = unsafe { _mm512_loadu_si512(pivot.as_ptr().add(i) as *const __m512i) };
+        let current = unsafe { _mm512_loadu_si512(acc.as_ptr().add(i) as *const __m512i) };
+        let updated = _mm512_add_epi32(current, _mm512_mullo_epi32(values, multiplier));
+        unsafe { _mm512_storeu_si512(acc.as_mut_ptr().add(i) as *mut __m512i, updated) };
+        i += 16;
+    }
+    for (x, &y) in acc[i..].iter_mut().zip(&pivot[i..]) {
+        *x += factor * y;
+    }
+}
+
+/// [`add_lazy`] in 32-bit lanes, counted the same way.
+#[inline]
+fn add_lazy32(acc: &mut [u32], pivot: &[u32], from: usize, factor: u32, simd: u8) {
+    debug_assert_eq!(acc.len(), pivot.len());
+    #[cfg(target_arch = "x86_64")]
+    if simd == 0 {
+        add_lazy32_scalar(acc, pivot, from, factor);
+    } else if simd == 2 {
+        // SAFETY: `lazy_simd_kind` verified AVX-512F and AVX2.
+        unsafe { add_lazy32_avx512(acc, pivot, from, factor) };
+    } else {
+        // SAFETY: `lazy_simd_kind` verified AVX2 before this call.
+        unsafe { add_lazy32_avx2(acc, pivot, from, factor) };
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        let _ = simd;
+        add_lazy32_scalar(acc, pivot, from, factor);
+    }
+    count_ops(acc.len() - from);
+}
+
+/// [`reduce_lazy_by`] in 32-bit lanes, normalising every `every` updates.
+#[inline]
+fn reduce_lazy_by32(
+    acc: &mut [u32],
+    known: &[(usize, Vec<u32>)],
+    fp32: Barrett32,
+    simd: u8,
+    pending: &mut usize,
+    every: usize,
+) {
+    for (c, pivot) in known {
+        let f = fp32.reduce(acc[*c]);
+        if f != 0 {
+            add_lazy32(acc, pivot, *c, fp32.p - f, simd);
+            *pending += 1;
+            if *pending == every {
+                for x in acc.iter_mut() {
+                    *x = fp32.reduce(*x);
+                }
+                *pending = 0;
+            }
+        }
+    }
+}
+
+/// [`rref32_deferred`] with 32-bit accumulators ([`narrow_acc_interval`]):
+/// the same chunks, order, pivots and counted operations; no widening of
+/// the rows and no 64-bit reduction when they are stored.
+fn rref32_deferred_n32(
+    rows: &mut Vec<Vec<u32>>,
+    fp32: Barrett32,
+    fp: Barrett,
+    deadline: Option<Instant>,
+    every: usize,
+) -> Option<Vec<usize>> {
+    let _timer = MemTimer::new(1);
+    let simd = lazy_simd_kind();
+    let parallel = deferred_parallel();
+    let mut known: Vec<(usize, Vec<u32>)> = Vec::new();
+    let sources = std::mem::take(rows);
+    let chunk_rows = if parallel { DEFERRED_CHUNK } else { 1 };
+    let _def_ns = PpNs(PP_DEF_NS, Instant::now());
+    pp_add(PP_DEF_ROWS, sources.len() as u64);
+    for chunk in sources.chunks(chunk_rows) {
+        pp_add(PP_DEF_CHUNKS, 1);
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return None;
+        }
+        let n_cols = chunk[0].len();
+        let reduce_one = |source: &Vec<u32>| -> (Vec<u32>, usize) {
+            let mut acc = source.clone();
+            let mut pending = 0usize;
+            reduce_lazy_by32(&mut acc, &known, fp32, simd, &mut pending, every);
+            (acc, pending)
+        };
+        let o0 = pp_ops();
+        let spread = chunk.len() > 1 && chunk.len() * known.len().max(1) * n_cols > PAR_WORK;
+        let mut reduced: Vec<(Vec<u32>, usize)> = if spread {
+            chunk.par_iter().map(reduce_one).collect()
+        } else {
+            chunk.iter().map(reduce_one).collect()
+        };
+        let o1 = pp_ops();
+        pp_add(
+            if spread {
+                PP_DEF_CHUNK_PAR
+            } else {
+                PP_DEF_CHUNK_SER
+            },
+            o1 - o0,
+        );
+        let t_store = Instant::now();
+        let known_before = known.len();
+        for (acc, pending) in reduced.iter_mut() {
+            if known.len() > known_before {
+                pp_add(PP_DEF_STORE_CHECKS, known.len() as u64);
+                reduce_lazy_by32(acc, &known, fp32, simd, pending, every);
+            }
+            let mut row = std::mem::take(acc);
+            for x in row.iter_mut() {
+                *x = fp32.reduce(*x);
+            }
+            let Some(c) = row.iter().position(|&v| v != 0) else {
+                continue;
+            };
+            let inv = invmod(u64::from(row[c]), fp.p) as u32;
+            for x in &mut row[c..] {
+                *x = fp32.reduce(*x * inv);
+            }
+            count_ops(row.len() - c);
+            count_norm(row.len() - c);
+            let at = known.partition_point(|(pc, _)| *pc < c);
+            known.insert(at, (c, row));
+        }
+        pp_add(PP_DEF_STORE, pp_ops() - o1);
+        pp_add(PP_DEF_STORE_NS, pp_ns(t_store));
+    }
+    pp_add(PP_DEF_RANK, known.len() as u64);
+    if deadline.is_some_and(|d| Instant::now() > d) {
+        return None;
+    }
+    let n_cols = known.first().map_or(0, |(_, r)| r.len());
+    let back = |i: usize| -> Vec<u32> {
+        let (_, row) = &known[i];
+        let mut acc = row.clone();
+        let mut pending = 0usize;
+        reduce_lazy_by32(&mut acc, &known[i + 1..], fp32, simd, &mut pending, every);
+        for x in acc.iter_mut() {
+            *x = fp32.reduce(*x);
+        }
+        acc
     };
     let o0 = pp_ops();
     let spread = parallel && known.len() * n_cols > PAR_WORK;
@@ -4423,7 +4730,7 @@ pub fn f4(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> F4Report {
         elapsed_ms: 0.0,
     });
     let report = if let Some(chunk) = opts.stop_hilbert {
-        f4_hilbert_guarded(input, n_vars, p, opts, chunk)
+        f4_hilbert_guarded(input, n_vars, p, opts, chunk, TraceMode::Off)
     } else {
         f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), TraceMode::Off)
     };
@@ -4636,6 +4943,7 @@ fn f4_hilbert_guarded(
     p: u64,
     opts: &F4Options,
     chunk: usize,
+    mut trace: TraceMode,
 ) -> F4Report {
     let ops0 = field_ops_now();
     let t0 = Instant::now();
@@ -4692,7 +5000,9 @@ fn f4_hilbert_guarded(
         let mut o = plain.clone();
         o.hilbert_expect = Some(complete_intersection_hilbert(&degs));
         o.max_pairs_per_step = Some(chunk);
-        let r = f4_with_arithmetic(input, n_vars, p, &o, arithmetic_mode(), TraceMode::Off);
+        // the main run is the one a trace records or replays (the check
+        // on the leading forms is never traced)
+        let r = f4_with_arithmetic(input, n_vars, p, &o, arithmetic_mode(), trace.reborrow());
         if r.hilbert == HilbertStop::Applied {
             return F4Report {
                 field_ops: field_ops_now() - ops0,
@@ -4703,12 +5013,24 @@ fn f4_hilbert_guarded(
         }
         status = HilbertStop::Violated;
     }
-    let r = f4_with_arithmetic(input, n_vars, p, &plain, arithmetic_mode(), TraceMode::Off);
+    // The fallback full run.  A recording keeps only this run's steps; a
+    // replay does not apply to it (the recorded run stopped by the Hilbert
+    // rule) and reports the divergence.
+    let replayed = matches!(trace, TraceMode::Replay(_));
+    let fallback = match &mut trace {
+        TraceMode::Record(t) => {
+            **t = F4Trace::default();
+            TraceMode::Record(&mut **t)
+        }
+        _ => TraceMode::Off,
+    };
+    let r = f4_with_arithmetic(input, n_vars, p, &plain, arithmetic_mode(), fallback);
     F4Report {
         field_ops: field_ops_now() - ops0,
         ms: t0.elapsed().as_secs_f64() * 1e3,
         hilbert: status,
         hilbert_check_ops: check_ops,
+        trace_mismatch: r.trace_mismatch || replayed,
         ..r
     }
 }
@@ -5295,11 +5617,45 @@ fn f4_with_arithmetic(
                 && rows_poly.len() >= min_seeds;
             pp_add(if sym_par { PP_SYM_PAR } else { PP_SYM_SEQ }, 1);
             pp_add(PP_SYM_SEEDS, rows_poly.len() as u64);
-            let (extra, cols_packed, row_cols) = if sym_par {
-                pk.symbolic_par(&rows_poly, &alive)
-            } else {
-                pk.symbolic(&rows_poly, &alive, true)
+            // a replayed step reuses its frozen preprocessing when every
+            // basis element it touches has the support it was frozen with
+            let slot = match &trace {
+                TraceMode::Replay(t) if freeze_enabled() => Some(&t.steps[replay_step - 1].frozen),
+                _ => None,
             };
+            let hit = slot.and_then(|f| f.get()).filter(|fz| {
+                fz.support
+                    .iter()
+                    .all(|(i, terms)| pk.terms.get(*i).is_some_and(|t| t == terms))
+            });
+            let computed;
+            let (extra, cols_packed, row_cols): (&[(usize, u128)], &[u128], &[Vec<u32>]) =
+                if let Some(fz) = hit {
+                    FROZEN_HITS.fetch_add(1, AtomicOrdering::Relaxed);
+                    (&fz.extra, &fz.cols, &fz.row_cols)
+                } else {
+                    computed = if sym_par {
+                        pk.symbolic_par(&rows_poly, &alive)
+                    } else {
+                        pk.symbolic(&rows_poly, &alive, true)
+                    };
+                    if let Some(f) = slot.filter(|f| f.get().is_none()) {
+                        let mut used: Vec<usize> = rows_poly
+                            .iter()
+                            .map(|(i, _)| *i)
+                            .chain(computed.0.iter().map(|&(i, _)| i))
+                            .collect();
+                        used.sort_unstable();
+                        used.dedup();
+                        let _ = f.set(FrozenStep {
+                            support: used.iter().map(|&i| (i, pk.terms[i].clone())).collect(),
+                            extra: computed.0.clone(),
+                            cols: computed.1.clone(),
+                            row_cols: computed.2.clone(),
+                        });
+                    }
+                    (&computed.0, &computed.1, &computed.2)
+                };
             pp_add(PP_SYM_NS, pp_ns(t_sym));
             let tp1 = Instant::now();
             let idxs: Vec<usize> = rows_poly
@@ -5316,19 +5672,19 @@ fn f4_with_arithmetic(
             // runs) are cheaper on one thread than handed to the pool: the
             // hand-off wakes a worker and waits for it, which costs more than
             // building a few short rows.
-            let to_sparse = |(rc, &idx): (Vec<u32>, &usize)| -> Vec<(u32, u64)> {
-                rc.into_iter()
+            let to_sparse = |(rc, &idx): (&Vec<u32>, &usize)| -> Vec<(u32, u64)> {
+                rc.iter()
                     .zip(&basis[idx])
-                    .map(|(c, (_, v))| (c, *v))
+                    .map(|(&c, (_, v))| (c, *v))
                     .collect()
             };
             let sparse: Vec<Vec<(u32, u64)>> = if row_cols.len() * cols_packed.len() > PAR_WORK {
-                row_cols.into_par_iter().zip(&idxs).map(to_sparse).collect()
+                row_cols.par_iter().zip(&idxs).map(to_sparse).collect()
             } else {
-                row_cols.into_iter().zip(&idxs).map(to_sparse).collect()
+                row_cols.iter().zip(&idxs).map(to_sparse).collect()
             };
             // columns stay packed: only the terms of new polynomials are unpacked
-            (Cols::Packed(cols_packed, n_vars), sparse, tp1)
+            (Cols::Packed(cols_packed.to_vec(), n_vars), sparse, tp1)
         } else {
             let mut monomials: FxSet<Vec<u32>> = FxSet::default();
             let mut done: FxSet<Vec<u32>> = FxSet::default();
@@ -5854,12 +6210,14 @@ fn f4_with_arithmetic(
             if input_lm[free_cols[c]] {
                 continue;
             }
-            let poly: Poly = row
-                .iter()
-                .enumerate()
-                .filter(|(_, &v)| v != 0)
-                .map(|(j, &v)| (cols.get(free_cols[j]), v))
-                .collect();
+            // sized up front: a filtered collect grows by reallocation
+            let mut poly: Poly = Vec::with_capacity(row.iter().filter(|&&v| v != 0).count());
+            poly.extend(
+                row.iter()
+                    .enumerate()
+                    .filter(|(_, &v)| v != 0)
+                    .map(|(j, &v)| (cols.get(free_cols[j]), v)),
+            );
             if total_degree(&poly[0].0) == 0 {
                 return report(
                     &basis,
@@ -5897,6 +6255,7 @@ fn f4_with_arithmetic(
                     }
                 }
                 t.steps.push(TraceStep {
+                    frozen: Default::default(),
                     degree: d,
                     rows: retained
                         .iter()
@@ -6205,11 +6564,14 @@ fn interreduce_linear_with(
     let mut out: Vec<Poly> = rows
         .iter()
         .map(|row| {
-            row.iter()
-                .enumerate()
-                .filter(|(_, &v)| v != 0)
-                .map(|(j, &v)| (cols.get(free_cols[j]), v as u64))
-                .collect()
+            let mut f: Poly = Vec::with_capacity(row.iter().filter(|&&v| v != 0).count());
+            f.extend(
+                row.iter()
+                    .enumerate()
+                    .filter(|(_, &v)| v != 0)
+                    .map(|(j, &v)| (cols.get(free_cols[j]), v as u64)),
+            );
+            f
         })
         .collect();
     out.sort_by(|a, b| cmp_monomial(&a[0].0, &b[0].0, ord));
@@ -8784,6 +9146,53 @@ mod tests {
     }
 
     #[test]
+    fn narrow_accumulators_match_wide_rref() {
+        let mut x = 0x0fed_cba9_8765_4321u64;
+        let mut next = || {
+            x ^= x << 13;
+            x ^= x >> 7;
+            x ^= x << 17;
+            x
+        };
+        for p in [2u64, 3, 29, 53, 101, 251, 4093] {
+            let fp = Barrett::new(p);
+            let narrow = Barrett32::new(p);
+            // the 32-bit reduction holds on every u32, not only on p(p-1)
+            for probe in [0u32, 1, u32::MAX, u32::MAX - 1, 1 << 31] {
+                assert_eq!(narrow.reduce(probe) as u64, probe as u64 % p, "p={p}");
+            }
+            for _ in 0..10_000 {
+                let probe = next() as u32;
+                assert_eq!(narrow.reduce(probe) as u64, probe as u64 % p, "p={p}");
+            }
+            let interval = narrow_acc_interval_for(p);
+            assert!(interval.is_some_and(|k| k >= 256), "p={p}");
+            for every in [1usize, 2, 7, interval.unwrap()] {
+                for (rows, cols) in [(1, 1), (7, 9), (20, 15), (40, 33), (64, 70)] {
+                    let mut wide: Vec<Vec<u64>> = (0..rows)
+                        .map(|_| (0..cols).map(|_| next() % p).collect())
+                        .collect();
+                    let mut narrow_rows: Vec<Vec<u32>> = wide
+                        .iter()
+                        .map(|row| row.iter().map(|&v| v as u32).collect())
+                        .collect();
+                    let want = rref(&mut wide, fp, None).unwrap();
+                    let got =
+                        rref32_deferred_n32(&mut narrow_rows, narrow, fp, None, every).unwrap();
+                    assert_eq!(got, want, "p={p} every={every} {rows}x{cols}");
+                    let widened: Vec<Vec<u64>> = narrow_rows
+                        .into_iter()
+                        .map(|row| row.into_iter().map(u64::from).collect())
+                        .collect();
+                    assert_eq!(widened, wide, "p={p} every={every} {rows}x{cols}");
+                }
+            }
+        }
+        assert_eq!(narrow_acc_interval_for(4099), None);
+        assert_eq!(narrow_acc_interval_for(65_521), None);
+    }
+
+    #[test]
     fn narrow_arithmetic_matches_wide_rref() {
         let mut x = 0x0123_4567_89ab_cdefu64;
         let mut next = || {
@@ -9266,6 +9675,72 @@ mod packed_set_tests {
 
     /// Reduction by a set with its monomials packed against the vector one,
     /// for sets that reduce a good deal (multiples of one another).
+    #[test]
+    fn first_alive_divisor_matches_the_u128_scan() {
+        let mut rng = Xs(0x5eed_0fd1_d1d0_u64);
+        for n in 1usize..=15 {
+            let guard = (0..n).fold(0u128, |g, i| g | 0x80u128 << (8 * i));
+            let mono = |rng: &mut Xs, top: u64| {
+                (0..n).fold(0u128, |a, i| a | ((rng.below(top) as u128) << (8 * i)))
+            };
+            for len in [0usize, 1, 3, 4, 5, 9, 31] {
+                let lms: Vec<u128> = (0..len).map(|_| mono(&mut rng, 3)).collect();
+                for _ in 0..200 {
+                    let m = mono(&mut rng, 6);
+                    let want = lms.iter().position(|&a| ((m | guard) - a) & guard == guard);
+                    assert_eq!(first_alive_divisor(&lms, guard, m), want, "n={n} len={len}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn frozen_replay_steps_match_fresh_ones() {
+        let mut rng = Xs(0x7eed_f00d_1234_5678);
+        let (n, p) = (3usize, 53u64);
+        let monos = monomials_up_to(n, 2);
+        // dense quadrics: every system has the recorded shape, except those
+        // with one coefficient forced to zero (another support)
+        let system = |rng: &mut Xs, zero: Option<usize>| -> Vec<Poly> {
+            (0..n)
+                .map(|k| {
+                    let f: Vec<_> = monos
+                        .iter()
+                        .enumerate()
+                        .map(|(i, m)| {
+                            let c = if k == 0 && zero == Some(i) {
+                                0
+                            } else {
+                                1 + rng.below(p - 1)
+                            };
+                            (m.clone(), c)
+                        })
+                        .filter(|(_, c)| *c != 0)
+                        .collect();
+                    normalise(&f, p, Ordering::Grevlex)
+                })
+                .collect()
+        };
+        let opts = F4Options::new(Ordering::Grevlex, 10);
+        let (rec, trace) = f4_record(&system(&mut rng, None), n, p, &opts);
+        assert!(!rec.trace_mismatch);
+        let before = frozen_steps_total();
+        for t in 0..12 {
+            let zero = (t % 4 == 3).then_some(1 + t % 3);
+            let sys = system(&mut rng, zero);
+            let plain = f4(&sys, n, p, &opts);
+            // the first replay of a step freezes it, the second reuses it
+            let first = f4_replay(&sys, n, p, &opts, &trace);
+            let second = f4_replay(&sys, n, p, &opts, &trace);
+            assert_eq!(first.basis, second.basis, "system {t}");
+            assert_eq!(first.trace_mismatch, second.trace_mismatch, "system {t}");
+            if !first.trace_mismatch {
+                assert_eq!(first.basis, plain.basis, "system {t}");
+            }
+        }
+        assert!(frozen_steps_total() > before, "no step was reused");
+    }
+
     #[test]
     fn mono_table_interns_like_a_map() {
         let mut rng = Xs(0x0bad_cafe_dead_beef);
