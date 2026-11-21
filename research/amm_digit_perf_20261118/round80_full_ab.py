@@ -12,6 +12,7 @@ import csv
 import subprocess
 import tempfile
 import statistics
+import os
 
 repo = Path(__file__).resolve().parents[2]
 source_path = "src/cryptanalysis/prime_root_trace.rs"
@@ -74,7 +75,7 @@ fn main(){
    let t=Instant::now();
    let mut checksum=0u64;
    let mut completed=0;
-   for i in 0..8{
+   for _repeat in 0..16 { for i in 0..8 {
     let f=poly(p,case,i);
     let mut sink=|event:&RootEvent|{black_box(event);Ok(())};
     let limits=RootLimits{field_work:MAX_WORK,split_attempts:1000,events:MAX_EVENTS,degree:MAX_DEGREE};
@@ -88,15 +89,22 @@ fn main(){
     for &root in &report.roots { checksum=checksum.wrapping_mul(33).wrapping_add(root); }
     completed+=1;
     black_box(report);
-   }
-   let ns=t.elapsed().as_nanos() as f64/8.0;
+   } }
+   let ns=t.elapsed().as_nanos() as f64/128.0;
    println!("{p},{case},{ns:.3},{checksum},{completed}");
   }
  }
 }
 """
 
-with tempfile.TemporaryDirectory(prefix="root79-full-") as tmp:
+try:
+    cpu = min(os.sched_getaffinity(0))
+    os.sched_setaffinity(0, {cpu})
+    print(f"benchmark affinity pinned to logical CPU {cpu}", flush=True)
+except (AttributeError, OSError) as exc:
+    print(f"CPU affinity unavailable: {exc}", flush=True)
+
+with tempfile.TemporaryDirectory(prefix="root80-full-") as tmp:
     tmp = Path(tmp)
     bins = {}
     for label, source in [("before",baseline),("after",candidate)]:
@@ -150,4 +158,4 @@ with tempfile.TemporaryDirectory(prefix="root79-full-") as tmp:
         a = statistics.median(float(r["before_ns"]) for r in series)
         b = statistics.median(float(r["after_ns"]) for r in series)
         print(f"{key[0]},{key[1]},{a:.3f},{b:.3f},{a/b:.4f}")
-    print(f"verified {len(rows)} before/after result-matched full solve+verify trials, 8 polynomial instances each")
+    print(f"verified {len(rows)} before/after result-matched full solve+verify trials, 128 polynomial instances each")
