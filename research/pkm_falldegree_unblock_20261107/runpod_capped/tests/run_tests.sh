@@ -486,8 +486,8 @@ ecase E02 $R1 "base LOST with host-side evidence (relaunch auto)" $BASE:LOST
 ecase E03 ALL_RESOLVED "N3a: base LOST without host-side evidence (relaunch owner)" $BASE:LOST:false:owner
 ecase E04 ALL_RESOLVED "N1: base ABORTED uses the attempt; no relaunch" $BASE:ABORTED
 ecase E05 ALL_RESOLVED "base ADMITTED" $BASE:ADMITTED
-ecase E06 ALL_RESOLVED "base ADMITTED with oversize true: censored at 112Gi, no further size step" $BASE:ADMITTED:true
-ecase E07 ALL_RESOLVED "base OOM at 112Gi: censored, no further size step" $BASE:OOM
+ecase E06 ALL_RESOLVED "base ADMITTED with oversize true: censored at 54e9, no further size step" $BASE:ADMITTED:true
+ecase E07 ALL_RESOLVED "base OOM at the 256 GB pod: censored, no further size step" $BASE:OOM
 ecase E08 ALL_RESOLVED "base LIMIT (censored, not re-run)" $BASE:LIMIT
 ecase E09 ALL_RESOLVED "base NOT_ADMITTED (owner)" $BASE:NOT_ADMITTED
 ecase E10 ALL_RESOLVED "N2: base NO_EVIDENCE goes to the owner" $BASE:NO_EVIDENCE
@@ -575,9 +575,9 @@ binary check) need the image layer: \`RPC_LAYER_SRC\` (the layer tarball, SHA-25
 cases print \`SKIP-NEEDS-LAYER\`: a run without the layer gives $((ntot - nlayer)) results and $nlayer skips; a run with
 it gives $ntot results.
 
-Groups: A refusals before any API call (allow-list, order, the one stage, the pinned request); B launch paths (v2 create
+Groups: A refusals before any API call (allow-list, order, the one stage cap:14:0:7:54000000000, the pinned request); B launch paths on the 32 vCPU / 256 GB pod (v2 create
 body and checks, the study guard, pagination); C \`fetch.sh\` flows, with the git gate in C02-C02c; D the outcome
-classifier alone (\`fetch.sh --classify-dir\`) on synthetic receipt sets with v2 field names; E the order
+classifier alone (\`fetch.sh --classify-dir\`) on synthetic receipt sets with v2 field names, with the memory rule of owner decision 24 in D25-D37; R the reading at cap 7; E the order
 (\`next_allowed\`); F \`reap.sh\`; G syntax, pins, the request and the absence of v1 calls. Per-case output:
 \`out/<id>.txt\`. Machine-readable table: \`results.tsv\`. Every result here is \`[pcc:unverified]\`.
 
