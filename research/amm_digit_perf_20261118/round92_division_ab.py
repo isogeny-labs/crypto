@@ -159,7 +159,7 @@ with tempfile.TemporaryDirectory(prefix="root92-rust-") as temp:
             assert (a["checksum"],a["completed"])==(b["checksum"],b["completed"]),key
             rows.append({"trial":trial,"prime":key[0],"case":key[1],
                          "before_ns":a["ns_per_op"],"after_ns":b["ns_per_op"]})
-    out=repo/"research/amm_digit_perf_20261118/round92_ab_results.csv"
+    out=repo/os.environ.get("ROOTFIND_AB_OUTPUT", "research/amm_digit_perf_20261118/round92_ab_results.csv")
     with out.open("w",newline="") as f:
         writer=csv.DictWriter(f,fieldnames=list(rows[0]))
         writer.writeheader()
