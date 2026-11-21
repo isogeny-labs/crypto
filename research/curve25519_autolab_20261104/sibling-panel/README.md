@@ -1,5 +1,7 @@
 # Sibling-points panel (Stage 1): `sib=8,pool=64` on five fresh curves per size, k = 20, 24, 28, 32
 
+Claim `PCC-20261121-abc3ad`, standing `unverified`.
+
 Write-up of the panel frozen in [`PROTOCOL.md`](PROTOCOL.md) (2026-11-21, before any data). Every number on this page is an unverified assertion of the lane that produced it and is tagged [pcc:unverified]; no pcc claim has been filed for it yet. Nothing here changes the ledger: the ratchet waits for the owner's unit ruling (protocol, section 5).
 
 ## What was run
