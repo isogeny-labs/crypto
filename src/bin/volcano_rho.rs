@@ -712,6 +712,10 @@ fn rho(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens) ->
 /// immediately refilling any completed lane from `jobs`.  Every `(arm, seed)`
 /// follows the exact same RNG stream, 32-adding table, `iters`, `restarts`, and
 /// recovered discrete logarithm `k` as [`rho`].
+///
+/// Round-4 audit: `BATCH = 64` was bit-exact on walk length but regressed
+/// ~3–4× ns/op on Apple Silicon (DP `HashMap` working set dominates the
+/// saved inversions). Kept at 16 pending a denser DP table.
 fn rho_batch_jobs<'arm, FInst>(
     f: &Fp,
     jobs: &[(usize, u64)],

@@ -330,6 +330,135 @@ fn one(p: &BigUint) -> FieldElement {
     FieldElement::one(p.clone())
 }
 
+/// Stack-resident degree-≤4 polynomial over a single-word prime (`p < 2^63`).
+///
+/// Round-4 audit: the generic [`semaev_s4_in_x4`] path allocates dozens of
+/// `FieldElement`/`BigUint` values per factor-base pair.  `Poly4Fp` keeps the
+/// same resultant algebra in five `u64` limbs so S₄ sieving stays in registers.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Poly4Fp {
+    /// Coefficients `c[0] + c[1] X + … + c[4] X⁴` reduced mod `p`.
+    pub c: [u64; 5],
+    pub p: u64,
+}
+
+impl Poly4Fp {
+    /// Horner evaluation at `x`.
+    #[inline]
+    pub fn eval(&self, x: u64) -> u64 {
+        let p = self.p as u128;
+        let mut acc = 0u128;
+        for &ci in self.c.iter().rev() {
+            acc = (acc * (x as u128) + ci as u128) % p;
+        }
+        acc as u64
+    }
+
+    /// Lift to the heap [`FieldElement`] coefficient form used by older callers.
+    pub fn to_field_elements(&self) -> [FieldElement; 5] {
+        let p = BigUint::from(self.p);
+        std::array::from_fn(|i| FieldElement::new(BigUint::from(self.c[i]), p.clone()))
+    }
+}
+
+/// Stack-resident Semaev `S₄(X₁,X₂,X₃,X₄)` as a quartic in `X₄` for `p < 2^63`.
+///
+/// Bit-identical to [`semaev_s4_in_x4`] on single-word primes (see unit test).
+pub fn semaev_s4_poly4fp(x1: u64, x2: u64, x3: u64, a: u64, b: u64, p: u64) -> Poly4Fp {
+    debug_assert!(p > 3 && (p & 1) == 1 && (p >> 63) == 0);
+    #[inline(always)]
+    fn add(x: u64, y: u64, p: u64) -> u64 {
+        // Safe: callers keep `x, y < p < 2^63`, so `x + y` fits in `u64`.
+        let s = x + y;
+        if s >= p {
+            s - p
+        } else {
+            s
+        }
+    }
+    #[inline(always)]
+    fn sub(x: u64, y: u64, p: u64) -> u64 {
+        if x >= y {
+            x - y
+        } else {
+            x.wrapping_add(p).wrapping_sub(y)
+        }
+    }
+    #[inline(always)]
+    fn mul(x: u64, y: u64, p: u64) -> u64 {
+        ((x as u128 * y as u128) % (p as u128)) as u64
+    }
+    #[inline(always)]
+    fn neg(x: u64, p: u64) -> u64 {
+        if x == 0 {
+            0
+        } else {
+            p - x
+        }
+    }
+    #[inline(always)]
+    fn sm(k: u64, x: u64, p: u64) -> u64 {
+        mul(k % p, x, p)
+    }
+
+    // S₃(X₁, X₂, X) = α₂ X² + α₁ X + α₀ — same closed form as [`semaev_s3_in_x3`].
+    let s = add(x1, x2, p);
+    let pr = mul(x1, x2, p);
+    let dx12 = sub(x1, x2, p);
+    let alpha2 = mul(dx12, dx12, p);
+    let alpha1 = neg(
+        sm(2, add(mul(s, add(pr, a, p), p), sm(2, b, p), p), p),
+        p,
+    );
+    let alpha0 = sub(
+        mul(sub(pr, a, p), sub(pr, a, p), p),
+        sm(4, mul(b, s, p), p),
+        p,
+    );
+
+    // β₂, β₁, β₀ as degree-≤2 polys in X₄ (same as FieldElement path).
+    let x3sq = mul(x3, x3, p);
+    let b2 = [x3sq, neg(sm(2, x3, p), p), 1u64 % p];
+    let b1 = [
+        neg(sm(2, add(mul(a, x3, p), sm(2, b, p), p), p), p),
+        neg(sm(2, add(x3sq, a, p), p), p),
+        neg(sm(2, x3, p), p),
+    ];
+    let b0 = [
+        sub(mul(a, a, p), sm(4, mul(b, x3, p), p), p),
+        neg(add(sm(2, mul(a, x3, p), p), sm(4, b, p), p), p),
+        x3sq,
+    ];
+
+    let scale = |c: u64, poly: [u64; 3]| -> [u64; 3] {
+        [mul(c, poly[0], p), mul(c, poly[1], p), mul(c, poly[2], p)]
+    };
+    let sub3 = |u: [u64; 3], v: [u64; 3]| -> [u64; 3] {
+        [sub(u[0], v[0], p), sub(u[1], v[1], p), sub(u[2], v[2], p)]
+    };
+    let a_poly = sub3(scale(alpha2, b0), scale(alpha0, b2));
+    let b_poly = sub3(scale(alpha2, b1), scale(alpha1, b2));
+    let c_poly = sub3(scale(alpha1, b0), scale(alpha0, b1));
+
+    // S₄ = A² − B·C, degree ≤ 4.
+    let mut a_sq = [0u64; 5];
+    let mut bc = [0u64; 5];
+    for i in 0..3 {
+        for j in 0..3 {
+            a_sq[i + j] = add(a_sq[i + j], mul(a_poly[i], a_poly[j], p), p);
+            bc[i + j] = add(bc[i + j], mul(b_poly[i], c_poly[j], p), p);
+        }
+    }
+    let c = [
+        sub(a_sq[0], bc[0], p),
+        sub(a_sq[1], bc[1], p),
+        sub(a_sq[2], bc[2], p),
+        sub(a_sq[3], bc[3], p),
+        sub(a_sq[4], bc[4], p),
+    ];
+    Poly4Fp { c, p }
+}
+
 // ── Univariate root finder over F_p ─────────────────────────────────────
 
 /// Find every `F_p`-rational root of the polynomial
@@ -1763,6 +1892,19 @@ pub fn find_one_relation_s4_counted(
         }
     }
 
+    // Round-4: single-word primes use stack Poly4Fp + u64 root-finding.
+    let p_u64 = curve.p.to_u64_digits();
+    let fast_u64 = matches!(p_u64.as_slice(), [p] if *p > 3 && (*p & 1) == 1 && (*p >> 63) == 0);
+    let (a_u64, b_u64, p_word) = if fast_u64 {
+        (
+            a_fe.value.to_u64_digits().first().copied().unwrap_or(0),
+            b_fe.value.to_u64_digits().first().copied().unwrap_or(0),
+            p_u64[0],
+        )
+    } else {
+        (0, 0, 0)
+    };
+
     for trial in 1..=max_trials {
         let a = random_scalar(&curve.n);
         let b = random_scalar(&curve.n);
@@ -1786,25 +1928,53 @@ pub fn find_one_relation_s4_counted(
                     Point::Affine { x, .. } => x.clone(),
                     Point::Infinity => continue,
                 };
-                let quartic = semaev_s4_in_x4(&xr, &xi, &xj, &a_fe, &b_fe);
-                for xk in find_roots_fp_fast(&quartic, &curve.p) {
-                    let k = match x_to_idx.get(&xk.value).copied() {
-                        Some(k) => k,
-                        None => continue,
-                    };
-                    if let Some(rel) = try_finalise_s4(
-                        &r,
-                        i,
-                        &fb_i.point,
-                        j,
-                        &fb_j.point,
-                        k,
-                        &factor_base[k].point,
-                        curve,
-                        &a,
-                        &b,
-                    ) {
-                        return Some((rel, trial));
+                if fast_u64 {
+                    let xr_u = xr.value.to_u64_digits().first().copied().unwrap_or(0);
+                    let xi_u = xi.value.to_u64_digits().first().copied().unwrap_or(0);
+                    let xj_u = xj.value.to_u64_digits().first().copied().unwrap_or(0);
+                    let poly = semaev_s4_poly4fp(xr_u, xi_u, xj_u, a_u64, b_u64, p_word);
+                    let quartic = poly.to_field_elements();
+                    for xk in find_roots_fp_fast(&quartic, &curve.p) {
+                        let k = match x_to_idx.get(&xk.value).copied() {
+                            Some(k) => k,
+                            None => continue,
+                        };
+                        if let Some(rel) = try_finalise_s4(
+                            &r,
+                            i,
+                            &fb_i.point,
+                            j,
+                            &fb_j.point,
+                            k,
+                            &factor_base[k].point,
+                            curve,
+                            &a,
+                            &b,
+                        ) {
+                            return Some((rel, trial));
+                        }
+                    }
+                } else {
+                    let quartic = semaev_s4_in_x4(&xr, &xi, &xj, &a_fe, &b_fe);
+                    for xk in find_roots_fp_fast(&quartic, &curve.p) {
+                        let k = match x_to_idx.get(&xk.value).copied() {
+                            Some(k) => k,
+                            None => continue,
+                        };
+                        if let Some(rel) = try_finalise_s4(
+                            &r,
+                            i,
+                            &fb_i.point,
+                            j,
+                            &fb_j.point,
+                            k,
+                            &factor_base[k].point,
+                            curve,
+                            &a,
+                            &b,
+                        ) {
+                            return Some((rel, trial));
+                        }
                     }
                 }
             }
@@ -4024,6 +4194,39 @@ mod tests {
         let mut expected = vec![r1, r2, r3];
         expected.sort_by_key(|r| r.value.clone());
         assert_eq!(roots, expected);
+    }
+
+    /// Round-4: stack [`Poly4Fp`] matches heap [`semaev_s4_in_x4`] bit-for-bit.
+    #[test]
+    fn poly4fp_matches_heap_s4_on_tiny_curve() {
+        let curve = tiny_curve();
+        let p = curve.p.to_u64_digits()[0];
+        let a = curve.a_fe().value.to_u64_digits().first().copied().unwrap_or(0);
+        let b = curve.b.to_u64_digits().first().copied().unwrap_or(0);
+        let a_fe = curve.a_fe();
+        let b_fe = curve.fe(curve.b.clone());
+        for (x1, x2, x3) in [(1u64, 2, 3), (5, 8, 13), (17, 19, 23)] {
+            let heap = semaev_s4_in_x4(
+                &FieldElement::new(BigUint::from(x1), curve.p.clone()),
+                &FieldElement::new(BigUint::from(x2), curve.p.clone()),
+                &FieldElement::new(BigUint::from(x3), curve.p.clone()),
+                &a_fe,
+                &b_fe,
+            );
+            let stack = semaev_s4_poly4fp(x1, x2, x3, a, b, p);
+            for i in 0..5 {
+                let hv = heap[i].value.to_u64_digits().first().copied().unwrap_or(0);
+                assert_eq!(hv, stack.c[i], "coef {i} x=({x1},{x2},{x3})");
+            }
+            // Root sets agree.
+            let heap_roots = find_roots_fp_fast(&heap, &curve.p);
+            let stack_roots = find_roots_fp_fast(&stack.to_field_elements(), &curve.p);
+            let mut h: Vec<_> = heap_roots.iter().map(|r| r.value.clone()).collect();
+            let mut s: Vec<_> = stack_roots.iter().map(|r| r.value.clone()).collect();
+            h.sort();
+            s.sort();
+            assert_eq!(h, s);
+        }
     }
 
     /// **S_4 + root finder, end-to-end 3-decomposition oracle**.

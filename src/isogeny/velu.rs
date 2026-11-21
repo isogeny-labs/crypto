@@ -46,9 +46,10 @@
 //!
 //! We enumerate the kernel `G` by brute force over `F_p` and
 //! compute Vélu's sums directly.  This is `O(ℓ)` field operations
-//! per isogeny — fine for `ℓ ≤ 100` and the toy curves used here.
-//! Production-grade `√ℓ`-style algorithms (Bernstein–De Feo–
-//! Leroux–Smith, 2020) are deliberately not implemented.
+//! per isogeny — fine for `ℓ ≤ 73` and the toy curves used here.
+//! For larger odd degrees prefer
+//! [`crate::cryptanalysis::isogeny_eval::sqrt_velu`] (Bernstein–De Feo–
+//! Leroux–Smith √élu, crossover near `ℓ ≈ 73–101`).
 
 use super::SmallCurve;
 use num_bigint::BigUint;
@@ -74,57 +75,68 @@ impl VeluIsogeny {
     /// Evaluate the isogeny at an affine point `(x, y)`.  Returns
     /// `None` when `(x, y)` is in the kernel (image is the point
     /// at infinity).
+    ///
+    /// Round-4: one binary-EGCD inverse for the whole kernel via Montgomery's
+    /// trick (was one Fermat `a^{p-2}` per kernel point — educational but
+    /// asymptotically wasteful even at toy `ℓ`).
     pub fn evaluate(&self, x: u64, y: u64) -> Option<(u64, u64)> {
         let p = self.domain.p as u128;
         let xm = x as u128 % p;
         let ym = y as u128 % p;
         let a = self.domain.a as u128 % p;
+        let n = self.kernel_half.len();
+        if n == 0 {
+            return Some((x, y));
+        }
 
-        // Reject kernel points.
-        for &(xk, _) in &self.kernel_half {
-            if xm == xk as u128 % p {
+        // Reject kernel points; collect denominators `x − x_Q`.
+        let mut dens = vec![0u128; n];
+        for (i, &(xk, _)) in self.kernel_half.iter().enumerate() {
+            let xk = xk as u128 % p;
+            if xm == xk {
                 return None;
             }
+            dens[i] = mod_sub(xm, xk, p);
         }
+
+        // Montgomery batch inversion of all dens.
+        let mut prefix = vec![0u128; n];
+        prefix[0] = dens[0];
+        for i in 1..n {
+            prefix[i] = mod_mul(prefix[i - 1], dens[i], p);
+        }
+        let mut inv_acc = mod_inv(prefix[n - 1], p)?;
+        let mut invs = vec![0u128; n];
+        for i in (1..n).rev() {
+            invs[i] = mod_mul(inv_acc, prefix[i - 1], p);
+            inv_acc = mod_mul(inv_acc, dens[i], p);
+        }
+        invs[0] = inv_acc;
 
         let mut acc_x = xm;
         let mut acc_y = ym;
-        for &(xq, yq) in &self.kernel_half {
+        for (i, &(xq, yq)) in self.kernel_half.iter().enumerate() {
             let xq = xq as u128 % p;
             let yq = yq as u128 % p;
 
             let gx_q = mod_add(3 * mod_mul(xq, xq, p) % p, a, p);
             let gy_q = mod_sub(0, 2 * yq % p, p);
-            // T-row test: 2Q = O ⇔ yQ = 0.
             let t_row = yq == 0;
-
-            // Vélu: v(Q) = g_x(Q) when 2Q = O, and 2·g_x(Q) otherwise.
             let v_q = if t_row { gx_q } else { (2 * gx_q) % p };
             let u_q = mod_mul(gy_q, gy_q, p);
 
-            let dx = mod_sub(xm, xq, p);
-            let dx_inv = mod_inv(dx, p)?;
+            let dx_inv = invs[i];
             let dx_inv2 = mod_mul(dx_inv, dx_inv, p);
             let dx_inv3 = mod_mul(dx_inv2, dx_inv, p);
 
             acc_x = mod_add(acc_x, mod_mul(v_q, dx_inv, p), p);
             acc_x = mod_add(acc_x, mod_mul(u_q, dx_inv2, p), p);
 
-            // y-coordinate transformation: y' = y · (1 - ...)
-            // We accumulate the bracket Σ [v · dx^{-2} + 2u · dx^{-3}].
             let bracket = mod_add(
                 mod_mul(v_q, dx_inv2, p),
                 mod_mul(2 * u_q % p, dx_inv3, p),
                 p,
             );
-            // Subtract the bracket from acc_y / ym, then re-multiply by y.
-            // The cleanest way: compute the prefactor (1 − Σ) on the
-            // running ym independently.
-            //
-            // Since acc_y starts as ym, the *first* iteration should
-            // already apply (1 - bracket_1).  But we want all
-            // iterations to multiply the same y, not to cascade.
-            // Rebuild the factor explicitly:
             acc_y = mod_sub(acc_y, mod_mul(ym, bracket, p), p);
         }
         Some((acc_x as u64, acc_y as u64))
@@ -144,24 +156,28 @@ fn mod_mul(a: u128, b: u128, p: u128) -> u128 {
     // each, product < 2^124).
     ((a % p) * (b % p)) % p
 }
-fn mod_pow(mut base: u128, mut e: u128, p: u128) -> u128 {
-    let mut r = 1u128 % p;
-    base %= p;
-    while e > 0 {
-        if e & 1 == 1 {
-            r = mod_mul(r, base, p);
-        }
-        base = mod_mul(base, base, p);
-        e >>= 1;
-    }
-    r
-}
 fn mod_inv(a: u128, p: u128) -> Option<u128> {
-    if a == 0 {
+    if a % p == 0 {
         return None;
     }
-    // Fermat: p prime ⇒ a^{p-2} ≡ a⁻¹.
-    Some(mod_pow(a, p - 2, p))
+    // Binary extended gcd — `O(log p)` vs Fermat `O(log p)` multiplies with
+    // a much smaller constant (Round-4 leftover from educational Vélu).
+    let mut t = 0i128;
+    let mut newt = 1i128;
+    let mut r = p as i128;
+    let mut newr = (a % p) as i128;
+    while newr != 0 {
+        let q = r / newr;
+        (t, newt) = (newt, t - q * newt);
+        (r, newr) = (newr, r - q * newr);
+    }
+    if r > 1 {
+        return None;
+    }
+    if t < 0 {
+        t += p as i128;
+    }
+    Some(t as u128)
 }
 
 // ── Vélu codomain construction ────────────────────────────────────────────────
