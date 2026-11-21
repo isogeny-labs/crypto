@@ -1220,10 +1220,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 if state.exponent & 1 == 1 {
                     state.acc = vdiv(&vproduct(&state.acc, &state.base, p), &state.modulus, p)?.1;
                 }
-                // Squaring a polynomial is algebraically identical to multiplying
-                // it by itself, but the independent verifier's specialized
-                // arithmetic avoids computing symmetric off-diagonal pairs twice.
-                state.base = vdiv(&vsquare(&state.base, p), &state.modulus, p)?.1;
+                state.base = vdiv(&vproduct(&state.base, &state.base, p), &state.modulus, p)?.1;
                 state.exponent >>= 1;
                 if (*exponent, accumulator, base) != (state.exponent, &state.acc, &state.base) {
                     return Err("modular power step failed".into());
