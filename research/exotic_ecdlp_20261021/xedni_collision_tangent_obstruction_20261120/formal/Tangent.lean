@@ -105,6 +105,30 @@ theorem no_relation_of_nondvd (W : WeierstrassCurve.Affine ℚ) [W.IsElliptic]
   rw [ha1, ha2] at hob
   exact hndiv (integer_divisibility a1 a2 x1 x2 y1 y2 hob)
 
+theorem no_relation_of_mod47 (W : WeierstrassCurve.Affine ℚ) [W.IsElliptic]
+    (k1 k2 x1 x2 y1 y2 : ℤ)
+    (ha1 : W.a₁ = ((47*k1 : ℤ) : ℚ))
+    (ha2 : W.a₂ = ((47*k2 : ℤ) : ℚ))
+    (hP : W.Nonsingular (x1 : ℚ) (y1 : ℚ))
+    (hQ : W.Nonsingular (x2 : ℚ) (y2 : ℚ))
+    (hmod : ((x1-x2)^2*(x1+2*x2)-(y1-y2)^2) % 47 ≠ 0) :
+    (WeierstrassCurve.Affine.Point.some (x1 : ℚ) (y1 : ℚ) hP) +
+      (WeierstrassCurve.Affine.Point.some (x2 : ℚ) (y2 : ℚ) hQ) +
+      (WeierstrassCurve.Affine.Point.some (x2 : ℚ) (y2 : ℚ) hQ) ≠ 0 := by
+  intro hrel
+  have hob := obstruction_of_point_relation W _ _ _ _ hP hQ hrel
+  rw [ha1, ha2] at hob
+  have hz : (x1-x2)^2*(47*k2+x1+2*x2)-47*k1*(x1-x2)*(y1-y2)
+      -(y1-y2)^2 = 0 := by
+    have hq : (((x1-x2)^2*(47*k2+x1+2*x2)-47*k1*(x1-x2)*(y1-y2)
+      -(y1-y2)^2 : ℤ) : ℚ) = 0 := by
+      simpa [obstruction] using hob
+    exact_mod_cast hq
+  have hdiv : (47 : ℤ) ∣ (x1-x2)^2*(x1+2*x2)-(y1-y2)^2 := by
+    refine ⟨k1*(x1-x2)*(y1-y2)-k2*(x1-x2)^2, ?_⟩
+    nlinarith [hz]
+  exact hmod (Int.emod_eq_zero_of_dvd hdiv)
+
 structure Coords where
   x1 : ℤ
   x2 : ℤ
@@ -144,6 +168,7 @@ theorem no_relation_for_eight_source_pairs (i : Fin 8)
 #print axioms integer_divisibility
 #print axioms obstruction_of_point_relation
 #print axioms no_relation_of_nondvd
+#print axioms no_relation_of_mod47
 #print axioms sourcePair_nondvd
 #print axioms no_relation_for_eight_source_pairs
 

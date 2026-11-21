@@ -1,6 +1,6 @@
 # Tangent divisibility closes the auxiliary-x-collision source stratum
 
-For the frozen 336 ordered source pairs with distinct rational x coordinates and an auxiliary x collision, the specified `P + 2Q = O` rational relation is excluded throughout the rational elliptic-curve family with **integral `a1,a2` and prescribed good reduction to `y²=x³−x−2` at 47**. The fixed-prime group law excludes 328 pairs. The other eight pass that necessary finite-field relation, but each has `x₁−x₂ ∤ (y₁−y₂)²`; a checked Lean theorem derives this divisibility as a necessary consequence of the rational point-group relation for any elliptic Weierstrass curve through the two points with integral `a1,a2`. The exact 336-row census and an independent Sage replay agree on every case.
+For the frozen 336 ordered source pairs with distinct rational x coordinates and an auxiliary x collision, a Lean-checked point-group theorem excludes the specified `P + 2Q = O` rational relation on every elliptic Weierstrass curve through each pair with `a1,a2 ∈ 47ℤ`. The tangent identity gives a nonzero residue modulo 47 for 328 pairs; the other eight have `x₁−x₂ ∤ (y₁−y₂)²`. A generated Lean case certificate checks all 336 exact source coordinates. This proves the relation obstruction across the full stated coefficient family without an assumption about good reduction or the remaining Weierstrass coefficients.
 
 | Source indices | `x₁−x₂` | `y₁−y₂` | `(y₁−y₂)² mod |x₁−x₂|` | Obstruction |
 | --- | ---: | ---: | ---: | --- |
@@ -8,7 +8,7 @@ For the frozen 336 ordered source pairs with distinct rational x coordinates and
 | 663, 703 | 7 | 11, −11 | 2 | Tangent divisibility |
 | 1160, 1202 | −33 | 7, −7 | 16 | Tangent divisibility |
 | 1500, 1542 | 11 | 10, −10 | 1 | Tangent divisibility |
-| Remaining 328 pairs | varies | varies | recorded per row | Fixed-prime reduction |
+| Remaining 328 pairs | varies | varies | recorded per row | Tangent identity modulo 47 |
 
 The six relation-eligible pairs admitted by the auxiliary local gates are among these eight. The earlier 16,200-curve height-box census found zero rational relations; this theorem supplies an arithmetic obstruction across **all integral `a1,a2` choices** for those eight exact point pairs, independent of the height of `a3,a4,a6`. The two remaining finite-field-positive pairs, indices 663 and 703, are covered by the same theorem even though their auxiliary gate was empty.
 
@@ -26,9 +26,9 @@ Subtracting the two point-incidence equations and eliminating the tangent slope 
 
 `D²(a2+x₁+2x₂) − a1·D·Y − Y² = 0`.
 
-When `a1,a2,x₁,x₂,y₁,y₂` are integers, the first two terms are multiples of `D`, so `D ∣ Y²`. The four nonzero residues in the table refute that necessary condition for all eight ordered cases. The proof uses the full Mathlib affine point group law: it derives `2Q=−P`, rules out a vertical tangent, extracts the doubled point's x and y coordinates, obtains the tangent line and derivative equations, and then proves the integer divisibility consequence.
+When `a1,a2,x₁,x₂,y₁,y₂` are integers, the first two terms are multiples of `D`, so `D ∣ Y²`. The four nonzero residues in the table refute that necessary condition for all eight ordered cases. When `a1,a2 ∈ 47ℤ`, the same identity implies `D²(x₁+2x₂)−Y² ≡ 0 (mod 47)`. Direct arithmetic refutes this congruence for each of the other 328 pairs. The proof uses the full Mathlib affine point group law: it derives `2Q=−P`, rules out a vertical tangent, extracts the doubled point's x and y coordinates, and obtains the tangent equations.
 
-For the other 328 pairs, a rational relation would reduce to the same relation on the fixed good-reduction curve over `F₄₇`. Their finite-field sums are nonidentity. The [previous Sage audit](../xedni_collision_reduction_screen_20261120/README.md) checked the model reduction, exact point incidence, and denominator units for all 18,576 centered constructed curves. The present classification applies the standard good-reduction homomorphism to every curve in the declared family satisfying those same reduction conditions.
+The [previous Sage audit](../xedni_collision_reduction_screen_20261120/README.md) also checked the fixed-curve reduction obstruction and exact point incidence for all 18,576 centered constructed curves. The tangent congruence provides a direct rational-curve proof for the 328 cases, with no reduction-map bridge.
 
 ## Proof map and evidence
 
@@ -38,10 +38,11 @@ For the other 328 pairs, a rational relation would reduce to the same relation o
 | Point-group to tangent | `XedniCollisionTangent.obstruction_of_point_relation` | Elliptic `W/ℚ`; nonsingular affine points `P,Q`; `P+Q+Q=0` | Lean checked |
 | Integer necessity | `XedniCollisionTangent.no_relation_of_nondvd` | Integral `a1,a2` and point coordinates; `D ∤ Y²` | Lean checked |
 | Eight exact ordered pairs | `XedniCollisionTangent.no_relation_for_eight_source_pairs` | Explicit `Fin 8` coordinate table; any elliptic `W/ℚ` with integral `a1,a2` containing its two points | Lean checked |
-| Remaining 328 pairs | `XedniCollisionReduction.no_relation_of_reduced_sum` in the preceding packet | Good-reduction homomorphism to fixed `E/F₄₇`, exact point reduction, nonidentity reduced sum | Generic Lean implication checked; concrete map instantiation open |
+| Modulo-47 necessity | `XedniCollisionTangent.no_relation_of_mod47` | Elliptic `W/ℚ`; exact integral point coordinates; `a1=47k1`, `a2=47k2`; nonzero tangent residue | Lean checked |
+| All 336 exact pairs | `XedniCollisionTangent.all_source_cases_blocked` and `no_relation_for_all_collision_cases` | Generated `Fin 336` source table; elliptic `W/ℚ` through the two points; `a1,a2 ∈ 47ℤ` | Lean checked |
 | Complete input classification | [result](result.json) and [Sage audit](sage-audit-result.json) | Frozen 1,722-row source; 336 selected collision pairs; exact `D,Y` and finite-field sums | 328 reduction, 8 divisibility, audit PASS |
 
-The [formal build](formal/build.sh) checks pinned Lean `v4.35.0-rc4` and Mathlib revision `021c46bdd042f67b538b9f9871d556a93713a9a9`. Its [output](formal/build-output.txt) lists only `propext`, `Classical.choice`, and `Quot.sound` for every declaration, with empty stderr; the module has no `sorry`, `admit`, custom claim axiom, or native evaluation. `lean4checker --fresh` is unavailable on this host. The eight-case point-level theorem is fully checked. Formalizing the concrete rational-curve reduction map for the 328 other cases remains a separate bridge; their finite-field arithmetic and the required model reductions have independent Sage receipts.
+The [formal build](formal/build.sh) checks pinned Lean `v4.35.0-rc4` and Mathlib revision `021c46bdd042f67b538b9f9871d556a93713a9a9`. Its [output](formal/build-output.txt) lists only `propext`, `Classical.choice`, and `Quot.sound` for the point-level declarations; the 336-case arithmetic certificate uses only `propext`. Stderr is empty, and the modules have no `sorry`, `admit`, custom claim axiom, or native evaluation. `lean4checker --fresh` is unavailable on this host. The earlier concrete reduction-map bridge remains a separate formalization question, while the present theorem directly settles this relation for the stated coefficient family.
 
 The [protocol](protocol.json), [census runner](census.py), and Lean source were pushed before census execution as `b68cfe5f5d2`. Selection uses the independently computed fixed-prime relation bit from the preceding packet, whose result SHA-256 is frozen in the protocol. The [result](result.json) retains every one of the 336 classifications and exact arithmetic residues. The [Sage replay](sage_audit.py) independently recomputed all finite-field sums and integer residues; its [runtime receipt](sage-runtime-info.json) records the checked Sage build.
 
@@ -52,6 +53,7 @@ python3 research/exotic_ecdlp_20261021/xedni_collision_tangent_obstruction_20261
 /Volumes/SSD990/cryptanalysis/sage --runtime-info > research/exotic_ecdlp_20261021/xedni_collision_tangent_obstruction_20261120/sage-runtime-info.json
 /Volumes/SSD990/cryptanalysis/sage -python research/exotic_ecdlp_20261021/xedni_collision_tangent_obstruction_20261120/sage_audit.py > research/exotic_ecdlp_20261021/xedni_collision_tangent_obstruction_20261120/sage-audit-result.json
 sh research/exotic_ecdlp_20261021/xedni_collision_tangent_obstruction_20261120/formal/build.sh
+python3 research/exotic_ecdlp_20261021/xedni_collision_tangent_obstruction_20261120/make_cases.py --check
 ```
 
 The next mathematical check is the source law with **distinct x at both auxiliary primes**, where the preceding CRT census recorded eight rational relations. For this collision stratum, changing the rational point lifts, permitting nonintegral `a1,a2` under explicit local-integrality rules, or changing the relation word defines a new construction with its own proof and cost obligations.

@@ -5,4 +5,5 @@ PINNED=/Volumes/SSD990/cryptanalysis/experiments/xedni-public-first-large-holdou
 cmp "$HERE/lean-toolchain" "$PINNED/lean-toolchain"
 cmp "$HERE/lake-manifest.json" "$PINNED/lake-manifest.json"
 cd "$PINNED"
-lake env lean -R "$HERE" "$HERE/Tangent.lean"
+lake env lean -R "$HERE" -o "$HERE/Tangent.olean" "$HERE/Tangent.lean"
+lake env sh -c 'LEAN_PATH="$1:$LEAN_PATH" lean -R "$1" "$1/Cases.lean"' sh "$HERE"
