@@ -2251,7 +2251,7 @@ pub(crate) mod tests {
 
     pub fn ghs_instances() -> Vec<Inst> {
         let text = include_str!(
-            "../../research/ghs_cubic_genus3_build_20261012/results/run-20261013T0320Z.jsonl"
+            "../../../research/ghs_cubic_genus3_build_20261012/results/run-20261013T0320Z.jsonl"
         );
         let m4 = mons_of_degree(4);
         let mut out = Vec::new();
@@ -3495,19 +3495,19 @@ pub(crate) mod tests {
             (
                 5,
                 include_str!(
-                    "../../research/quartic_pic_canonical_20261018/results/v4_dump_q5.jsonl"
+                    "../../../research/quartic_pic_canonical_20261018/results/v4_dump_q5.jsonl"
                 ),
             ),
             (
                 7,
                 include_str!(
-                    "../../research/quartic_pic_canonical_20261018/results/v4_dump_q7.jsonl"
+                    "../../../research/quartic_pic_canonical_20261018/results/v4_dump_q7.jsonl"
                 ),
             ),
             (
                 11,
                 include_str!(
-                    "../../research/quartic_pic_canonical_20261018/results/v4_dump_q11.jsonl"
+                    "../../../research/quartic_pic_canonical_20261018/results/v4_dump_q11.jsonl"
                 ),
             ),
         ];
