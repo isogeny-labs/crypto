@@ -3177,6 +3177,14 @@ fn parse_args() -> Args {
 /// A target curve over `F_p` on which at least `need` abscissae of `V`
 /// carry points.
 fn target_curve(p: u64, tower: &Tower, need: usize, rng: &mut StdRng) -> (PrimeCurve, Vec<u64>) {
+    let available = tower
+        .cover
+        .as_ref()
+        .map_or(tower.v.len(), |cv| cv.image(&tower.v, p).len());
+    assert!(
+        need <= available,
+        "target_curve requires {need} distinct base abscissae, but the tower has only {available}"
+    );
     loop {
         let a = rng.gen_range(0..p);
         let b = rng.gen_range(1..p);
@@ -4200,5 +4208,29 @@ mod tests {
         assert_eq!(eqs[0].terms.len(), 9);
         let sum = eqs[0].terms.values().fold(0u64, |a, &c| (a + c) % curve.p);
         assert_eq!(sum, 1_862_312_789);
+    }
+
+    #[test]
+    #[should_panic(
+        expected = "target_curve requires 5 distinct base abscissae, but the tower has only 4"
+    )]
+    fn target_curve_rejects_more_summands_than_base_points() {
+        let p = BB_PRIME;
+        let mut rng = StdRng::seed_from_u64(20261121);
+        let tower = kummer(p, 2, &mut rng);
+        target_curve(p, &tower, 5, &mut rng);
+    }
+
+    #[test]
+    #[should_panic(
+        expected = "target_curve requires 5 distinct base abscissae, but the tower has only 4"
+    )]
+    fn target_curve_rejects_cover_image_with_too_few_points() {
+        let p = BB_PRIME;
+        let mut rng = StdRng::seed_from_u64(20261122);
+        let mut tower = kummer(p, 3, &mut rng);
+        tower.cover = Some(CoverMap::draw(CoverKind::Square, p, &mut rng));
+        assert_eq!(tower.cover.as_ref().unwrap().image(&tower.v, p).len(), 4);
+        target_curve(p, &tower, 5, &mut rng);
     }
 }
