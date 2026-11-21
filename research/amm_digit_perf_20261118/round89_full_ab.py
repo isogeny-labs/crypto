@@ -162,6 +162,36 @@ fn main(){
     println!("{p},square_{degree},{ns:.3},{checksum},{count}");
   }
  }
+ // Constructed binomial multiplication is a separate root-certificate
+ // workload. The source-exact before/after checksums must match.
+ for p in [65_521u64, 1_000_000_007, MAX_PRIME] {
+  for degree in [6usize,8,12,16] {
+   let mut seed=0x2026_1121_0091u64 ^ p ^ degree as u64;
+   let mut inputs=Vec::new();
+   for index in 0..1024usize {
+    let mut a=Vec::with_capacity(degree);
+    for _ in 0..degree {
+     seed=seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+     a.push((seed % (p-1))+1);
+    }
+    let mut b=vec![0;degree];
+    b[0]=((seed>>13)%(p-1))+1;
+    b[degree-1]=if index%2==0 {1} else {((seed>>7)%(p-1))+1};
+    inputs.push((a,b));
+   }
+   let start=Instant::now();let mut checksum=0u64;let mut calls=0;
+   for _ in 0..3 {
+    for (a,b) in &inputs {
+     let result=cryptanalysis::prime_root_trace::benchmark_product(
+         black_box(a),black_box(b),black_box(p));
+     checksum=checksum.wrapping_mul(33).wrapping_add(result[degree-1]);
+     black_box(result);calls+=1;
+    }
+   }
+   let ns=start.elapsed().as_nanos() as f64 / calls as f64;
+   println!("{p},product_binomial_{degree},{ns:.3},{checksum},{calls}");
+  }
+ }
 }
 """
 
@@ -196,6 +226,10 @@ with tempfile.TemporaryDirectory(prefix="root89-full-") as tmp:
                             "--","--nocapture"],cwd=folder,check=True)
             subprocess.run(["cargo","test","--release","--quiet",
                             "certificate_tampering_rejected",
+                            "--","--nocapture"],cwd=folder,check=True)
+        if label == "after":
+            subprocess.run(["cargo","test","--release","--quiet",
+                            "binomial_products_match_independent_arithmetic_oracle",
                             "--","--nocapture"],cwd=folder,check=True)
         if label == "after":
             subprocess.run(["cargo","test","--release","--quiet",
