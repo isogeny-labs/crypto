@@ -1174,6 +1174,7 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
 // dense monic moduli, fixed-degree reduction avoids allocating and trimming
 // the quotient that vdiv must return for independently checked Division events.
 // Sparse/binomial and nonmonic moduli retain vdiv's existing specializations.
+#[inline]
 fn vremainder(a: &[u64], m: &[u64], p: u64) -> Result<Vec<u64>, String> {
     if m.len() < 4 || m.last() != Some(&1) || (m[1] == 0 && m[2] == 0) {
         return Ok(vdiv(a, m, p)?.1);
