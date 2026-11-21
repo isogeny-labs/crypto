@@ -316,6 +316,12 @@ impl Engine<'_> {
     }
     fn event(&mut self, event: RootEvent) -> Work<()> {
         self.room()?;
+        self.event_after_room(event)
+    }
+    // A Field operation has already checked the event budget in field().
+    // Do not repeat that check for every modular operation. There is no
+    // intervening event between the check and this emission.
+    fn event_after_room(&mut self, event: RootEvent) -> Work<()> {
         self.report.counters.observe(&event);
         if let Err(error) = (self.sink)(&event) {
             self.report.unacknowledged = Some(event);
@@ -331,7 +337,7 @@ impl Engine<'_> {
             return Err(RootStop::WorkLimit);
         }
         let value = field_value_cached(&op, a, b, self.report.p, self.reciprocal32);
-        self.event(RootEvent::Field { op, a, b, value })?;
+        self.event_after_room(RootEvent::Field { op, a, b, value })?;
         Ok(value)
     }
     fn inv(&mut self, value: u64) -> Work<u64> {
