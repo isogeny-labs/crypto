@@ -1170,23 +1170,59 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
     remainder.truncate(b.len() - 1);
     Ok((trim(quotient), trim(remainder)))
 }
+// The modular-power and Euclidean-GCD replay only need a remainder. For
+// dense monic moduli, fixed-degree reduction avoids allocating and trimming
+// the quotient that vdiv must return for independently checked Division events.
+// Sparse/binomial and nonmonic moduli retain vdiv's existing specializations.
+fn vremainder(a: &[u64], m: &[u64], p: u64) -> Result<Vec<u64>, String> {
+    if m.len() < 4 || m.last() != Some(&1) || (m[1] == 0 && m[2] == 0) {
+        return Ok(vdiv(a, m, p)?.1);
+    }
+    if a.len() < m.len() {
+        return Ok(trim(a.to_vec()));
+    }
+    let degree = m.len() - 1;
+    let mut remainder = a.to_vec();
+    for shift in (0..=a.len() - m.len()).rev() {
+        let factor = remainder[shift + degree];
+        if factor == 0 {
+            continue;
+        }
+        // The monic highest term cancels without a field multiplication.
+        remainder[shift + degree] = 0;
+        for (j, &coefficient) in m[..degree].iter().enumerate() {
+            if coefficient == 0 {
+                continue;
+            }
+            let product = vmul(factor, coefficient, p);
+            let old = remainder[shift + j];
+            remainder[shift + j] = if old >= product {
+                old - product
+            } else {
+                old + p - product
+            };
+        }
+    }
+    remainder.truncate(degree);
+    Ok(trim(remainder))
+}
 fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, String> {
     // The independent verifier keeps separate arithmetic, but skips
     // identities that cannot affect any residue.
-    let mut r = if m.len() > 1 { vec![1] } else { vdiv(&[1], m, p)?.1 };
+    let mut r = if m.len() > 1 { vec![1] } else { vremainder(&[1], m, p)? };
     // Degree-short canonical inputs are already their own residues.
     // Do not allocate quotient/remainder vectors for these bases.
     let mut b = if base.len() < m.len() {
         trim(base.to_vec())
     } else {
-        vdiv(base, m, p)?.1
+        vremainder(base, m, p)?
     };
     while e > 0 {
         if e & 1 == 1 {
             r = if r == [1] {
                 b.clone()
             } else {
-                vdiv(&vproduct(&r, &b, p), m, p)?.1
+                vremainder(&vproduct(&r, &b, p), m, p)?
             };
         }
         e >>= 1;
@@ -1194,7 +1230,7 @@ fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, Strin
         // Skipping the last modular square saves a polynomial product
         // and a polynomial division in the verifier's independent replay.
         if e != 0 {
-            b = vdiv(&vsquare(&b, p), m, p)?.1;
+            b = vremainder(&vsquare(&b, p), m, p)?;
         }
     }
     Ok(r)
@@ -1214,7 +1250,7 @@ fn vmonic(mut a: Vec<u64>, p: u64) -> Vec<u64> {
 }
 fn vgcd(mut a: Vec<u64>, mut b: Vec<u64>, p: u64) -> Result<Vec<u64>, String> {
     while !b.is_empty() {
-        let r = vdiv(&a, &b, p)?.1;
+        let r = vremainder(&a, &b, p)?;
         a = b;
         b = r;
     }
@@ -1630,6 +1666,33 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round87_remainder_only_replay_matches_independent_division() {
+        // Compare fixed-degree remainder-only reduction against the frozen
+        // Euclidean quotient-and-remainder verifier, including 61-bit fields.
+        for p in [3_u64, 5, 65_521, 1_000_000_007, MAX_PRIME] {
+            for degree in 3..=8 {
+                for seed in 0..32_u64 {
+                    let mut modulus: Vec<u64> = (0..degree)
+                        .map(|i| ((seed * 37 + i as u64 * 71 + 1) % (p - 1)) + 1)
+                        .collect();
+                    modulus.push(1);
+                    for extra in 0..=degree {
+                        let length = degree + extra;
+                        let dividend: Vec<u64> = (0..length)
+                            .map(|i| ((seed * 47 + i as u64 * 113 + 2) % (p - 1)) + 1)
+                            .collect();
+                        assert_eq!(
+                            vremainder(&dividend, &modulus, p).unwrap(),
+                            vdiv(&dividend, &modulus, p).unwrap().1,
+                            "p={p} degree={degree} seed={seed} extra={extra}"
+                        );
+                    }
+                }
+            }
+        }
+    }
 
     #[test]
     fn round82_full_split_frobenius_certificate_and_tampering() {
