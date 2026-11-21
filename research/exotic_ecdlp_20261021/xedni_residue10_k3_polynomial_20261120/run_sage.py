@@ -103,7 +103,12 @@ def main():
     select_raw, select_packed = packed_rows(selection)
     rows_raw, rows_packed = packed_rows(output)
     (HERE / "selection.jsonl.gz").write_bytes(select_packed)
-    (HERE / "polynomial-rows.jsonl.gz").write_bytes(rows_packed)
+    row_dir = HERE / "polynomial-rows"
+    row_dir.mkdir(exist_ok=True)
+    row_lines = rows_raw.splitlines(keepends=True)
+    assert len(row_lines) == len(output)
+    for i, line in enumerate(row_lines):
+        (row_dir / f"{i:03d}.jsonl").write_bytes(line)
     print(json.dumps({"schema": "xedni-residue10-k3-polynomial-result-v1",
                       "status": "PASS" if not counts["producer_failure"] else "PARTIAL",
                       "source_checks_sha256": sha(checks_bytes),

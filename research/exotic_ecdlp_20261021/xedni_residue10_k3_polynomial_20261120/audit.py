@@ -77,9 +77,11 @@ def main():
     checks = [json.loads(x) for x in gzip.decompress(source_bytes).splitlines()]
     points = [json.loads(x) for x in gzip.decompress(point_bytes).splitlines()]
     selected_bytes = (HERE / "selection.jsonl.gz").read_bytes()
-    polynomial_bytes = (HERE / "polynomial-rows.jsonl.gz").read_bytes()
+    row_files = sorted((HERE / "polynomial-rows").glob("[0-9][0-9][0-9].jsonl"))
+    assert len(row_files) == 32
     selected_raw = gzip.decompress(selected_bytes)
-    polynomial_raw = gzip.decompress(polynomial_bytes)
+    polynomial_raw = b"".join(path.read_bytes() for path in row_files)
+    polynomial_bytes = gzip.compress(polynomial_raw, mtime=0)
     assert sha(selected_bytes) == result["selection_packed_sha256"]
     assert sha(selected_raw) == result["selection_raw_sha256"]
     assert sha(polynomial_bytes) == result["polynomial_rows_packed_sha256"]

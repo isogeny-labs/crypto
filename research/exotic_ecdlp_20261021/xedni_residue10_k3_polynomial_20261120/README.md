@@ -10,7 +10,7 @@ For the frozen locally selected coefficient-10 CRT stream, **all 32 classes comp
 | Rootless-modulus certificates | 32 |
 | Unresolved / producer-failure cells in final result | 0 / 0 |
 
-Certificate moduli are recorded per class in [polynomial rows](polynomial-rows.jsonl.gz): 13 for 10 classes, 17 for 12, and 23, 37, 43, 59, or 61 for the remaining 10. The [selection rows](selection.jsonl.gz) retain all 1,488 reduced-compatibility statuses, including the 1,456 incompatible rows. The selection is a **post-run diagnostic** based on reduced group work, not an uncharged unknown-target selection rule. The earlier [centered coefficient-10 census](../xedni_residue10_rational_20261120/README.md) already checked all 1,488 rational curves; this packet extends the 32 reduced-compatible fixed-`k1,k2` classes to every integer `k3` representative preserving their auxiliary residues.
+Certificate moduli are recorded per class in [polynomial rows](polynomial-rows/): 13 for 10 classes, 17 for 12, and 23, 37, 43, 59, or 61 for the remaining 10. The [selection rows](selection.jsonl.gz) retain all 1,488 reduced-compatibility statuses, including the 1,456 incompatible rows. The selection is a **post-run diagnostic** based on reduced group work, not an uncharged unknown-target selection rule. The earlier [centered coefficient-10 census](../xedni_residue10_rational_20261120/README.md) already checked all 1,488 rational curves; this packet extends the 32 reduced-compatible fixed-`k1,k2` classes to every integer `k3` representative preserving their auxiliary residues.
 
 ## Proof and verification map
 
@@ -22,12 +22,12 @@ The [independent SymPy audit](audit.py) recomputes the full Weierstrass group la
 | --- | --- | --- | --- |
 | Rootless modulus implies no integer root | `XedniResidue10K3.no_integer_root_of_rootless_mod` | Any integer coefficient list, any modulus, every integer argument | Lean checked |
 | Residue evaluation commutes with integer cast | `XedniResidue10K3.evalResidue_cast` | Same exact Horner representation | Lean checked |
-| 32 concrete numerator identities and rootless moduli | [Sage result](result.json), [polynomial rows](polynomial-rows.jsonl.gz), [SymPy audit](audit-result.json) | Frozen 32 selected classes, shifts only in `k3` | Complete exact arithmetic replay |
+| 32 concrete numerator identities and rootless moduli | [Sage result](result.json), [polynomial rows](polynomial-rows/), [SymPy audit](audit-result.json) | Frozen 32 selected classes, shifts only in `k3` | Complete exact arithmetic replay |
 | Full Lean binding from each generic elliptic section to its stored numerator | Requires formal rational-function specialization and the 32 symbolic `10Q` identities | Same classes | Formalization partial; the generic rootless implication is checked, while these concrete symbolic identities remain computational certificates |
 
 The [protocol](protocol.json) fixed the input digests, post-run selection, coefficient shift, necessary polynomial, prime search cap, status rules, and claim boundary before execution. The [result](result.json) includes raw and packed hashes for both streams. The [runtime receipt](sage-runtime-info.json) records the accepted local Sage build. The [Lean build](formal/build.sh) pins `v4.35.0-rc4` and Mathlib revision `021c46bdd042f67b538b9f9871d556a93713a9a9`; [output](formal/build-output.txt) lists only `propext` and `Quot.sound` under `#print axioms`. No reported theorem uses `sorry`, `admit`, a custom claim axiom, or native evaluation. `lean4checker --fresh` is unavailable on this host.
 
-The 646 KB coefficient stream is retained in Git through an exact-path artifact-policy entry. The configured object store rejected its upload with `AllAccessDisabled`; the checked-in stream preserves the independently audited bytes and digest for replay.
+The 32 coefficient records are retained as separate, ordered JSONL files, each below the repository artifact threshold. Concatenating them in filename order reproduces the raw SHA-256 in `result.json`; deterministic gzip compression reproduces its packed SHA-256. The configured object store rejected the original aggregate upload with `AllAccessDisabled`, so the checked-in records preserve all certificate bytes for replay without changing the trusted artifact policy.
 
 The next algebraic screen should vary `k1,k2` within the same local residue class or change the auxiliary-prime policy. Those variations change the generic numerator and need a new frozen certificate and cost record. A complete unknown-target pipeline also needs relation selection, novel rank, descent, and same-point rho timing under the repository measurement contract.
 
