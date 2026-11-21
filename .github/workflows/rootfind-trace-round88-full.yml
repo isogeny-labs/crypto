@@ -1,0 +1,35 @@
+name: Rootfind round88 dense-product A/B
+on:
+  push:
+    branches:
+      - 'automation/rootfind-barrett-dense-product-round88-20261121'
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_root_trace.rs'
+      - 'research/amm_digit_perf_20261118/round88_full_ab.py'
+      - '.github/workflows/rootfind-trace-round88-full.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-exact-rootfind:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round88_full_ab.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Rust source-exact before/after product and full solve+verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/amm_digit_perf_20261118/round88_full_ab.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round88-product-and-root-solve-ab
+          path: research/amm_digit_perf_20261118/round88_full_ab_results.csv

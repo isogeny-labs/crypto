@@ -792,6 +792,27 @@ fn vmonomial_product(m: &[u64], other: &[u64]) -> Option<Vec<u64>> {
     result[shift..].copy_from_slice(other);
     Some(trim(result))
 }
+// Keep the wide 32-bit arithmetic in its own cold-to-other-fields code
+// region. Inlining it into the generic verifier perturbs even the unchanged
+// 61-bit hot path and gave measurable code-layout regressions.
+#[inline(never)]
+fn vproduct_barrett32(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    debug_assert!(p > 1 && p <= u32::MAX as u64);
+    let reciprocal = u64::MAX / p;
+    let mut result = vec![0; a.len() + b.len() - 1];
+    for (i, &x) in a.iter().enumerate() {
+        if x == 0 { continue; }
+        for (j, &y) in b.iter().enumerate() {
+            if y == 0 { continue; }
+            let term = result[i + j] + x * y;
+            let quotient = ((term as u128 * reciprocal as u128) >> 64) as u64;
+            let remainder = term - quotient * p;
+            result[i + j] = if remainder >= p { remainder - p } else { remainder };
+        }
+    }
+    trim(result)
+}
+
 fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     if a.is_empty() || b.is_empty() {
         return vec![];
@@ -834,6 +855,9 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     }
     if let Some(result) = vmonomial_product(a, b) { return result; }
     if let Some(result) = vmonomial_product(b, a) { return result; }
+    if p <= u32::MAX as u64 && a.len() >= 8 && b.len() >= 8 {
+        return vproduct_barrett32(a, b, p);
+    }
     let mut r = vec![0; a.len() + b.len() - 1];
     for (i, &x) in a.iter().enumerate() {
         // Sparse root polynomials often have zero middle coefficients.
@@ -1630,6 +1654,38 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round88_dense_barrett_product_matches_reference_convolution() {
+        let mut state = 0x8422_26d3_1214_6587u64;
+        // The oracle uses independent u128 remainder arithmetic.
+        for p in [3u64, 65521, 1_000_000_007, 4_294_967_291, MAX_PRIME] {
+            for alen in 2..=12 {
+                for blen in 2..=12 {
+                    for case in 0..24 {
+                        let mut a = vec![0; alen];
+                        let mut b = vec![0; blen];
+                        for x in a.iter_mut().chain(b.iter_mut()) {
+                            state = state.wrapping_mul(6364136223846793005)
+                                .wrapping_add(1442695040888963407);
+                            *x = state % p;
+                        }
+                        if case % 6 == 0 { a[0] = 0; b[blen - 1] = 0; }
+                        if case % 7 == 0 { a[alen - 1] = p - 1; b[0] = p - 1; }
+                        let mut expected = vec![0u64; alen + blen - 1];
+                        for (i, &x) in a.iter().enumerate() {
+                            for (j, &y) in b.iter().enumerate() {
+                                expected[i + j] = ((expected[i + j] as u128
+                                    + x as u128 * y as u128) % p as u128) as u64;
+                            }
+                        }
+                        assert_eq!(vproduct(&a, &b, p), trim(expected),
+                            "p={p} alen={alen} blen={blen} case={case}");
+                    }
+                }
+            }
+        }
+    }
 
     #[test]
     fn round82_full_split_frobenius_certificate_and_tampering() {
