@@ -9,7 +9,7 @@
 //!     [--arms AaCcR] [--cc 2.0] [--max-h 64] [--threads 4] [--rho-cap 3e7]
 //!     [--seed-search 600] [--max-trials 5e7] [--smith] [--smith-census N]
 //!     [--quartic] [--qc 3.0] [--restart-sqrt] [--sge W,F]... --out FILE.jsonl
-//!     [--quartic-arms full,2lp,2lp-alg,2lp-new] [--quartic-seeds p=s1/s2,...]
+//!     [--quartic-arms full,2lp,2lp-alg,2lp-kick,2lp-new] [--quartic-seeds p=s1/s2,...]
 //! ```
 //!
 //! Arms: `A` full base, `a` full base with the parity prefilter, `C` double
@@ -68,11 +68,13 @@ struct Cfg {
     smith: bool,
     smith_census: u64,
     quartic: bool,
-    /// `--quartic-arms full,2lp,2lp-alg,2lp-new`: the quartic arms to run
+    /// `--quartic-arms full,2lp,2lp-alg,2lp-kick,2lp-new`: the quartic arms to run
     /// (default `full,2lp`, the frozen pair).  `2lp-alg` is the algebraic
-    /// descent with the frozen solve, `2lp-new` the algebraic descent with
-    /// the linked solve policy (`ql::QSolve::Linked`).  Any value other than
-    /// the default adds descent / solve fields to the quartic records.
+    /// descent with the frozen solve; `2lp-kick` adds the `T` kick after
+    /// each decomposition row (`ql::QDiemOpts::kick_t`); `2lp-new` is the
+    /// algebraic descent, the kick and the linked solve policy
+    /// (`ql::QSolve::Linked`, `--quartic-inhom` rows).  Any value other
+    /// than the default adds descent / solve fields to the quartic records.
     quartic_arms: Vec<String>,
     /// `--quartic-seeds p=s1/s2/...,...`: evaluate only these curve seeds in
     /// the quartic cell of `p` (same admission path, no seed search).
@@ -197,7 +199,7 @@ fn parse() -> Result<Cfg, String> {
             "--quartic-arms" => {
                 c.quartic_arms = v.split(',').map(String::from).collect();
                 for a in &c.quartic_arms {
-                    if !["full", "2lp", "2lp-alg", "2lp-gt", "2lp-new"].contains(&a.as_str()) {
+                    if !["full", "2lp", "2lp-alg", "2lp-kick", "2lp-new"].contains(&a.as_str()) {
                         return Err(format!("--quartic-arms: unknown arm {a}"));
                     }
                 }
@@ -724,11 +726,11 @@ fn main() -> ExitCode {
             let ext = cfg.quartic_arms != ["full", "2lp"];
             for name in &cfg.quartic_arms {
                 use ql::{QArm as A, QDescent as D, QSolve as S};
-                let (arm, nb, descent, solve, step_gt, suffix) = match name.as_str() {
+                let (arm, nb, descent, solve, kick_t, suffix) = match name.as_str() {
                     "full" => (A::Full, 0usize, D::Scan, S::Legacy, false, ""),
                     "2lp" => (A::DoubleLp, nb2, D::Scan, S::Legacy, false, ""),
                     "2lp-alg" => (A::DoubleLp, nb2, D::Algebraic, S::Legacy, false, "_alg"),
-                    "2lp-gt" => (A::DoubleLp, nb2, D::Algebraic, S::Legacy, true, "_gt"),
+                    "2lp-kick" => (A::DoubleLp, nb2, D::Algebraic, S::Legacy, true, "_kick"),
                     _ => (A::DoubleLp, nb2, D::Algebraic, S::Linked, true, "_new"),
                 };
                 let o = ql::run_diem_with(
@@ -745,7 +747,7 @@ fn main() -> ExitCode {
                         solve,
                         diag: cfg.quartic_diag,
                         inhom_rows: if solve == ql::QSolve::Linked { cfg.quartic_inhom } else { 8 },
-                        step_gt,
+                        kick_t,
                     },
                 );
                 let mut rec = head.clone();
@@ -763,7 +765,7 @@ fn main() -> ExitCode {
                 if ext {
                     rec["descent"] = json!(format!("{descent:?}"));
                     rec["solve"] = json!(format!("{solve:?}"));
-                    rec["step_gt"] = json!(step_gt);
+                    rec["kick_t"] = json!(kick_t);
                     rec["rel_decomp_mul"] = json!(o.rel_decomp.mul);
                     rec["rel_decomp_add"] = json!(o.rel_decomp.add);
                     rec["rel_enum_mul"] = json!(o.rel_enum.mul);

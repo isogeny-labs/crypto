@@ -1301,12 +1301,21 @@ pub struct QDiemOpts {
     /// Inhomogeneous rows wanted before the first attempt (0: the frozen 8);
     /// every failed attempt adds 4, as in the frozen instrument.
     pub inhom_rows: u64,
-    /// Step the decomposition walk by `G + T` instead of `G` (frozen), so
-    /// that consecutive rows carry different `T`-coefficients.  With the
-    /// `G` step all rows of one batch share `b`, and with the degree
-    /// direction left free by the line relations, `e_t + h b v_deg` is in
-    /// the kernel: `t` is undetermined until a second batch arrives.
-    pub step_gt: bool,
+    /// After every counted decomposition row, step the walk once by `T`
+    /// (one counted Pic addition) besides the frozen step by `G`.
+    ///
+    /// Why: the line relations are homogeneous, so they fix the
+    /// logarithms only up to `alpha v_deg + mu lambda` (`v_deg`: every
+    /// `lambda_P + 1`, `lambda_kappa + 4`, the base-point shift; `lambda`:
+    /// the true logarithms, scale).  A decomposition row of
+    /// `x = [a]G + [b]T` removes the combination
+    /// `-alpha + mu h a + h b (mu t - tau) = 0` from the kernel
+    /// `alpha v_deg + mu lambda + tau e_t`, so `t` is determined only when the
+    /// rows' points `(a_i, b_i)` span the affine plane.  One walk
+    /// `x + i G` puts them all on the line `b = const`: with no line through
+    /// `P0` in the core the frozen first attempt is singular in `t` by
+    /// construction.  The kick moves each later row off that line.
+    pub kick_t: bool,
 }
 
 /// One counted attempt's diagnosis (only with [`QDiemOpts::diag`]).
@@ -1554,19 +1563,13 @@ pub fn run_diem_with(inst: &QInstance, prm: QIcParams, opts: QDiemOpts) -> QIcRe
                 let bt = cmul(&pq, &mut ops, &tgt, b);
                 let mut x = pq.add(&ag, &bt);
                 ops.adds += 1;
-                // step G (frozen) or G + T (every row its own T-coefficient)
-                let step = if opts.step_gt {
-                    ops.adds += 1;
-                    pq.add(&g, &tgt)
-                } else {
-                    g.clone()
-                };
                 while ninhom < want_inhom {
                     if res.decomp_trials >= max_decomp {
                         res.exhausted = true;
                         break 'outer;
                     }
                     res.decomp_trials += 1;
+                    let mut kick = false;
                     if let PicClass::Typ(m) = &x {
                         let dec = match opts.descent {
                             QDescent::Scan => ctx.decompose(m, &mut res.rel_decomp),
@@ -1611,6 +1614,7 @@ pub fn run_diem_with(inst: &QInstance, prm: QIcParams, opts: QDiemOpts) -> QIcRe
                                     }
                                     if linked || opts.solve == QSolve::Legacy {
                                         ninhom += 1;
+                                        kick = true;
                                     }
                                 } else {
                                     res.bad_relations += 1;
@@ -1618,12 +1622,15 @@ pub fn run_diem_with(inst: &QInstance, prm: QIcParams, opts: QDiemOpts) -> QIcRe
                             }
                         }
                     }
-                    x = pq.add(&x, &step);
-                    ops.adds += 1;
-                    a = if a + 1 == r { 0 } else { a + 1 };
-                    if opts.step_gt {
+                    if opts.kick_t && kick {
+                        // the next rows leave the line through the (a, b) so far
+                        x = pq.add(&x, &tgt);
+                        ops.adds += 1;
                         b = if b + 1 == r { 0 } else { b + 1 };
                     }
+                    x = pq.add(&x, &g);
+                    ops.adds += 1;
+                    a = if a + 1 == r { 0 } else { a + 1 };
                 }
             }
 
@@ -2190,7 +2197,7 @@ mod tests {
                         solve: QSolve::Linked,
                         diag: false,
                         inhom_rows: 0,
-                        step_gt: true,
+                        kick_t: true,
                     },
                 );
                 assert!(o.certified, "q={q} seed={seed}: {o:?}");
@@ -2235,7 +2242,7 @@ mod tests {
                                 solve,
                                 diag: true,
                                 inhom_rows: 0,
-                                step_gt: solve == QSolve::Linked,
+                                kick_t: solve == QSolve::Linked,
                             },
                         );
                         eprintln!(

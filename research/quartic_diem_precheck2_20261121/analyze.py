@@ -17,7 +17,7 @@ import numpy as np
 PRIMARY = "Q_diem_2lp_new"
 OLD = "Q_diem_2lp"
 ALG = "Q_diem_2lp_alg"
-GT = "Q_diem_2lp_gt"
+GT = "Q_diem_2lp_kick"
 PREV = "../quartic_diem_precheck_20261120/raw/run.jsonl"
 T975 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 8: 2.306}
 B = 4000
@@ -243,8 +243,8 @@ def main(paths):
         out["arms"][arm] = arm_block([r for r in runs if r["arm"] == arm], rng)
     out["paired_new_over_old"] = paired(runs, PRIMARY, OLD, rng)
     out["paired_alg_over_old"] = paired(runs, ALG, OLD, rng)
-    out["paired_gt_over_alg"] = paired(runs, GT, ALG, rng)
-    out["paired_new_over_gt"] = paired(runs, PRIMARY, GT, rng)
+    out["paired_kick_over_alg"] = paired(runs, GT, ALG, rng)
+    out["paired_new_over_kick"] = paired(runs, PRIMARY, GT, rng)
     out["paired_new_over_alg"] = paired(runs, PRIMARY, ALG, rng)
     out["alg_same_relations_as_old"] = same_relations(runs)
     out["old_arm_reproduces_20261120"] = repro(runs)
