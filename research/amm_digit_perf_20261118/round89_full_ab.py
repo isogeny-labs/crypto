@@ -182,7 +182,7 @@ fn main(){
    let start=Instant::now();let mut checksum=0u64;let mut calls=0;
    for _ in 0..3 {
     for (a,b) in &inputs {
-     let result=cryptanalysis::prime_root_trace::benchmark_product(
+     let result=cryptanalysis::prime_root_trace::benchmark_verified_product(
          black_box(a),black_box(b),black_box(p));
      checksum=checksum.wrapping_mul(33).wrapping_add(result[degree-1]);
      black_box(result);calls+=1;
@@ -211,7 +211,10 @@ with tempfile.TemporaryDirectory(prefix="root89-full-") as tmp:
         (folder / "Cargo.toml").write_text(cargo)
         (folder / "src/main.rs").write_text(main)
         (folder / "src/cryptanalysis/prime_root_trace.rs").write_text(
-            source + "\n#[doc(hidden)] pub(crate) fn benchmark_product(a:&[u64],b:&[u64],p:u64)->Vec<u64>{vproduct(a,b,p)}\n#[doc(hidden)] pub(crate) fn benchmark_square(a:&[u64],p:u64)->Vec<u64>{vsquare(a,p)}\n"
+            source + "\n#[doc(hidden)] pub(crate) fn benchmark_product(a:&[u64],b:&[u64],p:u64)->Vec<u64>{vproduct(a,b,p)}\n#[doc(hidden)] pub(crate) fn benchmark_square(a:&[u64],p:u64)->Vec<u64>{vsquare(a,p)}\n" +
+            ("#[doc(hidden)] pub(crate) fn benchmark_verified_product(a:&[u64],b:&[u64],p:u64)->Vec<u64>{vverified_product(a,b,p)}\n"
+             if label == "after" else
+             "#[doc(hidden)] pub(crate) fn benchmark_verified_product(a:&[u64],b:&[u64],p:u64)->Vec<u64>{vproduct(a,b,p)}\n")
         )
         (folder / "src/cryptanalysis/prime_root_bounded.rs").write_text(
             "// The bounded API is out of scope for this exact producer+verifier benchmark.\n"
