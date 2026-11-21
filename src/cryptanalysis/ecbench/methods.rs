@@ -139,6 +139,14 @@ pub struct MethodDecl {
     pub params: &'static [ParamDecl],
 }
 
+const GROWING_ARITY_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "bits",
+        default: Some("16"),
+        help: "prime-order curve bit size for prime_instance_for (12..=40)",
+    },
+];
+
 const DIEM_KGROW_PARAMS: &[ParamDecl] = &[
     ParamDecl {
         name: "p",
@@ -773,6 +781,14 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ecbench::diem_kgrow::solve",
             applies: Applies::Any,
             params: DIEM_KGROW_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.growing_arity",
+            family: "ic",
+            summary: "Growing-arity prime-field ksum: m=m(L) from GROWING_ARITY_ORACLE_TARGET, B≤C m exp(L/m) capped for KSumOracle, prime_instance_for(bits)+prime-abscissa; matched S_ρ=√(π/2), [d]G=Q via pipeline verify — not extension-IC",
+            entry: "ecbench::growing_arity::solve",
+            applies: Applies::Any,
+            params: GROWING_ARITY_PARAMS,
         },
         MethodDecl {
             id: "rho.cubic",
@@ -3551,6 +3567,10 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
         let _ = (m, inst, curve);
         return Ok(());
     }
+    if id == "ic.growing_arity" {
+        let _ = (m, inst, curve);
+        return Ok(());
+    }
     if id == NEG_STRONG {
         if !matches!(inst, Instance::F2m4(_)) {
             return Err(neg_strong_refusal(curve));
@@ -4017,6 +4037,10 @@ pub fn solve_measured(
     if m.id == "ic.diem_kgrow" {
         let _ = (inst, curve, target, oracle);
         return super::diem_kgrow::solve(m, seed);
+    }
+    if m.id == "ic.growing_arity" {
+        let _ = (inst, curve, target, oracle);
+        return super::growing_arity::solve(m, seed);
     }
     if m.id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
         return Err("CM folded controls require a prime-field instance".into());
@@ -11531,6 +11555,7 @@ mod accounting_rules_tests {
         covered.extend([
             "ic.k4_gaudry",           // curves over F_{p^4}: ecbench::fp4 tests
             "ic.diem_kgrow",          // self-hosted E(F_{p^k}) charged cell + ladder example
+            "ic.growing_arity",       // growing-m ksum on prime_instance_for
             "ic.cm_folded_native_v1", // native backend binary
             "ic.cm_folded_recurrence_v1",
             "ic.cm_folded_native_d43_v1",

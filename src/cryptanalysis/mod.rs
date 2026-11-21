@@ -160,6 +160,7 @@ pub mod diem_kgrow;
 pub mod diem_kgrow_linelog;
 pub mod diem_kgrow_semaev;
 pub mod diem_quartic;
+pub mod growing_arity;
 pub mod ec_index_calculus;
 pub mod ec_index_calculus_curves;
 pub mod ec_index_calculus_j0;

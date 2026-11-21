@@ -66,6 +66,7 @@ pub mod curve25519_pair;
 pub mod curve25519_workload;
 pub mod db;
 pub mod diem_kgrow;
+pub mod growing_arity;
 pub mod diagnostic_binding_core;
 pub mod diagnostic_file_adapter;
 pub mod diagnostic_inventory;
