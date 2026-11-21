@@ -625,8 +625,11 @@ fn vpow(mut a: u64, mut e: u64, p: u64) -> u64 {
         if e & 1 == 1 {
             r = vmul(r, a, p);
         }
-        a = vmul(a, a, p);
         e >>= 1;
+        // The final square is never consumed.
+        if e != 0 {
+            a = vmul(a, a, p);
+        }
     }
     r
 }
@@ -1130,6 +1133,29 @@ fn vpower_reduce(product: Vec<u64>, modulus: &[u64], p: u64) -> Result<Vec<u64>,
     }
 }
 fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, String> {
+    // F_p[x] / (c + d*x) is F_p. Reduce the base by Horner evaluation at
+    // -c/d, then use a scalar power rather than repeatedly allocating
+    // polynomials and doing synthetic division at every exponent bit.
+    // This remains independent of the producer's field-operation trace.
+    if m.len() == 2 {
+        if m[1] == 0 {
+            return Err("division by zero polynomial".into());
+        }
+        let minus_constant = if m[0] == 0 { 0 } else { p - m[0] };
+        let root = if m[1] == 1 {
+            minus_constant
+        } else {
+            vmul(minus_constant, vinv(m[1], p), p)
+        };
+        let mut value = 0u64;
+        for &coefficient in base.iter().rev() {
+            let sum = vmul(value, root, p) + coefficient;
+            // Coefficients and products are canonical; 2*p - 2 fits u64.
+            value = if sum >= p { sum - p } else { sum };
+        }
+        let result = vpow(value, e, p);
+        return Ok(if result == 0 { vec![] } else { vec![result] });
+    }
     // Polynomial remainder is invariant under scaling the modulus by a
     // nonzero field element. Normalize a nonmonic modulus ONCE rather than
     // redoing extended-Euclid inversion at every vdiv in the exponent loop.
@@ -1231,15 +1257,14 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             return Err("events after root finish".into());
         }
         counters.observe(event);
-        if index == 0
-            && *event
-                != (RootEvent::Begin {
-                    p,
-                    polynomial: report.polynomial.clone(),
-                    seed: report.seed,
-                })
-        {
-            return Err("root trace header differs".into());
+        if index == 0 {
+            match event {
+                RootEvent::Begin { p: event_p, polynomial, seed }
+                    if *event_p == p
+                        && polynomial == &report.polynomial
+                        && *seed == report.seed => {}
+                _ => return Err("root trace header differs".into()),
+            }
         }
         match event {
             RootEvent::Begin { .. } => {
@@ -1651,6 +1676,61 @@ mod tests {
             ((a as u128 * x as u128 + b as u128) % p as u128) as u64
         })
     }
+    #[test]
+    fn round96_linear_modulus_scalar_power_matches_independent_polynomial_arithmetic() {
+        // Freeze the polynomial-ring method as an independent oracle for
+        // every linear-modulus specialization, including zero and 0^0.
+        fn reference(base: &[u64], mut exponent: u64, modulus: &[u64], p: u64)
+            -> Result<Vec<u64>, String>
+        {
+            let mut r = vdiv(&[1], modulus, p)?.1;
+            let mut b = vdiv(base, modulus, p)?.1;
+            while exponent > 0 {
+                if exponent & 1 == 1 {
+                    r = vdiv(&vproduct(&r, &b, p), modulus, p)?.1;
+                }
+                exponent >>= 1;
+                if exponent != 0 {
+                    b = vdiv(&vsquare(&b, p), modulus, p)?.1;
+                }
+            }
+            Ok(r)
+        }
+        let mut seed = 0x524f_4f54_2026_1196u64;
+        for p in [7u64, 65_521, 1_000_000_007, MAX_PRIME] {
+            for case in 0..128u64 {
+                let constant = if case % 7 == 0 { 0 } else { seed % p };
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                let leading = if case & 1 == 0 { 1 } else { 1 + seed % (p - 1) };
+                let modulus = vec![constant, leading];
+                let mut base = vec![0; 1 + case as usize % 9];
+                for value in &mut base {
+                    seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                    *value = if case % 5 == 0 { 0 } else { seed % p };
+                }
+                if case % 11 == 0 { base.clear(); }
+                for exponent in [0, 1, 2, 17, (p - 1) / 2, p] {
+                    assert_eq!(vpower(&base, exponent, &modulus, p).unwrap(),
+                               reference(&base, exponent, &modulus, p).unwrap(),
+                               "p={p} case={case} exponent={exponent}");
+                }
+            }
+        }
+        assert!(vpower(&[1], 7, &[1, 0], 7).is_err());
+    }
+
+    #[test]
+    fn round96_linear_root_certificate_replay() {
+        for p in [7u64, 65_521, 1_000_000_007, MAX_PRIME] {
+            for root in [0, 1, 2, 6, p - 1] {
+                let polynomial = vec![if root == 0 { 0 } else { p - root }, 1];
+                let report = run(&polynomial, p);
+                assert!(report.complete());
+                verify(&report).unwrap();
+            }
+        }
+    }
+
     #[test]
     fn round95_nonmonic_power_reduction_matches_legacy_reference() {
         // Frozen reference performs every reduction using the original
