@@ -120,6 +120,7 @@ Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hypere
 
 ## Blocked / questions for the owner
 
+- PKM curve-selection preflight (Codex, PR #4884): example release tests pass 19/19, but the required `cargo test --release --locked --lib` gate reported 72 failures before it was stopped after 7,465 passes. At least one ecbench failure is a missing artifact-store `research/curve25519_f1_targetwalk_20261108/sessions/k20-s0/records.jsonl` on current main; that file is not in Git. Restore the exact artifact-store inputs and rerun the full library gate before marking this PR ready.
 
 - Lazy-orbit column sweep vs strong rho (claude, 2026-11-17, branch claude/admiring-gauss-vo7kxf, PR #4565): protocol frozen (`research/ic_lead_chase_20261116/protocol.json`, sha256 19116bb1…, source 3658d3aa26), specs and analysis bound, queue registrations `experiments/queue/EXP-LAZYCOL-N{17,29,31}-001.json` filed `blocked`. Needs: live daily+monthly budget headroom in account 104186811093 (latest readback over the monthly cap; this runtime has no lab AWS identity), approved expspec records, an isolab image built from 3658d3aa26, and a perf-ipc w_cal host.
 
