@@ -23,8 +23,16 @@ jobs:
             src/cryptanalysis/prime_root_trace.rs
             research/amm_digit_perf_20261118/round89_full_ab.py
       - uses: dtolnay/rust-toolchain@stable
-      - name: Compare baseline and round89 production Rust source
+      - name: Compare baseline and candidate production Rust source
         shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/amm_digit_perf_20261118/round89_full_ab.py
+      - name: Isolate replay optimizations against frozen round89 source
+        shell: bash
+        env:
+          ROOTFIND_BASELINE_REF: fb1011afad75de2bbe473cc5ed18405fb1e1983a
+          ROOTFIND_AB_OUTPUT: research/amm_digit_perf_20261118/round90_replay_ab_results.csv
         run: |
           set -euo pipefail
           python3 research/amm_digit_perf_20261118/round89_full_ab.py
@@ -32,4 +40,6 @@ jobs:
         if: always()
         with:
           name: round89-rootfind-before-after
-          path: research/amm_digit_perf_20261118/round89_full_ab_results.csv
+          path: |
+            research/amm_digit_perf_20261118/round89_full_ab_results.csv
+            research/amm_digit_perf_20261118/round90_replay_ab_results.csv
