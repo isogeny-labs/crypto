@@ -343,15 +343,30 @@ impl Engine<'_> {
         let mut r = a.to_vec();
         let mut q = vec![0; a.len().saturating_sub(b.len()) + 1];
         if a.len() >= b.len() {
-            let inv = self.inv(*b.last().unwrap())?;
+            // The leading coefficient cancels by construction: c = lead(r)/lead(b).
+            // In the monic case c is already the top remainder coefficient, so
+            // no inverse or traced multiplication is necessary. Zero divisor
+            // coefficients also leave lower remainder coefficients unchanged.
+            // These are omitted arithmetic operations, not unreported work.
+            let lead = *b.last().unwrap();
+            let inverse = if lead == 1 { None } else { Some(self.inv(lead)?) };
             while r.len() >= b.len() {
                 let shift = r.len() - b.len();
-                let c = self.field(FieldOp::Mul, *r.last().unwrap(), inv)?;
+                let highest = *r.last().unwrap();
+                let c = if let Some(inv) = inverse {
+                    self.field(FieldOp::Mul, highest, inv)?
+                } else {
+                    highest
+                };
                 q[shift] = c;
-                for (k, &v) in b.iter().enumerate() {
+                for (k, &v) in b[..b.len() - 1].iter().enumerate() {
+                    if v == 0 { continue; }
                     let product = self.field(FieldOp::Mul, c, v)?;
                     r[shift + k] = self.field(FieldOp::Sub, r[shift + k], product)?;
                 }
+                // lead(r) - c * lead(b) is zero in F_p, so removing this
+                // coefficient is exact for both monic and nonmonic divisors.
+                r.pop();
                 r = trim(r);
             }
         }
@@ -1588,6 +1603,57 @@ mod tests {
             ((a as u128 * x as u128 + b as u128) % p as u128) as u64
         })
     }
+    #[test]
+    fn round93_traced_division_matches_independent_quotient_remainder() {
+        // Exhaust both monic and nonmonic cases, with sparse and dense
+        // divisors. The verifier arithmetic is independent of Engine::div.
+        let mut seed = 0x524f_4f54_2026_1193u64;
+        for p in [7u64, 65_521, 1_000_000_007, MAX_PRIME] {
+            for case in 0..384usize {
+                let alen = 1 + case % 11;
+                let blen = 1 + (case / 3) % 9;
+                let mut a = vec![0; alen];
+                let mut b = vec![0; blen];
+                for coeff in a.iter_mut().chain(b.iter_mut()) {
+                    seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                    *coeff = seed % p;
+                }
+                a[alen - 1] = 1 + a[alen - 1] % (p - 1);
+                b[blen - 1] = if case & 1 == 0 { 1 } else { p - 1 };
+                if case % 3 == 0 {
+                    for coefficient in &mut b[1..blen - 1] {
+                        *coefficient = 0;
+                    }
+                }
+                let reference = vdiv(&a, &b, p).unwrap();
+                let mut sink = |_event: &RootEvent| Ok(());
+                let mut engine = Engine {
+                    report: RootReport {
+                        schema: "prime-root-trace/v1".into(),
+                        p,
+                        polynomial: vec![1, 1],
+                        seed: 7,
+                        limits: limits(),
+                        stop: RootStop::Complete,
+                        counters: RootCounters::default(),
+                        events: vec![],
+                        unacknowledged: None,
+                        sink_error: None,
+                        roots: vec![],
+                    },
+                    sink: &mut sink,
+                    next_id: 0,
+                };
+                let actual = engine.div(&a, &b).unwrap();
+                assert_eq!(actual, reference, "p={p} case={case} a={a:?} b={b:?}");
+                assert!(matches!(
+                    engine.report.events.last(),
+                    Some(RootEvent::Division { .. })
+                ));
+            }
+        }
+    }
+
     #[test]
     fn round92_skips_terminal_power_squares_but_preserves_complete_certificates() {
         for p in [7u64, 13u64, 65_521, 1_000_000_007, MAX_PRIME] {
