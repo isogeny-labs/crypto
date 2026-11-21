@@ -139,6 +139,39 @@ pub struct MethodDecl {
     pub params: &'static [ParamDecl],
 }
 
+const DIEM_KGROW_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "p",
+        default: Some("5"),
+        help: "base-field prime for the self-hosted E(F_{p^k}) cell",
+    },
+    ParamDecl {
+        name: "k",
+        default: Some("2"),
+        help: "extension degree, or `schedule` to use k_of_p(p,k_min,k_max)",
+    },
+    ParamDecl {
+        name: "k_min",
+        default: Some("2"),
+        help: "lower clamp for schedule mode",
+    },
+    ParamDecl {
+        name: "k_max",
+        default: Some("8"),
+        help: "upper clamp for schedule mode",
+    },
+    ParamDecl {
+        name: "trial_budget",
+        default: Some("2000000"),
+        help: "charged k-decomp trial budget",
+    },
+    ParamDecl {
+        name: "planted",
+        default: Some("2"),
+        help: "number of planted k-summand targets per cell",
+    },
+];
+
 const K4_PARAMS: &[ParamDecl] = &[
     ParamDecl {
         name: "base",
@@ -727,6 +760,14 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ecbench::fp4::solve_k4",
             applies: Applies::Any,
             params: K4_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.diem_kgrow",
+            family: "ic",
+            summary: "Selectable-k Diem extension-IC lab cell: charged brute k-summand factor-base decomp on self-hosted E(F_{p^k}) from params (p,k), matched Pollard-ρ with [d]G=Q check; for growing (p,k(p)) ladders / α-vs-√r discrimination — not absolute F_p same-target, not a Gröbner Semaev solver",
+            entry: "ecbench::diem_kgrow::solve",
+            applies: Applies::Any,
+            params: DIEM_KGROW_PARAMS,
         },
         MethodDecl {
             id: "rho.cubic",
@@ -3500,6 +3541,11 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
             curve.slug, curve.family
         ));
     }
+    if id == "ic.diem_kgrow" {
+        // Self-hosted (p,k) cell; any workload is accepted as a carrier.
+        let _ = (m, inst, curve);
+        return Ok(());
+    }
     if id == NEG_STRONG {
         if !matches!(inst, Instance::F2m4(_)) {
             return Err(neg_strong_refusal(curve));
@@ -3962,6 +4008,11 @@ pub fn solve_measured(
     hyper_ic_variant_guard(m, inst, curve)?;
     let d = decl(&m.id).ok_or("unregistered method")?;
     three_leads_applicable(m, inst, curve)?;
+    // Self-hosted extension geometry from params; workload curve unused.
+    if m.id == "ic.diem_kgrow" {
+        let _ = (inst, curve, target, oracle);
+        return super::diem_kgrow::solve(m, seed);
+    }
     if m.id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
         return Err("CM folded controls require a prime-field instance".into());
     }
@@ -11474,6 +11525,7 @@ mod accounting_rules_tests {
         // Covered elsewhere (own tests, native backends, other curve shapes).
         covered.extend([
             "ic.k4_gaudry",           // curves over F_{p^4}: ecbench::fp4 tests
+            "ic.diem_kgrow",          // self-hosted E(F_{p^k}) charged cell + ladder example
             "ic.cm_folded_native_v1", // native backend binary
             "ic.cm_folded_recurrence_v1",
             "ic.cm_folded_native_d43_v1",

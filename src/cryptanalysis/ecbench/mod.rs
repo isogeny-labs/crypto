@@ -15,6 +15,7 @@
 //! | [`aps`] | bounded APS polynomial instrument with exclusive wall phases and explicit incomplete native pricing |
 //! | [`generic`] | counted BSGS (three forms) and the kangaroo on any [`CountedGroup`] |
 //! | [`fp4`] | `E(F_{p⁴})`: the curve, its counted group and `ic.k4_gaudry` (Gaudry `k = 4`) |
+//! | [`diem_kgrow`] | `ic.diem_kgrow`: selectable-`k` charged Diem cell on growing `(p,k)` (self-hosted geometry) |
 //! | [`hec`] | hyperelliptic Jacobians: the thread's instances, `hec.ic_fb_walk` and its rho reference, counted in `bitop/v1` primitives |
 //! | [`hyper`] | the hyperelliptic thread's Jacobians (genus 2–4, `p < 256`) for the generic arms |
 //! | [`hyper_ic`] | `ic.hyperelliptic`: the thread's index calculus on those Jacobians, counted |
@@ -64,6 +65,7 @@ pub mod cover_quartic;
 pub mod curve25519_pair;
 pub mod curve25519_workload;
 pub mod db;
+pub mod diem_kgrow;
 pub mod diagnostic_binding_core;
 pub mod diagnostic_file_adapter;
 pub mod diagnostic_inventory;
