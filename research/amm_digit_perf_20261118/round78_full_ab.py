@@ -109,6 +109,10 @@ with tempfile.TemporaryDirectory(prefix="root78-full-") as tmp:
             "// The bounded API is out of scope for this exact producer+verifier benchmark.\n"
         )
         subprocess.run(["cargo","build","--release","--quiet"],cwd=folder,check=True)
+        if label == "after":
+            subprocess.run(["cargo","test","--release","--quiet",
+                            "round78_division_paths_match_independent_euclid_and_certify",
+                            "--","--nocapture"],cwd=folder,check=True)
         bins[label] = folder / "target/release/rootfind-isolated-ab"
     rows = []
     for trial in range(13):
