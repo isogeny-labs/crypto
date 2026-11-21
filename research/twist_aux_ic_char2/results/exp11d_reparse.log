@@ -1,0 +1,30 @@
+file type curve truth | gb_time gb_deg | status param_time elim sqfr generic tries | sols split bad
+c1_P_1.ms P 1 0 0.0 4096 0 0.0 None None ? 0 5 0 0
+c1_P_2.ms P 1 0 0.0 4096 0 0.0 None None ? 0 10 0 0
+c1_P_3.ms P 1 1 0.0 4096 0 0.0 None None ? 0 9 1 0
+c1_R_1.ms R 1 1 0.0 4096 0 0.0 None None ? 0 1 1 0
+c1_R_2.ms R 1 1 0.0 4096 0 0.0 None None ? 0 2 1 0
+c1_R_3.ms R 1 1 0.0 4096 0 0.0 None None ? 0 4 1 0
+c2_P_1.ms P 2 3 0.0 4080 ERR:SyntaxError 0.0 None None ? 0 0 0 0
+c2_P_2.ms P 2 0 0.0 4088 ERR:SyntaxError 0.0 None None ? 0 0 0 0
+c2_P_3.ms P 2 1 0.0 4096 ERR:SyntaxError 0.0 None None ? 0 0 0 0
+c2_R_1.ms R 2 0 0.0 4088 0 0.0 None None ? 0 0 0 0
+c2_R_2.ms R 2 0 0.0 4096 0 0.0 None None ? 0 1 0 0
+c2_R_3.ms R 2 0 0.0 4096 0 0.0 None None ? 0 0 0 0
+SUMMARY q=31 P: n=6 | GB time median 0.00s, degrees [4080, 4088, 4096] | solve finished 3/6, param time median 0.0s (cap 900) | generic 0/6 | finished: split 1 vs truth 1, bad 0
+SUMMARY q=31 R: n=6 | GB time median 0.00s, degrees [4088, 4096] | solve finished 6/6, param time median 0.0s (cap 900) | generic 0/6 | finished: split 3 vs truth 3, bad 0
+file type curve truth | gb_time gb_deg | status param_time elim sqfr generic tries | sols split bad
+c1_P_1.ms P 1 0 0.0 4096 0 0.0 None None ? 0 11 0 0
+c1_P_2.ms P 1 1 0.0 4088 0 0.0 None None ? 0 8 1 0
+c1_P_3.ms P 1 1 0.0 4096 0 0.0 None None ? 0 9 1 0
+c1_R_1.ms R 1 0 0.0 4096 0 0.0 None None ? 0 1 0 0
+c1_R_2.ms R 1 0 0.0 4096 0 0.0 None None ? 0 0 0 0
+c1_R_3.ms R 1 0 0.0 4096 0 0.0 None None ? 0 2 0 0
+c2_P_1.ms P 2 0 0.0 4088 0 0.0 None None ? 0 11 0 0
+c2_P_2.ms P 2 1 0.0 4096 0 0.0 None None ? 0 11 1 0
+c2_P_3.ms P 2 1 0.0 4096 0 0.0 None None ? 0 4 1 0
+c2_R_1.ms R 2 0 0.0 4096 0 0.0 None None ? 0 0 0 0
+c2_R_2.ms R 2 0 0.0 4096 0 0.0 None None ? 0 1 0 0
+c2_R_3.ms R 2 1 0.0 4096 0 0.0 None None ? 0 1 1 0
+SUMMARY q=43 P: n=6 | GB time median 0.00s, degrees [4088, 4096] | solve finished 6/6, param time median 0.0s (cap 900) | generic 0/6 | finished: split 4 vs truth 4, bad 0
+SUMMARY q=43 R: n=6 | GB time median 0.00s, degrees [4096] | solve finished 6/6, param time median 0.0s (cap 900) | generic 0/6 | finished: split 1 vs truth 1, bad 0
