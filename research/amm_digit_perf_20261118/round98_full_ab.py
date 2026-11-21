@@ -251,7 +251,7 @@ with tempfile.TemporaryDirectory(prefix="root98-full-") as tmp:
                             "--","--nocapture"],cwd=folder,check=True)
         bins[label] = folder / "target/release/rootfind-isolated-ab"
     rows = []
-    for trial in range(13):
+    for trial in range(17):
         order = ("before","after") if trial % 2 == 0 else ("after","before")
         trial_data = {}
         for label in order:
