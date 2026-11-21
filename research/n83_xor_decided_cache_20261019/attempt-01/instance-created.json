@@ -1,0 +1,137 @@
+{
+  "ReservationId": "r-015e1f53273d5ec4d",
+  "OwnerId": "104186811093",
+  "Groups": [],
+  "Instances": [
+    {
+      "Architecture": "x86_64",
+      "BlockDeviceMappings": [],
+      "ClientToken": "42b594e9-8708-463f-91c5-fe1a0882df24",
+      "EbsOptimized": false,
+      "EnaSupport": true,
+      "Hypervisor": "xen",
+      "InstanceLifecycle": "spot",
+      "NetworkInterfaces": [
+        {
+          "Attachment": {
+            "AttachTime": "2026-10-19T12:14:04+00:00",
+            "AttachmentId": "eni-attach-007c1c2689f32ce58",
+            "DeleteOnTermination": true,
+            "DeviceIndex": 0,
+            "Status": "attaching",
+            "NetworkCardIndex": 0
+          },
+          "Description": "",
+          "Groups": [
+            {
+              "GroupId": "sg-0847db9918be48acf",
+              "GroupName": "n83-cache-20261019-8cde893"
+            }
+          ],
+          "Ipv6Addresses": [],
+          "MacAddress": "02:ff:d8:54:dc:0f",
+          "NetworkInterfaceId": "eni-0880094e4a98f01fd",
+          "OwnerId": "104186811093",
+          "PrivateDnsName": "ip-172-31-16-191.us-west-2.compute.internal",
+          "PrivateIpAddress": "172.31.16.191",
+          "PrivateIpAddresses": [
+            {
+              "Primary": true,
+              "PrivateDnsName": "ip-172-31-16-191.us-west-2.compute.internal",
+              "PrivateIpAddress": "172.31.16.191"
+            }
+          ],
+          "SourceDestCheck": true,
+          "Status": "in-use",
+          "SubnetId": "subnet-07709db0a38a3857b",
+          "VpcId": "vpc-0d4183a7579b59a6a",
+          "InterfaceType": "interface",
+          "Operator": {
+            "Managed": false
+          }
+        }
+      ],
+      "RootDeviceName": "/dev/xvda",
+      "RootDeviceType": "ebs",
+      "SecurityGroups": [
+        {
+          "GroupId": "sg-0847db9918be48acf",
+          "GroupName": "n83-cache-20261019-8cde893"
+        }
+      ],
+      "SourceDestCheck": true,
+      "SpotInstanceRequestId": "sir-h9cqpdpj",
+      "StateReason": {
+        "Code": "pending",
+        "Message": "pending"
+      },
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": "n83-cache-20261019-8cde893"
+        },
+        {
+          "Key": "Study",
+          "Value": "n83-xor-cache-gate"
+        }
+      ],
+      "VirtualizationType": "hvm",
+      "CpuOptions": {
+        "CoreCount": 4,
+        "ThreadsPerCore": 2
+      },
+      "CapacityReservationSpecification": {
+        "CapacityReservationPreference": "open"
+      },
+      "MetadataOptions": {
+        "State": "pending",
+        "HttpTokens": "required",
+        "HttpPutResponseHopLimit": 2,
+        "HttpEndpoint": "enabled",
+        "HttpProtocolIpv6": "disabled",
+        "InstanceMetadataTags": "disabled"
+      },
+      "EnclaveOptions": {
+        "Enabled": false
+      },
+      "BootMode": "uefi-preferred",
+      "PrivateDnsNameOptions": {
+        "HostnameType": "ip-name",
+        "EnableResourceNameDnsARecord": false,
+        "EnableResourceNameDnsAAAARecord": false
+      },
+      "MaintenanceOptions": {
+        "AutoRecovery": "default"
+      },
+      "CurrentInstanceBootMode": "uefi",
+      "Operator": {
+        "Managed": false
+      },
+      "InstanceId": "i-02221470a4ccc3da8",
+      "ImageId": "ami-0803a33fd43db1fbf",
+      "State": {
+        "Code": 0,
+        "Name": "pending"
+      },
+      "PrivateDnsName": "ip-172-31-16-191.us-west-2.compute.internal",
+      "PublicDnsName": "",
+      "StateTransitionReason": "",
+      "KeyName": "n83-cache-20261019-8cde893",
+      "AmiLaunchIndex": 0,
+      "ProductCodes": [],
+      "InstanceType": "c7i.2xlarge",
+      "LaunchTime": "2026-10-19T12:14:04+00:00",
+      "Placement": {
+        "GroupName": "",
+        "Tenancy": "default",
+        "AvailabilityZone": "us-west-2b"
+      },
+      "Monitoring": {
+        "State": "disabled"
+      },
+      "SubnetId": "subnet-07709db0a38a3857b",
+      "VpcId": "vpc-0d4183a7579b59a6a",
+      "PrivateIpAddress": "172.31.16.191"
+    }
+  ]
+}

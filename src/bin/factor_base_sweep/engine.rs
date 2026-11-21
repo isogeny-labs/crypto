@@ -208,20 +208,21 @@ pub fn run(request: &Request, dir: &Path) -> Result<Value> {
         "inventory",
         json!({"fb_id":dump.factor_base.fb_id,"columns":dump.factor_base.columns,"signed_points":dump.points.len(),"order_root":root_order(&dump)?}),
     )?;
+    let falls = forecast::affine_falls(&inst, &dump);
     match &inst {
         Instance::Prime(i)=>{
             if i.curve.p>1_000_000{return Err("direct prime root extraction requires p <=1000000; no implicit scaled substitute".into());}
             let points=dump.points.iter().map(|p|Ok(PrimePoint::affine(integer(&p.x)?,integer(&p.y)?))).collect::<Result<Vec<_>>>()?;
             if points.iter().any(|p|!i.curve.is_on_curve(*p)){return Err("off-curve inventory".into());}
             let xs:Vec<u64>=points.iter().map(|p|p.x).collect::<BTreeSet<_>>().into_iter().collect();
-            execute(request,dir,started,&dump,&i.curve,i.generator_point(),i.r,i.cofactor,&points,|p|[p.x,p.y],|x|polynomials::prime(&i.curve,x,&xs),2,i.curve.p,|a|[a[0],a[1]])
+            execute(request,dir,started,&dump,&i.curve,i.generator_point(),i.r,i.cofactor,&points,|p|[p.x,p.y],|x|polynomials::prime(&i.curve,x,&xs),2,i.curve.p,|a|[a[0],a[1]],falls)
         }
         Instance::Binary(i)=>{
             let basis=if let Some(b)=basis {b}else if dump.factor_base.family=="binary-subspace" {let dim=dump.factor_base.dimension.ok_or("missing subspace dimension")?; (0..dim).map(|j|1<<j).collect()}else{return Err("algebraic backend requires an explicit linear subspace; nonlinear inventory retained but not priced as its span".into());};
             let v=shapes::subspace(i,&basis);let points=dump.points.iter().map(|p|Ok(FastPoint::affine(integer(&p.x)?,integer(&p.y)?))).collect::<Result<Vec<_>>>()?;
             if points.iter().any(|p|!i.fast.is_on_curve(*p)){return Err("off-curve inventory".into());}
             let group=BinaryGroup(&i.fast);let vars=2*basis.len();
-            execute(request,dir,started,&dump,&group,i.generator,i.r,i.cofactor,&points,|p|[p.x,p.y],|x|polynomials::binary(i,&v,x),vars,2,|a|{let mut x=[0,0];for k in 0..2{for(j,b)in basis.iter().enumerate(){if a[k*basis.len()+j]==1{x[k]^=b;}}}x})
+            execute(request,dir,started,&dump,&group,i.generator,i.r,i.cofactor,&points,|p|[p.x,p.y],|x|polynomials::binary(i,&v,x),vars,2,|a|{let mut x=[0,0];for k in 0..2{for(j,b)in basis.iter().enumerate(){if a[k*basis.len()+j]==1{x[k]^=b;}}}x},falls)
         }
         _=>Err("this algebraic sweep backend supports native small prime/binary instances only; no implicit substitute".into()),
     }
@@ -265,13 +266,14 @@ fn execute<G: CountedGroup>(
     nvars: usize,
     p: u64,
     decode: impl Fn(&[u64]) -> [u64; 2],
+    falls: Option<u32>,
 ) -> Result<Value> {
     let mut setup = GroupOps::default();
     let positive = subgroup_positive_control(group, points, r, &xy, &mut setup)?;
     let mut rows = IncrementalGauss::new(dump.factor_base.columns as usize, r);
     // Advisory degree-of-regularity forecast, updated after every solve and
     // written beside the measurement.  It never shortens the candidate.
-    let mut forecaster = forecast::forecaster(req, dump, r, h);
+    let mut forecaster = forecast::forecaster(req, dump, r, h, falls);
     let mut admitted_rows = 0usize;
     let mut records = Vec::new();
     let mut total_ops = 0;

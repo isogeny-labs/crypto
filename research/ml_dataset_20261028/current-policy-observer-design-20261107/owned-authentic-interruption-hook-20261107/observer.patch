@@ -1,0 +1,110 @@
+--- a/src/ml_dataset/owned_search_capture_publication.rs
++++ b/src/ml_dataset/owned_search_capture_publication.rs
+@@ -3,6 +3,9 @@
+ use super::{OwnedAttempt,Failure as OwnerFailure,Stop,Budget,capture};
+ use super::capture_encoding as encoding;
+ use std::{mem::size_of,time::Instant};
++#[cfg(test)]
++#[path="owned_search_publication_observer.rs"]
++pub(in crate::ml_dataset::solvers) mod test_observer;
+ pub(in crate::ml_dataset::solvers) const ROLE:&str="boolean-original-owned-search-snapshot-chunk-v1";
+ #[derive(Default)]
+ pub(in crate::ml_dataset::solvers) struct Publication{
+@@ -50,6 +53,12 @@
+   let exact=after.event_count==before.event_count.checked_add(1).ok_or(Stop::Overflow)?
+    &&after.binding_sha256==before.binding_sha256&&after.byte_end>before.byte_end;
+   chunk.exact=exact;if !exact{return Err(Stop::Observer)}
++  // Test observers see an actual installed acknowledgement, never pending bytes.
++  // This is custody evidence only; the original deadline check remains below.
++  #[cfg(test)]
++  test_observer::notify(test_observer::Boundary::ChunkAcknowledged {
++   pattern:self.pattern,snapshot:self.snapshot.index,chunk:index,bytes:count,receipt:after,
++  });
+   self.budget.check(Instant::now())
+  }
+ }
+@@ -90,7 +99,17 @@
+    let retained_bytes=bridge.snapshot.chunks.iter().try_fold(0u64,|n,c|n.checked_add(c.bytes)).ok_or(Stop::Overflow)?;
+    if !byte_summary.0||byte_summary.1!=byte_summary.2||byte_summary.1!=retained_bytes{return Err(Stop::Observer)}
+    bridge.budget.check(Instant::now())?;
+-   bridge.snapshot.complete=true;Ok(())
++   bridge.snapshot.complete=true;
++   #[cfg(test)]
++   test_observer::notify(test_observer::Boundary::SnapshotComplete {
++    pattern,snapshot:index,chunks:acknowledged,bytes:retained_bytes,
++    receipt:bridge.snapshot.chunks.last().and_then(|c|c.ack.as_ref()).expect("checked complete acknowledgement"),
++   });
++   // Test instrumentation cannot return a successful publication after consuming
++   // the original deadline while observing its complete durable state.
++   #[cfg(test)]
++   bridge.budget.check(Instant::now())?;
++   Ok(())
+  })();
+  if let Err(s)=result{publication.failure=Some(s);if let Some(last)=publication.snapshots.last_mut(){if !last.complete{last.failure.get_or_insert(s);}}let _:Result<(),Stop>=budget.fail(s);}
+  result
+--- /dev/null
++++ b/src/ml_dataset/owned_search_publication_observer.rs
+@@ -0,0 +1,63 @@
++//! Test-child observation of real durable boundaries. This module is cfg(test)
++//! only. It cannot mint a receipt or change producer state, limits or verdicts.
++use super::capture;
++use std::cell::Cell;
++use std::marker::PhantomData;
++use std::rc::Rc;
++
++#[derive(Clone, Copy)]
++pub(in crate::ml_dataset::solvers) enum Boundary<'a> {
++    /// Head installation and acknowledgement equality checks already succeeded.
++    /// The producer's subsequent deadline check has not necessarily succeeded.
++    ChunkAcknowledged {
++        pattern: u32,
++        snapshot: u64,
++        chunk: u64,
++        bytes: u64,
++        receipt: &'a capture::CommittedEventPosition,
++    },
++    /// Encoder completion, exact acknowledgements, byte totals and original
++    /// budget check already succeeded; native mathematical success is not implied.
++    SnapshotComplete {
++        pattern: u32,
++        snapshot: u64,
++        chunks: u64,
++        bytes: u64,
++        receipt: &'a capture::CommittedEventPosition,
++    },
++}
++type Observer = for<'a> fn(Boundary<'a>);
++thread_local! {
++    static OBSERVER: Cell<Option<Observer>> = const { Cell::new(None) };
++}
++/// Not Send/Sync: unregister only on the installing producer thread.
++pub(in crate::ml_dataset::solvers) struct Guard {
++    _same_thread: PhantomData<Rc<()>>,
++}
++impl Drop for Guard {
++    fn drop(&mut self) {
++        OBSERVER.with(|slot| slot.set(None));
++    }
++}
++/// Install once on the actual producer thread before authentic owner admission.
++/// A test driver may copy bounded notification metadata to its preopened control
++/// channel and park until supervisor termination. That instrumentation is outside
++/// scientific timings and must be recorded separately. No owner renewal occurs.
++/// Callback return resumes the ordinary producer checks; callback panic is a test
++/// failure, never an accepted interruption envelope or a verified snapshot.
++pub(in crate::ml_dataset::solvers) fn install(observer: Observer) -> Result<Guard, &'static str> {
++    OBSERVER.with(|slot| {
++        if slot.get().is_some() {
++            return Err("publication test observer already installed on this thread");
++        }
++        slot.set(Some(observer));
++        Ok(Guard { _same_thread: PhantomData })
++    })
++}
++pub(super) fn notify(boundary: Boundary<'_>) {
++    // Cell retrieval does not hold a RefCell borrow across a user callback.
++    // The reference lifetime prevents a safe callback from retaining the receipt.
++    if let Some(observer) = OBSERVER.with(Cell::get) {
++        observer(boundary);
++    }
++}

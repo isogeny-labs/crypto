@@ -1,0 +1,20 @@
+   Compiling twist-route-experiments v0.1.0 (/workspace/crypto-twist-runs/research/twist_routes_1_3_20261021/runner)
+warning: unused import: `arithmetic::*`
+ --> src/bin/../cold_audit_20261029.rs:3:5
+  |
+3 |     arithmetic::*,
+  |     ^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: function `independent_GP_census_and_fiber_controls` should have a snake case name
+   --> src/bin/../cold_audit_20261029.rs:294:8
+    |
+294 |     fn independent_GP_census_and_fiber_controls() {
+    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: convert the identifier to snake case: `independent_gp_census_and_fiber_controls`
+    |
+    = note: `#[warn(non_snake_case)]` on by default
+
+warning: `twist-route-experiments` (bin "twist-cold-harness" test) generated 2 warnings (run `cargo fix --bin "twist-cold-harness" --tests` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 3.85s
+     Running unittests src/bin/twist-cold-harness.rs (research/twist_routes_1_3_20261021/runner/target/release/deps/twist_cold_harness-0fbdcecfd0fb9ec1)

@@ -1,0 +1,49 @@
+{
+  "schema": "n83.attempt-reconciliation/v1",
+  "attempt": "spike38-attempt-07",
+  "classification": "local factor-base verification completed; PDP generation failed before candidate outputs",
+  "runner_exit_code": 101,
+  "runner_error": {
+    "schema": "n83.runner-error/v1",
+    "exit_code": 101,
+    "line": 86,
+    "command": "timeout --signal=TERM --kill-after=30 12400 \"$BIN/pdp\" generate \"$INPUTS\" \"$BASE_LOCAL/data\" \"$MATCHED\" spike38 > \"$HERE/generate.log\" 2>&1",
+    "utc": "2026-11-05T18:23:28.437292+00:00"
+  },
+  "generate_log": "\nthread 'main' (1008425) panicked at src/bin/pdp.rs:339:63:\ncalled `Result::unwrap()` on an `Err` value: Os { code: 20, kind: NotADirectory, message: \"Not a directory\" }\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n",
+  "protocol_hash_check": {
+    "schema": "n83.protocol-hash-check/v1",
+    "expected_sha256": "1b0a27b19e5f32b78a23bd53a51e2a05cdc0c7a146c3d7a2269f93aa1679e3e5",
+    "actual_sha256": "1b0a27b19e5f32b78a23bd53a51e2a05cdc0c7a146c3d7a2269f93aa1679e3e5",
+    "match": true
+  },
+  "reused_shards_check": {
+    "schema": "n83.reused-shards-check/v1",
+    "attempt": "07",
+    "source_path": "/tmp/n83-candidate-bases/r38-attempt-06/data",
+    "shard_index_sha256": "f990221ecd91d7a7a8bc3eadf89529aec5f06c7ed8fa3cad40f31dd245337765",
+    "verified_shards": 384,
+    "verified_bytes": 4576000923,
+    "reused_existing_shards": 384,
+    "downloaded_missing_shards": 0,
+    "all_hashes_match": true
+  },
+  "candidate_input_systems": 0,
+  "top_certificates": 0,
+  "candidate_inputs_directory_exists": false,
+  "top_certificates_directory_exists": false,
+  "observed_base_tree_missing_s3_file_index": true,
+  "source_helper_contract": "remote_shard_index reads BASES/s3-file-index.json if it exists; attempt07 failure was ENOTDIR at src/bin/pdp.rs:339. Capture openat trace on the next attempt to identify the exact path and assert all required base paths before generation.",
+  "results_s3_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-07/results/",
+  "results_indexed_files": 427,
+  "results_index_sha256": "c59c241a66f5548ee1897fed365d737d64f8f78f6a3f12dc9b37b6a81077dcd9",
+  "results_total_bytes": 4962979,
+  "results_readback_byte_identical": true,
+  "next_action": "Preserve source shards, add and hash-check the exact S3 shard-index sidecar in the base directory, use strace openat capture, and keep fresh generator output paths absent in attempt08.",
+  "diagnosis_correction": {
+    "supersedes": "missing local s3-file-index as the primary cause",
+    "correct_cause": "MATCHED was set to the inputs.json file, while pdp::generate appends inputs.json to the argument. Attempt08 openat evidence proves the attempted path ended with inputs.json/inputs.json and ENOTDIR. Attempt07 used the same unchanged MATCHED argument.",
+    "evidence_attempt08_openat_trace_sha256": "a7fa7af71488334e39c892f91b5ca16e04faf37be41871f8c266f148d9559367",
+    "evidence_failed_path": "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/pdp/baseline/inputs.json/inputs.json"
+  }
+}

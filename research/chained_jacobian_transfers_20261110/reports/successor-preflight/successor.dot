@@ -1,0 +1,18 @@
+digraph Successor {
+  rankdir=LR;
+  graph [bgcolor="white",pad="0.16",nodesep="0.5",ranksep="0.75"];
+  node [shape=box,style="rounded,filled",fillcolor="#edf5fc",color="#315c83",fontname="DejaVu Sans",fontsize=12];
+  edge [color="#315c83",fontname="DejaVu Sans",fontsize=11];
+  a1 [label="Actual E109' × E113'\nj87 / j92"];
+  a2 [label="Actual E109'' × E113''\nj47 / j89"];
+  j1 [label="J1: C1(68,42,26)\naccepted old Jacobian"];
+  j2 [label="J2: C2(19,10,22)\nsmooth monic F101 model"];
+  boundary [label="Composite kernel Z/49 × Z/49\nFrobenius33 /27; splits over F101^42\n49 of2401 points lie in F101^6",fillcolor="#fff4df",color="#9b6b2d"];
+  a1 -> a2 [label="actual β1 × β2\ndegree49;kernel Frobenius5/6"];
+  a1 -> j1 [label="P1,degree4 HLP quotient"];
+  a2 -> j2 [label="P2,degree4 HLP quotient"];
+  j1 -> j2 [label="written global Φ2,degree49\nnative whole-map evaluator next",style=dashed];
+  j2 -> boundary [label="compose with accepted Φ1",style=dotted,color="#9b6b2d"];
+  {rank=same;a1;j1;}
+  {rank=same;a2;j2;}
+}

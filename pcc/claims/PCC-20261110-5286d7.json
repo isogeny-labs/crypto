@@ -1,0 +1,29 @@
+{
+ "created_at": "2026-11-10T07:39:35Z",
+ "id": "PCC-20261110-5286d7",
+ "kind": "measurement",
+ "producer": {
+  "commit": "608f40db67a2464eaee56ae7f056c42b397b1de5",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/theorem_census_20261109/f4-saturation-v1/export.json",
+    "sha256": "68e8bb768d0bfa2200f5a672d9061afa62d9529197723679548f1c4cc854d151"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/theorem_census_20261109/f4-saturation-v2/export.json",
+    "sha256": "912d1b286e24ce0a2b26f1488110b37d5ae3ae0bf5b884b7a116ab1219372a37"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact known-answer artifact records only. V1 protocol inconsistency disclosed, v2 predata amendment preserved. Native execution standing requires independent signed evidence absent here.",
+ "statement": "Producer-local frozen trials retain four msolve calls: v1 F101 ordinary matches its known answer, saturation rejects the characteristic and v1 sample metadata fails export planning; v2 F65537 ordinary segfaults and saturation times out, with both not_validated and a structurally valid all-row export. No native execution, independence or general C refinement is certified."
+}

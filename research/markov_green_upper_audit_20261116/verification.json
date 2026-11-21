@@ -1,0 +1,123 @@
+{
+  "schema": "markov-green-upper-verification/v1",
+  "source_commit": "0b93849a4fefd0ee91a5eb0426cbe9f4b35b1c77",
+  "claim_id": "PCC-20261116-02e783",
+  "declaration_sha256": "28f396a4cd16557abd05803143f203b1bd0c6aee358a5177ce995f27bda734b0",
+  "all_source_and_artifact_pins_match": true,
+  "all6226_preservation_and_dependency_pins_checked_around_replay": true,
+  "expanded_dependency_pins_checked": 36,
+  "formal_source_files": 51,
+  "gate_declarations": 17,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 229,
+  "actual_verdict": {
+    "claim_id": "PCC-20261116-02e783",
+    "claim_sha256": "ec438a74629cbd8da45ebcefbe68cef85a33ab895c9b3a5e9cf22a99bab8523a",
+    "commit": "0b93849a4fefd0ee91a5eb0426cbe9f4b35b1c77",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/markov_green_upper_audit_20261116/lean (UpperCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-16T10:18:06Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261116-02e783",
+    "claim_sha256": "ec438a74629cbd8da45ebcefbe68cef85a33ab895c9b3a5e9cf22a99bab8523a",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46956,
+    "sha256": "b8b0f7f4a07f0de0c05d827b373ac71b8ec7d737c03ae9ea04ec3039c1f21528",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "schema": "markov-green-upper-preflight/v1",
+    "build_snapshots": 8,
+    "failed_states": [
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07"
+    ],
+    "successful_states": [
+      "08"
+    ],
+    "dependency_plans": 1,
+    "old_formal_files": 44,
+    "static_hash_dependency_pins": 36,
+    "published_preservation_entries": 6190,
+    "all_checked_entries": 6226,
+    "frozen_plans": 49,
+    "copied_modules": 0,
+    "hydrated_modules": 0,
+    "manifest_packages": 15,
+    "all6226pins_checked_every_state_and_gate": true,
+    "exact_source_roots_from01": true,
+    "all_failed_states_retained": true,
+    "known_source_methods_credited": true,
+    "actual_PMF_and_Green_predecessor_reused": true,
+    "exact_finite_weighted_geometric_identity": true,
+    "finite_weighted_geometric_bound": true,
+    "actual_finite_Green_envelope": true,
+    "c_arbitrary_real": true,
+    "actual_varying_finite_state_spaces": true,
+    "actual_IsLittleO_error": true,
+    "explicit_nonnegative_remainder": true,
+    "actual_remainder_limit_zero": true,
+    "eventual_epsilon_upper_bound": true,
+    "actual_prime_family_healthy_strict_control": true,
+    "earlier_literal_equality_counter_retained": true,
+    "zero_terms_one_term_zero_ratio_controls": true,
+    "transparent_pinned_proposition_bundles": true,
+    "source_upper_bound_refuted": false,
+    "asymptotic_equality_inferred": false,
+    "general_Markov_collision_integer_block_repair": false,
+    "practical_hash_or_scalar_runtime": false,
+    "full14complete": false,
+    "novelty_claim": false,
+    "paid_compute_and_agent_upload": 0,
+    "gate_declarations": 17,
+    "new_modules": 4,
+    "new_concrete_modules": 4,
+    "official_import_bridge_modules": 0,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "same_host_prover": true,
+    "signed_standing": "unverified",
+    "pinned_custom_source_modules": 30,
+    "actually_imported_custom_modules": 23,
+    "actually_imported_frozen_modules": 19,
+    "additional_frozen_modules_retained_as_pins": 7
+  }
+}

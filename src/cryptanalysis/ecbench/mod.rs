@@ -15,6 +15,7 @@
 //! | [`aps`] | bounded APS polynomial instrument with exclusive wall phases and explicit incomplete native pricing |
 //! | [`generic`] | counted BSGS (three forms) and the kangaroo on any [`CountedGroup`] |
 //! | [`fp4`] | `E(F_{p⁴})`: the curve, its counted group and `ic.k4_gaudry` (Gaudry `k = 4`) |
+//! | [`hec`] | hyperelliptic Jacobians: the thread's instances, `hec.ic_fb_walk` and its rho reference, counted in `bitop/v1` primitives |
 //! | [`hyper`] | the hyperelliptic thread's Jacobians (genus 2–4, `p < 256`) for the generic arms |
 //! | [`hyper_ic`] | `ic.hyperelliptic`: the thread's index calculus on those Jacobians, counted |
 //! | [`koblitz_batched`] | `ic.koblitz_batched`: the candidate tournament worker's pair-table pipeline (`batch_trials` collection with a rank check per batch), charged by counted group operations |
@@ -26,7 +27,8 @@
 //! | [`host`] | the host capsule and its environment class |
 //! | [`isolation`] | CPU reservation, eviction, pinning, NUMA binding, kernel counters |
 //! | [`legacy`] | the accounting of the past under which committed records still replay |
-//! | [`record`] | the record, the child protocol, isolation grading |
+//! | [`measurement`] | shared process observations and frozen isolation grading |
+//! | [`record`] | the record, child protocol and grading compatibility reexports |
 //! | [`runner`] | sessions: interleaved measured children, sealed append-only records |
 //! | [`signals`] | interruption: the host is restored and no child outlives the runner |
 //! | [`compare`] | paired ratios with bootstrap intervals; wall time gated by level |
@@ -59,6 +61,8 @@ pub mod cm_folded;
 pub mod compare;
 pub mod conductor_gap;
 pub mod cover_quartic;
+pub mod curve25519_pair;
+pub mod curve25519_workload;
 pub mod db;
 pub mod diagnostic_binding_core;
 pub mod diagnostic_file_adapter;
@@ -68,6 +72,8 @@ pub mod diagnostic_preflight;
 pub mod diagnostic_resources;
 pub mod diagnostic_runtime;
 pub mod diagnostics;
+pub mod exact_rho_scalar;
+pub mod exact_sampling;
 pub mod exact_scalar;
 pub mod ext;
 pub mod fbm;
@@ -77,6 +83,9 @@ pub mod full_price;
 pub mod generic;
 pub mod ghs_cover;
 pub mod gpu;
+pub mod growth;
+pub mod hashed_native;
+pub mod hec;
 pub mod host;
 pub mod hyper;
 pub mod hyper_ic;
@@ -88,10 +97,12 @@ pub mod known_log;
 pub mod koblitz_batched;
 pub mod koblitz_descent;
 pub mod legacy;
+pub mod measurement;
 pub mod methods;
 pub mod negation_strong;
 pub mod optimization;
 pub mod oracle;
+pub mod orbit_ic;
 pub mod plane_quartic;
 pub mod prime_orbit;
 pub mod record;
@@ -104,6 +115,7 @@ pub mod stats;
 pub mod tensor_cofactor;
 pub mod three_leads;
 pub mod trend;
+pub mod wcal;
 pub mod wordram_price;
 pub mod work;
 pub mod workload;

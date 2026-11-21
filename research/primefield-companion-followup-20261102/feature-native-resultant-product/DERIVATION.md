@@ -1,0 +1,11 @@
+# Scalar product over a remainder tree
+
+For source roots a_i define F(X)=product_i(X-a_i). For destination points b_j the existing root_resultant contract is R=product_j F(b_j)=product_(i,j)(b_j-a_i), including repeated points and zero factors. The orientation is fixed by this expression.
+
+At a destination node let B be its monic product polynomial. Every child divisor divides B, so replacing F by F mod B preserves all leaf evaluations below that node. Return the Horner value at a leaf and the product of the two child returns at an internal node. Induction on the tree proves equality to the ordered vector's product. Commutativity permits this regrouping; no projection passes through an addition. Both children are evaluated even when the first value is zero.
+
+For n nonempty destination leaves the new reduction uses n-1 combining field multiplications; the old fold initialized at one performs n. The new reduction does not allocate a leaf-value vector or concatenate evaluation vectors. It retains one left scalar per recursion level, O(log n) on this balanced tree. This statement concerns returned evaluation data only: product trees, polynomial remainders, Newton series and their allocations remain. The same monic remainder and Horner paths are traversed. No change to the asymptotic polynomial arithmetic bound is asserted; no elapsed-time or peak-memory measurement is supplied.
+
+The projected residual consumes exactly the same field resultant and applies its existing final projection. Full reference validation remains mandatory. Empty root or point arrays still return EmptyTree and a foreign-modulus tree still returns Domain. Prime modulus and word-size restrictions are inherited. The original 4563-case cohort is unchanged.
+
+Sources checked: feature-native-low-product/polynomial.rs, feature-native-projected-residual/residual.rs; FLINT's multipoint-evaluation documentation (https://flintlib.org/doc/algorithms/polynomials/subproduct-tree.html), remainder-tree divisibility lemma and evaluation algorithm. This is an application of established remainder-tree evaluation, with scalar product aggregation tailored to this source consumer. KB unavailable: no MCP tools were loaded and scripts/research-kb status reported no executable. No novelty-priority claim.

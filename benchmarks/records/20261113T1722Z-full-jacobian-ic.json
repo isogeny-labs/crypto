@@ -1,0 +1,311 @@
+{
+  "branch": "claude/ecdlp-chained-transfers-8cpiek",
+  "closed_utc": "2026-11-13T18:55:55+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "-c",
+        "set -o pipefail; ./target/release/full_jacobian_ic --threads 2 --stage2 25601,51203 --budget-s 2400 2>&1 | tee research/full_jacobian_ic_20261113/run.log"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-13T17:29:02+00:00",
+      "wall_s": 427.735
+    }
+  ],
+  "commit": "28da34a03b924a473e495ab38a203d0031cdfda9",
+  "commit_dirty": true,
+  "created_utc": "2026-11-13T17:22:14+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261111-chained-prime-transfer"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v445-x86_64-with-glibc2.39"
+  },
+  "id": "20261113T1722Z-full-jacobian-ic",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "total_w0.1_a_p211",
+      "note": "whole-J IC arm A, p=211, r=109; reference: negation rho on E1 at w=0.1",
+      "reference": 71.1458,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 498213.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "total_w0.1_b_p211",
+      "note": "whole-J IC arm B, p=211, r=109; reference: negation rho on E1 at w=0.1",
+      "reference": 71.1458,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 28889.2
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "total_w0.1_a_p419",
+      "note": "whole-J IC arm A, p=419, r=113; reference: negation rho on E1 at w=0.1",
+      "reference": 76.875,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 1847680.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "total_w0.1_b_p419",
+      "note": "whole-J IC arm B, p=419, r=113; reference: negation rho on E1 at w=0.1",
+      "reference": 76.875,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 134991.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "total_w0.1_a_p821",
+      "note": "whole-J IC arm A, p=821, r=71; reference: negation rho on E1 at w=0.1",
+      "reference": 72.3625,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 4059150.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "total_w0.1_b_p821",
+      "note": "whole-J IC arm B, p=821, r=71; reference: negation rho on E1 at w=0.1",
+      "reference": 72.3625,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 313496.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "total_w0.1_a_p1619",
+      "note": "whole-J IC arm A, p=1619, r=401; reference: negation rho on E1 at w=0.1",
+      "reference": 109.537,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 4770880.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "total_w0.1_b_p1619",
+      "note": "whole-J IC arm B, p=1619, r=401; reference: negation rho on E1 at w=0.1",
+      "reference": 109.537,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 188843.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "total_w0.1_a_p3203",
+      "note": "whole-J IC arm A, p=3203, r=313; reference: negation rho on E1 at w=0.1",
+      "reference": 98.6813,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 3306850.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "total_w0.1_b_p3203",
+      "note": "whole-J IC arm B, p=3203, r=313; reference: negation rho on E1 at w=0.1",
+      "reference": 98.6813,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 122458.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "total_w0.1_a_p6421",
+      "note": "whole-J IC arm A, p=6421, r=3191; reference: negation rho on E1 at w=0.1",
+      "reference": 205.49,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 4874280.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "total_w0.1_b_p6421",
+      "note": "whole-J IC arm B, p=6421, r=3191; reference: negation rho on E1 at w=0.1",
+      "reference": 205.49,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 128723.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "total_w0.1_a_p12841",
+      "note": "whole-J IC arm A, p=12841, r=3169; reference: negation rho on E1 at w=0.1",
+      "reference": 231.644,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 28546000.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 12,
+      "name": "total_w0.1_b_p12841",
+      "note": "whole-J IC arm B, p=12841, r=3169; reference: negation rho on E1 at w=0.1",
+      "reference": 231.644,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 204121.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 2,
+      "name": "total_w0.1_a_p25601",
+      "note": "whole-J IC arm A, p=25601, r=127; reference: negation rho on E1 at w=0.1",
+      "reference": 78.6688,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 488718000.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 2,
+      "name": "total_w0.1_b_p25601",
+      "note": "whole-J IC arm B, p=25601, r=127; reference: negation rho on E1 at w=0.1",
+      "reference": 78.6688,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 451664.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 2,
+      "name": "total_w0.1_a_p51203",
+      "note": "whole-J IC arm A, p=51203, r=1831; reference: negation rho on E1 at w=0.1",
+      "reference": 164.8,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 1232010000.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 2,
+      "name": "total_w0.1_b_p51203",
+      "note": "whole-J IC arm B, p=51203, r=1831; reference: negation rho on E1 at w=0.1",
+      "reference": 164.8,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 769174.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 7,
+      "name": "ratio_slope_w0.1_a",
+      "note": "OLS slope of ln(arm/rho at w=0.1) on ln p, stage-1 primes; spread = 95% t interval",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        -0.07,
+        0.912
+      ],
+      "unit": "ratio",
+      "value": 0.421
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 7,
+      "name": "ratio_slope_w0.1_b",
+      "note": "OLS slope of ln(arm/rho at w=0.1) on ln p, stage-1 primes; spread = 95% t interval",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        -0.654,
+        0.549
+      ],
+      "unit": "ratio",
+      "value": -0.053
+    }
+  ],
+  "problem": "prime-field-chained-transfer-no-advantage",
+  "raw": [
+    {
+      "bytes": 143446,
+      "path": "research/full_jacobian_ic_20261113/full_jacobian.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e6/e65114ea8bf019ac4e4ae76f6eb5bf2f036dfb496b95816532ba49c8fa7c9d7c",
+      "sha256": "e65114ea8bf019ac4e4ae76f6eb5bf2f036dfb496b95816532ba49c8fa7c9d7c",
+      "uploaded": false
+    },
+    {
+      "bytes": 6258,
+      "path": "research/full_jacobian_ic_20261113/run.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bf/bfd3f60df888745a52a5db5772d4331d784f54a457a6366778506db121722ba3",
+      "sha256": "bfd3f60df888745a52a5db5772d4331d784f54a457a6366778506db121722ba3",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/full_jacobian_ic_20261113/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/full_jacobian_ic_20261113/full_jacobian.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "full-jacobian-ic",
+  "status": "measured",
+  "summary": "Whole-J genus-2 IC (O3) on the transferred instance, p=211..51203: all 36 IC cells above the negation rho on E1 at band and calibrated reading; frozen closed-by-data rule unresolved (slope CI); unvalidated",
+  "validation": null
+}

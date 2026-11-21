@@ -1,0 +1,17 @@
+   Compiling theorem-audit-identity v0.1.0 (/workspace/crypto-audit/research/theorem_census_20261109/identity)
+warning: function `check` is never used
+   --> src/bin/../../../../../src/cryptanalysis/identity_certificate.rs:528:8
+    |
+528 | pub fn check(c: &IdentityCertificate) -> Result<Verdict, Malformed> {
+    |        ^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `schoenhage_identity` is never used
+   --> src/bin/../../../../../src/cryptanalysis/identity_certificate.rs:580:8
+    |
+580 | pub fn schoenhage_identity() -> IdentityStatement {
+    |        ^^^^^^^^^^^^^^^^^^^
+
+warning: `theorem-audit-identity` (bin "recursive_semaev_degree") generated 2 warnings
+    Finished `release` profile [optimized] target(s) in 7.16s

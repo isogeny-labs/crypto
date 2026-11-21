@@ -9,7 +9,7 @@
   execution)
 - **Next action owner:** owner (credentials and budget); then the session that
   holds them runs the frozen cards
-- **Last updated:** 2026-11-08 (Koblitz part resolved; prime tower open)
+- **Last updated:** 2026-11-06
 
 ## Problem
 
@@ -148,11 +148,49 @@ What would unblock it (owner decisions, none taken):
   prime tower's per-cell infrastructure retry limit before the next attempt.
 
 Results so far (exact, every file matched its SHA256SUMS): ten Koblitz m = 2
-negative controls (chain-s3 4/4 proved_unsat on each of k0n23, k1n29, k0n31,
-k0n37, k0n41; chain-s3-orbit 4/4 incomplete at its conflict budget); the three
+negative controls (chain-s3 4/4 proved_unsat on each of icv1-f2m23-t5197-69e76b73, icv1-f2m29-tm40309-30c52b96, icv1-f2m31-tm90707-c95f16f5,
+icv1-f2m37-tm534059-32aad96b, icv1-f2m41-tm2308219-7f48b14a; chain-s3-orbit 4/4 incomplete at its conflict budget); the three
 prime-tower controls under protocol v2 (D 6, 7, 4); kummer-m5-t2 D = 6;
 kummer-m5-t3 capped at 8 GiB (inconclusive_cap). Verdicts await each study's
 `analyze.py` and the director's assessment.
+
+## 2026-11-06: conjugate-pair and radix follow-up shares the access dependency
+
+`research/lead_followup_20261106/PROTOCOL.md` and blocked cards
+`XP-20261106-conjugate-chart-followup` / `XP-20261106-radix-depth-followup`
+reuse this launch-gate record. The managed Codex runtime reports no configured
+AWS identity, secrets or EKS tool. With a complete `.resume/RESUME.md`,
+`scripts/checkpoint.sh gate` reports no upload transport (no AWS profile
+`ecc-challenges-new`, no checkpoint upload token). GitHub access works, but
+the current `isolab-experiment.yml` dispatch takes ecbench specs; the example
+payload requires an authenticated arbitrary-command route and a matching image.
+No scientific job was submitted. These are access observations, not mathematical
+obstructions or a change to any earlier run's budget/attempt allowance.
+
+Exit conditions for these two cards: reconnect the existing scoped capability,
+pass the checkpoint and publication checks, pin the command image/source/binary,
+verify live budget/capacity under their shared proposed ceiling, and qualify the
+worker controls. Development tests and a merged preparation PR do not satisfy
+those conditions or complete either scientific panel.
+
+- **Last updated:** 2026-11-08 (Koblitz part resolved; prime tower open)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Update 2026-11-08: Koblitz part resolved, prime tower open
 
@@ -170,3 +208,130 @@ kummer-m5-t3 capped at 8 GiB (inconclusive_cap). Verdicts await each study's
   `retries.max_attempts` = 2. Running it again needs an owner decision. The
   cpu-spot limit raise (`launch/criu/nodepool-change-20261107/patch-cpu-spot.sh`)
   still needs an operator.
+
+## 2026-11-15: cubic-extension symbolic graph comparison
+
+The same checkpoint/command-image access dependency also affects the native
+Rust integration at `research/extension_ic_graph_20261115/` on branch
+`feat/extension-ic-graph-elimination`. Its frozen cohort and holdouts are in
+`protocol.json`; the requested baseline/candidate measurements remain pending.
+[pcc:unverified]
+
+Observed in this Codex workspace: no `aws` executable, no checkpoint upload
+environment token or token file, and the checkpoint gate reports
+`no way to upload` / `cannot upload, so nothing was checkpointed` (raw output:
+`research/extension_ic_graph_20261115/validation/checkpoint-gate.log`). GitHub
+workflow metadata is readable; Actions permissions/variables endpoints returned
+HTTP 403. No workload was dispatched. [pcc:unverified]
+
+The next action is to use an existing authenticated lab runner/profile, pass
+checkpoint/publication/pool gates, and build a digest-pinned command image
+carrying `gaudry_cubic_graph_compare`. The maintained GitHub fixture image's
+`ecbench` executable does not itself expose this new comparison example.
+The frozen limit is USD 5, four CPUs, 8 GiB, 900 seconds and zero automatic
+retries. Local unit checks are not the requested EKS comparison. The user has
+been asked for an existing runner/profile location, not credential text.
+
+This addition does not change the older arity/dreg findings or assert anything
+about their current credentials. Recheck when this session receives a configured
+runner/profile or checkpoint transport. The shared obstruction remains open.
+
+## 2026-11-18: H115 Frobenius--Kummer moment measurement
+
+Crypto draft PR #4625 source revision `6d8def5473` and cryptanalysis draft PR
+#1739 revision `ed206d8d` publish the frozen H115 producer and independent
+verifier before measurement. Their branch-specific resume note fixes the exact
+protocol/curve/source hashes, USD 1.00 cap, 1,800-second deadline and zero
+scientific retries.
+
+In this managed workspace, `.resume/RESUME.md` passes its content check and the
+branch is present on the remote. Both `scripts/checkpoint.sh push` and
+`scripts/checkpoint.sh gate` exit 1 because no AWS profile, upload token or
+token file exists. No checkpoint, image, EKS Job or producer `--run` invocation
+was created. The scoped receipt is
+`research/h115_frobenius_kummer_resolvent_20261117/RUN_BLOCKED.md`.
+
+This is an access observation only. The next action is the unchanged frozen
+card `XP-20261118-h115-frobenius-kummer`: connect an authorized transport, pass
+the checkpoint gate, build the bound source into a digest-pinned image and run
+one exhaustive panel. Exact bytes must pass verifier normal mode and all eight
+one-at-a-time copied-packet mutations. No local scoring substitute is allowed.
+
+  execution); `research/h114_multiradix_carry_cohomology_20261117/` (one
+  checkpoint-gated exhaustive H114 multiradix carry/cohomology run)
+- **Last updated:** 2026-11-17
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 2026-11-17: H114 multiradix carry/cohomology measurement
+
+Crypto draft PR #4622 at revision
+`4ceb5c032917a5f72a15046eee5aa4aad327a93c` and cryptanalysis draft PR
+#1736 at revision `f18430232e2814922d95f67e97abdda5d6ff44f6` publish the
+frozen H114 producer and source-independent verifier before measurement. The
+complete resume note names the exact protocol/curve/source hashes, commands,
+controls, USD 1.00 cap, 1,800-second deadline and zero scientific retries.
+
+Observed in this managed workspace: `aws` is absent; neither
+`CHECKPOINT_UPLOAD_TOKEN` nor
+`/home/agent/.config/checkpoint/upload-token` exists. Both
+`scripts/checkpoint.sh push` and `scripts/checkpoint.sh gate` exit 1 with:
+
+```text
+checkpoint: no way to upload: no AWS profile 'ecc-challenges-new', no CHECKPOINT_UPLOAD_TOKEN, no /home/agent/.config/checkpoint/upload-token
+checkpoint: cannot upload, so nothing was checkpointed
+```
+
+The scoped receipt is
+`research/h114_multiradix_carry_cohomology_20261117/RUN_BLOCKED.md`. No
+candidate-scoring mode, EKS build or EKS Job was invoked. This is an access
+observation only; it supplies no evidence for or against the candidate.
+
+The next discriminating action remains the unchanged frozen run: bind an
+authorized upload transport, make `scripts/checkpoint.sh gate` pass, build the
+producer revision into a digest-pinned Isolab image, confirm the frozen budget,
+then launch exactly one exhaustive run and verify its exact bytes plus all five
+tamper classes. A local scoring substitute is not accepted by the protocol.

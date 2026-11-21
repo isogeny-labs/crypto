@@ -1,0 +1,28 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-17T21:22:23Z",
+ "id": "PCC-20261117-1ed703",
+ "kind": "theorem",
+ "producer": {
+  "commit": "4ce098bdb050a46ca425fe75b0db87edcf0ac059",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "882b453e62b1a6290cbd24fe574e6c3a35a6f7f54a750226ec3f8d2dde2ef6fd",
+   "kind": "lean",
+   "project": "research/ecdlp_weakness_lean_20261104/lean",
+   "theorem": "SchnorrScalarBridge.composite_scalarMap_not_injective"
+  },
+  {
+   "decl_sha256": "46ddf360d93dc4e2bc4ed592f2bfa1458f2a7bec48e7e80af0607e5934733451",
+   "kind": "lean",
+   "project": "research/ecdlp_weakness_lean_20261104/lean",
+   "theorem": "SchnorrScalarBridge.prime_scalarMap_injective"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Lean v4.34.1 / Mathlib v4.34.1; normalized ZMod coordinate model; the separate pre-existing exact-order group bridge and concrete subgroup validation remain distinct obligations.",
+ "statement": "The coordinate map k \u21a6 k*2 on ZMod 6 is not injective, while multiplication by a nonzero element of prime ZMod q is injective. This is a coordinate-level omitted-hypothesis countermodel and positive endpoint, not a Schnorr security theorem."
+}

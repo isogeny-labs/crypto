@@ -1,0 +1,7 @@
+# R110: lift the degree-7 x=1 branches and resolve N51 cancellation
+
+This is an exact deterministic local algebra calculation, with no timing or statistical comparison. Pin R51, R102, R107, R108, and R109 by SHA-256. For each y base place, set s=r^7 and u=r^23 v. Form G(s,u)/r^184 from the exact R107 translated coefficients, retaining r-orders <40. Its initial equation is v+v^8=0; choose the root v(0)=1 and lift it coefficientwise, rejecting any nonzero residual below order 40. Compose the actual 105-term N51 rational expression with the R108 base series as in R109, then substitute the lifted u. Report v_r(n) only if nonzero below both the G and N known-precision bounds. The R109 weight-zero cancellation must reproduce first. Fresh byte-identical replay, changed-source hash rejection, and an independent evaluator are acceptance controls. Preserve failed attempts, source, raw data, Lean arithmetic, and report. Commit this source/protocol before executing.
+
+The only promised result is the degree-7 local n valuation at x=1; other supports and the global divisor remain separate. A result at the precision boundary is unresolved and triggers a precision extension, not an asserted valuation.
+
+Sources: R51 donor, R102 audit, R107 Newton edges, R108 base Hensel series, R109 N51 coefficients, [Stacks Henselian lifting](https://stacks.math.columbia.edu/tag/04GE), [Stacks normal curve DVRs](https://stacks.math.columbia.edu/tag/0B8Y).

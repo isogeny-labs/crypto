@@ -1,0 +1,89 @@
+name: Prime31 RR9 determinant relation predicate (native Rust, pinned source)
+
+on:
+  push:
+    branches: [research/prime31-rr9-evaluation-gate-20261116]
+    paths:
+      - research/prime31_ic_20261115/rr9/RR9_DETERMINANT_PROTOCOL_20261116.md
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_evaluation.rs
+      - .github/workflows/prime31-rr9-evaluation.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/rr9/RR9_DETERMINANT_PROTOCOL_20261116.md
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_evaluation.rs
+      - .github/workflows/prime31-rr9-evaluation.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rr9-original-curve:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Check out proposed RR9 experiment
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      # Main removed the old native project path; use immutable already-merged
+      # Rust source containing the entire dependency/workspace tree.
+      - name: Check out immutable merged #4454 complete native Rust source
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: aps-pinned
+          persist-credentials: false
+      - name: Install pinned Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Install new native RR9 example in pinned source tree
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_evaluation.rs aps-pinned/research/prime31_ic_20261115/native/examples/prime31_rr9_evaluation.rs
+          test -f aps-pinned/research/prime31_ic_20261115/native/Cargo.toml
+      - name: Compile, test original reusable Rust library and RR9 controls
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          cargo +1.100.0 test --locked --release --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_evaluation
+      - name: Execute source-specific 128-case RR9 predicate panel
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_evaluation > prime31-rr9-evaluation.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("prime31-rr9-evaluation.json").read_text())
+          assert d["schema"]=="prime31.rr9.evaluation.v1"
+          assert (d["p"],d["n"])==(2147483647,2147446831)
+          assert d["positive_count"]==64 and d["negative_count"]==64
+          assert d["complete_unknown_target_ecdlp_recoveries"]==0
+          assert len(d["panels"])==2
+          for p in d["panels"]:
+              assert len(p["factor_base"])==31
+              assert p["accepted_positive"]==32 and p["accepted_negative"]==32
+              assert p["draws_including_rejections"]>=32
+              assert p["safe_repeated_row_rejected"] and p["naive_repeated_row_false_zero"]
+              assert p["confluent_hermite_double_control"]
+              assert p["confluent_hermite_repeated_true_det"]==0
+              assert p["confluent_hermite_repeated_false_det"]!=0
+              higher=p["confluent_hermite_higher_controls"]
+              assert len(higher)==3
+              assert [h["multiplicity"] for h in higher]==[3,4,8]
+              assert all(h["true_det"]==0 and h["wrong_det"]!=0
+                         and h["curve_witness_outside_determinant"] for h in higher)
+              assert p["ninth_jet_wrong_det"]!=0
+              assert p["ninth_jet_original_curve_negative"]
+              assert len(p["cases"])==32
+              assert all(c["positive_det"]==0 and c["negative_det"]!=0
+                         and c["no_repeated_or_infinite_points"] for c in p["cases"])
+              print("RR9", p["base"],"32 true / 32 false", "draws",p["draws_including_rejections"])
+          print("RR9 predicate-only 64 positive + 64 negative checks PASS")
+          PY
+      - name: Preserve raw source-specific predicate cases
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-determinant-128-case
+          path: prime31-rr9-evaluation.json
+          if-no-files-found: warn
+          retention-days: 30

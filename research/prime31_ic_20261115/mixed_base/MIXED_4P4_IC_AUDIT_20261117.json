@@ -1,0 +1,86 @@
+{
+  "schema": "prime31.mixed_4p4_producer_replay_summary.v1",
+  "evidence_scope": "producer-side arithmetic recomputation, not signed independent PCC",
+  "pcc": "unverified",
+  "source": {
+    "native_example_sha256": "c8a79b0edee9791ae42cd132cfebd867dfaa2cc0a1bf9cbac223247aa3a4efe5",
+    "native_parent_commit": "1df714645aa683cf975bc76fcacb9842cb4780fd",
+    "actions_run": "https://github.com/isogeny-labs/crypto/actions/runs/44017666839",
+    "raw_artifact": "https://github.com/isogeny-labs/crypto/actions/runs/44017666839/artifacts/14299004221",
+    "raw_json_sha256": "029f8948aef3cdaa14e1ae664b7c54d3ce083f0603c0e55b2787aea31d52c53c",
+    "raw_bytes": 63968
+  },
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "generator": [
+      625037715,
+      2100627251
+    ]
+  },
+  "regenerated_dickson": {
+    "seed": 3,
+    "terminal": 933677148,
+    "num_curve_points": 31
+  },
+  "shared_affine_point": [
+    3,
+    166645833
+  ],
+  "exact_base_columns": 61,
+  "cases": [
+    {
+      "case": 0,
+      "caller_only_k": 2062758563,
+      "q": [
+        872133043,
+        510239525
+      ],
+      "recovered_k": 2062758563,
+      "rank": 62,
+      "rows": 62,
+      "relation_misses": 0,
+      "half_probes": 179502,
+      "cold_table_build_ns": 2051902033,
+      "complete_cold_ns": 2115457523
+    },
+    {
+      "case": 1,
+      "caller_only_k": 651689658,
+      "q": [
+        1841259055,
+        779429965
+      ],
+      "recovered_k": 651689658,
+      "rank": 62,
+      "rows": 62,
+      "relation_misses": 0,
+      "half_probes": 232380,
+      "cold_table_build_ns": 2042133375,
+      "complete_cold_ns": 2122593909
+    }
+  ],
+  "supplementary_original_curve_replay": {
+    "signed_relation_equations_checked": 124,
+    "rows_mod_n_recomputed": 124,
+    "rref_full_rank_case_count": 2,
+    "basis_point_logs_checked_per_case": 61,
+    "known_target_logs_checked": 2,
+    "failures": 0,
+    "implemented_with": "standalone independent affine arithmetic, used for producer-side offline audit only"
+  },
+  "totals": {
+    "cold_ns": 4238051432,
+    "setup_ns": 4094035408,
+    "full_cold_2q_correct": 2,
+    "total_half_probes": 411882
+  },
+  "not_demonstrated": [
+    "cheaper end-to-end solver",
+    "fastest matched WZ rho parity",
+    "non-generic polynomial extraction",
+    "independent PCC signed verification"
+  ]
+}

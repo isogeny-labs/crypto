@@ -1,0 +1,143 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 71,
+  "runs": [
+    {
+      "attempt": "rational-fibers71-01",
+      "source_revision": "82aa6569e36c425041be661dee73268e4d4b6a71",
+      "kind": "Singular",
+      "status": "accepted",
+      "native_exit": 0,
+      "marker": "RATIONAL_FIBERS71_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "result_lines": [
+        "FIBER71_RESULT fiber=0 algebra_dimension=32 stable_steps=5 reduced_dimension=4 branches=2",
+        "FIBER71_RESULT fiber=1 algebra_dimension=32 stable_steps=4 reduced_dimension=8 branches=4"
+      ],
+      "degree_lines": [
+        "FIBER71_DEGREE fiber=0 degree=2 multiplicity=2",
+        "FIBER71_DEGREE fiber=1 degree=2 multiplicity=4"
+      ],
+      "started_utc": "2026-11-02T19:28:08Z",
+      "finished_utc": "2026-11-02T19:28:12Z",
+      "native_wall_seconds": 4.0,
+      "artifacts": [
+        {
+          "path": "runs/rational-fibers71-01/PROTOCOL.md",
+          "sha256": "61dfda1cb70a6d1f151b0b0af45974a92d82315ce58c935819c25495853f8cbd",
+          "bytes": 2091
+        },
+        {
+          "path": "runs/rational-fibers71-01/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/rational-fibers71-01/donors.json",
+          "sha256": "56f212404dc76d10381388184d5d37424fdc45c42d6510c31f19d397b191bf33",
+          "bytes": 771
+        },
+        {
+          "path": "runs/rational-fibers71-01/driver.sh",
+          "sha256": "78a31ec7a02a5a514fe0731e13707dad035c8f01c4b60d947b2061ae950c40dd",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/rational-fibers71-01/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/rational-fibers71-01/finished-utc.txt",
+          "sha256": "3476eed9879fc21058fbf70d4c3fbabc8858eb1592212fc69f16423bae2828ff",
+          "bytes": 21
+        },
+        {
+          "path": "runs/rational-fibers71-01/gate.log",
+          "sha256": "2f4ede4fd2ee10948ccdcafa1073f8dd07348f4ec894bfa3c2c929fb57158322",
+          "bytes": 161
+        },
+        {
+          "path": "runs/rational-fibers71-01/input.sing",
+          "sha256": "b09a0be029848c1b3e9d6612d68c41479f178aa7e8f94f5427cf13a93a15edf6",
+          "bytes": 4685
+        },
+        {
+          "path": "runs/rational-fibers71-01/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/rational-fibers71-01/native.log",
+          "sha256": "30161fc13b33dfcf0a5d681aa6d164c72ff1e4742777717dc00d715c41daff5a",
+          "bytes": 1195188
+        },
+        {
+          "path": "runs/rational-fibers71-01/protocol.json",
+          "sha256": "a5ed16b247273997d378814d7f527bd88ba9e8a96cc4a2a2b2d50e7e159f53b1",
+          "bytes": 2431
+        },
+        {
+          "path": "runs/rational-fibers71-01/rational-fibers71.sing",
+          "sha256": "7f5f08a1a7900dcd377fc186f02c9d83e6b7dc7670333ffb02fa56baeb9b1069",
+          "bytes": 26211
+        },
+        {
+          "path": "runs/rational-fibers71-01/source-revision.txt",
+          "sha256": "de4fa1b531bbd1314aa370808f22aff8b9790ed5cdf22b22e0526bc4b0a4b219",
+          "bytes": 41
+        },
+        {
+          "path": "runs/rational-fibers71-01/source.sha256",
+          "sha256": "693e22c0c76743b988f762b52acfb4f893908b2f262fe9d42d5119e3f017768f",
+          "bytes": 467
+        },
+        {
+          "path": "runs/rational-fibers71-01/started-utc.txt",
+          "sha256": "f7eeff270a5ada5194a8e9170eafff1dd522a8b662a2ba8ea410d373875bcf40",
+          "bytes": 21
+        }
+      ]
+    }
+  ],
+  "input_pins": [
+    {
+      "artifact": "input.sing",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/71/RATIONAL_FIBERS71.sing",
+      "revision": "82aa6569e36c425041be661dee73268e4d4b6a71",
+      "sha256": "b09a0be029848c1b3e9d6612d68c41479f178aa7e8f94f5427cf13a93a15edf6"
+    },
+    {
+      "artifact": "driver.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/71/NATIVE_DRIVER.sh",
+      "revision": "82aa6569e36c425041be661dee73268e4d4b6a71",
+      "sha256": "78a31ec7a02a5a514fe0731e13707dad035c8f01c4b60d947b2061ae950c40dd"
+    },
+    {
+      "artifact": "launcher.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/71/REPLAY_CAS.sh",
+      "revision": "82aa6569e36c425041be661dee73268e4d4b6a71",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "artifact": "PROTOCOL.md",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/71/PROTOCOL.md",
+      "revision": "82aa6569e36c425041be661dee73268e4d4b6a71",
+      "sha256": "61dfda1cb70a6d1f151b0b0af45974a92d82315ce58c935819c25495853f8cbd"
+    },
+    {
+      "artifact": "protocol.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/71/protocol.json",
+      "revision": "82aa6569e36c425041be661dee73268e4d4b6a71",
+      "sha256": "a5ed16b247273997d378814d7f527bd88ba9e8a96cc4a2a2b2d50e7e159f53b1"
+    },
+    {
+      "artifact": "donors.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/71/donors.json",
+      "revision": "82aa6569e36c425041be661dee73268e4d4b6a71",
+      "sha256": "56f212404dc76d10381388184d5d37424fdc45c42d6510c31f19d397b191bf33"
+    }
+  ],
+  "donors_checked": 5
+}

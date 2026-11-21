@@ -99,7 +99,9 @@ defaults:
     shell: bash
 jobs:
   scope:
-    if: ${{ !github.event.pull_request.draft }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (!github.event.pull_request.draft)
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
@@ -135,6 +137,29 @@ jobs:
             /benches/
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-ell1016839-cubic research/drastic_prime_conductor_gap_round3_20261012/sessions/d4-ell1016839-auto research/ecbench_conductor_gap_20261012 research/ecbench_conductor_gap_ir_20261014 research/ecbench_n37_shared_rank_20261004/sessions/mac_arm64_l0_02 research/factor_base_shape_leads_20261018 research/ghs_curve_comparison_20261009/sessions research/notes/ecc2k130/cold_compact_orbit_ic_20261003/sessions research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/sessions research/prime_rho_automorphism_20261015/sessions/cubic research/prime_rho_automorphism_20261015/sessions/quartic
       - id: scope
         env:
           CI_EVENT: ${{ github.event_name }}
@@ -144,7 +169,9 @@ jobs:
   factor-base-sweep:
     name: factor-base sweep CLI
     needs: scope
-    if: always() && !cancelled() && !github.event.pull_request.draft && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
+    if: >-
+      !github.event.pull_request.draft &&
+      (always() && !cancelled() && !github.event.pull_request.draft && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false'))
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
@@ -180,6 +207,29 @@ jobs:
             /research/factor_base_shape_leads_20261018/
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+            /tools/artifacts/
+            /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-ell1016839-cubic research/drastic_prime_conductor_gap_round3_20261012/sessions/d4-ell1016839-auto research/ecbench_conductor_gap_20261012 research/ecbench_conductor_gap_ir_20261014 research/ecbench_n37_shared_rank_20261004/sessions/mac_arm64_l0_02 research/factor_base_shape_leads_20261018 research/ghs_curve_comparison_20261009/sessions research/notes/ecc2k130/cold_compact_orbit_ic_20261003/sessions research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/sessions research/prime_rho_automorphism_20261015/sessions/cubic research/prime_rho_automorphism_20261015/sessions/quartic
       - name: Materialize native fixture inputs
         run: node .github/scripts/ci-scope.mjs --materialize
       - uses: dtolnay/rust-toolchain@1.98
@@ -220,12 +270,18 @@ jobs:
           cmp "$replay/runs/guard-coverage.json" "$replay/guard-coverage.json"
 
   harness:
-    if: always() && !cancelled() && !github.event.pull_request.draft && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false')
+    if: >-
+      !github.event.pull_request.draft &&
+      (always() && !cancelled() && !github.event.pull_request.draft && (needs.scope.result != 'success' || needs.scope.outputs.ecbench_replay != 'false'))
     needs: scope
     runs-on: ubuntu-24.04
     # Keep the exhaustive scientific audit's existing 300-minute budget in
-    # the weekly/manual lane; ordinary PR validation is bounded at 45 minutes.
-    timeout-minutes: ${{ (github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 300 }}
+    # the weekly/manual lane; ordinary PR validation is bounded at 75 minutes.
+    # 45 minutes stopped fitting on 2026-11-11: runs 42969362215 and
+    # 43000966973 (twice) were cancelled at 45 min before any audit step ran
+    # (session listing 6.9 min, store pull 5.0 min, lib tests 15.7 min,
+    # integration tests 13.1 min); a passing re-run took 43.5 min.
+    timeout-minutes: ${{ (github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'merge_group') && 75 || 300 }}
     steps:
       - name: Require successful scope classification
         if: needs.scope.result != 'success'
@@ -265,6 +321,27 @@ jobs:
             /research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
             /tools/artifacts/
             /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-ell1016839-cubic research/drastic_prime_conductor_gap_round3_20261012/sessions/d4-ell1016839-auto research/ecbench_conductor_gap_20261012 research/ecbench_conductor_gap_ir_20261014 research/ecbench_n37_shared_rank_20261004/sessions/mac_arm64_l0_02 research/factor_base_shape_leads_20261018 research/ghs_curve_comparison_20261009/sessions research/notes/ecc2k130/cold_compact_orbit_ic_20261003/sessions research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/sessions research/prime_rho_automorphism_20261015/sessions/cubic research/prime_rho_automorphism_20261015/sessions/quartic
       - name: Materialize compile-time inputs without unrelated archives
         run: node .github/scripts/ci-scope.mjs --materialize
       # Sessions are found by schema, wherever they live: check out every
@@ -308,6 +385,9 @@ jobs:
           mapfile -t artifact_sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
           test "${#artifact_sessions[@]}" -gt 0
           python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
+          python3 .github/scripts/ecbench-hydrate-pointers.py "$RUNNER_TEMP/ecbench-sessions.txt"
+      - name: Test frozen archive pointer recovery
+        run: python3 .github/scripts/test_ecbench_hydrate_pointers.py
       - name: Test audit download partitioning
         run: python3 .github/scripts/test_ecbench_download_shard.py
       - name: Plan audit downloads once from hydrated sessions
@@ -386,6 +466,15 @@ jobs:
           python3 research/ecbench_factor_bases_20261013/check_fb_ids.py
           python3 research/ecbench_factor_bases_20261013/check_fbm_ids.py
           python3 -m py_compile research/ecbench_factor_bases_20261013/join_sage_dor.py
+      - name: Re-derive the conductor-gap instruction census from archived profiles
+        run: |
+          study=research/ecbench_conductor_gap_ir_20261014
+          archive=research/ecbench_conductor_gap_20261012
+          cargo test --release --example conductor_gap_ir
+          (cd "$study" && sha256sum -c raw-callgrind.tar.xz.sha256)
+          tar -xJf "$study/raw-callgrind.tar.xz" -C "$study"
+          cargo run --release --example conductor_gap_ir -- analyze "$study" "$archive"
+          git diff --exit-code -- "$study/analysis.json" "$study/analysis.md"
       - name: Host
         run: ./target/release/ecbench host | tee -a "$GITHUB_STEP_SUMMARY"
       # Bounds are re-derivable from the sessions they name, challenges must
@@ -611,8 +700,12 @@ jobs:
             "isolation_levels.ic L0 is below required L2",
             "isolation_levels.rho L0 is below required L2",
             "record_class must be verified_answer_controlled_wall for a primary wall claim"]' "$RUNNER_TEMP/check-native.json" > /dev/null
-          for _ in 1 2; do ./target/release/ecbench db sql "$RUNNER_TEMP/claim" "$RUNNER_TEMP/claim.json" | sqlite3 -bail "$RUNNER_TEMP/ecbench.db"; done
-          test "$(sqlite3 "$RUNNER_TEMP/ecbench.db" 'select count(*), min(check_status) from claims')" = "1|FAIL"
+          db="$RUNNER_TEMP/ecbench.db"
+          for _ in 1 2; do
+            ./target/release/ecbench db sql "$RUNNER_TEMP/claim" "$RUNNER_TEMP/claim.json" |
+              python3 -c 'import sqlite3, sys; c = sqlite3.connect(sys.argv[1]); c.executescript(sys.stdin.read()); c.commit(); c.close()' "$db"
+          done
+          test "$(python3 -c 'import sqlite3, sys; c = sqlite3.connect(sys.argv[1]); r = c.execute("select count(*), min(check_status) from claims").fetchone(); print(f"{r[0]}|{r[1]}")' "$db")" = "1|FAIL"
           jq -r '.verdict' "$RUNNER_TEMP/claim.json" | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Audit complete and interrupted sessions; pin incomplete scratch evidence
         if: (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
@@ -641,7 +734,9 @@ jobs:
   # and a week costs ~28 runner-hours at 1.0x and ~39 at 1.4x.  quarter=all
   # (180 h) uses 48 shards: heaviest 5.0 h at 1.4x, ~148 runner-hours.
   replay_plan:
-    if: ${{ always() && !cancelled() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && needs.harness.result == 'success' }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (always() && !cancelled() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && needs.harness.result == 'success')
     needs: [scope, harness]
     runs-on: ubuntu-24.04
     timeout-minutes: 90
@@ -662,6 +757,27 @@ jobs:
             /research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
             /tools/artifacts/
             /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-ell1016839-cubic research/drastic_prime_conductor_gap_round3_20261012/sessions/d4-ell1016839-auto research/ecbench_conductor_gap_20261012 research/ecbench_conductor_gap_ir_20261014 research/ecbench_n37_shared_rank_20261004/sessions/mac_arm64_l0_02 research/factor_base_shape_leads_20261018 research/ghs_curve_comparison_20261009/sessions research/notes/ecc2k130/cold_compact_orbit_ic_20261003/sessions research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/sessions research/prime_rho_automorphism_20261015/sessions/cubic research/prime_rho_automorphism_20261015/sessions/quartic
       - name: Check out and list every committed ecbench session
         run: |
           list="$RUNNER_TEMP/ecbench-sessions.txt"
@@ -699,6 +815,7 @@ jobs:
           mapfile -t artifact_sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
           test "${#artifact_sessions[@]}" -gt 0
           python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
+          python3 .github/scripts/ecbench-hydrate-pointers.py "$RUNNER_TEMP/ecbench-sessions.txt"
       - name: Weigh every session, check the long-session pins and plan the week
         env:
           QUARTER: ${{ inputs.quarter }}
@@ -714,7 +831,9 @@ jobs:
           if-no-files-found: error
 
   exhaustive_replay:
-    if: ${{ always() && !cancelled() && needs.replay_plan.result == 'success' }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (always() && !cancelled() && needs.replay_plan.result == 'success')
     needs: [replay_plan, harness]
     runs-on: ubuntu-24.04
     # replay_plan only succeeds on workflow_dispatch and schedule, so this lane
@@ -746,6 +865,28 @@ jobs:
             /.github/scripts/
             /tools/artifacts/
             /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
+        if: steps.mine.outputs.count != '0'
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-ell1016839-cubic research/drastic_prime_conductor_gap_round3_20261012/sessions/d4-ell1016839-auto research/ecbench_conductor_gap_20261012 research/ecbench_conductor_gap_ir_20261014 research/ecbench_n37_shared_rank_20261004/sessions/mac_arm64_l0_02 research/factor_base_shape_leads_20261018 research/ghs_curve_comparison_20261009/sessions research/notes/ecc2k130/cold_compact_orbit_ic_20261003/sessions research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/sessions research/prime_rho_automorphism_20261015/sessions/cubic research/prime_rho_automorphism_20261015/sessions/quartic
       - name: Pull this shard's sessions from the artifact store
         if: steps.mine.outputs.count != '0'
         shell: bash
@@ -769,6 +910,7 @@ jobs:
           mapfile -t artifact_sessions < "$RUNNER_TEMP/mine.txt"
           printf '/%s/\n' "${artifact_sessions[@]}" | git sparse-checkout add --stdin
           python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
+          python3 .github/scripts/ecbench-hydrate-pointers.py "$RUNNER_TEMP/ecbench-sessions.txt"
       - uses: actions/download-artifact@v4
         if: steps.mine.outputs.count != '0'
         with:
@@ -786,7 +928,9 @@ jobs:
   # They are replayed only on request: workflow_dispatch with long=true.  Set
   # long_runner to a self-hosted runner label for them.
   long_replay:
-    if: ${{ always() && !cancelled() && github.event_name == 'workflow_dispatch' && inputs.long && needs.harness.result == 'success' }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (always() && !cancelled() && github.event_name == 'workflow_dispatch' && inputs.long && needs.harness.result == 'success')
     needs: [harness]
     runs-on: ${{ inputs.long_runner || 'ubuntu-24.04' }}
     timeout-minutes: 2880
@@ -807,6 +951,27 @@ jobs:
             /research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
             /tools/artifacts/
             /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-ell1016839-cubic research/drastic_prime_conductor_gap_round3_20261012/sessions/d4-ell1016839-auto research/ecbench_conductor_gap_20261012 research/ecbench_conductor_gap_ir_20261014 research/ecbench_n37_shared_rank_20261004/sessions/mac_arm64_l0_02 research/factor_base_shape_leads_20261018 research/ghs_curve_comparison_20261009/sessions research/notes/ecc2k130/cold_compact_orbit_ic_20261003/sessions research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/sessions research/prime_rho_automorphism_20261015/sessions/cubic research/prime_rho_automorphism_20261015/sessions/quartic
       - name: Check out and list every committed ecbench session
         run: |
           list="$RUNNER_TEMP/ecbench-sessions.txt"
@@ -844,6 +1009,7 @@ jobs:
           mapfile -t artifact_sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
           test "${#artifact_sessions[@]}" -gt 0
           python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
+          python3 .github/scripts/ecbench-hydrate-pointers.py "$RUNNER_TEMP/ecbench-sessions.txt"
       - uses: actions/download-artifact@v4
         with:
           name: ecbench-pr-audit-bin
@@ -856,7 +1022,9 @@ jobs:
           bash .github/scripts/ecbench-replay-sessions.sh "$RUNNER_TEMP/long.txt"
 
   evidence_audit_pr:
-    if: ${{ !github.event.pull_request.draft && (github.event_name == 'pull_request' || github.event_name == 'merge_group') && needs.scope.outputs.ecbench_replay != 'false' }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (!github.event.pull_request.draft && (github.event_name == 'pull_request' || github.event_name == 'merge_group') && needs.scope.outputs.ecbench_replay != 'false')
     needs: [scope, harness]
     runs-on: ubuntu-24.04
     timeout-minutes: 40
@@ -890,6 +1058,27 @@ jobs:
             /research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
             /tools/artifacts/
             /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-ell1016839-cubic research/drastic_prime_conductor_gap_round3_20261012/sessions/d4-ell1016839-auto research/ecbench_conductor_gap_20261012 research/ecbench_conductor_gap_ir_20261014 research/ecbench_n37_shared_rank_20261004/sessions/mac_arm64_l0_02 research/factor_base_shape_leads_20261018 research/ghs_curve_comparison_20261009/sessions research/notes/ecc2k130/cold_compact_orbit_ic_20261003/sessions research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/sessions research/prime_rho_automorphism_20261015/sessions/cubic research/prime_rho_automorphism_20261015/sessions/quartic
       - uses: actions/download-artifact@v4
         with:
           name: ecbench-audit-downloads
@@ -924,6 +1113,7 @@ jobs:
           mapfile -t artifact_sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
           test "${#artifact_sessions[@]}" -gt 0
           python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
+          python3 .github/scripts/ecbench-hydrate-pointers.py "$RUNNER_TEMP/ecbench-sessions.txt"
       - uses: actions/download-artifact@v4
         with:
           name: ecbench-pr-audit-bin
@@ -949,7 +1139,9 @@ jobs:
   # method id of a committed session has no sentinel, so a new method gets one
   # in the PR that adds its first session.
   replay_sentinels_pr:
-    if: ${{ !github.event.pull_request.draft && (github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push') && needs.scope.outputs.ecbench_replay != 'false' }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (!github.event.pull_request.draft && (github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push') && needs.scope.outputs.ecbench_replay != 'false')
     needs: [scope, harness]
     runs-on: ubuntu-24.04
     # Routine PR and merge-group runs get the 25-minute cap; push to main keeps 30.
@@ -965,6 +1157,27 @@ jobs:
             /docs/ecbench/replay-sentinels.json
             /tools/artifacts/
             /.artifacts/
+      - name: Pull store data this workflow reads (tools/artifacts)
+        continue-on-error: true
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/drastic_prime_conductor_gap_round2_20261012/sessions/d3-ell1016839-cubic research/drastic_prime_conductor_gap_round3_20261012/sessions/d4-ell1016839-auto research/ecbench_conductor_gap_20261012 research/ecbench_conductor_gap_ir_20261014 research/ecbench_n37_shared_rank_20261004/sessions/mac_arm64_l0_02 research/factor_base_shape_leads_20261018 research/ghs_curve_comparison_20261009/sessions research/notes/ecc2k130/cold_compact_orbit_ic_20261003/sessions research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/sessions research/prime_rho_automorphism_20261015/sessions/cubic research/prime_rho_automorphism_20261015/sessions/quartic
       # Coverage needs only each session's session.json and spec.json (plain
       # text in git); records are fetched for the sentinel sessions alone.
       - name: List committed ecbench sessions and check sentinel coverage

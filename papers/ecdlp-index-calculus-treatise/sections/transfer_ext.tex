@@ -442,6 +442,167 @@ Neither version changes the order against rho: the algebraic arm with seed 1093 
 $18\times$ negation rho at $w=0$ and about $4\cdot10^6\times$ at $w=1$. The corrections chapter records the
 failed V2 (Table~\ref{tab:corr-transfer}).
 
+\paragraph{What makes a seed good.} The base-comparison study of
+14 November measured the isogeny base at $k=20$, $t=5$, $G=3$, $m=2$ over
+tower seeds 0--20 in the F4 engine, with no rho arm (\S\ref{sec:ladder5}).
+A re-analysis of its 42 engine runs, with no new runs and a protocol frozen
+before any correlation was computed, asked why the seeds differ
+(\art{research/curve25519_isogeny_seed_cause_20261115/README.md}). The
+per-seed rate (hits per $10^9$ counted F4 multiply-adds, blind and lifts
+pooled, $n=21$) has Spearman $+0.959$ (permutation $p<5\cdot10^{-5}$) with
+the number of the 32 $x$-values of $V$ that lie on the miniature curve.
+That number runs from 10 (seed 13, rate $0.88$) to 21 (seed 17, rate
+$4.72$). The engine's base-point count is twice it in all 21 seeds, so the
+three features that reach $+0.959$ are one quantity. The descent-class mix
+($+0.077$, $p=0.74$), the 2-adic valuation of the auxiliary order
+($-0.334$, $p=0.14$) and its distance from $p+1$ ($+0.204$, $p=0.37$) do
+not explain the rate. All values are \texttt{[pcc:unverified]}.
+
+\paragraph{Screening seeds by on-curve count.} Three frozen studies of
+15 November used that count, read from the tower before any F4 work, to
+choose seeds (Table~\ref{tab:iso-seed-screen}). The first scored 40 fresh
+seeds (21--60) for $107{,}041$ tower operations in total and ran the 8
+highest (19--22 of 32 on the curve) and the 8 lowest (10--14) blind, at
+$3.54\cdot10^9$ multiply-adds per arm
+(\art{research/curve25519_isogeny_seed_screen_20261115/README.md}). The top
+group's rate is $2.86\times$ the bottom's (one-sided exact $p=4\cdot10^{-12}$)
+and $1.77\times$ the unscreened rate of seeds 1--20; the bottom group is at
+$0.62\times$. Its hypothesis H15 failed: a model with hits proportional to
+base points, fitted on seeds 0--20, predicts 104.7 hits for the top group
+(interval 85--125) against 146 observed. This contradicts the re-analysis's
+exploratory reading that blind hits are proportional to base points. A
+post-hoc fit of the rate as $b^k$ in the base-point count $b$ gives
+$k=1.95$ $[1.45,2.40]$ on 37 blind arms.
+
+The lifts arms on the same 16 seeds were frozen with a model fitted on
+seeds 0--20 alone, hits $=0.0022857\times\text{exposure}\times b^{2.05}$
+(\art{research/curve25519_isogeny_seed_screen_lifts_20261115/README.md}).
+It predicts $1021.8$ hits (interval 960--1085) for the top group against
+1014 observed, and $376.7$ (339--415) for the bottom against 368. Lifts
+against blind on these 16 seeds is $0.879$ (two-sided $p=0.093$), so
+neutrality is not rejected and a small lifts penalty is not excluded; a
+lifts target costs $1.4117$--$1.4156\cdot10^6$ multiply-adds, about eight
+times a blind one.
+
+\paragraph{The pairs law, depth $t$ and a deeper screen.} The next frozen
+study stated the law $\text{hits per target}=b(b-1)/(2\#E)$, $\#E=1{,}049{,}624$,
+with no fitted constant
+(\art{research/curve25519_isogeny_scaling_20261115/README.md}). It holds,
+inside the Poisson 95\% interval, for blind seeds 0--20 (218 against
+$206.2$), the bottom 8, eight unscreened seeds at $t=6$ (315 against
+$306.7$) and the out-of-sample seed 1550 (30 against $25.3$). It fails for
+the top 8 blind (146 against $122.2$, interval 101--144). Every one of the
+six $t=5$ group totals, blind and lifts, is $2$--$20\%$ above the law. At
+$t=6$ hits per target rise $3.82\times$ and multiply-adds per target
+$17.3\times$, so the rate falls to $0.22\times$ the $t=5$ rate; hypotheses
+H23 (the rate rises) and H25 (cost within $2\times$) failed. A deeper
+screen of 3{,}000 candidates ($7{,}725{,}157$ tower operations) found seed
+1550 with 26 of 32 on the curve; its one arm gives $8.476$
+$[5.719,12.101]$.
+
+\paragraph{Lower depth.} A frozen study at $t=4$ and $t=3$ scored 40
+fresh seeds per depth and ran the top 4 and the bottom 4 of each;
+amendment A1, made before any arm, records that the engine requires
+$G<t$, so $G=4$ cannot run below $t=5$
+(\art{research/curve25519_isogeny_lower_t_20261115/README.md}). The
+$t=4$, $G=3$ cell gives $9.167$ $[7.653,10.892]$ and the $t=3$, $G=2$
+cell $12.340$ $[9.690,15.492]$ ($t=3$ above $t=4$, one-sided $p=0.026$).
+At $t=4$ the $G=2$ and $G=3$ cells have the same 129 hits on the same
+targets and seeds, and $G=3$ costs $2.95\times$ less per target; the
+source states that the conditional binomial $p$ between them is not
+meaningful. Screening still separates groups at $t=4$, $G=3$: $15.777$
+for the top 4 against $2.558$ for the bottom 4 ($6.2\times$,
+$p=7.7\cdot10^{-18}$). The pairs law fails at $t=4$ (129 against $99.5$,
+interval 80--119) and sits at the edge of its interval at $t=3$ (74 in
+44--74); seed 214 alone had 38 hits against $22.01$ expected.
+Figure~\ref{fig:iso-seed-t} plots the rate and the cost per target
+against $t$.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llllrlrr@{}}
+\toprule
+$t$, $G$ & Seeds & Arm & Study & Hits & Rate $[95\%]$ & law o/e & mul-adds/target \\
+\midrule
+5, 3 & 1--20, unscreened & blind & 14 Nov & 206 & $2.909$ $[2.525,3.334]$ & -- & $1.7702$--$1.7710\cdot10^5$ \\
+5, 3 & top 8 of 40 & blind & screen & 146 & $5.155$ $[4.353,6.062]$ & $1.195$ & -- \\
+5, 3 & bottom 8 of 40 & blind & screen & 51 & $1.800$ $[1.340,2.367]$ & $1.125$ & -- \\
+5, 3 & top 8 of 40 & lifts & lifts & 1014 & $4.488$ $[4.216,4.773]$ & $1.040$ & $1.4117$--$1.4156\cdot10^6$ \\
+5, 3 & bottom 8 of 40 & lifts & lifts & 368 & $1.625$ $[1.463,1.800]$ & $1.016$ & (both groups) \\
+5, 3 & 1550, best of 3{,}000 & blind & scaling & 30 & $8.476$ $[5.719,12.101]$ & $1.187$ & -- \\
+6, 3 & 101--108, unscreened & blind & scaling & 315 & $0.643$ $[0.574,0.718]$ & $1.027$ & $3.0612$--$3.0635\cdot10^6$ \\
+4, 3 & top 4 + bottom 4 of 40 & blind & lower $t$ & 129 & $9.167$ $[7.653,10.892]$ & $1.297$ & $1.759\cdot10^4$ \\
+4, 2 & top 4 + bottom 4 of 40 & blind & lower $t$ & 129 & $3.103$ $[2.591,3.687]$ & $1.297$ & $5.196\cdot10^4$ \\
+3, 2 & top 4 + bottom 4 of 40 & blind & lower $t$ & 74 & $12.340$ $[9.690,15.492]$ & $1.261$ & $3{,}748$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Isogeny seeds on the $k=20$ Curve25519 miniature, F4 engine,
+$m=2$, 20{,}000 targets per arm. Rate: hits per $10^9$ counted F4
+multiply-adds, exact Poisson interval; law o/e: observed hits over the
+pairs law $b(b-1)/(2\#E)$ per target (for lifts, times the $7.98$--$7.99$
+lift targets per target). Screened seeds are ranked by the number of
+$x$-values of $V$ on the curve. No arm has a rho partner. Sources:
+\art{research/curve25519_isogeny_seeds_20261114/summary.txt} and the
+\texttt{summary.txt} of the four 15 November studies named in the text;
+all \texttt{[pcc:unverified]}, no validation file.}
+\label{tab:iso-seed-screen}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-u16xfer-c25519-t.pdf}
+\caption[]{Isogeny base on the $k=20$ Curve25519 miniature against tower
+depth $t$, blind arm. Left: hits per $10^9$ counted F4 multiply-adds with
+exact Poisson 95\% intervals. Right: F4 multiply-adds per target. The
+$t=5$ point pools unscreened seeds 1--20 and the $t=6$ point unscreened
+seeds 101--108; the $t=3$ and $t=4$ points pool the top 4 and the bottom 4
+of 40 screened seeds, so they are not random samples of seeds. No rho arm.
+Data: \art{figures/data-u16xfer-c25519-t.json}, from the summaries of
+Table~\ref{tab:iso-seed-screen}; \texttt{[pcc:unverified]}.}
+\label{fig:iso-seed-t}
+\end{figure}
+
+\paragraph{Indicative distance to rho.} No study above ran a matched rho
+arm. The lower-$t$ study did not rerun one (its session's AWS identity was
+invalid) and computed an indicative $S$ against the lab's replay-audited
+T12 negation rho, $S=1.544$, $1.654$ and $2.651$ at $w=0$, $0.1$ and $1$
+(Table~\ref{tab:iso-seed-gap}). Its $S$ charges the counted tower
+operations at one GAE each plus $w$ times $(\text{columns}+1)$ times
+multiply-adds per hit, over $\sqrt N=362.2$; it is not an ecbench $S$, and
+a multiply-add is not a group addition. Its hypothesis H34, an indicative
+gap at $w=0.1$ below the atlas's measured best arm, failed: $6.76\cdot10^4$
+at $t=3$ against $1.83\cdot10^4$. Lowering $t$ from 5 to 3 moves the
+indicative $w=0.1$ gap from $5.3\cdot10^5$ to $6.8\cdot10^4$, measured in
+F4 work on this engine. The $w=0$ column charges one seed's tower only;
+charging the 40-candidate screen ($82{,}384$ and $47{,}075$ operations)
+would add about 227 and 130 to $S$, so it is not comparable with the
+atlas's $27.9$. The scaling study's own estimate for seed 1550,
+$3.19\cdot10^9$ F4 multiply-adds for 27 relations against 321 expected rho
+group operations, a ratio of $9.92\cdot10^6$, mixes the same two units.
+None of these is a leaderboard row: there is no paired rho run, replay
+certificate, validator report or \texttt{pcc} claim. The distance to rho
+stays four to five orders of magnitude at $w=0.1$.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrrrl@{}}
+\toprule
+Cell & $w=0$ & $w=0.1$ & $w=1$ & Standing \\
+\midrule
+$t=5$, $G=3$, seed 1550 (recomputed) & $3.4$ & $5.3\cdot10^5$ & $3.3\cdot10^6$ & indicative \\
+$t=4$, $G=3$, 8 screened seeds & $3.6$ & $1.55\cdot10^5$ & $9.7\cdot10^5$ & indicative \\
+$t=3$, $G=2$, 8 screened seeds & $2.7$ & $6.8\cdot10^4$ & $4.2\cdot10^5$ & indicative \\
+\addlinespace
+Atlas best ($t=4$, $G=3$, seed 1193, trace replay) & $27.9$ & $1.83\cdot10^4$ & $1.13\cdot10^5$ & ecbench \\
+\bottomrule
+\end{tabular}
+\caption[]{Indicative gap to the T12 negation rho on the $k=20$
+Curve25519 miniature (arm $S$ over rho $S$). The first three rows are not
+ecbench sessions and are \texttt{[pcc:unverified]}; the last is the measured arm of \S\ref{sec:c25519}. Its validator report passes with errata.
+Source: \art{research/curve25519_isogeny_lower_t_20261115/README.md}.}
+\label{tab:iso-seed-gap}
+\end{table}
+
 \section{Isogeny computation as tooling}\label{sec:iso-tooling}
 
 Several studies built isogeny machinery without an ECDLP claim; they are
@@ -482,6 +643,144 @@ recorded because later studies rest on them.
   arithmetic, not the discrete logarithm.
 \end{itemize}
 
+\section{Small-norm endomorphisms}\label{sec:iso-endo}
+
+A non-integer endomorphism of degree $d$ on a curve with order of
+discriminant $D_E$ needs $x^2+\abs{D_E}y^2=4d$ with $y\ne0$, so $d\ge\abs{D_E}/4$.
+An endomorphism-adapted factor base therefore needs small $\abs{D_E}$. A
+census of 12 November counted how often that happens
+(\art{research/endo_degree_census_20261112/CENSUS.md}; protocol frozen by
+hash before data, one reporting amendment; every value
+\texttt{[pcc:unverified]}). Its controls passed: 5{,}600 of 5{,}600 CM curves
+with $D\in\{-3,-4,-7,-8,-11,-19,-43\}$ were detected with $d_K=D$ on the
+crater, and 3{,}200 of 3{,}200 non-maximal ones ($D=-12,-16,-27,-28$) were
+reported off it.
+
+\paragraph{Random curves.} Table~\ref{tab:iso-endo} gives the null
+population. The fraction whose isogeny class has $\abs{d_K}\le44$ (so a
+class endomorphism of degree at most 11) matches the exact formula, frozen
+before the run, with $\abs z\le1.45$ at every size, and scales as $C/\sqrt p$
+with $C$ near 4. The curve itself has such an endomorphism only on the
+crater. A post hoc computation of $\Pr[\operatorname{End}(E)=O_K]$ for the
+class-number-one discriminants predicts $35.5$, $7.7$, $0.46$ and $0.03$
+crater hits at 12, 16, 20 and 24 bits against 26, 7, 0 and 0 observed, a
+fall of about 16 per 4 bits: $\Pr\approx1/p$. In a class-level hit the
+conductor index $f$ has median about $0.45\sqrt p$, so reaching the crater
+is a $\sqrt p$-scale isogeny walk, the size of a rho run.
+
+\begin{table}[t]
+\centering\footnotesize
+\begin{tabular}{@{}rrrrrrr@{}}
+\toprule
+bits & curves (ordinary) & hits $\abs{d_K}\le44$ & fraction & expected & $z$ & crater hits \\
+\midrule
+12 & 30{,}000 (29{,}701) & 2{,}172 & $7.313\cdot10^{-2}$ & 2{,}206.7 & $-0.78$ & 26 \\
+16 & 100{,}000 (99{,}786) & 1{,}864 & $1.868\cdot10^{-2}$ & 1{,}803.3 & $1.45$ & 7 \\
+20 & 100{,}000 (99{,}941) & 422 & $4.222\cdot10^{-3}$ & 442.3 & $-0.97$ & 0 \\
+24 & 100{,}000 (99{,}985) & 128 & $1.280\cdot10^{-3}$ & 115.1 & $1.20$ & 0 \\
+28 & 50{,}000 (49{,}997) & 16 & $3.200\cdot10^{-4}$ & 14.2 & $0.47$ & 0 \\
+32 & 20{,}000 (20{,}000) & 1 & $5.0\cdot10^{-5}$ & 1.54 & $-0.43$ & -- \\
+40 & 2{,}000 (2{,}000) & 0 & 0 & 0.007 & $-0.09$ & -- \\
+\bottomrule
+\end{tabular}
+\caption[]{Endomorphism-degree census, null population: uniformly random
+$(a,b)$ over random primes of the given size. ``Expected'' is the exact
+formula frozen before the run; crater status is decidable only for
+$h(d_K)=1$. Sizes 32 and 40 have no power. Source:
+\art{research/endo_degree_census_20261112/CENSUS.md};
+\texttt{[pcc:unverified]}.}
+\label{tab:iso-endo}
+\end{table}
+
+\paragraph{The registry and named curves.} The frozen rule fired as written,
+with 185 registry rows at $p\ge2^{30}$, $\abs{d_K}\le44$, $d_K\notin\{-3,-4\}$;
+184 of them are decidable and all 184 are the programme's own
+CM-constructed curves on the crater. Among named curves, $d_K=-3$ (the
+$j=0$ crater) covers secp160k1 to secp256k1, every BN and BLS curve in the
+registry and Pallas, Vesta, Tweedledum and Tweedledee; the only other one is
+Bandersnatch ($d_K=-8$, class minimum degree 2, crater status unknown
+because its row records no $a$, $b$). No named standard curve has $d_K=-4$
+or any of $-7,-11,\dots,-43$; P-192 to P-521, Brainpool, Curve25519,
+Curve448 and the rest have $\abs{d_K}>44$. Beyond $j=0$ and $j=1728$, a
+curve with an endomorphism of degree at most 11 exists only by
+construction.
+
+\paragraph{The experiment it scopes, measured.} The small-$D_E$ protocol was
+frozen by hash before data, with one pre-data amendment that pinned cells,
+bases, solvers, costs and the stop rule, and was run on 12~November
+(\art{research/small_de_endo_fb_20261112/RESULTS.md}). Designed CM curves
+with $\operatorname{End}(E)=O_K$ for $D\in\{-3,-4,-7,-8,-11\}$ and a generic
+control curve ($\abs{d_K}>100$) at 12 to 28 bits, $m=2$ and 3, each with
+16 certified targets, carried four arms: A0, the generic curve with an
+$x$-interval base; A1, the small-$D_E$ curve with the standard base; A2, the
+same curve with a $\psi$-closed (for $D=-3,-4$) or layered base and folded
+logs; and A3, a control added after the smoke test that folds the generic
+curve's base by a random scalar in the same four layers. It has a passing
+validation gate, with caveats
+(\art{research/small_de_endo_fb_20261112/VALIDATION.json},
+\art{research/validation_20261112/REPORT.md}; validated,
+\texttt{[pcc:unverified]}). The validator replayed the run, re-rendered the
+derived tables and figure byte for byte, certified 1{,}920 IC and 2{,}240 rho
+logs, and checked the CM discriminant, $j$, $\lambda$ and $\psi(G)=[\lambda]G$
+on all 30 curves. Its caveats: the store copy of the raw data was not
+fetched, the record binds a dirty commit that predates the code, the
+amendment's pre-data status is the producer's statement, and rho's
+partition hashes and table operations are not emitted.
+
+The answer is no. Solving one trial costs the same in every arm of every
+cell: to the operation at $m=2$, and within $0.85\%$ at $m=3$ (the
+validator's correction of ``to the operation''). The decomposition
+probability per trial is unchanged for $D=-3,-4$ and lower by $0.09$--$0.11$
+for the layered $D=-7,-8$ bases at $m=2$, 20--28 bits. What falls is the
+column count: A2 has exactly $1/3$, $1/2$ or $1/4$ of A1's columns, so fewer
+relations and a smaller elimination. By the frozen rule (A2 below A1 by
+more than two pooled standard errors at all three weights in every cell)
+$D=-3,-4,-7,-8$ are gains and $D=-11$ is not: its five $m=2$ cells lose at
+$w=0$, where the degree-3 V\'elu kernel sums that build the layered base
+cost more than the trials save. The control shows that the gain is the
+folding, not the small $D_E$. A3 over A0 is $0.22$--$0.30$ at 20--28 bits, and
+the layered arms differ from it by at most $0.097$ at 24 and 28 bits; the
+automorphism arms ($0.33$ and $0.5$) are beaten by the scalar fold, whose
+factor 4 is a free parameter while $\abs{\operatorname{Aut}}/2$ is 3 or 2.
+Table~\ref{tab:iso-endo-fb} gives the 28-bit cells. No IC arm is below its
+best matched rho (plain, negation, or the automorphism fold for $D=-3,-4$) at
+any weight in any of the 120 arm-cells; the validator's minima are $2.325$,
+$7.616$ and $40.156$ at $w=0$, $0.1$ and 1, and the order holds for every $w$
+in $[0,1]$. Between 16 and 28 bits the amortised $m=2$ ratio at $w=0.1$ grows
+by $45$ (A0), $61$ (A2, $D=-3$) and $106\times$ (A1, $D=-3$), against
+$\sqrt{2^{12}}=64$. The scope is designed curves at toy size; it says
+nothing about deployed standard curves.
+
+\begin{table}[t]
+\centering\footnotesize
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+$D$ & $m$ & columns A2/A1 & A2/A1 relation phase, $w=0.1$ & LA A2/A1 & rule verdict \\
+\midrule
+$-3$ & 2 & 4311/12933 & $0.336$ & $0.315$ & win/win/win \\
+$-3$ & 3 & 184/552 & $0.337$ & $0.152$ & win/win/win \\
+$-4$ & 2 & 6468/12936 & $0.498$ & $0.496$ & win/win/win \\
+$-4$ & 3 & 276/552 & $0.473$ & $0.302$ & win/win/win \\
+$-7$ & 2 & 3234/12936 & $0.246$ & $0.236$ & win/win/win \\
+$-7$ & 3 & 138/552 & $0.287$ & $0.173$ & win/win/win \\
+$-8$ & 2 & 3234/12936 & $0.259$ & $0.233$ & win/win/win \\
+$-8$ & 3 & 138/552 & $0.393$ & $0.371$ & win/win/win \\
+$-11$ & 2 & 3234/12935 & $0.247$ & $0.234$ & loss/win/win \\
+$-11$ & 3 & 138/552 & $0.262$ & $0.080$ & win/win/win \\
+\addlinespace
+control A3/A0 & 2 & 3234/12934 & $0.253$ & $0.238$ & loss/win/win \\
+control A3/A0 & 3 & 138/552 & $0.296$ & $0.141$ & win/win/win \\
+\bottomrule
+\end{tabular}
+\caption[]{Endomorphism-adapted factor bases at 28 bits: the adapted arm A2
+against the standard base A1 on the same small-$D_E$ curve, and the
+scalar-folded control A3 against A0 on a generic curve. Verdicts at
+$w=0/0.1/1$ under the frozen rule. Source:
+\art{research/small_de_endo_fb_20261112/RESULTS.md}; validated with
+caveats, \texttt{[pcc:unverified]}.}
+\label{tab:iso-endo-fb}
+\end{table}
+
 \section{What the isogeny side settles}\label{sec:iso-summary}
 
 \begin{itemize}
@@ -495,6 +794,13 @@ recorded because later studies rest on them.
 \item Isogeny-built factor bases are single-curve bases with a
   presentation cost; selecting the seed is a constant-factor lever that
   leaves the algebraic arm orders of magnitude above rho.
+\item An endomorphism of degree at most 11 lies in a random curve's class
+  with probability near $4/\sqrt p$ and on the curve itself near $1/p$;
+  beyond $j=0$ and $1728$ such curves exist only by construction.
+\item On such curves an endomorphism-adapted base saves only by folding
+  columns, which a random-scalar fold on a generic curve matches; the
+  solving work per trial is unchanged, and every arm stays above rho
+  (validated).
 \end{itemize}
 \chapter{Twists, pairings and lifts}\label{ch:twistspairings}
 
@@ -730,7 +1036,7 @@ $n^{-1/4}$ break-even (\texttt{KN-OPEN-d3a6f0}). The round synthesis
 \texttt{RQ-CZLIFT-b9f765} cannot close yet, with a control and a review
 outstanding.
 
-\paragraph{Two November follow-ups.} Two preregistered studies tested
+\paragraph{Three November follow-ups.} Three preregistered studies tested
 specific lift-derived observables.
 \begin{itemize}
 \item \emph{H110, the $p^2$-lift defect.} A deterministic Hensel section
@@ -749,15 +1055,38 @@ specific lift-derived observables.
   of 28 rows; the candidate's best-match rate was $0.500$--$0.611$ against
   $0.500$--$0.630$ for 32 symmetry-matched controls
   (\art{research/torsion_division_derivative_20261031/README.md}).
+\item \emph{F2, the DFT support of the $p^2$-lift defect.} The follow-up to
+  H110 measured, along $\langle G\rangle$, the number $c$ of nonzero
+  degree-$m$ components of the discrete Fourier transform of $a_k=f([k]G)$
+  over $\FF_{p^m}$, $m=\operatorname{ord}_r(p)$, so that the linear
+  complexity is $L=[\text{mean}\ne0]+mc$; a sparse transform would make the
+  defect an exponential polynomial with few terms
+  (\art{research/p2_lift_linear_complexity_20261110/README.md}). On 21 curves
+  ($p$ from 101 to $65{,}521$, $r$ up to $65{,}957$, two supersingular curves with
+  $m=2$) and four observables (the first-layer defect $f_0$, the torsion
+  lift's $u$-digit, $f_1$ and $f_1-f_0$), every one of the 336 rows has
+  $c=N=(r-1)/m$ and $L\in\{r-1,r\}$, and 0 of 4{,}200 random $r$-periodic
+  sequences has $c<N$. The planted control gave $L=2$, $c=1$ on both
+  supersingular curves, and four scalar multipliers gave identical
+  $(L,c)$ on 21 of 21 curves. Decision rule 3 closed the sparse
+  exponential-polynomial transfer for the fixed-$x$ section, the $u=1$
+  section and the torsion lift's $x$-digit at these sizes; it bounds neither
+  higher formal layers nor larger $r$. On most curves $N$ is 1 to 8, so the
+  test has room for partial sparsity only on the two supersingular curves
+  ($N=2724$, 2715) and one with $N=21$. The run was local; the confirmatory
+  run on the lab cluster is open, and every value is
+  \texttt{[pcc:unverified]}.
 \end{itemize}
-Each rejects only its frozen family; neither establishes a lower bound.
+Each rejects only its frozen family; none establishes a lower bound.
 
 \section{Global lifts, heights and the CM canonical lift}\label{sec:tp-global}
 
 Silverman's xedni calculus lifts $(E,P,Q)$ to a curve over $\mathbb{Q}$ or a
 number field and hopes that the lifts satisfy a short Mordell--Weil
 relation. The obstruction chapter gives the exact function-field lift
-probability. Three items refine the global case.
+probability. Three items refine the global case. The cross-characteristic
+torsion bridges of 12--14 November, and the bounds on them, are in
+\S\ref{sec:obs-open}.
 
 \paragraph{The JKSST theorem, audited in Lean.} Jacobson, Koblitz,
 Silverman, Stein and Teske's analysis derives the classic bound under
@@ -1477,11 +1806,19 @@ point-driven pencils, peeling & $p=739$, 1{,}151, 1{,}187; 180 targets & 0 of 19
 pencils, Markowitz priority & $p=739$, 60 targets & $1.205\times$ peeling; 0 of 36 below (validated) \\
 genus-2 route at $n=2$ & 1{,}260 runs to 40 bits & $0.51$--$2.83$; unresolved \\
 GHS cover from $\FF_{p^6}$ (ecbench) & two sources, 20.2 and 23.5 bits & $6.62\times$ \\
+genus-2 IC on a bielliptic $J(C)$, chained v3 & $p=211$--$1619$, one curve each & $8.0$--$40.8\times$ plain rho; $376\times$ negation rho at $p=1619$ \\
+genus 2 and 3, full degree-1 base & $p=251$--$64{,}007$, 3 curves each & $47.11\times$, $141.97\times$ plain rho at $p=64{,}007$; $205\times$, $616\times$ negation rho \\
+amortised genus-2 IC, online & $p=211$--$205{,}661$, 128 targets & $0.999$--$1.111\times$ a memory-matched rho table \\
+genus-2 IC on the whole $J(C)$ (O3) & $p=211$--$51{,}203$, 9 primes & $\ge17.96\times$ at $w=0$; $406\times$ and more at $w=0.1$ \\
 \bottomrule
 \end{tabularx}
 \caption[]{Measured Jacobian and cover collectors on prime-field or
 small-degree sources. The $n=2$ genus-2 row is from
-\S\ref{sec:ghs-odd}. Sources: as cited in the text.}
+\S\ref{sec:ghs-odd}; the last four rows are from \S\ref{sec:jac-chain}. The
+plain-rho ratios of the chained rows are unverified assertions; their
+negation-rho ratios (at $w=0$) are validated, and the whole-$J(C)$ row is
+validated with caveats; all \texttt{[pcc:unverified]}. Sources: as cited in
+the text.}
 \label{tab:jac-samefield}
 \end{table}
 
@@ -1505,6 +1842,446 @@ remaining constructions.
   ambient genus-3 index calculus loses to source rho by about 70.17
   exponent bits there (\art{research/n83_genus3_image_solver_20261031/README.md}).
 \end{itemize}
+
+\section{Chained transfers and the genus ladder}\label{sec:jac-chain}
+
+The 11--12 November study measured the closure above on explicit covers
+(\art{research/chained_prime_transfer_20261111/README.md}). Its native code
+implements $\FF_p$ and $\FF_{p^2}$ arithmetic, V\'elu isogenies, and the
+bielliptic pull-back $\varphi^*$ and push-forward $\varphi_*$ on arbitrary
+reduced Mumford divisors, non-split ones included. A hop $h$ is accepted
+only after $h(P)\ne0$, $\operatorname{ord}h(P)=r$ and $h([x]P)=[x]h(P)$ on
+sampled $x$ have been checked, and a chain $E\to E'\to J(C)$ is verified end
+to end. Every number below is \texttt{[pcc:unverified]} at the source, and no
+timing is claimed. An independent validation of 13~November
+(\art{research/validation_20261112/REPORT.md}) reproduced v3 (16 of 16
+certificates, a byte-identical native replay), \texttt{tower\_large} (all 234
+table numbers, 1{,}680 solver logs certified at $p\le16{,}001$) and the
+push-forward study, and admitted none of them: their rho reference is the
+plain walk although the negation map is available, and rho's native work
+is not emitted. The negation-map re-measurement below supplies that
+reference and is validated. The transfer (cover, isogeny, $\varphi^*$) is a
+one-time cost and enters no per-instance total.
+
+\paragraph{The measured boundary, after replay.} The first run gave
+genus-2 index calculus at $9.8$--$42.9\times$ rho on $E$ for $p=211$--$1619$.
+An unsigned replay in the same session reproduced every raw file byte for
+byte and found faults in what was measured
+(\art{research/chained_prime_transfer_20261111/replay/REPLAY.md},
+\art{research/chained_prime_transfer_20261111/RESULTS.md}): the counted
+scalar multiplication charged the first addition into the identity
+(inflating IC by 8--13\%), the linear algebra was not emitted, rho was not
+checked against the planted log, the elimination accepted a log only if it
+equalled an uncharged BSGS answer, the instance was a surrogate rather than
+$(\varphi^*(P),\varphi^*([x]P))$, and no solve certificates were written.
+Version 3 removed all six faults: the elimination returns the first
+zero-factor-base row's $x=-\alpha/\beta$ without consulting the answer, the
+instance is the pulled-back pair, and each of the 16 solves (4 arms at 4
+sizes) emits a certificate; 16 of 16 verified
+(\art{research/chained_prime_transfer_20261111/V3.md}).
+Table~\ref{tab:jac-chain-v3} gives the v3 rows. Index calculus is above rho
+at every price, so the order holds across the band, which here is
+one-sided because the rho reference has no unpriced counters. The source
+flags an open instrument question: the linear-algebra counter equals
+$(\abs\Fb+2)\times\text{rows}+1$ in every case (the validator's correction
+of an earlier ``columns times rows''), which looks like a matrix-size count
+rather than elimination work.
+
+\begin{table}[t]
+\centering\footnotesize
+\begin{tabular}{@{}rrrrrrrrrr@{}}
+\toprule
+$p$ & $r$ & rho $E_1$ & rho $E_1'$ (deg) & rho $J(C)$ & IC ops & LA mulmods & \multicolumn{3}{c}{IC/rho at $w=0$, $0.1$, $1$} \\
+\midrule
+211 & 109 & 428 & 530 (2) & 396 & 3{,}419 & 14{,}633 & $8.0$ & $11.4$ & $42.2$ \\
+419 & 113 & 357 & 562 (2) & 361 & 8{,}475 & 51{,}976 & $23.7$ & $38.3$ & $169.3$ \\
+821 & 71 & 370 & 274 (3) & 414 & 11{,}353 & 164{,}828 & $30.7$ & $75.2$ & $476.2$ \\
+1619 & 401 & 847 & 649 (2) & 869 & 34{,}521 & 603{,}721 & $40.8$ & $112.0$ & $753.5$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Chained prime-field transfer, version 3: one bielliptic curve
+and one seed per size; counted group operations (elliptic or Cantor);
+IC is relation collection; LA is $\ZZ/r$ multiplications priced at $w$
+GAE. Ratios are the source's, derived from the committed counts. Source:
+\art{research/chained_prime_transfer_20261111/V3.md};
+\texttt{[pcc:unverified]}.}
+\label{tab:jac-chain-v3}
+\end{table}
+
+\paragraph{One log at genus 1 to 4.} The tower ladder solved the same
+instance at genus 1 ($E$ itself), 2, 3 (degree-2 covers $y^2=F(x^2)$) and 4
+(a degree-3 cover $y^2=c(h(x))$), with the \texttt{hyper\_ic} relation walk
+and the full degree-1 base, at the eight primes $53\le p\le251$, 8 seeds
+each; all $8\times8\times5$ solves recovered the planted log
+(\art{research/chained_prime_transfer_20261111/tower_ladder/LADDER.md}).
+The mean ratios of IC group operations between rungs are
+$\mathrm{IC}_2/\mathrm{IC}_1=2.01$, $\mathrm{IC}_3/\mathrm{IC}_2=2.99$ and
+$\mathrm{IC}_4/\mathrm{IC}_3=3.96$, against a smoothness prediction of about
+$g$. The log-log slopes in $p$ are $0.71$, $0.85$, $1.06$ and $1.21$ for
+genus 1 to 4, against $0.44$ for rho on $E$ (eight points, no interval). No
+rung is below rho at all three prices at any $p$. Genus 1 is $0.25$--$0.50\times$
+rho at 0~GAE and $6.5$--$27.6\times$ at 1~GAE, so its order is not stable across
+the band; genus 3 ($1.29$--$3.52\times$ at 0~GAE) and genus 4
+($3.71$--$19.55\times$) are above rho at every price. A separate sampling of
+$3.2$ million random reduced divisors at $g\le4$, $p\le251$ found mean
+smooth fractions $1.000$, $0.515$, $0.169$ and $0.0450$ for $g=1$ to 4, so
+expected trials per relation $1.00$, $1.94$, $5.91$ and $22.2$ against $g!$; the
+curve-to-curve spread is far larger than binomial noise
+(\art{research/chained_prime_transfer_20261111/tower_smoothness/SMOOTHNESS.md}).
+
+\paragraph{Larger $p$.} A word-size Jacobian for $g\le3$, $p<2^{31}$, was
+first checked against the $p<256$ implementation at the ladder's eight
+primes (identical curves, orders, divisors after 600 random operations per
+rung, and identical IC counters on 8 seeds); all eight passed
+(\art{research/chained_prime_transfer_20261111/tower_large/TOWER_LARGE.md}).
+Three instances per prime with $r\ge p/4$, 8 IC seeds and 64 rho seeds each
+give Table~\ref{tab:jac-chain-large}. The genus-3 to genus-2 ratio stays at
+$2.92$--$3.10$ for $p\ge503$, and trials per relation are $2.00$ and $6.04$ at
+$p=64{,}007$, against $2!$ and $3!$. IC group operations grow with slope
+$0.985$ (genus 2) and $0.991$ (genus 3) in $p$, rho's walk steps with $0.559$,
+and genus-3 linear algebra with $1.824$ ($2.150$ for $p\ge1000$), reaching
+$2.17\cdot10^9$ multiplications per solve at $p=64{,}007$. The only cell
+below rho is genus 2 at $p=251$ and 0~GAE ($0.67$), and the order flips
+inside the band; against the negation-map rho that cell is above at all
+three prices (Table~\ref{tab:jac-chain-neg}). The instrumented rho charges a fixed set-up that is most of
+its cost at these $r$; against walk steps alone the distance at
+$p=64{,}007$ is $226.7\times$ (genus 2) and $683.1\times$ (genus 3) at 0~GAE.
+The gap grows like $\sqrt p$: this is the cost of genus-$g$ index calculus
+with a full degree-1 base, $\tilde O(p^{2-2/g})$ with exponent at least 1, a
+limit of this approach and not a lower bound on the problem.
+
+\begin{table}[t]
+\centering\footnotesize
+\begin{tabular}{@{}rrrrrrrrrrr@{}}
+\toprule
+$p$ & $\bar r$ & rho$_E$ & walk & IC$_2$ & IC$_3$ & IC$_3$/IC$_2$ & \multicolumn{2}{c}{IC$_2$/rho$_E$} & \multicolumn{2}{c}{IC$_3$/rho$_E$} \\
+ & & & steps & & & & $w=0$ & $w=1$ & $w=0$ & $w=1$ \\
+\midrule
+251 & 107 & 415.7 & 10.0 & 278.6 & 766.7 & 2.75 & 0.67 & 81.69 & 1.84 & 211.32 \\
+503 & 260 & 522.7 & 26.4 & 531.5 & 1648.1 & 3.10 & 1.02 & 195.55 & 3.15 & 324.22 \\
+1009 & 409 & 617.5 & 33.2 & 1033.4 & 3137.2 & 3.04 & 1.67 & 394.36 & 5.08 & 508.36 \\
+2003 & 1010 & 713.8 & 57.0 & 2023.8 & 6025.0 & 2.98 & 2.84 & 731.41 & 8.44 & 1065.02 \\
+4001 & 1018 & 720.0 & 67.4 & 4047.9 & 11815.4 & 2.92 & 5.62 & 1418.59 & 16.41 & 3316.87 \\
+8009 & 3322 & 958.3 & 105.3 & 8054.2 & 24401.5 & 3.03 & 8.40 & 2046.36 & 25.46 & 9697.74 \\
+16001 & 6672 & 1066.7 & 125.6 & 16047.9 & 47918.2 & 2.99 & 15.04 & 3613.16 & 44.92 & 45755.03 \\
+32003 & 13395 & 1219.7 & 236.6 & 32003.8 & 95571.8 & 2.99 & 26.24 & 6328.24 & 78.36 & 260265.04 \\
+64007 & 26650 & 1359.1 & 282.5 & 64019.5 & 192940.9 & 3.01 & 47.11 & 11305.68 & 141.97 & 1600507.80 \\
+\bottomrule
+\end{tabular}
+\caption[]{One elliptic log carried to genus 2 and genus 3 at larger $p$:
+means over 3 instances $\times$ 8 IC seeds (64 rho seeds per instance),
+counted group operations; rho$_E$ includes the jump-table set-up and walk
+starts, ``walk steps'' is the walk alone; LA multiplications priced at $w$
+GAE. Source:
+\art{research/chained_prime_transfer_20261111/tower_large/TOWER_LARGE.md};
+\texttt{[pcc:unverified]}.}
+\label{tab:jac-chain-large}
+\end{table}
+
+\paragraph{Amortised index calculus against precomputed rho.} With a
+trapdoor the per-curve work of index calculus is also one-time: the
+factor-base logs are computed once, and each target costs a descent. A
+frozen protocol compared this against plain rho and against
+Bernstein--Lange precomputed rho with the table matched by memory (entries
+equal to the base size) and by budget, on 128 targets per curve at 11
+primes from 211 to $205{,}661$
+(\art{research/chained_prime_transfer_20261111/amortized/AMORTIZED.md}).
+Table~\ref{tab:jac-chain-amort} gives the online costs. The best variant
+answers a target in $2.0$--$3.1\%$ of plain rho's operations and breaks even
+against plain rho after 3 to 636 targets across the band. Against the
+memory-matched table its online cost is $0.0$--$1.2$ operations higher in 10
+of 11 rows; the eleventh ($p=25{,}693$) is a tie whose paired interval
+contains 0. The frozen rule (a win at every $p\ge1619$ against both tables at
+all three prices) holds at none of the 11 primes. Two frozen predictions
+failed: the linear algebra was $0.63$--$2.07$ times the one-time group
+operations, not below $10\%$, and the memory-matched table was cheaper to
+build than the headline IC variant in only 5 of 11 rows. The integration
+analysis gives the reason: the factor base is at least as large as the
+target group in every row ($\abs\Fb/r$ from $0.98$ to 125), because genus-2
+index calculus over $\FF_p$ needs about $p/2$ places while the transferred
+subgroup has order $r\le\#E\approx p$; storing a log per place is a
+time--memory trade that a rho table of the same size reproduces. The best
+variant was chosen after the fact among three, and the table parameter was
+tuned on 24 separate targets.
+
+\begin{table}[t]
+\centering\footnotesize
+\begin{tabular}{@{}rrrrrrrr@{}}
+\toprule
+$p$ & $r$ & $\abs\Fb$ & plain rho & IC$^*$ mean (min--max) & BL memory & IC$^*$/plain & IC$^*$/BL memory \\
+\midrule
+211 & 109 & 116 & 420.9 & 12.09 (4--20) & 11.32 & 0.029 & 1.068 \\
+419 & 113 & 223 & 435.5 & 12.40 (2--22) & 11.16 & 0.028 & 1.111 \\
+821 & 71 & 401 & 343.2 & 10.48 (2--23) & 9.64 & 0.031 & 1.087 \\
+1619 & 401 & 772 & 611.5 & 15.69 (6--30) & 14.93 & 0.026 & 1.051 \\
+3203 & 313 & 1534 & 532.0 & 14.73 (4--23) & 14.24 & 0.028 & 1.034 \\
+6421 & 3191 & 3141 & 894.2 & 21.09 (10--30) & 20.59 & 0.024 & 1.024 \\
+12841 & 3169 & 6379 & 886.9 & 21.60 (13--31) & 21.15 & 0.024 & 1.021 \\
+25693 & 103 & 12856 & 398.5 & 11.05 (2--21) & 11.07 & 0.028 & 0.999 \\
+51407 & 25733 & 25909 & 1370.8 & 27.71 (18--37) & 27.28 & 0.020 & 1.016 \\
+102829 & 641 & 51318 & 660.3 & 17.16 (8--31) & 16.48 & 0.026 & 1.042 \\
+205661 & 34211 & 102339 & 1397.9 & 28.04 (19--37) & 27.69 & 0.020 & 1.013 \\
+\bottomrule
+\end{tabular}
+\caption[]{Amortised genus-2 index calculus (IC$^*$, the
+\texttt{ic\_walk\_q90} variant) against plain rho and a memory-matched
+Bernstein--Lange table: online Cantor operations per target, certificate
+included, mean over 128 targets. The last column is the distance remaining
+to the precomputed rho. Source:
+\art{research/chained_prime_transfer_20261111/amortized/AMORTIZED.md};
+\texttt{[pcc:unverified]}.}
+\label{tab:jac-chain-amort}
+\end{table}
+
+\paragraph{The negation-map re-measurement.} A frozen protocol of
+13~November re-measured all three targets (v3, \texttt{tower\_large},
+push-forward) against a tuned negation-map rho on the same curve and
+instance, in the same process, with the walk's canonicalisations, partition
+hashes, distinguished-point lookups and inserts and word operations
+emitted per run, and every arm's emitted native counters priced at the
+\S5a band and at a host-calibrated weight
+(\art{research/negation_remeasure_20261113/RESULTS.md}). It also ran three
+improved collectors on the word Jacobian: every degree-1 place (A), a single
+large prime (B) and a double large prime (C). A second validator pass bound
+the artefacts to a clean commit and admitted the directory
+(\art{research/validation_20261113/REPORT.md},
+\art{research/negation_remeasure_20261113/VALIDATION.json}; validated,
+\texttt{[pcc:unverified]}, no pcc claim id). It certified 6{,}020 of 6{,}020
+logs with independent code and recomputed 162 arm-rows with 0 mismatches.
+None of the 38 curves has $j\in\{0,1728\}$, so the negation map is the
+strongest available rho. Table~\ref{tab:jac-chain-neg} gives the headline
+rows. The recorded plain rho spent about 400 operations on set-up where the
+negation walk spends 50 to 80; its total is $4.35$--$9.22\times$ the negation
+rho's (the validator's range; the record summary's ``5.4--9.2'' is
+inexact). So the recorded distances were too small at 0 and $0.1$~GAE. At
+$w=1$ the genus-3 tower distance at $p=64{,}007$ shrinks ($1{,}595{,}592$ to
+$995{,}132$), because the negation rho's native work is now priced. No arm
+of the 162 is below the negation rho at all three prices; 156 are above, and
+6 (push-forward arms that stop at the first collision and emit no native
+counter) are unresolved lower bounds. This is an accounting correction of
+the reference, not an improvement. Arm C's priced totals are below the
+recorded collector's at all three prices at v3 $p=1619$, tower genus 3
+$p=16{,}001$ and push-forward $J(C)$ $p=12{,}841$ (the producer's prediction
+N7, which held). The validator notes that arms A, B and C are lower bounds:
+they omit the walk's partition hash, the large-prime hash map and the
+union-find, and reversing any order would need at least 165 (v3), 4{,}585
+(tower genus 3) or 2{,}587 (push-forward) extra native operations per
+arm-C group operation. Arm C remains $28.1$, 213 and $778\times$ the negation
+rho at v3 $p=1619$. A Jacobian step costs $4.3$--$22.5$ elliptic additions in
+time and is counted as one, so every IC/rho ratio here is conservative for
+``above''.
+
+\begin{table}[t]
+\centering\footnotesize
+\begin{tabular}{@{}llrrll@{}}
+\toprule
+target & arm & $p$ & group ops & old ratio, $w=0$/$0.1$/1 & new ratio, $w=0$/$0.1$/1 \\
+\midrule
+v3 & recorded & 1619 & 34{,}521 & 40.8 / 112 / 754 & 376 / 864 / 2{,}353 \\
+v3 & C & 1619 & 2{,}583 & -- & 28.1 / 213 / 778 \\
+push-forward $J(C)$ & recorded & 12{,}841 & 372{,}747 & 394 / 4{,}720 / 43{,}658 & 2{,}473 / 20{,}667 / 51{,}693 \\
+push-forward $J(C)$ & C & 12{,}841 & 15{,}063 & -- & 99.9 / 1{,}067 / 2{,}717 \\
+tower genus 2 & recorded & 251 & 279 & 0.67 / 8.77 / 81.7 & 4.06 / 72.7 / 365 \\
+tower genus 2 & recorded & 64{,}007 & 63{,}987 & 47.1 / 1{,}175 / 11{,}322 & 205 / 4{,}640 / 10{,}101 \\
+tower genus 2 & C & 64{,}007 & 52{,}898 & -- & 169 / 2{,}398 / 5{,}143 \\
+tower genus 3 & recorded & 64{,}007 & 192{,}688 & 142 / 159{,}687 / 1{,}595{,}592 & 616 / 446{,}318 / 995{,}132 \\
+tower genus 3 & C & 64{,}007 & 44{,}494 & -- & 142 / 4{,}699 / 10{,}311 \\
+\bottomrule
+\end{tabular}
+\caption[]{Chained transfers re-measured against the negation-map rho in the
+same process. Old: the recorded ratio to the recorded plain rho (group
+operations plus the emitted linear-algebra counter at $w$ GAE). New: the
+arm's total with every emitted native counter priced at $w$, over the
+negation rho with its native counters priced the same way. Every new row is
+above rho at all three prices. At $p=64{,}007$ the old column is a 4-seed
+rerun, not the recorded original (the recorded genus-3 values are $141.97$,
+$160{,}179$ and $1{,}600{,}508$). C: double-large-prime collector on the word
+Jacobian, a lower bound. Source:
+\art{research/negation_remeasure_20261113/RESULTS.md}; validated,
+\texttt{[pcc:unverified]}.}
+\label{tab:jac-chain-neg}
+\end{table}
+
+\paragraph{Index calculus on the whole Jacobian (open case O3).} The proof
+note of 12~November (\S\ref{sec:obs-pushforward}) shows that relations
+taken inside the transferred subgroup $c^*(E)$ are fibres. It leaves open
+an index calculus that draws relations from all of $J_C(\FF_p)$, Gaudry
+style, of order about $p^2$ (its case O3). A frozen study of 13~November
+ran that on the transferred genus-2 instance, with full relations (A) and
+a double large prime (B), the same collectors restricted to $c^*(E)$ as
+controls ($A_S$, $B_S$), and the negation rho on $E_1$ in the same process,
+at seven stage-1 primes from 211 to 12{,}841 and two stage-2 primes
+(\art{research/full_jacobian_ic_20261113/RESULTS.md}). An independent
+validation admitted it with caveats
+(\art{research/validation_20261114/REPORT.md},
+\art{research/full_jacobian_ic_20261113/VALIDATION.json}; validated with
+caveats, \texttt{[pcc:unverified]}). It recomputed 2{,}057 values with 0
+mismatches, replayed all 9 primes with 0 non-timing differences, and
+certified 360 of 360 IC logs and 736 of 736 rho logs with its own group law
+and Cantor arithmetic. Table~\ref{tab:jac-o3} gives the distances. All 36
+IC cells are above the negation rho at 0, $0.1$ and 1~GAE and at the
+calibrated reading. The smallest $w=0$ ratio is $17.96$, for B at $p=211$
+(the validator's correction of the producer's $18.7$;
+\art{research/full_jacobian_ic_20261113/ERRATA.md}). The frozen rule's
+verdict is nevertheless \emph{unresolved}, not ``closed by data'': it also
+required the 95\% lower bound of the slope of $\ln(\text{ratio})$ on $\ln p$
+at $w=0.1$ to exceed $0.2$, and the bounds are $-0.0698$ (A) and $-0.6540$
+(B). The cause is the instance selection: $r$ was not bound to $p$ ($r=71$
+at $p=821$, $3{,}191$ at $p=6{,}421$, 127 at $p=25{,}601$), and rho on $E_1$
+costs about $\sqrt r$. The validator found eight reporting errors that
+change no cell, class or verdict, among them that prediction F6 failed on 3
+of 176 runs, that ``0 bad relations'' was not measured, and that the IC arms
+are lower bounds with a Cantor step counted as one $E_1$ addition although
+it costs about $4.3$--$5.7$ in time. It could not establish the freeze
+ordering from git. A rerun that changes only the selection,
+$r\ge\lceil0.4p\rceil$ with $r/p=0.494$--$0.542$ and $\#E_1=2r$ at all ten
+primes, is frozen
+(\art{research/full_jacobian_ic_rp_20261114/PROTOCOL.md}) and has not run:
+its S3 checkpoint gate had no credentials
+(\art{research/full_jacobian_ic_rp_20261114/PROGRESS.md}). O3 stays open.
+
+\begin{table}[t]
+\centering\footnotesize
+\begin{tabular}{@{}rrrrrr@{}}
+\toprule
+$p$ & $r$ & A & B & $A_S$ & $B_S$ \\
+\midrule
+211 & 109 & $7.0\cdot10^3$ & 406 & 114 & 51 \\
+419 & 113 & $2.4\cdot10^4$ & $1.8\cdot10^3$ & 246 & 133 \\
+821 & 71 & $5.6\cdot10^4$ & $4.3\cdot10^3$ & 434 & 240 \\
+1619 & 401 & $4.4\cdot10^4$ & $1.7\cdot10^3$ & $1.5\cdot10^3$ & 220 \\
+3203 & 313 & $3.4\cdot10^4$ & $1.2\cdot10^3$ & $3.9\cdot10^3$ & 556 \\
+6421 & 3191 & $2.4\cdot10^4$ & 626 & $1.1\cdot10^4$ & 649 \\
+12{,}841 & 3169 & $1.2\cdot10^5$ & 881 & $2.7\cdot10^4$ & 920 \\
+25{,}601 & 127 & $6.2\cdot10^6$ & $5.7\cdot10^3$ & $2.7\cdot10^4$ & $4.9\cdot10^3$ \\
+51{,}203 & 1831 & $7.5\cdot10^6$ & $4.7\cdot10^3$ & $1.8\cdot10^5$ & $6.5\cdot10^3$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Whole-Jacobian genus-2 index calculus on the transferred
+instance: arm total over the negation-map rho on $E_1$ at $w=0.1$. A: full
+relations; B: double large prime; $A_S$, $B_S$: the same collectors with
+relations restricted to the transferred subgroup. The last two primes are
+stage 2 (one instance, two IC seeds). Source:
+\art{research/full_jacobian_ic_20261113/RESULTS.md}, with
+\art{research/full_jacobian_ic_20261113/ERRATA.md}; validated with caveats,
+\texttt{[pcc:unverified]}.}
+\label{tab:jac-o3}
+\end{table}
+
+\paragraph{The genus ladder on one field.} A frozen study of 14~November
+measured one counted instrument on imaginary hyperelliptic Jacobians of
+genus 2 to 5 and on generic smooth plane quartics over the same primes $p=67$
+to 4{,}099 (genus 5 to 1{,}031), with near-prime $\#J=hr$, $h\le8$, 4 curves
+per cell, 3 solver seeds, full-base and double-large-prime index calculus
+(with and without a discriminant-parity prefilter), Diem's line relations on
+the quartics, and the negation rho
+(\art{research/genus_ladder_20261114/RESULTS.md}). The unit is the
+$\FF_p$-multiplication equivalent (FPM:
+$\text{Cantor multiplications}+10\cdot\text{inversions}+\text{relation
+multiplications}+g^2\cdot\text{linear-algebra multiplications}$). All 1{,}809
+runs certified. There is no independent replay and no pcc claim, so every
+value is an unverified assertion. Table~\ref{tab:jac-ladder} gives
+$p=1{,}031$. Each extra unit of genus multiplies the group by about $p$ and
+rho's cost by about $\sqrt p$ times a dearer group law (90, 219, 393 and 693
+field multiplications per Cantor step at genus 2 to 5), while the best
+index calculus grows by a factor 4 to 20. In FPM, genus 2 is above rho at
+every prime but one (2{,}053, unresolved), genus 3 is unresolved from
+$p=257$, and genus 4, genus 5 and the quartics are below from $p=131$ (the
+quartics at every prime). Under the GAE band no cell is below rho at all
+three weights: one relation trial drags hundreds of native multiplications,
+which $w=1$ prices like a whole Cantor step; genus 5 at $p=1{,}031$ is
+$0.0030$, $0.090$ and $0.48$ $[0.27,1.14]$. At $p=4{,}099$ the best quartic arm
+costs $1.33\cdot10^7$ FPM against $3.32\cdot10^7$ for genus-3 hyperelliptic
+index calculus, with exponents $0.69$ and $1.08$; the quartic rho is 44 times
+dearer than the hyperelliptic one (about 8{,}900 field multiplications per
+$\mathrm{Pic}$ addition), which is why its IC/rho ratio is small.
+
+Three further findings are model-level. The split rate of the relation
+walk follows $\binom{n_x}{g}2^g/\#J$, with $n_x$ the number of abscissae
+carrying two rational points, not $1/g!$: observed over model is
+$0.967$--$1.020$ in all 18 cells with $p\ge257$, and the model's
+curve-to-curve spread widens with genus (standard deviation of
+$\ln(\text{model}\cdot g!)$ $0.07$, $0.14$, $0.19$, $0.38$ at genus 2 to 5), so
+two curves of one genus over one field can differ in index-calculus cost by
+a factor 2 or more, predictably from $N_1$. The parity prefilter leaves
+trials, relations and linear algebra identical in 624 of 624 paired runs
+and cuts relation-phase multiplications to $0.60$--$0.76$, worth 1--9\% of
+the total FPM and 3--35\% at $w=0.1$ (a component change, unreplayed). A
+census of 2{,}000 random genus-3 curves per prime passed Smith's
+Propositions 2 and 4 at a pooled rate of $2{,}364/14{,}000=0.169$
+$[0.163,0.175]$, inside the frozen range; among the 28 admitted near-prime
+instances only 1 passed against about $4.7$ expected, a post hoc lead and
+not a finding. The explicit Smith isogeny is not built here. Two frozen
+predictions failed: rho's exponent at genus 2 ($0.77$ against $g/2$, set-up
+dominated) and the split-rate model in 3 small-prime cells, of which
+$(3,131)$ was a walk-restart artefact that a post hoc amendment removed.
+
+\begin{table}[t]
+\centering\footnotesize
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+curve & $\ln r$ & best IC (arm) & rho & IC/rho [95\%] & \multicolumn{2}{c}{exponent in $p$} & theory \\
+ & & FPM & FPM & & rho & 2LP & rho / 2LP \\
+\midrule
+genus 2 & 12.3 & $2.74\cdot10^5$ (C+pre) & $9.74\cdot10^4$ & $2.82$ $[2.09,4.03]$ & $0.77$ & $0.50$ & 1 / 1 \\
+genus 3 & 20.1 & $5.50\cdot10^6$ (C+pre) & $7.32\cdot10^6$ & $0.75$ $[0.46,1.40]$ & $1.47$ & $1.08$ & $1.5$ / $1.33$ \\
+genus 4 & 26.9 & $3.32\cdot10^7$ (C+pre) & $2.84\cdot10^8$ & $0.117$ $[0.077,0.216]$ & $1.90$ & $1.29$ & 2 / $1.5$ \\
+genus 5 & 33.6 & $1.50\cdot10^8$ (C+pre) & $1.80\cdot10^{10}$ & $0.0084$ $[0.0047,0.020]$ & $2.69$ & $1.02$ & $2.5$ / $1.6$ \\
+plane quartic & 19.5 & $4.58\cdot10^6$ (2LP) & $1.72\cdot10^8$ & $0.027$ $[0.019,0.037]$ & $1.36$ & $0.69$ & $1.5$ / 1 \\
+\bottomrule
+\end{tabular}
+\caption[]{The genus ladder at $p=1{,}031$: cost of one logarithm in FPM,
+mean with hierarchical bootstrap 95\% interval (curves, then runs). C+pre:
+double large prime with the parity prefilter; 2LP: double-large-prime Diem
+on the quartic. The genus-5 rho mean is over 3 curves (three runs hit the
+frozen cap). Exponents are fits over 7 primes (5 at genus 5), not asymptotic
+statements. Ratios are against rho on the same curve, not across curves.
+Source: \art{research/genus_ladder_20261114/RESULTS.md};
+\texttt{[pcc:unverified]}, synthetic random curves.}
+\label{tab:jac-ladder}
+\end{table}
+
+\paragraph{Genus 4 and quartics with $r$ bound to $p$.} A frozen follow-up
+took genus 4 and the plane quartics to $p=8{,}209$ with cofactor $h\le2$,
+3 curves and 2 seeds per cell, 108 runs, all certified
+(\art{research/genus_ladder_bound_r_20261114/RESULTS.md};
+Table~\ref{tab:jac-ladder-r}). In FPM, genus-4 arm c (double large prime
+with prefilter) is below rho at every prime, with exponent $1.458$
+$[1.449,1.467]$ against rho's $1.79$ $[1.20,2.22]$ (theory $1.5$ and 2, three
+primes). Under the GAE band genus 4 stays unresolved at every prime ($w=1$
+interval at $8{,}209$: $[0.48,1.64]$), and the quartic 2LP arm is below at
+$w=0$ and above at $0.1$ and 1. A validator agent rebuilt the binary and
+replayed $p=2{,}053$ and $4{,}099$: 72 of 72 runs identical on all 1{,}752
+counted fields
+(\art{research/genus_ladder_bound_r_20261114/VALIDATION_REPORT.md}). Its
+disposition is ``validated'' for those 12 cells and ``insufficient
+evidence'' for $p=8{,}209$ (not replayed). The replay ran on the producer's
+shared host, which is not the isolated measurement the validation gate
+asks for, so no row is admitted. The validator also corrected two
+statements: hyperelliptic rho and both quartic arms certify once, not twice,
+and the binary predates the commit it is attributed to (the sources are
+byte-identical).
+
+\begin{table}[t]
+\centering\footnotesize
+\begin{tabular}{@{}rrrrrrr@{}}
+\toprule
+$p$ & genus-4 arm c & genus-4 rho & c/rho [95\%] & quartic 2LP & quartic rho & 2LP/rho [95\%] \\
+\midrule
+2{,}053 & $8.93\cdot10^7$ & $1.81\cdot10^9$ & $0.049$ $[0.041,0.062]$ & $7.0\cdot10^6$ & $7.9\cdot10^8$ & $0.0089$ $[0.0056,0.018]$ \\
+4{,}099 & $2.40\cdot10^8$ & $6.42\cdot10^9$ & $0.038$ $[0.022,0.077]$ & $1.6\cdot10^7$ & $1.8\cdot10^9$ & $0.0086$ $[0.0042,0.020]$ \\
+8{,}209 & $6.74\cdot10^8$ & $2.16\cdot10^{10}$ & $0.031$ $[0.018,0.062]$ & $6.1\cdot10^7$ & $4.7\cdot10^9$ & $0.013$ $[0.0064,0.035]$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Genus-4 hyperelliptic and plane-quartic index calculus with
+$h\le2$, in FPM: means over 6 runs, hierarchical bootstrap 95\% intervals.
+FPM band only; under the GAE band no cell is below rho at all three
+weights. Rows $p\le4{,}099$ replayed identically by a validator on the
+producer's host; $p=8{,}209$ not replayed. Source:
+\art{research/genus_ladder_bound_r_20261114/RESULTS.md};
+\texttt{[pcc:unverified]}, pre-gate.}
+\label{tab:jac-ladder-r}
+\end{table}
 
 \section{Joux--Vitse in November}\label{sec:jac-jv}
 
@@ -1746,8 +2523,14 @@ The source lists its limits: one rho run at $p=1823$ was killed by the time
 rule and excluded, which biases that prime against the cover; the frozen
 bootstrap understates rho-run uncertainty (a run-level bootstrap widens the
 pooled U interval to $[0.0114,0.0182]$, no verdict changes); H against U is
-not resolved per prime; the run was local; and there is no validation file.
-It is accounting and distance, not an improvement.
+not resolved per prime; and the run was local. A validator passed the
+table-line arm U on 11 November (replay certificate, recomputation and
+bootstrap; \art{research/jv_sieve_line_vs_rho_20261103/VALIDATION.json}): pooled
+over the 24 instances in U2, under the upper-bound layer, U is $0.0141$ of rho
+at $w=0$, $0.0857$ at $w=0.1$ and $0.0900$ at $w=1$, and the validator found every arm, layer, unit
+and scope below rho at every $w$. The row is validated as a distance on the
+weak class only; it is accounting and distance, not an improvement of index
+calculus on prime-order curves.
 
 \paragraph{Cutting the sieve's additions.} Two changes that leave every
 line, hit, relation and logarithm bit-identical remove almost all of the
@@ -1844,6 +2627,15 @@ possible; the atlas lead is unexamined.
 \item On prime fields every same-field Jacobian route is closed by
   theorem, and every measured collector (Kummer, pencils, genus-2 index
   calculus) is above rho, three of them under a passing validation gate.
+  Against a negation-map rho the chained-transfer distances are larger than
+  recorded (validated), and index calculus on the whole genus-2 Jacobian is
+  at least $17.96\times$ rho at $w=0$ (validated with caveats); the decisive
+  rerun of that case, with $r$ bound to $p$, is frozen and not run.
+\item On one field, from genus 2 to 5 and on plane quartics, the best index
+  calculus falls below rho from genus 4 (and on quartics) in
+  $\FF_p$-multiplication equivalents, while under the GAE band no cell is
+  below at all three weights; these are synthetic curves at $\#J\le2^{51}$,
+  unverified except for a same-host replay of 12 cells.
 \item At $n=3$ the quartic routes are below rho in the weak family under
   counted costs; on generic quartics the Diem arm is below at $w=0$ only.
 \item At $n=4$ and $5$ the Jacobians exist in the right classes; the one
@@ -2243,6 +3035,27 @@ other two ways an extension-field structure enters a factor base.
   not cited as a gain (\S\ref{sec:pg-cofactor}); the $m=2$ torsion-anchor
   reading at $n=37$ was reversed on its bootstrap recheck
   (\S\ref{sec:corr-binary}).
+\item \emph{Trace images as a factor base.} A toy study asked whether
+  $\Fb_V=\{\operatorname{Tr}(Q):x(Q)\in V\subset\FF_{p^k}\}\subset E(\FF_p)$ covers
+  $E(\FF_p)$ differently from random points, at $p=11$--$31$, $k\in\{2,3\}$,
+  $d=\dim V\in\{1,2\}$, on 5{,}064 curves with 20 pairs each
+  (\art{research/tracezero_toy_20261106/README.md}). The registered verdict
+  is ``no structure detected''. The one residual, a coverage deficit at
+  $k=2$, $d=1$, was traced post hoc in two steps: first to the two degenerate
+  lines $V=\FF_p g$ with $g\in\FF_p$ or $g^p=-g$, then to the $b=0$
+  ($j=1728$) curves, where $\Delta\mathrm{cov}_3=-0.2032$ $[-0.2250,-0.1832]$
+  ($n=75$) against $+0.0027$ $[+0.0004,+0.0051]$ on generic curves. The
+  mechanism is 2-isogeny descent: for a rational root $r_0$ of the cubic and
+  $V=r_0+\FF_p g$, $\delta(\operatorname{Tr}Q)=N_{\FF_{p^2}/\FF_p}(x-r_0)$ is
+  the square class of $N(g)$, so the whole trace image lies in one coset of
+  $\ker\delta$, of index 2 when $N(g)$ is a square. On cofactor curves this
+  would at most filter the eight cofactor lifts by a constant factor 2 or 4;
+  a check on the $k=20$ Curve25519 miniature found the ``bits'' base in both
+  descent classes (36\%/64\% at $t=5$, 40\%/60\% at $t=6$, 47\%/53\% at
+  $t=9$), so no lift is excluded
+  (\art{research/curve25519_miniature_descent_class_20261111/README.md}). All
+  values are \texttt{[pcc:unverified]}; there is no cost or rho
+  comparison.
 \item \emph{A relabelled quotient count.} In the Joux--Vitse cover, the
   first form of the Hilbert early stop (B0) cut counted $S$ $2.53$--$2.64\times$
   while unpriced F4-driver work rose $8.3$--$8.5\times$; the study classifies it as

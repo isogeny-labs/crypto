@@ -1,0 +1,210 @@
+{
+  "schema": "rootfind-pair-index-timing-result/v1",
+  "status": "completed_l0_component_timer",
+  "run_id": "run-20261116T141419Z",
+  "protocol_commit": "46faae79f8",
+  "amendment_commit": "71d5af799b",
+  "source_commit": "1b91f79a5c",
+  "executable_sha256": "4f8e218be771a8cf58cc1005c9aa49561ae85701d3846f5af0f266ca862ec7ff",
+  "raw_sha256": {
+    "stdout": "a87fdeb9db5a8831c0dddab7f41770362af562ecb910e8e514e0eb5d00be6bb9",
+    "stderr": "45e25f1d5de414c0962881fe740c5476e30184ebe3936b425cafddbf7185a7ad",
+    "meta": "a1bee9d779d0a81d00fdfe78773b44c5e0861ff7c0fff94cfabac1f74f50d43c"
+  },
+  "unit": "nanoseconds measured with Instant on one L0 macOS process",
+  "timed_scope": "fresh index allocation/insertion plus fixed precomputed key lookup",
+  "omitted": [
+    "elliptic-curve pair sums",
+    "target and probe-key generation",
+    "relation rank and linear algebra",
+    "verification",
+    "process startup",
+    "per-arm peak RSS"
+  ],
+  "cells": [
+    {
+      "n": 13,
+      "curve_id": "ICV1:f2m-13-752c6463:181:8012:0x1:-7:unk:r:515ee5696294",
+      "base_sha256": "d9f69121c63a04c3f744c5be0e4ea488a030db0315794a4e05c7a9d3cd341807",
+      "pair_attempts": 272,
+      "first_keys": 261,
+      "checked_collisions": 11,
+      "probes": 2112,
+      "pair_sha256": "2266aef75d0784180a6bd50fb8f09344570e9ceb8f87e9e16e01997049638f08",
+      "probe_sha256": "0a59010b422cde79f3686f0d790c5392885bba4ef23c0997ebadcb362f8c42e6",
+      "expected_checksum": 7822019210915062898,
+      "hash_aa_combined_difference_ns": 0,
+      "arms": {
+        "hash": {
+          "repetitions": 101,
+          "build_median_ns": 875,
+          "probe_median_ns": 4791,
+          "combined_median_ns": 5667,
+          "combined_min_ns": 5583,
+          "combined_max_ns": 15126
+        },
+        "hash-aa": {
+          "repetitions": 101,
+          "build_median_ns": 875,
+          "probe_median_ns": 4792,
+          "combined_median_ns": 5667,
+          "combined_min_ns": 5583,
+          "combined_max_ns": 7418
+        },
+        "flat-direct-u32": {
+          "repetitions": 101,
+          "build_median_ns": 1625,
+          "probe_median_ns": 3000,
+          "combined_median_ns": 4666,
+          "combined_min_ns": 4375,
+          "combined_max_ns": 5833,
+          "combined_ratio_to_hash": 0.8233633315687312,
+          "passes_component_rule": true
+        },
+        "paged": {
+          "repetitions": 101,
+          "build_median_ns": 1666,
+          "probe_median_ns": 7125,
+          "combined_median_ns": 8791,
+          "combined_min_ns": 8459,
+          "combined_max_ns": 12584,
+          "combined_ratio_to_hash": 1.5512616904887948,
+          "passes_component_rule": false
+        },
+        "inline": {
+          "repetitions": 101,
+          "build_median_ns": 1125,
+          "probe_median_ns": 6083,
+          "combined_median_ns": 7208,
+          "combined_min_ns": 6458,
+          "combined_max_ns": 12999,
+          "combined_ratio_to_hash": 1.2719251808717134,
+          "passes_component_rule": false
+        }
+      }
+    },
+    {
+      "n": 19,
+      "curve_id": "ICV1:f2m-19-87f45376:797:523492:0x1:-7:unk:r:b6cf2467887c",
+      "base_sha256": "013a0d4223494500cd06b48bf41b51dda2dd5add0009d1b89cdb0b7bd49c0a5a",
+      "pair_attempts": 4830,
+      "first_keys": 4800,
+      "checked_collisions": 30,
+      "probes": 8896,
+      "pair_sha256": "8e129ab844159a3dfb81da7c885653c948f5319008ee3210f3532404c8e7302f",
+      "probe_sha256": "7d0a5e71caacc6d6262b3948bc94203446e62759621abb07856c2b83ad561413",
+      "expected_checksum": 8265981056586323413,
+      "hash_aa_combined_difference_ns": 374,
+      "arms": {
+        "hash": {
+          "repetitions": 101,
+          "build_median_ns": 14791,
+          "probe_median_ns": 22458,
+          "combined_median_ns": 37708,
+          "combined_min_ns": 35375,
+          "combined_max_ns": 56833
+        },
+        "hash-aa": {
+          "repetitions": 101,
+          "build_median_ns": 14958,
+          "probe_median_ns": 22167,
+          "combined_median_ns": 37334,
+          "combined_min_ns": 34875,
+          "combined_max_ns": 56750
+        },
+        "flat-direct-u32": {
+          "repetitions": 101,
+          "build_median_ns": 17125,
+          "probe_median_ns": 13875,
+          "combined_median_ns": 31500,
+          "combined_min_ns": 29208,
+          "combined_max_ns": 38875,
+          "combined_ratio_to_hash": 0.8353665004773523,
+          "passes_component_rule": true
+        },
+        "paged": {
+          "repetitions": 101,
+          "build_median_ns": 20916,
+          "probe_median_ns": 24042,
+          "combined_median_ns": 45000,
+          "combined_min_ns": 41751,
+          "combined_max_ns": 55417,
+          "combined_ratio_to_hash": 1.193380714967646,
+          "passes_component_rule": false
+        },
+        "inline": {
+          "repetitions": 101,
+          "build_median_ns": 21000,
+          "probe_median_ns": 25916,
+          "combined_median_ns": 47500,
+          "combined_min_ns": 43458,
+          "combined_max_ns": 62750,
+          "combined_ratio_to_hash": 1.2596796435769597,
+          "passes_component_rule": false
+        }
+      }
+    },
+    {
+      "n": 23,
+      "curve_id": "ICV1:f2m-23-c07a6b8c:5197:8383412:0x1:-7:unk:r:69e76b739aa7",
+      "base_sha256": "686cba2fafe973e49139c2722df47bf728340e25a4df5faad8b51dfa91df3877",
+      "pair_attempts": 18906,
+      "first_keys": 18842,
+      "checked_collisions": 64,
+      "probes": 17600,
+      "pair_sha256": "4b3d0ab694c9d43f9798f26f7981bf9246d982a7bea6542671817e795df12ab5",
+      "probe_sha256": "237645e1c91e34db99d9135c9483f3b1ab74418c25e5a23fbf0967c7c958331e",
+      "expected_checksum": 14022121119170650394,
+      "hash_aa_combined_difference_ns": 875,
+      "arms": {
+        "hash": {
+          "repetitions": 101,
+          "build_median_ns": 64917,
+          "probe_median_ns": 46416,
+          "combined_median_ns": 112416,
+          "combined_min_ns": 101459,
+          "combined_max_ns": 153249
+        },
+        "hash-aa": {
+          "repetitions": 101,
+          "build_median_ns": 63875,
+          "probe_median_ns": 46625,
+          "combined_median_ns": 111541,
+          "combined_min_ns": 100625,
+          "combined_max_ns": 131999
+        },
+        "flat-direct-u32": {
+          "repetitions": 101,
+          "build_median_ns": 191292,
+          "probe_median_ns": 36667,
+          "combined_median_ns": 226749,
+          "combined_min_ns": 189500,
+          "combined_max_ns": 477125,
+          "combined_ratio_to_hash": 2.017052732707088,
+          "passes_component_rule": false
+        },
+        "paged": {
+          "repetitions": 101,
+          "build_median_ns": 80208,
+          "probe_median_ns": 36875,
+          "combined_median_ns": 118083,
+          "combined_min_ns": 103167,
+          "combined_max_ns": 274834,
+          "combined_ratio_to_hash": 1.0504109735269,
+          "passes_component_rule": false
+        },
+        "inline": {
+          "repetitions": 101,
+          "build_median_ns": 82500,
+          "probe_median_ns": 41458,
+          "combined_median_ns": 125541,
+          "combined_min_ns": 113333,
+          "combined_max_ns": 182001,
+          "combined_ratio_to_hash": 1.1167538428693424,
+          "passes_component_rule": false
+        }
+      }
+    }
+  ],
+  "independent_replay": false
+}

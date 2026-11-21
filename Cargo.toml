@@ -5,6 +5,25 @@ edition = "2021"
 default-run = "crypto"
 description = "Educational comprehensive cryptography library: ECC, RSA, AES, ChaCha20, SHA, KDF, PQC"
 
+# Helper module of b0_pdp_sat_baseline (included there with #[path]); built as a
+# library example so Cargo's example discovery does not require a `main`.
+[[example]]
+name = "pdp_lin_cdcl"
+path = "examples/support/pdp_lin_cdcl.rs"
+crate-type = ["lib"]
+
+# Shared modules of the jv_sieve_* examples (included there with #[path]); built
+# as library examples so Cargo's example discovery does not require a `main`.
+[[example]]
+name = "jv_sieve_quadratic_pair_relation_controls"
+path = "examples/jv_sieve_quadratic_pair_relation_controls.rs"
+crate-type = ["lib"]
+
+[[example]]
+name = "jv_sieve_quadratic_pair_graph_controls"
+path = "examples/jv_sieve_quadratic_pair_graph_controls.rs"
+crate-type = ["lib"]
+
 [[example]]
 name = "performance_gains_audit"
 path = "examples/performance_gains_audit.rs"
@@ -28,11 +47,17 @@ path = "experiments/koblitz-n53-compact-cold-20261009/native_run.rs"
 
 [[bin]]
 name = "ct_dynamic_audit"
-path = "research/ct_dynamic_audit_20261102/src/main.rs"
+path = "src/bin/ct_dynamic_audit.rs"
 
 [[bin]]
 name = "crypto"
 path = "src/main.rs"
+
+# `torsionguard` — common-kernel certificates for declared finite primary
+# modules, with explicit non-algebraic soundness obligations.
+[[bin]]
+name = "torsionguard"
+path = "src/bin/torsionguard.rs"
 
 [[bin]]
 name = "n83-exclusion-audit"
@@ -67,6 +92,11 @@ path = "src/bin/isoclass_rho/main.rs"
 name = "volcano-stats"
 path = "src/bin/volcano_stats.rs"
 
+# `volcano-gap` — two deep 2-volcanoes on either side of a large prime
+# conductor gap, joined by an explicit, verified degree-N Vélu isogeny.
+[[bin]]
+name = "volcano-gap"
+path = "src/bin/volcano_gap.rs"
 # `generator-n0` — E3a of research/generator_effect_ic_20261019: the base's
 # cofactor-class count N0 against the volcano study's IC relation yield.
 [[bin]]
@@ -76,6 +106,10 @@ path = "src/bin/generator_n0.rs"
 [[bin]]
 name = "pkm-aux-search"
 path = "src/bin/pkm_aux_search.rs"
+
+[[bin]]
+name = "pkm-smooth-tower"
+path = "src/bin/pkm_smooth_tower.rs"
 
 [[bin]]
 name = "quartic-ic"
@@ -173,7 +207,7 @@ path = "src/lib.rs"
 # Checkpointed native ecbench orchestration and recorded-value aggregation.
 [[bin]]
 name = "volcano-ic-driver"
-path = "research/full_volcano_graphwide_ic_20261017/execution/driver.rs"
+path = "src/bin/volcano_ic_driver.rs"
 
 [[bin]]
 name = "volcano-ic-summarize"
@@ -192,12 +226,22 @@ redis-native-tls = ["redis/tls-native-tls"]
 wide-vars = []
 # Explicit selected-bin CLI contracts; production builds keep their behavior.
 ic-cli-contracts = []
+# examples/mt_fieldops.rs: fast multiplicative hasher for every arm's hash tables (timing sensitivity only;
+# counted operations are identical with and without it).
+mt-fasthash = []
 f4-four-tables = []
 f4-five-tables = []
 f4-wide-tables = []
 redis-cache = []
 # Verbose tracing in the isogeny rho attack's linear-algebra step.
 rho_debug = []
+# jemalloc as the global allocator of the binaries that opt in (today
+# examples/jv_cover.rs). F4 over F_p allocates one exponent vector per term,
+# and glibc's allocator was ~30% of F4's instructions on jv_cover's systems;
+# jv_cover --exp dlp ran 1.18x faster with jemalloc preloaded
+# (research/f4_inner_dispatch_20261120). Off by default so every other wall
+# time in the lab stays comparable; counted operations are unchanged.
+jemalloc = ["dep:tikv-jemallocator"]
 # Field-operation counters in the CryptoPro-B field (`cryptopro_b_field::opcount`),
 # for the counting run of `cryptopro-b-chain-sweep`; timing builds leave it off.
 cryptopro-b-opcount = []
@@ -207,13 +251,16 @@ endo-chain-opcount = []
 # Field-operation counters in the one-word field of `semaev_decomp` (`semaev_decomp::opcount`),
 # for PS-0 of research/pdp_oracle_speedup_20261011; timing builds leave it off.
 pdp-opcount = []
+# R04's in-scan stage counters (research/ic_tool_program/rounds/R04-scan-probes):
+# a separate build that prices the collection scan's stages, never the default.
+scan-probes = []
 
 [lints.rust]
 # `hashclash_linked` is set by a downstream build script that links the
 # HashClash C library (see src/cryptanalysis/md5_hashclash_ffi.rs).
 # `ecbench_reader` is set by tools/backend-leaderboard/build.rs, which compiles
 # shared ecbench sources without the full harness.
-unexpected_cfgs = { level = "warn", check-cfg = ["cfg(hashclash_linked)", "cfg(ecbench_reader)"] }
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(hashclash_linked)", "cfg(ecbench_reader)", "cfg(sat_qualification_child)"] }
 
 [lints.clippy]
 # The whole allow list; CI runs clippy with -D warnings for everything else.
@@ -234,6 +281,9 @@ result_unit_err = "allow"
 chunks_exact_to_as_chunks = "allow"
 
 [dependencies]
+tikv-jemallocator = { version = "0.6", optional = true }
+certified-relations = { path = "crates/certified-relations" }
+relation-replay-checker = { path = "crates/relation-replay-checker" }
 hashed-ecdl-tensor = { path = "crates/hashed-ecdl-tensor" }
 ecdl-tensor-ic = { path = "crates/ecdl-tensor-ic" }
 pencil-symbolic-graph = { path = "research/pencil_large_prime_20261029", features = ["reporting"] }
@@ -316,6 +366,12 @@ path = "research/conductor_gap_followups_20261016/native/followups.rs"
 name = "conductor_gap_followup_posthoc"
 path = "research/conductor_gap_followups_20261016/native/posthoc.rs"
 
+# `gae-reference` — a tuned (Montgomery / carry-less, batched-inversion)
+# affine addition timed beside the CountedGroup addition that defines the GAE
+# unit, with a per-addition cross-check against it.
+[[bin]]
+name = "gae-reference"
+path = "src/bin/gae_reference.rs"
 [[bin]]
 name = "factor-base-sweep"
 path = "src/bin/factor_base_sweep.rs"
@@ -331,3 +387,273 @@ path = "src/bin/classgroup.rs"
 [[bin]]
 name = "classgroup-structure"
 path = "src/bin/classgroup_structure.rs"
+
+[[bin]]
+name = "semaev-descent-treewidth"
+path = "src/bin/semaev_descent_treewidth.rs"
+# `lab` — an opt-in build profile for long measured runs (assessment
+# 2026-11-10, R8). One codegen unit and thin LTO let the compiler inline
+# across modules (for example the `#[target_feature]` pclmul kernels into
+# their callers) and keep line tables for profilers. It changes machine code
+# only: values, counted units and RNG consumption are those of `release`,
+# but `binary_sha256` in host records differs, so name the profile beside
+# any wall-time figure and never pool timings across profiles. `release`
+# is unchanged (CI build budgets), and `panic` stays `unwind`: 31
+# `catch_unwind` sites depend on it. Build and use:
+#
+#     cargo build --profile lab --bin ecbench      # -> target/lab/ecbench
+#     ./target/lab/ecbench run --spec SPEC --out DIR
+#
+# Expect a markedly longer build than `release` (single codegen unit).
+[profile.lab]
+inherits = "release"
+codegen-units = 1
+lto = "thin"
+debug = "line-tables-only"
+
+[[example]]
+name = "dreg_score"
+path = "examples/maintained/dreg_score.rs"
+test = true
+
+
+[[example]]
+name = "nonisomorphic_extension_isogeny"
+path = "examples/maintained/nonisomorphic_extension_isogeny.rs"
+test = true
+
+
+[[example]]
+name = "koblitz_n83_factor_base_export"
+path = "examples/maintained/koblitz_n83_factor_base_export.rs"
+test = true
+
+
+[[example]]
+name = "n83_d18_shared_bits"
+path = "examples/maintained/n83_d18_shared_bits.rs"
+test = true
+
+
+[[example]]
+name = "n83_rho_speed_eval"
+path = "examples/maintained/n83_rho_speed_eval.rs"
+test = true
+
+
+[[example]]
+name = "ic_campaign_pricing_audit"
+path = "examples/maintained/ic_campaign_pricing_audit.rs"
+test = true
+
+
+[[example]]
+name = "conductor_gap_replication"
+path = "examples/maintained/conductor_gap_replication.rs"
+test = true
+
+
+[[example]]
+name = "trace_incidence_rho"
+path = "examples/maintained/trace_incidence_rho.rs"
+test = true
+
+
+[[example]]
+name = "ic_quartic_core_probe"
+path = "examples/maintained/ic_quartic_core_probe.rs"
+test = true
+
+
+[[example]]
+name = "koblitz_orbit_dlp_fast"
+path = "examples/maintained/koblitz_orbit_dlp_fast.rs"
+test = true
+
+
+[[example]]
+name = "r6_1_direct_s5"
+path = "examples/maintained/r6_1_direct_s5.rs"
+test = true
+
+
+[[example]]
+name = "smith_isogeny"
+path = "examples/maintained/smith_isogeny.rs"
+test = true
+
+
+[[example]]
+name = "koblitz_n83_free_selector_export_control"
+path = "examples/maintained/koblitz_n83_free_selector_export_control.rs"
+test = true
+
+
+[[example]]
+name = "fp_backend_bench"
+path = "examples/maintained/fp_backend_bench.rs"
+test = true
+
+
+[[example]]
+name = "chained_richelot_automorphisms"
+path = "examples/maintained/chained_richelot_automorphisms.rs"
+test = true
+
+
+[[example]]
+name = "ic_quartic_wide_audit"
+path = "examples/maintained/ic_quartic_wide_audit.rs"
+test = true
+
+
+[[example]]
+name = "rr_quadratic_panel"
+path = "examples/maintained/rr_quadratic_panel.rs"
+test = true
+
+
+[[example]]
+name = "n83_factor_base_sweep_v5"
+path = "examples/maintained/n83_factor_base_sweep_v5.rs"
+test = true
+
+
+[[example]]
+name = "rr_sat_amortise"
+path = "examples/maintained/rr_sat_amortise.rs"
+test = true
+
+
+[[example]]
+name = "jv_sieve_extension_sparse_compare"
+path = "examples/maintained/jv_sieve_extension_sparse_compare.rs"
+test = true
+
+
+
+[[example]]
+name = "gc_native_solve"
+path = "examples/maintained/gc_native_solve.rs"
+test = true
+
+
+[[example]]
+name = "koblitz_ic_leads_bench"
+path = "examples/maintained/wide/koblitz_ic_leads_bench.rs"
+test = true
+
+
+[[example]]
+name = "ic_cas_correctness"
+path = "examples/maintained/wide/ic_cas_correctness.rs"
+test = true
+
+
+[[example]]
+name = "hky_crosscheck"
+path = "examples/maintained/wide/hky_crosscheck.rs"
+test = true
+
+
+[[example]]
+name = "ic_algebraic_followup"
+path = "examples/maintained/wide/ic_algebraic_followup.rs"
+test = true
+
+
+[[example]]
+name = "dreg_hybrid"
+path = "examples/maintained/wide/dreg_hybrid.rs"
+test = true
+
+
+[[example]]
+name = "xl_dense_degree"
+path = "examples/maintained/wide/xl_dense_degree.rs"
+test = true
+
+
+[[example]]
+name = "f4_f5_boolean_perf"
+path = "examples/maintained/wide/f4_f5_boolean_perf.rs"
+test = true
+
+
+[[example]]
+name = "ic_qualified_closure_audit"
+path = "examples/maintained/wide/ic_qualified_closure_audit.rs"
+test = true
+
+
+[[example]]
+name = "dreg_closure"
+path = "examples/maintained/wide/dreg_closure.rs"
+test = true
+
+
+[[example]]
+name = "fb_koblitz_ek1"
+path = "examples/maintained/wide/fb_koblitz_ek1.rs"
+test = true
+
+
+[[example]]
+name = "dreg_eliminated_s4"
+path = "examples/maintained/wide/dreg_eliminated_s4.rs"
+test = true
+
+
+[[example]]
+name = "isogeny_gap_round7_runs"
+path = "examples/maintained/wide/isogeny_gap_round7_runs.rs"
+test = true
+
+
+[[example]]
+name = "ecbench_open_questions"
+path = "examples/maintained/wide/ecbench_open_questions.rs"
+test = true
+
+
+[[example]]
+name = "hky_grid"
+path = "examples/maintained/wide/hky_grid.rs"
+test = true
+
+
+[[example]]
+name = "ic_guess_completed_audit"
+path = "examples/maintained/wide/ic_guess_completed_audit.rs"
+test = true
+
+
+[[example]]
+name = "hky_last_fall_degree"
+path = "examples/maintained/wide/hky_last_fall_degree.rs"
+test = true
+
+
+[[example]]
+name = "ic_guess_symmetry"
+path = "examples/maintained/wide/ic_guess_symmetry.rs"
+test = true
+
+
+[[example]]
+name = "hky_par"
+path = "examples/maintained/wide/hky_par.rs"
+test = true
+
+
+[[example]]
+name = "isogeny_gap_f4_phase_profile"
+path = "examples/maintained/wide/isogeny_gap_f4_phase_profile.rs"
+test = true
+
+
+[[example]]
+name = "ecbench_open_questions_replay_failures"
+path = "examples/maintained/wide/ecbench_open_questions_replay_failures.rs"
+test = true
+

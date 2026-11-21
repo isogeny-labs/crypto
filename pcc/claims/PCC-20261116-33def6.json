@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T16:48:33Z",
+ "id": "PCC-20261116-33def6",
+ "kind": "execution",
+ "producer": {
+  "commit": "d117889470a84e95093511d7e6c8604cc46fdbe8",
+  "model": "",
+  "session": "01a1dc01-cc02-7381-a21c-3b12d7b79441"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/audits/2026-11-16-ecbench-pointer-recovery.json",
+    "sha256": "2bfb8a2b756ccfed75bc766295234da0d7238f318eb1dd51c7d16ff20eeb5f11"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/audits/2026-11-16-ecbench-verifier-controls.json",
+    "sha256": "375acc82fe9e2b9ddbef3f6ef19904c469323fb3d0ae942ef1cf5ac90c33d0a7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/ecbench/defect-proposals/20261116-f3-m83/proposal.json",
+    "sha256": "8f4ca678afbee6bb2beaba086318102ea98ece8ceeefda4bc93f69a06df20e40"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/ecbench/defect-proposals/20261116-f3-m83/controls.json",
+    "sha256": "1b5537303a8d7b5ca2fd7110fb7ffaf1e0f540327307de200d98f0a52ef71463"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "ecbench-evidence-recovery",
+ "statement": "Recorded original ecbench archive-pointer recovery, canonical GET/hash checks, sequence-overflow refusal and inactive frozen-defect proposal controls; unsigned evidence."
+}

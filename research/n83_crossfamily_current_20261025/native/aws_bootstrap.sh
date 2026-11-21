@@ -14,16 +14,38 @@ finish() {
   code=$?
   printf '%s %s\n' "$code" "$(date -u +%FT%TZ)" > "$base/bootstrap.exit"
   if [ -d "$base/results" ]; then
-    tar -C "$base" -czf "$base/raw_results.tar.gz" results
-    sha256sum "$base/raw_results.tar.gz" > "$base/raw_results.sha256"
-    curl --fail --retry 5 --retry-delay 5 --silent --show-error \
-      --upload-file "$base/raw_results.tar.gz" "$N83_RESULTS_PUT_URL" \
-      > "$base/upload.stdout" 2> "$base/upload.stderr" || true
+    if tar -C "$base" -czf "$base/raw_results.tar.gz" results; then
+      raw_bytes=$(wc -c < "$base/raw_results.tar.gz")
+      if [ "$raw_bytes" -le "$N83_RESULT_ARCHIVE_MAX_BYTES" ]; then
+        sha256sum "$base/raw_results.tar.gz" > "$base/raw_results.sha256"
+        curl --fail --retry 5 --retry-delay 5 --silent --show-error \
+          --upload-file "$base/raw_results.tar.gz" "$N83_RESULTS_PUT_URL" \
+          > "$base/upload.stdout" 2> "$base/upload.stderr" || true
+      else
+        printf 'ARCHIVE_CAP raw=%s limit=%s\n' "$raw_bytes" \
+          "$N83_RESULT_ARCHIVE_MAX_BYTES" > "$base/raw_results.archive_failure"
+      fi
+    else
+      printf 'ARCHIVE_CREATE_FAILED\n' > "$base/raw_results.archive_failure"
+    fi
   fi
   tar -C "$base" --exclude=crypto --exclude=bundle --exclude=cargo-target \
     --exclude=results --exclude=raw_results.tar.gz -czf \
     /var/tmp/n83-crossfamily-status.tar.gz . || true
   if [ -f /var/tmp/n83-crossfamily-status.tar.gz ]; then
+    status_bytes=$(wc -c < /var/tmp/n83-crossfamily-status.tar.gz)
+    if [ "$status_bytes" -gt "$N83_STATUS_ARCHIVE_MAX_BYTES" ]; then
+      printf 'ARCHIVE_CAP status=%s limit=%s\n' "$status_bytes" \
+        "$N83_STATUS_ARCHIVE_MAX_BYTES" > "$base/status.archive_failure"
+      tar -C "$base" -czf /var/tmp/n83-crossfamily-status.tar.gz \
+        bootstrap.exit status.archive_failure raw_results.archive_failure 2>/dev/null || \
+        tar -C "$base" -czf /var/tmp/n83-crossfamily-status.tar.gz \
+          bootstrap.exit status.archive_failure || true
+    fi
+    status_bytes=$(wc -c < /var/tmp/n83-crossfamily-status.tar.gz)
+    if [ "$status_bytes" -gt "$N83_STATUS_ARCHIVE_MAX_BYTES" ]; then
+      return
+    fi
     curl --fail --retry 5 --retry-delay 5 --silent --show-error \
       --upload-file /var/tmp/n83-crossfamily-status.tar.gz \
       "$N83_STATUS_PUT_URL" > /dev/null 2>&1 || true

@@ -1,0 +1,193 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h93a8cf047d0ece53",
+  "statement": {
+    "name": "Second elliptic cycle polynomial reduction modulo four",
+    "source": "ISOGENY_CYCLE_PROOF.md;Lean IsogenyCycles.second_cycle_polynomial",
+    "variables": [
+      "x"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x"
+                },
+                {
+                  "op": "const",
+                  "args": 2
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x"
+                },
+                {
+                  "op": "const",
+                  "args": 2
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x"
+                },
+                {
+                  "op": "const",
+                  "args": 2
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x"
+                },
+                {
+                  "op": "const",
+                  "args": 2
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "var",
+          "args": "x"
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "var",
+                      "args": "x"
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "var",
+                    "args": "x"
+                  }
+                },
+                {
+                  "op": "const",
+                  "args": 1
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "var",
+                      "args": "x"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "const",
+                      "args": 9
+                    },
+                    {
+                      "op": "var",
+                      "args": "x"
+                    }
+                  ]
+                },
+                {
+                  "op": "const",
+                  "args": 32
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": 4
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "const",
+                      "args": 14
+                    },
+                    {
+                      "op": "var",
+                      "args": "x"
+                    }
+                  ]
+                },
+                {
+                  "op": "const",
+                  "args": -4
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 17731,
+  "value_digest": "b183616de67194b028933934c5c7a90483b3c196226627e1202686eb5e146b17",
+  "independence": "Same producer issues;existing repository checker code plus domain-separated64extra points;scientific standing unsigned",
+  "proof": {
+    "kind": "lean4;pointer only;requires separate proof gate",
+    "path": "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+    "sha256": "58e58276291da478c043b425ff1898e7502e07504693d8ac948234413dff1330"
+  }
+}

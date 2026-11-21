@@ -1,0 +1,34 @@
+[
+  {
+    "argv": [
+      "git",
+      "-c",
+      "gc.auto=0",
+      "read-tree",
+      "--reset",
+      "-i",
+      "94479f7e3eb9de9ae59b764d2b2b50b3238f0a44"
+    ],
+    "exit": 128,
+    "stdout": "",
+    "stderr": "fatal: unable to read tree (7c07d4734c3a02d3e9323608c3dbaa32550ac40b)\n"
+  },
+  {
+    "argv": [
+      "git",
+      "-c",
+      "gc.auto=0",
+      "-c",
+      "fetch.recurseSubmodules=false",
+      "fetch",
+      "--no-tags",
+      "--no-write-fetch-head",
+      "--filter=tree:0",
+      "origin",
+      "7c07d4734c3a02d3e9323608c3dbaa32550ac40b"
+    ],
+    "exit": 128,
+    "stdout": "",
+    "stderr": "error: RPC failed; HTTP 503 curl 22 The requested URL returned error: 503\nfatal: expected 'acknowledgments'\n"
+  }
+]

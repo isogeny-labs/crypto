@@ -1,0 +1,15 @@
+digraph preflight {
+  graph [label="N83 V5 ordered K600 zero-trial preflight, 2026-11-16 UTC", labelloc=t, fontsize=18, fontname="Helvetica", pad="0.25", nodesep="0.35", ranksep="0.45"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11, fillcolor="#f3f6fa", color="#66788a"];
+  edge [fontname="Helvetica", fontsize=10, color="#506477"];
+  frozen [label="Frozen V5 ordinal 26960859236\nK600 signed Frobenius + ordered first pair\nzero relation trials"];
+  s3 [label="Exact S3 GET + SHA-256\n3,025,798 bytes; 600 orbits"];
+  a1 [label="Attempt 1\nPREFLIGHT_ONLY; 0 trials, 0 relations, 0 SAT\nDocker inspection lost by trap", fillcolor="#fff0d8", color="#be8730"];
+  a2 [label="Attempt 2\nPREFLIGHT_ONLY; 0 trials, 0 relations, 0 SAT\nDocker exit 0; OOM false", fillcolor="#e3f3e9", color="#438b61"];
+  future [label="Separate next protocol\npositive control + natural query\nrelation, rank, target, full cold cost pending", fillcolor="#e8edfa", color="#536ba4"];
+  frozen -> s3;
+  s3 -> a1;
+  s3 -> a2;
+  a1 -> a2 [label="receipt amendment", style=dashed];
+  a2 -> future [label="admission only"];
+}

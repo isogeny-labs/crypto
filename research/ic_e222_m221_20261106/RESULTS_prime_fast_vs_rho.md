@@ -16,3 +16,18 @@ Engine: `examples/prime_fast_vs_rho.rs`, same native Montgomery arithmetic for b
 Reading: the single-target gap to rho widens by about 5x to 9x per 4 bits (IC time grows about 8x then 17x per 4 bits, rho about 1.4x to 2x), the direction the Gaudry-Diem barrier predicts; no crossover is approached. Distance remaining is therefore larger than the CLI-stack figure (22x to 49x) at 28 bits and above. Limits: IC at 32 bits was not re-tuned (best c was 0.25 to 0.5, edge of grid), rho is the DP implementation with start-up costs ignored at these sizes, no §5a pricing band applied (rho hash/DP bookkeeping unpriced), toy sizes.
 
 Next discriminating experiment: amortize relation collection across many targets on `prime_fast` (shared factor-base logs, one linear system, then one cheap extraction per target) and compare per-target cost against the same rho for T targets, under a frozen protocol.
+
+Correction (validator, `results/pf_multi/VALIDATOR_REPORT.md`): `rho_parallel` builds a 1024-entry table per solve (1.3 to 2.9 ms), which dominates the small-size rho times above. The IC/rho ratios at 24 and 28 bits are therefore overstated; the validator measured 4.4x to 9.5x advantage corrections for the multi-target case at 23 to 26 bits. Re-measure with a right-sized table before citing.
+
+## Re-measurement with a right-sized rho table (table_bits = 5, 10 targets per curve, all verified)
+
+| bits | res | IC ms | rho ms | IC/rho |
+|---|---|---|---|---|
+| 24 | 3 | 9.4 | 0.63 | 15 |
+| 24 | 1 | 11.1 | 0.59 | 19 |
+| 28 | 3 | 109.7 | 1.40 | 78 |
+| 28 | 1 | 98.1 | 1.58 | 62 |
+| 32 | 3 | 1720 | 3.88 | 443 |
+| 32 | 1 | 1649 | 3.12 | 528 |
+
+The validator's concern is confirmed in the direction that makes the single-target gap larger, not smaller: the 1024-entry table was inflating rho's time at small sizes, so the gap to rho is about 15x to 19x at 24 bits, 62x to 78x at 28 bits and 443x to 528x at 32 bits (the figures above this section, 5x to 257x, understate it). Not independently replayed.

@@ -1,0 +1,584 @@
+--------------------------------------------------------------------------------
+Profile data file 'research/trace_zero_rowmap_20261117/profiles/baseline-discovery/callgrind.out' (creator: callgrind-3.24.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 8395707
+Trigger: Program termination
+Profiled target:  /workspace/scratch/trace-rowmap-baseline one research/trace_zero_projected_20261115/inputs/scale-n131-d12-uniform.json kernel-lazy (PID 1093, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       0
+Include dirs:     
+User annotated:   research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_linearized.rs
+Auto-annotation:  off
+
+--------------------------------------------------------------------------------
+Ir                  
+--------------------------------------------------------------------------------
+51,775,125 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                  file:function
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- User-annotated source: research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_linearized.rs
+--------------------------------------------------------------------------------
+Ir                 
+
+-- line 11 ----------------------------------------
+        .               trace_zero_relations::{
+        .                   TraceZeroRelationDisposition as Disposition, TraceZeroRelationLimits as Limits,
+        .                   TraceZeroRelationReport as Report,
+        .               },
+        .           };
+        .           use num_bigint::BigUint;
+        .           use std::{collections::BTreeMap, time::Instant};
+        .           
+        3 ( 0.00%)  #[derive(Clone, Debug, Default)]
+        .           pub struct TraceZeroLinearizedReport {
+        .               pub relation: Report,
+        .               pub source_dimension: usize,
+        .               pub product_dimension: usize,
+        .               pub linear_columns: usize,
+        .               pub systems: usize,
+        .               pub maximum_rank: usize,
+        .               pub maximum_nullity: usize,
+-- line 27 ----------------------------------------
+-- line 29 ----------------------------------------
+        .               pub projected_systems: usize,
+        .               pub projected_rows: usize,
+        .               pub projected_inconsistent: usize,
+        .           }
+        .           
+        .           type WordMask = [u64; 3];
+        .           
+        .           fn words(x: &F2mElement) -> WordMask {
+   23,892 ( 0.05%)      let mut a = [0; 3];
+        .               a[..x.raw_bits().len()].copy_from_slice(x.raw_bits());
+   53,338 ( 0.10%)      a
+        .           }
+        .           
+        .           fn parity(a: &WordMask, b: &WordMask) -> u64 {
+2,294,954 ( 4.43%)      (((a[0] & b[0]) ^ (a[1] & b[1]) ^ (a[2] & b[2])).count_ones() & 1) as u64
+        .           }
+        .           
+        .           enum ProjectedResult {
+        .               Inconsistent,
+        .               Unique(F2mElement, F2mElement),
+        .               Deficient,
+        .           }
+        .           
+-- line 51 ----------------------------------------
+-- line 58 ----------------------------------------
+        .               rhs: Vec<WordMask>,
+        .               w_pivots: Vec<(usize, WordMask)>,
+        .               halves: Vec<F2mElement>,
+        .               w_support: WordMask,
+        .           }
+        .           impl ProductProjection {
+        .               fn reduce_with(pivots: &[(usize, WordMask)], mut a: WordMask) -> WordMask {
+        .                   for (bit, row) in pivots {
+  195,845 ( 0.38%)              if a[bit / 64] & (1u64 << (bit % 64)) != 0 {
+        .                           for j in 0..3 {
+   97,818 ( 0.19%)                      a[j] ^= row[j];
+        .                           }
+        .                       }
+        .                   }
+    8,515 ( 0.02%)          a
+        .               }
+        .               #[cfg(test)]
+        .               fn new(xs: &[F2mElement], ws: &[F2mElement], c: &BinaryCurve) -> Self {
+        .                   Self::new_with_field(xs, ws, c, &WordField::new(c))
+        .               }
+        .               fn new_with_field(
+        .                   xs: &[F2mElement],
+        .                   ws: &[F2mElement],
+        .                   c: &BinaryCurve,
+        .                   field: &WordField,
+        .               ) -> Self {
+        3 ( 0.00%)          assert!(xs.len() < 63 && c.m <= 192);
+        .                   let pivots: Vec<_> = ws
+        .                       .iter()
+        .                       .rev()
+      115 ( 0.00%)              .map(|w| (w.degree().unwrap() as usize, words(w)))
+        .                       .collect();
+        .                   let coordinates: Vec<_> = (0..c.m as usize)
+        .                       .filter(|i| !pivots.iter().any(|(p, _)| p == i))
+        .                       .collect();
+        .                   let mut rhs = vec![[0; 3]; coordinates.len()];
+        .                   for bit in 0..c.m as usize {
+      393 ( 0.00%)              let mut unit = [0; 3];
+      393 ( 0.00%)              unit[bit / 64] = 1u64 << (bit % 64);
+        .                       let projected = Self::reduce_with(&pivots, unit);
+   14,148 ( 0.03%)              for (j, &coord) in coordinates.iter().enumerate() {
+   99,036 ( 0.19%)                  if projected[coord / 64] & (1u64 << (coord % 64)) != 0 {
+      108 ( 0.00%)                      rhs[j][bit / 64] |= 1u64 << (bit % 64);
+        .                           }
+        .                       }
+        .                   }
+        .                   let halves: Vec<_> = xs
+        .                       .iter()
+        .                       .map(|x| {
+       48 ( 0.00%)                  x.square(&c.irreducible)
+    6,276 ( 0.01%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::square (12x)
+       48 ( 0.00%)                      .half_trace(&c.irreducible)
+   11,814 ( 0.02%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::half_trace (12x)
+        .                               .expect("odd field")
+        .                       })
+        .                       .collect();
+        1 ( 0.00%)          let mut equations = vec![vec![[0; 3]; xs.len() + 1]; coordinates.len()];
+        .                   for (i, h) in halves.iter().enumerate() {
+        .                       let mut multiple = words(h);
+        .                       for bit in 0..c.m as usize {
+    6,288 ( 0.01%)                  let image = Self::reduce_with(&pivots, multiple);
+  169,776 ( 0.33%)                  for (j, &coord) in coordinates.iter().enumerate() {
+1,188,432 ( 2.30%)                      if image[coord / 64] & (1u64 << (coord % 64)) != 0 {
+  154,736 ( 0.30%)                          equations[j][i][bit / 64] |= 1u64 << (bit % 64);
+        .                               }
+        .                           }
+        .                           multiple = field.times_x(multiple);
+        .                       }
+        .                   }
+        .                   for (row, mask) in equations.iter_mut().zip(&rhs) {
+      432 ( 0.00%)              row[xs.len()] = *mask;
+        .                   }
+        .                   let mut w_support = [0; 3];
+        1 ( 0.00%)          for (_, w) in &pivots {
+        .                       for i in 0..3 {
+       69 ( 0.00%)                  w_support[i] |= w[i];
+        .                       }
+        .                   }
+        .                   Self {
+        4 ( 0.00%)              equations,
+        .                       rhs,
+        4 ( 0.00%)              w_pivots: pivots,
+        4 ( 0.00%)              halves,
+        .                       w_support,
+        .                   }
+        .               }
+        .           
+        .               #[cfg(test)]
+        .               fn solve(
+        .                   &self,
+        .                   xs: &[F2mElement],
+-- line 146 ----------------------------------------
+-- line 154 ----------------------------------------
+        .                   &self,
+        .                   xs: &[F2mElement],
+        .                   c: &BinaryCurve,
+        .                   z: WordMask,
+        .                   y: WordMask,
+        .                   field: &WordField,
+        .               ) -> (ProjectedResult, usize) {
+        .                   let width = xs.len() + 1;
+    7,972 ( 0.02%)          let coefficient_mask = (1u64 << width) - 1;
+    7,972 ( 0.02%)          let mut pivots = [0u64; 64];
+   97,657 ( 0.19%)  => ???:0x0000000000163280 (1,993x)
+        .                   let mut rank = 0;
+        .                   let zw = z;
+   17,937 ( 0.03%)          let offset = field.add(y, field.mul(z, field.half(z)));
+  502,236 ( 0.97%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::mul (1,993x)
+        .                   let target = offset;
+        .                   for (j, (columns, rhs)) in self.equations.iter().zip(&self.rhs).enumerate() {
+   51,572 ( 0.10%)              let mut row = parity(rhs, &target) << width;
+  103,144 ( 0.20%)              for (i, col) in columns.iter().enumerate() {
+1,547,160 ( 2.99%)                  row |= parity(col, &zw) << i;
+        .                       }
+        .                       loop {
+        .                           let coefficients = row & coefficient_mask;
+  334,949 ( 0.65%)                  if coefficients == 0 {
+   11,826 ( 0.02%)                      if row >> width != 0 {
+        .                                   return (ProjectedResult::Inconsistent, j + 1);
+        .                               }
+        .                               break;
+        .                           }
+   91,831 ( 0.18%)                  let bit = 63 - coefficients.leading_zeros() as usize;
+  275,493 ( 0.53%)                  if pivots[bit] == 0 {
+   47,630 ( 0.09%)                      pivots[bit] = row;
+        .                               rank += 1;
+        .                               break;
+        .                           }
+   68,016 ( 0.13%)                  row ^= pivots[bit];
+        .                       }
+   71,445 ( 0.14%)              if rank == width {
+        .                           // These independent rows force one coefficient vector. Check
+        .                           // ALL remaining W conditions with one exact remainder test.
+        .                           let mut solution = 0u64;
+   12,688 ( 0.02%)                  for (i, &pivot) in pivots.iter().enumerate().take(width) {
+  164,944 ( 0.32%)                      if ((pivot >> width) ^ ((pivot & solution).count_ones() as u64)) & 1 != 0 {
+        .                                   solution |= 1u64 << i;
+        .                               }
+        .                           }
+    3,904 ( 0.01%)                  let mut h = if solution & (1u64 << xs.len()) != 0 {
+        .                               [1, 0, 0]
+        .                           } else {
+        .                               [0; 3]
+        .                           };
+        .                           for (i, hi) in self.halves.iter().enumerate() {
+   23,424 ( 0.05%)                      if solution & (1u64 << i) != 0 {
+        .                                   h = field.add(h, words(hi));
+        .                               }
+        .                           }
+    7,808 ( 0.02%)                  let product_words = field.add(offset, field.mul(z, h));
+  245,952 ( 0.48%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::mul (976x)
+        .                           if product_words
+        .                               .iter()
+        .                               .zip(&self.w_support)
+    2,928 ( 0.01%)                      .any(|(v, s)| *v & !*s != 0)
+        .                               || Self::reduce_with(&self.w_pivots, product_words) != [0; 3]
+        .                           {
+        .                               return (ProjectedResult::Inconsistent, j + 1);
+        .                           }
+        .                           let mut u = F2mElement::zero(c.m);
+        .                           for (i, x) in xs.iter().enumerate() {
+        .                               if solution & (1u64 << i) != 0 {
+        .                                   u = u.add(x);
+-- line 220 ----------------------------------------
+-- line 253 ----------------------------------------
+        .           }
+        .           fn linear_solutions(
+        .               columns: &[F2mElement],
+        .               target: &F2mElement,
+        .               n: u32,
+        .           ) -> Option<(BigUint, Vec<BigUint>, usize)> {
+        .               // Three words cover every supported field (n <= 131). Retain the
+        .               // arbitrary-width path for coefficient spaces wider than 192 bits.
+        2 ( 0.00%)      if n <= 192 && columns.len() <= 192 {
+        .                   return packed_linear_solutions(columns, target, n);
+        .               }
+        .               generic_linear_solutions(columns, target, n)
+        .           }
+        .           fn generic_linear_solutions(
+        .               columns: &[F2mElement],
+        .               target: &F2mElement,
+        .               n: u32,
+-- line 269 ----------------------------------------
+-- line 305 ----------------------------------------
+        .           }
+        .           
+        .           fn packed_linear_solutions(
+        .               columns: &[F2mElement],
+        .               target: &F2mElement,
+        .               n: u32,
+        .           ) -> Option<(BigUint, Vec<BigUint>, usize)> {
+        .               fn packed(x: &F2mElement) -> [u64; 3] {
+      108 ( 0.00%)          let mut a = [0; 3];
+        .                   a[..x.raw_bits().len()].copy_from_slice(x.raw_bits());
+      112 ( 0.00%)          a
+        .               }
+        .               fn leading(a: &[u64; 3]) -> Option<usize> {
+        .                   (0..3)
+        .                       .rev()
+      589 ( 0.00%)              .find(|&i| a[i] != 0)
+      321 ( 0.00%)              .map(|i| i * 64 + 63 - a[i].leading_zeros() as usize)
+        .               }
+        .               fn big(a: &[u64; 3]) -> BigUint {
+        .                   BigUint::from_slice(
+        .                       &a.iter()
+        .                           .flat_map(|w| [*w as u32, (*w >> 32) as u32])
+        .                           .collect::<Vec<_>>(),
+        .                   )
+        .               }
+        .               let mut rows = [[0u64; 6]; 192];
+       12 ( 0.00%)      let mut present = [false; 192];
+        .               let mut rank = 0;
+        .               let mut kernel = Vec::new();
+        .               for (j, col) in columns.iter().enumerate() {
+        .                   let mut a = packed(col);
+      105 ( 0.00%)          let mut label = [0u64; 3];
+      350 ( 0.00%)          label[j / 64] = 1u64 << (j % 64);
+        .                   loop {
+        .                       let Some(bit) = leading(&a) else {
+        .                           kernel.push(big(&label));
+        .                           break;
+        .                       };
+        .                       debug_assert!(bit < n as usize);
+      640 ( 0.00%)              if !present[bit] {
+       35 ( 0.00%)                  present[bit] = true;
+       70 ( 0.00%)                  rows[bit][..3].copy_from_slice(&a);
+        .                           rows[bit][3..].copy_from_slice(&label);
+       70 ( 0.00%)                  rank += 1;
+        .                           break;
+        .                       }
+        .                       for w in 0..3 {
+      855 ( 0.00%)                  a[w] ^= rows[bit][w];
+    1,995 ( 0.00%)                  label[w] ^= rows[bit][3 + w];
+        .                       }
+        .                   }
+        .               }
+        .               let mut a = packed(target);
+        .               let mut solution = [0u64; 3];
+        .               while let Some(bit) = leading(&a) {
+        2 ( 0.00%)          if !present[bit] {
+        .                       return None;
+        .                   }
+        .                   for w in 0..3 {
+        .                       a[w] ^= rows[bit][w];
+        .                       solution[w] ^= rows[bit][3 + w];
+        .                   }
+        .               }
+        .               Some((big(&solution), kernel, rank))
+-- line 368 ----------------------------------------
+-- line 701 ----------------------------------------
+        .               vec![root.clone(), root.add(u)]
+        .           }
+        .           fn x_key(x: &F2mElement) -> WordMask {
+        .               let w = words(x);
+        .               [w[2], w[1], w[0]]
+        .           }
+        .           fn word_basis(values: impl IntoIterator<Item = WordMask>, n: u32) -> Vec<F2mElement> {
+        .               let mut pivots: Vec<Option<WordMask>> = vec![None; n as usize];
+        3 ( 0.00%)      for mut v in values {
+        .                   loop {
+   22,068 ( 0.04%)              let Some(word) = (0..3).rev().find(|&i| v[i] != 0) else {
+        .                           break;
+        .                       };
+    6,199 ( 0.01%)              let bit = word * 64 + 63 - v[word].leading_zeros() as usize;
+   12,433 ( 0.02%)              if let Some(p) = pivots[bit] {
+        .                           for i in 0..3 {
+   30,820 ( 0.06%)                      v[i] ^= p[i];
+        .                           }
+        .                       } else {
+      140 ( 0.00%)                  pivots[bit] = Some(v);
+        .                           break;
+        .                       }
+        .                   }
+        .               }
+        .               pivots
+        .                   .into_iter()
+        .                   .flatten()
+      142 ( 0.00%)          .map(|w| F2mElement::from_words(&w, n))
+    4,690 ( 0.01%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::from_words (35x)
+        .                   .collect()
+        .           }
+        .           
+        .           /// For each actual final point R, solve the necessary linear equation
+        .           /// v²+z*v+z²*u²+b=0 with u in span(B_x), v in span(B_x*B_x),
+        .           /// z=x(T-R). Factor X²+uX+v and replay actual supplied point signs.
+        .           /// All candidates of a deficient affine space are required for Refuted.
+       17 ( 0.00%)  pub fn decompose_trace_zero_linearized(
+        .               v: &TraceZeroVariety,
+        .               base: &[BinaryPoint],
+        .               target: &BinaryPoint,
+        .               limits: Limits,
+        .           ) -> TraceZeroLinearizedReport {
+        .               let mut out = TraceZeroLinearizedReport::default();
+        1 ( 0.00%)      let deadline = limits.wall_budget.map(|d| Instant::now() + d);
+        2 ( 0.00%)      if !v.contains(target) {
+        .                   out.relation.reason = Some("invalid linearized target/base");
+        .                   return out;
+        .               }
+       10 ( 0.00%)      if limits.max_models == 0 || limits.max_patterns == 0 || limits.max_variables == 0 {
+        .                   out.relation.reason = Some(
+        .                       if base
+        .                           .iter()
+        .                           .any(|p| matches!(p, BinaryPoint::Infinity) || !v.contains(p))
+        .                       {
+        .                           "invalid linearized target/base"
+        .                       } else {
+        .                           "zero linearized budget"
+        .                       },
+        .                   );
+        .                   return out;
+        .               }
+        2 ( 0.00%)      if base.is_empty() {
+        .                   out.relation.disposition = Disposition::Refuted;
+        .                   return out;
+        .               }
+        .               let c = v.curve();
+       13 ( 0.00%)      let compact = (c.m >= 31 && base.len() >= 64).then(|| WordField::new(c));
+  528,069 ( 1.02%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::new (1x)
+        .               let mut by_x: BTreeMap<WordMask, Vec<usize>> = BTreeMap::new();
+        .               for (i, p) in base.iter().enumerate() {
+    5,982 ( 0.01%)          let BinaryPoint::Affine { x: fx, y: fy } = p else {
+        .                       out.relation.reason = Some("invalid linearized target/base");
+        .                       return out;
+        .                   };
+    7,976 ( 0.02%)          if fx.m_value() != c.m || fy.m_value() != c.m {
+        .                       out.relation.reason = Some("invalid linearized target/base");
+        .                       return out;
+        .                   }
+        .                   let x = x_key(fx);
+        .                   let known_sign = by_x.get(&x).is_some_and(|ids| {
+    8,973 ( 0.02%)              let BinaryPoint::Affine { y: known, .. } = &base[ids[0]] else {
+        .                           unreachable!()
+        .                       };
+    3,988 ( 0.01%)              fy == known || *fy == known.add(fx)
+  101,694 ( 0.20%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::add (997x)
+        .                   });
+        .                   // is_in_4e performs the field-width and curve-equation checks itself.
+        .                   // Once one ordinate is admitted, its identical/opposite lift is also
+        .                   // admitted; every supplied sign/index is still retained below.
+    2,991 ( 0.01%)          if !known_sign
+    1,994 ( 0.00%)              && !compact
+        .                           .as_ref()
+    2,991 ( 0.01%)                  .map_or_else(|| c.is_in_4e(p) == Some(true), |f| f.admit(p))
+1,671,969 ( 3.23%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::admit (997x)
+        .                   {
+        .                       out.relation.reason = Some("invalid linearized target/base");
+        .                       return out;
+        .                   }
+    7,976 ( 0.02%)          by_x.entry(x).or_default().push(i);
+  173,131 ( 0.33%)  => /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/collections/btree/map/entry.rs:<alloc::collections::btree::map::entry::Entry<[u64; 3], alloc::vec::Vec<usize>>>::or_default (1,994x)
+        .               }
+    4,985 ( 0.01%)      let xs = word_basis(by_x.keys().map(|w| [w[2], w[1], w[0]]), c.m);
+        .               let products: Vec<_> = xs
+        .                   .iter()
+        .                   .enumerate()
+      156 ( 0.00%)          .flat_map(|(i, x)| xs[i..].iter().map(|y| words(&x.mul(y, &c.irreducible))))
+   40,716 ( 0.08%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::mul (78x)
+        .                   .collect();
+        .               let ws = word_basis(products, c.m);
+        .               out.source_dimension = xs.len();
+        .               out.product_dimension = ws.len();
+        1 ( 0.00%)      out.linear_columns = xs.len() + ws.len();
+        3 ( 0.00%)      if out.linear_columns > limits.max_variables as usize {
+        .                   out.relation.reason = Some("linear-column allocation cap");
+        .                   return out;
+        .               }
+      140 ( 0.00%)      let xs_squared: Vec<_> = xs.iter().map(|x| x.square(&c.irreducible)).collect();
+   18,305 ( 0.04%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::square (35x)
+        .               let ws_squared: Vec<_> = ws.iter().map(|w| w.square(&c.irreducible)).collect();
+        .               // Small bases keep scalar admission/search costs. Larger bases amortize
+        .               // each inversion over at most 256 consecutive residuals, in original order.
+        .               // Unused tail residuals are computed and charged even for an early answer.
+        7 ( 0.00%)      let batch_size = if base.len() >= 64 { 256 } else { 1 };
+        .               let mut residuals = Vec::new();
+        .               let mut residual_start = 0;
+        .               let use_projection =
+       10 ( 0.00%)          c.m >= 31 && base.len() >= 64 && xs.len() < 63 && out.linear_columns < c.m as usize;
+       75 ( 0.00%)      let mut projection = None;
+        .               let mut incomplete = false;
+        .               for (r, p) in base.iter().enumerate() {
+        .                   if deadline.is_some_and(|d| Instant::now() >= d) {
+        .                       out.relation.reason = Some("linearized total deadline");
+        .                       return out;
+        .                   }
+   13,953 ( 0.03%)          if r == 0 || r == residual_start + residuals.len() {
+        .                       residual_start = r;
+        .                       // An immediate relation should not pay for 31 unused residuals.
+       80 ( 0.00%)              residuals = if r == 0 || batch_size == 1 {
+       21 ( 0.00%)                  vec![WordPoint::from_point(&point_add(c, target, &point_neg(p)))]
+   72,763 ( 0.14%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/curve.rs:full_trace_zero_backend::binary_ecc::curve::point_add (1x)
+      170 ( 0.00%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/curve.rs:full_trace_zero_backend::binary_ecc::curve::point_neg (1x)
+       75 ( 0.00%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordPoint>::from_point (1x)
+       16 ( 0.00%)              } else if let Some(f) = &compact {
+       56 ( 0.00%)                  f.residuals(c, target, &base[r..base.len().min(r + batch_size)])
+3,594,385 ( 6.94%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::residuals (8x)
+        .                       } else {
+        .                           residual_batch(c, target, &base[r..base.len().min(r + batch_size)])
+        .                               .iter()
+        .                               .map(WordPoint::from_point)
+        .                               .collect()
+        .                       };
+        .                   }
+   17,946 ( 0.03%)          let residual = residuals[r - residual_start];
+    3,988 ( 0.01%)          out.relation.patterns_attempted += 1;
+        .                   let mut residual_incomplete = false;
+    1,994 ( 0.00%)          let found = if residual == WordPoint::Infinity {
+        .                       base.iter().enumerate().find_map(|(i, q)| {
+        .                           let BinaryPoint::Affine { x, .. } = q else {
+        .                               unreachable!()
+        .                           };
+        .                           let negative = point_neg(q);
+        .                           by_x.get(&x_key(x))
+        .                               .and_then(|ids| ids.iter().copied().find(|&j| base[j] == negative))
+        .                               .map(|j| (i, j))
+        .                       })
+        .                   } else {
+    7,976 ( 0.02%)              let WordPoint::Affine { x: zw, y: yw } = residual else {
+        .                           unreachable!()
+        .                       };
+    1,994 ( 0.00%)              out.systems += 1;
+    9,970 ( 0.02%)              let projected = if r > 0 && use_projection {
+        .                           let p = projection.get_or_insert_with(|| {
+        .                               ProductProjection::new_with_field(
+        .                                   &xs,
+        .                                   &ws,
+        .                                   c,
+        .                                   compact.as_ref().expect("projected compact workspace"),
+        .                               )
+        .                           });
+        .                           out.projected_columns = xs.len() + 1;
+        .                           out.projected_systems += 1;
+   57,797 ( 0.11%)                  let (answer, rows) = p.solve_compact(
+        .                               &xs,
+        .                               c,
+        .                               zw,
+        .                               yw,
+        .                               compact.as_ref().expect("projected compact workspace"),
+        .                           );
+    1,993 ( 0.00%)                  out.projected_rows += rows;
+        .                           Some(answer)
+        .                       } else {
+        .                           None
+        .                       };
+    1,995 ( 0.00%)              let mut unique_pair = None;
+   17,937 ( 0.03%)              let (solution, kernel, rank) = match projected {
+        .                           Some(ProjectedResult::Inconsistent) => {
+    1,993 ( 0.00%)                      out.projected_inconsistent += 1;
+        .                               out.relation.patterns_refuted += 1;
+        .                               continue;
+        .                           }
+        .                           Some(ProjectedResult::Unique(u, v)) => {
+        .                               unique_pair = Some((u, v));
+        .                               (BigUint::default(), Vec::new(), out.linear_columns)
+        .                           }
+        .                           Some(ProjectedResult::Deficient) | None => {
+        6 ( 0.00%)                      let z = F2mElement::from_words(&zw, c.m);
+      134 ( 0.00%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::from_words (1x)
+        4 ( 0.00%)                      let z2 = z.square(&c.irreducible);
+      613 ( 0.00%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::square (1x)
+        .                               let columns: Vec<_> = xs_squared
+        .                                   .iter()
+       60 ( 0.00%)                          .map(|x2| z2.mul(x2, &c.irreducible))
+    6,396 ( 0.01%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::mul (12x)
+        .                                   .chain(
+        .                                       ws.iter()
+        2 ( 0.00%)                                  .zip(&ws_squared)
+      207 ( 0.00%)                                  .map(|(w, w2)| w2.add(&z.mul(w, &c.irreducible))),
+   12,270 ( 0.02%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::mul (23x)
+    2,346 ( 0.00%)  => /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::add (23x)
+        .                                   )
+        .                                   .collect();
+        2 ( 0.00%)                      let Some(answer) = linear_solutions(&columns, &c.b, c.m) else {
+        .                                   out.relation.patterns_refuted += 1;
+        .                                   continue;
+        .                               };
+        .                               answer
+        .                           }
+        .                       };
+        .                       let z = F2mElement::from_words(&zw, c.m);
+        .                       out.maximum_rank = out.maximum_rank.max(rank);
+-- line 914 ----------------------------------------
+-- line 989 ----------------------------------------
+        .                       out.relation.indices = Some(vec![i, j, r]);
+        .                       out.relation.disposition = Disposition::Found;
+        .                       return out;
+        .                   }
+        .                   if !residual_incomplete {
+        .                       out.relation.patterns_refuted += 1;
+        .                   }
+        .               }
+        4 ( 0.00%)      if incomplete {
+        .                   out.relation.reason = Some("linearized affine-model cap");
+        .               } else {
+        .                   out.relation.disposition = Disposition::Refuted;
+        .               }
+       36 ( 0.00%)      out
+       24 ( 0.00%)  }
+   75,821 ( 0.15%)  => /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/ptr/mod.rs:core::ptr::drop_glue::<core::option::Option<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>> (1x)
+   22,923 ( 0.04%)  => /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/ptr/mod.rs:core::ptr::drop_glue::<core::option::Option<full_trace_zero_backend::cryptanalysis::trace_zero_linearized::ProductProjection>> (1x)
+    1,188 ( 0.00%)  => /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/ptr/mod.rs:core::ptr::drop_glue::<alloc::vec::Vec<full_trace_zero_backend::binary_ecc::f2m::F2mElement>> (4x)
+
+  195,708 ( 0.38%)  <counts for unidentified lines in research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_linearized.rs>
+
+--------------------------------------------------------------------------------
+Ir                 
+--------------------------------------------------------------------------------
+7,426,465 (14.34%)  events annotated
+

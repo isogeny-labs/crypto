@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T09:16:25Z",
+ "id": "PCC-20261116-942215",
+ "kind": "measurement",
+ "producer": {
+  "commit": "c26d3bc61689c055c0e435f88e7258f4eefecbe2",
+  "model": "codex",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "benchmarks/software/browser-generator/20261116/comparison.json",
+    "sha256": "427520c74c2621c1fc35b580de51b358720da40478516bba2062d229e5be71e0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "benchmarks/software/browser-generator/20261116/protocol.json",
+    "sha256": "f4381ffa1e5c992b45f417700a0af4e97b6384c1d999517fa4a612af87993974"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "benchmarks/software/browser-generator/20261116/raw/baseline-a1.json",
+    "sha256": "0ecccfa462ab555b5e4756a73e1873972fce7ad04b416b29a3bb2c1adcc0ab9e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "benchmarks/software/browser-generator/20261116/raw/candidate-b1.json",
+    "sha256": "dedee656cb1488ab7eea98a0638c87a8d54b6c6f2eb5d6cc76781107dca2adf0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "benchmarks/software/browser-generator/20261116/raw/candidate-b2.json",
+    "sha256": "bf41a31b37d6c7c0b097da30461c7ffee9dd7dad6ee0e80806d02f25f0e97160"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "benchmarks/software/browser-generator/20261116/raw/baseline-a2.json",
+    "sha256": "90ee1583e82dedbb0582701ec8c72ca725010669a5acfc6a45141da2c102b14d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "benchmarks/software/browser-generator/20261116/report.pdf",
+    "sha256": "0d21eb87a0a64a55f8f7836ac33f43ab1aa2fc0ae49337b781831fc99a602246"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "benchmarks/software/browser-generator/20261116/report.svg",
+    "sha256": "f7d617c41d8cf0640166ed0a1253316363674e799cd11f67a8e90fed321c7524"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Unisolated local catalog generator main at code commit 6b7dca5838c303f9f4f55d87d84e98fe1ecc6aa6; two observations per variant",
+ "statement": "The four registered raw receipts report generator main wall times of 183.13312383300217, 20.012492750000092, 19.01348345799488 and 162.9898612919933 seconds, with the same semantic digest. Timing excludes module import and independent digest; this is a local software workload."
+}

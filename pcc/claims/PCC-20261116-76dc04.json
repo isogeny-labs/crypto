@@ -1,0 +1,104 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T01:48:06Z",
+ "id": "PCC-20261116-76dc04",
+ "kind": "theorem",
+ "producer": {
+  "commit": "187fc0ed13224cb29f704929bf4e08471f0be01e",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "08602cdb70bf37f4d909544dcd2c710e124081214025446d327537d30d25b7e9",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-scaling",
+   "theorem": "Curve25519ScalingAudit.four_lower"
+  },
+  {
+   "decl_sha256": "ebf6cb63777b638d9d1203e583714001559b3a10ee9a78722a4c11ba1c8b28d4",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-scaling",
+   "theorem": "Curve25519ScalingAudit.four_attained"
+  },
+  {
+   "decl_sha256": "ccba06bab9719f22ffe9ad0bcb3f194c917e6a14ebec12e02502d68bacc7c4d2",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-scaling",
+   "theorem": "Curve25519ScalingAudit.six_lower"
+  },
+  {
+   "decl_sha256": "6c2bc170d9d341155ccb441e5fa60d00a4e239a9749a4c48762f82ac959b0f31",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-scaling",
+   "theorem": "Curve25519ScalingAudit.six_attained"
+  },
+  {
+   "decl_sha256": "147ad15a55c89a1769108561afb7ce6214f61e30b8d32c55c51ac08d97a0f467",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-scaling",
+   "theorem": "Curve25519ScalingAudit.six_naive_balance"
+  },
+  {
+   "decl_sha256": "b9bb0b193e7ee112acc6aae7c7f917be6a695d8b1880bf26bd69cfb362fde65f",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-scaling",
+   "theorem": "Curve25519ScalingAudit.numeric_model_below_half"
+  },
+  {
+   "decl_sha256": "9458d7378680f2c62e495010888e4e14316aced8ae6be82e1f9cba40fc1e82e8",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-scaling",
+   "theorem": "Curve25519ScalingParameters.sixth_root_lower"
+  },
+  {
+   "decl_sha256": "29df047727a065ea664b70f5c8b67b984c3c8a8bab625d204516e730ac06da4c",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-scaling",
+   "theorem": "Curve25519ScalingParameters.sixth_root_upper"
+  },
+  {
+   "decl_sha256": "d582f5189289aec8a11a9a103061eebc3b6ce81fde3c81f4f7c9aa3277ab116d",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-scaling",
+   "theorem": "Curve25519ScalingParameters.current_base_above_sixth_root"
+  },
+  {
+   "decl_sha256": "09e8733928e08e7e75c8b1d8de260edb9c2b4d1cd29c75b86d316a3c9be18f49",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-scaling",
+   "theorem": "Curve25519ScalingParameters.current_budget_square_above_order"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-scaling/ScalingAudit.lean",
+    "sha256": "0178965b0c1f5885f0b96e7379ad4056b9415ea37a25bb20eb4d821ea7b7977f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-scaling/ParameterArithmetic.lean",
+    "sha256": "5f68a517abc463616811ec86321e77094cc61bacd599f8c0baee6db80a4dca25"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-scaling/lake-manifest.json",
+    "sha256": "c78f190d0554d41e94abe79f8c771a763df965c4c8a290ecf1ad6ab9399d7485"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-scaling/gate-v1/audit.log",
+    "sha256": "a51ed7000c6edc74983a8ad502f2df9790b8a43294cc8842cd2cc1d6148bace1"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "curve25519-scaling-model-instances",
+ "statement": "Ten named Lean endpoints establish only numeric model and integer instances: the four-summand gamma=1/2 saturated-yield rational envelope has minimum4/9 at beta2/9; the six-summand gamma=3/2 envelope has minimum5/12 at beta1/6, while its naive unsaturated balance beta2/11 evaluates to5/11. Both model minima are less than1/2. Four Core inequalities establish the actual scalar-order floor sixth root2^42, and that the current claimed class lower bound has fifth and sixth powers above that scalar-order integer. The maintained gate audits12 declarations with zero trusted-native exceptions; only the ten named endpoints are claimed. No actual algorithm cost, yield/distribution, point count, growing-family admissibility or attack exponent follows. Complete source files and dependency manifest are pinned in addition to declaration bindings."
+}

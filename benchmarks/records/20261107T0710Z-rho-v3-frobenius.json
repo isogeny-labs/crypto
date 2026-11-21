@@ -1,0 +1,115 @@
+{
+  "branch": "aburan28/wizardly-einstein-i9seky",
+  "closed_utc": "2026-11-07T07:13:30+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ecbench_rho_v3_frobenius_20261107/spec.json",
+        "--out",
+        "research/ecbench_rho_v3_frobenius_20261107/sessions/main",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--quiet"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-07T07:10:55+00:00",
+      "wall_s": 24.442
+    }
+  ],
+  "commit": "3592f4a17261623cbc5d71e1ee329671d61b77fe",
+  "commit_dirty": false,
+  "created_utc": "2026-11-07T07:10:50+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261107-rho-v3-frobenius"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
+  },
+  "id": "20261107T0710Z-rho-v3-frobenius",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 864,
+      "name": "rho_frob_v3_over_v2_ops",
+      "note": "candidate/incumbent paired, 6 Koblitz curves (lower is better); band 0.459/0.475/0.571",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.418,
+        0.504
+      ],
+      "unit": "ratio",
+      "value": 0.459
+    },
+    {
+      "baseline": 0.163,
+      "better": "lower",
+      "n": 144,
+      "name": "rho_frob_v3_s_k43",
+      "note": "Koblitz 1:43 log2 r 32.11; floor sqrt(pi/172)=0.135; baseline rho.signed_frobenius_v2 same session",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "S",
+      "value": 0.142
+    }
+  ],
+  "problem": "ecdlp:koblitz-ladder",
+  "raw": [
+    {
+      "bytes": 20432480,
+      "path": "research/ecbench_rho_v3_frobenius_20261107/sessions/main/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b8/b870dd8e2cb3527ccb4e1178f77c18d3a34d973e78d622be1411a59566fec811",
+      "sha256": "b870dd8e2cb3527ccb4e1178f77c18d3a34d973e78d622be1411a59566fec811",
+      "uploaded": false
+    },
+    {
+      "bytes": 629067,
+      "path": "research/ecbench_rho_v3_frobenius_20261107/sessions/main/plan.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a9/a9c0406b16d67accc32e1dd4fc5534de86aaaa4f7b6caac21dd60f0dd7890409",
+      "sha256": "a9c0406b16d67accc32e1dd4fc5534de86aaaa4f7b6caac21dd60f0dd7890409",
+      "uploaded": false
+    },
+    {
+      "bytes": 2092,
+      "path": "research/ecbench_rho_v3_frobenius_20261107/sessions/main/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/34/34f7f7f5f987a2afd41148227a22805d6ed2b736682b94ff892951d04d37e0f7",
+      "sha256": "34f7f7f5f987a2afd41148227a22805d6ed2b736682b94ff892951d04d37e0f7",
+      "uploaded": false
+    },
+    {
+      "bytes": 327495,
+      "path": "research/ecbench_rho_v3_frobenius_20261107/audit.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8a/8ae82580d14f74c1da57fe56757fd78da62ecb0395621617b6a9cb5b9d3085cb",
+      "sha256": "8ae82580d14f74c1da57fe56757fd78da62ecb0395621617b6a9cb5b9d3085cb",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261107-rho-v3-frobenius/REPORT.pdf",
+    "png": [
+      "benchmarks/20261107-rho-v3-frobenius/s_over_floor.png"
+    ],
+    "svg": [
+      "benchmarks/20261107-rho-v3-frobenius/s_over_floor.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "rho-v3-frobenius",
+  "status": "measured",
+  "summary": "rho.signed_frobenius_v3 vs v2 on Koblitz 2^15.4..2^32.1, local L0, counted GAE: paired ops 0.459 [0.418,0.504], band-robust; medium tier 1.076x floor [0.998,1.147] (v2 1.249x); search phase 1.03-1.04x floor from 2^21. Replay-all 2592/2592. Not validated.",
+  "validation": null
+}

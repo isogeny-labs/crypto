@@ -1,0 +1,13 @@
+{
+ "schema":"odd-regular-hermite-inputs/v1",
+ "fields":[{"p":3,"n":1},{"p":5,"n":1},{"p":3,"n":2,"modulus":"t²+1"},{"p":5,"n":2,"modulus":"t²+2"}],
+ "curves":["X³+X","X³+X+1"],
+ "representation":"a0+p*a1, field constants i embedded i%p",
+ "selection":"Beforecomparisons: first lexicographic representative per fixed guardcategory then lexicographic fill; categories ramified,a_zero,a_equals_z,r1_zero,r1_nonzero,delta_zero,delta_nonzero,regular. Curve order c0=0then1, target/source points increasing(x,y), h increasingcanonical. Max100000selectioncells perfield. Missing categories explicit.",
+ "cell_caps":{"GF3":16,"GF5":16,"GF9":16,"GF25":8},
+ "raw_oracle":"Everyq³k/r/s assignment peradmitteda!=zcell, independent direct point/derivative prefilter thenliteralnormdivision oneachregularsurvivor. Rawstates andnormevaluations separate.",
+ "domain":"Dsrc={a,a+1}; targetoverlaprecorded; no prime-field subspace assumption",
+ "raw_state_cap":200000,"predicate_cap":2000000,"raw_payload_cap_bytes":33554432,
+ "worker_seconds":90,"internal_work_seconds":80,"internal_demote_seconds":84,"internal_print_seconds":88,"memory_limit_mb":4096,"cores":1,
+ "output":"Allretainedderivedcandidate norm/cubic/remainder/cube/sourceorder certificates inexclusive gzip; compactstdoutsummaryonly, atmost256KiB expectedunder32KiB. Exact scoped parameter equality vsindependentdensegrid. Commonfactor/originalaux/globalUNKNOWN."
+}

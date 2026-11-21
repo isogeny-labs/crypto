@@ -13,7 +13,7 @@ jq -e --arg repository "${ISOLAB_IMAGE_REPOSITORY:-104186811093.dkr.ecr.us-east-
   and (.job.job_name|length)<=55
   and ((.job.seconds // 900)|type)=="number"
   and ((.job.seconds // 900)|floor)==(.job.seconds // 900)
-  and (.job.seconds // 900)>=1 and (.job.seconds // 900)<=3600
+  and (.job.seconds // 900)>=1 and (.job.seconds // 900)<=4800
   and ((.job.memory // "4Gi")|type)=="string"
   and ((.job.memory // "4Gi")|test("^[1-9][0-9]*(Mi|Gi)$"))
   and ((.job.instance_type // "c8a.2xlarge")|type)=="string"

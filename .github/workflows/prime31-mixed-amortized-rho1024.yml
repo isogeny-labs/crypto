@@ -1,0 +1,135 @@
+name: Prime31 1024Q complete amortized IC vs exact existing native rho32
+
+on:
+  push:
+    branches: [research/prime31-mixed-ic-amortized-20261117]
+    paths:
+      - research/prime31_ic_20261115/mixed_base/MIXED_AMORTIZED_MATCHED_RHO_PROTOCOL_20261117.md
+      - research/prime31_ic_20261115/mixed_base/prime31_amortized_rho_1024q_suffix.rsfrag
+      - research/prime31_ic_20261115/native/examples/prime31_mixed_base_amortized_ic.rs
+      - .github/workflows/prime31-mixed-amortized-rho1024.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/mixed_base/MIXED_AMORTIZED_MATCHED_RHO_PROTOCOL_20261117.md
+      - research/prime31_ic_20261115/mixed_base/prime31_amortized_rho_1024q_suffix.rsfrag
+      - research/prime31_ic_20261115/native/examples/prime31_mixed_base_amortized_ic.rs
+      - .github/workflows/prime31-mixed-amortized-rho1024.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  identical-1024q:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    env:
+      RAYON_NUM_THREADS: '1'
+      CARGO_BUILD_JOBS: '2'
+    steps:
+      - name: Checkout prospectively frozen comparison source and protocol
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples
+            research/prime31_ic_20261115/mixed_base
+      - name: Checkout immutable original native Rust IC and optimized native rho source
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: aps-pinned
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install Rust 1.100
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Install new IC and construct source-identical original rho with a wrapper only
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp research/prime31_ic_20261115/native/examples/prime31_mixed_base_amortized_ic.rs \
+            aps-pinned/research/prime31_ic_20261115/native/examples/prime31_mixed_base_amortized_ic.rs
+          cp aps-pinned/research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs \
+            aps-pinned/research/prime31_ic_20261115/native/examples/prime31_mixed_rho_1024.rs
+          python3 - <<'PY'
+          from pathlib import Path
+          file=Path("aps-pinned/research/prime31_ic_20261115/native/examples/prime31_mixed_rho_1024.rs")
+          src=file.read_text()
+          needle="fn main()->Result<(),String> {"
+          assert src.count(needle)==1, "underlying source changed: fail closed"
+          src=src.replace(needle,"fn aps_original_main_unused()->Result<(),String> {",1)
+          snippet=Path("research/prime31_ic_20261115/mixed_base/prime31_amortized_rho_1024q_suffix.rsfrag").read_text()
+          assert snippet.count("fn main() -> Result<(), String>")==1
+          assert src.count("fn neg_rho_cold_policy(")==1
+          file.write_text(src+"\n"+snippet)
+          print("Original native rho arithmetic unchanged; source-original main renamed; exact wrapper appended")
+          PY
+      - name: Compile and test existing native library, complete IC and root rho wrapper
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 test --locked --release \
+            --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          cargo +1.100.0 test --locked --release \
+            --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_mixed_base_amortized_ic
+          cargo +1.100.0 test --locked --release --no-run \
+            --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_mixed_rho_1024
+      - name: Fully cold reusable index calculus on frozen 1024 Q
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release \
+            --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_mixed_base_amortized_ic > prime31-ic-1024-matched-input.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open("prime31-ic-1024-matched-input.json"))
+          assert d['schema']=='prime31.mixed_4p4_amortized_complete_ic.v1'
+          assert d['target_count']==1024 and d['completed_unknown_target_logs']==1024
+          assert d['base_log_point_replays']==61 and d['setup_rank']==61
+          assert len(d['targets'])==1024
+          assert all(t['caller_check'] and t['solver']['status']=='complete'
+                     for t in d['targets'])
+          print("1024/1024 native IC scalar recoveries reverified")
+          PY
+      - name: Exact existing 32-lane folded/unfolded rho on identical 1024 public Q
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release \
+            --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_mixed_rho_1024 -- prime31-ic-1024-matched-input.json \
+            > prime31-mixed-ic-vs-native-rho-1024q.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open("prime31-mixed-ic-vs-native-rho-1024q.json"))
+          assert d['schema']=='prime31.mixed_ic_vs_exact_native_rho_1024q.v1'
+          assert d['targets']==1024 and d['IC_completed']==1024
+          assert len(d['cases'])==1024
+          assert all(x['same_public_Q_verified'] for x in d['cases'])
+          assert d['unfolded_rho32_completed']==1024, 'unfolded has capped cases; do not call complete'
+          assert d['folded_rho32_completed']==1024, 'folded has capped cases; do not call complete'
+          assert d['unfolded_rho32_AA_first64_completed']==64
+          print("Exact same-1024Q complete native rho32 1024/1024 unfolded and folded")
+          print("Total charged IC ms",int(d['IC_fully_charged_batch_ns'])/1e6)
+          print("Native unfolded rho32 ms",int(d['unfolded_rho32_cold_total_ns'])/1e6)
+          print("Native folded rho32 ms",int(d['folded_rho32_cold_total_ns'])/1e6)
+          print("IC/rho32 unfolded",d['ratio_IC_full_batch_over_rho32_unfolded'])
+          print("IC/rho32 folded",d['ratio_IC_full_batch_over_rho32_folded'])
+          print("AA 64 rho ms",int(d['unfolded_rho32_AA_first64_total_ns'])/1e6)
+          print("IC descent-only paired wins",d['paired_IC_descent_only_wins_vs_rho'])
+          PY
+      - name: Preserve failed/capped rho and all original complete IC output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-mixed-ic-vs-native-rho-1024q-full-raw
+          path: |
+            prime31-ic-1024-matched-input.json
+            prime31-mixed-ic-vs-native-rho-1024q.json
+          if-no-files-found: warn
+          retention-days: 30

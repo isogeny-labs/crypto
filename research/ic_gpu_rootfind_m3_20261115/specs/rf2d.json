@@ -1,0 +1,91 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "rootfind-subtract-gpu m = 2: worker per run against a daemon worker (CUDA context start), prime-order curves 28-32 bits",
+ "description": "research/ic_gpu_rootfind_m3_20261115, frozen 2026-11-15 before the run. The m = 2 workload of research/ic_gpu_rootfind_ic_20261114 at |F_x| = 4096: CPU arm, GPU arm with a worker process per run (worker=spawn, each record creates its CUDA context), GPU arm connecting to a running daemon (worker=daemon). Identical relations, logarithm and S required; the daemon's one-time start is reported beside the records. Public synthetic curves; no security claim. rf2-gpuaa-F4096 is an A/A copy of rf2-gpu-F4096 (the wall-time noise floor of an IC arm).",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 28,
+    "seed": 20261114
+   },
+   {
+    "kind": "prime_search",
+    "bits": 30,
+    "seed": 20261114
+   },
+   {
+    "kind": "prime_search",
+    "bits": 32,
+    "seed": 20261114
+   }
+  ],
+  "targets_per_curve": 2,
+  "target_seed": 20261115
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rf2-cpu-F4096",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract:m=2",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf2-gpu-F4096",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract-gpu:m=2,worker=spawn",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf2-gpud-F4096",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract-gpu:m=2,worker=daemon",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  },
+  {
+   "name": "rf2-gpuaa-F4096",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract-gpu:m=2,worker=spawn",
+     "targets": "walk-prime-batch-1024"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261118,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

@@ -1,0 +1,11 @@
+name = "hasse_trace_coefficient_audit"
+version = "0.1.0"
+defaultTargets = ["HasseTraceCoefficientAudit"]
+
+[[require]]
+name = "quadratic_twist_count_audit"
+path = "../../quadratic_twist_count_audit_20261114/lean"
+
+[[lean_lib]]
+name = "HasseTraceCoefficientAudit"
+roots = ["PowerSumCoefficient", "ActualHasseTrace", "HasseTraceControls", "HasseTraceCertificate"]

@@ -1,0 +1,42 @@
+{
+  "schema": "semaev-source-verification/v1",
+  "created": "2026-11-10T11:53:21.984Z",
+  "source_commit": "44b32e67b92c27dcd1fc0f21291d4b77f61776d0",
+  "source_plan": "sources.json",
+  "all_source_and_artifact_pins_match": true,
+  "full_gate": {
+    "archive": "research/semaev_source_audit_20261110/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 28,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "actual_local_verdict": {
+    "claim_id": "PCC-20261110-95607f",
+    "claim_sha256": "9609c2bc97d0112da326124923bca935a06cadb122c565f5c983d4f3b948ad3f",
+    "commit": "44b32e67b92c27dcd1fc0f21291d4b77f61776d0",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/semaev_source_audit_20261110/lean (BinaryFourthCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-10T11:51:59Z",
+    "verifier_host": "762f5fc120c9"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261110-95607f",
+    "claim_sha256": "9609c2bc97d0112da326124923bca935a06cadb122c565f5c983d4f3b948ad3f",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "scope": "For every characteristic-two field/a/tuple, corrected binary S4 expression equals actual Mathlib resultant. Actual F4/nonsingular binary curve/four rational points sum0 while literal missing-plus product is1 and resultant0. Direct formula equality and vanishing negations; all16F2tuples agree. Literal typography of pinned author manuscript, no refutation of generic recursive theorem or other source versions."
+}

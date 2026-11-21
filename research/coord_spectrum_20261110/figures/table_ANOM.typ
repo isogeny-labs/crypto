@@ -1,0 +1,5 @@
+#table(columns: 12, align: (left,) + (right,) * 11, stroke: 0.4pt, inset: 2.5pt,
+  text(size: 7pt)[*curve*], text(size: 7pt)[*r*], text(size: 7pt)[*x*], text(size: 7pt)[*y*], text(size: 7pt)[*χ(x)*], text(size: 7pt)[*χ(x+1)*], text(size: 7pt)[*χ(x+2)*], text(size: 7pt)[*D_n*], text(size: 7pt)[*λ η*], text(size: 7pt)[*PLANT η*], text(size: 7pt)[*E ratio, z (K1)*], text(size: 7pt)[*E ratio, z (K2)*],
+  text(size: 7pt)[ANOM_16], text(size: 7pt)[74869], text(size: 7pt)[0.774], text(size: 7pt)[0.733], text(size: 7pt)[0.474], text(size: 7pt)[0.474], text(size: 7pt)[0.474], text(size: 7pt)[0.991], text(size: 7pt)[1.000000], text(size: 7pt)[1.000000], text(size: 7pt)[K=274: 1.00468, +1.26], text(size: 7pt)[K=1777: 0.99998, -0.09],
+  text(size: 7pt)[ANOM_20], text(size: 7pt)[1060513], text(size: 7pt)[0.700], text(size: 7pt)[0.686], text(size: 7pt)[0.411], text(size: 7pt)[0.411], text(size: 7pt)[0.411], text(size: 7pt)[1.000], text(size: 7pt)[1.000000], text(size: 7pt)[1.000000], text(size: 7pt)[K=1030: 1.00105, +1.07], text(size: 7pt)[K=10400: 1.00001, +0.24],
+)

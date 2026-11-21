@@ -1,0 +1,106 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "rho.plain"
+      },
+      "name": "rho-plain",
+      "role": "control"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "glv-orbit:size=64,group=negation",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "ic-a2-64",
+      "role": "control"
+    }
+  ],
+  "description": "structure_aware_ic_20261019 PROTOCOL.md B-test: random-curve control, rho.negation and A=2 IC; rho.plain is the positive control",
+  "label": "test, random randB, 20 bits",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 1,
+    "seed": 1,
+    "timeout_seconds": 3600,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 174662,
+        "b": 460083,
+        "group_order": 891377,
+        "gx": 1,
+        "gy": 611161,
+        "kind": "prime_explicit",
+        "p": 892141,
+        "r": 891377
+      },
+      {
+        "a": 894568,
+        "b": 491339,
+        "group_order": 902299,
+        "gx": 1,
+        "gy": 734608,
+        "kind": "prime_explicit",
+        "p": 902137,
+        "r": 902299
+      },
+      {
+        "a": 669150,
+        "b": 532067,
+        "group_order": 800897,
+        "gx": 0,
+        "gy": 234281,
+        "kind": "prime_explicit",
+        "p": 800593,
+        "r": 800897
+      },
+      {
+        "a": 5467,
+        "b": 36703,
+        "group_order": 524287,
+        "gx": 6,
+        "gy": 120122,
+        "kind": "prime_explicit",
+        "p": 525253,
+        "r": 524287
+      },
+      {
+        "a": 993355,
+        "b": 593223,
+        "group_order": 1036579,
+        "gx": 2,
+        "gy": 450322,
+        "kind": "prime_explicit",
+        "p": 1035649,
+        "r": 1036579
+      },
+      {
+        "a": 818618,
+        "b": 455747,
+        "group_order": 871037,
+        "gx": 0,
+        "gy": 275099,
+        "kind": "prime_explicit",
+        "p": 871657,
+        "r": 871037
+      }
+    ],
+    "target_seed": 202,
+    "targets_per_curve": 8
+  }
+}

@@ -154,6 +154,13 @@ xargs -0 -P "$(nproc)" -n 1 bash -c '
     dir="$out.session"
     cp -r "$1" "$dir"
     gzip -dc "$dir/ecbench_records.jsonl.gz" > "$dir/records.jsonl"
+  elif [ -f "$1/plan.json.gz" ] && [ ! -f "$1/plan.json" ]; then
+    # records.jsonl was hydrated from the artifact store (tools/artifacts), so
+    # the first branch did not fire, but plan.json.gz is still the only
+    # committed copy of the plan. Decompress it the same way, in a copy.
+    dir="$out.session"
+    cp -r "$1" "$dir"
+    gzip -dc "$dir/plan.json.gz" > "$dir/plan.json"
   fi
   if ! "$ecbench" verify --dir "$dir" --replay 0 --allow-interrupted --exit-code > "$out.json" 2> "$out.err"; then
     msg=$(echo "$1"; { jq -r ".problems[]" "$out.json" 2> /dev/null || true; cat "$out.err"; } | sed "s/^/    /")

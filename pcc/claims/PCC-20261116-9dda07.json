@@ -1,0 +1,107 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T10:06:02Z",
+ "id": "PCC-20261116-9dda07",
+ "kind": "statement",
+ "producer": {
+  "commit": "d4f4da8bbfdec953f0b60b26aa5acc8173bccc3d",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/direct-elimination-v1/PROTOCOL.md",
+    "sha256": "385dd8b599ee09c6f3fdbb5f844cc477b9085e95af1ed2d86d486547e012f46f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/direct-elimination-v1/QUALIFICATION_SCOPE.md",
+    "sha256": "55621982a0dd11c0568203b36b71baf1cca2f69384c5e2bdaef030cbdba35d5a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/direct-elimination-v1/SOURCES.sha256",
+    "sha256": "bcde6db522709048b6a472293a948f161d00e7eff7098c7ef3ad7554cd23b076"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/direct-elimination-v1/SOURCE_QUALIFICATION.json",
+    "sha256": "e2fe191a49314a70df3292751c66b7779331b3b29dc5d4cc2b46868a1f8c5d58"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/direct-elimination-v1/source-v1-delta.tar.xz",
+    "sha256": "cb9fb832c25824607f2c0a76f5d1cf8ddf7114a0f67097d4df397798f2e53809"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/direct-elimination-v1/native-v1/pre-call.json",
+    "sha256": "517b64c5ccb0e504afb1343dd402c9fb59cc22baa0928860b76f8a9e93bd96f0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/direct-elimination-v1/native-v1/controls.json",
+    "sha256": "05bab8800bd8867cb511bb5d1c9731c02ed8b0d9ed659ead36e459eb7a8d193c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/direct-elimination-v1/native-v1/q1-k2-original-system.json",
+    "sha256": "1890f336c647869e45aa7523878df494415477217a38931e9330e430850471da"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/direct-elimination-v1/development/rust-test-04.log",
+    "sha256": "b5220a20469e5e1761e1f56741e2917700ead031557130d56c112aa2d3f4974c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/direct-elimination-v1/development/clippy-03.log",
+    "sha256": "bdfd9268c4b03d76cd1f302561dc7208dc4f5be524cfa13ba76d7a68c1e372f0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/direct-elimination-v1/development/fmt-final.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/direct-elimination-v1/development/build-final.log",
+    "sha256": "646dc166dae3a7811663695cca47334342cec88181c0c848091eab567110274b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/direct-elimination-v1/development/native-final.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "curve25519-sparse-elimination-v1",
+ "statement": "Fixed producer qualification of a new bounded ordinary sparse Buchberger/partial-root-extraction baseline with dynamic sparse monomials and exact BigUint coefficients. On the declared actual-field q1/k2 arity2 known-answer control, the public-System-only solver returns71 original values satisfying81 equations and independent indexed-row/group replay as positive columns(j1,t0),(j2,t0). That case uses8 branch nodes and zero Buchberger calls; its root comes from linear/quadratic propagation, not an observed Groebner advantage. Eleven fixed polynomial/interface cases,106 unchanged-sqrt comparisons, nine forced resource refusals, malformed/canonicalization and root mutation/truncation controls pass. The1100-variable test has only one constrained variable. A work1 refusal on the immutable1059-variable input is admission-only, not a full solve attempt. Six compiled-in pins/composite49 inputs/archive round-trips match; focused release test/fmt/strict Clippy pass. Counters are partial primitive/reservation data, not normalized complete cold cost, peak RSS or a performance/exponent result. No absence certificate, new general theorem, novel algorithm or signed standing is established."
+}

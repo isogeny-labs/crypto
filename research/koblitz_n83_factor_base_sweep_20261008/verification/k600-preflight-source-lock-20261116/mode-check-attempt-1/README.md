@@ -1,0 +1,3 @@
+# No-work exporter mode-dispatch check
+
+At 2026-11-16 UTC, the already built Linux ARM64 exporter ELF (SHA-256 `44ab0d6927ee3ab5c79afbaf62b6922cb98591c739e5af87a06a445d367a9852`) was run in the frozen source-labelled runtime image with `primary-store-v3-orbit-chain-cold` and deliberately omitted required arguments. The program returned its mode-specific argument usage with exit 1, which [result.txt](result.txt) classifies as `MODE_DISPATCH_REACHED_NO_WORK`. The [stderr](stderr.log.gz), [exit](exit.txt), and UTC endpoints are retained. No factor-base object was read, no circuit was built and no worker output was requested. This check distinguishes the exporter dispatch from the wrong executable in the preceding failed run; the full zero-trial preflight remains pending.

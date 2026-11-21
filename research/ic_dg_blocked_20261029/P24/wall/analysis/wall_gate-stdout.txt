@@ -1,0 +1,49 @@
+WALL_GATE_FACTS (mechanical facts; the executor does not interpret them)
+records.count 1344
+records.by_arm {"dg": {"measured": 288, "measured_verified": 288, "records": 336, "warmup": 48}, "dg-aa": {"measured": 288, "measured_verified": 288, "records": 336, "warmup": 48}, "dgb": {"measured": 288, "measured_verified": 288, "records": 336, "warmup": 48}, "dgb-edge": {"measured": 288, "measured_verified": 288, "records": 336, "warmup": 48}}
+records.measured_verified_by_arm_and_curve {"dg": {"icv1-fp24-t1973-f876d133": 144, "icv1-fp24-tm995-ee6c519b": 144}, "dg-aa": {"icv1-fp24-t1973-f876d133": 144, "icv1-fp24-tm995-ee6c519b": 144}, "dgb": {"icv1-fp24-t1973-f876d133": 144, "icv1-fp24-tm995-ee6c519b": 144}, "dgb-edge": {"icv1-fp24-t1973-f876d133": 144, "icv1-fp24-tm995-ee6c519b": 144}}
+records.isolation_levels {"L1": 2, "L2": 1342}
+gate.executions 1344
+gate.grades [{"count": 2, "level": "L1"}, {"count": 1342, "level": "L2"}]
+gate.accepted false
+gate.below_l2_len 2
+gate.invalid_outcomes_len 0
+FACT_EXECUTIONS_1344=true
+FACT_EACH_OF_4_ARMS_336_RECORDS_288_MEASURED_288_VERIFIED=true
+cond1_facts {"exit_code": 42, "job_exit_pod_uid_equals_prefix": true, "pod_uid_prefix_count": 1, "single_pod": true}
+cond2_facts {"audit_ok": true, "problems_len": 0, "replays_identical_and_reproduced": 1152, "replays_total": 1152, "session_status": "complete"}
+AA {"a_arm": "dg", "b_arm": "dg-aa", "file": "compare-dg__dg-aa-w0.json", "ops_ci95": [1.0, 1.0], "ops_pairs": 288, "ops_ratio_b_over_a_repr": "1.0", "ops_ratio_equals_1_exactly": true, "ops_ratio_formats_as_1.000": true, "ops_status": "ok", "pricing_weight": 0.0, "which": "cond3 dg:dg-aa"}
+AA {"a_arm": "dg", "b_arm": "dg-aa", "file": "compare-dg__dg-aa-w0.1.json", "ops_ci95": [1.0, 1.0], "ops_pairs": 288, "ops_ratio_b_over_a_repr": "1.0", "ops_ratio_equals_1_exactly": true, "ops_ratio_formats_as_1.000": true, "ops_status": "ok", "pricing_weight": 0.1, "which": "cond3 dg:dg-aa"}
+AA {"a_arm": "dg", "b_arm": "dg-aa", "file": "compare-dg__dg-aa-w1.json", "ops_ci95": [1.0, 1.0], "ops_pairs": 288, "ops_ratio_b_over_a_repr": "1.0", "ops_ratio_equals_1_exactly": true, "ops_ratio_formats_as_1.000": true, "ops_status": "ok", "pricing_weight": 1.0, "which": "cond3 dg:dg-aa"}
+AA {"a_arm": "dgb-edge", "b_arm": "dgb", "file": "compare-dgb-edge__dgb-w0.json", "ops_ci95": [1.0, 1.0], "ops_pairs": 288, "ops_ratio_b_over_a_repr": "1.0", "ops_ratio_equals_1_exactly": true, "ops_ratio_formats_as_1.000": true, "ops_status": "ok", "pricing_weight": 0.0, "which": "cond3 dgb-edge:dgb"}
+AA {"a_arm": "dgb-edge", "b_arm": "dgb", "file": "compare-dgb-edge__dgb-w0.1.json", "ops_ci95": [1.0, 1.0], "ops_pairs": 288, "ops_ratio_b_over_a_repr": "1.0", "ops_ratio_equals_1_exactly": true, "ops_ratio_formats_as_1.000": true, "ops_status": "ok", "pricing_weight": 0.1, "which": "cond3 dgb-edge:dgb"}
+AA {"a_arm": "dgb-edge", "b_arm": "dgb", "file": "compare-dgb-edge__dgb-w1.json", "ops_ci95": [1.0, 1.0], "ops_pairs": 288, "ops_ratio_b_over_a_repr": "1.0", "ops_ratio_equals_1_exactly": true, "ops_ratio_formats_as_1.000": true, "ops_status": "ok", "pricing_weight": 1.0, "which": "cond3 dgb-edge:dgb"}
+cond4_facts {"build_info_ecbench_sha256": "88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c", "build_info_ecbench_sha256_equals_want": true, "build_info_source_revision": "be2969cebf30a0cfb79088fd10094324c3efb3bb", "build_info_source_revision_equals_want": true, "input_spec_equals_frozen_spec": true, "input_spec_present": true}
+cond5_facts {"accepted": false, "grades_all_L2_or_L3_and_sum_equals_executions": false, "invalid_outcomes_key_present_and_empty": true, "records_all_L2_or_L3": false}
+cond6_facts {"a_arm": null, "b_arm": null, "control_comparison_present": false, "wall.aa_arms": null, "wall.aa_ci95_is_null": true, "wall.aa_pairs": null, "wall.aa_selection": null, "wall.pairs": null, "wall.pairs_below_level": null, "wall.self_aa": null, "wall.status": null}
+cond7_facts {"wall.aa_arms": ["dg", "dg-aa"], "wall.aa_pairs": 288, "wall.aa_selection": "includes arm A", "wall.corrected_ci95_is_null": false, "wall.pairs": 288, "wall.pairs_below_level": 1, "wall.self_aa": false, "wall.status": "admitted", "wall_block_identical_at_w0.1": true, "wall_block_identical_at_w1": true}
+cond8_facts {"dg__dgb_ops_ratio_b_over_a_repr_by_weight": {"0": "1.0", "0.1": "1.0", "1": "1.0"}, "ops_ratio_equals_1_exactly_at_all_three": true, "records_half_R_COND8_RECORDS": true}
+cond9_facts {"dg-aa__dgb_w0.wall.pairs": 288, "dg-aa__dgb_w0.wall.ratio_b_over_a_repr": "0.9075054282283199", "dg__dgb_w0.wall.corrected_ratio_repr": "0.9074948190706239", "relative_difference_le_1e-9": false, "relative_difference_repr": "1.1690598638218818e-05"}
+a1_wall_facts {"arms": ["dgb", "dgb-edge"], "first_bad_p": [], "first_bad_points": [], "ok": true, "p_limit": 4294967295, "p_max": 12513203, "records_checked": 672, "records_unparsed": 0, "records_with_p_over_limit": 0, "records_with_points_over_limit": 0, "signed_points_limit": 65536, "signed_points_max": 324, "signed_points_source_counts": {"record.signed_points": 672}}
+decision_block_w0 {"aa_ci95": [0.9984310384727686, 1.0024428190490493], "aa_ratio": 1.0004349178395924, "ci95": [0.9054824766136029, 0.9103029314605291], "ci_method": "linearised_t_pairs", "corrected_ci95": [0.9044866448552347, 0.9105129979800146], "corrected_dof": 532.6359397175977, "corrected_ratio": 0.9074948190706239, "median_ratio": 0.9096127875818495, "ns_per_gae_a": 79.33656080883952, "ns_per_gae_b": 72.02883090184311, "outside_noise": true, "ratio_b_over_a": 0.9078895047567753, "total_wall_ratio": 0.9078895047567754}
+decision_resample_seed 20261002
+position_control_edge_dg_vs_dgb-edge_w0 {"aa_arms": ["dg", "dg-aa"], "aa_selection": "includes arm A", "ci95": [0.905681040850429, 0.9106137189688578], "pairs": 288, "ratio_b_over_a": 0.908144030871973, "self_aa": false, "status": "admitted"}
+candidate_middle_over_edge_dgb-edge_vs_dgb_w0 {"aa_arms": null, "aa_selection": null, "ci95": [0.9983619463508341, 1.0010793589544642], "pairs": 288, "ratio_b_over_a": 0.9997197293528943, "self_aa": true, "status": "admitted"}
+W_COND1=false
+W_COND2=true
+W_COND3=true
+W_COND3_ROUNDED3=true
+W_COND4=true
+W_COND5=false
+W_COND6=false
+W_COND7=false
+W_COND8=true
+W_COND8_ROUNDED3=true
+W_COND9=false
+W_A1=true
+W_ALL_1_TO_9=false
+W_ALL_1_TO_9_AND_A1=false
+W_ALL_1_TO_9_AND_A1_ROUNDED3=false
+CORRECTED_CI95_UPPER_LT_1=true
+CORRECTED_CI95_LOWER_GT_1=false
+WALL_GATE_OK

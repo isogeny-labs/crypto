@@ -1,0 +1,16 @@
+{
+  "schema":"experiment.protocol/v1",
+  "id":"KOBLITZ-R80-CANDIDATE-REDUCED-U0",
+  "version":1,
+  "goal":"enumerate reduced quotient dimensions and prime degrees of both rejected-candidate u=0 components",
+  "claims":[{"id":"candidate_reduced80","class":"exact_computation","statement":"two complete candidate fibers have computed radicals and exhaustive prime-degree sums"}],
+  "arms":{"reference":"R79 finite candidate quotient dimensions and R78 source factors","candidate":"complete radicals and minimal-prime degrees for y=0,1","positive":["both input dimensions 16","both source factors vanish","radical reduced dimensions","prime degree sums"],"negative":[],"baseline":{"not_applicable_reason":"exact candidate diagnostic"},"A_A":{"not_applicable_reason":"complete deterministic fibers"}},
+  "variables":{"fixed":["saved R50 candidate bytes","both u=0 components","one thread","1200 seconds each","4 GiB virtual"],"measured":["reduced dimensions","prime counts/degrees","exit/errors/hashes"],"statistical":"not applicable"},
+  "randomization":{"method":"fixed","reason":"both complete components","seeds":[80]},
+  "blinding":{"method":"none","reason":"exact algebra"},
+  "sample_size":{"instances":2,"replicates":1,"warmups":0,"power":"not applicable"},
+  "metrics":["two reduced dimensions","all prime quotient degrees"],
+  "execution":{"launchers":["REPLAY_CAS.sh candidate-v0-80-01 ZERO80.sing CANDIDATE_V0_80_ALL_CHECKS_PASS","REPLAY_CAS.sh candidate-v1-80-01 ONE80.sing CANDIDATE_V1_80_ALL_CHECKS_PASS"],"backend":"authorized local Singular","timeout_seconds_per_program":1200,"virtual_KiB":4194304,"threads":1,"seed":80,"queue":"one math job at a time","source_gate":"frozen Git bytes and donor hashes","checkpoint":"existing checkpoint gate; immutable raw copies"},
+  "stopping":{"accept":"both programs exit0, exact markers, zero native errors and all assertions","failure":"retain raw failure/timeout; freeze repair before new ID"},
+  "analysis":{"method":"exact radical and minimal-prime census on complete finite candidate quotients","scope":"candidate data only; no normality or actual branch certification"}
+}

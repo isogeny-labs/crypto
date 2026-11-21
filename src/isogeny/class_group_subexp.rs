@@ -1873,7 +1873,15 @@ pub fn compute(
         }
         // the Hermite form costs rows × k²: keep one covering relation per
         // column first, then fill up to the target; the rest stays in the pool
-        relations = select_covering(&pool, n, n + params.excess);
+        // A covering subset can still generate a proper sublattice. At the
+        // final existing round, use every relation already paid for rather
+        // than discard the rows which may saturate that sublattice.
+        let relation_target = if round + 1 == max_rounds {
+            pool.len()
+        } else {
+            n + params.excess
+        };
+        relations = select_covering(&pool, n, relation_target);
         let t_sge = std::time::Instant::now();
         let dense = structured_elimination(&relations, n);
         eprintln!(
@@ -2153,6 +2161,22 @@ mod tests {
             let g = fp.form.a.gcd(&fp.form.b).gcd(&fp.form.c);
             assert!(g.is_one());
         }
+    }
+
+    #[test]
+    fn covering_rows_can_miss_a_relation_needed_to_saturate_the_lattice() {
+        let pool = vec![
+            Relation {
+                entries: vec![(0, 2)],
+            },
+            Relation {
+                entries: vec![(0, 3)],
+            },
+        ];
+        let covering = select_covering(&pool, 1, 1);
+        let complete = select_covering(&pool, 1, pool.len());
+        assert_eq!(lattice_index(&covering, 1, &[true]), Some(BigInt::from(2)));
+        assert_eq!(lattice_index(&complete, 1, &[true]), Some(BigInt::one()));
     }
 
     #[test]

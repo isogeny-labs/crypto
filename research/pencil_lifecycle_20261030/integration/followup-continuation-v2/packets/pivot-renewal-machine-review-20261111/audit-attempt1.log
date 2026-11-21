@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "audit.py", line 29, in <module>
+    assert sha(O / "coordinator-release.json") == RELEASE
+AssertionError
+
+The retained outer coordinator copy is canonicalized JSON with SHA-256
+336d1b10ee96615d5efd6ceb97a84296de9d488691eeec22325ca0a7587305e1,
+not a byte-for-byte copy of the bound release. The repository release remains
+present with SHA-256 b3acbb8650a1f370579e067fa89874d6348278a63517adb9cb1ee54aae8eecff;
+the admission receipt binds that digest, and the two JSON values compare equal.

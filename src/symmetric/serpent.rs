@@ -1,6 +1,6 @@
 //! Serpent — 128-bit block cipher with 32 rounds.
 //!
-//! Designed by Anderson, Biham, and Shamir (1998); a finalist in the
+//! Designed by Anderson, Biham, and Knudsen (1998); a finalist in the
 //! AES competition where it placed second to Rijndael, primarily on
 //! performance grounds (Serpent is ~2× slower than AES in software).
 //! It has a substantially larger security margin than AES — 32 rounds
@@ -19,9 +19,11 @@
 //!   where `φ = 0x9e3779b9` (the fractional part of the golden ratio).
 //! - The eight 4-bit S-boxes (S0..S7) are applied bit-sliced: a
 //!   "nibble at position j" is `(bit j of W0, bit j of W1, bit j of W2,
-//!   bit j of W3)`.  The cipher's IP / FP permutations rearrange bits
-//!   so that the 32 nibbles seen by the S-boxes are 32 consecutive
-//!   4-bit groups of the input.
+//!   bit j of W3)`.  This is the bit-sliced form of the cipher, in which
+//!   the specification's initial and final permutations (IP / FP) do not
+//!   appear: they only convert between the "standard" description and the
+//!   bit-sliced one, and applying them around bit-sliced rounds gives a
+//!   different cipher.
 //!
 //! # Side-channel posture
 //!
@@ -35,25 +37,25 @@
 //! The CT scan costs ~16× per S-box call but keeps the access
 //! pattern uniform.
 //!
-//! IP, FP, the linear transform, and the key schedule all operate
+//! The linear transform and the key schedule operate
 //! over the full state with no input-dependent branching.
 //!
+//! # Byte order and test vectors
+//! A block is four little-endian `u32` words, the convention of the
+//! optimised reference code and of most libraries.  The Cambridge
+//! submission's vector files print a block as one 128-bit hexadecimal
+//! number, most significant byte first, so a vector from those files is
+//! the byte-reversed form of this module's block.  The tests check the
+//! `I=0` entries of `ecb_e_m.txt` (10,000 chained encryptions of the zero
+//! block under the zero key) for 128, 192 and 256-bit keys.  Those entries
+//! use an all-zero key, so they do not exercise the byte order of a
+//! non-zero key.
+//!
+//! Until 2026-11-15 this module wrapped the bit-sliced rounds in IP / FP
+//! and so computed a different permutation.  Data encrypted with that
+//! version does not decrypt with this one.
+//!
 //! # Caveats
-//! - **KAT regression — Cambridge `floppy4/ecb_e_m.txt` does NOT
-//!   match.**  We added the `I=0` zero-key/zero-plaintext KATs from
-//!   the original Anderson/Biham/Knudsen submission tarball; all three
-//!   (128 / 192 / 256-bit key) currently fail.  The implementation
-//!   passes self-consistency (round-trip, S-box / permutation
-//!   inverses, avalanche) but the byte-exact output diverges from
-//!   the reference, almost certainly due to a byte/bit-ordering
-//!   convention mismatch (LE word loading vs the reference's MSB-
-//!   first bit numbering) or an IP/FP indexing-direction divergence.
-//!   **This Serpent is therefore NOT interop-compatible** with
-//!   reference implementations and should not be used to encrypt
-//!   data that any other Serpent library will need to decrypt.
-//!   The failing KATs are kept in the suite under `#[ignore]` so
-//!   `cargo test -- --ignored` will surface them; investigation is
-//!   tracked as a follow-up.
 //! - Serpent has no standardised AEAD construction in this crate;
 //!   pair it with an independent MAC (e.g. HMAC-SHA-256) if you
 //!   need authentication.
@@ -95,40 +97,6 @@ const fn compute_inv_sbox() -> [[u8; 16]; 8] {
         s += 1;
     }
     out
-}
-
-/// Initial Permutation (IP).  `IP[i] = j` means input bit `i` lands at
-/// output bit `j`.  Generated from the closed form `IP[i] = (i % 4) * 32
-/// + (i / 4)` — see the spec, but in practice we pre-populate the table
-///   for clarity and to make the inverse easy to read.
-const IP: [u8; 128] = compute_ip();
-
-/// Final Permutation (FP), inverse of `IP`.
-const FP: [u8; 128] = compute_fp();
-
-const fn compute_ip() -> [u8; 128] {
-    let mut t = [0u8; 128];
-    let mut i = 0;
-    while i < 128 {
-        // Bit i of the input lands at bit (i % 4) * 32 + (i / 4) of the
-        // permuted output.  After IP, "bit j of word w" was input bit
-        // 4*j + w — so adjacent-by-4 input bits form a nibble, ready
-        // for the bit-sliced S-box.
-        t[i] = ((i % 4) * 32 + (i / 4)) as u8;
-        i += 1;
-    }
-    t
-}
-
-const fn compute_fp() -> [u8; 128] {
-    let mut t = [0u8; 128];
-    let ip = compute_ip();
-    let mut i = 0;
-    while i < 128 {
-        t[ip[i] as usize] = i as u8;
-        i += 1;
-    }
-    t
 }
 
 // ── Constant-time 4-bit S-box lookup ─────────────────────────────────────────
@@ -176,30 +144,6 @@ fn words_to_block(words: &[u32; 4]) -> [u8; 16] {
     out[8..12].copy_from_slice(&words[2].to_le_bytes());
     out[12..16].copy_from_slice(&words[3].to_le_bytes());
     out
-}
-
-// ── IP / FP ──────────────────────────────────────────────────────────────────
-
-fn apply_perm(perm: &[u8; 128], words: &[u32; 4]) -> [u32; 4] {
-    let mut out = [0u32; 4];
-    // Bit i of input → bit perm[i] of output.  Always 128 iterations,
-    // independent of operand values.
-    for i in 0..128usize {
-        let bit = (words[i / 32] >> (i % 32)) & 1;
-        let p = perm[i] as usize;
-        out[p / 32] |= bit << (p % 32);
-    }
-    out
-}
-
-#[inline]
-fn ip(block: &[u8; 16]) -> [u32; 4] {
-    apply_perm(&IP, &block_to_words(block))
-}
-
-#[inline]
-fn fp(words: [u32; 4]) -> [u8; 16] {
-    words_to_block(&apply_perm(&FP, &words))
 }
 
 // ── S-box (bit-sliced) ───────────────────────────────────────────────────────
@@ -353,7 +297,7 @@ fn xor_round_key(state: &mut [u32; 4], rk: &[u32; 4]) {
 /// Encrypt one 16-byte block under `key`.  Pure block primitive — for
 /// streams of multiple blocks, wrap in a mode (CTR, etc.).
 pub fn serpent_encrypt(key: &SerpentKey, block: &[u8; 16]) -> [u8; 16] {
-    let mut state = ip(block);
+    let mut state = block_to_words(block);
 
     // Rounds 0..30: AddRoundKey → S → LT
     for i in 0..31 {
@@ -366,12 +310,12 @@ pub fn serpent_encrypt(key: &SerpentKey, block: &[u8; 16]) -> [u8; 16] {
     sbox(31, &mut state); // S_{31 mod 8} = S_7
     xor_round_key(&mut state, &key.round_keys[32]);
 
-    fp(state)
+    words_to_block(&state)
 }
 
 /// Decrypt one 16-byte block under `key`.  Inverse of `serpent_encrypt`.
 pub fn serpent_decrypt(key: &SerpentKey, block: &[u8; 16]) -> [u8; 16] {
-    let mut state = ip(block);
+    let mut state = block_to_words(block);
 
     // Reverse the final round.
     xor_round_key(&mut state, &key.round_keys[32]);
@@ -385,7 +329,7 @@ pub fn serpent_decrypt(key: &SerpentKey, block: &[u8; 16]) -> [u8; 16] {
         xor_round_key(&mut state, &key.round_keys[i]);
     }
 
-    fp(state)
+    words_to_block(&state)
 }
 
 #[cfg(test)]
@@ -395,22 +339,6 @@ mod tests {
     fn hex_block(s: &str) -> [u8; 16] {
         let bytes = hex::decode(s).unwrap();
         bytes.try_into().unwrap()
-    }
-
-    #[test]
-    fn ip_fp_are_inverses() {
-        // Several inputs spanning low / high / mixed bits.
-        let cases = [
-            [0u8; 16],
-            [0xffu8; 16],
-            *b"sixteen-bytes!!!",
-            hex_block("0123456789abcdeffedcba9876543210"),
-        ];
-        for input in cases {
-            let after = ip(&input);
-            let back = fp(after);
-            assert_eq!(back, input, "FP(IP(x)) must equal x");
-        }
     }
 
     #[test]
@@ -523,51 +451,46 @@ mod tests {
         assert!(SerpentKey::new(&[]).is_ok()); // padding fills to 256 bits
     }
 
-    /// KAT: Cambridge Serpent submission tarball, `floppy4/ecb_e_m.txt`,
-    /// I=0 case for each key size (zero key, zero plaintext).  These
-    /// vectors are in the original Anderson/Biham/Knudsen "standard"
-    /// byte order.
+    /// Monte Carlo test, Cambridge Serpent submission tarball,
+    /// `floppy4/ecb_e_m.txt`, entry `I=0` for each key size: the zero
+    /// block encrypted 10,000 times in a chain under the zero key.  The
+    /// file prints the block most significant byte first, so the expected
+    /// value is compared with the byte-reversed block (module docs, "Byte
+    /// order and test vectors").
     /// Source: https://www.cl.cam.ac.uk/~rja14/Papers/serpent.tar.gz
-    ///
-    /// **Currently failing** — these tests are kept in the suite (gated
-    /// `#[ignore]`) as a tracked correctness regression.  The
-    /// implementation passes self-consistency (round-trip across many
-    /// keys, S-box / permutation inverse identities, avalanche) but
-    /// does NOT match the Cambridge KAT byte-for-byte.  Most likely
-    /// cause is a byte/bit-ordering convention mismatch between our
-    /// little-endian word loading and the reference's MSB-first bit
-    /// numbering, OR a divergence in IP/FP indexing direction.
-    /// **Do not treat this Serpent as interop-compatible** until these
-    /// tests pass.  Run with `cargo test -- --ignored` to confirm
-    /// status.
-    #[test]
-    #[ignore = "Serpent output diverges from Cambridge floppy4/ecb_e_m.txt; investigation pending"]
-    fn kat_serpent_128_zero() {
-        let key = SerpentKey::new(&[0u8; 16]).unwrap();
-        let ct = serpent_encrypt(&key, &[0u8; 16]);
-        let expect = hex_block("90e7a5ba9497fa1bfc00f7d1a3a86a1e");
-        assert_eq!(ct, expect, "Serpent-128 KAT mismatch");
-        assert_eq!(serpent_decrypt(&key, &ct), [0u8; 16]);
+    fn monte_carlo_zero(key_len: usize, expect_msb_first: &str) {
+        let key = SerpentKey::new(&vec![0u8; key_len]).unwrap();
+        let mut block = [0u8; 16];
+        for _ in 0..10_000 {
+            block = serpent_encrypt(&key, &block);
+        }
+        let mut printed = block;
+        printed.reverse();
+        assert_eq!(
+            printed,
+            hex_block(expect_msb_first),
+            "Serpent-{} Monte Carlo mismatch",
+            key_len * 8
+        );
+        for _ in 0..10_000 {
+            block = serpent_decrypt(&key, &block);
+        }
+        assert_eq!(block, [0u8; 16], "decryption does not undo the chain");
     }
 
     #[test]
-    #[ignore = "Serpent output diverges from Cambridge floppy4/ecb_e_m.txt; investigation pending"]
-    fn kat_serpent_192_zero() {
-        let key = SerpentKey::new(&[0u8; 24]).unwrap();
-        let ct = serpent_encrypt(&key, &[0u8; 16]);
-        let expect = hex_block("2d8af7b79eb7f21fdb394c77c3fb8c3a");
-        assert_eq!(ct, expect, "Serpent-192 KAT mismatch");
-        assert_eq!(serpent_decrypt(&key, &ct), [0u8; 16]);
+    fn monte_carlo_serpent_128_zero() {
+        monte_carlo_zero(16, "90e7a5ba9497fa1bfc00f7d1a3a86a1e");
     }
 
     #[test]
-    #[ignore = "Serpent output diverges from Cambridge floppy4/ecb_e_m.txt; investigation pending"]
-    fn kat_serpent_256_zero() {
-        let key = SerpentKey::new(&[0u8; 32]).unwrap();
-        let ct = serpent_encrypt(&key, &[0u8; 16]);
-        let expect = hex_block("92efa3ca9477794d31f4df7bce23e60a");
-        assert_eq!(ct, expect, "Serpent-256 KAT mismatch");
-        assert_eq!(serpent_decrypt(&key, &ct), [0u8; 16]);
+    fn monte_carlo_serpent_192_zero() {
+        monte_carlo_zero(24, "2d8af7b79eb7f21fdb394c77c3fb8c3a");
+    }
+
+    #[test]
+    fn monte_carlo_serpent_256_zero() {
+        monte_carlo_zero(32, "92efa3ca9477794d31f4df7bce23e60a");
     }
 
     #[test]

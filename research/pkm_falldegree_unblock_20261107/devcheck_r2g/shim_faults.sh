@@ -13,7 +13,8 @@ op=$1
 if [ "$op" = cp ] && [ "$(basename "${3:-}")" = progress.txt ] && [ "${3#s3://}" != "$3" ]; then
   n=$(( $(cat "$CNT" 2>/dev/null || echo 0) + 1 )); echo $n > "$CNT"
   if [ -n "${SNAP_DIR:-}" ]; then
-    d=$FAKE_S3/${3#s3://}; d=${d%/*}; mkdir -p "$SNAP_DIR"
+    k=${3#s3://}; if [[ $k =~ ^([^/]+)/runs/pfd-bu-[0-9]+-[0-9]+/(.*)$ ]]; then k=${BASH_REMATCH[1]}/${BASH_REMATCH[2]}; fi   # as s3shim.sh maps it
+    d=$FAKE_S3/$k; d=${d%/*}; mkdir -p "$SNAP_DIR"
     cp -f "$d/units_done.txt" "$SNAP_DIR/$n.units_done" 2>/dev/null; cp -f "$d/progress.txt" "$SNAP_DIR/$n.progress" 2>/dev/null
     tail -n1 "$2" > "$SNAP_DIR/$n.lastline"
   fi

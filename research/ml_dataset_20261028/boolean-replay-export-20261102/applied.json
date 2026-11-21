@@ -1,0 +1,39 @@
+{
+  "at": "2026-11-02T18:40:34.468023+00:00",
+  "export_patch": "d7565a02eca31387c7ffe03858c08dc4ffd098445642bae8b7e1558a87dbd47b",
+  "export_review": "d400e2b88d3c3e509f577d178f2c0891f7d0c378989605b567546e795fdc7aeb",
+  "all_export_after_hashes_verified_before_test_fix": true,
+  "test_fix": "Two exhaustive checker fixture suffixes gain required final newline; runtime checker and caps unchanged",
+  "corrected_replay_sha256": "209dadf62b9728679afa1b4d7b7af28eeb8ad59f6dba88643b4caa7c673fe155",
+  "prior_failure_receipt": {
+    "argv": [
+      "cargo",
+      "+1.98",
+      "test",
+      "--release",
+      "--lib",
+      "--locked",
+      "--offline",
+      "--",
+      "ml_dataset",
+      "--test-threads=1",
+      "--nocapture"
+    ],
+    "source_base": "25e5a75c36004e50a9f53e3c6a7143baeab43b0e",
+    "source_has_uncommitted_v9_replay_and_cli": true,
+    "started_at": "2026-11-02T18:32:39.803842+00:00",
+    "source_hash_manifest": "source-hashes.json",
+    "finished_at": "2026-11-02T18:39:38.415544+00:00",
+    "exit_code": 101,
+    "source_unchanged": true,
+    "counts": [
+      663,
+      1,
+      2,
+      0,
+      5556
+    ],
+    "nonempty_summary": true,
+    "log_sha256": "ad0fef0c562f3b150cf6cb04dcdb87dc98963123ce2633170e2fcfec483cd933"
+  }
+}

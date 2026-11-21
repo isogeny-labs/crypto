@@ -1,0 +1,100 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T18:00:26Z",
+ "id": "PCC-20261116-82b8d6",
+ "kind": "statement",
+ "producer": {
+  "commit": "292abb6a209601b0ad78be4621da7ad85bcf64b2",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-scalar-distribution-failure-03/Root435/research_chained_jacobian_transfers_20261110_lean_CubicFrobeniusTraceDescent05_lean/build.log",
+    "sha256": "69ec18b5ac780de049eb6363fa6e86d10443b142477013bae643267b436f37db"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-scalar-distribution-failure-03/Root435/research_chained_jacobian_transfers_20261110_lean_CubicFrobeniusTraceDescent05_lean/status",
+    "sha256": "0c6532fbd1cb7b97b6781811241a4e7dcaebf0e3ff758f7054a3038de5d2281f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-scalar-distribution-failure-03/Root435.actual-command.txt",
+    "sha256": "928c87f738f6a7b754a58b2384acc8bbc62376a8feb391bfb79ebfb1ea5b9947"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-scalar-distribution-failure-03/Root435.actual.exit",
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-scalar-distribution-failure-03/Root435.entire-caller.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-scalar-distribution-failure-03/Root435.entire-caller.stdout",
+    "sha256": "afb81cf168b241b622ec7379c38c9454e7d71e6d62aca401dd26fd41c02cd79e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-scalar-distribution-failure-03/Root435.finish",
+    "sha256": "e0ef8e407c32a22bc3907d28d2d3c67371874b6f8b86dfe7082895f5bcc799e8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-scalar-distribution-failure-03/Root435.original-tool-byte-pins.sha256",
+    "sha256": "ce79c443682e9ae9f12adba759c0c31b69937feca4192111b982a313a5ccf6b9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-scalar-distribution-failure-03/Root435.start",
+    "sha256": "7b4394c6fdebda806cb48aaaa43a56f509e4c8a282c750c64249420974eead90"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-scalar-distribution-failure-03/entire-actual-source.lean.txt",
+    "sha256": "07fa536e8b4fb925d88857e6779aff4c193089bc690e430fe027561f1243d13a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-scalar-distribution-failure-03/entire-original-caller.sh.txt",
+    "sha256": "3a9c05b94484d03828d1a3064d707d4921c674692009a11cd5b068d3b8a657bf"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-Frobenius-trace-scalar-distribution-failure-03/entire-source-byte-pins.sha256",
+    "sha256": "59c6985eb0d76ed0fdb455cf54684127f2fc9e2c203ee05f49e78dfffe95a906"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Second original Root cubic trace05 gate fails1 only in trace3_smul: after correct explicit F scalar rewrites, grind does not distribute an abstract variable Int scalar and reports unexpected module-instance terms. Full source/build output retained and dependent sorryAx rejected; Consumer not reached. Prior redundant rewrites and fixed-target eigenline proof now print standard axioms but no full acceptance. Next remedy uses exactly original IntModule.zsmul_add, preserving statement/hypotheses/original gates and all failed attempts; no tactic-limit or mathematical change."
+}

@@ -1,0 +1,48 @@
+[
+  {
+    "output": "main.rs",
+    "source": "feature-native-resultant-panel/main.rs",
+    "source_sha256": "65bb58dbdc72a2133ca4db118e50bd8c945607916162ca995360f57f54f31805",
+    "output_sha256": "410158c17262ce05911a83815c58bb424fdf6103cb475c3c79d4b35a27dd4728",
+    "edits": [
+      {
+        "old": "mod panel;",
+        "new": "#[path=\"../feature-native-resultant-panel/panel.rs\"]mod panel;\ninclude!(\"journal.rs\");"
+      },
+      {
+        "old": "panel::self_test();meter::self_test();",
+        "new": "panel::self_test();meter::self_test();journal_self_test();"
+      },
+      {
+        "old": "let mut out=std::fs::OpenOptions::new().write(true).create_new(true).open(output).unwrap();",
+        "new": "let mut out=std::fs::OpenOptions::new().write(true).create_new(true).open(output).unwrap();\n let mut events=std::fs::OpenOptions::new().write(true).create_new(true).open(format!(\"{}.events\",output)).unwrap();"
+      },
+      {
+        "old": "let arm=ARMS[(offset+c.id)%5];let(v,s)=evaluate",
+        "new": "let arm=ARMS[(offset+c.id)%5];journal_event(&mut events,c.id*5+offset,\"start\",protocol,input_hash);let(v,s)=evaluate"
+      },
+      {
+        "old": "out.flush().unwrap();",
+        "new": "out.flush().unwrap();out.sync_all().unwrap();journal_event(&mut events,c.id*5+offset,\"complete\",protocol,input_hash);"
+      }
+    ],
+    "reverse_exact": true
+  },
+  {
+    "output": "capture.py",
+    "source": "feature-native-resultant-protocol/capture.py",
+    "source_sha256": "13eb1f89251a0b9ac7a5b99b4674978be66f8306c23a5a11f8bfd99e016a2f06",
+    "output_sha256": "d74f4ceaf0474a43b72aa36b4a52cc46d87dad1990459700d5c0a76da97d0e78",
+    "edits": [
+      {
+        "old": "from common import protocol,bindings,sha,require,canonical,analyzer",
+        "new": "import sys\nsys.path.insert(0,str(Path(__file__).resolve().parent.parent/\"feature-native-resultant-protocol\"))\nfrom common import protocol,bindings,sha,require,canonical,analyzer"
+      },
+      {
+        "old": "'attempts':1,'host':host_facts()",
+        "new": "'attempts':1,'events_sha256':sha(Path(str(rows)+'.events'))if Path(str(rows)+'.events').exists()else None,'host':host_facts()"
+      }
+    ],
+    "reverse_exact": true
+  }
+]

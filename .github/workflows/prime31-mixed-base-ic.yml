@@ -1,0 +1,91 @@
+name: Prime31 mixed-base complete 4+4 IC (Rust pinned source)
+
+on:
+  push:
+    branches: [research/prime31-mixed-base-ic-20261117]
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_mixed_base_ic.rs
+      - research/prime31_ic_20261115/mixed_base/**
+      - .github/workflows/prime31-mixed-base-ic.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_mixed_base_ic.rs
+      - research/prime31_ic_20261115/mixed_base/**
+      - .github/workflows/prime31-mixed-base-ic.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mixed-base-complete-ic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    env:
+      RAYON_NUM_THREADS: "1"
+      CARGO_BUILD_JOBS: "2"
+    steps:
+      - name: Check out research source and frozen protocol
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check out immutable existing native Rust arithmetic (merged APS)
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: aps-pinned
+          persist-credentials: false
+      - name: Install Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only new research example
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f aps-pinned/research/prime31_ic_20261115/native/Cargo.lock
+          test -f research/prime31_ic_20261115/mixed_base/MIXED_4P4_IC_PROTOCOL_20261117.md
+          cp research/prime31_ic_20261115/native/examples/prime31_mixed_base_ic.rs aps-pinned/research/prime31_ic_20261115/native/examples/
+          sha256sum research/prime31_ic_20261115/native/examples/prime31_mixed_base_ic.rs > prime31-mixed-source.sha256
+          git -C aps-pinned rev-parse HEAD >> prime31-mixed-source.sha256
+      - name: Native Rust library and new algorithmic controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 test --locked --release --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          cargo +1.100.0 test --locked --release --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_mixed_base_ic
+      - name: Execute prospective two-target fully cold original-curve panel
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release --manifest-path aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_mixed_base_ic > prime31-mixed-base-ic.json
+      - name: Reject incomplete recovery and malformed cross-base rank
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -e '
+            .schema == "prime31.mixed_base_4p4_complete_ic.v1" and
+            .curve.p == 2147483647 and .curve.n == 2147446831 and
+            .targets == 2 and .completed_unknown_target_logs == 2 and
+            (.panels | length == 2 and all(.[];
+              .caller_comparison == true and
+              .solver.status == "complete" and
+              .solver.distinct_basis_points == 61 and
+              .solver.overlap_deduplicated == 1 and
+              .solver.required_rank == 62 and
+              .solver.final_rank == 62 and
+              .solver.factor_base_logs_independently_replayed == 61 and
+              .solver.first_distinct_nets == 618885 and
+              .solver.dickson_distinct_nets == 618885 and
+              (.solver.attempt_count <= 160) and
+              (.solver.attempts | all(.[]; .independent == true or .independent == false or .no_mixed_half_sum == true))
+            ))
+          ' prime31-mixed-base-ic.json
+      - name: Retain every raw relation and failure, including capped runs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-mixed-base-complete-ic-producer
+          path: |
+            prime31-mixed-source.sha256
+            prime31-mixed-base-ic.json
+          if-no-files-found: warn
+          retention-days: 30

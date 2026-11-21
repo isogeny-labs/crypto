@@ -1,0 +1,50 @@
+{
+  "schema": "aps.failed-development-boundaries/v1",
+  "standing": "unverified producer observations",
+  "observations": [
+    {
+      "id": "nov6-final-unit/build",
+      "source_commit": "88eeedb39b4ef3d045bd53facbe65cab850b9470",
+      "source_tree": "fdc9a9f1c08994dd5b0a72c0e297dccb1ab55824",
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --lib --no-run --message-format=json-render-diagnostics",
+      "exit": 101,
+      "private_log_sha256": "6f78a07dda7befcb90b521c84a2235293725e5d74626384ed2bdc49594d2da1a",
+      "test_verdict": null,
+      "note": "Compiler SIGKILL during concurrent root validation; no test verdict. Superseded by serialized build."
+    },
+    {
+      "id": "nov6-final-public/leads",
+      "source_commit": "88eeedb39b4ef3d045bd53facbe65cab850b9470",
+      "source_tree": "fdc9a9f1c08994dd5b0a72c0e297dccb1ab55824",
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --test aps_cost_leads -- --test-threads=2",
+      "exit": 130,
+      "private_log_sha256": "45e80683279e59cf7dfb5f42588cbadd480dd5c06fabc99e61e1bb85277cc82d",
+      "test_verdict": null,
+      "note": "Author interrupted own public compile to serialize large root builds; no test verdict."
+    },
+    {
+      "id": "nov6-root-clippy-198-1",
+      "source_tree_fully_pinned": false,
+      "exit": 101,
+      "private_log_sha256": "c7e1a6f839c73e8a35c59d927917c7e7213d3917a0ca68b1235dd2409274f1f1",
+      "note": "New chart triggered manual_is_multiple_of; corrected with the native method. Later strict lint on62 passed."
+    },
+    {
+      "id": "nov6-touched-artifact-wiring",
+      "source_tree_fully_pinned": false,
+      "exit": 124,
+      "private_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "note": "Native workflow-wiring lookup exceeded its120s local metadata budget; no complete wiring verdict. No workflow/assertion/timeout was changed."
+    },
+    {
+      "id": "nov6-benchrec-check",
+      "source_tree_fully_pinned": false,
+      "exit": 1,
+      "private_log_sha256": "b8a118077bc5c0a46cfa2ce60fc54f82b0e4073afedabfe20cc5535fca3ebe61",
+      "note": "Whole repository progress check sees zero records in this minimal checkout and reports stale progress. The task adds no benchmark result or canonical progress row; those files are unchanged."
+    }
+  ],
+  "raw_logs_published": false,
+  "benchmark_launched": false,
+  "assertions_weakened": false
+}

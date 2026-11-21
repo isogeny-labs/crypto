@@ -1,0 +1,33 @@
+{
+  "_what": "End to end on a degree-21 random binary curve (instances of research/m4gb_e2e_ic_ladder_20261110): the pair-table reference row and the symbolic descent solved by inherited-f4 (next kernels folded in), inherited-f4-legacy (the kernels before the fold) and fes-then-inherited (fes-f2 up to 14 unknowns, inherited-f4 above). Read S, s_over_rho against the matched counted rho, verified, and the solver's priced_by.",
+  "instance": {
+    "regime": "char2",
+    "degree": 21,
+    "max_cofactor": 8
+  },
+  "repeats": 3,
+  "seed": 20261110,
+  "configurations": [
+    {
+      "factor_base": "binary-subspace:dimension=11",
+      "oracle": "mitm:m=2",
+      "targets": "walk"
+    }
+  ],
+  "matrix": {
+    "factor_base": [
+      "binary-subspace:dimension=11"
+    ],
+    "oracle": [
+      "descent-algebraic:m=2"
+    ],
+    "solver": [
+      "inherited-f4",
+      "inherited-f4-legacy",
+      "fes-then-inherited"
+    ],
+    "targets": [
+      "walk"
+    ]
+  }
+}

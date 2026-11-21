@@ -1,0 +1,72 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "signed-Frobenius rho v4 (two-rung jumps) against v3, Koblitz 2^15.4..2^32.1",
+  "description": "Does rho.signed_frobenius_v4 (v3 with two-rung jumps) lower rho.signed_frobenius_v3? Incumbent v3 with an A/A control on the six Koblitz curves of the v3 session, 48 planted targets each. Counted GAE; local L0 host.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 29
+      },
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 17
+      },
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 19
+      },
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 23
+      },
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 37
+      },
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 43
+      }
+    ],
+    "targets_per_curve": 48,
+    "target_seed": 20261113
+  },
+  "arms": [
+    {
+      "name": "incumbent",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_v3"
+      }
+    },
+    {
+      "name": "candidate",
+      "role": "candidate",
+      "method": {
+        "id": "rho.signed_frobenius_v4"
+      }
+    },
+    {
+      "name": "incumbent-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_v3"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261113,
+    "isolation_required": "L0",
+    "timeout_seconds": 600
+  }
+}

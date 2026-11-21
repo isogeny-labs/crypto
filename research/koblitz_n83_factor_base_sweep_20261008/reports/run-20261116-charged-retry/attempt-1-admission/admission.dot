@@ -1,0 +1,11 @@
+digraph admission_timeout {
+  graph [rankdir=LR, bgcolor="white", pad="0.15", nodesep="0.25", ranksep="0.42"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, color="#456b8b", fillcolor="#ecf4fb", penwidth=1.3];
+  edge [color="#8b98a8", penwidth=1.2];
+  source [label="Committed source\ne906c79d8a78"];
+  container [label="No-work admission\ncontainer started"];
+  cap [label="120 s soft cap\nexit 124", color="#a56e33", fillcolor="#fff1df"];
+  stop [label="Operator stop\ncontainer absent", color="#a56e33", fillcolor="#fff1df"];
+  build [label="Build output absent\nno stage", color="#398c62", fillcolor="#eaf7ef"];
+  source -> container -> cap -> stop -> build;
+}

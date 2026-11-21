@@ -1,0 +1,115 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h08a8b0da9bbd7a55",
+  "statement": {
+    "name": "Projected scalar recovery residual over every commutative ring",
+    "source": "PROJECTED_QUERY_LAW_IMPLEMENTATION_20261026.md; exact theorem ICProjectedRecovery.scalar_recovery_residual in proofs/ProjectedRecoveryIdentity.lean. Vanishing additionally requires hInv*h=1. This is not a curve-order, direct-sum, uniformity, relation-oracle or cost certificate.",
+    "variables": [
+      "h",
+      "hInv",
+      "d",
+      "k"
+    ],
+    "degree_bound": 3,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "hInv"
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "h"
+                },
+                {
+                  "op": "add",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "d"
+                    },
+                    {
+                      "op": "var",
+                      "args": "k"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "var",
+            "args": "k"
+          }
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "var",
+            "args": "d"
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "hInv"
+                },
+                {
+                  "op": "var",
+                  "args": "h"
+                }
+              ]
+            },
+            {
+              "op": "const",
+              "args": -1
+            }
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "var",
+              "args": "d"
+            },
+            {
+              "op": "var",
+              "args": "k"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 202610260102,
+  "value_digest": "251a5740625701bfdfd63a00b2da08fde055854357254f520f87f298c6a9a463",
+  "independence": "Native issuer and separate checker invocation with256extra domain-separated points; faithful Lean commutative-ring identity built and axiom-audited separately. All polynomial coefficients have magnitude1. Fixed v1 modulus alone is not a general integer proof or finite-group certificate.",
+  "proof": {
+    "kind": "lean4-v4.34.1",
+    "path": "research/ic_algebraic_crossover_20261023/proofs/ProjectedRecoveryIdentity.lean",
+    "sha256": "a156a3b75d7e6103888a3d7c3ea0d7e7d467582d0befca1592721db7b3f05ca8"
+  }
+}

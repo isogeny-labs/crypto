@@ -1,0 +1,33 @@
+{
+  "schema": "pencil.qualification-test-list/v1",
+  "tests": [
+    "cryptanalysis::ecbench::three_leads::pencil::managed_stream_parity::direct_managed_four_modes_preserve_order_and_counters",
+    "cryptanalysis::ecbench::three_leads::pencil::managed_stream_parity::actual_adapter_native_and_managed_routes_preserve_order_and_counters",
+    "cryptanalysis::ecbench::three_leads::pencil::managed_stream_parity::actual_progress_io_failure_is_nonfatal_and_online_closes",
+    "cryptanalysis::ecbench::three_leads::pencil::managed_stream_parity::trace_io_record_byte_limits_fail_and_online_guard_closes"
+  ],
+  "cargo_arguments": [
+    "test",
+    "--release",
+    "--locked",
+    "--offline",
+    "--lib",
+    "EXACT_TEST_NAME",
+    "--",
+    "--exact",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "existing_exporter_controls": 11,
+  "existing_controls_unchanged": true,
+  "prospective_enclosing_limits": {
+    "build_seconds": 1800,
+    "post_build_seconds": 600,
+    "cpu": 2,
+    "memory_gib": 16,
+    "deadline": "2026-11-11T12:00:00Z",
+    "attempts": 1,
+    "concurrency": 1
+  },
+  "admission": "Root must bind current source image, publication, review, ledger, lease, runtime and fresh identities. No execution by this packet alone."
+}

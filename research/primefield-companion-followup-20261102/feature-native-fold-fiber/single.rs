@@ -1,0 +1,71 @@
+impl Fold{
+ /// Lift an authenticated image and intersect with retained observations. No source access.
+ /// Caller binds the image and observations to the same unknown scalar.
+ pub fn lift(&self,center:u64,image:u64,history:&[(u64,i8)],max_records:usize)->Result<RootSet,Error>{
+  if history.len()>max_records{return Err(Error::Limit)}
+  if center>=self.r||image>=self.r||image!=0&&pow(image,self.d as u64,self.r)!=1{return Err(Error::Domain)}
+  if history.iter().any(|&(a,s)|a>=self.r||!(-1..=1).contains(&s)){return Err(Error::Domain)}
+  let mut poly=polynomial::Poly::new(self.r).map_err(|_|Error::Domain)?;
+  // The zero image is one distinct root, not the repeated polynomial (X+c)^m.
+  let coefficients=if image==0{vec![center,1]}else{self.fiber(center,image,&mut poly)};
+  let mut state=RootSet{r:self.r,coefficients,poly};
+  for &(offset,sign)in history{state.observe(offset,sign)?;}
+  Ok(state)
+ }
+}
+#[derive(Default,Debug)]pub struct FiberStats{pub outer:Counts,pub retained:usize,pub replayed:usize,pub extra_queries:usize,pub lifted_degree:usize}
+#[derive(Debug)]pub enum FiberOutcome{Recovered{value:u64,route:&'static str,stats:FiberStats},Unresolved{phase:&'static str,degree:usize,stats:FiberStats}}
+pub struct SingleRecovery{inner:PublicRecovery,max_records:usize,extra_offsets:Vec<u64>}
+impl SingleRecovery{
+ /// Uses the first configured center; the second center is not queried.
+ /// Extra offsets are caller-supplied, capped and canonical, with no random-generation claim.
+ pub fn new(inner:PublicRecovery,max_records:usize,extra_offsets:&[u64])->Result<Self,Error>{
+  if max_records==0||extra_offsets.len()>inner.max_calls{return Err(Error::Limit)}
+  if extra_offsets.iter().any(|&a|a>=inner.fold.r){return Err(Error::Domain)}
+  Ok(Self{inner,max_records,extra_offsets:extra_offsets.to_vec()})
+ }
+ fn finish(&self,value:u64,target:Option<[u64;2]>,route:&'static str,mut stats:FiberStats)->Result<FiberOutcome,Error>{
+  if PublicRecovery::pair(self.inner.multiple(value,&mut stats.outer))!=target{return Err(Error::Verification)}
+  Ok(FiberOutcome::Recovered{value,route,stats})
+ }
+ fn shifted(&self,point:Option<group::Point>,offset:u64,stats:&mut FiberStats)->Result<i8,Error>{
+  stats.outer.shift_scalar_muls+=1;let shift=self.inner.multiple(offset,&mut stats.outer);let t=self.inner.curve.plus(point,shift);stats.outer.group_additions+=1;
+  self.inner.query(PublicRecovery::pair(t),&mut stats.outer)
+ }
+ fn refine_fiber(&self,target:Option<[u64;2]>,point:Option<group::Point>,mut fiber:RootSet,mut stats:FiberStats)->Result<FiberOutcome,Error>{
+    if let Some(k)=fiber.moments().singleton{return self.finish(k,target,"retained-signs",stats)}
+    if fiber.moments().count==0{return Err(Error::Verification)}
+    for &offset in &self.extra_offsets{
+     if stats.outer.source_calls>=self.inner.max_calls{break}
+     let sign=self.shifted(point,offset,&mut stats)?;stats.extra_queries+=1;
+     if sign==0{return self.finish((self.inner.fold.r-offset)%self.inner.fold.r,target,"extra-zero",stats)}
+     fiber.observe(offset,sign)?;
+     if let Some(k)=fiber.moments().singleton{return self.finish(k,target,"extra-sign",stats)}
+     if fiber.moments().count==0{return Err(Error::Verification)}
+    }
+    return Ok(FiberOutcome::Unresolved{phase:"fiber",degree:fiber.coefficients.len()-1,stats});
+ }
+ pub fn recover(&self,target:Option<[u64;2]>)->Result<FiberOutcome,Error>{
+  let mut stats=FiberStats::default();let s=self.inner.query(target,&mut stats.outer)?;
+  if s==0{return self.finish(0,target,"identity",stats)}
+  let mut history=vec![(0,s)];stats.retained=1;
+  let point=target.map(|[x,y]|group::Point{x,y});let center=self.inner.centers[0];let mut image=self.inner.fold.initial()?;
+  for b in 1..=self.inner.max_rounds{
+   let mut product=1;for offset in self.inner.fold.offsets(center,b as u64)?{
+    if history.len()>=self.max_records||stats.outer.source_calls>=self.inner.max_calls{return Ok(FiberOutcome::Unresolved{phase:"image",degree:image.coefficients.len()-1,stats})}
+    let sign=self.shifted(point,offset,&mut stats)?;history.push((offset,sign));stats.retained=history.len();
+    if sign==0{return self.finish((self.inner.fold.r-offset)%self.inner.fold.r,target,"zero-source",stats)}product*=sign;
+   }
+   self.inner.fold.observe(&mut image,b as u64,product)?;stats.outer.folded_updates+=1;
+   if image.moments().count==0{return Err(Error::Verification)}
+   if let Some(z)=image.moments().singleton{
+    stats.lifted_degree=if z==0{1}else{self.inner.fold.m};
+    let fiber=self.inner.fold.lift(center,z,&history,self.max_records)?;stats.replayed=history.len();
+    // Release the image and transcript before any extra source query.
+    drop(image);drop(history);
+    return self.refine_fiber(target,point,fiber,stats);
+   }
+  }
+  Ok(FiberOutcome::Unresolved{phase:"image",degree:image.coefficients.len()-1,stats})
+ }
+}

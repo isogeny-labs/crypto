@@ -1,0 +1,42 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-022",
+  "title": "Replace `native_decide` by a kernel proof",
+  "class": "lean",
+  "difficulty": 2,
+  "source": [
+    "tools/lean/trusted-native.txt",
+    "tools/lean/proof-gate.sh",
+    "AGENTS.md 'Mathematical results should include Lean proofs'",
+    "research/factor_base_designs_20261015/lean/FactorBaseDesigns/NumberFacts.lean"
+  ],
+  "prompt": "A Lean 4 toolchain is available; the gate is `tools/lean/proof-gate.sh`. Follow the repository's Lean rules (AGENTS.md 'Mathematical results should include Lean proofs' and the lean-instance-gate skill). `benchmarks/agent-autonomy/fixtures/T-022/Facts.lean` proves three arithmetic facts with `native_decide`, which the gate does not accept unless a study records a trust decision. Replace the tactic by kernel-checked proofs, without adding anything to `tools/lean/trusted-native.txt`.",
+  "setup": "Harness writes benchmarks/agent-autonomy/fixtures/T-022/Facts.lean with `theorem f1 : 17 * 241 = 4096 + 1 := by native_decide`, `theorem f2 : (2 ^ 100) % 101 = 1 := by native_decide` and `theorem f3 : ∀ x : Fin 331, (2 * x.val) % 331 = 0 → x.val = 0 := by native_decide`, and commits it.",
+  "acceptance": [
+    "tools/lean/proof-gate.sh on the file exits 0 and reports no TRUST",
+    "no `native_decide` in the file",
+    "tools/lean/trusted-native.txt is unchanged",
+    "theorems f1, f2, f3 keep their statements"
+  ],
+  "check_command": "tools/lean/proof-gate.sh benchmarks/agent-autonomy/fixtures/T-022/Facts.lean && ! grep -q native_decide benchmarks/agent-autonomy/fixtures/T-022/Facts.lean && git diff --quiet \"$T_BASE\" HEAD -- tools/lean/trusted-native.txt && grep -q 'theorem f1' benchmarks/agent-autonomy/fixtures/T-022/Facts.lean && grep -q 'theorem f3' benchmarks/agent-autonomy/fixtures/T-022/Facts.lean",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "adding `sorry`, `axiom`, `native_decide` or a new trusted-native entry",
+    "changing a theorem statement to make its proof easier",
+    "raising maxHeartbeats or maxRecDepth",
+    "adding an entry to tools/lean/trusted-native.txt"
+  ],
+  "max_wall_minutes": 25,
+  "status": "DRAFT",
+  "grounding": "medium",
+  "requires": [
+    "lean",
+    "lake"
+  ],
+  "check_exit_before_fix": "nonzero",
+  "notes": ""
+}

@@ -1,0 +1,11 @@
+digraph normroute {
+ graph[rankdir=TB,bgcolor="white",pad="0.2"];
+ node[shape=box,style="rounded,filled",fillcolor="#edf4fb",fontname="Helvetica",fontsize=12];
+ A[label="Prime-field ECDLP target Q\nGenerate O(n) labelled points online; all costs charged"];
+ B[label="Signed point relation\nWritten principal-divisor / prescribed-norm equivalence"];
+ C[label="Structured linear coefficient equations\nPLUS nonzero rank-one constraint"];
+ L[label="Drop rank one: linear shortcut FAILS\nF17 curve y^2=x^3+2x+2; 19 points\nU=11, V=9: norm residual2X^2",fillcolor="#f9dddd"];
+ R[label="Retain rank one: witness search unresolved\nRequired bit cost2^{o(n)}, not established",fillcolor="#fff1d6"];
+ E[label="No novel sub-exponential algorithm obtained\nFormal result is the exact shortcut counterexample",fillcolor="#fff1d6"];
+ A->B;B->C;C->L;C->R;L->E;R->E;
+}

@@ -1,0 +1,75 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Prime-field algebraic track, first counted row, m=3 chain cell on fp16 (gated on the README preflight)",
+  "description": "research/prime_ic_leads_20261110/algebraic_row_spec/README.md section 9. Run only if the preflight bound holds. Same seeds and target law as spec.json, so its fp16 targets 0-3 are spec.json's.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_roster",
+        "bits": 16
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 1504454584,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "inc-m3-n64",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=64",
+          "oracle": "mitm:m=3,negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "iso-t4-m3-chain",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=4",
+          "oracle": "pkm-semaev:m=3,mode=chain",
+          "max_trials": "400000"
+        }
+      }
+    },
+    {
+      "name": "iso-t4-m3-chain-grid",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=4",
+          "oracle": "pkm-semaev:m=3,mode=chain,engine=exhaustive",
+          "max_trials": "400000"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 976050496,
+    "isolation_required": "L0",
+    "timeout_seconds": 1800
+  }
+}

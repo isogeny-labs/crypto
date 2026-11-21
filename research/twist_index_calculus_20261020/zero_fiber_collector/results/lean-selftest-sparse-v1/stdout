@@ -1,0 +1,10 @@
+WRONG expected pass matching /^PASS +2 thm +0 trusted/, got fail: Good.lean
+/home/ec2-user/scratch/twist-lean-selftest-sparse-v1/tools/lean/selftest/../proof-gate.sh: line 69: 4006315 Aborted                 (core dumped) ! ( cd "$(dirname "$root/$t")" && lean -o "$dir/$mod.olean" "$root/$t" ) > "$log/build.log" 2>&1
+FAIL_build                0 thm   0 trusted  tools/lean/selftest/pass/Good.lean
+WRONG expected pass matching /^PASS +1 thm +1 trusted/, got fail: Trusted.lean
+/home/ec2-user/scratch/twist-lean-selftest-sparse-v1/tools/lean/selftest/../proof-gate.sh: line 69: 4008002 Aborted                 (core dumped) ! ( cd "$(dirname "$root/$t")" && lean -o "$dir/$mod.olean" "$root/$t" ) > "$log/build.log" 2>&1
+FAIL_build                0 thm   0 trusted  tools/lean/selftest/pass/Trusted.lean
+WRONG expected fail matching /FAIL +uses_it +non-standard axioms: \[research_claim\]/, got fail: Axiom.lean
+/home/ec2-user/scratch/twist-lean-selftest-sparse-v1/tools/lean/selftest/../proof-gate.sh: line 69: 4011525 Aborted                 (core dumped) ! ( cd "$(dirname "$root/$t")" && lean -o "$dir/$mod.olean" "$root/$t" ) > "$log/build.log" 2>&1
+FAIL_build                0 thm   0 trusted  tools/lean/selftest/fail/Axiom.lean
+ok    fail  FAIL_build                0 thm   0 trusted  tools/lean/selftest/fail/BuildError.lean

@@ -1,0 +1,9 @@
+# Executed actual F61 pairing-image cubic membership
+
+Source checkpoint7b887bff7 before23:18:11–23:18:17UTC data. ONE first geometric size3 source policy, ALL31 actual original source points,4signed branches, caps0..8 =1116branch rungs. Independent C++/Rust field/group/Miller/polynomial/expanded-witness/point-row reconstruction agrees:408 certified,708 explicit unknown,168 ordered row records across repeated caps; maximum actual constructed FINITE-FIELD-input expanded witness degree6. Matrix degree null. No full policy frontier or unique-challenge count. [pcc:unverified]
+
+Cubic F=product(X-a_i), H=product(z-b_j X); bounded Euclidean Bezout witness and exact divisibility before public-base root extraction. Both input and intermediate expanded witness products denied BEFORE construction above cap. Original E point sums independently check every admitted ordered row; exhaustive point-pair reference never feeds candidate stopping. Pairing inputs are actual Q points, not scalar labels. Fresh fullA/A equality; all8 changed controls reject101/no receipt. All22 build/data/control stages complete, no native failed stage; compiler unused-helper warnings retained. [pcc:unverified]
+
+This establishes an executable finite-field certificate path, NOT a lower relevant solving-degree or speed gain. Degree3 inputs still reach actual expanded witness degree6. Curve S3 pullback degree, pairing/setup cost, cold public-log algebraic source recovery and strongest source frontier remain unmeasured here. Separate pairing component recovered all31 original scalars generically, not via this partial algebraic solver. [pcc:unverified]
+
+All61 raw files retained locally;10120byte archive SHA256d5aa355002b9cefec10f219d9142e3df1003d70eb16c64c0322e44b5d21be3ca actually restores/hash-checks/repacks. Local editable report/graph and plot-data use native receipt counts. No raw asset upload, paid resource, Lean/IDC/signed PCC/registry/benchmark change. [pcc:unverified]

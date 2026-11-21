@@ -1,0 +1,17 @@
+digraph direct_index {
+  graph [rankdir=LR, bgcolor="#f8fafc", pad="0.22", nodesep="0.3", ranksep="0.42", fontname="Helvetica"];
+  node [shape=box, style="rounded,filled", fillcolor="#e0e7ff", color="#4338ca", fontname="Helvetica", fontsize=12, margin="0.13,0.08"];
+  edge [color="#475569", fontname="Helvetica", fontsize=10];
+  pair [label="Fixed binary factor base\nordered signed pairs", fillcolor="#e2e8f0", color="#475569"];
+  hash [label="Existing batch builder\nfirst witness per x + 1"];
+  collisions [label="Retained collisions\nchecked rows + torsion seed", fillcolor="#ccfbf1", color="#0f766e"];
+  dense [label="Opt-in direct array\n8 × (2^n + 1) bytes", fillcolor="#fed7aa", color="#c2410c"];
+  scan [label="Unchanged target scan\nlookup, re-add, sign check"];
+  answer [label="Verified [d]G = Q", fillcolor="#ccfbf1", color="#0f766e"];
+  pair -> hash;
+  hash -> collisions [label="same stream"];
+  hash -> dense [label="convert after build"];
+  dense -> scan [label="array lookup"];
+  collisions -> answer [label="seed rank"];
+  scan -> answer;
+}

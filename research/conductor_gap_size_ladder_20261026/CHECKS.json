@@ -1,0 +1,74 @@
+{
+  "schema": "conductor-gap.size-design-checks/v1",
+  "scope": "Parameter feasibility, certificates and design; no new solver measurements or curve models",
+  "base_head": "a7038c5b8ee882e4165276a2b41f11016474c698",
+  "search_v1_commit": "ee0f5489b8a946ccb6ea870c56b7fea6e8300993",
+  "search_v2_commit": "834cc5015d221c9bac774bd9eb278db624db4d85",
+  "parameter_verification": {
+    "status": "pass",
+    "native_classes": 128,
+    "upper_classes": 6,
+    "cells": 22,
+    "receipt": "results-v2/verification.json",
+    "independence": "Separate native implementation on this host; exact-head CI replay still pending"
+  },
+  "negative_controls": {
+    "wrong_known_factor": "rejected",
+    "duplicate_class": "rejected",
+    "truncated_cohort": "rejected",
+    "reversed_row_order": "same verifier receipt",
+    "retained_v1_prefix": "byte-identical",
+    "log": "checks/native-validation-summary.log"
+  },
+  "identity_example": {
+    "tests_passed": 2,
+    "tests_failed": 0,
+    "id": "IDC1h4e934fe294c7d1ba",
+    "certificate_points": 32,
+    "extra_checker_points": 64,
+    "log": "checks/identity-tests.log",
+    "lean": "lean/lake unavailable; no checked formal proof claimed"
+  },
+  "rust_library": {
+    "command": "cargo test --release --lib --offline",
+    "passed": 4494,
+    "failed": 0,
+    "ignored": 119,
+    "log": "checks/rust-lib.log"
+  },
+  "site_tests": {
+    "passed": 49,
+    "failed": 0,
+    "log": "checks/site-tests.log",
+    "initial_import_error_retained": "checks/site-tests-attempt1.log"
+  },
+  "validation_gate": {
+    "unhydrated_parent_snapshot": "fail: two existing rows reference 15 absent raw inputs after parent artifact migration",
+    "unhydrated_log": "checks/gate-check.log",
+    "local_hydrated": "pass",
+    "hydrated_tests_passed": 49,
+    "hydrated_tests_failed": 0,
+    "referenced_digests_checked": 53,
+    "missing_files_restored": 15,
+    "source_commit": "02fcefddfd3953e4cd45909baa7ec4e70560e80b",
+    "hydrated_log": "checks/gate-check-hydrated.log",
+    "context": "VALIDATION_CONTEXT.md"
+  },
+  "backlog_card": {
+    "id": "XP-20261026-conductor-gap-size-confirmation",
+    "validation": "pass",
+    "state": "blocked; no driver, lease, paid resource or solver execution",
+    "log": "checks/backlog-validation.log"
+  },
+  "conductor": {
+    "available": false,
+    "shared_lease_claimed": false,
+    "log": "checks/conductor.log"
+  },
+  "pdf": "PDF_INSPECTION.json",
+  "artifact_hashes": "ARTIFACTS.sha256",
+  "large_files": {"status": "pass", "limit_bytes": 10485760, "log": "checks/large-files.log"},
+  "historical_archives_ranked_rows_and_graphs": "unchanged against parent a7038c5b",
+  "ci_and_required_reviews": "not confirmed; exact-head checks remain required before merge",
+  "larger_size_model_map_pilot_confirmation": "not performed; explicit remaining requirements in linked problem and blocked backlog card"
+}

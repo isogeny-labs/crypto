@@ -1,11 +1,11 @@
 {
   "schema": "frozen-workflow-pins/v1",
-  "description": "Workflows whose exact bytes research evidence pins. Live workflows may change (runner, triggers, disk fixes); custody is checked in an isolated view that restores the pinned bytes from `revision` (.github/scripts/frozen-workflow-check.mjs). check: replay = run below by frozen-workflow-replays.yml; wrapper = the workflow itself runs frozen-workflow-check.mjs; record = no runtime check asserts the pin, so this file and the replay job's custody step document it.",
+  "description": "Workflows whose exact bytes research evidence pins. Live workflows may change (runner, triggers, disk fixes); custody is checked in an isolated view that restores the pinned bytes from `revision` (.github/scripts/frozen-workflow-check.mjs); a replay may carry its own `revision` when its manifest pins another version of its workflow. check: replay = run below by frozen-workflow-replays.yml; wrapper = the workflow itself runs frozen-workflow-check.mjs; record = no runtime check asserts the pin, so this file and the replay job's custody step document it.",
   "revision": "d30a63b89c3a6f79d55cd798ea6519e075636034",
   "workflows": {
     ".github/workflows/ecc2k130-dag-linux-v2-outcome-replay.yml": {
       "pinned_sha256": "edc2013bd78b47893c5145227d59ed4fa0b24825cef5ea76bf857160fb6a82e4",
-      "check": "record",
+      "check": "replay",
       "pinned_by": [
         "research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_outcome_replay_20260929/FROZEN.json"
       ]
@@ -19,7 +19,7 @@
     },
     ".github/workflows/ecc2k130-leaf-m10-support.yml": {
       "pinned_sha256": "23d9704a830cb053ed85dd365e9d87b4be9d1d8d8397f7170f196baf24e3bed1",
-      "check": "record",
+      "check": "replay",
       "pinned_by": [
         "research/notes/ecc2k130/leaf_m10_support_20260930/FROZEN.json"
       ]
@@ -33,14 +33,14 @@
     },
     ".github/workflows/ecc2k130-m3-base-selector-source.yml": {
       "pinned_sha256": "94cdc369821d89948bf41808b1fa98dbb3f66fea4e7fc81a84587b902d09a328",
-      "check": "record",
+      "check": "replay",
       "pinned_by": [
         "research/notes/ecc2k130/m3_base_selector_20260930/FROZEN.json"
       ]
     },
     ".github/workflows/ecc2k130-m3-four-policy.yml": {
       "pinned_sha256": "5c2a2f06008a913e5c351b4c6070cc13c6d7b1880b82e936dc52ed00c8cba147",
-      "check": "record",
+      "check": "replay",
       "pinned_by": [
         "research/notes/ecc2k130/m3_base_selector_20260930/FROZEN.json",
         "research/notes/ecc2k130/m3_four_policy_20260930/FROZEN_REPLAY.json"
@@ -55,21 +55,21 @@
     },
     ".github/workflows/ecc2k130-n13-s5-fullpoint-control.yml": {
       "pinned_sha256": "c9285da1887843cac5b6c260d2dd37cc2db4d69757fd1e18b4d2573563a25588",
-      "check": "record",
+      "check": "replay",
       "pinned_by": [
         "research/notes/ecc2k130/n13_s5_fullpoint_control_20260925/FROZEN.json"
       ]
     },
     ".github/workflows/ecc2k130-n13-s5-solver-panel.yml": {
       "pinned_sha256": "0736b381bb8c7dbd90bd3ac99f4ce67bf7f5899de87a37f521ad634c9f8b8f45",
-      "check": "record",
+      "check": "replay",
       "pinned_by": [
         "research/notes/ecc2k130/n13_s5_solver_panel_20260925/FROZEN.json"
       ]
     },
     ".github/workflows/ecc2k130-n19-s6-fullpoint-exporter.yml": {
       "pinned_sha256": "07073e882ec255754debcdd6dd5f93bd95f9bca9793b41d061a72a7e12555a60",
-      "check": "record",
+      "check": "replay",
       "pinned_by": [
         "research/notes/ecc2k130/n19_s6_fullpoint_exporter_20260925/FROZEN.json"
       ]
@@ -99,7 +99,7 @@
     },
     ".github/workflows/ecc2k130-phase-charged-successor-design.yml": {
       "pinned_sha256": "df9c26ee8ded44b85df5b2a8e41c83ef2cbe09a3e1efe64a4da0e2c2baf41d2e",
-      "check": "record",
+      "check": "replay",
       "pinned_by": [
         "research/notes/ecc2k130/rotated_phase_charged_successor_20260925/FROZEN.json"
       ]
@@ -113,7 +113,7 @@
     },
     ".github/workflows/ecc2k130-rotated-phase-selector.yml": {
       "pinned_sha256": "cd53f409a9c8fbdb25a6f3a33095517c63edaa28c249441710b5cc5461d070d4",
-      "check": "record",
+      "check": "replay",
       "pinned_by": [
         "research/notes/ecc2k130/rotated_phase_selector_20260925/FROZEN.json",
         "research/notes/ecc2k130/rotated_phase_selector_20260925/evidence/receipt.json"
@@ -149,7 +149,7 @@
     },
     ".github/workflows/ecc2k130-s3-sparse-n19-linear-replay.yml": {
       "pinned_sha256": "08f38e1089b56e95a25949fdba35cec13dc8c1a94a0e7a94307c17677391cbb4",
-      "check": "record",
+      "check": "replay",
       "pinned_by": [
         "research/notes/ecc2k130/rotated_s3_sparse_n19_linear_20260929/FROZEN.json"
       ]
@@ -193,14 +193,15 @@
     },
     ".github/workflows/ecc2k130-symbolic-oaware-width-gate.yml": {
       "pinned_sha256": "7a55e6b8247bd0e1648376f480dc21630f89d02869dfb6b78ef711ec2f3e6e09",
-      "check": "record",
+      "check": "replay",
       "pinned_by": [
         "research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/FROZEN.json"
-      ]
+      ],
+      "note": "Replayed with a historical source view (input_view_manifest): eight src/ files the freeze pins changed on main after 2026-09-25. The study's checks only hash them or replay the frozen width decision against them; see research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/FROZEN_VIEW.md."
     },
     ".github/workflows/endomorphism-search.yml": {
       "pinned_sha256": "1bee6995d9c8affdb6bb37149e8e37c3bc4d0c8e9451ea5e425941afff608fa6",
-      "check": "record",
+      "check": "replay",
       "pinned_by": [
         "research/endomorphism_search_20261005/native-manifest.sha256"
       ]
@@ -214,16 +215,77 @@
     },
     ".github/workflows/p192-geometry-collector-lean.yml": {
       "pinned_sha256": "07024051aa1820905e182564f48c90d3722af5821651db78d2ef4477ce38d39c",
-      "check": "record",
+      "check": "replay",
       "pinned_by": [
         "research/p192_extension_cover_20261012/reports/run-20261016T0432Z/RUN.json",
         "research/p192_extension_cover_20261012/reports/run-20261016T0512Z/RUN.json",
         "research/p192_extension_cover_20261012/reports/run-20261016T0747Z/RUN.json",
         "research/p192_extension_cover_20261012/reports/run-20261016T1850Z/RUN.json"
-      ]
+      ],
+      "note": "Replay p192_anchor_eight_20261024: reports/run-20261024-anchor-eight/ARTIFACTS.sha256 pins this workflow at b350582e757d1c1f979a222eca3801d6de045d290c270f2c216fb7ba5b335514, held by d0597e0ea3df9ce4003d27f182c06d9e19ee5c4b (the replay's own revision), and research/p192_extension_cover_20261012/REPORT.md at 0444d2bfb9316fed4f5682918434b3ae7318530b888dcc88965f7cd4f075341e, to which merge 097e2b2361 later added four figure-link lines; the input view .github/scripts/p192-anchor-eight-report-view-v1.json restores the pinned report from the same commit with the drift note research/p192_extension_cover_20261012/FROZEN_VIEW.md. The cross-cubic-anchor-fan job runs its sha256sum -c step through this replay. The run-20261024 and run-20261024-high-degree ARTIFACTS.sha256 manifests do not pin this workflow and pass on live bytes."
     }
   },
   "replays": [
+    {
+      "id": "dag_linux_v2_outcome_replay_20260929",
+      "workflow": ".github/workflows/ecc2k130-dag-linux-v2-outcome-replay.yml",
+      "manifest": "research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_outcome_replay_20260929/FROZEN.json",
+      "manifest_format": "key:workflow_sha256",
+      "extra_workflows": [
+        ".github/workflows/ecc2k130-symbolic-dag-dimacs-linux-v2-check.yml|research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928/FROZEN.json|pointer:/workflow_sha256/ecc2k130-symbolic-dag-dimacs-linux-v2-check.yml",
+        ".github/workflows/ecc2k130-symbolic-dag-dimacs-linux-v2-measure.yml|research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928/FROZEN.json|pointer:/workflow_sha256/ecc2k130-symbolic-dag-dimacs-linux-v2-measure.yml",
+        ".github/workflows/ecc2k130-symbolic-dag-dimacs-linux-preparation.yml|research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928/FROZEN.json|key:preparation.workflow_sha256",
+        ".github/workflows/ecc2k130-symbolic-dag-dimacs-gate.yml|research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928/FROZEN.json|key:first.workflow_sha256"
+      ],
+      "roots": [
+        "research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_outcome_replay_20260929",
+        "research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_20260928",
+        "research/notes/ecc2k130/symbolic_dag_dimacs_gate_20260925",
+        "research/notes/ecc2k130/symbolic_dag_dimacs_linux_attempt2_20260926",
+        "research/notes/ecc2k130/symbolic_dag_fullpoint_20260925",
+        "research/notes/ecc2k130/n13_oaware_sat_benchmark_20260925"
+      ],
+      "command": [
+        "python3",
+        "-B",
+        "research/notes/ecc2k130/symbolic_dag_dimacs_linux_v2_outcome_replay_20260929/gate.py"
+      ]
+    },
+    {
+      "id": "endomorphism_search_20261005",
+      "workflow": ".github/workflows/endomorphism-search.yml",
+      "manifest": "research/endomorphism_search_20261005/native-manifest.sha256",
+      "manifest_format": "sha256sum",
+      "extra_workflows": [],
+      "roots": [],
+      "command": [
+        "sha256sum",
+        "--check",
+        "research/endomorphism_search_20261005/native-manifest.sha256"
+      ]
+    },
+    {
+      "id": "leaf_m10_support_20260930",
+      "workflow": ".github/workflows/ecc2k130-leaf-m10-support.yml",
+      "manifest": "research/notes/ecc2k130/leaf_m10_support_20260930/FROZEN.json",
+      "manifest_format": "pointer:/sha256/.github~1workflows~1ecc2k130-leaf-m10-support.yml",
+      "extra_workflows": [],
+      "roots": [
+        "research/notes/ecc2k130/leaf_m10_support_20260930",
+        "research/notes/ecc2k130/rotated_subspace_support_20260925",
+        "research/notes/ecc2k130/rotated_unequal_arity_20260925",
+        "research/ecc2k130_relations",
+        "research/notes/ecc2k130/m10_export_capacity_20260925",
+        "research/notes/ecc2k130/dual_all_lines_20260930"
+      ],
+      "command": [
+        "bash",
+        "-eo",
+        "pipefail",
+        "-c",
+        "python3 -m py_compile research/notes/ecc2k130/leaf_m10_support_20260930/*.py\npython3 -m unittest discover -s research/notes/ecc2k130/leaf_m10_support_20260930 -p 'test_support.py' -v\npython3 -c 'import sys; sys.path.insert(0,\"research/notes/ecc2k130/leaf_m10_support_20260930\"); from produce import checked_inputs; checked_inputs()'\n"
+      ]
+    },
     {
       "id": "m10_export_capacity_20260925",
       "workflow": ".github/workflows/ecc2k130-m10-capacity-once.yml",
@@ -241,6 +303,50 @@
         "python3",
         "-B",
         "research/notes/ecc2k130/m10_export_capacity_20260925/ci_replay.py"
+      ]
+    },
+    {
+      "id": "m3_base_selector_20260930",
+      "workflow": ".github/workflows/ecc2k130-m3-base-selector-source.yml",
+      "manifest": "research/notes/ecc2k130/m3_base_selector_20260930/FROZEN.json",
+      "manifest_format": "sha256-root",
+      "extra_workflows": [
+        ".github/workflows/ecc2k130-m3-four-policy.yml|research/notes/ecc2k130/m3_base_selector_20260930/FROZEN.json|pointer:/sha256/.github~1workflows~1ecc2k130-m3-four-policy.yml"
+      ],
+      "roots": [
+        "research/notes/ecc2k130/m3_base_selector_20260930",
+        "research/notes/ecc2k130/m3_four_policy_20260930",
+        "research/ecc2k130_factor_base_pilot_20260924",
+        "research/ecc2k130_factor_base_replication_20260925",
+        "research/ecc2k130_dual_transport_20260925",
+        "research/ecc2k130_relations",
+        "research/ecc2k130_oriented_transport_20260924"
+      ],
+      "command": [
+        "python3",
+        "-B",
+        "research/notes/ecc2k130/m3_base_selector_20260930/check_source_lock.py"
+      ]
+    },
+    {
+      "id": "m3_four_policy_20260930",
+      "workflow": ".github/workflows/ecc2k130-m3-four-policy.yml",
+      "manifest": "research/notes/ecc2k130/m3_four_policy_20260930/FROZEN_REPLAY.json",
+      "manifest_format": "sha256-root",
+      "extra_workflows": [],
+      "roots": [
+        "research/notes/ecc2k130/m3_four_policy_20260930",
+        "research/ecc2k130_factor_base_pilot_20260924",
+        "research/ecc2k130_factor_base_replication_20260925",
+        "research/ecc2k130_dual_transport_20260925",
+        "research/ecc2k130_relations",
+        "research/ecc2k130_oriented_transport_20260924"
+      ],
+      "command": [
+        "python3",
+        "-B",
+        "-c",
+        "import sys; sys.path.insert(0, 'research/notes/ecc2k130/m3_four_policy_20260930'); import verify, produce; verify.checked_config(); produce.checked_config(require_lock=False)"
       ]
     },
     {
@@ -279,6 +385,69 @@
         "python3",
         "-B",
         "research/notes/ecc2k130/n13_oaware_sparse_dense_sat_20260925/ci_replay.py"
+      ]
+    },
+    {
+      "id": "n13_s5_fullpoint_control_20260925",
+      "workflow": ".github/workflows/ecc2k130-n13-s5-fullpoint-control.yml",
+      "manifest": "research/notes/ecc2k130/n13_s5_fullpoint_control_20260925/FROZEN.json",
+      "manifest_format": "pointer:/workflow_sha256/.github~1workflows~1ecc2k130-n13-s5-fullpoint-control.yml",
+      "extra_workflows": [],
+      "roots": [
+        "research/notes/ecc2k130/n13_s5_fullpoint_control_20260925",
+        "research/notes/ecc2k130/n19_s6_fullpoint_exporter_20260925",
+        "research/notes/ecc2k130/symbolic_dag_dimacs_gate_20260925",
+        "research/notes/ecc2k130/symbolic_dag_fullpoint_20260925",
+        "research/notes/ecc2k130/rotated_pdp_corpus_20260925",
+        "research/notes/ecc2k130/rotated_s3_candidate_20260925",
+        "research/notes/ecc2k130/rotated_subspace_support_20260925"
+      ],
+      "command": [
+        "python3",
+        "-B",
+        "research/notes/ecc2k130/n13_s5_fullpoint_control_20260925/ci_replay.py"
+      ]
+    },
+    {
+      "id": "n13_s5_solver_panel_20260925",
+      "workflow": ".github/workflows/ecc2k130-n13-s5-solver-panel.yml",
+      "manifest": "research/notes/ecc2k130/n13_s5_solver_panel_20260925/FROZEN.json",
+      "manifest_format": "pointer:/workflow_sha256/.github~1workflows~1ecc2k130-n13-s5-solver-panel.yml",
+      "extra_workflows": [],
+      "roots": [
+        "research/notes/ecc2k130/n13_s5_solver_panel_20260925",
+        "research/notes/ecc2k130/n13_s5_fullpoint_control_20260925",
+        "research/notes/ecc2k130/n19_s6_fullpoint_exporter_20260925",
+        "research/notes/ecc2k130/symbolic_dag_dimacs_gate_20260925",
+        "research/notes/ecc2k130/symbolic_dag_fullpoint_20260925",
+        "research/notes/ecc2k130/rotated_pdp_corpus_20260925",
+        "research/notes/ecc2k130/rotated_s3_candidate_20260925",
+        "research/notes/ecc2k130/rotated_subspace_support_20260925"
+      ],
+      "command": [
+        "python3",
+        "-B",
+        "research/notes/ecc2k130/n13_s5_solver_panel_20260925/ci_replay.py"
+      ]
+    },
+    {
+      "id": "n19_s6_fullpoint_exporter_20260925",
+      "workflow": ".github/workflows/ecc2k130-n19-s6-fullpoint-exporter.yml",
+      "manifest": "research/notes/ecc2k130/n19_s6_fullpoint_exporter_20260925/FROZEN.json",
+      "manifest_format": "pointer:/workflow_sha256/.github~1workflows~1ecc2k130-n19-s6-fullpoint-exporter.yml",
+      "extra_workflows": [],
+      "roots": [
+        "research/notes/ecc2k130/n19_s6_fullpoint_exporter_20260925",
+        "research/notes/ecc2k130/rotated_subspace_support_20260925",
+        "research/notes/ecc2k130/symbolic_dag_dimacs_gate_20260925",
+        "research/notes/ecc2k130/symbolic_dag_fullpoint_20260925",
+        "research/notes/ecc2k130/rotated_beta_sweep_20260925",
+        "research/notes/ecc2k130/rotated_pdp_corpus_20260925"
+      ],
+      "command": [
+        "python3",
+        "-B",
+        "research/notes/ecc2k130/n19_s6_fullpoint_exporter_20260925/ci_replay.py"
       ]
     },
     {
@@ -332,6 +501,42 @@
       ]
     },
     {
+      "id": "rotated_phase_charged_successor_20260925",
+      "workflow": ".github/workflows/ecc2k130-phase-charged-successor-design.yml",
+      "manifest": "research/notes/ecc2k130/rotated_phase_charged_successor_20260925/FROZEN.json",
+      "manifest_format": "pointer:/source_sha256/.github~1workflows~1ecc2k130-phase-charged-successor-design.yml",
+      "extra_workflows": [],
+      "roots": [
+        "research/notes/ecc2k130/rotated_phase_charged_successor_20260925",
+        "research/notes/ecc2k130/rotated_four_base_joint_rank_20260925",
+        "research/notes/ecc2k130/rotated_pdp_corpus_20260925",
+        "research/notes/ecc2k130/rotated_beta_sweep_20260925"
+      ],
+      "command": [
+        "python3",
+        "-B",
+        "research/notes/ecc2k130/rotated_phase_charged_successor_20260925/check_protocol.py"
+      ]
+    },
+    {
+      "id": "rotated_phase_selector_20260925",
+      "workflow": ".github/workflows/ecc2k130-rotated-phase-selector.yml",
+      "manifest": "research/notes/ecc2k130/rotated_phase_selector_20260925/FROZEN.json",
+      "manifest_format": "pointer:/file_sha256/workflow",
+      "extra_workflows": [],
+      "roots": [
+        "research/notes/ecc2k130/rotated_phase_selector_20260925",
+        "research/notes/ecc2k130/rotated_pdp_corpus_20260925",
+        "research/notes/ecc2k130/rotated_subspace_support_20260925",
+        "research/notes/ecc2k130/rotated_four_base_joint_rank_20260925"
+      ],
+      "command": [
+        "python3",
+        "-B",
+        "research/notes/ecc2k130/rotated_phase_selector_20260925/ci_replay.py"
+      ]
+    },
+    {
       "id": "rotated_s3_sparse_cnf_20260925",
       "workflow": ".github/workflows/ecc2k130-s3-sparse-cnf.yml",
       "manifest": "research/notes/ecc2k130/rotated_s3_sparse_cnf_20260925/FROZEN.json",
@@ -370,6 +575,32 @@
         "python3",
         "-B",
         "research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/ci_replay.py"
+      ]
+    },
+    {
+      "id": "rotated_s3_sparse_n19_linear_20260929",
+      "workflow": ".github/workflows/ecc2k130-s3-sparse-n19-linear-replay.yml",
+      "manifest": "research/notes/ecc2k130/rotated_s3_sparse_n19_linear_20260929/FROZEN.json",
+      "manifest_format": "key:workflow_sha256",
+      "extra_workflows": [
+        ".github/workflows/ecc2k130-s3-sparse-n19-growth.yml|research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/FROZEN.json|key:workflow_sha256"
+      ],
+      "roots": [
+        "research/notes/ecc2k130/rotated_s3_sparse_n19_linear_20260929",
+        "research/notes/ecc2k130/rotated_s3_sparse_n19_20260925",
+        "research/notes/ecc2k130/rotated_s3_o_branch_20260925",
+        "research/notes/ecc2k130/rotated_s3_sparse_cnf_20260925",
+        "research/notes/ecc2k130/rotated_pdp_corpus_20260925",
+        "research/notes/ecc2k130/rotated_s3_candidate_20260925",
+        "research/notes/ecc2k130/rotated_s3_fibre_theorem_20260925",
+        "research/notes/ecc2k130/rotated_subspace_support_20260925"
+      ],
+      "command": [
+        "bash",
+        "-eo",
+        "pipefail",
+        "-c",
+        "out=$(mktemp -d); python3 -B research/notes/ecc2k130/rotated_s3_sparse_n19_linear_20260929/verify.py --produced research/notes/ecc2k130/rotated_s3_sparse_n19_20260925/evidence/final/producer --out \"$out/result.json\"; python3 -B research/notes/ecc2k130/rotated_s3_sparse_n19_linear_20260929/audit_result.py --result \"$out/result.json\""
       ]
     },
     {
@@ -442,6 +673,57 @@
         "python3",
         "-B",
         "research/notes/ecc2k130/symbolic_dag_fullpoint_20260925/ci_replay.py"
+      ]
+    },
+    {
+      "id": "symbolic_oaware_width_gate_20260925",
+      "workflow": ".github/workflows/ecc2k130-symbolic-oaware-width-gate.yml",
+      "manifest": "research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/FROZEN.json",
+      "manifest_format": "pointer:/files/.github~1workflows~1ecc2k130-symbolic-oaware-width-gate.yml",
+      "input_view_manifest": ".github/scripts/symbolic-oaware-width-gate-source-view-v1.json",
+      "extra_workflows": [],
+      "roots": [
+        "research/notes/ecc2k130/symbolic_oaware_width_gate_20260925",
+        "research/notes/ecc2k130/n13_oaware_sat_benchmark_20260925/FROZEN.json",
+        "research/notes/ecc2k130/n13_oaware_sat_benchmark_20260925/RESULT.md",
+        "research/notes/ecc2k130/n13_oaware_sat_benchmark_20260925/run.py",
+        "research/notes/ecc2k130/rotated_s3_o_branch_20260925/PROTOCOL.md",
+        "research/notes/ecc2k130/rotated_s3_o_branch_20260925/export.py",
+        "research/notes/ecc2k130/rotated_s3_o_branch_20260925/verify.py",
+        "src/binary_ecc/curve.rs",
+        "src/binary_ecc/f2m.rs",
+        "src/cryptanalysis/binary_semaev.rs",
+        "src/cryptanalysis/coordinate_search.rs",
+        "src/cryptanalysis/pq_descent.rs",
+        "src/cryptanalysis/pq_descent_symbolic.rs",
+        "src/cryptanalysis/pq_groebner_f2.rs",
+        "src/cryptanalysis/sat.rs",
+        "src/cryptanalysis/semaev_decomp.rs",
+        "src/cryptanalysis/semaev_sat.rs"
+      ],
+      "command": [
+        "bash",
+        "-eo",
+        "pipefail",
+        "-c",
+        "python3 -m py_compile research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/{audit,verify,run,ci_replay}.py\npython3 research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/audit.py --preflight\npython3 research/notes/ecc2k130/symbolic_oaware_width_gate_20260925/ci_replay.py\n"
+      ]
+    },
+    {
+      "id": "p192_anchor_eight_20261024",
+      "workflow": ".github/workflows/p192-geometry-collector-lean.yml",
+      "revision": "d0597e0ea3df9ce4003d27f182c06d9e19ee5c4b",
+      "manifest": "research/p192_extension_cover_20261012/reports/run-20261024-anchor-eight/ARTIFACTS.sha256",
+      "manifest_format": "sha256sum",
+      "input_view_manifest": ".github/scripts/p192-anchor-eight-report-view-v1.json",
+      "extra_workflows": [],
+      "roots": [
+        "research/p192_extension_cover_20261012/FROZEN_VIEW.md"
+      ],
+      "command": [
+        "sha256sum",
+        "-c",
+        "research/p192_extension_cover_20261012/reports/run-20261024-anchor-eight/ARTIFACTS.sha256"
       ]
     }
   ]

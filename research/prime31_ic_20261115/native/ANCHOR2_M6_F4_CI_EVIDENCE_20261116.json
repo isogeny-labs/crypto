@@ -1,0 +1,648 @@
+{
+  "evidence_type": "source-exact GitHub Actions Rust development execution; not independent PCC",
+  "source_run_id": 43809984651,
+  "source_job_id": 133109279191,
+  "source_branch_head": "28f38c1390c8a83bc9559cc63d037c4ad3b0ca44",
+  "source_url": "https://github.com/isogeny-labs/crypto/actions/runs/43809984651",
+  "source_step": "Frozen prime31 two-anchor target-dependent m6 Rust F4 resource gate",
+  "outcome": "success (all tests/code executed; algebraic root extraction none)",
+  "algebraic_equations": "S4(three leaves,u); S4(three leaves,v); S3(u,v,x(R-A-B))",
+  "anchor_sum": [
+    2121728040,
+    1419282076
+  ],
+  "base_size": 31,
+  "correctness_note": "No censored run is a negative relation proof; signed point-lift and exception handling required",
+  "cost_note": "F4 ms and muladds omit input construction, curve operations, root extraction and full cold solve",
+  "curve_order": 2147446831,
+  "curve_prime": 2147483647,
+  "natural_outcomes": [
+    {
+      "f4": {
+        "basis_elements": 15,
+        "budget_seconds": 5,
+        "degree_cap": 12,
+        "degree_reached": 10,
+        "dense_cap": 15000,
+        "inconsistent": false,
+        "max_cols": 2577,
+        "max_dense_entries": 10229,
+        "max_nnz": 10372,
+        "muladds": 56211,
+        "nnz_cap": 15000,
+        "oversize": true,
+        "pairs_above_bound": 0,
+        "reported_ms": 11.634139999999999,
+        "root_extraction": "not_implemented",
+        "scope": "bounded F4 pilot only; no target logarithm recovered",
+        "solving_degree_max": 10,
+        "staircase_at_stop": null,
+        "steps": 2,
+        "timed_out": false,
+        "verdict": "undetermined"
+      },
+      "index": 0,
+      "note": "old m8 split label is NOT a witness label for anchored m6",
+      "public_R": [
+        1968789159,
+        1892466856
+      ],
+      "registered_m8_restricted_split_positive": false,
+      "shifted_R": [
+        1870475003,
+        55971426
+      ]
+    },
+    {
+      "f4": {
+        "basis_elements": 15,
+        "budget_seconds": 5,
+        "degree_cap": 12,
+        "degree_reached": 10,
+        "dense_cap": 15000,
+        "inconsistent": false,
+        "max_cols": 2577,
+        "max_dense_entries": 10229,
+        "max_nnz": 10372,
+        "muladds": 56211,
+        "nnz_cap": 15000,
+        "oversize": true,
+        "pairs_above_bound": 0,
+        "reported_ms": 12.099476,
+        "root_extraction": "not_implemented",
+        "scope": "bounded F4 pilot only; no target logarithm recovered",
+        "solving_degree_max": 10,
+        "staircase_at_stop": null,
+        "steps": 2,
+        "timed_out": false,
+        "verdict": "undetermined"
+      },
+      "index": 1,
+      "note": "old m8 split label is NOT a witness label for anchored m6",
+      "public_R": [
+        717194643,
+        229440838
+      ],
+      "registered_m8_restricted_split_positive": false,
+      "shifted_R": [
+        2096402427,
+        1438063535
+      ]
+    },
+    {
+      "f4": {
+        "basis_elements": 15,
+        "budget_seconds": 5,
+        "degree_cap": 12,
+        "degree_reached": 10,
+        "dense_cap": 15000,
+        "inconsistent": false,
+        "max_cols": 2577,
+        "max_dense_entries": 10229,
+        "max_nnz": 10372,
+        "muladds": 56211,
+        "nnz_cap": 15000,
+        "oversize": true,
+        "pairs_above_bound": 0,
+        "reported_ms": 11.03824,
+        "root_extraction": "not_implemented",
+        "scope": "bounded F4 pilot only; no target logarithm recovered",
+        "solving_degree_max": 10,
+        "staircase_at_stop": null,
+        "steps": 2,
+        "timed_out": false,
+        "verdict": "undetermined"
+      },
+      "index": 2,
+      "note": "old m8 split label is NOT a witness label for anchored m6",
+      "public_R": [
+        1139688853,
+        1663496011
+      ],
+      "registered_m8_restricted_split_positive": false,
+      "shifted_R": [
+        727604313,
+        1840326089
+      ]
+    },
+    {
+      "f4": {
+        "basis_elements": 15,
+        "budget_seconds": 5,
+        "degree_cap": 12,
+        "degree_reached": 10,
+        "dense_cap": 15000,
+        "inconsistent": false,
+        "max_cols": 2577,
+        "max_dense_entries": 10229,
+        "max_nnz": 10372,
+        "muladds": 56211,
+        "nnz_cap": 15000,
+        "oversize": true,
+        "pairs_above_bound": 0,
+        "reported_ms": 10.787439,
+        "root_extraction": "not_implemented",
+        "scope": "bounded F4 pilot only; no target logarithm recovered",
+        "solving_degree_max": 10,
+        "staircase_at_stop": null,
+        "steps": 2,
+        "timed_out": false,
+        "verdict": "undetermined"
+      },
+      "index": 3,
+      "note": "old m8 split label is NOT a witness label for anchored m6",
+      "public_R": [
+        903384438,
+        1336077056
+      ],
+      "registered_m8_restricted_split_positive": true,
+      "shifted_R": [
+        588512308,
+        1238172466
+      ]
+    },
+    {
+      "f4": {
+        "basis_elements": 15,
+        "budget_seconds": 5,
+        "degree_cap": 12,
+        "degree_reached": 10,
+        "dense_cap": 15000,
+        "inconsistent": false,
+        "max_cols": 2577,
+        "max_dense_entries": 10229,
+        "max_nnz": 10372,
+        "muladds": 56211,
+        "nnz_cap": 15000,
+        "oversize": true,
+        "pairs_above_bound": 0,
+        "reported_ms": 11.077013,
+        "root_extraction": "not_implemented",
+        "scope": "bounded F4 pilot only; no target logarithm recovered",
+        "solving_degree_max": 10,
+        "staircase_at_stop": null,
+        "steps": 2,
+        "timed_out": false,
+        "verdict": "undetermined"
+      },
+      "index": 4,
+      "note": "old m8 split label is NOT a witness label for anchored m6",
+      "public_R": [
+        416168746,
+        769355412
+      ],
+      "registered_m8_restricted_split_positive": false,
+      "shifted_R": [
+        1560206467,
+        1168853979
+      ]
+    },
+    {
+      "f4": {
+        "basis_elements": 15,
+        "budget_seconds": 5,
+        "degree_cap": 12,
+        "degree_reached": 10,
+        "dense_cap": 15000,
+        "inconsistent": false,
+        "max_cols": 2577,
+        "max_dense_entries": 10229,
+        "max_nnz": 10372,
+        "muladds": 56211,
+        "nnz_cap": 15000,
+        "oversize": true,
+        "pairs_above_bound": 0,
+        "reported_ms": 10.729731,
+        "root_extraction": "not_implemented",
+        "scope": "bounded F4 pilot only; no target logarithm recovered",
+        "solving_degree_max": 10,
+        "staircase_at_stop": null,
+        "steps": 2,
+        "timed_out": false,
+        "verdict": "undetermined"
+      },
+      "index": 5,
+      "note": "old m8 split label is NOT a witness label for anchored m6",
+      "public_R": [
+        1809836224,
+        2040899650
+      ],
+      "registered_m8_restricted_split_positive": false,
+      "shifted_R": [
+        1772105458,
+        372943759
+      ]
+    },
+    {
+      "f4": {
+        "basis_elements": 15,
+        "budget_seconds": 5,
+        "degree_cap": 12,
+        "degree_reached": 10,
+        "dense_cap": 15000,
+        "inconsistent": false,
+        "max_cols": 2577,
+        "max_dense_entries": 10229,
+        "max_nnz": 10372,
+        "muladds": 56211,
+        "nnz_cap": 15000,
+        "oversize": true,
+        "pairs_above_bound": 0,
+        "reported_ms": 10.912253999999999,
+        "root_extraction": "not_implemented",
+        "scope": "bounded F4 pilot only; no target logarithm recovered",
+        "solving_degree_max": 10,
+        "staircase_at_stop": null,
+        "steps": 2,
+        "timed_out": false,
+        "verdict": "undetermined"
+      },
+      "index": 6,
+      "note": "old m8 split label is NOT a witness label for anchored m6",
+      "public_R": [
+        507326007,
+        1484169864
+      ],
+      "registered_m8_restricted_split_positive": true,
+      "shifted_R": [
+        757268852,
+        1069361688
+      ]
+    },
+    {
+      "f4": {
+        "basis_elements": 15,
+        "budget_seconds": 5,
+        "degree_cap": 12,
+        "degree_reached": 10,
+        "dense_cap": 15000,
+        "inconsistent": false,
+        "max_cols": 2577,
+        "max_dense_entries": 10229,
+        "max_nnz": 10372,
+        "muladds": 56211,
+        "nnz_cap": 15000,
+        "oversize": true,
+        "pairs_above_bound": 0,
+        "reported_ms": 10.859715000000001,
+        "root_extraction": "not_implemented",
+        "scope": "bounded F4 pilot only; no target logarithm recovered",
+        "solving_degree_max": 10,
+        "staircase_at_stop": null,
+        "steps": 2,
+        "timed_out": false,
+        "verdict": "undetermined"
+      },
+      "index": 7,
+      "note": "old m8 split label is NOT a witness label for anchored m6",
+      "public_R": [
+        2021378929,
+        681564049
+      ],
+      "registered_m8_restricted_split_positive": true,
+      "shifted_R": [
+        1018261728,
+        506389525
+      ]
+    },
+    {
+      "f4": {
+        "basis_elements": 15,
+        "budget_seconds": 5,
+        "degree_cap": 12,
+        "degree_reached": 10,
+        "dense_cap": 15000,
+        "inconsistent": false,
+        "max_cols": 2577,
+        "max_dense_entries": 10229,
+        "max_nnz": 10372,
+        "muladds": 56211,
+        "nnz_cap": 15000,
+        "oversize": true,
+        "pairs_above_bound": 0,
+        "reported_ms": 10.916402,
+        "root_extraction": "not_implemented",
+        "scope": "bounded F4 pilot only; no target logarithm recovered",
+        "solving_degree_max": 10,
+        "staircase_at_stop": null,
+        "steps": 2,
+        "timed_out": false,
+        "verdict": "undetermined"
+      },
+      "index": 8,
+      "note": "old m8 split label is NOT a witness label for anchored m6",
+      "public_R": [
+        355071516,
+        1885301435
+      ],
+      "registered_m8_restricted_split_positive": false,
+      "shifted_R": [
+        1712399566,
+        1566455931
+      ]
+    },
+    {
+      "f4": {
+        "basis_elements": 15,
+        "budget_seconds": 5,
+        "degree_cap": 12,
+        "degree_reached": 10,
+        "dense_cap": 15000,
+        "inconsistent": false,
+        "max_cols": 2577,
+        "max_dense_entries": 10229,
+        "max_nnz": 10372,
+        "muladds": 56211,
+        "nnz_cap": 15000,
+        "oversize": true,
+        "pairs_above_bound": 0,
+        "reported_ms": 10.978899,
+        "root_extraction": "not_implemented",
+        "scope": "bounded F4 pilot only; no target logarithm recovered",
+        "solving_degree_max": 10,
+        "staircase_at_stop": null,
+        "steps": 2,
+        "timed_out": false,
+        "verdict": "undetermined"
+      },
+      "index": 9,
+      "note": "old m8 split label is NOT a witness label for anchored m6",
+      "public_R": [
+        313899796,
+        1258699631
+      ],
+      "registered_m8_restricted_split_positive": false,
+      "shifted_R": [
+        488374558,
+        724885380
+      ]
+    },
+    {
+      "f4": {
+        "basis_elements": 15,
+        "budget_seconds": 5,
+        "degree_cap": 12,
+        "degree_reached": 10,
+        "dense_cap": 15000,
+        "inconsistent": false,
+        "max_cols": 2577,
+        "max_dense_entries": 10229,
+        "max_nnz": 10372,
+        "muladds": 56211,
+        "nnz_cap": 15000,
+        "oversize": true,
+        "pairs_above_bound": 0,
+        "reported_ms": 11.029043,
+        "root_extraction": "not_implemented",
+        "scope": "bounded F4 pilot only; no target logarithm recovered",
+        "solving_degree_max": 10,
+        "staircase_at_stop": null,
+        "steps": 2,
+        "timed_out": false,
+        "verdict": "undetermined"
+      },
+      "index": 10,
+      "note": "old m8 split label is NOT a witness label for anchored m6",
+      "public_R": [
+        838650931,
+        143875807
+      ],
+      "registered_m8_restricted_split_positive": false,
+      "shifted_R": [
+        2010566777,
+        1669185037
+      ]
+    },
+    {
+      "f4": {
+        "basis_elements": 15,
+        "budget_seconds": 5,
+        "degree_cap": 12,
+        "degree_reached": 10,
+        "dense_cap": 15000,
+        "inconsistent": false,
+        "max_cols": 2577,
+        "max_dense_entries": 10229,
+        "max_nnz": 10372,
+        "muladds": 56211,
+        "nnz_cap": 15000,
+        "oversize": true,
+        "pairs_above_bound": 0,
+        "reported_ms": 11.066744,
+        "root_extraction": "not_implemented",
+        "scope": "bounded F4 pilot only; no target logarithm recovered",
+        "solving_degree_max": 10,
+        "staircase_at_stop": null,
+        "steps": 2,
+        "timed_out": false,
+        "verdict": "undetermined"
+      },
+      "index": 11,
+      "note": "old m8 split label is NOT a witness label for anchored m6",
+      "public_R": [
+        168674640,
+        27179311
+      ],
+      "registered_m8_restricted_split_positive": false,
+      "shifted_R": [
+        513487904,
+        1439223007
+      ]
+    },
+    {
+      "f4": {
+        "basis_elements": 15,
+        "budget_seconds": 5,
+        "degree_cap": 12,
+        "degree_reached": 10,
+        "dense_cap": 15000,
+        "inconsistent": false,
+        "max_cols": 2577,
+        "max_dense_entries": 10229,
+        "max_nnz": 10372,
+        "muladds": 56211,
+        "nnz_cap": 15000,
+        "oversize": true,
+        "pairs_above_bound": 0,
+        "reported_ms": 11.091880999999999,
+        "root_extraction": "not_implemented",
+        "scope": "bounded F4 pilot only; no target logarithm recovered",
+        "solving_degree_max": 10,
+        "staircase_at_stop": null,
+        "steps": 2,
+        "timed_out": false,
+        "verdict": "undetermined"
+      },
+      "index": 12,
+      "note": "old m8 split label is NOT a witness label for anchored m6",
+      "public_R": [
+        960365344,
+        5913570
+      ],
+      "registered_m8_restricted_split_positive": false,
+      "shifted_R": [
+        1419866776,
+        1119844499
+      ]
+    },
+    {
+      "f4": {
+        "basis_elements": 15,
+        "budget_seconds": 5,
+        "degree_cap": 12,
+        "degree_reached": 10,
+        "dense_cap": 15000,
+        "inconsistent": false,
+        "max_cols": 2577,
+        "max_dense_entries": 10229,
+        "max_nnz": 10372,
+        "muladds": 56211,
+        "nnz_cap": 15000,
+        "oversize": true,
+        "pairs_above_bound": 0,
+        "reported_ms": 15.211481000000001,
+        "root_extraction": "not_implemented",
+        "scope": "bounded F4 pilot only; no target logarithm recovered",
+        "solving_degree_max": 10,
+        "staircase_at_stop": null,
+        "steps": 2,
+        "timed_out": false,
+        "verdict": "undetermined"
+      },
+      "index": 13,
+      "note": "old m8 split label is NOT a witness label for anchored m6",
+      "public_R": [
+        1030456516,
+        1905316550
+      ],
+      "registered_m8_restricted_split_positive": false,
+      "shifted_R": [
+        1709507322,
+        1066257741
+      ]
+    },
+    {
+      "f4": {
+        "basis_elements": 15,
+        "budget_seconds": 5,
+        "degree_cap": 12,
+        "degree_reached": 10,
+        "dense_cap": 15000,
+        "inconsistent": false,
+        "max_cols": 2577,
+        "max_dense_entries": 10229,
+        "max_nnz": 10372,
+        "muladds": 56211,
+        "nnz_cap": 15000,
+        "oversize": true,
+        "pairs_above_bound": 0,
+        "reported_ms": 11.077774999999999,
+        "root_extraction": "not_implemented",
+        "scope": "bounded F4 pilot only; no target logarithm recovered",
+        "solving_degree_max": 10,
+        "staircase_at_stop": null,
+        "steps": 2,
+        "timed_out": false,
+        "verdict": "undetermined"
+      },
+      "index": 14,
+      "note": "old m8 split label is NOT a witness label for anchored m6",
+      "public_R": [
+        326383954,
+        663099615
+      ],
+      "registered_m8_restricted_split_positive": true,
+      "shifted_R": [
+        2127535430,
+        33742132
+      ]
+    },
+    {
+      "f4": {
+        "basis_elements": 15,
+        "budget_seconds": 5,
+        "degree_cap": 12,
+        "degree_reached": 10,
+        "dense_cap": 15000,
+        "inconsistent": false,
+        "max_cols": 2577,
+        "max_dense_entries": 10229,
+        "max_nnz": 10372,
+        "muladds": 56211,
+        "nnz_cap": 15000,
+        "oversize": true,
+        "pairs_above_bound": 0,
+        "reported_ms": 11.065771999999999,
+        "root_extraction": "not_implemented",
+        "scope": "bounded F4 pilot only; no target logarithm recovered",
+        "solving_degree_max": 10,
+        "staircase_at_stop": null,
+        "steps": 2,
+        "timed_out": false,
+        "verdict": "undetermined"
+      },
+      "index": 15,
+      "note": "old m8 split label is NOT a witness label for anchored m6",
+      "public_R": [
+        239766802,
+        2091337017
+      ],
+      "registered_m8_restricted_split_positive": true,
+      "shifted_R": [
+        1187144119,
+        958439925
+      ]
+    }
+  ],
+  "natural_panel_count": 16,
+  "positive_six_leaf_control": {
+    "f4": {
+      "basis_elements": 15,
+      "budget_seconds": 5,
+      "degree_cap": 12,
+      "degree_reached": 10,
+      "dense_cap": 15000,
+      "inconsistent": false,
+      "max_cols": 2577,
+      "max_dense_entries": 10229,
+      "max_nnz": 10372,
+      "muladds": 56211,
+      "nnz_cap": 15000,
+      "oversize": true,
+      "pairs_above_bound": 0,
+      "reported_ms": 12.8573,
+      "root_extraction": "not_implemented",
+      "scope": "bounded F4 pilot only; no target logarithm recovered",
+      "solving_degree_max": 10,
+      "staircase_at_stop": null,
+      "steps": 2,
+      "timed_out": false,
+      "verdict": "undetermined"
+    },
+    "public_target": [
+      2061011380,
+      1550897815
+    ],
+    "residual_target": [
+      1058954473,
+      622883175
+    ],
+    "witness_used_only_for_f4_soundness": true
+  },
+  "public_positive_anchors": [
+    [
+      3,
+      166645833
+    ],
+    [
+      105948780,
+      879804229
+    ]
+  ],
+  "scope": "exact anchored six-summand target-dependent bounded Rust F4, no root extraction or ECDLP",
+  "standing": "[pcc:unverified]",
+  "sum_variables_after": 2,
+  "sum_variables_before": 3,
+  "tower_variables_after": 36,
+  "tower_variables_before": 48
+}

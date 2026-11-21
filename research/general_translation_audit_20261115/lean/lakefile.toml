@@ -1,0 +1,11 @@
+name = "general_translation_audit"
+version = "0.1.0"
+defaultTargets = ["GeneralTranslationAudit"]
+
+[[require]]
+name = "local_translation_audit"
+path = "../../local_translation_audit_20261115/lean"
+
+[[lean_lib]]
+name = "GeneralTranslationAudit"
+roots = ["GeneralAction", "GeneralControls", "GeneralEvaluation", "GeneralExtension", "GeneralField", "GeneralLocal", "GeneralLocalMap", "GeneralRegularBasechange", "GeneralTranscendence", "GeneralTranslationCertificate", "GeneralTransport", "GeneralValuationBasechange"]

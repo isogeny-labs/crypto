@@ -1,0 +1,18 @@
+p = 211: 10 candidate(s) tried, skipped by reason: {"bielliptic_rejected_degenerate_or_no_rational_weierstrass_point": 6, "r_below_50": 3}
+p = 419: 28 candidate(s) tried, skipped by reason: {"bielliptic_rejected_degenerate_or_no_rational_weierstrass_point": 18, "r_below_50": 9}
+p = 821: 3 candidate(s) tried, skipped by reason: {"bielliptic_rejected_degenerate_or_no_rational_weierstrass_point": 1, "r_divides_e2_order_so_r_part_of_J_not_cyclic": 1}
+p = 1619: 2 candidate(s) tried, skipped by reason: {"bielliptic_rejected_degenerate_or_no_rational_weierstrass_point": 1}
+      p        r    rho_src  rho_isog(d)      rho_jac   ic_fb  ic_grpops    ic_trials   ic/rho_src  chain
+    211      109        428      530(2)          396     116       3419          226        8.0x  ok ic_log=right certs=4/4
+    419      113        357      562(2)          361     223       8475          542       23.7x  ok ic_log=right certs=4/4
+    821       71        370      274(3)          414     401      11353          851       30.7x  ok ic_log=right certs=4/4
+   1619      401        847      649(2)          869     772      34521         1653       40.8x  ok ic_log=right certs=4/4
+
+rho_src  = direct Pollard rho on E1 (group ops)
+rho_isog = rho after a verified isogeny hop E1→E1' (same order r)
+rho_jac  = rho on the order-r subgroup of J(C) after verified φ^*
+ic_jac   = genus-2 index calculus on J(C), counted group ops
+All figures [pcc:unverified]; isogeny/pull-back DLP-preservation is
+checked in-process before each measurement.
+wrote research/chained_prime_transfer_20261111/repro/certs_v3.repro.jsonl (16 certificates)
+wrote research/chained_prime_transfer_20261111/repro/results_v3.repro.json

@@ -1,0 +1,19 @@
+{
+  "schema": "research.source-review/v1",
+  "status": "final_bindings_consistent_pending_publication_live_release",
+  "new_execution": false,
+  "freeze_sha256": "4974f9673e7b5a4cd76ad558e798625ba144e1e6231838f03b6fa9fcab128861",
+  "manifest_sha256": "e70f17101477c2ffdc83b2d808a75fe2b43db911954a5dfef93c7152f1279e73",
+  "prior_freeze_sha256": "e83cd2f50e2e6edd17146ed158be688afcd6b8d94f3d470f8ec3d4d89754d6a1",
+  "changed_fields": [
+    "prior_attempt_conservative_debit_seconds",
+    "remaining_before_attempt_seconds"
+  ],
+  "checks": [
+    "All frozen local hashes match; source and executable bindings unchanged.",
+    "Prior debit 12660 plus remaining 30540 equals 43200; proposed 3600 reserve fits, leaving 26940.",
+    "Recorded terminal, ledger, source-review and epoch-3 claim receipt hashes match.",
+    "Draft remains unreleased. Root must confirm publication, current ownership and serial no-overlap immediately before launch."
+  ],
+  "findings": []
+}

@@ -1,0 +1,307 @@
+{
+  "schema": "crypto.autoresearch.mechanical-task-card.v1",
+  "card_id": "CARD-sat-ladder-scaling-20261110-F4-RUN-02",
+  "experiment_id": "sat_ladder_scaling_20261110",
+  "author_role": "experiment-director",
+  "executor_role": "executor-mechanical",
+  "kind": "frozen_command",
+  "commit": "9465664dbe6ba5757b9cb011192215a00605e8d8",
+  "receipt": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.receipt.json",
+  "binds": [
+    {
+      "path": "/home/user/crypto/research/sat_ladder_scaling_20261110/PROTOCOL.md",
+      "sha256": "156fe81023a340fa7431f870b3f60a58457fa236a57325100ec582f514c0bbbc"
+    },
+    {
+      "path": "/home/user/crypto/research/sat_ladder_scaling_20261110/FREEZE.sha256",
+      "sha256": "75760ac9e50ce57acafbf139758f5be2074c26d905d48006dfa64d00ad624ab9"
+    },
+    {
+      "path": "/home/user/crypto/research/sat_ladder_scaling_20261110/tool/Cargo.toml",
+      "sha256": "b94869ee38dcd3f7038ddd9b467e481d6ba51d821057765f391348985a53b0a8"
+    },
+    {
+      "path": "/home/user/crypto/research/sat_ladder_scaling_20261110/tool/Cargo.lock",
+      "sha256": "b4685bb42c0da6592fa867809a194bdfee5c2c4b63c4b0d5d3f6674d8cb496b7"
+    },
+    {
+      "path": "/home/user/crypto/research/sat_ladder_scaling_20261110/tool/src/main.rs",
+      "sha256": "6627a93246f7f4b0445a9a380d4f2e9d016ea001a0b7b671ac328f5e18c5a9b1"
+    },
+    {
+      "path": "/home/user/crypto/research/sat_ladder_scaling_20261110/tool/target/release/sat_ladder_scaling",
+      "sha256": "8e6cc0b7945ee2658ec2f92bb4a7a56ec7d2e79edb02316e8e2332792aef0ca0"
+    }
+  ],
+  "must_not_exist": [
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.receipt.json",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.run",
+    "research/sat_ladder_scaling_20261110/results/run.json",
+    "research/sat_ladder_scaling_20261110/results/run-02.stdout.txt",
+    "research/sat_ladder_scaling_20261110/results/run-02.stderr.txt",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.verify-freeze.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.verify-freeze.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.git-head.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.git-head.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.rustc-version.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.rustc-version.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.cargo-version.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.cargo-version.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.nproc.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.nproc.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.uname.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.uname.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.cpu-model.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.cpu-model.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.build.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.build.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.test.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.test.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.binary-sha256.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.binary-sha256.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.result-sha256.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.result-sha256.stderr",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.result-table.stdout",
+    "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.result-table.stderr"
+  ],
+  "commands": [
+    {
+      "id": "verify-freeze",
+      "argv": [
+        "sha256sum",
+        "-c",
+        "FREEZE.sha256"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "cwd": "research/sat_ladder_scaling_20261110",
+      "stdout": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.verify-freeze.stdout",
+      "stderr": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.verify-freeze.stderr",
+      "outputs": [
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.verify-freeze.stdout"
+      ]
+    },
+    {
+      "id": "git-head",
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.git-head.stdout",
+      "stderr": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.git-head.stderr",
+      "outputs": [
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.git-head.stdout"
+      ]
+    },
+    {
+      "id": "rustc-version",
+      "argv": [
+        "rustc",
+        "-Vv"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.rustc-version.stdout",
+      "stderr": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.rustc-version.stderr",
+      "outputs": [
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.rustc-version.stdout"
+      ]
+    },
+    {
+      "id": "cargo-version",
+      "argv": [
+        "cargo",
+        "-V"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.cargo-version.stdout",
+      "stderr": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.cargo-version.stderr",
+      "outputs": [
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.cargo-version.stdout"
+      ]
+    },
+    {
+      "id": "nproc",
+      "argv": [
+        "nproc"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.nproc.stdout",
+      "stderr": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.nproc.stderr",
+      "outputs": [
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.nproc.stdout"
+      ]
+    },
+    {
+      "id": "uname",
+      "argv": [
+        "uname",
+        "-a"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.uname.stdout",
+      "stderr": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.uname.stderr",
+      "outputs": [
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.uname.stdout"
+      ]
+    },
+    {
+      "id": "cpu-model",
+      "argv": [
+        "lscpu"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.cpu-model.stdout",
+      "stderr": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.cpu-model.stderr",
+      "outputs": [
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.cpu-model.stdout"
+      ]
+    },
+    {
+      "id": "build",
+      "argv": [
+        "cargo",
+        "build",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/sat_ladder_scaling_20261110/tool/Cargo.toml"
+      ],
+      "timeout_seconds": 3600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.build.stdout",
+      "stderr": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.build.stderr",
+      "outputs": [
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.build.stdout"
+      ]
+    },
+    {
+      "id": "test",
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--manifest-path",
+        "/home/user/crypto/research/sat_ladder_scaling_20261110/tool/Cargo.toml"
+      ],
+      "timeout_seconds": 3600,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.test.stdout",
+      "stderr": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.test.stderr",
+      "outputs": [
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.test.stdout"
+      ]
+    },
+    {
+      "id": "binary-sha256",
+      "argv": [
+        "sha256sum",
+        "/home/user/crypto/research/sat_ladder_scaling_20261110/tool/target/release/sat_ladder_scaling"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.binary-sha256.stdout",
+      "stderr": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.binary-sha256.stderr",
+      "outputs": [
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.binary-sha256.stdout"
+      ]
+    },
+    {
+      "id": "run-full",
+      "argv": [
+        "/home/user/crypto/research/sat_ladder_scaling_20261110/tool/target/release/sat_ladder_scaling",
+        "--protocol",
+        "/home/user/crypto/research/sat_ladder_scaling_20261110/PROTOCOL.md",
+        "--n",
+        "4,5,6,7,8,9",
+        "--targets",
+        "10",
+        "--budget",
+        "4000000",
+        "--threads",
+        "2",
+        "--out",
+        "research/sat_ladder_scaling_20261110/results/run.json"
+      ],
+      "timeout_seconds": 43200,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/sat_ladder_scaling_20261110/results/run-02.stdout.txt",
+      "stderr": "research/sat_ladder_scaling_20261110/results/run-02.stderr.txt",
+      "outputs": [
+        "research/sat_ladder_scaling_20261110/results/run.json",
+        "research/sat_ladder_scaling_20261110/results/run-02.stdout.txt"
+      ]
+    },
+    {
+      "id": "result-sha256",
+      "argv": [
+        "sha256sum",
+        "research/sat_ladder_scaling_20261110/results/run.json"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.result-sha256.stdout",
+      "stderr": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.result-sha256.stderr",
+      "outputs": [
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.result-sha256.stdout"
+      ]
+    },
+    {
+      "id": "result-table",
+      "argv": [
+        "cat",
+        "research/sat_ladder_scaling_20261110/results/run-02.stdout.txt"
+      ],
+      "timeout_seconds": 60,
+      "success_exit_codes": [
+        0
+      ],
+      "stdout": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.result-table.stdout",
+      "stderr": "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.result-table.stderr",
+      "outputs": [
+        "research/sat_ladder_scaling_20261110/cards/receipts/F4-RUN-02.result-table.stdout"
+      ]
+    }
+  ],
+  "bus_address": "executor-mechanical-sat-ladder-scaling",
+  "background": true,
+  "write_scope": [
+    "research/sat_ladder_scaling_20261110/"
+  ],
+  "stop_when": [
+    "Any command exits with a status other than 0 or reaches its timeout; report the printed text verbatim, retry nothing and edit nothing.",
+    "The verify-freeze command prints any line not ending in OK, or the test command prints no line containing test result: ok. 7 passed; 0 failed; 1 ignored; report the printed text verbatim.",
+    "The run-full command exits with a nonzero status; report the printed text verbatim."
+  ],
+  "notes": "Frozen full run of study sat_ladder_scaling_20261110 on the grid amended in PROTOCOL.md section 6 (n 4,5,6,7,8,9; 10 targets per n; conflict budget 4000000; 2 threads), with PROTOCOL.md sections 2 and 5 and FREEZE.sha256. Every flag name was checked against parse_args in tool/src/main.rs: --protocol, --n, --targets, --budget, --threads, --out; the binary name is the Cargo package name sat_ladder_scaling. The result metrics are solver conflict, decision and propagation counts; wall time is descriptive only and the host is shared with other running studies. Execution route: local host. The isolab-eks route is unavailable from this session (no aws CLI) and the GitHub route takes only ecbench specs, so this is local evidence; the section 9a confirmatory EKS run is open. The run-full command has a 12-hour limit, so it runs detached: run the card, then run wait until the receipt status is no longer detached. The cpu-model step runs lscpu. The binary bound in binds is the build already on disk before this card; the binary-sha256 step records the digest of the binary this card builds. The result-table step prints results/run-02.stdout.txt. Re-run (card -02) after the 2026-11-11 container restart, which lost the detached run-full step of F4-RUN-01 (loss ledger: benchmarks/losses/20261111-card-sat-ladder-scaling-20261110-f4-run-01-11-run-full.json). The -02 run-full step writes stdout and stderr to results/run-02.stdout.txt and results/run-02.stderr.txt, not results/run.stdout.txt and results/run.stderr.txt, because the card runner opens those logs for truncating write and the stale -01 files stay in place; results/run.json is the same path as in -01 and does not exist yet. The card pins the commit 9465664dbe6ba5757b9cb011192215a00605e8d8; the binds were recomputed from the files on disk on 2026-11-11 and FREEZE.sha256 is unchanged."
+}

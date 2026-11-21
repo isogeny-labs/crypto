@@ -1,0 +1,27 @@
+{
+  "provider": "runpod",
+  "pod_id": "cy2tbnhzgtwr6e",
+  "deleted_at": "2026-11-16T17:07:01Z",
+  "cleanup_method": "official GraphQL podTerminate then pod lookup",
+  "termination_http": 200,
+  "termination_response": {
+    "data": {
+      "podTerminate": null
+    }
+  },
+  "lookup_http": 200,
+  "lookup_response": {
+    "data": {
+      "pod": null
+    }
+  },
+  "owned_pod_absent": true,
+  "collected_before_deletion": true,
+  "collected_portable_hashes_passed": true,
+  "collected_qualified_hashes_passed": true,
+  "rest_cleanup_transport_error": {
+    "curl_exit": 56,
+    "http": 0,
+    "reason": "CONNECT tunnel rejected by proxy with403 before provider response; one administrative retry then official GraphQL fallback"
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "branch": "claude/index-calculus-gpu-optimization-otouqv",
+  "closed_utc": "2026-11-14T04:58:28+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/ic_gpu_measure_20261112/rp_gpu.sh",
+        "exec",
+        "icgpu-4",
+        "./job.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-14T04:38:03+00:00",
+      "wall_s": 0.431
+    }
+  ],
+  "commit": "6128d645d65d064938816416a51e61f4140a6ca4",
+  "commit_dirty": false,
+  "created_utc": "2026-11-14T04:36:55+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/ic_gpu_overhead_20261114"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261114T0436Z-ic-fes-gpu-overhead",
+  "metrics": [
+    {
+      "baseline": 0.002619,
+      "better": "lower",
+      "n": 2,
+      "name": "fes_f2_gpu_solver_s_per_call_char2_n29",
+      "note": "practicality note; baseline = abecd26901 engine (text serve, AnfRow route); counted ops/calls identical; same-arm spread 1.004",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.001543
+    },
+    {
+      "baseline": 0.001107,
+      "better": "lower",
+      "n": 2,
+      "name": "fes_f2_gpu_solver_s_per_call_char2_n25",
+      "note": "practicality note; same-arm spread 1.20; counted ops identical",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.000484
+    },
+    {
+      "baseline": 0.000653,
+      "better": "lower",
+      "n": 2,
+      "name": "fes_f2_gpu_solver_s_per_call_koblitz_n23_t2",
+      "note": "second target (no worker start-up); counted ops identical; S pinned and identical",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.000236
+    },
+    {
+      "baseline": 27.35,
+      "better": "lower",
+      "n": 2,
+      "name": "whole_solve_wall_s_char2_n29_fes_f2_gpu",
+      "note": "practicality note; whole ic bench row",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 17.45
+    },
+    {
+      "baseline": 0.013651,
+      "better": "lower",
+      "n": 4,
+      "name": "fes_f2_cpu_solver_s_per_call_koblitz_n23",
+      "note": "CPU fes-f2 after the from_poly change; same-arm spread 1.005",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.013434
+    }
+  ],
+  "problem": "ic-gpu-kernels",
+  "raw": [
+    {
+      "bytes": 2219530,
+      "path": "research/ic_gpu_overhead_20261114/raw/out_ab.tgz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/df/dfcedbfa18b3eee1b22668f123dd5b916fd70572f97ce895dec00f6dbce0ba62",
+      "sha256": "dfcedbfa18b3eee1b22668f123dd5b916fd70572f97ce895dec00f6dbce0ba62",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_gpu_overhead_20261114/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/ic_gpu_overhead_20261114/fig_overhead.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-fes-gpu-overhead",
+  "status": "measured",
+  "summary": "fes-f2-gpu per-call overhead cut (direct from_poly, binary serve protocol, single-copy CUDA I/O): 1.7-2.8x less solver time per call, whole solve 1.6-2.0x, on one A100 with ABBA old/new; counted ops, calls and hit rate identical. [pcc:unverified]",
+  "validation": null
+}

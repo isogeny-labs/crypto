@@ -346,6 +346,10 @@ pub struct Forecast {
     pub advice_reasons: Vec<String>,
     pub advisory: String,
     pub certified_degree_of_regularity: Option<u32>,
+    /// The calibration that placed the prior's point mass, when it is not
+    /// the semi-regular degree.  Absent in forecasts written before it existed.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prior_source: Option<String>,
 }
 
 /// Sequential forecaster for one cell of a sweep.
@@ -365,6 +369,40 @@ pub struct Forecaster {
     linear_algebra: Vec<(usize, u64)>,
     linear_algebra_unit: String,
     linear_algebra_price: f64,
+    /// Calibrated prior point and its source; `None` keeps the semi-regular degree.
+    prior_point: Option<(u32, String)>,
+    /// Affine falls at degree 2 that the factor base guarantees, and their source.
+    /// Used only when no calibrated point is set; see [`Forecaster::set_affine_falls`].
+    affine_falls: Option<(u32, String)>,
+}
+
+/// Effective degree of a Boolean system after `falls` affine equations are used to
+/// eliminate as many variables: the Boolean semi-regular degree of the reduced
+/// shape (the `falls` lowest-degree equations dropped), floored at 2.  A forecast
+/// point, not a bound: on Boolean `m = 2` binary-subspace decomposition systems it
+/// was at or above the measured solving degree on all 15,543 measured systems with
+/// `k ≥ 7` (ml-cryptanalysis `experiments/dmut-mechanistic-20261114`), but targets
+/// with four or more decompositions in `V × V` have solving degree at least 3 while
+/// it can be 2, at every `k` (`BOUND_ANALYSIS.md` there; 12 constructed cases at
+/// n = 31–61).  Such targets are rare for random points (heuristically about
+/// `2^(2k−1−n)`).  `[pcc:unverified]`
+pub fn effective_degree(shape: &SystemShape, falls: u32) -> u32 {
+    let f = (falls as usize).min(shape.equation_degrees.len());
+    let mut degrees = shape.equation_degrees.clone();
+    degrees.sort_unstable();
+    let left: Vec<u32> = degrees.split_off(f);
+    if left.is_empty() {
+        return 2;
+    }
+    let reduced = SystemShape {
+        variables: shape.variables.saturating_sub(f).max(1),
+        equation_degrees: left,
+        boolean: true,
+    };
+    reduced
+        .semi_regular_degree()
+        .unwrap_or(reduced.variables as u32 + 1)
+        .max(2)
 }
 
 fn label(d: Option<u32>, bound: u32) -> String {
@@ -502,7 +540,26 @@ impl Forecaster {
             linear_algebra: Vec::new(),
             linear_algebra_unit: "relation-matrix row operations".into(),
             linear_algebra_price: 1.0,
+            prior_point: None,
+            affine_falls: None,
         }
+    }
+    /// Record that the factor base guarantees `falls` affine equations at
+    /// degree 2 (for a binary subspace `V` of `GF(2^n)`, at least
+    /// `n − dim(V·V)`; ml-cryptanalysis `experiments/ic-fb-structure` P1).  When
+    /// no calibrated point is set and the shape is Boolean, the prior's point
+    /// becomes `min(semi-regular degree, effective_degree(shape, falls))`.
+    /// Weight, uniform half and the data-only cost path are unchanged.
+    pub fn set_affine_falls(&mut self, falls: u32, source: &str) {
+        self.affine_falls = Some((falls, source.into()));
+    }
+    /// Centre the prior's point mass on a calibrated degree instead of the
+    /// semi-regular degree.  The prior weight and its uniform half are
+    /// unchanged, so the prior still washes out with data and the cost
+    /// projection still excludes it once a solve is observed.  `source`
+    /// names the calibration and is recorded on the forecast.
+    pub fn set_prior_degree(&mut self, degree: u32, source: &str) {
+        self.prior_point = Some((degree.max(1), source.into()));
     }
     /// Name the unit the relation matrix's work is counted in.
     pub fn set_linear_algebra_unit(&mut self, unit: &str) {
@@ -744,11 +801,12 @@ impl Forecaster {
             .and_then(|s| s.equation_degrees.iter().copied().min())
             .unwrap_or(2)
             .max(1);
+        let (prior_point, prior_source) = self.prior_point_and_source(semi_regular);
         let all = degree_forecast(
             self.observations.iter().copied(),
             self.bound,
             self.prior_weight,
-            semi_regular,
+            prior_point,
             lowest,
         );
         let decomposable = degree_forecast(
@@ -758,7 +816,7 @@ impl Forecaster {
                 .filter(|o| o.outcome == Outcome::Decomposed),
             self.bound,
             self.prior_weight,
-            semi_regular,
+            prior_point,
             lowest,
         );
         // The prior shapes the degree forecast; the cost projection charges
@@ -919,7 +977,30 @@ impl Forecaster {
             advice_reasons: reasons,
             advisory: "advisory triage only; the sweep never stops, skips or shortens a candidate on this forecast".into(),
             certified_degree_of_regularity: None,
+            prior_source,
         }
+    }
+
+    /// The prior's point and its recorded source: a calibrated point if one is
+    /// set; otherwise, on a Boolean shape with known affine falls, the smaller
+    /// of the semi-regular and effective degrees; otherwise the semi-regular degree.
+    fn prior_point_and_source(&self, semi_regular: Option<u32>) -> (Option<u32>, Option<String>) {
+        if let Some((d, s)) = &self.prior_point {
+            return (Some(*d), Some(format!("{s}; prior point at degree {d}")));
+        }
+        if let (Some((falls, s)), Some(shape)) = (&self.affine_falls, &self.shape) {
+            if shape.boolean {
+                let eff = effective_degree(shape, *falls);
+                let point = semi_regular.map_or(eff, |sr| sr.min(eff));
+                return (
+                    Some(point),
+                    Some(format!(
+                        "{s}; effective degree {eff} after {falls} affine falls; prior point at degree {point}"
+                    )),
+                );
+            }
+        }
+        (semi_regular, None)
     }
 }
 
@@ -1110,6 +1191,158 @@ mod tests {
         assert_eq!(full.band_of_all(), (Some(6), Some(6)));
         assert_eq!(full.excess_over_semi_regular, Some(3));
         assert_eq!(full.structural_gain, Some(false));
+    }
+
+    fn boolean_quadratics(vars: usize, equations: usize) -> SystemShape {
+        SystemShape {
+            variables: vars,
+            equation_degrees: vec![2; equations],
+            boolean: true,
+        }
+    }
+
+    #[test]
+    fn boolean_semi_regular_degree_matches_the_python_reference() {
+        // Values from ml-cryptanalysis csd.macaulay.semiregular_dreg, the function the
+        // effective-degree bound was validated with.
+        for (vars, eqs, want) in [
+            (14, 33, 3),
+            (20, 30, 4),
+            (10, 12, 3),
+            (24, 47, 4),
+            (7, 5, 3),
+            (26, 47, 5),
+        ] {
+            assert_eq!(
+                boolean_quadratics(vars, eqs).semi_regular_degree(),
+                Some(want),
+                "{vars} vars, {eqs} quadratics"
+            );
+        }
+    }
+
+    #[test]
+    fn effective_degree_matches_the_python_reference_on_measured_shapes() {
+        // ml-cryptanalysis experiments/dmut-mechanistic-20261114 rows: falls = n - dim(VV) + 1.
+        let s47 = boolean_quadratics(26, 47); // n = 47, k = 13
+        assert_eq!(effective_degree(&s47, 47 - 25 + 1), 2); // fppr, dim(VV) = 25
+        assert_eq!(effective_degree(&s47, 47 - 36 + 1), 3); // near_gp, dim(VV) = 36
+        assert_eq!(effective_degree(&s47, 1), 4); // random, dim(VV) = n, falls = 1
+        let s53 = boolean_quadratics(30, 53); // n = 53, k = 15
+        assert_eq!(effective_degree(&s53, 53 - 29 + 1), 2);
+        assert_eq!(effective_degree(&s53, 53 - 42 + 1), 4);
+        assert_eq!(effective_degree(&s53, 1), 5); // random, falls = 1
+        assert_eq!(
+            effective_degree(&boolean_quadratics(4, 3), 10),
+            2,
+            "all equations used up"
+        );
+    }
+
+    #[test]
+    fn affine_falls_lower_the_prior_point_only_without_a_calibrated_point() {
+        let mut f = Forecaster::new(8);
+        f.set_shape(boolean_quadratics(26, 47));
+        let before = f.forecast();
+        assert_eq!(
+            before.all_targets.predicted_degree,
+            Some(5),
+            "semi-regular point"
+        );
+        assert_eq!(before.prior_source, None);
+        f.set_affine_falls(23, "test falls");
+        let capped = f.forecast();
+        assert_eq!(capped.all_targets.predicted_degree, Some(2));
+        assert_eq!(
+            capped.semi_regular_degree,
+            Some(5),
+            "the yardstick is unchanged"
+        );
+        assert_eq!(
+            capped.prior_source.as_deref(),
+            Some("test falls; effective degree 2 after 23 affine falls; prior point at degree 2")
+        );
+        f.set_prior_degree(3, "test calibration");
+        assert_eq!(
+            f.forecast().all_targets.predicted_degree,
+            Some(3),
+            "a calibrated point wins"
+        );
+        let mut field = Forecaster::new(8);
+        field.set_shape(quadratic_shape(4, false));
+        let sr = field.forecast().all_targets.predicted_degree;
+        field.set_affine_falls(3, "test falls");
+        assert_eq!(
+            field.forecast().all_targets.predicted_degree,
+            sr,
+            "non-Boolean shapes are untouched"
+        );
+    }
+
+    #[test]
+    fn a_calibrated_prior_point_moves_the_empty_forecast_and_washes_out() {
+        let mut f = Forecaster::new(8);
+        f.set_shape(quadratic_shape(2, false)); // semi-regular degree 3
+        f.set_prior_degree(2, "test calibration");
+        let empty = f.forecast();
+        assert_eq!(
+            empty.semi_regular_degree,
+            Some(3),
+            "the semi-regular degree is still reported"
+        );
+        assert_eq!(empty.all_targets.predicted_degree, Some(2));
+        assert_eq!(empty.all_targets.prior_weight, 1.0);
+        assert_eq!(
+            empty.prior_source.as_deref(),
+            Some("test calibration; prior point at degree 2")
+        );
+        for _ in 0..40 {
+            f.observe(decided(Outcome::Decomposed, 6, 10, true));
+        }
+        let full = f.forecast();
+        assert_eq!(full.all_targets.predicted_degree, Some(6));
+        assert_eq!(
+            full.excess_over_semi_regular,
+            Some(3),
+            "excess stays relative to semi-regular"
+        );
+    }
+
+    #[test]
+    fn a_calibrated_prior_at_the_semi_regular_degree_changes_nothing_but_the_source() {
+        let mut base = Forecaster::new(8);
+        base.set_shape(quadratic_shape(2, false));
+        let mut cal = base.clone();
+        cal.set_prior_degree(3, "test calibration");
+        for f in [&mut base, &mut cal] {
+            f.observe(decided(Outcome::Decomposed, 4, 10, true));
+            f.observe(decided(Outcome::Refuted, 3, 10, false));
+        }
+        let (a, b) = (base.forecast(), cal.forecast());
+        assert_eq!(a.prior_source, None);
+        assert_eq!(a.all_targets, b.all_targets);
+        assert_eq!(a.decomposable_targets, b.decomposable_targets);
+        assert_eq!(a.cost, b.cost);
+        let mut b_without = b.clone();
+        b_without.prior_source = None;
+        assert_eq!(a, b_without);
+    }
+
+    #[test]
+    fn prior_source_is_absent_from_old_json_and_round_trips() {
+        let mut f = Forecaster::new(8);
+        f.set_shape(quadratic_shape(2, false));
+        let plain = serde_json::to_value(f.forecast()).unwrap();
+        assert!(
+            plain.get("prior_source").is_none(),
+            "unset source is not serialized"
+        );
+        let back: Forecast = serde_json::from_value(plain).unwrap();
+        assert_eq!(back.prior_source, None);
+        f.set_prior_degree(2, "test calibration");
+        let with = f.forecast();
+        let back: Forecast = serde_json::from_value(serde_json::to_value(&with).unwrap()).unwrap();
+        assert_eq!(back.prior_source, with.prior_source);
     }
 
     impl Forecast {

@@ -1,0 +1,178 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "cheon-ecbench wide, minus: 14 P-224-shaped curves of 36 to 62 bits, 24 targets each",
+  "description": "research/cheon_ecbench_wide_20261106/PROTOCOL.md. Curves from curves.json (cheon_p224_shape gen --bits 36,38,...,62); arms, d shape, target seed and measurement as research/cheon_ecbench_medium_20261106/spec-*.json, with 24 targets per curve and a 3600 s timeout. Operation counts only.",
+  "workloads": {
+    "curves": [
+      {
+        "a": 42839962887,
+        "b": 20874427050,
+        "group_order": 51539573731,
+        "gx": 1,
+        "gy": 6673236750,
+        "kind": "prime_explicit",
+        "p": 51539607599,
+        "r": 51539573731
+      },
+      {
+        "a": 17529164684,
+        "b": 64402007602,
+        "group_order": 206158772329,
+        "gx": 1,
+        "gy": 78068462413,
+        "kind": "prime_explicit",
+        "p": 206158430209,
+        "r": 206158772329
+      },
+      {
+        "a": 631256874754,
+        "b": 396321534139,
+        "group_order": 824632004309,
+        "gx": 1,
+        "gy": 358987552726,
+        "kind": "prime_explicit",
+        "p": 824633720837,
+        "r": 824632004309
+      },
+      {
+        "a": 62543284952,
+        "b": 1316274821483,
+        "group_order": 3298535353481,
+        "gx": 2,
+        "gy": 81315297975,
+        "kind": "prime_explicit",
+        "p": 3298534883417,
+        "r": 3298535353481
+      },
+      {
+        "a": 4446846082295,
+        "b": 8537060969387,
+        "group_order": 13194139832747,
+        "gx": 1,
+        "gy": 2639664229832,
+        "kind": "prime_explicit",
+        "p": 13194139533349,
+        "r": 13194139832747
+      },
+      {
+        "a": 34594083178937,
+        "b": 2966526380693,
+        "group_order": 52776566620861,
+        "gx": 1,
+        "gy": 20822981424385,
+        "kind": "prime_explicit",
+        "p": 52776558133303,
+        "r": 52776566620861
+      },
+      {
+        "a": 39641408782314,
+        "b": 41864005889039,
+        "group_order": 211106219695673,
+        "gx": 6,
+        "gy": 47249795888303,
+        "kind": "prime_explicit",
+        "p": 211106232533047,
+        "r": 211106219695673
+      },
+      {
+        "a": 548432262590603,
+        "b": 517609737896812,
+        "group_order": 844424927532547,
+        "gx": 2,
+        "gy": 68563426688470,
+        "kind": "prime_explicit",
+        "p": 844424930132057,
+        "r": 844424927532547
+      },
+      {
+        "a": 1295299755018450,
+        "b": 2616635297825668,
+        "group_order": 3377699780661797,
+        "gx": 1,
+        "gy": 36869105830282,
+        "kind": "prime_explicit",
+        "p": 3377699720527897,
+        "r": 3377699780661797
+      },
+      {
+        "a": 9747439063640566,
+        "b": 11266668522726132,
+        "group_order": 13510798894462577,
+        "gx": 2,
+        "gy": 5798236913432454,
+        "kind": "prime_explicit",
+        "p": 13510798882111519,
+        "r": 13510798894462577
+      },
+      {
+        "a": 8102277897249688,
+        "b": 3876574820001616,
+        "group_order": 54043195377297631,
+        "gx": 1,
+        "gy": 9076903442878176,
+        "kind": "prime_explicit",
+        "p": 54043195528445957,
+        "r": 54043195377297631
+      },
+      {
+        "a": 77820819277036018,
+        "b": 22981726657118617,
+        "group_order": 216172781974301177,
+        "gx": 1,
+        "gy": 25822220679620628,
+        "kind": "prime_explicit",
+        "p": 216172782113783843,
+        "r": 216172781974301177
+      },
+      {
+        "a": 266958886551088021,
+        "b": 361107338951082445,
+        "group_order": 864691126899996653,
+        "gx": 3,
+        "gy": 141763765150014220,
+        "kind": "prime_explicit",
+        "p": 864691128455135281,
+        "r": 864691126899996653
+      },
+      {
+        "a": 3420827111682484458,
+        "b": 3211882459968223436,
+        "group_order": 3458764513990144637,
+        "gx": 1,
+        "gy": 1653816644662593717,
+        "kind": "prime_explicit",
+        "p": 3458764513820540933,
+        "r": 3458764513990144637
+      }
+    ],
+    "targets_per_curve": 24,
+    "target_seed": 20261022
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "cheon-comb",
+      "role": "candidate",
+      "method": {
+        "id": "cheon.pminus1_comb",
+        "params": {
+          "d": "shape:0.12943:0.015"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 1,
+    "isolation_required": "L0",
+    "timeout_seconds": 3600
+  }
+}

@@ -1,0 +1,15 @@
+# C73: a new structural direction: Frobenius-split five-source search
+
+The previous cycles mainly optimized classical conditional root solving. This cycle instead tests a change to the unresolved independent-source problem: separate rational and anti-rational contributions via Frobenius, with exact low-arity guards.
+
+For an ordinary binary curve, every point with ground-field x lifts to the quadratic extension and is rational or anti-rational. If five such points sum to a non-torsion rational target, their anti-rational subtotal is rational two-torsion. Splitting by the number of anti-rational sources gives exact lower-arity necessary conditions. Under the explicit G1/G2/G3 guards in PROOF.md, every five-distinct-source solution has rational lifts. Repeated sources are not discarded; they require their own complete branch coverage.
+
+Actual evidence: on the original GF(2^83), A=0, B=1, d=18 target, both the target and its torsion translate are outside the domain. Two complete quadratic scans visited every 262,143 nonzero source x, with zero-source cases handled separately. Neither target had any source-domain pair root. For distinct domain elements xy=1 is impossible because the unreduced polynomial product has degree<=34<83; the only product-one pair is (1,1). The field Rabin check and target point equation passed. These establish the theorem's actual-instance guards, not a completed five-source root list.
+
+Independent small oracle: all 110,856 original five-source polynomial-chain tuples across six rational non-torsion targets over GF8 matched geometric reconstruction over GF64. This covered 252,936 signed geometric assignments, including 4,056 with two anti-rational sources and 48 with four. A concrete nonrational witness is retained; an unconditional rational-point shortcut is false. Exact root-set digests, full source and native scan outputs are preserved.
+
+This changes the search architecture: the distinct-source hard branch can be routed to rational group arithmetic, while repeated/nonrational branches remain explicit. It does not solve the remaining five-sum search, establish an asymptotic improvement, or pass any genuine F4/F5/F6 speed gate. Frobenius eigenspaces and twists are classical; novelty of a complete architecture requires further primary literature review.
+
+New leads: (1) complete the Frobenius branch partition; (2) target-driven joins that intersect component images before expanding source fibers; (3) field-specific block kernels selected by algebraic image degree, not graph sparsity. The immediate falsifiable test is stronger chain-topology rationalization plus repeated-source reconstruction on independent small fields, followed by an exact group-search prototype with all finite intermediate restrictions retained.
+
+One frozen 90-second, 4-GiB, one-core experiment passed through resume/run-ready. The coordinator exceeded its 900-second cap while deriving/designing the new reduction; worker limits held. This budget failure is disclosed and does not alter scientific gates. The scientific goal remains active; no qualified 50x or generalized rootfinding release is claimed.

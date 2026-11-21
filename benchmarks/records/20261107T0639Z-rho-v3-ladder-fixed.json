@@ -1,0 +1,148 @@
+{
+  "branch": "aburan28/wizardly-einstein-i9seky",
+  "closed_utc": "2026-11-07T06:48:19+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/ecbench",
+        "run",
+        "--spec",
+        "research/ecbench_rho_v3_ladder_20261107/spec.json",
+        "--out",
+        "research/ecbench_rho_v3_ladder_20261107/sessions/main",
+        "--cpus",
+        "none",
+        "--allow-busy",
+        "--quiet"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-07T06:39:25+00:00",
+      "wall_s": 46.812
+    }
+  ],
+  "commit": "c047182e274ecc86280dc186042d336baebedb03",
+  "commit_dirty": true,
+  "created_utc": "2026-11-07T06:39:18+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261107-rho-v3-ladder"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
+  },
+  "id": "20261107T0639Z-rho-v3-ladder-fixed",
+  "metrics": [
+    {
+      "baseline": 0.983,
+      "better": "lower",
+      "n": 192,
+      "name": "rho_negation_v3_s_r28",
+      "note": "log2 r 27.96; baseline rho.negation_v2 same session; theory sqrt(pi/4)=0.886",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.83,
+        1.017
+      ],
+      "unit": "S",
+      "value": 0.923
+    },
+    {
+      "baseline": 1.106,
+      "better": "lower",
+      "n": 192,
+      "name": "rho_negation_v3_s_r24",
+      "note": "log2 r 23.97; baseline rho.negation_v2; theory 0.886",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.841,
+        1.007
+      ],
+      "unit": "S",
+      "value": 0.923
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1152,
+      "name": "rho_negation_v3_over_v2_ops",
+      "note": "candidate/incumbent paired, 6 curves (lower is better); band 0.864/0.869/0.888 at w=0/0.1/1",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.832,
+        0.898
+      ],
+      "unit": "ratio",
+      "value": 0.8643
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1152,
+      "name": "rho_plain_v3_over_plain_ops",
+      "note": "candidate/baseline paired, 6 curves (lower is better)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.901,
+        0.979
+      ],
+      "unit": "ratio",
+      "value": 0.9391
+    }
+  ],
+  "problem": "ecdlp:prime-ladder-18-28",
+  "raw": [
+    {
+      "bytes": 44095470,
+      "path": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1c/1c536f957b4ee9eded713535f0e083b599b8559d665c89d5bcd4e3645c55c4af",
+      "sha256": "1c536f957b4ee9eded713535f0e083b599b8559d665c89d5bcd4e3645c55c4af",
+      "uploaded": false
+    },
+    {
+      "bytes": 1260541,
+      "path": "research/ecbench_rho_v3_ladder_20261107/sessions/main/plan.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/68/6831c6ef2c73a5042a0641734dcde6808e96e300aa04d47e71889819efc1f7c8",
+      "sha256": "6831c6ef2c73a5042a0641734dcde6808e96e300aa04d47e71889819efc1f7c8",
+      "uploaded": false
+    },
+    {
+      "bytes": 2038,
+      "path": "research/ecbench_rho_v3_ladder_20261107/sessions/main/session.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/77/7713b77487d10ac0eb0556263d55c387292df84c3fc04997de9330c2dbeaaf6e",
+      "sha256": "7713b77487d10ac0eb0556263d55c387292df84c3fc04997de9330c2dbeaaf6e",
+      "uploaded": false
+    },
+    {
+      "bytes": 727191,
+      "path": "research/ecbench_rho_v3_ladder_20261107/audit.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/79/790537667a04373a4bf2e7d328c99c6844191ea78744bbe7d789293f10ae8576",
+      "sha256": "790537667a04373a4bf2e7d328c99c6844191ea78744bbe7d789293f10ae8576",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261107-rho-v3-ladder/REPORT.pdf",
+    "png": [
+      "benchmarks/20261107-rho-v3-ladder/s_over_theory.png"
+    ],
+    "svg": [
+      "benchmarks/20261107-rho-v3-ladder/s_over_theory.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "rho-v3-ladder-fixed",
+  "status": "measured",
+  "summary": "rho.negation_v3 (ladder-built jump table, k~sqrt(F/2)) vs rho.negation_v2 on prime 2^17.7..2^28, local L0, counted GAE: paired ops 0.864 [0.832,0.898], band-robust; v3 S/theory 1.30 at 2^17.7 to 1.04 at 2^24 and 2^28; search phase 1.00-1.03x theory at >=2^24. Audit replay-all 5760/5760. Not validated (no L2, no validator).",
+  "validation": null
+}

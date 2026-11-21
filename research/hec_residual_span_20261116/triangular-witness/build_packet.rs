@@ -1,0 +1,7 @@
+use crate::{packet::{Packet,Row,Kind},core::Trace,sparse::Sparse,action};
+use hec_native_ic::{fp::Fp,jac::{Curve,Div}};
+pub fn build(c:&Curve,d:&Div,target:&Div,ell:u64,sm:u64,trace:&Trace)->Packet{let lambda=action::witness(c,trace.z,ell).unwrap().lambda;let fl=Fp::new(ell);let n=trace.points.len()+1;let mut rows=vec![];let mut public=vec![0;n];public[0]=1;rows.push(Row{kind:Kind::Public,coeff:public,rhs:fl.inv(sm)});
+let mut index=std::collections::BTreeMap::new();for(j,&(rx,ry))in trace.points.iter().enumerate(){let(mut xx,mut w)=(rx,1);for _ in 0..5{assert!(index.insert((xx,ry),(j,w)).is_none());let ny=c.fp.neg(ry);if ny!=ry{assert!(index.insert((xx,ny),(j,fl.neg(w))).is_none());}xx=c.fp.mul(xx,trace.z);w=fl.mul(w,lambda);}}
+for p in &trace.primitives{let mut v=vec![0;n];for point in &p.points{let &(j,w)=index.get(point).expect("support must lie in a unique signed orbit");v[j]=fl.add(v[j],w);}v[n-1]=1;rows.push(Row{kind:Kind::Pencil{a:p.a,t:p.t,points:p.points.clone()},coeff:v,rhs:fl.neg(p.a%ell)});}
+ let (k,witness)=crate::triangular::solve(&rows,n,ell);assert_eq!(Some(k),trace.answer.map(|x|x.1));Packet{curve:c.clone(),d:*d,target:*target,ell,sm,z:trace.z,lambda,reps:trace.points.clone(),rows,witness,k}
+}

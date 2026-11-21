@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T08:32:15Z",
+ "id": "PCC-20261117-403870",
+ "kind": "statement",
+ "producer": {
+  "commit": "f35867831245560527428e3562ab55d74eefb5a0",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_richelot_map_20261117/evidence/first-arithmetic-F-09/ACTUAL_FIRST_MAP14_SCOPE.json",
+    "sha256": "874b28343fc72c64f3e38d5c86c951b083717596e91207d8db4ce2f731f7fa46"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_richelot_map_20261117/evidence/first-arithmetic-F-09/19-first-frozen-arithmetic.stdout",
+    "sha256": "8456908b5b33d32c2170afe54d8a779da8d91af8913bf34fe63bfbc81f3fa11e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Frozen public unit14 sourcef35867831245560527428e3562ab55d74eefb5a0 passes its first actual Rust arithmetic test:17 witnesses,34 diagonal/cyclic homomorphism pairs,17 old/new conjugacies, both declared quadratic-orbit routes, two nonzero109/113 generators,10 scalar cases,3 malformed constructors and2 wrong-dual-sign controls. Both declared dual[2] orientations and inverse6159 recovery pass; formula-derived normalization30/16/76/13/kappa100 matches the pre-map11b4a9 prediction. One new test passes,13 inherited tests compile/filter; all24 recorded phase expectations including strict Clippy/fmt/source/dependency/copied-qualifier guards pass. Full42435B output and74-member1730144B archive027021bb3c73c511a906ff3d3ec116de0725c2fc7f236377188afad6403c7aa7 retain full3rlibs and both ELF copies, all full bytes/modes compared. Same-engine finite correctness, unsigned; no original12317-class replay, new general Lean or performance claim."
+}

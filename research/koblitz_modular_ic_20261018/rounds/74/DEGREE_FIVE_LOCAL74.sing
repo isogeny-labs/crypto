@@ -1,0 +1,106 @@
+LIB "linalg.lib";
+proc require74(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump74(link out,string name,matrix M){
+ int x;int y;write(out,"matrix "+name+"["+string(nrows(M))+"]["+string(ncols(M))+"];");
+ for(x=1;x<=nrows(M);x++){for(y=1;y<=ncols(M);y++){if(M[x,y]!=0){write(out,name+"["+string(x)+","+string(y)+"]="+string(M[x,y])+";");}}}
+}
+execute(read("../../../61/runs/trace61-01/trace-polynomial61.sing"));
+execute(read("../../../52/source-data/rr-table50.sing"));
+intmat slots74[32][32];int p74;int i74;int j74;int k74;int x74;int y74;int t74;int c74;int picked74;int mask74;int bits74;int w74;int primitive74;int primitiveCount74;int localRank74;int residue74;int e74;int lengthSum74;int budget74;
+for(p74=1;p74<=528;p74++){
+ x74=parents50[p74,1];y74=parents50[p74,2];
+ require74(x74>=1 && x74<=y74 && y74<=32 && slots74[x74,y74]==0,"LOCAL74_UNIQUE_PRODUCT_SLOT");
+ slots74[x74,y74]=p74;slots74[y74,x74]=p74;
+}
+for(i74=1;i74<=32;i74++){for(j74=1;j74<=32;j74++){require74(slots74[i74,j74]>0,"LOCAL74_ALL_528_PRODUCT_SLOTS");}}
+matrix sourceTable74=table50;
+execute(read("../../../73/runs/degree-five73-02/degree-five73.sing"));
+require74(reducedDimension73==20 && branches73==6 && degreeCount1_73==4 && degreeCount2_73==1 && degreeCount14_73==1,"LOCAL74_R73_FULL_DEGREE_PROFILE");
+map tableToFiber74=tablePidCertificate50,a;
+map unitToFiber74=tracePolynomial61,a;
+matrix fiberTable74=tableToFiber74(sourceTable74);
+matrix sourceUnit74=unitToFiber74(unit61);
+require74(nrows(fiberTable74)==32 && ncols(fiberTable74)==528 && nrows(sourceUnit74)==32 && ncols(sourceUnit74)==1,"LOCAL74_FULL_SOURCE_SHAPES");
+matrix fixedF3274=matrix(syz(module(relative73+unitmat(32))));
+require74(nrows(fixedF3274)==32 && ncols(fixedF3274)==6 && mat_rk(fixedF3274)==6,"LOCAL74_COMPLETE_RELATIVE_FIXED_KERNEL");
+require74(relative73*fixedF3274==fixedF3274,"LOCAL74_ALL_RELATIVE_FIXED_PRODUCTS");
+matrix traceCandidates74[32][30];matrix current74[32][1];matrix trace74[32][1];matrix squareVector74[32][1];
+c74=0;
+for(j74=1;j74<=6;j74++){for(k74=0;k74<=4;k74++){
+ c74++;for(i74=1;i74<=32;i74++){current74[i74,1]=a^k74*fixedF3274[i74,j74];}
+ trace74=matrix(0,32,1);
+ for(t74=1;t74<=5;t74++){
+  trace74=trace74+current74;
+  for(i74=1;i74<=32;i74++){squareVector74[i74,1]=current74[i74,1]^2;}
+  current74=square73*squareVector74;
+ }
+ for(i74=1;i74<=32;i74++){squareVector74[i74,1]=trace74[i74,1]^2;traceCandidates74[i74,c74]=trace74[i74,1];}
+ require74(square73*squareVector74==trace74,"LOCAL74_ALL_30_ABSOLUTE_TRACE_FIXED");
+}}
+require74(c74==30,"LOCAL74_COMPLETE_TRACE_CANDIDATES");
+matrix selected74=matrix(0,32,32);matrix trial74[32][32];picked74=0;
+for(j74=1;j74<=30;j74++){
+ trial74=selected74;
+ for(i74=1;i74<=32;i74++){trial74[i74,picked74+1]=traceCandidates74[i74,j74];}
+ if(mat_rk(trial74)>picked74){selected74=trial74;picked74++;}
+}
+require74(picked74==6,"LOCAL74_COMPLETE_SIX_DIMENSION_F2_FIXED_BASIS");
+matrix idempotents74[32][63];matrix operators74[32][2016];matrix operator74[32][32];
+matrix vector74[32][1];matrix other74[32][1];matrix primitiveSum74[32][1];
+intmat primitiveMasks74[6][1];intmat primitiveRanks74[6][1];intmat primitiveDegrees74[6][1];intmat primitiveIndices74[6][1];intmat degreeCounts74[14][1];
+for(mask74=1;mask74<=63;mask74++){
+ bits74=mask74;vector74=matrix(0,32,1);
+ for(j74=1;j74<=6;j74++){
+  if(bits74!=2*(bits74 div 2)){for(i74=1;i74<=32;i74++){vector74[i74,1]=vector74[i74,1]+selected74[i74,j74];}}
+  bits74=bits74 div 2;
+ }
+ require74(bits74==0 && vector74!=matrix(0,32,1),"LOCAL74_ALL_63_NONZERO_FIXED_VECTORS");
+ for(i74=1;i74<=32;i74++){squareVector74[i74,1]=vector74[i74,1]^2;idempotents74[i74,mask74]=vector74[i74,1];}
+ require74(square73*squareVector74==vector74,"LOCAL74_ALL_63_IDEMPOTENTS");
+ operator74=matrix(0,32,32);
+ for(j74=1;j74<=32;j74++){for(i74=1;i74<=32;i74++){
+  if(vector74[i74,1]!=0){for(k74=1;k74<=32;k74++){operator74[k74,j74]=operator74[k74,j74]+vector74[i74,1]*fiberTable74[k74,slots74[i74,j74]];}}
+ }}
+ require74(operator74*operator74==operator74 && operator74*sourceUnit74==vector74,"LOCAL74_FULL_PRODUCT_IDEMPOTENT_OPERATOR");
+ for(i74=1;i74<=32;i74++){for(j74=1;j74<=32;j74++){operators74[i74,32*(mask74-1)+j74]=operator74[i74,j74];}}
+}
+primitiveCount74=0;lengthSum74=0;budget74=0;primitiveSum74=matrix(0,32,1);
+for(mask74=1;mask74<=63;mask74++){
+ for(i74=1;i74<=32;i74++){vector74[i74,1]=idempotents74[i74,mask74];for(j74=1;j74<=32;j74++){operator74[i74,j74]=operators74[i74,32*(mask74-1)+j74];}}
+ primitive74=1;
+ for(w74=1;w74<=63;w74++){
+  if(w74!=mask74){for(i74=1;i74<=32;i74++){other74[i74,1]=idempotents74[i74,w74];}
+   if(operator74*other74==other74){primitive74=0;}
+  }
+ }
+ if(primitive74==1){
+  primitiveCount74++;require74(primitiveCount74<=6,"LOCAL74_TOO_MANY_PRIMITIVES");
+  localRank74=mat_rk(operator74);residue74=mat_rk(relative73*operator74);
+  require74(residue74>=1 && residue74<=14 && localRank74>0 && localRank74==(localRank74 div residue74)*residue74,"LOCAL74_INTEGRAL_LOCAL_LENGTH");
+  e74=localRank74 div residue74;
+  require74(e74>=1 && e74!=2*(e74 div 2),"LOCAL74_ALL_TAME_ODD_INDICES");
+  if(residue74==14){require74(e74==1,"LOCAL74_DEGREE_FOURTEEN_UNRAMIFIED");}
+  degreeCounts74[residue74,1]=degreeCounts74[residue74,1]+1;
+  primitiveMasks74[primitiveCount74,1]=mask74;primitiveRanks74[primitiveCount74,1]=localRank74;
+  primitiveDegrees74[primitiveCount74,1]=residue74;primitiveIndices74[primitiveCount74,1]=e74;
+  lengthSum74=lengthSum74+localRank74;budget74=budget74+residue74*(e74-1);
+  primitiveSum74=primitiveSum74+vector74;
+  print("LOCAL74_FACTOR mask="+string(mask74)+" residue_degree="+string(residue74)+" absolute_degree="+string(5*residue74)+" local_length="+string(localRank74)+" ramification="+string(e74));
+ }
+}
+require74(primitiveCount74==6 && lengthSum74==32 && budget74==12 && primitiveSum74==sourceUnit74,"LOCAL74_PRIMITIVE_SUM_LENGTH_DIFFERENT");
+require74(degreeCounts74[1,1]==4 && degreeCounts74[2,1]==1 && degreeCounts74[14,1]==1,"LOCAL74_R73_RESIDUE_DEGREE_MULTISET");
+for(x74=1;x74<=6;x74++){for(y74=x74+1;y74<=6;y74++){
+ mask74=primitiveMasks74[x74,1];w74=primitiveMasks74[y74,1];
+ for(i74=1;i74<=32;i74++){other74[i74,1]=idempotents74[i74,w74];for(j74=1;j74<=32;j74++){operator74[i74,j74]=operators74[i74,32*(mask74-1)+j74];}}
+ require74(operator74*other74==matrix(0,32,1),"LOCAL74_PAIRWISE_PRIMITIVE_ORTHOGONALITY");
+}}
+link out74="ASCII:w degree-five-local74.sing";open(out74);
+write(out74,"ring degreeFiveLocalResult74=(2,a),(q),dp;minpoly=a^5+a^3+a^2+a+1;short=0;");
+dump74(out74,"relativeFixed74",fixedF3274);dump74(out74,"traceCandidates74",traceCandidates74);
+dump74(out74,"absoluteFixedBasis74",selected74);dump74(out74,"allIdempotents74",idempotents74);
+write(out74,"int primitiveCount74="+string(primitiveCount74)+";int lengthSum74="+string(lengthSum74)+";int differentBudget74="+string(budget74)+";");
+for(x74=1;x74<=6;x74++){write(out74,"int primitiveMask"+string(x74)+"_74="+string(primitiveMasks74[x74,1])+";int localRank"+string(x74)+"_74="+string(primitiveRanks74[x74,1])+";int residueDegree"+string(x74)+"_74="+string(primitiveDegrees74[x74,1])+";int ramification"+string(x74)+"_74="+string(primitiveIndices74[x74,1])+";");}
+close(out74);
+print("LOCAL74_RESULT base_degree=5 fiber_dimension=32 relative_fixed_dimension=6 absolute_fixed_dimension=6 nonzero_idempotents=63 primitive_count="+string(primitiveCount74)+" local_length_sum="+string(lengthSum74)+" different_budget="+string(budget74));
+print("DEGREE_FIVE_LOCAL74_ALL_CHECKS_PASS");quit;

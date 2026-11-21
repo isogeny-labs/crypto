@@ -113,6 +113,7 @@ def main(argv: list[str] | None = None) -> int:
             "schema": pcc.CLAIM_SCHEMA,
             "id": pcc.new_claim_id(),
             "kind": "measurement",
+            "claim_type": "data",
             "statement": statement(row),
             "scope": (f"one leaderboard row as built by scripts/build_ic_leaderboard.py from {row['source']}; "
                       f"validated under docs/VALIDATION_GATE.md by {evidence.relative_to(REPO).as_posix()}/VALIDATION.json "

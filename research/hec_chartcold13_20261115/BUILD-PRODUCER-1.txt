@@ -1,0 +1,145 @@
+   Compiling autocfg v1.5.1
+   Compiling hec-native-ic v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/crates/hec-native-ic)
+   Compiling num-traits v0.2.19
+   Compiling num-integer v0.1.47
+   Compiling num-bigint v0.4.8
+   Compiling hec-chart-cold13 v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_chartcold13_20261115)
+error[E0433]: cannot find `target` in `super`
+  --> config.rs:26:12
+   |
+26 |     super::target::monomials(4)
+   |            ^^^^^^ could not find `target` in the crate root
+
+error[E0433]: cannot find `target` in `super`
+  --> config.rs:61:12
+   |
+61 |     super::target::monomials(4)
+   |            ^^^^^^ could not find `target` in the crate root
+
+warning: function `reduce` is never used
+   --> verify_poly.rs:115:4
+    |
+115 | fn reduce(a: &[u64], m: &[u64]) -> U {
+    |    ^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+error[E0433]: cannot find `target` in `super`
+  --> config.rs:72:12
+   |
+72 |     super::target::monomials(4)
+   |            ^^^^^^ could not find `target` in the crate root
+
+error[E0433]: cannot find `target` in `super`
+  --> config.rs:97:35
+   |
+97 |     for (&(a, _, c), v) in super::target::monomials(4).iter().zip(f) {
+   |                                   ^^^^^^ could not find `target` in the crate root
+
+error[E0433]: cannot find `target` in `super`
+   --> config.rs:162:16
+    |
+162 |         super::target::rational_points(&f, P),
+    |                ^^^^^^ could not find `target` in the crate root
+
+error[E0433]: cannot find `target` in `super`
+  --> config.rs:26:12
+   |
+26 |     super::target::monomials(4)
+   |            ^^^^^^ unresolved import
+   |
+note: module `crate::target_program::target` exists but is inaccessible
+  --> runtime_program.rs:8:1
+   |
+ 8 | mod target {
+   | ^^^^^^^^^^ not accessible
+help: a similar path exists
+   |
+26 |     super::crate::target_program::target::monomials(4)
+   |            +++++++++++++++++++++++
+
+error[E0433]: cannot find `target` in `super`
+  --> config.rs:61:12
+   |
+61 |     super::target::monomials(4)
+   |            ^^^^^^ unresolved import
+   |
+note: module `crate::target_program::target` exists but is inaccessible
+  --> runtime_program.rs:8:1
+   |
+ 8 | mod target {
+   | ^^^^^^^^^^ not accessible
+help: a similar path exists
+   |
+61 |     super::crate::target_program::target::monomials(4)
+   |            +++++++++++++++++++++++
+
+error[E0433]: cannot find `target` in `super`
+  --> config.rs:72:12
+   |
+72 |     super::target::monomials(4)
+   |            ^^^^^^ unresolved import
+   |
+note: module `crate::target_program::target` exists but is inaccessible
+  --> runtime_program.rs:8:1
+   |
+ 8 | mod target {
+   | ^^^^^^^^^^ not accessible
+help: a similar path exists
+   |
+72 |     super::crate::target_program::target::monomials(4)
+   |            +++++++++++++++++++++++
+
+error[E0433]: cannot find `target` in `super`
+  --> config.rs:97:35
+   |
+97 |     for (&(a, _, c), v) in super::target::monomials(4).iter().zip(f) {
+   |                                   ^^^^^^ unresolved import
+   |
+note: module `crate::target_program::target` exists but is inaccessible
+  --> runtime_program.rs:8:1
+   |
+ 8 | mod target {
+   | ^^^^^^^^^^ not accessible
+help: a similar path exists
+   |
+97 |     for (&(a, _, c), v) in super::crate::target_program::target::monomials(4).iter().zip(f) {
+   |                                   +++++++++++++++++++++++
+
+error[E0433]: cannot find `target` in `super`
+   --> config.rs:162:16
+    |
+162 |         super::target::rational_points(&f, P),
+    |                ^^^^^^ unresolved import
+    |
+note: module `crate::target_program::target` exists but is inaccessible
+   --> runtime_program.rs:8:1
+    |
+  8 | mod target {
+    | ^^^^^^^^^^ not accessible
+help: a similar path exists
+    |
+162 |         super::crate::target_program::target::rational_points(&f, P),
+    |                +++++++++++++++++++++++
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `hec-chart-cold13` (bin "generate13") due to 5 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `hec-chart-cold13` (bin "recover13") due to 5 previous errors
+warning: function `install` is never used
+  --> config.rs:18:8
+   |
+18 | pub fn install(c: Config) {
+   |        ^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `hc` is never used
+  --> setup.rs:16:8
+   |
+16 | pub fn hc() -> [u64; 8] {
+   |        ^^
+
+warning: `hec-chart-cold13` (bin "verify13") generated 1 warning
+warning: `hec-chart-cold13` (bin "descent13") generated 2 warnings
+warning: `hec-chart-cold13` (bin "fiberalign13") generated 1 warning (1 duplicate)

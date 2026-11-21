@@ -1,0 +1,3576 @@
+{
+  "schema": "twist.followup-run/v1",
+  "command": "homogeneous-pilot",
+  "fixture_sha256": "8d490a36d65ebf906b93e04eeeb21ac5802f2a9382ef03271a4648fd4b78a4ed",
+  "rows": [
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp6-tm7-fc20da94",
+      "p": 59,
+      "B": 8,
+      "arity": 2,
+      "encoding": "bits",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "77c1c0c17dd38252d19de245f5269bd15b451653179533be9d3d2cbeb30f3984",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "77c1c0c17dd38252d19de245f5269bd15b451653179533be9d3d2cbeb30f3984",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "9887b8996017223b6ad12bf76c13c4ff93440b0755da5439f152ea7b370b8991",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 59",
+          "input_sha256": "9887b8996017223b6ad12bf76c13c4ff93440b0755da5439f152ea7b370b8991",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 59",
+          "input_sha256": "9887b8996017223b6ad12bf76c13c4ff93440b0755da5439f152ea7b370b8991",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "477a6089ec6479ae4b8016d3e4242b88bb57c308c3acb791440521737f9477be",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 0,
+        "expected_affine_assignments": 0,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "b9c70d721aa20e1608b24b25914f2a5abe88074a1464197821fdc52a05beb36f",
+        "stdout_sha256": "e4b6afed643565e70c841a8bee0c33983a66e5ec79400997cf418bbdc8bc5d46",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 1,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 0,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 0,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp6-tm7-fc20da94",
+      "p": 59,
+      "arity": 2,
+      "encoding": "bits",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 0,
+        "expected_affine_assignments": 0,
+        "bases": [],
+        "script_sha256": "13045fc32bd42509afe4f65e92d90d4e711f3c99ebc234bccf50b43b018ee21d",
+        "stdout_sha256": "4f2b6da8c1b349ee5066f3391e431793d8d372570916f50fa7a565ab160e493b",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp6-tm7-fc20da94",
+      "p": 59,
+      "B": 8,
+      "arity": 2,
+      "encoding": "chain",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "e80276bda4c95dbf5d32f4fdaff66ed2407ca0a2c7336e83be7fdcd458a304d3",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "e80276bda4c95dbf5d32f4fdaff66ed2407ca0a2c7336e83be7fdcd458a304d3",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "bd21edb1547767fcbe261fbd58f97d05869422692d2df10e64f8000d5e8576ee",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 59",
+          "input_sha256": "bd21edb1547767fcbe261fbd58f97d05869422692d2df10e64f8000d5e8576ee",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 59",
+          "input_sha256": "bd21edb1547767fcbe261fbd58f97d05869422692d2df10e64f8000d5e8576ee",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "27aa33b9b374b54f226ded8b47b6f2aab29922b92df0f83345e9214c7f7c8697",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 0,
+        "expected_affine_assignments": 0,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "89dfd94e8e4ae1f00286d6c3c9a281d6ec4a4fa2af98a15863a53987cdbd11ef",
+        "stdout_sha256": "e4b6afed643565e70c841a8bee0c33983a66e5ec79400997cf418bbdc8bc5d46",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 12,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 0,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 0,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp6-tm7-fc20da94",
+      "p": 59,
+      "arity": 2,
+      "encoding": "chain",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 0,
+        "expected_affine_assignments": 0,
+        "bases": [],
+        "script_sha256": "90638d47c99630dc52c9b29ba9a00801527aec50f60c857621155c76ac9c5734",
+        "stdout_sha256": "4f2b6da8c1b349ee5066f3391e431793d8d372570916f50fa7a565ab160e493b",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp6-tm7-fc20da94",
+      "p": 59,
+      "B": 8,
+      "arity": 2,
+      "encoding": "product",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "0b0dab6ddb169c554bfc0f8cc7bfe620f6ae49186cf62430bf1e20fd931c97ab",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "0b0dab6ddb169c554bfc0f8cc7bfe620f6ae49186cf62430bf1e20fd931c97ab",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "d72cd6924aff751658e3669ce1759ca37af393cca3bc805a0aa39f116b97d3c5",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 59",
+          "input_sha256": "d72cd6924aff751658e3669ce1759ca37af393cca3bc805a0aa39f116b97d3c5",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 59",
+          "input_sha256": "d72cd6924aff751658e3669ce1759ca37af393cca3bc805a0aa39f116b97d3c5",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 256,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "85894a987ef3c7cb4d54c24e28c06f5f6f35d09ae645077f85c13d190b648149",
+        "stdout_sha256": "3b104e421d89e81be656f836d2588190490c13c87dbf0070f34e87323e781335",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 0,
+        "expected_affine_assignments": 0,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "87f77ad2b91e324c175450e14b2afafd983668b9860d7c084d660596a869f5f4",
+        "stdout_sha256": "e4b6afed643565e70c841a8bee0c33983a66e5ec79400997cf418bbdc8bc5d46",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 0,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 0,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 0,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp6-tm7-fc20da94",
+      "p": 59,
+      "arity": 2,
+      "encoding": "product",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 0,
+        "expected_affine_assignments": 0,
+        "bases": [],
+        "script_sha256": "76fe0fbd357dc05490f508e6877e36bf1773e37eeac8295aeeaffab2782088ab",
+        "stdout_sha256": "4f2b6da8c1b349ee5066f3391e431793d8d372570916f50fa7a565ab160e493b",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp6-tm7-fc20da94",
+      "p": 59,
+      "B": 8,
+      "arity": 2,
+      "encoding": "symmetric",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "d42103e5711361ee86edb6a29dc699992090efc57d480a624c65e9c179a538d2",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "d42103e5711361ee86edb6a29dc699992090efc57d480a624c65e9c179a538d2",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "cc14c443247d20c73e1c3dcbd4eeafbfd32933da4c87a88834a3f62706401412",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 59",
+          "input_sha256": "cc14c443247d20c73e1c3dcbd4eeafbfd32933da4c87a88834a3f62706401412",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 59",
+          "input_sha256": "cc14c443247d20c73e1c3dcbd4eeafbfd32933da4c87a88834a3f62706401412",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 98,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "be4912484a6a0f5a0974c8c9a5c6614628e1b167fc856a932cbdacc4b4669be6",
+        "stdout_sha256": "61afe30b22add2c477a7043af754a7c471359b30d59f7dc68a12be52adb3404f",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 0,
+        "expected_affine_assignments": 0,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "4c1b1d1c2a9e16fa27d0b89a73f1b4d39b31f916e89c8162364b8ec2dc7d90b2",
+        "stdout_sha256": "e4b6afed643565e70c841a8bee0c33983a66e5ec79400997cf418bbdc8bc5d46",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 0,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 0,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 0,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp6-tm7-fc20da94",
+      "p": 59,
+      "arity": 2,
+      "encoding": "symmetric",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 0,
+        "expected_affine_assignments": 0,
+        "bases": [],
+        "script_sha256": "a22146d1f5da769da31ad2010ec836eab8073151777c8e2f66cde7a939514e33",
+        "stdout_sha256": "4f2b6da8c1b349ee5066f3391e431793d8d372570916f50fa7a565ab160e493b",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp6-tm7-fc20da94",
+      "p": 59,
+      "B": 8,
+      "arity": 3,
+      "encoding": "bits",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "7f4c29437da929c6587efe09e764dcc86f848968caac2dc625c03e7ec68207c0",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "7f4c29437da929c6587efe09e764dcc86f848968caac2dc625c03e7ec68207c0",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "b794cd9fab8765f845940a041228bd14a9b790c3415a8501a075b6f6d8db1f1f",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 59",
+          "input_sha256": "b794cd9fab8765f845940a041228bd14a9b790c3415a8501a075b6f6d8db1f1f",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 59",
+          "input_sha256": "b794cd9fab8765f845940a041228bd14a9b790c3415a8501a075b6f6d8db1f1f",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 124,
+        "completion_and_clean_output": false,
+        "dimension": null,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "ab020f430181eeb1015674bae40910ce97dba2388e4e26346f4cc85375eab237",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 87,
+        "expected_affine_assignments": 87,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "4c5e9545e296d264d1d01552fce6a933487c6def36460eab2d6b0c2b7cb539e1",
+        "stdout_sha256": "25e5a93e43d35da98bfdc89101a5c6a974a1b7121f606e4a8e9e4c148532d536",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 124,
+        "clean_complete": false,
+        "projective_infinity_cone_dimension": 2,
+        "generator_ideal_already_h_saturated": null,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 87,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 8,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp6-tm7-fc20da94",
+      "p": 59,
+      "arity": 3,
+      "encoding": "bits",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 124,
+        "completion_and_clean_output": false,
+        "dimension": null,
+        "expected_affine_assignments": 87,
+        "bases": [],
+        "script_sha256": "fc2411f969b3ba383a0eebe4e17f3f624d9764a5dc93c3e153d8731ca328e5bc",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp6-tm7-fc20da94",
+      "p": 59,
+      "B": 8,
+      "arity": 3,
+      "encoding": "chain",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "a2066ba2ff583b2df5fd94f1692e0daf0fa527c291f99cdedcafd9cb2fdb7266",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "a2066ba2ff583b2df5fd94f1692e0daf0fa527c291f99cdedcafd9cb2fdb7266",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "2e1db6ded5e0157836a99ab5bbe636da18dd855be72573e7c2ca20f692c9989b",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 59",
+          "input_sha256": "2e1db6ded5e0157836a99ab5bbe636da18dd855be72573e7c2ca20f692c9989b",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 59",
+          "input_sha256": "2e1db6ded5e0157836a99ab5bbe636da18dd855be72573e7c2ca20f692c9989b",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "35fc46b1d4e3f286c184be14c230caaac98cb5203bc8894afa52d55ff8e19468",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 87,
+        "expected_affine_assignments": 87,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "26faa6f18a3835c1cfc02317029cff2fd5d44e00618c579e45b75cbb691d3f87",
+        "stdout_sha256": "25e5a93e43d35da98bfdc89101a5c6a974a1b7121f606e4a8e9e4c148532d536",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 19,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 87,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 8,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp6-tm7-fc20da94",
+      "p": 59,
+      "arity": 3,
+      "encoding": "chain",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 124,
+        "completion_and_clean_output": false,
+        "dimension": null,
+        "expected_affine_assignments": 87,
+        "bases": [],
+        "script_sha256": "d5463f5c7733e0f38bb321429408107d9b2da66c8ff126faa5d654377d5488f3",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp6-tm7-fc20da94",
+      "p": 59,
+      "B": 8,
+      "arity": 3,
+      "encoding": "product",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "f9546655fc346a0f224e89a8799bec470abc9f581ed9a1b94865ac6ed2236422",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "f9546655fc346a0f224e89a8799bec470abc9f581ed9a1b94865ac6ed2236422",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "34878f67d988c2ccd870050065ccb73d757839d6fd2ef5d8da1ba8b42a62f728",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 59",
+          "input_sha256": "34878f67d988c2ccd870050065ccb73d757839d6fd2ef5d8da1ba8b42a62f728",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 59",
+          "input_sha256": "34878f67d988c2ccd870050065ccb73d757839d6fd2ef5d8da1ba8b42a62f728",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "cda3c7bb589d5d40ff8ebc94c163763469eb9e4ba5a66c7c436b1f6e06c7b1f3",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 87,
+        "expected_affine_assignments": 87,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "b0ac2d6d3ff02b7820d50acb1306c54c22b89e7e0151f1d7a73cb71aa71c45ff",
+        "stdout_sha256": "25e5a93e43d35da98bfdc89101a5c6a974a1b7121f606e4a8e9e4c148532d536",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 1,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 87,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 8,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp6-tm7-fc20da94",
+      "p": 59,
+      "arity": 3,
+      "encoding": "product",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 87,
+        "expected_affine_assignments": 87,
+        "bases": [],
+        "script_sha256": "07cbac2c8196d897ba2a22fddd62cf1889fead7c32c2b0d7404a24794f294694",
+        "stdout_sha256": "23e005a68104bdd5f97e7c838d96ea9629d27015e16990bc42cb418f08f72241",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp6-tm7-fc20da94",
+      "p": 59,
+      "B": 8,
+      "arity": 3,
+      "encoding": "symmetric",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "e4451073a4069fef57fc2ba722c944a7e976861296dfd37b0874201e93cc215d",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "e4451073a4069fef57fc2ba722c944a7e976861296dfd37b0874201e93cc215d",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "9ae61aee0c260cded5c974ba9fb8cd8abee013c14e11e5c6d821efe5e67ab3f8",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 59",
+          "input_sha256": "9ae61aee0c260cded5c974ba9fb8cd8abee013c14e11e5c6d821efe5e67ab3f8",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 59,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 59",
+          "input_sha256": "9ae61aee0c260cded5c974ba9fb8cd8abee013c14e11e5c6d821efe5e67ab3f8",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "ff0d2c3e8db95cec11eab943743ec9a3acc4be3f8fde2588a1813bd3de8ba92b",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 40,
+        "expected_affine_assignments": 40,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "0c14c38f801fab54653096143aee2bf51cb55004e615dc18b04323e343b6dba6",
+        "stdout_sha256": "b5248f440634cf8d8356ab0b5c40d9469942d9e05bf3e944998864cb4ef53dc7",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 2,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 40,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 55,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp6-tm7-fc20da94",
+      "p": 59,
+      "arity": 3,
+      "encoding": "symmetric",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 40,
+        "expected_affine_assignments": 40,
+        "bases": [],
+        "script_sha256": "998c69aed06a65e1ac468c595a9be6962acffc2f79b945ba6a56b7094fdb2308",
+        "stdout_sha256": "853d7d14f91ea953c5f56a7d69dc7d09ce754549f33b2cd671ebfd1e511b879c",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm21-71e3bcb7",
+      "p": 211,
+      "B": 8,
+      "arity": 2,
+      "encoding": "bits",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "8a5134c15b40b570d23a708c535bd596ac5338084ca9e27b76825260825a1b2b",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "8a5134c15b40b570d23a708c535bd596ac5338084ca9e27b76825260825a1b2b",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "7406c8799342f25acd58485b4be473595b49405111fda0a7f967202f3d3a98d1",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 211",
+          "input_sha256": "7406c8799342f25acd58485b4be473595b49405111fda0a7f967202f3d3a98d1",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 211",
+          "input_sha256": "7406c8799342f25acd58485b4be473595b49405111fda0a7f967202f3d3a98d1",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "89aabaaf0bb6fe8d936abba36bd31fe30508e46688871b76716395a977b99dca",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 0,
+        "expected_affine_assignments": 0,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "f54504c733df05cb7139d66c8b651eb23e275f0ba8d8d41af1e261cb8d0127fa",
+        "stdout_sha256": "e4b6afed643565e70c841a8bee0c33983a66e5ec79400997cf418bbdc8bc5d46",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 1,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 0,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 0,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm21-71e3bcb7",
+      "p": 211,
+      "arity": 2,
+      "encoding": "bits",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 0,
+        "expected_affine_assignments": 0,
+        "bases": [],
+        "script_sha256": "2b702a3b2babc75a25008f7dda8221b26870138aa35a197b93d98c3ffa611ae9",
+        "stdout_sha256": "4f2b6da8c1b349ee5066f3391e431793d8d372570916f50fa7a565ab160e493b",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm21-71e3bcb7",
+      "p": 211,
+      "B": 8,
+      "arity": 2,
+      "encoding": "chain",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "775059722ff6a8dd7974efd7ccbfbc337be18e77b6e3e9e16eafd8e2340fa83d",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "775059722ff6a8dd7974efd7ccbfbc337be18e77b6e3e9e16eafd8e2340fa83d",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "60ec75bb9e300d04940875ac7bedd04af435f3285a802c5fa832a2e10e5c54e1",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 211",
+          "input_sha256": "60ec75bb9e300d04940875ac7bedd04af435f3285a802c5fa832a2e10e5c54e1",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 211",
+          "input_sha256": "60ec75bb9e300d04940875ac7bedd04af435f3285a802c5fa832a2e10e5c54e1",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "4c02e12497ceccfefe1a1eefebfc8fc032b831c1959f75d372574ed6f6d8f902",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 0,
+        "expected_affine_assignments": 0,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "4c2e42e53065049c4b3f952fb7f45b9f313cf86bb02d7e4ed3a8360ca9044acd",
+        "stdout_sha256": "e4b6afed643565e70c841a8bee0c33983a66e5ec79400997cf418bbdc8bc5d46",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 12,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 0,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 0,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm21-71e3bcb7",
+      "p": 211,
+      "arity": 2,
+      "encoding": "chain",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 0,
+        "expected_affine_assignments": 0,
+        "bases": [],
+        "script_sha256": "6b7dcf7aa9076c144485bb9e246b7da7b498316881b54b16746bc88a473ba2be",
+        "stdout_sha256": "4f2b6da8c1b349ee5066f3391e431793d8d372570916f50fa7a565ab160e493b",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm21-71e3bcb7",
+      "p": 211,
+      "B": 8,
+      "arity": 2,
+      "encoding": "product",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "e4db02c20633729077d8c0ab36c5c674535467d21cde0db9becca2dc3590242c",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "e4db02c20633729077d8c0ab36c5c674535467d21cde0db9becca2dc3590242c",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "07005d60895bf54aefdfb4a17c375a5660f6de2618079397812d0da4b93e92c1",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 211",
+          "input_sha256": "07005d60895bf54aefdfb4a17c375a5660f6de2618079397812d0da4b93e92c1",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 211",
+          "input_sha256": "07005d60895bf54aefdfb4a17c375a5660f6de2618079397812d0da4b93e92c1",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 256,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "c162604df7cf17a368c0bc65767985974c53a84b0a9e0f861542e4ccef6367dd",
+        "stdout_sha256": "3b104e421d89e81be656f836d2588190490c13c87dbf0070f34e87323e781335",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 0,
+        "expected_affine_assignments": 0,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "531104681a7fbc0d3faaa9621c97289433fb56e3db0b559351af2c9e0dbcb835",
+        "stdout_sha256": "e4b6afed643565e70c841a8bee0c33983a66e5ec79400997cf418bbdc8bc5d46",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 0,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 0,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 0,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm21-71e3bcb7",
+      "p": 211,
+      "arity": 2,
+      "encoding": "product",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 0,
+        "expected_affine_assignments": 0,
+        "bases": [],
+        "script_sha256": "66b88c1c43327f81e6a605680a167b507b8b7e48a86488aaf0e61b21d2ba9067",
+        "stdout_sha256": "4f2b6da8c1b349ee5066f3391e431793d8d372570916f50fa7a565ab160e493b",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm21-71e3bcb7",
+      "p": 211,
+      "B": 8,
+      "arity": 2,
+      "encoding": "symmetric",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "e5ae59d41b37c6c67a874337cc31728f5e652939bd05a5a0404dcabbfbcc96db",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "e5ae59d41b37c6c67a874337cc31728f5e652939bd05a5a0404dcabbfbcc96db",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "e4d4562182c8430d0e48520c4aa332acd06187da8bd8ca0d327ea33968bb3015",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 211",
+          "input_sha256": "e4d4562182c8430d0e48520c4aa332acd06187da8bd8ca0d327ea33968bb3015",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 211",
+          "input_sha256": "e4d4562182c8430d0e48520c4aa332acd06187da8bd8ca0d327ea33968bb3015",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 98,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "9573640ce7d083b2461e91a12197ec49b45806021114bcf2e27799c920020eab",
+        "stdout_sha256": "61afe30b22add2c477a7043af754a7c471359b30d59f7dc68a12be52adb3404f",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 0,
+        "expected_affine_assignments": 0,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "231ba837f82b51151b7270d0c6f2c9811d839841b7d695afd9189807e8e7fe30",
+        "stdout_sha256": "e4b6afed643565e70c841a8bee0c33983a66e5ec79400997cf418bbdc8bc5d46",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 0,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 0,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 0,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm21-71e3bcb7",
+      "p": 211,
+      "arity": 2,
+      "encoding": "symmetric",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 0,
+        "expected_affine_assignments": 0,
+        "bases": [],
+        "script_sha256": "20b539e302034eb4d114384591ccdfb074ecc9f5e37f0cef4698b2ff02258188",
+        "stdout_sha256": "4f2b6da8c1b349ee5066f3391e431793d8d372570916f50fa7a565ab160e493b",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm21-71e3bcb7",
+      "p": 211,
+      "B": 8,
+      "arity": 3,
+      "encoding": "bits",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "1d530548c97297ab051290c621207ca952de00a3fc2f19f6ea67c6ca0ec0c312",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "1d530548c97297ab051290c621207ca952de00a3fc2f19f6ea67c6ca0ec0c312",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "af5b31f131d46a8e57cdaeedfd7e7ae00a9a11ae261b76632ff6035645b5b8d9",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 211",
+          "input_sha256": "af5b31f131d46a8e57cdaeedfd7e7ae00a9a11ae261b76632ff6035645b5b8d9",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 211",
+          "input_sha256": "af5b31f131d46a8e57cdaeedfd7e7ae00a9a11ae261b76632ff6035645b5b8d9",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 124,
+        "completion_and_clean_output": false,
+        "dimension": null,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "efbacb5b960a37c920f8101c3a13805511ea7da383894f3e4b456f94929ffe57",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 18,
+        "expected_affine_assignments": 18,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "f67468b3c0c63ed0743a1e2211b3652857fc6f52a4b6574adbc085ceaf233114",
+        "stdout_sha256": "32b60000901c5c48eb794ccc59acd6be8d9560bcb4f772190810c9291f59a1c9",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 124,
+        "clean_complete": false,
+        "projective_infinity_cone_dimension": 2,
+        "generator_ideal_already_h_saturated": null,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 18,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 0,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm21-71e3bcb7",
+      "p": 211,
+      "arity": 3,
+      "encoding": "bits",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 124,
+        "completion_and_clean_output": false,
+        "dimension": null,
+        "expected_affine_assignments": 18,
+        "bases": [],
+        "script_sha256": "3c8e8122787b52e9a69fabe80a3f2c94fd3f73b8afd3657a589e2c66c24a8638",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm21-71e3bcb7",
+      "p": 211,
+      "B": 8,
+      "arity": 3,
+      "encoding": "chain",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "74bff74c0e6f2d9e638eb9af2ca7bf2f23c073f7cb127200c8e41a7d22e37365",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "74bff74c0e6f2d9e638eb9af2ca7bf2f23c073f7cb127200c8e41a7d22e37365",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "77f8fbb5d52cb5d5532fab5826784bb8887daf65df2fedbdff379e4c8abb4370",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 211",
+          "input_sha256": "77f8fbb5d52cb5d5532fab5826784bb8887daf65df2fedbdff379e4c8abb4370",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 211",
+          "input_sha256": "77f8fbb5d52cb5d5532fab5826784bb8887daf65df2fedbdff379e4c8abb4370",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "cd61c33584b4b00b6839933496a708859e89bf4143a1a226e13db15e81e12884",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 18,
+        "expected_affine_assignments": 18,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "861b0722da80787ec5637b90c0371562a20f53b4805a221da22a0795d9946e7e",
+        "stdout_sha256": "32b60000901c5c48eb794ccc59acd6be8d9560bcb4f772190810c9291f59a1c9",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 19,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 18,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 0,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm21-71e3bcb7",
+      "p": 211,
+      "arity": 3,
+      "encoding": "chain",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 124,
+        "completion_and_clean_output": false,
+        "dimension": null,
+        "expected_affine_assignments": 18,
+        "bases": [],
+        "script_sha256": "8fdbdcf8177d288ca45130b1b3f7dfc96e4962aefe5d9a3bf6bbb835c9ddd4ce",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm21-71e3bcb7",
+      "p": 211,
+      "B": 8,
+      "arity": 3,
+      "encoding": "product",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "6acab4c664e08e0536c639f250f2fe97c8698f12f1996bc6b16ddccdc99e4087",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "6acab4c664e08e0536c639f250f2fe97c8698f12f1996bc6b16ddccdc99e4087",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "2db5e826e259dbbbfedf01ddaf07dffa8f1094657b39da1db2939745a4b359b0",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 211",
+          "input_sha256": "2db5e826e259dbbbfedf01ddaf07dffa8f1094657b39da1db2939745a4b359b0",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 211",
+          "input_sha256": "2db5e826e259dbbbfedf01ddaf07dffa8f1094657b39da1db2939745a4b359b0",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "e122be8937b25f9d63afcdb7d3541ca540223e5fc4de08308a087bec0088b78c",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 18,
+        "expected_affine_assignments": 18,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "154347c0623888ec860646ad556d180227bf2d3991de6c6deeb65ea681210848",
+        "stdout_sha256": "32b60000901c5c48eb794ccc59acd6be8d9560bcb4f772190810c9291f59a1c9",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 1,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 18,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 0,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm21-71e3bcb7",
+      "p": 211,
+      "arity": 3,
+      "encoding": "product",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 18,
+        "expected_affine_assignments": 18,
+        "bases": [],
+        "script_sha256": "ed634b976318b7fcb5fe78d94c844972761f4bb287154bca1a72aefb198e647c",
+        "stdout_sha256": "1966d6d344b25e620d2800091444444423c9da4030aa213b173508e87b5a6bf9",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm21-71e3bcb7",
+      "p": 211,
+      "B": 8,
+      "arity": 3,
+      "encoding": "symmetric",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "670a11c3d01a62c02855738769aa6b9b29635b035536d3fb42a59a20df24e970",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "670a11c3d01a62c02855738769aa6b9b29635b035536d3fb42a59a20df24e970",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "a0e8f1d0848a100d92d02e0b9c6a8022f4987ad5dc72cd5fc41d40139b4d20fa",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 211",
+          "input_sha256": "a0e8f1d0848a100d92d02e0b9c6a8022f4987ad5dc72cd5fc41d40139b4d20fa",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 211,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 211",
+          "input_sha256": "a0e8f1d0848a100d92d02e0b9c6a8022f4987ad5dc72cd5fc41d40139b4d20fa",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "4ce9c89b22e60cefd48a39edd9bc9e6c4cd5daa149c7e3f46c65d1f7eb040bbd",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 8,
+        "expected_affine_assignments": 8,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "0a9d0472688e665156a2415aa6744563570880950463e7071b700e58fda2c736",
+        "stdout_sha256": "cdc26cc84cd4c0a6164640093d13211b94490acba04517df5dc0b01d1bdd4afa",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 2,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 8,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 10,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm21-71e3bcb7",
+      "p": 211,
+      "arity": 3,
+      "encoding": "symmetric",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 8,
+        "expected_affine_assignments": 8,
+        "bases": [],
+        "script_sha256": "afdc93b9d7e1ea7d6a5bcda4d1f7ac8e2c62e29b3cd0a9f76a148fcc4897fb22",
+        "stdout_sha256": "d0be8ec470f74dfc983e57473ac3b53d0d416b3dd8ed423aee0df013b88ab52e",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm5-23216e9c",
+      "p": 251,
+      "B": 8,
+      "arity": 2,
+      "encoding": "bits",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "cd46dea110f2c3b775a6217d46685da642855ed2e36ff7b3e650e0b8596bdf23",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "cd46dea110f2c3b775a6217d46685da642855ed2e36ff7b3e650e0b8596bdf23",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "ce78d0263f97f51f79f84686fec462ec7e4093a154fb84dd6d82be6bfb451cf0",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 251",
+          "input_sha256": "ce78d0263f97f51f79f84686fec462ec7e4093a154fb84dd6d82be6bfb451cf0",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 251",
+          "input_sha256": "ce78d0263f97f51f79f84686fec462ec7e4093a154fb84dd6d82be6bfb451cf0",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "62f44700bc331d9186f43e578cc25168eb32ea40cd46aa77b856b2b5583fcba1",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 2,
+        "expected_affine_assignments": 2,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "98acd38f2a0e8fda3acff3b4154c73a27a69e6b1cb1d65997191dac1e2b02355",
+        "stdout_sha256": "bf7da5e2d1ef9f7af383829efd8473de94a097d57f918233a873dca6c401e9c4",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 1,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 2,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 0,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm5-23216e9c",
+      "p": 251,
+      "arity": 2,
+      "encoding": "bits",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 2,
+        "expected_affine_assignments": 2,
+        "bases": [],
+        "script_sha256": "4c58a8aaf10903c20e4d01092aa3b203bf3b254a97ec8ce6509e77cc9a37c283",
+        "stdout_sha256": "1eb6adc5754ce2dfa96444a4c5df1f287e9b6c353b1aa1056a385d0efaf58a32",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm5-23216e9c",
+      "p": 251,
+      "B": 8,
+      "arity": 2,
+      "encoding": "chain",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "84f505b701ce32d46cd35a5c82c2e03d009c45cd4e16243862d753ab7ad7dd93",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "84f505b701ce32d46cd35a5c82c2e03d009c45cd4e16243862d753ab7ad7dd93",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "f49798817a53c436d6b746b68551f999e3bd23c866ded76e1b4ac8014ed08643",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 251",
+          "input_sha256": "f49798817a53c436d6b746b68551f999e3bd23c866ded76e1b4ac8014ed08643",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 251",
+          "input_sha256": "f49798817a53c436d6b746b68551f999e3bd23c866ded76e1b4ac8014ed08643",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "195bb1fe34829f0989b63c13491295c4790fdf98e0968753bc3f439ca28a7021",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 2,
+        "expected_affine_assignments": 2,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "5c2a0d3ef6c27b0a1360995d619a73b42af86417ada91e446d34b3223702cf6f",
+        "stdout_sha256": "bf7da5e2d1ef9f7af383829efd8473de94a097d57f918233a873dca6c401e9c4",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 12,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 2,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 0,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm5-23216e9c",
+      "p": 251,
+      "arity": 2,
+      "encoding": "chain",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 2,
+        "expected_affine_assignments": 2,
+        "bases": [],
+        "script_sha256": "f64bbde6fa6f5760bcfeeb2b3fcafbd6ebf6014abfdf738b3c78d024b0b58179",
+        "stdout_sha256": "1eb6adc5754ce2dfa96444a4c5df1f287e9b6c353b1aa1056a385d0efaf58a32",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm5-23216e9c",
+      "p": 251,
+      "B": 8,
+      "arity": 2,
+      "encoding": "product",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "0365bb7763e0acb2fa3ba2633d31ec8b2b525418e51ad4a437a43a93bad1b4de",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "0365bb7763e0acb2fa3ba2633d31ec8b2b525418e51ad4a437a43a93bad1b4de",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "5e032490c22b8085f0057cc72d8bbd2215d61fed65837f2f1c7c259214a31b83",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 251",
+          "input_sha256": "5e032490c22b8085f0057cc72d8bbd2215d61fed65837f2f1c7c259214a31b83",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 251",
+          "input_sha256": "5e032490c22b8085f0057cc72d8bbd2215d61fed65837f2f1c7c259214a31b83",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "f5338a62f97c4c77590909054c24eeb67a8aadf31c25f10b4dbb9aad1edd09e9",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 2,
+        "expected_affine_assignments": 2,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "87fc48b69cecf59f831807b86b1001e6067507cd06b2805932c3282139495730",
+        "stdout_sha256": "bf7da5e2d1ef9f7af383829efd8473de94a097d57f918233a873dca6c401e9c4",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 0,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 2,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 0,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm5-23216e9c",
+      "p": 251,
+      "arity": 2,
+      "encoding": "product",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 2,
+        "expected_affine_assignments": 2,
+        "bases": [],
+        "script_sha256": "314fb96366d2dde39e94e8db7ca2a332f4478c24083f3d1c01cc00d129b49324",
+        "stdout_sha256": "1eb6adc5754ce2dfa96444a4c5df1f287e9b6c353b1aa1056a385d0efaf58a32",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm5-23216e9c",
+      "p": 251,
+      "B": 8,
+      "arity": 2,
+      "encoding": "symmetric",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "efcb2dd0a09c30d9257703e37e39fc794224d0027bb405ef886656bf268dfadf",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "efcb2dd0a09c30d9257703e37e39fc794224d0027bb405ef886656bf268dfadf",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "d48218fa0484c75ded00abb95a14850eaf633fc5145415a3ae876d8141854560",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 251",
+          "input_sha256": "d48218fa0484c75ded00abb95a14850eaf633fc5145415a3ae876d8141854560",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 251",
+          "input_sha256": "d48218fa0484c75ded00abb95a14850eaf633fc5145415a3ae876d8141854560",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "1a1617248460e604a62939248bdb78d2acd9263478fe3dd6d33434ca7dbed078",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 1,
+        "expected_affine_assignments": 1,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "d27503d9cdf94f61b31cf93423bc2994bc37c685a7dee13fc36a720173099516",
+        "stdout_sha256": "22ec0e149c91807e9c0e4fb6191b1410254c813ee4d6f3aede5db4df1c3a46c1",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 0,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 1,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 1,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm5-23216e9c",
+      "p": 251,
+      "arity": 2,
+      "encoding": "symmetric",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 1,
+        "expected_affine_assignments": 1,
+        "bases": [],
+        "script_sha256": "4a78f4bd8f5bb06b80a08952321a132ac054c43a9f86cb7225f178ebce36c762",
+        "stdout_sha256": "4d284dbce9a239fe34f16aa21330d3a5e17cfdb3946f0d7d742ff2ce6e72cd4c",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm5-23216e9c",
+      "p": 251,
+      "B": 8,
+      "arity": 3,
+      "encoding": "bits",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "0f8466a434dcf6afb8054d9585fcae41d4dafc9e8dd13313f13fb360e1cf72b3",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "0f8466a434dcf6afb8054d9585fcae41d4dafc9e8dd13313f13fb360e1cf72b3",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "e974a5de7b6c2c1946c9216495b61608e6b7cfb5802f51648f24ab0985e36732",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 251",
+          "input_sha256": "e974a5de7b6c2c1946c9216495b61608e6b7cfb5802f51648f24ab0985e36732",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 251",
+          "input_sha256": "e974a5de7b6c2c1946c9216495b61608e6b7cfb5802f51648f24ab0985e36732",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 124,
+        "completion_and_clean_output": false,
+        "dimension": null,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "909adec44da7eb759264591aec2bc32c01b4fe4375e878569b3f26f9063802bd",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 18,
+        "expected_affine_assignments": 18,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "1c47d2cc6c411221bd83b5e10f2629d3438a16cda1cecc6501f31d56d1e85782",
+        "stdout_sha256": "32b60000901c5c48eb794ccc59acd6be8d9560bcb4f772190810c9291f59a1c9",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 124,
+        "clean_complete": false,
+        "projective_infinity_cone_dimension": 2,
+        "generator_ideal_already_h_saturated": null,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 18,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 0,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm5-23216e9c",
+      "p": 251,
+      "arity": 3,
+      "encoding": "bits",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 124,
+        "completion_and_clean_output": false,
+        "dimension": null,
+        "expected_affine_assignments": 18,
+        "bases": [],
+        "script_sha256": "31787e208f7976ca21917d0bdf66bd2877214a23bd824ad0067d097356e3ec90",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm5-23216e9c",
+      "p": 251,
+      "B": 8,
+      "arity": 3,
+      "encoding": "chain",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "0ddebff453f332eea94458080c257362a379b16086d93bf2d8594e4c9c281a34",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "0ddebff453f332eea94458080c257362a379b16086d93bf2d8594e4c9c281a34",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "4d25131ace9f962a9a4009f5c2879d8b1a153061483774b456d3d523a9bf0e0f",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 251",
+          "input_sha256": "4d25131ace9f962a9a4009f5c2879d8b1a153061483774b456d3d523a9bf0e0f",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 251",
+          "input_sha256": "4d25131ace9f962a9a4009f5c2879d8b1a153061483774b456d3d523a9bf0e0f",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "dd074df428a71449d6b2dd198243243411029928f870c5fff52ff1ff2d3ef35c",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 18,
+        "expected_affine_assignments": 18,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "16f28595a16194ee3ab3683141a3aea304eaec666bdef95daba603c3644e81f1",
+        "stdout_sha256": "32b60000901c5c48eb794ccc59acd6be8d9560bcb4f772190810c9291f59a1c9",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 19,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 18,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 0,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm5-23216e9c",
+      "p": 251,
+      "arity": 3,
+      "encoding": "chain",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 124,
+        "completion_and_clean_output": false,
+        "dimension": null,
+        "expected_affine_assignments": 18,
+        "bases": [],
+        "script_sha256": "96b12809a979f1158f77170386cb4a9a82f5fec45e420bb8d0442bfabd6e5503",
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm5-23216e9c",
+      "p": 251,
+      "B": 8,
+      "arity": 3,
+      "encoding": "product",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "98bff42ff84dda72a3e29b305b389f33820cf37a9b621b382434d3339ece794b",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "98bff42ff84dda72a3e29b305b389f33820cf37a9b621b382434d3339ece794b",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "5457023654f6022879b8b2fd4becff093f4d480ba84ef477dc9858bd0a86f2b2",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 251",
+          "input_sha256": "5457023654f6022879b8b2fd4becff093f4d480ba84ef477dc9858bd0a86f2b2",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 251",
+          "input_sha256": "5457023654f6022879b8b2fd4becff093f4d480ba84ef477dc9858bd0a86f2b2",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "8e667b4e78f2765796e4bb983788938a729561a1b951270afd238abe8da4d0fd",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 18,
+        "expected_affine_assignments": 18,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "4d684ff329d5d2624778e067e53f5fcd321e595ff24b8bcbd95df29abae8a88d",
+        "stdout_sha256": "32b60000901c5c48eb794ccc59acd6be8d9560bcb4f772190810c9291f59a1c9",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 1,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 18,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 0,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm5-23216e9c",
+      "p": 251,
+      "arity": 3,
+      "encoding": "product",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 18,
+        "expected_affine_assignments": 18,
+        "bases": [],
+        "script_sha256": "13f5b032efca46200d2ee051b60737cd9e9c65c16b4772c4b24dd6c1ab48b4e4",
+        "stdout_sha256": "1966d6d344b25e620d2800091444444423c9da4030aa213b173508e87b5a6bf9",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm5-23216e9c",
+      "p": 251,
+      "B": 8,
+      "arity": 3,
+      "encoding": "symmetric",
+      "order": "grevlex",
+      "engines": [
+        {
+          "engine": "S0",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "fad27655a02f05d1a990f5fa5bb11ae0f46462477fe69cd4da03e55ed5fd0351",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        },
+        {
+          "engine": "A0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": false,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "fad27655a02f05d1a990f5fa5bb11ae0f46462477fe69cd4da03e55ed5fd0351",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H0",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 0,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": 0,
+          "basis_parsed": true,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": null,
+          "input_sha256": "6d40ab77669af40e3002feb37b164af2c068a781ef834917f74969a7bec12987",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "H1",
+          "program": "/tmp/twist-cas/msolve-signature-output",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 251",
+          "input_sha256": "6d40ab77669af40e3002feb37b164af2c068a781ef834917f74969a7bec12987",
+          "binary_sha256": "447dd20e0396fc027cf4bec3db4874ac1a5569037b54766b0f41e7a501152f49"
+        },
+        {
+          "engine": "S1",
+          "program": "/tmp/twist-cas/root/usr/bin/msolve",
+          "signature_mode": 1,
+          "homogeneous": true,
+          "p": 251,
+          "exit_code": -1,
+          "basis_parsed": false,
+          "source_restores_actual_field_before_signature_core": true,
+          "actual_field_correction_note": "NOTE: Field characteristic is now corrected to 251",
+          "input_sha256": "6d40ab77669af40e3002feb37b164af2c068a781ef834917f74969a7bec12987",
+          "binary_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28"
+        }
+      ],
+      "homogeneous_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "45e2f16aa9d4fe98d39c5c12b7f375e1c78e2365774a1dbdf75cb221a78f69ac",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "dehomogenized_affine_complete_basis_gate": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 8,
+        "expected_affine_assignments": 8,
+        "bases": [
+          {
+            "basis": "S0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "A0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "H0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "1f86abcedb3fe4d5fecd57ecb873d3db78dcc71895d7db44b2e878bf1008cda5",
+        "stdout_sha256": "cdc26cc84cd4c0a6164640093d13211b94490acba04517df5dc0b01d1bdd4afa",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "infinity_and_saturation": {
+        "exit_code": 0,
+        "clean_complete": true,
+        "projective_infinity_cone_dimension": 2,
+        "generator_ideal_already_h_saturated": false,
+        "unsaturated_generator_ideal_and_saturation_recorded_separately": true
+      },
+      "actual_affine_assignments_replayed": 8,
+      "omitted_nonaffine_or_first_pair_branches_retained_as_count": 10,
+      "status": "bounded-correct-field-homogeneous-signature-pilot",
+      "full_E25_complete": false,
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25",
+      "fixture": "icv1-fp8-tm5-23216e9c",
+      "p": 251,
+      "arity": 3,
+      "encoding": "symmetric",
+      "order": "lex",
+      "status": "signature-backend-does-not-provide-lex-order",
+      "independent_lex_affine_reference": {
+        "exit_code": 0,
+        "completion_and_clean_output": true,
+        "dimension": 8,
+        "expected_affine_assignments": 8,
+        "bases": [],
+        "script_sha256": "a292d64391c7075b231b4e5cd8efd3063043304893572d6c3e91652a9824c0f1",
+        "stdout_sha256": "d0be8ec470f74dfc983e57473ac3b53d0d416b3dd8ed423aee0df013b88ab52e",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "performance_claim": false
+    },
+    {
+      "experiment": "E25-control",
+      "p": 59,
+      "engines": [
+        {
+          "name": "Q0",
+          "signature": 0,
+          "exit_code": 0,
+          "basis_parsed": true
+        },
+        {
+          "name": "Q1",
+          "signature": 1,
+          "exit_code": -1,
+          "basis_parsed": false
+        }
+      ],
+      "homogeneous": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": -1,
+        "expected_affine_assignments": null,
+        "bases": [
+          {
+            "basis": "Q0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "e632412a9e1ee836aadc295dcc35a3502ab09c01146f7b8db9a986e5ce0cda1e",
+        "stdout_sha256": "1c703304273b125b47d81d77421496c58bd7b4594b9dfd9c740b59c88b7475e0",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "affine": {
+        "exit_code": 0,
+        "completion_and_clean_output": false,
+        "dimension": 1,
+        "expected_affine_assignments": 1,
+        "bases": [
+          {
+            "basis": "Q0",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "TRUNCATED",
+            "all_S_pairs_and_both_inclusions_verified": false
+          },
+          {
+            "basis": "WRONGFIELD",
+            "all_S_pairs_and_both_inclusions_verified": false
+          }
+        ],
+        "script_sha256": "dcf51d1dc3073dfb2d4834777e87aaa989ea38adad1a73be208f35218d774e1a",
+        "stdout_sha256": "22ec0e149c91807e9c0e4fb6191b1410254c813ee4d6f3aede5db4df1c3a46c1",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "positive_control_affine_solution": [
+        1,
+        2
+      ],
+      "wrong_characteristic_metadata_rejected": true,
+      "status": "positive-and-incomplete-basis-controls-recorded"
+    }
+  ],
+  "performance_claim": false,
+  "novelty_established": false,
+  "independent_host_replay": false
+}

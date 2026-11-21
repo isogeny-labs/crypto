@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-13T07:57:30Z",
+ "id": "PCC-20261113-7560d2",
+ "kind": "theorem",
+ "producer": {
+  "commit": "d42ef187472f366c32dada33a381abfa4eb6ba53",
+  "model": "",
+  "session": "prime-ic-cost-floor-20261113"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "1351cf4f923b14078ccbc22f3cd475873e5a50647b48aaf1a93fb52ba80fb181",
+   "kind": "lean",
+   "project": "research/prime_norm_rank_20261112/lean",
+   "theorem": "PrimeICCostFloor.workCallFloor"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "declared single-target cost-accounting model only; not a lower bound on an actual solver or ECDLP algorithm",
+ "statement": "The defined single-target work expression max(1,p/b^7)*c+b^2 is at least b^4 whenever c>=b^4."
+}

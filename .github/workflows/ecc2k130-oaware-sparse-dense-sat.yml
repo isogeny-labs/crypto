@@ -24,6 +24,26 @@ jobs:
         with:
           fetch-depth: 0 # merge-ancestry checks include #785, #786 and #787
           filter: blob:none
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/notes/ecc2k130/rotated_s3_o_branch_20260925 research/notes/ecc2k130/rotated_s3_sparse_cnf_20260925
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -31,8 +51,10 @@ jobs:
         run: |
           python3 -m py_compile research/notes/ecc2k130/n13_oaware_sparse_dense_sat_20260925/{run,verify,ci_replay,analyze,selftest,runtime_controls}.py
       - name: Check merged ancestry, frozen bytes and identical target semantics
-        run: |
-          python3 research/notes/ecc2k130/n13_oaware_sparse_dense_sat_20260925/ci_replay.py
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 research/notes/ecc2k130/n13_oaware_sparse_dense_sat_20260925/ci_replay.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only n13_oaware_sparse_dense_sat_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
       - name: Check synthetic ABBA and strict decision threshold
         run: |
           python3 research/notes/ecc2k130/n13_oaware_sparse_dense_sat_20260925/selftest.py

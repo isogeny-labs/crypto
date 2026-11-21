@@ -1,0 +1,475 @@
+{
+  "schema": "markov-green-upper-source-plan/v1",
+  "created": "2026-11-16T10:16:33.602139+00:00",
+  "formal": {
+    "project": "research/markov_green_upper_audit_20261116/lean",
+    "theorem": "MarkovGreenUpperAudit.actual_green_upper_envelope_certificate",
+    "statement": "theorem actual_green_upper_envelope_certificate : ActualWeightedGeometric ∧ ActualFiniteGreenUpper ∧ ActualAsymptoticGreenUpper ∧ ActualStrictUpperControl",
+    "decl_sha256": "28f396a4cd16557abd05803143f203b1bd0c6aee358a5177ce995f27bda734b0",
+    "scope": "Actual finite weighted-geometric identity and actual finite-kernel Green envelope bound; pointwise error e=o(t^-2) gives explicit nonnegative remainder abs(e)*(t+1)*(t+2) tending to0 and eventual-epsilon upper bounds on varying finite doubly stochastic chains. Actual prime uniform family is a strict-upper-bound control with Green limit1 and retained literal equality counter. No equality inferred from upper envelope; no general collision block repair/full14 closure. Signedunverified/zero spend.",
+    "sources": [
+      {
+        "path": "research/rho_collision_audit_20261110/lean/FirstCollision.lean",
+        "bytes": 2000,
+        "sha256": "6f513a6bc498e01f7bdf60c156dd7778b9e301101c5ed90ca26648ca8bc0f1f3"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/CollisionCertificate.lean",
+        "bytes": 2485,
+        "sha256": "9ec402373f13e2004e58a185dc7824b6bf7ef1e88ca0ec0819eb1088f190abfa"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/CollisionTails.lean",
+        "bytes": 3005,
+        "sha256": "a816e5f511d2f438e6fcd7c29d6d3730281ceb757a4dafae35f6a2cfbe530a3e"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/Cylinder.lean",
+        "bytes": 2810,
+        "sha256": "85231289c6ddd9d038f9f8acccd3e75faf322fd4a735a4fdff885596c14bb434"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/PathAgreement.lean",
+        "bytes": 3898,
+        "sha256": "04a6e61e1c4e95724a1bb14f34f9344924185fb9216ef650f640a451a26d4a61"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/PostCollisionControl.lean",
+        "bytes": 2104,
+        "sha256": "28e88e300b31a25978d0b8e13f4ee7119666e27366d3f039a9445121d147df3f"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/Survival.lean",
+        "bytes": 3510,
+        "sha256": "b4660c08256c6336341194cb5e1a188f1a528908cc4a35af414190eca1c5a0ad"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkBoundary.lean",
+        "bytes": 8391,
+        "sha256": "a612deeb8573dbd76dcc7f76bf0396ea5da1a7da0b5eed6aacc274b71c6bce1c"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkWeighted.lean",
+        "bytes": 5280,
+        "sha256": "036f4d438b4a09fd46d937c1983c4e4a3a2435193d33ff05b50a41fd6f0636a4"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/WalkWeightedGeneral.lean",
+        "bytes": 11094,
+        "sha256": "2eaa87a45eac00c7507992927c746e6cc1f48d446a15acf0ecac0b160c32ffb8"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/lakefile.toml",
+        "bytes": 356,
+        "sha256": "0a701461970071d742dd15e11f48fec7b44c17ef90c1cd95c3d563472c9d06b3"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/lake-manifest.json",
+        "bytes": 3948,
+        "sha256": "64c5efc80667aa6d01a85d66546171cf484ea733ed60bc78b8ede4f2321e410d"
+      },
+      {
+        "path": "research/static_hash_collision_audit_20261114/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/lakefile.toml",
+        "bytes": 280,
+        "sha256": "ef3c7bbfa8df48c11cc80121f45e386731f323f54651aab17488579dae39e438"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/lake-manifest.json",
+        "bytes": 4069,
+        "sha256": "90f185ef835962877da491e4397eb6f9a17786f3a3c66494e96461bf513a66e9"
+      },
+      {
+        "path": "research/rho_collision_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/lakefile.toml",
+        "bytes": 258,
+        "sha256": "50c2e8bd80c059c5bf813cc5645abc046e6f41be2f06025bb8423282bb3ad82b"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/walk_audit_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayBound.lean",
+        "bytes": 3326,
+        "sha256": "95c06bd962b249037332e26b856a531a8c02e81fb122c6129aa58c216264fb09"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayCertificate.lean",
+        "bytes": 3105,
+        "sha256": "513fc57f4adbcab4d5d993342098152ef04b0abfb0215abd95150a8b5e33e337"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayImports.lean",
+        "bytes": 146,
+        "sha256": "36d9be4677ab307066530510c1475caf5efb497d31950211e4fca02571766991"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayLaw.lean",
+        "bytes": 2432,
+        "sha256": "0dc05fb33c6390a0fc9e11599b2a219b7780ad54256c38a4742429b8435ab0f9"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayWords.lean",
+        "bytes": 2908,
+        "sha256": "dc3566fc13acae361df0b0bf7fcc333faf3a57ace3b1c07f7f286e5add959981"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/GreenMoment.lean",
+        "bytes": 2779,
+        "sha256": "d95978a4ba42253273c649b25c313502bf5a6810df2d6b12e9875acdeda1ac4f"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/KMPTCounter.lean",
+        "bytes": 2501,
+        "sha256": "b4ec70f16c9b571049aeae98e67d7eca9bdb7aab8321ff1d60e3b3c5933cc5b6"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/MarkovCollision.lean",
+        "bytes": 3252,
+        "sha256": "7d67f3cf8890c5158d891653d5dbee393156eac3d55124921fd703cf939324b6"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean",
+        "bytes": 4105,
+        "sha256": "ad8e99bc6030b198670689f92ffa533a06b56d67a6596f1e14e1fc6b2b71e3cd"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/lake-manifest.json",
+        "bytes": 4642,
+        "sha256": "edc211ef0e5380d9547fc265fcd54f5e8761ae454056aebc4825d8a435f232a2"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/lakefile.toml",
+        "bytes": 430,
+        "sha256": "03482634ef04178e4b43f517aae4a7dabcff7141251e4f376cf3985392feadd9"
+      },
+      {
+        "path": "research/markov_birthday_rounding_audit_20261116/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/markov_green_bound_audit_20261116/lean/GreenBound.lean",
+        "bytes": 5085,
+        "sha256": "7e12c28c432f4eac5da5abf451ac71ffc6bd23f3c65baa065cba2ae09cdde8cc"
+      },
+      {
+        "path": "research/markov_green_bound_audit_20261116/lean/GreenCertificate.lean",
+        "bytes": 4899,
+        "sha256": "ef67f67b1a882acd0baaa67fe454db97ab9e63004b1f164803e08171add86711"
+      },
+      {
+        "path": "research/markov_green_bound_audit_20261116/lean/GreenControls.lean",
+        "bytes": 5024,
+        "sha256": "c5a5bb81f9fd3e1f8248ceae27295fc3fc93107ac2997b453fd9ac9a7c26908e"
+      },
+      {
+        "path": "research/markov_green_bound_audit_20261116/lean/GreenCore.lean",
+        "bytes": 2951,
+        "sha256": "38a19fa680835510c421e0721dd76ef93c2a876a7c8df81e235efbc39478bbf4"
+      },
+      {
+        "path": "research/markov_green_bound_audit_20261116/lean/GreenImports.lean",
+        "bytes": 217,
+        "sha256": "33721f41834fbb42a4ea3cda31fdd84e2728527a86821ffb0063ef86940236aa"
+      },
+      {
+        "path": "research/markov_green_bound_audit_20261116/lean/GreenKernel.lean",
+        "bytes": 1511,
+        "sha256": "57e708c0bfdd0f46eeb1d24b5cfb71d1be5f7f3cb4b4c41a25e7db77ead81316"
+      },
+      {
+        "path": "research/markov_green_bound_audit_20261116/lean/GreenUniformFamily.lean",
+        "bytes": 7357,
+        "sha256": "e754efe4c36244de9bc7494d038adc33a0e54374615274eb7a4d2df88822543c"
+      },
+      {
+        "path": "research/markov_green_bound_audit_20261116/lean/lake-manifest.json",
+        "bytes": 4931,
+        "sha256": "df4e5e2e6d0c12dab592ed970b2104620cc28b1788089b3c248bc9c11ab547e0"
+      },
+      {
+        "path": "research/markov_green_bound_audit_20261116/lean/lakefile.toml",
+        "bytes": 379,
+        "sha256": "f42132b1df264c9209cf35b119b4cb34a4facfe1be9a3fa35f4fb2f63ecd1b40"
+      },
+      {
+        "path": "research/markov_green_bound_audit_20261116/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/markov_green_upper_audit_20261116/lean/GreenAsymptotic.lean",
+        "bytes": 3076,
+        "sha256": "c1e4143bb657f9d1521541f1087198b053f66d3f0824f5b22af7ad8cea566c69"
+      },
+      {
+        "path": "research/markov_green_upper_audit_20261116/lean/GreenEnvelope.lean",
+        "bytes": 1864,
+        "sha256": "4dc7c6f6cde7b6239f0cd1e0ea098e78802aca48941691c8e038401741dcb17f"
+      },
+      {
+        "path": "research/markov_green_upper_audit_20261116/lean/UpperCertificate.lean",
+        "bytes": 4158,
+        "sha256": "01eb6e7ed7ac2d56d337a0e39db2d64c958c7a3b0eb6d55f85bc0fbd53ff7614"
+      },
+      {
+        "path": "research/markov_green_upper_audit_20261116/lean/WeightedGeometric.lean",
+        "bytes": 2327,
+        "sha256": "bd6614d16ec7768601ff571d32f65949185e46933b244c69eb8c2d375a230a81"
+      },
+      {
+        "path": "research/markov_green_upper_audit_20261116/lean/lake-manifest.json",
+        "bytes": 5214,
+        "sha256": "b70c8bf0162224d41385f910c58d4aa7ac0025276de26f96c34a3d61cf5f3071"
+      },
+      {
+        "path": "research/markov_green_upper_audit_20261116/lean/lakefile.toml",
+        "bytes": 327,
+        "sha256": "0ff7660a76dc9ea24d462421bfc6479c35ce976d83cc188d7198d01911abcf2e"
+      },
+      {
+        "path": "research/markov_green_upper_audit_20261116/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "BirthdayBound",
+    "BirthdayCertificate",
+    "BirthdayImports",
+    "BirthdayLaw",
+    "BirthdayWords",
+    "CollisionCertificate",
+    "CollisionTails",
+    "Cylinder",
+    "FirstCollision",
+    "GreenAsymptotic",
+    "GreenBound",
+    "GreenCertificate",
+    "GreenControls",
+    "GreenCore",
+    "GreenEnvelope",
+    "GreenImports",
+    "GreenKernel",
+    "GreenMoment",
+    "GreenUniformFamily",
+    "KMPTCounter",
+    "MarkovCollision",
+    "PathAgreement",
+    "PostCollisionControl",
+    "Survival",
+    "UniformChain",
+    "UpperCertificate",
+    "WalkBoundary",
+    "WalkWeighted",
+    "WalkWeightedGeneral",
+    "WeightedGeometric"
+  ],
+  "artifacts": [
+    {
+      "path": "research/markov_green_upper_audit_20261116/evidence/attempts.tar.xz.part01",
+      "bytes": 64000,
+      "sha256": "71626a269318dac542238a117a78d33ed7ca10c3ecbb702b37c9e9771777daeb"
+    },
+    {
+      "path": "research/markov_green_upper_audit_20261116/evidence/attempts.tar.xz.part02",
+      "bytes": 64000,
+      "sha256": "895600009f20c2cd2c1883a358441d63c215700a00be5ba7531ab1ac2e039299"
+    },
+    {
+      "path": "research/markov_green_upper_audit_20261116/evidence/attempts.tar.xz.part03",
+      "bytes": 40468,
+      "sha256": "f94ba7f777b0f08ab45dbe8af4443e34429c9e252d31684c7f4a8dd961f73c34"
+    },
+    {
+      "path": "research/markov_green_upper_audit_20261116/evidence/attempts.tar.xz.sha256",
+      "bytes": 90,
+      "sha256": "3b0b59c7a55e8774ae4670c4727137fdf5add7d6763e6a10f504d13d94354b26"
+    },
+    {
+      "path": "research/markov_green_upper_audit_20261116/evidence/attempts.json",
+      "bytes": 1081,
+      "sha256": "1ae0a49664b6b82ba77700254bead0c50aa971db353c7e84361575090c9433a4"
+    },
+    {
+      "path": "research/markov_green_upper_audit_20261116/evidence/gate.tar.gz",
+      "bytes": 2283,
+      "sha256": "7c27cd4271ecd0bd40dfb78d393646f7c2a4fe0e053a477ed452b6f6b01db5b0"
+    },
+    {
+      "path": "research/markov_green_upper_audit_20261116/evidence/gate.json",
+      "bytes": 4081,
+      "sha256": "3540a76e0d7c6d53f3ceab1733e4e0e7eb54c04129eb2e5aaa1ef5afc8dcb796"
+    },
+    {
+      "path": "research/markov_green_upper_audit_20261116/evidence/source-review.json",
+      "bytes": 3327,
+      "sha256": "d1cefd23ea17ab870d0a2901426aa5abf588f8f4d99889676011ac41c5ae44ed"
+    },
+    {
+      "path": "research/markov_green_upper_audit_20261116/evidence/binding-check.json",
+      "bytes": 1974,
+      "sha256": "296f662ab6407bac05ce01cfde86933d2f44eb347968fa3ef945d5d5db4fc23e"
+    },
+    {
+      "path": "research/markov_green_upper_audit_20261116/proof-map.json",
+      "bytes": 18071,
+      "sha256": "607a9c3711212e26b0c72bbef260f77abf3d177af67aa6ee1a69ba4e7d1c983d"
+    },
+    {
+      "path": "research/markov_green_upper_audit_20261116/render_report.py",
+      "bytes": 7103,
+      "sha256": "dbeb9a090da69a24f04b5fc5abd8fd7b9ab78a934de496704d0572c88a90cc63"
+    },
+    {
+      "path": "research/markov_green_upper_audit_20261116/restore_attempts.py",
+      "bytes": 1454,
+      "sha256": "ad4323d1a631009f5ab16d39ca7067ec39a5cbd7fc355f0723e58da5ac7adbfc"
+    },
+    {
+      "path": "research/markov_green_upper_audit_20261116/export_binding_input.py",
+      "bytes": 1751,
+      "sha256": "fcd1fe43a45fa693f3b8a711cbfebb732541a9fee7555e153cc3018afc31f776"
+    },
+    {
+      "path": "research/markov_green_upper_audit_20261116/PROTOCOL.md",
+      "bytes": 4341,
+      "sha256": "56b92fa3cda8d6633ebf9e3cb861a0c6d66e3b5aad4f937a9eeecabd936fa75c"
+    },
+    {
+      "path": "research/markov_green_upper_audit_20261116/preflight.json",
+      "bytes": 7058,
+      "sha256": "f417be38d92538dcd590da26ab86702559b4b1bad38835eb5b10a2640a84f282"
+    },
+    {
+      "path": "research/markov_green_upper_audit_20261116/reports/layout.json",
+      "bytes": 393,
+      "sha256": "ee2780bc1d20759a957f936251742548368ee33f48314181cce22e6ab2c67f64"
+    },
+    {
+      "path": "research/markov_green_upper_audit_20261116/reports/report.pdf",
+      "bytes": 46956,
+      "sha256": "b8b0f7f4a07f0de0c05d827b373ac71b8ec7d737c03ae9ea04ec3039c1f21528"
+    },
+    {
+      "path": "research/markov_green_upper_audit_20261116/reports/scope.svg",
+      "bytes": 875,
+      "sha256": "d4e3ced15729a7af49ce58a9af80bb82644d1fd59e666a59574c57917e4ea02a"
+    },
+    {
+      "path": "research/markov_green_bound_audit_20261116/sources.json",
+      "bytes": 17614,
+      "sha256": "9fe36d69fb595798a5ba1169c3686971a18e142c88fc034fdfcb6ab96135f4b6"
+    }
+  ],
+  "assurance": {
+    "schema": "markov-green-upper-preflight/v1",
+    "build_snapshots": 8,
+    "failed_states": [
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07"
+    ],
+    "successful_states": [
+      "08"
+    ],
+    "dependency_plans": 1,
+    "old_formal_files": 44,
+    "static_hash_dependency_pins": 36,
+    "published_preservation_entries": 6190,
+    "all_checked_entries": 6226,
+    "frozen_plans": 49,
+    "copied_modules": 0,
+    "hydrated_modules": 0,
+    "manifest_packages": 15,
+    "all6226pins_checked_every_state_and_gate": true,
+    "exact_source_roots_from01": true,
+    "all_failed_states_retained": true,
+    "known_source_methods_credited": true,
+    "actual_PMF_and_Green_predecessor_reused": true,
+    "exact_finite_weighted_geometric_identity": true,
+    "finite_weighted_geometric_bound": true,
+    "actual_finite_Green_envelope": true,
+    "c_arbitrary_real": true,
+    "actual_varying_finite_state_spaces": true,
+    "actual_IsLittleO_error": true,
+    "explicit_nonnegative_remainder": true,
+    "actual_remainder_limit_zero": true,
+    "eventual_epsilon_upper_bound": true,
+    "actual_prime_family_healthy_strict_control": true,
+    "earlier_literal_equality_counter_retained": true,
+    "zero_terms_one_term_zero_ratio_controls": true,
+    "transparent_pinned_proposition_bundles": true,
+    "source_upper_bound_refuted": false,
+    "asymptotic_equality_inferred": false,
+    "general_Markov_collision_integer_block_repair": false,
+    "practical_hash_or_scalar_runtime": false,
+    "full14complete": false,
+    "novelty_claim": false,
+    "paid_compute_and_agent_upload": 0,
+    "gate_declarations": 17,
+    "new_modules": 4,
+    "new_concrete_modules": 4,
+    "official_import_bridge_modules": 0,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "same_host_prover": true,
+    "signed_standing": "unverified",
+    "pinned_custom_source_modules": 30,
+    "actually_imported_custom_modules": 23,
+    "actually_imported_frozen_modules": 19,
+    "additional_frozen_modules_retained_as_pins": 7
+  },
+  "dependency_source_plan": "research/markov_green_bound_audit_20261116/sources.json",
+  "preservation_scope": "All48 published pinsets6190entries and49 initial plans checked;6226 includes36 StaticHash dependency entries. All initial records archived."
+}

@@ -1,0 +1,49 @@
+{
+  "candidate_id": "spike29",
+  "certificate_sha256": "12e22b61e2ac76e9a4864e7ef2e34d2c99fef022d6d2b41d52acbdab70352f44",
+  "command": [
+    "timeout",
+    "--kill-after=5s",
+    "60s",
+    "prlimit",
+    "--as=8589934592",
+    "--",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+    "run",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/cases/prime-m3-natural/input",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/cases/prime-m3-natural/output"
+  ],
+  "elapsed_seconds": 0.788,
+  "family": "prime",
+  "first_fall_degree": null,
+  "first_fall_lower_bound": 5,
+  "id": "prime-m3-natural",
+  "input_row_sha256": "a91dae6275cc5a4bd2e369b61a887c21007ae94f8120db19329b1be49f4774b4",
+  "m": 3,
+  "replay": {
+    "command": [
+      "timeout",
+      "--kill-after=5s",
+      "60s",
+      "prlimit",
+      "--as=8589934592",
+      "--",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+      "replay",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/cases/prime-m3-natural/input",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r29-attempt-02/first-fall-attempt-03/output-01/cases/prime-m3-natural/output/prime-m3-natural.json"
+    ],
+    "elapsed_seconds": 0.007,
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "{\"input\":\"prime-m3-natural\",\"kind\":\"explicit polynomial witness or coefficient-minor replay; not independent research review\",\"verified\":true}\n",
+    "verified": true
+  },
+  "returncode": 0,
+  "s3_readback_sha256": "12e22b61e2ac76e9a4864e7ef2e34d2c99fef022d6d2b41d52acbdab70352f44",
+  "status": "completed",
+  "stderr": "",
+  "stdout": "{\"first_fall_degree\":null,\"first_fall_lower_bound\":5,\"id\":\"prime-m3-natural\",\"status\":\"certified_no_fall_through_degree_4\"}\n",
+  "system_sha256": "59d8507ca9ba32e880e25a0d4d59e2aa480878190cfd43aeb031087432712558",
+  "target_kind": "natural"
+}

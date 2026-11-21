@@ -1,0 +1,206 @@
+{
+  "schema": "galois-character-pairing-source-plan/v1",
+  "created": "2026-11-15T00:49:54.298949+00:00",
+  "formal": {
+    "project": "research/galois_character_pairing_audit_20261115/lean",
+    "theorem": "GaloisCharacterPairingAudit.galois_character_pairing_certificate",
+    "statement": "theorem galois_character_pairing_certificate : (∀ (K : Type) [Field K] [Fintype K] (M : Type) [CommGroup M] [Finite M] [TopologicalSpace M] [DiscreteTopology M] [TopologicalSpace (MulAut M)] [DiscreteTopology (MulAut M)] (ρ : Gamma K →ₜ* MulAut M) (hM : ∀ m : M, m ^ (Fintype.card K - 1) = 1), Nonempty (galoisCharacters K M ρ ≃* (CocycleClasses K M ρ →* Kˣ)) ∧ Nonempty (CocycleClasses K M ρ ≃* (galoisCharacters K M ρ →* Kˣ)) ∧ (∀ (χ : galoisCharacters K M ρ) (c : Cocycles K M ρ), baseUnitMap K (pairing K M ρ hM χ (QuotientGroup.mk c)) = χ.val (c.val (frobenius K))) ∧ (∀ χ ψ c, pairing K M ρ hM (χ * ψ) c = pairing K M ρ hM χ c * pairing K M ρ hM ψ c) ∧ (∀ χ c d, pairing K M ρ hM χ (c * d) = pairing K M ρ hM χ c * pairing K M ρ hM χ d) ∧ (∀ χ, (∀ c, pairing K M ρ hM χ c = 1) → χ = 1) ∧ (∀ c, (∀ χ, pairing K M ρ hM χ c = 1) → c = 1) ∧ Nat.card (galoisCharacters K M ρ) = Nat.card (CocycleClasses K M ρ)) ∧ (∀ (K : Type) [Field K] [Fintype K] [CharP K 2], (∀ χ : TwoCharacters K, χ = 1) ∧ missingTwoClass K ≠ 1 ∧ (¬ ∃ e : TwoCharacters K →* (TwoClasses K →* Kˣ), ∀ c : TwoClasses K, (∀ χ : TwoCharacters K, e χ c = 1) → c = 1) ∧ ¬ ∀ m : TwoTarget, m ^ (Fintype.card K - 1) = 1)",
+    "decl_sha256": "117deabc6ffa81828e499acbcc42d2c0a96947d2d3e5605128590db25ba4aee7",
+    "scope": "Bruin2011 Lemma2.1 finite-module displayed pairing: every actual finite field K, actual algebraic closure Omega and Krull absolute Galois group Gamma with derived q-Frobenius density; finite Abelian M with actual continuous action and exponent dividing q-1. Actual Gamma-equivariant homomorphisms M to Omega units descend uniquely to K-unit characters via actual Frobenius fixed field and annihilation. All-Gamma invariance derived from actual density. Compose actual all-continuous-crossed-cocycle / all-principal-cocycle class quotient with credited finite-field character biduality. Both duality MulEquivs, exact source Omega-unit evaluation formula on every cocycle representative, both bilinear laws, both trivial radicals and equal cardinality are proved without duality, nondegeneracy, H1 value or descent premises. Every finite characteristic-2 K, actual M=Multiplicative(ZMod2) with trivial action: actual Omega-unit characters all trivial, actual continuous-cocycle class nonzero, no right-nondegenerate bilinear homomorphism on the same domains; annihilation hypothesis false. Qualified source case proved, deleting hypothesis refuted. Seven prior core files copied byte-identical, credited PCC-20261115-ed6495/PCC-20261114-cdb4f1; credited PowerTargets prime-power root argument. Separate Mathlib continuous homogeneous-complex H1 comparison, isogeny-kernel/Lang/Cartier group scheme/Jacobian/divisor/full Tate/MOV/Frey-Ruck bridges remain open. Original FR94 primary remains unread. Bruin2011 DOI10.5802/jtnb.764 full six article pages previously read/seven PDF pages inspected; current selected printed325/PDF4 Galois-Cartier definition/Eq2.1/Lemma2.1 rechecked. Copyright primary files local only. No novelty/canonical corpus promotion/full14 completion. Standard foundations/defaults, no holes/custom axioms/native proof evaluation/raised limits/global flags/waivers/frozen edits/cryptographic Python/native cryptographic experiment/spend/upload. Native complete written-header processing procedural, not kernel parser/hash/execution/physical-host refinement. Signed standing unverified.",
+    "sources": [
+      {
+        "path": "research/galois_character_pairing_audit_20261115/lean/CharTwoGaloisControl.lean",
+        "bytes": 3510,
+        "sha256": "70eb368514f9785f149a8ab0cf07d0df6c32eee9c137e5cf417319955d76a376"
+      },
+      {
+        "path": "research/galois_character_pairing_audit_20261115/lean/CocycleClasses.lean",
+        "bytes": 4491,
+        "sha256": "c321b70efd4c340af8b1a7308471a25539b56736c5e0b8b1de05eabeba262ef7"
+      },
+      {
+        "path": "research/galois_character_pairing_audit_20261115/lean/CoinvariantCharacters.lean",
+        "bytes": 2859,
+        "sha256": "4ad1669833b5b28e8c0ad62a6dec0bf9eb22fe44dd1ca7c9dc8921bdc82a080e"
+      },
+      {
+        "path": "research/galois_character_pairing_audit_20261115/lean/FieldCharacterRoots.lean",
+        "bytes": 1459,
+        "sha256": "32579d797877c0657c0708ac02b29b7f175d2e6cde9ed57c4dec07483866994b"
+      },
+      {
+        "path": "research/galois_character_pairing_audit_20261115/lean/FiniteCocycles.lean",
+        "bytes": 5449,
+        "sha256": "5b1d532721a575ede866588a03fd4d874b344555a24e40d76fe91068ca30c867"
+      },
+      {
+        "path": "research/galois_character_pairing_audit_20261115/lean/FiniteQuotients.lean",
+        "bytes": 4324,
+        "sha256": "3814a32c42a4a12516889d23e78daf97e009440688d6a861ed63bce3c7025adb"
+      },
+      {
+        "path": "research/galois_character_pairing_audit_20261115/lean/GaloisCharacters.lean",
+        "bytes": 5156,
+        "sha256": "ae45b926cfb3b38aff8e630ff4ed6a487624b299e4526c2441362ce62b2ddfcb"
+      },
+      {
+        "path": "research/galois_character_pairing_audit_20261115/lean/GaloisGenerator.lean",
+        "bytes": 3939,
+        "sha256": "a5288bdb05416d3f6c450c5368df741353adc2b8dea41d1f1406a5c9ca6486db"
+      },
+      {
+        "path": "research/galois_character_pairing_audit_20261115/lean/GaloisPairingCertificate.lean",
+        "bytes": 2674,
+        "sha256": "ef31601d5728b979ef6eedfc9528f3b686454a4d47e206b9acdd7f873424efec"
+      },
+      {
+        "path": "research/galois_character_pairing_audit_20261115/lean/GaloisUnits.lean",
+        "bytes": 3718,
+        "sha256": "e6ae41090a9d89a7defaed7dc816b19e4b7aa748ceb5d8e7c393307e4c97ad83"
+      },
+      {
+        "path": "research/galois_character_pairing_audit_20261115/lean/PerfectCocyclePairing.lean",
+        "bytes": 4885,
+        "sha256": "39bf43cdbf0a3267319cb508f39a3121de64b20aed009d6b42d8b2e1a36236fc"
+      },
+      {
+        "path": "research/galois_character_pairing_audit_20261115/lean/PerfectEvaluation.lean",
+        "bytes": 3197,
+        "sha256": "ce8bf9ce8e9a137730b5b4a9feed3543632eb2eb76a4638594303ec8d8ee6faa"
+      },
+      {
+        "path": "research/galois_character_pairing_audit_20261115/lean/lakefile.toml",
+        "bytes": 562,
+        "sha256": "8750aab536b392abb274ecb7edc102d180db05daa7e18c1da04d4391143a4475"
+      },
+      {
+        "path": "research/galois_character_pairing_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3181,
+        "sha256": "6e0e613d8098487d571b7462089f2af5eb82a2eb3f18a56c8950d1817dcafac9"
+      },
+      {
+        "path": "research/galois_character_pairing_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "CharTwoGaloisControl",
+    "CocycleClasses",
+    "CoinvariantCharacters",
+    "FieldCharacterRoots",
+    "FiniteCocycles",
+    "FiniteQuotients",
+    "GaloisCharacters",
+    "GaloisGenerator",
+    "GaloisPairingCertificate",
+    "GaloisUnits",
+    "PerfectCocyclePairing",
+    "PerfectEvaluation"
+  ],
+  "artifacts": [
+    {
+      "path": "research/galois_character_pairing_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 18280,
+      "sha256": "5b62cdbe1444a195a4be4cecfa9cf08ef35751c967dcbe3641e180afc76add9e"
+    },
+    {
+      "path": "research/galois_character_pairing_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "afdd28be1c00f282d94659717f22514ecbbe0b56a264fd5406d43c0ec3085886"
+    },
+    {
+      "path": "research/galois_character_pairing_audit_20261115/evidence/attempts.json",
+      "bytes": 234,
+      "sha256": "2a5f4b55f5448463f0f21e3dfc810fc58b635908e76383e64189a4c161cd21ad"
+    },
+    {
+      "path": "research/galois_character_pairing_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 2423,
+      "sha256": "81349ac08e724fa30269e847dc49aa80d808092ddd9159bc2e601604fa0f2ec9"
+    },
+    {
+      "path": "research/galois_character_pairing_audit_20261115/evidence/gate.json",
+      "bytes": 1271,
+      "sha256": "84da6d18fbf57bd8adbb9199e4743104df8b90eced8fbb5c999b479969743fb1"
+    },
+    {
+      "path": "research/galois_character_pairing_audit_20261115/evidence/source-review.json",
+      "bytes": 5211,
+      "sha256": "d1412eb66ab98b9e8fbd7dff8f57b331fe16736fd02f15f690b01c48ebeefb73"
+    },
+    {
+      "path": "research/galois_character_pairing_audit_20261115/evidence/binding-check.json",
+      "bytes": 5541,
+      "sha256": "a297dcd82c18a6540ee47a0bf19395d3c81620fecb5a08fbac51fade41c00502"
+    },
+    {
+      "path": "research/galois_character_pairing_audit_20261115/proof-map.json",
+      "bytes": 8196,
+      "sha256": "360ad41f34be39f5e937b1406061050ef151bcc6db5eb78b56e88907d4924776"
+    },
+    {
+      "path": "research/galois_character_pairing_audit_20261115/render_report.py",
+      "bytes": 7036,
+      "sha256": "d136a7e1f9451e1cd60f74756cd0222867d72c5180c949d71f6cf3c386a03826"
+    },
+    {
+      "path": "research/galois_character_pairing_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/galois_character_pairing_audit_20261115/export_binding_input.py",
+      "bytes": 1762,
+      "sha256": "f575adacc595cfcfb7e1cff3ad43cedb7f00ffe70b428fa68ad8723046544a4a"
+    },
+    {
+      "path": "research/galois_character_pairing_audit_20261115/reports/galois-pairing.svg",
+      "bytes": 1429,
+      "sha256": "5ca8cf3652b18b47c2f74647f7da50d68193b41b4fa3bd0c7f7f72ebe4a6c5d8"
+    },
+    {
+      "path": "research/galois_character_pairing_audit_20261115/reports/layout.json",
+      "bytes": 232,
+      "sha256": "54676160ce501dc4994127f0f62a4b0e9b6f9b347bebf83262f0473c3066cd01"
+    },
+    {
+      "path": "research/galois_character_pairing_audit_20261115/reports/report.pdf",
+      "bytes": 46919,
+      "sha256": "1b068af65c39eb26fafd02d372cfa96d753fdfb1c89519633ce29aea5c16d8b0"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 73,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_all_Gamma_equivariant_Omega_characters": true,
+    "actual_character_descent_derived": true,
+    "actual_all_continuous_cocycle_principal_class_quotient": true,
+    "both_duality_MulEquivs_derived": true,
+    "exact_source_Omega_value_formula_proved": true,
+    "actual_characteristic2_guard_deletion_counterexample": true,
+    "canonical_continuous_complex_H1_comparison_proved": false,
+    "full_isogeny_Tate_pairing_proved": false,
+    "original_FR_read": false,
+    "novelty_claim": false,
+    "canonical_corpus_promoted": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

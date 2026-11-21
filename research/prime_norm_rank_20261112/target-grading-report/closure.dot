@@ -1,0 +1,13 @@
+digraph closure {
+  graph [rankdir=TB, bgcolor="white", nodesep=0.3, ranksep=0.35];
+  node [shape=box, style="rounded,filled", fillcolor="#edf4ff", color="#355f85", fontname="Helvetica", fontsize=13];
+  edge [color="#355f85", fontname="Helvetica", fontsize=11];
+  r [label="Actual monic division remainder V\nDegree below five over coefficient algebra A"];
+  old [label="Old rows: V0, V1, V2, V3, V4"];
+  new [label="New rows: s V(q), V1, V2, V3, V4\nPublic q and nonzero s"];
+  span [label="Same constant K-linear input span\nPCC-20261114-bcec52 (unsigned)",fillcolor="#e7f3e7"];
+  admission [label="Budget D admits every old AND new input",fillcolor="#fff2d7",color="#ad7a20"];
+  full [label="Identical FULL iterated closures at D\nDerived-row multiplication included\nActual binding: PCC-20261114-d07690 (unsigned)",fillcolor="#e7f3e7"];
+  next [label="Next: bounded derivations or a different mechanism\nLower admission budgets / nonlinear charts remain open",fillcolor="#fff2d7",color="#ad7a20"];
+  r -> old; r -> new; old -> span; new -> span; span -> admission; admission -> full; full -> next [style=dashed,color="#ad7a20"];
+}

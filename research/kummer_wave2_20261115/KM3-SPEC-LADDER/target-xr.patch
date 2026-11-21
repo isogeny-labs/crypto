@@ -1,0 +1,195 @@
+diff --git a/examples/pkm_tower_pilot.rs b/examples/pkm_tower_pilot.rs
+index 9efea80a01..cfa46af36a 100644
+--- a/examples/pkm_tower_pilot.rs
++++ b/examples/pkm_tower_pilot.rs
+@@ -2383,6 +2383,14 @@ struct Args {
+     /// of the same tower (`TowerWeights`). `k = 1`, radix 2, is the unit
+     /// grading of every committed row.
+     radix_k: u32,
++    /// `--target-xr V`: every random target's `x_R` is `V` (the rng is
++    /// consumed as without the flag; planted targets are unchanged).
++    target_xr: Option<u64>,
++    /// `--spec-ladder` (`--engine hky`, `m = 3`, Kummer/tower control): after
++    /// each random m = 3 target, also measure the m = 2 system with target
++    /// `rho` for every F_p-root `rho` of `S3(u, x3, x_R)`, `x3` in the base
++    /// (KM3-SPEC-LADDER, Lemma P). Rows carry `spec_of`.
++    spec_ladder: bool,
+ }
+ 
+ #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+@@ -2564,6 +2572,8 @@ fn parse_args() -> Args {
+         hky_max_cols: 2_000_000,
+         hky_max_entries: 600_000_000,
+         radix_k: 1,
++        target_xr: None,
++        spec_ladder: false,
+     };
+     let args: Vec<String> = std::env::args().skip(1).collect();
+     let list = |s: &str| -> Vec<usize> {
+@@ -2589,6 +2599,11 @@ fn parse_args() -> Args {
+             i += 1;
+             continue;
+         }
++        if args[i] == "--spec-ladder" {
++            a.spec_ladder = true;
++            i += 1;
++            continue;
++        }
+         if args[i] == "--verify" {
+             a.verify = true;
+             i += 1;
+@@ -2734,6 +2749,7 @@ fn parse_args() -> Args {
+                 }
+             }
+             "--dump" => a.dump = Some(v.parse().expect("--dump")),
++            "--target-xr" => a.target_xr = Some(v.parse().expect("--target-xr")),
+             "--targets" => a.targets = Some(list(&v)),
+             other => panic!("unknown flag `{other}`"),
+         }
+@@ -2868,7 +2884,11 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
+     }
+     if cell.control != Control::Ladder {
+         for _ in 0..a.random {
+-            targets.push(random_target(&curve, &mut rng));
++            let mut tg = random_target(&curve, &mut rng);
++            if let Some(v) = a.target_xr {
++                tg.x_r = v % p;
++            }
++            targets.push(tg);
+         }
+     }
+     let mut any_finished = false;
+@@ -3078,10 +3098,133 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
+             }
+         }
+         sink.push(row);
++        if a.spec_ladder
++            && a.engine == Engine::Hky
++            && cell.control == Control::Tower
++            && cell.m == 3
++            && !target.planted
++            && tower.cover.is_none()
++        {
++            let m3_dfall = r.extra.get("last_fall_degree").cloned().unwrap_or(Value::Null);
++            spec_ladder_rows(cell, a, &tower, &curve, target, k, &m3_dfall, g_seed_rng(cell_seed), sink);
++        }
+     }
+     any_finished
+ }
+ 
++
++fn g_seed_rng(seed: u64) -> StdRng {
++    StdRng::seed_from_u64(seed ^ 0x5EC1_ADDE)
++}
++
++/// Lemma P arm: for each distinct `F_p`-root `rho` of `S3(u, x3, x_R)` over
++/// `x3` in the base, the m = 2 system with target `rho` on the same tower
++/// and curve, closure to `--hky-cmax`.
++#[allow(clippy::too_many_arguments)]
++fn spec_ladder_rows(
++    cell: &Cell,
++    a: &Args,
++    tower: &Tower,
++    curve: &PrimeCurve,
++    target: &Target,
++    k: usize,
++    m3_dfall: &Value,
++    mut rng: StdRng,
++    sink: &mut Sink,
++) {
++    let p = curve.p;
++    let (ca, cb) = (curve.a, curve.b);
++    // pairs (x3, rho), rho an F_p root of the quadratic S3(u, x3, x_R) in u.
++    let mut rhos: BTreeMap<u64, Vec<u64>> = BTreeMap::new();
++    let mut no_root = 0usize;
++    let mut degenerate = 0usize;
++    for &x3 in &tower.v {
++        let ev = |u: u64| -> u64 {
++            let v = s3(
++                &Pol::constant(1, u, p),
++                &Pol::constant(1, x3, p),
++                &Pol::constant(1, target.x_r, p),
++                ca,
++                cb,
++                p,
++            );
++            v.terms.get(&vec![0u32]).copied().unwrap_or(0)
++        };
++        let (v0, v1, vm) = (ev(0), ev(1), ev(p - 1));
++        let inv2 = invm(2, p);
++        let c2 = subm(mulm(addm(v1, vm, p), inv2, p), v0, p);
++        let c1 = mulm(subm(v1, vm, p), inv2, p);
++        let c0 = v0;
++        if c2 == 0 {
++            degenerate += 1;
++            continue;
++        }
++        let disc = subm(mulm(c1, c1, p), mulm(4, mulm(c2, c0, p), p), p);
++        match curve.sqrt(disc) {
++            None => no_root += 1,
++            Some(sq) => {
++                let i2a = invm(mulm(2, c2, p), p);
++                let r1 = mulm(addm(p - c1, sq, p), i2a, p);
++                let r2 = mulm(subm(p - c1, sq, p), i2a, p);
++                let mut roots = vec![r1];
++                if r2 != r1 {
++                    roots.push(r2);
++                }
++                for r in roots {
++                    rhos.entry(r).or_default().push(x3);
++                }
++            }
++        }
++    }
++    eprintln!(
++        "-- spec-ladder t={} target {k}: {} distinct rho, {} x3 without F_p root, {} degenerate",
++        cell.t,
++        rhos.len(),
++        no_root,
++        degenerate
++    );
++    let cell2 = Cell {
++        kind: cell.kind,
++        m: 2,
++        control: Control::Tower,
++        t: cell.t,
++        g: cell.g,
++    };
++    for (rho, x3s) in &rhos {
++        let tg = Target {
++            planted: false,
++            x_r: *rho,
++            solution: None,
++            xs: Vec::new(),
++        };
++        let (eqs, n, _sol, _tw) = system(
++            Control::Tower,
++            tower,
++            curve,
++            2,
++            &tg,
++            cell.g,
++            None,
++            &mut rng,
++        );
++        let out = measure_hky(&eqs, tower, &cell2, n, p, None, a);
++        let mut row = json!({
++            "kind": cell.kind.name(), "m": 2, "control": "tower", "t": cell.t,
++            "g": cell.g, "target": "random", "target_index": k, "x_r": rho, "p": p,
++            "curve": {"a": ca, "b": cb},
++            "spec_of": {"m": 3, "x_r_m3": target.x_r, "target_index": k, "rho": rho,
++                        "x3_list": x3s, "m3_last_fall_degree": m3_dfall},
++            "wall_s": out.ms / 1e3,
++        });
++        if let (Some(obj), Some(extra)) = (row.as_object_mut(), out.extra.as_object()) {
++            for (kk, v) in extra {
++                obj.insert(kk.clone(), v.clone());
++            }
++        }
++        sink.push(row);
++    }
++}
++
+ /// A basis to print with `--dump`, from either engine.
+ enum Dumpable {
+     Raw(Vec<Poly>),

@@ -1,0 +1,84 @@
+--- a/commands.json
++++ b/commands.json
+@@ -2,7 +2,7 @@
+   "prospective_argv": [
+     "sudo",
+     "systemd-run",
+-    "--unit=pencil-kummer-lock-v2-20261111",
++    "--unit=pencil-kummer-lock-v3-20261111",
+     "--property=User=ec2-user",
+     "--property=CPUQuota=100%",
+     "--property=MemoryMax=2G",
+@@ -13,14 +13,14 @@
+     "--property=KillMode=control-group",
+     "--property=PrivateNetwork=yes",
+     "--property=ProtectSystem=strict",
+-    "--property=ReadWritePaths=/var/tmp/pencil-kummer-lock-v2-20261111",
++    "--property=ReadWritePaths=/var/tmp/pencil-kummer-lock-v3-20261111",
+     "--property=LimitFSIZE=16777216",
+-    "--property=StandardOutput=append:/var/tmp/pencil-kummer-lock-v2-20261111/unit.stdout",
+-    "--property=StandardError=append:/var/tmp/pencil-kummer-lock-v2-20261111/unit.stderr",
++    "--property=StandardOutput=append:/var/tmp/pencil-kummer-lock-v3-20261111/unit.stdout",
++    "--property=StandardError=append:/var/tmp/pencil-kummer-lock-v3-20261111/unit.stderr",
+     "--property=Type=exec",
+     "--property=RemainAfterExit=yes",
+     "/usr/bin/python3",
+-    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-lock-gate-v2-20261111/generate_lock.py"
++    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-lock-gate-v3-20261111/generate_lock.py"
+   ],
+   "status": "not_released",
+   "note": "Concrete launch.py captures ownership, terminal and cgroup cleanup. Native50+5 seconds stays inside60second reservation; caller stops at52 seconds.",
+@@ -30,6 +30,6 @@
+     "--kill-after=1",
+     "59",
+     "/usr/bin/python3",
+-    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-lock-gate-v2-20261111/launch.py"
++    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-lock-gate-v3-20261111/launch.py"
+   ]
+ }
+--- a/generate_lock.py
++++ b/generate_lock.py
+@@ -2,7 +2,7 @@
+ """Prospective, one-shot offline resolution only; no compiler, payload or tests."""
+ import hashlib,json,os,pathlib,subprocess,sys,time,datetime
+ P=pathlib.Path(__file__).resolve().parent
+-W=pathlib.Path('/var/tmp/pencil-kummer-lock-v2-20261111')
++W=pathlib.Path('/var/tmp/pencil-kummer-lock-v3-20261111')
+ start=time.monotonic(); end=start+45
+ sha=lambda b:hashlib.sha256(b).hexdigest()
+ def check():
+@@ -19,7 +19,7 @@
+ assert datetime.datetime.now(datetime.timezone.utc)<datetime.datetime.fromisoformat(release['absolute_deadline'])-datetime.timedelta(seconds=60)
+ inputs=json.loads(verified(P/'lock-inputs.json',release['inputs_sha256']))
+ verified(__file__,release['worker_sha256'])
+-assert json.loads((W/'caller-owner.json').read_text())['unit']=='pencil-kummer-lock-v2-20261111.service'
++assert json.loads((W/'caller-owner.json').read_text())['unit']=='pencil-kummer-lock-v3-20261111.service'
+ assert set(p.name for p in W.iterdir()) <= {'caller-owner.json','unit.stdout','unit.stderr','launch.stdout','launch.stderr','owner.json'}
+ result={'status':'failed','compile_invoked':False,'network_allowed':False,'locks':{},'resolutions':[]}
+ try:
+--- a/launch.py
++++ b/launch.py
+@@ -1,7 +1,7 @@
+ #!/usr/bin/env python3
+ import pathlib,subprocess,json,time,os,hashlib,sys,datetime
+ P=pathlib.Path(__file__).resolve().parent
+-W=pathlib.Path('/var/tmp/pencil-kummer-lock-v2-20261111');U='pencil-kummer-lock-v2-20261111.service'
++W=pathlib.Path('/var/tmp/pencil-kummer-lock-v3-20261111');U='pencil-kummer-lock-v3-20261111.service'
+ r=json.loads((P/'release.json').read_text());assert r['released'] is True and r['serial_owner_confirmed'] is True
+ assert r['launcher_sha256']==hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest()
+ assert datetime.datetime.now(datetime.timezone.utc)+datetime.timedelta(seconds=60)<datetime.datetime.fromisoformat(r['absolute_deadline'])
+--- a/release-draft.json
++++ b/release-draft.json
+@@ -5,10 +5,10 @@
+   "publication_commit": null,
+   "publication_readback_sha256": null,
+   "inputs_sha256": "f16a0ffc365bf63ee5b931a157d0ec77eb497ddf0b5f2fbebefdc9a11a96a172",
+-  "worker_sha256": "a380b70b8c1b5263477d8c188b40221282c9784e11e0d738a55d4d942c8b5902",
++  "worker_sha256": "4724f9664b98975a012613efac5e3eb4ce35b1b84b6bc4bbbce8335809da9907",
+   "review_sha256": null,
+   "current_ledger_sha256": null,
+-  "launcher_sha256": "ec748e3234441739e032a9e5451d7a7f0565728293d29b259f5799ec1b952a00",
++  "launcher_sha256": "7b9d073e1fdd2a9158b71e2970c9ac0215839077faab568d6812dd27b786c3e2",
+   "rustc_proxy_sha256": "3a358ba4a695e85b093472b3cc6b7baf3c2c48edc5b87a1ce565d89390e8747e",
+   "absolute_deadline": "2026-11-11T12:00:00Z"
+ }

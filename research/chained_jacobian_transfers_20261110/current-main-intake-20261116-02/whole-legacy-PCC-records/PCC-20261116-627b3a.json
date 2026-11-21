@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T20:43:50Z",
+ "id": "PCC-20261116-627b3a",
+ "kind": "theorem",
+ "producer": {
+  "commit": "e12f0ed198ebe96f5be4e7e43ffa9613ab05fb51",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "5c8f2e7bf401e6049c1bd9d9ddf9783d68ec6eac3200eac505774083d21925b2",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-final-03/CubicNativeNormEuclid22309.lean",
+   "theorem": "CubicNativeNormEuclid22309.raw_norm_value"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Literal normalized UInt64 q223 norm and actual signed Euclidean inverse model; finite223 base certificates derive termination/gcd/unit/all-state signed64 bounds, original dual64/0/j1/120/default memory. No Rust compiler/counter/runtime, complete composed field/Jacobian or signed standing.",
+ "statement": "theorem raw_norm_value (a b c p0 p1 p2 : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) (hc : c.toNat<223) (hp0 : p0.toNat<223) (hp1 : p1.toNat<223) (hp2 : p2.toNat<223) : (rawNormBlock a b c p0 p1 p2).toNat= ((a.toNat*p0.toNat)%223+3*((b.toNat*p2.toNat+c.toNat*p1.toNat)%223))%223"
+}

@@ -1,0 +1,575 @@
+{
+  "created_at": "2026-11-01T04:48:31.908817+00:00",
+  "fixture": "/var/tmp/ml-dataset-cli46-e0a865-final008-20261101",
+  "read_only": true,
+  "dataset_commands_executed": 0,
+  "gate_wrong": false,
+  "first_missing_channel": "policy/causal/export/prefix-features.jsonl",
+  "also_empty": "policy/causal/export/algebraic-features.jsonl",
+  "channel_rows": {
+    "features.jsonl": 4,
+    "prefix-features.jsonl": 0,
+    "algebraic-features.jsonl": 0,
+    "restricted/prefix-records.jsonl": 8,
+    "restricted/algebraic-records.jsonl": 0,
+    "restricted/targets.jsonl": 4
+  },
+  "cells": [
+    {
+      "cell": 0,
+      "config": {
+        "curve_seed": 0,
+        "degree_bound": 3,
+        "factor_base_policy": {
+          "kind": "legacy"
+        },
+        "factor_base_size": 4,
+        "family": "prime",
+        "generator_index": 0,
+        "key_index": 0,
+        "m": 3,
+        "n": 7,
+        "seed": 42,
+        "solver": "f4",
+        "twist": false,
+        "work_limit": 16384
+      },
+      "status": "budget_exhausted",
+      "solver_completed": false
+    },
+    {
+      "cell": 1,
+      "config": {
+        "curve_seed": 0,
+        "degree_bound": 3,
+        "factor_base_policy": {
+          "candidate_limit": 128,
+          "kind": "sampled_x_projected_control"
+        },
+        "factor_base_size": 4,
+        "family": "prime",
+        "generator_index": 0,
+        "key_index": 0,
+        "m": 3,
+        "n": 7,
+        "seed": 42,
+        "solver": "f4",
+        "twist": false,
+        "work_limit": 16384
+      },
+      "status": "verified",
+      "solver_completed": true
+    },
+    {
+      "cell": 2,
+      "config": {
+        "curve_seed": 0,
+        "degree_bound": 3,
+        "factor_base_policy": {
+          "kind": "legacy"
+        },
+        "factor_base_size": 4,
+        "family": "prime",
+        "generator_index": 0,
+        "key_index": 0,
+        "m": 3,
+        "n": 7,
+        "seed": 42,
+        "solver": "f4",
+        "twist": true,
+        "work_limit": 16384
+      },
+      "status": "verified",
+      "solver_completed": true
+    },
+    {
+      "cell": 3,
+      "config": {
+        "curve_seed": 0,
+        "degree_bound": 3,
+        "factor_base_policy": {
+          "candidate_limit": 128,
+          "kind": "sampled_x_projected_control"
+        },
+        "factor_base_size": 4,
+        "family": "prime",
+        "generator_index": 0,
+        "key_index": 0,
+        "m": 3,
+        "n": 7,
+        "seed": 42,
+        "solver": "f4",
+        "twist": true,
+        "work_limit": 16384
+      },
+      "status": "verified",
+      "solver_completed": true
+    }
+  ],
+  "verify": {
+    "artifact_hashes_verified": true,
+    "assigned_shard_cells": 4,
+    "campaign_attempts_complete": true,
+    "completed_receipts": 4,
+    "completed_shard_receipts": 4,
+    "discoverable_catalog_cells": 0,
+    "full_scope_complete": false,
+    "full_scope_complete_reason": "accounted attempts and known answers do not establish all requested methods or end-to-end ECDLP solves",
+    "incomplete_attempts": [],
+    "independently_solved_ecdlp_cells": 0,
+    "known_answer_replay_performed": true,
+    "known_answer_verified_cells": 4,
+    "outcomes": {
+      "budget_exhausted": 1,
+      "verified": 3
+    },
+    "planned_cells": 4,
+    "published_cells": 0,
+    "published_completion_receipts": 0,
+    "remote_rechecked_during_status": false,
+    "schema": "crypto.ml-dataset.status/v1",
+    "shard_attempts_complete": true
+  },
+  "restricted_records": [
+    {
+      "target": "182961f27a0bd53619c9e1558b4b4fb52d395bc9904143f8414d7073b5f8e9f3",
+      "feature_id": null,
+      "record": {
+        "certificate": {
+          "certificate": null,
+          "exact_fall_degree_verified": false,
+          "limits": {
+            "degree": 8,
+            "entries": 262144,
+            "operations": 10000000,
+            "rows": 8192
+          },
+          "native_execution_trace_verified": false,
+          "native_instruction_count_verified": false,
+          "reason": "representation not found in bounded generator-multiple span",
+          "schema": "ml-dataset.ideal-equality-certificate/v1",
+          "status": "unknown",
+          "work": {
+            "coefficient_operations": 20136,
+            "generated_rows": 630,
+            "peak_retained_entries": 1740
+          }
+        },
+        "kind": "ideal_equality_audit",
+        "node_id": 0,
+        "sequence": 2
+      }
+    },
+    {
+      "target": "f6183315637e1f2a858cf00d589896ac048b890bbc34297d0c4c6498a302240e",
+      "feature_id": null,
+      "record": {
+        "admission_status": "bounded_unknown_suffix",
+        "algebraic_consequences": {
+          "admission_status": "retained_rows_checked",
+          "closure_completeness_verified": false,
+          "counts": {
+            "admitted_degree_drop_rows": 0,
+            "admitted_nonzero_rows": 0,
+            "admitted_zero_rows": 0,
+            "direct_identity_coefficient_operations": 0,
+            "examined_target_rows": 0,
+            "serialized_payload_bytes": 0,
+            "terminal_record_bytes": 0,
+            "unknown_suffix_records": 0,
+            "verified_identity_rows": 0
+          },
+          "exact_first_fall_degree": null,
+          "exact_last_fall_degree": null,
+          "limits": {
+            "direct_identity_coefficient_operations": 10000000,
+            "examined_target_rows": 4096,
+            "serialized_payload_bytes": 67108864,
+            "terminal_record_bytes": 4096
+          },
+          "native_execution_trace_verified": false,
+          "native_instruction_count_verified": false,
+          "schema": "ml-dataset.algebraic-channel-summary/v1",
+          "serialized_payload_scope": "sum of serialized optional feature and record JSON bytes for each emitted nonterminal occurrence, before sorter envelopes and deduplication; excludes terminal censoring record",
+          "source_completion_claimed": false,
+          "work_scope": "direct identity coefficient multiplication and accumulation; excludes parsing, primality, graph construction and I/O; not native instructions"
+        },
+        "bytes_read": 1380,
+        "events_read": 2,
+        "exact_fall_degree_verified": false,
+        "ideal_equality_certified_nodes": 0,
+        "limits": {
+          "certificate_plus_root_coefficient_operations": 100000000,
+          "event_bytes": 8388608,
+          "events": 4096,
+          "stream_bytes": 67108864
+        },
+        "native_execution_trace_verified": false,
+        "native_instruction_count_verified": false,
+        "reason": "representation not found in bounded generator-multiple span",
+        "schema": "ml-dataset.prime-chain-prefix-replay/v1",
+        "source_completion_claimed": false,
+        "verified_branch_examples": 0,
+        "verifier_work": {
+          "certificate_coefficient_operations": 20136,
+          "finite_domain_evaluations": 0,
+          "root_coefficient_operations": 0
+        },
+        "verifier_work_scope": "certificate/root coefficient operations and finite-domain evaluations; excludes parsing, specialization, graph construction, primality checks and I/O; not native solve costs or CPU instructions"
+      }
+    },
+    {
+      "target": "01bb5b6ffc8544fb222ffc34ffa20c76412543ff868735d2b2ed79e4d1c997f1",
+      "feature_id": null,
+      "record": {
+        "admission_status": "bounded_unknown_suffix",
+        "algebraic_consequences": {
+          "admission_status": "retained_rows_checked",
+          "closure_completeness_verified": false,
+          "counts": {
+            "admitted_degree_drop_rows": 0,
+            "admitted_nonzero_rows": 0,
+            "admitted_zero_rows": 0,
+            "direct_identity_coefficient_operations": 0,
+            "examined_target_rows": 0,
+            "serialized_payload_bytes": 0,
+            "terminal_record_bytes": 0,
+            "unknown_suffix_records": 0,
+            "verified_identity_rows": 0
+          },
+          "exact_first_fall_degree": null,
+          "exact_last_fall_degree": null,
+          "limits": {
+            "direct_identity_coefficient_operations": 10000000,
+            "examined_target_rows": 4096,
+            "serialized_payload_bytes": 67108864,
+            "terminal_record_bytes": 4096
+          },
+          "native_execution_trace_verified": false,
+          "native_instruction_count_verified": false,
+          "schema": "ml-dataset.algebraic-channel-summary/v1",
+          "serialized_payload_scope": "sum of serialized optional feature and record JSON bytes for each emitted nonterminal occurrence, before sorter envelopes and deduplication; excludes terminal censoring record",
+          "source_completion_claimed": false,
+          "work_scope": "direct identity coefficient multiplication and accumulation; excludes parsing, primality, graph construction and I/O; not native instructions"
+        },
+        "bytes_read": 1387,
+        "events_read": 2,
+        "exact_fall_degree_verified": false,
+        "ideal_equality_certified_nodes": 0,
+        "limits": {
+          "certificate_plus_root_coefficient_operations": 100000000,
+          "event_bytes": 8388608,
+          "events": 4096,
+          "stream_bytes": 67108864
+        },
+        "native_execution_trace_verified": false,
+        "native_instruction_count_verified": false,
+        "reason": "representation not found in bounded generator-multiple span",
+        "schema": "ml-dataset.prime-chain-prefix-replay/v1",
+        "source_completion_claimed": false,
+        "verified_branch_examples": 0,
+        "verifier_work": {
+          "certificate_coefficient_operations": 20136,
+          "finite_domain_evaluations": 0,
+          "root_coefficient_operations": 0
+        },
+        "verifier_work_scope": "certificate/root coefficient operations and finite-domain evaluations; excludes parsing, specialization, graph construction, primality checks and I/O; not native solve costs or CPU instructions"
+      }
+    },
+    {
+      "target": "cfcf7c491a0e38f894527b24eb0c39020d90fe4db322f847d984b38e8886ad4a",
+      "feature_id": null,
+      "record": {
+        "admission_status": "bounded_unknown_suffix",
+        "algebraic_consequences": {
+          "admission_status": "retained_rows_checked",
+          "closure_completeness_verified": false,
+          "counts": {
+            "admitted_degree_drop_rows": 0,
+            "admitted_nonzero_rows": 0,
+            "admitted_zero_rows": 0,
+            "direct_identity_coefficient_operations": 0,
+            "examined_target_rows": 0,
+            "serialized_payload_bytes": 0,
+            "terminal_record_bytes": 0,
+            "unknown_suffix_records": 0,
+            "verified_identity_rows": 0
+          },
+          "exact_first_fall_degree": null,
+          "exact_last_fall_degree": null,
+          "limits": {
+            "direct_identity_coefficient_operations": 10000000,
+            "examined_target_rows": 4096,
+            "serialized_payload_bytes": 67108864,
+            "terminal_record_bytes": 4096
+          },
+          "native_execution_trace_verified": false,
+          "native_instruction_count_verified": false,
+          "schema": "ml-dataset.algebraic-channel-summary/v1",
+          "serialized_payload_scope": "sum of serialized optional feature and record JSON bytes for each emitted nonterminal occurrence, before sorter envelopes and deduplication; excludes terminal censoring record",
+          "source_completion_claimed": false,
+          "work_scope": "direct identity coefficient multiplication and accumulation; excludes parsing, primality, graph construction and I/O; not native instructions"
+        },
+        "bytes_read": 1374,
+        "events_read": 2,
+        "exact_fall_degree_verified": false,
+        "ideal_equality_certified_nodes": 0,
+        "limits": {
+          "certificate_plus_root_coefficient_operations": 100000000,
+          "event_bytes": 8388608,
+          "events": 4096,
+          "stream_bytes": 67108864
+        },
+        "native_execution_trace_verified": false,
+        "native_instruction_count_verified": false,
+        "reason": "representation not found in bounded generator-multiple span",
+        "schema": "ml-dataset.prime-chain-prefix-replay/v1",
+        "source_completion_claimed": false,
+        "verified_branch_examples": 0,
+        "verifier_work": {
+          "certificate_coefficient_operations": 20136,
+          "finite_domain_evaluations": 0,
+          "root_coefficient_operations": 0
+        },
+        "verifier_work_scope": "certificate/root coefficient operations and finite-domain evaluations; excludes parsing, specialization, graph construction, primality checks and I/O; not native solve costs or CPU instructions"
+      }
+    },
+    {
+      "target": "01bb5b6ffc8544fb222ffc34ffa20c76412543ff868735d2b2ed79e4d1c997f1",
+      "feature_id": null,
+      "record": {
+        "certificate": {
+          "certificate": null,
+          "exact_fall_degree_verified": false,
+          "limits": {
+            "degree": 8,
+            "entries": 262144,
+            "operations": 10000000,
+            "rows": 8192
+          },
+          "native_execution_trace_verified": false,
+          "native_instruction_count_verified": false,
+          "reason": "representation not found in bounded generator-multiple span",
+          "schema": "ml-dataset.ideal-equality-certificate/v1",
+          "status": "unknown",
+          "work": {
+            "coefficient_operations": 20136,
+            "generated_rows": 630,
+            "peak_retained_entries": 1740
+          }
+        },
+        "kind": "ideal_equality_audit",
+        "node_id": 0,
+        "sequence": 2
+      }
+    },
+    {
+      "target": "f6183315637e1f2a858cf00d589896ac048b890bbc34297d0c4c6498a302240e",
+      "feature_id": null,
+      "record": {
+        "certificate": {
+          "certificate": null,
+          "exact_fall_degree_verified": false,
+          "limits": {
+            "degree": 8,
+            "entries": 262144,
+            "operations": 10000000,
+            "rows": 8192
+          },
+          "native_execution_trace_verified": false,
+          "native_instruction_count_verified": false,
+          "reason": "representation not found in bounded generator-multiple span",
+          "schema": "ml-dataset.ideal-equality-certificate/v1",
+          "status": "unknown",
+          "work": {
+            "coefficient_operations": 20136,
+            "generated_rows": 630,
+            "peak_retained_entries": 1740
+          }
+        },
+        "kind": "ideal_equality_audit",
+        "node_id": 0,
+        "sequence": 2
+      }
+    },
+    {
+      "target": "cfcf7c491a0e38f894527b24eb0c39020d90fe4db322f847d984b38e8886ad4a",
+      "feature_id": null,
+      "record": {
+        "certificate": {
+          "certificate": null,
+          "exact_fall_degree_verified": false,
+          "limits": {
+            "degree": 8,
+            "entries": 262144,
+            "operations": 10000000,
+            "rows": 8192
+          },
+          "native_execution_trace_verified": false,
+          "native_instruction_count_verified": false,
+          "reason": "representation not found in bounded generator-multiple span",
+          "schema": "ml-dataset.ideal-equality-certificate/v1",
+          "status": "unknown",
+          "work": {
+            "coefficient_operations": 20136,
+            "generated_rows": 630,
+            "peak_retained_entries": 1740
+          }
+        },
+        "kind": "ideal_equality_audit",
+        "node_id": 0,
+        "sequence": 2
+      }
+    },
+    {
+      "target": "182961f27a0bd53619c9e1558b4b4fb52d395bc9904143f8414d7073b5f8e9f3",
+      "feature_id": null,
+      "record": {
+        "admission_status": "bounded_unknown_suffix",
+        "algebraic_consequences": {
+          "admission_status": "retained_rows_checked",
+          "closure_completeness_verified": false,
+          "counts": {
+            "admitted_degree_drop_rows": 0,
+            "admitted_nonzero_rows": 0,
+            "admitted_zero_rows": 0,
+            "direct_identity_coefficient_operations": 0,
+            "examined_target_rows": 0,
+            "serialized_payload_bytes": 0,
+            "terminal_record_bytes": 0,
+            "unknown_suffix_records": 0,
+            "verified_identity_rows": 0
+          },
+          "exact_first_fall_degree": null,
+          "exact_last_fall_degree": null,
+          "limits": {
+            "direct_identity_coefficient_operations": 10000000,
+            "examined_target_rows": 4096,
+            "serialized_payload_bytes": 67108864,
+            "terminal_record_bytes": 4096
+          },
+          "native_execution_trace_verified": false,
+          "native_instruction_count_verified": false,
+          "schema": "ml-dataset.algebraic-channel-summary/v1",
+          "serialized_payload_scope": "sum of serialized optional feature and record JSON bytes for each emitted nonterminal occurrence, before sorter envelopes and deduplication; excludes terminal censoring record",
+          "source_completion_claimed": false,
+          "work_scope": "direct identity coefficient multiplication and accumulation; excludes parsing, primality, graph construction and I/O; not native instructions"
+        },
+        "bytes_read": 1375,
+        "events_read": 2,
+        "exact_fall_degree_verified": false,
+        "ideal_equality_certified_nodes": 0,
+        "limits": {
+          "certificate_plus_root_coefficient_operations": 100000000,
+          "event_bytes": 8388608,
+          "events": 4096,
+          "stream_bytes": 67108864
+        },
+        "native_execution_trace_verified": false,
+        "native_instruction_count_verified": false,
+        "reason": "representation not found in bounded generator-multiple span",
+        "schema": "ml-dataset.prime-chain-prefix-replay/v1",
+        "source_completion_claimed": false,
+        "verified_branch_examples": 0,
+        "verifier_work": {
+          "certificate_coefficient_operations": 20136,
+          "finite_domain_evaluations": 0,
+          "root_coefficient_operations": 0
+        },
+        "verifier_work_scope": "certificate/root coefficient operations and finite-domain evaluations; excludes parsing, specialization, graph construction, primality checks and I/O; not native solve costs or CPU instructions"
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "/var/tmp/ml-dataset-cli46-e0a865-final008-20261101/protocol.json",
+      "sha256": "e339243e6bd927985797faa78464ce5060d925112a4ac6242f72f1d4231833ab",
+      "bytes": 37598
+    },
+    {
+      "path": "/var/tmp/ml-dataset-cli46-e0a865-final008-20261101/execution-failed.json",
+      "sha256": "a5403e2e0b406c4bf68b4ad05b8e996dfd7ae4ea5a567a38bedb692a4f0aeba5",
+      "bytes": 317
+    },
+    {
+      "path": "/var/tmp/ml-dataset-cli46-e0a865-final008-20261101/prepared.json",
+      "sha256": "9ff935628540727b71a34d62cda24ca9088988f0f0cbfe4fc733da7420911540",
+      "bytes": 1461
+    },
+    {
+      "path": "/var/tmp/ml-dataset-cli46-e0a865-final008-20261101/policy/causal/export/features.jsonl",
+      "sha256": "7961b8949f869992dc42a17f8dfb48992ebfda55a4f32b7aa08346b4c25f5eb1",
+      "bytes": 26544
+    },
+    {
+      "path": "/var/tmp/ml-dataset-cli46-e0a865-final008-20261101/policy/causal/export/prefix-features.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/var/tmp/ml-dataset-cli46-e0a865-final008-20261101/policy/causal/export/algebraic-features.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/var/tmp/ml-dataset-cli46-e0a865-final008-20261101/policy/causal/export/restricted/prefix-records.jsonl",
+      "sha256": "cb4e956a18afaecf289180aa80a7e8de55a4c95bece0ae342a7213a3b6f0951c",
+      "bytes": 13364
+    },
+    {
+      "path": "/var/tmp/ml-dataset-cli46-e0a865-final008-20261101/policy/causal/export/restricted/algebraic-records.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/var/tmp/ml-dataset-cli46-e0a865-final008-20261101/policy/causal/export/restricted/targets.jsonl",
+      "sha256": "486d4149e3c95765d4f99b51a69fb3b1eb9ce752fb14a269daad2bf526bf4412",
+      "bytes": 17458
+    },
+    {
+      "path": "/var/tmp/ml-dataset-cli46-e0a865-final008-20261101/policy/causal/run/cells/000000000000/manifest.json",
+      "sha256": "3aa7df9755b8c69666b4c4aa473ea239f3b951c35862a7e0da806059cda5cdf8",
+      "bytes": 11924
+    },
+    {
+      "path": "/var/tmp/ml-dataset-cli46-e0a865-final008-20261101/policy/causal/run/cells/000000000001/manifest.json",
+      "sha256": "3af733eb83743f50a7b2f4fc9e21125d174074b204e36bb2b5b8dd3f1e360dd0",
+      "bytes": 12485
+    },
+    {
+      "path": "/var/tmp/ml-dataset-cli46-e0a865-final008-20261101/policy/causal/run/cells/000000000002/manifest.json",
+      "sha256": "41dfc7971e56d90c00b4c2eb606501434a75d4786ac2afc45b77730dbda89b42",
+      "bytes": 12432
+    },
+    {
+      "path": "/var/tmp/ml-dataset-cli46-e0a865-final008-20261101/policy/causal/run/cells/000000000003/manifest.json",
+      "sha256": "d6d2734cf54d550e72cbe851f6a213f3142fee49c9307b29b851087062801387",
+      "bytes": 12486
+    },
+    {
+      "path": "/var/tmp/ml-dataset-cli46-e0a865-final008-20261101/commands/128-policy-causal-verify/receipt.json",
+      "sha256": "69dee1253a9629b1282f33e38742bc003498e90a888a774f16973c6c9c9db773",
+      "bytes": 1106
+    },
+    {
+      "path": "/var/tmp/ml-dataset-cli46-e0a865-final008-20261101/commands/128-policy-causal-verify/stdout",
+      "sha256": "7cf13e9e6f755c9185a7850abc2030a9b38876a0e39223bcea4976c605a3f927",
+      "bytes": 697
+    },
+    {
+      "path": "/home/ec2-user/crypto-ml-koblitz-m3-adapter-20261030/src/ml_dataset/prime_chain_prefix.rs",
+      "sha256": "a621dc3204aad6cb88db05ef597f5fa234d52aea209401439929d2b21f68c58f",
+      "bytes": 43003
+    },
+    {
+      "path": "/home/ec2-user/crypto-ml-koblitz-m3-adapter-20261030/src/ml_dataset/prefix_algebra.rs",
+      "sha256": "5ccdc726bab042c60eca868eda8db638ffdf4c3c2d0cf2179c170be60e73f9d7",
+      "bytes": 42189
+    },
+    {
+      "path": "/home/ec2-user/crypto-ml-koblitz-m3-adapter-20261030/src/ml_dataset/export.rs",
+      "sha256": "5735fccca7c7f218a97d7560d7222aa03892e0d5a04978c1800da656582c93bc",
+      "bytes": 123278
+    }
+  ]
+}

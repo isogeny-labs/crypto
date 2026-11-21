@@ -10,11 +10,11 @@ use crypto_lib::cryptanalysis::koblitz_factor_base_search::{
 use crypto_lib::cryptanalysis::koblitz_index_calculus::is_irreducible_f2;
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     build_subgroup_orbit_factor_base_with_cost, factor_x_n_minus_1, find_irreducible_sparse,
-    individual_log, individual_log_with_progress,
-    koblitz_index_calculus_dlp_with_factor_base_and_progress, koblitz_point_count,
-    order_of_2_mod_n, solve_factor_base_logs, solve_factor_base_logs_with_progress,
-    DecompositionStrategy, FactorBaseLogTable, FactorBaseSelectionCost, FrobeniusFactorBase,
-    KoblitzCurve, KoblitzIcEvent, KoblitzIcOptions, LinearAlgebra, LogTableReport, LogTableStage,
+    individual_log, individual_log_with_trace,
+    koblitz_index_calculus_dlp_with_factor_base_and_trace, koblitz_point_count, order_of_2_mod_n,
+    solve_factor_base_logs, solve_factor_base_logs_with_trace, DecompositionStrategy,
+    FactorBaseLogTable, FactorBaseSelectionCost, FrobeniusFactorBase, KoblitzCurve, KoblitzIcEvent,
+    KoblitzIcOptions, LinearAlgebra, LogTableReport, LogTableStage, QueryObserver, QueryTrace,
     MAX_N, MAX_SUBFIELD_DEGREE,
 };
 use crypto_lib::cryptanalysis::koblitz_sparse_la::{
@@ -583,8 +583,13 @@ pub struct LogsArgs {
     #[arg(long,default_value_t=4,value_parser=clap::value_parser!(u8).range(1..=64))]
     pub block_size: u8,
     /// Write the logarithm database here; an existing path is never overwritten.
-    #[arg(long = "database")]
-    pub database: PathBuf,
+    #[arg(long = "database", required_unless_present = "log_store")]
+    pub database: Option<PathBuf>,
+    /// Shared log-table store directory (default `$IC_LOG_STORE`): a table
+    /// already stored for this curve, generator and factor base is
+    /// re-verified and reused instead of recomputed; a new one is added.
+    #[arg(long)]
+    pub log_store: Option<PathBuf>,
 }
 /// Recover a target's logarithm by descent, reusing a saved database.
 #[derive(Clone, Debug, Args)]
@@ -600,8 +605,19 @@ pub struct SolveArgs {
     #[arg(long,default_value_t=1,value_parser=clap::value_parser!(u64).range(1..=255))]
     pub curve_b: u64,
     /// Logarithm database written by `ic logs`.
-    #[arg(long)]
-    pub logs: PathBuf,
+    #[arg(long, required_unless_present = "log_store")]
+    pub logs: Option<PathBuf>,
+    /// Look the table up in this shared log-table store instead (default
+    /// `$IC_LOG_STORE` when --logs is absent), by curve, generator and
+    /// the factor base named by --factor-base or --factor-index.
+    #[arg(long, conflicts_with = "logs")]
+    pub log_store: Option<PathBuf>,
+    /// Factor-base recipe of the stored table (with the store only).
+    #[arg(long, conflicts_with_all = ["logs", "factor_index"])]
+    pub factor_base: Option<PathBuf>,
+    /// Legacy factor-base index of the stored table (with the store only).
+    #[arg(long, conflicts_with = "logs")]
+    pub factor_index: Option<usize>,
     /// Public logarithm of the synthetic target; defaults to 53 unless --random-target.
     #[arg(long,value_parser=clap::value_parser!(u64).range(1..),conflicts_with="random_target")]
     pub known_log: Option<u64>,
@@ -636,6 +652,20 @@ pub struct LogTableDocument {
     pub solver: Solver,
     /// `(x, y, log_G point)` per relation column; coordinates hex, log decimal.
     pub columns: Vec<LogColumn>,
+    /// Schema 2: the generator the logarithms are taken to (hex coordinates).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub generator: Option<GeneratorPoint>,
+    /// Schema 2: SHA-256 of the sorted materialised factor base
+    /// (`log_store::factor_base_sha256`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub factor_base_sha256: Option<String>,
+}
+/// A generator's affine coordinates, hex.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct GeneratorPoint {
+    pub x: String,
+    pub y: String,
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -656,8 +686,16 @@ pub fn load_log_table(path: &Path) -> Result<LogTableDocument, String> {
     }
     let doc: LogTableDocument = serde_json::from_slice(&data)
         .map_err(|e| format!("invalid logarithm database JSON: {e}"))?;
-    if doc.schema_version != 1 {
-        return Err("unsupported logarithm database schema version".into());
+    match doc.schema_version {
+        1 if doc.generator.is_none() && doc.factor_base_sha256.is_none() => {}
+        2 if doc.generator.is_some() && doc.factor_base_sha256.is_some() => {}
+        1 | 2 => {
+            return Err(
+                "logarithm database fields do not match its schema version (schema 2 alone, and always, carries generator and factor_base_sha256)"
+                    .into(),
+            )
+        }
+        _ => return Err("unsupported logarithm database schema version".into()),
     }
     Ok(doc)
 }
@@ -726,6 +764,8 @@ pub(crate) fn log_table_to_doc(
         summands,
         solver,
         columns,
+        generator: None,
+        factor_base_sha256: None,
     }
 }
 /// Rebuild a logarithm table from its document and re-verify every column
@@ -742,6 +782,18 @@ pub(crate) fn log_table_from_doc(
     {
         return Err("logarithm database does not belong to this curve".into());
     }
+    if let Some(g) = &doc.generator {
+        let here = match c.generator() {
+            BinaryPoint::Affine { x, y } => GeneratorPoint {
+                x: params::hex(&x.to_biguint()),
+                y: params::hex(&y.to_biguint()),
+            },
+            BinaryPoint::Infinity => return Err("the curve's generator is infinity".into()),
+        };
+        if *g != here {
+            return Err("logarithm database is taken to a different generator".into());
+        }
+    }
     let mut columns = Vec::with_capacity(doc.columns.len());
     for col in &doc.columns {
         let x = F2mElement::from_biguint(&params::number(&col.x)?, c.n);
@@ -755,39 +807,84 @@ pub(crate) fn log_table_from_doc(
     }
     Ok(table)
 }
-pub fn logs(args: LogsArgs, quiet: bool) -> Result<Value, String> {
-    let begin = Instant::now();
-    if std::fs::symlink_metadata(&args.database).is_ok() {
-        return Err(format!(
-            "logarithm database already exists: {}",
-            args.database.display()
-        ));
-    }
-    let spec = match &args.factor_base {
+/// The factor-base recipe a `logs` or store-backed `solve` names: a saved
+/// recipe for this curve, or the legacy family's index.
+fn resolve_spec(
+    degree: u32,
+    curve_a: u8,
+    subfield: u32,
+    curve_b: u64,
+    factor_base: Option<&Path>,
+    factor_index: usize,
+) -> Result<FactorBaseSpec, String> {
+    match factor_base {
         Some(path) => {
             let doc = load_factor_base(path)?;
-            if doc.degree != args.degree
-                || doc.curve_a != args.curve_a
-                || doc.subfield != args.subfield
-                || doc.curve_b != args.curve_b
+            if doc.degree != degree
+                || doc.curve_a != curve_a
+                || doc.subfield != subfield
+                || doc.curve_b != curve_b
             {
                 return Err(format!(
                     "factor-base recipe was found on {}, not {}",
                     doc.label(),
-                    curve_label(args.degree, args.curve_a, args.subfield, args.curve_b)
+                    curve_label(degree, curve_a, subfield, curve_b)
                 ));
             }
-            doc.spec
+            Ok(doc.spec)
         }
         None => {
-            validate_factor_size(args.degree, args.subfield)?;
-            FactorBaseSpec::Factor {
-                index: args.factor_index,
-            }
+            validate_factor_size(degree, subfield)?;
+            Ok(FactorBaseSpec::Factor {
+                index: factor_index,
+            })
         }
-    };
+    }
+}
+pub fn logs(args: LogsArgs, quiet: bool) -> Result<Value, String> {
+    let begin = Instant::now();
+    if let Some(database) = &args.database {
+        if std::fs::symlink_metadata(database).is_ok() {
+            return Err(format!(
+                "logarithm database already exists: {}",
+                database.display()
+            ));
+        }
+    }
+    let store = super::log_store::dir_from(args.log_store.as_deref());
+    let spec = resolve_spec(
+        args.degree,
+        args.curve_a,
+        args.subfield,
+        args.curve_b,
+        args.factor_base.as_deref(),
+        args.factor_index,
+    )?;
     let c = curve(args.degree, args.curve_a, args.subfield, args.curve_b)?;
     let fb = materialize(&c, &spec)?;
+    if let Some(dir) = &store {
+        if let Some((table, doc, key, path)) = super::log_store::lookup(dir, &c, &fb)? {
+            // A verified store hit: no collection, no linear algebra.
+            if let Some(database) = &args.database {
+                write_new(
+                    database,
+                    &serde_json::to_value(&doc).map_err(|e| e.to_string())?,
+                )?;
+            }
+            return Ok(
+                json!({"schema_version":1,"operation":"logs","status":"complete",
+                "evidence_scope":"synthetic_known_answer","degree":c.n,"curve_a":c.a,
+                "subgroup_order":c.subgroup_order.to_string(),"cofactor":c.cofactor.to_string(),
+                "factor_base":factor_base_json(&spec,&fb,table.len()),
+                "counts":{"columns":table.len(),"trials":0,"relations":0},
+                "log_table":super::log_store::provenance("store",Some(&key),Some(&path)),
+                "verified":true,"out":args.database.as_ref().map(|p| p.display().to_string()),
+                "elapsed_seconds":begin.elapsed().as_secs_f64(),"resources":resources(),
+                "scope":"stored factor-base logarithm table, re-verified column by column; no precomputation ran in this run",
+                "limitations":["No imported target was used.","This run's cost is amortized: the precomputation was paid by the run that stored the table."]}),
+            );
+        }
+    }
     if !quiet {
         println!(
             "ic — factor-base logarithm precomputation on {}; r = {}\nFactor base: {}; {} summands; engine {}; linear algebra {}",
@@ -812,24 +909,38 @@ pub fn logs(args: LogsArgs, quiet: bool) -> Result<Value, String> {
         "logs: constructing collector and pair table (if needed)"
     ));
     let result = if super::progress::enabled() {
-        solve_factor_base_logs_with_progress(&c, &fb, &opts, &mut |stage, report| {
-            let label = match stage {
-                LogTableStage::Collection => "collection",
-                LogTableStage::LinearAlgebraAndVerification => {
-                    "linear algebra and column verification started"
-                }
-                LogTableStage::Finished => "finished",
-            };
-            super::progress::line(format_args!(
-                "logs: {label}; {}/{} trials, {} relations, rank {}/{}; verified={}",
-                report.trials,
-                opts.max_trials,
-                report.relations,
-                report.coefficient_rank,
-                report.columns,
-                report.verified
-            ));
-        })
+        super::progress::inputs(format_args!("logs"), c.generator(), None);
+        solve_factor_base_logs_with_trace(
+            &c,
+            &fb,
+            &opts,
+            &mut |stage, report| {
+                let label = match stage {
+                    LogTableStage::Collection => "collection",
+                    LogTableStage::LinearAlgebraAndVerification => {
+                        "linear algebra and column verification started"
+                    }
+                    LogTableStage::Finished => "finished",
+                };
+                super::progress::line(format_args!(
+                    "logs: {label}; {}/{} trials, {} relations, rank {}/{}; verified={}",
+                    report.trials,
+                    opts.max_trials,
+                    report.relations,
+                    report.coefficient_rank,
+                    report.columns,
+                    report.verified
+                ));
+            },
+            Some(&|trace| {
+                super::progress::query(
+                    format_args!("logs: trial"),
+                    trace,
+                    opts.max_trials as u64,
+                    &fb,
+                )
+            }),
+        )
     } else {
         solve_factor_base_logs(&c, &fb, &opts)
     };
@@ -846,11 +957,22 @@ pub fn logs(args: LogsArgs, quiet: bool) -> Result<Value, String> {
             "elapsed_seconds":begin.elapsed().as_secs_f64(),"resources":resources()}),
         );
     }
-    let doc = log_table_to_doc(&c, &spec, args.summands, args.solver, &table);
-    write_new(
-        &args.database,
-        &serde_json::to_value(&doc).map_err(|e| e.to_string())?,
-    )?;
+    let doc = super::log_store::stored_doc(&c, &spec, &fb, args.summands, args.solver, &table)?;
+    if let Some(database) = &args.database {
+        write_new(
+            database,
+            &serde_json::to_value(&doc).map_err(|e| e.to_string())?,
+        )?;
+    }
+    let stored = match &store {
+        Some(dir) => {
+            let (how, key, path) = super::log_store::insert(dir, &c, &fb, &doc)?;
+            let mut v = super::log_store::provenance("computed", Some(&key), Some(&path));
+            v["store_write"] = json!(how.name());
+            v
+        }
+        None => super::log_store::provenance("computed", None, None),
+    };
     Ok(
         json!({"schema_version":1,"operation":"logs","status":"complete",
         "evidence_scope":"synthetic_known_answer","degree":c.n,"curve_a":c.a,
@@ -858,7 +980,8 @@ pub fn logs(args: LogsArgs, quiet: bool) -> Result<Value, String> {
         "factor_base":factor_base_json(&spec,&fb,report.columns),
         "counts":{"columns":report.columns,"trials":report.trials,"relations":report.relations},
         "linear_algebra":linear_algebra_json(&report),
-        "verified":true,"out":args.database.display().to_string(),
+        "log_table":stored,
+        "verified":true,"out":args.database.as_ref().map(|p| p.display().to_string()),
         "elapsed_seconds":begin.elapsed().as_secs_f64(),"resources":resources(),
         "scope":"once-per-curve factor-base logarithm database; every column log certified by [x]G == point",
         "limitations":["No imported target was used.","This precomputation does not establish scaling or challenge readiness."]}),
@@ -866,7 +989,34 @@ pub fn logs(args: LogsArgs, quiet: bool) -> Result<Value, String> {
 }
 pub fn solve(args: SolveArgs, quiet: bool) -> Result<Value, String> {
     let begin = Instant::now();
-    let doc = load_log_table(&args.logs)?;
+    let (doc, from_store) = match &args.logs {
+        Some(path) => (load_log_table(path)?, None),
+        None => {
+            let dir = super::log_store::dir_from(args.log_store.as_deref())
+                .ok_or("ic solve needs --logs, --log-store or $IC_LOG_STORE")?;
+            let spec = resolve_spec(
+                args.degree,
+                args.curve_a,
+                args.subfield,
+                args.curve_b,
+                args.factor_base.as_deref(),
+                args.factor_index.unwrap_or(0),
+            )?;
+            let c = curve(args.degree, args.curve_a, args.subfield, args.curve_b)?;
+            let fb = materialize(&c, &spec)?;
+            let key = super::log_store::key_for(&c, &fb)?;
+            match super::log_store::lookup(&dir, &c, &fb)? {
+                Some((_, doc, key, path)) => (doc, Some((key, path))),
+                None => {
+                    return Err(format!(
+                    "no stored logarithm table for key {} in {}; run `ic logs --log-store` first",
+                    key.key,
+                    dir.display()
+                ))
+                }
+            }
+        }
+    };
     if doc.degree != args.degree
         || doc.curve_a != args.curve_a
         || doc.subfield != args.subfield
@@ -885,8 +1035,13 @@ pub fn solve(args: SolveArgs, quiet: bool) -> Result<Value, String> {
         );
     }
     let fb = materialize(&c, &doc.spec)?;
-    // Reconstruct the table and re-verify every column against the curve.
-    let table = log_table_from_doc(&c, &doc)?;
+    // Reconstruct the table and re-verify every column against the curve
+    // (and, for a schema-2 table, its generator and factor-base hash).
+    let table = super::log_store::verify_doc(&c, &fb, &doc)?;
+    let log_table = match &from_store {
+        Some((key, path)) => super::log_store::provenance("store", Some(key), Some(path)),
+        None => super::log_store::provenance("file", None, args.logs.as_deref()),
+    };
     // Build the synthetic known-answer target.
     let k = if args.random_target {
         let mut rng = StdRng::seed_from_u64(args.seed ^ 0x534f_4c56_4552_5447);
@@ -913,12 +1068,14 @@ pub fn solve(args: SolveArgs, quiet: bool) -> Result<Value, String> {
         "solve: building descent tables and starting target search"
     ));
     let outcome = if super::progress::enabled() {
-        individual_log_with_progress(&c, &fb, &table, &target, &opts, &mut |trial, outcome| {
-            super::progress::line(format_args!(
-                "solve: trial {trial}/{}: {}",
-                opts.max_trials,
-                super::progress::outcome(outcome)
-            ));
+        super::progress::inputs(format_args!("solve"), c.generator(), Some(&target));
+        individual_log_with_trace(&c, &fb, &table, &target, &opts, &|trace| {
+            super::progress::query(
+                format_args!("solve: trial"),
+                trace,
+                opts.max_trials as u64,
+                &fb,
+            );
         })
     } else {
         individual_log(&c, &fb, &table, &target, &opts)
@@ -942,7 +1099,9 @@ pub fn solve(args: SolveArgs, quiet: bool) -> Result<Value, String> {
         "status":if verified{"complete"}else{"incomplete"},
         "evidence_scope":"synthetic_known_answer","degree":c.n,"curve_a":c.a,
         "database":{"columns":table.len(),"reverified":true,"spec":doc.spec,
-            "source":args.logs.display().to_string(),"summands_precomputed":doc.summands},
+            "source":from_store.as_ref().map(|(_, p)| p).or(args.logs.as_ref()).map(|p| p.display().to_string()),
+            "summands_precomputed":doc.summands},
+        "log_table":log_table,
         "result":{"expected":k.to_string(),"recovered":recovered.as_ref().map(ToString::to_string),"verified":verified},
         "counts":{"descent_trials":report.trials},
         "elapsed_seconds":begin.elapsed().as_secs_f64(),"resources":resources(),
@@ -1320,7 +1479,16 @@ pub fn run(args: RunArgs, quiet: bool) -> Result<Value, String> {
         }
     };
     let mut columns = 0usize;
-    let report = koblitz_index_calculus_dlp_with_factor_base_and_progress(
+    super::progress::inputs(format_args!("run"), c.generator(), Some(&target));
+    let observer = |trace: QueryTrace<'_>| {
+        super::progress::query(
+            format_args!("[2/4] trial"),
+            trace,
+            opts.max_trials as u64,
+            &fb,
+        )
+    };
+    let report = koblitz_index_calculus_dlp_with_factor_base_and_trace(
         &c,
         &target,
         &fb,
@@ -1360,7 +1528,8 @@ pub fn run(args: RunArgs, quiet: bool) -> Result<Value, String> {
                     }
                     return;
                 }
-                KoblitzIcEvent::RelationAttemptFinished { .. } => return,
+                KoblitzIcEvent::RelationQueryStarted { .. }
+                | KoblitzIcEvent::RelationAttemptFinished { .. } => return,
                 KoblitzIcEvent::RelationCollectionFinished { collected, trials } => (
                     "relation_collection",
                     "stopped",
@@ -1396,6 +1565,7 @@ pub fn run(args: RunArgs, quiet: bool) -> Result<Value, String> {
             };
             record(&mut stages, stage, state, details, &mut stage_start);
         },
+        super::progress::enabled().then_some(&observer as &QueryObserver<'_>),
     );
     let factor_base = factor_base_json(&spec, &fb, columns);
     let mode = json!({"control":args.control,"collapse_negation":!args.control,

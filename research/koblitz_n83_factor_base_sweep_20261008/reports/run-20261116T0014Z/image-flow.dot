@@ -1,0 +1,18 @@
+digraph n83_image {
+  graph [rankdir=TB, bgcolor="white", pad="0.12", nodesep="0.35", ranksep="0.48", fontname="Arial", label="N83 Colima toolchain provision | 2026-11-16T00:14Z", labelloc=t, fontsize=17];
+  node [shape=box, style="rounded,filled", fontname="Arial", fontsize=13, color="#44637d", fillcolor="#ecf3f8", margin="0.15,0.1"];
+  edge [fontname="Arial", fontsize=10, color="#425466"];
+  dockerfile [label="Tracked Dockerfile\nSHA-256 93e2eada...", fillcolor="#ecf3f8"];
+  base [label="Pinned Rust 1.99.1 base\nSHA-256 e6f2cff3...", fillcolor="#ecf3f8"];
+  build [label="ARM64 Docker build\nexit 0, 12 seconds", fillcolor="#e1f2e7", color="#287d45"];
+  image [label="Toolchain image\nID 2d67b100...", fillcolor="#e1f2e7", color="#287d45"];
+  smoke [label="No-work version smoke\nexit 0", fillcolor="#e1f2e7", color="#287d45"];
+  next [label="Amended charged build\nPENDING", fillcolor="#fff4df", color="#bc8a2b"];
+  {rank=same; dockerfile; base; build;}
+  {rank=same; image; smoke; next;}
+  dockerfile -> build;
+  base -> build;
+  build -> image;
+  image -> smoke;
+  smoke -> next [style=dashed];
+}

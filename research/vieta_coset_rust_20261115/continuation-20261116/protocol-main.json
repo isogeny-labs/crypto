@@ -1,0 +1,611 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "VIETA-POLYNOMIAL-MAIN-20261116",
+  "version": 1,
+  "created": "2026-11-16",
+  "repository": "crypto",
+  "study_dir": "research/vieta_coset_rust_20261115",
+  "authors": [
+    "Codex"
+  ],
+  "question": "What complete-set component counts do explicit schoolbook/Karatsuba/Newton backends produce on identical retained targets, with A/A and unaffected lookup controls?",
+  "claims": [
+    {
+      "id": "C-output",
+      "class": "exact_computation",
+      "text": "Successful rows agree with complete scalar subtraction and separate wide replay.",
+      "decided_by": [
+        "C-karatsuba",
+        "C-newton"
+      ]
+    },
+    {
+      "id": "C-counts",
+      "class": "comparative",
+      "text": "Report descriptive paired multiplication counts at query scope; no inferential, external-fastest, timing or whole-DLP claim.",
+      "decided_by": [
+        "C-karatsuba",
+        "C-newton",
+        "C-null",
+        "C-lookup"
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "schoolbook",
+      "role": "baseline",
+      "description": "Historical schoolbook products/division.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "9814b4bb5ca5949685be0f99bc992f6e1d0cc8bd",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml",
+            "--bins"
+          ]
+        ],
+        "binary_sha256": "82584bfb5f086fa768259960804066bf2f23faf0262512e0a0ba8d433f64f96a",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "schoolbook"
+      }
+    },
+    {
+      "id": "karatsuba",
+      "role": "candidate",
+      "description": "Generic counted Karatsuba; classical division.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "9814b4bb5ca5949685be0f99bc992f6e1d0cc8bd",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml",
+            "--bins"
+          ]
+        ],
+        "binary_sha256": "82584bfb5f086fa768259960804066bf2f23faf0262512e0a0ba8d433f64f96a",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "karatsuba"
+      },
+      "same_instrument_as": "schoolbook"
+    },
+    {
+      "id": "newton",
+      "role": "candidate",
+      "description": "Karatsuba plus Newton division for long quotients.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "9814b4bb5ca5949685be0f99bc992f6e1d0cc8bd",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml",
+            "--bins"
+          ]
+        ],
+        "binary_sha256": "82584bfb5f086fa768259960804066bf2f23faf0262512e0a0ba8d433f64f96a",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "newton"
+      },
+      "same_instrument_as": "schoolbook"
+    },
+    {
+      "id": "newton-aa",
+      "role": "control_aa",
+      "description": "Exact repeated newton arm; deterministic count control.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "9814b4bb5ca5949685be0f99bc992f6e1d0cc8bd",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml",
+            "--bins"
+          ]
+        ],
+        "binary_sha256": "82584bfb5f086fa768259960804066bf2f23faf0262512e0a0ba8d433f64f96a",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "newton-aa"
+      },
+      "same_instrument_as": "schoolbook"
+    },
+    {
+      "id": "lookup",
+      "role": "reference",
+      "description": "Prepared batched subtraction; generic component control.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "9814b4bb5ca5949685be0f99bc992f6e1d0cc8bd",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml",
+            "--bins"
+          ]
+        ],
+        "binary_sha256": "82584bfb5f086fa768259960804066bf2f23faf0262512e0a0ba8d433f64f96a",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "lookup"
+      },
+      "same_instrument_as": "schoolbook"
+    },
+    {
+      "id": "lookup-fast",
+      "role": "control_negative",
+      "description": "Same lookup under unused polynomial mode; counts must be invariant.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "9814b4bb5ca5949685be0f99bc992f6e1d0cc8bd",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml",
+            "--bins"
+          ]
+        ],
+        "binary_sha256": "82584bfb5f086fa768259960804066bf2f23faf0262512e0a0ba8d433f64f96a",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "lookup-fast"
+      },
+      "same_instrument_as": "schoolbook"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Input-level conditioned sums go through every arm and must return a nonempty complete set. Separate independent product/division identities exercise the Newton code even if short-quotient Euclid never uses it."
+    },
+    "negative": {
+      "present": true,
+      "arm": "lookup-fast",
+      "null_population": {
+        "description": "Identical targets through batched lookup whose polynomial mode is unused.",
+        "generator": "Same fixture policy v1 as all other arms; backend flag changed only.",
+        "n": 24,
+        "why_n": "One unaffected-path comparison per retained target; descriptive exact-count invariance, no distributional inference.",
+        "matched_on": [
+          "field",
+          "curve",
+          "m",
+          "target",
+          "seed",
+          "binary",
+          "budgets",
+          "lookup algorithm"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "polynomial_backend",
+        "levels": [
+          "schoolbook",
+          "karatsuba",
+          "newton"
+        ]
+      },
+      {
+        "name": "method",
+        "levels": [
+          "vieta",
+          "lookup"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "field_and_m",
+        "treatment": "crossed",
+        "value": [
+          [
+            "word62",
+            8192
+          ],
+          [
+            "word62",
+            16384
+          ],
+          [
+            "p224",
+            512
+          ],
+          [
+            "p224",
+            2048
+          ]
+        ],
+        "how": "Keep every configuration separate; component fixtures explain standard-panel exception."
+      },
+      {
+        "name": "target_population",
+        "treatment": "crossed",
+        "value": [
+          "uniform-x-rational",
+          "conditioned-sum"
+        ],
+        "how": "Alternating inputs, same exact target across all arms; identity separate."
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "One immutable native release binary, locked dependencies, one CPU.",
+        "how": "Source/build/binary/analysis hashes recorded before calls."
+      },
+      {
+        "name": "arm_order",
+        "treatment": "fixed",
+        "value": "cyclic offset per target, reversed on odd target index",
+        "how": "Six interleaved arms, no per-method target selection."
+      },
+      {
+        "name": "host_environment",
+        "treatment": "measured",
+        "how": "Unmodified isolated_bench CPU4; missing PSI/unmovable host threads mean below-L2 clocks."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unblinded descriptive native analyzer",
+        "how": "Raw per-input values/ranges retained; no statistical significance test."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-karatsuba",
+        "arms": [
+          "schoolbook",
+          "karatsuba"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "polynomial_backend"
+        ]
+      },
+      {
+        "id": "C-newton",
+        "arms": [
+          "schoolbook",
+          "newton"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "polynomial_backend"
+        ]
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "newton",
+          "newton-aa"
+        ],
+        "design": "aa",
+        "differs_in": []
+      },
+      {
+        "id": "C-null",
+        "arms": [
+          "lookup",
+          "lookup-fast"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "polynomial_backend"
+        ]
+      },
+      {
+        "id": "C-lookup",
+        "arms": [
+          "newton",
+          "lookup"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "method"
+        ]
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Exact poly_compare.rs fixture policy v1: 0x76696574612d7631 XOR m, existing random_point and fixed base-index sums; root seed42+i identical across arms. Source frozen."
+    },
+    "instance_sampling": {
+      "rule": "[['word62', 8192], ['word62', 16384], ['p224', 512], ['p224', 2048]]; 2 warmups then 6 retained alternating random-x-rational and conditioned sums. Random-x reduction/canonical sqrt sign are not uniform-point sampling.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicitly unblinded deterministic descriptive counts; no inferential selection.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 4,
+    "replicates": 6,
+    "warmups": 2,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": false,
+      "note": "Descriptive exact per-target observations, medians/ranges; not powered for population significance or exponent claims."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 3600,
+      "measured_on": "Separate word62/m32 bootstrap: 12 arm calls complete and replayed; isolated thin-driver wall 0.0175705530000414 seconds, zero other-process CPU reported. This is not extrapolated across degrees/fields. The declared3600 seconds is an enforced shared envelope, not a fitted forecast."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "muls",
+        "name": "Primitive multiplications",
+        "unit": "field multiplications",
+        "kind": "counted",
+        "definition": "All multiplications inside each independent stage, including inverse/sqrt internals; cold accounting includes declared reusable setup.",
+        "source": "row.work.muls",
+        "aggregation": "median",
+        "resolution": "1",
+        "uncertainty": "range"
+      },
+      {
+        "id": "relations",
+        "name": "Complete ordered relations",
+        "unit": "point pairs",
+        "kind": "exact",
+        "definition": "Length and SHA-256 of sorted complete pair set, compared across arms and replayed by wide scalar subtraction.",
+        "source": "row.relations and row.result_sha256",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "elapsed",
+        "name": "Stage wall interval",
+        "unit": "nanoseconds",
+        "kind": "timed",
+        "definition": "First to last stage operation, fixture generation excluded; include cold setup separately. Do not interpret without admitted host/A-A receipts. Local diagnostic only: PSI absent and unmovable host threads; wall_valid=false for L2 comparisons.",
+        "source": "row.elapsed_ns",
+        "aggregation": "median",
+        "resolution": "monotonic Instant, actual host resolution recorded",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 2,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "adds",
+      "muls",
+      "inversions",
+      "square_roots",
+      "polynomial_products",
+      "polynomial_divisions",
+      "split_attempts",
+      "group_adds",
+      "membership_lookups",
+      "karatsuba_nodes",
+      "newton_divisions"
+    ],
+    "record": [
+      "source_revision",
+      "binary_sha256",
+      "rustc",
+      "cpu_model",
+      "kernel",
+      "SMT",
+      "NUMA",
+      "memory",
+      "PSI",
+      "affinity",
+      "co_tenants",
+      "interruptions",
+      "isolation",
+      "A/A",
+      "failures"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": [
+        4
+      ],
+      "max_memory_gib": 8,
+      "cloud_spend_usd": 0,
+      "git_only_checkpoint_authorized": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "4 configurations x6 arms x(2 warmups+6 retained)=192 query rows. Stage cap30s, multiplication cap4e9. Main+supplemental share one3600s attempt; preflight120s separate. Retain all failures/missing rows."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Set mismatch or positive-control miss invalidates its input; preserve failed rows, no retry. Complete remaining arms after a budget failure."
+    }
+  ],
+  "decision_rule": {
+    "text": "Descriptive per-input counts only after complete output checks/replay. Warm query interval excludes separately recorded shared setup and scalar complete-set verification. No cold full-solve, timing, fastest-backend or significance claim. All incomplete rows retained.",
+    "comparison_ids": [
+      "C-karatsuba",
+      "C-newton",
+      "C-null",
+      "C-lookup"
+    ],
+    "statistic": "Native per-population median/min/max and all values; paired ratios only on matched completed cells.",
+    "interval": "Observed range, not a confidence interval.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Explicit numerator/denominator multiplication ratio at component query scope; no exponent fit.",
+    "verdict_vocabulary": [
+      "descriptive_only",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "native/poly_compare.rs",
+      "sha256": "1c6bfdd3e3494f0f128459e3caba9c064e7cb1e9e4b6944f5e8959d6a6560c83"
+    },
+    "inputs": [
+      "continuation-20261116/run/main/*.jsonl"
+    ],
+    "outputs": [
+      "summary.json",
+      "export.json",
+      "report.pdf",
+      "counts.svg"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "Measure before source/protocol/binary publication",
+    "Change frozen inputs/arms/budgets or silently retry failures",
+    "Pool primary/supplemental, identity/finite or the two target populations",
+    "Treat below-L2 clocks or generic-reference counts as external-fastest/full-DLP gains",
+    "Treat bootstrap envelope as a measured runtime forecast",
+    "Promote producer checks to independent signed standing"
+  ],
+  "literature": [
+    {
+      "ref": "src/cryptanalysis/isogeny_eval/poly.rs; src/cryptanalysis/zero_dim_la.rs; pkm_smooth_tower.rs; prime_fast.rs",
+      "provenance": "internal",
+      "claim": "Existing standard Karatsuba/Newton/counting patterns and component references.",
+      "verified_by": "Producer source read; KB MCP/wrapper unavailable."
+    },
+    {
+      "ref": "https://flintlib.org/doc/nmod_poly/index.html; FLINT v3.3.1 inv_series_newton.c",
+      "provenance": "retrieved",
+      "claim": "Standard reversed-series Newton division and short-quotient classical fallback; no novelty.",
+      "verified_by": "Producer primary/internal source read."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "1abbbad626f0fd1a7714eb833f61ed5cd1bbd55a9a2d84a7e922c63eb9527c1d",
+    "commit": "9814b4bb5ca5949685be0f99bc992f6e1d0cc8bd",
+    "frozen_at": "2026-11-16T16:00:07Z",
+    "filed_before_affected_data": true
+  },
+  "invalidation_rules": [
+    "Counted results require complete-set equality and separate-process replay.",
+    "All local wall values are diagnostic, wall_valid=false for L2 claims, even when the isolated runner reports no detected contention.",
+    "Retain failures, timeouts, missing rows and warmups; report their actual flow."
+  ],
+  "extensions": {
+    "panel": "poly-main",
+    "matrix": [
+      [
+        "word62",
+        8192
+      ],
+      [
+        "word62",
+        16384
+      ],
+      [
+        "p224",
+        512
+      ],
+      [
+        "p224",
+        2048
+      ]
+    ],
+    "fixture_policy": "v1",
+    "operation_limit": 4000000000,
+    "seconds_per_stage": 30,
+    "total_shared_deadline_seconds": 3600,
+    "user_authorization": "Explicit local/Git-only authorization retained through requested continuation; no cloud spend.",
+    "standard_panel_exception": "Reuse exact prior power-of-two coset fixtures to attribute arithmetic changes; word62 has no asserted prime subgroup order. P224 standard curve.",
+    "preflight": "Separate bootstrap calibration only; primary freeze updated with its receipt before main data.",
+    "preflight_receipt": {
+      "path": "continuation-20261116/run/preflight/isolation.jsonl",
+      "sha256": "6148e20957c3f430b7d08f3f2a58f5f06f1a272d6f07efcff8040691c30a3bf2"
+    }
+  }
+}

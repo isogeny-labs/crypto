@@ -1,0 +1,260 @@
+{
+  "branch": "claude/ecdlp-chained-transfers-8cpiek",
+  "closed_utc": "2026-11-11T18:45:48+00:00",
+  "commands": [
+    {
+      "argv": [
+        "./target/release/tower_bench",
+        "run",
+        "--json",
+        "research/chained_prime_transfer_20261111/tower/tower.json",
+        "--svg",
+        "research/chained_prime_transfer_20261111/tower/tower.svg"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-11T18:45:01+00:00",
+      "wall_s": 2.052
+    }
+  ],
+  "commit": "ecd04f4d7bee5544fcb89d8b1330dfd4686804d4",
+  "commit_dirty": true,
+  "created_utc": "2026-11-11T18:45:00+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261111-tower-up-genus-ladder"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v378-x86_64-with-glibc2.39"
+  },
+  "id": "20261111T1845Z-tower-up-genus-ladder",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ic_j2_p53",
+      "note": "genus-2 IC group ops (LA unpriced); ref = rho on E, same r",
+      "reference": 131.4,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 70.1
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ic_j3_p53",
+      "note": "genus-3 IC group ops (LA unpriced); ref = rho on E, same r",
+      "reference": 131.4,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 169.6
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ic_j2_p79",
+      "note": "genus-2 IC group ops (LA unpriced); ref = rho on E, same r",
+      "reference": 136.8,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 105.6
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ic_j3_p79",
+      "note": "genus-3 IC group ops (LA unpriced); ref = rho on E, same r",
+      "reference": 136.8,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 298.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ic_j2_p101",
+      "note": "genus-2 IC group ops (LA unpriced); ref = rho on E, same r",
+      "reference": 185.2,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 125.8
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ic_j3_p101",
+      "note": "genus-3 IC group ops (LA unpriced); ref = rho on E, same r",
+      "reference": 185.2,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 292.6
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ic_j2_p131",
+      "note": "genus-2 IC group ops (LA unpriced); ref = rho on E, same r",
+      "reference": 337.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 147.6
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ic_j3_p131",
+      "note": "genus-3 IC group ops (LA unpriced); ref = rho on E, same r",
+      "reference": 337.0,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 502.5
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ic_j2_p151",
+      "note": "genus-2 IC group ops (LA unpriced); ref = rho on E, same r",
+      "reference": 181.2,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 181.1
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ic_j3_p151",
+      "note": "genus-3 IC group ops (LA unpriced); ref = rho on E, same r",
+      "reference": 181.2,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 580.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ic_j2_p181",
+      "note": "genus-2 IC group ops (LA unpriced); ref = rho on E, same r",
+      "reference": 249.2,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 210.4
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ic_j3_p181",
+      "note": "genus-3 IC group ops (LA unpriced); ref = rho on E, same r",
+      "reference": 249.2,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 683.5
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ic_j2_p211",
+      "note": "genus-2 IC group ops (LA unpriced); ref = rho on E, same r",
+      "reference": 224.2,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 234.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ic_j3_p211",
+      "note": "genus-3 IC group ops (LA unpriced); ref = rho on E, same r",
+      "reference": 224.2,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 789.1
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ic_j2_p251",
+      "note": "genus-2 IC group ops (LA unpriced); ref = rho on E, same r",
+      "reference": 248.4,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 267.2
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "ic_j3_p251",
+      "note": "genus-3 IC group ops (LA unpriced); ref = rho on E, same r",
+      "reference": 248.4,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "gae",
+      "value": 829.0
+    }
+  ],
+  "problem": "transfer:prime-cover-tower",
+  "raw": [
+    {
+      "bytes": 2481,
+      "path": "research/chained_prime_transfer_20261111/tower/tower.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/68/68720849224bde972e9139f89e7e2e2ffe63a27cd48a129ccc1d0df681f0f2eb",
+      "sha256": "68720849224bde972e9139f89e7e2e2ffe63a27cd48a129ccc1d0df681f0f2eb",
+      "uploaded": false
+    },
+    {
+      "bytes": 834,
+      "path": "research/chained_prime_transfer_20261111/tower/run.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/09/09878a19a1c2f8419c1619c4dec8d7c4de4b85c8a0e418a86c85e876cc70618b",
+      "sha256": "09878a19a1c2f8419c1619c4dec8d7c4de4b85c8a0e418a86c85e876cc70618b",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261111-tower-up-genus-ladder/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261111-tower-up-genus-ladder/tower.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "tower-up-genus-ladder",
+  "status": "measured",
+  "summary": "Tower up E->J(C2)->J(C3), p 53..251: IC genus3/genus2 = 2.3-3.4x; genus-3 IC above rho at every GAE price; genus-2 IC unranked at 0 GAE, above rho at 0.1/1 (boundary)",
+  "validation": null
+}

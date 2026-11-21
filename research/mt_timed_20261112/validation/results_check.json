@@ -1,0 +1,289 @@
+{
+ "summary_fields": 272,
+ "summary_mismatches": [],
+ "max_rel_diff": 0.0,
+ "quoted": [
+  {
+   "name": "ic/rho solve 2^24 range",
+   "claimed": [
+    0.78,
+    0.83
+   ],
+   "recomputed": [
+    0.7776964862952125,
+    0.8288248547988808
+   ],
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "2^24 faster in all 3 cells (primary rule)",
+   "claimed": 3,
+   "recomputed": 3,
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "ic/rho solve 28/1024",
+   "claimed": 0.93,
+   "recomputed": 0.9318617164586132,
+   "ok": true,
+   "note": "faster under the primary rule: faster"
+  },
+  {
+   "name": "28/4096 and 28/16384 unranked",
+   "claimed": 2,
+   "recomputed": 2,
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "ic/rho solve 2^32 range",
+   "claimed": [
+    1.11,
+    1.29
+   ],
+   "recomputed": [
+    1.1144071828980056,
+    1.2885020349125165
+   ],
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "2^32 slower in all 3 cells (primary rule)",
+   "claimed": 3,
+   "recomputed": 3,
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "incl. verify range",
+   "claimed": [
+    0.82,
+    1.27
+   ],
+   "recomputed": [
+    0.8177018425460636,
+    1.2678314588015085
+   ],
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "fixed-key control range",
+   "claimed": [
+    0.75,
+    1.28
+   ],
+   "recomputed": [
+    0.7518252183013685,
+    1.2842975890130073
+   ],
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "fixed-key control 'the same pattern' (decisions equal to the primary rule)",
+   "claimed": "same pattern",
+   "recomputed": {
+    "24/1024": "faster",
+    "24/4096": "faster",
+    "24/16384": "unranked",
+    "28/1024": "unranked",
+    "28/4096": "unranked",
+    "28/16384": "unranked",
+    "32/1024": "unranked",
+    "32/4096": "slower",
+    "32/16384": "slower"
+   },
+   "ok": false,
+   "note": "decisions differ in 24/16384, 28/1024, 32/1024"
+  },
+  {
+   "name": "A/A rep0/rep1 interval contains 1 in all 9 cells",
+   "claimed": 9,
+   "recomputed": 9,
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "A/A widest 24/1024",
+   "claimed": [
+    0.863,
+    0.667,
+    1.145
+   ],
+   "recomputed": [
+    0.8633488234662081,
+    0.6666666666666666,
+    1.1454545454545453
+   ],
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "A/A median |log| 0.028, p95 0.28",
+   "claimed": [
+    0.028,
+    0.28
+   ],
+   "recomputed": [
+    0.027666493636296738,
+    0.27665660244007323
+   ],
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "ic/bsgs range",
+   "claimed": [
+    1.33,
+    1.59
+   ],
+   "recomputed": [
+    1.3264556516342325,
+    1.5899351606584662
+   ],
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "rhodpu (kappa 0) fastest rho",
+   "claimed": 29,
+   "recomputed": 29,
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "rho2xks fastest rho (RESULTS: 7)",
+   "claimed": 7,
+   "recomputed": 6,
+   "ok": false,
+   "note": "rhodpu kappa 0.25 wins 1 (32 b, T = 16384), not mentioned"
+  },
+  {
+   "name": "ic5 20, ic5w 16",
+   "claimed": [
+    20,
+    16
+   ],
+   "recomputed": [
+    20,
+    16
+   ],
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "GAE 214-294 ns",
+   "claimed": [
+    214,
+    294
+   ],
+   "recomputed": [
+    214.422,
+    293.751
+   ],
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "I/M 23-31",
+   "claimed": [
+    23,
+    31
+   ],
+   "recomputed": [
+    22.970260710074676,
+    30.584976025572722
+   ],
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "native op 0.005-0.009 GAE (canon_hash_ns / padd_ns)",
+   "claimed": [
+    0.005,
+    0.009
+   ],
+   "recomputed": [
+    0.004905515215267353,
+    0.00937403811176092
+   ],
+   "ok": true,
+   "note": "numbers match, but canon_hash_ns times canonicalisation + one hash of x, which the harness counts as 2 native operations (N += 2 per point)"
+  },
+  {
+   "name": "std lookup 2^10-2^16 0.04-0.15",
+   "claimed": [
+    0.04,
+    0.15
+   ],
+   "recomputed": [
+    0.03754880834448223,
+    0.14790316555409377
+   ],
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "std lookup 2^18-2^20 0.12-0.42",
+   "claimed": [
+    0.12,
+    0.42
+   ],
+   "recomputed": [
+    0.11450854635388476,
+    0.42060828407726975
+   ],
+   "ok": false,
+   "note": ""
+  },
+  {
+   "name": "std lookup 2^22-2^24 0.27-0.85",
+   "claimed": [
+    0.27,
+    0.85
+   ],
+   "recomputed": [
+    0.26836334174181536,
+    0.8527572072378106
+   ],
+   "ok": true,
+   "note": ""
+  },
+  {
+   "name": "fast hasher 2-5x cheaper",
+   "claimed": [
+    2,
+    5
+   ],
+   "recomputed": [
+    1.2191620010836193,
+    6.100379094708875
+   ],
+   "ok": false,
+   "note": ""
+  },
+  {
+   "name": "1836 executions, 0 errors, every target verified",
+   "claimed": [
+    1836,
+    0
+   ],
+   "recomputed": [
+    1836,
+    0
+   ],
+   "ok": true,
+   "note": ""
+  }
+ ],
+ "quoted_failures": [
+  "fixed-key control 'the same pattern' (decisions equal to the primary rule)",
+  "rho2xks fastest rho (RESULTS: 7)",
+  "std lookup 2^18-2^20 0.12-0.42",
+  "fast hasher 2-5x cheaper"
+ ]
+}

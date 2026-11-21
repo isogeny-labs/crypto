@@ -14,6 +14,7 @@ on:
 
 jobs:
   replay:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|ecc2k130-rotated-phase-selector.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|ecc2k130-rotated-phase-selector.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
     timeout-minutes: 10
     steps:
@@ -22,10 +23,15 @@ jobs:
         with:
           python-version: '3.13'
       - name: Frozen source/input/archive preflight
-        run: python3 research/notes/ecc2k130/rotated_phase_selector_20260925/ci_replay.py
+        env:
+          FROZEN_VIEW_STEP: |
+            python3 research/notes/ecc2k130/rotated_phase_selector_20260925/ci_replay.py
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only rotated_phase_selector_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"
       - name: Independent outcome replay when committed
         shell: bash
-        run: |
-          if test -f research/notes/ecc2k130/rotated_phase_selector_20260925/evidence/receipt.json; then
-            python3 research/notes/ecc2k130/rotated_phase_selector_20260925/ci_replay.py --evidence research/notes/ecc2k130/rotated_phase_selector_20260925/evidence
-          fi
+        env:
+          FROZEN_VIEW_STEP: |
+            if test -f research/notes/ecc2k130/rotated_phase_selector_20260925/evidence/receipt.json; then
+              python3 research/notes/ecc2k130/rotated_phase_selector_20260925/ci_replay.py --evidence research/notes/ecc2k130/rotated_phase_selector_20260925/evidence
+            fi
+        run: node .github/scripts/run-frozen-workflow-replays.mjs --only rotated_phase_selector_20260925 -- bash -eo pipefail -c "$FROZEN_VIEW_STEP"

@@ -1,0 +1,12 @@
+digraph filter {
+ graph [rankdir=TB,bgcolor="white",pad="0.2",ranksep="0.35"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf5ff",fontname="Helvetica",fontsize=12,margin="0.13"];
+ edge [fontname="Helvetica",fontsize=11];
+ input [label="Proposed sparse filter\nW_G(N) = G N' - G' N,  N = A^2 - f B^2"];
+ exact [label="Keep monic/separable G and deg N <= deg G\nW_G(N)=0 iff N=cG\nNonzero N implies nonzero c",fillcolor="#eaf7eb"];
+ ghost [label="Drop degree cap: false positives\nF17: N = X (X-1)^17, G=X\nW_X(N)=0 but N is not cX",fillcolor="#ffecec"];
+ rank [label="Same norm coefficient constraints\nRank-one reconstruction still required\nSparse implementation benefit unmeasured",fillcolor="#fff1d5"];
+ input -> exact [label="bounded"];
+ input -> ghost [label="unbounded"];
+ exact -> rank;
+}

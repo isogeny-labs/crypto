@@ -1,0 +1,171 @@
+module
+public import OrientationDegree
+public import Mathlib.NumberTheory.Padics.RingHoms
+public import OrientationContent
+import all OrientationContent
+
+public section
+noncomputable section
+namespace OrientationCoefficientReduction
+open OrientationAnchor Polynomial
+instance : Fact (Nat.Prime 2) := ⟨by decide⟩
+
+def integralRationals : Subring ℚ where
+  carrier := {q | VBound 0 q}
+  zero_mem' := VBound.zero 0
+  one_mem' := Or.inr (by simp)
+  add_mem' ha hb := ha.add hb
+  neg_mem' ha := ha.neg
+  mul_mem' ha hb := by simpa using ha.mul hb
+
+theorem norm_bound {q : ℚ} (n : ℕ) (h : VBound (n:ℤ) q) :
+    padicNorm 2 q ≤ (2:ℚ)^(-(n:ℤ)) := by
+  rcases h with rfl | h
+  · simp only [padicNorm.zero]
+    positivity
+  by_cases hq : q=0
+  · subst q
+    simp only [padicNorm.zero]
+    positivity
+  rw [padicNorm.eq_zpow_of_nonzero hq]
+  exact zpow_le_zpow_right₀ (by norm_num) (neg_le_neg h)
+
+theorem integral_norm {q : ℚ} (h : VBound 0 q) : padicNorm 2 q ≤ 1 := by
+  simpa using norm_bound 0 h
+
+def toPadic : integralRationals →+* ℤ_[2] where
+  toFun q := ⟨(q.val : ℚ_[2]), by
+    change ‖(q.val:ℚ_[2])‖ ≤ 1
+    rw [Padic.eq_padicNorm]
+    have H := (Rat.cast_le (K:=ℝ)).mpr (integral_norm q.property)
+    simpa only [Rat.cast_one] using H⟩
+  map_one' := by apply Subtype.ext; simp
+  map_zero' := by apply Subtype.ext; simp
+  map_add' a b := by
+    apply Subtype.ext
+    change (((a.val+b.val:ℚ)):ℚ_[2])=(a.val:ℚ_[2])+(b.val:ℚ_[2])
+    exact Rat.cast_add ..
+  map_mul' a b := by
+    apply Subtype.ext
+    change (((a.val*b.val:ℚ)):ℚ_[2])=(a.val:ℚ_[2])*(b.val:ℚ_[2])
+    exact Rat.cast_mul ..
+
+def reduce (p : ℕ) : integralRationals →+* ZMod (2^p) :=
+  (PadicInt.toZModPow p).comp toPadic
+
+theorem reduce_zero_of_bound (p : ℕ) (q : integralRationals)
+    (h : VBound (p:ℤ) q.val) : reduce p q=0 := by
+  change PadicInt.toZModPow p (toPadic q)=0
+  rw [← RingHom.mem_ker,PadicInt.ker_toZModPow,
+    ← PadicInt.norm_le_pow_iff_mem_span_pow]
+  change ‖(q.val:ℚ_[2])‖ ≤ (2:ℝ)^(-(p:ℤ))
+  rw [Padic.eq_padicNorm]
+  have H := (Rat.cast_le (K:=ℝ)).mpr (norm_bound p h)
+  simpa only [Rat.cast_zpow,Rat.cast_ofNat] using H
+
+theorem integral_den_valuation {q : ℚ} (h : VBound 0 q) : padicValNat 2 q.den=0 := by
+  by_cases hq : q=0
+  · subst q; simp
+  have hv := h.resolve_left hq
+  rcases Rat.num_or_den_zero_padicVal q (by decide : Nat.Prime 2) with hn | hd
+  · rw [padicValRat_def,hn] at hv
+    omega
+  · exact hd
+
+theorem integral_den_not_dvd {q : ℚ} (h : VBound 0 q) : ¬ 2 ∣ q.den := by
+  have hd := (padicValNat.eq_zero_iff).mp (integral_den_valuation h)
+  rcases hd with hd | hd | hd
+  · norm_num at hd
+  · exact (q.den_ne_zero hd).elim
+  · exact hd
+
+theorem integral_den_odd {q : ℚ} (h : VBound 0 q) : Odd q.den := by
+  exact Nat.not_even_iff_odd.mp (fun he => integral_den_not_dvd h he.two_dvd)
+
+theorem reduce_compatible (m n : ℕ) (hmn : m ≤ n) (q : integralRationals) :
+    ZMod.castHom (pow_dvd_pow 2 hmn) (ZMod (2^m)) (reduce n q)=reduce m q := by
+  exact DFunLike.congr_fun (PadicInt.zmod_cast_comp_toZModPow m n hmn) (toPadic q)
+
+
+theorem denominator_coprime (q : integralRationals) (p : ℕ) : q.val.den.Coprime (2^p) := by
+  have hc : q.val.den.Coprime 2 := Nat.coprime_comm.mpr
+    ((Nat.prime_two.coprime_iff_not_dvd).mpr (integral_den_not_dvd q.property))
+  exact hc.pow_right p
+
+theorem denominator_unit (q : integralRationals) (p : ℕ) :
+    IsUnit (q.val.den : ZMod (2^p)) :=
+  (ZMod.isUnit_iff_coprime _ _).mpr (denominator_coprime q p)
+
+theorem reduce_mul_den (q : integralRationals) (p : ℕ) :
+    reduce p q*(q.val.den : ZMod (2^p))=(q.val.num : ZMod (2^p)) := by
+  have H : q*(q.val.den : integralRationals)=(q.val.num : integralRationals) := by
+    apply Subtype.ext
+    exact Rat.mul_den_eq_num q.val
+  have h := congrArg (reduce p) H
+  simpa only [map_mul,map_natCast,map_intCast] using h
+
+theorem reduce_finite_formula (q : integralRationals) (p : ℕ) :
+    reduce p q=(q.val.num : ZMod (2^p))*(q.val.den : ZMod (2^p))⁻¹ := by
+  rw [← reduce_mul_den q p,mul_assoc,ZMod.mul_inv_of_unit _ (denominator_unit q p),mul_one]
+
+def reduceTo (p : ℕ) (R : Type*) [CommRing R] [CharP R (2^p)] : integralRationals →+* R :=
+  (ZMod.castHom (dvd_refl (2^p)) R).comp (reduce p)
+
+theorem reduceTo_zero_of_bound (p : ℕ) (R : Type*) [CommRing R] [CharP R (2^p)]
+    (q : integralRationals) (h : VBound (p:ℤ) q.val) : reduceTo p R q=0 := by
+  change ZMod.castHom (dvd_refl (2^p)) R (reduce p q)=0
+  rw [reduce_zero_of_bound p q h,map_zero]
+
+def liftPoly (P : ℚ[X]) (hP : Content 0 P) : integralRationals[X] :=
+  Polynomial.ofFinsupp (Finsupp.onFinset P.support (fun n => (⟨P.coeff n,hP n⟩ : integralRationals)) (by
+    intro n hn
+    apply mem_support_iff.mpr
+    intro hz
+    exact hn (Subtype.ext hz)))
+
+theorem liftPoly_coeff (P : ℚ[X]) (hP : Content 0 P) (n : ℕ) :
+    ((liftPoly P hP).coeff n).val=P.coeff n := rfl
+
+theorem map_liftPoly (P : ℚ[X]) (hP : Content 0 P) :
+    (liftPoly P hP).map integralRationals.subtype=P := by
+  ext n
+  rw [coeff_map]
+  rfl
+
+theorem map_zero_of_content (p : ℕ) (R : Type*) [CommRing R] [CharP R (2^p)]
+    (P : integralRationals[X]) (hP : ∀ n,VBound (p:ℤ) (P.coeff n).val) :
+    P.map (reduceTo p R)=0 := by
+  ext n
+  rw [coeff_map,coeff_zero]
+  exact reduceTo_zero_of_bound p R (P.coeff n) (hP n)
+
+theorem liftPoly_map_zero (p : ℕ) (R : Type*) [CommRing R] [CharP R (2^p)]
+    (P : ℚ[X]) (hP : Content 0 P) (hp : Content (p:ℤ) P) :
+    (liftPoly P hP).map (reduceTo p R)=0 :=
+  map_zero_of_content p R _ (fun n => by simpa only [liftPoly_coeff] using hp n)
+
+theorem actual_integral_polynomial_product (p : ℕ) (R : Type*) [CommRing R] [CharP R (2^p)]
+    (W A B : ℚ[X]) (hW : Content 0 W) (hA : Content 0 A) (hB : Content 0 B)
+    (herr : Content (p:ℤ) (W-A*B)) :
+    (liftPoly W hW).map (reduceTo p R)=
+      (liftPoly A hA).map (reduceTo p R)*(liftPoly B hB).map (reduceTo p R) := by
+  let E := liftPoly W hW-liftPoly A hA*liftPoly B hB
+  have he : E.map integralRationals.subtype=W-A*B := by
+    simp only [E,Polynomial.map_sub,Polynomial.map_mul,map_liftPoly]
+  have hv : ∀ n,VBound (p:ℤ) (E.coeff n).val := by
+    intro n
+    have H := congrArg (fun P : ℚ[X] => P.coeff n) he
+    rw [coeff_map] at H
+    change VBound (p:ℤ) (integralRationals.subtype (E.coeff n))
+    rw [H]
+    exact herr n
+  have hz := map_zero_of_content p R E hv
+  simpa only [E,Polynomial.map_sub,Polynomial.map_mul,sub_eq_zero] using hz
+
+end OrientationCoefficientReduction
+#print axioms OrientationCoefficientReduction.reduce_zero_of_bound
+#print axioms OrientationCoefficientReduction.integral_den_odd
+#print axioms OrientationCoefficientReduction.reduce_compatible
+
+#print axioms OrientationCoefficientReduction.reduce_finite_formula
+#print axioms OrientationCoefficientReduction.actual_integral_polynomial_product

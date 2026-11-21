@@ -1,0 +1,47 @@
+{
+  "schema": "diem-domain-source-plan/v1",
+  "created": "2026-11-10T06:26:37.064209+00:00",
+  "status": "Whole535kernel gate passed; preissue source plan, no Diem domain packet yet.",
+  "formal": {
+    "project": "research/theorem_census_20261109/lean",
+    "theorem": "DiemSmallFieldAudit.diem_domain_audit_certificate",
+    "statement": "theorem diem_domain_audit_certificate : (∀ n q N : ℕ,2≤n → 2^(7*n)≤q → (q:ℝ)+1-(n:ℝ)*2^(n+2)*(Real.sqrt (q:ℝ)+1)≤N → q+1≤2*N) ∧ (¬ ∀ n q N : ℕ,2≤n → (q:ℝ)+1-(n:ℝ)*2^(n+2)*(Real.sqrt (q:ℝ)+1)≤N → q+1≤2*N) ∧ (Nat.card B=2 ∧ Nat.card F=4 ∧ Module.finrank B F=2 ∧ curve.Δ≠0 ∧ Nat.card curve.Point=1 ∧ Function.Bijective (mobiusChart alpha) ∧ Nat.card {P : curve.Point // P∈factorBase curve alpha}=0) ∧ (¬ ∀ (W : WeierstrassCurve.Affine F) (c : F),W.Δ≠0 → Nat.card B+1≤2*Nat.card {P : W.Point // P∈factorBase W c}) ∧ ¬ (2^(7*2)≤(2:ℕ))",
+    "decl_sha256": "d71eb5ac61c483a58ded7c905e20dd06ae2b654d208f4b9aa648168083f77b46",
+    "sources": [
+      {
+        "path": "research/theorem_census_20261109/lean/DiemThreshold.lean",
+        "bytes": 3355,
+        "sha256": "2537128120f15b7ddc6be380ab2e6c7a2c3a800252034364867efe2329d0790d"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/DiemSmallField.lean",
+        "bytes": 9131,
+        "sha256": "ac3c9012cec758c657f824f193da20586062414264155d20d7abef11a998ff68"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      }
+    ],
+    "gate": {
+      "path": "evidence/diem-domain-gate.log",
+      "declarations": 535,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Universal arithmetic implication n≥2and2^(7n)≤qand explicit lowerestimate N≥q+1−n2^(n+2)(sqrtq+1)implyq+1≤2N; directnegation of this inference withoutsizepremise(syntheticn2/q4/N0, not an actualcurvecount). ActualF4quotientofX²+X+1/F2hascard4/degree2; actualcurve y²+y=x³+alpha hasΔ1andpointcard1; checked Mobiuschartbijectionalpha+1/xcomposedwithactualpointXgivesemptyactualpointpreimageofbaseprojectivechart. Directnegation of unrestricted nonsingularcurve/chart halfbound. Actualq2/n2violates sizehypothesis. Schemecover degree/ramification/Condition2.7identification and geometricgenus/Hasse–Weilestimate remain open; qualifiedDiempropositionnotrefuted."
+  },
+  "literature": {
+    "primary": "Diem2011Condition2.7/Props4.9–4.11read; Prop4.11andproofvisuallycheckedPDFpage22/printed95. Explicitn≥2/log2q≥7n, sourcegeometricestimate retained as premise. DOI10.1112/S0010437X10005075.",
+    "pdf_sha256": "74902b5816cd550aa57e180c60fb5bc60b64d93c8ce9f2019a53ca30a934a58a",
+    "formal": "Mathlib actual AdjoinRootirreducibility/quotientroot/powerbasis/cardinality, characteristictransport, real sqrt and actual elliptic point types/coordinates reviewed.",
+    "fallback": "KB/Conductor unavailable; bounded primary/repository/Mathlib fallback; no novelty or blanket source promotion."
+  },
+  "native_experiments": 0,
+  "paid_compute": 0,
+  "inherited_sources": "Previously issued modules/plans unchanged; additive Lake roots only.",
+  "fresh_checker": "lean4checker unavailable; actual kernel builds plus complete transitive axiom audit.",
+  "elaboration": "No new elaboration or linter option.",
+  "identity_format": "No new IDC claim: fixed odd-modulus polynomial format does not encode characteristic-two quotient, inequalities or point-image sets; Lean binds these propositions."
+}

@@ -96,6 +96,46 @@ fn unix_ms() -> u128 {
         .unwrap_or(0)
 }
 
+// A parallel fork can briefly inherit a writer for a just-copied executable,
+// even with CLOEXEC, until that other child execs. ETXTBSY means our executable
+// never ran: only that launch error may wait, within the original budget.
+fn spawn_snapshot(
+    cmd: &mut Command,
+    started: Instant,
+    budget: Duration,
+) -> std::io::Result<std::process::Child> {
+    spawn_with_deadline(|| cmd.spawn(), started, budget)
+}
+
+fn spawn_with_deadline<T>(
+    mut spawn: impl FnMut() -> std::io::Result<T>,
+    started: Instant,
+    budget: Duration,
+) -> std::io::Result<T> {
+    loop {
+        if started.elapsed() >= budget {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::TimedOut,
+                "GPU executable launch deadline expired",
+            ));
+        }
+        match spawn() {
+            #[cfg(unix)]
+            Err(error) if error.raw_os_error() == Some(libc::ETXTBSY) => {
+                let remaining = budget.saturating_sub(started.elapsed());
+                if remaining.is_zero() {
+                    return Err(error);
+                }
+                std::thread::sleep(remaining.min(Duration::from_millis(10)));
+                if started.elapsed() >= budget {
+                    return Err(error);
+                }
+            }
+            result => return result,
+        }
+    }
+}
+
 fn run_one(
     binary: &Path,
     args: &[String],
@@ -124,7 +164,8 @@ fn run_one(
     }
     let started_unix_ms = unix_ms();
     let start = Instant::now();
-    let child = match cmd.spawn() {
+    let budget = Duration::from_secs(timeout);
+    let child = match spawn_snapshot(&mut cmd, start, budget) {
         Ok(child) => child,
         Err(e) => {
             let message = format!("{}: {e}", binary.display());
@@ -141,7 +182,7 @@ fn run_one(
                     elapsed_ns: start.elapsed().as_nanos(),
                     child_pid: 0,
                     exit_code: None,
-                    timed_out: false,
+                    timed_out: start.elapsed() >= budget,
                     stdout_sha256: sha256_hex(b""),
                     stderr_sha256: sha256_hex(message.as_bytes()),
                 },
@@ -159,7 +200,9 @@ fn run_one(
             let (lock, cv) = &*done;
             let guard = lock.lock().unwrap_or_else(|e| e.into_inner());
             let (guard, _) = cv
-                .wait_timeout_while(guard, Duration::from_secs(timeout), |finished| !*finished)
+                .wait_timeout_while(guard, budget.saturating_sub(start.elapsed()), |finished| {
+                    !*finished
+                })
                 .unwrap_or_else(|e| e.into_inner());
             if !*guard {
                 *timed_out.lock().unwrap_or_else(|e| e.into_inner()) = true;
@@ -934,7 +977,8 @@ pub fn audit_match(dir: &Path) -> Result<Vec<String>, String> {
             .and_then(|v| v.get("k"))
             .and_then(|v| parse_scalar_hex(v));
         let verified = k.is_some_and(|k| {
-            k < workload.curve.r && inst.mul_generator_hex(k).as_ref() == Some(&workload.target)
+            super::exact_scalar::ExactScalar::from(k) < workload.curve.r
+                && inst.mul_generator_hex(k).as_ref() == Some(&workload.target)
         });
         if verified != receipt.independently_verified || (!verified && receipt.status == "verified")
         {
@@ -1134,6 +1178,113 @@ mod tests {
     }
 
     #[test]
+    fn executable_writer_release_allows_one_launch_within_original_budget() {
+        let root = std::env::temp_dir().join(format!(
+            "ecbench-gpu-busy-release-{}-{}",
+            std::process::id(),
+            unix_ms()
+        ));
+        std::fs::create_dir(&root).unwrap();
+        let driver = root.join("driver.sh");
+        std::fs::write(&driver, "#!/bin/sh\necho launched\n").unwrap();
+        std::fs::set_permissions(&driver, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let writer = std::fs::OpenOptions::new()
+            .write(true)
+            .open(&driver)
+            .unwrap();
+        // Linux enforces writer/executable exclusion; macOS permits it.
+        #[cfg(target_os = "linux")]
+        assert_eq!(
+            Command::new(&driver).spawn().unwrap_err().raw_os_error(),
+            Some(libc::ETXTBSY)
+        );
+        let release = std::thread::spawn(move || {
+            std::thread::sleep(Duration::from_millis(50));
+            drop(writer);
+        });
+        // Exercise the identical retry loop on every host without depending
+        // on its executable-file locking semantics.
+        let mut attempts = 0;
+        let mut command = Command::new(&driver);
+        command.stdout(Stdio::piped());
+        let child = spawn_with_deadline(
+            || {
+                attempts += 1;
+                if attempts <= 5 {
+                    Err(std::io::Error::from_raw_os_error(libc::ETXTBSY))
+                } else {
+                    command.spawn()
+                }
+            },
+            Instant::now(),
+            Duration::from_secs(3),
+        );
+
+        let child = child.unwrap();
+        assert_eq!(child.wait_with_output().unwrap().stdout, b"launched\n");
+        assert!(attempts >= 6);
+        let (receipt, output) = run_one(&driver, &[], &root, "released", 3).unwrap();
+        release.join().unwrap();
+        assert_eq!(receipt.exit_code, Some(0));
+        assert!(receipt.child_pid > 0);
+        assert!(!receipt.timed_out);
+        assert_eq!(output, "launched\n");
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn busy_launch_deadline_and_other_spawn_errors_do_not_start_children() {
+        let root = std::env::temp_dir().join(format!(
+            "ecbench-gpu-busy-deadline-{}-{}",
+            std::process::id(),
+            unix_ms()
+        ));
+        std::fs::create_dir(&root).unwrap();
+        let driver = root.join("driver.sh");
+        std::fs::write(&driver, "#!/bin/sh\necho must-not-run\n").unwrap();
+        std::fs::set_permissions(&driver, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let writer = std::fs::OpenOptions::new()
+            .write(true)
+            .open(&driver)
+            .unwrap();
+        let start = Instant::now();
+        let mut attempts = 0;
+        let error = spawn_with_deadline::<std::process::Child>(
+            || {
+                attempts += 1;
+                Err(std::io::Error::from_raw_os_error(libc::ETXTBSY))
+            },
+            start,
+            Duration::from_millis(30),
+        )
+        .unwrap_err();
+        assert!(attempts <= 4);
+        #[cfg(target_os = "linux")]
+        assert_eq!(
+            Command::new(&driver).spawn().unwrap_err().raw_os_error(),
+            Some(libc::ETXTBSY)
+        );
+        // A descheduled test can exhaust its budget before the first attempt.
+        assert!(
+            error.raw_os_error() == Some(libc::ETXTBSY)
+                || error.kind() == std::io::ErrorKind::TimedOut
+        );
+        assert!(start.elapsed() >= Duration::from_millis(30));
+        drop(writer);
+        let error = spawn_snapshot(
+            &mut Command::new(root.join("absent")),
+            Instant::now(),
+            Duration::from_secs(3),
+        )
+        .unwrap_err();
+        assert_eq!(error.kind(), std::io::ErrorKind::NotFound);
+        let expired =
+            spawn_snapshot(&mut Command::new(&driver), Instant::now(), Duration::ZERO).unwrap_err();
+        assert_eq!(expired.kind(), std::io::ErrorKind::TimedOut);
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
     fn matched_receipt_replays_and_detects_raw_tampering() {
         let root = std::env::temp_dir().join(format!(
             "ecbench-gpu-match-test-{}-{}",
@@ -1158,7 +1309,7 @@ mod tests {
             "#!/bin/sh\nif [ \"$1\" = selftest ]; then echo 'selftest OK'; exit 0; fi\nsleep 1\necho 'ECBENCH_CURVE p={} a={} b={} r={} gx={} gy={} cofactor={}'\necho 'ECBENCH_RESULT k=0x{:064x} baby_steps=100 giant_steps=50 seed_ops=10 device_seconds=0.1 host_seconds=0.2 setup_seconds=0.02 candidate_verification_seconds=0.01 transfer_seconds=0.01 h2d_bytes=64 d2h_bytes=64 d2d_bytes=0'\n",
             prime.curve.p, prime.curve.a, prime.curve.b, prime.r,
             prime.generator.0, prime.generator.1, prime.cofactor,
-            workload.planted.unwrap()
+            workload.planted.unwrap().checked_u128().expect("legacy GPU fixture")
         )).unwrap();
         std::fs::set_permissions(&driver, std::fs::Permissions::from_mode(0o700)).unwrap();
         let telemetry = root.join("telemetry.sh");
@@ -1215,10 +1366,6 @@ mod lock_and_capsule_tests {
     }
 
     fn options(d: &Path, lock: &str) -> GpuOptions {
-        let _true_binary = ["/usr/bin/true", "/bin/true"]
-            .into_iter()
-            .find(|path| Path::new(path).is_file())
-            .expect("system true executable");
         let true_binary = ["/bin/true", "/usr/bin/true"]
             .into_iter()
             .find(|path| Path::new(path).is_file())

@@ -1,0 +1,19 @@
+.............................................E................
+======================================================================
+ERROR: test_gate_passes_on_the_committed_tree (__main__.Committed.test_gate_passes_on_the_committed_tree)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/crypto/scripts/test_validation_gate.py", line 529, in test_gate_passes_on_the_committed_tree
+    self.assertEqual(g.check(REPO), [])
+                     ^^^^^^^^^^^^^
+  File "/workspace/crypto/scripts/validation_gate.py", line 588, in check
+    bv, bg = load_verdicts("benchmarks", repo), load_pre_gate(PRE_GATE_BENCHMARKS, repo)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto/scripts/validation_gate.py", line 290, in load_verdicts
+    raise SystemExit(f"{SWEEPS[kind]}:{n} names no row (needs `row` or `row_id`)")
+SystemExit: research/validation_sweep_20261019/B-benchmarks/verdicts.jsonl:1 names no row (needs `row` or `row_id`)
+
+----------------------------------------------------------------------
+Ran 62 tests in 0.728s
+
+FAILED (errors=1)

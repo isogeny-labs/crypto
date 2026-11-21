@@ -1,0 +1,152 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h0f32be38dee24607",
+  "statement": {
+    "name": "Universal cost-surplus balance",
+    "source": "PrimeICCostFloor.surplusIdentity; universal CommRing identity only, not ordered or logarithmic conclusions",
+    "variables": [
+      "p",
+      "b",
+      "t"
+    ],
+    "degree_bound": 5,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "t"
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "b"
+                        },
+                        {
+                          "op": "var",
+                          "args": "b"
+                        },
+                        {
+                          "op": "var",
+                          "args": "b"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "var",
+                    "args": "p"
+                  }
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "b"
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "t"
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "b"
+                      },
+                      {
+                        "op": "var",
+                        "args": "b"
+                      },
+                      {
+                        "op": "var",
+                        "args": "b"
+                      },
+                      {
+                        "op": "var",
+                        "args": "b"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "t"
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "t"
+            },
+            {
+              "op": "var",
+              "args": "t"
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "p"
+              },
+              {
+                "op": "var",
+                "args": "b"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 2026111306,
+  "value_digest": "2437f9e59f4a95dfc7315c409fa0045c36614a5df6447dfa30a7513d4e0e5c6b",
+  "independence": "Unsigned ring-identity check; ordered cost and entropy bounds require separate Lean proofs",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/prime_norm_rank_20261112/lean/PrimeICCostFloor.lean",
+    "sha256": "43dd8916eea9c65f1a3df00357670c57ac1f57be8204ab760f37cdb0a7aa13ed"
+  }
+}

@@ -1,0 +1,12 @@
+AMENDMENT 3 (rank-deficit detection degree), written 2026-11-12 before any detection data. [pcc:unverified]
+Reason: an attempt that adapts its stopping degree to observed ranks can recognise a target with V_R != {}
+at the first degree where dim(Mac^J_D / J) < H(D - Delta), i.e. at
+  D_det(R) = Delta + delta_det(R),  delta_det(R) = least t with L_t cap F_{V_R} != {0}
+(a nonzero function of degree <= t supported on the grid zeros V_R).  delta_det depends only on V_R.
+Proven floors: (U),(Gamma) give no information below the witness degree; for (beta) a nonzero multilinear
+polynomial of degree t has >= 2^{N-t} nonzeros, so delta_det >= m*s - log2|V_R|.
+Generic prediction: least t with #{a : wt(a) > t} < |V_R|.
+Measurement: fresh decomposable targets (planted zeros, own seeds), all families of the preset grid incl.
+bits; per target |V_R|, delta_det, generic prediction.
+Decision rule (fixed now): CONSISTENT if every target has delta_det >= generic - 1; REFUTED if any target
+has delta_det <= generic - 3 or >= 10% of an instance's targets are <= generic - 2; else AMBIGUOUS.

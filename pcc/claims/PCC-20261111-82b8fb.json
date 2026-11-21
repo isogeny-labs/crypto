@@ -1,0 +1,73 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T22:44:40Z",
+ "id": "PCC-20261111-82b8fb",
+ "kind": "theorem",
+ "producer": {
+  "commit": "882b6446d358b316bf670f49f52a6ba06fe76edd",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "f3304d18e27d837cdaa95f9ffd13097ca68cad289aa4a4079d35b499ae71ed3d",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/CyclicFortyNine.lean",
+   "theorem": "CyclicFortyNine.first_unique_scalar"
+  },
+  {
+   "decl_sha256": "5264962ae08afe6651cf09d4cfc19621635ff24232e84fa69ac833f06478b30c",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/CyclicFortyNine.lean",
+   "theorem": "CyclicFortyNine.second_unique_scalar"
+  },
+  {
+   "decl_sha256": "e872110110d7d9fef0704f094e75bca57fbdeff42ff0668a7dbafc5a72a10a92",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/CyclicFortyNine.lean",
+   "theorem": "CyclicFortyNine.first_exact_order"
+  },
+  {
+   "decl_sha256": "449a6ca7a61d54b48989c4fc1915168d9c5bde4a4e1e7cba138d298756c6658d",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/CyclicFortyNine.lean",
+   "theorem": "CyclicFortyNine.second_exact_order"
+  },
+  {
+   "decl_sha256": "5883b2405e5a75256efbf81da835d6855e222092a1cb8310b3dc5ea79430a250",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/CyclicFortyNine.lean",
+   "theorem": "CyclicFortyNine.sixth_powers"
+  },
+  {
+   "decl_sha256": "d1a06ce43a92d29cdb7a29dd6d72a62e06fde81dca32577de1d7c7e71064a1e5",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/CyclicFortyNine.lean",
+   "theorem": "CyclicFortyNine.sixth_fixed_residues"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cyclic49-lean-01.txt",
+    "sha256": "7be05fc21f7bd52535e29fe324ef602109f9c4521ae7601cee0db3b23e5c87dd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cyclic49-lean-01-build.txt",
+    "sha256": "fbf191073222b26723533f4b32ae863b8d08203f5ef2681300c971738b63bcb4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/cyclic49-lean-01-audit.txt",
+    "sha256": "02c5f62a205c90120b49bfcbb4e1b8b783946b1864ed108ea182817ea2efd196"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Six kernel-computed finite-ring certificates modulo49: unique roots33/27 reducing5/6 for the two actual source Frobenius characteristic polynomials,exact orders42/14,sixthpowers8/29 and sixth-fixed residues precisely multiples of7. Lean4.35.0 gate6/zero trusted native;uses decide,not native_decide or custom axioms. Actual elliptic cyclic kernels,Frobenius Cayley-Hamilton,HLP transport and splitting-field interpretation remain written bridges. Unsigned scientific standing."
+}

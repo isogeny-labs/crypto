@@ -1,0 +1,471 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-cm61-operational-replay-20261115",
+  "version": 1,
+  "created": "2026-11-15",
+  "repository": "crypto",
+  "study_dir": "research/quadratic_twist_chord_proof_20261105/cm8-61-full-20261115",
+  "authors": [
+    "producer"
+  ],
+  "question": "Does the prior finite F61 frontier change when operational intermediate/input degree and generic-identity online recoveries are explicitly accounted? Unblinded replay of existing data.",
+  "claims": [
+    {
+      "id": "row-degree-frontier",
+      "text": "Exact uniform INITIAL rank/expanded chord certificate frontier and actual cold original-source recovery; no stationary expectation or speed",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-coverage"
+      ]
+    },
+    {
+      "id": "speed-regularity",
+      "text": "Intrinsic regularity, original S3 pullback degree, total cost and speed are outside scope",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "audit",
+      "role": "candidate",
+      "description": "Full existing16380-shard native arithmetic replay and audit operational accounting check",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "299296c50051ea7f333700e6a766dc56d851de4f",
+        "build": null,
+        "binary_sha256": "ef2a41dbdc3127d2a646d8e7d47dfa9d53138f259ba4945bac1e15f3a2a98952",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 16380
+      }
+    },
+    {
+      "id": "positive",
+      "role": "control_positive",
+      "description": "Full existing16380-shard native arithmetic replay and positive operational accounting check",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "299296c50051ea7f333700e6a766dc56d851de4f",
+        "build": null,
+        "binary_sha256": "ef2a41dbdc3127d2a646d8e7d47dfa9d53138f259ba4945bac1e15f3a2a98952",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "scope": "full",
+        "configurations": 16380
+      }
+    },
+    {
+      "id": "reject-degree",
+      "role": "control_negative",
+      "description": "Full existing16380-shard native arithmetic replay and reject-degree operational accounting check",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "299296c50051ea7f333700e6a766dc56d851de4f",
+        "build": null,
+        "binary_sha256": "ef2a41dbdc3127d2a646d8e7d47dfa9d53138f259ba4945bac1e15f3a2a98952",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 16380
+      }
+    },
+    {
+      "id": "reject-input",
+      "role": "control_negative",
+      "description": "Full existing16380-shard native arithmetic replay and reject-input operational accounting check",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "299296c50051ea7f333700e6a766dc56d851de4f",
+        "build": null,
+        "binary_sha256": "ef2a41dbdc3127d2a646d8e7d47dfa9d53138f259ba4945bac1e15f3a2a98952",
+        "threads": 1,
+        "flags": {
+          "binary": "producer",
+          "scope": "full"
+        }
+      },
+      "parameters": {
+        "expected_exit": 101,
+        "scope": "full",
+        "configurations": 16380
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": "determinism",
+      "not_applicable_reason": "No new producer/data or timing statistic; separate full positive reconstruction checks exact same native analysis receipt"
+    },
+    "positive": {
+      "present": true,
+      "arm": "positive",
+      "expected_detection": "Fresh independent audit accepts exact full partial/cold-recovery bundle",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "reject-degree",
+      "null_population": {
+        "description": "Lowered claimed operation or input degree, all original data immutable",
+        "generator": "Native C++ mutation modes in frozen order",
+        "n": 2,
+        "why_n": "Complete predeclared semantic coverage, not a statistical sample",
+        "matched_on": [
+          "same original bundle",
+          "all untargeted fields",
+          "rehash rule"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "implementation",
+        "levels": [
+          "bounded C++ chord solver",
+          "independent Rust pair/polynomial/scalar reference"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "fixture",
+        "treatment": "fixed",
+        "value": "E61(21,39), nonsquare59 T61(23,54), odd subgroup31 actual phi/inverse",
+        "how": "Native independent field/group route checks"
+      },
+      {
+        "name": "policy_encoding_cap",
+        "treatment": "fixed",
+        "value": "455 policies per role x4roles x9caps =16380 configurations; partial distinct/diagonal branches",
+        "how": "Complete nested native loops, unchanged after data"
+      },
+      {
+        "name": "process_repeat",
+        "treatment": "fixed",
+        "value": "Full analysis followed by full native receipt-check and two full false receipt checks",
+        "how": "Fresh full executions"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": [
+          "audit",
+          "positive",
+          "reject-degree",
+          "reject-input"
+        ],
+        "how": "Fixed dependency order, no timing metric"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-coverage",
+        "arms": [
+          "audit",
+          "positive",
+          "reject-degree",
+          "reject-input"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "Exact unchanged case reconstruction, positive receipt equality, both changed degree/input claims reject101/no receipt"
+      }
+    ],
+    "crosses_map": true,
+    "transfer_obligations": [
+      {
+        "domain": "actual cyclic r19 source and twist subgroups only",
+        "check": "19 point/inverse images and361 addition pairs; every recovered scalar verified on original E/P"
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Dependency-ordered exact finite enumeration and adversarial controls; no clock statistic",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "note": "Deterministic census; seed0 records no randomness"
+    },
+    "instance_sampling": {
+      "rule": "One full finite bundle; no sampling or independent-challenge interpretation",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicit algorithms and semantic attacks; exact equality criteria frozen before full data"
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Full finite declared bundle, no independent challenge/statistical significance interpretation; prior geometry data known, new partial solver unseen."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 240,
+      "threads": 1,
+      "estimated_total_seconds": 500,
+      "measured_on": "Existing full native replay under600s stage cap; four existing-data reconstructions conservatively estimated500s, not a timing claim."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "exit_code",
+        "name": "Native exit code",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Native exit code; no timing or pricing inference",
+        "source": "*.exit",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "original_recoveries",
+        "name": "original_recoveries",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "All actual original scalar recoveries, routes separated",
+        "source": "audit.json original_recoveries",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "algebraic_online_recoveries",
+        "name": "algebraic_online_recoveries",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Nonidentity algebraic online recovery records",
+        "source": "audit.json algebraic_online_recoveries",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "generic_identity_online_recoveries",
+        "name": "generic_identity_online_recoveries",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Generic identity online recovery records",
+        "source": "audit.json generic_identity_online_recoveries",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "strongest_source_uniform_joint_extensions",
+        "name": "strongest_source_uniform_joint_extensions",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "All30 algebraic-eligible original profiles, operational input/intermediate peak instead of final witness",
+        "source": "audit.json strongest_source_uniform_joint_extensions",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "original_recoveries",
+      "algebraic_online_recoveries",
+      "generic_identity_online_recoveries",
+      "strongest_source_uniform_joint_extensions"
+    ],
+    "record": [
+      "actual source commit",
+      "binary hashes",
+      "commands",
+      "all exits/logs/raw/false payloads",
+      "checkpoint head",
+      "declared caps"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 600,
+    "placement": {
+      "outer_seconds": 3600,
+      "max_local_workers": 2,
+      "paid_resources": false
+    },
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Complete all4 full reconstructions, retain any mismatch/failure; no old producer rerun or changed original case.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stage600seconds and outer3600seconds; any cap means incomplete, not a null",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Distinguish final certificate/input/intermediate peaks and algebraic/generic routes, then exact all-source uniform initial frontier",
+    "comparison_ids": [
+      "exact-coverage"
+    ],
+    "threshold": "All4 declared full checks complete, two genuine lowered-degree claims reject101/no receipt",
+    "statistic": "All30 algebraic-eligible original targets; named max constructed input/intermediate witness degree and uniform initial rank sum",
+    "interval": "none; finite deterministic enumeration",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact defects, no statistical effect size",
+    "verdict_vocabulary": [
+      "finite_frontier_extension_unsigned",
+      "finite_null_unsigned",
+      "invalid",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "auditor/audit-operational.rs",
+      "sha256": "f22e1b699e4c61f61e6bdad0bbcbe1ba3daac398c13a5f9cad472e209bef076a"
+    },
+    "inputs": [
+      "Exact existing casesA index cf7b8cc7cfc4b400849f01babeb2e9b54e4a128515fcb86e14474585d0a01225",
+      "All original16380 canonical shards"
+    ],
+    "outputs": [
+      "audit.json",
+      "positive.json",
+      "false-degree.json",
+      "false-input.json",
+      "all exits/logs"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Operational peak vs final certificate degree, uniform initial source/twist rank; all policies retained"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Use reference pair enumeration to supply candidate stopping/roots",
+    "Admit an uncertified branch root",
+    "Hide diagonal/O/failed branches or blocked setups",
+    "Read target scalar labels in recovery",
+    "Call chord expanded degree original S3 pullback degree or intrinsic regularity",
+    "Free log/setup caching between cold targets",
+    "Select favorable policy/cap prefix",
+    "Upload denied raw archives or use credentials/paid resources"
+  ],
+  "literature": [
+    {
+      "ref": "../cm8-61-20261115/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "New actual finite subgroup map and explicit kernel domain"
+    },
+    {
+      "ref": "../cm8-61-chord-20261115/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "Known engineering panel and inherited primary-source review; whole full panel not yet run"
+    },
+    {
+      "ref": "https://arxiv.org/abs/1503.08001v2 sections2/4/5",
+      "provenance": "retrieved",
+      "claim": "Named solving degree separated from intrinsic regularity and first fall"
+    }
+  ],
+  "amendments": [
+    {
+      "id": "operational-and-generic-accounting",
+      "filed": "2026-11-15",
+      "filed_before_affected_data": true,
+      "reason": "Original final Bezout witness is not intermediate constructed degree; original identity shifts explicit but generic online recoveries need separate count",
+      "changes": [
+        "NEW separate analyzer and receipt metric; original data/protocol/results untouched",
+        "All existing native arithmetic replayed exactly; full false claim checks",
+        "Entire source policy frontier receives same stricter metric and algebraic-only online eligibility"
+      ],
+      "supersedes_fields": [
+        "analysis_plan",
+        "metrics",
+        "decision_rule"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "e2e7d54c288c11bb2cbdcb4fbdc4a587574559e29743f6d0c812ee21cb21af77",
+    "commit": "299296c50051ea7f333700e6a766dc56d851de4f",
+    "frozen_at": "2026-11-15T21:39:46Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "dataset_index_sha256": "cf7b8cc7cfc4b400849f01babeb2e9b54e4a128515fcb86e14474585d0a01225",
+    "binary_sha256": "ef2a41dbdc3127d2a646d8e7d47dfa9d53138f259ba4945bac1e15f3a2a98952",
+    "source_commit": "299296c50051ea7f333700e6a766dc56d851de4f",
+    "original_full_protocol": "protocol.json",
+    "data_already_exists": true,
+    "unblinded": true,
+    "readme": "OPERATIONAL_REPLAY.md",
+    "checkpoint": "Authorized exact GitHub branch source/protocol before new replay",
+    "qualifier_sha256": "07756c6dca8b35e799c39a3bafb1fec4cbc33b88deaa1f851091737ade63a141"
+  }
+}

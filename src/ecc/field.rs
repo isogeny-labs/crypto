@@ -4,6 +4,8 @@
 //! The modulus p must be prime for `inv()` to work correctly (Fermat's
 //! little theorem: a^(p-2) ≡ a^(-1) mod p).
 
+use crate::ct_bignum::{MontgomeryContext, Uint, U256};
+use crate::ecc::mont_vt::{ct_pow4, ct_pow4_public};
 use crate::utils::mod_pow_ct;
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
@@ -124,8 +126,19 @@ impl FieldElement {
     /// `BigUint` arithmetic is still not constant-time at the limb
     /// level — see SECURITY.md.
     pub fn pow(&self, exp: &BigUint) -> Self {
+        self.pow_impl(exp, false)
+    }
+
+    /// [`pow`](Self::pow); with `public_exp` the exponent is a public
+    /// constant (Fermat's `p - 2`), so the 256-bit path may follow its bit
+    /// pattern (a fixed window) instead of the always-multiply ladder: its
+    /// sequence of operations still does not depend on the base.
+    fn pow_impl(&self, exp: &BigUint, public_exp: bool) -> Self {
         let bits = self.modulus.bits() as usize;
-        let value = mod_pow_ct(&self.value, exp, &self.modulus, bits);
+        let value = match pow_ct_256(&self.value, exp, &self.modulus, public_exp) {
+            Some(v) => v,
+            None => mod_pow_ct(&self.value, exp, &self.modulus, bits),
+        };
         FieldElement {
             value,
             modulus: self.modulus.clone(),
@@ -139,7 +152,7 @@ impl FieldElement {
             return None;
         }
         let exp = &self.modulus - BigUint::from(2u32);
-        Some(self.pow(&exp))
+        Some(self.pow_impl(&exp, true))
     }
 
     /// Multiplicative inverse in **variable time**; `None` if `self` is
@@ -187,6 +200,50 @@ impl FieldElement {
             None => self.inv(),
         }
     }
+}
+
+thread_local! {
+    /// The Montgomery constants of the last 256-bit modulus
+    /// [`pow_ct_256`] saw (building them takes two `BigUint` reductions;
+    /// a curve's field is the same modulus call after call).
+    static MONT_256: std::cell::RefCell<Option<(BigUint, MontgomeryContext<4>)>> =
+        const { std::cell::RefCell::new(None) };
+}
+
+/// `base^exp mod m` through the branch-free fixed-width Montgomery ladder
+/// of [`crate::ct_bignum`], when `m` is odd and exactly 256 bits (the
+/// P-256 and secp256k1 fields) and `exp` has at most 256 bits: the same
+/// power [`mod_pow_ct`] computes for `bits = 256` (its ladder reads
+/// exactly the low 256 bits of `exp`), 256 squarings and 256 products
+/// with no allocation or division.  `None` for any other input, which
+/// keeps the `BigUint` ladder.
+fn pow_ct_256(base: &BigUint, exp: &BigUint, m: &BigUint, public_exp: bool) -> Option<BigUint> {
+    if m.bits() != 256 || !m.bit(0) || exp.bits() > 256 {
+        return None;
+    }
+    let reduced;
+    let base = if base < m {
+        base
+    } else {
+        reduced = base % m;
+        &reduced
+    };
+    let (b, e) = (U256::from_biguint(base), U256::from_biguint(exp));
+    MONT_256.with(|cell| {
+        let mut slot = cell.borrow_mut();
+        if slot.as_ref().is_none_or(|(cm, _)| cm != m) {
+            let ctx = MontgomeryContext::new(U256::from_biguint(m))?;
+            *slot = Some((m.clone(), ctx));
+        }
+        let ctx = &slot.as_ref()?.1;
+        let (p, n0, r2, one) = (&ctx.n.0, ctx.n_inv_low, &ctx.r2_mod_n.0, &ctx.r_mod_n.0);
+        let r = if public_exp {
+            ct_pow4_public(&b.0, &e.0, p, n0, r2, one)
+        } else {
+            ct_pow4(&b.0, &e.0, p, n0, r2, one)
+        };
+        Some(Uint(r).to_biguint())
+    })
 }
 
 /// The value of `n` when it fits one 64-bit word.

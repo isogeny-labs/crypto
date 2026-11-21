@@ -1,0 +1,7 @@
+# Separate CLI46 v3 metadata reconciliation
+
+Read REPORT.md for exact scope, case outcomes and validation limits. The accepted derived export is experiment.export.derived.json, SHA2564aee068ce1aa909ef96ca851cf2d8ba7e7ff90bd5a2c1115cd10c5e3d70d2822. It does not replace the original frozen execution failure. All92 original observation statuses/verification/measurements are unchanged; only authenticated metadata, evidence references and derivation notes are added. No dataset command was rerun.
+
+Read-only checks authenticate original pre-failure native checkpoints/manifests, recompute policy analysis, recheck native causal projection and original command/replay/restore receipts, and run the pinned official export schema/lint with file verification. They do not rerun the native standalone analyzer after failure, compile code, execute crypto, replay solver arithmetic, assert new S3 persistence or turn original FAIL into PASS. Exact logs and original primary-file hashes are in audit.json and official-validation.json. See REPORT.md for the125 saved dataset commands,39verified/4unsupported/3partial outcomes and correction of the original incorrect no_dataset_commands flag.
+
+Absolute evidence paths refer to the preserved original fixture. Archive/report tooling must retain that custody relationship; the package itself is not a new self-contained copy of all dataset files. artifact-hashes.json binds the external package files at handoff. Independent review may add its own files separately.

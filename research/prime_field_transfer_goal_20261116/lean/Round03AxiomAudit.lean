@@ -1,0 +1,11 @@
+import CMTargetBoundary
+
+#print axioms CMTargetBoundary.small_twice_pi_norm
+#print axioms CMTargetBoundary.small_alpha_norm
+#print axioms CMTargetBoundary.small_product_norm
+#print axioms CMTargetBoundary.large_twice_pi_norm
+#print axioms CMTargetBoundary.large_alpha_norm
+#print axioms CMTargetBoundary.target_orientation
+#print axioms CMTargetBoundary.source_orientation
+#print axioms CMTargetBoundary.parameter_norm_identity
+#print axioms CMTargetBoundary.parameter_factor_identity

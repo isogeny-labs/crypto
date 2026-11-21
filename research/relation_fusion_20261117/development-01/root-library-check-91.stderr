@@ -1,0 +1,39 @@
+    Checking hashed-ecdl-tensor v0.1.0 (/workspace/relation-fusion-live/crates/hashed-ecdl-tensor)
+    Checking volcano-cli v0.1.0 (/workspace/relation-fusion-live/tools/volcano-cli)
+    Checking aws-smithy-http-client v1.5.2
+    Checking rayon v1.12.0
+    Checking aws-sdk-sts v1.119.0
+    Checking clap v4.6.7
+    Checking flate2 v1.1.10
+    Checking ecdl-tensor-ic v0.1.0 (/workspace/relation-fusion-live/crates/ecdl-tensor-ic)
+    Checking pencil-symbolic-graph v0.1.0 (/workspace/relation-fusion-live/research/pencil_large_prime_20261029)
+warning: function `work` is never used
+   --> crates/hashed-ecdl-tensor/src/metrics.rs:170:15
+    |
+170 | pub(crate) fn work(n: u64) -> Result<()> {
+    |               ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+    Checking certified-relations v0.1.0 (/workspace/relation-fusion-live/crates/certified-relations)
+warning: `hashed-ecdl-tensor` (lib) generated 1 warning
+    Checking relation-replay-checker v0.1.0 (/workspace/relation-fusion-live/crates/relation-replay-checker)
+    Checking streebog v0.10.2
+    Checking base64 v0.21.7
+    Checking crypto v0.1.0 (/workspace/relation-fusion-live)
+error: this file contains an unclosed delimiter
+    --> src/cryptanalysis/ecbench/workload.rs:2592:3
+     |
+1550 | impl Instance {
+     |               - unclosed delimiter
+...
+1639 |                 Instance::Wide(_) | Instance::Fp4(_) | Instance::ThreeLeads(_) | Instance::Hyper(_) => {
+     |                                                                                                        - this delimiter might not be properly closed...
+...
+1735 |             }
+     |             - ...as it matches this but it has different indentation
+...
+2592 | }
+     |  ^
+
+error: could not compile `crypto` (lib) due to 1 previous error

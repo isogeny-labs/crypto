@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T22:18:19Z",
+ "id": "PCC-20261116-0ff3d5",
+ "kind": "theorem",
+ "producer": {
+  "commit": "90ea6cb42434698be3fac9d2d012a579f298b961",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "a2a696cd7d7c3ab0ee9dbbba4c82e601973453ca76ca5716aed33fe2d5ae63ab",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/native-norm-Euclidean-complete-types-final-05/CubicNativeNormEuclid22309.lean",
+   "theorem": "CubicNativeNormEuclid22309.actual_division_matches"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Canonical new record for byte-identical frozen legacy coefficient/word certificate from sourceeb3e882c; full original gate/type/negative provenance retained. No new Lean declaration, field/library instance, compiler/Jacobian/runtime/cost or signed promotion, and no legacy ledger reconciliation.",
+ "statement": "theorem actual_division_matches (n : Fin 223) (s : EuclidState) (hs : s\u2208euclidTrace 16 (initialState n)) (hnr : s.nr\u22600) : 0<s.nr \u2227 s.r.tdiv s.nr=s.r/s.nr"
+}

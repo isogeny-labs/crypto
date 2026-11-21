@@ -429,7 +429,7 @@ fn division_poly_x(l: u64, a: &BigInt, b: &BigInt, p: &BigInt) -> Result<Poly> {
 }
 
 /// Velu / Kohel codomain of y^2 = x^3 + a x + b for the kernel polynomial psi (monic).
-fn velu_codomain(l: u64, a: &BigInt, b: &BigInt, psi: &[BigInt], p: &BigInt) -> (BigInt, BigInt) {
+pub(crate) fn velu_codomain(l: u64, a: &BigInt, b: &BigInt, psi: &[BigInt], p: &BigInt) -> (BigInt, BigInt) {
     let d = psi.len() - 1;
     let c = |i: isize| -> BigInt {
         if i < 0 {

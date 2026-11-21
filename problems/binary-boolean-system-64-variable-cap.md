@@ -6,7 +6,7 @@
   (the `m = 4` algebraic arms at n ≥ 23); any Gröbner/SAT decomposition of a
   binary summation-polynomial system with more than 64 Weil-descended unknowns
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-25
+- **Last updated:** 2026-10-26
 
 ## Problem
 

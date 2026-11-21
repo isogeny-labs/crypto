@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>State of Index Calculus</title>
+<style>
+@page { size: A4; margin: 18mm 16mm 18mm 16mm; }
+:root { --ink:#1b1f24; --mute:#5b6570; --rule:#d5dbe1; --accent:#2a6fdb; --warn:#b5462f; --ok:#1f8a4c; --bg:#ffffff; --soft:#f4f6f9; }
+body { font-family: "Inter","Helvetica Neue",Arial,sans-serif; color:var(--ink); background:var(--bg); font-size:9.6pt; line-height:1.42; margin:0; }
+h1 { font-size:22pt; margin:0 0 4pt; letter-spacing:-0.3px; }
+h2 { font-size:13.5pt; margin:18pt 0 6pt; padding-bottom:3pt; border-bottom:1.5px solid var(--ink); page-break-after:avoid; }
+h3 { font-size:10.8pt; margin:12pt 0 4pt; page-break-after:avoid; }
+p { margin:4pt 0 6pt; }
+.sub { color:var(--mute); font-size:10pt; margin-bottom:12pt; }
+.meta { font-size:8.5pt; color:var(--mute); border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); padding:6pt 0; margin:10pt 0 12pt; }
+table { border-collapse:collapse; width:100%; margin:6pt 0 10pt; font-size:8.4pt; page-break-inside:auto; }
+th, td { text-align:left; padding:3pt 5pt; border-bottom:1px solid var(--rule); vertical-align:top; }
+th { background:var(--soft); font-weight:600; }
+tr { page-break-inside:avoid; }
+td.n, th.n { text-align:right; font-variant-numeric:tabular-nums; }
+code { font-family:"JetBrains Mono",Menlo,Consolas,monospace; font-size:8.1pt; background:var(--soft); padding:0 2px; border-radius:2px; }
+.box { background:var(--soft); border-left:3px solid var(--accent); padding:7pt 10pt; margin:8pt 0; page-break-inside:avoid; }
+.box.warn { border-left-color:var(--warn); }
+.box.ok { border-left-color:var(--ok); }
+ul { margin:3pt 0 6pt 14pt; padding:0; } li { margin:1.5pt 0; }
+figure { margin:8pt 0; text-align:center; page-break-inside:avoid; }
+figure img { width:92%; }
+figcaption { font-size:8.2pt; color:var(--mute); text-align:left; margin-top:3pt; }
+.y { color:var(--ok); font-weight:600; } .p { color:#b07d10; font-weight:600; } .x { color:var(--warn); font-weight:600; }
+.pb { page-break-before:always; }
+.small { font-size:8.2pt; color:var(--mute); }
+.tag { font-family:monospace; font-size:7.6pt; color:var(--mute); }
+</style></head><body>
+
+<h1>State of Index Calculus</h1>
+<div class="sub">The index-calculus (IC) code in <b>isogeny-labs/crypto</b> and <b>isogeny-labs/cryptanalysis</b>: what it is, what it supports, how it measures against Pollard rho, where it is limited, and how to improve it</div>
+<div class="meta">Date: 18 November 2026 · Snapshots: crypto <code>833a35d21e</code> (main), cryptanalysis <code>cfc03a37e</code> (main) · Method: read-only code and evidence survey, with no new measurements · Every number is quoted from in-repo evidence. Its pcc standing is <code>[pcc:unverified]</code>, because <code>pcc.py standing-by-type</code> lists all 3,544 ledger claims in crypto as <i>unverified</i>. "Validated" means only the 2026-10-19 validation gate (a <code>VALIDATION.json</code> exists).</div>
+
+<h2>1. Executive summary</h2>
+<div class="box">
+<b>Bottom line.</b> The lab has a very large, broad and well-instrumented IC code base: about 330k lines of Rust IC code in crypto alone, with about 2,000 unit tests. It covers binary/Koblitz, prime-field, extension-field, hyperelliptic and Weil-descent settings. On <b>generic, prime-order and Koblitz elliptic curves no configuration is below matched Pollard rho at any measured size</b>. The best validated distance remaining is about <b>4×</b> (Table A, Koblitz n=47, 36.6-bit r). The gap <b>widens with log₂ r in every ranked family</b>. IC is below rho only on known weak subfamilies (GHS-weak plane quartics, the Joux–Vitse weak class), on toy hyperelliptic Jacobians and on (ℤ/pℤ)*. All of these are reproductions of known theory, not new tiers.
+</div>
+<ul>
+<li><b>Support breadth is high; production depth is narrow.</b> Only the Koblitz/binary pipeline and the pluggable <code>ic_framework</code> + <code>ecbench</code> stack are mature end-to-end paths. Prime-field, F<sub>p<sup>k</sup></sub>, GHS, Diem, plane-quartic and P-256 modules are mostly single-study research code. Some (for example <code>gaudry_quartic</code>) measure one stage and have no relation collection or linear algebra.</li>
+<li><b>Hard ceilings remain.</b> Several pipelines are single-machine-word: <code>pack_point</code> is exact only for n ≤ 62, Boolean solvers are capped at 64 variables, relation moduli must be r &lt; 2<sup>63</sup>, and the BigUint prime-field root finder brute-forces only p &lt; 2<sup>20</sup>. The wide paths <code>koblitz_wide</code>/<code>koblitz_big</code> reach n ≤ 191, but only on the Koblitz track. Characteristic 3 and extension fields are estimate-only in <code>icx</code>.</li>
+<li><b>Duplication and drift are the biggest engineering debt.</b> There are five hashed/tensor IC implementations, three hyperelliptic IC engines, four or more independent Wiedemann/Lanczos implementations, about six Boolean F4/Macaulay engines and 65 files with their own elimination routine. The cryptanalysis <code>suite/</code> is a stale fork of crypto's <code>src/cryptanalysis</code>: <code>koblitz_index_calculus.rs</code> is 14.4k lines there against 27.5k in crypto. <code>hashed-ecdl-tensor</code> is documented as "byte-identical" across repos but differs in 48 source files.</li>
+<li><b>Process signals are weak.</b> No pcc claim is verified. Every Table A/B row passes the gate only "with caveats" (<code>pricing_ok=False</code>). All of Table C is pre-gate. A root-finder replay regression is still open (72/168 identical). <code>docs/ic/progress-timeline.json</code> on main is malformed JSON.</li>
+<li><b>Highest-leverage improvements</b> (§8): (1) consolidate linear algebra and the field/word layer into shared, multi-word crates; (2) charge every arm fully and close the replay regression so that rows can reach verified standing; (3) attack the dominant cold-cost phases (setup and the rank stage are 75–99% of cold S); (4) concentrate research on structural levers that change the <i>exponent</i>, not the constant. The generic-decomposition track (k-sum, pair table) is bounded by √r and cannot cross rho by construction.</li>
+</ul>
+
+<h2>2. Scope and method</h2>
+<p>I swept both repositories with three parallel read-only surveys: crypto code, crypto results, and cryptanalysis code and results. I then re-checked the load-bearing claims by hand against code, ledgers and leaderboards (§9 lists the checks). Line counts come from <code>wc -l</code> and test counts from <code>#[test]</code> greps. I ran no experiments. The shared <code>research-kb</code> server and the lead atlas (<code>crypto-autoresearcher</code>) are not reachable from this session (<code>scripts/research-kb</code>: "no executable found"; no sibling checkout), so the report has no KB receipt. Novelty statements here are limited to what the two repositories record.</p>
+
+<table>
+<tr><th>Repository</th><th class="n">Tracked files</th><th>Where IC lives</th><th>Role</th></tr>
+<tr><td>crypto</td><td class="n">450,387</td><td><code>src/cryptanalysis/</code> (663 .rs, 728k LOC; about 328k IC-related), <code>ic_framework/</code>, <code>ecbench/</code>, 7 crates, <code>gpu/</code>, <code>src/bin/{ic,icx,icprog,ecbench,ic_autolab}</code>, <code>research/ic_*</code></td><td>Primary producer: engines, harness, leaderboard</td></tr>
+<tr><td>cryptanalysis</td><td class="n">109,251</td><td><code>suite/src/cryptanalysis/</code> (fork), C <code>src/indexcalc.c</code>, <code>crates/prime-field-auxiliary-ic</code>, <code>experiments/ic-bench</code>, <code>xedni-*</code>, <code>chained-transfer-*</code></td><td>Baseline ledger (<code>docs/ic/BASELINES.md</code>), protocols, Xedni and transfer research</td></tr>
+</table>
+
+<h2>3. Architecture map</h2>
+<h3>3.1 crypto: the pluggable framework</h3>
+<p><code>src/cryptanalysis/ic_framework/</code> (27 files, 36.0k LOC, 211 tests) defines five stage traits in <code>stages.rs</code>: <code>FactorBaseBuilder</code>, <code>Targets</code>, <code>DecompositionOracle</code>, <code>SystemSolver</code> and <code>RelationSolver</code>. Each runs over a counted group. The cost unit is S = operations/√r. The stages are driven by <code>ic bench/plan/sweep</code> and by <code>ecbench</code> (85 files, 87.7k LOC, 646 tests), which charges every ECDLP method (rho, BSGS, kangaroo, IC) in one counted unit with replays.</p>
+<table>
+<tr><th style="width:18%">Stage</th><th>Registered implementations (verified from code)</th></tr>
+<tr><td>Factor bases</td><td>prime: <code>prime-abscissa</code>, <code>prime-projected-abscissa</code>, <code>prime-kummer</code>, <code>prime-isogeny</code>, <code>prime-interval</code>, <code>glv-orbit</code>, <code>cm-multiplier</code>, <code>explicit-x</code>; binary: <code>binary-subspace</code>, <code>koblitz-closure</code>, <code>koblitz-trace-zero</code>, <code>koblitz-orbit</code>, <code>compact-orbit-scan</code>, <code>cyclotomic</code>, <code>onb-weight</code>, <code>binary-multiplier</code>; other: <code>gls-line</code>, <code>hashed-affine</code>, <code>known-log</code></td></tr>
+<tr><td>Decomposition oracles</td><td>table/walk: <code>subtract</code>, <code>mitm</code>, <code>mitm-fiber</code>, <code>mitm-frobenius-*</code>, <code>ksum</code>, <code>ksum-frobenius</code>, <code>wsum</code>, <code>wwalk</code>, <code>residual-sweep</code>; root-finding: <code>rootfind-subtract(-gpu)</code>, <code>rootfind-pairs</code>, <code>rootfind-mitm-prime-batch</code>; algebraic: <code>descent-algebraic(-fiber)</code>, <code>symmetrised</code>, <code>koblitz-symmetrised</code>, <code>chained-x</code>, <code>pkm-semaev</code>; other: <code>cm-scalar-orbit</code>, <code>hashed-tensor</code></td></tr>
+<tr><td>System solvers</td><td><code>f4-f2</code>, <code>buchberger-f2</code>, <code>m4gb-f2(-server)</code> (GPL subprocess), <code>matrix-f4</code>, <code>matrix-f5</code>, <code>inherited-f4</code> (+ <code>-next/-legacy/-batched</code>), <code>fes-f2(-gpu/-wide)</code>, <code>fes-then-*</code>, <code>exhaustive</code>, <code>crossbred-f2</code>, <code>xl-f2</code>, <code>sat-cdcl</code>, <code>primo-smt</code></td></tr>
+<tr><td>Relation linear algebra</td><td><code>incremental-gauss</code> (+ full-rank/checked/echelon), <code>structured-gauss</code>, <code>sparse-cado</code> = filter + block Wiedemann, filter + block Lanczos. An iterative answer is accepted only when two independently seeded solves agree.</td></tr>
+<tr><td>Planning and verification</td><td><code>planner.rs</code> (<code>ic plan</code>), <code>dreg_forecast.rs</code> (advisory degree of regularity), <code>relation-replay-checker</code> crate (independent; hard-wired to p = 2<sup>31</sup>−1), <code>certified-relations</code> crate (6.9k LOC, 70 tests), <code>replay_check</code>, <code>ic_validate</code>, <code>scripts/ic_audit/</code>, <code>tools/icms/</code></td></tr>
+</table>
+
+<h3>3.2 Module families by size (crypto <code>src/cryptanalysis</code>)</h3>
+<table>
+<tr><th>Prefix</th><th class="n">Files</th><th class="n">LOC</th><th>Content</th></tr>
+<tr><td><code>koblitz_*</code></td><td class="n">22</td><td class="n">79.9k</td><td>GGMP Frobenius-invariant IC; wide (n ≤ 127) and big (n ≤ 191) variants; AVX-512/VPCLMUL arithmetic; sparse LA</td></tr>
+<tr><td>F4/F5/Gröbner</td><td class="n">18</td><td class="n">58.0k</td><td><code>f4_fp</code> (9.5k, 52 tests), tower F4, signature tower, Boolean F4, <code>gf2_elim</code> (M4RI, AVX-512)</td></tr>
+<tr><td><code>quartic*</code></td><td class="n">13</td><td class="n">31.0k</td><td>Plane-quartic / genus-3 IC (GHS-weak family)</td></tr>
+<tr><td><code>jv_*</code></td><td class="n">29</td><td class="n">27.5k</td><td>Joux–Vitse covers, sieves and decompositions over F<sub>p<sup>5</sup></sub> and F<sub>p<sup>6</sup></sub></td></tr>
+<tr><td><code>gaudry_*</code></td><td class="n">11</td><td class="n">19.7k</td><td>E(F<sub>p<sup>3</sup></sub>) full pipeline; E(F<sub>p<sup>4</sup></sub>) S₅ solve stage only</td></tr>
+<tr><td><code>semaev*</code></td><td class="n">16</td><td class="n">19.6k</td><td>Summation polynomials S₃–S₅, symmetrised forms, SAT encodings</td></tr>
+<tr><td><code>p256_*</code>, <code>wide*</code>, <code>pq_*</code></td><td class="n">27</td><td class="n">30.6k</td><td>P-256 factor-base studies; wide Boolean systems (≤ 128 vars); Petit–Quisquater descent</td></tr>
+<tr><td><code>hyperelliptic*</code>, <code>ghs_*</code>, <code>descent*</code>, <code>large_prime*</code></td><td class="n">31</td><td class="n">27.8k</td><td>ADH/Gaudry Jacobian IC; GHS descent; large-prime variation</td></tr>
+</table>
+
+<h3>3.3 cryptanalysis</h3>
+<ul>
+<li><b><code>suite/src/cryptanalysis/</code></b> (Rust): a fork of crypto's code, about 120k IC-related LOC including Koblitz 39.6k (280 tests), <code>ic_framework</code> 6.5k (12 files against 27 in crypto) and the boundary ledger 12.8k. No shared file is identical to its crypto counterpart. <code>xedni_lift.rs</code> (LLL/Babai lifting search) exists only here.</li>
+<li><b>C library</b> <code>src/indexcalc.c</code> + <code>linalg.c</code> (3.8k LOC): IC in <b>(ℤ/pℤ)*</b>, p &lt; 2<sup>63</sup>, not ECDLP. Linear sieve L<sub>p</sub>[1/2,1], Pohlig–Hellman, structured Gauss + Lanczos with Hensel lifting. It has CMake tests and is the one setting where IC crosses rho (near 56 bits).</li>
+<li><b><code>crates/prime-field-auxiliary-ic</code></b> (4.7k LOC, 31 tests): m = 2 prime-field IC at p = 2<sup>31</sup>−1 and 2<sup>61</sup>−1. The factor base comes from auxiliary-map fibers. Decomposition is a centered resultant circuit with AVX2/512 paths. Linear algebra is union-find graph elimination with a certificate DAG.</li>
+<li><b>Python</b> <code>suite/python/indexcalc</code> (4.4k LOC; SAT point decomposition for Koblitz curves, also near-copied in <code>ecc2k130/</code>). <code>experiments/ic-bench</code> (2.4k LOC; 2,644 workloads, toy end-to-end with calibrated rho). <code>ic-candidate-catalog</code> holds 1,000 design proposals, not measurements.</li>
+<li><b>GPU and FPGA</b>: <code>suite/cuda</code> (3.3k LOC) runs Boolean Macaulay and PDP kernels. The top-level <code>cuda/</code>, <code>gpu/certicom</code> and <code>fpga/</code> directories are rho infrastructure, not IC.</li>
+</ul>
+
+<h2 class="pb">4. Support matrix: what we support</h2>
+<p class="small">Legend: <span class="y">FULL</span> end-to-end pipeline with relation collection, linear algebra and verified log, measured against rho; <span class="p">PARTIAL</span> partial: one stage, toy sizes, synthetic, or a single study; <span class="x">NONE</span> absent or estimate-only.</p>
+<table>
+<tr><th>Group / setting</th><th>Status</th><th>Decomposition</th><th>Size reach</th><th>Main code</th></tr>
+<tr><td>Binary Koblitz K<sub>a</sub>/F<sub>2<sup>n</sup></sub></td><td><span class="y">FULL</span></td><td>Frobenius-orbit pair/MITM tables, S₃/S₄ Semaev + inherited F4, SAT, root-finding, large primes, k-sum</td><td>n ≤ 63 (u64); wide ≤ 127; big ≤ 191 (ECC2K-130, K-163); measured to n = 83 (log₂ r 52.9)</td><td><code>koblitz_index_calculus.rs</code> (27.5k, 216 tests), <code>inherited_f4.rs</code>, <code>koblitz_sparse_la.rs</code></td></tr>
+<tr><td>Random binary E/F<sub>2<sup>m</sup></sub></td><td><span class="y">FULL</span></td><td>Subspace bases, S₄ "pairs then root-find X₃", SAT, trace-zero</td><td>Table B up to 24.4-bit r</td><td><code>semaev_decomp.rs</code>, <code>binary_semaev*</code>, <code>sat.rs</code></td></tr>
+<tr><td>Prime field E/F<sub>p</sub> (generic)</td><td><span class="y">FULL</span> generic / <span class="p">PARTIAL</span> algebraic</td><td>Pair/k-sum tables (generic, √r-bounded); PKM Kummer tower + <code>pkm-semaev</code> (built, not competitive); automorphism orbits for j = 0, 1728</td><td>Table B to 23.4 bits; bitop ladder to 40 bits; residual collector to 36 bits; aux-IC at 31/61 bits</td><td><code>ic_framework</code>, <code>prime_orbit_index_calculus.rs</code>, <code>pkm_semaev.rs</code>, <code>prime-field-auxiliary-ic</code></td></tr>
+<tr><td>E(F<sub>p<sup>3</sup></sub>) Gaudry/Diem</td><td><span class="p">PARTIAL</span></td><td>Subspace base, symmetrised S₄, Macaulay + eigenvector solve</td><td>Small p; 528–4,000× rho</td><td><code>gaudry_cubic*.rs</code></td></tr>
+<tr><td>E(F<sub>p<sup>4</sup></sub>), E(F<sub>p<sup>5</sup></sub>), E(F<sub>p<sup>6</sup></sub>)</td><td><span class="p">PARTIAL</span></td><td>S₅ solve (k = 4, no pipeline); Joux–Vitse (n−1)-decomposition; JV genus-3 cover sieve</td><td>k = 5 complete DLP at p = 31, 61; JV weak class at p ≈ 10³</td><td><code>gaudry_quartic.rs</code>, <code>jv_*</code> (29 files)</td></tr>
+<tr><td>Hyperelliptic g = 2, 3, 4</td><td><span class="y">FULL</span> (toy)</td><td>ADH/Gaudry degree-1 base, Cantor arithmetic, sparse elimination</td><td>p &lt; 2<sup>62</sup> (native crate); toy rows</td><td><code>hyperelliptic_index_calculus.rs</code>, <code>crates/hec-native-ic</code>, <code>hecx</code></td></tr>
+<tr><td>Plane quartics (genus 3), GHS-weak E/F<sub>q<sup>3</sup></sub></td><td><span class="y">FULL</span></td><td>Diem-style double large prime, block Lanczos reuse</td><td>q up to about 2<sup>21–22</sup></td><td><code>quartic*</code>, <code>plane_quartic_pic*.rs</code></td></tr>
+<tr><td>Weil descent / GHS on general curves</td><td><span class="p">PARTIAL</span></td><td>GHS descent + Gaudry IC on the descended Jacobian (planted DLP)</td><td>Synthetic; Menezes–Qu lemma 6 step not implemented</td><td><code>ghs_*</code> (only literal TODOs in the IC code)</td></tr>
+<tr><td>Characteristic 3</td><td><span class="x">NONE</span></td><td>None</td><td>Estimate-only in <code>icx</code>; designed <code>fpk.rs</code> / <code>field_dispatch.rs</code> do not exist</td><td><code>gf3m.rs</code> (arithmetic only)</td></tr>
+<tr><td>Hashed / tensor IC (Bochum, App. D.4)</td><td><span class="p">PARTIAL</span></td><td>Compact Boolean encodings, recursive tensor contraction</td><td>Work unit uncalibrated; no 131-bit workload</td><td>5 implementations (§6.3)</td></tr>
+<tr><td>Xedni calculus</td><td><span class="p">PARTIAL</span></td><td>LLL/Babai lift search</td><td>Success per trial ∝ ≤ 1/p; char 2 gated</td><td><code>xedni_lift.rs</code> (cryptanalysis)</td></tr>
+<tr><td>(ℤ/pℤ)* (control)</td><td><span class="y">FULL</span></td><td>Linear sieve</td><td>p &lt; 2<sup>63</sup></td><td><code>src/indexcalc.c</code> (cryptanalysis)</td></tr>
+</table>
+
+<h3>4.1 Engines underneath</h3>
+<table>
+<tr><th>Engine</th><th>File (LOC)</th><th>Status</th></tr>
+<tr><td>Degree-bounded F4 over F<sub>p</sub>, p &lt; 2<sup>32</sup></td><td><code>f4_fp.rs</code> (9,461)</td><td>Real; certified-solution fix landed. Main currently has a fall-degree merge break (PR #4559, 12 replay tests).</td></tr>
+<tr><td>Tower F4 (PKM ring), Faugère–Lachartre</td><td><code>f4_fp_tower*.rs</code> (7.6k)</td><td>Solving degree still rises with N (m = 3: 6, 6, 7, 7)</td></tr>
+<tr><td>Signature F5/GVW (tower)</td><td><code>sig_fp_tower.rs</code></td><td>Abandoned; up to 28× memory</td></tr>
+<tr><td>Boolean F4 (Gebauer–Möller)</td><td><code>pq_f4_f2.rs</code> (3.4k)</td><td>≤ 64 vars; docstring still claims a timed-out set "generates the same ideal" (false)</td></tr>
+<tr><td>Inherited F4 (default oracle)</td><td><code>inherited_f4.rs</code> (5.4k)</td><td><code>from_system</code> unsafe below the generator degree (open audit item)</td></tr>
+<tr><td>FES (Gray-code exhaustive), CPU/GPU</td><td><code>mq_fes.rs</code>, <code>gpu/fes</code></td><td>Lowers wall time but increases counted work; returns 1 solution on an empty system (defect)</td></tr>
+<tr><td>Crossbred, XL, CDCL-SAT with XOR</td><td><code>crossbred.rs</code>, <code>pq_xl.rs</code>, <code>sat.rs</code> (8.1k)</td><td>XL is a toy; SAT is a from-scratch CDCL; WDSat by subprocess</td></tr>
+<tr><td>M4GB</td><td><code>m4gb_oracle.rs</code></td><td>GPL-3 subprocess; n ≤ 16; no operation counters, so it cannot back a leaderboard row</td></tr>
+<tr><td>Reach (FRAMEWORK §8)</td><td>—</td><td>F4 decides ≤ 28 unknowns, FES 32/36, exhaustive 26, xl-f2 10. <b>No engine beats exhaustive search.</b></td></tr>
+</table>
+
+<h2 class="pb">5. Measured standing against Pollard rho</h2>
+<p>The leaderboard (<code>docs/ic/LEADERBOARD.md</code>, <code>leaderboard.json</code>) has three tables, each in its own unit, so ratios are comparable only within a table. Figure 1 plots the best recipe per curve as IC cost ÷ matched rho, where 1.0× is parity.</p>
+<figure><img src="fig1_board.svg"><figcaption><b>Figure 1.</b> Best IC/rho per curve in leaderboard tables A–C (28 rows; 19 validated with caveats, Table C pre-gate). Units differ by table: A and C are batched-addition clock units, B is counted GAE. Every point is above parity. Fitted slope of log₂(IC/rho) against log₂ r: prime +0.078, random binary +0.159, Koblitz one-target +0.113, Koblitz batch −0.029 (that series is U-shaped: it falls to 39 bits, then rises). Source: <code>make_charts.py</code> over <code>leaderboard.json</code>.</figcaption></figure>
+
+<table>
+<tr><th>Family (table)</th><th>Best row</th><th class="n">log₂ r</th><th class="n">IC/rho</th><th>Largest row</th><th>Standing</th></tr>
+<tr><td>Koblitz, one target (A)</td><td><code>icv1-f2m47-t22705043</code></td><td class="n">36.6</td><td class="n">4.08×</td><td>n61, 47.2 bits: 11.1×</td><td>validated with caveats</td></tr>
+<tr><td>Koblitz, 32-target batch (C)</td><td><code>icv1-f2m41-tm2308219</code></td><td class="n">39.0</td><td class="n">3.62×</td><td>n61: 9.2×</td><td>pre-gate</td></tr>
+<tr><td>Prime field (B)</td><td><code>icv1-fp12-t19</code></td><td class="n">11.9</td><td class="n">5.47×</td><td>fp24, 23.4 bits: 13.5×</td><td>validated with caveats</td></tr>
+<tr><td>Prime, ksum5 re-measure (outside A–C)</td><td>all 8 rows</td><td class="n">10–23</td><td class="n">≈5.0–6.9×</td><td>—</td><td>validated</td></tr>
+<tr><td>Random binary (B)</td><td><code>icv1-f2m18-t393</code></td><td class="n">15.0</td><td class="n">10.6×</td><td>f2m27, 24.4 bits: 38.2×</td><td>validated with caveats</td></tr>
+<tr><td>Koblitz n = 83 (cryptanalysis BASELINES)</td><td>K₁ R1 on D4 closure base</td><td class="n">52.9</td><td class="n">2.04×</td><td>—</td><td>point estimate; factor base uncharged (lower bound); one host class</td></tr>
+<tr><td>Curve25519-family generic autolab</td><td>k = 20–32</td><td class="n">20–32</td><td class="n">≈1.4–1.9×</td><td>—</td><td>not gated; √r-bounded track</td></tr>
+</table>
+
+<h3>5.1 Where IC is below rho</h3>
+<ul>
+<li><b>GHS-weak E/F<sub>q<sup>3</sup></sub> with #E = 4ℓ (plane-quartic IC).</b> Crossover at q* = 6371.2 [5383, 8267]. Double large prime at q = 2,097,091 is 0.0052× negation rho. After later engineering, DL reaches 0.0021× (validated). The fitted exponent in q is about 1.0 against rho's 1.5, which matches the Õ(q) theory. Under SUCCESS_CRITERIA §5 rule 5 this counts as a <i>reproduction</i>.</li>
+<li><b>Joux–Vitse cover sieve, weak class over F<sub>p<sup>6</sup></sub>.</b> 0.014–0.17× rho across the price band, but reachable on about 1% of curves (3/60 classes at p = 1009, 0/60 at p = 1511 and 1823).</li>
+<li><b>Toy hyperelliptic Jacobians, g = 2–4.</b> 0.11–0.77× (accounting class, not EC). <b>(ℤ/pℤ)*</b> crosses rho near 56 bits. Both are positive controls showing that the instruments can detect a sub-rho method.</li>
+</ul>
+
+<h3>5.2 How the gap scales</h3>
+<p>Every ranked family worsens with size. The prime bitop ladder goes from 6.2× at 16 bits to 78.3× at 40 bits (fitted α 0.646 against rho's 0.504). The leaderboard's total exponents are prime 0.447 against 0.372 and char-2 0.538 against 0.392. The new prime collection-frontier analysis (2026-11-17, unverified) derives an optimum B ≈ p<sup>1/3</sup> with total cost p<sup>2/3</sup>, so the gap grows as p<sup>1/6</sup>. Cryptanalysis native panels N15→N27 show rho/IC falling from 0.548 to 0.086. <b>Constant-factor engineering is being outrun by exponent drift</b>: any lever that does not change the exponent loses ground with size.</p>
+
+<figure><img src="fig2_timeline.svg" style="width:85%"><figcaption><b>Figure 2.</b> Headline cold one-target points by landing date (<code>leaderboard.json</code> progress series; mixed curves and units, values &gt; 200× omitted). The early sub-1 points (Sept.) were against unmatched or weak rho; with a matched rho, the trajectory sits at 1.3–15×.</figcaption></figure>
+
+<h3>5.3 Corrections already on record</h3>
+<ul>
+<li>Retained-setup online ratios (n61 13.9×, n83 18.5×) were <b>withdrawn</b>: they were measured against empty-table rho, and a precomputed-table rho wins every N83 pair.</li>
+<li>Tournament sub-1 ratios were measured against an unmatched rho. Native round 0026 in Ir is 10.7–14.6×.</li>
+<li>The XL solving-degree ladder was an instrument artefact. The ECC2K-130 cost rows built on it were relabelled.</li>
+<li>Table B's binary gaps were overstated 1.4–3.4× because the incumbent was untuned. That is an accounting correction, not an improvement.</li>
+<li>L10 finds the lab's quartic negation rho overpriced by 1.73×. That is not yet applied to existing quartic rows, so those rows may overstate IC's advantage.</li>
+</ul>
+
+<h2 class="pb">6. Limitations</h2>
+<h3>6.1 Structural (mathematical)</h3>
+<ul>
+<li><b>Generic decomposition is √r-bounded.</b> Pair-table, k-sum and claw methods satisfy S·T² ≳ r/2n and are generic algorithms, so they cannot beat rho/BSGS by construction (RESEARCH_IC_LEADS_ASSESSMENT_20261018). Much of the measured "best" frontier (Curve25519 autolab, ksum5) lives on this track.</li>
+<li><b>No competitive algebraic oracle for prime-field curves.</b> The PKM tower's solving degree still rises (141× at 28 bits, 159× at 30). The Coppersmith-style reach is 0.0125 against the 0.169 needed. Structured factor bases (Dickson, geometric, quadratic) show a κ slope of about 0 against the 1/3 needed.</li>
+<li><b>Extension-field routes are far from rho</b> except on weak classes. JV k = 5 complete DLP is 6.8×10⁷× and 1.2×10⁶× rho. Gaudry F<sub>p<sup>3</sup></sub> is 528–4,000×.</li>
+<li><b>Xedni</b> lift success decays as ≤ 1/p, and 83% of the successes are trivial collinear events. <b>Chained transfers</b> hit "same-product collapse" and the q223 obstructions. <b>Twist factor-base unions</b> are obstructed algebraically.</li>
+</ul>
+<h3>6.2 Engineering ceilings</h3>
+<table>
+<tr><th>Limit</th><th>Where</th><th>Effect</th></tr>
+<tr><td>Single-word field/point packing; <code>pack_point</code> exact for n ≤ 62, unguarded at 63</td><td>both repos' Koblitz/binary core</td><td>Silent key collision at n = 63; standard sizes need the separate wide/big paths</td></tr>
+<tr><td>Boolean systems ≤ 64 vars (≤ 128 in <code>wide_groebner</code>)</td><td><code>pq_f4_f2</code>, solvers</td><td>Caps the decomposition dimension</td></tr>
+<tr><td>Relation modulus r &lt; 2<sup>63</sup> (LA <code>ModWord</code>)</td><td><code>koblitz_sparse_la</code>, framework LA</td><td>No standard-size linear algebra outside <code>ic_wide</code></td></tr>
+<tr><td><code>find_roots_fp</code> brute force; returns <code>[]</code> silently above 20-bit p</td><td><code>ec_index_calculus.rs:354</code></td><td>Toy-only prime path; the fast Cantor–Zassenhaus exists but is rarely wired</td></tr>
+<tr><td>Single-threaded counting</td><td>FRAMEWORK §8</td><td>Wall-clock studies need separate native paths; GPU paths only for root-finding and FES</td></tr>
+<tr><td><code>relation-replay-checker</code> fixed to p = 2<sup>31</sup>−1</td><td>crate</td><td>Independent verification does not cover other fields</td></tr>
+<tr><td>Char 3, F<sub>p<sup>k</sup></sub> in <code>icx</code></td><td><code>icx</code></td><td>Estimate-only; the <code>attack</code> regime is never selected</td></tr>
+</table>
+<h3>6.3 Duplication and drift</h3>
+<table>
+<tr><th>Capability</th><th class="n">Implementations</th><th>Where</th></tr>
+<tr><td>Hashed / tensor IC</td><td class="n">5 (+2 copies)</td><td><code>hashed-ecdl-tensor</code> (crypto 32.4k; cryptanalysis 7.2k; bindings 21.2k), <code>ecdl-tensor-ic</code>, <code>hashed-ecdl-cpu</code>, <code>ic_framework/hashed.rs</code>, <code>ecbench/hashed_native.rs</code></td></tr>
+<tr><td>Hyperelliptic IC</td><td class="n">3</td><td>BigUint lib, <code>hec-native-ic</code> (own workspace; example depends on a research/ path), ecbench <code>hec</code>/<code>hyper_ic</code></td></tr>
+<tr><td>Wiedemann / Lanczos</td><td class="n">≥ 4</td><td><code>ic_framework/linalg</code>, <code>koblitz_sparse_la</code>, <code>pq_wiedemann</code>, <code>gaudry_cubic::wiedemann_*</code></td></tr>
+<tr><td>Gaussian elimination variants</td><td class="n">65 files</td><td>e.g. <code>ec_index_calculus</code> (9 fns), <code>koblitz_groebner</code> (23), <code>f4_fp</code> (15)</td></tr>
+<tr><td>Boolean F4 / Macaulay</td><td class="n">≈ 6</td><td><code>pq_f4_f2</code>, <code>matrix_f5_f2</code>, <code>f4_gf2</code>, <code>koblitz_groebner</code>, <code>wide_groebner</code>, <code>inherited_f4</code></td></tr>
+<tr><td>IC core across repos</td><td class="n">2 forks</td><td>cryptanalysis <code>suite/</code> diverged: <code>koblitz_index_calculus</code> 14.4k vs 27.5k, <code>ic_boundary</code> 8.5k vs 22.4k, <code>ic_framework</code> 12 vs 27 files</td></tr>
+</table>
+<p>The "must remain byte-identical" statement in both <code>hashed-ecdl-tensor</code> READMEs is <b>false</b>: <code>diff -rq</code> over <code>src/</code> lists 48 differences. Only the Hexagon-scoped files match.</p>
+
+<h3>6.4 Correctness and process debt</h3>
+<ul>
+<li>Confirmed open defects (ENGINE_AUDIT §2.5): <code>fes-f2</code> returns 1 solution on an empty system; <code>buchberger-f2</code> panics at n = 25–26; <code>pack_point</code> collides at n = 63; Oakley Group 3 records the wrong order.</li>
+<li>The root-finder replay-all regression is open: 72/168 identical, against 120/168 on 10-13 (sweep D, PR #2290). The F4/F5/F6 cross-family audit reproduced 72/144.</li>
+<li>Main had build breaks: the <code>f4_fp</code> fall-degree merge (#4559), and ecbench failing to compile at <code>3b0840b6f2</code>. The autolab binary has no recorded commit (validator finding F2).</li>
+<li>Validation: every A/B row has <code>pricing_ok=False</code>; Table C is entirely pre-gate; pcc has 0 verified claims out of 3,544. Several cryptanalysis native panels retain failed A/A controls ("invalid for promotion").</li>
+<li>Stale or broken documentation: FRAMEWORK §8 still says "No iterative matrix" (block Wiedemann and Lanczos ship) and its §9 plug-in table is a subset. Five <code>gpu/*/README.md</code> say "No kernel here has been run on a GPU", contradicting the A100 report <code>research/ic_gpu_measure_20261112</code>. <code>docs/ic/progress-timeline.json</code> is invalid JSON (line 565, a missing <code>},{</code>). A stray <code>koblitz_index_calculus.rs.rej.orig</code> is in <code>src/</code>.</li>
+<li>Code smells across the IC modules: 5,220 <code>.unwrap()</code>, 258 <code>panic!</code>, 167 "unsupported" paths. There are almost no TODO markers, so limitations live in prose docs, not in code.</li>
+<li>Lost work: three positive Gröbner engines (equivariant F4, JV trace reuse, BooleanSolve Wiedemann) were never landed.</li>
+</ul>
+
+<h2>7. Closed lines (do not reopen without new mechanism)</h2>
+<table>
+<tr><th>Line</th><th>Verdict</th></tr>
+<tr><td>Koblitz online-only advantage</td><td>Closed; generic bound S·T² ≳ r/2n</td></tr>
+<tr><td>Structured prime factor bases (Dickson, geometric, quadratic)</td><td>κ slope ≈ 0 against 1/3 needed</td></tr>
+<tr><td>F6-IC; GPU FES as a counted lever</td><td>No gain once geometry is charged; FES lowers wall time but worsens counted work</td></tr>
+<tr><td>N83 degree-two image calculus; algebraic linear S₃ ladder</td><td>Rejected by gates; 36,440× rho at n41</td></tr>
+<tr><td>Twist factor-base union; chained-transfer q223 route</td><td>Algebraic obstructions</td></tr>
+<tr><td>Xedni (generic and j = 0)</td><td>Lift success ≤ 1/p; 0/13,750 wide-shift relations</td></tr>
+<tr><td>Joux–Vitse pair-only; pair claw</td><td>Relabelling; BSGS-like (2.2× strong rho)</td></tr>
+<tr><td>Curve-derived binary subspaces</td><td>No better than random</td></tr>
+<tr><td>g2plus L04, L07 (Prym), L02 at g = 3</td><td>Killed</td></tr>
+</table>
+
+<h2 class="pb">8. How to improve: prioritised plan</h2>
+<p>The success criterion counts every verified, measured improvement over the IC baseline, with beating rho as the long-term goal. Below, items are ordered by expected value per unit of effort. P0 makes future improvements <i>countable</i>. P1 moves measured rows. P2 targets the exponent, which is the only way to close a gap that grows with size.</p>
+
+<h3>P0: make results countable (days to weeks)</h3>
+<table>
+<tr><th style="width:30%">Action</th><th>Why / acceptance</th></tr>
+<tr><td>Fix the root-finder replay regression (72/168) and the <code>f4_fp</code> build break; pin the autolab binary commit</td><td>Unblocks promotion of stage counters. Acceptance: replay-all 168/168 identical on main, in CI.</td></tr>
+<tr><td>Close <code>pricing_ok=False</code> on Tables A/B: charge native work for both arms across the §5a 0/0.1/1 band; validate or retire Table C</td><td>Turns "validated with caveats" into clean gate passes; the prerequisite for any T-tier claim.</td></tr>
+<tr><td>Get first pcc claims to <i>verified</i>: start with the n = 83 2.04× row and Table A n47</td><td>Today 0/3,544 are verified, so no number can be cited as more than an assertion.</td></tr>
+<tr><td>Apply the L10 1.73× quartic-rho repricing to the existing quartic rows</td><td>Keeps the GHS-weak rows honest.</td></tr>
+<tr><td>Hygiene: fix <code>progress-timeline.json</code>; update FRAMEWORK §8/§9 and the GPU READMEs; remove <code>.rej.orig</code>; correct the "byte-identical" claim; add a guard at n = 63 in <code>pack_point</code>; fix the <code>fes-f2</code> empty-system and <code>buchberger-f2</code> panics</td><td>Cheap, and removes silent-wrong-answer risks.</td></tr>
+</table>
+
+<h3>P1: consolidate and move the constant (weeks)</h3>
+<table>
+<tr><th style="width:30%">Action</th><th>Why / acceptance</th></tr>
+<tr><td><b>One shared sparse linear-algebra crate</b> (filter + block Wiedemann/Lanczos, multi-word modulus, two-seed acceptance) used by every pipeline</td><td>Replaces ≥ 4 Wiedemann/Lanczos copies and 65 elimination sites. Lifts the r &lt; 2<sup>63</sup> cap. Session logs already name "replace O(B³) dense LA with sparse". Acceptance: the same relations give the same log on all pipelines, and counted LA ops do not increase.</td></tr>
+<tr><td><b>Multi-word field/point layer</b> (one <code>Field</code> trait over u64 / u128 / limbs, for F<sub>2<sup>n</sup></sub> and F<sub>p</sub>)</td><td>Removes the n ≤ 62 / 64-var ceilings outside the Koblitz-only wide paths, and lets <code>icx</code> run instead of estimate. This is the engine audit's "real blocker to standard sizes".</td></tr>
+<tr><td><b>Attack cold setup and rank stages</b></td><td>Setup is about 99% of cold S at n41–61. At n = 83 the rank stage is 35.5% and the index build 39.0%. Make the batched lock-step table solver the prime default (53–177× faster than the sweep) and cut the O(B²) table build.</td></tr>
+<tr><td><b>De-fork cryptanalysis <code>suite/</code></b>: depend on crypto crates (or vendor them by a pinned hash) instead of a hand-diverged copy; collapse the hashed/tensor family to one crate and the hyperelliptic family to one engine with a native backend</td><td>Ends cross-repo drift: the n41–83 baseline rows already use crypto binaries while their evidence lives in cryptanalysis.</td></tr>
+<tr><td>Wire Cantor–Zassenhaus (and the radical d ≤ 4 finder in flight) into every prime root-finding path; drop the silent-<code>[]</code> brute force</td><td>Removes the 20-bit prime ceiling.</td></tr>
+<tr><td>Finish the Faugère–Lachartre split for Boolean F4 (#4562); land the three lost Gröbner engines with counters</td><td>Engine work that was already shown positive but never landed.</td></tr>
+</table>
+
+<h3>P2: research levers that could change the exponent (months)</h3>
+<table>
+<tr><th style="width:30%">Lever</th><th>Rationale / cheapest falsifier</th></tr>
+<tr><td>Closure solving degree ≤ 3 at m = 4, held at ℓ ≥ 5 (CERTICOM131 falsifier); relation shape 5+-sums for ECC2K-130</td><td>The only stated Koblitz route to a smaller exponent. Falsifier: degree of regularity rises at the next ℓ.</td></tr>
+<tr><td>Prime field: confirm or break the p<sup>2/3</sup> collection law at 36–40 bits; look for factor bases with κ slope &gt; 0</td><td>If p<sup>2/3</sup> holds, generic prime IC is exponentially behind rho (p<sup>1/2</sup>). Effort should then go only to algebraic oracles with a falling solving degree.</td></tr>
+<tr><td>Transfer-aware IC: widen the operational reach of the JV weak class (currently about 1% of curves) and the GHS-weak family, with fully charged transfer cost</td><td>The only families below rho today. Counts as T-tier only when transfer and identification are charged on cold, public, preregistered targets.</td></tr>
+<tr><td>Genus 2/3: g2plus L01 pencil sieve (3–5×), L03 base re-balance (−36–40%), the genus-3 positive-control W arm (1.72×)</td><td>Cheapest route to a validated sub-rho Jacobian row. Rerun L06/L08 per their notes.</td></tr>
+<tr><td>Deprioritise: the √r-bounded generic tracks (k-sum, pair claw, Curve25519 autolab) as rho-beating vehicles</td><td>Useful as baselines and engineering testbeds only: they cannot cross rho by construction.</td></tr>
+</table>
+
+<div class="box warn"><b>Caveat on this report.</b> It is an accounting and survey document. It establishes no improvement and changes no row. All figures are producer assertions (<code>[pcc:unverified]</code>) quoted from the paths given. The survey agents' LOC and test counts were spot-checked, not exhaustively re-derived.</div>
+
+<h2>9. Verification log and sources</h2>
+<p class="small">Re-checked by hand in this session: <code>pcc.py standing-by-type</code> (data 2068, interpretive 1310, literature 15, untyped 151: all unverified); <code>MATRIX_NAMES</code> in <code>ic_framework/linalg.rs:1146</code>; the <code>find_roots_fp</code> doc at <code>ec_index_calculus.rs:345–354</code>; FRAMEWORK.md lines 868 and 916; <code>koblitz_index_calculus.rs.rej.orig</code> present; five GPU READMEs with "No kernel here has been run"; 663 .rs files under <code>src/cryptanalysis</code>; the leaderboard GHS-weak lines 938, 965 and 1067; the <code>hashed-ecdl-tensor</code> src diff (48 entries) against README line 33; cryptanalysis BASELINES.md n = 83 row (2.043); the <code>progress-timeline.json</code> parse error at line 565.</p>
+<p class="small">Primary sources. crypto: <code>docs/ic/{LEADERBOARD.md, leaderboard.json, SUCCESS_CRITERIA.md, FRAMEWORK.md, ENGINE_AUDIT_AND_DESIGN.md, SOLVER_SELECTION.md, GROEBNER_F4F5F6_AUDIT_20261010.md, M4GB_INTEGRATION_ASSESSMENT_20261110.md, STANDARD_PANEL.md, CERTICOM131_IC_PROGRAM.md, T20_REVIEW_20261020.md}</code>, <code>RESEARCH_IC_LEADS_ASSESSMENT_20261018.md</code>, <code>RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md</code>, <code>RESEARCH_ECC2K130_IC_FEASIBILITY.md</code>, <code>research/{prime_ic_collection_frontier_20261117, bitop_ladder_20261019, g2plus_leads_20261116, twist_index_calculus_20261020, jv_walk_charge_20261111, ic_gpu_measure_20261112}</code>, <code>docs/ACTIVE.md</code>, <code>docs/session-logs/2026-11-17.md</code>. cryptanalysis: <code>docs/ic/BASELINES.md</code>, <code>suite/docs/ic/ENGINE_AUDIT_AND_DESIGN.md</code>, <code>papers/ecdlp-constant/sec-indexcalc.tex</code>, <code>experiments/{ic-bench, prime-field-auxiliary-ic, ic-pair-index-gather-20261117, chained-transfer-public-target}</code>, <code>research/xedni_lift_success_20261112/RESULTS.md</code>, <code>benchmarks/progress/PROGRESS.md</code>.</p>
+<p class="small">Figures are regenerated by <code>python3 docs/ic/state-of-ic-20261118/make_charts.py</code> (run from the crypto root).</p>
+</body></html>

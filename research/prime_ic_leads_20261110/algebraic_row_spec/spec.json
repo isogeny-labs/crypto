@@ -1,0 +1,189 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Prime-field algebraic track, first counted row: pkm-semaev m=2 on prime-isogeny, Table B curves fp16/fp18/fp20",
+  "description": "research/prime_ic_leads_20261110/algebraic_row_spec/README.md. Counted S in GAE across the 5a band; wall time descriptive only (L0, no A/A-timing claim). Public synthetic Table B curves and hashed public targets; no security claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_roster",
+        "bits": 16
+      },
+      {
+        "kind": "prime_roster",
+        "bits": 18
+      },
+      {
+        "kind": "prime_roster",
+        "bits": 20
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 1504454584,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "inc-n20",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=20",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "inc-n32",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "inc-n51",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=51",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "iso-t4-m2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=4",
+          "oracle": "pkm-semaev:m=2,mode=full",
+          "max_trials": "400000"
+        }
+      }
+    },
+    {
+      "name": "iso-t5-m2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=5",
+          "oracle": "pkm-semaev:m=2,mode=full",
+          "max_trials": "400000"
+        }
+      }
+    },
+    {
+      "name": "iso-t6-m2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=6",
+          "oracle": "pkm-semaev:m=2,mode=full",
+          "max_trials": "400000"
+        }
+      }
+    },
+    {
+      "name": "iso-t5-m2-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=5",
+          "oracle": "pkm-semaev:m=2,mode=full",
+          "max_trials": "400000"
+        }
+      }
+    },
+    {
+      "name": "iso-t4-m2-grid",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=4",
+          "oracle": "pkm-semaev:m=2,mode=full,engine=exhaustive",
+          "max_trials": "400000"
+        }
+      }
+    },
+    {
+      "name": "iso-t5-m2-grid",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=5",
+          "oracle": "pkm-semaev:m=2,mode=full,engine=exhaustive",
+          "max_trials": "400000"
+        }
+      }
+    },
+    {
+      "name": "iso-t6-m2-grid",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=6",
+          "oracle": "pkm-semaev:m=2,mode=full,engine=exhaustive",
+          "max_trials": "400000"
+        }
+      }
+    },
+    {
+      "name": "iso-t4-m2-xchk",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=4",
+          "oracle": "pkm-semaev:m=2,mode=full,crosscheck=1",
+          "max_trials": "400000"
+        }
+      }
+    },
+    {
+      "name": "iso-t5-m2-xchk",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=5",
+          "oracle": "pkm-semaev:m=2,mode=full,crosscheck=1",
+          "max_trials": "400000"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 976050496,
+    "isolation_required": "L0",
+    "timeout_seconds": 7200
+  }
+}

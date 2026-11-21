@@ -1,0 +1,10 @@
+{"arms": {"new_c1": {"batched": true, "pair_layout": "bucketed (default)", "c": 1.0},
+          "old_c1": {"batched": true, "pair_layout": "sorted + binary search (IC_PAIR_SORTED=1)", "c": 1.0},
+          "new_c2": {"batched": true, "pair_layout": "bucketed (default)", "c": 2.0},
+          "old_c2": {"batched": true, "pair_layout": "sorted + binary search (IC_PAIR_SORTED=1)", "c": 2.0},
+          "bsgs_tuned": {"mode": "tuned"}},
+ "T": [1000, 10000], "bits": [25, 29, 31], "instances": {"25": 2, "29": 2, "31": 1}, "extra": 6,
+ "order": "per (bits, T): new_c1, old_c1, new_c2, old_c2, bsgs (same binary; the layout is switched by the environment variable)",
+ "basis": "bucketed layout explored at 27 bits only (exploratory timings, 27-bit total at c = 1 about halved); 25/29/31-bit curves not used for any tuning of this arm",
+ "prediction": "new_c1 / old_c1 <= 0.75 at T = 1000 (median over rows); new_c2 / old_c2 <= 0.85 at T = 1000; new_c2 / old_c2 <= 0.9 at T = 10000; all returned logs verified",
+ "abandon_if": "new_c1 / old_c1 median >= 1.0 at T = 1000"}

@@ -1,0 +1,16 @@
+{
+  "schema":"experiment.protocol/v1",
+  "id":"KOBLITZ-R107-MARKED23-LAMBDA-LOCAL-COEFFICIENTS",
+  "version":1,
+  "goal":"compute exact lambda coefficient orders over both x=1 base completions through s^32",
+  "claims":[{"id":"local_coefficients107","class":"exact_computation","statement":"all R51 lambda terms give source-bound F4[[s]] coefficient orders or certified lower bounds at both base places"}],
+  "arms":{"reference":"R101 x=1 lambda fiber","candidate":"R51 G51 substitution through R106 base series","positive":["R101 u^16+u^8 fiber","29 source terms","F4 translated coefficients"],"negative":["changed donor hash rejected"],"baseline":{"not_applicable_reason":"exact algebra"},"A_A":{"not_applicable_reason":"deterministic exact computation"}},
+  "variables":{"fixed":["R51/R105/R106 SHA-256 pins","F2[[s]]/s^32","F4 alpha^2+alpha+1"],"measured":["lambda coefficient supports","u-adic coefficient orders","leading F4 scalars"],"statistical":"not applicable"},
+  "randomization":{"method":"fixed","reason":"exact computation"},
+  "blinding":{"method":"none","reason":"exact computation"},
+  "sample_size":{"instances":2,"replicates":1,"power":"not applicable"},
+  "metrics":["coefficient valuation or lower bound","leading F4 scalar","replay"],
+  "execution":{"backend":"source-bound Python exact series","source_gate":"committed protocol/source and donor hashes","queue":"one serial attempt","checkpoint":"retain raw attempts"},
+  "stopping":{"accept":"all source pins, R101 fiber, exact coefficients, negative control and fresh replay","failure":"retain and amend before rerun"},
+  "analysis":{"method":"binary series substitution then F4 lambda translation","scope":"truncated local Newton input, not complete normalization"}
+}

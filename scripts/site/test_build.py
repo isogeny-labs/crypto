@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import ast
 import os
 import re
 import tempfile
@@ -541,11 +542,62 @@ class BuildTests(unittest.TestCase):
         self.assertNotIn("write", permissions.group(1))
         test_job = re.search(r"^  test:\n((?:    .*\n|\n)*)", workflow, re.M)
         self.assertIsNotNone(test_job)
-        self.assertIn("if: github.event_name == 'pull_request'", test_job.group(1))
         self.assertNotRegex(test_job.group(1), r"actions/(?:deploy-pages|upload-pages-artifact)@")
-        publish = re.search(r"^  publish:\n    if: ([^\n]+)", workflow, re.M)
+        publish = re.search(r"^  publish:\n((?:    .*\n|\n)*)", workflow, re.M)
         self.assertIsNotNone(publish)
-        self.assertEqual(publish.group(1), "(github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')) && !inputs.source_connection_check")
+
+        def runs(job, context):
+            # YAML folding and optional expression wrappers must not change
+            # what this security boundary tests: PRs validate, never publish.
+            condition = re.search(r"^    if:[ \t]*(.*)$", job, re.M)
+            self.assertIsNotNone(condition, "job has no scheduling condition")
+            expression = condition.group(1).strip()
+            if expression in (">", ">-", "|", "|-"):
+                chunks = []
+                for line in job[condition.end():].splitlines():
+                    if not line.strip():
+                        continue
+                    if not line.startswith("      "):
+                        break
+                    chunks.append(line.strip())
+                expression = " ".join(chunks)
+            if expression.startswith("${{") and expression.endswith("}}"):
+                expression = expression[3:-2].strip()
+            for key, value in context.items():
+                expression = expression.replace(key, repr(value))
+            expression = expression.replace("&&", " and ").replace("||", " or ")
+            expression = re.sub(r"!(?!=)", " not ", expression).strip()
+            tree = ast.parse(expression, mode="eval")
+            allowed = (
+                ast.Expression, ast.BoolOp, ast.UnaryOp, ast.Compare,
+                ast.And, ast.Or, ast.Not, ast.Eq, ast.NotEq, ast.Constant,
+            )
+            self.assertTrue(all(isinstance(node, allowed) for node in ast.walk(tree)))
+            return eval(compile(tree, "<workflow condition>", "eval"), {"__builtins__": {}})
+
+        for event in ("pull_request", "pull_request_target", "push", "schedule",
+                      "release", "workflow_dispatch", "merge_group"):
+            for draft in (False, True):
+                for ref in ("refs/heads/main", "refs/heads/feature"):
+                    for connection_check in (False, True):
+                        context = {
+                            "github.event_name": event,
+                            "github.event.pull_request.draft": draft,
+                            "github.ref": ref,
+                            "inputs.source_connection_check": connection_check,
+                        }
+                        with self.subTest(**context):
+                            self.assertIs(
+                                runs(test_job.group(1), context),
+                                event == "pull_request" and not draft,
+                            )
+                            self.assertIs(
+                                runs(publish.group(1), context),
+                                not draft and not connection_check and (
+                                    event in ("schedule", "workflow_dispatch")
+                                    or (event == "push" and ref == "refs/heads/main")
+                                ),
+                            )
         self.assertRegex(workflow, r"(?m)^  workflow_dispatch:")
         for trigger in ("push", "pull_request"):
             # The trigger's block is everything indented deeper than its key,
@@ -945,14 +997,27 @@ class BuildTests(unittest.TestCase):
         spec = importlib.util.spec_from_file_location("build_lab_browser", os.path.join(ROOT, "scripts", "build_lab_browser.py"))
         builder = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(builder)
-        fresh = builder.build()
-        committed = read(os.path.join(ROOT, "docs", "browser", "data.json"))
         source = builder.RepositoryInputs(ROOT)
-        # Mention statistics are volatile (see builder.comparable); the rest
-        # must match a fresh build exactly.
-        self.assertEqual(builder.comparable(json.loads(committed)), builder.comparable(fresh), "docs/browser/data.json is stale; run python3 scripts/build_lab_browser.py")
-
+        committed = read(os.path.join(ROOT, "docs", "browser", "data.json"))
         data = json.loads(committed)
+        if data.get("native_campaign"):
+            # The native producer checks every generated byte and its pinned
+            # historical inputs. Do not recompute native sessions in Python.
+            import subprocess
+
+            result = subprocess.run(
+                ["cargo", "+1.98.0", "run", "--release", "--locked", "--manifest-path",
+                 "research/ecbench_open_questions_20261014/native-publish/Cargo.toml", "--", "--check"],
+                cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                text=True, timeout=180,
+            )
+            self.assertEqual(result.returncode, 0, result.stdout[-12000:])
+        else:
+            fresh = builder.build()
+            # Historical mention statistics are volatile; all other fields
+            # still have to match their own producer exactly.
+            self.assertEqual(builder.comparable(data), builder.comparable(fresh), "docs/browser/data.json is stale; run python3 scripts/build_lab_browser.py")
+
         registry = json.loads(read(os.path.join(ROOT, "docs", "curves", "registry.json")))
         slugs = {c["slug"] for c in data["curves"]}
         self.assertEqual(slugs, {c["slug"] for c in registry["curves"]}, "every registered curve and no other")
