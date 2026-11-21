@@ -11,15 +11,15 @@ the A cases the stub fails every call, so "0 API calls" means the refusal came b
 **Runs.** `bash tests/run_tests.sh` from `runpod_capped/` writes nothing in the repository and prints the results;
 `bash tests/run_tests.sh --write` also replaces `tests/out/`, `tests/results.tsv` and this file.
 
-**The image layer.** 53 of the 177 cases (launch, fetch, four reaper cases and five refusals that come after the
+**The image layer.** 53 of the 188 cases (launch, fetch, four reaper cases and five refusals that come after the
 binary check) need the image layer: `RPC_LAYER_SRC` (the layer tarball, SHA-256 `a0f7e28e…`, `image.json`
 `layer.digest`) and `RPC_BIN_SRC` (its `usr/local/bin`; defaults in the session scratchpad). Without them those
-cases print `SKIP-NEEDS-LAYER`: a run without the layer gives 124 results and 53 skips; a run with
-it gives 177 results.
+cases print `SKIP-NEEDS-LAYER`: a run without the layer gives 135 results and 53 skips; a run with
+it gives 188 results.
 
-Groups: A refusals before any API call (allow-list, order, the one stage, the pinned request); B launch paths (v2 create
+Groups: A refusals before any API call (allow-list, order, the one stage cap:14:0:7:54000000000, the pinned request); B launch paths on the 32 vCPU / 256 GB pod (v2 create
 body and checks, the study guard, pagination); C `fetch.sh` flows, with the git gate in C02-C02c; D the outcome
-classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 field names; E the order
+classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 field names, with the memory rule of owner decision 24 in D25-D37; R the reading at cap 7; E the order
 (`next_allowed`); F `reap.sh`; G syntax, pins, the request and the absence of v1 calls. Per-case output:
 `out/<id>.txt`. Machine-readable table: `results.tsv`. Every result here is `[pcc:unverified]`.
 
@@ -34,8 +34,8 @@ classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 f
 | A07 | PASS | order: -r1 requested when the base is ADMITTED | exit 3, 0 API calls | exit 3, 0 API calls |
 | A08 | PASS | order: -r1 requested when the base is LOST with relaunch owner | exit 3, 0 API calls | exit 3, 0 API calls |
 | A09 | PASS | order: -r1 requested while the base is in flight (receipts, no outcome) | exit 3, 0 API calls | exit 3, 0 API calls |
-| A10 | PASS | stage cap 6 at -m112 for the base name (only cap:14:0:7:27900000000) | exit 3, 0 API calls | exit 3, 0 API calls |
-| A11 | PASS | stage cap 7 at the 56Gi --max-dense for the base name | exit 3, 0 API calls | exit 3, 0 API calls |
+| A10 | PASS | stage cap 7 at the -m112 --max-dense for the base name (only cap:14:0:7:54000000000) | exit 3, 0 API calls | exit 3, 0 API calls |
+| A11 | PASS | stage cap 6 at --max-dense 54e9 for the base name | exit 3, 0 API calls | exit 3, 0 API calls |
 | A12 | PASS | '## Amendment 33' not in PREREGISTRATION.md | exit 3, 0 API calls | exit 3, 0 API calls |
 | A13 | PASS | rp_pinned.sh modified (one line appended) | exit 3, 0 API calls | exit 3, 0 API calls |
 | A14 | PASS | server_pinned.py modified (one line appended) | exit 3, 0 API calls | exit 3, 0 API calls |
@@ -57,25 +57,26 @@ classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 f
 | A29 | PASS | development stage with --max-dense 999 | exit 3, 0 API calls | exit 3, 0 API calls |
 | A30 | PASS | a draft Amendment 18 name (pkm-x-t14-k1-c6) | exit 3, 0 API calls | exit 3, 0 API calls |
 | A31 | PASS | a draft Amendment 18 name (pkm-x-t13-k0-c6-r3) | exit 3, 0 API calls | exit 3, 0 API calls |
-| A32 | PASS | draw 1 of the same cap (not this route's cell) | exit 3, 0 API calls | exit 3, 0 API calls |
+| A32 | PASS | draw 1 of the same cap (needs a later owner decision) | exit 3, 0 API calls | exit 3, 0 API calls |
+| A33 | PASS | the retired name of owner decision 23 (pkm-x-t14-k0-c7-m112) | exit 3, 0 API calls | exit 3, 0 API calls |
 | B01 | PASS | a pkm-x- pod is live (serial rule) | exit 3, no create | exit 3, creates 0 |
 | B02 | PASS | catalog availability NONE for cpu5m at 16 vCPU: no attempt | exit 10, no create, no receipts dir | exit 10, creates 0, dir no |
-| B03 | PASS | price 0.084 x 16 = 1.344/h x 30 h = US$40.32 > US$40 | exit 3 (per-job guard), no create | exit 3, creates 0 |
-| B04 | PASS | ledger US$465.84 + 13.00 = 478.84, + worst case US$31.20 = 510.04 > US$510 | exit 3 (study guard) | exit 3, creates 0 |
-| B04b | PASS | ledger US$478.74 + worst case US$31.20 = 509.94 <= US$510 | exit 0 (started) | exit 0, creates 1 |
+| B03 | PASS | price 0.068 x 32 = 2.176/h x 30 h = US$65.28 > US$65 | exit 3 (per-job guard), no create | exit 3, creates 0 |
+| B04 | PASS | ledger US$465.84 + 6.77 = 472.61, + worst case US$62.40 = 535.01 > US$535 | exit 3 (study guard) | exit 3, creates 0 |
+| B04b | PASS | ledger US$472.59 + worst case US$62.40 = 534.99 <= US$535 | exit 0 (started) | exit 0, creates 1 |
 | B05 | PASS | create response cloud COMMUNITY (not the SECURE tier) | exit 4, delete logged then made, receipts -> .prestart-1, ledger row closed | exit 4, pods left 0 |
-| B06 | PASS | create response cost 0.98 differs from the catalog price (0.065 x 16 = 1.04) | exit 4, pod deleted | exit 4, pods left 0 |
+| B06 | PASS | create response cost 0.98 differs from the catalog price (0.065 x 32 = 2.08) | exit 4, pod deleted | exit 4, pods left 0 |
 | B07 | PASS | create call timed out but the pod exists (trap set before create) | exit 4, pod found by name and deleted | exit 4, pods left 0 |
 | B08 | PASS | create refused by the API (HTTP 400), no pod exists | exit 4, receipts -> .nocreate-*, name free | exit 4 |
 | B09 | PASS | runner would start more than 55 min after creation | exit 5, pod deleted, not an attempt | exit 5 |
 | B10 | PASS | development launch end to end against the v2 stub | exit 0; v2 create body keys only; token and key absent from receipts and create argv; command and env dropped from saved records; cgroup limit read before start; data center read when ready; ledger row at 30 h; no v1 or GraphQL call | exit 0; X-Token argv lines (rp_pinned.sh, disclosed): 13 |
-| B11 | PASS | study launch pkm-x-t14-k0-c7-m112, then pkm-x-t14-k0-c7-m112-r1 | the study run starts with stage cap:14:0:7:27900000000 and the pinned request (exit 0); its -r1 is refused while it is in flight (exit 3) | exit 0 then 3 |
+| B11 | PASS | study launch pkm-x-t14-k0-c7-d54, then pkm-x-t14-k0-c7-d54-r1 | the study run starts with stage cap:14:0:7:54000000000 and the pinned request (exit 0); its -r1 is refused while it is in flight (exit 3) | exit 0 then 3 |
 | B12 | PASS | the pod start command parses and carries server_pinned.py (= runpod/server.py at d2a16c723d) | bash -n ok; embedded runner sha256 f56fd08e... | bash -n 0; embedded sha256 f56fd08e |
 | B13 | PASS | the boot loop copies cgroup v2 files and writes its final copy after runner_state.json | memory.max, memory.events and final-at copied | final-at fstype memory.events memory.max proc-self-cgroup snapshot-at  |
-| B14 | PASS | S4: cgroup memory.max 60,000,000,000 bytes (< 112 GiB) | exit 4 before start, pod deleted | exit 4 |
+| B14 | PASS | S4: cgroup memory.max 255,999,999,999 bytes (one byte under the 256,000,000,000 floor) | exit 4 before start, pod deleted | exit 4 |
 | B15 | PASS | S4: no cgroup memory limit file before start (unobservable: owner) | exit 4 before start, pod deleted | exit 4 |
 | B16 | PASS | N6: receipts and token lost after a launch, pod gone: the same name is refused | exit 0, then exit 3 (ledger row) | exit 0 then 3 |
-| B17 | PASS | GET record cpu.memory 64 GB, below the 121 GB floor (112 GiB) | exit 4 before start, pod deleted | exit 4 |
+| B17 | PASS | GET record cpu.memory 128 GB, below the 256 GB floor | exit 4 before start, pod deleted | exit 4 |
 | B18 | PASS | the record read when the runner answers has no data center id | exit 4 before upload, pod deleted | exit 4 |
 | B19 | PASS | v2 list pagination: a live pkm-x- pod on page 2 (serial rule) | exit 3, the second page was read | exit 3, creates 0 |
 | B20 | PASS | create answered 202 (queued) instead of 201: not accepted | exit 4, pod deleted | exit 4 |
@@ -131,9 +132,9 @@ classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 f
 | D21 | PASS | N2: completed in time but the transfer check still failed at the hard deadline | NO_EVIDENCE P7 | NO_EVIDENCE P7 |
 | D22 | PASS | a file of the kept tree changed after collection (rule 6) | NOT_ADMITTED P2e | NOT_ADMITTED P2e |
 | D23 | PASS | create response cloud COMMUNITY (rule 7) | NOT_ADMITTED P2e | NOT_ADMITTED P2e |
-| D23b | PASS | GET record cpu.memory 64, below the 121 GB floor (rule 7) | NOT_ADMITTED P2e | NOT_ADMITTED P2e |
+| D23b | PASS | GET record cpu.memory 64, below the 256 GB floor (rule 7) | NOT_ADMITTED P2e | NOT_ADMITTED P2e |
 | D23c | PASS | request record with an interruptible field (rule 7) | NOT_ADMITTED P2e | NOT_ADMITTED P2e |
-| D23d | PASS | create response cost 1.05 differs from the catalog price 1.04 (rule 7) | NOT_ADMITTED P2e | NOT_ADMITTED P2e |
+| D23d | PASS | create response cost 2.09 differs from the catalog price 2.08 (rule 7) | NOT_ADMITTED P2e | NOT_ADMITTED P2e |
 | D23e | PASS | no GET record after create: cpu.memory unobservable (rule 7 fails closed) | NOT_ADMITTED P2e | NOT_ADMITTED P2e |
 | D24 | PASS | owner decision 13: pod gone from the list and v2 GET 404, before any logged session action | LOST P3 relaunch=auto | LOST P3 relaunch=auto |
 | D24c | PASS | pod gone and GET 404 after a logged session delete | LOST P3 relaunch=owner | LOST P3 relaunch=owner |
@@ -145,19 +146,28 @@ classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 f
 | D44b | PASS | R2 probe P3: runner seen done, then gone with GET 404 after the run deadline | LOST P6 relaunch=owner | LOST P6 relaunch=owner |
 | D45 | PASS | v2 status ERROR | LOST P3 relaunch=owner | LOST P3 relaunch=owner |
 | D46 | PASS | v2 status STARTING after the runner's start (the container is starting again) | LOST P3 relaunch=owner | LOST P3 relaunch=owner |
-| D25 | PASS | memory: development size 56Gi, pilot 30 GiB | ADMITTED P2d source=pilot_log_VmHWM_MiB | ADMITTED P2d source=pilot_log_VmHWM_MiB |
-| D26 | PASS | memory: development size 56Gi, pilot 70 GiB: no 56 GiB step any more | ADMITTED P2d source=pilot_log_VmHWM_MiB | ADMITTED P2d source=pilot_log_VmHWM_MiB |
-| D27 | PASS | memory: -m112 attempt, pilot 125 GiB (> 112 GiB): OOM, censored (owner decision 15) | OOM P2p source=pilot_log_VmHWM_MiB | OOM P2p source=pilot_log_VmHWM_MiB |
-| D28 | PASS | memory: -m112, pilot 64 MiB and cgroup 120 GiB -> pilot (primary); cgroup ignored | ADMITTED P2d source=pilot_log_VmHWM_MiB | ADMITTED P2d source=pilot_log_VmHWM_MiB |
-| D28b | PASS | memory: -m112, no pilot line, cgroup v2 120 GiB -> cgroup fallback, > 112 GiB | OOM P2p source=cgroup_v2_memory.peak | OOM P2p source=cgroup_v2_memory.peak |
-| D29 | PASS | memory: no pilot line, no cgroup file -> none | NOT_ADMITTED P2u source=none | NOT_ADMITTED P2u source=none |
-| D30 | PASS | memory: -m112, no pilot line, cgroup v1 max_usage 100 GiB -> v1 fallback | ADMITTED P2d source=cgroup_v1_memory.max_usage_in_bytes | ADMITTED P2d source=cgroup_v1_memory.max_usage_in_bytes |
-| D31 | PASS | memory: -m112, pilot 113 GiB -> OOM (owner decision 15) | OOM P2p source=pilot_log_VmHWM_MiB | OOM P2p source=pilot_log_VmHWM_MiB |
-| D32 | PASS | memory: -m112, pilot 100 GiB | ADMITTED P2d source=pilot_log_VmHWM_MiB | ADMITTED P2d source=pilot_log_VmHWM_MiB |
-| D33 | PASS | memory: -m112, pilot exactly 112 GiB (not above) | ADMITTED P2d source=pilot_log_VmHWM_MiB | ADMITTED P2d source=pilot_log_VmHWM_MiB |
-| D34 | PASS | memory: -m112, exit 137, oom_kill 0 | LOST P2c source=pilot_log_VmHWM_MiB | LOST P2c source=pilot_log_VmHWM_MiB |
-| D36 | PASS | memory: -m112, pilot 30 GiB but exit 137 with oom_kill 1 -> OOM whatever the peak | OOM P2b source=pilot_log_VmHWM_MiB | OOM P2b source=pilot_log_VmHWM_MiB |
-| D37 | PASS | -m112 row with oversize true: admitted as a row; the reading treats it as censored (Amendments 7 B, 14) | ADMITTED P2d source=pilot_log_VmHWM_MiB | ADMITTED P2d source=pilot_log_VmHWM_MiB |
+| D25 | PASS | memory: pilot 30 GiB under the 256,000,000,000-byte limit | ADMITTED P2d source=pilot_log_VmHWM_MiB | ADMITTED P2d source=pilot_log_VmHWM_MiB |
+| D26 | PASS | memory: pilot 245,760 MiB (257,698,037,760 bytes) above memory.max 256,000,000,000: censored | OOM P2p source=pilot_log_VmHWM_MiB | OOM P2p source=pilot_log_VmHWM_MiB |
+| D27 | PASS | memory: pilot 244,140 MiB (255,999,836,160 bytes), just under memory.max | ADMITTED P2d source=pilot_log_VmHWM_MiB | ADMITTED P2d source=pilot_log_VmHWM_MiB |
+| D28 | PASS | memory: pilot 64 MiB and cgroup 250 GiB -> pilot (primary); cgroup ignored | ADMITTED P2d source=pilot_log_VmHWM_MiB | ADMITTED P2d source=pilot_log_VmHWM_MiB |
+| D28b | PASS | memory: no pilot line, cgroup v2 peak 257,000,000,000 above memory.max -> cgroup fallback | OOM P2p source=cgroup_v2_memory.peak | OOM P2p source=cgroup_v2_memory.peak |
+| D29 | PASS | memory: no pilot line, no cgroup peak file -> none | NOT_ADMITTED P2u source=none | NOT_ADMITTED P2u source=none |
+| D30 | PASS | memory: no pilot line, cgroup v1 max_usage 100 GiB -> v1 fallback | ADMITTED P2d source=cgroup_v1_memory.max_usage_in_bytes | ADMITTED P2d source=cgroup_v1_memory.max_usage_in_bytes |
+| D31 | PASS | memory: cgroup oom_kill 1 with exit 0 in the end lines -> OOM, censored | OOM P2k source=pilot_log_VmHWM_MiB | OOM P2k source=pilot_log_VmHWM_MiB |
+| D32 | PASS | memory: a 112Gi-shaped stage with pilot 113 GiB is no longer OOM (owner decision 15's step removed) | ADMITTED P2d source=pilot_log_VmHWM_MiB | ADMITTED P2d source=pilot_log_VmHWM_MiB |
+| D34 | PASS | memory: exit 137, oom_kill 0 | LOST P2c source=pilot_log_VmHWM_MiB | LOST P2c source=pilot_log_VmHWM_MiB |
+| D36 | PASS | memory: exit 137 with oom_kill 1 -> OOM whatever the peak | OOM P2b source=pilot_log_VmHWM_MiB | OOM P2b source=pilot_log_VmHWM_MiB |
+| D33 | PASS | memory: memory.max 'max' (no numeric limit) and pilot 300,000 MiB: P2p cannot fire | ADMITTED P2d | ADMITTED P2d |
+| D37 | PASS | memory: no cgroup files in the tree; the limit read before start (cgroup-prestart.json) is used for P2p | OOM P2p | OOM P2p |
+| R01 | PASS | refutes at cap 7 (inconsistent true) -> d_F = 7 | ADMITTED P2d d_F== 7 censored=- | ADMITTED P2d d_F== 7 censored=- |
+| R02 | PASS | degree 7 completed without refuting, oversize and timed_out false -> d_F >= 8 | ADMITTED P2d d_F=>= 8 censored=- | ADMITTED P2d d_F=>= 8 censored=- |
+| R03 | PASS | oversize at 54e9 (stop line oversize) -> censored, d_F >= 7 stands | ADMITTED P2d d_F=>= 7 censored=size | ADMITTED P2d d_F=>= 7 censored=size |
+| R04 | PASS | stopped by the wall budget (stop line budget) -> censored | ADMITTED P2d d_F=>= 7 censored=budget | ADMITTED P2d d_F=>= 7 censored=budget |
+| R05 | PASS | row oversize true but the stop line says budget -> no reading (owner) | ADMITTED P2d d_F=none censored=- | ADMITTED P2d d_F=none censored=- |
+| R06 | PASS | degree 6 reached, nothing stopped it -> no reading (owner) | ADMITTED P2d d_F=none censored=- | ADMITTED P2d d_F=none censored=- |
+| R07 | PASS | cgroup oom_kill 1 -> OOM, censored at the new size | OOM P2k d_F=>= 7 censored=memory | OOM P2k d_F=>= 7 censored=memory |
+| R08 | PASS | exit 137 with oom_kill 1 -> OOM, censored | OOM P2b d_F=>= 7 censored=memory | OOM P2b d_F=>= 7 censored=memory |
+| R09 | PASS | runner ended after the run deadline -> LIMIT, censored | LIMIT P2a d_F=>= 7 censored=time limit | LIMIT P2a d_F=>= 7 censored=time limit |
 | D38 | PASS | runner idle and status EXITED | LOST P3 relaunch=owner | LOST P3 relaunch=owner |
 | D39 | PASS | status EXITED after the session logged a delete | LOST P3 relaunch=owner | LOST P3 relaunch=owner |
 | D40 | PASS | S2: a truncated check-in line fails closed | NO_EVIDENCE P0 | NO_EVIDENCE P0 |
@@ -166,18 +176,18 @@ classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 f
 | D41 | PASS | N3b: two done collections of the pod disagree file by file | NO_EVIDENCE P0b | NO_EVIDENCE P0b |
 | D41b | PASS | N3b: two done collections agree | ADMITTED P2d | ADMITTED P2d |
 | D42 | PASS | S2: a zero-byte start.json (no response) is read as absent; the start comes from the check-in | PENDING P8 | PENDING P8 |
-| E01 | PASS | nothing run yet | pkm-x-t14-k0-c7-m112 | pkm-x-t14-k0-c7-m112 |
-| E02 | PASS | base LOST with host-side evidence (relaunch auto) | pkm-x-t14-k0-c7-m112-r1 | pkm-x-t14-k0-c7-m112-r1 |
+| E01 | PASS | nothing run yet | pkm-x-t14-k0-c7-d54 | pkm-x-t14-k0-c7-d54 |
+| E02 | PASS | base LOST with host-side evidence (relaunch auto) | pkm-x-t14-k0-c7-d54-r1 | pkm-x-t14-k0-c7-d54-r1 |
 | E03 | PASS | N3a: base LOST without host-side evidence (relaunch owner) | ALL_RESOLVED | ALL_RESOLVED |
 | E04 | PASS | N1: base ABORTED uses the attempt; no relaunch | ALL_RESOLVED | ALL_RESOLVED |
 | E05 | PASS | base ADMITTED | ALL_RESOLVED | ALL_RESOLVED |
-| E06 | PASS | base ADMITTED with oversize true: censored at 112Gi, no further size step | ALL_RESOLVED | ALL_RESOLVED |
-| E07 | PASS | base OOM at 112Gi: censored, no further size step | ALL_RESOLVED | ALL_RESOLVED |
+| E06 | PASS | base ADMITTED with oversize true: censored at 54e9, no further size step | ALL_RESOLVED | ALL_RESOLVED |
+| E07 | PASS | base OOM at the 256 GB pod: censored, no further size step | ALL_RESOLVED | ALL_RESOLVED |
 | E08 | PASS | base LIMIT (censored, not re-run) | ALL_RESOLVED | ALL_RESOLVED |
 | E09 | PASS | base NOT_ADMITTED (owner) | ALL_RESOLVED | ALL_RESOLVED |
 | E10 | PASS | N2: base NO_EVIDENCE goes to the owner | ALL_RESOLVED | ALL_RESOLVED |
-| E11 | PASS | base in flight | BLOCKED:pkm-x-t14-k0-c7-m112 | BLOCKED:pkm-x-t14-k0-c7-m112 |
-| E12 | PASS | base LOST auto, relaunch in flight | BLOCKED:pkm-x-t14-k0-c7-m112-r1 | BLOCKED:pkm-x-t14-k0-c7-m112-r1 |
+| E11 | PASS | base in flight | BLOCKED:pkm-x-t14-k0-c7-d54 | BLOCKED:pkm-x-t14-k0-c7-d54 |
+| E12 | PASS | base LOST auto, relaunch in flight | BLOCKED:pkm-x-t14-k0-c7-d54-r1 | BLOCKED:pkm-x-t14-k0-c7-d54-r1 |
 | E13 | PASS | base LOST auto, relaunch LOST auto: no third attempt | ALL_RESOLVED | ALL_RESOLVED |
 | E14 | PASS | base LOST auto, relaunch ADMITTED | ALL_RESOLVED | ALL_RESOLVED |
 | F01 | PASS | reaper: 27 h old pod without receipts, 1 h old pod, other session's pod | pod past creation + 26 h deleted through v2 (logged first); young and non-pkm-x pods kept; second pass changes nothing | exit 0, left ["young1","other1"]; exit 0, left ["young1","other1"]; 3 receipt lines |
@@ -194,6 +204,7 @@ classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 f
 | G-fetch.sh | PASS | syntax of fetch.sh | bash -n ok | rc 0 |
 | G-reap.sh | PASS | syntax of reap.sh | bash -n ok | rc 0 |
 | G-rp_pinned.sh | PASS | syntax of rp_pinned.sh | bash -n ok | rc 0 |
+| G-make_requests_d54.sh | PASS | syntax of make_requests_d54.sh | bash -n ok | rc 0 |
 | G-make_requests_m112.sh | PASS | syntax of make_requests_m112.sh | bash -n ok | rc 0 |
 | G-run_tests.sh | PASS | syntax of tests/run_tests.sh | bash -n ok | rc 0 |
 | G-curl_stub.sh | PASS | syntax of tests/curl_stub.sh | bash -n ok | rc 0 |
@@ -201,6 +212,6 @@ classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 f
 | G-server | PASS | vendored runner = runpod/server.py at d2a16c723d | server_pinned.py sha256 f56fd08e... | f56fd08e |
 | G-v2 | PASS | REST v2 port (comments excluded) | no REST v1 or GraphQL URL and no v1 field name in the route's code | 0 hits |
 | G-rpuse | PASS | pod-proxy calls only through the pinned client | rp_pinned.sh used only for upload, start, status, fetch (its v1 create, pod, delete are never called) | 0 hits |
-| G-request | PASS | the one request (Amendments 7 B and 14) | request sha256 = pin = make_requests output; equals its derivation; four changed paths | pin 44e009f1 |
+| G-request | PASS | the one request (Amendment 7 B, owner decision 24) | request sha256 = pin = make_requests output; equals its derivation; four changed paths | pin 089176f2 |
 
-Summary of this run (image layer available: 1): 177 passed, 0 failed, 0 SKIP-NEEDS-LAYER (run 2026-11-21T20:32:19Z).
+Summary of this run (image layer available: 1): 188 passed, 0 failed, 0 SKIP-NEEDS-LAYER (run 2026-11-21T22:34:40Z).

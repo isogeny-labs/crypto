@@ -8,8 +8,8 @@ A06	PASS	exit 3, 0 API calls	exit 3, 0 API calls	order: -r1 requested with no ba
 A07	PASS	exit 3, 0 API calls	exit 3, 0 API calls	order: -r1 requested when the base is ADMITTED
 A08	PASS	exit 3, 0 API calls	exit 3, 0 API calls	order: -r1 requested when the base is LOST with relaunch owner
 A09	PASS	exit 3, 0 API calls	exit 3, 0 API calls	order: -r1 requested while the base is in flight (receipts, no outcome)
-A10	PASS	exit 3, 0 API calls	exit 3, 0 API calls	stage cap 6 at -m112 for the base name (only cap:14:0:7:27900000000)
-A11	PASS	exit 3, 0 API calls	exit 3, 0 API calls	stage cap 7 at the 56Gi --max-dense for the base name
+A10	PASS	exit 3, 0 API calls	exit 3, 0 API calls	stage cap 7 at the -m112 --max-dense for the base name (only cap:14:0:7:54000000000)
+A11	PASS	exit 3, 0 API calls	exit 3, 0 API calls	stage cap 6 at --max-dense 54e9 for the base name
 A12	PASS	exit 3, 0 API calls	exit 3, 0 API calls	'## Amendment 33' not in PREREGISTRATION.md
 A13	PASS	exit 3, 0 API calls	exit 3, 0 API calls	rp_pinned.sh modified (one line appended)
 A14	PASS	exit 3, 0 API calls	exit 3, 0 API calls	server_pinned.py modified (one line appended)
@@ -31,25 +31,26 @@ A28	PASS	exit 3, 0 API calls	exit 3, 0 API calls	S3: image.json layer digest dis
 A29	PASS	exit 3, 0 API calls	exit 3, 0 API calls	development stage with --max-dense 999
 A30	PASS	exit 3, 0 API calls	exit 3, 0 API calls	a draft Amendment 18 name (pkm-x-t14-k1-c6)
 A31	PASS	exit 3, 0 API calls	exit 3, 0 API calls	a draft Amendment 18 name (pkm-x-t13-k0-c6-r3)
-A32	PASS	exit 3, 0 API calls	exit 3, 0 API calls	draw 1 of the same cap (not this route's cell)
+A32	PASS	exit 3, 0 API calls	exit 3, 0 API calls	draw 1 of the same cap (needs a later owner decision)
+A33	PASS	exit 3, 0 API calls	exit 3, 0 API calls	the retired name of owner decision 23 (pkm-x-t14-k0-c7-m112)
 B01	PASS	exit 3, no create	exit 3, creates 0	a pkm-x- pod is live (serial rule)
 B02	PASS	exit 10, no create, no receipts dir	exit 10, creates 0, dir no	catalog availability NONE for cpu5m at 16 vCPU: no attempt
-B03	PASS	exit 3 (per-job guard), no create	exit 3, creates 0	price 0.084 x 16 = 1.344/h x 30 h = US$40.32 > US$40
-B04	PASS	exit 3 (study guard)	exit 3, creates 0	ledger US$465.84 + 13.00 = 478.84, + worst case US$31.20 = 510.04 > US$510
-B04b	PASS	exit 0 (started)	exit 0, creates 1	ledger US$478.74 + worst case US$31.20 = 509.94 <= US$510
+B03	PASS	exit 3 (per-job guard), no create	exit 3, creates 0	price 0.068 x 32 = 2.176/h x 30 h = US$65.28 > US$65
+B04	PASS	exit 3 (study guard)	exit 3, creates 0	ledger US$465.84 + 6.77 = 472.61, + worst case US$62.40 = 535.01 > US$535
+B04b	PASS	exit 0 (started)	exit 0, creates 1	ledger US$472.59 + worst case US$62.40 = 534.99 <= US$535
 B05	PASS	exit 4, delete logged then made, receipts -> .prestart-1, ledger row closed	exit 4, pods left 0	create response cloud COMMUNITY (not the SECURE tier)
-B06	PASS	exit 4, pod deleted	exit 4, pods left 0	create response cost 0.98 differs from the catalog price (0.065 x 16 = 1.04)
+B06	PASS	exit 4, pod deleted	exit 4, pods left 0	create response cost 0.98 differs from the catalog price (0.065 x 32 = 2.08)
 B07	PASS	exit 4, pod found by name and deleted	exit 4, pods left 0	create call timed out but the pod exists (trap set before create)
 B08	PASS	exit 4, receipts -> .nocreate-*, name free	exit 4	create refused by the API (HTTP 400), no pod exists
 B09	PASS	exit 5, pod deleted, not an attempt	exit 5	runner would start more than 55 min after creation
 B10	PASS	exit 0; v2 create body keys only; token and key absent from receipts and create argv; command and env dropped from saved records; cgroup limit read before start; data center read when ready; ledger row at 30 h; no v1 or GraphQL call	exit 0; X-Token argv lines (rp_pinned.sh, disclosed): 13	development launch end to end against the v2 stub
-B11	PASS	the study run starts with stage cap:14:0:7:27900000000 and the pinned request (exit 0); its -r1 is refused while it is in flight (exit 3)	exit 0 then 3	study launch pkm-x-t14-k0-c7-m112, then pkm-x-t14-k0-c7-m112-r1
+B11	PASS	the study run starts with stage cap:14:0:7:54000000000 and the pinned request (exit 0); its -r1 is refused while it is in flight (exit 3)	exit 0 then 3	study launch pkm-x-t14-k0-c7-d54, then pkm-x-t14-k0-c7-d54-r1
 B12	PASS	bash -n ok; embedded runner sha256 f56fd08e...	bash -n 0; embedded sha256 f56fd08e	the pod start command parses and carries server_pinned.py (= runpod/server.py at d2a16c723d)
 B13	PASS	memory.max, memory.events and final-at copied	final-at fstype memory.events memory.max proc-self-cgroup snapshot-at 	the boot loop copies cgroup v2 files and writes its final copy after runner_state.json
-B14	PASS	exit 4 before start, pod deleted	exit 4	S4: cgroup memory.max 60,000,000,000 bytes (< 112 GiB)
+B14	PASS	exit 4 before start, pod deleted	exit 4	S4: cgroup memory.max 255,999,999,999 bytes (one byte under the 256,000,000,000 floor)
 B15	PASS	exit 4 before start, pod deleted	exit 4	S4: no cgroup memory limit file before start (unobservable: owner)
 B16	PASS	exit 0, then exit 3 (ledger row)	exit 0 then 3	N6: receipts and token lost after a launch, pod gone: the same name is refused
-B17	PASS	exit 4 before start, pod deleted	exit 4	GET record cpu.memory 64 GB, below the 121 GB floor (112 GiB)
+B17	PASS	exit 4 before start, pod deleted	exit 4	GET record cpu.memory 128 GB, below the 256 GB floor
 B18	PASS	exit 4 before upload, pod deleted	exit 4	the record read when the runner answers has no data center id
 B19	PASS	exit 3, the second page was read	exit 3, creates 0	v2 list pagination: a live pkm-x- pod on page 2 (serial rule)
 B20	PASS	exit 4, pod deleted	exit 4	create answered 202 (queued) instead of 201: not accepted
@@ -105,9 +106,9 @@ D20	PASS	LOST P3 relaunch=owner	LOST P3 relaunch=owner	the runner's start differ
 D21	PASS	NO_EVIDENCE P7	NO_EVIDENCE P7	N2: completed in time but the transfer check still failed at the hard deadline
 D22	PASS	NOT_ADMITTED P2e	NOT_ADMITTED P2e	a file of the kept tree changed after collection (rule 6)
 D23	PASS	NOT_ADMITTED P2e	NOT_ADMITTED P2e	create response cloud COMMUNITY (rule 7)
-D23b	PASS	NOT_ADMITTED P2e	NOT_ADMITTED P2e	GET record cpu.memory 64, below the 121 GB floor (rule 7)
+D23b	PASS	NOT_ADMITTED P2e	NOT_ADMITTED P2e	GET record cpu.memory 64, below the 256 GB floor (rule 7)
 D23c	PASS	NOT_ADMITTED P2e	NOT_ADMITTED P2e	request record with an interruptible field (rule 7)
-D23d	PASS	NOT_ADMITTED P2e	NOT_ADMITTED P2e	create response cost 1.05 differs from the catalog price 1.04 (rule 7)
+D23d	PASS	NOT_ADMITTED P2e	NOT_ADMITTED P2e	create response cost 2.09 differs from the catalog price 2.08 (rule 7)
 D23e	PASS	NOT_ADMITTED P2e	NOT_ADMITTED P2e	no GET record after create: cpu.memory unobservable (rule 7 fails closed)
 D24	PASS	LOST P3 relaunch=auto	LOST P3 relaunch=auto	owner decision 13: pod gone from the list and v2 GET 404, before any logged session action
 D24c	PASS	LOST P3 relaunch=owner	LOST P3 relaunch=owner	pod gone and GET 404 after a logged session delete
@@ -119,19 +120,28 @@ D44	PASS	LOST P3 relaunch=owner	LOST P3 relaunch=owner	R2 probe P2: runner seen 
 D44b	PASS	LOST P6 relaunch=owner	LOST P6 relaunch=owner	R2 probe P3: runner seen done, then gone with GET 404 after the run deadline
 D45	PASS	LOST P3 relaunch=owner	LOST P3 relaunch=owner	v2 status ERROR
 D46	PASS	LOST P3 relaunch=owner	LOST P3 relaunch=owner	v2 status STARTING after the runner's start (the container is starting again)
-D25	PASS	ADMITTED P2d source=pilot_log_VmHWM_MiB	ADMITTED P2d source=pilot_log_VmHWM_MiB	memory: development size 56Gi, pilot 30 GiB
-D26	PASS	ADMITTED P2d source=pilot_log_VmHWM_MiB	ADMITTED P2d source=pilot_log_VmHWM_MiB	memory: development size 56Gi, pilot 70 GiB: no 56 GiB step any more
-D27	PASS	OOM P2p source=pilot_log_VmHWM_MiB	OOM P2p source=pilot_log_VmHWM_MiB	memory: -m112 attempt, pilot 125 GiB (> 112 GiB): OOM, censored (owner decision 15)
-D28	PASS	ADMITTED P2d source=pilot_log_VmHWM_MiB	ADMITTED P2d source=pilot_log_VmHWM_MiB	memory: -m112, pilot 64 MiB and cgroup 120 GiB -> pilot (primary); cgroup ignored
-D28b	PASS	OOM P2p source=cgroup_v2_memory.peak	OOM P2p source=cgroup_v2_memory.peak	memory: -m112, no pilot line, cgroup v2 120 GiB -> cgroup fallback, > 112 GiB
-D29	PASS	NOT_ADMITTED P2u source=none	NOT_ADMITTED P2u source=none	memory: no pilot line, no cgroup file -> none
-D30	PASS	ADMITTED P2d source=cgroup_v1_memory.max_usage_in_bytes	ADMITTED P2d source=cgroup_v1_memory.max_usage_in_bytes	memory: -m112, no pilot line, cgroup v1 max_usage 100 GiB -> v1 fallback
-D31	PASS	OOM P2p source=pilot_log_VmHWM_MiB	OOM P2p source=pilot_log_VmHWM_MiB	memory: -m112, pilot 113 GiB -> OOM (owner decision 15)
-D32	PASS	ADMITTED P2d source=pilot_log_VmHWM_MiB	ADMITTED P2d source=pilot_log_VmHWM_MiB	memory: -m112, pilot 100 GiB
-D33	PASS	ADMITTED P2d source=pilot_log_VmHWM_MiB	ADMITTED P2d source=pilot_log_VmHWM_MiB	memory: -m112, pilot exactly 112 GiB (not above)
-D34	PASS	LOST P2c source=pilot_log_VmHWM_MiB	LOST P2c source=pilot_log_VmHWM_MiB	memory: -m112, exit 137, oom_kill 0
-D36	PASS	OOM P2b source=pilot_log_VmHWM_MiB	OOM P2b source=pilot_log_VmHWM_MiB	memory: -m112, pilot 30 GiB but exit 137 with oom_kill 1 -> OOM whatever the peak
-D37	PASS	ADMITTED P2d source=pilot_log_VmHWM_MiB	ADMITTED P2d source=pilot_log_VmHWM_MiB	-m112 row with oversize true: admitted as a row; the reading treats it as censored (Amendments 7 B, 14)
+D25	PASS	ADMITTED P2d source=pilot_log_VmHWM_MiB	ADMITTED P2d source=pilot_log_VmHWM_MiB	memory: pilot 30 GiB under the 256,000,000,000-byte limit
+D26	PASS	OOM P2p source=pilot_log_VmHWM_MiB	OOM P2p source=pilot_log_VmHWM_MiB	memory: pilot 245,760 MiB (257,698,037,760 bytes) above memory.max 256,000,000,000: censored
+D27	PASS	ADMITTED P2d source=pilot_log_VmHWM_MiB	ADMITTED P2d source=pilot_log_VmHWM_MiB	memory: pilot 244,140 MiB (255,999,836,160 bytes), just under memory.max
+D28	PASS	ADMITTED P2d source=pilot_log_VmHWM_MiB	ADMITTED P2d source=pilot_log_VmHWM_MiB	memory: pilot 64 MiB and cgroup 250 GiB -> pilot (primary); cgroup ignored
+D28b	PASS	OOM P2p source=cgroup_v2_memory.peak	OOM P2p source=cgroup_v2_memory.peak	memory: no pilot line, cgroup v2 peak 257,000,000,000 above memory.max -> cgroup fallback
+D29	PASS	NOT_ADMITTED P2u source=none	NOT_ADMITTED P2u source=none	memory: no pilot line, no cgroup peak file -> none
+D30	PASS	ADMITTED P2d source=cgroup_v1_memory.max_usage_in_bytes	ADMITTED P2d source=cgroup_v1_memory.max_usage_in_bytes	memory: no pilot line, cgroup v1 max_usage 100 GiB -> v1 fallback
+D31	PASS	OOM P2k source=pilot_log_VmHWM_MiB	OOM P2k source=pilot_log_VmHWM_MiB	memory: cgroup oom_kill 1 with exit 0 in the end lines -> OOM, censored
+D32	PASS	ADMITTED P2d source=pilot_log_VmHWM_MiB	ADMITTED P2d source=pilot_log_VmHWM_MiB	memory: a 112Gi-shaped stage with pilot 113 GiB is no longer OOM (owner decision 15's step removed)
+D34	PASS	LOST P2c source=pilot_log_VmHWM_MiB	LOST P2c source=pilot_log_VmHWM_MiB	memory: exit 137, oom_kill 0
+D36	PASS	OOM P2b source=pilot_log_VmHWM_MiB	OOM P2b source=pilot_log_VmHWM_MiB	memory: exit 137 with oom_kill 1 -> OOM whatever the peak
+D33	PASS	ADMITTED P2d	ADMITTED P2d	memory: memory.max 'max' (no numeric limit) and pilot 300,000 MiB: P2p cannot fire
+D37	PASS	OOM P2p	OOM P2p	memory: no cgroup files in the tree; the limit read before start (cgroup-prestart.json) is used for P2p
+R01	PASS	ADMITTED P2d d_F== 7 censored=-	ADMITTED P2d d_F== 7 censored=-	refutes at cap 7 (inconsistent true) -> d_F = 7
+R02	PASS	ADMITTED P2d d_F=>= 8 censored=-	ADMITTED P2d d_F=>= 8 censored=-	degree 7 completed without refuting, oversize and timed_out false -> d_F >= 8
+R03	PASS	ADMITTED P2d d_F=>= 7 censored=size	ADMITTED P2d d_F=>= 7 censored=size	oversize at 54e9 (stop line oversize) -> censored, d_F >= 7 stands
+R04	PASS	ADMITTED P2d d_F=>= 7 censored=budget	ADMITTED P2d d_F=>= 7 censored=budget	stopped by the wall budget (stop line budget) -> censored
+R05	PASS	ADMITTED P2d d_F=none censored=-	ADMITTED P2d d_F=none censored=-	row oversize true but the stop line says budget -> no reading (owner)
+R06	PASS	ADMITTED P2d d_F=none censored=-	ADMITTED P2d d_F=none censored=-	degree 6 reached, nothing stopped it -> no reading (owner)
+R07	PASS	OOM P2k d_F=>= 7 censored=memory	OOM P2k d_F=>= 7 censored=memory	cgroup oom_kill 1 -> OOM, censored at the new size
+R08	PASS	OOM P2b d_F=>= 7 censored=memory	OOM P2b d_F=>= 7 censored=memory	exit 137 with oom_kill 1 -> OOM, censored
+R09	PASS	LIMIT P2a d_F=>= 7 censored=time limit	LIMIT P2a d_F=>= 7 censored=time limit	runner ended after the run deadline -> LIMIT, censored
 D38	PASS	LOST P3 relaunch=owner	LOST P3 relaunch=owner	runner idle and status EXITED
 D39	PASS	LOST P3 relaunch=owner	LOST P3 relaunch=owner	status EXITED after the session logged a delete
 D40	PASS	NO_EVIDENCE P0	NO_EVIDENCE P0	S2: a truncated check-in line fails closed
@@ -140,18 +150,18 @@ D40c	PASS	NO_EVIDENCE P0	NO_EVIDENCE P0	S2: an unparsable GET record after creat
 D41	PASS	NO_EVIDENCE P0b	NO_EVIDENCE P0b	N3b: two done collections of the pod disagree file by file
 D41b	PASS	ADMITTED P2d	ADMITTED P2d	N3b: two done collections agree
 D42	PASS	PENDING P8	PENDING P8	S2: a zero-byte start.json (no response) is read as absent; the start comes from the check-in
-E01	PASS	pkm-x-t14-k0-c7-m112	pkm-x-t14-k0-c7-m112	nothing run yet
-E02	PASS	pkm-x-t14-k0-c7-m112-r1	pkm-x-t14-k0-c7-m112-r1	base LOST with host-side evidence (relaunch auto)
+E01	PASS	pkm-x-t14-k0-c7-d54	pkm-x-t14-k0-c7-d54	nothing run yet
+E02	PASS	pkm-x-t14-k0-c7-d54-r1	pkm-x-t14-k0-c7-d54-r1	base LOST with host-side evidence (relaunch auto)
 E03	PASS	ALL_RESOLVED	ALL_RESOLVED	N3a: base LOST without host-side evidence (relaunch owner)
 E04	PASS	ALL_RESOLVED	ALL_RESOLVED	N1: base ABORTED uses the attempt; no relaunch
 E05	PASS	ALL_RESOLVED	ALL_RESOLVED	base ADMITTED
-E06	PASS	ALL_RESOLVED	ALL_RESOLVED	base ADMITTED with oversize true: censored at 112Gi, no further size step
-E07	PASS	ALL_RESOLVED	ALL_RESOLVED	base OOM at 112Gi: censored, no further size step
+E06	PASS	ALL_RESOLVED	ALL_RESOLVED	base ADMITTED with oversize true: censored at 54e9, no further size step
+E07	PASS	ALL_RESOLVED	ALL_RESOLVED	base OOM at the 256 GB pod: censored, no further size step
 E08	PASS	ALL_RESOLVED	ALL_RESOLVED	base LIMIT (censored, not re-run)
 E09	PASS	ALL_RESOLVED	ALL_RESOLVED	base NOT_ADMITTED (owner)
 E10	PASS	ALL_RESOLVED	ALL_RESOLVED	N2: base NO_EVIDENCE goes to the owner
-E11	PASS	BLOCKED:pkm-x-t14-k0-c7-m112	BLOCKED:pkm-x-t14-k0-c7-m112	base in flight
-E12	PASS	BLOCKED:pkm-x-t14-k0-c7-m112-r1	BLOCKED:pkm-x-t14-k0-c7-m112-r1	base LOST auto, relaunch in flight
+E11	PASS	BLOCKED:pkm-x-t14-k0-c7-d54	BLOCKED:pkm-x-t14-k0-c7-d54	base in flight
+E12	PASS	BLOCKED:pkm-x-t14-k0-c7-d54-r1	BLOCKED:pkm-x-t14-k0-c7-d54-r1	base LOST auto, relaunch in flight
 E13	PASS	ALL_RESOLVED	ALL_RESOLVED	base LOST auto, relaunch LOST auto: no third attempt
 E14	PASS	ALL_RESOLVED	ALL_RESOLVED	base LOST auto, relaunch ADMITTED
 F01	PASS	pod past creation + 26 h deleted through v2 (logged first); young and non-pkm-x pods kept; second pass changes nothing	exit 0, left ["young1","other1"]; exit 0, left ["young1","other1"]; 3 receipt lines	reaper: 27 h old pod without receipts, 1 h old pod, other session's pod
@@ -168,6 +178,7 @@ G-run.sh	PASS	bash -n ok	rc 0	syntax of run.sh
 G-fetch.sh	PASS	bash -n ok	rc 0	syntax of fetch.sh
 G-reap.sh	PASS	bash -n ok	rc 0	syntax of reap.sh
 G-rp_pinned.sh	PASS	bash -n ok	rc 0	syntax of rp_pinned.sh
+G-make_requests_d54.sh	PASS	bash -n ok	rc 0	syntax of make_requests_d54.sh
 G-make_requests_m112.sh	PASS	bash -n ok	rc 0	syntax of make_requests_m112.sh
 G-run_tests.sh	PASS	bash -n ok	rc 0	syntax of tests/run_tests.sh
 G-curl_stub.sh	PASS	bash -n ok	rc 0	syntax of tests/curl_stub.sh
@@ -175,4 +186,4 @@ G-pin	PASS	rp_pinned.sh sha256 b4b60199...	b4b60199	pinned client copy unchanged
 G-server	PASS	server_pinned.py sha256 f56fd08e...	f56fd08e	vendored runner = runpod/server.py at d2a16c723d
 G-v2	PASS	no REST v1 or GraphQL URL and no v1 field name in the route's code	0 hits	REST v2 port (comments excluded)
 G-rpuse	PASS	rp_pinned.sh used only for upload, start, status, fetch (its v1 create, pod, delete are never called)	0 hits	pod-proxy calls only through the pinned client
-G-request	PASS	request sha256 = pin = make_requests output; equals its derivation; four changed paths	pin 44e009f1	the one request (Amendments 7 B and 14)
+G-request	PASS	request sha256 = pin = make_requests output; equals its derivation; four changed paths	pin 089176f2	the one request (Amendment 7 B, owner decision 24)

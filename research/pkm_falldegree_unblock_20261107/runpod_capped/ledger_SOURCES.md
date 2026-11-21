@@ -32,7 +32,7 @@ Every figure is `[pcc:unverified]`. Paths are relative to `research/pkm_falldegr
 - Pod times are measured from `progress.txt` / the RESULTS files / `SPOT_LOSSES.md` / `STAGE_B_LOST.md`. For lost jobs the pod-killed time is from the EKS audit log as cited there.
 - Amendment 12's cost guard readings exist only for `pfd-b-20261109-r1` (`receipts/BR/price-guard/start.json`, `check-20261109T2340Z.json`). No other EKS job has a `price-guard/` directory (the guard was frozen 2026-11-09 and the other jobs ran before it or were not read; Y-jobs: `SPOT_LOSSES.md:31` 'no price was read').
 - `state`: all EKS rows closed (jobs ended, succeeded, failed or lost); `pfd-b-rp` open. The Spot losses (rows `pfd-b-20261108`, `pfd-b-20261109-r1`, `pfd-x-t13-k0-c6-20261108`, `-r1`, `-r2`) are included.
-- RunPod dev smokes: rows copied from the current `runpod_capped/ledger.tsv:8-9` with their `cost.json` evidence verified (1.04 x 47 s = 0.0136; 1.04 x 188 s = 0.0543).
+- RunPod dev smokes: rows copied from the current `runpod_capped/ledger.tsv:8-9` with their `cost.json` evidence checked (1.04 x 47 s = 0.0136; 1.04 x 188 s = 0.0543).
 - No `.run/` supervisor directory exists in this checkout (`find /home/user/crypto -maxdepth 4 -name .run` is empty); supervisor records are `cards/*.run` and `receipts/*/pool-check/*.supervisor.log`, which carry no cost.
 
 ## 3. Items considered and not in the sum
