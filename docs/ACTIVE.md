@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+- [x] Test genus-2 smooth-companion torsion sieve against matched ECDLP coverage nulls (automation, completed 2026-11-18, branch research/genus2-companion-torsion-sieve-20261118, PR #4761; toy predicate rejected)
+
 - [x] Implement and test a norm-fiber Riemann--Roch router for the n=83 image-compatible calculus, beginning with an exact n=9 gate (Codex, completed 2026-11-18, branch codex/n83-norm-fiber-rr-router-20261118, PR #4759; registered finite-crossover gate stopped n=13+)
 - [x] Derive and screen a materially higher-degree image-compatible Riemann--Roch family, requiring a finite crossover before measurement (Codex, completed 2026-11-19, branch codex/n83-norm-fiber-rr-router-20261118, PR #4759; no route passed the frozen analytic gate)
 
