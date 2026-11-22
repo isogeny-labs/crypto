@@ -1,4 +1,4 @@
-//! Class-group Lagrange reduce: i64 fast path vs BigInt (`IC_CLASS_I64=0`).
+//! Class-group Lagrange reduce + compose: i64 fast path vs BigInt (`IC_CLASS_I64=0`).
 //!
 //!   TMPDIR=/Volumes/SSD990-2/tmp CARGO_TARGET_DIR=/Volumes/SSD990-2/cargo-target-perf \
 //!   /usr/sbin/taskpolicy -a cargo run --release --example class_group_reduce_ab
@@ -42,6 +42,21 @@ fn main() {
             assert_eq!(r1.b, r2.b);
             assert_eq!(r1.c, r2.c);
             assert!(r1.is_reduced());
+        }
+        // Compose agreement on a small subset.
+        let n = forms.len().min(8);
+        for i in 0..n {
+            for j in 0..n {
+                unsafe {
+                    std::env::remove_var("IC_CLASS_I64");
+                }
+                let c1 = forms[i].compose(&forms[j]);
+                unsafe {
+                    std::env::set_var("IC_CLASS_I64", "0");
+                }
+                let c2 = forms[i].compose(&forms[j]);
+                assert_eq!((&c1.a, &c1.b, &c1.c), (&c2.a, &c2.b, &c2.c), "compose {disc}");
+            }
         }
     }
     println!("correctness: ok");
@@ -149,4 +164,48 @@ fn main() {
     println!("  i64 : med {ei:.0} ns");
     println!("  big : med {eb:.0} ns");
     println!("  speedup big/i64 : {:.3}x", eb / ei);
+
+    // Compose A/B on reduced forms of D=-12007.
+    let n = base.len().min(48);
+    let mut wc_i = Vec::new();
+    let mut wc_b = Vec::new();
+    let compose_iters = 40usize;
+    for r in 0..9 {
+        for name in if r % 2 == 0 {
+            ["i64", "big"]
+        } else {
+            ["big", "i64"]
+        } {
+            unsafe {
+                if name == "i64" {
+                    std::env::remove_var("IC_CLASS_I64");
+                } else {
+                    std::env::set_var("IC_CLASS_I64", "0");
+                }
+            }
+            for i in 0..n.min(4) {
+                let _ = black_box(base[i].compose(&base[(i + 3) % n]));
+            }
+            let t0 = Instant::now();
+            for _ in 0..compose_iters {
+                for i in 0..n {
+                    for j in 0..n {
+                        let _ = black_box(base[i].compose(&base[j]));
+                    }
+                }
+            }
+            let ns = t0.elapsed().as_nanos() as f64 / (compose_iters * n * n) as f64;
+            if name == "i64" {
+                wc_i.push(ns);
+            } else {
+                wc_b.push(ns);
+            }
+        }
+    }
+    let ci = med(wc_i);
+    let cb = med(wc_b);
+    println!("class-group compose on reduced |D|=12007 ({n}×{n})");
+    println!("  i64 fast path     : med {ci:.1} ns");
+    println!("  BigInt (opt-out)  : med {cb:.1} ns");
+    println!("  speedup big/i64   : {:.3}x", cb / ci);
 }

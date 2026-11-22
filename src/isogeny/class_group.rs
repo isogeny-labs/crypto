@@ -71,6 +71,75 @@ fn reduce_i64(mut a: i64, mut b: i64, mut c: i64) -> (i64, i64, i64) {
     (a, b, c)
 }
 
+/// Extended gcd on `i128`: returns `(g, u, v)` with `u·a + v·b = g = gcd(|a|,|b|)`.
+fn ext_gcd_i128(a: i128, b: i128) -> (i128, i128, i128) {
+    if b == 0 {
+        let sign = if a < 0 { -1 } else { 1 };
+        return (a.abs(), sign, 0);
+    }
+    let (g, u1, v1) = ext_gcd_i128(b, a.rem_euclid(b));
+    let u = v1;
+    let v = u1 - (a.div_euclid(b)) * v1;
+    (g, u, v)
+}
+
+/// Gauss/Shanks composition on `i64` forms (same steps as
+/// [`BinaryQuadraticForm::compose`]).  Intermediates use `i128`.
+/// Returns `None` if an intermediate overflows `i64`.
+fn compose_i64(
+    a1: i64,
+    b1: i64,
+    c1: i64,
+    a2: i64,
+    b2: i64,
+    c2: i64,
+    disc: i64,
+) -> Option<(i64, i64, i64)> {
+    // Prefer a1 ≤ a2.
+    let (a1, b1, a2, b2, c2) = if a1 <= a2 {
+        (a1, b1, a2, b2, c2)
+    } else {
+        (a2, b2, a1, b1, c1)
+    };
+    let a1 = a1 as i128;
+    let b1 = b1 as i128;
+    let a2 = a2 as i128;
+    let b2 = b2 as i128;
+    let c2 = c2 as i128;
+    let disc = disc as i128;
+
+    let s = (b1 + b2) / 2;
+    let n = (b2 - b1) / 2;
+
+    let (d1, y0, _) = ext_gcd_i128(a2, a1);
+    let (d, x2, y2) = if s.rem_euclid(d1) == 0 {
+        (d1, 0i128, -y0)
+    } else {
+        let (d, x2, y3) = ext_gcd_i128(s, d1);
+        (d, x2, -(y3 * y0))
+    };
+
+    let v1 = a1 / d;
+    let v2 = a2 / d;
+    let r_raw = y2 * n - x2 * c2;
+    let r = r_raw.rem_euclid(v1);
+
+    let b3 = b2 + 2 * v2 * r;
+    let a3 = v1 * v2;
+    let numerator = b3 * b3 - disc;
+    let denominator = a3 * 4;
+    if denominator == 0 || numerator.rem_euclid(denominator) != 0 {
+        return None;
+    }
+    let c3 = numerator / denominator;
+
+    Some(reduce_i64(
+        i64::try_from(a3).ok()?,
+        i64::try_from(b3).ok()?,
+        i64::try_from(c3).ok()?,
+    ))
+}
+
 /// A primitive positive-definite integral binary quadratic form
 /// `f(x, y) = a·x² + b·x·y + c·y²` of negative discriminant
 /// `b² − 4ac = D < 0`.
@@ -223,6 +292,28 @@ impl BinaryQuadraticForm {
     pub fn compose(&self, other: &Self) -> Self {
         let d_disc = self.discriminant();
         assert_eq!(d_disc, other.discriminant());
+
+        // Hot path: i64 compose+reduce when all coeffs and D fit.
+        // `IC_CLASS_I64=0` forces BigInt (A/B).
+        if std::env::var("IC_CLASS_I64").as_deref() != Ok("0") {
+            if let (Ok(a1), Ok(b1), Ok(c1), Ok(a2), Ok(b2), Ok(c2), Ok(disc)) = (
+                i64::try_from(&self.a),
+                i64::try_from(&self.b),
+                i64::try_from(&self.c),
+                i64::try_from(&other.a),
+                i64::try_from(&other.b),
+                i64::try_from(&other.c),
+                i64::try_from(&d_disc),
+            ) {
+                if let Some((a, b, c)) = compose_i64(a1, b1, c1, a2, b2, c2, disc) {
+                    return Self {
+                        a: BigInt::from(a),
+                        b: BigInt::from(b),
+                        c: BigInt::from(c),
+                    };
+                }
+            }
+        }
 
         // Cohen's algorithm prefers a₁ ≤ a₂; swap if needed.
         let (a1, b1, _c1, a2, b2, c2) = if self.a <= other.a {
