@@ -80,7 +80,6 @@ pub mod candidate {
 """
 tail = between.replace("}\npub mod candidate {", "}\n}\n")
 tests = r"""
-}
 #[cfg(test)]
 mod checks {
  use super::cryptanalysis::{baseline,candidate};
