@@ -1254,6 +1254,67 @@ pub fn find_one_relation_s4_via_s3_counted(
     None
 }
 
+/// Word-sized modular arithmetic for the MITM fast path (`p < 2^63`).
+#[inline]
+fn add_mod_u64(a: u64, b: u64, p: u64) -> u64 {
+    let s = a as u128 + b as u128;
+    (if s >= p as u128 { s - p as u128 } else { s }) as u64
+}
+
+#[inline]
+fn sub_mod_u64(a: u64, b: u64, p: u64) -> u64 {
+    if a >= b {
+        a - b
+    } else {
+        a + p - b
+    }
+}
+
+#[inline]
+fn mul_mod_u64(a: u64, b: u64, p: u64) -> u64 {
+    ((a as u128 * b as u128) % p as u128) as u64
+}
+
+/// Extended-Euclid inverse modulo a prime `p` (no exponentiation).
+fn inv_prime_u64(a: u64, p: u64) -> u64 {
+    let (mut t, mut newt) = (0i128, 1i128);
+    let (mut r, mut newr) = (p as i128, (a % p) as i128);
+    while newr != 0 {
+        let q = r / newr;
+        let (t2, r2) = (t - q * newt, r - q * newr);
+        t = newt;
+        newt = t2;
+        r = newr;
+        newr = r2;
+    }
+    (t.rem_euclid(p as i128)) as u64
+}
+
+/// Affine `(x1,y1) + (x2,y2)` over `F_p`, `p < 2^63`, with `u128`
+/// products. Returns `None` for the point at infinity.
+fn add_point_u64(p: u64, a: u64, x1: u64, y1: u64, x2: u64, y2: u64) -> Option<(u64, u64)> {
+    if x1 == x2 {
+        if add_mod_u64(y1, y2, p) == 0 {
+            return None;
+        }
+        let num = add_mod_u64(mul_mod_u64(3, mul_mod_u64(x1, x1, p), p), a, p);
+        let den = inv_prime_u64(add_mod_u64(y1, y1, p), p);
+        let lam = mul_mod_u64(num, den, p);
+        let x3 = sub_mod_u64(sub_mod_u64(mul_mod_u64(lam, lam, p), x1, p), x2, p);
+        let y3 = sub_mod_u64(mul_mod_u64(lam, sub_mod_u64(x1, x3, p), p), y1, p);
+        Some((x3, y3))
+    } else {
+        let lam = mul_mod_u64(
+            sub_mod_u64(y2, y1, p),
+            inv_prime_u64(sub_mod_u64(x2, x1, p), p),
+            p,
+        );
+        let x3 = sub_mod_u64(sub_mod_u64(mul_mod_u64(lam, lam, p), x1, p), x2, p);
+        let y3 = sub_mod_u64(mul_mod_u64(lam, sub_mod_u64(x1, x3, p), p), y1, p);
+        Some((x3, y3))
+    }
+}
+
 /// **Pair-sum table** for the meet-in-the-middle 3-decomposition oracle.
 ///
 /// Built once per factor base: every unordered pair `{F_i, F_j}`, `i ≤ j`,
@@ -1263,6 +1324,14 @@ pub fn find_one_relation_s4_via_s3_counted(
 /// an `x` collision (two pair sums `±S`) only costs one failed verify.
 pub struct PairSumTable {
     by_x: std::collections::HashMap<BigUint, Vec<(u32, u32)>>,
+    /// Word-sized mirror of `by_x` for `p < 2^63`; empty otherwise.
+    by_x_u64: std::collections::HashMap<u64, Vec<(u32, u32)>>,
+    /// Word-sized factor-base points (same indices as `factor_base`).
+    fb_u64: Vec<Option<(u64, u64)>>,
+    /// `p` when the word-sized fast path applies.
+    p_u64: Option<u64>,
+    /// `a` when the word-sized fast path applies.
+    a_u64: Option<u64>,
     /// Number of non-identity pair sums stored.
     pub pairs: usize,
     /// Number of group additions spent building the table.
@@ -1273,22 +1342,58 @@ pub struct PairSumTable {
 pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> PairSumTable {
     let a_fe = curve.a_fe();
     let n = factor_base.len();
+    let p_u64 = if curve.p.bits() <= 63 {
+        curve.p.to_u64_digits().first().copied()
+    } else {
+        None
+    };
+    let a_u64 = if p_u64.is_some() {
+        curve.a.to_u64_digits().first().copied()
+    } else {
+        None
+    };
+    let fast = p_u64.is_some() && a_u64.is_some();
     let mut by_x: std::collections::HashMap<BigUint, Vec<(u32, u32)>> =
         std::collections::HashMap::with_capacity(n * (n + 1) / 2);
+    let mut by_x_u64: std::collections::HashMap<u64, Vec<(u32, u32)>> =
+        std::collections::HashMap::with_capacity(if fast { n * (n + 1) / 2 } else { 0 });
+    let fb_u64: Vec<Option<(u64, u64)>> = if fast {
+        factor_base
+            .iter()
+            .map(|fb| match &fb.point {
+                Point::Affine { x, y } => Some((
+                    x.value.to_u64_digits().first().copied()?,
+                    y.value.to_u64_digits().first().copied()?,
+                )),
+                _ => None,
+            })
+            .collect()
+    } else {
+        vec![None; n]
+    };
     let mut pairs = 0usize;
     for i in 0..n {
         for j in i..n {
             if let Point::Affine { x, .. } = factor_base[i].point.add(&factor_base[j].point, &a_fe)
             {
-                by_x.entry(x.value.clone())
-                    .or_default()
-                    .push((i as u32, j as u32));
+                let key = x.value.clone();
+                if fast {
+                    if let Some(k) = key.to_u64_digits().first().copied() {
+                        by_x_u64.entry(k).or_default().push((i as u32, j as u32));
+                    }
+                } else {
+                    by_x.entry(key).or_default().push((i as u32, j as u32));
+                }
                 pairs += 1;
             }
         }
     }
     PairSumTable {
         by_x,
+        by_x_u64,
+        fb_u64,
+        p_u64,
+        a_u64,
         pairs,
         build_additions: pairs,
     }
@@ -1325,6 +1430,51 @@ pub fn find_one_relation_s4_via_mitm_counted(
         let r = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
         if matches!(r, Point::Infinity) {
             continue;
+        }
+        // Word-sized probe path (`p < 2^63`): 2B u64 additions per draw,
+        // exact same relation family; every hit is still finalised and
+        // re-added in the BigUint group before it is accepted.
+        if let (Some(p), Some(a_u64)) = (table.p_u64, table.a_u64) {
+            if !table.by_x_u64.is_empty() {
+                if let Point::Affine { x, y } = &r {
+                    let rx = x.value.to_u64_digits().first().copied();
+                    let ry = y.value.to_u64_digits().first().copied();
+                    if let (Some(rx), Some(ry)) = (rx, ry) {
+                        for k in 0..factor_base.len() {
+                            let Some((fx, fy)) = table.fb_u64[k] else {
+                                continue;
+                            };
+                            let candidates = [
+                                add_point_u64(p, a_u64, rx, ry, fx, sub_mod_u64(p, fy, p)),
+                                add_point_u64(p, a_u64, rx, ry, fx, fy),
+                            ];
+                            for candidate in candidates.into_iter().flatten() {
+                                let Some(pairs) = table.by_x_u64.get(&candidate.0) else {
+                                    continue;
+                                };
+                                for &(i, j) in pairs {
+                                    let (i, j) = (i as usize, j as usize);
+                                    if let Some(rel) = try_finalise_s4(
+                                        &r,
+                                        i,
+                                        &factor_base[i].point,
+                                        j,
+                                        &factor_base[j].point,
+                                        k,
+                                        &factor_base[k].point,
+                                        curve,
+                                        &a,
+                                        &b,
+                                    ) {
+                                        return Some((rel, trial));
+                                    }
+                                }
+                            }
+                        }
+                        continue;
+                    }
+                }
+            }
         }
         for k in 0..factor_base.len() {
             // R ∓ F_k: both anchor signs, so the table only needs one
