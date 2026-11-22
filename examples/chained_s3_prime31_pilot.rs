@@ -291,7 +291,8 @@ mod tests {
                         let a = signed(c, p, signs & 1 != 0);
                         let b = signed(c, q, signs & 2 != 0);
                         let d = signed(c, r, signs & 4 != 0);
-                        if c.add(&mut ops, c.add(&mut ops, a, b), d) == target {
+                        let ab = c.add(&mut ops, a, b);
+                        if c.add(&mut ops, ab, d) == target {
                             return true;
                         }
                     }
