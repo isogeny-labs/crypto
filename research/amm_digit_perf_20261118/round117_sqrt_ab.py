@@ -36,16 +36,6 @@ old_sqrt = """        if p % 4 == 3 {
         }"""
 assert frozen.count(new_sqrt) >= 1
 frozen = frozen.replace(new_sqrt, old_sqrt, 1)
-new_disc = """        // Direct sqrt and verification is faster than Jacobi filtering
-        // on these primes, even for uniform nonresidue inputs.
-        if (p == MAX_PRIME || p == 1_000_000_007 || p == 4_294_967_291) && a < p {
-            return self.sqrt(a);
-        }"""
-old_disc = """        if p == MAX_PRIME && a < p {
-            return self.sqrt(a);
-        }"""
-assert frozen.count(new_disc) == 1
-frozen = frozen.replace(new_disc, old_disc)
 assert frozen != source
 
 header = r'''
