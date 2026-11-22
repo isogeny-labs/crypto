@@ -227,6 +227,7 @@ pub fn spec_for(ch: &Challenge, candidate: &MethodSpec, epoch: u64) -> Spec {
                 ch.challenge_id
             ),
         },
+        field_profile: None,
         workloads: WorkloadPlan {
             curves: w.curves.clone(),
             targets_per_curve: w.targets_per_curve,

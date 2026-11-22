@@ -289,6 +289,7 @@ pub fn generate(o: &SweepOptions) -> Result<Spec, String> {
             off_panel_reason: "legacy generated method-by-size sweep uses its declared constructor ladder"
                 .into(),
         },
+        field_profile: None,
         workloads: WorkloadPlan {
             curves,
             targets_per_curve: o.targets,
