@@ -1370,9 +1370,9 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
     let mut counters = RootCounters::default();
     let mut powers: HashMap<u64, PowerState> = HashMap::new();
     let mut gcds: HashMap<u64, (Vec<u64>, Vec<u64>)> = HashMap::new();
-    // An immediately preceding Division event has already been checked using
+    // A prior Division event has already been checked using
     // independent arithmetic. Keep its verified remainder for the following
-    // GcdStep and its verified quotient for an accepted SplitEnd. Borrow
+    // matching GcdStep and its verified quotient for an accepted SplitEnd. Borrow
     // certificate operands, and own only the computed remainder.
     let mut verified_division: Option<(&[u64], &[u64], &[u64], &[u64], Vec<u64>)> = None;
     let mut next_id = 0;
@@ -1388,13 +1388,6 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
     {
         if finished {
             return Err("events after root finish".into());
-        }
-        // A cached division is reusable only by the immediately following
-        // GCD or split event. This also prevents any stale cross-event reuse.
-        if !matches!(event, RootEvent::Division { .. }
-            | RootEvent::GcdStep { .. } | RootEvent::SplitEnd { .. })
-        {
-            verified_division = None;
         }
         counters.observe(event);
         if index == 0 {
@@ -1470,8 +1463,8 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 if verified_q != *quotient || verified_r != *remainder {
                     return Err("division identity failed".into());
                 }
-                // No additional arithmetic is needed if the next GcdStep or
-                // accepted SplitEnd repeats this exact verified identity.
+                // A matching GcdStep or accepted SplitEnd can reuse this
+                // independently verified identity even across other events.
                 verified_division = Some((
                     a.as_slice(), b.as_slice(),
                     quotient.as_slice(), remainder.as_slice(), verified_r,
@@ -1582,7 +1575,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 let verified_r = if let Some(remainder) = cached {
                     remainder
                 } else {
-                    // Older/nonadjacent traces must still be independently
+                    // Missing or nonmatching identities must still be independently
                     // checked, with no reliance on the producer's assertion.
                     let (verified_q, verified_r) = vdiv(&state.0, &state.1, p)?;
                     if verified_q != *quotient || verified_r != *remainder {
