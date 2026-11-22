@@ -1,7 +1,7 @@
-//! Run69: authentic RHS target-specific quotient recovery, generic negative control.
-//! Source-bound original Rust arithmetic and B677 factor base. The million-entry
-//! pair table is GENERIC meet-in-the-middle; never represent it as blind Semaev
-//! extraction, novel index calculus, or a competitive non-generic ECDLP solver.
+// Run69: authentic RHS target-specific quotient recovery, generic negative control.
+// Source-bound original Rust arithmetic and B677 factor base. The million-entry
+// pair table is GENERIC meet-in-the-middle; never represent it as blind Semaev
+// extraction, novel index calculus, or a competitive non-generic ECDLP solver.
 use prime31_algebraic_ic::{check_curve, Arithmetic, Base, Point, PRIME31};
 use std::collections::{HashMap, HashSet};
 use std::time::Instant;
