@@ -10,6 +10,7 @@ on:
       - 'research/prime31_f4_admission_20261121/run57_basis.json'
       - 'research/prime31_f4_admission_20261121/run57_rank_gate.py'
       - 'research/prime31_f4_admission_20261121/run57_validate.py'
+      - 'research/prime31_f4_admission_20261121/run58_early_target_model.py'
       - 'research/prime31_f4_admission_20261121/RUN55_DICKSON2_YIELD_PROTOCOL.md'
       - '.github/workflows/prime31-dickson2-yield.yml'
   pull_request:
@@ -20,6 +21,7 @@ on:
       - 'research/prime31_f4_admission_20261121/run57_basis.json'
       - 'research/prime31_f4_admission_20261121/run57_rank_gate.py'
       - 'research/prime31_f4_admission_20261121/run57_validate.py'
+      - 'research/prime31_f4_admission_20261121/run58_early_target_model.py'
       - '.github/workflows/prime31-dickson2-yield.yml'
   workflow_dispatch:
 jobs:
@@ -35,6 +37,9 @@ jobs:
           key: prime31-native-dickson2-yield
       - name: Independently verify 500 exact small-system modular rank cases
         run: python3 research/prime31_f4_admission_20261121/run57_validate.py
+      - name: Independently verify 51 exact target-graph counts and run58 conditional model
+        timeout-minutes: 3
+        run: python3 research/prime31_f4_admission_20261121/run58_early_target_model.py
       - name: Compile existing Prime31 native Rust (not monolithic root crate)
         timeout-minutes: 14
         working-directory: research/prime31_ic_20261115/native
@@ -45,7 +50,7 @@ jobs:
         run: |
           timeout 90s target/release/examples/prime31_dickson2_yield_census
           timeout 90s target/release/examples/prime31_dickson2_collision_rank
-      - name: Independent signed-rank saturation gate (idealized public relations)
+      - name: Independent signed-rank saturation and run58 target-closure gates (conditional)
         timeout-minutes: 3
         working-directory: research/prime31_ic_20261115/native
         run: timeout 150s target/release/examples/prime31_rank_completion_gate
