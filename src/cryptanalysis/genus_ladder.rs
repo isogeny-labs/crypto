@@ -51,8 +51,8 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
 use super::chained_transfer::ic_control::{
-    addm, build_rows, combine, mulmod, pa, peel, pm, ppow, ps, split_order, subm, wiedemann,
-    wiedemann_coord, CubicOracle, Dsu, Nat, Rel, Row, REL_FB,
+    addm, build_rows, combine, mulmod, pa, peel, pm, ppow, ps, split_order, subm, CubicOracle, Dsu,
+    Nat, Rel, Row, REL_FB,
 };
 use super::ic_boundary::{
     invmod, pivot_inversion_steps, rho_walk_with_policy, CountedGroup, GroupOps, NegationClasses,
@@ -2496,6 +2496,447 @@ fn skip_wiedemann_draws(rng: &mut StdRng, nr: usize, ncols: usize, r: u64, dense
     }
 }
 
+// ── Wiedemann with the same counts, a faster inner loop ─────────────────
+//
+// `wiedemann` and `wiedemann_coord` below replace the imports of the same
+// names from `ic_control` (kept there unchanged as the reference; the test
+// `fast_wiedemann_equals_reference` compares them).  Same signatures, same
+// random draws, same value of every `Nat` increment, same outputs: only the
+// way the residues are computed differs (research/genus_ladder_wied_speed_20261122).
+//
+// * rows are held in CSR split by entry kind: `+1`, `−1` and generic entries
+//   (generic ones carry a Shoup quotient, so `v·x mod r` is two multiplies);
+// * a row sum is accumulated unreduced in `u64` and reduced once (Barrett,
+//   `⌊(2^64−1)/r⌋`), when `(2·len+1)·r < 2^64`, else term by term as before;
+// * `Aᵀy` is a gather over the transposed CSR, the diagonal `D` is fused into `A x`;
+// * Berlekamp–Massey dot products accumulate in `u128`.
+
+#[inline(always)]
+fn mulhi(a: u64, b: u64) -> u64 {
+    ((a as u128 * b as u128) >> 64) as u64
+}
+
+/// `⌊v·2^64 / r⌋` for `v < r`.
+#[inline]
+fn shoup_pre(v: u64, r: u64) -> u64 {
+    (((v as u128) << 64) / r as u128) as u64
+}
+
+/// `v·x mod r` up to one multiple of `r`: the value is in `[0, 2r)`
+/// (`vs = shoup_pre(v, r)`, `v < r`, any `x`).
+#[inline(always)]
+fn shoup_mul(v: u64, vs: u64, x: u64, r: u64) -> u64 {
+    v.wrapping_mul(x).wrapping_sub(mulhi(vs, x).wrapping_mul(r))
+}
+
+/// `t mod r` for `t < 2r`, `r < 2^63`.
+#[inline(always)]
+fn fold(t: u64, r: u64) -> u64 {
+    t.min(t.wrapping_sub(r))
+}
+
+/// `Σ a·b mod r` over a list of pairs, accumulated in `u128` and reduced
+/// every `kmax - 1` terms (`kmax` terms of `(r-1)^2` fit 128 bits).
+fn dot_mod(init: u64, pairs: impl Iterator<Item = (u64, u64)>, r: u64) -> u64 {
+    let rm = (r - 1) as u128;
+    let kmax = (u128::MAX / (rm * rm).max(1)).clamp(2, 1 << 20) as usize;
+    let mut acc = init as u128;
+    let mut cnt = 0usize;
+    for (a, b) in pairs {
+        acc += a as u128 * b as u128;
+        cnt += 1;
+        if cnt == kmax - 1 {
+            acc %= r as u128;
+            cnt = 0;
+        }
+    }
+    (acc % r as u128) as u64
+}
+
+fn invm_fast(a: u64, r: u64) -> u64 {
+    let (mut res, mut b, mut e) = (1u64, a, r - 2);
+    while e > 0 {
+        if e & 1 == 1 {
+            res = mulmod(res, b, r);
+        }
+        b = mulmod(b, b, r);
+        e >>= 1;
+    }
+    res
+}
+
+/// Sparse lines (rows of `A`, or rows of `Aᵀ`) split by entry kind.
+struct Lines {
+    n: usize,
+    pp: Vec<u32>,
+    mp: Vec<u32>,
+    gp: Vec<u32>,
+    pc: Vec<u32>,
+    mc: Vec<u32>,
+    gc: Vec<u32>,
+    gv: Vec<u64>,
+    gs: Vec<u64>,
+    /// Entries and generic entries per line (for the counters).
+    len: Vec<u32>,
+    nonu: Vec<u32>,
+    tot_len: u64,
+    tot_nonu: u64,
+    /// The unreduced `u64` row sum cannot overflow.
+    fast: bool,
+}
+
+impl Lines {
+    fn build<'a>(lines: impl Iterator<Item = &'a [(u32, u64)]>, r: u64) -> Lines {
+        let mut s = Lines {
+            n: 0,
+            pp: vec![0],
+            mp: vec![0],
+            gp: vec![0],
+            pc: vec![],
+            mc: vec![],
+            gc: vec![],
+            gv: vec![],
+            gs: vec![],
+            len: vec![],
+            nonu: vec![],
+            tot_len: 0,
+            tot_nonu: 0,
+            fast: true,
+        };
+        let mut worst = 0u128;
+        for t in lines {
+            let g0 = s.gc.len();
+            for &(c, v) in t {
+                if v == 1 {
+                    s.pc.push(c);
+                } else if v == r - 1 {
+                    s.mc.push(c);
+                } else {
+                    let v = if v >= r { v % r } else { v };
+                    s.gc.push(c);
+                    s.gv.push(v);
+                    s.gs.push(shoup_pre(v, r));
+                }
+            }
+            s.pp.push(s.pc.len() as u32);
+            s.mp.push(s.mc.len() as u32);
+            s.gp.push(s.gc.len() as u32);
+            let ng = (s.gc.len() - g0) as u32;
+            s.len.push(t.len() as u32);
+            s.nonu.push(ng);
+            s.tot_len += t.len() as u64;
+            s.tot_nonu += ng as u64;
+            worst = worst.max(t.len() as u128 + ng as u128);
+            s.n += 1;
+        }
+        s.fast = (2 * worst + 2) * r as u128 <= u64::MAX as u128 && r < (1u64 << 63);
+        s
+    }
+
+    /// `out[i] = (Σ_k val_ik x[col_ik]) · diag[i] mod r` (no diagonal: just the sum).
+    fn apply(&self, x: &[u64], out: &mut [u64], r: u64, bar: u64, diag: Option<(&[u64], &[u64])>) {
+        for i in 0..self.n {
+            let (p0, p1) = (self.pp[i] as usize, self.pp[i + 1] as usize);
+            let (m0, m1) = (self.mp[i] as usize, self.mp[i + 1] as usize);
+            let (g0, g1) = (self.gp[i] as usize, self.gp[i + 1] as usize);
+            let mut y = if self.fast {
+                let mut sp = 0u64;
+                for &c in &self.pc[p0..p1] {
+                    sp += x[c as usize];
+                }
+                let mut sm = 0u64;
+                for &c in &self.mc[m0..m1] {
+                    sm += x[c as usize];
+                }
+                let mut sg = 0u64;
+                for k in g0..g1 {
+                    sg += shoup_mul(self.gv[k], self.gs[k], x[self.gc[k] as usize], r);
+                }
+                let tot = sp + sg + (m1 - m0) as u64 * r - sm;
+                let t = tot.wrapping_sub(mulhi(tot, bar).wrapping_mul(r));
+                fold(t, r)
+            } else {
+                let mut acc = 0u64;
+                for &c in &self.pc[p0..p1] {
+                    acc = addm(acc, x[c as usize], r);
+                }
+                for &c in &self.mc[m0..m1] {
+                    acc = subm(acc, x[c as usize], r);
+                }
+                for k in g0..g1 {
+                    acc = addm(acc, mulmod(self.gv[k], x[self.gc[k] as usize], r), r);
+                }
+                acc
+            };
+            if let Some((d, ds)) = diag {
+                y = fold(shoup_mul(d[i], ds[i], y, r), r);
+            }
+            out[i] = y;
+        }
+    }
+}
+
+/// `A`, `Aᵀ` and the modulus data of one system.
+struct Sys {
+    r: u64,
+    bar: u64,
+    a: Lines,
+    at: Option<Lines>,
+    nr: usize,
+}
+
+impl Sys {
+    fn new(rows: &[Row], ncols: usize, r: u64, transpose: bool) -> Sys {
+        let a = Lines::build(rows.iter().map(|x| x.0.as_slice()), r);
+        let at = transpose.then(|| {
+            let mut cols: Vec<Vec<(u32, u64)>> = vec![Vec::new(); ncols];
+            for (i, (t, _)) in rows.iter().enumerate() {
+                for &(c, v) in t {
+                    cols[c as usize].push((i as u32, v));
+                }
+            }
+            Lines::build(cols.iter().map(|x| x.as_slice()), r)
+        });
+        Sys {
+            r,
+            bar: u64::MAX / r,
+            a,
+            at,
+            nr: rows.len(),
+        }
+    }
+
+    /// `y = A x`, counted as `mat_vec`.
+    fn mat_vec(&self, x: &[u64], y: &mut [u64], nat: &mut Nat) {
+        self.a.apply(x, y, self.r, self.bar, None);
+        nat.add += self.a.tot_len;
+        nat.mul += self.a.tot_nonu;
+    }
+
+    /// `z = Aᵀ y`, counted as `mat_t_vec` (rows with `y = 0` are not charged).
+    fn mat_t_vec(&self, y: &[u64], z: &mut [u64], nat: &mut Nat) {
+        let at = self.at.as_ref().expect("transpose built");
+        at.apply(y, z, self.r, self.bar, None);
+        let (mut add, mut mul) = (0u64, 0u64);
+        for (i, &yv) in y.iter().enumerate() {
+            if yv != 0 {
+                add += self.a.len[i] as u64;
+                mul += self.a.nonu[i] as u64;
+            }
+        }
+        nat.add += add;
+        nat.mul += mul;
+    }
+
+    /// `out = AᵀDA v`, counted as `m_apply`.
+    fn m_apply(
+        &self,
+        d: (&[u64], &[u64]),
+        v: &[u64],
+        tmp: &mut [u64],
+        out: &mut [u64],
+        nat: &mut Nat,
+    ) {
+        self.a.apply(v, tmp, self.r, self.bar, Some(d));
+        nat.add += self.a.tot_len;
+        nat.mul += self.a.tot_nonu + self.nr as u64;
+        self.mat_t_vec(tmp, out, nat);
+    }
+}
+
+fn diag_shoup(d: &[u64], r: u64) -> Vec<u64> {
+    d.iter().map(|&x| shoup_pre(x, r)).collect()
+}
+
+/// Berlekamp–Massey, as `ic_control`'s, with `u128` dot products.
+fn berlekamp_massey(s: &[u64], r: u64, nat: &mut Nat) -> Vec<u64> {
+    let mut c = vec![1u64];
+    let mut b = vec![1u64];
+    let mut l = 0usize;
+    let mut m = 1usize;
+    let mut binv = 1u64;
+    for n in 0..s.len() {
+        let terms = l.min(c.len() - 1);
+        nat.mul += terms as u64;
+        nat.add += terms as u64;
+        let d = dot_mod(
+            s[n],
+            c[1..=terms]
+                .iter()
+                .zip(s[n - terms..n].iter().rev())
+                .map(|(&a, &b)| (a, b)),
+            r,
+        );
+        if d == 0 {
+            m += 1;
+            continue;
+        }
+        let coef = {
+            nat.mul += 1;
+            mulmod(d, binv, r)
+        };
+        let t = c.clone();
+        if c.len() < b.len() + m {
+            c.resize(b.len() + m, 0);
+        }
+        let cs = shoup_pre(coef, r);
+        nat.mul += b.len() as u64;
+        nat.add += b.len() as u64;
+        for (i, &bv) in b.iter().enumerate() {
+            let prod = fold(shoup_mul(coef, cs, bv, r), r);
+            c[i + m] = subm(c[i + m], prod, r);
+        }
+        if 2 * l <= n {
+            l = n + 1 - l;
+            b = t;
+            nat.mul += pivot_inversion_steps(r);
+            binv = invm_fast(d, r);
+            m = 1;
+        } else {
+            m += 1;
+        }
+    }
+    c.truncate(l + 1);
+    c.resize(l + 1, 0);
+    c
+}
+
+/// Solve `A x = c` by Wiedemann on `AᵀDA x = AᵀD c`; as `ic_control::wiedemann`.
+fn wiedemann(
+    rows: &[Row],
+    ncols: usize,
+    r: u64,
+    rng: &mut StdRng,
+    dense_u: bool,
+    nat: &mut Nat,
+) -> Option<Vec<u64>> {
+    let nr = rows.len();
+    let d: Vec<u64> = (0..nr).map(|_| rng.gen_range(1..r)).collect();
+    let ds = diag_shoup(&d, r);
+    let sys = Sys::new(rows, ncols, r, true);
+    let mut tmp = vec![0u64; nr];
+    for ((t, row), &di) in tmp.iter_mut().zip(rows.iter()).zip(d.iter()) {
+        nat.mul += 1;
+        *t = mulmod(row.1, di, r);
+    }
+    let mut bp = vec![0u64; ncols];
+    sys.mat_t_vec(&tmp, &mut bp, nat);
+    let mut proj: Vec<(usize, u64)> = Vec::new();
+    if dense_u || ncols <= 16 {
+        proj.extend((0..ncols).map(|i| (i, rng.gen_range(1..r))));
+    } else {
+        for _ in 0..16 {
+            proj.push((rng.gen_range(0..ncols), rng.gen_range(1..r)));
+        }
+    }
+    let len = 2 * ncols + 2;
+    let mut seq = Vec::with_capacity(len);
+    let mut v = bp.clone();
+    let mut w = vec![0u64; ncols];
+    for _ in 0..len {
+        nat.mul += proj.len() as u64;
+        nat.add += proj.len() as u64;
+        seq.push(dot_mod(0, proj.iter().map(|&(i, uv)| (uv, v[i])), r));
+        sys.m_apply((&d, &ds), &v, &mut tmp, &mut w, nat);
+        std::mem::swap(&mut v, &mut w);
+    }
+    let c = berlekamp_massey(&seq, r, nat);
+    let l = c.len() - 1;
+    if l == 0 || c[l] == 0 {
+        return None;
+    }
+    let mut acc = vec![0u64; ncols];
+    let mut v = bp.clone();
+    for j in 0..l {
+        let coef = c[l - 1 - j];
+        let cs = shoup_pre(coef, r);
+        nat.mul += ncols as u64;
+        nat.add += ncols as u64;
+        for (a, &vi) in acc.iter_mut().zip(v.iter()) {
+            *a = addm(*a, fold(shoup_mul(coef, cs, vi, r), r), r);
+        }
+        if j + 1 < l {
+            sys.m_apply((&d, &ds), &v, &mut tmp, &mut w, nat);
+            std::mem::swap(&mut v, &mut w);
+        }
+    }
+    nat.mul += pivot_inversion_steps(r);
+    let sc = subm(0, invm_fast(c[l], r), r);
+    let ss = shoup_pre(sc, r);
+    nat.mul += ncols as u64;
+    for a in acc.iter_mut() {
+        *a = fold(shoup_mul(sc, ss, *a, r), r);
+    }
+    let mut ax = vec![0u64; nr];
+    sys.mat_vec(&acc, &mut ax, nat);
+    if ax.iter().zip(rows.iter()).all(|(a, row)| *a == row.1) {
+        Some(acc)
+    } else {
+        None
+    }
+}
+
+/// `x[ct]` for `A x = c`; as `ic_control::wiedemann_coord`.
+fn wiedemann_coord(
+    rows: &[Row],
+    ncols: usize,
+    ct: usize,
+    r: u64,
+    rng: &mut StdRng,
+    square: bool,
+    nat: &mut Nat,
+) -> Option<u64> {
+    let len = 2 * ncols + 2;
+    let mut seq = Vec::with_capacity(len);
+    if square {
+        if rows.len() < ncols {
+            return None;
+        }
+        let mut idx: Vec<usize> = (0..rows.len()).collect();
+        for i in 0..ncols {
+            let j = rng.gen_range(i..idx.len());
+            idx.swap(i, j);
+        }
+        let sub: Vec<Row> = idx[..ncols].iter().map(|&i| rows[i].clone()).collect();
+        let sys = Sys::new(&sub, ncols, r, false);
+        let mut v: Vec<u64> = sub.iter().map(|row| row.1).collect();
+        let mut w = vec![0u64; ncols];
+        for _ in 0..len {
+            seq.push(v[ct]);
+            sys.mat_vec(&v, &mut w, nat);
+            std::mem::swap(&mut v, &mut w);
+        }
+    } else {
+        let nr = rows.len();
+        let d: Vec<u64> = (0..nr).map(|_| rng.gen_range(1..r)).collect();
+        let ds = diag_shoup(&d, r);
+        let sys = Sys::new(rows, ncols, r, true);
+        let mut tmp = vec![0u64; nr];
+        for ((t, row), &di) in tmp.iter_mut().zip(rows.iter()).zip(d.iter()) {
+            nat.mul += 1;
+            *t = mulmod(row.1, di, r);
+        }
+        let mut v = vec![0u64; ncols];
+        sys.mat_t_vec(&tmp, &mut v, nat);
+        let mut w = vec![0u64; ncols];
+        for _ in 0..len {
+            seq.push(v[ct]);
+            sys.m_apply((&d, &ds), &v, &mut tmp, &mut w, nat);
+            std::mem::swap(&mut v, &mut w);
+        }
+    }
+    let c = berlekamp_massey(&seq, r, nat);
+    let l = c.len() - 1;
+    if l == 0 || c[l] == 0 {
+        return None;
+    }
+    nat.mul += l as u64;
+    nat.add += l as u64;
+    let acc = dot_mod(0, (0..l).map(|j| (c[l - 1 - j], seq[j])), r);
+    nat.mul += pivot_inversion_steps(r) + 1;
+    Some(mulmod(acc, subm(0, invm_fast(c[l], r), r), r))
+}
+
 // ── rho ─────────────────────────────────────────────────────────────────
 
 #[derive(Clone, Debug, Default)]
@@ -3998,5 +4439,195 @@ mod kappa_phase_split {
                 med(3) / med(4), med(3) / med(5)
             );
         }
+    }
+}
+
+/// Count identity for the Wiedemann speed study
+/// (`research/genus_ladder_wied_speed_20261122`): every counted field and the
+/// recovered `t` of 24 runs equal a reference recorded from the unmodified
+/// solver.  `WIED_GEN=<path>` writes the reference instead of checking it.
+#[cfg(test)]
+mod wied_speed {
+    use super::*;
+    use serde_json::{json, Value};
+
+    const FIXTURE: &str = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/research/genus_ladder_wied_speed_20261122/count_reference.json"
+    );
+
+    fn first_instance(p: u64, g: u32) -> Instance {
+        for cs in 1..400u64 {
+            if let Ok(i) = make_instance(p, g, cs, 7, 64) {
+                return i;
+            }
+        }
+        panic!("no instance at p = {p}, g = {g}");
+    }
+
+    fn nat(n: Nat) -> Value {
+        json!([n.mul, n.add])
+    }
+
+    fn record(o: &IcResult) -> Value {
+        json!({
+            "recovered": o.recovered, "certified": o.certified, "exhausted": o.exhausted,
+            "trials": o.trials, "relations": o.relations, "attempts": o.attempts,
+            "la_fallbacks": o.la_fallbacks, "cycles": o.cycles,
+            "cantor_mul": o.cantor_mul, "cantor_inv": o.cantor_inv,
+            "group_adds": o.group.adds, "group_doubles": o.group.doubles,
+            "rel": nat(o.rel), "la": nat(o.la), "la_graph": nat(o.la_graph),
+            "la_peel": nat(o.la_peel), "la_wied": nat(o.la_wied), "la_sge": nat(o.la_sge),
+            "la_sel": nat(o.la_sel),
+            "core_rows": o.core_rows, "core_cols": o.core_cols,
+            "core_nnz_before_sge": o.core_nnz_before_sge,
+            "core_nnz_after_sge": o.core_nnz_after_sge,
+            "sge_rows_in": o.sge.rows_in,
+        })
+    }
+
+    #[test]
+    fn wiedemann_speedup_keeps_counts_and_outputs() {
+        let mut out = serde_json::Map::new();
+        let sge = Some(SgeParams {
+            w_max: 8,
+            fill_max: 3.0,
+        });
+        for g in [3u32, 4] {
+            for p in [1031u64, 2053, 8209] {
+                let inst = first_instance(p, g);
+                for arm in [Arm::Full, Arm::DoubleLp] {
+                    for s in [None, sge] {
+                        let prm = IcParams {
+                            arm,
+                            nb: fb_size_2lp(p, g, 2.0),
+                            seed: 5,
+                            max_trials: 50_000_000,
+                            restart: RESTART,
+                            prefilter: true,
+                            verify_relations: false,
+                            sge: s,
+                        };
+                        let o = run_ic(&inst, prm);
+                        assert!(o.certified, "p={p} g={g} {arm:?}");
+                        let key = format!(
+                            "g{g}_p{p}_{arm:?}_{}",
+                            if s.is_some() { "sge" } else { "nosge" }
+                        );
+                        eprintln!(
+                            "{key} trials {} la.mul {} wall {:.1}s",
+                            o.trials,
+                            o.la.mul,
+                            o.wall_ns as f64 / 1e9
+                        );
+                        out.insert(key, record(&o));
+                    }
+                }
+            }
+        }
+        assert!(out.len() >= 20);
+        if let Ok(path) = std::env::var("WIED_GEN") {
+            let s = serde_json::to_string_pretty(&Value::Object(out)).unwrap();
+            std::fs::write(path, s + "\n").unwrap();
+            return;
+        }
+        let want: Value =
+            serde_json::from_str(&std::fs::read_to_string(FIXTURE).expect("fixture")).unwrap();
+        let got = Value::Object(out);
+        assert_eq!(got, want);
+    }
+}
+
+/// The local Wiedemann equals `ic_control`'s (the reference) on synthetic
+/// systems: solution, counters and the random stream afterwards.
+#[cfg(test)]
+mod fast_wiedemann_oracle {
+    use super::*;
+    use crate::cryptanalysis::chained_transfer::ic_control as reference;
+
+    fn prime_below(mut x: u64) -> u64 {
+        while !is_prime_u64(x) {
+            x -= 1;
+        }
+        x
+    }
+
+    fn system(r: u64, ncol: usize, extra: usize, seed: u64) -> (Vec<Row>, usize) {
+        let mut st = seed;
+        let mut next = move || {
+            st = mix64(st.wrapping_add(0x9E37_79B9_7F4A_7C15));
+            st
+        };
+        let tcol = (ncol - 1) as u32;
+        let x: Vec<u64> = (0..ncol).map(|_| next() % r).collect();
+        let rows = (0..ncol + extra)
+            .map(|_| {
+                let k = 2 + (next() % 5) as usize;
+                let mut t: Vec<(u32, u64)> = (0..k)
+                    .map(|_| {
+                        let c = (next() % (ncol as u64 - 1)) as u32;
+                        let v = match next() % 5 {
+                            0 => r - 1,
+                            1 | 2 => 1,
+                            3 => 0,
+                            _ => 1 + next() % (r - 1),
+                        };
+                        (c, v)
+                    })
+                    .collect();
+                t.push((tcol, 1 + next() % (r - 1)));
+                t.sort_unstable_by_key(|e| e.0);
+                t.dedup_by_key(|e| e.0);
+                let rhs = t
+                    .iter()
+                    .fold(0, |acc, &(c, v)| addm(acc, mulmod(v, x[c as usize], r), r));
+                (t, rhs)
+            })
+            .collect();
+        (rows, ncol)
+    }
+
+    #[test]
+    fn fast_wiedemann_equals_reference() {
+        let primes = [
+            65_537,
+            prime_below(1 << 40),
+            prime_below(1 << 50),
+            prime_below((1 << 50) + 1_000_000),
+            prime_below(1 << 52),
+            prime_below(1 << 58),
+            prime_below(1 << 62),
+            prime_below((1 << 63) - 1),
+        ];
+        let mut solved = 0;
+        for (k, &r) in primes.iter().enumerate() {
+            for (ncol, extra) in [(12usize, 5usize), (40, 12), (90, 30)] {
+                let (rows, nc) = system(r, ncol, extra, 1000 + k as u64 * 7 + ncol as u64);
+                for dense in [false, true] {
+                    let (mut ra, mut rb) = (StdRng::seed_from_u64(9), StdRng::seed_from_u64(9));
+                    let (mut na, mut nb) = (Nat::default(), Nat::default());
+                    let a = reference::wiedemann(&rows, nc, r, &mut ra, dense, &mut na);
+                    let b = wiedemann(&rows, nc, r, &mut rb, dense, &mut nb);
+                    assert_eq!(a, b, "solution r={r} nc={nc} dense={dense}");
+                    assert_eq!(na, nb, "counts r={r} nc={nc} dense={dense}");
+                    assert_eq!(ra.gen::<u64>(), rb.gen::<u64>(), "stream r={r}");
+                    solved += a.is_some() as u32;
+                }
+                for square in [false, true] {
+                    let (mut ra, mut rb) = (StdRng::seed_from_u64(4), StdRng::seed_from_u64(4));
+                    let (mut na, mut nb) = (Nat::default(), Nat::default());
+                    let ct = nc - 1;
+                    let a = reference::wiedemann_coord(&rows, nc, ct, r, &mut ra, square, &mut na);
+                    let b = wiedemann_coord(&rows, nc, ct, r, &mut rb, square, &mut nb);
+                    assert_eq!(a, b, "coord r={r} nc={nc} square={square}");
+                    assert_eq!(na, nb, "coord counts r={r} nc={nc} square={square}");
+                    assert_eq!(ra.gen::<u64>(), rb.gen::<u64>());
+                }
+            }
+        }
+        assert!(
+            solved > 0,
+            "no system solved: the comparison would be vacuous"
+        );
     }
 }

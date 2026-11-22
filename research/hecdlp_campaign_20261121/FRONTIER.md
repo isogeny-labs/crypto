@@ -156,3 +156,26 @@ Consequences, re-priced at the in-situ κ from the recorded counts: [pcc:unverif
 Limits: wall time on one shared VM, no hardware counters, one instance per prime, the LA time
 obtained by differencing two runs. The figures that would settle it are cycles on an isolated host
 (the `perf-ipc` skill refuses on this VM).
+
+### R8: Wiedemann 5.5–6.1× faster in wall time, every count unchanged [pcc:unverified]
+
+`genus_ladder_wied_speed_20261122`: a local Wiedemann in `genus_ladder.rs` (CSR rows split into ±1
+and generic entries, Shoup multipliers, one Barrett reduction per row, transposed CSR, fused
+diagonal, u128 dot products in Berlekamp–Massey) and a division-free `mulmod` / branchless `addm`
+in `chained_transfer/ic_control.rs`. Counts and outputs identical on 24 fixture runs (recorded
+from the unmodified build before the change) and on the timing instances; the main session reran
+the identity tests (5 passed). Wall time per counted `la_mul` (median of 15, load < 1.5):
+
+| p | ns before → after | speedup | κ in situ before → after |
+|--:|--:|--:|--:|
+| 65537 | 100.7 → 16.6 | 6.06× | 18.2 → 2.86 |
+| 131101 | 120.4 → 20.3 | 5.93× | 16.6 → 2.96 |
+| 262147 | 104.4 → 19.0 | 5.49× | 16.3 → 2.66 |
+
+This is a **component speed-up of the linear algebra**, measured in wall time on one VM. After it,
+κ in situ (2.7–3.0) agrees with the bare-multiply κ, so FPM at κ ≈ 3 now describes this host.
+Re-priced from R2's counts at the new κ, the SGE(8,3) arm is 0.176 / 0.228 / 0.198 of negation rho
+at p = 65537 / 131101 / 262147. **That ratio is not yet a matched comparison:** it prices rho at its
+counted field operations times the Cantor field-multiplication time, while only the index-calculus
+linear algebra was engineered. The matched test is end-to-end wall time of both arms on the same
+instances and binary (R9).
