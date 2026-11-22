@@ -76,6 +76,26 @@ impl SignedDsu {
         self.free = self.free - before + after;
     }
 
+    /// Run58 exact count of immediately solvable signed-pair target templates.
+    /// Only the current affine relation graph is used; frozen homogeneous rows
+    /// and target-to-target cancellations can yield additional solutions.
+    fn single_target_count(&mut self) -> (u128, u128, usize) {
+        let n = self.parent.len();
+        let mut sizes = vec![0usize; n];
+        let mut known = 0usize;
+        for i in 0..n {
+            let (r, _) = self.root(i);
+            if self.anchored[r] { known += 1; }
+            else { sizes[r] += 1; }
+        }
+        let a = known as u128;
+        let good = 2 * a * a + sizes.iter().map(|&s| {
+            let x = s as u128;
+            x * x.saturating_sub(1)
+        }).sum::<u128>();
+        (good, 2 * (n as u128) * (n as u128), known)
+    }
+
     // Exact deficiency except the positive-only shortcut used for stop tests.
     fn deficiency(&mut self, rows: &[Vec<i64>], exact: bool) -> usize {
         if !exact && self.free > rows.len() {
@@ -159,6 +179,52 @@ fn trial(n: usize, rows: &[Vec<i64>], seed: u64) -> (usize, usize) {
     (hi, missing)
 }
 
+/// Run58: synthetic successful-pair stream; full failed-probe scaling by exact
+/// frozen Prime31 two-point support. This is not a root-extraction timing.
+fn run58_one_target_gate(name: &str, n: usize, support: u64) {
+    const GRID: [usize; 11] = [0,100,200,300,400,500,600,700,900,1200,1800];
+    const TARGETS: [usize; 4] = [1,32,128,1024];
+    const REPS: usize = 128;
+    let mut reciprocal = [0f64; GRID.len()];
+    let mut probability = [0f64; GRID.len()];
+    let mut zero = [0usize; GRID.len()];
+    for trial in 0..REPS {
+        let mut d = SignedDsu::new(n);
+        let mut rng = SplitMix64(0x58_2026 + 7919 * trial as u64
+            + if name == "hybrid" { 104729 } else { 0 });
+        let mut previous = 0;
+        for (ix, &m) in GRID.iter().enumerate() {
+            for _ in previous..m {
+                let (i,a,j,b) = draw(&mut rng, n);
+                d.add(i,a,j,b);
+            }
+            let (good,total,_) = d.single_target_count();
+            let p = good as f64 / total as f64;
+            probability[ix] += p;
+            if good == 0 { zero[ix] += 1; }
+            else { reciprocal[ix] += 1.0 / p; }
+            previous = m;
+        }
+    }
+    for &target_count in &TARGETS {
+        let mut best: Option<(usize, f64, f64)> = None;
+        for (ix, &m) in GRID.iter().enumerate() {
+            if zero[ix] > 0 { continue; }
+            let mean_wait = reciprocal[ix] / REPS as f64;
+            let mean_p = probability[ix] / REPS as f64;
+            let queries = (m as f64 + target_count as f64 * mean_wait)
+                * N as f64 / support as f64;
+            if best.is_none_or(|(_, old, _)| queries < old) {
+                best = Some((m, queries, mean_p));
+            }
+        }
+        let (m, expected_queries, p) = best.expect("no supported stopping budget");
+        println!(
+            "run58 {name}: targets={target_count}, base_positive_hits={m},              CONDITIONAL model_uniform_calls={expected_queries:.0},              p_one_target_hit={p:.5}"
+        );
+    }
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut arithmetic = Arithmetic::default();
     check_curve(PRIME31, &mut arithmetic)?;
@@ -191,5 +257,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "hybrid/dickson conditional query ratio={:.6}; equal-call-cost threshold={:.6}",
         means[1] / means[0], means[0] / means[1]
     );
+    // Run58 adds conditional per-target early stopping WITHOUT requiring full base rank.
+    run58_one_target_gate("dickson", 509, 518_084);
+    run58_one_target_gate("hybrid", 677, 916_468);
     Ok(())
 }
