@@ -1,5 +1,5 @@
 # Prime31 symmetric Semaev / Newton original-Rust CI and admission record
-Date: 2026-11-22 UTC. Lane: PR #4924. Status: source-only until a completed source-specific CI receipt is inspected. **[pcc:unverified]**
+Date: 2026-11-22 UTC. Lane: PR #4924. **Updated status:** original-Rust CI [#45082848679](https://github.com/isogeny-labs/crypto/actions/runs/45082848679) succeeded; full signed, extracted-root, cold solver and independent-PCC gates remain open. New `--sweep` and monic-t non-table oracle are committed and in [source-specific CI #45086017598](https://github.com/isogeny-labs/crypto/actions/runs/45086017598), **not yet marked passed**. See [full measured table](CI_RESULTS_20261122.md) and [new exact quotient-elimination proposal](MONIC_T_ELIMINATION.md). **[pcc:unverified]**
 
 ## Exact registered problem and non-negotiable comparison
 
