@@ -69,6 +69,29 @@ These are independently executed **Python arithmetic checks**, not original-sour
 4. Only if the trace–skew system is solver-stage competitive, integrate the existing Rust IC relation collector and verify authentic labelled independent rows, full rank/target-specific quotient rank, signed witnesses, complete unknown-target log recovery, and matched optimized negation rho and best project IC costs.
 5. A speedup in asymptotic exponent needs a **growing prime-field family**, end-to-end slope bounds with uncertainty and a proven or defensibly analysed sub-generic decomposition algorithm, not a constant-size p31 speedup. Neither theorem nor performance evidence here establishes it.
 
+## Asymptotic decision boundary (explicit **heuristic**, not an attack theorem)
+
+For a growing family of ordinary prime-field curves with subgroup order r≈p, suppose a factor base has B=p^β independently behaving x-values. In the *unsaturated* random-sum model a signed m-summand target has relation probability Θ(B^m/p); collecting Θ(B) **independent** rows needs Θ(p/B^(m-1)) target shifts. If an actually nonenumerative relation oracle costs Θ(B^α) operations per shift, and the algebraic relation matrix costs Θ(B^ω) operations (`ω≈2` optimistic sparse-linear-algebra surrogate), then the combined exponent is
+
+```text
+T_rel ≈ p * B^(α-m+1),    T_LA ≈ B^ω
+τ_m(β) = max(1 + β*(α-m+1), ω*β),  for m*β<1,
+β_opt = 1/(ω+m-1-α),   τ_opt = ω/(ω+m-1-α)
+```
+
+This is only valid where the probability/independent-rank model and the oracle assumptions both hold; it omits setup, failed decompositions, target descent, collisions and large-prime graph effects. In particular it **does not** prove a lower bound or optimal complexity for index calculus.
+
+At ω=2 the model gives:
+
+| Number of summands | Per-shift exponent α | Optimistic complete-relation+LA exponent | Assessment |
+| --- | ---: | ---: | --- |
+| m=3 | 1 (one factor-base scan) | 2/3 | Worse than ideal rho's 1/2 |
+| m=3 | 0 (hypothetical B-independent oracle) | 1/2 | Merely matches rho |
+| m=4 | 1 | 1/2 | Merely matches rho |
+| m=4 | 0 | 2/5 | Potential exponent lever **if** actually realized and fully charged |
+
+**Decision:** m=4 with a verified sublinear-in-B query oracle is the next high-value asymptotic target; m=3 and generic B^2 tables are needed as controls. The trace–skew pair presentation is only a mechanism to test for such an oracle; it has *not* been shown to make α<1. Measure the actual F4 scaling and maintain the stronger existing radical-DRL incumbent before claiming an algorithmic advantage.
+
 ## Literature / internal sources
 - Semaev (2004), [Summation polynomials and the discrete logarithm problem on elliptic curves](https://eprint.iacr.org/2004/031); original S3 construction.
 - Kousidis–Wiemers (2019), [On the first fall degree of summation polynomials](https://doi.org/10.1515/jmc-2017-0022); first-fall degree is not a measured solving-degree or end-to-end complexity guarantee.
