@@ -591,6 +591,7 @@ Curves of higher genus and the transfers are described in
 | `cheon.pminus1_comb`, `cheon.pminus1_naive`, `cheon.pplus1_comb` | every addition and doubling of the comb tables (comb) or per-step double-and-add (naive), the baby and giant steps, the shift, the `n + 1` polynomial multi-scalar sums, and the final `[α]G = Q` check; phases `p-1:*` / `p+1:*`. The auxiliary inputs come from the workload's **static-DH oracle** (`P ↦ [α]P`): `d − 1` queries for `n − 1`, `2d − 1` for `n + 1`; the queries are a **separate resource**, in `counters.oracle_queries` and `oracle_server_group_ops` and `detail.oracle`, **not** in `total_gae` | hash inserts and lookups, scalar-field multiplications, `F_{n²}` multiplications |
 | `ic.pipeline` | factor base, oracle set-up (pair tables), relation trials, linear algebra, verification, each a phase; native work (lookups, row operations, square roots, Artin–Schreier solves, …) at the pinned ratio where the repository has one | native work with no pinned ratio for this curve; algebraic-solver operations |
 | `ic.pipeline_counted` | the same pipeline with the relation phase charge rebuilt from counted work and pinned conversions for deterministic SAT/PDP replays | algebraic-solver operations without a pinned conversion, including SAT conflicts; these runs remain lower bounds |
+| `ic.pipeline` with `oracle=mitm-coset[:m=2][,negation_folded=1]` | as `mitm` (set-up additions of the pair table, one lookup and one verifying addition a probe) over the pairs whose classes in `E/⟨G⟩` cancel only, plus, at cofactor above 2, one `[r]P` a `±` pair of base points to label its class (phase `oracle_setup`, in `adds`/`doubles`/`scalar_mults` and so in `S`) | at cofactor 2 the class is `Tr(x) = Tr(a)`, `2(n−1)` field squarings a base point, counted as `mitm_coset_label_field_squarings_uncharged` (phase `oracle_setup`, listed in `unpriced`); lookups and table inserts as for `mitm` |
 | `ic.orbit_rank_v1` | cofactor projection, direct or signed-Frobenius quotient pair-table additions, ordinary `aG+bQ` queries, and independent full-point relation checks; every scalar multiplication uses its actual additions/doublings | raw-x lifting, Frobenius maps, canonicalisations, table inserts/probes and modular rank operations; all native work remains unpriced |
 | `ic.hyperelliptic` | Jacobian operations: the factor-base walk's step precomputation (`setup`), every relation-search step (`relations`), verification | the smoothness oracle's `F_p` multiplications, elimination row operations (phase `linear_algebra`, 0 GAE); priced across the §5a band |
 | `ic.known_log_mitm2_v1` | every known-log base scalar multiplication, folded pair-table addition, failed query, pair witness check and final scalar verification; separate setup and five online phases | base sampling and indexing, table insertions and probes, negations and scalar combinations; native work is counted and unpriced |
@@ -796,6 +797,28 @@ unpinned work keeps the reported `S` a lower bound. The
 probe but adds canonicalisation, Frobenius-map, lookup, entry and
 representative counts to `oracle_setup`. Use `mitm-frobenius:m=3` on the
 same base as its accounting control.
+
+`mitm-coset:m=2[,negation_folded=1]` (binary and Koblitz curves,
+`ic_framework::plugins::CosetMitmOracle`) is `mitm` over a coset-filtered
+pair table (the GT-02 lead of `docs/notes/graph-theory-ic-20261121.md`,
+ported from the cryptanalysis repository).  A subgroup target `R` can only
+equal `P_i + P_j` when the classes of `P_i` and `P_j` in `E/⟨G⟩` cancel, so
+the table is built over those pairs alone, visited in `mitm`'s order: every
+key a subgroup target can reach keeps `mitm`'s first witness, and the probe,
+its lookups and its verifying addition are `mitm`'s, so the relations are
+identical and only the set-up additions fall (a fraction of up to `1 − 1/h`
+of the table).  At `m = 3` the probed `R − P` leaves the subgroup, so the
+oracle builds the full table and labels nothing.  The labelling is part of
+`S`: one `[r]P` per `±` pair of base points when the cofactor is not 2, and
+at cofactor 2 the trace test's field squarings, counted but uncharged
+(`mitm_coset_label_field_squarings_uncharged`; about `2n` squarings a base
+point against `|F|²/4` additions).  The filter helps only on a base that
+straddles the classes: a subgroup-orbit base (every point is `[h]P`) lies in
+one class and the labelling is then pure cost, and on a Koblitz divisor base
+the trace vanishes unless `(x + 1)` divides the divisor, so a divisor without
+`x + 1` is one class and the filter keeps every pair.  `mitm_coset_classes`
+and `mitm_coset_in_subgroup` in `oracle_setup` say which case a run was in.
+Use `mitm:m=2` on the same base as the matched control.
 
 `cm-multiplier:size=K,norm=N[,endo=I][,mult=M]` and
 `binary-multiplier:size=K,mult=M` expose the generator-relative multiplier
