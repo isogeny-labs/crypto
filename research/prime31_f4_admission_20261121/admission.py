@@ -21,7 +21,7 @@ def main():
     print("7-leaf arm calls:", calls)
     print("total calls:", sum(calls))
     print("per-target calls:", sum(calls) / N)
-    print("7-leaf per-call / 8-leaf per-call crossover:", N / sum(calls))
+    print("7-leaf per-call / 8-leaf per-call crossover:", (N - MISSES) / sum(calls))
     for v in (16, 31, 64, 74):
         d4, _ = dense_envelope(v, 4)
         d5, tib = dense_envelope(v, 5)
