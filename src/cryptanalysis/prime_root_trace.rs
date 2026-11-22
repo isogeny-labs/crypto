@@ -1344,9 +1344,21 @@ fn quartic_reduce(mut t: [u64; 7], c: [u64; 4], p: u64) -> [u64; 4] {
 #[inline]
 fn quartic_mul(a: [u64; 4], b: [u64; 4], c: [u64; 4], p: u64) -> [u64; 4] {
     let mut t = [0u64; 7];
-    for i in 0..4 {
-        for j in 0..4 {
-            t[i + j] = cubic_add(t[i + j], vmul(a[i], b[j], p), p);
+    if p <= 2_000_000_000 {
+        // Every coefficient contains at most four products. Therefore
+        // 4*(p-1)^2 <= 4*(2e9-1)^2 < 2^64: one reduction per column is safe.
+        // This replaces 16 divisions/modular reductions with 7.
+        for i in 0..4 {
+            for j in 0..4 {
+                t[i + j] += a[i] * b[j];
+            }
+        }
+        for x in &mut t { *x %= p; }
+    } else {
+        for i in 0..4 {
+            for j in 0..4 {
+                t[i + j] = cubic_add(t[i + j], vmul(a[i], b[j], p), p);
+            }
         }
     }
     quartic_reduce(t, c, p)
@@ -1354,12 +1366,24 @@ fn quartic_mul(a: [u64; 4], b: [u64; 4], c: [u64; 4], p: u64) -> [u64; 4] {
 #[inline]
 fn quartic_square(a: [u64; 4], c: [u64; 4], p: u64) -> [u64; 4] {
     let mut t = [0u64; 7];
-    for i in 0..4 {
-        t[2 * i] = cubic_add(t[2 * i], vmul(a[i], a[i], p), p);
-        for j in (i + 1)..4 {
-            let product = vmul(a[i], a[j], p);
-            t[i + j] = cubic_add(
-                t[i + j], cubic_add(product, product, p), p);
+    if p <= 2_000_000_000 {
+        // Symmetry: 4 squares + 6 doubled cross terms. The accumulated
+        // value for any column is bounded by 4*(p-1)^2 < 2^64.
+        for i in 0..4 {
+            t[2 * i] += a[i] * a[i];
+            for j in (i + 1)..4 {
+                t[i + j] += 2 * a[i] * a[j];
+            }
+        }
+        for x in &mut t { *x %= p; }
+    } else {
+        for i in 0..4 {
+            t[2 * i] = cubic_add(t[2 * i], vmul(a[i], a[i], p), p);
+            for j in (i + 1)..4 {
+                let product = vmul(a[i], a[j], p);
+                t[i + j] = cubic_add(
+                    t[i + j], cubic_add(product, product, p), p);
+            }
         }
     }
     quartic_reduce(t, c, p)
