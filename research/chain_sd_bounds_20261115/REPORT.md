@@ -22,7 +22,10 @@ beyond depth 14, and Lean proofs.
 | T6 | Constant lower bound `LFD(k) ≥ 4` for all `k ≥ 2` (needs `t ≠ 0`, `A ≠ −3t²`); `LFD(k) ≥ 3` for `k ≥ 2` and all `(A, B, t)` | `≥ 4` proved (§7, desk); `≥ 3` Lean (`one_not_mem_closure_two`, `two_lt_solvingDegree`) |
 | T7 | Upper bound `LFD(k) ≤ 2k + 1` for every unit instance, `k ≥ 1`: `A = 2, B = 1` | proved (§6, desk) |
 | T8 | Finite depths: exact `LFD(k) = 4, 4, 4, 4, 5, 5, 5, 5` for `k = 2..9` on the admissible instance `p = 12289, n = 11`, each with an upper and a lower replay certificate; `LFD(k) ≥ 6` for `10 ≤ k ≤ 15` on `p = 65537, n = 3` by one certified closure at `k = 10` plus T4 | certified (§8; all 17 certificates verified by the independent checker) |
-| T9 | Linear lower bound `ck − C ≤ LFD(k)` with `c > 0` | **open** (§7.3: the missing lemma is stated exactly; the lane-P slope-1/14 proof is not re-derived here) |
+| T9 | Linear lower bound `ck − C ≤ LFD(k)` with `c > 0` | **open** [pcc:unverified]; reduced by T10 to the `k`-free Missing Lemma Π (§13.2), which a counting heuristic predicts to fail asymptotically (§13.4) |
+| T10 | **Theorem A** (cofactor reduction): if every cofactor `v` supported on `[0,N−3]²` with `wt(g·v) ≤ c−1` has per-coordinate popcount `≤ k−3`, then `1 ∉ V_c(k)` | Lean (`one_not_mem_closure_of_cofactorHyp`, §13.2) |
+| T11 | The boundary functionals of §7.3 annihilate `u` iff `S` divides the lift `L(u)` iff the cofactor `g⁻¹u` avoids the top two residues | proved (paper, §13.1) |
+| T12 | The slope 1/4 is shared by the Möbius and affine couplings of two 2-power chains | computed (§13.5) |
 
 Separate reports, as requested: finite-depth results in §8, constant bounds in §6–7 (`4 ≤ LFD(k) ≤ 2k + 1`), linear growth in §7.3 (open above; the proved linear *upper* growth is `2k + 1`). [pcc:unverified]
 
@@ -254,6 +257,8 @@ with the same `(p, A, B, t)`. Table in §8.
 
 ### 7.3 The linear lower bound: open, and the exact missing lemma
 
+*Follow-up (2026-11-22):* §13 replaces the missing lemma below by the sharper, `k`-free Missing Lemma Π, proves the reduction in Lean (Theorem A), and records the evidence on whether it can hold. [pcc:unverified]
+
 The primary theorem asks for `ck − C ≤ LFD(k)` with `c > 0`. **This is not proved here.** What is [pcc:unverified]
 established: `LFD` is nondecreasing in `k` on a fixed instance (T4); `LFD(k) ≥ 4` for `k ≥ 2` (T6);
 `LFD(k) ≥ 5` for `6 ≤ k ≤ 11` on `p = 12289, n = 11` and `LFD(k) ≥ 6` for `10 ≤ k ≤ 15` on
@@ -357,14 +362,16 @@ Theorem 1 these are statements about the pinned polynomial-ring computation.
 | T6, weak form `1 ∉ V_2` (`LFD ≥ 3`) | `one_not_mem_closure_two`, `two_lt_solvingDegree` (`LowerThree.lean`) | `k ≥ 2`, any `A B t` | checked |
 | T6 (`LFD ≥ 4`), T7 (`LFD ≤ 2k+1`) | — | | paper only (§6, §7.1) |
 | T9 linear lower bound | — | | open |
+| T10 Theorem A | `one_not_mem_closure_of_cofactorHyp` (generic `g`), `one_not_mem_chainSystem_of_cofactorHyp` (Semaev generator), `CofactorHyp`, `shift_avoids_top`, `inv_not_mem_avoidSub`, `popcount_add_le` (`Cofactor.lean`) | `k ≥ 2`, `g·ginv = 1`, `supp g ⊆ {0,1,2}²`, `g_(2,2) ≠ 0`, `g ∈ Q_{≤c}`, hypothesis `CofactorHyp g c` | checked |
+| T11 boundary ⇔ divisibility | — | `S` irreducible, unit instance | paper only (§13.1) |
 
 Build: `cd lean && lake build` (Lean 4.34.1, Mathlib `d13f23b723b8a846827a245b89c10fc7d3f11612` = tag
 `v4.34.1`; `lakefile.toml`, `lake-manifest.json`, `lean-toolchain` pinned; "Build completed
 successfully (8931 jobs)"). Axioms: `lake env lean ChainSd/Axioms.lean` prints only `propext`,
-`Classical.choice`, `Quot.sound` for all 17 listed theorems (recorded in `reports/axioms.txt`). No
+`Classical.choice`, `Quot.sound` for all 22 listed theorems (recorded in `reports/axioms.txt`; 2026-11-22 build: 8933 jobs). No
 `sorry`, no `native_decide`, no custom axiom. Files: `Closure.lean` (abstract), `Popcount.lean`,
 `GroupAlgebra.lean` (concrete algebra, depth monotonicity), `Reach.lean` (reachability, T2 concrete),
-`Unit.lean` (T3), `LowerThree.lean` (`1 ∉ V_2`).
+`Unit.lean` (T3), `LowerThree.lean` (`1 ∉ V_2`), `Cofactor.lean` (T10, Theorem A).
 
 ## 11. Reproduction
 
@@ -398,3 +405,167 @@ Not reachable in this session: the `research-kb` and `ecdb` MCP servers (not con
 atlas (sibling checkout absent), and `isogeny-labs/ml-cryptanalysis` (`add_repo` denied), where the
 N8 proof, `U1-upper-bounds.md` and `experiments/ic-bounds-k14/` live; their values are quoted from
 the crypto-repository summaries and labelled unverified.
+
+## 13. Follow-up (2026-11-21/22): the cofactor reduction of the lower bound
+
+Every statement in this section is `[pcc:unverified]`. Theorem A is kernel-checked in Lean
+(`lean/ChainSd/Cofactor.lean`); the measurements are engine runs (`native/`, commands in §13.7).
+
+### 13.1 The boundary functionals are a divisibility test
+
+Let `L : Q_k → F[x₁,x₂]` be the lift with exponents in `[0,N)²`, and `Z = Z₁ ∪ Z₂` the `4N`
+boundary points of the curve `C : S = 0` with `x₁ ∈ μ_N` (`Z₁`) or `x₂ ∈ μ_N` (`Z₂`).
+
+**Proposition 13.1.** For `u ∈ Q_k` the following are equivalent [pcc:unverified]:
+1. `L(u)` vanishes on the boundary scheme `(S, x₁^N − 1) ∪ (S, x₂^N − 1)`;
+2. `S` divides `L(u)` in `F[x₁, x₂]`;
+3. the cofactor `κ(u) := g⁻¹u ∈ Q_k` is supported on `[0, N−3]²`, i.e. it avoids the top two
+   residues `N−2, N−1` in both coordinates.
+
+*Proof.* (2⇒1) is clear. (1⇒2): in the coordinate ring `F[C]` the ideals `(x₁^N − 1)` and
+`(x₂^N − 1)` are coprime (unit instance), so `L(u) = (x₁^N−1)(x₂^N−1)q` there. On the projective
+model `x₁` and `x₂` have degree 2, so the pole divisor of `L(u)` (bidegree `≤ (N−1,N−1)`) is at
+most `(N−1)(x₁)_∞ + (N−1)(x₂)_∞`, while that of the right-hand side is at least
+`N(x₁)_∞ + N(x₂)_∞` unless `q = 0`. Hence `L(u)|_C = 0` and `S | L(u)` (`S` irreducible).
+(2⇔3): `S` has bidegree exactly `(2,2)` (leading coefficient `(x₁−t)²`), so `L(u) = S·h` forces
+`deg_{xᵢ} h ≤ N−3` and `π(h) = g⁻¹u`; conversely, if `L(g⁻¹u)` has bidegree `≤ (N−3,N−3)`, then
+`S·L(g⁻¹u)` has exponents `< N` and equals `L(u)`. ∎
+
+So the boundary test of §7.3 checks exactly one thing: whether the closure stays inside the
+**no-wrap multiples** of `S`. Measured (F2 instance, two random seeds per cell, `bnd` command):
+
+| degree c | boundary functionals annihilate V_c(k) | fail |
+|---|---|---|
+| 3 | k = 3, 4, 5, 6 | k = 2 |
+| 4 | k = 7, 8, 9 | k = 5, 6 (k = 6 only through the top-bit wrap, `j = k−1`) |
+| 5 | ⟨k = 11: pending⟩ | k = 10 (only through the top-bit wrap, `j = 9`) |
+
+These fit `k ≥ 4c − 9`, within one level of the exact law `⌊(k+14)/4⌋`.
+
+### 13.2 Theorem A (Lean): the cofactor reduction
+
+**Theorem A.** Let `k ≥ 2`, let `g ∈ Q_k` be a unit supported on `{0,1,2}²` with `g_{(2,2)} ≠ 0`
+and `g ∈ Q_{≤c}`. Assume the cofactor hypothesis `H(c,k)`: every `v ∈ Q_k` supported on
+`[0,N−3]²` with `g·v ∈ Q_{≤c−1}` has, at each exponent `(a,b)` of its support, `popcount(a) ≤ k−3`
+and `popcount(b) ≤ k−3`. Then `1 ∉ V_c(k)`, so `LFD(k) > c`.
+
+*Proof.* The subspace `{u ∈ Q_{≤c} : supp(g⁻¹u) ⊆ [0,N−3]²}` contains `g` and is closed under the
+degree-`c` shift rule. A residue of popcount `≤ k−3` plus `2^j` is never `N−2` or `N−1`: if it
+were, `N−1` would be the sum of it and a number of popcount `≤ 2`, contradicting subadditivity of
+popcount. The subspace does not contain `1`: if `g⁻¹` avoided the top residues, the coefficient of
+`g·g⁻¹` at the lex-largest exponent of `g⁻¹` plus `(2,2)` would be `g_{(2,2)}·(g⁻¹)_max ≠ 0`, with
+no wrap-around. ∎
+
+Lean: `ChainSd.one_not_mem_closure_of_cofactorHyp` (any such `g`) and
+`ChainSd.one_not_mem_chainSystem_of_cofactorHyp` (the Semaev generator `gen p k A B t`); the
+hypothesis is `ChainSd.CofactorHyp`. Supporting lemmas: `popcount_add_le` (subadditivity),
+`shift_avoids_top`, `inv_not_mem_avoidSub`, `shift_mem_weightSub`. The 2026-11-22 build passes
+(8933 jobs), and the axiom audit of all 22 listed theorems shows only `propext`,
+`Classical.choice`, `Quot.sound`.
+
+**Corollary A.** Let `Π(w)` be the maximum, over all `h ∈ F[x₁,x₂]` whose product `S·h` has every
+monomial of binary weight `≤ w`, of the per-coordinate popcount of the exponents of `h`. If
+`Π(c−1) ≤ k−3`, then `H(c,k)` holds (for `v` as in `H`, `L(g·v) = S·L(v)`), so `1 ∉ V_c(k)`.
+
+The linear lower bound therefore reduces to a statement with no `k` and no wrap-around:
+
+**Missing Lemma Π** (replaces the locality lemma of §7.3). There are `α, β` such that `Π(w) ≤ αw + β`
+for every `w`, uniformly over the admissible family. It would give `LFD(k) ≥ (k − 3 − β)/α + 1`.
+
+### 13.3 Measurements of Π(w)
+
+Two independent solvers agree on every shared box (`X = 32, 64`, weights 3 and 4):
+- `lwm`: dense kernel of the weight constraints on `h`;
+- `lwm2`: `f = S·h` on low-weight monomials, required to vanish at `4X + 200` distinct points of
+  `C`, then exact division by `S`. A failed division aborts the run. A first `lwm2` version sampled
+  repeated abscissae and aborted at `X = 1024, w = 5`; it was fixed, and the fixed version
+  reproduces `X = 512, w = 4` exactly.
+
+The box `X` bounds the cofactor degree.
+
+| w | X=8 | 16 | 32 | 64 | 128 | 256 | 512 | 1024 | 2048 |
+|---|---|---|---|---|---|---|---|---|---|
+| 2 | 1 | 1 | 1 | 1 | | | | | |
+| 3 | 3 | 4 | 5 | 5 | 6 | 6 | 6 | | |
+| 4 | 3 | 4 | 5 | 6 | 7 | 8 | 8 | 9 | 10 |
+| 5 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | ⟨pending⟩ |
+
+At `w = 3` the maximum cofactor degree is 38, 70, 130, 258 at `X = 64..512`, so the popcount bound 6
+is reached well inside the box. The extremal weight-3 cofactor is dense on a `64 × 64` block: a
+414-term `f` whose `h` fills the block. Weight-3 relations close blocks of side `2^6` but not `2^7`.
+Values at `w = 4, 5` are lower bounds: the cofactors reach the box edge.
+
+**Consistency test of Theorem A.** Where the law says `1 ∈ V_c(k)`, Theorem A must be silent, so [pcc:unverified]
+`Π(c−1) > k − 3` for `k ≤ 4c − 11`. This requires `Π(3) > 2` (holds: 6), `Π(4) > 6` (holds: ≥ 10),
+and, for the lane-P value `LFD(13) = 6` (not re-verified), `Π(5) ≥ 11` (measured so far: ≥ 10).
+
+### 13.4 A counting heuristic, and what it predicts for the primary theorem
+
+A relation `S·h = f` dense at scale `2^m` needs the low-weight monomials that use scale `2^m`, about
+`C(2m, ≤ w−1)` of them, to outnumber the roughly `2^m` new vanishing conditions on `C`. This
+predicts the largest closable block exponent `m(w)`:
+
+| w | 3 | 4 | 5 | 6 | 7 | 20 | 100 |
+|---|---|---|---|---|---|---|---|
+| predicted `m(w)` | 6 | 10 | 14 | 19 | 23 | ≈ 90 | ≈ 465 |
+
+It matches `Π(3) = 6` and `Π(4) ≥ 10` exactly. The increments, about 4–5 per unit of weight for [pcc:unverified]
+`w ≤ 7`, are the observed slope `1/4`. But asymptotically `m(w) ~ w·log₂ w`. If the heuristic is
+sharp:
+- Theorem A gives `LFD(k) ≳ k/4.x` at every practical depth, but only `Ω(k / log k)` asymptotically;
+- Missing Lemma Π is **false**, so this route cannot prove the primary linear lower bound.
+
+Whether `LFD` itself is linear then depends on **reachability**. The closure reaches fewer cofactors
+than all multiples: at `c = 4` the reachable low cofactors have popcount 5 (`k = 6, 7, 8`), while
+`Π(3) = 6`. At `c = 5` (`k = 10`) the reachable popcount is ⟨pending⟩, against `Π(4) ≥ 10`.
+
+### 13.5 The slope 1/4 is shared by other couplings
+
+The slope does not come from the Semaev polynomial. Same engine; Möbius and affine at
+`p = 7340033`; unit generators checked by grid enumeration:
+
+| generator | LFD at k = 2..9 | fit |
+|---|---|---|
+| Semaev `S₃`, bidegree (2,2) (F1/F2) | 4,4,4,4,5,5,5,5 | `⌊(k+14)/4⌋` |
+| Möbius `x₁x₂ + 1234x₁ + 40001x₂ + 777` | 3,3,4,4,4,4,5,5 | `⌊k/4⌋ + 3` |
+| affine `x₂ − x₁ − 123457` | 3,3,3,4,4,4,4,5 | `⌊(k−1)/4⌋ + 3` |
+
+The binomial coupling `x₂ = λx₁` has constant LFD, and one chain alone has LFD 2. So the slope
+`1/4` belongs to two 2-power chains coupled by any non-binomial relation. Their cofactor bounds
+grow the same way: affine Π = 1, 4, ≥ 8 and Möbius Π(2) = 4, Π(3) = 7 for `w = 1, 2, 3`.
+
+### 13.6 Depth 15
+
+The upper certificate at `k = 15` needs `1 ∈ V_7(15)`, the closure on `C(30, ≤7) = 2,629,575`
+columns. On the admissible instance F1 the constant `1` enters the closure only near full rank:
+
+| k | D = LFD | columns | rank when 1 enters | fraction |
+|---|---|---|---|---|
+| 4 | 4 | 163 | 151 | 0.93 |
+| 5 | 4 | 386 | 365 | 0.95 |
+| 6 | 5 | 1,586 | 1,375 | 0.87 |
+| 7 | 5 | 3,473 | 2,903 | 0.84 |
+| 8 | 5 | 6,885 | 6,853 | 0.995 |
+| 9 | 5 | 12,616 | 12,580 | 0.997 |
+
+A dense echelon at that rank for `k = 15` is about `2.5 × 10⁶ × 2.6 × 10⁶` entries, roughly 25 TB at 4
+bytes. The largest closure in the repository (lane P, GPU) had about `3.8 × 10⁵` columns. A larger
+host does not close this gap, so no paid compute was launched, although AWS and RunPod credentials
+are present. Certifying `LFD(15)` from above needs a structured derivation of `1`, which is open. The
+lower side stays `LFD(15) ≥ 6` (§8).
+
+### 13.7 Reproduction (native engine, `research/chain_sd_bounds_20261115/native`)
+
+```sh
+cargo build --release
+./target/release/chainsd bnd 65537 7 18 0 3 4            # boundary-functional and top-extraction tests
+./target/release/chainsd cofactor 65537 8 4 <terms>      # support of g^{-1} V_4(8); <terms> = a:b:c list of S
+./target/release/chainsd lwm2 65537 512 3 <terms>        # Pi(3) at box 512 (evaluation solver)
+./target/release/chainsd lwm 65537 64 3 <terms>          # dense cross-check
+./target/release/chainsd gen2 7340033 9 7 0:1:1 1:0:7340032 0:0:7216576   # affine coupling LFD
+./target/release/chainsd closure 12289 8 1210 0 11 5 early               # early-exit rank
+```
+
+`<terms>` for F2 is `0:0:324 0:1:65429 0:2:9 1:0:65429 1:1:65483 1:2:65531 2:0:9 2:1:65531 2:2:1`.
+Recorded values: `reports/cofactor_data.json`. Graphs: `reports/pi_vs_box.svg` and
+`reports/lfd_universality.svg` (source `reports/plot_cofactor.py`).

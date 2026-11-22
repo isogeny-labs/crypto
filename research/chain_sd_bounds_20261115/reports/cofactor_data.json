@@ -1,0 +1,57 @@
+{
+  "description": "Recorded values for REPORT.md section 13 (2026-11-21/22). Engine: research/chain_sd_bounds_20261115/native (chainsd). All [pcc:unverified].",
+  "pi_measured": {
+    "semaev_F2": {
+      "instance": "p=65537, A=18, B=0, t=3 (S_3 bidegree (2,2))",
+      "solver": "lwm2 (evaluation on 4X+200 distinct curve points, exact division by S); cross-checked with lwm (dense) at X=32,64",
+      "per_coordinate_max_popcount": {
+        "2": {"8": 1, "16": 1, "32": 1, "64": 1},
+        "3": {"8": 3, "16": 4, "32": 5, "64": 5, "128": 6, "256": 6, "512": 6},
+        "4": {"8": 3, "16": 4, "32": 5, "64": 6, "128": 7, "256": 8, "512": 8, "1024": 9, "2048": 10},
+        "5": {"8": 3, "16": 4, "32": 5, "64": 6, "128": 7, "256": 8, "512": 9, "1024": 10}
+      },
+      "max_cofactor_degree": {
+        "3": {"64": 38, "128": 70, "256": 130, "512": 258},
+        "4": {"512": 386, "1024": 770, "2048": 1538},
+        "5": {"512": 511, "1024": 1023}
+      }
+    },
+    "affine": {
+      "instance": "p=7340033, x2 - x1 - 123457",
+      "per_coordinate_max_popcount": {
+        "1": {"32": 1, "128": 1, "512": 1},
+        "2": {"32": 4, "128": 4, "512": 4},
+        "3": {"32": 5, "128": 7, "512": 8}
+      }
+    },
+    "mobius": {
+      "instance": "p=7340033, x1 x2 + 1234 x1 + 40001 x2 + 777",
+      "per_coordinate_max_popcount": {
+        "2": {"32": 4, "128": 4, "512": 4},
+        "3": {"32": 5, "128": 7, "512": 7}
+      }
+    }
+  },
+  "counting_prediction_m_of_w": {"3": 6, "4": 10, "5": 14, "6": 19, "7": 23, "20": 90, "100": 465},
+  "boundary_threshold": {
+    "description": "boundary functionals annihilate V_c(k)? (bnd command, F2 instance, 2 seeds each)",
+    "3": {"2": false, "3": true, "4": true, "5": true, "6": true},
+    "4": {"4": false, "5": false, "6": false, "7": true, "8": true, "9": true},
+    "5": {"10": false}
+  },
+  "reachable_cofactor_popcount": {
+    "description": "max per-coordinate popcount of g^{-1}u over u in V_c(k) (all) and over its weight <= c-1 part (low); cofactor command, F2",
+    "c3": {"k3..7": {"all": 1, "low": 0}},
+    "c4": {"k6": {"all": 6, "low": 5}, "k7": {"all": 6, "low": 5}, "k8": {"all": 6, "low": 5}}
+  },
+  "early_exit_fraction": {
+    "description": "rank of the closure when 1 first enters (early exit) / columns, instance F1 (p=12289, n=11) at D = LFD(k)",
+    "4": [151, 163], "5": [365, 386], "6": [1375, 1586], "7": [2903, 3473], "8": [6853, 6885], "9": [12580, 12616]
+  },
+  "universality_lfd": {
+    "description": "LFD(k) for k = 2..9, p = 7340033 (Mobius, affine) and F1/F2 (Semaev); unit generators by grid enumeration",
+    "semaev": [4, 4, 4, 4, 5, 5, 5, 5],
+    "mobius": [3, 3, 4, 4, 4, 4, 5, 5],
+    "affine": [3, 3, 3, 4, 4, 4, 4, 5]
+  }
+}

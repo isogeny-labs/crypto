@@ -22,7 +22,9 @@
   [T6], [LFD($k$) $>= 4$ for all $k >= 2$ ($t != 0$, $A != -3t^2$)], [proved (paper)],
   [T7], [LFD($k$) $<= 2k+1$ for every unit instance], [proved (paper)],
   [T8], [LFD($k$) $= 4,4,4,4,5,5,5,5$ for $k = 2..9$ with verified upper and lower replay certificates; LFD $>= 6$ for $10 <= k <= 15$ on $p = 65537$ by one certified depth-10 closure and T4], [certified (see §3)],
-  [T9], [Linear lower bound $c k - C <=$ LFD($k$), $c > 0$], [*open*; missing lemma stated],
+  [T9], [Linear lower bound $c k - C <=$ LFD($k$), $c > 0$], [*open*; reduced to Missing Lemma Π (§6)],
+  [T10], [Theorem A: if every cofactor $v$ off the top two residues with $"wt"(g v) <= c-1$ has per-coordinate popcount $<= k-3$, then $1 in.not V_c (k)$], [proved; Lean],
+  [T12], [Slope 1/4 shared by Möbius and affine couplings], [computed],
 )
 
 Separately: finite-depth results (§3), constant bounds $4 <= "LFD"(k) <= 2k+1$ (T6, T7), linear growth (upper slope 2 proved; lower slope open; lane-P empirical slope $1\/4$).
@@ -58,6 +60,20 @@ Ring $FF_p[y_(1,0..k-1), y_(2,0..k-1)]$, grevlex, generators $y_(s,j+1) - y_(s,j
 
 A linear lower bound needs a *locality* lemma: for $c <= alpha k - beta$, $1 in.not U_c (k)$; equivalently a co-closed family of functionals annihilating $g$ with one not annihilating $1$, or (through T5 and the observed equality $U_c = pi_k (W_c)$) that no element of the $ZZ$-exponent closure $W_c subset (S_3)$ is $equiv 1$ modulo $(x_1^N - 1, x_2^N - 1)$. The evaluation functionals at the Semaev-curve points with one coordinate in $mu_N$ are *not* the annihilator ($k = 6$, $D = 4$: 188 of 605 rows fail although $1 in.not V_4$); this counterexample is preserved in `reports/evaltest.md`.
 
+= Follow-up 2026-11-22: the cofactor reduction
+
+*Theorem A (Lean).* With $g$ a unit supported on ${0,1,2}^2$, $g_(2,2) != 0$: if every $v in Q_k$ supported on $[0, N-3]^2$ with $g v in Q_(<= c-1)$ has per-coordinate popcount $<= k-3$, then $1 in.not V_c (k)$. The subspace of weight-$<= c$ elements whose cofactor $g^(-1) u$ avoids the top two residues is closed under the degree-$c$ rule and misses 1. The boundary functionals of §4 test exactly this: they annihilate $u$ iff $S$ divides the lift $L(u)$ iff the cofactor avoids the top residues.
+
+*Missing Lemma Π.* Let Π($w$) be the largest per-coordinate popcount of a cofactor $h$ with $S h$ of binary weight $<= w$ in $FF_p [x_1, x_2]$ (no $k$, no wrap-around). A bound Π($w$) $<= alpha w + beta$ gives LFD($k$) $>= (k - 3 - beta)\/alpha + 1$.
+
+#figure(image("pi_vs_box.svg", width: 100%), caption: [Measured Π($w$) for the F2 instance against the cofactor box; dotted: counting prediction $m(w) = 6, 10, 14$. Π(3) = 6 is saturated; Π(4) $>= 10$ and Π(5) $>= 10$ still track the box edge.])
+
+The counting heuristic matches Π(3) and Π(4) exactly and grows by about 4–5 per unit of weight for $w <= 7$, which is the observed slope 1/4. Asymptotically it grows like $w log_2 w$, so if it is sharp, Missing Lemma Π fails and Theorem A alone gives only $Omega(k \/ log k)$. The closure reaches fewer cofactors than all multiples (popcount 5 at $c = 4$ against Π(3) = 6), so LFD itself may still be linear.
+
+#figure(image("lfd_universality.svg", width: 100%), caption: [LFD($k$) for three couplings of two 2-power chains: Semaev ⌊(k+14)/4⌋, Möbius ⌊k/4⌋+3, affine ⌊(k-1)/4⌋+3.])
+
+*Depth 15.* The constant 1 enters the closure only at 84–99.7 % of full rank ($k = 4..9$); at $k = 15$, $D = 7$ that is a dense echelon of about 25 TB. A larger host does not close the gap; no paid compute was launched.
+
 = Files
 
-`REPORT.md` (full statements and proofs), `lean/ChainSd/{Closure,Popcount,GroupAlgebra,Reach,Unit,LowerThree}.lean` (Lean 4.34.1, Mathlib v4.34.1; 17 theorems audited, standard axioms only), `native/` (Rust engine), `native/checker/chaincheck.c` (independent checker), `certs/` (replay certificates and `README.md`), `reports/` (this document, graphs, `values.json`, `evaltest.md`).
+`REPORT.md` (full statements and proofs), `lean/ChainSd/{Closure,Popcount,GroupAlgebra,Reach,Unit,LowerThree,Cofactor}.lean` (Lean 4.34.1, Mathlib v4.34.1; 22 theorems audited, standard axioms only), `native/` (Rust engine), `native/checker/chaincheck.c` (independent checker), `certs/` (replay certificates and `README.md`), `reports/` (this document, graphs, `values.json`, `evaltest.md`).
