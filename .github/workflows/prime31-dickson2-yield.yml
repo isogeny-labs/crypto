@@ -1,0 +1,33 @@
+name: Prime31 native Dickson2 exact yield
+on:
+  push:
+    branches:
+      - research/prime31-f4-admission-run51-20261121
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_dickson2_yield_census.rs'
+      - 'research/prime31_f4_admission_20261121/RUN55_DICKSON2_YIELD_PROTOCOL.md'
+      - '.github/workflows/prime31-dickson2-yield.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_dickson2_yield_census.rs'
+      - '.github/workflows/prime31-dickson2-yield.yml'
+  workflow_dispatch:
+jobs:
+  native-yield:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: research/prime31_ic_20261115/native -> target
+          key: prime31-native-dickson2-yield
+      - name: Compile existing Prime31 native Rust (not monolithic root crate)
+        timeout-minutes: 8
+        working-directory: research/prime31_ic_20261115/native
+        run: cargo build --release --example prime31_dickson2_yield_census
+      - name: Verify full depth-10 signed two-summand support census
+        timeout-minutes: 2
+        working-directory: research/prime31_ic_20261115/native
+        run: timeout 90s target/release/examples/prime31_dickson2_yield_census
