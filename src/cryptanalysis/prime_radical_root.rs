@@ -5083,3 +5083,54 @@ mod round115_barrett_regressions {
         assert_eq!(checked, 800_288);
     }
 }
+
+#[cfg(test)]
+mod round116_coefficient_normalization_tests {
+    use super::RadicalRootCtx;
+
+    #[test]
+    fn padded_noncanonical_coefficients_match_independent_modulo_normalization() {
+        let mut seed = 0x7df4_1159_c2e5_ba08u64;
+        for p in [5u64, 7, 101, 65_521, 1_000_000_007, (1u64 << 61) - 1] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            for i in 0..1_024 {
+                let mut polynomial = Vec::new();
+                let degree = (i % 3) + 1;
+                for j in 0..=degree {
+                    seed = seed.wrapping_mul(6364136223846793005)
+                        .wrapping_add(1442695040888963407);
+                    let x = seed % p;
+                    let value = match j % 4 {
+                        0 => x,
+                        1 => p + x,
+                        2 => 2 * p + x,
+                        _ => 3 * p + x,
+                    };
+                    polynomial.push(value);
+                }
+                // Ensure nonzero degree for the comparison, even if
+                // a random leading coefficient was congruent to zero.
+                polynomial[degree] = if i & 1 == 0 { 1 } else { p + 1 };
+                // Extra trailing entries are zero modulo p but not
+                // necessarily zero as machine words.
+                if i & 3 == 0 {
+                    polynomial.extend_from_slice(&[p, 2 * p, 0, p]);
+                }
+                let mut normalized: Vec<u64> =
+                    polynomial.iter().map(|x| x % p).collect();
+                while normalized.last() == Some(&0) {
+                    normalized.pop();
+                }
+                assert_eq!(
+                    ctx.roots(&polynomial),
+                    ctx.roots(&normalized),
+                    "p={p}, i={i}, polynomial={polynomial:?}"
+                );
+            }
+            for zero in [&[][..], &[p][..], &[0, p, 2 * p][..]] {
+                assert_eq!(ctx.roots(zero), ctx.roots(&[]));
+            }
+            assert!(ctx.roots(&[1, 0, 0, 0, 0, 1]).is_err());
+        }
+    }
+}
