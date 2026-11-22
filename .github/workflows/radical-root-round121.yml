@@ -1,0 +1,32 @@
+name: Rootfinding Round121 sparse Fp2 and Jacobi Rust A/B
+on:
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_radical_root.rs'
+      - 'research/amm_digit_perf_20261118/round121_sparse_fq2_ab.py'
+      - '.github/workflows/radical-root-round121.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-rust-fp2:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            src/cryptanalysis/prime_radical_root.rs
+            research/amm_digit_perf_20261118/round121_sparse_fq2_ab.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Source-exact Rust correctness and alternating Fp2 A/B
+        run: |
+          set -euo pipefail
+          rustc --version
+          python3 research/amm_digit_perf_20261118/round121_sparse_fq2_ab.py | tee round121_native_rust.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rootfind-round121-native-rust
+          path: round121_native_rust.txt
+          if-no-files-found: warn
