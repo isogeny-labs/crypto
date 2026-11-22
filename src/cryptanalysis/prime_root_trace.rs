@@ -2059,12 +2059,12 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                         modulus: monic,
                         initial_frobenius: base.as_slice() == [0, 1]
                             && *exponent == p && modulus == &report.polynomial,
-                        // Full Rust A/B reproduced a significant
-                        // 1e9+7 split-verifier regression. Enable this
-                        // independently verified power reuse only for the
-                        // two prime ranges where it helped; other fields
-                        // retain their existing independent vpower replay.
-                        split_power: (p <= 65_521 || p == MAX_PRIME)
+                        // Native source-exact A/B found the split-power
+                        // reuse most consistently beneficial at p=2^61-1.
+                        // Retain the previously validated verifier path on
+                        // other primes; unrelated small-field and 1e9+7
+                        // controls showed instability or regressions.
+                        split_power: p == MAX_PRIME
                             && split.as_ref().is_some_and(|(h, delta)| {
                             base.len() == 2 && base[0] == *delta && base[1] == 1
                                 && *exponent == (p - 1) / 2 && modulus == h
