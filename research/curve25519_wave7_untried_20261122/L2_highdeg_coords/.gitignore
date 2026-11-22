@@ -1,3 +1,2 @@
-# Binary per-cell outputs exceed the 64 KB data-file policy and the artifact store refuses uploads from this runtime.
-# They stay on the run host; SHA256 sums and lossless JSON mirrors are committed after the run.
+# npz outputs (each under 64 KB) are kept out of Git by this rule and the wave .gitignore; lossless JSON mirrors are in data_json/.
 **/*.npz

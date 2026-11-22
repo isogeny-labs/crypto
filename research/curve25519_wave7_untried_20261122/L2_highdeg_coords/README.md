@@ -134,7 +134,7 @@ R_col = mean covered ÷ cols-matched x-frames. R_val = mean covered ÷ x-frames 
 | random classes (control) | 16, 18, 20 | 0.990–1.010 | 1 | – | – |
 | x-frame on 2E (positive control) | 16, 18, 20 | 1.606–2.001 | [1.6, 2.4] | – | – |
 
-The coset-selection gain (the frame-search effect) appears at about the same size in every arm:
+The coset-selection gain (the frame-search effect) appears at about the same size in every function arm:
 argmax-J frame ÷ mean is 1.42–6.03 for the f-frames and 1.42–7.20 for the cols-matched x-frames
 of the function arms at t = 4–7 [pcc:unverified]. The control arms go lower: down to 1.05 for
 f-frames and 1.11 for x-frames [pcc:unverified]. That
@@ -166,14 +166,17 @@ Every value in the table holds on all three curves and on every target [pcc:unve
 **Engine calibration (C2).** `curve25519_family-5abc70ba f4cost k bits T 0 10 …` reports
 `solving_degree_max` 6 at every (k, T ∈ {4, 5}), equal to M2's D_ref(x) = 6 [pcc:unverified].
 It also reports `poly_terms_per_specialisation` 121 and 256, equal to Ŝ_x's terms
-[pcc:unverified].
+[pcc:unverified]. For x, the M2 proxy counts 22.0× the engine's F4 mul-adds per target at T = 4
+(8.91·10⁷ against 4.05·10⁶) and 31.1× at T = 5 (3.96·10⁹ against 1.27·10⁸) [pcc:unverified].
+So proxy mul-adds are not engine costs, and the 2.12× dense ÷ x figure is a ratio between proxy
+counts.
 
 **Power.** At n ≤ 10, x's closure already spans most of the cube: Σ_{i≤6} C(10, i) = 848 of 1,024
 monomials. So the proxy cannot show a large cost gap at these sizes. The structural results are
 these (P5a–c):
 
-- the dense functions need D = n at every n;
-- x refutes at D = 6 at both n = 8 and n = 10.
+- the dense functions need D = n at every n measured (n = 8, 10) [pcc:unverified];
+- x refutes at D = 6 at both n = 8 and n = 10 [pcc:unverified].
 
 The size of the gap at larger n is not measured.
 
@@ -205,7 +208,7 @@ rests on one small coverage count.
 | P2 per value | ranges in § Census, ≥ 90% | **held**, 72/72 |
 | P3 points per value | ∈ [0.99, 1.01] | **held**, 1.001–1.004 |
 | P4 max fibre, symmetries, per-variable degree, kernel, verification | exact | **held** |
-| P4 total degree | x = 4; others ≤ 2 × per-variable | **failed**: xe 12 (bound 8), q 21 (18), xeye 12 (8), jac6 54 (36); x 4, v 18, ye 6 and uv 50 were within |
+| P4 total degree | x = 4; others ≤ 2 × per-variable | **failed**: ye 6 (bound 4), xe 12 (8), q 21 (18), xeye 12 (8), jac6 54 (36); x 4, v 18 and uv 50 were within. `analyse.py` used a bound of 6 for ye (TOT_MAX), which differs from the frozen text, so its mechanical check passed ye (Errata E2) |
 | P5a reduced degree e | dense = n; xe and xeye = 8; x and ye = 4 | **failed**: xe and xeye give e = 6 at T = 4 on all three curves; every other cell held |
 | P5b dense D_ref = n | every target | **held** |
 | P5c x D_ref ≤ n − 2 | ≥ 90% | **held**: 6 at n = 8 and n = 10 |
@@ -229,7 +232,23 @@ Every outcome in this table is [pcc:unverified].
   - So **the xeye prediction at k = 16 (1/4) is post-hoc**; it is the one P1x cell that failed.
   - The xe predictions, and the xeye predictions at k = 18 and 20, are blind.
 - **The smoke test** (k = 16 only, after the freeze) exposed values that already contradicted P4
-  total degree and P5a for xeye at T = 4. The predictions were not edited.
+  total degree (ye, xe, q, xeye) and P5a for xeye at T = 4. The predictions were not edited.
+- **The freeze cannot be verified from git as "before the smoke test"** (Errata E7).
+  PROTOCOL.md first appears in commit `56e5973465` together with the first smoke outputs. The
+  verifiable freeze `b0a6957edb` comes after the smoke. The predictions in the analysis script
+  do predate any committed smoke output (`c47218b9d5`).
+- **P5d is not demonstrably blind** (Errata E7). In the draft analysis (`c47218b9d5`) its
+  threshold was ≥ 3 at T = 5. It became ≥ 1.0 at T = 4 and 5 in `fcd9e9186a`, before the
+  protocol's first commit. That commit also added runtime instrumentation, so runs may have
+  been attempted. The measured 2.12 passes the frozen threshold and would have failed the
+  draft one. The record cannot show whether data informed the change.
+- **The pre-freeze K = 50 census was not re-drawn** (Errata E1). PROTOCOL §0 says that cell
+  is "re-drawn anyway, with a different seed" at K = 2000; that sentence is wrong. The seen
+  frames are rows 0–49 of the data cells `census_k16_{v,xeye,even,rand,xAA}_t5`, which
+  reproduce the §0 table exactly. With those cells, the verdicts are as in the Predictions
+  table. Without them (validator's recomputation): P1 44/44, P1x 22/23 (the same failing
+  cell), P2 70/70, NC1 11/11, and PC2 and NC2 hold [pcc:unverified]. Dropping only the 50 rows
+  changes no verdict [pcc:unverified].
 - **The smoke and the data run share seeds:**
   - the 20 smoke census rows per arm at k = 16, t = 4 are identical to the first 20 of the
     2,000 data rows (1%), checked by comparing arrays;
@@ -255,9 +274,11 @@ From PROTOCOL §0. None changed a prediction or threshold.
   D_ref and D_root, and the engine degrees.
 - **Measured by counting in this proxy:** M2 mul-adds. They are not the engine's F4 mul-adds.
 - **Derived:** cost per relation, which is mul-adds ÷ the coverage of the same base.
+- **Known counting defect:** `true_decomp` in `macaulay.py` counts a lift twice when a Boolean
+  root has value 0 (Errata E9). It affects 14 of 933 records and not the census agreement.
 - **Interpretation, not tested:** the drift of R_col with t in the k = 16, t = 7 cells (x_E·y_E
   0.311, xe 0.568, 2E 1.606). It is consistent with coverage saturating near r = 8209: the
-  x-frames cover 3,264 of 8,209 points there.
+  x-frames cover 3,264 of the 8,208 non-identity points of E[r] there [pcc:unverified].
 
 ## Distance to rho (imported, not measured)
 
@@ -280,8 +301,9 @@ bash smoke/run_smoke.sh          # smoke, not data
 
 ## Data
 
-- `data/*.npz` and `smoke/*.npz` are git-ignored (`.gitignore`, the 64 KB data-file policy; the
-  artifact store refused uploads from this runtime).
+- `data/*.npz` and `smoke/*.npz` are kept out of Git by the wave `.gitignore` (data) and this
+  lead's `.gitignore` (smoke). Each is under 64 KB (the largest is 31.3 KB; 2.43 MB in total), so
+  the 64 KB data-file policy did not require excluding them (Errata E11).
 - Their lossless JSON mirrors are in `data_json/`: arrays carry dtype and shape, and files above
   900 KB are split into numbered parts. `export_json.py --check` reloaded all 130 NPZ files
   exactly.
@@ -300,4 +322,37 @@ bash smoke/run_smoke.sh          # smoke, not data
 - Sources checked: the repository files listed in PROTOCOL §10.
 
 ## Errata
+
+From the validator's report (`validator-report.json`). PROTOCOL.md, the scripts, the data and the
+analysis are unchanged; each correction is applied in the text above.
+
+- **E1 (moderate).** PROTOCOL §0 says the seen pre-freeze K = 50 census at k = 16, t = 5 is
+  re-drawn with a different seed. It was not: the seen frames are rows 0–49 of the five data
+  cells, and §0's sentence is wrong. Without those cells: P1 44/44, P1x 22/23 (same failing
+  cell), P2 70/70, NC1 11/11, PC2 and NC2 hold. Dropping only the 50 rows changes no verdict
+  [pcc:unverified].
+- **E2.** ye's total degree is 6 against the frozen bound of 4, so ye also fails P4 total degree.
+  `analyse.py` used TOT_MAX 6 for ye, which differs from the frozen text. The P4 total-degree
+  verdict (failed) is unchanged [pcc:unverified].
+- **E3.** The per-relation range 1.01–12.3× holds for v and x/y (P6) only. Over all four dense
+  functions at T = 5 it is 0.84–12.3×, with uv at k = 18 (0.88) and Y²/X³ at k = 20 (0.84)
+  below x. Each value rests on the coverage of a single base [pcc:unverified].
+- **E4.** P1's range is 0.993–1.007 over the 45 qualifying cells, and 0.989–1.007 over all 48
+  [pcc:unverified].
+- **E5.** The selection gain is 1.42–6.03 for f-frames and 1.42–7.20 for x-frames in the function
+  arms. The controls go down to 1.05 and 1.11 [pcc:unverified].
+- **E6.** The outcome label is "Instrument valid; positive rule not met; negative rule not met
+  (P1x failed in one post-hoc cell); mixed outcome, no positive". "No verdict" is reserved for
+  an invalid instrument (PROTOCOL §7).
+- **E7.** The freeze-before-smoke ordering cannot be verified from git, and the P5d threshold
+  changed from ≥ 3 to ≥ 1.0 before the protocol's first commit. P5d is treated as not
+  demonstrably blind.
+- **E8.** Result sentences that lacked a tag are now tagged. E[r] has 8,208 non-identity
+  points.
+- **E9.** `true_decomp` counts a lift twice when a Boolean root has value 0: 14 of 933 records.
+  Census agreement is unaffected [pcc:unverified].
+- **E10.** For x, the M2 proxy is 22.0× (T = 4) and 31.1× (T = 5) the engine's F4 mul-adds per
+  target. 2.12× is a ratio between proxies [pcc:unverified].
+- **E11.** The npz files are under 64 KB each; they are excluded by the `.gitignore` files, not
+  by the size policy. Their lossless mirrors are in `data_json/`.
 
