@@ -172,7 +172,7 @@ the identity tests (5 passed). Wall time per counted `la_mul` (median of 15, loa
 | 131101 | 120.4 → 20.3 | 5.93× | 16.6 → 2.96 |
 | 262147 | 104.4 → 19.0 | 5.49× | 16.3 → 2.66 |
 
-This is a **component speed-up of the linear algebra**, measured in wall time on one VM. After it,
+This is a **component speed-up of the linear algebra**, measured in wall time on one VM. After it, [pcc:unverified]
 κ in situ (2.7–3.0) agrees with the bare-multiply κ, so FPM at κ ≈ 3 now describes this host.
 Re-priced from R2's counts at the new κ, the SGE(8,3) arm is 0.176 / 0.228 / 0.198 of negation rho
 at p = 65537 / 131101 / 262147. **That ratio is not yet a matched comparison:** it prices rho at its
