@@ -1,0 +1,8 @@
+Requested automated relation-finding benchmark
+UTC: 2026-11-22T15:14:35Z
+Branch: hourly-runs
+Command: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Curve: frozen synthetic Koblitz GF(2^23), a=0, m=2; natural=256, planted=64, unsat=64
+Baseline: results/relation_baseline.json; anomaly threshold: 20%
+Output: results/hourly_log.csv
+Note: this is a runner trigger, not an ECC2K-130 measurement.
