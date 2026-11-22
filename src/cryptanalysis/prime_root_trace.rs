@@ -1255,7 +1255,8 @@ fn cubic_mul(a: [u64; 3], b: [u64; 3], c: [u64; 3], p: u64) -> [u64; 3] {
 fn cubic_square(a: [u64; 3], c: [u64; 3], p: u64) -> [u64; 3] {
     // Symmetry reduces the nine convolution terms to six products.
     let high = vmul(a[2], a[2], p);
-    let t3 = cubic_add(vmul(a[1], a[2], p), vmul(a[1], a[2], p), p);
+    let cross = vmul(a[1], a[2], p);
+    let t3 = cubic_add(cross, cross, p);
     let cross = vmul(a[0], a[2], p);
     let t2 = cubic_add(cubic_add(cross, cross, p), vmul(a[1], a[1], p), p);
     let cross = vmul(a[0], a[1], p);
