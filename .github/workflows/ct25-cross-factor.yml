@@ -2,6 +2,7 @@ name: CT25 absolute geometric cross-factor control
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/chained_jacobian_transfers_20261110/ct25_absolute_cross_factor.py'
       - 'research/chained_jacobian_transfers_20261110/CT25_ABSOLUTE_FACTOR_OBSTRUCTION.md'
@@ -13,6 +14,7 @@ permissions:
 
 jobs:
   cross-factor:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
