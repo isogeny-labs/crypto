@@ -2638,6 +2638,21 @@ struct WalkTally {
     /// Brent's per-step compares ([`WalkPolicy::brent`]): the least-key
     /// update, the checkpoint test and the power-of-two test.
     brent_word_ops: u64,
+    /// The jump-index selection, a shift and a mask (or a remainder) of the
+    /// point's mixed key, two word operations per [`TunedWalker::index_of`]
+    /// call: every step's selection and every look-ahead re-test. Strong
+    /// tallies its equivalent as `partition_hashes_uncharged`; this walk had
+    /// left it untallied (research/koblitz_rho_reference_20261115, section
+    /// 1). Reported as `work_native` like the window's compares, so
+    /// committed records replay unchanged.
+    jump_select_word_ops: u64,
+    /// The same selections counted once each: the per-step native operation
+    /// the §5a band prices at `w` (strong's `partition_hashes_uncharged`
+    /// is one per step). Reported behind the marker
+    /// `counted:jump_selections` (`ecbench::band`), so committed records
+    /// replay unchanged; `ecbench::work` prices its word operations through
+    /// [`JUMP_SELECT_WORD_OPS`], not again here.
+    jump_selections: u64,
 }
 
 /// How a walk that never reached a distinguished point ended.
@@ -2685,6 +2700,8 @@ impl WalkTally {
         self.lost_budget += o.lost_budget;
         self.window_word_ops += o.window_word_ops;
         self.brent_word_ops += o.brent_word_ops;
+        self.jump_select_word_ops += o.jump_select_word_ops;
+        self.jump_selections += o.jump_selections;
     }
 
     /// The window's and Brent's word operations, as a search phase's
@@ -2698,6 +2715,13 @@ impl WalkTally {
         if self.brent_word_ops > 0 {
             out.insert(BRENT_WORD_OPS.to_string(), self.brent_word_ops);
         }
+        if self.jump_select_word_ops > 0 {
+            out.insert(JUMP_SELECT_WORD_OPS.to_string(), self.jump_select_word_ops);
+        }
+        if self.jump_selections > 0 {
+            out.insert(JUMP_SELECTIONS.to_string(), self.jump_selections);
+            out.insert(format!("counted:{JUMP_SELECTIONS}"), 1);
+        }
         out
     }
 }
@@ -2707,6 +2731,12 @@ impl WalkTally {
 pub const WINDOW_WORD_OPS: &str = "cycle_window_word_ops";
 /// `work_native` name of Brent's per-step compares; one `word_op` each.
 pub const BRENT_WORD_OPS: &str = "brent_word_ops";
+/// `work_native` name of the tuned walk's jump-index selections (two word
+/// operations each, see [`WalkTally`]); one `word_op` each.
+pub const JUMP_SELECT_WORD_OPS: &str = "jump_select_word_ops";
+/// `work_native` name of the tuned walk's jump-index selections counted once
+/// each, behind `counted:jump_selections`: the band prices each at `w`.
+pub const JUMP_SELECTIONS: &str = "jump_selections";
 
 /// How one walk ended.
 enum WalkEnd<E> {
@@ -2882,6 +2912,8 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
         loop {
             // One step, with the look-ahead when it is on.
             let j0 = self.index_of(h);
+            tally.jump_select_word_ops += 2;
+            tally.jump_selections += 1;
             tally.jump_index_selections += 1;
             let mut tried = 0usize;
             let (y, ya, yb, ky, hy) = loop {
@@ -2911,6 +2943,13 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                 // toss, so a branch on it is mispredicted half the time);
                 // every operand is pure, so evaluating them all changes
                 // nothing.
+                // The look-ahead's re-test selects a jump too (charged only
+                // when the test reaches it; `&` evaluates every operand, so
+                // charge it whenever the look-ahead is on).
+                if self.look_ahead {
+                    tally.jump_select_word_ops += 2;
+                    tally.jump_selections += 1;
+                }
                 if self.look_ahead
                     & flipped
                     & (tried < jump_count)

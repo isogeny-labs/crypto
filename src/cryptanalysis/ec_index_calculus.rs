@@ -1906,7 +1906,7 @@ pub fn ec_index_calculus_dlp_staged(
         extra_relations,
         max_trials_per_relation,
         max_relation_attempts,
-        false,
+        FactorBaseChoice::SmallX,
         &mut rng,
     )
 }
@@ -1933,7 +1933,7 @@ pub fn ec_index_calculus_dlp_staged_seeded(
         extra_relations,
         max_trials_per_relation,
         max_relation_attempts,
-        false,
+        FactorBaseChoice::SmallX,
         &mut rng,
     )
 }
@@ -1961,7 +1961,86 @@ pub fn ec_index_calculus_dlp_staged_seeded_projected(
         extra_relations,
         max_trials_per_relation,
         max_relation_attempts,
-        true,
+        FactorBaseChoice::Projected,
+        &mut rng,
+    )
+}
+
+/// Which factor base the staged pipeline uses.
+#[derive(Clone, Debug)]
+pub enum FactorBaseChoice {
+    /// [`build_factor_base`]: the points with the smallest abscissae.
+    SmallX,
+    /// [`build_factor_base_projected`].
+    Projected,
+    /// A factor base the caller built (e.g. [`build_factor_base_from_xs`]).
+    Given(Vec<FactorBaseEntry>),
+}
+
+/// The factor base whose abscissae are the given `xs` (in order): every `x`
+/// with `x³ + ax + b` a square becomes one entry, its `y` canonicalised to the
+/// smaller of `y, p − y` as in [`build_factor_base`]; other `x` (and repeats)
+/// are skipped. Used to compare structured abscissa sets (a Kummer coset, a
+/// random set) against the small-x default (EXP-PKM-IC-001).
+pub fn build_factor_base_from_xs(curve: &CurveParams, xs: &[BigUint]) -> Vec<FactorBaseEntry> {
+    let mut out: Vec<FactorBaseEntry> = Vec::with_capacity(xs.len());
+    let mut seen = std::collections::HashSet::new();
+    for x in xs {
+        let x = x % &curve.p;
+        if !seen.insert(x.clone()) {
+            continue;
+        }
+        let xf = curve.fe(x);
+        let rhs_value = xf
+            .mul(&xf)
+            .mul(&xf)
+            .add(&curve.a_fe().mul(&xf))
+            .add(&curve.fe(curve.b.clone()))
+            .value;
+        count("sqrt_mod_p_calls_uncharged", 1);
+        if let Some(y) = sqrt_mod_p(&rhs_value, &curve.p) {
+            let y_canon = if &y * &BigUint::from(2u32) < curve.p {
+                y
+            } else {
+                &curve.p - &y
+            };
+            out.push(FactorBaseEntry {
+                idx: out.len(),
+                point: Point::Affine {
+                    x: xf,
+                    y: curve.fe(y_canon),
+                },
+            });
+        }
+    }
+    out
+}
+
+/// Seeded staged pipeline over a factor base the caller built; otherwise
+/// identical to [`ec_index_calculus_dlp_staged_seeded`].
+#[allow(clippy::too_many_arguments)]
+pub fn ec_index_calculus_dlp_staged_seeded_with_factor_base(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb: Vec<FactorBaseEntry>,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+    seed: u64,
+) -> Option<(BigUint, EcIcStageReport)> {
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(seed);
+    let fb_size = fb.len();
+    ec_index_calculus_dlp_staged_with_rng(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        FactorBaseChoice::Given(fb),
         &mut rng,
     )
 }
@@ -2354,7 +2433,7 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     extra_relations: usize,
     max_trials_per_relation: usize,
     max_relation_attempts: usize,
-    project_cofactor: bool,
+    fb_choice: FactorBaseChoice,
     rng: &mut R,
 ) -> Option<(BigUint, EcIcStageReport)> {
     use std::time::Instant;
@@ -2362,10 +2441,10 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     let total_started = Instant::now();
 
     let fb_started = Instant::now();
-    let fb = if project_cofactor {
-        build_factor_base_projected(curve, fb_size)
-    } else {
-        build_factor_base(curve, fb_size)
+    let fb = match fb_choice {
+        FactorBaseChoice::SmallX => build_factor_base(curve, fb_size),
+        FactorBaseChoice::Projected => build_factor_base_projected(curve, fb_size),
+        FactorBaseChoice::Given(fb) => fb,
     };
     let factor_base_ms = fb_started.elapsed().as_secs_f64() * 1e3;
     if fb.is_empty() {
