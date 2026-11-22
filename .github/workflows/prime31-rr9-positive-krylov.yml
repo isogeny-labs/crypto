@@ -33,6 +33,8 @@ jobs:
           sparse-checkout: |
             /research/prime31_ic_20261115/native/
             /research/prime31_ic_20261115/rr9/verify_d9_positive_krylov.py
+            /src/cryptanalysis/f4_fp_tower.rs
+            /src/cryptanalysis/sig_fp_tower.rs
       - name: Pin Rust and identify source
         run: |
           rustup toolchain install 1.100.0 --profile minimal
