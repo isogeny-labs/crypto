@@ -1,0 +1,68 @@
+{
+  "schema": "shared-s3-prospective-workload/v1",
+  "study": "s3_shared_elimination_20261122",
+  "tracking_pr": "https://github.com/isogeny-labs/crypto/pull/4922",
+  "execution_ready": false,
+  "canonical_experiment_protocol_frozen": false,
+  "performance_instrument": null,
+  "performance_run_attempted": false,
+  "implemented_entry_points": {
+    "source": "examples/shared_s3_matrix.rs",
+    "plan": ["shared-s3-matrix", "--plan"],
+    "correctness": ["shared-s3-matrix", "--check"],
+    "benchmark": null
+  },
+  "prospective_solver_arms": [
+    {"id": "original-f4", "preconditioner": "none", "downstream": "existing F4"},
+    {"id": "fresh-integer", "preconditioner": "fresh frozen-envelope Macaulay", "backend": "Integer"},
+    {"id": "shared-integer", "preconditioner": "shared common row space", "backend": "Integer", "primary_candidate": true},
+    {"id": "shared-fma", "preconditioner": "shared common row space", "backend": "Fma", "primary_candidate": false},
+    {"id": "shared-split16", "preconditioner": "shared common row space", "backend": "Split16", "primary_candidate": false}
+  ],
+  "principal_curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "subgroup_order": 2147446831,
+    "cofactor": 1,
+    "generator": [625037715, 2100627251],
+    "source": "examples/prime31_batched_ic_same_1024q.rs",
+    "registry_slug": null
+  },
+  "cold_accounting": {
+    "unit_of_work": "one public ECDLP target",
+    "shared_setup_charged_in_full": true,
+    "candidate_projection_charged_to_fresh": false,
+    "cross_dlp_amortization_in_primary_metric": false,
+    "new_counter_coverage_complete": false,
+    "complete_cost_ratio": null
+  },
+  "prospective_controls": {
+    "aa": "separate executions of identical integer reference",
+    "positive": "planted relations checked in original equations and the group",
+    "adversarial": "rank/support drops, invalid input, incomplete traversal, exceptional prefixes",
+    "full_pipeline_reference": "bind strongest applicable algebraic IC incumbent before launch",
+    "rho": "matched optimized negation reference for the full-DLP comparison"
+  },
+  "prospective_matched_suite": {
+    "exact_inputs": 60,
+    "repetitions": 3,
+    "input_corpus_hash": null,
+    "holdout_corpus_hash": null,
+    "minimum_measured_rounds": 5,
+    "repetition_round_nesting": "unresolved; must be fixed in the canonical runner specification before freeze",
+    "timing_admission": "EKS L2, replay, warmup, interleaved arms, A/A",
+    "budget_usd_ceiling": null,
+    "live_budget_headroom": null,
+    "launch_blocked_while_budget_unknown": true
+  },
+  "open_dependencies": [
+    "full-root-library compile and test gate",
+    "production #4920 chain adapter and complete chart coverage",
+    "full cold accounting integration and supported immutable workload image",
+    "exact matched corpus, holdouts, current IC incumbent and protocol binding",
+    "readable canonical protocol skill/checker and successful freeze",
+    "authenticated supported runner, live budget/capacity and checkpoint admission",
+    "required workflow artifact retrieval or another already authorized route"
+  ]
+}
