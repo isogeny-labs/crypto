@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T14:25:08Z",
+ "id": "PCC-20261118-3560cd",
+ "kind": "statement",
+ "producer": {
+  "commit": "bbf30f5b796eb88457fe05775df465774e3da45b",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/batch-walk-20261118/summary.json",
+    "sha256": "5ed8f1d55189c6b27790c76f9c9f115505f09a5622352ee298a951b1fb490628"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/batch-walk-20261118/pre-call-manifest.sha256",
+    "sha256": "712ef62c658f51d393c45b814cf63f983514743845c85b87e199b73a77812199"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/batch-walk-20261118/wide-field-pre-call-manifest.sha256",
+    "sha256": "089bf8d1a64feb503456e44811cdd7bb54032015c625930aced961ea141516dc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/batch-walk-20261118/results/projective-controls.json",
+    "sha256": "201a712ff0323b6b486e36a9543c7eaa07015abdd01276729f6a37b9c8e33d26"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/batch-walk-20261118/results/wide-field-control.json",
+    "sha256": "a08e500c0eb1adc2f7c67a93c9887f7a430e404103c74595b86ce995edf19e12"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/batch-walk-20261118",
+ "statement": "The optional bounded-projective evaluator has 24 matched small pipeline replays covering 504 point-input evaluations across three supplied prime fields, with unchanged default and affine outputs, direct PARI quotient/image comparisons, 3717 small group-law comparisons and five option rejections. A separately bounded 202-bit target-field primitive check compares 32768 kernel-walk x-coordinates; it constructs no target quotient or isogeny images. Counters cover walk-local operations, not runtime or total work; no speedup or conductor crossing is established."
+}
