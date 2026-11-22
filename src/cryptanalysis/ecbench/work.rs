@@ -384,6 +384,7 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         | "aux_orders_undetermined"
         | "aux_two_sylow_rejected"
         | "pair_table_representatives"
+        | "orbit_identity_skips"
         | "pair_table_kind"
         | "pair_table_points"
         | "scan_window_len"
