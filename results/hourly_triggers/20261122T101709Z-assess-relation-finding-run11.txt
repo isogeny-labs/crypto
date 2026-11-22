@@ -1,0 +1,5 @@
+Trigger hourly frozen Stage-21 Koblitz GF(2^23), a=0, m=2 natural-relation monitor.
+Command: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Record wall_seconds, relations_per_sec, success_rate in results/hourly_log.csv, compare against results/relation_baseline.json at >20%; create issue on failure or anomaly.
+Requested UTC: 2026-11-22T10:17:09Z
+This is the n=23 public synthetic control, not ECC2K-130.
