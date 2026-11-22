@@ -38,8 +38,8 @@ use crate::cryptanalysis::ecbench::ext::ExtInstance;
 use crate::cryptanalysis::ecbench::fp4::{self as fp4, Fp4Group, Fp4Instance, K4Base, K4Params};
 use crate::cryptanalysis::ecbench::full_price;
 use crate::cryptanalysis::ecbench::generic::{
-    bsgs_interleaved, bsgs_negation, bsgs_negation_table, bsgs_textbook, kangaroo, kangaroo_with,
-    verify_candidate, GenericOutcome,
+    bsgs_interleaved, bsgs_negation, bsgs_negation_table, bsgs_textbook,
+    build_negation_table, kangaroo, kangaroo_with, verify_candidate, GenericOutcome,
 };
 use crate::cryptanalysis::ecbench::hec;
 use crate::cryptanalysis::ecbench::hyper::HyperInstance;
@@ -907,6 +907,18 @@ pub fn registry() -> &'static [MethodDecl] {
             family: "bsgs",
             summary: "bsgs.negation with the baby table's half-width m given (m + 1 classes, giant stride 2m + 1): the equal-memory comparator for a known-log base",
             entry: "ecbench::generic::bsgs_negation_table",
+            applies: Applies::Any,
+            params: &[ParamDecl {
+                name: "baby",
+                default: Some("0"),
+                help: "baby table half-width m (table entries m + 1); 0 means ceil(sqrt(r)/2), which is bsgs.negation",
+            }],
+        },
+        MethodDecl {
+            id: "bsgs.negation_table_v2",
+            family: "bsgs",
+            summary: "versioned cached-table BSGS: target-independent negation baby table, inserts and stride negation charged once in the cold total; online lookups, hit recovery arithmetic and final [d]G = Q verification charged in their phases",
+            entry: "ecbench::generic::build_negation_table + NegationBabyTable::solve + verify_candidate",
             applies: Applies::Any,
             params: &[ParamDecl {
                 name: "baby",
@@ -3065,9 +3077,14 @@ fn solve_generic<G: CountedGroup>(
 ) -> Result<SolveReport, String> {
     let cap = || -> Result<u64, String> { Ok(rho_cap(r, param_u64(m, "cap_multiple")? as f64)) };
     let t = Instant::now();
-    // Everything these methods do depends on the target (rho's jump table
-    // is [a]G + [b]Q), so the whole solve is the online window.
-    measurement::begin_online(Phase::RhoSolve);
+    // The versioned cached BSGS builds its reusable `G`-only table before
+    // opening the online window.  Frozen generic ids retain their original
+    // whole-call boundary; in particular this does not reinterpret any
+    // committed record.
+    let split_cached_bsgs = m.id == "bsgs.negation_table_v2";
+    if !split_cached_bsgs {
+        measurement::begin_online(Phase::RhoSolve);
+    }
     // The rho walks keep one ledger for the whole solve; the tables and
     // the kangaroo keep set-up and search apart.  Either way the field
     // operations reported are the solve's total, known only when the
@@ -3152,6 +3169,53 @@ fn solve_generic<G: CountedGroup>(
                 bsgs_negation_table(g, gen, target, r, baby)
             };
             generic(o, t.elapsed().as_nanos() as u64, 2)
+        }
+        "bsgs.negation_table_v2" => {
+            let baby = param_u64(m, "baby")?;
+            let baby = if baby == 0 {
+                crate::cryptanalysis::ecbench::generic::ceil_sqrt(r)
+                    .div_ceil(2)
+                    .max(1)
+            } else {
+                baby
+            };
+            let table = build_negation_table(g, gen, r, baby);
+            measurement::begin_online(Phase::RhoSolve);
+            let mut o = table.solve(g, target);
+            verify_candidate(g, gen, target, &mut o);
+            measurement::end_online();
+            let wall = t.elapsed().as_nanos() as u64;
+            let f = field_ops_of(g, &[o.setup, o.search, o.verification]);
+            let mut rep = generic_report_v2(o, wall, 2, f, "bsgs");
+
+            // Keep the top-level counters for the stable band/report schema,
+            // and also bind each native count to the phase that performed it
+            // so reusable/per-target work splits are honest.
+            for (phase_name, counter) in [
+                ("setup", "inserts_uncharged"),
+                ("setup", "point_negations_uncharged"),
+                ("search", "lookups_uncharged"),
+                ("search", "recovery_key_comparisons_uncharged"),
+                ("search", "recovery_modr_muls_uncharged"),
+                ("search", "recovery_modr_adds_uncharged"),
+            ] {
+                let Some(count) = rep.counters.get(counter).copied() else {
+                    continue;
+                };
+                rep.phases
+                    .iter_mut()
+                    .find(|p| p.name == phase_name)
+                    .expect("generic v2 report has setup and search phases")
+                    .native
+                    .insert(counter.into(), count);
+            }
+            rep.detail["cache_contract"] = json!({
+                "cold_total_charges_setup_once": true,
+                "online_excludes_setup": true,
+                "reusable_phase": "setup",
+                "per_target_phases": ["search", "verification"],
+            });
+            rep
         }
         "kangaroo.vow" => {
             let o = kangaroo(g, gen, target, r, seed, cap()?);
@@ -3298,7 +3362,9 @@ fn solve_generic<G: CountedGroup>(
         }
         other => return Err(format!("`{other}` is not a generic method")),
     };
-    measurement::end_online();
+    if !split_cached_bsgs {
+        measurement::end_online();
+    }
     Ok(rep)
 }
 
@@ -6165,6 +6231,12 @@ fn online_window(family: &str, id: &str, snap: &Snapshot) -> Option<OnlineWindow
     if id == "rho.preprocessing" {
         w.start_event = "first target-dependent operation (G + Q and the online stride) after the target-blind jump table and distinguished-point table are complete".into();
         w.mapping = "preprocessing rho: the online walks on the precomputation's map, table lookups at distinguished points, and final [d]G=Q verification".into();
+    }
+    if id == "bsgs.negation_table_v2" {
+        w.start_event = "first target-dependent giant-step lookup after the G-only negation baby table and giant stride are complete".into();
+        w.stop_event = "[d]G = Q verified inside the method".into();
+        w.included_stages = vec!["giant_steps".into(), "recovery_check".into()];
+        w.mapping = "cached BSGS: setup and table inserts are reusable and excluded from the online clock; giant steps, table lookups, collision recovery, and final scalar replay are per-target and inside it".into();
     }
     Some(w)
 }
@@ -9447,6 +9519,30 @@ mod tests {
     }
 
     #[test]
+    fn frozen_negation_table_identity_stays_on_its_original_entry() {
+        let historical = resolve(&MethodSpec {
+            id: "bsgs.negation_table".into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        assert_eq!(historical.params["baby"], "0");
+        assert_eq!(historical.entry, "ecbench::generic::bsgs_negation_table");
+        assert_eq!(historical.method_id, "ECM1hae967a248ea2");
+        assert_eq!(
+            historical.method_sha256,
+            "ae967a248ea21c4a34ec79a0130ebaa412891a6ea97e61532b0ce51199a08d97"
+        );
+
+        let versioned = resolve(&MethodSpec {
+            id: "bsgs.negation_table_v2".into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        assert_ne!(versioned.method_id, historical.method_id);
+        assert_ne!(versioned.entry, historical.entry);
+    }
+
+    #[test]
     fn historical_genus2_method_id_survives_thread_parameter_resolution() {
         let historical = resolve(&MethodSpec {
             id: HYPER_GENUS2_ID.into(),
@@ -10715,6 +10811,7 @@ mod accounting_rules_tests {
             ("bsgs.textbook_v2", &[], true),
             ("bsgs.interleaved_v2", &[], true),
             ("bsgs.negation_v2", &[], true),
+            ("bsgs.negation_table_v2", &[], true),
             ("kangaroo.vow_v2", &[], true),
             ("claw.pair_table_v2", claw, false),
         ];
@@ -10792,6 +10889,56 @@ mod accounting_rules_tests {
             assert_eq!(a_total, a.total_gae, "{old}");
             assert_eq!(b.total_gae, a.total_gae + v.gae, "{new}");
         }
+    }
+
+    #[test]
+    fn cached_bsgs_v2_separates_reusable_setup_from_verified_online_query() {
+        let (inst, facts) = built(&CurveSpec::PrimeSearch {
+            bits: 18,
+            seed: 59297,
+        });
+        let rep = run(
+            &method("bsgs.negation_table_v2", &[("baby", "128")]),
+            &inst,
+            &facts,
+            100_003,
+            9,
+        );
+        assert_eq!(rep.recovered, Some(ExactScalar::from(100_003u64)));
+        let setup = rep.phases.iter().find(|p| p.name == "setup").unwrap();
+        let search = rep.phases.iter().find(|p| p.name == "search").unwrap();
+        let verification = rep
+            .phases
+            .iter()
+            .find(|p| p.name == "verification")
+            .unwrap();
+        assert_eq!(
+            setup.native["inserts_uncharged"],
+            rep.counters["inserts_uncharged"]
+        );
+        assert_eq!(
+            search.native["lookups_uncharged"],
+            rep.counters["lookups_uncharged"]
+        );
+        assert_eq!(setup.native["point_negations_uncharged"], 1);
+        assert_eq!(search.native["recovery_key_comparisons_uncharged"], 1);
+        assert_eq!(search.native["recovery_modr_muls_uncharged"], 1);
+        assert_eq!(search.native["recovery_modr_adds_uncharged"], 1);
+        assert_eq!(verification.scalar_mults, 1);
+        assert_phases_sum("bsgs.negation_table_v2", &rep);
+
+        let online = rep.online.expect("cached query has an online window");
+        assert!(online.wall_ns > 0 && online.wall_ns < rep.solve_wall_ns);
+        assert!(online.start_event.contains("after the G-only negation baby table"));
+        assert_eq!(
+            online.phases_ns.values().sum::<u64>(),
+            online.wall_ns,
+            "exclusive online phases sum to the online interval"
+        );
+        assert_eq!(
+            rep.detail["cache_contract"]["cold_total_charges_setup_once"],
+            json!(true)
+        );
     }
 
     /// A kangaroo restart is neither set-up nor a jump: v2 charges it to
@@ -11440,6 +11587,7 @@ mod accounting_rules_tests {
             ("bsgs.textbook_v2", &[], &prime),
             ("bsgs.interleaved_v2", &[], &prime),
             ("bsgs.negation_v2", &[], &prime),
+            ("bsgs.negation_table_v2", &[], &prime),
             ("kangaroo.vow_v2", &[], &prime),
             ("claw.pair_table_v2", claw, &koblitz),
         ];
