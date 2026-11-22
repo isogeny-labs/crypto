@@ -62,7 +62,12 @@ fn two_isogenies_via_cubic_roots(curve: &SmallCurve) -> Vec<VeluIsogeny> {
             Some(p) => p,
             None => continue,
         };
-        let q = p_point.scalar_mul(&BigUint::from(cofactor), &a_fe);
+        // Public torsion sampling: vartime ladder (`IC_ISO_CT=1` → CT A/B).
+        let q = if std::env::var("IC_ISO_CT").as_deref() == Ok("1") {
+            p_point.scalar_mul(&BigUint::from(cofactor), &a_fe)
+        } else {
+            p_point.scalar_mul_vartime(&BigUint::from(cofactor), &a_fe)
+        };
         let x_t = match &q {
             Point::Affine { x, y } => {
                 // 2-torsion: y must be zero.  If non-zero, the point

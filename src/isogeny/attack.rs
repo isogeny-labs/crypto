@@ -31,9 +31,40 @@
 use super::cm::{cm_discriminant, CmData};
 use super::SmallCurve;
 use crate::cryptanalysis::pollard_rho::RhoSolution;
+use crate::ecc::field::FieldElement;
 use crate::ecc::point::Point;
 use num_bigint::BigUint;
 use num_traits::Zero;
+use std::sync::atomic::{AtomicBool, Ordering};
+
+/// Research ECDLP / isogeny-class walks are public: default to vartime
+/// ladders.  `IC_ISO_CT=1` restores CT for A/B measurement.
+static ISO_CT: AtomicBool = AtomicBool::new(false);
+
+fn refresh_iso_ct_flag() {
+    ISO_CT.store(
+        std::env::var("IC_ISO_CT").as_deref() == Ok("1"),
+        Ordering::Relaxed,
+    );
+}
+
+#[inline(always)]
+fn smul(p: &Point, k: &BigUint, a: &FieldElement) -> Point {
+    if ISO_CT.load(Ordering::Relaxed) {
+        p.scalar_mul(k, a)
+    } else {
+        p.scalar_mul_vartime(k, a)
+    }
+}
+
+#[inline(always)]
+fn padd(p: &Point, q: &Point, a: &FieldElement) -> Point {
+    if ISO_CT.load(Ordering::Relaxed) {
+        p.add(q, a)
+    } else {
+        p.add_vartime(q, a)
+    }
+}
 
 /// Per-curve summary record.  Returned by [`run_attack_suite`] for
 /// every curve in the experimental sweep.
@@ -98,6 +129,7 @@ pub fn glv_endomorphism_available(curve: &SmallCurve) -> bool {
 /// - `max_iters` — bound on rho steps before giving up.
 /// - `seed`     — deterministic seed for reproducibility.
 pub fn rho_on_curve(curve: &SmallCurve, max_iters: u64, seed: u64) -> (Option<RhoSolution>, u64) {
+    refresh_iso_ct_flag();
     let cm = cm_discriminant(curve);
     let n = cm.order as u64;
     if n < 4 {
@@ -141,7 +173,7 @@ pub fn rho_on_curve(curve: &SmallCurve, max_iters: u64, seed: u64) -> (Option<Rh
 
     // Pick a private scalar d in [1, n−1].
     let d = (seed.wrapping_mul(0x9E3779B97F4A7C15) % (n - 1)) + 1;
-    let h = g.scalar_mul(&BigUint::from(d), &a_fe);
+    let h = smul(&g, &BigUint::from(d), &a_fe);
     let _ = d;
 
     let n_big = BigUint::from(n);
@@ -184,7 +216,7 @@ fn rho_via_pohlig_gls(
     }
     let targets: Vec<Point> = secrets
         .iter()
-        .map(|d| g.scalar_mul(&BigUint::from(*d), a_fe))
+        .map(|d| smul(g, &BigUint::from(*d), a_fe))
         .collect();
     let (sol, total_iters) = pohlig_multi_target_rho(g, &targets, n_big, a_fe, max_iters, seed);
     let per_target = total_iters / M.max(1);
@@ -246,9 +278,7 @@ fn r_adding_rho_on_curve(
     for _ in 0..R {
         let a_i = rng.gen_biguint_below(n);
         let b_i = rng.gen_biguint_below(n);
-        let pt = g
-            .scalar_mul(&a_i, a_fe)
-            .add(&h.scalar_mul(&b_i, a_fe), a_fe);
+        let pt = padd(&smul(g, &a_i, a_fe), &smul(h, &b_i, a_fe), a_fe);
         m_pts.push(pt);
         m_a.push(a_i);
         m_b.push(b_i);
@@ -297,7 +327,7 @@ fn r_adding_rho_on_curve(
         } else {
             (rng.gen_biguint_below(n), rng.gen_biguint_below(n))
         };
-        let start = g.scalar_mul(&a0, a_fe).add(&h.scalar_mul(&b0, a_fe), a_fe);
+        let start = padd(&smul(g, &a0, a_fe), &smul(h, &b0, a_fe), a_fe);
 
         let mut t = start.clone();
         let mut t_a = a0.clone();
@@ -312,14 +342,14 @@ fn r_adding_rho_on_curve(
         while iters < max_iters {
             // Tortoise: one r-adding step.
             let bt = bucket(&t);
-            t = t.add(&m_pts[bt], a_fe);
+            t = padd(&t, &m_pts[bt], a_fe);
             t_a = (&t_a + &m_a[bt]) % n;
             t_b = (&t_b + &m_b[bt]) % n;
 
             // Hare: two r-adding steps.
             for _ in 0..2 {
                 let bh = bucket(&hh);
-                hh = hh.add(&m_pts[bh], a_fe);
+                hh = padd(&hh, &m_pts[bh], a_fe);
                 h_a = (&h_a + &m_a[bh]) % n;
                 h_b = (&h_b + &m_b[bh]) % n;
             }
@@ -358,7 +388,7 @@ fn r_adding_rho_on_curve(
                         let g_u: u64 = g_gcd.iter_u64_digits().next().unwrap_or(0);
                         let mut x_cand = x_base;
                         for _ in 0..g_u {
-                            let test = g.scalar_mul(&x_cand, a_fe);
+                            let test = smul(g, &x_cand, a_fe);
                             if test == *h {
                                 return (
                                     Some(RhoSolution {
@@ -432,7 +462,7 @@ fn dp_parallel_rho_on_curve(
     for _ in 0..R {
         let ai = prng.gen_biguint_below(n);
         let bi = prng.gen_biguint_below(n);
-        let pt = g.scalar_mul(&ai, a_fe).add(&h.scalar_mul(&bi, a_fe), a_fe);
+        let pt = padd(&smul(g, &ai, a_fe), &smul(h, &bi, a_fe), a_fe);
         adders.push((pt, ai, bi));
     }
     let adders = Arc::new(adders);
@@ -512,9 +542,7 @@ fn dp_parallel_rho_on_curve(
             // Random initial (a, b).
             let a0 = wrng.gen_biguint_below(n);
             let b0 = wrng.gen_biguint_below(n);
-            let mut pt = g_pt
-                .scalar_mul(&a0, a_fe)
-                .add(&h_pt.scalar_mul(&b0, a_fe), a_fe);
+            let mut pt = padd(&smul(g_pt, &a0, a_fe), &smul(h_pt, &b0, a_fe), a_fe);
             let mut a_acc = a0;
             let mut b_acc = b0;
             let mut local: u64 = 0;
@@ -525,7 +553,7 @@ fn dp_parallel_rho_on_curve(
                 }
                 let bk = bucket(&pt);
                 let (add_pt, add_a, add_b) = &adders[bk];
-                pt = pt.add(add_pt, a_fe);
+                pt = padd(&pt, add_pt, a_fe);
                 a_acc = (&a_acc + add_a) % n;
                 b_acc = (&b_acc + add_b) % n;
                 local += 1;
@@ -547,7 +575,7 @@ fn dp_parallel_rho_on_curve(
                         if g_gcd.is_one() {
                             if let Some(inv) = mod_inverse(&rhs, n) {
                                 let x_val = (&lhs * &inv) % n;
-                                let test = g_pt.scalar_mul(&x_val, a_fe);
+                                let test = smul(g_pt, &x_val, a_fe);
                                 if test == *h_pt {
                                     let mut rg = result.lock().unwrap();
                                     if rg.is_none() {
@@ -567,7 +595,7 @@ fn dp_parallel_rho_on_curve(
                                 let mut x_cand = x_base;
                                 let mut found = false;
                                 for _ in 0..g_u {
-                                    let test = g_pt.scalar_mul(&x_cand, a_fe);
+                                    let test = smul(g_pt, &x_cand, a_fe);
                                     if test == *h_pt {
                                         let mut rg = result.lock().unwrap();
                                         if rg.is_none() {
@@ -641,6 +669,7 @@ pub fn multi_target_dp_rho(
     use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
     use std::sync::{Arc, Mutex};
 
+    refresh_iso_ct_flag();
     let m = targets.len();
     if m == 0 {
         return (None, 0);
@@ -654,9 +683,9 @@ pub fn multi_target_dp_rho(
     for _ in 0..R {
         let aj = prng.gen_biguint_below(n);
         let bj: Vec<BigUint> = (0..m).map(|_| prng.gen_biguint_below(n)).collect();
-        let mut pt = g.scalar_mul(&aj, a_fe);
+        let mut pt = smul(g, &aj, a_fe);
         for i in 0..m {
-            pt = pt.add(&targets[i].scalar_mul(&bj[i], a_fe), a_fe);
+            pt = padd(&pt, &smul(&targets[i], &bj[i], a_fe), a_fe);
         }
         adders.push((pt, aj, bj));
     }
@@ -736,9 +765,9 @@ pub fn multi_target_dp_rho(
             // Random initial state.
             let a0 = wrng.gen_biguint_below(n);
             let bs0: Vec<BigUint> = (0..m).map(|_| wrng.gen_biguint_below(n)).collect();
-            let mut pt = g_pt.scalar_mul(&a0, a_fe);
+            let mut pt = smul(g_pt, &a0, a_fe);
             for i in 0..m {
-                pt = pt.add(&targets[i].scalar_mul(&bs0[i], a_fe), a_fe);
+                pt = padd(&pt, &smul(&targets[i], &bs0[i], a_fe), a_fe);
             }
             let mut a_acc = a0;
             let mut bs_acc = bs0;
@@ -750,7 +779,7 @@ pub fn multi_target_dp_rho(
                 }
                 let bk = bucket(&pt);
                 let (add_pt, add_a, add_bs) = &adders[bk];
-                pt = pt.add(add_pt, a_fe);
+                pt = padd(&pt, add_pt, a_fe);
                 a_acc = (&a_acc + add_a) % n;
                 for i in 0..m {
                     bs_acc[i] = (&bs_acc[i] + &add_bs[i]) % n;
@@ -790,7 +819,7 @@ pub fn multi_target_dp_rho(
                             // Verify.
                             let mut ok = true;
                             for (i, dval) in sol.iter().enumerate() {
-                                let test = g_pt.scalar_mul(dval, a_fe);
+                                let test = smul(g_pt, dval, a_fe);
                                 if test != targets[i] {
                                     ok = false;
                                     break;
@@ -884,6 +913,7 @@ pub fn pohlig_multi_target_rho(
     use crate::cryptanalysis::pohlig_hellman::crt_combine;
     use num_traits::One;
 
+    refresh_iso_ct_flag();
     let m = targets.len();
     if m == 0 {
         return (None, 0);
@@ -919,10 +949,10 @@ pub fn pohlig_multi_target_rho(
         }
         let qe_big = BigUint::from(qe);
         let cofactor = BigUint::from(n_u64 / qe);
-        let g_sub = g.scalar_mul(&cofactor, a_fe);
+        let g_sub = smul(g, &cofactor, a_fe);
         let h_sub: Vec<Point> = targets
             .iter()
-            .map(|h| h.scalar_mul(&cofactor, a_fe))
+            .map(|h| smul(h, &cofactor, a_fe))
             .collect();
         if matches!(g_sub, Point::Infinity) {
             // Degenerate: g lifts to identity, skip.  d_i mod q^e
@@ -1213,6 +1243,7 @@ fn solve_mod_n(
 /// Top-level attack-suite runner.  Computes every feasibility
 /// detector and runs a single rho attempt with `rho_max_iters`.
 pub fn run_attack_suite(curve: &SmallCurve, rho_max_iters: u64, seed: u64) -> AttackReport {
+    refresh_iso_ct_flag();
     let cm = cm_discriminant(curve);
     let n = cm.order.unsigned_abs();
     let emb = embedding_degree(curve.p, n, 32);
@@ -1377,7 +1408,7 @@ mod tests {
         let secrets: Vec<u64> = vec![1234, 5678, 12345, 54321];
         let targets: Vec<Point> = secrets
             .iter()
-            .map(|d| g.scalar_mul(&BigUint::from(*d), &a_fe))
+            .map(|d| smul(&g, &BigUint::from(*d), &a_fe))
             .collect();
         // Round 7 failed at seeds 42, 100, 1, 12345.  Round 8 must
         // solve all of them.
@@ -1448,7 +1479,7 @@ mod tests {
         let secrets: Vec<u64> = vec![1234, 5678, 12345, 54321];
         let targets: Vec<Point> = secrets
             .iter()
-            .map(|d| g.scalar_mul(&BigUint::from(*d), &a_fe))
+            .map(|d| smul(&g, &BigUint::from(*d), &a_fe))
             .collect();
         let cap = 1u64 << 18;
         let (sol, _iters) = multi_target_dp_rho(&g, &targets, &n_big, &a_fe, cap, 7);
