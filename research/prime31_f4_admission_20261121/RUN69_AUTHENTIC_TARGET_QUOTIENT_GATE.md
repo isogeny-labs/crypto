@@ -55,4 +55,25 @@ Wire **a nonenumerative public-only RR9/F3 extractor** from #4692/#4822/#4812 in
 
 ## Outcome
 
-**Pending source-specific Rust CI**. Do not claim completion, a query-count improvement, or a new performance result until actual run69 output is recorded below.
+**Source-specific original-Rust PASS twice.** [First Actions #45060772593](https://github.com/isogeny-labs/crypto/actions/runs/45060772593), job 137325960852, and [second Actions #45060777274](https://github.com/isogeny-labs/crypto/actions/runs/45060777274), job 137325975373, both compiled and ran source blob `fa997afaed7d9fec915c1e6a5f53449240e8cdc6` unchanged. Both printed `RUN69 PASS`, independently checked 32/32 true-RHS quotient-recovered logs with the original Rust group law, agreed with hidden harness scalars *only after solving*, and matched separate same-process original-arithmetic BSGS.
+
+| Actual metric | Run69 CI 1 | Run69 CI 2 |
+|---|---:|---:|
+| Public relation shifts (all failures counted) | 5,378,231 | 5,378,231 |
+| Genuine labelled pair hits | 2,272 | 2,272 |
+| Independent signed-DSU pair rows | 651 | 651 |
+| Unanchored DSU roots before free-row elimination | 26 | 26 |
+| Factor-base full rank at stop | **No** | **No** |
+| Recovered and group-verified target logs | **32/32** | **32/32** |
+| Factor base + generic dictionary setup | 224.803 ms | 353.121 ms |
+| First public target-witness discovery | 43.651 ms | 65.119 ms |
+| Genuine RHS walk + target-quotient computations | 1,191.009 ms | 1,758.414 ms |
+| Complete pipeline including harness | **1,618.285 ms** | **2,412.716 ms** |
+| Same-process reference BSGS for same 32 logs | 158.320 ms | 235.428 ms |
+| Complete generic control / BSGS | **10.22× slower** | **10.25× slower** |
+
+**Actual mathematical improvement:** Relative to frozen run68's full-factor-base-rank stop on the *same* 32 public targets and `kG` walk, exact target-specific quotient stopping saves **2,889,243 of 8,267,474 shifts = 34.9471%**. It also needs 2,272 rather than 3,520 true-RHS pair matches (35.45% fewer), and stops without knowing all 677 base logs. This is no longer a synthetic rank prediction: the output 32 scalars were recovered and verified.
+
+**Cost qualification:** The two executions used the same deterministic cohort and curve, not independent random cohorts. Absolute runtimes varied with the runner; run68 and run69 whole-pipeline timings came from *different* workflow executions and must not be read as a matched-host speedup ratio. Within each run69 execution the generic reference solver remains about **10.2× slower** than that execution's non-optimized BSGS. No admissible RR9/F3 public-only nonenumerative extractor has been substituted, nor any best-index-calculus or optimized negation-rho match.
+
+Frozen [RUN69_RESULTS.json](RUN69_RESULTS.json) records both exact source-specific run IDs and all measured cost components. Keep PR draft; target quotient is validated as a reusable downstream optimization, **not** a cheaper qualifying non-generic prime-field ECDLP solver.
