@@ -1,0 +1,101 @@
+{
+ "k": 24,
+ "tag": "main",
+ "curve_facts": {
+  "k": 24,
+  "p": 16777141,
+  "p_prime": true,
+  "A": 7842,
+  "p_mod_8": 5,
+  "#E": 16784072,
+  "#E_claimed": null,
+  "#E_matches_claim": null,
+  "#E_factored": [
+   2,
+   2,
+   2,
+   2098009
+  ],
+  "#twist": 16770212,
+  "#twist_factored": [
+   2,
+   2,
+   4192553
+  ],
+  "#E+#twist==2p+2": true,
+  "n_x_Z": 1,
+  "n_x_E": 8392035,
+  "n_x_T": 8385105,
+  "Z_x_values": [
+   0
+  ],
+  "A2m4_is_square": false,
+  "x_eq_1_class": 1,
+  "x_eq_minus1_class": 2,
+  "nonresidue_used_for_twist": 2
+ },
+ "C1_explicit_addition_EE_TT": {
+  "EE": {
+   "tested": 5000,
+   "match": 5000
+  },
+  "TT": {
+   "tested": 5000,
+   "match": 5000
+  }
+ },
+ "C2_mixed_in_Fp2": {
+  "tested": 5000,
+  "both_roots_verified": 5000,
+  "conjugate": 5000,
+  "not_in_Fp": 5000,
+  "Fp_roots_found_by_counter": 0
+ },
+ "C3_wrongA_sensitivity": {
+  "ET": {
+   "true_A": {
+    "frac_with_Fp_root": 0.0,
+    "n": 1000000
+   },
+   "wrong_A_plus1": {
+    "frac_with_Fp_root": 0.500649,
+    "n": 1000000
+   }
+  },
+  "EE": {
+   "true_A": {
+    "frac_with_Fp_root": 1.0,
+    "n": 1000000
+   },
+   "wrong_A_plus1": {
+    "frac_with_Fp_root": 0.500381,
+    "n": 1000000
+   }
+  },
+  "TT": {
+   "true_A": {
+    "frac_with_Fp_root": 1.0,
+    "n": 1000000
+   },
+   "wrong_A_plus1": {
+    "frac_with_Fp_root": 0.499702,
+    "n": 1000000
+   }
+  }
+ },
+ "C4_identities": {
+  "disc_equals_4_f1_f2": true,
+  "same_root_count_std_vs_given": true,
+  "given_roots_are_inverses": {
+   "tested": 20000,
+   "match": 20000
+  }
+ },
+ "C5_predicted_Z_pairs": {
+  "EE": 4196017,
+  "TT": 4192552,
+  "ET": 0,
+  "diag_x_with_phi_x_eq_x": 2
+ },
+ "cpu_seconds": 65.06493544578552
+}
