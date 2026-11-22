@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="290" font-family="Helvetica,Arial,sans-serif" font-size="12">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="380.0" y="20" text-anchor="middle" font-size="14" font-weight="bold">Probe-side arms, one thread, A = 1024 (round 2, 10 runs, interleaved)</text>
+<line x1="300.0" y1="34" x2="300.0" y2="256" stroke="#e3e3e3"/>
+<text x="300.0" y="270" text-anchor="middle" fill="#555">0.5</text>
+<line x1="342.8" y1="34" x2="342.8" y2="256" stroke="#e3e3e3"/>
+<text x="342.8" y="270" text-anchor="middle" fill="#555">1</text>
+<line x1="385.6" y1="34" x2="385.6" y2="256" stroke="#e3e3e3"/>
+<text x="385.6" y="270" text-anchor="middle" fill="#555">2</text>
+<line x1="442.2" y1="34" x2="442.2" y2="256" stroke="#e3e3e3"/>
+<text x="442.2" y="270" text-anchor="middle" fill="#555">5</text>
+<line x1="485.0" y1="34" x2="485.0" y2="256" stroke="#e3e3e3"/>
+<text x="485.0" y="270" text-anchor="middle" fill="#555">10</text>
+<line x1="527.8" y1="34" x2="527.8" y2="256" stroke="#e3e3e3"/>
+<text x="527.8" y="270" text-anchor="middle" fill="#555">20</text>
+<line x1="584.4" y1="34" x2="584.4" y2="256" stroke="#e3e3e3"/>
+<text x="584.4" y="270" text-anchor="middle" fill="#555">50</text>
+<line x1="627.2" y1="34" x2="627.2" y2="256" stroke="#e3e3e3"/>
+<text x="627.2" y="270" text-anchor="middle" fill="#555">100</text>
+<line x1="670.0" y1="34" x2="670.0" y2="256" stroke="#e3e3e3"/>
+<text x="670.0" y="270" text-anchor="middle" fill="#555">200</text>
+<text x="485.0" y="285" text-anchor="middle" fill="#333">ns per signed point (log scale; whiskers: min–max)</text>
+<text x="292" y="55" text-anchor="end">fused</text>
+<rect x="300.0" y="44" width="160.4" height="16" fill="#9aa5b1"/>
+<line x1="456.0" y1="52" x2="463.1" y2="52" stroke="#111"/>
+<text x="469.1" y="56" fill="#111">6.71 (1.0x)</text>
+<text x="292" y="85" text-anchor="end">pre32</text>
+<rect x="300.0" y="74" width="156.4" height="16" fill="#9aa5b1"/>
+<line x1="453.2" y1="82" x2="459.2" y2="82" stroke="#111"/>
+<text x="465.2" y="86" fill="#111">6.29 (1.1x)</text>
+<text x="292" y="115" text-anchor="end">prefetch</text>
+<rect x="300.0" y="104" width="161.6" height="16" fill="#2f6db5"/>
+<line x1="457.9" y1="112" x2="463.6" y2="112" stroke="#111"/>
+<text x="469.6" y="116" fill="#111">6.85 (1.0x)</text>
+<text x="292" y="145" text-anchor="end">prefetch+pre32</text>
+<rect x="300.0" y="134" width="159.5" height="16" fill="#2f6db5"/>
+<line x1="456.8" y1="142" x2="460.8" y2="142" stroke="#111"/>
+<text x="466.8" y="146" fill="#111">6.62 (1.0x)</text>
+<text x="292" y="175" text-anchor="end">prefetch+pre32+blk128</text>
+<rect x="300.0" y="164" width="160.5" height="16" fill="#2f6db5"/>
+<line x1="457.1" y1="172" x2="463.7" y2="172" stroke="#111"/>
+<text x="469.7" y="176" fill="#111">6.72 (1.0x)</text>
+<text x="292" y="205" text-anchor="end">prefetch+pre32+blk8</text>
+<rect x="300.0" y="194" width="156.9" height="16" fill="#2f6db5"/>
+<line x1="454.0" y1="202" x2="459.7" y2="202" stroke="#111"/>
+<text x="465.7" y="206" fill="#111">6.34 (1.1x)</text>
+<text x="292" y="235" text-anchor="end">fused + one-multiply hash</text>
+<rect x="300.0" y="224" width="143.3" height="16" fill="#2f6db5"/>
+<line x1="440.2" y1="232" x2="445.2" y2="232" stroke="#111"/>
+<text x="451.2" y="236" fill="#111">5.09 (1.3x)</text>
+</svg>
