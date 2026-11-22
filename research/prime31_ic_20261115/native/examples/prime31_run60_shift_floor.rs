@@ -28,14 +28,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             black_box(q);
         }
         let ns = began.elapsed().as_nanos() as f64 / ITERATIONS as f64;
+        let additions = arithmetic.counts.group_additions
+            - before.group_additions;
+        // The scalar cross-check below is excluded from the timed shift loop.
+        assert_eq!(additions, ITERATIONS,
+                   "shift loop counted unexpected EC additions");
         cumulative += ITERATIONS;
         assert_eq!(q, arithmetic.scalar(PRIME31, cumulative, g),
                    "public shift drift from original scalar multiplication");
-        let additions = arithmetic.counts.group_additions
-            - before.group_additions;
-        // The scalar cross-check above is excluded from the timed shift loop.
-        assert_eq!(additions, ITERATIONS,
-                   "shift loop counted unexpected EC additions");
         println!("run60 rep={} iterations={} affine_shift_ns_per_call={:.3}",
                  rep, ITERATIONS, ns);
         samples_ns.push(ns);
