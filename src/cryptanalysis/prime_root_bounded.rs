@@ -263,7 +263,11 @@ impl Producer<'_> {
             let product = a as u128 * b as u128;
             let folded = ((product as u64) & p) + (product >> 61) as u64;
             let folded = (folded & p) + (folded >> 61);
-            if folded >= p { folded - p } else { folded }
+            if folded >= p {
+                folded - p
+            } else {
+                folded
+            }
         } else if p <= u32::MAX as u64 {
             // (p-1)^2 fits in u64, including p=2^32-5.
             (a * b) % p
@@ -351,8 +355,7 @@ impl Producer<'_> {
             let size = poly.len as usize;
             if c == 0 {
                 // x * f(x) is an exact coefficient shift.
-                out.coefficients[1..=size]
-                    .copy_from_slice(&poly.coefficients[..size]);
+                out.coefficients[1..=size].copy_from_slice(&poly.coefficients[..size]);
                 return Ok(out);
             }
             // R62_PRODUCER_UNIT_LINEAR_BEGIN
@@ -392,16 +395,22 @@ impl Producer<'_> {
         // A missing linear coefficient is a common parity/sparse signature
         // even when the constant coefficient is nonzero. Keep the original
         // dense kernel for ordinary dense inputs.
-        if a.coefficients[0] == 0 || b.coefficients[0] == 0
+        if a.coefficients[0] == 0
+            || b.coefficients[0] == 0
             || (a.len > 2 && a.coefficients[1] == 0)
-            || (b.len > 2 && b.coefficients[1] == 0) {
-        // R61_PRODUCT_LINEAR_ZERO_END
+            || (b.len > 2 && b.coefficients[1] == 0)
+        {
+            // R61_PRODUCT_LINEAR_ZERO_END
             for i in 0..a.len as usize {
                 let ai = a.coefficients[i];
-                if ai == 0 { continue; }
+                if ai == 0 {
+                    continue;
+                }
                 for j in 0..b.len as usize {
                     let bj = b.coefficients[j];
-                    if bj == 0 { continue; }
+                    if bj == 0 {
+                        continue;
+                    }
                     let value = self.mul(ai, bj)?;
                     out.coefficients[i + j] = self.add(out.coefficients[i + j], value)?;
                 }
@@ -467,7 +476,8 @@ impl Producer<'_> {
         // while evaluating the remainder at -1 or 1. This replaces
         // the mutable 17-coefficient cancellation buffer with one scalar.
         // Nonzero cancellations preserve the original copy/field charges.
-        if b.len == 2 && b.coefficients[1] == 1
+        if b.len == 2
+            && b.coefficients[1] == 1
             && (b.coefficients[0] == 1 || b.coefficients[0] == self.p - 1)
         {
             let plus = b.coefficients[0] == self.p - 1;
@@ -494,7 +504,8 @@ impl Producer<'_> {
         // q[i-1] = a[i] - c*q[i]. One reverse pass avoids copying,
         // updating, and repeatedly trimming a temporary remainder.
         // Skip zero quotients to preserve general-division metering.
-        if b.len == 2 && b.coefficients[1] == 1
+        if b.len == 2
+            && b.coefficients[1] == 1
             && b.coefficients[0] != 0
             && b.coefficients[0] != 1
             && b.coefficients[0] != self.p - 1
@@ -539,15 +550,20 @@ impl Producer<'_> {
         // Synthetic division by x^d+c: x^d == -c, so cancel each
         // descending high coefficient with one field update. For c=+/-1
         // this is just subtraction/addition, not multiplication.
-        if b.len >= 2 && b.coefficients[b.len as usize - 1] == 1
+        if b.len >= 2
+            && b.coefficients[b.len as usize - 1] == 1
             && (b.coefficients[0] == 1 || b.coefficients[0] == self.p - 1)
-            && b.coefficients[1..b.len as usize - 1].iter().all(|&v| v == 0)
+            && b.coefficients[1..b.len as usize - 1]
+                .iter()
+                .all(|&v| v == 0)
         {
             let d = b.len as usize - 1;
             let c = b.coefficients[0];
             for high in (d..a.len as usize).rev() {
                 let factor = remainder.coefficients[high];
-                if factor == 0 { continue; }
+                if factor == 0 {
+                    continue;
+                }
                 self.gate.charge(COPY_WORK)?;
                 let low = high - d;
                 quotient.coefficients[low] = factor;
@@ -571,7 +587,11 @@ impl Producer<'_> {
         // reciprocal, leading multiplication, or leading subtraction is needed.
         // For a general divisor, the leading term also cancels exactly.
         let monic = b.coefficients[b.len as usize - 1] == 1;
-        let inv = if monic { 1 } else { self.inverse(b.coefficients[b.len as usize - 1])? };
+        let inv = if monic {
+            1
+        } else {
+            self.inverse(b.coefficients[b.len as usize - 1])?
+        };
         while remainder.len >= b.len {
             self.gate.charge(COPY_WORK)?;
             let high = remainder.len as usize - 1;
@@ -584,7 +604,9 @@ impl Producer<'_> {
             quotient.coefficients[shift] = coefficient;
             for j in 0..b.len as usize - 1 {
                 let bj = b.coefficients[j];
-                if bj == 0 { continue; }
+                if bj == 0 {
+                    continue;
+                }
                 let v = self.mul(coefficient, bj)?;
                 remainder.coefficients[shift + j] =
                     self.sub(remainder.coefficients[shift + j], v)?;
@@ -627,7 +649,8 @@ impl Producer<'_> {
         // Horner evaluation at +/-1: no polynomial buffer updates or
         // trailing-zero trims. Keep charging only nonzero cancellations
         // as in the prior x^d+/-1 reduction.
-        if modulus.len == 2 && value.len >= 2
+        if modulus.len == 2
+            && value.len >= 2
             && (modulus.coefficients[0] == 1 || modulus.coefficients[0] == self.p - 1)
         {
             let plus = modulus.coefficients[0] == self.p - 1;
@@ -651,7 +674,8 @@ impl Producer<'_> {
         // R63_PRODUCER_SYNTHETIC_REDUCE_BEGIN
         // Horner evaluation at -c gives f mod (x+c) directly. The same
         // nonzero high coefficients are charged as the trim-driven loop.
-        if modulus.len == 2 && value.len >= 2
+        if modulus.len == 2
+            && value.len >= 2
             && modulus.coefficients[0] != 0
             && modulus.coefficients[0] != 1
             && modulus.coefficients[0] != self.p - 1
@@ -677,7 +701,9 @@ impl Producer<'_> {
         // former trim-driven loop, with a single deadline check.
         if modulus.len >= 3
             && value.len >= modulus.len
-            && modulus.coefficients[..modulus.len as usize - 1].iter().all(|&c| c == 0)
+            && modulus.coefficients[..modulus.len as usize - 1]
+                .iter()
+                .all(|&c| c == 0)
         {
             let n = value.len as usize;
             let d = modulus.len as usize - 1;
@@ -693,15 +719,20 @@ impl Producer<'_> {
         // Reduce modulo monic x^d+c by a single descending coefficient
         // fold. This avoids scanning d zero coefficients and trimming per
         // cancellation. Each nonzero term retains a deadline/work check.
-        if modulus.len >= 2 && value.len >= modulus.len
+        if modulus.len >= 2
+            && value.len >= modulus.len
             && (modulus.coefficients[0] == 1 || modulus.coefficients[0] == self.p - 1)
-            && modulus.coefficients[1..modulus.len as usize - 1].iter().all(|&v| v == 0)
+            && modulus.coefficients[1..modulus.len as usize - 1]
+                .iter()
+                .all(|&v| v == 0)
         {
             let d = modulus.len as usize - 1;
             let c = modulus.coefficients[0];
             for high in (d..value.len as usize).rev() {
                 let factor = value.coefficients[high];
-                if factor == 0 { continue; }
+                if factor == 0 {
+                    continue;
+                }
                 self.gate.charge(COPY_WORK)?;
                 let low = high - d;
                 value.coefficients[low] = if c == 1 {
@@ -721,8 +752,8 @@ impl Producer<'_> {
         // R59_BINOMIAL_REDUCTION_END
         // x^d+constant and x^d+... with a zero low coefficient appear
         // in sparse factor bases; avoid paying the sparse branch on dense f.
-        let sparse_modulus = modulus.coefficients[0] == 0
-            || (modulus.len > 2 && modulus.coefficients[1] == 0);
+        let sparse_modulus =
+            modulus.coefficients[0] == 0 || (modulus.len > 2 && modulus.coefficients[1] == 0);
         while value.len >= modulus.len {
             self.gate.charge(COPY_WORK)?;
             let high = value.len as usize - 1;
@@ -731,7 +762,9 @@ impl Producer<'_> {
             if sparse_modulus {
                 for j in 0..modulus.len as usize - 1 {
                     let mj = modulus.coefficients[j];
-                    if mj == 0 { continue; }
+                    if mj == 0 {
+                        continue;
+                    }
                     let product = self.mul(coefficient, mj)?;
                     value.coefficients[shift + j] =
                         self.sub(value.coefficients[shift + j], product)?;
@@ -754,9 +787,13 @@ impl Producer<'_> {
     fn square(&mut self, a: &Poly17) -> Result<Poly17> {
         self.gate.charge(3 * COPY_WORK)?;
         let mut out = Poly17::ZERO;
-        if a.len == 0 { return Ok(out); }
+        if a.len == 0 {
+            return Ok(out);
+        }
         let n = 2 * a.len as usize - 1;
-        if n > 17 { return Err(Stop::InvalidInput); }
+        if n > 17 {
+            return Err(Stop::InvalidInput);
+        }
         out.len = n as u8;
         // R55_PRODUCER_SMALL_SQUARE_BEGIN
         // Scalar squares and (x+c)^2 need only one multiplication and,
@@ -791,8 +828,11 @@ impl Producer<'_> {
         // R62_PRODUCER_BINOMIAL_SQUARE_BEGIN
         // (x^d+c)^2=x^(2d)+2cx^d+c^2. No sparse convolution
         // is necessary, and the highest coefficient remains monic.
-        if a.len >= 3 && a.coefficients[a.len as usize - 1] == 1
-            && a.coefficients[1..a.len as usize - 1].iter().all(|&v| v == 0)
+        if a.len >= 3
+            && a.coefficients[a.len as usize - 1] == 1
+            && a.coefficients[1..a.len as usize - 1]
+                .iter()
+                .all(|&v| v == 0)
         {
             let d = a.len as usize - 1;
             let c = a.coefficients[0];
@@ -816,7 +856,7 @@ impl Producer<'_> {
         // tested symmetric algorithm avoids redundant cross-products and
         // additions just as it does for larger inputs.
         if a.len >= 2 && !a.coefficients[..a.len as usize].contains(&0) {
-        // R55_PRODUCER_DENSE_THRESHOLD_END
+            // R55_PRODUCER_DENSE_THRESHOLD_END
             for i in 0..a.len as usize {
                 let ai = a.coefficients[i];
                 let diag = self.mul(ai, ai)?;
@@ -838,8 +878,7 @@ impl Producer<'_> {
                         if i == 0 || j + 1 == a.len as usize {
                             out.coefficients[i + j] = cross;
                         } else {
-                            out.coefficients[i + j] =
-                                self.add(out.coefficients[i + j], cross)?;
+                            out.coefficients[i + j] = self.add(out.coefficients[i + j], cross)?;
                         }
                         // R54_PRODUCER_SQUARE_CROSS_END
                     }
@@ -851,12 +890,16 @@ impl Producer<'_> {
         // R43_PRODUCER_SQUARE_END
         for i in 0..a.len as usize {
             let ai = a.coefficients[i];
-            if ai == 0 { continue; }
+            if ai == 0 {
+                continue;
+            }
             let diag = self.mul(ai, ai)?;
             out.coefficients[2 * i] = self.add(out.coefficients[2 * i], diag)?;
             for j in i + 1..a.len as usize {
                 let aj = a.coefficients[j];
-                if aj == 0 { continue; }
+                if aj == 0 {
+                    continue;
+                }
                 let cross = self.mul(ai, aj)?;
                 let twice = self.add(cross, cross)?;
                 out.coefficients[i + j] = self.add(out.coefficients[i + j], twice)?;
@@ -968,9 +1011,13 @@ impl Producer<'_> {
         // Modulo x^d, the x^p term vanishes for p>=d; otherwise it
         // is already reduced. No exponentiation, convolution or GCD
         // shortcut is needed, and the LinearPart event stays unchanged.
-        if exponent == self.p && monic.len >= 3
-            && base.len == 2 && base.coefficients[1] == 1
-            && monic.coefficients[..monic.len as usize - 1].iter().all(|&c| c == 0)
+        if exponent == self.p
+            && monic.len >= 3
+            && base.len == 2
+            && base.coefficients[1] == 1
+            && monic.coefficients[..monic.len as usize - 1]
+                .iter()
+                .all(|&c| c == 0)
         {
             let degree = monic.len as usize - 1;
             let mut result = Poly17::constant(base.coefficients[0]);
@@ -986,10 +1033,14 @@ impl Producer<'_> {
         // This is valid for affine x+delta by Frobenius, including p<=d,
         // after normalizing the leading coefficient. The scalar exponent
         // needs O(log p) field operations instead of polynomial convolution.
-        if exponent == self.p && monic.len >= 4
-            && base.len == 2 && base.coefficients[1] == 1
+        if exponent == self.p
+            && monic.len >= 4
+            && base.len == 2
+            && base.coefficients[1] == 1
             && monic.coefficients[0] != 0
-            && monic.coefficients[1..monic.len as usize - 1].iter().all(|&c| c == 0)
+            && monic.coefficients[1..monic.len as usize - 1]
+                .iter()
+                .all(|&c| c == 0)
         {
             let degree = monic.len as usize - 1;
             let quotient = self.p / degree as u64;
@@ -1000,7 +1051,11 @@ impl Producer<'_> {
             let scaled = if quotient == 0 || monic.coefficients[0] == self.p - 1 {
                 1
             } else if monic.coefficients[0] == 1 {
-                if quotient & 1 == 0 { 1 } else { self.p - 1 }
+                if quotient & 1 == 0 {
+                    1
+                } else {
+                    self.p - 1
+                }
             } else {
                 let neg_c = self.sub(0, monic.coefficients[0])?;
                 self.split_scalar_pow(neg_c, quotient)?
@@ -1020,11 +1075,9 @@ impl Producer<'_> {
         // R65_PRODUCER_AFFINE_LINEAR_BEGIN
         // For every affine base x+delta, Frobenius fixes the evaluation
         // at x=-c in Fp[x]/(x+c). No polynomial powering is necessary.
-        if monic.len == 2 && exponent == self.p
-            && base.len == 2 && base.coefficients[1] == 1
-        {
+        if monic.len == 2 && exponent == self.p && base.len == 2 && base.coefficients[1] == 1 {
             return Ok(Poly17::constant(
-                self.sub(base.coefficients[0], monic.coefficients[0])?
+                self.sub(base.coefficients[0], monic.coefficients[0])?,
             ));
         }
         // R65_PRODUCER_AFFINE_LINEAR_END
@@ -1034,8 +1087,10 @@ impl Producer<'_> {
         // the discriminant vanishes. Euler's criterion uses scalar
         // field operations rather than degree-two polynomial powering.
         // Prime p >= 3 is guaranteed by Fp64Arithmetic::try_new.
-        if monic.len == 3 && exponent == self.p
-            && base.len == 2 && base.coefficients[0] == 0
+        if monic.len == 3
+            && exponent == self.p
+            && base.len == 2
+            && base.coefficients[0] == 0
             && base.coefficients[1] == 1
         {
             let linear = monic.coefficients[1];
@@ -1069,17 +1124,17 @@ impl Producer<'_> {
         // R42_PRODUCER_FASTPATH_BEGIN
         // Both x^p and split's (x+delta)^((p-1)/2) have all-one
         // exponents for p=2^61-1. Avoid 51-53 redundant poly products.
-        if self.p == (1u64 << 61) - 1
-            && (exponent == self.p || exponent == (self.p - 1) / 2)
-        {
+        if self.p == (1u64 << 61) - 1 && (exponent == self.p || exponent == (self.p - 1) / 2) {
             return self.mersenne_bits_power(&b, 64 - exponent.leading_zeros(), &monic);
         }
         // R42_PRODUCER_FASTPATH_END
         // R44_PRODUCER_WINDOW_SWITCH_BEGIN
         // Avoid table setup on small degrees, sparse-bit exponents, and
         // the 61-bit prime already handled by the Mersenne addition chain.
-        if monic.len >= 5 && exponent >= (1u64 << 20)
-            && exponent <= u32::MAX as u64 && exponent.count_ones() >= 12
+        if monic.len >= 5
+            && exponent >= (1u64 << 20)
+            && exponent <= u32::MAX as u64
+            && exponent.count_ones() >= 12
             && (exponent == self.p || exponent == (self.p - 1) / 2)
         {
             return self.window3_power(&b, exponent, &monic);
@@ -1153,7 +1208,11 @@ impl Producer<'_> {
             if b.len == 2 && b.coefficients[1] == 1 {
                 let mut evaluation = a;
                 self.reduce_monic(&mut evaluation, &b)?;
-                return Ok(if evaluation.len == 0 { b } else { Poly17::constant(1) });
+                return Ok(if evaluation.len == 0 {
+                    b
+                } else {
+                    Poly17::constant(1)
+                });
             }
             // R64_PRODUCER_MONIC_LINEAR_GCD_END
             let r = self.division(&a, &b)?.1;
@@ -1230,7 +1289,10 @@ impl Producer<'_> {
         // R61_PRODUCER_SCALAR_IDENTITY_END
     }
     fn quadratic_split_factor(&mut self, h: &Poly17, delta: u64) -> Result<Option<Poly17>> {
-        if h.len != 3 || (self.p & 3 != 3 && self.p & 7 != 5 && self.p != 1_000_000_009) || h.coefficients[2] != 1 {
+        if h.len != 3
+            || (self.p & 3 != 3 && self.p & 7 != 5 && self.p != 1_000_000_009)
+            || h.coefficients[2] != 1
+        {
             return Ok(None);
         }
         let b = h.coefficients[1];
@@ -1294,7 +1356,9 @@ impl Producer<'_> {
                     v = self.mul(v, v)?;
                     i += 1;
                 }
-                if i == m { return Ok(None); }
+                if i == m {
+                    return Ok(None);
+                }
                 let mut b = c;
                 for _ in 1..(m - i) {
                     b = self.mul(b, b)?;
@@ -1317,8 +1381,7 @@ impl Producer<'_> {
         let neg_b = self.sub(0, b)?;
         let numerator_a = self.add(neg_b, sqrt_d)?;
         self.gate.charge(32)?;
-        let root_a = (numerator_a >> 1)
-            + (numerator_a & 1) * self.p.div_ceil(2);
+        let root_a = (numerator_a >> 1) + (numerator_a & 1) * self.p.div_ceil(2);
         let root_b = self.sub(neg_b, root_a)?;
         // R50_QUADRATIC_FINISH_PRODUCER_END
         if root_a == root_b {
@@ -1378,14 +1441,10 @@ impl Producer<'_> {
         } else if f.len == 2 {
             self.power_modulus(&f)?
         // R45_QUADRATIC_GCD_PRODUCER_BEGIN
-        } else if f.len == 3 && xp.len == 2
-            && xp.coefficients[0] == 0 && xp.coefficients[1] == 1
-        {
+        } else if f.len == 3 && xp.len == 2 && xp.coefficients[0] == 0 && xp.coefficients[1] == 1 {
             // x^p == x mod f: the quadratic is squarefree and split.
             self.power_modulus(&f)?
-        } else if f.len == 3 && xp.len == 2
-            && xp.coefficients[1] == self.p - 1
-        {
+        } else if f.len == 3 && xp.len == 2 && xp.coefficients[1] == self.p - 1 {
             // x^p == -b-x: the quadratic is irreducible.
             Poly17::constant(1)
         } else if f.len == 3 && xp.len <= 1 {
@@ -1635,7 +1694,11 @@ impl Replay {
             let high = (wide >> 61) as u64;
             let combined = low + high;
             let reduced = (combined & p) + (combined >> 61);
-            if reduced == p { 0 } else { reduced }
+            if reduced == p {
+                0
+            } else {
+                reduced
+            }
         } else if p <= u32::MAX as u64 {
             (x * y) % p
         } else {
@@ -1670,12 +1733,20 @@ impl Replay {
             while a & 1 == 0 {
                 self.gate.scalar()?;
                 a >>= 1;
-                u = if u & 1 == 0 { u >> 1 } else { (u + self.p) >> 1 };
+                u = if u & 1 == 0 {
+                    u >> 1
+                } else {
+                    (u + self.p) >> 1
+                };
             }
             while b & 1 == 0 {
                 self.gate.scalar()?;
                 b >>= 1;
-                v = if v & 1 == 0 { v >> 1 } else { (v + self.p) >> 1 };
+                v = if v & 1 == 0 {
+                    v >> 1
+                } else {
+                    (v + self.p) >> 1
+                };
             }
             self.gate.scalar()?;
             if a >= b {
@@ -1740,8 +1811,7 @@ impl Replay {
             let c = linear.coefficients[0];
             if c == 0 {
                 // No field operations are needed to multiply by x.
-                z.coefficients[1..=size]
-                    .copy_from_slice(&poly.coefficients[..size]);
+                z.coefficients[1..=size].copy_from_slice(&poly.coefficients[..size]);
                 return Ok(z);
             }
             // R62_REPLAY_UNIT_LINEAR_BEGIN
@@ -1751,8 +1821,11 @@ impl Replay {
                 for k in 0..=size {
                     self.gate.charge(32)?;
                     z.coefficients[k] = if k == 0 {
-                        if c == 1 { poly.coefficients[0] }
-                        else { self.minus(0, poly.coefficients[0])? }
+                        if c == 1 {
+                            poly.coefficients[0]
+                        } else {
+                            self.minus(0, poly.coefficients[0])?
+                        }
                     } else if k == size {
                         poly.coefficients[size - 1]
                     } else if c == 1 {
@@ -1785,7 +1858,8 @@ impl Replay {
         // R61_REPLAY_LINEAR_ZERO_BEGIN
         // Detect missing x coefficients without a full polynomial scan.
         // Replay remains output-diagonal rather than producer row-major.
-        let sparse = x.coefficients[0] == 0 || y.coefficients[0] == 0
+        let sparse = x.coefficients[0] == 0
+            || y.coefficients[0] == 0
             || (x.len > 2 && x.coefficients[1] == 0)
             || (y.len > 2 && y.coefficients[1] == 0);
         // R61_REPLAY_LINEAR_ZERO_END
@@ -1797,7 +1871,9 @@ impl Replay {
                 self.gate.charge(32)?;
                 let xi = x.coefficients[i];
                 let yj = y.coefficients[k - i];
-                if sparse && (xi == 0 || yj == 0) { continue; }
+                if sparse && (xi == 0 || yj == 0) {
+                    continue;
+                }
                 let v = self.times(xi, yj)?;
                 // R54_REPLAY_CONVOLUTION_BEGIN
                 // On a dense output diagonal the first term has no
@@ -1830,15 +1906,15 @@ impl Replay {
         let d = usize::from(denominator.len);
         // R52_REMAINDER_BEGIN
         // Independent verifier: f(x) mod x is the constant coefficient.
-        if d == 2 && denominator.coefficients[0] == 0
-            && denominator.coefficients[1] == 1 {
+        if d == 2 && denominator.coefficients[0] == 0 && denominator.coefficients[1] == 1 {
             return Ok(Poly17::constant(numerator.coefficients[0]));
         }
         // R52_REMAINDER_END
         // R66_REPLAY_UNIT_LINEAR_REMAINDER_BEGIN
         // Independent Horner evaluation at +/-1. Replay, unlike the
         // producer, charges every eliminated degree, even when zero.
-        if d == 2 && denominator.coefficients[1] == 1
+        if d == 2
+            && denominator.coefficients[1] == 1
             && (denominator.coefficients[0] == 1 || denominator.coefficients[0] == self.p - 1)
         {
             let at_plus_one = denominator.coefficients[0] == self.p - 1;
@@ -1861,7 +1937,8 @@ impl Replay {
         // R63_REPLAY_HORNER_REMAINDER_BEGIN
         // Independent Horner verifier for monic x+c. Its fixed descending
         // checks preserve the original replay remainder budget semantics.
-        if d == 2 && denominator.coefficients[1] == 1
+        if d == 2
+            && denominator.coefficients[1] == 1
             && denominator.coefficients[0] != 0
             && denominator.coefficients[0] != 1
             && denominator.coefficients[0] != self.p - 1
@@ -1897,7 +1974,8 @@ impl Replay {
         // Independent descending-index polynomial remainder: for monic
         // x^d+c the only surviving cancellation lies d slots below.
         // Treat +/-1 as additive units, independently of producer code.
-        if d >= 2 && denominator.coefficients[d - 1] == 1
+        if d >= 2
+            && denominator.coefficients[d - 1] == 1
             && (denominator.coefficients[0] == 1 || denominator.coefficients[0] == self.p - 1)
             && denominator.coefficients[1..d - 1].iter().all(|&v| v == 0)
         {
@@ -1906,7 +1984,9 @@ impl Replay {
             for high in (degree..usize::from(numerator.len)).rev() {
                 self.gate.charge(COPY_WORK)?;
                 let factor = r.coefficients[high];
-                if factor == 0 { continue; }
+                if factor == 0 {
+                    continue;
+                }
                 let low = high - degree;
                 r.coefficients[low] = if c == 1 {
                     self.minus(r.coefficients[low], factor)?
@@ -1947,8 +2027,7 @@ impl Replay {
                     continue;
                 }
                 let product = self.times(c, term)?;
-                r.coefficients[shift + j] =
-                    self.minus(r.coefficients[shift + j], product)?;
+                r.coefficients[shift + j] = self.minus(r.coefficients[shift + j], product)?;
             }
             r.coefficients[high] = 0;
         }
@@ -1978,8 +2057,7 @@ impl Replay {
         }
         // R52_CANCEL_BEGIN
         // Independently cancel modulo x without field arithmetic.
-        if divisor_len == 2 && denominator.coefficients[0] == 0
-            && numerator.len >= 2 {
+        if divisor_len == 2 && denominator.coefficients[0] == 0 && numerator.len >= 2 {
             *numerator = Poly17::constant(numerator.coefficients[0]);
             return Ok(());
         }
@@ -1988,7 +2066,8 @@ impl Replay {
         // Compute the scalar polynomial residue by Horner's rule.
         // Exactly one COPY_WORK check per cancelled degree, and
         // one field operation iff its leading term is nonzero.
-        if divisor_len == 2 && numerator.len >= 2
+        if divisor_len == 2
+            && numerator.len >= 2
             && (denominator.coefficients[0] == 1 || denominator.coefficients[0] == self.p - 1)
         {
             let at_plus_one = denominator.coefficients[0] == self.p - 1;
@@ -2013,7 +2092,8 @@ impl Replay {
         // Replay keeps one charge, multiplication and subtraction per
         // eliminated degree, even when its high coefficient is zero.
         // This path is deliberately distinct from Producer's skip-zero loop.
-        if divisor_len == 2 && numerator.len >= 2
+        if divisor_len == 2
+            && numerator.len >= 2
             && denominator.coefficients[0] != 0
             && denominator.coefficients[0] != 1
             && denominator.coefficients[0] != self.p - 1
@@ -2033,8 +2113,11 @@ impl Replay {
         // In Fp[x]/(x^d), canceling every high term is just truncation.
         // Unlike producer's trim-driven path, replay's original loop
         // checks every eliminated degree, including zero coefficients.
-        if divisor_len >= 3 && numerator.len >= denominator.len
-            && denominator.coefficients[..divisor_len - 1].iter().all(|&c| c == 0)
+        if divisor_len >= 3
+            && numerator.len >= denominator.len
+            && denominator.coefficients[..divisor_len - 1]
+                .iter()
+                .all(|&c| c == 0)
         {
             let n = numerator.len as usize;
             let d = divisor_len - 1;
@@ -2048,16 +2131,21 @@ impl Replay {
         // R59_BINOMIAL_CANCEL_BEGIN
         // Replay keeps its independent descending coefficient traversal
         // and the same per-degree gate checks as the general cancel loop.
-        if divisor_len >= 2 && numerator.len >= denominator.len
+        if divisor_len >= 2
+            && numerator.len >= denominator.len
             && (denominator.coefficients[0] == 1 || denominator.coefficients[0] == self.p - 1)
-            && denominator.coefficients[1..divisor_len - 1].iter().all(|&v| v == 0)
+            && denominator.coefficients[1..divisor_len - 1]
+                .iter()
+                .all(|&v| v == 0)
         {
             let degree = divisor_len - 1;
             let c = denominator.coefficients[0];
             for high in (degree..usize::from(numerator.len)).rev() {
                 self.gate.charge(COPY_WORK)?;
                 let factor = numerator.coefficients[high];
-                if factor == 0 { continue; }
+                if factor == 0 {
+                    continue;
+                }
                 let low = high - degree;
                 numerator.coefficients[low] = if c == 1 {
                     self.minus(numerator.coefficients[low], factor)?
@@ -2087,7 +2175,9 @@ impl Replay {
             }
             for low in 0..divisor_len - 1 {
                 let term = denominator.coefficients[low];
-                if sparse && term == 0 { continue; }
+                if sparse && term == 0 {
+                    continue;
+                }
                 let term = self.times(factor, term)?;
                 numerator.coefficients[offset + low] =
                     self.minus(numerator.coefficients[offset + low], term)?;
@@ -2103,10 +2193,14 @@ impl Replay {
     fn square_diagonals(&mut self, x: &Poly17) -> Result<Poly17> {
         self.gate.charge(4 * COPY_WORK)?;
         let mut z = Poly17::ZERO;
-        if x.len == 0 { return Ok(z); }
+        if x.len == 0 {
+            return Ok(z);
+        }
         let len = usize::from(x.len);
         let n = 2 * len - 1;
-        if n > 17 { return Err(Stop::InvalidCertificate); }
+        if n > 17 {
+            return Err(Stop::InvalidCertificate);
+        }
         z.len = n as u8;
         // R55_REPLAY_SMALL_SQUARE_BEGIN
         // Independent closed-form squaring for scalar and monic linear
@@ -2139,7 +2233,8 @@ impl Replay {
         // R62_REPLAY_BINOMIAL_SQUARE_BEGIN
         // The replay square is constructed by coefficient degree,
         // independently of the producer's row-major sparse algorithm.
-        if len >= 3 && x.coefficients[len - 1] == 1
+        if len >= 3
+            && x.coefficients[len - 1] == 1
             && x.coefficients[1..len - 1].iter().all(|&v| v == 0)
         {
             let d = len - 1;
@@ -2163,7 +2258,7 @@ impl Replay {
         // For small dense polynomials use diagonal symmetric products
         // without repeated additions into zero-initialized coefficients.
         if len >= 2 && !x.coefficients[..len].contains(&0) {
-        // R55_REPLAY_DENSE_THRESHOLD_END
+            // R55_REPLAY_DENSE_THRESHOLD_END
             let mut doubled = [0u64; 17];
             for i in 0..len - 1 {
                 doubled[i] = self.plus(x.coefficients[i], x.coefficients[i])?;
@@ -2174,9 +2269,15 @@ impl Replay {
                 let end = len.min(k + 1);
                 for i in start..end {
                     let j = k - i;
-                    if i > j { break; }
+                    if i > j {
+                        break;
+                    }
                     self.gate.charge(32)?;
-                    let left = if i == j { x.coefficients[i] } else { doubled[i] };
+                    let left = if i == j {
+                        x.coefficients[i]
+                    } else {
+                        doubled[i]
+                    };
                     let product = self.times(left, x.coefficients[j])?;
                     // R54_REPLAY_SQUARE_BEGIN
                     // The first pair initializes this output degree.
@@ -2202,7 +2303,9 @@ impl Replay {
                 let end = len.min(k + 1);
                 for i in start..end {
                     let j = k - i;
-                    if i > j { break; }
+                    if i > j {
+                        break;
+                    }
                     self.gate.charge(32)?;
                     if x.coefficients[i] == 0 || x.coefficients[j] == 0 {
                         continue;
@@ -2221,7 +2324,9 @@ impl Replay {
                 let end = len.min(k + 1);
                 for i in start..end {
                     let j = k - i;
-                    if i > j { break; }
+                    if i > j {
+                        break;
+                    }
                     self.gate.charge(32)?;
                     let v = self.times(x.coefficients[i], x.coefficients[j])?;
                     let term = if i == j { v } else { self.plus(v, v)? };
@@ -2237,7 +2342,10 @@ impl Replay {
     // Independent iteration over the binary expansion of the bit count k.
     // Keep diagonal squaring, descending cancellation and replay accounting.
     fn repeated_mersenne_bits_power(
-        &mut self, base: &Poly17, bits: u32, monic: &Poly17,
+        &mut self,
+        base: &Poly17,
+        bits: u32,
+        monic: &Poly17,
     ) -> Result<Poly17> {
         debug_assert!(bits > 0);
         let mut length = 1u32;
@@ -2283,9 +2391,13 @@ impl Replay {
         // R57_MONOMIAL_FROBENIUS_REPLAY_BEGIN
         // Independent certificate calculation: in Fp[x]/(x^d),
         // Frobenius maps x+delta to delta plus x^p when p<d.
-        if exponent == self.p && monic.len >= 3
-            && base.len == 2 && base.coefficients[1] == 1
-            && monic.coefficients[..usize::from(monic.len) - 1].iter().all(|&v| v == 0)
+        if exponent == self.p
+            && monic.len >= 3
+            && base.len == 2
+            && base.coefficients[1] == 1
+            && monic.coefficients[..usize::from(monic.len) - 1]
+                .iter()
+                .all(|&v| v == 0)
         {
             let degree = usize::from(monic.len) - 1;
             let mut checked = Poly17::ZERO;
@@ -2304,10 +2416,14 @@ impl Replay {
         // R58_BINOMIAL_FROBENIUS_REPLAY_BEGIN
         // Independent left-to-right scalar exponentiation checks the same
         // Frobenius identity without sharing producer arithmetic.
-        if exponent == self.p && monic.len >= 4
-            && base.len == 2 && base.coefficients[1] == 1
+        if exponent == self.p
+            && monic.len >= 4
+            && base.len == 2
+            && base.coefficients[1] == 1
             && monic.coefficients[0] != 0
-            && monic.coefficients[1..usize::from(monic.len) - 1].iter().all(|&v| v == 0)
+            && monic.coefficients[1..usize::from(monic.len) - 1]
+                .iter()
+                .all(|&v| v == 0)
         {
             let degree = usize::from(monic.len) - 1;
             let quotient = self.p / degree as u64;
@@ -2318,7 +2434,11 @@ impl Replay {
             let scaled = if quotient == 0 || monic.coefficients[0] == self.p - 1 {
                 1
             } else if monic.coefficients[0] == 1 {
-                if quotient.is_multiple_of(2) { 1 } else { self.p - 1 }
+                if quotient.is_multiple_of(2) {
+                    1
+                } else {
+                    self.p - 1
+                }
             } else {
                 let neg_c = self.minus(0, monic.coefficients[0])?;
                 self.split_character_power(neg_c, quotient)?
@@ -2338,19 +2458,19 @@ impl Replay {
         // R65_REPLAY_AFFINE_LINEAR_BEGIN
         // Separate verifier calculation: reduce affine x+delta at x=-c.
         // The resulting field element is fixed by the p-th power map.
-        if monic.len == 2 && exponent == self.p
-            && base.len == 2 && base.coefficients[1] == 1
-        {
+        if monic.len == 2 && exponent == self.p && base.len == 2 && base.coefficients[1] == 1 {
             return Ok(Poly17::constant(
-                self.minus(base.coefficients[0], monic.coefficients[0])?
+                self.minus(base.coefficients[0], monic.coefficients[0])?,
             ));
         }
         // R65_REPLAY_AFFINE_LINEAR_END
         // R45_QUADRATIC_FROBENIUS_REPLAY_BEGIN
         // Verify quadratic Frobenius using a separate left-to-right
         // Euler-criterion implementation. Do not invoke producer code.
-        if monic.len == 3 && exponent == self.p
-            && base.len == 2 && base.coefficients[0] == 0
+        if monic.len == 3
+            && exponent == self.p
+            && base.len == 2
+            && base.coefficients[0] == 0
             && base.coefficients[1] == 1
         {
             let linear = monic.coefficients[1];
@@ -2383,12 +2503,8 @@ impl Replay {
         // R42_REPLAY_FASTPATH_BEGIN
         // Replay uses a distinct, iterative addition chain and its own
         // polynomial arithmetic; certificate contents remain unchanged.
-        if self.p == (1u64 << 61) - 1
-            && (exponent == self.p || exponent == (self.p - 1) / 2)
-        {
-            return self.repeated_mersenne_bits_power(
-                &base, 64 - exponent.leading_zeros(), &monic,
-            );
+        if self.p == (1u64 << 61) - 1 && (exponent == self.p || exponent == (self.p - 1) / 2) {
+            return self.repeated_mersenne_bits_power(&base, 64 - exponent.leading_zeros(), &monic);
         }
         // R42_REPLAY_FASTPATH_END
         // Keep the former loop for large (61-bit) exponents: native and
@@ -2411,7 +2527,11 @@ impl Replay {
         }
         // The top exponent bit is always 1. Initialize from the already
         // reduced base instead of squaring 1 and multiplying by base.
-        let mut acc = if exponent == 0 { Poly17::constant(1) } else { base };
+        let mut acc = if exponent == 0 {
+            Poly17::constant(1)
+        } else {
+            base
+        };
         if exponent == 0 && monic.len == 1 {
             self.cancel_monic(&mut acc, &monic)?;
         }
@@ -2480,14 +2600,19 @@ impl Replay {
             self.gate.charge(32)?;
             let factors_of_two = value.trailing_zeros();
             value >>= factors_of_two;
-            parity ^= (factors_of_two & 1 != 0)
-                && (odd_modulus & 7 == 3 || odd_modulus & 7 == 5);
+            parity ^= (factors_of_two & 1 != 0) && (odd_modulus & 7 == 3 || odd_modulus & 7 == 5);
             parity ^= (value & odd_modulus & 3) == 3;
             let remainder = odd_modulus % value;
             odd_modulus = value;
             value = remainder;
         }
-        Ok(if odd_modulus != 1 { 0 } else if parity { -1 } else { 1 })
+        Ok(if odd_modulus != 1 {
+            0
+        } else if parity {
+            -1
+        } else {
+            1
+        })
     }
     // R49_BINARY_JACOBI_REPLAY_END
     // R46_REPLAY_HELPER_BEGIN
@@ -2513,7 +2638,10 @@ impl Replay {
         // R61_REPLAY_SCALAR_IDENTITY_END
     }
     fn replay_quadratic_split(&mut self, f: Poly17, delta: u64) -> Result<Option<Poly17>> {
-        if f.len != 3 || (self.p % 4 != 3 && self.p % 8 != 5 && self.p != 1_000_000_009) || f.coefficients[2] != 1 {
+        if f.len != 3
+            || (self.p % 4 != 3 && self.p % 8 != 5 && self.p != 1_000_000_009)
+            || f.coefficients[2] != 1
+        {
             return Ok(None);
         }
         let b = f.coefficients[1];
@@ -2572,7 +2700,9 @@ impl Replay {
                     order_test = self.times(order_test, order_test)?;
                     count += 1;
                 }
-                if count == order { return Ok(None); }
+                if count == order {
+                    return Ok(None);
+                }
                 let mut multiplier = nonresidue;
                 for _ in 0..order - count - 1 {
                     multiplier = self.times(multiplier, multiplier)?;
@@ -2646,7 +2776,10 @@ impl Replay {
         }
         Ok(self.pending[self.pending_len - 1])
     }
-    #[expect(clippy::if_same_then_else, reason = "keep the R45 replay boundary explicit")]
+    #[expect(
+        clippy::if_same_then_else,
+        reason = "keep the R45 replay boundary explicit"
+    )]
     fn check_event(&mut self, event: &BoundedRootEvent) -> Result<()> {
         self.gate.clock()?;
         if self.finished || event.sequence != self.sequence {
@@ -2696,11 +2829,14 @@ impl Replay {
                 } else if input.len == 2 {
                     self.normalized_modulus(&input)?
                 // R45_QUADRATIC_GCD_REPLAY_BEGIN
-                } else if input.len == 3 && expected.len == 2
-                    && expected.coefficients[0] == 0 && expected.coefficients[1] == 1
+                } else if input.len == 3
+                    && expected.len == 2
+                    && expected.coefficients[0] == 0
+                    && expected.coefficients[1] == 1
                 {
                     self.normalized_modulus(&input)?
-                } else if input.len == 3 && expected.len == 2
+                } else if input.len == 3
+                    && expected.len == 2
                     && expected.coefficients[1] == self.p - 1
                 {
                     Poly17::constant(1)
@@ -2757,15 +2893,16 @@ impl Replay {
                 base.coefficients[0] = delta;
                 base.coefficients[1] = 1;
                 // R46_REPLAY_SPLIT_BEGIN
-                let expected = if let Some(factor) = self.replay_quadratic_split(polynomial, delta)? {
-                    factor
-                } else {
-                    let mut value = self.modular_power(base, (self.p - 1) / 2, &polynomial)?;
-                    value.len = value.len.max(1);
-                    value.coefficients[0] = self.minus(value.coefficients[0], 1)?;
-                    value.trim();
-                    self.monic_gcd(polynomial, value)?
-                };
+                let expected =
+                    if let Some(factor) = self.replay_quadratic_split(polynomial, delta)? {
+                        factor
+                    } else {
+                        let mut value = self.modular_power(base, (self.p - 1) / 2, &polynomial)?;
+                        value.len = value.len.max(1);
+                        value.coefficients[0] = self.minus(value.coefficients[0], 1)?;
+                        value.trim();
+                        self.monic_gcd(polynomial, value)?
+                    };
                 // R46_REPLAY_SPLIT_END
                 let proper = expected.len > 1 && expected.len < polynomial.len;
                 if expected != factor || proper != accepted {
@@ -2992,9 +3129,14 @@ mod tests {
             let field = field(p);
             let mut observer = |_: &BoundedRootEvent| Ok(());
             let mut producer = Producer {
-                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
-                unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
-                roots: [0; 8], root_count: 0,
+                p,
+                gate: Gate::new(budget(), deadline()),
+                observer: &mut observer,
+                unacknowledged: None,
+                pending: [Poly17::ZERO; 8],
+                pending_len: 0,
+                roots: [0; 8],
+                root_count: 0,
             };
             producer.gate.admit().unwrap();
             let mut replay =
@@ -3007,7 +3149,8 @@ mod tests {
                         let mut state = seed.wrapping_add(p ^ 0x9e37_79b9_7f4a_7c15);
                         let mut values = vec![0u64; n];
                         for (index, value) in values.iter_mut().enumerate() {
-                            state = state.wrapping_mul(6_364_136_223_846_793_005)
+                            state = state
+                                .wrapping_mul(6_364_136_223_846_793_005)
                                 .wrapping_add(1_442_695_040_888_963_407);
                             *value = if (seed + index as u64).is_multiple_of(3) {
                                 0
@@ -3019,7 +3162,9 @@ mod tests {
                         let a = Poly17::from_coefficients(&field, &values).unwrap();
                         let (q, division_remainder) = producer.division(&a, &divisor).unwrap();
                         let mut producer_remainder = a;
-                        producer.reduce_monic(&mut producer_remainder, &divisor).unwrap();
+                        producer
+                            .reduce_monic(&mut producer_remainder, &divisor)
+                            .unwrap();
                         let verifier_remainder = replay.remainder(a, &divisor).unwrap();
                         let mut verifier_cancel = a;
                         replay.cancel_monic(&mut verifier_cancel, &divisor).unwrap();
@@ -3037,9 +3182,10 @@ mod tests {
                         let mut reconstructed = [0u128; 17];
                         for (i, &coefficient) in q.coefficients().iter().enumerate() {
                             reconstructed[i] = (reconstructed[i]
-                                + u128::from(coefficient) * u128::from(c)) % u128::from(p);
-                            reconstructed[i + 1] = (reconstructed[i + 1]
-                                + u128::from(coefficient)) % u128::from(p);
+                                + u128::from(coefficient) * u128::from(c))
+                                % u128::from(p);
+                            reconstructed[i + 1] =
+                                (reconstructed[i + 1] + u128::from(coefficient)) % u128::from(p);
                         }
                         reconstructed[0] = (reconstructed[0]
                             + u128::from(division_remainder.coefficients[0]))
@@ -3059,15 +3205,14 @@ mod tests {
         // Both x-1 and x+1 divide this squarefree polynomial.
         let coefficients = [1_000_000_006u64, 0, 1];
         let mut observed = Vec::new();
-        let report = solve_bounded(
-            &f, &coefficients, 29, budget(), deadline(),
-            &mut |event| { observed.push(*event); Ok(()) },
-        );
+        let report = solve_bounded(&f, &coefficients, 29, budget(), deadline(), &mut |event| {
+            observed.push(*event);
+            Ok(())
+        });
         // No completeness assumption on randomized splitting; check every
         // event actually emitted, including partial/limited runs.
-        let mut replay = Replay::new(
-            &f, &coefficients, 29, budget(), budget(), deadline(),
-        ).unwrap();
+        let mut replay =
+            Replay::new(&f, &coefficients, 29, budget(), budget(), deadline()).unwrap();
         for event in &observed {
             replay.push(event).unwrap();
         }
@@ -3081,26 +3226,35 @@ mod tests {
             let f = field(p);
             let mut observer = |_: &BoundedRootEvent| Ok(());
             let mut producer = Producer {
-                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
-                unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
-                roots: [0; 8], root_count: 0,
+                p,
+                gate: Gate::new(budget(), deadline()),
+                observer: &mut observer,
+                unacknowledged: None,
+                pending: [Poly17::ZERO; 8],
+                pending_len: 0,
+                roots: [0; 8],
+                root_count: 0,
             };
             producer.gate.admit().unwrap();
-            let mut replay =
-                Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+            let mut replay = Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
             for n in 2..=17 {
                 for seed in 0..32u64 {
                     let mut state = (seed + 1) ^ p.wrapping_mul(0x9e3779b97f4a7c15);
                     let mut values = vec![0u64; n];
                     for (i, v) in values.iter_mut().enumerate() {
-                        state = state.wrapping_mul(6364136223846793005)
+                        state = state
+                            .wrapping_mul(6364136223846793005)
                             .wrapping_add(1442695040888963407);
-                        *v = if (seed + i as u64).is_multiple_of(5) { 0 } else { state % p };
+                        *v = if (seed + i as u64).is_multiple_of(5) {
+                            0
+                        } else {
+                            state % p
+                        };
                     }
                     values[n - 1] = 1;
                     let a = Poly17::from_coefficients(&f, &values).unwrap();
                     for c in [0, 1, p - 1, 2 % p, 17 % p, 173 % p] {
-                        let divisor=Poly17::from_coefficients(&f, &[c, 1]).unwrap();
+                        let divisor = Poly17::from_coefficients(&f, &[c, 1]).unwrap();
                         // Independent wide-arithmetic Horner oracle f(-c).
                         let x = (p - c) % p;
                         let mut expected = 0u128;
@@ -3113,25 +3267,32 @@ mod tests {
                         let mut r = a;
                         producer.reduce_monic(&mut r, &divisor).unwrap();
                         assert_eq!(r, expected, "producer reduction p={p} n={n} c={c}");
-                        assert_eq!(replay.remainder(a, &divisor).unwrap(), expected,
-                            "replay remainder p={p} n={n} c={c}");
+                        assert_eq!(
+                            replay.remainder(a, &divisor).unwrap(),
+                            expected,
+                            "replay remainder p={p} n={n} c={c}"
+                        );
                         let mut cancelled = a;
                         replay.cancel_monic(&mut cancelled, &divisor).unwrap();
                         assert_eq!(cancelled, expected, "replay cancel p={p} n={n} c={c}");
                         // Independently reconstruct the dividend from quotient.
                         let mut reconstructed = [0u64; 17];
                         for j in 0..quotient.len as usize {
-                            reconstructed[j] =
-                                ((reconstructed[j] as u128 + c as u128
-                                  * quotient.coefficients[j] as u128) % p as u128) as u64;
+                            reconstructed[j] = ((reconstructed[j] as u128
+                                + c as u128 * quotient.coefficients[j] as u128)
+                                % p as u128) as u64;
                             reconstructed[j + 1] =
-                                ((reconstructed[j + 1] as u128
-                                  + quotient.coefficients[j] as u128) % p as u128) as u64;
+                                ((reconstructed[j + 1] as u128 + quotient.coefficients[j] as u128)
+                                    % p as u128) as u64;
                         }
                         reconstructed[0] = ((reconstructed[0] as u128
-                            + expected.coefficients[0] as u128) % p as u128) as u64;
-                        assert_eq!(&reconstructed[..n], &values[..],
-                            "quotient reconstruction p={p} n={n} c={c}");
+                            + expected.coefficients[0] as u128)
+                            % p as u128) as u64;
+                        assert_eq!(
+                            &reconstructed[..n],
+                            &values[..],
+                            "quotient reconstruction p={p} n={n} c={c}"
+                        );
                         compared += 4;
                         producer.gate.metrics.work = 0;
                         producer.gate.metrics.field_work = 0;
@@ -3144,21 +3305,21 @@ mod tests {
         println!("ROUND63_HORNER_ORACLE comparisons={compared}");
     }
 
-
     #[test]
     fn round62_unit_coefficients_and_binomial_squares_match_wide_oracle() {
         // Full 128-bit coefficient oracle is independent of producer/replay.
         // Include zero, +/-1 and dense controls at both 32- and 61-bit primes.
         fn oracle(a: &Poly17, b: &Poly17, p: u64) -> Poly17 {
             let mut coefficients = [0u64; 17];
-            if a.len == 0 || b.len == 0 { return Poly17::ZERO; }
+            if a.len == 0 || b.len == 0 {
+                return Poly17::ZERO;
+            }
             let n = (a.len + b.len - 1) as usize;
             for i in 0..a.len as usize {
                 for j in 0..b.len as usize {
-                    coefficients[i + j] =
-                        ((coefficients[i + j] as u128
-                          + a.coefficients[i] as u128 * b.coefficients[j] as u128)
-                         % p as u128) as u64;
+                    coefficients[i + j] = ((coefficients[i + j] as u128
+                        + a.coefficients[i] as u128 * b.coefficients[j] as u128)
+                        % p as u128) as u64;
                 }
             }
             let mut result = Poly17 {
@@ -3169,24 +3330,36 @@ mod tests {
             result
         }
         let mut comparisons = 0usize;
-        for p in [3u64, 5, 7, 101, 1_000_000_007, 1_000_000_009,
-                  (1u64 << 61) - 1] {
+        for p in [
+            3u64,
+            5,
+            7,
+            101,
+            1_000_000_007,
+            1_000_000_009,
+            (1u64 << 61) - 1,
+        ] {
             let f = field(p);
             let mut observer = |_: &BoundedRootEvent| Ok(());
             let mut producer = Producer {
-                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
-                unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
-                roots: [0; 8], root_count: 0,
+                p,
+                gate: Gate::new(budget(), deadline()),
+                observer: &mut observer,
+                unacknowledged: None,
+                pending: [Poly17::ZERO; 8],
+                pending_len: 0,
+                roots: [0; 8],
+                root_count: 0,
             };
             producer.gate.admit().unwrap();
-            let mut replay =
-                Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+            let mut replay = Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
             for degree in [2usize, 3, 5, 8] {
                 for seed in 0..64u64 {
                     let mut values = vec![0u64; degree];
                     let mut state = seed ^ p.wrapping_mul(0x9e3779b97f4a7c15);
                     for (i, coefficient) in values.iter_mut().enumerate() {
-                        state = state.wrapping_mul(6364136223846793005)
+                        state = state
+                            .wrapping_mul(6364136223846793005)
                             .wrapping_add(1442695040888963407);
                         *coefficient = if seed % 5 == 0 && i % 2 == 0 {
                             0
@@ -3276,18 +3449,29 @@ mod tests {
         // A polynomial modulo x+/-1 can be canceled with one field add/sub
         // per nonzero high coefficient. Compare all four implementations
         // against a separate wide-integer synthetic-division oracle.
-        for p in [3u64, 5, 7, 101, 1_000_000_007, 1_000_000_009,
-                  (1u64 << 61) - 1] {
+        for p in [
+            3u64,
+            5,
+            7,
+            101,
+            1_000_000_007,
+            1_000_000_009,
+            (1u64 << 61) - 1,
+        ] {
             let f = field(p);
             let mut observer = |_: &BoundedRootEvent| Ok(());
             let mut producer = Producer {
-                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
-                unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
-                roots: [0; 8], root_count: 0,
+                p,
+                gate: Gate::new(budget(), deadline()),
+                observer: &mut observer,
+                unacknowledged: None,
+                pending: [Poly17::ZERO; 8],
+                pending_len: 0,
+                roots: [0; 8],
+                root_count: 0,
             };
             producer.gate.admit().unwrap();
-            let mut replay =
-                Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+            let mut replay = Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
             for c in [1u64, p - 1] {
                 let modulus = Poly17::from_coefficients(&f, &[c, 1]).unwrap();
                 for n in [2usize, 3, 8, 17] {
@@ -3295,11 +3479,14 @@ mod tests {
                         let mut input = vec![0u64; n];
                         let mut state = seed.wrapping_mul(0x9E3779B97F4A7C15);
                         for coefficient in &mut input {
-                            state = state.wrapping_mul(6364136223846793005)
+                            state = state
+                                .wrapping_mul(6364136223846793005)
                                 .wrapping_add(1442695040888963407);
                             *coefficient = state % p;
                         }
-                        if seed & 3 == 0 { input[0] = 0; }
+                        if seed & 3 == 0 {
+                            input[0] = 0;
+                        }
                         input[n - 1] = 1;
                         let numerator = Poly17::from_coefficients(&f, &input).unwrap();
 
@@ -3310,18 +3497,15 @@ mod tests {
                             quotient[high - 1] = factor;
                             let current = remainder[high - 1];
                             let next = if c == 1 {
-                                ((current as u128 + p as u128 - factor as u128)
-                                    % p as u128) as u64
+                                ((current as u128 + p as u128 - factor as u128) % p as u128) as u64
                             } else {
                                 ((current as u128 + factor as u128) % p as u128) as u64
                             };
                             remainder[high - 1] = next;
                             remainder[high] = 0;
                         }
-                        let expected_q =
-                            Poly17::from_coefficients(&f, &quotient).unwrap();
-                        let expected_r =
-                            Poly17::from_coefficients(&f, &remainder[..1]).unwrap();
+                        let expected_q = Poly17::from_coefficients(&f, &quotient).unwrap();
+                        let expected_r = Poly17::from_coefficients(&f, &remainder[..1]).unwrap();
                         let (q, r) = producer.division(&numerator, &modulus).unwrap();
                         assert_eq!((q, r), (expected_q, expected_r));
                         let mut reduced = numerator;
@@ -3346,18 +3530,29 @@ mod tests {
         // Oracle computes the coefficient reduction directly using u128.
         // Exercise all four affected paths, including the non-specialized
         // c=17 fallback, on full-capacity degree-8 polynomials.
-        for p in [3u64, 5, 7, 101, 1_000_000_007, 1_000_000_009,
-                  (1u64 << 61) - 1] {
+        for p in [
+            3u64,
+            5,
+            7,
+            101,
+            1_000_000_007,
+            1_000_000_009,
+            (1u64 << 61) - 1,
+        ] {
             let f = field(p);
             let mut observer = |_: &BoundedRootEvent| Ok(());
             let mut producer = Producer {
-                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
-                unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
-                roots: [0; 8], root_count: 0,
+                p,
+                gate: Gate::new(budget(), deadline()),
+                observer: &mut observer,
+                unacknowledged: None,
+                pending: [Poly17::ZERO; 8],
+                pending_len: 0,
+                roots: [0; 8],
+                root_count: 0,
             };
             producer.gate.admit().unwrap();
-            let mut replay =
-                Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+            let mut replay = Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
             for degree in [2usize, 3, 4, 6, 8] {
                 for c0 in [1u64, p - 1, 17 % p] {
                     let c = if c0 == 0 { 1 } else { c0 };
@@ -3370,7 +3565,8 @@ mod tests {
                         let mut input = vec![0; n];
                         let mut state = seed.wrapping_mul(0x9E3779B97F4A7C15);
                         for coefficient in &mut input {
-                            state = state.wrapping_mul(6364136223846793005)
+                            state = state
+                                .wrapping_mul(6364136223846793005)
                                 .wrapping_add(1442695040888963407);
                             *coefficient = state % p;
                         }
@@ -3383,8 +3579,8 @@ mod tests {
                             quotient[high - degree] = factor;
                             let sub = ((factor as u128 * c as u128) % p as u128) as u64;
                             let low = high - degree;
-                            oracle[low] = ((oracle[low] as u128 + p as u128
-                                - sub as u128) % p as u128) as u64;
+                            oracle[low] = ((oracle[low] as u128 + p as u128 - sub as u128)
+                                % p as u128) as u64;
                             oracle[high] = 0;
                         }
                         let expected_r = Poly17::from_coefficients(&f, &oracle[..degree]).unwrap();
@@ -3425,27 +3621,36 @@ mod tests {
             }
             result
         }
-        for p in [3u64, 5, 7, 101, 1_000_000_007, 1_000_000_009,
-                  (1u64 << 61) - 1] {
+        for p in [
+            3u64,
+            5,
+            7,
+            101,
+            1_000_000_007,
+            1_000_000_009,
+            (1u64 << 61) - 1,
+        ] {
             let f = field(p);
             let mut observer = |_: &BoundedRootEvent| Ok(());
             let mut producer = Producer {
-                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
-                unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
-                roots: [0; 8], root_count: 0,
+                p,
+                gate: Gate::new(budget(), deadline()),
+                observer: &mut observer,
+                unacknowledged: None,
+                pending: [Poly17::ZERO; 8],
+                pending_len: 0,
+                roots: [0; 8],
+                root_count: 0,
             };
             producer.gate.admit().unwrap();
-            let mut replay =
-                Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+            let mut replay = Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
             for degree in 3..=8usize {
                 for leading in [1u64, p - 1] {
                     for constant in [1u64, 2 % p, p - 1, 17 % p] {
                         let mut coefficients = vec![0u64; degree + 1];
-                        coefficients[0] =
-                            ((constant as u128 * leading as u128) % p as u128) as u64;
+                        coefficients[0] = ((constant as u128 * leading as u128) % p as u128) as u64;
                         coefficients[degree] = leading;
-                        let modulus =
-                            Poly17::from_coefficients(&f, &coefficients).unwrap();
+                        let modulus = Poly17::from_coefficients(&f, &coefficients).unwrap();
                         for delta in [0u64, 1, p - 1, 23 % p] {
                             let base = Poly17::from_coefficients(&f, &[delta, 1]).unwrap();
                             let q = p / degree as u64;
@@ -3455,17 +3660,21 @@ mod tests {
                             let mut expected = vec![0u64; degree];
                             expected[0] = delta;
                             if r == 0 {
-                                expected[0] =
-                                    ((delta as u128 + scaled as u128) % p as u128) as u64;
+                                expected[0] = ((delta as u128 + scaled as u128) % p as u128) as u64;
                             } else {
                                 expected[r] = scaled;
                             }
-                            let expected =
-                                Poly17::from_coefficients(&f, &expected).unwrap();
-                            assert_eq!(producer.power(&base, p, &modulus).unwrap(), expected,
-                                "producer p={p} degree={degree} c={constant} delta={delta}");
-                            assert_eq!(replay.modular_power(base, p, &modulus).unwrap(), expected,
-                                "replay p={p} degree={degree} c={constant} delta={delta}");
+                            let expected = Poly17::from_coefficients(&f, &expected).unwrap();
+                            assert_eq!(
+                                producer.power(&base, p, &modulus).unwrap(),
+                                expected,
+                                "producer p={p} degree={degree} c={constant} delta={delta}"
+                            );
+                            assert_eq!(
+                                replay.modular_power(base, p, &modulus).unwrap(),
+                                expected,
+                                "replay p={p} degree={degree} c={constant} delta={delta}"
+                            );
                         }
                     }
                 }
@@ -3490,35 +3699,57 @@ mod tests {
             }
             acc
         }
-        for p in [3u64, 5, 7, 101, 1_000_000_007, 1_000_000_009,
-                  (1u64 << 61) - 1] {
+        for p in [
+            3u64,
+            5,
+            7,
+            101,
+            1_000_000_007,
+            1_000_000_009,
+            (1u64 << 61) - 1,
+        ] {
             let f = field(p);
             let mut observer = |_: &BoundedRootEvent| Ok(());
             let mut producer = Producer {
-                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
-                unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
-                roots: [0; 8], root_count: 0,
+                p,
+                gate: Gate::new(budget(), deadline()),
+                observer: &mut observer,
+                unacknowledged: None,
+                pending: [Poly17::ZERO; 8],
+                pending_len: 0,
+                roots: [0; 8],
+                root_count: 0,
             };
             producer.gate.admit().unwrap();
-            let mut replay =
-                Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+            let mut replay = Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
 
             for leading in [1u64, p - 1] {
                 for constant in [0u64, 1, p - 1, 17 % p] {
                     let linear = Poly17::from_coefficients(
-                        &f, &[((constant as u128 * leading as u128)
-                              % p as u128) as u64, leading]
-                    ).unwrap();
+                        &f,
+                        &[
+                            ((constant as u128 * leading as u128) % p as u128) as u64,
+                            leading,
+                        ],
+                    )
+                    .unwrap();
                     for delta in [0u64, 1, p - 1, 23 % p] {
                         let base = Poly17::from_coefficients(&f, &[delta, 1]).unwrap();
-                        let expected = Poly17::constant(
-                            if delta >= constant { delta - constant }
-                            else { p - (constant - delta) }
+                        let expected = Poly17::constant(if delta >= constant {
+                            delta - constant
+                        } else {
+                            p - (constant - delta)
+                        });
+                        assert_eq!(
+                            producer.power(&base, p, &linear).unwrap(),
+                            expected,
+                            "linear producer p={p} c={constant} delta={delta} leading={leading}"
                         );
-                        assert_eq!(producer.power(&base, p, &linear).unwrap(), expected,
-                            "linear producer p={p} c={constant} delta={delta} leading={leading}");
-                        assert_eq!(replay.modular_power(base, p, &linear).unwrap(), expected,
-                            "linear replay p={p} c={constant} delta={delta} leading={leading}");
+                        assert_eq!(
+                            replay.modular_power(base, p, &linear).unwrap(),
+                            expected,
+                            "linear replay p={p} c={constant} delta={delta} leading={leading}"
+                        );
                     }
                 }
             }
@@ -3556,24 +3787,26 @@ mod tests {
         // A polynomial in Fp[x]/(x^d) is stored canonically. The oracle
         // constructs the reduced x^p + delta directly, never invoking
         // production polynomial multiplication or powering.
-        for p in [3u64, 5, 7, 1_000_000_007, 1_000_000_009,
-                  (1u64 << 61) - 1] {
+        for p in [3u64, 5, 7, 1_000_000_007, 1_000_000_009, (1u64 << 61) - 1] {
             let f = field(p);
             let mut observer = |_: &BoundedRootEvent| Ok(());
             let mut producer = Producer {
-                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
-                unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
-                roots: [0; 8], root_count: 0,
+                p,
+                gate: Gate::new(budget(), deadline()),
+                observer: &mut observer,
+                unacknowledged: None,
+                pending: [Poly17::ZERO; 8],
+                pending_len: 0,
+                roots: [0; 8],
+                root_count: 0,
             };
             producer.gate.admit().unwrap();
-            let mut replay =
-                Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+            let mut replay = Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
             for degree in 2..=8usize {
                 for leading in [1u64, p - 1] {
                     let mut modulus_coefficients = vec![0u64; degree + 1];
                     modulus_coefficients[degree] = leading;
-                    let modulus =
-                        Poly17::from_coefficients(&f, &modulus_coefficients).unwrap();
+                    let modulus = Poly17::from_coefficients(&f, &modulus_coefficients).unwrap();
                     for delta in [0u64, 1, p - 1, 17 % p] {
                         let base = Poly17::from_coefficients(&f, &[delta, 1]).unwrap();
                         let mut coefficients = vec![0u64; degree];
@@ -3581,12 +3814,17 @@ mod tests {
                         if p < degree as u64 {
                             coefficients[p as usize] = 1;
                         }
-                        let expected =
-                            Poly17::from_coefficients(&f, &coefficients).unwrap();
-                        assert_eq!(producer.power(&base, p, &modulus).unwrap(), expected,
-                            "producer p={p} d={degree} delta={delta}");
-                        assert_eq!(replay.modular_power(base, p, &modulus).unwrap(), expected,
-                            "replay p={p} d={degree} delta={delta}");
+                        let expected = Poly17::from_coefficients(&f, &coefficients).unwrap();
+                        assert_eq!(
+                            producer.power(&base, p, &modulus).unwrap(),
+                            expected,
+                            "producer p={p} d={degree} delta={delta}"
+                        );
+                        assert_eq!(
+                            replay.modular_power(base, p, &modulus).unwrap(),
+                            expected,
+                            "replay p={p} d={degree} delta={delta}"
+                        );
                     }
                 }
             }
@@ -3603,8 +3841,12 @@ mod tests {
                     let (report, events) = run(&coefficients, p, budget());
                     assert_eq!(report.stop, Stop::Complete, "p={p} d={degree}");
                     assert_eq!(&report.roots[..report.root_count as usize], &[0u64]);
-                    assert!(check(&coefficients, &report, &events).unwrap().finite_complete,
-                        "p={p} d={degree}");
+                    assert!(
+                        check(&coefficients, &report, &events)
+                            .unwrap()
+                            .finite_complete,
+                        "p={p} d={degree}"
+                    );
                 }
             }
         }
@@ -3622,9 +3864,14 @@ mod tests {
                 let modulus = Poly17::from_coefficients(&f, &modulus_coeffs).unwrap();
                 let mut observer = |_: &BoundedRootEvent| Ok(());
                 let mut producer = Producer {
-                    p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
-                    unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
-                    roots: [0; 8], root_count: 0,
+                    p,
+                    gate: Gate::new(budget(), deadline()),
+                    observer: &mut observer,
+                    unacknowledged: None,
+                    pending: [Poly17::ZERO; 8],
+                    pending_len: 0,
+                    roots: [0; 8],
+                    root_count: 0,
                 };
                 producer.gate.admit().unwrap();
                 let mut replay =
@@ -3654,7 +3901,10 @@ mod tests {
                         };
                         let (q, r) = producer.division(&polynomial, &modulus).unwrap();
                         assert_eq!(q, expected_quotient, "division quotient p={p} d={d} n={n}");
-                        assert_eq!(r, expected_remainder, "division remainder p={p} d={d} n={n}");
+                        assert_eq!(
+                            r, expected_remainder,
+                            "division remainder p={p} d={d} n={n}"
+                        );
                         let mut reduced = polynomial;
                         producer.reduce_monic(&mut reduced, &modulus).unwrap();
                         assert_eq!(reduced, expected_remainder, "producer p={p} d={d} n={n}");
@@ -3688,14 +3938,26 @@ mod tests {
             }
             accumulator
         }
-        for p in [5u64, 7, 17, 1_000_000_007, 1_000_000_009,
-                  1_000_000_021, (1u64 << 61) - 1] {
+        for p in [
+            5u64,
+            7,
+            17,
+            1_000_000_007,
+            1_000_000_009,
+            1_000_000_021,
+            (1u64 << 61) - 1,
+        ] {
             let f = field(p);
             let mut observer = |_: &BoundedRootEvent| Ok(());
             let mut producer = Producer {
-                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
-                unacknowledged: None, pending: [Poly17::ZERO; 8], pending_len: 0,
-                roots: [0; 8], root_count: 0,
+                p,
+                gate: Gate::new(budget(), deadline()),
+                observer: &mut observer,
+                unacknowledged: None,
+                pending: [Poly17::ZERO; 8],
+                pending_len: 0,
+                roots: [0; 8],
+                root_count: 0,
             };
             producer.gate.admit().unwrap();
             let mut replay = Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
@@ -3719,7 +3981,8 @@ mod tests {
                 assert_eq!(checked, expected, "replay p={p} a={a}");
                 assert_eq!(
                     (u128::from(a) * u128::from(actual)) % u128::from(p),
-                    1, "product p={p} a={a}"
+                    1,
+                    "product p={p} a={a}"
                 );
             }
             assert!(producer.gate.metrics.field_work <= budget().field_work);
@@ -3729,8 +3992,14 @@ mod tests {
 
     #[test]
     fn round51_scalar_and_monic_linear_products_match_wide_reference() {
-        for p in [3u64, 7, 1_000_000_007, 1_000_000_009,
-                  4_294_967_291, (1u64 << 61) - 1] {
+        for p in [
+            3u64,
+            7,
+            1_000_000_007,
+            1_000_000_009,
+            4_294_967_291,
+            (1u64 << 61) - 1,
+        ] {
             let f = field(p);
             let mut observer = |_: &BoundedRootEvent| Ok(());
             let mut producer = Producer {
@@ -3744,24 +4013,27 @@ mod tests {
                 root_count: 0,
             };
             producer.gate.admit().unwrap();
-            let mut replay =
-                Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
+            let mut replay = Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
             let mut seed = 0x2026_1120_5151_0001u64;
             let mut comparisons = 0usize;
             for size in [2usize, 4, 8] {
                 for _ in 0..16 {
                     let mut coefficients = [0u64; 8];
                     for value in coefficients.iter_mut().take(size) {
-                        seed = seed.wrapping_mul(6364136223846793005)
+                        seed = seed
+                            .wrapping_mul(6364136223846793005)
                             .wrapping_add(1442695040888963407);
                         *value = (seed ^ (seed >> 29)) % p;
                     }
                     coefficients[size - 1] = 1 + (seed % (p - 1));
-                    let poly =
-                        Poly17::from_coefficients(&f, &coefficients[..size]).unwrap();
+                    let poly = Poly17::from_coefficients(&f, &coefficients[..size]).unwrap();
                     for linear in [
-                        vec![0u64, 1], vec![1, 1], vec![p - 1, 1],
-                        vec![2 % p, 1], vec![1], vec![p - 1],
+                        vec![0u64, 1],
+                        vec![1, 1],
+                        vec![p - 1, 1],
+                        vec![2 % p, 1],
+                        vec![1],
+                        vec![p - 1],
                     ] {
                         let factor = Poly17::from_coefficients(&f, &linear).unwrap();
                         let mut wide = [0u128; 17];
@@ -3771,8 +4043,10 @@ mod tests {
                             }
                         }
                         let n = size + factor.len as usize - 1;
-                        let expected_coefficients: Vec<u64> = wide[..n].iter()
-                            .map(|&v| (v % u128::from(p)) as u64).collect();
+                        let expected_coefficients: Vec<u64> = wide[..n]
+                            .iter()
+                            .map(|&v| (v % u128::from(p)) as u64)
+                            .collect();
                         let expected =
                             Poly17::from_coefficients(&f, &expected_coefficients).unwrap();
                         assert_eq!(producer.product(&poly, &factor).unwrap(), expected);
@@ -3790,8 +4064,17 @@ mod tests {
     // modulo reference, including carries, zero, p-1 and random inputs.
     #[test]
     fn round31_bounded_canonical_ops_match_wide_reference() {
-        for p in [3u64, 7, 17, 487, 17_497, 1_000_000_007,
-                  4_294_967_291, 140_737_488_355_213, (1u64 << 61) - 1] {
+        for p in [
+            3u64,
+            7,
+            17,
+            487,
+            17_497,
+            1_000_000_007,
+            4_294_967_291,
+            140_737_488_355_213,
+            (1u64 << 61) - 1,
+        ] {
             let field = field(p);
             let mut observer = |_: &BoundedRootEvent| Ok(());
             let mut producer = Producer {
@@ -3810,28 +4093,66 @@ mod tests {
             let mut seed = 0x2026_1119_3131_0001u64;
             let mut comparisons = 0usize;
             for index in 0..2_048 {
-                seed = seed.wrapping_mul(6364136223846793005)
+                seed = seed
+                    .wrapping_mul(6364136223846793005)
                     .wrapping_add(1442695040888963407);
                 let mut x = (seed ^ (seed >> 29)) % p;
-                seed = seed.wrapping_mul(6364136223846793005)
+                seed = seed
+                    .wrapping_mul(6364136223846793005)
                     .wrapping_add(1442695040888963407);
                 let mut y = (seed ^ (seed >> 29)) % p;
                 match index % 37 {
-                    0 => { x = p - 1; y = p - 1; }
-                    1 => { x = 0; y = p - 1; }
-                    2 => { x = p - 1; y = 0; }
-                    3 => { x = 0; y = 0; }
+                    0 => {
+                        x = p - 1;
+                        y = p - 1;
+                    }
+                    1 => {
+                        x = 0;
+                        y = p - 1;
+                    }
+                    2 => {
+                        x = p - 1;
+                        y = 0;
+                    }
+                    3 => {
+                        x = 0;
+                        y = 0;
+                    }
                     _ => {}
                 }
                 let expected_add = ((x as u128 + y as u128) % p as u128) as u64;
                 let expected_sub = ((x as u128 + p as u128 - y as u128) % p as u128) as u64;
                 let expected_mul = ((x as u128 * y as u128) % p as u128) as u64;
-                assert_eq!(producer.add(x, y).unwrap(), expected_add, "producer add p={p}");
-                assert_eq!(producer.sub(x, y).unwrap(), expected_sub, "producer sub p={p}");
-                assert_eq!(producer.mul(x, y).unwrap(), expected_mul, "producer mul p={p}");
-                assert_eq!(replay.plus(x, y).unwrap(), expected_add, "replay plus p={p}");
-                assert_eq!(replay.minus(x, y).unwrap(), expected_sub, "replay minus p={p}");
-                assert_eq!(replay.times(x, y).unwrap(), expected_mul, "replay times p={p}");
+                assert_eq!(
+                    producer.add(x, y).unwrap(),
+                    expected_add,
+                    "producer add p={p}"
+                );
+                assert_eq!(
+                    producer.sub(x, y).unwrap(),
+                    expected_sub,
+                    "producer sub p={p}"
+                );
+                assert_eq!(
+                    producer.mul(x, y).unwrap(),
+                    expected_mul,
+                    "producer mul p={p}"
+                );
+                assert_eq!(
+                    replay.plus(x, y).unwrap(),
+                    expected_add,
+                    "replay plus p={p}"
+                );
+                assert_eq!(
+                    replay.minus(x, y).unwrap(),
+                    expected_sub,
+                    "replay minus p={p}"
+                );
+                assert_eq!(
+                    replay.times(x, y).unwrap(),
+                    expected_mul,
+                    "replay times p={p}"
+                );
                 comparisons += 6;
             }
             assert_eq!(comparisons, 12_288);
@@ -3843,37 +4164,70 @@ mod tests {
     #[test]
     fn round49_binary_jacobi_matches_fermat_for_prime_fields() {
         let mut checked = 0usize;
-        for p in [3u64, 7, 487, 1_000_000_007, 1_000_000_009,
-                  1_000_000_021, (1u64 << 61) - 1] {
+        for p in [
+            3u64,
+            7,
+            487,
+            1_000_000_007,
+            1_000_000_009,
+            1_000_000_021,
+            (1u64 << 61) - 1,
+        ] {
             let f = field(p);
             let mut observer = |_: &BoundedRootEvent| Ok(());
             let mut prod = Producer {
-                p, gate: Gate::new(budget(), deadline()), observer: &mut observer,
-                unacknowledged: None, pending: [Poly17::ZERO; 8],
-                pending_len: 0, roots: [0; 8], root_count: 0,
+                p,
+                gate: Gate::new(budget(), deadline()),
+                observer: &mut observer,
+                unacknowledged: None,
+                pending: [Poly17::ZERO; 8],
+                pending_len: 0,
+                roots: [0; 8],
+                root_count: 0,
             };
             prod.gate.admit().unwrap();
             let mut replay = Replay::new(&f, &[1, 1], 42, budget(), budget(), deadline()).unwrap();
             let mut rng = 0x2026_1119_4949_0001u64;
             for j in 0..512 {
-                rng = rng.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+                rng = rng
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
                 let v = match j % 29 {
-                    0 => 0, 1 => 1, 2 => p - 1, _ => rng % p,
+                    0 => 0,
+                    1 => 1,
+                    2 => p - 1,
+                    _ => rng % p,
                 };
                 let mut e = (p - 1) / 2;
                 let mut base = v as u128;
                 let mut acc = 1u128;
                 while e > 0 {
-                    if e & 1 != 0 { acc = acc * base % p as u128; }
+                    if e & 1 != 0 {
+                        acc = acc * base % p as u128;
+                    }
                     e >>= 1;
-                    if e > 0 { base = base * base % p as u128; }
+                    if e > 0 {
+                        base = base * base % p as u128;
+                    }
                 }
-                let expected = if acc == 0 { 0 } else if acc == 1 { 1 }
-                    else { assert_eq!(acc, (p - 1) as u128); -1 };
-                assert_eq!(prod.quadratic_character(v).unwrap(), expected,
-                    "producer p={p} v={v}");
-                assert_eq!(replay.quadratic_character(v).unwrap(), expected,
-                    "replay p={p} v={v}");
+                let expected = if acc == 0 {
+                    0
+                } else if acc == 1 {
+                    1
+                } else {
+                    assert_eq!(acc, (p - 1) as u128);
+                    -1
+                };
+                assert_eq!(
+                    prod.quadratic_character(v).unwrap(),
+                    expected,
+                    "producer p={p} v={v}"
+                );
+                assert_eq!(
+                    replay.quadratic_character(v).unwrap(),
+                    expected,
+                    "replay p={p} v={v}"
+                );
                 checked += 2;
             }
         }
@@ -3903,8 +4257,14 @@ mod tests {
 
         let mut comparisons = 0;
         for (r0, r1) in [
-            (0, 1), (1, 2), (2, 7), (17, 31), (31, 997),
-            (101, 103), (1_000, 20_000), (p - 3, p - 1),
+            (0, 1),
+            (1, 2),
+            (2, 7),
+            (17, 31),
+            (31, 997),
+            (101, 103),
+            (1_000, 20_000),
+            (p - 3, p - 1),
         ] {
             for leading in [1u64, p - 2] {
                 let f = polynomial(&[r0, r1], p, leading);
@@ -3928,13 +4288,20 @@ mod tests {
                 for leading in [1, p - 2] {
                     let f = polynomial(&expected, p, leading);
                     let (report, events) = run(&f, p, budget());
-                    assert_eq!(report.stop, Stop::Complete,
-                        "p={p} roots={expected:?} stop={:?}", report.stop);
+                    assert_eq!(
+                        report.stop,
+                        Stop::Complete,
+                        "p={p} roots={expected:?} stop={:?}",
+                        report.stop
+                    );
                     assert_eq!(&report.roots[..usize::from(report.root_count)], &expected);
                     assert!(check(&f, &report, &events).unwrap().finite_complete);
-                    assert!(events.iter().any(|event|
-                        matches!(event.kind, EventKind::Split { .. })),
-                        "expected split event for p={p}");
+                    assert!(
+                        events
+                            .iter()
+                            .any(|event| matches!(event.kind, EventKind::Split { .. })),
+                        "expected split event for p={p}"
+                    );
                 }
             }
         }
@@ -3999,16 +4366,21 @@ mod tests {
                     assert_eq!(report.root_count, 1);
                     let root = report.roots[0];
                     assert_eq!(
-                        (u128::from(a) * u128::from(root) + u128::from(b))
-                            % u128::from(p), 0,
+                        (u128::from(a) * u128::from(root) + u128::from(b)) % u128::from(p),
+                        0,
                         "p={p} a={a} b={b}"
                     );
                     assert!(check(&f, &report, &events).unwrap().finite_complete);
-                    let (xp, g) = events.iter().find_map(|e| {
-                        if let EventKind::LinearPart { xp, polynomial } = e.kind {
-                            Some((xp, polynomial))
-                        } else { None }
-                    }).unwrap();
+                    let (xp, g) = events
+                        .iter()
+                        .find_map(|e| {
+                            if let EventKind::LinearPart { xp, polynomial } = e.kind {
+                                Some((xp, polynomial))
+                            } else {
+                                None
+                            }
+                        })
+                        .unwrap();
                     assert_eq!(xp, Poly17::constant(root));
                     assert_eq!(g.len, 2);
                     assert_eq!(g.coefficients[1], 1);
