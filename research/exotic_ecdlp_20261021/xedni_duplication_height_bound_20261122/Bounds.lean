@@ -26,6 +26,64 @@ theorem homogeneous_bezout_identity (A B : ℤ) :
   unfold U V F G
   ring
 
+theorem common_divisor_dvd_resultant_of_coprime_B
+    (A B d : ℤ) (hF : d ∣ F A B) (hG : d ∣ G A B)
+    (hcop : Int.gcd d B = 1) : d ∣ (8038359040000 : ℤ) := by
+  have hprod : d ∣ (8038359040000 : ℤ) * B ^ 7 := by
+    rw [← homogeneous_bezout_identity]
+    exact dvd_add (dvd_mul_of_dvd_right hF _) (dvd_mul_of_dvd_right hG _)
+  have strip : ∀ n : ℕ, d ∣ (8038359040000 : ℤ) * B ^ n →
+      d ∣ (8038359040000 : ℤ) := by
+    intro n
+    induction n with
+    | zero => simpa
+    | succ n ih =>
+        intro hn
+        apply ih
+        apply Int.dvd_of_dvd_mul_left_of_gcd_one (b := (8038359040000 : ℤ) * B ^ n)
+          (c := B) ?_ hcop
+        simpa [pow_succ, mul_assoc] using hn
+  exact strip 7 hprod
+
+theorem common_divisor_dvd_resultant
+    (A B d : ℤ) (hAB : Int.gcd A B = 1)
+    (hF : d ∣ F A B) (hG : d ∣ G A B) :
+    d ∣ (8038359040000 : ℤ) := by
+  let e : ℤ := Int.gcd d B
+  have heD : e ∣ d := Int.gcd_dvd_left d B
+  have heB : e ∣ B := Int.gcd_dvd_right d B
+  have heF : e ∣ F A B := heD.trans hF
+  have hfactor : e ∣ F A B - A ^ 4 := by
+    have hdiv := dvd_mul_of_dvd_left heB
+      (-1502 * A ^ 2 * B + 31976 * A * B ^ 2 - 187435 * B ^ 3)
+    convert hdiv using 1 <;> unfold F <;> ring
+  have heA4 : e ∣ A ^ 4 := by
+    have hsub := dvd_sub heF hfactor
+    convert hsub using 1 <;> ring
+  obtain ⟨x, y, hbez⟩ :=
+    (Int.gcd_dvd_iff (a := A) (b := B) (n := 1)).mp (by simp [hAB])
+  simp only [Nat.cast_one] at hbez
+  have heOne : e ∣ (1 : ℤ) := by
+    have hpow : (1 : ℤ) = (A * x + B * y) ^ 4 := by
+      calc
+        (1 : ℤ) = (1 : ℤ) ^ 4 := by norm_num
+        _ = (A * x + B * y) ^ 4 := congrArg (· ^ 4) hbez
+    have hterm : e ∣ (A * x) ^ 4 := by
+      simpa [mul_pow] using dvd_mul_of_dvd_left heA4 (x ^ 4)
+    have hcross : e ∣ B * (4 * A ^ 3 * x ^ 3 * y +
+        6 * A ^ 2 * x ^ 2 * B * y ^ 2 +
+        4 * A * x * B ^ 2 * y ^ 3 + B ^ 3 * y ^ 4) :=
+      dvd_mul_of_dvd_left heB _
+    have hident : (A * x + B * y) ^ 4 = (A * x) ^ 4 +
+        B * (4 * A ^ 3 * x ^ 3 * y +
+        6 * A ^ 2 * x ^ 2 * B * y ^ 2 +
+        4 * A * x * B ^ 2 * y ^ 3 + B ^ 3 * y ^ 4) := by ring
+    rw [hpow, hident]
+    exact dvd_add hterm hcross
+  have hnat : Int.gcd d B ∣ 1 := (Int.natCast_dvd_natCast).mp heOne
+  have hcop : Int.gcd d B = 1 := Nat.dvd_one.mp hnat
+  exact common_divisor_dvd_resultant_of_coprime_B A B d hF hG hcop
+
 theorem upper_coefficient_bound :
     1 + 1502 + 31976 + 187435 < (2 : ℤ) ^ 18 ∧
     4 + 188 + 3004 + 15988 < (2 : ℤ) ^ 18 := by
@@ -46,6 +104,8 @@ theorem doubled_generator_x : F 17 1 = 5600 ∧ G 17 1 = 400 := by
   norm_num [F, G]
 
 #print axioms homogeneous_bezout_identity
+#print axioms common_divisor_dvd_resultant_of_coprime_B
+#print axioms common_divisor_dvd_resultant
 #print axioms upper_coefficient_bound
 #print axioms resultant_lt_pow43
 #print axioms outer_tail_coefficient_bound

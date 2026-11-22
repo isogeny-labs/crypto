@@ -50,13 +50,13 @@ removes at most a factor `R`; combining the upper and lower bounds yields
 | Forms match fixed-curve doubling | `check_sage.py`, 30 signed multiples with the checked launcher | Independent finite replay; general point identity not yet in Lean |
 | Homogeneous Bézout identity, coefficient and tail inequalities | `Bounds.lean`, pinned build and `#print axioms` | Lean checked |
 | Archimedean lower bound | `certificate.json`, exact Horner generator and independent exact Bernstein auditor | Exact computational certificate; Lean checker open |
-| Common-divisor bound `gcd(F,G)|R` | Bézout identity plus the coprimality argument above | Written proof; Lean divisibility bridge open |
+| Common-divisor bound `d|F,G ⇒ d|R` for primitive `A,B` | `common_divisor_dvd_resultant` in `Bounds.lean` | Lean checked, including coprimality bridge |
 | Uniform doubling defect and numerical comparison | Above inequalities and the canonical-limit geometric tail; Lean checks `(53/3)log 2<14` | Mathematical derivation; full fixed-point Lean theorem open |
 
-The polynomial and numerical Lean declarations use only standard foundations
-in their `#print axioms` output. The packet is **partially formalized** until
-the interval certificate, integer divisibility argument, and duplication
-map are connected to the actual `WeierstrassCurve.Affine.Point.naiveHeight`.
+The polynomial, divisibility and numerical Lean declarations use only standard
+foundations in their `#print axioms` output. The packet is **partially
+formalized** until the interval certificate and general duplication map are
+connected to the actual `WeierstrassCurve.Affine.Point.naiveHeight`.
 The canonical-limit packet already proves quadraticity for integer multiples.
 Mordell–Weil generation and rational-to-finite reduction remain separate
 obligations for a complete fixed-curve exclusion theorem.
