@@ -69,6 +69,10 @@ pub struct VeluIsogeny {
     /// `F_p`, listed as a half-set `R` (one representative per
     /// `{±Q}`).
     pub kernel_half: Vec<(u64, u64)>,
+    /// Precomputed Vélu `(x_Q, v(Q), u(Q))` for each half-set point —
+    /// built once at construction so [`evaluate`] skips per-call
+    /// `g_x`/`g_y` work (measured win on multi-point maps).
+    kernel_vu: Vec<(u64, u64, u64)>,
 }
 
 impl VeluIsogeny {
@@ -77,22 +81,20 @@ impl VeluIsogeny {
     /// at infinity).
     ///
     /// Round-4: one binary-EGCD inverse for the whole kernel via Montgomery's
-    /// trick (was one Fermat `a^{p-2}` per kernel point — educational but
-    /// asymptotically wasteful even at toy `ℓ`).
+    /// trick.  Round-6: `v(Q), u(Q)` precomputed at construction.
     pub fn evaluate(&self, x: u64, y: u64) -> Option<(u64, u64)> {
         let p = self.domain.p as u128;
-        let xm = x as u128 % p;
-        let ym = y as u128 % p;
-        let a = self.domain.a as u128 % p;
-        let n = self.kernel_half.len();
+        let xm = (x as u128) % p;
+        let ym = (y as u128) % p;
+        let n = self.kernel_vu.len();
         if n == 0 {
             return Some((x, y));
         }
 
         // Reject kernel points; collect denominators `x − x_Q`.
         let mut dens = vec![0u128; n];
-        for (i, &(xk, _)) in self.kernel_half.iter().enumerate() {
-            let xk = xk as u128 % p;
+        for (i, &(xk, _, _)) in self.kernel_vu.iter().enumerate() {
+            let xk = xk as u128;
             if xm == xk {
                 return None;
             }
@@ -115,16 +117,22 @@ impl VeluIsogeny {
 
         let mut acc_x = xm;
         let mut acc_y = ym;
-        for (i, &(xq, yq)) in self.kernel_half.iter().enumerate() {
-            let xq = xq as u128 % p;
-            let yq = yq as u128 % p;
-
-            let gx_q = mod_add(3 * mod_mul(xq, xq, p) % p, a, p);
-            let gy_q = mod_sub(0, 2 * yq % p, p);
-            let t_row = yq == 0;
-            let v_q = if t_row { gx_q } else { (2 * gx_q) % p };
-            let u_q = mod_mul(gy_q, gy_q, p);
-
+        let a = self.domain.a as u128 % p;
+        // `IC_VELU_PRECOMP=0` recomputes v/u each call (A/B baseline).
+        let recompute = std::env::var("IC_VELU_PRECOMP").as_deref() == Ok("0");
+        for i in 0..n {
+            let (v_q, u_q) = if recompute {
+                let (xq, yq) = self.kernel_half[i];
+                let xq = xq as u128 % p;
+                let yq = yq as u128 % p;
+                let gx_q = mod_add(3 * mod_mul(xq, xq, p) % p, a, p);
+                let gy_q = mod_sub(0, 2 * yq % p, p);
+                let v = if yq == 0 { gx_q } else { (2 * gx_q) % p };
+                (v, mod_mul(gy_q, gy_q, p))
+            } else {
+                let (_, v, u) = self.kernel_vu[i];
+                (v as u128, u as u128)
+            };
             let dx_inv = invs[i];
             let dx_inv2 = mod_mul(dx_inv, dx_inv, p);
             let dx_inv3 = mod_mul(dx_inv2, dx_inv, p);
@@ -134,7 +142,7 @@ impl VeluIsogeny {
 
             let bracket = mod_add(
                 mod_mul(v_q, dx_inv2, p),
-                mod_mul(2 * u_q % p, dx_inv3, p),
+                mod_mul((2 * u_q) % p, dx_inv3, p),
                 p,
             );
             acc_y = mod_sub(acc_y, mod_mul(ym, bracket, p), p);
@@ -151,10 +159,10 @@ fn mod_add(a: u128, b: u128, p: u128) -> u128 {
 fn mod_sub(a: u128, b: u128, p: u128) -> u128 {
     ((a % p) + p - (b % p)) % p
 }
+#[inline(always)]
 fn mod_mul(a: u128, b: u128, p: u128) -> u128 {
-    // For p < 2^62 this fits comfortably in u128 (operands < 2^62
-    // each, product < 2^124).
-    ((a % p) * (b % p)) % p
+    // Callers keep `a, b < p < 2^62`; product fits in u128.
+    (a * b) % p
 }
 fn mod_inv(a: u128, p: u128) -> Option<u128> {
     if a % p == 0 {
@@ -210,6 +218,7 @@ fn velu_codomain_from_kernel(domain: &SmallCurve, kernel: &[(u64, u64)]) -> Velu
 
     let mut sum_v = 0u128;
     let mut sum_uvx = 0u128;
+    let mut kernel_vu = Vec::with_capacity(half.len());
     for &(xq, yq) in &half {
         let xq = xq as u128 % p;
         let yq = yq as u128 % p;
@@ -223,6 +232,7 @@ fn velu_codomain_from_kernel(domain: &SmallCurve, kernel: &[(u64, u64)]) -> Velu
 
         sum_v = mod_add(sum_v, v_q, p);
         sum_uvx = mod_add(sum_uvx, mod_add(u_q, mod_mul(xq, v_q, p), p), p);
+        kernel_vu.push((xq as u64, v_q as u64, u_q as u64));
     }
 
     let new_a = mod_sub(a, (5 * sum_v) % p, p) as u64;
@@ -248,6 +258,7 @@ fn velu_codomain_from_kernel(domain: &SmallCurve, kernel: &[(u64, u64)]) -> Velu
         codomain,
         degree,
         kernel_half: half,
+        kernel_vu,
     }
 }
 
@@ -343,7 +354,8 @@ pub fn velu_isogeny_odd(domain: &SmallCurve, ell: u64) -> Vec<VeluIsogeny> {
             Some(p) => p,
             None => continue,
         };
-        let q = point.scalar_mul(&BigUint::from(cofactor), &a_fe);
+        // Public sampling: vartime word/mont ladders (CT Fermat unused).
+        let q = point.scalar_mul_vartime(&BigUint::from(cofactor), &a_fe);
         if matches!(q, Point::Infinity) {
             continue;
         }
@@ -368,7 +380,7 @@ pub fn velu_isogeny_odd(domain: &SmallCurve, ell: u64) -> Vec<VeluIsogeny> {
                     break;
                 }
             }
-            acc = acc.add(&q, &a_fe);
+            acc = acc.add_vartime(&q, &a_fe);
         }
         if bad || kernel.len() as u64 != ell - 1 {
             continue;
