@@ -2156,6 +2156,253 @@ pub fn enumerate_decompositions(
     (rels, ops)
 }
 
+/// What the resultant / multipoint-evaluation oracle did on one target
+/// (EXP-PKM-RESULTANT-001).
+#[derive(Clone, Debug)]
+pub struct ResultantDecomposition {
+    /// Relations `P_1 + P_2 = R` with both abscissae in `V` (sorted, as
+    /// point lists), exactly as [`enumerate_decompositions`] returns them.
+    pub relations: Vec<Vec<(u64, u64)>>,
+    /// `x ∈ V` with `g(x) = 0`, `g = ∏_{v∈V} S_3(v, X, x_R)`.
+    pub hits: usize,
+    /// All counted `F_p` work: `M` + NTT words (one `M` each) + `2⌈log₂p⌉`
+    /// per inversion, plus the finishing stage at the enumeration's constants.
+    pub field_ops: u64,
+    /// The product tree of `Z = ∏(X − v)`.
+    pub tree_ops: u64,
+    /// Forming the `S` quadratics and their balanced product `g`.
+    pub product_ops: u64,
+    /// The remainder tree evaluating `g` on `V`.
+    pub eval_ops: u64,
+    /// Root finding for each hit, lifts and sign checks.
+    pub finish_ops: u64,
+    pub ms: f64,
+}
+
+/// The `m = 2` decomposition oracle by one resultant and a multipoint
+/// evaluation (EXP-PKM-RESULTANT-001): `g(X) = ∏_{v∈V} S_3(v, X, x_R)` is the
+/// resultant in `Y` of `S_3(Y, X, x_R)` and `∏(Y − v)` up to a constant, so
+/// `x₁ ∈ V` starts a relation iff `g(x₁) = 0`. `g` is built by a balanced
+/// product and evaluated on `V` by a remainder tree
+/// ([`crate::cryptanalysis::isogeny_eval::poly`], counted). Each hit is then
+/// finished exactly like [`enumerate_decompositions`] (quadratic roots,
+/// membership, lifting, signs), with the same counted constants.
+pub fn resultant_decompose_m2(e: &Curve, v: &[u64], r: (u64, u64)) -> ResultantDecomposition {
+    use crate::cryptanalysis::isogeny_eval::counted_fp::PrimeField;
+    use crate::cryptanalysis::isogeny_eval::poly::{product, ProductTree};
+    let t0 = std::time::Instant::now();
+    let p = e.p;
+    let logp = 64 - p.leading_zeros() as u64;
+    let f = PrimeField::counted(p).expect("prime field");
+    let total = |f: &PrimeField<_>| {
+        let t = f.tally();
+        t.mul + t.word + t.inv * 2 * logp
+    };
+    let tree_start = total(&f);
+    let mut tree = ProductTree::new(&f, v);
+    let tree_ops = total(&f) - tree_start;
+    let prod_start = total(&f);
+    let g = product(
+        &f,
+        v.iter().map(|&x| s3_quad_counted(&f, e, x, r.0)).collect(),
+    );
+    // The formula makes 8 counted products; the enumeration charges 12 for the
+    // same quadratic, so the difference is charged here too.
+    let product_ops = total(&f) - prod_start + 4 * v.len() as u64;
+    let eval_start = total(&f);
+    let vals = tree.evaluate(&f, &g);
+    let eval_ops = total(&f) - eval_start;
+    let (relations, hits, finish_ops) = finish_resultant_hits(e, v, &vals, r);
+    ResultantDecomposition {
+        relations,
+        hits,
+        field_ops: tree_ops + product_ops + eval_ops + finish_ops,
+        tree_ops,
+        product_ops,
+        eval_ops,
+        finish_ops,
+        ms: t0.elapsed().as_secs_f64() * 1e3,
+    }
+}
+
+/// `S_3(x, X, x_R)` as `[c0, c1, c2]` in `X`: the formula of
+/// [`enumerate_decompositions`], every product counted by `f` (8 `M`).
+fn s3_quad_counted<C: crate::cryptanalysis::isogeny_eval::counted_fp::OpCounter>(
+    f: &crate::cryptanalysis::isogeny_eval::counted_fp::PrimeField<C>,
+    e: &Curve,
+    x: u64,
+    xr: u64,
+) -> Vec<u64> {
+    let a = f.elem(e.a);
+    let b = f.elem(e.b);
+    let d = f.sub(x, xr);
+    let s = f.add(x, xr);
+    let pr = f.mul(x, xr);
+    let c2 = f.sqr(d);
+    let c1 = f.neg(f.mul_small(2, f.add(f.mul(s, f.add(pr, a)), f.mul_small(2, b))));
+    let pa = f.sub(pr, a);
+    let c0 = f.sub(f.sqr(pa), f.mul_small(4, f.mul(b, s)));
+    vec![c0, c1, c2]
+}
+
+/// The finishing stage of the resultant oracle: for every `x₁ ∈ V` with
+/// `g(x₁) = 0`, the roots of `S_3(x₁, X, x_R)` in `V`, lifts and signs, at the
+/// enumeration's counted constants. Returns (relations, hits, ops).
+fn finish_resultant_hits(
+    e: &Curve,
+    v: &[u64],
+    vals: &[u64],
+    r: (u64, u64),
+) -> (Vec<Vec<(u64, u64)>>, usize, u64) {
+    let p = e.p;
+    let logp = 64 - p.leading_zeros() as u64;
+    let xr = r.0;
+    let mut finish_ops = 0u64;
+    let vset: HashSet<u64> = v.iter().copied().collect();
+    let lift = |x: u64| sqrtm(e.rhs(x), p).map(|y| (x, y));
+    let mut rels: Vec<Vec<(u64, u64)>> = vec![];
+    let mut hits = 0;
+    for (&x1, &gx) in v.iter().zip(vals) {
+        if gx != 0 {
+            continue;
+        }
+        hits += 1;
+        finish_ops += 6 * logp; // lift x1
+        let Some(p1) = lift(x1) else { continue };
+        finish_ops += 12; // the quadratic in X for x1
+        let c = {
+            let d = subm(x1, xr, p);
+            let s_ = addm(x1, xr, p);
+            let pr = mulm(x1, xr, p);
+            let c2 = mulm(d, d, p);
+            let c1 = subm(
+                0,
+                mulm(
+                    2,
+                    addm(mulm(s_, addm(pr, e.a, p), p), mulm(2, e.b, p), p),
+                    p,
+                ),
+                p,
+            );
+            let pa = subm(pr, e.a, p);
+            let c0 = subm(mulm(pa, pa, p), mulm(4, mulm(e.b, s_, p), p), p);
+            [c0, c1, c2]
+        };
+        let roots: Vec<u64> = if c[2] == 0 {
+            if c[1] == 0 {
+                vec![]
+            } else {
+                finish_ops += 2 * logp + 1;
+                vec![mulm(p - c[0] % p, invm(c[1], p), p)]
+            }
+        } else {
+            finish_ops += 3 + 4 * logp;
+            let disc = subm(mulm(c[1], c[1], p), mulm(4, mulm(c[2], c[0], p), p), p);
+            match sqrtm(disc, p) {
+                None => vec![],
+                Some(sd) => {
+                    finish_ops += 2 * logp + 2;
+                    let i = invm(mulm(2, c[2], p), p);
+                    vec![
+                        mulm(subm(sd, c[1], p), i, p),
+                        mulm(subm(p - sd, c[1], p), i, p),
+                    ]
+                }
+            }
+        };
+        for x2 in roots {
+            if vset.contains(&x2) {
+                finish_ops += 6 * logp; // lift x2
+                if let Some(p2) = lift(x2) {
+                    for rel in signed_relations(e, &[p1, p2], r) {
+                        if !rels.contains(&rel) {
+                            rels.push(rel);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    rels.sort();
+    (rels, hits, finish_ops)
+}
+
+/// The resultant oracle with its `V`-only work paid once (EXP-PKM-RESULTANT-001
+/// Amendment 1): the product tree of `Z = ∏(X − v)` and every node's cached
+/// reciprocal are built in [`ResultantOracleM2::new`] (`setup_ops`); each
+/// [`ResultantOracleM2::decompose`] then pays only the product of the `S`
+/// quadratics, the remainders with cached reciprocals and the finishing stage.
+pub struct ResultantOracleM2 {
+    e: Curve,
+    v: Vec<u64>,
+    tree: crate::cryptanalysis::isogeny_eval::poly::ProductTree,
+    f: crate::cryptanalysis::isogeny_eval::counted_fp::PrimeField<
+        crate::cryptanalysis::isogeny_eval::counted_fp::OpCounts,
+    >,
+    logp: u64,
+    /// Product tree, reciprocals, and the one dummy evaluation that fills them.
+    pub setup_ops: u64,
+}
+
+impl ResultantOracleM2 {
+    pub fn new(e: &Curve, v: &[u64]) -> Self {
+        use crate::cryptanalysis::isogeny_eval::counted_fp::PrimeField;
+        use crate::cryptanalysis::isogeny_eval::poly::ProductTree;
+        let f = PrimeField::counted(e.p).expect("prime field");
+        let logp = 64 - e.p.leading_zeros() as u64;
+        let mut tree = ProductTree::new(&f, v);
+        // A dividend of the full degree 2S makes every node cache its
+        // reciprocal at the precision real targets need.
+        let dummy = vec![1u64; 2 * v.len() + 1];
+        let _ = tree.evaluate(&f, &dummy);
+        let t = f.tally();
+        let setup_ops = t.mul + t.word + t.inv * 2 * logp;
+        ResultantOracleM2 {
+            e: *e,
+            v: v.to_vec(),
+            tree,
+            f,
+            logp,
+            setup_ops,
+        }
+    }
+
+    fn total(&self) -> u64 {
+        let t = self.f.tally();
+        t.mul + t.word + t.inv * 2 * self.logp
+    }
+
+    /// One target's relations at marginal cost (`tree_ops` is 0: the tree is
+    /// in `setup_ops`).
+    pub fn decompose(&mut self, r: (u64, u64)) -> ResultantDecomposition {
+        use crate::cryptanalysis::isogeny_eval::poly::product;
+        let t0 = std::time::Instant::now();
+        let prod_start = self.total();
+        let g = product(
+            &self.f,
+            self.v
+                .iter()
+                .map(|&x| s3_quad_counted(&self.f, &self.e, x, r.0))
+                .collect(),
+        );
+        let product_ops = self.total() - prod_start + 4 * self.v.len() as u64;
+        let eval_start = self.total();
+        let vals = self.tree.evaluate(&self.f, &g);
+        let eval_ops = self.total() - eval_start;
+        let (relations, hits, finish_ops) = finish_resultant_hits(&self.e, &self.v, &vals, r);
+        ResultantDecomposition {
+            relations,
+            hits,
+            field_ops: product_ops + eval_ops + finish_ops,
+            tree_ops: 0,
+            product_ops,
+            eval_ops,
+            finish_ops,
+            ms: t0.elapsed().as_secs_f64() * 1e3,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2399,6 +2646,67 @@ mod tests {
                     if trial < 2 {
                         assert!(!en.is_empty());
                     }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn resultant_oracle_finds_exactly_the_enumerated_relations() {
+        // EXP-PKM-RESULTANT-001 V1 in miniature: two primes (one NTT-friendly),
+        // coset and random V of several sizes, planted and random targets,
+        // including V large enough for the NTT path of `poly::mul`.
+        for (p, t) in [(10_009u64, 3usize), (12_289, 6), (3_221_225_473, 10)] {
+            let e = Curve { p, a: 3, b: 7 };
+            let mut rng = Rng(p ^ 77);
+            let coset = kummer_tower(p, &vec![2; t], None, 5).unwrap().v;
+            let random: Vec<u64> = {
+                let mut seen = HashSet::new();
+                let mut out = vec![];
+                while out.len() < coset.len() {
+                    let x = rng.below(p);
+                    if seen.insert(x) {
+                        out.push(x);
+                    }
+                }
+                out
+            };
+            for v in [coset, random] {
+                let base: Vec<(u64, u64)> = v
+                    .iter()
+                    .filter_map(|&x| sqrtm(e.rhs(x), p).map(|y| (x, y)))
+                    .collect();
+                assert!(base.len() >= 2);
+                let mut amortised = ResultantOracleM2::new(&e, &v);
+                assert!(amortised.setup_ops > 0);
+                for trial in 0..4 {
+                    let r = if trial < 3 {
+                        let pts: Vec<_> = (0..2)
+                            .map(|_| base[rng.below(base.len() as u64) as usize])
+                            .collect();
+                        match pts.iter().fold(None, |a, &q| e.add(a, Some(q))) {
+                            Some(r) => r,
+                            None => continue,
+                        }
+                    } else {
+                        e.random_point(&mut rng).unwrap()
+                    };
+                    let d = resultant_decompose_m2(&e, &v, r);
+                    let (en, _) = enumerate_decompositions(&e, &v, 2, r);
+                    assert_eq!(d.relations, en, "p {p} |V| {} trial {trial}", v.len());
+                    if trial < 3 {
+                        assert!(!en.is_empty());
+                        assert!(d.hits >= 1);
+                    }
+                    assert_eq!(
+                        d.field_ops,
+                        d.tree_ops + d.product_ops + d.eval_ops + d.finish_ops
+                    );
+                    let a = amortised.decompose(r);
+                    assert_eq!(a.relations, en, "amortised p {p} trial {trial}");
+                    assert_eq!(a.hits, d.hits);
+                    assert_eq!(a.product_ops, d.product_ops);
+                    assert!(a.field_ops < d.field_ops);
                 }
             }
         }

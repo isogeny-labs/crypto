@@ -56,7 +56,6 @@ impl Cv {
     #[allow(non_snake_case)]
     fn add(&self, P: (u64, u64), Q: (u64, u64)) -> Option<(u64, u64)> {
         let p = self.p;
-
         let l = if P.0 == Q.0 {
             if (P.1 + Q.1).is_multiple_of(p) {
                 return None;

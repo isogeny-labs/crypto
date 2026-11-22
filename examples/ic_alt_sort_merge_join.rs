@@ -46,7 +46,6 @@ impl Ec {
             (Some(p), Some(q)) => (p, q),
         };
         self.ops += 1;
-
         let l = if p.0 == q.0 {
             if (p.1 + q.1) % P == 0 {
                 return None;
@@ -440,17 +439,19 @@ fn median(v: &mut [f64]) -> f64 {
     v[v.len() / 2]
 }
 
+// The on-curve check is a guard on the hard-coded constants.
+#[allow(clippy::assertions_on_constants)]
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let n: usize = args.get(1).map(|s| s.parse().unwrap()).unwrap_or(48550);
     let reps: usize = args.get(2).map(|s| s.parse().unwrap()).unwrap_or(15);
     let kq = 1234567u64;
     let g = Some((GX, GY));
-    const {
+    const _: () = {
         assert!(
             (GY * GY) % P == (GX * GX % P * GX + A * GX + B) % P,
             "G on curve"
-        )
+        );
     };
     let mut ec = Ec { ops: 0 };
     assert!(ec.mul(R, g).is_none(), "r*G = O");
