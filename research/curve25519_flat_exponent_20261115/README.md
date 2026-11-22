@@ -155,7 +155,7 @@ on this route is memory, as in the extension study.
   "undetermined" since 2026-11-08.
 - The m = 4 verdict is not settled; the flat presentation moves the memory wall from D = 12 to D = 18
   and shows accelerating local slopes, consistent with no lever but not an estimator verdict.
-- No component speed-up is claimed here: the chain / flat ratios reproduce L3 (which already reported
+- No component speed-up is claimed here [pcc:unverified]: the chain / flat ratios reproduce L3 (which already reported
   them, with a validator report) and the same binary; nothing in this study is new engine work.
 - The counted unit and wall time agree per operation through D = 42 and then separate; a wall-time
   co-primary unit is informative only where the matrices fit in cache-friendly sizes.
