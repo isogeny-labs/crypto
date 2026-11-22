@@ -95,7 +95,7 @@ equal R2's.
 | 131101 | 0.848 [0.843, 0.853] | 0.841 | 0.65 | 0.303 | 0.360 |
 | 262147 | 0.829 [0.825, 0.833] | 0.809 [0.805, 0.814] | 0.65 | 0.356 [0.254, 0.588] | 0.439 |
 
-**A measured improvement over the index-calculus baseline**, confirmed out of sample: 14 to 19 % off
+**A measured improvement over the index-calculus baseline** [pcc:unverified], confirmed out of sample: 14 to 19 % off
 the genus-3 arm, growing with p. Predictions L1 to L4 held; L5 (≤ 0.33 of rho at 262147) failed at
 0.356. The selection lowers the LA level, not its exponent (`la_mul` exponent 1.51 for both); the
 arm's FPM exponent falls from 1.43 to 1.39 because the relation phase takes a larger share.
