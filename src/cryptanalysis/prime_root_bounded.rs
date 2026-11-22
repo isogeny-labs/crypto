@@ -1196,7 +1196,6 @@ impl Producer<'_> {
         Ok(if n == 1 { sign } else { 0 })
     }
     // R49_BINARY_JACOBI_PRODUCER_END
-    // R46_PRODUCER_HELPER_BEGIN
     // In a split squarefree quadratic, evaluating the quadratic character
     // at both roots is much cheaper than polynomial Euler powering + GCD.
     // For p == 3 (mod 4), sqrt(D) is D^((p+1)/4). Return None for any
@@ -1229,6 +1228,7 @@ impl Producer<'_> {
         Ok(acc)
         // R61_PRODUCER_SCALAR_IDENTITY_END
     }
+    // R46_PRODUCER_HELPER_BEGIN
     fn quadratic_split_factor(&mut self, h: &Poly17, delta: u64) -> Result<Option<Poly17>> {
         if h.len != 3 || (self.p & 3 != 3 && self.p & 7 != 5 && self.p != 1_000_000_009) || h.coefficients[2] != 1 {
             return Ok(None);
@@ -2490,7 +2490,6 @@ impl Replay {
         Ok(if odd_modulus != 1 { 0 } else if parity { -1 } else { 1 })
     }
     // R49_BINARY_JACOBI_REPLAY_END
-    // R46_REPLAY_HELPER_BEGIN
     // Certificate replay evaluates quadratic split characters independently,
     // with left-to-right scalar powering and separate field arithmetic.
     fn split_character_power(&mut self, x: u64, exponent: u64) -> Result<u64> {
@@ -2512,6 +2511,7 @@ impl Replay {
         Ok(acc)
         // R61_REPLAY_SCALAR_IDENTITY_END
     }
+    // R46_REPLAY_HELPER_BEGIN
     fn replay_quadratic_split(&mut self, f: Poly17, delta: u64) -> Result<Option<Poly17>> {
         if f.len != 3 || (self.p % 4 != 3 && self.p % 8 != 5 && self.p != 1_000_000_009) || f.coefficients[2] != 1 {
             return Ok(None);
