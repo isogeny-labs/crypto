@@ -20,7 +20,7 @@ HAVE_LAYER=0
 if [ -f "$RPC_LAYER_SRC" ] && [ "$(sha256sum "$RPC_LAYER_SRC" | cut -d' ' -f1)" = a0f7e28eb0759ddefc4b906974866d2a2215d4705e25e9fd1fca45513b8b1971 ] \
    && [ -f "$RPC_BIN_SRC/pkm_tower_pilot" ]; then HAVE_LAYER=1; fi
 echo "image layer available: $HAVE_LAYER"
-BASE=pkm-x-t14-k0-c7-d54 R1=pkm-x-t14-k0-c7-d54-r1 STG=cap:14:0:7:54000000000
+BASE=pkm-x-t14-k0-c7-d54-h1 R1=pkm-x-t14-k0-c7-d54-h1-r1 H2=pkm-x-t14-k0-c7-d54-h2 H2R=pkm-x-t14-k0-c7-d54-h2-r1 H3=pkm-x-t14-k0-c7-d54-h3 STG=cap:14:0:7:54000000000
 
 rec() { # rec ID OK(0|1) EXPECTED OBSERVED DESCRIPTION
   local r=PASS; [ "$2" = 0 ] || r=FAIL
@@ -43,6 +43,7 @@ mksb() { # fresh sandbox; sets SB, R (route dir), ST (stub dir), and the environ
   git init -q --bare "$SB/origin.git" && G remote add origin "$SB/origin.git" && G push -q origin main 2>/dev/null
   ST="$SB/stub"; mkdir -p "$ST" "$SB/bin" "$SB/state" "$ST/pretree/cgroup"; cp "$T/curl_stub.sh" "$SB/bin/curl"
   echo 256000000000 > "$ST/pretree/cgroup/memory.max"     # a 256 GB pod (the 128 GB smoke pod showed 128000000000)
+  echo 1048576 > "$ST/pretree/cgroup/max_map_count"         # a host that passes the check of owner decision 28
   jq -n '{cost:2.08, cloud:"SECURE", cpu:{id:"cpu5m", vcpuCount:32, memory:256}, dataCenterId:"EU-RO-1", disk:20,
           locked:false, mounts:{}, globalNetworking:{enabled:false}, registry:null, template:null, cudaVersion:null,
           runtime:null, ssh:{proxy:"stub"}}' > "$ST/create-template.json"
@@ -53,15 +54,15 @@ mksb() { # fresh sandbox; sets SB, R (route dir), ST (stub dir), and the environ
 }
 PRE_SB() { echo "$SB/repo/research/prime_fall_degree_20261027/PREREGISTRATION.md"; }
 fresh_ledger() { sed -i "s/^# complete_as_of\t.*/# complete_as_of\t$(date -u +%FT%TZ)/" "$R/ledger.tsv"; }
-freeze_heading() { printf '\n## Amendment 33 (test sandbox only)\n' >> "$(PRE_SB)"; }
+freeze_heading() { printf '\n## Amendment 34 (test sandbox only)\n' >> "$(PRE_SB)"; }
 freeze() { freeze_heading; (cd "$R" && sha256sum common.sh run.sh fetch.sh reap.sh) >> "$(PRE_SB)"; }
 study_ready() { fresh_ledger; freeze; }
 run() { ( cd "$R" && "$@" ) > "$OUTD/$ID.txt" 2>&1; echo $?; }
 calls() { if [ -f "$ST/calls.log" ]; then wc -l < "$ST/calls.log"; else echo 0; fi; }
 creates() { if [ -f "$ST/calls.log" ]; then grep -c -- '-X POST https://api.runpod.io/v2/pods ' "$ST/calls.log" || true; else echo 0; fi; }
-outcome() { # outcome NAME CLASS [OVERSIZE] [RELAUNCH auto|owner]
+outcome() { # outcome NAME CLASS [OVERSIZE] [RELAUNCH auto|owner]; CLASS HOSTLIMIT = NOT_ADMITTED with host_limit (P2h)
   mkdir -p "$R/receipts/$1"; jq -n --arg c "$2" --argjson o "${3:-false}" --arg r "${4:-auto}" \
-    '{class:$c, row:{oversize:$o, timed_out:false}} + (if $c == "LOST" then {relaunch:$r} else {} end)' > "$R/receipts/$1/outcome.json"; }
+    '(if $c == "HOSTLIMIT" then {class:"NOT_ADMITTED", rule:"P2h", host_limit:true} else {class:$c} end) + {row:{oversize:$o, timed_out:false}} + (if $c == "LOST" then {relaunch:$r} else {} end)' > "$R/receipts/$1/outcome.json"; }
 ORIGPATH=$PATH
 
 # ===================================================================== A. refusals before any network call (deny mode)
@@ -134,6 +135,13 @@ deny_case A30 "a draft Amendment 18 name (pkm-x-t14-k1-c6)" s_ready pkm-x-t14-k1
 deny_case A31 "a draft Amendment 18 name (pkm-x-t13-k0-c6-r3)" s_ready pkm-x-t13-k0-c6-r3 cap:13:0:6:12800000000
 deny_case A32 "draw 1 of the same cap (needs a later owner decision)" s_ready pkm-x-t14-k1-c7-d54 cap:14:1:7:54000000000
 deny_case A33 "the retired name of owner decision 23 (pkm-x-t14-k0-c7-m112)" s_ready pkm-x-t14-k0-c7-m112 cap:14:0:7:27900000000
+deny_case A34 "the used Amendment 33 name pkm-x-t14-k0-c7-d54 (retired; owner decision 28)" s_ready pkm-x-t14-k0-c7-d54 $STG
+deny_case A35 "order: h2 requested before h1 has run" s_ready $H2 $STG
+deny_case A36 "a fourth retry name (h4) is not on the allow-list" s_ready pkm-x-t14-k0-c7-d54-h4 $STG
+s_hostcap() { study_ready; local k; for k in 1 2 3 4 5; do mkdir -p "$R/receipts/$BASE.hostrefused-$k"; done; }
+deny_case A37 "per-name cap: five pods already refused by the host check" s_hostcap $BASE $STG
+s_h1plain() { study_ready; outcome $BASE NOT_ADMITTED; }
+deny_case A38 "order: h2 after h1 NOT_ADMITTED without a host limit (resolved: owner)" s_h1plain $H2 $STG
 
 # ===================================================================== B, C, F helpers (need the layer)
 mktree() { # mktree DIR STAGE STARTED ENDED PILOT_EXIT GZ_EXIT OOM_KILL|none [START_LINES] [CG_PEAK_BYTES|v1:BYTES|-] [LOG: keep|strip|MiB] [OVERSIZE]
@@ -483,6 +491,20 @@ got=$( (cd "$RC" && ./fetch.sh --classify-dir "$DR" "$DO") 2> "$OUTD/R09.err" | 
 rcase R10 '.inconsistent = false | .degree_reached = 7 | .oversize = true | .timed_out = true' - 0 0 "ADMITTED P2d d_F=>= 7 censored=size" "review 4 S4: oversize true with no stop line (no contrary stop line) -> censored by size"
 rcase R11 '.inconsistent = false | .degree_reached = 7 | .timed_out = true' - 0 0 "ADMITTED P2d d_F=>= 7 censored=budget" "review 4 S4: a deadline caught at the top of the step loop prints no stop line -> censored by the budget"
 got=$(jq -r '.oom_note // "none"' "$OUTD/D31.txt"); [ "$got" != none ]; rec D31b $? "oom_note present" "${got:0:40}" "review 4 S8: an OOM with the peak (30 GiB) under 90 percent of memory.max is annotated as a likely host-level or group kill"
+# Owner decision 28: the host-limit abort (P2h), on fixtures and on the committed tree of the Amendment 33 probe.
+hcase() { # hcase ID OOM ALLOC_LINE(1|0) CG_PEAK EXPECTED DESCRIPTION
+  nd "$1"; mktree "$TD" $S54 "$S0" "$okE" 134 0 "$2" 1 "$4" keep; jq --arg st $S54 '.stage = $st' "$DR/pod-state.json" > "$DR/x" && mv "$DR/x" "$DR/pod-state.json"
+  [ "$3" = 1 ] && printf 'memory allocation of 262144 bytes failed\nmemory allocation of 456768 bytes failed\n' >> "$TD/runs/X-m2-t8-k0-c5.log"
+  ck "$DR" $P2E prefetch done "$S0" "$okE" 1 200 RUNNING "$L0" true; collect "$DR" "$DO" done true $PCOL
+  local got; got=$( (cd "$RC" && ./fetch.sh --classify-dir "$DR" "$DO") 2> "$OUTD/$1.err" | tee "$OUTD/$1.txt" | jq -r '.class + " " + .rule + " host_limit=" + ((.host_limit // false) | tostring)')
+  [ "$got" = "$5" ]; rec "$1" $? "$5" "$got" "$6"
+}
+hcase D50 0 1 - "NOT_ADMITTED P2h host_limit=true" "exit 134, two failed allocations, oom_kill 0, peak 64 MiB under memory.max -> host-limit abort"
+hcase D51 1 1 - "OOM P2k host_limit=false" "the same with cgroup oom_kill 1 -> OOM, not a host limit"
+hcase D52 0 0 - "NOT_ADMITTED P2e host_limit=false" "exit 134 without an allocation failure line -> P2e, not a host limit"
+hcase D53 0 1 257000000000 "NOT_ADMITTED P2h host_limit=true" "pilot peak 64 MiB (primary) under the limit even with a cgroup peak file above it -> host limit"
+got=$( (cd "$RC" && ./fetch.sh --classify-dir "$RC/receipts/pkm-x-t14-k0-c7-d54" "$RC/results/pkm-x-t14-k0-c7-d54") 2> "$OUTD/D54.err" | tee "$OUTD/D54.txt" | jq -r '.class + " " + .rule + " host_limit=" + ((.host_limit // false) | tostring)')
+[ "$got" = "NOT_ADMITTED P2h host_limit=true" ]; rec D54 $? "NOT_ADMITTED P2h host_limit=true" "$got" "the committed collect-1 tree of pkm-x-t14-k0-c7-d54 (vm.max_map_count 65530, abort at step 34) reads as a host-limit abort (read only)"
 nd D38; ck "$DR" $((S0E + 4000)) regular idle "" "" null 200 EXITED "$L0" true; collect "$DR" "$DO" lost false $((S0E + 4010)); dcase D38 "LOST P3" "runner idle and status EXITED" owner
 nd D39; printf '{"at":"%s","action":"DELETE","pod":"p1","reason":"x"}\n' "$(iso $((S0E + 3000)))" > "$DR/session-actions.jsonl"; ck "$DR" $((S0E + 4000)) regular null "" "" null 200 EXITED "$L0" true; collect "$DR" "$DO" lost false $((S0E + 4010)); dcase D39 "LOST P3" "status EXITED after the session logged a delete" owner
 nd D40; ck "$DR" $((S0E + 4000)) regular idle "" "" null 200 RUNNING "$L0" true; printf '{"at":"broken' >> "$DR/checkins.jsonl"; dcase D40 "NO_EVIDENCE P0" "S2: a truncated check-in line fails closed"
@@ -512,6 +534,15 @@ ecase E11 BLOCKED:$BASE "base in flight" $BASE:INFLIGHT
 ecase E12 BLOCKED:$R1 "base LOST auto, relaunch in flight" $BASE:LOST $R1:INFLIGHT
 ecase E13 ALL_RESOLVED "base LOST auto, relaunch LOST auto: no third attempt" $BASE:LOST $R1:LOST
 ecase E14 ALL_RESOLVED "base LOST auto, relaunch ADMITTED" $BASE:LOST $R1:ADMITTED
+ecase E15 $H2 "owner decision 28: h1 a host-limit abort -> h2" $BASE:HOSTLIMIT
+ecase E16 $H3 "h1 and h2 host-limit aborts -> h3" $BASE:HOSTLIMIT $H2:HOSTLIMIT
+ecase E17 ALL_RESOLVED "three host-limit aborts: no fourth retry (owner)" $BASE:HOSTLIMIT $H2:HOSTLIMIT $H3:HOSTLIMIT
+ecase E18 $H2 "h1 LOST auto, its relaunch a host-limit abort -> h2" $BASE:LOST $R1:HOSTLIMIT
+ecase E19 $H2R "h1 host-limit abort, h2 LOST auto -> h2's relaunch" $BASE:HOSTLIMIT $H2:LOST
+ecase E20 ALL_RESOLVED "h1 NOT_ADMITTED without a host limit: resolved (owner)" $BASE:NOT_ADMITTED
+ecase E21 BLOCKED:$H2 "h1 host-limit abort, h2 in flight" $BASE:HOSTLIMIT $H2:INFLIGHT
+ID=E22; mksb; mkdir -p "$R/receipts/$BASE.hostrefused-1" "$R/receipts/$BASE.hostrefused-2"; got=$(cd "$R" && bash -c '. ./common.sh; next_allowed' 2>&1)
+[ "$got" = "$BASE" ]; rec E22 $? "$BASE" "$got" "pods refused by the host check do not use the name: h1 is offered again"
 
 # ===================================================================== F. reap.sh against the stub
 ID=F01; mksb; old=$(isod $(( $(date +%s) - 27 * 3600 ))); young=$(isod $(( $(date +%s) - 3600 )))

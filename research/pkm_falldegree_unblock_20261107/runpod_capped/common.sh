@@ -9,7 +9,7 @@ set -euo pipefail
 here=${here:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}
 study=$(cd "$here/.." && pwd)
 PREREG="$study/../prime_fall_degree_20261027/PREREGISTRATION.md"
-AMENDMENT_HEADING='## Amendment 33'
+AMENDMENT_HEADING='## Amendment 34'       # the host check of owner decision 28 (Amendment 33 stays in force)
 RP="$here/rp_pinned.sh"
 RP_SHA=b4b6019934e02ffa32043e2e6b9aee4eb4dcc53b42442b2e01d1b30ccf536c5d       # = main's runpod/rp.sh at d2a16c723d
 SERVER="$here/server_pinned.py"
@@ -28,7 +28,7 @@ DEADLINE_S=90000                          # the registered job time limit (reque
 START_WITHIN_S=3300                       # the runner must start within 55 min of creation, so start + 25 h <= creation + 26 h
 HARD_S=93600                              # 26 h after creation: the reaper deletes any pkm-x- pod older than this
 PUSH_WAIT_S=7200                          # a completed run's pod waits at most 2 h for the git gate (decision 22)
-CLASSIFIER_VERSION=a33-r3                 # recorded in every outcome.json with the SHA-256 of fetch.sh and common.sh (S3)
+CLASSIFIER_VERSION=a34-r1                 # recorded in every outcome.json with the SHA-256 of fetch.sh and common.sh (S3)
 # The frozen image, pinned here rather than read from the mutable image/*.json files (S3); run.sh checks they agree.
 LAYER_DIGEST=a0f7e28eb0759ddefc4b906974866d2a2215d4705e25e9fd1fca45513b8b1971
 BIN_SHA_PINS='pkm_tower_pilot f78f39599d75859a693d3177272e95cae79559eebb10c1ac528e0cb13e4fcee7
@@ -46,10 +46,14 @@ POLL_S=${RPC_POLL_S:-10}                  # seconds between API polls (only the 
 RAYON=12                                  # Amendment 9; rp_pinned.sh start sends rayon 12
 REC_ROOT="$here/receipts" DEV_ROOT="$here/receipts_dev" OUT_ROOT="$here/results" REAP_DIR="$here/reaper"
 LEDGER="$here/ledger.tsv"
-# The one cell (owner decisions 20 and 24): t = 14, draw 0, cap 7, at --max-dense 54000000000. Its one relaunch
-# (owner decision 13) runs only after a LOST with positive host-side evidence.
+# The one cell (owner decisions 20, 24 and 28): t = 14, draw 0, cap 7, at --max-dense 54000000000. The Amendment 33
+# name pkm-x-t14-k0-c7-d54 is used (NOT_ADMITTED, host limit; RESULTS_d54.md) and retired; owner decision 28 adds at most
+# three retries h1..h3 on hosts that pass the vm.max_map_count check, each with one relaunch -r1 (owner decision 13).
 STUDY_STAGE=cap:14:0:7:54000000000
-STUDY_NAMES=(pkm-x-t14-k0-c7-d54 pkm-x-t14-k0-c7-d54-r1)   # the c7-m112 names of decision 23 are retired (cell measured)
+STUDY_BASE=pkm-x-t14-k0-c7-d54
+STUDY_NAMES=($STUDY_BASE-h1 $STUDY_BASE-h1-r1 $STUDY_BASE-h2 $STUDY_BASE-h2-r1 $STUDY_BASE-h3 $STUDY_BASE-h3-r1)
+MAP_COUNT_MIN=262144                      # owner decision 28: the host's vm.max_map_count must be at least this before start
+HOST_REFUSE_MAX=5                         # at most this many pods per name refused by the host check (then the owner)
 STUDY_SRC_REL=requests_r2i/pfd-x-t14-k0-c6.json                      # the frozen request it is derived from
 STUDY_REQUEST="$here/requests_d54/pfd-x-t14-k0-c7-d54.json"           # written by make_requests_d54.sh
 STUDY_REQUEST_SHA=089176f2a75dc228a817dc1b88852cd1953fbfcd63e0452189acd4765f70d025   # pinned; see make_requests_d54_output.txt
@@ -133,15 +137,29 @@ outcome_of() {
 # (positive host-side evidence) gets the cell's one relaunch; ABORTED, NO_EVIDENCE and a LOST with relaunch "owner"
 # resolve the cell for the owner.
 lostauto() { [ "$2" = LOST ] && jq -e '.relaunch == "auto"' "$REC_ROOT/$1/outcome.json" >/dev/null 2>&1; }
-# next_allowed: the only study name run.sh may launch now, BLOCKED:<name>, or ALL_RESOLVED. The attempt here is the
-# cell's d54 attempt itself (owner decision 24); no size step follows it from this amendment.
+# hostlimit NAME: the classifier read this attempt as a host-limit abort (P2h: an allocation failure with no oom_kill and
+# the peak under the pod's memory.max), the case owner decision 28 retries on another host.
+hostlimit() { jq -e '.class == "NOT_ADMITTED" and .host_limit == true' "$REC_ROOT/$1/outcome.json" >/dev/null 2>&1; }
+# next_allowed: the only study name run.sh may launch now, BLOCKED:<name>, or ALL_RESOLVED (owner decision 28). Retry N
+# (h1, h2, h3) runs only after retry N-1 ended as a host-limit abort (itself or its relaunch); its relaunch -r1 only after
+# a LOST with relaunch "auto" (owner decision 13). Any other outcome resolves the cell. A host refusal before start
+# (run.sh exit 13) moves the receipts aside, so the same name is offered again (at most HOST_REFUSE_MAX pods per name).
 next_allowed() {
-  local b=${STUDY_NAMES[0]} r=${STUDY_NAMES[1]} o
-  o=$(outcome_of "$b")
-  case $o in NONE) echo "$b"; return ;; INFLIGHT|NOT_AN_ATTEMPT|PENDING) echo "BLOCKED:$b"; return ;; esac
-  lostauto "$b" "$o" || { echo ALL_RESOLVED; return; }
-  o=$(outcome_of "$r")
-  case $o in NONE) echo "$r" ;; INFLIGHT|NOT_AN_ATTEMPT|PENDING) echo "BLOCKED:$r" ;; *) echo ALL_RESOLVED ;; esac
+  local n b r o
+  for n in 1 2 3; do
+    b="$STUDY_BASE-h$n" r="$STUDY_BASE-h$n-r1"
+    o=$(outcome_of "$b")
+    case $o in NONE) echo "$b"; return ;; INFLIGHT|NOT_AN_ATTEMPT|PENDING) echo "BLOCKED:$b"; return ;; esac
+    if lostauto "$b" "$o"; then
+      o=$(outcome_of "$r")
+      case $o in NONE) echo "$r"; return ;; INFLIGHT|NOT_AN_ATTEMPT|PENDING) echo "BLOCKED:$r"; return ;; esac
+      hostlimit "$r" && continue
+      echo ALL_RESOLVED; return
+    fi
+    hostlimit "$b" && continue
+    echo ALL_RESOLVED; return
+  done
+  echo ALL_RESOLVED
 }
 
 # Study-wide cost ledger (owner decision 27: guard US$595, ceiling US$600). Rows: job route authority state usd source
@@ -160,5 +178,12 @@ ledger_close() { # ledger_close JOB USD SOURCE: closes this route's open row for
   local t; t=$(mktemp "$LEDGER.XXXX")  # or adds a closed row when none is open (a pod found only after a failed create)
   awk -F'\t' -v OFS='\t' -v j="$1" -v u="$2" -v s="$3" '$1 == j && $2 == "runpod_capped" && $4 == "open" { $4 = "closed"; $5 = u; $6 = s; hit = 1 } { print }
     END { if (!hit) print j, "runpod_capped", "Amendment 33", "closed", u, s }' "$LEDGER" > "$t"
+  mv "$t" "$LEDGER"
+}
+# ledger_rename OLD NEW: renames this route's row for job OLD (a pod refused by the host check is booked as
+# NAME.hostrefused-<k>/<pod id>, so N6's ledger_has, which matches NAME/..., does not block the same name).
+ledger_rename() {
+  local t; t=$(mktemp "$LEDGER.XXXX")
+  awk -F'\t' -v OFS='\t' -v o="$1" -v n="$2" '$1 == o && $2 == "runpod_capped" { $1 = n } { print }' "$LEDGER" > "$t"
   mv "$t" "$LEDGER"
 }

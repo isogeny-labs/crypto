@@ -41,6 +41,8 @@ here=$(cd "$(dirname "$0")" && pwd); . "$here/common.sh"
 #       P2c an end line exit 137, no oom evidence                                         -> LOST
 #       P2k cgroup oom_kill > 0, whatever the exit codes                                  -> OOM (censored at this size)
 #       P2p the memory peak exceeds the pod's numeric cgroup memory.max                   -> OOM (censored at this size)
+#       P2h pilot exit 134 with "memory allocation of N bytes failed" in its log, oom_kill 0 and the peak under the
+#           pod's numeric memory.max: a host-limit abort (owner decision 28)          -> NOT_ADMITTED, host_limit true
 #       P2u no memory peak observable                                                     -> NOT_ADMITTED
 #       P2d admission rules hold                                                          -> ADMITTED, with a reading
 #       P2e otherwise                                                                     -> NOT_ADMITTED
@@ -71,7 +73,7 @@ jsonlok() { [ ! -s "$1" ] || jq -e -s . "$1" >/dev/null 2>&1; }
 
 facts() {
   local R=$1 RES=$2 bad="" f stage cell s0 L0 ck acts cols K col O rs nstart pexit gexit oom cgp mmax man row floor
-  local r1 r2 r3 r4 r5 r6 r7 cgb cgsrc logmib limit disagree lim stop
+  local r1 r2 r3 r4 r5 r6 r7 cgb cgsrc logmib limit disagree lim stop afail
   # P0: every receipt the classifier reads must parse (fail closed).
   for f in "$R"/pod-create.json "$R"/pod-record.json "$R"/pod-state.json "$R"/pod-record-start.json "$R"/collect-[0-9]*.json "$R"/collect-started-*.json "$R"/transfer-*.json; do
     [ -e "$f" ] || continue; jsonok "$f" || bad="$bad ${f##*/}"
@@ -123,7 +125,9 @@ facts() {
   if [ "$lim" = null ]; then lim=$(jq -r '(.cgroup_memory_limit // "") | if test("^[0-9]+$") then tonumber else null end' "$R/cgroup-prestart.json" 2>/dev/null || echo null); fi
   [ -n "$lim" ] || lim=null
   # The stop line of the cell's log ("budget" or "oversize"), read for the reading of section 2.
-  stop=null
+  stop=null afail=0
+  [ -n "$cell" ] && [ -f "$O/runs/$cell.log" ] && afail=$(grep -cE "memory allocation of [0-9]+ bytes failed" "$O/runs/$cell.log" || true)
+  [ -n "$afail" ] || afail=0
   if [ -n "$cell" ] && [ -f "$O/runs/$cell.log" ]; then
     stop=$(grep -oE 'tower stop in step [0-9]+ \((budget|oversize)' "$O/runs/$cell.log" | tail -1 | sed -E 's/.*\(//' || true)
     if [ -n "$stop" ]; then stop="\"$stop\""; else stop=null; fi
@@ -163,14 +167,14 @@ facts() {
   jq -n --arg bad "$bad" --argjson dis "$disagree" --arg stage "$stage" --arg cell "$cell" --arg s0 "$s0" --arg L0 "$L0" \
     --argjson ck "$ck" --argjson acts "$acts" --argjson col "$col" --argjson ncol "$(jq length <<<"$cols")" \
     --argjson rs "$rs" --argjson nstart "$nstart" --argjson pexit "$pexit" --argjson gexit "$gexit" --argjson oom "$oom" \
-    --argjson cgp "$cgp" --argjson mmax "$mmax" --argjson row "$row" --argjson dls $DEADLINE_S --argjson lim "$lim" --argjson stop "$stop" \
+    --argjson cgp "$cgp" --argjson mmax "$mmax" --argjson row "$row" --argjson dls $DEADLINE_S --argjson lim "$lim" --argjson stop "$stop" --argjson afail "$afail" \
     --argjson cgb "$cgb" --argjson cgsrc "$cgsrc" --argjson logmib "$logmib" --argjson size "$limit" \
     --argjson adm "{\"r1\":$r1,\"r2\":$r2,\"r3\":$r3,\"r4\":$r4,\"r5\":$r5,\"r6\":$r6,\"r7\":$r7}" \
     '{unparsable:$bad, collections_disagree:$dis, stage:$stage, cell:$cell, s0:(if $s0 == "" then null else $s0 end),
       L0:(if $L0 == "" then null else $L0 end),
       checkins:$ck, actions:$acts, collect:$col, collections:$ncol,
       tree:{runner_state:$rs, start_lines:$nstart, pilot_exit:$pexit, gridzeros_exit:$gexit,
-      cgroup_present:$cgp, oom_kill:$oom, memory_max:$mmax, limit_bytes:$lim, stop:$stop}, row:$row, admission:$adm,
+      cgroup_present:$cgp, oom_kill:$oom, memory_max:$mmax, limit_bytes:$lim, stop:$stop, alloc_failures:$afail}, row:$row, admission:$adm,
       mem:{size:$size, cgroup_peak_bytes:$cgb, cgroup_peak_source:$cgsrc, pilot_peak_mib:$logmib}, deadline_s:$dls}'
 }
 
@@ -233,6 +237,10 @@ decide() { jq -c --arg ver "$CLASSIFIER_VERSION" --arg fsha "$(sha256sum "$here/
         elif $k137 then $base + {class:"LOST", rule:"P2c", memory:$mem, why:"exit 137 without oom evidence (oom_kill \($f.tree.oom_kill // "absent"))"} + $rl
         elif $oomk then $base + {class:"OOM", rule:"P2k", memory:$mem, why:"cgroup oom_kill \($f.tree.oom_kill) (no exit 137 in the end lines); censored at this size"}
         elif $pk.peak_bytes != null and $f.tree.limit_bytes != null and $pk.peak_bytes > $f.tree.limit_bytes then $base + {class:"OOM", rule:"P2p", why:"memory peak \($pk.peak_bytes) bytes (\($pk.source)) above the pod'"'"'s cgroup memory.max \($f.tree.limit_bytes); censored at this size", memory:$mem}
+        elif $f.tree.pilot_exit == 134 and ($f.tree.alloc_failures // 0) > 0 and (($f.tree.oom_kill // 0) == 0)
+             and $pk.peak_bytes != null and $f.tree.limit_bytes != null and $pk.peak_bytes < $f.tree.limit_bytes
+          then $base + {class:"NOT_ADMITTED", rule:"P2h", host_limit:true, memory:$mem,
+            why:"host-limit abort: the pilot exited 134 after \($f.tree.alloc_failures) failed allocation(s) with oom_kill 0 and peak \($pk.peak_bytes) bytes under memory.max \($f.tree.limit_bytes); no row, no reading (owner decision 28)"}
         elif $pk.peak_bytes == null then $base + {class:"NOT_ADMITTED", rule:"P2u", why:"no memory peak observable (no pilot VmHWM field and no cgroup peak file)", memory:$mem}
         elif ($f.admission | all(.[]; . == true)) then $base + {class:"ADMITTED", rule:"P2d", why:"completed; admission rules 1-7 hold", row:$f.row, memory:$mem}
         else $base + {class:"NOT_ADMITTED", rule:"P2e", why:"completed, but admission rules failed: \([$f.admission | to_entries[] | select(.value != true) | .key] | join(","))", memory:$mem}

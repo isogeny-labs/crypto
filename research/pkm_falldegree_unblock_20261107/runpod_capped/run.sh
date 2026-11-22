@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # run.sh NAME STAGE  -- start ONE capped F4 run on a reserved RunPod CPU pod (Amendment 33 draft,
 # AMENDMENT_R2_H_runpod_capped.md, sections 3-5). Shell only. RunPod REST v2.
-#   NAME   pkm-x-t14-k0-c7-d54, or its one relaunch pkm-x-t14-k0-c7-d54-r1 (only after a LOST with relaunch "auto";
-#          next_allowed in common.sh), or pkm-x-dev-<word> for a development check (t <= 10 only; receipts in
+#   NAME   pkm-x-t14-k0-c7-d54-h1, -h2, -h3 (owner decision 28), each with one relaunch -r1 (only after a LOST with
+#          relaunch "auto"); the order is next_allowed in common.sh, or pkm-x-dev-<word> for a development check (t <= 10 only; receipts in
 #          receipts_dev/; not data).
 #   STAGE  cap:T:K:C:DENSE; for a study name it must be cap:14:0:7:54000000000, which is command[1] of the pinned request.
 # Env: RPC_STATE (private scratch dir outside the worktree), RPC_BIN (dir with the four study binaries and entry_r2.sh),
@@ -11,7 +11,8 @@
 # Exit: 0 started; 2 usage; 3 refused before create (nothing created, no attempt); 4 refused or failed after the create
 #       call, pod deleted and confirmed gone (not an attempt); 5 upload or start failed, pod deleted and confirmed gone (not
 #       an attempt); 10 cpu5m not in stock (nothing created, no attempt); 11 a pre-start deletion was not confirmed (the
-#       pod may still exist: run reap.sh, tell the owner).
+#       pod may still exist: run reap.sh, tell the owner); 13 the host check refused the pod (vm.max_map_count below 262,144
+#       or unreadable; owner decision 28), pod deleted and confirmed gone, the name not used: run run.sh again for another host.
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd); . "$here/common.sh"
 [ $# -eq 2 ] || { echo "usage: run.sh NAME STAGE" >&2; exit 2; }
@@ -29,6 +30,8 @@ id="" started=0 created_rec=0 upd="" q="" tokf="" bodyf=""
 [ ! -e "$OUT" ] || refuse "results directory $OUT already exists (never overwritten)"
 npre=$(compgen -G "$REC.prestart-*" | wc -l || true)
 [ "$npre" -lt 2 ] || refuse "$NAME already had $npre pre-start failures; a third goes to the owner"
+nhost=$(compgen -G "$REC.hostrefused-*" | wc -l || true)   # pods refused by the host check (owner decision 28)
+[ "$nhost" -lt "$HOST_REFUSE_MAX" ] || refuse "$NAME already had $nhost pods refused by the host check; the next goes to the owner"
 [ -f "$LEDGER" ] && ledger_has "$NAME" && refuse "$NAME already has a row in $LEDGER (any state): a further attempt needs the owner (N6)"
 
 # 1. Name, stage, request, order.
@@ -141,7 +144,7 @@ precleanup() {
     n=$(list_pkm 2>/dev/null | jq -r --arg n "$NAME" 'select(.name == $n) | .id' | tr '\n' ' ' || true)
     ids=$(echo "$ids $n" | tr ' ' '\n' | sort -u | tr '\n' ' '); [ -n "${ids// /}" ] && break; [ -n "$id" ] && break; sleep "$POLL_S"
   done
-  for i in $ids; do session_action "$REC" DELETE "$i" "pre-start failure (exit $rc)"
+  for i in $ids; do session_action "$REC" DELETE "$i" "pre-start failure (exit $rc$([ "$rc" = 13 ] && echo ", host check of owner decision 28"))"
     c=$(api_code DELETE "$API/pods/$i" "$REC/predelete-$i.response"); log "pre-start delete pod $i: HTTP $c"; done
   for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
     n=$(list_pkm 2>/dev/null) || { sleep "$POLL_S"; continue; }
@@ -160,6 +163,18 @@ precleanup() {
   jq -n --arg ids "$ids" --arg d "$deleted" --argjson s "$s" --argjson p "$p" --argjson u "$usd" --argjson g "$gone" --argjson rc "$rc" \
     '{pods:($ids|split(" ")|map(select(length>0))),deleted:$d,seconds_at_least:$s,cost_per_hr:$p,usd_derived:$u,reason:"pre-start failure",exit:$rc,confirmed_gone:($g==1)}' > "$REC/cost.json"
   jq -n --argjson rc "$rc" '{class:"NOT_AN_ATTEMPT",rule:"P1",reason:"failure before the runner started",exit:$rc,ended_by_signal:($rc >= 128)}' > "$REC/outcome.json"
+  # Owner decision 28: a pod refused by the host check, deleted and confirmed gone, does not use the name. Its receipts
+  # go to <name>.hostrefused-<k>, its ledger row is booked as <name>.hostrefused-<k>/<pod id> (so N6 does not match it),
+  # and the next run.sh of the same name may create a new pod (at most HOST_REFUSE_MAX per name).
+  if [ "$rc" = 13 ] && [ "$gone" = 1 ] && [ -n "$id" ]; then
+    local h=1; while [ -e "$REC.hostrefused-$h" ]; do h=$((h + 1)); done
+    jq -n --arg m "${mmc:-unreadable}" --argjson t "$MAP_COUNT_MIN" '{class:"NOT_AN_ATTEMPT",rule:"P1",host_refused:true,
+      reason:"host vm.max_map_count \($m) below \($t) or unreadable; refused before start (owner decision 28)",exit:13}' > "$REC/outcome.json"
+    ledger_close "$NAME/$id" "$usd" "${REC#"$here/"}.hostrefused-$h/cost.json" 2>/dev/null || true
+    ledger_rename "$NAME/$id" "$NAME.hostrefused-$h/$id"
+    log "host refused (vm.max_map_count ${mmc:-unreadable}): pod $id deleted, confirmed gone; receipts moved to $REC.hostrefused-$h; the name stays free"
+    rpc_cleanup; mv "$REC" "$REC.hostrefused-$h"; remind "${REC#"$here/"}.hostrefused-$h"; exit 13
+  fi
   local k=1; while [ -e "$REC.prestart-$k" ]; do k=$((k + 1)); done
   # S7: the ledger row is closed only when the deletion is confirmed; otherwise it stays open at the worst case.
   if [ "$gone" = 1 ]; then ledger_close "$NAME/${id:-${ids// /}}" "$usd" "${REC#"$here/"}.prestart-$k/cost.json" 2>/dev/null || true
@@ -282,6 +297,14 @@ jq -n --arg v "$mm" --arg s "${mmsrc:-none}" --argjson x "$(printf '%s' "${extra
 { { [ "$mm" = max ] && ! is_study "$NAME"; } || { [[ $mm =~ ^[0-9]+$ ]] && [ "$mm" -ge "$POD_LIMIT_BYTES" ]; }; } \
   || { log "REFUSED cgroup memory limit '${mm:-unobservable}' (${mmsrc:-no file}): must be >= $POD_LIMIT_BYTES bytes (max only for development names); owner"; exit 4; }
 log "cgroup memory limit $mm ($mmsrc)"
+# 10c. The host check of owner decision 28: the host's vm.max_map_count, which the boot loop copies once at boot from
+#      /proc/sys/vm/max_map_count into /results/cgroup/max_map_count (read here from the pre-start fetch, recorded in
+#      cgroup-prestart.json; the runner's /status does not report it). Below MAP_COUNT_MIN or unreadable: the pod is
+#      deleted before start (exit 13) and the name stays free for another host.
+mmc=$(jq -r '.recorded.max_map_count // empty' "$REC/cgroup-prestart.json" 2>/dev/null || true)
+[[ $mmc =~ ^[0-9]+$ ]] && [ "$mmc" -ge "$MAP_COUNT_MIN" ] \
+  || { log "REFUSED host: vm.max_map_count '${mmc:-unreadable}' below $MAP_COUNT_MIN (owner decision 28); deleting the pod before start"; exit 13; }
+log "host vm.max_map_count $mmc (>= $MAP_COUNT_MIN)"
 
 # 11. Deadlines written before start (S6, decision D3), then start.
 ce=$(epoch "$(jq -r '.createdAt' "$REC/pod-create.json")")
