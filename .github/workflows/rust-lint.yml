@@ -4,9 +4,10 @@ name: Rust lint
 # (src/, tests/, examples/, benches/) and cd_attack/. The crates under
 # research/ are archived snapshots and are not linted.
 #
-# - Format is PR-scoped, because the tree predates the check. Three maintained
-#   prime-root files are temporarily exempt: archived A/B extractors match
-#   exact source blocks in them, so reformatting changes the frozen controls.
+# - Format is PR-scoped, because the tree predates the check. Three exact
+#   prime-root blobs are temporarily exempt: archived A/B extractors match
+#   source blocks in them, so reformatting changes the frozen controls. Any
+#   later edit to those files must pass rustfmt or renew its explicit pin.
 # - Clippy runs with -D warnings: every compiler and clippy warning fails
 #   the build. The allow list lives in Cargo.toml `[lints]`, and each
 #   remaining exception is an item-level #[allow] next to the code.
@@ -157,12 +158,16 @@ jobs:
           out=$(rustfmt --edition 2021 --check "${files[@]}" 2>&1 || true)
           bad=0
           for f in "${files[@]}"; do
+            expected_blob=
             case "$f" in
-              src/cryptanalysis/prime_radical_root.rs|src/cryptanalysis/prime_root_bounded.rs|src/cryptanalysis/prime_root_trace.rs)
-                echo "legacy source-bound benchmark formatting exception: $f"
-                continue
-                ;;
+              src/cryptanalysis/prime_radical_root.rs) expected_blob=22be2c51d8e248586a9fadf68ca2adeed4118637 ;;
+              src/cryptanalysis/prime_root_bounded.rs) expected_blob=ecf253a2c81b69748efb4277802c09e60bf326ec ;;
+              src/cryptanalysis/prime_root_trace.rs) expected_blob=87bf4e69952c85fffa9ba73bc33862b513ab42cb ;;
             esac
+            if [ -n "$expected_blob" ] && [ "$(git hash-object "$f")" = "$expected_blob" ]; then
+              echo "pinned source-bound benchmark formatting exception: $f"
+              continue
+            fi
             if grep -q "^Diff in $PWD/$f" <<<"$out"; then
               echo "::error file=$f::not rustfmt-clean; run: rustfmt --edition 2021 $f"
               bad=1
