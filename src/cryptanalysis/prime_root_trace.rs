@@ -1501,6 +1501,32 @@ fn vcubic_replay_square(a: &[u64], m: &[u64], p: u64) -> Vec<u64> {
 // All field additions and doubled cross terms fit u64 because p <= 2^61-1.
 #[inline]
 fn quartic_reduce(mut t: [u64; 7], c: [u64; 4], p: u64) -> [u64; 4] {
+    // Sparse quartic moduli occur during splitting. Avoid modular products
+    // by zero, and use coefficient copying for unit coefficients. Gate the
+    // extra tests once so dense moduli retain their original inner loop.
+    if c[1] == 0 || c[2] == 0 {
+        for degree in (4..=6).rev() {
+            let high = t[degree];
+            if high == 0 { continue; }
+            if c[0] != 0 {
+                let x = if c[0] == 1 { high } else { vmul(high, c[0], p) };
+                t[degree - 4] = quadratic_sub(t[degree - 4], x, p);
+            }
+            if c[1] != 0 {
+                let x = if c[1] == 1 { high } else { vmul(high, c[1], p) };
+                t[degree - 3] = quadratic_sub(t[degree - 3], x, p);
+            }
+            if c[2] != 0 {
+                let x = if c[2] == 1 { high } else { vmul(high, c[2], p) };
+                t[degree - 2] = quadratic_sub(t[degree - 2], x, p);
+            }
+            if c[3] != 0 {
+                let x = if c[3] == 1 { high } else { vmul(high, c[3], p) };
+                t[degree - 1] = quadratic_sub(t[degree - 1], x, p);
+            }
+        }
+        return [t[0], t[1], t[2], t[3]];
+    }
     for degree in (4..=6).rev() {
         let high = t[degree];
         if high == 0 { continue; }
@@ -1513,14 +1539,14 @@ fn quartic_reduce(mut t: [u64; 7], c: [u64; 4], p: u64) -> [u64; 4] {
 }
 // A quartic coefficient is the sum of at most four products of canonical
 // residues. For p=2^61-1, this sum is < 4*(p-1)^2 < 2^124: it fits u128.
-// Folding the Mersenne modulus three times is enough even for that upper
-// bound. Accumulate before reduction to avoid 16 modular reductions per
+// Two Mersenne folds suffice: after the first, the high part is at
+// most four; the second is at most p+4, so one subtraction canonicalizes.
+// Accumulate before reduction to avoid 16 modular reductions per
 // multiplication (or 10 per symmetric square).
 #[inline]
 fn quartic_mersenne_reduce(value: u128) -> u64 {
     let p = MAX_PRIME as u128;
     let folded = (value & p) + (value >> 61);
-    let folded = (folded & p) + (folded >> 61);
     let folded = (folded & p) + (folded >> 61);
     if folded >= p { (folded - p) as u64 } else { folded as u64 }
 }
@@ -3416,4 +3442,64 @@ mod round108_unit_monomial_fastpaths {
             }
         }
     }
+
+    #[test]
+    fn quartic_mersenne_two_fold_and_sparse_reduction_oracle() {
+        // Independent u128 division, not the optimized vmul/folding code.
+        let p = MAX_PRIME;
+        let mut seed = 0xa319_5432_fba9_87de_u64;
+        let mut next = || {
+            seed ^= seed << 7;
+            seed ^= seed >> 9;
+            seed ^= seed << 8;
+            seed % p
+        };
+        let oracle = |a: [u64; 4], b: [u64; 4], c: [u64; 4]| {
+            let mut t = [0u64; 7];
+            for i in 0..4 {
+                for j in 0..4 {
+                    let sum = t[i + j] as u128 + a[i] as u128 * b[j] as u128;
+                    t[i + j] = (sum % p as u128) as u64;
+                }
+            }
+            for degree in (4..=6).rev() {
+                let high = t[degree];
+                for j in 0..4 {
+                    let product = (high as u128 * c[j] as u128 % p as u128) as u64;
+                    let old = t[degree - 4 + j];
+                    t[degree - 4 + j] = if old >= product {
+                        old - product
+                    } else {
+                        old + p - product
+                    };
+                }
+            }
+            [t[0], t[1], t[2], t[3]]
+        };
+        for shape in 0..6 {
+            for case in 0..2000 {
+                let mut a = [next(), next(), next(), next()];
+                let mut b = [next(), next(), next(), next()];
+                let mut c = [next(), next(), next(), next()];
+                if shape & 1 != 0 { c[1] = 0; }
+                if shape & 2 != 0 { c[2] = 0; }
+                if shape == 4 { c[0] = 0; c[1] = 0; c[2] = 1; }
+                if shape == 5 { c[0] = 1; c[1] = 0; c[2] = 0; }
+                if case % 19 == 0 { a = [p - 1; 4]; }
+                if case % 23 == 0 { b = [p - 1; 4]; }
+                assert_eq!(quartic_mul(a, b, c, p), oracle(a, b, c),
+                    "shape={shape} case={case} multiply");
+                assert_eq!(quartic_square(a, c, p), oracle(a, a, c),
+                    "shape={shape} case={case} square");
+            }
+        }
+        for value in [
+            0u128, 1, p as u128, 4 * (p as u128 - 1).pow(2),
+            4 * (p as u128 - 1).pow(2) - 1,
+        ] {
+            assert_eq!(quartic_mersenne_reduce(value),
+                (value % p as u128) as u64);
+        }
+    }
+
 }
