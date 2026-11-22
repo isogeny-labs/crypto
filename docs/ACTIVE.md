@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+- [x] LFD paper runs (records, engine extract and Rust lift moved to lfd-summation-systems PR #37); this PR keeps the hky3 engine changes, the encoding control and the binary d_F ladder (Claude, started 2026-11-18, branch claude/lfd-ffd-paper-eprint-status-qq8fit, PR #4735)
+
 - [ ] Prime31 weighted-slot RR9 resultant encoding, exact Rust/independent controls and full-cost extraction gate (automation, started 2026-11-18, branch automation/prime31-rr9-weighted-resultant-20261118, PR #4728)
 - [ ] Daily public-source research PR sweep refresh (automation, started 2026-11-19, branch codex/daily-research-leads-20261118, PR #4724; preserve 2026-11-18 frozen evidence; no paid compute or merge)
 - [x] Exact universal formal-collision quotient for weighted Prime31 M6; bound gains from weight retuning (automation, completed 2026-11-18, branch automation/prime31-m6-throughput-ceiling-20261118, PR #4722; source-specific original Rust 40+2 tests and independent BigInt replay passed, signed PCC pending)
