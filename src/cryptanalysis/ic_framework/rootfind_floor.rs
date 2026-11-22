@@ -535,13 +535,17 @@ impl RootfindFloorOracle<'_> {
             yr[t] = f.to_mont(target.y);
         }
         ops.field_ops.muls += 2 * t_n as u64;
-        for t in 0..t_n {
-            if targets[t].infinity {
-                continue;
-            }
-            for i in 0..k {
-                let slot = t * k + i;
-                let d = f.sub(xr[t], self.reps[i].x);
+        // j-major (`slot = i * t_n + t`) so the post-inv loop streams diffs.
+        for i in 0..k {
+            let xi = self.reps[i].x;
+            for t in 0..t_n {
+                let slot = i * t_n + t;
+                if targets[t].infinity {
+                    self.degenerate[slot] = true;
+                    self.diffs[slot] = f.one;
+                    continue;
+                }
+                let d = f.sub(xr[t], xi);
                 self.degenerate[slot] = d == 0;
                 self.diffs[slot] = if d == 0 { f.one } else { d };
             }
@@ -557,11 +561,20 @@ impl RootfindFloorOracle<'_> {
                 prefetch_t0(&self.reps[i + 1] as *const _ as *const u8);
             }
             let rep = self.reps[i];
+            let mut open = 0u32;
             for t in 0..t_n {
-                if out[t].is_some() || targets[t].infinity {
+                if out[t].is_none() && !targets[t].infinity {
+                    open |= 1 << t;
+                }
+            }
+            if open == 0 {
+                break;
+            }
+            for t in 0..t_n {
+                if open & (1 << t) == 0 {
                     continue;
                 }
-                let slot = t * k + i;
+                let slot = i * t_n + t;
                 if self.degenerate[slot] {
                     let g = ctx.group;
                     for summand in [rep.plus, rep.minus] {

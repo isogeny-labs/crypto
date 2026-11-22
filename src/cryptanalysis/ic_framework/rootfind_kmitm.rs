@@ -1351,12 +1351,15 @@ impl RootfindKMitmOracle<'_> {
             yr[t] = f.to_mont(target.y);
         }
         ops.field_ops.muls += 2 * t_n as u64;
+        // Layout is **j-major**: `slot = j * t_n + t` so the post-inv hot
+        // loop (j outer, t inner) streams `diffs` / `degenerate` sequentially.
         let mut any_active = false;
-        for t in 0..t_n {
-            let target = targets[t];
-            for j in 0..n {
-                let slot = t * n + j;
-                let pj = fb.points[j];
+        for j in 0..n {
+            let pj = fb.points[j];
+            let (xj_m, _) = self.fb_mont[j];
+            for t in 0..t_n {
+                let slot = j * t_n + t;
+                let target = targets[t];
                 if g.is_identity(&pj) {
                     self.degenerate[slot] = true;
                     self.diffs[slot] = f.one;
@@ -1395,7 +1398,7 @@ impl RootfindKMitmOracle<'_> {
                     continue;
                 }
                 self.degenerate[slot] = false;
-                self.diffs[slot] = f.sub(self.fb_mont[j].0, xr[t]);
+                self.diffs[slot] = f.sub(xj_m, xr[t]);
                 any_active = true;
             }
         }
@@ -1415,11 +1418,20 @@ impl RootfindKMitmOracle<'_> {
                 prefetch_t0(&self.fb_mont[j + 1] as *const _ as *const u8);
             }
             let (xj, yj) = self.fb_mont[j];
+            let mut open = 0u32;
             for t in 0..t_n {
-                if out[t].is_some() {
+                if out[t].is_none() {
+                    open |= 1 << t;
+                }
+            }
+            if open == 0 {
+                break;
+            }
+            for t in 0..t_n {
+                if open & (1 << t) == 0 {
                     continue;
                 }
-                let slot = t * n + j;
+                let slot = j * t_n + t;
                 if self.degenerate[slot] {
                     continue;
                 }

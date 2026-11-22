@@ -113,11 +113,31 @@ single-target path.
 **Stop criterion:** preferred production probes (kmitm IFMA, floor IFMA) stay
 grade A with intensity declared and A_full ≈ A_single. Met on this host.
 
-### Tick 5 (loop stop) — reconfirm
+### Tick 5 — reconfirm
 
 Smoke remeasure with intensity declared: kmitm IFMA **A=0.939**, floor IFMA
-**A=0.920**. Stop criterion still holds. Unsubscribed `loop-rootfind-optlevel`.
+**A=0.920**. Preferred-path stop criterion held.
 
+### Tick 6 (scalar layout) — no gain
+
+Hypothesis: scalar-lane `diffs` were t-major (`slot = t·n + j`), so the
+post-inv hot loop (j outer, t inner) strode by `|F|` and paid cache/overhead
+that depressed attainment. Changed kmitm + floor scalar lanes to **j-major**
+(`slot = j·t_n + t`) and early-out when every lane has a hit.
+
+| Arm | Tick 3/5 A | Tick 6 A | Δ |
+|---|---:|---:|---|
+| kmitm:m=4 lanes8 | 0.179 | 0.177 | noise |
+| floor:m=3 lanes8 | 0.479 | 0.456 | noise / contention |
+| kmitm:m=4 IFMA | 0.939 | **0.949** | flat (still A) |
+| floor:m=3 IFMA | 0.920 | **0.919** | flat (still A) |
+
+Fail-closed on the layout lever: scalar lanes stay D/B; preferred IFMA stays
+A near the compute roof. Remaining scalar gap is SIMD / dependency (T-timing
+cannot split); IFMA is the production path when present.
+
+Probe harness now emits `working_set_bytes` + `bytes_declared` in the
+`optlevel.ops/v1` line (tables treated in-cache).
 
 ## Claim hygiene
 

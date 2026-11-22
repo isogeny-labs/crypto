@@ -159,14 +159,18 @@ fn main() {
     };
 
     let _ = params;
-    let bytes_declared = 0.0; // INTENSITY_UNKNOWN unless we declare traffic
+    // Tables for these probe sizes sit in L3 on this host class; DRAM
+    // traffic per op is ~0 once warm (`in_cache`). Declared bytes_per_op
+    // is a placeholder for the cold-line size of one mont key + word.
+    let working_set_bytes = (a.max(1) * 64).next_power_of_two().max(1 << 16) as u64;
+    let bytes_declared = 16.0;
     let line = json!({
         "schema": "optlevel.ops/v1",
         "ops": ops,
         "op_class": "modmuladd_p62",
         "kernel_seconds": kernel_seconds,
         "bytes_declared": bytes_declared,
-        "working_set_bytes": 0,
+        "working_set_bytes": working_set_bytes,
         "arm": arm,
         "mode": mode,
         "bits": bits,
@@ -174,7 +178,7 @@ fn main() {
         "targets": n_targets,
         "probes": probes,
         "ifma_prepared": ifma,
-        "note": "ops = charged Montgomery muls+sqrs on probe path; prepare excluded",
+        "note": "ops = charged Montgomery muls+sqrs on probe path; prepare excluded; tables treated in-cache",
         "pcc": "unverified",
     });
     println!("{line}");
