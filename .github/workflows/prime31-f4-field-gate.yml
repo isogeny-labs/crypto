@@ -1,0 +1,21 @@
+name: Prime31 F4 field-width smoke
+on:
+  push:
+    branches:
+      - research/prime31-f4-admission-run51-20261121
+  pull_request:
+    paths:
+      - 'examples/prime31_f4_field_gate.rs'
+      - 'src/cryptanalysis/f4_fp.rs'
+      - '.github/workflows/prime31-f4-field-gate.yml'
+  workflow_dispatch:
+
+jobs:
+  field-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Run exact Prime31 field arithmetic smoke
+        run: cargo run --release --example prime31_f4_field_gate
