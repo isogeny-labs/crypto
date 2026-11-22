@@ -1,0 +1,18 @@
+{
+  "schema": "h116-division-torsor-frobenius-launch/v1",
+  "protocol_id": "H116-DIVISION-TORSOR-FROBENIUS-001",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and exact hashes in DIVISION_TORSOR_FROBENIUS_SOURCE_GATE.md",
+  "torsion_order": 2,
+  "maps": 16,
+  "coordinate_scales": [1, 2, 3],
+  "required_half_cocycle_checks": 6080,
+  "required_multiset_checks": 1520,
+  "replicates": 4096,
+  "commands": {
+    "build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_division_torsor_frobenius.rs", "-o", "/tmp/h116_division_torsor_frobenius"],
+    "selftest": ["/tmp/h116_division_torsor_frobenius", "--selftest"],
+    "run": ["/tmp/h116_division_torsor_frobenius", "--run", "DIVISION_TORSOR_FROBENIUS_RESULT.json"]
+  },
+  "outputs": ["DIVISION_TORSOR_FROBENIUS_RESULT.json", "DIVISION_TORSOR_FROBENIUS_RUN.txt", "DIVISION_TORSOR_FROBENIUS_SHA256SUMS"],
+  "measurement_scope": "coordinate-selected geometric halves and their E[2]-valued Frobenius cocycles, with target-independent unselected-multiset, coordinate-rescaling, planted-scorer and family-wise shuffle controls; no generic decoder or ECDLP speedup claim"
+}
