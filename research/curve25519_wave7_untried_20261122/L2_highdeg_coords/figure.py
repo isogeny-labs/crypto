@@ -22,7 +22,7 @@ for y, lab in [(1, 'generic'), (0.5, '1/|H| = 1/2'), (0.25, '1/4'), (2, 'even co
     a1.text(len(arms) - 0.4, y, lab, fontsize=7, va='bottom', ha='right', color='gray')
 a1.set_xticks(range(len(arms)))
 a1.set_xticklabels(['v', 'x/y', 'uv', 'Y²/X³', 'y_E', 'x A/A', 'random', 'x_E', 'x_E·y_E', '2E (PC2)'], fontsize=8)
-a1.set_yscale('log'); a1.set_ylabel('coverage per column ÷ cols-matched x-frames')
+a1.set_yscale('log'); a1.set_yticks([0.25, 0.5, 1, 2]); a1.set_yticklabels(['0.25', '0.5', '1', '2']); a1.minorticks_off(); a1.set_ylabel('coverage per column ÷ cols-matched x-frames')
 a1.set_title('(a) census, k = 16 / 18 / 20, t = 4..7, K = 2000', fontsize=9)
 for k, c in cols.items():
     a1.plot([], [], 'o', color=c, label=f'k = {k}')
