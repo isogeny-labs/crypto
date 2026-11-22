@@ -126,6 +126,22 @@ theorem bernstein_quartic_lower
     _ ≤ b₀ * w₀ + b₁ * w₁ + b₂ * w₂ + b₃ * w₃ + b₄ * w₄ := by
       gcongr
 
+theorem interval_26_positive_F (t : ℝ)
+    (hl : (191 / 16 : ℝ) ≤ t) (hu : t ≤ (383 / 32 : ℝ)) :
+    (21517662721 / 1073741824 : ℝ) ≤
+      t ^ 4 - 1502 * t ^ 2 + 31976 * t - 187435 := by
+  let s : ℝ := 32 * t - 382
+  have hs₀ : 0 ≤ s := by dsimp [s]; linarith
+  have hs₁ : s ≤ 1 := by dsimp [s]; linarith
+  have hb := bernstein_quartic_lower
+    (35716865 / 65536 : ℝ) (74424129 / 131072 : ℝ)
+    (464404355 / 786432 : ℝ) (321454273 / 524288 : ℝ)
+    (666501633 / 1048576 : ℝ)
+    (21517662721 / 1073741824 : ℝ) s hs₀ hs₁
+    (by norm_num) (by norm_num) (by norm_num)
+    (by norm_num) (by norm_num)
+  convert hb using 1 <;> dsimp [s] <;> ring
+
 theorem numerical_height_gap_lt14 : (53 / 3 : ℝ) * Real.log 2 < 14 := by
   have hlog := Real.log_two_lt_d9
   linarith
@@ -140,6 +156,7 @@ theorem doubled_generator_x : F 17 1 = 5600 ∧ G 17 1 = 400 := by
 #print axioms resultant_lt_pow43
 #print axioms outer_tail_coefficient_bound
 #print axioms bernstein_quartic_lower
+#print axioms interval_26_positive_F
 #print axioms numerical_height_gap_lt14
 #print axioms doubled_generator_x
 
