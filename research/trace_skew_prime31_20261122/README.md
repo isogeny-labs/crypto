@@ -130,6 +130,22 @@ These are independently executed **Python arithmetic checks**, not original-sour
 4. Only if the trace–skew system is solver-stage competitive, integrate the existing Rust IC relation collector and verify authentic labelled independent rows, full rank/target-specific quotient rank, signed witnesses, complete unknown-target log recovery, and matched optimized negation rho and best project IC costs.
 5. A speedup in asymptotic exponent needs a **growing prime-field family**, end-to-end slope bounds with uncertainty and a proven or defensibly analysed sub-generic decomposition algorithm, not a constant-size p31 speedup. Neither theorem nor performance evidence here establishes it.
 
+## Original-crate Rust F4 pilot: actual S3 relations and m4 chains (not yet executed)
+
+[examples/prime31_trace_f4_pilot.rs](../../examples/prime31_trace_f4_pilot.rs) is checked in against the repository's existing `crypto_lib::cryptanalysis::f4_fp::{f4,F4Options,normalise}`, not a fresh CAS or Python performance harness. It symbolically generates all ordinary-`Fp` Newton moments and unitriangular degree-B reductions, verifies `max(total_degree(G_j)) <= B`, converts to the **same Grevlex F4 backend**, and records per-arm input degree, term count, matrix rows/cols, `solving_degree`, `degree_reached`, field operations, setup time, F4 time, timeout and degree cap. **The code has not been compiled or run in original Rust; no observed ratio is asserted.**
+
+Supported experiments:
+
+| Command option | Source curve and target | Matched arms | Gate / limitation |
+| --- | --- | --- | --- |
+| default | Prime31, existing cofactor-one ordinary fixture, B=3/4, planted **G+2G=3G** with x(G)=625037715, x(2G)=1923055775, x(3G)=265866980 | Ordered `h(x1),h(x2),S3(x1,x2,z)` versus symmetric raw H0,H1,S3(e1,e2,z) versus symmetric degree-B G0,G1,S3(e1,e2,z) | Exact same signed relation, original direct S3 degree 4 vs pair-symmetric S3 degree 2; all solutions/group signs still require replay |
+| `--m4` | Prime31 B=3/4, four-factor **membership-only** | Ordered 4 h equations vs raw H0..H3 vs degree-B G0..G3 | Algebraic instrumentation only, **not** S5 relation solver |
+| `--m4-s3` | Prime31, B=4 selected base x(G),x(2G),x(3G),x(4G), genuine planted **G+2G+3G+4G=10G** with u=x(3G),v=x(7G) | Ordered six-variable chain `S3(x1,x2,u),S3(x3,x4,v),S3(u,v,z)` plus four h; versus the exact same 6-variable chain using pair invariants (s12,t12,s34,t34,u,v) and 4 raw H or 4 degree-B G constraints | Original unspecialized auxiliary u,v; each arm has its own bounded F4 budget; F4 may time out, handle infinity charts separately in a complete solver |
+
+The planted m4 S3 identities have been independently checked with Python big-integer arithmetic modulo p=2147483647 (all three equal zero), as well as the published project fixture group multiples. **This is a planted correctness seed, not an unbiased factor-base relation-yield experiment**; it must be followed by exact small-field full zero-set checks, unknown-index uniform target studies, independent target relation rank, original Rust execution and matched best prior-DRL/rho. Stop censored F4 cells rather than treating a timeout as a solved system. Do not use single-target F4 time as a complete ECDLP cost.
+
+The `--m4-s3` chain tests a **pairwise radical quotient** (two pairs), not the global 4-invariant `G0..G3` plus expanded symmetric S5; both remain design choices with separate costs. The nearest repository incumbent is the September radical unordered-pair suite; comparison with its stored DRL basis and independent replay are mandatory before presenting any F4 speed result as competitive.
+
 ## Asymptotic decision boundary (explicit **heuristic**, not an attack theorem)
 
 For a growing family of ordinary prime-field curves with subgroup order r≈p, suppose a factor base has B=p^β independently behaving x-values. In the *unsaturated* random-sum model a signed m-summand target has relation probability Θ(B^m/p); collecting Θ(B) **independent** rows needs Θ(p/B^(m-1)) target shifts. If an actually nonenumerative relation oracle costs Θ(B^α) operations per shift, and the algebraic relation matrix costs Θ(B^ω) operations (`ω≈2` optimistic sparse-linear-algebra surrogate), then the combined exponent is
