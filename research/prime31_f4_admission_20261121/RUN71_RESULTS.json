@@ -75,7 +75,7 @@
   "followup": {
     "cold_difference_only_source_commit": "9fef5061a562e3b1daf1eb1d96fdec5d69fbe42c",
     "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/45072185961",
-    "status": "running when snapshot was written"
+    "status": "completed source-identical CI PASS x2; cold complete reference still 5.37–5.38x slower than paired BSGS"
   },
   "limitations": [
     "one deterministic cohort repeated on different Actions runners; not independent sampling",
@@ -83,5 +83,47 @@
     "916,469-key pair table is generic group enumeration, disqualifies non-generic/index-calculus result",
     "no qualified blind RR9/F3 extraction, optimized rho or best-index-calculus frontier comparisons",
     "PCC independent signed validation unavailable"
-  ]
+  ],
+  "cold_difference_only": {
+    "source_commit": "9fef5061a562e3b1daf1eb1d96fdec5d69fbe42c",
+    "source_blob_sha": "eee78a17c02e789195c6777ece70452a5f5c3d45",
+    "classification": "source-identical original-Rust cold DIFFERENCE branch timed before readout-only baseline and BSGS; reference remains GENERIC",
+    "runs": [
+      {
+        "url": "https://github.com/isogeny-labs/crypto/actions/runs/45072185961/attempts/1",
+        "job_id": 137361408875,
+        "library_tests": "41/41",
+        "conclusion": "success",
+        "setup_ms": 288.887,
+        "certificate_ms": 247.014,
+        "cold_relation_ms": 534.314,
+        "cold_total_ms": 1074.583,
+        "reference_bsgs_setup_ms": 13.546,
+        "reference_bsgs_online_ms": 186.688,
+        "relative_cold_to_bsgs": 5.36663603583807,
+        "verified_logs": 32,
+        "public_shifts": 1668210
+      },
+      {
+        "url": "https://github.com/isogeny-labs/crypto/actions/runs/45072185961/attempts/2",
+        "job_id": 137362043575,
+        "library_tests": "41/41",
+        "conclusion": "success",
+        "setup_ms": 355.968,
+        "certificate_ms": 298.757,
+        "cold_relation_ms": 614.763,
+        "cold_total_ms": 1274.441,
+        "reference_bsgs_setup_ms": 15.881,
+        "reference_bsgs_online_ms": 220.793,
+        "relative_cold_to_bsgs": 5.3847951190244805,
+        "verified_logs": 32,
+        "public_shifts": 1668210
+      }
+    ],
+    "limitations": [
+      "Two source-identical CI attempts replay one deterministic target cohort on different runners",
+      "Cold snapshot excludes control-arm RREF and BSGS, includes original group verification and exact rank; generic dictionary/triple extraction still disqualifies a non-generic claim",
+      "No optimized rho/best IC frontier same-host comparison and no independent PCC"
+    ]
+  }
 }
