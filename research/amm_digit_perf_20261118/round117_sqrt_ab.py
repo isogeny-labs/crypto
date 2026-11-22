@@ -37,7 +37,7 @@ old_sqrt = """        if p % 4 == 3 {
 assert frozen.count(new_sqrt) >= 1
 frozen = frozen.replace(new_sqrt, old_sqrt, 1)
 # Frozen baseline also predates the tentative narrow 32-bit Jacobi path.
-narrow_begin = frozen.index("            // Two frequent 32-bit moduli:")
+narrow_begin = frozen.index("            // A selected 32-bit modulus:")
 narrow_end = frozen.index("            let (mut v, mut n) = (a, p);", narrow_begin)
 frozen = frozen[:narrow_begin] + frozen[narrow_end:]
 assert frozen != source
