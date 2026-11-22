@@ -982,10 +982,10 @@ impl RadicalRootCtx {
         // Squaring 59 times and checking r^2=a beats running the
         // variable-time Jacobi prefilter first, especially for residues.
         // Noncanonical inputs retain the prior standalone sqrt behavior.
-        // The native Rust A/B screen found that direct sqrt on the two
-        // tested 32-bit primes regresses uniform discriminants by >20%.
-        // Preserve the fast Jacobi prefilter; the MAX_PRIME exemption is
-        // the independently validated pre-round117 special case.
+        // For p = 2^61-1, the square-root power is 2^59.
+        // Squaring 59 times and checking r^2=a beats running the
+        // variable-time Jacobi prefilter first, especially for residues.
+        // Noncanonical inputs retain the prior standalone sqrt behavior.
         if p == MAX_PRIME && a < p {
             return self.sqrt(a);
         }
