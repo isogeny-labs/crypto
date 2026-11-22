@@ -982,9 +982,11 @@ impl RadicalRootCtx {
         // Squaring 59 times and checking r^2=a beats running the
         // variable-time Jacobi prefilter first, especially for residues.
         // Noncanonical inputs retain the prior standalone sqrt behavior.
-        // Direct sqrt and verification is faster than Jacobi filtering
-        // on these primes, even for uniform nonresidue inputs.
-        if (p == MAX_PRIME || p == 1_000_000_007 || p == 4_294_967_291) && a < p {
+        // The native Rust A/B screen found that direct sqrt on the two
+        // tested 32-bit primes regresses uniform discriminants by >20%.
+        // Preserve the fast Jacobi prefilter; the MAX_PRIME exemption is
+        // the independently validated pre-round117 special case.
+        if p == MAX_PRIME && a < p {
             return self.sqrt(a);
         }
         if p >= (1u64 << 20) && p & 3 == 3 && a != 0 && a < p {
@@ -5194,7 +5196,7 @@ mod round117_sqrt_chain_and_discriminant_tests {
         }
     }
     #[test]
-    fn discriminant_bypass_matches_independent_euler_character() {
+    fn discriminant_character_matches_independent_euler_character() {
         let mut seed = 0x117e_2026_1122_80abu64;
         for p in [1_000_000_007u64, 4_294_967_291] {
             let ctx = RadicalRootCtx::new(p).unwrap();
