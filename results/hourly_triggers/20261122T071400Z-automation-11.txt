@@ -1,0 +1,6 @@
+Triggered at 2026-11-22T07:14:00Z by hourly relation-finding assessment.
+Scope: frozen Stage-21 Koblitz GF(2^23), a=0, m=2 control; not ECC2K-130.
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+CSV: results/hourly_log.csv
+Baseline: results/relation_baseline.json
+Alert: >20% deviation or benchmark failure.
