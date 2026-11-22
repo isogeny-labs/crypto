@@ -94,7 +94,7 @@
     "exact_negative_proofs": "C++ full generic lookup only; Python checks positive witnesses and source integrity"
   },
   "native_rust": {
-    "status": "CI_PENDING",
+    "status": "PASS_TWO_INDEPENDENT_SOURCE_IDENTICAL_ACTIONS",
     "example": "research/prime31_ic_20261115/native/examples/prime31_run66_three_sum_support.rs",
     "test_cohorts": "independent deterministic 256-point x lifts, not the SHA256/W8 full cohorts",
     "expected_counts": [
@@ -120,7 +120,44 @@
           41
         ]
       }
-    ]
+    ],
+    "passing_source_commit": "61c95fd4f9352907af563583e6683cd1f167f4d6",
+    "runs": [
+      {
+        "url": "https://github.com/isogeny-labs/crypto/actions/runs/45043881026",
+        "job_id": 137274077964,
+        "status": "success"
+      },
+      {
+        "url": "https://github.com/isogeny-labs/crypto/actions/runs/45043885425",
+        "job_id": 137274092773,
+        "status": "success"
+      }
+    ],
+    "verified": {
+      "pair_support_B509": 518085,
+      "pair_support_B677": 916469,
+      "signed_pair_records_B509": 518671,
+      "signed_pair_records_B677": 917335,
+      "xwalkA_B509": [
+        0,
+        15
+      ],
+      "xwalkB_B509": [
+        1,
+        16
+      ],
+      "xwalkA_B677": [
+        0,
+        43
+      ],
+      "xwalkB_B677": [
+        1,
+        41
+      ],
+      "witnesses_verified": 115
+    },
+    "notes": "The Rust pass is for two 256-point x-walk cohorts independent of the 4096 SHA/W8 cohorts, and is a generic support grader; current source has only a warning cleanup after passing CI."
   },
   "cost_gate": {
     "min_successful_rows_if_full_base_rank": 589,
