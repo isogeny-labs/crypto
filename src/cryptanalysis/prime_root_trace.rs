@@ -1375,11 +1375,13 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
     // matching GcdStep and its verified quotient for an accepted SplitEnd. Borrow
     // certificate operands, and own only the computed remainder.
     let mut verified_division: Option<(&[u64], &[u64], &[u64], &[u64], Vec<u64>)> = None;
-    // For linear and quadratic root polynomials the divisions are too small
-    // for a cache's matching overhead to amortize. Source-exact A/B on the
-    // frozen Round100 baseline found consistent 4-10% verifier regressions.
-    // Restrict reuse to quartic and larger root-certificate workloads.
-    let reuse_divisions = report.polynomial.len() >= 5;
+    // Source-exact Rust A/B identified two cache-overhead crossovers:
+    // linear/quadratic cases (too little work to amortize matching), and
+    // degree-eight certificates over small prime fields (fast division).
+    // Keep the original independent replay there, and reuse independently
+    // checked division results for the remaining quartic/higher workloads.
+    let reuse_divisions = report.polynomial.len() >= 5
+        && !(report.polynomial.len() >= 9 && p <= 65_521);
     let mut next_id = 0;
     let mut inverse = None;
     let mut split: Option<(Vec<u64>, u64)> = None;
