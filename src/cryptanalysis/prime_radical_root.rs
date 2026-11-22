@@ -42,10 +42,18 @@ fn frobenius_roots(p: u64, poly: &[u64]) -> Result<Vec<u64>, String> {
 #[derive(Clone, Copy)]
 pub(crate) struct Fp {
     pub p: u64,
+    // floor(2^64 / p): quotient estimate for canonical 32-bit products.
+    // Calculated once per field rather than dividing on every multiply.
+    reciprocal_64: u64,
 }
 impl Fp {
     pub fn new(p: u64) -> Self {
-        Fp { p }
+        let reciprocal_64 = if p >= 2 && p <= u32::MAX as u64 {
+            ((1u128 << 64) / p as u128) as u64
+        } else {
+            0
+        };
+        Fp { p, reciprocal_64 }
     }
     #[inline]
     pub fn add(&self, a: u64, b: u64) -> u64 {
@@ -97,8 +105,15 @@ impl Fp {
                 folded
             }
         } else if self.p <= u32::MAX as u64 && a < self.p && b < self.p {
-            // Canonical 32-bit operands fit in a native 64-bit product.
-            (a * b) % self.p
+            // Division-free 64-bit Barrett reduction. Let x=a*b < 2^64
+            // and mu=floor(2^64/p). Then floor(x*mu/2^64) differs
+            // from floor(x/p) by at most one (and never exceeds it).
+            // The remainder is in [0,2p), so one subtraction suffices.
+            // This uses a u128 widening multiply instead of integer div.
+            let product = a * b;
+            let quotient = ((product as u128 * self.reciprocal_64 as u128) >> 64) as u64;
+            let remainder = product - quotient * self.p;
+            if remainder >= self.p { remainder - self.p } else { remainder }
         } else {
             ((a as u128 * b as u128) % self.p as u128) as u64
         }
@@ -5023,5 +5038,34 @@ mod round114_mersenne_sqrt_and_unit_inverse {
             }
             assert_eq!(f.powm(a, 1u64 << 59), expected, "a={a}");
         }
+    }
+}
+
+#[cfg(test)]
+mod round115_barrett_regressions {
+    use super::Fp;
+    #[test]
+    fn canonical_products_match_independent_wide_remainder() {
+        let primes = [5u64, 7, 11, 31, 257, 65_521, 1_000_000_007, 4_294_967_291];
+        let mut checked = 0usize;
+        for p in primes {
+            let f = Fp::new(p);
+            let mut seed = p ^ 0xb7d4_218c_517f_3a9d;
+            for &a in &[0, 1, 2, p / 2, p - 2, p - 1] {
+                for &b in &[0, 1, 2, p / 2, p - 2, p - 1] {
+                    assert_eq!(f.mul(a, b), (a as u128 * b as u128 % p as u128) as u64);
+                    checked += 1;
+                }
+            }
+            for _ in 0..100_000 {
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+                let a = seed % p;
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+                let b = seed % p;
+                assert_eq!(f.mul(a, b), (a as u128 * b as u128 % p as u128) as u64, "p={p} a={a} b={b}");
+                checked += 1;
+            }
+        }
+        assert_eq!(checked, 800_288);
     }
 }
