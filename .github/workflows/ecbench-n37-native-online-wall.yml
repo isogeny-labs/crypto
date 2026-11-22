@@ -47,7 +47,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 research/ecbench_n37_k8_k16_20261004 research/ecbench_n37_native_online_wall_20261004
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/ecbench_n37_native_online_wall_20261004
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
         with:
