@@ -1163,14 +1163,22 @@ impl RadicalRootCtx {
         let inv_2a = f.inv(f.add(a, a));
         let nb = f.neg(b);
         let first = f.mul(f.add(nb, s), inv_2a);
-        let mut roots = if s == 0 {
+        // A nonzero discriminant yields two distinct roots when a != 0.
+        // Sorting a two-element vector and then scanning to deduplicate
+        // costs more than ordering its elements directly. The equal case
+        // still preserves legacy behavior for invalid a == 0 callers.
+        if s == 0 {
             vec![first]
         } else {
-            vec![first, f.mul(f.sub(nb, s), inv_2a)]
-        };
-        roots.sort_unstable();
-        roots.dedup();
-        roots
+            let second = f.mul(f.sub(nb, s), inv_2a);
+            if first < second {
+                vec![first, second]
+            } else if first > second {
+                vec![second, first]
+            } else {
+                vec![first]
+            }
+        }
     }
     /// F_p-roots of the depressed cubic t^3 + P t + Q = 0 (Cardano; F_{p^2} when D is a non-residue).
     pub fn cubic_depressed(&self, pp: u64, q: u64) -> Vec<u64> {
