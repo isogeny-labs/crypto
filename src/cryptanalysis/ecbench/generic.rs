@@ -60,7 +60,10 @@ impl GenericOutcome {
 /// fails is booked in `failed_candidates` and kept for the runner to
 /// grade.  A solve with no candidate (exhausted) pays nothing.  This is the
 /// rule of every `_v2` method: rho and index calculus have always paid it
-/// for the answer they return, BSGS, the kangaroo and the claw had not.
+/// for the answer they return, BSGS, the kangaroo and the claw had not.  The
+/// final point equality is classified by `verification_checks` as outcome
+/// shape under the repository's verification convention; the scalar replay
+/// carries the charged group work.
 pub fn verify_candidate<G: CountedGroup>(
     g: &G,
     gen: G::Elt,
@@ -279,6 +282,110 @@ pub fn bsgs_negation_table<G: CountedGroup>(
     out.recovered = found;
     out.exhausted = found.is_none();
     out
+}
+
+/// Target-independent advice for [`bsgs_negation_table`].
+///
+/// Building this value performs every baby step and constructs the giant
+/// stride from `G` alone.  [`NegationBabyTable::solve`] is consequently the
+/// exact online boundary for a cached-table query: its first operation reads
+/// `target`, while the cold one-target cost remains the sum of `setup` and
+/// `search` in the returned [`GenericOutcome`].
+pub struct NegationBabyTable<E> {
+    table: FastMap<(u64, u64)>,
+    back: E,
+    giant_stride: u64,
+    order: u64,
+    setup: GroupOps,
+    inserts: u64,
+    baby_steps: u64,
+    point_negations: u64,
+}
+
+/// Build the target-independent half-width-`m` negation table used by
+/// [`bsgs_negation_table`].  The table is reusable only for the same group,
+/// generator, order and `m`; callers comparing a cold one-target solve must
+/// still charge this complete build once.
+pub fn build_negation_table<G: CountedGroup>(
+    g: &G,
+    gen: G::Elt,
+    r: u64,
+    m: u64,
+) -> NegationBabyTable<G::Elt> {
+    let mut setup = GroupOps::default();
+    let m = m.max(1);
+    let mut table: FastMap<(u64, u64)> = fast_map(m as usize + 1);
+    let mut p = g.identity();
+    for j in 0..=m {
+        table.entry(class_key(g, &p)).or_insert((j, g.key(&p)));
+        if j < m {
+            p = g.add(&mut setup, p, gen);
+        }
+    }
+    let s = 2 * m + 1;
+    let stride = g.mul(&mut setup, gen, s);
+    let back = g.neg(stride);
+
+    NegationBabyTable {
+        table,
+        back,
+        giant_stride: s,
+        order: r,
+        setup,
+        inserts: m + 1,
+        baby_steps: m + 1,
+        // `back = -stride` is target-independent native work outside the
+        // counted group-operation ledger.  Per-entry class negations are
+        // carried by `inserts_uncharged` instead.
+        point_negations: 1,
+    }
+}
+
+impl<E: Copy> NegationBabyTable<E> {
+    /// Query one target against this table.  The returned outcome includes
+    /// the table's complete setup ledger and insert count, so it is a cold
+    /// one-target record even when the caller clocks this method alone as
+    /// the cached online interval.
+    pub fn solve<G: CountedGroup<Elt = E>>(&self, g: &G, target: E) -> GenericOutcome {
+        let mut out = GenericOutcome {
+            setup: self.setup,
+            ..Default::default()
+        };
+        let mut c = StepCounters {
+            inserts: self.inserts,
+            baby: self.baby_steps,
+            ..Default::default()
+        };
+        out.count("point_negations_uncharged", self.point_negations);
+        let mut y = target;
+        let giants = self.order / self.giant_stride + 1;
+        let found = 'search: {
+            for i in 0..=giants {
+                c.lookups += 1;
+                if let Some(&(j, key)) = self.table.get(&class_key(g, &y)) {
+                    // One key equality chooses the sign, then one multiply
+                    // and one add/subtract modulo the subgroup order recover
+                    // the scalar.  These happen only on a table hit.
+                    out.count("recovery_key_comparisons_uncharged", 1);
+                    out.count("recovery_modr_muls_uncharged", 1);
+                    out.count("recovery_modr_adds_uncharged", 1);
+                    let is = mulmod(i, self.giant_stride, self.order);
+                    break 'search Some(if g.key(&y) == key {
+                        addmod(is, j, self.order)
+                    } else {
+                        submod(is, j, self.order)
+                    });
+                }
+                c.giant += 1;
+                y = g.add(&mut out.search, y, self.back);
+            }
+            None
+        };
+        c.flush(&mut out);
+        out.recovered = found;
+        out.exhausted = found.is_none();
+        out
+    }
 }
 
 /// Kangaroo parameters chosen from `r`.
@@ -551,6 +658,90 @@ mod tests {
             ] {
                 assert_eq!(out.recovered, Some(k), "{name} k={k} r={}", inst.r);
             }
+        }
+    }
+
+    #[test]
+    fn negation_table_is_target_independent_reusable_advice() {
+        let inst = find_prime_order_curve(14, 59297);
+        let g = &inst.curve;
+        let gen = inst.generator_point();
+        let m = ceil_sqrt(inst.r).div_ceil(2);
+        let table = build_negation_table(g, gen, inst.r, m);
+        let mut setup = None;
+        for k in [1, inst.r / 3, inst.r / 2 + 7, inst.r - 1] {
+            let q = g.mul(&mut GroupOps::default(), gen, k);
+            let cached = table.solve(g, q);
+            let direct = bsgs_negation_table(g, gen, q, inst.r, m);
+            assert_eq!(cached.recovered, Some(k));
+            assert_eq!(cached.recovered, direct.recovered);
+            assert_eq!(cached.setup, direct.setup);
+            assert_eq!(cached.search, direct.search);
+            for name in [
+                "inserts_uncharged",
+                "baby_steps",
+                "lookups_uncharged",
+                "giant_steps",
+            ] {
+                assert_eq!(cached.counters.get(name), direct.counters.get(name), "{name}");
+            }
+            assert_eq!(cached.counters["point_negations_uncharged"], 1);
+            assert_eq!(cached.counters["recovery_key_comparisons_uncharged"], 1);
+            assert_eq!(cached.counters["recovery_modr_muls_uncharged"], 1);
+            assert_eq!(cached.counters["recovery_modr_adds_uncharged"], 1);
+            assert_eq!(
+                cached.counters["inserts_uncharged"],
+                m + 1,
+                "one insert attempt per baby-table entry"
+            );
+            match setup {
+                Some(want) => assert_eq!(want, cached.setup),
+                None => setup = Some(cached.setup),
+            }
+        }
+    }
+
+    #[test]
+    fn cached_negation_table_counts_recovery_only_on_a_hit() {
+        struct Cyclic(u64);
+        impl CountedGroup for Cyclic {
+            type Elt = u64;
+            fn identity(&self) -> u64 {
+                0
+            }
+            fn is_identity(&self, p: &u64) -> bool {
+                *p == 0
+            }
+            fn add(&self, ops: &mut GroupOps, p: u64, q: u64) -> u64 {
+                ops.adds += 1;
+                (p + q) % self.0
+            }
+            fn double(&self, ops: &mut GroupOps, p: u64) -> u64 {
+                ops.doubles += 1;
+                (2 * p) % self.0
+            }
+            fn neg(&self, p: u64) -> u64 {
+                (self.0 - p) % self.0
+            }
+            fn key(&self, p: &u64) -> u64 {
+                *p
+            }
+        }
+
+        // The declared order deliberately bounds the search before target 50
+        // in Z/101 can reach the table.  This exercises the exhausted path,
+        // not a valid DLP instance under the declared order.
+        let group = Cyclic(101);
+        let out = build_negation_table(&group, 1, 5, 1).solve(&group, 50);
+        assert!(out.exhausted);
+        assert_eq!(out.recovered, None);
+        assert_eq!(out.counters["point_negations_uncharged"], 1);
+        for name in [
+            "recovery_key_comparisons_uncharged",
+            "recovery_modr_muls_uncharged",
+            "recovery_modr_adds_uncharged",
+        ] {
+            assert!(!out.counters.contains_key(name), "{name}");
         }
     }
 
