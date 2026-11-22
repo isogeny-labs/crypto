@@ -8,12 +8,14 @@ on:
       - "examples/prime31_trace_skew_pair.rs"
       - "examples/prime31_trace_moment.rs"
       - "examples/prime31_trace_f4_pilot.rs"
+      - "examples/prime31_monic_s3_pair_oracle.rs"
       - ".github/workflows/prime31-trace-symmetric-rust-gate.yml"
   pull_request:
     paths:
       - "examples/prime31_trace_skew_pair.rs"
       - "examples/prime31_trace_moment.rs"
       - "examples/prime31_trace_f4_pilot.rs"
+      - "examples/prime31_monic_s3_pair_oracle.rs"
       - ".github/workflows/prime31-trace-symmetric-rust-gate.yml"
   workflow_dispatch:
 
@@ -33,6 +35,10 @@ jobs:
         run: |
           cargo run --locked --release --example prime31_trace_skew_pair
           cargo run --locked --release --example prime31_trace_moment
+      - name: Monic-in-t non-table quotient/gcd S3 pair oracle (original Rust)
+        run: |
+          cargo test --locked --release --example prime31_monic_s3_pair_oracle
+          cargo run --locked --release --example prime31_monic_s3_pair_oracle
       - name: Matched m2 F4 arms, planted genuine Prime31 S3
         run: cargo run --locked --release --example prime31_trace_f4_pilot
       - name: Quadratic Newton circuit versus matched F4 arms
