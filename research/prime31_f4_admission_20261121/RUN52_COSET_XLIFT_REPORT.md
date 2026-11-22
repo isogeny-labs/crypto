@@ -41,7 +41,7 @@ Use the explicit signed polynomial map to eliminate seven leaf y variables, thei
 - Five intermediate (x,y) pairs, six slopes: 6×3 oriented addition equations (18 equations), substituting y_i=f(x_i)^4/c_i at leaves.
 - Six denominator-product/inverse guard variables (6 quadratic constraints), ruling out division by zero.
 
-This reduces run50's 64-variable quadratic circuit, but raises degree from 2 to 21. **There is no reason to presume this will outperform the existing 14-variable degree-8 transformed-slot Horner chart** in PR #4812 or the 4-variable triangular reduction in PR #4822. An admission test must measure actual F4 rows/columns/degree and failed-query cost, not variable count alone.
+An independently implemented Python evaluator then checked **all 31 specialized equations on 4,090/4,090 archived witnesses** and rejected **4,090/4,090 poisoned-target coordinate mutants**, with zero exceptional denominators in that cohort. This validates the proposed chart on known witnesses but is not coefficient-level Rust parity or a blind polynomial solve. The independent checker is available in the run52 replay archive.\n\nThis reduces run50's 64-variable quadratic circuit, but raises degree from 2 to 21. **There is no reason to presume this will outperform the existing 14-variable degree-8 transformed-slot Horner chart** in PR #4812 or the 4-variable triangular reduction in PR #4822. An admission test must measure actual F4 rows/columns/degree and failed-query cost, not variable count alone.
 
 ## Prior work, overlap and rank ordering
 
