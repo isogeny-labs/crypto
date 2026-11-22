@@ -1,0 +1,554 @@
+{
+  "schema": "conductor.projective-walk-development/v1",
+  "scope": "Small public development controls and a bounded target-field coordinate prefix; no complete target construction or timing",
+  "pipeline_projective_runs": 24,
+  "projective_point_input_evaluations": 504,
+  "distinct_pipeline_fields": [
+    "11",
+    "6666679",
+    "71"
+  ],
+  "default_fixture_bytes_unchanged": true,
+  "baseline_and_new_affine_outputs_equal": true,
+  "all_projective_semantics_equal_to_baseline": true,
+  "projective_batch_caps": [
+    1,
+    7,
+    64,
+    4096
+  ],
+  "arithmetic_controls": {
+    "scope": "small native arithmetic development controls; no timing",
+    "fields": [
+      7,
+      11,
+      71
+    ],
+    "mixed_add_pari_pairs": "3717",
+    "doubling_cases": "84",
+    "infinity_cases": "171",
+    "inverse_pair_cases": "84",
+    "two_torsion_inputs": "4",
+    "walk_samples": "261",
+    "walk_infinity_rejections": "141",
+    "normalization_x_checks": "600",
+    "runtime_measurements": null
+  },
+  "wide_field_coordinate_control": {
+    "scope": "bounded target-field coordinate control only",
+    "p": "4794168233664648458988367110514316682522236917173341621535751",
+    "ell": "729845429276318409687041",
+    "kernel": [
+      "4515130868018265073699728324389842779619221778507237352874816",
+      "1852242499917145718370025456583037063631410696703406330482828"
+    ],
+    "points_per_walk": 4096,
+    "controls": [
+      {
+        "walk": "baby",
+        "batch_cap": 1,
+        "x_comparisons": 4096,
+        "batch_inverse_calls": "4096",
+        "projective_additions": "4095",
+        "peak_batch_points": 1,
+        "first_x": "4515130868018265073699728324389842779619221778507237352874816",
+        "last_x": "3361360155679467034729681166394804618766191049173997003865809"
+      },
+      {
+        "walk": "baby",
+        "batch_cap": 7,
+        "x_comparisons": 4096,
+        "batch_inverse_calls": "586",
+        "projective_additions": "4095",
+        "peak_batch_points": 7,
+        "first_x": "4515130868018265073699728324389842779619221778507237352874816",
+        "last_x": "3361360155679467034729681166394804618766191049173997003865809"
+      },
+      {
+        "walk": "baby",
+        "batch_cap": 64,
+        "x_comparisons": 4096,
+        "batch_inverse_calls": "64",
+        "projective_additions": "4095",
+        "peak_batch_points": 64,
+        "first_x": "4515130868018265073699728324389842779619221778507237352874816",
+        "last_x": "3361360155679467034729681166394804618766191049173997003865809"
+      },
+      {
+        "walk": "baby",
+        "batch_cap": 4096,
+        "x_comparisons": 4096,
+        "batch_inverse_calls": "1",
+        "projective_additions": "4095",
+        "peak_batch_points": 4096,
+        "first_x": "4515130868018265073699728324389842779619221778507237352874816",
+        "last_x": "3361360155679467034729681166394804618766191049173997003865809"
+      },
+      {
+        "walk": "giant",
+        "batch_cap": 1,
+        "x_comparisons": 4096,
+        "batch_inverse_calls": "4096",
+        "projective_additions": "4095",
+        "peak_batch_points": 1,
+        "first_x": "3843822737551580748065577380293571310296953891178020639935581",
+        "last_x": "1229778125430595102248760808621252971246301624018331963085258"
+      },
+      {
+        "walk": "giant",
+        "batch_cap": 7,
+        "x_comparisons": 4096,
+        "batch_inverse_calls": "586",
+        "projective_additions": "4095",
+        "peak_batch_points": 7,
+        "first_x": "3843822737551580748065577380293571310296953891178020639935581",
+        "last_x": "1229778125430595102248760808621252971246301624018331963085258"
+      },
+      {
+        "walk": "giant",
+        "batch_cap": 64,
+        "x_comparisons": 4096,
+        "batch_inverse_calls": "64",
+        "projective_additions": "4095",
+        "peak_batch_points": 64,
+        "first_x": "3843822737551580748065577380293571310296953891178020639935581",
+        "last_x": "1229778125430595102248760808621252971246301624018331963085258"
+      },
+      {
+        "walk": "giant",
+        "batch_cap": 4096,
+        "x_comparisons": 4096,
+        "batch_inverse_calls": "1",
+        "projective_additions": "4095",
+        "peak_batch_points": 4096,
+        "first_x": "3843822737551580748065577380293571310296953891178020639935581",
+        "last_x": "1229778125430595102248760808621252971246301624018331963085258"
+      }
+    ],
+    "total_x_comparisons": "32768",
+    "full_target_quotient": null,
+    "isogeny_images": null,
+    "runtime_measurements": null
+  },
+  "option_rejections": [
+    {
+      "case": "zero",
+      "exit": 2,
+      "stdout_empty": true
+    },
+    {
+      "case": "too-large",
+      "exit": 2,
+      "stdout_empty": true
+    },
+    {
+      "case": "duplicate",
+      "exit": 2,
+      "stdout_empty": true
+    },
+    {
+      "case": "missing",
+      "exit": 2,
+      "stdout_empty": true
+    },
+    {
+      "case": "invalid",
+      "exit": 2,
+      "stdout_empty": true
+    }
+  ],
+  "pipeline_counts": [
+    {
+      "p": "6666679",
+      "ell": "10009",
+      "baby_count": 50,
+      "giant_count": 50,
+      "block": 17,
+      "point_inputs": 36,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 1,
+        "batch_inverse_calls": "200",
+        "projective_additions": "188",
+        "projective_points": "200",
+        "peak_batch_points": 1
+      }
+    },
+    {
+      "p": "6666679",
+      "ell": "10009",
+      "baby_count": 50,
+      "giant_count": 50,
+      "block": 17,
+      "point_inputs": 36,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 4096,
+        "batch_inverse_calls": "12",
+        "projective_additions": "188",
+        "projective_points": "200",
+        "peak_batch_points": 17
+      }
+    },
+    {
+      "p": "6666679",
+      "ell": "10009",
+      "baby_count": 50,
+      "giant_count": 50,
+      "block": 17,
+      "point_inputs": 36,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 64,
+        "batch_inverse_calls": "12",
+        "projective_additions": "188",
+        "projective_points": "200",
+        "peak_batch_points": 17
+      }
+    },
+    {
+      "p": "6666679",
+      "ell": "10009",
+      "baby_count": 50,
+      "giant_count": 50,
+      "block": 17,
+      "point_inputs": 36,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 7,
+        "batch_inverse_calls": "36",
+        "projective_additions": "188",
+        "projective_points": "200",
+        "peak_batch_points": 7
+      }
+    },
+    {
+      "p": "11",
+      "ell": "5",
+      "baby_count": 1,
+      "giant_count": 1,
+      "block": 2,
+      "point_inputs": 6,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 1,
+        "batch_inverse_calls": "2",
+        "projective_additions": "0",
+        "projective_points": "2",
+        "peak_batch_points": 1
+      }
+    },
+    {
+      "p": "11",
+      "ell": "5",
+      "baby_count": 1,
+      "giant_count": 1,
+      "block": 2,
+      "point_inputs": 6,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 4096,
+        "batch_inverse_calls": "2",
+        "projective_additions": "0",
+        "projective_points": "2",
+        "peak_batch_points": 1
+      }
+    },
+    {
+      "p": "11",
+      "ell": "5",
+      "baby_count": 1,
+      "giant_count": 1,
+      "block": 2,
+      "point_inputs": 6,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 64,
+        "batch_inverse_calls": "2",
+        "projective_additions": "0",
+        "projective_points": "2",
+        "peak_batch_points": 1
+      }
+    },
+    {
+      "p": "11",
+      "ell": "5",
+      "baby_count": 1,
+      "giant_count": 1,
+      "block": 2,
+      "point_inputs": 6,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 7,
+        "batch_inverse_calls": "2",
+        "projective_additions": "0",
+        "projective_points": "2",
+        "peak_batch_points": 1
+      }
+    },
+    {
+      "p": "6666679",
+      "ell": "10009",
+      "baby_count": 18,
+      "giant_count": 139,
+      "block": 200,
+      "point_inputs": 36,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 1,
+        "batch_inverse_calls": "157",
+        "projective_additions": "155",
+        "projective_points": "157",
+        "peak_batch_points": 1
+      }
+    },
+    {
+      "p": "6666679",
+      "ell": "10009",
+      "baby_count": 18,
+      "giant_count": 139,
+      "block": 200,
+      "point_inputs": 36,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 4096,
+        "batch_inverse_calls": "2",
+        "projective_additions": "155",
+        "projective_points": "157",
+        "peak_batch_points": 139
+      }
+    },
+    {
+      "p": "6666679",
+      "ell": "10009",
+      "baby_count": 18,
+      "giant_count": 139,
+      "block": 200,
+      "point_inputs": 36,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 64,
+        "batch_inverse_calls": "4",
+        "projective_additions": "155",
+        "projective_points": "157",
+        "peak_batch_points": 64
+      }
+    },
+    {
+      "p": "6666679",
+      "ell": "10009",
+      "baby_count": 18,
+      "giant_count": 139,
+      "block": 200,
+      "point_inputs": 36,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 7,
+        "batch_inverse_calls": "23",
+        "projective_additions": "155",
+        "projective_points": "157",
+        "peak_batch_points": 7
+      }
+    },
+    {
+      "p": "6666679",
+      "ell": "10009",
+      "baby_count": 50,
+      "giant_count": 50,
+      "block": 64,
+      "point_inputs": 36,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 1,
+        "batch_inverse_calls": "100",
+        "projective_additions": "98",
+        "projective_points": "100",
+        "peak_batch_points": 1
+      }
+    },
+    {
+      "p": "6666679",
+      "ell": "10009",
+      "baby_count": 50,
+      "giant_count": 50,
+      "block": 64,
+      "point_inputs": 36,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 4096,
+        "batch_inverse_calls": "2",
+        "projective_additions": "98",
+        "projective_points": "100",
+        "peak_batch_points": 50
+      }
+    },
+    {
+      "p": "6666679",
+      "ell": "10009",
+      "baby_count": 50,
+      "giant_count": 50,
+      "block": 64,
+      "point_inputs": 36,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 64,
+        "batch_inverse_calls": "2",
+        "projective_additions": "98",
+        "projective_points": "100",
+        "peak_batch_points": 50
+      }
+    },
+    {
+      "p": "6666679",
+      "ell": "10009",
+      "baby_count": 50,
+      "giant_count": 50,
+      "block": 64,
+      "point_inputs": 36,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 7,
+        "batch_inverse_calls": "16",
+        "projective_additions": "98",
+        "projective_points": "100",
+        "peak_batch_points": 7
+      }
+    },
+    {
+      "p": "71",
+      "ell": "19",
+      "baby_count": 1,
+      "giant_count": 4,
+      "block": 4,
+      "point_inputs": 6,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 1,
+        "batch_inverse_calls": "5",
+        "projective_additions": "3",
+        "projective_points": "5",
+        "peak_batch_points": 1
+      }
+    },
+    {
+      "p": "71",
+      "ell": "19",
+      "baby_count": 1,
+      "giant_count": 4,
+      "block": 4,
+      "point_inputs": 6,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 4096,
+        "batch_inverse_calls": "2",
+        "projective_additions": "3",
+        "projective_points": "5",
+        "peak_batch_points": 4
+      }
+    },
+    {
+      "p": "71",
+      "ell": "19",
+      "baby_count": 1,
+      "giant_count": 4,
+      "block": 4,
+      "point_inputs": 6,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 64,
+        "batch_inverse_calls": "2",
+        "projective_additions": "3",
+        "projective_points": "5",
+        "peak_batch_points": 4
+      }
+    },
+    {
+      "p": "71",
+      "ell": "19",
+      "baby_count": 1,
+      "giant_count": 4,
+      "block": 4,
+      "point_inputs": 6,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 7,
+        "batch_inverse_calls": "2",
+        "projective_additions": "3",
+        "projective_points": "5",
+        "peak_batch_points": 4
+      }
+    },
+    {
+      "p": "71",
+      "ell": "19",
+      "baby_count": 2,
+      "giant_count": 2,
+      "block": 1,
+      "point_inputs": 6,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 1,
+        "batch_inverse_calls": "6",
+        "projective_additions": "0",
+        "projective_points": "6",
+        "peak_batch_points": 1
+      }
+    },
+    {
+      "p": "71",
+      "ell": "19",
+      "baby_count": 2,
+      "giant_count": 2,
+      "block": 1,
+      "point_inputs": 6,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 4096,
+        "batch_inverse_calls": "6",
+        "projective_additions": "0",
+        "projective_points": "6",
+        "peak_batch_points": 1
+      }
+    },
+    {
+      "p": "71",
+      "ell": "19",
+      "baby_count": 2,
+      "giant_count": 2,
+      "block": 1,
+      "point_inputs": 6,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 64,
+        "batch_inverse_calls": "6",
+        "projective_additions": "0",
+        "projective_points": "6",
+        "peak_batch_points": 1
+      }
+    },
+    {
+      "p": "71",
+      "ell": "19",
+      "baby_count": 2,
+      "giant_count": 2,
+      "block": 1,
+      "point_inputs": 6,
+      "walk_backend": {
+        "name": "bounded_projective",
+        "batch_cap": 7,
+        "batch_inverse_calls": "6",
+        "projective_additions": "0",
+        "projective_points": "6",
+        "peak_batch_points": 1
+      }
+    }
+  ],
+  "main_qualification_exit": 0,
+  "wide_field_qualification_exit": 0,
+  "full_target_quotient": null,
+  "full_target_images": null,
+  "endpoint_ecdlp_trials": 0,
+  "runtime_measurements": null,
+  "peak_rss": null,
+  "independent_verification": "not established"
+}
