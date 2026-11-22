@@ -122,6 +122,29 @@ impl Fp {
     pub fn sqr(&self, a: u64) -> u64 {
         self.mul(a, a)
     }
+    // For p=2^32-5, sqrt exponent (p+1)/4 = 2^30-1.
+    // Addition chain 1,3,15,63,4095,2^24-1,2^30-1:
+    // 29 squarings + 6 products versus 29 squarings + 30 products.
+    // Only public canonical coefficients use this path.
+    #[inline]
+    fn sqrt_power_4294967291(&self, a: u64) -> u64 {
+        debug_assert!(self.p == 4_294_967_291 && a < self.p);
+        let a3 = self.mul(self.sqr(a), a);
+        let mut a15 = a3;
+        for _ in 0..2 { a15 = self.sqr(a15); }
+        a15 = self.mul(a15, a3);
+        let mut a63 = a15;
+        for _ in 0..2 { a63 = self.sqr(a63); }
+        a63 = self.mul(a63, a3);
+        let mut a4095 = a63;
+        for _ in 0..6 { a4095 = self.sqr(a4095); }
+        a4095 = self.mul(a4095, a63);
+        let mut a16777215 = a4095;
+        for _ in 0..12 { a16777215 = self.sqr(a16777215); }
+        a16777215 = self.mul(a16777215, a4095);
+        for _ in 0..6 { a16777215 = self.sqr(a16777215); }
+        self.mul(a16777215, a63)
+    }
     #[inline]
     pub fn half(&self, a: u64) -> u64 {
         // In an odd prime field, (a + (a&1)*p)/2 is a/2 mod p.
@@ -871,7 +894,11 @@ impl RadicalRootCtx {
             return Some(0);
         }
         if p % 4 == 3 {
-            let r = f.powm(a, (p + 1) / 4);
+            let r = if p == 4_294_967_291 && a < p {
+                f.sqrt_power_4294967291(a)
+            } else {
+                f.powm(a, (p + 1) / 4)
+            };
             return if f.sqr(r) == a { Some(r) } else { None };
         }
         // p = 5 (mod 8): one exponentiation and one optional multiplication
@@ -955,7 +982,9 @@ impl RadicalRootCtx {
         // Squaring 59 times and checking r^2=a beats running the
         // variable-time Jacobi prefilter first, especially for residues.
         // Noncanonical inputs retain the prior standalone sqrt behavior.
-        if p == MAX_PRIME && a < p {
+        // Direct sqrt and verification is faster than Jacobi filtering
+        // on these primes, even for uniform nonresidue inputs.
+        if (p == MAX_PRIME || p == 1_000_000_007 || p == 4_294_967_291) && a < p {
             return self.sqrt(a);
         }
         if p >= (1u64 << 20) && p & 3 == 3 && a != 0 && a < p {
@@ -5139,6 +5168,49 @@ mod round116_coefficient_normalization_tests {
                 assert_eq!(ctx.roots(zero), ctx.roots(&[]));
             }
             assert!(ctx.roots(&[1, 0, 0, 0, 0, 1]).is_err());
+        }
+    }
+}
+
+#[cfg(test)]
+mod round117_sqrt_chain_and_discriminant_tests {
+    use super::*;
+    fn next(seed: &mut u64) -> u64 {
+        *seed ^= *seed << 13;
+        *seed ^= *seed >> 7;
+        *seed ^= *seed << 17;
+        *seed
+    }
+    #[test]
+    fn special_square_root_chain_matches_independent_binary_power() {
+        let f = Fp::new(4_294_967_291);
+        let mut seed = 0xb199_117a_d947_62e1u64;
+        for a in [0, 1, 2, 3, f.p - 2, f.p - 1]
+            .into_iter()
+            .chain((0..16_384).map(|_| next(&mut seed) % f.p))
+        {
+            assert_eq!(f.sqrt_power_4294967291(a), f.powm(a, (f.p + 1) / 4),
+                       "a={a}");
+        }
+    }
+    #[test]
+    fn discriminant_bypass_matches_independent_euler_character() {
+        let mut seed = 0x117e_2026_1122_80abu64;
+        for p in [1_000_000_007u64, 4_294_967_291] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = &ctx.f;
+            for i in 0..8_192 {
+                let mut a = next(&mut seed) % p;
+                if i % 2 == 0 { a = f.sqr(a); }
+                let root = ctx.sqrt_discriminant(a);
+                let is_square = a == 0 || f.powm(a, (p - 1) / 2) == 1;
+                assert_eq!(root.is_some(), is_square, "p={p}, a={a}");
+                if let Some(r) = root { assert_eq!(f.sqr(r), a, "p={p}, a={a}"); }
+                assert_eq!(root, ctx.sqrt(a), "p={p}, a={a}");
+            }
+            for a in [p, p + 1, p + 2, u64::MAX] {
+                assert_eq!(ctx.sqrt_discriminant(a), ctx.sqrt(a), "p={p}, a={a}");
+            }
         }
     }
 }
