@@ -401,11 +401,37 @@ impl Engine<'_> {
             exponent,
             modulus: modulus.to_vec(),
         })?;
+        // Round 106: repeated nonmonic polynomial divisions in one power
+        // previously recomputed the same expensive traced Fermat inverse
+        // on every square and accumulator update. Normalize once, using
+        // exactly one independently checked inverse, and then divide only
+        // by a monic polynomial. The original modulus remains bound by
+        // PowerBegin; scaling by a unit preserves every polynomial residue.
+        // Cow keeps already-monic moduli borrowed with no extra allocation.
+        let monic_modulus: std::borrow::Cow<'_, [u64]> = if modulus.last() == Some(&1) {
+            std::borrow::Cow::Borrowed(modulus)
+        } else {
+            let lead = *modulus.last().expect("power modulus is nonzero");
+            let inverse = self.inv(lead)?;
+            let mut coefficients = Vec::with_capacity(modulus.len());
+            for &coefficient in &modulus[..modulus.len() - 1] {
+                coefficients.push(if coefficient == 0 {
+                    0
+                } else if coefficient == lead {
+                    1
+                } else {
+                    self.field(FieldOp::Mul, coefficient, inverse)?
+                });
+            }
+            coefficients.push(1);
+            std::borrow::Cow::Owned(coefficients)
+        };
+        let modulus = monic_modulus.as_ref();
         // A smaller-degree polynomial is already reduced. Recording a
         // zero-quotient division allocates a certificate and runs the event
         // sink without doing any field work. PowerBegin already binds the
-        // exact modulus and base, and the independent verifier recomputes
-        // both initial residues, so these no-op divisions are unnecessary.
+        // original modulus, and the independent verifier compares residues
+        // modulo its monic normalization.
         let mut b = if base.len() < modulus.len() {
             base.to_vec()
         } else {
@@ -2073,6 +2099,53 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round106_nonmonic_power_uses_single_normalization_and_monic_divisions() {
+        // 2*(x-3)*(x-7) has exactly the roots 3 and 7 over each field.
+        // PowerBegin must continue binding the *original* nonmonic input;
+        // the producer's divisions inside that power must use a monic
+        // equivalent, and the independent certificate verifier must accept it.
+        for p in [65_521u64, 1_000_000_007, MAX_PRIME] {
+            let input = vec![42, p - 20, 2];
+            let report = solve(
+                &input, p, 7,
+                RootLimits {
+                    field_work: MAX_WORK,
+                    split_attempts: 1000,
+                    events: MAX_EVENTS,
+                    degree: MAX_DEGREE,
+                },
+                &mut |_| Ok(()),
+            ).unwrap();
+            assert!(report.complete(), "p={p} stop={:?}", report.stop);
+            verify(&report).unwrap();
+            assert_eq!(report.roots, vec![3, 7], "p={p}");
+            let mut in_original_power = false;
+            let mut checked_divisions = 0;
+            let mut normalizations = 0;
+            for event in &report.events {
+                match event {
+                    RootEvent::PowerBegin { modulus, .. } if modulus == &input => {
+                        in_original_power = true;
+                    }
+                    RootEvent::PowerEnd { .. } if in_original_power => {
+                        in_original_power = false;
+                    }
+                    RootEvent::InverseBegin { value } if in_original_power && *value == 2 => {
+                        normalizations += 1;
+                    }
+                    RootEvent::Division { b, .. } if in_original_power => {
+                        assert_eq!(b.last(), Some(&1), "nonmonic power division p={p}");
+                        checked_divisions += 1;
+                    }
+                    _ => {}
+                }
+            }
+            assert!(checked_divisions > 0, "missing power division p={p}");
+            assert_eq!(normalizations, 1, "repeated power inversion p={p}");
+        }
+    }
 
 
     #[test]
