@@ -5,7 +5,7 @@ on:
       - 'automation/rootfind-column-accumulator-round89-20261121'
     paths:
       - 'src/cryptanalysis/prime_root_trace.rs'
-      - 'research/amm_digit_perf_20261118/round100_full_ab.py'
+      - 'research/amm_digit_perf_20261118/round101_full_ab.py'
       - '.github/workflows/rootfind-round101-division-cache.yml'
   workflow_dispatch:
 permissions:
@@ -20,13 +20,13 @@ jobs:
           fetch-depth: 0
           sparse-checkout: |
             src/cryptanalysis/prime_root_trace.rs
-            research/amm_digit_perf_20261118/round100_full_ab.py
+            research/amm_digit_perf_20261118/round101_full_ab.py
       - uses: dtolnay/rust-toolchain@stable
-      - name: Frozen Round100 versus Round101 source-exact solve and certificate replay
+      - name: Frozen Round100 versus Round101 source-exact solve and verifier-only replay
         env:
           ROOTFIND_BASELINE_REF: ec848c0dd2ca25730e4f14276002219569cdcfb4
           ROOTFIND_AB_OUTPUT: research/amm_digit_perf_20261118/round101_division_cache_results.csv
-        run: python3 research/amm_digit_perf_20261118/round100_full_ab.py
+        run: python3 research/amm_digit_perf_20261118/round101_full_ab.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
