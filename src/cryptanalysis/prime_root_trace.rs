@@ -1758,8 +1758,6 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                         vquadratic_replay_mul(&state.acc, &state.base, &state.modulus, p)
                     } else if state.modulus.len() == 4 && p >= (1u64 << 24) {
                         vcubic_replay_mul(&state.acc, &state.base, &state.modulus, p)
-                    } else if state.modulus.len() == 5 && p >= (1u64 << 24) && p <= u32::MAX as u64 {
-                        vquartic_replay_mul(&state.acc, &state.base, &state.modulus, p)
                     } else {
                         vpower_reduce(vproduct(&state.acc, &state.base, p), &state.modulus, p)?
                     };
@@ -1775,8 +1773,6 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                         vquadratic_replay_square(&state.base, &state.modulus, p)
                     } else if state.modulus.len() == 4 && p >= (1u64 << 24) {
                         vcubic_replay_square(&state.base, &state.modulus, p)
-                    } else if state.modulus.len() == 5 && p >= (1u64 << 24) && p <= u32::MAX as u64 {
-                        vquartic_replay_square(&state.base, &state.modulus, p)
                     } else {
                         vpower_reduce(vproduct(&state.base, &state.base, p), &state.modulus, p)?
                     };
