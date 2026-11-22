@@ -39,3 +39,19 @@ The now-derived [Run71 target-certificate difference-row theorem and experiment]
 For a **qualifying** non-generic solver, replace the generic pair/triple dictionary with existing public-only unknown-index polynomial extraction in [#4692](https://github.com/isogeny-labs/crypto/pull/4692) (registered 46+18 positive/negative corpus), [#4822](https://github.com/isogeny-labs/crypto/pull/4822) (RR9/Krylov) and [#4812](https://github.com/isogeny-labs/crypto/pull/4812) (Horner/F3). Charge negative attempts, complete authentic RHS rank, setup, online target recovery and memory, then compare cold 1, 32, 128 and 1024 verified logs against best existing IC, optimized negation-rho and shared-BSGS **on the same host**. Prior one-relation work by Amadori–Pintore–Sala (2018), DOI 10.1016/j.ffa.2018.01.009, precludes a blanket claim of novelty.
 
 **Admission status:** original Rust correctness and fully charged generic reference cost independently replayed twice; genuine nonenumerative root extraction and complete cheaper index-calculus solver **still not established**. Keep PR draft, [pcc:unverified].
+
+
+## Cost-accounting erratum (Run71 source audit, 2026-11-22)
+
+**The previously published 7.20×/7.25× comparisons above are conservative but mislabelled as cold K4 solver-only ratios.** The source `prime31_run70b_k4_cold.rs` computes its `whole.elapsed()` **after** executing the separate BSGS reference. Thus `whole_pipeline_ms` includes the entire BSGS control on the *solver* side of its ratio, despite dividing by that same BSGS cost. This is a reporting defect, not a cryptanalytic speedup.
+
+Without altering the frozen original timing receipts, subtract the separately measured in-process BSGS setup+online times from the recorded whole duration:
+
+| CI | Frozen reported whole including BSGS | Reference BSGS | Corrected source-structure solver-only estimate | Corrected solver / BSGS |
+|---|---:|---:|---:|---:|
+| #45066979236 | 1,086.016 ms | 150.769 ms | **935.247 ms** | **6.203× slower** |
+| #45066973351 | 1,708.381 ms | 235.548 ms | **1,472.833 ms** | **6.253× slower** |
+
+The *corrected* figures are **derived by subtraction**, not directly timed isolated cold stop boundaries. The individually timed setup + witness + relation stages provide a corroborating lower bound of 934.804 ms and 1,472.187 ms, respectively. The generic solver therefore remains markedly slower than matched BSGS; the prior 7.2× number overstates the gap by approximately one BSGS execution.
+
+Run71 now logs a truly isolated `RUN71_COLD_DIFFERENCE` timestamp **before any reference BSGS or readout-only baseline RREF**. Use that source-specific measurement instead of repeatedly estimating cold costs from joint experiments. Do not rewrite the earlier frozen JSON; retain it as an immutable record with this erratum.
