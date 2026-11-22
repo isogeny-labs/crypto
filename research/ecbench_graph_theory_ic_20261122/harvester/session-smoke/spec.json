@@ -1,0 +1,28 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Gaudry k=3 on E(F_p^3): cycle harvester vs eliminator vs matched rho (smoke)",
+  "description": "ic.k3_gaudry harvester=eliminator and harvester=cycles against rho.negation on the same fp3_random curves, p in {271, 523, 1039}, three curves each, one planted target per curve. Operation counts only (--cpus none); a plumbing and direction check, not a performance claim.",
+  "workloads": {
+    "curves": [
+      {"kind": "fp3_random", "p": 271, "seed": 1},
+      {"kind": "fp3_random", "p": 271, "seed": 2},
+      {"kind": "fp3_random", "p": 271, "seed": 3},
+      {"kind": "fp3_random", "p": 523, "seed": 1},
+      {"kind": "fp3_random", "p": 523, "seed": 2},
+      {"kind": "fp3_random", "p": 523, "seed": 3},
+      {"kind": "fp3_random", "p": 1039, "seed": 1},
+      {"kind": "fp3_random", "p": 1039, "seed": 2},
+      {"kind": "fp3_random", "p": 1039, "seed": 3}
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 20261122,
+    "target_kind": "planted"
+  },
+  "arms": [
+    {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+    {"name": "rho-plain", "role": "baseline", "method": {"id": "rho.plain"}},
+    {"name": "k3-eliminator", "role": "baseline", "method": {"id": "ic.k3_gaudry", "params": {"harvester": "eliminator"}}},
+    {"name": "k3-cycles", "role": "candidate", "method": {"id": "ic.k3_gaudry", "params": {"harvester": "cycles"}}}
+  ],
+  "measurement": {"rounds": 1, "warmup": 0, "order": "alternate_measured", "seed": 20261123, "isolation_required": "L0", "timeout_seconds": 600}
+}
