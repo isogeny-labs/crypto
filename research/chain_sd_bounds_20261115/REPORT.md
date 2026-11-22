@@ -488,7 +488,7 @@ The box `X` bounds the cofactor degree.
 | 2 | 1 | 1 | 1 | 1 | | | | | |
 | 3 | 3 | 4 | 5 | 5 | 6 | 6 | 6 | | |
 | 4 | 3 | 4 | 5 | 6 | 7 | 8 | 8 | 9 | 10 |
-| 5 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | ⟨pending⟩ |
+| 5 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 |
 
 At `w = 3` the maximum cofactor degree is 38, 70, 130, 258 at `X = 64..512`, so the popcount bound 6
 is reached well inside the box. The extremal weight-3 cofactor is dense on a `64 × 64` block: a
@@ -497,7 +497,7 @@ Values at `w = 4, 5` are lower bounds: the cofactors reach the box edge.
 
 **Consistency test of Theorem A.** Where the law says `1 ∈ V_c(k)`, Theorem A must be silent, so [pcc:unverified]
 `Π(c−1) > k − 3` for `k ≤ 4c − 11`. This requires `Π(3) > 2` (holds: 6), `Π(4) > 6` (holds: ≥ 10),
-and, for the lane-P value `LFD(13) = 6` (not re-verified), `Π(5) ≥ 11` (measured so far: ≥ 10).
+and, for the lane-P value `LFD(13) = 6` (not re-verified), `Π(5) ≥ 11` (holds: ≥ 11 at `X = 2048`, 37,035 unknowns, kernel dimension 28,839).
 
 ### 13.4 A counting heuristic, and what it predicts for the primary theorem
 

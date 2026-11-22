@@ -66,7 +66,7 @@ A linear lower bound needs a *locality* lemma: for $c <= alpha k - beta$, $1 in.
 
 *Missing Lemma Π.* Let Π($w$) be the largest per-coordinate popcount of a cofactor $h$ with $S h$ of binary weight $<= w$ in $FF_p [x_1, x_2]$ (no $k$, no wrap-around). A bound Π($w$) $<= alpha w + beta$ gives LFD($k$) $>= (k - 3 - beta)\/alpha + 1$.
 
-#figure(image("pi_vs_box.svg", width: 100%), caption: [Measured Π($w$) for the F2 instance against the cofactor box; dotted: counting prediction $m(w) = 6, 10, 14$. Π(3) = 6 is saturated; Π(4) $>= 10$ and Π(5) $>= 10$ still track the box edge.])
+#figure(image("pi_vs_box.svg", width: 100%), caption: [Measured Π($w$) for the F2 instance against the cofactor box; dotted: counting prediction $m(w) = 6, 10, 14$. Π(3) = 6 is saturated; Π(4) $>= 10$ and Π(5) $>= 11$ still track the box edge.])
 
 The counting heuristic matches Π(3) and Π(4) exactly and grows by about 4–5 per unit of weight for $w <= 7$, which is the observed slope 1/4. Asymptotically it grows like $w log_2 w$, so if it is sharp, Missing Lemma Π fails and Theorem A alone gives only $Omega(k \/ log k)$. The closure reaches fewer cofactors than all multiples (popcount 5 at $c = 4$ against Π(3) = 6), so LFD itself may still be linear.
 
