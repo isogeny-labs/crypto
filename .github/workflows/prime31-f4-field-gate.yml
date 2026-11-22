@@ -7,6 +7,7 @@ on:
     paths:
       - 'examples/prime31_f4_field_gate.rs'
       - 'examples/prime31_coset_xlift_f4.rs'
+      - 'examples/prime31_coset_cubic_factor.rs'
       - 'src/cryptanalysis/f4_fp.rs'
       - '.github/workflows/prime31-f4-field-gate.yml'
   workflow_dispatch:
@@ -18,6 +19,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - name: Check exact seven-cubic factor-base roots with existing Rust CZ
+        timeout-minutes: 3
+        run: cargo run --release --example prime31_coset_cubic_factor
       - name: Run exact Prime31 field arithmetic smoke
         run: cargo run --release --example prime31_f4_field_gate
       - name: Recover 8 split cosets with existing F4 solver
