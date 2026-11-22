@@ -514,8 +514,16 @@ const CASES: &[(&str, Fx, P)] = &[
         Fx::Fp4,
         &[("base", "xline"), ("large_primes", "0"), ("c4", "97")],
     ),
-    ("ic.k3_gaudry", Fx::Fp3, &[("harvester", "eliminator")]),
-    ("ic.k3_gaudry", Fx::Fp3, &[("harvester", "cycles")]),
+    (
+        "ic.k3_gaudry",
+        Fx::Fp3,
+        &[("harvester", "eliminator"), ("oracle", "groebner")],
+    ),
+    (
+        "ic.k3_gaudry",
+        Fx::Fp3,
+        &[("harvester", "cycles"), ("oracle", "groebner")],
+    ),
 ];
 
 /// Ids that are not run, each with why.  Only an external backend or the

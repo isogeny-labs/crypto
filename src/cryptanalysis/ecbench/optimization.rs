@@ -281,6 +281,12 @@ const POLICIES: &[PolicyDecl] = &[
         SpecializedDomain,
         StandardBand
     ),
+    policy!(
+        "ic.k3_gaudry",
+        NativeAdaptive,
+        SpecializedDomain,
+        StandardBand
+    ),
     policy!("rho.cubic", ReplayControl, FrozenHistorical, StandardBand),
     policy!("rho.quartic", ReplayControl, FrozenHistorical, StandardBand),
     policy!(

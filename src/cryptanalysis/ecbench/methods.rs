@@ -187,8 +187,8 @@ const K3_PARAMS: &[ParamDecl] = &[
     },
     ParamDecl {
         name: "oracle",
-        default: Some("groebner"),
-        help: "`groebner` (the O(1) symmetrised-S₄ solve) or `mitm` (2|F| pair tests per residual)",
+        default: None,
+        help: "`groebner` (the O(1) symmetrised-S₄ solve) or `mitm` (2|F| pair tests per residual); no default, since it changes the search",
     },
     ParamDecl {
         name: "trial_cap",
