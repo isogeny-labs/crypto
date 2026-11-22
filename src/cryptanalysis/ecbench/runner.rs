@@ -50,7 +50,9 @@ use crate::cryptanalysis::ecbench::record::{
     UNIT,
 };
 use crate::cryptanalysis::ecbench::signals;
-use crate::cryptanalysis::ecbench::spec::{plan, Execution, Plan, Spec};
+#[cfg(test)]
+use crate::cryptanalysis::ecbench::spec::plan;
+use crate::cryptanalysis::ecbench::spec::{Execution, Plan, Spec};
 use crate::cryptanalysis::ecbench::workload::{Workload, FLOOR_RULE_V2};
 
 pub const SESSION_SCHEMA: &str = "ecbench.session/v1";
@@ -979,7 +981,7 @@ pub fn run_session(
     if let Some(clock) = diagnostic_clock.as_mut() {
         clock.preparation.lock_acquired_ns = Some(clock.offset()?);
     }
-    let plan_: Plan = plan(spec)?;
+    let plan_: Plan = super::spec::plan_for_new_run(spec)?;
     for w in &plan_.warnings {
         progress(&format!("warning: {w}"));
     }
