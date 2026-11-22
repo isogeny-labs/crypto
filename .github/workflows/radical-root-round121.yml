@@ -7,6 +7,7 @@ on:
     paths:
       - 'src/cryptanalysis/prime_radical_root.rs'
       - 'research/amm_digit_perf_20261118/round121_sparse_fq2_ab.py'
+      - 'research/amm_digit_perf_20261118/round121_cubic_ab.py'
       - '.github/workflows/radical-root-round121.yml'
   workflow_dispatch:
 permissions:
@@ -21,15 +22,19 @@ jobs:
           sparse-checkout: |
             src/cryptanalysis/prime_radical_root.rs
             research/amm_digit_perf_20261118/round121_sparse_fq2_ab.py
+            research/amm_digit_perf_20261118/round121_cubic_ab.py
       - uses: dtolnay/rust-toolchain@stable
       - name: Source-exact Rust correctness and alternating Fp2 A/B
         run: |
           set -euo pipefail
           rustc --version
           python3 research/amm_digit_perf_20261118/round121_sparse_fq2_ab.py | tee round121_native_rust.txt
+          python3 research/amm_digit_perf_20261118/round121_cubic_ab.py | tee round121_native_cubic.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: rootfind-round121-native-rust
-          path: round121_native_rust.txt
+          path: |
+            round121_native_rust.txt
+            round121_native_cubic.txt
           if-no-files-found: warn
