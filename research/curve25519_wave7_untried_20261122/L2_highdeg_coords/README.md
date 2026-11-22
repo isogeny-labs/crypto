@@ -23,18 +23,18 @@ on E. The question has two parts:
 
 ## Answer
 
-**No positive result. By the frozen verdict rule the outcome is formally "no verdict:
-inconclusive, no positive"** [pcc:unverified].
+**Instrument valid; positive rule not met; negative rule not met (P1x failed in one post-hoc
+cell); mixed outcome, no positive** [pcc:unverified].
 
-- **Why not formally negative.** The rule requires P1, P1x and P6 for a negative verdict. P1x
-  failed in one of its 24 cells: x_E·y_E at k = 16, t = 7. That cell's band was 1/4 ± 20%, so at
+- **Why not negative.** The rule requires P1, P1x and P6 for a negative verdict. P1x
+  failed in one of its 24 cells: x_E·y_E at k = 16, t = 7 [pcc:unverified]. That cell's band was 1/4 ± 20%, so at
   most 0.300; it read 0.311 [0.306, 0.316] [pcc:unverified]. Its 1/4 prediction is the post-hoc
   one (§ Blindness). On the blind cells alone P1x held [pcc:unverified]. A failed prediction stays
   failed.
 - **What the data show:**
   1. **No degree ≥ 3 chart function covers more per column.** v, Weierstrass x/y, Montgomery
-     uv and Jacobian Y²/X³ read coverage per column ÷ cols-matched x-frames of 0.989–1.007, in
-     45/45 qualifying cells [pcc:unverified]. No cell came near the positive threshold of 1.5
+     uv and Jacobian Y²/X³ read coverage per column ÷ cols-matched x-frames of 0.993–1.007 in
+     the 45 qualifying cells (0.989–1.007 over all 48) [pcc:unverified]. No cell came near the positive threshold of 1.5
      [pcc:unverified].
   2. **Functions with a rational translation in their stabiliser lose coverage.**
      - Edwards x (Montgomery X/Y) reads 0.508–0.568 [pcc:unverified].
@@ -47,12 +47,15 @@ inconclusive, no positive"** [pcc:unverified].
   4. **The dense systems are harder, not easier.**
      - v, x/y, uv and Y²/X³ give a reduced Boolean equation of full degree n at every T, so the
        degree-D closure refutes only at D = n [pcc:unverified].
-     - x refutes at D = 6 at n = 8 and n = 10 on every target. The engine's F4 also reports
-       degree 6 [pcc:unverified].
-     - At n = 10 the counted proxy costs 2.12× x per target for every dense function
-       [pcc:unverified].
-     - Per relation, the dense functions cost 1.01–12.3× x on the same [0, 2^t) base
-       [pcc:unverified].
+     - x refutes at D = 6 at n = 8 and n = 10 on every target [pcc:unverified]. The engine's F4
+       also reports degree 6 [pcc:unverified].
+     - At n = 10 the counted proxy costs 2.12× x per target for every dense function. That is a
+       ratio between two proxy counts, not between engine counts [pcc:unverified].
+     - Per relation, v and x/y (the P6 arms) cost 1.01–12.3× x on the same [0, 2^t) base
+       [pcc:unverified]. Over all four dense functions at T = 5 the range is 0.84–12.3×. Two
+       cells are below x: uv at k = 18 (0.88) and Y²/X³ at k = 20 (0.84) [pcc:unverified]. Each
+       value rests on the coverage of a single base, some as small as 10 points, so these
+       ratios are noisy.
      - At these sizes the proxy has little power to show a large gap; see the Macaulay section.
 
 ![coverage per column and proxy cost](l2_coverage.png)
@@ -101,7 +104,7 @@ Notes on the second table:
 - The symmetry sets and fibre maxima are the measured ones; they equal the prediction on every
   curve [pcc:unverified].
 - The S^f columns are identical on the three curves [pcc:unverified]. Every kernel had
-  dimension 1. All 1,000 fresh zeros vanished and all 1,000 random triples did not
+  dimension 1 [pcc:unverified]. All 1,000 fresh zeros vanished and all 1,000 random triples did not
   [pcc:unverified].
 - The split-fibre counts equal the per-variable degree wherever a fully rational fibre exists
   [pcc:unverified]. x_E·y_E has none at k = 18 or 20.
@@ -132,7 +135,9 @@ R_col = mean covered ÷ cols-matched x-frames. R_val = mean covered ÷ x-frames 
 | x-frame on 2E (positive control) | 16, 18, 20 | 1.606–2.001 | [1.6, 2.4] | – | – |
 
 The coset-selection gain (the frame-search effect) appears at about the same size in every arm:
-argmax-J frame ÷ mean is 1.4–6 at t = 4–7 for both f-frames and x-frames [pcc:unverified]. That
+argmax-J frame ÷ mean is 1.42–6.03 for the f-frames and 1.42–7.20 for the cols-matched x-frames
+of the function arms at t = 4–7 [pcc:unverified]. The control arms go lower: down to 1.05 for
+f-frames and 1.11 for x-frames [pcc:unverified]. That
 statistic was descriptive, with no threshold.
 
 ## Macaulay proxy (counted, like for like; low power)
