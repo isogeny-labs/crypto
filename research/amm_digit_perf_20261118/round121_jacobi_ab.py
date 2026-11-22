@@ -157,7 +157,7 @@ mod tests {
     let mut before=Vec::new();let mut after=Vec::new();let mut hash_ref=None;
     for trial in 0..13{
      let measure=|optimized:bool|->(f64,u64){
-      let start=Instant::now();let mut digest=0x1211_2026_f00d_abcd;
+      let start=Instant::now();let mut digest=0x1211_2026_f00d_abcdu64;
       for _ in 0..64{
        for &(b,c) in &inputs {
         let roots=if optimized{
