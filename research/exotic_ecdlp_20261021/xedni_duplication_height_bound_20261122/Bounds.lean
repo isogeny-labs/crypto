@@ -96,6 +96,36 @@ theorem outer_tail_coefficient_bound :
     (1502 : ℚ) / 128 ^ 2 + 31976 / 128 ^ 3 + 187435 / 128 ^ 4 < 1 / 4 := by
   norm_num
 
+theorem bernstein_quartic_lower
+    (b₀ b₁ b₂ b₃ b₄ K s : ℝ)
+    (hs₀ : 0 ≤ s) (hs₁ : s ≤ 1)
+    (hb₀ : K ≤ b₀) (hb₁ : K ≤ b₁) (hb₂ : K ≤ b₂)
+    (hb₃ : K ≤ b₃) (hb₄ : K ≤ b₄) :
+    K ≤ b₀ * (1 - s) ^ 4 +
+      b₁ * (4 * s * (1 - s) ^ 3) +
+      b₂ * (6 * s ^ 2 * (1 - s) ^ 2) +
+      b₃ * (4 * s ^ 3 * (1 - s)) + b₄ * s ^ 4 := by
+  let w₀ : ℝ := (1 - s) ^ 4
+  let w₁ : ℝ := 4 * s * (1 - s) ^ 3
+  let w₂ : ℝ := 6 * s ^ 2 * (1 - s) ^ 2
+  let w₃ : ℝ := 4 * s ^ 3 * (1 - s)
+  let w₄ : ℝ := s ^ 4
+  have ht : 0 ≤ 1 - s := sub_nonneg.mpr hs₁
+  have hw₀ : 0 ≤ w₀ := pow_nonneg ht _
+  have hw₁ : 0 ≤ w₁ := by dsimp [w₁]; positivity
+  have hw₂ : 0 ≤ w₂ := by dsimp [w₂]; positivity
+  have hw₃ : 0 ≤ w₃ := by dsimp [w₃]; positivity
+  have hw₄ : 0 ≤ w₄ := pow_nonneg hs₀ _
+  have hsum : w₀ + w₁ + w₂ + w₃ + w₄ = 1 := by
+    dsimp [w₀, w₁, w₂, w₃, w₄]
+    ring
+  change K ≤ b₀ * w₀ + b₁ * w₁ + b₂ * w₂ + b₃ * w₃ + b₄ * w₄
+  calc
+    K = K * (w₀ + w₁ + w₂ + w₃ + w₄) := by rw [hsum]; ring
+    _ = K * w₀ + K * w₁ + K * w₂ + K * w₃ + K * w₄ := by ring
+    _ ≤ b₀ * w₀ + b₁ * w₁ + b₂ * w₂ + b₃ * w₃ + b₄ * w₄ := by
+      gcongr
+
 theorem numerical_height_gap_lt14 : (53 / 3 : ℝ) * Real.log 2 < 14 := by
   have hlog := Real.log_two_lt_d9
   linarith
@@ -109,6 +139,7 @@ theorem doubled_generator_x : F 17 1 = 5600 ∧ G 17 1 = 400 := by
 #print axioms upper_coefficient_bound
 #print axioms resultant_lt_pow43
 #print axioms outer_tail_coefficient_bound
+#print axioms bernstein_quartic_lower
 #print axioms numerical_height_gap_lt14
 #print axioms doubled_generator_x
 
