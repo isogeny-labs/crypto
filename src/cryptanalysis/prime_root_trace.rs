@@ -1488,10 +1488,10 @@ fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, Strin
     if m.len() == 4 {
         return vpower_cubic(base, e, m, p);
     }
-    // The large-prime native CPU path is intentionally unchanged until
-    // source-exact Rust A/B clears the crossover. Local GCC reproductions
-    // regressed over 2^61-1; only test 32-bit fields here.
-    if m.len() == 5 && p <= u32::MAX as u64 {
+    // Source-exact Rust A/B showed a 3.3% complete-quartic regression over
+    // p=65521 and a 2.5% gain over p=1e9+7; keep small-field and p61
+    // workloads on the original, previously validated generic path.
+    if m.len() == 5 && p >= (1u64 << 24) && p <= u32::MAX as u64 {
         return vpower_quartic(base, e, m, p);
     }
     // Polynomial remainder is invariant under scaling the modulus by a
@@ -1734,7 +1734,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                         vquadratic_replay_mul(&state.acc, &state.base, &state.modulus, p)
                     } else if state.modulus.len() == 4 && p >= (1u64 << 24) {
                         vcubic_replay_mul(&state.acc, &state.base, &state.modulus, p)
-                    } else if state.modulus.len() == 5 && p <= u32::MAX as u64 {
+                    } else if state.modulus.len() == 5 && p >= (1u64 << 24) && p <= u32::MAX as u64 {
                         vquartic_replay_mul(&state.acc, &state.base, &state.modulus, p)
                     } else {
                         vpower_reduce(vproduct(&state.acc, &state.base, p), &state.modulus, p)?
@@ -1751,7 +1751,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                         vquadratic_replay_square(&state.base, &state.modulus, p)
                     } else if state.modulus.len() == 4 && p >= (1u64 << 24) {
                         vcubic_replay_square(&state.base, &state.modulus, p)
-                    } else if state.modulus.len() == 5 && p <= u32::MAX as u64 {
+                    } else if state.modulus.len() == 5 && p >= (1u64 << 24) && p <= u32::MAX as u64 {
                         vquartic_replay_square(&state.base, &state.modulus, p)
                     } else {
                         vpower_reduce(vproduct(&state.base, &state.base, p), &state.modulus, p)?
