@@ -130,6 +130,24 @@ These are independently executed **Python arithmetic checks**, not original-sour
 4. Only if the trace–skew system is solver-stage competitive, integrate the existing Rust IC relation collector and verify authentic labelled independent rows, full rank/target-specific quotient rank, signed witnesses, complete unknown-target log recovery, and matched optimized negation rho and best project IC costs.
 5. A speedup in asymptotic exponent needs a **growing prime-field family**, end-to-end slope bounds with uncertainty and a proven or defensibly analysed sub-generic decomposition algorithm, not a constant-size p31 speedup. Neither theorem nor performance evidence here establishes it.
 
+## Critical asymptotic obstacle and a compact quadratic-circuit alternative
+
+The degree-B theorem is **NOT** an efficient materialization bound. A generic polynomial in m elementary variables of total degree B can have up to C(B+m,m) monomials. For m=4, the upper-bound support sizes are 495 at B=8, 58,905 at B=32, 814,385 at B=64, 12,082,785 at B=128, and **8,882,684,790 at B=677**. Not every G_j reaches that support, but a dense expanded F4 input at index-calculus-sized B can be prohibitively expensive. If the actual expansion costs Θ(B^4), even the optimistic m4 model with B≈p^(1/5) incurs p^(4/5) **cold preprocessing**, worse than generic rho. This is a conditional *method obstruction*, not a lower bound on the best algebraic decomposition algorithm.
+
+The proposed alternative exposes the **Newton recurrence itself** as a sparse quadratic circuit. Introduce fresh variables `U_1,...,U_(B+m-1)`, fix U0=m, and impose
+
+```text
+for k=1,...,B+m-1:
+  U_k = SUM_(i=1)^(k-1) (-1)^(i-1) e_i U_(k-i) + (-1)^(k-1)*k*e_k  if k<=m;
+  U_k = SUM_(i=1)^m     (-1)^(i-1) e_i U_(k-i)                       if k>m.
+for j=0,...,m-1:
+  SUM_(k=0)^B h_k U_(j+k) = 0.
+```
+
+All equations have total degree ≤2, contain O(mB) monomial occurrences for fixed m, and are an **exact graph lift** of H_j=0 because the triangular U recurrence uniquely determines every U_k from e. They introduce O(B) additional variables and constraints, however, so ordinary generic F4 may still be much worse. A structured recurrence-elimination or black-box engine that avoids both the Θ(B^m) expansion and huge F4 matrices would be necessary for an asymptotic advantage.
+
+The original-crate Rust [F4 pilot](../../examples/prime31_trace_f4_pilot.rs) includes this as an additional `--circuit` arm in the m2 planted S3 comparison, with the same original F4 backend, bounded timeouts, full equation setup and exact planted power-sum verification. **Neither compile/test evidence nor a measured speed ratio exists yet**. The next discriminating experiment is expanded degree-B G versus quadratic circuit at B=3/4/6/8, then m4 chained S3 and finally scalable structured elimination, rather than materializing massive B677 polynomials.
+
 ## Original-crate Rust F4 pilot: actual S3 relations and m4 chains (not yet executed)
 
 [examples/prime31_trace_f4_pilot.rs](../../examples/prime31_trace_f4_pilot.rs) is checked in against the repository's existing `crypto_lib::cryptanalysis::f4_fp::{f4,F4Options,normalise}`, not a fresh CAS or Python performance harness. It symbolically generates all ordinary-`Fp` Newton moments and unitriangular degree-B reductions, verifies `max(total_degree(G_j)) <= B`, converts to the **same Grevlex F4 backend**, and records per-arm input degree, term count, matrix rows/cols, `solving_degree`, `degree_reached`, field operations, setup time, F4 time, timeout and degree cap. **The code has not been compiled or run in original Rust; no observed ratio is asserted.**
