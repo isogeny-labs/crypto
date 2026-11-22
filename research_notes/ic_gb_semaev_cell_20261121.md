@@ -66,9 +66,48 @@ The first version wrote the `C` coefficient of S3 with `+4b(x1+x2)` instead of
 (assert caught it immediately). Anyone re-deriving S4 from the resultant should
 check against the group law before trusting a basis.
 
+## Calibration (same day): `solving_degree` is trustworthy
+
+`examples/ic_gb_calibrate.rs` runs homogeneous semi-regular systems (m quadrics
+in n variables, m = n+1 and n+2) and compares `solving_degree` with the
+Bardet–Faugère–Salvy prediction (first non-positive coefficient of
+`(1-t^2)^m/(1-t)^n`, computed in exact integer arithmetic).
+
+| n | m | predicted d_reg | solving_degree |
+|---|---|---|---|
+| 3 | 4 | 3 | 3 |
+| 3 | 5 | 3 | 3 |
+| 4 | 5 | 3 | 3 |
+| 4 | 6 | 3 | 3 |
+| 5 | 6 | 4 | 4 |
+| 5 | 7 | 3 | 3 |
+| 6 | 7 | 4 | 4 |
+| 6 | 8 | 4 | 4 |
+
+**8/8 exact.** The instrument is calibrated against the standard prediction, so
+the small values in the table above are real properties of those (near-empty)
+ideals, not a bug. This is the first calibration of a prime-field d_reg
+instrument in this workspace and it should be quoted whenever the metric is
+used.
+
+## Scaling wall (same day)
+
+The dense F4 times out at k = 12 and 16 with a 120 s budget (degree reached
+21–24, ~4,600 rows):
+`k=12 window solving_degree=5 timed_out=true`, `k=12 pullback 3 timed_out=true`,
+`k=16 window 5 timed_out=true`, `k=16 pullback 3 timed_out=true`.
+The differing `solving_degree` values under timeout are not evidence — both
+runs were truncated.
+
+So the instrument as written covers membership degrees up to ~10 at this prime.
+Reaching |B| ≈ (30p)^{1/3} ≈ 50 needs the sparse/dense split moved to `msolve`
+(F4 over F_p, available at `/opt/homebrew/bin/msolve`), or a much larger budget
+with the degree bound raised.
+
 ## Next
 
-1. Calibrate `solving_degree` on a cell with a known published value.
-2. Move to |B| ≈ (30p)^{1/3} with msolve for the dense steps, or raise the F4
-   degree bound and budget.
-3. Read the PKM paper before any further parametrized-base compute.
+1. Move the |B| ≈ (30p)^{1/3} cell to msolve for the dense steps (the repo's F4
+   remains the reference implementation for cross-checks at small k).
+2. Read the PKM paper before any further parametrized-base compute.
+3. Consider adding the calibration as a `#[test]` so the metric cannot silently
+   drift.

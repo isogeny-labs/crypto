@@ -231,7 +231,11 @@ fn main() {
         v
     };
 
-    for k in [6usize, 8] {
+    let ks: Vec<usize> = std::env::args().skip(1)
+        .filter_map(|a| a.parse().ok())
+        .collect();
+    let ks = if ks.is_empty() { vec![6usize, 8] } else { ks };
+    for k in ks {
         let wx: Vec<u64> = xs_all.iter().copied().take(k).collect();
         // pullback: |T| = k/2, x-set = {x : x^2 in T}
         let mut t: Vec<u64> = Vec::new();
