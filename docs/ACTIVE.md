@@ -14,6 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+- [x] Prime31: evaluate signed one/two-prefix RR9 chart reduction without generic sum tables, Rust exact-source algebra and cost gate (automation, started 2026-11-19, branch automation/prime31-rr9-prefix2-cost-20261119, PR #4773)
 - [ ] Prime31 public RR9 factor-resultant/Jacobian gate and scaling falsifier (automation, 2026-11-19, PR #4772; prospective protocol recorded, original native Rust + independent dual replay CI pending)
 
 - [ ] Speed up prime-field ECDLP index calculus across counted cost `S(w)` (`w in [0, 1]`), `bitop/v1` gate counts, and cold single-target solve wall time (Cursor, started 2026-11-18, branch cursor/prime-ecdlp-ic-speedup-809a)
