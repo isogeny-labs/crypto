@@ -41,7 +41,8 @@ def zK(K):
     Phi = 0.5 * (1 + np.vectorize(math.erf)(xs / math.sqrt(2)))
     logF = K * np.log(np.clip(Phi, 1e-300, 1))
     cdf = np.exp(logF)
-    return float(np.trapezoid(1 - cdf, xs) - np.trapezoid(cdf[xs < 0], xs[xs < 0]))
+    pos = xs >= 0
+    return float(np.trapezoid(1 - cdf[pos], xs[pos]) - np.trapezoid(cdf[~pos], xs[~pos]))
 
 def zK_asym(log2K):
     """Asymptotic E[max of K N(0,1)] for huge K (derived scaling only)."""
@@ -180,10 +181,11 @@ def main():
     for key_ in list(reps): reps[key_] = centred(reps[key_], G[key_])
     res['PC3'] = pc3; res['PC3_pass'] = bool(pc3) and all(x['inside'] for x in pc3)
     # ---------- fits (arm F: J selector on J, K) ----------
-    def fit_arm(arm, curves, Kfit, train_max, sname='J', vname='J'):
+    def fit_arm(arm, curves, Kfit, train_max, sname='J', vname='J', tfilter=None):
         out = {}
         for cur in curves:
-            ts = sorted(t for (ar, cu, t, s, v, KK) in G if ar == arm and cu == cur and s == sname and v == vname and KK == Kfit)
+            ts = sorted(t for (ar, cu, t, s, v, KK) in G if ar == arm and cu == cur and s == sname and v == vname and KK == Kfit
+                        and (tfilter is None or tfilter(cur, t)))
             if len(ts) < 3: continue
             Gv = np.array([G[(arm, cur, t, sname, vname, Kfit)] for t in ts])
             R_ = np.array([reps.get((arm, cur, t, sname, vname, Kfit), np.full(a.B or 2, Gv[i])) for i, t in enumerate(ts)])
@@ -248,6 +250,9 @@ def main():
     res['decision_F'] = decide(fitsF); res['decision_I'] = decide(fitsI)
     # composition-only selector: alpha of Phi gain (P3)
     fitsPhi = fit_arm('F', curvesF, KF, 99, 'Phi', 'Phi')
+    unsat = {(c_['curve'], c_['t']) for c_ in res['F_cells'] if c_['cov_over_r'] is not None and c_['cov_over_r'] <= 0.05}
+    fitsCov = fit_arm('F', curvesF, KF, 99, 'J', 'covered', tfilter=lambda cu, t: (cu, t) in unsat)
+    res['descriptive_alpha_covered_unsaturated'] = {cu: f['fits_all'].get('M2', [None, None])[1] for cu, f in fitsCov.items()}
     res['alpha_Phi'] = {cu: f['fits_all'].get('M2', [None, None])[1] for cu, f in fitsPhi.items()}
     # c-only share of the J-selector excess at t >= 8 (P3b)
     share = {}
