@@ -393,9 +393,6 @@ impl Engine<'_> {
         Ok((q, r))
     }
     fn pow(&mut self, base: &[u64], mut exponent: u64, modulus: &[u64]) -> Work<Vec<u64>> {
-        if modulus.last() != Some(&1) {
-            return self.pow_nonmonic(base, exponent, modulus);
-        }
         let id = self.next_id;
         self.next_id += 1;
         self.event(RootEvent::PowerBegin {
@@ -592,7 +589,15 @@ impl Engine<'_> {
             })?;
             return Ok(RootStop::AllFieldElements);
         }
-        let xp = self.pow(&[0, 1], p, &f)?;
+        // The first Frobenius power is the only call using the caller's
+        // possibly nonmonic input. Every later split uses a monic gcd
+        // factor. Dispatch here, leaving the monic power implementation
+        // byte-for-byte unchanged for the hot paths and their codegen.
+        let xp = if f.last().is_some_and(|&lead| lead != 1) {
+            self.pow_nonmonic(&[0, 1], p, &f)?
+        } else {
+            self.pow(&[0, 1], p, &f)?
+        };
         let mut xpx = xp.clone();
         xpx.resize(xpx.len().max(2), 0);
         xpx[1] = self.field(FieldOp::Sub, xpx[1], 1)?;
