@@ -88,5 +88,46 @@
     "complete_index_calculus_solver": false,
     "measured_complete_solver_advantage": false,
     "independent_signed_pcc": "unverified"
-  }
+  },
+  "native_ci_with_independent_python": {
+    "url": "https://github.com/isogeny-labs/crypto/actions/runs/45022156215",
+    "run_id": 45022156215,
+    "job_id": 137207239654,
+    "status_at_log_retrieval": "job steps all successful; workflow concluding",
+    "python_120025_field_12288_group": "pass",
+    "rust_120049_field_12288_group": "pass",
+    "rust_version": "1.100.0",
+    "release_build_seconds": 6.3,
+    "benchmark": {
+      "complete_folded_ns_per_step": [
+        21.7497,
+        21.8733,
+        21.8971,
+        21.8566,
+        21.8786
+      ],
+      "partial_prior_ns_per_step": [
+        21.6424,
+        21.9587,
+        21.8177,
+        21.9612,
+        22.3461
+      ],
+      "original_affine_ns_per_step": [
+        385.601,
+        385.2714,
+        384.8678,
+        384.2782,
+        384.3006
+      ],
+      "median_complete_folded_ns": 21.8733,
+      "median_partial_prior_ns": 21.9587,
+      "median_original_affine_ns": 384.8678,
+      "original_over_complete": 17.5954,
+      "partial_over_complete": 1.0039,
+      "projected_1024_shift_only_ms": 102.8032,
+      "digest": 1372725649
+    }
+  },
+  "validation_note": "The same-source second run reports nearly equal complete-folded vs prior partial (1.0039x), despite first-run 1.0951x. Do not claim a robust 9.5% fold benefit. Both runs validate exceptional completeness and show ~21.6-21.9ns complete primitive. Cross-run original affine timing drift is large; never aggregate unmatched ratios."
 }
