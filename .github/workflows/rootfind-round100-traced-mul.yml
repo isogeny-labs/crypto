@@ -1,0 +1,34 @@
+name: Rootfind round100 traced polynomial multiplication A/B
+on:
+  push:
+    branches:
+      - 'automation/rootfind-column-accumulator-round89-20261121'
+    paths:
+      - 'src/cryptanalysis/prime_root_trace.rs'
+      - 'research/amm_digit_perf_20261118/round100_full_ab.py'
+      - '.github/workflows/rootfind-round100-traced-mul.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  round100-source-exact:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round100_full_ab.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Frozen Round99 versus Round100 source-exact Rust solve/verify and traced product
+        env:
+          ROOTFIND_BASELINE_REF: 06d01cfbf7f4df79f9f247240124eea80e8e6bf4
+          ROOTFIND_AB_OUTPUT: research/amm_digit_perf_20261118/round100_full_results.csv
+        run: python3 research/amm_digit_perf_20261118/round100_full_ab.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rootfind-round100-traced-mul-ab
+          path: research/amm_digit_perf_20261118/round100_full_results.csv
