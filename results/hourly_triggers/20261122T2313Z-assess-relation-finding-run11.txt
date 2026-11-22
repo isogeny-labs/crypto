@@ -1,0 +1,6 @@
+trigger_utc=2026-11-22T23:13:00Z
+purpose=Assess relation-finding throughput and success against frozen n23 baseline
+harness=python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+baseline=results/relation_baseline.json
+threshold_percent=20
+output=results/hourly_log.csv
