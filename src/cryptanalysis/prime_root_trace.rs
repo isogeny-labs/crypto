@@ -1307,7 +1307,6 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
 // Quotient-free ownership for a residue already below the modulus degree.
 // In particular, initial 1 and x+delta need no allocation or division when
 // their degrees are smaller. A nonempty modulus is required in both paths.
-#[inline]
 // Keep the general cubic-and-higher reduction out of the linear/quadratic
 // modular-power hot path. The verifier has many repeated calls with tiny
 // moduli; inlining this loop there enlarges the entire exponentiation body.
@@ -1330,6 +1329,33 @@ fn vpower_monic_remainder(mut remainder: Vec<u64>, modulus: &[u64], p: u64) -> V
     trim(remainder)
 }
 
+// For x^d +/- 1 the quotient-ring remainder needs one coefficient
+// addition/subtraction per cancelled high term, not degree modular products.
+// Keep this verifier-only fast path out of the existing generic remainder
+// loop so dense/non-unit moduli retain their original code.
+#[inline(never)]
+fn vpower_unit_binomial_remainder(
+    mut remainder: Vec<u64>, degree: usize, positive_reduction: bool, p: u64,
+) -> Vec<u64> {
+    debug_assert!(degree >= 4 && remainder.len() > degree);
+    for shift in (0..remainder.len() - degree).rev() {
+        let high = remainder[shift + degree];
+        if high == 0 { continue; }
+        remainder[shift + degree] = 0;
+        let old = remainder[shift];
+        remainder[shift] = if positive_reduction {
+            // The modulus is x^d - 1.
+            let sum = old + high; // canonical residues, 2*p-2 <= 2^62-4
+            if sum >= p { sum - p } else { sum }
+        } else {
+            // The modulus is x^d + 1.
+            if old >= high { old - high } else { old + p - high }
+        };
+    }
+    remainder.truncate(degree);
+    trim(remainder)
+}
+
 fn vpower_reduce(product: Vec<u64>, modulus: &[u64], p: u64) -> Result<Vec<u64>, String> {
     if !modulus.is_empty() && product.len() < modulus.len() {
         return Ok(product);
@@ -1338,6 +1364,15 @@ fn vpower_reduce(product: Vec<u64>, modulus: &[u64], p: u64) -> Result<Vec<u64>,
     // the remainder only: avoid allocating a quotient for every reduction.
     // Preserve the existing synthetic linear/quadratic division fast paths.
     if modulus.len() >= 4 && modulus.last() == Some(&1) {
+        // Check the unit constant before scanning interior coefficients.
+        // Avoid the scan for the overwhelmingly common dense modulus.
+        let degree = modulus.len() - 1;
+        if degree >= 4 && (modulus[0] == 1 || modulus[0] == p - 1)
+            && modulus[1..degree].iter().all(|&x| x == 0)
+        {
+            return Ok(vpower_unit_binomial_remainder(
+                product, degree, modulus[0] == p - 1, p));
+        }
         return Ok(vpower_monic_remainder(product, modulus, p));
     }
     Ok(vdiv(&product, modulus, p)?.1)
@@ -3502,4 +3537,55 @@ mod round108_unit_monomial_fastpaths {
         }
     }
 
+}
+
+#[cfg(test)]
+mod round110_unit_binomial_quotient {
+    use super::*;
+
+    #[test]
+    fn unit_binomial_remainder_matches_independent_u128_long_division() {
+        // The reference performs full polynomial long division with u128
+        // arithmetic; it never calls the specialized reduction routine.
+        for p in [7u64, 65_521, 1_000_000_007, MAX_PRIME] {
+            for degree in [4usize, 5, 8] {
+                for constant in [1, p - 1] {
+                    let mut modulus = vec![0u64; degree + 1];
+                    modulus[0] = constant;
+                    modulus[degree] = 1;
+                    let mut state = 0x726f_6f74_3131_3030u64 ^ p;
+                    for iteration in 0..384usize {
+                        let width = degree + 1 + (iteration % (degree * 2 + 1));
+                        let mut product = vec![0u64; width];
+                        for value in &mut product {
+                            state ^= state << 7;
+                            state ^= state >> 9;
+                            state ^= state << 8;
+                            *value = state % p;
+                        }
+                        if iteration % 11 == 0 {
+                            for value in &mut product { *value = p - 1; }
+                        } else if iteration % 13 == 0 {
+                            product[width - 1] = 0;
+                        }
+                        let mut expected = product.clone();
+                        for shift in (0..expected.len() - degree).rev() {
+                            let high = expected[shift + degree];
+                            let term = (high as u128 * constant as u128
+                                        % p as u128) as u64;
+                            expected[shift] = ((expected[shift] as u128
+                                + p as u128 - term as u128) % p as u128) as u64;
+                            expected[shift + degree] = 0;
+                        }
+                        expected.truncate(degree);
+                        assert_eq!(
+                            vpower_reduce(product, &modulus, p).unwrap(),
+                            trim(expected),
+                            "p={p} degree={degree} constant={constant} trial={iteration}"
+                        );
+                    }
+                }
+            }
+        }
+    }
 }
