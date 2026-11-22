@@ -1,0 +1,5 @@
+{'commit': '6213ecbc0da0ed4917ab75805258201d6629b477', 'n_instances': 54, 'n_runs': 32, 'instances_pass': 52, 'runs_pass': 30, 'runs_by_arm': {'w': 16, 'x': 16, 'Q': 0}, 'all_pass': False}
+FAIL {'curve_seed': 172, 'target_seed': 3000181, 'checks': {'f': True, 'G': True, 'T': False, 't': True, 'order_h_r': True}, 'pass': False}
+FAIL {'curve_seed': 172, 'target_seed': 7000193, 'checks': {'f': True, 'G': True, 'T': True, 't': False, 'order_h_r': True}, 'pass': False}
+FAIL {'arm': 'w', 'curve_seed': 172, 'target_seed': 1000175, 'seed': 1, 'recovered': 6714523865044167, 'fields_compared': ['group_ops', 'rel_mul', 'rel_add', 'la_mul', 'la_add', 'trials', 'relations'], 'checks': {'recovered_eq_t': False, 'recovered_G_eq_T': False, 'counts_eq_committed_row': True, 'certified_ok_eq_row': True}, 'pass': False}
+FAIL {'arm': 'w', 'curve_seed': 172, 'target_seed': 8000196, 'seed': 2, 'recovered': 32474485226905061, 'fields_compared': ['group_ops', 'rel_mul', 'rel_add', 'la_mul', 'la_add', 'trials', 'relations'], 'checks': {'recovered_eq_t': True, 'recovered_G_eq_T': True, 'counts_eq_committed_row': False, 'certified_ok_eq_row': True}, 'pass': False}
