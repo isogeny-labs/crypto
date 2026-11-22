@@ -42,3 +42,10 @@ The existing F4 engine's own module documentation states that it is designed for
 5. Compare cold and amortized 1, 32, 128, 1,024, 4,096 targets against best same-runner native Rust index-calculus, negated BSGS and optimized negation-safe rho. Report isolated paired repetitions and uncertainty; no claimed win before that.
 
 **Unresolved:** there is still no verified blind sparse-F4 root recovery on Prime31 and no established fully charged non-generic solver advantage.
+
+## New source-linked Rust smoke gate
+
+The branch adds `examples/prime31_f4_field_gate.rs` using the repository's **existing** `crypto_lib::cryptanalysis::f4_fp::{f4,F4Options,Ordering,Poly}` interface. It builds a two-variable overdetermined, linear/quadratic system over the actual p=2^31−1 with a root near p and checks that every returned basis equation vanishes at that known root. This is only an arithmetic-width/API smoke gate and does not use hidden witnesses as input to any future blind Prime31 F4 experiment.
+
+A bounded `.github/workflows/prime31-f4-field-gate.yml` is added for the branch. The local environment has no Rust toolchain; workflow PASS is **not yet observed**, so neither compilation nor native F4 correctness is claimed for this commit.
+
