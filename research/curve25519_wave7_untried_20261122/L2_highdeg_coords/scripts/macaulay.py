@@ -20,8 +20,9 @@ Reported per (k, f, T, target):
   M2 (degree-D Macaulay closure, MutantXL rule, the counted proxy): V_D = span of
      m*Shat (deg m <= D - e), closed under z_i * h for h in V_D of degree <= D - 1
      (degree falls); at D = n the ring is closed, V_n = the ideal. D_ref = first D with
-     1 in V_D (refutation); for a target with a unique Boolean root D_root = first D
-     with n independent polynomials of degree <= 1 in V_D (they pin the root).
+     1 in V_D (refutation); for a target with 1..8 Boolean roots Z, D_root = first D
+     at which V_D holds all n + 1 - rank{(1,z)} independent polynomials of degree <= 1
+     that vanish on Z (they pin the roots up to their affine hull).
      Recorded per D: active columns sum_{i<=D} C(n,i), rank V_D, counted mul-adds
      (rows x pivots x active columns per reduction, rows x active columns per pivot in
      each RREF). Check: rank V_n = 2^n - |Z|.
@@ -69,7 +70,7 @@ def moebius(vals, n, p):
     return h
 
 
-def closure(ring, shat_perm, e, p, mode, Dmax):
+def closure(ring, shat_perm, e, p, mode, Dmax, lin_target=None):
     """M2. shat_perm: coefficients in the degree-descending column order."""
     n, N = ring.n, ring.N
     B = np.zeros((0, N), dtype=np.int64); piv = []
@@ -80,6 +81,8 @@ def closure(ring, shat_perm, e, p, mode, Dmax):
     mult_last = {0: [-1]}
     D0 = max(e, 0)
     res = dict(D_ref=None, D_root=None)
+    if lin_target is None:
+        lin_target = n
     for D in range(D0, Dmax + 1):
         lo = N - ring.cnt[D]
         j = D - e
@@ -129,9 +132,9 @@ def closure(ring, shat_perm, e, p, mode, Dmax):
         hist.append(dict(D=D, cols=ring.cnt[D], rank=len(piv), muladds=counter['muladds'], refuted=refuted, lin=lin))
         if refuted and res['D_ref'] is None:
             res['D_ref'] = D
-        if lin >= n and res['D_root'] is None:
+        if lin >= lin_target and res['D_root'] is None:
             res['D_root'] = D
-        if (mode == 'ref' and refuted) or (mode == 'root' and lin >= n) or D == Dmax:
+        if (mode == 'ref' and refuted) or (mode == 'root' and lin >= lin_target) or D == Dmax:
             break
     res['hist'] = hist
     return res
@@ -217,10 +220,16 @@ def run(a):
                             d1 = max(popcount(int(x)) for x in np.nonzero(hi)[0])
                             rec['M1'] = dict(d_mult=d1, D=e + d1, rows=sum(math.comb(nn, i) for i in range(d1 + 1)),
                                              cols=sum(math.comb(nn, i) for i in range(min(nn, e + d1) + 1)))
-                        if ring is not None and (Z.size == 0 or Z.size == 1):
+                        if ring is not None and Z.size <= 8:
                             sp_perm = np.zeros(ring.N, dtype=np.int64); sp_perm[ring.pos] = h
                             mode = 'ref' if Z.size == 0 else 'root'
-                            cl = closure(ring, sp_perm, e, p, mode, nn)
+                            lin_target = None
+                            if Z.size:
+                                # degree <= 1 polynomials vanishing on Z: n + 1 - rank{(1, z) : z in Z}
+                                Mz = np.array([[1] + [(int(z) >> i) & 1 for i in range(nn)] for z in Z], dtype=np.int64)
+                                lin_target = nn + 1 - len(rref(Mz, p)[1])
+                                rec['lin_target'] = lin_target
+                            cl = closure(ring, sp_perm, e, p, mode, nn, lin_target)
                             last = cl['hist'][-1]
                             rec['M2'] = dict(mode=mode, D_ref=cl['D_ref'], D_root=cl['D_root'], hist=cl['hist'],
                                              rank_at_n_check=(last['rank'] == ring.N - Z.size) if last['D'] == nn else None)

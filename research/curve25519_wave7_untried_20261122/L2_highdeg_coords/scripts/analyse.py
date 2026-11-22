@@ -181,7 +181,7 @@ def main():
     a = ap.parse_args()
     cells = census(a.data)
     sp = json.load(open(f'{a.data}/sumpoly.json'))
-    mc = json.load(open(f'{a.data}/macaulay.json'))
+    mc = [r for fn in sorted(glob.glob(f'{a.data}/macaulay*.json')) for r in json.load(open(fn))]
     meta = json.load(open(f'{a.data}/census_meta.json')) if os.path.exists(f'{a.data}/census_meta.json') else {}
     V = decide(cells, sp, mc, meta)
     V = {kk: (bool(v) if isinstance(v, (bool, np.bool_)) else v) for kk, v in V.items()}
