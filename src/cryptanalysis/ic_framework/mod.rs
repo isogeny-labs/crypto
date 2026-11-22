@@ -83,6 +83,8 @@ pub mod rootfind_floor;
 pub mod rootfind_gpu;
 pub mod rootfind_kmitm;
 #[cfg(target_arch = "x86_64")]
+mod rootfind_kmitm_avx2;
+#[cfg(target_arch = "x86_64")]
 mod rootfind_kmitm_ifma;
 pub mod shared_rank;
 pub mod solver_units;

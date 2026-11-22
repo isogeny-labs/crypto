@@ -175,8 +175,25 @@ implementation-level on this roof.
 ### Loop continues — AVX2 fallback (non-IFMA hosts)
 
 Next track: 4-wide AVX2 Montgomery lanes for `right=1` when IFMA is absent
-(`p < 2^32`). Measured on this host with IFMA forced off. Stop when AVX2
-lanes reach grade **B** (≥0.40) or three fail-closed ticks within noise.
+(`p < 2^31` so `a·b+m·p` fits in u64). Measured on this host with IFMA
+forced off. Stop when AVX2 lanes reach grade **B** (≥0.40) or three
+fail-closed ticks within noise.
+
+### Tick 9 — AVX2 first cut (fail-closed)
+
+Landed `rootfind_kmitm_avx2::Avx2Right1` (R=2^32, 4 lanes, `mul_epu32`),
+wired behind `decompose_lanes` when IFMA is off. Correctness:
+`kmitm_avx2_lanes_recover_planted_m4` passes at bits=28.
+
+| Arm (bits=28, \|Fₓ\|=32) | A_single | Grade |
+|---|---:|---|
+| kmitm:m=4 AVX2 | **0.158** | D |
+| kmitm:m=4 scalar lanes8 | 0.181 | D |
+
+AVX2 is **slower** than scalar lanes (Bloom/map overhead + weaker 4-wide
+vs 8-wide scalar ILP; `mul_epu32` mont is not free). Fail-closed tick 1/3.
+Next loop tick: cut candidate-buffer / map traffic, or widen to 8 via two
+AVX2 packs; else second fail-closed.
 
 ## Claim hygiene
 

@@ -31,7 +31,7 @@ fn main() {
             .unwrap_or_else(|| d.to_string())
     };
     let arm = get("--arm", "kmitm:m=4");
-    let mode = get("--mode", "single"); // single | lanes | ifma
+    let mode = get("--mode", "single"); // single | lanes | ifma | avx2
     let bits: u32 = get("--bits", "32").parse().unwrap();
     let size: usize = get("--size", "32").parse().unwrap();
     let n_targets: usize = get("--targets", "4096").parse().unwrap();
@@ -89,6 +89,7 @@ fn main() {
             .prepare(&ctx, &fb, &params, &mut GroupOps::default())
             .unwrap_or_else(|e| panic!("prepare: {e}"));
         let ifma = oracle.ifma_prepared();
+        let avx2 = oracle.avx2_prepared();
         match mode.as_str() {
             "ifma" => {
                 if !ifma {
@@ -96,12 +97,22 @@ fn main() {
                 }
                 oracle.set_ifma_enabled(true);
             }
-            "lanes" => oracle.set_ifma_enabled(false),
+            "avx2" => {
+                oracle.set_ifma_enabled(false);
+                oracle.set_avx2_enabled(true);
+                if !avx2 {
+                    eprintln!("AVX2 not prepared on this host/p; falling back to scalar lanes");
+                }
+            }
+            "lanes" => {
+                oracle.set_ifma_enabled(false);
+                oracle.set_avx2_enabled(false);
+            }
             _ => {}
         }
         // Warm.
         warm_kmitm(&mut oracle, &ctx, &fb, &targets, &mode);
-        run_kmitm(&mut oracle, &ctx, &fb, &targets, &mode, min_secs, ifma)
+        run_kmitm(&mut oracle, &ctx, &fb, &targets, &mode, min_secs, ifma || avx2)
     } else if arm.starts_with("rootfind-floor") || arm.starts_with("floor:") {
         let spec = if arm.starts_with("floor:") {
             format!("rootfind-{arm}")

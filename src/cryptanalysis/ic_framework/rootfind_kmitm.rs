@@ -215,9 +215,14 @@ pub struct RootfindKMitmOracle<'i> {
     /// AVX-512 IFMA right=1 walk (`None` without IFMA / wide p / right≠1).
     #[cfg(target_arch = "x86_64")]
     ifma: Option<Arc<super::rootfind_kmitm_ifma::IfmaRight1>>,
+    /// AVX2 4-wide right=1 walk (`None` without AVX2 / `p ≥ 2^31` / right≠1).
+    #[cfg(target_arch = "x86_64")]
+    avx2: Option<Arc<super::rootfind_kmitm_avx2::Avx2Right1>>,
     /// When false, [`Self::decompose_lanes`] stays on the scalar 8-wide path
     /// even if IFMA prepared (A/B wall measurement).
     ifma_enabled: bool,
+    /// Prefer AVX2 lockstep when IFMA is off/unavailable (default true).
+    avx2_enabled: bool,
     /// Scratch for the batch-inv probe.
     diffs: Vec<u64>,
     scratch: Vec<u64>,
@@ -228,9 +233,15 @@ pub struct RootfindKMitmOracle<'i> {
     /// Scratch for IFMA prefix products (reused across chunks).
     #[cfg(target_arch = "x86_64")]
     ifma_prefix: Vec<[u64; 8]>,
+    /// Scratch for AVX2 prefix products.
+    #[cfg(target_arch = "x86_64")]
+    avx2_prefix: Vec<[u64; 4]>,
     /// Reused Bloom/map-pass candidate buffer for the IFMA path.
     #[cfg(target_arch = "x86_64")]
     ifma_cands: Vec<(usize, usize, u64)>,
+    /// Reused candidate buffer for the AVX2 path.
+    #[cfg(target_arch = "x86_64")]
+    avx2_cands: Vec<(usize, usize, u64)>,
     pub mismatches: u64,
     probe_right_adds: u64,
     probe_lookups: u64,
@@ -265,7 +276,10 @@ impl<'i> RootfindKMitmOracle<'i> {
             canon_bloom: None,
             #[cfg(target_arch = "x86_64")]
             ifma: None,
+            #[cfg(target_arch = "x86_64")]
+            avx2: None,
             ifma_enabled: true,
+            avx2_enabled: true,
             diffs: Vec::new(),
             scratch: Vec::new(),
             degenerate: Vec::new(),
@@ -273,7 +287,11 @@ impl<'i> RootfindKMitmOracle<'i> {
             #[cfg(target_arch = "x86_64")]
             ifma_prefix: Vec::new(),
             #[cfg(target_arch = "x86_64")]
+            avx2_prefix: Vec::new(),
+            #[cfg(target_arch = "x86_64")]
             ifma_cands: Vec::new(),
+            #[cfg(target_arch = "x86_64")]
+            avx2_cands: Vec::new(),
             mismatches: 0,
             probe_right_adds: 0,
             probe_lookups: 0,
@@ -331,11 +349,30 @@ impl<'i> RootfindKMitmOracle<'i> {
         self.ifma_enabled
     }
 
+    /// Whether prepare built an AVX2 right=1 lockstep backend.
+    pub fn avx2_prepared(&self) -> bool {
+        #[cfg(target_arch = "x86_64")]
+        {
+            self.avx2.is_some()
+        }
+        #[cfg(not(target_arch = "x86_64"))]
+        {
+            false
+        }
+    }
+
+    pub fn set_avx2_enabled(&mut self, on: bool) {
+        self.avx2_enabled = on;
+    }
+
+    pub fn avx2_enabled(&self) -> bool {
+        self.avx2_enabled
+    }
+
     /// PLAN lever 2: probe up to eight targets per chunk. Prefers AVX-512
-    /// IFMA lockstep when prepared and enabled; otherwise scalar shared
-    /// Montgomery batch-inv. `out[i]` receives the witness for `targets[i]`
-    /// (or `None`). Falls back to one-at-a-time when the batch-inv path is
-    /// off or `targets.len() ≤ 1`.
+    /// IFMA lockstep when prepared and enabled; else AVX2 4-wide when
+    /// prepared; otherwise scalar shared Montgomery batch-inv.
+    /// `out[i]` receives the witness for `targets[i]` (or `None`).
     pub fn decompose_lanes(
         &mut self,
         ctx: &InstanceCtx<PrimeCurve>,
@@ -374,6 +411,25 @@ impl<'i> RootfindKMitmOracle<'i> {
                         &targets[base..end],
                         &mut out[base..end],
                     );
+                    base = end;
+                    continue;
+                }
+                #[cfg(target_arch = "x86_64")]
+                if self.avx2.is_some() && self.avx2_enabled {
+                    // AVX2 is 4-wide; split an 8-chunk into two.
+                    let mut b = base;
+                    while b < end {
+                        let e = (b + 4).min(end);
+                        self.probe_right1_prime_lanes_avx2(
+                            g,
+                            fb,
+                            ops,
+                            counters,
+                            &targets[b..e],
+                            &mut out[b..e],
+                        );
+                        b = e;
+                    }
                     base = end;
                     continue;
                 }
@@ -423,7 +479,10 @@ impl<'i> RootfindKMitmOracle<'i> {
             canon_bloom: self.canon_bloom.clone(),
             #[cfg(target_arch = "x86_64")]
             ifma: self.ifma.clone(),
+            #[cfg(target_arch = "x86_64")]
+            avx2: self.avx2.clone(),
             ifma_enabled: self.ifma_enabled,
+            avx2_enabled: self.avx2_enabled,
             diffs: vec![0; n],
             scratch: vec![0; n],
             degenerate: vec![false; n],
@@ -431,7 +490,11 @@ impl<'i> RootfindKMitmOracle<'i> {
             #[cfg(target_arch = "x86_64")]
             ifma_prefix: Vec::new(),
             #[cfg(target_arch = "x86_64")]
+            avx2_prefix: Vec::new(),
+            #[cfg(target_arch = "x86_64")]
             ifma_cands: Vec::new(),
+            #[cfg(target_arch = "x86_64")]
+            avx2_cands: Vec::new(),
             mismatches: 0,
             probe_right_adds: 0,
             probe_lookups: 0,
@@ -692,6 +755,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
         #[cfg(target_arch = "x86_64")]
         {
             self.ifma = None;
+            self.avx2 = None;
         }
         let batch_ok = ctx.group.supports_siblings()
             && (3..1u64 << PRIME_FAST_MAX_BITS).contains(&ctx.group.p);
@@ -699,7 +763,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
         // (`folded = x+1` affine → insert `to_mont(x)`). Probe checks the
         // mont x₃ before any table lookup, so miss-dominated paths skip
         // `from_mont`. A parallel mont→witness map makes bloom-pass hits
-        // avoid the affine conversion entirely. When IFMA lockstep is
+        // avoid the affine conversion entirely. When IFMA/AVX2 lockstep is
         // available for right=1, a second Bloom/map keyed by canonical
         // affine x feeds the vector path with no mont conversion.
         let entries = self.table.as_deref().map(LeftTable::entries).unwrap_or(1) as usize;
@@ -719,15 +783,23 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
             && super::rootfind_kmitm_ifma::has_ifma();
         #[cfg(not(target_arch = "x86_64"))]
         let want_ifma = false;
+        #[cfg(target_arch = "x86_64")]
+        let want_avx2 = right_k == 1
+            && batch_ok
+            && (5..1u64 << 31).contains(&ctx.group.p)
+            && super::rootfind_kmitm_avx2::has_avx2();
+        #[cfg(not(target_arch = "x86_64"))]
+        let want_avx2 = false;
+        let want_canon = want_ifma || want_avx2;
         if batch_ok {
             let f = Fp64::new(ctx.group.p);
             let mut mont_left = fast_map(entries.max(1));
-            let mut canon_left = if want_ifma {
+            let mut canon_left = if want_canon {
                 fast_map(entries.max(1))
             } else {
                 fast_map(0)
             };
-            let mut canon_bloom = if want_ifma {
+            let mut canon_bloom = if want_canon {
                 Some(WordBloom::new(entries.max(1)))
             } else {
                 None
@@ -759,7 +831,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
                 });
             }
             self.mont_left = Arc::new(mont_left);
-            if want_ifma {
+            if want_canon {
                 self.canon_left = Arc::new(canon_left);
                 self.canon_bloom = canon_bloom.map(Arc::new);
             }
@@ -805,18 +877,25 @@ impl DecompositionOracle<PrimeCurve> for RootfindKMitmOracle<'_> {
             None
         };
         #[cfg(target_arch = "x86_64")]
-        if want_ifma && right_k == 1 {
+        if right_k == 1 {
             let xs: Vec<u64> = fb.points.iter().map(|p| p.x).collect();
             let ys: Vec<u64> = fb.points.iter().map(|p| p.y).collect();
-            self.ifma = super::rootfind_kmitm_ifma::IfmaRight1::new(ctx.group.p, &xs, &ys)
-                .map(Arc::new);
-            self.ifma_prefix.clear();
-            // Very large left tables can still be Bloom/cache-bound
-            // (`IFMA_ATTEMPT.md`). After batch Mont-inv of the IFMA prefix,
-            // the win band extends past 80k; keep scalar only above ~500k.
-            let left_n = self.canon_left.len();
-            if self.ifma.is_some() && left_n > 500_000 {
-                self.ifma_enabled = false;
+            if want_ifma {
+                self.ifma = super::rootfind_kmitm_ifma::IfmaRight1::new(ctx.group.p, &xs, &ys)
+                    .map(Arc::new);
+                self.ifma_prefix.clear();
+                // Very large left tables can still be Bloom/cache-bound
+                // (`IFMA_ATTEMPT.md`). After batch Mont-inv of the IFMA prefix,
+                // the win band extends past 80k; keep scalar only above ~500k.
+                let left_n = self.canon_left.len();
+                if self.ifma.is_some() && left_n > 500_000 {
+                    self.ifma_enabled = false;
+                }
+            }
+            if want_avx2 {
+                self.avx2 = super::rootfind_kmitm_avx2::Avx2Right1::new(ctx.group.p, &xs, &ys)
+                    .map(Arc::new);
+                self.avx2_prefix.clear();
             }
         }
         self.mismatches = 0;
@@ -1615,6 +1694,128 @@ impl RootfindKMitmOracle<'_> {
         self.ifma_cands.clear();
     }
 
+    /// PLAN lever 2 fallback: AVX2 4-wide lockstep over ≤4 right=1 probes.
+    #[cfg(target_arch = "x86_64")]
+    fn probe_right1_prime_lanes_avx2(
+        &mut self,
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        targets: &[PrimePoint],
+        out: &mut [Option<Vec<usize>>],
+    ) {
+        let Some(avx2) = self.avx2.clone() else {
+            self.probe_right1_prime_lanes(g, fb, ops, counters, targets, out);
+            return;
+        };
+        let t_n = targets.len();
+        debug_assert!(t_n <= 4, "avx2 lane chunk cap is 4");
+        for (t, &target) in targets.iter().enumerate() {
+            for (j, &pj) in fb.points.iter().enumerate() {
+                if g.is_identity(&pj) || pj.x != target.x {
+                    continue;
+                }
+                let tt = g.add(ops, target, g.neg(pj));
+                self.probe_right_adds += 1;
+                let mut lookups = 0u64;
+                if let Some(left) = self
+                    .table
+                    .as_ref()
+                    .and_then(|tb| tb.probe_left(g, fb, ops, &mut lookups, tt))
+                {
+                    self.probe_lookups += lookups;
+                    counters.lookups += lookups;
+                    if out[t].is_none() {
+                        if let Some(hit) = self.finish_hit_prime(
+                            g,
+                            fb,
+                            ops,
+                            counters,
+                            target,
+                            left,
+                            std::slice::from_ref(&j),
+                        ) {
+                            out[t] = Some(hit);
+                        }
+                    }
+                } else {
+                    self.probe_lookups += lookups;
+                    counters.lookups += lookups;
+                }
+            }
+        }
+        let mut adds = 0u64;
+        let mut bloom_rejects = 0u64;
+        let mut bloom_passes = 0u64;
+        let mut map_miss = 0u64;
+        let skip: [bool; 4] = std::array::from_fn(|i| i < t_n && out[i].is_some());
+        let bloom = self.canon_bloom.clone();
+        let canon_left = Arc::clone(&self.canon_left);
+        self.avx2_cands.clear();
+        let muls = {
+            let prefix = &mut self.avx2_prefix;
+            let cands = &mut self.avx2_cands;
+            avx2.for_each_sibling_pair(targets, prefix, |lane, j, xp, xm| {
+                if skip[lane] {
+                    return;
+                }
+                adds += 1;
+                for (x, right_j) in [(xp, fb.neg_index[j]), (xm, j)] {
+                    let pass = bloom.as_ref().map(|b| b.maybe(x)).unwrap_or(true);
+                    if !pass {
+                        bloom_rejects += 1;
+                        continue;
+                    }
+                    bloom_passes += 1;
+                    if canon_left.get(&x).is_some() {
+                        cands.push((lane, right_j, x));
+                    } else {
+                        map_miss += 1;
+                    }
+                }
+            })
+        };
+        self.probe_batch_inv += 1;
+        counters.inversions += 1;
+        ops.field_ops.invs += 1;
+        ops.field_ops.muls += muls;
+        ops.adds += adds;
+        self.probe_right_adds += adds;
+        self.bloom_rejects += bloom_rejects;
+        self.bloom_passes += bloom_passes;
+        self.bloom_false_positives += map_miss;
+        self.probe_lookups += bloom_passes;
+        counters.lookups += bloom_passes;
+        let cands = std::mem::take(&mut self.avx2_cands);
+        for &(lane, right_j, x_canon) in &cands {
+            if out[lane].is_some() {
+                continue;
+            }
+            if !self.lookup_canon_into(x_canon) {
+                continue;
+            }
+            let left = std::mem::take(&mut self.left_scratch);
+            let hit = self.finish_hit_prime(
+                g,
+                fb,
+                ops,
+                counters,
+                targets[lane],
+                left,
+                std::slice::from_ref(&right_j),
+            );
+            if self.left_scratch.capacity() == 0 {
+                self.left_scratch = Vec::with_capacity(self.left_k as usize);
+            }
+            if let Some(hit) = hit {
+                out[lane] = Some(hit);
+            }
+        }
+        self.avx2_cands = cands;
+        self.avx2_cands.clear();
+    }
+
     /// Shared batch-inv across `targets.len()` independent right≥2 probes.
     fn probe_right_precomputed_prime_lanes(
         &mut self,
@@ -2155,6 +2356,50 @@ mod tests {
         let mut counters = OracleCounters::default();
         oracle.decompose_lanes(&c, &fb, &mut dops, &mut counters, &targets, &mut out);
         assert!(out[0].is_some(), "lanes should recover planted sum");
+        assert_eq!(out[0].as_ref().unwrap().len(), 4);
+    }
+
+    /// AVX2 lockstep (when prepared, typically bits≤28) recovers planted m=4.
+    #[test]
+    fn kmitm_avx2_lanes_recover_planted_m4() {
+        let inst = prime_instance_for(28, 59297);
+        let fb = prime_factor_base(&inst, 16);
+        let c = ctx(&inst);
+        let g = &inst.curve;
+        let m = 4u32;
+        let mut idxs = Vec::new();
+        for x in &fb.abscissa_list {
+            if idxs.len() == m as usize {
+                break;
+            }
+            idxs.push(fb.x_index[x][0]);
+        }
+        let mut ops = GroupOps::default();
+        let mut s = fb.points[idxs[0]];
+        for &i in &idxs[1..] {
+            s = g.add(&mut ops, s, fb.points[i]);
+        }
+        let mut state = 0xA11C_EEE5_u64;
+        let mut targets = vec![s];
+        for _ in 0..3 {
+            state = state.wrapping_mul(0x9E37_79B9_7F4A_7C15).wrapping_add(1);
+            targets.push(g.mul(&mut ops, inst.generator_point(), 1 + state % (inst.r - 1)));
+        }
+        let (_, params) = Params::parse_spec("rootfind-kmitm:m=4").unwrap();
+        let mut oracle = RootfindKMitmOracle::new_prime(m, &inst);
+        oracle
+            .prepare(&c, &fb, &params, &mut GroupOps::default())
+            .unwrap();
+        if !oracle.avx2_prepared() {
+            return;
+        }
+        oracle.set_ifma_enabled(false);
+        oracle.set_avx2_enabled(true);
+        let mut out = vec![None; targets.len()];
+        let mut dops = GroupOps::default();
+        let mut counters = OracleCounters::default();
+        oracle.decompose_lanes(&c, &fb, &mut dops, &mut counters, &targets, &mut out);
+        assert!(out[0].is_some(), "AVX2 lanes should recover planted sum");
         assert_eq!(out[0].as_ref().unwrap().len(), 4);
     }
 
