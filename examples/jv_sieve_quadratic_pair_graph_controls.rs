@@ -5,4 +5,5 @@ pub mod quadratic_pair_graph;
 
 /// The controls are the unit tests of the included module: `cargo test --example <this example>`.
 #[allow(dead_code)] // built as crate-type = ["lib"] (Cargo.toml); main is never called
+#[allow(dead_code)]
 fn main() {}

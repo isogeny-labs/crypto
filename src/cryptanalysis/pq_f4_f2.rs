@@ -1122,8 +1122,8 @@ fn fl_enabled() -> bool {
     *ENABLED.get_or_init(|| std::env::var("F4_F2_FL").as_deref() != Ok("0"))
 }
 
-fn fl_shape(reducers: usize, pair_rows: usize, n_cols: usize) -> bool {
-    if !fl_enabled()
+fn fl_shape(allow_fl: bool, reducers: usize, pair_rows: usize, n_cols: usize) -> bool {
+    if !allow_fl
         || n_cols < FL_MIN_COLS
         || reducers < FL_MIN_ROWS
         || pair_rows < FL_MIN_ROWS
@@ -1988,7 +1988,36 @@ pub fn groebner_basis_f4(
     n_vars: usize,
     budget: Option<Duration>,
 ) -> (Vec<F2BoolPoly>, F4Stats) {
-    groebner_basis_f4_until(initial, n_vars, budget, None)
+    groebner_basis_f4_inner(
+        initial,
+        n_vars,
+        budget,
+        None,
+        max_matrix_words(),
+        EARLY_GUARD,
+        fl_enabled(),
+    )
+}
+
+/// [`groebner_basis_f4`] with the Faugère–Lachartre split disabled.
+///
+/// This is the exact, same-binary control used by benchmark adapters.  It
+/// avoids process-global environment state, so the split and full-width
+/// arms remain independently selectable in one test process.
+pub fn groebner_basis_f4_full_width(
+    initial: Vec<F2BoolPoly>,
+    n_vars: usize,
+    budget: Option<Duration>,
+) -> (Vec<F2BoolPoly>, F4Stats) {
+    groebner_basis_f4_inner(
+        initial,
+        n_vars,
+        budget,
+        None,
+        max_matrix_words(),
+        EARLY_GUARD,
+        false,
+    )
 }
 
 /// The variables the degree-1 elements of `polys` pin: one bit per
@@ -2021,6 +2050,7 @@ pub fn groebner_basis_f4_until(
         max_free,
         max_matrix_words(),
         EARLY_GUARD,
+        fl_enabled(),
     )
 }
 
@@ -2076,6 +2106,7 @@ fn groebner_basis_f4_inner(
     max_free: Option<usize>,
     max_words: u64,
     guard: EarlyGuard,
+    allow_fl: bool,
 ) -> (Vec<F2BoolPoly>, F4Stats) {
     static BATCH_INSERTS: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     let batch_inserts =
@@ -2527,7 +2558,8 @@ fn groebner_basis_f4_inner(
 
         let t = Instant::now();
         let pair_row_count = all.len() - reducers.len();
-        let Some(pivots) = (if fl_shape(reducers.len(), pair_row_count, cols.monos.len()) {
+        let Some(pivots) = (if fl_shape(allow_fl, reducers.len(), pair_row_count, cols.monos.len())
+        {
             echelon_fl(rows, cols.monos.len(), reducers.len(), &mut st, deadline)
         } else {
             echelon(rows, cols.monos.len(), &mut st, deadline)
@@ -3638,7 +3670,7 @@ mod tests {
         guard: EarlyGuard,
     ) -> (Vec<F2BoolPoly>, F4Stats, tally::Tally) {
         let before = tally::snapshot();
-        let (gb, st) = groebner_basis_f4_inner(eqs, n, None, None, max_words, guard);
+        let (gb, st) = groebner_basis_f4_inner(eqs, n, None, None, max_words, guard, true);
         (gb, st, tally::snapshot().since(before))
     }
 
