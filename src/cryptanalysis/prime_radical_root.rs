@@ -1410,6 +1410,17 @@ impl RadicalRootCtx {
     /// Degrees 1..=4 are supported; the zero polynomial and constants return an error / no roots.
     pub fn roots(&self, f: &[u64]) -> Result<RadicalRoots, String> {
         let fp = &self.f;
+        // Monic linear inputs occur repeatedly in recursive root reduction.
+        // Avoid degree scanning and coefficient normalization entirely.
+        // Coefficients are public; noncanonical constants still reduce.
+        if f.len() == 2 && f[1] == 1 {
+            let x = f[0];
+            let x = if x < fp.p { x } else { x % fp.p };
+            return Ok(RadicalRoots {
+                roots: vec![fp.neg(x)],
+                frobenius_fallback: false,
+            });
+        }
         // Polynomials of degree <=4 fit in a stack buffer. Scan trailing
         // zeroes first (including coefficients congruent to 0 mod p) so
         // arbitrarily padded input remains accepted without a heap Vec.
