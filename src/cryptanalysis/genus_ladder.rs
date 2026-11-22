@@ -1433,6 +1433,25 @@ pub struct IcResult {
     pub cycles: i64,
     pub core_rows: usize,
     pub core_cols: usize,
+    /// Relations held when the last attempt started (diagnostic).
+    pub excess_rows_collected: usize,
+    /// Rows and columns of the peeled core of the last attempt before the
+    /// row selection of [`ExcessParams`] (equal to `core_rows`/`core_cols`
+    /// without it), and the mean row weight before and after it.
+    pub core_rows_pre: usize,
+    pub core_cols_pre: usize,
+    pub mean_weight_before: f64,
+    pub mean_weight_after: f64,
+    /// Rows handed to the merge stage (= `core_rows`).
+    pub rows_kept: usize,
+    /// Non-zeros of the core before and after the merge stage.
+    pub core_nnz_before_sge: usize,
+    pub core_nnz_after_sge: usize,
+    /// The lightest-row selection ([`ExcessParams`]); zero without it.
+    /// Included in `la`.
+    pub la_sel: Nat,
+    /// Attempts whose selection left too short a core and was undone.
+    pub ex_fallback: u32,
     pub attempts: u32,
     /// [`IcExt::coord_square`] solves that returned nothing and fell back.
     pub la_fallbacks: u32,
@@ -1584,8 +1603,113 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
     run_ic_ext(inst, prm, IcExt::default())
 }
 
+/// Relation excess with lightest-row selection (research/genus_ladder_light_rows_20261121).
+/// Offered through [`run_ic_ext_excess`], not as a field of [`IcParams`] (which
+/// other modules build by struct literal); `None` there is [`run_ic_ext`].
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ExcessParams {
+    /// Collect `(1 + extra) ×` the relations at which the stopping rule first
+    /// stops, continuing the same random stream.
+    pub extra: f64,
+    /// Fraction of the peeled core's rows kept: the lightest by weight, but at
+    /// least `cols + margin`; a row that is the only live holder of a column
+    /// is never dropped.  See [`select_light_rows`].
+    pub keep: f64,
+}
+
+/// Keep the lightest rows of a peeled core.  Rows are sorted by weight (ties
+/// by index) and dropped from the heaviest while more than
+/// `max(ceil(keep · rows), cols + margin(cols))` are alive, except a row
+/// holding a column (the target's included) of live weight one.  The
+/// survivors are peeled again.  `Err(false)` when nothing was dropped and
+/// `Err(true)` when the re-peeled core is shorter than `cols' + margin(cols')`
+/// or no longer holds the target column (the caller keeps the original
+/// core).  Counted: one addition per entry for the column weights, one per
+/// entry of a dropped row, and the re-peel as [`peel`] counts it; the sort's
+/// comparisons are free, as in `peel`/`sge_reduce`.
+pub(crate) fn select_light_rows(
+    rows: &[Row],
+    ncols: usize,
+    tcol: u32,
+    keep: f64,
+    margin: &dyn Fn(usize) -> usize,
+    nat: &mut Nat,
+) -> Result<(Vec<Row>, usize, u32), bool> {
+    let alive = light_survivors(rows, ncols, keep, margin, nat);
+    if alive.iter().all(|&a| a) {
+        return Err(false);
+    }
+    let surv: Vec<Row> = rows
+        .iter()
+        .zip(&alive)
+        .filter(|(_, &a)| a)
+        .map(|(r, _)| r.clone())
+        .collect();
+    let (core, cc, ct) = peel(&surv, ncols, tcol, nat);
+    // The re-peel may remove a row holding the target column through another
+    // column of weight one; a core that no longer holds the target is undone.
+    let holds_t = core.iter().any(|(t, _)| t.iter().any(|&(c, _)| c == ct));
+    if holds_t && core.len() >= cc + margin(cc) {
+        Ok((core, cc, ct))
+    } else {
+        Err(true)
+    }
+}
+
+/// The drop step of [`select_light_rows`]: which rows stay.  Every column
+/// held by some row keeps at least one holder.
+fn light_survivors(
+    rows: &[Row],
+    ncols: usize,
+    keep: f64,
+    margin: &dyn Fn(usize) -> usize,
+    nat: &mut Nat,
+) -> Vec<bool> {
+    let target = ((keep * rows.len() as f64).ceil() as usize).max(ncols + margin(ncols));
+    if target >= rows.len() {
+        return vec![true; rows.len()]; // nothing can be dropped: no work
+    }
+    let mut w = vec![0u32; ncols];
+    for (t, _) in rows {
+        for &(c, _) in t {
+            w[c as usize] += 1;
+            nat.add += 1;
+        }
+    }
+    let mut order: Vec<usize> = (0..rows.len()).collect();
+    order.sort_by_key(|&i| (rows[i].0.len(), i));
+    let mut alive = vec![true; rows.len()];
+    let mut n_alive = rows.len();
+    for &i in order.iter().rev() {
+        if n_alive <= target {
+            break;
+        }
+        if rows[i].0.iter().any(|&(c, _)| w[c as usize] < 2) {
+            continue;
+        }
+        for &(c, _) in &rows[i].0 {
+            w[c as usize] -= 1;
+            nat.add += 1;
+        }
+        alive[i] = false;
+        n_alive -= 1;
+    }
+    alive
+}
+
 /// [`run_ic`] with the speed-ups of [`IcExt`].
 pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
+    run_ic_ext_excess(inst, prm, ext, None)
+}
+
+/// [`run_ic_ext`] with the optional relation excess ([`ExcessParams`]); `None`
+/// is [`run_ic_ext`], count for count.  Ignored for [`Arm::Full`].
+pub fn run_ic_ext_excess(
+    inst: &Instance,
+    prm: IcParams,
+    ext: IcExt,
+    excess: Option<ExcessParams>,
+) -> IcResult {
     let start = std::time::Instant::now();
     let curve = &inst.curve;
     let (p, r, h) = (inst.p, inst.r, inst.h);
@@ -1669,6 +1793,7 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
     let mut since_restart = u64::MAX;
     let mut next_check = nunk as u64;
     let mut solved = false;
+    let mut excess_done = excess.is_none() || prm.arm == Arm::Full;
 
     'outer: while !solved {
         while (rels.len() as u64) < next_check {
@@ -1812,6 +1937,16 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
                 next_check = rels.len() as u64 + (need - res.cycles).max(1) as u64;
                 continue;
             }
+            if let (Some(ex), false) = (excess, excess_done) {
+                // First stop of the rule: go on to (1 + extra) times as many
+                // relations from the same stream, then attempt.
+                excess_done = true;
+                let target = (rels.len() as f64 * (1.0 + ex.extra)).ceil() as u64;
+                if target > rels.len() as u64 {
+                    next_check = target;
+                    continue;
+                }
+            }
         } else {
             let mut scratch = Nat::default();
             let rows = build_rows(&rels, nver, tcol, r, &mut scratch);
@@ -1837,6 +1972,34 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
             next_check = rels.len() as u64 + (nunk as u64 / 20).max(8);
             continue;
         }
+        res.excess_rows_collected = rels.len();
+        res.core_rows_pre = core.len();
+        res.core_cols_pre = cc;
+        let nnz_of = |rows: &[Row]| rows.iter().map(|(t, _)| t.len()).sum::<usize>();
+        let mean_w = |rows: &[Row]| nnz_of(rows) as f64 / rows.len().max(1) as f64;
+        res.mean_weight_before = mean_w(&core);
+        let (core, cc, ct) = match excess {
+            Some(ex) if prm.arm != Arm::Full => {
+                let mut sel = Nat::default();
+                let picked = select_light_rows(&core, cc, ct, ex.keep, &margin, &mut sel);
+                res.la_sel.merge(sel);
+                res.la.merge(sel);
+                match picked {
+                    Ok(c) => {
+                        res.core_rows = c.0.len();
+                        res.core_cols = c.1;
+                        c
+                    }
+                    Err(undone) => {
+                        res.ex_fallback += u32::from(undone);
+                        (core, cc, ct)
+                    }
+                }
+            }
+            _ => (core, cc, ct),
+        };
+        res.rows_kept = core.len();
+        res.mean_weight_after = mean_w(&core);
         let mut w_nat = Nat::default();
         let dense = res.attempts > 1;
         // UnitT solves for h·log T: one inversion of h and one product.
@@ -1968,6 +2131,13 @@ pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
         next_check = rels.len() as u64 + (nunk as u64 / 20).max(16);
     }
     res.la.add += dsu.ops;
+    (res.core_nnz_before_sge, res.core_nnz_after_sge) = match prm.sge {
+        Some(_) => (res.sge.nnz_in, res.sge.nnz_out),
+        None => {
+            let n = (res.mean_weight_after * res.rows_kept as f64).round() as usize;
+            (n, n)
+        }
+    };
     res.group = ops;
     res.walk_ops = (ops.adds + ops.doubles) - res.setup_ops - res.verify_ops;
     res.cantor_mul = curve.fmul() - fm0;
@@ -3540,5 +3710,198 @@ mod tests {
                 }
             }
         }
+    }
+
+    /// `excess: None` is the frozen instrument through the new entry point,
+    /// and a selection that drops nothing (`extra = 0`, `keep = 1`) changes
+    /// no count of the run.
+    #[test]
+    fn excess_none_and_noop_reproduce_baseline_counts() {
+        let key = |o: &IcResult| {
+            (
+                o.trials,
+                o.relations,
+                o.rel,
+                o.cantor_mul,
+                o.la,
+                o.la_wied,
+                o.la_sge,
+                o.core_rows,
+                o.core_cols,
+                o.recovered,
+            )
+        };
+        // The frozen row of `sge_none_reproduces_frozen_counts` for (67, 3, DoubleLp, pre).
+        let inst = first_instance(67, 3);
+        let o = run_ic_ext_excess(
+            &inst,
+            prm(67, 3, Arm::DoubleLp, true, None),
+            IcExt::default(),
+            None,
+        );
+        assert_eq!(
+            (
+                o.trials,
+                o.relations,
+                o.rel.mul,
+                o.rel.add,
+                o.cantor_mul,
+                o.la.mul,
+                o.la.add
+            ),
+            (4272, 39, 323304, 275525, 945740, 11597, 25023)
+        );
+        assert_eq!(o.la_sel, Nat::default());
+        let noop = Some(ExcessParams {
+            extra: 0.0,
+            keep: 1.0,
+        });
+        for (p, g, sge) in [
+            (67u64, 3u32, None),
+            (131, 2, None),
+            (
+                257,
+                3,
+                Some(SgeParams {
+                    w_max: 8,
+                    fill_max: 3.0,
+                }),
+            ),
+            (
+                131,
+                4,
+                Some(SgeParams {
+                    w_max: 8,
+                    fill_max: 3.0,
+                }),
+            ),
+        ] {
+            let inst = first_instance(p, g);
+            let a = run_ic_ext(&inst, prm(p, g, Arm::DoubleLp, true, sge), IcExt::default());
+            let b = run_ic_ext_excess(
+                &inst,
+                prm(p, g, Arm::DoubleLp, true, sge),
+                IcExt::default(),
+                noop,
+            );
+            assert_eq!(key(&a), key(&b), "p = {p} g = {g}");
+            assert_eq!(b.la_sel.mul, 0);
+        }
+    }
+
+    /// With the excess the logarithm is still certified: 20 instances at
+    /// p in {1031, 2053}, genus 3 and 4.
+    #[test]
+    fn excess_certifies_on_twenty_instances() {
+        let mut n = 0;
+        let mut selected = 0;
+        for (p, g) in [(1031u64, 3u32), (2053, 3), (1031, 4), (2053, 4)] {
+            let mut got = 0;
+            let mut cs = 1u64;
+            while got < 5 {
+                let c = cs;
+                cs += 1;
+                let Ok(inst) = make_instance(p, g, c, 7 + c, 64) else {
+                    continue;
+                };
+                got += 1;
+                n += 1;
+                let ex = ExcessParams {
+                    extra: 0.5,
+                    keep: 0.7,
+                };
+                let sge = Some(SgeParams {
+                    w_max: 8,
+                    fill_max: 3.0,
+                });
+                let base = run_ic_ext(&inst, prm(p, g, Arm::DoubleLp, true, sge), IcExt::default());
+                let o = run_ic_ext_excess(
+                    &inst,
+                    prm(p, g, Arm::DoubleLp, true, sge),
+                    IcExt::default(),
+                    Some(ex),
+                );
+                let tag = format!("p = {p} g = {g} curve {c}");
+                assert!(base.certified && o.certified, "{tag}");
+                assert_eq!(o.recovered, Some(inst.t_secret), "{tag}");
+                assert!(o.relations >= base.relations, "{tag}");
+                assert_eq!(o.sge.rows_in, o.core_rows, "{tag}");
+                assert_eq!(o.rows_kept, o.core_rows, "{tag}");
+                assert!(o.rows_kept <= o.core_rows_pre, "{tag}");
+                assert!(o.core_rows >= o.core_cols, "{tag}");
+                assert_eq!(
+                    o.la.mul,
+                    o.la_graph.mul + o.la_peel.mul + o.la_sel.mul + o.la_sge.mul + o.la_wied.mul,
+                    "{tag}"
+                );
+                if o.core_rows < o.core_rows_pre {
+                    selected += 1;
+                }
+            }
+        }
+        assert_eq!(n, 20);
+        assert!(selected > 0, "the selection never dropped a row");
+    }
+
+    /// The drop step keeps a holder of every column the rows hold (the target
+    /// column included), and the selected system keeps `t`.
+    #[test]
+    fn light_rows_never_uncover_a_column_and_keep_t() {
+        let r = 1_000_000_007u64;
+        let (nrow, ncol) = (90usize, 30usize);
+        let tcol = (ncol - 1) as u32;
+        let mut st = 11u64;
+        let mut next = || {
+            st = st.wrapping_add(0x9E37_79B9_7F4A_7C15);
+            mix64(st)
+        };
+        let margin = |_: usize| 2usize;
+        let mut dropped_any = false;
+        for _ in 0..8 {
+            let x: Vec<u64> = (0..ncol).map(|_| next() % r).collect();
+            let rows: Vec<Row> = (0..nrow)
+                .map(|_| {
+                    let k = 1 + next() % 6;
+                    let mut t: Vec<(u32, u64)> = (0..k)
+                        .map(|_| ((next() % ncol as u64) as u32, 1 + next() % (r - 1)))
+                        .collect();
+                    t.sort_unstable_by_key(|e| e.0);
+                    t.dedup_by_key(|e| e.0);
+                    let rhs = t
+                        .iter()
+                        .fold(0, |acc, &(c, v)| addm(acc, mulmod(v, x[c as usize], r), r));
+                    (t, rhs)
+                })
+                .collect();
+            let mut nat = Nat::default();
+            let alive = light_survivors(&rows, ncol, 0.0, &margin, &mut nat);
+            let mut before = vec![0u32; ncol];
+            let mut after = vec![0u32; ncol];
+            for (row, &a) in rows.iter().zip(&alive) {
+                for &(c, _) in &row.0 {
+                    before[c as usize] += 1;
+                    after[c as usize] += u32::from(a);
+                }
+            }
+            for c in 0..ncol {
+                assert!(before[c] == 0 || after[c] >= 1, "column {c} uncovered");
+            }
+            dropped_any |= alive.iter().any(|&a| !a);
+            assert!(nat.add > 0);
+            let mut sel = Nat::default();
+            if let Ok((core, cc, ct)) = select_light_rows(&rows, ncol, tcol, 0.0, &margin, &mut sel)
+            {
+                // original rows only, the target column still covered
+                assert!(core.len() < rows.len());
+                assert!(core.iter().all(|(_, b)| rows.iter().any(|(_, b0)| b0 == b)));
+                assert!(
+                    before[tcol as usize] == 0
+                        || core.iter().any(|(t, _)| t.iter().any(|&(c, _)| c == ct))
+                );
+                assert!(cc <= ncol && core.len() >= cc + margin(cc));
+                assert!(sel.add > nat.add);
+            }
+        }
+        assert!(dropped_any);
     }
 }

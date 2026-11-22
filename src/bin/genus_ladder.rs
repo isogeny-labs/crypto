@@ -21,6 +21,10 @@
 //! Arm `s` is arm `w` with the merge: `--sge W,F` (default 4,1.5) reduces the
 //! peeled core, then the coordinate Wiedemann solves the reduced matrix; the
 //! arm is named `...+sgecoord+sge(W,F)` and only runs merged.
+//! `--excess E,K` (repeatable, with `--sge`) adds a run per setting that
+//! collects `(1 + E)` times the relations of the stopping rule, keeps the
+//! lightest fraction `K` of the peeled core's rows, then merges and solves;
+//! named `<arm>+sge(W,F)+ex(E,K)` (`research/genus_ladder_light_rows_20261121`).
 //! One JSON object per line.  Protocol:
 //! `research/genus_ladder_20261114/PROTOCOL.md`.  All figures are
 //! `[pcc:unverified]`.
@@ -69,6 +73,8 @@ struct Cfg {
     quartic: bool,
     quartic_alg: bool,
     sge: Vec<gl::SgeParams>,
+    /// `--excess E,K` (repeatable): relation excess with lightest-row selection.
+    excess: Vec<gl::ExcessParams>,
     order_method: gl::OrderMethod,
     out: String,
 }
@@ -103,6 +109,7 @@ fn parse() -> Result<Cfg, String> {
         quartic: false,
         quartic_alg: false,
         sge: Vec::new(),
+        excess: Vec::new(),
         order_method: gl::OrderMethod::Enumerate,
         out: String::new(),
     };
@@ -189,6 +196,17 @@ fn parse() -> Result<Cfg, String> {
                 }
                 c.sge.push(gl::SgeParams { w_max, fill_max });
             }
+            "--excess" => {
+                let (e, k) = v
+                    .split_once(',')
+                    .ok_or(format!("--excess wants E,K, not {v}"))?;
+                let extra = num(e)?;
+                let keep = num(k)?;
+                if !(extra >= 0.0 && extra.is_finite() && keep > 0.0 && keep <= 1.0) {
+                    return Err(format!("--excess wants E >= 0 and 0 < K <= 1, not {v}"));
+                }
+                c.excess.push(gl::ExcessParams { extra, keep });
+            }
             "--order-method" => c.order_method = gl::OrderMethod::parse(&v)?,
             "--out" => c.out = v,
             _ => return Err(format!("unknown flag {flag}")),
@@ -268,6 +286,14 @@ fn main() -> ExitCode {
             .sge
             .iter()
             .map(|s| json!({"w_max": s.w_max, "fill_max": s.fill_max}))
+            .collect::<Vec<_>>());
+    }
+    if !cfg.excess.is_empty() {
+        // Only with the flag, so a run without it writes the frozen layout.
+        config["excess"] = json!(cfg
+            .excess
+            .iter()
+            .map(|e| json!({"extra": e.extra, "keep": e.keep}))
             .collect::<Vec<_>>());
     }
     if cfg.order_method != gl::OrderMethod::Enumerate {
@@ -593,8 +619,20 @@ fn main() -> ExitCode {
                         .chain(cfg.sge.iter().copied().map(Some))
                         .collect()
                 };
+                // Each merge setting runs plain and, with --excess, once per excess
+                // setting; an excess setting without a merge setting runs only
+                // when no --sge is given.
+                let mut combos: Vec<(Option<gl::SgeParams>, Option<gl::ExcessParams>)> = Vec::new();
                 for sge in settings {
-                    let o = gl::run_ic_ext(
+                    combos.push((sge, None));
+                    if sge.is_some() || cfg.sge.is_empty() {
+                        for ex in &cfg.excess {
+                            combos.push((sge, Some(*ex)));
+                        }
+                    }
+                }
+                for (sge, excess) in combos {
+                    let o = gl::run_ic_ext_excess(
                         &inst,
                         IcParams {
                             arm,
@@ -611,10 +649,14 @@ fn main() -> ExitCode {
                             sge,
                         },
                         ext,
+                        excess,
                     );
                     let suffix = match sge {
                         None => String::new(),
                         Some(s) => format!("+sge({},{})", s.w_max, s.fill_max),
+                    } + &match excess {
+                        None => String::new(),
+                        Some(e) => format!("+ex({},{})", e.extra, e.keep),
                     };
                     let mut rec = head.clone();
                     rec["kind"] = json!("run");
@@ -658,6 +700,22 @@ fn main() -> ExitCode {
                     rec["core_rows"] = json!(o.core_rows);
                     rec["core_cols"] = json!(o.core_cols);
                     rec["attempts"] = json!(o.attempts);
+                    if let Some(ex) = excess {
+                        // Only on excess runs, so other runs keep the frozen layout.
+                        rec["excess_extra"] = json!(ex.extra);
+                        rec["excess_keep"] = json!(ex.keep);
+                        rec["excess_rows_collected"] = json!(o.excess_rows_collected);
+                        rec["rows_kept"] = json!(o.rows_kept);
+                        rec["mean_weight_before"] = json!(o.mean_weight_before);
+                        rec["mean_weight_after"] = json!(o.mean_weight_after);
+                        rec["core_nnz_before_sge"] = json!(o.core_nnz_before_sge);
+                        rec["core_nnz_after_sge"] = json!(o.core_nnz_after_sge);
+                        rec["core_rows_pre"] = json!(o.core_rows_pre);
+                        rec["core_cols_pre"] = json!(o.core_cols_pre);
+                        rec["la_sel_mul"] = json!(o.la_sel.mul);
+                        rec["la_sel_add"] = json!(o.la_sel.add);
+                        rec["ex_fallback"] = json!(o.ex_fallback);
+                    }
                     if let Some(sp) = sge {
                         // Merge-stage fields, only on merged runs.
                         let st = o.sge;
