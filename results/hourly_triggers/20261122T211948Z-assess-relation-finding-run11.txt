@@ -1,0 +1,6 @@
+Automated relation-finding assessment
+UTC trigger: 2026-11-22T21:19:48Z
+Benchmark: frozen synthetic Koblitz GF(2^23), curve_a=0, two-summand natural arm
+Harness: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Baseline: results/relation_baseline.json; alert threshold 20%
+Destination: results/hourly_log.csv; branch hourly-runs
