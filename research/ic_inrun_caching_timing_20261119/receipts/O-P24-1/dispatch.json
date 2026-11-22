@@ -1,0 +1,17 @@
+{
+  "job": "O-P24-1",
+  "workflow": "isolab-experiment.yml",
+  "ref": "main",
+  "inputs": {
+    "source_revision": "104ca79ef997cb6be708559859b1a3bd342cea98",
+    "spec_path": "research/ic_inrun_caching_timing_20261119/specs/p24a-batch-sparse.json",
+    "instance_type": "c8a.2xlarge",
+    "seconds": "4800"
+  },
+  "dispatched_at": "2026-11-19T17:30:30Z",
+  "run_id": 44577926579,
+  "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/44577926579",
+  "outcome": "failure before build: the 'contracts' job's artifact hydration found no Git-history object for research/* manifest entries (e.g. research/five_leads_e2e_20261019/*, research/pencil_large_prime_20261029/root-cold-seed-tests.log); S3 not contacted; no image built, no EKS job created, no AWS spend",
+  "prior_evidence": "dispatch run 44374607134 on main ad2a014 (2026-11-18) also failed; the experiment pipeline is blocked lab-wide by the same store-hydration problem that keeps PR checks gate/scope red",
+  "decision": "remaining 7 jobs not dispatched; resubmit only after the artifact store hydration is repaired"
+}
