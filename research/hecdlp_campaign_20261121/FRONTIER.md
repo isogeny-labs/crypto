@@ -235,3 +235,28 @@ about 5 below rho in matched wall time from 2^16 to 2^20. An exponent gap is not
 the linear algebra's p^{3/2} scaling, equal to rho's, is the structural reason the arm cannot pull
 away: any exponent gain must come from a linear algebra that scales below p^{3/2} on these cores.
 No sub-exponential method for fixed genus has been found or claimed.
+
+### R11: a bounded-weight core lowers the LA exponent, and the relation phase pays it back [pcc:unverified]
+
+`genus_ladder_bounded_core_20261122` (`--bounded W,STEP,EMAX,COVER`; defaults byte-identical; 120
+runs certified; main session reran the identity and new tests, 95 passed): adaptive relation excess
+until the selected core's mean weight is ≤ 8, greedy heaviest-row removal keeping every column
+covered. Genus 3, p = 32771 … 262147, 3 curves × 2 seeds.
+
+| exponent over four primes | plain SGE(8,3) | bounded, cover 1 | bounded, cover 2 |
+|---|--:|--:|--:|
+| `la_mul` | 1.524 [1.516, 1.533] | 1.390 [1.376, 1.402] | 1.365 [1.351, 1.378] |
+| relation phase | 1.300 | 1.408 | 1.408 |
+| total, FPM at κ = 3 | 1.380 | 1.405 | 1.399 |
+
+B1–B3 held (the weight after SGE varies by 2–3 % instead of 13 %; the LA exponent falls by
+0.13–0.16, intervals excluding plain). B4 failed: at κ = 3 the arm costs 1.08–1.10 of plain at
+262147 and its total exponent is higher. Holding the weight fixed needs an excess that grows with p
+(0.2 → 0.5), which raises the relation phase from p^1.30 to p^1.41.
+
+**What rounds 1–4 establish about the exponent.** The relation phase and the linear algebra trade
+against each other through the core's weight: every construction tried here either leaves the LA at
+p^1.5 (plain, SGE, R4) or buys it down by spending relations (R11). The best total exponent measured
+is about 1.38–1.41 in counts and 1.41 in wall time (R10), against rho's 1.5–1.56 with an interval
+that does not exclude it. The double-large-prime theory's 4/3 is not reached at p ≤ 2^20 by any
+variant tried.

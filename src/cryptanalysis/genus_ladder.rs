@@ -1452,6 +1452,15 @@ pub struct IcResult {
     pub la_sel: Nat,
     /// Attempts whose selection left too short a core and was undone.
     pub ex_fallback: u32,
+    /// [`BoundedParams`]: relations held when the stopping rule first
+    /// stopped, probes (attempts abandoned for a heavier core than the
+    /// target; their graph, peel and selection work is in `la`), the realised
+    /// excess of the solving attempt, and whether it ran above the target
+    /// weight because the excess cap was reached.  Zero without it.
+    pub bd_n0: u64,
+    pub bd_probes: u32,
+    pub bd_extra: f64,
+    pub bd_capped: bool,
     pub attempts: u32,
     /// [`IcExt::coord_square`] solves that returned nothing and fell back.
     pub la_fallbacks: u32,
@@ -1697,6 +1706,93 @@ fn light_survivors(
     alive
 }
 
+/// Weight-bounded core (research/genus_ladder_bounded_core_20261122).  Offered
+/// through [`run_ic_ext_bounded`]; excludes [`ExcessParams`].
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct BoundedParams {
+    /// Target mean row weight of the selected core (before the merge).
+    pub target: f64,
+    /// Relations are collected in steps of `step ·` (the relations at the
+    /// rule's first stop); the first attempt is at excess `step`.
+    pub step: f64,
+    /// No further excess beyond this (relative to the first stop); the
+    /// attempt then runs above the target and is flagged.
+    pub extra_max: f64,
+    /// A row is dropped only if every column it holds keeps at least this
+    /// many live rows (1: as [`select_light_rows`], re-peeled; 2: no column
+    /// can fall to weight one, so no re-peel is needed).
+    pub cover: u32,
+}
+
+/// Greedy minimum-weight selection: drop the heaviest row (ties: higher
+/// index) whose removal leaves each of its columns, the target column
+/// included, held by at least `cover` live rows, until `cols + margin(cols)`
+/// rows are left.  Equivalent to repeatedly taking the heaviest eligible row:
+/// a row's weight is fixed and eligibility only ever turns off.  `cover = 1`
+/// re-peels the survivors and, as [`select_light_rows`], undoes a result that
+/// is too short or lost the target (`Err(true)`); `Err(false)`: nothing to
+/// drop.  Counted: one addition per entry for the column weights and one per
+/// entry of a dropped row; the sort's comparisons are free.
+pub(crate) fn select_bounded_rows(
+    rows: &[Row],
+    ncols: usize,
+    tcol: u32,
+    cover: u32,
+    margin: &dyn Fn(usize) -> usize,
+    nat: &mut Nat,
+) -> Result<(Vec<Row>, usize, u32), bool> {
+    let floor = ncols + margin(ncols);
+    if floor >= rows.len() {
+        return Err(false);
+    }
+    let mut w = vec![0u32; ncols];
+    for (t, _) in rows {
+        for &(c, _) in t {
+            w[c as usize] += 1;
+            nat.add += 1;
+        }
+    }
+    let mut order: Vec<usize> = (0..rows.len()).collect();
+    order.sort_by_key(|&i| (rows[i].0.len(), i));
+    let mut alive = vec![true; rows.len()];
+    let mut n_alive = rows.len();
+    for &i in order.iter().rev() {
+        if n_alive <= floor {
+            break;
+        }
+        if rows[i].0.iter().any(|&(c, _)| w[c as usize] < cover + 1) {
+            continue;
+        }
+        for &(c, _) in &rows[i].0 {
+            w[c as usize] -= 1;
+            nat.add += 1;
+        }
+        alive[i] = false;
+        n_alive -= 1;
+    }
+    if n_alive == rows.len() {
+        return Err(false);
+    }
+    let surv: Vec<Row> = rows
+        .iter()
+        .zip(&alive)
+        .filter(|(_, &a)| a)
+        .map(|(r, _)| r.clone())
+        .collect();
+    if cover >= 2 {
+        // Every column keeps at least two rows: the survivors are peeled
+        // already, with the same columns.
+        return Ok((surv, ncols, tcol));
+    }
+    let (core, cc, ct) = peel(&surv, ncols, tcol, nat);
+    let holds_t = core.iter().any(|(t, _)| t.iter().any(|&(c, _)| c == ct));
+    if holds_t && core.len() >= cc + margin(cc) {
+        Ok((core, cc, ct))
+    } else {
+        Err(true)
+    }
+}
+
 /// [`run_ic`] with the speed-ups of [`IcExt`].
 pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
     run_ic_ext_excess(inst, prm, ext, None)
@@ -1710,6 +1806,23 @@ pub fn run_ic_ext_excess(
     ext: IcExt,
     excess: Option<ExcessParams>,
 ) -> IcResult {
+    run_ic_ext_bounded(inst, prm, ext, excess, None)
+}
+
+/// [`run_ic_ext_excess`] with the optional weight-bounded core
+/// ([`BoundedParams`], not together with `excess`); `None` is
+/// [`run_ic_ext_excess`], count for count.  Ignored for [`Arm::Full`].
+pub fn run_ic_ext_bounded(
+    inst: &Instance,
+    prm: IcParams,
+    ext: IcExt,
+    excess: Option<ExcessParams>,
+    bounded: Option<BoundedParams>,
+) -> IcResult {
+    assert!(
+        excess.is_none() || bounded.is_none(),
+        "excess and bounded exclude each other"
+    );
     let start = std::time::Instant::now();
     let curve = &inst.curve;
     let (p, r, h) = (inst.p, inst.r, inst.h);
@@ -1794,6 +1907,8 @@ pub fn run_ic_ext_excess(
     let mut next_check = nunk as u64;
     let mut solved = false;
     let mut excess_done = excess.is_none() || prm.arm == Arm::Full;
+    let mut bd_n0: Option<u64> = None;
+    let mut bd_level = 0u32;
 
     'outer: while !solved {
         while (rels.len() as u64) < next_check {
@@ -1937,6 +2052,17 @@ pub fn run_ic_ext_excess(
                 next_check = rels.len() as u64 + (need - res.cycles).max(1) as u64;
                 continue;
             }
+            if let (Some(b), None) = (bounded, bd_n0) {
+                // First stop of the rule: the first attempt is at excess `step`.
+                bd_n0 = Some(rels.len() as u64);
+                bd_level = 1;
+                res.bd_n0 = rels.len() as u64;
+                let target = (rels.len() as f64 * (1.0 + b.step)).ceil() as u64;
+                if target > rels.len() as u64 {
+                    next_check = target;
+                    continue;
+                }
+            }
             if let (Some(ex), false) = (excess, excess_done) {
                 // First stop of the rule: go on to (1 + extra) times as many
                 // relations from the same stream, then attempt.
@@ -1995,6 +2121,40 @@ pub fn run_ic_ext_excess(
                         (core, cc, ct)
                     }
                 }
+            }
+            None if prm.arm != Arm::Full && bounded.is_some() => {
+                let b = bounded.expect("checked");
+                let n0 = bd_n0.expect("set at the first stop");
+                let mut sel = Nat::default();
+                let picked = select_bounded_rows(&core, cc, ct, b.cover, &margin, &mut sel);
+                res.la_sel.merge(sel);
+                res.la.merge(sel);
+                let c = match picked {
+                    Ok(c) => {
+                        res.core_rows = c.0.len();
+                        res.core_cols = c.1;
+                        c
+                    }
+                    Err(undone) => {
+                        res.ex_fallback += u32::from(undone);
+                        (core, cc, ct)
+                    }
+                };
+                let w = mean_w(&c.0);
+                let next = bd_level + 1;
+                if w > b.target && f64::from(next) * b.step <= b.extra_max + 1e-9 {
+                    // Heavier than the target: abandon this attempt (its work
+                    // stays counted) and collect another step of relations.
+                    res.attempts -= 1;
+                    res.bd_probes += 1;
+                    bd_level = next;
+                    next_check = (n0 as f64 * (1.0 + f64::from(next) * b.step)).ceil() as u64;
+                    next_check = next_check.max(rels.len() as u64 + 1);
+                    continue;
+                }
+                res.bd_capped = w > b.target;
+                res.bd_extra = rels.len() as f64 / n0 as f64 - 1.0;
+                c
             }
             _ => (core, cc, ct),
         };
@@ -4281,6 +4441,171 @@ mod tests {
             }
         }
         assert_eq!(n, 20);
+        assert!(selected > 0, "the selection never dropped a row");
+    }
+
+    /// The bounded selection keeps `cover` live rows on every column it held
+    /// (the target column included), never goes below `cols + margin` rows,
+    /// and its minimum-weight greedy leaves a total weight no larger than the
+    /// lightest-first selection's under the same cover.
+    #[test]
+    fn bounded_rows_keep_cover_and_t_and_are_lighter() {
+        let r = 1_000_000_007u64;
+        let (nrow, ncol) = (120usize, 30usize);
+        let tcol = (ncol - 1) as u32;
+        let mut st = 5u64;
+        let mut next = || {
+            st = st.wrapping_add(0x9E37_79B9_7F4A_7C15);
+            mix64(st)
+        };
+        let margin = |_: usize| 2usize;
+        let mut dropped_any = false;
+        for _ in 0..8 {
+            let rows: Vec<Row> = (0..nrow)
+                .map(|_| {
+                    let k = 2 + next() % 9;
+                    let mut t: Vec<(u32, u64)> = (0..k)
+                        .map(|_| ((next() % ncol as u64) as u32, 1 + next() % (r - 1)))
+                        .collect();
+                    t.push((tcol, 1 + next() % (r - 1)));
+                    t.sort_unstable_by_key(|e| e.0);
+                    t.dedup_by_key(|e| e.0);
+                    (t, next() % r)
+                })
+                .collect();
+            let mut before = vec![0u32; ncol];
+            for row in &rows {
+                for &(c, _) in &row.0 {
+                    before[c as usize] += 1;
+                }
+            }
+            for cover in [1u32, 2, 3] {
+                let mut nat = Nat::default();
+                let Ok((core, cc, ct)) =
+                    select_bounded_rows(&rows, ncol, tcol, cover, &margin, &mut nat)
+                else {
+                    continue;
+                };
+                dropped_any = true;
+                assert!(core.len() < rows.len() && core.len() >= cc + margin(cc));
+                assert!(core.iter().all(|(_, b)| rows.iter().any(|(_, b0)| b0 == b)));
+                assert!(core.iter().any(|(t, _)| t.iter().any(|&(c, _)| c == ct)));
+                if cover >= 2 {
+                    // no re-peel: the columns are the input's, each still held
+                    // by at least `cover` rows where it was before.
+                    assert_eq!(cc, ncol);
+                    let mut after = vec![0u32; ncol];
+                    for row in &core {
+                        for &(c, _) in &row.0 {
+                            after[c as usize] += 1;
+                        }
+                    }
+                    for c in 0..ncol {
+                        assert!(
+                            before[c] < cover || after[c] >= cover.min(before[c]),
+                            "column {c} cover {cover}"
+                        );
+                    }
+                    let w = |v: &[Row]| v.iter().map(|x| x.0.len()).sum::<usize>();
+                    assert!(w(&core) < w(&rows));
+                }
+                assert!(nat.add > 0 && nat.mul == 0);
+            }
+        }
+        assert!(dropped_any);
+    }
+
+    /// The weight-bounded core certifies on 24 instances (genus 3 and 4,
+    /// p in {1031, 2053, 8209}), keeps the relation stream (at least the
+    /// plain arm's relations, the same first stop), charges every step to
+    /// `la`, and `None` is the excess path count for count.
+    #[test]
+    fn bounded_certifies_and_none_is_the_baseline() {
+        let sge = Some(SgeParams {
+            w_max: 8,
+            fill_max: 3.0,
+        });
+        let mut n = 0;
+        let (mut probed, mut selected) = (0, 0);
+        for (p, g) in [
+            (1031u64, 3u32),
+            (2053, 3),
+            (8209, 3),
+            (1031, 4),
+            (2053, 4),
+            (8209, 4),
+        ] {
+            let mut got = 0;
+            let mut cs = 1u64;
+            while got < 4 {
+                let c = cs;
+                cs += 1;
+                let Ok(inst) = make_instance(p, g, c, 7 + c, 64) else {
+                    continue;
+                };
+                got += 1;
+                n += 1;
+                let tag = format!("p = {p} g = {g} curve {c}");
+                let a = run_ic_ext_excess(
+                    &inst,
+                    prm(p, g, Arm::DoubleLp, true, sge),
+                    IcExt::default(),
+                    None,
+                );
+                let z = run_ic_ext_bounded(
+                    &inst,
+                    prm(p, g, Arm::DoubleLp, true, sge),
+                    IcExt::default(),
+                    None,
+                    None,
+                );
+                assert_eq!(
+                    (a.la, a.rel, a.trials, a.recovered),
+                    (z.la, z.rel, z.trials, z.recovered),
+                    "{tag}"
+                );
+                assert_eq!((z.bd_probes, z.bd_n0), (0, 0), "{tag}");
+                for cover in [2u32, 1] {
+                    let bd = BoundedParams {
+                        target: 6.0,
+                        step: 0.2,
+                        extra_max: 1.0,
+                        cover,
+                    };
+                    let o = run_ic_ext_bounded(
+                        &inst,
+                        prm(p, g, Arm::DoubleLp, true, sge),
+                        IcExt::default(),
+                        None,
+                        Some(bd),
+                    );
+                    let tag = format!("{tag} cover {cover}");
+                    assert!(a.certified && o.certified, "{tag}");
+                    assert_eq!(o.recovered, Some(inst.t_secret), "{tag}");
+                    assert!(o.relations >= a.relations, "{tag}");
+                    assert_eq!(o.bd_n0, a.relations, "{tag}");
+                    assert!(o.bd_extra <= bd.extra_max + 0.2, "{tag}");
+                    assert_eq!(o.sge.rows_in, o.core_rows, "{tag}");
+                    assert_eq!(o.rows_kept, o.core_rows, "{tag}");
+                    assert!(o.rows_kept <= o.core_rows_pre, "{tag}");
+                    assert!(o.core_rows >= o.core_cols, "{tag}");
+                    assert_eq!(
+                        o.la.mul,
+                        o.la_graph.mul
+                            + o.la_peel.mul
+                            + o.la_sel.mul
+                            + o.la_sge.mul
+                            + o.la_wied.mul,
+                        "{tag}"
+                    );
+                    assert!(o.attempts >= 1, "{tag}");
+                    probed += u32::from(o.bd_probes > 0);
+                    selected += u32::from(o.core_rows < o.core_rows_pre);
+                }
+            }
+        }
+        assert_eq!(n, 24);
+        assert!(probed > 0, "the target never asked for more relations");
         assert!(selected > 0, "the selection never dropped a row");
     }
 
