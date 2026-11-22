@@ -22,15 +22,6 @@ source = Path("src/cryptanalysis/prime_radical_root.rs").read_text().split("\n#[
 start = source.index("    // Cardano/Ferrari setup already caches these small inverses.")
 end = source.index("    /// Distinct roots of monic y^2 + b y + c.",start)
 frozen = source[:start] + source[end:]
-old_quad = "        let inv_2a = f.inv(f.add(a, a));"
-new_quad = """        let inv_2a = match a {
-            2 => self.inv4,
-            3 => f.half(self.inv3),
-            4 => f.half(self.inv4),
-            _ => f.inv(f.add(a, a)),
-        };"""
-assert frozen.count(new_quad) == 1
-frozen = frozen.replace(new_quad, old_quad)
 assert frozen.count("let ia = self.inv_leading(a);") == 2
 frozen = frozen.replace("let ia = self.inv_leading(a);","let ia = f.inv(a);")
 assert frozen.count("let ia = self.inv_leading(c[3]);") == 1
