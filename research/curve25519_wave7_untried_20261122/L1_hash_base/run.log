@@ -13,3 +13,21 @@ k=22 table 2.5s, valid columns 2098920
 {"k": 22, "N": 290, "B": 512, "p": 4194301, "A": 43186, "order": 4197848, "r": 524731, "m_u": 4992, "m_p": 624, "theta_b0": 2513680726708258, "instrument_check_failures": 0, "hash_pass_s": 2.442509174346924, "wall_s": 258.0067412853241, "smoke": false, "cv_A": 0.7, "hash_evals_build": 2098920, "p_scan": 4194301}
 k=24 table 12.2s, valid columns 8392032
 {"k": 24, "N": 290, "B": 512, "p": 16777141, "A": 7842, "order": 16784072, "r": 2098009, "m_u": 19958, "m_p": 2495, "theta_b0": 667944537039947, "instrument_check_failures": 0, "hash_pass_s": 11.429942607879639, "wall_s": 295.6828315258026, "smoke": false, "cv_A": 0.7, "hash_evals_build": 8392032, "p_scan": 16777141}
+{"k": 24, "N": 579, "B": 512, "p": 16777141, "A": 7842, "order": 16784072, "r": 2098009, "m_u": 5007, "m_p": 626, "theta_b0": 1239634789737715, "instrument_check_failures": 0, "hash_pass_s": 11.909690856933594, "wall_s": 1449.2323396205902, "smoke": false, "cv_A": 0.7, "hash_evals_build": 8392032, "p_scan": 16777141}
+# L1 hash-membership factor base: results table [pcc:unverified]
+
+Ratios are verified-hit-rate ratios (MC), 95 % bootstrap intervals over bases; "exact" is the ratio of exact mean covered points.
+
+| k | N | B | comparison | MC ratio | 95 % CI | exact ratio |
+|--:|--:|--:|:--|--:|:--|--:| 
+...
+HOLDS: P1 hash/rand pooled in [0.98,1.02], CI inside [0.97,1.03]; >= 8/10 cell CIs contain 1
+HOLDS: P1p power: hash/rand half-width <= 0.03 in >= 8/10 cells (else underpowered, null not clai
+HOLDS: P2 hash/bits_rand and bits_rand/rand pooled in [0.98,1.02], CI inside [0.97,1.03]
+HOLDS: P2b single draws (bits lo=0; literal theta hash base) inside the 1-99 percentile of their 
+HOLDS: P3 ceiling: no base above 2N^2/(r-1); projected arms in [0.78,1.0] of it; rand_proj/rand i
+HOLDS: P4 positive control T0/blind exact in [1.80,2.20] every cell; MC CI excludes 1 in every ce
+HOLDS: P5 planted: plant5/rand CI excludes 1 in >= 9/10 cells and pooled within 0.015 of design; 
+HOLDS: P6 A/A: rand/rand2 and hash/hash2 pooled in [0.985,1.015], CI inside [0.97,1.03]; >= 8/10 
+HOLDS: P7 instrument: 0 verification failures; every hit verified; 0 instrument-check failures; M
+HOLDS: P8 cost: hash arm priced total >= rand arm in every cell at w = 0, 0.1, 1 (equal at 0, str
