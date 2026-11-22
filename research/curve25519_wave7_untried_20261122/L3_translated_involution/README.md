@@ -5,7 +5,7 @@
 row, it is not a solve, and it does not change any order against the generic baseline or Pollard
 rho. The protocol ([PROTOCOL.md](PROTOCOL.md)) was frozen before any data (`FREEZE.sha256`, hash-checked
 at launch, commit 0e3c0fbda0). The desk derivations are in [DESK.md](DESK.md), and the run was
-committed at e783d12a5b [pcc:unverified]. The PDF is [REPORT.pdf](REPORT.pdf).
+The run outputs were committed at 6d9cb1674a and are present at e783d12a5b [pcc:unverified]. The PDF is [REPORT.pdf](REPORT.pdf).
 
 ## Question
 
@@ -39,8 +39,10 @@ Do these functions give more exact order-r coverage than x-frames at equal t?
    - They give 0.48–0.70× the coverage of E' x-frames at equal t, as predicted, before counting their
      higher polynomial degree. [pcc:unverified]
 4. **The extra signed relations of a translated involution are bookkeeping, not a gain.**
-   - These are the same-sign sums D ± T, which give about 3× the coverage.
-   - An x-frame with the same T-shifted targets gets 1.00–1.17× of that count.
+   - These are the same-sign sums D ± T, which give about 3× the coverage. [pcc:unverified]
+   - Their full signed set is 1.00–1.17× the set an x-frame covers when it decomposes the same
+     T-shifted targets R, R − T and R + T (model 1.00–1.15; P5 60/60). Both need three
+     decompositions of the same degree, so this is accounting, not a gain. [pcc:unverified]
    - Either way, the decomposition degree in the target is 3× larger. [pcc:unverified]
 5. **The one predicted positive held.**
    - Plain x-frames on E' cover more than plain x-frames on E: 1.21–1.24× at t = 4, 1.10–1.12× at
@@ -63,12 +65,12 @@ P6's acceptance range.
 [pcc:unverified]
 
 - **Curve facts, checked exactly.**
-  - p and r are prime, #E = 8r by a character sum, E(F_p) is cyclic, and A² − 4 is a non-square.
+  - p and r are prime, #E = 8r by a character sum, E(F_p) is cyclic, and A² − 4 is a non-square. [pcc:unverified]
   - E' was built with Vélu's formulas for kernel <T0>: y² = (x + A)(x − 2)(x + 2), with
-    φ(x, y) = (x + 1/x, y − y/x²).
-  - #E' = #E by a character sum, and E'(F_p) ≅ Z/2 × Z/4r.
-  - φ is a homomorphism mapping E[r] injectively into E'[r], checked on 2000 samples.
-  - So targets transported by φ are covered exactly when their E'[r] images are.
+    φ(x, y) = (x + 1/x, y − y/x²). [pcc:unverified]
+  - #E' = #E by a character sum, and E'(F_p) ≅ Z/2 × Z/4r. [pcc:unverified]
+  - φ is a homomorphism mapping E[r] injectively into E'[r], checked on 2000 samples. [pcc:unverified]
+  - So targets transported by φ are covered exactly when their E'[r] images are. [pcc:unverified]
 - **Every degree-2 f is an ι_T function with T ∈ E(F_p).** Its four ramification points are the
   halves of T. This is derived.
 - **Theorem 1.** If S ∈ E(F_p) with 2S = T, then f = μ∘x∘τ_{−S} with μ ∈ PGL2(F_p), and the base is
@@ -86,30 +88,30 @@ P6's acceptance range.
   mixed-sign coverage depends only on the class of T modulo 2E(F_p). This is derived; P4a tests it.
 - **Lemma 3: which T have no rational half.**
   - On E: the T with odd log, equivalently x_T a non-square, half of all points. Checked exactly on
-    2000 points per curve. T0 does have a rational half, so Montgomery y/x is a translated frame.
+    2000 points per curve [pcc:unverified]. T0 does have a rational half, so Montgomery y/x is a translated frame.
   - On E': three of the four classes of E'/2E' ≅ (Z/2)², three quarters of all points. The
-    class-to-2-torsion map was computed with explicit F_{p²} halving.
+    class-to-2-torsion map was computed with explicit F_{p²} halving. [pcc:unverified]
 - **Theorem 4.** With no rational half, no within-fibre difference lies in E[r]. This is derived; P1
   tests it.
 - **Huff (E').**
   - a x(y² − 1) = b y(x² − 1) via x = b(u + a²)/v, y = a(u + b²)/v; the curve equation was checked on
-    every point.
+    every point. [pcc:unverified]
   - Huff x is an ι_T function for T = Wa, and Huff y for T = Wb. Both are 2-torsion points outside
-    2E', in class (0,1).
+    2E', in class (0,1). [pcc:unverified]
 - **Jacobi intersection (E').**
-  - αs² + c² = 1, βs² + d² = 1, with α = A + 2, β = A − 2, checked on every point.
-  - s, c and d have degree 4, read off the fibre histograms.
-  - Their invariance groups show that c and d are x-frames pulled back from E'/<eβ> and E'/<eα>.
+  - αs² + c² = 1, βs² + d² = 1, with α = A + 2, β = A − 2, checked on every point. [pcc:unverified]
+  - s, c and d have degree 4, read off the fibre histograms. [pcc:unverified]
+  - Their invariance groups show that c and d are x-frames pulled back from E'/<eβ> and E'/<eα>. [pcc:unverified]
   - s is a translated E x-frame pulled back by the dual isogeny. That last identification is derived
-    from the invariance groups, not checked pointwise.
+    from the invariance groups, not checked pointwise. [pcc:unverified]
 
 ## Corrections to the brief
 
 - **The halves are defined over F_{p⁴}, not F_{p²}.** On E, a T with no rational half has no half
   over F_{p²}: N(x_T − e1) = x_T² + A x_T + 1 is a non-square, and the Galois argument puts the
-  halves over F_{p⁴}. On E' the brief's F_{p²} is correct: every T has a half there.
+  halves over F_{p⁴}. On E' the brief's F_{p²} is correct: every T has a half there. [pcc:unverified]
 - **The Jacobi-intersection coordinates have degree 4.** They are therefore not ι_T functions. The
-  premise holds for Huff.
+  premise holds for Huff. [pcc:unverified]
 
 ## Census (exact counts, 2000 random Möbius frames per cell; `analysis/summary.json`)
 
@@ -167,8 +169,10 @@ Ratio to the matched null, with 95% bootstrap intervals and the model in bracket
   - The two intervals that exclude 1 are k = 20, t = 4, E' x-frame (1.073, CI 1.026–1.121) and
     k = 20, t = 6, E x-frame (0.971, CI 0.951–0.993).
   - Two misses in 30 is in line with the 5% nominal rate, and the threshold was ≥ 27.
+  - A third cell (k = 16, t = 6, E x-frame) has an upper bound of 1.0008. With another bootstrap
+    stream it falls just below 1 (27/30, still at the threshold). [pcc:unverified]
 - **PC1 held, 24/24.** The planted removal of within-fibre pairs was detected at t = 4–6 in every k
-  (CI upper bound ≤ 0.992), and it matches the model in 15/15 cells. [pcc:unverified]
+  (CI upper bound ≤ 0.950), and it matches the model in 15/15 cells. [pcc:unverified]
 - **PC2 held, 9/9.** The frame-search selection gain was reproduced: 2.62–2.75 at t = 5, 1.98–2.18 at
   t = 6 and 1.55–1.72 at t = 7. [pcc:unverified]
 
@@ -182,6 +186,11 @@ Ratio to the matched null, with 95% bootstrap intervals and the model in bracket
   [pcc:unverified]
 - **P4a held, 36/36.** Huff x, Huff y and class (0,1) have the same distribution: mean ratios within
   3.7% of 1 and KS distance at most 0.0585, against a critical value of 0.0617. [pcc:unverified]
+  - The k = 16, t = 5 Huff x cell (mean 63.62) lies about 3.4 SE above the pooled same-class
+    estimate (61.49 over the other 8000 frames; 61.19 in the validator's 5000 independent frames).
+    A frame-exact replay reproduces all 2000 recorded frames, so this is a sampling excursion of the
+    seeded sample, not a fault. It is also the cell with P4a's narrowest margins: ratio 1.037 against
+    the 1.05 bound, and KS 0.0575 against 0.0617. [pcc:unverified]
 - **P4b held, 36/36.** The three no-half classes are indistinguishable: pairwise ratios 0.984–1.017.
   [pcc:unverified]
 - **P5 held, 60/60.** The full signed set matches the T-shifted x-null model. Full ÷ mixed-sign
@@ -208,15 +217,17 @@ up about 12% on geometric mean. This is a measured component effect of coverage 
 [pcc:unverified]
 
 **Why.** E' has full rational 2-torsion, so 4 of its 8 cosets are self-paired under negation, against
-2 of 8 on E. That adds about N/4 within-fibre relations.
+2 of 8 on E. That adds about N/4 more self-paired fibres, i.e. about N/2 more covered points.
+[pcc:unverified]
 
 **Why it needs an engine check before anyone relies on it.**
 
 1. Coverage is not cost. Whether F4 on E' has the same solving degree and polynomial size as on E has
    not been measured. Only the multidegree argument says it should.
-2. The gain fades as 1/N with N ≈ 2^{t−1}: it is 1.5% at t = 8, and it has no bearing at 255 bits.
+2. The gain fades as 1/N with N ≈ 2^{t−1}: it is 1–2% at t = 8 (measured; model 1.2–1.5%), and it has no bearing at
+   255 bits. [pcc:unverified]
 3. The isogeny transport, a few field operations per target and per base point, has to be charged.
-4. The selected-frame ratio is noisy, ranging 1.03–1.39 across cells.
+4. The selected-frame ratio is noisy, ranging 1.03–1.39 across cells. [pcc:unverified]
 
 The check needed is a `pkm-semaev` run on E' against E, with the same seeds, in the engine.
 
@@ -258,4 +269,27 @@ the §5a band. [pcc:unverified]
 
 ## Errata
 
-(none)
+- **E1 (medium).** Answer item 4 inverted a measured direction. The no-half full signed set is
+  1.00–1.17× the x-frame's T-shifted set (model 1.00–1.15; P5 60/60), not the other way round. It is
+  accounting, not a gain; corrected above. [pcc:unverified]
+- **E2.** DESK.md §3, which is frozen and left unchanged, says "E' x-frames have about N/4 more than
+  E x-frames". In covered points the difference is about N/2: about N/4 more self-paired fibres, each
+  covering 2 points. Ep.x − E.x is 4.2 / 3.9 / 4.5 at t = 4 against N/2 = 4. Corrected in this
+  README. [pcc:unverified]
+- **E3.** The PC1 interval bound at t = 4–6 is ≤ 0.950. The earlier 0.992 was the t = 8 value.
+  [pcc:unverified]
+- **E4.** The A/A verdict depends on the bootstrap stream at a third cell, k = 16, t = 6, E x-frame,
+  whose upper bound is 1.0008. An independent stream gives 27/30, still at the threshold, so the
+  verdict holds. [pcc:unverified]
+- **E5.** Provenance: the L3 run outputs were committed at 6d9cb1674a and are present at e783d12a5b.
+  Earlier the README attributed them to e783d12a5b. [pcc:unverified]
+- **E6.** [pcc:unverified] tags were added to the desk-result, brief-correction and engine-check
+  sentences that lacked them.
+- **E7.** The gain at t = 8 is 1–2% measured (1.0105 / 1.0163 / 1.0195) and 1.2–1.5% in the model,
+  not "1.5%". [pcc:unverified]
+- **E8.** PROTOCOL.md's model table, which is frozen, says k = 18 and k = 20 are within 0.01 of
+  k = 16 "except where noted". It does not note Ep.ji_s / Ep.x at t = 7: 0.517 at k = 16 against
+  0.504 and 0.501 at k = 18 and 20. The verdicts are unaffected, because `analyse.py` reads
+  `model_predictions.json`. [pcc:unverified]
+- **E9.** See the P4a note: the k = 16, t = 5 Huff x cell is a sampling excursion of the seeded
+  sample. [pcc:unverified]
