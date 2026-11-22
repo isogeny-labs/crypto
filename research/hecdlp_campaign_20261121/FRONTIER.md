@@ -141,7 +141,7 @@ entries it visits (about 11 additions per counted multiplication), so a counted 
 16 to 18 field multiplications of wall time. FPM with κ = g² = 9 therefore **under-weights the
 linear algebra by about 2×** on this host.
 
-Consequences, re-priced at the in-situ κ from the recorded counts:
+Consequences, re-priced at the in-situ κ from the recorded counts: [pcc:unverified]
 - **The light-row floor (R4) is an improvement in wall-clock terms**: lighter rows cut both
   additions and multiplications, and κ in situ is far above the 2.5–4.1 break-even. The R4
   errata's "not an improvement at the measured price" referred to the bare-multiply κ and is
