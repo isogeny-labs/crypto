@@ -1325,6 +1325,105 @@ fn vcubic_replay_square(a: &[u64], m: &[u64], p: u64) -> Vec<u64> {
     cubic_trim(cubic_square(cubic_coordinates(a), [m[0], m[1], m[2]], p))
 }
 
+// Quartic quotient-ring arithmetic for the independent certificate verifier.
+// Unlike generic Vec polynomial multiplication, coefficients stay on the stack,
+// and x^6, x^5 and x^4 are reduced directly by a monic degree-four modulus.
+// All field additions and doubled cross terms fit u64 because p <= 2^61-1.
+#[inline]
+fn quartic_reduce(mut t: [u64; 7], c: [u64; 4], p: u64) -> [u64; 4] {
+    for degree in (4..=6).rev() {
+        let high = t[degree];
+        if high == 0 { continue; }
+        for j in 0..4 {
+            t[degree - 4 + j] = quadratic_sub(
+                t[degree - 4 + j], vmul(high, c[j], p), p);
+        }
+    }
+    [t[0], t[1], t[2], t[3]]
+}
+#[inline]
+fn quartic_mul(a: [u64; 4], b: [u64; 4], c: [u64; 4], p: u64) -> [u64; 4] {
+    let mut t = [0u64; 7];
+    for i in 0..4 {
+        for j in 0..4 {
+            t[i + j] = cubic_add(t[i + j], vmul(a[i], b[j], p), p);
+        }
+    }
+    quartic_reduce(t, c, p)
+}
+#[inline]
+fn quartic_square(a: [u64; 4], c: [u64; 4], p: u64) -> [u64; 4] {
+    let mut t = [0u64; 7];
+    for i in 0..4 {
+        t[2 * i] = cubic_add(t[2 * i], vmul(a[i], a[i], p), p);
+        for j in (i + 1)..4 {
+            let product = vmul(a[i], a[j], p);
+            t[i + j] = cubic_add(
+                t[i + j], cubic_add(product, product, p), p);
+        }
+    }
+    quartic_reduce(t, c, p)
+}
+#[inline]
+fn quartic_coordinates(a: &[u64]) -> [u64; 4] {
+    [a.first().copied().unwrap_or(0), a.get(1).copied().unwrap_or(0),
+     a.get(2).copied().unwrap_or(0), a.get(3).copied().unwrap_or(0)]
+}
+#[inline]
+fn quartic_trim(a: [u64; 4]) -> Vec<u64> {
+    trim(a.to_vec())
+}
+fn vpower_quartic(base: &[u64], mut exponent: u64, modulus: &[u64], p: u64)
+    -> Result<Vec<u64>, String>
+{
+    debug_assert_eq!(modulus.len(), 5);
+    let lead = modulus[4];
+    if lead == 0 { return Err("division by zero leading coefficient".into()); }
+    let inverse = if lead == 1 { 1 } else { vinv(lead, p) };
+    let c = if lead == 1 {
+        [modulus[0], modulus[1], modulus[2], modulus[3]]
+    } else {
+        [vmul(modulus[0], inverse, p), vmul(modulus[1], inverse, p),
+         vmul(modulus[2], inverse, p), vmul(modulus[3], inverse, p)]
+    };
+    // Horner reduction of an arbitrary-degree base without a quotient.
+    let mut power = [0u64; 4];
+    for &coefficient in base.iter().rev() {
+        let high = power[3];
+        power = [
+            quadratic_sub(coefficient, vmul(high, c[0], p), p),
+            quadratic_sub(power[0], vmul(high, c[1], p), p),
+            quadratic_sub(power[1], vmul(high, c[2], p), p),
+            quadratic_sub(power[2], vmul(high, c[3], p), p),
+        ];
+    }
+    let mut accumulator = [1, 0, 0, 0];
+    while exponent != 0 {
+        if exponent & 1 == 1 {
+            accumulator = quartic_mul(accumulator, power, c, p);
+        }
+        exponent >>= 1;
+        if exponent != 0 {
+            power = quartic_square(power, c, p);
+        }
+    }
+    Ok(quartic_trim(accumulator))
+}
+#[inline]
+fn vquartic_replay_mul(a: &[u64], b: &[u64], modulus: &[u64], p: u64) -> Vec<u64> {
+    debug_assert_eq!(modulus.len(), 5);
+    quartic_trim(quartic_mul(
+        quartic_coordinates(a), quartic_coordinates(b),
+        [modulus[0], modulus[1], modulus[2], modulus[3]], p))
+}
+#[inline]
+fn vquartic_replay_square(a: &[u64], modulus: &[u64], p: u64) -> Vec<u64> {
+    debug_assert_eq!(modulus.len(), 5);
+    quartic_trim(quartic_square(
+        quartic_coordinates(a),
+        [modulus[0], modulus[1], modulus[2], modulus[3]], p))
+}
+
 fn vpower_quadratic(base: &[u64], mut exponent: u64, modulus: &[u64], p: u64)
     -> Result<Vec<u64>, String>
 {
@@ -1388,6 +1487,12 @@ fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, Strin
     }
     if m.len() == 4 {
         return vpower_cubic(base, e, m, p);
+    }
+    // The large-prime native CPU path is intentionally unchanged until
+    // source-exact Rust A/B clears the crossover. Local GCC reproductions
+    // regressed over 2^61-1; only test 32-bit fields here.
+    if m.len() == 5 && p <= u32::MAX as u64 {
+        return vpower_quartic(base, e, m, p);
     }
     // Polynomial remainder is invariant under scaling the modulus by a
     // nonzero field element. Normalize a nonmonic modulus ONCE rather than
@@ -1629,6 +1734,8 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                         vquadratic_replay_mul(&state.acc, &state.base, &state.modulus, p)
                     } else if state.modulus.len() == 4 && p >= (1u64 << 24) {
                         vcubic_replay_mul(&state.acc, &state.base, &state.modulus, p)
+                    } else if state.modulus.len() == 5 && p <= u32::MAX as u64 {
+                        vquartic_replay_mul(&state.acc, &state.base, &state.modulus, p)
                     } else {
                         vpower_reduce(vproduct(&state.acc, &state.base, p), &state.modulus, p)?
                     };
@@ -1644,6 +1751,8 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                         vquadratic_replay_square(&state.base, &state.modulus, p)
                     } else if state.modulus.len() == 4 && p >= (1u64 << 24) {
                         vcubic_replay_square(&state.base, &state.modulus, p)
+                    } else if state.modulus.len() == 5 && p <= u32::MAX as u64 {
+                        vquartic_replay_square(&state.base, &state.modulus, p)
                     } else {
                         vpower_reduce(vproduct(&state.base, &state.base, p), &state.modulus, p)?
                     };
@@ -2671,6 +2780,65 @@ mod round97_remainder_tests {
     }
 }
 
+
+#[cfg(test)]
+mod round103_quartic_quotient {
+    use super::*;
+
+    // Independent oracle: long division, generic multiplication and squaring.
+    // It does not call vpower, quartic_mul, quartic_square, or quartic_reduce.
+    fn reference_power(base: &[u64], mut e: u64, modulus: &[u64], p: u64) -> Vec<u64> {
+        let m = vmonic(modulus.to_vec(), p);
+        let mut r = vdiv(&[1], &m, p).unwrap().1;
+        let mut b = vdiv(base, &m, p).unwrap().1;
+        while e != 0 {
+            if e & 1 == 1 { r = vdiv(&vproduct(&r, &b, p), &m, p).unwrap().1; }
+            e >>= 1;
+            if e != 0 { b = vdiv(&vproduct(&b, &b, p), &m, p).unwrap().1; }
+        }
+        r
+    }
+    #[test]
+    fn quartic_multiply_square_horner_and_power_match_independent_long_division() {
+        let mut state = 0x1030_aaaa_bbbb_ccccu64;
+        for p in [7u64, 65_521, 1_000_000_007, MAX_PRIME] {
+            for iteration in 0..512 {
+                let mut next = || {
+                    state ^= state << 13; state ^= state >> 7;
+                    state ^= state << 17; state % p
+                };
+                let mut c = [0u64; 4];
+                let mut a = [0u64; 4];
+                let mut b = [0u64; 4];
+                for j in 0..4 { c[j] = next(); a[j] = next(); b[j] = next(); }
+                let mut modulus = c.to_vec();
+                modulus.push(1);
+                let a_poly = trim(a.to_vec());
+                let b_poly = trim(b.to_vec());
+                let direct = vdiv(&vproduct(&a_poly, &b_poly, p), &modulus, p).unwrap().1;
+                assert_eq!(quartic_trim(quartic_mul(a, b, c, p)), direct, "mul p={p}");
+                let direct_sq = vdiv(&vproduct(&a_poly, &a_poly, p), &modulus, p).unwrap().1;
+                assert_eq!(quartic_trim(quartic_square(a, c, p)), direct_sq, "square p={p}");
+                assert_eq!(vquartic_replay_mul(&a_poly, &b_poly, &modulus, p),
+                    direct, "replay multiply p={p}");
+                assert_eq!(vquartic_replay_square(&a_poly, &modulus, p),
+                    direct_sq, "replay square p={p}");
+                let base: Vec<u64> = (0..(iteration % 12)).map(|_| next()).collect();
+                let exponent = (next() & 255) + (iteration % 7) as u64;
+                let lead = if iteration % 2 == 0 { 1 } else { 2 };
+                let mut nonmonic = c.iter().map(|&x| vmul(x, lead, p)).collect::<Vec<_>>();
+                nonmonic.push(lead);
+                let actual = vpower_quartic(&base, exponent, &nonmonic, p).unwrap();
+                let expected = reference_power(&base, exponent, &nonmonic, p);
+                assert_eq!(actual, expected,
+                    "power p={p} iteration={iteration} e={exponent}");
+                if p <= u32::MAX as u64 {
+                    assert_eq!(vpower(&base, exponent, &nonmonic, p).unwrap(), expected);
+                }
+            }
+        }
+    }
+}
 
 #[cfg(test)]
 mod round100_traced_multiplication {
