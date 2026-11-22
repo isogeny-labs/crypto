@@ -1,6 +1,6 @@
 # Prime31 run64 — projective Semaev S3 cost ablation
 
-Date: 2026-11-22 UTC. Repository branch: `research/prime31-f4-admission-run51-20261121` / draft PR #4901. Evidence status: **source committed, native Rust CI pending**, no signed PCC.
+Date: 2026-11-22 UTC. Repository branch: `research/prime31-f4-admission-run51-20261121` / draft PR #4901. Evidence status: **two source-identical native Rust CI attempts passed** ([Actions #45032930310](https://github.com/isogeny-labs/crypto/actions/runs/45032930310)); signed PCC remains unverified.
 
 ## Mathematical result: a division-free public S3 zero predicate
 
@@ -37,7 +37,7 @@ These are algebraic correctness controls, **not Rust throughput or blind unknown
 
 CI gate: Rust 1.100.0 original-crate compilation, 40 × 192 original-arithmetic group-law controls (7,680), 16 genuine factor-base pair sums and 16 doubling certificates, and 5 rotations of 250,000 public shifts per arm. Compare shift-only; projective S3 and batch-affine-X S3 at K=1,4,16. Record all seven raw times and medians, not just favorable ratios. Infinity, input-invariant and final-scalar mismatches fail closed.
 
-**Native CI is not called passed until its result and logs are inspected.** Timings and complete ECDLP benefit are unknown in this file pending the native gate. Both algebraic arms here evaluate **fixed public pair coefficients** rather than extracting unknown factor-base indices. Therefore even a large component speedup would not qualify as non-generic blind extraction.
+**Native CI passed twice**, with matched component timings frozen below and in `RUN64_RESULTS.json`. Complete ECDLP cost remains unmeasured. Both algebraic arms here evaluate **fixed public pair coefficients** rather than extracting unknown factor-base indices. Therefore even a large component speedup would not qualify as non-generic blind extraction.
 
 ## Audited prior leads and decision
 
