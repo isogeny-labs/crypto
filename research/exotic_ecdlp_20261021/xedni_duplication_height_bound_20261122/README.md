@@ -51,15 +51,16 @@ removes at most a factor `R`; combining the upper and lower bounds yields
 | Homogeneous Bézout identity, coefficient and tail inequalities | `Bounds.lean`, pinned build and `#print axioms` | Lean checked |
 | Quartic Bernstein coefficient lower-bound rule | `bernstein_quartic_lower` in `Bounds.lean` | Lean checked for arbitrary coefficients and `s∈[0,1]` |
 | Certificate cell 26 (`191/16≤A/B≤383/32`) | `interval_26_positive_F` in `Bounds.lean` | Lean checked with its exact rational coefficients |
-| Archimedean lower bound | `certificate.json`, exact Horner generator and independent exact Bernstein auditor | Exact computational certificate; Lean checker open |
+| Finite-range archimedean lower bound on `[-128,128]` | `finite_archimedean_lower` in generated `Cells.lean`; generator agrees with `certificate.json` | All 91 cells and coverage Lean checked |
+| Outer-range archimedean lower bound | Exact coefficient inequality in `Bounds.lean`; written triangle-inequality argument above | Numeric inequality Lean checked; real-polynomial tail bridge open |
 | Common-divisor bound `d|F,G ⇒ d|R` for primitive `A,B` | `common_divisor_dvd_resultant` in `Bounds.lean` | Lean checked, including coprimality bridge |
 | Uniform doubling defect and numerical comparison | Above inequalities and the canonical-limit geometric tail; Lean checks `(53/3)log 2<14` | Mathematical derivation; full fixed-point Lean theorem open |
 
-The polynomial, divisibility and numerical Lean declarations use only standard
-foundations in their `#print axioms` output. The packet is **partially
-formalized** until the remaining 90 concrete intervals and their coverage
-are discharged using the Lean Bernstein rule and the general duplication map is
-connected to the actual `WeierstrassCurve.Affine.Point.naiveHeight`.
+The polynomial, divisibility, finite-range and numerical Lean declarations
+use only standard foundations in their `#print axioms` output. The packet is
+**partially formalized** until the outer-range inequality, homogeneous scaling
+and general duplication map are connected to the actual
+`WeierstrassCurve.Affine.Point.naiveHeight`.
 The canonical-limit packet already proves quadraticity for integer multiples.
 Mordell–Weil generation and rational-to-finite reduction remain separate
 obligations for a complete fixed-curve exclusion theorem.
@@ -69,6 +70,7 @@ Replay from this directory:
 ```sh
 python3 generate_certificate.py
 python3 audit_certificate.py
+python3 generate_lean_cells.py --check
 sh build.sh
 /Volumes/SSD990/cryptanalysis/sage --runtime-info
 /Volumes/SSD990/cryptanalysis/sage -python /Volumes/SSD990-2/crypto-worktrees/exotic-ecdlp-recovery-20261119/research/exotic_ecdlp_20261021/xedni_duplication_height_bound_20261122/check_sage.py
