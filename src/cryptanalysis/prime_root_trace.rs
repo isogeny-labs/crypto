@@ -354,40 +354,12 @@ impl Engine<'_> {
         Ok(acc)
     }
     fn mul(&mut self, a: &[u64], b: &[u64]) -> Work<Vec<u64>> {
-        // Identity products occur at the start of binary quotient-ring power
-        // chains. They need no coefficient products or additions, but still
-        // produce the same independently checked Product event.
-        // Dense-by-dense products cannot match any identity below. A single
-        // length gate keeps all four shape checks off that hot path.
+        // Keep this short dispatch away from the wide generic convolution.
+        // The no-inline helper keeps the hot producer loop's code size stable.
         if a.len() <= 2 || b.len() <= 2 {
-        let special = if a == [1] {
-            Some(trim(b.to_vec()))
-        } else if b == [1] {
-            Some(trim(a.to_vec()))
-        } else if a == [0, 1] && b.len() >= 4 {
-            // Multiplication by X shifts coefficients by one place. Restrict
-            // to a nontrivial other operand: tiny X*X fell below break-even
-            // in local GCC profiling.
-            let mut shifted = Vec::with_capacity(b.len() + 1);
-            shifted.push(0);
-            shifted.extend_from_slice(b);
-            Some(trim(shifted))
-        } else if b == [0, 1] && a.len() >= 4 {
-            let mut shifted = Vec::with_capacity(a.len() + 1);
-            shifted.push(0);
-            shifted.extend_from_slice(a);
-            Some(trim(shifted))
-        } else {
-            None
-        };
-        if let Some(product) = special {
-            self.event(RootEvent::Product {
-                a: a.to_vec(),
-                b: b.to_vec(),
-                product: product.clone(),
-            })?;
-            return Ok(product);
-        }
+            if let Some(result) = self.mul_shortcut(a, b)? {
+                return Ok(result);
+            }
         }
         let mut product = if a.is_empty() || b.is_empty() {
             vec![]
@@ -423,6 +395,39 @@ impl Engine<'_> {
             product: product.clone(),
         })?;
         Ok(product)
+    }
+    // An opt-in coefficient-copy shortcut for the identities 1*f and X*f.
+    // Keep it out of the dense-by-dense convolution code path.
+    #[inline(never)]
+    fn mul_shortcut(&mut self, a: &[u64], b: &[u64]) -> Work<Option<Vec<u64>>> {
+        let special = if a == [1] {
+            Some(trim(b.to_vec()))
+        } else if b == [1] {
+            Some(trim(a.to_vec()))
+        } else if a == [0, 1] && b.len() >= 4 {
+            let mut shifted = Vec::with_capacity(b.len() + 1);
+            shifted.push(0);
+            shifted.extend_from_slice(b);
+            Some(trim(shifted))
+        } else if b == [0, 1] && a.len() >= 4 {
+            let mut shifted = Vec::with_capacity(a.len() + 1);
+            shifted.push(0);
+            shifted.extend_from_slice(a);
+            Some(trim(shifted))
+        } else {
+            None
+        };
+        if let Some(product) = special {
+            // Preserve the durable Product event and independent verification.
+            self.event(RootEvent::Product {
+                a: a.to_vec(),
+                b: b.to_vec(),
+                product: product.clone(),
+            })?;
+            Ok(Some(product))
+        } else {
+            Ok(None)
+        }
     }
     fn div(&mut self, a: &[u64], b: &[u64]) -> Work<(Vec<u64>, Vec<u64>)> {
         debug_assert!(!b.is_empty());
