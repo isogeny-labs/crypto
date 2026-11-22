@@ -1431,6 +1431,40 @@ fn quartic_coordinates(a: &[u64]) -> [u64; 4] {
 fn quartic_trim(a: [u64; 4]) -> Vec<u64> {
     trim(a.to_vec())
 }
+// This verifier-only addition chain is for the two exact exponents used by
+// Frobenius and quadratic-character splitting over p = 2^61 - 1.
+// Concatenating (2^a-1) and (2^b-1) requires b squarings and one multiply:
+// (2^a-1)*2^b + (2^b-1) = 2^(a+b)-1.
+// Compared with ordinary binary exponentiation, 60/61-bit exponents retain
+// 59/60 squares but require only 8/9 quotient-ring multiplies, not 59/60.
+// The producer's recorded field-operation trace and certificate stay intact.
+#[inline]
+fn quartic_mersenne_exponent_chain(
+    base: [u64; 4], exponent: u64, modulus: [u64; 4],
+) -> [u64; 4] {
+    debug_assert!(exponent == MAX_PRIME || exponent == MAX_PRIME >> 1);
+    #[inline]
+    fn append(a: [u64; 4], b: [u64; 4], bits: usize, c: [u64; 4]) -> [u64; 4] {
+        let mut squared = a;
+        for _ in 0..bits {
+            squared = quartic_square(squared, c, MAX_PRIME);
+        }
+        quartic_mul(squared, b, c, MAX_PRIME)
+    }
+    let x2 = append(base, base, 1, modulus);
+    let x4 = append(x2, x2, 2, modulus);
+    let x8 = append(x4, x4, 4, modulus);
+    let x16 = append(x8, x8, 8, modulus);
+    let x32 = append(x16, x16, 16, modulus);
+    let x48 = append(x32, x16, 16, modulus);
+    let x56 = append(x48, x8, 8, modulus);
+    let x60 = append(x56, x4, 4, modulus);
+    if exponent == MAX_PRIME {
+        append(x60, base, 1, modulus)
+    } else {
+        x60
+    }
+}
 fn vpower_quartic(base: &[u64], mut exponent: u64, modulus: &[u64], p: u64)
     -> Result<Vec<u64>, String>
 {
@@ -1454,6 +1488,12 @@ fn vpower_quartic(base: &[u64], mut exponent: u64, modulus: &[u64], p: u64)
             quadratic_sub(power[1], vmul(high, c[2], p), p),
             quadratic_sub(power[2], vmul(high, c[3], p), p),
         ];
+    }
+    // The Mersenne field produces these exponents in the principal
+    // Frobenius and Cantor-Zassenhaus split checks. For other fields or
+    // exponent shapes, retain the measured binary-power path.
+    if p == MAX_PRIME && (exponent == MAX_PRIME || exponent == MAX_PRIME >> 1) {
+        return Ok(quartic_trim(quartic_mersenne_exponent_chain(power, exponent, c)));
     }
     let mut accumulator = [1, 0, 0, 0];
     while exponent != 0 {
@@ -2853,6 +2893,43 @@ mod round103_quartic_quotient {
         r
     }
 
+    #[test]
+    fn round105_mersenne_quartic_addition_chain_matches_division() {
+        // Independent polynomial multiplication/long division oracle.
+        let p = MAX_PRIME;
+        let mut rng = StdRng::seed_from_u64(0x726f_6f74_3130_3531);
+        for nonmonic in [false, true] {
+            for width in [0usize, 1, 2, 4, 7] {
+                for _ in 0..16 {
+                    let modulus = vec![
+                        rng.gen_range(0..p), rng.gen_range(0..p),
+                        rng.gen_range(0..p), rng.gen_range(0..p),
+                        if nonmonic { rng.gen_range(2..p) } else { 1 },
+                    ];
+                    let base: Vec<_> = (0..width).map(|_| rng.gen_range(0..p)).collect();
+                    for exponent in [p, (p - 1) / 2] {
+                        assert_eq!(
+                            vpower(&base, exponent, &modulus, p).unwrap(),
+                            reference_power(&base, exponent, &modulus, p),
+                            "nonmonic={nonmonic} width={width} exponent={exponent}",
+                        );
+                    }
+                }
+            }
+        }
+        // Extreme residues ensure intermediate products cannot be
+        // specialized using unchecked assumptions about coefficient size.
+        for coefficient in [0, 1, 2, p / 2, p - 2, p - 1] {
+            let modulus = vec![p - 1, coefficient, 0, p - 1, 1];
+            let base = vec![coefficient, p - 1, 0, coefficient];
+            for exponent in [p, (p - 1) / 2] {
+                assert_eq!(
+                    vpower(&base, exponent, &modulus, p).unwrap(),
+                    reference_power(&base, exponent, &modulus, p),
+                );
+            }
+        }
+    }
     #[test]
     fn round104_mersenne_quartic_column_extremes() {
         let p = MAX_PRIME;
