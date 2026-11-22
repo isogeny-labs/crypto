@@ -4,6 +4,7 @@ on:
     paths:
       - 'src/cryptanalysis/prime_radical_root.rs'
       - 'research/amm_digit_perf_20261118/round118_inv_ab.py'
+      - 'research/amm_digit_perf_20261118/round118_small_leading_ab.py'
       - '.github/workflows/radical-root-round118.yml'
   workflow_dispatch:
 permissions:
@@ -18,12 +19,14 @@ jobs:
           sparse-checkout: |
             src/cryptanalysis/prime_radical_root.rs
             research/amm_digit_perf_20261118/round118_inv_ab.py
+            research/amm_digit_perf_20261118/round118_small_leading_ab.py
       - uses: dtolnay/rust-toolchain@stable
       - name: Source-exact Rust correctness and paired root benchmarks
         run: |
           set -euo pipefail
           rustc --version
           python3 research/amm_digit_perf_20261118/round118_inv_ab.py | tee round118_native_rust.txt
+          python3 research/amm_digit_perf_20261118/round118_small_leading_ab.py | tee -a round118_native_rust.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
