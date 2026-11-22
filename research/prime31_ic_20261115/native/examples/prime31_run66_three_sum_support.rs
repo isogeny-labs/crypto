@@ -124,7 +124,7 @@ fn run_arm(
         let mut witnesses = 0usize;
         let mut ec_checks = 0usize;
         let start = Instant::now();
-        for &(cohort, _, target) in prefix.iter().filter(|&&(cohort, _, _)| cohort == *c) {
+        for &(_, _, target) in prefix.iter().filter(|&&(cohort, _, _)| cohort == *c) {
             if !ar.on_curve(PRIME31, target) {
                 return Err("public target off-curve".into());
             }
