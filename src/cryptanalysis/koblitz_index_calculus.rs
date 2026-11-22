@@ -19065,8 +19065,8 @@ mod tests {
             collection_window: None,
             ..windowed_options(want)
         };
-        let collector =
-            RelationCollector::with_pair_table(&kc, &fb, &defaulted, Some(&pair)).expect("collector");
+        let collector = RelationCollector::with_pair_table(&kc, &fb, &defaulted, Some(&pair))
+            .expect("collector");
         assert_eq!(collector.admission_dispatch().collection_window, Some(want));
         let full = KoblitzIcOptions {
             collection_window: Some(base),
@@ -19076,9 +19076,8 @@ mod tests {
             RelationCollector::with_pair_table(&kc, &fb, &full, Some(&pair)).expect("collector");
         assert_eq!(full_collector.admission_dispatch().collection_window, None);
         let overridden = windowed_options(7.min(base.saturating_sub(1)).max(1));
-        let over_collector =
-            RelationCollector::with_pair_table(&kc, &fb, &overridden, Some(&pair))
-                .expect("collector");
+        let over_collector = RelationCollector::with_pair_table(&kc, &fb, &overridden, Some(&pair))
+            .expect("collector");
         assert_eq!(
             over_collector.admission_dispatch().collection_window,
             overridden.collection_window
