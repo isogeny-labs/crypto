@@ -13,6 +13,8 @@ tracked in [PR #4922](https://github.com/isogeny-labs/crypto/pull/4922).
   source bindings, successful development checks, and retained failed attempts.
 - [REVIEW.md](REVIEW.md): same-team source review, including the defect missed
   by inspection and caught by execution.
+- [registration/README.md](registration/README.md): unsigned PCC statement
+  `PCC-20261122-2fb226`, committed-receipt binding, and append-only metadata.
 - [qualifier/README.md](qualifier/README.md) and
   [integration_qualifier/README.md](integration_qualifier/README.md): native
   source-bound development builds, with explicit exclusions.
