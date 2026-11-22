@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+- [x] Repair second-pass audit findings: restore the pcc gate workflow and re-land the headline tolerance cap (the claim types, test_pcc call and lessons entries were already handled on main) (claude, completed 2026-11-18, branch claude/codebase-assessment-report-fp044d, PR #4750)
+
 - [ ] Next IC levers (owner: a–c): (a) decomposition-based single-target IC vs batched rho, (b) multi-target IC vs rho on a second host, (c) Montgomery-form field arithmetic for every arm of mt_fieldops (claude, started 2026-11-20, branch aburan28/youthful-hopper-hfrwkd, PR #4747)
 
 - [x] Single-target (T = 1) baseline: the multi-target IC instrument's single-target IC against batched single-target rho at 2^32, 2^36, 2^40 (claude, started 2026-11-19, branch aburan28/youthful-hopper-hfrwkd, PR #4747): measured 2026-11-19, IC/rho 3.8x / 5.0x / 6.9x, gap grows; bench record close awaits main's malformed hec record
