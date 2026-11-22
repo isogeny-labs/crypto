@@ -1030,8 +1030,12 @@ impl RadicalRootCtx {
                     n = v;
                     v = next;
                 }
+                // The Jacobi test already proves that a is a square. Use the
+                // 2^30-1 addition chain here as in sqrt(), not generic rpow.
+                // This saves 24 modular multiplications for each accepted
+                // canonical discriminant over p = 2^32-5.
                 if n != 1 || negative { return None; }
-                return Some(self.f.powm(a, (p + 1) / 4));
+                return Some(self.f.sqrt_power_4294967291(a));
             }
             let (mut v, mut n) = (a, p);
             let mut negative = false;
