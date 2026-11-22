@@ -2057,7 +2057,12 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                         base: reduced_base,
                         exponent: *exponent,
                         modulus: monic,
-                        initial_frobenius: base.as_slice() == [0, 1]
+                        // Run source-exact A/B found reliable net
+                        // benefit for p=2^61-1. The 65,521 full-solver
+                        // benchmark showed repeatable shape-dependent
+                        // regressions, so keep its original Finish replay.
+                        initial_frobenius: p == MAX_PRIME
+                            && base.as_slice() == [0, 1]
                             && *exponent == p && modulus == &report.polynomial,
                         // Native source-exact A/B found the split-power
                         // reuse most consistently beneficial at p=2^61-1.
@@ -2132,7 +2137,8 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     return Err("nonconsecutive computation id".into());
                 }
                 next_id += 1;
-                if initial_gcd_id.is_none() && a == &report.polynomial {
+                if p == MAX_PRIME && initial_gcd_id.is_none()
+                    && a == &report.polynomial {
                   if let Some(xp) = verified_frobenius.as_ref() {
                     let mut expected_xpx = xp.clone();
                     expected_xpx.resize(expected_xpx.len().max(2), 0);
