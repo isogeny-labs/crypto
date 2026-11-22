@@ -10,6 +10,10 @@
 #[path = "../../research/cover-aut-quotient_20261115/src/aut.rs"]
 mod aut;
 #[path = "../../research/cover-aut-quotient_20261115/src/orbit.rs"]
+#[expect(
+    clippy::manual_is_multiple_of,
+    reason = "archived orbit module is included by this maintained binary"
+)]
 mod orbit;
 
 use std::collections::HashMap;

@@ -467,7 +467,7 @@ mod tests {
             by_special.entry(sc).or_default().push(acc);
         }
         let mut checked = 0;
-        for (_k, v) in by_special.iter() {
+        for v in by_special.values() {
             for w in v.windows(2) {
                 assert_eq!(w[0].key, w[1].key, "two relations of one type disagree");
                 checked += 1;

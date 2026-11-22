@@ -219,22 +219,14 @@ fn field_value(op: &FieldOp, a: u64, b: u64, p: u64) -> u64 {
         FieldOp::Add => {
             if a < p && b < p {
                 let sum = a + b; // p <= 2^61-1: no u64 overflow
-                if sum >= p {
-                    sum - p
-                } else {
-                    sum
-                }
+                if sum >= p { sum - p } else { sum }
             } else {
                 ((a as u128 + b as u128) % p as u128) as u64
             }
         }
         FieldOp::Sub => {
             if a < p && b < p {
-                if a >= b {
-                    a - b
-                } else {
-                    a + p - b
-                }
+                if a >= b { a - b } else { a + p - b }
             } else {
                 ((a as u128 + p as u128 - b as u128) % p as u128) as u64
             }
@@ -245,11 +237,7 @@ fn field_value(op: &FieldOp, a: u64, b: u64, p: u64) -> u64 {
                 let product = a as u128 * b as u128;
                 let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
                 let folded = (folded & MAX_PRIME) + (folded >> 61);
-                if folded >= MAX_PRIME {
-                    folded - MAX_PRIME
-                } else {
-                    folded
-                }
+                if folded >= MAX_PRIME { folded - MAX_PRIME } else { folded }
             } else if p <= u32::MAX as u64 && a < p && b < p {
                 (a * b) % p
             } else {
@@ -568,11 +556,7 @@ fn vmul(a: u64, b: u64, p: u64) -> u64 {
         let product = a as u128 * b as u128;
         let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64;
         let folded = (folded & MAX_PRIME) + (folded >> 61);
-        if folded >= p {
-            folded - p
-        } else {
-            folded
-        }
+        if folded >= p { folded - p } else { folded }
     } else if p <= u32::MAX as u64 && a < p && b < p {
         (a * b) % p
     } else {
@@ -625,10 +609,8 @@ fn vmonomial_product(m: &[u64], other: &[u64]) -> Option<Vec<u64>> {
     if m.len() == 1 && m[0] == 1 {
         return Some(trim(other.to_vec()));
     }
-    if m.len() < 2
-        || m[0] != 0
-        || *m.last().unwrap() != 1
-        || m[1..m.len() - 1].iter().any(|&x| x != 0)
+    if m.len() < 2 || m[0] != 0 || *m.last().unwrap() != 1
+        || m[1..m.len()-1].iter().any(|&x| x != 0)
     {
         return None;
     }
@@ -645,42 +627,27 @@ fn vproduct(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
     // polynomial convolution. Preserve monic/zero scalar shortcuts.
     if a.len() == 1 || b.len() == 1 {
         let (scalar, other) = if a.len() == 1 { (a[0], b) } else { (b[0], a) };
-        if scalar == 0 {
-            return vec![];
-        }
-        if scalar == 1 {
-            return trim(other.to_vec());
-        }
+        if scalar == 0 { return vec![]; }
+        if scalar == 1 { return trim(other.to_vec()); }
         return trim(other.iter().map(|&x| vmul(x, scalar, p)).collect());
     }
-    if let Some(result) = vmonomial_product(a, b) {
-        return result;
-    }
-    if let Some(result) = vmonomial_product(b, a) {
-        return result;
-    }
+    if let Some(result) = vmonomial_product(a, b) { return result; }
+    if let Some(result) = vmonomial_product(b, a) { return result; }
     let mut r = vec![0; a.len() + b.len() - 1];
     for (i, &x) in a.iter().enumerate() {
         // Sparse root polynomials often have zero middle coefficients.
         // Multiplying those coefficients cannot change the accumulator.
-        if x == 0 {
-            continue;
-        }
+        if x == 0 { continue; }
         for (j, &y) in b.iter().enumerate() {
-            if y == 0 {
-                continue;
-            }
+            if y == 0 { continue; }
             // Fused multiply-accumulate: no u128 division for canonical
             // small fields or the 61-bit Mersenne prime.
             r[i + j] = if p == MAX_PRIME {
                 let product = x as u128 * y as u128;
-                let folded = ((product as u64) & MAX_PRIME) + (product >> 61) as u64 + r[i + j];
+                let folded = ((product as u64) & MAX_PRIME)
+                    + (product >> 61) as u64 + r[i + j];
                 let folded = (folded & MAX_PRIME) + (folded >> 61);
-                if folded >= p {
-                    folded - p
-                } else {
-                    folded
-                }
+                if folded >= p { folded - p } else { folded }
             } else if p <= u32::MAX as u64 {
                 // (p-1)^2 + (p-1) < 2^64 when p <= 2^32-1.
                 (r[i + j] + x * y) % p
@@ -704,10 +671,7 @@ fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
     // (c + d*x^k)^2 needs exactly three field multiplications, and
     // its nonzero leading coefficient makes output trimming unnecessary.
     // This binomial shape occurs frequently in root certificates.
-    if a.len() >= 6
-        && a[0] != 0
-        && a[1] == 0
-        && a[2] == 0
+    if a.len() >= 6 && a[0] != 0 && a[1] == 0 && a[2] == 0
         && *a.last().unwrap() != 0
         && a[3..a.len() - 1].iter().all(|&x| x == 0)
     {
@@ -729,9 +693,7 @@ fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
         let mut count = 0usize;
         let mut third = None;
         for (i, &x) in a.iter().enumerate() {
-            if x == 0 {
-                continue;
-            }
+            if x == 0 { continue; }
             if count == 2 {
                 third = Some((i, x));
                 break;
@@ -740,9 +702,7 @@ fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
             count += 1;
         }
         if third.is_none() {
-            if count == 0 {
-                return vec![];
-            }
+            if count == 0 { return vec![]; }
             let mut result = vec![0; 2 * a.len() - 1];
             let (i, x) = terms[0];
             result[2 * i] = vmul(x, x, p);
@@ -762,9 +722,7 @@ fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
             let mut fourth = None;
             let mut too_many = false;
             for (offset, &w) in a[k + 1..].iter().enumerate() {
-                if w == 0 {
-                    continue;
-                }
+                if w == 0 { continue; }
                 if fourth.is_some() {
                     too_many = true;
                     break;
@@ -827,24 +785,18 @@ fn vsquare(a: &[u64], p: u64) -> Vec<u64> {
         for &value in a {
             if value == 0 {
                 zeros += 1;
-                if zeros == 2 {
-                    break;
-                }
+                if zeros == 2 { break; }
             }
         }
         if zeros == 2 {
             let mut result = vec![0; 2 * a.len() - 1];
             for (i, &x) in a.iter().enumerate() {
-                if x == 0 {
-                    continue;
-                }
+                if x == 0 { continue; }
                 let diagonal = vmul(x, x, p);
                 let sum = result[2 * i] + diagonal;
                 result[2 * i] = if sum >= p { sum - p } else { sum };
                 for (j, &y) in a.iter().enumerate().skip(i + 1) {
-                    if y == 0 {
-                        continue;
-                    }
+                    if y == 0 { continue; }
                     let cross = vmul(x, y, p);
                     let twice = cross + cross;
                     let twice = if twice >= p { twice - p } else { twice };
@@ -883,12 +835,8 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
     // canonical quotient trimming even if a standalone caller supplies
     // trailing zero coefficients.
     if b.len() == 1 {
-        if b[0] == 0 {
-            return Err("division by zero polynomial".into());
-        }
-        if b[0] == 1 {
-            return Ok((trim(a.to_vec()), vec![]));
-        }
+        if b[0] == 0 { return Err("division by zero polynomial".into()); }
+        if b[0] == 1 { return Ok((trim(a.to_vec()), vec![])); }
         // Degree-zero division has no remainder. Avoid allocating a
         // temporary dividend and trimming after every quotient digit.
         let inverse = vinv(b[0], p);
@@ -897,10 +845,8 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
     }
     // Division by x^k is a coefficient split, not a polynomial long
     // division. The guard avoids a full scan for dense divisors.
-    if b.len() > 1
-        && b[0] == 0
-        && *b.last().unwrap() == 1
-        && b[1..b.len() - 1].iter().all(|&x| x == 0)
+    if b.len() > 1 && b[0] == 0 && *b.last().unwrap() == 1
+        && b[1..b.len()-1].iter().all(|&x| x == 0)
     {
         let shift = b.len() - 1;
         return Ok((trim(a[shift..].to_vec()), trim(a[..shift].to_vec())));
@@ -915,11 +861,8 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
             q[i - 1] = carry;
             let product = vmul(carry, b[0], p);
             let value = a[i - 1];
-            carry = if value >= product {
-                value - product
-            } else {
-                value + p - product
-            };
+            carry = if value >= product { value - product }
+                    else { value + p - product };
         }
         return Ok((trim(q), if carry == 0 { vec![] } else { vec![carry] }));
     }
@@ -934,23 +877,15 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
             quotient[index - 1] = coefficient;
             let product = vmul(coefficient, b[0], p);
             let value = a[index - 1];
-            carry = if value >= product {
-                value - product
-            } else {
-                value + p - product
-            };
+            carry = if value >= product { value - product }
+                    else { value + p - product };
         }
-        return Ok((
-            trim(quotient),
-            if carry == 0 { vec![] } else { vec![carry] },
-        ));
+        return Ok((trim(quotient), if carry == 0 { vec![] } else { vec![carry] }));
     }
     // Retain the established monic-binomial fast path for k >= 3:
     // native Rust regression screening found the fixed-degree approach
     // about 2-4% slower on this already-specialized case.
-    if b.len() >= 4
-        && b[0] != 0
-        && *b.last().unwrap() == 1
+    if b.len() >= 4 && b[0] != 0 && *b.last().unwrap() == 1
         && b[1..b.len() - 1].iter().all(|&x| x == 0)
     {
         let mut r = a.to_vec();
@@ -962,11 +897,8 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
             r.pop();
             let product = vmul(c, b[0], p);
             let old = r[shift];
-            r[shift] = if old >= product {
-                old - product
-            } else {
-                old + p - product
-            };
+            r[shift] = if old >= product { old - product }
+                       else { old + p - product };
             r = trim(r);
         }
         return Ok((trim(q), r));
@@ -993,28 +925,20 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
             let mut quotient = vec![0; a.len() - degree];
             for shift in (0..quotient.len()).rev() {
                 let coefficient = remainder[shift + degree];
-                if coefficient == 0 {
-                    continue;
-                }
+                if coefficient == 0 { continue; }
                 quotient[shift] = coefficient;
                 remainder[shift + degree] = 0;
                 if b[0] != 0 {
                     let product = vmul(coefficient, b[0], p);
                     let old = remainder[shift];
-                    remainder[shift] = if old >= product {
-                        old - product
-                    } else {
-                        old + p - product
-                    };
+                    remainder[shift] = if old >= product { old - product }
+                                       else { old + p - product };
                 }
                 if let Some((index, value)) = middle {
                     let product = vmul(coefficient, value, p);
                     let old = remainder[shift + index];
-                    remainder[shift + index] = if old >= product {
-                        old - product
-                    } else {
-                        old + p - product
-                    };
+                    remainder[shift + index] = if old >= product { old - product }
+                                               else { old + p - product };
                 }
             }
             remainder.truncate(degree);
@@ -1030,27 +954,16 @@ fn vdiv(a: &[u64], b: &[u64], p: u64) -> Result<(Vec<u64>, Vec<u64>), String> {
     let inverse = if lead == 1 { 1 } else { vinv(lead, p) };
     for shift in (0..quotient.len()).rev() {
         let highest = remainder[shift + b.len() - 1];
-        if highest == 0 {
-            continue;
-        }
-        let coefficient = if lead == 1 {
-            highest
-        } else {
-            vmul(highest, inverse, p)
-        };
+        if highest == 0 { continue; }
+        let coefficient = if lead == 1 { highest } else { vmul(highest, inverse, p) };
         quotient[shift] = coefficient;
         remainder[shift + b.len() - 1] = 0;
         for (index, &value) in b[..b.len() - 1].iter().enumerate() {
-            if value == 0 {
-                continue;
-            }
+            if value == 0 { continue; }
             let product = vmul(coefficient, value, p);
             let old = remainder[shift + index];
-            remainder[shift + index] = if old >= product {
-                old - product
-            } else {
-                old + p - product
-            };
+            remainder[shift + index] = if old >= product { old - product }
+                                       else { old + p - product };
         }
     }
     remainder.truncate(b.len() - 1);
@@ -1171,19 +1084,11 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 let expected = match op {
                     FieldOp::Add => {
                         let sum = *a + *b; // canonical, p <= 2^61-1
-                        if sum >= p {
-                            sum - p
-                        } else {
-                            sum
-                        }
+                        if sum >= p { sum - p } else { sum }
                     }
                     FieldOp::Sub => {
-                        if a >= b {
-                            *a - *b
-                        } else {
-                            *a + p - *b
-                        }
-                    }
+                        if a >= b { *a - *b } else { *a + p - *b }
+                    },
                     FieldOp::Mul => vmul(*a, *b, p),
                     FieldOp::Square => {
                         if a != b {
@@ -1346,10 +1251,10 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
             }
             RootEvent::LinearRoot { polynomial, root } => {
                 canonical(polynomial, p)?;
-                if polynomial.len() != 2 || *root >= p || {
-                    let sum = vmul(polynomial[1], *root, p) + polynomial[0];
-                    sum != 0 && sum != p
-                } {
+                if polynomial.len() != 2
+                    || *root >= p
+                    || { let sum = vmul(polynomial[1], *root, p) + polynomial[0]; sum != 0 && sum != p }
+                {
                     return Err("linear root identity failed".into());
                 }
             }
@@ -1460,24 +1365,17 @@ mod tests {
                     let reference = match op {
                         FieldOp::Add => ((a as u128 + b as u128) % p as u128) as u64,
                         FieldOp::Sub => ((a as u128 + p as u128 - b as u128) % p as u128) as u64,
-                        FieldOp::Mul | FieldOp::Square => {
-                            ((a as u128 * b as u128) % p as u128) as u64
-                        }
+                        FieldOp::Mul | FieldOp::Square =>
+                            ((a as u128 * b as u128) % p as u128) as u64,
                     };
-                    assert_eq!(
-                        field_value(&op, a, b, p),
-                        reference,
-                        "p={p} a={a} b={b} op={op:?}"
-                    );
+                    assert_eq!(field_value(&op, a, b, p), reference,
+                               "p={p} a={a} b={b} op={op:?}");
                     if a < p - 2 && b < p - 2 {
                         assert_eq!(
                             field_value(&op, a + p, b, p),
                             match op {
-                                FieldOp::Add =>
-                                    ((a as u128 + p as u128 + b as u128) % p as u128) as u64,
-                                FieldOp::Sub =>
-                                    ((a as u128 + p as u128 + p as u128 - b as u128) % p as u128)
-                                        as u64,
+                                FieldOp::Add => ((a as u128 + p as u128 + b as u128) % p as u128) as u64,
+                                FieldOp::Sub => ((a as u128 + p as u128 + p as u128 - b as u128) % p as u128) as u64,
                                 FieldOp::Mul | FieldOp::Square =>
                                     (((a + p) as u128 * b as u128) % p as u128) as u64,
                             }
@@ -1497,15 +1395,16 @@ mod tests {
             match op {
                 FieldOp::Add => ((a as u128 + b as u128) % p as u128) as u64,
                 FieldOp::Sub => ((a as u128 + p as u128 - b as u128) % p as u128) as u64,
-                FieldOp::Mul | FieldOp::Square => ((a as u128 * b as u128) % p as u128) as u64,
+                FieldOp::Mul | FieldOp::Square =>
+                    ((a as u128 * b as u128) % p as u128) as u64,
             }
         }
-        fn sample(xs: &[(u64, u64)], op: &FieldOp, p: u64, fast: bool) -> f64 {
+        fn sample(xs: &[(u64,u64)], op: &FieldOp, p: u64, fast: bool) -> f64 {
             let start = Instant::now();
             let mut checksum = 0u64;
             for _ in 0..32 {
-                for &(a, b) in xs {
-                    let (a, b) = (black_box(a), black_box(b));
+                for &(a,b) in xs {
+                    let (a,b) = (black_box(a), black_box(b));
                     checksum ^= if fast {
                         field_value(op, a, b, p)
                     } else {
@@ -1524,7 +1423,7 @@ mod tests {
                 let a = seed % p;
                 seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
                 let b = seed % p;
-                xs.push((a, b));
+                xs.push((a,b));
             }
             for op in [FieldOp::Add, FieldOp::Sub, FieldOp::Mul, FieldOp::Square] {
                 let (mut before, mut after) = (Vec::new(), Vec::new());
@@ -1539,12 +1438,8 @@ mod tests {
                 }
                 before.sort_by(f64::total_cmp);
                 after.sort_by(f64::total_cmp);
-                println!(
-                    "round22 field p={p} op={op:?}: {:.3} -> {:.3} ns ({:.3}x)",
-                    before[6],
-                    after[6],
-                    before[6] / after[6]
-                );
+                println!("round22 field p={p} op={op:?}: {:.3} -> {:.3} ns ({:.3}x)",
+                         before[6], after[6], before[6] / after[6]);
             }
         }
     }

@@ -4,9 +4,9 @@ name: Rust lint
 # (src/, tests/, examples/, benches/) and cd_attack/. The crates under
 # research/ are archived snapshots and are not linted.
 #
-# - Format is PR-scoped, because the tree predates the check: a changed
-#   .rs file must be rustfmt-clean, the rest of the tree is left alone
-#   until someone touches it.
+# - Format is PR-scoped, because the tree predates the check. Three maintained
+#   prime-root files are temporarily exempt: archived A/B extractors match
+#   exact source blocks in them, so reformatting changes the frozen controls.
 # - Clippy runs with -D warnings: every compiler and clippy warning fails
 #   the build. The allow list lives in Cargo.toml `[lints]`, and each
 #   remaining exception is an item-level #[allow] next to the code.
@@ -157,6 +157,12 @@ jobs:
           out=$(rustfmt --edition 2021 --check "${files[@]}" 2>&1 || true)
           bad=0
           for f in "${files[@]}"; do
+            case "$f" in
+              src/cryptanalysis/prime_radical_root.rs|src/cryptanalysis/prime_root_bounded.rs|src/cryptanalysis/prime_root_trace.rs)
+                echo "legacy source-bound benchmark formatting exception: $f"
+                continue
+                ;;
+            esac
             if grep -q "^Diff in $PWD/$f" <<<"$out"; then
               echo "::error file=$f::not rustfmt-clean; run: rustfmt --edition 2021 $f"
               bad=1
