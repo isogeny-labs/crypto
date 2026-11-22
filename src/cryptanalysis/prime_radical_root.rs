@@ -1060,6 +1060,18 @@ impl RadicalRootCtx {
         self.sqrt(a)
     }
 
+    // Cardano/Ferrari setup already caches these small inverses.
+    // Reuse them for common nonmonic polynomial leading coefficients.
+    #[inline]
+    fn inv_leading(&self, a: u64) -> u64 {
+        match a {
+            2 => self.inv2,
+            3 => self.inv3,
+            4 => self.inv4,
+            _ => self.f.inv(a),
+        }
+    }
+
     /// Distinct roots of monic y^2 + b y + c.
     pub fn quad_monic(&self, b: u64, c: u64) -> Vec<u64> {
         let f = &self.f;
@@ -1119,7 +1131,12 @@ impl RadicalRootCtx {
             Some(s) => s,
             None => return vec![],
         };
-        let inv_2a = f.inv(f.add(a, a));
+        let inv_2a = match a {
+            2 => self.inv4,
+            3 => f.half(self.inv3),
+            4 => f.half(self.inv4),
+            _ => f.inv(f.add(a, a)),
+        };
         let nb = f.neg(b);
         let first = f.mul(f.add(nb, s), inv_2a);
         let mut roots = if s == 0 {
@@ -1372,7 +1389,7 @@ impl RadicalRootCtx {
             let mut roots = if a == 1 {
                 self.cubic_monic(b, c, d)
             } else {
-                let ia = f.inv(a);
+                let ia = self.inv_leading(a);
                 self.cubic_monic(f.mul(b, ia), f.mul(c, ia), f.mul(d, ia))
             };
             roots.push(0);
@@ -1384,7 +1401,7 @@ impl RadicalRootCtx {
         let (b1, c1, d1, e1) = if a == 1 {
             (b, c, d, e)
         } else {
-            let ia = f.inv(a);
+            let ia = self.inv_leading(a);
             (f.mul(b, ia), f.mul(c, ia), f.mul(d, ia), f.mul(e, ia))
         };
         // x divides the quartic when e1=0. Solve the cubic cofactor,
@@ -1551,7 +1568,7 @@ impl RadicalRootCtx {
                 let mut v = if c[3] == 1 {
                     self.cubic_monic(c[2], c[1], c[0])
                 } else {
-                    let ia = fp.inv(c[3]);
+                    let ia = self.inv_leading(c[3]);
                     self.cubic_monic(fp.mul(c[2], ia), fp.mul(c[1], ia), fp.mul(c[0], ia))
                 };
                 v.sort_unstable();
