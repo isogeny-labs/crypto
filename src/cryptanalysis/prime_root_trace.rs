@@ -1785,6 +1785,41 @@ fn vpower_quadratic(base: &[u64], mut exponent: u64, modulus: &[u64], p: u64)
     Ok(trim(vec![residue.0, residue.1]))
 }
 
+// p = 2^61 - 1 has the two dominant exponents 2^61 - 1 (Frobenius)
+// and 2^60 - 1 (Cantor-Zassenhaus). Build a^(2^k - 1) blocks using
+// repeated squaring and one modular product per block rather than a
+// product for every set bit. This is verifier-only and remains independent
+// of Engine's traced polynomial arithmetic. The fixed operation schedule
+// uses 59/60 squares and 8/9 products for the two exponents, versus
+// 59/60 squares and 60/61 products in binary exponentiation.
+#[inline(never)]
+fn vpower_mersenne_high_degree(
+    base: &[u64], exponent: u64, modulus: &[u64], p: u64,
+) -> Result<Vec<u64>, String> {
+    debug_assert!(p == MAX_PRIME && modulus.len() >= 6);
+    debug_assert!(exponent == MAX_PRIME || exponent == MAX_PRIME >> 1);
+    let initial = vpower_reduce(base.to_vec(), modulus, p)?;
+    let append = |mut power: Vec<u64>, factor: &[u64], bits: usize|
+        -> Result<Vec<u64>, String> {
+        for _ in 0..bits {
+            power = vpower_reduce(vsquare(&power, p), modulus, p)?;
+        }
+        vpower_reduce(vproduct(&power, factor, p), modulus, p)
+    };
+    let x2 = append(initial.clone(), &initial, 1)?;
+    let x4 = append(x2.clone(), &x2, 2)?;
+    let x8 = append(x4.clone(), &x4, 4)?;
+    let x16 = append(x8.clone(), &x8, 8)?;
+    let x32 = append(x16.clone(), &x16, 16)?;
+    let x48 = append(x32, &x16, 16)?;
+    let x56 = append(x48, &x8, 8)?;
+    let x60 = append(x56, &x4, 4)?;
+    if exponent == MAX_PRIME {
+        append(x60, &initial, 1)
+    } else {
+        Ok(x60)
+    }
+}
 fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, String> {
     // F_p[x] / (c + d*x) is F_p. Reduce the base by Horner evaluation at
     // -c/d, then use a scalar power rather than repeatedly allocating
@@ -1834,6 +1869,13 @@ fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, Strin
     } else {
         m
     };
+    // Only degree >= 5: smaller quotient rings have source-exact,
+    // separately benchmarked specialized power routines above.
+    if p == MAX_PRIME && m.len() >= 6
+        && (e == MAX_PRIME || e == MAX_PRIME >> 1)
+    {
+        return vpower_mersenne_high_degree(base, e, m, p);
+    }
     let mut r = vpower_reduce(vec![1], m, p)?;
     let mut b = vpower_reduce(base.to_vec(), m, p)?;
     while e > 0 {
@@ -2378,6 +2420,55 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round112_mersenne_high_degree_chain_matches_independent_binary_oracle() {
+        let p = MAX_PRIME;
+        let mut rng = StdRng::seed_from_u64(0x726f_6f74_3131_3230);
+        // Check degrees five through eight, both exponents, zero/sparse/
+        // dense inputs and monic/nonmonic moduli. The reference path uses
+        // independent generic polynomial division and multiplication.
+        for degree in 5..=8usize {
+            for case in 0..18 {
+                let mut modulus: Vec<u64> =
+                    (0..degree).map(|_| rng.gen_range(0..p)).collect();
+                let mut base: Vec<u64> =
+                    (0..degree + 2).map(|_| rng.gen_range(0..p)).collect();
+                if case % 4 == 0 {
+                    for value in &mut modulus[1..degree] { *value = 0; }
+                }
+                if case % 5 == 0 {
+                    for value in &mut base[1..] { *value = 0; }
+                }
+                if case % 11 == 0 {
+                    base.clear();
+                }
+                let lead = if case % 3 == 0 { 2 } else { 1 };
+                modulus.push(lead);
+                let monic = vmonic(modulus.clone(), p);
+                for exponent in [MAX_PRIME, MAX_PRIME >> 1] {
+                    let mut expected = vec![1];
+                    let mut power = vdiv(&base, &monic, p).unwrap().1;
+                    let mut bits = exponent;
+                    while bits != 0 {
+                        if bits & 1 == 1 {
+                            expected = vdiv(
+                                &vproduct(&expected, &power, p), &monic, p,
+                            ).unwrap().1;
+                        }
+                        bits >>= 1;
+                        if bits != 0 {
+                            power = vdiv(&vsquare(&power, p), &monic, p).unwrap().1;
+                        }
+                    }
+                    assert_eq!(
+                        vpower(&base, exponent, &modulus, p).unwrap(), expected,
+                        "degree={degree} case={case} exponent={exponent}",
+                    );
+                }
+            }
+        }
+    }
 
     #[test]
     fn round111_reused_frobenius_and_gcd_reject_modified_certificates() {
