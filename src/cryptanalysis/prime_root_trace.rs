@@ -354,6 +354,37 @@ impl Engine<'_> {
         Ok(acc)
     }
     fn mul(&mut self, a: &[u64], b: &[u64]) -> Work<Vec<u64>> {
+        // Identity products occur at the start of binary quotient-ring power
+        // chains. They need no coefficient products or additions, but still
+        // produce the same independently checked Product event.
+        let special = if a == [1] {
+            Some(trim(b.to_vec()))
+        } else if b == [1] {
+            Some(trim(a.to_vec()))
+        } else if a == [0, 1] && b.len() >= 4 {
+            // Multiplication by X shifts coefficients by one place. Restrict
+            // to a nontrivial other operand: tiny X*X fell below break-even
+            // in local GCC profiling.
+            let mut shifted = Vec::with_capacity(b.len() + 1);
+            shifted.push(0);
+            shifted.extend_from_slice(b);
+            Some(trim(shifted))
+        } else if b == [0, 1] && a.len() >= 4 {
+            let mut shifted = Vec::with_capacity(a.len() + 1);
+            shifted.push(0);
+            shifted.extend_from_slice(a);
+            Some(trim(shifted))
+        } else {
+            None
+        };
+        if let Some(product) = special {
+            self.event(RootEvent::Product {
+                a: a.to_vec(),
+                b: b.to_vec(),
+                product: product.clone(),
+            })?;
+            return Ok(product);
+        }
         let mut product = if a.is_empty() || b.is_empty() {
             vec![]
         } else {
@@ -3322,6 +3353,55 @@ mod round107_inverse_chain {
                                    &mut |_| Ok(())).unwrap();
                 assert!(report.complete(), "p={p}, stop={:?}", report.stop);
                 verify(&report).unwrap();
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod round108_unit_monomial_fastpaths {
+    use super::*;
+
+    #[test]
+    fn identity_and_x_shift_products_preserve_independent_certificates() {
+        // Direct producer-vs-independent-verifier oracle across field sizes,
+        // narrow break-even cases, and both operand orders.
+        let mut seed = 0x726f_6f74_3130_3831u64;
+        for p in [7, 65_521, 1_000_000_007, MAX_PRIME] {
+            for width in [1usize, 2, 3, 4, 8] {
+                for case in 0..64u64 {
+                    let mut polynomial = vec![0; width];
+                    for coefficient in &mut polynomial {
+                        seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+                        *coefficient = seed % p;
+                    }
+                    polynomial[width - 1] = 1 + case % (p - 1);
+                    for monomial in [&[1u64][..], &[0, 1][..]] {
+                        for (a, b) in [(monomial, polynomial.as_slice()),
+                                       (polynomial.as_slice(), monomial)] {
+                            let mut sink = |_: &RootEvent| Ok(());
+                            let report = RootReport {
+                                schema: "prime-root-trace/v1".into(), p,
+                                polynomial: vec![1, 1], seed: 7,
+                                limits: RootLimits {
+                                    field_work: MAX_WORK, split_attempts: MAX_EVENTS,
+                                    events: MAX_EVENTS, degree: MAX_DEGREE,
+                                },
+                                stop: RootStop::Complete,
+                                counters: RootCounters::default(),
+                                events: vec![], unacknowledged: None,
+                                sink_error: None, roots: vec![],
+                            };
+                            let mut engine = Engine { report, sink: &mut sink, next_id: 0 };
+                            let actual = engine.mul(a, b).unwrap();
+                            assert_eq!(actual, vproduct(a, b, p),
+                                "p={p} width={width} case={case} a={a:?} b={b:?}");
+                            assert_eq!(engine.report.counters.field_work(), 0);
+                            assert!(matches!(engine.report.events.last(),
+                                Some(RootEvent::Product { .. })));
+                        }
+                    }
+                }
             }
         }
     }
