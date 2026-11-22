@@ -81,3 +81,23 @@ What round 2 established: the genus-3 arm is a constant factor 2.5–3.3 below r
 with no measurable exponent gap, and the merged core's row count, not its weight, prices the LA.
 Relation filtering that leaves the core at cols + margin but lighter is the one lever that moved
 (about 15 % at 131101, post hoc); it is the subject of R4.
+
+## Round 3: the light-row floor, preregistered (2026-11-22) [pcc:unverified]
+
+R4 (`genus_ladder_light_floor_20261122`) tested R3's post-hoc variant on six curves per prime that R3
+never saw (R2's curves 4 to 9), protocol frozen before data. Relation excess E, then keep only the
+lightest cols + margin rows after peel, then SGE(8,3) and Wiedemann. 180 runs certified; plain rows
+equal R2's.
+
+| p | FPM_mid / plain, E = 0.2 | E = 0.3 | `la_mul` / plain | best arm over rho | plain over rho (same curves) |
+|--:|--:|--:|--:|--:|--:|
+| 65537 | 0.860 [0.855, 0.865] | 0.857 | 0.64 | 0.226 | 0.263 |
+| 131101 | 0.848 [0.843, 0.853] | 0.841 | 0.65 | 0.303 | 0.360 |
+| 262147 | 0.829 [0.825, 0.833] | 0.809 [0.805, 0.814] | 0.65 | 0.356 [0.254, 0.588] | 0.439 |
+
+**A measured improvement over the index-calculus baseline**, confirmed out of sample: 14 to 19 % off
+the genus-3 arm, growing with p. Predictions L1 to L4 held; L5 (≤ 0.33 of rho at 262147) failed at
+0.356. The selection lowers the LA level, not its exponent (`la_mul` exponent 1.51 for both); the
+arm's FPM exponent falls from 1.43 to 1.39 because the relation phase takes a larger share.
+Disclosed deviations: the frozen command lacked `--curves 6` (a partial run on two curves was analysed
+before the rerun) and the analysis script got a key-name fix; both in `AMENDMENT.md`.
