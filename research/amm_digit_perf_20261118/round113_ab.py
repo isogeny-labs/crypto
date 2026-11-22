@@ -165,6 +165,42 @@ fn main() {
                      start.elapsed().as_nanos() as f64/count as f64);
         }
     }
+
+    // Complete root extraction with independent certificate verification.
+    // The polynomial (X-r1)(X-r2) is split over each chosen prime.
+    for p in [MAX_PRIME, 1_000_000_007u64, 65_521u64] {
+        let mut inputs=Vec::new();
+        for i in 0..8u64 {
+            let r1=(3+i*7)%p;
+            let r2=(19+i*13)%p;
+            let product=((r1 as u128*r2 as u128)%(p as u128)) as u64;
+            let sum=(r1+r2)%p;
+            inputs.push(vec![product,if sum==0 {0} else {p-sum},1]);
+        }
+        let limits=cryptanalysis::prime_root_trace::RootLimits {
+            field_work: cryptanalysis::prime_root_trace::MAX_WORK,
+            split_attempts: 1000,
+            events: cryptanalysis::prime_root_trace::MAX_EVENTS,
+            degree: cryptanalysis::prime_root_trace::MAX_DEGREE,
+        };
+        let mut h=0u64;
+        let mut count=0u64;
+        let start=Instant::now();
+        for _ in 0..4 {
+            for f in &inputs {
+                let report=cryptanalysis::prime_root_trace::solve(
+                    black_box(f),black_box(p),7,limits.clone(),&mut |_| Ok(())
+                ).expect("root solve");
+                assert!(report.complete(), "quadratic root solve was censored");
+                cryptanalysis::prime_root_trace::verify(&report).expect("independent verification");
+                h=hash(h,&report.roots);
+                h=h.wrapping_mul(131).wrapping_add(report.events.len() as u64);
+                count+=1;
+            }
+        }
+        println!("{p},complete_quadratic_solve_verify,{:.3},{h},{count}",
+                 start.elapsed().as_nanos() as f64 / count as f64);
+    }
 }
 """
 try:
@@ -181,7 +217,13 @@ with tempfile.TemporaryDirectory(prefix="rootfind112-") as scratch:
         (d/"src/cryptanalysis").mkdir(parents=True)
         (d/"Cargo.toml").write_text(cargo)
         (d/"src/main.rs").write_text(main)
-        (d/"src/cryptanalysis/prime_root_trace.rs").write_text(source+"\n"+helper)
+        # The benchmark entry point selects the new production multiplier only
+        # for the candidate. The frozen baseline keeps the old implementation.
+        accessor = helper if label == "before" else helper.replace(
+            "    quadratic_mul(a, b, c, d, p)",
+            "    if p <= u32::MAX as u64 { quadratic_mul_karatsuba(a, b, c, d, p) } else { quadratic_mul(a, b, c, d, p) }",
+        )
+        (d/"src/cryptanalysis/prime_root_trace.rs").write_text(source+"\n"+accessor)
         (d/"src/cryptanalysis/prime_root_bounded.rs").write_text(
             "// isolated bench stub of unrelated bounded API\n")
         subprocess.run(["cargo","build","--release","--quiet"],cwd=d,check=True)
