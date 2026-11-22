@@ -48,9 +48,9 @@ fn free_rows(ar:&mut Arithmetic,pts:&[Point])->Result<Vec<Vec<i64>>,String> {
         for pair in a.chunks_exact(2) {
             let idx=pair[0].as_u64().ok_or("bad free index")? as usize;
             let c=pair[1].as_i64().ok_or("bad free coeff")?;
-            if idx>=pts.len() || ![-1,1].contains(&c) {return Err("bad free pair".into())}
-            let p=if c==1 {pts[idx]} else {ar.neg(PRIME31,pts[idx])};
-            s=ar.add(PRIME31,s,p);
+            if idx>=pts.len() || ![-2,-1,1,2].contains(&c) {return Err("bad free pair".into())}
+            let p=if c>0 {pts[idx]} else {ar.neg(PRIME31,pts[idx])};
+            for _ in 0..c.unsigned_abs() {s=ar.add(PRIME31,s,p);}
             v.push(idx as i64);v.push(c);
         }
         if s.is_some() {return Err("homogeneous identity fails original EC group law".into())}
@@ -124,11 +124,11 @@ impl AffineDsu {
         for row in rows {
             let mut eq=vec![0u64;u+1];
             for pc in row.chunks_exact(2) {
-                let i=pc[0] as usize;let c=pc[1] as i8;
+                let i=pc[0] as usize;let c=from_i64(pc[1]);
                 let (r,s,b)=self.find(i);
-                eq[u]=sub(eq[u],signed(b,c));
-                if let Some(v)=self.value[r]{eq[u]=sub(eq[u],signed(v,c*s))}
-                else {let col=cols[&r];eq[col]=add(eq[col],signed(1,c*s))}
+                eq[u]=sub(eq[u],mul(c,b));
+                if let Some(v)=self.value[r]{eq[u]=sub(eq[u],mul(c,signed(v,s)))}
+                else {let col=cols[&r];eq[col]=add(eq[col],mul(c,signed(1,s)))}
             }
             a.push(eq);
         }
