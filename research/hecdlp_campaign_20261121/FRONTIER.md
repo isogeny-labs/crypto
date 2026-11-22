@@ -101,3 +101,13 @@ the genus-3 arm, growing with p. Predictions L1 to L4 held; L5 (≤ 0.33 of rho 
 arm's FPM exponent falls from 1.43 to 1.39 because the relation phase takes a larger share.
 Disclosed deviations: the frozen command lacked `--curves 6` (a partial run on two curves was analysed
 before the rerun) and the analysis script got a key-name fix; both in `AMENDMENT.md`.
+
+### R5: the floor does not carry to genus 4 and 5 [pcc:unverified]
+
+`genus_ladder_light_floor_g45_20261122`, same option on the earlier genus-4 and genus-5 instances, 105
+runs certified, plain rows identical. Best-E FPM_mid over plain: 0.984 [0.958, 1.002] at genus 4,
+p = 2053; 0.963 [0.950, 0.971] at genus 4, p = 4099; 1.072 [1.063, 1.082] at genus 5, p = 1031. G2 to
+G5 failed. Cause: at these primes the plain merged core already holds only 17 to 32 rows beyond its
+columns, so the floor removes 1 to 2.5 % of the rows, and the LA share is lower (0.52, 0.60, 0.23)
+than at genus 3, p = 262147 (0.67). The lever scales with the core's size; it is a genus-3, large-p
+effect on present evidence.
