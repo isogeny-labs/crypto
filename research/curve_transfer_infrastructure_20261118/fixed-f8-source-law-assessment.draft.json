@@ -1,0 +1,421 @@
+{
+  "format": "correspondence-assessment-draft-v1",
+  "assessment_state": "draft",
+  "authority": "companion artifact; not a ledger record or certificate",
+  "case_id": "fixed-gf8-binary-cubic-cover-source-law-oracle",
+  "source": {
+    "object_uid": "ICV1:f2m-3-52f67f9a:3:6:0x6:unk:unk:r:b773aeda044a",
+    "representation_uid": "fixed-gf8-target-a1-b3",
+    "model_sha256": "b773aeda044afd92f6de9ac87198f2a8aa2109fb9822ff9a4768ad91e8fe8827",
+    "registration_status": "unregistered fixed fixture; no EC1 is asserted without a bound generator and subgroup record",
+    "equations": "E: y^2 + x*y = x^3 + x^2 + (t+1) over GF(2)[t]/(t^3+t+1)",
+    "field": "GF(8) = GF(2)[t]/(t^3+t+1), polynomial-basis elements encoded 0..7",
+    "dimension": 1,
+    "subgroup_order": null
+  },
+  "destination": {
+    "object_uid": "urn:jacobian-context:1:sha256:c76cbeb9ffcb10b8892e23bda8c3fe0144cc48bae075edeb5d37839f5e8d210e",
+    "representation_uid": "fixed-gf8-genus3-a1-b3",
+    "source_cover_uid": "urn:hc-model:1:sha256:3c5cfac0d4a4df8bb733f5acb000534ffef89f692fb09875b63aff61cbd44e1c",
+    "declared_field_uid": "urn:declared-field:1:sha256:80f837034fe3d74c2cfb5760ecc7d6f24629bb6aa1b55997692225b2efc474be",
+    "equations": "J(H), H: v^2 + u^2*v = u^7 + u^4 + (t^2+t+1)*u",
+    "field": "GF(8) = GF(2)[t]/(t^3+t+1), polynomial-basis elements encoded 0..7",
+    "dimension": 3,
+    "ambient_group_order": "486 reduced divisor classes, exhaustively constructed and checked for this fixed fixture"
+  },
+  "transformation": {
+    "kind": "separable curve cover with induced pullback and pushforward",
+    "family": "ordinary-binary degree-three cubic cover",
+    "map_uid": "urn:curve-cover-map:1:sha256:ed811c5fc342836e149c1e6818cc77e5f2f49fc41350510bb40821180499125a",
+    "map_id": "CV1D3hed811c5fc342",
+    "degree": 3,
+    "field_of_definition": "GF(8)",
+    "formulas": {
+      "curve_map": "phi(u,v)=(u^3,u*v+(t^2+t+1))",
+      "pullback": "phi^*: E(GF(8)) -> J(H)(GF(8))",
+      "pushforward": "phi_*: J(H)(GF(8)) -> E(GF(8))",
+      "image_endomorphism": "e=phi^* composed with phi_*"
+    },
+    "exceptional_cases": [
+      "the unique point at infinity on H maps to the point at infinity on E",
+      "the ramified affine point (u,v)=(0,0) maps to the rational two-torsion point (0,t^2+t+1)",
+      "five inert degree-two closed fibers are excluded from graph-place zero supports and must be rejected explicitly",
+      "shared, repeated, irreducible, and ramified support must retain exact valuations"
+    ],
+    "normalization": "No model conversion: both equations use the fixed polynomial basis of GF(8)."
+  },
+  "obligations": {
+    "existence": {
+      "state": "supported",
+      "evidence": [
+        "execution_receipt.fixed-gf8-rust198-e0ae0fe5-20261119"
+      ],
+      "scope": "Supported only for the recorded GF(8) source, target, and degree-three map by the locally replayed exhaustive finite-field checks; this is not signed PCC standing, a general construction theorem, or a catalog-wide promotion."
+    },
+    "explicit_construction": {
+      "state": "supported",
+      "evidence": [
+        "execution_receipt.fixed-gf8-rust198-e0ae0fe5-20261119"
+      ],
+      "scope": "The exact equations, polynomial-basis field, curve map, independent source-law construction, and exceptional fibers were replayed for this one fixture."
+    },
+    "map_correctness": {
+      "state": "supported",
+      "evidence": [
+        "execution_receipt.fixed-gf8-rust198-e0ae0fe5-20261119"
+      ],
+      "scope": "Supported by the local replay on all 486 independently constructed source classes, all 236196 ordered pushforward-additivity pairs, all six target pullbacks, both composition identities, and differential comparison with production after the independent oracle completed; signed PCC standing remains absent."
+    },
+    "subgroup_preservation": {
+      "state": "not_applicable",
+      "evidence": [
+        "execution_receipt.fixed-gf8-rust198-e0ae0fe5-20261119"
+      ],
+      "scope": "No named subgroup or subgroup order is bound to this fixture. The local exhaustive replay supports the whole-group identities phi_*phi^*=[3] and e^2=[3]e, but preservation of any future named subgroup remains unknown until that subgroup is specified and checked."
+    },
+    "computational_advantage": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": "This finite oracle is an arithmetic control, not evidence that transfer improves any ECDLP computation."
+    },
+    "scaling_support": {
+      "state": "unknown",
+      "evidence": [],
+      "scope": "One fixed GF(8) fixture cannot support catalog-wide, asymptotic, or large-field claims."
+    }
+  },
+  "preservation_certificate": {
+    "identity": "supported by the local exhaustive replay: phi_* phi^*=[3] on all six points of E(GF(8)); e^2=[3]e on all 486 classes of J(H)(GF(8))",
+    "kernel_intersection": null,
+    "recovery_map": null,
+    "scalar_multiplier": 3,
+    "proof_artifact": {
+      "path": "tests/binary_cover_transfer_oracle.rs",
+      "sha256": "1dcaaa18c4485b529b2dde621a3b510664f87cfaa5142f30e32ed27e396a0d37",
+      "receipt": "execution_receipt.fixed-gf8-rust198-e0ae0fe5-20261119",
+      "scope": "executable exhaustive certificate for the fixed fixture; not a named-subgroup certificate"
+    }
+  },
+  "mechanism": {
+    "proposed_benefit": "Independently validate the complete source group law and both induced divisor maps for one nontrivial finite fixture.",
+    "prediction": "The principal-divisor construction yields exactly 486 classes from 233 admissible graph places; the six target points each have an 81-class pushforward fiber, and both composition identities hold exhaustively.",
+    "falsification_condition": "Any nonunique class sum, failed associativity triple, bad place valuation, admitted inert place, unequal fiber size, failed map identity, or production mismatch falsifies the proposed fixed-fixture certificate.",
+    "relation_completeness_lemma": {
+      "statement": "For this one-point genus-three model, every relation needed to add degree-at-most-three reduced representatives is witnessed by a nonzero function in L(9*infinity).",
+      "argument": "At the unique point at infinity, ord_infinity(u)=-2 and ord_infinity(v)=-7. Thus 1,u,u^2,u^3,u^4,v,u*v have distinct pole orders 0,2,4,6,8,7,9 and form the seven-dimensional Riemann-Roch space L(9*infinity). For reduced divisors D1,D2,D3 of degrees at most three, a relation D1+D2+iota(D3) has finite degree at most nine; any principal relation needed by the reduced-class law therefore has its function in this enumerated space. The oracle exhaustively enumerates its normalized projective functions and requires a unique resulting class sum.",
+      "code_references": [
+        "tests/binary_cover_transfer_oracle.rs:949",
+        "tests/binary_cover_transfer_oracle.rs:1022",
+        "tests/binary_cover_transfer_oracle.rs:1359"
+      ],
+      "scope": "This closes the relation-space completeness argument only for the recorded GF(8) fixture; it is not a general genus-three Jacobian theorem or catalog-wide oracle."
+    },
+    "assumptions": [
+      "GF(8) arithmetic uses the irreducible modulus t^3+t+1.",
+      "No conclusion outside this exact field, curve, or map follows from exhaustive finite enumeration."
+    ]
+  },
+  "cost_comparison": {
+    "workload": "exhaustive correctness replay for one fixed GF(8) fixture",
+    "baseline": "No performance baseline was measured. Production arithmetic was used only for differential correctness comparison after the independent oracle completed.",
+    "units": "exact enumerated functions, places, classes, pairs, triples, and observed release-test seconds",
+    "construction": "Enumerated 299593 normalized projective functions in L(9*infinity); retained 33856 graph-supported principal divisors with pole counts [1,3,28,168,1138,5798,26720] at poles [0,2,4,6,7,8,9].",
+    "transfer": "Checked 236196 ordered pushforward-additivity pairs, all six target pullbacks, phi_*phi^*=[3], e^2=[3]e, and every production map value after independent construction.",
+    "destination": "independent six-point target group table with six equal 81-class pushforward fibers",
+    "recovery": "not applicable without a named subgroup",
+    "verification": "Observed 57513726 sparse principal-relation lookups and all 114791256 associativity triples, followed by all 486^2 production additions, all production negations, scalar multiples 0 through 54 for every class, pushforwards, endomorphisms, and target pullbacks.",
+    "failed_attempts_and_duplicates": "Observed 23277 functions rejected for inert support and 242460 rejected for remaining higher-degree support; 53627780 factor trials. Projective normalization and a uniqueness assertion admitted no duplicate retained principal divisor.",
+    "memory_and_data": "The clean producer-commit replay recorded 1107960 KiB peak child RSS for the complete cached-target Cargo invocation, including compilation and the test process. This is not a test-only peak, a cold-build measurement, or a hardware-normalized comparison.",
+    "setup_reuse": "single fixed fixture; no amortized catalog or solver claim",
+    "uncertainty": "Correctness counts are exhaustive for the fixed fixture. The canonical raw output and wrapper-level peak child RSS are recorded, but cold-build cost, test-only peak RSS, a complete hardware manifest, packaged-artifact reproducibility, and behavior outside this fixture remain unmeasured.",
+    "evidence_label": "measured fixed-fixture correctness replay; not a speed benchmark"
+  },
+  "controls": [
+    "Oracle field, polynomial, place, principal-divisor, source-group, target-group, pullback, and pushforward code must not import production arithmetic.",
+    "Enumerate 233 admissible graph places with degree counts 5, 44, and 184; reject the five inert degree-two places from principal zero supports.",
+    "Handle the ramified u=0 place with an independent local-series valuation and unramified places with independent Hensel valuations.",
+    "Require 486 unique canonical reduced divisor keys with degree distribution 1, 5, 56, and 424.",
+    "Require a unique sum for every unordered class pair and associativity for all 486^3 ordered triples.",
+    "Check all 486^2 ordered pushforward homomorphism pairs, all pullbacks, phi_*phi^*=[3], and e^2=[3]e.",
+    "Cross the production boundary only after the independent group table and maps have been constructed and checked.",
+    "Passed controls cover inert-place rejection, the ramified local valuation, infinity, the rational two-torsion fiber, shared support, repeated support, nonsplit support, conjugate support, and the complete non-table (a,b)=(0,1) production path.",
+    "Malformed-input, altered-field, altered-equation, altered-map, and missing-place mutation controls remain open and are not implied by the passing fixture replay."
+  ],
+  "protocol": {
+    "parameter_scope": "Only a=1, b=t+1, d=sqrt(b)=t^2+t+1 over GF(8) with modulus t^3+t+1.",
+    "sample_selection": "Exhaustive enumeration of the fixed source and target groups; no random sample.",
+    "stopping_rules": "Stop and retain a failed receipt at the first arithmetic invariant failure; resource exhaustion is an incomplete run, never a mathematical refutation.",
+    "invalidation_rules": "Invalidate the receipt if the fixture bytes, oracle source, production comparison source, compiler/toolchain, enumeration counts, or canonical output digest changes.",
+    "hardware_manifest": {
+      "state": "incomplete",
+      "recorded": "x86_64-unknown-linux-gnu compiler host triple",
+      "missing": "CPU model, memory capacity, kernel/container image, affinity, and isolation data were not captured"
+    },
+    "execution_route": "repository-integrated Rust test with a frozen source digest and exact command/exit-status receipt"
+  },
+  "historical_execution_receipt": {
+    "id": "fixed-gf8-release-rerun-20261119",
+    "date_utc": "2026-11-19",
+    "working_directory": "/workspace/crypto-next",
+    "working_tree_base_revision": "74752a1e644b1c9cc8f4efeb2e2befac6e24f7bb",
+    "working_tree_state": "The oracle test source was uncommitted and is bound by SHA-256 below; this companion draft is not a release or ledger receipt.",
+    "command": "RUSTUP_HOME=/tmp/clean-corpus-rust/rustup CARGO_HOME=/tmp/clean-corpus-rust/cargo CARGO_TARGET_DIR=/tmp/clean-corpus-rust/target CARGO_INCREMENTAL=0 PATH=/tmp/clean-corpus-rust/cargo/bin:$PATH cargo test --release --test binary_cover_transfer_oracle -- --nocapture",
+    "profile": "release (optimized), cached target directory; not a cold-build benchmark",
+    "exit_status": 0,
+    "result": {
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0,
+      "tests": [
+        "independent_all_class_oracle_also_exercises_the_general_non_table_path",
+        "independent_f8_principal_divisor_oracle_checks_every_class_and_map"
+      ]
+    },
+    "timing_seconds": {
+      "cargo_reported_compile": 3.3,
+      "test_harness": 13.36,
+      "command_wrapper_wall": 16.662458392,
+      "interpretation": "Observed correctness-replay timings only; no uncertainty study or performance comparison was run."
+    },
+    "counters": {
+      "admissible_graph_places": 233,
+      "reduced_divisor_classes": 486,
+      "reduced_divisor_degree_distribution": [
+        1,
+        5,
+        56,
+        424
+      ],
+      "divisor_candidates": 266304,
+      "projective_functions": 299593,
+      "retained_principal": 33856,
+      "retained_principal_by_pole_0_through_9": [
+        1,
+        0,
+        3,
+        0,
+        28,
+        0,
+        168,
+        1138,
+        5798,
+        26720
+      ],
+      "rejected_inert": 23277,
+      "rejected_higher_degree": 242460,
+      "factor_trials": 53627780,
+      "source_table_lookups": 57513726,
+      "associativity_triples": 114791256,
+      "transfer_pairs": 236196,
+      "repeated_classes": 20,
+      "nonsplit_classes": 448,
+      "ramified_classes": 57,
+      "shared_support_pairs": 9077,
+      "conjugate_support_pairs": 7262,
+      "target_points": 6,
+      "classes_per_pushforward_fiber": 81
+    },
+    "digests": {
+      "oracle_test_source_sha256": "1dcaaa18c4485b529b2dde621a3b510664f87cfaa5142f30e32ed27e396a0d37",
+      "production_cover_transfer_source_sha256": "e1336ef5e5fb6ab32d58be956e72a8732adc43aca30d46a4f8ce45b03cdcdad5",
+      "cargo_lock_sha256": "430a56316353412d28492dc9e3f9d77bd6e1243442c663a5dcbea6b5028e46ba",
+      "compiled_test_binary_sha256": "bdf2742a2d565f457042290941ebd6d1b6a7c5d19a2af9f2c8b9d81b64f5ce05",
+      "compiled_test_binary_bytes": 7476696,
+      "canonical_raw_output_sha256": null,
+      "canonical_raw_output_status": "not captured; the exact counters and harness result are recorded, but no raw-output digest is claimed"
+    },
+    "package": {
+      "crate": "crypto 0.1.0",
+      "artifact": "ephemeral Cargo integration-test executable under /tmp/clean-corpus-rust/target; not a packaged release artifact",
+      "package_receipt": null,
+      "state": "open: publish or archive an executable artifact plus manifest before claiming packaged reproducibility"
+    },
+    "toolchain": {
+      "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+      "rustc_commit": "0ef1bc386059596dada8fb65b50425aab2ea637a",
+      "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
+      "host": "x86_64-unknown-linux-gnu",
+      "llvm": "23.1.5",
+      "manifest_state": "Exact compiler versions and Cargo.lock digest are recorded; rustup distribution/package checksums and the execution image are not frozen."
+    },
+    "memory": {
+      "peak_rss_kib": null,
+      "state": "not measured; retain as an explicit open obligation"
+    },
+    "warnings": [
+      "Unrelated existing dead-code warning: CatalogK2::decode_packed in src/bin/odd_extension_transfer_pilot.rs:130.",
+      "Unrelated existing dead-code warning: catalog in src/bin/curve_cover_check/checker.rs:621.",
+      "The fixed-GF(8) oracle test emitted no warning after its unused independent method was removed."
+    ]
+  },
+  "execution_receipt": {
+    "id": "fixed-gf8-rust198-e0ae0fe5-20261119",
+    "date_utc": "2026-11-19",
+    "working_directory": "/tmp/crypto-odd-producer-e0ae0fe5d0",
+    "producer_commit": "e0ae0fe5d09c0492a8b50600e88d0b9da68afef1",
+    "producer_tree": "5bffeaf5cafaefaf0b950431db1798c1c4b133af",
+    "working_tree_state": "clean before and after the replay; the generated odd-transfer corpus was moved out of the detached worktree before this command",
+    "command": "CRYPTO_BUILD_GIT_COMMIT=e0ae0fe5d09c0492a8b50600e88d0b9da68afef1 CRYPTO_BUILD_GIT_DIRTY=false CARGO_HOME=/tmp/clean-corpus-rust/cargo RUSTUP_HOME=/tmp/clean-corpus-rust/rustup CARGO_TARGET_DIR=/tmp/clean-corpus-rust/target-1.98 PATH=/tmp/clean-corpus-rust/cargo/bin:$PATH /tmp/clean-corpus-rust/cargo/bin/cargo +1.98.0 test --offline --locked --release --test binary_cover_transfer_oracle -- --nocapture --test-threads=1",
+    "measurement_wrapper": "fresh Python 3 process using time.monotonic and resource.getrusage(RUSAGE_CHILDREN); combined Cargo stdout and stderr were written unchanged to the raw artifact",
+    "profile": "release (optimized), isolated cached target directory; the invocation rebuilt repository targets and is not a cold-build or test-only benchmark",
+    "exit_status": 0,
+    "result": {
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 0,
+      "tests": [
+        "independent_all_class_oracle_also_exercises_the_general_non_table_path",
+        "independent_f8_principal_divisor_oracle_checks_every_class_and_map"
+      ]
+    },
+    "timing_seconds": {
+      "cargo_reported_compile": 259.0,
+      "test_harness": 12.70,
+      "command_wrapper_wall": 272.536535713,
+      "child_user": 962.702604,
+      "child_system": 64.867481,
+      "interpretation": "The wrapper covers compilation and test execution in a cached target directory. Parallel child CPU time can exceed wall time. These are correctness-replay observations, not a performance comparison."
+    },
+    "resource_measurement": {
+      "max_child_rss_kib": 1107960,
+      "minor_page_faults": 15405477,
+      "major_page_faults": 463,
+      "voluntary_context_switches": 132156,
+      "involuntary_context_switches": 110861,
+      "scope": "RUSAGE_CHILDREN for the whole Cargo invocation; this is not isolated test-process memory, aggregate concurrent RSS, or a cold-build measurement"
+    },
+    "counters": {
+      "admissible_graph_places": 233,
+      "reduced_divisor_classes": 486,
+      "reduced_divisor_degree_distribution": [
+        1,
+        5,
+        56,
+        424
+      ],
+      "divisor_candidates": 266304,
+      "projective_functions": 299593,
+      "retained_principal": 33856,
+      "retained_principal_by_pole_0_through_9": [
+        1,
+        0,
+        3,
+        0,
+        28,
+        0,
+        168,
+        1138,
+        5798,
+        26720
+      ],
+      "rejected_inert": 23277,
+      "rejected_higher_degree": 242460,
+      "factor_trials": 53627780,
+      "source_table_lookups": 57513726,
+      "associativity_triples": 114791256,
+      "transfer_pairs": 236196,
+      "repeated_classes": 20,
+      "nonsplit_classes": 448,
+      "ramified_classes": 57,
+      "shared_support_pairs": 9077,
+      "conjugate_support_pairs": 7262,
+      "target_points": 6,
+      "classes_per_pushforward_fiber": 81
+    },
+    "artifacts": {
+      "raw_output": {
+        "path": "research/curve_transfer_infrastructure_20261118/fixed-gf8-rust198-e0ae0fe5.raw.log",
+        "sha256": "2f5019d482cff5982ca0d24e4412ea5462cbd9e58aedd697d95f59db5ce051c4",
+        "bytes": 1035
+      },
+      "resource_report": {
+        "path": "research/curve_transfer_infrastructure_20261118/fixed-gf8-rust198-e0ae0fe5.time.txt",
+        "sha256": "dcc56bca971b52767e42def8af5391fd92079e609c6c09bfb97696552bd20ac1",
+        "bytes": 459
+      }
+    },
+    "digests": {
+      "oracle_test_source_sha256": "1dcaaa18c4485b529b2dde621a3b510664f87cfaa5142f30e32ed27e396a0d37",
+      "production_cover_transfer_source_sha256": "e1336ef5e5fb6ab32d58be956e72a8732adc43aca30d46a4f8ce45b03cdcdad5",
+      "cargo_lock_sha256": "430a56316353412d28492dc9e3f9d77bd6e1243442c663a5dcbea6b5028e46ba",
+      "compiled_test_binary_path": "/tmp/clean-corpus-rust/target-1.98/release/deps/binary_cover_transfer_oracle-93797fe540d4afc5",
+      "compiled_test_binary_sha256": "350d90b66b60bf159106f21c6bc51a01dfced16508fa15ef0e380c0cc663753c",
+      "compiled_test_binary_bytes": 7486640
+    },
+    "package": {
+      "crate": "crypto 0.1.0",
+      "artifact": "ephemeral Cargo integration-test executable under /tmp/clean-corpus-rust/target-1.98; the executable digest is recorded but its bytes are not archived as a release package",
+      "package_receipt": null,
+      "state": "open: publish or archive an executable artifact plus manifest before claiming packaged reproducibility"
+    },
+    "toolchain": {
+      "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)",
+      "rustc_commit": "88d9e12ae178fab0fb5cc050a94da85685d449ea",
+      "cargo": "cargo 1.98.0 (797e8a9bc 2026-08-05)",
+      "cargo_commit": "797e8a9bca276c1c9f9f738d2a20f484fa4eea9d",
+      "host": "x86_64-unknown-linux-gnu",
+      "llvm": "22.1.8",
+      "manifest_state": "Exact compiler versions and Cargo.lock digest are recorded; rustup distribution/package checksums and the execution image are not frozen."
+    },
+    "memory": {
+      "peak_rss_kib": 1107960,
+      "state": "measured by RUSAGE_CHILDREN for the whole cached-target Cargo invocation; not isolated to the test executable"
+    },
+    "warnings": []
+  },
+  "exploration_boundary": {
+    "families": [
+      "ordinary-binary degree-three cover"
+    ],
+    "parameters": "one fixed GF(8) model and one fixed degree-three map",
+    "completed_scope": "Exhaustive independent source-law, transfer-map, composition, and production-differential replay for the one recorded GF(8) fixture.",
+    "completeness_claim": "none"
+  },
+  "composition": {
+    "edge_ids": [
+      "urn:curve-cover-map:1:sha256:ed811c5fc342836e149c1e6818cc77e5f2f49fc41350510bb40821180499125a",
+      "phi^*:E(GF(8))->J(H)(GF(8))",
+      "phi_*:J(H)(GF(8))->E(GF(8))",
+      "e=phi^*phi_*:J(H)(GF(8))->J(H)(GF(8))"
+    ],
+    "junction_compatibility": "Supported by the local exhaustive replay for the exact fixed domains and codomains, all canonical source classes, all target points, and the recorded exceptional supports; signed PCC standing is not claimed.",
+    "weakest_open_obligation": "No named subgroup is bound; any subgroup-preservation claim requires a subgroup definition and a separate kernel/recovery certificate."
+  },
+  "sources": [
+    {
+      "id": "independent-fixed-gf8-oracle",
+      "uri": "tests/binary_cover_transfer_oracle.rs",
+      "revision": "e0ae0fe5d09c0492a8b50600e88d0b9da68afef1",
+      "sha256": "1dcaaa18c4485b529b2dde621a3b510664f87cfaa5142f30e32ed27e396a0d37",
+      "scope": "Independent field, place, principal-divisor, 486-class source-law, target-law, and transfer oracle, followed by production differential checks."
+    },
+    {
+      "id": "production-binary-transfer",
+      "uri": "src/binary_ecc/cover_transfer.rs",
+      "revision": "e0ae0fe5d09c0492a8b50600e88d0b9da68afef1",
+      "sha256": "e1336ef5e5fb6ab32d58be956e72a8732adc43aca30d46a4f8ce45b03cdcdad5",
+      "scope": "Production implementation to be compared only after independent construction."
+    },
+    {
+      "id": "dependency-lock",
+      "uri": "Cargo.lock",
+      "revision": "e0ae0fe5d09c0492a8b50600e88d0b9da68afef1",
+      "sha256": "430a56316353412d28492dc9e3f9d77bd6e1243442c663a5dcbea6b5028e46ba",
+      "scope": "Dependency lock used by the recorded optimized replay; not by itself a complete package or execution-image manifest."
+    }
+  ],
+  "open_obligations": [
+    "Publish or archive a packaged executable test artifact with package checksum, exact toolchain distribution checksums, dependency lock, execution-image identity, and reproduction instructions.",
+    "Capture a complete hardware and isolation manifest, and separate cold-build, cached-build, test-only, and test-process peak-memory measurements before making resource or performance comparisons.",
+    "Add malformed-representative, altered-field, altered-equation, altered-map, missing-place, and deliberate production-mismatch mutation controls; the passing arithmetic controls do not cover these mutations.",
+    "Bind and check a named subgroup, kernel intersection, and recovery map before assigning any subgroup-preservation status beyond not-applicable for this unbound fixture.",
+    "Obtain signed PCC standing or an equivalent independent review before promoting this local draft to proof-grade evidence.",
+    "Keep catalog-wide independence, solver applicability, computational advantage, and scaling explicitly open."
+  ],
+  "recommended_next_action": "Package and independently replay the producer-commit-bound fixed-fixture test, add the outstanding mutation controls and complete environment capture, and only then assess separately named subgroups or additional catalog rows.",
+  "official_status_change": "none"
+}

@@ -1,0 +1,17 @@
+PRESET amendment 2 (2026-11-18), written after the 12-16 bit -l 1 data and the first 18-bit rows,
+before any of the data it describes.   [pcc:unverified]
+Primary analysis and kill rule unchanged.
+
+Observed instrument limits at 18 bits: m=4 arm D stopped (rc != 0, no TIMINGS) at F4 degree 50 under
+the 4.5 GB address-space cap after about 9 minutes; the kernel OOM killer fired once in the session
+while three msolve processes ran. Under the preset these cells are censored.
+
+SECONDARY (exploratory, does not enter the verdict unless stated):
+  S1. After the primary ladder stops, rerun m=4, 18-bit, instance 0, arms D, B4, H4b, sequentially
+      and alone on the machine, msolve -l 1 -g 2 -t 1, address-space cap 11 GB, timeout 7200 s each.
+      Report R = T_D / T_X and Msum ratios as one extra paired point; refit beta with that point added
+      and say whether the verdict would change. Because this point is one instance with a different
+      contention level, it can at most flag "verdict sensitive to the censored cell"; it cannot by
+      itself turn KILL into ALIVE.
+  S2. Cells in which only alternative arms remain alive (D censored at an earlier bit size) give no
+      paired ratio; they are stopped rather than run to save the machine for S1.
