@@ -1370,6 +1370,11 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
     let mut counters = RootCounters::default();
     let mut powers: HashMap<u64, PowerState> = HashMap::new();
     let mut gcds: HashMap<u64, (Vec<u64>, Vec<u64>)> = HashMap::new();
+    // An immediately preceding Division event has already been checked using
+    // independent arithmetic. Keep its verified remainder for the following
+    // GcdStep and its verified quotient for an accepted SplitEnd. Borrow
+    // certificate operands, and own only the computed remainder.
+    let mut verified_division: Option<(&[u64], &[u64], &[u64], &[u64], Vec<u64>)> = None;
     let mut next_id = 0;
     let mut inverse = None;
     let mut split: Option<(Vec<u64>, u64)> = None;
@@ -1383,6 +1388,13 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
     {
         if finished {
             return Err("events after root finish".into());
+        }
+        // A cached division is reusable only by the immediately following
+        // GCD or split event. This also prevents any stale cross-event reuse.
+        if !matches!(event, RootEvent::Division { .. }
+            | RootEvent::GcdStep { .. } | RootEvent::SplitEnd { .. })
+        {
+            verified_division = None;
         }
         counters.observe(event);
         if index == 0 {
@@ -1458,6 +1470,12 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 if verified_q != *quotient || verified_r != *remainder {
                     return Err("division identity failed".into());
                 }
+                // No additional arithmetic is needed if the next GcdStep or
+                // accepted SplitEnd repeats this exact verified identity.
+                verified_division = Some((
+                    a.as_slice(), b.as_slice(),
+                    quotient.as_slice(), remainder.as_slice(), verified_r,
+                ));
             }
             RootEvent::PowerBegin {
                 id,
@@ -1548,15 +1566,32 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 canonical(quotient, p)?;
                 canonical(remainder, p)?;
                 let state = gcds.get_mut(id).ok_or("missing gcd begin")?;
-                let (verified_q, verified_r) = vdiv(&state.0, &state.1, p)?;
-                if verified_q != *quotient || verified_r != *remainder {
-                    return Err("Euclidean step failed".into());
-                }
-                // Move the prior divisor into the new dividend; a deep clone
-                // of that polynomial was previously performed every GCD step.
-                // The exact remainder has already been independently computed
-                // and compared to the certificate. Move that owned vector into
-                // the state instead of allocating a second copy of the event.
+                let cached = verified_division.take().and_then(
+                    |(dividend, divisor, checked_q, checked_r, computed_r)| {
+                        if dividend == state.0.as_slice()
+                            && divisor == state.1.as_slice()
+                            && checked_q == quotient.as_slice()
+                            && checked_r == remainder.as_slice()
+                        {
+                            Some(computed_r)
+                        } else {
+                            None
+                        }
+                    },
+                );
+                let verified_r = if let Some(remainder) = cached {
+                    remainder
+                } else {
+                    // Older/nonadjacent traces must still be independently
+                    // checked, with no reliance on the producer's assertion.
+                    let (verified_q, verified_r) = vdiv(&state.0, &state.1, p)?;
+                    if verified_q != *quotient || verified_r != *remainder {
+                        return Err("Euclidean step failed".into());
+                    }
+                    verified_r
+                };
+                // Transfer the independently calculated remainder instead
+                // of recomputing division and cloning the event data.
                 let previous_b = std::mem::replace(&mut state.1, verified_r);
                 state.0 = previous_b;
             }
@@ -1593,10 +1628,22 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 s[0] = (s[0] + p - 1) % p;
                 let g = vgcd(h.clone(), trim(s), p)?;
                 let valid = g.len() > 1 && g.len() < h.len();
+                let split_quotient_valid = if valid {
+                    match verified_division.take() {
+                        Some((dividend, divisor, checked_q, checked_r, _))
+                            if dividend == h.as_slice()
+                                && divisor == g.as_slice()
+                                && checked_q == quotient.as_slice()
+                                && checked_r.is_empty() => true,
+                        _ => vdiv(&h, &g, p)? == (quotient.clone(), vec![]),
+                    }
+                } else {
+                    true
+                };
                 if h != *polynomial
                     || g != *factor
                     || valid != *accepted
-                    || (valid && vdiv(&h, &g, p)? != (quotient.clone(), vec![]))
+                    || !split_quotient_valid
                     || (!valid && !quotient.is_empty())
                 {
                     return Err("split identity failed".into());
@@ -1704,6 +1751,30 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round101_verified_division_cache_rejects_modified_gcd_step() {
+        for p in [65_521u64, 1_000_000_007, MAX_PRIME] {
+            let polynomial = vec![p - 1, 0, 1];
+            let report = run(&polynomial, p);
+            verify(&report).unwrap();
+            let mut tampered = run(&polynomial, p);
+            let step = tampered.events.iter_mut().find_map(|event| {
+                if let RootEvent::GcdStep { quotient, .. } = event {
+                    Some(quotient)
+                } else {
+                    None
+                }
+            }).expect("root solver must perform a GCD step");
+            if step.is_empty() {
+                step.push(1);
+            } else {
+                step[0] = (step[0] + 1) % p;
+                if step.last() == Some(&0) { step.pop(); }
+            }
+            assert!(verify(&tampered).is_err(), "forged quotient p={p}");
+        }
+    }
 
     #[test]
     fn round99_quadratic_power_step_replay_matches_generic_polynomials() {
