@@ -7,7 +7,7 @@
 //!
 //! cargo run --release --example prime31_coset_cubic_factor
 use crypto_lib::cryptanalysis::pkm_smooth_tower::{
-    mulm, poly_mul, poly_roots, powm, Rng,
+    mulm, poly_mul, poly_roots, powm, Curve, Rng,
 };
 use std::collections::BTreeSet;
 use std::time::{Duration, Instant};
@@ -65,6 +65,15 @@ fn structured(c: u64, y0: u64, seed: u64, check: bool) -> BTreeSet<u64> {
         let cubic = vec![(B + P - y2) % P, A, 0, 1];
         let fiber_roots = poly_roots(&cubic, P, &mut Rng(seed ^ fiber));
         assert_eq!(fiber_roots.len(), 3, "a registered split cubic failed");
+        if check {
+            let curve = Curve { p: P, a: A, b: B };
+            let mut sum = None;
+            for &x in &fiber_roots {
+                sum = curve.add(sum, Some((x, y)));
+            }
+            assert_eq!(sum, None, "horizontal cubic fiber does not sum to O");
+            assert_eq!(fiber_roots.iter().copied().sum::<u64>() % P, 0, "Vieta x^2 coefficient");
+        }
         for x in fiber_roots {
             if check {
                 assert_eq!(rhs(x), y2);
@@ -128,7 +137,7 @@ fn main() {
     }
     let direct = median(direct_times).as_secs_f64() * 1000.0;
     let fiber = median(structured_times).as_secs_f64() * 1000.0;
-    println!("PRIME31_COSET_CUBIC_PASS: 8 cosets x 7 cubics x 3 public x roots = 168");
+    println!("PRIME31_COSET_CUBIC_PASS: 8 cosets x 7 cubics x 3 public x roots = 168; 56 fiber group-zero relations");
     println!("Rust paired rootfinding median five rounds: degree21_ms={direct:.3}, seven_cubics_ms={fiber:.3}, speed_ratio={:.3}", direct / fiber);
     println!("Scope: factor-base acquisition only; no public-Q decomposition, F4 blind solve, or DLP advantage.");
 }
