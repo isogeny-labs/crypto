@@ -129,6 +129,14 @@ natural-query recovery and independent rank calculations. Their evidence is
 kept in [development-checks.json](development-checks.json). They are correctness
 fixtures, not benchmark samples or substitute Prime31 campaign results.
 
+All 30 native tests passed. A post-publication source check matched 61 inventoried
+files to the tracked checkout and the optimized running binary. The separate
+root-library command did not pass: this sparse checkout lacked 51 included
+fixture inputs, and its compiler process also ended with SIGKILL (cause
+unestablished). See [the root gate receipt](evidence/root-library-gate.json).
+The pre-existing benchmark-record gate also rejects an unchanged historical
+record; [its receipt](evidence/preexisting-benchrec-gate.json) is preserved.
+
 `make-target 20261122` reproduces the public input. `panel panel.json NEW_DIR`
 materializes 54 IC input files without running them. The additional rho input
 has cell ID `p31aux-v1-rho`. The checked-in [cells](cells) are the launch inputs.
