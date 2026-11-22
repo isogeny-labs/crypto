@@ -1,18 +1,35 @@
-//! Experimental components of "Integer multiplication below n log n" (2026-09-23).
+//! Experimental reconstruction of "Integer multiplication below n log n" (2026-09-23).
 //!
-//! This module provides an exact finite-field reference for the synthetic-transform
-//! algebra, a bounded scalar XOR motif, and an opt-in adapter for existing polynomial
-//! callers. It does NOT implement the rank-saving recursive tensor schedule,
-//! precision-controlled Gaussian resampling, or the complete asymptotic multiplier.
-//! `Algorithm::PublishedSubNlogN` is explicitly unavailable: no conventional fallback
-//! can silently impersonate that algorithm. This public-data research code is not
-//! constant time and makes no performance or complexity claim.
+//! The literal parameter selector, rank-labelled recursive tensor and interchange
+//! schedules, certified Gaussian resampling, complex transforms, CRT transport,
+//! and whole-integer recovery are executable components. `multiply_published`
+//! reports the actual selected route; every native-sized input selects the
+//! prescribed small-input base case. `assembly::Plan` exercises the numerical
+//! construction at explicit admitted parameters without changing the selector.
 //!
-//! Primary source: <https://github.com/openai/math/tree/main/preprints/Integer-multiplication-below-n-log-n-September-23-2026>.
-//! See `research/subnlogn_rust_20261122/README.md` for the component map and limits.
+//! This is not a verified sub-nlogn native runtime: the full fixed network has not
+//! been executed, and the segmented filesystem interpreter's host overhead is
+//! outside the paper's fixed-tape recurrence. A base-case or diagnostic product
+//! does not establish that bound. This public-data code is not constant time.
+//!
+//! The bounded finite-field reference and its opt-in `ExperimentalField` adapter
+//! remain separate. See `research/subnlogn_rust_20261122/README.md` for source pins,
+//! stage mapping, cost obligations, and evidence scope.
 
+pub mod assembly;
+pub mod certified;
+pub mod crt;
+pub mod fastdiv;
+pub mod fastint;
 pub mod motif;
+pub mod parameters;
+pub mod resampling;
+pub mod ring;
+pub mod swap;
 pub mod synthetic;
+pub mod tape;
+pub mod tensor;
+pub mod transforms;
 
 use crate::bigint::Big;
 use crate::field::{Field, Prepared, Rng, Zp};
@@ -25,25 +42,35 @@ use std::sync::Arc;
 pub enum Algorithm {
     /// Bounded exact finite-field reference for the paper's synthetic-transform algebra.
     SyntheticReference,
-    /// Full September 2026 construction; not implemented in this module.
+    /// Literal September 2026 parameter prescription and experimental reconstruction.
+    /// This request is not a claim that a rank-saving branch ran or a bound was verified.
     PublishedSubNlogN,
 }
 
 #[derive(Debug)]
 pub enum Error {
-    FullAlgorithmUnavailable,
+    SizeOverflow,
     InputLimit { supplied: usize, limit: usize },
     CoefficientBound,
     Synthetic(synthetic::Error),
+    Parameters(parameters::Error),
+    Assembly(assembly::Error),
 }
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::FullAlgorithmUnavailable => write!(f, "full sub-nlogn multiplier unavailable: recursive rank-saving schedule, certified resampling and complete assembly remain unimplemented"),
-            Self::InputLimit { supplied, limit } => write!(f, "input has {supplied} limbs; hard limit is {limit}"),
-            Self::CoefficientBound => write!(f, "integer convolution cannot be reconstructed within its coefficient bound"),
+            Self::SizeOverflow => write!(f, "integer length exceeds native addressability"),
+            Self::InputLimit { supplied, limit } => {
+                write!(f, "input has {supplied} limbs; hard limit is {limit}")
+            }
+            Self::CoefficientBound => write!(
+                f,
+                "integer convolution cannot be reconstructed within its coefficient bound"
+            ),
             Self::Synthetic(e) => write!(f, "synthetic transform: {e:?}"),
+            Self::Parameters(e) => write!(f, "{e}"),
+            Self::Assembly(e) => write!(f, "{e}"),
         }
     }
 }
@@ -235,25 +262,104 @@ impl<F: Field> Field for ExperimentalField<F> {
     }
 }
 
-/// Independent of requested transform limits; checked before trimming or allocating.
+/// Synthetic-reference limit; checked before trimming or allocating on that route.
 pub const MAX_INPUT_LIMBS: usize = 256;
 const INTEGER_PRIME: u64 = (1u64 << 61) - 1;
+
+/// Actual route, separate from the requested algorithm's name.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum IntegerRoute {
+    SyntheticReference,
+    PublishedBaseCase { reason: parameters::BaseCaseReason },
+    PublishedTransform,
+}
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct IntegerProduct {
     /// Canonical little-endian 64-bit limbs; zero is the empty vector.
     pub limbs: Vec<u64>,
+    /// Requested construction. Consult `route` for the actual executed path.
     pub backend: Algorithm,
-    /// Zero for a zero product, otherwise the synthetic transform length.
+    pub route: IntegerRoute,
+    /// Synthetic reference length or published target volume; zero for a base case.
     pub transform_points: usize,
 }
 
-/// Multiply bounded unsigned integers through exact byte convolution over a prime.
+/// Execution details for the literal published parameter selection.
+#[derive(Debug)]
+pub enum PublishedExecution {
+    BaseCase {
+        reason: parameters::BaseCaseReason,
+        prerequisite: fastint::Work,
+    },
+    Transform {
+        parameters: assembly::Parameters,
+        execution: Box<assembly::Execution>,
+        precision: Box<assembly::PrecisionCertificate>,
+    },
+}
+
+#[derive(Debug)]
+pub struct PublishedProduct {
+    pub limbs: Vec<u64>,
+    pub execution: PublishedExecution,
+}
+
+/// Execute the literal parameter prescription and report the actual route.
 ///
-/// Inputs and output use little-endian u64 limbs. With byte coefficients, every
-/// convolution coefficient is at most min(byte_lengths)*255^2. The explicit bound
-/// below ensures recovery from the prime-field result is unique before carrying.
-/// This executes the synthetic reference only and has no sub-nlogn complexity claim.
+/// The exponent epsilon=2^-75 is not enlarged for practical inputs. Consequently
+/// every input length representable by `usize` selects a base case. That case
+/// uses the concrete recursive Fermat multiplier and is explicitly identified.
+/// An admitted transform uses `assembly::Plan`; any error is returned, with no
+/// error-triggered fallback. For explicit diagnostic geometry use that plan
+/// directly. Neither this API nor its receipts verify a native asymptotic bound.
+pub fn multiply_published(a: &[u64], b: &[u64]) -> Result<PublishedProduct, Error> {
+    for input in [a, b] {
+        input.len().checked_mul(64).ok_or(Error::SizeOverflow)?;
+    }
+    let a = Big::from_limbs(a);
+    let b = Big::from_limbs(b);
+    let n = a.bits().max(b.bits());
+    match parameters::select(n).map_err(Error::Parameters)? {
+        parameters::Selection::BaseCase { reason } => {
+            a.bits()
+                .checked_add(b.bits())
+                .and_then(|bits| bits.checked_next_power_of_two())
+                .ok_or(Error::SizeOverflow)?;
+            let (value, prerequisite) = fastint::multiply_with_work(&a, &b);
+            Ok(PublishedProduct {
+                limbs: value.0,
+                execution: PublishedExecution::BaseCase {
+                    reason,
+                    prerequisite,
+                },
+            })
+        }
+        parameters::Selection::Transform(parameters) => {
+            let mut plan = assembly::Plan::new(parameters.clone()).map_err(Error::Assembly)?;
+            let product = plan.multiply(&a, &b).map_err(Error::Assembly)?;
+            Ok(PublishedProduct {
+                limbs: product.value.0,
+                execution: PublishedExecution::Transform {
+                    parameters,
+                    execution: Box::new(product.execution),
+                    precision: Box::new(product.precision),
+                },
+            })
+        }
+    }
+}
+
+/// Multiply unsigned integers through the explicitly requested construction.
+///
+/// Inputs and output use little-endian u64 limbs. `max_points` limits only the
+/// synthetic-reference route; the literal prescription chooses its own geometry.
+/// `multiply_published` exposes the more detailed construction receipts.
+///
+/// On the synthetic-reference route, every byte-convolution coefficient is at
+/// most min(byte_lengths)*255^2. The explicit bound below ensures recovery from
+/// the prime-field result is unique before carrying. That reference is bounded
+/// independently by `MAX_INPUT_LIMBS`.
 pub fn multiply_exact(
     a: &[u64],
     b: &[u64],
@@ -261,7 +367,22 @@ pub fn multiply_exact(
     max_points: usize,
 ) -> Result<IntegerProduct, Error> {
     if algorithm == Algorithm::PublishedSubNlogN {
-        return Err(Error::FullAlgorithmUnavailable);
+        let product = multiply_published(a, b)?;
+        let (route, transform_points) = match product.execution {
+            PublishedExecution::BaseCase { reason, .. } => {
+                (IntegerRoute::PublishedBaseCase { reason }, 0)
+            }
+            PublishedExecution::Transform { parameters, .. } => (
+                IntegerRoute::PublishedTransform,
+                parameters.target_lengths.iter().product(),
+            ),
+        };
+        return Ok(IntegerProduct {
+            limbs: product.limbs,
+            backend: algorithm,
+            route,
+            transform_points,
+        });
     }
     for input in [a, b] {
         if input.len() > MAX_INPUT_LIMBS {
@@ -277,6 +398,7 @@ pub fn multiply_exact(
         return Ok(IntegerProduct {
             limbs: vec![],
             backend: algorithm,
+            route: IntegerRoute::SyntheticReference,
             transform_points: 0,
         });
     }
@@ -328,6 +450,7 @@ pub fn multiply_exact(
     Ok(IntegerProduct {
         limbs,
         backend: algorithm,
+        route: IntegerRoute::SyntheticReference,
         transform_points: points,
     })
 }

@@ -15,6 +15,10 @@ experimental-subnlogn = []
 name = "subnlogn"
 required-features = ["experimental-subnlogn"]
 
+[[example]]
+name = "subnlogn_full_flow"
+required-features = ["experimental-subnlogn"]
+
 [lints.clippy]
 # Index-heavy polynomial and matrix code reads more directly with explicit indices, and the
 # isogeny formulas take many curve parameters; the repository's other crates allow the same.

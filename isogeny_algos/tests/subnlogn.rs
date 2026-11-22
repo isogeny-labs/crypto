@@ -9,7 +9,8 @@ use isogeny_algos::fpm::FpM;
 use isogeny_algos::gf2n::GF2n;
 use isogeny_algos::poly;
 use isogeny_algos::subnlogn::{
-    multiply_exact, Algorithm, Config, Error, ExperimentalField, MAX_INPUT_LIMBS,
+    multiply_exact, multiply_published, Algorithm, Config, Error, ExperimentalField, IntegerRoute,
+    PublishedExecution, MAX_INPUT_LIMBS,
 };
 use std::rc::Rc;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -113,10 +114,13 @@ fn exact_integer_zero_padding_and_endianness_are_explicit() {
 #[test]
 fn strict_integer_modes_and_resource_limits_do_not_silently_fall_back() {
     for (a, b) in [(&[][..], &[][..]), (&[1][..], &[1][..])] {
+        let product = multiply_exact(a, b, Algorithm::PublishedSubNlogN, 64).unwrap();
+        assert_eq!(product.limbs, word_product(a, b));
         assert!(matches!(
-            multiply_exact(a, b, Algorithm::PublishedSubNlogN, 64),
-            Err(Error::FullAlgorithmUnavailable)
+            product.route,
+            IntegerRoute::PublishedBaseCase { .. }
         ));
+        assert_eq!(product.transform_points, 0);
     }
     let too_long = vec![0; MAX_INPUT_LIMBS + 1];
     // The input cap applies before normalization and also when the product is zero.
@@ -128,6 +132,43 @@ fn strict_integer_modes_and_resource_limits_do_not_silently_fall_back() {
     }
     assert!(multiply_exact(&[u64::MAX], &[u64::MAX], Algorithm::SyntheticReference, 16).is_ok());
     assert!(multiply_exact(&[u64::MAX], &[u64::MAX], Algorithm::SyntheticReference, 15).is_err());
+}
+
+#[test]
+fn published_selection_reports_base_case_and_actual_prerequisite_work() {
+    // Exceed the independent reference cap and enter the real Fermat recursion.
+    let a = vec![u64::MAX; MAX_INPUT_LIMBS + 1];
+    let b: Vec<_> = (0..65)
+        .map(|i| (i as u64).wrapping_mul(0xfedcba987654321))
+        .collect();
+    let product = multiply_published(&a, &b).unwrap();
+    assert_eq!(product.limbs, word_product(&a, &b));
+    match product.execution {
+        PublishedExecution::BaseCase {
+            reason,
+            prerequisite,
+        } => {
+            assert!(matches!(
+                reason,
+                isogeny_algos::subnlogn::parameters::BaseCaseReason::DimensionBelowTwo {
+                    dimension: 1
+                }
+            ));
+            assert!(prerequisite.transform_nodes > 0);
+            assert!(prerequisite.schoolbook_leaves > 0);
+        }
+        PublishedExecution::Transform { .. } => {
+            panic!("native input did not enter the literal family")
+        }
+    }
+    let padded = multiply_published(&[7, 0, 0], &[11, 0]).unwrap();
+    assert_eq!(padded.limbs, [77]);
+    let zero = multiply_published(&[], &[1]).unwrap();
+    assert!(zero.limbs.is_empty());
+    assert!(matches!(
+        zero.execution,
+        PublishedExecution::BaseCase { .. }
+    ));
 }
 
 #[test]

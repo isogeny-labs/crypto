@@ -2,15 +2,40 @@
 use isogeny_algos::field::{Field, Zp};
 use isogeny_algos::poly;
 use isogeny_algos::subnlogn::motif::{BitMotif, PublishedAudit};
-use isogeny_algos::subnlogn::{multiply_exact, Algorithm, Config, ExperimentalField};
+use isogeny_algos::subnlogn::{
+    multiply_exact, multiply_published, Algorithm, Config, ExperimentalField, PublishedExecution,
+};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     if std::env::args().skip(1).any(|arg| arg == "--full") {
-        // A request for the complete algorithm must fail explicitly.
-        multiply_exact(&[3], &[7], Algorithm::PublishedSubNlogN, 128)?;
-        unreachable!("the complete published algorithm is unavailable");
+        return published_demonstration();
     }
     demonstration()
+}
+
+fn published_demonstration() -> Result<(), Box<dyn std::error::Error>> {
+    let product = multiply_published(&[u64::MAX; 2], &[u64::MAX; 2])?;
+    assert_eq!(product.limbs, [1, 0, u64::MAX - 1, u64::MAX]);
+    match product.execution {
+        PublishedExecution::BaseCase {
+            reason,
+            prerequisite,
+        } => println!(
+            concat!(
+                "{{\"scope\":\"literal_published_parameter_dispatch\",",
+                "\"route\":\"base_case\",\"reason\":\"{:?}\",",
+                "\"rank_saving_transform_executed\":false,",
+                "\"native_asymptotic_bound_verified\":false,",
+                "\"prerequisite_transform_nodes\":{},\"schoolbook_leaves\":{},",
+                "\"integer_matches_known_answer\":true}}"
+            ),
+            reason, prerequisite.transform_nodes, prerequisite.schoolbook_leaves,
+        ),
+        PublishedExecution::Transform { .. } => {
+            return Err("unexpected asymptotic-family selection for native fixture".into());
+        }
+    }
+    Ok(())
 }
 
 fn demonstration() -> Result<(), Box<dyn std::error::Error>> {
@@ -97,5 +122,10 @@ mod tests {
     #[test]
     fn example_checks_candidate_products_and_auxiliary_restoration() {
         super::demonstration().unwrap();
+    }
+
+    #[test]
+    fn published_example_reports_literal_base_case() {
+        super::published_demonstration().unwrap();
     }
 }
