@@ -558,6 +558,11 @@ fn run_pipeline_inner<G: CountedGroup>(
     mut progress: Option<&mut dyn FnMut(PipelineEvent<'_, G::Elt>)>,
     matrix_factory: Option<&dyn RelationSolverFactory>,
 ) -> Result<(RunReport, FactorBase<G::Elt>), String> {
+    // Input hardening from f73b2edcc7, lost in a 2026-11-16 merge: reject a
+    // degenerate subgroup order before any work.
+    if ctx.r < 2 || ctx.cofactor.is_multiple_of(ctx.r) {
+        return Err("pipeline requires r >= 2 and a cofactor nonzero modulo r".into());
+    }
     let started = Instant::now();
 
     // ── Stage 1: the factor base ───────────────────────────────────
@@ -574,6 +579,22 @@ fn run_pipeline_inner<G: CountedGroup>(
     }
     let fb_started = Instant::now();
     let fb = base_builder.build(ctx, &spec.factor_base_params, &mut fb_ops)?;
+    // Plug-in output check from f73b2edcc7 (lost in the same merge): every
+    // index a factor-base plug-in returns must point inside its own tables.
+    if fb.points.len() != fb.col_of.len()
+        || fb.points.len() != fb.coef_of.len()
+        || fb.points.len() != fb.neg_index.len()
+        || fb.col_of.iter().any(|&column| column >= fb.columns)
+        || fb.neg_index.iter().any(|&index| index >= fb.points.len())
+        || fb
+            .point_index
+            .values()
+            .any(|&index| index >= fb.points.len())
+            .x_index
+            .flatten()
+    {
+        return Err("factor-base plug-in returned inconsistent point/column indexes".into());
+    }
     // A base without its hash index (`lean_layout`) can be read only by the
     // oracle that names base points by orbit-layout index.
     if fb.index_elided() && oracle.name() != "mitm-frobenius-layout-counted" {
@@ -581,7 +602,6 @@ fn run_pipeline_inner<G: CountedGroup>(
             "a base without its index (lean_layout) needs mitm-frobenius-layout-counted, not {}",
             oracle.name()
         ));
-    }
     let archive_import = base_builder.name() == "archive";
     if archive_import
         && matches!(oracle.name(), "mitm-frobenius" | "mitm-frobenius-counted")

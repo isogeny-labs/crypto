@@ -8267,9 +8267,10 @@ fn solve_ic_binary(
         "mitm" => Box::new(MitmOracle::new(ms)),
         // Generic over the group: one probe a target into the negation-folded
         // table of every signed m-sum of the base (as on prime curves).
+        // Restored from d87eb39548 (lost in the 2026-11-16 merges).
+        "ksum" => Box::new(KSumOracle::new(ms)),
         // Restored: present in 2476332d22 (the binary k-sum study's build) and
         // lost from main since, which made `ksum` refuse binary curves.
-        "ksum" => Box::new(KSumOracle::new(ms)),
         "wwalk" => Box::new(WWalkOracle::<FastPoint>::new()),
         // Koblitz: the same probe into a table folded by the signed
         // Frobenius as well, over a Frobenius-closed base.
