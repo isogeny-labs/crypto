@@ -1,0 +1,28 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | gen-c1 | 144/144 | 0.378 | 0.633 | 2.931 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | gen-c1-aa | 144/144 | 0.378 | 0.633 | 2.931 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | gen-c1-off | 144/144 | 0.378 | 0.633 | 2.931 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | ls | 144/144 | 0.305 | 0.399 | 1.242 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | rho-strong | 144/144 | 4.511 | 4.618 | 5.576 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | rho-v5 | 144/144 | 0.348 | 0.378 | 0.648 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs gen-c1-aa | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs gen-c1-off | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs ls | ls < gen-c1 |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs rho-strong | gen-c1 < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs rho-v5 | rho-v5 < gen-c1 |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-aa vs gen-c1-off | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-aa vs ls | ls < gen-c1-aa |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-aa vs rho-strong | gen-c1-aa < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-aa vs rho-v5 | rho-v5 < gen-c1-aa |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-off vs ls | ls < gen-c1-off |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-off vs rho-strong | gen-c1-off < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-off vs rho-v5 | rho-v5 < gen-c1-off |
+| icv1-f2m29-tm40309-30c52b96 | ls vs rho-strong | ls < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | ls vs rho-v5 | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | rho-strong vs rho-v5 | rho-v5 < rho-strong |

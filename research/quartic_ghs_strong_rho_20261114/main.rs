@@ -48,7 +48,143 @@ mod strong_rho;
 
 use common::*;
 use ghs::*;
-use strong_rho::{strong_rho, FieldCounts, NativeCounts, StrongOpts};
+use strong_rho::{
+    strong_rho, strong_rho_bare, strong_rho_uncounted, FieldCounts, NativeCounts, StrongOpts,
+};
+
+#[derive(Clone, Copy)]
+enum CountMode {
+    Counted,
+    FieldCounterFree,
+    Bare,
+}
+
+impl CountMode {
+    fn field_authoritative(self) -> bool {
+        matches!(self, Self::Counted)
+    }
+
+    fn native_authoritative(self) -> bool {
+        matches!(self, Self::Counted | Self::FieldCounterFree)
+    }
+}
+
+#[derive(Clone, Copy)]
+enum SetupMode {
+    BatchedJumps,
+    BatchedJumpsAndWalkers,
+    Legacy,
+}
+
+#[derive(Clone, Copy)]
+struct ArmMode {
+    width: usize,
+    count_mode: CountMode,
+    setup_mode: SetupMode,
+    use_mul5: bool,
+}
+
+fn parse_strong_arm(arm: &str) -> ArmMode {
+    let (rest, count_mode) = if let Some(rest) = arm.strip_prefix("strong-b") {
+        (rest, CountMode::Counted)
+    } else if let Some(rest) = arm.strip_prefix("fast-b") {
+        (rest, CountMode::FieldCounterFree)
+    } else if let Some(rest) = arm.strip_prefix("bare-b") {
+        (rest, CountMode::Bare)
+    } else {
+        panic!("unknown arm {arm}")
+    };
+    let (width_text, setup_mode, use_mul5) = if let Some(width) = rest.strip_suffix("-legacy-setup")
+    {
+        (width, SetupMode::Legacy, false)
+    } else if let Some(width) = rest.strip_suffix("-mul5-walker-table") {
+        (width, SetupMode::BatchedJumpsAndWalkers, true)
+    } else if let Some(width) = rest.strip_suffix("-mul6-walker-table") {
+        (width, SetupMode::BatchedJumpsAndWalkers, false)
+    } else if let Some(width) = rest.strip_suffix("-walker-table") {
+        (width, SetupMode::BatchedJumpsAndWalkers, false)
+    } else if let Some(width) = rest.strip_suffix("-mul5") {
+        (width, SetupMode::BatchedJumps, true)
+    } else if let Some(width) = rest.strip_suffix("-mul6") {
+        (width, SetupMode::BatchedJumps, false)
+    } else {
+        (rest, SetupMode::BatchedJumps, false)
+    };
+    let width: usize = width_text
+        .parse()
+        .unwrap_or_else(|_| panic!("invalid batch width in arm {arm}"));
+    assert!(width > 0, "batch width must be positive in arm {arm}");
+    ArmMode {
+        width,
+        count_mode,
+        setup_mode,
+        use_mul5,
+    }
+}
+
+fn selftest_arm_parser() {
+    let counted = parse_strong_arm("strong-b8");
+    assert_eq!(counted.width, 8);
+    assert!(matches!(counted.count_mode, CountMode::Counted));
+    assert!(matches!(counted.setup_mode, SetupMode::BatchedJumps));
+    assert!(!counted.use_mul5);
+    assert!(counted.count_mode.field_authoritative());
+    assert!(counted.count_mode.native_authoritative());
+
+    let field_counter_free = parse_strong_arm("fast-b8");
+    assert_eq!(field_counter_free.width, 8);
+    assert!(matches!(
+        field_counter_free.count_mode,
+        CountMode::FieldCounterFree
+    ));
+    assert!(matches!(
+        field_counter_free.setup_mode,
+        SetupMode::BatchedJumps
+    ));
+    assert!(!field_counter_free.use_mul5);
+    assert!(!field_counter_free.count_mode.field_authoritative());
+    assert!(field_counter_free.count_mode.native_authoritative());
+
+    let plain = parse_strong_arm("bare-b8");
+    assert_eq!(plain.width, 8);
+    assert!(matches!(plain.count_mode, CountMode::Bare));
+    assert!(matches!(plain.setup_mode, SetupMode::BatchedJumps));
+    assert!(!plain.use_mul5);
+    assert!(!plain.count_mode.field_authoritative());
+    assert!(!plain.count_mode.native_authoritative());
+
+    let combined = parse_strong_arm("bare-b16-mul5-walker-table");
+    assert_eq!(combined.width, 16);
+    assert!(matches!(combined.count_mode, CountMode::Bare));
+    assert!(matches!(
+        combined.setup_mode,
+        SetupMode::BatchedJumpsAndWalkers
+    ));
+    assert!(combined.use_mul5);
+
+    let explicit_control = parse_strong_arm("strong-b8-mul6");
+    assert_eq!(explicit_control.width, 8);
+    assert!(matches!(
+        explicit_control.setup_mode,
+        SetupMode::BatchedJumps
+    ));
+    assert!(!explicit_control.use_mul5);
+
+    let explicit_control_table = parse_strong_arm("strong-b8-mul6-walker-table");
+    assert_eq!(explicit_control_table.width, 8);
+    assert!(matches!(
+        explicit_control_table.setup_mode,
+        SetupMode::BatchedJumpsAndWalkers
+    ));
+    assert!(!explicit_control_table.use_mul5);
+
+    let legacy = parse_strong_arm("bare-b4-legacy-setup");
+    assert_eq!(legacy.width, 4);
+    assert!(matches!(legacy.count_mode, CountMode::Bare));
+    assert!(matches!(legacy.setup_mode, SetupMode::Legacy));
+    assert!(!legacy.use_mul5);
+    eprintln!("selftest: bare arm parser and authority split match schema");
+}
 
 fn median(v: &mut [f64]) -> f64 {
     v.sort_by(|a, b| a.partial_cmp(b).unwrap());
@@ -111,8 +247,8 @@ fn target_stream(inst: &Inst, seed: u64) -> (u64, Rng) {
 
 fn flat_field(prefix: &str, c: FieldCounts) -> String {
     format!(
-        "\"{p}.fq_mul\":{},\"{p}.fq_inv\":{},\"{p}.fq_add\":{},\"{p}.f3_mul\":{},\"{p}.f3_sq\":{},\"{p}.f3_inv\":{},\"{p}.batch_inv\":{},\"{p}.group_add\":{}",
-        c.fq_mul, c.fq_inv, c.fq_add, c.f3_mul, c.f3_sq, c.f3_inv, c.batch_inv, c.group_add,
+        "\"{p}.fq_mul\":{},\"{p}.fq_inv\":{},\"{p}.fq_add\":{},\"{p}.fq_small_div\":{},\"{p}.f3_mul\":{},\"{p}.f3_sq\":{},\"{p}.f3_inv\":{},\"{p}.batch_inv\":{},\"{p}.group_add\":{}",
+        c.fq_mul, c.fq_inv, c.fq_add, c.fq_small_div, c.f3_mul, c.f3_sq, c.f3_inv, c.batch_inv, c.group_add,
         p = prefix,
     )
 }
@@ -190,21 +326,36 @@ fn run(q: u64, seed: u64, i0: usize, i1: usize, target_policy: &str, arms: &str)
                 );
                 continue;
             }
-            let width: usize = arm
-                .strip_prefix("strong-b")
-                .unwrap_or_else(|| panic!("unknown arm {arm}"))
-                .parse()
-                .expect("batch width");
-            let out = strong_rho(
-                &inst,
-                k,
-                seed * 1000 + i as u64,
-                StrongOpts::for_instance(&inst, width),
-            );
+            let mode = parse_strong_arm(arm);
+            let field_count_authoritative = mode.count_mode.field_authoritative();
+            let native_count_authoritative = mode.count_mode.native_authoritative();
+            let count_authoritative = field_count_authoritative && native_count_authoritative;
+            let mut opts = StrongOpts::for_instance(&inst, mode.width);
+            opts.batch_setup = !matches!(mode.setup_mode, SetupMode::Legacy);
+            opts.reuse_setup_table_for_walkers =
+                matches!(mode.setup_mode, SetupMode::BatchedJumpsAndWalkers);
+            opts.use_mul5 = mode.use_mul5;
+            let effective_mul5 = mode.use_mul5 && inst.q % 2 != 0 && inst.q % 3 != 0;
+            let out = match mode.count_mode {
+                CountMode::Counted => strong_rho(&inst, k, seed * 1000 + i as u64, opts),
+                CountMode::FieldCounterFree => {
+                    strong_rho_uncounted(&inst, k, seed * 1000 + i as u64, opts)
+                }
+                CountMode::Bare => strong_rho_bare(&inst, k, seed * 1000 + i as u64, opts),
+            };
             println!(
-                "{{\"rec\":\"rho\",\"arm\":\"{}\",\"batch\":{},\"q\":{},\"seed\":{},\"i\":{},\"target_kind\":\"{}\",\"ell\":{},\"k\":{},\"k_found\":{},\"ok\":{},\"steps\":{},\"dps\":{},\"restarts\":{},\"lookahead\":{},\"cycles\":{},\"cycle_adds\":{},\"wall_s\":{:.9},{},{},{},{},{}}}",
+                "{{\"rec\":\"rho\",\"arm\":\"{}\",\"batch\":{},\"setup_mode\":\"{}\",\"field_kernel\":\"{}\",\"count_authoritative\":{},\"field_count_authoritative\":{},\"native_count_authoritative\":{},\"q\":{},\"seed\":{},\"i\":{},\"target_kind\":\"{}\",\"ell\":{},\"k\":{},\"k_found\":{},\"ok\":{},\"steps\":{},\"dps\":{},\"restarts\":{},\"lookahead\":{},\"cycles\":{},\"cycle_adds\":{},\"setup.reciprocal_div\":{},\"wall_s\":{:.9},{},{},{},{},{}}}",
                 arm,
-                width,
+                mode.width,
+                match mode.setup_mode {
+                    SetupMode::Legacy => "legacy",
+                    SetupMode::BatchedJumps => "batched-window2-jumps",
+                    SetupMode::BatchedJumpsAndWalkers => "batched-window2-jumps-walkers",
+                },
+                if effective_mul5 { "evaluation5" } else { "karatsuba6" },
+                count_authoritative,
+                field_count_authoritative,
+                native_count_authoritative,
                 q,
                 seed,
                 i,
@@ -219,6 +370,7 @@ fn run(q: u64, seed: u64, i0: usize, i1: usize, target_policy: &str, arms: &str)
                 out.lookahead,
                 out.cycles,
                 out.cycle_adds,
+                out.setup_reciprocal_div,
                 out.wall_s,
                 flat_field("setup", out.setup_field),
                 flat_field("walk", out.walk_field),
@@ -232,7 +384,7 @@ fn run(q: u64, seed: u64, i0: usize, i1: usize, target_policy: &str, arms: &str)
 
 fn usage() -> ! {
     eprintln!(
-        "usage: ghs_strong_rho selftest | run <q> <seed> <i0> <i1> <ic-repeat|sequence> <old-neg,strong-b1,...>"
+        "usage: ghs_strong_rho selftest | run <q> <seed> <i0> <i1> <ic-repeat|sequence> <old-neg,strong-b1,strong-b1-mul6,fast-b1,bare-b1,strong-b1-mul5,strong-b1-mul5-walker-table,strong-b1-mul6-walker-table,fast-b1-mul5-walker-table,bare-b1-mul5-walker-table,strong-b1-legacy-setup,fast-b1-legacy-setup,bare-b1-legacy-setup,...>"
     );
     std::process::exit(2)
 }
@@ -240,6 +392,7 @@ fn usage() -> ! {
 fn main() {
     let args: Vec<_> = std::env::args().collect();
     if args.len() == 2 && args[1] == "selftest" {
+        selftest_arm_parser();
         strong_rho::selftest();
         return;
     }

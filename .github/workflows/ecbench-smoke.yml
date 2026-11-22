@@ -89,6 +89,7 @@ jobs:
             /tools/volcano-cli/
             /isogeny_algos/
             /docs/ecbench/
+            /research/ecbench_phased_panel_20261117/panel.json
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
       - name: Materialize compile-time inputs without unrelated archives
@@ -107,6 +108,8 @@ jobs:
           for s in "${specs[@]}"; do
             ./target/release/ecbench plan --spec "$s" --json > /dev/null || { echo "::error file=$s::spec does not validate"; exit 1; }
           done
+          ./target/release/ecbench plan \
+            --spec docs/ecbench/specs/panel-phase1-k0-23.json --json > /dev/null
           echo "${#specs[@]} smoke/claim specs validate" >> "$GITHUB_STEP_SUMMARY"
       - name: Host report
         run: ./target/release/ecbench host | tee -a "$GITHUB_STEP_SUMMARY"

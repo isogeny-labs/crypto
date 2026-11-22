@@ -1,0 +1,299 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "EXT-IC-GRAPH-FRESH-SCALING-20261118",
+  "version": 1,
+  "created": "2026-11-18",
+  "repository": "crypto",
+  "study_dir": "research/extension_ic_graph_20261115/leads-20261118/fresh-scaling",
+  "authors": ["Claude Opus 5.5 (lane fresh-scaling, draft; not frozen, not dispatched)"],
+  "status_note": "DRAFT. Not frozen: freeze.status is draft, the analysis program and the IC/rho worker build are not pinned, no nonce exists, and no paid compute is authorized. Every number in this file is [pcc:unverified].",
+  "links": {
+    "lane_readme": "research/extension_ic_graph_20261115/README.md",
+    "e2e_template": "research/extension_ic_graph_20261115/nagao-e2e/PLAN.md",
+    "e2e_worker": "research/extension_ic_graph_20261115/nagao-e2e/native/worker.rs",
+    "runtime_sources": [
+      "research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/*.time.txt",
+      "research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-*.raw.json",
+      "research/extension_ic_graph_20261115/nagao-e2e/results/summary.json"
+    ],
+    "descent_breakdown": "research/extension_ic_graph_20261115/leads-20261118/descent-finder/README.md",
+    "capacity_guard": "research/extension_ic_graph_20261115/AMENDMENT_16_CAPACITY_VALIDATION.md",
+    "target_generator": "research/extension_ic_graph_20261115/leads-20261118/fresh-scaling/gen/src/main.rs",
+    "runtime_estimate": "research/extension_ic_graph_20261115/leads-20261118/fresh-scaling/estimate.csv",
+    "success_criteria": "docs/ic/SUCCESS_CRITERIA.md",
+    "validation_gate": "docs/VALIDATION_GATE.md"
+  },
+  "question": "Along the restricted weak-cover family E_alpha: y^2 = x(x - alpha)(x - sigma alpha) over F_{p^6} (alpha in F_{p^6} \\ F_{p^2}, #E = 4l, l prime), how does the cold complete cost of the frozen quadratic-remainder graph index calculus grow with l, compared with the cheapest registered Pollard rho on the same fresh public targets, over six growing sizes p = 127, 223, 383, 661, 1153, 2017 (b = log2 l from about 39.9 to 63.9)? Report per-size ratios as the distance remaining and fitted exponents with intervals; no tier claim is licensed by this draft.",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Per size, the ratio sum C_IC / sum C_rho_ref over the n admitted fresh public targets, with its 95% paired bootstrap interval, on metric M2 (complete-process CPU seconds) and, only if gate G-cov passes, on M1 (complete counted GAE at the section 5a band).",
+      "class": "comparative",
+      "decided_by": ["CMP-ratio-127", "CMP-ratio-223", "CMP-ratio-383", "CMP-ratio-661", "CMP-ratio-1153", "CMP-ratio-2017"],
+      "if_supported": "A per-size distance-remaining table for this family and implementation, read only in the metric it was measured in.",
+      "if_not_supported": "An interval containing 1 is reported as unresolved at that size; no ranking is written."
+    },
+    {
+      "id": "C2",
+      "text": "The fitted exponent alpha_IC of ln C_IC against ln l (and against ln p^6), with its 95% stratified bootstrap interval, and the paired difference alpha_IC - alpha_rho_ref.",
+      "class": "comparative",
+      "decided_by": ["CMP-slope"],
+      "if_supported": "An exponent estimate on the declared path; T2 still requires the held-out size and complete counts that this draft cannot provide (see distance_remaining).",
+      "if_not_supported": "An interval for alpha_IC - alpha_rho containing 0 is reported as no exponent difference resolved on this path."
+    },
+    {
+      "id": "C3",
+      "text": "Descent residual counts R per run follow a negative-binomial draw with 2 required successes; the pooled acceptance rate pi_hat = sum(A) / sum(R) per size and the descent-normalised expected IC cost E[C_IC] = mean(C_nd) + (2 / pi_hat) * mean(c_res).",
+      "class": "heuristic_estimate",
+      "decided_by": ["CMP-descent-normalised"],
+      "if_supported": "A model-based secondary reading that separates acceptance rate from per-residual cost; never substituted for the measured C1/C2 numbers.",
+      "if_not_supported": "If accepted descents per run are not 2, or pi_hat differs across sizes by more than its interval, the normalisation is withdrawn and only measured costs are reported."
+    },
+    {
+      "id": "C4",
+      "text": "Rho's fitted exponent in l is 1/2 within [0.47, 0.53] (positive control for the fit), and rho-plain-b16 versus rho-neg-b16 shows no exponent difference (negative control for the slope detector).",
+      "class": "comparative",
+      "decided_by": ["CTL-rho-slope", "CTL-rho-slope-difference"],
+      "if_supported": "The fit can see a known exponent and does not invent a difference between two arms of equal exponent.",
+      "if_not_supported": "The fit or instrument is invalid; C2 is not reported."
+    },
+    {
+      "id": "C5",
+      "text": "No T1, T2 or T3 tier, no leaderboard row, no general rho-parity statement and no statement for sizes outside 127 <= p <= 2017.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H-scaling",
+      "statement": "The graph IC's cold cost grows with a smaller exponent in l than rho's 1/2 on this family, because its collection and linear algebra scale with the factor base (about p, so l^{1/6} per element) while its descent costs a near-constant number of F_p operations per residual; at the small sizes the descent's fixed cost flattens the measured slope.",
+      "mechanism": "Joux-Vitse cover-and-decomposition over F_{p^6}: genus-3 cover over F_{p^2}, factor base indexed by F_p (about p/2 classes), Nagao decomposition of 6 points with an F_p-rational sextic, one success in about 720 attempts heuristically; observed 2 accepted in 1506, 1728 and 3415 residuals at p1009 [pcc:unverified].",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "M2_cpu_seconds",
+          "direction": "lower",
+          "minimum_effect": "alpha_IC - alpha_rho_ref < 0 with the Holm-adjusted one-sided 95% interval wholly below 0; the local slope of the IC between the two largest sizes is reported beside the global fit.",
+          "provenance": {
+            "written_at": "2026-11-18",
+            "first_recorded_in": "research/extension_ic_graph_20261115/leads-20261118/fresh-scaling/protocol.draft.json",
+            "data_seen": [
+              {"path": "research/extension_ic_graph_20261115/nagao-e2e/results/summary.json", "measured": "p1009 fixed known-answer instance: IC median 20.71 s, rho plain b16 median 111.40 s"},
+              {"path": "research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/", "measured": "p1009 one fixture: IC 15.1-31.5 s, rho 36.9-119.8 s per config"}
+            ],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "fresh public targets at six sizes; no size other than p1009 has any recorded IC run on this pipeline"
+          }
+        },
+        {
+          "id": "P2",
+          "metric": "M2_cpu_seconds",
+          "direction": "higher",
+          "minimum_effect": "At p127 and p223 the IC ratio to rho_ref exceeds 1 (rho costs under a second there; IC's descent alone is several seconds). Stated so that a fixed-cost-dominated small-size regime is expected, not a failure.",
+          "provenance": {
+            "written_at": "2026-11-18",
+            "first_recorded_in": "research/extension_ic_graph_20261115/leads-20261118/fresh-scaling/estimate.csv",
+            "data_seen": [{"path": "research/extension_ic_graph_20261115/leads-20261118/fresh-scaling/estimate.csv", "measured": "model only"}],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "p127, p223"
+          }
+        }
+      ]
+    }
+  ],
+  "family": {
+    "rule": "jv_cover.rs weak family over F_{q^3}, q = p^2: alpha uniform in F_{p^6} \\ F_{p^2} from the target stream; accept when Cover admits alpha (N, F in F_q[x]), j(E) is in neither F_{p^2} nor F_{p^3}, #E = 4l with l prime < 2^64 (BSGS in the library's Hasse window, two extra points killed), and no embedding degree k <= 1000; then the frozen pipeline's own public validation (spec_from_curve: transfer of G and Q to Jac_H non-degenerate) in the admission pass.",
+    "path": "p doubles about every 1.74x: p in {127, 223, 383, 661, 1153, 2017}; m = 6 fixed (n = 3 over F_{p^2}); cofactor h = 4 fixed; genus-3 cover fixed; factor base = F_p (about p points); Nagao ng = 6; method parameters exactly as the nagao-e2e frozen baseline (full factor base, 1024-B collection batches, full p^2 B cap, 65536 source cap, 8192 descent residual cap, 32 accepted cap, degree 24, staircase 64).",
+    "sizes": [
+      {"p": 127, "b_approx": 39.93, "field_bits": 41.93},
+      {"p": 223, "b_approx": 44.81, "field_bits": 46.81},
+      {"p": 383, "b_approx": 49.49, "field_bits": 51.49},
+      {"p": 661, "b_approx": 54.21, "field_bits": 56.21},
+      {"p": 1153, "b_approx": 59.03, "field_bits": 61.03},
+      {"p": 2017, "b_approx": 63.87, "field_bits": 65.87}
+    ],
+    "bounds_tier": "medium (field bits 41.9 to 65.9, all within 32 < bits <= 96)",
+    "size_bands": "B1 (32 <= b < 64) at every size; p2017 sits at b = 63.87, just inside B1.",
+    "density_disclosure": "Dry run (nonce DRYRUN-NOT-A-BEACON-20261118, 3 targets per size): admissible alpha per attempt 3/46, 3/113, 3/146, 3/221, 3/277, 3/125 for p = 127 ... 2017; all rejections were #E not 4 * prime. Descriptive only.",
+    "weakness_disclosure": "Weak by construction: GHS/cover-weak (genus-3 cover over F_{p^2}); the family is a known weak subfamily (SUCCESS_CRITERIA section 5 item 5) and results are for this subfamily only. Not anomalous (l != p). Embedding degree > 1000 checked per target. j outside proper subfields, so the only automorphism is negation (gamma = 2) and no Frobenius fold applies to rho.",
+    "upper_limit": "l must stay below 2^64 for the frozen library (u64 scalars); p <= 2039. This blocks the T2 held-out size (8 bits above the largest fitted size)."
+  },
+  "targets": {
+    "kind": "public (Q hashed to the curve and multiplied by the cofactor 4; nobody knows log_G Q); planted only for controls",
+    "generator": {
+      "path": "research/extension_ic_graph_20261115/leads-20261118/fresh-scaling/gen",
+      "binary_sha256": null,
+      "source_sha256": null,
+      "note": "Pin both at freeze. Zero-dependency Rust; tested against the committed p101 (stage32) and p1009 (nagao-e2e) public inputs, which lie on the curve only in the library's exact tower basis."
+    },
+    "nonce_scheme": {
+      "pilot_nonce": "fresh-scaling-gen pilot-nonce --protocol-sha256 H (H = freeze.protocol_sha256). Planted pilot and positive-control targets only.",
+      "measured_nonce": "fresh-scaling-gen nonce --protocol-sha256 H --commit C --drand-round R --drand-randomness X, where C is the commit id of the first commit on main that contains COMMITMENT.json (protocol hash, generator source and binary hashes, sizes, n, worker build manifest), R is the first drand mainnet round (default chain, chain hash 8990e7a9aaed2ffed73dbd7092123d6f289930540d7651336225dc172e51b2ce, 30 s period) whose time is at least the committer timestamp of C plus 3600 s, and X is that round's published randomness. Both the round and C are recorded; anyone recomputes the nonce. Neither the protocol author nor the runner can predict X when C is made.",
+      "derivation": "Each target is generate(nonce, p, index, kind) with SHA-256 counter streams keyed by 'fresh-scaling/v1|family=jv-weak-cover-fp6|nonce=..|p=..|index=..|kind=..|role=curve|generator|target'. Each target has its own fresh curve.",
+      "admission_and_replacement": "Indices 0, 1, 2, ... per size in increasing order; a target is admitted when the generator accepts it and the frozen worker's public validation (no solve, no answer) accepts its transfer. The measured set is the first n admitted indices. Every refused index is listed with its reason. No other exclusion.",
+      "worker_seeds": "fresh-scaling-gen seed --nonce N --p P --index I --role ROLE with ROLE in {ic, ic-aa, rho, rho-aa}. All four rho configurations of a target share the 'rho' seed; the IC A/A arm uses 'ic-aa'."
+    }
+  },
+  "arms": [
+    {"id": "ic-graph", "role": "candidate", "description": "Frozen quadratic-remainder graph IC, six-variable Nagao finder (nagao-e2e baseline arm), complete scalar recovery from public input, fresh process."},
+    {"id": "ic-graph-aa", "role": "aa_control", "description": "Same binary and target as ic-graph with an independent worker seed; independent factor-base randomisation, collection and residual stream."},
+    {"id": "rho-plain-b16", "role": "reference_candidate", "description": "Registered native rho, plain walk, batch 16, r256, DP bits 16."},
+    {"id": "rho-plain-b1", "role": "reference_candidate", "description": "Plain walk, batch 1."},
+    {"id": "rho-neg-b16", "role": "reference_candidate", "description": "Negation walk, batch 16."},
+    {"id": "rho-neg-b1", "role": "reference_candidate", "description": "Negation walk, batch 1."},
+    {"id": "rho-aa", "role": "aa_control", "description": "rho-neg-b16 with the independent 'rho-aa' seed."},
+    {"id": "descent-probe", "role": "optional_secondary", "description": "OPTIONAL, not in the frozen source: descent-only Nagao decomposition of M = 200000 independent residuals per size to estimate pi with about 200 successes. Requires its own opt-in entry point and a separately frozen amendment before any measured data; otherwise absent."}
+  ],
+  "instrument": {
+    "repo": "crypto",
+    "worker": "nagao-e2e native worker (one executable for IC and rho, as in nagao-e2e/native/worker.rs), built from the historical library fcda1e22cb0c5424ca3244f783e69be8b99792f4 with nagao-e2e/library-overlay, or a re-pinned successor named at freeze",
+    "commit": null,
+    "binary_sha256": null,
+    "threads": "RAYON_NUM_THREADS=1",
+    "same_instrument_as": "every arm runs the same worker binary; only --method and --seed differ"
+  },
+  "controls": {
+    "aa": {"present": true, "comparison": "CTL-aa-ic and CTL-aa-rho", "not_applicable_reason": null},
+    "positive": {
+      "present": true,
+      "arm": "planted targets (kind = planted, pilot nonce, indices 0 and 1 per size) through ic-graph and rho-neg-b16, run first at each size; plus the committed p1009 known-answer bridge fixture (nagao-e2e/public.json) through every arm once per host",
+      "expected_detection": "Every planted target returns exactly the owner-held scalar in both arms with [k]G = Q replayed on E; the bridge fixture returns its recorded scalar with identical IC work signature and residual count 1506 under worker seed 401. For the fit: rho_ref's exponent in l lies in [0.47, 0.53].",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "CTL-rho-slope-difference",
+      "null_population": {"description": "Two rho configurations (plain-b16, neg-b16) with the same theoretical exponent 1/2 and different constants, on the same targets.", "matched_on": ["targets", "binary", "host", "seeds policy", "sizes"]},
+      "expected": "The 95% interval of alpha_plain - alpha_neg contains 0.",
+      "note": "The SUCCESS_CRITERIA T1 negative control (fixed n = 2 Weil restriction or a decomposition oracle on a random base) has no entry point in the frozen worker; it is listed under distance_remaining."
+    }
+  },
+  "variable_ledger": {
+    "independent": [{"name": "p", "levels": [127, 223, 383, 661, 1153, 2017]}, {"name": "arm", "levels": ["ic-graph", "ic-graph-aa", "rho-plain-b16", "rho-plain-b1", "rho-neg-b16", "rho-neg-b1", "rho-aa"]}],
+    "factors": [
+      {"name": "binary", "treatment": "fixed", "how": "one worker build, sha256 pinned at freeze and re-hashed after the run"},
+      {"name": "host", "treatment": "fixed+measured", "how": "isolab-eks L2, one instance type for the whole study, one pinned core, isolation tier recorded per row"},
+      {"name": "target", "treatment": "randomized", "how": "fresh curve and public Q per index from the measured nonce; every arm sees the same target"},
+      {"name": "seeds", "treatment": "derived", "how": "fresh-scaling-gen seed; recorded per row"},
+      {"name": "order", "treatment": "crossed", "how": "within each target the seven arms run in a cyclic Latin-square rotation indexed by target index mod 7; sizes ascending; targets in index order"},
+      {"name": "warmup", "treatment": "fixed", "how": "one discarded warmup per arm per host on the bridge fixture"},
+      {"name": "spot_preemption", "treatment": "measured", "how": "a preempted row restarts from scratch; its clock is invalid, it is counted as an attempt, and the restart is a new row"},
+      {"name": "analyst", "treatment": "masked", "how": "arm labels replaced by hashed tokens in the analysis input until the analysis program has run; key hash in the export"}
+    ],
+    "comparisons": [
+      {"id": "CMP-ratio-<p>", "design": "paired_by_target", "arms": ["ic-graph", "rho_ref"]},
+      {"id": "CMP-slope", "design": "paired_by_target_stratified_by_size", "arms": ["ic-graph", "rho_ref"]},
+      {"id": "CMP-descent-normalised", "design": "model", "arms": ["ic-graph"]},
+      {"id": "CTL-aa-ic", "design": "aa", "arms": ["ic-graph", "ic-graph-aa"]},
+      {"id": "CTL-aa-rho", "design": "aa", "arms": ["rho-neg-b16", "rho-aa"]},
+      {"id": "CTL-rho-slope", "design": "absolute", "arms": ["rho_ref"]},
+      {"id": "CTL-rho-slope-difference", "design": "one_factor", "arms": ["rho-plain-b16", "rho-neg-b16"]}
+    ]
+  },
+  "randomization": {
+    "arm_order": "latin_square_rotation",
+    "seed_derivation": {"method": "nonce_after_freeze", "nonce": null, "note": "measured nonce from protocol hash, commit and a later drand round"},
+    "instance_sampling": {"rule": "first n admitted indices per size", "independent_of_arm": true},
+    "blinding": {"analysis_labels_masked": true}
+  },
+  "sample_size": {
+    "targets_per_size": 32,
+    "planted_controls_per_size": 2,
+    "bridge_runs_per_arm": 1,
+    "justification": "SUCCESS_CRITERIA T1 item 1 requires at least 32 targets below b = 64. Noise model: rho cost per run is Rayleigh-like (CV about 0.52); IC cost CV is f_d * sqrt((1 - pi)/2) ~ 0.707 f_d from the negative-binomial descent (f_d = descent share, about 0.37 at p1009 and near 1 at p127), plus a small collection term. With n = 32, the per-size ratio interval half-width is about 1.96 * sqrt(CV_ic^2 + CV_rho^2) / sqrt(32): about +-30% at p127 and +-20% at p2017 (log scale). The exponent SE from 6 sizes is about 0.12 / (5.7 * sqrt(6)) ~ 0.009, so statistical width is small next to model misfit (fixed descent cost, polylog factors); curvature is therefore reported, not hidden.",
+    "descent_f4_accounting": "Critic F4: with 2 successes per run, the pooled pi_hat per size rests on 2n = 64 successes (relative SE about 12.5%), the same information as averaging measured costs. Descent normalisation therefore separates rate from per-residual cost but does not shrink the variance; only more successes do (more targets, or the optional descent-probe arm). Any IC-versus-IC comparison is paired on the worker seed so both arms consume the identical residual stream (checked by stream signature), which removes the NB term; where a candidate changes the stream, require at least 100 pooled successes per arm per size (n = 50 targets, or the probe) before reading a descent difference.",
+    "power": {"method": "bootstrap_interval_width", "alpha": 0.05, "tests_in_family": 7, "correction": "holm", "resamples": 2000, "passes": null, "note": "Width targets above; the attainable bootstrap resolution with 2000 resamples is 1/2001 per tail, below alpha/m = 0.0071."},
+    "preflight_runtime": {
+      "source": "estimate.csv (fresh-scaling-gen estimate --n 32); per-step rho seconds from Run50 Runpod CPU (plain-b16 148 ns, plain-b1 204 ns, neg-b16 167 ns, neg-b1 220 ns per step at p1009); IC model T = 13 s (p/1009)^e + 2000 residuals * 3.8 ms, e in {2, 3}",
+      "per_size_cpu_hours_all_arms": {"127": 0.15, "223": 0.19, "383": 0.40, "661": 1.4, "1153": 6.8, "2017": "35.0-35.6"},
+      "estimated_total_cpu_hours": 45,
+      "estimated_total_with_overhead_and_pilot": "about 55 CPU-hours",
+      "measured_on": "model from recorded single-walk rho timings and the p1009 IC; no run at any other size exists. Generator dry run: 0.01 to 29 s per target, under 4 CPU-minutes for 18 targets."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {"id": "M2_cpu_seconds", "unit": "s", "kind": "timed", "definition": "user + sys CPU seconds of one fresh worker process from exec to exit (public-input parse and validation, cold transfer, factor base, collection including failures, graph and linear algebra, every descent attempt, affine recovery, scalar replay on E, report write), single thread, on the L2 host; wall recorded beside it.", "aggregation": "sum over targets per size (ratio of sums)", "uncertainty": "paired bootstrap over targets, 2000 resamples, seed from SHA-256(nonce|'bootstrap')", "timed_primary_justification": "Complete counted costs are not available (gate G-cov); process CPU time is the only complete measure of all phases today. It supports distance-remaining statements in seconds on this host, not a GAE tier."}
+    ],
+    "gated_primary": [
+      {"id": "M1_gae_band", "unit": "GAE", "kind": "counted", "definition": "every phase's counted operations priced at the section 5a band (0, 0.1, 1 GAE per unpriced native operation) for both arms, rho reference cheapest per weight", "gate": "G-cov", "status": "BLOCKED: the descent linear stage (sparse FGLM, gcd with x^p - x, read-out) is outside the jv_bitops hooks, so recorded descent subtotals omit at least about 25% (descent-finder README). M1 is reported only if G-cov passes on the bridge fixture before measurement; otherwise it is reported as an unrankable lower bound with complete_cost null."}
+    ],
+    "secondary": [
+      {"id": "phase_counts", "definition": "per phase counted subtotals (transfer, base, collection, graph, linear algebra, descent hooked, descent legacy F_p multiplications including the linear stage, affine, verification)"},
+      {"id": "descent_R_A", "definition": "residuals attempted R and accepted A per IC run"},
+      {"id": "rho_steps", "definition": "rho semantic steps, distinguished points, collisions, restarts per run"},
+      {"id": "peak_rss", "definition": "peak resident memory per process (memory per size, SUCCESS_CRITERIA section 1)"}
+    ]
+  },
+  "gates": [
+    {"id": "G-cov", "rule": "On the bridge fixture, hooked descent field multiplications equal the legacy stage counters including the linear stage within 0.5%, and every phase's hooked count is nonzero where its legacy counter is nonzero. Fails today."},
+    {"id": "G-pilot", "rule": "At each size, both planted pilot targets recover through ic-graph within the per-run cap. A size failing G-pilot is dropped before the measured nonce exists (amendment filed with the pilot outcome); the study needs at least 4 surviving sizes spanning at least 16 bits, otherwise it stops as inconclusive (pipeline not applicable at small p; Amendment 16's capacity model flags p < 1009 for the older sieve collector)."},
+    {"id": "G-aa", "rule": "CTL-aa-ic and CTL-aa-rho ratio intervals contain 1 at every size; a size failing G-aa is reported but excluded from C1/C2."}
+  ],
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "latin_square_rotation",
+    "clock": "process CPU (getrusage of the child) and monotonic wall",
+    "record": ["commit, worker and generator binary sha256, rustc -Vv, container digest", "host CPU model, isolation tier, pinned core, cgroup snapshot per row", "argv, exit status, stdout/stderr, worker report JSON per row", "target public sha256, index, nonce, derived seed per row"]
+  },
+  "execution": {
+    "backend": "isolab-eks Spot L2 (AGENTS.md 9a); NOT AUTHORIZED in this lane: no dispatch, no paid compute",
+    "timeout_seconds": {"ic_per_run": "max(1800, 20x model)", "rho_per_run": "step cap 20x sqrt(pi l / 2) (probability of reaching it is negligible); hitting it is a recorded failure charged at consumed cost"},
+    "checkpoint": {"policy": "none", "after_restore": {"wall_time": "invalid", "counted_units": "invalid (row restarted from scratch)"}},
+    "retries": {"infrastructure_only": true, "max_attempts": 2}
+  },
+  "stopping_rules": [
+    {"rule": "Fixed n = 32 admitted public targets per size; no sequential adding after looking at an interval (adding targets starts a new attempt).", "kind": "fixed_n", "preregistered": true},
+    {"rule": "Sizes run in ascending order; each size completes before the next starts. Global budget 80 CPU-hours; if the remaining projected cost of the next size exceeds the budget, stop before it and report the completed sizes (at least 4 needed for C2).", "kind": "budget", "preregistered": true},
+    {"rule": "If more than 2 of 32 IC runs at a size fail or hit the cap, report the success probability and stop the larger sizes.", "kind": "invalidation", "preregistered": true},
+    {"rule": "Positive controls (planted, bridge) run first per size and per host; any miss stops that size and the instrument is invalid.", "kind": "invalidation", "preregistered": true}
+  ],
+  "invalidation_rules": [
+    "A row from a binary, generator or nonce other than the frozen ones is inadmissible.",
+    "A recovered scalar not replayed as [k]G = Q on E is a failure, not a solve.",
+    "An IC run whose worker reads anything but public curve, G, Q, l is invalid (the generator emits no answer field; the checker refuses answer-like keys).",
+    "A preempted row's clock is invalid; the restarted row is used and the attempt is listed."
+  ],
+  "decision_rule": {
+    "text": "Per size: R_s = sum C_IC / sum C_rho_ref over the n admitted targets; rho_ref is the registered rho configuration with the smallest sum at that size (per weight for M1). Report R_s with its 95% paired bootstrap interval as the distance remaining; 'below rho at size p on M2' only if the Holm-adjusted interval lies wholly below 1, 'above' only if wholly above, else 'unresolved'. Exponent: OLS of ln(mean C) on ln(mean l) over sizes for ic-graph, rho_ref, each rho configuration and each IC phase, also on ln p^6; 95% stratified bootstrap (targets resampled within size, 2000 resamples). Read alpha_IC - alpha_rho_ref only if C4's controls pass; report local slopes between consecutive sizes and a quadratic-in-ln-l fit beside the line. Descent-normalised costs are a labelled secondary reading.",
+    "comparison_ids": ["CMP-ratio-<p>", "CMP-slope", "CMP-descent-normalised"],
+    "multiple_comparisons": "Holm over the 6 per-size ratio tests plus the slope test, per metric (family-wise 0.05); every attempt in the family is listed."
+  },
+  "analysis_plan": {
+    "script": {"path": "research/extension_ic_graph_20261115/leads-20261118/fresh-scaling/analysis (Rust, to be written and frozen; extends nagao-e2e/native/analyze.rs)", "sha256": null},
+    "inputs": ["rows.jsonl (one row per process)", "targets/*/manifest.json", "COMMITMENT.json", "drand round JSON"],
+    "outputs": ["summary.json", "export.json (experiment.export/v1)", "report.typ/report.pdf with ratio and fit graphs"],
+    "blinded": true,
+    "frozen_before_data": true,
+    "dry_run": "Required on scratch rows from the pilot before the measured nonce exists."
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": ["ln C against ln l per arm with fits and intervals", "R_s per size with intervals and the line R = 1", "descent R per run (NB) and pi_hat per size"],
+    "required_sentences": ["fixed restricted weak subfamily (cover-weak), not a general elliptic-curve statement", "M2 is process CPU time on one host, not a GAE tier", "complete counted cost null unless G-cov passed"]
+  },
+  "inadmissible": [
+    "Changing sizes, n, arms, caps, metric or rho_ref selection after the measured nonce exists",
+    "Using the DRYRUN nonce or the pilot nonce for any measured row",
+    "Dropping a target for anything but the preregistered admission rule",
+    "Reporting M1 as complete while G-cov fails, or any T1/T2/T3 tier from this protocol",
+    "Comparing against a single rho configuration chosen after seeing results"
+  ],
+  "distance_remaining": [
+    "T1 needs counted GAE with every phase priced (G-cov fails: descent linear stage unhooked) and an ecbench family plus `ecbench challenge commit` for this family (not registered).",
+    "T1 negative control (n = 2 Weil restriction or random-base decomposition oracle) has no entry point in the frozen worker.",
+    "T2 needs a held-out size at least 8 bits above the largest fitted size (b >= 72); the frozen library holds l in u64, so p <= 2039 (b < 64). A u128 or BigUint scalar path is a prerequisite.",
+    "Cross-host audit receipt, VALIDATION.json and pcc standing verified are not produced by this draft."
+  ],
+  "literature": [
+    {"ref": "Joux, Vitse, Cover and decomposition index calculus on elliptic curves made practical, EUROCRYPT 2012, sections 3.1-3.3", "provenance": "lane documents (author PDF SHA256 7ca88c54ebfcb6fac8d05d313bfe8c26d3cb133081c55c4ab6ea4c1b45729b38 recorded in nagao-e2e/PLAN.md and AMENDMENT_16)", "claim": "the family, cover and decomposition route", "verified_by": "not re-read in this lane"},
+    {"ref": "docs/ic/SUCCESS_CRITERIA.md", "provenance": "internal", "claim": "T1 n >= 32 below b = 64; T2 six sizes, 24 bits, held-out; public targets; Holm"},
+    {"ref": "research/extension_ic_graph_20261115/leads-20261118/descent-finder/README.md", "provenance": "internal", "claim": "descent ~77% F4 / ~22% linear stage; 2 accepted per run; linear stage outside hooks"}
+  ],
+  "knowledge_base": "research-kb unavailable: no MCP tool in this session; scripts/research-kb reports 'no executable found'. ecdb unavailable: ECDB_TOKEN unset, no AWS CLI, function URL returns 403. No KB source ids recorded.",
+  "amendments": [],
+  "freeze": {"status": "draft", "protocol_sha256": null, "commit": null, "frozen_at": null, "filed_before_affected_data": true}
+}

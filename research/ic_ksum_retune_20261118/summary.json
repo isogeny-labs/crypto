@@ -1,0 +1,262 @@
+{
+ "schema": "crypto.ic_ksum_retune_summary/v1",
+ "standing": "[pcc:unverified]",
+ "unit": "ecbench counted GAE, ratio of totals; w in {0, 0.1, 1} GAE per native op",
+ "binary_sha256": "808511395723f84505d4fe8edaf32e66e8d8bff34cdad57777360c5999ffe161",
+ "rule": "R1 (rule.py, w = 0.1 objective)",
+ "verdict": {
+  "rows_holding": [],
+  "rows_significantly_worse": [],
+  "rule_improves": false,
+  "all_changed_rows_hold": false
+ },
+ "unchanged_rows": [
+  "P20",
+  "P22",
+  "B15",
+  "B21",
+  "B27"
+ ],
+ "rows": {
+  "P24": {
+   "incumbent": "k5 N11",
+   "retuned": "k6 N10",
+   "holds": false,
+   "max_upper": 1.1014,
+   "weights": {
+    "0": {
+     "ratio": 1.002,
+     "ci95": [
+      0.9772,
+      1.0274
+     ],
+     "ci95_bootstrap": [
+      0.9711,
+      1.0324
+     ],
+     "per_replicate": [
+      1.0241,
+      1.0011,
+      0.9815
+     ],
+     "per_replicate_upper": [
+      1.0831,
+      1.0507,
+      1.0318
+     ],
+     "gap_incumbent": 4.517,
+     "gap_retuned": 4.526,
+     "aa": 1.0
+    },
+    "0.1": {
+     "ratio": 1.0022,
+     "ci95": [
+      0.9763,
+      1.0287
+     ],
+     "ci95_bootstrap": [
+      0.97,
+      1.034
+     ],
+     "per_replicate": [
+      1.0252,
+      1.0013,
+      0.9808
+     ],
+     "per_replicate_upper": [
+      1.087,
+      1.0531,
+      1.0333
+     ],
+     "gap_incumbent": 4.764,
+     "gap_retuned": 4.775,
+     "aa": 1.0
+    },
+    "1": {
+     "ratio": 1.0029,
+     "ci95": [
+      0.9731,
+      1.0335
+     ],
+     "ci95_bootstrap": [
+      0.9657,
+      1.0397
+     ],
+     "per_replicate": [
+      1.0296,
+      1.0019,
+      0.9781
+     ],
+     "per_replicate_upper": [
+      1.1014,
+      1.0619,
+      1.0385
+     ],
+     "gap_incumbent": 5.934,
+     "gap_retuned": 5.951,
+     "aa": 1.0
+    }
+   }
+  },
+  "B18": {
+   "incumbent": "k4 N7",
+   "retuned": "k5 N7",
+   "holds": false,
+   "max_upper": 1.0825,
+   "weights": {
+    "0": {
+     "ratio": 1.0237,
+     "ci95": [
+      1.0029,
+      1.0449
+     ],
+     "ci95_bootstrap": [
+      0.9965,
+      1.0528
+     ],
+     "per_replicate": [
+      1.0163,
+      1.0271,
+      1.0279
+     ],
+     "per_replicate_upper": [
+      1.0665,
+      1.0736,
+      1.0825
+     ],
+     "gap_incumbent": 2.897,
+     "gap_retuned": 2.966,
+     "aa": 1.0
+    },
+    "0.1": {
+     "ratio": 1.0169,
+     "ci95": [
+      0.995,
+      1.0392
+     ],
+     "ci95_bootstrap": [
+      0.9883,
+      1.0474
+     ],
+     "per_replicate": [
+      1.0094,
+      1.0203,
+      1.0212
+     ],
+     "per_replicate_upper": [
+      1.0622,
+      1.0689,
+      1.0788
+     ],
+     "gap_incumbent": 3.065,
+     "gap_retuned": 3.117,
+     "aa": 1.0
+    },
+    "1": {
+     "ratio": 0.9912,
+     "ci95": [
+      0.9654,
+      1.0176
+     ],
+     "ci95_bootstrap": [
+      0.9578,
+      1.0274
+     ],
+     "per_replicate": [
+      0.9834,
+      0.9947,
+      0.9957
+     ],
+     "per_replicate_upper": [
+      1.0462,
+      1.053,
+      1.0645
+     ],
+     "gap_incumbent": 3.92,
+     "gap_retuned": 3.886,
+     "aa": 1.0
+    }
+   }
+  },
+  "B24": {
+   "incumbent": "k5 N9",
+   "retuned": "k6 N9",
+   "holds": false,
+   "max_upper": 1.0623,
+   "weights": {
+    "0": {
+     "ratio": 0.9685,
+     "ci95": [
+      0.9424,
+      0.9954
+     ],
+     "ci95_bootstrap": [
+      0.9365,
+      1.0031
+     ],
+     "per_replicate": [
+      0.9288,
+      1.0001,
+      0.9787
+     ],
+     "per_replicate_upper": [
+      0.9874,
+      1.0623,
+      1.0377
+     ],
+     "gap_incumbent": 4.234,
+     "gap_retuned": 4.101,
+     "aa": 1.0
+    },
+    "0.1": {
+     "ratio": 0.9556,
+     "ci95": [
+      0.929,
+      0.9831
+     ],
+     "ci95_bootstrap": [
+      0.9229,
+      0.9909
+     ],
+     "per_replicate": [
+      0.9151,
+      0.988,
+      0.966
+     ],
+     "per_replicate_upper": [
+      0.975,
+      1.0519,
+      1.0265
+     ],
+     "gap_incumbent": 4.521,
+     "gap_retuned": 4.32,
+     "aa": 1.0
+    },
+    "1": {
+     "ratio": 0.9117,
+     "ci95": [
+      0.8833,
+      0.941
+     ],
+     "ci95_bootstrap": [
+      0.8766,
+      0.9494
+     ],
+     "per_replicate": [
+      0.8685,
+      0.9465,
+      0.9225
+     ],
+     "per_replicate_upper": [
+      0.9322,
+      1.0158,
+      0.9876
+     ],
+     "gap_incumbent": 5.878,
+     "gap_retuned": 5.359,
+     "aa": 1.0
+    }
+   }
+  }
+ }
+}

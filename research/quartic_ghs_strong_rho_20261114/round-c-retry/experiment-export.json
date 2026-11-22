@@ -1,0 +1,287 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "ghs-strong-rho-r3-retry-slab2-q223",
+  "created": "2026-11-18T18:04:34Z",
+  "protocol": {
+    "path": "../ROUND_C_RETRY.md",
+    "sha256": "294a0f149a30cb2e2f37a962f60bb20314b70b87c887b851e78ea0c832703581",
+    "protocol_id": "ghs-strong-rho-r3-retry-slab2",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex_api",
+    "model": null,
+    "session": "ghs_retry",
+    "role": "executor"
+  },
+  "source": {
+    "repo": "isogeny-labs/crypto",
+    "commit": "ad2a014c0022cf000845014499a9649b6c2cef2d",
+    "dirty": true
+  },
+  "backend": "local",
+  "host": {
+    "path": "metadata.txt",
+    "sha256": "60da8464372ea2ab44d94e5a199425b7c0eba0adfc87e635e8d5a38e700ee4fe",
+    "class_id": "development-xeon-8370c",
+    "summary": {
+      "cpu_model": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz",
+      "logical_cpus": 5,
+      "memory_bytes": null,
+      "kernel": "Linux 6.18.57 x86_64",
+      "hypervisor": null,
+      "isolation_tier_max": "L0"
+    }
+  },
+  "arms": [
+    {
+      "id": "strong-b8",
+      "role": "baseline",
+      "binary_sha256": "0cd185940bd826c1d7431a395dc3ed1433cf3abcc6dad9ea204e0969ad025b62",
+      "commit": null
+    },
+    {
+      "id": "strong-b8-retry2",
+      "role": "candidate",
+      "binary_sha256": "0cd185940bd826c1d7431a395dc3ed1433cf3abcc6dad9ea204e0969ad025b62",
+      "commit": null
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "q223-seed1-i0-strong-b8",
+      "arm": "strong-b8",
+      "instance_id": "q223-seed1-ell2773073",
+      "seed": 1000,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "steps": 1487,
+          "distinguished_points": 76,
+          "lookahead_retries": 53,
+          "walk_batch_inversions": 231,
+          "walk_fq_multiplications": 53825,
+          "walk_fq_inversions": 241,
+          "walk_group_additions": 1551,
+          "cold_fq_multiplications": 149558,
+          "cold_fq_inversions": 2619
+        },
+        "wall_seconds": 0.001977097,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "walk_hash": 4534,
+          "walk_canonicalisations": 1497,
+          "walk_lookahead_tests": 1549,
+          "walk_dp_tests": 1487,
+          "walk_table_ops": 153,
+          "walk_cycle_compares": 355,
+          "walk_scalar_adds": 4496,
+          "walk_scalar_muls": 1,
+          "walk_scalar_invs": 1
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "development runtime; no isolation certificate, A/A control, or checkpoint admission"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "source-bound standalone selftest and round-c-retry/validate.sh"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "q223.jsonl",
+          "sha256": "8043f25682e5b92bddfabf727431b1bd719c635f0d83d2c553dcf14451161910",
+          "bytes": 2923,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "local",
+      "backend_ref": null
+    },
+    {
+      "run_id": "q223-seed1-i0-strong-b8-retry2",
+      "arm": "strong-b8-retry2",
+      "instance_id": "q223-seed1-ell2773073",
+      "seed": 1000,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "steps": 1487,
+          "distinguished_points": 76,
+          "lookahead_retries": 53,
+          "walk_batch_inversions": 188,
+          "walk_fq_multiplications": 104206,
+          "walk_fq_inversions": 198,
+          "walk_group_additions": 2988,
+          "cold_fq_multiplications": 199939,
+          "cold_fq_inversions": 2576
+        },
+        "wall_seconds": 0.021789049,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "walk_hash": 4534,
+          "walk_canonicalisations": 1497,
+          "walk_lookahead_tests": 1549,
+          "walk_dp_tests": 1487,
+          "walk_table_ops": 153,
+          "walk_cycle_compares": 355,
+          "walk_scalar_adds": 4496,
+          "walk_scalar_muls": 1,
+          "walk_scalar_invs": 1
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "development runtime; no isolation certificate, A/A control, or checkpoint admission"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "source-bound standalone selftest and round-c-retry/validate.sh"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "q223.jsonl",
+          "sha256": "8043f25682e5b92bddfabf727431b1bd719c635f0d83d2c553dcf14451161910",
+          "bytes": 2923,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "local",
+      "backend_ref": null
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 2,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "../ROUND_C_RETRY.md",
+      "sha256": "294a0f149a30cb2e2f37a962f60bb20314b70b87c887b851e78ea0c832703581",
+      "bytes": 6148,
+      "kind": "protocol"
+    },
+    {
+      "path": "metadata.txt",
+      "sha256": "60da8464372ea2ab44d94e5a199425b7c0eba0adfc87e635e8d5a38e700ee4fe",
+      "bytes": 1272,
+      "kind": "host"
+    },
+    {
+      "path": "q223.jsonl",
+      "sha256": "8043f25682e5b92bddfabf727431b1bd719c635f0d83d2c553dcf14451161910",
+      "bytes": 2923,
+      "kind": "raw"
+    },
+    {
+      "path": "selftest.txt",
+      "sha256": "2c1970eda07d57ac791debad172698621e283ca37f73a29d0d0f059b5f4f666c",
+      "bytes": 344,
+      "kind": "log"
+    },
+    {
+      "path": "validation.txt",
+      "sha256": "91e98620c593cb8ef28f9edae0c54946ca4dc24bbcc0912e17db6c62413734ad",
+      "bytes": 27,
+      "kind": "receipt"
+    },
+    {
+      "path": "RESULTS.md",
+      "sha256": "f3a480e57df378eddab78d8b5f4dc5e1a5dbcf48ed1527749110034d09c70cd8",
+      "bytes": 5859,
+      "kind": "report"
+    },
+    {
+      "path": "counts.svg",
+      "sha256": "30c5b213d45715857c8efb2ecb9d76faba6135e74db08359f8fdd934da703acd",
+      "bytes": 4944,
+      "kind": "report"
+    },
+    {
+      "path": "report.pdf",
+      "sha256": "157095d372db69803e1da9fb1229d08f337cad453989d7dba5ce77cf2c7578ea",
+      "bytes": 45758,
+      "kind": "report"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "validate.sh",
+      "sha256": "6881da16871296590da3cca2d8f9241e8721908f9a326982040a543ab5346e98",
+      "bytes": 1540,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "validation.txt",
+        "sha256": "91e98620c593cb8ef28f9edae0c54946ca4dc24bbcc0912e17db6c62413734ad",
+        "bytes": 27,
+        "kind": "receipt"
+      },
+      {
+        "path": "RESULTS.md",
+        "sha256": "f3a480e57df378eddab78d8b5f4dc5e1a5dbcf48ed1527749110034d09c70cd8",
+        "bytes": 5859,
+        "kind": "report"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "Both arms emitted ok=true, k_found=1765657, steps=1487, lookahead=53, and identical native counters.",
+      "by": "codex"
+    },
+    {
+      "kind": "observation",
+      "text": "The baseline and candidate emitted 231 and 188 walk batch inversions, respectively, and 53825 and 104206 walk F_q multiplications.",
+      "by": "codex"
+    }
+  ],
+  "reviews_dir": "reviews"
+}
