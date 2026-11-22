@@ -45,3 +45,17 @@ The independent local C++ EC-affine reference ran five 250000-addition repetitio
 3. **P2 — complete solver:** feed genuinely blind roots into run59 quotient-rank+affine right-side recovery. Track useful rank per call, exceptions, factor-base setup and all target verifications. Compare against same-host best **existing index calculus**, optimized negated BSGS and rho; include CI artifact, seed, original Rust build SHA and raw timing vectors. No modeled query count can be promoted as a complete solver benchmark.
 
 **Outcome:** actual-group enumeration checks the run59 uniform-pair support approximation to within 0.016% in one frozen cohort and exposes the tight per-shift admission budget. Only original-Rust CI can establish production primitive cost; the intended **cheaper complete ordinary prime-field ECDLP solver is still unestablished**.
+
+## Source-specific native Rust result (2026-11-22 11:27 UTC)
+
+**PASS:** [Actions #45017313908](https://github.com/isogeny-labs/crypto/actions/runs/45017313908), job 137192304311, original Rust 1.100.0 focused release run. The job compiled and ran `prime31_run60_shift_floor.rs`, using the unchanged original `Arithmetic::add`; all five 250000-addition endpoints matched independently recomputed `Arithmetic::scalar` and counted exactly 250000 timed group additions per repetition.
+
+| Repetition | Original Rust affine shift ns |
+|---:|---:|
+| 0 | 176.460 |
+| 1 | 177.130 |
+| 2 | 176.702 |
+| 3 | 179.990 |
+| 4 | 173.960 |
+
+Median **176.702 ns per affine shift**, 4.882× the **cross-run sensitivity** of 36.195 ns. At 4,699,949 queries this shift-only term would be **830.492 ms**, before extraction, failed probes, factor-base cost or linear algebra; historical shared BSGS was 170.113 ms on a **different host/run**. This **rules out a competitive implementation that uses one of these original-Rust affine additions per modeled query at this measured speed**, not all possible projective/batched implementations. The runner is shared and was not CPU pinned; treat this as source-linked diagnostic, not a fully isolated paired solver benchmark.
