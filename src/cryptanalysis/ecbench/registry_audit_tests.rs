@@ -55,6 +55,7 @@ enum Fx {
     Gls,
     Subfield,
     Fp4,
+    Fp3,
     /// `PrimeExplicit` p = 4999, order 5006 = 2 · 2503: cofactor two, so the
     /// cofactor multiplication of a hashed public point is a real doubling.
     Cofactor2,
@@ -163,6 +164,7 @@ fn spec(fx: Fx) -> CurveSpec {
             max_cofactor_ratio: 64,
         },
         Fx::Fp4 => CurveSpec::Fp4Translation { p: 29, seed: 1 },
+        Fx::Fp3 => CurveSpec::Fp3Random { p: 67, seed: 1 },
     }
 }
 
@@ -512,6 +514,8 @@ const CASES: &[(&str, Fx, P)] = &[
         Fx::Fp4,
         &[("base", "xline"), ("large_primes", "0"), ("c4", "97")],
     ),
+    ("ic.k3_gaudry", Fx::Fp3, &[("harvester", "eliminator")]),
+    ("ic.k3_gaudry", Fx::Fp3, &[("harvester", "cycles")]),
 ];
 
 /// Ids that are not run, each with why.  Only an external backend or the

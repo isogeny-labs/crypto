@@ -35,6 +35,7 @@ use crate::cryptanalysis::ecbench::claw::{
     ClawShape,
 };
 use crate::cryptanalysis::ecbench::ext::ExtInstance;
+use crate::cryptanalysis::ecbench::fp3::{self as fp3, Fp3Group, Fp3Instance, K3Params};
 use crate::cryptanalysis::ecbench::fp4::{self as fp4, Fp4Group, Fp4Instance, K4Base, K4Params};
 use crate::cryptanalysis::ecbench::full_price;
 use crate::cryptanalysis::ecbench::generic::{
@@ -164,6 +165,34 @@ const K4_PARAMS: &[ParamDecl] = &[
         name: "trial_cap",
         default: Some("2000"),
         help: "trials per column before the run counts as exhausted",
+    },
+];
+
+const K3_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "harvester",
+        default: None,
+        help: "`eliminator` (pivot elimination of the large primes, target column protected) or `cycles` (the gain-forest cycle harvester); changes the search, so no default",
+    },
+    ParamDecl {
+        name: "max_lp",
+        default: Some("auto"),
+        help: "large primes accepted per relation; `auto` is 2 for the eliminator and 3 for the harvester (the pre-registered pairing)",
+    },
+    ParamDecl {
+        name: "lp_exponent",
+        default: Some("0.6666666666666666"),
+        help: "|F'| = ⌈|F|^lp_exponent⌉ (Gaudry's |F|^{1−1/k}, k = 3)",
+    },
+    ParamDecl {
+        name: "oracle",
+        default: Some("groebner"),
+        help: "`groebner` (the O(1) symmetrised-S₄ solve) or `mitm` (2|F| pair tests per residual)",
+    },
+    ParamDecl {
+        name: "trial_cap",
+        default: Some("400"),
+        help: "residuals per base column before the run counts as exhausted",
     },
 ];
 
@@ -727,6 +756,14 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ecbench::fp4::solve_k4",
             applies: Applies::Any,
             params: K4_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.k3_gaudry",
+            family: "ic",
+            summary: "Gaudry's k = 3 index calculus on E(F_{p³}) (fp3_random curves only): subspace base {P : x(P) ∈ F_p}, double large primes (|F'| = ⌈|F|^lp_exponent⌉) handled by `harvester=eliminator` (pivots) or `harvester=cycles` (gain-forest cycle harvester, up to 3 large primes), filtering + Wiedemann; the oracle runs for real and everything is charged in GAE (group additions + F_p multiplications ÷ the curve's measured F_p mults per addition + 9 F_p mults per multiplication mod r); only the relation-digest hashing is uncharged",
+            entry: "ecbench::fp3::solve_k3",
+            applies: Applies::Any,
+            params: K3_PARAMS,
         },
         MethodDecl {
             id: "rho.cubic",
@@ -3494,6 +3531,15 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
     {
         return Err(prime_only_refusal(id, curve));
     }
+    if id == "ic.k3_gaudry" && !matches!(inst, Instance::Fp3(_)) {
+        return Err(format!(
+            "`ic.k3_gaudry` runs on fp3_random curves only; {} is {}",
+            curve.slug, curve.family
+        ));
+    }
+    if id == "ic.k3_gaudry" {
+        k3_params(m)?;
+    }
     if id == "ic.k4_gaudry" && !matches!(inst, Instance::Fp4(_)) {
         return Err(format!(
             "`ic.k4_gaudry` runs on fp4_translation curves only; {} is {}",
@@ -4260,6 +4306,9 @@ fn solve_inner(
     if let Instance::Fp4(i) = inst {
         return solve_fp4(m, i, tx, ty, seed);
     }
+    if let Instance::Fp3(i) = inst {
+        return solve_fp3(m, i, tx, ty, seed);
+    }
     if let Instance::Hec(i) = inst {
         return hec::solve(m, i, tx, ty, seed);
     }
@@ -4296,6 +4345,12 @@ fn solve_inner(
     if m.id == "ic.k4_gaudry" {
         return Err(format!(
             "`ic.k4_gaudry` runs on fp4_translation curves only; {} is {}",
+            curve.slug, curve.family
+        ));
+    }
+    if m.id == "ic.k3_gaudry" {
+        return Err(format!(
+            "`ic.k3_gaudry` runs on fp3_random curves only; {} is {}",
             curve.slug, curve.family
         ));
     }
@@ -4684,6 +4739,7 @@ fn solve_inner(
         | (Instance::Wide(_), _)
         | (Instance::Big(_), _)
         | (Instance::Fp4(_), _)
+        | (Instance::Fp3(_), _)
         | (Instance::ThreeLeads(_), _)
         | (Instance::Ext(_), _)
         | (Instance::Genus2(_), _)
@@ -5774,6 +5830,106 @@ fn solve_endo_orbit<G: CountedGroup, E: Endomorphism<G>>(
         d.extend(c);
     }
     Ok(rep)
+}
+
+/// The checked parameters of `ic.k3_gaudry`.
+fn k3_params(m: &ResolvedMethod) -> Result<K3Params, String> {
+    use crate::cryptanalysis::gaudry_cubic::{Harvester, Solver};
+    let harvester = match m.params["harvester"].as_str() {
+        "eliminator" => Harvester::Eliminator,
+        "cycles" => Harvester::Cycles,
+        other => return Err(format!("harvester `{other}`: eliminator or cycles")),
+    };
+    let max_lp = match (m.params["max_lp"].as_str(), harvester) {
+        ("auto", Harvester::Eliminator) => 2,
+        ("auto", Harvester::Cycles) => 3,
+        (v, _) => v
+            .parse::<u8>()
+            .ok()
+            .filter(|&k| (1..=3).contains(&k))
+            .ok_or_else(|| format!("max_lp `{v}`: auto, 1, 2 or 3"))?,
+    };
+    if harvester == Harvester::Eliminator && max_lp > 2 {
+        return Err("the eliminator takes at most two large primes per relation".into());
+    }
+    let lp_exponent = param_f64(m, "lp_exponent")?;
+    if lp_exponent >= 1.0 {
+        return Err("lp_exponent must be below 1".into());
+    }
+    let solver = match m.params["oracle"].as_str() {
+        "groebner" => Solver::Groebner,
+        "mitm" => Solver::MeetInTheMiddle,
+        other => return Err(format!("oracle `{other}`: groebner or mitm")),
+    };
+    let trial_cap_per_column = param_u64(m, "trial_cap")?;
+    if trial_cap_per_column == 0 {
+        return Err("trial_cap must be positive".into());
+    }
+    Ok(K3Params {
+        harvester,
+        max_lp,
+        lp_exponent,
+        solver,
+        trial_cap_per_column,
+    })
+}
+
+/// `E(F_{p³})`: `ic.k3_gaudry`, or a generic method on [`Fp3Group`].
+fn solve_fp3(
+    m: &ResolvedMethod,
+    i: &Fp3Instance,
+    tx: u64,
+    ty: u64,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    let target = i.decode(tx, ty)?;
+    if m.id != "ic.k3_gaudry" {
+        if !(m.id.starts_with("rho.plain")
+            || m.id == "rho.negation"
+            || m.id == "rho.negation_v2"
+            || m.id.starts_with("bsgs.")
+            || m.id == "kangaroo.vow"
+            || m.id == "kangaroo.vow_v2")
+        {
+            return Err(format!("`{}` has no E(F_p³) implementation", m.id));
+        }
+        let g = Fp3Group(i.curve());
+        return solve_generic(m, &g, i.g, target, i.r, seed);
+    }
+    let prm = k3_params(m)?;
+    let t = Instant::now();
+    measurement::begin_online(Phase::RhoSolve);
+    let out = fp3::solve_k3(i, target, seed, &prm);
+    measurement::end_online();
+    let phases: Vec<PhaseRecord> = out
+        .phases
+        .iter()
+        .map(|&(name, adds, gae)| PhaseRecord {
+            name: name.into(),
+            adds,
+            gae,
+            ..Default::default()
+        })
+        .collect();
+    let total = phases.iter().map(|p| p.gae).sum();
+    Ok(SolveReport {
+        recovered: out.recovered.map(ExactScalar::from),
+        exhausted: out.exhausted,
+        phases,
+        total_gae: total,
+        automorphisms_used: 2,
+        unpriced: unpriced_of(&out.counters),
+        counters: out.counters,
+        deterministic: true,
+        nondeterminism: vec![],
+        solve_wall_ns: t.elapsed().as_nanos() as u64,
+        factor_base: None,
+        detail: out.detail,
+        online: None,
+        online_error: None,
+        solver: None,
+        field_ops: None,
+    })
 }
 
 /// `E(F_{p⁴})`: `ic.k4_gaudry`, or a generic method on [`Fp4Group`].
@@ -9132,6 +9288,9 @@ pub fn dump_factor_base(
     ) {
         return Err("no factor-base plug-in runs on E(F_p⁴); ic.k4_gaudry builds its own".into());
     }
+    if let Instance::Fp3(_) = &inst {
+        return Err("no factor-base plug-in runs on E(F_p³); ic.k3_gaudry builds its own".into());
+    }
     if let Instance::Ghs(_) = &inst {
         return Err("no factor-base plug-in runs on a ghs_fp6 curve".into());
     }
@@ -9268,6 +9427,7 @@ pub fn dump_factor_base(
         | Instance::Wide(_)
         | Instance::Big(_)
         | Instance::Fp4(_)
+        | Instance::Fp3(_)
         | Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
         | Instance::ThreeLeads(_)
@@ -11474,6 +11634,7 @@ mod accounting_rules_tests {
         // Covered elsewhere (own tests, native backends, other curve shapes).
         covered.extend([
             "ic.k4_gaudry",           // curves over F_{p^4}: ecbench::fp4 tests
+            "ic.k3_gaudry",           // curves over F_{p^3}: ecbench::fp3 tests
             "ic.cm_folded_native_v1", // native backend binary
             "ic.cm_folded_recurrence_v1",
             "ic.cm_folded_native_d43_v1",
