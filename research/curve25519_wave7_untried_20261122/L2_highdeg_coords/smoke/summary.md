@@ -18,9 +18,27 @@
 - P4_max_fibre: True
 - P4_symmetries: True
 - P4_pervar_degree: True
-- P4_total_degree: True
+- P4_total_degree: False
 - P4_verified: True
-- PC3_S3: True
+- PC3_S3: False
+- P5a_e: False
+- P5a_mismatch: [(16, 'xeye', 4, 6), (16, 'xeye', 4, 6)]
+- P5b_dense_Dref_n: True
+- P5c_x_T5_le_n-2: True
+- P5c_x_T4_le_6: True
+- M2_median_muladds: {'16/q/T4': 109387008, '16/q/T5': 8407478272, '16/x/T4': 89140567, '16/x/T5': 3959923720, '16/xeye/T4': 89781165, '16/xeye/T5': 7100994912}
+- P5d_ratios: {'16/q': 2.1231414710180325, '16/q/T4': 1.2271293719726957}
+- P5d: True
+- P6_cost_per_relation: {'16/q/T4': 37414914528.0, '16/q/T5': 841670599205.4634, '16/x/T4': 121959152417.16667, '16/x/T5': 524306674475.4839, '16/xeye/T4': 52643827391.78571, '16/xeye/T5': 647689635917.8667}
+- P6_ratios_T5: [1.6053020878429025]
+- P6: True
+- lead_positive_M2: False
+- P5e_ye_eq_x: False
+- P5f_xe_xeye_above_x: False
+- P5g_M1_full: False
+- consistency_census_vs_system: True
+- M2_rank_check: True
+- C1_terms_x: True
 
 | k | arm | t | cols | cov f | cov xm | R_col [95% CI] | R_val | pts/value | sel gain f / xm |
 |--:|:--|--:|--:|--:|--:|:--|--:|--:|:--|

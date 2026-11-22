@@ -114,10 +114,11 @@ def decide(cells, sp, mc, meta):
             p4deg.append(S is not None and S['pervar_degree'] == pv and S['kernel_dim'] == 1)
             p4tot.append(S is not None and (S['total_degree'] == 4 if f == 'x' else S['total_degree'] <= TOT_MAX[f]))
             p4ver.append(S is not None and S['verify_zeros_vanish'] == S['verify_n'] and S['random_nonvanish'] >= 0.99 * S['verify_n'])
-    V['P3_points_per_value'] = all(p3)
-    V['P4_max_fibre'] = all(p4fib); V['P4_symmetries'] = all(p4sym); V['P4_pervar_degree'] = all(p4deg)
-    V['P4_total_degree'] = all(p4tot); V['P4_verified'] = all(p4ver)
-    V['PC3_S3'] = all(F['x'].get('PC3_S3_proportional', False) for F in sp.values() if 'x' in F)
+    allne = lambda L: bool(L) and all(bool(x) for x in L)
+    V['P3_points_per_value'] = allne(p3)
+    V['P4_max_fibre'] = allne(p4fib); V['P4_symmetries'] = allne(p4sym); V['P4_pervar_degree'] = allne(p4deg)
+    V['P4_total_degree'] = allne(p4tot); V['P4_verified'] = allne(p4ver)
+    V['PC3_S3'] = allne([F['x'].get('PC3_S3_proportional', False) for F in sp.values() if 'x' in F])
     # P5 from macaulay
     if mc:
         recs = [r for r in mc if 'e' in r]
@@ -179,10 +180,11 @@ def main():
     ap.add_argument('--out', default='analysis')
     a = ap.parse_args()
     cells = census(a.data)
-    sp = json.load(open(f'{a.data}/sumpoly.json')) if os.path.exists(f'{a.data}/sumpoly.json') else {}
-    mc = json.load(open(f'{a.data}/macaulay.json')) if os.path.exists(f'{a.data}/macaulay.json') else []
+    sp = json.load(open(f'{a.data}/sumpoly.json'))
+    mc = json.load(open(f'{a.data}/macaulay.json'))
     meta = json.load(open(f'{a.data}/census_meta.json')) if os.path.exists(f'{a.data}/census_meta.json') else {}
     V = decide(cells, sp, mc, meta)
+    V = {kk: (bool(v) if isinstance(v, (bool, np.bool_)) else v) for kk, v in V.items()}
     json.dump(dict(verdicts=V, cells=cells), open(f'{a.out}/summary.json', 'w'), indent=1, default=float)
     with open(f'{a.out}/summary.md', 'w') as fh:
         fh.write('# L2 summary (mechanical; every sentence [pcc:unverified])\n\n')
