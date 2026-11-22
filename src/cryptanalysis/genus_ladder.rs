@@ -4445,7 +4445,7 @@ mod kappa_phase_split {
 /// Count identity for the Wiedemann speed study
 /// (`research/genus_ladder_wied_speed_20261122`): every counted field and the
 /// recovered `t` of 24 runs equal a reference recorded from the unmodified
-/// solver.  `WIED_GEN=<path>` writes the reference instead of checking it.
+/// solver.  `PROBE_WIED_GEN=<path>` writes the reference instead of checking it.
 #[cfg(test)]
 mod wied_speed {
     use super::*;
@@ -4526,7 +4526,7 @@ mod wied_speed {
             }
         }
         assert!(out.len() >= 20);
-        if let Ok(path) = std::env::var("WIED_GEN") {
+        if let Ok(path) = std::env::var("PROBE_WIED_GEN") {
             let s = serde_json::to_string_pretty(&Value::Object(out)).unwrap();
             std::fs::write(path, s + "\n").unwrap();
             return;
