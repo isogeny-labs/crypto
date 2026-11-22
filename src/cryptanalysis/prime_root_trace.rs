@@ -1336,6 +1336,38 @@ fn vpower_monic_remainder(mut remainder: Vec<u64>, modulus: &[u64], p: u64) -> V
     trim(remainder)
 }
 
+// A verifier-only remainder for sparse monic octics x^8 + c and
+// x^8 + x^k + c. The ordinary path examines eight modulus coefficients
+// for every high term; here only the nonzero columns are touched.
+// The operation is independent of the certificate producer and receives
+// only publicly committed polynomial coefficients.
+#[inline(never)]
+fn vpower_sparse_octic_remainder(
+    mut remainder: Vec<u64>, constant: u64, unit_middle: Option<usize>, p: u64,
+) -> Vec<u64> {
+    const DEGREE: usize = 8;
+    debug_assert!(remainder.len() > DEGREE);
+    for shift in (0..remainder.len() - DEGREE).rev() {
+        let high = remainder[shift + DEGREE];
+        if high == 0 { continue; }
+        remainder[shift + DEGREE] = 0;
+        if constant != 0 {
+            let term = if constant == 1 { high }
+                else if constant == p - 1 { p - high }
+                else { vmul(high, constant, p) };
+            let old = remainder[shift];
+            remainder[shift] = if old >= term { old - term } else { old + p - term };
+        }
+        if let Some(index) = unit_middle {
+            let old = remainder[shift + index];
+            remainder[shift + index] =
+                if old >= high { old - high } else { old + p - high };
+        }
+    }
+    remainder.truncate(DEGREE);
+    trim(remainder)
+}
+
 // For x^d +/- 1 the quotient-ring remainder needs one coefficient
 // addition/subtraction per cancelled high term, not degree modular products.
 // Keep this verifier-only fast path out of the existing generic remainder
@@ -1379,6 +1411,29 @@ fn vpower_reduce(product: Vec<u64>, modulus: &[u64], p: u64) -> Result<Vec<u64>,
         {
             return Ok(vpower_unit_binomial_remainder(
                 product, degree, modulus[0] == p - 1, p));
+        }
+        // Select the sparse degree-eight reducer only when there is no
+        // interior coefficient except an optional unit coefficient at x^k.
+        // Reject the common dense case with two indexed tests, then preserve
+        // the established general reducer for all other modulus shapes.
+        // The x^8 +/- 1 case above retains its previous optimized path.
+        if degree == 8 && modulus[1] == 0 && modulus[2] == 0 {
+            let mut unit_middle = None;
+            let mut supported = true;
+            for (index, &coefficient) in modulus[3..degree].iter().enumerate() {
+                if coefficient != 0 {
+                    if coefficient != 1 || unit_middle.is_some() {
+                        supported = false;
+                        break;
+                    }
+                    unit_middle = Some(index + 3);
+                }
+            }
+            if supported {
+                return Ok(vpower_sparse_octic_remainder(
+                    product, modulus[0], unit_middle, p,
+                ));
+            }
         }
         return Ok(vpower_monic_remainder(product, modulus, p));
     }
@@ -3914,6 +3969,61 @@ mod round110_unit_binomial_quotient {
                             trim(expected),
                             "p={p} degree={degree} constant={constant} trial={iteration}"
                         );
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod round114_sparse_octic_remainder {
+    use super::*;
+
+    #[test]
+    fn sparse_octic_matches_independent_long_division() {
+        // Exhaust edge values and randomly chosen coefficients across fields.
+        // The oracle uses u128 division, never vmul or the optimized helper.
+        let mut state = 0x726f_6f74_3131_3431u64;
+        for p in [7u64, 65_521, 1_000_000_007, MAX_PRIME] {
+            for constant in [0, 1, 2, p - 1, p - 2] {
+                for interior in [None, Some((3usize, 1u64)), Some((6, 1)),
+                                 Some((6, p - 1)), Some((6, 2))] {
+                    let degree = 8;
+                    let mut modulus = vec![0u64; degree + 1];
+                    modulus[0] = constant;
+                    if let Some((index, value)) = interior {
+                        modulus[index] = value;
+                    }
+                    modulus[degree] = 1;
+                    for iteration in 0..128 {
+                        let mut product = vec![0u64; degree + 1 + (iteration % 9)];
+                        for value in &mut product {
+                            state ^= state << 7;
+                            state ^= state >> 9;
+                            state ^= state << 8;
+                            *value = state % p;
+                        }
+                        if iteration % 13 == 0 {
+                            product.fill(p - 1);
+                        } else if iteration % 17 == 0 {
+                            let last = product.len() - 1;
+                            product[last] = 0;
+                        }
+                        let mut oracle = product.clone();
+                        for shift in (0..oracle.len() - degree).rev() {
+                            let high = oracle[shift + degree];
+                            for index in 0..degree {
+                                let term = ((high as u128 * modulus[index] as u128)
+                                        % p as u128) as u64;
+                                oracle[shift + index] = ((oracle[shift + index] as u128
+                                    + p as u128 - term as u128) % p as u128) as u64;
+                            }
+                            oracle[shift + degree] = 0;
+                        }
+                        oracle.truncate(degree);
+                        assert_eq!(vpower_reduce(product, &modulus, p).unwrap(), trim(oracle),
+                            "p={p} constant={constant} interior={interior:?} trial={iteration}");
                     }
                 }
             }
