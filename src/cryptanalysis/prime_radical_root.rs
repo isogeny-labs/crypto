@@ -353,13 +353,6 @@ impl Ring for Fq2 {
     }
     fn mul(&self, x: (u64, u64), y: (u64, u64)) -> (u64, u64) {
         let f = &self.f;
-        // The AMM root solver frequently multiplies by elements of Fp.
-        // Avoid Karatsuba's extra base-field product when the left operand
-        // lies in the embedded prime field. Keep dense arithmetic unchanged.
-        // Public-input, variable-time fast path; never use for secret data.
-        if x.1 == 0 {
-            return (f.mul(x.0, y.0), f.mul(x.0, y.1));
-        }
         let ac = f.mul(x.0, y.0);
         let bd = f.mul(x.1, y.1);
         // The first quadratic non-residue is commonly 2 or 3.
