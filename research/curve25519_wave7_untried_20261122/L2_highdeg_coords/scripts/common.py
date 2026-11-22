@@ -171,8 +171,8 @@ class Curve:
             val = u * ((u - 1) % p) % p * vinv(np.where(ok, den, 1), p) % p
         elif name == 'jac6':   # Jacobian Y^2/X^3 = y^2/x^3
             ok = x != 0
-            val = v * v % p * vinv(np.where(ok, x, 1) ** 1, p) % p
-            val = val * vinv(np.where(ok, x, 1), p) % p * vinv(np.where(ok, x, 1), p) % p
+            ix = vinv(np.where(ok, x, 1), p)
+            val = v * v % p * ix % p * ix % p * ix % p
         elif name == 'ye':     # Edwards y = Y/Z = (u-1)/(u+1)  (degree-2 control)
             ok = (u + 1) % p != 0
             val = (u - 1) % p * vinv(np.where(ok, (u + 1) % p, 1), p) % p

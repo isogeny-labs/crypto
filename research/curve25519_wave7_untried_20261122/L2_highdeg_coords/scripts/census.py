@@ -39,7 +39,7 @@ def xframe_first(XT, L, c, n, even=False, logsx=None):
 def run_cell(C, tables, arm, t, K, XT):
     n, p = C.n, C.p
     rng = np.random.default_rng(C_.dseed(C.k, arm, t))
-    rows = np.zeros((K, 9), dtype=np.int64)  # values pts cols cov J | xm_cov xm_J | xv_cols xv_cov
+    rows = np.zeros((K, 10), dtype=np.int64)  # values pts cols cov J | xm_cov xm_J | xv_cols xv_cov xv_J
     for i in range(K):
         L = int(rng.integers(p)); Lm = int(rng.integers(p)); Lv = int(rng.integers(p))
         if arm == 'rand':
@@ -62,8 +62,8 @@ def run_cell(C, tables, arm, t, K, XT):
         xm = xframe_first(XT, Lm, cols, n) if cols else np.array([], dtype=np.int64)
         xm_cov, _, xm_J = C_.coverage(xm, n)
         xv = C_.fold(XT.interval(Lv, 2 ** t), n)
-        xv_cov, xv_cols, _ = C_.coverage(xv, n)
-        rows[i] = (vals, pts, cols, cov, J, xm_cov, xm_J, xv_cols, xv_cov)
+        xv_cov, xv_cols, xv_J = C_.coverage(xv, n)
+        rows[i] = (vals, pts, cols, cov, J, xm_cov, xm_J, xv_cols, xv_cov, xv_J)
     return rows
 
 
@@ -81,7 +81,6 @@ def main():
     for k in a.k:
         C = C_.Curve(k)
         XT = C_.FTable(C, 'x')
-        ev = np.isin(XT.val, XT.val[(XT.log % 2) == 0])
         XT.ev_uvals = np.unique(XT.val[(XT.log % 2) == 0])
         tables = {f: C_.FTable(C, f) for f in a.arms if f in C_.FUNCS}
         meta[k] = dict(facts=C.facts, p=C.p, A=C.A, n=C.n, r=C.r)

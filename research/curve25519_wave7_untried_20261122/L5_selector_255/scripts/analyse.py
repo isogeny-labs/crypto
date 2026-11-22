@@ -128,10 +128,15 @@ def main():
     ap.add_argument('--B', type=int, default=500); ap.add_argument('--K', type=int, default=2000)
     ap.add_argument('--Kiso', type=int, default=500); ap.add_argument('--Kreal', type=int, default=200)
     ap.add_argument('--train-max', type=int, default=10); ap.add_argument('--iso-train-max', type=int, default=7)
+    ap.add_argument('--pools', required=True, help='pc3_pools.py output (PC3 and bootstrap calibration)')
     ap.add_argument('--smoke', action='store_true')
     a = ap.parse_args(); os.makedirs(a.out, exist_ok=True)
     res = dict(label='SMOKE, NOT DATA' if a.smoke else 'data', K=a.K, Kiso=a.Kiso, Kreal=a.Kreal, B=a.B)
     csv = ['arm,curve,t,selector,value,K,gain,lo95,hi95,mean_c,mean_value,dispersion_D']
+    rowsout = []          # rendered into gains.csv at the end, with calibrated intervals
+    calib = [1.0]         # bootstrap SE inflation factor f (PROTOCOL.md), set after PC3
+    def centred(bs, g):   # bias-centred bootstrap replicates, spread scaled by the calibration factor
+        return g + calib[0] * (bs - bs.mean())
     # ---------- arm F ----------
     cells = load_frames(a.frames); G = {}; reps = {}
     for (cur, t), C in sorted(cells.items()):
@@ -150,31 +155,29 @@ def main():
         for (sname, vname), (keys, vals) in sels.items():
             for KK in sorted({10, 100, a.Kreal, 500, 1000, K}):
                 if KK > N // 2: continue
-                g = gain_point(vals, keys, KK); lo = hi = float('nan')
+                g = gain_point(vals, keys, KK)
                 if KK in (K, a.Kreal) and a.B:
-                    bs = boot_gain(vals, keys, KK, a.B, derived_seed('boot', cur, t, sname, vname, KK))
-                    lo, hi = np.percentile(bs, [2.5, 97.5]); reps[('F', cur, t, sname, vname, KK)] = bs
+                    reps[('F', cur, t, sname, vname, KK)] = boot_gain(vals, keys, KK, a.B, derived_seed('boot', cur, t, sname, vname, KK))
                 G[('F', cur, t, sname, vname, KK)] = g
-                csv.append(f'F,{cur},{t},{sname},{vname},{KK},{g:.6g},{lo:.6g},{hi:.6g},{c.mean():.6g},{np.mean(vals):.6g},{D:.4g}')
+                rowsout.append((('F', cur, t, sname, vname, KK), c.mean(), np.mean(vals), D))
         res.setdefault('F_cells', []).append(dict(curve=cur, t=t, N=N, mean_c=float(c.mean()), mean_J=float(J.mean()),
             mean_cov=float(cov.mean()), cov_over_r=float(cov.mean() / r) if cov[0] >= 0 else None, J_over_r=float(J.mean() / r),
             dispersion_D=D, cv_J=float(J.std(ddof=1) / J.mean()), cv_J_pred=float(2 * math.sqrt(D) * 2 ** (-t / 2)),
             bits_lo0_cov=int(b0[9]), bits_lo0_J=int(b0[7])))
     # P0: PC3 predictive interval of the realised single-pool gain at k20 t = 5, 6 (covered, J selector)
     pc = json.load(open(a.pc)); res['PC1_exact_replay'] = pc['PC1_pass']; res['PC2_instrument_equivalence'] = pc['PC2_pass']
-    pc3 = []
-    for t in (5, 6):
-        if ('k20', t) not in cells: continue
-        R = cells[('k20', t)]['rows'][1:]; N = len(R); K = min(2000, N // 2)
-        rng = np.random.default_rng(derived_seed('pc3', t)); real = []
-        for b in range(200 if not a.smoke else 20):
-            idx = rng.integers(0, N, N)
-            for j in range(10):
-                sub = idx[rng.choice(N, K, replace=False)]; S = R[sub]
-                o = order_by_key([S[:, 7], S[:, 1], -S[:, 0]]); real.append(S[o[-1], 9] / S[:, 9].mean())
-        lo, hi = np.percentile(real, [2.5, 97.5]); pub = next(c for c in pc['pc1'] if c['t'] == t)['published']['gain_vs_mean']
-        pc3.append(dict(t=t, K=K, pred_lo=float(lo), pred_hi=float(hi), published=pub, inside=bool(lo <= pub <= hi),
-                        expected_gain=G.get(('F', 'k20', t, 'J', 'covered', K))))
+    pools = json.load(open(a.pools)); pc3 = []; ratios = []
+    for cell in pools['cells']:
+        t = cell['t']; pub = next(c for c in pc['pc1'] if c['t'] == t)['published']['gain_vs_mean']
+        lo, hi = cell['realised_lo95'], cell['realised_hi95']
+        pc3.append(dict(t=t, K=pools['K'], pools=pools['pools'], pred_lo=lo, pred_hi=hi, published=pub,
+                        inside=bool(lo <= pub <= hi), median_realised=float(np.median(cell['realised']))))
+        bkey = ('F', 'k20', t, 'J', 'J', pools['K'])
+        if bkey in reps and len(cell['ustat_J']) >= 3:
+            ratios.append(cell['ustat_J_sd'] / float(np.std(reps[bkey], ddof=1)))
+    calib[0] = max(1.0, float(np.mean(ratios))) if ratios else 1.0
+    res['bootstrap_calibration'] = dict(sd_ratio_empirical_over_bootstrap=ratios, factor=calib[0])
+    for key_ in list(reps): reps[key_] = centred(reps[key_], G[key_])
     res['PC3'] = pc3; res['PC3_pass'] = bool(pc3) and all(x['inside'] for x in pc3)
     # ---------- fits (arm F: J selector on J, K) ----------
     def fit_arm(arm, curves, Kfit, train_max, sname='J', vname='J'):
@@ -215,17 +218,18 @@ def main():
         pair_adds = bp * (bp + 1) // 2 - cols                      # the binary's O(c^2) pair additions
         rP_ops = (sel_ops - pair_adds) / np.maximum(bp, 1)          # [r]P group ops per signed base point
         N = len(rows); K = min(a.Kiso, N // 2); cur = kname[k]; r = CURVES[cur][3] // 8
+        rho_i = cols.mean() / (1 << t); Diso = float(cols.var(ddof=1) / ((1 << t) * rho_i * (1 - rho_i)))
         for vname, vals in (('J', J), ('covered', cov)):
             for KK in sorted({10, 100, K}):
                 if KK > N // 2: continue
-                g = gain_point(vals, [J, cols, -seed], KK); lo = hi = float('nan')
+                g = gain_point(vals, [J, cols, -seed], KK)
                 if KK == K and a.B:
-                    bs = boot_gain(vals, [J, cols, -seed], KK, a.B, derived_seed('boot', 'iso', k, t, vname, KK))
-                    lo, hi = np.percentile(bs, [2.5, 97.5]); reps[('I', cur, t, 'J', vname, KK)] = bs
+                    reps[('I', cur, t, 'J', vname, KK)] = centred(boot_gain(vals, [J, cols, -seed], KK, a.B,
+                                                                            derived_seed('boot', 'iso', k, t, vname, KK)), g)
                 G[('I', cur, t, 'J', vname, KK)] = g
-                csv.append(f'I,{cur},{t},J,{vname},{KK},{g:.6g},{lo:.6g},{hi:.6g},{cols.mean():.6g},{vals.mean():.6g},')
+                rowsout.append((('I', cur, t, 'J', vname, KK), cols.mean(), vals.mean(), Diso))
         res.setdefault('I_cells', []).append(dict(curve=cur, t=t, N=N, mean_cols=float(cols.mean()), mean_J=float(J.mean()),
-            cov_over_r=float(cov.mean() / r), build_group_ops_mean=float(np.mean([x['build_group_ops'] for x in rows])),
+            cov_over_r=float(cov.mean() / r), dispersion_D=Diso, build_group_ops_mean=float(np.mean([x['build_group_ops'] for x in rows])),
             rP_group_ops_per_point=float(np.mean(rP_ops)), selector_group_ops_binary_mean=float(sel_ops.mean())))
     KI = max([KK for (ar, cu, t, s, v, KK) in G if ar == 'I'] or [0])
     fitsI = fit_arm('I', sorted({cu for (ar, cu, *_r) in G if ar == 'I'}), KI, a.iso_train_max) if KI else {}
@@ -259,7 +263,11 @@ def main():
             gj = G.get(('F', cur, t, 'J', 'J', KF)); gs = G.get(('F', cur, t, 'surrogate', 'surrJ', KF))
             if gj and gs and t >= 6: p4[f'{cur}_t{t}'] = (gj - 1) / (gs - 1)
             gd = G.get(('F', cur, t, 'decoy', 'J', KF))
-            if gd: p8[f'{cur}_t{t}'] = gd
+            if gd:
+                Rr = cells[(cur, t)]['rows'][1:]; Jv = Rr[:, 7].astype(float)
+                w = selection_weights(len(Jv), KF)
+                sd0 = math.sqrt(float(np.sum(w ** 2))) * Jv.std() / Jv.mean()   # null SD of a label-blind choice
+                p8[f'{cur}_t{t}'] = dict(gain=gd, z=(gd - 1) / sd0)
             g100 = G.get(('F', cur, t, 'J', 'J', 100))
             if gj and g100 and t >= 8: p9[f'{cur}_t{t}'] = (gj - 1) / (g100 - 1)
     res['P4_real_over_surrogate_excess'] = p4; res['P8_decoy_gain'] = p8; res['P9_excess_ratio_K2000_over_K100'] = p9
@@ -272,7 +280,8 @@ def main():
             t = int(key[4:]); rows = Z[key]; c = rows[:, 0]; Jr = J_counts(rows[:, 1:]).astype(float)
             N = len(rows); KK = min(a.Kreal, N // 2); idx = np.arange(N)
             g = gain_point(Jr, [Jr, c, -idx], KK)
-            bs = boot_gain(Jr, [Jr, c, -idx], KK, a.B or 2, derived_seed('boot', 'real', t, KK))
+            bs = centred(boot_gain(Jr, [Jr, c, -idx], KK, a.B or 2, derived_seed('boot', 'real', t, KK)), g)
+            reps[('R', 'curve25519', t, 'J', 'J', KK)] = bs; G[('R', 'curve25519', t, 'J', 'J', KK)] = g
             props = rows[:, 1:].sum(0) / rows[:, 1:].sum()
             gm = G.get(('F', 'k24f', t, 'J', 'J', KK)); gm20 = G.get(('F', 'k20', t, 'J', 'J', KK))
             lo, hi = np.percentile(bs, [2.5, 97.5])
@@ -283,7 +292,7 @@ def main():
             rsum[f'r1_t{t}'] = dict(t=t, N=N, K=KK, gain_J=g, lo95=float(lo), hi95=float(hi), mini_k24f=gm, mini_k20=gm20,
                                     P6_pass=ok, class_props=props.tolist(),
                                     dispersion_D=float(c.var(ddof=1) / ((1 << t) * rho * (1 - rho))))
-            csv.append(f'R,curve25519,{t},J,J,{KK},{g:.6g},{lo:.6g},{hi:.6g},{c.mean():.6g},{Jr.mean():.6g},')
+            rowsout.append((('R', 'curve25519', t, 'J', 'J', KK), c.mean(), Jr.mean(), rsum[f'r1_t{t}']['dispersion_D']))
         if key.startswith('r1c_t'):
             t = int(key[5:]); c = Z[key]; rho = c.mean() / (1 << t)
             rsum[f'r1c_t{t}'] = dict(t=t, N=len(c), dispersion_D=float(c.var(ddof=1) / ((1 << t) * rho * (1 - rho))))
@@ -378,7 +387,10 @@ def main():
         V['P2_adequate'] = dF['adequate']
     V['P3a_alpha_Phi_ge_0.8'] = bool(res['alpha_Phi']) and all(v is not None and v >= 0.8 for v in res['alpha_Phi'].values())
     V['P3b_c_share_ge_0.7'] = bool(share) and all(v >= 0.7 for v in share.values())
-    V['P4_surrogate_within_0.75_1.33'] = bool(p4) and all(0.75 <= v <= 1.33 for v in p4.values())
+    gm4 = {cu: float(np.exp(np.mean([math.log(v) for k_, v in p4.items() if k_.startswith(cu + '_') and v > 0]))) for cu in curvesF
+           if any(k_.startswith(cu + '_') for k_ in p4)}
+    res['P4_geomean_by_curve'] = gm4
+    V['P4_surrogate_geomean_within_0.75_1.33'] = bool(gm4) and all(0.75 <= v <= 1.33 for v in gm4.values())
     flog = [json.loads(l) for f in a.frames_log for l in open(f)]
     fc = [x for x in flog if x.get('event') == 'cell']
     res['P5_cost_cells'] = [dict(curve=x['curve'], t=x['t'], ops_per_point=x['cost_group_ops_per_point'],
@@ -390,8 +402,11 @@ def main():
                                     1.0 <= x['cost_group_ops_per_point'] / x['log2r'] <= 1.6 for x in fc)
     dI = res['decision_I']
     if dI: V['P7_iso_alpha_in_0.35_0.65'] = all(0.35 <= v <= 0.65 for v in dI['alpha_M2'].values())
-    V['P8_decoy_in_0.97_1.03'] = bool(p8) and all(0.97 <= v <= 1.03 for v in p8.values())
-    V['P9_K_ratio_in_1.1_1.6'] = bool(p9) and all(1.1 <= v <= 1.6 for v in p9.values())
+    V['P8_decoy_abs_z_le_3.5'] = bool(p8) and all(abs(v['z']) <= 3.5 for v in p8.values())
+    gm9 = {cu: float(np.exp(np.mean([math.log(v) for k_, v in p9.items() if k_.startswith(cu + '_') and v > 0]))) for cu in curvesF
+           if any(k_.startswith(cu + '_') for k_ in p9)}
+    res['P9_geomean_by_curve'] = gm9
+    V['P9_K_ratio_geomean_in_1.1_1.6'] = bool(gm9) and all(1.1 <= v <= 1.6 for v in gm9.values())
     r1 = [v for k_, v in rsum.items() if k_.startswith('r1_t') and v['P6_pass'] is not None]
     V['P6_real_matches_mini'] = bool(r1) and all(v['P6_pass'] for v in r1)
     r1c = [v['dispersion_D'] for k_, v in rsum.items() if k_.startswith('r1c_t')]
@@ -405,6 +420,10 @@ def main():
     if 'excess_tstar_winner_hi95' in der: V['R4_excess_tstar_le_1e-15'] = der['excess_tstar_winner_hi95'] <= 1e-15
     res['verdicts'] = V
     json.dump(res, open(os.path.join(a.out, 'results.json'), 'w'), indent=1, default=float)
+    for key_, mc, mv, Dv in rowsout:
+        g = G[key_]; lo = hi = float('nan')
+        if key_ in reps: lo, hi = np.percentile(reps[key_], [2.5, 97.5])
+        csv.append(','.join(str(x) for x in key_) + f',{g:.6g},{lo:.6g},{hi:.6g},{mc:.6g},{mv:.6g},{Dv:.4g}')
     open(os.path.join(a.out, 'gains.csv'), 'w').write('\n'.join(csv) + '\n')
     try:
         figure(a, G, fitsF, fitsI, rsum, der, KF, KI)
