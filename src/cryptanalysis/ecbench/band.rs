@@ -209,6 +209,8 @@ pub const FIELD_ARITHMETIC_COUNTERS: &[&str] = &[
     "oracle_fp_muls_uncharged",
     "native_field_muls_uncharged",
     "native_field_sqrs_uncharged",
+    // The trace test of `mitm-coset` at cofactor 2: GF(2^n) squarings.
+    "mitm_coset_label_field_squarings_uncharged",
     "linalg_mulmods_uncharged",
     "linalg_mulmod_uncharged",
     "smoothness_field_muls_uncharged",
