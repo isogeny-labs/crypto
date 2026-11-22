@@ -43,6 +43,34 @@ use num_traits::{One, Signed, Zero};
 use std::collections::HashMap;
 use std::fmt;
 
+/// Lagrange reduction on `i64` coefficients (same steps as
+/// [`BinaryQuadraticForm::reduce`]'s BigInt path).  Intermediate
+/// arithmetic uses `i128` to avoid overflow for `|D| ≲ 10⁹`.
+fn reduce_i64(mut a: i64, mut b: i64, mut c: i64) -> (i64, i64, i64) {
+    loop {
+        let two_a = (a as i128) * 2;
+        let mut r = (b as i128).rem_euclid(two_a);
+        if r > a as i128 {
+            r -= two_a;
+        }
+        let q = ((b as i128) - r) / two_a;
+        c = (c as i128 + q * q * (a as i128) - q * (b as i128)) as i64;
+        b = r as i64;
+        if a > c {
+            std::mem::swap(&mut a, &mut c);
+            b = -b;
+            continue;
+        }
+        if a == c && b < 0 {
+            b = -b;
+        } else if a == -b {
+            b = -b;
+        }
+        break;
+    }
+    (a, b, c)
+}
+
 /// A primitive positive-definite integral binary quadratic form
 /// `f(x, y) = a·x² + b·x·y + c·y²` of negative discriminant
 /// `b² − 4ac = D < 0`.
@@ -111,6 +139,22 @@ impl BinaryQuadraticForm {
     /// Lagrange reduction.  Returns the unique reduced form
     /// equivalent to `self` under SL₂(Z).
     pub fn reduce(&self) -> Self {
+        // Hot path for |D| ≲ 10⁶ class-group work: i64 Lagrange when
+        // coefficients fit.  `IC_CLASS_I64=0` forces the BigInt path (A/B).
+        if std::env::var("IC_CLASS_I64").as_deref() != Ok("0") {
+            if let (Ok(a0), Ok(b0), Ok(c0)) = (
+                i64::try_from(&self.a),
+                i64::try_from(&self.b),
+                i64::try_from(&self.c),
+            ) {
+                let (a, b, c) = reduce_i64(a0, b0, c0);
+                return Self {
+                    a: BigInt::from(a),
+                    b: BigInt::from(b),
+                    c: BigInt::from(c),
+                };
+            }
+        }
         let (mut a, mut b, mut c) = (self.a.clone(), self.b.clone(), self.c.clone());
 
         loop {
