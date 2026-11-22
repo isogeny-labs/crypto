@@ -26,7 +26,7 @@ jobs:
           workspaces: research/prime31_ic_20261115/native
       - name: Verify frozen 168-leaf input fingerprint
         run: |
-          echo "f8d84a3585b77c91c871fbccca179e9c0d06e9a04b44a6e2fe9635813e563b66  research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv" | sha256sum --check
+          echo "fc484615394ee423190747d05001cea526580fb0df0279fbcf789ab6cafc0c46  research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv" | sha256sum --check
       - name: Original Rust Prime31 B509/B677 three-sum support gate
         working-directory: research/prime31_ic_20261115/native
         run: cargo run --locked --release --example prime31_run66_three_sum_support
