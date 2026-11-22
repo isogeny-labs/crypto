@@ -1,0 +1,14 @@
+{
+  "action": "compare the smoke rows with the data rows; if they coincide, recompute every verdict on the held-out rows and report both",
+  "created": "2026-11-22T04:10:36Z",
+  "evidence": [
+    "research/curve25519_wave7_untried_20261122/L1_hash_base/validator-report.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "a smoke test uses the same seed rule as the confirmatory run",
+  "why": "wave-7 L1: smoke draws were byte-identical to bases 0-299 of the k = 16 data cells and were seen before the freeze"
+}
