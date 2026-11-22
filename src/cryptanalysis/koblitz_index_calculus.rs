@@ -5432,10 +5432,12 @@ impl ProbeBudget {
     ) -> Self {
         let points = points as u128;
         let summands_scanned = if scans_summands {
-            let window = collection_window
-                .map(u128::from)
-                .unwrap_or(points)
-                .min(points);
+            // Match RelationCollector: None on the m=3 pair-table path
+            // defaults to ⌈|F|/3⌉; an explicit window ≥ |F| is the full scan.
+            let window = match collection_window {
+                Some(w) => u128::from(w).min(points),
+                None => default_m3_window(points as usize) as u128,
+            };
             (unit_trials as u128)
                 .saturating_mul(units as u128)
                 .saturating_mul(window)
@@ -12523,10 +12525,11 @@ pub struct KoblitzIcOptions {
     /// as the window shrinks. The added probes are walked instead of
     /// multiplied.
     ///
-    /// Small windows eventually lose to probe arithmetic, so callers
-    /// must tune the window on a separate selection run. `None` scans
-    /// the whole base and draws every probe with its own scalar
-    /// multiplication, the behaviour before this option was added.
+    /// On the walked pair-table `m = 3` path (`can_walk`), `None` defaults
+    /// to [`default_m3_window`] (`⌈|F|/3⌉`), matching the descent walk.
+    /// Set `Some(w)` to override; `w = 0` or `w ≥ |F|` keeps the full
+    /// sweep (one scalar multiplication per probe). When the walked path
+    /// is unavailable, `None` remains a full sweep.
     pub collection_window: Option<usize>,
     /// Index of the irreducible factor of `x^n − 1` defining the
     /// factor base.
@@ -15677,12 +15680,24 @@ impl<'a> RelationCollector<'a> {
     }
 
     /// The window of factor-base summands a probe scans, and whether
-    /// probes are walked: `Some(w)` when
-    /// [`KoblitzIcOptions::collection_window`] asks for fewer summands
-    /// than the base has and the fast oracle can honour it.
+    /// probes are walked: `Some(w)` when the walked `m = 3` pair-table
+    /// path can honour a short scan.
+    ///
+    /// [`KoblitzIcOptions::collection_window`] `None` defaults to
+    /// [`default_m3_window`] when [`Self::can_walk`]; an explicit `0` or
+    /// `w ≥ |F|` keeps the full sweep.
     fn window(&self) -> Option<usize> {
-        let w = self.opts.collection_window?;
-        if !self.can_walk() || w == 0 || w >= self.fb.points.len() {
+        if !self.can_walk() {
+            return None;
+        }
+        let base = self.fb.points.len();
+        let w = match self.opts.collection_window {
+            Some(0) => return None,
+            Some(w) if w >= base => return None,
+            Some(w) => w,
+            None => default_m3_window(base),
+        };
+        if w == 0 || w >= base {
             return None;
         }
         Some(w)
@@ -17502,9 +17517,11 @@ pub(crate) const DESCENT_WALKS: usize = 64;
 /// whenever any of its three indices lands in the window, so the yield
 /// per probe is about `1 − (1 − f)³ ≈ 0.70` of a full scan while the
 /// lookup cost is `f` — roughly `2.1×` relations per lookup
-/// ([`PairSumTable::decompose_fast_window`]).  Callers that set
-/// [`KoblitzIcOptions::collection_window`] override this; a window at
-/// least as long as the base is the full scan.
+/// ([`PairSumTable::decompose_fast_window`]).  Relation collection on the
+/// walked pair-table path uses the same default when
+/// [`KoblitzIcOptions::collection_window`] is `None`. Callers that set
+/// the option override it; a window at least as long as the base is the
+/// full scan.
 pub(crate) fn default_m3_window(base: usize) -> usize {
     if base == 0 {
         return 0;
@@ -19035,6 +19052,37 @@ mod tests {
         assert_eq!(default_m3_window(3), 1);
         assert_eq!(default_m3_window(10), 4);
         assert_eq!(default_m3_window(300), 100);
+    }
+
+    #[test]
+    fn default_collection_uses_the_m3_window_when_walkable() {
+        let kc = KoblitzCurve::new(0, 19).unwrap();
+        let fb = build_subgroup_orbit_factor_base(&kc, 5, 120).unwrap();
+        let pair = PairSumTable::build(&kc, &fb).unwrap();
+        let base = fb.points.len();
+        let want = default_m3_window(base);
+        let defaulted = KoblitzIcOptions {
+            collection_window: None,
+            ..windowed_options(want)
+        };
+        let collector =
+            RelationCollector::with_pair_table(&kc, &fb, &defaulted, Some(&pair)).expect("collector");
+        assert_eq!(collector.admission_dispatch().collection_window, Some(want));
+        let full = KoblitzIcOptions {
+            collection_window: Some(base),
+            ..windowed_options(want)
+        };
+        let full_collector =
+            RelationCollector::with_pair_table(&kc, &fb, &full, Some(&pair)).expect("collector");
+        assert_eq!(full_collector.admission_dispatch().collection_window, None);
+        let overridden = windowed_options(7.min(base.saturating_sub(1)).max(1));
+        let over_collector =
+            RelationCollector::with_pair_table(&kc, &fb, &overridden, Some(&pair))
+                .expect("collector");
+        assert_eq!(
+            over_collector.admission_dispatch().collection_window,
+            overridden.collection_window
+        );
     }
 
     #[test]
@@ -24395,8 +24443,10 @@ mod tests {
         // Both scan the same number of summands, so the comparison is
         // relations bought per unit of the cost that actually dominates.
         let divisor = 16;
+        // Explicit `Some(base)` overrides the walked default and keeps the
+        // full sweep; `None` would now take ⌈|F|/3⌉.
         let full = KoblitzIcOptions {
-            collection_window: None,
+            collection_window: Some(base),
             ..windowed_options(base)
         };
         let windowed = windowed_options(base / divisor);

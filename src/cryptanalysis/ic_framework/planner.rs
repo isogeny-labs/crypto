@@ -774,7 +774,8 @@ fn koblitz_choices(
             // Fiber yield on h > 1 is wired from the fiber module; the
             // panel that calibrated the counted recipe was prime-order
             // (h = 1) or fiber-blind, so mark the fiber default as
-            // extrapolated until a matched h > 1 panel re-prices it.
+            // extrapolated until a matched h > 1 panel re-prices it
+            // (docs/ic/FIBER_H_GT1_VALIDATION.md).
             support: if profile.cofactor > 1 {
                 Support::Extrapolated
             } else {

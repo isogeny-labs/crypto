@@ -23,11 +23,21 @@ where GPU / NUMA fit. No second bloom is added here.
 | ecbench NUMA pinning | Enabled in measured sessions | `ecbench::isolation` pins the run CPU and binds memory to its node; `/proc/self/numa_maps` is read back. Not a library default for every `PairSumTable::build` — place the process with the isolab / ecbench harness when claiming DRAM locality. |
 | macOS / non-Linux hugepages | No-op | `advise_huge_pages` compiles away; layout knobs still apply. |
 
+## Collection window default
+
+On the walked pair-table `m = 3` path, relation **collection** now defaults
+to the same `⌈|F|/3⌉` third-summand window as the descent walk
+(`default_m3_window`). Set `collection_window` explicitly to override; a
+window of `0` or `≥ |F|` keeps the full sweep. This is a relations-per-lookup
+choice already checked by `a_window_finds_more_relations_per_lookup_than_the_full_scan`,
+not an S-column claim.
+
 ## What not to do
 
 - Do not add another host-side bloom on the same keys (RootBloom stays on Semaev root tables only).
 - Do not re-fuse the blocked m=3 key/lookup split.
 - Do not treat hugepage or NUMA advice as an S-column speedup without a paired cold measurement.
+- Do not promote the planner's `h > 1` fiber default to Measured without the matched panel in [`FIBER_H_GT1_VALIDATION.md`](FIBER_H_GT1_VALIDATION.md).
 
 ## Related evidence
 
