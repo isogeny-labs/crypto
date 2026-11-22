@@ -2,7 +2,7 @@
 //!
 //! Same public targets, factor base, and Rust group implementation for both arms:
 //! (1) signed point-pair table; (2) x-only S3 quadratic-root index.
-//! The S3 arm saves unconditional pair additions but pays Fp inversions.
+//! The S3 arm saves unconditional pair additions and batches all nonzero denominators into one Fp inversion per setup/query panel.
 //! This is a relation-*oracle* comparison, not a full ECDLP speed claim.
 //!
 //! cargo test --release --example chained_s3_prime31_pilot
@@ -88,6 +88,75 @@ fn s3_roots(
     out
 }
 
+/// Compute a whole panel of S3 pairs with one inversion, rather than one
+/// Fermat inversion per nonexceptional pair. This is Montgomery's batch
+/// inversion on (x_i-x_j)^2, *not* a new Semaev identity.
+///
+/// Each returned vector is the exact projective x-root set of one input pair;
+/// equal x, rational two-torsion and O are handled without division.
+fn s3_roots_many(
+    c: &PrimeCurve,
+    sem: &SemaevCurve,
+    pairs: &[(PrimePoint, PrimePoint)],
+    st: &mut Stats,
+) -> Vec<Vec<XKey>> {
+    let f = sem.f;
+    let mut outputs = vec![Vec::<XKey>::new(); pairs.len()];
+    let mut denoms = Vec::<u64>::with_capacity(pairs.len());
+    let mut pending = Vec::<(usize, u64, u64)>::with_capacity(pairs.len());
+
+    for (index, &(lhs, rhs)) in pairs.iter().enumerate() {
+        assert!(!lhs.infinity && !rhs.infinity);
+        assert!(c.is_on_curve(lhs) && c.is_on_curve(rhs));
+        st.s3_root_calls += 1;
+        if lhs.x == rhs.x {
+            st.exceptional_x_equal += 1;
+            let doubled = c.double(&mut st.ops, lhs);
+            let roots = &mut outputs[index];
+            roots.extend([XKey::Infinity, key(doubled)]);
+            roots.sort_unstable();
+            roots.dedup();
+            continue;
+        }
+        let e1 = f.add(lhs.x, rhs.x);
+        let e2 = f.mul(lhs.x, rhs.x);
+        let middle = f.add(f.mul(e1, f.add(e2, sem.a)), f.mul(2, sem.b));
+        let split = f.mul(2, f.mul(lhs.y, rhs.y));
+        let dx = f.sub(lhs.x, rhs.x);
+        denoms.push(f.mul(dx, dx));
+        pending.push((index, middle, split));
+    }
+
+    if !denoms.is_empty() {
+        // pref[k] = product of denoms[0..k], pref[0] = 1.
+        // Every denominator is nonzero by the unequal-abscissa guard.
+        let mut pref = Vec::<u64>::with_capacity(denoms.len() + 1);
+        pref.push(1);
+        for &denom in &denoms {
+            pref.push(f.mul(*pref.last().expect("prefix nonempty"), denom));
+        }
+        let mut inverse = f.inv(*pref.last().expect("product nonempty"));
+        st.s3_denominator_inversions += 1;
+        for t in (0..denoms.len()).rev() {
+            let (index, middle, split) = pending[t];
+            let inv_d2 = f.mul(inverse, pref[t]);
+            inverse = f.mul(inverse, denoms[t]);
+
+            let lhs = pairs[index].0;
+            let rhs = pairs[index].1;
+            let z_plus = f.mul(f.add(middle, split), inv_d2);
+            let z_minus = f.mul(f.sub(middle, split), inv_d2);
+            assert_eq!(sem.s3(lhs.x, rhs.x, z_plus), 0);
+            assert_eq!(sem.s3(lhs.x, rhs.x, z_minus), 0);
+            let roots = &mut outputs[index];
+            roots.extend([XKey::Finite(z_plus), XKey::Finite(z_minus)]);
+            roots.sort_unstable();
+            roots.dedup();
+        }
+    }
+    outputs
+}
+
 fn factor_base(c: &PrimeCurve, size: usize) -> Vec<PrimePoint> {
     let mut out = Vec::new();
     for x in 0..c.p {
@@ -126,11 +195,17 @@ fn build_s3_pairs(
     st: &mut Stats,
 ) -> HashMap<XKey, Vec<(usize, usize)>> {
     let mut table: HashMap<XKey, Vec<(usize, usize)>> = HashMap::new();
+    let mut pairs = Vec::with_capacity(base.len() * (base.len() + 1) / 2);
+    let mut indices = Vec::with_capacity(pairs.capacity());
     for i in 0..base.len() {
         for j in i..base.len() {
-            for k in s3_roots(c, sem, base[i], base[j], st) {
-                table.entry(k).or_default().push((i, j));
-            }
+            indices.push((i, j));
+            pairs.push((base[i], base[j]));
+        }
+    }
+    for ((i, j), roots) in indices.into_iter().zip(s3_roots_many(c, sem, &pairs, st)) {
+        for k in roots {
+            table.entry(k).or_default().push((i, j));
         }
     }
     table
@@ -192,14 +267,16 @@ fn query_s3(
     target: PrimePoint,
     st: &mut Stats,
 ) -> Option<[PrimePoint; 3]> {
-    for (k, &leaf) in base.iter().enumerate() {
-        // If R=O, the pair must have the same x as the third leaf.
-        let keys = if target.infinity {
-            vec![XKey::Finite(leaf.x)]
-        } else {
-            s3_roots(c, sem, target, leaf, st)
-        };
-        for root in keys {
+    // The entire query batch shares the target. The one nonzero product
+    // inversion is charged even if the first matching bucket exits early.
+    let mut roots_by_leaf: Vec<Vec<XKey>> = if target.infinity {
+        base.iter().map(|leaf| vec![XKey::Finite(leaf.x)]).collect()
+    } else {
+        let pairs: Vec<_> = base.iter().map(|&leaf| (target, leaf)).collect();
+        s3_roots_many(c, sem, &pairs, st)
+    };
+    for (k, _) in base.iter().enumerate() {
+        for root in std::mem::take(&mut roots_by_leaf[k]) {
             st.probes += 1;
             if let Some(candidates) = table.get(&root) {
                 for &(i, j) in candidates {
@@ -334,18 +411,23 @@ mod tests {
             let sem = SemaevCurve::new(p, a, b);
             let base = factor_base(&c, 12);
             let mut st = Stats::default();
-            for &v in &base {
-                for &w in &base {
-                    let actual = s3_roots(&c, &sem, v, w, &mut st);
-                    let mut ops = GroupOps::default();
-                    let mut expected = vec![
-                        key(c.add(&mut ops, v, w)),
-                        key(c.add(&mut ops, v, c.neg(w))),
-                    ];
-                    expected.sort_unstable();
-                    expected.dedup();
-                    assert_eq!(actual, expected, "s3 roots vs point sums");
-                }
+            let pair_panel: Vec<_> = base.iter().flat_map(|&v| {
+                base.iter().map(move |&w| (v, w))
+            }).collect();
+            let mut batched = Stats::default();
+            let batch = s3_roots_many(&c, &sem, &pair_panel, &mut batched);
+            assert_eq!(batched.s3_denominator_inversions, 1, "one batched inverse");
+            for ((v, w), batch_roots) in pair_panel.into_iter().zip(batch) {
+                let actual = s3_roots(&c, &sem, v, w, &mut st);
+                let mut ops = GroupOps::default();
+                let mut expected = vec![
+                    key(c.add(&mut ops, v, w)),
+                    key(c.add(&mut ops, v, c.neg(w))),
+                ];
+                expected.sort_unstable();
+                expected.dedup();
+                assert_eq!(actual, expected, "S3 roots vs group law");
+                assert_eq!(batch_roots, expected, "batched S3 roots vs group law");
             }
         }
     }
