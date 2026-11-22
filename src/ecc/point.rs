@@ -17,7 +17,54 @@
 //! This is O(log k) point operations.
 
 use super::field::{inv_mod_u64, single_word, FieldElement};
+use super::mont_vt::{Jac, Mont};
 use num_bigint::BigUint;
+
+/// Fixed-width Montgomery Jacobian ladder for an odd multi-word modulus.
+/// Declines (returns `None`) when `IC_MONT_VT=0` or the modulus does not fit.
+fn mont_scalar_mul_vt<const N: usize>(
+    x: &FieldElement,
+    y: &FieldElement,
+    k: &BigUint,
+    a: &FieldElement,
+) -> Option<Point> {
+    if std::env::var("IC_MONT_VT").as_deref() == Ok("0") {
+        return None;
+    }
+    let ctx = Mont::<N>::new(&x.modulus)?;
+    let xm = ctx.enter(&x.value)?;
+    let ym = ctx.enter(&y.value)?;
+    let am = ctx.enter(&a.value)?;
+    let mut acc: Option<Jac<N>> = None;
+    for i in (0..k.bits()).rev() {
+        if let Some(j) = &acc {
+            acc = ctx.double(j, &am);
+        }
+        if k.bit(i) {
+            acc = match &acc {
+                None => Some(Jac {
+                    x: xm,
+                    y: ym,
+                    z: ctx.one(),
+                }),
+                Some(j) => ctx.add_affine(j, &xm, &ym, &am),
+            };
+        }
+    }
+    let Some(j) = acc else {
+        return Some(Point::Infinity);
+    };
+    // Z^(p−2) in Montgomery form (same Fermat inverse FieldElement::inv uses).
+    let zi = ctx.pow(&j.z, &(&x.modulus - 2u32));
+    let zi2 = ctx.mul(&zi, &zi);
+    let zi3 = ctx.mul(&zi2, &zi);
+    let xa = ctx.leave(&ctx.mul(&j.x, &zi2));
+    let ya = ctx.leave(&ctx.mul(&j.y, &zi3));
+    Some(Point::Affine {
+        x: FieldElement::new(xa, x.modulus.clone()),
+        y: FieldElement::new(ya, y.modulus.clone()),
+    })
+}
 
 /// A point on a Weierstrass curve, either the identity (point at infinity)
 /// or an affine coordinate pair.
@@ -229,10 +276,15 @@ impl Point {
             if let Some(w) = Word::of(m) {
                 if let Some([x1, y1, x2, y2, a]) = w.get([x1, y1, x2, y2, a]) {
                     if let (Some(ku), Some(lu)) = (single_word(k), single_word(l)) {
-                        return w.point(
-                            w.double_scalar_jsf((x1, y1), ku, (x2, y2), lu, a),
-                            m,
-                        );
+                        // Default JSF.  `IC_WORD_SHAMIR=w2|w4` is A/B-only:
+                        // one-shot joint windows lost to JSF (~0.94× / ~0.23×
+                        // on p=2^64-59) — precompute dominates; do not switch.
+                        let pt = match std::env::var("IC_WORD_SHAMIR").as_deref() {
+                            Ok("w2") => w.double_scalar_window((x1, y1), ku, (x2, y2), lu, a, 2),
+                            Ok("w4") => w.double_scalar_window((x1, y1), ku, (x2, y2), lu, a, 4),
+                            _ => w.double_scalar_jsf((x1, y1), ku, (x2, y2), lu, a),
+                        };
+                        return w.point(pt, m);
                     }
                     // Wide scalars on a word prime: binary interleaved Shamir.
                     let both = w.affine_add((x1, y1), (x2, y2), a);
@@ -397,6 +449,20 @@ impl Point {
             if &x.modulus == p256_p && &a.value == p256_a {
                 return super::p256_point::scalar_mul_p256_vartime(self, k);
             }
+        }
+        // Fixed-width Montgomery Jacobian (mont_vt): fills the gap between
+        // the single-word path and the specialised P-256/secp ladders.
+        // Opt out with `IC_MONT_VT=0` for A/B against the BigUint ladder.
+        let limbs = x.modulus.bits().div_ceil(64);
+        let mont = match limbs {
+            2 => mont_scalar_mul_vt::<2>(x, y, k, a),
+            3 => mont_scalar_mul_vt::<3>(x, y, k, a),
+            4 => mont_scalar_mul_vt::<4>(x, y, k, a),
+            5..=9 => mont_scalar_mul_vt::<9>(x, y, k, a),
+            _ => None,
+        };
+        if let Some(pt) = mont {
+            return pt;
         }
         let mut acc: Option<Jacobian> = None;
         for i in (0..k.bits()).rev() {
@@ -945,6 +1011,79 @@ impl Word {
                     }),
                     Some(j) => self.jacobian_add_affine(j, pt, a),
                 };
+            }
+        }
+        acc.map(|j| self.jacobian_to_affine(j))
+    }
+
+    /// Joint fixed-window `k·P + l·Q`: table `i·P + j·Q` for
+    /// `i,j ∈ {0..2^w − 1}`, then MSB windows of `w` bits (Straus).
+    ///
+    /// `w` is 2 or 4.  Precompute is `2^{2w} − 1` affine additions; for a
+    /// one-shot multiply that can dominate JSF's six signed precomputes.
+    fn double_scalar_window(
+        self,
+        p: (u64, u64),
+        k: u64,
+        q: (u64, u64),
+        l: u64,
+        a: u64,
+        w: u32,
+    ) -> Option<(u64, u64)> {
+        debug_assert!(w == 2 || w == 4);
+        if k == 0 && l == 0 {
+            return None;
+        }
+        let radix = 1u32 << w;
+        let n = (radix * radix) as usize;
+        // table[i * radix + j] = i·P + j·Q; index 0 is the identity (unused).
+        let mut table: Vec<Option<(u64, u64)>> = vec![None; n];
+        for j in 1..radix {
+            table[j as usize] = if j == 1 {
+                Some(q)
+            } else {
+                table[(j - 1) as usize].and_then(|prev| self.affine_add(prev, q, a))
+            };
+        }
+        for i in 1..radix {
+            let base = (i * radix) as usize;
+            table[base] = if i == 1 {
+                Some(p)
+            } else {
+                table[base - radix as usize].and_then(|prev| self.affine_add(prev, p, a))
+            };
+            for j in 1..radix {
+                table[base + j as usize] = match (table[base], table[j as usize]) {
+                    (Some(ip), Some(jq)) => self.affine_add(ip, jq, a),
+                    (Some(ip), None) => Some(ip),
+                    (None, Some(jq)) => Some(jq),
+                    (None, None) => None,
+                };
+            }
+        }
+        let top = 64u32 - (k | l).leading_zeros();
+        let mut bit = top.div_ceil(w) * w;
+        let mut acc: Option<WordJacobian> = None;
+        while bit > 0 {
+            bit -= w;
+            for _ in 0..w {
+                if let Some(j) = acc {
+                    acc = self.jacobian_double(j, a);
+                }
+            }
+            let dk = ((k >> bit) & ((1u64 << w) - 1)) as u32;
+            let dl = ((l >> bit) & ((1u64 << w) - 1)) as u32;
+            if dk != 0 || dl != 0 {
+                if let Some(pt) = table[(dk * radix + dl) as usize] {
+                    acc = match acc {
+                        None => Some(WordJacobian {
+                            x: pt.0,
+                            y: pt.1,
+                            z: 1,
+                        }),
+                        Some(j) => self.jacobian_add_affine(j, pt, a),
+                    };
+                }
             }
         }
         acc.map(|j| self.jacobian_to_affine(j))
