@@ -45,3 +45,19 @@ Accept an exception-safe candidate only with all tests passing and median comple
 4. **P3:** direct F4 16-var W9 vs compact 14-var Horner vs 4-var RR9 ablation at matched caps, but treat #4891 multi-second small-base F4 and previous large-MQ matrix ceilings as admission warnings, not unsatisfiability evidence.
 
 **Scientific disposition:** mathematical repair and a measurable engineering hypothesis, not an established non-generic index-calculus breakthrough. No new complete prime-field ECDLP speed advantage is supported at this stage.
+
+## Source-specific Rust execution — PASS, measured component improvement
+
+The earlier CI-pending status above is superseded for the initially introduced Rust source/workflow by **[Actions #45022038604](https://github.com/isogeny-labs/crypto/actions/runs/45022038604)**, job `137206872980`, **SUCCESS** on source/workflow commit `a0c63206805924035d35801deb9ca6fb645f23f7`, Rust 1.100.0 release (12.86 seconds Cargo build). It printed `correctness=PASS` for 120,049 exact canonical field pairs and 96 separate 128-step chains (12,288 real curve additions), including O, -G, G doubling and order wrap. All five per-arm endpoints were independently checked with the original `Arithmetic::scalar`. Full raw vectors and exact source binding are frozen in `RUN62_RESULTS.json`.
+
+| Equal-runner Rust +G primitive, five 250,000-step repetitions | ns/step, median | All 5 ns/step |
+|---|---:|---|
+| Original complete affine `Arithmetic::add` | **289.9812** | 290.9099, 289.9687, 290.1010, 289.9325, 289.9812 |
+| Run61-equivalent partial generic mixed Jacobian (`H=0` unsafe) | **23.6105** | 23.6105, 23.8345, 23.5962, 23.3134, 23.7230 |
+| **Run62 complete exception-safe Mersenne-folded** | **21.5597** | 21.7635, 21.5597, 21.5963, 21.5482, 21.5085 |
+
+Run62 is **13.4501× faster than original affine on the matched public +G primitive** and **1.0951× faster than the previous partial formula** despite adding completeness branches. The prior published 10.50× result used a different Actions run and should *not* be directly pooled into this new ratio.
+
+The run59 **conditional** 4,699,949-probe projection now charges **101.330ms shift-only**, leaving only **68.783ms** (14.635ns/probe) for *all* other operations relative to the previous **cross-run** 170.113ms BSGS reference. This is a changed sensitivity calculation, not an executed ECDLP solve, not an independent root extraction, and not a same-host solver advantage.
+
+The later workflow update also added a separate Python big-int verifier step. Its source-specific CI result is not included in the earlier #45022038604 receipt; the independent Python verifier had already passed locally. This is an explicit validation distinction, not an assumption of green CI.
