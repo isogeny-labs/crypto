@@ -5,6 +5,8 @@ from math import comb
 H = (2327, 983, 421, 207, 87, 34, 22, 9)
 N = 4096
 MISSES = 6
+H1024 = (580, 233, 124, 50, 23, 6, 6, 2)
+HISTORICAL_BSGS_1024_MS = 170.113
 
 def call_counts(hist=H, misses=MISSES):
     assert sum(hist) + misses == N
@@ -18,6 +20,12 @@ def main():
     calls = call_counts()
     assert calls == (4096, 1769, 786, 365, 158, 71, 37, 15)
     assert sum(calls) == 7297
+    assert sum(H1024) == 1024
+    calls_1024 = sum((i + 1) * n for i, n in enumerate(H1024))
+    assert calls_1024 == 1827
+    print("7-leaf 1024 first-hit histogram:", H1024)
+    print("7-leaf 1024 calls:", calls_1024)
+    print("historical 1024-target BSGS sensitivity ms/7-leaf-call (all else free):", HISTORICAL_BSGS_1024_MS / calls_1024)
     print("7-leaf arm calls:", calls)
     print("total calls:", sum(calls))
     print("per-target calls:", sum(calls) / N)
