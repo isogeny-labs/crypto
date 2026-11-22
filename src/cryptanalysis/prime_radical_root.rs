@@ -119,6 +119,16 @@ impl Fp {
         // regresses at the 61-bit Mersenne modulus. Keep the original
         // binary Fp path there; Fp2 still benefits from adaptive rpow.
         if self.p == MAX_PRIME {
+            // For p = 2^61-1, sqrt(a) = a^((p+1)/4) = a^(2^59).
+            // Avoid binary-power bit tests and the identity multiply.
+            // This is public root-finding arithmetic, never secret data.
+            if e == (1u64 << 59) {
+                let mut root = if a < MAX_PRIME { a } else { a % MAX_PRIME };
+                for _ in 0..59 {
+                    root = self.sqr(root);
+                }
+                return root;
+            }
             let mut b = a % self.p;
             let mut exponent = e;
             let mut acc = 1u64;
@@ -148,6 +158,12 @@ impl Fp {
         if r1 == 0 {
             return 0; // preserve powm(0, p-2)
         }
+        // Unit/half-unit inverses recur in monic normalization and radicals.
+        // The formulas hold in every supported odd prime field.
+        if r1 == 1 { return 1; }
+        if r1 == self.p - 1 { return self.p - 1; }
+        if r1 == 2 { return (self.p + 1) / 2; }
+        if r1 == self.p - 2 { return (self.p - 1) / 2; }
         let (mut t0, mut t1) = (0i64, 1i64);
         while r1 != 0 {
             let q = r0 / r1;
@@ -4936,6 +4952,51 @@ mod round37_frobenius_tests {
                 |(x,e)| {
                     let v = q.pow(x,e); v.0 ^ v.1
                 });
+        }
+    }
+}
+
+#[cfg(test)]
+mod round114_mersenne_sqrt_and_unit_inverse {
+    use super::*;
+
+    #[test]
+    fn radical_unit_inverse_shortcuts_match_fermat_oracle() {
+        for p in [5, 7, 65_521, 1_000_000_007, MAX_PRIME] {
+            let f = Fp::new(p);
+            for a in [0, 1, 2, p - 2, p - 1, p / 2, p, p + 1, u64::MAX] {
+                let inv = f.inv(a);
+                // Fermat powering remains an independent reference to
+                // extended-Euclid inversion and the constant shortcuts.
+                let expected = f.powm(a, p - 2);
+                assert_eq!(inv, expected, "p={p}, a={a}");
+                let reduced = a % p;
+                if reduced != 0 {
+                    assert_eq!(f.mul(reduced, inv), 1, "p={p}, a={a}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn mersenne_sqrt_power_matches_independent_wide_reference() {
+        let p = MAX_PRIME;
+        let f = Fp::new(p);
+        let mut state = 0x917a_c5db_7102_637du64;
+        for a in [0, 1, 2, p - 1, p, p + 1, u64::MAX]
+            .into_iter()
+            .chain((0..2048).map(|_| {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                state
+            }))
+        {
+            let mut expected = a % p;
+            for _ in 0..59 {
+                expected = ((expected as u128 * expected as u128) % p as u128) as u64;
+            }
+            assert_eq!(f.powm(a, 1u64 << 59), expected, "a={a}");
         }
     }
 }
