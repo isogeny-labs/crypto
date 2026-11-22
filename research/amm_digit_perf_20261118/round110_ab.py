@@ -47,6 +47,14 @@ pub(crate) fn benchmark_engine_power(
     out
 }
 """
+remainder_helper = r"""
+#[doc(hidden)]
+pub(crate) fn benchmark_power_remainder(
+    product: &[u64], modulus: &[u64], p: u64,
+) -> Vec<u64> {
+    vpower_reduce(product.to_vec(), modulus, p).expect("valid monic remainder")
+}
+"""
 quartic_helper = r"""
 #[doc(hidden)]
 pub(crate) fn benchmark_quartic_power(
@@ -208,6 +216,38 @@ fn main(){
             }
         }
     }
+    // Production Rust source-exact general verifier remainder. The new
+    // specialization is called only for x^d +/- 1 (degree >=4); retain
+    // dense, sparse-nonunit, and near-miss controls in each prime field.
+    for p in [65_521u64,1_000_000_007,MAX_PRIME] {
+        for degree in [4usize,8] {
+            for kind in 0..6usize {
+                let mut m=vec![0u64;degree+1];m[degree]=1;
+                match kind {
+                    0 => m[0]=1,                 // x^d+1
+                    1 => m[0]=p-1,               // x^d-1
+                    2 => {m[0]=13;m[1]=17;m[2]=19;m[degree-1]=23;},
+                    3 => {m[0]=1;m[1]=7;},       // not a binomial
+                    4 => {m[0]=p-1;m[1]=13;},    // not a binomial
+                    _ => {m[1]=17;},            // zero constant, nonbinomial
+                }
+                let inputs:Vec<Vec<u64>>=(0..16u64).map(|i|
+                    (0..(degree*2+3)).map(|j|
+                        (i*97+j as u64*31+13)%p).collect()).collect();
+                let mut h=0u64;let mut n=0usize;
+                let start=Instant::now();
+                for _ in 0..32 {
+                    for input in &inputs {
+                        let out=cryptanalysis::prime_root_trace::benchmark_power_remainder(
+                            black_box(input),black_box(&m),black_box(p));
+                        h=checksum(h,&out);black_box(out);n+=1;
+                    }
+                }
+                println!("{p},vpower_reduce_d{degree}_kind{kind},{:.3},{h},{n}",
+                    start.elapsed().as_nanos() as f64/n as f64);
+            }
+        }
+    }
     // Completed root extraction and independent certificate verification.
     for p in [65_521u64,1_000_000_007,MAX_PRIME] {
         for degree in [2usize,4] {
@@ -250,7 +290,7 @@ with tempfile.TemporaryDirectory(prefix="rootfind109-") as temp:
         (d/"src/cryptanalysis").mkdir(parents=True)
         (d/"Cargo.toml").write_text(cargo)
         (d/"src/main.rs").write_text(main)
-        (d/"src/cryptanalysis/prime_root_trace.rs").write_text(source+"\n"+helper+"\n"+extra_helper+"\n"+quartic_helper)
+        (d/"src/cryptanalysis/prime_root_trace.rs").write_text(source+"\n"+helper+"\n"+extra_helper+"\n"+quartic_helper+"\n"+remainder_helper)
         (d/"src/cryptanalysis/prime_root_bounded.rs").write_text(
             "// unrelated bounded API stubbed only in isolated A/B harness\n")
         subprocess.run(["cargo","build","--release","--quiet"],cwd=d,check=True)
