@@ -63,15 +63,16 @@ The two pinned files must hash to their `sha256`, and must say:
   list of `{name, claimed, recomputed, rel_tol?}` whose numbers are finite and
   agree within a relative tolerance of 1e-9. The tolerance is the gate's
   (`HEADLINE_REL_TOL`): a report may state its own `rel_tol` only as a finite
-  number from 0 up; NaN, infinity, a negative value or a non-number is an
-  error, so a report cannot switch the comparison off that way. A cap of 1e-6
-  (`HEADLINE_REL_TOL_MAX`) is implemented and not yet enforced
-  (`HEADLINE_REL_TOL_ENFORCE_MAX = False`): 22 admitted benchmarks rows state
-  tolerances from 1e-3 to 5e299 for headlines rounded for display, and
-  enforcing the cap needs the owner to choose between re-issuing those reports
-  with the numbers the recompute produces and freezing the rows. Until then a
-  large finite `rel_tol` still widens the comparison. New reports should claim
-  the recomputed number and state no tolerance.
+  number from 0 to 1e-6 (`HEADLINE_REL_TOL_MAX`); a larger value, NaN,
+  infinity, a negative value or a non-number is an error, so a report cannot
+  widen the comparison or switch it off. A claimed value rounded for display
+  does not pass: claim the number the recompute produces. The one exception
+  is `docs/ic/validation/REL_TOL_PRE_CAP.json`: the validator reports that
+  stated a wider tolerance when the cap began (owner decision, 2026-11-15),
+  listed by content digest. A listed report keeps its stated (finite)
+  tolerance and is still compared at it. The list may only shrink against the
+  base, and editing or re-issuing a listed report changes its digest and puts
+  it under the cap. `validation_gate.py rel-tol-pre-cap` wrote the list once.
 
 Each pinned file must hold a JSON object. The `rho_reference` descriptor is
 checked as written, except that `order_holds_across_band` is recomputed: it is

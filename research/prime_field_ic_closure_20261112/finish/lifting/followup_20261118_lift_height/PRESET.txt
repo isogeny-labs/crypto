@@ -1,0 +1,47 @@
+PRESET lift-height  (frozen 2026-11-18 before any data of this round)   [pcc:unverified]
+
+Question. Lemma 3H (finish/lifting/followup_20261115/README.md s1) excludes lifting with r = 7, 8, 9
+points at 256 bits iff every trial output has height ratio rho = H/lambda <= rho_max(r):
+  rho_max(7) = 32.6, rho_max(8) = 10.8, rho_max(9) = 4.94   (bounds_hermite.py, margin 0 at b = 256).
+
+Arms
+ A. PROOF: try to supply lambda >= H(256)/rho_max(r) from an explicit Lang-type theorem
+    (Hindry-Silverman 1988, David 1997, Petsche 2006; constants [L-recalled] unless re-read).
+ B. EMPIRICAL rho_G on honest toy lifts, r = 7, 8 (existing 9-monomial cubic path, O on cubic),
+    bits 20, 24, 28, 32 (extending the 8-16 bit data); 2 curves x 15 trials per cell; 5 doublings.
+ C. r = 9 toy: new construction (10-monomial cubic through 9 lifts, origin = third intersection
+    of the tangent at lift 1; group points P_i - Q0 with Q0 = -2 P_1, masks c_i + 2 c_1).
+    Same construction also at r = 7, 8 for a like-for-like comparison. Bits 12..32.
+    Detector positive control (DET: P'_3 := P'_1 + P'_2 over Q) at r = 9 must return (1,1,-1,0..)
+    on >= 90% of ok trials or arm C is void.
+ D. DEPENDENT-CONDITIONAL rho: honest trials at tiny bits (6-8) where an exact relation exists;
+    rho_L = H / lambda_1(L), L = lattice spanned by the circuit's points. Compared with the
+    unconditional rho_G distribution in the same cells (tests the random-map heuristic).
+ E. CALIBRATION lambda_MW / lambda_G at e = 16 and e = 32 (lambda_calib.py, r = 2..7, 15 per cell,
+    90 s limit per curve).
+
+Kill rule (applied mechanically; outcome words: KILLED / SUPPORTED-EMPIRICAL / INCONCLUSIVE)
+ K-A (proof): KILLED if the best explicit constant available, evaluated at Szpiro ratio sigma = 1
+     (its most favourable value) and with log|Delta_min| replaced by the toy-fit log|Delta_W|(256)
+     (an upper bound, again favourable), gives lambda_lb < H(256)/rho_max(r) for r = 7.
+     (r = 8, 9 then fail a fortiori.)  A proof is claimed only if every input is a cited theorem.
+ K-B/C (empirical, per r in {7,8,9}): KILLED for that r if
+     (i)  at the largest bit size measured for r, max rho_G over relation-free ok trials > rho_max(r); or
+     (ii) the OLS slope of per-cell p90(rho_G) against bits (cells with bits >= 12, >= 10 ok trials)
+          is positive AND its extrapolation to 256 bits exceeds rho_max(r).
+     Otherwise SUPPORTED-EMPIRICAL (never "proved"; heuristic: dependence-conditional rho assumed
+     distributed like the unconditional one), unless K-D fires.
+     INCONCLUSIVE for that r if fewer than 20 ok trials exist at bits >= 20.
+ K-D: the random-map reading is CONTRADICTED if, among >= 5 honest dependent trials, the median
+     rho_L exceeds the unconditional p99 rho_G of the same (bits, r) cells pooled. With < 5 such
+     trials: INCONCLUSIVE. If contradicted, every SUPPORTED-EMPIRICAL above is downgraded to
+     INCONCLUSIVE.
+ K-E: calibration only matters if Lemma 3H needs lambda over all of E'(Q). If the worst
+     rho_MW/rho_G at e = 16/32 times the toy max rho_G (largest bits) exceeds rho_max(r), report
+     the calibrated margin as negative for that r.
+
+Resources: every heavy command under `timeout` and `ulimit -v` (<= 3 GB per process), <= 3 in
+parallel on the 4-vCPU shared VM. Seeds: base 20261118 (disjoint from the 20261115 round).
+Disk: the volume had 0 MB free at 2026-11-18 start (a failed `git pull` of main left a 2 GB
+tmp pack, removed); outputs are kept small (no raw point coordinates beyond what analysis needs).
+Nothing is committed, pushed, or filed. Everything reported is [pcc:unverified].

@@ -30,6 +30,7 @@ use crypto_lib::cryptanalysis::ic_boundary::{
     roster_prime_instance, signed_frobenius_rho, BinaryGroup, BinaryInstance, Calibration,
     CountedGroup, GroupOps, PinOutcome, PrimeInstance, RhoResult,
 };
+use crypto_lib::cryptanalysis::ic_framework::genroot::GenRootOracle;
 use crypto_lib::cryptanalysis::ic_framework::hashed::{HashedAffineBase, HashedTensorOracle};
 use crypto_lib::cryptanalysis::ic_framework::linalg::MATRIX_NAMES;
 use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle;
@@ -399,6 +400,11 @@ fn listing() -> Value {
                     {"name": "mitm", "summands": "2 or 3", "regimes": ["prime", "char2", "koblitz"],
                      "parameters": [{"name": "negation_folded", "means": "1 to halve the table's additions"},
                                     {"name": "m", "means": "summands, 2 or 3"}]},
+                    {"name": "genroot", "summands": "2 to 6", "regimes": ["prime", "char2", "koblitz"],
+                     "parameters": [{"name": "m", "means": "summands, 2 to 6"},
+                                    {"name": "left", "means": "sources in the target-independent table, 1..m-1; default ceil(m/2)"},
+                                    {"name": "max_table", "means": "left-table record cap, default 4000000"}],
+                     "needs": "the generalized root-finder's exact S3 chain (tools/generalized-rootfinder); fiber root-finding is counted, not priced, so S is marked partial"},
                     {"name": "pkm-semaev", "summands": "2 or 3", "regimes": ["prime"],
                      "parameters": [
                         {"name": "m", "means": "summands, 2 or 3"},
@@ -772,6 +778,7 @@ fn run_prime(
                 m, inst,
             );
         let mut hashed = HashedTensorOracle::new();
+        let mut genroot = GenRootOracle::new(m);
         // Built on the base's own tower, so it refuses any other base.
         let mut pkm = match or_name {
             "pkm-semaev" => Some(PkmSemaevOracle::from_spec(m, &spec, inst)?),
@@ -786,11 +793,12 @@ fn run_prime(
             "rootfind-subtract" => &mut rootfind,
             "rootfind-subtract-gpu" => &mut rootfind_gpu,
             "hashed-tensor" => &mut hashed,
+            "genroot" => &mut genroot,
             other => {
                 return Err(format!(
                     "oracle `{other}` is not available on a prime-field curve; try subtract, mitm, \
                      mitm-prime-batch, mitm-prime-blocked, rootfind-subtract, rootfind-subtract-gpu, \
-                     hashed-tensor or pkm-semaev"
+                     hashed-tensor, genroot or pkm-semaev"
                 ))
             }
         };
@@ -908,7 +916,9 @@ fn run_binary(
             "chained-x" => Some(ChainedXOracle::new(m, inst)),
             _ => None,
         };
+        let mut genroot = GenRootOracle::new(m);
         let oracle: &mut dyn DecompositionOracle<BinaryGroup> = match or_name {
+            "genroot" => &mut genroot,
             "subtract" => &mut subtract,
             "subtract-binary-batch" => &mut subtract_binary,
             "mitm" => &mut mitm,
