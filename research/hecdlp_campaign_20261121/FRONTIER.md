@@ -179,3 +179,27 @@ at p = 65537 / 131101 / 262147. **That ratio is not yet a matched comparison:** 
 counted field operations times the Cantor field-multiplication time, while only the index-calculus
 linear algebra was engineered. The matched test is end-to-end wall time of both arms on the same
 instances and binary (R9).
+
+### R9: matched wall-clock comparison against rho [pcc:unverified]
+
+`genus_ladder_wallclock_vs_rho_20261122`: one binary (committed tree f6acc4c2e4, with R8's
+Wiedemann), R2's curves 1–6 per prime, 2 seeds, one thread, one prime at a time (load 1.00), both
+arms timed end to end with the instance search excluded. 108 runs certified; every count equal
+to R2's rows.
+
+| p | IC + SGE(8,3) wall (s) | negation rho wall (s) | ratio [95 %] | without SGE |
+|--:|--:|--:|--:|--:|
+| 65537 | 2.89 | 14.28 | 0.202 [0.158, 0.271] | 0.272 |
+| 131101 | 8.48 | 32.51 | 0.261 [0.220, 0.324] | 0.335 |
+| 262147 | 22.19 | 118.76 | 0.187 [0.121, 0.325] | 0.226 |
+
+- **Rho is not the weak side.** Rho costs 6.35 / 7.34 / 7.10 ns per counted field operation; the [pcc:unverified]
+  index-calculus relation phase 6.57 / 7.15 / 7.63. They share one Cantor implementation.
+- **Where this stands.** The genus-3 index-calculus arm solves the DLP in about a fifth of rho's
+  wall time across p = 65537 to 262147, against about half before R8 (old binary, a confounded
+  cross-check). Wall-time exponents over the three primes are 1.47 for the arm and 1.53 for rho;
+  that is descriptive, three points, no interval, and not an exponent claim.
+- **What it is not.** A constant factor of about 5 at genus 3 on one VM; no sub-exponential
+  algorithm; no leaderboard row (no isolated host, no `VALIDATION.json`; the gate workflow is
+  disabled). The deviation `raw/load.log` was deleted and reconstructed from printed lines,
+  disclosed in RESULTS.md.
