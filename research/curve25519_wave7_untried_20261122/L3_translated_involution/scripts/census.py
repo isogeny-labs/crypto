@@ -203,6 +203,9 @@ def main():
             print(f'k={a.k} {arm} t={t} {meta["timing"][f"{arm}|t={t}"]}s', file=sys.stderr, flush=True)
         np.savez_compressed(os.path.join(a.outdir, f'{arm}.npz'), **data)
     meta['total_s'] = round(time.time() - t0, 2)
+    import resource
+    meta['maxrss_MB'] = round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 1)
+    meta['cpu_s'] = round(resource.getrusage(resource.RUSAGE_SELF).ru_utime + resource.getrusage(resource.RUSAGE_SELF).ru_stime, 2)
     json.dump(meta, open(os.path.join(a.outdir, 'meta.json'), 'w'), indent=1)
 
 

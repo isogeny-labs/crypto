@@ -104,3 +104,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+    import resource
+    print(f'maxrss_MB {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/1024:.0f}', file=sys.stderr)

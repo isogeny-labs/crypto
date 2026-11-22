@@ -190,7 +190,7 @@ def run(a):
                     for lR in tl:
                         lR = int(lR)
                         cR = fullval[(n - lR) % n]
-                        rec = dict(k=k, f=f, T=T, n=nn, kind=kind, target_log=lR)
+                        rec = dict(k=k, f=f, T=T, n=nn, kind=kind, target_log=lR, base_cols=int(cls.size), base_cov=float(covered_set.size / r))
                         if cR < 0:
                             rec['skip'] = 'f(-R) at a pole'; out.append(rec); continue
                         cp = np.array([pow(int(cR), e_, p) for e_ in range(Dp + 1)], dtype=np.int64)
@@ -232,6 +232,8 @@ def run(a):
                             print('BUDGET EXCEEDED, stopping', file=sys.stderr)
                             json.dump(out, open(a.out, 'w'), default=int); return
     json.dump(out, open(a.out, 'w'), default=int)
+    import resource
+    print(f'maxrss_MB {resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/1024:.0f} wall {time.time()-t0:.0f}s', file=sys.stderr)
 
 
 if __name__ == '__main__':

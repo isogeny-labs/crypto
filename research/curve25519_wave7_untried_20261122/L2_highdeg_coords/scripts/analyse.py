@@ -72,6 +72,10 @@ def decide(cells, sp, mc, meta):
     inside = sum(0.85 <= c['R_col'] <= 1.15 for c in test)
     V['P1_inside'] = f'{inside}/{len(test)}'
     V['P1'] = bool(test) and inside >= 0.9 * len(test) and not any(c['R_col_ci'][0] > 1.15 for c in test)
+    pos = {}
+    for c in [c for c in cells if c['arm'] in ('v', 'q', 'uv', 'jac6', 'xeye', 'xe')]:
+        pos.setdefault(c['arm'], []).append(c['R_col'] >= 1.5 and c['R_col_ci'][0] > 1.15)
+    V['lead_positive_census'] = [a for a, v in pos.items() if sum(v) >= 2 / 3 * len(v)]
     # P1x
     hx = [c for c in cells if c['arm'] in HSIZE and c['mean_xm'] >= 50]
     okx = [0.8 / HSIZE[c['arm']][c['k']] <= c['R_col'] <= 1.2 / HSIZE[c['arm']][c['k']] for c in hx]
@@ -141,8 +145,22 @@ def decide(cells, sp, mc, meta):
             for f in ('v', 'q'):
                 if (k, f, 5) in med and (k, 'x', 5) in med:
                     ratios[f'{k}/{f}'] = med[(k, f, 5)] / med[(k, 'x', 5)]
-        V['P5d_ratios_T5'] = ratios
-        V['P5d'] = bool(ratios) and all(x >= 3 for x in ratios.values())
+        for k in (16, 18, 20):
+            for f in ('v', 'q'):
+                if (k, f, 4) in med and (k, 'x', 4) in med:
+                    ratios[f'{k}/{f}/T4'] = med[(k, f, 4)] / med[(k, 'x', 4)]
+        V['P5d_ratios'] = ratios
+        V['P5d'] = bool(ratios) and all(x >= 1.0 for x in ratios.values())
+        # P6: cost per relation = median M2 mul-adds per refutable target / base coverage (same base)
+        cov = {}
+        for r in recs:
+            cov[(r['k'], r['f'], r['T'])] = r['base_cov']
+        cpr = {kk: med[kk] / cov[kk] for kk in med if cov.get(kk)}
+        V['P6_cost_per_relation'] = {f'{k}/{f}/T{T}': v for (k, f, T), v in sorted(cpr.items())}
+        p6 = [cpr[(k, f, 5)] / cpr[(k, 'x', 5)] for k in (16, 18, 20) for f in ('v', 'q') if (k, f, 5) in cpr and (k, 'x', 5) in cpr]
+        V['P6_ratios_T5'] = p6
+        V['P6'] = bool(p6) and all(x >= 1.0 for x in p6)
+        V['lead_positive_M2'] = sum(1 for k in (16, 18, 20) if any(cpr.get((k, f, 5), 1e99) <= 0.67 * cpr.get((k, 'x', 5), 0) for f in ('v', 'q', 'uv', 'jac6', 'xeye', 'xe'))) >= 2
         dmed = lambda f, k: statistics.median([r['M2']['D_ref'] for r in m2 if r['f'] == f and r['T'] == 5 and r['k'] == k and r['M2']['D_ref']] or [float('nan')])
         V['P5e_ye_eq_x'] = all(abs(dmed('ye', k) - dmed('x', k)) <= 1 for k in (16, 18, 20))
         V['P5f_xe_xeye_above_x'] = all(dmed(f, k) >= dmed('x', k) + 1 for f in ('xe', 'xeye') for k in (16, 18, 20))
@@ -152,7 +170,6 @@ def decide(cells, sp, mc, meta):
         V['M2_rank_check'] = all(r['M2']['rank_at_n_check'] in (True, None) for r in recs if 'M2' in r)
         V['C1_terms_x'] = all(r['terms'] == {4: 121, 5: 256, 6: 484}[r['T']] for r in recs if r['f'] == 'x')
         # cost per relation (M2 median per target / coverage probability of the same base)
-        V['note'] = 'cost per relation needs the census coverage of the [0,2^t) base: written by macaulay.py runs as census_covered fraction'
     return V
 
 

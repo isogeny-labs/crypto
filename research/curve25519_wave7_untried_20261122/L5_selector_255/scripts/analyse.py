@@ -464,6 +464,7 @@ def figure(a, G, fitsF, fitsI, rsum, der, KF, KI):
                            label=f'{cur} {mdl}')
     ax[1].axvline(ts_, color='gray', lw=0.6); ax[1].text(ts_ - 30, -3, f't* = {ts_} (derived)', fontsize=7)
     ax[1].set_xlabel('t'); ax[1].set_ylabel('log10 excess (DERIVED)'); ax[1].legend(fontsize=6); ax[1].set_title('extrapolation (derived)', fontsize=9)
+    if a.smoke: fig.suptitle('SMOKE, NOT DATA', color='red', fontsize=9)
     fig.tight_layout()
     fig.savefig(os.path.join(a.out, 'fig_gain_vs_t.svg')); fig.savefig(os.path.join(a.out, 'fig_gain_vs_t.png'), dpi=70)
 
