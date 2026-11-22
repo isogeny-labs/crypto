@@ -22,6 +22,8 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: research/prime31_ic_20261115/native
+      - name: Independent Python big-int field and exceptional group-law replay
+        run: python3 research/prime31_f4_admission_20261121/run62_independent.py
       - name: Run independently checked full-domain group and field gate
         working-directory: research/prime31_ic_20261115/native
         run: cargo run --release --example prime31_run62_complete_shift
