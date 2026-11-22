@@ -10,6 +10,11 @@ pub mod quadratic_pair_graph;
 #[path = "../src/cryptanalysis/jv_quadratic_pair_relation.rs"]
 pub mod quadratic_pair_relation;
 
+/// The controls are unit tests: `cargo test --example <this example>`.
+/// Cargo.toml builds this example as `crate-type = ["lib"]`, so nothing calls `main`.
+#[allow(dead_code)]
+fn main() {}
+
 #[cfg(test)]
 pub(crate) mod tests {
     use super::{principal_relation as single, quadratic_pair_relation as pair};
@@ -301,7 +306,3 @@ pub(crate) mod tests {
         }
     }
 }
-
-/// The example is a test harness (`cargo test --example jv_sieve_quadratic_pair_relation_controls`);
-/// an empty `main` lets `cargo check --all-targets` build it.
-fn main() {}
