@@ -1,0 +1,18 @@
+# Verdicts
+
+- CAL1_exact_frame_search_fixed_frames: held (30/30) [pcc:unverified]
+- CAL2_null_matches_frame_search_mobius_mean: held (15/15) [pcc:unverified]
+- CAL3_model_matches_nulls: held (30/30) [pcc:unverified]
+- C1_translated_frames_pointwise_identity: held (89966/90000) [pcc:unverified]
+- C2_controls_match_null: held (45/45) [pcc:unverified]
+- AA_split_half: held (28/30) [pcc:unverified]
+- PC1_planted_selfpair_removal_detected: held (24/24) [pcc:unverified]
+- PC2_selection_gain_detected: held (9/9) [pcc:unverified]
+- P1_nohalf_below_null: held (126/126) [pcc:unverified]
+- P2_Ep_xframes_above_E_xframes: held (21/21) [pcc:unverified]
+- P3_JI_degree4_halves_coverage: held (72/72) [pcc:unverified]
+- P4a_same_class_same_distribution: held (36/36) [pcc:unverified]
+- P4b_no_class_effect: held (36/36) [pcc:unverified]
+- P5_full_set_matches_shifted_null: held (60/60) [pcc:unverified]
+- P6_no_fatter_selection_tail: held (6/6) [pcc:unverified]
+- P7_Ep_selected_vs_E_selected: held (1/1) [pcc:unverified]
