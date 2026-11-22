@@ -50,7 +50,7 @@ fn direct(c: u64, seed: u64) -> BTreeSet<u64> {
         .collect()
 }
 
-fn structured(c: u64, y0: u64, seed: u64) -> BTreeSet<u64> {
+fn structured(c: u64, y0: u64, seed: u64, check: bool) -> BTreeSet<u64> {
     assert_eq!(powm(y0, 7, P), c);
     assert_eq!((P - 1) % 7, 0);
     let zeta = powm(3, (P - 1) / 7, P);
@@ -66,16 +66,22 @@ fn structured(c: u64, y0: u64, seed: u64) -> BTreeSet<u64> {
         let fiber_roots = poly_roots(&cubic, P, &mut Rng(seed ^ fiber));
         assert_eq!(fiber_roots.len(), 3, "a registered split cubic failed");
         for x in fiber_roots {
-            assert_eq!(rhs(x), y2);
-            // The 7th-power condition fixes the sign, unlike an x-only S3.
-            assert_eq!(mulm(powm(rhs(x), 4, P), powm(c, P - 2, P), P), y);
+            if check {
+                assert_eq!(rhs(x), y2);
+                // The 7th-power condition fixes the sign, unlike an x-only S3.
+                assert_eq!(mulm(powm(rhs(x), 4, P), powm(c, P - 2, P), P), y);
+            }
             assert!(roots.insert(x), "overlapping x support");
         }
-        factored = poly_mul(&factored, &cubic, P);
+        if check {
+            factored = poly_mul(&factored, &cubic, P);
+        }
         y = mulm(y, zeta, P);
     }
     assert_eq!(y, y0);
-    assert_eq!(factored, full_coset_polynomial(c));
+    if check {
+        assert_eq!(factored, full_coset_polynomial(c));
+    }
     assert_eq!(roots.len(), 21);
     roots
 }
@@ -86,6 +92,13 @@ fn median(mut times: Vec<Duration>) -> Duration {
 }
 
 fn main() {
+    // The full fiber-polynomial and signed-lift certificates are checked
+    // outside the timings; both timed arms use the same roots backend.
+    for (i, &(c, y0)) in COSETS.iter().enumerate() {
+        let a = direct(c, 0x5353_0000 ^ i as u64);
+        let b = structured(c, y0, 0x5377_0000 ^ i as u64, true);
+        assert_eq!(a, b);
+    }
     let mut direct_times = Vec::new();
     let mut structured_times = Vec::new();
     for repetition in 0..5u64 {
@@ -105,6 +118,7 @@ fn main() {
                 c,
                 y0,
                 0x7f31_0000 ^ (i as u64) ^ (repetition << 12),
+                false,
             ));
         }
         structured_times.push(start.elapsed());
