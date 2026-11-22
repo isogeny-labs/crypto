@@ -1,6 +1,7 @@
 name: Selected-call frontier (48 frozen vectors)
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/chained_jacobian_transfers_20261110/cost_frontier_20261114/**'
       - 'research/chained_jacobian_transfers_20261110/evidence/public-n4-complete-chain-checkpoint-01/01-literal-setup-and-selected-vectors.json'
@@ -10,6 +11,7 @@ on:
       - 'research/chained-selected-cost-frontier-20261114'
 jobs:
   selected-call-audit:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

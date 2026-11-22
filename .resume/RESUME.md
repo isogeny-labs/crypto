@@ -1,3 +1,35 @@
+# Resume: crypto @ claude/hyperelliptic-index-calculus-td1fdn (genus-4 follow-up, PR #4693)
+
+## Goal
+Narrow arm x's p = 16411 interval against window-free plain rho (54 targets), test a smaller
+factor base (cc tuned on p = 8209), and get a validator replay for the leaderboard.
+
+## Lead / hypothesis
+Linear algebra is ~75% of arm x's native work; a smaller factor base should lower it. The 9-target
+rho mean was ~14% above sqrt(pi r/2), so the 0.876 point estimate is expected to regress up.
+
+## Spec
+research/genus4_followup_20261118/PROTOCOL.md (frozen at ae36cdc6e4, frozen.sha256, binary.sha256).
+Binary: cargo build --release --bin genus_ladder at ae36cdc6e4, copied to scratchpad bin/genus_ladder.fu.
+
+## State
+Frozen; launching run.sh (part A cc sweep at p = 8209, part B IC arms + 90 Q rho runs at p = 16411).
+
+## Next steps
+1. If killed: counts are deterministic; rerun missing keys into *_resume.jsonl (analyze reads b_q.jsonl*
+   only, so name resume files b_q.jsonl.r1 etc. is NOT read: use b_q_r1.jsonl and extend uniq pattern
+   with a logged deviation).
+2. analyze.py, RESULTS.md, benchmarks/20261118-genus4-followup, benchrec close, validator agent replay.
+
+## Runs in flight
+run.sh (local, 4 threads), started 2026-11-18.
+
+## Stop and success conditions
+Stop on any uncertified run or G2/G3 failure (report as new instrument). Success: protocol readings
+reported with predictions scored; leaderboard only after VALIDATION.json.
+
+---
+
 # Resume: crypto @ codex/ghs-rho-opt-20261118
 
 ## Goal
