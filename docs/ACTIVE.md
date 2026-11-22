@@ -14,7 +14,9 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
-- [ ] Genus-131 prime-order Jacobian known-answer test (Codex, started 2026-11-22, branch codex/genus-131-known-answer)
+- [ ] Genus-131 prime-order Jacobian known-answer test (Codex, started 2026-11-22, branch codex/genus-131-known-answer, PR #4926)
+- [ ] Prime31 weighted-slot RR9 resultant encoding, exact Rust/independent controls and full-cost extraction gate (automation, started 2026-11-18, branch automation/prime31-rr9-weighted-resultant-20261118, PR #4728)
+- [ ] Daily public-source research PR sweep refresh (automation, started 2026-11-19, branch codex/daily-research-leads-20261118, PR #4724; preserve 2026-11-18 frozen evidence; no paid compute or merge)
 - [x] Exact universal formal-collision quotient for weighted Prime31 M6; bound gains from weight retuning (automation, completed 2026-11-18, branch automation/prime31-m6-throughput-ceiling-20261118, PR #4722; source-specific original Rust 40+2 tests and independent BigInt replay passed, signed PCC pending)
 - [x] Prime31 M6 exact uniform-query throughput ceiling and non-generic cost-gate audit (automation, completed 2026-11-18, branch automation/prime31-m6-throughput-ceiling-20261118, PR #4722; pinned Rust 40+2 tests and separate Python exact replay PASS, signed PCC pending)
 - [x] Prime31 signed pair Semaev projector: exact denominator-safe polynomial membership, bounded Rust test, and B31 cost gate (automation, started 2026-11-18, branch automation/prime31-algebraic-pair-projector-20261118, PR #4720; source-specific Rust 42/42 and independent 715-case BigInt replay passed; no full-solver speed claim)
@@ -157,7 +159,6 @@ Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hypere
 - [ ] Autolab rounds 38 to 40 (claude, started 2026-11-17, branch ic-autolab-20261117b): round 39 ratchets `tw2l-x20-j16-n2` at k = 28 (0.944, counted GAE; wall time 1.236x slower; validator disposition validated for the counted claim); open: a second-host replay or human validation, a code-level lever beyond the K = 3 collision floor, and the `hashed-ecdl-tensor` standalone build failure (eight modules with no `mod` line in `lib.rs`)
 
 ## Blocked / questions for the owner
-- [ ] Publish the genus-131 known-answer test. Native-module regression passed locally. GitHub rejected the configured credential (Codex, branch codex/genus-131-known-answer).
 
 - Curve-transfer infrastructure continuation (Codex, PR #4697): the scoped
   curve workflow is green at exact implementation/workflow head `d8df2130...`,
