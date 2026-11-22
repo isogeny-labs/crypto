@@ -14,6 +14,7 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+- [x] Prime31 signed pair Semaev projector: exact denominator-safe polynomial membership, bounded Rust test, and B31 cost gate (automation, started 2026-11-18, branch automation/prime31-algebraic-pair-projector-20261118, PR #4720; source-specific Rust 42/42 and independent 715-case BigInt replay passed; no full-solver speed claim)
 - [x] Specify and test a compact growing-degree or adaptive target-local router for the n=83 image-compatible relation calculus (Codex, completed 2026-11-18, branch codex/n83-adaptive-image-router-20261118, PR #4719)
 
 - [ ] Audit and implement RR9 low-power multiplicity-strata exact gate on original Prime31 (automation, started 2026-11-18, branch automation/prime31-rr9-low-power-strata-20261118)
