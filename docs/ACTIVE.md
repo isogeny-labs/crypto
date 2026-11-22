@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+- [x] Preregister and test sparse partial pair-table construction on public toy ECDLP (automation, 2026-11-18, branch research/ic-partial-pairtable-20261118-run2, PR #4763; 24 B32+8 B16 correct, 160 local arm replays, [pcc:unverified]; native follow-up queued)
+
 - [x] Speed up ECDLP index calculus: binary x-only sibling pairs (`BinaryGroup::sibling_pair`) and necklace-reduced `ksum-frobenius` with Montgomery leaf batches, target-free setup collision harvesting, and scale-free `scale=X` sizing — up to 11.84x counted speedup across the §5a band (14.75x wall) on 44.3-bit `icv1-f2m53-tm56619371-dac20a85` and 6.09x (7.14x wall) on 39-bit `icv1-f2m41-tm2308219-7f48b14a` (`research/koblitz_frob_ksum_sib_20261118`, Cursor, completed 2026-11-18, branch cursor/ecdlp-ic-speedup-809a, PR #4762) [pcc:unverified]
 
 - [x] Test genus-2 smooth-companion torsion sieve against matched ECDLP coverage nulls (automation, completed 2026-11-18, branch research/genus2-companion-torsion-sieve-20261118, PR #4761; toy predicate rejected)
