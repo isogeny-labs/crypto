@@ -164,7 +164,15 @@ mod round42 {
                         "replay degree={degree} trial={trial} exp={exp}");
                     assert_eq!(new.0,new.1,
                         "cross-check degree={degree} trial={trial} exp={exp}");
-                    assert!(new.2 < old.2 && new.3 < old.3);
+                    // The later R65 affine-linear shortcut returns before
+                    // either R42 branch for degree one and exponent p.
+                    // That control must tie; all reached R42 cases improve.
+                    if degree == 1 && exp == p {
+                        assert_eq!((new.2,new.3),(old.2,old.3));
+                    } else {
+                        assert!(new.2 < old.2 && new.3 < old.3,
+                            "degree={degree} trial={trial} exp={exp}");
+                    }
                     comparisons+=3;
                 }
             }
