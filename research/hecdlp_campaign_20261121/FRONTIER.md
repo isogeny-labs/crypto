@@ -260,3 +260,15 @@ p^1.5 (plain, SGE, R4) or buys it down by spending relations (R11). The best tot
 is about 1.38–1.41 in counts and 1.41 in wall time (R10), against rho's 1.5–1.56 with an interval
 that does not exclude it. The double-large-prime theory's 4/3 is not reached at p ≤ 2^20 by any
 variant tried.
+
+### R12: per-prime weight target [pcc:unverified]
+
+`genus_ladder_bounded_sweep_20261122`, same binary and instances as R11, W ∈ {8.5, 9, 9.5, 10}
+with cover 1, 144 runs certified, plain rows equal to R11's. W = 10 (the top of the grid) wins at
+every prime: FPM at κ = 3 of 0.987 / 0.979 / 0.971 / 0.971 of plain at p = 32771 / 65537 / 131101 /
+262147, with excess 0.1–0.2. Total exponent 1.372 [1.367, 1.375] against plain's 1.380; paired
+difference −0.008 [−0.012, −0.005]. S2 held, S3 and S4 failed (a drop of 0.02 was predicted).
+
+A 1–3 % constant gain that grows with p, and an exponent change of under 0.01. The same trade as
+R11: lowering W lowers the LA exponent and raises the relation phase's by about as much. W > 10 is
+untested but can only matter at the largest prime, where the excess is already above its floor.
