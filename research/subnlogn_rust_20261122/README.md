@@ -153,6 +153,11 @@ observations; neither local tests nor an unsigned record establish the complete
 published theorem. No performance experiment or leaderboard update is part of
 this change.
 
+The source implementation is commit
+`a1a2a0b4e51554415caad43f7ba544d0de53bd7a`. Native-observation record
+`PCC-20261122-5140c7` pins the receipt; its standing is `unverified` and its
+unsigned attestation check is `not_covered`. [pcc:unverified]
+
 Primary source is the manuscript at `openai/math` commit
 `4eaee87548250b2682affda7d05d947c05554bae`:
 

@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-22T19:46:05Z",
+ "id": "PCC-20261122-5140c7",
+ "kind": "statement",
+ "producer": {
+  "commit": "a1a2a0b4e51554415caad43f7ba544d0de53bd7a",
+  "model": "Codex",
+  "session": "codex/subnlogn-rust-integration-20261122"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/subnlogn_rust_20261122/correctness.json",
+    "sha256": "f202348012b9306f3f2644df407e62f6047dd3c375fe8e09fa81c368c29915a8"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "isogeny_algos experimental-subnlogn bounded scalar motif, finite-field reference, exact integer reconstruction and convolution adapter; correctness.json pins source and raw test logs",
+ "statement": "The source-pinned bounded subnlogn reference components completed the recorded local correctness checks: 64 library, 9 integration, 1 example and 10 polynomial regression tests passed, with one pre-existing ignored library test. Focused clippy passed. These are unsigned native observations, not execution proofs, performance results or a complete implementation of the published asymptotic algorithm."
+}
