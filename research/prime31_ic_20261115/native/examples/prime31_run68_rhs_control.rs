@@ -222,7 +222,8 @@ fn bsgs(ar:&mut Arithmetic,qs:&[Point])->Result<(Vec<u64>,f64,f64),String> {
     let g=Some(PRIME31.g);
     let mut baby=HashMap::with_capacity(m as usize);let mut at=None;
     for i in 0..m {baby.entry(at).or_insert(i);at=ar.add(PRIME31,at,g)}
-    let delta=ar.neg(PRIME31,ar.scalar(PRIME31,m,g));
+    let mg=ar.scalar(PRIME31,m,g);
+    let delta=ar.neg(PRIME31,mg);
     let setup_ms=before.elapsed().as_secs_f64()*1e3;
     let mut found=Vec::new();let start=Instant::now();
     for &q in qs {
