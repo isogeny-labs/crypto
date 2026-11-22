@@ -1885,6 +1885,9 @@ struct PowerState {
     // A verified PowerEnd with this binding can also certify Finish's
     // X^p mod f without repeating the entire exponentiation.
     initial_frobenius: bool,
+    // An exact split-base/exponent/modulus binding is just as strong as
+    // recomputing the full Cantor-Zassenhaus power at SplitEnd.
+    split_power: bool,
 }
 
 /// Checks each supplied arithmetic state, the terminal distinct-root certificate,
@@ -1918,6 +1921,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
     // final certificate's Frobenius and linear-part obligations.
     let mut verified_frobenius: Option<Vec<u64>> = None;
     let mut verified_linear_part: Option<Vec<u64>> = None;
+    let mut verified_split_power: Option<Vec<u64>> = None;
     let mut initial_gcd_id: Option<u64> = None;
     // A prior Division event has already been checked using
     // independent arithmetic. Keep its verified remainder for the following
@@ -2055,6 +2059,10 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                         modulus: monic,
                         initial_frobenius: base.as_slice() == [0, 1]
                             && *exponent == p && modulus == &report.polynomial,
+                        split_power: split.as_ref().is_some_and(|(h, delta)| {
+                            base.len() == 2 && base[0] == *delta && base[1] == 1
+                                && *exponent == (p - 1) / 2 && modulus == h
+                        }),
                     },
                 );
             }
@@ -2107,6 +2115,8 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 }
                 if state.initial_frobenius {
                     verified_frobenius = Some(state.acc);
+                } else if state.split_power {
+                    verified_split_power = Some(state.acc);
                 }
             }
             RootEvent::GcdBegin { id, a, b } => {
@@ -2116,7 +2126,8 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     return Err("nonconsecutive computation id".into());
                 }
                 next_id += 1;
-                if let Some(xp) = verified_frobenius.as_ref() {
+                if initial_gcd_id.is_none() && a == &report.polynomial {
+                  if let Some(xp) = verified_frobenius.as_ref() {
                     let mut expected_xpx = xp.clone();
                     expected_xpx.resize(expected_xpx.len().max(2), 0);
                     expected_xpx[1] = if expected_xpx[1] == 0 {
@@ -2124,9 +2135,10 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     } else {
                         expected_xpx[1] - 1
                     };
-                    if a == &report.polynomial && b == &trim(expected_xpx) {
+                    if b == &trim(expected_xpx) {
                         initial_gcd_id = Some(*id);
                     }
+                  }
                 }
                 gcds.insert(*id, (a.clone(), b.clone()));
             }
@@ -2189,6 +2201,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 {
                     return Err("invalid split proposal or RNG stream".into());
                 }
+                verified_split_power = None;
             }
             RootEvent::SplitEnd {
                 polynomial,
@@ -2200,7 +2213,14 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     canonical(v, p)?;
                 }
                 let (h, delta) = split.take().ok_or("missing split begin")?;
-                let mut s = vpower(&[delta, 1], (p - 1) / 2, &h, p)?;
+                // The independently replayed matching power chain already
+                // proves this value. Fall back to independent powering if
+                // the certificate lacks the exact matching computation.
+                let mut s = if let Some(replayed) = verified_split_power.take() {
+                    replayed
+                } else {
+                    vpower(&[delta, 1], (p - 1) / 2, &h, p)?
+                };
                 if s.is_empty() {
                     s.push(0);
                 }
@@ -2379,6 +2399,17 @@ mod tests {
             }
         }
         assert!(verify(&forged).is_err(), "forged replayed gcd accepted");
+
+        let mut forged = report.clone();
+        for event in &mut forged.events {
+            if let RootEvent::SplitEnd { factor, accepted, .. } = event {
+                if *accepted && !factor.is_empty() {
+                    factor[0] = (factor[0] + 1) % p;
+                    break;
+                }
+            }
+        }
+        assert!(verify(&forged).is_err(), "forged split factor accepted");
 
         let mut forged = report.clone();
         for event in &mut forged.events {
