@@ -4,6 +4,7 @@
 //! Run (original repository):
 //!   cargo run --release --locked --example prime31_trace_f4_pilot
 //!   cargo run --release --locked --example prime31_trace_f4_pilot -- --m4
+//!   cargo run --release --locked --example prime31_trace_f4_pilot -- --m4-s3
 //! Use --m4 only to include the m4 membership-only stage; it is NOT an S5 solve.
 //! This file has no native compile/run receipt yet, so no speed result is claimed.
 
@@ -167,18 +168,31 @@ fn evaluate(f: Fp, p: &Mpoly, values: &[u64]) -> u64 {
     res
 }
 
-/// Formula of Semaev S3; exactly symmetric and of TOTAL DEGREE 2
-/// in the pair invariants (e1,e2), rather than degree 4 in x1,x2.
-fn s3_symmetric(f: Fp, e1: &Mpoly, e2: &Mpoly, z: u64) -> Mpoly {
+/// S3(e1,e2,z) in a polynomial third coordinate z; specialize z to
+/// a constant for the final target or keep it as an unrestricted auxiliary.
+fn s3_symmetric_expr(f: Fp, e1: &Mpoly, e2: &Mpoly, z: &Mpoly) -> Mpoly {
     let n = e1.keys().next().expect("nonzero e1 variable").len();
     let d = sub(f, &mul(f, e1, e1), &scale(f, e2, 4));
     let mid = add(f, &mul(f, e1, &add(f, e2, &constant(n, A))), &constant(n, f.mul(2, B)));
     let c = sub(f, e2, &constant(n, A));
     let c0 = sub(f, &mul(f, &c, &c), &scale(f, e1, f.mul(4, B)));
-    add(f, &sub(f, &scale(f, &d, f.mul(z, z)), &scale(f, &mid, f.mul(2, z))), &c0)
+    add(f, &sub(f, &mul(f, &d, &mul(f, z, z)), &scale(f, &mul(f, &mid, z), 2)), &c0)
 }
 
-/// Same S3 as an ordered-coordinate reference, with NO coordinate quotient.
+/// For fixed z, S3 is quadratic in pair invariants e1,e2, whereas
+/// ordered-coordinate S3 is quartic in x1,x2.
+fn s3_symmetric(f: Fp, e1: &Mpoly, e2: &Mpoly, z: u64) -> Mpoly {
+    let n = e1.keys().next().expect("nonzero e1 variable").len();
+    s3_symmetric_expr(f, e1, e2, &constant(n, z))
+}
+
+fn s3_ordered_expr(f: Fp, x: &Mpoly, y: &Mpoly, z: &Mpoly) -> Mpoly {
+    let e1 = add(f, x, y);
+    let e2 = mul(f, x, y);
+    s3_symmetric_expr(f, &e1, &e2, z)
+}
+
+/// Same S3 in ordered coordinates with a fixed target x.
 fn s3_ordered(f: Fp, x: &Mpoly, y: &Mpoly, z: u64) -> Mpoly {
     let e1 = add(f, x, y);
     let e2 = mul(f, x, y);
@@ -272,10 +286,77 @@ fn run_m4_membership(f: Fp, base: &[u64], budget: Duration) {
     run_arm(f, "m4-sym-degreeB-G-membership", &reduced, budget, (base.len()*2+6) as u32);
 }
 
+/// Reindex a two-variable symmetric membership equation into one
+/// of two independent pair-invariant slots in the six-variable S3 chain.
+fn pair_embed(p: &Mpoly, n: usize, start: usize) -> Mpoly {
+    assert!(start+2<=n);
+    let mut out = Mpoly::new();
+    for (ex, &c) in p {
+        assert_eq!(ex.len(),2);
+        let mut dest=vec![0;n];
+        dest[start]=ex[0];
+        dest[start+1]=ex[1];
+        out.insert(dest,c);
+    }
+    out
+}
+
+/// Planted genuine four-summand instance:
+/// G + 2G + 3G + 4G = 10G, u=x(3G), v=x(7G).
+/// Original 6-variable ordered S3 chain versus 6-variable two-pair
+/// symmetric raw/reduced equations, same actual source curve and target.
+/// Kept optional because every native F4 arm has an independent time budget.
+fn run_m4_s3_relation(f: Fp, budget: Duration) {
+    const X4G:u64 = 1_731_809_510;
+    const X7G:u64 = 864_723_287;
+    const X10G:u64 = 1_344_580_913;
+    let base=[GX,X2G,X3G,X4G];
+    let h=poly_from_roots(f,&base);
+    let (raw,reduced)=moment_system(f,&h,2);
+    let x:Vec<Mpoly>=(0..6).map(|i|var(6,i)).collect();
+    let ordered = {
+        let mut r=vec![
+            s3_ordered_expr(f,&x[0],&x[1],&x[4]),
+            s3_ordered_expr(f,&x[2],&x[3],&x[5]),
+            s3_ordered(f,&x[4],&x[5],X10G),
+        ];
+        for i in 0..4 { r.push(membership(f,&base,6,i)); }
+        r
+    };
+    let s12=f.add(GX,X2G);
+    let t12=f.mul(GX,X2G);
+    let s34=f.add(X3G,X4G);
+    let t34=f.mul(X3G,X4G);
+    let symvals=[s12,t12,s34,t34,X3G,X7G];
+    let ordvals=[GX,X2G,X3G,X4G,X3G,X7G];
+    let base_chain=[
+        s3_symmetric_expr(f,&x[0],&x[1],&x[4]),
+        s3_symmetric_expr(f,&x[2],&x[3],&x[5]),
+        s3_ordered(f,&x[4],&x[5],X10G),
+    ];
+    let mut raw_arm=base_chain.to_vec();
+    let mut red_arm=base_chain.to_vec();
+    for start in [0,2] {
+        for j in 0..2 {
+            raw_arm.push(pair_embed(&raw[j],6,start));
+            red_arm.push(pair_embed(&reduced[j],6,start));
+        }
+    }
+    for eq in &ordered { assert_eq!(evaluate(f,eq,&ordvals),0,"ordered planted S3 identity"); }
+    for eq in raw_arm.iter().chain(red_arm.iter()) {
+        assert_eq!(evaluate(f,eq,&symvals),0,"symmetric planted S3 identity");
+    }
+    println!("m4 chained genuine relation G+2G+3G+4G=10G; u=x(3G), v=x(7G); B=4, 6 variables");
+    run_arm(f,"m4-S3-ordered", &ordered,budget,14);
+    run_arm(f,"m4-S3-sym-raw-H", &raw_arm,budget,14);
+    run_arm(f,"m4-S3-sym-degreeB-G", &red_arm,budget,14);
+}
+
 fn main() {
     let f = Fp::new(P);
     let args: Vec<String> = std::env::args().skip(1).collect();
     let m4 = args.iter().any(|x| x=="--m4");
+    let m4_s3 = args.iter().any(|x| x=="--m4-s3");
     let budget = Duration::from_secs(15);
     // B=3/4 are bounded development cells, not exponent-scaling evidence.
     for size in [3usize, 4] {
@@ -283,6 +364,7 @@ fn main() {
         run_m2(f, &base, budget);
         if m4 { run_m4_membership(f, &base, budget); }
     }
+    if m4_s3 { run_m4_s3_relation(f,budget); }
     println!("No complete relation rank, cold discrete-log recovery or asymptotic advantage asserted.");
 }
 
