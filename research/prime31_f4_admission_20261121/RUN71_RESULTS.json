@@ -1,0 +1,87 @@
+{
+  "schema": "prime31-run71-true-rhs-certificate-difference-v1",
+  "date_utc": "2026-11-22",
+  "status": "PASS twice source-identical original Rust; generic reference negative control; PCC unverified",
+  "pr": "https://github.com/isogeny-labs/crypto/pull/4901",
+  "source": "research/prime31_ic_20261115/native/examples/prime31_run71_difference_rhs.rs",
+  "exact_tested_source_commit": "0f75ec4572b99a119189a33508b494b512eed64a",
+  "exact_tested_source_blob_sha": "282af2f3163014f62ea436dd2587c7eba3268f45",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "h": 1,
+    "g": [
+      625037715,
+      2100627251
+    ]
+  },
+  "targets": 32,
+  "certificates_per_target": 4,
+  "generic_pair_table_keys": 916469,
+  "public_certificate_leaf_probes": 933657,
+  "verified_difference_group_identities": 96,
+  "free_rank_initial": 88,
+  "augmented_rank_initial": 184,
+  "incremental_rank_initial": 96,
+  "baseline": {
+    "shift_count": 2528933,
+    "pair_hits": 1088,
+    "independent_pair_dsu_rows": 546,
+    "verified_logs": 32
+  },
+  "difference": {
+    "shift_count": 1668210,
+    "pair_hits": 736,
+    "independent_pair_dsu_rows": 454,
+    "free_rank_projected": 88,
+    "augmented_rank_projected": 178,
+    "incremental_rank_projected": 90,
+    "nullity_at_target_success": 45,
+    "verified_logs": 32
+  },
+  "query_savings": {
+    "count": 860723,
+    "fraction": 0.3403502583896054,
+    "against_run69_k1_fraction": 0.6898218020014388
+  },
+  "ci": [
+    {
+      "url": "https://github.com/isogeny-labs/crypto/actions/runs/45071857479/attempts/1",
+      "job_id": 137360358347,
+      "library_tests": "41/41",
+      "conclusion": "success",
+      "setup_ms": 224.853,
+      "certificate_ms": 186.773,
+      "joint_walk_ms": 636.634,
+      "joint_including_reference_bsgs_ms": 1215.642,
+      "reference_bsgs_setup_ms": 10.897,
+      "reference_bsgs_online_ms": 153.092
+    },
+    {
+      "url": "https://github.com/isogeny-labs/crypto/actions/runs/45071857479/attempts/2",
+      "job_id": 137361051578,
+      "library_tests": "41/41",
+      "conclusion": "success",
+      "setup_ms": 352.151,
+      "certificate_ms": 297.095,
+      "joint_walk_ms": 927.554,
+      "joint_including_reference_bsgs_ms": 1819.654,
+      "reference_bsgs_setup_ms": 16.058,
+      "reference_bsgs_online_ms": 221.705
+    }
+  ],
+  "followup": {
+    "cold_difference_only_source_commit": "9fef5061a562e3b1daf1eb1d96fdec5d69fbe42c",
+    "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/45072185961",
+    "status": "running when snapshot was written"
+  },
+  "limitations": [
+    "one deterministic cohort repeated on different Actions runners; not independent sampling",
+    "joint arm wall costs include control and reference BSGS, not valid cold difference-only cost",
+    "916,469-key pair table is generic group enumeration, disqualifies non-generic/index-calculus result",
+    "no qualified blind RR9/F3 extraction, optimized rho or best-index-calculus frontier comparisons",
+    "PCC independent signed validation unavailable"
+  ]
+}
