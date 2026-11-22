@@ -1044,7 +1044,7 @@ impl Producer<'_> {
             let b_squared = self.mul(linear, linear)?;
             let discriminant = self.sub(b_squared, four_c)?;
             if discriminant == 0 {
-                let half = (self.p + 1) / 2;
+                let half = self.p.div_ceil(2);
                 let root = self.mul(linear, half)?;
                 return Ok(Poly17::constant(self.sub(0, root)?));
             }
@@ -1271,7 +1271,7 @@ impl Producer<'_> {
             let mut r = 1u64;
             let mut base = discriminant;
             let mut exp_t = q;
-            let mut exp_r = (q + 1) / 2;
+            let mut exp_r = q.div_ceil(2);
             while exp_t != 0 || exp_r != 0 {
                 if exp_t & 1 != 0 {
                     t = self.mul(t, base)?;
@@ -1318,7 +1318,7 @@ impl Producer<'_> {
         let numerator_a = self.add(neg_b, sqrt_d)?;
         self.gate.charge(32)?;
         let root_a = (numerator_a >> 1)
-            + ((numerator_a & 1) * ((self.p + 1) / 2));
+            + (numerator_a & 1) * self.p.div_ceil(2);
         let root_b = self.sub(neg_b, root_a)?;
         // R50_QUADRATIC_FINISH_PRODUCER_END
         if root_a == root_b {
@@ -2318,7 +2318,7 @@ impl Replay {
             let scaled = if quotient == 0 || monic.coefficients[0] == self.p - 1 {
                 1
             } else if monic.coefficients[0] == 1 {
-                if quotient % 2 == 0 { 1 } else { self.p - 1 }
+                if quotient.is_multiple_of(2) { 1 } else { self.p - 1 }
             } else {
                 let neg_c = self.minus(0, monic.coefficients[0])?;
                 self.split_character_power(neg_c, quotient)?
@@ -2359,7 +2359,7 @@ impl Replay {
             let square = self.times(linear, linear)?;
             let discriminant = self.minus(square, four)?;
             if discriminant == 0 {
-                let root = self.times(linear, (self.p + 1) / 2)?;
+                let root = self.times(linear, self.p.div_ceil(2))?;
                 return Ok(Poly17::constant(self.minus(0, root)?));
             }
             // R49_FROBENIUS_REPLAY_BEGIN
@@ -2545,7 +2545,7 @@ impl Replay {
             // The fixed nonresidue power is checked against a wide oracle
             // in the round-48 regression test.
             let odd = (self.p - 1) >> 3;
-            let root_exponent = (odd + 1) / 2;
+            let root_exponent = odd.div_ceil(2);
             let mut root = 1u64;
             let mut residue = 1u64;
             let mut factor = discriminant;
@@ -2646,6 +2646,7 @@ impl Replay {
         }
         Ok(self.pending[self.pending_len - 1])
     }
+    #[expect(clippy::if_same_then_else, reason = "keep the R45 replay boundary explicit")]
     fn check_event(&mut self, event: &BoundedRootEvent) -> Result<()> {
         self.gate.clock()?;
         if self.finished || event.sequence != self.sequence {
@@ -3008,7 +3009,7 @@ mod tests {
                         for (index, value) in values.iter_mut().enumerate() {
                             state = state.wrapping_mul(6_364_136_223_846_793_005)
                                 .wrapping_add(1_442_695_040_888_963_407);
-                            *value = if (seed + index as u64) % 3 == 0 {
+                            *value = if (seed + index as u64).is_multiple_of(3) {
                                 0
                             } else {
                                 state % p
@@ -3094,7 +3095,7 @@ mod tests {
                     for (i, v) in values.iter_mut().enumerate() {
                         state = state.wrapping_mul(6364136223846793005)
                             .wrapping_add(1442695040888963407);
-                        *v = if (seed + i as u64) % 5 == 0 { 0 } else { state % p };
+                        *v = if (seed + i as u64).is_multiple_of(5) { 0 } else { state % p };
                     }
                     values[n - 1] = 1;
                     let a = Poly17::from_coefficients(&f, &values).unwrap();

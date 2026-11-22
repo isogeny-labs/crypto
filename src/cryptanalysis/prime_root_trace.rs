@@ -563,6 +563,7 @@ fn vmul(a: u64, b: u64, p: u64) -> u64 {
         ((a as u128 * b as u128) % p as u128) as u64
     }
 }
+#[expect(dead_code, reason = "retained as the Fermat inversion reference")]
 fn vpow(mut a: u64, mut e: u64, p: u64) -> u64 {
     let mut r = 1;
     while e > 0 {
@@ -1405,7 +1406,7 @@ mod tests {
                 for &(a,b) in xs {
                     let (a,b) = (black_box(a), black_box(b));
                     checksum ^= if fast {
-                        field_value(&op, a, b, p)
+                        field_value(op, a, b, p)
                     } else {
                         old(op, a, b, p)
                     };
