@@ -21,8 +21,8 @@
   "arms": [
     {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
     {"name": "rho-plain", "role": "baseline", "method": {"id": "rho.plain"}},
-    {"name": "k3-eliminator", "role": "baseline", "method": {"id": "ic.k3_gaudry", "params": {"harvester": "eliminator"}}},
-    {"name": "k3-cycles", "role": "candidate", "method": {"id": "ic.k3_gaudry", "params": {"harvester": "cycles"}}}
+    {"name": "k3-eliminator", "role": "baseline", "method": {"id": "ic.k3_gaudry", "params": {"harvester": "eliminator", "oracle": "groebner"}}},
+    {"name": "k3-cycles", "role": "candidate", "method": {"id": "ic.k3_gaudry", "params": {"harvester": "cycles", "oracle": "groebner"}}}
   ],
   "measurement": {"rounds": 1, "warmup": 0, "order": "alternate_measured", "seed": 20261123, "isolation_required": "L0", "timeout_seconds": 600}
 }
