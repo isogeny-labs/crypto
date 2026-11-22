@@ -172,6 +172,24 @@ impl Point {
             if let Some(w) = Word::of(m) {
                 if let Some([x, y, a]) = w.get([x, y, a]) {
                     let mut acc: Option<WordJacobian> = None;
+                    // Word scalars: scan bits in a register (BigUint::bit is heap traffic).
+                    if let Some(ku) = single_word(k) {
+                        if ku != 0 {
+                            let top = 63 - ku.leading_zeros();
+                            for i in (0..=top).rev() {
+                                if let Some(j) = acc {
+                                    acc = w.jacobian_double(j, a);
+                                }
+                                if ((ku >> i) & 1) != 0 {
+                                    acc = match acc {
+                                        None => Some(WordJacobian { x, y, z: 1 }),
+                                        Some(j) => w.jacobian_add_affine(j, (x, y), a),
+                                    };
+                                }
+                            }
+                        }
+                        return w.point(acc.map(|j| w.jacobian_to_affine(j)), m);
+                    }
                     for i in (0..k.bits()).rev() {
                         if let Some(j) = acc {
                             acc = w.jacobian_double(j, a);
@@ -191,14 +209,12 @@ impl Point {
     }
 
     /// `k·self + l·other` in **variable time**, for public points and
-    /// scalars: exactly `self.scalar_mul_vartime(k, a)` plus
-    /// `other.scalar_mul_vartime(l, a)`.
+    /// scalars.
     ///
-    /// When `p` fits a word the sum is one interleaved (Shamir) pass in
-    /// Jacobian coordinates with `self + other` precomputed, about
-    /// `max(bits)` doublings and three quarters as many mixed additions,
-    /// and a single inversion for the whole sum; the two ladders and the
-    /// final addition cost three.  Above one word the specialised
+    /// When `p` and both scalars fit a word: Solinas joint sparse form
+    /// (JSF) on Jacobian words with `{±P, ±Q, ±(P±Q)}` precomputed —
+    /// average joint Hamming weight `n/3` vs `n/2` for binary Shamir, one
+    /// inversion for the sum.  Above one word the specialised
     /// `scalar_mul_vartime` paths beat a generic `BigUint` Jacobian Shamir
     /// (~10× on P-256 A/B), so we fall back to two ladders + add.
     pub fn double_scalar_mul_vartime(
@@ -212,6 +228,13 @@ impl Point {
             let m = &x1.modulus;
             if let Some(w) = Word::of(m) {
                 if let Some([x1, y1, x2, y2, a]) = w.get([x1, y1, x2, y2, a]) {
+                    if let (Some(ku), Some(lu)) = (single_word(k), single_word(l)) {
+                        return w.point(
+                            w.double_scalar_jsf((x1, y1), ku, (x2, y2), lu, a),
+                            m,
+                        );
+                    }
+                    // Wide scalars on a word prime: binary interleaved Shamir.
                     let both = w.affine_add((x1, y1), (x2, y2), a);
                     let mut acc: Option<WordJacobian> = None;
                     for i in (0..k.bits().max(l.bits())).rev() {
@@ -238,9 +261,7 @@ impl Point {
                     return w.point(acc.map(|j| w.jacobian_to_affine(j)), m);
                 }
             }
-            // Above one word: specialised scalar_mul_vartime (P-256/secp
-            // Montgomery, …) beats a generic BigUint Jacobian Shamir by
-            // ~10× on measured A/B — fall back to two ladders + add.
+            // Above one word: specialised ladders beat generic BigUint Shamir.
         }
         self.scalar_mul_vartime(k, a)
             .add_vartime(&other.scalar_mul_vartime(l, a), a)
@@ -837,6 +858,96 @@ impl Word {
         let zi = self.inv(j.z).expect("a Jacobian point has Z != 0");
         let zi2 = self.mul(zi, zi);
         (self.mul(j.x, zi2), self.mul(j.y, self.mul(zi2, zi)))
+    }
+
+    #[inline(always)]
+    fn affine_neg(self, (x, y): (u64, u64)) -> (u64, u64) {
+        (x, if y == 0 { 0 } else { self.p - y })
+    }
+
+    /// Solinas joint sparse form digits of `(k0, k1)`, LSB-first.
+    ///
+    /// Digits in `{-1,0,1}`; average joint Hamming weight `n/3` (vs `n/2`
+    /// for binary interleaved Shamir).  Matches Hankerson–Menezes–Vanstone
+    /// Alg. 3.28 with `û ←` LSB then the joint / NAF sign flips.
+    fn jsf_digits(k0: u64, k1: u64) -> ([(i8, i8); 66], usize) {
+        let mut n0 = k0 as i128;
+        let mut n1 = k1 as i128;
+        let mut out = [(0i8, 0i8); 66];
+        let mut len = 0usize;
+        while n0 != 0 || n1 != 0 {
+            let mut u0 = (n0 & 1) as i8;
+            let mut u1 = (n1 & 1) as i8;
+            if u0 == 1 && u1 == 1 && ((n0 >> 1) & 1) == 1 && ((n1 >> 1) & 1) == 1 {
+                u0 = -1;
+                u1 = -1;
+            } else {
+                if u0 == 1 && ((n0 >> 1) & 1) == 1 {
+                    u0 = -1;
+                }
+                if u1 == 1 && ((n1 >> 1) & 1) == 1 {
+                    u1 = -1;
+                }
+            }
+            out[len] = (u0, u1);
+            len += 1;
+            n0 = (n0 - u0 as i128) >> 1;
+            n1 = (n1 - u1 as i128) >> 1;
+            debug_assert!(len < 66);
+        }
+        (out, len)
+    }
+
+    /// `k·P + l·Q` via Solinas JSF in Jacobian words (one final inversion).
+    fn double_scalar_jsf(
+        self,
+        p: (u64, u64),
+        k: u64,
+        q: (u64, u64),
+        l: u64,
+        a: u64,
+    ) -> Option<(u64, u64)> {
+        if k == 0 && l == 0 {
+            return None;
+        }
+        let (digits, len) = Self::jsf_digits(k, l);
+        if len == 0 {
+            return None;
+        }
+        let neg_p = self.affine_neg(p);
+        let neg_q = self.affine_neg(q);
+        let p_plus_q = self.affine_add(p, q, a);
+        let p_minus_q = self.affine_add(p, neg_q, a);
+        let mut acc: Option<WordJacobian> = None;
+        for i in (0..len).rev() {
+            if let Some(j) = acc {
+                acc = self.jacobian_double(j, a);
+            }
+            let (dk, dl) = digits[i];
+            let add = match (dk, dl) {
+                (0, 0) => None,
+                (1, 0) => Some(p),
+                (-1, 0) => Some(neg_p),
+                (0, 1) => Some(q),
+                (0, -1) => Some(neg_q),
+                (1, 1) => p_plus_q,
+                (-1, -1) => p_plus_q.map(|r| self.affine_neg(r)),
+                (1, -1) => p_minus_q,
+                (-1, 1) => p_minus_q.map(|r| self.affine_neg(r)),
+                _ => None,
+            };
+            if let Some(pt) = add {
+                acc = match acc {
+                    None => Some(WordJacobian {
+                        x: pt.0,
+                        y: pt.1,
+                        z: 1,
+                    }),
+                    Some(j) => self.jacobian_add_affine(j, pt, a),
+                };
+            }
+        }
+        acc.map(|j| self.jacobian_to_affine(j))
     }
 }
 
