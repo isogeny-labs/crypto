@@ -1,0 +1,50 @@
+{
+  "protocol": "Run57 Prime31 conditional rank-complete two-summand relation oracle sensitivity",
+  "date_utc": "2026-11-22",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "group_order": 2147446831
+  },
+  "validation": "local exact modular rank simulation and 500 independent small-system dense rank checks; Rust source-specific CI pending; NOT an ECDLP solve",
+  "basis_sha256": "4837e1264f173486334ff6ee9e5609795bc7b73d35f9b52255e13c89b2dc5831",
+  "full_trial_results_sha256": "1aabb3b531009d0c6a90f2b2142a142f302dc91c0a7af7b89d18e99bfced3889",
+  "source_seed": "python.Random(0x13579bdf + 7919*t), t=0..255; separate naive-rank seeds 0x2468ace0+6073*t",
+  "n_trials_per_arm": 256,
+  "positive_cap": 8000,
+  "dickson": {
+    "points": 509,
+    "homogeneous_rank": 13,
+    "naive_hits": 496,
+    "mean_residual_rank_at_naive_hits": 79.046875,
+    "mean_positive_hits_full_rank": 1732.16796875,
+    "mean_uniform_calls": 7179798.2860924,
+    "p05_positive_hits": 1306,
+    "p95_positive_hits": 2369
+  },
+  "hybrid": {
+    "points": 677,
+    "homogeneous_rank": 88,
+    "naive_hits": 589,
+    "mean_residual_rank_at_naive_hits": 93.875,
+    "mean_positive_hits_full_rank": 2292.88671875,
+    "mean_uniform_calls": 5372639.653563109,
+    "p05_positive_hits": 1697,
+    "p95_positive_hits": 3364
+  },
+  "comparison": {
+    "hybrid_calls_fraction": 0.7482995259031385,
+    "hybrid_calls_reduction_percent": 25.17004740968615,
+    "maximum_hybrid_per_call_multiplier_at_equal_setup": 1.3363632681620088,
+    "bootstrap_95_interval_model_only": [
+      1.292,
+      1.383
+    ]
+  },
+  "caveats": [
+    "Independent uniform successful-pair simulation conditioned on a hit, not measured S3/F4 extraction",
+    "Excludes all setup, rootfinding, false probes, scalar shifts and target log recovery",
+    "No cost advantage for a complete non-generic prime-field solver is claimed"
+  ]
+}
