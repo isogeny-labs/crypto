@@ -1,6 +1,7 @@
 name: CT22 HLP mod-4 torsion census
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - "research/chained_jacobian_transfers_20261110/ct22_mod4_gluing.rs"
       - "research/chained_jacobian_transfers_20261110/ct22_actual_e4.py"
@@ -8,6 +9,7 @@ on:
   workflow_dispatch:
 jobs:
   torsion:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

@@ -1,0 +1,57 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h58f8b65b6366",
+  "label": "ic_tableb_binary_wwalk_20261119 B21: C = 2 wwalk on random-binary Table B vs the k-sum incumbent",
+  "spec_id": "ECS1h065c0215e856",
+  "spec_sha256": "065c0215e856fc7780a8881d1ae889dd8033b17f569f2a2c037c3251101a9dc1",
+  "env_class_id": "ECBENV3h7e5034a7877f",
+  "host_sha256": "a2deb2fc55f62ad257db89650838f63c725fe6b24ba163d01481bfdb72867c84",
+  "plan_sha256": "054bf72db6562de8ed89fd0d115206cd3d6c05ac5dc3cfdf97437f605e8712b2",
+  "binary_sha256": "93139f8e16fc25278c073ccba388d2b10f24574c0a2f3959e4767bf8126aa41d",
+  "git_commit": "ce71cfa8f1f2e56c6bd70bfe9fde2a7a96b60ee5",
+  "git_dirty": false,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": true,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "f6_ic_tree": 2,
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1795113393369,
+  "finished_unix_ms": 1795113397427,
+  "status": "complete",
+  "executions_planned": 720,
+  "records_written": 720,
+  "records_sha256": "70632b2ca00b92fb83fa55026f237f54340e9680507bc3be3f40f614881dd98a",
+  "status_counts": {
+    "verified": 720
+  },
+  "last_seq": 719
+}
