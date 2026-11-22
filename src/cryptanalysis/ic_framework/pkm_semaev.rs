@@ -4189,6 +4189,7 @@ mod tests {
         let mut rng = StdRng::seed_from_u64(29);
         let g = inst.generator_point();
         let mut hits = 0;
+        let mut unliftable_raw_disagreements = 0;
         for k in 0..32u64 {
             let target = if k.is_multiple_of(3) {
                 let idx: Vec<usize> = (0..2).map(|_| rng.gen_range(0..fb.points.len())).collect();
@@ -4216,7 +4217,38 @@ mod tests {
                 }
                 got.is_some()
             };
+            let before_disagreements = f4
+                .relation_counters()
+                .get("pkm_crosscheck_disagreements")
+                .copied()
+                .unwrap_or(0);
             let (a, c) = (run(&mut f4), run(&mut grid));
+            let after_disagreements = f4
+                .relation_counters()
+                .get("pkm_crosscheck_disagreements")
+                .copied()
+                .unwrap_or(0);
+            if after_disagreements > before_disagreements {
+                // This counter compares raw quotient polynomial roots. A root
+                // outside the base can disagree even when both relation
+                // oracles correctly reject the target. Keep the raw signal,
+                // but require an independent failed lift for every increase.
+                assert!(!a && !c, "{label}: raw disagreement has a relation");
+                let q = match f4.membership {
+                    Membership::T0Bits { q: Some(q), .. } => q,
+                    _ => panic!("{label}: raw grid disagreement outside T0 quotient"),
+                };
+                let x_r = addm(q.w_of(target.x).expect("target is not T0"), q.s, curve.p);
+                let (raw, _) = f4.grid(curve, x_r, false);
+                assert!(!raw.is_empty(), "{label}: missing raw grid witness");
+                assert!(
+                    raw.iter().all(|xs| f4
+                        .t0_lift(curve, fb, &mut GroupOps::default(), &q, xs, target)
+                        .is_none()),
+                    "{label}: raw grid witness lifts to the declared base"
+                );
+                unliftable_raw_disagreements += after_disagreements - before_disagreements;
+            }
             assert_eq!(a, c, "{label}: F4 against the grid, target {k}");
             assert_eq!(
                 c,
@@ -4229,7 +4261,7 @@ mod tests {
         let n = f4.relation_counters();
         assert_eq!(
             n.get("pkm_crosscheck_disagreements").copied().unwrap_or(0),
-            0,
+            unliftable_raw_disagreements,
             "{label}"
         );
         assert!(
