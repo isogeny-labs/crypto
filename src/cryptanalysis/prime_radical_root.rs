@@ -353,6 +353,13 @@ impl Ring for Fq2 {
     }
     fn mul(&self, x: (u64, u64), y: (u64, u64)) -> (u64, u64) {
         let f = &self.f;
+        // The AMM root solver frequently multiplies by elements of Fp.
+        // Avoid Karatsuba's extra base-field product when the left operand
+        // lies in the embedded prime field. Keep dense arithmetic unchanged.
+        // Public-input, variable-time fast path; never use for secret data.
+        if x.1 == 0 {
+            return (f.mul(x.0, y.0), f.mul(x.0, y.1));
+        }
         let ac = f.mul(x.0, y.0);
         let bd = f.mul(x.1, y.1);
         // The first quadratic non-residue is commonly 2 or 3.
@@ -1018,10 +1025,10 @@ impl RadicalRootCtx {
         if p >= (1u64 << 20) && (p & 3 == 3 || p & 7 == 5)
             && a != 0 && a < p
         {
-            // A selected 32-bit modulus: use 32-bit Euclidean remainders
-            // rather than 64-bit hardware divisions in the Jacobi prefilter.
-            // Public, canonical discriminants only.
-            if p == 4_294_967_291 {
+            // Use narrow Euclidean remainders for every 32-bit modulus,
+            // not only p=2^32-5. For larger primes, retain u64 arithmetic.
+            // Both branches operate exclusively on canonical public inputs.
+            let positive = if p <= u32::MAX as u64 {
                 let (mut v, mut n) = (a as u32, p as u32);
                 let mut negative = false;
                 while v != 0 {
@@ -1037,30 +1044,31 @@ impl RadicalRootCtx {
                     n = v;
                     v = next;
                 }
-                // The Jacobi test already proves that a is a square. Use the
-                // 2^30-1 addition chain here as in sqrt(), not generic rpow.
-                // This saves 24 modular multiplications for each accepted
-                // canonical discriminant over p = 2^32-5.
-                if n != 1 || negative { return None; }
-                return Some(self.f.sqrt_power_4294967291(a));
-            }
-            let (mut v, mut n) = (a, p);
-            let mut negative = false;
-            while v != 0 {
-                let twos = v.trailing_zeros();
-                v >>= twos;
-                if twos & 1 != 0 && (n & 7 == 3 || n & 7 == 5) {
-                    negative = !negative;
+                n == 1 && !negative
+            } else {
+                let (mut v, mut n) = (a, p);
+                let mut negative = false;
+                while v != 0 {
+                    let twos = v.trailing_zeros();
+                    v >>= twos;
+                    if twos & 1 != 0 && (n & 7 == 3 || n & 7 == 5) {
+                        negative = !negative;
+                    }
+                    if v & 3 == 3 && n & 3 == 3 {
+                        negative = !negative;
+                    }
+                    let next = n % v;
+                    n = v;
+                    v = next;
                 }
-                if v & 3 == 3 && n & 3 == 3 {
-                    negative = !negative;
-                }
-                let next = n % v;
-                n = v;
-                v = next;
-            }
-            if n != 1 || negative {
+                n == 1 && !negative
+            };
+            if !positive {
                 return None;
+            }
+            // The special square-root chain remains selected for p=2^32-5.
+            if p == 4_294_967_291 {
+                return Some(self.f.sqrt_power_4294967291(a));
             }
             // For p == 5 (mod 8), a^(p+3)/8 squares to a or -a
             // precisely when a is a quadratic residue. Jacobi already
@@ -5316,6 +5324,64 @@ mod round120_five_mod_eight_discriminant_regressions {
                 if let Some(r) = filtered {
                     assert_eq!(ctx.f.sqr(r), a, "p={p} a={a}");
                 }
+            }
+            for a in [p, p + 1, u64::MAX] {
+                assert_eq!(ctx.sqrt_discriminant(a), ctx.sqrt(a));
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod round121_narrow_jacobi_and_sparse_extension_tests {
+    use super::*;
+
+    fn next(seed: &mut u64) -> u64 {
+        *seed ^= *seed << 13;
+        *seed ^= *seed >> 7;
+        *seed ^= *seed << 17;
+        *seed
+    }
+
+    #[test]
+    fn embedded_prime_field_multiplication_matches_schoolbook() {
+        let mut seed = 0x1210_2026_1122_ff20u64;
+        let mut count = 0usize;
+        for p in [65_521u64, 1_000_000_007, MAX_PRIME] {
+            let f = Fp::new(p);
+            let q = Fq2 { f, n: 2 };
+            for i in 0..50_000 {
+                let x = (next(&mut seed) % p,
+                         if i % 3 == 0 { 0 } else { next(&mut seed) % p });
+                let y = (next(&mut seed) % p,
+                         if i % 5 == 0 { 0 } else { next(&mut seed) % p });
+                let got = q.mul(x, y);
+                let expected = (
+                    f.add(f.mul(x.0, y.0), f.mul(2, f.mul(x.1, y.1))),
+                    f.add(f.mul(x.0, y.1), f.mul(x.1, y.0)),
+                );
+                assert_eq!(got, expected, "p={p} i={i}");
+                count += 1;
+            }
+        }
+        assert_eq!(count, 150_000);
+    }
+
+    #[test]
+    fn narrow_jacobi_matches_full_square_root_and_euler_criterion() {
+        let mut seed = 0x1210_2026_1122_abb5u64;
+        for p in [101u64, 1_000_000_021, 4_294_967_197, 4_294_967_291,
+                  2_305_843_009_213_693_693] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            for i in 0..4_096 {
+                let x = next(&mut seed) % p;
+                let a = if i % 2 == 0 { ctx.f.sqr(x) } else { x };
+                let got = ctx.sqrt_discriminant(a);
+                assert_eq!(got, ctx.sqrt(a), "p={p} a={a}");
+                assert_eq!(got.is_some(),
+                           a == 0 || ctx.f.powm(a, (p - 1) / 2) == 1,
+                           "p={p} a={a}");
+                if let Some(r) = got { assert_eq!(ctx.f.sqr(r), a); }
             }
             for a in [p, p + 1, u64::MAX] {
                 assert_eq!(ctx.sqrt_discriminant(a), ctx.sqrt(a));
