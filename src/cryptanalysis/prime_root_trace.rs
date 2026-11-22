@@ -1786,36 +1786,21 @@ fn vquartic_replay_square(a: &[u64], modulus: &[u64], p: u64) -> Vec<u64> {
 }
 
 #[inline]
-fn vpower_quadratic_loop<const KARATSUBA: bool>(
-    mut power: (u64, u64), mut exponent: u64, c: u64, d: u64, p: u64,
-) -> (u64, u64) {
-    let mut residue = (1, 0);
-    while exponent != 0 {
-        if exponent & 1 == 1 {
-            residue = if KARATSUBA {
-                quadratic_mul_karatsuba(residue, power, c, d, p)
-            } else {
-                quadratic_mul(residue, power, c, d, p)
-            };
-        }
-        exponent >>= 1;
-        if exponent != 0 {
-            power = quadratic_square(power, c, d, p);
-        }
-    }
-    residue
-}
-fn vpower_quadratic(base: &[u64], exponent: u64, modulus: &[u64], p: u64)
+// Keep the p61 exponentiation body unchanged. Earlier source-exact native
+// benchmarks showed that a const-generic extraction regressed p61 by ~10%
+// despite identical field arithmetic. Dispatch only 32-bit-prime inputs.
+fn vpower_quadratic(base: &[u64], mut exponent: u64, modulus: &[u64], p: u64)
     -> Result<Vec<u64>, String>
 {
+    if p <= u32::MAX as u64 {
+        return vpower_quadratic_karatsuba(base, exponent, modulus, p);
+    }
     debug_assert_eq!(modulus.len(), 3);
     let lead = modulus[2];
     if lead == 0 { return Err("division by zero leading coefficient".into()); }
     let inverse = if lead == 1 { 1 } else { vinv(lead, p) };
     let c = if lead == 1 { modulus[0] } else { vmul(modulus[0], inverse, p) };
     let d = if lead == 1 { modulus[1] } else { vmul(modulus[1], inverse, p) };
-    // Horner reduction also handles degree >2 bases, without an allocated
-    // quotient: (a+b*x)*x+v = (v-b*c)+(a-b*d)*x.
     let (mut a, mut b) = (0, 0);
     for &value in base.iter().rev() {
         let next_a = quadratic_sub(value, vmul(b, c, p), p);
@@ -1823,11 +1808,49 @@ fn vpower_quadratic(base: &[u64], exponent: u64, modulus: &[u64], p: u64)
         a = next_a;
         b = next_b;
     }
-    let residue = if p <= u32::MAX as u64 {
-        vpower_quadratic_loop::<true>((a, b), exponent, c, d, p)
-    } else {
-        vpower_quadratic_loop::<false>((a, b), exponent, c, d, p)
-    };
+    let mut residue = (1, 0);
+    let mut power = (a, b);
+    while exponent != 0 {
+        if exponent & 1 == 1 {
+            residue = quadratic_mul(residue, power, c, d, p);
+        }
+        exponent >>= 1;
+        if exponent != 0 {
+            power = quadratic_square(power, c, d, p);
+        }
+    }
+    Ok(trim(vec![residue.0, residue.1]))
+}
+
+#[inline(never)]
+fn vpower_quadratic_karatsuba(
+    base: &[u64], mut exponent: u64, modulus: &[u64], p: u64,
+) -> Result<Vec<u64>, String> {
+    debug_assert!(p <= u32::MAX as u64);
+    debug_assert_eq!(modulus.len(), 3);
+    let lead = modulus[2];
+    if lead == 0 { return Err("division by zero leading coefficient".into()); }
+    let inverse = if lead == 1 { 1 } else { vinv(lead, p) };
+    let c = if lead == 1 { modulus[0] } else { vmul(modulus[0], inverse, p) };
+    let d = if lead == 1 { modulus[1] } else { vmul(modulus[1], inverse, p) };
+    let (mut a, mut b) = (0, 0);
+    for &value in base.iter().rev() {
+        let next_a = quadratic_sub(value, vmul(b, c, p), p);
+        let next_b = quadratic_sub(a, vmul(b, d, p), p);
+        a = next_a;
+        b = next_b;
+    }
+    let mut residue = (1, 0);
+    let mut power = (a, b);
+    while exponent != 0 {
+        if exponent & 1 == 1 {
+            residue = quadratic_mul_karatsuba(residue, power, c, d, p);
+        }
+        exponent >>= 1;
+        if exponent != 0 {
+            power = quadratic_square(power, c, d, p);
+        }
+    }
     Ok(trim(vec![residue.0, residue.1]))
 }
 
