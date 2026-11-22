@@ -41,7 +41,19 @@ A simple independent check of the coupon-collector effect: at 496 Dickson positi
 - `run57_rank_gate.py`: signed-DSU + exact modular projected-rank trial with nonidentity support probabilities, seeded positive samples and failure distinction.
 - `run57_validate.py`: independently authored dense full-matrix rank comparison (500 trials).
 - `RUN57_RESULTS.json`: committed exact per-arm summary and seed/provenance; `run57_rank_gate.py` regenerates `run57_compact_results.json` with all 512 stopping times. Local full results SHA256 `1aabb3b531009d0c6a90f2b2142a142f302dc91c0a7af7b89d18e99bfced3889`. [pcc:unverified].
-- Source-linked existing-Rust `research/prime31_ic_20261115/native/examples/prime31_rank_completion_gate.rs` is committed and now has its own source-triggered cached CI step; it draws a separate 128-trial SplitMix64 cohort. It reuses the original crate's `check_curve`/`Arithmetic`, not a replacement EC engine. The Rust cohort's native compilation and execution remain unverified until a green source-specific Actions run.
+- Source-linked existing-Rust `research/prime31_ic_20261115/native/examples/prime31_rank_completion_gate.rs` is committed and now has its own source-triggered cached CI step; it draws a separate 128-trial SplitMix64 cohort. It reuses the original crate's `check_curve`/`Arithmetic`, not a replacement EC engine. The separate 128-trial Rust cohort is now source-linked CI PASS #45003247773; see verified results below.
+
+## Independent source-linked native Rust verification (2026-11-22, PASS)
+
+The **original** `prime31-algebraic-ic` crate, original `Arithmetic` / `PRIME31` and the small dedicated cached runner compiled and passed [GitHub Actions #45003247773](https://github.com/isogeny-labs/crypto/actions/runs/45003247773) (job 137149155743). The source-bound runner completed **500/500 independent Python dense rank tests**, a 14.41-second release build, the existing full 509-point Rust signed-pair yield/rank census, and a **separate 128-trial native Rust SplitMix64 rank-saturation simulation** with the same frozen 13/88 free-row basis. This is *not* merely a predicted CI result.
+
+| Rust idealized conditional model (128 seeds) | Dickson 509 | Hybrid 677 |
+|---|---:|---:|
+| Mean successful pair rows to full rank | **1,738.375** | **2,285.656** |
+| Mean rank deficiency after naive minimum | **79.555** | **93.742** |
+| Mean uniform queries (model extrapolation) | **7,205,526** | **5,355,697** |
+
+Native hybrid/Dickson query ratio **0.743276** (25.67% fewer modeled calls), same-setup hybrid oracle-cost threshold **1.345395×**. This corroborates the independent 256-seed Python model's **1.33636×** gate despite different RNGs and cohort sizes. Only the model implementation, deterministic exact modular arithmetic and source-bound execution are verified; actual S3/F4 costs and blind ECDLP logs remain unmeasured. No independent signed PCC.
 
 ## Priority changes / falsifiable next tests
 
