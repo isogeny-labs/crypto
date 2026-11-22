@@ -414,9 +414,16 @@ impl<'i> RootfindKMitmOracle<'i> {
                     base = end;
                     continue;
                 }
+                // AVX2 dual-pack is correct but loses to scalar 8-wide on
+                // this host class (`optlevel` ticks 9–11). Prefer scalar
+                // lanes unless the caller forces AVX2 (`set_avx2_enabled`
+                // alone is not enough — require IFMA off and an explicit
+                // env? keep: only take AVX2 when scalar path is unavailable.
+                // Optlevel/mode=avx2 sets ifma off + avx2 on and calls
+                // decompose_lanes; to honour that, still enter when
+                // `avx2_enabled && !ifma_enabled`.
                 #[cfg(target_arch = "x86_64")]
-                if self.avx2.is_some() && self.avx2_enabled {
-                    // Dual-pack AVX2: one FB walk covers up to 8 targets.
+                if self.avx2.is_some() && self.avx2_enabled && !self.ifma_enabled {
                     self.probe_right1_prime_lanes_avx2(
                         g,
                         fb,

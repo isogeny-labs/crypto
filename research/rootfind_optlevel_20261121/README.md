@@ -205,8 +205,29 @@ passes (8-target planted test).
 
 Fail-closed tick 2/3: dual-pack does not beat scalar 8-wide ILP + one
 shared Fp64 batch-inv. Bound is the `mul_epu32` mont / store-reload prefix
-chain, not the split-walk. Next tick: last attempt (e.g. keep results in
-Montgomery and key bloom by R=2^32 mont form) or stop.
+chain, not the split-walk.
+
+### Tick 11 — stop AVX2 fallback (fail-closed 3/3)
+
+No further implementation lever closes a **0.16 → 0.40** attainment gap on
+T-timing: dual-pack (tick 10) was flat; mont-keyed bloom / dropping `×1`
+would at best shave a mul per candidate, not 2.5× the rate. Scalar 8-wide
+Fp64 batch-inv remains the better non-IFMA path on this host.
+
+**AVX2 fallback stop:** keep the code for non-IFMA / `p < 2^31` hosts and
+correctness tests; do not prefer it over scalar lanes when both are
+available (`decompose_lanes` order: IFMA → AVX2 → scalar — change: prefer
+scalar over AVX2 when both prepared). Loop unsubscribed.
+
+### Final optlevel verdict
+
+| Path | Status |
+|---|---|
+| Preferred IFMA (kmitm + floor) | **Fully optimized** — grade A, compute roof |
+| Scalar lanes (non-IFMA) | Grade D; best available without IFMA/SIMD mont |
+| AVX2 lanes | Landed, correct, **not** competitive vs scalar here |
+
+Remaining gains are algorithmic (G3 / different search), not this roof.
 
 ## Claim hygiene
 
