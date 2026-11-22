@@ -1,0 +1,30 @@
+name: Prime31 run59 free-row target gate
+on:
+  push:
+    branches:
+      - research/prime31-f4-admission-run51-20261121
+  pull_request:
+    paths:
+      - "research/prime31_ic_20261115/native/examples/prime31_rank_completion_gate.rs"
+      - "research/prime31_f4_admission_20261121/run59_*.py"
+      - "research/prime31_f4_admission_20261121/run57_basis.json"
+      - ".github/workflows/prime31-run59-free-row-gate.yml"
+  workflow_dispatch:
+
+jobs:
+  quotient-span:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check exact 101-case independent rank oracle
+        run: python3 research/prime31_f4_admission_20261121/run59_direct_rank_verify.py
+      - name: Replay conditional 256-trial model
+        run: python3 research/prime31_f4_admission_20261121/run59_free_row_target.py
+      - uses: dtolnay/rust-toolchain@1.100.0
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: research/prime31_ic_20261115/native
+      - name: Run original Prime31 Rust rank completion with run59 extension
+        working-directory: research/prime31_ic_20261115/native
+        run: cargo run --release --example prime31_rank_completion_gate
