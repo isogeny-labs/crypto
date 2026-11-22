@@ -2390,9 +2390,9 @@ pub fn ec_index_calculus_dlp(
         return None;
     }
     let x = solution.values[m].clone();
-    // Verify Q ≡ x·G independently of the linear algebra.
+    // Verify Q ≡ x·G independently of the linear algebra (public `x`: vartime).
     let a_fe = curve.a_fe();
-    let candidate = g.scalar_mul(&x, &a_fe);
+    let candidate = g.scalar_mul_vartime(&x, &a_fe);
     if &candidate == q {
         Some(x)
     } else {
@@ -3102,7 +3102,8 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     let (va, vd) = scalar_mult_ops(&x);
     count("group_additions", va);
     count("group_doublings", vd);
-    let candidate = g.scalar_mul(&x, &a_fe);
+    // Public recovered `x`: Word/specialised vartime ladder (~13× vs CT on word primes).
+    let candidate = g.scalar_mul_vartime(&x, &a_fe);
     let verified = &candidate == q;
     let verify_ms = verify_started.elapsed().as_secs_f64() * 1e3;
     if !verified {
@@ -3212,7 +3213,8 @@ pub fn ec_index_calculus_dlp_s4_staged(
 
     let verify_started = Instant::now();
     let a_fe = curve.a_fe();
-    let candidate = g.scalar_mul(&x, &a_fe);
+    // Public recovered `x`: vartime (matches staged S₃ verify).
+    let candidate = g.scalar_mul_vartime(&x, &a_fe);
     let verified = &candidate == q;
     let verify_ms = verify_started.elapsed().as_secs_f64() * 1e3;
     if !verified {
