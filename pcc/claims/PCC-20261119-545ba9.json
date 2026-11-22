@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T08:06:19Z",
+ "id": "PCC-20261119-545ba9",
+ "kind": "theorem",
+ "producer": {
+  "commit": "e0a4460da3d8234240f04679b31dd18f3d41ca25",
+  "model": "Codex",
+  "session": "kummer-galois-signs-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "1e1775b6d16f80fa6f05c8439a5c1078e200bbf1a6a5ecf234d17a26818af827",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.galoisSignCharacterProjector_isolates_term"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "This constructs and separates the sign characters once a finite Galois extension containing the chosen nonzero square roots and the transformed point relations are supplied. It does not yet construct the splitting field for the specialized Semaev radicands, prove the transformed elliptic-curve relations, or establish the full subexponential ECDLP algorithm and cost bound.",
+ "statement": "For square roots of pairwise nonsquare-product radicands in a finite Galois extension of characteristic not two, the explicitly defined integer Galois signs are multiplicative, square to one, pairwise separate, and therefore discharge the sign-character hypotheses of the Kummer projector."
+}
