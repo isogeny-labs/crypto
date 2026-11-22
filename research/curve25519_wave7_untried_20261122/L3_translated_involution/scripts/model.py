@@ -15,11 +15,6 @@ import json, math
 import curves as cv
 
 
-def g2(k):
-    """2-part cosets as (a mod m2, e) and the size m2 of the cyclic factor."""
-    return None
-
-
 class G2:
     def __init__(self, kind):
         self.kind = kind
@@ -150,4 +145,5 @@ if __name__ == '__main__':
                 a = T[f'{k}|{t}|{arm}']['full']; b = T[f'{k}|{t}|{ref}']['full']
                 row.append(f'{a:8.1f}({a / b:.3f})')
         print(f'{arm:13s}', ' '.join(row))
-    json.dump(T, open('/dev/stdout', 'w') if False else open(__file__.replace('model.py', '../model_predictions.json'), 'w'), indent=0)
+    import os
+    json.dump(T, open(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'model_predictions.json'), 'w'), indent=0)

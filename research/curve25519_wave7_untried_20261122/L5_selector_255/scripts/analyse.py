@@ -376,6 +376,9 @@ def main():
         der['sampled_cost_per_frame_full_label_over_rho'] = 2 ** (math.log2(n_req * (ops_label + 2)) - RHO_OPS_LOG2)
         der['breakeven_IC_cost_over_rho_min'] = (min(v['full_label_over_rho'] for v in cost.values()) * (1 + 1 / e_w)
                                                   if e_w > 0 else float('inf'))
+        # isogeny-tower base at t*: needs an auxiliary E'/F_p with 2^t* | #E'(F_p) (prime_tower.rs). Traces a with
+        # p + 1 - a = 0 mod 2^t* in the Hasse interval: about 4 sqrt(p) / 2^t* of them (derived count).
+        der['iso_aux_trace_candidates_log2'] = math.log2(4) + 0.5 * math.log2(2 ** 255 - 19) - ts_
     res['derived_255'] = der
     # ---------- prediction verdicts ----------
     V = {}
