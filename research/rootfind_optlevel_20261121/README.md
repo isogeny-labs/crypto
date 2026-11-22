@@ -113,6 +113,12 @@ single-target path.
 **Stop criterion:** preferred production probes (kmitm IFMA, floor IFMA) stay
 grade A with intensity declared and A_full ≈ A_single. Met on this host.
 
+### Tick 5 (loop stop) — reconfirm
+
+Smoke remeasure with intensity declared: kmitm IFMA **A=0.939**, floor IFMA
+**A=0.920**. Stop criterion still holds. Unsubscribed `loop-rootfind-optlevel`.
+
+
 ## Claim hygiene
 
 Attainments are `[pcc:unverified]` assertions. They are **not** speedups,
