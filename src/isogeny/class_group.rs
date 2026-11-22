@@ -389,6 +389,25 @@ impl BinaryQuadraticForm {
             let disc = self.discriminant();
             return Self::principal(&disc).expect("principal form exists");
         }
+        // Stay in i64 for the whole binary ladder when coeffs+D fit —
+        // avoids BigInt round-trips on every compose/square.
+        // `IC_CLASS_I64=0` forces the BigInt ladder (A/B).
+        if std::env::var("IC_CLASS_I64").as_deref() != Ok("0") {
+            if let (Ok(a0), Ok(b0), Ok(c0), Ok(disc)) = (
+                i64::try_from(&self.a),
+                i64::try_from(&self.b),
+                i64::try_from(&self.c),
+                i64::try_from(&self.discriminant()),
+            ) {
+                if let Some((a, b, c)) = pow_i64(a0, b0, c0, disc, k) {
+                    return Self {
+                        a: BigInt::from(a),
+                        b: BigInt::from(b),
+                        c: BigInt::from(c),
+                    };
+                }
+            }
+        }
         let mut base = self.reduce();
         let mut acc: Option<Self> = None;
         let mut e = k;
@@ -406,6 +425,29 @@ impl BinaryQuadraticForm {
         }
         acc.unwrap()
     }
+}
+
+/// Binary exponentiation entirely in `i64`/`i128` compose.
+fn pow_i64(a: i64, b: i64, c: i64, disc: i64, k: u64) -> Option<(i64, i64, i64)> {
+    let (mut ba, mut bb, mut bc) = reduce_i64(a, b, c);
+    let mut acc: Option<(i64, i64, i64)> = None;
+    let mut e = k;
+    while e > 0 {
+        if e & 1 == 1 {
+            acc = Some(match acc {
+                None => (ba, bb, bc),
+                Some((aa, ab, ac)) => compose_i64(aa, ab, ac, ba, bb, bc, disc)?,
+            });
+        }
+        e >>= 1;
+        if e > 0 {
+            let (sa, sb, sc) = compose_i64(ba, bb, bc, ba, bb, bc, disc)?;
+            ba = sa;
+            bb = sb;
+            bc = sc;
+        }
+    }
+    acc
 }
 
 impl PartialEq for BinaryQuadraticForm {
@@ -570,6 +612,36 @@ pub struct ClassGroup {
 
 const MAX_TABULATED_H: usize = 64;
 
+/// Build the composition table with i64 keys when every reduced form fits.
+fn mul_table_i64(disc: &BigInt, elements: &[BinaryQuadraticForm]) -> Option<Vec<Vec<usize>>> {
+    if std::env::var("IC_CLASS_I64").as_deref() == Ok("0") {
+        return None;
+    }
+    let disc = i64::try_from(disc).ok()?;
+    let mut coeffs = Vec::with_capacity(elements.len());
+    let mut idx = HashMap::with_capacity(elements.len());
+    for (i, e) in elements.iter().enumerate() {
+        let a = i64::try_from(&e.a).ok()?;
+        let b = i64::try_from(&e.b).ok()?;
+        let c = i64::try_from(&e.c).ok()?;
+        idx.insert((a, b, c), i);
+        coeffs.push((a, b, c));
+    }
+    let n = elements.len();
+    let mut t = vec![vec![0usize; n]; n];
+    for i in 0..n {
+        let (a1, b1, c1) = coeffs[i];
+        for j in 0..n {
+            let (a2, b2, c2) = coeffs[j];
+            let (a, b, c) = compose_i64(a1, b1, c1, a2, b2, c2, disc)?;
+            t[i][j] = *idx
+                .get(&(a, b, c))
+                .expect("composition stayed inside the class group");
+        }
+    }
+    Some(t)
+}
+
 impl ClassGroup {
     /// Build `Cl(O)` for the given discriminant.  Builds the full
     /// multiplication table when `h ≤ MAX_TABULATED_H`.
@@ -580,17 +652,23 @@ impl ClassGroup {
             index_of.insert(e.clone(), i);
         }
         let mul_table = if elements.len() <= MAX_TABULATED_H {
-            let mut t = vec![vec![0usize; elements.len()]; elements.len()];
-            for i in 0..elements.len() {
-                for j in 0..elements.len() {
-                    let p = elements[i].compose(&elements[j]);
-                    let k = *index_of
-                        .get(&p)
-                        .expect("composition stayed inside the class group");
-                    t[i][j] = k;
+            // Prefer i64 compose + (a,b,c) keys (skips BigInt Hash/PartialEq
+            // reduce on every lookup).  Falls back to BinaryQuadraticForm map.
+            if let Some(t) = mul_table_i64(disc, &elements) {
+                Some(t)
+            } else {
+                let mut t = vec![vec![0usize; elements.len()]; elements.len()];
+                for i in 0..elements.len() {
+                    for j in 0..elements.len() {
+                        let p = elements[i].compose(&elements[j]);
+                        let k = *index_of
+                            .get(&p)
+                            .expect("composition stayed inside the class group");
+                        t[i][j] = k;
+                    }
                 }
+                Some(t)
             }
-            Some(t)
         } else {
             None
         };

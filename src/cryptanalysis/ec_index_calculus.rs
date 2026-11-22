@@ -1930,8 +1930,10 @@ pub fn find_one_relation_s4_counted(
     }
 
     // Round-4: single-word primes use stack Poly4Fp + u64 root-finding.
-    // Round-6: JSF/mont double-scalar for R; Poly4Fp::roots avoids FieldElement
-    // brute force on p ≤ 2^20; u64 factor-base x-index for the word path.
+    // Round-6: JSF/mont double-scalar for R; Poly4Fp::roots / u64 x-index.
+    // Round-9: default probes Semaev poly only at factor-base x-coords
+    // (O(fb) evals/pair) instead of enumerating all roots in F_p then
+    // filtering — wins when fb ≪ p.  `IC_S4_FB_PROBE=0` restores roots().
     let p_u64 = curve.p.to_u64_digits();
     let fast_u64 = matches!(p_u64.as_slice(), [p] if *p > 3 && (*p & 1) == 1 && (*p >> 63) == 0);
     let (a_u64, b_u64, p_word) = if fast_u64 {
@@ -1943,19 +1945,30 @@ pub fn find_one_relation_s4_counted(
     } else {
         (0, 0, 0)
     };
-    let x_to_idx_u64: Option<std::collections::HashMap<u64, usize>> = if fast_u64 {
-        let mut m = std::collections::HashMap::with_capacity(factor_base.len());
+    let fb_probe = std::env::var("IC_S4_FB_PROBE").as_deref() != Ok("0");
+    let fb_xs_u64: Option<Vec<(u64, usize)>> = if fast_u64 {
+        let mut v = Vec::with_capacity(factor_base.len());
         for fb in factor_base {
             if let Point::Affine { x, .. } = &fb.point {
                 if let Some(xu) = x.value.to_u64_digits().first().copied() {
-                    m.insert(xu, fb.idx);
+                    v.push((xu, fb.idx));
                 }
             }
         }
-        Some(m)
+        Some(v)
     } else {
         None
     };
+    let x_to_idx_u64: Option<std::collections::HashMap<u64, usize>> =
+        if fast_u64 && !fb_probe {
+            let mut m = std::collections::HashMap::with_capacity(factor_base.len());
+            for &(xu, idx) in fb_xs_u64.as_ref().expect("word fb") {
+                m.insert(xu, idx);
+            }
+            Some(m)
+        } else {
+            None
+        };
 
     for trial in 1..=max_trials {
         let a = random_scalar(&curve.n);
@@ -1973,46 +1986,79 @@ pub fn find_one_relation_s4_counted(
 
         // Sweep factor-base pairs (i < j keeps the sweep half-size; the
         // sign resolution below covers both orders).
-        for (i, fb_i) in factor_base.iter().enumerate() {
-            let xi = match &fb_i.point {
-                Point::Affine { x, .. } => x.clone(),
-                Point::Infinity => continue,
-            };
-            let xi_u = if fast_u64 {
-                xi.value.to_u64_digits().first().copied().unwrap_or(0)
-            } else {
-                0
-            };
-            for (j, fb_j) in factor_base.iter().enumerate().skip(i + 1) {
-                let xj = match &fb_j.point {
+        if fast_u64 {
+            let fb_xs = fb_xs_u64.as_ref().expect("word fb");
+            for (i, fb_i) in factor_base.iter().enumerate() {
+                let xi_u = match &fb_i.point {
+                    Point::Affine { x, .. } => {
+                        x.value.to_u64_digits().first().copied().unwrap_or(0)
+                    }
+                    Point::Infinity => continue,
+                };
+                for (j, fb_j) in factor_base.iter().enumerate().skip(i + 1) {
+                    let xj_u = match &fb_j.point {
+                        Point::Affine { x, .. } => {
+                            x.value.to_u64_digits().first().copied().unwrap_or(0)
+                        }
+                        Point::Infinity => continue,
+                    };
+                    let poly = semaev_s4_poly4fp(xr_u, xi_u, xj_u, a_u64, b_u64, p_word);
+                    if fb_probe {
+                        for &(xk, k) in fb_xs {
+                            if poly.eval(xk) != 0 {
+                                continue;
+                            }
+                            if let Some(rel) = try_finalise_s4(
+                                &r,
+                                i,
+                                &fb_i.point,
+                                j,
+                                &fb_j.point,
+                                k,
+                                &factor_base[k].point,
+                                curve,
+                                &a,
+                                &b,
+                            ) {
+                                return Some((rel, trial));
+                            }
+                        }
+                    } else {
+                        let idx_u = x_to_idx_u64.as_ref().expect("word index");
+                        for xk in poly.roots() {
+                            let k = match idx_u.get(&xk).copied() {
+                                Some(k) => k,
+                                None => continue,
+                            };
+                            if let Some(rel) = try_finalise_s4(
+                                &r,
+                                i,
+                                &fb_i.point,
+                                j,
+                                &fb_j.point,
+                                k,
+                                &factor_base[k].point,
+                                curve,
+                                &a,
+                                &b,
+                            ) {
+                                return Some((rel, trial));
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            for (i, fb_i) in factor_base.iter().enumerate() {
+                let xi = match &fb_i.point {
                     Point::Affine { x, .. } => x.clone(),
                     Point::Infinity => continue,
                 };
-                if fast_u64 {
-                    let xj_u = xj.value.to_u64_digits().first().copied().unwrap_or(0);
-                    let poly = semaev_s4_poly4fp(xr_u, xi_u, xj_u, a_u64, b_u64, p_word);
-                    let idx_u = x_to_idx_u64.as_ref().expect("word index");
-                    for xk in poly.roots() {
-                        let k = match idx_u.get(&xk).copied() {
-                            Some(k) => k,
-                            None => continue,
-                        };
-                        if let Some(rel) = try_finalise_s4(
-                            &r,
-                            i,
-                            &fb_i.point,
-                            j,
-                            &fb_j.point,
-                            k,
-                            &factor_base[k].point,
-                            curve,
-                            &a,
-                            &b,
-                        ) {
-                            return Some((rel, trial));
-                        }
-                    }
-                } else {
+                for (j, fb_j) in factor_base.iter().enumerate().skip(i + 1) {
+                    let xj = match &fb_j.point {
+                        Point::Affine { x, .. } => x.clone(),
+                        Point::Infinity => continue,
+                    };
                     let quartic = semaev_s4_in_x4(&xr, &xi, &xj, &a_fe, &b_fe);
                     for xk in find_roots_fp_fast(&quartic, &curve.p) {
                         let k = match x_to_idx.get(&xk.value).copied() {

@@ -2,7 +2,9 @@
 //!
 //!   TMPDIR=/Volumes/SSD990-2/tmp CARGO_TARGET_DIR=/Volumes/SSD990-2/cargo-target-perf \
 //!   /usr/sbin/taskpolicy -a cargo run --release --example class_group_reduce_ab
-use crypto_lib::isogeny::class_group::{class_number, enumerate_reduced_forms, BinaryQuadraticForm};
+use crypto_lib::isogeny::class_group::{
+    class_number, enumerate_reduced_forms, BinaryQuadraticForm, ClassGroup,
+};
 use num_bigint::BigInt;
 use std::hint::black_box;
 use std::time::Instant;
@@ -43,7 +45,7 @@ fn main() {
             assert_eq!(r1.c, r2.c);
             assert!(r1.is_reduced());
         }
-        // Compose agreement on a small subset.
+        // Compose / pow agreement on a small subset.
         let n = forms.len().min(8);
         for i in 0..n {
             for j in 0..n {
@@ -57,6 +59,27 @@ fn main() {
                 let c2 = forms[i].compose(&forms[j]);
                 assert_eq!((&c1.a, &c1.b, &c1.c), (&c2.a, &c2.b, &c2.c), "compose {disc}");
             }
+            unsafe {
+                std::env::remove_var("IC_CLASS_I64");
+            }
+            let p1 = forms[i].pow(17);
+            unsafe {
+                std::env::set_var("IC_CLASS_I64", "0");
+            }
+            let p2 = forms[i].pow(17);
+            assert_eq!((&p1.a, &p1.b, &p1.c), (&p2.a, &p2.b, &p2.c), "pow {disc}");
+        }
+        if forms.len() <= 64 {
+            unsafe {
+                std::env::remove_var("IC_CLASS_I64");
+            }
+            let g1 = ClassGroup::new(&d(disc));
+            unsafe {
+                std::env::set_var("IC_CLASS_I64", "0");
+            }
+            let g2 = ClassGroup::new(&d(disc));
+            assert_eq!(g1.class_number(), g2.class_number());
+            assert_eq!(g1.mul_table, g2.mul_table, "mul_table {disc}");
         }
     }
     println!("correctness: ok");
@@ -208,4 +231,86 @@ fn main() {
     println!("  i64 fast path     : med {ci:.1} ns");
     println!("  BigInt (opt-out)  : med {cb:.1} ns");
     println!("  speedup big/i64   : {:.3}x", cb / ci);
+
+    // pow A/B — native i64 ladder vs BigInt compose round-trips.
+    let exponents: [u64; 8] = [3, 7, 15, 31, 63, 127, 255, 1023];
+    let mut wp_i = Vec::new();
+    let mut wp_b = Vec::new();
+    let pow_iters = 200usize;
+    for r in 0..9 {
+        for name in if r % 2 == 0 {
+            ["i64", "big"]
+        } else {
+            ["big", "i64"]
+        } {
+            unsafe {
+                if name == "i64" {
+                    std::env::remove_var("IC_CLASS_I64");
+                } else {
+                    std::env::set_var("IC_CLASS_I64", "0");
+                }
+            }
+            for f in base.iter().take(4) {
+                let _ = black_box(f.pow(31));
+            }
+            let t0 = Instant::now();
+            for _ in 0..pow_iters {
+                for f in base.iter().take(16) {
+                    for &e in &exponents {
+                        let _ = black_box(f.pow(e));
+                    }
+                }
+            }
+            let ops = (pow_iters * 16 * exponents.len()) as f64;
+            let ns = t0.elapsed().as_nanos() as f64 / ops;
+            if name == "i64" {
+                wp_i.push(ns);
+            } else {
+                wp_b.push(ns);
+            }
+        }
+    }
+    let pi = med(wp_i);
+    let pb = med(wp_b);
+    println!("class-group pow on |D|=12007 (16 forms × 8 exps)");
+    println!("  i64 ladder        : med {pi:.1} ns/pow");
+    println!("  BigInt (opt-out)  : med {pb:.1} ns/pow");
+    println!("  speedup big/i64   : {:.3}x", pb / pi);
+
+    // ClassGroup::new mul-table (h(D)=-399 → h=18 ≤ 64).
+    let disc_small = d(-399);
+    let mut wg_i = Vec::new();
+    let mut wg_b = Vec::new();
+    for r in 0..9 {
+        for name in if r % 2 == 0 {
+            ["i64", "big"]
+        } else {
+            ["big", "i64"]
+        } {
+            unsafe {
+                if name == "i64" {
+                    std::env::remove_var("IC_CLASS_I64");
+                } else {
+                    std::env::set_var("IC_CLASS_I64", "0");
+                }
+            }
+            let _ = black_box(ClassGroup::new(&disc_small));
+            let t0 = Instant::now();
+            for _ in 0..80 {
+                let _ = black_box(ClassGroup::new(&disc_small));
+            }
+            let ns = t0.elapsed().as_nanos() as f64 / 80.0;
+            if name == "i64" {
+                wg_i.push(ns);
+            } else {
+                wg_b.push(ns);
+            }
+        }
+    }
+    let gi = med(wg_i);
+    let gb = med(wg_b);
+    println!("ClassGroup::new(D=-399) with mul-table");
+    println!("  i64 mul-table     : med {gi:.0} ns");
+    println!("  BigInt (opt-out)  : med {gb:.0} ns");
+    println!("  speedup big/i64   : {:.3}x", gb / gi);
 }
