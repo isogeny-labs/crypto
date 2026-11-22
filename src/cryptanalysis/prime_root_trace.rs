@@ -1223,6 +1223,107 @@ fn vquadratic_replay_square(a: &[u64], m: &[u64], p: u64) -> Vec<u64> {
     trim(vec![constant, linear])
 }
 
+// Specialized arithmetic in F_p[x]/(x^3+c2*x^2+c1*x+c0).
+// Polynomial multiplication has five coefficients; reduce the x^4 and x^3
+// terms directly. All additions are of canonical residues and fit u64 for
+// the public p <= 2^61-1 bound. This is verifier-only (no Engine trace edits).
+#[inline]
+fn cubic_add(a: u64, b: u64, p: u64) -> u64 {
+    let sum = a + b;
+    if sum >= p { sum - p } else { sum }
+}
+#[inline]
+fn cubic_mul(a: [u64; 3], b: [u64; 3], c: [u64; 3], p: u64) -> [u64; 3] {
+    let high = vmul(a[2], b[2], p);
+    let t3 = cubic_add(vmul(a[1], b[2], p), vmul(a[2], b[1], p), p);
+    let t2 = cubic_add(
+        cubic_add(vmul(a[0], b[2], p), vmul(a[1], b[1], p), p),
+        vmul(a[2], b[0], p), p);
+    let t1 = cubic_add(vmul(a[0], b[1], p), vmul(a[1], b[0], p), p);
+    let t0 = vmul(a[0], b[0], p);
+    // x^4 = -c2*x^3-c1*x^2-c0*x; then remove x^3.
+    let t3 = quadratic_sub(t3, vmul(c[2], high, p), p);
+    let t2 = quadratic_sub(t2, vmul(c[1], high, p), p);
+    let t1 = quadratic_sub(t1, vmul(c[0], high, p), p);
+    [
+        quadratic_sub(t0, vmul(c[0], t3, p), p),
+        quadratic_sub(t1, vmul(c[1], t3, p), p),
+        quadratic_sub(t2, vmul(c[2], t3, p), p),
+    ]
+}
+#[inline]
+fn cubic_square(a: [u64; 3], c: [u64; 3], p: u64) -> [u64; 3] {
+    // Symmetry reduces the nine convolution terms to six products.
+    let high = vmul(a[2], a[2], p);
+    let t3 = cubic_add(vmul(a[1], a[2], p), vmul(a[1], a[2], p), p);
+    let cross = vmul(a[0], a[2], p);
+    let t2 = cubic_add(cubic_add(cross, cross, p), vmul(a[1], a[1], p), p);
+    let cross = vmul(a[0], a[1], p);
+    let t1 = cubic_add(cross, cross, p);
+    let t0 = vmul(a[0], a[0], p);
+    let t3 = quadratic_sub(t3, vmul(c[2], high, p), p);
+    let t2 = quadratic_sub(t2, vmul(c[1], high, p), p);
+    let t1 = quadratic_sub(t1, vmul(c[0], high, p), p);
+    [
+        quadratic_sub(t0, vmul(c[0], t3, p), p),
+        quadratic_sub(t1, vmul(c[1], t3, p), p),
+        quadratic_sub(t2, vmul(c[2], t3, p), p),
+    ]
+}
+#[inline]
+fn cubic_coordinates(a: &[u64]) -> [u64; 3] {
+    [a.first().copied().unwrap_or(0), a.get(1).copied().unwrap_or(0),
+        a.get(2).copied().unwrap_or(0)]
+}
+#[inline]
+fn cubic_trim(a: [u64; 3]) -> Vec<u64> {
+    trim(a.to_vec())
+}
+fn vpower_cubic(base: &[u64], mut exponent: u64, m: &[u64], p: u64)
+    -> Result<Vec<u64>, String>
+{
+    debug_assert_eq!(m.len(), 4);
+    let lead = m[3];
+    if lead == 0 { return Err("division by zero leading coefficient".into()); }
+    let inverse = if lead == 1 { 1 } else { vinv(lead, p) };
+    let c = if lead == 1 { [m[0], m[1], m[2]] }
+            else { [vmul(m[0], inverse, p), vmul(m[1], inverse, p),
+                    vmul(m[2], inverse, p)] };
+    // Horner evaluation of an arbitrary-degree base in the cubic quotient.
+    // Multiplication by x maps (a,b,d) to (-c0*d,a-c1*d,b-c2*d).
+    let mut power = [0u64; 3];
+    for &coefficient in base.iter().rev() {
+        let high = power[2];
+        power = [
+            quadratic_sub(coefficient, vmul(high, c[0], p), p),
+            quadratic_sub(power[0], vmul(high, c[1], p), p),
+            quadratic_sub(power[1], vmul(high, c[2], p), p),
+        ];
+    }
+    let mut accumulator = [1, 0, 0];
+    while exponent != 0 {
+        if exponent & 1 == 1 {
+            accumulator = cubic_mul(accumulator, power, c, p);
+        }
+        exponent >>= 1;
+        if exponent != 0 {
+            power = cubic_square(power, c, p);
+        }
+    }
+    Ok(cubic_trim(accumulator))
+}
+#[inline]
+fn vcubic_replay_mul(a: &[u64], b: &[u64], m: &[u64], p: u64) -> Vec<u64> {
+    debug_assert_eq!(m.len(), 4);
+    cubic_trim(cubic_mul(cubic_coordinates(a), cubic_coordinates(b),
+                         [m[0], m[1], m[2]], p))
+}
+#[inline]
+fn vcubic_replay_square(a: &[u64], m: &[u64], p: u64) -> Vec<u64> {
+    debug_assert_eq!(m.len(), 4);
+    cubic_trim(cubic_square(cubic_coordinates(a), [m[0], m[1], m[2]], p))
+}
+
 fn vpower_quadratic(base: &[u64], mut exponent: u64, modulus: &[u64], p: u64)
     -> Result<Vec<u64>, String>
 {
@@ -1283,6 +1384,9 @@ fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, Strin
     // independent. Applies to both monic and nonmonic quadratic certificates.
     if m.len() == 3 {
         return vpower_quadratic(base, e, m, p);
+    }
+    if m.len() == 4 {
+        return vpower_cubic(base, e, m, p);
     }
     // Polynomial remainder is invariant under scaling the modulus by a
     // nonzero field element. Normalize a nonmonic modulus ONCE rather than
@@ -1522,6 +1626,8 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 if state.exponent & 1 == 1 {
                     state.acc = if state.modulus.len() == 3 && p >= (1u64 << 24) {
                         vquadratic_replay_mul(&state.acc, &state.base, &state.modulus, p)
+                    } else if state.modulus.len() == 4 && p >= (1u64 << 24) {
+                        vcubic_replay_mul(&state.acc, &state.base, &state.modulus, p)
                     } else {
                         vpower_reduce(vproduct(&state.acc, &state.base, p), &state.modulus, p)?
                     };
@@ -1535,6 +1641,8 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 if next_exponent != 0 || base.as_slice() != state.base.as_slice() {
                     state.base = if state.modulus.len() == 3 && p >= (1u64 << 24) {
                         vquadratic_replay_square(&state.base, &state.modulus, p)
+                    } else if state.modulus.len() == 4 && p >= (1u64 << 24) {
+                        vcubic_replay_square(&state.base, &state.modulus, p)
                     } else {
                         vpower_reduce(vproduct(&state.base, &state.base, p), &state.modulus, p)?
                     };
@@ -1761,6 +1869,48 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+
+    #[test]
+    fn round102_cubic_quotient_power_matches_independent_division() {
+        let mut rng = StdRng::seed_from_u64(0x726f_6f74_3130_3231);
+        for p in [7u64, 65_521, 1_000_000_007, MAX_PRIME] {
+            for nonmonic in [false, true] {
+                for _case in 0..48 {
+                    let lead = if nonmonic { rng.gen_range(2..p) } else { 1 };
+                    let modulus = vec![rng.gen_range(0..p), rng.gen_range(0..p),
+                                       rng.gen_range(0..p), lead];
+                    let width = rng.gen_range(0..12);
+                    let base: Vec<u64> = (0..width).map(|_| rng.gen_range(0..p)).collect();
+                    let exponent = rng.gen_range(0..4096u64);
+                    let normalized = vmonic(modulus.clone(), p);
+                    let mut reference = vec![1];
+                    let mut power = vdiv(&base, &normalized, p).unwrap().1;
+                    let mut bits = exponent;
+                    while bits != 0 {
+                        if bits & 1 == 1 {
+                            reference = vdiv(&vproduct(&reference, &power, p),
+                                             &normalized, p).unwrap().1;
+                        }
+                        bits >>= 1;
+                        if bits != 0 {
+                            power = vdiv(&vproduct(&power, &power, p),
+                                         &normalized, p).unwrap().1;
+                        }
+                    }
+                    assert_eq!(vpower(&base, exponent, &modulus, p).unwrap(), reference);
+                    for i in 0..3 {
+                        let a: Vec<u64> = (0..i+1).map(|_| rng.gen_range(0..p)).collect();
+                        let b: Vec<u64> = (0..i+1).map(|_| rng.gen_range(0..p)).collect();
+                        let old_mul = vdiv(&vproduct(&a, &b, p), &normalized, p).unwrap().1;
+                        let old_sq = vdiv(&vproduct(&a, &a, p), &normalized, p).unwrap().1;
+                        assert_eq!(vcubic_replay_mul(&a, &b, &normalized, p), old_mul);
+                        assert_eq!(vcubic_replay_square(&a, &normalized, p), old_sq);
+                    }
+                }
+            }
+        }
+    }
 
     #[test]
     fn round101_verified_division_cache_rejects_modified_gcd_step() {
