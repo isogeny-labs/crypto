@@ -53,6 +53,32 @@ commands; the one-infinity arithmetic boundary; bounded binary transfer; and
 the additive evidence schema. In particular, the prime even-sextic cover does
 not use the odd-degree one-infinity Jacobian implementation.
 
+The [odd-characteristic subgroup-transfer corpus contract](ODD_SUBGROUP_TRANSFER_CERTIFICATES.md)
+documents the separate fail-closed exporter and exact replay command. It keeps
+proved direct-prime bindings, proof-range gaps, normalized targets,
+extension-field backends, and invalid catalog data in distinct buckets; it is
+not a catalog-wide Jacobian or solver claim.
+
+The tracked odd corpus covers 22,243 maps and 940 named bindings in 17,879,292
+bytes (SHA-256
+`1ecfabcdaecc3e00d78ab2ce7eebeb94607e1c2c224f261fb5718a4f53b65268`).
+Clean producer commit `8c94831426fa35040fa7b38b1379299bf6e6d957`
+binds source digest
+`a5412b92e5e027b281d79c541cc34df130e16d9c71a7034f2065c6e181d8b3ef`
+across 29 source files. Its exact partition is 675 supported, 240 proof-range
+unsupported, 0 kernel-intersection unsupported, 15 Edwards
+normalized-backend unsupported, 9 extension-backend unsupported, 1 invalid
+generator, 0 other invalid, and 0 transfer-arithmetic failures. Seven
+Montgomery bindings now use the composed
+backend but remain proof-gated because their fields or declared orders lack an
+accepted certificate; they are not live-supported. Canonical
+same-implementation replay exits `1` because the unsupported and failed rows
+are retained; source-tree replay exits `0`. Neither receipt is catalog-wide
+independent evidence, a solver, or an advantage claim. [pcc:unverified]
+
+The earlier 17,879,352-byte `7c60fc…` corpus from producer `e0ae0fe5…`, with
+partition 675/233/22/9/1, remains immutable historical evidence.
+
 For the exact polynomial-basis F8 genus-three fixture with `a=1`, `b=3`, the
 [machine-readable order certificate](fixed-f8-genus3-order-certificate.json)
 and its [implementation-separated native replay](../../src/bin/ecdlp_audit/fixed_f8_order.rs)
@@ -60,25 +86,39 @@ derive `#Jac(H)(GF(8))=486` from exhaustive extension point counts. This is an
 order certificate only, not an independent check of the divisor arithmetic or
 transfer map.
 
-The current [cover-transfer assessment](cover-transfer-assessments.json),
-validated by its [v2 schema](cover-transfer-assessment.schema.json), classifies
-all 2,100 HC1/CV1 map rows (2,098 distinct cover models) and all 664 linked EC1
-representations. The map population is 160 binary cubic covers and 1,940
-odd-characteristic quadratic covers: 586 direct prime-field, 30
-normalized-target prime-field, and 1,324 extension-field covers. The EC1
-population is 134 binary and 530 odd-characteristic representations.
-Classification is not blanket support:
+The separate
+[fixed-fixture source-law assessment](../../research/curve_transfer_infrastructure_20261118/fixed-f8-source-law-assessment.draft.json)
+records the clean producer-commit-bound Rust 1.98 replay of all 486 divisor
+classes and both induced maps, including exact raw-output and wrapper-level
+resource receipts. It remains a local unsigned draft for one fixture, with
+packaging, mutation, named-subgroup, signed-review, scaling, and solver claims
+explicitly open.
+
+The dated [cover-transfer assessment](cover-transfer-assessments.json),
+validated by its [v2 schema](cover-transfer-assessment.schema.json), pins
+catalog commit `728304718cb0ab6df70da620a908a5f76f175293` and classifies all
+15,791 HC1/CV1 map rows (15,789 distinct cover models) and all 979 linked EC1
+representations in that cohort. Its map profiles contain 165 binary cubic
+covers, 14,272 direct odd-prime covers (14,012 proved-u64, two proved-psi13,
+and 258 proof-unsupported), 30 normalized-target prime-field covers, and
+1,324 extension-field covers. Its EC1 profiles contain 142 binary and 837 odd
+representations. This frozen assessment is not the live graph: the
+[2026-11-18 inventory](COVERS.md#2026-11-18-live-catalog-inventory) contains
+22,417 maps, 22,415 distinct cover models, and 1,090 linked EC1
+representations. Classification is not blanket support:
 the ledger assigns every declared claim an explicit `supported`, `refuted`,
 `unknown`, or `not_applicable` result and retains each unmet obligation. Its
 [source-linked report](../../research/cover_transfer_assessment_20261013/README.md)
 records the typed graph, costs, controls, exploration boundary, and open
-obligations. The current source constructor accepts all 2,100 inputs. The
+obligations. The source constructor recorded by the dated assessment accepts
+all 15,791 inputs in its pinned cohort. The
 published `v0.1.0-main.1371` executable was directly replayed against its
-bundled 592-row registry; comparison of its pinned allowlist with the current
-profiles statically places 746 inputs inside and 1,354 outside its syntactic
-domain. No 2,100-command archived-binary batch receipt exists, so it is not a
-catalog-wide packaged artifact. Neither the catalog nor the assessment is a
-Jacobian index-calculus solver.
+bundled 592-row registry; a historical comparison of its pinned allowlist
+with an earlier 2,100-row cohort placed 746 inputs inside and 1,354 outside
+its syntactic domain. That comparison has not been rerun across either the
+15,791-row frozen cohort or the 22,417-row live graph, and no corresponding
+catalog-wide archived-binary batch receipt exists. Neither the catalog nor
+the assessment is a Jacobian index-calculus solver.
 
 The proposed
 [comprehensive private-key recovery audit](../../research/notes/ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md)

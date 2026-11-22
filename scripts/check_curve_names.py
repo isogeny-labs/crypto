@@ -398,9 +398,19 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--fix", action="store_true", help="rewrite retired names in place")
     ap.add_argument("--diff", metavar="BASE", help="also lint what HEAD adds over BASE")
+    ap.add_argument("--changed-only", metavar="BASE",
+                    help="lint only the lines HEAD adds over BASE, which is the "
+                         "contract a pull request owns; the archived corpus's "
+                         "standing debt is main's to clear")
     args = ap.parse_args()
     res = Resolver()
     pins = pinned_hashes()
+    if args.changed_only:
+        problems = lint_diff(args.changed_only, res, pins)
+        for p in problems:
+            print(p)
+        print(f"curve names: {len(problems)} problem(s)", file=sys.stderr)
+        return 1 if problems else 0
     problems = lint(res, pins, args.fix)
     if not cid.ALIAS_MAP.exists() or cid.ALIAS_MAP.read_text() != cid.alias_map_text(res.reg):
         problems.append("src/cryptanalysis/curve_aliases.json does not match docs/curves/registry.json; "
