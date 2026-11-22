@@ -1,0 +1,134 @@
+{
+  "schema": "prime31-run66-three-sum-support-v1",
+  "utc_date": "2026-11-22",
+  "classification": "generic exhaustive grader / factor-base structural diagnostic; not algebraic non-generic extraction, not a complete ECDLP solver",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "cofactor": 1,
+    "g": [
+      625037715,
+      2100627251
+    ]
+  },
+  "sources": {
+    "prior_pr": "https://github.com/isogeny-labs/crypto/pull/4901",
+    "y7_fixture_sha256": "fc484615394ee423190747d05001cea526580fb0df0279fbcf789ab6cafc0c46",
+    "hybrid_base_sha256": "522747b6cf805c025be4f59d194ec3335a57aff97528fb841cf7c2b4ec2f0162",
+    "dickson_base_sha256": "fa6a97bb09d2224fb75dfd51aa84fcea0aaa28d4bf08272c2b400827b1ab3f04",
+    "sha256_public_points_sha256": "9f8c56056dfd3856acec882f6aa9ab2546184a5497077185988b69b891e965db",
+    "adaptive4096_sha256": "07dfd381c1d069f4610e907ca3e7f9922ebb599ed473a18dca8e010652bb6e6a"
+  },
+  "arms": [
+    {
+      "base": "dickson",
+      "B": 509,
+      "signed": 1018,
+      "unordered_signed_pairs": 518671,
+      "distinct_pair_sums": 518085,
+      "unordered_signed_triples_capacity": 176348140,
+      "capacity_probability": 0.08211990977112113,
+      "free_homogeneous_rank": 13,
+      "cohorts": [
+        {
+          "name": "sha256",
+          "n": 4096,
+          "two_sum_hits": 2,
+          "three_sum_hits": 304,
+          "three_sum_wilson95": [
+            0.06658407,
+            0.08265133
+          ]
+        },
+        {
+          "name": "frozen_W8",
+          "n": 4096,
+          "two_sum_hits": 2,
+          "three_sum_hits": 353,
+          "three_sum_wilson95": [
+            0.07797046,
+            0.0951683
+          ]
+        }
+      ]
+    },
+    {
+      "base": "hybrid_y7",
+      "B": 677,
+      "signed": 1354,
+      "unordered_signed_pairs": 917335,
+      "distinct_pair_sums": 916469,
+      "unordered_signed_triples_capacity": 414635420,
+      "capacity_probability": 0.19308297370366884,
+      "free_homogeneous_rank": 88,
+      "cohorts": [
+        {
+          "name": "sha256",
+          "n": 4096,
+          "two_sum_hits": 4,
+          "three_sum_hits": 711,
+          "three_sum_wilson95": [
+            0.16229218,
+            0.18548747
+          ]
+        },
+        {
+          "name": "frozen_W8",
+          "n": 4096,
+          "two_sum_hits": 5,
+          "three_sum_hits": 763,
+          "three_sum_wilson95": [
+            0.17465214,
+            0.19849435
+          ]
+        }
+      ]
+    }
+  ],
+  "independent_python": {
+    "status": "PASS",
+    "positive_triple_witnesses_checked": 2131,
+    "provenance_sha256_recomputed": 4096,
+    "exact_negative_proofs": "C++ full generic lookup only; Python checks positive witnesses and source integrity"
+  },
+  "native_rust": {
+    "status": "CI_PENDING",
+    "example": "research/prime31_ic_20261115/native/examples/prime31_run66_three_sum_support.rs",
+    "test_cohorts": "independent deterministic 256-point x lifts, not the SHA256/W8 full cohorts",
+    "expected_counts": [
+      {
+        "B": 509,
+        "walkA": [
+          0,
+          15
+        ],
+        "walkB": [
+          1,
+          16
+        ]
+      },
+      {
+        "B": 677,
+        "walkA": [
+          0,
+          43
+        ],
+        "walkB": [
+          1,
+          41
+        ]
+      }
+    ]
+  },
+  "cost_gate": {
+    "min_successful_rows_if_full_base_rank": 589,
+    "empirical_three_sum_hit_probability": 0.173583984375,
+    "optimistic_uniform_calls": 3393.1701828410687,
+    "historical_shared_bsgs_1024_ms_different_runner": 170.113,
+    "naive_upper_microseconds_per_oracle": 50.13394284207874,
+    "qualifiers": "illustrative necessary-condition sensitivity only; rank deficiencies, F4 failures, setup, scalar shifts, LA and independent log verification omitted; distinct runner"
+  },
+  "outcome": "3-sum sampled support grows nearly in proportion to signed-triple cardinality. Do not infer intrinsic algebraic extraction advantage from coverage."
+}
