@@ -1,6 +1,44 @@
 # Trace–skew radical pair image for Prime31 Semaev systems
 Date: 2026-11-22. Status: **new candidate presentation, exact mathematical lemma and independent arithmetic replay; original Rust/CI and solver-speed measurements pending**.
 
+## Generalized m-fold symmetric trace-moment equations (new 2026-11-22 result)
+
+The two-generator pair system below extends to **every fixed arity m < char(k)**. This targets the m=4 (S5) prime-field index-calculus path directly, without expanding independent ordered factor-base constraints.
+
+Let W be B pairwise distinct k-rational field elements, let h(T)=prod_(w in W)(T-w), and let q(T)=prod_(i=1)^m(T-x_i)=T^m-e1*T^(m-1)+...+(-1)^m*e_m. Define m polynomial equations in the symmetric coefficients e1,...,em:
+
+```text
+H_j(e1,...,em) := SUM_(i=1)^m x_i^j * h(x_i),       j=0,...,m-1.
+```
+
+These are bona fide polynomials in the e's by the fundamental theorem of symmetric polynomials. **Exact set-theoretic theorem:** over the algebraic closure, if characteristic p=0 or p>m, the common zero set of all H_j is exactly the image of the multisets of m elements of W. It contains C(B+m-1,m) points, including every repeated-root diagonal and NO points with x_i outside the factor base (even after extension-field splitting).
+
+**Proof.** Group the roots x_i by their t distinct values z_1,...,z_t with multiplicities n_l <= m. The first t equations read
+
+```text
+V(z_1,...,z_t) * (n_1*h(z_1),...,n_t*h(z_t))^T = 0,
+V_(j,l) = z_l^j, j=0,...,t-1.
+```
+
+V is invertible over the algebraic closure because the z_l are distinct. Since 0<n_l<=m<p, each n_l is invertible and h(z_l)=0. Thus every z_l is in W, proving sufficiency and completeness. Conversely tuples in W satisfy every H_j.
+
+**Stronger simple-root Jacobian lemma:** at an image point of the multiset (x_1,...,x_m), with distinct-root multiplicities n_w, the Jacobian of the m H equations with respect to e1,...,em is
+
+```text
+det( dH_j / d e_k ) =
+   (-1)^[m(m-1)/2] * (PRODUCT_w n_w!) * (PRODUCT_(i=1)^m h'(x_i)).
+```
+
+The right-hand side is nonzero for squarefree h and p>m, so the ideal (H0,...,H_(m-1)) is radical; it is a zero-dimensional complete intersection. A proof is obtained by differentiating the power sums and taking the confluent Vandermonde limit at coinciding x_i: ordinary Vandermonde factors cancel the e-coordinate Jacobian, while the coalescent w-block contributes n_w! times h'(w)^{n_w}. **Status:** algebraic proof and symbolic/exact modular tests, not Lean-checked. The determinant formula requires the precise equation order H0,...,H_(m-1) and coordinate order e1,...,em.
+
+**Division-free implementation:** Let P_n=SUM_i x_i^n. Newton identities give P0=m; for 1<=n<=m, P_n=sum_(i=1)^(n-1)(-1)^(i-1)e_i P_(n-i) + (-1)^(n-1)n*e_n; for n>m, P_n=sum_(i=1)^m(-1)^(i-1)e_i P_(n-i). Then H_j=sum_(k=0)^B h_k P_(j+k). The new [Rust original-crate example](../../examples/prime31_trace_moment.rs) implements this recurrence and its exact forward-mode derivatives, determinant and factorial formula; m=2,3,4 are tested. It uses neither square-root extraction nor inversion in equation/Jacobian **evaluation** (test-only determinant certification uses field inversions). For fixed m, evaluation has O(B) field complexity; **finding solutions** to these equations is not thereby O(B).
+
+**Independent numerical evidence in this run** (Python modular-arithmetic verifier, not Rust): exhaustive all F17 coefficient tuples e in F17^m, W={0,1,3,5}, m=2/3/4: respectively 289 / 4,913 / 83,521 assignments, with exactly 10 / 20 / 35 expected solutions and every solution's Jacobian nonzero. Separate positive multiset/closed-form-Jacobian replay: F101 with B4 and B5 for m2..4 (10,20,35 and 15,35,70 cases), and F2147483647 with W={0,1,2,4,6,7,8,10} for m2..4 (36,120,330 cases), all vanish and match the determinant formula exactly. These last field values are merely algebraic factor-base values, not necessarily all x-coordinates of curve points; elliptic-curve admissibility remains a separate solver gate.
+
+**Exact Semaev use.** For m=4, the polynomial S5(x1,x2,x3,x4,x_R) is symmetric in the first four coordinates and therefore expressible as S5(e1,e2,e3,e4,x_R). Combine the four H_j membership equations with S5 in symmetric coordinates, or test the split-pair version below with two pair-image systems plus three chained S3 equations. Both require actual signed-point and possible intermediate infinity witness checking; neither has been benchmarked. Symmetric S5 materialization and F4 can remain exponentially costly in m or degree B. This result does **not** establish a faster relation oracle or solve the prime-field ECDLP.
+
+**Literature originality boundary:** using symmetric coordinates, Newton sums and reduced unordered images is established algebraic technique; the repository's September radical-pair work is particularly close. The exact presentation above is new research work in this PR, but mathematical priority and any asymptotic speed advantage are **unverified**.
+
 ## Research question and overlap
 Can we eliminate the once-per-base radical Gröbner preprocessing of the existing unordered-pair image, while retaining its low-dimensional, **reduced** scheme and the same exact Semaev relation witnesses? This is a different question from PR #4920 (signed-root table), #4921 (FASS symmetric-chain protocol), #4922 (shared F4 elimination), #4891 (basis-specific F4), #4901 (cold Prime31 solver), and the existing `research/radical_pair_image_20260921/RESULTS.md`. The latter already benchmarked radical vs direct presentations for small fields and reports a strong **solver-stage** improvement: at base size 11 on a GF(29) holdout, cold batch time ratio 0.0967. It also warns that the previous *two norm equations* carry nonreduced multiplicity. That finding is a primary incumbent and disqualifies a novelty claim for mere elementary symmetrisation.
 
