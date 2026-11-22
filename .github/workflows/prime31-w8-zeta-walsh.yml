@@ -1,0 +1,58 @@
+name: Prime31 W8 complementary-zeta Walsh exact component
+on:
+  push:
+    branches:
+      - automation/prime31-rr9-weighted-resultant-20261118
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_w8_zeta_fourier.rs
+      - research/prime31_ic_20261115/native/verify_prime31_w8_zeta_fourier.py
+      - research/prime31_ic_20261115/rr9/W8_ZETA_WALSH_PROTOCOL_20261118.md
+      - .github/workflows/prime31-w8-zeta-walsh.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_w8_zeta_fourier.rs
+      - research/prime31_ic_20261115/native/verify_prime31_w8_zeta_fourier.py
+      - .github/workflows/prime31-w8-zeta-walsh.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prime31-w8-zeta-walsh:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Fetch original pinned arithmetic crate
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay ONLY candidate zeta-Walsh Rust example
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_w8_zeta_fourier.rs \
+             pinned/research/prime31_ic_20261115/native/examples/prime31_w8_zeta_fourier.rs
+      - name: Original crate library tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: All 8192 exact signed predicates in Rust
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_w8_zeta_fourier
+      - name: Generate counted three-way comparison
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_zeta_fourier > prime31-w8-zeta-walsh.json
+          test -s prime31-w8-zeta-walsh.json
+      - name: Independent Python BigInt original-curve and algebraic replay
+        run: python3 research/prime31_ic_20261115/native/verify_prime31_w8_zeta_fourier.py prime31-w8-zeta-walsh.json
+      - name: Archive raw counted operation and time evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-w8-zeta-walsh-original-curve
+          path: prime31-w8-zeta-walsh.json
+          retention-days: 30
+          if-no-files-found: warn
