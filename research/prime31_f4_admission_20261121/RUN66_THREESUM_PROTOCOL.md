@@ -21,3 +21,8 @@ For a base with B canonical nonsymmetric points, allow both signs and repetition
 ## Success and next admissible experiment
 
 Success of THIS gate: exact combinatorial ceiling, reproducible public-holdout coverage and independently verified original-Rust arithmetic agreement. A genuine attack requires a **nonenumerative** public-only S4/F3/RR9 root extractor with no generic pair dictionary or planted index, 46-positive/18-negative registered gate, actual rank and independent [k]G=Q recovery, and all-in same-host IC/BSGS/rho timings. Do not open a competing extraction implementation when #4692/#4812/#4822 own that work.
+
+
+## Rust fixture amendment (recorded before native Rust CI, after independent C++/Python census)
+
+The native Rust source uses **existing** \`Base::build(PRIME31,10)\` plus the frozen 168 public y^7/cubic-fiber points in \`RUN66_Y7_EXTRA168.csv\` to reconstruct the exact 677-point hybrid without introducing a new base builder. To avoid duplicating a 4096-point sensitive calibration fixture, native Rust tests two **additional**, independently frozen, public x-coordinate walks (256 x-lifted points per walk): start=17/step=1 and start=100000003/step=1000003, advancing until the next quadratic-residue RHS and alternating y parity. These are not the original SHA-256/W8 cohorts; their independently computed C++ prefix hit counts are B509: (0 pair,15 triple)/(1 pair,16 triple), B677: (0,43)/(1,41). The full 4096+4096 original cohorts remain validated by independent C++ and Python only. Do not describe the Rust walks as reproducing the full SHA-256 or W8 holdout.
