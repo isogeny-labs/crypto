@@ -4,10 +4,8 @@ use prime31_algebraic_ic::{check_curve, Arithmetic, Base, Point, PRIME31};
 use std::collections::{HashMap, HashSet};
 use std::time::Instant;
 
-const HYBRID_POINTS: &str =
-    include_str!("../../../prime31_f4_admission_20261121/RUN66_HYBRID_BASE.csv");
-const PUBLIC_PREFIX: &str =
-    include_str!("../../../prime31_f4_admission_20261121/RUN66_PUBLIC_PREFIX256.csv");
+const Y7_EXTRA: &str =
+    include_str!("../../../prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv");
 
 fn parse_xy(line: &str) -> Result<Point, String> {
     let (xs, ys) = line.split_once(',').ok_or("missing comma")?;
@@ -22,12 +20,20 @@ fn check_base(ar: &mut Arithmetic) -> Result<(Vec<Point>, Vec<Point>), String> {
         != (2_147_483_647, 847_514_846, 2_087_444_724, 2_147_446_831) {
         return Err("prime31 constants have changed".into());
     }
+    let canonical = |point: Point| -> Point {
+        point.map(|(x, y)| (x, y.min((PRIME31.p - y) % PRIME31.p)))
+    };
     let dickson = Base::build(PRIME31, 10, ar)?.points.into_iter()
-        .map(Some).collect::<Vec<_>>();
+        .map(|p| canonical(Some(p))).collect::<Vec<_>>();
     if dickson.len() != 509 { return Err("Dickson B509 changed".into()); }
-    let hybrid = HYBRID_POINTS.lines().filter(|s| !s.is_empty())
+    let extra = Y7_EXTRA.lines().filter(|s| !s.is_empty())
         .map(parse_xy).collect::<Result<Vec<_>, _>>()?;
-    if hybrid.len() != 677 { return Err("hybrid B677 fixture changed".into()); }
+    if extra.len() != 168 { return Err("expected 168 cubic-fiber leaf points".into()); }
+    let mut hybrid = dickson.clone();
+    hybrid.extend(extra.into_iter().map(canonical));
+    hybrid.sort_unstable();
+    hybrid.dedup();
+    if hybrid.len() != 677 { return Err(format!("hybrid fixture size {}, expected 677", hybrid.len())); }
     let hd = hybrid.iter().copied().collect::<HashSet<_>>();
     if hd.len() != 677 { return Err("hybrid duplicates".into()); }
     if !dickson.iter().all(|p| hd.contains(p)) {
@@ -41,26 +47,41 @@ fn check_base(ar: &mut Arithmetic) -> Result<(Vec<Point>, Vec<Point>), String> {
     Ok((dickson, hybrid))
 }
 
-fn query_prefix() -> Result<Vec<(char, usize, Point)>, String> {
-    let mut out = Vec::new();
-    for line in PUBLIC_PREFIX.lines().skip(1).filter(|s| !s.is_empty()) {
-        let fields = line.split(',').collect::<Vec<_>>();
-        if fields.len() != 4 { return Err("invalid public fixture column count".into()); }
-        let cohort = fields[0].chars().next().ok_or("empty cohort")?;
-        if !matches!(cohort, 'H' | 'W') || fields[0].len() != 1 {
-            return Err("invalid cohort code".into());
-        }
-        let index = fields[1].parse::<usize>().map_err(|e| e.to_string())?;
-        let pt = parse_xy(&format!("{},{}", fields[2], fields[3]))?;
-        out.push((cohort, index, pt));
+fn fpow(mut x: u64, mut e: u64) -> u64 {
+    let mut r = 1_u64;
+    while e > 0 {
+        if e & 1 != 0 { r = r * x % PRIME31.p; }
+        x = x * x % PRIME31.p;
+        e >>= 1;
     }
-    if out.len() != 512 { return Err("public prefix must contain 2*256".into()); }
-    for (c, chunk) in [('H', &out[..256]), ('W', &out[256..])] {
-        for (i, &(got_c, got_i, _)) in chunk.iter().enumerate() {
-            if c != got_c || got_i != i {
-                return Err("public cohort ordering changed".into());
+    r
+}
+fn walk(start: u64, step: u64, label: char) -> Vec<(char, usize, Point)> {
+    let mut x = start;
+    let mut points = Vec::with_capacity(256);
+    while points.len() < 256 {
+        let y2 = (x*x%PRIME31.p*x%PRIME31.p +
+            PRIME31.a*x%PRIME31.p + PRIME31.b) % PRIME31.p;
+        if y2 == 0 || fpow(y2, (PRIME31.p - 1)/2) == 1 {
+            let mut y = fpow(y2, (PRIME31.p + 1)/4);
+            if y%2 != (points.len() as u64)%2 {
+                y = (PRIME31.p - y)%PRIME31.p;
             }
+            points.push((label, points.len(), Some((x,y))));
         }
+        x = (x + step) % PRIME31.p;
+    }
+    points
+}
+fn query_prefix() -> Result<Vec<(char, usize, Point)>, String> {
+    // Two deterministic public x-coordinate walks. No hidden target scalar exists.
+    let mut out = walk(17, 1, 'H');
+    out.extend(walk(100_000_003, 1_000_003, 'W'));
+    if out.len() != 512 ||
+       out[0].2 != Some((18,221278090)) ||
+       out[1].2 != Some((19,1227894081)) ||
+       out[256].2 != Some((101000006,1077058598)) {
+        return Err("public deterministic x-walk fixture changed".into());
     }
     Ok(out)
 }
@@ -112,7 +133,8 @@ fn run_arm(
                 let need = ar.add(PRIME31, target, ar.neg(PRIME31, pt));
                 ec_checks += 1;
                 if let Some(&(i, j)) = tab.get(&need) {
-                    let sum = ar.add(PRIME31, ar.add(PRIME31, pt, signed[i]), signed[j]);
+                    let partial = ar.add(PRIME31, pt, signed[i]);
+                    let sum = ar.add(PRIME31, partial, signed[j]);
                     if sum != target {
                         return Err("generic grader witness failed group-law check".into());
                     }
@@ -138,8 +160,8 @@ fn main() -> Result<(), String> {
     let mut ar = Arithmetic::default();
     let (dickson, hybrid) = check_base(&mut ar)?;
     let points = query_prefix()?;
-    run_arm(&mut ar, &dickson, &points, &[(0, 20), (0, 26)])?;
-    run_arm(&mut ar, &hybrid, &points, &[(0, 46), (0, 45)])?;
+    run_arm(&mut ar, &dickson, &points, &[(0, 15), (1, 16)])?;
+    run_arm(&mut ar, &hybrid, &points, &[(0, 43), (1, 41)])?;
     println!("run66 original Prime31 Rust: PASS; no blind root or ECDLP log recovered");
     Ok(())
 }
