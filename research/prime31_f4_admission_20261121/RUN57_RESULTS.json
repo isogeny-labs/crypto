@@ -7,7 +7,7 @@
     "b": 2087444724,
     "group_order": 2147446831
   },
-  "validation": "local exact modular rank simulation and 500 independent small-system dense rank checks; Rust source-specific CI pending; NOT an ECDLP solve",
+  "validation": "local exact 256-seed Python plus 500 independent modular rank checks and source-specific native Rust 128-seed rank model CI PASS; NOT an ECDLP solve",
   "basis_sha256": "4837e1264f173486334ff6ee9e5609795bc7b73d35f9b52255e13c89b2dc5831",
   "full_trial_results_sha256": "1aabb3b531009d0c6a90f2b2142a142f302dc91c0a7af7b89d18e99bfced3889",
   "source_seed": "python.Random(0x13579bdf + 7919*t), t=0..255; separate naive-rank seeds 0x2468ace0+6073*t",
@@ -46,5 +46,26 @@
     "Independent uniform successful-pair simulation conditioned on a hit, not measured S3/F4 extraction",
     "Excludes all setup, rootfinding, false probes, scalar shifts and target log recovery",
     "No cost advantage for a complete non-generic prime-field solver is claimed"
-  ]
+  ],
+  "native_rust_ci": {
+    "source_specific_run": "https://github.com/isogeny-labs/crypto/actions/runs/45003247773",
+    "job_id": 137149155743,
+    "result": "SUCCESS",
+    "validator_small_dense_cases": 500,
+    "rust_compilation": "release PASS 14.41s",
+    "cohort": "128 independent SplitMix64 synthetic positive-pair trials per arm",
+    "dickson": {
+      "mean_positive_hits": 1738.375,
+      "mean_rank_deficiency_naive": 79.555,
+      "modeled_uniform_calls": 7205526
+    },
+    "hybrid": {
+      "mean_positive_hits": 2285.656,
+      "mean_rank_deficiency_naive": 93.742,
+      "modeled_uniform_calls": 5355697
+    },
+    "hybrid_over_dickson_query_ratio": 0.743276,
+    "hybrid_per_call_cost_threshold": 1.345395,
+    "limitations": "only idealized conditional rank model, not public-only F4 extraction or a complete ECDLP solver; PCC unverified"
+  }
 }
