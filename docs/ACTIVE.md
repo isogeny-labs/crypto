@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+- [ ] Speed up prime-field ECDLP index calculus across counted cost `S(w)` (`w in [0, 1]`), `bitop/v1` gate counts, and cold single-target solve wall time (Cursor, started 2026-11-18, branch cursor/prime-ecdlp-ic-speedup-809a)
+
 - [x] Test Frobenius cross-bilinear x-coordinate sum-bucket filter on Koblitz toy fields (automation, completed 2026-11-18, branch research/frob-cross-bilinear-sumfilter-20261118, PR #4768; toy-negative, independently unverified)
 - [x] Evaluate round-robin balanced vs random partial pair-table prefixes on toy ECDLP, freeze falsifier, independent audit (automation, started 2026-11-18, branch research/ic-pair-schedule-r3-20261118, PR #4765; falsified, no leaderboard promotion)
 - [x] Preregister D4/S5 coefficient-span root-lattice falsifier and complete S3 planted-root calibration (automation, completed 2026-11-18, branch research/d4-s5-coefficient-span-falsifier-20261118, PR #4764; full D4 lattice trial remains queued)
