@@ -326,8 +326,21 @@ impl Engine<'_> {
                 continue;
             }
             for (j, &y) in b.iter().enumerate() {
-                let z = self.field(FieldOp::Mul, x, y)?;
-                product[i + j] = self.field(FieldOp::Add, product[i + j], z)?;
+                // Multiplication by zero cannot contribute to the polynomial.
+                // Omitting it avoids two trace events and their sink calls.
+                if y == 0 {
+                    continue;
+                }
+                // Multiplication by one and addition to an empty coefficient
+                // are exact identities. Their omission changes only the
+                // operation trace/counters, not the Product certificate.
+                let z = if x == 1 { y } else if y == 1 { x }
+                        else { self.field(FieldOp::Mul, x, y)? };
+                if product[i + j] == 0 {
+                    product[i + j] = z;
+                } else {
+                    product[i + j] = self.field(FieldOp::Add, product[i + j], z)?;
+                }
             }
         }
         let product = trim(product);
@@ -2421,6 +2434,105 @@ mod round97_remainder_tests {
                     let actual=vpower_reduce(product,&modulus,p).unwrap();
                     assert_eq!(actual,expected,"p={p} degree={degree} case={case}");
                 }
+            }
+        }
+    }
+}
+
+
+#[cfg(test)]
+mod round100_traced_multiplication {
+    use super::*;
+
+    #[test]
+    fn sparse_unit_and_zero_accumulator_elision_matches_wide_oracle() {
+        // Engine arithmetic is tested independently of the verifier's
+        // polynomial multiplication. The certificate Product still binds
+        // the full result, even when identity operations are untraced.
+        let mut seed = 0x726f_6f74_3130_3030u64;
+        for p in [3u64, 65_521, 1_000_000_007, MAX_PRIME] {
+            for width in [1usize, 2, 4, 8, 12] {
+                for case in 0..128 {
+                    let mut next = || {
+                        seed = seed.wrapping_mul(6364136223846793005)
+                            .wrapping_add(1442695040888963407);
+                        seed % p
+                    };
+                    let mut a = vec![0; width];
+                    let mut b = vec![0; width];
+                    for i in 0..width {
+                        a[i] = next();
+                        b[i] = next();
+                        if case % 4 == 0 && i % 2 == 0 { a[i] = 0; }
+                        if case % 4 == 1 && i % 3 != 0 { b[i] = 0; }
+                        if case % 4 == 2 && i % 2 == 0 { a[i] = 1; }
+                        if case % 4 == 3 && i % 3 == 0 { b[i] = 1; }
+                    }
+                    let mut expected = vec![0u64; 2 * width - 1];
+                    for (i, &x) in a.iter().enumerate() {
+                        for (j, &y) in b.iter().enumerate() {
+                            expected[i + j] = ((expected[i + j] as u128
+                                + x as u128 * y as u128) % p as u128) as u64;
+                        }
+                    }
+                    let expected = trim(expected);
+                    let mut observer = |_: &RootEvent| -> Result<(), String> { Ok(()) };
+                    let mut engine = Engine {
+                        report: RootReport {
+                            schema: "prime-root-trace/v1".into(),
+                            p,
+                            polynomial: vec![],
+                            seed: 0,
+                            limits: RootLimits {
+                                field_work: MAX_WORK,
+                                split_attempts: MAX_EVENTS,
+                                events: MAX_EVENTS,
+                                degree: MAX_DEGREE,
+                            },
+                            stop: RootStop::WorkLimit,
+                            counters: RootCounters::default(),
+                            events: vec![],
+                            unacknowledged: None,
+                            sink_error: None,
+                            roots: vec![],
+                        },
+                        sink: &mut observer,
+                        next_id: 0,
+                    };
+                    assert_eq!(engine.mul(&a, &b).unwrap(), expected,
+                        "p={p}, width={width}, case={case}");
+                    assert!(matches!(engine.report.events.last(),
+                        Some(RootEvent::Product { product, .. }) if product == &expected));
+                    for ev in &engine.report.events {
+                        match ev {
+                            RootEvent::Field { op: FieldOp::Mul, a, b, .. } =>
+                                assert!(*a != 0 && *b != 0 && *a != 1 && *b != 1),
+                            RootEvent::Field { op: FieldOp::Add, a, .. } =>
+                                assert_ne!(*a, 0),
+                            _ => {}
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn optimized_trace_still_verifies_end_to_end_sparse_and_dense_roots() {
+        let limits = RootLimits {
+            field_work: MAX_WORK, split_attempts: 1000,
+            events: MAX_EVENTS, degree: MAX_DEGREE,
+        };
+        for p in [13u64, 65_521, 1_000_000_007, MAX_PRIME] {
+            for f in [
+                vec![p - 3, 1],
+                vec![6, p - 5, 1],
+                vec![1, 0, 1],
+            ] {
+                let report = solve(&f, p, 17, limits.clone(),
+                    &mut |_| Ok(())).unwrap();
+                assert!(report.complete(), "p={p} f={f:?} stop={:?}", report.stop);
+                verify(&report).unwrap();
             }
         }
     }
