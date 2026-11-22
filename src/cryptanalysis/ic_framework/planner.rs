@@ -18,7 +18,7 @@
 //! |:--|:--|:--|:--|:--|
 //! | prime (any `j`) | `prime-abscissa`, `round(#E^{1/3}/2)` abscissae | `mitm-prime-blocked:m=2` (`p < 2^62`), else `mitm:m=2,negation_folded=1` | `incremental-gauss` (target pinned); `sparse-cado` for a log database | `walk` |
 //! | random binary | `binary-subspace`, dimension `round(log2 #E / 3)` | `mitm:m=2,negation_folded=1` | as above | `walk` |
-//! | Koblitz, odd `n < 64` | `compact-orbit-scan`, `max(1, round(0.6 (r/n³)^{1/3}))` orbit columns | `mitm-frobenius-counted:m=2` | as above | `stride-renew` for `log2 r ≤ 21`, else `walk` |
+//! | Koblitz, odd `n < 64` | `compact-orbit-scan`, `max(1, round(0.6 (r/n³)^{1/3}))` orbit columns | `mitm-frobenius-counted:m=2` when `h = 1`; `mitm-frobenius-fiber:fiber=closed,m=2` when `h > 1` | as above | `stride-renew` for `log2 r ≤ 21`, else `walk` |
 //!
 //! Anything else (extension fields, even-degree or wide Koblitz curves, genus
 //! 2) has no measured `ic.pipeline` recipe: the plan names the rho reference
@@ -32,7 +32,7 @@ use crate::cryptanalysis::ic_boundary::{BinaryInstance, PrimeInstance};
 
 /// The planner's rule set.  A spec that pins a plan names this version; a
 /// change to any rule or calibration constant changes it.
-pub const PLANNER_VERSION: &str = "ic-planner/4";
+pub const PLANNER_VERSION: &str = "ic-planner/5";
 
 /// What kind of curve the plan is for: the classes the evidence separates.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
@@ -750,10 +750,36 @@ fn koblitz_choices(
         },
         Choice {
             stage: "oracle",
-            value: "mitm-frobenius-counted:m=2".into(),
-            rule: "koblitz.oracle.frobenius-table",
-            reason: "pair table stored modulo Frobenius, with its set-up counted natively".into(),
-            support,
+            value: if profile.cofactor > 1 {
+                "mitm-frobenius-fiber:fiber=closed,m=2".into()
+            } else {
+                "mitm-frobenius-counted:m=2".into()
+            },
+            rule: if profile.cofactor > 1 {
+                "koblitz.oracle.frobenius-fiber"
+            } else {
+                "koblitz.oracle.frobenius-table"
+            },
+            reason: if profile.cofactor > 1 {
+                format!(
+                    "cofactor h = {}: fiber-closed Frobenius pair table (ic_framework::fiber \
+                     closed mode) so a hit on any lift T+K counts; lifts/combined stay \
+                     selectable by name. Yield, not ns/probe; ns/probe recipe for h = 1 \
+                     remains mitm-frobenius-counted:m=2",
+                    profile.cofactor
+                )
+            } else {
+                "pair table stored modulo Frobenius, with its set-up counted natively".into()
+            },
+            // Fiber yield on h > 1 is wired from the fiber module; the
+            // panel that calibrated the counted recipe was prime-order
+            // (h = 1) or fiber-blind, so mark the fiber default as
+            // extrapolated until a matched h > 1 panel re-prices it.
+            support: if profile.cofactor > 1 {
+                Support::Extrapolated
+            } else {
+                support
+            },
             evidence: vec![E_FROB],
         },
         Choice {
@@ -1088,6 +1114,38 @@ mod tests {
         let pl = plan(&prime(32.0, 4_294_967_291), &opts);
         assert_eq!(pl.get("factor_base"), Some("prime-abscissa:size=500"));
         assert!(!pl.warnings.is_empty());
+    }
+
+    #[test]
+    fn koblitz_oracle_uses_fiber_when_cofactor_exceeds_one() {
+        let h1 = CurveProfile {
+            class: CurveClass::Koblitz,
+            p: None,
+            n: Some(17),
+            group_order: 65_587.0,
+            r: 65_587.0,
+            cofactor: 1,
+        };
+        let h4 = CurveProfile {
+            cofactor: 4,
+            group_order: 65_587.0 * 4.0,
+            ..h1.clone()
+        };
+        let p1 = plan(&h1, &PlanOptions::default());
+        let p4 = plan(&h4, &PlanOptions::default());
+        assert_eq!(p1.get("oracle"), Some("mitm-frobenius-counted:m=2"));
+        assert_eq!(
+            p4.get("oracle"),
+            Some("mitm-frobenius-fiber:fiber=closed,m=2")
+        );
+        assert_eq!(
+            p4.choices
+                .iter()
+                .find(|c| c.stage == "oracle")
+                .unwrap()
+                .support,
+            Support::Extrapolated
+        );
     }
 
     #[test]

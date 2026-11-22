@@ -5372,6 +5372,69 @@ mod tests {
         }
     }
 
+    /// `mitm-frobenius` and `mitm-frobenius-counted` share the same hot
+    /// kernel (`decompose_mitm_frobenius`); the counted flag only changes
+    /// which setup counters are published.  Drift here would make the
+    /// measurement path a different algorithm.
+    #[test]
+    fn mitm_frobenius_counted_matches_uncounted_decompositions() {
+        let inst = koblitz_instance(0, 19).expect("K0 n19");
+        let g = BinaryGroup(&inst.fast);
+        let ctx = koblitz_ctx(&inst, &g);
+        let fb = CompactOrbitScanBase { instance: &inst }
+            .build(
+                &ctx,
+                &Params::parse_spec("compact-orbit-scan:columns=4,raw_x_cap=1000000")
+                    .unwrap()
+                    .1,
+                &mut GroupOps::default(),
+            )
+            .expect("base");
+        let params = Params::parse_spec("mitm-frobenius:m=2").unwrap().1;
+        let mut plain = FrobeniusMitmOracle::new(2, &inst);
+        let mut counted = FrobeniusMitmOracle::new_counted(2, &inst);
+        plain
+            .prepare(&ctx, &fb, &params, &mut GroupOps::default())
+            .unwrap();
+        counted
+            .prepare(&ctx, &fb, &params, &mut GroupOps::default())
+            .unwrap();
+        assert_eq!(plain.name(), "mitm-frobenius");
+        assert_eq!(counted.name(), "mitm-frobenius-counted");
+        // Same table shape; counted publishes build counters, uncounted does not.
+        let setup_plain = plain.setup_native();
+        let setup_counted = counted.setup_native();
+        assert!(
+            setup_counted.get("canonicalisations").copied().unwrap_or(0) > 0,
+            "counted path must publish table setup"
+        );
+        assert!(
+            setup_plain.get("canonicalisations").copied().unwrap_or(0) == 0,
+            "uncounted path must not republish table setup as native setup"
+        );
+        let mut hits = 0u32;
+        for k in 1..200u64 {
+            let mut ops_a = GroupOps::default();
+            let mut ops_b = GroupOps::default();
+            let mut ca = OracleCounters::default();
+            let mut cb = OracleCounters::default();
+            let point = g.mul(&mut GroupOps::default(), inst.generator, k);
+            let a = plain.decompose(&ctx, &fb, &mut ops_a, &mut ca, point);
+            let b = counted.decompose(&ctx, &fb, &mut ops_b, &mut cb, point);
+            assert_eq!(a, b, "k={k}: counted/uncounted decomposition drift");
+            // Probe charges must match: measurement tax is setup-only.
+            assert_eq!(ops_a.adds, ops_b.adds, "k={k}: probe add drift");
+            assert_eq!(ops_a.doubles, ops_b.doubles, "k={k}: probe double drift");
+            if a.is_some() {
+                hits += 1;
+            }
+        }
+        assert!(
+            hits > 0,
+            "planted probes should hit the table at least once"
+        );
+    }
+
     #[test]
     fn cached_halftrace_factor_base_preserves_order_columns_and_coefficients() {
         let inst = koblitz_instance(1, 9).unwrap();
