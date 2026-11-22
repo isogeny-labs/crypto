@@ -153,8 +153,12 @@ observations; neither local tests nor an unsigned record establish the complete
 published theorem. No performance experiment or leaderboard update is part of
 this change.
 
-The source implementation is commit
-`a1a2a0b4e51554415caad43f7ba544d0de53bd7a`. Native-observation record
+The native checks used local implementation commit
+`a1a2a0b4e51554415caad43f7ba544d0de53bd7a`. Its tree
+`b1ce7a122e04e7db88fdf1c644d8cb19f9e7d996` is identical to
+[published implementation `83d9df79d1833d61adec8c41addaf30dacb753ec`](https://github.com/isogeny-labs/crypto/commit/83d9df79d1833d61adec8c41addaf30dacb753ec).
+The commit identifiers differ because publication used the connected GitHub
+integration. Native-observation record
 `PCC-20261122-5140c7` pins the receipt; its standing is `unverified` and its
 unsigned attestation check is `not_covered`. [pcc:unverified]
 
