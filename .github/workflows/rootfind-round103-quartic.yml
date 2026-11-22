@@ -4,6 +4,7 @@ on:
     branches: ['automation/rootfind-column-accumulator-round89-20261121']
     paths:
       - 'src/cryptanalysis/prime_root_trace.rs'
+      - 'research/amm_digit_perf_20261118/round103_full_ab.py'
       - '.github/workflows/rootfind-round103-quartic.yml'
   workflow_dispatch:
 permissions:
@@ -18,13 +19,13 @@ jobs:
           fetch-depth: 0
           sparse-checkout: |
             src/cryptanalysis/prime_root_trace.rs
-            research/amm_digit_perf_20261118/round102_full_ab.py
+            research/amm_digit_perf_20261118/round103_full_ab.py
       - uses: dtolnay/rust-toolchain@stable
       - name: Rust production baseline Round102 versus Round103, complete solve and verify
         env:
           ROOTFIND_BASELINE_REF: 0b88fc4e3e240d7a7aefe38fae9af3c6a57ec27a
           ROOTFIND_AB_OUTPUT: research/amm_digit_perf_20261118/round103_full_results.csv
-        run: python3 research/amm_digit_perf_20261118/round102_full_ab.py
+        run: python3 research/amm_digit_perf_20261118/round103_full_ab.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
