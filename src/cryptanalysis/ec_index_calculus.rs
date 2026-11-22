@@ -1584,13 +1584,27 @@ fn find_one_relation_counted_with_rng<R: rand::RngCore>(
     rng: &mut R,
 ) -> Option<(Relation, usize)> {
     let x_to_idx = factor_base_x_index(factor_base);
-    find_one_relation_sweep_with_index(curve, g, q, factor_base, &x_to_idx, None, max_trials, rng)
+    let word = if std::env::var("IC_FAST_SWEEP").as_deref() == Ok("0") {
+        None
+    } else {
+        WordSweep::new(curve, factor_base)
+    };
+    find_one_relation_sweep_with_index(
+        curve,
+        g,
+        q,
+        factor_base,
+        &x_to_idx,
+        word.as_ref(),
+        max_trials,
+        rng,
+    )
 }
 
 /// The sweep's inner loop on `u64` words (small odd prime fields below 2^40): the same candidate set,
-/// in the same order, as the `BigUint` loop in [`find_one_relation_sweep_with_index`].  Experimental
-/// (`IC_FAST_SWEEP=1`, which also hoists the x-index); the default sweep is unchanged.  The design and
-/// the equality of results were first established by an independent validator's probe.
+/// in the same order, as the `BigUint` loop in [`find_one_relation_sweep_with_index`].  Enabled by
+/// default when [`WordSweep::new`] succeeds; `IC_FAST_SWEEP=0` selects the BigUint sweep.  The design
+/// and the equality of results were first established by an independent validator's probe.
 struct WordSweep {
     p: u64,
     a: u64,
@@ -2940,15 +2954,19 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     } else {
         None
     };
-    // Experimental: IC_HOIST_SWEEP=1 builds the sweep's x-index once per solve.
-    let fast_sweep = std::env::var("IC_FAST_SWEEP").as_deref() == Ok("1");
+    // WordSweep (u64 Semaev S₃ + hoisted x-index) for single-word odd primes
+    // below 2^40.  Default on when the curve qualifies; `IC_FAST_SWEEP=0`
+    // forces the BigUint sweep, `IC_FAST_SWEEP=1` forces the word path when
+    // possible.  `IC_HOIST_SWEEP=1` alone still hoists the x-index for the
+    // BigUint sweep.
+    let word_sweep = if std::env::var("IC_FAST_SWEEP").as_deref() == Ok("0") {
+        None
+    } else {
+        WordSweep::new(curve, &fb)
+    };
+    let fast_sweep = word_sweep.is_some();
     let hoisted_index = if fast_sweep || std::env::var("IC_HOIST_SWEEP").as_deref() == Ok("1") {
         Some(factor_base_x_index(&fb))
-    } else {
-        None
-    };
-    let word_sweep = if fast_sweep {
-        WordSweep::new(curve, &fb)
     } else {
         None
     };
