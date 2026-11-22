@@ -7,6 +7,7 @@ on:
       - 'research/prime31_ic_20261115/native/B27_B29_B31_FULL_COST_PROTOCOL_20261117.md'
       - '.github/workflows/prime31-b27-b29-b31-full-cost.yml'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs'
       - '.github/workflows/prime31-b27-b29-b31-full-cost.yml'
@@ -17,6 +18,7 @@ permissions:
 
 jobs:
   prime31-bsize-full-cost:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
