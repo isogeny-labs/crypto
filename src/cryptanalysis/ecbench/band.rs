@@ -251,6 +251,7 @@ pub const FIELD_ARITHMETIC_COUNTERS: &[&str] = &[
     "matrix_multiply_subtracts_uncharged",
     "linalg_muls_uncharged",
     "scalar_modular_muls_uncharged",
+    "recovery_modr_muls_uncharged",
 ];
 
 /// Counters whose name looks like a multiplication or squaring but that are

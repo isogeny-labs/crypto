@@ -9,17 +9,29 @@ on:
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'src/lib.rs'
+      - 'src/build_provenance.rs'
+      - 'src/ct_bignum.rs'
       - 'src/bin/curve_standards.rs'
       - 'src/bin/curve_standards/**'
       - 'src/bin/curve_cover_check.rs'
       - 'src/bin/curve_cover_check/**'
       - 'src/bin/hyperelliptic_cover.rs'
+      - 'src/bin/curve_transfer_sweep.rs'
+      - 'src/bin/odd_transfer_catalog.rs'
+      - 'src/bin/odd_extension_transfer_pilot.rs'
+      - 'tests/binary_cover_transfer_oracle.rs'
+      - 'tests/common/prime_split_sextic_oracle.rs'
+      - 'tests/prime_cover_transfer_oracle.rs'
+      - 'tests/prime_montgomery_transfer_adapter.rs'
+      - 'tests/prime_montgomery_composed_transfer.rs'
+      - 'tests/prime_montgomery_composed_transfer_oracle.rs'
       - 'examples/cover_catalog_transition_audit.rs'
       - 'src/bin/ecdlp_audit.rs'
       - 'src/bin/ecdlp_audit/**'
       - 'src/binary_ecc/**'
       - 'src/prime_hyperelliptic/**'
       - 'src/cryptanalysis/ecc2k130_guard.rs'
+      - 'src/cryptanalysis/bitops.rs'
       - 'src/cryptanalysis/mod.rs'
       - 'src/hash/mod.rs'
       - 'src/hash/sha256.rs'
@@ -35,6 +47,8 @@ on:
       - 'scripts/build_curve_registry.py'
       - 'scripts/build_cover_transfer_assessments.mjs'
       - 'scripts/test_cover_transfer_assessment.mjs'
+      - 'scripts/verify_binary_transfer_source.mjs'
+      - 'scripts/test_verify_binary_transfer_source.mjs'
       - 'scripts/catalog_snapshot.mjs'
       - 'scripts/test_catalog_snapshot.mjs'
       - 'research/cover_transfer_assessment_20261013/**'
@@ -43,6 +57,8 @@ on:
       - 'problems/catalog-cover-subgroup-certificates-incomplete.md'
       - 'research/hyperelliptic_cover_infrastructure_20261006/evidence.json'
       - 'research/hyperelliptic_cover_infrastructure_20261006/README.md'
+      - 'research/curve_transfer_infrastructure_20261118/**'
+      - 'research/chained_jacobian_transfers_20261110/lean/ChainTransfer.lean'
       - '.github/workflows/curve-covers.yml'
       - '.github/workflows/release.yml'
   workflow_dispatch:
@@ -57,7 +73,14 @@ concurrency:
 jobs:
   certificates:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 120
+    env:
+      # Integration-test targets pull in many large binaries. Serializing their
+      # links and omitting unused debug sections avoid concurrent rust-lld
+      # pressure and runner-disk exhaustion without changing test semantics.
+      CARGO_BUILD_JOBS: '1'
+      CARGO_PROFILE_DEV_DEBUG: '0'
+      CARGO_PROFILE_TEST_DEBUG: '0'
     steps:
       # The full-history checkout no longer fits a hosted runner's disk
       # (checkout fails mid-clone); free the unused SDKs first (as in #2385).
@@ -116,7 +139,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
       - run: cargo test --bin curve_cover_check --bin curve_standards
-      - name: Replay exact catalog transition inventory
+      - name: Replay pinned historical catalog transition inventory
         run: |
           cargo test --example cover_catalog_transition_audit
           cargo run --example cover_catalog_transition_audit -- "$RUNNER_TEMP/catalog-transition.json"
@@ -126,6 +149,81 @@ jobs:
           cargo test --lib hyperelliptic
           cargo test --lib binary_ecc::cover_transfer::tests
           cargo test --bin hyperelliptic-cover
+          cargo test --bin curve-transfer-sweep
+          cargo test --test binary_cover_transfer_f2_source_oracle
+          cargo test --test prime_cover_transfer_oracle
+          cargo run --bin hyperelliptic-cover -- transfer-catalog-verify \
+            --input docs/curves/binary-subgroup-transfer-certificates.json \
+            --registry docs/curves/registry.json \
+            --cover-graph docs/curves/cover-links.yaml \
+            --traits docs/curves/traits.json \
+            --expected-sha256 a55c7f9a0c836614281388f19b3b31fa622eeb1650ddc00c59e4e78562471392 \
+            --expected-bytes 500924
+          binary_producer_commit="$(jq -r .producer.git_commit docs/curves/binary-subgroup-transfer-certificates.json)"
+          git fetch --no-tags --filter=blob:none --recurse-submodules=no origin "$binary_producer_commit"
+          node scripts/test_verify_binary_transfer_source.mjs
+          node scripts/verify_binary_transfer_source.mjs \
+            --input docs/curves/binary-subgroup-transfer-certificates.json \
+            --repo-root . \
+            --output "$RUNNER_TEMP/binary-transfer-source-replay.json"
+          jq -e --arg commit "$binary_producer_commit" '
+            .status == "producer_source_digest_bound_to_recorded_git_tree" and
+            .producer_commit == $commit and
+            .source_files_checked == 21 and
+            ([.checks[]] | all(. == true))
+          ' "$RUNNER_TEMP/binary-transfer-source-replay.json" >/dev/null
+          cmp "$RUNNER_TEMP/binary-transfer-source-replay.json" \
+            research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json
+      - name: Optimized independent oracles and odd-transfer catalog controls
+        run: |
+          odd_corpus_sha256="1ecfabcdaecc3e00d78ab2ce7eebeb94607e1c2c224f261fb5718a4f53b65268"
+          odd_corpus_bytes="17879292"
+          actual_odd_sha256="$(sha256sum docs/curves/odd-subgroup-transfer-certificates.json | awk '{print $1}')"
+          actual_odd_bytes="$(wc -c < docs/curves/odd-subgroup-transfer-certificates.json)"
+          test "$actual_odd_sha256" = "$odd_corpus_sha256"
+          test "$actual_odd_bytes" = "$odd_corpus_bytes"
+          cargo test --release --bin odd-transfer-catalog -- --test-threads=1
+          cargo test --release --bin odd_extension_transfer_pilot -- --test-threads=1
+          cargo test --release --locked --test prime_cover_transfer_oracle -- --test-threads=1
+          cargo test --release --locked --test prime_montgomery_composed_transfer_oracle -- --test-threads=1
+          cargo test --release --test prime_montgomery_transfer_adapter -- --test-threads=1
+          cargo test --release --test prime_montgomery_composed_transfer -- --test-threads=1
+          cargo test --release --test binary_cover_transfer_oracle -- --nocapture --test-threads=1
+          set +e
+          cargo run --release --bin odd-transfer-catalog -- verify \
+            --input docs/curves/odd-subgroup-transfer-certificates.json \
+            --registry docs/curves/registry.json \
+            --cover-graph docs/curves/cover-links.yaml \
+            --expected-sha256 "$odd_corpus_sha256" \
+            --expected-bytes "$odd_corpus_bytes" \
+            --output "$RUNNER_TEMP/odd-subgroup-transfer-replay.json"
+          odd_verify_code=$?
+          set -e
+          test "$odd_verify_code" -eq 1
+          jq -e --arg sha "$odd_corpus_sha256" --argjson bytes "$odd_corpus_bytes" '
+            .status == "verified_named_subgroup_incomplete" and
+            .checks.canonical_bytes_equal == true and
+            .checks.optional_raw_hash_and_size == true and
+            .checks.all_named_subgroup_records_supported == false and
+            .corpus.sha256 == $sha and
+            .corpus.bytes == $bytes
+          ' "$RUNNER_TEMP/odd-subgroup-transfer-replay.json" >/dev/null
+          cmp "$RUNNER_TEMP/odd-subgroup-transfer-replay.json" \
+            research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json
+          cargo run --release --bin odd-transfer-catalog -- verify-source \
+            --input docs/curves/odd-subgroup-transfer-certificates.json \
+            --repo-root . \
+            --output "$RUNNER_TEMP/odd-subgroup-transfer-source-replay.json"
+          producer_commit="$(jq -r .producer.git_commit docs/curves/odd-subgroup-transfer-certificates.json)"
+          producer_source="$(jq -r .producer.source_sha256 docs/curves/odd-subgroup-transfer-certificates.json)"
+          jq -e --arg commit "$producer_commit" --arg source "$producer_source" '
+            .status == "source_manifest_bound_to_recorded_git_tree" and
+            .producer_commit == $commit and
+            .source_sha256 == $source and
+            ([.checks[]] | all(. == true))
+          ' "$RUNNER_TEMP/odd-subgroup-transfer-source-replay.json" >/dev/null
+          cmp "$RUNNER_TEMP/odd-subgroup-transfer-source-replay.json" \
+            research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json
       - name: Replay the native audit plan and fixed-F8 order certificate
         run: |
           cargo test --bin ecdlp-audit
@@ -136,12 +234,16 @@ jobs:
             --input docs/curves/fixed-f8-genus3-order-certificate.json \
             --repo-root .
       - run: cargo run --bin curve_standards -- --check
-      - run: python3 scripts/update_curve_standards.py --check
+      - name: Check the standards-to-curve registry join
+        # The repository-wide IC display renderer is owned by a separate gate;
+        # this curve workflow still verifies the complete registry merge.
+        run: python3 scripts/update_curve_standards.py --check --registry-only
       - run: cargo run --bin curve_cover_check -- --check
-      - name: Check sparse-safe lab-browser generation
-        run: |
-          python3 scripts/test_build_lab_browser.py
-          python3 scripts/build_lab_browser.py --check
+      - name: Check sparse-safe lab-browser input handling
+        # The browser's retained session rows require artifact-backed
+        # records.jsonl inputs that this certificate job does not hydrate.
+        # A fully hydrated browser-output freshness check remains separate.
+        run: python3 scripts/test_build_lab_browser.py
 
   transfer-assessment:
     name: Cover transfer assessment
@@ -169,8 +271,18 @@ jobs:
             /.github/workflows/
             /scripts/
             /src/
+            /tests/binary_cover_transfer_f2_source_oracle.rs
+            /tests/common/prime_split_sextic_oracle.rs
+            /tests/prime_cover_transfer_oracle.rs
+            /tests/prime_montgomery_composed_transfer.rs
+            /tests/prime_montgomery_composed_transfer_oracle.rs
+            /tests/prime_montgomery_transfer_adapter.rs
             /docs/curves/
             /research/cover_transfer_assessment_20261013/
+            /research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json
+            /research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json
+            /research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json
+            /research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json
             /research/hyperelliptic_cover_infrastructure_20261006/
             /tools/artifacts/
             /.artifacts/
@@ -226,7 +338,11 @@ jobs:
           node --test scripts/test_cover_transfer_assessment.mjs
           node --test scripts/test_catalog_snapshot.mjs
       - name: Validate the assessment schema
-        run: python -m jsonschema -i docs/curves/cover-transfer-assessments.json docs/curves/cover-transfer-assessment.schema.json
+        run: |
+          python -m jsonschema -i docs/curves/cover-transfer-assessments.json docs/curves/cover-transfer-assessment.schema.json
+          python -m jsonschema -i docs/curves/binary-subgroup-transfer-certificates.json docs/curves/binary-subgroup-transfer-certificates.schema.json
+          python -m jsonschema -i research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json docs/curves/binary-subgroup-transfer-source-verification.schema.json
+          python -m jsonschema -i docs/curves/odd-subgroup-transfer-certificates.json docs/curves/odd-subgroup-transfer-certificates.schema.json
       - name: Install native PDF metadata reader
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends poppler-utils
       - name: Verify typed map, subgroup, and evidence bindings
@@ -253,6 +369,8 @@ jobs:
           df -h .
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 0
+          filter: blob:none
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             /research/cover_transfer_assessment_20261013/lean/**

@@ -744,9 +744,33 @@ fn generic_rule(method: &str, counter: &str) -> Option<Rule> {
         // A collision whose coefficients do not solve: an inversion and a
         // product modulo r.
         "useless_collisions" => Prims(&[(ModrInv, 1), (ModrMul, 1)]),
+        // The versioned cached-BSGS verification phase already carries every
+        // group operation of `[d]G = Q`; these counters describe its outcome.
+        // Scope the new interpretation to the new id so frozen records keep
+        // their established work-block reading.
+        "verification_checks" | "failed_candidates" if method == "bsgs.negation_table_v2" => {
+            Shape
+        }
+        "point_negations_uncharged" if method == "bsgs.negation_table_v2" => {
+            Prims(&[(FieldAdd, 1)])
+        }
+        "recovery_key_comparisons_uncharged" if method == "bsgs.negation_table_v2" => {
+            Prims(&[(WordOp, 1)])
+        }
+        "recovery_modr_muls_uncharged" if method == "bsgs.negation_table_v2" => {
+            Prims(&[(ModrMul, 1)])
+        }
+        "recovery_modr_adds_uncharged" if method == "bsgs.negation_table_v2" => {
+            Prims(&[(ModrAdd, 1)])
+        }
         // BSGS with negation keys every point by its class: a negation and
         // a comparison before the probe.
-        "inserts_uncharged" | "lookups_uncharged" if method == "bsgs.negation" => {
+        "inserts_uncharged" | "lookups_uncharged"
+            if matches!(
+                method,
+                "bsgs.negation" | "bsgs.negation_table_v2"
+            ) =>
+        {
             Prims(&[(HashProbe, 1), (FieldAdd, 2)])
         }
         "walk_steps"
@@ -906,6 +930,109 @@ fn known_uncounted(
         }
     }
     out.into_iter().map(str::to_string).collect()
+}
+
+/// Check the duplicated top-level/phase-native binding of the versioned
+/// cached BSGS counters before either copy is priced.  The top-level copy is
+/// retained for the stable report and band schemas, while the phase copy
+/// determines reusable versus per-target work.  Accepting a missing,
+/// duplicated, misphased or unequal copy would therefore silently change
+/// either the total or its split.
+fn validate_cached_bsgs_native_bindings(x: &Priceable<'_>) -> Result<(), String> {
+    if x.method_id != "bsgs.negation_table_v2" {
+        return Ok(());
+    }
+    const RECOVERY: [&str; 3] = [
+        "recovery_key_comparisons_uncharged",
+        "recovery_modr_muls_uncharged",
+        "recovery_modr_adds_uncharged",
+    ];
+    let verification_checks = x
+        .counters
+        .get("verification_checks")
+        .copied()
+        .unwrap_or(0);
+    if verification_checks > 1 {
+        return Err(format!(
+            "verification_checks: cached BSGS has {verification_checks}, expected zero or one"
+        ));
+    }
+    let recovery_present = RECOVERY
+        .iter()
+        .copied()
+        .filter(|name| x.counters.contains_key(*name))
+        .count();
+    let expected_recovery = if verification_checks == 1 { RECOVERY.len() } else { 0 };
+    if recovery_present != expected_recovery {
+        return Err(format!(
+            "cached BSGS recovery counters must appear together exactly on a verified table hit: found {recovery_present}, expected {expected_recovery}"
+        ));
+    }
+    if x.counters.get("failed_candidates").copied().unwrap_or(0) > verification_checks {
+        return Err("failed_candidates exceeds cached BSGS verification_checks".into());
+    }
+
+    for (counter, expected_phase, required) in [
+        ("inserts_uncharged", "setup", true),
+        ("point_negations_uncharged", "setup", true),
+        ("lookups_uncharged", "search", true),
+        ("recovery_key_comparisons_uncharged", "search", false),
+        ("recovery_modr_muls_uncharged", "search", false),
+        ("recovery_modr_adds_uncharged", "search", false),
+    ] {
+        let bindings: Vec<(&str, u64)> = x
+            .phases
+            .iter()
+            .filter_map(|p| {
+                p.native
+                    .get(counter)
+                    .copied()
+                    .map(|count| (p.name.as_str(), count))
+            })
+            .collect();
+        let Some(top) = x.counters.get(counter).copied() else {
+            if required {
+                return Err(format!(
+                    "{counter}: cached BSGS top-level counter is missing"
+                ));
+            }
+            if !bindings.is_empty() {
+                return Err(format!(
+                    "{counter}: cached BSGS has a phase-native binding without a top-level counter"
+                ));
+            }
+            continue;
+        };
+        let [(phase, count)] = bindings.as_slice() else {
+            return Err(format!(
+                "{counter}: cached BSGS requires exactly one phase-native binding, found {}",
+                bindings.len()
+            ));
+        };
+        if *phase != expected_phase {
+            return Err(format!(
+                "{counter}: cached BSGS binding is in phase `{phase}`, expected `{expected_phase}`"
+            ));
+        }
+        if *count != top {
+            return Err(format!(
+                "{counter}: cached BSGS phase-native count {count} differs from top-level count {top}"
+            ));
+        }
+        if matches!(
+            counter,
+            "point_negations_uncharged"
+                | "recovery_key_comparisons_uncharged"
+                | "recovery_modr_muls_uncharged"
+                | "recovery_modr_adds_uncharged"
+        ) && top != 1
+        {
+            return Err(format!(
+                "{counter}: cached BSGS expected exactly one operation, found {top}"
+            ));
+        }
+    }
+    Ok(())
 }
 
 /// What a solver unit's count leaves out, if anything.
@@ -1115,6 +1242,7 @@ fn hec_shape(counter: &str) -> bool {
 
 /// Price a record in `bitop/v1`.
 pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
+    validate_cached_bsgs_native_bindings(x)?;
     let widths = widths_of(x.curve)?;
     let method = x.method_id;
     let hec = is_hec(method);
@@ -1221,9 +1349,23 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
             }
         }
         if !ic {
-            // A generic method's priced work that no counter carries (the
-            // rho window's compares): in `work_native`, so committed records,
-            // which have none, replay and price as before.
+            // This versioned method binds native counters to the phase that
+            // performed them.  Restrict the new reading to its new id: no
+            // frozen generic record acquires a different price or split.
+            if method == "bsgs.negation_table_v2" {
+                for (name, &count) in &p.native {
+                    if count == 0 {
+                        continue;
+                    }
+                    match generic_rule(method, name) {
+                        Some(Shape) => {}
+                        Some(Prims(ps)) => add_prims(&mut prims, ps, count as u128),
+                        None => push_unique(&mut unpriced, name),
+                    }
+                }
+            }
+            // Post-record-schema generic counts such as the rho window's
+            // compares retain their established `work_native` path.
             for (name, &count) in &p.work_native {
                 if count == 0 {
                     continue;
@@ -1313,6 +1455,14 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
         let mut natives = BTreeMap::new();
         for (name, &count) in x.counters {
             if count == 0 {
+                continue;
+            }
+            // A phase-bound copy is the same operation count, not another
+            // charge.  Keep the top-level counter for report/band
+            // compatibility, but price it in its named phase above.
+            if method == "bsgs.negation_table_v2"
+                && x.phases.iter().any(|p| p.native.contains_key(name))
+            {
                 continue;
             }
             match generic_rule(method, name) {
@@ -2573,6 +2723,198 @@ mod tests {
         assert!(is_reusable_phase("ic.pipeline", "factor_base"));
         assert!(is_reusable_phase("ic.pipeline", "oracle_setup"));
         assert!(!is_reusable_phase("ic.pipeline", "relations"));
+    }
+
+    #[test]
+    fn cached_bsgs_native_table_work_stays_in_its_performed_phase() {
+        let c = curve("prime", 20, (1 << 19) + 21, 2);
+        let phases = vec![
+            PhaseRecord {
+                name: "setup".into(),
+                adds: 10,
+                gae: 10.0,
+                native: [
+                    ("inserts_uncharged".to_string(), 11u64),
+                    ("point_negations_uncharged".to_string(), 1u64),
+                ]
+                    .into_iter()
+                    .collect(),
+                ..Default::default()
+            },
+            PhaseRecord {
+                name: "search".into(),
+                adds: 3,
+                gae: 3.0,
+                native: [
+                    ("lookups_uncharged".to_string(), 4u64),
+                    ("recovery_key_comparisons_uncharged".to_string(), 1u64),
+                    ("recovery_modr_muls_uncharged".to_string(), 1u64),
+                    ("recovery_modr_adds_uncharged".to_string(), 1u64),
+                ]
+                    .into_iter()
+                    .collect(),
+                ..Default::default()
+            },
+        ];
+        // The top-level copies are retained for the report/band schema and
+        // must not become a second synthetic `natives` charge.
+        let counters = [
+            ("inserts_uncharged".to_string(), 11u64),
+            ("point_negations_uncharged".to_string(), 1u64),
+            ("lookups_uncharged".to_string(), 4u64),
+            ("recovery_key_comparisons_uncharged".to_string(), 1u64),
+            ("recovery_modr_muls_uncharged".to_string(), 1u64),
+            ("recovery_modr_adds_uncharged".to_string(), 1u64),
+            ("verification_checks".to_string(), 1u64),
+        ]
+        .into_iter()
+        .collect();
+        let params = BTreeMap::new();
+        assert!(matches!(
+            generic_rule("bsgs.negation_table_v2", "verification_checks"),
+            Some(Shape)
+        ));
+        assert!(matches!(
+            generic_rule("bsgs.negation_table_v2", "failed_candidates"),
+            Some(Shape)
+        ));
+        let w = price(&Priceable {
+            method_id: "bsgs.negation_table_v2",
+            method_params: &params,
+            curve: &c,
+            phases: &phases,
+            counters: &counters,
+            solver: None,
+        })
+        .unwrap();
+        assert_eq!(w.phases.len(), 2, "no duplicate synthetic natives phase");
+        assert_eq!(w.phases[0].prims["hash_probe"], 11);
+        assert_eq!(w.phases[0].prims["field_add"], 23);
+        assert_eq!(w.phases[1].prims["hash_probe"], 4);
+        assert_eq!(w.phases[1].prims["field_add"], 8);
+        assert_eq!(w.phases[1].prims["word_op"], 1);
+        assert_eq!(w.phases[1].prims["modr_mul"], 1);
+        assert_eq!(w.phases[1].prims["modr_add"], 1);
+        assert!(
+            w.complete,
+            "every reported cached-BSGS counter has a rule and no phase copy is double-priced"
+        );
+        let (reusable, per_target) = target_split("bsgs.negation_table_v2", &w).unwrap();
+        assert_eq!(reusable, w.phases[0].bitops.parse().unwrap());
+        assert_eq!(per_target, w.phases[1].bitops.parse().unwrap());
+    }
+
+    #[test]
+    fn cached_bsgs_native_binding_must_be_exact_and_phase_correct() {
+        let c = curve("prime", 20, (1 << 19) + 21, 2);
+        let phases = vec![
+            PhaseRecord {
+                name: "setup".into(),
+                native: [
+                    ("inserts_uncharged".to_string(), 11u64),
+                    ("point_negations_uncharged".to_string(), 1u64),
+                ]
+                    .into_iter()
+                    .collect(),
+                ..Default::default()
+            },
+            PhaseRecord {
+                name: "search".into(),
+                native: [("lookups_uncharged".to_string(), 4u64)]
+                    .into_iter()
+                    .collect(),
+                ..Default::default()
+            },
+        ];
+        let counters: BTreeMap<String, u64> = [
+            ("inserts_uncharged".to_string(), 11u64),
+            ("point_negations_uncharged".to_string(), 1u64),
+            ("lookups_uncharged".to_string(), 4u64),
+        ]
+        .into_iter()
+        .collect();
+        let params = BTreeMap::new();
+        let reject = |phases: &[PhaseRecord], counters: &BTreeMap<String, u64>| {
+            price(&Priceable {
+                method_id: "bsgs.negation_table_v2",
+                method_params: &params,
+                curve: &c,
+                phases,
+                counters,
+                solver: None,
+            })
+            .unwrap_err()
+        };
+        assert!(price(&Priceable {
+            method_id: "bsgs.negation_table_v2",
+            method_params: &params,
+            curve: &c,
+            phases: &phases,
+            counters: &counters,
+            solver: None,
+        })
+        .unwrap()
+        .complete);
+
+        let mut unequal = phases.clone();
+        unequal[0]
+            .native
+            .insert("inserts_uncharged".into(), 10);
+        assert!(reject(&unequal, &counters).contains("differs from top-level"));
+
+        let mut wrong_phase = phases.clone();
+        wrong_phase[0].native.remove("inserts_uncharged");
+        wrong_phase[1]
+            .native
+            .insert("inserts_uncharged".into(), 11);
+        assert!(reject(&wrong_phase, &counters).contains("expected `setup`"));
+
+        let mut duplicated = phases.clone();
+        duplicated[1]
+            .native
+            .insert("inserts_uncharged".into(), 11);
+        assert!(reject(&duplicated, &counters).contains("exactly one"));
+
+        let mut partial_hit = counters.clone();
+        partial_hit.insert("verification_checks".into(), 1);
+        partial_hit.insert("recovery_key_comparisons_uncharged".into(), 1);
+        assert!(reject(&phases, &partial_hit).contains("must appear together"));
+
+        let mut recovery_without_hit = counters.clone();
+        for name in [
+            "recovery_key_comparisons_uncharged",
+            "recovery_modr_muls_uncharged",
+            "recovery_modr_adds_uncharged",
+        ] {
+            recovery_without_hit.insert(name.into(), 1);
+        }
+        assert!(reject(&phases, &recovery_without_hit).contains("exactly on a verified table hit"));
+
+        let mut wrong_recovery_phase = phases.clone();
+        let mut hit = recovery_without_hit;
+        hit.insert("verification_checks".into(), 1);
+        for name in [
+            "recovery_key_comparisons_uncharged",
+            "recovery_modr_muls_uncharged",
+            "recovery_modr_adds_uncharged",
+        ] {
+            wrong_recovery_phase[1].native.insert(name.into(), 1);
+        }
+        wrong_recovery_phase[1]
+            .native
+            .remove("recovery_modr_muls_uncharged");
+        wrong_recovery_phase[0]
+            .native
+            .insert("recovery_modr_muls_uncharged".into(), 1);
+        assert!(reject(&wrong_recovery_phase, &hit).contains("expected `search`"));
+
+        let mut missing = phases;
+        missing[1].native.remove("lookups_uncharged");
+        assert!(reject(&missing, &counters).contains("exactly one"));
+
+        let mut missing_top = counters;
+        missing_top.remove("lookups_uncharged");
+        assert!(reject(&missing, &missing_top).contains("top-level counter is missing"));
     }
 
     #[test]
