@@ -1,4 +1,11 @@
 # Trace–skew radical pair image for Prime31 Semaev systems
+
+## New native CI checkpoint (2026-11-22 UTC)
+
+Original Rust 1.100.0 [CI run #45082848679](https://github.com/isogeny-labs/crypto/actions/runs/45082848679), job 137394665846, **passed** both pair/moment test targets and all four F4 example modes. Detailed original-Rust stage measurements and scope: [CI_RESULTS_20261122.md](CI_RESULTS_20261122.md). B3/B4 two-summand degree-B G uses 359/783 F4 field operations versus ordered 511/1238 (29.75%/36.75% lower), but the six-variable four-summand G chain consumes **2,182,404** operations vs ordered **1,036,961** (**2.105× worse**) at B4. A quadratic circuit is also worse than G at both B3/B4. `setup_ms` excludes construction of symbolic equations, while the F4 runner does not certify roots. **No complete solver or asymptotic advantage**.
+
+A new bounded `--sweep` mode and CI step for B3/4/6/8/12/16/24/32 m2 F4 field-operation scaling have been committed. Its outcome is pending source-specific CI inspection; it does not demonstrate scaling with p. Older paragraphs below referring to unexecuted Rust describe the **earlier** checkpoint and are superseded on that narrow compiler/CI point. [pcc:unverified]
+
 Date: 2026-11-22. Status: **new candidate presentation, exact mathematical lemma and independent arithmetic replay; original Rust/CI and solver-speed measurements pending**.
 
 ## Generalized m-fold symmetric trace-moment equations (new 2026-11-22 result)
