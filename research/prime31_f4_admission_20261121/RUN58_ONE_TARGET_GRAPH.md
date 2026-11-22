@@ -49,3 +49,9 @@ The existing original-Rust research/prime31_ic_20261115/native/examples/prime31_
 4. Only if all ECDLP logs verify, compare fully charged end-to-end native Rust against best same-host negated BSGS, optimized rho and index-calculus frontier. A favorable reproducible confidence interval is required before claiming a cheaper complete solver.
 
 **Result at this scope:** A rigorously checkable partial-rank stopping and conditional query-budget lead. The public-only algebraic root-extraction bottleneck remains unbroken.
+
+## Source-specific CI evidence (2026-11-22 09:32 UTC)
+
+[GitHub Actions run #45007882519](https://github.com/isogeny-labs/crypto/actions/runs/45007882519) **completed successfully** on source commit bcf71939742844563aeb28b67a69baff0f692a63. Its logs show independent 500/500 prior rank checks, 51/51 exhaustive run58 small-graph checks, 512/512 deterministic Python conditional trials, source-linked original Rust release build in 16.38s, original 509-point two-summand arithmetic census, and a separate 128-seed **native Rust** signed-target model. Native-Rust hybrid results: 985793 modeled uniform queries for T=1, 4994824 for T=1024 (the latter at m=900, mean single-positive target closure ~0.83190). Independently implemented Python found 988031 / 5002567 with different random generators. These are **model-based estimates** and do not constitute measured non-generic extraction or an ECDLP win.
+
+Separately, the 64-fixture actual-prime31 affine-potential validation passed locally with an independently written Python EC group law. Its source was subsequently committed as run58_affine_recovery_verify.py and added to the cached Rust CI workflow; do not claim source-specific CI PASS for that subsequent change without observing it.
