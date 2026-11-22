@@ -508,8 +508,20 @@ fn ext_gcd(a: &BigInt, b: &BigInt) -> (BigInt, BigInt, BigInt) {
 /// "negative twin" `(a, −b, c)`.
 ///
 /// Complexity: `O(|D|^{1/2 + ε})` arithmetic operations.
+///
+/// When `D` fits in `i64` the hot loop runs in native integers
+/// (`IC_CLASS_I64=0` forces the BigInt path for A/B).
 pub fn enumerate_reduced_forms(disc: &BigInt) -> Vec<BinaryQuadraticForm> {
     assert!(disc.is_negative(), "discriminant must be negative");
+    if std::env::var("IC_CLASS_I64").as_deref() != Ok("0") {
+        if let Ok(d) = i64::try_from(disc) {
+            return enumerate_reduced_forms_i64(d);
+        }
+    }
+    enumerate_reduced_forms_bigint(disc)
+}
+
+fn enumerate_reduced_forms_bigint(disc: &BigInt) -> Vec<BinaryQuadraticForm> {
     let abs_d = disc.abs();
     // bound on a: a ≤ √(|D|/3)
     let bound_sq = &abs_d / 3;
@@ -558,6 +570,88 @@ pub fn enumerate_reduced_forms(disc: &BigInt) -> Vec<BinaryQuadraticForm> {
             b += BigInt::from(2);
         }
         a += BigInt::one();
+    }
+    forms
+}
+
+#[inline]
+fn gcd_i64(mut x: i64, mut y: i64) -> i64 {
+    x = x.abs();
+    y = y.abs();
+    while y != 0 {
+        let t = x % y;
+        x = y;
+        y = t;
+    }
+    x
+}
+
+#[inline]
+fn is_reduced_i64(a: i64, b: i64, c: i64) -> bool {
+    let abs_b = b.abs();
+    if abs_b > a || a > c {
+        return false;
+    }
+    if (abs_b == a || a == c) && b < 0 {
+        return false;
+    }
+    true
+}
+
+fn isqrt_u64(n: u64) -> u64 {
+    if n == 0 {
+        return 0;
+    }
+    let mut x = 1u64 << (((64 - n.leading_zeros() as u32) + 1) / 2);
+    if x == 0 {
+        x = 1;
+    }
+    loop {
+        let y = (x + n / x) / 2;
+        if y >= x {
+            return x;
+        }
+        x = y;
+    }
+}
+
+fn enumerate_reduced_forms_i64(disc: i64) -> Vec<BinaryQuadraticForm> {
+    debug_assert!(disc < 0);
+    let abs_d = disc.unsigned_abs();
+    let a_max = isqrt_u64(abs_d / 3) as i64;
+    let parity = disc.rem_euclid(2);
+    let mut forms = Vec::new();
+    let mut a = 1i64;
+    while a <= a_max {
+        let mut b = parity;
+        // Start b in (-a, a]; for parity 0/1 the first candidate ≥ -a+ε
+        // matching the BigInt loop (b starts at parity ∈ {0,1} ≥ 0).
+        while b <= a {
+            let num = (b as i128) * (b as i128) - (disc as i128);
+            let denom = (a as i128) * 4;
+            if num.rem_euclid(denom) == 0 {
+                let c = (num / denom) as i64;
+                if c >= a && gcd_i64(a, gcd_i64(b, c)) == 1 && is_reduced_i64(a, b, c) {
+                    forms.push(BinaryQuadraticForm {
+                        a: BigInt::from(a),
+                        b: BigInt::from(b),
+                        c: BigInt::from(c),
+                    });
+                    if b != 0 && b != a && a != c {
+                        let mb = -b;
+                        if is_reduced_i64(a, mb, c) {
+                            forms.push(BinaryQuadraticForm {
+                                a: BigInt::from(a),
+                                b: BigInt::from(mb),
+                                c: BigInt::from(c),
+                            });
+                        }
+                    }
+                }
+            }
+            b += 2;
+        }
+        a += 1;
     }
     forms
 }

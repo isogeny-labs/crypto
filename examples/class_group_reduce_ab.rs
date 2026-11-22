@@ -153,40 +153,55 @@ fn main() {
     println!("  BigInt (opt-out)  : med {mb:.1} ns");
     println!("  speedup big/i64   : {:.3}x", mb / mi);
 
-    // Also enumerate wall time.
-    let mut we_i = Vec::new();
-    let mut we_b = Vec::new();
-    for r in 0..7 {
-        for name in if r % 2 == 0 {
-            ["i64", "big"]
-        } else {
-            ["big", "i64"]
-        } {
-            unsafe {
+    // Enumerate wall time — small + larger |D| (form-construction bound).
+    for &(label, dval, reps) in &[
+        ("D=-12007", -12007i64, 40usize),
+        ("D=-3999991", -3999991i64, 6usize), // ≡ 1 (mod 4)
+    ] {
+        let disc_e = d(dval);
+        unsafe {
+            std::env::remove_var("IC_CLASS_I64");
+        }
+        let h_fast = class_number(&disc_e);
+        unsafe {
+            std::env::set_var("IC_CLASS_I64", "0");
+        }
+        let h_big = class_number(&disc_e);
+        assert_eq!(h_fast, h_big, "h({label})");
+        let mut we_i = Vec::new();
+        let mut we_b = Vec::new();
+        for r in 0..7 {
+            for name in if r % 2 == 0 {
+                ["i64", "big"]
+            } else {
+                ["big", "i64"]
+            } {
+                unsafe {
+                    if name == "i64" {
+                        std::env::remove_var("IC_CLASS_I64");
+                    } else {
+                        std::env::set_var("IC_CLASS_I64", "0");
+                    }
+                }
+                let t0 = Instant::now();
+                for _ in 0..reps {
+                    let _ = black_box(enumerate_reduced_forms(&disc_e));
+                }
+                let ns = t0.elapsed().as_nanos() as f64 / reps as f64;
                 if name == "i64" {
-                    std::env::remove_var("IC_CLASS_I64");
+                    we_i.push(ns);
                 } else {
-                    std::env::set_var("IC_CLASS_I64", "0");
+                    we_b.push(ns);
                 }
             }
-            let t0 = Instant::now();
-            for _ in 0..20 {
-                let _ = black_box(enumerate_reduced_forms(&disc));
-            }
-            let ns = t0.elapsed().as_nanos() as f64 / 20.0;
-            if name == "i64" {
-                we_i.push(ns);
-            } else {
-                we_b.push(ns);
-            }
         }
+        let ei = med(we_i);
+        let eb = med(we_b);
+        println!("enumerate_reduced_forms({label}) h={h_fast}");
+        println!("  i64 : med {ei:.0} ns");
+        println!("  big : med {eb:.0} ns");
+        println!("  speedup big/i64 : {:.3}x", eb / ei);
     }
-    let ei = med(we_i);
-    let eb = med(we_b);
-    println!("enumerate_reduced_forms(D=-12007)");
-    println!("  i64 : med {ei:.0} ns");
-    println!("  big : med {eb:.0} ns");
-    println!("  speedup big/i64 : {:.3}x", eb / ei);
 
     // Compose A/B on reduced forms of D=-12007.
     let n = base.len().min(48);
