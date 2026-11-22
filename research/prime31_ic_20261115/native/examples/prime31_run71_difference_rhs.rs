@@ -19,10 +19,11 @@ mod control {
         for shift in 0..1024u64 {
             for (t, &pt) in sp.iter().enumerate() {
                 probes += 1;
-                let complement = ar.add(PRIME31, r, ar.neg(PRIME31, pt));
+                let negative = ar.neg(PRIME31, pt);
+                let complement = ar.add(PRIME31, r, negative);
                 if let Some(&(i, j)) = tab.get(&complement) {
-                    let p = ar.add(PRIME31, pt,
-                        ar.add(PRIME31, sp[i as usize], sp[j as usize]));
+                    let pair_sum = ar.add(PRIME31, sp[i as usize], sp[j as usize]);
+                    let p = ar.add(PRIME31, pt, pair_sum);
                     if p != r {
                         return Err("Run71 certificate original-EC proof failed".into());
                     }
