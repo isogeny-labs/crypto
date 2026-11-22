@@ -39,13 +39,7 @@ frozen = """        let mut n = f.len();
         }
 """
 baseline = source[:start] + frozen + source[end:]
-# The second Round116 optimization specializes monic linear polynomials.
-# Reconstruct the frozen pre-Round116 root entry point too.
-fast_start = baseline.index("        // Monic linear inputs occur repeatedly")
-fast_end = baseline.index("        // Polynomials of degree", fast_start)
-baseline = baseline[:fast_start] + baseline[fast_end:]
 assert baseline != source and baseline.count("let mut leading = 0u64;") == 0
-assert "Monic linear inputs occur repeatedly" not in baseline
 
 header = r'''
 #![allow(dead_code, unused_imports)]
