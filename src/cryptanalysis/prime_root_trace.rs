@@ -299,6 +299,7 @@ impl Engine<'_> {
         }
         self.field(FieldOp::Mul, power, factor)
     }
+    #[inline(never)]
     fn inv(&mut self, value: u64) -> Work<u64> {
         debug_assert_ne!(value, 0);
         self.event(RootEvent::InverseBegin { value })?;
