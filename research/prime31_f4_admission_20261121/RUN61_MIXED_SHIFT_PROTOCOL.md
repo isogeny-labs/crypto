@@ -1,0 +1,29 @@
+# Prime31 run61 — fixed-generator mixed Jacobian public-shift ablation
+
+**Status:** original-Rust source checked in with a pinned CI gate; full native timings must be read from that workflow. Do not infer an ECDLP or Semaev extraction improvement from an EC operation kernel.
+
+## Scope and decision
+
+Following [run60](RUN60_EXACT_SUPPORT_SHIFT_GATE.md), the original Rust affine scalar-step operation cost **176.702 ns median** in [Actions #45017313908](https://github.com/isogeny-labs/crypto/actions/runs/45017313908). A hypothetical 1:1 affine-per-public-query implementation of run59's **4,699,949** conditional 1024-target probes would pay **830.492 ms** merely for group shifts (different-host sensitivity: historical 170.113-ms BSGS). That does not rule out a faster coordinate system. The next falsifiable component is the fixed-generator mixed Jacobian addition, evaluated against *the same original curve and original Rust affine backend in the same process*.
+
+## Standard projective formula; no mathematical novelty claimed
+
+For prime field p=2147483647, Jacobian `J=(X,Y,Z)` represents affine `(X/Z²,Y/Z³)`. For the **unchanged** `G=(625037715,2100627251)`, when `J+G` is nonexceptional:
+
+```
+ZZ=Z²; U=Gx*ZZ; S=Gy*Z*ZZ; H=U-X; r=S-Y
+HH=H²; HHH=H*HH; V=X*HH
+X'=r²-HHH-2V; Y'=r*(V-X')-Y*HHH; Z'=Z*H  (mod p)
+```
+
+This is a standard mixed projective addition, not an index-calculus invention. The test **fails** on `H=0` rather than incorrectly treating a doubling or infinity as a normal step. It starts from `2G`, never reaches an exceptional branch during its registered 1.25-million additions (far less than n), and cross-checks all 1024 initial steps plus each 250000-step endpoint against original Rust affine addition and scalar multiplication. A separate independently implemented Python affine/Jacobian mathematical replay checked **10,000** steps and 1,310 intermediate affine endpoints.
+
+`research/prime31_ic_20261115/native/examples/prime31_run61_mixed_shift.rs` uses `PRIME31`, `check_curve`, `Arithmetic::add`, `Arithmetic::scalar` from the original slim Rust crate, with no new factor-base, F4 or EC solver library. `.github/workflows/prime31-run61-mixed-shift.yml` pins Rust 1.100.0 and source-specific output.
+
+## Measurement and admission conditions
+
+Registered five 250000-step repetitions for **both** the original affine and specialized Jacobian kernel within the same source-specific Actions run, recording each repetition, checked endpoint and median. Report `affine_median/Jacobian_median` but **do not** report any end-to-end attack speedup. The cross-run **36.195 ns/probe** sensitivity still applies *only* to an algorithm that truly needs one such step per uniform query, and excludes all algebraic extraction. Promotion requires an independently verified public-only unknown-index relation extractor, complete signed ECDLP logs and fully charged paired same-host comparisons against optimized existing Rust index calculus, negated BSGS and rho.
+
+**Leading hypotheses:** (a) mixed projective avoids an inversion per shifted query and may substantially improve the affine kernel; (b) if the projective kernel exceeds 36.195 ns, *even shift-only* violates the historical sensitivity for the exact run59 query model; (c) if it is below, the dominant unresolved expense becomes blind root extraction and negative-query handling. None of these is a complete-solver result.
+
+Literature/previous work checked: run55–60, #4692/#4812/#4822/#4809/#4846, Amadori–Pintore–Sala (2018) prime-field one-relation strategy and Yokoyama et al. (2020) naive Semaev conditional complexity bound. Standard projective group formulas are classical; no priority/novelty claim.
