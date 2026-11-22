@@ -202,6 +202,27 @@ impl Fp {
         if r1 == self.p - 1 { return self.p - 1; }
         if r1 == 2 { return (self.p + 1) / 2; }
         if r1 == self.p - 2 { return (self.p - 1) / 2; }
+        // Narrow Euclidean remainders for 32-bit prime fields. A u32
+        // quotient/remainder needs no 64-bit div; keep i64 Bezout
+        // coefficients, which may grow up to p. Inputs are public.
+        if self.p <= u32::MAX as u64 {
+            let (mut u, mut v) = (self.p as u32, r1 as u32);
+            let (mut x, mut y) = (0i64, 1i64);
+            while v != 0 {
+                let q = u / v;
+                let rem = u - q * v;
+                let next = x - (q as i64) * y;
+                u = v;
+                v = rem;
+                x = y;
+                y = next;
+            }
+            return if x < 0 {
+                (x + self.p as i64) as u64
+            } else {
+                x as u64
+            };
+        }
         let (mut t0, mut t1) = (0i64, 1i64);
         while r1 != 0 {
             let q = r0 / r1;
