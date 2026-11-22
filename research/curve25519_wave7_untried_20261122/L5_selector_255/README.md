@@ -1,8 +1,9 @@
 # L5: frame and seed selectors toward 255 bits (wave 7, 2026-11-22)
 
 **Class:** a component measurement on the algebraic track (exact counts, counted group operations and Legendre
-symbols, no timings) plus a derived extrapolation to Curve25519. It is not a leaderboard row: there is no replay
-certificate, no validator report and no matched rho arm, so the validation gate was not attempted. Protocol:
+symbols, no timings) plus a derived extrapolation to Curve25519. It is not a leaderboard row. An independent validator report exists
+([validator-report.json](validator-report.json); its errata E1–E12 are applied below), but there is no replay
+certificate and no matched rho arm, so the validation gate is not met. Protocol:
 [PROTOCOL.md](PROTOCOL.md), frozen before data. PDF: [REPORT.pdf](REPORT.pdf). Every result sentence below is
 [pcc:unverified]: no pcc claim was filed.
 
@@ -14,10 +15,14 @@ what are the gain and the cost on the real Curve25519 at the t that an m = 2 Sem
 
 ## Answer
 
-1. **The gain dies like 2^(−t/2).** The one-parameter form gain − 1 = C·2^(−t/2) (M3) wins the preregistered
-   held-out test on every curve, for frames and for seeds [pcc:unverified]. With α free (M2), the fitted α is
-   0.553–0.565 for frames (k20, k24f, k24r) and 0.561–0.590 for seeds [pcc:unverified]. M1 (ln gain linear in t)
-   predicts gain < 1 on the held-out t and fails [pcc:unverified].
+1. **The gain falls about like 2^(−t/2).** Under the preregistered rule, which prefers the simpler model, the
+   one-parameter form gain − 1 = C·2^(−t/2) (M3) wins the held-out test on every curve, for frames and for seeds
+   [pcc:unverified]. With α free (M2), the fitted α is 0.553–0.565 for frames (k20, k24f, k24r) and 0.561–0.590
+   for seeds [pcc:unverified]. The free-α 95% intervals exclude 0.5 on k24f [0.530, 0.579] and k24r
+   [0.514, 0.588] [pcc:unverified]. M3 is therefore the conservative extrapolation, the one with the larger
+   excess; M2 gives 2–5·10⁻²¹ at t* [pcc:unverified]. M1 (ln gain linear in t) predicts gain < 1 on the held-out
+   t for frames and for k24r seeds. On k20 seeds it scores a finite 1.427, which is still inadequate (> ln 2)
+   [pcc:unverified].
 2. **The gain is a column-count effect.** Picking frames by the column count c alone captures 96–100% of the
    J-selector's excess at every t ≥ 8 [pcc:unverified]. The class-composition part falls like 2^(−t)
    (α_Φ = 1.03–1.05) [pcc:unverified]. An iid model (binomial column count, multinomial labels) reproduces the
@@ -28,12 +33,18 @@ what are the gain and the cost on the real Curve25519 at the t that an m = 2 Sem
    - The column dispersion index D is 0.88–0.96 at t = 12, 14 and 16 [pcc:unverified].
    - At t* = 128, 64 sampled frames are homogeneous, and a frame selected from half the samples shows no excess
      on the other half [pcc:unverified].
-4. **At 255 bits the selector is worthless (DERIVED EXTRAPOLATION).**
-   - The derived t* is 128 for m = 2.
-   - The extrapolated excess there is about 4·10⁻¹⁹ at K = 2000, and about 1·10⁻¹⁸ even at K = 2⁶⁴.
-   - Enumerating a single frame with full labels costs about 2^136 group operations, about 1.1·10³ × rho.
-   - The Legendre-only selectors cost 0, 0.68 and 6.8 × rho per frame at 0, 0.1 and 1 GAE per symbol.
-   - Selection could only pay for an index-calculus attack that is already more than about 2.8·10²¹ × rho.
+4. **At 255 bits the derived selector excess is about 4·10⁻¹⁹ (DERIVED EXTRAPOLATION)** [pcc:unverified].
+   - The derived t* is 128 for m = 2 [pcc:unverified].
+   - The extrapolated excess there is about 4·10⁻¹⁹ at K = 2000, and about 1·10⁻¹⁸ even at K = 2⁶⁴
+     [pcc:unverified].
+   - Enumerating a single frame with full labels costs about 1,142 × rho with the ladder count (731 × rho with
+     double-and-add) [pcc:unverified].
+   - The Legendre-only selectors cost 0, 0.68 and 6.8 × rho per frame at 0, 0.1 and 1 GAE per symbol
+     [pcc:unverified].
+   - Break-even [pcc:unverified]:
+     - full-label selection pays only for an index-calculus attack that already costs at least 2.8·10²¹ × rho;
+     - Legendre-only selection pays only above 1.7·10¹⁸ × rho (0.1 GAE) or 1.7·10¹⁹ × rho (1 GAE);
+     - at w = 0 the Legendre-only selection costs no group operations, but its gain is only 1 + 4·10⁻¹⁹.
 
 ## Gain vs t (measured)
 
@@ -154,7 +165,7 @@ Every prediction held [pcc:unverified]:
 | P3a | composition-only α_Φ ≥ 0.8 | **held**: 1.029–1.055 |
 | P3b | c-only share of the excess ≥ 0.7 at every t ≥ 8 | **held**: minimum 0.959 |
 | P4 | real ÷ iid-surrogate excess, geometric mean over t ≥ 6, in [0.75, 1.33] | **held**: 0.968 (k20), 0.959 (k24f), 1.026 (k24r) |
-| P5 | [r]P costs 1.0–1.6·log₂ r group ops per point; labels correct | **held**: 20, 27, 25 ops = 1.18, 1.29, 1.19·log₂ r; 200/200 labels correct per cell |
+| P5 | [r]P by counted double-and-add costs 1.0–1.6·log₂ r group ops per point; labels correct | **held**: 20, 27, 25 ops = 1.18, 1.29, 1.19·log₂ r; 200/200 labels correct per cell |
 | P6 | the real-curve excess is compatible with k24f at t = 6, 8, 10 | **held** (table above) |
 | P7 | seed α in [0.35, 0.65] | **held**: 0.590 (k20), 0.561 (k24r) |
 | P8 | decoy \|z\| ≤ 3.5 in every cell | **held**: maximum \|z\| 2.73 |
@@ -177,12 +188,13 @@ These costs are [pcc:unverified]:
   204,790 (k24r) group ops plus 16,384 Legendre symbols.
 - **Legendre-only selectors:** the one-bit (S1) and c-only selectors cost 0 group ops and 2^t + c Legendre
   symbols per frame.
-- **Seeds:** the tower build costs 1,529–19,643 group ops per seed (k20, t = 4–9) and 2,317–25,614 (k24r). The
+- **Seeds:** the mean tower build cost per seed rises from 1,529 group ops (t = 4) to 19,643 (t = 9) at k20, and
+  from 2,317 to 25,614 at k24r. Single seeds range from 278 to 125,667 (k20) and from 456 to 152,809 (k24r). The
   [r]P selector costs 20 (k20) or 25 (k24r) ops per signed base point. The engine's reported selector count also
   includes O(c²) pair additions, which the class-count form of J does not need.
 - **Curve25519:** each label costs 506 counted ladder ops (xDBL + xADD per bit of r), and 659,525 labels were
-  computed. A double-and-add count for r would be 324 ops (251 doublings, 73 additions). Arm R used about 9.9·10⁶
-  Legendre symbols for on-curve tests, plus one more per label for the parity check.
+  computed. A double-and-add count for r would be 324 ops (252 doublings, 72 additions). Arm R used about 9.51·10⁶
+  Legendre symbols for on-curve tests plus 659,525 for the parity check, 1.017·10⁷ in total.
 
 ## Real Curve25519 (arm R, measured)
 
@@ -200,15 +212,16 @@ These results are [pcc:unverified]:
 
 ## DERIVED EXTRAPOLATION to Curve25519 (not a measurement)
 
-Every number in this section is DERIVED from fitted miniature laws and counting formulas, not measured.
+Every number in this section is DERIVED from fitted miniature laws and counting formulas, not measured, and every
+bullet is [pcc:unverified].
 - **t\* = 128 for m = 2.** This t is derived, not taken from a cited study. It is where mean J/r = 1: log₂ mean J
-  = 2t − 3.95 is fitted on k24f, and r ≈ 2²⁵². Rough values for m = 3 and m = 4 are 86 and 65.
+  = 2t − 3.95 is fitted on k24f, and r ≈ 2²⁵². Rough values for m = 3 and m = 4 are 86 and 65 [pcc:unverified].
 - **Excess at t\* (M3, K = 2000):** 4.09·10⁻¹⁹ (k20), 3.73·10⁻¹⁹ (k24f), 3.81·10⁻¹⁹ (k24r); the largest upper
   95% end is 4.37·10⁻¹⁹. M2 gives 2–5·10⁻²¹ (upper ends up to 3.7·10⁻¹⁹). The mechanism's frozen point
   prediction was 3.7·10⁻¹⁹. Scaling with the Gaussian tail to K = 2⁶⁴ gives 1.09·10⁻¹⁸. At m = 3 (t = 86) the M3
-  excess is about 8·10⁻¹³; at m = 4 (t = 65) it is about 1.2·10⁻⁹.
-- **Rho:** √(πr/4) = 2^125.83 group operations.
-- **Cost of enumerating one frame at t\*, against rho:**
+  excess is about 8·10⁻¹³; at m = 4 (t = 65) it is about 1.2·10⁻⁹ [pcc:unverified].
+- **Rho:** √(πr/4) = 2^125.83 group operations [pcc:unverified].
+- **Cost of enumerating one frame at t\*, against rho** [pcc:unverified]:
 
   | GAE per Legendre symbol | full labels (2^127 × 506 ops + 2^128 symbols) | one-bit / c-only (2^128 + 2^127 symbols) |
   |--:|--:|--:|
@@ -216,15 +229,20 @@ Every number in this section is DERIVED from fitted miniature laws and counting 
   | 0.1 | 1,142 × rho | 2^125.26 = 0.68 × rho |
   | 1 | 1,146 × rho | 2^128.58 = 6.8 × rho |
 
+  The full-label column uses the ladder count of 506 ops per label. With the double-and-add count of 324 ops, the
+  full-label figure is about 731 × rho [pcc:unverified].
+
 - **Sampling instead of enumerating:** resolving an excess of 4·10⁻¹⁹ needs about 2^126.8 samples per frame
-  (s₁ = 1.43 per sample). That is more than the frame's 2^127 columns, so sampling saves nothing; with full
-  labels it costs about 974 × rho per frame.
-- **Break-even:** a selection costing even one Legendre-only frame enumeration (the 0.1 GAE column) pays only if
-  the index-calculus attack itself costs at least 2.8·10²¹ × rho. At w = 0 the Legendre-only selector costs no
-  group operations, but its gain of 1 + 4·10⁻¹⁹ is still not a usable improvement [pcc:unverified].
+  (s₁ = 1.43 per sample). That is 0.85 × the frame's 2^127 columns, so sampling saves at most about 15%: with full
+  labels it costs about 974 × rho per frame against 1,142 × rho for enumeration [pcc:unverified].
+- **Break-even** (selection cost × (1 + 1/e), e = 4.09·10⁻¹⁹) [pcc:unverified]:
+  - full-label selection (about 1,142 × rho per frame) pays only if the index-calculus attack costs at least
+    2.8·10²¹ × rho;
+  - Legendre-only selection pays only above 1.7·10¹⁸ × rho (0.1 GAE) or 1.7·10¹⁹ × rho (1 GAE);
+  - at w = 0 the Legendre-only selection costs no group operations, but its gain is 1 + 4·10⁻¹⁹.
 - **Isogeny-tower base at t\*:** the base needs an auxiliary E′/F_p with 2^128 dividing #E′(F_p). Only about
   4√p / 2^128 ≈ 2^1.5 traces qualify. No construction for such a curve is known here, so the seed arm's base may
-  not be buildable at 255 bits. This is a derived note, not checked.
+  not be buildable at 255 bits. This is a derived note, not checked [pcc:unverified].
 
 ## Measured vs derived
 
@@ -260,7 +278,9 @@ orders across the §5a band [pcc:unverified].
   - Every curve fact was verified by computation (`data/verify_curves.json`).
 - **Bootstrap calibration.** The raw frame bootstrap underestimates the spread of the selection statistic by a
   factor of 2.3–3.8 (from the 80 independent pools). All intervals are therefore widened by the preregistered
-  factor f = 3.05 [pcc:unverified].
+  factor f = 3.05 [pcc:unverified]. f is the average of the t = 5 ratio (2.32) and the t = 6 ratio (3.77). It was
+  measured only at k20 with N = 4000 and K = 2000, and it is applied without validation to the other N and K
+  (arm I, R1, covered values). The validator found no verdict changes for any f in [1, 3.77].
 - **Smoke vs data seeds.** The smoke run (`smoke/`, "SMOKE, NOT DATA") used the same derived-seed rule as the
   data run. I checked the overlap explicitly:
   - frame census: the 121 smoke rows (bits_lo0 + 120 frames) at k20, t = 4–12 equal the first 121 data rows
@@ -270,23 +290,29 @@ orders across the §5a band [pcc:unverified].
   - arm I: seeds 0–39 at k20, t = 4–7 equal the data rows (40/40 per cell);
   - Curve25519 R1: the first 40 frames (t = 6) and 12 frames (t = 8) equal the data rows; R1c: the first 6
     frames at t = 12;
-  - Curve25519 R2: the data frames differ from the smoke frames; only frame 0's start point coincides;
+  - Curve25519 R2: data frame 0 starts at the smoke frame 0 point, and its first 64 labelled samples (with their
+    trials) are the smoke samples. The other 63 data frames differ. Recomputed without frame 0, R2 and R3 still
+    hold: p = 0.450 (classes), 0.269 (on-curve rates), 0.0109 (pooled), and R3 is inside the null range
+    [pcc:unverified];
   - the smoke subsets are part of the data; no prediction was revised after the smoke run.
-- **Data files.** These are git-ignored:
-  - `data/**/*.npz` and `data/**/*.jsonl` (64 KB data-file policy; the artifact store refuses uploads from this
-    runtime). `data/SHA256SUMS` lists all 49 of them and verifies. `data_json/` holds lossless JSON mirrors
+- **Data files.**
+  - `data/SHA256SUMS` lists 49 npz and jsonl data files and verifies. Of these, 45 are git-ignored under the 64 KB
+    data-file policy (the artifact store refuses uploads from this runtime). The three `data/frames_*.jsonl` logs
+    and `data/iso.jsonl` are tracked in Git, each under 5 KB. `data_json/` holds lossless JSON mirrors
     (`export_json.py`; exact reload check 49/49; hashes in `data_json/SHA256SUMS`).
-  - `analysis/gains.csv` (89 KB). Its exact mirror is `analysis/gains.json`, and `analysis/gains.csv.sha256`
-    binds it.
+  - `analysis/gains.csv` (89 KB) is git-ignored. Its exact mirror is `analysis/gains.json`, and
+    `analysis/gains.csv.sha256` binds it. It was committed in 2985e0f8e6 and again in 7c3c954db2 (the same blob,
+    99d38569…) before being untracked in 8304e6fefa, so the blob remains in Git history.
 - **Phase 2 edit by the lead.** The lead rewrote `.gitignore` once in phase 2 before the coordinator's
   append-only note arrived. It was restored with the original lines plus `analysis/gains.csv`, and the jsonl
-  lines were appended.
+  lines were appended. The original comment names `data/json/`; an appended line corrects it to `data_json/`.
 - **Run warning.** One RuntimeWarning (log of a non-positive value in an M1 bootstrap refit) is in `run.log`. It
   affects only M1 bootstrap replicates, and M1 lost.
 
 ## Files
 
 - [PROTOCOL.md](PROTOCOL.md)
+- [validator-report.json](validator-report.json)
 - `scripts/`: the frozen run and analysis code (`run_all.sh`, `selector_scan.py`, `run_iso.sh`,
   `real25519_sample.py`, `pc_replay.py`, `pc3_pools.py`, `iso_pc.py`, `verify_curves.py`, `l5common.py`,
   `analyse.py`, the verbatim `frame_census_orig.py`).
@@ -313,4 +339,30 @@ orders across the §5a band [pcc:unverified].
 - `tools/pcc/pcc.py` (lint-prose)
 
 ## Errata
+
+These are the validator errata E1–E12 from [validator-report.json](validator-report.json), applied 2026-11-22. No
+data or analysis file changed.
+- **E1 (moderate).** The break-even of 2.8·10²¹ × rho belongs to full-label selection. Legendre-only selection
+  pays only above 1.7·10¹⁸ × rho (0.1 GAE) or 1.7·10¹⁹ × rho (1 GAE), and at w = 0 it costs no group operations
+  but gains only 1 + 4·10⁻¹⁹. Answer 4 and the derived section are corrected.
+- **E2.** 2^126.8 samples is 0.85 × the frame's 2^127 columns, not more than it. Sampling saves at most about 15%
+  (974 vs 1,142 × rho).
+- **E3.** The Legendre counts are 9.51·10⁶ for on-curve tests plus 659,525 for parity, 1.017·10⁷ in total.
+- **E4.** The double-and-add count is 252 doublings plus 72 additions, still 324 ops.
+- **E5.** R2 data frame 0 shares its first 64 labelled samples with the smoke run. R2 and R3 still hold without
+  frame 0.
+- **E6.** Every derived bullet is now tagged [pcc:unverified], and "worthless" is replaced by the quantitative
+  excess.
+- **E7.** M3 wins under the preregistered simplicity rule, while the free-α intervals exclude 0.5 on k24f and
+  k24r. M3 is the conservative extrapolation, and M2 gives 2–5·10⁻²¹ at t*. The M1 sentence is qualified for k20
+  seeds.
+- **E8.** The README now discloses the `gains.csv` commits (2985e0f8e6, 7c3c954db2; blob 99d38569 in history) and
+  that 45 of the 49 data files are ignored while the three `frames_*.jsonl` and `iso.jsonl` are tracked. An
+  appended `.gitignore` line names `data_json/`.
+- **E9.** Seed tower build costs are now given as per-t means with the single-seed ranges.
+- **E10.** The P5 row names the counted double-and-add rule. Both 255-bit full-label figures are given (ladder
+  1,142 × rho; double-and-add 731 × rho), as derived values.
+- **E11.** f averages the t = 5 and t = 6 ratios and is transferred unvalidated to other N and K. The verdicts are
+  unchanged for f in [1, 3.77].
+- **E12.** The Class paragraph cites `validator-report.json` and keeps that the validation gate is not met.
 
