@@ -1,0 +1,101 @@
+{
+  "schema": "prime31-run67-conditional-three-sum-quotient-visibility-v1",
+  "date_utc": "2026-11-22",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "h": 1,
+    "g": [
+      625037715,
+      2100627251
+    ]
+  },
+  "factor_base": {
+    "B": 677,
+    "original_free_homogeneous_rank": 88,
+    "remaining_initial_coordinates": 589
+  },
+  "cohort_n": 4096,
+  "classification": "exact projected row-space and group-law classification for frozen targets, conditional on synthetic signed-pair rank rows; all triple decompositions found using generic enumerative grader; not blind algebraic extraction, not measured full ECDLP speed",
+  "synthetic_pair_rows": [
+    {
+      "m": 0,
+      "direct_rank": 88,
+      "anchored": 0,
+      "first_witness": {
+        "sha": 0,
+        "w8": 0
+      },
+      "all_witnesses": {
+        "sha": 0,
+        "w8": 0
+      }
+    },
+    {
+      "m": 100,
+      "direct_rank": 188,
+      "anchored": 1,
+      "first_witness": {
+        "sha": 0,
+        "w8": 0
+      },
+      "all_witnesses": {
+        "sha": 0,
+        "w8": 0
+      }
+    },
+    {
+      "m": 400,
+      "direct_rank": 488,
+      "anchored": 346,
+      "first_witness": {
+        "sha": 76,
+        "w8": 108
+      },
+      "all_witnesses": {
+        "sha": 82,
+        "w8": 114
+      }
+    },
+    {
+      "m": 900,
+      "direct_rank": 642,
+      "anchored": 636,
+      "first_witness": {
+        "sha": 573,
+        "w8": 642
+      },
+      "all_witnesses": {
+        "sha": 581,
+        "w8": 647
+      }
+    }
+  ],
+  "generic_three_sum_support": {
+    "sha": 711,
+    "w8": 763
+  },
+  "all_witness_rate_over_4096": {
+    "m400_sha": 0.02001953125,
+    "m400_w8": 0.02783203125,
+    "m900_sha": 0.141845703125,
+    "m900_w8": 0.157958984375
+  },
+  "validated": {
+    "local_bigint_ec_and_exact_677d_quotient_positive_certificates": 1424,
+    "independent_direct_dense_gaussian_checks": "40 deterministic SHA positive witnesses per m, 160 evaluations; ranks 88,188,488,642, all agree with DSU+projected Gaussian",
+    "compiler": "g++ -std=c++17 -O3",
+    "original_rust": "Reused earlier run66 source-bound original-Rust factor base and group law, but no new original-Rust CI executed for run67",
+    "github_python": "standalone 677-coordinate direct Gaussian, local PASS using frozen run57_basis.json and run66 hybrid_witness.csv"
+  },
+  "reproducibility": {
+    "original_signed_three_sum_witnesses": "prime31_run66_replay_20261122.zip conversation attachment",
+    "original_rank_fixture": "research/prime31_f4_admission_20261121/run57_basis.json",
+    "original_rust_group": "research/prime31_ic_20261115/native/examples/prime31_run66_three_sum_support.rs",
+    "new_script": "research/prime31_f4_admission_20261121/run67_standalone_rank_witness.py",
+    "full_local_replay": "prime31_run67_rank_visible_20261122.zip; sha256 af3bdf923d32649ae72b5a5e1ba5826a1a5f62b47266f013b71cf2aed723d1ef"
+  },
+  "admission": "No same-host complete IC/BSGS/rho cost measured; no scalar logarithm recovered. PR remains draft."
+}
