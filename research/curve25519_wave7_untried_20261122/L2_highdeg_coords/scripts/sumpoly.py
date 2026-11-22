@@ -157,8 +157,12 @@ def main():
                     a4 = (1 - A_sq(C) * pow(3, -1, p)) % p
                     a6 = (C.A * (2 * C.A * C.A - 9) * pow(27, -1, p)) % p
                     x1, x2, x3 = rnd
-                    S3 = ((x1 - x2) ** 2 % p * x3 % p * x3 - 2 * (((x1 + x2) * ((x1 * x2 + a4) % p) + 2 * a6) % p) * x3
-                          + (x1 * x2 - a4) ** 2 - 4 * a6 * (x1 + x2)) % p
+                    # every product reduced mod p before the next multiplication (int64, p < 2^21)
+                    d12 = (x1 - x2) % p
+                    m12 = (x1 * x2 - a4) % p
+                    S3 = (d12 * d12 % p * x3 % p * x3 % p
+                          - 2 * (((x1 + x2) % p * ((x1 * x2 + a4) % p) + 2 * a6) % p) * x3 % p
+                          + m12 * m12 % p - 4 * a6 % p * ((x1 + x2) % p)) % p
                     ratio = evr * np.array([pow(int(z), p - 2, p) if z else 0 for z in S3]) % p
                     R['PC3_S3_proportional'] = bool(np.unique(ratio[S3 != 0]).size == 1)
             else:
