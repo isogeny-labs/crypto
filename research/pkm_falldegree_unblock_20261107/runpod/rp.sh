@@ -6,7 +6,7 @@
 #   rp.sh pod ID                    -> pod record (costPerHr, vcpuCount, memoryInGb, desiredStatus)
 #   rp.sh upload ID DIR             -> PUT every allowed file in DIR
 #   rp.sh start ID STAGES_JSON      -> POST /start with stages + the frozen SHA-256s from ../image/image.json
-#   rp.sh status ID | fetch ID OUT.tar.gz | delete ID
+#   rp.sh status ID | fetch ID OUT.tar.gz | delete ID | reap ID OUTDIR DEADLINE_EPOCH
 # Token: $RUNNER_TOKEN (generated per pod by `create`, kept in $TOKDIR/<pod>.token, never committed).
 set -euo pipefail
 API=https://api.runpod.io/v2; H=(-H "Authorization: Bearer proxy-injected" -H "Content-Type: application/json")
@@ -19,7 +19,7 @@ case "$1" in
     boot="import base64;exec(base64.b64decode('$(base64 -w0 "$here/server.py")'))"
     body=$(jq -n --arg n "$name" --argjson v "$vcpu" --arg t "$t" --arg b "$boot" --arg h "$(sha256sum "$here/server.py" | cut -c1-64)" --arg c "${CPU_ID:-cpu5m}" '{name:$n,cloud:"SECURE",cpu:{id:$c,vcpuCount:$v},
       image:"python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b",disk:20,ports:["8000/http"],
-      env:{RUNNER_TOKEN:$t,RUNNER_SHA256:$h,RESULTS_DIR:"/workspace/results"},entrypoint:["python3","-u","-c"],cmd:[$b]}')
+      env:{RUNNER_TOKEN:$t,RUNNER_SHA256:$h,RESULTS_DIR:"/workspace/results"},entrypoint:["python3","-u","-c"],cmd:[$b]} + (if env.DC then {dataCenterIds:(env.DC|split(","))} else {} end)')
     out=$(curl -sS -X POST "$API/pods" "${H[@]}" -d "$body"); id=$(jq -r '.id // empty' <<<"$out")
     [ -n "$id" ] || { echo "$out" >&2; exit 1; }
     umask 077; echo "$t" > "$TOKDIR/$id.token"; jq '{id,name,cost,cpu,dataCenterId,image,status}' <<<"$out" | tee "$TOKDIR/$id.create.json" ;;
@@ -69,5 +69,13 @@ case "$1" in
         && echo "manifest check: all files match" || echo "manifest check: MISMATCH (files written after the manifest are expected while running)"
       rm -rf "$d"; sha256sum "$3" ;;
   delete) curl -sS -X DELETE "$API/pods/$2" "${H[@]}"; echo "deleted $2" ;;
+  reap) # rp.sh reap ID OUTDIR DEADLINE_EPOCH (Amendment 33): the pod is billed until deleted, not until its job ends.
+      # Job done -> fetch, check the manifest, delete. Past the deadline -> fetch what exists, delete. Else report.
+      st=$(curl -sS -m 60 -H "X-Token: $(tok $2)" "$(url $2)/status" | jq -r '.state // "unreachable"' 2>/dev/null || echo unreachable)
+      if [ "$st" = done ] || [ "$(date +%s)" -gt "$4" ]; then
+        mkdir -p "$3"; out="$3/$2-$(date -u +%Y%m%dT%H%MZ).tar.gz"
+        if "$0" fetch "$2" "$out" || [ "$(date +%s)" -gt "$4" ]; then "$0" delete "$2"; echo "reaped $2 state=$st"
+        else echo "fetch failed for $2 (state $st); kept until the deadline"; fi
+      else echo "alive $2 state=$st"; fi ;;
   *) echo "unknown command" >&2; exit 2 ;;
 esac

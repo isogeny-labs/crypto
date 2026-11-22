@@ -1,0 +1,92 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "K1 sibling walk pilot, a=1 n=29",
+ "description": "Pilot (not confirmatory) for koblitz_k1_sibwalk_20261118: k and m per curve; separate seeds.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 1,
+    "n": 29
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261118472,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "ls",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000,generator_orbit=1,lean_layout=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c1-m1",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000,generator_orbit=1,lean_layout=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=1",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c1-m2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000,generator_orbit=1,lean_layout=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=2",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c1-m4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000,generator_orbit=1,lean_layout=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=4",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c1-m8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000,generator_orbit=1,lean_layout=1",
+     "oracle": "mitm-frobenius-layout-counted:m=2,sib=1,walk_sib=8",
+     "max_trials": "1000000000",
+     "targets": "stride-generator"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261119472,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}
