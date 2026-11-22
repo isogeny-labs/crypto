@@ -123,4 +123,6 @@ jobs:
           # Checkout uses the synthetic PR merge commit. Its first parent is
           # the exact base used to build it, even if main advanced after the event.
           test "$(git rev-parse HEAD^2)" = "$PR_HEAD"
-          python3 scripts/check_curve_names.py --diff "$(git rev-parse HEAD^1)"
+          # Only the added lines: the whole-tree lint above is advisory here
+          # because the archived corpus's standing debt is not this change's.
+          python3 scripts/check_curve_names.py --changed-only "$(git rev-parse HEAD^1)"
