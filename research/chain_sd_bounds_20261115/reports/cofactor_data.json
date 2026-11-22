@@ -29,7 +29,8 @@
           "256": 8,
           "512": 8,
           "1024": 9,
-          "2048": 10
+          "2048": 10,
+          "4094": 10
         },
         "5": {
           "8": 3,
@@ -220,5 +221,96 @@
       4,
       5
     ]
+  },
+  "shift_hypothesis": {
+    "description": "H' (Theorem A') on all of W via lwm2 at X = 2^k - 2, and the reachable version via cofactor; F2; randomized (one generic element)",
+    "rows": [
+      {
+        "c": 4,
+        "k": 6,
+        "reachable": false,
+        "W": false,
+        "W_hits": 137,
+        "dim_low": 111,
+        "dim_W": 111
+      },
+      {
+        "c": 4,
+        "k": 7,
+        "reachable": true,
+        "W": false,
+        "W_hits": 265,
+        "dim_low": 115,
+        "dim_W": 126
+      },
+      {
+        "c": 4,
+        "k": 8,
+        "reachable": true,
+        "W": true,
+        "W_hits": 0,
+        "dim_low": 119,
+        "dim_W": 130
+      },
+      {
+        "c": 4,
+        "k": 9,
+        "reachable": true,
+        "W": true,
+        "W_hits": 0,
+        "dim_low": 123,
+        "dim_W": 134
+      },
+      {
+        "c": 4,
+        "k": 10,
+        "W": true,
+        "W_hits": 0,
+        "dim_W": 138
+      },
+      {
+        "c": 5,
+        "k": 10,
+        "reachable": false,
+        "W": false,
+        "W_hits": 2568,
+        "dim_low": 3163,
+        "dim_W": 3163
+      },
+      {
+        "c": 5,
+        "k": 11,
+        "reachable": true,
+        "W": false,
+        "W_hits": 4616,
+        "dim_low": 3441,
+        "dim_W": 3569
+      },
+      {
+        "c": 5,
+        "k": 12,
+        "W": true,
+        "W_hits": 0,
+        "dim_W": 3855
+      }
+    ],
+    "ladder_from_depth": {
+      "truth": {
+        "4": 6,
+        "5": 10
+      },
+      "reachable": {
+        "4": 7,
+        "5": 11
+      },
+      "theorem_A_prime": {
+        "4": 8,
+        "5": 12
+      },
+      "theorem_A": {
+        "4": 9,
+        "5": 13
+      }
+    }
   }
 }

@@ -26,6 +26,7 @@ beyond depth 14, and Lean proofs.
 | T10 | **Theorem A** (cofactor reduction): if every cofactor `v` supported on `[0,N−3]²` with `wt(g·v) ≤ c−1` has per-coordinate popcount `≤ k−3`, then `1 ∉ V_c(k)` | Lean (`one_not_mem_closure_of_cofactorHyp`, §13.2) |
 | T11 | The boundary functionals of §7.3 annihilate `u` iff `S` divides the lift `L(u)` iff the cofactor `g⁻¹u` avoids the top two residues | proved (paper, §13.1) |
 | T12 | The slope 1/4 is shared by the Möbius and affine couplings of two 2-power chains | computed (§13.5) |
+| T13 | **Theorem A′**: the shift hypothesis `H′(c,k)` (every shift of a low cofactor stays off the top residues) implies `1 ∉ V_c(k)`; Theorem A is a corollary. `H′` holds from `k = 4c − 8` at `c = 4, 5` (`c = 5`, `k = 11, 12` predicted first), one level better than Theorem A, two levels short of the truth | proved; Lean (§13.8); measurements `[pcc:unverified]` |
 
 Separate reports, as requested: finite-depth results in §8, constant bounds in §6–7 (`4 ≤ LFD(k) ≤ 2k + 1`), linear growth in §7.3 (open above; the proved linear *upper* growth is `2k + 1`). [pcc:unverified]
 
@@ -363,12 +364,13 @@ Theorem 1 these are statements about the pinned polynomial-ring computation.
 | T6 (`LFD ≥ 4`), T7 (`LFD ≤ 2k+1`) | — | | paper only (§6, §7.1) |
 | T9 linear lower bound | — | | open |
 | T10 Theorem A | `one_not_mem_closure_of_cofactorHyp` (generic `g`), `one_not_mem_chainSystem_of_cofactorHyp` (Semaev generator), `CofactorHyp`, `shift_avoids_top`, `inv_not_mem_avoidSub`, `popcount_add_le` (`Cofactor.lean`) | `k ≥ 2`, `g·ginv = 1`, `supp g ⊆ {0,1,2}²`, `g_(2,2) ≠ 0`, `g ∈ Q_{≤c}`, hypothesis `CofactorHyp g c` | checked |
+| T13 Theorem A′ | `one_not_mem_closure_of_shiftHyp`, `one_not_mem_chainSystem_of_shiftHyp`, `ShiftHyp`, `shiftHyp_of_cofactorHyp` | `g` unit supported on `{0,1,2}²`, `g₂₂ ≠ 0`, `k ≥ 2` | Lean |
 | T11 boundary ⇔ divisibility | — | `S` irreducible, unit instance | paper only (§13.1) |
 
 Build: `cd lean && lake build` (Lean 4.34.1, Mathlib `d13f23b723b8a846827a245b89c10fc7d3f11612` = tag
 `v4.34.1`; `lakefile.toml`, `lake-manifest.json`, `lean-toolchain` pinned; "Build completed
 successfully (8931 jobs)"). Axioms: `lake env lean ChainSd/Axioms.lean` prints only `propext`,
-`Classical.choice`, `Quot.sound` for all 22 listed theorems (recorded in `reports/axioms.txt`; 2026-11-22 build: 8933 jobs). No
+`Classical.choice`, `Quot.sound` for all 25 listed theorems (recorded in `reports/axioms.txt`; 2026-11-22 build: 8933 jobs). No
 `sorry`, no `native_decide`, no custom axiom. Files: `Closure.lean` (abstract), `Popcount.lean`,
 `GroupAlgebra.lean` (concrete algebra, depth monotonicity), `Reach.lean` (reachability, T2 concrete),
 `Unit.lean` (T3), `LowerThree.lean` (`1 ∉ V_2`), `Cofactor.lean` (T10, Theorem A).
@@ -460,7 +462,7 @@ Lean: `ChainSd.one_not_mem_closure_of_cofactorHyp` (any such `g`) and
 `ChainSd.one_not_mem_chainSystem_of_cofactorHyp` (the Semaev generator `gen p k A B t`); the
 hypothesis is `ChainSd.CofactorHyp`. Supporting lemmas: `popcount_add_le` (subadditivity),
 `shift_avoids_top`, `inv_not_mem_avoidSub`, `shift_mem_weightSub`. The 2026-11-22 build passes
-(8933 jobs), and the axiom audit of all 22 listed theorems shows only `propext`,
+(8933 jobs), and the axiom audit of all 25 listed theorems shows only `propext`,
 `Classical.choice`, `Quot.sound`.
 
 **Corollary A.** Let `Π(w)` be the maximum, over all `h ∈ F[x₁,x₂]` whose product `S·h` has every
@@ -487,7 +489,7 @@ The box `X` bounds the cofactor degree.
 |---|---|---|---|---|---|---|---|---|---|
 | 2 | 1 | 1 | 1 | 1 | | | | | |
 | 3 | 3 | 4 | 5 | 5 | 6 | 6 | 6 | | |
-| 4 | 3 | 4 | 5 | 6 | 7 | 8 | 8 | 9 | 10 |
+| 4 | 3 | 4 | 5 | 6 | 7 | 8 | 8 | 9 | 10 (also 10 at `X = 4094`, edge 11: saturated) |
 | 5 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 |
 
 At `w = 3` the maximum cofactor degree is 38, 70, 130, 258 at `X = 64..512`, so the popcount bound 6
@@ -520,13 +522,8 @@ than all multiples: at `c = 4` the reachable low cofactors have popcount 5 (`k =
 `Π(3) = 6`. At `c = 5` (`k = 10`, rank 18,569, `1 ∉ V_5`) the reachable low cofactors have popcount 9 [pcc:unverified]
 (`= k − 1`), against `Π(4) ≥ 10`, and all of `V_5` reaches popcount 10. So the hypothesis of Theorem A
 (`≤ k − 3 = 7`) **fails** at `(k, c) = (10, 5)` although `1 ∉ V_5(10)` is certified: there Theorem A
-is silent. Yet the low cofactors still avoid the top two residues (`touchesTop2 = false`). The
-invariant that actually holds is top-residue avoidance itself; the popcount bound is only one
-sufficient condition for it (via `shift_avoids_top`). The closure step of Theorem A uses exactly
-one property: every shift `v + 2^j e_s` of a low cofactor `v` stays off the top residues. Stated with
-that property in place of the popcount bound, the hypothesis is weaker and the paper argument of Theorem A goes
-through unchanged (this variant is not formalized). Whether it holds at `(10, 5)` was not measured: the run checked the low cofactors
-themselves, not their shifts. This is the candidate for a sharper missing lemma.
+is silent. §13.8 measures the weaker shift hypothesis of Theorem A′ and the reachable version:
+both also fail at `(10, 5)`.
 
 ### 13.5 The slope 1/4 is shared by other couplings
 
@@ -573,8 +570,59 @@ cargo build --release
 ./target/release/chainsd lwm 65537 64 3 <terms>          # dense cross-check
 ./target/release/chainsd gen2 7340033 9 7 0:1:1 1:0:7340032 0:0:7216576   # affine coupling LFD
 ./target/release/chainsd closure 12289 8 1210 0 11 5 early               # early-exit rank
+./target/release/chainsd lwm2 65537 4094 4 <terms>       # H′ test at k = 12, c = 5 (X = 2^k − 2)
 ```
 
 `<terms>` for F2 is `0:0:324 0:1:65429 0:2:9 1:0:65429 1:1:65483 1:2:65531 2:0:9 2:1:65531 2:2:1`.
 Recorded values: `reports/cofactor_data.json`. Graphs: `reports/pi_vs_box.svg` and
 `reports/lfd_universality.svg` (source `reports/plot_cofactor.py`).
+
+### 13.8 Theorem A′ (Lean) and the threshold ladder
+
+**Theorem A′** (`one_not_mem_closure_of_shiftHyp`, `one_not_mem_chainSystem_of_shiftHyp`; Lean,
+standard axioms). Replace `CofactorHyp` by the shift hypothesis `H′(c,k)`: every `v` off the top
+residues with `g v ∈ Q_{≤c−1}` stays off the top residues after each generator shift `x_s^{2^j}`.
+Then `1 ∉ V_c(k)`. `CofactorHyp → ShiftHyp` is `shiftHyp_of_cofactorHyp`, so Theorem A is now a
+corollary. `H′` is the only property of the cofactors the closure step uses.
+
+**Measurement** (F2, `p = 65537`). By §13.1, the `v` in `H′` are the cofactors `h` of the no-wrap
+multiples `S h` of weight `≤ c − 1` with `h` in the box `[0, N−3]²`, so `lwm2` at `X = N − 2` tests
+`H′` (generic kernel element; a hit is a support exponent whose shift lands on a top residue). The
+reachable version replaces `W` by the low part of the closure (`cofactor`, `low_shift_hits_top`).
+Randomized tests (one generic element each), `[pcc:unverified]`:
+
+| c | k | 1 ∉ V_c (law) | reachable shifts avoid top | `H′` (all of W) | dim low(V_c) | dim W |
+|---|---|---|---|---|---|---|
+| 4 | 6 | yes | no (`(0,30)`, `j = 5`) | no (137 hits) | 111 | 111 |
+| 4 | 7 | yes | yes | no (265 hits) | 115 | 126 |
+| 4 | 8 | yes | yes | **yes** | 119 | 130 |
+| 4 | 9 | yes | yes | yes | 123 | 134 |
+| 4 | 10 | yes | — | yes | — | 138 |
+| 5 | 10 | yes | no (`(0,510)`, `j = 9`) | no (2,568 hits) | 3,163 | 3,163 |
+| 5 | 11 | yes | yes (boundary test, §13.1) | no (4,616 hits) | 3,441 | 3,569 |
+| 5 | 12 | yes | — | **yes** (0 hits, 12,951 unknowns) | — | 3,855 |
+
+The `c = 5` rows for `k = 11, 12` were predicted, and the prediction committed to the session log,
+before the runs finished. Both outcomes matched. [pcc:unverified]
+
+**Findings.** [pcc:unverified]
+- At the first depth where `1 ∉ V_c` (`k = 6` for `c = 4`, `k = 10` for `c = 5`) the closure's low
+  part **equals** `W` (equal dimensions, and low ⊆ W since its cofactors avoid the top). Both shift
+  versions fail there. No argument with the invariant "the cofactor avoids the top residues" can
+  prove `1 ∉ V_c(k)` at that depth.
+- Each method proves `1 ∉ V_c(k)` from a depth with the same slope 4 in `c`:
+
+  | method | from depth | c = 4 | c = 5 |
+  |---|---|---|---|
+  | truth (lane-P law, certified to `k = 10`) | `4c − 10` | 6 | 10 |
+  | reachable / boundary invariant | `4c − 9` | 7 | 11 |
+  | Theorem A′ (`H′` on all of W) | `4c − 8` | 8 | 12 |
+  | Theorem A (popcount `≤ k − 3`) | `4c − 7` | 9 | 13 (needs `Π(4) = 10`, measured to `X = 4094`) |
+
+- `H′` holds exactly when no cofactor exponent has popcount `k − 1` and none equals `N − 2 − 2^j`.
+  So Theorem A′ is governed by `Π(c − 1) ≤ k − 2`, one level better than Theorem A, and inherits
+  the same open question: the ladder continues with slope `1/4` only while `Π(w) ≈ 4w − 6`
+  (`Π(3) = 6`, `Π(4) = 10`; counting prediction 14 for `w = 5`, 19 rather than 18 for `w = 6`).
+  The linear lower bound therefore stays open, and the gap between Theorem A′ and the truth is a
+  constant 2 levels of `k` at `c = 4, 5`.
+

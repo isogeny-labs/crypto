@@ -25,6 +25,7 @@
   [T9], [Linear lower bound $c k - C <=$ LFD($k$), $c > 0$], [*open*; reduced to Missing Lemma Π (§6)],
   [T10], [Theorem A: if every cofactor $v$ off the top two residues with $"wt"(g v) <= c-1$ has per-coordinate popcount $<= k-3$, then $1 in.not V_c (k)$], [proved; Lean],
   [T12], [Slope 1/4 shared by Möbius and affine couplings], [computed],
+  [T13], [Theorem A′: if every shift of a low cofactor stays off the top residues, then $1 in.not V_c (k)$; holds from $k = 4c - 8$ at $c = 4, 5$], [proved; Lean],
 )
 
 Separately: finite-depth results (§3), constant bounds $4 <= "LFD"(k) <= 2k+1$ (T6, T7), linear growth (upper slope 2 proved; lower slope open; lane-P empirical slope $1\/4$).
@@ -74,6 +75,14 @@ The counting heuristic matches Π(3) and Π(4) exactly and grows by about 4–5 
 
 *Depth 15.* The constant 1 enters the closure only at 84–99.7 % of full rank ($k = 4..9$); at $k = 15$, $D = 7$ that is a dense echelon of about 25 TB. A larger host does not close the gap; no paid compute was launched.
 
+= Follow-up: Theorem A′ and the threshold ladder
+
+*Theorem A′ (Lean).* Replacing the popcount hypothesis by the shift hypothesis $H'$ (every shift $x_s^(2^j)$ of a low cofactor stays off the top residues) still gives $1 in.not V_c (k)$; Theorem A becomes a corollary.
+
+#figure(image("threshold_ladder.svg", width: 90%), caption: [Depth from which each method proves $1 in.not V_c (k)$ (F2, $p = 65537$). Measured at $c = 4$; at $c = 5$ the Theorem A′ cells $k = 11$ (fails) and $k = 12$ (holds) were predicted before the runs. Theorem A at $c = 5$ is inferred from $Pi(4) = 10$. All four lines have slope 4 in $c$, i.e. LFD slope $1\/4$.])
+
+At the first depth where $1 in.not V_c$ ($k = 6$ for $c = 4$, $k = 10$ for $c = 5$) the low part of the closure equals the whole space $W$ of low-weight multiples (3,163 dimensions at $c = 5$), and every top-avoidance argument fails there. Theorem A′ is governed by $Pi(c-1) <= k - 2$; the ladder keeps slope $1\/4$ only while $Pi(w) approx 4w - 6$ ($Pi(3) = 6$, $Pi(4) = 10$ measured), so the linear lower bound stays open.
+
 = Files
 
-`REPORT.md` (full statements and proofs), `lean/ChainSd/{Closure,Popcount,GroupAlgebra,Reach,Unit,LowerThree,Cofactor}.lean` (Lean 4.34.1, Mathlib v4.34.1; 22 theorems audited, standard axioms only), `native/` (Rust engine), `native/checker/chaincheck.c` (independent checker), `certs/` (replay certificates and `README.md`), `reports/` (this document, graphs, `values.json`, `evaltest.md`).
+`REPORT.md` (full statements and proofs), `lean/ChainSd/{Closure,Popcount,GroupAlgebra,Reach,Unit,LowerThree,Cofactor}.lean` (Lean 4.34.1, Mathlib v4.34.1; 25 theorems audited, standard axioms only), `native/` (Rust engine), `native/checker/chaincheck.c` (independent checker), `certs/` (replay certificates and `README.md`), `reports/` (this document, graphs, `values.json`, `evaltest.md`).

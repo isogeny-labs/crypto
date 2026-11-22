@@ -56,3 +56,20 @@ fig.tight_layout()
 fig.savefig(os.path.join(here, "lfd_universality.svg"))
 fig.savefig(os.path.join(here, "lfd_universality.png"), dpi=150)
 print("wrote pi_vs_box.{svg,png} lfd_universality.{svg,png}")
+
+# ---------------------------------------------------------------- figure 5
+L = D["shift_hypothesis"]["ladder_from_depth"]
+fig, ax = plt.subplots(figsize=(6.4, 3.8))
+cs = [4, 5]
+styles = (("truth", "truth (LFD law, certified)", "#000000", "o", "-"),
+          ("reachable", "reachable / boundary invariant", "#2ca02c", "s", "-"),
+          ("theorem_A_prime", "Theorem A' (shift hypothesis on all of W)", "#1f77b4", "^", "-"),
+          ("theorem_A", "Theorem A (popcount <= k-3)", "#d62728", "v", "--"))
+for key, lab, col, mk, ls in styles:
+    ax.plot(cs, [L[key][str(c)] for c in cs], marker=mk, color=col, ls=ls, label=lab)
+ax.set_xticks(cs); ax.set_xlabel("degree c"); ax.set_ylabel("smallest depth k proving 1 not in V_c(k)")
+ax.grid(alpha=0.25); ax.legend(fontsize=7, loc="upper left")
+ax.set_title("Threshold ladder: four methods, common slope 4 (LFD slope 1/4)", fontsize=9.5)
+fig.tight_layout()
+fig.savefig(os.path.join(here, "threshold_ladder.svg"))
+print("wrote threshold_ladder.svg")
