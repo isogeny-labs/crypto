@@ -74,7 +74,30 @@ lane-mul count. Wall ns/target is the comparable speed metric.
 | floor:m=3 IFMA | **0.922 / 0.925** | **A** | new; two ticks agree within noise |
 
 Limiter on floor/kmitm IFMA: "near the roofline; what remains is the algorithmic
-axis." **Loop stopped** — both preferred IFMA probe arms are grade A and stable.
+axis."
+
+### Tick 3 (landed) — A_full + scalar prefetch
+
+- Software prefetch on scalar lane FB walks (kmitm + floor): **no gain** within
+  noise (lanes still D / B).
+- Concurrent copies (`--scale copies:1,4`) for preferred IFMA arms:
+
+| Arm | A_single | A_full | Grade |
+|---|---:|---:|---|
+| kmitm:m=4 IFMA | 0.957 | **0.954** | **A** |
+| floor:m=3 IFMA | 0.925 | **0.921** | **A** |
+
+Preferred IFMA probes are at the compute roof on this host (single and full).
+Remaining non-A arms are **fallbacks**: scalar lanes (need SIMD — IFMA is the
+fix) and `subtract:m=3` (same search as floor; floor is the optimized path).
+
+## Still open (loop continues)
+
+1. Port IFMA/lanes onto `rootfind-subtract` so the baseline arm also scores A
+   (or formally mark it superseded by floor for attainment).
+2. Declare `bytes_declared` / working set to clear `INTENSITY_UNKNOWN`.
+3. Scalar-lane headroom on non-IFMA hosts (T-timing cannot split overhead vs
+   dependency chains without a PMU).
 
 ## Claim hygiene
 

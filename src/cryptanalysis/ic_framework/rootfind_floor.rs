@@ -36,6 +36,17 @@ use crate::cryptanalysis::ic_boundary::{
 };
 use crate::cryptanalysis::prime_fast::{Fp64, MAX_BITS as PRIME_FAST_MAX_BITS};
 
+#[inline(always)]
+fn prefetch_t0(p: *const u8) {
+    #[cfg(target_arch = "x86_64")]
+    // SAFETY: `_mm_prefetch` only hints; `p` need not be dereferenceable.
+    unsafe {
+        std::arch::x86_64::_mm_prefetch::<{ std::arch::x86_64::_MM_HINT_T0 }>(p as *const i8);
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    let _ = p;
+}
+
 /// One representative an abscissa, Montgomery form, with both signs'
 /// factor-base indices.
 #[derive(Clone, Copy)]
@@ -542,6 +553,9 @@ impl RootfindFloorOracle<'_> {
         self.sweep_field_muls += 2 * t_n as u64 + 3 * total as u64;
         self.sweep_field_adds += total as u64;
         for i in 0..k {
+            if i + 1 < k {
+                prefetch_t0(&self.reps[i + 1] as *const _ as *const u8);
+            }
             let rep = self.reps[i];
             for t in 0..t_n {
                 if out[t].is_some() || targets[t].infinity {
