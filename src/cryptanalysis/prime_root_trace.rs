@@ -1188,6 +1188,9 @@ fn quadratic_square(a: (u64, u64), c: u64, d: u64, p: u64) -> (u64, u64) {
     let cross = if cross + cross >= p { cross + cross - p } else { cross + cross };
     (low, quadratic_sub(cross, vmul(d, high, p), p))
 }
+// Use fused replay only for fields >= 2^24: two replicated native Rust
+// A/B runs found 2-4% complete-solver regressions over p=65521 despite
+// favorable isolated C++ arithmetic; preserve the generic small-field path.
 // Replay PowerStep over a degree-two quotient ring without constructing a
 // temporary polynomial product and quotient. The Engine records independent
 // field-operation events; these helpers are verifier-only arithmetic.
@@ -1484,7 +1487,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     return Err("power continued after completion".into());
                 }
                 if state.exponent & 1 == 1 {
-                    state.acc = if state.modulus.len() == 3 {
+                    state.acc = if state.modulus.len() == 3 && p >= (1u64 << 24) {
                         vquadratic_replay_mul(&state.acc, &state.base, &state.modulus, p)
                     } else {
                         vpower_reduce(vproduct(&state.acc, &state.base, p), &state.modulus, p)?
@@ -1497,7 +1500,7 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 // exactly matches the previously verified base. Every
                 // nonterminal square is still independently recomputed.
                 if next_exponent != 0 || base.as_slice() != state.base.as_slice() {
-                    state.base = if state.modulus.len() == 3 {
+                    state.base = if state.modulus.len() == 3 && p >= (1u64 << 24) {
                         vquadratic_replay_square(&state.base, &state.modulus, p)
                     } else {
                         vpower_reduce(vproduct(&state.base, &state.base, p), &state.modulus, p)?
