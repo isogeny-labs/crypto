@@ -11938,7 +11938,7 @@ pub(super) fn run_verified_worker_entry(
     if let Some(artifact) = delivery.artifact.take() {
         accept_receipt(artifact);
     }
-    let _ = accept_receipt; // ends the closure's borrows (not a Drop type)
+    let _ = accept_receipt;
     let receipt_rejected = !rejected_roots.is_empty();
     let ledger = budget.saved_ledger();
     let completed = ledger.phase == Phase::Complete
