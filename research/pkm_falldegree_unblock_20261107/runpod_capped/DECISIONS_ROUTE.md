@@ -108,3 +108,17 @@ entry is `[pcc:unverified]`.
 | R4-S11 | 2026-11-21 | Stale "guard US$510" comments in `common.sh` and `ledger.tsv` fixed; the repeated paragraph in `ledger_SOURCES.md` removed. | Hygiene. |
 | R4-S13 | 2026-11-21 | A failed create's non-JSON response is not copied to `run.log`; only its size is. | It could echo the body with the pod token. |
 | Not done | 2026-11-21 | S7 (reaper fallback to known pod ids when the list is unreadable; a pod after a timed-out create without a ledger row; the unconfirmed pre-start delete), S10 (token recovery on a real pod), S12 (main's numbering, to check at the freeze), the request's inherited first note sentence (S11, documentary). | Larger changes or not doable offline; the reaper now reports a blind pass instead. |
+
+## Owner decision 28 (2026-11-22, draft Amendment 34)
+
+| # | date | decision | where it acts |
+|:--|:--|:--|:--|
+| 28 (owner) | 2026-11-22 | Retry the t = 14 draw 0 cap-7 probe with one pre-start check: refuse any pod whose host allows fewer than 262,144 memory mappings, delete it before the job starts and try another host. Same cell, flags, request, binaries, limits and budget. | `AMENDMENT_34_hostcheck.md`; `run.sh` step 10c and `precleanup`; `common.sh` `STUDY_NAMES`, `MAP_COUNT_MIN`, `HOST_REFUSE_MAX`, `next_allowed`; `fetch.sh` rule P2h. |
+
+| id | date | change | reason (one line) |
+|:--|:--|:--|:--|
+| H1 names | 2026-11-22 | Allow-list `pkm-x-t14-k0-c7-d54-h1`, `-h2`, `-h3`, each with `-r1` (decision 13); h(N+1) only after hN or its relaunch ended as a host-limit abort; the Amendment 33 name is retired. | N6 forbids reusing the used name; at most three retries. |
+| H2 host check | 2026-11-22 | After the cgroup check and before `/start`, `run.sh` reads `recorded.max_map_count` from the pre-start fetch (the boot loop's copy of `/proc/sys/vm/max_map_count`; the runner's `/status` does not report it) and refuses a value below 262,144 or none: logged delete, exit 13. | The probe's host allowed 65,530 and the pilot aborted at step 34 with 63.5 GiB used. |
+| H3 refusal accounting | 2026-11-22 | A confirmed host refusal moves the receipts to `<name>.hostrefused-<k>/` and books the ledger row as `<name>.hostrefused-<k>/<pod id>` (closed, derived cost), so N6 (`ledger_has`, rows `<name>/…`) does not block the name; at most five per name, then the owner. An unconfirmed delete stays the exit-11 path. | A pre-start refusal must not use the name, and nothing may be overwritten. |
+| H4 classifier | 2026-11-22 | Rule P2h (classifier `a34-r1`): pilot exit 134 with a "memory allocation of N bytes failed" line, `oom_kill` 0 and the peak under the numeric `memory.max` is NOT_ADMITTED with `host_limit: true`; on the committed probe tree it gives P2h (test D54). The probe's own `outcome.json` is not rewritten. | The order of H1 needs to recognise a host-limit abort. |
+| H5 heading | 2026-11-22 | `AMENDMENT_HEADING` is `## Amendment 34`; `run.sh` and `fetch.sh` refuse study names until Amendment 34 and the new script hashes are in the preregistration. | The route scripts changed after Amendment 33 froze them. |

@@ -276,7 +276,35 @@ ID=B23; mksb; touch "$ST/create-error-html"; rc=$(run ./run.sh pkm-x-dev-nj cap:
 nc=$(compgen -G "$R/receipts_dev/pkm-x-dev-nj.nocreate-*" | head -1)
 [ "$rc" = 4 ] && [ -n "$nc" ] && grep -q 'non-JSON response of' "$nc/run.log" && ! grep -rqF "$tok" "$nc" && ! grep -qF "$tok" "$OUTD/B23.txt"
 rec B23 $? "exit 4; run.log names the size of the non-JSON body; the token is in no receipt" "exit $rc" "a failed create's response body is copied to run.log only as redacted JSON (review 4 S13)"
-else skip B01 B02 B02b B03 B04 B04b B05 B06 B07 B08 B09 B10 B11 B12 B13 B14 B15 B16 B17 B18 B19 B20 B21 B22 B23; fi
+# H: the host check of owner decision 28 (vm.max_map_count >= 262,144 before start; a refusal does not use the name)
+ID=H01; mksb; study_ready; echo 65530 > "$ST/pretree/cgroup/max_map_count"; rc=$(run ./run.sh $BASE $STG); HR="$R/receipts/$BASE.hostrefused-1"
+ok1=1; [ "$rc" = 13 ] && [ "$(pods)" = 0 ] && ! grep -q '/start' "$ST/calls.log" && [ -d "$HR" ] && [ ! -e "$R/receipts/$BASE" ] \
+  && jq -e '.host_refused == true and .class == "NOT_AN_ATTEMPT"' "$HR/outcome.json" >/dev/null && jq -e '.recorded.max_map_count == "65530"' "$HR/cgroup-prestart.json" >/dev/null \
+  && grep -qP "^$BASE\.hostrefused-1/stubpod1\trunpod_capped\t.*\tclosed\t" "$R/ledger.tsv" && ! grep -qP "^$BASE/" "$R/ledger.tsv" \
+  && grep -q 'host check of owner decision 28' "$HR/session-actions.jsonl" && jq -e '.confirmed_gone == true' "$HR/cost.json" >/dev/null && ok1=0
+echo 1048576 > "$ST/pretree/cgroup/max_map_count"; rc2=$( (cd "$R" && ./run.sh $BASE $STG) > "$OUTD/H01b.txt" 2>&1; echo $?)
+[ "$ok1" = 0 ] && [ "$rc2" = 0 ] && [ -d "$R/receipts/$BASE" ] && grep -qP "^$BASE/stubpod1\t.*\topen\t" "$R/ledger.tsv"
+rec H01 $? "exit 13: pod deleted (logged), receipts -> .hostrefused-1, ledger row NAME.hostrefused-1/pod closed; then the same name starts on a good host (exit 0)" "exit $rc then $rc2" "host vm.max_map_count 65,530 (the Amendment 33 probe's host), then a host with 1,048,576"
+ID=H02; mksb; study_ready; rm -f "$ST/pretree/cgroup/max_map_count"; rc=$(run ./run.sh $BASE $STG)
+[ "$rc" = 13 ] && [ "$(pods)" = 0 ] && [ -d "$R/receipts/$BASE.hostrefused-1" ] && grep -q "unreadable" "$R/receipts/$BASE.hostrefused-1/outcome.json"
+rec H02 $? "exit 13, pod deleted" "exit $rc" "host vm.max_map_count unreadable (no file): refused, fail closed"
+ID=H03; mksb; study_ready; echo 262144 > "$ST/pretree/cgroup/max_map_count"; rc=$(run ./run.sh $BASE $STG)
+[ "$rc" = 0 ] && grep -q 'host vm.max_map_count 262144' "$R/receipts/$BASE/run.log"
+rec H03 $? "exit 0 (started)" "exit $rc" "host vm.max_map_count exactly 262,144: accepted"
+ID=H03b; mksb; study_ready; echo 262143 > "$ST/pretree/cgroup/max_map_count"; rc=$(run ./run.sh $BASE $STG)
+[ "$rc" = 13 ] && [ "$(pods)" = 0 ]; rec H03b $? "exit 13" "exit $rc" "host vm.max_map_count 262,143: refused"
+ID=H04; mksb; echo 65530 > "$ST/pretree/cgroup/max_map_count"; rc=$(run ./run.sh pkm-x-dev-hc cap:8:0:5:12800000000)
+[ "$rc" = 13 ] && [ -d "$R/receipts_dev/pkm-x-dev-hc.hostrefused-1" ] && [ "$(pods)" = 0 ]
+rec H04 $? "exit 13, receipts_dev/...hostrefused-1" "exit $rc" "the host check applies to development names too"
+ID=H05; mksb; study_ready; echo 65530 > "$ST/pretree/cgroup/max_map_count"; touch "$ST/delete-fail"; rc=$(run ./run.sh $BASE $STG)
+[ "$rc" = 11 ] && [ -d "$R/receipts/$BASE.prestart-1" ] && [ ! -e "$R/receipts/$BASE.hostrefused-1" ] && grep -qP "^$BASE/stubpod1\t.*\topen\t" "$R/ledger.tsv"
+rec H05 $? "exit 11, receipts -> .prestart-1, ledger row NAME/pod left open (the name is blocked: owner)" "exit $rc" "host refusal whose delete is not confirmed: treated as any unconfirmed pre-start delete"
+ID=H06; mksb; study_ready; echo 65530 > "$ST/pretree/cgroup/max_map_count"; n=0
+for k in 1 2 3 4 5; do export STUB_POD_ID="hpod$k"; (cd "$R" && ./run.sh $BASE $STG) >> "$OUTD/H06.txt" 2>&1; [ $? = 13 ] && n=$((n + 1)); done; unset STUB_POD_ID
+rc=$( (cd "$R" && ./run.sh $BASE $STG) >> "$OUTD/H06.txt" 2>&1; echo $?); rows=$(grep -cP "^$BASE\.hostrefused-[1-5]/hpod[1-5]\t" "$R/ledger.tsv")
+[ "$n" = 5 ] && [ "$rc" = 3 ] && [ "$rows" = 5 ] && [ -d "$R/receipts/$BASE.hostrefused-5" ] && grep -q 'refused by the host check; the next goes to the owner' "$OUTD/H06.txt"
+rec H06 $? "five refusals (exit 13 each, five ledger rows, five receipt dirs), then exit 3" "refusals $n, then exit $rc, rows $rows" "per-name cap on host refusals (HOST_REFUSE_MAX 5)"
+else skip B01 B02 B02b B03 B04 B04b B05 B06 B07 B08 B09 B10 B11 B12 B13 B14 B15 B16 B17 B18 B19 B20 B21 B22 B23 H01 H02 H03 H03b H04 H05 H06; fi
 
 if [ "$HAVE_LAYER" = 1 ]; then
 # ===================================================================== C. fetch.sh flows against the stub
@@ -291,7 +319,7 @@ G push -q origin main; rc4=$(fetch pkm-x-dev-c --delete "$C"); rc5=$(fetch pkm-x
 [ "$rc" = 8 ] && [ "$c1" = "ADMITTED P2d" ] && [ "$rc2" = 8 ] && [ "$rc3" = 8 ] && [ "$rc4" = 0 ] && [ "$rc5" = 9 ] && [ -f "$D/cost.json" ] && [ "$(pods)" = 0 ] \
   && grep -qP '^pkm-x-dev-c/stubpod1\t.*\tclosed\t' "$R/ledger.tsv" && [ -d "$RD/collect-1" ] && grep -q 'largest pilot memory peak' "$D/admission-lines-1.txt" \
   && grep -q 'on an origin branch head now: 0' "$D/git-gate.txt" && grep -q 'mismatches 0, on an origin branch head now: 1' "$D/git-gate.txt" \
-  && jq -e '.classifier.version == "a33-r3" and (.classifier.fetch_sha256 | length) == 64' "$D/outcome.json" >/dev/null && jq -e '.cost_per_hr == 2.08' "$D/cost.json" >/dev/null
+  && jq -e '.classifier.version == "a34-r1" and (.classifier.fetch_sha256 | length) == 64' "$D/outcome.json" >/dev/null && jq -e '.cost_per_hr == 2.08' "$D/cost.json" >/dev/null
 rec C02 $? "exit 8 ADMITTED; gate: uncommitted 8, committed but not pushed 8, pushed 0; re-run 9" "exit $rc $c1; $rc2; $rc3; $rc4; $rc5" "completed run: collect, the git gate (decision 22), delete, refuse re-collection"
 startrun C02b 1000; E=$(iso $(( $(epoch "$S0") + 60 ))); mktree "$ST/tree" cap:8:0:5:12800000000 "$S0" "$E" 0 0 0; status_done "$S0" "$E" 0
 rc=$(fetch pkm-x-dev-c); G add -f "$RD/collect-1" "$D/outcome.json" "$D/local-sha256-1.txt" && G commit -qm kept && G push -q origin main; C=$(G rev-parse HEAD)
@@ -623,7 +651,7 @@ want=$(cd "$RC" && bash -c '. ./common.sh; d54_request "$study/$STUDY_SRC_REL"')
 [ "$(sha256sum "$RC/requests_d54/pfd-x-t14-k0-c7-d54.json" | cut -d' ' -f1)" = "$pin" ] && jq -e --argjson w "$want" '. == $w' "$RC/requests_d54/pfd-x-t14-k0-c7-d54.json" >/dev/null \
   && grep -q "^$pin  requests_d54/pfd-x-t14-k0-c7-d54.json  changed: \"job.job_name job.command.1 job.memory provenance.note\"" "$RC/make_requests_d54_output.txt"
 rec G-request $? "request sha256 = pin = make_requests output; equals its derivation; four changed paths" "pin ${pin:0:8}" "the one request (Amendment 7 B, owner decision 24)"
-ntot=$((npass + nfail + nskip)); nlayer=$(echo A15 A16 A17 A18 A19 B01 B02 B02b B03 B04 B04b B05 B06 B07 B08 B09 B10 B11 B12 B13 B14 B15 B16 B17 B18 B19 B20 B21 B22 B23 C01 C02 C02b C02c C03 C04 C05 C06 C07 C08 C08b C09 C10 C11 C12 C13 C14 C15 C16 C17 C18 C18b C19 F02 F04 F05 F06 F10 W01 W02 W04 | wc -w)
+ntot=$((npass + nfail + nskip)); nlayer=$(echo A15 A16 A17 A18 A19 B01 B02 B02b B03 B04 B04b B05 B06 B07 B08 B09 B10 B11 B12 B13 B14 B15 B16 B17 B18 B19 B20 B21 B22 B23 H01 H02 H03 H03b H04 H05 H06 C01 C02 C02b C02c C03 C04 C05 C06 C07 C08 C08b C09 C10 C11 C12 C13 C14 C15 C16 C17 C18 C18b C19 F02 F04 F05 F06 F10 W01 W02 W04 | wc -w)
 
 if [ "$WRITE" = 1 ]; then
   rm -rf "$T/out"; cp -a "$OUTD" "$T/out"; cp "$RES" "$T/results.tsv"
@@ -647,7 +675,7 @@ binary check) need the image layer: \`RPC_LAYER_SRC\` (the layer tarball, SHA-25
 cases print \`SKIP-NEEDS-LAYER\`: a run without the layer gives $((ntot - nlayer)) results and $nlayer skips; a run with
 it gives $ntot results.
 
-Groups: A refusals before any API call (allow-list, order, the one stage cap:14:0:7:54000000000, the pinned request); B launch paths on the 32 vCPU / 256 GB pod (v2 create
+Groups: A refusals before any API call (allow-list with the h1-h3 retries of owner decision 28, order, the one stage cap:14:0:7:54000000000, the pinned request); B launch paths on the 32 vCPU / 256 GB pod, and H the host check of owner decision 28 (v2 create
 body and checks, the study guard, pagination); C \`fetch.sh\` flows, with the git gate in C02-C02c; D the outcome
 classifier alone (\`fetch.sh --classify-dir\`) on synthetic receipt sets with v2 field names, with the memory rule of owner decision 24 in D25-D37; R the reading at cap 7; E the order
 (\`next_allowed\`); F \`reap.sh\` (F10, F11: a fresh \`RPC_STATE\`, the independent reaper of owner decision 25); W \`watch.sh\` (owner decision 26); G syntax, pins, the request and the absence of v1 calls. Per-case output:
