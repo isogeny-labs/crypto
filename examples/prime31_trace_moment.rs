@@ -79,6 +79,41 @@ fn trace_moments(f: Fp, h: &[u64], elementary: &[u64]) -> Vec<Jet> {
     out
 }
 
+/// Triangular polynomial row operation:
+/// G_j = H_j - e1*H_(j-1) + e2*H_(j-2) - ... + (-1)^j e_j*H0.
+/// Same exact (radical) ideal and same Jacobian determinant at every root.
+/// Each G_j has total polynomial degree at most deg(h) in e1,...,em,
+/// unlike H_j of degree deg(h)+j. This lowers the input degree to the
+/// ordered-coordinate degree without introducing permutation copies.
+fn reduced_trace_moments(f: Fp, h: &[u64], es: &[u64]) -> Vec<Jet> {
+    let raw = trace_moments(f, h, es);
+    let m = es.len();
+    let mut out = Vec::with_capacity(m);
+    for j in 0..m {
+        let mut result = Jet { value: 0, deriv: vec![0; m] };
+        for a in 0..=j {
+            let coeff = if a == 0 {
+                1
+            } else if a % 2 == 0 {
+                es[a - 1]
+            } else {
+                f.neg(es[a - 1])
+            };
+            let dcoeff = if a % 2 == 0 { 1 } else { f.neg(1) };
+            let term = &raw[j - a];
+            result.value = f.add(result.value, f.mul(coeff, term.value));
+            for k in 0..m {
+                result.deriv[k] = f.add(result.deriv[k], f.mul(coeff, term.deriv[k]));
+            }
+            if a > 0 {
+                result.deriv[a - 1] = f.add(result.deriv[a - 1], f.mul(dcoeff, term.value));
+            }
+        }
+        out.push(result);
+    }
+    out
+}
+
 fn polynomial_from_roots(f: Fp, roots: &[u64]) -> Vec<u64> {
     let mut h = vec![1];
     for &x in roots {
@@ -172,9 +207,12 @@ fn enumerate_multisets(
 ) {
     if current.len() == m {
         let es = elementary_from_roots(f, current);
-        let jets = trace_moments(f, h, &es);
+        let raw = trace_moments(f, h, &es);
+        let jets = reduced_trace_moments(f, h, &es);
+        assert!(raw.iter().all(|j| j.value == 0));
         assert!(jets.iter().all(|j| j.value == 0));
         let got = actual_jacobian(f, &jets);
+        assert_eq!(got, actual_jacobian(f, &raw));
         let predicted = expected_jacobian(f, h, current);
         assert_ne!(got, 0);
         assert_eq!(got, predicted);
@@ -247,8 +285,10 @@ mod tests {
                     *e = x % 17;
                     x /= 17;
                 }
-                let jets = trace_moments(f, &h, &es);
+                let jets = reduced_trace_moments(f, &h, &es);
+                let raw = trace_moments(f, &h, &es);
                 let is_solution = jets.iter().all(|j| j.value == 0);
+                assert_eq!(is_solution, raw.iter().all(|j| j.value == 0));
                 assert_eq!(is_solution, positives.contains(&es));
                 if is_solution {
                     seen += 1;
@@ -285,7 +325,7 @@ mod tests {
         // e1 is larger than the maximum sum of four base abscissae.
         for j in 0..1000u64 {
             let e = [1000 + j, 31 + 13 * j, 2 * j, 17 * j];
-            let jets = trace_moments(f, &h, &e);
+            let jets = reduced_trace_moments(f, &h, &e);
             assert!(jets.iter().any(|k| k.value != 0));
         }
     }
