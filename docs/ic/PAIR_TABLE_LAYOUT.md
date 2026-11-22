@@ -37,7 +37,7 @@ not an S-column claim.
 - Do not add another host-side bloom on the same keys (RootBloom stays on Semaev root tables only).
 - Do not re-fuse the blocked m=3 key/lookup split.
 - Do not treat hugepage or NUMA advice as an S-column speedup without a paired cold measurement.
-- Do not promote the planner's `h > 1` fiber default to Measured without the matched panel in [`FIBER_H_GT1_VALIDATION.md`](FIBER_H_GT1_VALIDATION.md).
+- The planner's `h > 1` fiber default is `Support::Measured` via the matched K0-13 capsule in [`FIBER_H_GT1_VALIDATION.md`](FIBER_H_GT1_VALIDATION.md); that is not an S-column win over counted.
 
 ## Related evidence
 
