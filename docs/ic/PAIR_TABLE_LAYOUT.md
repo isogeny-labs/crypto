@@ -32,6 +32,16 @@ window of `0` or `≥ |F|` keeps the full sweep. This is a relations-per-lookup
 choice already checked by `a_window_finds_more_relations_per_lookup_than_the_full_scan`,
 not an S-column claim.
 
+## Compact a+b build
+
+`PairSumTable::build_compact_within` caches packed pair-sum keys from the
+Montgomery-batched add pass and reuses them for the counting-sort scatter.
+That removes a second `|F|(|F|+1)/2` addition sweep (the witnessed compact
+builder already did this). Temporary key storage is eight bytes per pair and
+is dropped before the table is returned; answers and counted probes are
+unchanged. This is a stage engineering win on compact construction wall
+time, not an S-column claim by itself.
+
 ## What not to do
 
 - Do not add another host-side bloom on the same keys (RootBloom stays on Semaev root tables only).

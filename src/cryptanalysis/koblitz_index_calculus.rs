@@ -6052,32 +6052,46 @@ impl PairSumTable {
         let negated: Vec<FastPoint> = points.iter().map(|&p| curve.neg(p)).collect();
         let (negated_x, negated_y) = coordinate_slices(&negated);
 
-        // A counting sort in two passes over the pairs, both parallel.
-        // The bucket of a key is known before any key is compared, so
-        // nothing is sorted: counting the buckets and scattering into
-        // them puts every rest in its run, and a run is short enough to
-        // scan.  The pair sums are recomputed rather than held between
-        // the passes — holding them would cost the eight bytes a pair
-        // that this representation exists to avoid.
+        // Counting sort in two logical passes, but the packed keys are
+        // cached from the first so the second never repeats the
+        // `|F|(|F|+1)/2` Montgomery-batched additions.  Eight temporary
+        // bytes a pair is half the rest+filter footprint and is dropped
+        // before the table is returned; the witnessed builder already
+        // paid this cost and measured that the add pass dominates.
+        let mut row_start = Vec::with_capacity(n_points + 1);
+        row_start.push(0usize);
+        for i in 0..n_points {
+            row_start.push(row_start[i] + n_points - i);
+        }
+        let total = *row_start.last()?;
+        if total as u128 != pairs {
+            return None;
+        }
+        let mut cached_keys = vec![0u64; total];
+        let cache_slots = cached_keys.as_mut_ptr() as usize;
         let counts: Vec<AtomicU32> = (0..buckets + 1).map(|_| AtomicU32::new(0)).collect();
-        let each_row = |i: usize, f: &mut dyn FnMut(u64)| {
+        (0..n_points).into_par_iter().for_each(|i| {
             let mut sums = Vec::with_capacity(n_points - i);
             let mut scratch = BatchScratch::default();
             curve.add_many(points[i], &points[i..], &mut sums, &mut scratch);
-            for sum in &sums {
-                f(sum.pack());
-            }
-        };
-        (0..n_points).into_par_iter().for_each(|i| {
-            each_row(i, &mut |key| {
+            for (offset, sum) in sums.into_iter().enumerate() {
+                let key = sum.pack();
+                // SAFETY: each row owns the disjoint range measured in
+                // `row_start`, with exactly one slot per returned sum.
+                unsafe {
+                    *(cache_slots as *mut u64).add(row_start[i] + offset) = key;
+                }
                 counts[(key >> bucket_shift) as usize + 1].fetch_add(1, Ordering::Relaxed);
-            });
+            }
         });
         let mut bucket_start: Vec<u32> = counts.iter().map(|c| c.load(Ordering::Relaxed)).collect();
+        drop(counts);
         for b in 0..buckets {
             bucket_start[b + 1] += bucket_start[b];
         }
-        let total = bucket_start[buckets] as usize;
+        if bucket_start[buckets] as usize != total {
+            return None;
+        }
         let cursor: Vec<AtomicU32> = bucket_start.iter().map(|&c| AtomicU32::new(c)).collect();
         let mut rests = vec![0u32; total];
         let filter_bits = filter_bits_for(total);
@@ -6091,11 +6105,9 @@ impl PairSumTable {
         let present_atomic: Vec<AtomicU64> = (0..words).map(|_| AtomicU64::new(0)).collect();
         // Each pair claims its slot with one atomic increment, and no
         // two pairs claim the same one, so the writes never overlap.
-        // The presence filter is set in the same pass: both want only
-        // the key, and a pass costs `|F|²/2` point additions.
         let slots = rests.as_mut_ptr() as usize;
         (0..n_points).into_par_iter().for_each(|i| {
-            each_row(i, &mut |key| {
+            for &key in &cached_keys[row_start[i]..row_start[i + 1]] {
                 let bucket = (key >> bucket_shift) as usize;
                 let slot = cursor[bucket].fetch_add(1, Ordering::Relaxed) as usize;
                 // SAFETY: `slot` is this pair's own index, handed out
@@ -6106,8 +6118,9 @@ impl PairSumTable {
                 }
                 let (word, bits) = filter_slot(pair_filter_hash(key), present_mask, FILTER_EXTRA);
                 present_atomic[word].fetch_or(bits, Ordering::Relaxed);
-            });
+            }
         });
+        drop(cached_keys);
         let present: Vec<u64> = present_atomic
             .iter()
             .map(|w| w.load(Ordering::Relaxed))

@@ -144,8 +144,31 @@ fn invmod(a: u64, m: u64) -> Option<u64> {
 }
 
 fn to_u64_mod(v: &BigUint, m: u64) -> u64 {
-    let reduced = v % BigUint::from(m);
-    reduced.to_u64_digits().first().copied().unwrap_or(0)
+    // Same fast path as `koblitz_relation_solver::to_u64_mod`.
+    if v.is_zero() {
+        return 0;
+    }
+    let digits = v.to_u64_digits();
+    match digits.len() {
+        0 => 0,
+        1 => {
+            let x = digits[0];
+            if x < m {
+                x
+            } else {
+                x % m
+            }
+        }
+        2 => {
+            let lo = digits[0];
+            let hi = digits[1];
+            ((lo as u128 | ((hi as u128) << 64)) % m as u128) as u64
+        }
+        _ => {
+            let reduced = v % BigUint::from(m);
+            reduced.to_u64_digits().first().copied().unwrap_or(0)
+        }
+    }
 }
 
 /// The largest modulus the `u64` arithmetic supports: sums of two
