@@ -2937,13 +2937,14 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     let relations_started = Instant::now();
     // Experimental: IC_SUM_TABLE=1 swaps the per-trial sweep for a pair-sum table lookup.
     // Table construction is charged to the relation-collection stage.
-    // Default: the table for a small factor base (its build is O(fb^2) point
-    // additions and it loses from fb about 128); `IC_SUM_TABLE=1` forces it,
-    // `IC_SUM_TABLE=0` selects the per-trial sweep.
+    // Default: the table while it wins wall time.  Measured crossover on
+    // bench-16bit (p=65353): table through fb=256 (~0.75× vs WordSweep),
+    // WordSweep at fb=384 (~1.7×).  `IC_SUM_TABLE=1` forces the table,
+    // `IC_SUM_TABLE=0` selects the per-trial sweep (WordSweep when eligible).
     let use_table = match std::env::var("IC_SUM_TABLE").as_deref() {
         Ok("1") => true,
         Ok("0") => false,
-        _ => fb.len() <= 64,
+        _ => fb.len() <= 256,
     };
     if !use_table {
         // the per-trial sweep's square roots and Semaev evaluations are not counted
