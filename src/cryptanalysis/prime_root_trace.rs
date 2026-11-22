@@ -291,14 +291,51 @@ impl Engine<'_> {
         self.event(RootEvent::Field { op, a, b, value })?;
         Ok(value)
     }
+    // Append a (2^bits-1) exponent block by repeated verified squares
+    // followed by a verified product. All operations remain in the trace.
+    fn inverse_mersenne_append(&mut self, mut power: u64, factor: u64, bits: usize) -> Work<u64> {
+        for _ in 0..bits {
+            power = self.field(FieldOp::Square, power, power)?;
+        }
+        self.field(FieldOp::Mul, power, factor)
+    }
     fn inv(&mut self, value: u64) -> Work<u64> {
         debug_assert_ne!(value, 0);
         self.event(RootEvent::InverseBegin { value })?;
-        if value == 1 {
-            self.event(RootEvent::InverseEnd { value, inverse: 1 })?;
-            return Ok(1);
+        let p = self.report.p;
+        // Exact odd-prime identities. No field operations are performed, so
+        // none should be added to the trace or field-work budget.
+        let trivial = if value == 1 { Some(1) }
+            else if value == 2 { Some((p + 1) / 2) }
+            else if value == p - 1 { Some(p - 1) }
+            else if value == p - 2 { Some((p - 1) / 2) }
+            else { None };
+        if let Some(inverse) = trivial {
+            self.event(RootEvent::InverseEnd { value, inverse })?;
+            return Ok(inverse);
         }
-        let mut exponent = self.report.p - 2;
+        if p == MAX_PRIME {
+            // p-2 = 2^61-3 = 4*(2^59-1)+1. Build the exponents
+            // 2^k-1 for k=2,4,8,16,32,48,56,58,59, then append
+            // two squares and a multiplication by the original value.
+            // This uses 60 traced squares + 10 traced multiplies instead
+            // of 60 squares + 60 multiplies in the binary Fermat chain.
+            // Unlike the independent verifier, these operations are
+            // accounted for and remain interruptible at every field event.
+            let x2 = self.inverse_mersenne_append(value, value, 1)?;
+            let x4 = self.inverse_mersenne_append(x2, x2, 2)?;
+            let x8 = self.inverse_mersenne_append(x4, x4, 4)?;
+            let x16 = self.inverse_mersenne_append(x8, x8, 8)?;
+            let x32 = self.inverse_mersenne_append(x16, x16, 16)?;
+            let x48 = self.inverse_mersenne_append(x32, x16, 16)?;
+            let x56 = self.inverse_mersenne_append(x48, x8, 8)?;
+            let x58 = self.inverse_mersenne_append(x56, x2, 2)?;
+            let x59 = self.inverse_mersenne_append(x58, value, 1)?;
+            let inverse = self.inverse_mersenne_append(x59, value, 2)?;
+            self.event(RootEvent::InverseEnd { value, inverse })?;
+            return Ok(inverse);
+        }
+        let mut exponent = p - 2;
         let (mut acc, mut base) = (1, value);
         while exponent > 0 {
             if exponent & 1 == 1 {
@@ -3222,6 +3259,67 @@ mod round100_traced_multiplication {
                 let report = solve(&f, p, 17, limits.clone(),
                     &mut |_| Ok(())).unwrap();
                 assert!(report.complete(), "p={p} f={f:?} stop={:?}", report.stop);
+                verify(&report).unwrap();
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod round107_inverse_chain {
+    use super::*;
+
+    #[test]
+    fn mersenne_inverse_chain_matches_independent_fermat_oracle() {
+        let p = MAX_PRIME;
+        let mut seed = 0x726f_6f74_3130_3731u64;
+        let mut samples = vec![1, 2, 3, 5, p - 2, p - 1, p / 2];
+        for _ in 0..1024 {
+            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
+            samples.push(1 + seed % (p - 1));
+        }
+        for value in samples {
+            let mut sink = |_: &RootEvent| Ok(());
+            let report = RootReport {
+                schema: "prime-root-trace/v1".into(),
+                p,
+                polynomial: vec![1, 1],
+                seed: 7,
+                limits: RootLimits { field_work: MAX_WORK, split_attempts: MAX_EVENTS,
+                                     events: MAX_EVENTS, degree: MAX_DEGREE },
+                stop: RootStop::Complete,
+                counters: RootCounters::default(),
+                events: vec![],
+                unacknowledged: None,
+                sink_error: None,
+                roots: vec![],
+            };
+            let mut engine = Engine { report, sink: &mut sink, next_id: 0 };
+            let actual = engine.inv(value).unwrap();
+            assert_eq!(actual, vpow(value, p - 2, p), "value={value}");
+            assert_eq!(vmul(actual, value, p), 1, "value={value}");
+            if [1, 2, p - 1, p - 2].contains(&value) {
+                assert_eq!(engine.report.counters.field_work(), 0);
+            } else {
+                assert_eq!(engine.report.counters.squares, 60);
+                assert_eq!(engine.report.counters.multiplications, 10);
+            }
+        }
+    }
+
+    #[test]
+    fn inverse_shortcuts_preserve_verified_root_certificates() {
+        let limits = RootLimits { field_work: MAX_WORK, split_attempts: 1000,
+                                  events: MAX_EVENTS, degree: MAX_DEGREE };
+        for p in [7, 65_521, 1_000_000_007, MAX_PRIME] {
+            for polynomial in [
+                vec![6, p - 5, 1],       // monic (x-2)(x-3)
+                vec![12, p - 10, 2],     // twice that polynomial
+                vec![p - 2, 1],         // linear root 2
+            ] {
+                let report = solve(&polynomial, p, 13, limits.clone(),
+                                   &mut |_| Ok(())).unwrap();
+                assert!(report.complete(), "p={p}, stop={:?}", report.stop);
                 verify(&report).unwrap();
             }
         }
