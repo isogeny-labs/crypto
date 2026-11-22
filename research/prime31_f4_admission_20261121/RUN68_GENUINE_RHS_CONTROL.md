@@ -37,3 +37,26 @@ Expected stdout fields: \`RUN68_RELATIONS\` (actual shifted queries/hits/indepen
 **P1 — actual non-generic RHS → quotient solver:** Replace run68's dictionary oracle with the admitted polynomial extractor, retain authentic \([k]G\) RHS and 88 free rows, and feed *all* returned distinct roots to the rank engine. Check every scalar \([\ell]G=Q\), not just factor-base identities.
 
 **P2 — qualified timing:** Same host, original Rust, same curve and targets, cold 1 / batches 32,128,1024, full setup + online + failures + rank + verification. Compare against the **strongest existing index calculus** first and optimized shared BSGS and negation rho. Require statistically repeatable advantage over the frontier, not an isolated component ratio. Keep PR draft until passed.
+
+
+## Measured native result — exact Rust source CI PASS ×2
+
+The source-fixed version (\`197de2a7cd01d96c92151e38dca28938456e29c0\`) ran under the original crate using pinned Rust 1.100.0. [First passing Actions run #45055226592](https://github.com/isogeny-labs/crypto/actions/runs/45055226592), job 137308851779; [second source-identical run #45055266777](https://github.com/isogeny-labs/crypto/actions/runs/45055266777), job 137308981036. Both passed and printed **32/32 actual Prime31 target scalar logs checked via original Rust \`[k]G=Q\`**, plus **677/677 original factor-base logs**. The second had only unrelated documentation commits versus the first; the Rust source was unchanged. Exact source output and scope frozen in [RUN68_RESULTS.json](RUN68_RESULTS.json).
+
+| Measure | Passing run 1 | Passing run 2 |
+|---|---:|---:|
+| Actual public relation shifts | 8,267,474 | 8,267,474 |
+| Genuine RHS-labelled signed-pair hits | 3,520 | 3,520 |
+| Independent pair rows before 88 free rows | 672 | 672 |
+| Original-Rust verified base-point logs | 677/677 | 677/677 |
+| Verified 32-target logs | 32/32 | 32/32 |
+| Generic pair-table/base setup | 290.163 ms | 287.847 ms |
+| Genuine RHS collection + rank + base-log check | 2,353.420 ms | 2,327.579 ms |
+| 32-target online generic lookup + verification | 56.177 ms | 55.397 ms |
+| **Full pipeline including target generation/control harness** | **2,900.834 ms** | **2,871.313 ms** |
+| Same-process original-Rust BSGS setup + 32 online logs | 200.484 ms | 199.930 ms |
+| Indicative complete generic control / reference BSGS ratio | **14.47× slower** | **14.36× slower** |
+
+The actual query walk had 8,267,474 points to recover all 677 base logs, versus run57's idealized synthetic-query model (different distribution and stopping implementation). This is **one deterministic cohort and walk** replayed twice, not an independently sampled distribution over targets or walks. The previous 88 homogeneous rows were checked against EC group law and their coefficients, including +2, handled exactly. Pair-table precomputation is charged; no polynomial extraction occurred.
+
+**Conclusion limited to this evidence:** a complete correct *generic control* now genuinely recovers 32 Prime31 logarithms with authentic relation right-hand sides in the original Rust crate, revealing a >14× deficit against the same-process reference BSGS for this single run. This control is **not** novel or non-generic and therefore does not satisfy the desired index-calculus advantage. Same-runner optimized rho and strongest index calculus were not run, and PCC remains unverified. The decisive next integration is to replace the **generic** relation-pair dictionary with a measured public-only nonenumerative RR9/F3 extractor while retaining the now-verified real-RHS rank/recovery stages.
