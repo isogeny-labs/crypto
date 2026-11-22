@@ -2818,16 +2818,57 @@
                   3059.8
                 ],
                 "ladder_builtin_rho_note": "the ladder's own rho_ms field is a single unoptimised walk and exhausted its 5M-step budget on every 36-bit seed; it is a fixture sanity check, not a baseline",
-                "claim_boundary": "single host, shared load; known-answer synthetic fixture only; no vs_rho claim, no deployed-curve claim, no asymptotic claim"
+                "claim_boundary": "single host, shared load; known-answer synthetic fixture only; no vs_rho claim, no deployed-curve claim, no asymptotic claim",
+                "pair_table_word_build": {
+                  "change": "build_pair_sum_table computes the B(B+1)/2 sums in u64 via add_point_u64 (one extended-Euclid inversion per pair) instead of Point::add (one modular exponentiation per pair, plus BigUint allocation); the u64 key conversion alone was not the arithmetic",
+                  "equivalence_gate": "examples/prime_pair_table_check -- identical abscissae, index pairs and count at 16/32/36 bits (7260 / 80200 / 131328 pairs)",
+                  "b_probe_cpu_ms": {
+                    "2048": 18220,
+                    "2560": 16820,
+                    "3072": 16340,
+                    "4096": 19960,
+                    "5120": 27370,
+                    "6144": 48320
+                  },
+                  "optimal_B_after": 3072,
+                  "optimal_B_before": 2048,
+                  "four_seeds_B3072_cpu_ms": [
+                    16090,
+                    14280,
+                    13770,
+                    13780
+                  ],
+                  "four_seeds_B3072_pair_table_ms": [
+                    1807.9,
+                    1192.0,
+                    1161.2,
+                    1205.9
+                  ],
+                  "four_seeds_B3072_relations_ms": [
+                    14752.4,
+                    11028.3,
+                    10512.9,
+                    10327.3
+                  ],
+                  "four_seeds_B3072_la_ms": [
+                    3866.3,
+                    2798.5,
+                    2419.8,
+                    2548.0
+                  ],
+                  "all_ic_match_truth": true,
+                  "speedup_vs_rung_record": "IC CPU 31.4-33.1 s -> 13.8-16.1 s (~2.2x); table stage ~13x; IC/tuned rho ~1.5e3 -> ~6-9e2",
+                  "claim_boundary": "same synthetic fixture; constant-factor stage fix only, no regime change, no vs_rho claim"
+                }
               }
             },
             "verdict": "A3_S4_3DECOMP_36BIT_MITM",
             "next_target": {
-              "summary": "Cut the pair-table build, which is now the dominant stage (B^2/2 pair sums, each a full modular inversion through Point::add at ec_index_calculus.rs:1371; the 'u64 fast path' only converts the key). Batch the inversions (Montgomery's trick) over each pair row before any larger rung.",
+              "summary": "The pair-table build is no longer the bottleneck: at B>=4096 the wall is sparse F_n fill-in (nnz_peak 9.5M at B=3072, LA 3.6 s -> 9.8 s -> 21 s -> 53 s over B=4096/5120/6144). Cut LA fill-in (better pivoting or a structured/block Wiedemann path) before pushing the factor base past 3072, then take the 40-bit rung.",
               "acceptance_gates": [
-                "same relation set and same recovered scalar as the inversion-per-pair build",
-                "table stage timed separately and charged in the same process",
-                "36-bit four-seed row reproduced within 10%"
+                "same rank and same recovered scalar as the current sparse engine",
+                "nnz_peak and LA wall reported per B on the 36-bit fixture",
+                "B sweep re-run with LA charged in the same process"
               ]
             },
             "evidence": [
@@ -2837,7 +2878,9 @@
               "src/cryptanalysis/ec_index_calculus.rs",
               "examples/prime_mitm_check.rs",
               "examples/a3_s4_ladder.rs",
-              "research/prime_36bit_20261122/README.md"
+              "research/prime_36bit_20261122/README.md",
+              "research/prime_36bit_20261122/PAIR_TABLE_U64.md",
+              "examples/prime_pair_table_check.rs"
             ]
           },
           "next_target": {

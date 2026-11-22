@@ -116,6 +116,13 @@ Log: `prime_mitm_check.log` (300 s CPU on the shared host).
   only converts the resulting abscissa to a `u64` key. Batching the
   inversions (Montgomery's trick) is the obvious next lever, and it is what
   the ledger's `next_target` now records.
+
+**Update, same day:** the table build now runs in word arithmetic — see
+`PAIR_TABLE_U64.md` in this directory. It makes the table stage ~13× faster,
+moves the optimal B from 2048 to 3072, and takes the four-seed IC CPU from
+31.4–33.1 s to 13.8–16.1 s (~2.2×). The remaining 36-bit wall is relation
+collection and sparse-LA fill-in, in that order.
+
 - **32 → 36 bits costs ~10× CPU**, at the tuned B on the same four seeds:
   3.19–3.33 s at 32 bits (`a3_32bit_cpu.txt`) against 31.4–33.1 s here. The
   `p^{2/3}` projection of this family predicts 2^(8/3) = 6.3×, so this one
