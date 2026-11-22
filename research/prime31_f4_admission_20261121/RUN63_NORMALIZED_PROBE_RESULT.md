@@ -39,3 +39,18 @@ The measured paired overheads are +5.4461ns for x-only normalization and +1.2139
 3. **P2 complete end-to-end:** recover independent blind logs, original-rust [k]G=Q, 1/32/128/1024 cohorts. Charge setup, F4 misses, memory, rank and verification. Compare paired same-host with strongest optimized shared BSGS, rho and existing index-calculus frontier. Change conclusions only when all costs and CI/replay are measured.
 
 **Classification:** independently original-Rust-checked, exact-source Rust microbenchmark with a measured lower-level x-coordinate materialization improvement. Not a new non-generic index-calculus solver and not a complete ECDLP speedup.
+
+## Same-source second Actions attempt — PASS; important performance variance
+
+Re-ran **the same workflow and source commit** through GitHub's job re-run rather than changing candidate code. Second job `137222651551` also **SUCCESS** on [Actions #45026992197](https://github.com/isogeny-labs/crypto/actions/runs/45026992197), 40×192 original-Rust correctness cases and all 15 benchmark endpoints PASS; repeated digest `1273258821` unchanged.
+
+| Same-source attempt | Projective-only median | Affine X batch-256 median | Affine XY batch-256 median |
+|---|---:|---:|---:|
+| Job 137222066807 | 16.4223 ns | 21.8684 ns | 23.0823 ns |
+| Job 137222651551 | **22.3473 ns** | **29.9276 ns** | **30.9814 ns** |
+
+Second raw data (ns/probe): projective 22.5185, 22.3176, 22.3356, 22.3473, 23.8736; x-only 30.1501, 29.9276, 29.8406, 29.9199, 29.9312; XY 30.8825, 30.9015, 30.9814, 31.0090, 31.0196.
+
+On the second runner, the batch x-coordinate overhead was **7.5803 ns** per step and the subsequent y output added **1.0538 ns**. The x-only runner median increased from 21.8684 to 29.9276 ns (**36.9% slower**), while still below the purely hypothetical 36.19465-ns sensitivity. Under the **same unmeasured run59 query count**, the projected x-only cost is **102.780–140.658 ms** on these two runners and the leftover versus the **separate historical** 170.113-ms shared-BSGS is only **6.267–14.326 ns/query**. This variation is large enough that an arithmetic-only result should not be treated as a stable speedup on a future solver host.
+
+Source-bound machine-readable evidence: [RUN63_RESULTS.json](RUN63_RESULTS.json). Both receipts use identical input/source and all expected exact reference checks passed. No per-probe relation detector, negative S3/F4 costs, rank work, factor-base setup, memory, online target logarithms or same-host complete BSGS/rho were measured. A total non-generic solver crossover is **unestablished**.
