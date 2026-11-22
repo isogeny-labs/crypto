@@ -3314,7 +3314,7 @@ mod round107_inverse_chain {
         for p in [7, 65_521, 1_000_000_007, MAX_PRIME] {
             for polynomial in [
                 vec![6, p - 5, 1],       // monic (x-2)(x-3)
-                vec![12, p - 10, 2],     // twice that polynomial
+                vec![12 % p, p - (10 % p), 2], // twice that polynomial mod p
                 vec![p - 2, 1],         // linear root 2
             ] {
                 let report = solve(&polynomial, p, 13, limits.clone(),
