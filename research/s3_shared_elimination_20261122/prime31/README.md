@@ -11,6 +11,9 @@ extraction and structured public-input recovery in PR #4922.
   their hashes and the reproducible source manifests are retained here.
 - [../REPORT.md](../REPORT.md), section 7: human-readable outcome and limits.
 - [../report.pdf](../report.pdf): the refreshed report and diagram.
+- [registration/README.md](registration/README.md): unsigned statement
+  `PCC-20261122-95c625`, binding this receipt to source/evidence commit
+  `26f6880421d5fcb85cb33c68ec2f56aedfae6803`.
 
 The source-bound Rust suite recorded 12 passing tests. The focused Prime31
 CLI recorded nine identical complete finite-chart solutions for original F4
