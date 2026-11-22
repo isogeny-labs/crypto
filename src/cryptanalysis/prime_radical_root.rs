@@ -1010,7 +1010,14 @@ impl RadicalRootCtx {
         if p == MAX_PRIME && a < p {
             return self.sqrt(a);
         }
-        if p >= (1u64 << 20) && p & 3 == 3 && a != 0 && a < p {
+        // For large p == 5 (mod 8), the ordinary square-root power is
+        // expensive even for nonresidues. A binary Jacobi filter rejects
+        // roughly half of uniformly distributed discriminants before any
+        // field exponentiation. Its extra cost on known squares is measured
+        // separately: use only in the discriminant API, not sqrt().
+        if p >= (1u64 << 20) && (p & 3 == 3 || p & 7 == 5)
+            && a != 0 && a < p
+        {
             // A selected 32-bit modulus: use 32-bit Euclidean remainders
             // rather than 64-bit hardware divisions in the Jacobi prefilter.
             // Public, canonical discriminants only.
@@ -1055,10 +1062,19 @@ impl RadicalRootCtx {
             if n != 1 || negative {
                 return None;
             }
-            // The prime-field Jacobi character +1 proves that a is a
-            // quadratic residue. For p = 3 (mod 4), r=a^((p+1)/4) is
-            // necessarily a square root. Skip sqrt()'s redundant r*r check.
-            // Only public, canonical inputs take this variable-time branch.
+            // For p == 5 (mod 8), a^(p+3)/8 squares to a or -a
+            // precisely when a is a quadratic residue. Jacobi already
+            // proved residuosity, so at most one verification square and
+            // one conditional correction by sqrt(-1) are required.
+            if p & 7 == 5 {
+                let root = self.f.powm(a, (p + 3) / 8);
+                return if self.f.sqr(root) == a {
+                    Some(root)
+                } else {
+                    Some(self.f.mul(root, self.zc))
+                };
+            }
+            // p = 3 (mod 4): Jacobi proves that the power is a root.
             return Some(self.f.powm(a, (p + 1) / 4));
         }
         self.sqrt(a)
@@ -5271,6 +5287,38 @@ mod round117_sqrt_chain_and_discriminant_tests {
             }
             for a in [p, p + 1, p + 2, u64::MAX] {
                 assert_eq!(ctx.sqrt_discriminant(a), ctx.sqrt(a), "p={p}, a={a}");
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod round120_five_mod_eight_discriminant_regressions {
+    use super::*;
+    #[test]
+    fn jacobi_prefilter_matches_standalone_sqrt_and_euler_criterion() {
+        let mut state = 0x120a_2026_1122_5abdu64;
+        for p in [13u64, 101, 1_000_000_021, 4_294_967_197,
+                  2_305_843_009_213_693_693] {
+            let ctx = RadicalRootCtx::new(p).expect("p is prime");
+            for i in 0..2_048 {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                let x = state % p;
+                let a = if i & 1 == 0 { ctx.f.sqr(x) } else { x };
+                let old = ctx.sqrt(a);
+                let filtered = ctx.sqrt_discriminant(a);
+                assert_eq!(filtered, old, "p={p} a={a}");
+                assert_eq!(filtered.is_some(),
+                           a == 0 || ctx.f.powm(a, (p - 1) / 2) == 1,
+                           "Euler criterion p={p} a={a}");
+                if let Some(r) = filtered {
+                    assert_eq!(ctx.f.sqr(r), a, "p={p} a={a}");
+                }
+            }
+            for a in [p, p + 1, u64::MAX] {
+                assert_eq!(ctx.sqrt_discriminant(a), ctx.sqrt(a));
             }
         }
     }
