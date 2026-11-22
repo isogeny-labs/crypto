@@ -517,7 +517,16 @@ sharp:
 
 Whether `LFD` itself is linear then depends on **reachability**. The closure reaches fewer cofactors
 than all multiples: at `c = 4` the reachable low cofactors have popcount 5 (`k = 6, 7, 8`), while
-`Π(3) = 6`. At `c = 5` (`k = 10`) the reachable popcount is ⟨pending⟩, against `Π(4) ≥ 10`.
+`Π(3) = 6`. At `c = 5` (`k = 10`, rank 18,569, `1 ∉ V_5`) the reachable low cofactors have popcount 9 [pcc:unverified]
+(`= k − 1`), against `Π(4) ≥ 10`, and all of `V_5` reaches popcount 10. So the hypothesis of Theorem A
+(`≤ k − 3 = 7`) **fails** at `(k, c) = (10, 5)` although `1 ∉ V_5(10)` is certified: there Theorem A
+is silent. Yet the low cofactors still avoid the top two residues (`touchesTop2 = false`). The
+invariant that actually holds is top-residue avoidance itself; the popcount bound is only one
+sufficient condition for it (via `shift_avoids_top`). The closure step of Theorem A uses exactly
+one property: every shift `v + 2^j e_s` of a low cofactor `v` stays off the top residues. Stated with
+that property in place of the popcount bound, the hypothesis is weaker and the paper argument of Theorem A goes
+through unchanged (this variant is not formalized). Whether it holds at `(10, 5)` was not measured: the run checked the low cofactors
+themselves, not their shifts. This is the candidate for a sharper missing lemma.
 
 ### 13.5 The slope 1/4 is shared by other couplings
 

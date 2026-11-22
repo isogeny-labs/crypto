@@ -68,7 +68,7 @@ A linear lower bound needs a *locality* lemma: for $c <= alpha k - beta$, $1 in.
 
 #figure(image("pi_vs_box.svg", width: 100%), caption: [Measured Π($w$) for the F2 instance against the cofactor box; dotted: counting prediction $m(w) = 6, 10, 14$. Π(3) = 6 is saturated; Π(4) $>= 10$ and Π(5) $>= 11$ still track the box edge.])
 
-The counting heuristic matches Π(3) and Π(4) exactly and grows by about 4–5 per unit of weight for $w <= 7$, which is the observed slope 1/4. Asymptotically it grows like $w log_2 w$, so if it is sharp, Missing Lemma Π fails and Theorem A alone gives only $Omega(k \/ log k)$. The closure reaches fewer cofactors than all multiples (popcount 5 at $c = 4$ against Π(3) = 6), so LFD itself may still be linear.
+The counting heuristic matches Π(3) and Π(4) exactly and grows by about 4–5 per unit of weight for $w <= 7$, which is the observed slope 1/4. Asymptotically it grows like $w log_2 w$, so if it is sharp, Missing Lemma Π fails and Theorem A alone gives only $Omega(k \/ log k)$. The closure reaches fewer cofactors than all multiples (popcount 5 at $c = 4$ against Π(3) = 6), so LFD itself may still be linear. At $c = 5$, $k = 10$ the reachable low cofactors have popcount 9 $= k-1$, above the $k-3$ that Theorem A needs, although $1 in.not V_5(10)$ and they still avoid the top residues: Theorem A is silent there, and the invariant that holds is top-residue avoidance, not a popcount bound.
 
 #figure(image("lfd_universality.svg", width: 100%), caption: [LFD($k$) for three couplings of two 2-power chains: Semaev ⌊(k+14)/4⌋, Möbius ⌊k/4⌋+3, affine ⌊(k-1)/4⌋+3.])
 
