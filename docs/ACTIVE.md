@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+
+- [x] Prove and audit the complete prime-field ECDLP bound from graded parity counting through order-free recovery (Codex, completed 2026-11-18, branch codex/ecdlp-end-to-end-20261118, PR #4698)
 - [ ] Establish read-only IsoLab budget telemetry through the existing GitHub identity before conductor-worker cloud execution (Codex, started 2026-11-18, branch ops/conductor-budget-preflight-20261118, PR #4695)
 - [ ] Freeze and validate the separate exact GitHub-runner norm-branch protocol and workflow; dispatch only after merge in a fresh result PR (Codex, started 2026-11-18, branch codex/norm-branch-runner-freeze-20261118, PR #4694)
 
