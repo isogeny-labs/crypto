@@ -827,6 +827,13 @@ fn vinv(a: u64, p: u64) -> u64 {
     if r1 == 0 {
         return 0; // preserve vpow(0, p-2, p) behavior
     }
+    // Common unit/half-unit inverses can be checked algebraically. Avoid
+    // integer Euclid divisions for frequent monic-normalization constants.
+    // The modulus is an odd prime bounded by 2^61-1.
+    if r1 == 1 { return 1; }
+    if r1 == p - 1 { return p - 1; }
+    if r1 == 2 { return (p + 1) / 2; }
+    if r1 == p - 2 { return (p - 1) / 2; }
     let (mut t0, mut t1) = (0i64, 1i64);
     while r1 != 0 {
         let q = r0 / r1;
@@ -1392,9 +1399,22 @@ fn quadratic_mul(a: (u64, u64), b: (u64, u64), c: u64, d: u64, p: u64)
 {
     // x^2 = -d*x-c in F_p[x]/(x^2+d*x+c).
     let high = vmul(a.1, b.1, p);
-    let low = quadratic_sub(vmul(a.0, b.0, p), vmul(c, high, p), p);
-    let cross = vmul(a.0, b.1, p) + vmul(a.1, b.0, p);
-    let cross = if cross >= p { cross - p } else { cross };
+    let constant = vmul(a.0, b.0, p);
+    // Karatsuba for 32-bit primes: the cross term needs one product,
+    // (a0+a1)(b0+b1) - a0*b0 - a1*b1, instead of two products.
+    // Keep the established Mersenne-prime path where folding and extra
+    // modular additions have a different performance crossover.
+    let cross = if p <= u32::MAX as u64 {
+        let left = a.0 + a.1;
+        let right = b.0 + b.1;
+        let left = if left >= p { left - p } else { left };
+        let right = if right >= p { right - p } else { right };
+        quadratic_sub(quadratic_sub(vmul(left, right, p), constant, p), high, p)
+    } else {
+        let sum = vmul(a.0, b.1, p) + vmul(a.1, b.0, p);
+        if sum >= p { sum - p } else { sum }
+    };
+    let low = quadratic_sub(constant, vmul(c, high, p), p);
     let linear = quadratic_sub(cross, vmul(d, high, p), p);
     (low, linear)
 }
@@ -2420,6 +2440,39 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round113_quadratic_karatsuba_and_inverse_match_independent_formulas() {
+        let mut rng = StdRng::seed_from_u64(0x7131_3331_3331_3371);
+        for p in [3u64, 5, 65_521, 1_000_000_007, MAX_PRIME] {
+            for v in [0, 1, 2, p - 2, p - 1, p / 2] {
+                let inv = vinv(v, p);
+                if v == 0 { assert_eq!(inv, 0); }
+                else {
+                    assert!(inv < p);
+                    assert_eq!(vmul(v, inv, p), 1);
+                    assert_eq!(inv, vpow(v, p - 2, p));
+                }
+            }
+            for _ in 0..4_096 {
+                let a = (rng.gen_range(0..p), rng.gen_range(0..p));
+                let b = (rng.gen_range(0..p), rng.gen_range(0..p));
+                let c = rng.gen_range(0..p);
+                let d = rng.gen_range(0..p);
+                let high = vmul(a.1, b.1, p);
+                let constant = vmul(a.0, b.0, p);
+                let cross = {
+                    let v = vmul(a.0, b.1, p) + vmul(a.1, b.0, p);
+                    if v >= p { v - p } else { v }
+                };
+                let expected = (
+                    quadratic_sub(constant, vmul(c, high, p), p),
+                    quadratic_sub(cross, vmul(d, high, p), p),
+                );
+                assert_eq!(quadratic_mul(a, b, c, d, p), expected);
+            }
+        }
+    }
 
     #[test]
     fn round112_mersenne_high_degree_chain_matches_independent_binary_oracle() {
