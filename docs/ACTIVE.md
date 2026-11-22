@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+- [x] Graph-IC leads round 2: accounting, fresh/scaling protocol, rho fold, independent validation, root build, descent wall-time check, new-lead scouting (claude, started 2026-11-18, branch aburan28/charming-clarke-qfc2gp, PR #4741; results in research/extension_ic_graph_20261115/leads-20261118/, owner decisions listed in its SUMMARY.md)
+
 - [x] m = 3 rootfind-subtract: sweep a rotating fraction of the base per trial (lead 1 of research/ic_m3_cost_leads_20261115), counted-S study at 37.4/39.3 bits: S 0.36–0.55x of the full sweep at 1/16 (w = 0), validated (research/ic_m3_sweep_window_20261118; claude, 2026-11-18, PR #4739)
 
 - [ ] Round-5 Table B leads: L5-BINSG (stride-generator targets on binary), L5-BINSIB (x-only siblings on binary curves, code), L5-LB (leaderboard component for rounds 2-4) (Claude, started 2026-11-20, branch aburan28/inspiring-dijkstra-ay05qi, PR #4738)
@@ -126,7 +128,7 @@ Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hypere
 
 - [x] Regenerate artifact-store pull steps in the 36 drifted workflows (`tools/artifacts/wire_workflows.py`) so the `artifacts` check passes (claude, started 2026-11-18, branch aburan28/vigilant-wright-xm1vt6-workflow-wiring)
 
-- [ ] Chase open graph-IC (extension_ic_graph_20261115) leads in parallel: Run51 outcome, descent finder, complete accounting, fresh/scaling protocol, rho fold, independent validation, root build (claude, started 2026-11-18, branch aburan28/charming-clarke-qfc2gp)
+- [x] Chase open graph-IC (extension_ic_graph_20261115) leads in parallel: Run51 outcome, descent finder, complete accounting, fresh/scaling protocol, rho fold, independent validation, root build (claude, started 2026-11-18, branch aburan28/charming-clarke-qfc2gp, PR #4654; 2 of 7 lanes landed)
 
 - [x] O4 protocol Amendment 2 before any data: settle the eight open readings in chained_transfer_next PROGRESS.md and fix choice 4 (a wrong log from a rank-deficient solve must trigger a retry, not an uncertified run) in quartic_ic (claude, started 2026-11-18, branch claude/ecdlp-chained-transfers-8cpiek, PR #4632)
 
