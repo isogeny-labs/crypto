@@ -1,0 +1,225 @@
+{
+  "branch": "claude/f4-f5-algorithm-speed-bvp7qd",
+  "closed_utc": "2026-11-18T07:03:30+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/koblitz_known_log_columns_20261118/run.sh",
+        "37"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-18T05:55:53+00:00",
+      "wall_s": 20.954
+    },
+    {
+      "argv": [
+        "bash",
+        "research/koblitz_known_log_columns_20261118/a1/run.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-18T06:27:37+00:00",
+      "wall_s": 1948.869
+    }
+  ],
+  "commit": "753f3fae10a69732dda997d0d1be319eda0b6c13",
+  "commit_dirty": true,
+  "created_utc": "2026-11-18T05:10:25+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261118-koblitz-known-log-columns",
+    "research/koblitz_known_log_columns_20261118"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v595-x86_64-with-glibc2.39"
+  },
+  "id": "20261118T0510Z-koblitz-known-log-columns",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "sp_c4_d5_over_gen_c4_n23_w0",
+      "note": "pcc:unverified; A1 primary, K1 n23",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.505,
+        0.683
+      ],
+      "unit": "ratio",
+      "value": 0.588
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "sp_c4_d5_over_gen_c4_n23_w1",
+      "note": "pcc:unverified; A1 primary, K1 n23",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.579,
+        0.718
+      ],
+      "unit": "ratio",
+      "value": 0.645
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "sp_c8_d5_over_gen_c8_n37_w0",
+      "note": "pcc:unverified; A1 primary, K1 n37",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.33,
+        0.44
+      ],
+      "unit": "ratio",
+      "value": 0.381
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "sp_c8_d5_over_gen_c8_n37_w1",
+      "note": "pcc:unverified; A1 primary, K1 n37",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.392,
+        0.498
+      ],
+      "unit": "ratio",
+      "value": 0.442
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "kl_c3_over_gen_c4_n23_w0",
+      "note": "pcc:unverified; A0 primary, null",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.867,
+        1.417
+      ],
+      "unit": "ratio",
+      "value": 1.109
+    },
+    {
+      "baseline": 0.954,
+      "better": "lower",
+      "n": 144,
+      "name": "sp_c4_d5_s_n23_w0.1",
+      "note": "pcc:unverified; band S at w=0.1; baseline gen-c4; reference rho-strong (v5 0.260)",
+      "reference": 0.954,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 0.577
+    },
+    {
+      "baseline": 0.875,
+      "better": "lower",
+      "n": 144,
+      "name": "sp_c8_d5_s_n37_w0.1",
+      "note": "pcc:unverified; band S at w=0.1; baseline gen-c8; reference rho-strong (v5 0.167)",
+      "reference": 0.301,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 0.348
+    }
+  ],
+  "problem": "ecdlp:koblitz_small_rows_ic_gen_orbit",
+  "raw": [
+    {
+      "bytes": 211054,
+      "path": "research/koblitz_known_log_columns_20261118/results.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b0/b0a89b7aed6679cafc3f513de8c15d76ffbc0e590f692072ca2a1b88a7895da0",
+      "sha256": "b0a89b7aed6679cafc3f513de8c15d76ffbc0e590f692072ca2a1b88a7895da0",
+      "uploaded": false
+    },
+    {
+      "bytes": 22011,
+      "path": "research/koblitz_known_log_columns_20261118/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/88/88b36d473063ba232fb8cc5c38e9599991d13d8a82fb80c3529e287f56f19bfe",
+      "sha256": "88b36d473063ba232fb8cc5c38e9599991d13d8a82fb80c3529e287f56f19bfe",
+      "uploaded": false
+    },
+    {
+      "bytes": 13248,
+      "path": "research/koblitz_known_log_columns_20261118/tables/records-n23.csv.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e2/e29b3279eec00ceb27ee7d3b223bc427b90e96fe2e6a48169cd22684212cb2ed",
+      "sha256": "e29b3279eec00ceb27ee7d3b223bc427b90e96fe2e6a48169cd22684212cb2ed",
+      "uploaded": false
+    },
+    {
+      "bytes": 7682,
+      "path": "research/koblitz_known_log_columns_20261118/tables/records-n29.csv.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6c/6c05f267979571887db8f221b5ef28cf2d4846a06a5b68bedcfaa92982029587",
+      "sha256": "6c05f267979571887db8f221b5ef28cf2d4846a06a5b68bedcfaa92982029587",
+      "uploaded": false
+    },
+    {
+      "bytes": 14052,
+      "path": "research/koblitz_known_log_columns_20261118/tables/records-n37.csv.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d0/d04dc1245e3d5b0a43724c15b43cb2b87891f2d7a17926dfa756033375cbb475",
+      "sha256": "d04dc1245e3d5b0a43724c15b43cb2b87891f2d7a17926dfa756033375cbb475",
+      "uploaded": false
+    },
+    {
+      "bytes": 226250,
+      "path": "research/koblitz_known_log_columns_20261118/a1/results.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/20/20e50e1160d6ef657d795aaa494ce84fdd12dab891ebb9fefdf623a678ddcec9",
+      "sha256": "20e50e1160d6ef657d795aaa494ce84fdd12dab891ebb9fefdf623a678ddcec9",
+      "uploaded": false
+    },
+    {
+      "bytes": 20403,
+      "path": "research/koblitz_known_log_columns_20261118/a1/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/58/58ebdaf9d62e70600fa9f9e60daa7a959d83f1683fa53bdce167574dc3707cf9",
+      "sha256": "58ebdaf9d62e70600fa9f9e60daa7a959d83f1683fa53bdce167574dc3707cf9",
+      "uploaded": false
+    },
+    {
+      "bytes": 14145,
+      "path": "research/koblitz_known_log_columns_20261118/a1/tables/records-n23.csv.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/61/611ff0b8c4551cc1f4caf59a0e9464c6cb6dc8379327f9288eabe37bc2907dc2",
+      "sha256": "611ff0b8c4551cc1f4caf59a0e9464c6cb6dc8379327f9288eabe37bc2907dc2",
+      "uploaded": false
+    },
+    {
+      "bytes": 15140,
+      "path": "research/koblitz_known_log_columns_20261118/a1/tables/records-n37.csv.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5f/5fa883539dcb79e6e99473f807d890d1ab1b97117c0cc4db86ead32ad22f3472",
+      "sha256": "5fa883539dcb79e6e99473f807d890d1ab1b97117c0cc4db86ead32ad22f3472",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/koblitz_known_log_columns_20261118/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/koblitz_known_log_columns_20261118/figures/fig1-phase-split.svg",
+      "research/koblitz_known_log_columns_20261118/figures/fig2-ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "koblitz-known-log-columns",
+  "status": "measured",
+  "summary": "Known-log seed columns on the gen-orbit IC arm, K1 n23/n29/n37 [pcc:unverified, not validated]: A1 primary sp-c4-d5/gen-c4 0.588 (n23), sp-c8-d5/gen-c8 0.381 (n37) at w=0; A0 primary null at n23; n29 lever inert",
+  "validation": null
+}
