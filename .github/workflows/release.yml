@@ -57,6 +57,8 @@ jobs:
           sparse-checkout: |
             /tools/factor-base/
             /.github/scripts/
+            /scripts/verify_binary_transfer_source.mjs
+            /scripts/test_verify_binary_transfer_source.mjs
             /build.rs
             /rustfmt.toml
             /clippy.toml
@@ -179,6 +181,8 @@ jobs:
             /.cargo/
             /rust-toolchain*
             /.github/scripts/
+            /scripts/verify_binary_transfer_source.mjs
+            /scripts/test_verify_binary_transfer_source.mjs
             /build.rs
             /rustfmt.toml
             /clippy.toml
@@ -188,6 +192,13 @@ jobs:
             /benches/
             /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs
             /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+            /research/chained_jacobian_transfers_20261110/lean/ChainTransfer.lean
+            /research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json
+            /research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json
+            /research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json
+            /research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json
+            /research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json
+            /research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json
             /docs/curves/
             /docs/ecdlp-audit/
             /README.md
@@ -238,7 +249,8 @@ jobs:
           cargo build --locked --release
           --bin crypto --bin ic --bin ecbench --bin curve_cover_check
           --bin curve_standards --bin hyperelliptic-cover --bin ecdlp-audit
-          --bin factor-base-sweep
+          --bin factor-base-sweep --bin curve-transfer-sweep
+          --bin odd-transfer-catalog
           --target ${{ matrix.target }}
       - name: Smoke-test the binaries
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
@@ -248,7 +260,7 @@ jobs:
         run: |
           ext=""
           [ "${{ runner.os }}" = "Windows" ] && ext=".exe"
-          for bin in crypto curve_cover_check curve_standards hyperelliptic-cover ecdlp-audit factor-base-sweep; do
+          for bin in crypto curve_cover_check curve_standards hyperelliptic-cover ecdlp-audit factor-base-sweep curve-transfer-sweep odd-transfer-catalog; do
             "./target/${{ matrix.target }}/release/$bin$ext" --help > /dev/null
           done
           "./target/${{ matrix.target }}/release/ic$ext" --help > /dev/null
@@ -266,10 +278,31 @@ jobs:
           "./target/${{ matrix.target }}/release/ecbench$ext" host --json \
             > ecbench-host-smoke.json
           grep -Fq '"git_commit": "'"$GITHUB_SHA"'"' ecbench-host-smoke.json
+      - name: Verify binary producer source tree
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
+        shell: bash
+        run: |
+          binary_producer_commit="$(node -e 'const c=require("./docs/curves/binary-subgroup-transfer-certificates.json"); process.stdout.write(c.producer.git_commit)')"
+          git fetch --no-tags --filter=blob:none --recurse-submodules=no origin "$binary_producer_commit"
+          node scripts/test_verify_binary_transfer_source.mjs
+          node scripts/verify_binary_transfer_source.mjs \
+            --input docs/curves/binary-subgroup-transfer-certificates.json \
+            --repo-root . \
+            --output "$RUNNER_TEMP/binary-transfer-source-replay.json"
+          jq -e --arg commit "$binary_producer_commit" '
+            .status == "producer_source_digest_bound_to_recorded_git_tree" and
+            .producer_commit == $commit and
+            .source_files_checked == 21 and
+            ([.checks[]] | all(. == true))
+          ' "$RUNNER_TEMP/binary-transfer-source-replay.json" >/dev/null
+          cmp "$RUNNER_TEMP/binary-transfer-source-replay.json" \
+            research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json
       - name: Stage the archive
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || needs.scope.outputs.release_rust != 'false'
         shell: bash
         run: |
+          set -E
+          trap 'code=$?; set +e; printf "::error::archive staging failed (exit %s): %s\n" "$code" "$BASH_COMMAND" >&2; for diagnostic in *-smoke.json *-replay.json; do [ -f "$diagnostic" ] || continue; printf "::group::%s\n" "$diagnostic" >&2; tail -c 8192 "$diagnostic" >&2; printf "\n::endgroup::\n" >&2; done; exit "$code"' ERR
           name="crypto-${{ needs.meta.outputs.tag }}-${{ matrix.target }}"
           mkdir -p "dist/$name"
           ext=""
@@ -280,8 +313,17 @@ jobs:
           cp "target/${{ matrix.target }}/release/curve_standards$ext" "dist/$name/"
           mkdir -p "dist/$name/docs/curves"
           cp docs/curves/registry.json docs/curves/covers.json docs/curves/cover-links.yaml \
+             docs/curves/traits.json \
              docs/curves/cover-links.schema.json docs/curves/COVERS.md docs/curves/ICV1.md \
              docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md \
+             docs/curves/BINARY_SUBGROUP_TRANSFER_CERTIFICATES.md \
+             docs/curves/binary-subgroup-transfer-certificates.json \
+             docs/curves/binary-subgroup-transfer-certificates.schema.json \
+             docs/curves/binary-subgroup-transfer-source-verification.schema.json \
+             docs/curves/ODD_SUBGROUP_TRANSFER_CERTIFICATES.md \
+             docs/curves/odd-subgroup-transfer-certificates.json \
+             docs/curves/odd-subgroup-transfer-certificates.schema.json \
+             docs/curves/CURVE_TRANSFER_SWEEP.md \
              docs/curves/hyperelliptic-infrastructure.schema.json \
              docs/curves/cover-transfer-assessments.json \
              docs/curves/cover-transfer-assessment.schema.json \
@@ -292,7 +334,15 @@ jobs:
           # verification checkout. The mock binds repository source/report
           # paths and pinned Git objects that are intentionally not staged.
           cp -R docs/ecdlp-audit "dist/$name/docs/"
-          for bin in crypto ic ecbench curve_cover_check hyperelliptic-cover ecdlp-audit factor-base-sweep; do
+          mkdir -p "dist/$name/research/curve_transfer_infrastructure_20261118"
+          cp research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json \
+             research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json \
+             research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json \
+             research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json \
+             research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json \
+             research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json \
+             "dist/$name/research/curve_transfer_infrastructure_20261118/"
+          for bin in crypto ic ecbench curve_cover_check hyperelliptic-cover ecdlp-audit factor-base-sweep curve-transfer-sweep odd-transfer-catalog; do
             cp "target/${{ matrix.target }}/release/$bin$ext" "dist/$name/"
           done
           # `[ -f ] && cp` leaves the loop's exit status at 1 when the last
@@ -300,6 +350,8 @@ jobs:
           for extra in README.md LICENSE LICENSE.md; do
             [ -f "$extra" ] && cp "$extra" "dist/$name/" || true
           done
+          odd_producer_commit="$(node -e 'const c=require("./docs/curves/odd-subgroup-transfer-certificates.json"); process.stdout.write(c.producer.git_commit)')"
+          git fetch --no-tags --filter=blob:none --recurse-submodules=no origin "$odd_producer_commit"
           # Exercise the installed layout, not just binaries in target/. The
           # generated verification request reuses the constructor's exact
           # certificate, while native catalog checking consumes the staged
@@ -308,13 +360,30 @@ jobs:
             cd "dist/$name"
             for required in \
               docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md \
+              docs/curves/BINARY_SUBGROUP_TRANSFER_CERTIFICATES.md \
+              docs/curves/binary-subgroup-transfer-certificates.json \
+              docs/curves/binary-subgroup-transfer-certificates.schema.json \
+              docs/curves/binary-subgroup-transfer-source-verification.schema.json \
+              docs/curves/ODD_SUBGROUP_TRANSFER_CERTIFICATES.md \
+              docs/curves/odd-subgroup-transfer-certificates.json \
+              docs/curves/odd-subgroup-transfer-certificates.schema.json \
+              docs/curves/traits.json \
+              docs/curves/CURVE_TRANSFER_SWEEP.md \
               docs/curves/hyperelliptic-infrastructure.schema.json \
               docs/curves/cover-transfer-assessments.json \
               docs/curves/cover-transfer-assessment.schema.json \
-              docs/curves/fixed-f8-genus3-order-certificate.json; do
+              docs/curves/fixed-f8-genus3-order-certificate.json \
+              research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json \
+              research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json \
+              research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json \
+              research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json \
+              research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json \
+              research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json; do
               test -f "$required"
             done
             "./hyperelliptic-cover$ext" --help > /dev/null
+            "./curve-transfer-sweep$ext" --help > /dev/null
+            "./odd-transfer-catalog$ext" --help > /dev/null
             "./ecdlp-audit$ext" --help > /dev/null
             "./curve_cover_check$ext" \
               --registry docs/curves/registry.json \
@@ -331,15 +400,148 @@ jobs:
               | "./hyperelliptic-cover$ext" arithmetic --input - > arithmetic-smoke.json
             "./hyperelliptic-cover$ext" catalog-export \
               --registry docs/curves/registry.json --output catalog-smoke.json
+            if "./hyperelliptic-cover$ext" transfer-catalog-verify \
+              --input docs/curves/binary-subgroup-transfer-certificates.json \
+              --registry docs/curves/registry.json \
+              --cover-graph docs/curves/cover-links.yaml \
+              --traits docs/curves/traits.json \
+              --expected-sha256 a55c7f9a0c836614281388f19b3b31fa622eeb1650ddc00c59e4e78562471392 \
+              --expected-bytes 500924 \
+              --output transfer-catalog-replay.json; then
+              :
+            else
+              verify_code=$?
+              producer_commit="$(node -e 'const c=require("./docs/curves/binary-subgroup-transfer-certificates.json"); process.stdout.write(c.producer.git_commit)')"
+              rustc_version="$(node -e 'const c=require("./docs/curves/binary-subgroup-transfer-certificates.json"); process.stdout.write(c.producer.rustc_version)')"
+              "./hyperelliptic-cover$ext" transfer-catalog-export \
+                --registry docs/curves/registry.json \
+                --cover-graph docs/curves/cover-links.yaml \
+                --traits docs/curves/traits.json \
+                --producer-commit "$producer_commit" \
+                --rustc-version "$rustc_version" \
+                --output transfer-catalog-regenerated.json || true
+              sha256sum docs/curves/binary-subgroup-transfer-certificates.json \
+                transfer-catalog-regenerated.json >&2 || true
+              diff -u docs/curves/binary-subgroup-transfer-certificates.json \
+                transfer-catalog-regenerated.json | head -n 240 >&2 || true
+              exit "$verify_code"
+            fi
             node -e 'const fs=require("fs"); for(const file of ["verified-smoke.json","arithmetic-smoke.json"]){const r=JSON.parse(fs.readFileSync(file)); if(r.status!=="ok") process.exit(1)} const c=JSON.parse(fs.readFileSync("catalog-smoke.json")); if(c.schema_version!=="curve-covers/v1") process.exit(1);'
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("transfer-catalog-replay.json")); if(r.schema_version!=="binary-subgroup-transfer-catalog-verification/v1"||r.status!=="verified_complete"||r.checks.optional_raw_hash_and_size!==true||r.checks.canonical_bytes_equal!==true||r.corpus.sha256!=="a55c7f9a0c836614281388f19b3b31fa622eeb1650ddc00c59e4e78562471392"||r.corpus.bytes!==500924||r.summary.failed_named_subgroup_records!==0) process.exit(1);'
+            cmp transfer-catalog-replay.json research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json
+            cmp "$RUNNER_TEMP/binary-transfer-source-replay.json" research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json
+            odd_corpus_sha256="1ecfabcdaecc3e00d78ab2ce7eebeb94607e1c2c224f261fb5718a4f53b65268"
+            odd_corpus_bytes="17879292"
+            actual_odd_sha256="$(sha256sum docs/curves/odd-subgroup-transfer-certificates.json | awk '{print $1}')"
+            actual_odd_bytes="$(wc -c < docs/curves/odd-subgroup-transfer-certificates.json)"
+            test "$actual_odd_sha256" = "$odd_corpus_sha256"
+            test "$actual_odd_bytes" = "$odd_corpus_bytes"
+            if "./odd-transfer-catalog$ext" verify \
+              --input docs/curves/odd-subgroup-transfer-certificates.json \
+              --registry docs/curves/registry.json \
+              --cover-graph docs/curves/cover-links.yaml \
+              --expected-sha256 "$odd_corpus_sha256" \
+              --expected-bytes "$odd_corpus_bytes" \
+              --output odd-transfer-catalog-replay.json; then
+              echo 'odd transfer replay unexpectedly reported complete support' >&2
+              exit 1
+            else
+              odd_verify_code=$?
+            fi
+            if [ "$odd_verify_code" -ne 1 ]; then
+              echo "odd transfer replay exited $odd_verify_code; expected incomplete status exit 1" >&2
+              exit 1
+            fi
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("odd-transfer-catalog-replay.json")); const sha=process.argv[1], bytes=Number(process.argv[2]); if(r.schema_version!=="odd-subgroup-transfer-catalog-verification/v1"||r.status!=="verified_named_subgroup_incomplete"||r.checks.optional_raw_hash_and_size!==true||r.checks.canonical_bytes_equal!==true||r.checks.all_named_subgroup_records_supported!==false||r.corpus.sha256!==sha||r.corpus.bytes!==bytes) process.exit(1);' "$odd_corpus_sha256" "$odd_corpus_bytes"
+            cmp odd-transfer-catalog-replay.json research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json
+            "./odd-transfer-catalog$ext" verify-source \
+              --input docs/curves/odd-subgroup-transfer-certificates.json \
+              --repo-root "$GITHUB_WORKSPACE" \
+              --output odd-transfer-source-replay.json
+            node -e 'const fs=require("fs"); const c=JSON.parse(fs.readFileSync("docs/curves/odd-subgroup-transfer-certificates.json")); const r=JSON.parse(fs.readFileSync("odd-transfer-source-replay.json")); if(r.schema_version!=="odd-subgroup-transfer-source-verification/v1"||r.status!=="source_manifest_bound_to_recorded_git_tree"||r.producer_commit!==c.producer.git_commit||r.source_sha256!==c.producer.source_sha256||Object.values(r.checks).some(v=>v!==true)) process.exit(1);'
+            cmp odd-transfer-source-replay.json research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json
             "./ecdlp-audit$ext" verify-fixed-f8-order \
               --input docs/curves/fixed-f8-genus3-order-certificate.json \
               --repo-root . \
               > fixed-f8-order-smoke.json
             node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("fixed-f8-order-smoke.json")); if(r.status!=="verified"||r.jacobian_order_over_f8!==486) process.exit(1);'
+            "./curve-transfer-sweep$ext" capabilities \
+              --output transfer-capabilities-smoke.json
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("transfer-capabilities-smoke.json")); if(r.schema_version!=="curve-transfer-sweep-capabilities/v1"||r.integrated_request_families.length!==2||r.families.length!==6) process.exit(1);'
+            printf '%s\n' \
+              '{"schema":"curve-transfer-sweep-request/v1","selector":{"kind":"model","value":{"a":"0x0","b":"0x1","field":"f2m-7-e1a6f45a","form":"y^2+xy=x^3+a*x^2+b","modulus":"0x83","v":"1"}},"families":["binary_cubic_pullback_v1"],"bounds":{"prime_shift_start":0,"prime_shift_end":0,"max_attempts":1,"max_field_bits":7,"max_genus":3,"max_degree":3}}' \
+              > binary-transfer-sweep-request.json
+            "./curve-transfer-sweep$ext" sweep \
+              --request binary-transfer-sweep-request.json \
+              --registry docs/curves/registry.json \
+              --output binary-transfer-sweep-smoke.json
+            "./curve-transfer-sweep$ext" verify \
+              --input binary-transfer-sweep-smoke.json \
+              --registry docs/curves/registry.json \
+              --output binary-transfer-sweep-verify-smoke.json
+            node -e 'const fs=require("fs"); const s=JSON.parse(fs.readFileSync("binary-transfer-sweep-smoke.json")); const v=JSON.parse(fs.readFileSync("binary-transfer-sweep-verify-smoke.json")); if(s.record_state!=="bounded_search_result"||s.summary.parameter_points_attempted!==1||s.summary.verified_candidates!==1||v.status!=="verified"||v.candidate_count!==1) process.exit(1);'
+            printf '%s\n' \
+              '{"schema":"curve-transfer-sweep-request/v1","selector":{"kind":"model","value":{"v":"1","form":"y^2=x^3+a*x+b","p":"5","field":"fp-5","a":"1","b":"1"}},"families":["prime_quadratic_pullback_v1"],"bounds":{"prime_shift_start":0,"prime_shift_end":3,"max_attempts":4,"max_field_bits":5,"max_genus":2,"max_degree":2}}' \
+              > odd-transfer-sweep-request.json
+            "./curve-transfer-sweep$ext" sweep \
+              --request odd-transfer-sweep-request.json \
+              --registry docs/curves/registry.json \
+              --output odd-transfer-sweep-smoke.json
+            "./curve-transfer-sweep$ext" verify \
+              --input odd-transfer-sweep-smoke.json \
+              --registry docs/curves/registry.json \
+              --output odd-transfer-sweep-verify-smoke.json
+            node -e 'const fs=require("fs"); const s=JSON.parse(fs.readFileSync("odd-transfer-sweep-smoke.json")); const v=JSON.parse(fs.readFileSync("odd-transfer-sweep-verify-smoke.json")); if(s.record_state!=="bounded_search_result"||s.summary.parameter_points_attempted!==4||s.summary.verified_candidates!==4||v.status!=="verified"||v.candidate_count!==4) process.exit(1);'
+            printf '%s\n' \
+              '{"schema":"curve-transfer-sweep-request/v1","selector":{"kind":"model","value":{"v":"1","form":"B*y^2=x^3+A*x^2+x","p":"11","field":"fp-11","A":"3","B":"1"}},"families":["prime_quadratic_pullback_v1"],"bounds":{"prime_shift_start":0,"prime_shift_end":0,"max_attempts":1,"max_field_bits":4,"max_genus":2,"max_degree":2}}' \
+              > montgomery-transfer-sweep-request.json
+            "./curve-transfer-sweep$ext" sweep \
+              --request montgomery-transfer-sweep-request.json \
+              --registry docs/curves/registry.json \
+              --output montgomery-transfer-sweep-smoke.json
+            "./curve-transfer-sweep$ext" verify \
+              --input montgomery-transfer-sweep-smoke.json \
+              --registry docs/curves/registry.json \
+              --output montgomery-transfer-sweep-verify-smoke.json
+            node -e 'const fs=require("fs"); const s=JSON.parse(fs.readFileSync("montgomery-transfer-sweep-smoke.json")); const v=JSON.parse(fs.readFileSync("montgomery-transfer-sweep-verify-smoke.json")); const c=s.candidates&&s.candidates[0], st=c&&c.statuses; if(s.record_state!=="bounded_search_result"||s.resolved_target.model.form!=="B*y^2=x^3+A*x^2+x"||s.summary.parameter_points_attempted!==1||s.summary.verified_candidates!==1||c.family!=="prime_quadratic_pullback_v1"||st.explicit_construction!=="verified"||st.transfer_runtime_constructor!=="runtime_transfer_constructor_replayed"||st.jacobian_arithmetic!=="strict_proof_split_sextic_backend_available_not_replayed_by_sweep"||st.arbitrary_class_pushforward!=="runtime_constructor_replayed_operations_not_replayed_by_sweep"||st.composition_identities!=="runtime_constructor_replayed_operations_not_replayed_by_sweep"||v.status!=="verified"||v.candidate_count!==1) process.exit(1);'
+            printf '%s\n' \
+              '{"schema":"hyperelliptic-transfer-operation/v1","model":{"a":"0x0","b":"0x1","field":"f2m-7-e1a6f45a","form":"y^2+xy=x^3+a*x^2+b","modulus":"0x83","v":"1"},"operation":"pull_push_composition_certificate","point":{"kind":"affine","x":"0x0","y":"0x1"}}' \
+              | "./hyperelliptic-cover$ext" transfer --input - > transfer-smoke.json
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("transfer-smoke.json")); if(r.status!=="ok"||r.result.context.field_degree!==7||r.result.context.map_degree!==3||r.result.result.identity_holds!==true) process.exit(1);'
+            printf '%s\n' \
+              '{"schema":"hyperelliptic-transfer-operation/v1","model":{"a":"0x0","b":"0x1","field":"f2m-7-e1a6f45a","form":"y^2+xy=x^3+a*x^2+b","modulus":"0x83","v":"1"},"operation":"generated_subgroup_certificate","point":{"kind":"affine","x":"0x26","y":"0x5"},"order":"29"}' \
+              | "./hyperelliptic-cover$ext" transfer --input - > binary-generated-subgroup-smoke.json
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("binary-generated-subgroup-smoke.json")); const q=r.result&&r.result.result; if(r.status!=="ok"||r.result.context.map_degree!==3||q.annihilator!=="29"||q.exact_order_or_primality_claimed!==false||Object.values(q.checks).some(v=>v!==true)) process.exit(1);'
+            printf '%s\n' \
+              '{"schema":"hyperelliptic-transfer-operation/v1","model":{"v":"1","form":"y^2=x^3+a*x+b","p":"5","field":"fp-5","a":"0","b":"1"},"operation":"pull_push_composition_certificate","point":{"kind":"affine","x":"0","y":"1"}}' \
+              | "./hyperelliptic-cover$ext" transfer --input - > odd-transfer-smoke.json
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("odd-transfer-smoke.json")); if(r.status!=="ok"||r.result.context.map_degree!==2||r.result.result.identity_holds!==true) process.exit(1);'
+            printf '%s\n' \
+              '{"schema":"hyperelliptic-transfer-operation/v1","model":{"v":"1","form":"B*y^2=x^3+A*x^2+x","p":"11","field":"fp-11","A":"3","B":"1"},"operation":"pull_push_composition_certificate","point":{"kind":"affine","x":"10","y":"1"}}' \
+              | "./hyperelliptic-cover$ext" transfer --input - \
+              > montgomery-transfer-smoke.json
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("montgomery-transfer-smoke.json")); const c=r.result&&r.result.context, q=r.result&&r.result.result; if(r.status!=="ok"||c.family!=="normalized_prime_quadratic_pullback_v1_split_sextic_balanced_montgomery"||c.target_model.form!=="B*y^2=x^3+A*x^2+x"||!c.coordinate_scope.includes("original Montgomery coordinates")||c.map.composed.x!=="0x1*(u^2+0x0)-0x1"||c.map.composed.y!=="0x1*v"||q.identity_holds!==true||q.input.kind!=="affine"||q.input.x!=="0xa"||q.input.y!=="0x1"||q.pullback.u.join(",")!=="0x0,0x0,0x1"||q.pushforward.kind!=="affine"||q.pushforward.x!=="0x0"||q.pushforward.y!=="0x0"||q.twice_input.kind!=="affine"||q.twice_input.x!=="0x0"||q.twice_input.y!=="0x0") process.exit(1);'
+            if printf '%s\n' \
+              '{"schema":"hyperelliptic-transfer-operation/v1","model":{"a":"0x0","b":"0x1","field":"f2m-7-e1a6f45a","form":"y^2+xy=x^3+a*x^2+b","modulus":"0x83","v":"1"},"operation":"pushforward","divisor":{"u":[],"v":[]}}' \
+              | "./hyperelliptic-cover$ext" transfer --input - > malformed-divisor-smoke.json; then
+              echo 'malformed divisor unexpectedly accepted' >&2
+              exit 1
+            fi
+            node -e 'const fs=require("fs"); const r=JSON.parse(fs.readFileSync("malformed-divisor-smoke.json")); if(r.status!=="invalid_input"||r.command!=="transfer") process.exit(1);'
             rm construct-smoke.json verify-smoke.json verified-smoke.json \
                arithmetic-smoke.json catalog-smoke.json fixed-f8-order-smoke.json \
-               curve-cover-check-smoke.json
+               curve-cover-check-smoke.json binary-transfer-sweep-request.json \
+               binary-transfer-sweep-smoke.json binary-transfer-sweep-verify-smoke.json \
+               odd-transfer-sweep-request.json odd-transfer-sweep-smoke.json \
+               odd-transfer-sweep-verify-smoke.json \
+               montgomery-transfer-sweep-request.json \
+               montgomery-transfer-sweep-smoke.json \
+               montgomery-transfer-sweep-verify-smoke.json transfer-smoke.json \
+               binary-generated-subgroup-smoke.json odd-transfer-smoke.json \
+               montgomery-transfer-smoke.json \
+               malformed-divisor-smoke.json transfer-catalog-replay.json \
+               odd-transfer-catalog-replay.json odd-transfer-source-replay.json \
+               transfer-capabilities-smoke.json
           )
           cd dist
           if [ "${{ runner.os }}" = "Windows" ]; then
@@ -1016,7 +1218,7 @@ jobs:
 
           | Artifact | Contents |
           | --- | --- |
-          | `crypto-*-x86_64-unknown-linux-gnu.tar.gz` | `crypto`, `ic`, `ecbench`, `curve_cover_check`, `curve_standards`, `hyperelliptic-cover`, `ecdlp-audit`, `factor-base-sweep` — glibc |
+          | `crypto-*-x86_64-unknown-linux-gnu.tar.gz` | `crypto`, `ic`, `ecbench`, `curve_cover_check`, `curve_standards`, `hyperelliptic-cover`, `curve-transfer-sweep`, `odd-transfer-catalog`, `ecdlp-audit`, `factor-base-sweep` — glibc |
           | `isogeny-*-x86_64-unknown-linux-gnu.tar.gz` | dedicated `isogeny` executable, README, BUILD.json — glibc |
           | `isogeny-*-x86_64-unknown-linux-musl.tar.gz` | dedicated tool — static |
           | `isogeny-algos-*-x86_64-unknown-linux-gnu.tar.gz` | `isogeny-algos` (point counting, isogenies, Vélu/√élu, chains, BMSS, duals, CSIDH, paths, KLPT, Richelot, Φ_ℓ), USAGE.md, BUILD.json — glibc |
@@ -1039,15 +1241,23 @@ jobs:
           `factor-base-sweep run --out runs/bases`. No Rust toolchain or source
           checkout is needed to run the installed native CLI.
 
+          Run `curve-transfer-sweep --help` for finite, replayable enumeration
+          of the explicitly implemented curve-cover families.
+
+          Run `odd-transfer-catalog --help` to export or byte-for-byte replay
+          the retained odd-characteristic named-subgroup evidence corpus.
+
           Run `isogeny --help` after extracting the dedicated tool archive.
           `isogeny search --curve p224 --ell 1471 --out p224-1471` constructs
           and independently verifies the recorded one-eigenline map.
 
           The Rust archives also include the `docs/curves` catalog snapshot,
-          hyperelliptic command contract and transfer-assessment records, plus
-          non-authoritative `docs/ecdlp-audit` examples. Run `ecdlp-audit --help`
-          to inspect the audit CLI. Its packaged mock is not self-validating:
-          `verify-plan` requires the matching repository paths and Git objects.
+          hyperelliptic command and named-subgroup certificate contracts, and
+          transfer-assessment records, plus non-authoritative `docs/ecdlp-audit`
+          examples. These transfer records do not claim a solver or computational
+          advantage. Run `ecdlp-audit --help` to inspect the audit CLI. Its
+          packaged mock is not self-validating: `verify-plan` requires the
+          matching repository paths and Git objects.
 
           Run `isogeny-algos help` for the algorithm toolkit; every command prints one
           JSON record with its checks (USAGE.md in the archive).

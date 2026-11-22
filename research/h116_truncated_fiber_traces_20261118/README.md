@@ -152,7 +152,193 @@ prefix. The curve-specific instance now defines that series by
 `q=1+A X^4q^2+B X^6q^3`, proves the cleared affine identity, proves rescaling to
 `(a^4A,a^6B)`, and matches the complete source/target x-ratio used by the
 implementation. The remaining formal-group obligation is the parameter
-identity derived from `V+pi=[t]` and local Frobenius. [pcc:unverified]
+identity derived from `V+pi=[t]` and local Frobenius. The generic filtration
+part of that obligation is now discharged against Mathlib's actual
+`FormalGroup`: Lean proves `Y | F(X,Y)-X`, proves that an `X^m` correction is
+invisible below degree `m`, and composes it with the existing one-degree pole
+loss. The endomorphism orientation is now proved as well: from certified
+relations `F(actual,omitted)=scalar` and
+`F(omitted,inverseCorrection)=0`, associativity derives
+`F(scalar,inverseCorrection)=actual`. In a commutative formal group the inverse
+inherits the omitted parameter's `X^m` factor; alternatively, an explicit
+short-Weierstrass negation certificate `F(omitted,-omitted)=0` avoids a
+separately constructed inverse series. A new possibly noncommutative-ring
+theorem derives `V+pi=[t]` from the Frobenius characteristic polynomial,
+`pi*V=[p]`, left cancellation by `pi`, and centrality of `[t]`. Binding those
+abstract premises to additive endomorphisms now removes two certificates:
+integer scalar maps are central automatically, and injective `pi` supplies
+left-composition cancellation. A checked `ZMod 2` mutation shows injectivity
+is necessary: the two equations hold for zero `pi,V`, cardinality two and trace
+one, while the sum conclusion fails. The positive Frobenius instance is now
+constructed on Mathlib's actual nonsingular affine points by applying
+`Affine.Point.map` to the finite-field Frobenius algebra homomorphism. Mathlib
+proves this point map additive and injective; over `ZMod p`, Lean proves its
+coordinates are exactly `(x^p,y^p)`. Over any algebraic extension of
+`ZMod p`, inverse field Frobenius now induces an inverse point endomorphism.
+Defining the pointwise candidate `V=[p]*piInverse`, Lean proves
+`pi*piInverse=1`, hence `pi*V=[p]`. The characteristic equation is therefore
+the only remaining positive point-group algebraic premise needed to derive
+`V+pi=[t]`. Identifying this pointwise candidate with the retained
+rational/scheme Verschiebung and transporting the equality to the formal
+parameter, negation, sign and target scaling remain open.
+An eight-cell exhaustive extension-field panel then checks the remaining
+pointwise characteristic equation and the constructed `V` on all 5,066
+enumerated points. All positive equations and point-count recurrences pass,
+and an independent implementation matches every correctness field. The frozen
+protocol nevertheless fails one of 24 mutation requirements: on the 35-point
+`p=5`, degree-two group, `[5]pi^-1=[5]`, so omitting `pi^-1` is algebraically
+invisible. The failed control is retained in
+`POINTWISE_CHARPOLY_EXPERIMENT.md`; it is finite evidence, not the missing
+generic theorem. [pcc:unverified]
+Lean now also rearranges the point identity into the exact candidate
+orientation `V-1=[t-1]-pi`. A total observable on actual affine points maps
+infinity to zero and `(x,y)` to `z=-x/y`; the two point expressions are proved
+to have the same observed `z` value under the explicit characteristic
+premise. This closes pointwise orientation but not identification with the
+retained rational/scheme morphism or equality of completed local series.
+[pcc:unverified]
+For finite point groups, the characteristic premise now has a proof-carrying
+compressed form. Lean proves that checking the characteristic expression on a
+set whose additive-subgroup closure is top proves the global endomorphism
+equation, fixes the trace definition to `p+1-Nat.card E(F_p)`, and composes the
+certificate to the pointwise `V-1` orientation. This does not extend a finite
+certificate to the algebraic closure. [pcc:unverified]
+The frozen generator-certificate experiment instantiates that interface on the
+eight parent groups. Three groups are cyclic and five use two generators, so
+5,066 exhaustive characteristic checks compress to 13 generator checks. Both
+coefficient mutations and every dropped-generator control reject, and an
+independent implementation matches all generator coordinates, orders and
+closures. Generator discovery still enumerates these small groups; this is a
+finite verification compression, not a generic algorithmic speedup.
+[pcc:unverified]
+Lean now also proves an algebraic-point exhaustion theorem. Both coordinates
+of any affine point over an algebraic extension lie in one finite intermediate
+field, so some positive power of the actual point Frobenius fixes the point.
+Vanishing of the characteristic expression on every positive Frobenius-fixed
+locus therefore implies the global point-endomorphism equation and the exact
+`V-1` orientation. A `ZMod 3` control proves that checking only one fixed locus
+is insufficient. The restricted characteristic identities themselves remain
+unproved. [pcc:unverified]
+The frozen `H116-FROBENIUS-FIXED-LOCI-001` census passes all eight cells with
+exact independent replay. Every one of 5,066 points has a period dividing the
+extension degree. The base locus omits 5,002 points, and the union of every
+proper-period stratum omits 4,924 full-period points; the correct
+characteristic expression has zero failures in all strata.
+[pcc:unverified]
+Lean now also proves a finite rational-function separation bridge: equality on
+a finite pole-free sample implies equality after cross multiplication when
+both cross-product degrees are strictly below the sample size. A `ZMod 3`
+control proves that strictness cannot be weakened. The frozen
+`H116-RATIONAL-SEPARATION-CAPACITY-001` experiment finds 2,534 distinct
+affine x-values across the same eight cells, with per-cell raw capacities from
+16 to 1,236, and independently reconstructs the nonzero degree-|S| polynomial
+that vanishes on every sample. This measures capacity only; the actual H116
+map, poles and degree certificate remain open. [pcc:unverified]
+The first attempt to instantiate that bridge retained a useful failure: it
+mistook `ker(V-1)` for `E(F_p)`. Lean now proves the corrected kernel
+eigenrelation `pi(P)=[t-1]P` for every `V`-fixed point and its iterated
+fixed-locus form. The frozen v2 joint reconstruction then recovers three full
+base-field rational x-maps of degrees `(7,6)`, `(5,4)` and `(14,13)` from two
+independent interpolation windows. All eight extension cells agree within
+their base-curve family, all 2,524 regular evaluations match, and the predicted
+visible-kernel sizes match. Generic degree, cyclicity, scheme semantics and
+local-series transport remain open. [pcc:unverified]
+At the abstract endomorphism-ring layer, Lean also proves the exact factor
+identity `(V-1)(pi-1)=p+1-t`. Thus the algebraic norm calculation behind the
+predicted degree is closed; its scheme-theoretic degree/kernel interpretation
+is the remaining geometric step. [pcc:unverified]
+Lean now packages that geometric step as an exact paired-degree certificate:
+multiplicativity of degree, `deg[N]=N^2`, and equality of the degrees of
+`V-1` and `pi-1` imply `deg(V-1)=N`. A numeric mutation shows the equality
+premise is essential: unequal degrees 4 and 9 still have product `6^2`. The
+pinned Mathlib snapshot supplies no elliptic-isogeny, dual-isogeny, or morphism-
+degree API, so those three inputs remain explicit obligations rather than
+assumptions hidden in the conclusion. [pcc:unverified]
+The frozen `H116-KERNEL-X-ORBIT-001` experiment independently checks a finer
+consequence of the corrected eigenspace model. Across eight cells, every root
+of the three reconstructed denominators matches the union of the
+`lambda^d=+1` and `lambda^d=-1` eigenspaces modulo `P~-P`, including exact
+simple/double multiplicities and zero numerator cancellations. The two locked
+sign-sensitive cells contain five denominator roots that point enumeration
+cannot see: three at `p=5,d=3` and two at `p=7,d=2`. This repairs the retained
+v1 interpretation on the finite panel but does not prove generic cyclicity or
+scheme semantics. [pcc:unverified]
+The frozen `H116-DUAL-PAIR-COMPOSITION-001` experiment then reconstructs the
+other norm factor `pi-1` rather than assuming its kernel polynomial. Its three
+stable rational x-maps have the same respective degrees `(7,6)`, `(5,4)` and
+`(14,13)` as the recovered `V-1` maps. Direct group evaluation verifies
+`(V-1)((pi-1)P)=[N]P` on all 5,066 points with zero failures; omitting the
+right-factor subtraction and changing `[N]` to `[N+1]` reject in every cell.
+This is finite evidence for the paired-degree certificate, not a proof that
+the maps are scheme-theoretic dual isogenies. [pcc:unverified]
+The next Lean layer imports the finite field-tower degree law and Mathlib's
+exact division-polynomial degrees. For any field where `n` is nonzero,
+`Phi_n/Psi_n^2` has numerator/denominator degrees
+`(n^2,n^2-1)` and leading coefficients `(1,n^2)`. When `n` vanishes
+in the field and `|n|>1`, Lean proves the denominator degree strictly
+collapses; a `ZMod 3` control records a concrete case. The frozen
+[scalar division-polynomial experiment](SCALAR_DIVPOLY_DEGREE_EXPERIMENT.md)
+independently constructs these maps for `N=7,5,14`, matches direct scalar
+multiplication on 5,058 affine points with zero failures, and measures the
+`[p]` denominator-degree collapses `24->20`, `48->42`, and
+`120->110`. The concrete pullback tower, point-map identification,
+coordinate-to-scheme degree theorem, and duality remain open.
+[pcc:unverified]
+The next Lean checkpoint removes the abstract coordinate-degree assumption.
+For two compatible function-field towers above the pulled-back target x-line,
+quadratic source and target coordinate projections force the curve-map degree
+to equal the rational coordinate extension degree. Mathlib's exact reduced
+rational-function theorem then identifies that coordinate degree as
+`max(deg num(f),deg denom(f))`. The remaining scalar-specific steps are to
+prove generic-`n` no-cancellation, construct the actual H116
+pullback fields and identify the quotient with the curve map. The
+[source-linked report](reports/search-20261118T1152Z/REPORT.md) contains the
+tower diagram, references, audit receipt and unequal-projection control.
+[pcc:unverified]
+The following Lean checkpoint closes the generic displayed-quotient gap:
+for nonzero `q` with `IsCoprime p q`, canonical `RatFunc` normalization keeps
+the degrees of both `p` and `q`, and the coordinate extension therefore has
+degree `max(deg p,deg q)`. The separately frozen
+[`H116-SCALAR-DIVPOLY-COPRIMALITY-001`](SCALAR_DIVPOLY_COPRIMALITY_PROTOCOL.md)
+panel targets the generic premise `IsCoprime Phi_n Psi_n^2` with exact gcds
+and two negative controls.  A new scalar-two Lean instance no longer waits on
+that panel: the explicit Bezout constant is `4*A^3+27*B^2`, so every
+nonsingular short-Weierstrass curve outside characteristic two has coprime
+Mathlib division polynomials `Phi_2,Psi_2^2`.  Combining this with the reduced
+quotient theorem proves the exact coordinate extension degree
+`[F(X):F(Phi_2/Psi_2^2)]=4`.  Arbitrary `n`, the curve-map identification and
+the H116 pullback fields remain open.  The next Lean checkpoint repeats the
+construction at scalar three with a degree-eight extended-Euclid witness whose
+constant is `64*(4*A^3+27*B^2)^2`.  It proves coprimality of Mathlib's
+`Phi_3,Psi_3^2` and exact reduced coordinate degree nine outside the stated
+characteristic exclusions; the singular `A=B=0` pair over `ZMod 5` is a
+proved negative control.  These fixed-scalar results do not establish the
+generic-`n` premise.  A further generic Lean reduction now removes the
+`X*PsiSq_n` multiple from Mathlib's exact `Phi_n` definition and proves that
+three certificates suffice: `prePsi_(n+1)`, `prePsi_(n-1)`, and the parity
+factor must each be coprime to `PsiSq_n`.  An integer mutation shows that one
+certificate cannot simply be omitted.  The unresolved generic theorem is now
+this adjacent-EDS/parity coprimality package rather than an opaque rational-
+function cancellation claim.  Lean also closes the next root-semantic layer:
+polynomials over an algebraically closed field with no common root are
+coprime, and a group element killed by `[n]` and `[n+1]` is zero.  Hence a
+common-root-to-nonzero-adjacent-torsion certificate would discharge each
+adjacent polynomial obligation.  The exact missing bridge is now to construct
+that nonzero elliptic point from Mathlib's division-polynomial roots; a zero-
+point control proves the nonzero clause is necessary. [pcc:unverified]
+The source-linked [universal resultant bridge](UNIVERSAL_RESULTANT_BRIDGE.md)
+now records that Schmidt's published multiplication-polynomial formula, once
+aligned with the pinned Mathlib `Phi,PsiSq` conventions, implies arbitrary-
+scalar coprimality and exact coordinate extension degree `n^2`.  Lean proves
+that implication with the formula kept as an explicit premise.  This removes
+the mathematical novelty claim from the fixed-scalar corridor; convention
+alignment, the H116 map semantics and the scalar predicate remain open.
+[pcc:unverified]
+At the coordinate layer Lean now defines `z=-x/y` and proves exactly that
+`(x,-y)` sends `z` to `-z`, that field maps commute with `z`, and that a
+coordinatewise `p`-power endomorphism sends `z` to `z^p`; the bridge from
+these coordinate identities to the actual formal group remains open.
+[pcc:unverified]
 
 The frozen [prefix-transfer boundary control](PREFIX_TRANSFER_EXPERIMENT.md)
 then tests that precision loss on 20 finite-field series cases. In every case a
@@ -180,8 +366,21 @@ substitution and the complete normalized x-ratio match in all five cells.
 Wrong target scaling and wrong local parameter first differ at coefficient
 four in every cell. Identity certificate `IDC1h692b3e04c6a4f0cd` and the
 inspected [PDF report](reports/run-20261118T0618Z/REPORT.pdf) bind the algebraic
-and experimental records. This discharges no part of the remaining local
-endomorphism parameter identity. [pcc:unverified]
+and experimental records. This does not discharge the actual local
+endomorphism parameter identification. [pcc:unverified]
+
+The preregistered
+[first omitted-Frobenius boundary experiment](FROBENIUS_BOUNDARY_EXPERIMENT.md)
+tests the coefficient immediately beyond the matched low jet. On the excluded
+p=31, r=37 fixture, the retained normalized `V-1` map and an independently
+constructed scalar `[-6]` map agree through coefficient 14, first differ at
+the predicted coefficient `(p-1)/2=15`, and have the predicted delta
+`2/(t-1)=10 mod 31`. Both map identities pass and all three controls reject.
+The first producer's wrong duplication sign is retained as a failed positive
+control; v2 changed only that sign under a new source freeze. The
+[inspected report](reports/run-20261118T0645Z/REPORT.pdf) includes the data and
+formal dependency chain. This is one small-curve boundary result, not a
+growing-family theorem or ECDLP speedup. [pcc:unverified]
 
 The preregistered
 [out-of-sample formal-scalar panel](FORMAL_SCALAR_OOS_EXPERIMENT.md) kept the
@@ -224,3 +423,258 @@ The independent verifier source is now bound in
 `INDEPENDENT_VERIFIER_GATE.md`. Its target-admission run has not started
 because the mandatory cryptanalysis checkpoint upload credential is absent;
 this blocks the producer run rather than weakening the gate. [pcc:unverified]
+
+The excluded-fixture
+[invariant-moment predicate experiment](INVARIANT_MOMENT_PREDICATE_EXPERIMENT.md)
+then tested one bounded public-digit candidate without touching the frozen OOS
+cohort. Across 576 model-target records, jet/direct/repeat identities and all
+native/isomorphic-model invariants agree. None of the 11,520 preregistered
+single-channel predicates is exact on either curve or the combined six rows;
+the best target score is 65/288, below the fixed shuffled-label control's
+69/288. This rejects that exact six-bin decoder, not every relational or
+multi-channel observable, and supplies no ECDLP or runtime theorem.
+[pcc:unverified]
+
+The separately frozen
+[quotient-digit experiment](QUOTIENT_DIGIT_EXPERIMENT.md) tests a recursive
+public reduction: for each base-six digit candidate it evaluates moments on
+`[6^-1](Q-[d]P)` and selects a unique channel extremum. None of the 32 fixed
+argmin/argmax rules is exact on either curve. The best target score is 57/258
+versus 47/258 for one shuffled-label control, but unequal tie coverage,
+best-of-32 selection and a single shuffle leave that gap uncalibrated. A
+prospective max-statistic permutation control is the next evidence gate; no
+digit oracle or ECDLP claim follows. [pcc:unverified]
+
+That prospective
+[max-statistic calibration](QUOTIENT_DIGIT_CALIBRATION_EXPERIMENT.md) includes
+all 32 unequal-coverage rules in each of 4,096 row-preserving label
+permutations. The selected `IX1-argmin` statistic has standardized root
+4.320948; six null maxima meet or exceed it, for plus-one empirical
+`p=0.00170857`. This admits one unchanged out-of-sample association test. The
+rule remains highly inexact (57/204 covered targets, with 54 abstentions), so
+the calibration is not a digit oracle or an ECDLP result. [pcc:unverified]
+
+The unchanged
+[five-curve OOS test](QUOTIENT_DIGIT_OOS_EXPERIMENT.md) then generated 9,120
+coordinate-model records and scored 4,485 nontrivial quotient targets. All
+repeat and invariant gates pass. `IX1-argmin` covers 4,328 targets and is
+correct on 845 (19.52% versus 16.67%); no one of 4,096 row-preserving null
+replicates reaches its standardized excess, for plus-one p=0.000244. The
+association is heterogeneous—p=431 is below baseline—and the rule remains far
+from exact. This is a replicated ordering bias, not an iterable digit oracle
+or a subexponential ECDLP algorithm. [pcc:unverified]
+
+The audited [selected-channel derivation](QUOTIENT_DIGIT_CHANNEL_PROOF.md)
+then proves the rule's exact closed form: the shared higher jet cancels and
+`X1=u^2-u0^2`, so `IX1` is a public constant times
+`(x^2-x0^2)^6`. Lean also proves the base-six quotient group identity and
+strict scalar decrease. The 215-theorem audit has zero failures and zero
+trusted/native decisions. This explains how an exact rule would recurse, but
+also shows that the measured association is a cheap x-coordinate ordering
+heuristic rather than a hidden high-moment decoder. [pcc:unverified]
+
+The frozen [rank and search-cost experiment](QUOTIENT_DIGIT_RANK_EXPERIMENT.md)
+then measures the true digit's full position rather than only argmin success.
+The rank histogram is `870,727,738,763,729,658`; its mean reciprocal rank
+beats every one of 4,096 row-preserving shuffles. Recursive complete-path
+survival, however, is only 355/4,485 at width one and still only 3,437/4,485
+at width five. Every curve requires width six somewhere, and width six has
+search exponent `log_6(6)=1`. The signal is therefore useful only as a finite
+search ordering here. The next candidate changes the radix and measures
+whether correct ranks compress with growing arity; no exact or subexponential
+ECDLP follows. [pcc:unverified]
+
+That frozen [growing-radix test](QUOTIENT_MULTIRADIX_EXPERIMENT.md) measures
+radices 2 through 64. Pooled mean rank grows as `B^0.8351`, below every one of
+4,096 shuffled slopes, but exact path width is all of `B` through radix 48 and
+61/64 at radix 64. The apparent compression is dominated by `B` approaching
+the smaller subgroup orders: per-curve slope rises from 0.332 at order 127 to
+0.910 at order 547, whose radix-64 rank is nearly uniform. Radices at least 24
+also have only one recursion level. A larger fixed-ratio panel is required;
+this finite association is not a complete subexponential decoder.
+[pcc:unverified]
+
+The required [fixed-ratio large panel](QUOTIENT_LARGE_PANEL_EXPERIMENT.md)
+then moves to independently selected prime subgroup orders 5,081, 9,851 and
+19,927 while capping the radix at 16. It generates 69,712 model records with
+zero repeat or invariant mismatch and retains three recursion levels at radix
+16. The prior signal disappears: every radix needs its full width, mean ranks
+are null-like or slightly worse than shuffled labels, and all 4,096 shuffled
+pooled and per-curve slopes are more favorable. This closes the frozen `IX1`
+ordering mechanism, while leaving different observables and covers open.
+[pcc:unverified]
+
+The next frozen [quadratic-Kummer parity test](KUMMER_PARITY_EXPERIMENT.md)
+uses split/inert Frobenius bits from 184 covers
+`z^2=product(x-x([j]P))`. Every rule is exactly balanced: the retained
+single-anchor rule scores 755/1,510, exactly half on each of five curves, with
+family-wise p=1 and no exact-on-covered rule. The accompanying
+[Lean obstruction](KUMMER_PARITY_PROOF.md) proves the reason for every x-only
+observable: `kP` and `(r-k)P=-kP` have equal negation-invariant observations
+but opposite parity when `r` is odd. The 219-theorem audit has zero failures
+and zero trusted/native decisions. A new parity route must use signed y-data or
+another nonsymmetric cover. [pcc:unverified]
+
+The frozen [signed-y follow-up](SIGNED_KUMMER_PARITY_EXPERIMENT.md) then tests
+184 nonsymmetric covers `z^2=product(y-y([j]P))`. Its selected two-anchor rule
+scores 792/1,498 with no exact rule, but 3,726/4,096 shuffled family maxima are
+at least as large (p=0.90969). Thus escaping the x-only obstruction is
+necessary but not sufficient. A more structured nonsymmetric lead must change
+the divisor, not merely the coordinate sign. [pcc:unverified]
+
+The frozen [Miller-divisor follow-up](MILLER_KUMMER_PARITY_EXPERIMENT.md)
+tests 184 products of quadratic characters of tangent-line/vertical-line
+doubling quotients.  Its selected three-anchor rule scores 788/1,480 with no
+exact rule, while 2,828/4,096 shuffled family maxima are at least as large
+(`p=0.690505`).  The group-law divisor structure therefore does not rescue
+this bounded parity family.  The next lead changes from anchor translates to
+fixed small division-polynomial characters evaluated at the target.
+[pcc:unverified]
+
+The frozen [division-polynomial character test](DIVPOLY_CHARACTER_PARITY_EXPERIMENT.md)
+then checks 184 products from `Legendre(psi_m(Q))`, `m=2..9`.  All 12,160
+multiplication-coordinate identities pass.  The selected `psi_4 psi_9` rule
+scores 812/1,520, but 2,284/4,096 shuffled family maxima are at least as large
+(`p=0.557725`), and no rule is exact.  The next lead leaves quadratic
+characters for a selected `[2]`-division torsor Frobenius cocycle with an
+explicit cohomological constancy control. [pcc:unverified]
+
+The frozen [division-torsor test](DIVISION_TORSOR_FROBENIUS_EXPERIMENT.md)
+passes 7,600 algebraic checks and its planted scorer, but every degree-three
+splitting-field selector chooses the rational half.  Its cocycle is zero, the
+retained constant map scores exactly 760/1,520, and family-wise `p=1`.  The
+[Lean proof](DIVISION_TORSOR_FROBENIUS_PROOF.md) proves that fixed translation
+leaves the full cocycle multiset unchanged and that selecting the fixed point
+forces zero; the 224-theorem audit has no failures or trusted decisions.  The
+next lead tests the first p-adic carry of a canonical lift, with anomalous
+Smart quotient as a positive control. [pcc:unverified]
+
+The p-adic carry route is already represented by the repository's
+non-anomalous formal-log experiment, so the next distinct frozen
+[genus-three trace test](GENUS3_TRACE_PARITY_EXPERIMENT.md) instead evaluates
+fixed-genus Frobenius-trace bits, which are theoretically polynomial-time
+computable by the Schoof--Pila framework.  All algebraic and planted controls
+pass, but the retained rule is exactly 760/1,520 and family-wise `p=1`.
+Moreover, `Q -> -Q` multiplies the defining character sum only by
+`chi(-1)=+/-1`, so every trace parity is negation-invariant.  The Lean
+obstruction composes this fact with the opposite parity of `k` and `r-k` in
+an odd-order subgroup.  It rules out every deterministic decoder from this
+entire mod-two trace family, not only the 512 measured affine rules.  The next
+lead changes to an odd trace modulus, where the twist sign remains visible.
+[pcc:unverified]
+
+The frozen [chiral genus-three trace-digit test](CHIRAL_GENUS3_TRACE_DIGIT_EXPERIMENT.md)
+then replaces `y-y(T)` by the ordered covers
+`(x+c*y)-(x(T)+c*y(T))`, `c=+/-1`.  Negation swaps the two traces instead of
+making them equal: all 3,040 exact swap controls pass, and 1,296/1,520 targets
+have a residue tuple distinct from its negation.  Nevertheless, the best of
+all 243 affine `F_3` digit maps scores only 554/1,505, no rule is exact, and
+family-wise `p=0.431047`.  The geometry escapes the old obstruction but its
+first Frobenius trace does not decode the digit.  The next lead tests the
+second Frobenius power sum and second zeta coefficient of the same fixed-genus
+cover. [pcc:unverified]
+
+The frozen [second-zeta follow-up](CHIRAL_GENUS3_ZETA2_DIGIT_EXPERIMENT.md)
+then constructs every `F_(p^2)` exactly, checks all extension curve and
+Frobenius-fixed censuses, and derives both the second Frobenius power sum and
+the second zeta coefficient.  The new residues distinguish up to 1,356/1,520
+targets from their negations, but the best of the 486 preregistered rules is
+only 562/1,505 with no exact rule and family-wise `p=0.226263`.  The next lead
+uses the isogeny decomposition `Jac(C) ~ E x Prym(C/E)` to remove the public
+elliptic factor before scoring the Prym middle coefficient and its real-Weil
+discriminant. [pcc:unverified]
+
+The frozen [Prym-factor experiment](CHIRAL_GENUS3_PRYM_DIGIT_EXPERIMENT.md)
+removes the known elliptic factor and tests the abelian surface's middle Weil
+coefficient and real-Weil discriminant.  All 3,148 factor and Prym bounds pass.
+The selected discriminant rule scores 570/1,508, with no exact rule and
+family-wise `p=0.0622407`.  This is not a decoder, but it is the strongest
+calibrated association in the chiral sequence; the next gate therefore keeps
+the exact `[0,2,0,2]`, offset-two rule unchanged on fresh ordinary
+prime-order curves. [pcc:unverified]
+
+The unchanged [Prym-discriminant OOS test](CHIRAL_GENUS3_PRYM_OOS_EXPERIMENT.md)
+then scores only that rule on 1,840 targets from three fresh ordinary
+prime-order curves.  Every exact oracle control passes, but the rule scores
+598/1,836, has ternary excess `-42`, fixed-rule `p=1`, and is not exact.  This
+closes the selected raw-residue rule.  The next lead changes to Frobenius
+splitting-type bits of the Prym real-Weil polynomial modulo auxiliary primes.
+[pcc:unverified]
+
+The frozen [Prym splitting-bit test](PRYM_FROBENIUS_SPLITTING_PARITY_EXPERIMENT.md)
+then checks the real-Weil polynomial over `F_5` and `F_7`.  All 6,296 direct
+root controls pass and 1,486/1,520 targets are distinguished from their
+negations, but the selected rule is only 385/688, no rule is exact, and
+family-wise `p=0.342690`.  The next lead tests linear factors of the full
+degree-four Prym Weil polynomial, probing rational auxiliary-torsion
+Frobenius eigenlines rather than only the real quadratic discriminant.
+[pcc:unverified]
+
+The subsequent [full-Weil eigenline test](PRYM_FROBENIUS_EIGENLINE_PARITY_EXPERIMENT.md)
+passes 6,296 direct root checks and 31,480 full/real Weil quotient identities.
+Its selected rule has near-total coverage but scores only 809/1,511, no rule
+is exact, and family-wise `p=0.778130`.  Thus the splitting null is not merely
+an artifact of repeated-root abstention.  The next lead retains complete
+quartic factor-degree partitions modulo the auxiliary primes and tests whether
+their categorical tuple transports scalar parity across curves.
+[pcc:unverified]
+
+The [complete factor-type transport test](PRYM_FROBENIUS_FACTOR_TYPE_TRANSPORT_EXPERIMENT.md)
+then retains all irreducible-degree partitions modulo 5 and 7.  It passes
+6,296 reconstruction, 15,240 irreducibility, and 37,776 evaluation controls,
+but produces 1,492 keys for 1,520 targets; 14 repeated keys contain both
+parities.  Leave-one-curve-out exact-key transport is 16/32 with `p=1`.
+The next lead leaves characteristic-polynomial summaries and measures the
+signed splitting of the residual ramification quadratic on each chiral line
+through the target.
+[pcc:unverified]
+
+The [target-tethered ramification test](CHIRAL_BRANCH_RESIDUAL_PARITY_EXPERIMENT.md)
+then removes the known target intersection from each chiral line cubic and
+measures splitting of the residual quadratic.  All 12,160 reconstruction and
+root-count controls, 24,320 discriminant controls, and 5,568 rational chord
+sums pass, but the selected rule is only 796/1,502 with `p=0.994142` and no
+exact rule.  Three new Lean identities raise the audited proof surface to 236
+theorems.  The next lead tests characters of pairwise resultants between these
+residual quadratics, retaining mutual branch-divisor geometry.
+[pcc:unverified]
+
+The [pairwise branch-resultant test](CHIRAL_BRANCH_RESULTANT_PARITY_EXPERIMENT.md)
+then retains norms of cross-differences between residual branch pairs.  All
+42,560 Sylvester and common-root controls pass, and the tuple distinguishes
+every target from its negation, but the best frozen rule is only 799/1,482
+with `p=0.550891` and no exact rule.  Three Lean resultant identities raise
+the audited surface to 239 theorems.  The next lead forms auxiliary genus-one
+quartics from selected branch pairs and tests their Frobenius traces modulo
+three, retaining cross-ratio geometry beyond norm characters.
+[pcc:unverified]
+
+The [branch-pair genus-one trace test](CHIRAL_BRANCH_PAIR_TRACE_DIGIT_EXPERIMENT.md)
+then promotes selected quartic products to elliptic curves and measures four
+Frobenius traces modulo three.  All 5,992 point counts and 2,401,920 quartic
+evaluations pass their controls; the selected rule is 536/1,444 with positive
+excess but family-wise `p=0.253600`, and no rule is exact.  Two Lean identities
+raise the audit to 241 theorems.  The next lead tests quadratic characters of
+the classical binary-quartic invariants `I,J`, retaining isomorphism/`j`
+geometry beyond the trace.
+[pcc:unverified]
+
+The [binary-quartic invariant test](CHIRAL_BINARY_QUARTIC_INVARIANT_PARITY_EXPERIMENT.md)
+then measures the ordered quadratic characters of `I,J` for those four
+target-tethered quartics.  All 5,992 independent invariant/discriminant
+identities pass and the tuple distinguishes 1,426/1,520 target signs, but the
+selected rule is only 764/1,431 with family-wise `p=0.929216` and no rule is
+exact.  One Lean identity raises the audit to 242 theorems.  The next lead
+retains the marked quartic factorization and tests its induced rational
+two-isogeny Kummer/covering class.
+[pcc:unverified]
+
+The [marked two-isogeny halving test](CHIRAL_MARKED_TWO_ISOGENY_HALVING_PARITY_EXPERIMENT.md)
+then asks whether the marked source and dual kernel points have rational
+halves.  All 5,992 resolvent/coefficient controls, 11,984 halving-formula and
+group-order controls, and 4,818,424 exhaustive point doublings pass; the
+tuple distinguishes 1,376/1,520 target signs, but the selected rule is only
+762/1,444 with family-wise `p=0.997803` and no rule is exact.  One Lean
+identity raises the audit to 243 theorems.  The next lead retains the complete
+Frobenius cycle type on each four-point halving fiber.
+[pcc:unverified]
