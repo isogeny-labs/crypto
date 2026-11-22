@@ -422,12 +422,21 @@ fn main() {
     let m4 = args.iter().any(|x| x=="--m4");
     let m4_s3 = args.iter().any(|x| x=="--m4-s3");
     let circuit = args.iter().any(|x| x=="--circuit");
+    let sweep = args.iter().any(|x| x=="--sweep");
     let budget = Duration::from_secs(15);
-    // B=3/4 are bounded development cells, not exponent-scaling evidence.
-    for size in [3usize, 4] {
+    // Sweep is a fixed-prime, fixed-planted-target *component scaling* diagnostic.
+    // It is not an asymptotic exponent or unknown-index relation-yield experiment.
+    // The extra-variable quadratic circuit and 4-coordinate membership controls
+    // remain restricted to the original small cells to contain F4 blowup.
+    let sizes: &[usize] = if sweep {
+        &[3, 4, 6, 8, 12, 16, 24, 32]
+    } else {
+        &[3, 4]
+    };
+    for &size in sizes {
         let base = prime31_base(f, size);
-        run_m2(f, &base, budget, circuit);
-        if m4 { run_m4_membership(f, &base, budget); }
+        run_m2(f, &base, budget, circuit && size <= 4);
+        if m4 && size <= 4 { run_m4_membership(f, &base, budget); }
     }
     if m4_s3 { run_m4_s3_relation(f,budget); }
     println!("No complete relation rank, cold discrete-log recovery or asymptotic advantage asserted.");
