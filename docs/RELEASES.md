@@ -12,9 +12,7 @@ asset's source commit and successful Actions run.
 
 | Artifact | Contents / build | Runner |
 | --- | --- | --- |
-| `crypto-<tag>-x86_64-unknown-linux-gnu.tar.gz` | `crypto`, `ic`, `ecbench`, `curve_cover_check`, `curve_standards`, `hyperelliptic-cover`, `ecdlp-audit`; selected `cargo build --locked --release --bin …` targets | ubuntu |
-| `crypto-<tag>-aarch64-apple-darwin.tar.gz` | same seven executables | macos |
-| `crypto-<tag>-x86_64-pc-windows-msvc.zip` | same seven executables, with `.exe` suffixes | windows |
+| `crypto-<tag>-x86_64-unknown-linux-gnu.tar.gz` | Ten executables: `crypto`, `ic`, `ecbench`, `curve_cover_check`, `curve_standards`, `hyperelliptic-cover`, `curve-transfer-sweep`, `odd-transfer-catalog`, `ecdlp-audit`, and `factor-base-sweep`; selected `cargo build --locked --release --bin …` targets | ubuntu |
 | `isogeny-<tag>-x86_64-unknown-linux-gnu.tar.gz` | dedicated `isogeny` executable, README, and build receipt | ubuntu |
 | `isogeny-<tag>-x86_64-unknown-linux-musl.tar.gz` | same dedicated executable and records, statically linked | ubuntu |
 | `isogeny-<tag>-aarch64-apple-darwin.tar.gz` | same dedicated executable and records | macos |
@@ -23,10 +21,11 @@ asset's source commit and successful Actions run.
 | `ecc2k130-cuda-<tag>-x86_64-linux.tar.gz` | `make -C ecc2k130 gpu` | ubuntu + nvcc |
 
 A release produced from this workflow revision also carries `SHA256SUMS`;
-verify with `sha256sum -c SHA256SUMS`. Its three Rust archives contain a staged
+verify with `sha256sum -c SHA256SUMS`. The Rust archive contains a staged
 `docs/curves` catalog snapshot,
-the standalone hyperelliptic command manual and schemas, the catalog-wide
-transfer-assessment ledger, the fixed-F8 order certificate and its
+the standalone cover command manuals and schemas, the binary and odd
+named-subgroup transfer corpora, the catalog-wide transfer-assessment ledger,
+the fixed-F8 order certificate and its
 implementation-separated native replay command, and non-authoritative
 `docs/ecdlp-audit` example records. The main Rust bundle does not currently
 have a musl artifact; the dedicated
@@ -39,11 +38,13 @@ your platform from its release page (the
 [latest release](https://github.com/aburan28/crypto/releases/latest) may still
 refer to an earlier commit), verify it against `SHA256SUMS`, and unpack it.
 The cover tools are ordinary
-executables; neither command requires `cargo run` or a Rust toolchain:
+executables; these commands require neither `cargo run` nor a Rust toolchain:
 
 ```sh
 ./hyperelliptic-cover --help
 ./curve_cover_check --help
+./curve-transfer-sweep --help
+./odd-transfer-catalog --help
 ```
 
 The archive carries the release's `docs/curves` registry, cover report, linkage
@@ -51,17 +52,44 @@ graph, standards registry, hyperelliptic command contract, evidence schemas,
 and transfer-assessment ledger. Catalog commands still take paths:
 `curve_cover_check` accepts `--registry PATH` and `--output PATH`, and
 `hyperelliptic-cover catalog-export` requires `--registry PATH` (with an
-optional `--output PATH`). Run from the extracted archive root to use relative
+optional `--output PATH`). `curve-transfer-sweep capabilities` inventories the
+two integrated request families separately from routed diagnostic and search
+shapes. `odd-transfer-catalog` exports or exactly replays the bundled
+odd-characteristic named-subgroup corpus; a valid replay currently exits `1`
+with `verified_named_subgroup_incomplete` because unsupported and failed rows
+are deliberately retained. Run from the extracted archive root to use relative
 `docs/curves/...` paths, or pass explicit paths. The other
 `hyperelliptic-cover` subcommands accept an explicit supported model shape and
 perform no registry lookup. See
 `docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md` for the exact request contract,
 infinity-model boundary, and structured unsupported cases.
 
+The tracked odd corpus is exactly 17,879,292 bytes with SHA-256
+`1ecfabcdaecc3e00d78ab2ce7eebeb94607e1c2c224f261fb5718a4f53b65268`.
+It records clean producer commit
+`8c94831426fa35040fa7b38b1379299bf6e6d957`, framed source digest
+`a5412b92e5e027b281d79c541cc34df130e16d9c71a7034f2065c6e181d8b3ef`,
+29 source files, 22,243 maps, and 940 named bindings. Its final partition is
+675 supported, 240 proof-range unsupported, 0 kernel-intersection unsupported,
+15 Edwards normalized
+backend unsupported, 9 extension backend unsupported, 1 invalid generator, 0
+other invalid, and 0 transfer-arithmetic failures. Canonical
+same-implementation replay exits `1`, while repository source replay exits
+`0`; neither result is an independent arithmetic check, a solver, or an
+advantage claim. The recorded compiler label remains caller-supplied and the
+Lean theorem remains local, unsigned, and conditional. [pcc:unverified]
+
+Seven Montgomery bindings now have a composed backend but remain proof-gated
+because accepted field/order evidence is missing; they are not live-supported.
+The earlier 17,879,352-byte `7c60fc…` corpus from producer `e0ae0fe5…`, with
+partition 675/233/22/9/1, remains immutable historical evidence.
+
 Before compression, the release job enters the staged archive tree, requires
 byte-identical native regeneration of the saved cover catalog and link graph,
 and runs one construction, verification, binary-Jacobian identity operation,
 and full catalog export against the staged registry on every native target.
+It also checks the sweeper capability boundary and requires an exact,
+hash-and-size-pinned replay of the deliberately incomplete odd transfer corpus.
 It also replays the fixed-F8 order certificate with the implementation-separated
 native verifier embedded in `ecdlp-audit`. The cover CI runs that verifier's
 full 45-test suite, including the fixed-F8 verifier's 12 replay-and-fail-closed
