@@ -1,0 +1,32 @@
+name: Rootfind round109 native Rust quartic A/B
+on:
+  push:
+    branches:
+      - automation/rootfind-column-accumulator-round89-20261121
+    paths:
+      - src/cryptanalysis/prime_root_trace.rs
+      - research/amm_digit_perf_20261118/round109_ab.py
+      - .github/workflows/rootfind-round109-ab.yml
+  workflow_dispatch:
+jobs:
+  round109-source-exact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare frozen Round108 with Round109
+        env:
+          ROOTFIND_AB_TRIALS: "13"
+          ROOTFIND_BASELINE_REF: ad28594bf268b163d740ee2c8d3d61740e20e17e
+        run: python3 research/amm_digit_perf_20261118/round109_ab.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rootfind-round109-source-exact-results
+          path: research/amm_digit_perf_20261118/round109_full_results.csv
+          if-no-files-found: warn
