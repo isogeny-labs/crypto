@@ -1,0 +1,256 @@
+name: Exact norm-branch runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_revision:
+        description: Exact full main-branch commit SHA to test
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: norm-branch-exact-runner
+  cancel-in-progress: false
+
+jobs:
+  exact-census:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      SOURCE_REVISION: ${{ inputs.source_revision }}
+      STUDY: research/prime_leads_chase_20261113/norm-branch-census
+      RUNNER_PROTOCOL: research/prime_leads_chase_20261113/norm-branch-census/runner
+    steps:
+      - name: Validate trusted main source selection
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_REF" == refs/heads/main ]]
+          [[ "$SOURCE_REVISION" =~ ^[a-f0-9]{40}$ ]]
+          [[ "$SOURCE_REVISION" == "$GITHUB_SHA" ]]
+          [[ "$GITHUB_RUN_ATTEMPT" =~ ^[12]$ ]]
+
+      - name: Check out the exact tested source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ env.SOURCE_REVISION }}
+          fetch-depth: 1
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.gitignore
+            /scripts/checkpoint.sh
+            /scripts/checkpoint_presign.py
+            /research/prime_leads_chase_20261113/norm-branch-census/
+            /research/prime_leads_chase_20261113/NORM_BRANCH_COUNTEREXAMPLE.md
+            /research/prime_leads_chase_20261113/CONTINUATION_PROTOCOL.md
+            /research/prime_norm_rank_20261112/DERIVATION.md
+            /.github/workflows/norm-branch-exact-runner.yml
+            /.github/workflows/isolab-experiment.yml
+
+      - name: Verify source closure and frozen protocols
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$(git rev-parse HEAD)" == "$SOURCE_REVISION" ]]
+          git update-ref refs/remotes/origin/checkpoint-source "$SOURCE_REVISION"
+          (cd "$STUDY" && sha256sum -c PROTOCOL.sha256)
+          (cd "$RUNNER_PROTOCOL" && sha256sum -c PROTOCOL.sha256)
+          sha256sum -c "$RUNNER_PROTOCOL/SOURCE_CLOSURE.sha256"
+
+      - name: Test wrapper transport and create-new controls
+        shell: bash
+        run: "$RUNNER_PROTOCOL/test-run.sh"
+
+      - name: Install pinned native toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends musl-tools
+          rustup toolchain install 1.99.1 --profile minimal \
+            --component rustfmt --target x86_64-unknown-linux-musl
+
+      - name: Test and build without AWS credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          export CARGO_BUILD_JOBS=2
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/norm-branch-target"
+          export RUSTFLAGS='-C target-cpu=x86-64'
+          env -u AWS_ACCESS_KEY_ID -u AWS_SECRET_ACCESS_KEY \
+            -u AWS_SESSION_TOKEN -u AWS_REGION -u AWS_DEFAULT_REGION \
+            cargo +1.99.1 fmt --manifest-path "$STUDY/Cargo.toml" -- --check
+          env -u AWS_ACCESS_KEY_ID -u AWS_SECRET_ACCESS_KEY \
+            -u AWS_SESSION_TOKEN -u AWS_REGION -u AWS_DEFAULT_REGION \
+            cargo +1.99.1 test --locked --release \
+              --manifest-path "$STUDY/Cargo.toml" \
+              --target x86_64-unknown-linux-musl
+          env -u AWS_ACCESS_KEY_ID -u AWS_SECRET_ACCESS_KEY \
+            -u AWS_SESSION_TOKEN -u AWS_REGION -u AWS_DEFAULT_REGION \
+            cargo +1.99.1 build --locked --release \
+              --manifest-path "$STUDY/Cargo.toml" \
+              --target x86_64-unknown-linux-musl --bins
+          install -d -m755 "$RUNNER_TEMP/norm-branch-bin"
+          install -m755 \
+            "$CARGO_TARGET_DIR/x86_64-unknown-linux-musl/release/produce" \
+            "$RUNNER_TEMP/norm-branch-bin/produce"
+          install -m755 \
+            "$CARGO_TARGET_DIR/x86_64-unknown-linux-musl/release/check" \
+            "$RUNNER_TEMP/norm-branch-bin/check"
+          for binary in produce check; do
+            readelf -h "$RUNNER_TEMP/norm-branch-bin/$binary" \
+              | grep -q 'Advanced Micro Devices X86-64'
+            ! readelf -l "$RUNNER_TEMP/norm-branch-bin/$binary" | grep -q INTERP
+          done
+
+      - name: Record exact build identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          parent_sha=$(sha256sum "$STUDY/protocol.json" | cut -d' ' -f1)
+          runner_sha=$(sha256sum "$RUNNER_PROTOCOL/protocol.json" | cut -d' ' -f1)
+          closure_sha=$(sha256sum "$RUNNER_PROTOCOL/SOURCE_CLOSURE.sha256" | cut -d' ' -f1)
+          producer_sha=$(sha256sum "$RUNNER_TEMP/norm-branch-bin/produce" | cut -d' ' -f1)
+          checker_sha=$(sha256sum "$RUNNER_TEMP/norm-branch-bin/check" | cut -d' ' -f1)
+          jq -n \
+            --arg source "$SOURCE_REVISION" \
+            --arg workflow "$GITHUB_SHA" \
+            --arg parent "$parent_sha" \
+            --arg runner "$runner_sha" \
+            --arg closure "$closure_sha" \
+            --arg producer "$producer_sha" \
+            --arg checker "$checker_sha" \
+            '{schema:"norm.branch-census-build/v1",source_revision:$source,
+              workflow_revision:$workflow,toolchain:"rust-1.99.1",
+              target:"x86_64-unknown-linux-musl",
+              rustflags:"-C target-cpu=x86-64",cargo_build_jobs:2,
+              parent_protocol_sha256:$parent,runner_protocol_sha256:$runner,
+              source_closure_manifest_sha256:$closure,
+              producer_sha256:$producer,checker_sha256:$checker}' \
+            > "$RUNNER_TEMP/norm-branch-build-info.json"
+
+      - name: Obtain checkpoint-only AWS credentials
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
+        with:
+          role-to-assume: ${{ vars.ISOLAB_TRIGGER_ROLE_ARN }}
+          role-session-name: norm-branch-${{ github.run_id }}
+          role-duration-seconds: 3600
+          aws-region: ${{ vars.ISOLAB_AWS_REGION }}
+          mask-aws-account-id: true
+
+      - name: Checkpoint exact source before held-out execution
+        shell: bash
+        env:
+          CHECKPOINT_AWS_PROFILE: github-oidc-ambient
+          CHECKPOINT_AWS_REGION: ${{ vars.ISOLAB_AWS_REGION }}
+          CHECKPOINT_BUCKET: ${{ vars.ISOLAB_RESULTS_BUCKET }}
+          CHECKPOINT_PREFIX: checkpoints
+          CHECKPOINT_SESSION: github-actions-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          [[ "$(git rev-parse HEAD)" == "$SOURCE_REVISION" ]]
+          install -d -m755 .resume
+          install -m644 "$RUNNER_PROTOCOL/RESUME.md" .resume/RESUME.md
+          printf '\nWorkflow run: `%s/%s`; source: `%s`; URL: `%s/%s/actions/runs/%s`.\n' \
+            "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" "$SOURCE_REVISION" \
+            "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" \
+            >> .resume/RESUME.md
+          scripts/checkpoint.sh gate
+          install -m644 .resume/.last-push \
+            "$RUNNER_TEMP/norm-branch-checkpoint.txt"
+          grep -F "s3://$CHECKPOINT_BUCKET/$CHECKPOINT_PREFIX/" \
+            "$RUNNER_TEMP/norm-branch-checkpoint.txt"
+
+      - name: Run one exact non-timing census
+        id: census
+        shell: bash
+        run: |
+          set -euo pipefail
+          ulimit -c 0
+          ulimit -v 4194304
+          set +e
+          env -u AWS_ACCESS_KEY_ID -u AWS_SECRET_ACCESS_KEY \
+            -u AWS_SESSION_TOKEN -u AWS_REGION -u AWS_DEFAULT_REGION \
+            timeout --signal=TERM --kill-after=10s 1800s \
+              "$RUNNER_PROTOCOL/run.sh" \
+              "$RUNNER_TEMP/norm-branch-output" \
+              "$RUNNER_TEMP/norm-branch-bin/produce" \
+              "$RUNNER_TEMP/norm-branch-bin/check" \
+              "$SOURCE_REVISION" \
+              "$STUDY/protocol.json" \
+              "$STUDY/PROTOCOL.sha256" \
+              "$RUNNER_PROTOCOL/protocol.json" \
+              "$RUNNER_PROTOCOL/PROTOCOL.sha256" \
+              "$RUNNER_TEMP/norm-branch-build-info.json"
+          status=$?
+          set -e
+          printf '%s\n' "$status" > "$RUNNER_TEMP/norm-branch-workflow-exit.txt"
+          exit "$status"
+
+      - name: Verify retained exact payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          output="$RUNNER_TEMP/norm-branch-output"
+          (cd "$output" && sha256sum -c SHA256SUMS)
+          jq -e --arg source "$SOURCE_REVISION" \
+            '.schema=="norm.branch-census/v1"
+              and .source_revision==$source
+              and (.cells|length)==40' \
+            "$output/artifact.json" >/dev/null
+          jq -e \
+            '.schema=="norm.branch-census-check/v1"
+              and .pass==true and (.errors|length)==0' \
+            "$output/checker.json" >/dev/null
+          jq -e \
+            '.schema=="experiment.export/v1"
+              and .status=="verified_complete"
+              and .timing_endpoint==false' \
+            "$output/execution.json" >/dev/null
+          cmp "$output/checker.json" "$output/checker-replay.json"
+          cmp "$output/checker.stdout" "$output/checker-replay.stdout"
+          cmp "$output/checker.stderr" "$output/checker-replay.stderr"
+
+      - name: Retain checkpoint, build, and all runner outputs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: norm-branch-exact-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/norm-branch-checkpoint.txt
+            ${{ runner.temp }}/norm-branch-build-info.json
+            ${{ runner.temp }}/norm-branch-workflow-exit.txt
+            ${{ runner.temp }}/norm-branch-output
+            research/prime_leads_chase_20261113/norm-branch-census/protocol.json
+            research/prime_leads_chase_20261113/norm-branch-census/PROTOCOL.sha256
+            research/prime_leads_chase_20261113/norm-branch-census/runner
+          if-no-files-found: warn
+          retention-days: 90
+          compression-level: 0
+
+      - name: Report exact non-timing outcome
+        if: always()
+        shell: bash
+        run: |
+          output="$RUNNER_TEMP/norm-branch-output"
+          if [[ -f "$output/execution.json" && -f "$output/SHA256SUMS" \
+            && -f "$output/job-exit.json" ]] \
+            && jq -e '.status=="verified_complete"' "$output/execution.json" >/dev/null \
+            && jq -e '.exit_status==0' "$output/job-exit.json" >/dev/null; then
+            verdict=$(jq -er .verdict "$output/execution.json")
+            artifact_sha=$(jq -er .outputs.artifact_sha256 "$output/execution.json")
+            printf 'Exact norm-branch runner: **%s**.\n\nSource: `%s`\n\nArtifact SHA-256: `%s`\n\nThe exact payload and checker replay completed; timing is excluded. EKS v1 remains incomplete.\n' \
+              "$verdict" "$SOURCE_REVISION" "$artifact_sha" \
+              >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf 'Exact norm-branch runner: **INCOMPLETE_EXECUTION**. Inspect the retained checkpoint, workflow exit, and partial output. EKS v1 remains incomplete.\n' \
+              >> "$GITHUB_STEP_SUMMARY"
+          fi
