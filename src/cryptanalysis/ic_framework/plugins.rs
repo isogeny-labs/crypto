@@ -4266,6 +4266,13 @@ pub struct RootfindSubtractOracle<'i> {
     /// charges the build and supplies its work counters here.
     defer_table: bool,
     deferred_table_work: BTreeMap<String, u64>,
+    /// `sweep=1/N`: the abscissae a trial examines, `ceil(k/N)` of the `k`
+    /// (`0` = all, the default).  Window `t` starts at `t · window mod k`, so
+    /// successive trials rotate through the base and every abscissa is swept
+    /// equally often.
+    window: usize,
+    /// Trials examined so far in this run (the rotation's position).
+    trial: u64,
 }
 
 impl<'i> RootfindSubtractOracle<'i> {
@@ -4284,6 +4291,8 @@ impl<'i> RootfindSubtractOracle<'i> {
             sweep_field_adds: 0,
             defer_table: false,
             deferred_table_work: BTreeMap::new(),
+            window: 0,
+            trial: 0,
         }
     }
 
@@ -4320,10 +4329,17 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractOracle<'_> {
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
-        &[(
-            "m",
-            "summands, 2 or 3; 3 builds the negation-folded pair table",
-        )]
+        &[
+            (
+                "m",
+                "summands, 2 or 3; 3 builds the negation-folded pair table",
+            ),
+            (
+                "sweep",
+                "1 (default: every abscissa until the first hit) or 1/N: each trial examines a \
+                 rotating window of ceil(k/N) of the k abscissae, then the next target is taken",
+            ),
+        ]
     }
 
     fn prepare(
@@ -4340,13 +4356,23 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractOracle<'_> {
             ));
         }
         for key in params.0.keys() {
-            if key != "m" {
+            if key != "m" && key != "sweep" {
                 return Err(format!(
-                    "rootfind-subtract reads only `m`; `{key}` would change the method's identity \
-                     without changing the search"
+                    "rootfind-subtract reads only `m` and `sweep`; `{key}` would change the method's \
+                     identity without changing the search"
                 ));
             }
         }
+        // `sweep=1/N` (or `1`): the fraction of the base's abscissae a trial
+        // examines before the next target is taken.
+        let sweep_den: usize = match params.0.get("sweep").map(|s| s.as_str()) {
+            None | Some("1") => 1,
+            Some(s) => s
+                .strip_prefix("1/")
+                .and_then(|d| d.parse::<usize>().ok())
+                .filter(|&d| d >= 1)
+                .ok_or_else(|| format!("rootfind-subtract: sweep must be 1 or 1/N, got `{s}`"))?,
+        };
         let p = self.instance.curve.p;
         if p != ctx.group.p {
             return Err("rootfind-subtract was built for another curve".into());
@@ -4378,6 +4404,12 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractOracle<'_> {
         }
         self.diffs = vec![0; reps.len()];
         self.degenerate = vec![false; reps.len()];
+        self.window = if sweep_den <= 1 {
+            0
+        } else {
+            reps.len().div_ceil(sweep_den)
+        };
+        self.trial = 0;
         self.reps = reps;
         self.field = Some(f);
         if self.m == 3 && !self.defer_table {
@@ -4436,20 +4468,31 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractOracle<'_> {
         // row is taken on the ledger below, exactly as `subtract` takes
         // it, so the two oracles examine the same candidates in the same
         // order whatever the target.
+        // The abscissae this trial examines: all `k` in base order, or (with
+        // `sweep=1/N`) the next window of `n = ceil(k/N)` of them, rotating.
         let k = self.reps.len();
-        for (i, rep) in self.reps.iter().enumerate() {
-            let d = f.sub(xr, rep.x);
-            self.degenerate[i] = d == 0;
-            self.diffs[i] = if d == 0 { f.one } else { d };
+        let (n, offset) = if self.window == 0 || self.window >= k {
+            (k, 0)
+        } else {
+            let o = ((self.trial % k as u64) * self.window as u64 % k as u64) as usize;
+            self.trial += 1;
+            (self.window, o)
+        };
+        let at = |j: usize| if offset == 0 { j } else { (offset + j) % k };
+        for j in 0..n {
+            let d = f.sub(xr, self.reps[at(j)].x);
+            self.degenerate[j] = d == 0;
+            self.diffs[j] = if d == 0 { f.one } else { d };
         }
-        f.batch_inv(&mut self.diffs, &mut self.scratch);
+        f.batch_inv(&mut self.diffs[..n], &mut self.scratch);
         counters.inversions += 1;
         ops.field_ops.invs += 1;
-        ops.field_ops.muls += 3 * k as u64;
-        self.sweep_field_muls += 2 + 3 * k as u64;
-        self.sweep_field_adds += k as u64;
-        for i in 0..k {
-            let rep = self.reps[i];
+        ops.field_ops.muls += 3 * n as u64;
+        self.sweep_field_muls += 2 + 3 * n as u64;
+        self.sweep_field_adds += n as u64;
+        for j in 0..n {
+            let rep = self.reps[at(j)];
+            let i = j;
             if self.degenerate[i] {
                 for summand in [rep.plus, rep.minus] {
                     let t = g.add(ops, point, g.neg(fb.points[summand]));
