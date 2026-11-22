@@ -50,7 +50,9 @@ use crate::cryptanalysis::ecbench::record::{
     UNIT,
 };
 use crate::cryptanalysis::ecbench::signals;
-use crate::cryptanalysis::ecbench::spec::{plan, Execution, Plan, Spec};
+#[cfg(test)]
+use crate::cryptanalysis::ecbench::spec::plan;
+use crate::cryptanalysis::ecbench::spec::{Execution, Plan, Spec};
 use crate::cryptanalysis::ecbench::workload::{Workload, FLOOR_RULE_V2};
 
 pub const SESSION_SCHEMA: &str = "ecbench.session/v1";
@@ -543,6 +545,11 @@ pub struct SessionStop {
 pub struct PlanDoc {
     pub schema: String,
     pub spec_id: String,
+    #[serde(
+        default,
+        skip_serializing_if = "crate::cryptanalysis::ecbench::spec::CurvePolicy::is_legacy"
+    )]
+    pub curve_policy: crate::cryptanalysis::ecbench::spec::CurvePolicy,
     pub arms: Vec<crate::cryptanalysis::ecbench::spec::Arm>,
     pub workloads: Vec<Workload>,
     pub executions: Vec<Execution>,
@@ -979,7 +986,7 @@ pub fn run_session(
     if let Some(clock) = diagnostic_clock.as_mut() {
         clock.preparation.lock_acquired_ns = Some(clock.offset()?);
     }
-    let plan_: Plan = plan(spec)?;
+    let plan_: Plan = super::spec::plan_for_new_run(spec)?;
     for w in &plan_.warnings {
         progress(&format!("warning: {w}"));
     }
@@ -1135,6 +1142,7 @@ fn execute_session(
     let plan_doc = PlanDoc {
         schema: "ecbench.plan/v1".into(),
         spec_id: p.spec_id.clone(),
+        curve_policy: p.spec.curve_policy.clone(),
         arms: p.arms.clone(),
         workloads: p.workloads.clone(),
         executions: p.executions.clone(),

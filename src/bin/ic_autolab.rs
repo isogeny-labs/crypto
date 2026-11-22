@@ -1080,7 +1080,8 @@ fn train_spec(
         arms.push(json!({"name": c.name, "role": "candidate", "method": c.method()}));
     }
     json!({
-        "schema": "ecbench.spec/v1",
+        "schema": "ecbench.spec/v2",
+        "curve_policy": {"mode": "diagnostic", "off_panel_reason": "adaptive training uses Curve25519-family miniatures chosen by the autolab round"},
         "label": format!("ic_autolab round {round} train, {track} track, k = {}", size.k),
         "description": format!("{}/round-{round:03}/PROTOCOL.md (frozen before data), train screen. Public synthetic {scope} and targets; no security claim. In-sample selection; promotion_eligible=false.", home.display()),
         "workloads": {"curves": [size.curve], "targets_per_curve": targets, "target_seed": target_seed, "target_kind": "public"},
@@ -1108,7 +1109,8 @@ fn holdout_spec(
         "Curve25519-family miniature"
     };
     json!({
-        "schema": "ecbench.spec/v1",
+        "schema": "ecbench.spec/v2",
+        "curve_policy": {"mode": "diagnostic", "off_panel_reason": "fresh holdout uses the same Curve25519-family miniature as its training round"},
         "label": format!("ic_autolab round {round} holdout, {track} track, k = {}", size.k),
         "description": format!("{}/round-{round:03}/PROTOCOL.md (frozen before data), fresh holdout: sel = {} ({} + {}). Public synthetic {scope} and targets; no security claim.", home.display(), sel.name, sel.factor_base, sel.oracle),
         "workloads": {"curves": [size.curve], "targets_per_curve": targets, "target_seed": target_seed, "target_kind": "public"},

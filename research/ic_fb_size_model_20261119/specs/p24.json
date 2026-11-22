@@ -1,0 +1,116 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "factor-base size sweep, cost model test, curve p24",
+  "description": "research/ic_fb_size_model_20261119/PROTOCOL.md",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 16777199,
+        "a": 16777196,
+        "b": 31,
+        "group_order": 16782299,
+        "r": 16782299,
+        "gx": 2,
+        "gy": 5412647
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261031
+  },
+  "arms": [
+    {
+      "name": "rho",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "fb32",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "fb64",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=64",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "fb128",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=128",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "fb256",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=256",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "fb512",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=512",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "fb1024",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=1024",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-prime-blocked:m=2",
+          "targets": "walk"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 20261119,
+    "isolation_required": "L0",
+    "timeout_seconds": 1800
+  }
+}

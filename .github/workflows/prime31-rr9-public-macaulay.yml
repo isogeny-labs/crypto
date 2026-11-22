@@ -2,6 +2,7 @@ name: Prime31 public RR9 B8 Macaulay certificate (pinned Rust)
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs'
       - 'research/prime31_ic_20261115/rr9/RR9_PUBLIC_MACAULAY_PROTOCOL_20261117.md'
@@ -13,6 +14,7 @@ permissions:
 
 jobs:
   rr9-public-macaulay:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:

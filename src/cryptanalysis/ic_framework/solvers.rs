@@ -13,6 +13,7 @@
 //! | name | engine | native unit |
 //! |:--|:--|:--|
 //! | `f4-f2` | Faugère's F4: batched pairs, symbolic preprocessing, bit-packed elimination, field pairs; a full reduced basis | word XORs (elimination only) |
+//! | `f4-f2-full-width` | same F4 implementation and binary as `f4-f2`, with only the Faugère–Lachartre split disabled | word XORs (elimination only) |
 //! | `buchberger-f2` | boolean-ring Buchberger with the coprime and chain criteria and the field-equation pairs, one pair at a time | monomial operations |
 //! | `matrix-f4` | the Koblitz oracle's hybrid: Macaulay matrices to a fixed degree, then splitting | word XORs (elimination only) |
 //! | `matrix-f5` | the same hybrid, rows the Boolean F5 criterion predicts to vanish left out | word XORs (elimination only) |
@@ -100,9 +101,7 @@ use crate::cryptanalysis::m4gb_oracle::{
     run_m4gb, run_m4gb_persistent, select_binary, M4gbError, M4gbOptions, M4gbRun,
 };
 use crate::cryptanalysis::pq_f4_f2::{
-    groebner_basis_f4, groebner_basis_f4_skeleton, groebner_basis_f4_traced,
-    solutions_from_reduced_basis, F4PairTrace, F4Skeleton, SKELETON_DEFAULT_CAP_BYTES,
-    TRACE_DEFAULT_CAP_BYTES,
+    groebner_basis_f4, groebner_basis_f4_full_width, solutions_from_reduced_basis,
 };
 use crate::cryptanalysis::pq_groebner_f2::{
     bit, groebner_basis_f2_within, mask_from64, solve_system_f2_counted, F2BoolPoly, Mask,
@@ -261,46 +260,11 @@ impl SystemSolver for F4F2 {
     ) -> (SolverVerdict, SolverCost) {
         let started = Instant::now();
         let tally_before = bitop_tally::snapshot();
-        let use_skeleton = params.u64_or("skeleton", 0).unwrap_or(0) != 0;
-        let cap_bytes = params
-            .u64_or("skeleton_mb", SKELETON_DEFAULT_CAP_BYTES >> 20)
-            .unwrap_or(SKELETON_DEFAULT_CAP_BYTES >> 20)
-            .saturating_mul(1 << 20);
-        let use_trace = params.u64_or("trace", 0).unwrap_or(0) != 0;
-        let trace_cap = params
-            .u64_or("trace_mb", TRACE_DEFAULT_CAP_BYTES >> 20)
-            .unwrap_or(TRACE_DEFAULT_CAP_BYTES >> 20)
-            .saturating_mul(1 << 20);
-        // A solve that finds the skeleton (or the trace) in use by another
-        // thread runs the plain path: same basis, its own (plain) count.
-        let mut guard = if use_skeleton {
-            self.skeleton.try_lock().ok()
+        let (gb, st) = if params.get("_f4_full_width_control") == Some("1") {
+            groebner_basis_f4_full_width(system.equations.clone(), system.n_vars, budget)
         } else {
-            None
+            groebner_basis_f4(system.equations.clone(), system.n_vars, budget)
         };
-        let mut trace_guard = if use_trace && !use_skeleton {
-            self.trace.try_lock().ok()
-        } else {
-            None
-        };
-        let (gb, st) = match (guard.as_deref_mut(), trace_guard.as_deref_mut()) {
-            (None, Some(slot)) => {
-                let store = slot.get_or_insert_with(|| F4PairTrace::with_cap(trace_cap));
-                groebner_basis_f4_traced(system.equations.clone(), system.n_vars, budget, store)
-            }
-            (Some(slot), _) => {
-                let skeleton = slot.get_or_insert_with(|| F4Skeleton::with_cap(cap_bytes));
-                groebner_basis_f4_skeleton(
-                    system.equations.clone(),
-                    system.n_vars,
-                    budget,
-                    skeleton,
-                )
-            }
-            (None, None) => groebner_basis_f4(system.equations.clone(), system.n_vars, budget),
-        };
-        drop(guard);
-        drop(trace_guard);
         let mut tests = 0u64;
         let mut extra = BTreeMap::new();
         for (k, v) in [
@@ -459,6 +423,40 @@ impl SystemSolver for F4F2 {
 }
 
 // ── M4GB, an external process ──────────────────────────────────────
+
+/// Same-binary control for [`F4F2`] with only the Faugère–Lachartre
+/// reducer/free-column split disabled.
+pub struct F4F2FullWidth;
+
+impl SystemSolver for F4F2FullWidth {
+    fn name(&self) -> &str {
+        "f4-f2-full-width"
+    }
+
+    fn describe(&self) -> String {
+        "F4 over F_2[v]/(v²−v): exact same-binary control for f4-f2 with the Faugère–Lachartre split disabled and the full-width reducer cascade retained"
+            .into()
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        F4F2.accepts(shape)
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        let mut control = params.clone();
+        control
+            .0
+            .insert("_f4_full_width_control".into(), "1".into());
+        let (verdict, mut cost) = F4F2.solve(system, &control, budget);
+        cost.extra.insert("fl_forced_full_width".into(), 1);
+        (verdict, cost)
+    }
+}
 
 /// M4GB (Makarim–Stevens, ISSAC 2017) run as a separate process behind
 /// `M4GB_BINARY` ([`crate::cryptanalysis::m4gb_oracle`]).  It is priced by
@@ -2247,7 +2245,8 @@ impl SystemSolver for Exhaustive {
 /// Every solver the framework knows, by name.
 pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
     vec![
-        Box::new(F4F2::default()),
+        Box::new(F4F2),
+        Box::new(F4F2FullWidth),
         Box::new(BuchbergerF2),
         Box::new(M4gbF2),
         Box::new(M4gbF2Server),
@@ -2802,7 +2801,13 @@ mod tests {
         use rand::SeedableRng;
         let mut rng = rand::rngs::StdRng::seed_from_u64(20261016);
         let sys = random_quadratic(10, 9, &mut rng);
-        for name in ["f4-f2", "matrix-f4", "matrix-f5", "inherited-f4"] {
+        for name in [
+            "f4-f2",
+            "f4-f2-full-width",
+            "matrix-f4",
+            "matrix-f5",
+            "inherited-f4",
+        ] {
             let run = || {
                 let sys = sys.clone();
                 std::thread::spawn(move || {
