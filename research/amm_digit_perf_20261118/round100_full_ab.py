@@ -264,6 +264,9 @@ with tempfile.TemporaryDirectory(prefix="root100-full-") as tmp:
             subprocess.run(["cargo","test","--release","--quiet",
                             "round100_traced_multiplication", "--", "--nocapture"],cwd=folder,check=True)
         if label == "after":
+            # Run every non-ignored root module test, not only the focused cases.
+            subprocess.run(["cargo","test","--release","--quiet"],cwd=folder,check=True)
+        if label == "after":
             subprocess.run(["cargo","test","--release","--quiet",
                             "round99_quadratic_power_step_replay_matches_generic_polynomials",
                             "--","--nocapture"],cwd=folder,check=True)
