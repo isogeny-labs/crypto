@@ -1,0 +1,433 @@
+{
+  "schema": "prime31-run72-authentic-rhs-K2-K3-K4-multi-seed-v1",
+  "date_utc": "2026-11-22",
+  "status": "PASS 9/9 native Rust examples and 41/41 original library tests each of 3 CI jobs; generic negative control; PCC unverified",
+  "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/45077314037",
+  "source_commit": "783d2a928a548d48be9f2e0e6e7be9b0cf60141b",
+  "source_blobs": {
+    "research/prime31_ic_20261115/native/examples/prime31_run72_k2_rhs_width.rs": "a364819e6a95fbdc1196e9c8bf5fae7d98148041",
+    "research/prime31_ic_20261115/native/examples/prime31_run72_k3_rhs_width.rs": "7b203e43c41170fd3dc2db5e0d0ed882c5400b2e",
+    "research/prime31_ic_20261115/native/examples/prime31_run72_k4_rhs_width.rs": "a189220c8fe0aa790a2b283e7c9896a089861a03"
+  },
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "g": [
+      625037715,
+      2100627251
+    ],
+    "h": 1
+  },
+  "setup": {
+    "factor_base": "B677",
+    "free_rows": 88,
+    "generic_pair_keys": 916469,
+    "targets_per_cohort": 32,
+    "changed_dimension": "K signed three-summand certificates per public Q",
+    "widths": [
+      2,
+      3,
+      4
+    ],
+    "seeds": [
+      "0x68b677a1d1",
+      "0x9d3a6f5c127",
+      "0x2c6478eb19d"
+    ]
+  },
+  "controls": {
+    "group_verify": "all K-1 certificate differences per Q and every recovered [k]G=Q",
+    "reference_bsgs": "same process, but each width step is sequential on a shared runner",
+    "secrets": "candidate solver does not receive harness scalar",
+    "classification": "GENERIC_NEGATIVE_CONTROL"
+  },
+  "records": [
+    {
+      "width": 2,
+      "seed": "0x2c6478eb19d",
+      "job_id": 137377318378,
+      "initial": {
+        "free_rank": 88,
+        "augmented_rank": 120,
+        "difference_increment": 32,
+        "verified_difference_groups": 32
+      },
+      "complete": {
+        "diff_shifts": 4282074,
+        "baseline_shifts": 4282074,
+        "diff_hits": 1824,
+        "baseline_hits": 1824,
+        "diff_independent_pair_rows": 640,
+        "baseline_independent_pair_rows": 640,
+        "initial_free_rank": 88,
+        "initial_augmented_rank": 120,
+        "final_free_rank": 32,
+        "final_augmented_rank": 33,
+        "witnessed_leaf_probes": 445740,
+        "verified_difference_rows": 32,
+        "generic_keys": 916469,
+        "setup_ms": 303.754,
+        "witness_ms": 125.676,
+        "joint_relation_ms": 1370.874,
+        "joint_total_ms": 2035.15
+      },
+      "cold": {
+        "setup_ms": 303.754,
+        "witness_ms": 125.676,
+        "cold_relation_ms": 1370.357,
+        "cold_total_ms": 1801.604,
+        "verified": 32
+      },
+      "bsgs": {
+        "setup_ms": 14.379,
+        "_ms": 218.492
+      },
+      "pass": true
+    },
+    {
+      "width": 3,
+      "seed": "0x2c6478eb19d",
+      "job_id": 137377318378,
+      "initial": {
+        "free_rank": 88,
+        "augmented_rank": 152,
+        "difference_increment": 64,
+        "verified_difference_groups": 64
+      },
+      "complete": {
+        "diff_shifts": 2528933,
+        "baseline_shifts": 2528933,
+        "diff_hits": 1088,
+        "baseline_hits": 1088,
+        "diff_independent_pair_rows": 546,
+        "baseline_independent_pair_rows": 546,
+        "initial_free_rank": 88,
+        "initial_augmented_rank": 152,
+        "final_free_rank": 88,
+        "final_augmented_rank": 110,
+        "witnessed_leaf_probes": 693012,
+        "verified_difference_rows": 64,
+        "generic_keys": 916469,
+        "setup_ms": 345.204,
+        "witness_ms": 215.255,
+        "joint_relation_ms": 793.335,
+        "joint_total_ms": 1590.62
+      },
+      "cold": {
+        "setup_ms": 345.204,
+        "witness_ms": 215.255,
+        "cold_relation_ms": 792.577,
+        "cold_total_ms": 1355.061,
+        "verified": 32
+      },
+      "bsgs": {
+        "setup_ms": 14.663,
+        "_ms": 219.991
+      },
+      "pass": true
+    },
+    {
+      "width": 4,
+      "seed": "0x2c6478eb19d",
+      "job_id": 137377318378,
+      "initial": {
+        "free_rank": 88,
+        "augmented_rank": 184,
+        "difference_increment": 96,
+        "verified_difference_groups": 96
+      },
+      "complete": {
+        "diff_shifts": 1668210,
+        "baseline_shifts": 2528933,
+        "diff_hits": 736,
+        "baseline_hits": 1088,
+        "diff_independent_pair_rows": 454,
+        "baseline_independent_pair_rows": 546,
+        "initial_free_rank": 88,
+        "initial_augmented_rank": 184,
+        "final_free_rank": 88,
+        "final_augmented_rank": 177,
+        "witnessed_leaf_probes": 911657,
+        "verified_difference_rows": 96,
+        "generic_keys": 916469,
+        "setup_ms": 310.826,
+        "witness_ms": 262.766,
+        "joint_relation_ms": 939.6,
+        "joint_total_ms": 1759.561
+      },
+      "cold": {
+        "setup_ms": 310.826,
+        "witness_ms": 262.766,
+        "cold_relation_ms": 647.405,
+        "cold_total_ms": 1223.973,
+        "verified": 32
+      },
+      "bsgs": {
+        "setup_ms": 14.363,
+        "_ms": 228.874
+      },
+      "pass": true
+    },
+    {
+      "width": 2,
+      "seed": "0x68b677a1d1",
+      "job_id": 137377318768,
+      "initial": {
+        "free_rank": 88,
+        "augmented_rank": 120,
+        "difference_increment": 32,
+        "verified_difference_groups": 32
+      },
+      "complete": {
+        "diff_shifts": 3480715,
+        "baseline_shifts": 3480715,
+        "diff_hits": 1472,
+        "baseline_hits": 1472,
+        "diff_independent_pair_rows": 603,
+        "baseline_independent_pair_rows": 603,
+        "initial_free_rank": 88,
+        "initial_augmented_rank": 120,
+        "final_free_rank": 58,
+        "final_augmented_rank": 63,
+        "witnessed_leaf_probes": 503029,
+        "verified_difference_rows": 32,
+        "generic_keys": 916469,
+        "setup_ms": 347.319,
+        "witness_ms": 159.18,
+        "joint_relation_ms": 1173.193,
+        "joint_total_ms": 1918.601
+      },
+      "cold": {
+        "setup_ms": 347.319,
+        "witness_ms": 159.18,
+        "cold_relation_ms": 1172.322,
+        "cold_total_ms": 1681.067,
+        "verified": 32
+      },
+      "bsgs": {
+        "setup_ms": 15.832,
+        "_ms": 220.632
+      },
+      "pass": true
+    },
+    {
+      "width": 3,
+      "seed": "0x68b677a1d1",
+      "job_id": 137377318768,
+      "initial": {
+        "free_rank": 88,
+        "augmented_rank": 152,
+        "difference_increment": 64,
+        "verified_difference_groups": 64
+      },
+      "complete": {
+        "diff_shifts": 2061888,
+        "baseline_shifts": 2688751,
+        "diff_hits": 896,
+        "baseline_hits": 1152,
+        "diff_independent_pair_rows": 491,
+        "baseline_independent_pair_rows": 558,
+        "initial_free_rank": 88,
+        "initial_augmented_rank": 152,
+        "final_free_rank": 88,
+        "final_augmented_rank": 152,
+        "witnessed_leaf_probes": 739025,
+        "verified_difference_rows": 64,
+        "generic_keys": 916469,
+        "setup_ms": 351.917,
+        "witness_ms": 241.875,
+        "joint_relation_ms": 938.909,
+        "joint_total_ms": 1773.96
+      },
+      "cold": {
+        "setup_ms": 351.917,
+        "witness_ms": 241.875,
+        "cold_relation_ms": 728.77,
+        "cold_total_ms": 1325.786,
+        "verified": 32
+      },
+      "bsgs": {
+        "setup_ms": 15.955,
+        "_ms": 221.865
+      },
+      "pass": true
+    },
+    {
+      "width": 4,
+      "seed": "0x68b677a1d1",
+      "job_id": 137377318768,
+      "initial": {
+        "free_rank": 88,
+        "augmented_rank": 184,
+        "difference_increment": 96,
+        "verified_difference_groups": 96
+      },
+      "complete": {
+        "diff_shifts": 1668210,
+        "baseline_shifts": 2528933,
+        "diff_hits": 736,
+        "baseline_hits": 1088,
+        "diff_independent_pair_rows": 454,
+        "baseline_independent_pair_rows": 546,
+        "initial_free_rank": 88,
+        "initial_augmented_rank": 184,
+        "final_free_rank": 88,
+        "final_augmented_rank": 178,
+        "witnessed_leaf_probes": 933657,
+        "verified_difference_rows": 96,
+        "generic_keys": 916469,
+        "setup_ms": 349.694,
+        "witness_ms": 297.994,
+        "joint_relation_ms": 904.153,
+        "joint_total_ms": 1792.386
+      },
+      "cold": {
+        "setup_ms": 349.694,
+        "witness_ms": 297.994,
+        "cold_relation_ms": 618.729,
+        "cold_total_ms": 1271.43,
+        "verified": 32
+      },
+      "bsgs": {
+        "setup_ms": 15.84,
+        "_ms": 219.504
+      },
+      "pass": true
+    },
+    {
+      "width": 2,
+      "seed": "0x9d3a6f5c127",
+      "job_id": 137377318720,
+      "initial": {
+        "free_rank": 88,
+        "augmented_rank": 120,
+        "difference_increment": 32,
+        "verified_difference_groups": 32
+      },
+      "complete": {
+        "diff_shifts": 2608250,
+        "baseline_shifts": 3838045,
+        "diff_hits": 1120,
+        "baseline_hits": 1632,
+        "diff_independent_pair_rows": 553,
+        "baseline_independent_pair_rows": 627,
+        "initial_free_rank": 88,
+        "initial_augmented_rank": 120,
+        "final_free_rank": 86,
+        "final_augmented_rank": 104,
+        "witnessed_leaf_probes": 430537,
+        "verified_difference_rows": 32,
+        "generic_keys": 916469,
+        "setup_ms": 347.787,
+        "witness_ms": 136.371,
+        "joint_relation_ms": 1273.966,
+        "joint_total_ms": 2031.086
+      },
+      "cold": {
+        "setup_ms": 347.787,
+        "witness_ms": 136.371,
+        "cold_relation_ms": 872.666,
+        "cold_total_ms": 1359.044,
+        "verified": 32
+      },
+      "bsgs": {
+        "setup_ms": 15.943,
+        "_ms": 254.599
+      },
+      "pass": true
+    },
+    {
+      "width": 3,
+      "seed": "0x9d3a6f5c127",
+      "job_id": 137377318720,
+      "initial": {
+        "free_rank": 88,
+        "augmented_rank": 152,
+        "difference_increment": 64,
+        "verified_difference_groups": 64
+      },
+      "complete": {
+        "diff_shifts": 2141629,
+        "baseline_shifts": 3838045,
+        "diff_hits": 928,
+        "baseline_hits": 1632,
+        "diff_independent_pair_rows": 501,
+        "baseline_independent_pair_rows": 627,
+        "initial_free_rank": 88,
+        "initial_augmented_rank": 152,
+        "final_free_rank": 88,
+        "final_augmented_rank": 147,
+        "witnessed_leaf_probes": 687409,
+        "verified_difference_rows": 64,
+        "generic_keys": 916469,
+        "setup_ms": 347.383,
+        "witness_ms": 217.512,
+        "joint_relation_ms": 1302.779,
+        "joint_total_ms": 2142.215
+      },
+      "cold": {
+        "setup_ms": 347.383,
+        "witness_ms": 217.512,
+        "cold_relation_ms": 746.434,
+        "cold_total_ms": 1314.65,
+        "verified": 32
+      },
+      "bsgs": {
+        "setup_ms": 15.956,
+        "_ms": 255.058
+      },
+      "pass": true
+    },
+    {
+      "width": 4,
+      "seed": "0x9d3a6f5c127",
+      "job_id": 137377318720,
+      "initial": {
+        "free_rank": 88,
+        "augmented_rank": 184,
+        "difference_increment": 96,
+        "verified_difference_groups": 96
+      },
+      "complete": {
+        "diff_shifts": 1825641,
+        "baseline_shifts": 2528933,
+        "diff_hits": 800,
+        "baseline_hits": 1088,
+        "diff_independent_pair_rows": 469,
+        "baseline_independent_pair_rows": 546,
+        "initial_free_rank": 88,
+        "initial_augmented_rank": 184,
+        "final_free_rank": 88,
+        "final_augmented_rank": 174,
+        "witnessed_leaf_probes": 862666,
+        "verified_difference_rows": 96,
+        "generic_keys": 916469,
+        "setup_ms": 350.511,
+        "witness_ms": 273.006,
+        "joint_relation_ms": 904.849,
+        "joint_total_ms": 1802.457
+      },
+      "cold": {
+        "setup_ms": 350.511,
+        "witness_ms": 273.006,
+        "cold_relation_ms": 671.607,
+        "cold_total_ms": 1299.79,
+        "verified": 32
+      },
+      "bsgs": {
+        "setup_ms": 16.104,
+        "_ms": 253.091
+      },
+      "pass": true
+    }
+  ],
+  "caveats": [
+    "Three deterministic 32-target cohorts; no distribution of independent runner timings",
+    "Widths measured sequentially within a seed/runner; minor wall-time differences may reflect drift",
+    "Generic 916469-key table disqualifies non-generic algorithm",
+    "No RR9/F3 blind unknown-index root extraction, best IC or matched rho competition",
+    "No external PCC attestation"
+  ]
+}
