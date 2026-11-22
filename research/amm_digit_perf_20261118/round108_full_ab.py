@@ -271,7 +271,7 @@ with tempfile.TemporaryDirectory(prefix="rootfind108-") as temp:
         subprocess.run(["cargo","build","--release","--quiet"],cwd=d,check=True)
         if label=="after":
             subprocess.run(["cargo","test","--release","--quiet"],cwd=d,check=True)
-        binaries[label]=d/"target/release/round107-source-exact"
+        binaries[label]=d/"target/release/round108-source-exact"
     rows=[]
     trials=int(os.environ.get("ROOTFIND_AB_TRIALS","13"))
     for trial in range(trials):
