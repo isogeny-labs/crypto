@@ -26,3 +26,6 @@ import ChainSd.Cofactor
 #print axioms ChainSd.inv_not_mem_avoidSub
 #print axioms ChainSd.one_not_mem_closure_of_cofactorHyp
 #print axioms ChainSd.one_not_mem_chainSystem_of_cofactorHyp
+#print axioms ChainSd.shiftHyp_of_cofactorHyp
+#print axioms ChainSd.one_not_mem_closure_of_shiftHyp
+#print axioms ChainSd.one_not_mem_chainSystem_of_shiftHyp

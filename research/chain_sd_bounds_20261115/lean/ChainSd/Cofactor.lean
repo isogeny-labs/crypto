@@ -153,6 +153,14 @@ def CofactorHyp (g : ChainAlg p k) (c : ℕ) : Prop :=
   ∀ v : ChainAlg p k, v ∈ avoidSub p k → g * v ∈ weightSub p k (c - 1) →
     ∀ x ∈ v.coeff.support, popcount x.1.val + 3 ≤ k ∧ popcount x.2.val + 3 ≤ k
 
+/-- The shift hypothesis `H'(c)`: every cofactor `v` off the top residues with `g v` of weight
+`≤ c − 1` stays off the top residues after each generator shift. It is the only property of the
+cofactors that the closure step of Theorem A uses; `CofactorHyp` implies it
+(`shiftHyp_of_cofactorHyp`). -/
+def ShiftHyp (g : ChainAlg p k) (c : ℕ) : Prop :=
+  ∀ v : ChainAlg p k, v ∈ avoidSub p k → g * v ∈ weightSub p k (c - 1) →
+    ∀ js : Fin k × Bool, single (shiftExpo k js.1 js.2) (1 : ZMod p) * v ∈ avoidSub p k
+
 /-! ### Support of a shifted element -/
 
 variable {p k}
@@ -195,6 +203,11 @@ theorem shift_mem_avoidSub (hk : 2 ≤ k) (js : Fin k × Bool) {v : ChainAlg p k
     · rw [Prod.fst_add, h1, zero_add]; exact hxt.1
     · rw [Prod.snd_add, h2, add_comm, val_add_two_pow]
       exact shift_avoids_top hk (ZMod.val_lt _) hp2 j.isLt
+
+/-- The popcount hypothesis implies the shift hypothesis. -/
+theorem shiftHyp_of_cofactorHyp (hk : 2 ≤ k) {g : ChainAlg p k} {c : ℕ}
+    (H : CofactorHyp p k g c) : ShiftHyp p k g c :=
+  fun v hv hw js => shift_mem_avoidSub hk js hv (H v hv hw)
 
 /-! ### Weight of a shift -/
 
@@ -326,11 +339,11 @@ noncomputable def cofactorSub (ginv : ChainAlg p k) (c : ℕ) : Submodule (ZMod 
 
 variable {p k}
 
-/-- **Theorem A.** Under the cofactor hypothesis, `1` is not in the degree-`c` closure of `g`. -/
-theorem one_not_mem_closure_of_cofactorHyp (hk : 2 ≤ k) {c : ℕ} (g ginv : ChainAlg p k)
+/-- **Theorem A′.** Under the shift hypothesis, `1` is not in the degree-`c` closure of `g`. -/
+theorem one_not_mem_closure_of_shiftHyp (hk : 2 ≤ k) {c : ℕ} (g ginv : ChainAlg p k)
     (hinv : g * ginv = 1) (hsupp : ∀ x ∈ g.coeff.support, x.1.val ≤ 2 ∧ x.2.val ≤ 2)
     (h22 : g.coeff (((2 : ℕ) : ZMod (2 ^ k)), ((2 : ℕ) : ZMod (2 ^ k))) ≠ 0)
-    (hg : g ∈ weightSub p k c) (H : CofactorHyp p k g c) :
+    (hg : g ∈ weightSub p k c) (H : ShiftHyp p k g c) :
     (1 : ChainAlg p k) ∉ (chainSystemG p k g).closure c := by
   have hinv' : ginv * g = 1 := by rw [mul_comm]; exact hinv
   have hcl : (chainSystemG p k g).IsClosed c (cofactorSub p k ginv c) := by
@@ -358,13 +371,21 @@ theorem one_not_mem_closure_of_cofactorHyp (hk : 2 ≤ k) {c : ℕ} (g ginv : Ch
         simp only [shiftMap, LinearMap.mulLeft_apply]; ring
       rw [e]
       have hgv : g * (ginv * u) = u := by rw [← mul_assoc, hinv, one_mul]
-      have hpop := H (ginv * u) hu2 (by rw [hgv]; exact hw)
-      exact shift_mem_avoidSub hk js hu2 hpop
+      exact H (ginv * u) hu2 (by rw [hgv]; exact hw) js
   intro h1
   have hmem := (chainSystemG p k g).closure_le hcl h1
   have : ginv * 1 ∈ avoidSub p k := hmem.2
   rw [mul_one] at this
   exact inv_not_mem_avoidSub hk g ginv hinv hsupp h22 this
+
+/-- **Theorem A.** Under the cofactor (popcount) hypothesis, `1` is not in the degree-`c`
+closure of `g`. -/
+theorem one_not_mem_closure_of_cofactorHyp (hk : 2 ≤ k) {c : ℕ} (g ginv : ChainAlg p k)
+    (hinv : g * ginv = 1) (hsupp : ∀ x ∈ g.coeff.support, x.1.val ≤ 2 ∧ x.2.val ≤ 2)
+    (h22 : g.coeff (((2 : ℕ) : ZMod (2 ^ k)), ((2 : ℕ) : ZMod (2 ^ k))) ≠ 0)
+    (hg : g ∈ weightSub p k c) (H : CofactorHyp p k g c) :
+    (1 : ChainAlg p k) ∉ (chainSystemG p k g).closure c :=
+  one_not_mem_closure_of_shiftHyp hk g ginv hinv hsupp h22 hg (shiftHyp_of_cofactorHyp hk H)
 
 /-- Theorem A for the Semaev generator of the chain system. -/
 theorem one_not_mem_chainSystem_of_cofactorHyp (hk : 2 ≤ k) {c : ℕ} (hc : 2 ≤ c)
@@ -374,6 +395,16 @@ theorem one_not_mem_chainSystem_of_cofactorHyp (hk : 2 ≤ k) {c : ℕ} (hc : 2 
     (1 : ChainAlg p k) ∉ (chainSystem p k A B t).closure c := by
   rw [chainSystem_eq_G]
   refine one_not_mem_closure_of_cofactorHyp hk _ ginv hinv hsupp ?_ hg H
+  rw [gen_coeff_22 hk]; exact one_ne_zero
+
+/-- Theorem A′ for the Semaev generator of the chain system. -/
+theorem one_not_mem_chainSystem_of_shiftHyp (hk : 2 ≤ k) {c : ℕ}
+    (A B t : ZMod p) (ginv : ChainAlg p k) (hinv : gen p k A B t * ginv = 1)
+    (hsupp : ∀ x ∈ (gen p k A B t).coeff.support, x.1.val ≤ 2 ∧ x.2.val ≤ 2)
+    (hg : gen p k A B t ∈ weightSub p k c) (H : ShiftHyp p k (gen p k A B t) c) :
+    (1 : ChainAlg p k) ∉ (chainSystem p k A B t).closure c := by
+  rw [chainSystem_eq_G]
+  refine one_not_mem_closure_of_shiftHyp hk _ ginv hinv hsupp ?_ hg H
   rw [gen_coeff_22 hk]; exact one_ne_zero
 
 end ChainSd

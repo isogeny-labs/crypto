@@ -838,7 +838,8 @@ fn main() {
             let low: Vec<usize> = (0..basis.rows.len()).filter(|&r| (lay.wt[basis.pivcol[r]] as u32) < d).collect();
             let sa = cofactor_stats(&inst, &lay, &basis, &all, &terms, &mut rng);
             let sl = cofactor_stats(&inst, &lay, &basis, &low, &terms, &mut rng);
-            println!("{{\"k\":{},\"D\":{},\"rank\":{},\"one_in_V\":{},\"all:max_pop1,max_pop2,max_total,touchesTop2\":[{},{},{},{}],\"low\":[{},{},{},{}]}}", k, d, res.rank, res.one_in_v, sa.0, sa.1, sa.2, sa.3, sl.0, sl.1, sl.2, sl.3);
+            println!("{{\"k\":{},\"D\":{},\"rank\":{},\"one_in_V\":{},\"all:max_pop1,max_pop2,max_total,touchesTop2\":[{},{},{},{}],\"low\":[{},{},{},{}],\"low_shift_hits_top\":\"{}\"}}", k, d, res.rank, res.one_in_v, sa.0, sa.1, sa.2, sa.3, sl.0, sl.1, sl.2, sl.3,
+                sl.4.map_or("none".to_string(), |(a, b, j)| format!("({},{}) j={}", a, b, j)));
         }
 
         "lwm" => {
@@ -1002,7 +1003,12 @@ fn dft2(f: &Fp, n: usize, z: u64, u: &[u64], inverse: bool) -> Vec<u64> {
 }
 
 /// cofactor support statistics: kappa(u) = g^{-1} u in Q_k for a random combination of the given rows
-fn cofactor_stats(inst: &Inst, lay: &Layout, basis: &Basis, rows: &[usize], gen: &[(u64, u64, u64)], rng: &mut Rng) -> (u32, u32, u32, bool) {
+/// Smallest j < k with (a + 2^j) mod n in {n-2, n-1} (the shift by x^(2^j) lands on a top residue).
+fn shift_hits_top(a: usize, n: usize, k: u32) -> Option<u32> {
+    (0..k).find(|&j| { let t = (a + (1usize << j)) % n; t >= n - 2 })
+}
+
+fn cofactor_stats(inst: &Inst, lay: &Layout, basis: &Basis, rows: &[usize], gen: &[(u64, u64, u64)], rng: &mut Rng) -> (u32, u32, u32, bool, Option<(usize, usize, u32)>) {
     let f = Fp { p: inst.p };
     let n = 1usize << inst.k;
     let nm = (n as u64) - 1;
@@ -1018,13 +1024,15 @@ fn cofactor_stats(inst: &Inst, lay: &Layout, basis: &Basis, rows: &[usize], gen:
     let kap = dft2(&f, n, z, &qh, true);
     let (mut m1, mut m2, mut mt) = (0u32, 0u32, 0u32);
     let mut touches = false;
+    let mut shift_hit: Option<(usize, usize, u32)> = None;
     for a in 0..n { for b in 0..n {
         if kap[a * n + b] == 0 { continue; }
+        if shift_hit.is_none() { if let Some(j) = shift_hits_top(a, n, inst.k).or(shift_hits_top(b, n, inst.k)) { shift_hit = Some((a, b, j)); } }
         let (pa, pb) = ((a as u64).count_ones(), (b as u64).count_ones());
         m1 = m1.max(pa); m2 = m2.max(pb); mt = mt.max(pa + pb);
         if a >= n - 2 || b >= n - 2 { touches = true; }
     } }
-    (m1, m2, mt, touches)
+    (m1, m2, mt, touches, shift_hit)
 }
 
 
@@ -1232,9 +1240,18 @@ fn lwm_eval(p: u64, xbox: usize, w: u32, gen: &[(u64, u64, u64)], seed: u64) -> 
         for &b in cols.iter().take(2) { let a_s: Vec<usize> = (0..lim).filter(|&a| h[b][a] != 0).collect(); eprintln!("  column x2^{}: x1-exponents {:?}", b, &a_s[..a_s.len().min(40)]); }
     }
     let (mut m1, mut m2, mut mt, mut md) = (0u32, 0u32, 0u32, 0usize);
+    // when X + 2 = N = 2^k, h is a cofactor in Q_k off the top residues; record the first exponent whose
+    // shift by some x_s^(2^j) lands on a top residue, and how many support points do so
+    let kq = if lim.is_power_of_two() { Some(lim.trailing_zeros()) } else { None };
+    let (mut nhit, mut first): (usize, Option<(usize, usize, u32)>) = (0, None);
     for b in 0..lim { for a in 0..lim { if h[b][a] != 0 {
         let (pa, pb) = ((a as u64).count_ones(), (b as u64).count_ones()); m1 = m1.max(pa); m2 = m2.max(pb); mt = mt.max(pa + pb); md = md.max(a.max(b));
+        if let Some(kk) = kq { if let Some(j) = shift_hits_top(a, lim, kk).or(shift_hits_top(b, lim, kk)) { nhit += 1; if first.is_none() { first = Some((a, b, j)); } } }
     } } }
+    if let Some(kk) = kq {
+        println!("{{\"k\":{},\"shift_test\":true,\"support_points_hitting_top\":{},\"first\":\"{}\"}}", kk, nhit,
+                 first.map_or("none".to_string(), |(a, b, j)| format!("({},{}) j={}", a, b, j)));
+    }
     (nunk - nb, m1, m2, mt, md, nunk)
 }
 
