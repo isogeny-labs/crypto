@@ -1,5 +1,5 @@
 
-**k20** (N = 4000 frames per t; gain = selected ÷ mean; K = 2000 unless stated; 95% calibrated bootstrap)
+**k20** (N = 4000 frames per t; gain = selected ÷ mean; K = 2000 unless stated; 95% calibrated bootstrap) [pcc:unverified]
 
 | t | mean c | J-sel, J | J-sel, J (K = 100) | c-only, J | S1, J | Φ-sel, Φ | J-sel, covered | iid surrogate | decoy |
 |--:|--:|:--|--:|--:|--:|--:|:--|--:|--:|
@@ -13,7 +13,7 @@
 | 11 | 1025 | 1.157 [1.103, 1.186] | 1.104 | 1.157 | 1.157 | 1.015 | – | 1.162 | 1.005 |
 | 12 | 2050 | 1.107 [1.065, 1.134] | 1.073 | 1.107 | 1.107 | 1.009 | – | 1.104 | 1.005 |
 
-**k24f** (N = 4000 frames per t; gain = selected ÷ mean; K = 2000 unless stated; 95% calibrated bootstrap)
+**k24f** (N = 4000 frames per t; gain = selected ÷ mean; K = 2000 unless stated; 95% calibrated bootstrap) [pcc:unverified]
 
 | t | mean c | J-sel, J | J-sel, J (K = 100) | c-only, J | S1, J | Φ-sel, Φ | J-sel, covered | iid surrogate | decoy |
 |--:|--:|:--|--:|--:|--:|--:|:--|--:|--:|
@@ -29,7 +29,7 @@
 | 13 | 4096 | 1.069 [1.062, 1.074] | 1.055 | 1.069 | 1.069 | 1.004 | – | 1.076 | 0.998 |
 | 14 | 8196 | 1.048 [1.038, 1.055] | 1.036 | 1.048 | 1.048 | 1.002 | – | 1.055 | 1.007 |
 
-**k24r** (N = 4000 frames per t; gain = selected ÷ mean; K = 2000 unless stated; 95% calibrated bootstrap)
+**k24r** (N = 4000 frames per t; gain = selected ÷ mean; K = 2000 unless stated; 95% calibrated bootstrap) [pcc:unverified]
 
 | t | mean c | J-sel, J | J-sel, J (K = 100) | c-only, J | S1, J | Φ-sel, Φ | J-sel, covered | iid surrogate | decoy |
 |--:|--:|:--|--:|--:|--:|--:|:--|--:|--:|
@@ -45,7 +45,7 @@
 | 13 | 4095 | 1.083 [1.063, 1.094] | 1.058 | 1.083 | 1.083 | 1.004 | – | 1.077 | 0.983 |
 | 14 | 8192 | 1.050 [1.042, 1.054] | 1.039 | 1.050 | 1.050 | 1.002 | – | 1.058 | 0.999 |
 
-**Seed selector (arm I)** (N = 1000 seeds per t; K = 500; J-selector)
+**Seed selector (arm I)** (N = 1000 seeds per t; K = 500; J-selector) [pcc:unverified]
 
 | t | k20 mean cols | k20 gain on J | k20 gain on covered | k24r mean cols | k24r gain on J | k24r gain on covered |
 |--:|--:|:--|:--|--:|:--|:--|
@@ -56,7 +56,7 @@
 | 8 | 128.5 | 1.463 [1.158, 1.704] | 1.451 [1.143, 1.657] | 127.9 | 1.434 [1.282, 1.529] | 1.434 [1.281, 1.525] |
 | 9 | 255.3 | 1.256 [1.211, 1.286] | 1.238 [1.194, 1.270] | 256.4 | 1.279 [1.176, 1.369] | 1.277 [1.189, 1.368] |
 
-**Real Curve25519 (arm R1) vs miniatures** (K = 200; J-selector, value J)
+**Real Curve25519 (arm R1) vs miniatures** (K = 200; J-selector, value J) [pcc:unverified]
 
 | t | frames | Curve25519 | k24f | k20 |
 |--:|--:|:--|:--|:--|
