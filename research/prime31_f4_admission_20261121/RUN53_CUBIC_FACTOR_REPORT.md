@@ -24,6 +24,7 @@ The independent Python reference parsed the user-supplied run52 `eight_leaves.ts
 - 56/56 cubics split into 3 distinct F_p roots (168/168 x-roots), with no cross-coset overlap;
 - every recovered x set equals the archived 21 x values for that coset;
 - recovered y satisfies both y^2=f(x) and y^7=c, without a sqrt or sign oracle;
+- all 56 triples satisfy x1+x2+x3=0 (Vieta), and an independent Python elliptic-curve implementation checked each *signed* horizontal triple sums to the identity. This recovers run46's 56 geometry relations directly from the public cubic factorizations; it does not provide the other 112 relations needed for full logarithm recovery.
 - zeta^7=1 and zeta!=1; after seven fibers y returns to y0.
 
 No points from the frozen target decompositions were used in the candidate root solver.
