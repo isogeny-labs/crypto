@@ -139,6 +139,39 @@ cannot split); IFMA is the production path when present.
 Probe harness now emits `working_set_bytes` + `bytes_declared` in the
 `optlevel.ops/v1` line (tables treated in-cache).
 
+### Tick 7 — map-filter IFMA candidates (no attainment move)
+
+Hypothesis: Bloom false positives into `finish_hit` / PairTable burn wall
+that depresses attainment. Filter kmitm IFMA candidates with the canonical
+`FastMap` inside the vector callback and reuse a cand scratch buffer.
+
+| Arm | Tick 6 A | Tick 7 A | Δ |
+|---|---:|---:|---|
+| kmitm:m=4 IFMA | 0.949 | **0.952** | noise (floor 0.061) |
+| floor:m=3 IFMA | 0.919 | **0.920** | noise |
+| kmitm:m=4 lanes8 | 0.177 | 0.181 | noise |
+
+Fail-closed on the map-filter lever for attainment (hygiene only). Preferred
+IFMA remains grade **A** at the compute roof.
+
+### Stop (loop unsubscribed)
+
+Preferred production probes are fully optimized **for this host's measured
+ceiling**:
+
+- kmitm:m=4 IFMA: A ≈ **0.95** (ticks 6–7), grade A, intensity declared,
+  limiter = algorithmic axis.
+- floor:m=3 IFMA: A ≈ **0.92**, grade A, same.
+
+**Scalar lanes why-not-A (documented):** T-timing cannot split instruction
+overhead vs dependency chains; layout (tick 6) and prefetch (tick 3) levers
+failed within noise; IFMA **is** the landed SIMD path when `avx512ifma` is
+present. Raising scalar to grade B would need a non-IFMA SIMD mont kernel
+(AVX2) aimed at hosts without IFMA — out of scope for the preferred path.
+
+Further gains on IFMA are algorithmic (different search / G3), not
+implementation-level on this roof.
+
 ## Claim hygiene
 
 Attainments are `[pcc:unverified]` assertions. They are **not** speedups,

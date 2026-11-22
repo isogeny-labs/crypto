@@ -228,6 +228,9 @@ pub struct RootfindKMitmOracle<'i> {
     /// Scratch for IFMA prefix products (reused across chunks).
     #[cfg(target_arch = "x86_64")]
     ifma_prefix: Vec<[u64; 8]>,
+    /// Reused Bloom/map-pass candidate buffer for the IFMA path.
+    #[cfg(target_arch = "x86_64")]
+    ifma_cands: Vec<(usize, usize, u64)>,
     pub mismatches: u64,
     probe_right_adds: u64,
     probe_lookups: u64,
@@ -269,6 +272,8 @@ impl<'i> RootfindKMitmOracle<'i> {
             left_scratch: Vec::new(),
             #[cfg(target_arch = "x86_64")]
             ifma_prefix: Vec::new(),
+            #[cfg(target_arch = "x86_64")]
+            ifma_cands: Vec::new(),
             mismatches: 0,
             probe_right_adds: 0,
             probe_lookups: 0,
@@ -425,6 +430,8 @@ impl<'i> RootfindKMitmOracle<'i> {
             left_scratch: Vec::with_capacity(self.left_k as usize),
             #[cfg(target_arch = "x86_64")]
             ifma_prefix: Vec::new(),
+            #[cfg(target_arch = "x86_64")]
+            ifma_cands: Vec::new(),
             mismatches: 0,
             probe_right_adds: 0,
             probe_lookups: 0,
@@ -1531,15 +1538,18 @@ impl RootfindKMitmOracle<'_> {
                 }
             }
         }
-        // Bloom-pass candidates only (reject inside the IFMA callback).
-        let mut cands: Vec<(usize, usize, u64)> = Vec::new();
+        // Bloom + map filter inside the IFMA callback; reuse cand scratch.
         let mut adds = 0u64;
         let mut bloom_rejects = 0u64;
         let mut bloom_passes = 0u64;
+        let mut map_miss = 0u64;
         let skip: [bool; 8] = std::array::from_fn(|i| i < t_n && out[i].is_some());
         let bloom = self.canon_bloom.clone();
+        let canon_left = Arc::clone(&self.canon_left);
+        self.ifma_cands.clear();
         let muls = {
             let prefix = &mut self.ifma_prefix;
+            let cands = &mut self.ifma_cands;
             ifma.for_each_sibling_pair(targets, prefix, |lane, j, xp, xm| {
                 if skip[lane] {
                     return;
@@ -1547,11 +1557,15 @@ impl RootfindKMitmOracle<'_> {
                 adds += 1;
                 for (x, right_j) in [(xp, fb.neg_index[j]), (xm, j)] {
                     let pass = bloom.as_ref().map(|b| b.maybe(x)).unwrap_or(true);
-                    if pass {
-                        bloom_passes += 1;
+                    if !pass {
+                        bloom_rejects += 1;
+                        continue;
+                    }
+                    bloom_passes += 1;
+                    if canon_left.get(&x).is_some() {
                         cands.push((lane, right_j, x));
                     } else {
-                        bloom_rejects += 1;
+                        map_miss += 1;
                     }
                 }
             })
@@ -1561,19 +1575,23 @@ impl RootfindKMitmOracle<'_> {
         ops.field_ops.invs += 1;
         // Honest IFMA Montgomery muls (vector lane-ops + batch-inv Fermat).
         ops.field_ops.muls += muls;
-        let _ = n_fb; // reserved for future intensity notes
+        let _ = n_fb;
         ops.adds += adds;
         self.probe_right_adds += adds;
         self.bloom_rejects += bloom_rejects;
         self.bloom_passes += bloom_passes;
+        self.bloom_false_positives += map_miss;
+        self.probe_lookups += bloom_passes;
+        counters.lookups += bloom_passes;
+        // Drain owned candidates so we can call &mut self finishers.
+        let cands = std::mem::take(&mut self.ifma_cands);
         for &(lane, right_j, x_canon) in &cands {
             if out[lane].is_some() {
                 continue;
             }
-            self.probe_lookups += 1;
-            counters.lookups += 1;
             if !self.lookup_canon_into(x_canon) {
-                self.bloom_false_positives += 1;
+                // Map was checked in the callback; a miss here is a race-free
+                // inconsistency (should not happen with Arc-shared tables).
                 continue;
             }
             let left = std::mem::take(&mut self.left_scratch);
@@ -1593,6 +1611,8 @@ impl RootfindKMitmOracle<'_> {
                 out[lane] = Some(hit);
             }
         }
+        self.ifma_cands = cands;
+        self.ifma_cands.clear();
     }
 
     /// Shared batch-inv across `targets.len()` independent right≥2 probes.
