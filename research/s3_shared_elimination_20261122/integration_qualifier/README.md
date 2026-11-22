@@ -6,7 +6,7 @@ entire root library was terminated by SIGKILL; memory exhaustion was not
 independently established. A result from this package is scoped integration
 evidence; it is not a successful build or test of the full root crate.
 
-The binary and its five tests are compiled directly from the existing example
+The binary and its tests are compiled directly from the existing example
 path. No fixture, expected result, equation, solver option, or test body is
 rewritten here. The library is named `crypto_lib` so the example's imports stay
 unchanged. Cargo builds this library in production mode for the binary test
@@ -61,7 +61,7 @@ cargo run --release --offline --manifest-path research/s3_shared_elimination_202
 cargo run --release --offline --manifest-path research/s3_shared_elimination_20261122/integration_qualifier/Cargo.toml --bin shared-s3-integration-source-manifest
 ```
 
-The first command executes only the example's existing five correctness tests.
+The first command executes only the example's correctness tests.
 The second prints its correctness report. Without `--check`, that example
 prints its plan. There is no benchmark flag. Existing solver deadlines remain
 cancellation guards, and incomplete outcomes are errors, not proofs of no
@@ -86,16 +86,23 @@ separately for an experiment.
 
 ## Limits of the evidence
 
-The finite auxiliary chart is exhausted only in the bounded F17 fixture. Its
-exceptional-prefix control demonstrates a valid signed cancellation relation
-outside that chart. It does not establish complete point-decomposition coverage.
-The example's F4 integration and toy public-target recovery use the integer
-backend; all three arithmetic backends are compared for bounded preconditioning,
-consequences, and witnesses. The committed p31 curve check is a known-point
-witness check, not a p31 ECDLP solve. The qualifier does not run the production
-chain-chart adapter, rho reference, paid experiment, full cost ledger, or legacy
-test suites. Neither a faster native matrix product nor an improved ECDLP
-complexity follows from passing these tests.
+The earlier five-case qualification and its frozen evidence cover bounded F17
+F4 integration and recovery, plus a known Prime31 point witness. The current
+Prime31 follow-up is specified in [../prime31/PLAN.md](../prime31/PLAN.md):
+use actual F4 with the unrestricted auxiliary coordinate, compare the finite
+chart solutions with a separate signed-prefix reference, and recover a public
+structured known-answer target using relation arithmetic modulo 2147446831.
+The coordinate modulus is 2147483647. A new separately captured execution is
+required to establish observations for this extension; the old receipt is
+not evidence for the changed example.
+
+Finite-chart enumeration does not establish complete point-decomposition
+coverage. The exceptional-prefix control retains a valid signed cancellation
+relation outside that chart. The structured target/base does not constitute a
+uniform-target benchmark. The qualifier does not run the production chain-chart
+adapter, rho reference, paid experiment, full cost ledger, or legacy test suites.
+Neither a faster native matrix product nor an improved ECDLP complexity follows
+from passing these tests.
 
 Until a separately recorded execution succeeds, this directory establishes
 only an authored qualification path. Evidence remains PCC-unverified.

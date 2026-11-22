@@ -10,6 +10,11 @@ before reducing each target's residual matrix. The default F4 dispatcher is
 unchanged. These are established algebraic constructions implemented behind
 checked Rust interfaces; this report makes no novelty claim.
 
+The current correctness entry point, `--check-prime31`, uses the requested
+Fp with p = 2^31 - 1 = 2147483647. Its actual F4 relation extraction and
+public-input known-answer recovery are recorded in section 7. The original
+F17 checks remain exhaustive regression controls.
+
 The shared component is a finite-degree preconditioner. It returns polynomial
 consequences and exposes all original equations. It does not assert that the
 chosen degree completes a Groebner basis. Factor-base membership, full original
@@ -141,10 +146,11 @@ A finite coordinate `u` cannot encode an intermediate point at infinity.
 The fixture distinguishes checked finite-chart witnesses from exceptional
 prefix cancellation; a successful toy recovery is not a completeness claim
 for every S3 chart. Production integration must preserve #4920's explicit
-chart coverage and final group checks. A 31-bit arithmetic/row-space check is
-also not a 31-bit unknown-scalar recovery.
+chart coverage and final group checks. The initial 31-bit arithmetic/row-space
+check did not perform scalar recovery; section 7 records the later structured
+Prime31 recovery fixture separately.
 
-## 4. Development evidence
+## 4. Initial development evidence
 
 The commands, exit statuses, build/source bindings, and raw outputs are recorded
 in `evidence/development-receipt.json` and its referenced files. Every pass here
@@ -174,8 +180,9 @@ FMA, and split16 preconditioners; and 15 solutions at target x=7 from each of
 original, fresh-preconditioned, and shared-preconditioned F4. It replays 180
 signed finite-chart witnesses. The toy solver receives Q=(7,6) and recovers
 k=9 modulo 19 using two three-term relations plus the explicit G anchor, then
-checks kG=Q. The 31-bit fixture checks G+2G+4G=7G and its equations/consequences;
-it does not recover an unknown 31-bit scalar. [pcc:unverified]
+checks kG=Q. At this initial revision, the 31-bit fixture checked G+2G+4G=7G
+and its equations/consequences without scalar recovery. The later extension
+is recorded separately in section 7. [pcc:unverified]
 
 ### Failures retained and corrections
 
@@ -259,3 +266,58 @@ correctness evidence alone. No T0/T1/T2/T3 claim is made.
 
 Research KB client unavailable: source and PR inspection substituted for KB
 retrieval, with no claim that all literature or ideas have been exhausted.
+
+## 7. Prime31 relation extraction and public-input recovery
+
+The follow-up uses the same curve, generator and subgroup as section 3,
+with coordinate modulus p = 2147483647 and relation modulus r = 2147446831.
+The three factor-base abscissae are 625037715, 1923055775 and 1731809510,
+belonging to G, 2G and 4G. The public target is
+Q = (864723287, 1209733093). These are deliberately structured known-answer
+inputs. The expected scalar 7 is supplied only to the calling check;
+`recover_public` receives Q, G, r, a query cap and a preconditioner backend.
+
+The actual production F4 visitor keeps all original equations and the
+unrestricted auxiliary domain. After it finishes, a separate finite signed
+pair-sum enumeration checks the entire solution set for this tiny base and
+affine chart. That reference supplies neither auxiliary-domain restrictions
+nor solutions to F4 or recovery. Every accepted solution is signed and
+replayed in the original elliptic-curve group.
+
+The [follow-up receipt](prime31/development-receipt.json) and its raw files
+record these local producer observations. [pcc:unverified]
+
+| Follow-up check | Recorded outcome | Scope |
+| --- | --- | --- |
+| Actual-source integration suite | 12 passed; zero failed | Five retained tests and seven new Prime31/reference/boundary cases |
+| Original F4 and fresh/shared F4 | Nine identical solutions in every arm | One original arm; fresh and shared arms for Integer, FMA and Split16 |
+| Public-Q recovery | k = 7 modulo 2147446831 in all three preconditioner arms | Three F4 relations plus one explicit G anchor; rank four; final kG = Q check |
+| Negated public target | Test passes with the supplied negative point | Integer-preconditioned recovery checks the result depends on Q |
+| Input and interruption controls | Test suite passes | Noncanonical x/y, wrong modulus, insufficient query budget and expired deadline are rejected |
+
+These are observed correctness outcomes, not timing or cost comparisons.
+Integer, FMA and Split16 select the preconditioning arithmetic only. The
+downstream F4 implementation and IncrementalGauss relation solve remain the
+existing integer implementations. The latter works modulo r, never p.
+
+Both the tests and CLI ran from separately copied read-only executables.
+Build manifests, write-once pre-call bindings, raw outputs and post-call source
+and binary checks are retained under `prime31/evidence/attempt1/`. The frozen
+example digest is
+`2312503e4a71fd5d9118c6ef35dba8a4ab56d36ea1b484fba208ee55907bd1f2`.
+The separate same-team source review caught the canonical-coordinate admission
+defect before execution; the fix and malformed-coordinate controls are included.
+Source inspection and these producer checks do not supply signed PCC standing.
+
+This fixture now exercises extraction, signed lifting, independent relations,
+subgroup linear algebra and final scalar replay on the requested field. It
+does not sample uniform targets or establish full point-decomposition coverage.
+The original whole-library gate and admitted performance experiment remain open.
+The full library was not rerun after the previously recorded compiler SIGKILL:
+this follow-up changes the example, with the same actual production dependency
+closure qualified separately. No production library failure is treated as fixed.
+
+The existing row-space diagram now labels the two Prime31 arithmetic contexts.
+Canonical performance graphs and the leaderboard remain unchanged because no
+new performance observation was collected. The existing source-linked report
+and PDF are refreshed together; the initial development evidence is preserved.

@@ -110,3 +110,25 @@ F4 normalization and visitor contracts, and the existing signed abscissa lifter
 and incremental relation matrix. Prior-work findings and source links are in
 `REPORT.md`, section 6. Research KB access was unavailable; this review makes
 no novelty or absence-of-prior-work claim.
+# Prime31 follow-up source review
+
+The November 22 follow-up was independently inspected by a second session
+agent, within the same team. Reviewed example SHA-256:
+`2312503e4a71fd5d9118c6ef35dba8a4ab56d36ea1b484fba208ee55907bd1f2`.
+This is source review, not a separate-host execution or signed PCC verdict.
+
+The reviewer identified noncanonical public coordinates as an input-boundary
+defect: the underlying on-curve predicate reduces modulo p, while later group
+operations assume canonical coordinates. The example now rejects x or y
+outside [0,p) before group arithmetic, and includes both malformed-coordinate
+controls. No remaining substantive defect was identified in the frozen source.
+[pcc:unverified]
+
+Reviewed obligations: finite signed-pair completeness for the declared rational
+non-2-torsion base, repeated-x doubling and cancellation handling, retained
+original equations, full auxiliary domain, subgroup-modulus signs and anchor,
+public-Q input without the expected scalar, incomplete-outcome rejection,
+and the distinction between floating-point preconditioning and unchanged
+integer F4/relation linear algebra. The source explicitly limits the new
+recovery to a structured known-answer correctness fixture. Runtime evidence
+is recorded separately under `prime31/`.

@@ -9,6 +9,7 @@
 //!
 //! cargo run --release --example shared_s3_matrix -- --plan
 //! cargo run --release --example shared_s3_matrix -- --check
+//! cargo run --release --example shared_s3_matrix -- --check-prime31
 
 use std::collections::BTreeSet;
 use std::time::{Duration, Instant};
@@ -29,6 +30,14 @@ const VARIABLES: usize = 4;
 const DEGREE: u32 = 4;
 const TOY_ORDER: u64 = 19;
 const TOY_BASE_X: [u64; 3] = [0, 3, 5];
+const P31: u64 = 2_147_483_647;
+const P31_A: u64 = 847_514_846;
+const P31_B: u64 = 2_087_444_724;
+const P31_ORDER: u64 = 2_147_446_831;
+// Public coordinates retained from the committed development receipt. These
+// inputs do not contain the target's scalar or factor-base logarithms.
+const P31_BASE_X: [u64; 3] = [625_037_715, 1_923_055_775, 1_731_809_510];
+const P31_ATTEMPTS: u64 = 16;
 const BACKENDS: [Backend; 3] = [Backend::Integer, Backend::Fma, Backend::Split16];
 
 #[derive(Clone)]
@@ -170,6 +179,54 @@ impl FamilyFixture {
         ]
     }
 
+    /// Limit this development executable to its two declared curve/base
+    /// fixtures. In particular, removing a small-field guard does not silently
+    /// turn an exhaustive diagnostic into an arbitrary full-field search.
+    fn declared_group(&self) -> Result<(PrimePoint, u64), String> {
+        match (self.curve.p, self.curve.a, self.curve.b) {
+            (17, 2, 2) if self.factor_x == TOY_BASE_X => Ok((toy_generator(), TOY_ORDER)),
+            (P31, P31_A, P31_B) if self.factor_x == P31_BASE_X => Ok((p31_generator(), P31_ORDER)),
+            _ => Err("search is restricted to the declared p17 and p31 curve/base fixtures".into()),
+        }
+    }
+
+    /// Independent finite-chart reference, used only for validation after the
+    /// F4 calls. Rational lifts of x1 and x2 give all finite roots of their S3
+    /// equation as signed pair-sum abscissae. Repeated coordinates use doubling;
+    /// an opposite-sign cancellation has no affine auxiliary coordinate.
+    /// Neither this set nor its construction is passed to the relation solver.
+    fn signed_pair_reference(&self, target: PrimePoint) -> Result<BTreeSet<[u64; 4]>, String> {
+        let (_, order) = self.declared_group()?;
+        let curve = &self.curve;
+        if target.infinity
+            || target.x >= curve.p
+            || target.y >= curve.p
+            || !curve.is_on_curve(target)
+        {
+            return Err("reference target must be a finite point on the declared curve".into());
+        }
+        let fb = factor_base(curve, &self.factor_x, order)?;
+        let mut ops = GroupOps::default();
+        let mut out = BTreeSet::new();
+        for &left in &fb.points {
+            for &right in &fb.points {
+                let prefix = curve.add(&mut ops, left, right);
+                if prefix.infinity {
+                    continue;
+                }
+                if eval_s3_u64(left.x, right.x, prefix.x, curve.a, curve.b, curve.p) != 0 {
+                    return Err("finite signed pair failed original first S3 equation".into());
+                }
+                for &x3 in &self.factor_x {
+                    if eval_s3_u64(prefix.x, x3, target.x, curve.a, curve.b, curve.p) == 0 {
+                        out.insert([left.x, right.x, x3, prefix.x]);
+                    }
+                }
+            }
+        }
+        Ok(out)
+    }
+
     fn direct_solutions(&self, target_x: u64) -> Result<BTreeSet<[u64; 4]>, String> {
         if self.curve.p > 17 {
             return Err("exhaustive fixture restricted to p<=17".into());
@@ -218,6 +275,26 @@ fn toy_fixture() -> FamilyFixture {
 
 fn toy_generator() -> PrimePoint {
     PrimePoint::affine(5, 1)
+}
+
+fn p31_curve() -> PrimeCurve {
+    PrimeCurve {
+        p: P31,
+        a: P31_A,
+        b: P31_B,
+    }
+}
+
+fn p31_generator() -> PrimePoint {
+    PrimePoint::affine(625_037_715, 2_100_627_251)
+}
+
+fn p31_public_target() -> PrimePoint {
+    PrimePoint::affine(864_723_287, 1_209_733_093)
+}
+
+fn p31_fixture() -> FamilyFixture {
+    FamilyFixture::new(p31_curve(), P31_BASE_X.to_vec()).unwrap()
 }
 
 fn factor_base(
@@ -380,17 +457,28 @@ fn visit_solutions(
     original: &[Poly],
     extra: &[Poly],
 ) -> Result<(BTreeSet<[u64; 4]>, VisitReport), String> {
-    if fixture.curve.p > 17 {
-        return Err("full-field F4 fixture restricted to p<=17".into());
-    }
+    visit_solutions_with_options(fixture, original, extra, &solver_options())
+}
+
+fn visit_solutions_with_options(
+    fixture: &FamilyFixture,
+    original: &[Poly],
+    extra: &[Poly],
+    options: &F4Options,
+) -> Result<(BTreeSet<[u64; 4]>, VisitReport), String> {
+    fixture.declared_group()?;
     let mut equations = original.to_vec();
     equations.extend_from_slice(extra);
     let mut solutions = BTreeSet::new();
+    // The first S3 is a nonzero polynomial of degree at most two in u
+    // for these rational, non-order-two leaf coordinates. This is a stop
+    // guard only: no reference roots or restricted auxiliary domain are used.
+    let solution_cap = 2 * fixture.factor_x.len().pow(3);
     let report = f4_fp::solve_visit(
         &equations,
         VARIABLES,
         fixture.curve.p,
-        &solver_options(),
+        options,
         &fixture.domains(),
         |point| {
             if point.len() == VARIABLES {
@@ -398,13 +486,14 @@ fn visit_solutions(
             }
             // solve_visit stops on true; keep visiting within the finite
             // domain cap, and let the complete-outcome guard reject a stop.
-            solutions.len() > 459
+            solutions.len() > solution_cap
         },
     )?;
     if !report.complete || report.timed_out || report.trace_stopped || report.stopped_early {
-        return Err(
-            "bounded F4 fixture was incomplete; no exhaustion conclusion is available".into(),
-        );
+        return Err(format!(
+            "bounded F4 fixture was incomplete; no exhaustion conclusion is available: {}",
+            json!({"visit":report,"retained_solutions":solutions})
+        ));
     }
     for point in &solutions {
         if point[3] >= fixture.curve.p
@@ -537,9 +626,7 @@ fn find_relation(
     target: PrimePoint,
     ops: &mut GroupOps,
 ) -> Result<(Option<Vec<usize>>, PreparedTarget, VisitReport), String> {
-    if fixture.curve.p > 17 {
-        return Err("full-field relation fixture restricted to p<=17".into());
-    }
+    fixture.declared_group()?;
     if target.infinity {
         return Err("fixture relation request is outside the finite target chart".into());
     }
@@ -568,28 +655,52 @@ fn find_relation(
     if witness.is_none()
         && (!report.complete || report.timed_out || report.trace_stopped || report.stopped_early)
     {
-        return Err("relation extraction interrupted; finite-chart exhaustion is unknown".into());
+        return Err(format!(
+            "relation extraction interrupted; finite-chart exhaustion is unknown: {}",
+            json!({"target":point_value(target),"shared_target_report":prepared.report,"f4":report})
+        ));
     }
     Ok((witness, prepared, report))
 }
 
-/// Solver receives a public Q only. The known scalar is constructed and checked
-/// by the caller. This tiny fixture includes an explicit anchor relation for G
-/// and uses the existing incremental linear algebra modulo 19.
-fn recover_toy(fixture: &FamilyFixture, q: PrimePoint) -> Result<Value, String> {
+/// Solver receives the public Q, generator, subgroup order and bounded query
+/// policy. It receives neither the target scalar, factor-base logarithms,
+/// reference solutions nor a point-sum lookup table. Its only initial scalar
+/// relation is the explicit G anchor. All later rows come from the actual F4
+/// visitor and signed group replay; relation arithmetic uses `order`, not p.
+fn recover_public(
+    fixture: &FamilyFixture,
+    q: PrimePoint,
+    g: PrimePoint,
+    order: u64,
+    max_attempts: u64,
+    backend: Backend,
+) -> Result<Value, String> {
     let curve = &fixture.curve;
-    if (curve.p, curve.a, curve.b) != (17, 2, 2) {
-        return Err("toy recovery is restricted to the declared p17 curve".into());
+    if fixture.declared_group()? != (g, order) {
+        return Err("generator/order differs from the declared fixture".into());
     }
-    let g = toy_generator();
+    if max_attempts == 0 || max_attempts > 32 || max_attempts > order {
+        return Err(
+            "fixture requires an explicit attempt bound between 1 and min(32, order)".into(),
+        );
+    }
     let mut ops = GroupOps::default();
-    if !curve.is_on_curve(q) || q.infinity || !curve.mul(&mut ops, q, TOY_ORDER).infinity {
-        return Err("invalid toy target".into());
+    if g.infinity || !curve.is_on_curve(g) || !curve.mul(&mut ops, g, order).infinity {
+        return Err("invalid fixture generator".into());
     }
-    let shared = fixture.shared(Backend::Integer)?;
-    let fb = factor_base(curve, &fixture.factor_x, TOY_ORDER)?;
+    if q.infinity
+        || q.x >= curve.p
+        || q.y >= curve.p
+        || !curve.is_on_curve(q)
+        || !curve.mul(&mut ops, q, order).infinity
+    {
+        return Err("invalid public target".into());
+    }
+    let shared = fixture.shared(backend)?;
+    let fb = factor_base(curve, &fixture.factor_x, order)?;
     let target_column = fb.columns;
-    let mut gauss = IncrementalGauss::new(fb.columns + 1, TOY_ORDER);
+    let mut gauss = IncrementalGauss::new(fb.columns + 1, order);
     let gi = *fb
         .point_index
         .get(&curve.key(&g))
@@ -602,7 +713,7 @@ fn recover_toy(fixture: &FamilyFixture, q: PrimePoint) -> Result<Value, String> 
     let mut attempts = Vec::new();
     let mut relations = 0;
     let mut skipped_exceptional_or_base = 0;
-    for a in 0..TOY_ORDER {
+    for a in 0..max_attempts {
         let ag = curve.mul(&mut ops, g, a);
         let target = curve.add(&mut ops, ag, q);
         // Avoid counting a direct collision or one-point lookup as a three-term
@@ -611,18 +722,27 @@ fn recover_toy(fixture: &FamilyFixture, q: PrimePoint) -> Result<Value, String> 
             skipped_exceptional_or_base += 1;
             continue;
         }
-        let (witness, prepared, report) = find_relation(fixture, &shared, &fb, target, &mut ops)?;
+        let (witness, prepared, report) =
+            find_relation(fixture, &shared, &fb, target, &mut ops).map_err(|error| {
+                format!(
+                    "bounded recovery interrupted: {}",
+                    json!({"error":error,"backend":backend.name(),"a":a,"attempt_limit":max_attempts,"retained_attempts":attempts})
+                )
+            })?;
+        let rank_before = gauss.rank();
+        let mut relation = Value::Null;
         let status = if let Some(indices) = witness {
             let mut row = vec![0; fb.columns + 1];
             let mut replay = curve.identity();
-            for index in indices {
-                row[fb.col_of[index]] = (row[fb.col_of[index]] + fb.coef_of[index]) % TOY_ORDER;
+            for &index in &indices {
+                row[fb.col_of[index]] = (row[fb.col_of[index]] + fb.coef_of[index]) % order;
                 replay = curve.add(&mut ops, replay, fb.points[index]);
             }
             if replay != target {
                 return Err("relation failed point-sum replay before linear algebra".into());
             }
-            row[target_column] = TOY_ORDER - 1;
+            row[target_column] = order - 1;
+            relation = json!({"factor_base_indices":indices,"row":row,"rhs":a});
             if gauss.add_row(row, a) == RowStatus::Inconsistent {
                 return Err("relation matrix inconsistent modulo subgroup order".into());
             }
@@ -631,18 +751,30 @@ fn recover_toy(fixture: &FamilyFixture, q: PrimePoint) -> Result<Value, String> 
         } else {
             "finite_chart_exhausted"
         };
-        attempts.push(json!({"a":a,"b":1,"target":point_value(target),"status":status,"shared_target_report":prepared.report,"f4":report}));
+        attempts.push(json!({"a":a,"b":1,"target":point_value(target),"status":status,"relation":relation,"rank_before":rank_before,"rank_after":gauss.rank(),"shared_target_report":prepared.report,"f4":report}));
         if let Some(recovered) = gauss.pinned(target_column) {
             if curve.mul(&mut ops, g, recovered) != q {
                 return Err("recovered scalar failed public target check".into());
             }
             return Ok(json!({
-                "modulus": TOY_ORDER,
+                "modulus": order,
                 "coordinate_modulus": curve.p,
+                "preconditioner_backend": backend.name(),
+                "f4_backend": "unchanged production integer F4 visitor",
+                "relation_linear_algebra": "existing integer IncrementalGauss modulo subgroup order",
+                "generator": point_value(g),
+                "factor_base_x": fixture.factor_x,
+                "factor_base_points": fb.points.iter().copied().map(point_value).collect::<Vec<_>>(),
+                "factor_base_columns": fb.col_of,
+                "factor_base_coefficients": fb.coef_of,
+                "target_column": target_column,
                 "recovered_scalar": recovered,
                 "public_target": point_value(q),
                 "relation_count": relations,
                 "anchor_relations": 1,
+                "anchor_column": fb.col_of[gi],
+                "anchor_coefficient": fb.coef_of[gi],
+                "attempt_limit": max_attempts,
                 "rank": gauss.rank(),
                 "scoped_setup_report": shared.setup_report(),
                 "attempts": attempts,
@@ -653,22 +785,36 @@ fn recover_toy(fixture: &FamilyFixture, q: PrimePoint) -> Result<Value, String> 
                 "group_field_operations": ops.field_ops,
                 "group_count_scope": "target admission, query generation, sign lifting, relation replay and final scalar check; factor-base construction excluded",
                 "answer_checked_in_group": true,
+                "known_answer_passed_to_solver": false,
+                "reference_solutions_passed_to_solver": false,
+                "uniform_random_target_tested": false,
+                "benchmark_executed": false,
                 "cost_counter_coverage_complete": false,
-                "scope": "known-answer p17 fixture using finite-chart F4 relations; no timing or complete-cost comparison"
+                "scope": "structured known-answer target/base; public-Q recovery with finite-chart F4 relations; no uniform random-target or complete-cost conclusion"
             }));
         }
     }
-    Err("bounded fixture relations did not determine the target logarithm".into())
+    Err(format!(
+        "bounded fixture relations did not determine the target logarithm: {}",
+        json!({"attempt_limit":max_attempts,"backend":backend.name(),"rank":gauss.rank(),"relation_count":relations,"retained_attempts":attempts,"skipped_exceptional_or_base_queries":skipped_exceptional_or_base})
+    ))
+}
+
+fn recover_toy(fixture: &FamilyFixture, q: PrimePoint) -> Result<Value, String> {
+    recover_public(
+        fixture,
+        q,
+        toy_generator(),
+        TOY_ORDER,
+        TOY_ORDER,
+        Backend::Integer,
+    )
 }
 
 fn p31_fixture_check() -> Result<Value, String> {
-    let curve = PrimeCurve {
-        p: 2_147_483_647,
-        a: 847_514_846,
-        b: 2_087_444_724,
-    };
-    let order = 2_147_446_831;
-    let generator = PrimePoint::affine(625_037_715, 2_100_627_251);
+    let curve = p31_curve();
+    let order = P31_ORDER;
+    let generator = p31_generator();
     let mut ops = GroupOps::default();
     if !curve.is_on_curve(generator) || !curve.mul(&mut ops, generator, order).infinity {
         return Err("committed p31 fixture failed point/order replay".into());
@@ -679,10 +825,11 @@ fn p31_fixture_check() -> Result<Value, String> {
         .collect();
     let prefix = curve.add(&mut ops, points[0], points[1]);
     let target = curve.add(&mut ops, prefix, points[2]);
-    if prefix.infinity || target.infinity {
+    if prefix.infinity || target.infinity || target != p31_public_target() {
         return Err("p31 fixture selected an exceptional chart".into());
     }
     let fixture = FamilyFixture::new(curve.clone(), points.iter().map(|point| point.x).collect())?;
+    fixture.declared_group()?;
     let witness = [points[0].x, points[1].x, points[2].x, prefix.x];
     let mut reference = None;
     let mut reports = Vec::new();
@@ -722,8 +869,174 @@ fn p31_fixture_check() -> Result<Value, String> {
     )
 }
 
+fn check_lifted_set(
+    fixture: &FamilyFixture,
+    fb: &FactorBase<PrimePoint>,
+    solutions: &BTreeSet<[u64; 4]>,
+    target: PrimePoint,
+) -> Result<usize, String> {
+    let mut ops = GroupOps::default();
+    for point in solutions {
+        let witness = lift_chain(&fixture.curve, fb, point, target, &mut ops)
+            .ok_or("p31 polynomial solution failed its signed finite-prefix lift")?;
+        if !chain_indices_valid(&fixture.curve, fb, &witness, point[3], target, &mut ops) {
+            return Err("p31 signed witness failed exact finite-prefix replay".into());
+        }
+    }
+    Ok(solutions.len())
+}
+
+fn p31_f4_integration_check() -> Result<Value, String> {
+    let fixture = p31_fixture();
+    let target = p31_public_target();
+    let fb = factor_base(&fixture.curve, &fixture.factor_x, P31_ORDER)?;
+    let original = fixture
+        .shared(Backend::Integer)?
+        .original_equations(target.x)
+        .map_err(|e| e.to_string())?;
+    let (plain_set, plain_report) = visit_solutions(&fixture, &original, &[])?;
+    let plain_lifts = check_lifted_set(&fixture, &fb, &plain_set, target)?;
+    let mut arms = Vec::new();
+    for backend in BACKENDS {
+        let shared = fixture.shared(backend)?;
+        let fresh = fixture.fresh(backend)?;
+        if shared
+            .original_equations(target.x)
+            .map_err(|e| e.to_string())?
+            != original
+            || fresh
+                .original_equations(target.x)
+                .map_err(|e| e.to_string())?
+                != original
+        {
+            return Err("p31 arithmetic/preconditioning arms changed original equations".into());
+        }
+        let cached = shared.specialize(target.x).map_err(|e| e.to_string())?;
+        let uncached = fresh.specialize(target.x).map_err(|e| e.to_string())?;
+        if cached.total_rank != uncached.total_rank {
+            return Err("p31 fresh/shared rank differed during actual F4 qualification".into());
+        }
+        let (cached_set, cached_report) =
+            visit_solutions(&fixture, &original, &cached.consequences)?;
+        let (fresh_set, fresh_report) =
+            visit_solutions(&fixture, &original, &uncached.consequences)?;
+        if cached_set != plain_set || fresh_set != plain_set {
+            return Err(format!(
+                "p31 F4 finite-chart solutions changed under {} preconditioning",
+                backend.name()
+            ));
+        }
+        let shared_lifts = check_lifted_set(&fixture, &fb, &cached_set, target)?;
+        let fresh_lifts = check_lifted_set(&fixture, &fb, &fresh_set, target)?;
+        arms.push(json!({
+            "preconditioner_backend":backend.name(),
+            "solutions":cached_set.len(),
+            "shared_signed_lifts":shared_lifts,
+            "fresh_signed_lifts":fresh_lifts,
+            "shared_total_rank":cached.total_rank,
+            "fresh_total_rank":uncached.total_rank,
+            "shared_setup":shared.setup_report(),
+            "fresh_setup":fresh.setup_report(),
+            "shared_target":cached.report,
+            "fresh_target":uncached.report,
+            "shared_f4":cached_report,
+            "fresh_f4":fresh_report
+        }));
+    }
+    // Construct the independent check only after all production solver calls.
+    // It neither supplies a restricted u-domain nor acts as a solver fallback.
+    let expected = fixture.signed_pair_reference(target)?;
+    if plain_set != expected || expected.is_empty() {
+        return Err(
+            "p31 F4 solution set differs from the independent signed-pair reference".into(),
+        );
+    }
+    Ok(json!({
+        "coordinate_modulus":P31,
+        "public_target":point_value(target),
+        "factor_coordinate_domains":fixture.factor_x,
+        "auxiliary_domain":"full Fp (None in the production visitor)",
+        "solutions":plain_set,
+        "solution_count":expected.len(),
+        "reference":"finite signed pair sums, followed by original second-S3 evaluation; validation only",
+        "reference_computed_after_solver_calls":true,
+        "reference_solutions_passed_to_solver":false,
+        "original_equations_retained":true,
+        "original_signed_lifts":plain_lifts,
+        "original_f4":plain_report,
+        "arms":arms,
+        "scope":"complete solution sets for the declared three-coordinate factor base and finite auxiliary chart only",
+        "complete_point_decomposition_coverage":false,
+        "cost_counter_coverage_complete":false
+    }))
+}
+
+fn p31_recovery_check() -> Result<Value, String> {
+    let fixture = p31_fixture();
+    let target = p31_public_target();
+    // This caller-only check binds the historical public point. Neither 7 nor
+    // this known-answer comparison is passed to recover_public.
+    if fixture
+        .curve
+        .mul(&mut GroupOps::default(), p31_generator(), 7)
+        != target
+    {
+        return Err("historical p31 public target differs from the caller's known answer".into());
+    }
+    let mut arms = Vec::new();
+    for backend in BACKENDS {
+        let recovered = recover_public(
+            &fixture,
+            target,
+            p31_generator(),
+            P31_ORDER,
+            P31_ATTEMPTS,
+            backend,
+        )?;
+        if recovered["recovered_scalar"].as_u64() != Some(7) {
+            return Err("p31 recovered scalar differs from the caller-only known answer".into());
+        }
+        arms.push(recovered);
+    }
+    Ok(json!({
+        "coordinate_modulus":P31,
+        "subgroup_modulus":P31_ORDER,
+        "public_target":point_value(target),
+        "caller_only_expected_scalar":7,
+        "attempt_limit_per_arm":P31_ATTEMPTS,
+        "arms":arms,
+        "scope":"structured known-answer target/base; recovery correctness on the declared ordinary prime-field curve",
+        "uniform_random_target_tested":false,
+        "benchmark_executed":false,
+        "complete_cost_comparison":false
+    }))
+}
+
+fn run_prime31_checks() -> Result<Value, String> {
+    let witness = p31_fixture_check()?;
+    let f4 = p31_f4_integration_check()?;
+    let recovery = p31_recovery_check()?;
+    Ok(json!({
+        "schema":"shared-s3-matrix.prime31-check/v1",
+        "status":"passed",
+        "evidence_status":"producer local correctness checks; PCC-unverified",
+        "coordinate_modulus":P31,
+        "subgroup_modulus":P31_ORDER,
+        "curve":p31_curve(),
+        "generator":point_value(p31_generator()),
+        "historical_point_witness":witness,
+        "f4_integration":f4,
+        "public_target_recovery":recovery,
+        "scope":"structured known-answer target/base and finite-chart relation qualification",
+        "uniform_random_target_tested":false,
+        "benchmark_executed":false,
+        "complete_cost_comparison":false,
+        "cost_counter_coverage_complete":false
+    }))
+}
+
 fn plan() -> Value {
-    json!({"schema":"shared-s3-matrix.fixture-plan/v1","status":"planned","mode":"correctness-only","variables":["x1","x2","x3","u"],"common":["S3(x1,x2,u)","membership(x1)","membership(x2)","membership(x3)"],"parameterized":"S3(u,x3,t)","macaulay_degree":DEGREE,"limits":fixture_limits(),"backends":["integer","fma","split16"],"p17":{"curve":{"p":17,"a":2,"b":2},"subgroup_order":19,"generator":{"x":5,"y":1},"factor_base_x":TOY_BASE_X,"auxiliary_domain":"full F17","exhaustive_parameters":17,"assignments_per_parameter":459},"checks":["expanded S3 versus existing numeric evaluator","original/shared/fresh complete p17 polynomial solution sets","existing F4 visitor with original equations retained","signed finite-prefix witnesses and exceptional-prefix control","public toy logarithm recovered modulo19","committed p31 point witness and arithmetic equality"],"benchmark_executed":false,"native_blas_or_gpu":false,"complete_cost_comparison":false,"next_run":"--check"})
+    json!({"schema":"shared-s3-matrix.fixture-plan/v2","status":"planned","mode":"correctness-only","primary_coordinate_modulus":P31,"variables":["x1","x2","x3","u"],"common":["S3(x1,x2,u)","membership(x1)","membership(x2)","membership(x3)"],"parameterized":"S3(u,x3,t)","macaulay_degree":DEGREE,"limits":fixture_limits(),"backends":["integer","fma","split16"],"p31":{"curve":p31_curve(),"subgroup_order":P31_ORDER,"generator":point_value(p31_generator()),"public_target":point_value(p31_public_target()),"factor_base_x":P31_BASE_X,"auxiliary_domain":"full Fp","attempt_limit":P31_ATTEMPTS,"scope":"structured known-answer target/base; no uniform random-target or complete-cost conclusion"},"p17":{"role":"retained exhaustive diagnostic","curve":{"p":17,"a":2,"b":2},"subgroup_order":19,"generator":{"x":5,"y":1},"factor_base_x":TOY_BASE_X,"auxiliary_domain":"full F17","exhaustive_parameters":17,"assignments_per_parameter":459},"checks":["p31 original/fresh/shared F4 solution sets and independent signed-pair reference","p31 public-Q recovery modulo subgroup order with each preconditioner backend","p31 signed finite-prefix replay and historical point witness","retained exhaustive p17 identities and diagnostics"],"benchmark_executed":false,"native_blas_or_gpu":false,"complete_cost_comparison":false,"next_run":"--check-prime31","all_diagnostics":"--check"})
 }
 
 fn run_checks() -> Result<Value, String> {
@@ -745,7 +1058,7 @@ fn run_checks() -> Result<Value, String> {
     if recovery["recovered_scalar"].as_u64() != Some(9) {
         return Err("toy recovered scalar differs from caller-only known answer".into());
     }
-    let p31 = p31_fixture_check()?;
+    let p31 = run_prime31_checks()?;
     Ok(
         json!({"schema":"shared-s3-matrix.fixture-check/v1","status":"passed","evidence_status":"producer local correctness checks; PCC-unverified","identity_evaluations":identities,"p17_preconditioning":preconditioners,"f4_integration":f4,"signed_witnesses":signed,"toy_recovery":recovery,"p31":p31,"benchmark_executed":false,"complete_cost_comparison":false,"cost_counter_coverage_complete":false}),
     )
@@ -757,7 +1070,8 @@ fn main() {
         [] => Ok(plan()),
         [flag] if flag == "--plan" => Ok(plan()),
         [flag] if flag == "--check" => run_checks(),
-        _ => Err("usage: shared_s3_matrix [--plan|--check]; timing/benchmark execution is not implemented in this correctness fixture".into()),
+        [flag] if flag == "--check-prime31" => run_prime31_checks(),
+        _ => Err("usage: shared_s3_matrix [--plan|--check|--check-prime31]; timing/benchmark execution is not implemented in this correctness fixture".into()),
     };
     match result {
         Ok(value) => println!("{}", serde_json::to_string_pretty(&value).unwrap()),
@@ -815,5 +1129,137 @@ mod tests {
     #[test]
     fn committed_p31_nonexceptional_witness_matches_all_backends() {
         p31_fixture_check().unwrap();
+    }
+
+    #[test]
+    fn signed_pair_reference_matches_exhaustive_small_field_roots() {
+        let fixture = toy_fixture();
+        for scalar in 1..TOY_ORDER {
+            let q = fixture
+                .curve
+                .mul(&mut GroupOps::default(), toy_generator(), scalar);
+            assert_eq!(
+                fixture.signed_pair_reference(q).unwrap(),
+                fixture.direct_solutions(q.x).unwrap()
+            );
+        }
+    }
+
+    #[test]
+    fn p31_original_fresh_shared_solutions_and_signed_lifts_agree() {
+        let report = p31_f4_integration_check().unwrap();
+        assert_eq!(report["coordinate_modulus"], P31);
+        assert!(report["solution_count"].as_u64().unwrap() > 0);
+        assert_eq!(report["reference_solutions_passed_to_solver"], false);
+        assert_eq!(report["original_f4"]["complete"], true);
+        for arm in report["arms"].as_array().unwrap() {
+            assert_eq!(arm["shared_f4"]["complete"], true);
+            assert_eq!(arm["fresh_f4"]["complete"], true);
+            assert_eq!(arm["shared_signed_lifts"], report["solution_count"]);
+            assert_eq!(arm["fresh_signed_lifts"], report["solution_count"]);
+        }
+    }
+
+    #[test]
+    fn p31_public_target_recovers_modulo_subgroup_for_all_backends() {
+        let report = p31_recovery_check().unwrap();
+        assert_eq!(report["arms"].as_array().unwrap().len(), BACKENDS.len());
+        for arm in report["arms"].as_array().unwrap() {
+            assert_eq!(arm["coordinate_modulus"], P31);
+            assert_eq!(arm["modulus"], P31_ORDER);
+            assert_ne!(arm["coordinate_modulus"], arm["modulus"]);
+            assert_eq!(arm["recovered_scalar"], 7);
+            assert_eq!(arm["known_answer_passed_to_solver"], false);
+            assert_eq!(arm["reference_solutions_passed_to_solver"], false);
+            assert_eq!(arm["answer_checked_in_group"], true);
+            assert!(arm["relation_count"].as_u64().unwrap() >= 3);
+            for attempt in arm["attempts"].as_array().unwrap() {
+                if attempt["status"] == "found" {
+                    assert_eq!(attempt["f4"]["stopped_early"], true);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn p31_solver_uses_supplied_public_point_including_negation() {
+        let fixture = p31_fixture();
+        let negative = fixture.curve.neg(p31_public_target());
+        let report = recover_public(
+            &fixture,
+            negative,
+            p31_generator(),
+            P31_ORDER,
+            P31_ATTEMPTS,
+            Backend::Integer,
+        )
+        .unwrap();
+        assert_eq!(report["recovered_scalar"], P31_ORDER - 7);
+        assert_eq!(report["public_target"], point_value(negative));
+        assert_eq!(report["answer_checked_in_group"], true);
+    }
+
+    #[test]
+    fn p31_insufficient_budget_and_wrong_modulus_are_not_successes() {
+        let fixture = p31_fixture();
+        let insufficient = recover_public(
+            &fixture,
+            p31_public_target(),
+            p31_generator(),
+            P31_ORDER,
+            1,
+            Backend::Integer,
+        )
+        .unwrap_err();
+        assert!(insufficient.contains("did not determine"));
+        assert!(insufficient.contains("retained_attempts"));
+        assert!(insufficient.contains("\"attempt_limit\":1"));
+        let wrong_modulus = recover_public(
+            &fixture,
+            p31_public_target(),
+            p31_generator(),
+            P31,
+            P31_ATTEMPTS,
+            Backend::Integer,
+        )
+        .unwrap_err();
+        assert!(wrong_modulus.contains("generator/order differs"));
+    }
+
+    #[test]
+    fn p31_noncanonical_public_coordinates_are_rejected() {
+        let fixture = p31_fixture();
+        let q = p31_public_target();
+        for malformed in [
+            PrimePoint::affine(q.x + P31, q.y),
+            PrimePoint::affine(q.x, q.y + P31),
+        ] {
+            let failure = recover_public(
+                &fixture,
+                malformed,
+                p31_generator(),
+                P31_ORDER,
+                P31_ATTEMPTS,
+                Backend::Integer,
+            )
+            .unwrap_err();
+            assert!(failure.contains("invalid public target"));
+            assert!(fixture.signed_pair_reference(malformed).is_err());
+        }
+    }
+
+    #[test]
+    fn p31_deadline_does_not_become_finite_chart_exhaustion() {
+        let fixture = p31_fixture();
+        let original = fixture
+            .shared(Backend::Integer)
+            .unwrap()
+            .original_equations(p31_public_target().x)
+            .unwrap();
+        let mut options = solver_options();
+        options.deadline = Some(Instant::now());
+        let failure = visit_solutions_with_options(&fixture, &original, &[], &options).unwrap_err();
+        assert!(failure.contains("no exhaustion conclusion"));
+        assert!(failure.contains("\"timed_out\":true"));
     }
 }
