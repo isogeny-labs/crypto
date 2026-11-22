@@ -123,3 +123,36 @@ improvement**; it is conditional on κ, which nobody has measured at genus 3. Th
 measurement is κ itself: cycles of a mod-r multiply-add in Wiedemann against a field multiplication
 in Cantor, on the same host (`perf-ipc` or `optlevel` skill; this container has no PMU, so wall time
 over repeated kernels). Errata in `genus_ladder_light_floor_20261122/ERRATA.md`.
+
+### R7: κ measured at genus 3, and what it does to the frontier [pcc:unverified]
+
+`genus_ladder_kappa_20261122` (protocol frozen before data; one VM, single thread, wall clock, no
+PMU, one instance per prime, medians of 16 trials). κ is the wall-clock cost of one counted
+`la_mul` in F_p multiplications as counted in Cantor (`fmul + 10·finv`).
+
+| p | κ in situ (range) | κ bare mod-r multiply | κ per `la_add` |
+|--:|--:|--:|--:|
+| 65537 | 17.9 (15.6–23.7) | 2.25–2.85 | 0.99 |
+| 131101 | 17.0 (13.6–22.8) | 1.78–2.67 | 1.00 |
+| 262147 | 15.8 (12.7–19.9) | 1.08–1.80 | 1.00 |
+
+The bare multiply agrees with main's κ ≈ 2. In situ, Wiedemann's wall time follows the matrix
+entries it visits (about 11 additions per counted multiplication), so a counted `la_mul` costs
+16 to 18 field multiplications of wall time. FPM with κ = g² = 9 therefore **under-weights the
+linear algebra by about 2×** on this host.
+
+Consequences, re-priced at the in-situ κ from the recorded counts:
+- **The light-row floor (R4) is an improvement in wall-clock terms**: lighter rows cut both
+  additions and multiplications, and κ in situ is far above the 2.5–4.1 break-even. The R4
+  errata's "not an improvement at the measured price" referred to the bare-multiply κ and is
+  superseded for wall time.
+- **The genus-3 arm is further from rho than FPM at κ = 9 said.** R2's nine-curve rows, SGE(8,3) arm
+  over negation rho: 0.300 / 0.399 / 0.377 at κ = 9 become 0.479 / 0.625 / 0.568 at the in-situ κ
+  (p = 65537 / 131101 / 262147). The unmerged arm goes from 0.54–0.67 to 0.95–1.13, at or above
+  rho. The arm stays below rho, by a factor of about 1.6 to 2.1 instead of 2.5 to 3.3.
+- Every study in this campaign that reports FPM_mid used κ = g²; their ratios to rho are
+  optimistic for arms whose linear algebra is a large share, by up to the factor above.
+
+Limits: wall time on one shared VM, no hardware counters, one instance per prime, the LA time
+obtained by differencing two runs. The figures that would settle it are cycles on an isolated host
+(the `perf-ipc` skill refuses on this VM).

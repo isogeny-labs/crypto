@@ -3905,3 +3905,98 @@ mod tests {
         assert!(dropped_any);
     }
 }
+
+/// Phase split of the linear-algebra wall time (`research/genus_ladder_kappa_20261122`):
+/// times `sge_reduce` and `wiedemann` separately on a synthetic core of the
+/// real shape and prints wall time per counted operation.  Measurement
+/// only; `cargo test --release --lib kappa_phase_split -- --ignored --nocapture`.
+#[cfg(test)]
+mod kappa_phase_split {
+    use super::*;
+    use std::time::Instant;
+
+    #[test]
+    #[ignore]
+    fn sge_and_wiedemann_wall_per_counted_op() {
+        for r in [
+            35_204_231_349_877u64,
+            562_757_240_242_147,
+            4_511_942_408_507_159,
+        ] {
+            let (nrow, ncol) = (4_100usize, 4_000usize);
+            let tcol = (ncol - 1) as u32;
+            let mut st = 11u64;
+            let mut next = || {
+                st = st.wrapping_add(0x9E37_79B9_7F4A_7C15);
+                mix64(st)
+            };
+            let mut reps: Vec<[f64; 6]> = Vec::new();
+            for rep in 0..7u64 {
+                let x: Vec<u64> = (0..ncol).map(|_| next() % r).collect();
+                let rows: Vec<Row> = (0..nrow)
+                    .map(|i| {
+                        let k = 2 + next() % 5;
+                        let mut t: Vec<(u32, u64)> = vec![((i % (ncol - 1)) as u32, 1)];
+                        for _ in 0..k {
+                            let c = (next() % (ncol as u64 - 1)) as u32;
+                            let v = match next() % 20 {
+                                0..=1 => r - 1,
+                                2..=16 => 1,
+                                _ => 1 + next() % (r - 1),
+                            };
+                            t.push((c, v));
+                        }
+                        t.push((tcol, 1 + next() % (r - 1)));
+                        t.sort_unstable_by_key(|e| e.0);
+                        t.dedup_by_key(|e| e.0);
+                        let rhs = t
+                            .iter()
+                            .fold(0, |a, &(c, v)| addm(a, mulmod(v, x[c as usize], r), r));
+                        (t, rhs)
+                    })
+                    .collect();
+                let mut sn = Nat::default();
+                let t0 = Instant::now();
+                let (red, rc, rt, _) = sge_reduce(
+                    &rows,
+                    ncol,
+                    tcol,
+                    r,
+                    SgeParams {
+                        w_max: 8,
+                        fill_max: 3.0,
+                    },
+                    &mut sn,
+                );
+                let t_sge = t0.elapsed().as_nanos() as f64;
+                let mut rng = StdRng::seed_from_u64(rep);
+                let mut wn = Nat::default();
+                let t0 = Instant::now();
+                let sol = wiedemann(&red, rc, r, &mut rng, true, &mut wn);
+                let t_w = t0.elapsed().as_nanos() as f64;
+                if sol.map(|v| v[rt as usize]) != Some(x[tcol as usize]) {
+                    println!("r={r} rep {rep}: wiedemann returned a wrong value or None, skipped");
+                    continue;
+                }
+                reps.push([
+                    t_sge,
+                    sn.mul as f64,
+                    sn.add as f64,
+                    t_w,
+                    wn.mul as f64,
+                    wn.add as f64,
+                ]);
+            }
+            let med = |i: usize| {
+                let mut v: Vec<f64> = reps.iter().map(|x| x[i]).collect();
+                v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+                v[v.len() / 2]
+            };
+            println!(
+                "kappa_phase r={r} reps={} sge_ns={:.0} sge_mul={:.0} sge_add={:.0} wied_ns={:.0} wied_mul={:.0} wied_add={:.0} wied_ns_per_mul={:.2} wied_ns_per_add={:.2}",
+                reps.len(), med(0), med(1), med(2), med(3), med(4), med(5),
+                med(3) / med(4), med(3) / med(5)
+            );
+        }
+    }
+}

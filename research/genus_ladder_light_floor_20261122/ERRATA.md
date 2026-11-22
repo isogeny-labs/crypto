@@ -15,3 +15,10 @@ result reads; the frozen files are left as they are.
   partly the rho sample.
 - Minor: the last line of `data.sha256` hashes `partial2/joined.jsonl.gz` but is labelled as the
   decompressed file.
+
+- **E1, update (2026-11-22, after `genus_ladder_kappa_20261122`).** κ measured in wall time on this
+  host is 16–18 per counted `la_mul` in situ, because Wiedemann's time follows the entries it visits
+  (about 11 additions per multiplication); the bare mod-r multiply alone is 1.1–2.9. In wall-clock
+  terms the selection is therefore an improvement (κ far above the 2.5–4.1 break-even). The
+  statement above holds only for an accounting that charges `la_mul` alone at the bare-multiply
+  price. [pcc:unverified]
