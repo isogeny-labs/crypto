@@ -726,9 +726,7 @@ impl<R: Ring> Cube<R> {
         // test above. Skip its s-1 repeated cubings and start at digit 1.
         // These are the states the original digit-0 loop left behind.
         for j in 1..self.s {
-            // At digit one the correction is still the identity.
-            // Avoid a redundant full field/extension-field multiply.
-            let mut z = if j == 1 { h } else { r.mul(h, correction) };
+            let mut z = r.mul(h, correction);
             // z = (h*c^{-l})^(3^(s-1-j)). Repeated cubing uses only
             // 2(s-1-j) field multiplications, not binary exponentiation.
             for _ in (j + 1)..self.s {
