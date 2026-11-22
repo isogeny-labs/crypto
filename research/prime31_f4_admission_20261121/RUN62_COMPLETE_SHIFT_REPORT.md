@@ -61,3 +61,13 @@ Run62 is **13.4501× faster than original affine on the matched public +G primit
 The run59 **conditional** 4,699,949-probe projection now charges **101.330ms shift-only**, leaving only **68.783ms** (14.635ns/probe) for *all* other operations relative to the previous **cross-run** 170.113ms BSGS reference. This is a changed sensitivity calculation, not an executed ECDLP solve, not an independent root extraction, and not a same-host solver advantage.
 
 The later workflow update also added a separate Python big-int verifier step. Its source-specific CI result is not included in the earlier #45022038604 receipt; the independent Python verifier had already passed locally. This is an explicit validation distinction, not an assumption of green CI.
+
+## Second, fully independently replayed source-specific CI: PASS with important timing variance
+
+The complete workflow, now including the **separate independent Python big-int verifier**, subsequently passed **[Actions #45022156215](https://github.com/isogeny-labs/crypto/actions/runs/45022156215)**, job `137207239654`, under Rust 1.100.0. Its job returned **SUCCESS** with Python 120,025 canonical field operand pairs and 96×128 full group additions, **plus** original-Rust 120,049 field pairs and 96×128 exact group steps; all accepted. All exception branches and five full benchmark endpoints match the original arithmetic. The result is independently implemented Python plus source-linked Rust checks, not independent signed PCC.
+
+On this second GitHub runner repetition the complete median was **21.8733ns/shift**, the old partial median **21.9587ns/shift**, and original affine **384.8678ns/shift** (17.5954× complete vs affine). The complete-vs-partial ratio was only **1.0039×**, compared with **1.0951×** in the first job. This **fails any claim of a stable 9.5% arithmetic-reduction advantage over the prior partial implementation**. The original affine control also drifted substantially between jobs (289.98→384.87 ns), so cross-run speedups must not be pooled.
+
+The reproducible conclusion is instead **mathematical completeness with virtually unchanged fast mixed-Jacobian throughput (~21.56–21.87ns/shift on these two jobs)**. The cross-run sensitivity for the run59 conditional 1,024-target model becomes approximately **101.33–102.80ms of shift-only operations**, leaving a hypothetical **67.31–68.78ms** for the rest versus the separately measured historical 170.113ms BSGS result. No complete log extraction was performed.
+
+**Interpretation:** keep the complete exceptional-safe implementation as the correctness candidate, but further fold-only timing optimization is low-priority compared with genuinely blind non-generic root selection and actual complete-solver costs.
