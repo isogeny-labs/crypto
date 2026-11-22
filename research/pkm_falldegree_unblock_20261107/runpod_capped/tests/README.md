@@ -11,13 +11,13 @@ the A cases the stub fails every call, so "0 API calls" means the refusal came b
 **Runs.** `bash tests/run_tests.sh` from `runpod_capped/` writes nothing in the repository and prints the results;
 `bash tests/run_tests.sh --write` also replaces `tests/out/`, `tests/results.tsv` and this file.
 
-**The image layer.** 61 of the 204 cases (launch, fetch, four reaper cases and five refusals that come after the
+**The image layer.** 68 of the 229 cases (launch, fetch, four reaper cases and five refusals that come after the
 binary check) need the image layer: `RPC_LAYER_SRC` (the layer tarball, SHA-256 `a0f7e28e…`, `image.json`
 `layer.digest`) and `RPC_BIN_SRC` (its `usr/local/bin`; defaults in the session scratchpad). Without them those
-cases print `SKIP-NEEDS-LAYER`: a run without the layer gives 143 results and 61 skips; a run with
-it gives 204 results.
+cases print `SKIP-NEEDS-LAYER`: a run without the layer gives 161 results and 68 skips; a run with
+it gives 229 results.
 
-Groups: A refusals before any API call (allow-list, order, the one stage cap:14:0:7:54000000000, the pinned request); B launch paths on the 32 vCPU / 256 GB pod (v2 create
+Groups: A refusals before any API call (allow-list with the h1-h3 retries of owner decision 28, order, the one stage cap:14:0:7:54000000000, the pinned request); B launch paths on the 32 vCPU / 256 GB pod, and H the host check of owner decision 28 (v2 create
 body and checks, the study guard, pagination); C `fetch.sh` flows, with the git gate in C02-C02c; D the outcome
 classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 field names, with the memory rule of owner decision 24 in D25-D37; R the reading at cap 7; E the order
 (`next_allowed`); F `reap.sh` (F10, F11: a fresh `RPC_STATE`, the independent reaper of owner decision 25); W `watch.sh` (owner decision 26); G syntax, pins, the request and the absence of v1 calls. Per-case output:
@@ -59,6 +59,11 @@ classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 f
 | A31 | PASS | a draft Amendment 18 name (pkm-x-t13-k0-c6-r3) | exit 3, 0 API calls | exit 3, 0 API calls |
 | A32 | PASS | draw 1 of the same cap (needs a later owner decision) | exit 3, 0 API calls | exit 3, 0 API calls |
 | A33 | PASS | the retired name of owner decision 23 (pkm-x-t14-k0-c7-m112) | exit 3, 0 API calls | exit 3, 0 API calls |
+| A34 | PASS | the used Amendment 33 name pkm-x-t14-k0-c7-d54 (retired; owner decision 28) | exit 3, 0 API calls | exit 3, 0 API calls |
+| A35 | PASS | order: h2 requested before h1 has run | exit 3, 0 API calls | exit 3, 0 API calls |
+| A36 | PASS | a fourth retry name (h4) is not on the allow-list | exit 3, 0 API calls | exit 3, 0 API calls |
+| A37 | PASS | per-name cap: five pods already refused by the host check | exit 3, 0 API calls | exit 3, 0 API calls |
+| A38 | PASS | order: h2 after h1 NOT_ADMITTED without a host limit (resolved: owner) | exit 3, 0 API calls | exit 3, 0 API calls |
 | B01 | PASS | a pkm-x- pod is live (serial rule) | exit 3, no create | exit 3, creates 0 |
 | B02 | PASS | catalog availability NONE for cpu5m at 16 vCPU: no attempt | exit 10, no create, no receipts dir | exit 10, creates 0, dir no |
 | B03 | PASS | price 0.066 x 32 = 2.112/h x 30.8 h = US$65.05 > US$65 | exit 3 (per-job guard), no create | exit 3, creates 0 |
@@ -70,7 +75,7 @@ classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 f
 | B08 | PASS | create refused by the API (HTTP 400), no pod exists | exit 4, receipts -> .nocreate-*, name free | exit 4 |
 | B09 | PASS | runner would start more than 55 min after creation | exit 5, pod deleted, not an attempt | exit 5 |
 | B10 | PASS | development launch end to end against the v2 stub | exit 0; v2 create body keys only; token and key absent from receipts and create argv; command and env dropped from saved records; cgroup limit read before start; data center read when ready; ledger row at 30 h; no v1 or GraphQL call | exit 0; X-Token argv lines (rp_pinned.sh, disclosed): 13 |
-| B11 | PASS | study launch pkm-x-t14-k0-c7-d54, then pkm-x-t14-k0-c7-d54-r1 | the study run starts with stage cap:14:0:7:54000000000 and the pinned request (exit 0); its -r1 is refused while it is in flight (exit 3) | exit 0 then 3 |
+| B11 | PASS | study launch pkm-x-t14-k0-c7-d54-h1, then pkm-x-t14-k0-c7-d54-h1-r1 | the study run starts with stage cap:14:0:7:54000000000 and the pinned request (exit 0); its -r1 is refused while it is in flight (exit 3) | exit 0 then 3 |
 | B12 | PASS | the pod start command parses and carries server_pinned.py (= runpod/server.py at d2a16c723d) | bash -n ok; embedded runner sha256 f56fd08e... | bash -n 0; embedded sha256 f56fd08e |
 | B13 | PASS | the boot loop copies cgroup v2 files and writes its final copy after runner_state.json | memory.max, memory.events and final-at copied | final-at fstype max_map_count memory.events memory.max proc-self-cgroup snapshot-at  |
 | B14 | PASS | S4: cgroup memory.max 255,999,999,999 bytes (one byte under the 256,000,000,000 floor) | exit 4 before start, pod deleted | exit 4 |
@@ -84,6 +89,13 @@ classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 f
 | B21 | PASS | study run on a pod whose memory.max reads max: refused (review 4 S3) | exit 4 before start, pod deleted | exit 4 |
 | B22 | PASS | development run with memory.max max is accepted; the S1 settings are recorded (no rule reads them) | exit 0; memory.oom.group and max_map_count recorded in cgroup-prestart.json | exit 0 |
 | B23 | PASS | a failed create's response body is copied to run.log only as redacted JSON (review 4 S13) | exit 4; run.log names the size of the non-JSON body; the token is in no receipt | exit 4 |
+| H01 | PASS | host vm.max_map_count 65,530 (the Amendment 33 probe's host), then a host with 1,048,576 | exit 13: pod deleted (logged), receipts -> .hostrefused-1, ledger row NAME.hostrefused-1/pod closed; then the same name starts on a good host (exit 0) | exit 13 then 0 |
+| H02 | PASS | host vm.max_map_count unreadable (no file): refused, fail closed | exit 13, pod deleted | exit 13 |
+| H03 | PASS | host vm.max_map_count exactly 262,144: accepted | exit 0 (started) | exit 0 |
+| H03b | PASS | host vm.max_map_count 262,143: refused | exit 13 | exit 13 |
+| H04 | PASS | the host check applies to development names too | exit 13, receipts_dev/...hostrefused-1 | exit 13 |
+| H05 | PASS | host refusal whose delete is not confirmed: treated as any unconfirmed pre-start delete | exit 11, receipts -> .prestart-1, ledger row NAME/pod left open (the name is blocked: owner) | exit 11 |
+| H06 | PASS | per-name cap on host refusals (HOST_REFUSE_MAX 5) | five refusals (exit 13 each, five ledger rows, five receipt dirs), then exit 3 | refusals 5, then exit 3, rows 5 |
 | C01 | PASS | running before the deadline | exit 41, pod kept, one check-in with v2 status and startedAt | exit 41 |
 | C02 | PASS | completed run: collect, the git gate (decision 22), delete, refuse re-collection | exit 8 ADMITTED; gate: uncommitted 8, committed but not pushed 8, pushed 0; re-run 9 | exit 8 ADMITTED P2d; 8; 8; 0; 9 |
 | C02b | PASS | git gate: a kept file changed after the commit (manifest mismatch) | exit 8, pod kept | exit 8 then 8 |
@@ -175,6 +187,11 @@ classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 f
 | R10 | PASS | review 4 S4: oversize true with no stop line (no contrary stop line) -> censored by size | ADMITTED P2d d_F=>= 7 censored=size | ADMITTED P2d d_F=>= 7 censored=size |
 | R11 | PASS | review 4 S4: a deadline caught at the top of the step loop prints no stop line -> censored by the budget | ADMITTED P2d d_F=>= 7 censored=budget | ADMITTED P2d d_F=>= 7 censored=budget |
 | D31b | PASS | review 4 S8: an OOM with the peak (30 GiB) under 90 percent of memory.max is annotated as a likely host-level or group kill | oom_note present | peak below 90 percent of memory.max: a h |
+| D50 | PASS | exit 134, two failed allocations, oom_kill 0, peak 64 MiB under memory.max -> host-limit abort | NOT_ADMITTED P2h host_limit=true | NOT_ADMITTED P2h host_limit=true |
+| D51 | PASS | the same with cgroup oom_kill 1 -> OOM, not a host limit | OOM P2k host_limit=false | OOM P2k host_limit=false |
+| D52 | PASS | exit 134 without an allocation failure line -> P2e, not a host limit | NOT_ADMITTED P2e host_limit=false | NOT_ADMITTED P2e host_limit=false |
+| D53 | PASS | pilot peak 64 MiB (primary) under the limit even with a cgroup peak file above it -> host limit | NOT_ADMITTED P2h host_limit=true | NOT_ADMITTED P2h host_limit=true |
+| D54 | PASS | the committed collect-1 tree of pkm-x-t14-k0-c7-d54 (vm.max_map_count 65530, abort at step 34) reads as a host-limit abort (read only) | NOT_ADMITTED P2h host_limit=true | NOT_ADMITTED P2h host_limit=true |
 | D38 | PASS | runner idle and status EXITED | LOST P3 relaunch=owner | LOST P3 relaunch=owner |
 | D39 | PASS | status EXITED after the session logged a delete | LOST P3 relaunch=owner | LOST P3 relaunch=owner |
 | D40 | PASS | S2: a truncated check-in line fails closed | NO_EVIDENCE P0 | NO_EVIDENCE P0 |
@@ -183,8 +200,8 @@ classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 f
 | D41 | PASS | N3b: two done collections of the pod disagree file by file | NO_EVIDENCE P0b | NO_EVIDENCE P0b |
 | D41b | PASS | N3b: two done collections agree | ADMITTED P2d | ADMITTED P2d |
 | D42 | PASS | S2: a zero-byte start.json (no response) is read as absent; the start comes from the check-in | PENDING P8 | PENDING P8 |
-| E01 | PASS | nothing run yet | pkm-x-t14-k0-c7-d54 | pkm-x-t14-k0-c7-d54 |
-| E02 | PASS | base LOST with host-side evidence (relaunch auto) | pkm-x-t14-k0-c7-d54-r1 | pkm-x-t14-k0-c7-d54-r1 |
+| E01 | PASS | nothing run yet | pkm-x-t14-k0-c7-d54-h1 | pkm-x-t14-k0-c7-d54-h1 |
+| E02 | PASS | base LOST with host-side evidence (relaunch auto) | pkm-x-t14-k0-c7-d54-h1-r1 | pkm-x-t14-k0-c7-d54-h1-r1 |
 | E03 | PASS | N3a: base LOST without host-side evidence (relaunch owner) | ALL_RESOLVED | ALL_RESOLVED |
 | E04 | PASS | N1: base ABORTED uses the attempt; no relaunch | ALL_RESOLVED | ALL_RESOLVED |
 | E05 | PASS | base ADMITTED | ALL_RESOLVED | ALL_RESOLVED |
@@ -193,10 +210,18 @@ classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 f
 | E08 | PASS | base LIMIT (censored, not re-run) | ALL_RESOLVED | ALL_RESOLVED |
 | E09 | PASS | base NOT_ADMITTED (owner) | ALL_RESOLVED | ALL_RESOLVED |
 | E10 | PASS | N2: base NO_EVIDENCE goes to the owner | ALL_RESOLVED | ALL_RESOLVED |
-| E11 | PASS | base in flight | BLOCKED:pkm-x-t14-k0-c7-d54 | BLOCKED:pkm-x-t14-k0-c7-d54 |
-| E12 | PASS | base LOST auto, relaunch in flight | BLOCKED:pkm-x-t14-k0-c7-d54-r1 | BLOCKED:pkm-x-t14-k0-c7-d54-r1 |
+| E11 | PASS | base in flight | BLOCKED:pkm-x-t14-k0-c7-d54-h1 | BLOCKED:pkm-x-t14-k0-c7-d54-h1 |
+| E12 | PASS | base LOST auto, relaunch in flight | BLOCKED:pkm-x-t14-k0-c7-d54-h1-r1 | BLOCKED:pkm-x-t14-k0-c7-d54-h1-r1 |
 | E13 | PASS | base LOST auto, relaunch LOST auto: no third attempt | ALL_RESOLVED | ALL_RESOLVED |
 | E14 | PASS | base LOST auto, relaunch ADMITTED | ALL_RESOLVED | ALL_RESOLVED |
+| E15 | PASS | owner decision 28: h1 a host-limit abort -> h2 | pkm-x-t14-k0-c7-d54-h2 | pkm-x-t14-k0-c7-d54-h2 |
+| E16 | PASS | h1 and h2 host-limit aborts -> h3 | pkm-x-t14-k0-c7-d54-h3 | pkm-x-t14-k0-c7-d54-h3 |
+| E17 | PASS | three host-limit aborts: no fourth retry (owner) | ALL_RESOLVED | ALL_RESOLVED |
+| E18 | PASS | h1 LOST auto, its relaunch a host-limit abort -> h2 | pkm-x-t14-k0-c7-d54-h2 | pkm-x-t14-k0-c7-d54-h2 |
+| E19 | PASS | h1 host-limit abort, h2 LOST auto -> h2's relaunch | pkm-x-t14-k0-c7-d54-h2-r1 | pkm-x-t14-k0-c7-d54-h2-r1 |
+| E20 | PASS | h1 NOT_ADMITTED without a host limit: resolved (owner) | ALL_RESOLVED | ALL_RESOLVED |
+| E21 | PASS | h1 host-limit abort, h2 in flight | BLOCKED:pkm-x-t14-k0-c7-d54-h2 | BLOCKED:pkm-x-t14-k0-c7-d54-h2 |
+| E22 | PASS | pods refused by the host check do not use the name: h1 is offered again | pkm-x-t14-k0-c7-d54-h1 | pkm-x-t14-k0-c7-d54-h1 |
 | F01 | PASS | reaper: 27 h old pod without receipts, 1 h old pod, other session's pod | pod past creation + 26 h deleted through v2 (logged first); young and non-pkm-x pods kept; second pass changes nothing | exit 0, left ["young1","other1"]; exit 0, left ["young1","other1"]; 3 receipt lines |
 | F08 | PASS | S1: a due pod whose per-name lock is held by another process | pod untouched, skip recorded | exit 0, pods 1 |
 | F03 | PASS | reaper: pod list unreadable (network blocked) | exit 1 | exit 1 |
@@ -209,7 +234,7 @@ classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 f
 | F05 | PASS | N3c, the review's probe: start.json missing, runner running, created 90 min ago | pod untouched; the next fetch.sh waits (41) | exit 0, pods 1, fetch 41 |
 | F06 | PASS | N3c: past the run deadline but before the hard deadline, runner unreachable | pod untouched | exit 0, pods 1 |
 | F10 | PASS | owner decision 25: the hourly reaper in a fresh checkout, a run past its hard deadline | exit 0; fetch.sh recovers the token from the v2 record into the new RPC_STATE, collects and deletes | exit 0 LIMIT P4 |
-| W01 | PASS | a running job: watch.sh calls fetch.sh at its interval until MAX_WALL_S | exit 20 (segment over), pod kept, two or more check-ins | exit 20, check-ins 3 |
+| W01 | PASS | a running job: watch.sh calls fetch.sh at its interval until MAX_WALL_S | exit 20 (segment over), pod kept, two or more check-ins | exit 20, check-ins 2 |
 | W02 | PASS | a completed job: watch.sh stops for the git gate and deletes nothing | exit 8 at once (collected; the git gate is the session's), pod kept | exit 8 ADMITTED P2d |
 | W04 | PASS | past the hard deadline: fetch.sh collects and deletes; watch.sh ends | exit 0, LIMIT P4, deleted by fetch.sh | exit 0 LIMIT P4 |
 | W03 | PASS | watch.sh refuses an interval above 900 s | exit 2 | exit 2 |
@@ -230,4 +255,4 @@ classifier alone (`fetch.sh --classify-dir`) on synthetic receipt sets with v2 f
 | G-rpuse | PASS | pod-proxy calls only through the pinned client | rp_pinned.sh used only for upload, start, status, fetch (its v1 create, pod, delete are never called) | 0 hits |
 | G-request | PASS | the one request (Amendment 7 B, owner decision 24) | request sha256 = pin = make_requests output; equals its derivation; four changed paths | pin 089176f2 |
 
-Summary of this run (image layer available: 1): 204 passed, 0 failed, 0 SKIP-NEEDS-LAYER (run 2026-11-21T23:33:55Z).
+Summary of this run (image layer available: 1): 229 passed, 0 failed, 0 SKIP-NEEDS-LAYER (run 2026-11-22T07:13:36Z).

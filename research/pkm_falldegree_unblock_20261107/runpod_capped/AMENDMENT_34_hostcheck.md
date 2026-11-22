@@ -82,11 +82,11 @@ rewritten.
 
 | file | SHA-256 |
 |:--|:--|
-| `common.sh` | `@SHA_common.sh@` |
-| `run.sh` | `@SHA_run.sh@` |
-| `fetch.sh` | `@SHA_fetch.sh@` |
-| `reap.sh` | `@SHA_reap.sh@` (unchanged from Amendment 33) |
-| `watch.sh` | `@SHA_watch.sh@` (unchanged from Amendment 33) |
+| `common.sh` | `446c9ecc63cde08a32f56ed8f675212ae30a750eaef9c57e54fd58086adaec4a` |
+| `run.sh` | `7b6eaeb25c8b93749b2f61fd864db5fba2390da120de8d69f5c31b7019c5f74a` |
+| `fetch.sh` | `ffd8d0a0ac1b31d6b47355f07debdf1a580ba665dce50492ec6804a95a53724d` |
+| `reap.sh` | `90f3fbe7be95dac868d248b9a2321eea8d400fb0a06d4aff0defe65ca0e4becd` (unchanged from Amendment 33) |
+| `watch.sh` | `cea7bf4d774b289505fddd6d3a4c377d862c706f43a9dd24a4a91bfd8185fb73` (unchanged from Amendment 33) |
 | `requests_d54/pfd-x-t14-k0-c7-d54.json` | `089176f2a75dc228a817dc1b88852cd1953fbfcd63e0452189acd4765f70d025` (unchanged) |
 
 At the freeze the first four lines go into the preregistration as `sha256sum` output. Offline tests: `tests/README.md`.
