@@ -37,6 +37,8 @@ jobs:
         run: cargo run --locked --release --example prime31_trace_f4_pilot
       - name: Quadratic Newton circuit versus matched F4 arms
         run: cargo run --locked --release --example prime31_trace_f4_pilot -- --circuit
+      - name: Fixed-Prime31 m2 F4 input-size sweep B3 through B32 (planted relation only)
+        run: cargo run --locked --release --example prime31_trace_f4_pilot -- --sweep
       - name: Four-coordinate membership-only F4 controls (not S5 solver)
         run: cargo run --locked --release --example prime31_trace_f4_pilot -- --m4
       - name: Six-variable genuine four-point chained S3 F4 controls
