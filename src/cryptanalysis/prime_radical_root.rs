@@ -990,6 +990,28 @@ impl RadicalRootCtx {
             return self.sqrt(a);
         }
         if p >= (1u64 << 20) && p & 3 == 3 && a != 0 && a < p {
+            // Two frequent 32-bit moduli: use 32-bit Euclidean remainders
+            // rather than 64-bit hardware divisions in the Jacobi prefilter.
+            // Public, canonical discriminants only.
+            if p == 1_000_000_007 || p == 4_294_967_291 {
+                let (mut v, mut n) = (a as u32, p as u32);
+                let mut negative = false;
+                while v != 0 {
+                    let twos = v.trailing_zeros();
+                    v >>= twos;
+                    if twos & 1 != 0 && (n & 7 == 3 || n & 7 == 5) {
+                        negative = !negative;
+                    }
+                    if v & 3 == 3 && n & 3 == 3 {
+                        negative = !negative;
+                    }
+                    let next = n % v;
+                    n = v;
+                    v = next;
+                }
+                if n != 1 || negative { return None; }
+                return Some(self.f.powm(a, (p + 1) / 4));
+            }
             let (mut v, mut n) = (a, p);
             let mut negative = false;
             while v != 0 {
