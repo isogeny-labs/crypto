@@ -193,7 +193,7 @@ impl Fp {
     #[inline]
     fn small_inverses(&self, n: u64) -> (u64, u64, u64, u64, u64) {
         let p = self.p;
-        let i2 = (p + 1) / 2;
+        let i2 = p.div_ceil(2);
         let i3 = if p % 3 == 1 { (2 * p + 1) / 3 } else { (p + 1) / 3 };
         let i4 = if p % 4 == 1 { (3 * p + 1) / 4 } else { (p + 1) / 4 };
         let i27 = self.mul(self.sqr(i3), i3);
@@ -401,7 +401,7 @@ pub(crate) fn rpow<R: Ring>(r: &R, a: R::E, mut e: u128) -> R::E {
     // Sparse or short exponents skip the table: AMM has many cheap 3^k
     // exponents for which precomputation would be a regression.
     let bits = u128::BITS - e.leading_zeros();
-    if bits >= 32 && e.count_ones() > (bits + 3) / 4 + 7 {
+    if bits >= 32 && e.count_ones() > bits.div_ceil(4) + 7 {
         let a2 = r.sqr(a);
         let mut odd = [r.one(); 8];
         odd[0] = a;
@@ -462,6 +462,7 @@ pub(crate) struct Cube<R: Ring> {
     n: u128,
     s: u32,
     e3: u128,
+    #[cfg(test)]
     c: R::E,
     // c^{-1} in the 3-Sylow; computed once for rolling digit corrections.
     c_inv: R::E,
@@ -495,6 +496,7 @@ impl<R: Ring> Cube<R> {
                 n,
                 s,
                 e3,
+                #[cfg(test)]
                 c: one,
                 c_inv: one,
                 inverse_powers: vec![],
@@ -546,6 +548,7 @@ impl<R: Ring> Cube<R> {
             n,
             s,
             e3,
+            #[cfg(test)]
             c,
             c_inv,
             inverse_powers,
@@ -784,11 +787,13 @@ impl<R: Ring> Cube<R> {
 /// Per-prime context: one-time precomputation (non-residues, 3-Sylow generators, constants).
 pub struct RadicalRootCtx {
     pub(crate) f: Fp,
+    #[cfg(test)]
     inv2: u64,
     inv3: u64,
     inv4: u64,
     inv27: u64,
     inv_n: u64,
+    #[cfg(test)]
     n: u64, // quadratic non-residue
     s2: u32,
     t2: u64,
@@ -815,14 +820,16 @@ impl RadicalRootCtx {
         let w2 = cube_q.w;
         // Inverses 2,3,4,27,n are fixed per prime and only require
         // two products plus, at most, one Euclidean inversion.
-        let (i2, i3, i4, i27, in_) = f.small_inverses(n);
+        let (_i2, i3, i4, i27, in_) = f.small_inverses(n);
         Ok(RadicalRootCtx {
             f,
-            inv2: i2,
+            #[cfg(test)]
+            inv2: _i2,
             inv3: i3,
             inv4: i4,
             inv27: i27,
             inv_n: in_,
+            #[cfg(test)]
             n,
             s2,
             t2,
@@ -1376,7 +1383,7 @@ impl RadicalRootCtx {
         // zeroes first (including coefficients congruent to 0 mod p) so
         // arbitrarily padded input remains accepted without a heap Vec.
         let mut n = f.len();
-        while n > 0 && f[n - 1] % fp.p == 0 {
+        while n > 0 && f[n - 1].is_multiple_of(fp.p) {
             n -= 1;
         }
         if n > 5 {
@@ -1637,7 +1644,7 @@ mod tests {
         fn prime_small(p: u64) -> bool {
             let mut d = 2u64;
             while d * d <= p {
-                if p % d == 0 { return false; }
+                if p.is_multiple_of(d) { return false; }
                 d += 1;
             }
             true
@@ -1711,12 +1718,11 @@ mod tests {
             assert_eq!(f.small_inverses(ctx.n), before, "p={p}");
             assert_eq!((ctx.inv2, ctx.inv3, ctx.inv4, ctx.inv27, ctx.inv_n),
                        before, "ctx p={p}");
-            for cube in [&ctx.cube_p] {
-                let expected_w2 = if cube.s >= 2 { cube.r.sqr(cube.w) } else { cube.r.one() };
-                assert_eq!(cube.w_squared, expected_w2, "Fp p={p}");
-                let expected_inv2 = if cube.s == 2 { cube.r.sqr(cube.c_inv) } else { cube.r.one() };
-                assert_eq!(cube.c_inv_squared, expected_inv2, "Fp p={p}");
-            }
+            let cube = &ctx.cube_p;
+            let expected_w2 = if cube.s >= 2 { cube.r.sqr(cube.w) } else { cube.r.one() };
+            assert_eq!(cube.w_squared, expected_w2, "Fp p={p}");
+            let expected_inv2 = if cube.s == 2 { cube.r.sqr(cube.c_inv) } else { cube.r.one() };
+            assert_eq!(cube.c_inv_squared, expected_inv2, "Fp p={p}");
             let q = &ctx.cube_q;
             assert_eq!(q.w_squared, if q.s >= 2 { q.r.sqr(q.w) } else { q.r.one() }, "Fp2 p={p}");
             assert_eq!(q.c_inv_squared, if q.s == 2 { q.r.sqr(q.c_inv) } else { q.r.one() }, "Fp2 p={p}");
@@ -1853,7 +1859,7 @@ mod tests {
             let q = &ctx.cube_q.r;
             let order = q.order();
             let mut t = order;
-            while t % 3 == 0 { t /= 3; }
+            while t.is_multiple_of(3) { t /= 3; }
             let e3 = if t % 3 == 1 { (2 * t + 1) / 3 } else { (t + 1) / 3 };
             let exponents = [0, 1, (p - 1) as u128, p as u128,
                              order / 3, e3, order - 1, order, u128::MAX];
@@ -1937,7 +1943,7 @@ mod tests {
             let ctx = RadicalRootCtx::new(p).unwrap();
             let q = &ctx.cube_q.r;
             let mut t = q.order();
-            while t % 3 == 0 { t /= 3; }
+            while t.is_multiple_of(3) { t /= 3; }
             let e3 = if t % 3 == 1 { (2 * t + 1) / 3 } else { (t + 1) / 3 };
             let mut real = Vec::new();
             let mut imag = Vec::new();
@@ -2191,7 +2197,7 @@ mod tests {
             let q = &ctx.cube_q.r;
             let n = q.order();
             let mut t = n;
-            while t % 3 == 0 { t /= 3; }
+            while t.is_multiple_of(3) { t /= 3; }
             let e3 = if t % 3 == 1 { (2 * t + 1) / 3 } else { (t + 1) / 3 };
             let exp = [0, 1, p as u128 - 1, p as u128, p as u128 + 1,
                        n / 3, t, e3, n - 1, n, u128::MAX];
@@ -2230,7 +2236,7 @@ mod tests {
             let q = &ctx.cube_q.r;
             let n = q.order();
             let mut t = n;
-            while t % 3 == 0 { t /= 3; }
+            while t.is_multiple_of(3) { t /= 3; }
             let e3 = if t % 3 == 1 { (2 * t + 1) / 3 } else { (t + 1) / 3 };
             let mut xs = Vec::with_capacity(512);
             for _ in 0..512 {
@@ -2842,7 +2848,7 @@ mod tests {
                    |x| rpow(&q, x, e2).0);
             // Realistic AMM cube-root exponent (not synthetic all-ones).
             let mut t3 = (p as u128) * (p as u128) - 1;
-            while t3 % 3 == 0 {
+            while t3.is_multiple_of(3) {
                 t3 /= 3;
             }
             let e3 = if t3 % 3 == 1 { (2 * t3 + 1) / 3 } else { (t3 + 1) / 3 };
@@ -4314,13 +4320,11 @@ mod sparse_round18_tests {
             // Construct coefficients in ascending order by multiplying
             // (X-r) successively, then scale by a.
             let mut coeff=[1u64,0,0,0,0];
-            let mut degree=0;
-            for &root in &roots {
+            for (degree, &root) in roots.iter().enumerate() {
                 for j in (1..=degree+1).rev() {
                     coeff[j]=f.sub(if j<=degree {f.mul(coeff[j],f.neg(root))} else {0},f.neg(coeff[j-1]));
                 }
                 coeff[0]=f.mul(coeff[0],f.neg(root));
-                degree+=1;
             }
             for j in 0..5 {poly[j]=f.mul(coeff[j],a);}
             quartic_controls.push((poly[4],poly[3],poly[2],poly[1],poly[0]));
@@ -4645,7 +4649,7 @@ impl RadicalRootCtx {
         // zeroes first (including coefficients congruent to 0 mod p) so
         // arbitrarily padded input remains accepted without a heap Vec.
         let mut n = f.len();
-        while n > 0 && f[n - 1] % fp.p == 0 {
+        while n > 0 && f[n - 1].is_multiple_of(fp.p) {
             n -= 1;
         }
         if n > 5 {
