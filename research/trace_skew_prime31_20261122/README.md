@@ -171,6 +171,7 @@ At ω=2 the model gives:
 
 ## Literature / internal sources
 - Semaev (2004), [Summation polynomials and the discrete logarithm problem on elliptic curves](https://eprint.iacr.org/2004/031); original S3 construction.
+- Faugère, Huot, Joux, Renault, Vitse (EUROCRYPT 2014), [*Symmetrized Summation Polynomials: Using Small Order Torsion Points to Speed Up Elliptic Curve Index Calculus*](https://doi.org/10.1007/978-3-642-55220-5_3); explicitly uses elementary symmetric coordinates for Semaev equations and the smaller polynomial systems they yield. Their results depend partly on small-order torsion and extension-field factor bases. **Therefore symmetrizing Semaev itself is established prior art, not a novelty claim for this PR.** The investigational difference here is an explicit characteristic-controlled, radical, degree-B factor-base membership presentation G_j and the matched Prime31 F4 comparison.
 - Kousidis–Wiemers (2019), [On the first fall degree of summation polynomials](https://doi.org/10.1515/jmc-2017-0022); first-fall degree is not a measured solving-degree or end-to-end complexity guarantee.
 - `research/radical_pair_image_20260921/RESULTS.md`: existing radical symmetric pair results and norm-equation warning. `src/cryptanalysis/semaev_prime_poly.rs`: original Rust arithmetic. `research/fass_prime31_20261122/PROTOCOL.md` (PR #4921): related symmetric-S3 strategy.
 - Sibling live PRs #4920, #4922, #4891, #4901.
