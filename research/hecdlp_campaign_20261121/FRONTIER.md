@@ -203,3 +203,35 @@ to R2's rows.
   algorithm; no leaderboard row (no isolated host, no `VALIDATION.json`; the gate workflow is
   disabled). The deviation `raw/load.log` was deleted and reconstructed from printed lines,
   disclosed in RESULTS.md.
+
+### R10: the exponent test to p = 2^20 [pcc:unverified]
+
+`genus_ladder_exponent_g3_20261122`: same binary as R9, genus 3, three new curves × 2 seeds at
+p = 524309 and 1048583, joined with R9's three primes; protocol frozen before data; 36 new runs
+certified; load 1.00 throughout.
+
+| p | IC + SGE(8,3) wall (s) | rho wall (s) | ratio [95 %] |
+|--:|--:|--:|--:|
+| 524309 | 56.77 | 480.20 | 0.118 [0.055, 0.487] |
+| 1048583 | 150.07 | 817.16 | 0.184 [0.107, 0.300] |
+
+| exponent over five primes (65537 … 1048583) | estimate [95 %] |
+|---|--:|
+| IC + SGE wall time | 1.414 [1.394, 1.433] |
+| rho wall time | 1.556 [1.277, 1.764] |
+| IC − rho (paired) | −0.142 [−0.355, 0.141] |
+| IC relation phase, counts | 1.308 [1.307, 1.309] (theory 4/3) |
+| IC linear algebra, `la_mul` | 1.496 [1.492, 1.501] (theory 3/2) |
+
+**The separation test failed (E3)**: the point estimates favour the index calculus by 0.14 in the
+exponent, but rho's interval, from three curves per new prime, spans 1.28 to 1.76, so the data do
+not establish an exponent gap. The relation phase scales at 1.31, at or below the 4/3 theory; the
+linear algebra scales at 3/2, the same as rho, and it is what keeps the arm's exponent near 1.41.
+Against expected rho (post hoc, outside the frozen protocol), the ratio falls monotonically
+0.216 → 0.131 over the five primes, but that slope rests on six curves at the two new primes.
+
+**Campaign status against the standing goal.** The genus-3 arm is a measured constant factor of
+about 5 below rho in matched wall time from 2^16 to 2^20. An exponent gap is not established, and
+the linear algebra's p^{3/2} scaling, equal to rho's, is the structural reason the arm cannot pull
+away: any exponent gain must come from a linear algebra that scales below p^{3/2} on these cores.
+No sub-exponential method for fixed genus has been found or claimed.
