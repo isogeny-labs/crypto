@@ -1,0 +1,171 @@
+{
+  "branch": "claude/f4-f5-algorithm-speed-bvp7qd",
+  "closed_utc": "2026-11-18T15:52:33+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/koblitz_n29_orbit_levers_20261118/run.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-18T15:49:12+00:00",
+      "wall_s": 17.053
+    }
+  ],
+  "commit": "0ae90a4812327d9585f89a924f7363c8ea9f20d9",
+  "commit_dirty": false,
+  "created_utc": "2026-11-18T15:12:54+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/koblitz_n29_orbit_levers_20261118"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v595-x86_64-with-glibc2.39"
+  },
+  "id": "20261118T1512Z-koblitz-n29-orbit-levers",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "lv_all_over_gen_c1_n29_w0",
+      "note": "pcc:unverified; P1 primary, K1 n29",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.679,
+        0.749
+      ],
+      "unit": "ratio",
+      "value": 0.713
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "lv_all_over_gen_c1_n29_w0.1",
+      "note": "pcc:unverified; P1 primary, K1 n29",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.58,
+        0.649
+      ],
+      "unit": "ratio",
+      "value": 0.614
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "lv_all_over_gen_c1_n29_w1",
+      "note": "pcc:unverified; P1 primary, K1 n29",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.462,
+        0.514
+      ],
+      "unit": "ratio",
+      "value": 0.487
+    },
+    {
+      "baseline": 0.706,
+      "better": "lower",
+      "n": 144,
+      "name": "lv_all_s_n29_w0.1",
+      "note": "pcc:unverified; band S at w=0.1; baseline gen-c1; reference rho-strong (v5 0.388)",
+      "reference": 4.611,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 0.433
+    }
+  ],
+  "problem": "ecdlp:koblitz_small_rows_ic_gen_orbit",
+  "raw": [
+    {
+      "bytes": 97893,
+      "path": "research/koblitz_n29_orbit_levers_20261118/results.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a6/a628ff8cbdd79403cae092550fa3f07ea951a7bcc0bd6c3e1ffc16f43f62a51e",
+      "sha256": "a628ff8cbdd79403cae092550fa3f07ea951a7bcc0bd6c3e1ffc16f43f62a51e",
+      "uploaded": false
+    },
+    {
+      "bytes": 33258,
+      "path": "research/koblitz_n29_orbit_levers_20261118/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8e/8ebcf0befbb78e88c9388c2b479b291e2bb3958d73299dec18374828662c8d93",
+      "sha256": "8ebcf0befbb78e88c9388c2b479b291e2bb3958d73299dec18374828662c8d93",
+      "uploaded": false
+    },
+    {
+      "bytes": 11999,
+      "path": "research/koblitz_n29_orbit_levers_20261118/tables/records-n29.csv.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/84/844cea7fb455712d9cd84f38f2523fc8385382de899afd654cbf734a40842957",
+      "sha256": "844cea7fb455712d9cd84f38f2523fc8385382de899afd654cbf734a40842957",
+      "uploaded": false
+    },
+    {
+      "bytes": 9978,
+      "path": "research/koblitz_n29_orbit_levers_20261118/tables/band-n29.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/51/5176747901916183d29f2337b768e90176fab292f56464fff357d46ff89ba902",
+      "sha256": "5176747901916183d29f2337b768e90176fab292f56464fff357d46ff89ba902",
+      "uploaded": false
+    },
+    {
+      "bytes": 15858,
+      "path": "research/koblitz_n29_orbit_levers_20261118/audits/audit-n29.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/de/de8bc7a75051aea60c917a9b0bf9d001b61acc1a525dca26115fa09a4763ed25",
+      "sha256": "de8bc7a75051aea60c917a9b0bf9d001b61acc1a525dca26115fa09a4763ed25",
+      "uploaded": false
+    },
+    {
+      "bytes": 10889,
+      "path": "research/koblitz_n29_orbit_levers_20261118/audits/xbin-a0-n29.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/83/8314dfd11d30b3c764237b04a8e943a3edb32fc36fcdffd3b34fc6546d26a0b7",
+      "sha256": "8314dfd11d30b3c764237b04a8e943a3edb32fc36fcdffd3b34fc6546d26a0b7",
+      "uploaded": false
+    },
+    {
+      "bytes": 148979,
+      "path": "research/koblitz_n29_orbit_levers_20261118/REPORT.pdf",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8c/8cab797fdca50a07e4ae14b6f5a9e754cfa10a9a87f267f3579b61c20539233b",
+      "sha256": "8cab797fdca50a07e4ae14b6f5a9e754cfa10a9a87f267f3579b61c20539233b",
+      "uploaded": false
+    },
+    {
+      "bytes": 76530,
+      "path": "research/koblitz_n29_orbit_levers_20261118/figures/fig1-phases-band.svg",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/61/619d510e23b4ccbcf1147f1558252ba20ef62ed95d9a4a5031e16a6bca120219",
+      "sha256": "619d510e23b4ccbcf1147f1558252ba20ef62ed95d9a4a5031e16a6bca120219",
+      "uploaded": false
+    },
+    {
+      "bytes": 82578,
+      "path": "research/koblitz_n29_orbit_levers_20261118/figures/fig2-ratios.svg",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/02/02db94f63dfd2d3dbcac89724389cce280fe1c49f8b800f28fa3c6ac464bca33",
+      "sha256": "02db94f63dfd2d3dbcac89724389cce280fe1c49f8b800f28fa3c6ac464bca33",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/koblitz_n29_orbit_levers_20261118/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/koblitz_n29_orbit_levers_20261118/figures/fig1-phases-band.svg",
+      "research/koblitz_n29_orbit_levers_20261118/figures/fig2-ratios.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "koblitz-n29-orbit-levers",
+  "status": "measured",
+  "summary": "K1 n29 gen-orbit IC levers (lean base, sibling pair table, tau-adic check): lv-all/gen-c1 0.713 [0.679,0.749] / 0.614 [0.580,0.649] / 0.487 [0.462,0.514] at w=0/0.1/1; lv-all/rho-v5 0.877 [0.736,1.046] / 1.116 / 2.262 (unresolved in band); pcc:unverified, not validated",
+  "validation": null
+}

@@ -1,6 +1,7 @@
 name: CT20 F101 gluing reference regression
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'research/chained_jacobian_transfers_20261110/ct20_gluing_oracle.py'
       - 'research/chained_jacobian_transfers_20261110/CT20_F101_GLUING_INVENTORY.md'
@@ -13,6 +14,7 @@ permissions:
 
 jobs:
   oracle:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -35,6 +37,7 @@ jobs:
           if-no-files-found: ignore
 
   native:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
