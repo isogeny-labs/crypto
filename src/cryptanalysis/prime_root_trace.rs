@@ -435,40 +435,7 @@ impl Engine<'_> {
         debug_assert!(!b.is_empty());
         let mut r = a.to_vec();
         let mut q = vec![0; a.len().saturating_sub(b.len()) + 1];
-        // A short monic divisor is used throughout quadratic/quartic
-        // Frobenius powers and GCDs. Its highest remainder coefficient can
-        // be cancelled by assigning zero at a fixed descending degree.
-        // Avoid repeatedly popping/trimming the Vec after each digit.
-        // Keep the existing path for wide/dense and nonmonic divisors:
-        // GCC local task-clock screening found degree-eight regressions
-        // outside the 61-bit sparse-binomial subset.
-        let short_monic = b.last() == Some(&1) && b.len() <= 5;
-        let mersenne_sparse = self.report.p == MAX_PRIME && b.len() <= 9
-            && b.len() >= 6 && b.last() == Some(&1)
-            && b[1] == 0 && b[2] == 0
-            && b[1..b.len() - 1].iter().all(|&x| x == 0);
-        if a.len() >= b.len() && (short_monic || mersenne_sparse) {
-            let degree = b.len() - 1;
-            for shift in (0..q.len()).rev() {
-                let highest = r[shift + degree];
-                if highest == 0 {
-                    continue;
-                }
-                q[shift] = highest;
-                for (k, &coefficient) in b[..degree].iter().enumerate() {
-                    if coefficient == 0 {
-                        continue;
-                    }
-                    let term = self.field(FieldOp::Mul, highest, coefficient)?;
-                    r[shift + k] = self.field(FieldOp::Sub, r[shift + k], term)?;
-                }
-                // The monic leading coefficient cancels exactly. Every
-                // earlier operation uses identical traced field events.
-                r[shift + degree] = 0;
-            }
-            r.truncate(degree);
-            r = trim(r);
-        } else if a.len() >= b.len() {
+        if a.len() >= b.len() {
             // The leading coefficient cancels by construction: c = lead(r)/lead(b).
             // In the monic case c is already the top remainder coefficient, so
             // no inverse or traced multiplication is necessary. Zero divisor
@@ -1915,6 +1882,9 @@ struct PowerState {
     base: Vec<u64>,
     exponent: u64,
     modulus: Vec<u64>,
+    // A verified PowerEnd with this binding can also certify Finish's
+    // X^p mod f without repeating the entire exponentiation.
+    initial_frobenius: bool,
 }
 
 /// Checks each supplied arithmetic state, the terminal distinct-root certificate,
@@ -1942,6 +1912,13 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
     let mut counters = RootCounters::default();
     let mut powers: HashMap<u64, PowerState> = HashMap::new();
     let mut gcds: HashMap<u64, (Vec<u64>, Vec<u64>)> = HashMap::new();
+    // These are independently reconstructed results of fully replayed
+    // PowerStep/GcdStep events, not assertions accepted from the producer.
+    // Retain only computations whose original inputs exactly match the
+    // final certificate's Frobenius and linear-part obligations.
+    let mut verified_frobenius: Option<Vec<u64>> = None;
+    let mut verified_linear_part: Option<Vec<u64>> = None;
+    let mut initial_gcd_id: Option<u64> = None;
     // A prior Division event has already been checked using
     // independent arithmetic. Keep its verified remainder for the following
     // matching GcdStep and its verified quotient for an accepted SplitEnd. Borrow
@@ -2076,6 +2053,8 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                         base: reduced_base,
                         exponent: *exponent,
                         modulus: monic,
+                        initial_frobenius: base.as_slice() == [0, 1]
+                            && *exponent == p && modulus == &report.polynomial,
                     },
                 );
             }
@@ -2126,6 +2105,9 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 if state.exponent != 0 || state.acc != *value {
                     return Err("incomplete power chain".into());
                 }
+                if state.initial_frobenius {
+                    verified_frobenius = Some(state.acc);
+                }
             }
             RootEvent::GcdBegin { id, a, b } => {
                 canonical(a, p)?;
@@ -2134,6 +2116,18 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     return Err("nonconsecutive computation id".into());
                 }
                 next_id += 1;
+                if let Some(xp) = verified_frobenius.as_ref() {
+                    let mut expected_xpx = xp.clone();
+                    expected_xpx.resize(expected_xpx.len().max(2), 0);
+                    expected_xpx[1] = if expected_xpx[1] == 0 {
+                        p - 1
+                    } else {
+                        expected_xpx[1] - 1
+                    };
+                    if a == &report.polynomial && b == &trim(expected_xpx) {
+                        initial_gcd_id = Some(*id);
+                    }
+                }
                 gcds.insert(*id, (a.clone(), b.clone()));
             }
             RootEvent::GcdStep {
@@ -2182,6 +2176,9 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 let (a, b) = gcds.remove(id).ok_or("missing gcd begin")?;
                 if !b.is_empty() || vmonic(a, p) != *value {
                     return Err("incomplete Euclidean chain".into());
+                }
+                if initial_gcd_id == Some(*id) {
+                    verified_linear_part = Some(value.clone());
                 }
             }
             RootEvent::SplitBegin { polynomial, delta } => {
@@ -2282,14 +2279,26 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     {
                         return Err("invalid finite-root certificate".into());
                     }
-                    let xp = vpower(&[0, 1], p, &report.polynomial, p)?;
+                    // When replay has verified the exact original
+                    // (X, exponent=p, modulus=f) computation, reusing its
+                    // independently checked terminal value is equivalent
+                    // to repeating the same arithmetic here.
+                    let xp = if let Some(cached) = verified_frobenius.as_ref() {
+                        cached.clone()
+                    } else {
+                        vpower(&[0, 1], p, &report.polynomial, p)?
+                    };
                     if xp != *xp_mod_f {
                         return Err("X^p residue certificate failed".into());
                     }
                     let mut xm = xp;
                     xm.resize(xm.len().max(2), 0);
                     xm[1] = (xm[1] + p - 1) % p;
-                    let g = vgcd(report.polynomial.clone(), trim(xm), p)?;
+                    let g = if let Some(cached) = verified_linear_part.as_ref() {
+                        cached.clone()
+                    } else {
+                        vgcd(report.polynomial.clone(), trim(xm), p)?
+                    };
                     let mut product = vec![1];
                     let mut previous = None;
                     for &r in roots {
@@ -2337,6 +2346,58 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round111_reused_frobenius_and_gcd_reject_modified_certificates() {
+        let p = 65_521u64;
+        let f = vproduct(
+            &vproduct(&[p - 3, 1], &[p - 7, 1], p),
+            &vproduct(&[p - 11, 1], &[p - 19, 1], p), p);
+        let report = run(&f, p);
+        assert!(report.complete());
+        verify(&report).unwrap();
+        assert_eq!(report.roots, vec![3, 7, 11, 19]);
+
+        let mut forged = report.clone();
+        for event in &mut forged.events {
+            if let RootEvent::PowerEnd { value, .. } = event {
+                if !value.is_empty() {
+                    value[0] = (value[0] + 1) % p;
+                    break;
+                }
+            }
+        }
+        assert!(verify(&forged).is_err(), "forged replayed power accepted");
+
+        let mut forged = report.clone();
+        for event in &mut forged.events {
+            if let RootEvent::GcdEnd { value, .. } = event {
+                if !value.is_empty() {
+                    value[0] = (value[0] + 1) % p;
+                    break;
+                }
+            }
+        }
+        assert!(verify(&forged).is_err(), "forged replayed gcd accepted");
+
+        let mut forged = report.clone();
+        for event in &mut forged.events {
+            if let RootEvent::Finish { xp_mod_f, .. } = event {
+                xp_mod_f[0] = (xp_mod_f[0] + 1) % p;
+                break;
+            }
+        }
+        assert!(verify(&forged).is_err(), "forged Frobenius finish accepted");
+
+        let mut forged = report.clone();
+        for event in &mut forged.events {
+            if let RootEvent::Finish { linear_part, .. } = event {
+                linear_part[0] = (linear_part[0] + 1) % p;
+                break;
+            }
+        }
+        assert!(verify(&forged).is_err(), "forged linear-part finish accepted");
+    }
 
     #[test]
     fn round106_nonmonic_power_uses_single_normalization_and_monic_divisions() {
@@ -2807,74 +2868,6 @@ mod tests {
                     engine.report.events.last(),
                     Some(RootEvent::Division { .. })
                 ));
-            }
-        }
-    }
-
-    #[test]
-    fn round111_fixed_degree_division_matches_independent_verifier() {
-        // Regression sweep across both fixed-degree branches, dense wide
-        // fallback, short dividends and nonmonic controls. Every quotient
-        // and remainder is checked against independently implemented vdiv.
-        let mut seed = 0x1111_2026_524f_4f54u64;
-        for p in [7u64, 65_521, 1_000_000_007, MAX_PRIME] {
-            for degree in [1usize, 2, 4, 8] {
-                for shape in 0..5usize {
-                    for iteration in 0..64usize {
-                        let blen = degree + 1;
-                        let alen = if iteration % 5 == 0 {
-                            degree.saturating_sub(1).max(1)
-                        } else {
-                            2 * degree + 1
-                        };
-                        let mut a = vec![0; alen];
-                        let mut b = vec![0; blen];
-                        for coefficient in a.iter_mut().chain(b.iter_mut()) {
-                            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1);
-                            *coefficient = seed % p;
-                        }
-                        a[alen - 1] = 1 + a[alen - 1] % (p - 1);
-                        b[degree] = if shape == 2 { p - 1 } else { 1 };
-                        if shape == 1 || shape == 4 {
-                            for coefficient in &mut b[1..degree] {
-                                *coefficient = 0;
-                            }
-                        } else if shape == 3 {
-                            for (index, coefficient) in b[1..degree].iter_mut().enumerate() {
-                                if index % 2 == 0 {
-                                    *coefficient = 0;
-                                }
-                            }
-                        }
-                        if shape == 4 {
-                            b[0] = 0;
-                        }
-                        let expected = vdiv(&a, &b, p).unwrap();
-                        let mut sink = |_event: &RootEvent| Ok(());
-                        let mut engine = Engine {
-                            report: RootReport {
-                                schema: "prime-root-trace/v1".into(),
-                                p,
-                                polynomial: vec![1, 1],
-                                seed: 7,
-                                limits: limits(),
-                                stop: RootStop::Complete,
-                                counters: RootCounters::default(),
-                                events: vec![],
-                                unacknowledged: None,
-                                sink_error: None,
-                                roots: vec![],
-                            },
-                            sink: &mut sink,
-                            next_id: 0,
-                        };
-                        let result = engine.div(&a, &b).unwrap();
-                        assert_eq!(result, expected,
-                            "p={p} degree={degree} shape={shape} iteration={iteration}");
-                        assert!(matches!(engine.report.events.last(),
-                            Some(RootEvent::Division { .. })));
-                    }
-                }
             }
         }
     }
