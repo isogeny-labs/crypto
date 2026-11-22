@@ -85,9 +85,10 @@ expose = r'''
 pub fn f(p:u64)->Fp { Fp::new(p) }
 pub fn mul(f:&Fp,a:u64,b:u64)->u64{f.mul(a,b)}
 pub fn power(f:&Fp,a:u64,e:u64)->u64{f.powm(a,e)}
-pub fn fq2(f:Fp,n:u64,x:(u64,u64),y:(u64,u64))->(u64,u64){
+pub fn fq2ctx(f:Fp,n:u64)->Fq2 { Fq2{f,n} }
+pub fn fq2_mul(ctx:&Fq2,x:(u64,u64),y:(u64,u64))->(u64,u64) {
  use self::Ring;
- Fq2{f,n}.mul(x,y)
+ ctx.mul(x,y)
 }
 pub fn ctx(p:u64)->RadicalRootCtx { RadicalRootCtx::new(p).unwrap() }
 }
@@ -124,7 +125,8 @@ mod tests {
        let x=(next(&mut seed)%p,next(&mut seed)%p);
        let y=(next(&mut seed)%p,next(&mut seed)%p);
        let n=if p%8==3||p%8==5 {2}else{3};
-       assert_eq!(baseline::fq2(b,n,x,y),candidate::fq2(c,n,x,y));
+       let old_fq=baseline::fq2ctx(b,n);let new_fq=candidate::fq2ctx(c,n);
+       assert_eq!(baseline::fq2_mul(&old_fq,x,y),candidate::fq2_mul(&new_fq,x,y));
        count+=1;
      }
      if p==65_521 || p==1_000_000_007 || p==(1u64<<61)-1{
@@ -150,6 +152,8 @@ mod tests {
   for p in [65_521u64,1_000_000_007,4_294_967_291,(1u64<<61)-1]{
    let b=baseline::f(p);let c=candidate::f(p);
    let n=if p%8==3||p%8==5 {2}else{3};
+   let old_fq=baseline::fq2ctx(b,n);
+   let new_fq=candidate::fq2ctx(c,n);
    let old_ctx=if p!=4_294_967_291{Some(baseline::ctx(p))}else{None};
    let new_ctx=if p!=4_294_967_291{Some(candidate::ctx(p))}else{None};
    let mut inputs=Vec::new();
@@ -172,7 +176,7 @@ mod tests {
            "mul"=>if candidate_mode{candidate::mul(&c,a,x)}else{baseline::mul(&b,a,x)},
            "fq2_mul"=>{
              let y=(x,z);
-             let out=if candidate_mode{candidate::fq2(c,n,(a,x),y)}else{baseline::fq2(b,n,(a,x),y)};
+             let out=if candidate_mode{candidate::fq2_mul(&new_fq,(a,x),y)}else{baseline::fq2_mul(&old_fq,(a,x),y)};
              out.0.wrapping_mul(131).wrapping_add(out.1)
            },
            "power"=>if candidate_mode{candidate::power(&c,a,p/2)}else{baseline::power(&b,a,p/2)},
