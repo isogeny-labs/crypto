@@ -1131,12 +1131,7 @@ impl RadicalRootCtx {
             Some(s) => s,
             None => return vec![],
         };
-        let inv_2a = match a {
-            2 => self.inv4,
-            3 => f.half(self.inv3),
-            4 => f.half(self.inv4),
-            _ => f.inv(f.add(a, a)),
-        };
+        let inv_2a = f.inv(f.add(a, a));
         let nb = f.neg(b);
         let first = f.mul(f.add(nb, s), inv_2a);
         let mut roots = if s == 0 {
