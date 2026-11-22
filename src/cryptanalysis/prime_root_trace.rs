@@ -357,6 +357,9 @@ impl Engine<'_> {
         // Identity products occur at the start of binary quotient-ring power
         // chains. They need no coefficient products or additions, but still
         // produce the same independently checked Product event.
+        // Dense-by-dense products cannot match any identity below. A single
+        // length gate keeps all four shape checks off that hot path.
+        if a.len() <= 2 || b.len() <= 2 {
         let special = if a == [1] {
             Some(trim(b.to_vec()))
         } else if b == [1] {
@@ -384,6 +387,7 @@ impl Engine<'_> {
                 product: product.clone(),
             })?;
             return Ok(product);
+        }
         }
         let mut product = if a.is_empty() || b.is_empty() {
             vec![]
