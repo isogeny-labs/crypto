@@ -18,6 +18,18 @@ source_path = "src/cryptanalysis/prime_root_trace.rs"
 baseline_ref = os.environ.get("ROOTFIND_BASELINE_REF", "759c1202aa66ca5cbca1e56b058ac4f7b650399c")
 baseline = subprocess.check_output(["git", "show", f"{baseline_ref}:{source_path}"], cwd=repo, text=True)
 candidate = (repo / source_path).read_text()
+# The frozen source predates the nonmonic-specific method. Add only a thin
+# benchmark alias so both snapshots invoke the same actual producer dispatch
+# in their identical private accessor. No baseline arithmetic is modified.
+baseline += """
+impl Engine<'_> {
+    fn pow_nonmonic(
+        &mut self, base: &[u64], exponent: u64, modulus: &[u64],
+    ) -> Work<Vec<u64>> {
+        self.pow(base, exponent, modulus)
+    }
+}
+"""
 
 helper = r"""
 #[doc(hidden)]
@@ -36,7 +48,11 @@ pub(crate) fn benchmark_engine_power(
         events: vec![], unacknowledged: None, sink_error: None, roots: vec![],
     };
     let mut engine = Engine {report, sink: &mut sink, next_id: 0};
-    let out = engine.pow(base, exponent, modulus).expect("power cap");
+    let out = if modulus.last() != Some(&1) {
+        engine.pow_nonmonic(base, exponent, modulus)
+    } else {
+        engine.pow(base, exponent, modulus)
+    }.expect("power cap");
     std::hint::black_box(&engine.report.counters);
     out
 }
