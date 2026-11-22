@@ -957,8 +957,8 @@ fn lean_chart_manifest_matches_catalogue() {
         .map(|r| r.id.as_str())
         .collect();
     assert_eq!(lean_ids, catalogue_ids);
-    for (id, family) in entries {
-        assert_eq!(family, chart_family(&id), "{id}");
+    for (id, family) in &entries {
+        assert_eq!(*family, chart_family(id), "{id}");
     }
 }
 

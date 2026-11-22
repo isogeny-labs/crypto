@@ -717,11 +717,14 @@ fn rho(f: &Fp, inst: &Instance, n: u64, seed: u64, dp_bits: u32, lens: &Lens) ->
 /// ~3–4× ns/op on Apple Silicon (DP `HashMap` working set dominates the
 /// saved inversions). Kept at 16.
 ///
-/// Round-5: flat SoA/`DenseDp` linear tables were bit-exact on median iters
-/// but measured ~2% slower ALL ns/op at `BATCH = 16`, and `BATCH = 64` still
-/// ~3.6× ns/op worse. `HashMap` + `BATCH = 16` stays on the measured frontier
-/// pending a cache-friendly shared DP representation that does not enlarge
-/// the per-walker working set.
+/// Round-5 (paired same-tree A/B, ns_per_op + instructions retired):
+/// - Flat SoA/`DenseDp` linear tables: bit-exact iters, ~2% slower ALL ns/op
+///   at `BATCH = 16`; `BATCH = 64` still ~3.6× worse.
+/// - `BATCH = 32` with `HashMap`: bit-exact iters, ~1.2× slower ns/op median
+///   despite ~0.8% fewer retired instructions (working-set / cache effect).
+/// `HashMap` + `BATCH = 16` stays on the measured frontier pending a
+/// cache-friendly shared DP representation that does not enlarge the
+/// per-walker working set.
 fn rho_batch_jobs<'arm, FInst>(
     f: &Fp,
     jobs: &[(usize, u64)],
