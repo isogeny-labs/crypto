@@ -535,6 +535,10 @@ pub(crate) fn rpow<R: Ring>(r: &R, a: R::E, mut e: u128) -> R::E {
 pub(crate) struct Cube<R: Ring> {
     pub r: R,
     n: u128,
+    // Reuse the 3-coprime cofactor instead of dividing u128 group orders
+    // on each AMM root query. Computed once during field initialization.
+    cofactor: u128,
+    cofactor_mod3_eq1: bool,
     s: u32,
     e3: u128,
     c: R::E,
@@ -568,6 +572,8 @@ impl<R: Ring> Cube<R> {
             return Cube {
                 r,
                 n,
+                cofactor: t,
+                cofactor_mod3_eq1: t % 3 == 1,
                 s,
                 e3,
                 c: one,
@@ -619,6 +625,8 @@ impl<R: Ring> Cube<R> {
         Cube {
             r,
             n,
+            cofactor: t,
+            cofactor_mod3_eq1: t % 3 == 1,
             s,
             e3,
             c,
@@ -658,7 +666,7 @@ impl<R: Ring> Cube<R> {
         // test (a^t)^(3^(s-1)) and the Sylow correction h.
         // Since 3*e3-1 is either t or 2*t, this removes one
         // full-length exponentiation from the AMM hot path.
-        let t = self.n / self.p3s;
+        let t = self.cofactor;
         // R66_AMM_INVERSE_SYLOW_BEGIN
         // Keep the old residuosity-first path for base fields and generic
         // Rings: their inversions can be slower than exponentiation.
@@ -677,7 +685,7 @@ impl<R: Ring> Cube<R> {
             }
             if residue != r.one() { return None; }
             let x0 = r.pow(a, self.e3);
-            (x0, if t % 3 == 1 { r.mul(g, g) } else { g })
+            (x0, if self.cofactor_mod3_eq1 { r.mul(g, g) } else { g })
         };
         // R66_AMM_INVERSE_SYLOW_END
         // For s=1, a cube has h=1 and x0 is already a root.
@@ -2529,7 +2537,8 @@ mod tests {
     }
     fn cube_before_frobenius(ctx: &RadicalRootCtx) -> Cube<Fq2BeforePower> {
         let c = &ctx.cube_q;
-        Cube { r: Fq2BeforePower(c.r), n: c.n, s: c.s, e3: c.e3,
+        Cube { r: Fq2BeforePower(c.r), n: c.n, cofactor: c.cofactor,
+               cofactor_mod3_eq1: c.cofactor_mod3_eq1, s: c.s, e3: c.e3,
                c: c.c, c_inv: c.c_inv, inverse_powers: c.inverse_powers.clone(),
                inverse_squares: c.inverse_squares.clone(), w: c.w, w_squared: c.w_squared,
                c_inv_squared: c.c_inv_squared, p3s: c.p3s }
@@ -5378,6 +5387,42 @@ mod round121_narrow_jacobi_and_sparse_extension_tests {
             }
             for a in [p, p + 1, u64::MAX] {
                 assert_eq!(ctx.sqrt_discriminant(a), ctx.sqrt(a));
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod round122_cube_cofactor_cache_tests {
+    use super::*;
+    #[test]
+    fn cached_3_coprime_cofactor_matches_group_orders_and_cube_roots() {
+        let mut seed = 0x1220_2026_f00d_1a72u64;
+        for p in [5u64, 7, 31, 97, 109, 487, 65_521,
+                  1_000_000_007, 1_000_000_009, MAX_PRIME] {
+            let ctx = RadicalRootCtx::new(p).unwrap();
+            let f = &ctx.f;
+            for (order, cofactor, factor, one) in [
+                (ctx.cube_p.n, ctx.cube_p.cofactor, ctx.cube_p.p3s, ctx.cube_p.cofactor_mod3_eq1),
+                (ctx.cube_q.n, ctx.cube_q.cofactor, ctx.cube_q.p3s, ctx.cube_q.cofactor_mod3_eq1),
+            ] {
+                assert_eq!(cofactor * factor, order, "p={p}");
+                assert_ne!(cofactor % 3, 0, "p={p}");
+                assert_eq!(one, cofactor % 3 == 1, "p={p}");
+            }
+            for _ in 0..32 {
+                seed ^= seed << 13;
+                seed ^= seed >> 7;
+                seed ^= seed << 17;
+                let x = seed % p;
+                let y = (seed >> 21) % p;
+                if let Some(root) = ctx.cube_p.root(x) {
+                    assert_eq!(f.mul(f.sqr(root), root), x, "Fp p={p}");
+                }
+                if let Some(root) = ctx.cube_q.root((x, y)) {
+                    let q = &ctx.cube_q.r;
+                    assert_eq!(q.mul(q.sqr(root), root), (x, y), "Fp2 p={p}");
+                }
             }
         }
     }
