@@ -156,7 +156,7 @@ mod tests {
        let start=Instant::now();let mut digest=0x4af5_9851_923a_d072u64;
        for _ in 0..loops {for input in &inputs {
          let r=if new{candidate::roots(&c,black_box(input))}else{baseline::roots(&b,black_box(input))}.unwrap();
-         digest=digest.rotate_left(11)^black_box(hash(&r.0));
+         digest=digest.wrapping_mul(0x9e37_79b1_85eb_ca87).wrapping_add(black_box(hash(&r.0)));
        }}
        (start.elapsed().as_nanos()as f64/(loops*inputs.len())as f64,digest)
      };
