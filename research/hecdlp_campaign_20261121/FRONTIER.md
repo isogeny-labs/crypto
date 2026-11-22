@@ -68,3 +68,16 @@ at 0.33–0.43 across a 32× range of p where the asymptotic p^{−1/6} would pr
 reference as a second reading). R3: relation excess with lightest-row selection before SGE, to cut
 the merged core's weight (the only lever the shares point at). Not pursued: deeper merge (C1) and
 the base constant (C2), both closed.
+
+## Round 2 results (2026-11-22) [pcc:unverified]
+
+| genus / kind | best arm | over rho | at p | change | source |
+|---|---|--:|--:|---|---|
+| 3, hyperelliptic | 2LP + prefilter + SGE(8,3) | 0.300 [0.223, 0.420] / 0.399 [0.288, 0.534] / 0.377 [0.263, 0.565] (expected rho: 0.330 / 0.393 / 0.324) | 65537 / 131101 / 262147 | R2: 9 curves per prime; flat, no resolved trend; exponents rho 1.360 [1.254, 1.464], SGE arm 1.422 [1.418, 1.425], unmerged 1.347; the data do not separate the exponents | `genus_ladder_g3_highp_20261121` |
+| 3, hyperelliptic | + relation excess, keep lightest fraction K ≥ 0.5 | 1.8–5.2× the plain arm | 32771–131101 | R3: negative; Wiedemann pays per row (`la_wied_mul ≈ c·cols·(generic + rows)`, c 4.9–6.0), so an enlarged core costs more however light its rows | `genus_ladder_light_rows_20261121` |
+| 3, hyperelliptic | + excess 0.2, keep only the lightest cols + margin rows (post hoc) | FPM 0.877 / 0.866 / 0.843 of plain; `la_mul` 0.63–0.65 | 32771 / 65537 / 131101 | R3 post-hoc lead, same 3 curves: gain grows with p; preregistered on fresh instances as R4 | `genus_ladder_light_rows_20261121` |
+
+What round 2 established: the genus-3 arm is a constant factor 2.5–3.3 below rho across 8209–262147
+with no measurable exponent gap, and the merged core's row count, not its weight, prices the LA.
+Relation filtering that leaves the core at cols + margin but lighter is the one lever that moved
+(about 15 % at 131101, post hoc); it is the subject of R4.
