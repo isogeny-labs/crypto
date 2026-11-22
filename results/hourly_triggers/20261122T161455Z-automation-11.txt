@@ -1,0 +1,6 @@
+Trigger 2026-11-22T16:14:55Z
+Benchmark: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Scope: frozen synthetic Koblitz GF(2^23) a=0, m=2 (not ECC2K-130).
+Logging: results/hourly_log.csv
+Baseline: results/relation_baseline.json
+Alert threshold: 20% throughput or success-rate deviation, or run failure.
