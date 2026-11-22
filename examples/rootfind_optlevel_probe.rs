@@ -70,104 +70,99 @@ fn main() {
         "rootfind_optlevel_probe arm={arm} mode={mode} bits={bits} |Fx|={a} targets={n_targets} min_secs={min_secs} [pcc:unverified]"
     );
 
-    let (ops, kernel_seconds, probes, ifma) = if arm.starts_with("rootfind-kmitm")
-        || arm.starts_with("kmitm:")
-    {
-        let spec = if arm.starts_with("kmitm:") {
-            format!("rootfind-{arm}")
-        } else {
-            arm.clone()
-        };
-        let (_, params) = Params::parse_spec(&spec).unwrap();
-        let m: u32 = params
-            .0
-            .get("m")
-            .and_then(|s| s.parse().ok())
-            .unwrap_or(4);
-        let mut oracle = RootfindKMitmOracle::new_prime(m, &inst);
-        oracle
-            .prepare(&ctx, &fb, &params, &mut GroupOps::default())
-            .unwrap_or_else(|e| panic!("prepare: {e}"));
-        let ifma = oracle.ifma_prepared();
-        let avx2 = oracle.avx2_prepared();
-        match mode.as_str() {
-            "ifma" => {
-                if !ifma {
-                    eprintln!("IFMA not prepared on this host/p; falling back to scalar lanes");
+    let (ops, kernel_seconds, probes, ifma) =
+        if arm.starts_with("rootfind-kmitm") || arm.starts_with("kmitm:") {
+            let spec = if arm.starts_with("kmitm:") {
+                format!("rootfind-{arm}")
+            } else {
+                arm.clone()
+            };
+            let (_, params) = Params::parse_spec(&spec).unwrap();
+            let m: u32 = params.0.get("m").and_then(|s| s.parse().ok()).unwrap_or(4);
+            let mut oracle = RootfindKMitmOracle::new_prime(m, &inst);
+            oracle
+                .prepare(&ctx, &fb, &params, &mut GroupOps::default())
+                .unwrap_or_else(|e| panic!("prepare: {e}"));
+            let ifma = oracle.ifma_prepared();
+            let avx2 = oracle.avx2_prepared();
+            match mode.as_str() {
+                "ifma" => {
+                    if !ifma {
+                        eprintln!("IFMA not prepared on this host/p; falling back to scalar lanes");
+                    }
+                    oracle.set_ifma_enabled(true);
                 }
-                oracle.set_ifma_enabled(true);
-            }
-            "avx2" => {
-                oracle.set_ifma_enabled(false);
-                oracle.set_avx2_enabled(true);
-                if !avx2 {
-                    eprintln!("AVX2 not prepared on this host/p; falling back to scalar lanes");
+                "avx2" => {
+                    oracle.set_ifma_enabled(false);
+                    oracle.set_avx2_enabled(true);
+                    if !avx2 {
+                        eprintln!("AVX2 not prepared on this host/p; falling back to scalar lanes");
+                    }
                 }
-            }
-            "lanes" => {
-                oracle.set_ifma_enabled(false);
-                oracle.set_avx2_enabled(false);
-            }
-            _ => {}
-        }
-        // Warm.
-        warm_kmitm(&mut oracle, &ctx, &fb, &targets, &mode);
-        run_kmitm(&mut oracle, &ctx, &fb, &targets, &mode, min_secs, ifma || avx2)
-    } else if arm.starts_with("rootfind-floor") || arm.starts_with("floor:") {
-        let spec = if arm.starts_with("floor:") {
-            format!("rootfind-{arm}")
-        } else {
-            arm.clone()
-        };
-        let (_, params) = Params::parse_spec(&spec).unwrap();
-        let m: u32 = params
-            .0
-            .get("m")
-            .and_then(|s| s.parse().ok())
-            .unwrap_or(3);
-        let mut oracle = RootfindFloorOracle::new(m, &inst);
-        oracle
-            .prepare(&ctx, &fb, &params, &mut GroupOps::default())
-            .unwrap_or_else(|e| panic!("prepare: {e}"));
-        let ifma = oracle.ifma_prepared();
-        match mode.as_str() {
-            "ifma" => {
-                if !ifma {
-                    eprintln!("IFMA not prepared; falling back to scalar lanes");
+                "lanes" => {
+                    oracle.set_ifma_enabled(false);
+                    oracle.set_avx2_enabled(false);
                 }
-                oracle.set_ifma_enabled(true);
+                _ => {}
             }
-            "lanes" => oracle.set_ifma_enabled(false),
-            _ => {}
-        }
-        if mode == "lanes" || mode == "ifma" {
-            warm_floor_lanes(&mut oracle, &ctx, &fb, &targets);
-            run_floor_lanes(&mut oracle, &ctx, &fb, &targets, min_secs, ifma)
-        } else {
+            // Warm.
+            warm_kmitm(&mut oracle, &ctx, &fb, &targets, &mode);
+            run_kmitm(
+                &mut oracle,
+                &ctx,
+                &fb,
+                &targets,
+                &mode,
+                min_secs,
+                ifma || avx2,
+            )
+        } else if arm.starts_with("rootfind-floor") || arm.starts_with("floor:") {
+            let spec = if arm.starts_with("floor:") {
+                format!("rootfind-{arm}")
+            } else {
+                arm.clone()
+            };
+            let (_, params) = Params::parse_spec(&spec).unwrap();
+            let m: u32 = params.0.get("m").and_then(|s| s.parse().ok()).unwrap_or(3);
+            let mut oracle = RootfindFloorOracle::new(m, &inst);
+            oracle
+                .prepare(&ctx, &fb, &params, &mut GroupOps::default())
+                .unwrap_or_else(|e| panic!("prepare: {e}"));
+            let ifma = oracle.ifma_prepared();
+            match mode.as_str() {
+                "ifma" => {
+                    if !ifma {
+                        eprintln!("IFMA not prepared; falling back to scalar lanes");
+                    }
+                    oracle.set_ifma_enabled(true);
+                }
+                "lanes" => oracle.set_ifma_enabled(false),
+                _ => {}
+            }
+            if mode == "lanes" || mode == "ifma" {
+                warm_floor_lanes(&mut oracle, &ctx, &fb, &targets);
+                run_floor_lanes(&mut oracle, &ctx, &fb, &targets, min_secs, ifma)
+            } else {
+                warm_single(&mut oracle, &ctx, &fb, &targets);
+                run_single(&mut oracle, &ctx, &fb, &targets, min_secs)
+            }
+        } else if arm.starts_with("rootfind-subtract") || arm.starts_with("subtract:") {
+            let spec = if arm.starts_with("subtract:") {
+                format!("rootfind-{arm}")
+            } else {
+                arm.clone()
+            };
+            let (_, params) = Params::parse_spec(&spec).unwrap();
+            let m: u32 = params.0.get("m").and_then(|s| s.parse().ok()).unwrap_or(3);
+            let mut oracle = RootfindSubtractOracle::new(m, &inst);
+            oracle
+                .prepare(&ctx, &fb, &params, &mut GroupOps::default())
+                .unwrap_or_else(|e| panic!("prepare: {e}"));
             warm_single(&mut oracle, &ctx, &fb, &targets);
             run_single(&mut oracle, &ctx, &fb, &targets, min_secs)
-        }
-    } else if arm.starts_with("rootfind-subtract") || arm.starts_with("subtract:") {
-        let spec = if arm.starts_with("subtract:") {
-            format!("rootfind-{arm}")
         } else {
-            arm.clone()
+            panic!("unsupported --arm {arm} (want kmitm:/floor:/subtract: or full ids)");
         };
-        let (_, params) = Params::parse_spec(&spec).unwrap();
-        let m: u32 = params
-            .0
-            .get("m")
-            .and_then(|s| s.parse().ok())
-            .unwrap_or(3);
-        let mut oracle = RootfindSubtractOracle::new(m, &inst);
-        oracle
-            .prepare(&ctx, &fb, &params, &mut GroupOps::default())
-            .unwrap_or_else(|e| panic!("prepare: {e}"));
-        warm_single(&mut oracle, &ctx, &fb, &targets);
-        run_single(&mut oracle, &ctx, &fb, &targets, min_secs)
-    } else {
-        panic!("unsupported --arm {arm} (want kmitm:/floor:/subtract: or full ids)");
-    };
 
     let _ = params;
     // Tables for these probe sizes sit in L3 on this host class; DRAM
@@ -242,14 +237,7 @@ fn run_kmitm(
                 for chunk in targets.chunks(8) {
                     let mut o = GroupOps::default();
                     let mut c = OracleCounters::default();
-                    oracle.decompose_lanes(
-                        ctx,
-                        fb,
-                        &mut o,
-                        &mut c,
-                        chunk,
-                        &mut out[..chunk.len()],
-                    );
+                    oracle.decompose_lanes(ctx, fb, &mut o, &mut c, chunk, &mut out[..chunk.len()]);
                     total_ops += o.field_ops.muls + o.field_ops.sqrs;
                     probes += chunk.len() as u64;
                     black_box(&out);

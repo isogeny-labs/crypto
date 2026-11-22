@@ -66,9 +66,8 @@ fn main() {
         let left_est = (m as usize - 1).min(9);
         let est = (a as u128).saturating_pow(left_est as u32);
         if est > 2_000_000_000u128 {
-            let msg = format!(
-                "skip m={m}: estimated left table ~{est} over |Fx|={a} (host OOM guard)"
-            );
+            let msg =
+                format!("skip m={m}: estimated left table ~{est} over |Fx|={a} (host OOM guard)");
             println!("m={m:>2}  {msg}");
             rows.push(json!({
                 "m": m,
@@ -172,7 +171,12 @@ fn main() {
         let mut thr_ns = [0.0f64; 3];
         let mut thr_hits = [0u64; 3];
         for (ti, threads) in [1usize, 2, 4].into_iter().enumerate() {
-            black_box(mitm.decompose_threaded(&ctx, &fb, &targets[..targets.len().min(4)], threads));
+            black_box(mitm.decompose_threaded(
+                &ctx,
+                &fb,
+                &targets[..targets.len().min(4)],
+                threads,
+            ));
             let t_thr = Instant::now();
             let out = mitm.decompose_threaded(&ctx, &fb, &targets, threads);
             thr_ns[ti] = t_thr.elapsed().as_nanos() as f64 / targets.len() as f64;
@@ -181,43 +185,42 @@ fn main() {
         }
 
         let (ksum_build_ns, ksum_probe_ns, ksum_entries, ksum_hits, ksum_ok) =
-            if m <= 9 && !skip_ksum
-        {
-            let (_, pk) = Params::parse_spec(&format!("ksum:m={m},prune=1")).unwrap();
-            let mut ksum = KSumOracle::new(m);
-            let mut bk = GroupOps::default();
-            let tb = Instant::now();
-            let prepared = ksum.prepare(&ctx, &fb, &pk, &mut bk);
-            if let Err(e) = prepared {
-                println!("m={m:>2}  ksum refused: {e}");
-                (None, None, None, None, false)
-            } else {
-                let build_ns = tb.elapsed().as_nanos() as f64;
-                let entries = <KSumOracle as DecompositionOracle<
-                    crypto_lib::cryptanalysis::ic_boundary::PrimeCurve,
-                >>::setup_work_native(&ksum)
-                .get("table_insert_attempts")
-                .copied();
-                for t in targets.iter().take(4) {
-                    let mut o = GroupOps::default();
-                    let mut c = OracleCounters::default();
-                    black_box(ksum.decompose(&ctx, &fb, &mut o, &mut c, *t));
-                }
-                let mut hits = 0u64;
-                let tp = Instant::now();
-                for &t in &targets {
-                    let mut o = GroupOps::default();
-                    let mut c = OracleCounters::default();
-                    if ksum.decompose(&ctx, &fb, &mut o, &mut c, t).is_some() {
-                        hits += 1;
+            if m <= 9 && !skip_ksum {
+                let (_, pk) = Params::parse_spec(&format!("ksum:m={m},prune=1")).unwrap();
+                let mut ksum = KSumOracle::new(m);
+                let mut bk = GroupOps::default();
+                let tb = Instant::now();
+                let prepared = ksum.prepare(&ctx, &fb, &pk, &mut bk);
+                if let Err(e) = prepared {
+                    println!("m={m:>2}  ksum refused: {e}");
+                    (None, None, None, None, false)
+                } else {
+                    let build_ns = tb.elapsed().as_nanos() as f64;
+                    let entries = <KSumOracle as DecompositionOracle<
+                        crypto_lib::cryptanalysis::ic_boundary::PrimeCurve,
+                    >>::setup_work_native(&ksum)
+                    .get("table_insert_attempts")
+                    .copied();
+                    for t in targets.iter().take(4) {
+                        let mut o = GroupOps::default();
+                        let mut c = OracleCounters::default();
+                        black_box(ksum.decompose(&ctx, &fb, &mut o, &mut c, *t));
                     }
+                    let mut hits = 0u64;
+                    let tp = Instant::now();
+                    for &t in &targets {
+                        let mut o = GroupOps::default();
+                        let mut c = OracleCounters::default();
+                        if ksum.decompose(&ctx, &fb, &mut o, &mut c, t).is_some() {
+                            hits += 1;
+                        }
+                    }
+                    let probe_ns = tp.elapsed().as_nanos() as f64 / targets.len() as f64;
+                    (Some(build_ns), Some(probe_ns), entries, Some(hits), true)
                 }
-                let probe_ns = tp.elapsed().as_nanos() as f64 / targets.len() as f64;
-                (Some(build_ns), Some(probe_ns), entries, Some(hits), true)
-            }
-        } else {
-            (None, None, None, None, false)
-        };
+            } else {
+                (None, None, None, None, false)
+            };
 
         let build_ratio = ksum_build_ns.map(|k| k / build_m_ns);
         let probe_ratio = ksum_probe_ns.map(|k| k / probe_m_ns);

@@ -232,7 +232,9 @@ fn collect_kmitm_threaded(
 }
 
 /// Walk-collect + Gauss + verify using a caller-prepared oracle.
-fn collect_with_oracle<O: DecompositionOracle<crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>>(
+fn collect_with_oracle<
+    O: DecompositionOracle<crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>,
+>(
     oracle: &mut O,
     fb: &crypto_lib::cryptanalysis::ic_boundary::FactorBase<PrimePoint>,
     inst: &crypto_lib::cryptanalysis::ic_boundary::PrimeInstance,
@@ -387,7 +389,11 @@ fn shared_multi(
     }
 }
 
-fn oracle_growth_cell(bits: u32, size: usize, n_targets: usize) -> Result<serde_json::Value, String> {
+fn oracle_growth_cell(
+    bits: u32,
+    size: usize,
+    n_targets: usize,
+) -> Result<serde_json::Value, String> {
     let inst = prime_instance_for(bits, 59297);
     let fb = prime_factor_base(&inst, size);
     let a = fb.abscissa_list.len();
@@ -609,9 +615,7 @@ fn main() -> Result<(), String> {
             "verified_reps": ok,
             "repeats": repeats,
         });
-        println!(
-            "  {arm:<22} MEDIAN wall={med_wall:.4}s verified={ok}/{repeats}"
-        );
+        println!("  {arm:<22} MEDIAN wall={med_wall:.4}s verified={ok}/{repeats}");
         cold_summary.push(row);
     }
     let sub_wall = cold_summary
@@ -636,7 +640,8 @@ fn main() -> Result<(), String> {
                 let vs = sub_wall.map(|s| if per > 0.0 { s / per } else { 0.0 });
                 println!(
                     "  {spec:<40} per_amort={per:.4}s vs_sub_cold={} verified={}/{}",
-                    vs.map(|x| format!("{x:.2}x")).unwrap_or_else(|| "n/a".into()),
+                    vs.map(|x| format!("{x:.2}x"))
+                        .unwrap_or_else(|| "n/a".into()),
                     v.get("verified").and_then(|x| x.as_u64()).unwrap_or(0),
                     multi
                 );
@@ -704,7 +709,10 @@ fn main() -> Result<(), String> {
         let mut ys_adds = Vec::new();
         let mut ys_probe = Vec::new();
         for cell in &growth_rows {
-            let a = cell.get("abscissae").and_then(|v| v.as_f64()).unwrap_or(0.0);
+            let a = cell
+                .get("abscissae")
+                .and_then(|v| v.as_f64())
+                .unwrap_or(0.0);
             if a <= 0.0 {
                 continue;
             }

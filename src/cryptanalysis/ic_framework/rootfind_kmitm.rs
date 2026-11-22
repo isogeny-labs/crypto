@@ -1241,21 +1241,6 @@ impl RootfindKMitmOracle<'_> {
         }
     }
 
-    #[inline]
-    fn bloom_maybe_canon(&mut self, x: u64) -> bool {
-        match &self.canon_bloom {
-            Some(b) if b.maybe(x) => {
-                self.bloom_passes += 1;
-                true
-            }
-            Some(_) => {
-                self.bloom_rejects += 1;
-                false
-            }
-            None => true,
-        }
-    }
-
     fn probe_right_precomputed_prime(
         &mut self,
         g: &PrimeCurve,
@@ -2401,7 +2386,10 @@ mod tests {
         let mut dops = GroupOps::default();
         let mut counters = OracleCounters::default();
         oracle.decompose_lanes(&c, &fb, &mut dops, &mut counters, &targets, &mut out);
-        assert!(out[0].is_some(), "AVX2 dual-pack should recover planted sum");
+        assert!(
+            out[0].is_some(),
+            "AVX2 dual-pack should recover planted sum"
+        );
         assert_eq!(out[0].as_ref().unwrap().len(), 4);
     }
 
@@ -2487,7 +2475,10 @@ mod tests {
             .unwrap();
         let out = oracle.decompose_threaded(&c, &fb, &targets, 2);
         assert_eq!(out.len(), targets.len());
-        assert!(out[0].is_some(), "threaded probe should recover planted sum");
+        assert!(
+            out[0].is_some(),
+            "threaded probe should recover planted sum"
+        );
         assert_eq!(out[0].as_ref().unwrap().len(), 4);
     }
 

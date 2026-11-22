@@ -204,11 +204,7 @@ impl IfmaRight1 {
         // kmitm: dx = x_j − x_R; floor: dx = x_R − x_j.
         let diff = |j: usize| {
             let xj = _mm512_set1_epi64(self.xs[j] as i64);
-            let d = if floor_dx {
-                sub(vxr, xj)
-            } else {
-                sub(xj, vxr)
-            };
+            let d = if floor_dx { sub(vxr, xj) } else { sub(xj, vxr) };
             let zm = _mm512_cmpeq_epi64_mask(d, z);
             (_mm512_mask_blend_epi64(zm, d, one_r), zm)
         };

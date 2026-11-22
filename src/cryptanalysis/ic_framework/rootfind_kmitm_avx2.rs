@@ -78,15 +78,6 @@ impl Avx2Right1 {
         self.for_each_pair(pts, prefix, false, on_pair)
     }
 
-    pub fn for_each_floor_pair(
-        &self,
-        pts: &[PrimePoint],
-        prefix: &mut Vec<[u64; LANES]>,
-        on_pair: impl FnMut(usize, usize, u64, u64),
-    ) -> u64 {
-        self.for_each_pair(pts, prefix, true, on_pair)
-    }
-
     fn for_each_pair(
         &self,
         pts: &[PrimePoint],
@@ -116,7 +107,15 @@ impl Avx2Right1 {
         let dual = n_live > LANES;
         unsafe {
             self.sweep_dual(
-                &xr_a, &yr_a, &xr_b, &yr_b, n_live, dual, floor_dx, prefix, &mut on_pair,
+                &xr_a,
+                &yr_a,
+                &xr_b,
+                &yr_b,
+                n_live,
+                dual,
+                floor_dx,
+                prefix,
+                &mut on_pair,
             )
         }
     }
@@ -242,8 +241,8 @@ impl Avx2Right1 {
         } else {
             [0u64; LANES]
         };
-        let fermat_muls = (1 + dual as u64)
-            * (2 * LANES as u64 + ((32 - self.p.leading_zeros()) as u64 * 3 / 2));
+        let fermat_muls =
+            (1 + dual as u64) * (2 * LANES as u64 + ((32 - self.p.leading_zeros()) as u64 * 3 / 2));
         let mut inv_va = ld(&inv_a);
         let mut inv_vb = if dual { ld(&inv_b) } else { z };
         for j in (1..k).rev() {

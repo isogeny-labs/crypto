@@ -336,8 +336,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindFloorOracle<'_> {
             let n = table.entries.max(1) as usize;
             bloom = WordBloom::new(n);
             #[cfg(target_arch = "x86_64")]
-            let want_ifma = (5..1u64 << 52).contains(&p)
-                && super::rootfind_kmitm_ifma::has_ifma();
+            let want_ifma = (5..1u64 << 52).contains(&p) && super::rootfind_kmitm_ifma::has_ifma();
             #[cfg(not(target_arch = "x86_64"))]
             let want_ifma = false;
             let mut canon_bloom = if want_ifma {
@@ -356,18 +355,9 @@ impl DecompositionOracle<PrimeCurve> for RootfindFloorOracle<'_> {
             self.canon_bloom = canon_bloom;
             #[cfg(target_arch = "x86_64")]
             if want_ifma {
-                let xs: Vec<u64> = self
-                    .reps
-                    .iter()
-                    .map(|r| f.from_mont(r.x))
-                    .collect();
-                let ys: Vec<u64> = self
-                    .reps
-                    .iter()
-                    .map(|r| f.from_mont(r.y))
-                    .collect();
-                self.ifma =
-                    super::rootfind_kmitm_ifma::IfmaRight1::new(p, &xs, &ys).map(Arc::new);
+                let xs: Vec<u64> = self.reps.iter().map(|r| f.from_mont(r.x)).collect();
+                let ys: Vec<u64> = self.reps.iter().map(|r| f.from_mont(r.y)).collect();
+                self.ifma = super::rootfind_kmitm_ifma::IfmaRight1::new(p, &xs, &ys).map(Arc::new);
                 self.ifma_prefix.clear();
             }
         }
@@ -607,9 +597,9 @@ impl RootfindFloorOracle<'_> {
                         continue;
                     }
                     self.bloom_passes += 1;
-                    if let Some(found) =
-                        self.lookup_x(ctx, fb, ops, counters, targets[t], summand, x3, lam, yr[t], f)
-                    {
+                    if let Some(found) = self.lookup_x(
+                        ctx, fb, ops, counters, targets[t], summand, x3, lam, yr[t], f,
+                    ) {
                         out[t] = Some(found);
                         break;
                     }
@@ -671,7 +661,8 @@ impl RootfindFloorOracle<'_> {
                 }
             }
         }
-        let skip: [bool; 8] = std::array::from_fn(|i| i < t_n && (out[i].is_some() || targets[i].infinity));
+        let skip: [bool; 8] =
+            std::array::from_fn(|i| i < t_n && (out[i].is_some() || targets[i].infinity));
         let bloom = self.canon_bloom.as_ref();
         let mut cands: Vec<(usize, usize, u64)> = Vec::new();
         let mut adds = 0u64;
@@ -740,7 +731,10 @@ impl RootfindFloorOracle<'_> {
         // Recompute λ on the rare hit path (Montgomery).
         let xr = f.to_mont(point.x);
         let yr = f.to_mont(point.y);
-        let rep = self.reps.iter().find(|r| r.plus == summand || r.minus == summand)?;
+        let rep = self
+            .reps
+            .iter()
+            .find(|r| r.plus == summand || r.minus == summand)?;
         let dx = f.sub(xr, rep.x);
         if dx == 0 {
             return None;

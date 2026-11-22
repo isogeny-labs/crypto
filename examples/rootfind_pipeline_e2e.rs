@@ -462,7 +462,7 @@ fn main() -> Result<(), String> {
             .unwrap_or_else(|| d.to_string())
     };
     let panel = get("--panel", "all"); // all | breakthrough | recipe
-    // Pinned 32-bit best recipes from research/rootfind_10x_exponent_20261121/.
+                                       // Pinned 32-bit best recipes from research/rootfind_10x_exponent_20261121/.
     let (bits, size) = if panel == "recipe" {
         (
             get("--bits", "32").parse().unwrap_or(32),
@@ -513,7 +513,12 @@ fn main() -> Result<(), String> {
                 "walk-prime-batch-8",
             ),
             ("floor:m=3@64/walk", "rootfind-floor:m=3", 64, "walk"),
-            ("floor:m=3@64/batch8", "rootfind-floor:m=3", 64, "walk-prime-batch-8"),
+            (
+                "floor:m=3@64/batch8",
+                "rootfind-floor:m=3",
+                64,
+                "walk-prime-batch-8",
+            ),
             ("kmitm:m=4@64/walk", "rootfind-kmitm:m=4", 64, "walk"),
             ("kmitm:m=5@32/walk", "rootfind-kmitm:m=5", 32, "walk"),
             (
@@ -575,9 +580,7 @@ fn main() -> Result<(), String> {
             }
             let med_w = median_f64(&mut walls);
             let med_s = median_f64(&mut ss);
-            println!(
-                "  {arm:<28} MEDIAN wall={med_w:.4}s S={med_s:.3} verified={ok}/{repeats}"
-            );
+            println!("  {arm:<28} MEDIAN wall={med_w:.4}s S={med_s:.3} verified={ok}/{repeats}");
             recipe_summary.push(json!({
                 "arm": arm, "oracle": spec, "size": a_size, "targets": tgt_name,
                 "median_wall_s": med_w, "median_S": med_s,
@@ -624,9 +627,7 @@ fn main() -> Result<(), String> {
                 continue;
             }
             let med_w = median_f64(&mut walls);
-            println!(
-                "  {arm:<28} MEDIAN wall={med_w:.4}s verified={ok}/{repeats}"
-            );
+            println!("  {arm:<28} MEDIAN wall={med_w:.4}s verified={ok}/{repeats}");
             recipe_summary.push(json!({
                 "arm": arm, "lanes": 8, "size": a_size,
                 "median_wall_s": med_w, "verified_reps": ok, "repeats": repeats,
@@ -646,23 +647,23 @@ fn main() -> Result<(), String> {
     }
 
     if panel != "breakthrough" {
-    for &(arm, spec) in standard_arms {
-        let mut walls = Vec::new();
-        let mut decomp_walls = Vec::new();
-        let mut ok = 0usize;
-        let mut last: Option<ArmResult> = None;
-        let mut skipped: Option<String> = None;
-        for rep in 0..repeats {
-            let seed = seed0.wrapping_add(rep as u64 * 0x9E37);
-            let planted = 1 + (seed % (inst.r - 1));
-            match run_standard(arm, spec, Targets::Walk, &inst, size, seed, planted) {
-                Ok(row) => {
-                    if row.verified {
-                        ok += 1;
-                    }
-                    walls.push(row.wall_s);
-                    decomp_walls.push(row.decomp_wall_s);
-                    println!(
+        for &(arm, spec) in standard_arms {
+            let mut walls = Vec::new();
+            let mut decomp_walls = Vec::new();
+            let mut ok = 0usize;
+            let mut last: Option<ArmResult> = None;
+            let mut skipped: Option<String> = None;
+            for rep in 0..repeats {
+                let seed = seed0.wrapping_add(rep as u64 * 0x9E37);
+                let planted = 1 + (seed % (inst.r - 1));
+                match run_standard(arm, spec, Targets::Walk, &inst, size, seed, planted) {
+                    Ok(row) => {
+                        if row.verified {
+                            ok += 1;
+                        }
+                        walls.push(row.wall_s);
+                        decomp_walls.push(row.decomp_wall_s);
+                        println!(
                         "  {arm:<14} rep={rep} wall={:.4}s decomp={:.4}s setup={:.4}s S={:.3} targets={} rels={} verified={}",
                         row.wall_s,
                         row.decomp_wall_s,
@@ -672,76 +673,74 @@ fn main() -> Result<(), String> {
                         row.relations,
                         row.verified
                     );
-                    all_rows.push(json!({
-                        "arm": arm,
-                        "mode": "run_pipeline",
-                        "rep": rep,
-                        "wall_s": row.wall_s,
-                        "decomp_wall_s": row.decomp_wall_s,
-                        "setup_wall_s": row.setup_wall_s,
-                        "s": row.s,
-                        "total_gae": row.total_gae,
-                        "targets": row.targets,
-                        "relations": row.relations,
-                        "verified": row.verified,
-                        "exhausted": row.exhausted,
-                        "recovered": row.recovered,
-                    }));
-                    last = Some(row);
-                }
-                Err(e) => {
-                    println!("  {arm:<14} SKIP: {e}");
-                    skipped = Some(e);
-                    break;
+                        all_rows.push(json!({
+                            "arm": arm,
+                            "mode": "run_pipeline",
+                            "rep": rep,
+                            "wall_s": row.wall_s,
+                            "decomp_wall_s": row.decomp_wall_s,
+                            "setup_wall_s": row.setup_wall_s,
+                            "s": row.s,
+                            "total_gae": row.total_gae,
+                            "targets": row.targets,
+                            "relations": row.relations,
+                            "verified": row.verified,
+                            "exhausted": row.exhausted,
+                            "recovered": row.recovered,
+                        }));
+                        last = Some(row);
+                    }
+                    Err(e) => {
+                        println!("  {arm:<14} SKIP: {e}");
+                        skipped = Some(e);
+                        break;
+                    }
                 }
             }
-        }
-        if let Some(e) = skipped {
+            if let Some(e) = skipped {
+                summary.push(json!({
+                    "arm": arm,
+                    "mode": "run_pipeline",
+                    "skipped": true,
+                    "skip_reason": e,
+                }));
+                continue;
+            }
+            let med_wall = median_f64(&mut walls);
+            let med_decomp = median_f64(&mut decomp_walls);
+            let last = last.unwrap();
             summary.push(json!({
                 "arm": arm,
                 "mode": "run_pipeline",
-                "skipped": true,
-                "skip_reason": e,
+                "median_wall_s": med_wall,
+                "median_decomp_wall_s": med_decomp,
+                "verified_reps": ok,
+                "repeats": repeats,
+                "s": last.s,
             }));
-            continue;
-        }
-        let med_wall = median_f64(&mut walls);
-        let med_decomp = median_f64(&mut decomp_walls);
-        let last = last.unwrap();
-        summary.push(json!({
-            "arm": arm,
-            "mode": "run_pipeline",
-            "median_wall_s": med_wall,
-            "median_decomp_wall_s": med_decomp,
-            "verified_reps": ok,
-            "repeats": repeats,
-            "s": last.s,
-        }));
-        println!(
+            println!(
             "  {arm:<14} MEDIAN wall={med_wall:.4}s decomp={med_decomp:.4}s verified={ok}/{repeats}"
         );
-    }
+        }
 
-    // PLAN lever 4 inside a full solve: threaded relation collection for m=12.
-    for threads in [1usize, 2, 4] {
-        let arm = format!("kmitm:m=12,thr={threads}");
-        let mut walls = Vec::new();
-        let mut decomp_walls = Vec::new();
-        let mut ok = 0usize;
-        let mut skipped: Option<String> = None;
-        for rep in 0..repeats {
-            let seed = seed0.wrapping_add(rep as u64 * 0x9E37);
-            let planted = 1 + (seed % (inst.r - 1));
-            match run_kmitm_threaded_collect(
-                &arm, 12, threads, &inst, size, seed, planted,
-            ) {
-                Ok(row) => {
-                    if row.verified {
-                        ok += 1;
-                    }
-                    walls.push(row.wall_s);
-                    decomp_walls.push(row.decomp_wall_s);
-                    println!(
+        // PLAN lever 4 inside a full solve: threaded relation collection for m=12.
+        for threads in [1usize, 2, 4] {
+            let arm = format!("kmitm:m=12,thr={threads}");
+            let mut walls = Vec::new();
+            let mut decomp_walls = Vec::new();
+            let mut ok = 0usize;
+            let mut skipped: Option<String> = None;
+            for rep in 0..repeats {
+                let seed = seed0.wrapping_add(rep as u64 * 0x9E37);
+                let planted = 1 + (seed % (inst.r - 1));
+                match run_kmitm_threaded_collect(&arm, 12, threads, &inst, size, seed, planted) {
+                    Ok(row) => {
+                        if row.verified {
+                            ok += 1;
+                        }
+                        walls.push(row.wall_s);
+                        decomp_walls.push(row.decomp_wall_s);
+                        println!(
                         "  {arm:<18} rep={rep} wall={:.4}s decomp={:.4}s setup={:.4}s targets={} rels={} verified={}",
                         row.wall_s,
                         row.decomp_wall_s,
@@ -750,53 +749,53 @@ fn main() -> Result<(), String> {
                         row.relations,
                         row.verified
                     );
-                    all_rows.push(json!({
-                        "arm": arm,
-                        "mode": "threaded_collect",
-                        "threads": threads,
-                        "rep": rep,
-                        "wall_s": row.wall_s,
-                        "decomp_wall_s": row.decomp_wall_s,
-                        "setup_wall_s": row.setup_wall_s,
-                        "targets": row.targets,
-                        "relations": row.relations,
-                        "verified": row.verified,
-                        "exhausted": row.exhausted,
-                        "recovered": row.recovered,
-                    }));
-                }
-                Err(e) => {
-                    println!("  {arm:<18} SKIP: {e}");
-                    skipped = Some(e);
-                    break;
+                        all_rows.push(json!({
+                            "arm": arm,
+                            "mode": "threaded_collect",
+                            "threads": threads,
+                            "rep": rep,
+                            "wall_s": row.wall_s,
+                            "decomp_wall_s": row.decomp_wall_s,
+                            "setup_wall_s": row.setup_wall_s,
+                            "targets": row.targets,
+                            "relations": row.relations,
+                            "verified": row.verified,
+                            "exhausted": row.exhausted,
+                            "recovered": row.recovered,
+                        }));
+                    }
+                    Err(e) => {
+                        println!("  {arm:<18} SKIP: {e}");
+                        skipped = Some(e);
+                        break;
+                    }
                 }
             }
-        }
-        if let Some(e) = skipped {
+            if let Some(e) = skipped {
+                summary.push(json!({
+                    "arm": arm,
+                    "mode": "threaded_collect",
+                    "threads": threads,
+                    "skipped": true,
+                    "skip_reason": e,
+                }));
+                continue;
+            }
+            let med_wall = median_f64(&mut walls);
+            let med_decomp = median_f64(&mut decomp_walls);
             summary.push(json!({
                 "arm": arm,
                 "mode": "threaded_collect",
                 "threads": threads,
-                "skipped": true,
-                "skip_reason": e,
+                "median_wall_s": med_wall,
+                "median_decomp_wall_s": med_decomp,
+                "verified_reps": ok,
+                "repeats": repeats,
             }));
-            continue;
-        }
-        let med_wall = median_f64(&mut walls);
-        let med_decomp = median_f64(&mut decomp_walls);
-        summary.push(json!({
-            "arm": arm,
-            "mode": "threaded_collect",
-            "threads": threads,
-            "median_wall_s": med_wall,
-            "median_decomp_wall_s": med_decomp,
-            "verified_reps": ok,
-            "repeats": repeats,
-        }));
-        println!(
+            println!(
             "  {arm:<18} MEDIAN wall={med_wall:.4}s decomp={med_decomp:.4}s verified={ok}/{repeats}"
         );
-    }
+        }
     } // end panel != breakthrough for standard + threaded cold arms
 
     // Amortized multi-DLP: prepare once, solve many planted logs (relation
@@ -805,179 +804,193 @@ fn main() -> Result<(), String> {
     let mut amort = Vec::new();
     let mut thr_amort = Vec::new();
     if panel != "breakthrough" {
-    println!("\n## Amortized multi-DLP (prepare once, {multi_n} planted logs)");
-    for &(arm_name, oracle_spec) in &[
-        ("subtract:m=3", "rootfind-subtract:m=3"),
-        ("floor:m=3", "rootfind-floor:m=3"),
-        ("kmitm:m=4", "rootfind-kmitm:m=4"),
-        ("kmitm:m=12", "rootfind-kmitm:m=12"),
-    ] {
-        let (name, params) = match Params::parse_spec(oracle_spec) {
-            Ok(v) => v,
-            Err(e) => {
+        println!("\n## Amortized multi-DLP (prepare once, {multi_n} planted logs)");
+        for &(arm_name, oracle_spec) in &[
+            ("subtract:m=3", "rootfind-subtract:m=3"),
+            ("floor:m=3", "rootfind-floor:m=3"),
+            ("kmitm:m=4", "rootfind-kmitm:m=4"),
+            ("kmitm:m=12", "rootfind-kmitm:m=12"),
+        ] {
+            let (name, params) = match Params::parse_spec(oracle_spec) {
+                Ok(v) => v,
+                Err(e) => {
+                    println!("  {arm_name:<14} SKIP: {e}");
+                    amort.push(json!({"arm": arm_name, "skipped": true, "skip_reason": e}));
+                    continue;
+                }
+            };
+            let m = match params.u64_or("m", 2) {
+                Ok(v) => v as u32,
+                Err(e) => {
+                    println!("  {arm_name:<14} SKIP: {e}");
+                    amort.push(json!({"arm": arm_name, "skipped": true, "skip_reason": e}));
+                    continue;
+                }
+            };
+            let fb = prime_factor_base(&inst, size);
+            let mut prep_ops = GroupOps::default();
+            let dummy_ctx = {
+                let g = inst.generator_point();
+                InstanceCtx {
+                    group: &inst.curve,
+                    generator: g,
+                    target: g,
+                    r: inst.r,
+                    cofactor: inst.cofactor,
+                    group_order: inst.group_order,
+                    name: inst.name.clone(),
+                    field_degree: None,
+                }
+            };
+            let t_prep = Instant::now();
+            let prep_res = match name.as_str() {
+                "rootfind-subtract" => {
+                    let mut o = RootfindSubtractOracle::new(m, &inst);
+                    o.prepare(&dummy_ctx, &fb, &params, &mut prep_ops)
+                }
+                "rootfind-floor" => {
+                    let mut o = RootfindFloorOracle::new(m, &inst);
+                    o.prepare(&dummy_ctx, &fb, &params, &mut prep_ops)
+                }
+                "rootfind-kmitm" => {
+                    let mut o = RootfindKMitmOracle::new_prime(m, &inst);
+                    o.prepare(&dummy_ctx, &fb, &params, &mut prep_ops)
+                }
+                _ => Ok(()),
+            };
+            if let Err(e) = prep_res {
+                println!("  {arm_name:<14} SKIP prepare: {e}");
+                amort.push(json!({"arm": arm_name, "skipped": true, "skip_reason": e}));
+                continue;
+            }
+            let prep_s = t_prep.elapsed().as_secs_f64();
+            // Re-prepare inside each solve via run_pipeline (honest cold amort
+            // would share tables; here we time N full pipelines and report
+            // total/N plus a separate shared-prepare threaded collect).
+            let mut walls = Vec::new();
+            let mut ok = 0usize;
+            let mut skipped: Option<String> = None;
+            let t_all = Instant::now();
+            for i in 0..multi_n {
+                let seed = seed0.wrapping_add(10_000 + i as u64 * 0x9E37);
+                let planted = 1 + (seed % (inst.r - 1));
+                match run_standard(
+                    arm_name,
+                    oracle_spec,
+                    Targets::Walk,
+                    &inst,
+                    size,
+                    seed,
+                    planted,
+                ) {
+                    Ok(row) => {
+                        if row.verified {
+                            ok += 1;
+                        }
+                        walls.push(row.wall_s);
+                    }
+                    Err(e) => {
+                        skipped = Some(e);
+                        break;
+                    }
+                }
+            }
+            if let Some(e) = skipped {
                 println!("  {arm_name:<14} SKIP: {e}");
                 amort.push(json!({"arm": arm_name, "skipped": true, "skip_reason": e}));
                 continue;
             }
-        };
-        let m = match params.u64_or("m", 2) {
-            Ok(v) => v as u32,
-            Err(e) => {
-                println!("  {arm_name:<14} SKIP: {e}");
-                amort.push(json!({"arm": arm_name, "skipped": true, "skip_reason": e}));
-                continue;
-            }
-        };
+            let total = t_all.elapsed().as_secs_f64();
+            let per = total / multi_n as f64;
+            println!(
+            "  {arm_name:<14} {multi_n} DLPs total={total:.4}s per={per:.4}s prep_once≈{prep_s:.4}s verified={ok}/{multi_n}"
+        );
+            amort.push(json!({
+                "arm": arm_name,
+                "mode": "multi_cold_pipeline",
+                "n": multi_n,
+                "total_wall_s": total,
+                "per_dlp_wall_s": per,
+                "prep_once_s": prep_s,
+                "verified": ok,
+            }));
+        }
+
+        // Shared-prepare threaded collect: one m=12 prepare, then multi_n solves
+        // with thr=1/2/4 (relation phase only amortized).
+        println!("\n## Shared-prepare m=12 threaded collect ({multi_n} DLPs)");
         let fb = prime_factor_base(&inst, size);
-        let mut prep_ops = GroupOps::default();
-        let dummy_ctx = {
-            let g = inst.generator_point();
-            InstanceCtx {
-                group: &inst.curve,
-                generator: g,
-                target: g,
-                r: inst.r,
-                cofactor: inst.cofactor,
-                group_order: inst.group_order,
-                name: inst.name.clone(),
-                field_degree: None,
-            }
+        let (_, params) = Params::parse_spec("rootfind-kmitm:m=12")?;
+        let mut shared = RootfindKMitmOracle::new_prime(12, &inst);
+        let g = inst.generator_point();
+        let prep_ctx = InstanceCtx {
+            group: &inst.curve,
+            generator: g,
+            target: g,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
         };
         let t_prep = Instant::now();
-        let prep_res = match name.as_str() {
-            "rootfind-subtract" => {
-                let mut o = RootfindSubtractOracle::new(m, &inst);
-                o.prepare(&dummy_ctx, &fb, &params, &mut prep_ops)
-            }
-            "rootfind-floor" => {
-                let mut o = RootfindFloorOracle::new(m, &inst);
-                o.prepare(&dummy_ctx, &fb, &params, &mut prep_ops)
-            }
-            "rootfind-kmitm" => {
-                let mut o = RootfindKMitmOracle::new_prime(m, &inst);
-                o.prepare(&dummy_ctx, &fb, &params, &mut prep_ops)
-            }
-            _ => Ok(()),
-        };
-        if let Err(e) = prep_res {
-            println!("  {arm_name:<14} SKIP prepare: {e}");
-            amort.push(json!({"arm": arm_name, "skipped": true, "skip_reason": e}));
-            continue;
-        }
-        let prep_s = t_prep.elapsed().as_secs_f64();
-        // Re-prepare inside each solve via run_pipeline (honest cold amort
-        // would share tables; here we time N full pipelines and report
-        // total/N plus a separate shared-prepare threaded collect).
-        let mut walls = Vec::new();
-        let mut ok = 0usize;
-        let mut skipped: Option<String> = None;
-        let t_all = Instant::now();
-        for i in 0..multi_n {
-            let seed = seed0.wrapping_add(10_000 + i as u64 * 0x9E37);
-            let planted = 1 + (seed % (inst.r - 1));
-            match run_standard(arm_name, oracle_spec, Targets::Walk, &inst, size, seed, planted) {
-                Ok(row) => {
+        if let Err(e) = shared.prepare(&prep_ctx, &fb, &params, &mut GroupOps::default()) {
+            println!("  shared m=12 SKIP prepare: {e}");
+            thr_amort.push(json!({"skipped": true, "skip_reason": e}));
+        } else {
+            let shared_prep_s = t_prep.elapsed().as_secs_f64();
+            for threads in [1usize, 2, 4] {
+                let t_all = Instant::now();
+                let mut ok = 0usize;
+                let mut decomp_s = 0.0f64;
+                let mut wall_s = 0.0f64;
+                for i in 0..multi_n {
+                    let seed = seed0.wrapping_add(20_000 + i as u64 * 0x9E37);
+                    let planted = 1 + (seed % (inst.r - 1));
+                    let row = collect_kmitm_threaded(
+                        &format!("shared-thr={threads}"),
+                        &shared,
+                        &fb,
+                        &inst,
+                        threads,
+                        seed,
+                        planted,
+                    )?;
                     if row.verified {
                         ok += 1;
                     }
-                    walls.push(row.wall_s);
+                    decomp_s += row.decomp_wall_s;
+                    wall_s += row.wall_s;
                 }
-                Err(e) => {
-                    skipped = Some(e);
-                    break;
-                }
-            }
-        }
-        if let Some(e) = skipped {
-            println!("  {arm_name:<14} SKIP: {e}");
-            amort.push(json!({"arm": arm_name, "skipped": true, "skip_reason": e}));
-            continue;
-        }
-        let total = t_all.elapsed().as_secs_f64();
-        let per = total / multi_n as f64;
-        println!(
-            "  {arm_name:<14} {multi_n} DLPs total={total:.4}s per={per:.4}s prep_once≈{prep_s:.4}s verified={ok}/{multi_n}"
-        );
-        amort.push(json!({
-            "arm": arm_name,
-            "mode": "multi_cold_pipeline",
-            "n": multi_n,
-            "total_wall_s": total,
-            "per_dlp_wall_s": per,
-            "prep_once_s": prep_s,
-            "verified": ok,
-        }));
-    }
-
-    // Shared-prepare threaded collect: one m=12 prepare, then multi_n solves
-    // with thr=1/2/4 (relation phase only amortized).
-    println!("\n## Shared-prepare m=12 threaded collect ({multi_n} DLPs)");
-    let fb = prime_factor_base(&inst, size);
-    let (_, params) = Params::parse_spec("rootfind-kmitm:m=12")?;
-    let mut shared = RootfindKMitmOracle::new_prime(12, &inst);
-    let g = inst.generator_point();
-    let prep_ctx = InstanceCtx {
-        group: &inst.curve,
-        generator: g,
-        target: g,
-        r: inst.r,
-        cofactor: inst.cofactor,
-        group_order: inst.group_order,
-        name: inst.name.clone(),
-        field_degree: None,
-    };
-    let t_prep = Instant::now();
-    if let Err(e) = shared.prepare(&prep_ctx, &fb, &params, &mut GroupOps::default()) {
-        println!("  shared m=12 SKIP prepare: {e}");
-        thr_amort.push(json!({"skipped": true, "skip_reason": e}));
-    } else {
-    let shared_prep_s = t_prep.elapsed().as_secs_f64();
-    for threads in [1usize, 2, 4] {
-        let t_all = Instant::now();
-        let mut ok = 0usize;
-        let mut decomp_s = 0.0f64;
-        let mut wall_s = 0.0f64;
-        for i in 0..multi_n {
-            let seed = seed0.wrapping_add(20_000 + i as u64 * 0x9E37);
-            let planted = 1 + (seed % (inst.r - 1));
-            let row = collect_kmitm_threaded(
-                &format!("shared-thr={threads}"),
-                &shared,
-                &fb,
-                &inst,
-                threads,
-                seed,
-                planted,
-            )?;
-            if row.verified {
-                ok += 1;
-            }
-            decomp_s += row.decomp_wall_s;
-            wall_s += row.wall_s;
-        }
-        let total = t_all.elapsed().as_secs_f64();
-        let per_decomp = decomp_s / multi_n as f64;
-        let thr1_ref = thr_amort.first().and_then(|r: &serde_json::Value| {
-            r.get("per_decomp_s").and_then(|v| v.as_f64())
-        });
-        let vs1 = thr1_ref.map(|t1| if per_decomp > 0.0 { t1 / per_decomp } else { 0.0 });
-        println!(
+                let total = t_all.elapsed().as_secs_f64();
+                let per_decomp = decomp_s / multi_n as f64;
+                let thr1_ref = thr_amort.first().and_then(|r: &serde_json::Value| {
+                    r.get("per_decomp_s").and_then(|v| v.as_f64())
+                });
+                let vs1 = thr1_ref.map(|t1| {
+                    if per_decomp > 0.0 {
+                        t1 / per_decomp
+                    } else {
+                        0.0
+                    }
+                });
+                println!(
             "  thr={threads}  {multi_n} DLPs total={total:.4}s collect_sum={wall_s:.4}s per_decomp={per_decomp:.4}s verified={ok}/{multi_n}{}",
             vs1.map(|x| format!("  vs_thr1={x:.2}x")).unwrap_or_default()
         );
-        thr_amort.push(json!({
-            "threads": threads,
-            "n": multi_n,
-            "total_wall_s": total,
-            "collect_sum_s": wall_s,
-            "decomp_sum_s": decomp_s,
-            "per_decomp_s": per_decomp,
-            "shared_prep_s": shared_prep_s,
-            "decomp_speedup_vs_thr1": vs1,
-            "verified": ok,
-        }));
-    }
-    } // end shared m=12 prepare ok
+                thr_amort.push(json!({
+                    "threads": threads,
+                    "n": multi_n,
+                    "total_wall_s": total,
+                    "collect_sum_s": wall_s,
+                    "decomp_sum_s": decomp_s,
+                    "per_decomp_s": per_decomp,
+                    "shared_prep_s": shared_prep_s,
+                    "decomp_speedup_vs_thr1": vs1,
+                    "verified": ok,
+                }));
+            }
+        } // end shared m=12 prepare ok
     } // end panel != breakthrough for amort + shared-prepare
 
     // Breakthrough panel: AVX-512 IFMA native sweep + walk-prime batch
@@ -996,7 +1009,11 @@ fn main() -> Result<(), String> {
                 "walk-prime-batch-8",
             ),
             ("floor:m=3/walk", "rootfind-floor:m=3", "walk"),
-            ("floor:m=3/batch8", "rootfind-floor:m=3", "walk-prime-batch-8"),
+            (
+                "floor:m=3/batch8",
+                "rootfind-floor:m=3",
+                "walk-prime-batch-8",
+            ),
         ]
     } else {
         &[
@@ -1007,7 +1024,11 @@ fn main() -> Result<(), String> {
                 "walk-prime-batch-8",
             ),
             ("floor:m=3/walk", "rootfind-floor:m=3", "walk"),
-            ("floor:m=3/batch8", "rootfind-floor:m=3", "walk-prime-batch-8"),
+            (
+                "floor:m=3/batch8",
+                "rootfind-floor:m=3",
+                "walk-prime-batch-8",
+            ),
             ("kmitm:m=4/walk", "rootfind-kmitm:m=4", "walk"),
             ("kmitm:m=5/walk", "rootfind-kmitm:m=5", "walk"),
             (
@@ -1112,12 +1133,20 @@ fn main() -> Result<(), String> {
     let base_wall = summary
         .iter()
         .find(|r| r["arm"] == "subtract:m=3")
-        .or_else(|| breakthrough.iter().find(|r| r["arm"] == "subtract:m=3/walk"))
+        .or_else(|| {
+            breakthrough
+                .iter()
+                .find(|r| r["arm"] == "subtract:m=3/walk")
+        })
         .and_then(|r| r["median_wall_s"].as_f64());
     let base_decomp = summary
         .iter()
         .find(|r| r["arm"] == "subtract:m=3")
-        .or_else(|| breakthrough.iter().find(|r| r["arm"] == "subtract:m=3/walk"))
+        .or_else(|| {
+            breakthrough
+                .iter()
+                .find(|r| r["arm"] == "subtract:m=3/walk")
+        })
         .and_then(|r| r["median_decomp_wall_s"].as_f64());
     let thr1 = summary
         .iter()
@@ -1128,8 +1157,12 @@ fn main() -> Result<(), String> {
     let mut gains = Vec::new();
     if let (Some(bw), Some(bd)) = (base_wall, base_decomp) {
         for row in summary.iter().chain(breakthrough.iter()) {
-            let Some(arm) = row["arm"].as_str() else { continue };
-            let Some(mw) = row["median_wall_s"].as_f64() else { continue };
+            let Some(arm) = row["arm"].as_str() else {
+                continue;
+            };
+            let Some(mw) = row["median_wall_s"].as_f64() else {
+                continue;
+            };
             let md = row["median_decomp_wall_s"].as_f64().unwrap_or(0.0);
             let wall_x = if mw > 0.0 { bw / mw } else { 0.0 };
             let decomp_x = if md > 0.0 { bd / md } else { 0.0 };
