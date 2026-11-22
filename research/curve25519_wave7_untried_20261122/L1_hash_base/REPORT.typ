@@ -11,9 +11,14 @@ yield plus a cost statement. It is not a leaderboard row, and it does
 not change the order against the generic baseline or rho.
 \[pcc:unverified\]
 
+#strong[Every number and table in this file is \[pcc:unverified\].]
+
 Protocol: #link("PROTOCOL.md"), frozen before any data
 (`FREEZE.sha256`). Brief: #link("../BRIEF.md"). PDF:
-#link("REPORT.pdf"). Run commit: `e783d12a5b`.
+#link("REPORT.pdf"). Protocol and code frozen at `91f2f2bcde`
+(`FREEZE.sha256`); the run was launched from it at 2026-11-22T03:10:04Z
+(run.log line 1); outputs and the frozen analysis were committed at
+`e783d12a5b`; write-up `190daab375`.
 
 == Question
 <question>
@@ -26,6 +31,17 @@ P\_j with P\_i, P\_j in the base? \[pcc:unverified\]
 
 == Answer
 <answer>
+#strong[Disclosure (erratum E2): \"frozen before any data\" is not
+literally true for the two k \= 16 cells.] The seed rule takes neither B
+nor a smoke role, so the pre-freeze smoke draws (committed 03:09:10Z,
+before the freeze at 03:10:00Z) are byte-identical to bases 0 to 299 (B
+\= 300 runs) and 0 to 39 (B \= 40 run) of the 512 bases in both k \= 16
+data cells, and were seen before the freeze. The validator\'s held-out
+result with bases 0 to 299 of both k \= 16 cells dropped: all P1 to P8
+still hold, hash/rand pooled 1.0026 \[0.9982, 1.0071\], and P1 is then
+exactly at its threshold (8 of 10 cell CIs contain 1).
+\[pcc:unverified\]
+
 + #strong[No departure was found.] The pooled hash/random
   verified-hit-rate ratio is 1.0013 with 95 % CI \[0.9978, 1.0048\] over
   10 cells (5 curves, k \= 16 to 24, two sizes each). The CI lies inside
@@ -196,7 +212,7 @@ P\_j with P\_i, P\_j in the base? \[pcc:unverified\]
   columns: 6,
   align: (col, row) => (right,right,center,center,center,center,).at(col),
   inset: 6pt,
-  [k], [N], [rand\_proj/rand], [T0/blind (MC)], [plant3/rand],
+  [k], [N], [rand\_proj/rand (MC)], [T0/blind (MC)], [plant3/rand],
   [plant5/rand],
   [16],
   [18],
@@ -279,8 +295,8 @@ P\_j with P\_i, P\_j in the base? \[pcc:unverified\]
   inside 1 to 99. \[pcc:unverified\]
 - #strong[P3 HELD.] No unprojected base exceeds 2N^2/(r-1). Projected
   arms are at 0.856 to 0.966 of it (needed 0.78 to 1.0). rand\_proj/rand
-  is 6.87 to 7.70 in every cell (needed 6.0 to 8.4).
-  hash\_proj/rand\_proj pooled 1.0006 \[0.9980, 1.0031\].
+  exact 6.87 to 7.70 (MC 6.91 to 7.71) in every cell (needed 6.0 to
+  8.4). hash\_proj/rand\_proj pooled 1.0006 \[0.9980, 1.0031\].
   \[pcc:unverified\]
 - #strong[P4 HELD.] T0/blind exact ratio 1.956 to 2.004 in all 10 cells
   (needed 1.80 to 2.20); the MC CI excludes 1 in 10 of 10.
@@ -295,8 +311,9 @@ P\_j with P\_i, P\_j in the base? \[pcc:unverified\]
 - #strong[P7 HELD.] 0 verification failures, every counted hit verified,
   0 instrument-check failures, worst MC-vs-exact z \= -2.54 (k \= 24, N
   \= 290, plant3). \[pcc:unverified\]
-- #strong[P8 HELD.] The hash arm\'s priced total is at least the random
-  arm\'s in every cell at w \= 0, 0.1 and 1. \[pcc:unverified\]
+- #strong[P8 HELD (derived, holds by construction: N^2 + w p \>\= N^2;
+  not a measurement).] The hash arm\'s priced total is at least the
+  random arm\'s in every cell at w \= 0, 0.1 and 1. \[pcc:unverified\]
 
 == Membership cost, priced separately (GAE band 0 / 0.1 / 1)
 <membership-cost-priced-separately-gae-band-0--01--1>
@@ -304,17 +321,20 @@ A hash evaluation is not a group operation. The table costs N^2 group
 additions; a probe is a lookup (no hash evaluation in table mode; a mode
 that membership-tests every probe candidate would cost N hash
 evaluations per target). The ratio below is (N^2 + w p) / N^2 for the
-hash base against the random base at equal yield, with shared unpriced
-native work (Legendre or square root per column) excluded.
-\[pcc:unverified\]
+hash base against the random base at equal yield, with shared native
+work excluded in the first three ratio columns, so those are upper
+bounds (erratum E5). The last two columns price the per-base native
+count of 2N Legendre or square-root tests on both arms at w each, ratio
+(N^2 + 2Nw + wp)/(N^2 + 2Nw); the T0 extra inversions belong to the T0
+arm only and are not priced. \[pcc:unverified\]
 
 #align(center)[#table(
-  columns: 8,
-  align: (col, row) => (right,right,right,right,right,right,right,right,).at(col),
+  columns: 10,
+  align: (col, row) => (right,right,right,right,right,right,right,right,right,right,).at(col),
   inset: 6pt,
   [k], [N], [table group ops (N^2)], [hash evals to build base (p)],
   [hash evals per column], [hash/rand priced total, w \= 0], [w \= 0.1],
-  [w \= 1],
+  [w \= 1], [w \= 0.1, 2N native priced], [w \= 1, 2N native priced],
   [16],
   [18],
   [324],
@@ -323,6 +343,8 @@ native work (Legendre or square root per column) excluded.
   [1.00],
   [21.20],
   [202.97],
+  [20.97],
+  [182.77],
   [16],
   [36],
   [1296],
@@ -331,6 +353,8 @@ native work (Legendre or square root per column) excluded.
   [1.00],
   [6.05],
   [51.49],
+  [6.02],
+  [48.83],
   [18],
   [36],
   [1296],
@@ -339,6 +363,8 @@ native work (Legendre or square root per column) excluded.
   [1.00],
   [21.23],
   [203.26],
+  [21.11],
+  [192.62],
   [18],
   [73],
   [5329],
@@ -347,6 +373,8 @@ native work (Legendre or square root per column) excluded.
   [1.00],
   [5.92],
   [50.19],
+  [5.91],
+  [48.88],
   [20],
   [72],
   [5184],
@@ -355,6 +383,8 @@ native work (Legendre or square root per column) excluded.
   [1.00],
   [21.23],
   [203.27],
+  [21.17],
+  [197.80],
   [20],
   [145],
   [21025],
@@ -363,6 +393,8 @@ native work (Legendre or square root per column) excluded.
   [1.00],
   [5.99],
   [50.87],
+  [5.98],
+  [50.19],
   [22],
   [145],
   [21025],
@@ -371,6 +403,8 @@ native work (Legendre or square root per column) excluded.
   [1.00],
   [20.95],
   [200.49],
+  [20.92],
+  [197.78],
   [22],
   [290],
   [84100],
@@ -379,6 +413,8 @@ native work (Legendre or square root per column) excluded.
   [1.00],
   [5.99],
   [50.87],
+  [5.98],
+  [50.53],
   [24],
   [290],
   [84100],
@@ -387,6 +423,8 @@ native work (Legendre or square root per column) excluded.
   [1.00],
   [20.95],
   [200.49],
+  [20.94],
+  [199.12],
   [24],
   [579],
   [335241],
@@ -395,6 +433,8 @@ native work (Legendre or square root per column) excluded.
   [1.00],
   [6.00],
   [51.05],
+  [6.00],
+  [50.87],
 )
 ]
 
@@ -415,10 +455,11 @@ a factor of at most two. \[pcc:unverified\]
   cancel, and the projected base reaches it up to collisions. A hash of
   u is independent of the group law, so it cannot bias the cosets.
   \[pcc:unverified\]
-- The earlier coordinate-oracle toy (lead\_sweep\_20261110) found
-  coordinate/random 0.998 at 2^20 but with per-size ratios 0.97 to 1.75
-  from 9 to 101 relations. This run has about 100,000 verified hits per
-  arm and cell and bootstrap over 512 bases. \[pcc:unverified\]
+- The earlier coordinate-oracle toy (lead\_sweep\_20261110) found a
+  random-base/coordinate-base addition-count ratio of 0.998 at 2^20 (per
+  size 0.97 to 1.75, 9 to 101 relations); that is a cost ratio, not a
+  yield ratio. This run has about 100,000 verified hits per arm and cell
+  and bootstrap over 512 bases. \[pcc:unverified\]
 
 == Measured versus derived
 <measured-versus-derived>
@@ -450,18 +491,28 @@ a factor of at most two. \[pcc:unverified\]
   smooth-family member p \= 16777213, A \= 318 used in the frame-search
   study. k \= 16 to 22 follow the family rule with the erratum values A
   \= 78 and A \= 43186. \[pcc:unverified\]
-- Hash replicates are disjoint rank windows of one key (random-oracle
-  assumption), tested by the A/A arm and P2b. Bases exclude points of
-  E\[8\]. The hash is taken on the Montgomery u. \[pcc:unverified\]
+- Hash and hash2 replicates are disjoint rank windows of one key
+  (random-oracle assumption), tested by the A/A arm and P2b; hash\_proj
+  windows overlap the next window when a projected image collides (24 of
+  512 bases at k \= 16 N \= 18, 69 of 512 at N \= 36, 0 to 6 of the
+  validator\'s 16 or 32 checked bases elsewhere), a negligible effect on
+  hash\_proj/rand\_proj. Bases exclude points of E\[8\]. The hash is
+  taken on the Montgomery u. \[pcc:unverified\]
 - PROTOCOL.md section 9 quotes \"3,600 to 29,000\" hash evaluations per
   column; the computed range over the cells is 1,818 to 57,852 (table
-  above). The frozen text was not edited. \[pcc:unverified\]
+  above). The same paragraph\'s design ratios \"w \= 0.1: 6.0 to 21.2; w
+  \= 1: 50 to 203\" differ from the computed 5.92 to 21.23 and 50.19 to
+  203.27. The frozen text was not edited. \[pcc:unverified\]
 - No validation-gate evidence (replay certificate, validator report,
   matched rho band) exists, so no leaderboard or `benchmarks/` row
   follows. \[pcc:unverified\]
 - Binary `out/*.npz` files are mirrored losslessly as `out_json/*.json`
   (`export_json.py`, which also checks the reload); `out/SHA256SUMS` and
-  `out_json/SHA256SUMS` list the hashes. \[pcc:unverified\]
+  `out_json/SHA256SUMS` list the hashes. Nine of the ten npz are tracked
+  in Git (committed during the run, 27 to 30 KB each, below the 64 KiB
+  threshold); `out/cell_k24_N579.npz` exists only on the run host and is
+  bound by its sha256 in `out/SHA256SUMS` and by its JSON mirror.
+  \[pcc:unverified\]
 - Sources checked (repository files read): BRIEF.md;
   curve25519\_frame\_search\_20261103 README.md, PROTOCOL.md,
   scripts/frame\_census.py, scripts/run\_confirm\_rulefix.sh;
@@ -483,3 +534,42 @@ python3 figure.py                                 # l1_ratios.svg / .png
 
 == Errata
 <errata>
+Validator errata E1 to E9 (`validator-report.json`, verdict
+pass\_with\_errata; no erratum changes a count, a ratio or a verdict).
+\[pcc:unverified\]
+
+- #strong[E1.] The header labelled the run `e783d12a5b`. Protocol and
+  code were frozen at `91f2f2bcde`, the run launched from it at
+  2026-11-22T03:10:04Z, outputs and analysis committed at `e783d12a5b`,
+  write-up `190daab375`. Fixed in the header. \[pcc:unverified\]
+- #strong[E2.] The smoke runs used the same seed rule, so smoke draws
+  are byte-identical to bases 0 to 299 (and 0 to 39) of the 512 in both
+  k \= 16 data cells and were seen before the freeze. Held-out result
+  with bases 0 to 299 of both k \= 16 cells dropped: all P1 to P8 hold,
+  hash/rand pooled 1.0026 \[0.9982, 1.0071\], P1 exactly at its
+  threshold (8 of 10 cell CIs contain 1). Disclosed in the Answer
+  section. \[pcc:unverified\]
+- #strong[E3.] The lead\_sweep citation was inverted and mislabelled; it
+  is now a random-base/coordinate-base addition-count ratio of 0.998
+  (per size 0.97 to 1.75). The frozen PROTOCOL section 2 carries the old
+  wording and was not edited. \[pcc:unverified\]
+- #strong[E4.] The P3 range was the exact ratio and the per-cell table
+  the MC ratio under one name; both are now labelled (exact 6.87 to
+  7.70, MC 6.91 to 7.71). \[pcc:unverified\]
+- #strong[E5.] Shared native work (2N Legendre or square-root tests per
+  base on both arms) was excluded from the cost band. The table now also
+  prices it, giving the repriced w \= 1 ratios 182.77 (k \= 16 N \= 18),
+  48.83 (k \= 16 N \= 36), 192.62 (k \= 18 N \= 36); the unrepriced
+  ratios are upper bounds. P8 is labelled derived, holding by
+  construction. Order and the no-strict-ranking statement are unchanged.
+  \[pcc:unverified\]
+- #strong[E6.] Nine of ten npz are tracked in Git; `cell_k24_N579.npz`
+  exists only on the run host, bound by sha256 and its JSON mirror.
+  \[pcc:unverified\]
+- #strong[E7.] hash\_proj windows overlap the next window when a
+  projected image collides; hash and hash2 windows are disjoint.
+  \[pcc:unverified\]
+- #strong[E8.] The PROTOCOL section 9 disclosure now also covers the
+  design-ratio range. \[pcc:unverified\]
+- #strong[E9.] A file-level line states that every number and table is
+  \[pcc:unverified\]. \[pcc:unverified\]
