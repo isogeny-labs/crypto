@@ -111,3 +111,15 @@ G5 failed. Cause: at these primes the plain merged core already holds only 17 to
 columns, so the floor removes 1 to 2.5 % of the rows, and the LA share is lower (0.52, 0.60, 0.23)
 than at genus 3, p = 262147 (0.67). The lever scales with the core's size; it is a genus-3, large-p
 effect on present evidence.
+
+### R6: replay of R4, and a correction [pcc:unverified]
+
+The validator replayed R4 in full (204 rows, 0 mismatches; ratios recomputed independently and
+bit-equal). Its finding F1 corrects the round-3 reading above: the light-row floor wins only when a
+mod-r multiplication in the linear algebra costs more than 2.5 to 4.1 field multiplications (κ). R4
+scored κ = 9. At κ = 1 the selection costs 1.09 to 1.11 of plain, and in GAE at w = 1 it costs 1.03
+to 1.05. The lab's measured κ is about 2 (PR #4852). **At the measured price, R4 is not an
+improvement**; it is conditional on κ, which nobody has measured at genus 3. The decisive next
+measurement is κ itself: cycles of a mod-r multiply-add in Wiedemann against a field multiplication
+in Cantor, on the same host (`perf-ipc` or `optlevel` skill; this container has no PMU, so wall time
+over repeated kernels). Errata in `genus_ladder_light_floor_20261122/ERRATA.md`.
