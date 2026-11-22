@@ -1,0 +1,28 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | gen-c3 | 144/144 | 0.810 | 1.028 | 2.986 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | gen-c4 | 144/144 | 0.754 | 0.976 | 2.975 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | k1-l9 | 144/144 | 43.814 | 52.818 | 133.858 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | rho-strong | 144/144 | 0.903 | 0.971 | 1.586 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | rho-v5 | 144/144 | 0.236 | 0.299 | 0.865 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | rho-v5-aa | 144/144 | 0.236 | 0.299 | 0.865 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c3 vs gen-c4 | gen-c4 < gen-c3 |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c3 vs k1-l9 | gen-c3 < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c3 vs rho-strong | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c3 vs rho-v5 | rho-v5 < gen-c3 |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c3 vs rho-v5-aa | rho-v5-aa < gen-c3 |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4 vs k1-l9 | gen-c4 < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4 vs rho-strong | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4 vs rho-v5 | rho-v5 < gen-c4 |
+| icv1-f2m23-tm5197-1f85e9e1 | gen-c4 vs rho-v5-aa | rho-v5-aa < gen-c4 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs rho-strong | rho-strong < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs rho-v5 | rho-v5 < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | k1-l9 vs rho-v5-aa | rho-v5-aa < k1-l9 |
+| icv1-f2m23-tm5197-1f85e9e1 | rho-strong vs rho-v5 | rho-v5 < rho-strong |
+| icv1-f2m23-tm5197-1f85e9e1 | rho-strong vs rho-v5-aa | rho-v5-aa < rho-strong |
+| icv1-f2m23-tm5197-1f85e9e1 | rho-v5 vs rho-v5-aa | unresolved inside the band |

@@ -1,0 +1,103 @@
+name: Prime31 B8 windowed rank and 1024-log generic oracle control
+
+on:
+  push:
+    branches:
+      - automation/prime31-rr9-weighted-resultant-20261118
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_w8_windowed_rank.rs
+      - research/prime31_ic_20261115/native/verify_prime31_w8_windowed_rank.py
+      - .github/workflows/prime31-w8-windowed-rank.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_w8_windowed_rank.rs
+      - research/prime31_ic_20261115/native/verify_prime31_w8_windowed_rank.py
+      - .github/workflows/prime31-w8-windowed-rank.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  original-rust-prime31-windowed-b8:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout experiment source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout immutable original Prime31 Rust crate
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay ONLY new oracle example on original source
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_w8_windowed_rank.rs \
+             pinned/research/prime31_ic_20261115/native/examples/prime31_w8_windowed_rank.rs
+          test -f pinned/research/prime31_ic_20261115/native/Cargo.toml
+      - name: Original library regression tests
+        run: |
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Exact signed B8 windowed rank and small online control
+        run: |
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_windowed_rank
+      - name: Execute full 31-rank 1024-target generic-oracle control
+        run: |
+          cargo +1.100.0 run --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_windowed_rank > prime31-w8-windowed-rank.json
+          test -s prime31-w8-windowed-rank.json
+      - name: Independent BigInt replay of all accepted training and 1024 recovered targets
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_w8_windowed_rank.py \
+            prime31-w8-windowed-rank.json
+      - name: Execute matched powers-of-two W8 31-rank 1024-log control
+        run: |
+          cargo +1.100.0 run --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_windowed_rank -- --powers2 > prime31-w8-windowed-pow2.json
+          test -s prime31-w8-windowed-pow2.json
+      - name: Independently replay full powers-of-two controls
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_w8_windowed_rank.py \
+            prime31-w8-windowed-pow2.json
+      - name: Compare paired result counters without masking failure
+        run: |
+          python3 - <<'PY'
+          import json
+          odd=json.load(open("prime31-w8-windowed-rank.json"))
+          pow2=json.load(open("prime31-w8-windowed-pow2.json"))
+          assert odd["weights"] == [1,3,5,7,11,13,17,19]
+          assert pow2["weights"] == [1,2,4,8,16,32,64,128]
+          assert odd["target_generation"] == pow2["target_generation"] == "indexed-offset-v2"
+          assert len(odd["recovered_targets"]) == len(pow2["recovered_targets"]) == 1024
+          for a,b in zip(odd["recovered_targets"],pow2["recovered_targets"]):
+              assert a["target_index"] == b["target_index"]
+              assert a["public_q"] == b["public_q"] and a["test_secret"] == b["test_secret"]
+          for arm in (odd,pow2):
+              assert arm["rank"] == 31 and arm["verified_target_count"] == 1024
+              assert arm["online_queries"] == 1024 + arm["failed_online_queries"]
+          for arm in (odd,pow2):
+              print({"weights":arm["weights"],"online_queries":arm["online_queries"],
+                     "training_queries":sum(x["trials"] for x in arm["window_training"]),
+                     "total_ec_additions":arm["counts"]["total_ec_additions"],
+                     "time_ns":arm["times_ns"]})
+          PY
+      - name: Publish both exact-source 1024-target arms
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-w8-windowed-rank-1024-weight-alignment
+          path: |
+            prime31-w8-windowed-rank.json
+            prime31-w8-windowed-pow2.json
+          if-no-files-found: warn
+          retention-days: 30
