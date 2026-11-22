@@ -1,0 +1,166 @@
+R64 selectable bare strong-rho post-remediation validation receipt
+timestamp_utc=2026-11-19T05:32:56Z
+branch=codex/ghs-rho-parallel-20261118
+revision_at_run=67e251c8c60bf8e3a9d5bea5da3fc6c480a16bd8
+source_revision_env=67e251c8c60b
+worktree_state=dirty_shared_multi_agent_worktree
+architecture=x86_64
+rustc=rustc 1.100.0 (0ef1bc386 2026-11-09)
+claim_status=pcc:unverified
+
+requested_scope:
+  - Preserve the selectable R64 production counter-free/bare strong-rho mode.
+  - Convert the native optimized-IR receipt logic into a reusable fail-closed shell gate.
+  - Rerun native IR, existing field IR, and production selftest gates on the remediated sources.
+  - Check explicit mul6 controls recover the same q=223 scalar/trajectory and label karatsuba6.
+  - Do not use the correctness run's incidental timing fields for a measurement or speedup claim [pcc:unverified].
+
+post_remediation_source_bindings:
+  b1d223a1e8d812d55250edc42b8e5afe48cf2544aec0aec161ca6568085f0464  research/quartic_ghs_strong_rho_20261114/strong_rho.rs
+  957557d731a983e58887b9c51a89d5ef107f1162084b4689dc8c94a332dc19fd  research/quartic_ghs_strong_rho_20261114/main.rs
+  7f8905527379b5170a88fb446a9fdcdcacf920ed050debb4b2e84065543d907e  research/quartic_ghs_r0_r99_20261119/prototypes/verify_r64_native_ir.sh
+
+command_1_gate_syntax:
+  chmod 755 research/quartic_ghs_r0_r99_20261119/prototypes/verify_r64_native_ir.sh
+  bash -n research/quartic_ghs_r0_r99_20261119/prototypes/verify_r64_native_ir.sh
+  if command -v shellcheck >/dev/null 2>&1; then shellcheck research/quartic_ghs_r0_r99_20261119/prototypes/verify_r64_native_ir.sh; else echo 'shellcheck unavailable'; fi
+  stat -c '%a %n' research/quartic_ghs_r0_r99_20261119/prototypes/verify_r64_native_ir.sh
+exit_status=0
+output:
+  shellcheck unavailable
+  755 research/quartic_ghs_r0_r99_20261119/prototypes/verify_r64_native_ir.sh
+
+command_2_reusable_native_ir_gate:
+  research/quartic_ghs_r0_r99_20261119/prototypes/verify_r64_native_ir.sh
+exit_status=0
+output:
+  rustc 1.100.0 (0ef1bc386 2026-11-09)
+  revision=67e251c8c60b
+  strong_rho_sha256=b1d223a1e8d812d55250edc42b8e5afe48cf2544aec0aec161ca6568085f0464
+  main_sha256=957557d731a983e58887b9c51a89d5ef107f1162084b4689dc8c94a332dc19fd
+  llvm_ir_sha256=899885f10f97750e31baae9a167f4bd25da00b4fa0ecc4b3d14b657e22d2af8b
+  bare_specialized_defs=1
+  counted_specialized_defs=4
+  bare_native_counter_formals=0
+  counted_native_counter_formals=4
+  bare_wrapper_defs=1
+  bare_wrapper_lines=3385
+  bare_wrapper_counter_references=0
+  bare_bump_definitions=0
+  bare_path_references=67
+  PASS: optimized bare strong-rho path retains no NativeCounts mutation hook
+
+command_3_existing_field_ir_gate:
+  research/quartic_ghs_strong_rho_20261114/round-c-counterfree/verify_counterfree_ir.sh
+exit_status=0
+output:
+  rustc 1.100.0 (0ef1bc386 2026-11-09)
+  counted_arithmetic_defs=11
+  uncounted_arithmetic_defs=11
+  counted_arithmetic_counter_ssa_markers=271
+  uncounted_arithmetic_counter_ssa_markers=0
+  counted_walk_counter_ssa_markers=6
+  uncounted_walk_counter_ssa_markers=0
+  PASS: optimized COUNT=false removes FastF3 counter read/modify/write hooks
+
+command_4_post_remediation_build:
+  GHS_SOURCE_REVISION=67e251c8c60b rustc --edition 2021 -O research/quartic_ghs_strong_rho_20261114/main.rs -o /tmp/ghs-r64-post-remediation
+exit_status=0
+output=(none)
+binary_sha256=e63507877de58fe2ed5c7e320597576ff56df97a6f2ed51b84df8ea646feaeed
+
+command_5_production_selftest:
+  /tmp/ghs-r64-post-remediation selftest 2>&1
+exit_status=0
+output:
+  selftest: bare arm parser and authority split match schema
+  selftest: reciprocal reduction matches widened remainder
+  selftest: masked and fallback partitions match modulo
+  selftest: small-c: 200 inverses match; fq_mul direct=12..12, reference=16..16, delta=4 each
+  selftest: fast field matches frozen field
+  selftest: production mul5 matches Karatsuba/frozen field on 20000 pairs; per call 5 fq_mul + 4 fq_small_div
+  selftest: fallback-c=18: 200 inverses match; fq_mul direct=13..15, reference=17..19, delta=4 each
+  selftest: batch inverse matches pointwise inversion
+  selftest: complete batches and width-2 simultaneous multiplication match frozen curve; cold table=FieldCounts { fq_mul: 459, fq_inv: 3, fq_add: 1642, fq_small_div: 0, f3_mul: 58, f3_sq: 15, f3_inv: 3, batch_inv: 3, group_add: 13 }
+  selftest: setup state exact; field legacy=FieldCounts { fq_mul: 86017, fq_inv: 2374, fq_add: 273888, fq_small_div: 0, f3_mul: 6309, f3_sq: 3935, f3_inv: 2374, batch_inv: 0, group_add: 2454 } batch=FieldCounts { fq_mul: 56756, fq_inv: 520, fq_add: 204914, fq_small_div: 0, f3_mul: 6456, f3_sq: 2356, f3_inv: 520, batch_inv: 33, group_add: 1463 } walker_table=FieldCounts { fq_mul: 47881, fq_inv: 272, fq_add: 176800, fq_small_div: 0, f3_mul: 5807, f3_sq: 1955, f3_inv: 272, batch_inv: 272, group_add: 1207 }
+  selftest: counted, field-counter-free, and bare planted logs match at widths 1, 4, 8, 16, and 32
+  selftest: full trajectory exact; setup legacy=FieldCounts { fq_mul: 84767, fq_inv: 2340, fq_add: 269884, fq_small_div: 0, f3_mul: 6217, f3_sq: 3877, f3_inv: 2340, batch_inv: 0, group_add: 2421 } batch=FieldCounts { fq_mul: 56050, fq_inv: 487, fq_add: 203048, fq_small_div: 0, f3_mul: 6431, f3_sq: 2324, f3_inv: 487, batch_inv: 33, group_add: 1441 } walker_table=FieldCounts { fq_mul: 47912, fq_inv: 261, fq_add: 177210, fq_small_div: 0, f3_mul: 5835, f3_sq: 1954, f3_inv: 261, batch_inv: 250, group_add: 1207 } mul5=FieldCounts { fq_mul: 49619, fq_inv: 487, fq_add: 331406, fq_small_div: 25724, f3_mul: 6431, f3_sq: 2324, f3_inv: 487, batch_inv: 33, group_add: 1441 } combined=FieldCounts { fq_mul: 42077, fq_inv: 261, fq_add: 293706, fq_small_div: 23340, f3_mul: 5835, f3_sq: 1954, f3_inv: 261, batch_inv: 250, group_add: 1207 }
+  SELFTEST OK
+
+attempt_0_cli_harness:
+  execution_status=not_started
+  observed_error=command rejected before process creation because its temporary-file cleanup used rm -f
+  resolution=replaced temporary file with an in-memory shell variable; no solver or calibration process ran in the rejected attempt
+
+command_6_explicit_mul6_cli_correctness:
+  raw_output=$(GHS_CALIB_TRIPLES=1 GHS_ISOLATION=correctness-only /tmp/ghs-r64-post-remediation run 223 1 0 1 ic-repeat strong-b8-mul6,strong-b8-mul6-walker-table)
+  printf '%s\n' "$raw_output"
+exit_status=0
+raw_output:
+  {"rec":"instance","q":223,"seed":1,"ell":2773073,"order":11092292,"tries":91,"field_c":3,"ic_target":1765657,"target_policy":"ic-repeat","source_revision":"67e251c8c60b"}
+  {"rec":"calibration","q":223,"seed":1,"triples":1,"r_inv":38.223037329,"r_lmul":0.925790323,"mul_ns_median":7.470050000,"mul_ns_min":7.470050000,"isolation":"correctness-only"}
+  {"rec":"rho","arm":"strong-b8-mul6","batch":8,"setup_mode":"batched-window2-jumps","field_kernel":"karatsuba6","count_authoritative":true,"field_count_authoritative":true,"native_count_authoritative":true,"q":223,"seed":1,"i":0,"target_kind":"ic","ell":2773073,"k":1765657,"k_found":1765657,"ok":true,"steps":1487,"dps":76,"restarts":0,"lookahead":53,"cycles":2,"cycle_adds":10,"setup.reciprocal_div":1,"wall_s":0.001765852,"setup.fq_mul":56484,"setup.fq_inv":511,"setup.fq_add":204142,"setup.fq_small_div":0,"setup.f3_mul":6437,"setup.f3_sq":2346,"setup.f3_inv":511,"setup.batch_inv":33,"setup.group_add":1455,"walk.fq_mul":52861,"walk.fq_inv":241,"walk.fq_add":192668,"walk.fq_small_div":0,"walk.f3_mul":7034,"walk.f3_sq":1553,"walk.f3_inv":241,"walk.batch_inv":231,"walk.group_add":1551,"verify.fq_mul":1090,"verify.fq_inv":30,"verify.fq_add":3466,"verify.fq_small_div":0,"verify.f3_mul":80,"verify.f3_sq":50,"verify.f3_inv":30,"verify.batch_inv":0,"verify.group_add":31,"setup_native.rng":80,"setup_native.hash":0,"setup_native.canon":8,"setup_native.lookahead_test":0,"setup_native.dp":0,"setup_native.table":0,"setup_native.cycle_cmp":0,"setup_native.scalar_add":12,"setup_native.scalar_mul":0,"setup_native.scalar_inv":0,"setup_native.band_ops":8,"walk_native.rng":0,"walk_native.hash":1567,"walk_native.canon":1497,"walk_native.lookahead_test":1549,"walk_native.dp":1487,"walk_native.table":153,"walk_native.cycle_cmp":355,"walk_native.scalar_add":4496,"walk_native.scalar_mul":1,"walk_native.scalar_inv":1,"walk_native.band_ops":5041}
+  {"rec":"rho","arm":"strong-b8-mul6-walker-table","batch":8,"setup_mode":"batched-window2-jumps-walkers","field_kernel":"karatsuba6","count_authoritative":true,"field_count_authoritative":true,"native_count_authoritative":true,"q":223,"seed":1,"i":0,"target_kind":"ic","ell":2773073,"k":1765657,"k_found":1765657,"ok":true,"steps":1487,"dps":76,"restarts":0,"lookahead":53,"cycles":2,"cycle_adds":10,"setup.reciprocal_div":1,"wall_s":0.001202949,"setup.fq_mul":48433,"setup.fq_inv":288,"setup.fq_add":178576,"setup.fq_small_div":0,"setup.f3_mul":5847,"setup.f3_sq":1979,"setup.f3_inv":288,"setup.batch_inv":258,"setup.group_add":1224,"walk.fq_mul":52861,"walk.fq_inv":241,"walk.fq_add":192668,"walk.fq_small_div":0,"walk.f3_mul":7034,"walk.f3_sq":1553,"walk.f3_inv":241,"walk.batch_inv":231,"walk.group_add":1551,"verify.fq_mul":1090,"verify.fq_inv":30,"verify.fq_add":3466,"verify.fq_small_div":0,"verify.f3_mul":80,"verify.f3_sq":50,"verify.f3_inv":30,"verify.batch_inv":0,"verify.group_add":31,"setup_native.rng":80,"setup_native.hash":0,"setup_native.canon":8,"setup_native.lookahead_test":0,"setup_native.dp":0,"setup_native.table":0,"setup_native.cycle_cmp":0,"setup_native.scalar_add":12,"setup_native.scalar_mul":0,"setup_native.scalar_inv":0,"setup_native.band_ops":8,"walk_native.rng":0,"walk_native.hash":1567,"walk_native.canon":1497,"walk_native.lookahead_test":1549,"walk_native.dp":1487,"walk_native.table":153,"walk_native.cycle_cmp":355,"walk_native.scalar_add":4496,"walk_native.scalar_mul":1,"walk_native.scalar_inv":1,"walk_native.band_ops":5041}
+
+command_6_validator:
+  printf '%s\n' "$raw_output" | jq -s -e '<predicate below>' >/dev/null
+  predicate:
+    map(select(.rec == "rho")) as $r |
+    ($r | length) == 2 and
+    $r[0].arm == "strong-b8-mul6" and
+    $r[1].arm == "strong-b8-mul6-walker-table" and
+    $r[0].setup_mode == "batched-window2-jumps" and
+    $r[1].setup_mode == "batched-window2-jumps-walkers" and
+    all($r[]; .q == 223 and .seed == 1 and .i == 0 and .k == 1765657 and .k_found == 1765657 and .ok == true and .field_kernel == "karatsuba6" and .count_authoritative == true and .field_count_authoritative == true and .native_count_authoritative == true) and
+    ([$r[0].q, $r[0].seed, $r[0].i, $r[0].ell, $r[0].k, $r[0].k_found, $r[0].ok, $r[0].steps, $r[0].dps, $r[0].restarts, $r[0].lookahead, $r[0].cycles, $r[0].cycle_adds] == [$r[1].q, $r[1].seed, $r[1].i, $r[1].ell, $r[1].k, $r[1].k_found, $r[1].ok, $r[1].steps, $r[1].dps, $r[1].restarts, $r[1].lookahead, $r[1].cycles, $r[1].cycle_adds])
+exit_status=0
+output:
+  R64_MUL6_CLI_GATE PASS q=223 k=1765657 trajectory=(steps=1487,dps=76,restarts=0,lookahead=53,cycles=2,cycle_adds=10) field_kernel=karatsuba6
+  {"arm":"strong-b8-mul6","setup_mode":"batched-window2-jumps","field_kernel":"karatsuba6","q":223,"seed":1,"i":0,"ell":2773073,"k":1765657,"k_found":1765657,"ok":true,"steps":1487,"dps":76,"restarts":0,"lookahead":53,"cycles":2,"cycle_adds":10,"count_authoritative":true,"field_count_authoritative":true,"native_count_authoritative":true}
+  {"arm":"strong-b8-mul6-walker-table","setup_mode":"batched-window2-jumps-walkers","field_kernel":"karatsuba6","q":223,"seed":1,"i":0,"ell":2773073,"k":1765657,"k_found":1765657,"ok":true,"steps":1487,"dps":76,"restarts":0,"lookahead":53,"cycles":2,"cycle_adds":10,"count_authoritative":true,"field_count_authoritative":true,"native_count_authoritative":true}
+
+timing_disposition:
+  - The production CLI necessarily emitted one-triple calibration and wall_s fields.
+  - The validator did not read or compare calibration or wall_s.
+  - Those incidental values are retained only as raw command output and establish no timing, ratio, speedup, or frontier result [pcc:unverified].
+
+command_7_legacy_analyzer_request_tests:
+  cd research/quartic_ghs_strong_rho_20261114
+  python3 -m unittest -v test_analyze.py test_make_requests.py
+exit_status=0
+output_summary:
+  Ran 17 tests in 0.263s
+  OK
+
+command_8_claim_and_hygiene_checks:
+  python3 tools/pcc/pcc.py lint-prose research/quartic_ghs_r0_r99_20261119/ranges/R64_PRODUCTION.md research/quartic_ghs_r0_r99_20261119/receipts/r64_validation.txt
+  bash -n research/quartic_ghs_r0_r99_20261119/prototypes/verify_r64_native_ir.sh
+  git diff --check -- research/quartic_ghs_r0_r99_20261119/prototypes/verify_r64_native_ir.sh research/quartic_ghs_r0_r99_20261119/ranges/R64_PRODUCTION.md research/quartic_ghs_r0_r99_20261119/receipts/r64_validation.txt
+exit_status=0
+output:
+  lint-prose: 0 finding(s)
+
+requirement_status:
+  reusable_native_ir_gate=implemented_and_passed
+  gate_temp_handling=mktemp_private_directory_with_exit_trap
+  gate_fixed_mutable_output=none
+  selectable_bare_mode=implemented_and_deterministically_screened
+  existing_default_arms=parser_and_known_answer_controls_passed
+  known_answers=passed_for_widths_1_4_8_16_32
+  trajectory_retry_cycle_parity=passed_for_widths_1_4_8_16_32
+  combined_mul5_walker_table=passed_at_width_8_k119_seed_0xC01D
+  explicit_mul6_controls=passed_q223_correctness_projection
+  effective_kernel_labels=both_karatsuba6
+  field_counter_elision=optimized_ir_gate_passed
+  native_counter_elision=optimized_ir_gate_passed
+  split_authority_schema=implemented_parser_control_passed
+  wall_performance=not_measured
+  frontier_effect=not_established
+
+limits:
+  - This is producer-side deterministic and optimized-IR evidence [pcc:unverified].
+  - No profiler, repeated timing loop, A/A, A/B, paid experiment, or leaderboard update was run.
+  - The q=223 production CLI invocation is a one-shot correctness check; its incidental timing fields are excluded.
+  - The selftest panel is the frozen development instance, not a multi-curve or statistical rho-constant study.
+  - The legacy Python tests pass, but no native analyzer contract for split field/native authority was added in this pass.
+  - Counter elision does not by itself establish a speedup.
