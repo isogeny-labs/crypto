@@ -800,6 +800,467 @@ fn main() {
                 if res.one_in_v { break; }
             }
         }
+
+
+        "bnddetail" => {
+            let inst = Inst { p: parse(&args, 2), k: parse(&args, 3) as u32, a: parse(&args, 4), b: parse(&args, 5), t: parse(&args, 6) };
+            bnd_detail(&inst, parse(&args, 7) as u32, parse(&args, 8) as u32, &mut log);
+        }
+
+        "gen2" => {
+            // LFD of a custom two-variable generator: gen2 p k Dmax a:b:c ...  (exponents < 4); brute-force unit check
+            let p = parse(&args, 2); let k = parse(&args, 3) as u32; let dmax = parse(&args, 4) as u32;
+            let terms: Vec<(u64, u64, u64)> = args[5..].iter().map(|s| { let v: Vec<u64> = s.split(':').map(|x| x.parse().unwrap()).collect(); (v[0], v[1], v[2] % p) }).collect();
+            let f = Fp { p };
+            let n = 1u64 << k; let zeta = zeta_of_order(&f, k);
+            let mut pw = vec![1u64; n as usize]; for i in 1..n as usize { pw[i] = f.mul(pw[i-1], zeta); }
+            let mut zeros = 0u64;
+            for i in 0..n as usize { for j in 0..n as usize {
+                let mut acc = 0u64; for &(a, b, c) in &terms { acc = f.add(acc, f.mul(c, f.mul(f.pow(pw[i], a), f.pow(pw[j], b)))); }
+                if acc == 0 { zeros += 1; } } }
+            let inst = Inst { p, k, a: 0, b: 0, t: 0 };
+            let mut lfd = None;
+            for d in 2..=dmax {
+                let (res, _, _) = closure_gen(&inst, d, true, false, &mut log, k, Some(&terms));
+                if res.one_in_v { lfd = Some(d); break; }
+            }
+            println!("{{\"gen2\":true,\"p\":{},\"k\":{},\"grid_zeros\":{},\"terms\":{},\"lfd\":{:?}}}", p, k, zeros, terms.len(), lfd);
+        }
+
+        "cofactor" => {
+            // cofactor p k D a:b:c ... : closure of the given generator, then support statistics of g^{-1} U_D
+            let p = parse(&args, 2); let k = parse(&args, 3) as u32; let d = parse(&args, 4) as u32;
+            let terms: Vec<(u64, u64, u64)> = args[5..].iter().map(|s| { let v: Vec<u64> = s.split(':').map(|x| x.parse().unwrap()).collect(); (v[0], v[1], v[2] % p) }).collect();
+            let inst = Inst { p, k, a: 0, b: 0, t: 0 };
+            let (res, lay, basis) = closure_gen(&inst, d, false, false, &mut log, k, Some(&terms));
+            let mut rng = Rng(5);
+            let all: Vec<usize> = (0..basis.rows.len()).collect();
+            let low: Vec<usize> = (0..basis.rows.len()).filter(|&r| (lay.wt[basis.pivcol[r]] as u32) < d).collect();
+            let sa = cofactor_stats(&inst, &lay, &basis, &all, &terms, &mut rng);
+            let sl = cofactor_stats(&inst, &lay, &basis, &low, &terms, &mut rng);
+            println!("{{\"k\":{},\"D\":{},\"rank\":{},\"one_in_V\":{},\"all:max_pop1,max_pop2,max_total,touchesTop2\":[{},{},{},{}],\"low\":[{},{},{},{}]}}", k, d, res.rank, res.one_in_v, sa.0, sa.1, sa.2, sa.3, sl.0, sl.1, sl.2, sl.3);
+        }
+
+        "lwm" => {
+            // lwm p X w a:b:c ... : low-weight multiples of the generator in F[x1,x2] inside the box [0,X)^2
+            let p = parse(&args, 2); let xbox = parse(&args, 3) as usize; let w = parse(&args, 4) as u32;
+            let terms: Vec<(u64, u64, u64)> = args[5..].iter().map(|s| { let v: Vec<u64> = s.split(':').map(|x| x.parse().unwrap()).collect(); (v[0], v[1], v[2] % p) }).collect();
+            let (dim, m1, m2, mt, md, sup) = low_weight_multiples(p, xbox, w, &terms, 9);
+            let hi: Vec<String> = sup.iter().filter(|(a, b)| (*a as u64).count_ones() >= m1 || (*b as u64).count_ones() >= m2).take(8).map(|(a, b)| format!("({},{})", a, b)).collect();
+            println!("{{\"X\":{},\"w\":{},\"kernel_dim\":{},\"max_pop_x1\":{},\"max_pop_x2\":{},\"max_total\":{},\"max_deg\":{},\"extreme_monomials\":\"{}\"}}", xbox, w, dim, m1, m2, mt, md, hi.join(" "));
+        }
+
+        "lwm2" => {
+            let p = parse(&args, 2); let xbox = parse(&args, 3) as usize; let w = parse(&args, 4) as u32;
+            let terms: Vec<(u64, u64, u64)> = args[5..].iter().map(|s| { let v: Vec<u64> = s.split(':').map(|x| x.parse().unwrap()).collect(); (v[0], v[1], v[2] % p) }).collect();
+            let (dim, m1, m2, mt, md, nl) = lwm_eval(p, xbox, w, &terms, 11);
+            println!("{{\"X\":{},\"w\":{},\"unknowns\":{},\"kernel_dim\":{},\"max_pop_x1\":{},\"max_pop_x2\":{},\"max_total\":{},\"max_deg_h\":{}}}", xbox, w, nl, dim, m1, m2, mt, md);
+        }
+        "bnd" => {
+            let inst = Inst { p: parse(&args, 2), k: parse(&args, 3) as u32, a: parse(&args, 4), b: parse(&args, 5), t: parse(&args, 6) };
+            let d = parse(&args, 7) as u32;
+            let seed = if args.len() > 8 { parse(&args, 8) } else { 1 };
+            bnd_test(&inst, d, seed, &mut log);
+        }
         _ => { eprintln!("unknown command"); std::process::exit(2); }
     }
+}
+
+// ---------------------------------------------------------------- boundary-functional invariant tests
+/// Boundary families: X1 = points (zeta, xi) with zeta in mu_N and S_3(zeta, xi, t) = 0 (xi in F_{p^2});
+/// X2 = the swapped points (xi, zeta).  Exponents are lifted to [0, N) in both coordinates.
+fn boundary_families(inst: &Inst) -> (Vec<(F2, F2)>, Vec<(F2, F2)>) {
+    let x1fam = boundary_points(inst);
+    let x2fam: Vec<(F2, F2)> = x1fam.iter().map(|(a, b)| (*b, *a)).collect();
+    (x1fam, x2fam)
+}
+
+/// Evaluate a dense column vector at each point (standard lift); returns the number of points with a
+/// nonzero value.
+fn count_nonzero_evals(inst: &Inst, lay: &Layout, v: &[u64], pts: &[(F2, F2)]) -> usize {
+    let f = Fp { p: inst.p };
+    let f2 = Fp2::new(f);
+    let n = 1usize << inst.k;
+    let nm = (n as u64) - 1;
+    let support: Vec<(usize, usize, u64)> = v.iter().enumerate()
+        .filter_map(|(c, &x)| { let x = x % f.p; if x != 0 { let m = lay.masks[c]; Some(((m & nm) as usize, (m >> inst.k) as usize, x)) } else { None } })
+        .collect();
+    if support.is_empty() { return 0; }
+    let mut bad = 0;
+    let mut p1 = vec![F2(0, 0); n];
+    let mut p2 = vec![F2(0, 0); n];
+    for (x1, x2) in pts {
+        let mut z = f2.from(1);
+        for e in 0..n { p1[e] = z; z = f2.mul(z, *x1); }
+        let mut z = f2.from(1);
+        for e in 0..n { p2[e] = z; z = f2.mul(z, *x2); }
+        let mut acc = F2(0, 0);
+        for &(a, b, c) in &support {
+            acc = f2.add(acc, f2.scal(c, f2.mul(p1[a], p2[b])));
+        }
+        if !f2.is_zero(acc) { bad += 1; }
+    }
+    bad
+}
+
+/// H^{(s)}_j: extract the terms whose coordinate-s exponent has bits j..k-1 all set, and clear those bits.
+fn extract_top(inst: &Inst, lay: &Layout, v: &[u64], s: u32, j: u32) -> Vec<u64> {
+    let p = inst.p;
+    let k = inst.k;
+    let nm = (1u64 << k) - 1;
+    let top = nm & !((1u64 << j) - 1); // bits j..k-1
+    let mut out = vec![0u64; v.len()];
+    for (c, &x) in v.iter().enumerate() {
+        let x = x % p;
+        if x == 0 { continue; }
+        let m = lay.masks[c];
+        let (a, b) = (m & nm, m >> k);
+        let (a2, b2) = if s == 1 {
+            if a & top != top { continue; }
+            (a & !top, b)
+        } else {
+            if b & top != top { continue; }
+            (a, b & !top)
+        };
+        let j2 = lay.idx[&(a2 | (b2 << k))] as usize;
+        out[j2] = (out[j2] + x) % p;
+    }
+    out
+}
+
+fn random_combo(basis: &Basis, rows: &[usize], rng: &mut Rng) -> Vec<u64> {
+    let p = basis.f.p;
+    let mut acc = vec![0u64; basis.n];
+    for &r in rows {
+        let c = rng.below(p - 1) + 1;
+        for (j, &x) in basis.rows[r].iter().enumerate() {
+            let x = x % p;
+            if x != 0 { acc[j] = (acc[j] + c * x) % p; }
+        }
+    }
+    acc
+}
+
+
+fn bnd_detail(inst: &Inst, d: u32, j: u32, log: &mut dyn Write) {
+    // print low rows whose coordinate-2 top extraction H_j fails on the X1 family, smallest support first
+    let (_res, lay, basis) = closure(inst, d, false, false, log);
+    let (x1fam, _x2fam) = boundary_families(inst);
+    let p = inst.p;
+    let nm = (1u64 << inst.k) - 1;
+    let mut fails: Vec<(usize, usize)> = Vec::new();
+    for r in 0..basis.rows.len() {
+        if (lay.wt[basis.pivcol[r]] as u32) >= d { continue; }
+        let h = extract_top(inst, &lay, &basis.rows[r], 2, j);
+        if count_nonzero_evals(inst, &lay, &h, &x1fam) > 0 {
+            let nnz = basis.rows[r].iter().filter(|&&x| x % p != 0).count();
+            fails.push((nnz, r));
+        }
+    }
+    fails.sort();
+    println!("# failing low rows for H2_{}: {}", j, fails.len());
+    for &(nnz, r) in fails.iter().take(3) {
+        let row = &basis.rows[r];
+        let mut terms: Vec<String> = Vec::new();
+        for (c, &x) in row.iter().enumerate() {
+            let x = x % p; if x == 0 { continue; }
+            let m = lay.masks[c];
+            terms.push(format!("({},{})", m & nm, m >> inst.k));
+        }
+        println!("row {} pivw {} nnz {} :: {}", r, lay.wt[basis.pivcol[r]], nnz, terms.join(" "));
+    }
+}
+
+
+/// 2D DFT over Z/N x Z/N: F(i,j) = sum_{a,b} u[a][b] z^{a i + b j}; inverse uses z^{-1} and N^{-2}.
+fn dft2(f: &Fp, n: usize, z: u64, u: &[u64], inverse: bool) -> Vec<u64> {
+    let zz = if inverse { f.inv(z) } else { z };
+    let mut pw = vec![1u64; n];
+    for i in 1..n { pw[i] = f.mul(pw[i - 1], zz); }
+    // transform along b (inner index), then along a
+    let mut tmp = vec![0u64; n * n];
+    for a in 0..n {
+        for j in 0..n {
+            let mut acc = 0u64;
+            for b in 0..n { let x = u[a * n + b]; if x != 0 { acc = (acc + x * pw[(b * j) % n]) % f.p; } }
+            tmp[a * n + j] = acc;
+        }
+    }
+    let mut out = vec![0u64; n * n];
+    for i in 0..n {
+        for j in 0..n {
+            let mut acc = 0u64;
+            for a in 0..n { let x = tmp[a * n + j]; if x != 0 { acc = (acc + x * pw[(a * i) % n]) % f.p; } }
+            out[i * n + j] = acc;
+        }
+    }
+    if inverse {
+        let ninv2 = f.inv(f.mul(n as u64 % f.p, n as u64 % f.p));
+        for x in out.iter_mut() { *x = f.mul(*x, ninv2); }
+    }
+    out
+}
+
+/// cofactor support statistics: kappa(u) = g^{-1} u in Q_k for a random combination of the given rows
+fn cofactor_stats(inst: &Inst, lay: &Layout, basis: &Basis, rows: &[usize], gen: &[(u64, u64, u64)], rng: &mut Rng) -> (u32, u32, u32, bool) {
+    let f = Fp { p: inst.p };
+    let n = 1usize << inst.k;
+    let nm = (n as u64) - 1;
+    let z = zeta_of_order(&f, inst.k);
+    let mut gv = vec![0u64; n * n];
+    for &(a, b, c) in gen { let i = ((a as usize) % n) * n + (b as usize) % n; gv[i] = (gv[i] + c) % f.p; }
+    let gh = dft2(&f, n, z, &gv, false);
+    let r = random_combo(basis, rows, rng);
+    let mut uv = vec![0u64; n * n];
+    for (c, &x) in r.iter().enumerate() { let x = x % f.p; if x != 0 { let m = lay.masks[c]; uv[((m & nm) as usize) * n + (m >> inst.k) as usize] = x; } }
+    let uh = dft2(&f, n, z, &uv, false);
+    let qh: Vec<u64> = uh.iter().zip(gh.iter()).map(|(&a, &b)| { assert!(b != 0, "g vanishes on the grid"); f.mul(a, f.inv(b)) }).collect();
+    let kap = dft2(&f, n, z, &qh, true);
+    let (mut m1, mut m2, mut mt) = (0u32, 0u32, 0u32);
+    let mut touches = false;
+    for a in 0..n { for b in 0..n {
+        if kap[a * n + b] == 0 { continue; }
+        let (pa, pb) = ((a as u64).count_ones(), (b as u64).count_ones());
+        m1 = m1.max(pa); m2 = m2.max(pb); mt = mt.max(pa + pb);
+        if a >= n - 2 || b >= n - 2 { touches = true; }
+    } }
+    (m1, m2, mt, touches)
+}
+
+
+/// Low-weight multiples in the polynomial ring F[x1,x2] (integer exponents, binary weight = popcount sum):
+/// K = { h : deg_{x_i} h < X, every monomial of S*h has weight <= w }.  Returns (dim K, max popcount of x1
+/// exponents, of x2 exponents, max total, max degree) over the support of a random element of K.
+fn low_weight_multiples(p: u64, xbox: usize, w: u32, gen: &[(u64, u64, u64)], seed: u64) -> (usize, u32, u32, u32, usize, Vec<(usize, usize)>) {
+    let f = Fp { p };
+    let gx = gen.iter().map(|t| t.0 as usize).max().unwrap();
+    let gy = gen.iter().map(|t| t.1 as usize).max().unwrap();
+    let ox = xbox + gx; let oy = xbox + gy;
+    let nunk = xbox * xbox;
+    // constraint rows: one per high-weight output monomial (A,B), as sparse lists over unknowns
+    let mut rows: Vec<Vec<(usize, u64)>> = Vec::new();
+    for aa in 0..ox { for bb in 0..oy {
+        if (aa as u64).count_ones() + (bb as u64).count_ones() <= w { continue; }
+        let mut r = Vec::new();
+        for &(ga, gb, c) in gen {
+            let (ga, gb) = (ga as usize, gb as usize);
+            if aa >= ga && bb >= gb && aa - ga < xbox && bb - gb < xbox { r.push(((aa - ga) * xbox + (bb - gb), c)); }
+        }
+        if !r.is_empty() { rows.push(r); }
+    } }
+    // dense Gaussian elimination to RREF over unknowns
+    let mut piv_of_col: Vec<Option<usize>> = vec![None; nunk];
+    let mut basis: Vec<Vec<u64>> = Vec::new();
+    let mut pivcols: Vec<usize> = Vec::new();
+    for r in rows {
+        let mut v = vec![0u64; nunk];
+        for (c, x) in r { v[c] = (v[c] + x) % p; }
+        // reduce
+        for col in 0..nunk {
+            let x = v[col] % p;
+            if x == 0 { v[col] = 0; continue; }
+            if let Some(bi) = piv_of_col[col] {
+                let b = &basis[bi]; let cc = p - x;
+                for j in col..nunk { if b[j] != 0 { v[j] = (v[j] + cc * b[j]) % p; } }
+            } else {
+                let inv = f.inv(x);
+                for j in col..nunk { v[j] = v[j] * inv % p; }
+                piv_of_col[col] = Some(basis.len()); pivcols.push(col); basis.push(v); break;
+            }
+        }
+    }
+    // back-substitute to RREF: pivot columns in decreasing order, eliminated from every other row
+    let nb = basis.len();
+    let mut order: Vec<usize> = (0..nb).collect();
+    order.sort_by(|&x, &y| pivcols[y].cmp(&pivcols[x]));
+    for &i in &order {
+        let pc = pivcols[i];
+        let bi = basis[i].clone();
+        for i2 in 0..nb {
+            if i2 == i { continue; }
+            let x = basis[i2][pc];
+            if x != 0 { let cc = p - x; for j in pc..nunk { if bi[j] != 0 { basis[i2][j] = (basis[i2][j] + cc * bi[j]) % p; } } }
+        }
+    }
+    // self-check: every RREF row has zeros at all other pivot columns
+    for i in 0..nb { for i2 in 0..nb { if i != i2 { assert!(basis[i][pivcols[i2]] == 0, "RREF check failed"); } } }
+    if let Ok(spec) = std::env::var("LWM_SHOW") {
+        let v: Vec<usize> = spec.split(',').map(|x| x.parse().unwrap()).collect();
+        let fc = v[0] * xbox + v[1];
+        if piv_of_col[fc].is_none() {
+            let mut hv = vec![0u64; nunk]; hv[fc] = 1;
+            for i in 0..nb { let x = basis[i][fc]; if x != 0 { hv[pivcols[i]] = (p - x) % p; } }
+            let hs: Vec<String> = (0..nunk).filter(|&c| hv[c] != 0).map(|c| format!("({},{})", c / xbox, c % xbox)).collect();
+            // product S*h
+            let mut prod = std::collections::BTreeMap::new();
+            for c in 0..nunk { if hv[c] == 0 { continue; } for &(ga, gb, gc) in gen { let key = (c / xbox + ga as usize, c % xbox + gb as usize); let e = prod.entry(key).or_insert(0u64); *e = (*e + gc * hv[c]) % p; } }
+            let ps: Vec<String> = prod.iter().filter(|(_, &x)| x != 0).map(|((a, b), _)| format!("({},{})", a, b)).collect();
+            eprintln!("h support ({} terms): {}", hs.len(), hs.join(" "));
+            eprintln!("S*h support ({} terms): {}", ps.len(), ps.join(" "));
+        } else { eprintln!("column ({},{}) is a pivot (not free)", v[0], v[1]); }
+    }
+    if let Ok(spec) = std::env::var("LWM_TOUCH") {
+        // smallest RREF kernel basis vector whose support has an x2-exponent with popcount >= spec
+        let thr: u32 = spec.parse().unwrap();
+        let mut best: Option<(usize, Vec<u64>)> = None;
+        for fc in 0..nunk { if piv_of_col[fc].is_some() { continue; }
+            let mut hv = vec![0u64; nunk]; hv[fc] = 1;
+            for i in 0..nb { let x = basis[i][fc]; if x != 0 { hv[pivcols[i]] = (p - x) % p; } }
+            let touch = (0..nunk).any(|c| hv[c] != 0 && ((c % xbox) as u64).count_ones() >= thr);
+            if touch { let nz = hv.iter().filter(|&&x| x != 0).count(); if best.as_ref().map_or(true, |(b, _)| nz < *b) { best = Some((nz, hv)); } }
+        }
+        if let Some((nz, hv)) = best {
+            let hs: Vec<String> = (0..nunk).filter(|&c| hv[c] != 0).map(|c| format!("({},{})", c / xbox, c % xbox)).collect();
+            let mut prod = std::collections::BTreeMap::new();
+            for c in 0..nunk { if hv[c] == 0 { continue; } for &(ga, gb, gc) in gen { let key = (c / xbox + ga as usize, c % xbox + gb as usize); let e = prod.entry(key).or_insert(0u64); *e = (*e + gc * hv[c]) % p; } }
+            let ps: Vec<String> = prod.iter().filter(|(_, &x)| x != 0).map(|((a, b), _)| format!("({},{})", a, b)).collect();
+            eprintln!("h ({} terms): {}", nz, hs.join(" "));
+            eprintln!("S*h ({} terms): {}", ps.len(), ps.join(" "));
+        } else { eprintln!("no basis vector touches popcount {}", thr); }
+    }
+    // random kernel element: free variables random, pivots solved
+    let mut rng = Rng(seed);
+    let mut h = vec![0u64; nunk];
+    for col in 0..nunk { if piv_of_col[col].is_none() { h[col] = rng.below(p - 1) + 1; } }
+    for i in 0..nb {
+        let pc = pivcols[i]; let mut acc = 0u64;
+        for j in (pc + 1)..nunk { if basis[i][j] != 0 && piv_of_col[j].is_none() { acc = (acc + basis[i][j] * h[j]) % p; } }
+        h[pc] = (p - acc) % p;
+    }
+    {
+        let mut prod = std::collections::HashMap::new();
+        for c in 0..nunk { if h[c] == 0 { continue; } for &(ga, gb, gc) in gen { let key = (c / xbox + ga as usize, c % xbox + gb as usize); let e = prod.entry(key).or_insert(0u64); *e = (*e + gc * h[c]) % p; } }
+        for ((a, b), x) in prod { if x != 0 { assert!((a as u64).count_ones() + (b as u64).count_ones() <= w, "kernel element violates the weight bound"); } }
+    }
+    let (mut m1, mut m2, mut mt, mut md) = (0u32, 0u32, 0u32, 0usize);
+    let mut sup = Vec::new();
+    for a in 0..xbox { for b in 0..xbox { if h[a * xbox + b] != 0 {
+        let (pa, pb) = ((a as u64).count_ones(), (b as u64).count_ones());
+        m1 = m1.max(pa); m2 = m2.max(pb); mt = mt.max(pa + pb); md = md.max(a.max(b)); sup.push((a, b));
+    } } }
+    (nunk - nb, m1, m2, mt, md, sup)
+}
+
+
+/// Low-weight multiples via evaluation: unknowns f_{AB} on L = {(A,B) in [0,X+2)^2 : pop(A)+pop(B) <= w};
+/// f must vanish at >= 4X+50 points of S = 0 with x1, x2 in F_p.  Then h = f / S by exact division.
+/// Returns (kernel dim, max pop x1, max pop x2, max total, max deg of h, |L|).
+fn lwm_eval(p: u64, xbox: usize, w: u32, gen: &[(u64, u64, u64)], seed: u64) -> (usize, u32, u32, u32, usize, usize) {
+    let f = Fp { p };
+    let lim = xbox + 2;
+    let mut lmon: Vec<(usize, usize)> = Vec::new();
+    for a in 0..lim { for b in 0..lim { if (a as u64).count_ones() + (b as u64).count_ones() <= w { lmon.push((a, b)); } } }
+    let nunk = lmon.len();
+    // generator as polynomial in x2 with F[x1] coefficients (degree <= 2 in each)
+    let mut s = vec![vec![0u64; 3]; 3]; // s[b][a]
+    for &(a, b, c) in gen { s[b as usize][a as usize] = (s[b as usize][a as usize] + c) % p; }
+    // points: x1 random in F_p, x2 root of the quadratic in x2 when it lies in F_p
+    let npts = 4 * xbox + 200;
+    let mut pts: Vec<(u64, u64)> = Vec::new();
+    let mut rng = Rng(seed);
+    let mut used = std::collections::HashSet::new();
+    while pts.len() < npts {
+        let x1 = rng.below(p);
+        if !used.insert(x1) { continue; } // distinct abscissae, hence distinct points
+        let ev = |row: &Vec<u64>| -> u64 { f.add(f.add(row[0], f.mul(row[1], x1)), f.mul(row[2], f.mul(x1, x1))) };
+        let (c0, c1, c2) = (ev(&s[0]), ev(&s[1]), ev(&s[2]));
+        if s[2].iter().all(|&x| x == 0) {
+            // generator linear in x2: x2 = -c0 / c1
+            if c1 == 0 { continue; }
+            pts.push((x1, f.mul(f.neg(c0), f.inv(c1))));
+            continue;
+        }
+        if c2 == 0 { continue; }
+        let disc = f.sub(f.mul(c1, c1), f.mul(4, f.mul(c2, c0)));
+        if let Some(r) = f.sqrt(disc) {
+            let inv = f.inv(f.mul(2, c2));
+            for x2 in [f.mul(f.add(f.neg(c1), r), inv), f.mul(f.sub(f.neg(c1), r), inv)] { pts.push((x1, x2)); }
+        }
+    }
+    // evaluation matrix rows = points, columns = unknowns; RREF via column pivots
+    let mut piv_of_col: Vec<Option<usize>> = vec![None; nunk];
+    let mut rows: Vec<Vec<u64>> = Vec::new(); let mut pivcols: Vec<usize> = Vec::new();
+    for &(x1, x2) in &pts {
+        let mut pw1 = vec![1u64; lim]; for i in 1..lim { pw1[i] = f.mul(pw1[i - 1], x1); }
+        let mut pw2 = vec![1u64; lim]; for i in 1..lim { pw2[i] = f.mul(pw2[i - 1], x2); }
+        let mut v: Vec<u64> = lmon.iter().map(|&(a, b)| f.mul(pw1[a], pw2[b])).collect();
+        for col in 0..nunk {
+            let x = v[col] % p; if x == 0 { v[col] = 0; continue; }
+            if let Some(bi) = piv_of_col[col] { let b = &rows[bi]; let cc = p - x; for j in col..nunk { if b[j] != 0 { v[j] = (v[j] + cc * b[j]) % p; } } }
+            else { let inv = f.inv(x); for j in col..nunk { v[j] = v[j] * inv % p; } piv_of_col[col] = Some(rows.len()); pivcols.push(col); rows.push(v); break; }
+        }
+    }
+    let nb = rows.len();
+    let mut order: Vec<usize> = (0..nb).collect(); order.sort_by(|&x, &y| pivcols[y].cmp(&pivcols[x]));
+    for &i in &order { let pc = pivcols[i]; let bi = rows[i].clone(); for i2 in 0..nb { if i2 == i { continue; } let x = rows[i2][pc]; if x != 0 { let cc = p - x; for j in pc..nunk { if bi[j] != 0 { rows[i2][j] = (rows[i2][j] + cc * bi[j]) % p; } } } } }
+    // random kernel element
+    let mut fv = vec![0u64; nunk];
+    for col in 0..nunk { if piv_of_col[col].is_none() { fv[col] = rng.below(p - 1) + 1; } }
+    for i in 0..nb { let pc = pivcols[i]; let mut acc = 0u64; for j in (pc + 1)..nunk { if rows[i][j] != 0 && piv_of_col[j].is_none() { acc = (acc + rows[i][j] * fv[j]) % p; } } fv[pc] = (p - acc) % p; }
+    // f as poly in x2 with F[x1] coefficients
+    let mut fp = vec![vec![0u64; lim]; lim]; // fp[b][a]
+    for (c, &(a, b)) in lmon.iter().enumerate() { fp[b][a] = fv[c]; }
+    // exact division by S in F[x1][x2]
+    let mut h = vec![vec![0u64; lim]; lim];
+    let dy = if s[2].iter().any(|&x| x != 0) { 2 } else { 1 };
+    let s2 = &s[dy];
+    // divide polynomial (in x1) by s2 exactly
+    let divx1 = |num: &Vec<u64>| -> Vec<u64> {
+        let mut r = num.clone(); let mut q = vec![0u64; num.len()];
+        let ds = (0..3).rev().find(|&i| s2[i] != 0).unwrap(); let linv = f.inv(s2[ds]);
+        for d in (ds..r.len()).rev() { let c = r[d]; if c == 0 { continue; } let qc = f.mul(c, linv); q[d - ds] = qc; for i in 0..=ds { r[d - ds + i] = f.sub(r[d - ds + i], f.mul(qc, s2[i])); } }
+        assert!(r.iter().all(|&x| x == 0), "non-exact division in x1"); q
+    };
+    for d in (dy..lim).rev() {
+        if fp[d].iter().all(|&x| x == 0) { continue; }
+        let q = divx1(&fp[d]);
+        // subtract q * S * x2^{d-dy}
+        for bb in 0..=dy { for aa in 0..3 { if s[bb][aa] == 0 { continue; } for (i, &qc) in q.iter().enumerate() { if qc == 0 { continue; } let ai = i + aa; if ai < lim { fp[d - dy + bb][ai] = f.sub(fp[d - dy + bb][ai], f.mul(qc, s[bb][aa])); } } } }
+        h[d - dy] = q;
+    }
+    assert!(fp.iter().all(|r| r.iter().all(|&x| x == 0)), "f is not divisible by S");
+    if std::env::var("LWM2_SHOW").is_ok() {
+        // smallest RREF kernel vector (over f-unknowns) whose cofactor contains a monomial of max x2-popcount
+        let mut fsup: Vec<String> = Vec::new();
+        for (c, &(a, b)) in lmon.iter().enumerate() { if fv[c] != 0 { fsup.push(format!("({},{})", a, b)); } }
+        let mut hist = std::collections::BTreeMap::new();
+        for b in 0..lim { for a in 0..lim { if h[b][a] != 0 { *hist.entry(((a as u64).count_ones(), (b as u64).count_ones())).or_insert(0usize) += 1; } } }
+        eprintln!("random kernel element: f has {} terms; h popcount histogram (pop1,pop2)->count: {:?}", fsup.len(), hist);
+        let mx2 = (0..lim).filter(|&b| h[b].iter().any(|&x| x != 0)).map(|b| (b as u64).count_ones()).max().unwrap_or(0);
+        let cols: Vec<usize> = (0..lim).filter(|&b| (b as u64).count_ones() == mx2 && h[b].iter().any(|&x| x != 0)).collect();
+        eprintln!("x2-exponents of h with popcount {}: {:?}", mx2, cols);
+        for &b in cols.iter().take(2) { let a_s: Vec<usize> = (0..lim).filter(|&a| h[b][a] != 0).collect(); eprintln!("  column x2^{}: x1-exponents {:?}", b, &a_s[..a_s.len().min(40)]); }
+    }
+    let (mut m1, mut m2, mut mt, mut md) = (0u32, 0u32, 0u32, 0usize);
+    for b in 0..lim { for a in 0..lim { if h[b][a] != 0 {
+        let (pa, pb) = ((a as u64).count_ones(), (b as u64).count_ones()); m1 = m1.max(pa); m2 = m2.max(pb); mt = mt.max(pa + pb); md = md.max(a.max(b));
+    } } }
+    (nunk - nb, m1, m2, mt, md, nunk)
+}
+
+fn bnd_test(inst: &Inst, d: u32, seed: u64, log: &mut dyn Write) {
+    let (res, lay, basis) = closure(inst, d, false, false, log);
+    let (x1fam, x2fam) = boundary_families(inst);
+    let mut rng = Rng(seed);
+    let all: Vec<usize> = (0..basis.rows.len()).collect();
+    let low: Vec<usize> = (0..basis.rows.len()).filter(|&r| (lay.wt[basis.pivcol[r]] as u32) < d).collect();
+    let mut out = String::new();
+    for trial in 0..2 {
+        let r_all = random_combo(&basis, &all, &mut rng);
+        let b1 = count_nonzero_evals(inst, &lay, &r_all, &x1fam);
+        let b2 = count_nonzero_evals(inst, &lay, &r_all, &x2fam);
+        let r_low = random_combo(&basis, &low, &mut rng);
+        let mut hs = Vec::new();
+        for j in 0..inst.k {
+            let h2 = extract_top(inst, &lay, &r_low, 2, j);
+            let h1 = extract_top(inst, &lay, &r_low, 1, j);
+            let f_h2 = count_nonzero_evals(inst, &lay, &h2, &x1fam);
+            let f_h1 = count_nonzero_evals(inst, &lay, &h1, &x2fam);
+            if f_h2 > 0 || f_h1 > 0 { hs.push(format!("{}:{}/{}", j, f_h2, f_h1)); }
+        }
+        out.push_str(&format!("{{\"trial\":{},\"all_x1\":{},\"all_x2\":{},\"points_per_family\":{},\"H_fail_j:x1fam/x2fam\":\"{}\"}}", trial, b1, b2, x1fam.len(), hs.join(" ")));
+        if trial == 0 { out.push(','); }
+    }
+    println!("{{\"p\":{},\"k\":{},\"A\":{},\"B\":{},\"t\":{},\"D\":{},\"rank\":{},\"columns\":{},\"one_in_V\":{},\"low_rows\":{},\"tests\":[{}]}}",
+        inst.p, inst.k, inst.a, inst.b, inst.t, d, res.rank, res.columns, res.one_in_v, low.len(), out);
 }

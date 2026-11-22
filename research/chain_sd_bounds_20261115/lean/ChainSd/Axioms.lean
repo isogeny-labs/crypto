@@ -3,6 +3,7 @@ import ChainSd.Unit
 import ChainSd.GroupAlgebra
 import ChainSd.Reach
 import ChainSd.LowerThree
+import ChainSd.Cofactor
 #print axioms ChainSd.ShiftSystem.closure_transfer
 #print axioms ChainSd.ShiftSystem.closure_mono
 #print axioms ChainSd.ShiftSystem.closure_le_F
@@ -20,3 +21,8 @@ import ChainSd.LowerThree
 #print axioms ChainSd.lastFallDegree_eq_solvingDegree_chain
 #print axioms ChainSd.one_not_mem_closure_two
 #print axioms ChainSd.two_lt_solvingDegree
+#print axioms ChainSd.popcount_add_le
+#print axioms ChainSd.shift_avoids_top
+#print axioms ChainSd.inv_not_mem_avoidSub
+#print axioms ChainSd.one_not_mem_closure_of_cofactorHyp
+#print axioms ChainSd.one_not_mem_chainSystem_of_cofactorHyp
