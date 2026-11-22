@@ -936,6 +936,13 @@ impl RadicalRootCtx {
     #[inline]
     fn sqrt_discriminant(&self, a: u64) -> Option<u64> {
         let p = self.f.p;
+        // For p = 2^61-1, the square-root power is 2^59.
+        // Squaring 59 times and checking r^2=a beats running the
+        // variable-time Jacobi prefilter first, especially for residues.
+        // Noncanonical inputs retain the prior standalone sqrt behavior.
+        if p == MAX_PRIME && a < p {
+            return self.sqrt(a);
+        }
         if p >= (1u64 << 20) && p & 3 == 3 && a != 0 && a < p {
             let (mut v, mut n) = (a, p);
             let mut negative = false;
@@ -4975,6 +4982,24 @@ mod round114_mersenne_sqrt_and_unit_inverse {
                     assert_eq!(f.mul(reduced, inv), 1, "p={p}, a={a}");
                 }
             }
+        }
+    }
+
+    #[test]
+    fn mersenne_jacobi_bypass_matches_complete_sqrt() {
+        let ctx = RadicalRootCtx::new(MAX_PRIME).expect("Mersenne context");
+        let p = MAX_PRIME;
+        let mut state = 0x71d2_4ca5_55ab_0093u64;
+        for a in [0, 1, 2, p - 2, p - 1, p, p + 1, u64::MAX]
+            .into_iter()
+            .chain((0..2048).map(|_| {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                state % p
+            }))
+        {
+            assert_eq!(ctx.sqrt_discriminant(a), ctx.sqrt(a), "a={a}");
         }
     }
 
