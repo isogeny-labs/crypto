@@ -8,6 +8,7 @@ on:
       - 'examples/prime31_f4_field_gate.rs'
       - 'examples/prime31_coset_xlift_f4.rs'
       - 'examples/prime31_coset_cubic_factor.rs'
+      - 'examples/prime31_coset_signed25.rs'
       - 'src/cryptanalysis/f4_fp.rs'
       - '.github/workflows/prime31-f4-field-gate.yml'
   workflow_dispatch:
@@ -33,13 +34,21 @@ jobs:
           cargo build --release \
             --example prime31_coset_cubic_factor \
             --example prime31_f4_field_gate \
-            --example prime31_coset_xlift_f4
+            --example prime31_coset_xlift_f4 \
+            --example prime31_coset_signed25
       - name: Check exact seven-cubic factor-base roots with existing Rust CZ
         timeout-minutes: 3
         run: timeout 150s target/release/examples/prime31_coset_cubic_factor
       - name: Run exact Prime31 field arithmetic smoke
         timeout-minutes: 2
         run: timeout 90s target/release/examples/prime31_f4_field_gate
+      - name: Validate signed25 ordinary affine chart in native Rust
+        timeout-minutes: 1
+        run: timeout 50s target/release/examples/prime31_coset_signed25
+      - name: Bounded F4 admission probe (incomplete degree is not UNSAT)
+        timeout-minutes: 2
+        continue-on-error: true
+        run: timeout 100s target/release/examples/prime31_coset_signed25 --bounded-f4
       - name: Recover 8 split cosets with existing F4 solver
         timeout-minutes: 3
         run: timeout 150s target/release/examples/prime31_coset_xlift_f4
