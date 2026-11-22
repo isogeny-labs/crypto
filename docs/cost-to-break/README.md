@@ -21,7 +21,7 @@ Files:
 | [`inputs-v1.json`](inputs-v1.json) | Every input number with its source (hand-edited) |
 | [`gen_table.rs`](gen_table.rs) | Std-only Rust generator: derives every other number |
 | [`table-v1.json`](table-v1.json) | Generated: derived rows, checks, and the inputs verbatim |
-| [`chart-v1.svg`](chart-v1.svg), [`chart-v1.png`](chart-v1.png) | Generated chart (the PNG is a 150 dpi render of the SVG) |
+| [`chart-v1.svg`](chart-v1.svg) | Generated chart. No PNG is committed: the artifact policy sends a PNG over 64 KiB to the store; render one locally with the command below if needed |
 | [`report.typ`](report.typ), [`report.pdf`](report.pdf) | One-page report with the chart, for people who will not read JSON |
 
 ## The table
@@ -161,7 +161,9 @@ classical costs only.
    /tmp/gen_table docs/cost-to-break --check    # exit 0 only if every output is current
    ```
 
-3. Re-render the PNG and the report. This is document rendering only:
+3. Re-render the report (and, if wanted, a local PNG; do not commit a PNG
+   over 64 KiB, which the artifact policy sends to the store). This is
+   document rendering only:
    Typst from a scratch virtualenv, as the `research-visuals` skill
    describes (`python3 -m venv /tmp/rv && /tmp/rv/bin/pip install typst`).
    From this directory:
