@@ -55,7 +55,15 @@ route). Requirements: an isolated node; `.resume/RESUME.md` filled
 (`python3 tools/benchrec.py init|run|add-raw|metric|close`), with raw
 reports in S3 by SHA-256. Record the image and commit in the record.
 
-**Tooling.** [`tools/boundary_pin_calibration.py`](tools/boundary_pin_calibration.py)
+**Tooling.** [`tools/solver_unit_pin_calibration.py`](tools/solver_unit_pin_calibration.py)
+patches one solver/native key per instance into the existing table without
+touching other keys; [`tools/run_interleaved_solver_pin.sh`](tools/run_interleaved_solver_pin.sh)
+runs the frozen 5× interleaved harness. The hashed-tensor contraction timer
+lives in `ic_framework::hashed` (`hashed_tensor_contraction_wall_ns` /
+`hashed_tensor_primitive_steps` on relation counters) and
+`examples/hashed_tensor_contraction_timer.rs`.
+
+[`tools/boundary_pin_calibration.py`](tools/boundary_pin_calibration.py)
 exists, but it cannot pin these keys as written. It reads
 `ledger.instances[].calibration` from `ic boundary` runs, where no solver
 unit is measured, and its `UNITS` list stops at `ns_per_canon`. A pin needs
