@@ -39,11 +39,6 @@ frozen = """        let mut n = f.len();
         }
 """
 baseline = source[:start] + frozen + source[end:]
-# Remove the candidate's direct short-polynomial dispatch to make the
-# frozen baseline exactly the source before Round116.
-short_start = baseline.index("        // Preserve the direct, source-equivalent short-polynomial path.")
-short_end = baseline.index("        // Polynomials of degree", short_start)
-baseline = baseline[:short_start] + baseline[short_end:]
 assert baseline != source and baseline.count("let mut leading = 0u64;") == 0
 
 header = r'''
