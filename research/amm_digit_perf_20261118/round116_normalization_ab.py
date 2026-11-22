@@ -63,8 +63,8 @@ pub mod baseline {
 '''
 expose = r'''
 pub fn ctx(p:u64)->RadicalRootCtx { RadicalRootCtx::new(p).unwrap() }
-pub fn roots(ctx:&RadicalRootCtx, input:&[u64])->Result<RadicalRoots,String>{
- ctx.roots(input)
+pub fn roots(ctx:&RadicalRootCtx, input:&[u64])->Result<(Vec<u64>,bool),String>{
+ ctx.roots(input).map(|r|(r.roots,r.frobenius_fallback))
 }
 }
 pub mod candidate {
@@ -156,7 +156,7 @@ mod tests {
        let start=Instant::now();let mut digest=0x4af5_9851_923a_d072u64;
        for _ in 0..loops {for input in &inputs {
          let r=if new{candidate::roots(&c,black_box(input))}else{baseline::roots(&b,black_box(input))}.unwrap();
-         digest=digest.rotate_left(11)^black_box(hash(&r.roots));
+         digest=digest.rotate_left(11)^black_box(hash(&r.0));
        }}
        (start.elapsed().as_nanos()as f64/(loops*inputs.len())as f64,digest)
      };
