@@ -38,8 +38,8 @@ use crate::cryptanalysis::ecbench::ext::ExtInstance;
 use crate::cryptanalysis::ecbench::fp4::{self as fp4, Fp4Group, Fp4Instance, K4Base, K4Params};
 use crate::cryptanalysis::ecbench::full_price;
 use crate::cryptanalysis::ecbench::generic::{
-    bsgs_interleaved, bsgs_negation, bsgs_negation_table, bsgs_textbook, kangaroo, kangaroo_with,
-    verify_candidate, GenericOutcome,
+    bsgs_interleaved, bsgs_negation, bsgs_negation_table, bsgs_textbook,
+    build_negation_table, kangaroo, kangaroo_with, verify_candidate, GenericOutcome,
 };
 use crate::cryptanalysis::ecbench::hec;
 use crate::cryptanalysis::ecbench::hyper::HyperInstance;
@@ -227,7 +227,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "solver",
             default: Some(""),
-            help: "descent-algebraic and descent-algebraic-fiber only: f4-f2, buchberger-f2, sat-cdcl, exhaustive (with :k=v options)",
+            help: "descent-algebraic and descent-algebraic-fiber only: f4-f2, f4-f2-full-width, buchberger-f2, sat-cdcl, exhaustive (with :k=v options)",
         },
         ParamDecl {
             name: "linalg",
@@ -907,6 +907,18 @@ pub fn registry() -> &'static [MethodDecl] {
             family: "bsgs",
             summary: "bsgs.negation with the baby table's half-width m given (m + 1 classes, giant stride 2m + 1): the equal-memory comparator for a known-log base",
             entry: "ecbench::generic::bsgs_negation_table",
+            applies: Applies::Any,
+            params: &[ParamDecl {
+                name: "baby",
+                default: Some("0"),
+                help: "baby table half-width m (table entries m + 1); 0 means ceil(sqrt(r)/2), which is bsgs.negation",
+            }],
+        },
+        MethodDecl {
+            id: "bsgs.negation_table_v2",
+            family: "bsgs",
+            summary: "versioned cached-table BSGS: target-independent negation baby table, inserts and stride negation charged once in the cold total; online lookups, hit recovery arithmetic and final [d]G = Q verification charged in their phases",
+            entry: "ecbench::generic::build_negation_table + NegationBabyTable::solve + verify_candidate",
             applies: Applies::Any,
             params: &[ParamDecl {
                 name: "baby",
@@ -2280,6 +2292,19 @@ pub(super) fn ops_phase(name: &str, ops: GroupOps) -> PhaseRecord {
     }
 }
 
+/// The counter `rho.signed_frobenius_v5` tallies its per-step jump-index
+/// selection under since 2026-11-19: the name the strong reference uses
+/// for its per-step partition hash, so `ecbench::work` and the §5a band
+/// price the two alike.  Records written before then lack it; their
+/// replay is matched with it removed ([`v5_pre_tally_record`]).
+pub const V5_JUMP_INDEX_COUNTER: &str = "partition_hashes_uncharged";
+
+/// A `rho.signed_frobenius_v5` record written before the per-step
+/// jump-index tally existed: it carries no [`V5_JUMP_INDEX_COUNTER`].
+pub(super) fn v5_pre_tally_record(method: &str, counters: &BTreeMap<String, u64>) -> bool {
+    method == "rho.signed_frobenius_v5" && !counters.contains_key(V5_JUMP_INDEX_COUNTER)
+}
+
 pub(super) fn unpriced_of(counters: &BTreeMap<String, u64>) -> Vec<String> {
     counters
         .iter()
@@ -3065,9 +3090,14 @@ fn solve_generic<G: CountedGroup>(
 ) -> Result<SolveReport, String> {
     let cap = || -> Result<u64, String> { Ok(rho_cap(r, param_u64(m, "cap_multiple")? as f64)) };
     let t = Instant::now();
-    // Everything these methods do depends on the target (rho's jump table
-    // is [a]G + [b]Q), so the whole solve is the online window.
-    measurement::begin_online(Phase::RhoSolve);
+    // The versioned cached BSGS builds its reusable `G`-only table before
+    // opening the online window.  Frozen generic ids retain their original
+    // whole-call boundary; in particular this does not reinterpret any
+    // committed record.
+    let split_cached_bsgs = m.id == "bsgs.negation_table_v2";
+    if !split_cached_bsgs {
+        measurement::begin_online(Phase::RhoSolve);
+    }
     // The rho walks keep one ledger for the whole solve; the tables and
     // the kangaroo keep set-up and search apart.  Either way the field
     // operations reported are the solve's total, known only when the
@@ -3152,6 +3182,53 @@ fn solve_generic<G: CountedGroup>(
                 bsgs_negation_table(g, gen, target, r, baby)
             };
             generic(o, t.elapsed().as_nanos() as u64, 2)
+        }
+        "bsgs.negation_table_v2" => {
+            let baby = param_u64(m, "baby")?;
+            let baby = if baby == 0 {
+                crate::cryptanalysis::ecbench::generic::ceil_sqrt(r)
+                    .div_ceil(2)
+                    .max(1)
+            } else {
+                baby
+            };
+            let table = build_negation_table(g, gen, r, baby);
+            measurement::begin_online(Phase::RhoSolve);
+            let mut o = table.solve(g, target);
+            verify_candidate(g, gen, target, &mut o);
+            measurement::end_online();
+            let wall = t.elapsed().as_nanos() as u64;
+            let f = field_ops_of(g, &[o.setup, o.search, o.verification]);
+            let mut rep = generic_report_v2(o, wall, 2, f, "bsgs");
+
+            // Keep the top-level counters for the stable band/report schema,
+            // and also bind each native count to the phase that performed it
+            // so reusable/per-target work splits are honest.
+            for (phase_name, counter) in [
+                ("setup", "inserts_uncharged"),
+                ("setup", "point_negations_uncharged"),
+                ("search", "lookups_uncharged"),
+                ("search", "recovery_key_comparisons_uncharged"),
+                ("search", "recovery_modr_muls_uncharged"),
+                ("search", "recovery_modr_adds_uncharged"),
+            ] {
+                let Some(count) = rep.counters.get(counter).copied() else {
+                    continue;
+                };
+                rep.phases
+                    .iter_mut()
+                    .find(|p| p.name == phase_name)
+                    .expect("generic v2 report has setup and search phases")
+                    .native
+                    .insert(counter.into(), count);
+            }
+            rep.detail["cache_contract"] = json!({
+                "cold_total_charges_setup_once": true,
+                "online_excludes_setup": true,
+                "reusable_phase": "setup",
+                "per_target_phases": ["search", "verification"],
+            });
+            rep
         }
         "kangaroo.vow" => {
             let o = kangaroo(g, gen, target, r, seed, cap()?);
@@ -3298,7 +3375,9 @@ fn solve_generic<G: CountedGroup>(
         }
         other => return Err(format!("`{other}` is not a generic method")),
     };
-    measurement::end_online();
+    if !split_cached_bsgs {
+        measurement::end_online();
+    }
     Ok(rep)
 }
 
@@ -4467,6 +4546,15 @@ fn solve_inner(
             )
             .ok_or("not a Koblitz instance")?;
             measurement::end_online();
+            let mut res = res;
+            // The per-step jump-index selection, tallied as the strong
+            // reference tallies its partition hash (one per step), so the
+            // §5a band prices it alike (owner decision 2026-11-19,
+            // research/koblitz_rho_reference_20261115/DECISION.md).  A
+            // native counter only: the walk, the outcome and every group
+            // operation are unchanged.
+            res.counters
+                .insert(V5_JUMP_INDEX_COUNTER.into(), res.jump_index_selections);
             Ok(rho_report_v2(
                 res,
                 t.elapsed().as_nanos() as u64,
@@ -6176,6 +6264,12 @@ fn online_window(family: &str, id: &str, snap: &Snapshot) -> Option<OnlineWindow
     if id == "rho.preprocessing" {
         w.start_event = "first target-dependent operation (G + Q and the online stride) after the target-blind jump table and distinguished-point table are complete".into();
         w.mapping = "preprocessing rho: the online walks on the precomputation's map, table lookups at distinguished points, and final [d]G=Q verification".into();
+    }
+    if id == "bsgs.negation_table_v2" {
+        w.start_event = "first target-dependent giant-step lookup after the G-only negation baby table and giant stride are complete".into();
+        w.stop_event = "[d]G = Q verified inside the method".into();
+        w.included_stages = vec!["giant_steps".into(), "recovery_check".into()];
+        w.mapping = "cached BSGS: setup and table inserts are reusable and excluded from the online clock; giant steps, table lookups, collision recovery, and final scalar replay are per-target and inside it".into();
     }
     Some(w)
 }
@@ -8177,6 +8271,11 @@ fn solve_ic_binary(
         // lost from main since, which made `ksum` refuse binary curves.
         "ksum" => Box::new(KSumOracle::new(ms)),
         "wwalk" => Box::new(WWalkOracle::<FastPoint>::new()),
+        // Koblitz: the same probe into a table folded by the signed
+        // Frobenius as well, over a Frobenius-closed base.
+        "ksum-frobenius" => Box::new(
+            crate::cryptanalysis::ic_framework::plugins::FrobeniusKSumOracle::new(ms, inst),
+        ),
         "mitm-frobenius" => Box::new(FrobeniusMitmOracle::new(ms, inst)),
         "mitm-frobenius-counted" => Box::new(FrobeniusMitmOracle::new_counted(ms, inst)),
         "mitm-frobenius-lazy-counted" => Box::new(FrobeniusMitmOracle::new_lazy_counted(ms, inst)),
@@ -9464,6 +9563,30 @@ mod tests {
     }
 
     #[test]
+    fn frozen_negation_table_identity_stays_on_its_original_entry() {
+        let historical = resolve(&MethodSpec {
+            id: "bsgs.negation_table".into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        assert_eq!(historical.params["baby"], "0");
+        assert_eq!(historical.entry, "ecbench::generic::bsgs_negation_table");
+        assert_eq!(historical.method_id, "ECM1hae967a248ea2");
+        assert_eq!(
+            historical.method_sha256,
+            "ae967a248ea21c4a34ec79a0130ebaa412891a6ea97e61532b0ce51199a08d97"
+        );
+
+        let versioned = resolve(&MethodSpec {
+            id: "bsgs.negation_table_v2".into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        assert_ne!(versioned.method_id, historical.method_id);
+        assert_ne!(versioned.entry, historical.entry);
+    }
+
+    #[test]
     fn historical_genus2_method_id_survives_thread_parameter_resolution() {
         let historical = resolve(&MethodSpec {
             id: HYPER_GENUS2_ID.into(),
@@ -10732,6 +10855,7 @@ mod accounting_rules_tests {
             ("bsgs.textbook_v2", &[], true),
             ("bsgs.interleaved_v2", &[], true),
             ("bsgs.negation_v2", &[], true),
+            ("bsgs.negation_table_v2", &[], true),
             ("kangaroo.vow_v2", &[], true),
             ("claw.pair_table_v2", claw, false),
         ];
@@ -10809,6 +10933,56 @@ mod accounting_rules_tests {
             assert_eq!(a_total, a.total_gae, "{old}");
             assert_eq!(b.total_gae, a.total_gae + v.gae, "{new}");
         }
+    }
+
+    #[test]
+    fn cached_bsgs_v2_separates_reusable_setup_from_verified_online_query() {
+        let (inst, facts) = built(&CurveSpec::PrimeSearch {
+            bits: 18,
+            seed: 59297,
+        });
+        let rep = run(
+            &method("bsgs.negation_table_v2", &[("baby", "128")]),
+            &inst,
+            &facts,
+            100_003,
+            9,
+        );
+        assert_eq!(rep.recovered, Some(ExactScalar::from(100_003u64)));
+        let setup = rep.phases.iter().find(|p| p.name == "setup").unwrap();
+        let search = rep.phases.iter().find(|p| p.name == "search").unwrap();
+        let verification = rep
+            .phases
+            .iter()
+            .find(|p| p.name == "verification")
+            .unwrap();
+        assert_eq!(
+            setup.native["inserts_uncharged"],
+            rep.counters["inserts_uncharged"]
+        );
+        assert_eq!(
+            search.native["lookups_uncharged"],
+            rep.counters["lookups_uncharged"]
+        );
+        assert_eq!(setup.native["point_negations_uncharged"], 1);
+        assert_eq!(search.native["recovery_key_comparisons_uncharged"], 1);
+        assert_eq!(search.native["recovery_modr_muls_uncharged"], 1);
+        assert_eq!(search.native["recovery_modr_adds_uncharged"], 1);
+        assert_eq!(verification.scalar_mults, 1);
+        assert_phases_sum("bsgs.negation_table_v2", &rep);
+
+        let online = rep.online.expect("cached query has an online window");
+        assert!(online.wall_ns > 0 && online.wall_ns < rep.solve_wall_ns);
+        assert!(online.start_event.contains("after the G-only negation baby table"));
+        assert_eq!(
+            online.phases_ns.values().sum::<u64>(),
+            online.wall_ns,
+            "exclusive online phases sum to the online interval"
+        );
+        assert_eq!(
+            rep.detail["cache_contract"]["cold_total_charges_setup_once"],
+            json!(true)
+        );
     }
 
     /// A kangaroo restart is neither set-up nor a jump: v2 charges it to
@@ -11087,6 +11261,88 @@ mod accounting_rules_tests {
             assert!(s.distinct_jumps >= last.distinct_jumps, "{bits}");
             last = s;
         }
+    }
+
+    /// `rho.signed_frobenius_v5` tallies its per-step jump-index selection
+    /// as `partition_hashes_uncharged` (owner decision 2026-11-19): the
+    /// report is the pre-tally report (the same walk, recovered scalar,
+    /// phases, group operations, GAE and every other counter) plus that one
+    /// counter, which equals the walk steps (strong's definition: one
+    /// partition hash per step) and is listed as unpriced, so the band
+    /// prices it at `w` per step.
+    #[test]
+    fn v5_jump_index_tally_adds_one_counter_equal_to_steps_and_changes_nothing_else() {
+        let m = method("rho.signed_frobenius_v5", &[]);
+        let cap = param_u64(&m, "cap_multiple").unwrap() as f64;
+        for (a, n) in [(0u8, 13u32), (1, 17), (0, 23), (1, 29)] {
+            let (inst, facts) = built(&CurveSpec::Koblitz { a, n });
+            let Instance::Binary(bi) = &inst else {
+                unreachable!()
+            };
+            for i in 0..6u64 {
+                let k = (1_009 + 7_919 * i) % bi.r;
+                let tgt = bi.fast.mul_u64(bi.generator, k);
+                let hex = [format!("0x{:x}", tgt.x), format!("0x{:x}", tgt.y)];
+                let seed = 40 + i;
+                let tallied = solve(&m, &inst, &facts, &hex, seed).unwrap();
+                let res = signed_frobenius_rho_v3(
+                    bi,
+                    FastPoint::affine(tgt.x, tgt.y),
+                    seed,
+                    rho_cap(bi.r, cap),
+                    RhoV3::v6(true),
+                )
+                .unwrap();
+                let steps = res.steps;
+                assert_eq!(res.jump_index_selections, steps, "a={a} n={n} i={i}");
+                let before = rho_report_v2(res, 0, None, GroupOps::default());
+                assert_eq!(tallied.recovered, before.recovered);
+                assert_eq!(tallied.recovered, Some(ExactScalar::from(k)));
+                assert_eq!(tallied.exhausted, before.exhausted);
+                assert_eq!(tallied.total_gae.to_bits(), before.total_gae.to_bits());
+                assert_eq!(tallied.phases.len(), before.phases.len());
+                for (p, q) in tallied.phases.iter().zip(&before.phases) {
+                    assert_eq!(
+                        (&p.name, p.adds, p.doubles, p.scalar_mults, p.gae.to_bits()),
+                        (&q.name, q.adds, q.doubles, q.scalar_mults, q.gae.to_bits())
+                    );
+                    assert_eq!(p.native, q.native);
+                    assert_eq!(p.work_native, q.work_native);
+                }
+                assert_eq!(tallied.field_ops, before.field_ops);
+                assert_eq!(tallied.automorphisms_used, before.automorphisms_used);
+                let mut extra = tallied.counters.clone();
+                assert_eq!(extra.remove(V5_JUMP_INDEX_COUNTER), Some(steps));
+                assert_eq!(extra, before.counters, "a={a} n={n} i={i}");
+                assert_eq!(tallied.counters["steps"], steps);
+                assert!(steps > 0);
+                let mut unpriced = tallied.unpriced.clone();
+                assert!(unpriced.contains(&V5_JUMP_INDEX_COUNTER.to_string()));
+                unpriced.retain(|u| u != V5_JUMP_INDEX_COUNTER);
+                assert_eq!(unpriced, before.unpriced);
+                assert!(v5_pre_tally_record(
+                    "rho.signed_frobenius_v5",
+                    &before.counters
+                ));
+                assert!(!v5_pre_tally_record(
+                    "rho.signed_frobenius_v5",
+                    &tallied.counters
+                ));
+            }
+        }
+        // Strong's definition, for the record: one partition hash per step.
+        let (inst, facts) = built(&CurveSpec::Koblitz { a: 1, n: 17 });
+        let s = run(
+            &method("rho.signed_frobenius_strong", &[]),
+            &inst,
+            &facts,
+            4_321,
+            3,
+        );
+        assert_eq!(
+            s.counters["partition_hashes_uncharged"],
+            s.counters["walk_steps"]
+        );
     }
 
     /// The v2 strong reference's fixed set-up against the frozen one at the
@@ -11457,6 +11713,7 @@ mod accounting_rules_tests {
             ("bsgs.textbook_v2", &[], &prime),
             ("bsgs.interleaved_v2", &[], &prime),
             ("bsgs.negation_v2", &[], &prime),
+            ("bsgs.negation_table_v2", &[], &prime),
             ("kangaroo.vow_v2", &[], &prime),
             ("claw.pair_table_v2", claw, &koblitz),
         ];
