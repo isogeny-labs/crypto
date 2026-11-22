@@ -1414,15 +1414,29 @@ impl RadicalRootCtx {
         // zeroes first (including coefficients congruent to 0 mod p) so
         // arbitrarily padded input remains accepted without a heap Vec.
         let mut n = f.len();
-        while n > 0 && f[n - 1] % fp.p == 0 {
+        // Cache the normalized leading coefficient. Previously it was
+        // reduced once to locate the degree and a second time in the
+        // coefficient loop. Canonical residues need neither division.
+        let mut leading = 0u64;
+        while n > 0 {
+            let x = f[n - 1];
+            let reduced = if x < fp.p { x } else { x % fp.p };
+            if reduced != 0 {
+                leading = reduced;
+                break;
+            }
             n -= 1;
         }
         if n > 5 {
             return Err("radical root finder supports degree <= 4".into());
         }
         let mut c = [0u64; 5];
-        for j in 0..n {
-            c[j] = f[j] % fp.p;
+        for j in 0..n.saturating_sub(1) {
+            let x = f[j];
+            c[j] = if x < fp.p { x } else { x % fp.p };
+        }
+        if n != 0 {
+            c[n - 1] = leading;
         }
         let ok = |roots: Vec<u64>| {
             Ok(RadicalRoots {
