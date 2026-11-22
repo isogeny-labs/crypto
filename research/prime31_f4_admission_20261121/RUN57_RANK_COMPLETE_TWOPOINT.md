@@ -17,7 +17,7 @@ Let `L_i=log_G(P_i)`. Every successful *known-scalar* random relation query with
 
 We therefore sampled random **successful signed pairs**, independently and uniformly over the fixed unsigned point indices and `±` signs (rejecting opposite-sign self-pairs giving identity). This models an *idealized uniformly random positive relation* conditional on a hit; it is not an actual algebraic oracle. Each trial incrementally builds the exact rank of coefficient rows over `F_n` via signed disjoint sets (with anchored odd-sign cycles and double-point rows), projects the frozen independent homogeneous rows to remaining component variables, and tests their rank by modular Gaussian elimination. The stopping rule is **full rank**, not merely number of hits.
 
-For each base: 256 deterministic independent SplitMix-like Python `random.Random` seeds `0x13579bdf + 7919*t`, fixed source basis from the archived run56, 8,000 positive-hit cap (all trials completed), binary search over frozen pairs; exact modular arithmetic, no floating-point rank tests. An independently coded *dense* Gauss–Jordan validator agreed with the signed-DSU plus projected-rank implementation on **500 random small-field-dimension test cases**. Full independent original-EC replay for all free relations is inherited from run56; this model *does not* replay individual target DLPs.
+For each base: 256 deterministic Python Mersenne-Twister `random.Random` seeds `0x13579bdf + 7919*t`, fixed source basis from the archived run56, 8,000 positive-hit cap (all trials completed), binary search over frozen pairs; exact modular arithmetic, no floating-point rank tests. An independently coded *dense* Gauss–Jordan validator agreed with the signed-DSU plus projected-rank implementation on **500 random small-field-dimension test cases**. Full independent original-EC replay for all free relations is inherited from run56; this model *does not* replay individual target DLPs.
 
 | Conditional rank-completion metric | Dickson 509 | Hybrid 677 |
 |---|---:|---:|
@@ -40,8 +40,8 @@ A simple independent check of the coupon-collector effect: at 496 Dickson positi
 - `run57_basis.json`: canonical 13 Dickson and 88 hybrid independent free-row *span bases*, from frozen 78 and 190 nonidentity collision records + 56 cubic triples. Source of truth remains the run56 archive; the compact fixture is an exact span-preserving reduction, not a new arithmetic assertion. Its source hash is recorded.
 - `run57_rank_gate.py`: signed-DSU + exact modular projected-rank trial with nonidentity support probabilities, seeded positive samples and failure distinction.
 - `run57_validate.py`: independently authored dense full-matrix rank comparison (500 trials).
-- `RUN57_SIMULATION_RESULTS.json`: all 512 trial stopping times and per-arm summaries; locally regenerated, [pcc:unverified].
-- Source-linked original-Rust `prime31_algebraic_ic` rank-completion example is a next reproducibility gate; no Rust CI success should be asserted without a green source-specific Actions run.
+- `RUN57_RESULTS.json`: committed exact per-arm summary and seed/provenance; `run57_rank_gate.py` regenerates `run57_compact_results.json` with all 512 stopping times. Local full results SHA256 `1aabb3b531009d0c6a90f2b2142a142f302dc91c0a7af7b89d18e99bfced3889`. [pcc:unverified].
+- Source-linked existing-Rust `research/prime31_ic_20261115/native/examples/prime31_rank_completion_gate.rs` is committed and now has its own source-triggered cached CI step; it draws a separate 128-trial SplitMix64 cohort. It reuses the original crate's `check_curve`/`Arithmetic`, not a replacement EC engine. The Rust cohort's native compilation and execution remain unverified until a green source-specific Actions run.
 
 ## Priority changes / falsifiable next tests
 
