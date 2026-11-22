@@ -1,0 +1,43 @@
+name: Prime31 symmetric Newton and S3 F4 original-Rust gate
+
+on:
+  push:
+    branches:
+      - research/symmetric-pair-quotient-prime31-20261122
+    paths:
+      - "examples/prime31_trace_skew_pair.rs"
+      - "examples/prime31_trace_moment.rs"
+      - "examples/prime31_trace_f4_pilot.rs"
+      - ".github/workflows/prime31-trace-symmetric-rust-gate.yml"
+  pull_request:
+    paths:
+      - "examples/prime31_trace_skew_pair.rs"
+      - "examples/prime31_trace_moment.rs"
+      - "examples/prime31_trace_f4_pilot.rs"
+      - ".github/workflows/prime31-trace-symmetric-rust-gate.yml"
+  workflow_dispatch:
+
+jobs:
+  original-rust-math:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.100.0
+      - uses: Swatinem/rust-cache@v2
+      - name: Exact symmetric pair tests (original crate)
+        run: cargo test --locked --release --example prime31_trace_skew_pair
+      - name: Exact m2/m3/m4 moment and Jacobian tests (original crate)
+        run: cargo test --locked --release --example prime31_trace_moment
+      - name: Source-bound pair and moment controls
+        run: |
+          cargo run --locked --release --example prime31_trace_skew_pair
+          cargo run --locked --release --example prime31_trace_moment
+      - name: Matched m2 F4 arms, planted genuine Prime31 S3
+        run: cargo run --locked --release --example prime31_trace_f4_pilot
+      - name: Quadratic Newton circuit versus matched F4 arms
+        run: cargo run --locked --release --example prime31_trace_f4_pilot -- --circuit
+      - name: Four-coordinate membership-only F4 controls (not S5 solver)
+        run: cargo run --locked --release --example prime31_trace_f4_pilot -- --m4
+      - name: Six-variable genuine four-point chained S3 F4 controls
+        run: cargo run --locked --release --example prime31_trace_f4_pilot -- --m4-s3
