@@ -1,3 +1,35 @@
+# Resume: crypto @ claude/hyperelliptic-index-calculus-td1fdn (genus-4 follow-up, PR #4693)
+
+## Goal
+Narrow arm x's p = 16411 interval against window-free plain rho (54 targets), test a smaller
+factor base (cc tuned on p = 8209), and get a validator replay for the leaderboard.
+
+## Lead / hypothesis
+Linear algebra is ~75% of arm x's native work; a smaller factor base should lower it. The 9-target
+rho mean was ~14% above sqrt(pi r/2), so the 0.876 point estimate is expected to regress up.
+
+## Spec
+research/genus4_followup_20261118/PROTOCOL.md (frozen at ae36cdc6e4, frozen.sha256, binary.sha256).
+Binary: cargo build --release --bin genus_ladder at ae36cdc6e4, copied to scratchpad bin/genus_ladder.fu.
+
+## State
+Frozen; launching run.sh (part A cc sweep at p = 8209, part B IC arms + 90 Q rho runs at p = 16411).
+
+## Next steps
+1. If killed: counts are deterministic; rerun missing keys into *_resume.jsonl (analyze reads b_q.jsonl*
+   only, so name resume files b_q.jsonl.r1 etc. is NOT read: use b_q_r1.jsonl and extend uniq pattern
+   with a logged deviation).
+2. analyze.py, RESULTS.md, benchmarks/20261118-genus4-followup, benchrec close, validator agent replay.
+
+## Runs in flight
+run.sh (local, 4 threads), started 2026-11-18.
+
+## Stop and success conditions
+Stop on any uncertified run or G2/G3 failure (report as new instrument). Success: protocol readings
+reported with predictions scored; leaderboard only after VALIDATION.json.
+
+---
+
 # Resume: crypto @ codex/ghs-rho-opt-20261118
 
 ## Goal
@@ -88304,3 +88336,12 @@ all owned through48deleted. GoalACTIVE, primarycomplete/fresh/signed parity unad
 2026-11-17 Codex deferred50integration: core98fe3e3bpublished; new separate producer/worker/complete qualifier with explicit activation_source,45/158controls/strictClippy and eight-arm transport pass. Independent flat-index replay matches108058recorded49sources/865full witnesses. Amendment45/deferred-pair-plan/RESUME_DEFERRED50.md register originalIC/table/grounded-screened/deferred-screened +4rho portfolio, worker360/wrapper3200/qualifier1800/lifetime7200/remaining6400. Protocol PDF/figures inspected. No50pod/call; publish/freeze source/native/metadata first. All owned through49deleted, goal active, claims187567/1bb597/3a7141UNVERIFIED. [pcc:unverified]
 
 2026-11-17 Codex Run50: eight matched Rust IC/rho workers recover expected scalar, original complete qualifier0; podqp4dpp4peu66x9deleted10:49:49Z DELETE204/GET404. Deferred5913875255822observed bitops/24.727sinner/27.829sprocess,5.165%lower than grounded-screened; fastest registered rho plain-b16/36.902sinner/36.908sprocess. N1exposed/incomplete/unsigned, no primary parity. All original/custody/native report data under runpod-deferred-pair-20261117-50; detailed RESUME_RUN50.md/NEXT.md. Descent3415residuals/3426280619436dominates; primary Nagao/class-domain review before cheaper/partial descent; strengthen complete/fresh/scaling/strongest-reference admission. Format-only export successor after cleanup distinguished by separate manifest. Claims7defbb/6224b9/853115/0ecee3UNVERIFIED. Goal active, no owned paid runner. [pcc:unverified]
+
+# Resume: round-2 IC leads (STACK + FEWCOL on Table B), 2026-11-18
+
+- Branch `aburan28/inspiring-dijkstra-ay05qi`, draft PR #4738. Protocol frozen in b0c61aee53: `research/ic_tableb_fewcol_20261118/PROTOCOL.md`.
+- Leads: `docs/leads/2026-11-18/ic-leads-round2/PROPOSALS.md`. L2-HRATE is closed (`HRATE.md`).
+- To run: `cargo build --release --bin ecbench`, then `python3 tools/benchrec.py run <record> -- research/ic_tableb_fewcol_20261118/run.sh`. The runner writes sessions, audits, compares and bands under that directory.
+- Afterwards: summary, graph, PDF and README; close the bench record; session log; tick ACTIVE; mark the PR ready.
+- Next leads if these hold: L2-INNER (insert depth-<5 sums, about 40 lines of Rust), L2-FREE (`free=1`), L2-WSIB.
+- Blocker carried over: main's malformed record `benchmarks/records/20261117T0334Z-hec-multi-production-cold.json` prevents `benchrec close` from rebuilding progress reports.

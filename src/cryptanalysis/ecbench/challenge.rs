@@ -221,6 +221,7 @@ pub fn spec_for(ch: &Challenge, candidate: &MethodSpec, epoch: u64) -> Spec {
             ch.challenge_id,
             serde_json::to_string(&ch.acceptance).unwrap_or_default()
         ),
+        field_profile: None,
         workloads: WorkloadPlan {
             curves: w.curves.clone(),
             targets_per_curve: w.targets_per_curve,

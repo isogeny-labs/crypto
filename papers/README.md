@@ -3,6 +3,11 @@
 Every manuscript generated from this repository's results lives here, one
 directory per paper.
 
+**Triage, 2026-11-22** (action plan R4): [`TRIAGE-20261122.md`](TRIAGE-20261122.md)
+proposes submit / revise / archive for every draft below, with at most three
+to submit within six months. The decisions are proposed; the Principal
+Cryptographer decides.
+
 | directory | title | status |
 |---|---|---|
 | [nist-exact-pair-audit-20261030/](nist-exact-pair-audit-20261030/) | Exact Label-Allocation Audit of Frobenius Splitting Scores | anonymous verified addendum; exact tail 5869345/20037600; no newly sampled curve; public generator base-change interpretation; historical cause and weakness remain open; not submitted |
@@ -22,7 +27,6 @@ directory per paper.
 | [`isogeny-class-rho/`](isogeny-class-rho/) | The Elliptic-Curve Discrete Logarithm Does Not Know Which Curve It Is On: Pollard Rho Across Whole Isogeny Classes of Prime, Binary and Koblitz Curves | research draft, anonymized, not submitted, not cleared; null result with passing positive controls (rho against rho, 77,900 verified solves on four classes), no speedup claim; target IACR ePrint, authors owed (README) |
 | [`ecdlp-ic-improvement-ledger/`](ecdlp-ic-improvement-ledger/) | Ratcheting Elliptic-Curve Index Calculus Toward Pollard Rho: A Ledger of Verified Improvements, the Distance That Remains, and the Claims That Did Not Survive (July–October 2026) | research draft, anonymized, not submitted; synthesis of committed evidence through 2026-10-23, no new measurement; every improvement against its own incumbent with its distance to matched rho; 0 of 28 IC leaderboard rows validated at writing |
 | [`ecdlp-index-calculus-treatise/`](ecdlp-index-calculus-treatise/) | Index Calculus for the Elliptic-Curve Discrete Logarithm: Theory, Algorithms, and a Measured Frontier | research draft, anonymized, not submitted; 87-page synthesis through 2026-10-29 (theory: summation cover, fall degrees with certified bounds, obstructions; algorithms; frontier; open problems); the submittable core is its fall-degree chapter |
-
 | [`ecdlp-boundaries-20261018/`](ecdlp-boundaries-20261018/) | Scoped Boundaries for Elliptic-Curve Index Calculus: Counterexamples, Conservation, and Oracle Models | source-bound research draft, anonymized, not independently reviewed, not submitted or published; six-result scope audit and two-target Lean inventory, no new trials |
 
 Markdown drafts that are not yet typeset stay with their notes and are listed
