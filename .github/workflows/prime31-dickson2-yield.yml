@@ -6,12 +6,16 @@ on:
     paths:
       - 'research/prime31_ic_20261115/native/examples/prime31_dickson2_yield_census.rs'
       - 'research/prime31_ic_20261115/native/examples/prime31_dickson2_collision_rank.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rank_completion_gate.rs'
+      - 'research/prime31_f4_admission_20261121/run57_basis.json'
       - 'research/prime31_f4_admission_20261121/RUN55_DICKSON2_YIELD_PROTOCOL.md'
       - '.github/workflows/prime31-dickson2-yield.yml'
   pull_request:
     paths:
       - 'research/prime31_ic_20261115/native/examples/prime31_dickson2_yield_census.rs'
       - 'research/prime31_ic_20261115/native/examples/prime31_dickson2_collision_rank.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rank_completion_gate.rs'
+      - 'research/prime31_f4_admission_20261121/run57_basis.json'
       - '.github/workflows/prime31-dickson2-yield.yml'
   workflow_dispatch:
 jobs:
@@ -28,10 +32,14 @@ jobs:
       - name: Compile existing Prime31 native Rust (not monolithic root crate)
         timeout-minutes: 14
         working-directory: research/prime31_ic_20261115/native
-        run: cargo build --release --example prime31_dickson2_yield_census --example prime31_dickson2_collision_rank
+        run: cargo build --release --example prime31_dickson2_yield_census --example prime31_dickson2_collision_rank --example prime31_rank_completion_gate
       - name: Verify full depth-10 signed two-summand support census
         timeout-minutes: 2
         working-directory: research/prime31_ic_20261115/native
         run: |
           timeout 90s target/release/examples/prime31_dickson2_yield_census
           timeout 90s target/release/examples/prime31_dickson2_collision_rank
+      - name: Independent signed-rank saturation gate (idealized public relations)
+        timeout-minutes: 3
+        working-directory: research/prime31_ic_20261115/native
+        run: timeout 150s target/release/examples/prime31_rank_completion_gate
