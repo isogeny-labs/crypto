@@ -354,9 +354,11 @@ impl Engine<'_> {
         Ok(acc)
     }
     fn mul(&mut self, a: &[u64], b: &[u64]) -> Work<Vec<u64>> {
-        // Keep this short dispatch away from the wide generic convolution.
-        // The no-inline helper keeps the hot producer loop's code size stable.
-        if a.len() <= 2 || b.len() <= 2 {
+        // The source-exact root benchmarks found a 2-3% gain on 65,521
+        // but repeatable larger-prime full-solver regressions. Restrict this
+        // small-field identity specialization to its measured benefit region;
+        // keep the original general producer convolution for larger fields.
+        if self.report.p <= 65_521 && (a.len() <= 2 || b.len() <= 2) {
             if let Some(result) = self.mul_shortcut(a, b)? {
                 return Ok(result);
             }
