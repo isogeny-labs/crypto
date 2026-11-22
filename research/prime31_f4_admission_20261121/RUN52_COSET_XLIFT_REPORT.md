@@ -27,6 +27,9 @@ Local independent Python bigint-field arithmetic checked the archived run50 sour
 
 Frozen inputs from the user-provided run50 archive, not yet present on the PR: `records/eight_leaves.tsv` SHA256 `127fe818a2712ad942af86db78bfba8e87cc5bbac432c9d00c790f84ef1b0472`; `experiments/prime31_run50/records/adaptive4096.csv` SHA256 `07dfd381c1d069f4610e907ca3e7f9922ebb599ed473a18dca8e010652bb6e6a`. The independent verifier and exact JSON result are available in the run52 archive outside the repo. This is arithmetic/certificate verification **not unknown-index F4 extraction**.
 
+
+Independent algorithmic **public-only** reference: a deterministic-seeded Cantor–Zassenhaus polynomial-splitting implementation, provided only each 21-degree `f(X)^7-c²` and no secret indices or base-point x coordinates, recovered **all 168 Prime31 roots** across eight cosets. Local Python reference timings were **21.60–28.51 ms per coset**, **204.55 ms total**, median **26.10 ms**. Recovered x sets were compared to the archived 168 x values only *after* factoring. These are Python-level factoring times on the present container, **not Rust F4 times, not multi-leaf unknown-target extraction, and not a comparison to a same-host ECDLP baseline**.
+
 ## New native Rust test (pending build and CI)
 
 `examples/prime31_coset_xlift_f4.rs` uses **the existing** `crypto_lib::cryptanalysis::f4_fp::{solve, F4Options, Verdict}` on eight public univariate polynomials, p=2³¹−1, an explicit 10-second deadline per instance, a degree-24 bound, and no group-sum/BSGS/witness-index inputs. The only archived point data are eight anchor points used as post-solve checks. The candidate recovers 21 roots per coset, validates each unique y lift, cross-checks the exact polynomial coefficients, and reports F4 field multiplications, wall time, 168-root coverage. The PR workflow now runs it after the existing field-width smoke gate.
