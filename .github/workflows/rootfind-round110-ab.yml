@@ -24,7 +24,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 50
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round110_ab.py
+          sparse-checkout-cone-mode: false
+      - name: Ensure frozen baseline commit is available
+        env:
+          ROOTFIND_BASELINE_REF: 7d001ce370be2271222b3c7390b2c482878e2f82
+        run: |
+          git cat-file -e "${ROOTFIND_BASELINE_REF}^{commit}" ||
+            git fetch --no-tags --depth=1 origin "$ROOTFIND_BASELINE_REF"
       - uses: dtolnay/rust-toolchain@stable
       - name: Compare frozen Round109 with Round110
         env:
