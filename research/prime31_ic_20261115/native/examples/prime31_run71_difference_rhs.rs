@@ -246,6 +246,10 @@ mod control {
         let mut base_stop: Option<(u64, u64, usize)> = None;
         let mut diff_logs = Vec::new();
         let mut base_logs = Vec::new();
+        // Early, fully charged *difference-only* path: no baseline RREF or
+        // BSGS is allowed before this timestamp.
+        let mut cold_diff_ms = None::<f64>;
+        let mut cold_relation_ms = None::<f64>;
         for shift in 1..=MAX_SHIFTS {
             point = ar.add(PRIME31, point, Some(PRIME31.g));
             if let Some(&(i, j)) = tab.get(&point) {
@@ -264,11 +268,16 @@ mod control {
                             }
                         }
                         diff_logs = logs;
+                        cold_relation_ms = Some(walk_start.elapsed().as_secs_f64() * 1e3);
+                        cold_diff_ms = Some(total.elapsed().as_secs_f64() * 1e3);
                         diff_stop = Some((shift, hits, independent, free_rank, aug_rank));
                         println!("RUN71_DIFFERENCE_STOP shifts={shift} hits={hits} independent={independent} free_rank={free_rank} augmented_rank={aug_rank} verified={}", diff_logs.len());
                     }
                 }
-                if base_stop.is_none() {
+                // Deliberately delay every readout-only baseline RREF until
+                // the difference solver is complete. This makes its captured
+                // early-stop cost a true cold difference-only execution path.
+                if diff_stop.is_some() && base_stop.is_none() {
                     let values = target_values(&mut ds, &free, &ws)?;
                     if let Some(logs) = solved(&values) {
                         for (index, (&x, &q)) in logs.iter().zip(&qs).enumerate() {
@@ -294,11 +303,14 @@ mod control {
             return Err("Run71 monotonicity or secret-only post-solve check failed".into());
         }
         let walk_ms = walk_start.elapsed().as_secs_f64() * 1e3;
+        let cold_diff_ms = cold_diff_ms.ok_or("missing cold difference timestamp")?;
+        let cold_relation_ms = cold_relation_ms.ok_or("missing cold relation timestamp")?;
         let mut reference = Arithmetic::default();
         let (bs, bs_setup, bs_online) = bsgs(&mut reference, &qs)?;
         if bs != diff_logs || bs != base_logs { return Err("Run71 independent BSGS mismatch".into()); }
         println!("RUN71_COMPLETE diff_shifts={ds_shift} baseline_shifts={base_shift} diff_hits={ds_hits} baseline_hits={base_hits} diff_independent_pair_rows={ds_rank} baseline_independent_pair_rows={base_rank} initial_free_rank={initial_free_rank} initial_augmented_rank={initial_aug_rank} final_free_rank={free_rank} final_augmented_rank={aug_rank} witnessed_leaf_probes={leaf_probes} verified_difference_rows={difference_proofs} generic_keys={} setup_ms={setup_ms:.3} witness_ms={witness_ms:.3} joint_relation_ms={walk_ms:.3} joint_total_ms={:.3} CLASS=GENERIC_NEGATIVE_CONTROL",
             tab.len(), total.elapsed().as_secs_f64() * 1e3);
+        println!("RUN71_COLD_DIFFERENCE setup_ms={setup_ms:.3} witness_ms={witness_ms:.3} cold_relation_ms={cold_relation_ms:.3} cold_total_ms={cold_diff_ms:.3} excludes_baseline_rref=true excludes_reference_bsgs=true verified=32 CLASS=GENERIC_NEGATIVE_CONTROL");
         println!("RUN71_BSGS setup_ms={bs_setup:.3} online_32_ms={bs_online:.3}");
         println!("RUN71 PASS authentic target-difference RHS; 32/32 complete logs; still GENERIC");
         Ok(())
