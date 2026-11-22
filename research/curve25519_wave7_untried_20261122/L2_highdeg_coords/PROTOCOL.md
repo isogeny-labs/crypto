@@ -38,6 +38,32 @@ Consequences for blindness:
   verdict reports with and without that cell; at K = 2000 the cell is re-drawn anyway,
   with a different seed.
 
+**The smoke test ran after this file was frozen** (`smoke/`, k = 16 only, tiny K and target
+counts, "smoke, not data"). It exposed some k = 16 values, listed in `smoke/SMOKE.md`. Some of
+them contradict frozen predictions:
+
+- P4 total degree: xe 12, q 21 and xeye 12, above the stated bounds of 8, 18 and 8.
+- P5a: e = 6, not 8, for xeye at T = 4.
+
+**The predictions were not edited.** A failed prediction stays failed, and the full run will
+decide them on k = 16, 18 and 20.
+
+Instrument fixes made after the freeze, before any data (none touches a prediction or a
+threshold):
+
+1. `sumpoly.py`: an int64 overflow in the explicit S₃ used by PC3. It is now reduced mod p at
+   every step. PC3 failed in the smoke before this fix and passed after it.
+2. `analyse.py`:
+   - verdicts over empty lists no longer pass vacuously;
+   - numpy booleans are cast to bool;
+   - the Macaulay records are read from per-curve files.
+3. `run_all.sh`: `macaulay.py` runs once per curve, `data/macaulay_k{k}.json`, to keep every
+   file under 1 MB.
+4. `macaulay.py`, root mode. Every covered target has at least 2 Boolean roots, (a, b) and
+   (b, a), so "unique root" never occurs. D_root is now the first D at which V_D contains all
+   n + 1 − rank{(1, z) : z ∈ Z} independent degree ≤ 1 polynomials vanishing on Z, for
+   |Z| ≤ 8.
+
 ## 1. Question
 
 Do the rational functions that the coordinate systems give help index calculus?
@@ -173,7 +199,7 @@ python3 scripts/analyse.py --data data --out analysis
     Boolean roots, true (re-added) decompositions, and agreement with the census;
   - **M1**, plain Macaulay: the exact refutation multiplier degree, deg(1/Ŝ);
   - **M2**, the degree-D Macaulay closure with degree falls (MutantXL rule; V_n is the full
-    ideal): D_ref for refutable targets, D_root for unique-root targets, and per D the
+    ideal): D_ref for refutable targets, D_root for targets with 1–8 Boolean roots (§0, fix 4), and per D the
     active columns, rank and counted mul-adds.
 
   Cells: k ∈ {16, 18, 20}; f ∈ {x, ye, xe, v, q, xeye, jac6, uv}; T ∈ {4, 5, 6}. M2 runs
@@ -200,8 +226,10 @@ python3 scripts/analyse.py --data data --out analysis
 | k | p | A | #E | r | twist order |
 |--:|--:|--:|--:|--:|--:|
 | 16 | 65437 | 1058 | 65672 = 8 · 8209 | 8209 | 65204 = 4 · 16301 |
-| 18 | 262133 | 78 | 263096 = 8 · 32887 | 32887 | 4r′ |
-| 20 | 1048573 | 926 | 1049624 = 8 · 131203 | 131203 | 4r′ |
+| 18 | 262133 | 78 | 263096 = 8 · 32887 | 32887 | 261172 = 4 · 65293 |
+| 20 | 1048573 | 926 | 1049624 = 8 · 131203 | 131203 | 1047524 = 4 · 261881 |
+
+A + 2 is a square at k = 16 and a non-square at k = 18 and 20 (`smoke/curve_facts.json`).
 
 The checks: p prime, p ≡ 5 (mod 8), A² − 4 a non-square, the exact count by Euler's
 criterion over every u, r prime, twist order 4 × prime, and a generator of order exactly 8r.
@@ -313,8 +341,20 @@ criterion over every u, r prime, twist order 4 × prime, and a generator of orde
 
 ## 9. Runtime and memory estimate
 
-See `smoke/SMOKE.md`, which is written after the smoke test. The budget is ≤ 3 h CPU on one
-core and ≤ 4 GB.
+Measured on the smoke test (one core, BLAS pinned to one thread) and extrapolated. The
+details are in `smoke/SMOKE.md`.
+
+| step | estimate | basis |
+|:--|--:|:--|
+| sumpoly | ≈ 12 min | dominated by the uv (D = 25, about 1,640 orbits) and jac6 (D = 18, 1,330 orbits) kernels; a synthetic 1400 × 1330 RREF mod p takes 18 s |
+| census | ≈ 16 min | 240k frames at 2–5 ms each |
+| macaulay | ≈ 50 min | M2 at n = 10 takes about 15 s per target for dense f and 4–5 s for x, ye, xe and xeye; ≈ 1000 s per curve |
+| engine calibration | ≈ 2 min | |
+| **total** | **≈ 80 min** | |
+
+Peak memory is about 0.2 GB (macaulay maxrss 199 MB in the smoke). Disk is about 8 MB, with
+every file under 1 MB. That fits the 3 h, 4 GB budget with a 2× margin. Each macaulay
+invocation has a 2 h self-stop (`--budget`).
 
 ## 10. Sources checked (repository files read)
 
