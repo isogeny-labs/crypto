@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "title": "Index-calculus boundary ledger",
-  "updated": "2026-11-18",
+  "updated": "2026-11-22",
   "claim_hygiene": "Public synthetic / known-answer fixtures only. Primary vs_rho claims use exactly one unseen target paired on the identical public point and resource envelope. Headline time is verified online wall after reusable IC preparation; exclude process launch, input loading, target generation, and target-independent setup. Multi-target averages, batch throughput, and shared-table amortization are secondary only and require a separate declared question after the primary one-target result. Never combine best component costs from different runs into a synthetic win. A new CPU wall-time speedup requires a qualifying host-isolation receipt; rows without one remain exploratory. Raw IC probes and rho walk steps use different units. An equal-budget precomputed-rho or multi-target study is secondary and cannot replace the one-target rho pair.",
   "ffd_vs_rank_la": "FFD / degree_of_regularity apply to Boolean Macaulay / Gr\u00f6bner algebra of Semaev (decomposition). Relation-matrix LA over F_r is stage rank; never conflate the two.",
   "stages": [
@@ -2157,7 +2157,7 @@
         "module_doc_sub_bits": 40,
         "dense_3sum_nonscaling_wall_bits": 80,
         "a3_s4_3decomp_ladder_bits": 28,
-        "a3_s4_3decomp_mitm_ladder_bits": 32
+        "a3_s4_3decomp_mitm_ladder_bits": 36
       },
       "records": {
         "factor_base": {
@@ -2704,17 +2704,130 @@
                   1314.0
                 ],
                 "commit": "6613095171",
-                "claim_boundary": "single unoptimised rho walk per seed; no vs_rho claim"
+                "claim_boundary": "single unoptimised rho walk per seed; no vs_rho claim",
+                "rho_arm_correction": {
+                  "arm": "cryptanalysis `ca solve --alg rho`, single thread, identical targets",
+                  "seeds": [
+                    20261121,
+                    20261122,
+                    20261123,
+                    20261124
+                  ],
+                  "ic_ms": [
+                    2472.4,
+                    2389.4,
+                    2780.8,
+                    3067.9
+                  ],
+                  "tuned_rho_ms": [
+                    12.49,
+                    5.51,
+                    3.7,
+                    1.86
+                  ],
+                  "tuned_rho_ops": [
+                    86364,
+                    76974,
+                    57713,
+                    47908
+                  ],
+                  "ic_over_tuned_rho": [
+                    197.9,
+                    433.6,
+                    752.0,
+                    1645.9
+                  ],
+                  "all_scalars_agree": true,
+                  "withdrawn": "the ic_over_rho 0.19-1.16 figure above compares IC with the ladder's unoptimised single walk; against the tuned arm the gap is 295x-1285x"
+                }
+              },
+              "mitm_36bit_rung": {
+                "curve": "a3-bench-36bit-p256class",
+                "p": 68719476731,
+                "a": 68719476728,
+                "b": 33,
+                "n": 68719022539,
+                "generator": [
+                  19,
+                  72892532
+                ],
+                "nG_is_infinity": true,
+                "B": 2048,
+                "B_policy": "measured probe over {1600,2048,2560,3072} at seed 20261121; the (2p)^(1/3) heuristic would say ~5158 and is 2x worse here because the pair-table build dominates",
+                "seeds": [
+                  20261121,
+                  20261122,
+                  20261123,
+                  20261124
+                ],
+                "ic_wall_ms": [
+                  50230.5,
+                  72325.1,
+                  54044.8,
+                  48938.4
+                ],
+                "pair_table_ms": [
+                  19082.2,
+                  24251.7,
+                  19980.7,
+                  15584.5
+                ],
+                "relations_ms": [
+                  29457.7,
+                  46194.2,
+                  32692.6,
+                  31476.5
+                ],
+                "linear_algebra_ms": [
+                  1686.8,
+                  1875.9,
+                  1365.7,
+                  1868.0
+                ],
+                "trials_total": [
+                  13211,
+                  13243,
+                  13435,
+                  13279
+                ],
+                "all_ic_match_truth": true,
+                "rho_arm": "cryptanalysis `ca solve --alg rho` (negation map, distinguished points), single thread, on the identical public target",
+                "rho_wall_ms": [
+                  22.69,
+                  19.55,
+                  22.93,
+                  15.99
+                ],
+                "rho_ops": [
+                  419269,
+                  217018,
+                  353344,
+                  193877
+                ],
+                "rho_ops_over_sqrt_n": [
+                  1.599,
+                  0.828,
+                  1.348,
+                  0.74
+                ],
+                "rho_agrees": true,
+                "ic_over_tuned_rho": [
+                  2213.7,
+                  3699.1,
+                  2357.1,
+                  3059.8
+                ],
+                "ladder_builtin_rho_note": "the ladder's own rho_ms field is a single unoptimised walk and exhausted its 5M-step budget on every 36-bit seed; it is a fixture sanity check, not a baseline",
+                "claim_boundary": "single host, shared load; known-answer synthetic fixture only; no vs_rho claim, no deployed-curve claim, no asymptotic claim"
               }
             },
-            "verdict": "A3_S4_3DECOMP_28BIT_S3_ANCHORED_SWEEP",
+            "verdict": "A3_S4_3DECOMP_36BIT_MITM",
             "next_target": {
-              "summary": "Cut the u64 table-build cost (batch inversion / cheaper pair generation) and run a paired 2-decomposition ladder under its own tuned B. The 32-bit rung and the u64 probe path have landed (commit 6613095171); the next comparison must use a tuned, negation-folded rho arm rather than a single unoptimised walk.",
+              "summary": "Cut the pair-table build, which is now the dominant stage (B^2/2 pair sums, each a full modular inversion through Point::add at ec_index_calculus.rs:1371; the 'u64 fast path' only converts the key). Batch the inversions (Montgomery's trick) over each pair row before any larger rung.",
               "acceptance_gates": [
-                "relations group-verified and rho agreement control on the identical public point",
-                "table, relation and LA timers recorded separately per bitlength",
-                "ffd status explicit (inapplicable + reason for direct S3 solving)",
-                "no subexponential or vs_rho claim; MITM is still super-rho (p^(2/3) projection)"
+                "same relation set and same recovered scalar as the inversion-per-pair build",
+                "table stage timed separately and charged in the same process",
+                "36-bit four-seed row reproduced within 10%"
               ]
             },
             "evidence": [
@@ -2723,7 +2836,8 @@
               "research/prime_s4_mitm_20261118/summary.json",
               "src/cryptanalysis/ec_index_calculus.rs",
               "examples/prime_mitm_check.rs",
-              "examples/a3_s4_ladder.rs"
+              "examples/a3_s4_ladder.rs",
+              "research/prime_36bit_20261122/README.md"
             ]
           },
           "next_target": {
