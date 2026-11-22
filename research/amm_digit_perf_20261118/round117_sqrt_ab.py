@@ -67,6 +67,7 @@ pub fn ctx(p:u64)->RadicalRootCtx {RadicalRootCtx::new(p).unwrap()}
 pub fn disc(ctx:&RadicalRootCtx,a:u64)->Option<u64> {ctx.sqrt_discriminant(a)}
 pub fn sqrt(ctx:&RadicalRootCtx,a:u64)->Option<u64> {ctx.sqrt(a)}
 pub fn square(ctx:&RadicalRootCtx,a:u64)->u64 {ctx.f.sqr(a)}
+pub fn product(ctx:&RadicalRootCtx,a:u64,b:u64)->u64 {ctx.f.mul(a,b)}
 pub fn character(ctx:&RadicalRootCtx,a:u64)->bool {
  a==0 || ctx.f.powm(a,(ctx.f.p-1)/2)==1
 }
@@ -136,7 +137,7 @@ mod tests {
       "quadratic_known_roots" => {
        let sum=(a+x)%p;
        let negative_sum=if sum==0 {0} else {p-sum};
-       vec![baseline::square(&b,a)%p,negative_sum,1]
+       vec![baseline::product(&b,a,x),negative_sum,1]
       },
       "cubic_uniform" => vec![a,x,y,1],
       _=>unreachable!(),
