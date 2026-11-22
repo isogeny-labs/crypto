@@ -127,12 +127,12 @@ def main():
         t = a.tstar; K = a.r2_frames; n = a.r2_n
         rng = random.Random(derived_seed('real', 'r2', t))
         counts = np.zeros((K, 2, 5), dtype=np.int64)   # two independent halves (A, B) for cross-validation
-        trials = np.zeros(K, dtype=np.int64); bad = 0; ops0 = lab.ops; ts = time.time()
+        trials = np.zeros((K, 2), dtype=np.int64); bad = 0; ops0 = lab.ops; ts = time.time()
         for f in range(K):
             L = rng.randrange(P); got = 0
             while got < n:
                 u = (L + rng.randrange(1 << t)) % P
-                trials[f] += 1
+                trials[f, got % 2] += 1           # a trial belongs to the half its success would join
                 if u == 0 or chi(u * u % P * u + A * u * u + u) != 1: continue
                 cl = lab.label(u); counts[f, got % 2, cl] += 1; got += 1
                 bad += int((1 if cl in (0, 2, 4) else -1) != chi(u))
