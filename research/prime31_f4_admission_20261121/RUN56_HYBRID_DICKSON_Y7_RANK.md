@@ -1,6 +1,6 @@
 # Prime31 run 56 — hybrid Dickson + y^7 factor-base rank and yield audit
 
-Date: 2026-11-21 PST (2026-11-22 UTC). **Independent local arithmetic/census only. Native Rust source-linked rank implementation committed; its CI not yet verified. No new complete ECDLP solver or native Rust timing.** [pcc:unverified]
+Date: 2026-11-21 PST (2026-11-22 UTC). **Independent local hybrid arithmetic/census; original-Rust Dickson-only rank independently compiled and executed on GitHub Actions (source-specific PASS #44997823296). No new complete ECDLP solver or hybrid native Rust timing.** [pcc:unverified]
 
 ## Scope and prior-work audit
 
@@ -49,7 +49,7 @@ These are **conditional best-case rank budgets**, not established expectations o
 
 ### Matched-control check (not strong evidence of special structure)
 
-For 16 preregistered SHA256-seeded *random valid-curve x* bases, each also with 509 unsigned points and all signed lifts, exhaustive independent local two-sum enumeration plus mod-n elimination gave homogeneous rank
+For 16 deterministic predeclared SHA256-seeded *random valid-curve x* bases, each also with 509 unsigned points and all signed lifts, exhaustive independent local two-sum enumeration plus mod-n elimination gave homogeneous rank
 `[7,9,8,11,9,13,8,9,9,9,17,8,6,7,13,5]`, average **9.25**, median **9**, range **5–17**. Dickson's rank 13 is *within* that observed range, not evidence of exceptional free-relation concentration. These random bases have no compact Dickson-style membership predicate and are **not** competitor factor bases for the same algebraic solver.
 
 ## Exact reproducer and custody
@@ -59,7 +59,7 @@ The archived run55 `base.csv` and 168 run53 y^7 points are frozen inputs. New in
 - `verify_collision_rank.py`: separate Python group arithmetic with all 78 nonidentity equalities checked, dense Gauss–Jordan mod n, SHA256 of inputs.
 - `build_hybrid_base.py`, `hybrid_census.cpp`, `hybrid_rank.py`: construct 677 distinct points; verify 190 equalities + 56 triple identity equations and rank88.
 - `compare_bases.py`: 16 deterministic 509-point random controls, no secret scalars.
-- New *original-Rust* checked-in source: `research/prime31_ic_20261115/native/examples/prime31_dickson2_collision_rank.rs`, using existing `Arithmetic` and `Base`, with expected assertions (518085 support, 78/13 collision records/rank, 496 residual coordinates). The focused existing GitHub workflow is extended to compile/run the new Rust example.
+- New *original-Rust* checked-in source: `research/prime31_ic_20261115/native/examples/prime31_dickson2_collision_rank.rs`, using existing `Arithmetic` and `Base`, with expected assertions (518085 support, 78/13 collision records/rank, 496 residual coordinates). The focused existing GitHub workflow compiled and executed the new Rust example on Rust 1.100.0. [Source-specific Actions PASS #44997823296](https://github.com/isogeny-labs/crypto/actions/runs/44997823296), job #137132565822: release compile 19.15s, exact Dickson yield 518085 and new homogeneous rank 13/509, 78 nonidentity collision records, 496 residual coordinates. Independent Python confirms rank13. Hybrid's rank88 remains a separately verified C++/Python result, NOT Rust CI.
 
 Local hybrid public base SHA256: `522747b6cf805c025be4f59d194ec3335a57aff97528fb841cf7c2b4ec2f0162`. Local frozen run55 base SHA256: `fa6a97bb09d2224fb75dfd51aa84fcea0aaa28d4bf08272c2b400827b1ab3f04`.
 
