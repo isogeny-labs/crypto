@@ -518,9 +518,7 @@ impl DecompositionOracle<PrimeCurve> for HashedTensorOracle {
             .relation_contraction_wall_ns
             .saturating_add(t0.elapsed().as_nanos() as u64);
         let delta_used = meter.used.saturating_sub(used_before);
-        let delta_adds = meter
-            .curve_additions
-            .saturating_sub(adds_before);
+        let delta_adds = meter.curve_additions.saturating_sub(adds_before);
         let delta_sqrts = meter.square_roots.saturating_sub(sqrts_before);
         let primitive = delta_used
             .saturating_sub(delta_adds)

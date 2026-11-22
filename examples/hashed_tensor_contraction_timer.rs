@@ -5,7 +5,7 @@
 //! `hashed_tensor_primitive_steps`).
 
 use crypto_lib::cryptanalysis::ic_boundary::{
-    CountedGroup, GroupOps, OracleCounters, roster_prime_instance,
+    roster_prime_instance, CountedGroup, GroupOps, OracleCounters,
 };
 use crypto_lib::cryptanalysis::ic_framework::hashed::{HashedAffineBase, HashedTensorOracle};
 use crypto_lib::cryptanalysis::ic_framework::stages::{
@@ -50,8 +50,14 @@ fn main() {
         let _ = oracle.decompose(&ctx, &fb, &mut ops, &mut counters, target);
     }
     let rel = oracle.relation_counters();
-    let wall = rel.get("hashed_tensor_contraction_wall_ns").copied().unwrap_or(0);
-    let steps = rel.get("hashed_tensor_primitive_steps").copied().unwrap_or(0);
+    let wall = rel
+        .get("hashed_tensor_contraction_wall_ns")
+        .copied()
+        .unwrap_or(0);
+    let steps = rel
+        .get("hashed_tensor_primitive_steps")
+        .copied()
+        .unwrap_or(0);
     let ratio = if steps > 0 {
         wall as f64 / steps as f64
     } else {

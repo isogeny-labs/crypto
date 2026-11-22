@@ -68,7 +68,12 @@ fn hashed_base_and_tensor_oracle_share_their_slots() {
             oracle.decompose(&ctx, &fb, &mut ops, &mut counters, other)
         });
     let counters = oracle.relation_counters();
-    if counters.get("hashed_tensor_primitive_steps").copied().unwrap_or(0) > 0 {
+    if counters
+        .get("hashed_tensor_primitive_steps")
+        .copied()
+        .unwrap_or(0)
+        > 0
+    {
         assert!(
             counters
                 .get("hashed_tensor_contraction_wall_ns")
