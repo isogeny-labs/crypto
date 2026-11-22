@@ -41,7 +41,3 @@ No manifest digest was changed.
 The other 159 entries, all pulled by `validation-gate`, were never committed
 to Git: their manifests were added in the same commit as the rest of their
 run, without the file. They still need their original store.
-
-## Ecbench full-library replay inputs (2026-11-21)
-
-The optional complete library run at `741a4e0b4fd7ac5ec7ab2bb414be8af6193d6d58` retained 36 ecbench test failures because 12 original session `records.jsonl` files were absent from its runner. Eleven exact originals are in historical crypto Git blobs; their object IDs are listed in `index.json`. Each blob was checked against the current session manifest's SHA-256 and byte count. The remaining Curve25519 target-walk record was recovered byte for byte from the local `crypto-benchrec-sync` worktree and compressed with deterministic gzip (`mtime=0`) as `8970667e2f18587eeb08d033123dab029b94042ac5c07c870b08988f1ee5b738.jsonl.gz` (2,293,097 original bytes). The pull command rechecks all 12 manifest hashes and sizes before installation. No original record or manifest was edited. This recovery serves development validation only; the S3-backed required gate remains independent.
