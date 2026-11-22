@@ -1375,6 +1375,11 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
     // matching GcdStep and its verified quotient for an accepted SplitEnd. Borrow
     // certificate operands, and own only the computed remainder.
     let mut verified_division: Option<(&[u64], &[u64], &[u64], &[u64], Vec<u64>)> = None;
+    // For linear and quadratic root polynomials the divisions are too small
+    // for a cache's matching overhead to amortize. Source-exact A/B on the
+    // frozen Round100 baseline found consistent 4-10% verifier regressions.
+    // Restrict reuse to quartic and larger root-certificate workloads.
+    let reuse_divisions = report.polynomial.len() >= 5;
     let mut next_id = 0;
     let mut inverse = None;
     let mut split: Option<(Vec<u64>, u64)> = None;
@@ -1465,10 +1470,12 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 }
                 // A matching GcdStep or accepted SplitEnd can reuse this
                 // independently verified identity even across other events.
-                verified_division = Some((
-                    a.as_slice(), b.as_slice(),
-                    quotient.as_slice(), remainder.as_slice(), verified_r,
-                ));
+                if reuse_divisions {
+                    verified_division = Some((
+                        a.as_slice(), b.as_slice(),
+                        quotient.as_slice(), remainder.as_slice(), verified_r,
+                    ));
+                }
             }
             RootEvent::PowerBegin {
                 id,
@@ -1559,19 +1566,23 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 canonical(quotient, p)?;
                 canonical(remainder, p)?;
                 let state = gcds.get_mut(id).ok_or("missing gcd begin")?;
-                let cached = verified_division.take().and_then(
-                    |(dividend, divisor, checked_q, checked_r, computed_r)| {
-                        if dividend == state.0.as_slice()
-                            && divisor == state.1.as_slice()
-                            && checked_q == quotient.as_slice()
-                            && checked_r == remainder.as_slice()
-                        {
-                            Some(computed_r)
-                        } else {
-                            None
-                        }
-                    },
-                );
+                let cached = if reuse_divisions {
+                    verified_division.take().and_then(
+                        |(dividend, divisor, checked_q, checked_r, computed_r)| {
+                            if dividend == state.0.as_slice()
+                                && divisor == state.1.as_slice()
+                                && checked_q == quotient.as_slice()
+                                && checked_r == remainder.as_slice()
+                            {
+                                Some(computed_r)
+                            } else {
+                                None
+                            }
+                        },
+                    )
+                } else {
+                    None
+                };
                 let verified_r = if let Some(remainder) = cached {
                     remainder
                 } else {
@@ -1622,13 +1633,17 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 let g = vgcd(h.clone(), trim(s), p)?;
                 let valid = g.len() > 1 && g.len() < h.len();
                 let split_quotient_valid = if valid {
-                    match verified_division.take() {
-                        Some((dividend, divisor, checked_q, checked_r, _))
-                            if dividend == h.as_slice()
-                                && divisor == g.as_slice()
-                                && checked_q == quotient.as_slice()
-                                && checked_r.is_empty() => true,
-                        _ => vdiv(&h, &g, p)? == (quotient.clone(), vec![]),
+                    if reuse_divisions {
+                        match verified_division.take() {
+                            Some((dividend, divisor, checked_q, checked_r, _))
+                                if dividend == h.as_slice()
+                                    && divisor == g.as_slice()
+                                    && checked_q == quotient.as_slice()
+                                    && checked_r.is_empty() => true,
+                            _ => vdiv(&h, &g, p)? == (quotient.clone(), vec![]),
+                        }
+                    } else {
+                        vdiv(&h, &g, p)? == (quotient.clone(), vec![])
                     }
                 } else {
                     true
