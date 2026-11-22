@@ -22,4 +22,26 @@ Three independent release invocations on the local host, each taking the median 
 | 31 | 9,500–9,583 | 66,333–66,792 |
 | 587 | 107,833–108,917 | 192,834–615,834 |
 
-The exact successor matched for all five degrees on both checked curves. This implementation does not improve this repository's known-kernel successor cost. The result does not evaluate the paper's native sampling, Elligator analogue, optimized coefficient state, or square-root Vélu method. Those are the next relevant candidates for a full CSIDH implementation comparison. No security claim follows from an operation cost comparison.
+The exact successor matched for all five degrees on both checked curves. These initial timings were for an affine coefficient bridge. They are retained as the baseline for the projective-state optimization below.
+
+## Projective-state optimization
+
+The first bridge divided `A-2` by `A+2`, divided the isogeny product, and computed square characters while recovering each codomain. The revised arm retains the ordinary Edwards coefficient as `D:C` and computes
+
+`D' = D^ell * (product (Wi+Zi))^8`, `C' = C^ell * (product 2Zi)^8`.
+
+It performs only the final division needed to expose the canonical Montgomery coefficient. It retains the Edwards normalization branch across odd-degree steps. Preparing that state from an arbitrary Montgomery coefficient requires a square-character check. The `known_kernel_point_to_codomain` projective benchmark starts after preparation; a separate `edwards_w_projective_cold` arm charges that check. The four-step action starts from the fixed public CSIDH base coefficient, whose Edwards state is known algebraically, so it constructs that state without a square-character check. The code checks exact canonical coefficient equality against Montgomery on the base and a nonzero successor curve for all five degrees, and checks a four-step action under 32 deterministic seeds.
+
+Seven further release invocations, each using the median of 21 calls, gave the following projective-state **known-kernel-point-to-codomain** medians in nanoseconds. Ranges include local timing outliers. The same kernel point was supplied to both arms; Montgomery generates its half-kernel multiples within the timed region.
+
+| Degree | Montgomery range | Projective Edwards `w` range | Typical relation |
+| ---: | ---: | ---: | --- |
+| 3 | 4,042–4,125 | 2,958–3,000 | `w` about 27% faster |
+| 5 | 4,500–4,542 | 3,542–3,583 | `w` about 21% faster |
+| 7 | 4,875–5,375 | 4,083–4,166 | `w` about 16% faster |
+| 31 | 9,458–9,708 | 10,041–21,208 | Montgomery usually faster |
+| 587 | 107,708–155,250 | 139,458–209,833 | Montgomery usually faster |
+
+The cold known-kernel arm, which prepares the Edwards state from the Montgomery coefficient for each call, took about 29–36 µs at degrees 3–31 in its ordinary runs, versus about 4–10 µs for Montgomery; several runs had much higher outliers. Thus the per-step component gain depends on retaining the model state. The fixed CSIDH base makes that retention natural for a scheme action, while an attack beginning from an arbitrary input coefficient must charge its preparation.
+
+The four-step positive action (`3,5,7,31`) sampled kernels separately at each successor. In five further local invocations with the fixed base state, medians ranged from 1.88–2.21 ms for Montgomery and 1.88–2.43 ms for projective `w`, with changes in which arm was faster. Earlier runs with an unnecessary initial square-character check were noisier still. This host-level experiment does not establish an action-level gain. The component gain is measured for small-degree known-kernel successors on an already prepared state. A full native Edwards action would also need point sampling and kernel extraction in Edwards coordinates; the present action uses the same Montgomery sampler in both arms. The paper's Elligator analogue and square-root Vélu method remain untested here.
