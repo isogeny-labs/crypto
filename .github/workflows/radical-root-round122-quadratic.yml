@@ -1,0 +1,30 @@
+name: Rootfinding Round122 native Rust complete nonmonic quadratic A/B
+on:
+  push:
+    branches:
+      - 'automation/radical-root-mersenne-sqrt-round114-20261122'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-rust-quadratic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            src/cryptanalysis/prime_radical_root.rs
+            research/amm_digit_perf_20261118/round122_quadratic_sort_ab.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Complete quadratic source-exact Rust correctness and paired benchmark
+        run: |
+          set -euo pipefail
+          rustc --version
+          python3 research/amm_digit_perf_20261118/round122_quadratic_sort_ab.py | tee round122_quadratic.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rootfind-round122-quadratic-rust
+          path: round122_quadratic.txt
+          if-no-files-found: warn
