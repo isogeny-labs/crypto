@@ -1188,6 +1188,25 @@ fn quadratic_square(a: (u64, u64), c: u64, d: u64, p: u64) -> (u64, u64) {
     let cross = if cross + cross >= p { cross + cross - p } else { cross + cross };
     (low, quadratic_sub(cross, vmul(d, high, p), p))
 }
+// Replay PowerStep over a degree-two quotient ring without constructing a
+// temporary polynomial product and quotient. The Engine records independent
+// field-operation events; these helpers are verifier-only arithmetic.
+#[inline]
+fn vquadratic_replay_mul(a: &[u64], b: &[u64], m: &[u64], p: u64) -> Vec<u64> {
+    debug_assert_eq!(m.len(), 3);
+    let lhs = (a.first().copied().unwrap_or(0), a.get(1).copied().unwrap_or(0));
+    let rhs = (b.first().copied().unwrap_or(0), b.get(1).copied().unwrap_or(0));
+    let (constant, linear) = quadratic_mul(lhs, rhs, m[0], m[1], p);
+    trim(vec![constant, linear])
+}
+#[inline]
+fn vquadratic_replay_square(a: &[u64], m: &[u64], p: u64) -> Vec<u64> {
+    debug_assert_eq!(m.len(), 3);
+    let lhs = (a.first().copied().unwrap_or(0), a.get(1).copied().unwrap_or(0));
+    let (constant, linear) = quadratic_square(lhs, m[0], m[1], p);
+    trim(vec![constant, linear])
+}
+
 fn vpower_quadratic(base: &[u64], mut exponent: u64, modulus: &[u64], p: u64)
     -> Result<Vec<u64>, String>
 {
@@ -1465,7 +1484,11 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                     return Err("power continued after completion".into());
                 }
                 if state.exponent & 1 == 1 {
-                    state.acc = vpower_reduce(vproduct(&state.acc, &state.base, p), &state.modulus, p)?;
+                    state.acc = if state.modulus.len() == 3 {
+                        vquadratic_replay_mul(&state.acc, &state.base, &state.modulus, p)
+                    } else {
+                        vpower_reduce(vproduct(&state.acc, &state.base, p), &state.modulus, p)?
+                    };
                 }
                 let next_exponent = state.exponent >> 1;
                 // Either the original fully traced terminal square, or the
@@ -1474,7 +1497,11 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
                 // exactly matches the previously verified base. Every
                 // nonterminal square is still independently recomputed.
                 if next_exponent != 0 || base.as_slice() != state.base.as_slice() {
-                    state.base = vpower_reduce(vproduct(&state.base, &state.base, p), &state.modulus, p)?;
+                    state.base = if state.modulus.len() == 3 {
+                        vquadratic_replay_square(&state.base, &state.modulus, p)
+                    } else {
+                        vpower_reduce(vproduct(&state.base, &state.base, p), &state.modulus, p)?
+                    };
                 }
                 state.exponent = next_exponent;
                 if (*exponent, accumulator, base) != (state.exponent, &state.acc, &state.base) {
@@ -1661,6 +1688,38 @@ pub fn verify(report: &RootReport) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn round99_quadratic_power_step_replay_matches_generic_polynomials() {
+        // Independent generic multiply/divide is the oracle; exercise sparse
+        // and zero residues, arbitrary quadratic coefficients, and Mersenne
+        // arithmetic. Both helpers must preserve canonical trimming.
+        for p in [3u64, 65_521, 1_000_000_007, MAX_PRIME] {
+            let mut seed = 0x494e_4445_5045_4e44u64 ^ p;
+            for trial in 0..8192 {
+                let mut next = || {
+                    seed = seed.wrapping_mul(6364136223846793005)
+                        .wrapping_add(1442695040888963407);
+                    seed % p
+                };
+                let mut a = trim(vec![next(), next()]);
+                let mut b = trim(vec![next(), next()]);
+                if trial % 17 == 0 { a.clear(); }
+                if trial % 23 == 0 { b = vec![1]; }
+                let modulus = vec![next(), next(), 1];
+                assert_eq!(
+                    vquadratic_replay_mul(&a, &b, &modulus, p),
+                    vpower_reduce(vproduct(&a, &b, p), &modulus, p).unwrap(),
+                    "quadratic replay multiply p={p} trial={trial}"
+                );
+                assert_eq!(
+                    vquadratic_replay_square(&a, &modulus, p),
+                    vpower_reduce(vproduct(&a, &a, p), &modulus, p).unwrap(),
+                    "quadratic replay square p={p} trial={trial}"
+                );
+            }
+        }
+    }
 
     #[test]
     fn round22_fast_trace_field_exact_under_frozen_arithmetic() {
