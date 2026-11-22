@@ -1341,6 +1341,19 @@ fn quartic_reduce(mut t: [u64; 7], c: [u64; 4], p: u64) -> [u64; 4] {
     }
     [t[0], t[1], t[2], t[3]]
 }
+// A quartic coefficient is the sum of at most four products of canonical
+// residues. For p=2^61-1, this sum is < 4*(p-1)^2 < 2^124: it fits u128.
+// Folding the Mersenne modulus three times is enough even for that upper
+// bound. Accumulate before reduction to avoid 16 modular reductions per
+// multiplication (or 10 per symmetric square).
+#[inline]
+fn quartic_mersenne_reduce(value: u128) -> u64 {
+    let p = MAX_PRIME as u128;
+    let folded = (value & p) + (value >> 61);
+    let folded = (folded & p) + (folded >> 61);
+    let folded = (folded & p) + (folded >> 61);
+    if folded >= p { (folded - p) as u64 } else { folded as u64 }
+}
 #[inline]
 fn quartic_mul(a: [u64; 4], b: [u64; 4], c: [u64; 4], p: u64) -> [u64; 4] {
     let mut t = [0u64; 7];
@@ -1354,6 +1367,16 @@ fn quartic_mul(a: [u64; 4], b: [u64; 4], c: [u64; 4], p: u64) -> [u64; 4] {
             }
         }
         for x in &mut t { *x %= p; }
+    } else if p == MAX_PRIME {
+        let mut columns = [0u128; 7];
+        for i in 0..4 {
+            for j in 0..4 {
+                columns[i + j] += a[i] as u128 * b[j] as u128;
+            }
+        }
+        for (result, value) in t.iter_mut().zip(columns) {
+            *result = quartic_mersenne_reduce(value);
+        }
     } else {
         for i in 0..4 {
             for j in 0..4 {
@@ -1376,6 +1399,17 @@ fn quartic_square(a: [u64; 4], c: [u64; 4], p: u64) -> [u64; 4] {
             }
         }
         for x in &mut t { *x %= p; }
+    } else if p == MAX_PRIME {
+        let mut columns = [0u128; 7];
+        for i in 0..4 {
+            columns[2 * i] += a[i] as u128 * a[i] as u128;
+            for j in (i + 1)..4 {
+                columns[i + j] += 2 * a[i] as u128 * a[j] as u128;
+            }
+        }
+        for (result, value) in t.iter_mut().zip(columns) {
+            *result = quartic_mersenne_reduce(value);
+        }
     } else {
         for i in 0..4 {
             t[2 * i] = cubic_add(t[2 * i], vmul(a[i], a[i], p), p);
@@ -1512,10 +1546,10 @@ fn vpower(base: &[u64], mut e: u64, m: &[u64], p: u64) -> Result<Vec<u64>, Strin
     if m.len() == 4 {
         return vpower_cubic(base, e, m, p);
     }
-    // Source-exact Rust A/B showed a 3.3% complete-quartic regression over
-    // p=65521 and a 2.5% gain over p=1e9+7; keep small-field and p61
-    // workloads on the original, previously validated generic path.
-    if m.len() == 5 && p >= (1u64 << 24) && p <= u32::MAX as u64 {
+    // Preserve the validated small-field generic path; p=2^61-1 uses
+    // bounded u128 Mersenne column accumulation in the quartic helpers.
+    if m.len() == 5 && ((p >= (1u64 << 24) && p <= u32::MAX as u64)
+        || p == MAX_PRIME) {
         return vpower_quartic(base, e, m, p);
     }
     // Polynomial remainder is invariant under scaling the modulus by a
@@ -2818,6 +2852,30 @@ mod round103_quartic_quotient {
         }
         r
     }
+
+    #[test]
+    fn round104_mersenne_quartic_column_extremes() {
+        let p = MAX_PRIME;
+        let values = [0u64, 1, 2, p / 2, p - 2, p - 1];
+        for &x in &values {
+            for &y in &values {
+                for &z in &values {
+                    let a = [x, y, z, p - 1];
+                    let b = [y, p - 1, x, z];
+                    let c = [z, x, y, p - 1];
+                    let mut modulus = c.to_vec(); modulus.push(1);
+                    let expected_product = vdiv(&vproduct(&a, &b, p), &modulus, p).unwrap().1;
+                    let expected_square = vdiv(&vsquare(&a, p), &modulus, p).unwrap().1;
+                    assert_eq!(quartic_trim(quartic_mul(a, b, c, p)), expected_product);
+                    assert_eq!(quartic_trim(quartic_square(a, c, p)), expected_square);
+                }
+            }
+        }
+        for k in 0..16u128 {
+            let value = 4 * (p as u128 - 1).pow(2) - k;
+            assert_eq!(quartic_mersenne_reduce(value), (value % p as u128) as u64);
+        }
+    }
     #[test]
     fn quartic_multiply_square_horner_and_power_match_independent_long_division() {
         let mut state = 0x1030_aaaa_bbbb_ccccu64;
@@ -2852,9 +2910,7 @@ mod round103_quartic_quotient {
                 let expected = reference_power(&base, exponent, &nonmonic, p);
                 assert_eq!(actual, expected,
                     "power p={p} iteration={iteration} e={exponent}");
-                if p <= u32::MAX as u64 {
-                    assert_eq!(vpower(&base, exponent, &nonmonic, p).unwrap(), expected);
-                }
+                assert_eq!(vpower(&base, exponent, &nonmonic, p).unwrap(), expected);
             }
         }
     }
