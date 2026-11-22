@@ -455,88 +455,6 @@ impl Engine<'_> {
         })?;
         Ok(acc)
     }
-    #[inline(never)]
-    fn pow_nonmonic(&mut self, base: &[u64], mut exponent: u64, modulus: &[u64]) -> Work<Vec<u64>> {
-        let id = self.next_id;
-        self.next_id += 1;
-        self.event(RootEvent::PowerBegin {
-            id,
-            base: base.to_vec(),
-            exponent,
-            modulus: modulus.to_vec(),
-        })?;
-        // Repeated polynomial reductions are now monic. Tracing the one
-        // Fermat inverse of the original leading coefficient is sufficient
-        // for the entire modular exponentiation. All skipped inverses are
-        // identities because the normalized divisor's leading term is one.
-        let lead = *modulus.last().expect("power modulus is nonzero");
-        let inverse = self.inv(lead)?;
-        let mut normalized_modulus = Vec::with_capacity(modulus.len());
-        for &coefficient in &modulus[..modulus.len() - 1] {
-            normalized_modulus.push(if coefficient == 0 {
-                0
-            } else if coefficient == lead {
-                1
-            } else {
-                self.field(FieldOp::Mul, coefficient, inverse)?
-            });
-        }
-        normalized_modulus.push(1);
-        let modulus = normalized_modulus.as_slice();
-        // A smaller-degree polynomial is already reduced. Recording a
-        // zero-quotient division allocates a certificate and runs the event
-        // sink without doing any field work. PowerBegin already binds the
-        // original modulus, and the independent verifier compares residues
-        // modulo its monic normalization.
-        let mut b = if base.len() < modulus.len() {
-            base.to_vec()
-        } else {
-            self.div(base, modulus)?.1
-        };
-        let mut acc = if modulus.len() > 1 {
-            vec![1]
-        } else {
-            self.div(&[1], modulus)?.1
-        };
-        while exponent != 0 {
-            if exponent & 1 == 1 {
-                let product = self.mul(&acc, &b)?;
-                // If the product degree is below the modulus degree, its
-                // remainder is already the product. Avoid allocating a
-                // quotient and emitting a redundant Division event.
-                acc = if product.len() < modulus.len() {
-                    product
-                } else {
-                    self.div(&product, modulus)?.1
-                };
-            }
-            // Round 92: the final modular square is never consumed after
-            // the exponent becomes zero. Save one traced multiplication and
-            // division per exponentiation, and keep the final PowerStep's
-            // base equal to the last useful base. The verifier supports both
-            // this shorter trace and legacy traces with the terminal square.
-            exponent >>= 1;
-            if exponent != 0 {
-                let product = self.mul(&b, &b)?;
-                b = if product.len() < modulus.len() {
-                    product
-                } else {
-                    self.div(&product, modulus)?.1
-                };
-            }
-            self.event(RootEvent::PowerStep {
-                id,
-                exponent,
-                accumulator: acc.clone(),
-                base: b.clone(),
-            })?;
-        }
-        self.event(RootEvent::PowerEnd {
-            id,
-            value: acc.clone(),
-        })?;
-        Ok(acc)
-    }
     fn gcd(&mut self, a: &[u64], b: &[u64]) -> Work<Vec<u64>> {
         let id = self.next_id;
         self.next_id += 1;
@@ -670,6 +588,88 @@ impl Engine<'_> {
         })?;
         self.report.roots = roots;
         Ok(RootStop::Complete)
+    }
+    #[inline(never)]
+    fn pow_nonmonic(&mut self, base: &[u64], mut exponent: u64, modulus: &[u64]) -> Work<Vec<u64>> {
+        let id = self.next_id;
+        self.next_id += 1;
+        self.event(RootEvent::PowerBegin {
+            id,
+            base: base.to_vec(),
+            exponent,
+            modulus: modulus.to_vec(),
+        })?;
+        // Repeated polynomial reductions are now monic. Tracing the one
+        // Fermat inverse of the original leading coefficient is sufficient
+        // for the entire modular exponentiation. All skipped inverses are
+        // identities because the normalized divisor's leading term is one.
+        let lead = *modulus.last().expect("power modulus is nonzero");
+        let inverse = self.inv(lead)?;
+        let mut normalized_modulus = Vec::with_capacity(modulus.len());
+        for &coefficient in &modulus[..modulus.len() - 1] {
+            normalized_modulus.push(if coefficient == 0 {
+                0
+            } else if coefficient == lead {
+                1
+            } else {
+                self.field(FieldOp::Mul, coefficient, inverse)?
+            });
+        }
+        normalized_modulus.push(1);
+        let modulus = normalized_modulus.as_slice();
+        // A smaller-degree polynomial is already reduced. Recording a
+        // zero-quotient division allocates a certificate and runs the event
+        // sink without doing any field work. PowerBegin already binds the
+        // original modulus, and the independent verifier compares residues
+        // modulo its monic normalization.
+        let mut b = if base.len() < modulus.len() {
+            base.to_vec()
+        } else {
+            self.div(base, modulus)?.1
+        };
+        let mut acc = if modulus.len() > 1 {
+            vec![1]
+        } else {
+            self.div(&[1], modulus)?.1
+        };
+        while exponent != 0 {
+            if exponent & 1 == 1 {
+                let product = self.mul(&acc, &b)?;
+                // If the product degree is below the modulus degree, its
+                // remainder is already the product. Avoid allocating a
+                // quotient and emitting a redundant Division event.
+                acc = if product.len() < modulus.len() {
+                    product
+                } else {
+                    self.div(&product, modulus)?.1
+                };
+            }
+            // Round 92: the final modular square is never consumed after
+            // the exponent becomes zero. Save one traced multiplication and
+            // division per exponentiation, and keep the final PowerStep's
+            // base equal to the last useful base. The verifier supports both
+            // this shorter trace and legacy traces with the terminal square.
+            exponent >>= 1;
+            if exponent != 0 {
+                let product = self.mul(&b, &b)?;
+                b = if product.len() < modulus.len() {
+                    product
+                } else {
+                    self.div(&product, modulus)?.1
+                };
+            }
+            self.event(RootEvent::PowerStep {
+                id,
+                exponent,
+                accumulator: acc.clone(),
+                base: b.clone(),
+            })?;
+        }
+        self.event(RootEvent::PowerEnd {
+            id,
+            value: acc.clone(),
+        })?;
+        Ok(acc)
     }
 }
 
