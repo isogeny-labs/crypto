@@ -31,6 +31,29 @@ det( dH_j / d e_k ) =
 
 The right-hand side is nonzero for squarefree h and p>m, so the ideal (H0,...,H_(m-1)) is radical; it is a zero-dimensional complete intersection. A proof is obtained by differentiating the power sums and taking the confluent Vandermonde limit at coinciding x_i: ordinary Vandermonde factors cancel the e-coordinate Jacobian, while the coalescent w-block contributes n_w! times h'(w)^{n_w}. **Status:** algebraic proof and symbolic/exact modular tests, not Lean-checked. The determinant formula requires the precise equation order H0,...,H_(m-1) and coordinate order e1,...,em.
 
+**Degree-B triangular preconditioning (exact, stronger than raw moments):** The naive H_j are of ordinary total degree B+j in the elementary coefficients, which is an unnecessary and potentially devastating F4 penalty. Let e_0=1 and define instead
+
+```text
+G_j(e)=SUM_(a=0)^j (-1)^a e_a H_(j-a)(e), j=0,...,m-1.
+     =(-1)^j SUM_(i=1)^m h(x_i) e_j(x_1,...,x_(i-1),x_(i+1),...,x_m).
+```
+
+The transformation H→G is lower-unitriangular over k[e], and its polynomial inverse exists; **the generated ideals and complete zero schemes are IDENTICAL** (no saturation or missing repeated roots). At every common root the derivative matrix transforms by the same unitriangular matrix, so the Jacobian determinant and radical proof above remain valid.
+
+**Theorem: each G_j has ordinary total degree in e1,...,em at most B (for B>=1).** Proof: each summand of G_j arising from h's monomial x_i^k has degree at most max(k,1) in *each individual x variable*, so the whole symmetric polynomial has individual degree ≤B. A symmetric polynomial in m variables with degree at most B in each x_i is a polynomial in elementary symmetric e1,...,em of ordinary total degree at most B. To prove the latter rigorously: polynomials of total e-degree≤B map injectively into the separately-degree≤B symmetric subspace, and both spaces have dimension binomial(B+m,m): respectively monomials of total degree≤B in m e's, and orbits of monomials with each x-exponent≤B. Consequently the injection is an isomorphism. This works over arbitrary coefficient rings where the fundamental theorem of symmetric polynomials applies; characteristic >m remains necessary for zero-set/radical exactness.
+
+For the original S3 pair (m=2), G0=H0 and G1=H1−e1 H0; the pair S3 equation becomes **quadratic** in (e1,e2), compared with its **quartic** ordered-coordinate S3. At m=4, this delivers four radical membership equations of degree ≤B in four symmetric variables, with no need to first compute the larger B+1-element DRL radical basis from the earlier experiment. It may reduce input-system size, **not yet the actual Gröbner solving degree or total work**.
+
+**Independent SymPy exact expansion, not Rust execution:** for the fully split test h(T)=prod_(w=1)^B(T-w), m=4:
+| B | naive H0,H1,H2,H3 degrees | preconditioned G0,G1,G2,G3 degrees | monomial counts in G0/G1/G2/G3 |
+| ---: | --- | --- | --- |
+| 3 | 3,4,5,6 | 3,3,3,3 | 7/8/7/5 |
+| 4 | 4,5,6,7 | 4,4,4,4 | 12/13/12/8 |
+| 6 | 6,7,8,9 | 6,6,6,6 | 27/31/29/19 |
+| 8 | 8,9,10,11 | 8,8,8,8 | 53/62/59/39 |
+
+The same degree flattening was checked symbolically for m=2 and m=3 at B=3,4,6,8. The existing source now implements `reduced_trace_moments` including the exact Jacobian adjustment and F17 root-equivalence checks. This is an **input-presentation degree reduction**; it cannot be promoted to a measured F4 or complete ECDLP speedup until native execution and matched controls.
+
 **Division-free implementation:** Let P_n=SUM_i x_i^n. Newton identities give P0=m; for 1<=n<=m, P_n=sum_(i=1)^(n-1)(-1)^(i-1)e_i P_(n-i) + (-1)^(n-1)n*e_n; for n>m, P_n=sum_(i=1)^m(-1)^(i-1)e_i P_(n-i). Then H_j=sum_(k=0)^B h_k P_(j+k). The new [Rust original-crate example](../../examples/prime31_trace_moment.rs) implements this recurrence and its exact forward-mode derivatives, determinant and factorial formula; m=2,3,4 are tested. It uses neither square-root extraction nor inversion in equation/Jacobian **evaluation** (test-only determinant certification uses field inversions). For fixed m, evaluation has O(B) field complexity; **finding solutions** to these equations is not thereby O(B).
 
 **Independent numerical evidence in this run** (Python modular-arithmetic verifier, not Rust): exhaustive all F17 coefficient tuples e in F17^m, W={0,1,3,5}, m=2/3/4: respectively 289 / 4,913 / 83,521 assignments, with exactly 10 / 20 / 35 expected solutions and every solution's Jacobian nonzero. Separate positive multiset/closed-form-Jacobian replay: F101 with B4 and B5 for m2..4 (10,20,35 and 15,35,70 cases), and F2147483647 with W={0,1,2,4,6,7,8,10} for m2..4 (36,120,330 cases), all vanish and match the determinant formula exactly. These last field values are merely algebraic factor-base values, not necessarily all x-coordinates of curve points; elliptic-curve admissibility remains a separate solver gate.
