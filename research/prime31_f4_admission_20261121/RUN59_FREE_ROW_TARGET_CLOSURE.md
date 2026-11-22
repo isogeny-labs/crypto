@@ -55,3 +55,14 @@ At **400 hybrid successful synthetic base relations**, mean immediate target-pos
 3. **Predicted bias/primitive cost falsifier:** compare exact observed `S/n` and signed-template output bias to the synthetic model; pair the full Rust extractor on the same host against existing optimized index-calculus, BSGS and rho, with identical public Q and all setup/target counts for T=1,32,128,1024. Required success: verified complete logs, rigorous total-cost ledger, favorable paired advantage confidence interval. Otherwise classify this as a useful partial-rank optimization only.
 
 **Key blocker:** blinded polynomial root extraction and fully charged timing, not the current linear-algebra stopping rule.
+
+
+## Source-specific GitHub validation (2026-11-22 10:25 UTC)
+
+**PASS:** [Actions run #45012197247](https://github.com/isogeny-labs/crypto/actions/runs/45012197247), job **137176735372**, on source commit `1cef1a961eda39c506cc78c20506f71bbcdd4b77`. The GitHub job logs show:
+
+- Independently implemented Python direct modular Gaussian rank verification: **101/101 systems and 11,644/11,644 signed-pair decisions** passed.
+- Python deterministic paired synthetic model: **256 trials per base** passed, including hybrid 957500/4699949 predicted calls for T=1/1024.
+- **Original Rust 1.100.0 release compilation PASS (11.58 seconds)**, preserving run57 and run58 gates. The Rust implementation reuses the native `prime31_algebraic_ic` `Arithmetic`, `PRIME31`, `SignedDsu`, `SplitMix64`, and modulo-`n` field arithmetic.
+- Independent **128-seed native Rust** synthetic model (different RNG than Python) reproduced the improvement: hybrid graph-only **988790 / 4996923** modeled calls for T=1/1024, full 88-free-row quotient **957206 / 4692051**, reductions **3.19% / 6.10%**. At m=400 Rust found target-positive probability **0.073252 → 0.177345**, i.e. **2.421×**.
+- No blind S3/F4 unknown-index root, unplanted target scalar, actual extraction time or complete ECDLP runtime was produced in this green job. The validation is restricted to correctness of the quotient-span algebra, original-Rust source compilation and synthetic conditional query simulations. Signed PCC remains unverified.
