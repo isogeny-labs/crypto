@@ -18,7 +18,7 @@ CURVES = {16: (65437, 1058), 18: (262133, 78), 20: (1048573, 926),
 HASH_KEYS = {'key1': b'curve25519-wave7-L1-hashbase-key-1',
              'key2': b'curve25519-wave7-L1-hashbase-key-2'}   # key2 only for the A/A arm
 C_SIZES = (0.2, 0.4)          # N = round(c * sqrt(r)); nominal unprojected yield c^2/4 = 1 %, 4 %
-HITS_PER_BASE = 50            # MC design: expected verified hits per base
+HITS_PER_BASE = 200           # MC design: expected verified hits per base (MC noise per arm = 0.31 % at B = 512)
 PLANT = {'plant3': 1.0149, 'plant5': 1.0247}   # size factors; yield ratio ~ f^2 = 1.030, 1.050
 
 
