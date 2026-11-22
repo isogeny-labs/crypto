@@ -363,6 +363,12 @@ const POLICIES: &[PolicyDecl] = &[
         StandardBand
     ),
     policy!(
+        "bsgs.negation_table_v2",
+        NativeGrid,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
         "kangaroo.vow",
         ReplayControl,
         FrozenHistorical,
