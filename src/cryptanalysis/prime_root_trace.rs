@@ -1397,26 +1397,34 @@ fn quadratic_sub(a: u64, b: u64, p: u64) -> u64 {
 fn quadratic_mul(a: (u64, u64), b: (u64, u64), c: u64, d: u64, p: u64)
     -> (u64, u64)
 {
-    // x^2 = -d*x-c in F_p[x]/(x^2+d*x+c).
+    // Original cross-product path, retained for the 61-bit Mersenne prime.
     let high = vmul(a.1, b.1, p);
-    let constant = vmul(a.0, b.0, p);
-    // Karatsuba for 32-bit primes: the cross term needs one product,
-    // (a0+a1)(b0+b1) - a0*b0 - a1*b1, instead of two products.
-    // Keep the established Mersenne-prime path where folding and extra
-    // modular additions have a different performance crossover.
-    let cross = if p <= u32::MAX as u64 {
-        let left = a.0 + a.1;
-        let right = b.0 + b.1;
-        let left = if left >= p { left - p } else { left };
-        let right = if right >= p { right - p } else { right };
-        quadratic_sub(quadratic_sub(vmul(left, right, p), constant, p), high, p)
-    } else {
-        let sum = vmul(a.0, b.1, p) + vmul(a.1, b.0, p);
-        if sum >= p { sum - p } else { sum }
-    };
-    let low = quadratic_sub(constant, vmul(c, high, p), p);
+    let low = quadratic_sub(vmul(a.0, b.0, p), vmul(c, high, p), p);
+    let cross = vmul(a.0, b.1, p) + vmul(a.1, b.0, p);
+    let cross = if cross >= p { cross - p } else { cross };
     let linear = quadratic_sub(cross, vmul(d, high, p), p);
     (low, linear)
+}
+#[inline]
+fn quadratic_mul_karatsuba(a: (u64, u64), b: (u64, u64), c: u64, d: u64, p: u64)
+    -> (u64, u64)
+{
+    // Five field multiplications rather than six. For 32-bit primes a
+    // modular multiplication costs more than two modular subtractions.
+    // Dispatch outside the exponentiation loop to avoid a per-bit branch.
+    let high = vmul(a.1, b.1, p);
+    let constant = vmul(a.0, b.0, p);
+    let left = a.0 + a.1;
+    let right = b.0 + b.1;
+    let left = if left >= p { left - p } else { left };
+    let right = if right >= p { right - p } else { right };
+    let cross = quadratic_sub(
+        quadratic_sub(vmul(left, right, p), constant, p), high, p,
+    );
+    (
+        quadratic_sub(constant, vmul(c, high, p), p),
+        quadratic_sub(cross, vmul(d, high, p), p),
+    )
 }
 #[inline]
 fn quadratic_square(a: (u64, u64), c: u64, d: u64, p: u64) -> (u64, u64) {
@@ -1437,7 +1445,11 @@ fn vquadratic_replay_mul(a: &[u64], b: &[u64], m: &[u64], p: u64) -> Vec<u64> {
     debug_assert_eq!(m.len(), 3);
     let lhs = (a.first().copied().unwrap_or(0), a.get(1).copied().unwrap_or(0));
     let rhs = (b.first().copied().unwrap_or(0), b.get(1).copied().unwrap_or(0));
-    let (constant, linear) = quadratic_mul(lhs, rhs, m[0], m[1], p);
+    let (constant, linear) = if p <= u32::MAX as u64 {
+        quadratic_mul_karatsuba(lhs, rhs, m[0], m[1], p)
+    } else {
+        quadratic_mul(lhs, rhs, m[0], m[1], p)
+    };
     trim(vec![constant, linear])
 }
 #[inline]
@@ -1773,7 +1785,27 @@ fn vquartic_replay_square(a: &[u64], modulus: &[u64], p: u64) -> Vec<u64> {
         [modulus[0], modulus[1], modulus[2], modulus[3]], p))
 }
 
-fn vpower_quadratic(base: &[u64], mut exponent: u64, modulus: &[u64], p: u64)
+#[inline]
+fn vpower_quadratic_loop<const KARATSUBA: bool>(
+    mut power: (u64, u64), mut exponent: u64, c: u64, d: u64, p: u64,
+) -> (u64, u64) {
+    let mut residue = (1, 0);
+    while exponent != 0 {
+        if exponent & 1 == 1 {
+            residue = if KARATSUBA {
+                quadratic_mul_karatsuba(residue, power, c, d, p)
+            } else {
+                quadratic_mul(residue, power, c, d, p)
+            };
+        }
+        exponent >>= 1;
+        if exponent != 0 {
+            power = quadratic_square(power, c, d, p);
+        }
+    }
+    residue
+}
+fn vpower_quadratic(base: &[u64], exponent: u64, modulus: &[u64], p: u64)
     -> Result<Vec<u64>, String>
 {
     debug_assert_eq!(modulus.len(), 3);
@@ -1791,17 +1823,11 @@ fn vpower_quadratic(base: &[u64], mut exponent: u64, modulus: &[u64], p: u64)
         a = next_a;
         b = next_b;
     }
-    let mut residue = (1, 0);
-    let mut power = (a, b);
-    while exponent != 0 {
-        if exponent & 1 == 1 {
-            residue = quadratic_mul(residue, power, c, d, p);
-        }
-        exponent >>= 1;
-        if exponent != 0 {
-            power = quadratic_square(power, c, d, p);
-        }
-    }
+    let residue = if p <= u32::MAX as u64 {
+        vpower_quadratic_loop::<true>((a, b), exponent, c, d, p)
+    } else {
+        vpower_quadratic_loop::<false>((a, b), exponent, c, d, p)
+    };
     Ok(trim(vec![residue.0, residue.1]))
 }
 
@@ -2470,6 +2496,7 @@ mod tests {
                     quadratic_sub(cross, vmul(d, high, p), p),
                 );
                 assert_eq!(quadratic_mul(a, b, c, d, p), expected);
+                assert_eq!(quadratic_mul_karatsuba(a, b, c, d, p), expected);
             }
         }
     }
