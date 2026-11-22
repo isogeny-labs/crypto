@@ -302,6 +302,35 @@ fn main(){
             }
         }
     }
+    // Independent certificate verification ONLY: preparing reports is outside
+    // the timed region. This specifically measures elimination of redundant
+    // Finish Frobenius/GCD recomputation, without the traced producer cost.
+    for p in [65_521u64,1_000_000_007,MAX_PRIME] {
+        for degree in [2usize,4] {
+            let mut reports=Vec::new();
+            for i in 0..8u64 {
+                let f=polynomial(p,degree,1,i);
+                let mut sink=|e:&RootEvent|->Result<(),String>{black_box(e);Ok(())};
+                let report=solve(&f,p,7+i,
+                    RootLimits{field_work:MAX_WORK,split_attempts:1000,
+                        events:MAX_EVENTS,degree:MAX_DEGREE},
+                    &mut sink).unwrap();
+                assert!(report.complete());
+                reports.push(report);
+            }
+            let mut h=0u64;let mut n=0usize;
+            let start=Instant::now();
+            for _ in 0..16 {
+                for report in &reports {
+                    verify(black_box(report)).expect("certificate replay");
+                    h=checksum(h,&report.roots);
+                    n+=1;
+                }
+            }
+            println!("{p},verify_only_d{degree},{:.3},{h},{n}",
+                start.elapsed().as_nanos() as f64/n as f64);
+        }
+    }
     // Completed root extraction and independent certificate verification.
     for p in [65_521u64,1_000_000_007,MAX_PRIME] {
         for degree in [2usize,4] {
