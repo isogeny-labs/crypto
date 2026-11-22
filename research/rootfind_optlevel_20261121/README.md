@@ -62,13 +62,19 @@ Goal: raise attainment toward the binding roof without changing the search
 † Tick 0 IFMA A used approximate mul charges; not comparable to tick 1's honest
 lane-mul count. Wall ns/target is the comparable speed metric.
 
-Limiter at A≈0.97: "near the roofline; what remains is the algorithmic axis."
-Next ticks: raise **floor:m=3** (A≈0.37) — still the highest e2e-relevant
-constant-factor arm's optlevel gap; declare intensity / tighten Bloom+lookup.
+### Tick 2 (landed) — floor lever 2
 
-Stop the `/loop` when the best probe arms are stable within the noise floor
-across two ticks, or when the binding roof is memory and intensity cannot rise
-without algorithm change.
+`rootfind-floor:m=3` gained `decompose_lanes` (scalar 8-wide) + IFMA lockstep
+(canonical Bloom; same IFMA backend as kmitm with floor dx convention).
+
+| Arm / mode | A_single | Grade | vs tick 0 |
+|---|---:|---|---|
+| floor:m=3 single | 0.406 | B | 0.375 → |
+| floor:m=3 lanes8 | 0.483 | B | new |
+| floor:m=3 IFMA | **0.922 / 0.925** | **A** | new; two ticks agree within noise |
+
+Limiter on floor/kmitm IFMA: "near the roofline; what remains is the algorithmic
+axis." **Loop stopped** — both preferred IFMA probe arms are grade A and stable.
 
 ## Claim hygiene
 

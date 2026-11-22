@@ -20,8 +20,13 @@
 //! is constant-factor engineering (wall / field work); charged `S` matches
 //! `rootfind-subtract` by design. Fail-closed: every hit re-adds in the
 //! group on the ledger.
+//!
+//! PLAN lever 2: [`RootfindFloorOracle::decompose_lanes`] probes up to eight
+//! targets behind one shared batch-inv; on AVX-512 IFMA hosts with `p < 2^52`
+//! it prefers an IFMA lockstep (canonical Bloom) for the miss path.
 
 use std::collections::BTreeMap;
+use std::sync::Arc;
 
 use super::plugins::table_counted;
 use super::stages::{DecompositionOracle, InstanceCtx, Params};
@@ -92,12 +97,19 @@ pub struct RootfindFloorOracle<'i> {
     /// `m = 2`: Montgomery abscissa → (plus, minus) base indices.
     x_map: FastMap<(u32, u32)>,
     bloom: Option<WordBloom>,
+    /// Canonical affine-x Bloom for the IFMA lane path (`m = 3`).
+    canon_bloom: Option<WordBloom>,
     /// `m = 3`: negation-folded pair table; bloom-pass probes look up here
     /// (no parallel Montgomery witness map — that doubled prepare wall).
     table: Option<PairTable>,
     diffs: Vec<u64>,
     degenerate: Vec<bool>,
     scratch: Vec<u64>,
+    #[cfg(target_arch = "x86_64")]
+    ifma: Option<Arc<super::rootfind_kmitm_ifma::IfmaRight1>>,
+    ifma_enabled: bool,
+    #[cfg(target_arch = "x86_64")]
+    ifma_prefix: Vec<[u64; 8]>,
     pub mismatches: u64,
     sweep_field_muls: u64,
     sweep_field_adds: u64,
@@ -115,15 +127,93 @@ impl<'i> RootfindFloorOracle<'i> {
             reps: Vec::new(),
             x_map: fast_map(0),
             bloom: None,
+            canon_bloom: None,
             table: None,
             diffs: Vec::new(),
             degenerate: Vec::new(),
             scratch: Vec::new(),
+            #[cfg(target_arch = "x86_64")]
+            ifma: None,
+            ifma_enabled: true,
+            #[cfg(target_arch = "x86_64")]
+            ifma_prefix: Vec::new(),
             mismatches: 0,
             sweep_field_muls: 0,
             sweep_field_adds: 0,
             bloom_passes: 0,
             bloom_false_positives: 0,
+        }
+    }
+
+    pub fn ifma_prepared(&self) -> bool {
+        #[cfg(target_arch = "x86_64")]
+        {
+            self.ifma.is_some()
+        }
+        #[cfg(not(target_arch = "x86_64"))]
+        {
+            false
+        }
+    }
+
+    pub fn set_ifma_enabled(&mut self, on: bool) {
+        self.ifma_enabled = on;
+    }
+
+    pub fn ifma_enabled(&self) -> bool {
+        self.ifma_enabled
+    }
+
+    /// PLAN lever 2: probe up to eight targets per chunk. Prefers IFMA when
+    /// prepared and enabled; otherwise scalar shared batch-inv.
+    pub fn decompose_lanes(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        targets: &[PrimePoint],
+        out: &mut [Option<Vec<usize>>],
+    ) {
+        let n = targets.len().min(out.len());
+        for slot in out.iter_mut().take(n) {
+            *slot = None;
+        }
+        if n == 0 {
+            return;
+        }
+        if n == 1 || self.field.is_none() || self.bloom.is_none() {
+            for i in 0..n {
+                out[i] = self.decompose(ctx, fb, ops, counters, targets[i]);
+            }
+            return;
+        }
+        const LANE_CAP: usize = 8;
+        let mut base = 0;
+        while base < n {
+            let end = (base + LANE_CAP).min(n);
+            #[cfg(target_arch = "x86_64")]
+            if self.ifma.is_some() && self.ifma_enabled && self.m == 3 {
+                self.probe_lanes_ifma(
+                    ctx,
+                    fb,
+                    ops,
+                    counters,
+                    &targets[base..end],
+                    &mut out[base..end],
+                );
+                base = end;
+                continue;
+            }
+            self.probe_lanes_scalar(
+                ctx,
+                fb,
+                ops,
+                counters,
+                &targets[base..end],
+                &mut out[base..end],
+            );
+            base = end;
         }
     }
 }
@@ -213,6 +303,11 @@ impl DecompositionOracle<PrimeCurve> for RootfindFloorOracle<'_> {
         self.field = Some(f);
 
         let mut bloom = WordBloom::new(self.x_map.len().max(1));
+        self.canon_bloom = None;
+        #[cfg(target_arch = "x86_64")]
+        {
+            self.ifma = None;
+        }
         if self.m == 2 {
             for &k in self.x_map.keys() {
                 bloom.insert(k);
@@ -229,10 +324,41 @@ impl DecompositionOracle<PrimeCurve> for RootfindFloorOracle<'_> {
             // PairTable directly — no second FastMap of every entry.
             let n = table.entries.max(1) as usize;
             bloom = WordBloom::new(n);
+            #[cfg(target_arch = "x86_64")]
+            let want_ifma = (5..1u64 << 52).contains(&p)
+                && super::rootfind_kmitm_ifma::has_ifma();
+            #[cfg(not(target_arch = "x86_64"))]
+            let want_ifma = false;
+            let mut canon_bloom = if want_ifma {
+                Some(WordBloom::new(n))
+            } else {
+                None
+            };
             table.for_each_folded_key(|folded| {
-                bloom.insert(f.to_mont(folded.wrapping_sub(1)));
+                let x_aff = folded.wrapping_sub(1);
+                bloom.insert(f.to_mont(x_aff));
+                if let Some(cb) = canon_bloom.as_mut() {
+                    cb.insert(x_aff);
+                }
             });
             self.table = Some(table);
+            self.canon_bloom = canon_bloom;
+            #[cfg(target_arch = "x86_64")]
+            if want_ifma {
+                let xs: Vec<u64> = self
+                    .reps
+                    .iter()
+                    .map(|r| f.from_mont(r.x))
+                    .collect();
+                let ys: Vec<u64> = self
+                    .reps
+                    .iter()
+                    .map(|r| f.from_mont(r.y))
+                    .collect();
+                self.ifma =
+                    super::rootfind_kmitm_ifma::IfmaRight1::new(p, &xs, &ys).map(Arc::new);
+                self.ifma_prefix.clear();
+            }
         }
         self.bloom = Some(bloom);
         self.bloom_passes = 0;
@@ -364,6 +490,260 @@ impl DecompositionOracle<PrimeCurve> for RootfindFloorOracle<'_> {
 }
 
 impl RootfindFloorOracle<'_> {
+    /// Shared batch-inv across ≤8 independent floor probes (scalar lever 2).
+    fn probe_lanes_scalar(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        targets: &[PrimePoint],
+        out: &mut [Option<Vec<usize>>],
+    ) {
+        let Some(f) = self.field else {
+            for (i, &t) in targets.iter().enumerate() {
+                out[i] = self.decompose(ctx, fb, ops, counters, t);
+            }
+            return;
+        };
+        let k = self.reps.len();
+        let t_n = targets.len();
+        let total = k * t_n;
+        if self.diffs.len() < total {
+            self.diffs.resize(total, 0);
+            self.scratch.resize(total, 0);
+            self.degenerate.resize(total, false);
+        }
+        let mut xr = [0u64; 8];
+        let mut yr = [0u64; 8];
+        for (t, &target) in targets.iter().enumerate() {
+            if target.infinity {
+                continue;
+            }
+            xr[t] = f.to_mont(target.x);
+            yr[t] = f.to_mont(target.y);
+        }
+        ops.field_ops.muls += 2 * t_n as u64;
+        for t in 0..t_n {
+            if targets[t].infinity {
+                continue;
+            }
+            for i in 0..k {
+                let slot = t * k + i;
+                let d = f.sub(xr[t], self.reps[i].x);
+                self.degenerate[slot] = d == 0;
+                self.diffs[slot] = if d == 0 { f.one } else { d };
+            }
+        }
+        f.batch_inv(&mut self.diffs[..total], &mut self.scratch);
+        counters.inversions += 1;
+        ops.field_ops.invs += 1;
+        ops.field_ops.muls += 3 * total as u64;
+        self.sweep_field_muls += 2 * t_n as u64 + 3 * total as u64;
+        self.sweep_field_adds += total as u64;
+        for i in 0..k {
+            let rep = self.reps[i];
+            for t in 0..t_n {
+                if out[t].is_some() || targets[t].infinity {
+                    continue;
+                }
+                let slot = t * k + i;
+                if self.degenerate[slot] {
+                    let g = ctx.group;
+                    for summand in [rep.plus, rep.minus] {
+                        let tt = g.add(ops, targets[t], g.neg(fb.points[summand]));
+                        if let Some(found) =
+                            self.lookup_full(ctx, fb, ops, counters, targets[t], summand, tt)
+                        {
+                            out[t] = Some(found);
+                            break;
+                        }
+                    }
+                    continue;
+                }
+                let inv = self.diffs[slot];
+                let lam_minus = f.mul(f.add(yr[t], rep.y), inv);
+                let lam_plus = f.mul(f.sub(yr[t], rep.y), inv);
+                let base = f.add(xr[t], rep.x);
+                let x_minus = f.sub(f.mul(lam_minus, lam_minus), base);
+                let x_plus = f.sub(f.mul(lam_plus, lam_plus), base);
+                for (summand, x3, lam) in [
+                    (rep.plus, x_minus, lam_minus),
+                    (rep.minus, x_plus, lam_plus),
+                ] {
+                    ops.adds += 1;
+                    ops.field_ops.muls += 2;
+                    self.sweep_field_muls += 2;
+                    counters.lookups += 1;
+                    let maybe = self.bloom.as_ref().map(|b| b.maybe(x3)).unwrap_or(false);
+                    if !maybe {
+                        continue;
+                    }
+                    self.bloom_passes += 1;
+                    if let Some(found) =
+                        self.lookup_x(ctx, fb, ops, counters, targets[t], summand, x3, lam, yr[t], f)
+                    {
+                        out[t] = Some(found);
+                        break;
+                    }
+                    self.bloom_false_positives += 1;
+                }
+            }
+        }
+    }
+
+    /// IFMA lockstep for m=3: canonical Bloom, PairTable lookup without
+    /// from_mont on the miss path.
+    #[cfg(target_arch = "x86_64")]
+    fn probe_lanes_ifma(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        targets: &[PrimePoint],
+        out: &mut [Option<Vec<usize>>],
+    ) {
+        let Some(ifma) = self.ifma.clone() else {
+            self.probe_lanes_scalar(ctx, fb, ops, counters, targets, out);
+            return;
+        };
+        let Some(f) = self.field else {
+            self.probe_lanes_scalar(ctx, fb, ops, counters, targets, out);
+            return;
+        };
+        let t_n = targets.len();
+        let k = self.reps.len();
+        // Degenerate same-abscissa rows: scalar fallback.
+        for (t, &target) in targets.iter().enumerate() {
+            if target.infinity {
+                continue;
+            }
+            let tx = f.to_mont(target.x);
+            ops.field_ops.muls += 1;
+            let degenerates: Vec<(usize, usize)> = self
+                .reps
+                .iter()
+                .filter(|r| r.x == tx)
+                .map(|r| (r.plus, r.minus))
+                .collect();
+            let g = ctx.group;
+            for (plus, minus) in degenerates {
+                for summand in [plus, minus] {
+                    let tt = g.add(ops, target, g.neg(fb.points[summand]));
+                    self.sweep_field_adds += 1;
+                    if let Some(found) =
+                        self.lookup_full(ctx, fb, ops, counters, target, summand, tt)
+                    {
+                        out[t] = Some(found);
+                        break;
+                    }
+                }
+                if out[t].is_some() {
+                    break;
+                }
+            }
+        }
+        let skip: [bool; 8] = std::array::from_fn(|i| i < t_n && (out[i].is_some() || targets[i].infinity));
+        let bloom = self.canon_bloom.as_ref();
+        let mut cands: Vec<(usize, usize, u64)> = Vec::new();
+        let mut adds = 0u64;
+        let mut bloom_rejects = 0u64;
+        let mut bloom_passes = 0u64;
+        let plus: Vec<usize> = self.reps.iter().map(|r| r.plus).collect();
+        let minus: Vec<usize> = self.reps.iter().map(|r| r.minus).collect();
+        let muls = {
+            let prefix = &mut self.ifma_prefix;
+            ifma.for_each_floor_pair(targets, prefix, |lane, j, x_minus, x_plus| {
+                if skip[lane] {
+                    return;
+                }
+                adds += 1;
+                for (x, summand) in [(x_minus, plus[j]), (x_plus, minus[j])] {
+                    let pass = bloom.map(|b| b.maybe(x)).unwrap_or(true);
+                    if pass {
+                        bloom_passes += 1;
+                        cands.push((lane, summand, x));
+                    } else {
+                        bloom_rejects += 1;
+                    }
+                }
+            })
+        };
+        counters.inversions += 1;
+        ops.field_ops.invs += 1;
+        ops.field_ops.muls += muls;
+        ops.adds += adds;
+        self.sweep_field_muls += muls;
+        self.sweep_field_adds += adds;
+        self.bloom_passes += bloom_passes;
+        let _ = bloom_rejects;
+        for &(lane, summand, x_aff) in &cands {
+            if out[lane].is_some() {
+                continue;
+            }
+            counters.lookups += 1;
+            if let Some(found) =
+                self.lookup_x_canon(ctx, fb, ops, counters, targets[lane], summand, x_aff, f)
+            {
+                out[lane] = Some(found);
+            } else {
+                self.bloom_false_positives += 1;
+            }
+        }
+        let _ = k;
+    }
+
+    /// Canonical-x bloom pass (`m = 3`): PairTable lookup without `from_mont`.
+    #[allow(clippy::too_many_arguments)]
+    fn lookup_x_canon(
+        &mut self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: PrimePoint,
+        summand: usize,
+        x_aff: u64,
+        f: Fp64,
+    ) -> Option<Vec<usize>> {
+        let g = ctx.group;
+        let table = self.table.as_ref()?;
+        let (i, j) = table.lookup_folded(x_aff.wrapping_add(1))?;
+        // Recompute λ on the rare hit path (Montgomery).
+        let xr = f.to_mont(point.x);
+        let yr = f.to_mont(point.y);
+        let rep = self.reps.iter().find(|r| r.plus == summand || r.minus == summand)?;
+        let dx = f.sub(xr, rep.x);
+        if dx == 0 {
+            return None;
+        }
+        let inv = f.inv(dx);
+        ops.field_ops.invs += 1;
+        ops.field_ops.muls += 3; // to_mont×2 counted below + inv internals approx
+        ops.field_ops.muls += 2;
+        let lam = if summand == rep.plus {
+            f.mul(f.add(yr, rep.y), inv)
+        } else {
+            f.mul(f.sub(yr, rep.y), inv)
+        };
+        ops.field_ops.muls += 1;
+        let x3 = f.to_mont(x_aff);
+        let y3 = f.sub(f.mul(lam, f.sub(xr, x3)), yr);
+        let y_aff = f.from_mont(y3);
+        ops.field_ops.muls += 3; // to_mont(x) + λ·Δx + from_mont(y)
+        let t = PrimePoint::affine(x_aff, y_aff);
+        let s = g.add(ops, fb.points[i], fb.points[j]);
+        if s == t {
+            Some(vec![summand, i, j])
+        } else if s == g.neg(t) {
+            Some(vec![summand, fb.neg_index[i], fb.neg_index[j]])
+        } else {
+            let _ = counters;
+            None
+        }
+    }
+
     #[allow(clippy::too_many_arguments)]
     fn lookup_full(
         &mut self,
@@ -556,5 +936,48 @@ mod tests {
             assert_eq!(hit_f, hit_s);
         }
         assert_eq!(floor.mismatches, 0);
+    }
+
+    /// IFMA / scalar lanes recover the same m=3 verdicts as single decompose.
+    #[test]
+    fn floor_lanes_match_single_m3() {
+        let inst = prime_instance_for(20, 59297);
+        let fb = prime_factor_base(&inst, 32);
+        let c = ctx(&inst);
+        let (_, params) = Params::parse_spec("rootfind-floor:m=3").unwrap();
+        let mut floor = RootfindFloorOracle::new(3, &inst);
+        floor
+            .prepare(&c, &fb, &params, &mut GroupOps::default())
+            .unwrap();
+        let mut state = 0xF100_00A5_u64;
+        let mut targets = Vec::new();
+        for _ in 0..8 {
+            state = state.wrapping_mul(0x9E37_79B9_7F4A_7C15).wrapping_add(1);
+            let mut scratch = GroupOps::default();
+            targets.push(inst.curve.mul(
+                &mut scratch,
+                inst.generator_point(),
+                1 + state % (inst.r - 1),
+            ));
+        }
+        let mut single = Vec::new();
+        for &t in &targets {
+            let mut o = GroupOps::default();
+            let mut cters = OracleCounters::default();
+            single.push(floor.decompose(&c, &fb, &mut o, &mut cters, t));
+        }
+        for enable in [false, true] {
+            if enable && !floor.ifma_prepared() {
+                continue;
+            }
+            floor.set_ifma_enabled(enable);
+            let mut out = vec![None; 8];
+            let mut o = GroupOps::default();
+            let mut cters = OracleCounters::default();
+            floor.decompose_lanes(&c, &fb, &mut o, &mut cters, &targets, &mut out);
+            for i in 0..8 {
+                assert_eq!(out[i], single[i], "mode ifma={enable} lane {i}");
+            }
+        }
     }
 }

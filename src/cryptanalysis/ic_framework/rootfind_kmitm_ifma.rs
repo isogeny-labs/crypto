@@ -77,15 +77,34 @@ impl IfmaRight1 {
     }
 
     /// For each live lane `l < n_live`, call `on_pair(l, j, x_plus, x_minus)`
-    /// with canonical abscissae of `R±F_j`. Degenerate lanes (same abscissa
-    /// as `F_j`, or padded) are skipped for that `j`.
-    ///
-    /// Returns the number of lane-Montgomery multiplications performed
-    /// (each vector `mm` counts `n_live` ops).
+    /// with canonical abscissae of `R±F_j` (**kmitm** dx = `x_j − x_R`).
+    /// Returns lane-Montgomery mul count (each vector `mm` counts `n_live`).
     pub fn for_each_sibling_pair(
         &self,
         pts: &[PrimePoint],
         prefix: &mut Vec<[u64; LANES]>,
+        on_pair: impl FnMut(usize, usize, u64, u64),
+    ) -> u64 {
+        self.for_each_pair(pts, prefix, false, on_pair)
+    }
+
+    /// Floor / subtract convention: dx = `x_R − x_i`, callback
+    /// `(lane, j, x_minus, x_plus)` matching `rootfind-floor`'s
+    /// `(rep.plus, x_minus)` / `(rep.minus, x_plus)`.
+    pub fn for_each_floor_pair(
+        &self,
+        pts: &[PrimePoint],
+        prefix: &mut Vec<[u64; LANES]>,
+        on_pair: impl FnMut(usize, usize, u64, u64),
+    ) -> u64 {
+        self.for_each_pair(pts, prefix, true, on_pair)
+    }
+
+    fn for_each_pair(
+        &self,
+        pts: &[PrimePoint],
+        prefix: &mut Vec<[u64; LANES]>,
+        floor_dx: bool,
         mut on_pair: impl FnMut(usize, usize, u64, u64),
     ) -> u64 {
         debug_assert!(!pts.is_empty() && pts.len() <= LANES);
@@ -98,7 +117,7 @@ impl IfmaRight1 {
             yr[l] = mulmod(q.y, self.r, self.p);
         }
         // SAFETY: `new` returned `Some` only where the CPU has IFMA.
-        unsafe { self.sweep_avx(&xr, &yr, n_live, prefix, &mut on_pair) }
+        unsafe { self.sweep_avx(&xr, &yr, n_live, floor_dx, prefix, &mut on_pair) }
     }
 
     /// Scalar Montgomery product, `R = 2^52` (same reduction as the vector `mm`).
@@ -145,6 +164,7 @@ impl IfmaRight1 {
         xr: &[u64; LANES],
         yr: &[u64; LANES],
         n_live: usize,
+        floor_dx: bool,
         prefix: &mut Vec<[u64; LANES]>,
         on_pair: &mut impl FnMut(usize, usize, u64, u64),
     ) -> u64 {
@@ -181,9 +201,14 @@ impl IfmaRight1 {
         let vxr = ld(xr);
         let vyr = ld(yr);
         let k = self.xs.len();
-        // dx = x_j − x_R (kmitm convention), with Montgomery-1 where 0.
+        // kmitm: dx = x_j − x_R; floor: dx = x_R − x_j.
         let diff = |j: usize| {
-            let d = sub(_mm512_set1_epi64(self.xs[j] as i64), vxr);
+            let xj = _mm512_set1_epi64(self.xs[j] as i64);
+            let d = if floor_dx {
+                sub(vxr, xj)
+            } else {
+                sub(xj, vxr)
+            };
             let zm = _mm512_cmpeq_epi64_mask(d, z);
             (_mm512_mask_blend_epi64(zm, d, one_r), zm)
         };
@@ -194,9 +219,6 @@ impl IfmaRight1 {
             acc = mm(acc, diff(j).0);
             prefix.push(st(acc));
         }
-        // Batch inv of the 8 lane products (one Fermat + Montgomery trick).
-        // Charge ~2·LANES mont muls for the product tree + back-sub, plus the
-        // single Fermat (~1.5·log₂(p) mulmods, counted as mont-equivalents).
         let inv_arr = self.inv_lanes(st(acc));
         let fermat_muls = 2 * LANES as u64 + ((64 - self.p.leading_zeros()) as u64 * 3 / 2);
         let mut inv = ld(&inv_arr);
@@ -213,20 +235,27 @@ impl IfmaRight1 {
             let xj = _mm512_set1_epi64(self.xs[j] as i64);
             let yj = _mm512_set1_epi64(self.ys[j] as i64);
             let inv_j = ld(&prefix[j]);
-            // λ₊ = (y_j − y_R) / dx ; λ₋ = −(y_j + y_R) / dx
-            let lp = mm(sub(yj, vyr), inv_j);
-            let lm = mm(sub(z, add(yj, vyr)), inv_j);
             let base = add(vxr, xj);
-            // ×1 (canonical) strips the Montgomery factor.
-            let lp2 = mm(lp, lp);
-            let lm2 = mm(lm, lm);
-            let xp = st(mm(sub(lp2, base), one));
-            let xm = st(mm(sub(lm2, base), one));
+            let (a0, a1) = if floor_dx {
+                // lam_minus = (y_R + y_i)/dx → x_minus; lam_plus = (y_R − y_i)/dx → x_plus
+                let lm = mm(add(vyr, yj), inv_j);
+                let lp = mm(sub(vyr, yj), inv_j);
+                let lm2 = mm(lm, lm);
+                let lp2 = mm(lp, lp);
+                (st(mm(sub(lm2, base), one)), st(mm(sub(lp2, base), one)))
+            } else {
+                // λ₊ = (y_j − y_R)/dx → x₊; λ₋ = −(y_j + y_R)/dx → x₋
+                let lp = mm(sub(yj, vyr), inv_j);
+                let lm = mm(sub(z, add(yj, vyr)), inv_j);
+                let lp2 = mm(lp, lp);
+                let lm2 = mm(lm, lm);
+                (st(mm(sub(lp2, base), one)), st(mm(sub(lm2, base), one)))
+            };
             for l in 0..n_live {
                 if zm & (1 << l) != 0 {
                     continue;
                 }
-                on_pair(l, j, xp[l], xm[l]);
+                on_pair(l, j, a0[l], a1[l]);
             }
         }
         vec_muls + fermat_muls

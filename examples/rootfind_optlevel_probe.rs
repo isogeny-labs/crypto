@@ -118,8 +118,24 @@ fn main() {
         oracle
             .prepare(&ctx, &fb, &params, &mut GroupOps::default())
             .unwrap_or_else(|e| panic!("prepare: {e}"));
-        warm_single(&mut oracle, &ctx, &fb, &targets);
-        run_single(&mut oracle, &ctx, &fb, &targets, min_secs)
+        let ifma = oracle.ifma_prepared();
+        match mode.as_str() {
+            "ifma" => {
+                if !ifma {
+                    eprintln!("IFMA not prepared; falling back to scalar lanes");
+                }
+                oracle.set_ifma_enabled(true);
+            }
+            "lanes" => oracle.set_ifma_enabled(false),
+            _ => {}
+        }
+        if mode == "lanes" || mode == "ifma" {
+            warm_floor_lanes(&mut oracle, &ctx, &fb, &targets);
+            run_floor_lanes(&mut oracle, &ctx, &fb, &targets, min_secs, ifma)
+        } else {
+            warm_single(&mut oracle, &ctx, &fb, &targets);
+            run_single(&mut oracle, &ctx, &fb, &targets, min_secs)
+        }
     } else if arm.starts_with("rootfind-subtract") || arm.starts_with("subtract:") {
         let spec = if arm.starts_with("subtract:") {
             format!("rootfind-{arm}")
@@ -252,6 +268,50 @@ fn warm_single<O: DecompositionOracle<crypto_lib::cryptanalysis::ic_boundary::Pr
         let mut c = OracleCounters::default();
         black_box(oracle.decompose(ctx, fb, &mut o, &mut c, t));
     }
+}
+
+fn warm_floor_lanes(
+    oracle: &mut RootfindFloorOracle<'_>,
+    ctx: &InstanceCtx<'_, crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>,
+    fb: &crypto_lib::cryptanalysis::ic_boundary::FactorBase<PrimePoint>,
+    targets: &[PrimePoint],
+) {
+    let n = targets.len().min(16);
+    let mut out = vec![None; n.min(8)];
+    for chunk in targets[..n].chunks(8) {
+        let mut o = GroupOps::default();
+        let mut c = OracleCounters::default();
+        oracle.decompose_lanes(ctx, fb, &mut o, &mut c, chunk, &mut out[..chunk.len()]);
+        black_box(&out);
+    }
+}
+
+fn run_floor_lanes(
+    oracle: &mut RootfindFloorOracle<'_>,
+    ctx: &InstanceCtx<'_, crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>,
+    fb: &crypto_lib::cryptanalysis::ic_boundary::FactorBase<PrimePoint>,
+    targets: &[PrimePoint],
+    min_secs: f64,
+    ifma: bool,
+) -> (u64, f64, u64, bool) {
+    let mut total_ops = 0u64;
+    let mut probes = 0u64;
+    let t0 = Instant::now();
+    loop {
+        let mut out = vec![None; 8];
+        for chunk in targets.chunks(8) {
+            let mut o = GroupOps::default();
+            let mut c = OracleCounters::default();
+            oracle.decompose_lanes(ctx, fb, &mut o, &mut c, chunk, &mut out[..chunk.len()]);
+            total_ops += o.field_ops.muls + o.field_ops.sqrs;
+            probes += chunk.len() as u64;
+            black_box(&out);
+        }
+        if t0.elapsed().as_secs_f64() >= min_secs {
+            break;
+        }
+    }
+    (total_ops, t0.elapsed().as_secs_f64(), probes, ifma)
 }
 
 fn run_single<O: DecompositionOracle<crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>>(
