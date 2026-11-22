@@ -416,20 +416,15 @@ impl<'i> RootfindKMitmOracle<'i> {
                 }
                 #[cfg(target_arch = "x86_64")]
                 if self.avx2.is_some() && self.avx2_enabled {
-                    // AVX2 is 4-wide; split an 8-chunk into two.
-                    let mut b = base;
-                    while b < end {
-                        let e = (b + 4).min(end);
-                        self.probe_right1_prime_lanes_avx2(
-                            g,
-                            fb,
-                            ops,
-                            counters,
-                            &targets[b..e],
-                            &mut out[b..e],
-                        );
-                        b = e;
-                    }
+                    // Dual-pack AVX2: one FB walk covers up to 8 targets.
+                    self.probe_right1_prime_lanes_avx2(
+                        g,
+                        fb,
+                        ops,
+                        counters,
+                        &targets[base..end],
+                        &mut out[base..end],
+                    );
                     base = end;
                     continue;
                 }
@@ -1710,7 +1705,7 @@ impl RootfindKMitmOracle<'_> {
             return;
         };
         let t_n = targets.len();
-        debug_assert!(t_n <= 4, "avx2 lane chunk cap is 4");
+        debug_assert!(t_n <= 8, "avx2 dual-pack cap is 8");
         for (t, &target) in targets.iter().enumerate() {
             for (j, &pj) in fb.points.iter().enumerate() {
                 if g.is_identity(&pj) || pj.x != target.x {
@@ -1749,7 +1744,7 @@ impl RootfindKMitmOracle<'_> {
         let mut bloom_rejects = 0u64;
         let mut bloom_passes = 0u64;
         let mut map_miss = 0u64;
-        let skip: [bool; 4] = std::array::from_fn(|i| i < t_n && out[i].is_some());
+        let skip: [bool; 8] = std::array::from_fn(|i| i < t_n && out[i].is_some());
         let bloom = self.canon_bloom.clone();
         let canon_left = Arc::clone(&self.canon_left);
         self.avx2_cands.clear();
@@ -2381,7 +2376,7 @@ mod tests {
         }
         let mut state = 0xA11C_EEE5_u64;
         let mut targets = vec![s];
-        for _ in 0..3 {
+        for _ in 0..7 {
             state = state.wrapping_mul(0x9E37_79B9_7F4A_7C15).wrapping_add(1);
             targets.push(g.mul(&mut ops, inst.generator_point(), 1 + state % (inst.r - 1)));
         }
@@ -2399,7 +2394,7 @@ mod tests {
         let mut dops = GroupOps::default();
         let mut counters = OracleCounters::default();
         oracle.decompose_lanes(&c, &fb, &mut dops, &mut counters, &targets, &mut out);
-        assert!(out[0].is_some(), "AVX2 lanes should recover planted sum");
+        assert!(out[0].is_some(), "AVX2 dual-pack should recover planted sum");
         assert_eq!(out[0].as_ref().unwrap().len(), 4);
     }
 

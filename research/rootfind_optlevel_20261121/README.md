@@ -192,8 +192,21 @@ wired behind `decompose_lanes` when IFMA is off. Correctness:
 
 AVX2 is **slower** than scalar lanes (Bloom/map overhead + weaker 4-wide
 vs 8-wide scalar ILP; `mul_epu32` mont is not free). Fail-closed tick 1/3.
-Next loop tick: cut candidate-buffer / map traffic, or widen to 8 via two
-AVX2 packs; else second fail-closed.
+
+### Tick 10 — dual-pack AVX2 (fail-closed)
+
+One FB walk drives two `__m256i` packs (up to 8 targets). Correctness still
+passes (8-target planted test).
+
+| Arm (bits=28, \|Fₓ\|=32) | Tick 9 A | Tick 10 A | Δ |
+|---|---:|---:|---|
+| kmitm:m=4 AVX2 | 0.158 | **0.158** | noise |
+| kmitm:m=4 scalar lanes8 | 0.181 | 0.177 | noise |
+
+Fail-closed tick 2/3: dual-pack does not beat scalar 8-wide ILP + one
+shared Fp64 batch-inv. Bound is the `mul_epu32` mont / store-reload prefix
+chain, not the split-walk. Next tick: last attempt (e.g. keep results in
+Montgomery and key bloom by R=2^32 mont form) or stop.
 
 ## Claim hygiene
 
