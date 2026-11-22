@@ -5350,6 +5350,7 @@ mod tests {
     /// the same answer on every residual, not merely the same counts.
     #[test]
     fn the_border_check_sends_only_the_residuals_no_degree_solves_to_the_fallback() {
+        let _env = env_lock();
         let inst = generate_instance3(271, 1);
         let pre = SymmetrisedS4::precompute(&inst.curve);
         let p = inst.curve.field.p;
@@ -5895,6 +5896,13 @@ mod tests {
 
     // ── the default large-prime path is unchanged ────────────────────────
 
+    /// `GAUDRY_BORDER_RETRY` is process-wide and one test flips it; a test
+    /// that compares exact reports must not run while it is set.
+    fn env_lock() -> std::sync::MutexGuard<'static, ()> {
+        static LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        LOCK.lock().unwrap_or_else(|e| e.into_inner())
+    }
+
     /// SHA-256 of the report's JSON with the two wall-clock fields zeroed.
     fn report_digest(mut rep: GaudryReport) -> String {
         rep.wall_ms = 0.0;
@@ -5912,6 +5920,7 @@ mod tests {
     /// the digests instead of asserting.
     #[test]
     fn default_large_prime_reports_are_unchanged() {
+        let _env = env_lock();
         let mut got: Vec<(String, String)> = Vec::new();
         let build = |p: u64, iseed: u64, bseed: u64| {
             let inst = generate_instance3(p, iseed);
