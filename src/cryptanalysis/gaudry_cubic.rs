@@ -5356,4 +5356,101 @@ mod tests {
             "pair {pair_each} vs triple {grob_each} F_p muls per residual"
         );
     }
+
+    // ── the default large-prime path is unchanged ────────────────────────
+
+    /// SHA-256 of the report's JSON with the two wall-clock fields zeroed.
+    fn report_digest(mut rep: GaudryReport) -> String {
+        rep.wall_ms = 0.0;
+        rep.linear_algebra_ms = 0.0;
+        let json = serde_json::to_string(&rep).unwrap();
+        crate::hash::sha256::sha256(json.as_bytes())
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect()
+    }
+
+    /// The reports of the default (eliminator) large-prime path, byte for
+    /// byte (wall clock excluded), as the code stood before the gain-forest
+    /// harvester was ported (crypto `c9601627e`).  `GOLDEN_PRINT=1` prints
+    /// the digests instead of asserting.
+    #[test]
+    fn default_large_prime_reports_are_unchanged() {
+        let mut got: Vec<(String, String)> = Vec::new();
+        let build = |p: u64, iseed: u64, bseed: u64| {
+            let inst = generate_instance3(p, iseed);
+            let mut rng = StdRng::seed_from_u64(bseed);
+            let base = SubspaceBase::build(&inst, &mut rng);
+            (inst, base)
+        };
+        let rule = |base: &SubspaceBase| (base.len() as f64).powf(2.0 / 3.0).ceil() as usize;
+        // 0: Groebner + Wiedemann + double large primes, the bench's arm.
+        let (inst, base) = build(67, 1, 1);
+        let opts = GaudryOptions {
+            solver: Solver::Groebner,
+            sparse_la: true,
+            small_base: rule(&base),
+            max_large_primes: 2,
+            ..GaudryOptions::default()
+        };
+        let rep = run_gaudry_opts(&inst, &base, 1, &opts);
+        assert_eq!(rep.correct, Some(true));
+        got.push(("groebner_lp2_p67".into(), report_digest(rep)));
+        // 1: the plain dense run.
+        let (inst, base) = build(67, 11, 2);
+        got.push((
+            "mitm_dense_p67".into(),
+            report_digest(run_gaudry(&inst, &base, 1, 20_000)),
+        ));
+        // 2: a larger field with a merge-level cap.
+        let (inst, base) = build(151, 3, 3);
+        let opts = GaudryOptions {
+            solver: Solver::Groebner,
+            sparse_la: true,
+            small_base: rule(&base),
+            max_large_primes: 2,
+            max_merge_level: 2,
+            ..GaudryOptions::default()
+        };
+        got.push((
+            "groebner_lp2_cap2_p151".into(),
+            report_digest(run_gaudry_opts(&inst, &base, 2, &opts)),
+        ));
+        // 3, 4: the two protected backends.
+        let (inst, base) = build(67, 1, 1);
+        let opts = GaudryOptions {
+            solver: Solver::Groebner,
+            sparse_la: true,
+            small_base: rule(&base),
+            max_large_primes: 2,
+            ..GaudryOptions::default()
+        };
+        for (name, backend) in [
+            ("pivot_backend_p67", LargePrimeBackend::Pivot),
+            ("graph_backend_p67", LargePrimeBackend::SymbolicGraph),
+        ] {
+            got.push((
+                name.into(),
+                report_digest(run_gaudry_with_eliminator(&inst, &base, 1, &opts, backend)),
+            ));
+        }
+        if std::env::var_os("GOLDEN_PRINT").is_some() {
+            for (k, v) in &got {
+                println!("GOLDEN {k} {v}");
+            }
+            return;
+        }
+        const GOLDEN: &[(&str, &str)] = &[
+            ("groebner_lp2_p67", "3a7b0cea7e1ee1bd4d3a7313fe85b5e9758256ad2eacad3e2efda1bc4e8b900d"),
+            ("mitm_dense_p67", "0edf9ac1de52650d79426602b3fad1a6989907472da94feab1ad08917e6067d8"),
+            ("groebner_lp2_cap2_p151", "9d8ce38d7fae38fe8a4a248e9428eb1791be9815c7fb7ebb4f6794c3aeb104f8"),
+            ("pivot_backend_p67", "b547716bfba01e59fba2eff97226fad464178ade3fda627164c2246fcb5f5eb0"),
+            ("graph_backend_p67", "780b187825cd4d82ba1b25d568f7d489ca981040bf6044b20ab9874324cb7847"),
+        ];
+        assert_eq!(got.len(), GOLDEN.len());
+        for ((k, v), (gk, gv)) in got.iter().zip(GOLDEN) {
+            assert_eq!(k, gk);
+            assert_eq!(v, gv, "{k}: the default path's report changed");
+        }
+    }
 }
