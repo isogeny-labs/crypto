@@ -97,6 +97,14 @@ redundant arm can be skipped; `rho_ms` / `rho_ok` are `null` in that mode.
 ~1.5×10³ × a tuned rho on the same instance.** Against rho it is nowhere
 near competitive; the rung's value is the scaling curve, not a speed record.
 
+## Correctness gate
+
+`examples/prime_mitm_check` on the frozen 16-bit targets: **3/3 seeds**,
+`s3_ok` / `mitm_ok` / `quartic_ok` all true and `same_scalar` true on each.
+Every candidate is re-added in the group before use, so a pass also means the
+u64 probe never returned a triple that does not sum to the sampled `R`.
+Log: `prime_mitm_check.log` (300 s CPU on the shared host).
+
 ## What the rung does say
 
 - The MITM path is correct at 36 bits: same scalar as the tuned rho, every
@@ -126,5 +134,6 @@ near competitive; the rung's value is the scaling curve, not a speed record.
 | `a3_36bit_rho_paired.jsonl` | tuned rho on the identical four targets |
 | `a3_32bit_rho_paired.jsonl` | same arm on the four archived 32-bit targets |
 | `a3_32bit_cpu.txt` | 32-bit CPU-time control at B=1600, for the 32→36 step |
+| `prime_mitm_check.log` | 16-bit S₃/MITM/quartic oracle-equivalence gate |
 | `summarise.py` | renders the two tables above |
 | `update_ledger.py` | folds this rung (and the 32-bit correction) into `docs/ic/boundary_targets.json` |
