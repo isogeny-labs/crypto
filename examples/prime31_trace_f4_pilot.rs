@@ -5,6 +5,7 @@
 //!   cargo run --release --locked --example prime31_trace_f4_pilot
 //!   cargo run --release --locked --example prime31_trace_f4_pilot -- --m4
 //!   cargo run --release --locked --example prime31_trace_f4_pilot -- --m4-s3
+//!   cargo run --release --locked --example prime31_trace_f4_pilot -- --circuit
 //! Use --m4 only to include the m4 membership-only stage; it is NOT an S5 solve.
 //! This file has no native compile/run receipt yet, so no speed result is claimed.
 
@@ -147,6 +148,50 @@ fn moment_system(f: Fp, h: &[u64], m: usize) -> (Vec<Mpoly>, Vec<Mpoly>) {
     (raw, reduced)
 }
 
+/// A quadratic arithmetic-circuit lift of Newton power sums.
+/// Variables: e1..em, P1..P_(B+m-1). P0=m is a constant.
+/// Each recurrence fixes its P_k uniquely in terms of earlier variables;
+/// H_j=SUM h_k P_(j+k)=0 is LINEAR in the P variables.
+/// All generated equations have total degree <=2, but n_vars=O(B).
+/// This trades dense G(e) expansion for B extra unknowns; not necessarily
+/// faster for F4, and the setup/LA bill must count the extra dimensions.
+fn moment_circuit(f: Fp, h: &[u64], m: usize) -> Vec<Mpoly> {
+    assert!(m>0 && (m as u64)<f.p && h.len()>=2);
+    let b=h.len()-1;
+    let max_p=b+m-1;
+    let n=m+max_p;
+    let p_k=|k:usize| -> Mpoly {
+        if k==0 { constant(n,m as u64) } else { var(n,m+k-1) }
+    };
+    let mut equations=Vec::new();
+    for k in 1..=max_p {
+        let mut eq=p_k(k);
+        for i in 1..=m.min(k.saturating_sub(1)) {
+            let product=mul(f,&var(n,i-1),&p_k(k-i));
+            if i%2==1 {
+                eq=sub(f,&eq,&product);
+            } else {
+                eq=add(f,&eq,&product);
+            }
+        }
+        if k<=m {
+            let coef=if k%2==1 {k as u64} else {f.neg(k as u64)};
+            eq=sub(f,&eq,&scale(f,&var(n,k-1),coef));
+        }
+        assert!(max_degree(&eq)<=2);
+        equations.push(eq);
+    }
+    for j in 0..m {
+        let mut eq=Mpoly::new();
+        for (k,&coef) in h.iter().enumerate() {
+            eq=add(f,&eq,&scale(f,&p_k(j+k),coef));
+        }
+        assert!(max_degree(&eq)<=1);
+        equations.push(eq);
+    }
+    equations
+}
+
 fn max_degree(p: &Mpoly) -> u32 {
     p.keys().map(|e| e.iter().sum::<u32>()).max().unwrap_or(0)
 }
@@ -236,7 +281,7 @@ fn run_arm(f: Fp, title: &str, polynomials: &[Mpoly], budget: Duration, bound: u
 
 /// Actual planted Semaev relation G + 2G = 3G on the ordinary cofactor-one
 /// Prime31 curve. This is an F4 relation-solver STAGE, not an unknown DLP.
-fn run_m2(f: Fp, base: &[u64], budget: Duration) {
+fn run_m2(f: Fp, base: &[u64], budget: Duration, include_circuit: bool) {
     let h = poly_from_roots(f, base);
     let (raw, reduced) = moment_system(f, &h, 2);
     let s = f.add(GX, X2G);
@@ -263,6 +308,25 @@ fn run_m2(f: Fp, base: &[u64], budget: Duration) {
     run_arm(f, "ordered-plus-S3", &ordered, budget, (base.len()*2+6) as u32);
     run_arm(f, "sym-raw-H-plus-S3", &arm_h, budget, (base.len()*2+6) as u32);
     run_arm(f, "sym-degreeB-G-plus-S3", &arm_g, budget, (base.len()*2+6) as u32);
+    if include_circuit {
+        let mut circuit=moment_circuit(f,&h,2);
+        let n=2+(base.len()+2-1);
+        let eq_s3=s3_symmetric(f,&var(n,0),&var(n,1),X3G);
+        circuit.push(eq_s3);
+        let xcoords=[GX,X2G];
+        let mut pows=Vec::new();
+        for k in 1..=base.len()+1 {
+            pows.push(f.add(f.pow(xcoords[0],k as u64),f.pow(xcoords[1],k as u64)));
+        }
+        let mut vals=vec![s,t];
+        vals.extend(pows);
+        assert_eq!(vals.len(),n);
+        for eq in &circuit {
+            assert_eq!(evaluate(f,eq,&vals),0,"quadratic power-circuit planted witness");
+        }
+        run_arm(f, "sym-quadratic-Newton-circuit-plus-S3", &circuit,budget,
+                (base.len()*2+6) as u32);
+    }
 }
 
 /// Optional m4 membership ONLY: no S5/relations; controls cost of membership
@@ -357,11 +421,12 @@ fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let m4 = args.iter().any(|x| x=="--m4");
     let m4_s3 = args.iter().any(|x| x=="--m4-s3");
+    let circuit = args.iter().any(|x| x=="--circuit");
     let budget = Duration::from_secs(15);
     // B=3/4 are bounded development cells, not exponent-scaling evidence.
     for size in [3usize, 4] {
         let base = prime31_base(f, size);
-        run_m2(f, &base, budget);
+        run_m2(f, &base, budget, circuit);
         if m4 { run_m4_membership(f, &base, budget); }
     }
     if m4_s3 { run_m4_s3_relation(f,budget); }
