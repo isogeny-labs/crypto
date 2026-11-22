@@ -1,0 +1,60 @@
+# Monic-in-t S3 quotient: an exact alternative to generic F4 for pair factor-base relations
+
+Date 2026-11-22. Status **mathematical derivation and independent small-instance modular arithmetic check; native implementation and speed unresolved.** This is a **different** elimination from #4922's reusable Macaulay pivot projection. Priority/novelty not established. Do not represent it as an asymptotic breakthrough.
+
+## Core observation
+
+For `E/Fp: y²=x³+ax+b`, a **fixed** public target abscissa `z` and pair invariants `s=x1+x2, t=x1*x2`, Semaev's equation is
+
+```
+F_z(s,t) = t² + q_z(s)*t + r_z(s) = 0
+q_z(s) = -4 z² - 2 s z - 2 a
+r_z(s) = s² z² - (2 a z + 4 b) s + a² - 4 b z.
+```
+
+Critically, **the coefficient of t² is 1** for every z, so the quotient `R_z=Fp[s,t]/(F_z)` is always a free `Fp[s]`-module of rank two with basis `1,t`; no inverse of a target-dependent leading coefficient is needed.
+
+Let `h(X)=prod_{w in W}(X-w)`, `P_k=x1^k+x2^k`, and the earlier exact trace moments `H_j = sum_{k=0}^B h_k P_(k+j)`, j=0,1. These are the **radical** pair-image equations. In `R_z`, compute by linear recurrence
+
+```
+P0=2, P1=s,
+Pk=s*P_(k-1)-t*P_(k-2),
+t*(u(s)+v(s)t) = -r_z(s)*v(s) + (u(s)-q_z(s)*v(s))*t.
+```
+
+Thus reduce each moment *during its construction*, without constructing an F4 Macaulay matrix:
+
+```
+H0 ≡ b0(s)+a0(s)t,   H1 ≡ b1(s)+a1(s)t (mod F_z).
+```
+
+The coefficients `a_i,b_i` are exact univariate polynomials over Fp. The recurrence has O(B) steps and O(B²) elementary coefficient work with ordinary dense polynomial arrays (not O(B^4)); faster univariate arithmetic may improve this, subject to measurement.
+
+## Exact univariate elimination with complete exceptional branches
+
+For any common zero (s,t) of H0,H1,F, the two univariate conditions hold:
+
+```
+D(s) = a0(s)*b1(s)-a1(s)*b0(s) = 0,
+N(s) = b0(s)^2 - q_z(s)*a0(s)*b0(s) + r_z(s)*a0(s)^2 = 0.
+```
+
+Therefore every genuine rational solution s is a root of `C(s)=gcd(D,N)`. This is an **exact necessary projection** (not an iff in isolation). Recover all roots of C over Fp using finite-field polynomial rootfinding. For each such s:
+
+- If a0(s) != 0, set `t=-b0/a0`.
+- Otherwise if b0(s) != 0, reject.
+- Otherwise if a1(s) != 0, set `t=-b1/a1`.
+- Otherwise if b1(s) != 0, reject.
+- If both remainders are identically zero at s, solve the **monic quadratic** `F_z(s,t)=0` for rational t.
+
+In every branch, verify **all three original polynomials** `H0,H1,F`. Then independently recover `x1,x2` as roots of `X²-sX+t`, verify both are rational and in W, lift actual curve points, enumerate valid signs and verify the signed group equation (with infinity and 2-torsion branches). If D=N=0 identically as polynomials (possible pathological specialization), treat the query as **censored/fallback**; do not pretend a finite projection exists. This procedure is complete on ordinary finite charts provided rational-root extraction succeeds and the stated exceptional branches are implemented.
+
+The scheme is especially attractive as a *non-table* pair-root oracle and a building block for pairwise m4 chains. However a pair-join oracle with even ~linear work in B is **not** enough by itself to establish a sub-rho m4 cold exponent; a measured sub-B target-query strategy, authentic rank and amortized setup are still required. Fast univariate factoring is not free. The previous radical DRL, #4922 sharing, #4901 real RHS and #4920 signed-pair controls remain required baselines.
+
+## Independent arithmetic spot-check (not original Rust)
+
+A standalone Python modular-polynomial prototype (kept out of the performance path) checked the exact quotient/remainder identities on the unchanged Prime31 curve for W={x(G),x(2G)}. With z=x(G), x(2G) and x(3G), the polynomial gcd C has degree one and includes exactly the relevant pair-sums among W. With z=x(10G), C=1 and there is no candidate. Explicit substitution into all remainder equations and F_z confirmed each genuine pair. This is not a representative yield experiment, not blind unknown-index recovery, and is not native Rust benchmark evidence.
+
+## Admission gate
+
+Implement the rank-two quotient recurrence and root extractor **in original Rust**; compare on the same B3..32 Prime31 public-Q targets to matched original F4, September DRL, #4922 reuse and #4920 table/original root finders. Record all construction, gcd, root factoring, sign/lift checking, retries and memory. Add positive and negative small-field exhaustive cases; include diagonal x1=x2 and intermediate-infinity group cases. If the non-table root extractor doesn't beat those controls, classify the negative result and stop that branch. **No speedup or priority claim here. [pcc:unverified]**
