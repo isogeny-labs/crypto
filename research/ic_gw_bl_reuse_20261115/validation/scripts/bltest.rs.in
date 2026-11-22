@@ -1,0 +1,74 @@
+// Validator stress harness for la2::block_lanczos (crate root; @SRC@ = the src dir whose ic2/la2 are tested,
+// @SHARED@ = the directory holding quartic_n4_20261019/, @PIC@ = plane_quartic_pic.rs). Random sparse
+// B (r x n) over F_ell with small and large ell; prints one JSON line per trial: kernel-vector digest, BlStats,
+// counted lmul/ladd of the call. Not a producer artifact; scratch build only.
+#![allow(dead_code, unused_imports, unused_variables, unused_mut, static_mut_refs)]
+#[path = "@SHARED@/quartic_n4_20261019/common.rs"]
+mod common;
+#[path = "@SHARED@/quartic_n4_20261019/ghs.rs"]
+mod ghs;
+#[path = "@SHARED@/quartic_n4_20261019/ic.rs"]
+mod ic;
+#[path = "@SHARED@/quartic_n4_20261019/solver.rs"]
+mod solver;
+#[path = "@PIC@"]
+mod pic;
+#[path = "@SRC@/ic2.rs"]
+mod ic2;
+#[path = "@SRC@/la2.rs"]
+mod la2;
+#[path = "@SRC@/rho2.rs"]
+mod rho2;
+#[path = "@SRC@/solver2.rs"]
+mod solver2;
+#[path = "@SRC@/summ2.rs"]
+mod summ2;
+use common::*;
+
+fn main() {
+    let a: Vec<String> = std::env::args().collect();
+    let trials: u64 = a[1].parse().unwrap();
+    let seed0: u64 = a[2].parse().unwrap();
+    let ells: [u64; 8] = [3, 5, 7, 11, 13, 101, 65537, 4501899029752451];
+    let bs: [usize; 5] = [1, 2, 3, 4, 8];
+    let mut g = Rng::new(seed0);
+    for t in 0..trials {
+        let ell = ells[g.below(ells.len() as u64) as usize];
+        let b = bs[g.below(bs.len() as u64) as usize];
+        let n = 4 + g.below(60) as usize;
+        // rows: fewer than n (non-trivial kernel) or about n
+        let r = if g.below(2) == 0 { 1 + g.below(n as u64 - 1) as usize } else { n - 1 + g.below(3) as usize };
+        let w = 1 + g.below(6) as usize;
+        let mut rows: Vec<ic::Row> = Vec::new();
+        for _ in 0..r {
+            let mut row: ic::Row = Vec::new();
+            let mut used = std::collections::BTreeSet::new();
+            for _ in 0..w {
+                let c = g.below(n as u64) as u32;
+                if used.insert(c) {
+                    let kind = g.below(3);
+                    let v = if kind == 0 { 1 } else if kind == 1 { ell - 1 } else { 1 + g.below(ell - 1) };
+                    row.push((c, v));
+                }
+            }
+            row.sort();
+            rows.push(row);
+        }
+        let mut rng = Rng::new(seed0 ^ (t.wrapping_mul(0x9E3779B97F4A7C15)));
+        let mut st = la2::BlStats { iters: 0, narrowed: 0 };
+        let s0 = snap();
+        eprintln!("TRIAL {}", t);
+        let res = la2::block_lanczos(&rows, n, ell, b, &mut rng, &mut st);
+        let s1 = snap();
+        let dig = match &res {
+            None => "none".to_string(),
+            Some(v) => {
+                let mut h: u64 = 1469598103934665603;
+                for &x in v { h = (h ^ x).wrapping_mul(1099511628211); }
+                format!("{:016x}", h)
+            }
+        };
+        println!("{{\"t\":{},\"ell\":{},\"b\":{},\"n\":{},\"r\":{},\"w\":{},\"res\":\"{}\",\"iters\":{},\"narrowed\":{},\"lmul\":{},\"ladd\":{}}}",
+            t, ell, b, n, r, w, dig, st.iters, st.narrowed, s1.lmul - s0.lmul, s1.ladd - s0.ladd);
+    }
+}

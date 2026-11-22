@@ -1,0 +1,141 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 76,
+  "runs": [
+    {
+      "attempt": "quadratic76-01",
+      "source_revision": "531d3fd337038b67259c6bf3efc03459f2e22817",
+      "kind": "Singular",
+      "status": "accepted",
+      "native_exit": 0,
+      "marker": "QUADRATIC76_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "factor_lines": [
+        "QUAD76_FACTOR fiber=0 mask=1 e=14 V=square_zero_nonzero",
+        "QUAD76_FACTOR fiber=0 mask=3 e=2 V=square_zero_nonzero",
+        "QUAD76_FACTOR fiber=1 mask=6 e=1 V=1",
+        "QUAD76_FACTOR fiber=1 mask=7 e=7 V=1",
+        "QUAD76_FACTOR fiber=1 mask=8 e=1 V=0",
+        "QUAD76_FACTOR fiber=1 mask=10 e=7 V=0"
+      ],
+      "result_lines": [
+        "QUAD76_RESULT branches=6 zero_fiber=2 one_fiber_V0=2 one_fiber_V1=2 all_source_checks=1"
+      ],
+      "started_utc": "2026-11-02T20:21:45Z",
+      "finished_utc": "2026-11-02T20:21:47Z",
+      "native_wall_seconds": 2.0,
+      "artifacts": [
+        {
+          "path": "runs/quadratic76-01/PROTOCOL.md",
+          "sha256": "c515cc2b3ce1be72bcf209291bf7e79bfca1e978594f63eccd4c25a10c5996fa",
+          "bytes": 1145
+        },
+        {
+          "path": "runs/quadratic76-01/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/quadratic76-01/donors.json",
+          "sha256": "49c6dbf884bacc0056dca25392cc5475a16aa1aa4eb71918789182cdbb80dcf0",
+          "bytes": 777
+        },
+        {
+          "path": "runs/quadratic76-01/driver.sh",
+          "sha256": "ce7150c382e11b9a68016f03d838be5d5efc1bb1d233b19a5d9d298981bbceaa",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/quadratic76-01/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/quadratic76-01/finished-utc.txt",
+          "sha256": "2a5f3e2a0f3cccfec5a24bc3ef512409b187deb8c5332e21e1a9d7fcdc3787b4",
+          "bytes": 21
+        },
+        {
+          "path": "runs/quadratic76-01/gate.log",
+          "sha256": "017ae4bb79127086b9fa7b9664ebde2857bb365c5eeadb17711d6ce933bfea4a",
+          "bytes": 166
+        },
+        {
+          "path": "runs/quadratic76-01/input.sing",
+          "sha256": "750d564373445570f2eebeb997ea1467cc06f0cc6df04b75bf4d8f3f5d9975ac",
+          "bytes": 3839
+        },
+        {
+          "path": "runs/quadratic76-01/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/quadratic76-01/native.log",
+          "sha256": "a0834ad18427f88536e2c3166cbff1d00da287aa626fdde829de495caf8db689",
+          "bytes": 376
+        },
+        {
+          "path": "runs/quadratic76-01/protocol.json",
+          "sha256": "b80358fbcace8d176a1f83a30a1bb1bca385a20e81250a40c69628b7446f0fbc",
+          "bytes": 2060
+        },
+        {
+          "path": "runs/quadratic76-01/source-revision.txt",
+          "sha256": "eee0b69cd525aa582f882be74625530e000b4a7432ab0847680b76d0ea4d0542",
+          "bytes": 41
+        },
+        {
+          "path": "runs/quadratic76-01/source.sha256",
+          "sha256": "470a989f5ea60cf20c58de5cf78dee76801fff1145b2f91505e240638894e6d2",
+          "bytes": 467
+        },
+        {
+          "path": "runs/quadratic76-01/started-utc.txt",
+          "sha256": "996fa1c1439fbdc30e94bb778333f69329beba574a6d7b2eb5cd029f3954913b",
+          "bytes": 21
+        }
+      ]
+    }
+  ],
+  "input_pins": [
+    {
+      "artifact": "input.sing",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/76/QUADRATIC76.sing",
+      "revision": "531d3fd337038b67259c6bf3efc03459f2e22817",
+      "sha256": "750d564373445570f2eebeb997ea1467cc06f0cc6df04b75bf4d8f3f5d9975ac"
+    },
+    {
+      "artifact": "driver.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/76/NATIVE_DRIVER.sh",
+      "revision": "531d3fd337038b67259c6bf3efc03459f2e22817",
+      "sha256": "ce7150c382e11b9a68016f03d838be5d5efc1bb1d233b19a5d9d298981bbceaa"
+    },
+    {
+      "artifact": "launcher.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/76/REPLAY_CAS.sh",
+      "revision": "531d3fd337038b67259c6bf3efc03459f2e22817",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "artifact": "PROTOCOL.md",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/76/PROTOCOL.md",
+      "revision": "531d3fd337038b67259c6bf3efc03459f2e22817",
+      "sha256": "c515cc2b3ce1be72bcf209291bf7e79bfca1e978594f63eccd4c25a10c5996fa"
+    },
+    {
+      "artifact": "protocol.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/76/protocol.json",
+      "revision": "531d3fd337038b67259c6bf3efc03459f2e22817",
+      "sha256": "b80358fbcace8d176a1f83a30a1bb1bca385a20e81250a40c69628b7446f0fbc"
+    },
+    {
+      "artifact": "donors.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/76/donors.json",
+      "revision": "531d3fd337038b67259c6bf3efc03459f2e22817",
+      "sha256": "49c6dbf884bacc0056dca25392cc5475a16aa1aa4eb71918789182cdbb80dcf0"
+    }
+  ],
+  "donor_hashes": 5
+}

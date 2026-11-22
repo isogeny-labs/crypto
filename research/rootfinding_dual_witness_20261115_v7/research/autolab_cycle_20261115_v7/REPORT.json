@@ -1,0 +1,120 @@
+{
+  "result": {
+    "evidence": {
+      "cell_unsat_claim": false,
+      "class_diagnostic_only": true,
+      "complete_global_root_search": false,
+      "details": {
+        "all_declared_points_evaluated": true,
+        "cell_unsat_claim": false,
+        "cells": [
+          {
+            "all512_points_evaluated": true,
+            "class_status": "constant_functional_class_impossible",
+            "depth": 0,
+            "points": 512,
+            "prefix": 0,
+            "rank": 416,
+            "witness_size": 197
+          },
+          {
+            "all512_points_evaluated": true,
+            "class_status": "constant_functional_class_impossible",
+            "depth": 1,
+            "points": 512,
+            "prefix": 0,
+            "rank": 416,
+            "witness_size": 203
+          },
+          {
+            "all512_points_evaluated": true,
+            "class_status": "constant_functional_class_impossible",
+            "depth": 1,
+            "points": 512,
+            "prefix": 1,
+            "rank": 416,
+            "witness_size": 207
+          },
+          {
+            "all512_points_evaluated": true,
+            "class_status": "constant_functional_class_impossible",
+            "depth": 2,
+            "points": 512,
+            "prefix": 0,
+            "rank": 416,
+            "witness_size": 207
+          },
+          {
+            "all512_points_evaluated": true,
+            "class_status": "constant_functional_class_impossible",
+            "depth": 2,
+            "points": 512,
+            "prefix": 1,
+            "rank": 416,
+            "witness_size": 207
+          },
+          {
+            "all512_points_evaluated": true,
+            "class_status": "constant_functional_class_impossible",
+            "depth": 2,
+            "points": 512,
+            "prefix": 2,
+            "rank": 416,
+            "witness_size": 195
+          },
+          {
+            "all512_points_evaluated": true,
+            "class_status": "constant_functional_class_impossible",
+            "depth": 2,
+            "points": 512,
+            "prefix": 3,
+            "rank": 416,
+            "witness_size": 215
+          }
+        ],
+        "disjoint_cover": false,
+        "field_degree": 83,
+        "h": 4989239479274253888111616,
+        "k": 0,
+        "only_nine_free_bits_per_cell": true,
+        "original_global_complete": false,
+        "overlapping_diagnostics": true,
+        "point_occurrences": 3584,
+        "root_cell_class_obstructed": true,
+        "setup_seconds": 0.6731243199992605,
+        "shared_parameter_bits": 73,
+        "small_control_cases": 4,
+        "stopped": null,
+        "supported_point_observations": 0,
+        "total_seconds": 7.682180035999409,
+        "unique_evaluated_points": 2048
+      },
+      "error": null,
+      "novelty_claim": false,
+      "original_root_count_exact": null,
+      "peak_process_rss_kib": 154800,
+      "predicates": 2203,
+      "qualified_speedup": null,
+      "raw_bytes": 519743,
+      "raw_path": "research/dual_obstruction_20261115_v6/raw.json.gz",
+      "raw_sha256": "123d001d247cce7c199cbfab5c448a5342d1afd9a9fa80aed6096bb1180b384d",
+      "raw_uncompressed_bytes": 1092775,
+      "release_gate_claim": false
+    },
+    "experiment_id": "dual-obstruction-20261115-v6",
+    "next_actions": [
+      "If the class is obstructed, design a genuinely different restricted polynomial-multiplier or whole-cell invariant with exact proof and cost; if no witness, sampled functional fits still require a universal identity proof before pruning."
+    ],
+    "schema": "scientific_result_v1",
+    "status": "passed",
+    "summary": "Exact odd-XOR witnesses refute only universal constant-functional support certificates on overlapping fixed norm cells; no cell/root UNSAT."
+  },
+  "process": {
+    "wall_seconds": 7.860731160999421,
+    "peak_process_rss_kib": 154800
+  },
+  "scientific_goal_complete": false,
+  "qualified_speedup": null,
+  "requested_speed_target": 8,
+  "decision": "Plainconstant-functionalclassrefutedon7specifiedcells; no cell rejected. Retirethisclass there, testgenuinelydifferentmultiplier/invariant or52compression withproof."
+}

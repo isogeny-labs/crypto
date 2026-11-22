@@ -30,6 +30,7 @@ research-kb (prior art)  →  controlled-experiment / experiment-protocol (desig
 | `ecbench-measure`, `ecbench-extend` | cross-method ECDLP measurements; adding a method |
 | `ic-autolab`, `dreg-triage` | index-calculus iterations and parameter sweeps |
 | `perf-ipc`, `profile` | cycles, IPC, where time goes |
+| `optlevel` | how close a kernel runs to its machine's roofline (not a speed claim) |
 | `curve-algebra`, `ecdlp-surfaces`, `isogeny-volcano`, `isogeny-volcano-diagrams` | curve structure, transfers, isogeny graphs |
 | `lean-instance-gate` | before any Lean definition, statement or proof; when a proof grows long or needs `maxHeartbeats` |
 | `ecbench-bounds` | what a method costs; whether a change beat it |
@@ -76,6 +77,10 @@ If an answer contradicts the plan or an accepted design, stop and report.
    changed or removed in the same round, not queued for later.
 6. **Never restate a rule in weaker form.** Point at the skill or AGENTS.md
    section instead.
+7. **Learn continuously.** Every skill and agent ends with a "Continuous
+   loop" section: read `tools/lessons.py brief --scope <name>` before acting,
+   record the outcome and lesson tests after, and fold adopted lessons back
+   into its own text by PR (AGENTS.md "Continuous learning loop").
 
 ## Stop-sign tables
 

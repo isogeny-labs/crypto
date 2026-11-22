@@ -1,0 +1,75 @@
+{
+  "branch": "fix/immutable-pcc-base-20261116",
+  "closed_utc": "2026-11-16T08:13:18+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "benchmarks/software/browser-generator/20261116/replay.py",
+        "--protocol",
+        "benchmarks/software/browser-generator/20261116/protocol.json",
+        "--variant",
+        "candidate",
+        "--workload-commit",
+        "6b7dca5838c303f9f4f55d87d84e98fe1ecc6aa6",
+        "--output",
+        "benchmarks/software/browser-generator/20261116/raw/candidate-b1.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T08:03:54+00:00",
+      "wall_s": 21.689
+    }
+  ],
+  "commit": "6b7dca5838c303f9f4f55d87d84e98fe1ecc6aa6",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T08:00:32+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "arm",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "isolation": "unstated",
+    "platform": "macOS-27.2-arm64-arm-64bit-Mach-O"
+  },
+  "id": "20261116T0800Z-catalog-candidate-b1",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "catalog_generation_wall",
+      "note": "candidate-b1; unisolated local software; generator main including build/render/document check; excludes module import and independent digest; no attack or rho price",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 20.012492750000092
+    }
+  ],
+  "problem": "software:lab-browser-fixed-catalog-20261116",
+  "raw": [
+    {
+      "bytes": 896,
+      "path": "benchmarks/software/browser-generator/20261116/raw/candidate-b1.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/de/dedee656cb1488ab7eea98a0638c87a8d54b6c6f2eb5d6cc76781107dca2adf0",
+      "sha256": "dedee656cb1488ab7eea98a0638c87a8d54b6c6f2eb5d6cc76781107dca2adf0",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/software/browser-generator/20261116/report.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/software/browser-generator/20261116/report.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "catalog-candidate-b1",
+  "status": "measured",
+  "summary": "candidate-b1: complete document and independent semantic digest pass; unisolated local software control; source and input hashes frozen in code commit",
+  "validation": null
+}

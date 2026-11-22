@@ -1,0 +1,35 @@
+{
+  "schema": "aps.source-checkpoint-observation/v1",
+  "standing": "unverified producer assertion from hosted job metadata",
+  "source_commit": "1bc72d29c22f91ca0d07002f2443719d7a5f2b33",
+  "source_tree": "ca32ad3952f5769985e3187d9fb3e0c4266342ef",
+  "baseline_commit": "d88afc85375e92bff6b5cf508b24c0adc3ff8663",
+  "workflow_run": 42299369704,
+  "job": 128172833689,
+  "workflow_url": "https://github.com/isogeny-labs/crypto/actions/runs/42299369704",
+  "job_conclusion": "success",
+  "observed_steps": {
+    "administrative_tests": "success",
+    "exact_source_closure_and_native_lease": "success",
+    "unchanged_standard_gate_and_receipt_check": "success",
+    "normalized_artifact_retention": "success"
+  },
+  "selected_files": 61,
+  "selection_sha256": "9fd021b87f74840c9e6ca32773eee4f3ebe15a3580115122ea522ef4d784406f",
+  "stock_gate_success": true,
+  "source_upload_acknowledgement_basis": "Successful unchanged stock gate plus the custody helper stock-receipt check in the completed hosted step; the receipt body was not independently retrieved.",
+  "normalized_artifact": {
+    "id": 13543396425,
+    "name": "aps-source-checkpoint-1bc72d29c22f91ca0d07002f2443719d7a5f2b33",
+    "metadata_read": true,
+    "body_retrieved": false,
+    "body_retrieval_failure": "storage redirect HTTP403; no retry or route change"
+  },
+  "stored_objects_independently_read_back": false,
+  "execution_attested": false,
+  "raw_logs_published": false,
+  "benchmark_launched": false,
+  "native_t10_state": "ready pending independent readback and closeout",
+  "source_capture_flag": "closed after actual successful job completion before further edits",
+  "boundary": "This acknowledgement covers source1bc only. Subsequent outcome metadata, a future frozen protocol or changed source require their own prospective checkpoint admission before an experiment."
+}

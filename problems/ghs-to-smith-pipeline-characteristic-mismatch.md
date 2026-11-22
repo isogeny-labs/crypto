@@ -1,20 +1,23 @@
 # GHS (characteristic 2) cannot feed Smith's genus-3 trigonal construction
 
 - **Status:** `open`. The characteristic-2 pipeline stays blocked. The
-  odd-characteristic alternative exists; Smith's Props. 2 and 4 on it are
-  unchecked.
+  odd-characteristic alternative now runs end to end at toy `q` (W3b,
+  2026-10-25): descent, Props. 2 and 4, Smith's `psi` to a plane quartic and
+  a discrete log there, verified on `E0`. Cost at scale is not measured.
 - **Kind:**
   - proved obstruction for the pipeline as stated (characteristic 2),
     unchanged;
   - for the odd-characteristic alternative, no characteristic obstruction
-    remains. It is an implementation gap: Smith's Props. 2 and 4 and the
-    trigonal construction are not implemented.
+    remains and the implementation gap is closed at toy size (Props. 2 and 4,
+    the trigonal construction as an explicit `psi`, end-to-end solves; W3b,
+    2026-10-25). What is open is empirical: the pipeline's cost at growing
+    `q` against matched rho.
 - **Affected work:**
   - [weak isogeny classes study, 2026-10-13](../research/weak_isogeny_classes_20261013/REPORT.md),
     section "Where the leads meet";
   - [odd-characteristic descent study, 2026-10-14](../research/odd_char_descent_genus3_20261014/REPORT.md).
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-14
+- **Last updated:** 2026-10-25
 
 ## Problem
 
@@ -80,7 +83,17 @@ Smith's isogeny is `F_q`-rational, and non-degenerate, on its output.
   - Genus 3 needs `(m, r) ∈ {(2,6), (3,5)}` and a branch-set period of 2
     or 3. So for `F_q(j(E)) = F_{q^n}` with `n >= 4` no odd-characteristic
     GHS cover has genus 3.
-- **Missing capability:** a native test of Smith's Prop. 2 (rational
+- **Exact computation (2026-10-25, [W3b study](../research/smith_isogeny_divisor_map_20261018/README.md)):**
+  - Smith's `psi` is computed on Mumford divisors as effective divisors on
+    the plane quartic `C ~ X`; on random degree-7 curves at
+    `q = 7, ..., 23` it passes well-definedness, homomorphism, kernel `S`,
+    order and `#J` checks on two independent `Pic^0` engines with zero
+    failures, and at `q <= 13` the enumerated image is exactly `J_H/S`.
+  - On the Joux–Vitse split arm, Props. 2 and 4 were run on every descended
+    `H` reached (counts per `q` in the study), and where they pass and `X`
+    is a plane quartic a planted ECDLP on `E0/F_{q^3}` was solved in
+    `J_X(F_q)` and the scalar verified on `E0`.
+- **Missing capability (before 2026-10-25):** a native test of Smith's Prop. 2 (rational
   trigonal map) and Prop. 4 (leading coefficient of `s(t)` a square) on this
   family. Also an executed trigonal construction showing that `J_H/S` is a
   smooth plane-quartic Jacobian. The family has three bielliptic
@@ -105,28 +118,32 @@ Smith's isogeny is `F_q`-rational, and non-degenerate, on its output.
 - [x] Or an odd-characteristic descent producing genus-3 hyperelliptic
   curves (sources above; built in the repository; re-checked 81/81),
   - [x] screened by Frobenius cycle type (`#S(H) = 3` or `1`),
-  - [ ] and by Smith's Props. 2 and 4, with the trigonal construction
+  - [x] and by Smith's Props. 2 and 4, with the trigonal construction
     executed on toy instances and the quartic's `L`-polynomial equal to
-    `L_H`.
+    `L_H` (W3b, 2026-10-25: `q = 7, 11, 13` in full and `17, 19, 23` under a
+    1 h cap; `#J_X = #J_H = #E0(F_{q^3})` on every quartic reached);
+  - [x] Smith's `psi` on divisor classes, verified (T1–T7 of the W3b
+    protocol), and a toy end-to-end solve through it (T8), recovered scalar
+    checked on `E0`;
+  - [ ] the pipeline's cost at growing `q` against matched rho (the DLP
+    stage here is brute force; an index calculus on the quartic is W2b).
 
 Either completed route gives an executable pipeline. Neither shows that the
 pipeline beats rho on the source curve.
 
 ## Next discriminating step
 
-- **Action:** implement Smith's Props. 2 and 4 natively (shared with
-  `smith-kernel-isogeny-class-walk.md`). Apply them to the three tractable
-  subgroups of each Joux–Vitse `H` in
-  `research/odd_char_descent_genus3_20261014/results/run-20261014T1800Z/jv_family.csv`.
-- **Controls:** random genus-3 hyperelliptic curves of the same cycle type
-  `(3,3,1,1)`, to see whether the family's success rate differs from
-  Smith's 1/4 per subgroup.
-- **Outcomes:**
-  - If some subgroup passes and the quotient is a smooth quartic with a
-    matching `L`, add the family as the third arm of the coverage study.
-  - If every subgroup fails on every instance, record that as a bounded
-    negative for this family. Types 1 and 2 remain the direct route to
-    plane quartics.
+- **Done (2026-10-25):** the step recorded on 2026-10-14 (native Props. 2
+  and 4 on the Joux–Vitse family, quotient a smooth plane quartic with
+  `L_X = L_H`) ran as part of W3b, together with an explicit `psi` and
+  end-to-end toy solves.
+- **Action now:** W2b: replace the brute-force dlog in `J_X(F_q)` by an
+  index calculus on the quartic (W1 canonical keys, W2a relations) and
+  measure the pipeline's end-to-end cost at growing `q` against matched rho
+  on `E0(F_{q^3})`.
+- **Outcomes:** a crossover estimate with an interval, or "no crossover in
+  range"; either is recorded here. The instances where `X` is hyperelliptic
+  (19% of the Prop. 4 passes at q = 7, falling to 4% at q = 23, in W3b) are outside this route.
 - **Recheck trigger:** a cited char-2 or char-3 trigonal analogue; access to
   Diem 2003.
 
@@ -138,3 +155,10 @@ pipeline beats rho on the source curve.
   the record is **not** closed as a proved obstruction. The cycle-type
   screen is done; Smith's Props. 2 and 4 remain. The characteristic-2
   statement is unchanged.
+- 2026-10-25: W3b ([study](../research/smith_isogeny_divisor_map_20261018/README.md)).
+  Smith's `psi` implemented on divisor classes and verified on two engines;
+  Route S (Joux–Vitse `m = 3, r = 5` descent, Props. 2 and 4, `psi`, dlog in
+  `J_X(F_q)`) solved planted ECDLPs end to end at toy `q`, each verified on
+  `E0`. Instances where `X` is hyperelliptic are skipped with that reason.
+  Open: cost at growing `q` (W2b). The characteristic-2 statement is
+  unchanged.

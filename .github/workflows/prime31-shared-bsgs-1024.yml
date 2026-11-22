@@ -1,0 +1,157 @@
+name: Prime31 shared-advice BSGS vs complete Rust mixed IC and native rho, 1024Q
+
+on:
+  push:
+    branches: [research/prime31-shared-bsgs-frontier-20261117]
+    paths:
+      - research/prime31_ic_20261115/mixed_base/prime31_shared_bsgs_1024q_suffix.rsfrag
+      - research/prime31_ic_20261115/mixed_base/SHARED_BSGS_1024Q_PROTOCOL_20261117.md
+      - .github/workflows/prime31-shared-bsgs-1024.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/mixed_base/prime31_shared_bsgs_1024q_suffix.rsfrag
+      - research/prime31_ic_20261115/mixed_base/SHARED_BSGS_1024Q_PROTOCOL_20261117.md
+      - .github/workflows/prime31-shared-bsgs-1024.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-exact-three-advice-sizes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      RAYON_NUM_THREADS: '1'
+      CARGO_BUILD_JOBS: '2'
+    steps:
+      - name: Checkout frozen BSGS protocol and new source suffix
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/mixed_base
+            research/prime31_ic_20261115/native/examples
+      - name: Checkout immutable original Rust arithmetic and complete IC
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: aps-pinned
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install pinned Rust 1.100
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Construct original-source BSGS and exact native rho, copy complete IC
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp research/prime31_ic_20261115/mixed_base/prime31_amortized_rho_1024q_suffix.rsfrag \
+            /tmp/exact-rho-suffix.rsfrag
+          cp research/prime31_ic_20261115/mixed_base/prime31_shared_bsgs_1024q_suffix.rsfrag \
+            /tmp/shared-bsgs-suffix.rsfrag
+          cp research/prime31_ic_20261115/native/examples/prime31_mixed_base_amortized_ic.rs \
+            aps-pinned/research/prime31_ic_20261115/native/examples/prime31_mixed_base_amortized_ic.rs
+          python3 - <<'PY'
+          from pathlib import Path
+          original=Path('aps-pinned/research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs').read_text()
+          needle="fn main()->Result<(),String> {"
+          assert original.count(needle)==1
+          assert original.count("fn jac_mixed(")==1
+          assert original.count("fn normalize_jac_batch(")==1
+          assert original.count("fn neg_rho_cold_policy(")==1
+          amended=original.replace(needle,"fn original_aps_main_unused()->Result<(),String> {",1)
+          for name,suffix in [
+            ("prime31_shared_bsgs_1024q","/tmp/shared-bsgs-suffix.rsfrag"),
+            ("prime31_same_q_native_rho_1024q","/tmp/exact-rho-suffix.rsfrag"),
+          ]:
+            s=Path(suffix).read_text()
+            assert s.count("fn main() -> Result<(), String>")==1
+            Path(f"aps-pinned/research/prime31_ic_20261115/native/examples/{name}.rs").write_text(amended+"\n"+s)
+          print("Original Jacobian and rho arithmetic preserved byte-for-byte apart from unused main rename")
+          PY
+      - name: Test native original library, mixed IC and generic BSGS
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 test --locked --release --manifest-path \
+            aps-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          cargo +1.100.0 test --locked --release --manifest-path \
+            aps-pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_mixed_base_amortized_ic
+          cargo +1.100.0 test --locked --release --manifest-path \
+            aps-pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_shared_bsgs_1024q
+          cargo +1.100.0 test --locked --release --no-run --manifest-path \
+            aps-pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_same_q_native_rho_1024q
+      - name: Run full 1024 unknown-target mixed IC with setup charged
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release --manifest-path \
+            aps-pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_mixed_base_amortized_ic > prime31-ic-1024-original.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open("prime31-ic-1024-original.json"))
+          assert d["schema"]=="prime31.mixed_4p4_amortized_complete_ic.v1"
+          assert d["completed_unknown_target_logs"]==1024
+          assert d["base_log_point_replays"]==61
+          assert len(d["targets"])==1024
+          assert all(t["caller_check"] and t["solver"]["status"]=="complete" for t in d["targets"])
+          print("Complete index-calculus arm: all 1024 caller-held k verified")
+          PY
+      - name: Run all three fully shared-precomputed BSGS advice sizes on identical Q
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release --manifest-path \
+            aps-pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_shared_bsgs_1024q -- prime31-ic-1024-original.json \
+            > prime31-shared-bsgs-three-arms-1024.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open("prime31-shared-bsgs-three-arms-1024.json"))
+          assert d["schema"]=="prime31.shared_precomputed_generic_bsgs_1024q.v1"
+          assert d["fixed_m_arms"]==[46341,262144,1048576]
+          assert d["target_count"]==1024 and len(d["arms"])==3
+          for arm in d["arms"]:
+              assert arm["complete_logs"]==1024
+              assert len(arm["cases"])==1024
+              assert arm["baby_entries"]==arm["m"]-1
+              assert all(c["caller_k_and_original_curve_match"] for c in arm["cases"])
+              print("Generic m",arm["m"],"cold setup ms",int(arm["fully_charged_setup_ns"])/1e6,
+                    "1024-Q online ms",int(arm["online_total_ns"])/1e6,
+                    "full ratio BSGS/IC",arm["ratio_bsgs_over_ic_complete"],
+                    "rss after setup KiB",arm["rss_after_setup_kib"])
+          PY
+      - name: Native unchanged 32-lane rho A/B on identical Q for cost context
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release --manifest-path \
+            aps-pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_same_q_native_rho_1024q -- prime31-ic-1024-original.json \
+            > prime31-native-rho-1024.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open("prime31-native-rho-1024.json"))
+          assert d["schema"]=="prime31.mixed_ic_vs_exact_native_rho_1024q.v1"
+          assert d["unfolded_rho32_completed"]==1024
+          assert d["folded_rho32_completed"]==1024
+          assert d["unfolded_rho32_AA_first64_completed"]==64
+          print("Matched native rho32 unfolded ms",int(d["unfolded_rho32_cold_total_ns"])/1e6)
+          PY
+      - name: Retain all exact-source raw records, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-shared-bsgs-1024q-complete-evidence
+          path: |
+            prime31-ic-1024-original.json
+            prime31-shared-bsgs-three-arms-1024.json
+            prime31-native-rho-1024.json
+          if-no-files-found: warn
+          retention-days: 30

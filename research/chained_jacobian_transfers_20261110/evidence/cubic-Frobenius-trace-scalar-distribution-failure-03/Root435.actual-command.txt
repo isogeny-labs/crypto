@@ -1,0 +1,5 @@
+cwd=/workspace/crypto
+toolchain=leanprover/lean4:v4.35.0
+workers=1
+memory=original defaults unchanged
+timeout --signal=TERM --kill-after=5s 120 bash tools/lean/proof-gate.sh --out /workspace/scratch/ct485-cubic-trace-descent-explicit-scalar-original-dual-gates/Root435 research/chained_jacobian_transfers_20261110/lean/CubicFrobeniusTraceDescent05.lean

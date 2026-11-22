@@ -1,0 +1,23 @@
+digraph Layers {
+  graph [rankdir=TB,bgcolor="white",fontname="Helvetica",nodesep=.3,ranksep=.4];
+  node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=10,fillcolor="#edf5fb",color="#345b7d"];
+  edge [fontname="Helvetica",fontsize=9,color="#345b7d"];
+  prior [label="Reused actual normalizer / integral localBase\nPrior source, same pinned dependencies"];
+  bridge [label="Literal signed-grid polynomial bridge\nActual base and completed charts integral"];
+  bits [label="Actual bit mask + strict margin\nDiagonal correction valuation exactly G_i"];
+  jet [label="Actual polynomial first coefficient\nc nonzero; v2(c)=a+1-i+G_i"];
+  factors [label="Explicit U,V with 2^u labels\nNormalized first-jet residual in 2 Z_(2)"];
+  weighted [label="Actual weighted row factors c U\nUnscaled residual weight >= v2(c)+1"];
+  higher [label="OPEN: all higher jet / precision layers\n2^u may exceed old tile count",fillcolor="#fff2d5",style="rounded,filled,dashed"];
+  cost [label="OPEN: full mode / recursion / ECDLP bit cost",fillcolor="#fff2d5",style="rounded,filled,dashed"];
+  prior -> bridge;
+  bridge -> jet;
+  bits -> jet;
+  bits -> factors;
+  jet -> factors;
+  factors -> weighted;
+  weighted -> higher [style=dashed];
+  higher -> cost [style=dashed];
+  status [shape=note,label="82 source-bound statements\nUnsigned PCC; no timing claim",fillcolor="#f5f5f5",color="#777777"];
+  status -> factors [style=dotted,arrowhead=none];
+}

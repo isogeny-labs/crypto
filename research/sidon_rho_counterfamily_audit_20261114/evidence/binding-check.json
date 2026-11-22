@@ -1,0 +1,36 @@
+{
+  "schema": "native-sidon-rho-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "sidon-rho-counterfamily",
+      "expected_decl_sha256": "f4550e4315788edd2a98a3625997981779e48497f43bb1391580f556d5203953",
+      "full_characters": 1043,
+      "full_decl_sha256": "f4550e4315788edd2a98a3625997981779e48497f43bb1391580f556d5203953",
+      "full_normalized_signature": "theorem sidon_rho_counterfamily_certificate : (∀ (p : ℕ) [NeZero p], 1902 < p → TwoStepCollisionAudit.DegreeTwoGeneric (increments p) ∧ (∀ h : ZMod p → Fin 20, p ≤ 951 * firstCollision p (transition p h) 0 ∧ firstCollision p (transition p h) 0 ≤ p) ∧ (p : ℝ) ≤ 951 * meanCollision p ∧ meanCollision p ≤ p ∧ meanCollision p = ∑ h, (uniformHashLaw p 20 (Nat.succ_pos 19) h).toReal * (firstCollision p (transition p h) 0 : ℝ) ∧ (∀ target : ZMod p, expectation (uniformWeights 20) (fun h => inDegree (increments p) h target) = 1 ∧ expectation (uniformWeights 20) (fun h => (inDegree (increments p) h target - 1)^2) = 19 / 20) ∧ (localLaw p).toOuterMeasure (GeneralTwoStepCollisionAudit.freshEvent (increments p) : Set (GeneralTwoStepCollisionAudit.JointSample (ZMod p) (Fin 20))) = ENNReal.ofReal ((7581 : ℝ) / (8000 * p))) ∧ (¬∃ C : ℝ, ∀ (p : ℕ) (hp : Nat.Prime p), 1902 < p → TwoStepCollisionAudit.DegreeTwoGeneric (increments p) → (@meanCollision p ⟨hp.ne_zero⟩)^2 ≤ C * p) ∧ Nat.Prime 10000019 ∧ (4 : ℝ) * 10000019 < (meanCollision 10000019)^2",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "sidon_rho_counterfamily_certificate",
+        "end_byte": 3272,
+        "file": "/workspace/scratch/sidon-rho-input01/SidonCounterfamily.lean",
+        "qualified_decl_id": "SidonRhoCounterfamilyAudit.sidon_rho_counterfamily_certificate",
+        "signature": "theorem sidon_rho_counterfamily_certificate :\n    (∀ (p : ℕ) [NeZero p], 1902 < p →\n      TwoStepCollisionAudit.DegreeTwoGeneric (increments p) ∧\n      (∀ h : ZMod p → Fin 20,\n        p ≤ 951 * firstCollision p (transition p h) 0 ∧\n          firstCollision p (transition p h) 0 ≤ p) ∧\n      (p : ℝ) ≤ 951 * meanCollision p ∧ meanCollision p ≤ p ∧\n      meanCollision p = ∑ h, (uniformHashLaw p 20 (Nat.succ_pos 19) h).toReal *\n        (firstCollision p (transition p h) 0 : ℝ) ∧\n      (∀ target : ZMod p,\n        expectation (uniformWeights 20) (fun h => inDegree (increments p) h target) = 1 ∧\n        expectation (uniformWeights 20) (fun h => (inDegree (increments p) h target - 1)^2) =\n          19 / 20) ∧\n      (localLaw p).toOuterMeasure\n          (GeneralTwoStepCollisionAudit.freshEvent (increments p) :\n            Set (GeneralTwoStepCollisionAudit.JointSample (ZMod p) (Fin 20))) =\n        ENNReal.ofReal ((7581 : ℝ) / (8000 * p))) ∧\n    (¬∃ C : ℝ, ∀ (p : ℕ) (hp : Nat.Prime p), 1902 < p →\n      TwoStepCollisionAudit.DegreeTwoGeneric (increments p) →\n        (@meanCollision p ⟨hp.ne_zero⟩)^2 ≤ C * p) ∧\n    Nat.Prime 10000019 ∧ (4 : ℝ) * 10000019 < (meanCollision 10000019)^2",
+        "start_byte": 2014
+      },
+      "recorded_statement": "theorem sidon_rho_counterfamily_certificate : (∀ (p : ℕ) [NeZero p], 1902 < p → TwoStepCollisionAudit.DegreeTwoGeneric (increments p) ∧ (∀ h : ZMod p → Fin 20, p ≤ 951 * firstCollision p (transition p h) 0 ∧ firstCollision p (transition p h) 0 ≤ p) ∧ (p : ℝ) ≤ 951 * meanCollision p ∧ meanCollision p ≤ p ∧ meanCollision p = ∑ h, (uniformHashLaw p 20 (Nat.succ_pos 19) h).toReal * (firstCollision p (transition p h) 0 : ℝ) ∧ (∀ target : ZMod p, expectation (uniformWeights 20) (fun h => inDegree (increments p) h target) = 1 ∧ expectation (uniformWeights 20) (fun h => (inDegree (increments p) h target - 1)^2) = 19 / 20) ∧ (localLaw p).toOuterMeasure (GeneralTwoStepCollisionAudit.freshEvent (increments p) : Set (GeneralTwoStepCollisionAudit.JointSample (ZMod p) (Fin 20))) = ENNReal.ofReal ((7581 : ℝ) / (8000 * p))) ∧ (¬∃ C : ℝ, ∀ (p : ℕ) (hp : Nat.Prime p), 1902 < p → TwoStepCollisionAudit.DegreeTwoGeneric (increments p) → (@meanCollision p ⟨hp.ne_zero⟩)^2 ≤ C * p) ∧ Nat.Prime 10000019 ∧ (4 : ℝ) * 10000019 < (meanCollision 10000019)^2",
+      "recorded_text_sha256": "f4550e4315788edd2a98a3625997981779e48497f43bb1391580f556d5203953",
+      "source_plan": "research/sidon_rho_counterfamily_audit_20261114/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "SidonRhoCounterfamilyAudit.sidon_rho_counterfamily_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Unsigned native processing, not kernel parsing/hash/host execution refinement."
+}

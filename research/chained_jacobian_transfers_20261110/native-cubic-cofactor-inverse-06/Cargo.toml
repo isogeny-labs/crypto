@@ -1,0 +1,13 @@
+[package]
+name = "chained-transfer-cubic-cofactor-inverse-06"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+original-kf223 = { package = "chained-transfer-original-kf223", path = "original-reference" }
+
+[workspace]
+members = ["."]
+exclude = ["original-reference"]
+resolver = "2"

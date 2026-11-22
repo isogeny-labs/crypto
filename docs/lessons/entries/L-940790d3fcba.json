@@ -1,0 +1,15 @@
+{
+  "action": "put the validator-owned CARGO_TARGET_DIR on /dev/shm through a symlink in the scratch dir and delete it afterwards; the build peaked near 1 GB there and the code sections still matched the producer's binary",
+  "created": "2026-11-18T21:59:47Z",
+  "evidence": [
+    "research/genus4_prime_order_20261118/validation/scripts/build.sh",
+    "research/genus4_prime_order_20261118/validation/out/binary_diff.txt"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "a release build of crypto_lib for validation when the root disk has under about 3 GB free",
+  "why": "2026-11-18: 1.8 GB free on /; a full disk on the shared VM would break other sessions' writes"
+}

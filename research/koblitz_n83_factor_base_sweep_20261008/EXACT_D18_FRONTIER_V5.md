@@ -1,0 +1,7 @@
+# Exact D18 addition to the N83 sweep
+
+`exact-d18-frontier-v5.json` appends the replayed, S3-custodied primary-curve D18 factor base to the frozen v4 ordinal grid. The first 26,939,278,080 ordinals are byte-for-byte the v4 cases; the next 51,840 cross the exact D18 base with every v3 solver tuple, for 26,939,329,920 cases total. The generator pins the v4 bytes and the D18 export, replay, S3 custody, import and bounded m=4 result by SHA-256. Query one case with `python3 exact_d18_frontier_v5.py --case ORDINAL`; check the saved design with `--check`.
+
+Each tuple carries a source/execution disposition. The SAT, signed-Frobenius, unsplit, binary-enumerated, zero-large-prime, single-thread, full-width linear-algebra m=4 tuple has a bounded censored screening result. The matching m=5 tuple has an opt-in source gate and a separately frozen protocol; neither has measured useful-rank yield or full index-calculus runtime. Other combinations are retained with their first unavailable adapter or unmeasured parameter. Dispositions are source-accounting labels, not measurements of speed or impossibility.
+
+The new base has 16,627 signed-Frobenius columns and 2,760,082 exact subgroup points. The archived object digest differs from the U base although the dimensions match. `candidate_id` and `selected_best_total_runtime` remain null. Selection requires a completed, independently replayed, same-point, fully charged comparison including relation acquisition, useful rank, linear algebra, target logarithm and matched rho.

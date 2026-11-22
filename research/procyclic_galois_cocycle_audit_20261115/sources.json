@@ -1,0 +1,169 @@
+{
+  "schema": "procyclic-source-plan/v1",
+  "created": "2026-11-15T00:23:14.295760+00:00",
+  "formal": {
+    "project": "research/procyclic_galois_cocycle_audit_20261115/lean",
+    "theorem": "ProcyclicGaloisCocycleAudit.procyclic_galois_cocycle_certificate",
+    "statement": "theorem procyclic_galois_cocycle_certificate : ∀ (K : Type) [Field K] [Fintype K], Nonempty (Gamma K ≃ₜ* Field.absoluteGaloisGroup K) ∧ (∀ a : Omega K, asAlgEquiv K (frobenius K) a = a ^ Fintype.card K) ∧ DenseRange (fun n : ℤ => frobenius K ^ n) ∧ (∀ (H : Type) [Group H] [Finite H] [TopologicalSpace H] [DiscreteTopology H], Function.Bijective (fun f : Gamma K →ₜ* H => f (frobenius K))) ∧ (∀ (M : Type) [CommGroup M] [Finite M] [TopologicalSpace M] [DiscreteTopology M] [TopologicalSpace (MulAut M)] [DiscreteTopology (MulAut M)] (ρ : Gamma K →ₜ* MulAut M), Function.Bijective (cocycleEvaluation K M ρ) ∧ Function.Bijective (classEvaluationHom K M ρ) ∧ Nonempty (CocycleClasses K M ρ ≃* Coinvariants K M ρ) ∧ (∀ c : Cocycles K M ρ, classEvaluationEquiv K M ρ (QuotientGroup.mk c) = QuotientGroup.mk (c.val (frobenius K)))) ∧ missingIntegerClass K ≠ 1 ∧ (∀ c : IntegerClasses K, integerEvaluation K c = 1) ∧ ¬ Function.Surjective (integerEvaluation K)",
+    "decl_sha256": "4f6948a2e69332e5f2a6f72ef7a13f751e3653bda1dbfa30f90482305c59c613",
+    "scope": "Bruin2011Eq2.1finitecontinuouscocyclefunctionalformula: everyactualfinitefieldK, actualAlgebraicClosureK/actualKrullGal/identitycontinuousMulEquivtoField.absoluteGaloisGroupK, actualqFrobeniuspowerlaw anddensity derivedfromXq-Xsplit/fixedfield/infiniteGaloiscorrespondence, notassumedprocyclicity. EveryfinitegroupH/anyh actualuniquefinite-targetcontinuoushomwithFrobeniusvalueh viaactualfinitefielddegreeorderhExtensionembeddedintoOmega/actualintermediatefieldrestriction/Frobeniuscompatibility/actualcyclicGaloisgroupmaps. EveryfinitecommutativeM/discreteM/discreteAutM/actualcontinuousactionrho: actualallcontinuouscrossedcocycles formgroup, actualfiniteMsemidirectAutMgraphandpointeduniversalproperty deriveexistenceeveryFrobeniusvalue/uniqueness. ActualcocycleevaluationMulEquivtoM; actualallprincipalcontinuouscocycles sigma->rho(sigma)m/m andtheirwholeimage; quotientofallcontinuouscocyclesbyallprincipalsisactualFrobeniuscoinvariantgroup, actualclassEvaluationMulEquiv/bijection/exactrepresentativeformula andexactclassrelationproved. No restrictedrepresentatives/suppliedcocycle/assumedH1value/duality/NDpremise. Standardall-cocycleclassquotient distinguishedfromseparateMathlibcontinuoushomogeneouscochaincomplexH1comparison, whichremainsopen. Everyfinitebasefieldactualdiscreteintegers/trivialaction: everycontinuouscocyclevanishesbyactualKrullcompactness/finiteimage/torsionfree, nonzeroactualintegercoinvariantclass1, sameactualclassEvaluationHomnotsurjective/directfiniteguarddeletionnegation. EarlierF2integercounter/compactproofcredited; qualifiedfinite-modulecaseprovednotrefuted. Bruin2011full6articlepagespreviouslyread/7PDFvisual; fresh325-326/PDF4-5textandPDF4visual, DOI10.5802/jtnb.764/PDF649044bytesSHA528b63797f936e094861c98a65da5eb1615dc46747960ba3444516197fbf49a7. CopyrightprimaryPDF/text/imageslocalonly. OriginalFR94stillunread correctDOI1218343-6/publisher403/sixboundedarchive503routesretained, separateprimarynotreplacement. FullBruinperfectpairing/Lang/Cartier/Jacobian/divisor/canonicalcomplexH1/MOV/FRbridgesnotprovedorrefuted. No novelty/canonicalpromotion. Defaults/noholes/customaxioms/nativeproofeval/raisedlimits/newglobalelabflags/waivers/frozenedits/cryptoPython/nativecryptoexperiment/spend/upload. Nativecompletewrittenheaderprocessingproceduralnotkernelparser/hash/physicalhostrefinement; signedstandingunverified.",
+    "sources": [
+      {
+        "path": "research/procyclic_galois_cocycle_audit_20261115/lean/CocycleClasses.lean",
+        "bytes": 4491,
+        "sha256": "c321b70efd4c340af8b1a7308471a25539b56736c5e0b8b1de05eabeba262ef7"
+      },
+      {
+        "path": "research/procyclic_galois_cocycle_audit_20261115/lean/FiniteCocycles.lean",
+        "bytes": 5449,
+        "sha256": "5b1d532721a575ede866588a03fd4d874b344555a24e40d76fe91068ca30c867"
+      },
+      {
+        "path": "research/procyclic_galois_cocycle_audit_20261115/lean/FiniteQuotients.lean",
+        "bytes": 4324,
+        "sha256": "3814a32c42a4a12516889d23e78daf97e009440688d6a861ed63bce3c7025adb"
+      },
+      {
+        "path": "research/procyclic_galois_cocycle_audit_20261115/lean/GaloisGenerator.lean",
+        "bytes": 3939,
+        "sha256": "a5288bdb05416d3f6c450c5368df741353adc2b8dea41d1f1406a5c9ca6486db"
+      },
+      {
+        "path": "research/procyclic_galois_cocycle_audit_20261115/lean/InfiniteControl.lean",
+        "bytes": 3079,
+        "sha256": "7fca0a5336514a0c1f3c54c6e388f9e0920b1772c62e3cd3245ac4d197f071be"
+      },
+      {
+        "path": "research/procyclic_galois_cocycle_audit_20261115/lean/ProcyclicCertificate.lean",
+        "bytes": 2040,
+        "sha256": "0672733ba91375e1c418d5dc249027a26dea62583abf2e293bc91490e3171f09"
+      },
+      {
+        "path": "research/procyclic_galois_cocycle_audit_20261115/lean/lakefile.toml",
+        "bytes": 424,
+        "sha256": "75e52516cdcac5c927f1956d5b1c9a45bbe86b93d6df5c382b08556e2c68f525"
+      },
+      {
+        "path": "research/procyclic_galois_cocycle_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3181,
+        "sha256": "0f1dfea13140ab773c311b742b532f6d8a73c9dfaf76b4b320c0eee6dd9917f9"
+      },
+      {
+        "path": "research/procyclic_galois_cocycle_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "CocycleClasses",
+    "FiniteCocycles",
+    "FiniteQuotients",
+    "GaloisGenerator",
+    "InfiniteControl",
+    "ProcyclicCertificate"
+  ],
+  "artifacts": [
+    {
+      "path": "research/procyclic_galois_cocycle_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 17160,
+      "sha256": "db9865d1666a9b24e330097255e4e94bf94305d25163f994477ea98b4ffdd5b8"
+    },
+    {
+      "path": "research/procyclic_galois_cocycle_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "55d04690835aab948360a08bd430bc93cd06d50627e164956e6d96610562fc16"
+    },
+    {
+      "path": "research/procyclic_galois_cocycle_audit_20261115/evidence/attempts.json",
+      "bytes": 234,
+      "sha256": "1d3ab740427e76b4d3c25b649417edb958c97a47cb21553df5006c424a13be78"
+    },
+    {
+      "path": "research/procyclic_galois_cocycle_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 1386,
+      "sha256": "9fa69426bd56cbff3413fbd39c944fb82865feed7284d005bedabeeacf25b715"
+    },
+    {
+      "path": "research/procyclic_galois_cocycle_audit_20261115/evidence/gate.json",
+      "bytes": 1271,
+      "sha256": "26b99a0608d3c5b58d2fa401f43cb70851b226b7b9fc31bb16c07410eb886a8c"
+    },
+    {
+      "path": "research/procyclic_galois_cocycle_audit_20261115/evidence/source-review.json",
+      "bytes": 5110,
+      "sha256": "a90b3c7c6060543a151d290b5068d4e36ce3abcce8dbc773824f9ebe86d8eb07"
+    },
+    {
+      "path": "research/procyclic_galois_cocycle_audit_20261115/evidence/binding-check.json",
+      "bytes": 4602,
+      "sha256": "637ae38525248ee6fdbe86a1890bd3415417e0084c54f6e3b7958e87cab7a36d"
+    },
+    {
+      "path": "research/procyclic_galois_cocycle_audit_20261115/proof-map.json",
+      "bytes": 4929,
+      "sha256": "6b46c77d194c6e2e75d0bdaa24a05346fc1274c5f5d95c89246e39df2e5e0185"
+    },
+    {
+      "path": "research/procyclic_galois_cocycle_audit_20261115/render_report.py",
+      "bytes": 7963,
+      "sha256": "54e27b60a1a18fd6f15a23cf9edde6f55c304868049e7f65b2acde31b370e10e"
+    },
+    {
+      "path": "research/procyclic_galois_cocycle_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/procyclic_galois_cocycle_audit_20261115/export_binding_input.py",
+      "bytes": 1758,
+      "sha256": "a85b366747e681ec7f3cb3b4cbfbeb66278eea027a5ae7cdad53d8b271385629"
+    },
+    {
+      "path": "research/procyclic_galois_cocycle_audit_20261115/reports/layout.json",
+      "bytes": 350,
+      "sha256": "eed3f715313efc8114e9decb5289f75798943f82e9fe5d629716468cae5521ac"
+    },
+    {
+      "path": "research/procyclic_galois_cocycle_audit_20261115/reports/procyclic-cocycles.svg",
+      "bytes": 1452,
+      "sha256": "6ee16eb9052b1124ee20af7a96971027e6184011948f395d4453b6d909319c36"
+    },
+    {
+      "path": "research/procyclic_galois_cocycle_audit_20261115/reports/report.pdf",
+      "bytes": 47416,
+      "sha256": "873215ba3d5e5807f434c7d0187ae325bb46f9ce95706f31e8143c7a53059771"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 36,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_Krull_Galois_Frobenius_density_derived": true,
+    "actual_finite_target_pointed_universal_property_derived": true,
+    "all_continuous_cocycles_classified": true,
+    "all_principal_cocycle_class_quotient_formula_proved": true,
+    "finite_guard_integer_negative_control_proved": true,
+    "canonical_continuous_homogeneous_complex_H1_comparison_proved": false,
+    "full_Bruin_Tate_pairing_proved": false,
+    "original_FR_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

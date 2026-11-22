@@ -1,0 +1,30 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T18:10:48Z",
+ "id": "PCC-20261111-0dc0d7",
+ "kind": "statement",
+ "producer": {
+  "commit": "45e3498a6821d7537cc62b114d4c5f0224b713e2",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/recovered-custody-20261111.json",
+    "sha256": "4674f1a38adcfcf98d29c71d3cba55d841da2cc531c795001f15a649ab9d5de5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/elliptic-seven-ci-observation.md",
+    "sha256": "fa435cd7aacd7b61ee736eff916f6d68a328eabed62549550f5cd0a2dd220fbd"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Original CT19 PCC records and exact two ledger rows recovered unchanged after workspace restoration;original root example and EllipticSeven Lean source byte-identical to GitHub recovery;both attestation subject hashes match;existing58dbb8 four proof checks pass while7e9547 remains unsigned/not_covered. Consumer ef9 exact-head43038507853 succeeded25 native/51 unit/two integration tests and PR1483 ordinary guarded merge confirmed52fe5eba0 after required/CodeQL completion;five source-independent apt DNS failures retained. Operational/producer assertions only,no signed scientific standing or actual Jacobian7-map inferred."
+}

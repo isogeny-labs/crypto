@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T10:00:10Z",
+ "id": "PCC-20261116-ff2cd9",
+ "kind": "measurement",
+ "producer": {
+  "commit": "2999c0170bf68e5c2e7d4eb5a129043b18d889ee",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/kernel-development/tests-default-01.log",
+    "sha256": "339660f0a5f4f94f6dce1738ed123988fc202182895bc372068003022552e9d5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/kernel-development/tests-scale-01.log",
+    "sha256": "548b265352bbc40e0d1cad415292b589edd72b37ddf7de7a4de40b84678ee332"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/kernel-development/tests-counter-01.log",
+    "sha256": "3d0d37ecdd3c0b9984545c3aabb94a76a685cd94a94fe1cbb376a3d213f5b38d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/kernel-development/clippy-02.log",
+    "sha256": "db4a15ba863b537bc89c738a746fe524408498cd1581ef447843b4ebf8964f8a"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Exact enumeration/cache kernels pass50 default,51 scale,52 scale+counter release tests; exact complete monomial vectors, normal-form remainder/provenance/field counts, native wire equality in four modes and scoped guard restoration checked. Strict clippy02 passes after three test-only slice-clone fixes; initial lint failure retained. No speed inference."
+}

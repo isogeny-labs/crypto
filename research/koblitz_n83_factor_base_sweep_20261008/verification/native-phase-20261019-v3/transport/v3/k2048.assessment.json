@@ -1,0 +1,35 @@
+{
+  "card_id": "CARD-n83-native-phase-20261019-v3-k2048",
+  "relay_verbatim": true,
+  "record_digests_verified": true,
+  "outcome": "executed_as_specified",
+  "stopped_at_step": null,
+  "recommendation": "proceed_to_analysis",
+  "interpretation": "not_assessed",
+  "reasons": [
+    "Native card-check independently verified exact actual relay and recorded stream/output digests; status completed.",
+    "Frozen k2048 command exited0, succeeded=true,timed_out=false; card_changed=false; dirty_before and dirty_after empty.",
+    "Native audit PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY records one independently replayed public query and eight valid phase markers,1000conflicts,0models,0relations,rank0.",
+    "Outer record has exit_code0,wall_censored=false,cleanup_verified=true; outer_wall_ms163378.646436 includes supervisory overhead and is not promoted to a performance result.",
+    "Separately frozen K4096 remains the next requested arm under completed v3 controls; no retries or scalar/performance promotion."
+  ],
+  "evidence": {
+    "card": "/home/ec2-user/scratch/n83-native-phase-20261019/v3/cards/k2048.json",
+    "relay": "/home/ec2-user/scratch/n83-native-phase-20261019/v3/k2048-relay.txt",
+    "relay_sha256": "ac65dd15492280a29a5a5f32f8b4e4806854f5e8835bc4dc6c67498ca4e61fb5",
+    "receipt": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048.receipt.json",
+    "audit": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/v3/k2048/audit.json",
+    "source_commit": "27d17bd17b9fe9c6b4ce04e0c9206706b2b5c804"
+  },
+  "observations": {
+    "disposition": "UNKNOWN_solver_cap",
+    "conflicts": 1000,
+    "models": 0,
+    "relations": 0,
+    "rank": 0,
+    "wall_censored": false,
+    "selected_best_total_runtime": null
+  },
+  "next_frozen_arm": "K4096",
+  "performance_or_scalar_promotion": false
+}

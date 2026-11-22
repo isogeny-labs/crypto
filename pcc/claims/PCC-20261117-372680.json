@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T04:13:46Z",
+ "id": "PCC-20261117-372680",
+ "kind": "statement",
+ "producer": {
+  "commit": "cf81d4ba6600f0e40a153d9f0cc0426927df5d5f",
+  "model": "",
+  "session": "codex-rho-parity-20261117"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "pcc/claims/PCC-20261117-79c430.json",
+    "sha256": "f4e4281b5fcb50b72820e460be11772d670d9ddc4ce71e445c40938f442e21b4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "pcc/claims/PCC-20261117-817df2.json",
+    "sha256": "40c57bcbca83fb27203e907e479aaafddf746a478de9ccb6604eb5addbbb4f0f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "pcc/claims/PCC-20261117-9075be.json",
+    "sha256": "287511068c7fd2cff4511514351b144529d1a0a6b276219061c01acdae383c19"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/rho-parity/development-ledger-fork.jsonl",
+    "sha256": "5d2bd75701db935384b5b13234a0c546b0bdc608f3fe959b536961b9402dd29c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/rho-parity/integration.json",
+    "sha256": "52a592026269d258c48d35d98006284827fc3319279bfee454780ed71905fed9"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "extension-ic/nagao-unit-elimination",
+ "statement": "Canonical reissue after concurrent main advancement. Preserve unchanged original proposal PCC-20261117-79c430, fixed-fixture diagnostic PCC-20261117-817df2 and final qualification PCC-20261117-9075be, plus their exact original three-entry ledger suffix. Producer native evidence reports identical solutions/rows in 24 fixed paired records, 13 passing tests and scoped Clippy success; observed incomplete component subtotal ratio 0.7231207597. No complete-cost, full-DLP or rho-parity ranking."
+}

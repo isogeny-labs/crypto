@@ -8,6 +8,7 @@
 //! The lever under test is "P +- Q with one inversion": x(P+Q) and x(P-Q) share the denominator
 //! x_Q - x_P, so both x-coordinates cost I + 2M + 2S (one affine addition costs I + 2M + S).
 //! Arms:
+//!   rho2xksp, rhodpup  rho2xks / rhodpu with a flat table and pipelined or prefetched lookups.
 //!   ic5b  ic5 with a std or flat target table and lock-step batched, prefetched probes (same counted ops).
 //!   ic4   index calculus: factor base = m smallest-x points (logs unknown), x-only pair-sum table
 //!         {x(F_i +- F_j)} built with shared inversions, factor-base logs from relations
@@ -168,6 +169,43 @@ impl F {
         let lm = self.mul(self.neg(self.add(y2, y1)), d);
         Some((self.sub(self.sqr(lp), s), self.sub(self.sqr(lm), s)))
     }
+    /// Montgomery's simultaneous inversion of nonzero values in place: 1 I + 3 (L - 1) M
+    /// (research/mt_ic_scale_20261115, arms ic5b "bi" and rhodpb).
+    fn batch_inv(&self, v: &mut [u64], scratch: &mut Vec<u64>) {
+        if v.is_empty() {
+            return;
+        }
+        scratch.clear();
+        let mut acc = v[0];
+        scratch.push(acc);
+        for &x in &v[1..] {
+            acc = self.mul(acc, x);
+            scratch.push(acc);
+        }
+        let mut inv = self.inv(acc);
+        for i in (1..v.len()).rev() {
+            let vi = v[i];
+            v[i] = self.mul(inv, scratch[i - 1]);
+            inv = self.mul(inv, vi);
+        }
+        v[0] = inv;
+    }
+    /// `xpair` with d = 1 / (x2 - x1) given (x1 != x2): 2M + 2S.
+    fn xpair_d(&self, p: (u64, u64), q: (u64, u64), d: u64) -> (u64, u64) {
+        let ((x1, y1), (x2, y2)) = (p, q);
+        let s = self.add(x1, x2);
+        let lp = self.mul(self.sub(y2, y1), d);
+        let lm = self.mul(self.neg(self.add(y2, y1)), d);
+        (self.sub(self.sqr(lp), s), self.sub(self.sqr(lm), s))
+    }
+    /// P + Q with d = 1 / (x2 - x1) given (x1 != x2): 2M + S.
+    fn padd_d(&self, p: (u64, u64), q: (u64, u64), d: u64) -> Pt {
+        let ((x1, y1), (x2, y2)) = (p, q);
+        let lam = self.mul(self.sub(y2, y1), d);
+        let x3 = self.sub(self.sub(self.sqr(lam), x1), x2);
+        let y3 = self.sub(self.mul(lam, self.sub(x1, x3)), y1);
+        Some((x3, y3))
+    }
     /// P + Q in full and the sibling P - Q in full, sharing the inversion: (I + 2M + S) + (2M + S).
     fn padd_with_sibling(&self, p: Pt, q: Pt) -> (Pt, Pt) {
         if let (Some((x1, y1)), Some((x2, y2))) = (p, q) {
@@ -184,6 +222,18 @@ impl F {
             }
         }
         (self.padd(p, q), None)
+    }
+    /// `padd_with_sibling` with d = 1 / (x2 - x1) given (x1 != x2): (2M + S) + (2M + S)
+    /// (research/mt_ic_rel_20261115, ic5b option "cb").
+    fn padd_sib_d(&self, p: (u64, u64), q: (u64, u64), d: u64) -> (Pt, Pt) {
+        let ((x1, y1), (x2, y2)) = (p, q);
+        let lam = self.mul(self.sub(y2, y1), d);
+        let x3 = self.sub(self.sub(self.sqr(lam), x1), x2);
+        let y3 = self.sub(self.mul(lam, self.sub(x1, x3)), y1);
+        let lm = self.mul(self.neg(self.add(y2, y1)), d);
+        let xm = self.sub(self.sub(self.sqr(lm), x1), x2);
+        let ym = self.sub(self.mul(lm, self.sub(x1, xm)), y1);
+        (Some((x3, y3)), Some((xm, ym)))
     }
     fn smul(&self, p: Pt, k: u64) -> Pt {
         let mut r: Pt = None;
@@ -273,39 +323,286 @@ struct Out {
     extra: String,
 }
 
-/// ic5b's table: std HashMap (exactly ic5's) or a flat open-addressed array of 8-byte slots
-/// (u32 x key, u32 index into `ents`), load factor at most 1/2, multiplicative hash, linear probing.
-/// The flat form needs x < 2^32 - 1 (p < 2^32); first insert of an x wins, as `entry().or_insert`.
-enum Tab {
-    Std(HashMap<u64, (u32, u16, i8)>),
+/// The table of ic5b, rho2xksp and rhodpup: std HashMap (exactly ic5's) or a flat open-addressed array of slots
+/// (x key, u32 index into `ents`), load factor at most 1/2, multiplicative hash, linear probing.
+/// For p < 2^32 the slots are 8 bytes (u32 key, `Flat`); for larger p they are 16 bytes (u64 key, `FlatW`,
+/// added for research/mt_ic_scale_20261115). First insert of an x wins, as `entry().or_insert`.
+enum Tab<V: Copy> {
+    Std(HashMap<u64, V>),
     Flat {
         slots: Vec<(u32, u32)>,
-        ents: Vec<(u32, u16, i8)>,
+        ents: Vec<V>,
+        mask: usize,
+        shift: u32,
+    },
+    FlatW {
+        slots: Vec<(u64, u32)>,
+        ents: Vec<V>,
+        mask: usize,
+        shift: u32,
+    },
+    /// 8-byte slots (low 32 bits of x as a fingerprint, u32 index; index FLAT_EMPTY = empty) with the full x of
+    /// every entry in `xs`, read only on a fingerprint match, so the table is exactly FlatW's
+    /// (research/mt_ic_mem_20261115, ic5b table mode "flatf" when p >= 2^32).
+    FlatF {
+        slots: Vec<(u32, u32)>,
+        xs: Vec<u64>,
+        ents: Vec<V>,
         mask: usize,
         shift: u32,
     },
 }
 const FLAT_EMPTY: u32 = u32::MAX;
-impl Tab {
-    fn new(flat: bool, cap: usize, p: u64) -> Tab {
+extern "C" {
+    fn madvise(addr: *mut std::ffi::c_void, len: usize, advice: i32) -> i32;
+}
+/// Environment `MTF_HP=1` (research/mt_ic_hp_20261118): every flat table's arrays, for every arm (IC and rho
+/// alike), ask for transparent huge pages with madvise(MADV_HUGEPAGE) before first touch. On a host whose THP mode
+/// is "madvise" this replaces 4 KB pages by 2 MB pages; nothing else changes.
+fn hp_on() -> bool {
+    static HP: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *HP.get_or_init(|| std::env::var("MTF_HP").map(|v| v == "1").unwrap_or(false))
+}
+fn hp_advise<T>(v: &Vec<T>) {
+    let bytes = v.capacity() * std::mem::size_of::<T>();
+    if !hp_on() || bytes < (4 << 20) {
+        return;
+    }
+    let p = v.as_ptr() as usize;
+    let a = (p + (2 << 20) - 1) & !((2 << 20) - 1);
+    let end = (p + bytes) & !((2 << 20) - 1);
+    if end > a {
+        // SAFETY: [a, end) lies inside the vector's own allocation; MADV_HUGEPAGE (14) only changes paging policy.
+        unsafe {
+            madvise(a as *mut std::ffi::c_void, end - a, 14);
+        }
+    }
+}
+/// `vec![x; n]` whose pages are advised before they are first written.
+fn hp_vec<T: Clone>(n: usize, x: T) -> Vec<T> {
+    let mut v = Vec::with_capacity(n);
+    hp_advise(&v);
+    v.resize(n, x);
+    v
+}
+/// `Vec::with_capacity(n)`, advised before first touch.
+fn hp_cap<T>(n: usize) -> Vec<T> {
+    let v = Vec::with_capacity(n);
+    hp_advise(&v);
+    v
+}
+/// A flat-table key: the x coordinate, narrowed to u32 when p < 2^32. `EMPTY` is never a valid x.
+trait FKey: Copy + Eq {
+    const EMPTY: Self;
+    fn of(x: u64) -> Self;
+    fn wide(self) -> u64;
+}
+impl FKey for u32 {
+    const EMPTY: u32 = u32::MAX;
+    #[inline]
+    fn of(x: u64) -> u32 {
+        x as u32
+    }
+    #[inline]
+    fn wide(self) -> u64 {
+        self as u64
+    }
+}
+impl FKey for u64 {
+    const EMPTY: u64 = u64::MAX;
+    #[inline]
+    fn of(x: u64) -> u64 {
+        x
+    }
+    #[inline]
+    fn wide(self) -> u64 {
+        self
+    }
+}
+#[inline]
+fn flat_home(x: u64, shift: u32) -> usize {
+    (x.wrapping_mul(0x9e37_79b9_7f4a_7c15) >> shift) as usize
+}
+fn flat_insert<K: FKey, V>(
+    slots: &mut Vec<(K, u32)>,
+    ents: &mut Vec<V>,
+    mask: &mut usize,
+    shift: &mut u32,
+    x: u64,
+    e: V,
+) {
+    // keep the load factor at most 1/2: double and reinsert (never reached by ic5b, whose capacity bound is
+    // exact; rho databases grow with retained walks)
+    if 2 * ents.len() >= slots.len() {
+        let size = 2 * slots.len();
+        let nshift = 64 - size.trailing_zeros();
+        let mut ns = hp_vec(size, (K::EMPTY, 0u32));
+        for &(k, v) in slots.iter() {
+            if k != K::EMPTY {
+                let mut j = flat_home(k.wide(), nshift);
+                while ns[j].0 != K::EMPTY {
+                    j = (j + 1) & (size - 1);
+                }
+                ns[j] = (k, v);
+            }
+        }
+        *slots = ns;
+        *mask = size - 1;
+        *shift = nshift;
+    }
+    let key = K::of(x);
+    let mut i = flat_home(x, *shift);
+    loop {
+        let (k, _) = slots[i];
+        if k == K::EMPTY {
+            slots[i] = (key, ents.len() as u32);
+            ents.push(e);
+            return;
+        }
+        if k == key {
+            return;
+        }
+        i = (i + 1) & *mask;
+    }
+}
+#[inline]
+fn flat_get<K: FKey, V: Copy>(
+    slots: &[(K, u32)],
+    ents: &[V],
+    mask: usize,
+    shift: u32,
+    x: u64,
+) -> Option<V> {
+    if x >= K::EMPTY.wide() {
+        return None;
+    }
+    let key = K::of(x);
+    let mut i = flat_home(x, shift);
+    loop {
+        let (k, v) = slots[i];
+        if k == K::EMPTY {
+            return None;
+        }
+        if k == key {
+            return Some(ents[v as usize]);
+        }
+        i = (i + 1) & mask;
+    }
+}
+fn flatf_insert<V>(
+    slots: &mut [(u32, u32)],
+    xs: &mut Vec<u64>,
+    ents: &mut Vec<V>,
+    mask: usize,
+    shift: u32,
+    x: u64,
+    e: V,
+) {
+    // ic5b sizes the table exactly (load factor at most 1/2, or 0.6 for "flatfd"), so no resize is needed
+    assert!(4 * ents.len() < 3 * slots.len(), "flatf table full");
+    let fp = x as u32;
+    let mut i = flat_home(x, shift);
+    loop {
+        let (k, v) = slots[i];
+        if v == FLAT_EMPTY {
+            slots[i] = (fp, ents.len() as u32);
+            ents.push(e);
+            xs.push(x);
+            return;
+        }
+        if k == fp && xs[v as usize] == x {
+            return;
+        }
+        i = (i + 1) & mask;
+    }
+}
+#[inline]
+fn flatf_get<V: Copy>(
+    slots: &[(u32, u32)],
+    xs: &[u64],
+    ents: &[V],
+    mask: usize,
+    shift: u32,
+    x: u64,
+) -> Option<V> {
+    let fp = x as u32;
+    let mut i = flat_home(x, shift);
+    loop {
+        let (k, v) = slots[i];
+        if v == FLAT_EMPTY {
+            return None;
+        }
+        if k == fp && xs[v as usize] == x {
+            return Some(ents[v as usize]);
+        }
+        i = (i + 1) & mask;
+    }
+}
+#[inline]
+fn flat_prefetch<T>(slots: &[T], i: usize) {
+    #[cfg(target_arch = "x86_64")]
+    // SAFETY: `i` is masked into range by `flat_home` (the shift leaves log2(len) bits); a prefetch never faults.
+    unsafe {
+        std::arch::x86_64::_mm_prefetch(
+            slots.as_ptr().add(i) as *const i8,
+            std::arch::x86_64::_MM_HINT_T0,
+        );
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    let _ = (slots, i);
+}
+impl<V: Copy> Tab<V> {
+    fn new(flat: bool, cap: usize, p: u64) -> Tab<V> {
         if flat {
-            assert!(p <= FLAT_EMPTY as u64, "flat table needs p < 2^32");
             let size = (2 * cap.max(1)).next_power_of_two();
-            Tab::Flat {
-                slots: vec![(FLAT_EMPTY, 0); size],
-                ents: Vec::with_capacity(cap),
-                mask: size - 1,
-                shift: 64 - size.trailing_zeros(),
+            let (mask, shift) = (size - 1, 64 - size.trailing_zeros());
+            if p <= FLAT_EMPTY as u64 {
+                Tab::Flat {
+                    slots: hp_vec(size, (FLAT_EMPTY, 0)),
+                    ents: hp_cap(cap),
+                    mask,
+                    shift,
+                }
+            } else {
+                Tab::FlatW {
+                    slots: hp_vec(size, (u64::MAX, 0)),
+                    ents: hp_cap(cap),
+                    mask,
+                    shift,
+                }
             }
         } else {
             Tab::Std(HashMap::with_capacity_and_hasher(cap, Default::default()))
         }
     }
-    #[inline]
-    fn home(x: u64, shift: u32) -> usize {
-        (x.wrapping_mul(0x9e37_79b9_7f4a_7c15) >> shift) as usize
+    /// ic5b table mode "flatf": `Flat` for p < 2^32, `FlatF` (8-byte fingerprint slots) above.
+    fn new_fp(cap: usize, p: u64) -> Tab<V> {
+        if p <= FLAT_EMPTY as u64 {
+            return Tab::new(true, cap, p);
+        }
+        let size = (2 * cap.max(1)).next_power_of_two();
+        Tab::FlatF {
+            slots: hp_vec(size, (0, FLAT_EMPTY)),
+            xs: hp_cap(cap),
+            ents: hp_cap(cap),
+            mask: size - 1,
+            shift: 64 - size.trailing_zeros(),
+        }
     }
-    fn insert_if_absent(&mut self, x: u64, e: (u32, u16, i8)) {
+    /// ic5b table mode "flatfd" (research/mt_ic_rel_20261115): `FlatF` for every p, sized to load at most 0.6
+    /// (slots = next power of two >= 5 cap / 3) instead of 1/2, which halves the slot array whenever 2 cap is
+    /// just above a power of two. Same x -> entry map as "flat"/"flatf"; probes stay mostly within a cache line.
+    fn new_fp_dense(cap: usize, _p: u64) -> Tab<V> {
+        let size = (cap.max(1) * 5).div_ceil(3).next_power_of_two();
+        Tab::FlatF {
+            slots: hp_vec(size, (0, FLAT_EMPTY)),
+            xs: hp_cap(cap),
+            ents: hp_cap(cap),
+            mask: size - 1,
+            shift: 64 - size.trailing_zeros(),
+        }
+    }
+    fn insert_if_absent(&mut self, x: u64, e: V) {
         match self {
             Tab::Std(m) => {
                 m.entry(x).or_insert(e);
@@ -315,25 +612,24 @@ impl Tab {
                 ents,
                 mask,
                 shift,
-            } => {
-                let mut i = Self::home(x, *shift);
-                loop {
-                    let (k, _) = slots[i];
-                    if k == FLAT_EMPTY {
-                        slots[i] = (x as u32, ents.len() as u32);
-                        ents.push(e);
-                        return;
-                    }
-                    if k as u64 == x {
-                        return;
-                    }
-                    i = (i + 1) & *mask;
-                }
-            }
+            } => flat_insert(slots, ents, mask, shift, x, e),
+            Tab::FlatW {
+                slots,
+                ents,
+                mask,
+                shift,
+            } => flat_insert(slots, ents, mask, shift, x, e),
+            Tab::FlatF {
+                slots,
+                xs,
+                ents,
+                mask,
+                shift,
+            } => flatf_insert(slots, xs, ents, *mask, *shift, x, e),
         }
     }
     #[inline]
-    fn get(&self, x: u64) -> Option<(u32, u16, i8)> {
+    fn get(&self, x: u64) -> Option<V> {
         match self {
             Tab::Std(m) => m.get(&x).copied(),
             Tab::Flat {
@@ -341,46 +637,89 @@ impl Tab {
                 ents,
                 mask,
                 shift,
-            } => {
-                if x >= FLAT_EMPTY as u64 {
-                    return None;
-                }
-                let mut i = Self::home(x, *shift);
-                loop {
-                    let (k, v) = slots[i];
-                    if k == FLAT_EMPTY {
-                        return None;
-                    }
-                    if k as u64 == x {
-                        return Some(ents[v as usize]);
-                    }
-                    i = (i + 1) & *mask;
-                }
-            }
+            } => flat_get(slots, ents, *mask, *shift, x),
+            Tab::FlatW {
+                slots,
+                ents,
+                mask,
+                shift,
+            } => flat_get(slots, ents, *mask, *shift, x),
+            Tab::FlatF {
+                slots,
+                xs,
+                ents,
+                mask,
+                shift,
+            } => flatf_get(slots, xs, ents, *mask, *shift, x),
         }
     }
     #[inline]
     fn prefetch(&self, x: u64) {
-        if let Tab::Flat { slots, shift, .. } = self {
-            let i = Self::home(x, *shift);
-            #[cfg(target_arch = "x86_64")]
-            // SAFETY: `i` is masked into range by `home` (the shift leaves log2(len) bits); a prefetch never faults.
-            unsafe {
-                std::arch::x86_64::_mm_prefetch(
-                    slots.as_ptr().add(i) as *const i8,
-                    std::arch::x86_64::_MM_HINT_T0,
-                );
+        match self {
+            Tab::Std(_) => {}
+            Tab::Flat { slots, shift, .. } => flat_prefetch(slots, flat_home(x, *shift)),
+            Tab::FlatW { slots, shift, .. } => flat_prefetch(slots, flat_home(x, *shift)),
+            Tab::FlatF { slots, shift, .. } => flat_prefetch(slots, flat_home(x, *shift)),
+        }
+    }
+    /// The flat tables' hash shift (home = (x * C) >> shift); None for `Std`.
+    fn shift(&self) -> Option<u32> {
+        match self {
+            Tab::Std(_) => None,
+            Tab::Flat { shift, .. } | Tab::FlatW { shift, .. } | Tab::FlatF { shift, .. } => {
+                Some(*shift)
             }
-            #[cfg(not(target_arch = "x86_64"))]
-            let _ = (slots, i);
         }
     }
     fn len(&self) -> usize {
         match self {
             Tab::Std(m) => m.len(),
-            Tab::Flat { ents, .. } => ents.len(),
+            Tab::Flat { ents, .. } | Tab::FlatW { ents, .. } | Tab::FlatF { ents, .. } => {
+                ents.len()
+            }
         }
     }
+}
+
+/// Insert a chunk of table entries in order of their home slot (stable counting sort on the top bits of the home,
+/// at most 4096 buckets), so consecutive inserts touch nearby slots (research/mt_ic_rel_20261115, ic5b option
+/// "rad"). Equal x share a home, so their relative order, and with it "first insert wins", is kept: the table maps
+/// every x to the same entry as in-order insertion; only slot positions and entry indices may differ.
+fn rad_flush<V: Copy>(table: &mut Tab<V>, buf: &mut Vec<(u64, V)>, tmp: &mut Vec<(u64, V)>) {
+    if buf.is_empty() {
+        return;
+    }
+    let Some(shift) = table.shift() else {
+        for &(x, e) in buf.iter() {
+            table.insert_if_absent(x, e);
+        }
+        buf.clear();
+        return;
+    };
+    let bb = (64 - shift).min(12);
+    let bucket = |x: u64| (x.wrapping_mul(0x9e37_79b9_7f4a_7c15) >> (64 - bb)) as usize;
+    let mut pos = vec![0usize; (1usize << bb) + 1];
+    for &(x, _) in buf.iter() {
+        pos[bucket(x) + 1] += 1;
+    }
+    for i in 1..pos.len() {
+        pos[i] += pos[i - 1];
+    }
+    tmp.clear();
+    tmp.resize(buf.len(), buf[0]);
+    for &(x, e) in buf.iter() {
+        let b = bucket(x);
+        tmp[pos[b]] = (x, e);
+        pos[b] += 1;
+    }
+    // home-ordered inserts, each slot prefetched 32 inserts ahead
+    for i in 0..tmp.len() {
+        if i + 32 < tmp.len() {
+            table.prefetch(tmp[i + 32].0);
+        }
+        table.insert_if_absent(tmp[i].0, tmp[i].1);
+    }
+    buf.clear();
 }
 
 fn main() {
@@ -947,13 +1286,43 @@ fn main() {
             let mu = param;
             let k: usize = args.get(6).map(|s| s.parse().unwrap()).unwrap_or(3);
             let gfac: f64 = args.get(7).map(|s| s.parse().unwrap()).unwrap_or(1.2);
-            let flat = match args.get(8).map(|s| s.as_str()).unwrap_or("std") {
+            // "flatf" (research/mt_ic_mem_20261115): "flat" with 8-byte fingerprint slots when p >= 2^32
+            let tmode = args.get(8).map(|s| s.as_str()).unwrap_or("std");
+            let flat = match tmode {
                 "std" => false,
-                "flat" => true,
+                "flat" | "flatf" | "flatfd" => true,
                 o => panic!("ic5b table mode {o}"),
             };
             let bsz: usize = args.get(9).map(|s| s.parse().unwrap()).unwrap_or(1).max(1);
-            assert!((2..=4).contains(&k));
+            // args[10] = "bi": Montgomery simultaneous inversion in the table build (per combo) and in the target
+            // phase (per lock-step round); the table, every trial and the recovered logs are unchanged, only I and
+            // M counts move (research/mt_ic_scale_20261115). Default "plain" is ic5b as before.
+            let bi = args.get(10).map(|s| s.as_str()) == Some("bi");
+            // args[11] = "pf" (research/mt_ic_mem_20261115): table-build inserts go through a FIFO of PF_DIST
+            // entries whose slots are prefetched; insert order, the table and every count are unchanged.
+            // args[11] is a comma-separated option set (research/mt_ic_rel_20261115): "pf" as before; "rel" batches
+            // the relation phase's inversions per block of kw trials and prefetches its probes; "rad" inserts the
+            // table in home-slot order per chunk (rad_flush); "cb" batches the (k-1)-term combination step. None of
+            // them changes the table's x -> entry map, a trial, a relation or a recovered log; I and M move.
+            let opts: Vec<&str> = args
+                .get(11)
+                .map(|s| s.split(',').collect())
+                .unwrap_or_default();
+            for o in &opts {
+                assert!(["pf", "rel", "rad", "cb"].contains(o), "ic5b option {o}");
+            }
+            let pf = opts.contains(&"pf");
+            let rel_b = opts.contains(&"rel");
+            let rad = opts.contains(&"rad");
+            let cb = opts.contains(&"cb");
+            const RAD_CHUNK: usize = 1 << 22;
+            let mut rbuf: Vec<(u64, (u32, u16, i8))> = Vec::new();
+            let mut rtmp: Vec<(u64, (u32, u16, i8))> = Vec::new();
+            const PF_DIST: usize = 32;
+            let mut ring: std::collections::VecDeque<(u64, (u32, u16, i8))> =
+                std::collections::VecDeque::with_capacity(PF_DIST + 1);
+            let mut bscr: Vec<u64> = Vec::new();
+            assert!((2..=5).contains(&k)); // k = 5 added for research/mt_ic_retune_20261115
             let kstar = mu * mu * ((n as f64) * targets as f64 / 2.0).sqrt();
             let classes = |m: usize| -> f64 {
                 let mut c = 1.0;
@@ -980,16 +1349,38 @@ fn main() {
                 }
             }
             snap.push(("fb".into(), take(&f)));
+            let ms_at_fb = t0.elapsed().as_secs_f64() * 1e3;
             // (k-1)-term full points: (point, indices, signs); first sign +1.
             let mut combos: Vec<(Pt, Vec<u16>, Vec<i8>)> = (0..m)
                 .map(|i| (Some(fb[i]), vec![i as u16], vec![1i8]))
                 .collect();
+            let mut cdens: Vec<u64> = Vec::with_capacity(m);
             for _ in 2..k {
                 let mut next = Vec::new();
                 for (p, idx, sg) in &combos {
                     let last = *idx.last().unwrap() as usize;
+                    // "cb": one simultaneous inversion per P over its l with x(F_l) != x(P)
+                    let batched = match (*p, cb) {
+                        (Some(pp), true) => {
+                            cdens.clear();
+                            for l in (last + 1)..m {
+                                if fb[l].0 != pp.0 {
+                                    cdens.push(f.sub(fb[l].0, pp.0));
+                                }
+                            }
+                            f.batch_inv(&mut cdens, &mut bscr);
+                            true
+                        }
+                        _ => false,
+                    };
+                    let mut j = 0usize;
                     for l in (last + 1)..m {
-                        let (sum, dif) = f.padd_with_sibling(*p, Some(fb[l]));
+                        let (sum, dif) = if batched && fb[l].0 != p.unwrap().0 {
+                            j += 1;
+                            f.padd_sib_d(p.unwrap(), fb[l], cdens[j - 1])
+                        } else {
+                            f.padd_with_sibling(*p, Some(fb[l]))
+                        };
                         for (pt, s) in [(sum, 1i8), (dif, -1i8)] {
                             if pt.is_some() {
                                 let mut i2 = idx.clone();
@@ -1004,25 +1395,84 @@ fn main() {
                 combos = next;
             }
             snap.push(("combos".into(), take(&f)));
+            let ms_at_combos = t0.elapsed().as_secs_f64() * 1e3;
             // table: x -> (combo id, l, sign of F_l)
             let cap: usize = combos
                 .iter()
                 .map(|(_, idx, _)| 2 * (m - 1 - *idx.last().unwrap() as usize))
                 .sum::<usize>()
                 .max(kstar as usize + 16);
-            let mut table = Tab::new(flat, cap, p);
+            let mut table = if tmode == "flatf" {
+                Tab::new_fp(cap, p)
+            } else if tmode == "flatfd" {
+                Tab::new_fp_dense(cap, p)
+            } else {
+                Tab::new(flat, cap, p)
+            };
+            let mut put = |table: &mut Tab<(u32, u16, i8)>, x: u64, e: (u32, u16, i8)| {
+                if rad {
+                    rbuf.push((x, e));
+                    if rbuf.len() >= RAD_CHUNK {
+                        rad_flush(table, &mut rbuf, &mut rtmp);
+                    }
+                } else if pf {
+                    table.prefetch(x);
+                    ring.push_back((x, e));
+                    if ring.len() > PF_DIST {
+                        let (x0, e0) = ring.pop_front().unwrap();
+                        table.insert_if_absent(x0, e0);
+                    }
+                } else {
+                    table.insert_if_absent(x, e);
+                }
+            };
+            let mut dens: Vec<u64> = Vec::with_capacity(m);
             for (ci_, (p, idx, _)) in combos.iter().enumerate() {
                 let last = *idx.last().unwrap() as usize;
+                if bi {
+                    // one simultaneous inversion over this combo's l > last (xpair is None when P is None or x equal)
+                    let pp = match *p {
+                        Some(v) => v,
+                        None => continue,
+                    };
+                    dens.clear();
+                    for l in (last + 1)..m {
+                        if fb[l].0 != pp.0 {
+                            dens.push(f.sub(fb[l].0, pp.0));
+                        }
+                    }
+                    f.batch_inv(&mut dens, &mut bscr);
+                    let mut j = 0usize;
+                    for l in (last + 1)..m {
+                        if fb[l].0 == pp.0 {
+                            continue;
+                        }
+                        let (xp, xm) = f.xpair_d(pp, fb[l], dens[j]);
+                        j += 1;
+                        f.hash();
+                        put(&mut table, xp, (ci_ as u32, l as u16, 1));
+                        f.hash();
+                        put(&mut table, xm, (ci_ as u32, l as u16, -1));
+                    }
+                    continue;
+                }
                 for l in (last + 1)..m {
                     if let Some((xp, xm)) = f.xpair(*p, Some(fb[l])) {
                         f.hash();
-                        table.insert_if_absent(xp, (ci_ as u32, l as u16, 1));
+                        put(&mut table, xp, (ci_ as u32, l as u16, 1));
                         f.hash();
-                        table.insert_if_absent(xm, (ci_ as u32, l as u16, -1));
+                        put(&mut table, xm, (ci_ as u32, l as u16, -1));
                     }
                 }
             }
+            let _ = put; // end the closure's borrow of `ring` and `rbuf`
+            while let Some((x0, e0)) = ring.pop_front() {
+                table.insert_if_absent(x0, e0);
+            }
+            rad_flush(&mut table, &mut rbuf, &mut rtmp);
+            drop((rbuf, rtmp));
             snap.push(("table".into(), take(&f)));
+            let ms_at_table = t0.elapsed().as_secs_f64() * 1e3;
             let entry_pt = |f: &F, e: (u32, u16, i8)| -> Pt {
                 let fl = Some(fb[e.1 as usize]);
                 f.padd(
@@ -1084,6 +1534,7 @@ fn main() {
             let budget_rel = (gfac * m as f64).ceil() as usize;
             let mut p1_trials = 0u64;
             let mut kk = 0usize;
+            let mut rblk: Vec<Option<(u64, u64)>> = Vec::with_capacity(kw);
             while rank < m {
                 if kk == kw {
                     kk = 0;
@@ -1091,7 +1542,39 @@ fn main() {
                     v_log = (v_log + e_log) % n;
                 }
                 p1_trials += 2;
-                if let Some((xp, xm)) = f.xpair(v_pt, w_pts[kk]) {
+                if rel_b && kk == 0 {
+                    // "rel": the block's kw pairs share one simultaneous inversion; all probes prefetched
+                    rblk.clear();
+                    if let Some(vp) = v_pt {
+                        dens.clear();
+                        for w in &w_pts[..kw] {
+                            if w.unwrap().0 != vp.0 {
+                                dens.push(f.sub(w.unwrap().0, vp.0));
+                            }
+                        }
+                        f.batch_inv(&mut dens, &mut bscr);
+                        let mut j = 0usize;
+                        for w in &w_pts[..kw] {
+                            if w.unwrap().0 == vp.0 {
+                                rblk.push(None);
+                                continue;
+                            }
+                            let pr = f.xpair_d(vp, w.unwrap(), dens[j]);
+                            j += 1;
+                            table.prefetch(pr.0);
+                            table.prefetch(pr.1);
+                            rblk.push(Some(pr));
+                        }
+                    } else {
+                        rblk.resize(kw, None);
+                    }
+                }
+                let pair = if rel_b {
+                    rblk[kk]
+                } else {
+                    f.xpair(v_pt, w_pts[kk])
+                };
+                if let Some((xp, xm)) = pair {
                     for (xx, sw) in [(xp, 1i64), (xm, -1i64)] {
                         f.hash();
                         if let Some(e) = table.get(xx) {
@@ -1154,6 +1637,7 @@ fn main() {
                 ylog[c] = md(v, n);
             }
             snap.push(("relations".into(), take(&f)));
+            let ms_at_relations = t0.elapsed().as_secs_f64() * 1e3;
             let mut trials = 0u64;
             let t_tgt = Instant::now();
             // lock-step batches: act[j] = (target, kq); a finished slot takes the next target
@@ -1169,6 +1653,18 @@ fn main() {
                 let kmax = act.iter().map(|a| a.1).max().unwrap();
                 ensure_w(&f, kmax, &mut w_pts, &mut w_log);
                 prob.clear();
+                if bi {
+                    // q and w_pts[kq] are never None here (as in the plain path, which unwraps both)
+                    dens.clear();
+                    for &(t, kq) in &act {
+                        let (qx, wx) = (qs[t].unwrap().0, w_pts[kq].unwrap().0);
+                        if qx != wx {
+                            dens.push(f.sub(wx, qx));
+                        }
+                    }
+                    f.batch_inv(&mut dens, &mut bscr);
+                }
+                let mut jd = 0usize;
                 for &(t, kq) in &act {
                     let q = qs[t];
                     trials += 2;
@@ -1180,7 +1676,12 @@ fn main() {
                         }));
                         continue;
                     }
-                    let pr = f.xpair(q, w_pts[kq]);
+                    let pr = if bi {
+                        jd += 1;
+                        Some(f.xpair_d(q.unwrap(), w_pts[kq].unwrap(), dens[jd - 1]))
+                    } else {
+                        f.xpair(q, w_pts[kq])
+                    };
                     if let Some((xp, xm)) = pr {
                         table.prefetch(xp);
                         table.prefetch(xm);
@@ -1237,9 +1738,9 @@ fn main() {
             Out {
                 ok: 0,
                 extra: format!(
-                    "\"k\":{},\"m\":{},\"combos\":{},\"table\":{},\"relations\":{},\"p1_trials\":{},\"trials\":{},\"w_len\":{},\"table_mode\":\"{}\",\"batch\":{},\"ms_targets\":{:.3}",
+                    "\"k\":{},\"m\":{},\"combos\":{},\"table\":{},\"relations\":{},\"p1_trials\":{},\"trials\":{},\"w_len\":{},\"table_mode\":\"{}\",\"inv\":\"{}\",\"pf\":{},\"opts\":\"{}\",\"batch\":{},\"ms_targets\":{:.3},\"ms_at_fb\":{:.3},\"ms_at_combos\":{:.3},\"ms_at_table\":{:.3},\"ms_at_relations\":{:.3}",
                     k, m, combos.len(), table.len(), nrel, p1_trials, trials, w_pts.len(),
-                    if flat { "flat" } else { "std" }, bsz, ms_targets
+                    tmode, if bi { "bi" } else { "plain" }, pf, opts.join(","), bsz, ms_targets, ms_at_fb, ms_at_combos, ms_at_table, ms_at_relations
                 ),
             }
         }
@@ -2504,6 +3005,180 @@ fn main() {
             }
         }
 
+        "rho2xksp" => {
+            // rho2xks with the treatment ic5b's arm B got (research/mt_rho_rematch_20261115): the database is
+            // a flat open-addressed table (Tab, as ic5b "flat"), and the target phase is pipelined by one step:
+            // after a step its two probe slots are prefetched, the next step's arithmetic is done, and only then
+            // are the previous step's lookups made. Targets stay sequential, so the retention of solved walks is
+            // rho2xks's. A hit is therefore seen one step late: at most one extra step per target (counted).
+            const ARMS: usize = 32;
+            const RESTART: usize = 32;
+            const BANK: usize = 64;
+            const NOY: u64 = u64::MAX;
+            let kappa = param;
+            let mut bank: Vec<(Pt, u64)> = Vec::new();
+            for _ in 0..BANK {
+                let k = rng.gen_range(1..n);
+                bank.push((f.smul(g, k), k));
+            }
+            let arms: Vec<(Pt, u64)> = (0..ARMS).map(|_| bank[rng.gen_range(0..BANK)]).collect();
+            let hidx = |pt: Pt| -> usize {
+                f.native();
+                pt.map(|(x, _)| (x as usize) % ARMS).unwrap_or(0)
+            };
+            // full P + A and x(P - A) with one inversion: I + 3M + 2S
+            let step_x = |f: &F, p: Pt, q: Pt| -> (Pt, Option<u64>) {
+                if let (Some((x1, y1)), Some((x2, y2))) = (p, q) {
+                    if x1 != x2 {
+                        let d = f.inv(f.sub(x2, x1));
+                        let lam = f.mul(f.sub(y2, y1), d);
+                        let x3 = f.sub(f.sub(f.sqr(lam), x1), x2);
+                        let y3 = f.sub(f.mul(lam, f.sub(x1, x3)), y1);
+                        let lm = f.mul(f.neg(f.add(y2, y1)), d);
+                        let xm = f.sub(f.sub(f.sqr(lm), x1), x2);
+                        return (Some((x3, y3)), Some(xm));
+                    }
+                }
+                (f.padd(p, q), None)
+            };
+            // db: x -> (log, y or NOY, (prev_x, prev_y, arm)) ; a NOY entry is prev - arms[arm], recomputed on a hit (counted)
+            let db_target = (kappa * ((n as f64) * targets as f64).sqrt()).ceil() as usize;
+            // capacity: the build fills db_target entries; retention adds up to the target trails
+            let mut db: Tab<(u64, u64, (u64, u64, usize))> = Tab::new(true, db_target * 2, f.p);
+            let mut cur: Pt = None;
+            let mut ca = 0u64;
+            let mut st = RESTART;
+            let mut db_steps = 0u64;
+            let mut sp: Pt = bank[0].0;
+            let mut sa = bank[0].1;
+            while db.len() < db_target {
+                if st >= RESTART || cur.is_none() {
+                    // chained starts s <- s + B_k: one addition per restart and unboundedly many distinct
+                    // starts (a fixed-bank triple sum capped the walks at C(66, 3) and could not fill large dbs)
+                    let k1 = rng.gen_range(0..BANK);
+                    sp = f.padd(sp, bank[k1].0);
+                    sa = (sa + bank[k1].1) % n;
+                    cur = sp;
+                    ca = sa;
+                    st = 0;
+                }
+                let h = hidx(cur);
+                let prev = cur;
+                let (nx, sx) = step_x(&f, prev, arms[h].0);
+                cur = nx;
+                if let Some(xm) = sx {
+                    let (px, py) = prev.unwrap();
+                    f.hash();
+                    db.insert_if_absent(xm, ((ca + n - arms[h].1) % n, NOY, (px, py, h)));
+                }
+                ca = (ca + arms[h].1) % n;
+                st += 1;
+                db_steps += 1;
+                if let Some((x, y)) = cur {
+                    f.hash();
+                    db.insert_if_absent(x, (ca, y, (0, 0, 0)));
+                }
+            }
+            snap.push(("db".into(), take(&f)));
+            let full_y = |f: &F, y2: u64, aux: (u64, u64, usize)| -> u64 {
+                if y2 != NOY {
+                    return y2;
+                }
+                f.padd(Some((aux.0, aux.1)), f.pneg(arms[aux.2].0))
+                    .unwrap()
+                    .1
+            };
+            let mut steps_total = 0u64;
+            for t in 0..targets {
+                let q = qs[t];
+                let mut cur: Pt = None;
+                let mut ca = 0u64;
+                let mut st = RESTART;
+                let mut tp: Pt = q;
+                let mut ta = 0u64;
+                let mut trail: Vec<(u64, u64, u64, (u64, u64, usize))> = Vec::new();
+                // the previous step's lookups, made one step late: (x, y, ca) of the new point and
+                // (xm, prev, pa, h) of its x-only sibling
+                let mut prev_look: Option<(
+                    Option<(u64, u64, u64)>,
+                    Option<(u64, Pt, u64, usize)>,
+                )> = None;
+                let v = loop {
+                    if st >= RESTART || cur.is_none() {
+                        let k1 = rng.gen_range(0..BANK);
+                        tp = f.padd(tp, bank[k1].0);
+                        ta = (ta + bank[k1].1) % n;
+                        cur = tp;
+                        ca = ta;
+                        st = 0;
+                    }
+                    let h = hidx(cur);
+                    let prev = cur;
+                    let pa = ca;
+                    let (nx, sx) = step_x(&f, prev, arms[h].0);
+                    cur = nx;
+                    ca = (ca + arms[h].1) % n;
+                    st += 1;
+                    steps_total += 1;
+                    if let Some((x, y)) = cur {
+                        trail.push((x, ca, y, (0, 0, 0)));
+                    }
+                    if let (Some(xm), Some((px, py))) = (sx, prev) {
+                        trail.push((xm, (pa + n - arms[h].1) % n, NOY, (px, py, h)));
+                    }
+                    if let Some((x, _)) = cur {
+                        db.prefetch(x);
+                    }
+                    if let Some(xm) = sx {
+                        db.prefetch(xm);
+                    }
+                    let this_look = (cur.map(|(x, y)| (x, y, ca)), sx.map(|xm| (xm, prev, pa, h)));
+                    if let Some((cl, sl)) = prev_look.take() {
+                        if let Some((x, y, cca)) = cl {
+                            f.hash();
+                            if let Some((a2, y2, aux)) = db.get(x) {
+                                let y2 = full_y(&f, y2, aux);
+                                let eps: i128 = if y == y2 { 1 } else { -1 };
+                                break md(eps * a2 as i128 - cca as i128, n);
+                            }
+                        }
+                        if let Some((xm, sprev, spa, sh)) = sl {
+                            f.hash();
+                            if let Some((a2, y2, aux)) = db.get(xm) {
+                                let ym = f.padd(sprev, f.pneg(arms[sh].0)).unwrap().1;
+                                let y2 = full_y(&f, y2, aux);
+                                let eps: i128 = if ym == y2 { 1 } else { -1 };
+                                break md(
+                                    eps * a2 as i128
+                                        - md(spa as i128 - arms[sh].1 as i128, n) as i128,
+                                    n,
+                                );
+                            }
+                        }
+                    }
+                    prev_look = Some(this_look);
+                    if steps_total > 4_000_000_000 {
+                        panic!("budget");
+                    }
+                };
+                found[t] = v;
+                for (x, off, y, aux) in trail {
+                    f.hash();
+                    db.insert_if_absent(x, ((off + v) % n, y, aux));
+                }
+            }
+            snap.push(("targets".into(), take(&f)));
+            Out {
+                ok: 0,
+                extra: format!(
+                    "\"db\":{},\"db_steps\":{},\"target_steps\":{}",
+                    db.len(),
+                    db_steps,
+                    steps_total
+                ),
+            }
+        }
+
         "rhoseq" => {
             // validator control: anchored rho with a sequential phase-1 database {G, 2G, ..., NG} (no walk waste, no restarts);
             // phase 2 identical to "rho".
@@ -2918,6 +3593,563 @@ fn main() {
                     steps_total,
                     walks,
                     abandoned
+                ),
+            }
+        }
+        "rhodpup" => {
+            // rhodpu with the treatment ic5b's arm B got (research/mt_rho_rematch_20261115): the database and
+            // each target's pending table are flat open-addressed tables (Tab, as ic5b "flat"), and each lookup
+            // slot is prefetched as soon as the distinguished point is known. Everything else is rhodpu's: the
+            // walks, the counted operations and the recovered logs are identical.
+            // Multi-target distinguished-point rho on {P, -P} classes (Kuhn-Struik with retention of solved
+            // walks, optional precomputation). Walk: P -> canon(P + A_h(P)), R = 1024 steps A_i = B_j + B_k from
+            // the 64-point bank; if the next point would use the same step index (a fruitless 2-cycle risk),
+            // the step A_(h+1) is used instead (the extra addition is counted). A point is distinguished when
+            // d hash bits are zero (theta = 2^d steps per walk on average); walks longer than 20 theta are
+            // abandoned (their steps stay counted). param = kappa: precomputation walks from known-log starts
+            // until kappa sqrt(nT) steps are spent; args[6] = offset of d from d0 = round(log2(n/T)/4).
+            // Each target walks from chained starts Q + s G until a distinguished point is found in the
+            // database (solved) or in its own earlier walks with the opposite Q sign (solved); otherwise it is
+            // kept pending. After a target is solved, its pending distinguished points are inserted with known
+            // logs. Every addition is counted; every database or pending lookup and insert is one hash op.
+            const BANK: usize = 64;
+            const R: usize = 1024;
+            let kappa = param;
+            let doff: i32 = args.get(6).map(|s| s.parse().unwrap()).unwrap_or(0);
+            let d0 = (0.25 * ((n as f64) / targets as f64).log2()).round() as i32;
+            let d = (d0 + doff).max(1) as u32;
+            let mask = (1u64 << d) - 1;
+            let theta = 1u64 << d;
+            let maxwalk = 20 * theta;
+            let half = f.p / 2;
+            let mut bank: Vec<(Pt, u64)> = Vec::new();
+            for _ in 0..BANK {
+                let k = rng.gen_range(1..n);
+                bank.push((f.smul(g, k), k));
+            }
+            let mut arms: Vec<(Pt, u64)> = Vec::with_capacity(R);
+            let mut used = std::collections::HashSet::new();
+            while arms.len() < R {
+                let (i, j) = (rng.gen_range(0..BANK), rng.gen_range(0..BANK));
+                if i == j || !used.insert((i.min(j), i.max(j))) {
+                    continue;
+                }
+                arms.push((f.padd(bank[i].0, bank[j].0), (bank[i].1 + bank[j].1) % n));
+            }
+            let mix = |x: u64| -> u64 { x.wrapping_mul(0x9E37_79B9_7F4A_7C15) };
+            let idx = |p: Pt| -> usize { p.map(|(x, _)| (mix(x) >> 40) as usize % R).unwrap_or(0) };
+            let is_dp =
+                |p: Pt| -> bool { p.map(|(x, _)| (mix(x) >> 8) & mask == 0).unwrap_or(false) };
+            // canonical class representative (y <= p/2); returns the sign applied
+            // native work per generated point: one canonicalisation and one hash of x (the step index and the
+            // distinguished-point test are bits of that one hash, so they are not counted again)
+            let canon = |p: Pt| -> (Pt, i64) {
+                f.native();
+                f.native();
+                match p {
+                    Some((x, y)) if y > half => (Some((x, f.p - y)), -1),
+                    _ => (p, 1),
+                }
+            };
+            // one walk step on (point, a, b) with point = a G + b Q canonical
+            let step = |f: &F, p: Pt, a: u64, b: i64| -> (Pt, u64, i64) {
+                let h = idx(p);
+                let (mut q1, mut s1) = canon(f.padd(p, arms[h].0));
+                let mut hh = h;
+                if q1.is_some() && idx(q1) == h {
+                    hh = (h + 1) % R;
+                    let r = canon(f.padd(p, arms[hh].0));
+                    q1 = r.0;
+                    s1 = r.1;
+                }
+                let a1 = md(s1 as i128 * ((a + arms[hh].1) % n) as i128, n);
+                (q1, a1, s1 * b)
+            };
+            let db_cap = ((kappa * ((n as f64) * targets as f64).sqrt()) as usize >> d).max(1024)
+                + 4 * targets;
+            let mut db: Tab<u64> = Tab::new(true, db_cap, f.p);
+            let pre_budget = (kappa * ((n as f64) * targets as f64).sqrt()) as u64;
+            let mut pre_steps = 0u64;
+            let mut sp: Pt = bank[0].0;
+            let mut sa = bank[0].1;
+            while pre_steps < pre_budget {
+                let k1 = rng.gen_range(0..BANK);
+                sp = f.padd(sp, bank[k1].0);
+                sa = (sa + bank[k1].1) % n;
+                let (mut p, s0) = canon(sp);
+                let mut a = md(s0 as i128 * sa as i128, n);
+                let mut len = 0u64;
+                while p.is_some() && len < maxwalk {
+                    let r = step(&f, p, a, 0);
+                    p = r.0;
+                    a = r.1;
+                    len += 1;
+                    if is_dp(p) {
+                        f.hash();
+                        db.insert_if_absent(p.unwrap().0, a);
+                        break;
+                    }
+                }
+                pre_steps += len;
+            }
+            snap.push(("db".into(), take(&f)));
+            let mut steps_total = 0u64;
+            let mut walks = 0u64;
+            let mut abandoned = 0u64;
+            let inv2 = n.div_ceil(2);
+            for t in 0..targets {
+                let q = qs[t];
+                let mut tp: Pt = q;
+                let mut ta = 0u64;
+                let mut pending: Vec<(u64, (u64, i64))> = Vec::new();
+                let mut ptab: Tab<(u64, i64)> = Tab::new(true, 64, f.p);
+                let v = 'tgt: loop {
+                    let k1 = rng.gen_range(0..BANK);
+                    tp = f.padd(tp, bank[k1].0);
+                    ta = (ta + bank[k1].1) % n;
+                    let (mut p, s0) = canon(tp);
+                    let mut a = md(s0 as i128 * ta as i128, n);
+                    let mut b = s0;
+                    let mut len = 0u64;
+                    walks += 1;
+                    while p.is_some() && len < maxwalk {
+                        let r = step(&f, p, a, b);
+                        p = r.0;
+                        a = r.1;
+                        b = r.2;
+                        len += 1;
+                        if is_dp(p) {
+                            let x = p.unwrap().0;
+                            db.prefetch(x);
+                            ptab.prefetch(x);
+                            f.hash();
+                            if let Some(a2) = db.get(x) {
+                                // a G + b Q = a2 G
+                                break 'tgt md(b as i128 * (a2 as i128 - a as i128), n);
+                            }
+                            f.hash();
+                            if let Some((a2, b2)) = ptab.get(x) {
+                                if b2 != b {
+                                    // a + b q = a2 + b2 q, b2 = -b: q = (a2 - a) / (2 b)
+                                    let num = md(a2 as i128 - a as i128, n);
+                                    let qv = md(
+                                        b as i128
+                                            * ((num as u128 * inv2 as u128) % n as u128) as i128,
+                                        n,
+                                    );
+                                    f.cm.set(f.cm.get() + 1);
+                                    break 'tgt qv;
+                                }
+                            } else {
+                                f.hash();
+                                ptab.insert_if_absent(x, (a, b));
+                                pending.push((x, (a, b)));
+                            }
+                            break;
+                        }
+                    }
+                    steps_total += len;
+                    if len >= maxwalk {
+                        abandoned += 1;
+                    }
+                    if steps_total > 4_000_000_000 {
+                        panic!("budget");
+                    }
+                };
+                found[t] = v;
+                for (x, (a, b)) in pending {
+                    f.hash();
+                    db.insert_if_absent(x, md(a as i128 + b as i128 * v as i128, n));
+                }
+            }
+            snap.push(("targets".into(), take(&f)));
+            Out {
+                ok: 0,
+                extra: format!(
+                    "\"db\":{},\"d\":{},\"pre_steps\":{},\"target_steps\":{},\"walks\":{},\"abandoned\":{}",
+                    db.len(),
+                    d,
+                    pre_steps,
+                    steps_total,
+                    walks,
+                    abandoned
+                ),
+            }
+        }
+        "rhodpb" => {
+            // rhodpup run as B lock-step lanes (args[7] = B, default 32) so that every round's point additions share
+            // one Montgomery simultaneous inversion (research/mt_ic_scale_20261115): the standard parallel form of
+            // multi-target distinguished-point rho. Each lane holds one target at a time with its own walk, pending
+            // set and chained starts; a solved lane inserts its pending points with known logs (retention) and takes
+            // the next target. Walk, step rule, distinguished-point rule, abandon rule and counted native work are
+            // rhodpu's; the order in which targets meet the database differs, so this is a different sample of the
+            // same algorithm, not a replay. Precomputation (kappa > 0) runs as B lock-step walks from known-log
+            // chained starts until kappa sqrt(nT) steps are spent.
+            const BANK: usize = 64;
+            const R: usize = 1024;
+            let kappa = param;
+            let doff: i32 = args.get(6).map(|s| s.parse().unwrap()).unwrap_or(0);
+            let lanes: usize = args.get(7).map(|s| s.parse().unwrap()).unwrap_or(32).max(1);
+            let d0 = (0.25 * ((n as f64) / targets as f64).log2()).round() as i32;
+            let d = (d0 + doff).max(1) as u32;
+            let mask = (1u64 << d) - 1;
+            let theta = 1u64 << d;
+            let maxwalk = 20 * theta;
+            let half = f.p / 2;
+            let mut bank: Vec<(Pt, u64)> = Vec::new();
+            for _ in 0..BANK {
+                let k = rng.gen_range(1..n);
+                bank.push((f.smul(g, k), k));
+            }
+            let mut arms: Vec<(Pt, u64)> = Vec::with_capacity(R);
+            let mut used = std::collections::HashSet::new();
+            while arms.len() < R {
+                let (i, j) = (rng.gen_range(0..BANK), rng.gen_range(0..BANK));
+                if i == j || !used.insert((i.min(j), i.max(j))) {
+                    continue;
+                }
+                arms.push((f.padd(bank[i].0, bank[j].0), (bank[i].1 + bank[j].1) % n));
+            }
+            let mix = |x: u64| -> u64 { x.wrapping_mul(0x9E37_79B9_7F4A_7C15) };
+            let idx = |p: Pt| -> usize { p.map(|(x, _)| (mix(x) >> 40) as usize % R).unwrap_or(0) };
+            let is_dp =
+                |p: Pt| -> bool { p.map(|(x, _)| (mix(x) >> 8) & mask == 0).unwrap_or(false) };
+            let canon = |p: Pt| -> (Pt, i64) {
+                f.native();
+                f.native();
+                match p {
+                    Some((x, y)) if y > half => (Some((x, f.p - y)), -1),
+                    _ => (p, 1),
+                }
+            };
+            // one batched round of additions lhs[j] + rhs[j]; pairs with equal x (or a None) use f.padd alone
+            let mut dens: Vec<u64> = Vec::new();
+            let mut scr: Vec<u64> = Vec::new();
+            let mut add_batch = |f: &F, pairs: &[(Pt, Pt)], out: &mut Vec<Pt>| {
+                dens.clear();
+                for &(a, b) in pairs {
+                    if let (Some(pa), Some(pb)) = (a, b) {
+                        if pa.0 != pb.0 {
+                            dens.push(f.sub(pb.0, pa.0));
+                        }
+                    }
+                }
+                f.batch_inv(&mut dens, &mut scr);
+                out.clear();
+                let mut j = 0usize;
+                for &(a, b) in pairs {
+                    match (a, b) {
+                        (Some(pa), Some(pb)) if pa.0 != pb.0 => {
+                            out.push(f.padd_d(pa, pb, dens[j]));
+                            j += 1;
+                        }
+                        _ => out.push(f.padd(a, b)),
+                    }
+                }
+            };
+            let db_cap = ((kappa * ((n as f64) * targets as f64).sqrt()) as usize >> d).max(1024)
+                + 4 * targets;
+            let mut db: Tab<u64> = Tab::new(true, db_cap, f.p);
+            let pre_budget = (kappa * ((n as f64) * targets as f64).sqrt()) as u64;
+            let mut pre_steps = 0u64;
+            let mut pairs: Vec<(Pt, Pt)> = Vec::with_capacity(lanes);
+            let mut outs: Vec<Pt> = Vec::with_capacity(lanes);
+            // lane state for walks: start chain (sp, sa); walk (p, a, b, len); mode 0 = needs a start, 1 = walking
+            struct Lane {
+                t: usize,
+                sp: Pt,
+                sa: u64,
+                p: Pt,
+                a: u64,
+                b: i64,
+                len: u64,
+                walking: bool,
+                h: usize,
+                pending: Vec<(u64, (u64, i64))>,
+                ptab: Option<Tab<(u64, i64)>>,
+            }
+            if pre_budget > 0 {
+                let mut pl: Vec<Lane> = (0..lanes)
+                    .map(|j| Lane {
+                        t: 0,
+                        sp: bank[j % BANK].0,
+                        sa: bank[j % BANK].1,
+                        p: None,
+                        a: 0,
+                        b: 0,
+                        len: 0,
+                        walking: false,
+                        h: 0,
+                        pending: Vec::new(),
+                        ptab: None,
+                    })
+                    .collect();
+                let mut active: Vec<usize> = (0..lanes).collect();
+                let mut starting = true;
+                while !active.is_empty() {
+                    pairs.clear();
+                    let mut kk: Vec<usize> = Vec::with_capacity(active.len());
+                    for &j in &active {
+                        let ln = &mut pl[j];
+                        if !ln.walking {
+                            let k1 = rng.gen_range(0..BANK);
+                            kk.push(k1);
+                            pairs.push((ln.sp, bank[k1].0));
+                        } else {
+                            kk.push(usize::MAX);
+                            ln.h = idx(ln.p);
+                            pairs.push((ln.p, arms[ln.h].0));
+                        }
+                    }
+                    add_batch(&f, &pairs, &mut outs);
+                    // second additions for the fruitless-cycle rule (rare)
+                    let mut redo: Vec<usize> = Vec::new();
+                    let mut res: Vec<(Pt, i64, usize)> = vec![(None, 0, 0); active.len()];
+                    for (q, &j) in active.iter().enumerate() {
+                        let ln = &mut pl[j];
+                        if kk[q] != usize::MAX {
+                            ln.sp = outs[q];
+                            ln.sa = (ln.sa + bank[kk[q]].1) % n;
+                            let (pp, s0) = canon(ln.sp);
+                            ln.p = pp;
+                            ln.a = md(s0 as i128 * ln.sa as i128, n);
+                            ln.len = 0;
+                            ln.walking = pp.is_some();
+                            continue;
+                        }
+                        let (q1, s1) = canon(outs[q]);
+                        if q1.is_some() && idx(q1) == ln.h {
+                            redo.push(q);
+                        } else {
+                            res[q] = (q1, s1, ln.h);
+                        }
+                    }
+                    if !redo.is_empty() {
+                        pairs.clear();
+                        for &q in &redo {
+                            let ln = &pl[active[q]];
+                            pairs.push((ln.p, arms[(ln.h + 1) % R].0));
+                        }
+                        add_batch(&f, &pairs, &mut outs);
+                        for (r, &q) in redo.iter().enumerate() {
+                            let (q1, s1) = canon(outs[r]);
+                            res[q] = (q1, s1, (pl[active[q]].h + 1) % R);
+                        }
+                    }
+                    let mut nactive = Vec::with_capacity(active.len());
+                    for (q, &j) in active.iter().enumerate() {
+                        let ln = &mut pl[j];
+                        if kk[q] != usize::MAX {
+                            if ln.walking || starting {
+                                nactive.push(j);
+                            }
+                            continue;
+                        }
+                        let (q1, s1, hh) = res[q];
+                        ln.a = md(s1 as i128 * ((ln.a + arms[hh].1) % n) as i128, n);
+                        ln.p = q1;
+                        ln.len += 1;
+                        let mut end = false;
+                        if is_dp(ln.p) {
+                            f.hash();
+                            db.insert_if_absent(ln.p.unwrap().0, ln.a);
+                            end = true;
+                        } else if ln.p.is_none() || ln.len >= maxwalk {
+                            end = true;
+                        }
+                        if end {
+                            pre_steps += ln.len;
+                            ln.walking = false;
+                            if pre_steps >= pre_budget {
+                                starting = false;
+                            }
+                            if starting {
+                                nactive.push(j);
+                            }
+                        } else {
+                            nactive.push(j);
+                        }
+                    }
+                    active = nactive;
+                }
+            }
+            snap.push(("db".into(), take(&f)));
+            let mut steps_total = 0u64;
+            let mut walks = 0u64;
+            let mut abandoned = 0u64;
+            let inv2 = n.div_ceil(2);
+            let mut next_t = 0usize;
+            let mut tl: Vec<Lane> = Vec::with_capacity(lanes);
+            while tl.len() < lanes && next_t < targets {
+                tl.push(Lane {
+                    t: next_t,
+                    sp: qs[next_t],
+                    sa: 0,
+                    p: None,
+                    a: 0,
+                    b: 0,
+                    len: 0,
+                    walking: false,
+                    h: 0,
+                    pending: Vec::new(),
+                    ptab: Some(Tab::new(true, 64, f.p)),
+                });
+                next_t += 1;
+            }
+            let mut kk: Vec<usize> = Vec::with_capacity(lanes);
+            let mut res: Vec<(Pt, i64, usize)> = Vec::with_capacity(lanes);
+            let mut redo: Vec<usize> = Vec::new();
+            while !tl.is_empty() {
+                pairs.clear();
+                kk.clear();
+                for ln in tl.iter_mut() {
+                    if !ln.walking {
+                        let k1 = rng.gen_range(0..BANK);
+                        kk.push(k1);
+                        pairs.push((ln.sp, bank[k1].0));
+                    } else {
+                        kk.push(usize::MAX);
+                        ln.h = idx(ln.p);
+                        pairs.push((ln.p, arms[ln.h].0));
+                    }
+                }
+                add_batch(&f, &pairs, &mut outs);
+                res.clear();
+                res.resize(tl.len(), (None, 0, 0));
+                redo.clear();
+                for (q, ln) in tl.iter_mut().enumerate() {
+                    if kk[q] != usize::MAX {
+                        ln.sp = outs[q];
+                        ln.sa = (ln.sa + bank[kk[q]].1) % n;
+                        let (pp, s0) = canon(ln.sp);
+                        ln.p = pp;
+                        ln.a = md(s0 as i128 * ln.sa as i128, n);
+                        ln.b = s0;
+                        ln.len = 0;
+                        ln.walking = pp.is_some();
+                        walks += 1;
+                        continue;
+                    }
+                    let (q1, s1) = canon(outs[q]);
+                    if q1.is_some() && idx(q1) == ln.h {
+                        redo.push(q);
+                    } else {
+                        res[q] = (q1, s1, ln.h);
+                    }
+                }
+                if !redo.is_empty() {
+                    pairs.clear();
+                    for &q in &redo {
+                        let ln = &tl[q];
+                        pairs.push((ln.p, arms[(ln.h + 1) % R].0));
+                    }
+                    add_batch(&f, &pairs, &mut outs);
+                    for (r, &q) in redo.iter().enumerate() {
+                        let (q1, s1) = canon(outs[r]);
+                        res[q] = (q1, s1, (tl[q].h + 1) % R);
+                    }
+                }
+                // prefetch the lookup slots of every lane that reached a distinguished point
+                for (q, ln) in tl.iter().enumerate() {
+                    if kk[q] == usize::MAX && is_dp(res[q].0) {
+                        let x = res[q].0.unwrap().0;
+                        db.prefetch(x);
+                        ln.ptab.as_ref().unwrap().prefetch(x);
+                    }
+                }
+                let mut q = 0usize;
+                let mut keep: Vec<bool> = vec![true; tl.len()];
+                let mut refill: Vec<usize> = Vec::new();
+                for ln in tl.iter_mut() {
+                    if kk[q] != usize::MAX {
+                        q += 1;
+                        continue;
+                    }
+                    let (q1, s1, hh) = res[q];
+                    ln.a = md(s1 as i128 * ((ln.a + arms[hh].1) % n) as i128, n);
+                    ln.b *= s1;
+                    ln.p = q1;
+                    ln.len += 1;
+                    let mut solved: Option<u64> = None;
+                    let mut end = false;
+                    if is_dp(ln.p) {
+                        let x = ln.p.unwrap().0;
+                        f.hash();
+                        if let Some(a2) = db.get(x) {
+                            solved = Some(md(ln.b as i128 * (a2 as i128 - ln.a as i128), n));
+                        } else {
+                            f.hash();
+                            let pt = ln.ptab.as_mut().unwrap();
+                            if let Some((a2, b2)) = pt.get(x) {
+                                if b2 != ln.b {
+                                    let num = md(a2 as i128 - ln.a as i128, n);
+                                    let qv = md(
+                                        ln.b as i128
+                                            * ((num as u128 * inv2 as u128) % n as u128) as i128,
+                                        n,
+                                    );
+                                    f.cm.set(f.cm.get() + 1);
+                                    solved = Some(qv);
+                                }
+                            } else {
+                                f.hash();
+                                pt.insert_if_absent(x, (ln.a, ln.b));
+                                ln.pending.push((x, (ln.a, ln.b)));
+                            }
+                        }
+                        end = true;
+                    } else if ln.p.is_none() || ln.len >= maxwalk {
+                        end = true;
+                    }
+                    if end {
+                        steps_total += ln.len;
+                        if ln.len >= maxwalk {
+                            abandoned += 1;
+                        }
+                        ln.walking = false;
+                    }
+                    if let Some(v) = solved {
+                        found[ln.t] = v;
+                        for &(x, (a, b)) in &ln.pending {
+                            f.hash();
+                            db.insert_if_absent(x, md(a as i128 + b as i128 * v as i128, n));
+                        }
+                        refill.push(q);
+                    }
+                    q += 1;
+                }
+                for q in refill {
+                    if next_t < targets {
+                        let ln = &mut tl[q];
+                        ln.t = next_t;
+                        ln.sp = qs[next_t];
+                        ln.sa = 0;
+                        ln.walking = false;
+                        ln.pending.clear();
+                        ln.ptab = Some(Tab::new(true, 64, f.p));
+                        next_t += 1;
+                    } else {
+                        keep[q] = false;
+                    }
+                }
+                let mut it = keep.iter();
+                tl.retain(|_| *it.next().unwrap());
+                if steps_total > 4_000_000_000 {
+                    panic!("budget");
+                }
+            }
+            snap.push(("targets".into(), take(&f)));
+            Out {
+                ok: 0,
+                extra: format!(
+                    "\"db\":{},\"d\":{},\"pre_steps\":{},\"target_steps\":{},\"walks\":{},\"abandoned\":{},\"lanes\":{}",
+                    db.len(),
+                    d,
+                    pre_steps,
+                    steps_total,
+                    walks,
+                    abandoned,
+                    lanes
                 ),
             }
         }

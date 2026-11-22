@@ -1,0 +1,95 @@
+{
+  "cgroup_before": {
+    "cpu.max": null,
+    "cpu.pressure": null,
+    "cpu.stat": null,
+    "memory.current": null,
+    "memory.events": null,
+    "memory.max": null,
+    "memory.peak": null,
+    "memory.pressure": null
+  },
+  "cgroup_path": "/sys/fs/cgroup",
+  "cpu_model": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+  "cpu_telemetry_before": {
+    "cpu_jiffies": [
+      1388012,
+      0,
+      27156,
+      444918,
+      14589,
+      0,
+      1194,
+      14347,
+      0,
+      0
+    ],
+    "cpu_pressure": "some avg10=0.14 avg60=0.03 avg300=0.08 total=73278356\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+    "frequency_khz_by_visible_cpu": {
+      "0": null,
+      "1": null,
+      "2": null,
+      "3": null
+    },
+    "interrupts_total": 6801367,
+    "recorded_utc": "2026-10-24T06:54:08.712924+00:00",
+    "steal_jiffies": 14347
+  },
+  "disk_free_bytes": 4864114688,
+  "git_sha": null,
+  "image_version": null,
+  "instance_id": "gh-local-0-local",
+  "mem_total_kib": 16477348,
+  "platform": "Linux-6.18.44-fc-v153-x86_64-with-glibc2.39",
+  "provider": "github_actions",
+  "python": "3.13.17 (main, Oct 22 2026, 14:06:04) [GCC 13.3.0]",
+  "recorded_utc": "2026-10-24T06:54:08.697512+00:00",
+  "run_url": "https://github.com/aburan28/crypto/actions/runs/local",
+  "runner_arch": null,
+  "runner_name": null,
+  "runner_os": null,
+  "schema": "n83.mitm3-panel-host/v1",
+  "topology": {
+    "cgroup_effective_cpus": null,
+    "lscpu_exit_status": 0,
+    "lscpu_json": "{\n   \"lscpu\": [\n      {\n         \"field\": \"Architecture:\",\n         \"data\": \"x86_64\"\n      },{\n         \"field\": \"CPU op-mode(s):\",\n         \"data\": \"32-bit, 64-bit\"\n      },{\n         \"field\": \"Address sizes:\",\n         \"data\": \"46 bits physical, 48 bits virtual\"\n      },{\n         \"field\": \"Byte Order:\",\n         \"data\": \"Little Endian\"\n      },{\n         \"field\": \"CPU(s):\",\n         \"data\": \"4\"\n      },{\n         \"field\": \"On-line CPU(s) list:\",\n         \"data\": \"0-3\"\n      },{\n         \"field\": \"Vendor ID:\",\n         \"data\": \"GenuineIntel\"\n      },{\n         \"field\": \"Model name:\",\n         \"data\": \"Intel(R) Xeon(R) Processor @ 2.80GHz\"\n      },{\n         \"field\": \"CPU family:\",\n         \"data\": \"6\"\n      },{\n         \"field\": \"Model:\",\n         \"data\": \"85\"\n      },{\n         \"field\": \"Thread(s) per core:\",\n         \"data\": \"1\"\n      },{\n         \"field\": \"Core(s) per socket:\",\n         \"data\": \"4\"\n      },{\n         \"field\": \"Socket(s):\",\n         \"data\": \"1\"\n      },{\n         \"field\": \"Stepping:\",\n         \"data\": \"7\"\n      },{\n         \"field\": \"BogoMIPS:\",\n         \"data\": \"5600.14\"\n      },{\n         \"field\": \"Flags:\",\n         \"data\": \"fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch cpuid_fault ssbd ibrs ibpb stibp ibrs_enhanced fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves arat umip avx512_vnni md_clear arch_capabilities\"\n      },{\n         \"field\": \"Hypervisor vendor:\",\n         \"data\": \"KVM\"\n      },{\n         \"field\": \"Virtualization type:\",\n         \"data\": \"full\"\n      },{\n         \"field\": \"L1d cache:\",\n         \"data\": \"128 KiB (4 instances)\"\n      },{\n         \"field\": \"L1i cache:\",\n         \"data\": \"128 KiB (4 instances)\"\n      },{\n         \"field\": \"L2 cache:\",\n         \"data\": \"4 MiB (4 instances)\"\n      },{\n         \"field\": \"L3 cache:\",\n         \"data\": \"33 MiB (1 instance)\"\n      },{\n         \"field\": \"NUMA node(s):\",\n         \"data\": \"1\"\n      },{\n         \"field\": \"NUMA node0 CPU(s):\",\n         \"data\": \"0-3\"\n      },{\n         \"field\": \"Vulnerability Gather data sampling:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Ghostwrite:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Indirect target selection:\",\n         \"data\": \"Mitigation; Aligned branch/return thunks\"\n      },{\n         \"field\": \"Vulnerability Itlb multihit:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability L1tf:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Mds:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Meltdown:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Mmio stale data:\",\n         \"data\": \"Vulnerable: Clear CPU buffers attempted, no microcode; SMT Host state unknown\"\n      },{\n         \"field\": \"Vulnerability Old microcode:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Reg file data sampling:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Retbleed:\",\n         \"data\": \"Mitigation; Enhanced IBRS\"\n      },{\n         \"field\": \"Vulnerability Spec rstack overflow:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Spec store bypass:\",\n         \"data\": \"Mitigation; Speculative Store Bypass disabled via prctl\"\n      },{\n         \"field\": \"Vulnerability Spectre v1:\",\n         \"data\": \"Mitigation; usercopy/swapgs barriers and __user pointer sanitization\"\n      },{\n         \"field\": \"Vulnerability Spectre v2:\",\n         \"data\": \"Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI Vulnerable\"\n      },{\n         \"field\": \"Vulnerability Srbds:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Tsa:\",\n         \"data\": \"Not affected\"\n      },{\n         \"field\": \"Vulnerability Tsx async abort:\",\n         \"data\": \"Vulnerable: Clear CPU buffers attempted, no microcode; SMT Host state unknown\"\n      },{\n         \"field\": \"Vulnerability Vmscape:\",\n         \"data\": \"Not affected\"\n      }\n   ]\n}\n",
+    "online_cpus": "0-3",
+    "online_numa_nodes": "0",
+    "visible_cpu_topology": {
+      "0": {
+        "core_id": "0",
+        "physical_package_id": "0",
+        "thread_siblings_list": "0"
+      },
+      "1": {
+        "core_id": "1",
+        "physical_package_id": "0",
+        "thread_siblings_list": "1"
+      },
+      "2": {
+        "core_id": "2",
+        "physical_package_id": "0",
+        "thread_siblings_list": "2"
+      },
+      "3": {
+        "core_id": "3",
+        "physical_package_id": "0",
+        "thread_siblings_list": "3"
+      }
+    }
+  },
+  "uname": {
+    "machine": "x86_64",
+    "node": "vm",
+    "processor": "x86_64",
+    "release": "6.18.44-fc-v153",
+    "system": "Linux",
+    "version": "#1 SMP PREEMPT_DYNAMIC @0"
+  },
+  "visible_affinity": [
+    0,
+    1,
+    2,
+    3
+  ]
+}

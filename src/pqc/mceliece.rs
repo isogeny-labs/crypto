@@ -633,7 +633,7 @@ pub struct McElieceePublicKey {
 /// All four secret components — `s_inv`, `support`, `g_poly`, `perm` —
 /// are zeroized on drop.  Knowing any of them defeats the cryptosystem,
 /// so they are all treated as secret material.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct McEliecePrivateKey {
     /// k×k inverse of the scrambler S.
     pub s_inv: BinMat,
@@ -647,22 +647,21 @@ pub struct McEliecePrivateKey {
     pub gf: GfTables,
 }
 
+impl std::fmt::Debug for McEliecePrivateKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("McEliecePrivateKey")
+            .field("secret", &"[REDACTED]")
+            .finish_non_exhaustive()
+    }
+}
+
 impl Drop for McEliecePrivateKey {
     fn drop(&mut self) {
-        for row in self.s_inv.iter_mut() {
-            for b in row.iter_mut() {
-                *b = 0;
-            }
-        }
-        for s in self.support.iter_mut() {
-            *s = 0;
-        }
-        for c in self.g_poly.iter_mut() {
-            *c = 0;
-        }
-        for p in self.perm.iter_mut() {
-            *p = 0;
-        }
+        use zeroize::Zeroize;
+        self.s_inv.zeroize();
+        self.support.zeroize();
+        self.g_poly.zeroize();
+        self.perm.zeroize();
     }
 }
 

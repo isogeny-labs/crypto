@@ -1,0 +1,42 @@
+   Compiling autocfg v1.5.1
+   Compiling proc-macro2 v1.0.107
+   Compiling libc v0.2.191
+   Compiling unicode-ident v1.0.27
+   Compiling zerocopy v0.8.63
+   Compiling quote v1.0.47
+   Compiling num-traits v0.2.19
+    Checking cfg-if v1.0.5
+   Compiling serde_core v1.0.229
+   Compiling syn v3.0.10
+    Checking num-integer v0.1.47
+   Compiling serde v1.0.229
+    Checking num-bigint v0.4.8
+    Checking getrandom v0.2.17
+    Checking rand_core v0.6.4
+    Checking chained-jacobian-transfer v0.1.0 (/workspace/crypto/research/chained_jacobian_transfers_20261110/native)
+    Checking isogeny_algos v0.1.0 (/workspace/crypto/isogeny_algos)
+   Compiling serde_derive v1.0.229
+    Checking chained-transfer-reference v0.1.0 (/workspace/scratch/ct28-t1-prototype)
+    Checking ppv-lite86 v0.2.21
+    Checking rand_chacha v0.3.1
+    Checking rand v0.8.8
+    Checking chained-seven-reference v0.1.0 (/workspace/scratch/ct28-t1-prototype/independent-walk)
+error: file is loaded as a module multiple times: `src/ct28_pullback_points.rs`
+  --> src/ct29_source_control.rs:5:1
+   |
+ 5 | / #[path = "ct28_pullback_points.rs"]
+ 6 | | mod existing_points;
+   | |____________________^ first loaded here
+   |
+  ::: src/ct28_pullback.rs:12:1
+   |
+12 | / #[path = "ct28_pullback_points.rs"]
+13 | | mod existing_points;
+   | |____________________^ loaded again here
+   |
+   = help: replace all but one `mod` item with `use` items
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#duplicate_mod
+   = note: `-D clippy::duplicate-mod` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::duplicate_mod)]`
+
+error: could not compile `chained-transfer-reference` (bin "chained-transfer-reference" test) due to 1 previous error

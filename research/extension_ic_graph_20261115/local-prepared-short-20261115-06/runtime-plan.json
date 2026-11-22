@@ -1,0 +1,42 @@
+{
+  "schema": "gaudry.cubic.local-run/v1",
+  "backend": "local_user_authorized",
+  "source_revision": "5f575deda8d874cb9336db8ebba963bb578ec8cc",
+  "binary_sha256": "9bea4598522d8d7a68039a3873736b1af8912c22b6bef20f8ea2f4e25f30ce0b",
+  "primes": [
+    127,
+    523,
+    1039
+  ],
+  "seeds": [
+    41,
+    43,
+    47
+  ],
+  "oracles": [
+    "SymmetricPairOnly",
+    "PreparedSymmetricPairOnly"
+  ],
+  "oracle_cli": "symmetric-pair,prepared-pair",
+  "rounds": 5,
+  "warmup_rounds": 1,
+  "max_residuals": 2000000,
+  "timeout_seconds": 900,
+  "memory_gib": 8,
+  "automatic_retries": 0,
+  "aa_tolerance": 1.10,
+  "bootstrap_draws": 10000,
+  "bootstrap_seed": 20261115,
+  "parity_min_subgroup_order": 1073741824,
+  "reference_scope": "existing_cubic_radding_reference_not_fastest_external",
+  "purpose": "prepared_oracle_and_epoch_mechanism_holdouts",
+  "sampler": "r-adding",
+  "component_hashes": "validation/prepared-epoch-source.sha256",
+  "paired_oracles": [
+    [
+      "SymmetricPairOnly",
+      "PreparedSymmetricPairOnly"
+    ]
+  ],
+  "pinned_cpu": "0"
+}

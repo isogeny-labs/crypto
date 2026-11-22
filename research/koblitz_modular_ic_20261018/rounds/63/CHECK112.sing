@@ -1,0 +1,46 @@
+LIB "linalg.lib";
+proc require63(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../52/source-data/marked23-field51.sing"));
+string baseEquation63=string(f23);string bString63=string(b23);string cString63=string(c23);string rString63=string(r23);string sString63=string(s23);string deltaString63=string(discriminant23);
+execute(read("../../../51/runs/base23-struct51-03/marked23-triangular51.sing"));
+execute("poly boundBase63="+baseEquation63+";poly actualB63="+bString63+";poly actualC63="+cString63+";poly actualR63="+rString63+";poly actualS63="+sString63+";poly actualDelta63="+deltaString63+";");
+intvec baseLeading63=leadexp(f51);intvec lambdaLeading63=leadexp(G51);
+require63(boundBase63==f51,"GEN112_ACTUAL_BASE_SOURCE_BINDING");
+require63(subst(f51,n,0)==f51 && subst(f51,l,0)==f51 && baseLeading63[3]==7 && leadcoef(f51)==1,"GEN112_MONIC_DEGREE7_BASE");
+require63(subst(G51,n,0)==G51 && lambdaLeading63[2]==16 && lambdaLeading63[3]==0 && leadcoef(G51)==1,"GEN112_MONIC_DEGREE16_LAMBDA");
+require63(diff(N51,n)==1 && N51==n+subst(N51,n,0),"GEN112_ACTUAL_MONIC_LINEAR_NU");
+ideal sourceIdeal63=f51,G51,N51;ideal GB63=std(sourceIdeal63);
+require63(dim(GB63)==0 && vdim(GB63)==112,"GEN112_COMPLETE_SOURCE_DIMENSION");
+ideal basis63;int i63;int j63;int pos63;
+for(j63=0;j63<7;j63++){for(i63=0;i63<16;i63++){pos63=1+i63+16*j63;basis63[pos63]=l^i63*y^j63;require63(reduce(basis63[pos63],GB63)==basis63[pos63],"GEN112_ALL112_STANDARD_MONOMIALS");}}
+
+execute(read("../generator112-01/generator112-base63.sing"));
+require63(size(cachedSource63)==size(sourceIdeal63),"CHECK112_BASE_CACHE_SOURCE_COUNT");
+for(i63=1;i63<=size(sourceIdeal63);i63++){require63(cachedSource63[i63]==sourceIdeal63[i63],"CHECK112_BASE_CACHE_SOURCE_BINDING");}
+execute(read("../generator112-01/generator112-lambda63.sing"));
+require63(size(cachedSource63)==size(sourceIdeal63),"CHECK112_LAMBDA_CACHE_SOURCE_COUNT");
+for(i63=1;i63<=size(sourceIdeal63);i63++){require63(cachedSource63[i63]==sourceIdeal63[i63],"CHECK112_LAMBDA_CACHE_SOURCE_BINDING");}
+proc checkBundle63(list B,poly P,poly t){
+ require63(size(B)==8,"CHECK112_COMPLETE_GENERATOR_BUNDLE");
+ require63(reduce(B[1]^2+x*B[2]^2+t*B[3]^2+x*t*B[4]^2+P,GB63)==0,"CHECK112_SOURCE_GROUPING");
+ require63(B[5]!=0 && reduce(B[5]+diff(P,t),GB63)==0 && reduce(B[5]+B[3]^2+x*B[4]^2,GB63)==0,"CHECK112_ACTUAL_DERIVATIVE");
+ require63(reduce(B[5]*B[6],GB63)==1,"CHECK112_ACTUAL_DERIVATIVE_INVERSE");
+ require63(reduce(B[7]+(B[1]*B[3]+x*B[2]*B[4])*B[6],GB63)==0 && reduce(B[8]+(B[1]*B[4]+B[2]*B[3])*B[6],GB63)==0,"CHECK112_FORMULA_COMPONENT_BINDINGS");
+ require63(reduce(B[7]^2+x*B[8]^2+t,GB63)==0,"CHECK112_GENERATOR_WHOLE_SOURCE_IDENTITY");
+ require63(reduce(B[5]*(B[6]+1),GB63)!=1,"CHECK112_CHANGED_INVERSE_REJECTED");return(1);
+}
+checkBundle63(baseGenerator63,f51,y);checkBundle63(lambdaGenerator63,G51,l);
+execute(read("../generator112-01/generator112-functions63.sing"));
+require63(size(inputs63)==124 && size(evenParts63)==124 && size(oddParts63)==124,"CHECK112_ALL124_RETAINED_SLOTS");
+list expected63;for(i63=1;i63<=112;i63++){expected63[i63]=basis63[i63];}
+expected63[113]=poly(1);expected63[114]=poly(x);expected63[115]=poly(x^2);
+list named63=actualB63,actualC63,actualR63,actualS63,actualDelta63,n,poly(diff(f51,y)),poly(diff(G51,l)),C51;
+for(i63=1;i63<=9;i63++){expected63[115+i63]=named63[i63];}
+for(i63=1;i63<=124;i63++){
+ require63(reduce(inputs63[i63]+expected63[i63],GB63)==0,"CHECK112_EVERY_ACTUAL_SOURCE_INPUT");
+ require63(reduce(evenParts63[i63]^2+x*oddParts63[i63]^2+expected63[i63],GB63)==0,"CHECK112_EVERY_WHOLE_SOURCE_IDENTITY");
+}
+require63(evenParts63[113]==1 && oddParts63[113]==0 && evenParts63[114]==0 && oddParts63[114]==1 && evenParts63[115]==x && oddParts63[115]==0,"CHECK112_ALL_THREE_EXACT_CONTROLS");
+require63(reduce((evenParts63[114]+1)^2+x*oddParts63[114]^2+expected63[114],GB63)!=0,"CHECK112_CHANGED_ROOT_REJECTED");
+print("CHECK112_RESULT source_degree=112 standard_monomials=112 input_bindings=124 whole_source_identities=124 generator_bundles=2 derivative_inverses=2 changed_inverses_rejected=2 changed_root_rejected=1");
+print("CHECK112_ALL_CHECKS_PASS");quit;

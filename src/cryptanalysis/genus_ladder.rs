@@ -51,9 +51,13 @@ use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
 use super::chained_transfer::ic_control::{
-    addm, build_rows, mulmod, peel, split_order, subm, wiedemann, Dsu, Nat, Rel, REL_FB,
+    addm, build_rows, combine, mulmod, pa, peel, pm, ppow, ps, split_order, subm, wiedemann,
+    wiedemann_coord, CubicOracle, Dsu, Nat, Rel, Row, REL_FB,
 };
-use super::ic_boundary::{rho_reference_walk, CountedGroup, GroupOps, RhoWalk};
+use super::ic_boundary::{
+    invmod, pivot_inversion_steps, rho_walk_with_policy, CountedGroup, GroupOps, NegationClasses,
+    PointClasses, RhoWalk, WalkPolicy,
+};
 use super::residual_walk::{is_prime_u64, mix64};
 
 /// Largest genus the fixed arrays hold.
@@ -648,21 +652,36 @@ impl JCurve {
         }
         let nu = (2..p).find(|&a| !sq[a as usize]).expect("a non-residue");
         let f = &self.f;
+        assert!(p < (1 << 31), "count_points(2) wants p < 2^31");
+        // Horner over F_p[√ν] with one Barrett reduction per coordinate and
+        // step (the reference is `count_points2_reference` in the tests).
+        let m = u64::MAX / p;
+        let red = |x: u64| -> u64 {
+            let q = ((u128::from(x) * u128::from(m)) >> 64) as u64;
+            let r = x - q * p;
+            if r >= p {
+                r - p
+            } else {
+                r
+            }
+        };
+        let nub: Vec<u64> = (0..=(p - 1) / 2).map(|b| nu * b % p).collect();
         let mut n = 1u64;
         for a in 0..p {
             for b in 0..=(p - 1) / 2 {
                 let (mut ra, mut rb) = (0u64, 0u64);
+                let nb_ = nub[b as usize];
                 for i in (0..f.n).rev() {
-                    let na = (ra * a + nu * (rb * b % p)) % p;
-                    let nb = (ra * b + rb * a) % p;
-                    ra = (na + f.c[i]) % p;
+                    let na = red(ra * a + rb * nb_ + f.c[i]);
+                    let nb = red(ra * b + rb * a);
+                    ra = na;
                     rb = nb;
                 }
                 let w = if b == 0 { 1 } else { 2 };
                 if ra == 0 && rb == 0 {
                     n += w;
                 } else {
-                    let norm = (ra * ra % p + p - nu * (rb * rb % p) % p) % p;
+                    let norm = red(ra * ra + p * p - nu * red(rb * rb));
                     if sq[norm as usize] {
                         n += 2 * w;
                     }
@@ -672,18 +691,20 @@ impl JCurve {
         n
     }
 
-    /// `#J(F_p)`: the first `min(g − 1, 2)` coefficients of `L(T)` from
-    /// `N_1` (and `N_2` for `g ≥ 3`), then baby-step giant-step over the
-    /// window the Weil bounds leave for the remaining ones; every candidate
-    /// is checked on 32 random divisors and exactly one must survive.
+    /// `#J(F_p)` by the enumeration route: [`OrderMethod::Enumerate`].
     pub fn jacobian_order(&self, seed: u64) -> Result<u64, String> {
+        self.jacobian_order_with(OrderMethod::Enumerate, seed)
+    }
+
+    /// `#J(F_p)`: the first `known` coefficients of `L(T)` from point counts
+    /// (`known = min(g − 1, 2)` for `Enumerate` and `Bsgs2`, `min(g − 1, 1)`
+    /// for `Bsgs1`), then baby-step giant-step over the window the Weil
+    /// bounds leave for the remaining ones; every candidate is checked on 32
+    /// random divisors and exactly one must survive.
+    pub fn jacobian_order_with(&self, method: OrderMethod, seed: u64) -> Result<u64, String> {
         let g = self.genus as usize;
         let p = i128::from(self.k.p);
-        let known = match g {
-            1 => 0,
-            2 => 1,
-            _ => 2,
-        };
+        let known = known_coefficients(g, method);
         let s: Vec<i128> = (1..=known as u32)
             .map(|k| self.count_points(k) as i128 - p.pow(k) - 1)
             .collect();
@@ -704,17 +725,7 @@ impl JCurve {
             }
         };
         let base: i128 = (0..=known).map(|i| c[i] * coef(i)).sum();
-        let mut bound = 1i128;
-        for i in known + 1..=g {
-            let binom = (0..i as i128).fold(1i128, |acc, j| acc * (2 * g as i128 - j) / (j + 1));
-            let w = (binom as f64 * (p as f64).powf(i as f64 / 2.0)).ceil() as i128 + 1;
-            bound += w * coef(i);
-        }
-        let sp = (p as f64).sqrt();
-        let lo = ((sp - 1.0).powi(2 * g as i32) * (1.0 - 1e-9))
-            .floor()
-            .max(1.0) as i128;
-        let hi = ((sp + 1.0).powi(2 * g as i32) * (1.0 + 1e-9)).ceil() as i128;
+        let (bound, lo, hi) = weil_window(self.k.p, g, known);
         let from = (base - bound).max(lo).max(1);
         let to = (base + bound).min(hi);
         if to < from {
@@ -722,7 +733,7 @@ impl JCurve {
         }
         let width = (to - from) as u64;
         let m = (((width + 1) as f64).sqrt().ceil() as u64).max(1);
-        if m > (1 << 26) {
+        if m > MAX_BSGS_TABLE {
             return Err(format!(
                 "order window too wide for baby-step giant-step (m = {m})"
             ));
@@ -789,6 +800,86 @@ impl JCurve {
     }
 }
 
+/// How `#J(F_p)` is obtained: which point counts are enumerated before the
+/// baby-step giant-step over the window the Weil bounds leave.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum OrderMethod {
+    /// `N_1`, and `N_2` for `g ≥ 3` (O(p²) enumeration over `F_{p²}`).
+    Enumerate,
+    /// `N_1` only; the window covers every remaining coefficient.
+    Bsgs1,
+    /// `N_1` and `N_2` (the `Enumerate` window; the same counts).
+    Bsgs2,
+}
+
+impl OrderMethod {
+    pub fn parse(s: &str) -> Result<Self, String> {
+        match s {
+            "enumerate" => Ok(Self::Enumerate),
+            "bsgs1" => Ok(Self::Bsgs1),
+            "bsgs2" => Ok(Self::Bsgs2),
+            _ => Err(format!(
+                "--order-method wants enumerate, bsgs1 or bsgs2, not {s}"
+            )),
+        }
+    }
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Enumerate => "enumerate",
+            Self::Bsgs1 => "bsgs1",
+            Self::Bsgs2 => "bsgs2",
+        }
+    }
+}
+
+/// The most baby steps held in the table (`2^26` entries).
+pub const MAX_BSGS_TABLE: u64 = 1 << 26;
+
+fn known_coefficients(g: usize, method: OrderMethod) -> usize {
+    let enumerated = match g {
+        1 => 0,
+        2 => 1,
+        _ => 2,
+    };
+    match method {
+        OrderMethod::Enumerate | OrderMethod::Bsgs2 => enumerated,
+        OrderMethod::Bsgs1 => enumerated.min(1),
+    }
+}
+
+/// `(bound, lo, hi)`: the half-width the Weil bounds leave for `#J` once the
+/// first `known` coefficients are fixed, and the absolute range of `#J`.
+fn weil_window(p: u64, g: usize, known: usize) -> (i128, i128, i128) {
+    let p = i128::from(p);
+    let coef = |i: usize| -> i128 {
+        if i < g {
+            1 + p.pow((g - i) as u32)
+        } else {
+            1
+        }
+    };
+    let mut bound = 1i128;
+    for i in known + 1..=g {
+        let binom = (0..i as i128).fold(1i128, |acc, j| acc * (2 * g as i128 - j) / (j + 1));
+        let w = (binom as f64 * (p as f64).powf(i as f64 / 2.0)).ceil() as i128 + 1;
+        bound += w * coef(i);
+    }
+    let sp = (p as f64).sqrt();
+    let lo = ((sp - 1.0).powi(2 * g as i32) * (1.0 - 1e-9))
+        .floor()
+        .max(1.0) as i128;
+    let hi = ((sp + 1.0).powi(2 * g as i32) * (1.0 + 1e-9)).ceil() as i128;
+    (bound, lo, hi)
+}
+
+/// The baby-step table size `m` of the widest window (centre ignored, Weil
+/// range not binding) for `(p, g, method)`: the memory bound of the route.
+pub fn bsgs_table_size(p: u64, g: usize, method: OrderMethod) -> u64 {
+    let (bound, lo, hi) = weil_window(p, g, known_coefficients(g, method));
+    let width = (2 * bound).min(hi - lo) as f64;
+    (width + 1.0).sqrt().ceil() as u64
+}
+
 impl CountedGroup for JCurve {
     type Elt = JDiv;
     fn identity(&self) -> JDiv {
@@ -834,6 +925,82 @@ pub struct Instance {
     pub target: JDiv,
 }
 
+/// Rabin's irreducibility test for a monic `f` over `F_p` (coefficients lowest
+/// degree first, `f.len() - 1 = n ≥ 1`): `f` is irreducible iff
+/// `x^(p^n) ≡ x (mod f)` and `gcd(x^(p^(n/q)) − x, f) = 1` for every prime `q | n`.
+///
+/// Used to skip seeds in a prime-order search: for `y² = f(x)` with `deg f`
+/// odd, `#J(F_p)[2] = 2^(m−1)` where `m` is the number of irreducible factors
+/// of `f` over `F_p`, so a reducible `f` gives an even `#J` and cannot pass
+/// `--max-h 1`.  Not counted (search bookkeeping, not part of any measured arm).
+pub fn f_irreducible(p: u64, f: &[u64]) -> bool {
+    let n = f.len() - 1;
+    if n <= 1 {
+        return n == 1;
+    }
+    let mut nat = Nat::default();
+    let mulmod = |a: &[u64], b: &[u64], nat: &mut Nat| -> Vec<u64> {
+        let mut c = vec![0u64; a.len() + b.len()];
+        for (i, &x) in a.iter().enumerate() {
+            if x == 0 {
+                continue;
+            }
+            for (j, &y) in b.iter().enumerate() {
+                c[i + j] = (c[i + j] + x * y % p) % p;
+            }
+        }
+        vrem(p, &c, f, nat)
+    };
+    let powp = |a: &[u64], nat: &mut Nat| -> Vec<u64> {
+        // a^p mod f by square-and-multiply
+        let mut res = vec![1u64];
+        let mut base = a.to_vec();
+        let mut e = p;
+        while e > 0 {
+            if e & 1 == 1 {
+                res = mulmod(&res, &base, nat);
+            }
+            base = mulmod(&base, &base, nat);
+            e >>= 1;
+        }
+        res
+    };
+    let x = vec![0u64, 1];
+    let minus_x = |a: &[u64]| -> Vec<u64> {
+        let mut d = a.to_vec();
+        if d.len() < 2 {
+            d.resize(2, 0);
+        }
+        d[1] = (d[1] + p - 1) % p;
+        vtrim(&mut d);
+        d
+    };
+    let primes: Vec<usize> = (2..=n)
+        .filter(|&q| n.is_multiple_of(q) && (2..q).all(|d| !q.is_multiple_of(d)))
+        .collect();
+    // frob[k] = x^(p^k) mod f, k = 0..=n
+    let mut frob = vec![x.clone()];
+    for k in 1..=n {
+        let next = powp(&frob[k - 1], &mut nat);
+        frob.push(next);
+    }
+    let fx = minus_x(&frob[n]);
+    if !fx.is_empty() {
+        return false;
+    }
+    for q in primes {
+        let d = minus_x(&frob[n / q]);
+        if d.is_empty() {
+            return false;
+        }
+        let g = vgcd_monic(p, f, &d, &mut nat);
+        if g.len() > 1 {
+            return false;
+        }
+    }
+    true
+}
+
 /// A random monic `f` of degree `2g + 1` from `(curve_seed, p, g)`.
 pub fn random_f(p: u64, genus: u32, curve_seed: u64) -> Vec<u64> {
     let mut st = curve_seed.wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ p ^ (u64::from(genus) << 48);
@@ -854,8 +1021,27 @@ pub fn make_instance(
     target_seed: u64,
     max_h: u64,
 ) -> Result<Instance, String> {
+    make_instance_with(
+        p,
+        genus,
+        curve_seed,
+        target_seed,
+        max_h,
+        OrderMethod::Enumerate,
+    )
+}
+
+/// [`make_instance`] with the group order found by `method`.
+pub fn make_instance_with(
+    p: u64,
+    genus: u32,
+    curve_seed: u64,
+    target_seed: u64,
+    max_h: u64,
+    method: OrderMethod,
+) -> Result<Instance, String> {
     let curve = JCurve::new(p, genus, &random_f(p, genus, curve_seed))?;
-    let order = curve.jacobian_order(curve_seed)?;
+    let order = curve.jacobian_order_with(method, curve_seed)?;
     let (h, r) = split_order(order, max_h).ok_or_else(|| format!("#J = {order} is not h*r"))?;
     instance_from(curve, order, h, r, target_seed)
 }
@@ -1197,6 +1383,9 @@ pub struct IcParams {
     pub prefilter: bool,
     /// Check every accepted relation by group arithmetic (tests only).
     pub verify_relations: bool,
+    /// Structured Gaussian elimination between the peel and Wiedemann
+    /// ([`SgeParams`]); `None` is the frozen instrument, count for count.
+    pub sge: Option<SgeParams>,
 }
 
 /// Double-large-prime base size `ceil(c · p^{1 − 1/g})` (Gaudry, Thomé,
@@ -1227,6 +1416,10 @@ pub struct IcResult {
     pub la_graph: Nat,
     pub la_peel: Nat,
     pub la_wied: Nat,
+    /// The merge stage ([`SgeParams`]); zero without it.  Included in `la`.
+    pub la_sge: Nat,
+    /// What the merge did to the core of the last attempt (zero without it).
+    pub sge: SgeStats,
     pub fb_cols: usize,
     pub trials: u64,
     /// Trials of full degree that reached the smoothness decision.
@@ -1241,6 +1434,10 @@ pub struct IcResult {
     pub core_rows: usize,
     pub core_cols: usize,
     pub attempts: u32,
+    /// [`IcExt::coord_square`] solves that returned nothing and fell back.
+    pub la_fallbacks: u32,
+    /// Candidates the Ferrari test left undecided (baseline test run).
+    pub ferrari_undecided: u64,
     pub wall_ns: u64,
 }
 
@@ -1261,9 +1458,134 @@ pub fn restart_sqrt(r: u64) -> u64 {
     (((r as f64).sqrt() / 2.0) as u64).clamp(16, RESTART)
 }
 
+/// Ferrari splitting test for a monic quartic `u = x⁴ + c₃x³ + c₂x² + c₁x + c₀`
+/// whose discriminant is already known to be a non-zero square (the parity
+/// prefilter passed).  For such a squarefree quartic Frobenius is the
+/// identity, a (2,2) or a (3,1) permutation of the roots.
+///
+/// * The resolvent cubic `R(z) = z³ − c₂z² + (c₁c₃ − 4c₀)z − (c₁² + c₀c₃² − 4c₀c₂)`
+///   has the roots `x₁x₂ + x₃x₄`, `x₁x₃ + x₂x₄`, `x₁x₄ + x₂x₃`; (3,1) permutes
+///   them cyclically, the identity and (2,2) fix them.  `disc R = disc u`, so
+///   the Cardano–Lucas cubic test decides (3,1) (not split) without any
+///   polynomial exponentiation.
+/// * Otherwise one root `θ` of `R` gives `b₁, b₂` (roots of `z² − θz + c₀`) and
+///   `a₁ = (c₁ − c₃b₁)/(b₂ − b₁)`, `a₂ = c₃ − a₁` with
+///   `u = (x² + a₁x + b₁)(x² + a₂x + b₂)` when the pairing is rational.  For
+///   the identity every `θ` gives a square `θ² − 4c₀`; for (2,2) a non-square
+///   proves "not split", and a square leaves the two quadratic discriminants
+///   to decide.
+///
+/// Returns `Some(None)` (not split), `Some(Some(roots))` (split, the four
+/// roots) or `None` (undecided: the caller runs the baseline test).  Every
+/// native operation is counted in `n`.
+pub(crate) fn ferrari_split(
+    co: &CubicOracle,
+    p: u64,
+    u: &[u64],
+    n: &mut Nat,
+) -> Option<Option<Vec<u64>>> {
+    if u.len() != 5 || u[4] != 1 {
+        return None;
+    }
+    let (c0, c1, c2, c3) = (u[0], u[1], u[2], u[3]);
+    let four_c0 = pm(p, 4, c0, n);
+    let r2 = ps(p, 0, c2, n);
+    let r1 = ps(p, pm(p, c1, c3, n), four_c0, n);
+    let t = pa(
+        p,
+        pm(p, c1, c1, n),
+        ps(p, pm(p, c0, pm(p, c3, c3, n), n), pm(p, four_c0, c2, n), n),
+        n,
+    );
+    let r0 = ps(p, 0, t, n);
+    let res: Vec<u64> = vec![r0, r1, r2, 1];
+    let (splits, info) = co.split_cubic(&res, n)?;
+    if !splits {
+        return Some(None); // (3,1)
+    }
+    let roots = match info {
+        Some((tt, pp)) => co.cubic_roots(&res, tt, pp, n),
+        None => None,
+    }
+    .or_else(|| co.split_cubic_roots_det(&res, n))?;
+    let theta = roots[0];
+    let d = ps(p, pm(p, theta, theta, n), four_c0, n);
+    if d == 0 {
+        return None;
+    }
+    if ppow(p, d, (p - 1) / 2, n) != 1 {
+        return Some(None); // (2,2): this pairing is not rational
+    }
+    let s = co.sqrt(d, n);
+    let inv2 = p.div_ceil(2);
+    let b1 = pm(p, pa(p, theta, s, n), inv2, n);
+    let b2 = pm(p, ps(p, theta, s, n), inv2, n);
+    if b1 == b2 {
+        return None;
+    }
+    let den = ps(p, b2, b1, n);
+    let a1 = pm(p, ps(p, c1, pm(p, c3, b1, n), n), ppow(p, den, p - 2, n), n);
+    let a2 = ps(p, c3, a1, n);
+    if pa(p, pm(p, a1, a2, n), pa(p, b1, b2, n), n) != c2 {
+        return None;
+    }
+    let mut out = Vec::with_capacity(4);
+    for (a, b) in [(a1, b1), (a2, b2)] {
+        let dq = ps(p, pm(p, a, a, n), pm(p, 4, b, n), n);
+        if dq == 0 {
+            return None;
+        }
+        if ppow(p, dq, (p - 1) / 2, n) != 1 {
+            return Some(None); // an irreducible quadratic factor
+        }
+        let sq = co.sqrt(dq, n);
+        let na = ps(p, 0, a, n);
+        out.push(pm(p, pa(p, na, sq, n), inv2, n));
+        out.push(pm(p, ps(p, na, sq, n), inv2, n));
+    }
+    out.sort_unstable();
+    Some(Some(out))
+}
+
+/// Optional speed-ups ported from the genus-3 positive control
+/// (`research/ic_positive_control_{la,capped}_20261116`).  The default is
+/// the frozen instrument, count for count.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct IcExt {
+    /// Coordinate Wiedemann on a random square row subset
+    /// (`ic_control::wiedemann_coord`): only the target's coordinate, no
+    /// `AᵀDA`, no reconstruction.  A failed certificate falls back, in the
+    /// same attempt and counted, to the baseline [`wiedemann`].  Ignored
+    /// when [`IcParams::sge`] is set.
+    pub coord_square: bool,
+    /// Unit-T walk: starts `a G + T`, jumps `α G`; the unknown is
+    /// `h · log T` (column −1) and the segment between restarts is capped at
+    /// `max(64, ⌊√r / 16⌋)` so a segment never runs into its rho cycle.
+    pub unit_t: bool,
+    /// Ferrari splitting test for quartics ([`ferrari_split`]) after the
+    /// parity prefilter, at genus 4; undecided cases fall back to the
+    /// baseline test.  Needs [`IcParams::prefilter`].
+    pub ferrari: bool,
+    /// Structured Gaussian elimination ([`sge_reduce`], with the
+    /// [`SgeParams`] of [`IcParams::sge`]) on the peeled core, then the
+    /// coordinate Wiedemann on a random square row subset of the *reduced*
+    /// matrix, the target column mapped through the renumbering.  A failed
+    /// certificate falls back, in the same attempt and counted, to the
+    /// baseline [`wiedemann`] on the same reduced matrix (the merge is not
+    /// repeated).  Needs [`IcParams::sge`]; without it this flag does nothing.
+    /// Merged rows carry non-unit entries, which [`ic_control`]'s `mat_vec`
+    /// charges one multiplication each per product (a `±1` entry is free).
+    pub sge_coord: bool,
+}
+
 /// Run one index-calculus arm on an instance.  The structure is
 /// `ic_control::run_ic_with`, with the genus a variable.
 pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
+    run_ic_ext(inst, prm, IcExt::default())
+}
+
+/// [`run_ic`] with the speed-ups of [`IcExt`].
+pub fn run_ic_ext(inst: &Instance, prm: IcParams, ext: IcExt) -> IcResult {
     let start = std::time::Instant::now();
     let curve = &inst.curve;
     let (p, r, h) = (inst.p, inst.r, inst.h);
@@ -1320,12 +1642,23 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
     let mut jumps: Vec<(JDiv, u64, u64)> = Vec::new();
     for _ in 0..16 {
         let a = rng.gen_range(1..short);
+        if ext.unit_t {
+            jumps.push((curve.mul(&mut ops, inst.g, a), a, 0));
+            continue;
+        }
         let b = rng.gen_range(1..short);
         let ag = curve.mul(&mut ops, inst.g, a);
         let bt = curve.mul(&mut ops, inst.target, b);
         jumps.push((curve.add(&mut ops, ag, bt), a, b));
     }
     res.setup_ops = ops.adds + ops.doubles;
+    // Cardano–Lucas constants for the Ferrari test, charged to the relation phase.
+    let cubic = (ext.ferrari && g == 4 && p > 3).then(|| CubicOracle::new(p, &mut res.rel));
+    let restart = if ext.unit_t {
+        prm.restart.min((((r as f64).sqrt() / 16.0) as u64).max(64))
+    } else {
+        prm.restart
+    };
 
     let mut rels: Vec<Rel> = Vec::new();
     let mut vid: HashMap<u32, u32> = HashMap::new();
@@ -1343,7 +1676,14 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
                 res.exhausted = true;
                 break 'outer;
             }
-            if since_restart >= prm.restart.max(1) {
+            if since_restart >= restart.max(1) && ext.unit_t {
+                let a = rng.gen_range(1..r);
+                let ag = curve.mul(&mut ops, inst.g, a);
+                cur = curve.add(&mut ops, ag, inst.target);
+                ca = a;
+                cb = 1;
+                since_restart = 0;
+            } else if since_restart >= restart.max(1) {
                 let a = rng.gen_range(1..r);
                 let b = rng.gen_range(1..r);
                 let ag = curve.mul(&mut ops, inst.g, a);
@@ -1376,12 +1716,26 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
                 // Two factors of a quadratic with square discriminant.
                 decided = g == 2;
             }
-            if !decided && !splits_completely(p, &u, &mut res.rel) {
+            let mut fer_roots = None;
+            if let (Some(co), true) = (cubic.as_ref(), prm.prefilter && g == 4) {
+                match ferrari_split(co, p, &u, &mut res.rel) {
+                    Some(None) => continue,
+                    Some(Some(r)) => fer_roots = Some(r),
+                    None => res.ferrari_undecided += 1,
+                }
+            }
+            if fer_roots.is_none() && !decided && !splits_completely(p, &u, &mut res.rel) {
                 continue;
             }
             res.splits += 1;
-            let Some(roots) = roots_of(p, &u, &mut rng, &mut res.rel) else {
-                continue;
+            let roots = match fer_roots {
+                Some(r) => r,
+                None => {
+                    let Some(r) = roots_of(p, &u, &mut rng, &mut res.rel) else {
+                        continue;
+                    };
+                    r
+                }
             };
             let vc = curve.v_coeffs(&cur);
             let mut rel = Rel {
@@ -1419,9 +1773,15 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
             if rel.nfb == 0 && lps.is_empty() {
                 continue;
             }
-            res.rel.mul += 2;
             rel.rhs = mulmod(h % r, ca, r);
-            rel.tcoef = subm(0, mulmod(h % r, cb, r), r);
+            if ext.unit_t {
+                debug_assert_eq!(cb, 1);
+                res.rel.mul += 1;
+                rel.tcoef = r - 1; // unknown h·log T
+            } else {
+                res.rel.mul += 2;
+                rel.tcoef = subm(0, mulmod(h % r, cb, r), r);
+            }
             if prm.verify_relations {
                 let mut sum = JDiv::IDENTITY;
                 for &(x, y) in &places {
@@ -1479,26 +1839,131 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
         }
         let mut w_nat = Nat::default();
         let dense = res.attempts > 1;
-        let sol = wiedemann(&core, cc, r, &mut rng, dense, &mut w_nat);
-        res.la_wied.merge(w_nat);
-        res.la.merge(w_nat);
-        if let Some(x) = sol {
-            let t = x[ct as usize];
+        // UnitT solves for h·log T: one inversion of h and one product.
+        let h_inv = if ext.unit_t {
+            w_nat.mul += pivot_inversion_steps(r) + 1;
+            invmod(h % r, r).expect("h is a unit modulo the prime r")
+        } else {
+            1
+        };
+        let to_log = |t: u64| if ext.unit_t { mulmod(t, h_inv, r) } else { t };
+        // The certificate: [t]G = T by the counted multiplication (its group
+        // operations are verify_ops) and by an independent one whose field
+        // work is taken back out of the tally.
+        // (Assigned, not accumulated, exactly as the frozen instrument does.)
+        let certify = |t: u64, ops: &mut GroupOps, verify_ops: &mut u64| -> bool {
             let v0 = ops.adds + ops.doubles;
-            let chk = curve.mul(&mut ops, inst.g, t);
-            res.verify_ops = ops.adds + ops.doubles - v0;
+            let chk = curve.mul(ops, inst.g, t);
+            *verify_ops = ops.adds + ops.doubles - v0;
             let (cm, ci) = (curve.fmul(), curve.finv());
             let ok = chk == inst.target && curve.mul_rtl(inst.g, t) == inst.target;
-            // The second, independent multiplication is a certificate, not
-            // solver work: take it back out of the field tally.
             curve.k.mul.set(cm);
             curve.k.inv.set(ci);
-            if ok {
-                res.recovered = Some(t);
-                res.certified = true;
-                solved = true;
-                continue;
+            ok
+        };
+        let mut answer = None;
+        // The reduced core of `sge_coord`, kept for the certified fallback.
+        let mut reduced: Option<(Vec<Row>, usize, u32)> = None;
+        if let (true, Some(sp)) = (ext.sge_coord, prm.sge) {
+            let mut s_nat = Nat::default();
+            let (red, rcc, rct, st) = sge_reduce(&core, cc, ct, r, sp, &mut s_nat);
+            res.la_sge.merge(s_nat);
+            res.la.merge(s_nat);
+            res.sge = st;
+            let t = wiedemann_coord(&red, rcc, rct as usize, r, &mut rng, true, &mut w_nat);
+            match t.map(to_log) {
+                Some(t) if certify(t, &mut ops, &mut res.verify_ops) => answer = Some(t),
+                _ => res.la_fallbacks += 1,
             }
+            reduced = Some((red, rcc, rct));
+        } else if ext.coord_square && prm.sge.is_none() {
+            let t = wiedemann_coord(&core, cc, ct as usize, r, &mut rng, true, &mut w_nat);
+            match t.map(to_log) {
+                Some(t) if certify(t, &mut ops, &mut res.verify_ops) => answer = Some(t),
+                _ => res.la_fallbacks += 1,
+            }
+        }
+        if answer.is_none() {
+            let sol = match prm.sge {
+                _ if reduced.is_some() => {
+                    let (red, rcc, rct) = reduced.as_ref().expect("checked");
+                    wiedemann(red, *rcc, r, &mut rng, true, &mut w_nat).map(|x| x[*rct as usize])
+                }
+                None => wiedemann(
+                    &core,
+                    cc,
+                    r,
+                    &mut rng,
+                    dense || ext.coord_square,
+                    &mut w_nat,
+                )
+                .map(|x| x[ct as usize]),
+                Some(sp) => {
+                    let mut s_nat = Nat::default();
+                    let (red, rcc, rct, st) = sge_reduce(&core, cc, ct, r, sp, &mut s_nat);
+                    res.la_sge.merge(s_nat);
+                    res.la.merge(s_nat);
+                    res.sge = st;
+                    // The merged system is solved with a copy of the stream; the
+                    // stream itself advances as the unmerged solve would, so a
+                    // failed attempt resumes the relation phase identically.
+                    let mut wrng = rng.clone();
+                    skip_wiedemann_draws(&mut rng, core.len(), cc, r, dense);
+                    wiedemann(&red, rcc, r, &mut wrng, dense, &mut w_nat).map(|x| x[rct as usize])
+                }
+            };
+            if let Some(t) = sol.map(to_log) {
+                if certify(t, &mut ops, &mut res.verify_ops) {
+                    answer = Some(t);
+                }
+            }
+        }
+        res.la_wied.merge(w_nat);
+        res.la.merge(w_nat);
+        if let Some(t) = answer {
+            res.recovered = Some(t);
+            res.certified = true;
+            solved = true;
+            continue;
+        }
+        if answer.is_none() {
+            let sol = match prm.sge {
+                None => wiedemann(
+                    &core,
+                    cc,
+                    r,
+                    &mut rng,
+                    dense || ext.coord_square,
+                    &mut w_nat,
+                )
+                .map(|x| x[ct as usize]),
+                Some(sp) => {
+                    let mut s_nat = Nat::default();
+                    let (red, rcc, rct, st) = sge_reduce(&core, cc, ct, r, sp, &mut s_nat);
+                    res.la_sge.merge(s_nat);
+                    res.la.merge(s_nat);
+                    res.sge = st;
+                    // The merged system is solved with a copy of the stream; the
+                    // stream itself advances as the unmerged solve would, so a
+                    // failed attempt resumes the relation phase identically.
+                    let mut wrng = rng.clone();
+                    skip_wiedemann_draws(&mut rng, core.len(), cc, r, dense);
+                    wiedemann(&red, rcc, r, &mut wrng, dense, &mut w_nat).map(|x| x[rct as usize])
+                }
+            };
+            if let Some(t) = sol.map(to_log) {
+                if certify(t, &mut ops, &mut res.verify_ops) {
+                    answer = Some(t);
+                }
+            }
+        }
+        res.la_wied.merge(w_nat);
+        res.la.merge(w_nat);
+        if let Some(t) = answer {
+            res.recovered = Some(t);
+            res.certified = true;
+            solved = true;
+            continue;
         }
         next_check = rels.len() as u64 + (nunk as u64 / 20).max(16);
     }
@@ -1516,6 +1981,351 @@ pub fn run_ic(inst: &Instance, prm: IcParams) -> IcResult {
     res
 }
 
+// ── structured Gaussian elimination before Wiedemann ────────────────────
+
+/// Structured Gaussian elimination (filtering, as in NFS linear algebra)
+/// between the peel and Wiedemann: columns of weight `2, 3, …, w_max` are
+/// merged away while the non-zeros stay within `fill_max` times the peeled
+/// core's.  See [`sge_reduce`].
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct SgeParams {
+    pub w_max: usize,
+    pub fill_max: f64,
+}
+
+/// What the merge did to the last core it reduced.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct SgeStats {
+    pub rows_in: usize,
+    pub cols_in: usize,
+    pub nnz_in: usize,
+    /// Entries that are not `±1` (each costs a multiplication per matrix
+    /// product in Wiedemann; a `±1` entry costs an addition).
+    pub generic_in: usize,
+    pub rows_out: usize,
+    pub cols_out: usize,
+    pub nnz_out: usize,
+    pub generic_out: usize,
+    /// Columns eliminated by a merge (one pivot row each).
+    pub merged: usize,
+    /// Columns of weight one removed with their row (no arithmetic).
+    pub peeled: usize,
+    /// Rows that became empty, and duplicate rows, removed.
+    pub empty: usize,
+    pub duplicates: usize,
+    /// Merges refused because the fill bound would have been passed.
+    pub refused: usize,
+}
+
+#[inline]
+fn is_unit(v: u64, r: u64) -> bool {
+    v == 1 || v == r - 1
+}
+
+fn coef_at(t: &[(u32, u64)], c: u32) -> Option<u64> {
+    t.binary_search_by_key(&c, |x| x.0).ok().map(|i| t[i].1)
+}
+
+/// Column state of [`sge_reduce`]: weights, the rows that may hold each
+/// column (stale ids are filtered on use), and the queue by weight.
+struct SgeCols {
+    w: Vec<usize>,
+    rows: Vec<Vec<u32>>,
+    heap: std::collections::BinaryHeap<std::cmp::Reverse<(usize, u32)>>,
+    tcol: u32,
+    w_max: usize,
+}
+
+impl SgeCols {
+    /// Row `i` changes from `old` to `new`: weights out and in, holders and
+    /// queue updated; one addition of bookkeeping per entry visited.
+    fn reweigh(&mut self, old: &[(u32, u64)], new: &[(u32, u64)], i: u32, nat: &mut Nat) {
+        let (mut a, mut b) = (0, 0);
+        while a < old.len() || b < new.len() {
+            nat.add += 1;
+            let c = if b == new.len() || (a < old.len() && old[a].0 < new[b].0) {
+                let c = old[a].0;
+                self.w[c as usize] -= 1;
+                a += 1;
+                c
+            } else if a == old.len() || new[b].0 < old[a].0 {
+                let c = new[b].0;
+                self.w[c as usize] += 1;
+                self.rows[c as usize].push(i);
+                b += 1;
+                c
+            } else {
+                a += 1;
+                b += 1;
+                continue;
+            };
+            if c != self.tcol && self.w[c as usize] <= self.w_max {
+                self.heap.push(std::cmp::Reverse((self.w[c as usize], c)));
+            }
+        }
+    }
+}
+
+/// Structured Gaussian elimination of `rows` (columns `0..ncols`, the
+/// unknown `t` in column `tcol`, never eliminated).
+///
+/// Repeatedly takes the live column of least weight `w ≤ w_max` (ties: the
+/// lower index).  Weight 0: dropped.  Weight 1: the column and its row are
+/// removed (a peel; no arithmetic).  Weight `w ≥ 2`: the shortest row holding
+/// the column (ties: a `±1` coefficient first) is the pivot; every other row
+/// holding the column becomes `row − (a_i / a_p)·pivot`, and the pivot row
+/// and the column leave the system.  A merge is refused when its worst-case
+/// fill (no cancellation: `(w − 1)(len_p − 2) − len_p` new non-zeros) would
+/// take the non-zeros past `fill_max` times the start.  Afterwards empty and
+/// duplicate rows are dropped and the columns renumbered densely, `t` last.
+///
+/// Every eliminated variable is determined by its pivot row from variables
+/// that stay or were eliminated later, so a full-column-rank system stays of
+/// full column rank and `t` keeps its value; the pivot rows are not needed
+/// because the solver wants `t` only (no back substitution).
+///
+/// Counting, in the convention of `ic_control` (`combine`, `mat_vec`): a
+/// product with a `±1` factor is free, any other modular product is one
+/// multiplication; an inversion of a pivot coefficient other than `±1` costs
+/// `pivot_inversion_steps(r)` multiplications; `combine` charges one
+/// addition per entry of both operands; the right-hand side one
+/// multiplication (unless the multiplier is `±1`) and one addition per
+/// merged row; the index bookkeeping one addition per entry touched, as
+/// `peel` does.
+pub(crate) fn sge_reduce(
+    rows: &[Row],
+    ncols: usize,
+    tcol: u32,
+    r: u64,
+    prm: SgeParams,
+    nat: &mut Nat,
+) -> (Vec<Row>, usize, u32, SgeStats) {
+    use std::cmp::Reverse;
+    use std::collections::BinaryHeap;
+
+    let mut st = SgeStats {
+        rows_in: rows.len(),
+        cols_in: ncols,
+        ..Default::default()
+    };
+    let mut rws: Vec<Row> = rows.to_vec();
+    let mut alive = vec![true; rws.len()];
+    let mut cs = SgeCols {
+        w: vec![0usize; ncols],
+        rows: vec![Vec::new(); ncols],
+        heap: BinaryHeap::new(),
+        tcol,
+        w_max: prm.w_max,
+    };
+    let mut nnz = 0usize;
+    for (i, (t, _)) in rws.iter().enumerate() {
+        for &(c, v) in t {
+            cs.rows[c as usize].push(i as u32);
+            cs.w[c as usize] += 1;
+            st.generic_in += usize::from(!is_unit(v, r));
+            nat.add += 1;
+        }
+        nnz += t.len();
+    }
+    st.nnz_in = nnz;
+    let limit = (prm.fill_max * nnz as f64).floor() as usize;
+    let mut dead = vec![false; ncols];
+    for c in 0..ncols as u32 {
+        if c != tcol && cs.w[c as usize] <= prm.w_max {
+            cs.heap.push(Reverse((cs.w[c as usize], c)));
+        }
+    }
+
+    while let Some(Reverse((wc, c))) = cs.heap.pop() {
+        let cu = c as usize;
+        if dead[cu] || cs.w[cu] != wc {
+            continue;
+        }
+        if wc == 0 {
+            dead[cu] = true;
+            continue;
+        }
+        // live rows holding c
+        let mut holders: Vec<u32> = Vec::with_capacity(wc);
+        cs.rows[cu].retain(|&i| alive[i as usize] && coef_at(&rws[i as usize].0, c).is_some());
+        cs.rows[cu].sort_unstable();
+        cs.rows[cu].dedup();
+        holders.extend_from_slice(&cs.rows[cu]);
+        nat.add += holders.len() as u64;
+        debug_assert_eq!(holders.len(), wc, "column weight bookkeeping");
+        if wc == 1 {
+            let i = holders[0];
+            let old = std::mem::take(&mut rws[i as usize].0);
+            alive[i as usize] = false;
+            nnz -= old.len();
+            cs.reweigh(&old, &[], i, nat);
+            dead[cu] = true;
+            st.peeled += 1;
+            continue;
+        }
+        let &piv = holders
+            .iter()
+            .min_by_key(|&&i| {
+                let t = &rws[i as usize].0;
+                let a = coef_at(t, c).expect("holder");
+                (t.len(), !is_unit(a, r), i)
+            })
+            .expect("weight at least 2");
+        let lp = rws[piv as usize].0.len();
+        let grow = (wc - 1) as isize * (lp as isize - 2) - lp as isize;
+        if nnz as isize + grow > limit as isize {
+            st.refused += 1;
+            continue;
+        }
+        let (pt, prhs) = {
+            let (t, b) = &rws[piv as usize];
+            (t.clone(), *b)
+        };
+        let ap = coef_at(&pt, c).expect("pivot holds c");
+        // ip = 1 / a_p
+        let ip = if is_unit(ap, r) {
+            ap
+        } else {
+            nat.mul += pivot_inversion_steps(r);
+            invmod(ap, r).expect("r is prime")
+        };
+        for &i in &holders {
+            if i == piv {
+                continue;
+            }
+            let (old, rhs) = {
+                let (t, b) = &rws[i as usize];
+                (t.clone(), *b)
+            };
+            let ai = coef_at(&old, c).expect("holder");
+            // m = a_i / a_p
+            let m = if ap == 1 {
+                ai
+            } else if ap == r - 1 {
+                subm(0, ai, r)
+            } else if is_unit(ai, r) {
+                if ai == 1 {
+                    ip
+                } else {
+                    subm(0, ip, r)
+                }
+            } else {
+                nat.mul += 1;
+                mulmod(ai, ip, r)
+            };
+            let (new, nrhs) = if m == 1 {
+                nat.add += 1;
+                (combine(&old, false, &pt, true, r, nat), subm(rhs, prhs, r))
+            } else if m == r - 1 {
+                nat.add += 1;
+                (combine(&old, false, &pt, false, r, nat), addm(rhs, prhs, r))
+            } else {
+                let scaled: Vec<(u32, u64)> = pt
+                    .iter()
+                    .map(|&(cc, v)| {
+                        let s = if v == 1 {
+                            m
+                        } else if v == r - 1 {
+                            subm(0, m, r)
+                        } else {
+                            nat.mul += 1;
+                            mulmod(v, m, r)
+                        };
+                        (cc, s)
+                    })
+                    .collect();
+                nat.mul += 1;
+                nat.add += 1;
+                (
+                    combine(&old, false, &scaled, true, r, nat),
+                    subm(rhs, mulmod(m, prhs, r), r),
+                )
+            };
+            debug_assert!(coef_at(&new, c).is_none(), "the pivot column cancels");
+            nnz = nnz + new.len() - old.len();
+            cs.reweigh(&old, &new, i, nat);
+            if new.is_empty() {
+                alive[i as usize] = false;
+                st.empty += 1;
+            }
+            rws[i as usize] = (new, nrhs);
+        }
+        alive[piv as usize] = false;
+        nnz -= lp;
+        let old = std::mem::take(&mut rws[piv as usize].0);
+        cs.reweigh(&old, &[], piv, nat);
+        dead[cu] = true;
+        st.merged += 1;
+    }
+
+    // duplicates (same entries and right-hand side), first occurrence kept
+    let mut seen: std::collections::HashSet<Row> = std::collections::HashSet::new();
+    let mut kept: Vec<Row> = Vec::new();
+    for (i, row) in rws.into_iter().enumerate() {
+        if !alive[i] {
+            continue;
+        }
+        nat.add += row.0.len() as u64;
+        if !seen.insert(row.clone()) {
+            st.duplicates += 1;
+            continue;
+        }
+        kept.push(row);
+    }
+    // dense renumbering, t last
+    let mut wt = vec![0usize; ncols];
+    for (t, _) in &kept {
+        for &(c, _) in t {
+            wt[c as usize] += 1;
+        }
+    }
+    let mut map = vec![u32::MAX; ncols];
+    let mut n = 0u32;
+    for c in 0..ncols {
+        if c as u32 != tcol && wt[c] > 0 {
+            map[c] = n;
+            n += 1;
+        }
+    }
+    map[tcol as usize] = n;
+    let out: Vec<Row> = kept
+        .into_iter()
+        .map(|(t, b)| {
+            let mut nt: Vec<(u32, u64)> = t.iter().map(|&(c, v)| (map[c as usize], v)).collect();
+            nt.sort_unstable_by_key(|x| x.0);
+            (nt, b)
+        })
+        .collect();
+    st.rows_out = out.len();
+    st.cols_out = n as usize + 1;
+    st.nnz_out = out.iter().map(|(t, _)| t.len()).sum();
+    st.generic_out = out
+        .iter()
+        .flat_map(|(t, _)| t.iter())
+        .filter(|&&(_, v)| !is_unit(v, r))
+        .count();
+    (out, n as usize + 1, n, st)
+}
+
+/// Advance `rng` exactly as `wiedemann` on an `nr × ncols` system would, so
+/// that the relation phase after a failed attempt draws the same stream with
+/// and without the merge (the merged system is solved with a copy).
+fn skip_wiedemann_draws(rng: &mut StdRng, nr: usize, ncols: usize, r: u64, dense_u: bool) {
+    for _ in 0..nr {
+        let _: u64 = rng.gen_range(1..r);
+    }
+    if dense_u || ncols <= 16 {
+        for _ in 0..ncols {
+            let _: u64 = rng.gen_range(1..r);
+        }
+    } else {
+        for _ in 0..16 {
+            let _: usize = rng.gen_range(0..ncols);
+            let _: u64 = rng.gen_range(1..r);
+        }
+    }
+}
+
 // ── rho ─────────────────────────────────────────────────────────────────
 
 #[derive(Clone, Debug, Default)]
@@ -1530,6 +2340,9 @@ pub struct RhoOut {
     pub cantor_inv: u64,
     /// Canonicalisations (the walk's per-step native work).
     pub native: u64,
+    /// The walk's other counted native work (`RhoResult::work_native`: the
+    /// short-cycle window's and Brent's compares), summed.  Not in `native`.
+    pub compares: u64,
     pub steps: u64,
     pub wall_ns: u64,
 }
@@ -1543,17 +2356,48 @@ impl RhoOut {
 /// Negation-map rho on the order-`r` subgroup (`rho_reference_walk`,
 /// `RhoWalk::negation()`), certified by an independent `[k]G`.
 pub fn run_rho(inst: &Instance, seed: u64) -> RhoOut {
+    run_rho_walk(inst, seed, RhoWalk::negation())
+}
+
+/// [`run_rho`] with the walk chosen (`RhoWalk::plain()` for the walk on
+/// points).  `native` is the walk's canonicalisations, floored at one per
+/// step, as in [`run_rho`].
+pub fn run_rho_walk(inst: &Instance, seed: u64, walk: RhoWalk) -> RhoOut {
+    run_rho_policy(inst, seed, walk, WalkPolicy::legacy())
+}
+
+/// [`run_rho_walk`] under a [`WalkPolicy`]. `WalkPolicy::legacy()` is
+/// `run_rho_walk` exactly (`rho_reference_walk` is that policy). Used for the
+/// leaner references: negation with `cycle_window = 0` and Brent detection
+/// (arm B), and the plain walk with `cycle_window = 0` (arm Q).
+pub fn run_rho_policy(inst: &Instance, seed: u64, walk: RhoWalk, policy: WalkPolicy) -> RhoOut {
     let (fm0, fi0) = (inst.curve.fmul(), inst.curve.finv());
     let max_steps = (60.0 * (inst.r as f64).sqrt()) as u64 + 10_000;
-    let rr = rho_reference_walk(
-        &inst.curve,
-        inst.g,
-        inst.target,
-        inst.r,
-        seed,
-        max_steps,
-        RhoWalk::negation(),
-    );
+    let rr = if walk.negation {
+        rho_walk_with_policy(
+            &inst.curve,
+            &NegationClasses { r: inst.r },
+            inst.g,
+            inst.target,
+            inst.r,
+            seed,
+            max_steps,
+            walk,
+            policy,
+        )
+    } else {
+        rho_walk_with_policy(
+            &inst.curve,
+            &PointClasses,
+            inst.g,
+            inst.target,
+            inst.r,
+            seed,
+            max_steps,
+            walk,
+            policy,
+        )
+    };
     let (cm, ci) = (inst.curve.fmul() - fm0, inst.curve.finv() - fi0);
     let certified = rr
         .recovered
@@ -1574,6 +2418,7 @@ pub fn run_rho(inst: &Instance, seed: u64) -> RhoOut {
             .copied()
             .unwrap_or(0)
             .max(rr.steps),
+        compares: rr.work_native.values().sum(),
         steps: rr.steps,
         wall_ns: rr.wall_ns,
     }
@@ -1581,8 +2426,301 @@ pub fn run_rho(inst: &Instance, seed: u64) -> RhoOut {
 
 #[cfg(test)]
 mod tests {
+
+    /// The default extension is the frozen instrument: every count equal.
+    #[test]
+    fn ext_default_is_run_ic_count_for_count() {
+        for (p, g) in [(131u64, 3u32), (131, 4), (257, 3)] {
+            let inst = first_instance(p, g);
+            let prm = IcParams {
+                arm: Arm::DoubleLp,
+                nb: fb_size_2lp(p, g, 2.0),
+                seed: 5,
+                max_trials: 5_000_000,
+                restart: restart_sqrt(inst.r),
+                prefilter: true,
+                verify_relations: false,
+                sge: None,
+            };
+            let a = run_ic(&inst, prm);
+            let b = run_ic_ext(&inst, prm, IcExt::default());
+            assert_eq!(
+                (
+                    a.trials,
+                    a.relations,
+                    a.group_ops(),
+                    a.rel,
+                    a.la,
+                    a.verify_ops,
+                    a.recovered
+                ),
+                (
+                    b.trials,
+                    b.relations,
+                    b.group_ops(),
+                    b.rel,
+                    b.la,
+                    b.verify_ops,
+                    b.recovered
+                )
+            );
+        }
+    }
+
+    /// Coordinate Wiedemann and the unit-T walk certify at genus 3 and 4, alone
+    /// and together, and the coordinate solve spends fewer LA multiplications.
+    #[test]
+    fn ext_arms_certify_at_genus_3_and_4() {
+        for (p, g) in [(131u64, 3u32), (131, 4), (257, 4)] {
+            let inst = first_instance(p, g);
+            let prm = IcParams {
+                arm: Arm::DoubleLp,
+                nb: fb_size_2lp(p, g, 2.0),
+                seed: 9,
+                max_trials: 5_000_000,
+                restart: restart_sqrt(inst.r),
+                prefilter: true,
+                verify_relations: true,
+                sge: None,
+            };
+            let base = run_ic(&inst, prm);
+            for ext in [
+                IcExt {
+                    coord_square: true,
+                    unit_t: false,
+                    ferrari: false,
+                    sge_coord: false,
+                },
+                IcExt {
+                    coord_square: false,
+                    unit_t: true,
+                    ferrari: false,
+                    sge_coord: false,
+                },
+                IcExt {
+                    coord_square: true,
+                    unit_t: true,
+                    ferrari: false,
+                    sge_coord: false,
+                },
+            ] {
+                let x = run_ic_ext(&inst, prm, ext);
+                assert!(x.certified, "p={p} g={g} {ext:?}");
+                assert_eq!(x.bad_relations, 0);
+                assert_eq!(x.recovered.unwrap() % inst.r, inst.t_secret % inst.r);
+                if ext
+                    == (IcExt {
+                        coord_square: true,
+                        unit_t: false,
+                        ferrari: false,
+                        sge_coord: false,
+                    })
+                {
+                    assert_eq!(x.relations, base.relations);
+                    if x.la_fallbacks == 0 {
+                        assert!(x.la_wied.mul < base.la_wied.mul, "p={p} g={g}");
+                    }
+                }
+            }
+        }
+    }
     use super::*;
     use crate::cryptanalysis::chained_transfer::hyper64::H64Curve;
+
+    /// For odd-degree `f`, a reducible `f` gives an even `#J` (2-torsion), so a
+    /// prime-order search may skip it; an irreducible `f` gives an odd `#J`.
+    #[test]
+    fn reducible_f_gives_even_jacobian_order() {
+        let (mut red, mut irr) = (0, 0);
+        for &(p, g) in &[(131u64, 3u32), (131, 4), (257, 4)] {
+            for cs in 1..120u64 {
+                let f = random_f(p, g, cs);
+                let Ok(curve) = JCurve::new(p, g, &f) else {
+                    continue;
+                };
+                let Ok(order) = curve.jacobian_order(cs) else {
+                    continue;
+                };
+                if f_irreducible(p, &f) {
+                    irr += 1;
+                    assert_eq!(order % 2, 1, "p={p} g={g} cs={cs}: irreducible f, even #J");
+                } else {
+                    red += 1;
+                    assert_eq!(order % 2, 0, "p={p} g={g} cs={cs}: reducible f, odd #J");
+                }
+            }
+        }
+        assert!(red > 50 && irr > 10, "red {red} irr {irr}");
+    }
+
+    /// Every monic quartic with a non-zero square discriminant over small
+    /// primes (both residue classes of p mod 3, with and without a
+    /// single-exponent cube root): a decided Ferrari answer equals brute
+    /// force, roots included, and most candidates are decided.
+    #[test]
+    fn ferrari_matches_brute_force_on_every_square_disc_quartic() {
+        let mut rates = Vec::new();
+        for p in [5u64, 7, 11, 13, 17, 19, 23] {
+            let mut chi = vec![-1i8; p as usize];
+            chi[0] = 0;
+            for y in 1..=(p - 1) / 2 {
+                chi[(y * y % p) as usize] = 1;
+            }
+            let mut n = Nat::default();
+            let co = CubicOracle::new(p, &mut n);
+            let (mut decided, mut total) = (0u64, 0u64);
+            for c0 in 0..p {
+                for c1 in 0..p {
+                    for c2 in 0..p {
+                        for c3 in 0..p {
+                            let u = vec![c0, c1, c2, c3, 1];
+                            if disc_character(p, &u, &chi, &mut n) != 1 {
+                                continue;
+                            }
+                            total += 1;
+                            let truth: Vec<u64> = (0..p)
+                                .filter(|&x| {
+                                    (((((x + c3) % p * x + c2) % p) * x + c1) % p * x + c0) % p == 0
+                                })
+                                .collect();
+                            match ferrari_split(&co, p, &u, &mut n) {
+                                None => {}
+                                Some(None) => {
+                                    decided += 1;
+                                    assert_ne!(truth.len(), 4, "p={p} u={u:?} split but rejected");
+                                }
+                                Some(Some(r)) => {
+                                    decided += 1;
+                                    assert_eq!(r, truth, "p={p} u={u:?}");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            eprintln!("ferrari p={p}: decided {decided} of {total}");
+            rates.push((p, decided, total));
+        }
+        // Correctness is asserted above for every prime; the fast path must
+        // decide most candidates once p is not tiny (degenerate quartics, with
+        // P' = 0 or b1 = b2, fall back to the exact baseline by design).
+        for (p, decided, total) in rates {
+            assert!(
+                p < 11 || decided * 2 >= total,
+                "p={p}: decided only {decided} of {total}"
+            );
+        }
+    }
+
+    /// `sge_coord` (merge, then the coordinate solve on a square subset of the
+    /// reduced matrix) certifies at genus 3 and 4, reproduces the relation
+    /// phase of arm w, and where the merge shrank the matrix and neither run
+    /// fell back it spends fewer LA multiplications than arm w.
+    #[test]
+    fn sge_coord_certifies_and_cuts_la() {
+        let w = IcExt {
+            coord_square: true,
+            unit_t: true,
+            ferrari: false,
+            sge_coord: false,
+        };
+        let s = IcExt {
+            sge_coord: true,
+            ..w
+        };
+        let mut shrank = 0;
+        for (p, g) in [(131u64, 3u32), (257, 3), (131, 4), (257, 4)] {
+            let inst = first_instance(p, g);
+            for sp in [
+                SgeParams {
+                    w_max: 4,
+                    fill_max: 1.5,
+                },
+                SgeParams {
+                    w_max: 8,
+                    fill_max: 3.0,
+                },
+            ] {
+                let mut prm = prm(p, g, Arm::DoubleLp, true, None);
+                prm.verify_relations = true;
+                prm.restart = restart_sqrt(inst.r);
+                let a = run_ic_ext(&inst, prm, w);
+                prm.sge = Some(sp);
+                let b = run_ic_ext(&inst, prm, s);
+                let tag = format!("p={p} g={g} {sp:?}");
+                assert!(b.certified && b.bad_relations == 0, "{tag}");
+                assert_eq!(b.recovered.unwrap() % inst.r, inst.t_secret % inst.r);
+                assert_eq!(
+                    b.la.mul,
+                    b.la_graph.mul + b.la_peel.mul + b.la_sge.mul + b.la_wied.mul
+                );
+                if b.attempts == a.attempts && b.relations == a.relations {
+                    assert_eq!((b.sge.rows_in, b.sge.cols_in), (b.core_rows, b.core_cols));
+                    eprintln!(
+                        "sge_coord {tag}: cols {}->{} nnz {}->{} generic {}->{} fb {}/{} \
+                         la_wied mul {} add {} (w: {} {}) la mul {} (w {})",
+                        b.sge.cols_in,
+                        b.sge.cols_out,
+                        b.sge.nnz_in,
+                        b.sge.nnz_out,
+                        b.sge.generic_in,
+                        b.sge.generic_out,
+                        b.la_fallbacks,
+                        a.la_fallbacks,
+                        b.la_wied.mul,
+                        b.la_wied.add,
+                        a.la_wied.mul,
+                        a.la_wied.add,
+                        b.la.mul,
+                        a.la.mul
+                    );
+                    if b.sge.cols_out * 10 <= b.sge.cols_in * 8
+                        && b.la_fallbacks == 0
+                        && a.la_fallbacks == 0
+                    {
+                        shrank += 1;
+                        assert!(b.la_wied.mul < a.la_wied.mul, "{tag}");
+                    }
+                }
+            }
+        }
+        eprintln!("sge_coord: matrices shrunk by 20% or more in {shrank} runs");
+    }
+
+    /// The Ferrari arm certifies at genus 4 and spends fewer relation-phase
+    /// multiplications per trial than the same arm without it.
+    #[test]
+    fn ferrari_arm_certifies_and_cuts_relation_work() {
+        for p in [131u64, 257] {
+            let inst = first_instance(p, 4);
+            let prm = IcParams {
+                arm: Arm::DoubleLp,
+                nb: fb_size_2lp(p, 4, 2.0),
+                seed: 9,
+                max_trials: 5_000_000,
+                restart: restart_sqrt(inst.r),
+                prefilter: true,
+                verify_relations: true,
+                sge: None,
+            };
+            let base = IcExt {
+                coord_square: true,
+                unit_t: true,
+                ferrari: false,
+                sge_coord: false,
+            };
+            let fer = IcExt {
+                ferrari: true,
+                ..base
+            };
+            let a = run_ic_ext(&inst, prm, base);
+            let b = run_ic_ext(&inst, prm, fer);
+            assert!(b.certified && b.bad_relations == 0, "p={p}");
+            assert_eq!(b.recovered.unwrap() % inst.r, inst.t_secret % inst.r);
+            let per = |x: &IcResult| x.rel.mul as f64 / x.trials as f64;
+            assert!(per(&b) < per(&a), "p={p}: {} vs {}", per(&b), per(&a));
+        }
+    }
 
     fn first_instance(p: u64, g: u32) -> Instance {
         for cs in 1..400u64 {
@@ -1874,6 +3012,253 @@ mod tests {
         }
     }
 
+    fn prm(p: u64, g: u32, arm: Arm, prefilter: bool, sge: Option<SgeParams>) -> IcParams {
+        IcParams {
+            arm,
+            nb: fb_size_2lp(p, g, 2.0),
+            seed: 5,
+            max_trials: 5_000_000,
+            restart: RESTART,
+            prefilter,
+            verify_relations: false,
+            sge,
+        }
+    }
+
+    /// `sge: None` is the frozen instrument: these counts were recorded from
+    /// the source before the merge stage existed (2026-11-15) and must not
+    /// move.  Fields: trials, relations, rel.mul, rel.add, cantor_mul,
+    /// la.mul, la.add, la_wied.mul, core_rows, core_cols, recovered.
+    #[test]
+    fn sge_none_reproduces_frozen_counts() {
+        #[rustfmt::skip]
+        let gold: [(u64, u32, Arm, bool, u64, u64, u64, u64, u64, u64, u64, u64, usize, usize, u64); 16] = [
+            (131, 2, Arm::Full, false, 145, 75, 17029, 14414, 59514, 19741, 36136, 19741, 72, 28, 2418),
+            (131, 2, Arm::Full, true, 145, 75, 11374, 8034, 59514, 19741, 36136, 19741, 72, 28, 2418),
+            (131, 2, Arm::DoubleLp, false, 99, 53, 11419, 9628, 55474, 2645, 3352, 2645, 32, 8, 2418),
+            (131, 2, Arm::DoubleLp, true, 99, 53, 7558, 5272, 55474, 2645, 3352, 2645, 32, 8, 2418),
+            (67, 3, Arm::Full, false, 4272, 39, 419722, 417673, 945740, 11597, 25023, 11597, 36, 27, 5447),
+            (67, 3, Arm::Full, true, 4272, 39, 323304, 275525, 945740, 11597, 25023, 11597, 36, 27, 5447),
+            (67, 3, Arm::DoubleLp, false, 4272, 39, 419722, 417673, 945740, 11597, 25023, 11597, 36, 27, 5447),
+            (67, 3, Arm::DoubleLp, true, 4272, 39, 323304, 275525, 945740, 11597, 25023, 11597, 36, 27, 5447),
+            (67, 4, Arm::Full, false, 1945, 39, 357024, 353828, 992336, 15695, 38397, 15695, 38, 30, 380849),
+            (67, 4, Arm::Full, true, 1945, 39, 241824, 202296, 992336, 15695, 38397, 15695, 38, 30, 380849),
+            (67, 4, Arm::DoubleLp, false, 1945, 39, 357024, 353828, 992336, 15695, 38397, 15695, 38, 30, 380849),
+            (67, 4, Arm::DoubleLp, true, 1945, 39, 241824, 202296, 992336, 15695, 38397, 15695, 38, 30, 380849),
+            (43, 5, Arm::Full, false, 2597, 35, 632387, 628324, 2205323, 13390, 37575, 13390, 35, 27, 15903666),
+            (43, 5, Arm::Full, true, 2597, 35, 448821, 371486, 2205323, 13390, 37575, 13390, 35, 27, 15903666),
+            (43, 5, Arm::DoubleLp, false, 2597, 35, 632387, 628324, 2205323, 13390, 37575, 13390, 35, 27, 15903666),
+            (43, 5, Arm::DoubleLp, true, 2597, 35, 448821, 371486, 2205323, 13390, 37575, 13390, 35, 27, 15903666),
+        ];
+        let mut insts: HashMap<(u64, u32), Instance> = HashMap::new();
+        for &(p, g, arm, pre, tr, rl, rm, ra, cm, lm, la, lw, cr, cc, t) in &gold {
+            let inst = insts.entry((p, g)).or_insert_with(|| first_instance(p, g));
+            let o = run_ic(inst, prm(p, g, arm, pre, None));
+            let got = (
+                o.trials,
+                o.relations,
+                o.rel.mul,
+                o.rel.add,
+                o.cantor_mul,
+                o.la.mul,
+                o.la.add,
+                o.la_wied.mul,
+                o.core_rows,
+                o.core_cols,
+                o.recovered,
+            );
+            assert_eq!(
+                got,
+                (tr, rl, rm, ra, cm, lm, la, lw, cr, cc, Some(t)),
+                "p = {p} g = {g} {arm:?} pre = {pre}"
+            );
+            assert!(o.certified);
+            assert_eq!(o.la_sge, Nat::default());
+            assert_eq!(o.sge, SgeStats::default());
+        }
+    }
+
+    /// With the merge the relation phase is identical, only the linear
+    /// algebra changes, and the run certifies with the same `t`.
+    #[test]
+    fn sge_keeps_relation_phase_and_t() {
+        let settings = [
+            SgeParams {
+                w_max: 2,
+                fill_max: 3.0,
+            },
+            SgeParams {
+                w_max: 4,
+                fill_max: 3.0,
+            },
+            SgeParams {
+                w_max: 8,
+                fill_max: 3.0,
+            },
+            SgeParams {
+                w_max: 8,
+                fill_max: 1.0,
+            },
+        ];
+        let mut reduced_some = false;
+        for (p, g) in [
+            (131u64, 2u32),
+            (67, 3),
+            (67, 4),
+            (43, 5),
+            (257, 3),
+            (131, 4),
+        ] {
+            let inst = first_instance(p, g);
+            for arm in [Arm::Full, Arm::DoubleLp] {
+                let off = run_ic(&inst, prm(p, g, arm, true, None));
+                assert!(off.certified);
+                for sp in settings {
+                    let on = run_ic(&inst, prm(p, g, arm, true, Some(sp)));
+                    let tag = format!("p = {p} g = {g} {arm:?} {sp:?}");
+                    assert!(on.certified, "{tag}");
+                    assert_eq!(on.recovered, off.recovered, "{tag}");
+                    assert_eq!(on.recovered, Some(inst.t_secret), "{tag}");
+                    assert_eq!(on.trials, off.trials, "{tag}");
+                    assert_eq!(on.candidates, off.candidates, "{tag}");
+                    assert_eq!(on.splits, off.splits, "{tag}");
+                    assert_eq!(on.relations, off.relations, "{tag}");
+                    assert_eq!(on.rels_by_lp, off.rels_by_lp, "{tag}");
+                    assert_eq!(on.rel, off.rel, "{tag}");
+                    assert_eq!(on.group_ops(), off.group_ops(), "{tag}");
+                    assert_eq!(on.cantor_mul, off.cantor_mul, "{tag}");
+                    assert_eq!(on.cantor_inv, off.cantor_inv, "{tag}");
+                    assert_eq!(on.attempts, off.attempts, "{tag}");
+                    assert_eq!(on.la_graph, off.la_graph, "{tag}");
+                    assert_eq!(on.la_peel, off.la_peel, "{tag}");
+                    assert_eq!((on.core_rows, on.core_cols), (off.core_rows, off.core_cols));
+                    assert_eq!(on.sge.rows_in, on.core_rows, "{tag}");
+                    assert_eq!(on.sge.cols_in, on.core_cols, "{tag}");
+                    assert!(on.sge.nnz_out as f64 <= sp.fill_max * on.sge.nnz_in as f64 + 1e-9);
+                    assert_eq!(
+                        on.la,
+                        Nat {
+                            mul: on.la_graph.mul + on.la_peel.mul + on.la_sge.mul + on.la_wied.mul,
+                            add: on.la_graph.add
+                                + on.la_peel.add
+                                + on.la_sge.add
+                                + on.la_wied.add
+                                + (off.la.add
+                                    - off.la_graph.add
+                                    - off.la_peel.add
+                                    - off.la_wied.add),
+                        },
+                        "{tag}"
+                    );
+                    if on.sge.cols_out < on.sge.cols_in {
+                        reduced_some = true;
+                    }
+                }
+            }
+        }
+        assert!(reduced_some, "the merge never removed a column");
+    }
+
+    /// The stream skip advances the generator exactly as `wiedemann` does.
+    #[test]
+    fn skip_draws_match_wiedemann() {
+        let r = 1_000_003u64;
+        for (nrow, ncol, dense) in [(30usize, 20usize, false), (30, 20, true), (12, 10, false)] {
+            let mut st = 77u64;
+            let rows: Vec<Row> = (0..nrow)
+                .map(|_| {
+                    let mut t: Vec<(u32, u64)> = (0..3)
+                        .map(|_| {
+                            st = st.wrapping_add(0x9E37_79B9_7F4A_7C15);
+                            (
+                                (mix64(st) % ncol as u64) as u32,
+                                1 + mix64(st ^ 9) % (r - 1),
+                            )
+                        })
+                        .collect();
+                    t.sort_unstable_by_key(|x| x.0);
+                    t.dedup_by_key(|x| x.0);
+                    (t, 1)
+                })
+                .collect();
+            let mut a = StdRng::seed_from_u64(3);
+            let mut b = a.clone();
+            let mut nat = Nat::default();
+            let _ = wiedemann(&rows, ncol, r, &mut a, dense, &mut nat);
+            skip_wiedemann_draws(&mut b, nrow, ncol, r, dense);
+            assert_eq!(a.gen::<u64>(), b.gen::<u64>());
+        }
+    }
+
+    /// On a random sparse system with general coefficients, the merged
+    /// system has the same `t`, and its counts are charged.
+    #[test]
+    fn sge_preserves_t_on_random_systems() {
+        let r = 1_000_000_007u64;
+        // Sparse enough that columns of weight 2 and 3 exist.
+        let (nrow, ncol) = (60usize, 41usize);
+        let tcol = (ncol - 1) as u32;
+        let mut st = 5u64;
+        let mut next = || {
+            st = st.wrapping_add(0x9E37_79B9_7F4A_7C15);
+            mix64(st)
+        };
+        for trial in 0..6 {
+            let x: Vec<u64> = (0..ncol).map(|_| next() % r).collect();
+            let rows: Vec<Row> = (0..nrow)
+                .map(|_| {
+                    let k = 2 + next() % 2;
+                    let mut t: Vec<(u32, u64)> = (0..k)
+                        .map(|_| {
+                            let c = (next() % (ncol as u64 - 1)) as u32;
+                            let v = match next() % 4 {
+                                0 => r - 1,
+                                1 | 2 => 1,
+                                _ => 1 + next() % (r - 1),
+                            };
+                            (c, v)
+                        })
+                        .collect();
+                    t.push((tcol, 1 + next() % (r - 1)));
+                    t.sort_unstable_by_key(|e| e.0);
+                    t.dedup_by_key(|e| e.0);
+                    let rhs = t
+                        .iter()
+                        .fold(0, |acc, &(c, v)| addm(acc, mulmod(v, x[c as usize], r), r));
+                    (t, rhs)
+                })
+                .collect();
+            for sp in [
+                SgeParams {
+                    w_max: 3,
+                    fill_max: 2.0,
+                },
+                SgeParams {
+                    w_max: 10,
+                    fill_max: 4.0,
+                },
+            ] {
+                let mut nat = Nat::default();
+                let (red, rc, rt, s) = sge_reduce(&rows, ncol, tcol, r, sp, &mut nat);
+                assert!(s.merged > 0 && nat.add > 0, "trial {trial} {s:?}");
+                assert_eq!(s.rows_out, red.len());
+                assert!(s.cols_out < ncol);
+                assert_eq!(
+                    s.rows_in - s.rows_out,
+                    s.merged + s.peeled + s.empty + s.duplicates
+                );
+                let mut rng = StdRng::seed_from_u64(trial);
+                let mut wn = Nat::default();
+                let sol = wiedemann(&red, rc, r, &mut rng, false, &mut wn);
+                assert_eq!(
+                    sol.map(|v| v[rt as usize]),
+                    Some(x[tcol as usize]),
+                    "trial {trial} {sp:?}"
+                );
+            }
+        }
+    }
+
     /// Every arm recovers the planted logarithm at every genus; the prefilter
     /// changes the native count and nothing else.
     #[test]
@@ -1890,6 +3275,7 @@ mod tests {
                     restart: RESTART,
                     prefilter,
                     verify_relations: verify,
+                    sge: None,
                 };
                 let chk = run_ic(&inst, mk(false, true));
                 assert!(chk.certified, "{arm:?} p = {p} g = {g}");
@@ -1914,6 +3300,245 @@ mod tests {
             assert!(rho.certified);
             assert_eq!(rho.recovered, Some(inst.t_secret));
             assert!(rho.cantor_mul > 0);
+        }
+    }
+
+    // ── order methods (fast order study, 2026-11-21) ────────────────────
+
+    /// The enumeration of `count_points(2)` as it was before the Barrett
+    /// reduction: the reference every new count is compared with.
+    fn count_points2_reference(c: &JCurve) -> u64 {
+        let p = c.k.p;
+        let mut sq = vec![false; p as usize];
+        for y in 1..p {
+            sq[(y * y % p) as usize] = true;
+        }
+        let nu = (2..p).find(|&a| !sq[a as usize]).expect("a non-residue");
+        let f = &c.f;
+        let mut n = 1u64;
+        for a in 0..p {
+            for b in 0..=(p - 1) / 2 {
+                let (mut ra, mut rb) = (0u64, 0u64);
+                for i in (0..f.n).rev() {
+                    let na = (ra * a + nu * (rb * b % p)) % p;
+                    let nb = (ra * b + rb * a) % p;
+                    ra = (na + f.c[i]) % p;
+                    rb = nb;
+                }
+                let w = if b == 0 { 1 } else { 2 };
+                if ra == 0 && rb == 0 {
+                    n += w;
+                } else {
+                    let norm = (ra * ra % p + p - nu * (rb * rb % p) % p) % p;
+                    if sq[norm as usize] {
+                        n += 2 * w;
+                    }
+                }
+            }
+        }
+        n
+    }
+
+    #[test]
+    fn count_points2_matches_reference() {
+        for (p, g, cs) in [
+            (67u64, 3u32, 1u64),
+            (257, 3, 2),
+            (1031, 3, 3),
+            (1031, 4, 4),
+            (2053, 2, 5),
+        ] {
+            let c = JCurve::new(p, g, &random_f(p, g, cs)).unwrap();
+            assert_eq!(
+                c.count_points(2),
+                count_points2_reference(&c),
+                "p={p} g={g}"
+            );
+        }
+    }
+
+    /// `Ok(order)` or the class of the error, for comparing routes.
+    fn order_outcome(c: &JCurve, m: OrderMethod, seed: u64) -> String {
+        match c.jacobian_order_with(m, seed) {
+            Ok(n) => format!("ok {n}"),
+            Err(e) => format!("err {}", e.split(':').next().unwrap_or("")),
+        }
+    }
+
+    fn json_instances(src: &str) -> Vec<(u64, Vec<u64>, u64, u64)> {
+        let v: serde_json::Value = serde_json::from_str(src).unwrap();
+        v["instances"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|i| i["g"] == 3 && i["family"] == "hyperelliptic")
+            .map(|i| {
+                (
+                    i["p"].as_u64().unwrap(),
+                    i["f"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .map(|x| x.as_u64().unwrap())
+                        .collect(),
+                    i["order"].as_u64().unwrap(),
+                    i["curve_seed"].as_u64().unwrap(),
+                )
+            })
+            .collect()
+    }
+
+    fn check_recorded(src: &str, p_max: u64, p_min: u64) -> usize {
+        let mut n = 0;
+        for (p, f, order, cs) in json_instances(src) {
+            if p > p_max || p < p_min {
+                continue;
+            }
+            let c = JCurve::new(p, 3, &f).unwrap();
+            assert_eq!(
+                c.jacobian_order_with(OrderMethod::Bsgs1, cs),
+                Ok(order),
+                "bsgs1 p={p} cs={cs}"
+            );
+            assert_eq!(
+                c.jacobian_order_with(OrderMethod::Enumerate, cs),
+                Ok(order),
+                "enum p={p} cs={cs}"
+            );
+            if p <= 1031 {
+                assert_eq!(c.jacobian_order_with(OrderMethod::Bsgs2, cs), Ok(order));
+            }
+            n += 1;
+        }
+        n
+    }
+
+    #[test]
+    fn bsgs1_matches_enumerate_on_recorded_instances() {
+        let a = check_recorded(
+            include_str!("../../research/genus_ladder_20261114/analysis.json"),
+            4099,
+            0,
+        );
+        assert_eq!(a, 28);
+    }
+
+    #[test]
+    #[ignore = "minutes: enumerates p = 8209, 16411 and 32771"]
+    fn bsgs1_matches_enumerate_on_scale_instances() {
+        let b = check_recorded(
+            include_str!("../../research/genus_ladder_scale_20261115/g3_analysis.json"),
+            32771,
+            0,
+        );
+        assert_eq!(b, 9);
+    }
+
+    #[test]
+    fn bsgs1_matches_enumerate_on_random_curves() {
+        let p = 1031u64;
+        let (mut ok, mut err, mut tested) = (0, 0, 0);
+        for cs in 9000..9050u64 {
+            let Ok(c) = JCurve::new(p, 3, &random_f(p, 3, cs)) else {
+                continue;
+            };
+            tested += 1;
+            let e = order_outcome(&c, OrderMethod::Enumerate, cs);
+            let b = order_outcome(&c, OrderMethod::Bsgs1, cs);
+            let b2 = order_outcome(&c, OrderMethod::Bsgs2, cs);
+            println!("RANDOM cs={cs} enumerate={e} bsgs1={b} bsgs2={b2}");
+            assert_eq!(e, b, "cs={cs}");
+            assert_eq!(e, b2, "cs={cs}");
+            if e.starts_with("ok") {
+                ok += 1;
+            } else {
+                err += 1;
+            }
+        }
+        println!("RANDOM tested={tested} ok={ok} err={err}");
+        assert!(tested >= 45);
+    }
+
+    #[test]
+    fn bsgs_table_size_is_monotone_and_bounded() {
+        assert!(bsgs_table_size(131101, 3, OrderMethod::Bsgs1) < MAX_BSGS_TABLE);
+        assert!(
+            bsgs_table_size(131101, 3, OrderMethod::Bsgs1)
+                < bsgs_table_size(262147, 3, OrderMethod::Bsgs1)
+        );
+    }
+
+    /// Timing probe: `PROBE_ORDER=p,g,method,cs cargo test --release --lib
+    /// order_probe -- --ignored --nocapture`.
+    #[test]
+    #[ignore = "manual timing probe"]
+    fn order_probe() {
+        let v = std::env::var("PROBE_ORDER").expect("PROBE_ORDER=p,g,method,cs");
+        let a: Vec<&str> = v.split(',').collect();
+        let (p, g, cs): (u64, u32, u64) = (
+            a[0].parse().unwrap(),
+            a[1].parse().unwrap(),
+            a[3].parse().unwrap(),
+        );
+        let c = JCurve::new(p, g, &random_f(p, g, cs)).unwrap();
+        if a[2] == "count2" {
+            let t = std::time::Instant::now();
+            let n = c.count_points(2);
+            println!(
+                "PROBE p={p} g={g} count_points(2)={n} wall_s={:.3}",
+                t.elapsed().as_secs_f64()
+            );
+            if a.len() > 4 {
+                let t = std::time::Instant::now();
+                let r = count_points2_reference(&c);
+                println!(
+                    "PROBE reference={r} wall_s={:.3}",
+                    t.elapsed().as_secs_f64()
+                );
+            }
+            return;
+        }
+        let m = OrderMethod::parse(a[2]).unwrap();
+        let t = std::time::Instant::now();
+        let r = c.jacobian_order_with(m, cs);
+        println!(
+            "PROBE p={p} g={g} method={} cs={cs} result={r:?} table_bound={} wall_s={:.3}",
+            m.name(),
+            bsgs_table_size(p, g as usize, m),
+            t.elapsed().as_secs_f64()
+        );
+    }
+
+    /// The legacy policy is `run_rho_walk` count for count; the window-free
+    /// walks (arms B and Q) certify, and the plain walk without its window is
+    /// the same walk with zero compares (validator finding B13).
+    #[test]
+    fn lean_rho_walks_certify_and_drop_window_compares() {
+        for (p, g) in [(131u64, 3u32), (131, 4), (257, 3), (1031, 3)] {
+            let inst = first_instance(p, g);
+            for seed in 1..=3u64 {
+                let a = run_rho_walk(&inst, seed, RhoWalk::negation());
+                let b = run_rho_policy(&inst, seed, RhoWalk::negation(), WalkPolicy::legacy());
+                assert_eq!(
+                    (a.recovered, a.steps, a.cantor_mul, a.compares, a.native),
+                    (b.recovered, b.steps, b.cantor_mul, b.compares, b.native)
+                );
+                let mut nw = RhoWalk::negation();
+                nw.cycle_window = 0;
+                let br = run_rho_policy(&inst, seed, nw, WalkPolicy::v2());
+                assert!(br.certified, "B p={p} g={g} seed={seed}");
+                assert_eq!(br.recovered, Some(inst.t_secret));
+                let pl = run_rho_walk(&inst, seed, RhoWalk::plain());
+                let mut pw = RhoWalk::plain();
+                pw.cycle_window = 0;
+                let q = run_rho_policy(&inst, seed, pw, WalkPolicy::legacy());
+                assert!(q.certified);
+                assert_eq!(q.compares, 0);
+                if pl.compares > 0 {
+                    // same walk when the window never fired
+                    assert_eq!((pl.recovered, pl.steps), (q.recovered, q.steps));
+                }
+            }
         }
     }
 }

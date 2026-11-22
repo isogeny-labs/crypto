@@ -1,0 +1,146 @@
+{
+  "cross_mechanism_attempt_existence_checks": 2,
+  "cross_mechanism_scalar_agreement_checks": 0,
+  "expected_measured_target_units_per_incidence_arm": 300,
+  "incidence_bounded_target_work": {
+    "8/known": {
+      "attempts_charged": 6,
+      "censored": 1,
+      "completed": 1,
+      "cpu_seconds": {
+        "maximum": 4.0,
+        "median": 2.5,
+        "minimum": 1.0,
+        "n": 2
+      },
+      "failed": 0,
+      "incomplete": 0,
+      "maximum_child_rss_kib": {
+        "maximum": 0.0,
+        "median": 0.0,
+        "minimum": 0.0,
+        "n": 2
+      },
+      "parent_peak_rss_kib": {
+        "maximum": 0.0,
+        "median": 0.0,
+        "minimum": 0.0,
+        "n": 2
+      },
+      "rows": 2,
+      "wall_seconds": {
+        "maximum": 6.0,
+        "median": 4.0,
+        "minimum": 2.0,
+        "n": 2
+      }
+    },
+    "8/pairs": {
+      "attempts_charged": 2,
+      "censored": 0,
+      "completed": 1,
+      "cpu_seconds": {
+        "maximum": 2.0,
+        "median": 2.0,
+        "minimum": 2.0,
+        "n": 1
+      },
+      "failed": 0,
+      "incomplete": 0,
+      "maximum_child_rss_kib": {
+        "maximum": 0.0,
+        "median": 0.0,
+        "minimum": 0.0,
+        "n": 1
+      },
+      "parent_peak_rss_kib": {
+        "maximum": 0.0,
+        "median": 0.0,
+        "minimum": 0.0,
+        "n": 1
+      },
+      "rows": 1,
+      "wall_seconds": {
+        "maximum": 3.0,
+        "median": 3.0,
+        "minimum": 3.0,
+        "n": 1
+      }
+    },
+    "8/pullback": {
+      "attempts_charged": 1,
+      "censored": 0,
+      "completed": 0,
+      "cpu_seconds": {
+        "maximum": 0.5,
+        "median": 0.5,
+        "minimum": 0.5,
+        "n": 1
+      },
+      "failed": 1,
+      "incomplete": 0,
+      "maximum_child_rss_kib": {
+        "maximum": 0.0,
+        "median": 0.0,
+        "minimum": 0.0,
+        "n": 1
+      },
+      "parent_peak_rss_kib": {
+        "maximum": 0.0,
+        "median": 0.0,
+        "minimum": 0.0,
+        "n": 1
+      },
+      "rows": 1,
+      "wall_seconds": {
+        "maximum": 0.5,
+        "median": 0.5,
+        "minimum": 0.5,
+        "n": 1
+      }
+    }
+  },
+  "interpretation": "Incidence time is bounded charged work across all attempted pools, including censored/failed units; it is not automatically time to a completed solve. Root time is per call with supplied literal datum and separately charged isogeny construction. No L2, fitted exponent, fastest-tool or validated speed claim.",
+  "measured_rows": 9,
+  "paired_known_over_arm_completed_only": {
+    "8/known": {
+      "cpu_ratio": {
+        "maximum": 1.0,
+        "median": 1.0,
+        "minimum": 1.0,
+        "n": 1
+      },
+      "wall_ratio": {
+        "maximum": 1.0,
+        "median": 1.0,
+        "minimum": 1.0,
+        "n": 1
+      }
+    },
+    "8/pairs": {
+      "cpu_ratio": {
+        "maximum": 2.0,
+        "median": 2.0,
+        "minimum": 2.0,
+        "n": 1
+      },
+      "wall_ratio": {
+        "maximum": 2.0,
+        "median": 2.0,
+        "minimum": 2.0,
+        "n": 1
+      }
+    }
+  },
+  "pcc_standing": "unverified",
+  "raw_rows": 10,
+  "schema": "trace-runpod-descriptive-summary/v1",
+  "status_counts": {
+    "incidence/known/none": 5,
+    "incidence/known/relation": 1,
+    "incidence/pairs/none": 1,
+    "incidence/pairs/relation": 1,
+    "incidence/pullback/failed": 1
+  },
+  "warmup_rows_retained": 1
+}

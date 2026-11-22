@@ -1,0 +1,62 @@
+{
+  "time": "2026-11-17T00:46:33.493829+00:00",
+  "state": "formatted/source only; no compilation or native call",
+  "prospective_protocol": "a38dff/public54483750e7a8 before adapter code",
+  "written_argument": "465331/not new Lean construction",
+  "new_adapter_sha256": "97b382861cb394865ac4c08cb318c7fda0336e7ad1772146618152ed46902a5c",
+  "all_compiler_inputs": [
+    {
+      "path": "research/chained_richelot_balanced_chart_20261117/Cargo.toml",
+      "bytes": 216,
+      "sha256": "d538fc4dc2cee65379cef0104afd5d080b93bf51f71c80a1da1a495bbaf8d14b"
+    },
+    {
+      "path": "research/chained_richelot_balanced_chart_20261117/Cargo.lock",
+      "bytes": 1118,
+      "sha256": "608c4a9ef0fae79e6ec6a995ed98241ea59997e0c55802f9e71aa71dd448add5"
+    },
+    {
+      "path": "research/chained_richelot_balanced_chart_20261117/fixtures-12.csv",
+      "bytes": 591,
+      "sha256": "c959041cf52d0cf095e019c47ab0e1227ff8a7231a641639d1ff42de1e9a6716"
+    },
+    {
+      "path": "research/chained_richelot_balanced_chart_20261117/REUSED_CORE_EXTRACTION.json",
+      "bytes": 629,
+      "sha256": "ba91a359a68b278070eecaee78f95b93afb7f4a9842ad029184b61263436f35e"
+    },
+    {
+      "path": "research/chained_richelot_balanced_chart_20261117/src/balanced.rs",
+      "bytes": 459,
+      "sha256": "d29a1af40e60afe711fdfe768e4619a4a8c4f1b26e4689971723c904c20b626c"
+    },
+    {
+      "path": "research/chained_richelot_balanced_chart_20261117/src/lib.rs",
+      "bytes": 400,
+      "sha256": "0ae6c94e8adea061f5f3dd88e20033ae963b15ff82ad8f79cf108cfea314d0db"
+    },
+    {
+      "path": "research/chained_richelot_balanced_chart_20261117/src/shifted.rs",
+      "bytes": 20967,
+      "sha256": "97b382861cb394865ac4c08cb318c7fda0336e7ad1772146618152ed46902a5c"
+    },
+    {
+      "path": "research/chained_richelot_balanced_chart_20261117/vendor/fp2.rs",
+      "bytes": 12739,
+      "sha256": "b833bdff5247f2eea0cde7feb89d0378cfe8305671f9065d2dae7ab538c03e55"
+    },
+    {
+      "path": "research/chained_richelot_balanced_chart_20261117/vendor/fp_poly.rs",
+      "bytes": 11867,
+      "sha256": "44f7af14d22bed78d85c4bd009ccce7197fa9257e7ff56164c8d891303e49590"
+    },
+    {
+      "path": "research/chained_richelot_balanced_chart_20261117/reused-core/balanced_core.rs.inc",
+      "bytes": 8554,
+      "sha256": "2f0a6bd3fee1295ec7fa09ab459ceae2b045a9bc8bf13d4d9dcf98fa7cf96434"
+    }
+  ],
+  "source_reuse": "Fp2/FpPoly full vendor bytes and241-line extracted balanced core exact. Core is a clearly named Rust include file, all compiler inputs explicitly hash-pinned. Rustfmt skip affects only unchanged vendor source; new wrappers and adapter formatted normally. Strict Clippy compiles/checks all source, no scientific test skipped.",
+  "dependencies": "offline lock generation only/four cached registry packages pinned checksums: autocfg1.5.1/num-bigint0.4.8/num-integer0.1.47/num-traits0.2.19",
+  "next": "Normal immutable source tag before no-run compiler; separately copied chmod555 qualifier/hash before native unit; one test worker/120s and strict Clippy/fmt/source guards; retain every outcome"
+}

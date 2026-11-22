@@ -3,6 +3,7 @@
 //!   replead-derive counts   > ../results/counts.jsonl
 //!   replead-derive census   > ../results/census.jsonl
 //!   replead-derive powersum > ../results/powersum.jsonl
+//!   replead-derive export   > ../results/systems.jsonl   (PROTOCOL.md cells)
 
 mod anf;
 mod census;
@@ -112,11 +113,97 @@ fn powersum() {
     }
 }
 
+/// Systems for the frozen cells of PROTOCOL.md: per cell, 16 unsatisfiable draws
+/// (exhaustively undecomposable targets) and 4 planted satisfiable draws, in each arm.
+/// One JSON line per (cell, draw, arm); monomials are u64 variable masks.
+fn export() {
+    const CELLS: [(u32, usize, usize); 4] = [(11, 3, 3), (11, 3, 4), (13, 3, 3), (11, 4, 3)];
+    for (n, m, l) in CELLS {
+        let f = field(n);
+        for (a, b) in [(0u64, 1u64), (1, 1)] {
+            let c = Curve { f, a, b };
+            let cell = format!("n{n}-m{m}-l{l}-a{a}");
+            let mut rng =
+                Rng(SEED ^ 0xE0 ^ (n as u64) << 32 ^ (m as u64) << 16 ^ (l as u64) << 8 ^ a);
+            let (mut unsat, mut sat) = (0, 0);
+            let mut draw = 0u32;
+            while unsat < 16 || sat < 4 {
+                let want_sat = unsat >= 16;
+                let (basis, xr, planted) = if want_sat {
+                    let p = plant(&c, l, m, &mut rng);
+                    let xr = match p.sums.last().unwrap() {
+                        curve::Pt::A(x, _) => *x,
+                        _ => unreachable!(),
+                    };
+                    (p.basis.clone(), xr, Some(p))
+                } else {
+                    let basis = systems::random_basis(&f, l, &mut rng);
+                    let r = c.random_point(&mut rng);
+                    if systems::decomposable(&c, &basis, m, r) {
+                        continue;
+                    }
+                    let curve::Pt::A(xr, _) = r else { continue };
+                    (basis, xr, None)
+                };
+                for rep in Rep::PROTOCOL {
+                    let built = match &planted {
+                        Some(p) => build(&c, rep, p),
+                        None => systems::build_target(&c, rep, &basis, m, xr),
+                    };
+                    assert!(
+                        built.nvars <= 64,
+                        "{cell} {} has {} variables",
+                        rep.name(),
+                        built.nvars
+                    );
+                    if planted.is_some() {
+                        assert!(
+                            systems::holds(&built),
+                            "{cell} planted relation fails in {}",
+                            rep.name()
+                        );
+                    }
+                    let polys: Vec<String> = systems::boolean_equations(&built)
+                        .iter()
+                        .map(|q| {
+                            let mut ms: Vec<u64> = q.0.iter().map(|mo| mo[0]).collect();
+                            ms.sort_unstable();
+                            format!(
+                                "[{}]",
+                                ms.iter()
+                                    .map(|v| v.to_string())
+                                    .collect::<Vec<_>>()
+                                    .join(",")
+                            )
+                        })
+                        .collect();
+                    let planted_bits: String = built
+                        .planted
+                        .iter()
+                        .map(|&v| if v { '1' } else { '0' })
+                        .collect();
+                    println!(
+                        "{{\"cell\":\"{cell}\",\"draw\":{draw},\"arm\":\"{}\",\"satisfiable\":{},\"n\":{n},\"m\":{m},\"l\":{l},\"a\":{a},\"b\":{b},\"xr\":{xr},\"basis\":{:?},\"nvars\":{},\"planted\":\"{planted_bits}\",\"polys\":[{}]}}",
+                        rep.name(), want_sat, basis, built.nvars, polys.join(",")
+                    );
+                }
+                if want_sat {
+                    sat += 1
+                } else {
+                    unsat += 1
+                }
+                draw += 1;
+            }
+        }
+    }
+}
+
 fn main() {
     match std::env::args().nth(1).as_deref() {
         Some("counts") => counts(),
         Some("census") => census(),
         Some("powersum") => powersum(),
-        _ => eprintln!("usage: replead-derive counts|census|powersum"),
+        Some("export") => export(),
+        _ => eprintln!("usage: replead-derive counts|census|powersum|export"),
     }
 }

@@ -1,0 +1,9 @@
+# Quotient level2 moduli development contract
+
+Continue actual P-192 d7 kernel1, unchanged principal-function and special-chart evidence, and the declared exact Fp24 compositum. Reference: Tian arXiv:2007.03172 section4.1, equations4.1--4.2. This is functional native development, with no paid run, timing claim or substituted curve.
+
+Normalize source level2 Weil functions on its fixed symplectic basis using square-root checks and cocycle recursion. Check all64 functions against the six basis translations on a separate regular class. The quotient normalization is the cube of source normalization. Compute the64 squared theta ratios at S_delta+v for a nonzero v in the actual kernel. Compare the entire vector at two distinct representatives, requiring the quotient values to agree. Inspect all28 odd zeros and36 even values before applying nonhyperelliptic reconstruction formulas; a vanishing even value is retained as a target-classification outcome, not bypassed.
+
+The generic determinant expression is extended by the fixed precision24 chart evaluator when a support denominator vanishes. Exact matching Fp8 kernel-point cases may use the already-qualified public special-chart values, with actual class/index matching; no generic lookup replaces an uncomputed value. Non-generic degree<3 inputs reject for this stage; screen up to26 nonzero kernel representatives and retain rejection reasons. No search over source curves, field sizes or kernels is authorized by this contract.
+
+Accept only explicit finite-field values and successful normalization/representative checks. This supplies moduli data, not a quartic equation, same-field descent or divisor-class map. A later Riemann reconstruction and projective smoothness check must bind to this exact vector; map and descent remain separate obligations.

@@ -1,0 +1,91 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R82-CANDIDATE-SOURCE-FRACTIONS",
+  "version": 1,
+  "goal": "verify all surviving auxiliary T variables as saved source-module fractions",
+  "claims": [
+    {
+      "id": "candidate_source_fractions82",
+      "class": "exact_computation",
+      "statement": "19 complete denominator-cleared fraction identities hold in the rejected candidate ring"
+    }
+  ],
+  "arms": {
+    "reference": "R50 selected source prime, saved fractional module and candidate ring",
+    "candidate": "19 explicit T(k) fraction identities",
+    "positive": [
+      "literal source map and source ideal containment",
+      "source and candidate denominator nonzero",
+      "all 19 fraction residuals zero"
+    ],
+    "negative": [
+      "corrupted numerator residual nonzero"
+    ],
+    "baseline": {
+      "not_applicable_reason": "exact algebra identity check"
+    },
+    "A_A": {
+      "not_applicable_reason": "complete deterministic relation list"
+    }
+  },
+  "variables": {
+    "fixed": [
+      "saved R50 producer bytes",
+      "R81 surviving T names",
+      "one thread",
+      "1200 seconds",
+      "4 GiB virtual"
+    ],
+    "measured": [
+      "19 residuals",
+      "denominator/source checks",
+      "corrupt control",
+      "exit/errors/hashes"
+    ],
+    "statistical": "not applicable"
+  },
+  "randomization": {
+    "method": "fixed",
+    "reason": "complete surviving coordinate set",
+    "seeds": [
+      82
+    ]
+  },
+  "blinding": {
+    "method": "none",
+    "reason": "exact algebra"
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": "not applicable"
+  },
+  "metrics": [
+    "19 fraction identities",
+    "source map containment",
+    "two denominator checks",
+    "one corrupt control"
+  ],
+  "execution": {
+    "launchers": [
+      "REPLAY_CAS.sh candidate-fractions82-01 FRACTIONS82.sing CANDIDATE_FRACTIONS82_ALL_CHECKS_PASS"
+    ],
+    "backend": "authorized local Singular",
+    "timeout_seconds_per_program": 1200,
+    "virtual_KiB": 4194304,
+    "threads": 1,
+    "seed": 82,
+    "queue": "one math job",
+    "source_gate": "frozen Git bytes and donor hashes",
+    "checkpoint": "existing checkpoint gate; immutable raw copy"
+  },
+  "stopping": {
+    "accept": "exit0, exact marker, zero native errors and all 19 identities plus controls",
+    "failure": "retain raw failure/timeout; freeze repair before new ID"
+  },
+  "analysis": {
+    "method": "complete denominator-cleared reduction in candidate ideal",
+    "scope": "candidate fraction compatibility only; no normality or branch certification"
+  }
+}

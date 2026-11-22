@@ -1,0 +1,100 @@
+{
+  "branch": "codex/native-certified-relation-integration-20261115",
+  "closed_utc": "2026-11-16T12:48:56+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python",
+        "tools/isolated_bench.py",
+        "reserve",
+        "--cpus",
+        "0",
+        "--out",
+        "/workspace/fused-profile-isolation-cb2817388-01.jsonl",
+        "--label",
+        "fixedLAST-matched-streamed-guest-instructions",
+        "--",
+        "/bin/bash",
+        "-e",
+        "-c",
+        "\n/workspace/relation-native-qualifiers/fused-profile-driver-cb2817388-38 fused-profile /workspace/root-paid-inputs-723f4c2dd-01 /workspace/fused-profile-results-cb2817388-01-baseline research/relation_degree_trace_20261115/fused-development/profile-config-baseline-38.json\n/workspace/relation-native-qualifiers/fused-profile-driver-cb2817388-38 fused-profile /workspace/root-paid-inputs-723f4c2dd-01 /workspace/fused-profile-results-cb2817388-01-direct research/relation_degree_trace_20261115/fused-development/profile-config-direct-38.json\n"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T12:43:14+00:00",
+      "wall_s": 5.823
+    }
+  ],
+  "commit": "e0e0a9d0a9ce076e28514007dbcc2bc83df9055f",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T12:43:01+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "bc0ac39ff549",
+    "isolation": "L0",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261116T1243Z-matched-streamed-instruction-profile-20261116",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "baseline_guest_instructions",
+      "note": "Whole-process guestIr including startup/checker, not native cycles or time",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 111865803.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "streamed_guest_instructions",
+      "note": "Same knownLAST fixture, complete checks, no speed ratio",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 108491681.0
+    }
+  ],
+  "problem": "kernel:certified-relations-grevlex",
+  "raw": [
+    {
+      "bytes": 59524,
+      "path": "research/relation_degree_trace_20261115/fused-profile-01/raw-baseline.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4d/4dab584b2ed4e29ae0e6673280f58b8d5de8b2a9f025329ff1c7ab6d4f9ee568",
+      "sha256": "4dab584b2ed4e29ae0e6673280f58b8d5de8b2a9f025329ff1c7ab6d4f9ee568",
+      "uploaded": false
+    },
+    {
+      "bytes": 59512,
+      "path": "research/relation_degree_trace_20261115/fused-profile-01/raw-direct.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/55/557a2cdc8f1bc1ac8e3ce801df96387500e7a81a18e26a97a2dd45aff501cfc4",
+      "sha256": "557a2cdc8f1bc1ac8e3ce801df96387500e7a81a18e26a97a2dd45aff501cfc4",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/relation_degree_trace_20261115/fused-profile-01/direct-report-01/report.pdf",
+    "png": [
+      "research/relation_degree_trace_20261115/fused-profile-01/direct-report-01/self.png"
+    ],
+    "svg": [
+      "research/relation_degree_trace_20261115/fused-profile-01/direct-report-01/self.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "matched-streamed-instruction-profile-20261116",
+  "status": "measured",
+  "summary": "Two exact matched guestIr profiles, same complete checked output/modes/pins,0contention; both reports/raw graphs retained, no native speed inference. PCC0e4eac unsigned.",
+  "validation": null
+}

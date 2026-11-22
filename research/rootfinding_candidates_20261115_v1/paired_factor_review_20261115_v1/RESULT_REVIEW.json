@@ -1,0 +1,54 @@
+{
+  "schema": "independent-recorded-result-review/v1",
+  "created_utc": "2026-11-15T03:02:20.599016+00:00",
+  "experiment_id": "paired-factor-20261115-v1",
+  "scientific_execution_by_reviewer": false,
+  "algorithm_rerun": false,
+  "recorded_status": "passed",
+  "raw_artifact_sha256_verified": true,
+  "raw_output_matches_final_details": true,
+  "wall_seconds": 1.142244478000066,
+  "peak_process_rss_kib": 153804,
+  "memory_scope": "self-process high water; inherited address-space limit, not aggregate tree measurement",
+  "original_root_count_exact": null,
+  "qualified_speedup": null,
+  "release_gate_claim": false,
+  "novelty_claim": false,
+  "decision": "ACCEPT_RECORDED_CONDITIONAL_COMPONENT_ONLY",
+  "controls": {
+    "admitted_cells": 32,
+    "constructed_support_cases": 136,
+    "positive_cells": 0,
+    "raw_states": 16640
+  },
+  "norm_cells_by_field_degree": {
+    "2": 16,
+    "3": 0,
+    "4": 64
+  },
+  "actual_cells": [
+    {
+      "k": 0,
+      "rank": 165,
+      "nullity": 1,
+      "consistent": false,
+      "recorded_row_combination_contradiction_replayed": true,
+      "conditional_norm_candidates": 0
+    },
+    {
+      "k": 1,
+      "rank": 164,
+      "nullity": 2,
+      "consistent": false,
+      "recorded_row_combination_contradiction_replayed": true,
+      "conditional_norm_candidates": 0
+    }
+  ],
+  "limitations": [
+    "No GF8 norm cells: target list empty for A0/B1 prefix source spaces; odd scalar quadratic controls and actualGF83 replay do not replace absent tiny odd norm-cell coverage.",
+    "GF4 prefix has no admitted norm cells; every scalar quadratic and constructed positive source product does exercise even root support.",
+    "All sampled norm cells supported-empty (positive_cells0); constructed136 factors test positive source permutations separately.",
+    "Whole paired source stratum has affine rank<=2 and overlaps previous coverage; no new rank3/global roots or baseline speed claim."
+  ],
+  "next_experiment": "Fresh normal single-pair2+1+1+1 chart; change GF8 target/curve selection and preregister supported positive norm cells, retaining common-factor/zero exceptions UNKNOWN until complete."
+}

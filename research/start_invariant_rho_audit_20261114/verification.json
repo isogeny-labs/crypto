@@ -1,0 +1,78 @@
+{
+  "schema": "start-invariant-rho-verification/v1",
+  "source_commit": "bd8347d6e39fc8f89b33d6c9f995323c0d3b8eac",
+  "claim_id": "PCC-20261114-52a042",
+  "declaration_sha256": "67e5dab5404c635114f843a3257bb0556c706a3a6359d7ecffd69373015c65b7",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 43,
+  "gate_declarations": 22,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 48,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-52a042",
+    "claim_sha256": "32abc9ec6ad48e0b9c068b6d7ce17d33417852ece0a61a600c766154fbd44db5",
+    "commit": "bd8347d6e39fc8f89b33d6c9f995323c0d3b8eac",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/start_invariant_rho_audit_20261114/lean (UniformStartCounterfamily.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T19:24:01Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-52a042",
+    "claim_sha256": "32abc9ec6ad48e0b9c068b6d7ce17d33417852ece0a61a600c766154fbd44db5",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47037,
+    "sha256": "f61cb00aa3e7dc53f59b719314d09ff5eb039788ac4d5b3dbe8ee10cef169275",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 22,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_hash_translation_equivalence_proved": true,
+    "all_real_firstcollision_statistics_start_independent": true,
+    "genuine_joint_mean_equals_zero_start_proved": true,
+    "actual_degree_two_genericity_proved": true,
+    "actual_original_hash_PMF_preserved": true,
+    "pointwise_and_mean_lower_bounds_proved": true,
+    "unbounded_prime_collision_ratio_proved": true,
+    "actual_local_probability_proved": true,
+    "qualified_random_table_refutation": false,
+    "infinite_greedy_sequence_proved": false,
+    "novelty_claim": false,
+    "canonical_corpus_promoted": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

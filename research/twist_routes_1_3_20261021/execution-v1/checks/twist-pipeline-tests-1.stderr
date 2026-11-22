@@ -1,0 +1,22 @@
+warning: value assigned to `cands` is never read
+   --> isogeny_algos/src/quat/deuring.rs:320:17
+    |
+320 |         let mut cands: Vec<([Int; 4], Int)> = vec![];
+    |                 ^^^^^
+    |
+    = help: maybe it is overwritten before being read?
+    = note: `#[warn(unused_assignments)]` on by default
+
+warning: `isogeny_algos` (lib) generated 1 warning
+   Compiling crypto v0.1.0 (/workspace/crypto-twist-runs)
+warning: unused variable: `twist`
+    --> src/cryptanalysis/ecbench/methods.rs:2867:17
+     |
+2867 |             let twist = TwistExperimentBase;
+     |                 ^^^^^ help: if this is intentional, prefix it with an underscore: `_twist`
+     |
+     = note: `#[warn(unused_variables)]` on by default
+
+warning: `crypto` (lib test) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 10m 21s
+     Running unittests src/lib.rs (target/release/deps/crypto_lib-6a16cd246fedb10f)

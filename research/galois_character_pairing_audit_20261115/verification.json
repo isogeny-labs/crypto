@@ -1,0 +1,77 @@
+{
+  "schema": "galois-character-pairing-verification/v1",
+  "source_commit": "2fc41798d616a165d4c8d7955e30f5a687b8b397",
+  "claim_id": "PCC-20261115-4711ad",
+  "declaration_sha256": "117deabc6ffa81828e499acbcc42d2c0a96947d2d3e5605128590db25ba4aee7",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 15,
+  "gate_declarations": 73,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 106,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-4711ad",
+    "claim_sha256": "34fd62d7d8204b7d1c90b67f3c1bf193a7e9d79f455ade7af9fde60998c6be62",
+    "commit": "2fc41798d616a165d4c8d7955e30f5a687b8b397",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/galois_character_pairing_audit_20261115/lean (GaloisPairingCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T00:52:09Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-4711ad",
+    "claim_sha256": "34fd62d7d8204b7d1c90b67f3c1bf193a7e9d79f455ade7af9fde60998c6be62",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46919,
+    "sha256": "1b068af65c39eb26fafd02d372cfa96d753fdfb1c89519633ce29aea5c16d8b0",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 73,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_all_Gamma_equivariant_Omega_characters": true,
+    "actual_character_descent_derived": true,
+    "actual_all_continuous_cocycle_principal_class_quotient": true,
+    "both_duality_MulEquivs_derived": true,
+    "exact_source_Omega_value_formula_proved": true,
+    "actual_characteristic2_guard_deletion_counterexample": true,
+    "canonical_continuous_complex_H1_comparison_proved": false,
+    "full_isogeny_Tate_pairing_proved": false,
+    "original_FR_read": false,
+    "novelty_claim": false,
+    "canonical_corpus_promoted": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

@@ -1,0 +1,62 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T04:34:31Z",
+ "id": "PCC-20261116-645f28",
+ "kind": "theorem",
+ "producer": {
+  "commit": "c39eca1cc28f804a903931341356844cc1273220",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "959bcc4c0fb05fb13dcc9c8d6da7ef830533fb23802049358e6fae9476f14711",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-circuit-v1",
+   "theorem": "Curve25519SelectorInstance.actual_selector_no_wrap"
+  },
+  {
+   "decl_sha256": "8b48c15b8580b3ffc121d57ac1de4364f998d24aefdcda6f1ba55930c33380a8",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-circuit-v1",
+   "theorem": "Curve25519SelectorInstance.actual_selector_range"
+  },
+  {
+   "decl_sha256": "fd374c8042ab02b2a33232caa94b3400f57394ceae0dc03412ab8456437de059",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-circuit-v1",
+   "theorem": "Curve25519SelectorInstance.small_modulus_counterexample"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-circuit-v1/SelectorInstance.lean",
+    "sha256": "e69e1478a9c4527caaade689a9a7a0a88b86c5985f316aebf955f8d6c6bf46d4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-circuit-v1/lakefile.toml",
+    "sha256": "bcfc7565416016d5feb2eb5bfffd3ac334755573b47b30a563857c71da8c5872"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-circuit-v1/lake-manifest.json",
+    "sha256": "434f6ca2bd398320b66eff450c062ba4cff89d1392760b9139125dc5695b64aa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-circuit-v1/lean-toolchain",
+    "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/curve25519_torus_native_20261115/lean-circuit-v1",
+ "statement": "Three fixed numeric selector endpoints: at p=2^255-19, two natural values below32768 whose ZMod sum is20632 have that exact integer sum and selector below20633; the explicit p17,x31,d3 counterexample shows modular range equality alone need not encode the integer interval. No compiler, bit-vector decoding, prime-field or Fp2/map bridge is formalized by these endpoints."
+}

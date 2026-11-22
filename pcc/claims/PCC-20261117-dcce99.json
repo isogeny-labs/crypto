@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T06:09:15Z",
+ "id": "PCC-20261117-dcce99",
+ "kind": "measurement",
+ "producer": {
+  "commit": "247bdde7100b2042d5cb9991d540520478cda9cc",
+  "model": "GPT-6",
+  "session": "vieta-speed-20261117"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vieta_coset_rust_20261115/speed-20261117/run/summary.json",
+    "sha256": "64ff603dccb86ffa0e1fe1b1b904b9a81927e03ac29673b19c06f6ca6d083d2a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vieta_coset_rust_20261115/speed-20261117/run/replay.json",
+    "sha256": "eb3923e7e64bb50bc5452bfc1fc2a9d03fc1a82f2656e904b611a025527a14a2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vieta_coset_rust_20261115/speed-20261117/run/seed-provenance-audit.json",
+    "sha256": "749b6e1640d2f8e197eff7067f513285878723ee515d4d570ffde57e5b84900c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vieta_coset_rust_20261115/speed-20261117/REGISTRATION_ERRATA.md",
+    "sha256": "b055bfed3ecba1f7ec39814a5b1110b26e5497bbb243a57d17031132d0e93ea9"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Producer observations only; fixed6-configuration Rust component-query study, main protocol f88b57e6b52d and pilot af0985e46cd0 unchanged; see registration errata.",
+ "statement": "Vieta speed study completed and replayed504 primary and72 separate calibration calls with no retry. Primitive counters and local elapsed diagnostics are retained by exact configuration/population; half-GCD did not beat Euclid/Newton in local median query elapsed costs, despite fewer multiplications on large word cosets. Strict protocol qualification fails360/60 canonical seed-table checks; published configuration/source provenance matches. No L2, independent signed or end-to-end standing."
+}

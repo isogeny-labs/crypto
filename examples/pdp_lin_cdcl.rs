@@ -452,13 +452,13 @@ impl LinCdcl {
     fn gje(&mut self) -> GjeOutcome {
         self.stats.gje_calls += 1;
         let nv = self.n_vars + 1;
-        let vw = (nv + 63) / 64;
+        let vw = nv.div_ceil(64);
         let n_static = self.xors.len();
         let n_rows = n_static + self.dyn_rows.len();
         if n_rows == 0 {
             return GjeOutcome::Quiet;
         }
-        let rw = (n_rows + 63) / 64;
+        let rw = n_rows.div_ceil(64);
         // Build reduced rows over unassigned vars; rhs folds in assigned values.
         let mut mat: Vec<Vec<u64>> = Vec::with_capacity(n_rows);
         let mut rhs: Vec<bool> = Vec::with_capacity(n_rows);
@@ -623,7 +623,7 @@ impl LinCdcl {
         self.qhead = self.trail.len();
         self.dyn_rows.retain(|d| d.level <= lvl);
         for g in &mut self.gates {
-            if g.linearised_at.map_or(false, |l| l > lvl) {
+            if g.linearised_at.is_some_and(|l| l > lvl) {
                 g.linearised_at = None;
             }
         }
@@ -911,3 +911,8 @@ impl ChainInstance {
         }
     }
 }
+
+/// This file is a module shared by `b0_pdp_sat_baseline.rs` through `#[path]`; cargo also
+/// compiles every file under `examples/` as an example binary, so it needs an entry point.
+#[allow(dead_code)]
+fn main() {}

@@ -6,7 +6,7 @@
 use super::ct::scalar_mul_secret;
 use super::curve::CurveParams;
 use super::point::Point;
-use crate::utils::random::random_scalar;
+use crate::utils::random::{try_random_scalar_with_rng, RandomError};
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
 
@@ -19,10 +19,19 @@ use num_traits::{One, Zero};
 /// scrub before reuse.  For genuinely defence-in-depth zeroization, swap
 /// `num-bigint` for `crypto-bigint` (a constant-time, zeroize-aware
 /// arbitrary-precision integer crate).
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct EccPrivateKey {
     pub scalar: BigUint,
     pub curve_name: String,
+}
+
+impl std::fmt::Debug for EccPrivateKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("EccPrivateKey")
+            .field("curve_name", &self.curve_name)
+            .field("scalar", &"[REDACTED]")
+            .finish()
+    }
 }
 
 impl Drop for EccPrivateKey {
@@ -53,9 +62,20 @@ impl EccKeyPair {
     /// secp256k1 (Algorithms 7/9, a = 0) and P-256 (Algorithms 1/3,
     /// general a).
     pub fn generate(curve: &CurveParams) -> Self {
-        let d = random_scalar(&curve.n);
+        Self::try_generate_with_rng(curve, &mut rand::rngs::OsRng)
+            .expect("ECC key generation requires a valid curve order and OS CSPRNG")
+    }
+
+    /// Generate with caller-owned cryptographic entropy, propagating failures.
+    /// The scalar multiplication has the same supported-curve and timing
+    /// limits as [`scalar_mul_secret`]; RNG injection does not change them.
+    pub fn try_generate_with_rng<R: rand::RngCore + rand::CryptoRng + ?Sized>(
+        curve: &CurveParams,
+        rng: &mut R,
+    ) -> Result<Self, RandomError> {
+        let d = try_random_scalar_with_rng(rng, &curve.n)?;
         let q = scalar_mul_secret(&curve.generator(), &d, curve);
-        EccKeyPair {
+        Ok(EccKeyPair {
             private: EccPrivateKey {
                 scalar: d,
                 curve_name: curve.name.to_string(),
@@ -64,7 +84,7 @@ impl EccKeyPair {
                 point: q,
                 curve_name: curve.name.to_string(),
             },
-        }
+        })
     }
 
     /// Derive the public key from a known private scalar (useful for testing).

@@ -1,0 +1,244 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "pilot 2 binary ksum n24",
+ "description": "pilot, not data. Public synthetic curve.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "binary_explicit",
+    "n": 24,
+    "modulus": 16777243,
+    "a": 0,
+    "b": 6277594,
+    "group_order": 16780264,
+    "r": 2097533,
+    "gx": 11058037,
+    "gy": 14510317
+   }
+  ],
+  "targets_per_curve": 24,
+  "target_seed": 777,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "inc-n48",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=48,mult=1",
+     "oracle": "mitm:m=2,negation_folded=1",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "inc-n67",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=67,mult=1",
+     "oracle": "mitm:m=2,negation_folded=1",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "inc-n96",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=96,mult=1",
+     "oracle": "mitm:m=2,negation_folded=1",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "inc-n137",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=137,mult=1",
+     "oracle": "mitm:m=2,negation_folded=1",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum3-n12",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=12,mult=1",
+     "oracle": "ksum:m=3",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum3-n16",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=16,mult=1",
+     "oracle": "ksum:m=3",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum3-n20",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=20,mult=1",
+     "oracle": "ksum:m=3",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum3-n24",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=24,mult=1",
+     "oracle": "ksum:m=3",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum3-n28",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=28,mult=1",
+     "oracle": "ksum:m=3",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum4-n7",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=7,mult=1",
+     "oracle": "ksum:m=4",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum4-n8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=8,mult=1",
+     "oracle": "ksum:m=4",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum4-n10",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=10,mult=1",
+     "oracle": "ksum:m=4",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum4-n12",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=12,mult=1",
+     "oracle": "ksum:m=4",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum5-n5",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=5,mult=1",
+     "oracle": "ksum:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum5-n6",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=6,mult=1",
+     "oracle": "ksum:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum5-n7",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=7,mult=1",
+     "oracle": "ksum:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum5-n8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=8,mult=1",
+     "oracle": "ksum:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 778,
+  "isolation_required": "L0",
+  "timeout_seconds": 600
+ }
+}

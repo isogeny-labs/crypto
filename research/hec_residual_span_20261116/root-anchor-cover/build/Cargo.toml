@@ -1,0 +1,10 @@
+[package]
+name="hec-root-anchor-cover"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../holdout/native"}
+[[bin]]
+name="root-anchor-cover"
+path="../main.rs"

@@ -1,0 +1,64 @@
+{
+  "schema": "research.pencil-managed-stream-validation/v1",
+  "source_only": true,
+  "admitted_now": {
+    "compile": false,
+    "tests": false,
+    "payload": false,
+    "scientific_targets": false,
+    "cloud_jobs": false
+  },
+  "cohort": {
+    "targets": 1260,
+    "execution_slots": 22680,
+    "measured_executions": 18900,
+    "warmups": 3780,
+    "measured_pencil_rho_pairs": 6300,
+    "measured_rho_aa_pairs": 6300,
+    "pricing_cells": 36,
+    "smaller_success_scope_allowed": false
+  },
+  "required_source_checks": [
+    "managed body remains authoritative and does not call donor solver",
+    "ordinary relation delegates to relation_capture with context None",
+    "trace-disabled branch emits no events and preserves operation order",
+    "progress emit failures remain nonfatal",
+    "trace emit failures return relation_trace_failure without fallback",
+    "online guard closes on every return after begin_online",
+    "terminal follows source scalar verification",
+    "submitted rows and pending constraints are captured after the same collector insertion",
+    "retained exporter keeps custody authentication external",
+    "absent cost and process fields remain null"
+  ],
+  "future_fixture_matrix": {
+    "modes": ["no_sink", "progress_only", "trace_only", "progress_and_trace"],
+    "positive_assertions": [
+      "same recovered scalar or same failure",
+      "same walk/lambda/relation order",
+    "same arithmetic and semantic counters; observer allocation formatting write flush and sync retained separately",
+      "same collector admission and pending constraint",
+      "complete contiguous trace has one header and one terminal",
+      "ordinary source verification and fresh replay agree"
+    ],
+    "negative_controls": [
+      "changed source identity",
+      "changed workload identity",
+      "changed algorithm seed",
+      "changed method config",
+      "duplicate attempt identity",
+      "progress write failure",
+      "trace write failure",
+      "trace record limit",
+      "trace byte limit",
+      "missing terminal",
+      "process timeout",
+      "signal after durable prefix",
+      "collector working cap",
+      "collector retained cap",
+      "changed context record resource or controller pin",
+      "retry presented as primary"
+    ]
+  },
+  "required_independent_review": true,
+  "runtime_checked": false
+}

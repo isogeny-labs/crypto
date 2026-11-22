@@ -764,10 +764,10 @@ pub fn mon4_index(e: (u8, u8, u8)) -> usize {
         .expect("degree-4 monomial")
 }
 
-type Mono = (u8, u8, u8);
-type Poly3 = std::collections::BTreeMap<Mono, K>;
+pub type Mono = (u8, u8, u8);
+pub type Poly3 = std::collections::BTreeMap<Mono, K>;
 
-fn poly3_mul(kf: &Kf, a: &Poly3, b: &Poly3) -> Poly3 {
+pub fn poly3_mul(kf: &Kf, a: &Poly3, b: &Poly3) -> Poly3 {
     let mut r = Poly3::new();
     for (ea, ca) in a {
         for (eb, cb) in b {
@@ -781,7 +781,7 @@ fn poly3_mul(kf: &Kf, a: &Poly3, b: &Poly3) -> Poly3 {
     r
 }
 
-fn poly3_add(kf: &Kf, a: &Poly3, b: &Poly3) -> Poly3 {
+pub fn poly3_add(kf: &Kf, a: &Poly3, b: &Poly3) -> Poly3 {
     let mut r = a.clone();
     for (e, c) in b {
         let cur = r.entry(*e).or_insert([0; 3]);
@@ -791,7 +791,7 @@ fn poly3_add(kf: &Kf, a: &Poly3, b: &Poly3) -> Poly3 {
     r
 }
 
-fn poly3_scale(kf: &Kf, a: &Poly3, c: &K) -> Poly3 {
+pub fn poly3_scale(kf: &Kf, a: &Poly3, c: &K) -> Poly3 {
     let mut r = Poly3::new();
     for (e, v) in a {
         let t = kf.mul(v, c);
@@ -802,7 +802,7 @@ fn poly3_scale(kf: &Kf, a: &Poly3, c: &K) -> Poly3 {
     r
 }
 
-type M3 = [[K; 3]; 3];
+pub type M3 = [[K; 3]; 3];
 
 fn det3(kf: &Kf, a: &M3) -> K {
     let m = |x: &K, y: &K| kf.mul(x, y);
@@ -1042,16 +1042,16 @@ pub enum Reject {
     Order,
 }
 
-struct Core {
-    quartic: [u64; 15],
-    omi: M3,
-    rmat: M3,
-    ea: K,
-    eb: K,
-    wb: K,
-    ws: K,
-    walpha: K,
-    wshift: K,
+pub struct Core {
+    pub quartic: [u64; 15],
+    pub omi: M3,
+    pub rmat: M3,
+    pub ea: K,
+    pub eb: K,
+    pub wb: K,
+    pub ws: K,
+    pub walpha: K,
+    pub wshift: K,
 }
 
 fn resultant_zero(kf: &Kf, a: &[K; 3], b: &[K; 3]) -> bool {
@@ -1062,7 +1062,7 @@ fn resultant_zero(kf: &Kf, a: &[K; 3], b: &[K; 3]) -> bool {
     kf.sub(&kf.mul(&d0, &d0), &kf.mul(&d1, &t)) == [0; 3]
 }
 
-fn build_core(kf: &Kf, ub: &K, uc: &K) -> Result<Core, Reject> {
+pub fn build_core(kf: &Kf, ub: &K, uc: &K) -> Result<Core, Reject> {
     let u = [*uc, *ub, kf.one()];
     let u1 = [kf.frob(&u[0]), kf.frob(&u[1]), kf.one()];
     let u2 = [kf.frob(&u1[0]), kf.frob(&u1[1]), kf.one()];

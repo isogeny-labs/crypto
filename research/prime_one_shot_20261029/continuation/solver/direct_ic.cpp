@@ -24,10 +24,11 @@ struct Counters {
 };
 struct Arithmetic {
     std::uint64_t*reductions;
-    int mod(long long x) const {++*reductions;x%=order;return static_cast<int>(x<0?x+order:x);}
+    int modulus=order;
+    int mod(long long x) const {++*reductions;x%=modulus;return static_cast<int>(x<0?x+modulus:x);}
     int inverse(int x)const{
         x=mod(x);if(!x)throw std::runtime_error("zero scalar inverse");
-        int y=1;for(unsigned e=order-2;e;e>>=1,x=mod(x*x))if(e&1U)y=mod(y*x);
+        int y=1;for(unsigned e=modulus-2;e;e>>=1,x=mod(x*x))if(e&1U)y=mod(y*x);
         return y;
     }
 };

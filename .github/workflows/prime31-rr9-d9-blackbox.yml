@@ -1,0 +1,134 @@
+name: Prime31 RR9 sparse D9 black-box rank (native Rust)
+
+on:
+  push:
+    branches: [automation/prime31-rr9-d9-wiedemann-20261117]
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_d9_blackbox*.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_d9_unit_verify.rs'
+      - 'research/prime31_ic_20261115/rr9/RR9_D9_BLACKBOX_PROTOCOL_20261117.md'
+      - '.github/workflows/prime31-rr9-d9-blackbox.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_d9_blackbox*.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rr9_d9_unit_verify.rs'
+      - 'research/prime31_ic_20261115/rr9/RR9_D9_BLACKBOX_PROTOCOL_20261117.md'
+      - '.github/workflows/prime31-rr9-d9-blackbox.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sparse-d9-exact-source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      CARGO_BUILD_JOBS: '2'
+      RAYON_NUM_THREADS: '1'
+    steps:
+      - name: Checkout only candidate and existing RR9 sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/prime31_ic_20261115/native/examples/prime31_rr9_d9_blackbox.rs
+            /research/prime31_ic_20261115/native/examples/prime31_rr9_d9_blackbox_core.rs
+            /research/prime31_ic_20261115/native/examples/prime31_rr9_d9_unit_verify.rs
+            /research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs
+            /research/prime31_ic_20261115/native/examples/prime31_rr9_barycentric_core.rs
+      - name: Checkout immutable original prime31 arithmetic and F4
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: prime31-native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/prime31_ic_20261115/native/
+            /src/cryptanalysis/
+      - name: Pin original Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay exact candidate and existing public RR9 quadrics
+        shell: bash
+        run: |
+          set -euo pipefail
+          src=research/prime31_ic_20261115/native/examples
+          dest=prime31-native-pinned/research/prime31_ic_20261115/native/examples
+          mkdir -p "$dest"
+          for name in prime31_rr9_d9_blackbox.rs prime31_rr9_d9_blackbox_core.rs prime31_rr9_d9_unit_verify.rs prime31_rr9_public_macaulay.rs prime31_rr9_barycentric_core.rs; do
+            cp "$src/$name" "$dest/$name"
+          done
+          git -C prime31-native-pinned rev-parse HEAD
+          sha256sum "$dest"/prime31_rr9_d9_blackbox*.rs "$dest"/prime31_rr9_public_macaulay.rs
+      - name: Native Rust library regressions plus sparse operator and rank falsifiers
+        shell: bash
+        run: |
+          set -euo pipefail
+          manifest=prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml
+          cargo +1.100.0 test --locked --release --manifest-path "$manifest" --lib
+          cargo +1.100.0 test --locked --release --manifest-path "$manifest" --example prime31_rr9_d9_blackbox
+          cargo +1.100.0 test --locked --release --manifest-path "$manifest" --example prime31_rr9_d9_unit_verify
+          cargo +1.100.0 build --locked --release --manifest-path "$manifest" --example prime31_rr9_d9_blackbox
+          cargo +1.100.0 build --locked --release --manifest-path "$manifest" --example prime31_rr9_d9_unit_verify
+      - name: Public-only first frozen negative D9 exact-rank attempt
+        shell: bash
+        run: |
+          set -euo pipefail
+          exe=prime31-native-pinned/research/prime31_ic_20261115/native/target/release/examples/prime31_rr9_d9_blackbox
+          timeout -k 10 1500 "$exe" 0 > prime31-rr9-d9-neg0.json
+          jq -e '.schema == "prime31.rr9.d9-blackbox-negative.v1" and
+            .p == 2147483647 and .n == 2147446831 and
+            .negative_index == 0 and .rows == 27456 and .columns == 11440 and
+            .krylov_moments == 22880 and .gram_applications == 22880 and
+            .no_sign_mask_or_secret_scalar_passed == true and
+            .one_sided_full_rank_certified == true and
+            .unit_bezout_identity_replayed == true and
+            .unit_bezout_witness_nonzeros > 0 and
+            (.unit_bezout_coefficients | length) == 27456 and
+            .inverse_gram_applications == 11439 and
+            .complete_unknown_ecdlp_solves == 0 and .pcc == "unverified"' prime31-rr9-d9-neg0.json
+          verifier=prime31-native-pinned/research/prime31_ic_20261115/native/target/release/examples/prime31_rr9_d9_unit_verify
+          "$verifier" prime31-rr9-d9-neg0.json > prime31-rr9-d9-replay0.json
+          jq -e '.schema == "prime31.rr9.d9-independent-unit-replay.v1" and
+            .macaulay_rows == 27456 and .macaulay_cols == 11440 and
+            .independent_quadrics_bezout_unit_identity == true and
+            .verified_without_bm_or_sign_masks == true' prime31-rr9-d9-replay0.json
+      - name: Public-only second frozen negative D9 exact-rank attempt
+        shell: bash
+        run: |
+          set -euo pipefail
+          exe=prime31-native-pinned/research/prime31_ic_20261115/native/target/release/examples/prime31_rr9_d9_blackbox
+          timeout -k 10 1500 "$exe" 1 > prime31-rr9-d9-neg1.json
+          jq -e '.schema == "prime31.rr9.d9-blackbox-negative.v1" and
+            .p == 2147483647 and .n == 2147446831 and
+            .negative_index == 1 and .rows == 27456 and .columns == 11440 and
+            .krylov_moments == 22880 and .gram_applications == 22880 and
+            .no_sign_mask_or_secret_scalar_passed == true and
+            .one_sided_full_rank_certified == true and
+            .unit_bezout_identity_replayed == true and
+            .unit_bezout_witness_nonzeros > 0 and
+            (.unit_bezout_coefficients | length) == 27456 and
+            .inverse_gram_applications == 11439 and
+            .complete_unknown_ecdlp_solves == 0 and .pcc == "unverified"' prime31-rr9-d9-neg1.json
+          verifier=prime31-native-pinned/research/prime31_ic_20261115/native/target/release/examples/prime31_rr9_d9_unit_verify
+          "$verifier" prime31-rr9-d9-neg1.json > prime31-rr9-d9-replay1.json
+          jq -e '.schema == "prime31.rr9.d9-independent-unit-replay.v1" and
+            .macaulay_rows == 27456 and .macaulay_cols == 11440 and
+            .independent_quadrics_bezout_unit_identity == true and
+            .verified_without_bm_or_sign_masks == true' prime31-rr9-d9-replay1.json
+      - name: Preserve bounded experimental evidence including failures
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: prime31-rr9-d9-blackbox-negative-rank
+          path: |
+            prime31-rr9-d9-neg*.json
+            prime31-rr9-d9-replay*.json
+          retention-days: 30
+          if-no-files-found: warn

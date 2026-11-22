@@ -1,0 +1,50 @@
+LIB "linalg.lib";
+proc require61(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump61(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
+execute(read("../../../52/source-data/compact-pid51.sing"));
+execute(read("../../../52/source-data/rr-table50.sing"));
+ring normalTrace61=2,(u),(c,dp);short=0;
+map tableMap61=tablePidCertificate50,u;matrix table61=tableMap61(table50);matrix sourceLift61=tableMap61(sourceLift50);intmat parents61=parents50;
+map compactMap61=compactPid51,u;matrix sourceH61=matrix(compactMap61(basis51));poly sourceD61=compactMap61(commonDenominator51);
+matrix Didentity61[32][32];int i61;int j61;int k61;int a61;int b61;int p61;
+for(i61=1;i61<=32;i61++){Didentity61[i61,i61]=sourceD61;}
+require61(sourceH61*sourceLift61==Didentity61,"TRACE61_FULL_NORMAL_SOURCE_BRIDGE");
+intmat slot61[32][32];list mult61;matrix M61[32][32];matrix trace61[1][32];matrix unit61[32][1];matrix unitMult61[32][32];poly unitTrace61;
+for(p61=1;p61<=528;p61++){
+ i61=parents61[p61,1];j61=parents61[p61,2];require61(i61>=1 && i61<=j61 && j61<=32 && slot61[i61,j61]==0,"TRACE61_ALL_PARENT_PAIRS");slot61[i61,j61]=p61;slot61[j61,i61]=p61;
+}
+for(i61=1;i61<=32;i61++){
+ M61=matrix(0,32,32);unit61[i61,1]=sourceLift61[i61,1];
+ for(j61=1;j61<=32;j61++){require61(slot61[i61,j61]>0,"TRACE61_NO_MISSING_PAIR");for(k61=1;k61<=32;k61++){M61[k61,j61]=table61[k61,slot61[i61,j61]];}trace61[1,i61]=trace61[1,i61]+M61[j61,j61];}
+ mult61[i61]=M61;
+}
+for(i61=1;i61<=32;i61++){M61=mult61[i61];unitTrace61=unitTrace61+unit61[i61,1]*trace61[1,i61];for(j61=1;j61<=32;j61++){for(k61=1;k61<=32;k61++){unitMult61[j61,k61]=unitMult61[j61,k61]+unit61[i61,1]*M61[j61,k61];}}}
+require61(unitMult61==unitmat(32) && unitTrace61==0,"TRACE61_UNIT_AND_TRACE_CONTROL");
+matrix T61[32][32];poly expected61;matrix Mi61[32][32];matrix Mj61[32][32];int products61=0;
+for(i61=1;i61<=32;i61++){for(j61=1;j61<=32;j61++){
+ for(k61=1;k61<=32;k61++){T61[i61,j61]=T61[i61,j61]+table61[k61,slot61[i61,j61]]*trace61[1,k61];}
+}}
+for(i61=1;i61<=32;i61++){
+ Mi61=mult61[i61];
+ for(j61=1;j61<=32;j61++){
+  Mj61=mult61[j61];expected61=0;
+  for(a61=1;a61<=32;a61++){for(b61=1;b61<=32;b61++){expected61=expected61+Mi61[a61,b61]*Mj61[b61,a61];}}
+  require61(expected61==T61[i61,j61] && T61[i61,j61]==T61[j61,i61],"TRACE61_ORDERED_TRACE_PRODUCT_AND_SYMMETRY");products61++;
+ }
+ require61(T61[i61,i61]==trace61[1,i61]^2,"TRACE61_TRACE_SQUARE_IDENTITY");
+ print("TRACE61_ROW row="+string(i61)+" ordered_trace_products="+string(products61));
+}
+link polyOut61="ASCII:w trace-polynomial61.sing";open(polyOut61);write(polyOut61,"ring tracePolynomial61=2,(u),dp;short=0;");dump61(polyOut61,"T61",T61);dump61(polyOut61,"trace61",trace61);dump61(polyOut61,"unit61",unit61);close(polyOut61);
+ring traceField61=(2,u),(q),dp;short=0;map fieldMap61=normalTrace61,u;
+matrix TF61=fieldMap61(T61);matrix HF61=fieldMap61(sourceH61);poly DF61=fieldMap61(sourceD61);
+int rank61=mat_rk(TF61);require61(rank61==32,"TRACE61_FULL_FIELD_TRACE_RANK");
+matrix inverse61=lift(module(TF61),module(unitmat(32)));
+require61(TF61*inverse61==unitmat(32) && inverse61*TF61==unitmat(32),"TRACE61_BOTH_INVERSE_PRODUCTS");
+matrix canonical61=HF61*inverse61;
+for(i61=1;i61<=32;i61++){for(j61=1;j61<=32;j61++){canonical61[i61,j61]=canonical61[i61,j61]/DF61;}}
+matrix scaled61[32][32];for(i61=1;i61<=32;i61++){for(j61=1;j61<=32;j61++){scaled61[i61,j61]=DF61*canonical61[i61,j61];}}
+require61(HF61*inverse61==scaled61,"TRACE61_ALL_DUAL_SOURCE_BINDINGS");
+matrix wrong61=TF61;wrong61[1,1]=wrong61[1,1]+1;require61(wrong61*inverse61!=unitmat(32),"TRACE61_CHANGED_GRAM_REJECTED");
+link dualOut61="ASCII:w trace-dual61.sing";open(dualOut61);write(dualOut61,"ring traceDual61=(2,u),(q),dp;short=0;");dump61(dualOut61,"T61",TF61);dump61(dualOut61,"inverse61",inverse61);dump61(dualOut61,"canonical61",canonical61);close(dualOut61);
+print("TRACE61_RESULT normal_basis=32 product_columns=528 ordered_trace_products="+string(products61)+" trace_pairing_rank="+string(rank61)+" dual_columns=32 normal_source_reconstructions=32 inverse_products=2 wrong_gram_rejected=1");
+print("TRACE61_ALL_CHECKS_PASS");quit;

@@ -1,0 +1,33 @@
+research/twist_index_calculus_20261020/zero_fiber_collector/collision_certificate/proof/RepeatedFactor.lean:20:24: error: `grind` failed
+case grind
+R : Type
+inst : Lean.Grind.CommRing R
+noZero : ∀ (u v : R), u * v = 0 → u = 0 ∨ v = 0
+g : R
+k : Nat
+h : g ^ k = 0
+hn : g ^ 0 = 0
+h_1 : ¬g = 0
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] ∀ (u v : R), u * v = 0 → u = 0 ∨ v = 0
+    [prop] g ^ k = 0
+    [prop] 1 = 0
+    [prop] ¬g = 0
+  [eqc] True propositions
+    [prop] ∀ (u v : R), u * v = 0 → u = 0 ∨ v = 0
+  [eqc] False propositions
+    [prop] g = 0
+  [eqc] Equivalence classes
+    [eqc] {0, 1, g ^ k}
+  [ematch] E-matching patterns
+    [thm] noZero: [@HMul.hMul `[R] `[R] `[R] `[instHMul] #2 #1]
+    [thm] Nat.pow_pos: [@HPow.hPow `[Nat] `[Nat] `[Nat] `[instHPow] #2 #1]
+    [thm] Nat.div_pow_of_pos: [@HPow.hPow `[Nat] `[Nat] `[Nat] `[instHPow] #2 #1]
+[grind] Issues
+  [issue] ring term with unexpected instance
+        g ^ k
+'RepeatedFactor.cubic_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'RepeatedFactor.power_zero' depends on axioms: [sorryAx]
+'RepeatedFactor.rejection_of_certificate' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

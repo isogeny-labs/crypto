@@ -1,0 +1,11 @@
+digraph G {
+  graph [rankdir=LR,bgcolor="white",pad="0.1",nodesep="0.15",ranksep="0.2"];
+  node [shape=box,style="rounded,filled",fillcolor="#e7f0fa",fontname="Helvetica",fontsize=10,margin="0.08,0.06"];
+  edge [fontname="Helvetica",fontsize=8,color="#53687d"];
+  original [label="Shared original\nSystem + dependencies"];
+  slice [label="Quiescent affine slice\n32 rows / 64 variables\n256 coefficients"];
+  checked [label="Weighted unit / conflict\nDirect BigUint check\nExact premise snapshot"];
+  leased [label="Apply labelled unit\nDrop lease before Undo\nOriginal root + row replay"];
+  original -> slice -> checked -> leased;
+  leased -> original [label="same original cache; no rebuild"];
+}

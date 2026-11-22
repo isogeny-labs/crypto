@@ -1,0 +1,28 @@
+{
+  "schema": "twist.PARI-receipt/v1",
+  "argv": [
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=1s",
+    "300s",
+    "/workspace/shared/twist-tools-20261023/cas/root/usr/bin/gp",
+    "-f",
+    "-q",
+    "-s",
+    "64000000",
+    "research/twist_routes_1_3_20261021/execution-v14/development-controls-v1/verify.gp"
+  ],
+  "started_epoch_s": 1793230542,
+  "finished_epoch_s": 1793230542,
+  "exit_code": 0,
+  "signal": null,
+  "script_sha256": "7e9aff3a41ef82648fd8efdedb2b4350caf4d2882c2710b9b6bfff1ee579d401",
+  "gp_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+  "stdout": "research/twist_routes_1_3_20261021/execution-v14/development-controls-v1/pari/pari.stdout",
+  "stderr": "research/twist_routes_1_3_20261021/execution-v14/development-controls-v1/pari/pari.stderr",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "1e51154edb2e8f00daee0630084e76553154a52bd9c3223dc4c5308012a1d3cf",
+  "initial_stack_bytes": 64000000,
+  "original_script_unchanged": true,
+  "preload": null
+}

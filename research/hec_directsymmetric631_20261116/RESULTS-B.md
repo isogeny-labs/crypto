@@ -1,0 +1,9 @@
+# Both original direct symmetric inverse solves pass
+
+B uses the identical direct generator as D1, with only its public target vector changed. Generation reads no old divisor/eliminant/quadratic. All twelve generated equations vanish in the complete independently verified original amended-Bdegree12algebra, saturation is invertible and corrupted interpolation is rejected.
+
+The direct solver returns dimension0/degree2 with eliminant s²+570s+460. Divisor coordinates u0,u1,u2,v0,v1,v2 are s,487+221s,60+213s,467+298s,171+275s,154+619s. These exactly match the independent compression certificate. Saturation coordinate is409+420s. Independent substitution passes every one of twelve direct equations, with squarefree eliminant and invertible denominator. No ordered separating-form fallback was needed for this direct solve.
+
+Custody: generation freezea9aef84b6577/checkpoint20261116T030301Z; system freezeff8b1d44f8b2/checkpoint20261116T030327Z. Initial collector invocation exits101before solver spawn because outer SOLVE-B.stderr aliases child solve-B.stderr on the case-insensitive filesystem. Empty child stdout and failure logs are retained. Only child output prefix changed to job-B, frozenf20dd92df8e5/checkpoint20261116T030421Z before the new invocation. The successful child solve was executed once. No polynomial, solver option or acceptance criterion changed. Corrected launcher/control/solver/verifier exit0/stderrempty.
+
+The inherited aggregate collector PASS text mentions three cases, but this invocation executes only B. Per-case outputs are authoritative. D1 is not rerun. Both direct inverses are now exact quadratic parametrizations for the registered source input pair, but direct-output rational class/adjacent replay and charged comparison remain. This does not establish a global map, exceptional-support coverage, general complexity, novelty or10xruntime. Earlier failed charged comparison unchanged; genus2/4and full objective remain open.

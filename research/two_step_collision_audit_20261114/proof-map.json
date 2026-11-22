@@ -1,0 +1,71 @@
+{
+  "main": "TwoStepCollisionAudit.degree_two_collision_certificate",
+  "binding": "4c1acf0fd9722f21066a7ce0cb3de28321e7e626a7fbb2eaa2efafd2c441c000",
+  "custom_imports": {
+    "ActualProbability": "research/two_step_collision_audit_20261114/lean/ActualProbability.lean",
+    "FiniteGraphs": "research/two_step_collision_audit_20261114/lean/FiniteGraphs.lean",
+    "LabelCoefficient": "research/two_step_collision_audit_20261114/lean/LabelCoefficient.lean",
+    "TwoStepCertificate": "research/two_step_collision_audit_20261114/lean/TwoStepCertificate.lean"
+  },
+  "modules": [
+    {
+      "file": "LabelCoefficient.lean",
+      "role": "Generic normalized finite real label-weight inclusion-exclusion: derive coefficient1−I2−I2²+I4 from actual admissible four-label sum."
+    },
+    {
+      "file": "FiniteGraphs.lean",
+      "role": "Actual Z7/staticlabels/orderedstarts, source degree≤2genericity and exact complete populations448/336/112; all kernel checked."
+    },
+    {
+      "file": "ActualProbability.lean",
+      "role": "Genuine uniform6272sample PMF, independent seven label/two start pointmass factors, exact actual event rates and genericity-deletion counter."
+    },
+    {
+      "file": "TwoStepCertificate.lean",
+      "role": "Uniform coefficient3/8/actual source-prediction match, direct omitted-genericity false statement and full explicit combined main."
+    }
+  ],
+  "claims": [
+    {
+      "declaration": "degree_two_label_coefficient",
+      "hypotheses": "Every finite real label-weight list summing to1",
+      "conclusion": "Actual admissible degree-two four-label sum equals1−I2−I2²+I4."
+    },
+    {
+      "declaration": "good_generic / bad_not_generic",
+      "hypotheses": "Actual increment tables1,3 and1,2 on primeZ7",
+      "conclusion": "Literal source degree0/1/2 sum qualification holds for first, fails for second; both distinct/nonzero."
+    },
+    {
+      "declaration": "good_one_count / good_two_count / bad_two_count",
+      "hypotheses": "All128actualstaticmaps×49orderedstartpairs",
+      "conclusion": "Actual one-step/fresh two-step populations448/336/112, no assumed native table."
+    },
+    {
+      "declaration": "sampleLaw_product_mass / sampleLaw_event_mass",
+      "hypotheses": "Actual6272sample uniform PMF",
+      "conclusion": "Seven independent label factors/two independent start factors, event mass equals actual event cardinality/6272."
+    },
+    {
+      "declaration": "good_actual_matches_degree_two_coefficient",
+      "hypotheses": "Actualgoodtable/uniformlabels",
+      "conclusion": "Two-step fresh event probability3/56 equals proved labelcoefficient3/8 divided by7; one-step rate1/14 differs."
+    },
+    {
+      "declaration": "coefficient_formula_without_genericity_false",
+      "hypotheses": "Actualbadtable stilldistinct/nonzero",
+      "conclusion": "Fresh two-step rate1/56 directly disproves source-coefficient extension after deleting degree≤2genericity."
+    }
+  ],
+  "gate_declarations": 26,
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "not established",
+  "open": "General actual-group/support degree-two collision probability coefficient, limiting random-increment-table firstcollision penalty/constants and practical fixed/keyedhash refinement. Known source correction credited, no qualified source theorem refuted."
+}

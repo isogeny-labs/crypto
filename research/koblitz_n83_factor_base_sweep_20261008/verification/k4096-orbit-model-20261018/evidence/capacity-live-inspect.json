@@ -1,0 +1,294 @@
+[
+    {
+        "Id": "f049d254d754d043bedb5e8f6fade785b541d07b8f62ce43fb9e62f0ce72ba45",
+        "Created": "2026-10-18T20:45:41.958095962Z",
+        "Path": "/worker",
+        "Args": [
+            "primary-orbit-chain-build",
+            "/panel",
+            "4096",
+            "public_x_hash",
+            "2026100801",
+            "5",
+            "0",
+            "150000",
+            "2000000",
+            "4096",
+            "/out/worker.json"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 13319,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-10-18T20:45:42.084027628Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:0dd364ba7e10242f07755449e3a3d0e35f9efd987952737b90def6709ab0c5ce",
+        "ResolvConfPath": "/var/lib/docker/containers/f049d254d754d043bedb5e8f6fade785b541d07b8f62ce43fb9e62f0ce72ba45/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/f049d254d754d043bedb5e8f6fade785b541d07b8f62ce43fb9e62f0ce72ba45/hostname",
+        "HostsPath": "/var/lib/docker/containers/f049d254d754d043bedb5e8f6fade785b541d07b8f62ce43fb9e62f0ce72ba45/hosts",
+        "LogPath": "/var/lib/docker/containers/f049d254d754d043bedb5e8f6fade785b541d07b8f62ce43fb9e62f0ce72ba45/f049d254d754d043bedb5e8f6fade785b541d07b8f62ce43fb9e62f0ce72ba45-json.log",
+        "Name": "/n83-chain-capacity-4c63ce37da4b4ede",
+        "RestartCount": 0,
+        "Driver": "overlayfs",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "none",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": true,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "CapAdd": null,
+            "CapDrop": [
+                "ALL"
+            ],
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": true,
+            "SecurityOpt": [
+                "no-new-privileges"
+            ],
+            "Tmpfs": {
+                "/tmp": "rw,noexec,nosuid,size=64m"
+            },
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 4294967296,
+            "NanoCpus": 1000000000,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": [],
+            "BlkioDeviceWriteBps": [],
+            "BlkioDeviceReadIOps": [],
+            "BlkioDeviceWriteIOps": [],
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 4294967296,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": 64,
+            "Ulimits": [],
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "Mounts": [
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990/llm/tmp/n83_k4096_orbit_model_20261018/panel",
+                    "Target": "/panel",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990/crypto/artifacts/n83_k2048_natural_highcap_20261018/worker",
+                    "Target": "/worker",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990/llm/tmp/n83_k4096_orbit_model_20261018/capacity-01/source",
+                    "Target": "/source",
+                    "ReadOnly": true
+                },
+                {
+                    "Type": "bind",
+                    "Source": "/Volumes/SSD990/llm/tmp/n83_k4096_orbit_model_20261018/capacity-01",
+                    "Target": "/out"
+                }
+            ],
+            "MaskedPaths": [
+                "/proc/acpi",
+                "/proc/asound",
+                "/proc/interrupts",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/sys/devices/virtual/powercap",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "Storage": {
+            "RootFS": {
+                "Snapshot": {
+                    "Name": "overlayfs"
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990/llm/tmp/n83_k4096_orbit_model_20261018/panel",
+                "Destination": "/panel",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990/crypto/artifacts/n83_k2048_natural_highcap_20261018/worker",
+                "Destination": "/worker",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990/llm/tmp/n83_k4096_orbit_model_20261018/capacity-01/source",
+                "Destination": "/source",
+                "Mode": "",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/Volumes/SSD990/llm/tmp/n83_k4096_orbit_model_20261018/capacity-01",
+                "Destination": "/out",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "f049d254d754",
+            "Domainname": "",
+            "User": "501:20",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "ICV1_FROZEN_SOURCE_DIR=/source",
+                "PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "LANG=C.UTF-8",
+                "GPG_KEY=A035C8C19219BA821ECEA86B64E628F8D684696D",
+                "PYTHON_VERSION=3.11.17",
+                "PYTHON_SHA256=bfb74ad39efae27cda510f134ab408e00f9992c56851cfc0b1cdb5646da11599"
+            ],
+            "Cmd": [
+                "/worker",
+                "primary-orbit-chain-build",
+                "/panel",
+                "4096",
+                "public_x_hash",
+                "2026100801",
+                "5",
+                "0",
+                "150000",
+                "2000000",
+                "4096",
+                "/out/worker.json"
+            ],
+            "Image": "sha256:0dd364ba7e10242f07755449e3a3d0e35f9efd987952737b90def6709ab0c5ce",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "Labels": {}
+        },
+        "NetworkSettings": {
+            "SandboxID": "dc12eeb413a393c99d830561b5b35bd9881d18dc70631f23ec7988739f1cf287",
+            "SandboxKey": "/var/run/docker/netns/dc12eeb413a3",
+            "Ports": {},
+            "Networks": {
+                "none": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "DriverOpts": null,
+                    "GwPriority": 0,
+                    "NetworkID": "dc053748e31d45366de97db4d48a29c0e156b61a47571b6a61ad24d52db43551",
+                    "EndpointID": "e3edd14ec5f8f4f9b55e9cd3d3e8ba81620b0b8a7746caac38228d32ec511567",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "MacAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:1847ca1d1bc792b4b58fff39c82c67942112e3e1ebc0ee1d06b9014873152ce7",
+            "size": 1748,
+            "annotations": {
+                "com.docker.official-images.bashbrew.arch": "arm64v8",
+                "org.opencontainers.image.base.digest": "sha256:a2ca65377c251208de42e1a2722cb949211236c161b634f6f3663754e2d06850",
+                "org.opencontainers.image.base.name": "debian:trixie-slim",
+                "org.opencontainers.image.created": "2026-10-06T02:00:02Z",
+                "org.opencontainers.image.revision": "cede844ace77284e32c03b61ebc35cdfc945e862",
+                "org.opencontainers.image.source": "https://github.com/docker-library/python.git#cede844ace77284e32c03b61ebc35cdfc945e862:3.11/slim-trixie",
+                "org.opencontainers.image.url": "https://hub.docker.com/_/python",
+                "org.opencontainers.image.version": "3.11.17-slim-trixie"
+            },
+            "platform": {
+                "architecture": "arm64",
+                "os": "linux",
+                "variant": "v8"
+            }
+        }
+    }
+]

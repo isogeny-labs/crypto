@@ -1,0 +1,13 @@
+[package]
+name="hec-direct-profile"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../crates/hec-native-ic"}
+[[bin]]
+name="direct-profile-control"
+path="main.rs"
+[[bin]]
+name="direct-profile-compare"
+path="bench.rs"

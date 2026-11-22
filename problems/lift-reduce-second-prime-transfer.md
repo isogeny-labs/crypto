@@ -114,3 +114,11 @@ A planned step is not a completed experiment.
   (Tate modules cross between fibres because reduction is injective on
   prime-to-characteristic torsion, which is also why the DLP crosses at the
   same size). Unresolved.
+
+## CT38 addendum — explicit good-reduction torsion control (2026-11-12)
+
+**Observed only in public small order 5; [pcc:unverified].** The prior "Observed: none" refers to the state before this addendum. A new independent Python+Go control (see [CT38](../research/lift_reduce_second_prime_20261112/CT38_CROSS_CHAR_TORSION.md)) reduces the five explicit rational torsion points of `y²−y=x³−x²` at good primes 101 and 103. The respective rational group orders are 100 and 120; a distinguished cyclic 5-subgroup transports, with all 25 ordered subgroup additions checked. A naive coordinate substitution on an arbitrary source point is explicitly rejected. This is a constructive **positive toy control**, not a new attack or a characteristic-changing algebraic map. No general input lift was implemented.
+
+**Literature scope correction.** Uniform polynomial lower bounds on global fields of definition of prime-order torsion for arbitrary varying fixed-dimensional abelian varieties (g≥2) must not be inferred from bounds for one fixed A. Gao–Gu (2026, arXiv:2608.22285) proves its number-field uniformity statements under a high-dimensional Szpiro hypothesis. Melistas (2023, DOI 10.1112/blms.12952) explicitly notes the abelian-surface uniform torsion problem remains unresolved. The higher-dimensional gate therefore remains **open**, not an unconditional mathematical obstruction. Shared KB and locked atlas were unavailable in this runtime; sources checked are linked in CT38.
+
+Next: a growing-order global torsion lift for an explicitly constructed g≥2 A/K with minimal field-degree and arbitrary-Q lifting algorithm, then predeclared complete solver costs with approved budget. No cloud allocation or result promotion from CT38. [pcc:unverified]

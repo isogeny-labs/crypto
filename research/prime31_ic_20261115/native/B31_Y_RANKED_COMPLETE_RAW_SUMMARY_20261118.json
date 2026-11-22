@@ -1,0 +1,94 @@
+{
+  "schema": "prime31.b31.y-ranked-complete-summary.v1",
+  "standing": "[pcc:unverified]",
+  "date_utc": "2026-11-18",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "subgroup_order": 2147446831,
+    "generator": [
+      625037715,
+      2100627251
+    ],
+    "cofactor": 1
+  },
+  "original_native_arithmetic_sha": "1df714645aa683cf975bc76fcacb9842cb4780fd",
+  "candidate_source_sha": "03822aff660abef29646c2c006885a300aedafdf",
+  "protocol": "research/prime31_ic_20261115/native/B31_Y_RANKED_COMPLETE_PROTOCOL_20261118.md",
+  "candidate": "original Rust four-plus-four generic-equivalent index-calculus with negation quotient; 31 rational points ranked by minimal canonical y among first 256 rational x lifts",
+  "control": "same Rust method, first 31 rational x points",
+  "target_count_per_arm": 256,
+  "runs": [
+    {
+      "run_id": 44230419721,
+      "job_id": 134553790457,
+      "artifact_id": 14395350831,
+      "independent_checker_in_workflow": false,
+      "AB": {
+        "x_first_ms": 2194.191246,
+        "y_ranked_ms": 2824.345782
+      },
+      "BA": {
+        "y_ranked_ms": 2771.233421,
+        "x_first_ms": 2160.96493
+      }
+    },
+    {
+      "run_id": 44230869392,
+      "job_id": 134555289197,
+      "artifact_id": 14395146631,
+      "artifact_sha256": "ff4808f9f9a28b77031ab4db3e56c1f19b2e39c3df3449dbcc71235e24823863",
+      "independent_checker_in_workflow": true,
+      "AB": {
+        "x_first_ms": 1327.643481,
+        "y_ranked_ms": 1722.114269
+      },
+      "BA": {
+        "y_ranked_ms": 1809.574317,
+        "x_first_ms": 1330.0563
+      }
+    }
+  ],
+  "invariant_results": {
+    "full_rank_per_arm": 31,
+    "unknown_logarithms_verified_per_arm": 256,
+    "generic_BSGS_fallbacks": 0,
+    "first_shift_hits_x_first": 244,
+    "first_shift_hits_y_ranked": 232,
+    "target_exhaustive_misses_x_first": 12,
+    "target_exhaustive_misses_y_ranked": 24,
+    "target_attempts_x_first": 268,
+    "target_attempts_y_ranked": 280,
+    "four_sum_representatives_x_first": 309443,
+    "four_sum_representatives_y_ranked": 309365,
+    "overlap_x_first_vs_y_ranked": 3,
+    "source_ab_ba_transcripts_identical": true
+  },
+  "independent_python_bigint_in_final_workflow": {
+    "factor_base_logs_replayed": 124,
+    "modular_relation_rows_replayed": 124,
+    "target_logarithms_replayed": 1024,
+    "signed_eight_point_witnesses_replayed": 1024,
+    "independent_y_rank_selection_matched": true
+  },
+  "classification": {
+    "exact_complete_prime31_solver_control": true,
+    "sign_independent_algebraic_relation_extractor": false,
+    "new_nongeneric_algorithm": false,
+    "beats_matched_BSGS": false,
+    "independently_signed_PCC": false
+  },
+  "full_raw_transcripts": "GitHub Actions artifact #14395146631 in run 44230869392; AB and BA logs",
+  "next_gate": "Public residual only sign-independent RR9/S9 or balanced S4/S3 exact Rust F4/rootfinding, then full blinded 1024 target pipeline with all costs",
+  "paired_first_shift_corpus_diagnostic": {
+    "same_256_public_targets_one_cohort": true,
+    "hits_both": 221,
+    "hits_x_first_only": 23,
+    "hits_y_ranked_only": 11,
+    "misses_both": 1,
+    "discordant": 34,
+    "posthoc_exact_two_sided_mcnemar_p": 0.05761267291381955,
+    "sampling_note": "same corpus across both GitHub AB/BA executions; runner replicates are not independent target draws and this is not a preregistered significance analysis"
+  }
+}

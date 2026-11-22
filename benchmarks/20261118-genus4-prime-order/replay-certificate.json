@@ -1,0 +1,228 @@
+{
+ "schema": "replay-certificate/v1",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "study": "research/genus4_prime_order_20261118",
+ "commit_validated": "7c0e84dedacc4acd5d6d587bfc6015fcbd2247ba",
+ "freeze_commit": "6da1e3c5b28342e2afd3a8753f844be9398bc5b8",
+ "binary": {
+  "commit": "ca722678990abd7c2396310808a84c20b2457398",
+  "binary_sha256_file": "493ee2942473b8708a0b52f40ab10095c4da83ab0f0755ed3e5dbc02771b6921",
+  "producer_binary_sha256_at_dispatch": "493ee2942473b8708a0b52f40ab10095c4da83ab0f0755ed3e5dbc02771b6921",
+  "validator_rebuild_sha256": "ac1dc60d8cf2d18956ec78ae381471069d3199ee6b7f77192f8505890845c276",
+  "code_sections_identical": true,
+  "harness_val_po_sha256": "81bbb7452728a377bbe809c2616fa72cf4e61fd3843be0b4ac9c38dff4b19c1d",
+  "evidence": "research/genus4_prime_order_20261118/validation/out/binary_diff.txt"
+ },
+ "nonce": "e57128a78a513434ef225010299714d3",
+ "nonce_drawn_utc": "2026-11-18T21:26:34Z",
+ "plan": "research/genus4_prime_order_20261118/validation/out/plan.json",
+ "commands": [
+  "research/genus4_prime_order_20261118/validation/scripts/jobs.py (writes research/genus4_prime_order_20261118/validation/out/jobs.txt)",
+  "research/genus4_prime_order_20261118/validation/scripts/run_jobs.sh"
+ ],
+ "comparison": "every field except wall_ns / search_wall_s / wall_s equal to the committed row (git blob at commit_validated); instance and cell rows equal",
+ "summary": {
+  "run_rows_identical": 73,
+  "run_rows_expected": 73,
+  "by_kind": {
+   "A": 24,
+   "B16x": 12,
+   "B16xs": 12,
+   "B32x": 12,
+   "B32xs": 12,
+   "Q": 1
+  },
+  "search_cells_identical": 3
+ },
+ "runs": [
+  {
+   "tag": "a_cc1.4_180_k2",
+   "rows_replayed": 8,
+   "identical_rows": 8,
+   "instance_rows_identical": true,
+   "cell_row": null,
+   "ok": true,
+   "file": "research/genus4_prime_order_20261118/validation/out/replay/a_cc1.4_180_k2.jsonl"
+  },
+  {
+   "tag": "a_cc2.0_172_k1",
+   "rows_replayed": 8,
+   "identical_rows": 8,
+   "instance_rows_identical": true,
+   "cell_row": null,
+   "ok": true,
+   "file": "research/genus4_prime_order_20261118/validation/out/replay/a_cc2.0_172_k1.jsonl"
+  },
+  {
+   "tag": "a_cc2.8_180_k2",
+   "rows_replayed": 8,
+   "identical_rows": 8,
+   "instance_rows_identical": true,
+   "cell_row": null,
+   "ok": true,
+   "file": "research/genus4_prime_order_20261118/validation/out/replay/a_cc2.8_180_k2.jsonl"
+  },
+  {
+   "tag": "b_p16411_x_752_k0",
+   "rows_replayed": 6,
+   "identical_rows": 6,
+   "instance_rows_identical": true,
+   "cell_row": null,
+   "ok": true,
+   "file": "research/genus4_prime_order_20261118/validation/out/replay/b_p16411_x_752_k0.jsonl"
+  },
+  {
+   "tag": "b_p16411_x_548_k3",
+   "rows_replayed": 6,
+   "identical_rows": 6,
+   "instance_rows_identical": true,
+   "cell_row": null,
+   "ok": true,
+   "file": "research/genus4_prime_order_20261118/validation/out/replay/b_p16411_x_548_k3.jsonl"
+  },
+  {
+   "tag": "b_p16411_xstar_752_k1",
+   "rows_replayed": 6,
+   "identical_rows": 6,
+   "instance_rows_identical": true,
+   "cell_row": null,
+   "ok": true,
+   "file": "research/genus4_prime_order_20261118/validation/out/replay/b_p16411_xstar_752_k1.jsonl"
+  },
+  {
+   "tag": "b_p16411_xstar_373_k2",
+   "rows_replayed": 6,
+   "identical_rows": 6,
+   "instance_rows_identical": true,
+   "cell_row": null,
+   "ok": true,
+   "file": "research/genus4_prime_order_20261118/validation/out/replay/b_p16411_xstar_373_k2.jsonl"
+  },
+  {
+   "tag": "b_p32771_x_1623_k3",
+   "rows_replayed": 6,
+   "identical_rows": 6,
+   "instance_rows_identical": true,
+   "cell_row": null,
+   "ok": true,
+   "file": "research/genus4_prime_order_20261118/validation/out/replay/b_p32771_x_1623_k3.jsonl"
+  },
+  {
+   "tag": "b_p32771_x_882_k1",
+   "rows_replayed": 6,
+   "identical_rows": 6,
+   "instance_rows_identical": true,
+   "cell_row": null,
+   "ok": true,
+   "file": "research/genus4_prime_order_20261118/validation/out/replay/b_p32771_x_882_k1.jsonl"
+  },
+  {
+   "tag": "b_p32771_xstar_882_k1",
+   "rows_replayed": 6,
+   "identical_rows": 6,
+   "instance_rows_identical": true,
+   "cell_row": null,
+   "ok": true,
+   "file": "research/genus4_prime_order_20261118/validation/out/replay/b_p32771_xstar_882_k1.jsonl"
+  },
+  {
+   "tag": "b_p32771_xstar_1623_k3",
+   "rows_replayed": 6,
+   "identical_rows": 6,
+   "instance_rows_identical": true,
+   "cell_row": null,
+   "ok": true,
+   "file": "research/genus4_prime_order_20261118/validation/out/replay/b_p32771_xstar_1623_k3.jsonl"
+  },
+  {
+   "tag": "q_455_k0",
+   "rows_replayed": 1,
+   "identical_rows": 1,
+   "instance_rows_identical": true,
+   "cell_row": null,
+   "ok": true,
+   "file": "research/genus4_prime_order_20261118/validation/out/replay/q_455_k0.jsonl"
+  },
+  {
+   "tag": "search_p32771_r1-1800-3_w3_c0",
+   "rows_replayed": null,
+   "identical_rows": null,
+   "instance_rows_identical": null,
+   "cell_row": [
+    {
+     "admitted": 0,
+     "family": "hyperelliptic",
+     "g": 4,
+     "kind": "cell",
+     "p": 32771,
+     "rejects": {
+      "f_reducible_even_order": 26,
+      "order_not_near_prime": 2
+     },
+     "tried": 28
+    }
+   ],
+   "ok": true,
+   "file": "research/genus4_prime_order_20261118/validation/out/replay/search_p32771_r1-1800-3_w3_c0.jsonl"
+  },
+  {
+   "tag": "search_p32771_r1-1800-3_w0_c0",
+   "rows_replayed": null,
+   "identical_rows": null,
+   "instance_rows_identical": null,
+   "cell_row": [
+    {
+     "admitted": 1,
+     "family": "hyperelliptic",
+     "g": 4,
+     "kind": "cell",
+     "p": 32771,
+     "rejects": {
+      "f_reducible_even_order": 23,
+      "order_not_near_prime": 4
+     },
+     "tried": 28
+    }
+   ],
+   "ok": true,
+   "file": "research/genus4_prime_order_20261118/validation/out/replay/search_p32771_r1-1800-3_w0_c0.jsonl"
+  },
+  {
+   "tag": "search_p32771_r2201-2600-all_w1_c28",
+   "rows_replayed": null,
+   "identical_rows": null,
+   "instance_rows_identical": null,
+   "cell_row": [
+    {
+     "admitted": 1,
+     "family": "hyperelliptic",
+     "g": 4,
+     "kind": "cell",
+     "p": 32771,
+     "rejects": {
+      "f_reducible_even_order": 25,
+      "order_not_near_prime": 2
+     },
+     "tried": 28
+    }
+   ],
+   "ok": true,
+   "file": "research/genus4_prime_order_20261118/validation/out/replay/search_p32771_r2201-2600-all_w1_c28.jsonl"
+  }
+ ],
+ "logarithm_certificates": {
+  "logs_checked": 49,
+  "all_recovered_eq_t_and_G_times_log_eq_T": true,
+  "counts_equal_committed": true,
+  "keys_certified": "60/60",
+  "tamper_control": {
+   "t+1": 3,
+   "count+1": 3,
+   "T coeff": 3,
+   "tried": 3
+  },
+  "evidence": "research/genus4_prime_order_20261118/validation/out/certs.json"
+ }
+}

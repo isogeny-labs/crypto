@@ -8,7 +8,9 @@
  *                      compiles via build.rs for the `gpu-rootfind` feature)
  *   make lib-cuda   -> librootfind_cuda.a     (emulation + CUDA; needs nvcc)
  */
+#include <cstdlib>
 #include <cstring>
+#include <unordered_map>
 #include <string>
 
 #include "rootfind_host.hpp"
@@ -38,6 +40,12 @@ extern "C" int rf_cuda_session64_run(void *h, const uint64_t *tx, const uint64_t
                                      rf_relation *out, uint32_t *n_found, double *seconds);
 extern "C" void rf_cuda_session64_destroy(void *h);
 extern "C" int rf_cuda_warmup(void);
+extern "C" int rf_cuda_pairs_bench(uint64_t p, uint32_t n, uint64_t seed, double *t_cell, double *t_run,
+                                   uint64_t *mismatch);
+extern "C" int rf_cuda_session64_create_pairs(const Fp64Ctx *f, uint64_t a_m, const uint64_t *fb_x,
+                                              const uint64_t *fb_y, uint32_t n_fb, uint32_t chunk,
+                                              uint32_t max_targets, uint32_t cap, void **out,
+                                              uint32_t *n_entries, uint32_t **pairb_host);
 #endif
 
 namespace {
@@ -193,6 +201,7 @@ struct rf64_session {
     uint32_t chunk, max_targets, cap;
     std::vector<uint64_t> fbx, fby;           /* Montgomery form */
     std::vector<uint64_t> px;                 /* probe set, Montgomery form; empty = factor base */
+    std::vector<uint32_t> pairb;              /* pairs mode: probe index -> first pair's build index */
     rf::SortedTableHost sorted;               /* emulation backend's table */
     rf::HashTableHost hash;
     std::vector<uint64_t> mx, my;             /* per-batch scratch */
@@ -208,7 +217,7 @@ extern "C" int rf64_session_create(uint64_t p, const uint64_t *fb_x, const uint6
     if ((p & 1) == 0 || p <= 3 || p >= (1ull << 62)) return RF_ERR_BAD_ARG;
     if (opt.chunk == 0) opt.chunk = RF_DEFAULT_CHUNK_64;
     if (!rf::chunk_ok(opt.chunk)) return RF_ERR_BAD_CHUNK;
-    if (opt.lookup != RF_LOOKUP_AUTO && opt.lookup != RF_LOOKUP_SORTED && opt.lookup != RF_LOOKUP_HASH) return RF_ERR_BAD_ARG;
+    if (opt.lookup < RF_LOOKUP_AUTO || opt.lookup > RF_LOOKUP_HASH_DEVICE) return RF_ERR_BAD_ARG;
     if (opt.backend != RF_BACKEND_AUTO && opt.backend != RF_BACKEND_EMULATE && opt.backend != RF_BACKEND_CUDA) return RF_ERR_BAD_ARG;
     for (uint32_t i = 0; i < n_fb; i++) if (fb_x[i] >= p || fb_y[i] >= p) return RF_ERR_BAD_ARG;
     if (probe_x && n_probe == 0) return RF_ERR_BAD_ARG;
@@ -235,7 +244,7 @@ extern "C" int rf64_session_create(uint64_t p, const uint64_t *fb_x, const uint6
 #else
         rc = RF_ERR_NO_CUDA;
 #endif
-    } else if (s->lookup == RF_LOOKUP_HASH) {
+    } else if (s->lookup == RF_LOOKUP_HASH || s->lookup == RF_LOOKUP_HASH_DEVICE) {
         s->hash = rf::build_hash<FieldFp64>(s->f, keys, n_keys);
     } else {
         s->sorted = rf::build_sorted<FieldFp64>(s->f, keys, n_keys);
@@ -284,6 +293,8 @@ extern "C" int rf64_session_decompose(rf64_session *s, const uint64_t *tx, const
         if (nw) std::memcpy(out, tmp.data(), nw * sizeof(rf_relation));
         res->n_found = found;
         res->n_written = nw;
+        if (!s->pairb.empty())
+            for (uint32_t k = 0; k < nw; k++) if (out[k].tau != 0) out[k].j = s->pairb[out[k].j];
         return found > nw ? RF_ERR_OVERFLOW : RF_OK;
 #else
         return RF_ERR_NO_CUDA;
@@ -297,12 +308,86 @@ extern "C" int rf64_session_decompose(rf64_session *s, const uint64_t *tx, const
     a.out = out; a.out_cap = cap;
     a.out_count = &found;
     double t0 = rf::now_seconds();
-    if (s->lookup == RF_LOOKUP_HASH) rf::emulate_chunk<FieldFp64, HashTable>(a, s->hash.view(), s->chunk);
+    if (s->lookup != RF_LOOKUP_SORTED) rf::emulate_chunk<FieldFp64, HashTable>(a, s->hash.view(), s->chunk);
     else rf::emulate_chunk<FieldFp64, SortedTable>(a, s->sorted.view(), s->chunk);
     res->seconds = rf::now_seconds() - t0;
     res->n_found = found;
     res->n_written = found < cap ? found : cap;
+    if (!s->pairb.empty())
+        for (uint32_t k = 0; k < res->n_written; k++) if (out[k].tau != 0) out[k].j = s->pairb[out[k].j];
     return found > cap ? RF_ERR_OVERFLOW : RF_OK;
+}
+
+extern "C" int rf64_session_create_pairs(uint64_t p, uint64_t curve_a, const uint64_t *fb_x, const uint64_t *fb_y,
+                                         uint32_t n_fb, uint32_t max_targets, uint32_t cap, const rf_options *opt_in,
+                                         rf64_session **out, rf_result *info, uint32_t *n_entries) {
+    rf_options opt = opt_in ? *opt_in : rf_options{RF_BACKEND_AUTO, RF_LOOKUP_AUTO, 0};
+    if (!fb_x || !fb_y || !out || !n_entries || n_fb == 0 || max_targets == 0) return RF_ERR_BAD_ARG;
+    if ((p & 1) == 0 || p <= 3 || p >= (1ull << 62) || curve_a >= p) return RF_ERR_BAD_ARG;
+    /* build indices must fit u32: n (n + 1) < 2^32 */
+    if ((uint64_t)n_fb * ((uint64_t)n_fb + 1) >= (1ull << 32)) return RF_ERR_BAD_ARG;
+    if (opt.chunk == 0) opt.chunk = RF_DEFAULT_CHUNK_64;
+    if (!rf::chunk_ok(opt.chunk)) return RF_ERR_BAD_CHUNK;
+    if (opt.backend != RF_BACKEND_AUTO && opt.backend != RF_BACKEND_EMULATE && opt.backend != RF_BACKEND_CUDA) return RF_ERR_BAD_ARG;
+    for (uint32_t i = 0; i < n_fb; i++) if (fb_x[i] >= p || fb_y[i] >= p || fb_y[i] == 0) return RF_ERR_BAD_ARG;
+    rf64_session *s = new rf64_session();
+    s->f = fp64_ctx_new(p);
+    s->backend = resolve_backend(opt.backend);
+    s->fbx = rf::to_mont64(s->f, fb_x, n_fb);
+    s->fby = rf::to_mont64(s->f, fb_y, n_fb);
+    const uint64_t a_m = fp64_to_mont(s->f, curve_a);
+    s->chunk = opt.chunk;
+    s->max_targets = max_targets;
+    s->cap = cap ? cap : 1;
+    s->cuda = nullptr;
+    int rc = RF_OK;
+    if (s->backend == RF_BACKEND_CUDA) {
+#if RF_HAVE_CUDA
+        uint32_t *pb = nullptr;
+        rc = rf_cuda_session64_create_pairs(&s->f, a_m, s->fbx.data(), s->fby.data(), n_fb, s->chunk,
+                                            max_targets, s->cap, &s->cuda, n_entries, &pb);
+        if (rc == RF_OK) {
+            /* the device translates hits to build indices itself (pb is null) */
+            if (pb) s->pairb.assign(pb, pb + *n_entries);
+            /* the probe set itself stays on the device; px only marks probe mode here */
+            s->px.assign(1, 0);
+        }
+        std::free(pb);
+        s->lookup = RF_LOOKUP_HASH_DEVICE;
+#else
+        rc = RF_ERR_NO_CUDA;
+#endif
+    } else {
+        /* host build, the same keys in the same order; first pair per abscissa */
+        const uint32_t n = n_fb;
+        std::unordered_map<uint64_t, uint32_t> first;
+        first.reserve((size_t)n * (n + 1));
+        /* the device's batched runs (rf_pair_run), then the first pair per key in build order */
+        std::vector<uint64_t> keys((size_t)n * (n + 1));
+        for (uint32_t ai = 0; ai < n; ai++)
+            for (uint32_t b0 = ai; b0 < n; b0 += RF_PAIR_CHUNK)
+                rf_pair_run(s->f, a_m, s->fbx.data(), s->fby.data(), n, ai, b0, keys.data());
+        for (uint32_t b = 0; b < (uint32_t)keys.size(); b++)
+            if (keys[b] != RF_PAIR_EMPTY) first.emplace(keys[b], b);
+        s->px.reserve(first.size());
+        s->pairb.reserve(first.size());
+        for (const auto &kv : first) { s->px.push_back(kv.first); s->pairb.push_back(kv.second); }
+        *n_entries = (uint32_t)s->px.size();
+        s->lookup = RF_LOOKUP_HASH;
+        s->hash = rf::build_hash<FieldFp64>(s->f, s->px.data(), (uint32_t)s->px.size());
+    }
+    if (rc != RF_OK) {
+        delete s;
+        return rc;
+    }
+    if (info) {
+        std::memset(info, 0, sizeof(*info));
+        info->backend_used = s->backend;
+        info->lookup_used = RF_LOOKUP_PAIRS_DEVICE;
+        info->chunk_used = s->chunk;
+    }
+    *out = s;
+    return RF_OK;
 }
 
 extern "C" void rf64_session_destroy(rf64_session *s) {
@@ -312,6 +397,8 @@ extern "C" void rf64_session_destroy(rf64_session *s) {
 #endif
     delete s;
 }
+
+extern "C" unsigned rf_emu_threads(void) { return rf::EmuPool::get().size(); }
 
 extern "C" int rf_warmup(void) {
 #if RF_HAVE_CUDA
@@ -354,4 +441,13 @@ extern "C" const char *rf_strerror(int status) {
         case RF_ERR_NOMEM: return "out of memory";
         default: return "unknown status";
     }
+}
+
+int rf_pairs_bench(uint64_t p, uint32_t n, uint64_t seed, double *t_cell, double *t_run, uint64_t *mismatch) {
+#if RF_HAVE_CUDA
+    return rf_cuda_pairs_bench(p, n, seed, t_cell, t_run, mismatch);
+#else
+    (void)p; (void)n; (void)seed; (void)t_cell; (void)t_run; (void)mismatch;
+    return -1;
+#endif
 }

@@ -1,0 +1,22 @@
+LIB "linalg.lib";
+proc require55(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump55(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
+execute(read("../../../52/source-data/compact-pid51.sing"));matrix H55=matrix(basis51);
+execute(read("../../../52/source-data/rr-table50.sing"));intmat parents55=parents50;
+map source55=compactPid51,u;
+require55(source55(H55)*sourceLift50==source55(commonDenominator51)*unitmat(32),"QUOTIENT55_GLOBAL_NORMAL_SOURCE_BINDING");
+proc multiply55(matrix x,matrix table){
+ matrix M[32][32];int p;int i;int j;int k;
+ for(p=1;p<=528;p++){i=parents55[p,1];j=parents55[p,2];for(k=1;k<=32;k++){M[k,j]=M[k,j]+x[i,1]*table[k,p];if(i!=j){M[k,i]=M[k,i]+x[j,1]*table[k,p];}}}return(M);
+}
+matrix one55[32][1];matrix v55[32][1];matrix lambda55[32][1];int i55;int j55;int k55;
+for(i55=1;i55<=32;i55++){one55[i55,1]=sourceLift50[i55,1];lambda55[i55,1]=sourceLift50[i55,2];v55[i55,1]=sourceLift50[i55,17];}
+matrix V55=multiply55(v55,table50);matrix I55=unitmat(32);matrix Z55[32][32];
+require55(multiply55(one55,table50)==I55,"QUOTIENT55_GLOBAL_UNIT");
+matrix baseResidual55=V55*V55+u^2*V55+(u+u^3)*I55;
+print("DIAG55_V="+string(nrows(V55))+"x"+string(ncols(V55))+" I="+string(nrows(I55))+"x"+string(ncols(I55))+" residual="+string(nrows(baseResidual55))+"x"+string(ncols(baseResidual55)));
+print("DIAG55_BASE_ZERO="+string(baseResidual55==Z55));
+matrix R55=(1+u)*V55+u^3*I55;
+print("DIAG55_R="+string(nrows(R55))+"x"+string(ncols(R55)));
+matrix scalar55=(1+u)*V55;matrix scalarTwo55=V55*(1+u);print("DIAG55_SCALAR_LEFT="+string(nrows(scalar55))+"x"+string(ncols(scalar55))+" RIGHT="+string(nrows(scalarTwo55))+"x"+string(ncols(scalarTwo55)));
+print("DIAG55_ALL_CHECKS_PASS");quit;

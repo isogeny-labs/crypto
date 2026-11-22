@@ -1,0 +1,11 @@
+digraph Pole {
+  graph [rankdir=LR,bgcolor="white",fontname="DejaVu Sans",ranksep=0.35];
+  node [shape=box,style="rounded,filled",fillcolor="#f4edfc",color="#735397",fontname="DejaVu Sans",fontsize=10];
+  edge [color="#735397",fontname="DejaVu Sans",fontsize=9];
+  p [label="P=(x,y)"];
+  p1 [label="sigma(P)"];
+  p2 [label="sigma^2(P)=(x,-y)"];
+  p3 [label="sigma^3(P)"];
+  p -> p1 -> p2 -> p3;
+  p3 -> p [label="Frobenius"];
+}

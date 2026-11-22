@@ -85,7 +85,7 @@ fn row(session: &str, r: &Record) -> Option<Row> {
         session: session.into(),
         arm: r.arm.clone(),
         method: r.method.id.clone(),
-        log2_r: (r.workload.curve.r as f64).log2(),
+        log2_r: (r.workload.curve.r.to_f64()).log2(),
         bitops: f(&v2.bitops),
         complete: v2.complete,
         mem_sum: f(&v2.memory_bits),

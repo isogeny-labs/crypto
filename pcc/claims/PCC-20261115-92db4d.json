@@ -1,0 +1,36 @@
+{
+ "created_at": "2026-11-15T06:11:02Z",
+ "id": "PCC-20261115-92db4d",
+ "kind": "statement",
+ "producer": {
+  "commit": "781d0fdc70bd0558bf50a0c661754a05295f449a",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_linearized_20261115/checks/unit-tests-final2.txt",
+    "sha256": "3316540512646c1b5405437a01e573a868fd59f1064c8a0b42eeae1c38e52dfd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_linearized_20261115/symmetric.identity.json",
+    "sha256": "f20133cf133b363862743542580c03eb00c7f42f62b38c38f61af3e21b6eeb70"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_linearized_20261115/workload.json",
+    "sha256": "2a1712a97cb882ddd26e0a6c37a17c70a5ba9fc8fb57bb0a2d681331e0cabeb5"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Producer correctness/static-preparation evidence only; rank-deficiency model cap tested; no solver-performance or novelty claim.",
+ "statement": "A native residual-linearized trace-zero backend and prepared-admission SAT variant pass three focused exact small-group/resource checks. Sixty-five-case scale input and an evaluated integral S3 expansion are prepared before new primary data."
+}

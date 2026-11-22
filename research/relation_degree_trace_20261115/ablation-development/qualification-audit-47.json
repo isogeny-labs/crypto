@@ -1,0 +1,2492 @@
+{
+  "cells": [
+    {
+      "affine_trace": {
+        "solving_degree": 5,
+        "status": "complete",
+        "trace": [
+          {
+            "closure_completed": true,
+            "closure_rounds": 3,
+            "columns": 35,
+            "degree": 4,
+            "degree_falls": 2,
+            "max_new_certificate_product_degree": 5,
+            "new_pivot_degree_histogram": {
+              "3": 2,
+              "4": 8
+            },
+            "new_pivots": 10,
+            "new_row_nonzeros": 152,
+            "new_rows_processed": 18,
+            "rank": 10,
+            "reference_gb_contained": false,
+            "row_reductions": 12
+          },
+          {
+            "closure_completed": true,
+            "closure_rounds": 4,
+            "columns": 56,
+            "degree": 5,
+            "degree_falls": 20,
+            "max_new_certificate_product_degree": 10,
+            "new_pivot_degree_histogram": {
+              "2": 6,
+              "3": 8,
+              "4": 7,
+              "5": 21
+            },
+            "new_pivots": 42,
+            "new_row_nonzeros": 2975,
+            "new_rows_processed": 291,
+            "rank": 52,
+            "reference_gb_contained": true,
+            "row_reductions": 4647
+          }
+        ]
+      },
+      "cell": {
+        "added_projection_rows": 0,
+        "case_wall_ns": 115782477,
+        "checked_f4_ns": 5097240,
+        "class": "star",
+        "class_index": 0,
+        "construction_ns": 17276,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 19109,
+        "identities_ok": true,
+        "identity_check_ns": 34334253,
+        "input_equations": 4,
+        "input_sha256": "266701ed30601d20d48e83dcfcb0866ceccc8617ab0452e58daca1e2d9b173f8",
+        "n": 3,
+        "paid_ns": 80316548,
+        "point_scalar_identity": true,
+        "preparation_ns": 118017,
+        "reference_ns": 40730653,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 35312801
+      },
+      "f4": {
+        "basis": [
+          [
+            [
+              [
+                0,
+                0,
+                2
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              655129145
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              670801058
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1410291062
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1750706894
+            ]
+          ],
+          [
+            [
+              [
+                0,
+                1,
+                1
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1144253695
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              1320014236
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1738558738
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              840233451
+            ]
+          ],
+          [
+            [
+              [
+                0,
+                2,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1198490113
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              551208325
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              2123873748
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              429767544
+            ]
+          ],
+          [
+            [
+              [
+                1,
+                0,
+                1
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1279911688
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              1615522021
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              661099333
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1945896101
+            ]
+          ],
+          [
+            [
+              [
+                1,
+                1,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              688162720
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              754704226
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1535191578
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1508837744
+            ]
+          ],
+          [
+            [
+              [
+                2,
+                0,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              2026198555
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              494067049
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1980327804
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1786507575
+            ]
+          ]
+        ],
+        "clock_ns": {
+          "canonical_output": 9925,
+          "construction_and_internal_checks": 278999,
+          "input_parse_admission_conversion": 122204
+        },
+        "clock_scope": "worker call; excludes process launch and printing; not a speed ratio",
+        "engine": "f4",
+        "f4_observations": {
+          "highest_processed_pair_degree": 5,
+          "highest_productive_degree_raw": 5,
+          "max_columns": 37,
+          "max_rows": 34,
+          "pairs_above_bound": 0,
+          "staircase_at_stop": null,
+          "steps": 8,
+          "timed_out": false,
+          "trace_mismatch": false
+        },
+        "observed_solving_degree": 5,
+        "prime": 2147483647,
+        "quotient_info": null,
+        "requires_matched_external_basis_check": true,
+        "schema": "relation-root-worker/v1",
+        "status": "complete",
+        "variables": 3,
+        "worker_wall_before_print_ns": 439370
+      },
+      "top_form_hilbert": {
+        "hilbert": {
+          "status": "not_vanished_within_cap",
+          "top_form_d_reg": null,
+          "trace": [
+            {
+              "degree": 0,
+              "hilbert_function": 1,
+              "monomials": 1,
+              "rank": 0
+            },
+            {
+              "degree": 1,
+              "hilbert_function": 3,
+              "monomials": 3,
+              "rank": 0
+            },
+            {
+              "degree": 2,
+              "hilbert_function": 6,
+              "monomials": 6,
+              "rank": 0
+            },
+            {
+              "degree": 3,
+              "hilbert_function": 10,
+              "monomials": 10,
+              "rank": 0
+            },
+            {
+              "degree": 4,
+              "hilbert_function": 13,
+              "monomials": 15,
+              "rank": 2
+            },
+            {
+              "degree": 5,
+              "hilbert_function": 15,
+              "monomials": 21,
+              "rank": 6
+            },
+            {
+              "degree": 6,
+              "hilbert_function": 17,
+              "monomials": 28,
+              "rank": 11
+            },
+            {
+              "degree": 7,
+              "hilbert_function": 19,
+              "monomials": 36,
+              "rank": 17
+            },
+            {
+              "degree": 8,
+              "hilbert_function": 21,
+              "monomials": 45,
+              "rank": 24
+            }
+          ]
+        },
+        "hilbert_ns": 50606
+      },
+      "trace_rows_checked": 50
+    },
+    {
+      "affine_trace": {
+        "solving_degree": 5,
+        "status": "complete",
+        "trace": [
+          {
+            "closure_completed": true,
+            "closure_rounds": 3,
+            "columns": 35,
+            "degree": 4,
+            "degree_falls": 2,
+            "max_new_certificate_product_degree": 5,
+            "new_pivot_degree_histogram": {
+              "3": 2,
+              "4": 9
+            },
+            "new_pivots": 11,
+            "new_row_nonzeros": 157,
+            "new_rows_processed": 19,
+            "rank": 11,
+            "reference_gb_contained": false,
+            "row_reductions": 12
+          },
+          {
+            "closure_completed": true,
+            "closure_rounds": 3,
+            "columns": 56,
+            "degree": 5,
+            "degree_falls": 20,
+            "max_new_certificate_product_degree": 8,
+            "new_pivot_degree_histogram": {
+              "2": 6,
+              "3": 8,
+              "4": 6,
+              "5": 21
+            },
+            "new_pivots": 41,
+            "new_row_nonzeros": 2646,
+            "new_rows_processed": 290,
+            "rank": 52,
+            "reference_gb_contained": true,
+            "row_reductions": 3912
+          }
+        ]
+      },
+      "cell": {
+        "added_projection_rows": 1,
+        "case_wall_ns": 74589596,
+        "checked_f4_ns": 5093570,
+        "class": "root-projection",
+        "class_index": 1,
+        "construction_ns": 786311,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 30396,
+        "identities_ok": true,
+        "identity_check_ns": 17624538,
+        "input_equations": 5,
+        "input_sha256": "38c07675a547a17f45e0ee3747567dbf3020c12bd9460654724d0f92c9734e36",
+        "n": 3,
+        "paid_ns": 53810703,
+        "point_scalar_identity": true,
+        "preparation_ns": 377738,
+        "reference_ns": 29898150,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 20649701
+      },
+      "f4": {
+        "basis": [
+          [
+            [
+              [
+                0,
+                0,
+                2
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              655129145
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              670801058
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1410291062
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1750706894
+            ]
+          ],
+          [
+            [
+              [
+                0,
+                1,
+                1
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1144253695
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              1320014236
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1738558738
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              840233451
+            ]
+          ],
+          [
+            [
+              [
+                0,
+                2,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1198490113
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              551208325
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              2123873748
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              429767544
+            ]
+          ],
+          [
+            [
+              [
+                1,
+                0,
+                1
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1279911688
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              1615522021
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              661099333
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1945896101
+            ]
+          ],
+          [
+            [
+              [
+                1,
+                1,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              688162720
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              754704226
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1535191578
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1508837744
+            ]
+          ],
+          [
+            [
+              [
+                2,
+                0,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              2026198555
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              494067049
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1980327804
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1786507575
+            ]
+          ]
+        ],
+        "clock_ns": {
+          "canonical_output": 9774,
+          "construction_and_internal_checks": 260592,
+          "input_parse_admission_conversion": 96015
+        },
+        "clock_scope": "worker call; excludes process launch and printing; not a speed ratio",
+        "engine": "f4",
+        "f4_observations": {
+          "highest_processed_pair_degree": 5,
+          "highest_productive_degree_raw": 5,
+          "max_columns": 37,
+          "max_rows": 29,
+          "pairs_above_bound": 0,
+          "staircase_at_stop": null,
+          "steps": 7,
+          "timed_out": false,
+          "trace_mismatch": false
+        },
+        "observed_solving_degree": 5,
+        "prime": 2147483647,
+        "quotient_info": null,
+        "requires_matched_external_basis_check": true,
+        "schema": "relation-root-worker/v1",
+        "status": "complete",
+        "variables": 3,
+        "worker_wall_before_print_ns": 394583
+      },
+      "top_form_hilbert": {
+        "hilbert": {
+          "status": "not_vanished_within_cap",
+          "top_form_d_reg": null,
+          "trace": [
+            {
+              "degree": 0,
+              "hilbert_function": 1,
+              "monomials": 1,
+              "rank": 0
+            },
+            {
+              "degree": 1,
+              "hilbert_function": 3,
+              "monomials": 3,
+              "rank": 0
+            },
+            {
+              "degree": 2,
+              "hilbert_function": 6,
+              "monomials": 6,
+              "rank": 0
+            },
+            {
+              "degree": 3,
+              "hilbert_function": 10,
+              "monomials": 10,
+              "rank": 0
+            },
+            {
+              "degree": 4,
+              "hilbert_function": 12,
+              "monomials": 15,
+              "rank": 3
+            },
+            {
+              "degree": 5,
+              "hilbert_function": 12,
+              "monomials": 21,
+              "rank": 9
+            },
+            {
+              "degree": 6,
+              "hilbert_function": 13,
+              "monomials": 28,
+              "rank": 15
+            },
+            {
+              "degree": 7,
+              "hilbert_function": 15,
+              "monomials": 36,
+              "rank": 21
+            },
+            {
+              "degree": 8,
+              "hilbert_function": 17,
+              "monomials": 45,
+              "rank": 28
+            }
+          ]
+        },
+        "hilbert_ns": 58047
+      },
+      "trace_rows_checked": 49
+    },
+    {
+      "affine_trace": {
+        "solving_degree": 5,
+        "status": "complete",
+        "trace": [
+          {
+            "closure_completed": true,
+            "closure_rounds": 3,
+            "columns": 35,
+            "degree": 4,
+            "degree_falls": 2,
+            "max_new_certificate_product_degree": 5,
+            "new_pivot_degree_histogram": {
+              "3": 2,
+              "4": 8
+            },
+            "new_pivots": 10,
+            "new_row_nonzeros": 152,
+            "new_rows_processed": 18,
+            "rank": 10,
+            "reference_gb_contained": false,
+            "row_reductions": 12
+          },
+          {
+            "closure_completed": true,
+            "closure_rounds": 4,
+            "columns": 56,
+            "degree": 5,
+            "degree_falls": 20,
+            "max_new_certificate_product_degree": 10,
+            "new_pivot_degree_histogram": {
+              "2": 6,
+              "3": 8,
+              "4": 7,
+              "5": 21
+            },
+            "new_pivots": 42,
+            "new_row_nonzeros": 2975,
+            "new_rows_processed": 291,
+            "rank": 52,
+            "reference_gb_contained": true,
+            "row_reductions": 4647
+          }
+        ]
+      },
+      "cell": {
+        "added_projection_rows": 0,
+        "case_wall_ns": 82260711,
+        "checked_f4_ns": 3897283,
+        "class": "nonroot-projections",
+        "class_index": 2,
+        "construction_ns": 696616,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 30636,
+        "identities_ok": true,
+        "identity_check_ns": 14053671,
+        "input_equations": 4,
+        "input_sha256": "266701ed30601d20d48e83dcfcb0866ceccc8617ab0452e58daca1e2d9b173f8",
+        "n": 3,
+        "paid_ns": 46698476,
+        "point_scalar_identity": true,
+        "preparation_ns": 87822,
+        "reference_ns": 27932448,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 35434965
+      },
+      "f4": {
+        "basis": [
+          [
+            [
+              [
+                0,
+                0,
+                2
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              655129145
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              670801058
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1410291062
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1750706894
+            ]
+          ],
+          [
+            [
+              [
+                0,
+                1,
+                1
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1144253695
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              1320014236
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1738558738
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              840233451
+            ]
+          ],
+          [
+            [
+              [
+                0,
+                2,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1198490113
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              551208325
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              2123873748
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              429767544
+            ]
+          ],
+          [
+            [
+              [
+                1,
+                0,
+                1
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1279911688
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              1615522021
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              661099333
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1945896101
+            ]
+          ],
+          [
+            [
+              [
+                1,
+                1,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              688162720
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              754704226
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1535191578
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1508837744
+            ]
+          ],
+          [
+            [
+              [
+                2,
+                0,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              2026198555
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              494067049
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1980327804
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1786507575
+            ]
+          ]
+        ],
+        "clock_ns": {
+          "canonical_output": 9604,
+          "construction_and_internal_checks": 249255,
+          "input_parse_admission_conversion": 92439
+        },
+        "clock_scope": "worker call; excludes process launch and printing; not a speed ratio",
+        "engine": "f4",
+        "f4_observations": {
+          "highest_processed_pair_degree": 5,
+          "highest_productive_degree_raw": 5,
+          "max_columns": 37,
+          "max_rows": 34,
+          "pairs_above_bound": 0,
+          "staircase_at_stop": null,
+          "steps": 8,
+          "timed_out": false,
+          "trace_mismatch": false
+        },
+        "observed_solving_degree": 5,
+        "prime": 2147483647,
+        "quotient_info": null,
+        "requires_matched_external_basis_check": true,
+        "schema": "relation-root-worker/v1",
+        "status": "complete",
+        "variables": 3,
+        "worker_wall_before_print_ns": 378839
+      },
+      "top_form_hilbert": {
+        "hilbert": {
+          "status": "not_vanished_within_cap",
+          "top_form_d_reg": null,
+          "trace": [
+            {
+              "degree": 0,
+              "hilbert_function": 1,
+              "monomials": 1,
+              "rank": 0
+            },
+            {
+              "degree": 1,
+              "hilbert_function": 3,
+              "monomials": 3,
+              "rank": 0
+            },
+            {
+              "degree": 2,
+              "hilbert_function": 6,
+              "monomials": 6,
+              "rank": 0
+            },
+            {
+              "degree": 3,
+              "hilbert_function": 10,
+              "monomials": 10,
+              "rank": 0
+            },
+            {
+              "degree": 4,
+              "hilbert_function": 13,
+              "monomials": 15,
+              "rank": 2
+            },
+            {
+              "degree": 5,
+              "hilbert_function": 15,
+              "monomials": 21,
+              "rank": 6
+            },
+            {
+              "degree": 6,
+              "hilbert_function": 17,
+              "monomials": 28,
+              "rank": 11
+            },
+            {
+              "degree": 7,
+              "hilbert_function": 19,
+              "monomials": 36,
+              "rank": 17
+            },
+            {
+              "degree": 8,
+              "hilbert_function": 21,
+              "monomials": 45,
+              "rank": 24
+            }
+          ]
+        },
+        "hilbert_ns": 49064
+      },
+      "trace_rows_checked": 50
+    },
+    {
+      "affine_trace": {
+        "solving_degree": 5,
+        "status": "complete",
+        "trace": [
+          {
+            "closure_completed": true,
+            "closure_rounds": 3,
+            "columns": 35,
+            "degree": 4,
+            "degree_falls": 2,
+            "max_new_certificate_product_degree": 5,
+            "new_pivot_degree_histogram": {
+              "3": 2,
+              "4": 9
+            },
+            "new_pivots": 11,
+            "new_row_nonzeros": 157,
+            "new_rows_processed": 19,
+            "rank": 11,
+            "reference_gb_contained": false,
+            "row_reductions": 12
+          },
+          {
+            "closure_completed": true,
+            "closure_rounds": 3,
+            "columns": 56,
+            "degree": 5,
+            "degree_falls": 20,
+            "max_new_certificate_product_degree": 8,
+            "new_pivot_degree_histogram": {
+              "2": 6,
+              "3": 8,
+              "4": 6,
+              "5": 21
+            },
+            "new_pivots": 41,
+            "new_row_nonzeros": 2646,
+            "new_rows_processed": 290,
+            "rank": 52,
+            "reference_gb_contained": true,
+            "row_reductions": 3912
+          }
+        ]
+      },
+      "cell": {
+        "added_projection_rows": 1,
+        "case_wall_ns": 78035231,
+        "checked_f4_ns": 4671055,
+        "class": "all-projections",
+        "class_index": 3,
+        "construction_ns": 923447,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 94803,
+        "identities_ok": true,
+        "identity_check_ns": 19473325,
+        "input_equations": 5,
+        "input_sha256": "38c07675a547a17f45e0ee3747567dbf3020c12bd9460654724d0f92c9734e36",
+        "n": 3,
+        "paid_ns": 56742450,
+        "point_scalar_identity": true,
+        "preparation_ns": 390777,
+        "reference_ns": 31189043,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 21112291
+      },
+      "f4": {
+        "basis": [
+          [
+            [
+              [
+                0,
+                0,
+                2
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              655129145
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              670801058
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1410291062
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1750706894
+            ]
+          ],
+          [
+            [
+              [
+                0,
+                1,
+                1
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1144253695
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              1320014236
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1738558738
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              840233451
+            ]
+          ],
+          [
+            [
+              [
+                0,
+                2,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1198490113
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              551208325
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              2123873748
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              429767544
+            ]
+          ],
+          [
+            [
+              [
+                1,
+                0,
+                1
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1279911688
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              1615522021
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              661099333
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1945896101
+            ]
+          ],
+          [
+            [
+              [
+                1,
+                1,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              688162720
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              754704226
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1535191578
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1508837744
+            ]
+          ],
+          [
+            [
+              [
+                2,
+                0,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              2026198555
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              494067049
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1980327804
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1786507575
+            ]
+          ]
+        ],
+        "clock_ns": {
+          "canonical_output": 9804,
+          "construction_and_internal_checks": 308123,
+          "input_parse_admission_conversion": 102894
+        },
+        "clock_scope": "worker call; excludes process launch and printing; not a speed ratio",
+        "engine": "f4",
+        "f4_observations": {
+          "highest_processed_pair_degree": 5,
+          "highest_productive_degree_raw": 5,
+          "max_columns": 37,
+          "max_rows": 29,
+          "pairs_above_bound": 0,
+          "staircase_at_stop": null,
+          "steps": 7,
+          "timed_out": false,
+          "trace_mismatch": false
+        },
+        "observed_solving_degree": 5,
+        "prime": 2147483647,
+        "quotient_info": null,
+        "requires_matched_external_basis_check": true,
+        "schema": "relation-root-worker/v1",
+        "status": "complete",
+        "variables": 3,
+        "worker_wall_before_print_ns": 480742
+      },
+      "top_form_hilbert": {
+        "hilbert": {
+          "status": "not_vanished_within_cap",
+          "top_form_d_reg": null,
+          "trace": [
+            {
+              "degree": 0,
+              "hilbert_function": 1,
+              "monomials": 1,
+              "rank": 0
+            },
+            {
+              "degree": 1,
+              "hilbert_function": 3,
+              "monomials": 3,
+              "rank": 0
+            },
+            {
+              "degree": 2,
+              "hilbert_function": 6,
+              "monomials": 6,
+              "rank": 0
+            },
+            {
+              "degree": 3,
+              "hilbert_function": 10,
+              "monomials": 10,
+              "rank": 0
+            },
+            {
+              "degree": 4,
+              "hilbert_function": 12,
+              "monomials": 15,
+              "rank": 3
+            },
+            {
+              "degree": 5,
+              "hilbert_function": 12,
+              "monomials": 21,
+              "rank": 9
+            },
+            {
+              "degree": 6,
+              "hilbert_function": 13,
+              "monomials": 28,
+              "rank": 15
+            },
+            {
+              "degree": 7,
+              "hilbert_function": 15,
+              "monomials": 36,
+              "rank": 21
+            },
+            {
+              "degree": 8,
+              "hilbert_function": 17,
+              "monomials": 45,
+              "rank": 28
+            }
+          ]
+        },
+        "hilbert_ns": 57096
+      },
+      "trace_rows_checked": 49
+    },
+    {
+      "affine_trace": {
+        "solving_degree": 5,
+        "status": "complete",
+        "trace": [
+          {
+            "closure_completed": true,
+            "closure_rounds": 3,
+            "columns": 35,
+            "degree": 4,
+            "degree_falls": 3,
+            "max_new_certificate_product_degree": 5,
+            "new_pivot_degree_histogram": {
+              "3": 3,
+              "4": 12
+            },
+            "new_pivots": 15,
+            "new_row_nonzeros": 235,
+            "new_rows_processed": 27,
+            "rank": 15,
+            "reference_gb_contained": false,
+            "row_reductions": 20
+          },
+          {
+            "closure_completed": true,
+            "closure_rounds": 3,
+            "columns": 56,
+            "degree": 5,
+            "degree_falls": 16,
+            "max_new_certificate_product_degree": 8,
+            "new_pivot_degree_histogram": {
+              "2": 6,
+              "3": 7,
+              "4": 3,
+              "5": 21
+            },
+            "new_pivots": 37,
+            "new_row_nonzeros": 2737,
+            "new_rows_processed": 286,
+            "rank": 52,
+            "reference_gb_contained": true,
+            "row_reductions": 4455
+          }
+        ]
+      },
+      "cell": {
+        "added_projection_rows": 0,
+        "case_wall_ns": 82133720,
+        "checked_f4_ns": 4482322,
+        "class": "leaf-closure",
+        "class_index": 4,
+        "construction_ns": 14622,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 34572,
+        "identities_ok": true,
+        "identity_check_ns": 15939892,
+        "input_equations": 6,
+        "input_sha256": "095ce289b11b87f45964e4b4d16b5dd890640241adaf528ac85fdfe9c6a07dfa",
+        "n": 3,
+        "paid_ns": 57529967,
+        "point_scalar_identity": true,
+        "preparation_ns": 132770,
+        "reference_ns": 36925789,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 24482791
+      },
+      "f4": {
+        "basis": [
+          [
+            [
+              [
+                0,
+                0,
+                2
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              655129145
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              670801058
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1410291062
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1750706894
+            ]
+          ],
+          [
+            [
+              [
+                0,
+                1,
+                1
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1144253695
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              1320014236
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1738558738
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              840233451
+            ]
+          ],
+          [
+            [
+              [
+                0,
+                2,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1198490113
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              551208325
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              2123873748
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              429767544
+            ]
+          ],
+          [
+            [
+              [
+                1,
+                0,
+                1
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1279911688
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              1615522021
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              661099333
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1945896101
+            ]
+          ],
+          [
+            [
+              [
+                1,
+                1,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              688162720
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              754704226
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1535191578
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1508837744
+            ]
+          ],
+          [
+            [
+              [
+                2,
+                0,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              2026198555
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              494067049
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1980327804
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1786507575
+            ]
+          ]
+        ],
+        "clock_ns": {
+          "canonical_output": 9624,
+          "construction_and_internal_checks": 259800,
+          "input_parse_admission_conversion": 167902
+        },
+        "clock_scope": "worker call; excludes process launch and printing; not a speed ratio",
+        "engine": "f4",
+        "f4_observations": {
+          "highest_processed_pair_degree": 5,
+          "highest_productive_degree_raw": 5,
+          "max_columns": 43,
+          "max_rows": 33,
+          "pairs_above_bound": 0,
+          "staircase_at_stop": null,
+          "steps": 6,
+          "timed_out": false,
+          "trace_mismatch": false
+        },
+        "observed_solving_degree": 5,
+        "prime": 2147483647,
+        "quotient_info": null,
+        "requires_matched_external_basis_check": true,
+        "schema": "relation-root-worker/v1",
+        "status": "complete",
+        "variables": 3,
+        "worker_wall_before_print_ns": 463676
+      },
+      "top_form_hilbert": {
+        "hilbert": {
+          "status": "not_vanished_within_cap",
+          "top_form_d_reg": null,
+          "trace": [
+            {
+              "degree": 0,
+              "hilbert_function": 1,
+              "monomials": 1,
+              "rank": 0
+            },
+            {
+              "degree": 1,
+              "hilbert_function": 3,
+              "monomials": 3,
+              "rank": 0
+            },
+            {
+              "degree": 2,
+              "hilbert_function": 6,
+              "monomials": 6,
+              "rank": 0
+            },
+            {
+              "degree": 3,
+              "hilbert_function": 10,
+              "monomials": 10,
+              "rank": 0
+            },
+            {
+              "degree": 4,
+              "hilbert_function": 12,
+              "monomials": 15,
+              "rank": 3
+            },
+            {
+              "degree": 5,
+              "hilbert_function": 12,
+              "monomials": 21,
+              "rank": 9
+            },
+            {
+              "degree": 6,
+              "hilbert_function": 12,
+              "monomials": 28,
+              "rank": 16
+            },
+            {
+              "degree": 7,
+              "hilbert_function": 12,
+              "monomials": 36,
+              "rank": 24
+            },
+            {
+              "degree": 8,
+              "hilbert_function": 12,
+              "monomials": 45,
+              "rank": 33
+            }
+          ]
+        },
+        "hilbert_ns": 66219
+      },
+      "trace_rows_checked": 49
+    },
+    {
+      "affine_trace": {
+        "solving_degree": 5,
+        "status": "complete",
+        "trace": [
+          {
+            "closure_completed": true,
+            "closure_rounds": 3,
+            "columns": 35,
+            "degree": 4,
+            "degree_falls": 3,
+            "max_new_certificate_product_degree": 5,
+            "new_pivot_degree_histogram": {
+              "3": 3,
+              "4": 12
+            },
+            "new_pivots": 15,
+            "new_row_nonzeros": 235,
+            "new_rows_processed": 27,
+            "rank": 15,
+            "reference_gb_contained": false,
+            "row_reductions": 20
+          },
+          {
+            "closure_completed": true,
+            "closure_rounds": 3,
+            "columns": 56,
+            "degree": 5,
+            "degree_falls": 16,
+            "max_new_certificate_product_degree": 8,
+            "new_pivot_degree_histogram": {
+              "2": 6,
+              "3": 7,
+              "4": 3,
+              "5": 21
+            },
+            "new_pivots": 37,
+            "new_row_nonzeros": 2737,
+            "new_rows_processed": 286,
+            "rank": 52,
+            "reference_gb_contained": true,
+            "row_reductions": 4455
+          }
+        ]
+      },
+      "cell": {
+        "added_projection_rows": 0,
+        "case_wall_ns": 75559197,
+        "checked_f4_ns": 4770705,
+        "class": "clique",
+        "class_index": 5,
+        "construction_ns": 40381,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 36725,
+        "identities_ok": true,
+        "identity_check_ns": 12708526,
+        "input_equations": 6,
+        "input_sha256": "095ce289b11b87f45964e4b4d16b5dd890640241adaf528ac85fdfe9c6a07dfa",
+        "n": 3,
+        "paid_ns": 53147501,
+        "point_scalar_identity": true,
+        "preparation_ns": 208172,
+        "reference_ns": 35382992,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 22318687
+      },
+      "f4": {
+        "basis": [
+          [
+            [
+              [
+                0,
+                0,
+                2
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              655129145
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              670801058
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1410291062
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1750706894
+            ]
+          ],
+          [
+            [
+              [
+                0,
+                1,
+                1
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1144253695
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              1320014236
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1738558738
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              840233451
+            ]
+          ],
+          [
+            [
+              [
+                0,
+                2,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1198490113
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              551208325
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              2123873748
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              429767544
+            ]
+          ],
+          [
+            [
+              [
+                1,
+                0,
+                1
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              1279911688
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              1615522021
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              661099333
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1945896101
+            ]
+          ],
+          [
+            [
+              [
+                1,
+                1,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              688162720
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              754704226
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1535191578
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1508837744
+            ]
+          ],
+          [
+            [
+              [
+                2,
+                0,
+                0
+              ],
+              1
+            ],
+            [
+              [
+                1,
+                0,
+                0
+              ],
+              2026198555
+            ],
+            [
+              [
+                0,
+                1,
+                0
+              ],
+              494067049
+            ],
+            [
+              [
+                0,
+                0,
+                1
+              ],
+              1980327804
+            ],
+            [
+              [
+                0,
+                0,
+                0
+              ],
+              1786507575
+            ]
+          ]
+        ],
+        "clock_ns": {
+          "canonical_output": 9394,
+          "construction_and_internal_checks": 242063,
+          "input_parse_admission_conversion": 105989
+        },
+        "clock_scope": "worker call; excludes process launch and printing; not a speed ratio",
+        "engine": "f4",
+        "f4_observations": {
+          "highest_processed_pair_degree": 5,
+          "highest_productive_degree_raw": 5,
+          "max_columns": 43,
+          "max_rows": 33,
+          "pairs_above_bound": 0,
+          "staircase_at_stop": null,
+          "steps": 6,
+          "timed_out": false,
+          "trace_mismatch": false
+        },
+        "observed_solving_degree": 5,
+        "prime": 2147483647,
+        "quotient_info": null,
+        "requires_matched_external_basis_check": true,
+        "schema": "relation-root-worker/v1",
+        "status": "complete",
+        "variables": 3,
+        "worker_wall_before_print_ns": 385859
+      },
+      "top_form_hilbert": {
+        "hilbert": {
+          "status": "not_vanished_within_cap",
+          "top_form_d_reg": null,
+          "trace": [
+            {
+              "degree": 0,
+              "hilbert_function": 1,
+              "monomials": 1,
+              "rank": 0
+            },
+            {
+              "degree": 1,
+              "hilbert_function": 3,
+              "monomials": 3,
+              "rank": 0
+            },
+            {
+              "degree": 2,
+              "hilbert_function": 6,
+              "monomials": 6,
+              "rank": 0
+            },
+            {
+              "degree": 3,
+              "hilbert_function": 10,
+              "monomials": 10,
+              "rank": 0
+            },
+            {
+              "degree": 4,
+              "hilbert_function": 12,
+              "monomials": 15,
+              "rank": 3
+            },
+            {
+              "degree": 5,
+              "hilbert_function": 12,
+              "monomials": 21,
+              "rank": 9
+            },
+            {
+              "degree": 6,
+              "hilbert_function": 12,
+              "monomials": 28,
+              "rank": 16
+            },
+            {
+              "degree": 7,
+              "hilbert_function": 12,
+              "monomials": 36,
+              "rank": 24
+            },
+            {
+              "degree": 8,
+              "hilbert_function": 12,
+              "monomials": 45,
+              "rank": 33
+            }
+          ]
+        },
+        "hilbert_ns": 66440
+      },
+      "trace_rows_checked": 49
+    }
+  ],
+  "mode": "qualification",
+  "monitor_valid": true,
+  "pins_unchanged": true,
+  "raw_identities_and_completed_bases_replayed": true
+}

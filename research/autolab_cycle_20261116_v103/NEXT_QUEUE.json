@@ -1,0 +1,35 @@
+{
+  "id": "C104-cubic-plus-singular-quadratic-guard",
+  "hypothesis": "The496 false positives of each GF32 cubic variety are exactly (X+t)Q^2 with Q irreducible quadratic; a narrow guarded trace check restores exact local splitting.",
+  "derivation": "SINGULAR_FAMILY_NEXT.md",
+  "experiments": [
+    {
+      "id": "singular-guard-oracles-next",
+      "command": [
+        "python",
+        "-m",
+        "research.singular_quadratic_guard_20261116_v104.oracles"
+      ],
+      "preconditions": "Author a fresh variant and proof/review; freeze all source, input and relation hashes before execution.",
+      "tests": "Exhaust all2^20 tuples for each of six residues; compare complete extra masks against all496 independently irreducible Q products; check all repeated/zero branches and small fields.",
+      "seconds": 90,
+      "memory_mb": 4096,
+      "cpu": 0
+    },
+    {
+      "id": "cubic-guard-compile-next",
+      "command": [
+        "python",
+        "-m",
+        "research.singular_quadratic_guard_20261116_v104.compile"
+      ],
+      "tests": "Bind same76parameters; reuse all monomials; compare exact predicate with original numeric oracle and record all circuit/setup/RSS costs before search.",
+      "seconds": 90,
+      "memory_mb": 4096,
+      "cpu": 0
+    }
+  ],
+  "promotion": "Complete finite local equivalence first, then changed hard diagnostic with original support/U recovery. No release claim from circuits or timeout.",
+  "falsifier": "Any extraneous code outside squared-irreducible-quadratic family, or guard removes an allowed repeated-root code. Preserve counterexample and retain exact old predicate.",
+  "qualified_speedup": null
+}

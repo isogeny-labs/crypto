@@ -1,0 +1,76 @@
+digraph yield_rank_frontier {
+  graph [rankdir=LR, bgcolor="white", pad=0.25, nodesep=0.35, ranksep=0.55,
+         fontname="Helvetica", label="Yield and rank frontier · 2026-11-18", labelloc=t, fontsize=18];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10,
+        color="#506176", penwidth=1.2, margin="0.10,0.07"];
+  edge [fontname="Helvetica", fontsize=8, color="#6d7f92", arrowsize=0.7];
+
+  mean [label="checked\nmean conservation", fillcolor="#d8f3dc", color="#2d7d46"];
+  ycensus [label="measured\nsmall-field yield census", fillcolor="#d8f3dc", color="#2d7d46"];
+  rcensus [label="measured\nsmall-field rank deficits", fillcolor="#d8f3dc", color="#2d7d46"];
+  left [label="checked\nsingle-target left kernel", fillcolor="#d8f3dc", color="#2d7d46"];
+
+  yvector [label="defined\nfixed yield count vector", fillcolor="#e7f1fb"];
+  rtrace [label="defined\nrank + support trace", fillcolor="#e7f1fb"];
+  kmode [label="defined\nkernel usage mode", fillcolor="#e7f1fb"];
+
+  ylaw [label="open\ntarget-wise scaling law", fillcolor="#fff1b8"];
+  visible [label="open\nsolver-visible yield", fillcolor="#fff1b8"];
+  strata [label="open\ntarget strata", fillcolor="#fff1b8"];
+  censor [label="open\nstopping / failure censorship", fillcolor="#fff1b8"];
+
+  rows [label="open\nrow ensemble law", fillcolor="#fff1b8"];
+  support [label="open\nsupport connectivity", fillcolor="#fff1b8"];
+  terminal [label="open\nterminal rank law", fillcolor="#fff1b8"];
+  scope [label="open\nleft/right scope audit", fillcolor="#fff1b8"];
+
+  yieldheur [label="heuristic\ndecomposition probability", fillcolor="#eee4f7", color="#79589f"];
+  rankheur [label="heuristic\nrelation rank", fillcolor="#eee4f7", color="#79589f"];
+  compose [label="open\nyield-to-rank composition", fillcolor="#ffd9d9", color="#a64b4b", penwidth=1.6];
+  e2e [label="open\ncomplete IC exponent", fillcolor="#ffd9d9", color="#a64b4b", penwidth=1.6];
+
+  producer [label="READY target\npublic population contract", shape=note, fillcolor="#e8f5e9", color="#2d7d46"];
+  visaudit [label="READY target\nsolver-visibility audit", shape=note, fillcolor="#e8f5e9", color="#2d7d46"];
+  modeaudit [label="READY target\nkernel-mode census", shape=note, fillcolor="#e8f5e9", color="#2d7d46"];
+  scaling [label="BLOCKED target\nyield scaling certificate", shape=note, fillcolor="#ffd9d9", color="#a64b4b"];
+  rankcert [label="BLOCKED target\nrank/support certificate", shape=note, fillcolor="#ffd9d9", color="#a64b4b"];
+
+  mean -> ylaw [label="qualifies"];
+  ycensus -> ylaw [label="measures"];
+  ycensus -> strata [label="qualifies"];
+  yvector -> ylaw [label="defines"];
+  yvector -> strata [label="defines"];
+  yvector -> censor [label="defines"];
+  ylaw -> yieldheur [label="conditions"];
+  visible -> yieldheur [label="conditions"];
+  strata -> yieldheur [label="conditions"];
+  censor -> yieldheur [label="conditions"];
+
+  rcensus -> support [label="measures"];
+  rcensus -> terminal [label="qualifies"];
+  left -> scope [label="qualifies"];
+  rtrace -> rows [label="defines"];
+  rtrace -> support [label="defines"];
+  rtrace -> terminal [label="defines"];
+  kmode -> scope [label="defines"];
+  rows -> rankheur [label="conditions"];
+  support -> rankheur [label="conditions"];
+  terminal -> rankheur [label="conditions"];
+  scope -> rankheur [label="qualifies"];
+  censor -> rankheur [label="conditions"];
+
+  ylaw -> compose [label="conditions"];
+  visible -> compose [label="conditions"];
+  rows -> compose [label="conditions"];
+  support -> compose [label="conditions"];
+  terminal -> compose [label="conditions"];
+  scope -> compose [label="conditions"];
+  compose -> e2e [label="conditions"];
+
+  producer -> yvector [style=dashed, label="freezes"];
+  producer -> rtrace [style=dashed, label="freezes"];
+  visaudit -> visible [style=dashed, label="attacks"];
+  modeaudit -> scope [style=dashed, label="attacks"];
+  scaling -> ylaw [style=dashed, label="attacks"];
+  rankcert -> terminal [style=dashed, label="attacks"];
+}

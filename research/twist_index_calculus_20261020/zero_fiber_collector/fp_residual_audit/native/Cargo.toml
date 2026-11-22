@@ -1,0 +1,16 @@
+[package]
+name = "twist-fp-residual-audit"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+serde_json = { version = "=1.0.154", features = ["arbitrary_precision"] }
+serde = { version = "=1.0.229", features = ["derive"] }
+sha2 = "=0.10.9"
+hex = "=0.4.3"
+
+[profile.release]
+opt-level = 3

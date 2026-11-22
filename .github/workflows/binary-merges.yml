@@ -9,6 +9,7 @@ name: binary-merges
 on:
   workflow_dispatch:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: [main]
   push:
     branches: [main]
@@ -20,6 +21,7 @@ concurrency:
 
 jobs:
   merges:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:

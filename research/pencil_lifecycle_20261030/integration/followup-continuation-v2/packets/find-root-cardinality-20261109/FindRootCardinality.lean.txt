@@ -1,0 +1,88 @@
+-- Prospective source only. No compiler or axiom readback has run.
+import Composition
+import UnionSize
+set_option autoImplicit false
+namespace FindRootCardinality
+open GraphFind SignedGraphAlgebra
+variable {K : Type*} [Field K] [DecidableEq K] {n : Nat}
+
+-- Edge-constant labels whose fixed labels are exactly actual roots.
+-- Forest termination connects this certificate to the unique returned root.
+def RootMap (s : GraphFind.State K n) (rho : Fin n → Fin n) : Prop :=
+ (∀ i, rho (s.parent i) = rho i) ∧ (∀ i, rho i = i ↔ s.parent i = i)
+
+theorem run_preserves_labels (s t : GraphFind.State K n) (x r : Fin n)
+    (p : Potential K) (run : Run s x t r p) (rho : Fin n → Fin n)
+    (hlabel : ∀ i, rho (s.parent i) = rho i) :
+    (∀ i, rho (t.parent i) = rho i) ∧ rho r = rho x := by
+  induction run with
+  | root x h => exact ⟨hlabel, rfl⟩
+  | step t x r q hne rec ih =>
+    obtain ⟨ht, hr⟩ := ih
+    have hrx : rho r = rho x := hr.trans (hlabel x)
+    refine ⟨?_, hrx⟩
+    intro i
+    by_cases hi : i = x
+    · subst i; simpa [compress] using hrx
+    · simpa [compress, hi] using ht i
+
+theorem run_roots_iff (s t : GraphFind.State K n) (x r : Fin n)
+    (p : Potential K) (run : Run s x t r p) (rank : Fin n → Nat)
+    (value : Fin n → K) (k : K) (hf : Forest s rank) (hv : Represents s value k) :
+    ∀ z, t.parent z = z ↔ s.parent z = z := by
+  induction run with
+  | root x h => intro z; rfl
+  | step t x r q hne rec ih =>
+    have hdown : rank (s.parent x) < rank x := (hf x).resolve_left hne
+    obtain ⟨_, _, _, _, hrank, hframe⟩ := run_preserves s t (s.parent x) r q rec rank value k hf hv
+    have hrx : rank r < rank x := lt_of_le_of_lt hrank hdown
+    have hrne : r ≠ x := by intro he; subst r; exact (Nat.lt_irrefl _ hrx)
+    intro z
+    by_cases hz : z = x
+    · subst z
+      simp [compress, hrne, hne]
+    · simpa [compress, hz] using ih z
+
+theorem run_preserves_root_map (s t : GraphFind.State K n) (x r : Fin n)
+    (p : Potential K) (run : Run s x t r p) (rank : Fin n → Nat)
+    (value : Fin n → K) (k : K) (hf : Forest s rank) (hv : Represents s value k)
+    (rho : Fin n → Fin n) (hm : RootMap s rho) : RootMap t rho := by
+  refine ⟨(run_preserves_labels s t x r p run rho hm.1).1, ?_⟩
+  intro z
+  exact (hm.2 z).trans (run_roots_iff s t x r p run rank value k hf hv z).symm
+
+theorem returned_root_eq_map (s t : GraphFind.State K n) (x r : Fin n)
+    (p : Potential K) (run : Run s x t r p) (rank : Fin n → Nat)
+    (value : Fin n → K) (k : K) (hf : Forest s rank) (hv : Represents s value k)
+    (rho : Fin n → Fin n) (hm : RootMap s rho) : r = rho x := by
+  have ht := run_preserves_root_map s t x r p run rank value k hf hv rho hm
+  have hroot := (run_preserves s t x r p run rank value k hf hv).2.2.1
+  have hfix : rho r = r := (ht.2 r).mpr hroot
+  exact hfix.symm.trans (run_preserves_labels s t x r p run rho hm.1).2
+
+-- Total forest search means these fibers describe actual returned roots,
+-- rather than an arbitrary equivalence relation on labels.
+theorem actual_root_exists (s : GraphFind.State K n) (rank : Fin n → Nat)
+    (value : Fin n → K) (k : K) (hf : Forest s rank) (hv : Represents s value k)
+    (rho : Fin n → Fin n) (hm : RootMap s rho) (x : Fin n) :
+    ∃ t p, Run s x t (rho x) p := by
+  obtain ⟨t, r, p, hr⟩ := run_exists s rank hf x
+  have he := returned_root_eq_map s t x r p hr rank value k hf hv rho hm
+  subst r
+  exact ⟨t, p, hr⟩
+
+def component (rho : Fin n → Fin n) (r : Fin n) : Finset (Fin n) :=
+  Finset.univ.filter (fun i => rho i = r)
+def RootSizes (s : GraphFind.State K n) (rho : Fin n → Fin n)
+    (sizes : UnionSize.Sizes n) : Prop :=
+  ∀ r, s.parent r = r → (UnionSize.sizeAt sizes r).toNat = (component rho r).card
+
+theorem run_preserves_root_sizes (s t : GraphFind.State K n) (x r : Fin n)
+    (p : Potential K) (run : Run s x t r p) (rank : Fin n → Nat)
+    (value : Fin n → K) (k : K) (hf : Forest s rank) (hv : Represents s value k)
+    (rho : Fin n → Fin n) (hm : RootMap s rho) (sizes : UnionSize.Sizes n)
+    (hs : RootSizes s rho sizes) : RootMap t rho ∧ RootSizes t rho sizes := by
+  refine ⟨run_preserves_root_map s t x r p run rank value k hf hv rho hm, ?_⟩
+  intro z hz
+  exact hs z ((run_roots_iff s t x r p run rank value k hf hv z).mp hz)
+end FindRootCardinality

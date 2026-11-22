@@ -1,0 +1,464 @@
+[
+  {
+    "theorem": "OrientationAnchor.anchor_flips",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem anchor_flips (x y j : \u2115) (h : delta x y = (2 : \u211a)^j) : x.testBit j \u2260 y.testBit j",
+    "decl_sha256": "0f2fde994a40bd9ca4c8bd4f84361fa3724659ecd59cb2aa1ac6fa51f6f94a8a",
+    "claim_id": "PCC-20261114-e45d6b"
+  },
+  {
+    "theorem": "OrientationAnchor.denominator_ne_zero",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem denominator_ne_zero (u x y j : \u2115) (hj : j \u2208 mask u x y) : (2 : \u211a)^j - delta x y \u2260 0",
+    "decl_sha256": "1d1e3ce5dd9ef1c5ddf3fdf63cf7b1583f63b4d23b8ad4015deae6faa4adaf7d",
+    "claim_id": "PCC-20261114-a2def2"
+  },
+  {
+    "theorem": "OrientationAnchor.factor_at_delta",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem factor_at_delta (u x y j : \u2115) (hj : j \u2208 mask u x y) : (factor (delta x y) j).eval (delta x y) = 1",
+    "decl_sha256": "9208737f21e5bc6ddaed5519ae2234bac9cd910f5c22b636662425e404c6b06f",
+    "claim_id": "PCC-20261114-3deacf"
+  },
+  {
+    "theorem": "OrientationAnchor.correction_at_delta",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem correction_at_delta (u x y : \u2115) (m : \u2115 \u2192 \u2115) : (correction u x y m).eval (delta x y) = 1",
+    "decl_sha256": "92bf043d256477f08a6e4be3972b20d2c0d6f8ccb803f8fc7a1f28ca3abb5d69",
+    "claim_id": "PCC-20261114-b59f52"
+  },
+  {
+    "theorem": "OrientationAnchor.quotient_identity",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem quotient_identity (u x y : \u2115) (m : \u2115 \u2192 \u2115) : (X-C (delta x y))*quotient u x y m = correction u x y m-1",
+    "decl_sha256": "acbd1653ee0ace94ba023cee7806982c4250e650f9dc113d83f1d1d804b88e2c",
+    "claim_id": "PCC-20261114-54ec26"
+  },
+  {
+    "theorem": "OrientationAnchor.nodal_puncture",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem nodal_puncture (S : Finset \u211a) (d : \u211a) (hd : d \u2208 S) : puncture S d * (X-C d) = nodal S",
+    "decl_sha256": "f25f54a4d12415b90ae6b66379c273a8b64100349412fc7f201dce28290bdb3b",
+    "claim_id": "PCC-20261114-b5f767"
+  },
+  {
+    "theorem": "OrientationAnchor.completed_identity",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem completed_identity (S : Finset \u211a) (u x y : \u2115) (m : \u2115 \u2192 \u2115) (hd : delta x y \u2208 S) : completed S u x y m - base S (delta x y) = nodal S * completion S u x y m",
+    "decl_sha256": "0b9ba8544c706ad806f3d2c1c235efbdb30969e86dfa0ce1f16c7d0a0b0c46ae",
+    "claim_id": "PCC-20261114-347a54"
+  },
+  {
+    "theorem": "OrientationAnchor.completed_at_node",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem completed_at_node (S : Finset \u211a) (u x y : \u2115) (m : \u2115 \u2192 \u2115) (hd : delta x y \u2208 S) (t : \u211a) (ht : t \u2208 S) : (completed S u x y m).eval t = (base S (delta x y)).eval t",
+    "decl_sha256": "2c225059bc3e2a88c86c50819788219ad0a2db89b4c6398d147a5b879c2b0a59",
+    "claim_id": "PCC-20261114-5661cf"
+  },
+  {
+    "theorem": "OrientationAnchor.delta_in_grid",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem delta_in_grid (a x y : \u2115) (hx : x < 2^a) (hy : y < 2^a) : delta x y \u2208 grid a",
+    "decl_sha256": "778b4d20671e4e5ecd753b7c97835dcbf142566d8b2786e27895c7e8053cb804",
+    "claim_id": "PCC-20261114-b3ef56"
+  },
+  {
+    "theorem": "OrientationAnchor.grid_card",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem grid_card (a : \u2115) : (grid a).card = 2 * 2^a",
+    "decl_sha256": "5ed6a0d96191d14a5b8692337ff8e6275a71252cf7f0a94c0e7020ce062c3f35",
+    "claim_id": "PCC-20261114-266dd4"
+  },
+  {
+    "theorem": "OrientationAnchor.zero_in_grid",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem zero_in_grid (a : \u2115) : (0 : \u211a) \u2208 grid a",
+    "decl_sha256": "caa24d6747b2b35689f9b8995dbf40450d2bcee08c7078afa302ce79ed98484c",
+    "claim_id": "PCC-20261114-773b53"
+  },
+  {
+    "theorem": "OrientationAnchor.normalizer_eq",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem normalizer_eq (S : Finset \u211a) (h0 : 0 \u2208 S) : normalizer S = (puncture S 0).eval 0",
+    "decl_sha256": "77d84ec7dc07ba25a0950dbeed764846583f07a2e2639bca02c65d185f9dfa18",
+    "claim_id": "PCC-20261114-bedf6d"
+  },
+  {
+    "theorem": "OrientationAnchor.normalizer_ne_zero",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem normalizer_ne_zero (S : Finset \u211a) (h0 : 0 \u2208 S) : normalizer S \u2260 0",
+    "decl_sha256": "1cf86d7d9595183da96bd4ef562c90edf052882b7b972ab83726ad6902145711",
+    "claim_id": "PCC-20261114-6189b6"
+  },
+  {
+    "theorem": "OrientationAnchor.completed_origin_diagonal",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem completed_origin_diagonal (S : Finset \u211a) (u x : \u2115) (m : \u2115 \u2192 \u2115) (h0 : 0 \u2208 S) : (completed S u x x m).eval 0 = 1",
+    "decl_sha256": "0736869ef55a063f143407beaa50e0cb6b7dd3b9dcaa1a6177c12a413f7e4f9b",
+    "claim_id": "PCC-20261114-6c17bb"
+  },
+  {
+    "theorem": "OrientationAnchor.completed_origin_offdiagonal",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem completed_origin_offdiagonal (S : Finset \u211a) (u x y : \u2115) (m : \u2115 \u2192 \u2115) (hd : delta x y \u2208 S) (h0 : 0 \u2208 S) (hxy : x \u2260 y) : (completed S u x y m).eval 0 = 0",
+    "decl_sha256": "7dba9c7f05650d40909ebf97d98ec1f659f80dc296ac6b1a133d85812df888f1",
+    "claim_id": "PCC-20261114-fb4e87"
+  },
+  {
+    "theorem": "OrientationAnchor.factor_degree",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem factor_degree (d : \u211a) (j : \u2115) : (factor d j).natDegree \u2264 1",
+    "decl_sha256": "4839ebdfb1ab9dc14f595aafd2fb41562547c08a33ea8823754b66fcaa8969e7",
+    "claim_id": "PCC-20261114-7b4860"
+  },
+  {
+    "theorem": "OrientationAnchor.correction_degree",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem correction_degree (u x y : \u2115) (m : \u2115 \u2192 \u2115) : (correction u x y m).natDegree \u2264 mass u m",
+    "decl_sha256": "0b732f4c4cb90f1e7c1c74270cc5fa1c77e5e95c85b0303011ac54b1b9ec9270",
+    "claim_id": "PCC-20261114-56f500"
+  },
+  {
+    "theorem": "OrientationAnchor.base_degree",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem base_degree (S : Finset \u211a) (d : \u211a) (hd : d \u2208 S) : (base S d).natDegree \u2264 S.card-1",
+    "decl_sha256": "ea9a0614213b3cdddd916f8b85eb567d6dac4f66cb3616982bf474720e7c56d2",
+    "claim_id": "PCC-20261114-ca4f96"
+  },
+  {
+    "theorem": "OrientationAnchor.completed_degree",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem completed_degree (S : Finset \u211a) (u x y : \u2115) (m : \u2115 \u2192 \u2115) (hd : delta x y \u2208 S) : (completed S u x y m).natDegree \u2264 S.card-1+mass u m",
+    "decl_sha256": "7046d3f0e589669b5db057631b5e53d7e168ffd8ebd800ae8fe4ed83666d345a",
+    "claim_id": "PCC-20261114-039d00"
+  },
+  {
+    "theorem": "OrientationAnchor.quotient_degree",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem quotient_degree (u x y : \u2115) (m : \u2115 \u2192 \u2115) : (quotient u x y m).degree < (mass u m : WithBot \u2115)",
+    "decl_sha256": "9e36e81f0fb4472a8206e87e737526d64372669f2dc46dcb9f6263e444e1bb87",
+    "claim_id": "PCC-20261114-bede32"
+  },
+  {
+    "theorem": "OrientationAnchor.completion_degree",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem completion_degree (S : Finset \u211a) (u x y : \u2115) (m : \u2115 \u2192 \u2115) : (completion S u x y m).degree < (mass u m : WithBot \u2115)",
+    "decl_sha256": "6d31ae965702e27fb16250f85dd7e40092e49f2bb1d9dce061c3066210b6bb25",
+    "claim_id": "PCC-20261114-278ad6"
+  },
+  {
+    "theorem": "OrientationAnchor.beta_lower",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem beta_lower (i s j : \u2115) : (if j=i then 1 else -((j-i:\u2115):\u2124)) \u2264 beta i s j",
+    "decl_sha256": "62376f3d4d2ccceb22ff88b70d9362c136e7d1ac628fb941907d57e72f1719d7",
+    "claim_id": "PCC-20261114-4a5676"
+  },
+  {
+    "theorem": "OrientationAnchor.crossing_gain",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem crossing_gain (u x y i s : \u2115) (m : \u2115 \u2192 \u2115) (hi : i \u2208 mask u x y) : schedule u i m \u2264 gain u x y i s m",
+    "decl_sha256": "dbe8860bac3f601a9f781d3b471efa36ea23630df9f6483a857e9f8846b028c0",
+    "claim_id": "PCC-20261114-d08fe0"
+  },
+  {
+    "theorem": "OrientationAnchor.beta_nonnegative",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationAnchor.lean",
+    "statement": "theorem beta_nonnegative (i s j : \u2115) (hs : s \u2264 i) : 0 \u2264 beta i s j",
+    "decl_sha256": "df72be1dfe9a837a225ddbca2705fb77d66b9baf2ea2d9a9b0d212840e648d9f",
+    "claim_id": "PCC-20261114-309bc0"
+  },
+  {
+    "theorem": "OrientationAnchor.VBound.zero",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationContent.lean",
+    "statement": "theorem zero (k : \u2124) : VBound k 0",
+    "decl_sha256": "be2e646374c93b5e63e2b4b8b11fdf3c70467c51b7843f144f1247371974df29",
+    "claim_id": "PCC-20261114-0dda53"
+  },
+  {
+    "theorem": "OrientationAnchor.VBound.mono",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationContent.lean",
+    "statement": "theorem mono {k l : \u2124} {q : \u211a} (h : VBound k q) (hl : l \u2264 k) : VBound l q",
+    "decl_sha256": "ca433ff433a8a0910b670e0a20cd38ac749786c834ea94a10e63bd068b4ea3f2",
+    "claim_id": "PCC-20261114-2b2700"
+  },
+  {
+    "theorem": "OrientationAnchor.VBound.neg",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationContent.lean",
+    "statement": "theorem neg {k : \u2124} {q : \u211a} (h : VBound k q) : VBound k (-q)",
+    "decl_sha256": "4a1af0681428814a91bd47106f0c6a2e14ba1b1e343b5539eaaadb72e2324aad",
+    "claim_id": "PCC-20261114-333da1"
+  },
+  {
+    "theorem": "OrientationAnchor.VBound.add",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationContent.lean",
+    "statement": "theorem add {k : \u2124} {q r : \u211a} (hq : VBound k q) (hr : VBound k r) : VBound k (q+r)",
+    "decl_sha256": "7676ad1cf4a006f61cae3362059ec3942d729b7a0f702c830cdec9a4122c0503",
+    "claim_id": "PCC-20261114-826016"
+  },
+  {
+    "theorem": "OrientationAnchor.VBound.mul",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationContent.lean",
+    "statement": "theorem mul {k l : \u2124} {q r : \u211a} (hq : VBound k q) (hr : VBound l r) : VBound (k+l) (q*r)",
+    "decl_sha256": "c2b7a721f1bfd6716bb795a3981ef012bf45053f04f829bfab6b42151d968c96",
+    "claim_id": "PCC-20261114-02d6f8"
+  },
+  {
+    "theorem": "OrientationAnchor.VBound.sum",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationContent.lean",
+    "statement": "theorem sum {\u03b9 : Type*} (S : Finset \u03b9) (f : \u03b9 \u2192 \u211a) (k : \u2124) (h : \u2200 i \u2208 S, VBound k (f i)) : VBound k (\u2211 i \u2208 S, f i)",
+    "decl_sha256": "400a02133ea1a633aa439cb586f3f882e4f014501fdcf3a9d5dd82a432608b4f",
+    "claim_id": "PCC-20261114-f80a8d"
+  },
+  {
+    "theorem": "OrientationAnchor.Content.mono",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationContent.lean",
+    "statement": "theorem mono {k l : \u2124} {P : \u211a[X]} (h : Content k P) (hl : l \u2264 k) : Content l P",
+    "decl_sha256": "8d62d16db8e8dd3605f21fd0f71390c7e84711ba7502108efb90e1e210a32676",
+    "claim_id": "PCC-20261114-81a8ff"
+  },
+  {
+    "theorem": "OrientationAnchor.Content.one",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationContent.lean",
+    "statement": "theorem one : Content 0 (1 : \u211a[X])",
+    "decl_sha256": "e265d8f2f3c84f38978543049d331776c43042cf6da538cf17fb0202347a9db1",
+    "claim_id": "PCC-20261114-8db006"
+  },
+  {
+    "theorem": "OrientationAnchor.Content.C",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationContent.lean",
+    "statement": "theorem C {k : \u2124} {q : \u211a} (h : VBound k q) : Content k (C q)",
+    "decl_sha256": "c4a597add0e58c74b6f7d6000260ed11b2b2e3cbed19186db594e8da1d0700ff",
+    "claim_id": "PCC-20261114-8bd1d1"
+  },
+  {
+    "theorem": "OrientationAnchor.Content.X",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationContent.lean",
+    "statement": "theorem X : Content 0 (X : \u211a[X])",
+    "decl_sha256": "318d0856f5a7dca6a5b89c60b3405cbd34fb75444919d7995fc55ecc9a8014bc",
+    "claim_id": "PCC-20261114-ab5273"
+  },
+  {
+    "theorem": "OrientationAnchor.Content.add",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationContent.lean",
+    "statement": "theorem add {k : \u2124} {P Q : \u211a[X]} (hP : Content k P) (hQ : Content k Q) : Content k (P+Q)",
+    "decl_sha256": "b05ab507784644c69bafd52576c151c41823c6b16e06b214fcc984710315ec26",
+    "claim_id": "PCC-20261114-901087"
+  },
+  {
+    "theorem": "OrientationAnchor.Content.mul",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationContent.lean",
+    "statement": "theorem mul {k l : \u2124} {P Q : \u211a[X]} (hP : Content k P) (hQ : Content l Q) : Content (k+l) (P*Q)",
+    "decl_sha256": "aca0033fffee59f20fe440ea4d87f7a5f4c3ff3468296b3ba5988000cb20417b",
+    "claim_id": "PCC-20261114-ad2d5a"
+  },
+  {
+    "theorem": "OrientationAnchor.Content.pow",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationContent.lean",
+    "statement": "theorem pow {k : \u2124} {P : \u211a[X]} (h : Content k P) (n : \u2115) : Content ((n:\u2124)*k) (P^n)",
+    "decl_sha256": "eddc8a4d089271fd4b98632bb4f72725fb70c455ec32322750955755c55ca9de",
+    "claim_id": "PCC-20261114-c10c51"
+  },
+  {
+    "theorem": "OrientationAnchor.Content.prod",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationContent.lean",
+    "statement": "theorem prod {\u03b9 : Type*} (S : Finset \u03b9) (P : \u03b9 \u2192 \u211a[X]) (k : \u03b9 \u2192 \u2124) (h : \u2200 i \u2208 S, Content (k i) (P i)) : Content (\u2211 i \u2208 S, k i) (\u220f i \u2208 S, P i)",
+    "decl_sha256": "27304d0c410fddbb5e8f4c4ee83792bee6f7a49968b90f6ca3ced6f8e27cc57d",
+    "claim_id": "PCC-20261114-9a98a8"
+  },
+  {
+    "theorem": "OrientationAnchor.int_bound_of_dvd",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationContent.lean",
+    "statement": "theorem int_bound_of_dvd (t : \u2124) (k : \u2115) (h : (2:\u2124)^k \u2223 t) : VBound k (t : \u211a)",
+    "decl_sha256": "7680f072407de529b6cd8a60d495ead33a29c392b4674bc5c96c8ab70c0bec98",
+    "claim_id": "PCC-20261114-8975a6"
+  },
+  {
+    "theorem": "OrientationAnchor.numerator_extra_dvd",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationContent.lean",
+    "statement": "theorem numerator_extra_dvd (t : \u2124) (i : \u2115) (ht : t \u2260 0) (hi : padicValInt 2 t = i) : (2:\u2124)^(i+1) \u2223 (2:\u2124)^i-t",
+    "decl_sha256": "375ad5b0d95675d41a240bdf431774d0e4d8cc15f06ba779f245df3b2d1211e5",
+    "claim_id": "PCC-20261114-8506ac"
+  },
+  {
+    "theorem": "OrientationAnchor.chart_numerator_content",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationContent.lean",
+    "statement": "theorem chart_numerator_content (a i j : \u2115) (t : \u2124) (ht : t \u2260 0) (hi : padicValInt 2 t = i) (hia : i \u2264 a) : Content (if j=i then (i:\u2124)+1 else min (i:\u2124) j) ((C ((2:\u211a)^j)-X).comp (C (t:\u211a)+C ((2:\u211a)^(a+1))*X))",
+    "decl_sha256": "8ecf070e7c70cea9b823dc741e37be56b490a794502da095cfbb12b203e866e2",
+    "claim_id": "PCC-20261114-176309"
+  },
+  {
+    "theorem": "OrientationAnchor.selected_denominator_valuation",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationProduct.lean",
+    "statement": "theorem selected_denominator_valuation (u x y j : \u2115) (hj : j \u2208 mask u x y) : padicValRat 2 ((2:\u211a)^j-delta x y) = min (j:\u2124) (chartOrder u x y)",
+    "decl_sha256": "64dabcf64ae0f8553ad9f833565e76b60bf8a540381c33e29ab7c8b70d9339d3",
+    "claim_id": "PCC-20261114-7c87fe"
+  },
+  {
+    "theorem": "OrientationAnchor.chart_factor_content",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationProduct.lean",
+    "statement": "theorem chart_factor_content (a i j : \u2115) (t : \u2124) (d : \u211a) (ht : t \u2260 0) (hi : padicValInt 2 t = i) (hia : i \u2264 a) : Content ((if j=i then (i:\u2124)+1 else min (i:\u2124) j)-padicValRat 2 ((2:\u211a)^j-d)) (chart a t (factor d j))",
+    "decl_sha256": "9f81c0e59b024dd0a4d86ebfb650592d8158597ce7a95590dcb761be0f9b16ee",
+    "claim_id": "PCC-20261114-a39253"
+  },
+  {
+    "theorem": "OrientationAnchor.chart_correction_content",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationProduct.lean",
+    "statement": "theorem chart_correction_content (a u x y i : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : t \u2260 0) (hi : padicValInt 2 t = i) (hia : i \u2264 a) : Content (gain u x y i (chartOrder u x y) m) (chart a t (correction u x y m))",
+    "decl_sha256": "e4110cfdd8d71aa475475bf8caa8bd3eba5b12027e18ab2eb35a527011ac6a97",
+    "claim_id": "PCC-20261114-23cc94"
+  },
+  {
+    "theorem": "OrientationAnchor.actual_crossing_content",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationProduct.lean",
+    "statement": "theorem actual_crossing_content (a u x y i : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : t \u2260 0) (hi : padicValInt 2 t = i) (hia : i \u2264 a) (hiu : i < u) (hc : x.testBit i = y.testBit i) : Content (schedule u i m) (chart a t (correction u x y m))",
+    "decl_sha256": "92d4fbefd04a9bfdd93d849bbd7d1b53e9a308038114fc71c790642231dd305b",
+    "claim_id": "PCC-20261114-7a81c4"
+  },
+  {
+    "theorem": "OrientationAnchor.beta_nonnegative_of_j_le",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationProduct.lean",
+    "statement": "theorem beta_nonnegative_of_j_le (i s j : \u2115) (hj : j \u2264 i) : 0 \u2264 beta i s j",
+    "decl_sha256": "6ae7c5a5e8eaae6f7b4cc206cb7b1334a457a51f652f57c4d6f89542dbc06d1b",
+    "claim_id": "PCC-20261114-b40b22"
+  },
+  {
+    "theorem": "OrientationAnchor.actual_noncrossing_content",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationProduct.lean",
+    "statement": "theorem actual_noncrossing_content (a u x y i : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : t \u2260 0) (hi : padicValInt 2 t = i) (hia : i \u2264 a) (hc : x.testBit i \u2260 y.testBit i) : Content 0 (chart a t (correction u x y m))",
+    "decl_sha256": "081932bfa0a2ed75231912b142160fc09074a487bb15325492646798dc68c80d",
+    "claim_id": "PCC-20261114-8da936"
+  },
+  {
+    "theorem": "OrientationAnchor.actual_inactive_content",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationProduct.lean",
+    "statement": "theorem actual_inactive_content (a u x y i : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : t \u2260 0) (hi : padicValInt 2 t = i) (hia : i \u2264 a) (hui : u \u2264 i) : Content 0 (chart a t (correction u x y m))",
+    "decl_sha256": "d384d91b8fa0897a19fe4f2d3a00e8af210f4c1484595b93c049f702c5c2ec41",
+    "claim_id": "PCC-20261114-189754"
+  },
+  {
+    "theorem": "OrientationAnchor.actual_nonzero_content",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationProduct.lean",
+    "statement": "theorem actual_nonzero_content (a u x y i : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : t \u2260 0) (hi : padicValInt 2 t = i) (hia : i \u2264 a) (hm : \u2200 j < u, 0 \u2264 schedule u j m) : Content 0 (chart a t (correction u x y m))",
+    "decl_sha256": "f4ce9bb14ccc3a8b5f7b34a282eada0774ddb0dd4f3aa18e4ebd689742b09a7f",
+    "claim_id": "PCC-20261114-a6cd15"
+  },
+  {
+    "theorem": "OrientationAnchor.old_counterexample_covered",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationProduct.lean",
+    "statement": "theorem old_counterexample_covered (u : \u2115) (hu : 1 < u) : 1 \u2208 mask u 0 1",
+    "decl_sha256": "804d19efd4c2ee6eb396cfad5f539af28ba815f931c58b97046899e5e1884637",
+    "claim_id": "PCC-20261114-7e76a5"
+  },
+  {
+    "theorem": "OrientationAnchor.zero_chart_factor_content",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationProduct.lean",
+    "statement": "theorem zero_chart_factor_content (a j : \u2115) (d : \u211a) (hj : j \u2264 a) (hd : padicValRat 2 ((2:\u211a)^j-d) \u2264 j) : Content 0 (chart a 0 (factor d j))",
+    "decl_sha256": "b2473ac3980131e9a83db9d57dea913dad584c9b495e8d1f4d65c362fca251a8",
+    "claim_id": "PCC-20261114-509249"
+  },
+  {
+    "theorem": "OrientationAnchor.actual_zero_content",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationProduct.lean",
+    "statement": "theorem actual_zero_content (a u x y : \u2115) (m : \u2115 \u2192 \u2115) (hu : u \u2264 a) : Content 0 (chart a 0 (correction u x y m))",
+    "decl_sha256": "63a993d3447da64b3a6a8ac5c935e037b428142be7dc43b45d69627811b54c1c",
+    "claim_id": "PCC-20261114-ad7522"
+  },
+  {
+    "theorem": "OrientationAnchor.grid_order_le",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationProduct.lean",
+    "statement": "theorem grid_order_le (a : \u2115) (t : \u2124) (ht : t \u2208 Ico (-(2:\u2124)^a) ((2:\u2124)^a)) (ht0 : t \u2260 0) : padicValInt 2 t \u2264 a",
+    "decl_sha256": "5c5aa368e3ddc4a2ddeb9b7d19ffe8c5f7cf5f42a383cca7e6b196a6ac72b8cb",
+    "claim_id": "PCC-20261114-ecd827"
+  },
+  {
+    "theorem": "OrientationAnchor.all_grid_correction_content",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationProduct.lean",
+    "statement": "theorem all_grid_correction_content (a u x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (ht : t \u2208 Ico (-(2:\u2124)^a) ((2:\u2124)^a)) (hu : u \u2264 a) (hm : \u2200 j < u, 0 \u2264 schedule u j m) : Content 0 (chart a t (correction u x y m))",
+    "decl_sha256": "2ab10b5a47feb4f9bd01a86e7d54a0036d92c767f8aba44bfff738b4c84938ec",
+    "claim_id": "PCC-20261114-e9d567"
+  },
+  {
+    "theorem": "OrientationAnchor.completed_content_from_base",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationProduct.lean",
+    "statement": "theorem completed_content_from_base (a u x y : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (k : \u2124) (ht : t \u2208 Ico (-(2:\u2124)^a) ((2:\u2124)^a)) (hu : u \u2264 a) (hm : \u2200 j < u, 0 \u2264 schedule u j m) (hb : Content k (chart a t (base (grid a) (delta x y)))) : Content k (chart a t (completed (grid a) u x y m))",
+    "decl_sha256": "12da70843445a89bcb1f1b7d5d7dee318e0a1b41c4ecf60b60c6fb887a37fb03",
+    "claim_id": "PCC-20261114-9a239f"
+  },
+  {
+    "theorem": "OrientationAnchor.completed_crossing_content_from_base",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationProduct.lean",
+    "statement": "theorem completed_crossing_content_from_base (a u x y i : \u2115) (t : \u2124) (m : \u2115 \u2192 \u2115) (k g : \u2124) (ht : t \u2260 0) (hi : padicValInt 2 t = i) (hia : i \u2264 a) (hiu : i < u) (hc : x.testBit i = y.testBit i) (hg : g \u2264 schedule u i m) (hb : Content k (chart a t (base (grid a) (delta x y)))) : Content (k+g) (chart a t (completed (grid a) u x y m))",
+    "decl_sha256": "3812771796a0bd634ac1ee40d4bfb88d3d140b6a4353647875fe5574ce972c5d",
+    "claim_id": "PCC-20261114-8e3afc"
+  },
+  {
+    "theorem": "OrientationAnchor.delta_as_int",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationValuation.lean",
+    "statement": "theorem delta_as_int (x y : \u2115) : delta x y = (((y:\u2124)-x : \u2124) : \u211a)",
+    "decl_sha256": "302b2cd5f97eac12b69399483bbaa5c9662f7a62cd54ea7b2823a8742a3981e7",
+    "claim_id": "PCC-20261114-be5833"
+  },
+  {
+    "theorem": "OrientationAnchor.signed_ne_zero",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationValuation.lean",
+    "statement": "theorem signed_ne_zero (x y : \u2115) (hxy : x \u2260 y) : (y:\u2124)-x \u2260 0",
+    "decl_sha256": "7440647faecca389557e715fd63eafed23e98c0524254deb4d61b39f7fc9b2de",
+    "claim_id": "PCC-20261114-5ae9fd"
+  },
+  {
+    "theorem": "OrientationAnchor.bit_diff_of_exact_divisibility",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationValuation.lean",
+    "statement": "theorem bit_diff_of_exact_divisibility (x y s : \u2115) (hlo : (2:\u2124)^s \u2223 (y:\u2124)-x) (hhi : \u00ac(2:\u2124)^(s+1) \u2223 (y:\u2124)-x) : x.testBit s \u2260 y.testBit s",
+    "decl_sha256": "9237eb04e34ca292908b247f128e056329950c5e36d07f824e04d6759ef3d5aa",
+    "claim_id": "PCC-20261114-0b9ec3"
+  },
+  {
+    "theorem": "OrientationAnchor.order_bit_diff",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationValuation.lean",
+    "statement": "theorem order_bit_diff (x y : \u2115) (hxy : x \u2260 y) : x.testBit (order x y) \u2260 y.testBit (order x y)",
+    "decl_sha256": "8bb0369e33be347c1b7a7cff7b98cc3b3ba3ab32a9a14655579f9f3b4d346164",
+    "claim_id": "PCC-20261114-8ad53d"
+  },
+  {
+    "theorem": "OrientationAnchor.mask_omits_order",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationValuation.lean",
+    "statement": "theorem mask_omits_order (u x y : \u2115) (hxy : x \u2260 y) : order x y \u2209 mask u x y",
+    "decl_sha256": "fa67802438df6182cb806f4f4fed340f59a77463ae96de69c952d5931d5e5f46",
+    "claim_id": "PCC-20261114-8f64e1"
+  },
+  {
+    "theorem": "OrientationAnchor.bits_below_order",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationValuation.lean",
+    "statement": "theorem bits_below_order (x y i : \u2115) (hi : i < order x y) : x.testBit i = y.testBit i",
+    "decl_sha256": "ab9d34ec466df49003dff09a4d2b03a8df34957bf93e0ff4bfc24311b185764e",
+    "claim_id": "PCC-20261114-87c0b9"
+  },
+  {
+    "theorem": "OrientationAnchor.order_le_of_bit_diff",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationValuation.lean",
+    "statement": "theorem order_le_of_bit_diff (x y i : \u2115) (hbit : x.testBit i \u2260 y.testBit i) : order x y \u2264 i",
+    "decl_sha256": "3ee9c4e2127ae38842477baecc48ac9c4165729e85656886fb6b7a341e626e23",
+    "claim_id": "PCC-20261114-40cc2f"
+  },
+  {
+    "theorem": "OrientationAnchor.delta_valuation",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationValuation.lean",
+    "statement": "theorem delta_valuation (x y : \u2115) : padicValRat 2 (delta x y) = (order x y : \u2124)",
+    "decl_sha256": "7b0948313678300b0a8ca856cf27fc76ba62aa50c0dff02ee38359625c117930",
+    "claim_id": "PCC-20261114-c1b217"
+  },
+  {
+    "theorem": "OrientationAnchor.denominator_valuation",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationValuation.lean",
+    "statement": "theorem denominator_valuation (u x y j : \u2115) (hxy : x \u2260 y) (hj : j \u2208 mask u x y) : padicValRat 2 ((2:\u211a)^j-delta x y) = min (j:\u2124) (order x y)",
+    "decl_sha256": "2c9a006de3ae322ddcec58826ceb779f3f0a95a8223d76ac612156277631a787",
+    "claim_id": "PCC-20261114-d1c39d"
+  },
+  {
+    "theorem": "OrientationAnchor.diagonal_denominator_valuation",
+    "source": "research/prime_orientation_anchor_20261114/lean/OrientationValuation.lean",
+    "statement": "theorem diagonal_denominator_valuation (x j : \u2115) : padicValRat 2 ((2:\u211a)^j-delta x x) = (j:\u2124)",
+    "decl_sha256": "0d25a74c6d15752afc065ca25e394a0322be777ac08c9ebdeb11efa1a4cb3cd2",
+    "claim_id": "PCC-20261114-0acf3f"
+  }
+]

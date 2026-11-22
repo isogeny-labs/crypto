@@ -1,0 +1,1350 @@
+name: Radical prime-field rootfinder correctness and timing
+
+on:
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_radical_root.rs'
+      - 'src/cryptanalysis/prime_root_trace.rs'
+      - 'src/cryptanalysis/prime_root_bounded.rs'
+      - 'research/amm_digit_perf_20261118/round31_bounded_isolated.py'
+      - 'research/amm_digit_perf_20261118/round32_verifier_isolated.py'
+      - 'research/amm_digit_perf_20261118/round33_bounded_poly_isolated.py'
+      - 'research/amm_digit_perf_20261118/round34_bounded_sparse_isolated.py'
+      - 'research/amm_digit_perf_20261118/round36_bounded_replay_isolated.py'
+      - 'research/amm_digit_perf_20261118/round38_bounded_gcd_isolated.py'
+      - 'research/amm_digit_perf_20261118/round39_bounded_power_isolated.py'
+      - 'research/amm_digit_perf_20261118/round40_bounded_frobenius_isolated.py'
+      - 'research/amm_digit_perf_20261118/round42_mersenne_chain_isolated.py'
+      - 'research/amm_digit_perf_20261118/round43_dense_square_isolated.py'
+      - 'research/amm_digit_perf_20261118/round44_window3_isolated.py'
+      - 'research/amm_digit_perf_20261118/round45_quadratic_frobenius_isolated.py'
+      - 'research/amm_digit_perf_20261118/round46_quadratic_split_isolated.py'
+      - 'research/amm_digit_perf_20261118/round47_quadratic_split_isolated.py'
+      - 'research/amm_digit_perf_20261118/round48_joint_tonelli_isolated.py'
+      - 'research/amm_digit_perf_20261118/round49_jacobi_isolated.py'
+      - 'research/amm_digit_perf_20261118/round50_quadratic_finish_isolated.py'
+      - 'research/amm_digit_perf_20261118/round51_linear_products_isolated.py'
+      - 'research/amm_digit_perf_20261118/round52_monic_linear_isolated.py'
+      - 'research/amm_digit_perf_20261118/round53_euclid_inverse_isolated.py'
+      - 'research/amm_digit_perf_20261118/round54_dense_accumulators_isolated.py'
+      - 'research/amm_digit_perf_20261118/round55_small_squares_isolated.py'
+      - 'research/amm_digit_perf_20261118/round56_monomial_isolated.py'
+      - 'research/amm_digit_perf_20261118/round57_monomial_frobenius_isolated.py'
+      - 'research/amm_digit_perf_20261118/round58_binomial_frobenius_isolated.py'
+      - 'research/amm_digit_perf_20261118/round64_linear_gcd_square_isolated.py'
+      - 'research/amm_digit_perf_20261118/round65_unit_frobenius_isolated.py'
+      - 'research/amm_digit_perf_20261118/round66_unit_linear_isolated.py'
+      - 'research/amm_digit_perf_20261118/round67_jacobi_isolated.py'
+      - 'research/amm_digit_perf_20261118/round68_rpow_sqrt_isolated.py'
+      - 'research/amm_digit_perf_20261118/round69_casus_finish_isolated.py'
+      - 'research/amm_digit_perf_20261118/round31_bounded_baseline.rs'
+      - 'research/amm_digit_perf_20261118/round23_verifier_isolated.py'
+      - 'research/amm_digit_perf_20261118/round24_verifier_isolated.py'
+      - 'research/amm_digit_perf_20261118/round25_verifier_isolated.py'
+      - 'research/amm_digit_perf_20261118/round26_verifier_isolated.py'
+      - 'research/amm_digit_perf_20261118/round27_verifier_isolated.py'
+      - 'research/amm_digit_perf_20261118/round28_verifier_isolated.py'
+      - 'research/amm_digit_perf_20261118/round29_verifier_isolated.py'
+      - 'research/amm_digit_perf_20261118/round29_verifier_baseline.rs'
+      - 'research/amm_digit_perf_20261118/round30_verifier_isolated.py'
+      - 'research/amm_digit_perf_20261118/round30_verifier_baseline.rs'
+      - '.github/workflows/radical-root-arithmetic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: radical-root-arithmetic-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  radical-casus-finish-round69:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_radical_root.rs
+            research/amm_digit_perf_20261118/round69_casus_finish_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Source-exact Rust casus finishing stage and full cubic A/B
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round69_casus_finish_isolated.py
+          } | tee "$RUNNER_TEMP/round69-native-rust.txt"
+          cat "$RUNNER_TEMP/round69-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round69-casus-finish-native-rust
+          path: ${{ runner.temp }}/round69-native-rust.txt
+          if-no-files-found: ignore
+
+  radical-rpow-sqrt-round68:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_radical_root.rs
+            research/amm_digit_perf_20261118/round68_rpow_sqrt_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare source-exact Rust roots, Fp2 powering and alternating A/B timings
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round68_rpow_sqrt_isolated.py
+          } | tee "$RUNNER_TEMP/round68-native-rust.txt"
+          cat "$RUNNER_TEMP/round68-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round68-rpow-sqrt-native-rust
+          path: ${{ runner.temp }}/round68-native-rust.txt
+          if-no-files-found: ignore
+
+  radical-jacobi-round67:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_radical_root.rs
+            research/amm_digit_perf_20261118/round67_jacobi_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare source-exact Rust root outputs and alternating A/B timings
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round67_jacobi_isolated.py
+          } | tee "$RUNNER_TEMP/round67-native-rust.txt"
+          cat "$RUNNER_TEMP/round67-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round67-jacobi-native-rust
+          path: ${{ runner.temp }}/round67-native-rust.txt
+          if-no-files-found: ignore
+
+  bounded-unit-linear-round66:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round66_unit_linear_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Exact Rust A/B for four unit-linear paths and complete root streams
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round66_unit_linear_isolated.py
+          } | tee "$RUNNER_TEMP/round66-native-rust.txt"
+          cat "$RUNNER_TEMP/round66-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round66-unit-linear-native-rust
+          path: ${{ runner.temp }}/round66-native-rust.txt
+          if-no-files-found: ignore
+
+  bounded-monomial-frobenius-round57:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round57_monomial_frobenius_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Verify producer and replay Frobenius, benchmark full root plus certificate
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round57_monomial_frobenius_isolated.py
+          } | tee "$RUNNER_TEMP/round57-native-rust.txt"
+          cat "$RUNNER_TEMP/round57-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round57-monomial-frobenius-native-rust
+          path: ${{ runner.temp }}/round57-native-rust.txt
+          if-no-files-found: ignore
+
+  bounded-monomial-round56:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round56_monomial_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Exact source Rust before/after for degree-two through degree-eight x-power reductions
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round56_monomial_isolated.py
+          } | tee "$RUNNER_TEMP/round56-native-rust.txt"
+          cat "$RUNNER_TEMP/round56-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round56-monomial-native-rust
+          path: ${{ runner.temp }}/round56-native-rust.txt
+          if-no-files-found: ignore
+
+  bounded-small-squares-round55:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round55_small_squares_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare small polynomial squares in compiled production Rust
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round55_small_squares_isolated.py
+          } | tee "$RUNNER_TEMP/round55-rust.txt"
+          cat "$RUNNER_TEMP/round55-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round55-small-squares-rust
+          path: ${{ runner.temp }}/round55-rust.txt
+          if-no-files-found: ignore
+
+  bounded-dense-accumulators-round54:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round54_dense_accumulators_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Verify dense polynomial producer/replay and benchmark before versus after in native Rust
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round54_dense_accumulators_isolated.py
+          } | tee "$RUNNER_TEMP/round54-rust.txt"
+          cat "$RUNNER_TEMP/round54-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round54-dense-polynomials-rust
+          path: ${{ runner.temp }}/round54-rust.txt
+          if-no-files-found: ignore
+
+  bounded-inversion-round53:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round53_euclid_inverse_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare producer Euclid, verifier binary inverse and constant division in native Rust
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round53_euclid_inverse_isolated.py
+          } | tee "$RUNNER_TEMP/round53-rust.txt"
+          cat "$RUNNER_TEMP/round53-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round53-euclid-binary-inverse-rust
+          path: ${{ runner.temp }}/round53-rust.txt
+          if-no-files-found: ignore
+
+  bounded-monic-linear-round52:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round52_monic_linear_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare exact production Rust before and after monic-linear synthetic division
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round52_monic_linear_isolated.py
+          } | tee "$RUNNER_TEMP/round52-rust.txt"
+          cat "$RUNNER_TEMP/round52-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round52-synthetic-linear-division-rust
+          path: ${{ runner.temp }}/round52-rust.txt
+          if-no-files-found: ignore
+
+  bounded-scalar-and-linear-round51:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round51_linear_products_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare R50 with exact production Rust optimized linear multiplication and replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round51_linear_products_isolated.py
+          } | tee "$RUNNER_TEMP/round51-rust.txt"
+          cat "$RUNNER_TEMP/round51-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round51-linear-producer-verifier-rust
+          path: ${{ runner.temp }}/round51-rust.txt
+          if-no-files-found: ignore
+
+  bounded-quadratic-finish-round50:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round50_quadratic_finish_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare R49 baseline with quadratic Vieta/halving in actual Rust
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round50_quadratic_finish_isolated.py
+          } | tee "$RUNNER_TEMP/round50-rust.txt"
+          cat "$RUNNER_TEMP/round50-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round50-bounded-quadratic-rust
+          path: ${{ runner.temp }}/round50-rust.txt
+          if-no-files-found: ignore
+
+  bounded-quadratic-split-round47:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round47_quadratic_split_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare frozen round46 root/certificate baseline against round47 in actual Rust
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round47_quadratic_split_isolated.py
+          } | tee "$RUNNER_TEMP/round47-rust.txt"
+          cat "$RUNNER_TEMP/round47-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round47-bounded-quadratic-split-rust
+          path: ${{ runner.temp }}/round47-rust.txt
+          if-no-files-found: ignore
+
+  bounded-quadratic-split-round46:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round46_quadratic_split_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Check frozen polynomial roots/events and benchmark scalar split in real Rust
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round46_quadratic_split_isolated.py
+          } | tee "$RUNNER_TEMP/round46-rust.txt"
+          cat "$RUNNER_TEMP/round46-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round46-bounded-quadratic-split-rust
+          path: ${{ runner.temp }}/round46-rust.txt
+          if-no-files-found: ignore
+
+  bounded-window3-round44:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round44_window3_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Check native producer/replay equivalence and benchmark sliding windows
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round44_window3_isolated.py
+          } | tee "$RUNNER_TEMP/round44-window3-rust.txt"
+          cat "$RUNNER_TEMP/round44-window3-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round44-window3-production-rust-ab
+          path: ${{ runner.temp }}/round44-window3-rust.txt
+          if-no-files-found: ignore
+
+  bounded-dense-square-round43:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round43_dense_square_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compile exact Rust, compare roots/certificates and benchmark dense square A/B
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round43_dense_square_isolated.py
+          } | tee "$RUNNER_TEMP/round43-bounded-rust.txt"
+          cat "$RUNNER_TEMP/round43-bounded-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round43-dense-square-rust-ab
+          path: ${{ runner.temp }}/round43-bounded-rust.txt
+          if-no-files-found: ignore
+
+  bounded-mersenne-addition-chain:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round42_mersenne_chain_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Verify exact production Rust and benchmark all-one exponent chains
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round42_mersenne_chain_isolated.py
+          } | tee "$RUNNER_TEMP/round42-bounded-rust.txt"
+          cat "$RUNNER_TEMP/round42-bounded-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round42-mersenne-chain-rust-a-b
+          path: ${{ runner.temp }}/round42-bounded-rust.txt
+          if-no-files-found: ignore
+
+  verifier-euclid:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round32_verifier_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Check Euclid inversion and benchmark compiled verifier Rust A/B
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round32_verifier_isolated.py
+          } | tee "$RUNNER_TEMP/round32-euclid-rust.txt"
+          cat "$RUNNER_TEMP/round32-euclid-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round32-euclid-verifier-rust-bench
+          path: ${{ runner.temp }}/round32-euclid-rust.txt
+          if-no-files-found: ignore
+
+  # The default crypto library is temporarily unbuildable due to unrelated
+  # F4/APS diagnostics. Compile the exact production source in a tiny,
+  # dependency-free test crate so field changes are still independently gated.
+  isolated-arithmetic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          # The full crypto repository is unusually large; this isolated
+          # crate imports only the exact production source file.
+          sparse-checkout: |
+            research/radical_field_perf_20261117/isolated
+            src/cryptanalysis/prime_radical_root.rs
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round22_trace_field_isolated.py
+            research/amm_digit_perf_20261118/round23_verifier_isolated.py
+            research/amm_digit_perf_20261118/round24_verifier_isolated.py
+            research/amm_digit_perf_20261118/round25_verifier_isolated.py
+            research/amm_digit_perf_20261118/round26_verifier_isolated.py
+            research/amm_digit_perf_20261118/round27_verifier_isolated.py
+            research/amm_digit_perf_20261118/round28_verifier_isolated.py
+            research/amm_digit_perf_20261118/round29_verifier_isolated.py
+            research/amm_digit_perf_20261118/round29_verifier_baseline.rs
+            research/amm_digit_perf_20261118/round30_verifier_isolated.py
+            research/amm_digit_perf_20261118/round30_verifier_baseline.rs
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compile actual Rust module and check arithmetic
+        run: |
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            optimized_field_arithmetic_matches_wide_reference -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            radical_power_reuse_matches_frozen_reference -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            cube_root_exhaustive_fp_and_fp2_both_classes -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            amm_digit_loop_matches_previous_reference -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            cardano_discriminant_reuse_matches_reference -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            cubic_shift_fq2_square_and_small_field_mul_match_reference -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            adaptive_window_power_and_quadratic_finish_match_frozen -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            quadratic_direct_discriminant_matches_frozen_normalized_formula -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            monic_cubic_entry_point_matches_frozen_normalization -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            fused_tonelli_and_quartic_coefficients_match_frozen -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            frobenius_fp2_power_matches_frozen_binary_and_cube_root -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            modular_half_and_linear_shortcuts_match_frozen_formula -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            actual_fp2_amm_cube_roots_match_pre_frobenius -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            fp2_cube_norm_and_mod8_sqrt_match_previous_algorithm -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            skip_zeroth_amm_digit_preserves_roots_fp_and_fp2 -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            cached_sylow_factors_match_precache_roots -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            s1_and_sparse_quadratic_quartic_match_previous -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            stack_coefficient_buffer_preserves_padding_and_modular_zeroes -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            sparse_cubics_and_even_quartics_match_frozen_reference -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            round20_sparse_fp2_and_depressed_quartic_match_reference -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            round21_small_inverses_and_cached_sylow_are_exact -- --nocapture
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            round22_nonresidue_reciprocity_preserves_first_candidate -- --nocapture
+      - name: Verify and benchmark actual Rust trace field arithmetic
+        run: python3 research/amm_digit_perf_20261118/round22_trace_field_isolated.py
+      - name: Verify and benchmark actual Rust trace verifier arithmetic
+        run: python3 research/amm_digit_perf_20261118/round23_verifier_isolated.py
+      - name: Verify and benchmark verifier fast paths in actual Rust
+        run: python3 research/amm_digit_perf_20261118/round24_verifier_isolated.py
+      - name: Verify and benchmark synthetic division and squaring in actual Rust
+        run: python3 research/amm_digit_perf_20261118/round25_verifier_isolated.py
+      - name: Verify and benchmark sparse polynomial and linear division improvements
+        run: python3 research/amm_digit_perf_20261118/round26_verifier_isolated.py
+      - name: Verify and benchmark monomial and sparse-square specializations
+        run: python3 research/amm_digit_perf_20261118/round27_verifier_isolated.py
+      - name: Verify and benchmark scalar arithmetic and trinomial squares
+        run: python3 research/amm_digit_perf_20261118/round28_verifier_isolated.py
+      - name: Validate and benchmark four-term squares, binomial division and power-step square
+        run: python3 research/amm_digit_perf_20261118/round29_verifier_isolated.py
+      - name: Check and time fixed-degree sparse/linear division and sparse squares
+        run: python3 research/amm_digit_perf_20261118/round30_verifier_isolated.py
+      - name: Actual Rust paired benchmark of AMM/Tonelli/discriminant
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "perf_event_paranoid=$(cat /proc/sys/kernel/perf_event_paranoid)"
+            echo "rustc=$(rustc --version)"
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_radical_power_reuse -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_amm_digit_loop -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_cardano_discriminant -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_cubic_shift_fq2_square_and_small_field_mul -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_adaptive_window_and_quad_finish -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_quadratic_direct_discriminant -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_fused_tonelli_and_quartic_coefficients -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_frobenius_fp2_power -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_half_linear_and_tripling -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_fp2_amm_cube_root_before_after_frobenius -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_fp2_cubing_and_mod8_sqrt_actual_rust -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_skip_zeroth_amm_digit_actual_rust -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_cached_sylow_factors -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_s1_and_sparse_roots_actual_rust -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_stack_coefficient_buffer_actual_rust -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_sparse_round19_actual_rust -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_round20_sparse_fp2_and_quartic_depression -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_round21_small_inverse_constants_actual_rust -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_round21_cached_amm_sylow_actual_rust -- --ignored --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_round22_nonresidue_selection -- --ignored --nocapture
+          } | tee "$RUNNER_TEMP/radical-power-reuse.txt"
+          cat "$RUNNER_TEMP/radical-power-reuse.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: radical-power-reuse-rust-bench
+          path: ${{ runner.temp }}/radical-power-reuse.txt
+          if-no-files-found: ignore
+
+  bounded-arithmetic:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round31_bounded_baseline.rs
+            research/amm_digit_perf_20261118/round31_bounded_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compiled Rust bounded producer and independent replay A/B
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/amm_digit_perf_20261118/round31_bounded_isolated.py \
+            | tee "$RUNNER_TEMP/round31-bounded-rust.txt"
+          cat "$RUNNER_TEMP/round31-bounded-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round31-bounded-rust-bench
+          path: ${{ runner.temp }}/round31-bounded-rust.txt
+          if-no-files-found: ignore
+
+  radical:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      CARGO_INCREMENTAL: 0
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - name: Check exact field arithmetic against wide reference
+        run: cargo test --release --lib optimized_field_arithmetic_matches_wide_reference -- --nocapture
+      - name: Check actual cubic and quartic outputs against reference
+        run: cargo test --release --lib matches_prime_root_trace_on_random_large_instances -- --nocapture
+      - name: Check cube-root algorithms over Fp and Fp2
+        run: cargo test --release --lib cube_root_exhaustive_fp_and_fp2_both_classes -- --nocapture
+      - name: Run paired before/after benchmark against actual Rust code
+        run: |
+          set -o pipefail
+          echo "runner=$(uname -a)" | tee "$RUNNER_TEMP/radical-root-results.txt"
+          echo "perf_event_paranoid=$(cat /proc/sys/kernel/perf_event_paranoid)" | tee -a "$RUNNER_TEMP/radical-root-results.txt"
+          cargo test --release --lib bench_radical_field_actual_rust -- --ignored --nocapture \
+            | tee -a "$RUNNER_TEMP/radical-root-results.txt"
+          cat "$RUNNER_TEMP/radical-root-results.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: radical-root-arithmetic-timing
+          path: ${{ runner.temp }}/radical-root-results.txt
+          if-no-files-found: ignore
+
+  bounded-polynomial-symmetric-division:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round33_bounded_poly_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Verify root polynomial arithmetic and measure real Rust before/after
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round33_bounded_poly_isolated.py
+          } | tee "$RUNNER_TEMP/round33-bounded-rust.txt"
+          cat "$RUNNER_TEMP/round33-bounded-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round33-bounded-polynomial-rust
+          path: ${{ runner.temp }}/round33-bounded-rust.txt
+          if-no-files-found: ignore
+
+  bounded-sparse-round34:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round34_bounded_sparse_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Check sparse/dense polynomial equivalence, full roots and A/B benchmark
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round34_bounded_sparse_isolated.py
+          } | tee "$RUNNER_TEMP/round34-bounded-rust.txt"
+          cat "$RUNNER_TEMP/round34-bounded-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round34-sparse-bounded-rust
+          path: ${{ runner.temp }}/round34-bounded-rust.txt
+          if-no-files-found: ignore
+
+  round35-small-factors:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            research/radical_field_perf_20261117/isolated
+            src/cryptanalysis/prime_radical_root.rs
+            src/cryptanalysis/prime_root_trace.rs
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test plus/minus-one roots and Mersenne exponentiation
+        run: |
+          set -euo pipefail
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml round35_ -- --nocapture
+          # The isolated stub intentionally disables the generic Frobenius
+          # fallback. The exhaustive test needs the full library; the new
+          # plus/minus-one cases are covered by round35_ above.
+      - name: Benchmark exact Rust cubic/quartic and Mersenne power paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml bench_round35_small_factors_and_mersenne_pow -- --ignored --nocapture
+          } | tee "$RUNNER_TEMP/round35-rust.txt"
+          cat "$RUNNER_TEMP/round35-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round35-cubic-quartic-rust
+          path: ${{ runner.temp }}/round35-rust.txt
+          if-no-files-found: ignore
+
+  bounded-replay-round36:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round36_bounded_replay_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Validate frozen replay equivalence, complete roots, and benchmark production Rust
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round36_bounded_replay_isolated.py
+          } | tee "$RUNNER_TEMP/round36-rust.txt"
+          cat "$RUNNER_TEMP/round36-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round36-root-replay-rust
+          path: ${{ runner.temp }}/round36-rust.txt
+          if-no-files-found: ignore
+
+
+  round37-fp2-frobenius:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            research/radical_field_perf_20261117/isolated
+            src/cryptanalysis/prime_radical_root.rs
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Check exact production Rust arithmetic and benchmark paired before/after
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              round37_fp2_frobenius_and_canonical_fp_match_frozen -- --nocapture
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_round37_fp2_frobenius_and_fp_powm_actual_rust -- --ignored --nocapture
+          } | tee "$RUNNER_TEMP/round37-native-rust.txt"
+          cat "$RUNNER_TEMP/round37-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round37-native-rust-benchmark
+          path: ${{ runner.temp }}/round37-native-rust.txt
+          if-no-files-found: ignore
+
+  round38-bounded-gcd:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round38_bounded_gcd_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Test actual producer/replay against frozen GCD and benchmark 13-pair A/B
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round38_bounded_gcd_isolated.py
+          } | tee "$RUNNER_TEMP/round38-gcd-native-rust.txt"
+          cat "$RUNNER_TEMP/round38-gcd-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round38-gcd-native-rust
+          path: ${{ runner.temp }}/round38-gcd-native-rust.txt
+          if-no-files-found: ignore
+
+  round39-bounded-power:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round39_bounded_power_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare complete bounded roots and certificate replay to frozen Rust baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          { rustc --version
+            python3 research/amm_digit_perf_20261118/round39_bounded_power_isolated.py
+          } | tee "$RUNNER_TEMP/round39-native-rust.txt"
+          cat "$RUNNER_TEMP/round39-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round39-native-rust
+          path: ${{ runner.temp }}/round39-native-rust.txt
+          if-no-files-found: ignore
+
+  round40-frobenius-linear-constant:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round40_bounded_frobenius_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare exact Rust before and after constant/linear Frobenius paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            rustc --version
+            python3 research/amm_digit_perf_20261118/round40_bounded_frobenius_isolated.py
+          } | tee "$RUNNER_TEMP/round40-frobenius-native-rust.txt"
+          cat "$RUNNER_TEMP/round40-frobenius-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round40-frobenius-native-rust
+          path: ${{ runner.temp }}/round40-frobenius-native-rust.txt
+          if-no-files-found: ignore
+
+  bounded-quadratic-frobenius-round45:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round45_quadratic_frobenius_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Check quadratic Frobenius identities and 13-pair Rust root extraction A/B
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round45_quadratic_frobenius_isolated.py
+          } | tee "$RUNNER_TEMP/round45-quadratic-native-rust.txt"
+          cat "$RUNNER_TEMP/round45-quadratic-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round45-quadratic-native-rust
+          path: ${{ runner.temp }}/round45-quadratic-native-rust.txt
+          if-no-files-found: ignore
+
+  bounded-jacobi-round49:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round49_jacobi_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Validate native Rust binary Jacobi against old Euler baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round49_jacobi_isolated.py
+          } | tee "$RUNNER_TEMP/round49-jacobi-rust.txt"
+          cat "$RUNNER_TEMP/round49-jacobi-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round49-jacobi-production-rust-ab
+          path: ${{ runner.temp }}/round49-jacobi-rust.txt
+          if-no-files-found: ignore
+
+  bounded-joint-tonelli-round48:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round48_joint_tonelli_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Native Rust R47-vs-R48 frozen roots, replay and 13-pair timing
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round48_joint_tonelli_isolated.py
+          } | tee "$RUNNER_TEMP/round48-tonelli-rust.txt"
+          cat "$RUNNER_TEMP/round48-tonelli-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round48-tonelli-native-rust
+          path: ${{ runner.temp }}/round48-tonelli-rust.txt
+          if-no-files-found: ignore
+
+  bounded-binomial-frobenius-round58:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round58_binomial_frobenius_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare exact source Rust before and after, root events and independent replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round58_binomial_frobenius_isolated.py
+          } | tee "$RUNNER_TEMP/round58-native-rust.txt"
+          cat "$RUNNER_TEMP/round58-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round58-binomial-frobenius-native-rust
+          path: ${{ runner.temp }}/round58-native-rust.txt
+          if-no-files-found: ignore
+
+  bounded-binomial-reduction-round59:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round59_binomial_reduction_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Validate source-exact binomial division, reduction and independent replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round59_binomial_reduction_isolated.py
+          } | tee "$RUNNER_TEMP/round59-native-rust.txt"
+          cat "$RUNNER_TEMP/round59-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round59-binomial-reduction-native-rust
+          path: ${{ runner.temp }}/round59-native-rust.txt
+          if-no-files-found: ignore
+
+  bounded-unit-linear-round60:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round60_unit_linear_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Verify four production Rust unit-linear paths and 13-pair A/B timing
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round60_unit_linear_isolated.py
+          } | tee "$RUNNER_TEMP/round60-native-rust.txt"
+          cat "$RUNNER_TEMP/round60-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round60-unit-linear-native-rust
+          path: ${{ runner.temp }}/round60-native-rust.txt
+          if-no-files-found: ignore
+
+
+  bounded-sparse-scalar-round61:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round61_sparse_scalar_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Benchmark source-exact Rust arithmetic and complete certificate streams
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round61_sparse_scalar_isolated.py
+          } | tee "$RUNNER_TEMP/round61-native-rust.txt"
+          cat "$RUNNER_TEMP/round61-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round61-sparse-scalar-native-rust
+          path: ${{ runner.temp }}/round61-native-rust.txt
+          if-no-files-found: ignore
+
+  bounded-unit-products-round62:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round62_unit_products_isolated.py
+            research/amm_digit_perf_20261118/round63_synthetic_linear_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Source-exact Rust before/after, oracle comparisons, and full root certificates
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round62_unit_products_isolated.py
+            python3 research/amm_digit_perf_20261118/round63_synthetic_linear_isolated.py
+          } | tee "$RUNNER_TEMP/round62-native-rust.txt"
+          cat "$RUNNER_TEMP/round62-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round62-unit-products-native-rust
+          path: ${{ runner.temp }}/round62-native-rust.txt
+          if-no-files-found: ignore
+
+  bounded-synthetic-linear-round63:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round63_synthetic_linear_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Validate source-exact Rust linear Horner, complete certificates and A/B timings
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round63_synthetic_linear_isolated.py
+          } | tee "$RUNNER_TEMP/round63-native-rust.txt"
+          cat "$RUNNER_TEMP/round63-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round63-synthetic-linear-native-rust
+          path: ${{ runner.temp }}/round63-native-rust.txt
+          if-no-files-found: ignore
+
+  bounded-linear-gcd-square-round64:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round64_linear_gcd_square_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Verify linear GCD and nonmonic square in production Rust, benchmark A/B
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round64_linear_gcd_square_isolated.py
+          } | tee "$RUNNER_TEMP/round64-native-rust.txt"
+          cat "$RUNNER_TEMP/round64-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round64-linear-gcd-square-native-rust
+          path: ${{ runner.temp }}/round64-native-rust.txt
+          if-no-files-found: ignore
+
+  bounded-unit-frobenius-round65:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_bounded.rs
+            research/amm_digit_perf_20261118/round65_unit_frobenius_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Validate and benchmark four round65 production Rust specializations
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            python3 research/amm_digit_perf_20261118/round65_unit_frobenius_isolated.py
+          } | tee "$RUNNER_TEMP/round65-native-rust.txt"
+          cat "$RUNNER_TEMP/round65-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round65-native-rust
+          path: ${{ runner.temp }}/round65-native-rust.txt
+          if-no-files-found: ignore
+
+  round66-fp2-inverse-sylow:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            research/radical_field_perf_20261117/isolated
+            src/cryptanalysis/prime_radical_root.rs
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compare source-exact Fp2 AMM roots to frozen two-power ring
+        run: |
+          cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+            round66_fp2_inverse_sylow_matches_prechange -- --nocapture
+      - name: Benchmark 13 alternating production Rust trials
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            cargo test --release --manifest-path research/radical_field_perf_20261117/isolated/Cargo.toml \
+              bench_round66_fp2_amm_inverse_sylow -- --ignored --nocapture
+          } | tee "$RUNNER_TEMP/round66-native-rust.txt"
+          cat "$RUNNER_TEMP/round66-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round66-fp2-amm-native-rust
+          path: ${{ runner.temp }}/round66-native-rust.txt
+          if-no-files-found: ignore

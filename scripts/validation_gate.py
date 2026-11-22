@@ -22,6 +22,11 @@ VALIDATION.json validates them. A row that is not frozen, or whose digest no
 longer matches the frozen one (it was added or changed after the gate), must be
 validated or the builder refuses it and the CI check fails.
 
+A sweep verdict validates only when the three artifacts it names are repository
+files that pass the checks a VALIDATION.json's artifacts pass. With `--base REF`
+the freeze may only shrink and the sweep verdict files may only be appended to;
+a REF that does not resolve to a commit stops the check.
+
     python3 scripts/validation_gate.py check [--base REF]    # the CI check
     python3 scripts/validation_gate.py freeze                # (re)write the pre-gate files
     python3 scripts/validation_gate.py evidence DIR          # explain one evidence directory
@@ -63,6 +68,17 @@ FAILED = "failed validation"
 REFERENCE_KINDS = {"negation", "frobenius", "automorphism_fold", "negation_frobenius",
                    "no_symmetry_available"}
 GAE_BAND = ("0", "0.1", "1")
+# Relative tolerance of the headline comparison.  A validator report may name its own
+# `rel_tol` only as a finite number from 0 up, so a report cannot switch the comparison off
+# with NaN or inf.  HEADLINE_REL_TOL_MAX is the cap a report's own tolerance should not
+# exceed; it is enforced only when HEADLINE_REL_TOL_ENFORCE_MAX is true.  It is false today
+# because 22 admitted benchmarks rows (and 14 research manifests) state tolerances from 1e-3
+# to 5e299 for headlines rounded for display; enforcing the cap is an owner decision
+# (re-issue those reports with exact values, or freeze the rows), recorded in
+# docs/audits/2026-11-15-correctness-validation-assessment.md, V-4.
+HEADLINE_REL_TOL = 1e-9
+HEADLINE_REL_TOL_MAX = 1e-6
+HEADLINE_REL_TOL_ENFORCE_MAX = False
 CERT_OK = {"verified", "pass", "passed", "pass_independent_replay"}
 # What a sweep verdict must carry to validate a row (the three artifacts).
 VERDICT_ARTIFACTS = ("replay_certificate", "validator_report", "rho_reference")
@@ -135,11 +151,19 @@ def _pinned_json(base: Path, repo: Path, spec, what: str, errors: list[str]):
     if spec.get("sha256") != sha256_file(p):
         errors.append(f"{what}: sha256 does not match {spec.get('path')}")
         return None
+    return _json_object(p, spec.get("path"), what, errors)
+
+
+def _json_object(p: Path, name, what: str, errors: list[str]):
     try:
-        return json.loads(p.read_text())
+        doc = json.loads(p.read_text())
     except ValueError as e:
-        errors.append(f"{what}: {spec.get('path')} is not JSON ({e})")
+        errors.append(f"{what}: {name} is not JSON ({e})")
         return None
+    if not isinstance(doc, dict):
+        errors.append(f"{what}: {name} is not a JSON object")
+        return None
+    return doc
 
 
 def _num(x) -> bool:
@@ -180,16 +204,31 @@ def check_validator_report(rep, base: Path, repo: Path, errors: list[str]) -> No
     if not isinstance(heads, list) or not heads:
         errors.append("validator report: no headline numbers recomputed")
         return
+    wide: list[str] = []  # headlines whose own rel_tol the gate does not accept
     for h in heads:
         ok = (isinstance(h, dict) and _num(h.get("claimed")) and _num(h.get("recomputed")))
         if not ok:
             errors.append(f"validator report: headline {h!r} lacks numeric claimed/recomputed")
             continue
-        tol = h.get("rel_tol", 1e-9)
+        tol = h.get("rel_tol", HEADLINE_REL_TOL)
+        if not (_num(tol) and 0 <= tol < math.inf
+                and (tol <= HEADLINE_REL_TOL_MAX or not HEADLINE_REL_TOL_ENFORCE_MAX)):
+            wide.append(f"{h.get('name', '?')} rel_tol {tol!r}")
+            continue
         scale = max(abs(h["claimed"]), abs(h["recomputed"]), 1e-300)
         if abs(h["claimed"] - h["recomputed"]) > tol * scale:
             errors.append(f"validator report: {h.get('name', '?')} claimed {h['claimed']} "
                           f"but recomputed {h['recomputed']}")
+    if wide:
+        bound = f" to {HEADLINE_REL_TOL_MAX}, the gate's maximum" if HEADLINE_REL_TOL_ENFORCE_MAX else " up"
+        errors.append(f"validator report: rel_tol of {len(wide)} headline(s) is not a finite number from 0"
+                      f"{bound} (first: {wide[0]})")
+
+
+def band_order_holds(band: dict) -> bool:
+    """AGENTS.md section 5a: the two arms keep one strict order at 0, 0.1 and 1 GAE."""
+    signs = {(band[k]["ic"] > band[k]["rho"]) - (band[k]["ic"] < band[k]["rho"]) for k in GAE_BAND}
+    return signs in ({1}, {-1})
 
 
 def check_rho_reference(ref, errors: list[str]) -> None:
@@ -204,21 +243,42 @@ def check_rho_reference(ref, errors: list[str]) -> None:
     for key in ("matches_protocol", "strongest_available", "same_unit", "same_binary_or_process"):
         if ref.get(key) is not True:
             errors.append(f"rho_reference: {key} is not true")
-    band = ref.get("gae_band")
+    band, band_ok = ref.get("gae_band"), False
     if not isinstance(band, dict) or set(band) != set(GAE_BAND):
         errors.append("rho_reference: gae_band must have exactly the keys 0, 0.1 and 1")
     else:
+        band_ok = True
         for k in GAE_BAND:
             v = band[k]
             if not (isinstance(v, dict) and _num(v.get("ic")) and _num(v.get("rho"))
                     and v["ic"] > 0 and v["rho"] > 0):
                 errors.append(f"rho_reference: gae_band[{k}] needs positive numeric ic and rho")
-    if not isinstance(ref.get("order_holds_across_band"), bool):
+                band_ok = False
+    stored = ref.get("order_holds_across_band")
+    if not isinstance(stored, bool):
         errors.append("rho_reference: order_holds_across_band must be a bool")
+    elif band_ok and stored != band_order_holds(band):
+        # The boolean is derived, never taken on the producer's word.
+        errors.append(f"rho_reference: order_holds_across_band is {str(stored).lower()} but the "
+                      f"gae_band numbers give {str(not stored).lower()}")
 
 
-def check_evidence_dir(evidence: Path, repo: Path = REPO, slug: str | None = None) -> list[str]:
-    """Every reason `evidence` lacks a complete, consistent VALIDATION.json (empty = valid)."""
+def check_row_binding(bound, slug: str | None, digest: str, errors: list[str]) -> None:
+    """The optional `row_digest` of a manifest: the digest of the row it backs (a string), or of
+    each row it backs by slug (an object).  A manifest without it is not bound to a row text."""
+    if isinstance(bound, dict):
+        ok = bound.get(slug) == digest if slug is not None else digest in bound.values()
+    else:
+        ok = bound == digest
+    if not ok:
+        errors.append(f"{MANIFEST}: row_digest does not match the row it is cited for ({digest})")
+
+
+def check_evidence_dir(evidence: Path, repo: Path = REPO, slug: str | None = None,
+                       digest: str | None = None) -> list[str]:
+    """Every reason `evidence` lacks a complete, consistent VALIDATION.json (empty = valid).
+    `digest` is the digest of the row being judged; it is compared with the manifest's
+    `row_digest` when the manifest carries one."""
     m = evidence / MANIFEST
     if not m.is_file():
         return [f"{MANIFEST} is missing"]
@@ -232,6 +292,8 @@ def check_evidence_dir(evidence: Path, repo: Path = REPO, slug: str | None = Non
     rows = man.get("rows")
     if rows is not None and slug is not None and slug not in rows:
         errors.append(f"{MANIFEST}: row {slug} is not among its rows")
+    if man.get("row_digest") is not None and digest is not None:
+        check_row_binding(man["row_digest"], slug, digest, errors)
     check_replay_certificate(
         _pinned_json(evidence, repo, man.get("replay_certificate"), "replay certificate", errors), errors)
     check_validator_report(
@@ -314,13 +376,43 @@ def sweep_text(note: dict) -> str:
     return note["verdict"] + "".join(f", {k}={note[k]}" for k in CAVEAT_FIELDS if k in note)
 
 
-def verdict_status(v: dict | None, digest: str) -> tuple[str, str, dict] | None:
+def verdict_artifact_errors(v: dict, repo: Path = REPO) -> list[str]:
+    """Why the three artifacts of a passing sweep line do not check (empty = they do).
+
+    Each key names a repository file, as a path from the repository root or as
+    `{path, sha256}`, and the file must pass the check its counterpart in a VALIDATION.json
+    passes.  `rho_reference` names a JSON file holding the descriptor, or a VALIDATION.json,
+    whose `rho_reference` is read."""
+    missing = [k for k in VERDICT_ARTIFACTS if not v.get(k)]
+    errors = ["lacks " + ", ".join(missing)] if missing else []
+    for key in VERDICT_ARTIFACTS:
+        spec = v.get(key)
+        if not spec:
+            continue
+        if isinstance(spec, dict):
+            name, doc = spec.get("path"), _pinned_json(repo, repo, spec, key, errors)
+        else:
+            name, p = spec, _rel(repo, repo, spec, errors, key)
+            doc = _json_object(p, name, key, errors) if p else None
+        if doc is None:
+            continue
+        if key == "replay_certificate":
+            check_replay_certificate(doc, errors)
+        elif key == "validator_report":
+            check_validator_report(doc, (repo / name).parent, repo, errors)
+        else:
+            check_rho_reference(doc.get("rho_reference") if doc.get("schema") == SCHEMA else doc, errors)
+    return errors
+
+
+def verdict_status(v: dict | None, digest: str, repo: Path = REPO) -> tuple[str, str, dict] | None:
     """(status, why, sweep note) a verdict decides, or None when it decides nothing.
 
-    A passing word validates only when the line names the three artifacts
-    (docs/VALIDATION_GATE.md, "Row standing") and carries no unclean caveat
-    (pricing_ok false, rho_reference_ok partial, ...); otherwise it is UNVALIDATED,
-    which cannot outrank the freeze.  Non-passing words never validate."""
+    A passing word validates only when the three artifacts the line names are repository
+    files that check (verdict_artifact_errors; docs/VALIDATION_GATE.md, "Row standing")
+    and it carries no unclean caveat (pricing_ok false, rho_reference_ok partial, ...);
+    otherwise it is UNVALIDATED, which cannot outrank the freeze.  Non-passing words
+    never validate."""
     if v is None:
         return None
     word = str(v.get("verdict", "")).lower()
@@ -330,12 +422,11 @@ def verdict_status(v: dict | None, digest: str) -> tuple[str, str, dict] | None:
     if word in VERDICT_FAIL:
         return FAILED, f"sweep verdict {word}", note
     if word in VERDICT_PASS:
-        missing = [k for k in VERDICT_ARTIFACTS if not v.get(k)]
+        broken = verdict_artifact_errors(v, repo)
         caveats = [f"{k}={v[k]}" for k in CAVEAT_FIELDS if k in v and v[k] not in CAVEAT_CLEAN]
-        if missing or caveats:
+        if broken or caveats:
             why = ("sweep verdict " + word + " does not validate: "
-                   + "; ".join(([("lacks " + ", ".join(missing))] if missing else [])
-                               + ([("caveats " + ", ".join(caveats))] if caveats else [])))
+                   + "; ".join(broken + ([("caveats " + ", ".join(caveats))] if caveats else [])))
             return UNVALIDATED, why, note
         return VALIDATED, "sweep verdict", note
     if word in VERDICT_NONPASS:
@@ -351,14 +442,14 @@ def judge(keys: list[str], digest: str, evidence: Path | None, slug: str | None,
     Order: a failing sweep verdict wins; then a complete VALIDATION.json; then a
     passing sweep verdict; then the frozen pre-gate digest; otherwise unvalidated.
     """
-    decided = [verdict_status(verdicts.get(k), digest) for k in keys]
+    decided = [verdict_status(verdicts.get(k), digest, repo) for k in keys]
     decided = [d for d in decided if d]
     for st, why, _ in decided:
         if st == FAILED:
             return FAILED, [why]
     errs: list[str] = []
     if evidence is not None:
-        errs = check_evidence_dir(evidence, repo, slug)
+        errs = check_evidence_dir(evidence, repo, slug, digest)
         if not errs:
             return VALIDATED, []
     for st, why, _ in decided:
@@ -386,7 +477,7 @@ def judge_board_row(row: dict, digest: str, verdicts: dict, pre_gate: dict,
     st, why = judge(keys, digest, repo / board_evidence_dir(row), row["slug"],
                     verdicts, pre_gate, repo)
     out = {"status": st, "evidence_dir": board_evidence_dir(row), "reasons": why}
-    seen = [d for d in (verdict_status(verdicts.get(k), digest) for k in keys) if d]
+    seen = [d for d in (verdict_status(verdicts.get(k), digest, repo) for k in keys) if d]
     if seen:  # the sweep verdict that bears on this row, caveats included; a failing one first
         out["sweep"] = sorted(seen, key=lambda d: d[0] != FAILED)[0][2]
     return out
@@ -437,7 +528,14 @@ def benchmark_groups(text: str) -> dict[str, str]:
     """Row text by directory; a directory listed on several rows is judged as one unit."""
     out: dict[str, str] = {}
     for d, line in benchmark_rows(text):
-        out[d] = (out[d] + "\n" if d in out else "") + line.strip()
+        normalized = line.strip()
+        # Exact duplicate rows occasionally occur in the historical table. They
+        # represent one archived statement and should not require the archive to
+        # encode the same text twice (which the one-record-per-directory schema
+        # cannot express).
+        existing = out.get(d, "").split("\n") if d in out else []
+        if normalized not in existing:
+            out[d] = (out[d] + "\n" if d in out else "") + normalized
     return out
 
 
@@ -541,6 +639,39 @@ def git_show(ref: str, rel: str) -> str | None:
     return r.stdout if r.returncode == 0 else None
 
 
+def base_resolves(ref: str) -> bool:
+    """Whether `ref` names a commit.  git_show cannot tell a missing file from a missing ref."""
+    r = subprocess.run(["git", "rev-parse", "--verify", "--quiet", "--end-of-options", f"{ref}^{{commit}}"],
+                       cwd=REPO, capture_output=True, text=True)
+    return r.returncode == 0
+
+
+def sweep_history_problems(repo: Path, base: str) -> list[str]:
+    """Sweep verdict files are append-only against `base`: its lines must open the head file,
+    unaltered and in order, so a failing line cannot be dropped or rewritten.  A file `base`
+    does not have may carry a passing line only if that line's artifacts check."""
+    out: list[str] = []
+    for rel in SWEEPS.values():
+        p = repo / rel
+        now = [line.strip() for line in p.read_text().splitlines() if line.strip()] if p.is_file() else []
+        old = git_show(base, rel)
+        if old is None:
+            for n, line in enumerate(now, 1):
+                v = json.loads(line)
+                if str(v.get("verdict", "")).lower() in VERDICT_PASS:
+                    errs = verdict_artifact_errors(v, repo)
+                    if errs:
+                        out.append(f"{rel} is new and its passing verdict {n} ({verdict_keys(v)[0]}) "
+                                   "does not check: " + "; ".join(errs))
+            continue
+        for n, was in enumerate((line.strip() for line in old.splitlines() if line.strip()), 1):
+            if n > len(now) or now[n - 1] != was:
+                out.append(f"{rel}: verdict {n} of the base file is missing or altered; "
+                           "sweep verdict files are append-only")
+                break
+    return out
+
+
 def grown(now: dict[str, str], before: dict[str, str]) -> list[str]:
     """Keys a freeze file gained or re-digested relative to `before`."""
     return sorted(k for k, d in now.items() if before.get(k) != d)
@@ -574,6 +705,10 @@ def expired_freeze_problems(repo, board, lb_v, lb_g, admitted, bv, bg, digest_of
 
 def check(repo: Path = REPO, base: str | None = None, digest_of=None) -> list[str]:
     """Problems with the committed leaderboard.json and benchmarks/README.md (empty = pass)."""
+    if base and not base_resolves(base):
+        # Every base comparison would read "absent at base" and pass.
+        raise SystemExit(f"validation gate: --base {base} does not resolve to a commit; "
+                         "fetch the base ref or correct it")
     problems: list[str] = []
     doc = json.loads((repo / LEADERBOARD_JSON).read_text())
     digest_of = digest_of or row_digest
@@ -603,6 +738,7 @@ def check(repo: Path = REPO, base: str | None = None, digest_of=None) -> list[st
             added = grown(load_pre_gate(rel, repo), json.loads(old).get("rows", {}))
             for k in added:
                 problems.append(f"{rel} gained or changed {k}; the pre-gate freeze may only shrink")
+        problems.extend(sweep_history_problems(repo, base))
     return problems
 
 
@@ -627,7 +763,8 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
     c = sub.add_parser("check")
-    c.add_argument("--base", help="git ref of the PR base; the freeze files may not grow past it")
+    c.add_argument("--base", help="git ref of the PR base; the freeze files may not grow past it and "
+                                  "the sweep verdict files may only be appended to")
     sub.add_parser("freeze")
     e = sub.add_parser("evidence")
     e.add_argument("dir", type=Path)

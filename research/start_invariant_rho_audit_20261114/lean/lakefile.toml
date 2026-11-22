@@ -1,0 +1,11 @@
+name = "start_invariant_rho_audit"
+version = "0.1.0"
+defaultTargets = ["StartInvariantRhoAudit"]
+
+[[require]]
+name = "sidon_rho_counterfamily_audit"
+path = "../../sidon_rho_counterfamily_audit_20261114/lean"
+
+[[lean_lib]]
+name = "StartInvariantRhoAudit"
+roots = ["HashTranslation", "UniformStartCounterfamily"]

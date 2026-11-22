@@ -1,0 +1,32 @@
+{
+  "status": "FAIL",
+  "commands": [
+    {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "ml-dataset",
+        "custody",
+        "create",
+        "--out",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103/copied-run",
+        "--bundle",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103/bundle",
+        "--max-bytes",
+        "16777216",
+        "--max-files",
+        "1000"
+      ],
+      "exit_code": 2,
+      "expected_error": null,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "1533bb53015b0dc45c9b77707052a50105767c6ca94f5f5272800c568f5b86d3"
+    }
+  ],
+  "planned_commands": 10,
+  "cloud_calls": 0,
+  "generate_calls": 0,
+  "exception": "ValueError('positive command failed')",
+  "original_fixture_unchanged": true,
+  "source_binary_unchanged": true,
+  "elapsed_seconds": 10.984680075998767
+}

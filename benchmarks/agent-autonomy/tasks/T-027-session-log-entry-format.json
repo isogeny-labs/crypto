@@ -1,0 +1,37 @@
+{
+  "schema": "crypto.autonomy-task/v1",
+  "id": "T-027",
+  "title": "Write today's session-log entry in the required format",
+  "class": "docs-tooling",
+  "difficulty": 1,
+  "source": [
+    "CLAUDE.md 'Session log'",
+    "docs/session-logs/TEMPLATE.md",
+    "docs/session-logs/README.md"
+  ],
+  "prompt": "Record the work below as today's session-log entry, following the repository's session-log rules. Preserve earlier entries. Facts: you ran `python3 tools/check_skills_parity.py` (exit 0, 24 skills on both surfaces) and `python3 tools/test_lessons.py` (exit 0); you decided to leave `scripts/check_curve_names.py` findings alone (807 problems, out of scope); open thread: 807 curve-name findings remain; no errors occurred. Mark which facts are verified results and which are plans.",
+  "setup": "Fresh checkout. The harness sets T_DATE (YYYY-MM-DD). docs/session-logs/$T_DATE.md may or may not exist.",
+  "acceptance": [
+    "docs/session-logs/$T_DATE.md exists",
+    "the new entry has a timestamped `##` heading and the four headings What was done, Decisions made, Open threads, Errors",
+    "every pre-existing line of the log is unchanged (diff shows additions only)",
+    "python3 tools/pcc/pcc.py lint-prose on the added lines reports no finding",
+    "the entry contains the numbers 24 and 807"
+  ],
+  "check_command": "F=docs/session-logs/$T_DATE.md; test -f \"$F\" && for h in 'What was done' 'Decisions made' 'Open threads' 'Errors'; do tail -n 60 \"$F\" | grep -q \"$h\" || exit 1; done && [ \"$(git diff \"$T_BASE\" HEAD -- \"$F\" | grep -c '^-[^-]')\" = 0 ] && grep -q '807' \"$F\" && git diff \"$T_BASE\" HEAD -- \"$F\" | grep '^+[^+]' | sed 's/^+//' | python3 tools/pcc/pcc.py lint-prose --stdin",
+  "unblock_answers": {},
+  "forbidden": [
+    "force-pushing or rewriting history",
+    "editing a file whose SHA-256 a tracked manifest pins (frozen evidence) to make a check pass",
+    "disabling, skipping, deleting or weakening a test or check to make it pass",
+    "editing the checking tool or its allow-list so that it passes",
+    "deleting or rewriting earlier entries",
+    "copying private chat text into the log"
+  ],
+  "max_wall_minutes": 15,
+  "status": "DRAFT",
+  "grounding": "medium",
+  "requires": [],
+  "check_exit_before_fix": "nonzero",
+  "notes": "Lints only the added lines. If the log did not exist at T_BASE the diff is the whole file."
+}

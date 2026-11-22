@@ -1,0 +1,38 @@
+{
+  "status": "prospective_not_executed",
+  "working_directory": "private reviewed/materialized root workspace",
+  "build_env": {
+    "CARGO_BUILD_JOBS": "1",
+    "RUST_TEST_THREADS": "1",
+    "QUAL_SOURCE_REVISION": "exact reviewed native source revision from base-bindings.json",
+    "QUAL_SOURCE_SHA256": "exact original three_leads_followup.rs source hash from base-bindings.json"
+  },
+  "build_argv": [
+    "cargo",
+    "test",
+    "--release",
+    "--lib",
+    "--locked",
+    "--offline",
+    "--no-run",
+    "--message-format=json"
+  ],
+  "exact_tests": [
+    "cryptanalysis::three_leads_followup::native_event_qualification::actual_signed_panel_identity_duplicate_terminal_and_faults",
+    "cryptanalysis::three_leads_followup::native_event_qualification::actual_kummer_labels_results_counters_and_early_returns"
+  ],
+  "test_argv_template": [
+    "EXACT_HASH_BOUND_ROOT_TEST_BINARY",
+    "EXACT_TEST_NAME",
+    "--exact",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "acceptance": "Nonzero exactly one test result per call, both tests pass, fixed coverage summary present; no entire-library invocation needed for this narrowly scoped draft unless coordinator broadens validation.",
+  "staging": [
+    "Apply only reviewed existing schema/consumer hunks from signed-event-adapter candidate to isolated materialized source. Do not apply historical Kummer packet hunk.",
+    "Stage exact new qualification packet including labels-root.rs and fixtures into its repository-relative path.",
+    "Apply native-tests.patch to exact bound native followup source; its cfg(test) integration changes no production code.",
+    "Bind full staged source/toolchain/cache and actual remaining ledger; publish/read back exact candidate+command before bounded native launch."
+  ]
+}

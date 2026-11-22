@@ -1,0 +1,13 @@
+# Fixed-policy actual finite-field gcd preflight
+
+NEW engineering preflight, not the full policy frontier or speed experiment. Within22:31–23:31UTC local window;600s stages, at most2local workers, no paid resources. Exact native sources/checkpoint BEFORE builds/data. Previous pairing preflight0640cbf15 finished and recorded before switching scope. [pcc:unverified]
+
+Use actual E/F61 A21 B39, delta59 twist A23 B54, r31 P=(0,10), S=chi(37,14). All31 actual source points includingO; ONE lexicographically first size3 base from inverse-pair representatives; caps0..8, ALL4ordered sign branches =1116branch rungs. This is one fixed-policy engineering panel, not an entire frontier. Query input is actual Q; compute z=e(Q,S), no scalar label. Source base images computed with pairing, no hidden target scalar table. [pcc:unverified]
+
+For each sign branch use F(X)=product(X-a_i) and H(X)=product(z-b_j X), both degree3. Expanded ORIGINAL FINITE-FIELD-input witness degree bound caps every intermediate Euclidean coefficient product BEFORE construction, plus original degree3 input/ordinary polynomial products. Need monic d, exact uF+vH=d and d divides both inputs BEFORE evaluating d at the three admissible public base roots. Then second-factor membership and actual original E point-sum verify every ordered signed row. Generic independent pair enumeration is a coverage reference only AFTER certification; never candidate stopping. Unknown admits no roots/rows and stays explicit. This finite-field witness degree is NOT original curve S3 pullback degree or intrinsic regularity. Matrix degree NULL, not0. [pcc:unverified]
+
+Independent Rust coefficient-pair arithmetic/linear Miller, independent dense polynomial/Euclidean/witness/point-row reconstruction versus C++ binary Miller. Full streams and receipts must agree over freshA/A. Eight genuinely changed controls source,cap,witness,root,row,missing-query,missing-cap,degree reject101/no receipt; all payloads/failures retained. No partial scope relabeling after data. [pcc:unverified]
+
+Literature/KB receipt inherited with explicit KB unavailability from just-completed pairing component: primary Galbraith–Rotger arXiv:math/0405054 sections2,3,8.1; historical repository pairing antecedents. Cubic product-membership/gcd is established polynomial algebra, no invention/novelty claim. This asks whether the actual finite-field presentation can issue bounded certificates; source-policy/full-cost advantage and cold legitimate public-log setup remain a separate future contract. [pcc:unverified]
+
+Source/protocol publication authorized on SAMEPR3560, raw/PDF/archive remain local. No result asset upload/newPCC/Lean/IDC/registry/global benchmark change.

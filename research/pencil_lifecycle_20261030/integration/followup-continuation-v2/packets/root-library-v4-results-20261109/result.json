@@ -1,0 +1,226 @@
+{
+  "schema": "root-library.validation-attempt/v1",
+  "status": "failed",
+  "reason": "work deadline during full suite",
+  "run": "root-library-v4-20261109",
+  "stages": {
+    "compile": "passed",
+    "test_inventory": "passed",
+    "four_exact_controls": "passed",
+    "full_library_suite": "incomplete_deadline",
+    "pre_input_custody": "passed",
+    "post_input_custody": "not_reached",
+    "completion_seal": "passed",
+    "owned_cleanup": "passed"
+  },
+  "inventory_count": 6179,
+  "exact_controls": [
+    {
+      "name": "cryptanalysis::ecbench::three_leads::pencil::tests::actual_some_none_known_answer_and_diagnostic_ledger",
+      "status": "passed",
+      "elapsed_seconds": 0.14798181597143412,
+      "stdout_sha256": "a24affe6bb722ff1585ba04cdb33dcc4eb90796a87f8636efd66d5c21045bd6f"
+    },
+    {
+      "name": "cryptanalysis::ecbench::three_leads::pencil::tests::scoped_prefix_fake_dispatch_and_shared_meter",
+      "status": "passed",
+      "elapsed_seconds": 0.1287228930159472,
+      "stdout_sha256": "f3511cd85f675975fef5fb9e969e0fd86f017698737325ab89a6125fbc08c829"
+    },
+    {
+      "name": "cryptanalysis::ecbench::three_leads::pencil::tests::scoped_prefix_panic_clears_ownership",
+      "status": "passed",
+      "elapsed_seconds": 0.1508060529595241,
+      "stdout_sha256": "c8239c50f0eac32cb47c819893b6bda6734dc9aa91b168af1739882d789a5d95"
+    },
+    {
+      "name": "cryptanalysis::ecbench::three_leads::pencil::tests::audited_digest_covers_work_and_failures_but_excludes_observations",
+      "status": "passed",
+      "elapsed_seconds": 0.16676157899200916,
+      "stdout_sha256": "11127626ed49831226db21f56c3e060813e2e1b656b4448121dc826d5635cfd3"
+    }
+  ],
+  "full_suite_partial_named_status_counts": {
+    "ok": 2142,
+    "ignored": 45,
+    "FAILED": 18
+  },
+  "full_suite_unfinished_lines": [
+    "test cryptanalysis::ic_framework::pkm_semaev::tests::bit_interval_m3_agrees_with_grid ... "
+  ],
+  "full_suite_final_summary_present": false,
+  "full_suite_reaped_exit": -9,
+  "commands": [
+    {
+      "label": "compile",
+      "argv": [
+        "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--release",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--no-run",
+        "--message-format=json"
+      ],
+      "pid": 333946,
+      "pgid": 333946,
+      "peak_observed_target_bytes": 2711431995,
+      "peak_observed_log_bytes": 237148,
+      "exit_code": 0,
+      "reaped_exit_code": 0,
+      "reaped": true,
+      "elapsed_seconds": 1024.4962493479834,
+      "stdout_sha256": "813af40798fbb3e02e5fe09b36b8c8256ede40bd1737adbdc1c6aa94c108e14c",
+      "stderr_sha256": "d4da1d433e8be52b3e346e5de1e075eee3c4cd63e267fd00167ef4c6342895d2"
+    },
+    {
+      "label": "list",
+      "argv": [
+        "/var/tmp/pencil-root-materialize-t1953-20261109/cache-stage-v2/target/release/deps/crypto_lib-0f5740d1cfe22c09",
+        "--list"
+      ],
+      "pid": 402256,
+      "pgid": 402256,
+      "exit_code": 0,
+      "reaped_exit_code": 0,
+      "reaped": true,
+      "elapsed_seconds": 0.07763928599888459,
+      "stdout_sha256": "53e3b31f86d16b17dbddb82e64b506dd8911da2e3f10fe0c8f80c5874edd1b49",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "exact-0",
+      "argv": [
+        "/var/tmp/pencil-root-materialize-t1953-20261109/cache-stage-v2/target/release/deps/crypto_lib-0f5740d1cfe22c09",
+        "cryptanalysis::ecbench::three_leads::pencil::tests::actual_some_none_known_answer_and_diagnostic_ledger",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "pid": 402327,
+      "pgid": 402327,
+      "exit_code": 0,
+      "reaped_exit_code": 0,
+      "reaped": true,
+      "elapsed_seconds": 0.14798181597143412,
+      "stdout_sha256": "a24affe6bb722ff1585ba04cdb33dcc4eb90796a87f8636efd66d5c21045bd6f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "exact-1",
+      "argv": [
+        "/var/tmp/pencil-root-materialize-t1953-20261109/cache-stage-v2/target/release/deps/crypto_lib-0f5740d1cfe22c09",
+        "cryptanalysis::ecbench::three_leads::pencil::tests::scoped_prefix_fake_dispatch_and_shared_meter",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "pid": 402362,
+      "pgid": 402362,
+      "exit_code": 0,
+      "reaped_exit_code": 0,
+      "reaped": true,
+      "elapsed_seconds": 0.1287228930159472,
+      "stdout_sha256": "f3511cd85f675975fef5fb9e969e0fd86f017698737325ab89a6125fbc08c829",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "exact-2",
+      "argv": [
+        "/var/tmp/pencil-root-materialize-t1953-20261109/cache-stage-v2/target/release/deps/crypto_lib-0f5740d1cfe22c09",
+        "cryptanalysis::ecbench::three_leads::pencil::tests::scoped_prefix_panic_clears_ownership",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "pid": 402804,
+      "pgid": 402804,
+      "exit_code": 0,
+      "reaped_exit_code": 0,
+      "reaped": true,
+      "elapsed_seconds": 0.1508060529595241,
+      "stdout_sha256": "c8239c50f0eac32cb47c819893b6bda6734dc9aa91b168af1739882d789a5d95",
+      "stderr_sha256": "53a2d480f31536b939358928ac7c65bc1bd01e23e6346982aa314506554d0171"
+    },
+    {
+      "label": "exact-3",
+      "argv": [
+        "/var/tmp/pencil-root-materialize-t1953-20261109/cache-stage-v2/target/release/deps/crypto_lib-0f5740d1cfe22c09",
+        "cryptanalysis::ecbench::three_leads::pencil::tests::audited_digest_covers_work_and_failures_but_excludes_observations",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "pid": 402846,
+      "pgid": 402846,
+      "exit_code": 0,
+      "reaped_exit_code": 0,
+      "reaped": true,
+      "elapsed_seconds": 0.16676157899200916,
+      "stdout_sha256": "11127626ed49831226db21f56c3e060813e2e1b656b4448121dc826d5635cfd3",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "full-suite",
+      "argv": [
+        "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+        "test",
+        "--release",
+        "--lib",
+        "--locked",
+        "--offline",
+        "--",
+        "--test-threads=1"
+      ],
+      "pid": 402975,
+      "pgid": 402975,
+      "peak_observed_target_bytes": 2618643591,
+      "peak_observed_log_bytes": 966493,
+      "reaped_exit_code": -9,
+      "reaped": true,
+      "elapsed_seconds": 460.2540196889895
+    }
+  ],
+  "worker_errors": [
+    {
+      "repr": "RuntimeError('work deadline/signal')",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v4-20261109/durable-worker.py\", line 181, in <module>\n    full=command('full-suite',base+['--','--test-threads=1'])\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v4-20261109/durable-worker.py\", line 112, in command\n    guard()\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v4-20261109/durable-worker.py\", line 60, in guard\n    if INTERRUPTED or time.monotonic()>=END-40:raise RuntimeError('work deadline/signal')\nRuntimeError: work deadline/signal\n"
+    }
+  ],
+  "compile_elapsed_seconds": 1024.4962493479834,
+  "full_suite_elapsed_seconds": 460.2540196889895,
+  "worker_elapsed_seconds": 1759.6633352260105,
+  "attempt_elapsed_seconds": 1761.1127297520288,
+  "outer_elapsed_seconds": 1761.2577844860498,
+  "charged_seconds": 1800,
+  "campaign_cumulative_charged_seconds": 18240,
+  "native_controls": {
+    "cpu.max": "200000 100000",
+    "memory.max": "17179869184",
+    "memory.swap.max": "0",
+    "pids.max": "512"
+  },
+  "test_binary": {
+    "path": "/var/tmp/pencil-root-materialize-t1953-20261109/cache-stage-v2/target/release/deps/crypto_lib-0f5740d1cfe22c09",
+    "sha256": "20c362a4c34dbe0cd10f9801be182fc32281e6a5ecbc1bc6c0f97797f46cd7ca"
+  },
+  "invocation_id": "a80ba03158b54687892e12b9e78f7c70",
+  "owner_join_verified": true,
+  "cleanup_complete": true,
+  "cgroup_absent_at_review": true,
+  "publication": {
+    "commit": "d97d50bb1c8549a4d71bc4df75e601cbb8818618",
+    "remote": "d97d50bb1c8549a4d71bc4df75e601cbb8818618",
+    "admission_sha256": "5adfda704682a75a406563a8dfe494ca5b6339f1780d18c06dd1df39d46919be",
+    "utc": "2026-11-09T19:41:28.513138+00:00"
+  },
+  "supervisor_saved_status": "pending_seal",
+  "completion_seal_status": "passed",
+  "terminal_manifest_sha256": "05aba314030e957103a881cd2520ed8388000d2863f6f7e6004f86bdf97bd3d4",
+  "archive_sha256": "47118d6241964a6da200130ffb2b97a532da30df1147522e6873113f5f04b631",
+  "archive_bytes": 321660,
+  "archived_files": 29,
+  "runtime_rerun": false,
+  "scope": "Pinned root default-feature candidate library validation; partial full-suite observations remain incomplete."
+}

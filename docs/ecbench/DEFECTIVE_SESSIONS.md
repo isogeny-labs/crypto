@@ -56,3 +56,35 @@ allows. A row needs the owner's approval, recorded in its note.
 - **Disposition:** pinned as defective. Approved by the repository owner
   (aburan28) on 2026-11-05, choosing this over withdrawal or leaving
   `evidence_audit_pr` red.
+
+## `research/ecc2k130_followups_20261116/F3-m83-counted/raw/sessions/smoke-k0n61`
+
+- **Session:** `ECBS1hbc0ef04c4f34`, original capsule source commit
+  `54ccbfa7ed830a0d0882310f71d49eeb89eaed1a`; original artifact manifest
+  `02bdbb73473e56d42dba5269498d4d3dbc031b90`.
+- **Defect:** the capsule declares 24 records and SHA256
+  `2aa97366f892f7d1a2f4c887e9e5543397ff6d047016048932efaace40e92843`,
+  while the manifest retains 16 records (sequences 0 through 15), SHA256
+  `5c937b749f9bb20f6541b19c9ed9e21c16f2392e103ee3b47e0995a272c629fb`.
+  Native verify fails exactly `last_seq`, `record_count`, `records_hash` and
+  `status_counts`. The five original files and producer receipt are unchanged.
+  [pcc:unverified]
+- **Recovery scope:** reachable Git path history, registered local worktrees,
+  canonical and legacy expected-digest object keys, object versions and the
+  producing branch checkpoint prefix did not yield the original 24-record
+  object. This bounded search does not establish absence elsewhere. See the
+  preserved [proposal](defect-proposals/20261116-f3-m83/proposal.json) and
+  [open custody record](../../problems/ecbench-f3-original-record-custody.md).
+  [pcc:unverified]
+- **Citable as:** the 16 retained records only, with this capsule-integrity
+  defect disclosed. The declared 24-record completion and any aggregate
+  requiring the missing eight records remain unsupported. The historical
+  producer receipt is an assertion, not a substitute for those bytes.
+- **Disposition:** pinned as defective, never integrity-passed. The repository
+  owner explicitly approved the exact proposed disposition in this chat on
+  2026-11-16, after reviewing PR #4439 and the five-file/four-failure scope.
+  The separate [decision receipt](defect-proposals/20261116-f3-m83/decision.json)
+  records the approval digest; the inactive proposal remains historical.
+  Every shard continues hashing all five original files and running verify;
+  changed bytes or a changed failure set fail CI. Original-data recovery
+  remains open.

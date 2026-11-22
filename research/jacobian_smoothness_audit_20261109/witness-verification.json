@@ -1,0 +1,47 @@
+{
+  "schema": "witness-candidate-verification/v1",
+  "recorded_at": "2026-11-10T00:33:08.016Z",
+  "evidence_commit": "d21ac57226028ad537b1ff33a4846bf6950cf209",
+  "actual_input": "Complete Stoll y2=x5+1/F3 model1, known cycle5/full10,25/100ordered pairs",
+  "export": {
+    "path": "evidence/stoll-witness-v1/export.json",
+    "sha256": "41c89785b6e682abd1e139f286c93b781887341f0b4cf0704ff39b64b3a04dfe"
+  },
+  "protocol_conformance": "Not fully conformant: frozen parameters conflict with pinned source; see separate immutable-byte deviation receipt.",
+  "canonical_structural_check": {
+    "path": "evidence/stoll-witness-v1/export-check-packaged.log",
+    "findings": 0,
+    "scope": "Schema/hash/file checks, not semantic resolution of contradictory protocol fields."
+  },
+  "claim": "PCC-20261110-760e42",
+  "local_verdict": {
+    "claim_id": "PCC-20261110-760e42",
+    "claim_sha256": "c7eb3e5f84c792ceeac217e0515ac41917e2c29be4122fddf081dde2191df2d4",
+    "commit": "d21ac57226028ad537b1ff33a4846bf6950cf209",
+    "proofs": [
+      {
+        "kind": "attestation",
+        "notes": [
+          "artifact: unsigned; independence needs a keyring signature"
+        ],
+        "reasons": [],
+        "verdict": "not_covered"
+      }
+    ],
+    "reasons": [
+      "claim kind measurement is not covered: recompute; replay"
+    ],
+    "schema": "pcc.verdict/v1",
+    "verdict": "not_covered",
+    "verified_at": "2026-11-10T00:21:17Z",
+    "verifier_host": "762f5fc120c9"
+  },
+  "standing": {
+    "claim_id": "PCC-20261110-760e42",
+    "claim_sha256": "c7eb3e5f84c792ceeac217e0515ac41917e2c29be4122fddf081dde2191df2d4",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "formal_status": "Native candidate record only; original kernel_proof_status not_checked remains unchanged. Later full Leanproof acceptance is separate.",
+  "paid_compute": 0
+}

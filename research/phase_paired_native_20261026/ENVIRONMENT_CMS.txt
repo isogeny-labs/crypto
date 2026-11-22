@@ -1,0 +1,50 @@
+# Environment of the CryptoMiniSat follow-up (PROTOCOL_ADDENDUM_2.md), captured 2026-10-26 before any measurement on the frozen manifest
+# Plain capture of command output; nothing here is vendored. The build tree was deleted after the binary was copied.
+
+## CryptoMiniSat (pinned)
+repository      https://github.com/msoos/cryptominisat
+tag             release/v5.16.0
+commit          2bf89cfb3e126e559d472388486327813f735f7e
+commit date     2026-09-21T23:54:57+02:00
+
+## Dependencies fetched by CryptoMiniSat's CMake (FetchContent), pinned by commit
+cadical   https://github.com/meelgroup/cadical  floating ref at pin time: master  commit 818c9562f114b315a9246ced943b66b60b38e8fb
+cadiback  https://github.com/meelgroup/cadiback  floating ref at pin time: main    commit 445ddc2f2b5e54421af64e0652c2eb8444175322
+(both resolved with git ls-remote on 2026-10-26, cloned at depth 1 to exactly those commits, handed to CMake through FETCHCONTENT_SOURCE_DIR_CADICAL / _CADIBACK with FETCHCONTENT_FULLY_DISCONNECTED=ON, so CMake fetched nothing itself)
+
+## System package installed for this build (apt, authorized by the user)
+apt-get update was run first because the package lists were empty (E: Unable to locate package libgmp-dev).
+Package: libgmp-dev
+Status: install ok installed
+Architecture: amd64
+Version: 2:6.3.0+dfsg-2ubuntu6.1
+Package: libgmpxx4ldbl
+Status: install ok installed
+Architecture: amd64
+Version: 2:6.3.0+dfsg-2ubuntu6.1
+pkg-config gmp: 6.3.0
+
+## Toolchain
+g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+cmake version 3.28.3
+rustc 1.97.0 (2d8144b78 2026-07-07)
+
+## CMake command line (run with nice -n 10; build: cmake --build . --target cryptominisat5-bin -j2)
+cmake -S /home/user/cms-src -B /home/user/cms-build -DCMAKE_BUILD_TYPE=Release -DENABLE_TESTING=OFF -DBUILD_SHARED_LIBS=OFF -DFETCHCONTENT_FULLY_DISCONNECTED=ON -DFETCHCONTENT_SOURCE_DIR_CADICAL=/home/user/cms-src-deps/cadical -DFETCHCONTENT_SOURCE_DIR_CADIBACK=/home/user/cms-src-deps/cadiback
+
+## Binary
+size bytes 6078344
+sha256 8e1e539976b1fa8bff2b1e30df5c200c9a03ee343c634eadc0152e1b6cecd8f7
+/home/user/cms-bin/cryptominisat5: ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), statically linked ... for GNU/Linux 3.2.0, not stripped
+--version banner (first lines):
+c CMS SHA1: 2bf89cfb3e126e559d472388486327813f735f7e
+c CaDiCaL SHA1: 818c9562f114b315a9246ced943b66b60b38e8fb
+c CadiBack SHA1: 445ddc2f2b5e54421af64e0652c2eb8444175322
+c CryptoMiniSat version 5.16.0
+c CMS compilation env CMAKE_CXX_COMPILER = /usr/bin/c++ | CMAKE_CXX_FLAGS =  -fno-stack-protector -fvisibility=hidden -msse4.2 -mpopcnt -mpclmul -Wlogical-op -Wrestrict -Wnull-dereference -Wdouble-promotion -Wshadow -Wformat=2 -Wextra-semi -pedantic | COMPILE_DEFINES =  -DNDEBUG -D_FORTIFY_SOURCE=0 -DUSE_ZLIB | BUILD_SHARED_LIBS = OFF | ONLY_SIMPLE =  | STATS = OFF | SQLITE3_FOUND =  | ZLIB_FOUND = TRUE | VALGRIND_FOUND =  | ENABLE_TESTING = OFF | SLOW_DEBUG = OFF | ENABLE_ASSERTIONS = OFF | PYTHON_EXECUTABLE =  | PYTHON_LIBRARY =  | PYTHON_INCLUDE_DIRS =  | MY_TARGETS =  | LARGEMEM = OFF | LIMITMEM = OFF | BREAKID_LIBRARIES =  | BREAKID-VER = . | 
+
+## Host
+Linux 6.18.44-fc-v153 x86_64
+model name	: Intel(R) Xeon(R) Processor @ 2.10GHz
+cpus 4
+free disk after the build: 2.8G

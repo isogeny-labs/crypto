@@ -1,0 +1,1 @@
+Original proposal manifest and receipts are unchanged. Test executables are preserved in the private software archive named by s3.receipt.json, not Git. Reproduction commands and scope limits are in README.md.

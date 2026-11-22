@@ -1,0 +1,13 @@
+digraph prior {
+ graph [rankdir=TB,bgcolor="white",nodesep=0.35,ranksep=0.30];
+ node [shape=box,style="rounded,filled",fillcolor="#edf4ff",fontname="Helvetica",fontsize=13,margin="0.15,0.09",color="#385b80"];
+ edge [color="#385b80"];
+ a [label="Intended: full arithmetic progression"];
+ b [label="Tracked constructor: skip nonliftable x\nNo constant-gap acceptance check"];
+ c [label="Constraint uses product over filtered x"];
+ a -> b -> c;
+ {rank=same;d [label="F3 arm: two base variables"];e [label="Pair control: R-Pk = Pi+Pj\nThree base points"]}
+ c -> d; c -> e;
+ f [label="Arities differ; targets are not paired\nSource audit only, no rerun",fillcolor="#fff2d9",color="#9b6d1d"];
+ d -> f;e -> f;
+}

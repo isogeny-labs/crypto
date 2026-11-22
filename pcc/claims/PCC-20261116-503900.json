@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T22:33:22Z",
+ "id": "PCC-20261116-503900",
+ "kind": "statement",
+ "producer": {
+  "commit": "c9e919acd0e03d4265f2439bedbef9c726093aeb",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/affine-closure-v1/file-interface-qualifier-v1.sh",
+    "sha256": "003a1d7ac36a16e54d7ba286a573595c0924e409e375907fa507532e7327688f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/affine-closure-v1/FILE_INTERFACE_PLAN.tsv",
+    "sha256": "f1de0f4d97fa93943e483d1cfac4d75d5f176edf179bc346ff54f4c6aab8da74"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/affine-closure-v1/FILE_INTERFACE_INPUTS.sha256",
+    "sha256": "e37b32bb894a63084893394b23a2b239e02e7170ad4e168d0f43db3358e552fc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/affine-closure-v1/FILE_INTERFACE_SHELL_PRE_CALL.json",
+    "sha256": "c11f128de38afe1f792259a538ced77d2a1f3ef32f25e1d32bd020b9a7c089fa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/affine-closure-v1/SHELL_INTERFACE_QUALIFICATION.json",
+    "sha256": "beded2b905826d74360965d714eccc5c8647e28ed57ea4241d8b9da89273131d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/affine-closure-v1/file-interface-shell-v1.tar.xz",
+    "sha256": "78b380884607cba91d7fccb14c713f0cddcdd06fe4d1406f50c2bf7bd08841b9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/affine-closure-v1/development/file-interface-shell-v1.log",
+    "sha256": "fdfaaf03c11e6e4cdf58d6a23537dde7c99270de4bf2a11b6b1ff55fb2ed9485"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/affine-closure-v1/INTERFACE_PROVENANCE.md",
+    "sha256": "1c452cba03056eda289ffb5096ce8567e65405ca5d3c58f3b2f7d4314db9f084"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Affine coefficient file interface, corrected thin-shell qualifier v1",
+ "statement": "Unsigned file-interface controls rerun with a separately frozen thin-shell launcher on the same immutable Rust binary and input/certificate bytes. Three positive coefficient/prefix checks exit0; eight corrupted-certificate and two malformed/oversized-request checks exit1, all planned/expected. Full pre-call/source/hash/stdout/stderr/status receipts retained in a separate verification-round archive. Historical Python-launched receipts remain unchanged/excluded from final acceptance. This checks neither producer counters, primality, execution/signed standing nor performance, and reruns no solver discovery."
+}

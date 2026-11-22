@@ -1,0 +1,9 @@
+Deviation (main session, 2026-11-17): the frozen PROTOCOL sec 9 runs each cc in one
+invocation over all three primes. Because the container restarts about every 30 min and
+genus_ladder does not checkpoint, a single long invocation risks losing all of it on a
+restart. Each cc is instead run per prime (8209, 16411, 32771 separately) and the
+per-prime JSONL outputs are concatenated into raw/cc1.jsonl and raw/cc2.jsonl. The
+records are identical: curve_seed derives from (p, curve index) alone, independent of
+which other primes share an invocation (verified: pilot curve_seed values reproduce).
+No threshold, arm, seed rule or decision rule changed.
+Deviation D1b (2026-11-20T22:40Z): the remaining secondary-sweep cells were run 3 at a time instead of serially (same commands, same binary); the in-progress cc0.5 p=16411 cell was restarted from scratch.

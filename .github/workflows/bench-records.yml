@@ -12,7 +12,8 @@ name: bench-records
 
 on:
   pull_request:
-    branches: [main]
+    # The hyperelliptic follow-up is stacked on its reviewed engine branch.
+    branches: [main, research/hec-native-ic-20261113, research/hec-followups-20261114]
     types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: [main]
@@ -39,6 +40,8 @@ jobs:
           filter: blob:none
       - name: Tool tests
         run: python3 -m unittest tools/test_benchrec.py
+      - name: Paired comparison integrity tests
+        run: python3 -m unittest discover -s scripts/perf -p test_perfindex.py
       - name: Configure S3 credentials
         if: ${{ env.KEY_ID != '' }}
         uses: aws-actions/configure-aws-credentials@v4

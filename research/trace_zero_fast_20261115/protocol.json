@@ -1,0 +1,446 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "TZF-20261115-cold-instruction-work",
+  "version": 1,
+  "created": "2026-11-15",
+  "repository": "crypto",
+  "study_dir": "research/trace_zero_fast_20261115",
+  "question": "Does packed elimination, invariant square hoisting, monic roots and batched residual inversion preserve exact answers while removing whole-process simulated instructions on six fixed d12 controls?",
+  "claims": [
+    {
+      "id": "correctness",
+      "text": "Exact old/new decisions and original witness order match; separate polynomial arithmetic checks known answers and saved points.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "instruction-work",
+      "text": "Report paired whole-cold-process instruction and separate field-work differences with identical outputs and baseline A/A.",
+      "class": "comparative",
+      "decided_by": [
+        "old-new"
+      ]
+    },
+    {
+      "id": "runtime",
+      "text": "Native runtime, external-best, scaling and full pipeline cost are not established.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "baseline",
+      "role": "baseline",
+      "description": "Byte-identical old linearized solver source snapshot",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "902f78ccfce8ab09c42b5dd39f3e9bde103c35aa",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_fast_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "15b6156c1e95c9220915ca7eb85883190b4c03791679f3195caab4b1cd7479ea",
+        "threads": 1,
+        "flags": {
+          "profile.release.debug": "line-tables-only"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      }
+    },
+    {
+      "id": "baseline-aa",
+      "role": "control_aa",
+      "description": "Identical baseline in independently interleaved fresh processes",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "902f78ccfce8ab09c42b5dd39f3e9bde103c35aa",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_fast_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "15b6156c1e95c9220915ca7eb85883190b4c03791679f3195caab4b1cd7479ea",
+        "threads": 1,
+        "flags": {
+          "profile.release.debug": "line-tables-only"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "same_instrument_as": "baseline"
+    },
+    {
+      "id": "candidate",
+      "role": "candidate",
+      "description": "Current production packed/batched solver with original replay",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "902f78ccfce8ab09c42b5dd39f3e9bde103c35aa",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_fast_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "15b6156c1e95c9220915ca7eb85883190b4c03791679f3195caab4b1cd7479ea",
+        "threads": 1,
+        "flags": {
+          "profile.release.debug": "line-tables-only"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Positive planted and cancellation targets embedded in each arm and both largest-class pilots; every such query must Found/replay."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Uniform targets embedded in each arm with separate polynomial-arithmetic inconsistency proof; paired implementation comparison, not unusual structure claim."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "strategy",
+        "levels": [
+          "baseline",
+          "candidate"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "15b6156c1e95c9220915ca7eb85883190b4c03791679f3195caab4b1cd7479ea",
+        "how": "One executable contains exact retained old source and optimized production source; same compiler/field/group modules. Callgrind3.24 and its options fixed."
+      },
+      {
+        "name": "instances",
+        "treatment": "fixed",
+        "how": "Six disclosed existing d12 controls, fixed before new work comparison; old and new source see identical input bytes."
+      },
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "how": "Rotate three arms by field index + kind index + replicate, five rounds."
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Single-threaded native solver; one CPU allocation and2GiB process address-space ceiling for the proposed local exception."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Recorded AMD EPYC9V74 virtual x86 host; CPU0, no PMU; simulated instructions only, no native timing claim."
+      },
+      {
+        "name": "cache_and_layout",
+        "treatment": "measured",
+        "how": "Every counted and Callgrind query is a fresh process; no shared process-local field cache. All cold setup charged. ASLR variation read against A/A."
+      },
+      {
+        "name": "preemption",
+        "treatment": "fixed",
+        "how": "Outer600second total guard, no retries; raw process output and flushed JSONL prefixes retained."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Compiled deterministic summary is hashed before affected data, with no adaptive sample selection or population inference."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "old-new",
+        "arms": [
+          "baseline",
+          "candidate"
+        ],
+        "differs_in": [
+          "strategy"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "aa",
+        "arms": [
+          "baseline",
+          "baseline-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "Rotate by field/kind/replicate; fresh child processes.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Reuse exact fixed prior65-case workload; primary selection explicitly n83/131,d12,distinct-planted-0/uniform/cancellation."
+    },
+    "instance_sampling": {
+      "rule": "Reuse exact fixed prior65-case workload; primary selection explicitly n83/131,d12,distinct-planted-0/uniform/cancellation.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Descriptive finite panel only; deterministic Rust summary and decision rules frozen before affected data, arm labels retained for reproducibility. No adaptive interpretation or population test.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 6,
+    "replicates": 5,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 6,
+      "correction": "other",
+      "passes": true,
+      "note": "Exact disclosed six-cell implementation comparison, paired five-repeat min/median/max and A/A; no population test or p-value."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 25.60205841064453,
+      "per_sample_seconds": 2.5579209480000005,
+      "threads": 1,
+      "estimated_total_seconds": 255.81494373064456,
+      "measured_on": "12-call CPU0/2GiB engineering pilot including both largest bases; fixed field/arm max of positive/uniform times15 calls. Planning only, not timing evidence."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "instructions",
+        "name": "Whole cold-process Callgrind Ir",
+        "unit": "simulated instructions",
+        "kind": "counted",
+        "definition": "Complete fresh executable including parsing, setup/admission, solve, roots/sign lifts and final replay; tally disabled. Simulated instruction work, never native runtime/cycles.",
+        "source": "rows.jsonl instructions",
+        "aggregation": "distribution",
+        "resolution": "1 simulated instructions",
+        "uncertainty": "range"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "field_mul",
+        "name": "Native field multiply",
+        "unit": "field multiplies",
+        "kind": "counted",
+        "definition": "Cold exact native query field multiplies from fixture/variety construction through replay; parser excluded.",
+        "source": "rows.jsonl field_mul",
+        "aggregation": "distribution",
+        "resolution": "1 field multiplies",
+        "uncertainty": "range"
+      },
+      {
+        "id": "field_square",
+        "name": "Native field square",
+        "unit": "field squares",
+        "kind": "counted",
+        "definition": "Cold exact native query field squares including inversion internals; parser excluded.",
+        "source": "rows.jsonl field_square",
+        "aggregation": "distribution",
+        "resolution": "1 field squares",
+        "uncertainty": "range"
+      },
+      {
+        "id": "inverse_informational",
+        "name": "Informational inversion calls",
+        "unit": "inversion calls",
+        "kind": "counted",
+        "definition": "Diagnostic only, never added to inner field multiply/square costs.",
+        "source": "rows.jsonl inverse_informational",
+        "aggregation": "distribution",
+        "resolution": "1 inversion calls",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "none",
+    "counters": [
+      "instructions",
+      "field_mul",
+      "field_square",
+      "inverse_informational"
+    ],
+    "record": [
+      "binary_sha256",
+      "kernel",
+      "cpu_model",
+      "threads",
+      "instance",
+      "seed",
+      "replicate",
+      "arm",
+      "result",
+      "instructions",
+      "field_mul",
+      "field_square",
+      "inverse_informational"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "state": "explicit_user_exception_authorized",
+      "cpus": 1,
+      "max_address_space_bytes": 2147483648,
+      "cloud_spend_usd": 0
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Fixed6cases x3arms x5repetitions=90 primary rows; separate12-call largest-class pilot.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stop on any invalid Found/Refuted result, preserving all rows.",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "Combined pilot/freeze/primary600seconds,2GiB/CPU0, no retries; every failed prefix retained.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Every cell needs identical outcomes and exact witness order,5 rows per arm, candidate medianIr at least5% lower and baseline A/A median difference<=1%; otherwise descriptive/inconclusive. Never infer native runtime.",
+    "comparison_ids": [
+      "old-new"
+    ],
+    "statistic": "Per-cell min/median/max whole-process simulatedIr and separate field counts",
+    "interval": "Exact five-repeat ranges and baseline A/A medians; no population CI",
+    "multiple_comparison_correction": "other",
+    "effect_size_measure": "Fraction of whole-process simulated instructions removed on identical fixed queries",
+    "verdict_vocabulary": [
+      "descriptive_difference",
+      "within_aa_discrepancy",
+      "inconclusive",
+      "invalid"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "native/src/main.rs",
+      "sha256": "6246e6091d7a0b9e0b9b09a33ae59550d85c5b20305a21f17953e1a5d17c2d89"
+    },
+    "inputs": [
+      "rows.jsonl"
+    ],
+    "outputs": [
+      "summary.json",
+      "export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "No timing, scaling, population, full-DLP or challenge-recovery claim.",
+    "UNKNOWN is not UNSAT; no row deletion, adaptive seeds or comparison of unpaired favorable subsets.",
+    "Native group counters exclude field/ANF, non-group inversions and SAT work; they are not a complete cost unit."
+  ],
+  "literature": [
+    {
+      "ref": "src/cryptanalysis/binary_semaev.rs",
+      "provenance": "internal",
+      "claim": "Known S3/Vieta and monic quadratic algebra, with Semaev/Diem references."
+    },
+    {
+      "ref": "src/cryptanalysis/koblitz_fast_arith.rs; src/cryptanalysis/wide_gf2m.rs",
+      "provenance": "internal",
+      "claim": "Established Montgomery batch inversion mechanism."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "4643a05317e1266df27e06984a03d0d9d4a5146b5f616c7f5b855ec97228ee00",
+    "commit": "902f78ccfce8ab09c42b5dd39f3e9bde103c35aa",
+    "frozen_at": "2026-11-15T21:11:16Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "workload_path": "../trace_zero_linearized_20261115/workload.json",
+    "workload_sha256": "2a1712a97cb882ddd26e0a6c37a17c70a5ba9fc8fb57bb0a2d681331e0cabeb5",
+    "planned_rows": 90,
+    "authorization": "Continued explicit local1CPU/2GiB/600second panel exception, zero paid resources/retries.",
+    "primary_cases": [
+      "scale-n83-d12-distinct-planted-0",
+      "scale-n83-d12-uniform",
+      "scale-n83-d12-cancellation",
+      "scale-n131-d12-distinct-planted-0",
+      "scale-n131-d12-uniform",
+      "scale-n131-d12-cancellation"
+    ],
+    "preflight": "12calls: n83/131,d12,distinct-planted-1 and uniform, all3arms; positiveFound/replay and everyvalid required.",
+    "runtime_planning": "Sum max pilot combined cost per field/arm times15 primary rows, plus actual fixed pilot elapsed.",
+    "external_comparison_gap": "No external-best claim; M4RI/FLINT/Magma not a supplied matched full-query arm."
+  }
+}

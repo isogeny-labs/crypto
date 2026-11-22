@@ -1,0 +1,72 @@
+{
+  "schema": "ordinary-binary-s3-verification/v1",
+  "source_commit": "7b82da6a1f3e8b5a84af7bb9c81ab5d24b020f82",
+  "claim_id": "PCC-20261113-1e2412",
+  "declaration_sha256": "79d3d696a33624dfc64c9584dc199c88467791f72304ccdb252c318667770424",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 24,
+  "gate_declarations": 43,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 33,
+  "actual_verdict": {
+    "claim_id": "PCC-20261113-1e2412",
+    "claim_sha256": "f9adfc4204085286b2b581d45b7588da34d8dd7da59e85976e0f997ad728777e",
+    "commit": "7b82da6a1f3e8b5a84af7bb9c81ab5d24b020f82",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/binary_semaev_irreducibility_audit_20261113/lean (BinaryCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-13T20:58:19Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261113-1e2412",
+    "claim_sha256": "f9adfc4204085286b2b581d45b7588da34d8dd7da59e85976e0f997ad728777e",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46946,
+    "sha256": "66332d5d1ef6dd9f9976601a8f6b567d5382e509acbca7cf3dd0cd76ae98b2cc",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 43,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "global_elaboration_flags": false,
+    "waivers": false,
+    "actual_ordinary_MV_polynomial": true,
+    "all_field_scalar_extensions": true,
+    "actual_IsSymmetric": true,
+    "actual_ordinary_Mathlib_group_zero_sums": true,
+    "direct_short_model_nonirreducibility": true,
+    "actual_model_polynomial_inequality": true,
+    "qualified_source_refuted": false,
+    "general_higher_arity_irreducibility": false,
+    "general_splits_k_ge_3": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

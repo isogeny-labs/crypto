@@ -20,11 +20,19 @@
 //! - `subfield:<k>:<n>:<a index>:<b index>` — `KoblitzCurve::subfield`;
 //! - `koblitz:<a>:<n>` — `KoblitzCurve::new(a, n)`;
 //! - `roster:<bits>` — `roster_prime_instance(bits)`, the bench roster.
+//! - `fp4torsion:<p>:<seed>:<max cofactor>` — the frozen D4 ecbench workload;
+//! - `glsfp2:<bits>:<seed>:<max cofactor>` — the frozen GLS rho workloads;
+//! - `subfieldfp3:<bits>:<seed>:<max cofactor ratio>` — the frozen Frobenius rho workloads.
 
 use crypto_lib::binary_ecc::BinaryPoint;
 use crypto_lib::cryptanalysis::curve_id::modulus_integer;
+use crypto_lib::cryptanalysis::ecbench::ext::ExtInstance;
+use crypto_lib::cryptanalysis::ecbench::workload::{CurveSpec, Instance};
+use crypto_lib::cryptanalysis::ext_curve::{ExtCurve, ExtField, ExtPoint};
+use crypto_lib::cryptanalysis::gaudry_quartic_d4::find_d4_curve;
 use crypto_lib::cryptanalysis::ic_boundary::{
-    find_prime_order_curve, random_binary_instance, roster_prime_instance, PrimeInstance,
+    find_prime_order_curve, random_binary_instance, roster_prime_instance, CountedGroup, GroupOps,
+    PrimeInstance,
 };
 use crypto_lib::cryptanalysis::koblitz_index_calculus::KoblitzCurve;
 use serde_json::{json, Value};
@@ -62,6 +70,37 @@ fn koblitz_record(c: &KoblitzCurve, name: String, call: String) -> Result<Value,
     }))
 }
 
+fn extension_record<F: ExtField>(
+    c: &ExtCurve<F>,
+    nu: u64,
+    generator: ExtPoint<F::El>,
+    order: u64,
+    r: u64,
+    h: u64,
+    icv1: String,
+    slug: String,
+    call: String,
+) -> Value {
+    let p = c.f.p();
+    assert!(!generator.infinity && c.is_on_curve(generator));
+    assert_eq!(r.checked_mul(h), Some(order));
+    let mut ops = GroupOps::default();
+    assert!(c.mul(&mut ops, generator, r).infinity);
+    let mut modulus = vec![0u64; c.f.degree() as usize];
+    // The two constructors use F_p[s] / (s^k - nu).
+    modulus[0] = (p - nu % p) % p;
+    // ExtInstance::id supplies the ICV1 identity; the model below is
+    // rechecked against it by build_curve_registry.py before registration.
+    json!({
+        "name": slug.clone(), "generator_call": call,
+        "field": {"kind": "prime_extension", "p": p, "degree": c.f.degree(), "modulus": modulus},
+        "a": c.f.coords(c.a), "b": c.f.coords(c.b),
+        "group_order": order, "subgroup_order": r, "cofactor": h,
+        "generator": {"x": c.f.coords(generator.x), "y": c.f.coords(generator.y)},
+        "icv1": icv1, "slug": slug,
+    })
+}
+
 fn one(spec: &str) -> Result<Value, String> {
     let parts: Vec<&str> = spec.split(':').collect();
     let num = |i: usize| -> Result<u64, String> {
@@ -87,6 +126,69 @@ fn one(spec: &str) -> Result<Value, String> {
                 &inst,
                 format!("bench-{bits}bit"),
                 format!("roster_prime_instance({bits})"),
+            ))
+        }
+        Some("fp4torsion") => {
+            let (p, seed, cap) = (num(1)?, num(2)?, num(3)?);
+            let c = find_d4_curve(p, seed, cap)?;
+            assert!(!c.generator.inf && c.inst.curve.on_curve(&c.generator));
+            assert_eq!(c.r.checked_mul(c.cofactor), Some(c.group_order));
+            assert!(c.inst.curve.mul(&c.generator, c.r).inf);
+            let f = &c.inst.curve.f;
+            let modulus = vec![(p - f.c % p) % p, 0, 0, 0];
+            let a = c.inst.curve.a.0;
+            let b = c.inst.curve.b.0;
+            let g = c.generator;
+            let order = c.group_order;
+            let r = c.r;
+            let h = c.cofactor;
+            let spec = CurveSpec::Fp4Torsion { p, seed, max_cofactor: cap };
+            let id = Instance::Fp4Torsion(Box::new(c)).facts(&spec);
+            Ok(json!({
+                "name": id.slug.clone(),
+                "generator_call": format!("gaudry_quartic_d4::find_d4_curve({p}, {seed}, {cap})"),
+                "field": {"kind": "prime_extension", "p": p, "degree": 4, "modulus": modulus},
+                "a": a, "b": b, "group_order": order, "subgroup_order": r, "cofactor": h,
+                "generator": {"x": g.x.0, "y": g.y.0},
+                "icv1": id.icv1, "slug": id.slug,
+            }))
+        }
+        Some("glsfp2") => {
+            let (bits, seed, cap) = (num(1)? as u32, num(2)?, num(3)?);
+            let instance = ExtInstance::build_gls(bits, seed, cap)?;
+            let id = instance.id();
+            let ExtInstance::Gls(i) = instance else {
+                unreachable!()
+            };
+            Ok(extension_record(
+                &i.curve,
+                i.curve.f.nu,
+                i.generator,
+                i.group_order,
+                i.r,
+                i.cofactor,
+                id.icv1,
+                id.slug,
+                format!("gls_fp2::generate_gls_instance({bits}, {seed}, {cap})"),
+            ))
+        }
+        Some("subfieldfp3") => {
+            let (bits, seed, cap) = (num(1)? as u32, num(2)?, num(3)?);
+            let instance = ExtInstance::build_subfield(bits, seed, cap)?;
+            let id = instance.id();
+            let ExtInstance::Subfield(i) = instance else {
+                unreachable!()
+            };
+            Ok(extension_record(
+                &i.curve,
+                i.curve.f.nu,
+                i.generator,
+                i.group_order,
+                i.r,
+                i.cofactor,
+                id.icv1,
+                id.slug,
+                format!("subfield_fp3::generate_subfield_instance({bits}, {seed}, false, {cap})"),
             ))
         }
         Some("koblitz") => {
@@ -128,7 +230,7 @@ fn one(spec: &str) -> Result<Value, String> {
             Ok(v)
         }
         _ => Err(format!(
-            "{spec}: expected prime:, roster:, char2:, subfield: or koblitz:"
+            "{spec}: expected prime:, roster:, char2:, subfield:, koblitz:, fp4torsion:, glsfp2: or subfieldfp3:"
         )),
     }
 }

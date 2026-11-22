@@ -1,0 +1,68 @@
+name: Prime31 Dickson31 complete rank31 1024Q Rust control
+on:
+  push:
+    branches: [automation/prime31-dickson31-complete-1024-20261117]
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs'
+      - 'research/prime31_ic_20261115/native/DICKSON31_COMPLETE_RANK_1024_PROTOCOL_20261117.md'
+      - '.github/workflows/prime31-dickson31-complete-1024.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs'
+      - '.github/workflows/prime31-dickson31-complete-1024.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  complete-rank-1024:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout exact candidate example
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs
+          sparse-checkout-cone-mode: false
+      - name: Checkout immutable original Rust arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: prime31-native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install pinned Rust compiler
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay the existing example with complete-solver tests
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs prime31-native-pinned/research/prime31_ic_20261115/native/examples/
+      - name: Original native Rust library regression
+        run: cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Full source-specific rank and 1024 unknown log recovery
+        shell: bash
+        run: |
+          set -o pipefail
+          timeout -k 10 1200 cargo +1.100.0 test --locked --release --manifest-path prime31-native-pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle complete_b31_1024_tests -- --nocapture --test-threads=1 2>&1 | tee prime31-dickson31-complete-1024.log
+      - name: Independent log gate (not independently signed PCC)
+        if: success()
+        shell: bash
+        run: |
+          grep -Fq 'test result: ok. 2 passed;' prime31-dickson31-complete-1024.log
+          grep -Fq 'DICKSON31_COMPLETE_1024_JSON=' prime31-dickson31-complete-1024.log
+          grep -Fq '"basis_rank":31' prime31-dickson31-complete-1024.log
+          grep -Fq '"complete_unknown_logs":1024' prime31-dickson31-complete-1024.log
+      - name: Archive full Rust output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-dickson31-complete-1024-raw
+          path: prime31-dickson31-complete-1024.log
+          retention-days: 30
+          if-no-files-found: warn

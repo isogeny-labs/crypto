@@ -1,0 +1,127 @@
+{
+  "scientific_goal": "active",
+  "qualified_speedup": null,
+  "oracle": {
+    "taylor_cases": 2232,
+    "root_polynomials": 240,
+    "original_systems": 32,
+    "literal_checks": 3168,
+    "large_counts": [
+      {
+        "k": 520,
+        "squarings": 519,
+        "multiplications": 10,
+        "chain_calls": 1,
+        "fallback_calls": 0
+      },
+      {
+        "k": 521,
+        "squarings": 520,
+        "multiplications": 11,
+        "chain_calls": 1,
+        "fallback_calls": 0
+      }
+    ],
+    "qualified_speedup": null
+  },
+  "cold_summaries": [
+    {
+      "field": "P192",
+      "medians": {
+        "generic": 0.09300082000845578,
+        "chain": 0.09154529200168326
+      },
+      "span_fraction": {
+        "generic": 0.022996238159512385,
+        "chain": 0.015806831547848305
+      },
+      "generic_over_chain": 1.0158995397245087,
+      "root_count": 1,
+      "roots": [
+        [
+          311,
+          981799188462848657231353444267028205532903658151171236737
+        ]
+      ]
+    },
+    {
+      "field": "P224",
+      "medians": {
+        "generic": 0.10145149100571871,
+        "chain": 0.10316077100287657
+      },
+      "span_fraction": {
+        "generic": 0.3589314423400138,
+        "chain": 0.041200719667855136
+      },
+      "generic_over_chain": 0.983430910989312,
+      "root_count": 1,
+      "roots": [
+        [
+          303,
+          7853313846942656004085238460089424115488873784883534103731932839575
+        ]
+      ]
+    },
+    {
+      "field": "P256",
+      "medians": {
+        "generic": 0.11125955000170507,
+        "chain": 0.10171679098857567
+      },
+      "span_fraction": {
+        "generic": 0.08670802639221879,
+        "chain": 0.04612489204840716
+      },
+      "generic_over_chain": 1.0938169492016436,
+      "root_count": 1,
+      "roots": [
+        [
+          308,
+          32249287400159441653813589507361194695053382420067893740865801413791720073305
+        ]
+      ]
+    },
+    {
+      "field": "P384",
+      "medians": {
+        "generic": 0.19562872100505047,
+        "chain": 0.21845493400178384
+      },
+      "span_fraction": {
+        "generic": 0.0779713168758031,
+        "chain": 0.32305209002597585
+      },
+      "generic_over_chain": 0.8955106548586951,
+      "root_count": 1,
+      "roots": [
+        [
+          310,
+          15604792480372949538191006635849828301260554821033134766600066171635012157554204441166750842305397413575767066458618
+        ]
+      ]
+    },
+    {
+      "field": "P521",
+      "medians": {
+        "generic": 0.41353158200217877,
+        "chain": 0.21952026900544297
+      },
+      "span_fraction": {
+        "generic": 0.30112136392231176,
+        "chain": 0.1577214130324129
+      },
+      "generic_over_chain": 1.883796807810605,
+      "root_count": 1,
+      "roots": [
+        [
+          303,
+          5285081490913885168565713102797567880579225388896960877551737301104093104120465918211942223436085344376690694242420393682497172393943071175340751269470605409
+        ]
+      ]
+    }
+  ],
+  "cold_runs": 30,
+  "all_field_geomean_diagnostic": 1.1301310735306558,
+  "next": "Field-entry route and changed throughput cohort; preserve noisy first-panel losses"
+}

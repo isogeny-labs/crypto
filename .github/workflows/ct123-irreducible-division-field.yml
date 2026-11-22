@@ -1,0 +1,38 @@
+name: CT123 irreducible global torsion division polynomial
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct123/**'
+      - '.github/workflows/ct123-irreducible-division-field.yml'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct123/**'
+      - '.github/workflows/ct123-irreducible-division-field.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct123:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          sparse-checkout: |
+            research/cross_characteristic_global_torsion_20261112/ct123
+      - name: Two independent exact polynomial and Frobenius certificates
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct123
+          python3 -B "$D/ct123_division_certificate.py" >/tmp/ct123-py.json
+          python3 -O -B "$D/ct123_division_certificate.py" >/tmp/ct123-pyo.json
+          node "$D/ct123_independent.js" >/tmp/ct123-js.json
+          node --no-opt "$D/ct123_independent.js" >/tmp/ct123-jso.json
+          cmp /tmp/ct123-py.json /tmp/ct123-pyo.json
+          cmp /tmp/ct123-py.json /tmp/ct123-js.json
+          cmp /tmp/ct123-py.json /tmp/ct123-jso.json
+          printf '%s  %s\n' c64b7d232db0749206f36c58efc0fe0e3a1c13bc1d1096835766581cec686854 /tmp/ct123-py.json | sha256sum -c

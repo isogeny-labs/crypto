@@ -1,0 +1,403 @@
+{
+ "status": "[pcc:unverified] local development checks",
+ "git_head_at_freeze": "3c24520f7cdc1c47bac26cc7778d058e655b79a8",
+ "onestep_pooled_by_p": {
+  "101": {
+   "k": 1749,
+   "n": 9000,
+   "rate": 0.19433333333333333,
+   "wilson95": [
+    0.18628962895994744,
+    0.20263786102712733
+   ],
+   "per_seed": [
+    {
+     "seed": 1,
+     "rate": 0.19066666666666668,
+     "wilson95": [
+      0.17700881160928228,
+      0.20511570280211938
+     ]
+    },
+    {
+     "seed": 2,
+     "rate": 0.18733333333333332,
+     "wilson95": [
+      0.17377427398296236,
+      0.20169209941994143
+     ]
+    },
+    {
+     "seed": 3,
+     "rate": 0.205,
+     "wilson95": [
+      0.19093556046018786,
+      0.2198189602877544
+     ]
+    }
+   ]
+  },
+  "211": {
+   "k": 1674,
+   "n": 9000,
+   "rate": 0.186,
+   "wilson95": [
+    0.17809568632547423,
+    0.19417224777248043
+   ],
+   "per_seed": [
+    {
+     "seed": 1,
+     "rate": 0.195,
+     "wilson95": [
+      0.18121614972329536,
+      0.20956394799915345
+     ]
+    },
+    {
+     "seed": 2,
+     "rate": 0.18866666666666668,
+     "wilson95": [
+      0.17506789075089216,
+      0.20306173905541083
+     ]
+    },
+    {
+     "seed": 3,
+     "rate": 0.17433333333333334,
+     "wilson95": [
+      0.16117584758214723,
+      0.1883237758876151
+     ]
+    }
+   ]
+  },
+  "521": {
+   "k": 1660,
+   "n": 9000,
+   "rate": 0.18444444444444444,
+   "wilson95": [
+    0.1765668147797682,
+    0.19259133555221736
+   ],
+   "per_seed": [
+    {
+     "seed": 1,
+     "rate": 0.174,
+     "wilson95": [
+      0.1608531639130219,
+      0.1879806454558906
+     ]
+    },
+    {
+     "seed": 2,
+     "rate": 0.18933333333333333,
+     "wilson95": [
+      0.17571479854362831,
+      0.2037464594643742
+     ]
+    },
+    {
+     "seed": 3,
+     "rate": 0.19,
+     "wilson95": [
+      0.1763617722514591,
+      0.20443111395824298
+     ]
+    }
+   ]
+  }
+ },
+ "onestep_all": {
+  "k": 5083,
+  "n": 27000,
+  "rate": 0.18825925925925927,
+  "wilson95": [
+   0.18364085975970604,
+   0.19296635274852617
+  ]
+ },
+ "modeltest": {
+  "preregistered_d2_to_d5": {
+   "instances": 60,
+   "instances_with_nonzero_kernel_d_le_5": 0,
+   "min_points": 36,
+   "max_points": 200,
+   "image_errors_total": 0,
+   "rational_pair_fraction": 0.4907846234860453
+  },
+  "extended_exploratory_p101": {
+   "instances": 12,
+   "min_degree_counts": {
+    "9": 1,
+    "10": 11
+   },
+   "kernel_dim_d2_to_d12_example": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    3,
+    6
+   ]
+  }
+ },
+ "coverage": [
+  {
+   "cell": "coverage",
+   "charpoly_mismatches": 0,
+   "class_any_lagrangian": 926604,
+   "class_pair_kernel": 691308,
+   "classes": 5231,
+   "curves": 1411788,
+   "direct_any_lagrangian": 926604,
+   "direct_pair_kernel": 691308,
+   "frac": {
+    "class_any": 0.6563336704944368,
+    "class_pair": 0.48966842047106224,
+    "direct_any": 0.6563336704944368,
+    "direct_pair": 0.48966842047106224
+   },
+   "necessary_condition": 926604,
+   "necessary_condition_violations": 0,
+   "p": 7
+  }
+ ],
+ "canon_S2b": {
+  "instances": 60,
+  "kernel_dims_d2_to_d6_counts": {
+   "(0, 0, 1, 3, 6)": 58,
+   "(1, 3, 6, 10, 15)": 2
+  },
+  "by_p": {
+   "37": {
+    "instances": 30,
+    "unique_quartic": 29,
+    "on_conic": 1
+   },
+   "101": {
+    "instances": 30,
+    "unique_quartic": 29,
+    "on_conic": 1
+   }
+  },
+  "min_points": 33,
+  "image_errors": 0,
+  "chart_skipped_points": 35
+ },
+ "pushforward_S3a": {
+  "instances": 60,
+  "with_smooth_quartic": 58,
+  "no_quartic_conic_image": 2,
+  "pairs_tested": 1538,
+  "phi_none": 44,
+  "library_panics_caught": 254,
+  "instances_with_tests": 57,
+  "instances_single_value": 57,
+  "instances_multi_value": 0,
+  "negative_control_instances_multivalued": 57,
+  "negative_control_instances_tested": 57
+ },
+ "dlp_S3b": {
+  "by_p": {
+   "101": {
+    "instances": 10,
+    "targets": 60,
+    "logs_found_on_C": 50,
+    "verified_on_H": 44,
+    "found_not_verified": 6,
+    "not_verified_with_difference_in_8_torsion": 6,
+    "ordH_over_ordC_counts": {
+     "1": 10
+    },
+    "median_ord_GH": 134294.0,
+    "ic_priced_fp_ops_per_target_median": 1947784.5,
+    "ic_priced_range": [
+     955424.0,
+     3353325.6666666665
+    ],
+    "ic_native_probes_per_target_median": 569.3333333333333,
+    "phi_native_estimate": 800,
+    "ic_order_phase_priced_median": 5059350.0,
+    "rho_steps_median": 324.7631400515255,
+    "rho_priced_median": 194660.65460602383,
+    "rho_priced_range": [
+     71220.44466090866,
+     358608.8109122245
+    ],
+    "cantor_field_ops_per_add_H_median": 598.4975124378109,
+    "S_over_rho": {
+     "0": {
+      "median": 10.510122248901036,
+      "min": 8.90940867403873,
+      "max": 13.559110843664776
+     },
+     "0.1": {
+      "median": 10.509036503639535,
+      "min": 8.908583502497796,
+      "max": 13.557640884570693
+     },
+     "1": {
+      "median": 10.499281073364276,
+      "min": 8.90116935511589,
+      "max": 13.544433305401817
+     }
+    }
+   },
+   "211": {
+    "instances": 12,
+    "targets": 72,
+    "logs_found_on_C": 60,
+    "verified_on_H": 54,
+    "found_not_verified": 6,
+    "not_verified_with_difference_in_8_torsion": 6,
+    "ordH_over_ordC_counts": {
+     "1": 10,
+     "2": 2
+    },
+    "median_ord_GH": 1166668.5,
+    "ic_priced_fp_ops_per_target_median": 4931259.0,
+    "ic_priced_range": [
+     2153749.3333333335,
+     8514738.5
+    ],
+    "ic_native_probes_per_target_median": 1393.0,
+    "phi_native_estimate": 800,
+    "ic_order_phase_priced_median": 14077966.0,
+    "rho_steps_median": 957.1413190746171,
+    "rho_priced_median": 505380.6131532077,
+    "rho_priced_range": [
+     206199.25310776907,
+     743147.5005846291
+    ],
+    "cantor_field_ops_per_add_H_median": 565.6169154228855,
+    "S_over_rho": {
+     "0": {
+      "median": 10.98677981120083,
+      "min": 7.420753646914971,
+      "max": 13.297570772985187
+     },
+     "0.1": {
+      "median": 10.98541599394635,
+      "min": 7.419662189194375,
+      "max": 13.295670586590138
+     },
+     "1": {
+      "median": 10.973161908217051,
+      "min": 7.409857711516264,
+      "max": 13.278597102774858
+     }
+    }
+   },
+   "521": {
+    "instances": 12,
+    "targets": 72,
+    "logs_found_on_C": 50,
+    "verified_on_H": 43,
+    "found_not_verified": 7,
+    "not_verified_with_difference_in_8_torsion": 7,
+    "ordH_over_ordC_counts": {
+     "1": 7,
+     "2": 5
+    },
+    "median_ord_GH": 16948893.5,
+    "ic_priced_fp_ops_per_target_median": 18303281.166666664,
+    "ic_priced_range": [
+     6943581.666666667,
+     47442343.333333336
+    ],
+    "ic_native_probes_per_target_median": 4732.875,
+    "phi_native_estimate": 800,
+    "ic_order_phase_priced_median": 50413252.5,
+    "rho_steps_median": 3648.500098205668,
+    "rho_priced_median": 2072269.7117890748,
+    "rho_priced_range": [
+     456549.0820504176,
+     4025128.396501453
+    ],
+    "cantor_field_ops_per_add_H_median": 604.6094527363184,
+    "S_over_rho": {
+     "0": {
+      "median": 10.604383995581951,
+      "min": 6.191677920917094,
+      "max": 15.208839399002173
+     },
+     "0.1": {
+      "median": 10.60298341921192,
+      "min": 6.190865267247756,
+      "max": 15.206148017692762
+     },
+     "1": {
+      "median": 10.590399027012321,
+      "min": 6.183563452049654,
+      "max": 15.181971163253657
+     }
+    }
+   }
+  },
+  "exponent_fit_log_log_over_p": {
+   "ic_priced_per_target": 1.3687494502309632,
+   "rho_priced": 1.4460634949766418,
+   "note": "slope of ln(cost) vs ln(p) over p = 101, 211, 521 (three points, no interval); BSGS on C expects 1.5, rho on a group of size p^3 expects 1.5"
+  }
+ },
+ "rho_reference": "analytic expectation sqrt(pi N / 4) group ops (negation map) x measured Cantor field ops per add on H; NOT a measured rho run",
+ "S_over_rho_summary": {
+  "101": {
+   "0": {
+    "median": 10.510122248901036,
+    "min": 8.90940867403873,
+    "max": 13.559110843664776
+   },
+   "0.1": {
+    "median": 10.509036503639535,
+    "min": 8.908583502497796,
+    "max": 13.557640884570693
+   },
+   "1": {
+    "median": 10.499281073364276,
+    "min": 8.90116935511589,
+    "max": 13.544433305401817
+   }
+  },
+  "211": {
+   "0": {
+    "median": 10.98677981120083,
+    "min": 7.420753646914971,
+    "max": 13.297570772985187
+   },
+   "0.1": {
+    "median": 10.98541599394635,
+    "min": 7.419662189194375,
+    "max": 13.295670586590138
+   },
+   "1": {
+    "median": 10.973161908217051,
+    "min": 7.409857711516264,
+    "max": 13.278597102774858
+   }
+  },
+  "521": {
+   "0": {
+    "median": 10.604383995581951,
+    "min": 6.191677920917094,
+    "max": 15.208839399002173
+   },
+   "0.1": {
+    "median": 10.60298341921192,
+    "min": 6.190865267247756,
+    "max": 15.206148017692762
+   },
+   "1": {
+    "median": 10.590399027012321,
+    "min": 6.183563452049654,
+    "max": 15.181971163253657
+   }
+  }
+ }
+}

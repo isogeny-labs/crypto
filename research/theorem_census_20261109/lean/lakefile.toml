@@ -1,0 +1,11 @@
+name = "theorem_refutations"
+version = "0.1.0"
+defaultTargets = ["Refutations"]
+
+[[require]]
+name = "theorem_audit"
+path = "../../theorem_audit_20261108/lean"
+
+[[lean_lib]]
+name = "Refutations"
+roots = ["Refutations", "RationalCounterexample", "DescentCounterexample", "TorsionBoundaries", "SourceFSTBoundary", "BivariateMultiplicity", "SolverCoefficientBoundary", "BinaryS3", "BinaryMisapplication", "CharacteristicTorsionBoundary", "GeneralS3", "GeneralS3Controls", "GeneralS4", "CompositeTorsion", "S4Degree", "ResultantDegreeStep", "RecursiveSemaevDegree", "RecursiveSemaevSymmetry", "SupersingularTraceClasses", "RecursiveSemaevFocus", "RecursiveSemaevTransport", "RecursiveSemaevSeededTransport", "RecursiveSemaevInitialDegrees", "RecursiveSemaevAllDegrees", "DeclaredResultantRoots", "SemaevPointLists", "RecursiveSemaevEvaluation", "RecursiveSemaevGeometry", "FrobeniusPointDescent", "FrobeniusFiniteExtension", "DiemThreshold", "DiemSmallField", "SubspaceCriterion", "F4Containment", "F4SaturationBoundary", "F4ExpectedOutputs"]
