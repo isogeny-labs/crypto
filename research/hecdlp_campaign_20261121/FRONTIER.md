@@ -114,7 +114,7 @@ effect on present evidence.
 
 ### R6: replay of R4, and a correction [pcc:unverified]
 
-The validator replayed R4 in full (204 rows, 0 mismatches; ratios recomputed independently and
+The validator replayed R4 in full (204 rows, 0 mismatches; ratios recomputed independently and [pcc:unverified]
 bit-equal). Its finding F1 corrects the round-3 reading above: the light-row floor wins only when a
 mod-r multiplication in the linear algebra costs more than 2.5 to 4.1 field multiplications (κ). R4
 scored κ = 9. At κ = 1 the selection costs 1.09 to 1.11 of plain, and in GAE at w = 1 it costs 1.03
