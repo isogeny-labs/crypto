@@ -55,5 +55,5 @@ ax[2].set_xscale("log"); ax[2].set_xlabel("D = |V|"); ax[2].set_ylabel("wall ns 
 ax[2].set_title("Per-operation time"); ax[2].legend(fontsize=7); ax[2].grid(alpha=0.3, which="both")
 fig.suptitle("Flat presentation, sym form, k = 20 (p = 1,048,573, A = 926), N = 6 targets per cell; dotted lines: censored cells [pcc:unverified]", fontsize=9)
 fig.tight_layout()
-fig.savefig(os.path.join(H, "flat_exponent.svg")); fig.savefig(os.path.join(H, "flat_exponent.png"), dpi=130)
+fig.savefig(os.path.join(H, "flat_exponent.svg")); fig.savefig(os.path.join(H, "flat_exponent.png"), dpi=55)  # kept under the 64 KB artifact-policy limit for data files
 print("wrote flat_exponent.svg/png")
