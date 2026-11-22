@@ -4,8 +4,19 @@ Runs with bare rustc, no Cargo, network, or unrelated repository dependencies.
 The two module bodies differ ONLY in the cached reciprocal and mul reduction.
 """
 from pathlib import Path
+import os
 import subprocess
 import tempfile
+
+# Pin all source-exact A/B subprocesses to one allowed CPU.
+try:
+    allowed = os.sched_getaffinity(0)
+    if allowed:
+        cpu = min(allowed)
+        os.sched_setaffinity(0, {cpu})
+        print(f"ROUND115_CPU_PIN cpu={cpu}", flush=True)
+except (AttributeError, OSError):
+    print("ROUND115_CPU_PIN unavailable", flush=True)
 
 source = Path("src/cryptanalysis/prime_radical_root.rs").read_text().split("\n#[cfg(test)]\n", 1)[0]
 new_struct = """pub(crate) struct Fp {
@@ -146,7 +157,11 @@ mod tests {
    for kind in ["mul","fq2_mul","power","quad","cubic"] {
     if kind=="cubic" && p==4_294_967_291 {continue;}
     if kind=="quad" && p==4_294_967_291 {continue;}
-    let loops=if kind=="mul"||kind=="fq2_mul" {80} else if kind=="power"{8}else{1};
+    // Multi-millisecond measurement windows avoid per-microbenchmark timer noise.
+    let loops=match kind {
+      "mul"=>2048, "fq2_mul"=>1024, "power"=>64,
+      "quad"=>96, "cubic"=>32, _=>unreachable!(),
+    };
     let mut before=Vec::new();let mut after=Vec::new();
     let mut expected=None;
     for trial in 0..13 {
