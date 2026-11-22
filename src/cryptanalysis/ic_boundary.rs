@@ -6751,6 +6751,29 @@ pub fn curve25519_family_instance(k: u32) -> Option<PrimeInstance> {
 /// `p`, random `(a, b)`, `O(p)` point count, until `#E` is prime.
 /// Deterministic in the seed; the count of curves tried is not returned
 /// because it is not a cost of the attack.
+/// Ordinary cofactor-one Mersenne prime curve for the p31 exponent-lead gate.
+///
+/// Frozen in `docs/ic/research/fp_p31_subexp_calibration_20261121/` (sourced from
+/// the external `CURVE.json` workdir).  Select with `ic bench --bits 31
+/// --family p31-subexp`.
+pub fn fp_p31_subexp_mersenne_instance() -> PrimeInstance {
+    let curve = PrimeCurve {
+        p: 2_147_483_647,
+        a: 2_147_483_644,
+        b: 21,
+    };
+    let r = 2_147_487_637;
+    PrimeInstance {
+        name: prime_curve_id(&curve, r).slug,
+        curve,
+        group_order: r,
+        r,
+        cofactor: 1,
+        generator: (1_391_443_431, 177_979_044),
+        representation: None,
+    }
+}
+
 pub fn find_prime_order_curve(bits: u32, seed: u64) -> PrimeInstance {
     assert!((8..=32).contains(&bits));
     let mut rng = StdRng::seed_from_u64(seed ^ (bits as u64) << 40);
@@ -17465,6 +17488,26 @@ mod tests {
             );
             assert_eq!(v, 0, "S₃ must vanish on x(P ± Q)");
         }
+    }
+
+    #[test]
+    fn fp_p31_subexp_mersenne_matches_frozen_curve_json() {
+        let inst = fp_p31_subexp_mersenne_instance();
+        assert_eq!(inst.curve.p, 2_147_483_647);
+        assert_eq!(inst.r, 2_147_487_637);
+        assert_eq!(inst.cofactor, 1);
+        let g = inst.generator_point();
+        let mut ops = GroupOps::default();
+        let d = 987_654_321u64;
+        let q = inst.curve.mul(&mut ops, g, d);
+        assert_eq!(q.x, 291_202_666);
+        assert_eq!(q.y, 1_848_813_168);
+        let pinned = Calibration::default().pin("prime", "generated-31bit-2147483647");
+        assert!(
+            !pinned.pinned.is_empty(),
+            "table row must resolve for slug {:?}",
+            inst.name
+        );
     }
 
     #[test]

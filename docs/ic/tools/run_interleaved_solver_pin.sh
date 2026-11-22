@@ -67,6 +67,10 @@ echo "=== interleaved rep 1..5 (by seed) ==="
 SOLVER_REPORTS=()
 HASHED_20=()
 HASHED_24=()
+# HASHED_31=()  # after boundary re-pin on prime/generated-31bit-2147483647:
+# run_hashed_prime 31 generated-31bit-2147483647 via:
+#   ic bench --json --bits 31 --family p31-subexp --factor-base hashed-affine \
+#     --oracle hashed-tensor --targets walk --max-trials 50000 --repeats 1 --seed "$seed"
 
 for seed in 1 2 3 4 5; do
   run_solver m4gb-f2 ns_per_monomial_op 'char2/random-binary-n15-b524b' "$seed" >/dev/null
