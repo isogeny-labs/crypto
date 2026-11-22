@@ -1,0 +1,487 @@
+{
+  "branch": "claude/f4-f5-algorithm-speed-bvp7qd",
+  "closed_utc": "2026-11-19T19:06:21+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/koblitz_v5_tally_remeasure_20261119/run.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T18:19:27+00:00",
+      "wall_s": 2680.135
+    }
+  ],
+  "commit": "9c525b01f5eb85c8033d1afd5971ea503a2af54f",
+  "commit_dirty": false,
+  "created_utc": "2026-11-19T18:19:21+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/koblitz_v5_tally_remeasure_20261119"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v653-x86_64-with-glibc2.39"
+  },
+  "id": "20261119T1819Z-koblitz-v5-tally-remeasure",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a0-n13_w0",
+      "note": "pcc:unverified; icv1-f2m13-t181-515ee569 log2 r 10.97; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0513,
+        0.0824
+      ],
+      "unit": "ratio",
+      "value": 0.0616
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a0-n13_w0.1",
+      "note": "pcc:unverified; icv1-f2m13-t181-515ee569 log2 r 10.97; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0547,
+        0.09
+      ],
+      "unit": "ratio",
+      "value": 0.0668
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a0-n13_w1",
+      "note": "pcc:unverified; icv1-f2m13-t181-515ee569 log2 r 10.97; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0764,
+        0.1491
+      ],
+      "unit": "ratio",
+      "value": 0.104
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a1-n17_w0",
+      "note": "pcc:unverified; icv1-f2m17-tm101-00378d4e log2 r 16.00; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0902,
+        0.1034
+      ],
+      "unit": "ratio",
+      "value": 0.0967
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a1-n17_w0.1",
+      "note": "pcc:unverified; icv1-f2m17-tm101-00378d4e log2 r 16.00; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0999,
+        0.1154
+      ],
+      "unit": "ratio",
+      "value": 0.1075
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a1-n17_w1",
+      "note": "pcc:unverified; icv1-f2m17-tm101-00378d4e log2 r 16.00; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.1651,
+        0.1973
+      ],
+      "unit": "ratio",
+      "value": 0.1807
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a0-n19_w0",
+      "note": "pcc:unverified; icv1-f2m19-t797-b6cf2467 log2 r 17.00; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.1011,
+        0.1189
+      ],
+      "unit": "ratio",
+      "value": 0.1098
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a0-n19_w0.1",
+      "note": "pcc:unverified; icv1-f2m19-t797-b6cf2467 log2 r 17.00; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.1122,
+        0.1332
+      ],
+      "unit": "ratio",
+      "value": 0.1225
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a0-n19_w1",
+      "note": "pcc:unverified; icv1-f2m19-t797-b6cf2467 log2 r 17.00; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.1839,
+        0.2264
+      ],
+      "unit": "ratio",
+      "value": 0.2048
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a0-n23_w0",
+      "note": "pcc:unverified; icv1-f2m23-t5197-69e76b73 log2 r 21.00; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.1809,
+        0.2156
+      ],
+      "unit": "ratio",
+      "value": 0.1982
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a0-n23_w0.1",
+      "note": "pcc:unverified; icv1-f2m23-t5197-69e76b73 log2 r 21.00; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.1995,
+        0.239
+      ],
+      "unit": "ratio",
+      "value": 0.2194
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a0-n23_w1",
+      "note": "pcc:unverified; icv1-f2m23-t5197-69e76b73 log2 r 21.00; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.2994,
+        0.368
+      ],
+      "unit": "ratio",
+      "value": 0.334
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a1-n23_w0",
+      "note": "pcc:unverified; icv1-f2m23-tm5197-1f85e9e1 log2 r 22.00; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.2272,
+        0.2761
+      ],
+      "unit": "ratio",
+      "value": 0.2509
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a1-n23_w0.1",
+      "note": "pcc:unverified; icv1-f2m23-tm5197-1f85e9e1 log2 r 22.00; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.2505,
+        0.3061
+      ],
+      "unit": "ratio",
+      "value": 0.2772
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a1-n23_w1",
+      "note": "pcc:unverified; icv1-f2m23-tm5197-1f85e9e1 log2 r 22.00; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.3688,
+        0.4618
+      ],
+      "unit": "ratio",
+      "value": 0.4132
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a1-n29_w0",
+      "note": "pcc:unverified; icv1-f2m29-tm40309-30c52b96 log2 r 15.37; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0723,
+        0.0823
+      ],
+      "unit": "ratio",
+      "value": 0.0774
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a1-n29_w0.1",
+      "note": "pcc:unverified; icv1-f2m29-tm40309-30c52b96 log2 r 15.37; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.0793,
+        0.0913
+      ],
+      "unit": "ratio",
+      "value": 0.0854
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a1-n29_w1",
+      "note": "pcc:unverified; icv1-f2m29-tm40309-30c52b96 log2 r 15.37; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.1298,
+        0.1571
+      ],
+      "unit": "ratio",
+      "value": 0.1435
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a0-n31_w0",
+      "note": "pcc:unverified; icv1-f2m31-tm90707-c95f16f5 log2 r 20.46; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.1595,
+        0.1906
+      ],
+      "unit": "ratio",
+      "value": 0.1744
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a0-n31_w0.1",
+      "note": "pcc:unverified; icv1-f2m31-tm90707-c95f16f5 log2 r 20.46; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.1773,
+        0.2132
+      ],
+      "unit": "ratio",
+      "value": 0.1944
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a0-n31_w1",
+      "note": "pcc:unverified; icv1-f2m31-tm90707-c95f16f5 log2 r 20.46; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.2795,
+        0.3471
+      ],
+      "unit": "ratio",
+      "value": 0.3117
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a0-n37_w0",
+      "note": "pcc:unverified; icv1-f2m37-tm534059-32aad96b log2 r 27.78; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.5068,
+        0.644
+      ],
+      "unit": "ratio",
+      "value": 0.5736
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a0-n37_w0.1",
+      "note": "pcc:unverified; icv1-f2m37-tm534059-32aad96b log2 r 27.78; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.5336,
+        0.6811
+      ],
+      "unit": "ratio",
+      "value": 0.6056
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "v5_over_strong_a0-n37_w1",
+      "note": "pcc:unverified; icv1-f2m37-tm534059-32aad96b log2 r 27.78; paired by target, 95% wider of compare intervals; v5 with per-step jump-index tally",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.6379,
+        0.8273
+      ],
+      "unit": "ratio",
+      "value": 0.7295
+    }
+  ],
+  "problem": "ecdlp:koblitz_small_rows_rho_reference",
+  "raw": [
+    {
+      "bytes": 5984,
+      "path": "research/koblitz_v5_tally_remeasure_20261119/results.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/71/713cca9a269a298b3e5b8e498e677ec9e7e982c8f58ea39cd096629e215be909",
+      "sha256": "713cca9a269a298b3e5b8e498e677ec9e7e982c8f58ea39cd096629e215be909",
+      "uploaded": false
+    },
+    {
+      "bytes": 16259,
+      "path": "research/koblitz_v5_tally_remeasure_20261119/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/72/720d1837b3964a3252e0a8f0dd4abccbc8a4821ce48e148d7434bf8c90180016",
+      "sha256": "720d1837b3964a3252e0a8f0dd4abccbc8a4821ce48e148d7434bf8c90180016",
+      "uploaded": false
+    },
+    {
+      "bytes": 7546,
+      "path": "research/koblitz_v5_tally_remeasure_20261119/audits/audit-a0-n13.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6f/6facaf3b4e968876489ec9df1ff8cea29452f2f41f1368f33dcee95f9c45f005",
+      "sha256": "6facaf3b4e968876489ec9df1ff8cea29452f2f41f1368f33dcee95f9c45f005",
+      "uploaded": false
+    },
+    {
+      "bytes": 7578,
+      "path": "research/koblitz_v5_tally_remeasure_20261119/audits/audit-a0-n19.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e5/e5af494b0c4bf0765c34e2d02d42da5aeaefa07b68db6a30385b6ab88bffeec2",
+      "sha256": "e5af494b0c4bf0765c34e2d02d42da5aeaefa07b68db6a30385b6ab88bffeec2",
+      "uploaded": false
+    },
+    {
+      "bytes": 7567,
+      "path": "research/koblitz_v5_tally_remeasure_20261119/audits/audit-a0-n23.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d3/d3b613bc44ab9e3fcfdba9e604a2a0a4133b54fccd3aa57950751d662201a0d1",
+      "sha256": "d3b613bc44ab9e3fcfdba9e604a2a0a4133b54fccd3aa57950751d662201a0d1",
+      "uploaded": false
+    },
+    {
+      "bytes": 7569,
+      "path": "research/koblitz_v5_tally_remeasure_20261119/audits/audit-a0-n31.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1b/1b028f5cd514648be85af24e41e92aa5ebd8007d1f07419028f69bb2f8560109",
+      "sha256": "1b028f5cd514648be85af24e41e92aa5ebd8007d1f07419028f69bb2f8560109",
+      "uploaded": false
+    },
+    {
+      "bytes": 7576,
+      "path": "research/koblitz_v5_tally_remeasure_20261119/audits/audit-a0-n37.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f3/f35d7eb5afa2f14ef7ecf50328a7f14971369e2e95d1452c442b981c94beb574",
+      "sha256": "f35d7eb5afa2f14ef7ecf50328a7f14971369e2e95d1452c442b981c94beb574",
+      "uploaded": false
+    },
+    {
+      "bytes": 7553,
+      "path": "research/koblitz_v5_tally_remeasure_20261119/audits/audit-a1-n17.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6a/6a7a6e778ff84108246682e7db7fbe8072e62af963e4212ee4a4c4dd653f3bf6",
+      "sha256": "6a7a6e778ff84108246682e7db7fbe8072e62af963e4212ee4a4c4dd653f3bf6",
+      "uploaded": false
+    },
+    {
+      "bytes": 7559,
+      "path": "research/koblitz_v5_tally_remeasure_20261119/audits/audit-a1-n23.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e7/e74b47799021d1717076fe0e63c7854e8f55fd2d5ad6ded40970ed45c934631c",
+      "sha256": "e74b47799021d1717076fe0e63c7854e8f55fd2d5ad6ded40970ed45c934631c",
+      "uploaded": false
+    },
+    {
+      "bytes": 7564,
+      "path": "research/koblitz_v5_tally_remeasure_20261119/audits/audit-a1-n29.json.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ac/ac6056615145146c3f2930c98b6a04fe00a0d5a0a1dceee747f80f9973fcda86",
+      "sha256": "ac6056615145146c3f2930c98b6a04fe00a0d5a0a1dceee747f80f9973fcda86",
+      "uploaded": false
+    },
+    {
+      "bytes": 2042739,
+      "path": "/tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/v5t/v5t-sessions.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ee/eed5c2e8360f02b83e1c09e0ac6fcebcafa491b6910934a4d2892b57e68ed4b5",
+      "sha256": "eed5c2e8360f02b83e1c09e0ac6fcebcafa491b6910934a4d2892b57e68ed4b5",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/koblitz_v5_tally_remeasure_20261119/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/koblitz_v5_tally_remeasure_20261119/figures/fig1-v5-over-strong.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "koblitz-v5-tally-remeasure",
+  "status": "measured",
+  "summary": "v5 (per-step jump-index tally) / strong below 1 on all 8 Koblitz curves below 2^38 at w = 0/0.1/1 (0.062-0.574 at w=0; 0.104-0.729 at w=1); crossover not reached up to log2 r 27.78; [pcc:unverified], validation pending",
+  "validation": null
+}

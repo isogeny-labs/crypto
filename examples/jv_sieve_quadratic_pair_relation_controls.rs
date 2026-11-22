@@ -10,9 +10,9 @@ pub mod quadratic_pair_graph;
 #[path = "../src/cryptanalysis/jv_quadratic_pair_relation.rs"]
 pub mod quadratic_pair_relation;
 
-// The controls are unit tests: `cargo test --example <this example>`. The
-// example is built as a library (`crate-type = ["lib"]` in Cargo.toml), so it
-// has no `main`.
+/// The controls are unit tests: `cargo test --example <this example>`.
+#[allow(dead_code)]
+fn main() {}
 
 #[cfg(test)]
 pub(crate) mod tests {
