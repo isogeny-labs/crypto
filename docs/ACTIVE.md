@@ -14,6 +14,10 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+- [x] Execute and evidence the GHS strong-rho optimization registry R0-R99 in parallel, with composed-baseline promotion gates (Codex, completed 2026-11-19, branch codex/ghs-rho-parallel-20261118, PR #4757)
+
+- [x] Specify the GHS strong-rho implementation and matched frontier-measurement program (Codex, completed 2026-11-19, branch codex/ghs-rho-parallel-20261118, PR #4757)
+
 - [ ] Run the frozen EKS timing study research/ic_inrun_caching_timing_20261119 (OLD 104ca79 vs NEW ab42aff, 8 jobs, USD 15 ceiling). BLOCKED: isolab-experiment.yml fails in its contracts job on research/* artifact hydration (run 44577926579; also 44374607134 on main) (Claude Code, started 2026-11-19, branch aburan28/confident-sagan-cudszh, PR #4756)
 - [x] Fix the default lanczos deferred arm accepting undetermined solutions, and clear pre-existing compile/clippy errors (ml_dataset_live_capture, genus_ladder_fastgroup, ml_dataset drop_non_drop) (Claude Code, started 2026-11-19, branch aburan28/confident-sagan-cudszh, PR #4756)
 - [x] IC caching round 2: ecbench factor-base log store (amortised rows only), method-aware is_reusable_phase, petit_quisquater x-index hoist, opt-in F4 trace replay, opt-in sparse linear-algebra attempt schedule (Claude Code, started 2026-11-19, branch aburan28/confident-sagan-cudszh, PR #4756)
