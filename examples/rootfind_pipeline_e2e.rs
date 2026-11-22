@@ -42,7 +42,6 @@ use serde_json::json;
 
 #[derive(Clone)]
 struct ArmResult {
-    arm: String,
     verified: bool,
     exhausted: bool,
     wall_s: f64,
@@ -55,9 +54,8 @@ struct ArmResult {
     recovered: Option<u64>,
 }
 
-fn report_to_arm(arm: &str, r: &RunReport) -> ArmResult {
+fn report_to_arm(_arm: &str, r: &RunReport) -> ArmResult {
     ArmResult {
-        arm: arm.to_string(),
         verified: r.verified,
         exhausted: r.exhausted,
         wall_s: r.wall_seconds,
@@ -256,7 +254,6 @@ fn collect_kmitm_threaded(
     let verified = check == ctx.target;
     let wall_s = wall0.elapsed().as_secs_f64();
     Ok(ArmResult {
-        arm: arm.to_string(),
         verified,
         exhausted: !verified,
         wall_s,
@@ -302,7 +299,7 @@ fn collect_kmitm_lanes(
     let mut targets_tried = 0u64;
     let mut relations = 0u64;
     let mut decomp_wall_s = 0.0f64;
-    let batch = lanes.max(1).min(8) * 4;
+    let batch = lanes.clamp(1, 8) * 4;
     let max_trials = 2_000_000u64;
     let h = ctx.cofactor % ctx.r;
     'outer: while targets_tried < max_trials {
@@ -357,7 +354,6 @@ fn collect_kmitm_lanes(
         .ok_or_else(|| format!("{arm}: exhausted without pinning target column"))?;
     let verified = ctx.group.mul(&mut ops, ctx.generator, d) == ctx.target;
     Ok(ArmResult {
-        arm: arm.to_string(),
         verified,
         exhausted: !verified,
         wall_s: wall0.elapsed().as_secs_f64(),

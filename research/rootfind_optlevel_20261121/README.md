@@ -166,7 +166,7 @@ ceiling**:
 **Scalar lanes why-not-A (documented):** T-timing cannot split instruction
 overhead vs dependency chains; layout (tick 6) and prefetch (tick 3) levers
 failed within noise; IFMA **is** the landed SIMD path when `avx512ifma` is
-present. Lesson `L-a3d0b41f87a5`: do not chase scalar-lane grade B on IFMA
+present. Lesson `L-cbc735717b4a`: do not chase scalar-lane grade B on IFMA
 hosts.
 
 Further gains on IFMA are algorithmic (different search / G3), not
