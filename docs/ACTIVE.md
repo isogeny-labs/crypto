@@ -157,6 +157,7 @@ Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hypere
 - [ ] Autolab rounds 38 to 40 (claude, started 2026-11-17, branch ic-autolab-20261117b): round 39 ratchets `tw2l-x20-j16-n2` at k = 28 (0.944, counted GAE; wall time 1.236x slower; validator disposition validated for the counted claim); open: a second-host replay or human validation, a code-level lever beyond the K = 3 collision floor, and the `hashed-ecdl-tensor` standalone build failure (eight modules with no `mod` line in `lib.rs`)
 
 ## Blocked / questions for the owner
+- [ ] Publish the genus-131 known-answer test. Native-module regression passed locally. GitHub rejected the configured credential (Codex, branch codex/genus-131-known-answer).
 
 - Curve-transfer infrastructure continuation (Codex, PR #4697): the scoped
   curve workflow is green at exact implementation/workflow head `d8df2130...`,
