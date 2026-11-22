@@ -1,0 +1,83 @@
+{
+  "schema": "h116.pointwise-rational-reconstruction-protocol/v2",
+  "protocol_id": "H116-POINTWISE-RATIONAL-RECONSTRUCTION-002",
+  "status": "frozen-after-retained-v1-failure-before-v2-implementation-and-execution",
+  "supersedes": "H116-POINTWISE-RATIONAL-RECONSTRUCTION-001",
+  "v1_protocol_sha256": "1b837dfb420183e2ba0702060494687cdf78652f5fd4073d5a64c8af26d277e3",
+  "v1_result_sha256": "d7ff21da47cd866f21fdb21422d0dbf48cd661e65e5963c32d6a2cc114faead9",
+  "v1_verification_sha256": "3f349b7add0c7d5f5f2f95e57497d5895010ad97b2dab0fba391e8463d8c4870",
+  "amendment_reason": "v1 falsely identified ker(V-1) with E(F_p)=ker(pi-1), so its observed-pole product omitted denominator factors whose roots did not split in the frozen extension; v2 jointly reconstructs numerator and denominator without assuming split poles",
+  "question": "Does joint degree-(N,N-1) rational interpolation recover one extension-stable base-field x-map for [t-1]P-pi(P), and do observed kernel points follow the new Frobenius-eigenspace prediction gcd(N,(t-1)^d-1)?",
+  "parent_pointwise_result_sha256": "5c8f506a81280c650470dac6d2b32deca78c9e63a45282b1a579a6ace66368eb",
+  "capacity_result_sha256": "eb4c9f7912f151a503c364732d0795cc3c0730515054bd42bd6a372d33a099e6",
+  "cells": [
+    {"slug":"fp5-a2-b1-d2","p":5,"a":2,"b":1,"degree":2},
+    {"slug":"fp5-a2-b1-d3","p":5,"a":2,"b":1,"degree":3},
+    {"slug":"fp5-a2-b1-d4","p":5,"a":2,"b":1,"degree":4},
+    {"slug":"fp7-a1-b1-d2","p":7,"a":1,"b":1,"degree":2},
+    {"slug":"fp7-a1-b1-d3","p":7,"a":1,"b":1,"degree":3},
+    {"slug":"fp7-a1-b1-d4","p":7,"a":1,"b":1,"degree":4},
+    {"slug":"fp11-a1-b1-d2","p":11,"a":1,"b":1,"degree":2},
+    {"slug":"fp11-a1-b1-d3","p":11,"a":1,"b":1,"degree":3}
+  ],
+  "degree_model": {
+    "N": "parent base-field point count",
+    "numerator_degree": "N",
+    "denominator_degree": "N-1 with leading coefficient normalized to one",
+    "unknown_count": "2*N coefficients after denominator normalization",
+    "cross_degree": "2*N-1",
+    "sample_requirement": "at least 2*N regular x-values for reconstruction and strictly more than 2*N-1 for separation"
+  },
+  "kernel_eigenspace_model": {
+    "premise": "on ker(V-1), V=1 and therefore pi=[t-1]",
+    "predicted_visible_kernel_size": "gcd(N,(t-1)^d-1)",
+    "predicted_pole_multiplicity": "predicted_visible_kernel_size-1",
+    "predicted_distinct_pole_x": "floor(predicted_visible_kernel_size/2) for the cyclic kernels in this panel"
+  },
+  "reconstruction": {
+    "equations": "N(x_i)=image_x_i*D(x_i) with deg N<=N, deg D=N-1, and leading(D)=1",
+    "first_window": "first 2*N regular x-values in canonical field-index order",
+    "second_window": "last 2*N regular x-values in canonical field-index order",
+    "solver": "deterministic Gaussian elimination over GF(p^d), requiring a unique pivot in every column",
+    "validation": "evaluate both candidates on every regular sample and every observed pole; require base-field coefficients and cross-degree separation margin"
+  },
+  "producer": {
+    "path": "h116_pointwise_rational_reconstruction_v2.rs",
+    "build": "rustc --edition=2021 -O -D warnings",
+    "source_hash": "to be sealed before execution"
+  },
+  "independent_verifier": {
+    "path": "h116_pointwise_rational_reconstruction_v2_verify.py",
+    "method": "separate Python field/group implementation and Gaussian solver",
+    "source_hash": "to be sealed before execution"
+  },
+  "positive_checks": [
+    "paired points above each x have equal image x-coordinate or both map to infinity",
+    "observed pole multiplicity plus infinity equals gcd(N,(t-1)^d-1) and the distinct pole count equals its frozen cyclic prediction",
+    "both 2*N-window linear systems have unique solutions and recover identical degree-(N,N-1) candidates",
+    "all recovered coefficients lie in F_p and are identical across extension degrees of each base curve",
+    "both candidates match every regular sample, their denominator vanishes at every observed pole, and their numerator does not cancel any observed pole",
+    "the regular sample count is strictly greater than the cross degree 2*N-1"
+  ],
+  "controls": [
+    "adding one to the numerator constant rejects every regular sample",
+    "adding one to the denominator constant destroys every observed pole",
+    "exactly 2*N-1 samples fail the strict separation-cardinality premise",
+    "the retained v1 split-pole reconstruction remains failed and is not overwritten"
+  ],
+  "measurements": [
+    "predicted and observed visible-kernel size, pole multiplicity and distinct pole count",
+    "solver ranks, degrees, coefficient encodings, full-sample mismatch and pole-cancellation counts",
+    "strict separation margin and mutation rejection counts",
+    "producer and verifier elapsed nanoseconds as single-run diagnostics"
+  ],
+  "acceptance": {
+    "primary": "all positive checks pass in all eight cells, every exact field matches independent replay, and all three base-curve coefficient families are stable",
+    "controls": "all controls reject or expose the intended boundary in every applicable cell",
+    "failure_policy": "retain every row; do not replace any v1 or v2 cell, window, degree, eigenspace prediction, check, or control"
+  },
+  "claim_boundary": "V2 tests a corrected finite-panel degree, eigenspace and rational-reconstruction model. It does not prove cyclicity or deg(V-1)=N generically, identify a scheme morphism over the algebraic closure, transport equality to completed local series, solve ECDLP, or establish runtime or asymptotic improvement.",
+  "filed_before_v2_code": true,
+  "filed_before_v2_data": true
+}
+

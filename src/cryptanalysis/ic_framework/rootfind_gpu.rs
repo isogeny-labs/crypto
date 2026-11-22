@@ -1954,6 +1954,58 @@ mod tests {
         assert!(solved > 0, "no run solved");
     }
 
+    /// `rootfind-subtract` with `sweep`: `sweep=1` is the default search, record for
+    /// record; windows of 1/2 and 1/4 still recover the planted logarithm,
+    /// verified; malformed values are refused.  (No worker needed.)
+    #[test]
+    fn rootfind_subtract_sweep_window() {
+        let calib = Calibration::default();
+        for (inst, size) in [
+            (prime_instance_for(18, 1), 32usize),
+            (prime_instance_for(20, 59297), 48),
+            (find_prime_order_curve(17, 3116), 28),
+        ] {
+            let g = inst.generator_point();
+            let planted = 20_261_118 % inst.r;
+            let q = inst.curve.mul(&mut GroupOps::default(), g, planted);
+            let c = ctx(&inst, q);
+            let base = PrimeAbscissaBase { instance: &inst };
+            for m in [2u32, 3] {
+                for targets in [Targets::Walk, Targets::WalkPrimeBatch256] {
+                    let run = |sweep: Option<&str>| {
+                        let mut spec = PipelineSpec {
+                            factor_base: "prime-abscissa".into(),
+                            oracle: "rootfind-subtract".into(),
+                            targets,
+                            max_trials: 4_000_000,
+                            seed: 7,
+                            ..Default::default()
+                        };
+                        spec.factor_base_params.set("size", size.to_string());
+                        spec.oracle_params.set("m", m.to_string());
+                        if let Some(sw) = sweep {
+                            spec.oracle_params.set("sweep", sw);
+                        }
+                        let mut o = RootfindSubtractOracle::new(m, &inst);
+                        run_pipeline(&c, &spec, &base, &mut o, planted, &calib, None)
+                    };
+                    let label = format!("{} m={m} {}", inst.name, targets.name());
+                    let full = run(None).unwrap();
+                    let one = run(Some("1")).unwrap();
+                    assert_same(&full, &one, &format!("{label} sweep=1"));
+                    for sw in ["1/2", "1/4"] {
+                        let w = run(Some(sw)).unwrap();
+                        assert!(w.verified, "{label} sweep={sw}: not verified");
+                        assert_eq!(w.recovered, Some(planted), "{label} sweep={sw}");
+                    }
+                    for bad in ["0", "1/0", "2", "1/x", "half"] {
+                        assert!(run(Some(bad)).is_err(), "{label} sweep={bad} accepted");
+                    }
+                }
+            }
+        }
+    }
+
     /// The fail-closed checks: m = 4 and unknown parameters are refused.
     #[test]
     fn gpu_oracle_refuses_bad_parameters() {
