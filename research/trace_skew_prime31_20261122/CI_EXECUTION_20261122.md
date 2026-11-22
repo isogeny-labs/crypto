@@ -23,6 +23,19 @@ Date: 2026-11-22 UTC. Lane: PR #4924. Status: source-only until a completed sour
 
 Literature originality boundary: Semaev 2004 [ePrint 2004/031](https://eprint.iacr.org/2004/031), Faugère–Huot–Joux–Renault–Vitse 2014 (EUROCRYPT, DOI `10.1007/978-3-642-55220-5_3`), Amadori–Pintore–Sala 2018 (DOI `10.1016/j.ffa.2018.01.009`). Symmetrizing Semaev constraints and one-relation prime-field index calculus are existing techniques. The shared research-KB MCP and its CLI wrapper are unavailable in this execution environment; a GitHub primary-source audit is **not** proof of global novelty.
 
+
+## Derived Run72 full-cold control ratios on the *same ordinary Prime31 curve*
+
+This is **not** a new measurement: it is direct arithmetic using source-pinned `research/prime31_f4_admission_20261121/RUN72_RESULTS.json` from #4901 (CI #45077314037, three deterministic 32-public-Q cohorts, all native Rust outputs replaying 32/32 each), with `K=4` for every cohort. Full candidate time is `cold.cold_total_ms`; matched BSGS time is `bsgs.setup_ms+bsgs.online_32_ms` from the same JSON.
+
+| Seed | K4 cold candidate ms | Shared BSGS ms | Candidate / BSGS | Genuine candidate shifts vs K4 readout-only |
+| --- | ---: | ---: | ---: | ---: |
+| `0x2c6478eb19d` | 1223.973 | 243.237 | **5.032× slower** | 1,668,210 vs 2,528,933 |
+| `0x68b677a1d1` | 1271.430 | 235.344 | **5.402× slower** | 1,668,210 vs 2,528,933 |
+| `0x9d3a6f5c127` | 1299.790 | 269.195 | **4.828× slower** | 1,825,641 vs 2,528,933 |
+
+This *does* establish a useful cost-gate assessment for already completed **generic** original-Rust controls: target-certificate difference rows improve the public relation shift count, but do not offset the signed pair-table setup + certificate discovery + relation work even against shared BSGS on these three cohorts. This cannot qualify as a novel non-generic or index-calculus advantage; comparisons with strongest IC and optimized rho are also outstanding. Producer-reported CI and this arithmetic are **[pcc:unverified]**, not a signed independent certification.
+
 ## Specific mathematical wall and falsifiable next experiment
 
 For `m=4`, explicit degree-`B` expansion in four elementary-symmetric coordinates has a worst-case `binomial(B+4,4)` monomial space; at `B=677` that is `8,882,684,790`. A preprocessing algorithm that actually constructs `Theta(B^4)` terms cannot be called sub-rho at the optimistic `B≈p^(1/5)` because its setup is already `p^(4/5)`. This is a bound on this representation, **not** a lower bound on every algorithm. The sparse Newton circuit has `O(B)` equations and variables; a generic F4 may still explode.
