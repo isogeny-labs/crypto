@@ -25,6 +25,11 @@
 //! operations; rank and word operations) must be the same in every run of a
 //! case across all arms, or the program exits 1.
 //!
+//! Overrides (unset, the panel above): `F4_AB_NEW` and `F4_AB_OLD` set the two
+//! arms' settings as `K=V,K=V` (`F4_AB_OLD` replaces the old paths above);
+//! `F4_AB_TIER` picks the `f4_fp_bench` tier (`large`, `xl`); `F4_AB_THREADS`
+//! the thread counts (`1,4`); `F4_AB_KOBLITZ=0` drops the GF(2) cells.
+//!
 //! Writes `OUT_DIR/runs.jsonl` (one line per child run) and
 //! `OUT_DIR/summary.json`, and prints the table.
 
@@ -42,11 +47,41 @@ const OLD_ENV: &[(&str, &str)] = &[
 ];
 const RESAMPLES: usize = 4000;
 
+/// `K=V,K=V` pairs from `var`, or `default` when it is unset.
+fn env_pairs(var: &str, default: &[(&str, &str)]) -> Vec<(String, String)> {
+    match std::env::var(var) {
+        Ok(s) => s
+            .split(',')
+            .filter(|kv| !kv.is_empty())
+            .map(|kv| {
+                let (k, v) = kv.split_once('=').expect("K=V");
+                (k.to_string(), v.to_string())
+            })
+            .collect(),
+        Err(_) => default
+            .iter()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect(),
+    }
+}
+
+/// The old arm's settings: `F4_AB_OLD`, else [`OLD_ENV`].
+fn old_env() -> &'static [(String, String)] {
+    static E: std::sync::OnceLock<Vec<(String, String)>> = std::sync::OnceLock::new();
+    E.get_or_init(|| env_pairs("F4_AB_OLD", OLD_ENV))
+}
+
+/// The new arm's settings: `F4_AB_NEW`, else none.
+fn new_env() -> &'static [(String, String)] {
+    static E: std::sync::OnceLock<Vec<(String, String)>> = std::sync::OnceLock::new();
+    E.get_or_init(|| env_pairs("F4_AB_NEW", &[]))
+}
+
 #[derive(Clone)]
 struct Cell {
     bench: &'static str,
     bin: String,
-    args: Vec<&'static str>,
+    args: Vec<String>,
     pair: &'static str,
     threads: usize,
 }
@@ -63,10 +98,8 @@ fn run_child(cell: &Cell, old: bool) -> (f64, i32, Outcome) {
         }
     }
     cmd.env("RAYON_NUM_THREADS", cell.threads.to_string());
-    if old {
-        for (k, v) in OLD_ENV {
-            cmd.env(k, v);
-        }
+    for (k, v) in if old { old_env() } else { new_env() } {
+        cmd.env(k, v);
     }
     let t0 = Instant::now();
     let out = cmd.output().expect("spawn benchmark");
@@ -88,11 +121,19 @@ fn run_child(cell: &Cell, old: bool) -> (f64, i32, Outcome) {
             if let Some(ms) = v.get("solve_ms").and_then(Value::as_f64) {
                 vals.insert(format!("{case}:solve"), ms);
             }
-            let fp = ["basis_fp", "solve_fp", "field_ops", "solve_field_ops", "steps", "max_rows", "max_cols"]
-                .iter()
-                .map(|k| v.get(*k).map_or("-".to_string(), |x| x.to_string()))
-                .collect::<Vec<_>>()
-                .join("/");
+            let fp = [
+                "basis_fp",
+                "solve_fp",
+                "field_ops",
+                "solve_field_ops",
+                "steps",
+                "max_rows",
+                "max_cols",
+            ]
+            .iter()
+            .map(|k| v.get(*k).map_or("-".to_string(), |x| x.to_string()))
+            .collect::<Vec<_>>()
+            .join("/");
             fps.insert(case.to_string(), fp);
         } else if let Some(sys) = v.get("system").and_then(Value::as_str) {
             // koblitz_f4_kernel_bench: one summary line per system
@@ -125,12 +166,35 @@ fn main() {
     let blocks: usize = a[2].parse().expect("BLOCKS");
     std::fs::create_dir_all(&out_dir).expect("out dir");
     let mut cells = Vec::new();
-    for threads in [1usize, 4] {
+    // `F4_AB_TIER` (f4_fp_bench tier, default large), `F4_AB_THREADS` (default
+    // 1,4) and `F4_AB_KOBLITZ=0` (skip the GF(2) cells) widen or narrow the panel.
+    let tier = std::env::var("F4_AB_TIER").unwrap_or_else(|_| "large".to_string());
+    let thread_list: Vec<usize> = std::env::var("F4_AB_THREADS")
+        .unwrap_or_else(|_| "1,4".to_string())
+        .split(',')
+        .map(|t| t.parse().expect("F4_AB_THREADS"))
+        .collect();
+    let koblitz = std::env::var("F4_AB_KOBLITZ").as_deref() != Ok("0");
+    for &threads in &thread_list {
         for pair in ["DEFAULT", "AA"] {
-            cells.push(Cell { bench: "f4_fp_bench", bin: a[3].clone(), args: vec!["3", "large"], pair, threads });
+            cells.push(Cell {
+                bench: "f4_fp_bench",
+                bin: a[3].clone(),
+                args: vec!["3".into(), tier.clone()],
+                pair,
+                threads,
+            });
         }
-        for pair in ["M4RI", "AA"] {
-            cells.push(Cell { bench: "koblitz_f4_kernel_bench", bin: a[4].clone(), args: vec!["5", "x"], pair, threads });
+        if koblitz {
+            for pair in ["M4RI", "AA"] {
+                cells.push(Cell {
+                    bench: "koblitz_f4_kernel_bench",
+                    bin: a[4].clone(),
+                    args: vec!["5".into(), "x".into()],
+                    pair,
+                    threads,
+                });
+            }
         }
     }
     let mut runs = std::fs::File::create(out_dir.join("runs.jsonl")).expect("runs.jsonl");
@@ -168,7 +232,9 @@ fn main() {
                         }
                         Some(f) if f != fp => mismatches.push(format!(
                             "{} {} {} block {b}: {fp} != {f}",
-                            cell.bench, case, if old { "old" } else { "new" }
+                            cell.bench,
+                            case,
+                            if old { "old" } else { "new" }
                         )),
                         _ => {}
                     }
@@ -255,12 +321,19 @@ fn main() {
     let summary = json!({
         "schema": "f4-ab-confirm/v1",
         "blocks": blocks, "runs": seq, "failed_runs": failures,
-        "resamples": RESAMPLES, "old_env": OLD_ENV,
+        "resamples": RESAMPLES, "old_env": old_env(), "new_env": new_env(),
+        "tier": tier, "threads": thread_list,
         "fingerprint_mismatches": mismatches, "rows": rows,
     });
-    std::fs::write(out_dir.join("summary.json"), serde_json::to_string_pretty(&summary).unwrap())
-        .expect("summary.json");
-    println!("{:<26} {:<8} {:>3} {:>9} {:>9} {:>7}  {:<18} sig", "case", "pair", "thr", "old_ms", "new_ms", "ratio", "95% CI");
+    std::fs::write(
+        out_dir.join("summary.json"),
+        serde_json::to_string_pretty(&summary).unwrap(),
+    )
+    .expect("summary.json");
+    println!(
+        "{:<26} {:<8} {:>3} {:>9} {:>9} {:>7}  {:<18} sig",
+        "case", "pair", "thr", "old_ms", "new_ms", "ratio", "95% CI"
+    );
     for r in &rows {
         if r["pair"] == "AA" && r["case"] != "SUM_f4_ms" && r["case"] != "kernel_x" {
             continue;
@@ -278,7 +351,10 @@ fn main() {
             if r["significant"] == true { "*" } else { "" },
         );
     }
-    println!("runs {seq}, failed {failures}, fingerprint mismatches {}", mismatches.len());
+    println!(
+        "runs {seq}, failed {failures}, fingerprint mismatches {}",
+        mismatches.len()
+    );
     if failures > 0 || !mismatches.is_empty() {
         for m in mismatches.iter().take(20) {
             eprintln!("MISMATCH {m}");

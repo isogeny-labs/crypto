@@ -1,0 +1,27 @@
+# Binary comparison (validator, 2026-11-18T10:50:39Z)
+producer binary (hashed at dispatch, before any validator build): 74f02ea1fb6a353e2762ba1494f2666acab0a774b17deec38bd02090dc11a6f9  size 7669072
+binary.sha256 (frozen at ae36cdc6e4): 74f02ea1fb6a353e2762ba1494f2666acab0a774b17deec38bd02090dc11a6f9
+validator rebuild from git archive ae36cdc6e4 (5521 paths), cargo build --release --locked --offline --bin genus_ladder, rustc 1.97.0 (2d8144b78 2026-07-07), cargo 1.97.0 (c980f4866 2026-06-30): 90128561be58415f7fb38295735b8e99e182880c22d40d438415b5d314b6657b  size 7669104
+build log:    Compiling crypto v0.1.0 (/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/fuval/src_ae36cdc6e4) /     Finished `release` profile [optimized] target(s) in 9m 55s
+
+## allocated sections (objcopy -O binary --only-section, sha256 prefix)
+.text prod=60805444086c4442 val=60805444086c4442 SAME
+.rodata prod=0886578c9486944d val=0886578c9486944d SAME
+.data prod=48b1cd2d439541d7 val=48b1cd2d439541d7 SAME
+.data.rel.ro prod=b11e17ba4041f0e0 val=b11e17ba4041f0e0 SAME
+.eh_frame prod=8d3720c6000ab97f val=8d3720c6000ab97f SAME
+.eh_frame_hdr prod=817ea8876b870c92 val=817ea8876b870c92 SAME
+.gcc_except_table prod=9573bce9e100ef24 val=9573bce9e100ef24 SAME
+.init_array prod=374708fff7719dd5 val=374708fff7719dd5 SAME
+.got prod=2bcc2ad4110ced94 val=2bcc2ad4110ced94 SAME
+.note.gnu.build-id prod=b785228b01d70fdf val=3b237332b72f29e1 DIFF
+
+## section size table diff (readelf -SW name size)
+25c25
+< .strtab 17289e
+---
+> .strtab 1728c1
+
+## symbols: 57424 each; address+type columns differ in 0 lines; names differ in 35 symbols, all by the .llvm.<hash> suffix of LLVM-promoted locals:
+     35 < ....llvm.9147154342000404476
+     35 > ....llvm.10800891556470652993
