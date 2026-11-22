@@ -16,7 +16,7 @@
 Let `h=[2327,983,421,207,87,34,22,9]` be archived run50 first-hit counts for the eight seven-leaf omission arms, with six misses requiring an eight-leaf fallback, on exactly 4,096 public targets.
 
 - Seven-leaf algebraic calls: `sum((i+1)*h[i])+8*6=7297`; mean **7297/4096 = 1.781494140625** calls per public target.
-- Thus with comparable preprocessing and identical per-call successful/negative pricing, seven-leaf must cost **less than 4096/7297 = 0.56132657** of a single eight-leaf call to win. This is a **necessary** condition under that simplified pricing; failed calls may differ in cost and the actual complete-solver gate is stricter.
+- Thus with comparable preprocessing and identical per-call successful/negative pricing, seven-leaf must cost **less than (4096-6)/7297 = 0.56050432** of a single eight-leaf call, since the six uncovered targets also require an eight-leaf fallback to win. This is a **necessary** condition under that simplified pricing; failed calls may differ in cost and the actual complete-solver gate is stricter.
 - Calls for each arm (including misses) are `[4096,1769,786,365,158,71,37,15]`. Negative-probe expense must be reported separately, not averaged away.
 - Six misses out of 4,096 do **not** prove universal seven-leaf coverage. The eight-leaf fallback is only known to succeed on the archived corpus.
 
