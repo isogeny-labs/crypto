@@ -1114,10 +1114,10 @@ def validate_claim(claim: Any, reasons: list[str]) -> bool:
         reasons.append(f"claim: schema is not {CLAIM_SCHEMA}")
         return False
     ok = True
-    if not CLAIM_ID_RE.match(str(claim.get("id", ""))):
+    if not isinstance(claim.get("id"), str) or not CLAIM_ID_RE.fullmatch(claim["id"]):
         reasons.append("claim: id must match PCC-YYYYMMDD-xxxxxx")
         ok = False
-    if claim.get("kind") not in CLAIM_KINDS:
+    if not isinstance(claim.get("kind"), str) or claim["kind"] not in CLAIM_KINDS:
         reasons.append(f"claim: kind must be one of {sorted(CLAIM_KINDS)}")
         ok = False
     if not isinstance(claim.get("statement"), str) or not claim["statement"].strip():
@@ -1128,7 +1128,8 @@ def validate_claim(claim: Any, reasons: list[str]) -> bool:
         reasons.append("claim: proofs must be a list")
         return False
     for i, pr in enumerate(proofs):
-        if not isinstance(pr, dict) or pr.get("kind") not in PROOF_KINDS:
+        if (not isinstance(pr, dict) or not isinstance(pr.get("kind"), str)
+                or pr["kind"] not in PROOF_KINDS):
             reasons.append(f"claim: proofs[{i}] kind must be one of {sorted(PROOF_KINDS)}")
             ok = False
     problem = claim_type_problem(claim)
@@ -1136,16 +1137,30 @@ def validate_claim(claim: Any, reasons: list[str]) -> bool:
         reasons.append(f"claim: {problem}")
         ok = False
     prod = claim.get("producer")
-    if not isinstance(prod, dict) or not re.match(r"^[0-9a-f]{40}$", str(prod.get("commit", ""))):
+    if (not isinstance(prod, dict) or not isinstance(prod.get("commit"), str)
+            or not re.fullmatch(r"[0-9a-f]{40}", prod["commit"])):
         reasons.append("claim: producer.commit must be a 40-hex commit")
         ok = False
     return ok
 
 
 def verify_claim(claim: dict[str, Any], repo: Path, kr: dict[str, Any]) -> dict[str, Any]:
+    """Apply the same registration-date type cutoff as standing and the ledger gate."""
+    dates = _claim_entry_dates(read_ledger(repo / LEDGER_PATH))
+    return _verify_claim(claim, repo, kr, dates)
+
+
+def _verify_claim(claim: dict[str, Any], repo: Path, kr: dict[str, Any],
+                  registration_dates: dict[str, str]) -> dict[str, Any]:
     reasons: list[str] = []
     results: list[dict[str, Any]] = []
-    if not validate_claim(claim, reasons):
+    valid = validate_claim(claim, reasons)
+    if valid:
+        problem = claim_type_problem(claim, registration_dates.get(str(claim.get("id")), ""))
+        if problem:
+            reasons.append(f"claim: {problem}")
+            valid = False
+    if not valid:
         return {"schema": VERDICT_SCHEMA, "claim_id": claim.get("id") if isinstance(claim, dict) else None,
                 "claim_sha256": claim_digest(claim) if isinstance(claim, dict) else None,
                 "verdict": "fail", "reasons": reasons, "proofs": results, "commit": head_commit(repo),
@@ -1501,6 +1516,14 @@ def _run_canaries(fx: Fixture) -> list[tuple[str, str, str, list[str]]]:
             got = v["verdict"]
             reasons = list(v["reasons"]) + [r for p in v["proofs"] for r in p["reasons"]]
             rows.append((name, expected, got, reasons))
+
+    def backdated_new_registration(copy: Path, claim: dict[str, Any]):
+        claim.pop("claim_type", None)
+        append_entry(copy / LEDGER_PATH, "genesis", {"repo": "fixture"})
+        append_entry(copy / LEDGER_PATH, "claim",
+                     {"claim_id": claim["id"], "claim_sha256": claim_digest(claim)})
+    check("claim: new registration cannot borrow legacy payload dates", "fail", "solve",
+          backdated_new_registration)
 
     def rewrite(copy: Path, rel: str, fn):
         p = copy / rel
@@ -2211,8 +2234,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if a.cmd == "verify-all":
         worst = 0
+        dates = _claim_entry_dates(read_ledger(repo / LEDGER_PATH))
         for p in sorted((repo / CLAIMS_DIR).glob("*.json")) if (repo / CLAIMS_DIR).is_dir() else []:
-            v = verify_claim(load_json(p), repo, kr)
+            v = _verify_claim(load_json(p), repo, kr, dates)
             _print_verdict(v, a.json, out)
             worst = max(worst, _exit_for(v["verdict"]), key=lambda x: {0: 0, 2: 1, 1: 2}[x])
         return worst
