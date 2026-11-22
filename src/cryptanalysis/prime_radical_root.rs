@@ -1410,6 +1410,24 @@ impl RadicalRootCtx {
     /// Degrees 1..=4 are supported; the zero polynomial and constants return an error / no roots.
     pub fn roots(&self, f: &[u64]) -> Result<RadicalRoots, String> {
         let fp = &self.f;
+        // Preserve the direct, source-equivalent short-polynomial path.
+        // It avoids subjecting degree-one roots to the longer normalized
+        // scan intended for quadratic/cubic/quartic inputs.
+        if f.len() == 2 {
+            let b = f[1] % fp.p;
+            let a = f[0] % fp.p;
+            if b == 0 {
+                return if a == 0 {
+                    Err("zero polynomial".into())
+                } else {
+                    Ok(RadicalRoots { roots: vec![], frobenius_fallback: false })
+                };
+            }
+            let root = if a == 0 { 0 }
+                else if b == 1 { fp.neg(a) }
+                else { fp.mul(fp.neg(a), fp.inv(b)) };
+            return Ok(RadicalRoots { roots: vec![root], frobenius_fallback: false });
+        }
         // Polynomials of degree <=4 fit in a stack buffer. Scan trailing
         // zeroes first (including coefficients congruent to 0 mod p) so
         // arbitrarily padded input remains accepted without a heap Vec.
