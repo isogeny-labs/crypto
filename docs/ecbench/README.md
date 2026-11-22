@@ -100,6 +100,13 @@ cargo build --release --bin ecbench
 ./target/release/ecbench plan --spec docs/ecbench/specs/smoke-prime.json
 ```
 
+New binary Gröbner/Semaev `ic.pipeline` specs also carry
+`"field_profile": "semaev-groebner-f2m17-v1"`. Planning, running and Iso Lab
+job construction reject a missing or different profile and reject any curve
+other than the exact `K1-17` field representation. Historical unpinned sessions
+remain replayable. See
+[`../ic/GROEBNER_FIELD_POLICY.md`](../ic/GROEBNER_FIELD_POLICY.md).
+
 The exact binary-field correctness fixture pairs `ic.large_prime` with
 the matched `rho.signed_frobenius` on the same explicit Koblitz curve and targets:
 
