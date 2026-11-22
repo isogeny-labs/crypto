@@ -24,6 +24,9 @@
 //! PLAN lever 2: [`RootfindFloorOracle::decompose_lanes`] probes up to eight
 //! targets behind one shared batch-inv; on AVX-512 IFMA hosts with `p < 2^52`
 //! it prefers an IFMA lockstep (canonical Bloom) for the miss path.
+//!
+//! PLAN lever 4: [`RootfindFloorOracle::decompose_threaded`] probes independent
+//! targets across workers that share prepared tables (`Arc`).
 
 use std::collections::BTreeMap;
 use std::sync::Arc;
@@ -104,15 +107,15 @@ pub struct RootfindFloorOracle<'i> {
     m: u32,
     instance: &'i PrimeInstance,
     field: Option<Fp64>,
-    reps: Vec<FloorRep>,
+    reps: Arc<Vec<FloorRep>>,
     /// `m = 2`: Montgomery abscissa → (plus, minus) base indices.
-    x_map: FastMap<(u32, u32)>,
-    bloom: Option<WordBloom>,
+    x_map: Arc<FastMap<(u32, u32)>>,
+    bloom: Option<Arc<WordBloom>>,
     /// Canonical affine-x Bloom for the IFMA lane path (`m = 3`).
-    canon_bloom: Option<WordBloom>,
+    canon_bloom: Option<Arc<WordBloom>>,
     /// `m = 3`: negation-folded pair table; bloom-pass probes look up here
     /// (no parallel Montgomery witness map — that doubled prepare wall).
-    table: Option<PairTable>,
+    table: Option<Arc<PairTable>>,
     diffs: Vec<u64>,
     degenerate: Vec<bool>,
     scratch: Vec<u64>,
@@ -135,8 +138,8 @@ impl<'i> RootfindFloorOracle<'i> {
             m,
             instance,
             field: None,
-            reps: Vec::new(),
-            x_map: fast_map(0),
+            reps: Arc::new(Vec::new()),
+            x_map: Arc::new(fast_map(0)),
             bloom: None,
             canon_bloom: None,
             table: None,
@@ -173,6 +176,80 @@ impl<'i> RootfindFloorOracle<'i> {
 
     pub fn ifma_enabled(&self) -> bool {
         self.ifma_enabled
+    }
+
+    /// PLAN lever 4: independent worker sharing this oracle's prepared
+    /// tables (`Arc`). Scratch buffers and counters start empty.
+    pub fn fork_worker(&self) -> Self {
+        let n = self.reps.len().max(1);
+        Self {
+            m: self.m,
+            instance: self.instance,
+            field: self.field,
+            reps: Arc::clone(&self.reps),
+            x_map: Arc::clone(&self.x_map),
+            bloom: self.bloom.clone(),
+            canon_bloom: self.canon_bloom.clone(),
+            table: self.table.clone(),
+            diffs: vec![0; n],
+            degenerate: vec![false; n],
+            scratch: vec![0; n],
+            #[cfg(target_arch = "x86_64")]
+            ifma: self.ifma.clone(),
+            ifma_enabled: self.ifma_enabled,
+            #[cfg(target_arch = "x86_64")]
+            ifma_prefix: Vec::new(),
+            mismatches: 0,
+            sweep_field_muls: 0,
+            sweep_field_adds: 0,
+            bloom_passes: 0,
+            bloom_false_positives: 0,
+        }
+    }
+
+    /// PLAN lever 4: probe every target across `threads` workers that share
+    /// the prepared tables (`Arc`). Uses `std::thread::scope` (no rayon pool
+    /// build). Return order matches `targets`. Engineering throughput only —
+    /// charged `S` is unchanged.
+    pub fn decompose_threaded(
+        &self,
+        ctx: &InstanceCtx<PrimeCurve>,
+        fb: &FactorBase<PrimePoint>,
+        targets: &[PrimePoint],
+        threads: usize,
+    ) -> Vec<Option<Vec<usize>>> {
+        let threads = threads.max(1).min(targets.len().max(1));
+        let mut out = vec![None; targets.len()];
+        if threads <= 1 || targets.len() <= 1 {
+            let mut worker = self.fork_worker();
+            for (slot, &t) in out.iter_mut().zip(targets) {
+                let mut ops = GroupOps::default();
+                let mut c = OracleCounters::default();
+                *slot = worker.decompose(ctx, fb, &mut ops, &mut c, t);
+            }
+            return out;
+        }
+        let chunk = targets.len().div_ceil(threads);
+        std::thread::scope(|scope| {
+            let mut rest_out = out.as_mut_slice();
+            let mut rest_tgt = targets;
+            while !rest_tgt.is_empty() {
+                let n = chunk.min(rest_tgt.len());
+                let (out_chunk, out_next) = rest_out.split_at_mut(n);
+                let (tgt_chunk, tgt_next) = rest_tgt.split_at(n);
+                rest_out = out_next;
+                rest_tgt = tgt_next;
+                scope.spawn(move || {
+                    let mut worker = self.fork_worker();
+                    for (slot, &t) in out_chunk.iter_mut().zip(tgt_chunk) {
+                        let mut ops = GroupOps::default();
+                        let mut c = OracleCounters::default();
+                        *slot = worker.decompose(ctx, fb, &mut ops, &mut c, t);
+                    }
+                });
+            }
+        });
+        out
     }
 
     /// PLAN lever 2: probe up to eight targets per chunk. Prefers IFMA when
@@ -309,8 +386,8 @@ impl DecompositionOracle<PrimeCurve> for RootfindFloorOracle<'_> {
         }
         self.diffs = vec![0; reps.len()];
         self.degenerate = vec![false; reps.len()];
-        self.reps = reps;
-        self.x_map = x_map;
+        self.reps = Arc::new(reps);
+        self.x_map = Arc::new(x_map);
         self.field = Some(f);
 
         let mut bloom = WordBloom::new(self.x_map.len().max(1));
@@ -351,8 +428,8 @@ impl DecompositionOracle<PrimeCurve> for RootfindFloorOracle<'_> {
                     cb.insert(x_aff);
                 }
             });
-            self.table = Some(table);
-            self.canon_bloom = canon_bloom;
+            self.table = Some(Arc::new(table));
+            self.canon_bloom = canon_bloom.map(Arc::new);
             #[cfg(target_arch = "x86_64")]
             if want_ifma {
                 let xs: Vec<u64> = self.reps.iter().map(|r| f.from_mont(r.x)).collect();
@@ -361,7 +438,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindFloorOracle<'_> {
                 self.ifma_prefix.clear();
             }
         }
-        self.bloom = Some(bloom);
+        self.bloom = Some(Arc::new(bloom));
         self.bloom_passes = 0;
         self.bloom_false_positives = 0;
         Ok(())
@@ -371,7 +448,7 @@ impl DecompositionOracle<PrimeCurve> for RootfindFloorOracle<'_> {
         let mut out = self
             .table
             .as_ref()
-            .map(PairTable::work_counters)
+            .map(|t| t.work_counters())
             .unwrap_or_default();
         let k = self.reps.len() as u64;
         if k > 0 {
@@ -1000,5 +1077,88 @@ mod tests {
                 assert_eq!(out[i], single[i], "mode ifma={enable} lane {i}");
             }
         }
+    }
+
+    /// PLAN lever 4: threaded probe matches single-target verdicts.
+    #[test]
+    fn floor_threaded_matches_single_m3() {
+        let inst = prime_instance_for(20, 59297);
+        let fb = prime_factor_base(&inst, 48);
+        let c = ctx(&inst);
+        let (_, params) = Params::parse_spec("rootfind-floor:m=3").unwrap();
+        let mut floor = RootfindFloorOracle::new(3, &inst);
+        floor
+            .prepare(&c, &fb, &params, &mut GroupOps::default())
+            .unwrap();
+        let mut state = 0xC0FF_EE11_u64;
+        let mut targets = Vec::new();
+        for _ in 0..64 {
+            state = state.wrapping_mul(0x9E37_79B9_7F4A_7C15).wrapping_add(7);
+            let mut scratch = GroupOps::default();
+            targets.push(inst.curve.mul(
+                &mut scratch,
+                inst.generator_point(),
+                1 + state % (inst.r - 1),
+            ));
+        }
+        let mut single = Vec::with_capacity(targets.len());
+        for &t in &targets {
+            let mut o = GroupOps::default();
+            let mut cters = OracleCounters::default();
+            single.push(floor.decompose(&c, &fb, &mut o, &mut cters, t));
+        }
+        for threads in [1usize, 2, 4] {
+            let out = floor.decompose_threaded(&c, &fb, &targets, threads);
+            assert_eq!(out, single, "threads={threads}");
+        }
+    }
+
+    /// PLAN lever 4 falsifier: 1/2/4-thread probe wall at large |F|.
+    /// Shared host (`[pcc:unverified]`). Records speedups; does not fail
+    /// the build when bandwidth-bound (<2.5× at 4 threads).
+    #[test]
+    fn floor_threaded_wall_panel_a256() {
+        use std::time::Instant;
+
+        let inst = prime_instance_for(28, 1);
+        let a = 256usize;
+        let fb = prime_factor_base(&inst, a);
+        let c = ctx(&inst);
+        let (_, params) = Params::parse_spec("rootfind-floor:m=3").unwrap();
+        let mut floor = RootfindFloorOracle::new(3, &inst);
+        floor
+            .prepare(&c, &fb, &params, &mut GroupOps::default())
+            .unwrap();
+        let mut state = 0x51A1_DEAD_u64;
+        let n_targets = 512usize;
+        let mut targets = Vec::with_capacity(n_targets);
+        for _ in 0..n_targets {
+            state = state.wrapping_mul(0x9E37_79B9_7F4A_7C15).wrapping_add(11);
+            let mut scratch = GroupOps::default();
+            targets.push(inst.curve.mul(
+                &mut scratch,
+                inst.generator_point(),
+                1 + state % (inst.r - 1),
+            ));
+        }
+        // Warmup.
+        let _ = floor.decompose_threaded(&c, &fb, &targets[..32], 2);
+        let mut ns = [0.0f64; 3];
+        for (i, threads) in [1usize, 2, 4].into_iter().enumerate() {
+            let t0 = Instant::now();
+            let out = floor.decompose_threaded(&c, &fb, &targets, threads);
+            ns[i] = t0.elapsed().as_nanos() as f64 / targets.len() as f64;
+            std::hint::black_box(&out);
+        }
+        let (s2, s4) = (ns[0] / ns[1], ns[0] / ns[2]);
+        eprintln!(
+            "lever4 floor A={a} n={n_targets}: thr1/2/4 = {:.1}/{:.1}/{:.1} ns/tgt \
+             speedup 2/4 = {s2:.2}x/{s4:.2}x (gate ≥2.5x @4: {})",
+            ns[0],
+            ns[1],
+            ns[2],
+            if s4 >= 2.5 { "pass" } else { "bandwidth-bound" }
+        );
+        assert!(ns[0] > 0.0 && ns[2] > 0.0);
     }
 }

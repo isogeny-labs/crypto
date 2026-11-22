@@ -156,6 +156,33 @@ fn main() {
                 assert!(hits_match, "hit counts must match ({hits_f} vs {hits_s})");
                 assert_eq!(floor.mismatches, 0);
                 assert_eq!(sub.mismatches, 0);
+
+                // PLAN lever 4: threads over independent targets (shared Arc).
+                let mut thr_ns = [0.0f64; 3];
+                let mut thr_hits = [0u64; 3];
+                if m == 3 {
+                    let _ =
+                        floor.decompose_threaded(&ctx, &fb, &targets[..targets.len().min(16)], 2);
+                    for (ti, threads) in [1usize, 2, 4].into_iter().enumerate() {
+                        let t_thr = Instant::now();
+                        let out = floor.decompose_threaded(&ctx, &fb, &targets, threads);
+                        thr_ns[ti] = t_thr.elapsed().as_nanos() as f64 / targets.len() as f64;
+                        thr_hits[ti] = out.iter().filter(|h| h.is_some()).count() as u64;
+                        black_box(&out);
+                    }
+                    let (s2, s4) = (thr_ns[0] / thr_ns[1], thr_ns[0] / thr_ns[2]);
+                    println!(
+                        "  thr1/2/4 {t1:8.1}/{t2:8.1}/{t4:8.1} ns/tgt  \
+                         ({s2:4.2}x/{s4:4.2}x) hits {h1}/{h2}/{h4}",
+                        t1 = thr_ns[0],
+                        t2 = thr_ns[1],
+                        t4 = thr_ns[2],
+                        h1 = thr_hits[0],
+                        h2 = thr_hits[1],
+                        h4 = thr_hits[2],
+                    );
+                }
+
                 rows.push(json!({
                     "bits": bits,
                     "m": m,
@@ -174,6 +201,11 @@ fn main() {
                     "charged_adds_floor": adds_f,
                     "charged_adds_subtract": adds_s,
                     "charged_adds_match": adds_match,
+                    "thr1_ns_per_target": if m == 3 { Some(thr_ns[0]) } else { None },
+                    "thr2_ns_per_target": if m == 3 { Some(thr_ns[1]) } else { None },
+                    "thr4_ns_per_target": if m == 3 { Some(thr_ns[2]) } else { None },
+                    "thr2_speedup": if m == 3 { Some(thr_ns[0] / thr_ns[1]) } else { None },
+                    "thr4_speedup": if m == 3 { Some(thr_ns[0] / thr_ns[2]) } else { None },
                 }));
             }
         }
