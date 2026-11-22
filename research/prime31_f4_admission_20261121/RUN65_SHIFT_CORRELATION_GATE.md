@@ -1,17 +1,19 @@
 # Prime31 run65: exact fixed-shift autocorrelation and eight-probe support union
 
-**Date:** 2026-11-22 UTC. **Lane:** draft [PR #4901](https://github.com/isogeny-labs/crypto/pull/4901). **Curve:** the *unchanged ordinary cofactor-one* (E/ℝ_p), (p=2^{31}-1=2147483647), (a=847514846), (b=2087444724), (#E=n=2147446831), (G=(625037715,2100627251)). The actual field is **F_p**, not R. This study does not compute an unknown discrete log.
+**Date:** 2026-11-22 UTC. **Lane:** draft [PR #4901](https://github.com/isogeny-labs/crypto/pull/4901). **Curve:** the *unchanged ordinary cofactor-one prime-field curve* (E/F_p), (p=2^{31}-1=2147483647), (a=847514846), (b=2087444724), (#E=n=2147446831), (G=(625037715,2100627251)). This study does not compute an unknown discrete log.
 
 ## Question and method
 
 Runs 55–59 modeled public shifts (Q+[k]G) by uniform independent relation probes. Each marginal is uniform for uniform (Q), but the successive translates are **not independent**. Before changing strides, compute their exact finite-population behavior rather than extrapolate from microbenchmarks.
 
-For each point support (S\subset E(\mathbb F_p)), define
-[
+For each point support \(S\subset E(\mathbb F_p)\), define
+
+$$
 I_d(S)=|S\cap(S+[d]G)|,\qquad
 U_8(S)=\left|\bigcup_{k=0}^{7}(S-[k]G)\right|.
-]
-If (Q) is uniform, (ℙ(Q,Q+[d]G\in S)=I_d/n), and the probability of at least one hit in eight consecutive shifts is **exactly** (U_8/n). The independent-marginal comparison is (n[1-(1-|S|/n)^8]); it is a *model*, not an assertion that the shifts are independent.
+$$
+
+If \(Q\) is uniform, then \(\Pr(Q,Q+[d]G\in S)=I_d/n\), and the probability of at least one hit in eight consecutive shifts is **exactly** \(U_8/n\). The independent-marginal comparison is \(n[1-(1-|S|/n)^8]\); it is a *model*, not an assertion that the shifts are independent.
 
 The fixed sets are the prior frozen public signed two-sum supports: Dickson depth 10 (509 unsigned base points, 518085 distinct sums including O); the 677-point Dickson + signed (y^7) hybrid (916469 sums including O); and the run60 quotient-rank-visible nonidentity subsets after **100/400/900 synthetic** positive pair rows, of sizes 266/239920/808824. No unknown factor-base indices are recovered, and the synthetic relation rows are not claimed to come from an algebraic oracle.
 
