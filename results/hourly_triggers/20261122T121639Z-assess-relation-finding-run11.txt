@@ -1,0 +1,7 @@
+Trigger: Assess relation-finding benchmark
+Requested UTC: 2026-11-22T12:16:39Z
+Target: hourly-runs
+Command: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+Scope: frozen public-synthetic Koblitz GF(2^23), a=0, m=2, with natural=256, planted=64, unsat=64; not ECC2K-130
+Baseline: results/relation_baseline.json; threshold: absolute relative change >20%.
+Outputs: results/hourly_log.csv; GitHub issue if run fails or metric change >20%.
