@@ -154,23 +154,29 @@ that depresses attainment. Filter kmitm IFMA candidates with the canonical
 Fail-closed on the map-filter lever for attainment (hygiene only). Preferred
 IFMA remains grade **A** at the compute roof.
 
-### Stop (loop unsubscribed)
+### Stop — preferred path (confirmed tick 8)
 
 Preferred production probes are fully optimized **for this host's measured
 ceiling**:
 
-- kmitm:m=4 IFMA: A ≈ **0.95** (ticks 6–7), grade A, intensity declared,
-  limiter = algorithmic axis.
-- floor:m=3 IFMA: A ≈ **0.92**, grade A, same.
+- kmitm:m=4 IFMA: A ≈ **0.95** (ticks 6–8), grade A, intensity declared,
+  limiter = algorithmic axis. Tick 8 reconfirm: **A = 0.948**.
+- floor:m=3 IFMA: A ≈ **0.92**, grade A, same. Tick 8: **A = 0.917**.
 
 **Scalar lanes why-not-A (documented):** T-timing cannot split instruction
 overhead vs dependency chains; layout (tick 6) and prefetch (tick 3) levers
 failed within noise; IFMA **is** the landed SIMD path when `avx512ifma` is
-present. Raising scalar to grade B would need a non-IFMA SIMD mont kernel
-(AVX2) aimed at hosts without IFMA — out of scope for the preferred path.
+present. Lesson `L-a3d0b41f87a5`: do not chase scalar-lane grade B on IFMA
+hosts.
 
 Further gains on IFMA are algorithmic (different search / G3), not
 implementation-level on this roof.
+
+### Loop continues — AVX2 fallback (non-IFMA hosts)
+
+Next track: 4-wide AVX2 Montgomery lanes for `right=1` when IFMA is absent
+(`p < 2^32`). Measured on this host with IFMA forced off. Stop when AVX2
+lanes reach grade **B** (≥0.40) or three fail-closed ticks within noise.
 
 ## Claim hygiene
 
