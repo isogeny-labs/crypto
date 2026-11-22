@@ -14,6 +14,8 @@ follow-ups here; history belongs in the session log, not in this file.
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items (top = next)
+- [x] Specify and test a compact growing-degree or adaptive target-local router for the n=83 image-compatible relation calculus (Codex, completed 2026-11-18, branch codex/n83-adaptive-image-router-20261118, PR #4719)
+
 - [ ] Audit and implement RR9 low-power multiplicity-strata exact gate on original Prime31 (automation, started 2026-11-18, branch automation/prime31-rr9-low-power-strata-20261118)
 - [x] Prime31 independent-slot masks: exact parity and cost controls on original curve, compare prior weighted slots (automation, started 2026-11-18, branch automation/prime31-independent-slot-mask-20261118, PR #4716)
 - [x] Compare complete Prime31 weighted M6 XOR-parity with exact any-witness/256-chunk Rust oracle: rank 31/31 and 1,024/1,024 source-curve logs for both; matched 1.43998–1.44093× within-M6 improvement, 87 versus 106 training queries; no non-generic/frontier win, signed validation pending [pcc:unverified] (automation, 2026-11-18, branch automation/prime31-weighted-slot-parity-20261118, PR #4714)
