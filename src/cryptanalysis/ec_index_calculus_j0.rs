@@ -90,8 +90,8 @@
 //!   Semaev-polynomial Gröbner basis cost across curve families.
 
 use crate::cryptanalysis::ec_index_calculus::{
-    find_one_relation, gaussian_eliminate_mod_n_particular, semaev_s3, semaev_s3_in_x3, sqrt_mod_p,
-    FactorBaseEntry,
+    find_one_relation, gaussian_eliminate_mod_n_particular, ic_padd, ic_smul, refresh_ic_ct_flag,
+    semaev_s3, semaev_s3_in_x3, sqrt_mod_p, FactorBaseEntry,
 };
 use crate::ecc::curve::CurveParams;
 use crate::ecc::field::FieldElement;
@@ -321,14 +321,13 @@ pub fn find_relation_with_psi_with_index(
     max_trials: usize,
     x_to_orbit: &HashMap<BigUint, usize>,
 ) -> Option<Vec<OrbitRelation>> {
+    refresh_ic_ct_flag();
     let a_fe = curve.a_fe();
     let b_fe = curve.fe(curve.b.clone());
     for _ in 0..max_trials {
         let alpha = random_scalar(&curve.n);
         let beta = random_scalar(&curve.n);
-        let ag = g.scalar_mul(&alpha, &a_fe);
-        let bq = q.scalar_mul(&beta, &a_fe);
-        let r = ag.add(&bq, &a_fe);
+        let r = ic_padd(&ic_smul(g, &alpha, &a_fe), &ic_smul(q, &beta, &a_fe), &a_fe);
         let xr = match &r {
             Point::Affine { x, .. } => x.clone(),
             Point::Infinity => continue,
@@ -424,7 +423,7 @@ fn resolve_signs(r: &Point, f_i: &Point, f_j: &Point, a_fe: &FieldElement) -> Op
         for s_j in [1i64, -1i64] {
             let p_i = if s_i > 0 { f_i.clone() } else { f_i.neg() };
             let p_j = if s_j > 0 { f_j.clone() } else { f_j.neg() };
-            let lhs = p_i.add(&p_j, a_fe);
+            let lhs = ic_padd(&p_i, &p_j, a_fe);
             if &lhs == r {
                 return Some((s_i, s_j));
             }
@@ -454,6 +453,7 @@ pub fn j0_index_calculus_dlp(
     extra_relations: usize,
     max_trials_per_relation: usize,
 ) -> Option<BigUint> {
+    refresh_ic_ct_flag();
     if !is_j_invariant_zero(curve) {
         return None;
     }
@@ -497,7 +497,7 @@ pub fn j0_index_calculus_dlp(
     }
     let x = solution.values[m].clone();
     let a_fe = curve.a_fe();
-    let candidate = g.scalar_mul(&x, &a_fe);
+    let candidate = ic_smul(g, &x, &a_fe);
     if &candidate == q {
         Some(x)
     } else {
@@ -556,9 +556,7 @@ pub fn find_relation_with_psi_counted_with_index(
     for trial in 1..=max_trials {
         let alpha = random_scalar(&curve.n);
         let beta = random_scalar(&curve.n);
-        let ag = g.scalar_mul(&alpha, &a_fe);
-        let bq = q.scalar_mul(&beta, &a_fe);
-        let r = ag.add(&bq, &a_fe);
+        let r = ic_padd(&ic_smul(g, &alpha, &a_fe), &ic_smul(q, &beta, &a_fe), &a_fe);
         let xr = match &r {
             Point::Affine { x, .. } => x.clone(),
             Point::Infinity => continue,
@@ -654,6 +652,7 @@ pub fn j0_index_calculus_dlp_staged(
     max_trials_per_relation: usize,
     max_relation_attempts: usize,
 ) -> Option<(BigUint, J0IcStageReport)> {
+    refresh_ic_ct_flag();
     use std::time::Instant;
     let total_started = Instant::now();
     if !is_j_invariant_zero(curve) {
@@ -741,7 +740,7 @@ pub fn j0_index_calculus_dlp_staged(
 
     let verify_started = Instant::now();
     let a_fe = curve.a_fe();
-    let candidate = g.scalar_mul(&x, &a_fe);
+    let candidate = ic_smul(g, &x, &a_fe);
     let verified = &candidate == q;
     let verify_ms = verify_started.elapsed().as_secs_f64() * 1e3;
     if !verified {
@@ -924,7 +923,7 @@ pub fn eisenstein_smooth_ic_dlp(
     }
     let x = solution.values[m].clone();
     let a_fe = curve.a_fe();
-    let candidate = g.scalar_mul(&x, &a_fe);
+    let candidate = ic_smul(g, &x, &a_fe);
     if &candidate == q {
         Some(x)
     } else {

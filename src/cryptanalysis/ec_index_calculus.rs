@@ -95,6 +95,36 @@ use crate::prime_hyperelliptic::ops as bitop_ops;
 use crate::utils::mod_inverse;
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
+use std::sync::atomic::{AtomicBool, Ordering};
+
+/// Public Semaev / IC walks: default vartime point ops.
+/// `IC_IC_CT=1` restores CT for A/B.
+static IC_CT: AtomicBool = AtomicBool::new(false);
+
+pub(crate) fn refresh_ic_ct_flag() {
+    IC_CT.store(
+        std::env::var("IC_IC_CT").as_deref() == Ok("1"),
+        Ordering::Relaxed,
+    );
+}
+
+#[inline(always)]
+pub(crate) fn ic_padd(p: &Point, q: &Point, a: &FieldElement) -> Point {
+    if IC_CT.load(Ordering::Relaxed) {
+        p.add(q, a)
+    } else {
+        p.add_vartime(q, a)
+    }
+}
+
+#[inline(always)]
+pub(crate) fn ic_smul(p: &Point, k: &BigUint, a: &FieldElement) -> Point {
+    if IC_CT.load(Ordering::Relaxed) {
+        p.scalar_mul(k, a)
+    } else {
+        p.scalar_mul_vartime(k, a)
+    }
+}
 
 // ── Operation counters (per thread) ───────────────────────────────────
 //
@@ -1873,7 +1903,7 @@ fn try_finalise(
         for s_j in [1i64, -1i64] {
             let p_i = if s_i > 0 { f_i.clone() } else { f_i.neg() };
             let p_j = if s_j > 0 { f_j.clone() } else { f_j.neg() };
-            let lhs = p_i.add(&p_j, &a_fe);
+            let lhs = ic_padd(&p_i, &p_j, &a_fe);
             if &lhs == r {
                 let i_idx = factor_base.iter().position(|fb| &fb.point == f_i)?;
                 let mut entries = Vec::new();
@@ -2112,7 +2142,7 @@ fn try_finalise_s4(
                 let p_i = if s_i > 0 { f_i.clone() } else { f_i.neg() };
                 let p_j = if s_j > 0 { f_j.clone() } else { f_j.neg() };
                 let p_k = if s_k > 0 { f_k.clone() } else { f_k.neg() };
-                let lhs = p_i.add(&p_j, &a_fe).add(&p_k, &a_fe);
+                let lhs = ic_padd(&ic_padd(&p_i, &p_j, &a_fe), &p_k, &a_fe);
                 if &lhs == r {
                     let mut entries: Vec<(usize, i64)> = vec![(i, s_i), (j, s_j), (k, s_k)];
                     // Merge duplicate factor-base indices.
@@ -3009,6 +3039,7 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     rng: &mut R,
 ) -> Option<(BigUint, EcIcStageReport)> {
     use std::time::Instant;
+    refresh_ic_ct_flag();
     reset_counters();
     let total_started = Instant::now();
 
@@ -3248,6 +3279,7 @@ pub fn ec_index_calculus_dlp_s4_staged(
     max_relation_attempts: usize,
 ) -> Option<(BigUint, EcIcStageReport)> {
     use std::time::Instant;
+    refresh_ic_ct_flag();
     let total_started = Instant::now();
 
     let fb_started = Instant::now();
