@@ -7,6 +7,13 @@ on:
       - src/cryptanalysis/prime_root_trace.rs
       - research/amm_digit_perf_20261118/round109_ab.py
       - .github/workflows/rootfind-round109-ab.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - src/cryptanalysis/prime_root_trace.rs
+      - research/amm_digit_perf_20261118/round109_ab.py
+      - .github/workflows/rootfind-round109-ab.yml
   workflow_dispatch:
 jobs:
   round109-source-exact:
