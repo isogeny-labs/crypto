@@ -52,6 +52,9 @@ An independently implemented Python evaluator then checked **all 31 specialized 
 - #4793 documented matched same-runner W8 and historical faster 2²⁰ shared-BSGS: **170.113 ms for 1,024 Prime31 targets**, including setup, on the historical runner. An algorithm that merely beats the older, slower 585-ms/4,096 C++ BSGS control is not a confirmed new frontier result. Current-host matched Rust BSGS and rho must be rerun.
 - Published analysis of naive Semaev prime-field PDP Gröbner costs (J. Math. Cryptol. DOI 10.1515/jmc-2019-0029) flags a structural obstacle; the present polynomial identities do not circumvent that lower-bound analysis.
 
+
+Frozen first 1,024 hash-to-curve targets from the same archive had omission-first-hit histogram `(580,233,124,50,23,6,6,2)`, **1,827 seven-leaf extraction calls** and no eight-leaf fallback. As a **cross-run sensitivity only**, taking #4793's historical 170.113 ms/1,024 shared-BSGS runtime at face value gives `170.113/1827 = 0.09311056 ms per seven-leaf extraction call` as an *optimistic all-other-costs-zero ceiling*. A sound advantage requires faster per-call extraction after including relation collection/linear algebra and a new same-target, same-host Rust baseline; no 0.093-ms requirement is certified across different hardware.
+
 ## Priority next tests and acceptance gates
 
 1. Observe CI PASS/failure for the **actual** 31-bit Rust univariate `solve` on all eight cosets. Record each call's wall, Fp row multiplications, failure/timeout; no fallback enumerating all p values.
