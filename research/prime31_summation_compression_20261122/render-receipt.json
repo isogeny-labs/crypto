@@ -1,0 +1,96 @@
+{
+  "schema": "research.render-receipt/v1",
+  "created_utc": "2026-11-23T00:30:37.441206+00:00",
+  "standing": "pcc:unverified",
+  "scope": "Document and figure rendering of the first two research iterations; no cryptographic computation or performance run.",
+  "commands": [
+    "python3 repo-audit/research/prime31_summation_compression_20261122/render_report.py",
+    "mkdir -p pdf-qa-prime31",
+    "pdftoppm -r 110 -png repo-audit/research/prime31_summation_compression_20261122/REPORT.pdf pdf-qa-prime31/page"
+  ],
+  "command_working_directory": "/workspace/scratch/2f841b0b9a19",
+  "pdf": {
+    "page_count": 8,
+    "page_size_points": [
+      612,
+      792
+    ],
+    "link_count": 9,
+    "embedded_fonts": [
+      "Liberation Sans regular subset",
+      "Liberation Sans bold subset"
+    ],
+    "all_pages_labeled_unverified": true
+  },
+  "visual_qa": {
+    "pages_inspected": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "render_dpi": 110,
+    "raster_pattern": "/workspace/scratch/2f841b0b9a19/pdf-qa-prime31/page-{1..8}.png",
+    "checks": [
+      "readable native-text equations and exponents",
+      "no clipped text or overlapping formula lines",
+      "table alignment and figure labels",
+      "complete source, build and cost qualifications",
+      "page numbering and margin clearance"
+    ],
+    "method": "Assistant visual inspection of all full pages; final overview sheets; figure PNG inspection. Raster QA remains scratch-only."
+  },
+  "render_dependencies": {
+    "reportlab": "4.4.9",
+    "matplotlib": "3.10.8",
+    "pypdf": "6.21.4",
+    "PyMuPDF": "1.26.6",
+    "Pillow": "13.0.0"
+  },
+  "artifacts": [
+    {
+      "path": "REPORT.pdf",
+      "bytes": 55998,
+      "sha256": "c3d682fe05fc36186509d3a7155511d5822fa22aeae157bcf864deba9d6db64c"
+    },
+    {
+      "path": "render_report.py",
+      "bytes": 31432,
+      "sha256": "cc8270a18072bdfeceb83ca5c624856d310f972f1f4989f98f6c73e725c7a18f"
+    },
+    {
+      "path": "figures/dickson-resultant-flow.svg",
+      "bytes": 6034,
+      "sha256": "2a5a25358977c935f98e57ee63a651171dd56bb595471f29c1348497c0a26078"
+    },
+    {
+      "path": "figures/dickson-resultant-flow.png",
+      "bytes": 53304,
+      "sha256": "f899c8e42074ce17398c4cb2e9d3fa9b6b489837c68e348eceda1d628696efef"
+    },
+    {
+      "path": "figures/kernel-counts.svg",
+      "bytes": 6641,
+      "sha256": "f8a44e652a8d5d838b3d6f94470f24fa123e856959ec72d749a45fd7711df03c"
+    },
+    {
+      "path": "figures/kernel-counts.png",
+      "bytes": 25277,
+      "sha256": "3a77dfd88c4d03785a53942f49fd2ea5984b7210c0c6dab0dbfd664eed1c0daf"
+    },
+    {
+      "path": "figures/kernel-counts.json",
+      "bytes": 589,
+      "sha256": "e02c025cc076907d86dfb5b8f66b34059d1799a4a109a79692d3c12c3394339b"
+    }
+  ],
+  "diagnostic_data_source": {
+    "path": "evidence/correctness-cases-final.stdout",
+    "sha256": "2f491f3250b71bca1597668098f0feecd9a40d9c76714986b482b2c8b8fc6efb"
+  },
+  "storage_note": "All listed deliverables are below 65536 bytes. Omit scratch QA rasters and runtime caches from publication."
+}

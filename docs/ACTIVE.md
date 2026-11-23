@@ -13,9 +13,18 @@ follow-ups here; history belongs in the session log, not in this file.
 
 Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
-## Active items
+## Active items (top = next)
+- [ ] Continue Prime31 S3/Dickson relation-solving research: implemented denominator-free quotient recurrence; sparse-product control remains stronger in the development cell; next succinct root-intersection gate (ChatGPT, started 2026-11-22, branch lane/prime31-dickson-quotient-gate, PR #4928; objective open).
+- [x] Certify Prime31 RR9 two-sign weighted-interpolation rank obstruction on the original curve (automation, started 2026-11-19, branch automation/prime31-rr9-two-sign-wrank-20261119, PR #4801; source-exact native Rust 40/40 + 2/2 PASS Actions #44497509496; independent signed PCC remains pending)
+- [x] Derive Prime31 RR9 public-only extractor budgets and correct historical optimized shared-BSGS frontier (automation, started 2026-11-19, branch automation/prime31-rr9-extractor-budget-gate-20261119, PR #4793; original-Rust source-bound CI PASS #44489047210; next unknown-index extraction remains with #4692)
 
-- [ ] Derive and qualify a denominator-free Dickson composition oracle for prime31 S3 relation extraction, including liftable-fibre equivalence and complete cost gates (ChatGPT, started 2026-11-22, branch lane/prime31-dickson-quotient-gate; in progress). (top = next)
+- [ ] Reproduce the genus 2–4 HEC index calculus comparison and examine the mathematical contribution (Codex, started 2026-11-18, branch research/hec-tenfold-replay, PR #4789)
+- [x] Publish the fresh P-192 plane-quartic transfer acceptance replay, machine receipt and exact remaining obligations (Codex, completed 2026-11-19, branch codex/p192-quartic-transfer-assessment-20261119, PR #4788)
+
+- [ ] Graph-anchored multi-pattern quadratic descent, certified F4 trace replay, and linear-stage accounting for extension-field graph IC (Cursor, started 2026-11-18, branch cursor/graph-index-calculus-ecdlp-7226)
+
+- [x] Keep the n83_d18_shared_bits include_bytes! CSV in Git (store policy keep entry) so CI `check --all-targets` can compile it (Claude, started 2026-11-19, branch aburan28/zealous-lovelace-tc390j-keep-n83-csv, PR #4786)
+
 - [x] Isogeny P0 closed without code: sqrt-Velu is already 1.6-5.6x faster than Velu from l~150-400 (isogeny_algos/docs/large-ell-20261016), chain callers use l=2,3 and sqrt-Velu in CSIDH-512 was a measured null, so a dispatcher has no consumer; trees lose even with the IFMA NTT; verdicts for all isogeny leads in isogeny-labs/workspace docs/isogeny-speedup-assessment.md (claude, 2026-11-19, branch claude/isogeny-sqrt-velu-p0, PR #4784)
 - [x] Restore `cargo check --all-targets` on main: port ic bench/progress/experiment bins, ic_quartic_core_probe example and ps6_tool to the current APIs (Claude, started 2026-11-19, branch aburan28/zealous-lovelace-tc390j, PR #4778)
 

@@ -1,0 +1,153 @@
+{
+  "schema": "prime31-summation-research-state/v1",
+  "checkpoint_date": "2026-11-22",
+  "timezone": "America/Los_Angeles",
+  "objective": "Develop a genuinely faster prime-field Semaev-style relation-solving strategy, then establish a correctly accounted asymptotic gain on an explicit growing family.",
+  "objective_status": "open; no asymptotic speedup achieved",
+  "repository": "isogeny-labs/crypto",
+  "pull_request": "https://github.com/isogeny-labs/crypto/pull/4928",
+  "branch": "lane/prime31-dickson-quotient-gate",
+  "tracking_commit": "087744300ac8d91335f2099b72fd311743fe7d32",
+  "review_base": "c6a9c98b665ce70f5c017257488b19bd324c4080",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "generator": [
+      625037715,
+      2100627251
+    ],
+    "provenance": "Inherited unchanged research/prime31_ic_20261115/native/lib.rs; no new point-count proof in this iteration"
+  },
+  "iterations": [
+    {
+      "id": 1,
+      "candidate": "Denominator-free Dickson trace/norm evaluation of Res_Y(D_(2^k)(Y)-c,S3(X,Y,r)) modulo the outer membership polynomial",
+      "completed": [
+        "Algebraic derivation including diagonal degree drop",
+        "Rational lift equivalence and oriented signed witness recovery",
+        "Rust implementation and qualified development checks",
+        "Sparse-product and Horner controls",
+        "Native identity certificates and independent agent source review"
+      ],
+      "diagnostic": {
+        "N": 64,
+        "B": 31,
+        "recurrence_field_multiplications": 17923,
+        "sparse_product_field_multiplications": 8816,
+        "filtered_horner_field_multiplications": 126511,
+        "full_horner_field_multiplications": 254913,
+        "excluded": [
+          "factor-base setup",
+          "gcd/root extraction",
+          "group validation",
+          "complete ECDLP"
+        ],
+        "horner_qualification": "Counts include denominator-clearing unit rescaling; a normalized gcd-only oracle can omit it",
+        "outcome": "Recurrence loses to sparse-product control in this cell; no runtime or complete-solver claim"
+      },
+      "corrected_schoolbook_bound": "O(B^2 * (1 + log^+(N/B))); O(B^2) when N/B is bounded",
+      "test_scope": "5 component tests; 25 original-curve fixtures; 41 unchanged library tests; 12 instrumented cases; cached-dependency adapter, not original lock",
+      "source_sha256": "b76cd5a1efeff77bc065554d89acc9b53be051e6b17811cca589c2dc93a018b1",
+      "source_git_blob": "750eb4ed1ea511cc70b0e7a4af413a8bf7ebeeab",
+      "correctness_json_sha256": "2f491f3250b71bca1597668098f0feecd9a40d9c76714986b482b2c8b8fc6efb"
+    },
+    {
+      "id": 2,
+      "candidate": "Push both scalar coordinates through the Dickson tower while seeking a bounded-degree relation",
+      "outcome": "Written and independently reviewed argument gives exact bidegree (2N,2N) for the full curve relation when R is nonzero of odd order",
+      "scope": "This excludes bounded-bidegree scalar equations for the full algebraic curve; it is not a circuit-size, sparsity, finite-fibre solver or ECDLP lower bound",
+      "proof": "NEXT_PROOF.md",
+      "formal_status": "No Lean runtime; unsigned PCC standing"
+    },
+    {
+      "id": 3,
+      "candidate": "Output-sensitive common-root search on Dickson tower with auxiliary norm states",
+      "outcome": "Exact conditional node count; standard norm evaluation still needs N leaves on misses; dimension-charged empty blocks require Omega(N-z)",
+      "proof": "NEXT_ROOT_INTERSECTION.md",
+      "missing_lemma": "Exact sublinear empty-root certification including target setup and all node costs",
+      "status": "written argument only; no faster predicate implemented"
+    }
+  ],
+  "claims": [
+    {
+      "id": "PCC-20261123-5f10b5",
+      "scope": "Recurrence and lifting/witness argument",
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261123-acf74d",
+      "scope": "Qualified development execution and adverse diagnostic",
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261123-f61d26",
+      "scope": "Full-curve bidegree obstruction",
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261123-87f011",
+      "scope": "Conditional node count, scalar norm degree and scoped empty-block work obstruction",
+      "standing": "unverified"
+    }
+  ],
+  "identity_certificates": {
+    "ids": [
+      "IDC1hf62e2402e4871a82",
+      "IDC1h869923a46a34c70c",
+      "IDC1hd3786f53034b6b9d",
+      "IDC1h3366a93945da9204"
+    ],
+    "scope": "Native evaluated tier over 2^61-1 plus separate checked-i128 coefficient expansion; all proof fields null; no formal kernel proof",
+    "root_replay": "identity-certificates/root-replay.json"
+  },
+  "next_mathematical_gate": "An output-sensitive common-root isolation algorithm on succinct Dickson/S3 circuits with a bound on all surviving branches, including failures; account for setup, membership, extraction and witnesses. Explicitly avoid claiming a short circuit is already a fast solver.",
+  "next_empirical_gate": "Implement and freeze the byte-level natural-target generator and matched controls in PROTOCOL.md; obtain repository checkpoint/EKS admission before any performance experiment; compare against sparse products, fast product trees and maintained group-complement scan.",
+  "growing_family_obligation": "A fixed 31-bit prime cannot establish an asymptotic exponent. Specify growing prime fields and smooth p+1 structure without assuming infinitely many Mersenne primes, and include complete index-calculus costs.",
+  "overlap_exclusions": [
+    "#4692",
+    "#4812",
+    "#4822",
+    "#4901"
+  ],
+  "reference_root_machinery": "#4829",
+  "continuation": {
+    "existing_automation_id": "6b0356b62c58819095775adf491e4492",
+    "cadence": "existing hourly schedule",
+    "prompt_update_status": "pending final published checkpoint",
+    "prompt_source": "CONTINUATION.md"
+  },
+  "space": {
+    "name": "Prime Field Summation Polynomial Research",
+    "creation_attempts": 1,
+    "status": "uncertain write receipt; repeated read timeouts; reconciliation required",
+    "space_id": null,
+    "page_id": null,
+    "instruction": "Find the exact Space before any retry; do not create a duplicate or report a confirmed save without a returned receipt and readback",
+    "recovery": "Connector reads timed out; one browser read returned no UI and was interrupted; no recovery-agent writes and no known IDs"
+  },
+  "environment_limits": [
+    "Original locked packages unavailable offline; separate adapter records eight version deviations",
+    "No Conductor binary; documented fail-open warning used for isolated paths",
+    "No research KB tools; bounded direct primary-source and repository audit",
+    "No EKS/AWS execution access in this session; no paid job launched",
+    "No Lean/lake/elan",
+    "Partial connector materialization, no complete local Git object graph; PCC producer commit is zero and source hashes are explicit"
+  ],
+  "report": "REPORT.md",
+  "pdf_status": "complete: 8 pages, visually checked, 55998 bytes; covers iterations 1 and 2",
+  "delivery_status": "Versioned in the containing PR commit; consult the PR head for latest publication",
+  "companion_lane": {
+    "pull_request": "https://github.com/isogeny-labs/crypto/pull/4924",
+    "branch": "research/symmetric-pair-quotient-prime31-20261122",
+    "observed_head": "fb850179c3847fd6950dbd91015c4e3d7c6da62d",
+    "scope": "Symmetric radical moments, monic-product quotient and rank-four factor tree",
+    "continuation": "Preserve and compare this existing hourly-task lane; resolve source-checkout discrepancy in Run74 note before importing results"
+  },
+  "original_lock_ci": {
+    "workflow": ".github/workflows/prime31-dickson-quotient-gate.yml",
+    "status": "queued by publication when GitHub triggers; no result yet",
+    "scope": "Correctness and deterministic diagnostics only, not timing benchmark"
+  }
+}
