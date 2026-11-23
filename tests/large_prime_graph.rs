@@ -1375,3 +1375,31 @@ fn projected_rank_refuses_noncanonical_or_nonunit_input() {
         Err(LpGraphError::InvalidModulus)
     ));
 }
+
+#[test]
+fn projected_rank_target_unknown_must_be_a_sparse_column_not_hidden_rhs() {
+    use crypto::cryptanalysis::large_prime_filter::CompleteRelation;
+    use crypto::cryptanalysis::large_prime_graph::projected_rank::audit_projected_rank;
+    // If RHS=1 secretly means 1 + beta*d with unknown target d, the
+    // rank audit cannot infer inconsistency: d must be a matrix column.
+    let omitted = CompleteRelation {
+        small: vec![],
+        rhs: 1,
+        sources: vec![(100, 1)],
+    };
+    let diagnostic = audit_projected_rank(&[omitted], 7).unwrap();
+    assert_eq!(diagnostic.useful_small_rank, 0);
+    assert_eq!(diagnostic.augmented_rank, 1);
+    assert_eq!(diagnostic.inconsistent_row_indices, vec![0]);
+    // Re-encode the unknown target log as an explicit (sparse) column.
+    let explicit = CompleteRelation {
+        small: vec![(u32::MAX, 1)],
+        rhs: 1,
+        sources: vec![(100, 1)],
+    };
+    let exact = audit_projected_rank(&[explicit], 7).unwrap();
+    assert_eq!(exact.useful_small_rank, 1);
+    assert_eq!(exact.augmented_rank, 1);
+    assert!(exact.inconsistent_row_indices.is_empty());
+    assert_eq!(exact.independent_row_indices, vec![0]);
+}
