@@ -53,3 +53,17 @@ Natural fixed-Prime31 capture and a viable charged collection/query budget remai
 
 ### Errors (what went wrong, how it was handled)
 No native test or CLI gate failed. Local Rust/Cargo, AWS CLI, AWS/S3 environment configuration and default AWS credential/config files are absent; retain exact downloadable CI artifact and small raw records, disclose missing durable full-archive custody, and do not fabricate a successful storage upload. Initial unsupported workflow-list endpoint was replaced by the connector's exact-commit workflow API; no repeated CI execution or completed-run polling. Whole-repository checks remain outside this focused qualification.
+
+## 2026-11-23 20:42 UTC — published-receipt binding after transport failure
+
+### What was done (commands, files, features)
+The local receipt commit `90522ccbf6c70e9c0a7a5b51c14b6a7a6c7a6a9f` was published through the connected GitHub API as `d532700090da7a3d35e5c1b03f081a0783dbd6ac`, preserving exact tree `ce74e476321857abd077244b8b90137707f379af`. In a new detached sparse worktree at that actual API commit, the native shell/jq/sha256sum writer previewed and appended `PCC-20261123-c7e76c`. Its producer commit is the API receipt commit, and its receipt hash remains `fa889d1bc52561d4155371034401083634f09de1ec57cbc49bbc209510ffe889`. Preserved all 1,827 existing ledger entries and appended one row at sequence 1,827, yielding 1,828 entries. Canonical claim digest `159e292d4bb26867ecd759e73f0d5240ebdb4fce26cf723ce77564d28f436113`; ledger-entry hash `88f8ab42dd8ca69561ce94f71d3732665cb4c1b3726f0752c5359b56ee8da436`. Native output, transport note and exact small historical records are in the scoped study directory. [pcc:unverified]
+
+### Decisions made (and why)
+Use a new claim ID because the API receipt commit has a different identity from the unpushed local receipt commit, despite an identical tree. Bind the new claim to the actual published receipt. Keep the old `PCC-20261123-c7e76b` and original local commits `90522ccb`/`485a0bf` unchanged; retain raw commit records, their exact binary-capable metadata patch and original native registration output under `evidence/unpublished-transport-20261123/`. Never copy the old append into the active ledger. The old patch is 15,119 bytes and all historical files are below 64 KiB.
+
+### Open threads
+Publish the new scoped registration metadata as a child of the API receipt commit, preserving the ledger prefix and the recorded producer binding. Natural collector-custodied Prime31 data, full-root qualification, durable full-artifact custody, cold recovery and matched complete-cost comparison remain open. No signed verification or independent-runner standing is established; no paid compute or merge.
+
+### Errors (what went wrong, how it was handled)
+The normal HTTPS git push failed because no username/credentials were available. The connected GitHub API remained available and published the receipt tree through a non-force update from the expected source head. No original local commit was reset or rewritten. No research test, collector, solver or benchmark was rerun for this transport correction. The metadata writer created no signature/verdict, altered no keyring and executed no scientific verifier; standing remains unsigned producer data.
