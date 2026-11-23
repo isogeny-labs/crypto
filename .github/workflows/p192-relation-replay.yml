@@ -21,6 +21,7 @@ jobs:
     timeout-minutes: 35
     outputs:
       source_revision: ${{ steps.source.outputs.revision }}
+      evidence_path: ${{ steps.source.outputs.evidence_path }}
     steps:
       - name: Require immutable source identity
         id: source
@@ -31,6 +32,7 @@ jobs:
           set -euo pipefail
           [[ "$REVISION" =~ ^[0-9a-f]{40}$ ]]
           printf 'revision=%s\n' "$REVISION" >> "$GITHUB_OUTPUT"
+          printf 'evidence_path=research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-%s-%s\n' "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: ${{ steps.source.outputs.revision }}
@@ -50,14 +52,17 @@ jobs:
         shell: bash
         env:
           LC_ALL: C
+          EVIDENCE_PATH: ${{ steps.source.outputs.evidence_path }}
         run: |
           set -euo pipefail
-          research/nist_cover_three_tests_20261116/replay_20261123/run.sh evidence/ci-replay
+          research/nist_cover_three_tests_20261116/replay_20261123/run.sh "$GITHUB_WORKSPACE/$EVIDENCE_PATH"
       - name: Export bounded public fixture records through the job log
         shell: bash
+        env:
+          EVIDENCE_PATH: ${{ steps.source.outputs.evidence_path }}
         run: |
           set -euo pipefail
-          out=research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-replay
+          out=$EVIDENCE_PATH
           for name in native/relations/result.json native/relations/checker-result.json \
             native/transfer/result.json native/transfer/checker-result.json comparison.json \
             pipeline-clock.json certificate-clock.json clock-build-cost.json exit7-clock.json \
@@ -75,7 +80,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: p192-replay-raw-${{ github.run_id }}
-          path: research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-replay
+          path: ${{ steps.source.outputs.evidence_path }}
           retention-days: 14
           if-no-files-found: warn
       - name: Preserve data reports for isolated optional signing
@@ -83,8 +88,8 @@ jobs:
         with:
           name: p192-replay-reports-${{ github.run_id }}
           path: |
-            research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-replay/replay-certificate.json
-            research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-replay/validator-report.json
+            ${{ steps.source.outputs.evidence_path }}/replay-certificate.json
+            ${{ steps.source.outputs.evidence_path }}/validator-report.json
           retention-days: 14
           if-no-files-found: error
   sign:
@@ -111,7 +116,7 @@ jobs:
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: p192-replay-raw-${{ github.run_id }}
-          path: research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-replay
+          path: ${{ needs.replay.outputs.evidence_path }}
       - name: Sign with the existing main-only identity
         env:
           PCC_SIGNING_KEY: ${{ secrets.PCC_SIGNING_KEY }}
