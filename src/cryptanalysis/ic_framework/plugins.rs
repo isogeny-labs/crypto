@@ -39,6 +39,8 @@
 //! | `mitm-frobenius-lazy-counted` | 2 or 3 | the same entries and probe; a hit names its summands' orbit members then, not every base point at build |
 //! | `mitm-frobenius-layout-counted` | 2 or 3 | the same entries and probe on a base laid out by orbit (`compact-orbit-scan`): members named by index, and half the same-orbit pairs added |
 //! | `rootfind-subtract` | 2 or 3 | prime curves: `prime_fast`'s direct-subtraction root finding, every `x(R ∓ F_i)` of a target from one Montgomery batched inversion, then a lookup (`m = 2`) or a probe of the negation-folded pair table (`m = 3`) |
+//! | `rootfind-floor` | 2 or 3 | same search and charged additions as `rootfind-subtract`, with x-only Montgomery candidates and a word-blocked Bloom filter in front of the exact abscissa map (lever 1 of the 100× plan) |
+//! | `rootfind-kmitm` | 3 to 12 | meet-in-the-middle: left=`min(9,m−1)` table (probe-favoring; `split=balanced` for half), Bloom + batch-inv folded probes on primes — `right=1` for `m≤10`; enables `m=10..12` |
 //! | `chained-x` | 2, 3 or 4 | Koblitz subspace bases: the chained `x`-frame descent (`groebner_decompose`), `m − 1` Semaev `S₃` links solved by boolean F4 with splitting |
 //!
 //! The pair table is where memory buys time, and `mitm`'s
@@ -2435,7 +2437,7 @@ impl FactorBaseBuilder<Fp2Curve> for GlsLineBase<'_> {
 
 /// `counters` with the marker that says the oracle's set-up counts all
 /// its table work (`ecbench::work::known_uncounted`).
-fn table_counted(mut counters: BTreeMap<String, u64>) -> BTreeMap<String, u64> {
+pub(crate) fn table_counted(mut counters: BTreeMap<String, u64>) -> BTreeMap<String, u64> {
     counters.insert("counted:table_insert_attempts".to_string(), 1);
     counters
 }
@@ -4528,7 +4530,10 @@ impl DecompositionOracle<PrimeCurve> for RootfindSubtractOracle<'_> {
         self.reps = reps;
         self.field = Some(f);
         if self.m == 3 && !self.defer_table {
-            let table = PairTable::build_negation_folded(ctx.group, fb);
+            // Same batched builder as `rootfind-floor:m=3` (PLAN lever 5):
+            // keep decompose parity (same keys/witnesses) while cutting
+            // prepare wall at large |Fₓ|.
+            let table = PairTable::build_negation_folded_prime_batch(ctx.group, fb)?;
             ops.merge(table.build_ops);
             self.table = Some(table);
         }

@@ -43,6 +43,8 @@ use crypto_lib::cryptanalysis::ic_framework::plugins::{
     SymmetrisedOracle,
 };
 use crypto_lib::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
+use crypto_lib::cryptanalysis::ic_framework::rootfind_floor::RootfindFloorOracle;
+use crypto_lib::cryptanalysis::ic_framework::rootfind_kmitm::RootfindKMitmOracle;
 use crypto_lib::cryptanalysis::ic_framework::solvers::{
     solver_by_name, solver_registry, validate_solver_params,
 };
@@ -773,6 +775,8 @@ fn run_prime(
         let mut batch = PrimeBatchMitmOracle::new();
         let mut blocked = PrimeBatchMitmOracle::blocked();
         let mut rootfind = RootfindSubtractOracle::new(m, inst);
+        let mut rootfind_floor = RootfindFloorOracle::new(m, inst);
+        let mut rootfind_kmitm = RootfindKMitmOracle::new_prime(m, inst);
         let mut rootfind_gpu =
             crypto_lib::cryptanalysis::ic_framework::rootfind_gpu::RootfindSubtractGpuOracle::new(
                 m, inst,
@@ -791,6 +795,8 @@ fn run_prime(
             "mitm-prime-batch" => &mut batch,
             "mitm-prime-blocked" => &mut blocked,
             "rootfind-subtract" => &mut rootfind,
+            "rootfind-floor" => &mut rootfind_floor,
+            "rootfind-kmitm" => &mut rootfind_kmitm,
             "rootfind-subtract-gpu" => &mut rootfind_gpu,
             "hashed-tensor" => &mut hashed,
             "genroot" => &mut genroot,
@@ -886,7 +892,8 @@ fn run_binary(
             }
         }
         let mut subtract = SubtractOracle;
-        let mut subtract_binary = crypto_lib::cryptanalysis::ic_framework::binary_subtract::BinarySubtractOracle::new();
+        let mut subtract_binary =
+            crypto_lib::cryptanalysis::ic_framework::binary_subtract::BinarySubtractOracle::new();
         let mut mitm = MitmOracle::new(m);
         let mut frob = FrobeniusMitmOracle::new(m, inst);
         let mut frob_counted = FrobeniusMitmOracle::new_counted(m, inst);
