@@ -6,7 +6,7 @@
 //! cargo run --release --example lp_graph_collect -- \
 //!     --n 20 --seed 20261123 --small 4 --envelope 7 --summands 4 \
 //!     --large-primes 2 --trials 40000 --graph filter|orbit \
-//!     --relations out.jsonl --out eval.json
+//!     --relations out.jsonl --out eval.json [--exact-forest] [--forest-max-rows 4096]
 //! ```
 //!
 //! The curve is `ic_boundary::random_binary_instance(n, seed, 16)`, or with
@@ -89,8 +89,23 @@ fn main() {
         "ecbench_large_prime binary n={n} seed={seed} koblitz={koblitz} r={} graph={:?} config={:?} recovered={:?}",
         instance.r, graph, config, report.recovered
     );
-    let eval =
-        evaluate_stream(&label, &relations, instance.r, &EvalParams::default()).expect("evaluate");
+    // Exact factor-base rank is optional: default output stays compatible with
+    // the previously recorded binary-curve runs. A cap applies to *all*
+    // expensive same-stream rank auditors inside evaluate_stream.
+    let mut params = EvalParams::default();
+    params.compare_exact_forest = args.iter().any(|arg| arg == "--exact-forest");
+    if let Some(v) = args
+        .iter()
+        .position(|arg| arg == "--forest-max-rows")
+        .and_then(|i| args.get(i + 1))
+    {
+        params.forest_max_rows = v.parse().expect("--forest-max-rows integer");
+        assert!(
+            (1..=4096).contains(&params.forest_max_rows),
+            "--forest-max-rows must be between 1 and 4096"
+        );
+    }
+    let eval = evaluate_stream(&label, &relations, instance.r, &params).expect("evaluate");
     let json = serde_json::to_string_pretty(&eval).unwrap() + "\n";
     match args
         .iter()
