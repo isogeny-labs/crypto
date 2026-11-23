@@ -58,3 +58,31 @@ A standalone Python modular-polynomial prototype (kept out of the performance pa
 ## Admission gate
 
 Implement the rank-two quotient recurrence and root extractor **in original Rust**; compare on the same B3..32 Prime31 public-Q targets to matched original F4, September DRL, #4922 reuse and #4920 table/original root finders. Record all construction, gcd, root factoring, sign/lift checking, retries and memory. Add positive and negative small-field exhaustive cases; include diagonal x1=x2 and intermediate-infinity group cases. If the non-table root extractor doesn't beat those controls, classify the negative result and stop that branch. **No speedup or priority claim here. [pcc:unverified]**
+
+
+## Candidate improvement: divide-and-conquer factor multiplication in the rank-four algebra (unimplemented)
+
+The linear Newton recurrence as currently implemented stores all `P_k` and costs `O(B²)` prime-field coefficient arithmetic to construct `H0,H1` for one target. There is a stronger algebraic route to **quasi-linear symbolic construction**, provided fast univariate multiplication is available. Work over the rank-four `Fp[s]`-algebra
+
+```
+A_z = Fp[s,t,X] / (t²+q_z(s)t+r_z(s), X²-sX+t).
+```
+
+It is free over `Fp[s]` on `1,t,X,tX`: both relations are monic in their respective extension variables, so there is no bad-leading-coefficient specialization. Multiply the factor-base polynomial **as a product of linear factors in this algebra**, using a balanced subproduct tree:
+
+```
+h(X) = PRODUCT_(w in W) (X-w) ≡ U(s,t)+V(s,t)X in A_z.
+H0 = 2U + s V,
+H1 = s U + (s²-2t)V.
+```
+
+Each `U,V` has the same rank-two `1,t` coordinates as the earlier oracle. For two factors represented by `(U,V)` and `(U',V')`, their product is
+
+```
+U_new = U*U' - t*V*V'
+V_new = U*V' + U'*V + s*V*V'
+```
+
+where multiplications in `Fp[s,t]/(F_z)` use `t²=-q_z(s)t-r_z(s)`. A product node with `L` factors has univariate coefficient degree `O(L)`; fixed-rank ring products require only a constant number of univariate polynomial multiplications of degree `O(L)`. A balanced tree of B leaves consequently uses `O(M(B) log B)` field operations for the **symbolic H0/H1 construction**, where M(B) is the cost of degree-B polynomial multiplication. With near-linear M(B), this is `O~(B)` instead of the direct `O(B²)` recurrence. This is a mathematical conditional complexity bound; the existing Rust prototype does **not yet** implement a fast polynomial multiplication backend, and no measurements are asserted.
+
+This is a meaningful **component asymptotic** improvement over the naive coefficient recurrence, not a non-generic ECDLP exponent improvement. The gcd, extraction/factorization, group-lift and target-rank costs remain, and merely processing B factor-base elements costs Omega(B) per fresh target unless preprocessing/shared structure avoids a full scan. In the optimistic four-summand relation-count model, an O~(B) per-target oracle with quadratic LA only *matches* the generic rho exponent 1/2 rather than beating it. A credible ECDLP exponent gain requires an amortized, sub-B per-shift oracle or a structural way to reuse target-independent work. As an additional check, compare the old Newton method and this tree on **identical W,z** by requiring identical four univariate coefficients and independently crosschecking all recovered S3 pairs before benchmarking.
