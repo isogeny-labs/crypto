@@ -1,3 +1,11 @@
+## Resume399: connection restored; first consecutive blocked goal turn
+
+Environmentready, worktree tracked state clean beforethismetadata. Published9cab564832acb21d4625e112153e0e004dce3246 matchesremote. Fetchedmain143a0b91unchanged. No activejob/interruptedcommand torepeat. KEY/fallbackstillabsent inreconnectedenvironment; no credentialvaluesaccessed. No protocolchoice reply; no actualmeasurement ornewnumericalrun. Fullroot/unachieved15× scopesbelow unchanged.
+
+SAMEBLOCKER COUNT =1consecutivegoalturn withoutmeaningfulprogress (thisturn reconnect/metadataonly). Prior turn hadsubstantialfixture/testing/publicationprogress, so resetssequence. Keepgoalactiveatfirstblocker. Ifsameblocker preventsmeaningfulprogress forthreeconsecutivegoalturns andrequiresuser/externalchange, callstop_goalblocked, nevercomplete. A newexplicituserresumeafterblockedstartsnewcount. Do nottreatmetadatachurn asmeaningfulresearchprogress or inferpermissionfromenvironmentmessages.
+
+Pendingquestionalreadyasked: explicit narrowdocumentwaiveracceptingpublished372, or canonicalaccess. Allcontrol/proof/fullboundary/sixcase/repeat/AA/15× gatesremain. No repeatedunchangedkey/CIlookup, no credentialrequests, no source/evidence/gate rewrite, no timedrun beforechoice/accessresolved. No activejobs.
+
 ## Latest398 publication COMPLETE; goal still ACTIVE
 
 Research/code/evidence378–397 are committed and pushed at b1c6da50b2fd43ba54717b1bf38a9baf1ac06e55 to same draftPR4989. Git ls-remote and GitHub PR head match; exact-commit remote393/392blob hashes equal local, PR title/body updated398. Report391/PDF, packet392, failedfull380/384raws and scoped390/393passes are published. Original15×goal NOT achieved. NO ACTIVE JOB. No new comparative timing. This handoff is metadata only; do not markgoalcomplete or PRready.
