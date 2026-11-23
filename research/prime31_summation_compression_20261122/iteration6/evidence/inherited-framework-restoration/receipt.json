@@ -1,0 +1,165 @@
+{
+  "schema": "ic-framework.inherited-merge-repair-audit/v1",
+  "repository": "isogeny-labs/crypto",
+  "source_path": "src/cryptanalysis/ic_framework/mod.rs",
+  "failed_ci": {
+    "run": "45097885135",
+    "job": "137441679059",
+    "commit": "a4ddc035c0c7519d6bab7a438d8a168f74ae40db",
+    "blob": "886e2eea78ca8b895f8b317a4d0cab8093af460c"
+  },
+  "current": {
+    "commit": "fc184b03d47e13ec922c9b489f3b3f8a976a8bd9",
+    "blob": "8c6fbde25df09ad504877f780f4bdbf6acbbd002"
+  },
+  "culprit": {
+    "commit": "732322c96041d1be47db7789ec702658cedff8bb",
+    "blob": "a3ace1f95a97f1f75b72dae090a94f00f5754bc3",
+    "parent1": "3636b1520a93311096377b035726fa7bc25009a1",
+    "parent1_blob": "84104546f291a009ecfb0a0728d52c57528680ff",
+    "parent2": "8104713e049d162577ef18cbf943e20fda3d2e36",
+    "parent2_blob": "3680ec50b0ab9826b9d56d83e570b4016973825a",
+    "base": "ad2a014c0022cf000845014499a9649b6c2cef2d",
+    "base_blob": "345e53baaa554e9cccae0751ae6a0edd754d17fb",
+    "three_way_conflicts": 1
+  },
+  "candidate": {
+    "git_blob": "f4f2cce4118d1510fd961cc6d6e0fc0354c257e1",
+    "lines": 4539
+  },
+  "diff": {
+    "insertions": 4,
+    "deletions": 0
+  },
+  "parser": {
+    "version": "rustfmt 1.11.0-stable (0ef1bc3860 2026-11-09)",
+    "command": "rustfmt --edition 2021 --emit stdout --config skip_children=true <file>",
+    "ci_source_exit": 1,
+    "current_source_exit": 1,
+    "candidate_exit": 0
+  },
+  "static_checks": {
+    "one_empty_base_conflict": true,
+    "culprit_restored_is_exact_three_way_union": true,
+    "current_change_is_exact_four_line_restoration": true,
+    "test_inventory_unchanged": true,
+    "test_count": 35,
+    "isolated_patch_check_exit": 0,
+    "isolated_patch_apply_exit": 0,
+    "applied_bytes_match_candidate": true,
+    "test_names": [
+      "live_pipeline_witnesses_are_real_equations_and_preserve_the_result",
+      "hashed_affine_setup_qualification_is_independent_of_oracle",
+      "known_log_base_recovers_logs_with_zero_linear_algebra",
+      "ksum_oracle_recovers_logs_with_three_to_seven_summands",
+      "known_log_random_scalars_recover_logs_with_zero_linear_algebra",
+      "known_log_random_scalars_recover_logs_on_a_cofactor_curve",
+      "known_log_base_digest_is_identical_for_the_same_generator",
+      "known_log_base_is_closed_under_negation",
+      "a_composed_pipeline_recovers_the_planted_logarithm",
+      "the_strides_recover_the_logarithm_without_a_jump_table",
+      "swapping_the_oracle_keeps_the_answer_and_moves_the_cost",
+      "the_report_shows_what_a_column_fold_does",
+      "the_algebraic_oracle_recovers_the_logarithm_and_its_solver_is_in_s",
+      "solver_pricing_is_unchanged_with_no_solver_unit_key_pinned",
+      "a_pinned_conflict_key_charges_sat_conflicts_by_count",
+      "a_partial_coverage_unit_stays_uncharged_even_when_pinned",
+      "every_shipped_solver_unit_has_its_calibration_key",
+      "a_pinned_hashed_tensor_step_key_charges_the_steps",
+      "a_word_xor_price_is_pinned_only_when_the_calibration_says_so",
+      "inherited_f4_word_xor_unit_is_priced_when_pinned",
+      "the_algebraic_and_combinatorial_oracles_agree_on_the_answer",
+      "the_structured_matrix_agrees_with_the_dense_one_end_to_end",
+      "full_rank_matrix_name_reaches_every_column_end_to_end",
+      "sparse_cado_matches_the_full_rank_matrix_end_to_end",
+      "sparse_attempt_schedules_match_the_full_rank_matrix_end_to_end",
+      "checked_full_rank_point_checks_each_column_without_changing_the_relation_stream",
+      "checked_full_rank_rejects_a_false_column_log",
+      "generator_orbit_base_pins_the_target_with_one_relation",
+      "generator_multiples_seed_known_log_columns_and_default_is_unchanged",
+      "generator_orbit_lean_sib_tau_levers_keep_the_solve_and_remove_work",
+      "k1_lazy_negatives_and_orbit_identities_keep_the_solve",
+      "k1_sibling_walk_ladder_verify_and_key_reuse_keep_the_solve",
+      "multiple_doublings_spread_the_known_log_seeds",
+      "layout_table_returns_the_lazy_pairs_with_no_maps_and_half_the_same_orbit_sums",
+      "the_symmetrised_koblitz_pipeline_recovers_the_logarithm_over_a_torsion_closed_base"
+    ]
+  },
+  "small_related_test": {
+    "path": "tests/rust_extension_security.rs",
+    "blob": "e4624c681aa9bae7573d381206b8056fe6974b35",
+    "name": "malformed_plugin_maps_and_invalid_subgroup_bounds_return_errors",
+    "exact_x_index_branch_coverage": false,
+    "executed": false
+  },
+  "remote_mutations": false,
+  "actual_shared_source_mutations": false,
+  "tests_executed": false,
+  "full_compilation_performed": false,
+  "files": {
+    "mod.current.rs": {
+      "bytes": 193139,
+      "sha256": "5f8155bffcc853bb703c79e81457288d879e3fcfdb183cb49da9937569ee7b97"
+    },
+    "mod.ci.rs": {
+      "bytes": 192950,
+      "sha256": "e62e87e7c06b0a1c206acdaad2f0740e44c0567cbbf695e655fa99532869330b"
+    },
+    "mod.restored.rs": {
+      "bytes": 193233,
+      "sha256": "4c8ae812e9f9233797e0131d132f13189cd7157f21318798556d0b57e96b06d0"
+    },
+    "restore_ic_framework.patch": {
+      "bytes": 786,
+      "sha256": "c009c70e9b24ff832f78f38f0c6235d99d7635e1ea0f4aaaddeb28a560bda74e"
+    },
+    "mod.culprit_merge.rs": {
+      "bytes": 188610,
+      "sha256": "a81647bf4cda80cde5bf8a4ad19631ab9469a7bdcde957bc38e36e3d12e4b651"
+    },
+    "mod.culprit_parent1.rs": {
+      "bytes": 137679,
+      "sha256": "4d8fb53255b452ac97c52d38dce0205d9ce9aee4943ae5cb48d578c4cc3a54b4"
+    },
+    "mod.culprit_parent2.rs": {
+      "bytes": 187652,
+      "sha256": "69b51a70dfa2f0d92f863f7f57b8480dd38ac4c7183f16d27fec30fa9cc57360"
+    },
+    "mod.culprit_base.rs": {
+      "bytes": 136627,
+      "sha256": "5c54697b8f435601f1c2632716e4880decf0282ee4b3bdc79687fcc8692e1054"
+    },
+    "mod.culprit_threeway.rs": {
+      "bytes": 188785,
+      "sha256": "33a5ac391f6b9952c482dc648c9eed43a7b5becf02a1a5d4a744961d711dfa5b"
+    },
+    "mod.culprit_union.rs": {
+      "bytes": 188704,
+      "sha256": "e1da74fbfed0616c0677e29f130c0f8c4ded29970a95ac42a88308995113c42e"
+    },
+    "parser_ci.log": {
+      "bytes": 601,
+      "sha256": "425a60e74965bd76e0553fa5f6523d576b1562bed40897af902664ee184a09a3"
+    },
+    "parser_current.log": {
+      "bytes": 606,
+      "sha256": "5c6a94102f03808737bb70e448e5a866eb77b31518bb7aa600676e87bce42eea"
+    },
+    "parser_restored.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "static_checks.json": {
+      "bytes": 2606,
+      "sha256": "9983e81e3370ae1fcf4a35003c7e73bc18413ac2acb85a03fd1459b8a3339003"
+    },
+    "rust_extension_security.rs": {
+      "bytes": 10793,
+      "sha256": "d9a61d0a88aba3b6c37268e49d89a3efdfbbf6310b379b0694124c53b51fe107"
+    },
+    "AUDIT.md": {
+      "bytes": 6870,
+      "sha256": "b942e2a3a6f6676903861f7210b54dffa2c12dde6bebe2dfd07f782cd69aa7dc"
+    }
+  }
+}
