@@ -284,8 +284,13 @@ fn verify_private_key(d: &BigUint, public_key: &EccPublicKey, curve: &CurveParam
     let g = curve.generator();
     let a = curve.a_fe();
     // Public-key recovery only — variable-time scalar mul is fine
-    // (we're attacking, not signing).
-    let computed = g.scalar_mul(d, &a);
+    // (we're attacking, not signing).  `IC_HNP_CT=1` restores the
+    // historical CT ladder for A/B measurement.
+    let computed = if std::env::var("IC_HNP_CT").as_deref() == Ok("1") {
+        g.scalar_mul(d, &a)
+    } else {
+        g.scalar_mul_vartime(d, &a)
+    };
     point_eq(&computed, &public_key.point)
 }
 

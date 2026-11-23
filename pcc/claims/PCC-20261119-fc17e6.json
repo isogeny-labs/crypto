@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T07:35:28Z",
+ "id": "PCC-20261119-fc17e6",
+ "kind": "theorem",
+ "producer": {
+  "commit": "e0a4460da3d8234240f04679b31dd18f3d41ca25",
+  "model": "Codex",
+  "session": "semaev-fraction-square-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "6761b594d36ee7903e37cba7a49677e928a8a5e27aa69603baac5634970ec560",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.shortCubicPolynomial_fraction_square_product_classification"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "This includes a generic UFD fraction-ring proof that a base-ring element square in the fraction field is a unit times a square, and the fact that polynomial units over a field are nonzero constants. It does not construct the multiquadratic Kummer extension or prove that its characters correspond to and separate the specialized radicand square classes.",
+ "statement": "For a nonsingular short cubic over a field of characteristic not two, if the cubic times its nontrivially scaled copy is a square in the rational function field, then exactly the exceptional scaling classes of Lemma 5.4 occur: if A is nonzero then B is zero and r is minus one; if A is zero and B is nonzero then r cubed is one."
+}

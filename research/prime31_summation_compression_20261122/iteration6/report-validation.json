@@ -1,0 +1,28 @@
+{
+  "schema": "prime31-iteration6-report-validation/v1",
+  "status": "pending_repaired_ci",
+  "source_commit": "a4ddc035c0c7519d6bab7a438d8a168f74ae40db",
+  "gate_source_sha256": "5cfcb6611552f16ea8a13fc1f6bd2dc441c4e32636812a647585f8f93c7438a0",
+  "identity_issuer_sha256": "b803aa70037cd95467cc0865f99fd8af5848912eb490542d8ad327b3dfa490fc",
+  "ci_summary": "The initial original-lock build failed before new tests on inherited spec.rs syntax. A faithful parent-source restoration is committed; its source-bound rerun is in progress, with no test success yet asserted.",
+  "identity_summary": "Native cubic-residual issuer prepared but not executed. Issuance and replay remain pending; intended certificate standing proof:null.",
+  "ci_url": "https://github.com/isogeny-labs/crypto/actions/runs/45097885135",
+  "ci_job_id": null,
+  "failure_scope": "Inherited malformed test-fixture calls and unclosed delimiters around ecbench/spec.rs lines 894-1042; no mathematical counterexample inferred.",
+  "next_action": "Collect the repaired original-lock correctness and native identity receipts, preserving the initial failure. Then specify an exact guarded-quadratic solver with setup, misses, rational extraction, memory and signed output fully charged.",
+  "receipt_path": null,
+  "standing": "pcc:unverified",
+  "performance": "No new timing panel or asymptotic solving bound.",
+  "initial_failure": {
+    "source_commit": "bf56de345c02ef6f1c55bfa047087b0e880cb09e",
+    "run_id": 45096187034,
+    "job_id": 137436389923,
+    "receipt_path": "evidence/ci-inherited-build-failure/receipt.json"
+  },
+  "build_restoration": {
+    "source_blob": "ed85acbb242a11a1412da7c842cef70872235dcc",
+    "audit_path": "evidence/inherited-spec-restoration/AUDIT.md",
+    "freeze_path": "evidence/inherited-spec-restoration/SOURCE_FREEZE.json"
+  },
+  "family_appendix": "Written reviewed input-availability results; no root solver or prime-subgroup family certified."
+}

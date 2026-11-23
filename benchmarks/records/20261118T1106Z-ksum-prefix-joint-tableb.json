@@ -1,0 +1,1138 @@
+{
+  "branch": "ksum-prefix-wip",
+  "closed_utc": "2026-11-18T11:41:31+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/ic_ksum_prefix_joint_20261118/run_all.sh",
+        "/tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/kpbin/ecbench",
+        "/tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/kp_confirm"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-18T11:06:48+00:00",
+      "wall_s": 840.843
+    }
+  ],
+  "commit": "bc3122e8dcd42a20eb57ddb291ae0cc77629da53",
+  "commit_dirty": false,
+  "created_utc": "2026-11-18T11:06:48+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v595-x86_64-with-glibc2.39"
+  },
+  "id": "20261118T1106Z-ksum-prefix-joint-tableb",
+  "metrics": [
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w0_p20",
+      "note": "[pcc:unverified] P20 k5 N9 -psr; prefix/inc counted GAE ratio of totals, w=0; bootstrap [0.9439, 0.9634]; per-replicate uppers [0.9696, 0.9684, 0.9723]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9461,
+        0.9611
+      ],
+      "unit": "ratio",
+      "value": 0.9536
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w0_p20",
+      "note": "[pcc:unverified] P20 k5 N9 -psr; joint/inc counted GAE ratio of totals, w=0; bootstrap [0.9868, 0.9872]; per-replicate uppers [0.9873, 0.9872, 0.9873]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9868,
+        0.9871
+      ],
+      "unit": "ratio",
+      "value": 0.987
+    },
+    {
+      "baseline": 3.8818,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_prefix_joint_over_rho_neg_w0_p20",
+      "note": "[pcc:unverified] P20: S(prefix-joint)/S(rho-neg), w=0; incumbent 3.882; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.5436,
+        3.7617
+      ],
+      "unit": "ratio",
+      "value": 3.651
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w0p1_p20",
+      "note": "[pcc:unverified] P20 k5 N9 -psr; prefix/inc counted GAE ratio of totals, w=0.1; bootstrap [0.9448, 0.9652]; per-replicate uppers [0.9716, 0.9705, 0.9745]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9471,
+        0.9628
+      ],
+      "unit": "ratio",
+      "value": 0.9549
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w0p1_p20",
+      "note": "[pcc:unverified] P20 k5 N9 -psr; joint/inc counted GAE ratio of totals, w=0.1; bootstrap [0.9885, 0.9888]; per-replicate uppers [0.989, 0.9889, 0.989]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9885,
+        0.9888
+      ],
+      "unit": "ratio",
+      "value": 0.9887
+    },
+    {
+      "baseline": 4.1035,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_prefix_joint_over_rho_neg_w0p1_p20",
+      "note": "[pcc:unverified] P20: S(prefix-joint)/S(rho-neg), w=0.1; incumbent 4.103; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.7562,
+        3.9913
+      ],
+      "unit": "ratio",
+      "value": 3.872
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w1_p20",
+      "note": "[pcc:unverified] P20 k5 N9 -psr; prefix/inc counted GAE ratio of totals, w=1; bootstrap [0.9481, 0.9717]; per-replicate uppers [0.9791, 0.9779, 0.9824]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9508,
+        0.9689
+      ],
+      "unit": "ratio",
+      "value": 0.9598
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w1_p20",
+      "note": "[pcc:unverified] P20 k5 N9 -psr; joint/inc counted GAE ratio of totals, w=1; bootstrap [0.9947, 0.9949]; per-replicate uppers [0.995, 0.9949, 0.9949]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9947,
+        0.9948
+      ],
+      "unit": "ratio",
+      "value": 0.9948
+    },
+    {
+      "baseline": 5.1692,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_prefix_joint_over_rho_neg_w1_p20",
+      "note": "[pcc:unverified] P20: S(prefix-joint)/S(rho-neg), w=1; incumbent 5.169; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.7766,
+        5.0973
+      ],
+      "unit": "ratio",
+      "value": 4.9344
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w0_p22",
+      "note": "[pcc:unverified] P22 k5 N10 -psr; prefix/inc counted GAE ratio of totals, w=0; bootstrap [0.9582, 0.9751]; per-replicate uppers [0.9887, 0.9834, 0.9719]; registered test fails",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9602,
+        0.9733
+      ],
+      "unit": "ratio",
+      "value": 0.9667
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w0_p22",
+      "note": "[pcc:unverified] P22 k5 N10 -psr; joint/inc counted GAE ratio of totals, w=0; bootstrap [0.9921, 0.9923]; per-replicate uppers [0.9923, 0.9923, 0.9924]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9921,
+        0.9922
+      ],
+      "unit": "ratio",
+      "value": 0.9922
+    },
+    {
+      "baseline": 4.3615,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_joint_over_rho_neg_w0_p22",
+      "note": "[pcc:unverified] P22: S(joint)/S(rho-neg), w=0; incumbent 4.362; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.2102,
+        4.4478
+      ],
+      "unit": "ratio",
+      "value": 4.3274
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w0p1_p22",
+      "note": "[pcc:unverified] P22 k5 N10 -psr; prefix/inc counted GAE ratio of totals, w=0.1; bootstrap [0.9593, 0.9769]; per-replicate uppers [0.9912, 0.9856, 0.9736]; registered test fails",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9613,
+        0.975
+      ],
+      "unit": "ratio",
+      "value": 0.9682
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w0p1_p22",
+      "note": "[pcc:unverified] P22 k5 N10 -psr; joint/inc counted GAE ratio of totals, w=0.1; bootstrap [0.9931, 0.9933]; per-replicate uppers [0.9933, 0.9933, 0.9934]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9931,
+        0.9932
+      ],
+      "unit": "ratio",
+      "value": 0.9932
+    },
+    {
+      "baseline": 4.5848,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_joint_over_rho_neg_w0p1_p22",
+      "note": "[pcc:unverified] P22: S(joint)/S(rho-neg), w=0.1; incumbent 4.585; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.4289,
+        4.6816
+      ],
+      "unit": "ratio",
+      "value": 4.5535
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w1_p22",
+      "note": "[pcc:unverified] P22 k5 N10 -psr; prefix/inc counted GAE ratio of totals, w=1; bootstrap [0.963, 0.9835]; per-replicate uppers [1.0002, 0.9937, 0.9796]; registered test fails",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9654,
+        0.9813
+      ],
+      "unit": "ratio",
+      "value": 0.9733
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w1_p22",
+      "note": "[pcc:unverified] P22 k5 N10 -psr; joint/inc counted GAE ratio of totals, w=1; bootstrap [0.9968, 0.9969]; per-replicate uppers [0.9969, 0.9969, 0.9969]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9968,
+        0.9969
+      ],
+      "unit": "ratio",
+      "value": 0.9968
+    },
+    {
+      "baseline": 5.6326,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_joint_over_rho_neg_w1_p22",
+      "note": "[pcc:unverified] P22: S(joint)/S(rho-neg), w=1; incumbent 5.633; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        5.4541,
+        5.7803
+      ],
+      "unit": "ratio",
+      "value": 5.6148
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w0_p24",
+      "note": "[pcc:unverified] P24 k5 N11 -psr; prefix/inc counted GAE ratio of totals, w=0; bootstrap [0.9613, 0.9782]; per-replicate uppers [0.9845, 0.9913, 0.979]; registered test fails",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9633,
+        0.9767
+      ],
+      "unit": "ratio",
+      "value": 0.97
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w0_p24",
+      "note": "[pcc:unverified] P24 k5 N11 -psr; joint/inc counted GAE ratio of totals, w=0; bootstrap [0.9953, 0.9955]; per-replicate uppers [0.9955, 0.9955, 0.9955]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9953,
+        0.9954
+      ],
+      "unit": "ratio",
+      "value": 0.9954
+    },
+    {
+      "baseline": 4.7442,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_joint_over_rho_neg_w0_p24",
+      "note": "[pcc:unverified] P24: S(joint)/S(rho-neg), w=0; incumbent 4.744; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.5946,
+        4.8537
+      ],
+      "unit": "ratio",
+      "value": 4.7224
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w0p1_p24",
+      "note": "[pcc:unverified] P24 k5 N11 -psr; prefix/inc counted GAE ratio of totals, w=0.1; bootstrap [0.962, 0.9795]; per-replicate uppers [0.9862, 0.9932, 0.9804]; registered test fails",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.964,
+        0.978
+      ],
+      "unit": "ratio",
+      "value": 0.971
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w0p1_p24",
+      "note": "[pcc:unverified] P24 k5 N11 -psr; joint/inc counted GAE ratio of totals, w=0.1; bootstrap [0.9959, 0.996]; per-replicate uppers [0.9961, 0.9961, 0.9961]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.996,
+        0.996
+      ],
+      "unit": "ratio",
+      "value": 0.996
+    },
+    {
+      "baseline": 5.0086,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_joint_over_rho_neg_w0p1_p24",
+      "note": "[pcc:unverified] P24: S(joint)/S(rho-neg), w=0.1; incumbent 5.009; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.8517,
+        5.1292
+      ],
+      "unit": "ratio",
+      "value": 4.9885
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w1_p24",
+      "note": "[pcc:unverified] P24 k5 N11 -psr; prefix/inc counted GAE ratio of totals, w=1; bootstrap [0.9642, 0.9845]; per-replicate uppers [0.9921, 1.0002, 0.9854]; registered test fails",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9665,
+        0.9827
+      ],
+      "unit": "ratio",
+      "value": 0.9746
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w1_p24",
+      "note": "[pcc:unverified] P24 k5 N11 -psr; joint/inc counted GAE ratio of totals, w=1; bootstrap [0.9981, 0.9982]; per-replicate uppers [0.9982, 0.9982, 0.9982]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9981,
+        0.9982
+      ],
+      "unit": "ratio",
+      "value": 0.9982
+    },
+    {
+      "baseline": 6.2631,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_joint_over_rho_neg_w1_p24",
+      "note": "[pcc:unverified] P24: S(joint)/S(rho-neg), w=1; incumbent 6.263; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        6.0702,
+        6.4384
+      ],
+      "unit": "ratio",
+      "value": 6.2516
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w0_b15",
+      "note": "[pcc:unverified] B15 k4 N7 -psr; prefix/inc counted GAE ratio of totals, w=0; bootstrap [0.951, 0.9669]; per-replicate uppers [0.9631, 0.9738, 0.9797]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9531,
+        0.9651
+      ],
+      "unit": "ratio",
+      "value": 0.9591
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w0_b15",
+      "note": "[pcc:unverified] B15 k4 N7 -psr; joint/inc counted GAE ratio of totals, w=0; bootstrap [0.9375, 0.939]; per-replicate uppers [0.9405, 0.9393, 0.9387]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9376,
+        0.9388
+      ],
+      "unit": "ratio",
+      "value": 0.9382
+    },
+    {
+      "baseline": 2.7631,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_prefix_joint_over_rho_neg_w0_b15",
+      "note": "[pcc:unverified] B15: S(prefix-joint)/S(rho-neg), w=0; incumbent 2.763; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.423,
+        2.5377
+      ],
+      "unit": "ratio",
+      "value": 2.4797
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w0p1_b15",
+      "note": "[pcc:unverified] B15 k4 N7 -psr; prefix/inc counted GAE ratio of totals, w=0.1; bootstrap [0.9524, 0.9696]; per-replicate uppers [0.9651, 0.977, 0.9836]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9546,
+        0.9675
+      ],
+      "unit": "ratio",
+      "value": 0.961
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w0p1_b15",
+      "note": "[pcc:unverified] B15 k4 N7 -psr; joint/inc counted GAE ratio of totals, w=0.1; bootstrap [0.9444, 0.9458]; per-replicate uppers [0.9472, 0.9461, 0.9455]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9445,
+        0.9456
+      ],
+      "unit": "ratio",
+      "value": 0.9451
+    },
+    {
+      "baseline": 2.9005,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_prefix_joint_over_rho_neg_w0p1_b15",
+      "note": "[pcc:unverified] B15: S(prefix-joint)/S(rho-neg), w=0.1; incumbent 2.9; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.5665,
+        2.6918
+      ],
+      "unit": "ratio",
+      "value": 2.6284
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w1_b15",
+      "note": "[pcc:unverified] B15 k4 N7 -psr; prefix/inc counted GAE ratio of totals, w=1; bootstrap [0.9577, 0.9803]; per-replicate uppers [0.9732, 0.9897, 0.9991]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9604,
+        0.9774
+      ],
+      "unit": "ratio",
+      "value": 0.9689
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w1_b15",
+      "note": "[pcc:unverified] B15 k4 N7 -psr; joint/inc counted GAE ratio of totals, w=1; bootstrap [0.9721, 0.9729]; per-replicate uppers [0.9738, 0.9732, 0.9727]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9722,
+        0.9728
+      ],
+      "unit": "ratio",
+      "value": 0.9725
+    },
+    {
+      "baseline": 3.6211,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_prefix_joint_over_rho_neg_w1_b15",
+      "note": "[pcc:unverified] B15: S(prefix-joint)/S(rho-neg), w=1; incumbent 3.621; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.3172,
+        3.5035
+      ],
+      "unit": "ratio",
+      "value": 3.4091
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w0_b18",
+      "note": "[pcc:unverified] B18 k4 N7 -psr; prefix/inc counted GAE ratio of totals, w=0; bootstrap [0.9254, 0.9481]; per-replicate uppers [0.9576, 0.9501, 0.9614]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9283,
+        0.9455
+      ],
+      "unit": "ratio",
+      "value": 0.9368
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w0_b18",
+      "note": "[pcc:unverified] B18 k4 N7 -psr; joint/inc counted GAE ratio of totals, w=0; bootstrap [0.9497, 0.9512]; per-replicate uppers [0.952, 0.9515, 0.9518]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9499,
+        0.9511
+      ],
+      "unit": "ratio",
+      "value": 0.9505
+    },
+    {
+      "baseline": 2.8607,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_prefix_joint_over_rho_neg_w0_b18",
+      "note": "[pcc:unverified] B18: S(prefix-joint)/S(rho-neg), w=0; incumbent 2.861; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.4793,
+        2.599
+      ],
+      "unit": "ratio",
+      "value": 2.5385
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w0p1_b18",
+      "note": "[pcc:unverified] B18 k4 N7 -psr; prefix/inc counted GAE ratio of totals, w=0.1; bootstrap [0.9249, 0.9487]; per-replicate uppers [0.9587, 0.9507, 0.9631]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9278,
+        0.946
+      ],
+      "unit": "ratio",
+      "value": 0.9369
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w0p1_b18",
+      "note": "[pcc:unverified] B18 k4 N7 -psr; joint/inc counted GAE ratio of totals, w=0.1; bootstrap [0.9558, 0.9572]; per-replicate uppers [0.9579, 0.9575, 0.9578]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.956,
+        0.9571
+      ],
+      "unit": "ratio",
+      "value": 0.9565
+    },
+    {
+      "baseline": 3.026,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_prefix_joint_over_rho_neg_w0p1_b18",
+      "note": "[pcc:unverified] B18: S(prefix-joint)/S(rho-neg), w=0.1; incumbent 3.026; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.6389,
+        2.7696
+      ],
+      "unit": "ratio",
+      "value": 2.7035
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w1_b18",
+      "note": "[pcc:unverified] B18 k4 N7 -psr; prefix/inc counted GAE ratio of totals, w=1; bootstrap [0.9226, 0.9512]; per-replicate uppers [0.9629, 0.9533, 0.9693]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9261,
+        0.948
+      ],
+      "unit": "ratio",
+      "value": 0.937
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w1_b18",
+      "note": "[pcc:unverified] B18 k4 N7 -psr; joint/inc counted GAE ratio of totals, w=1; bootstrap [0.9789, 0.9797]; per-replicate uppers [0.9801, 0.9799, 0.98]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.979,
+        0.9796
+      ],
+      "unit": "ratio",
+      "value": 0.9793
+    },
+    {
+      "baseline": 3.865,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_prefix_joint_over_rho_neg_w1_b18",
+      "note": "[pcc:unverified] B18: S(prefix-joint)/S(rho-neg), w=1; incumbent 3.865; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.4473,
+        3.6382
+      ],
+      "unit": "ratio",
+      "value": 3.5415
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w0_b21",
+      "note": "[pcc:unverified] B21 k5 N9 -psr; prefix/inc counted GAE ratio of totals, w=0; bootstrap [0.9406, 0.9601]; per-replicate uppers [0.9658, 0.9682, 0.9682]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9428,
+        0.9582
+      ],
+      "unit": "ratio",
+      "value": 0.9505
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w0_b21",
+      "note": "[pcc:unverified] B21 k5 N9 -psr; joint/inc counted GAE ratio of totals, w=0; bootstrap [0.9867, 0.987]; per-replicate uppers [0.9871, 0.9871, 0.9873]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9867,
+        0.987
+      ],
+      "unit": "ratio",
+      "value": 0.9868
+    },
+    {
+      "baseline": 3.8715,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_prefix_joint_over_rho_neg_w0_b21",
+      "note": "[pcc:unverified] B21: S(prefix-joint)/S(rho-neg), w=0; incumbent 3.872; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.5269,
+        3.734
+      ],
+      "unit": "ratio",
+      "value": 3.6289
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w0p1_b21",
+      "note": "[pcc:unverified] B21 k5 N9 -psr; prefix/inc counted GAE ratio of totals, w=0.1; bootstrap [0.9412, 0.9616]; per-replicate uppers [0.9677, 0.9701, 0.9701]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9436,
+        0.9597
+      ],
+      "unit": "ratio",
+      "value": 0.9516
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w0p1_b21",
+      "note": "[pcc:unverified] B21 k5 N9 -psr; joint/inc counted GAE ratio of totals, w=0.1; bootstrap [0.9884, 0.9887]; per-replicate uppers [0.9888, 0.9887, 0.9889]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9884,
+        0.9887
+      ],
+      "unit": "ratio",
+      "value": 0.9885
+    },
+    {
+      "baseline": 4.0882,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_prefix_joint_over_rho_neg_w0p1_b21",
+      "note": "[pcc:unverified] B21: S(prefix-joint)/S(rho-neg), w=0.1; incumbent 4.088; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.7339,
+        3.9565
+      ],
+      "unit": "ratio",
+      "value": 3.8436
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w1_b21",
+      "note": "[pcc:unverified] B21 k5 N9 -psr; prefix/inc counted GAE ratio of totals, w=1; bootstrap [0.9437, 0.9674]; per-replicate uppers [0.9744, 0.9773, 0.9771]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9464,
+        0.9651
+      ],
+      "unit": "ratio",
+      "value": 0.9557
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w1_b21",
+      "note": "[pcc:unverified] B21 k5 N9 -psr; joint/inc counted GAE ratio of totals, w=1; bootstrap [0.9946, 0.9948]; per-replicate uppers [0.9948, 0.9948, 0.9949]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9946,
+        0.9948
+      ],
+      "unit": "ratio",
+      "value": 0.9947
+    },
+    {
+      "baseline": 5.1306,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_prefix_joint_over_rho_neg_w1_b21",
+      "note": "[pcc:unverified] B21: S(prefix-joint)/S(rho-neg), w=1; incumbent 5.131; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.7279,
+        5.029
+      ],
+      "unit": "ratio",
+      "value": 4.8761
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w0_b24",
+      "note": "[pcc:unverified] B24 k5 N9 -psr; prefix/inc counted GAE ratio of totals, w=0; bootstrap [0.9175, 0.9444]; per-replicate uppers [0.9484, 0.9601, 0.9525]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9206,
+        0.9411
+      ],
+      "unit": "ratio",
+      "value": 0.9308
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w0_b24",
+      "note": "[pcc:unverified] B24 k5 N9 -psr; joint/inc counted GAE ratio of totals, w=0; bootstrap [0.9907, 0.9911]; per-replicate uppers [0.9912, 0.9911, 0.9912]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9908,
+        0.991
+      ],
+      "unit": "ratio",
+      "value": 0.9909
+    },
+    {
+      "baseline": 4.4619,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_prefix_joint_over_rho_neg_w0_b24",
+      "note": "[pcc:unverified] B24: S(prefix-joint)/S(rho-neg), w=0; incumbent 4.462; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.9936,
+        4.2351
+      ],
+      "unit": "ratio",
+      "value": 4.1126
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w0p1_b24",
+      "note": "[pcc:unverified] B24 k5 N9 -psr; prefix/inc counted GAE ratio of totals, w=0.1; bootstrap [0.9172, 0.9449]; per-replicate uppers [0.949, 0.9612, 0.9533]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9204,
+        0.9415
+      ],
+      "unit": "ratio",
+      "value": 0.9309
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w0p1_b24",
+      "note": "[pcc:unverified] B24 k5 N9 -psr; joint/inc counted GAE ratio of totals, w=0.1; bootstrap [0.9921, 0.9923]; per-replicate uppers [0.9925, 0.9923, 0.9925]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9921,
+        0.9923
+      ],
+      "unit": "ratio",
+      "value": 0.9922
+    },
+    {
+      "baseline": 4.7692,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_prefix_joint_over_rho_neg_w0p1_b24",
+      "note": "[pcc:unverified] B24: S(prefix-joint)/S(rho-neg), w=0.1; incumbent 4.769; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.2736,
+        4.5354
+      ],
+      "unit": "ratio",
+      "value": 4.4025
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w1_b24",
+      "note": "[pcc:unverified] B24 k5 N9 -psr; prefix/inc counted GAE ratio of totals, w=1; bootstrap [0.9163, 0.9467]; per-replicate uppers [0.9511, 0.9648, 0.956]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9198,
+        0.943
+      ],
+      "unit": "ratio",
+      "value": 0.9314
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w1_b24",
+      "note": "[pcc:unverified] B24 k5 N9 -psr; joint/inc counted GAE ratio of totals, w=1; bootstrap [0.9965, 0.9966]; per-replicate uppers [0.9967, 0.9966, 0.9967]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9965,
+        0.9966
+      ],
+      "unit": "ratio",
+      "value": 0.9966
+    },
+    {
+      "baseline": 6.224,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_prefix_joint_over_rho_neg_w1_b24",
+      "note": "[pcc:unverified] B24: S(prefix-joint)/S(rho-neg), w=1; incumbent 6.224; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        5.5976,
+        5.9589
+      ],
+      "unit": "ratio",
+      "value": 5.7754
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w0_b27",
+      "note": "[pcc:unverified] B27 k5 N12 -psr; prefix/inc counted GAE ratio of totals, w=0; bootstrap [0.9735, 0.9864]; per-replicate uppers [0.9979, 0.9894, 0.9855]; registered test fails",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9751,
+        0.985
+      ],
+      "unit": "ratio",
+      "value": 0.98
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w0_b27",
+      "note": "[pcc:unverified] B27 k5 N12 -psr; joint/inc counted GAE ratio of totals, w=0; bootstrap [0.9967, 0.9967]; per-replicate uppers [0.9968, 0.9968, 0.9968]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9967,
+        0.9967
+      ],
+      "unit": "ratio",
+      "value": 0.9967
+    },
+    {
+      "baseline": 5.0094,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_joint_over_rho_neg_w0_b27",
+      "note": "[pcc:unverified] B27: S(joint)/S(rho-neg), w=0; incumbent 5.009; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.8613,
+        5.1281
+      ],
+      "unit": "ratio",
+      "value": 4.9929
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w0p1_b27",
+      "note": "[pcc:unverified] B27 k5 N12 -psr; prefix/inc counted GAE ratio of totals, w=0.1; bootstrap [0.9743, 0.9879]; per-replicate uppers [1.0, 0.991, 0.9869]; registered test fails",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9761,
+        0.9864
+      ],
+      "unit": "ratio",
+      "value": 0.9812
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w0p1_b27",
+      "note": "[pcc:unverified] B27 k5 N12 -psr; joint/inc counted GAE ratio of totals, w=0.1; bootstrap [0.9971, 0.9972]; per-replicate uppers [0.9972, 0.9972, 0.9972]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9971,
+        0.9972
+      ],
+      "unit": "ratio",
+      "value": 0.9971
+    },
+    {
+      "baseline": 5.2429,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_joint_over_rho_neg_w0p1_b27",
+      "note": "[pcc:unverified] B27: S(joint)/S(rho-neg), w=0.1; incumbent 5.243; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        5.0888,
+        5.3706
+      ],
+      "unit": "ratio",
+      "value": 5.2278
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_prefix_over_inc_w1_b27",
+      "note": "[pcc:unverified] B27 k5 N12 -psr; prefix/inc counted GAE ratio of totals, w=1; bootstrap [0.9775, 0.9935]; per-replicate uppers [1.0077, 0.9971, 0.9924]; registered test fails",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9796,
+        0.9917
+      ],
+      "unit": "ratio",
+      "value": 0.9856
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 1152,
+      "name": "ratio_joint_over_inc_w1_b27",
+      "note": "[pcc:unverified] B27 k5 N12 -psr; joint/inc counted GAE ratio of totals, w=1; bootstrap [0.9986, 0.9987]; per-replicate uppers [0.9987, 0.9987, 0.9987]; registered test holds",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9986,
+        0.9987
+      ],
+      "unit": "ratio",
+      "value": 0.9987
+    },
+    {
+      "baseline": 6.3344,
+      "better": "lower",
+      "n": 1152,
+      "name": "gap_joint_over_rho_neg_w1_b27",
+      "note": "[pcc:unverified] B27: S(joint)/S(rho-neg), w=1; incumbent 6.334; distance remaining, not a gate",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        6.1508,
+        6.5058
+      ],
+      "unit": "ratio",
+      "value": 6.3258
+    }
+  ],
+  "problem": "ic:ksum_prefix_joint_tableb",
+  "raw": [
+    {
+      "bytes": 40701045,
+      "path": "/tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/kp-confirm-sessions.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5c/5cb867b808e0df1734f61f095f8d3747d977de523272e6279c8cd09e33ff10dd",
+      "sha256": "5cb867b808e0df1734f61f095f8d3747d977de523272e6279c8cd09e33ff10dd",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_ksum_prefix_joint_20261118/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/ic_ksum_prefix_joint_20261118/ratios.svg",
+      "research/ic_ksum_prefix_joint_20261118/gap.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ksum-prefix-joint-tableb",
+  "status": "measured",
+  "summary": "[pcc:unverified] k-sum -psr arm, Table B 8 rows x 3 replicates (1,152 pairs a row): L2 stride-renew-joint (Shamir set-up) holds on 8/8, joint/inc 0.938-0.997 at w=0, runs identical but for the set-up; L1 prefix=1 holds on 5/8 (P20,B15,B18,B21,B24), 0.931-0.959 at w=0; both 0.887-0.977. Gap to rho-neg (w=0) 2.76-5.01 -> 2.48-4.99. 24/24 verify OK. Raw kp-confirm-sessions.tar.gz in scratchpad, no S3.",
+  "validation": null
+}
