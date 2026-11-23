@@ -35,6 +35,14 @@ failures. The best permitted `S` is `n`; smaller pools increase this count.
 At `S=n`, this is approximately `sqrt(2n(B+1))` group additions, versus
 `sqrt(pi*n/2)` expected generic collision steps for the same subgroup.
 
+The pair count deliberately overcredits rank. For a realized one-LP stream
+with `E` retained partials and `U` occupied LP columns, the large-prime
+coefficient block has rank exactly `U` when every coefficient is nonzero:
+its left kernel has dimension `E-U`. Therefore **at most `E-U`** independent
+LP-free combinations can reach the factor-base matrix, even if one occupied
+LP has many collision pairs. The actual factor-base rank can be lower still.
+This exact rank bound is the first check for any native stream.
+
 `generic_lp_gate.py` computes the discrete collision target and this
 optimistic cost for `B=1,16,64,256,1024` and `S=n,n/16,n/256`. The gate
 rejects **this producer** if even the optimistic source work exceeds a
