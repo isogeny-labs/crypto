@@ -76,6 +76,7 @@ pub mod pkm_semaev;
 pub mod planner;
 pub mod plugins;
 pub mod prime_tower;
+pub mod prime_tower_wide;
 pub mod recursive_adapter;
 pub mod registry;
 pub mod residual;

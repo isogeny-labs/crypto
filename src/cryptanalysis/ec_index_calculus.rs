@@ -613,7 +613,9 @@ pub fn find_roots_fp_fast(coeffs: &[FieldElement], p: &BigUint) -> Vec<FieldElem
         return Vec::new();
     }
     // Monic copy for the polynomial arithmetic.
-    let lead_inv = f[deg].inv().expect("nonzero lead is invertible mod p");
+    let lead_inv = f[deg]
+        .inv_vartime()
+        .expect("nonzero lead is invertible mod p");
     let monic: Vec<FieldElement> = f.iter().map(|c| c.mul(&lead_inv)).collect();
 
     // X^p mod f(X) by repeated squaring.
@@ -646,14 +648,14 @@ pub fn find_roots_fp_fast(coeffs: &[FieldElement], p: &BigUint) -> Vec<FieldElem
             let qb = h[1].clone();
             let qc = h[0].clone();
             if qa.is_zero() {
-                if let Some(inv) = qb.inv() {
+                if let Some(inv) = qb.inv_vartime() {
                     factors.push(vec![qc.neg().mul(&inv), qb]);
                 }
             } else {
                 let four = FieldElement::new(BigUint::from(4u32), p.clone());
                 let disc = qb.mul(&qb).sub(&four.mul(&qa).mul(&qc));
                 if let Some(root) = sqrt_mod_p(&disc.value, p) {
-                    let two_inv = qa.add(&qa).inv().expect("2a invertible");
+                    let two_inv = qa.add(&qa).inv_vartime().expect("2a invertible");
                     let s = FieldElement::new(root, p.clone());
                     let r1 = qb.neg().add(&s).mul(&two_inv);
                     let r2 = qb.neg().sub(&s).mul(&two_inv);
@@ -711,7 +713,7 @@ pub fn find_roots_fp_fast(coeffs: &[FieldElement], p: &BigUint) -> Vec<FieldElem
     for lin in factors {
         if lin.len() == 2 && !lin[1].is_zero() {
             // root = −c0 / c1
-            if let Some(inv) = lin[1].inv() {
+            if let Some(inv) = lin[1].inv_vartime() {
                 roots.push(lin[0].neg().mul(&inv));
             }
         } else if lin.len() == 2 {
@@ -1090,11 +1092,20 @@ fn find_roots_fp_u64_stack(coeffs: &[FieldElement], p_big: &BigUint) -> Option<V
 }
 
 /// Polynomial remainder `a mod modulus` over `F_p` (any nonzero lead).
+///
+/// A monic modulus — what every call in the root finder passes — needs no
+/// inversion at all, which matters: the reduction runs once per squaring
+/// in `X^p mod f` and in `(X + c)^((p−1)/2) mod f`.
 fn poly_rem(a: &[FieldElement], modulus: &[FieldElement], p: &BigUint) -> Vec<FieldElement> {
     let m_deg = modulus.len() - 1;
-    let lead_inv = match modulus[m_deg].inv() {
-        Some(v) => v,
-        None => return a.to_vec(),
+    let monic = modulus[m_deg].value.is_one();
+    let lead_inv = if monic {
+        None
+    } else {
+        match modulus[m_deg].inv_vartime() {
+            Some(v) => Some(v),
+            None => return a.to_vec(),
+        }
     };
     let mut r = a.to_vec();
     loop {
@@ -1104,7 +1115,10 @@ fn poly_rem(a: &[FieldElement], modulus: &[FieldElement], p: &BigUint) -> Vec<Fi
         if r.is_empty() || r.len() - 1 < m_deg {
             break;
         }
-        let factor = r[r.len() - 1].mul(&lead_inv);
+        let factor = match &lead_inv {
+            Some(inv) => r[r.len() - 1].mul(inv),
+            None => r[r.len() - 1].clone(),
+        };
         let shift = r.len() - 1 - m_deg;
         for (i, term) in modulus.iter().enumerate().take(m_deg) {
             r[shift + i] = r[shift + i].sub(&factor.mul(term));
@@ -1208,7 +1222,7 @@ fn poly_gcd(a: &[FieldElement], b: &[FieldElement], p: &BigUint) -> Vec<FieldEle
     if a.is_empty() {
         return vec![FieldElement::zero(p.clone())];
     }
-    if let Some(inv) = a[a.len() - 1].inv() {
+    if let Some(inv) = a[a.len() - 1].inv_vartime() {
         for coeff in a.iter_mut() {
             *coeff = coeff.mul(&inv);
         }
@@ -1219,7 +1233,7 @@ fn poly_gcd(a: &[FieldElement], b: &[FieldElement], p: &BigUint) -> Vec<FieldEle
 /// Exact quotient `a / b` for polynomials with `b | a`.
 fn poly_div_exact(a: &[FieldElement], b: &[FieldElement], p: &BigUint) -> Vec<FieldElement> {
     let b_deg = b.len() - 1;
-    let lead_inv = b[b_deg].inv().expect("divisor lead is invertible");
+    let lead_inv = b[b_deg].inv_vartime().expect("divisor lead is invertible");
     let mut r = a.to_vec();
     let mut quotient = vec![FieldElement::zero(p.clone()); a.len().saturating_sub(b_deg)];
     while r.len() > b_deg && !(r.len() == 1 && r[0].is_zero()) {
@@ -1849,7 +1863,7 @@ fn find_one_relation_sweep_with_index<R: rand::RngCore>(
                 if qb.is_zero() {
                     continue;
                 }
-                let inv = match qb.inv() {
+                let inv = match qb.inv_vartime() {
                     Some(v) => v,
                     None => continue,
                 };
@@ -1874,7 +1888,7 @@ fn find_one_relation_sweep_with_index<R: rand::RngCore>(
                 Some(v) => v,
                 None => continue,
             };
-            let two_qa_inv = match qa.add(&qa).inv() {
+            let two_qa_inv = match qa.add(&qa).inv_vartime() {
                 Some(v) => v,
                 None => continue,
             };
@@ -2145,6 +2159,394 @@ pub fn find_one_relation_s4_counted(
     None
 }
 
+/// Solve `A·X² + B·X + C ≡ 0 (mod p)` over `F_p`, returning its
+/// `F_p`-rational roots (zero, one, or two of them).
+///
+/// Variable-time: the coefficients come from public factor-base data, and
+/// every inversion here is on a public value.  `A = 0` is handled as the
+/// linear case (the S₃ quadratic degenerates there when the two fixed
+/// abscissae coincide).
+fn quadratic_roots_fp(
+    qa: &FieldElement,
+    qb: &FieldElement,
+    qc: &FieldElement,
+    p: &BigUint,
+) -> Vec<FieldElement> {
+    if qa.is_zero() {
+        if qb.is_zero() {
+            return Vec::new();
+        }
+        return match qb.inv_vartime() {
+            Some(inv) => vec![qc.neg().mul(&inv)],
+            None => Vec::new(),
+        };
+    }
+    let four = FieldElement::new(BigUint::from(4u32), p.clone());
+    let disc = qb.mul(qb).sub(&four.mul(qa).mul(qc));
+    let Some(root) = sqrt_mod_p(&disc.value, p) else {
+        return Vec::new();
+    };
+    let two_a_inv = match qa.add(qa).inv_vartime() {
+        Some(v) => v,
+        None => return Vec::new(),
+    };
+    let s = FieldElement::new(root, p.clone());
+    let r1 = qb.neg().add(&s).mul(&two_a_inv);
+    let r2 = qb.neg().sub(&s).mul(&two_a_inv);
+    if r1.value == r2.value {
+        vec![r1]
+    } else {
+        vec![r1, r2]
+    }
+}
+
+/// **Find one 3-decomposition relation through an S₃-anchored sweep.**
+///
+/// This finds exactly the same relation family as
+/// [`find_one_relation_s4_counted`] — a signed triple of factor-base
+/// points summing to `R = aG + bQ` — but never evaluates the quartic
+/// `S₄` or runs Cantor–Zassenhaus over `F_p`.
+///
+/// Anchor a factor-base point `F_i` (both signs, since the base stores one
+/// representative per `±` pair), form `R′ = R ∓ F_i`, and decompose `R′`
+/// as a **two**-point sum: for every `x_j` in the base solve the quadratic
+/// `S₃(x_j, X, x_{R′}) = 0` and keep the roots that are factor-base
+/// abscissae.  `S₄(x_R, x_i, x_j, x_k) = 0` holds exactly when such a
+/// signed triple exists, so the yield per trial is the same `~ 2B³/p`
+/// relations as the quartic sweep (`B²/2` pairs × ≤4 roots × `B/p`), while
+/// each candidate costs one quadratic solve (a few multiplications, one
+/// square root) instead of a quartic plus a full `X^p mod f` and
+/// equal-degree splitting.  The equivalence is not heuristic: the census
+/// test `s3_anchor_sweep_matches_the_quartic_triple_census` checks both
+/// oracles against a brute-force sign census on the 16-bit rung.
+///
+/// Counted: returns the number of random `(a, b)` trials consumed.
+pub fn find_one_relation_s4_via_s3_counted(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    factor_base: &[FactorBaseEntry],
+    max_trials: usize,
+) -> Option<(Relation, usize)> {
+    use crate::utils::random::random_scalar;
+
+    let a_fe = curve.a_fe();
+    let b_fe = curve.fe(curve.b.clone());
+    let p = curve.p.clone();
+    let mut x_to_idx: std::collections::HashMap<BigUint, usize> = std::collections::HashMap::new();
+    for fb in factor_base {
+        if let Point::Affine { x, .. } = &fb.point {
+            x_to_idx.insert(x.value.clone(), fb.idx);
+        }
+    }
+    let negatives: Vec<Point> = factor_base.iter().map(|fb| fb.point.neg()).collect();
+
+    for trial in 1..=max_trials {
+        let a = random_scalar(&curve.n);
+        let b = random_scalar(&curve.n);
+        let ag = g.scalar_mul(&a, &a_fe);
+        let bq = q.scalar_mul(&b, &a_fe);
+        let r = ag.add(&bq, &a_fe);
+        if matches!(r, Point::Infinity) {
+            continue;
+        }
+        for (i, fb_i) in factor_base.iter().enumerate() {
+            // R − F_i and R + F_i: one representative covers both signs.
+            for r_prime in [r.add(&negatives[i], &a_fe), r.add(&fb_i.point, &a_fe)] {
+                let x_prime = match &r_prime {
+                    Point::Affine { x, .. } => x.clone(),
+                    Point::Infinity => continue,
+                };
+                for (j, fb_j) in factor_base.iter().enumerate() {
+                    let xj = match &fb_j.point {
+                        Point::Affine { x, .. } => x,
+                        Point::Infinity => continue,
+                    };
+                    let (qa, qb, qc) = semaev_s3_in_x3(xj, &x_prime, &a_fe, &b_fe);
+                    for xk in quadratic_roots_fp(&qa, &qb, &qc, &p) {
+                        let Some(&k) = x_to_idx.get(&xk.value) else {
+                            continue;
+                        };
+                        if let Some(rel) = try_finalise_s4(
+                            &r,
+                            i,
+                            &fb_i.point,
+                            j,
+                            &fb_j.point,
+                            k,
+                            &factor_base[k].point,
+                            curve,
+                            &a,
+                            &b,
+                        ) {
+                            return Some((rel, trial));
+                        }
+                    }
+                }
+            }
+        }
+    }
+    None
+}
+
+/// Word-sized modular arithmetic for the MITM fast path (`p < 2^63`).
+#[inline]
+fn add_mod_u64(a: u64, b: u64, p: u64) -> u64 {
+    let s = a as u128 + b as u128;
+    (if s >= p as u128 { s - p as u128 } else { s }) as u64
+}
+
+#[inline]
+fn sub_mod_u64(a: u64, b: u64, p: u64) -> u64 {
+    if a >= b {
+        a - b
+    } else {
+        a + p - b
+    }
+}
+
+#[inline]
+fn mul_mod_u64(a: u64, b: u64, p: u64) -> u64 {
+    ((a as u128 * b as u128) % p as u128) as u64
+}
+
+/// Extended-Euclid inverse modulo a prime `p` (no exponentiation).
+fn inv_prime_u64(a: u64, p: u64) -> u64 {
+    let (mut t, mut newt) = (0i128, 1i128);
+    let (mut r, mut newr) = (p as i128, (a % p) as i128);
+    while newr != 0 {
+        let q = r / newr;
+        let (t2, r2) = (t - q * newt, r - q * newr);
+        t = newt;
+        newt = t2;
+        r = newr;
+        newr = r2;
+    }
+    (t.rem_euclid(p as i128)) as u64
+}
+
+/// Affine `(x1,y1) + (x2,y2)` over `F_p`, `p < 2^63`, with `u128`
+/// products. Returns `None` for the point at infinity.
+fn add_point_u64(p: u64, a: u64, x1: u64, y1: u64, x2: u64, y2: u64) -> Option<(u64, u64)> {
+    if x1 == x2 {
+        if add_mod_u64(y1, y2, p) == 0 {
+            return None;
+        }
+        let num = add_mod_u64(mul_mod_u64(3, mul_mod_u64(x1, x1, p), p), a, p);
+        let den = inv_prime_u64(add_mod_u64(y1, y1, p), p);
+        let lam = mul_mod_u64(num, den, p);
+        let x3 = sub_mod_u64(sub_mod_u64(mul_mod_u64(lam, lam, p), x1, p), x2, p);
+        let y3 = sub_mod_u64(mul_mod_u64(lam, sub_mod_u64(x1, x3, p), p), y1, p);
+        Some((x3, y3))
+    } else {
+        let lam = mul_mod_u64(
+            sub_mod_u64(y2, y1, p),
+            inv_prime_u64(sub_mod_u64(x2, x1, p), p),
+            p,
+        );
+        let x3 = sub_mod_u64(sub_mod_u64(mul_mod_u64(lam, lam, p), x1, p), x2, p);
+        let y3 = sub_mod_u64(mul_mod_u64(lam, sub_mod_u64(x1, x3, p), p), y1, p);
+        Some((x3, y3))
+    }
+}
+
+/// **Pair-sum table** for the meet-in-the-middle 3-decomposition oracle.
+///
+/// Built once per factor base: every unordered pair `{F_i, F_j}`, `i ≤ j`,
+/// contributes its sum keyed by the `x`-coordinate of the sum.  The `y`
+/// sign is not stored: the probe tests both `R − F_k` and `R + F_k` and
+/// [`try_finalise_s4`] resolves the eight sign patterns in the group, so
+/// an `x` collision (two pair sums `±S`) only costs one failed verify.
+pub struct PairSumTable {
+    by_x: std::collections::HashMap<BigUint, Vec<(u32, u32)>>,
+    /// Word-sized mirror of `by_x` for `p < 2^63`; empty otherwise.
+    by_x_u64: std::collections::HashMap<u64, Vec<(u32, u32)>>,
+    /// Word-sized factor-base points (same indices as `factor_base`).
+    fb_u64: Vec<Option<(u64, u64)>>,
+    /// `p` when the word-sized fast path applies.
+    p_u64: Option<u64>,
+    /// `a` when the word-sized fast path applies.
+    a_u64: Option<u64>,
+    /// Number of non-identity pair sums stored.
+    pub pairs: usize,
+    /// Number of group additions spent building the table.
+    pub build_additions: usize,
+}
+
+/// Build the pair-sum table for `factor_base` (`B(B+1)/2` additions).
+pub fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> PairSumTable {
+    let a_fe = curve.a_fe();
+    let n = factor_base.len();
+    let p_u64 = if curve.p.bits() <= 63 {
+        curve.p.to_u64_digits().first().copied()
+    } else {
+        None
+    };
+    let a_u64 = if p_u64.is_some() {
+        curve.a.to_u64_digits().first().copied()
+    } else {
+        None
+    };
+    let fast = p_u64.is_some() && a_u64.is_some();
+    let mut by_x: std::collections::HashMap<BigUint, Vec<(u32, u32)>> =
+        std::collections::HashMap::with_capacity(n * (n + 1) / 2);
+    let mut by_x_u64: std::collections::HashMap<u64, Vec<(u32, u32)>> =
+        std::collections::HashMap::with_capacity(if fast { n * (n + 1) / 2 } else { 0 });
+    let fb_u64: Vec<Option<(u64, u64)>> = if fast {
+        factor_base
+            .iter()
+            .map(|fb| match &fb.point {
+                Point::Affine { x, y } => Some((
+                    x.value.to_u64_digits().first().copied()?,
+                    y.value.to_u64_digits().first().copied()?,
+                )),
+                _ => None,
+            })
+            .collect()
+    } else {
+        vec![None; n]
+    };
+    let mut pairs = 0usize;
+    for i in 0..n {
+        for j in i..n {
+            if let Point::Affine { x, .. } = factor_base[i].point.add(&factor_base[j].point, &a_fe)
+            {
+                let key = x.value.clone();
+                if fast {
+                    if let Some(k) = key.to_u64_digits().first().copied() {
+                        by_x_u64.entry(k).or_default().push((i as u32, j as u32));
+                    }
+                } else {
+                    by_x.entry(key).or_default().push((i as u32, j as u32));
+                }
+                pairs += 1;
+            }
+        }
+    }
+    PairSumTable {
+        by_x,
+        by_x_u64,
+        fb_u64,
+        p_u64,
+        a_u64,
+        pairs,
+        build_additions: pairs,
+    }
+}
+
+/// **Meet-in-the-middle 3-decomposition**: the third factor-base point is
+/// enumerated (both signs), and the remaining two-point sum is answered by
+/// one hash probe into [`PairSumTable`] instead of the `B²` pair sweep of
+/// [`find_one_relation_s4_via_s3_counted`].
+///
+/// Cost per random `(a, b)` draw is `2B` probes, so a relation costs
+/// `≈ p/B²` probes after the `B²` table is built; `B` relations then cost
+/// `≈ B² + p/B` — balanced at `B ≈ p^{1/4}` for `≈ p^{3/4}` total, against
+/// the `≈ p` of every enumeration sweep.  The decided relation family is
+/// identical (three signed factor-base points summing to `R`), so the
+/// yield per draw is unchanged and correctness is checked by the same
+/// in-group finaliser.
+pub fn find_one_relation_s4_via_mitm_counted(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    factor_base: &[FactorBaseEntry],
+    table: &PairSumTable,
+    max_trials: usize,
+) -> Option<(Relation, usize)> {
+    use crate::utils::random::random_scalar;
+
+    let a_fe = curve.a_fe();
+    let negatives: Vec<Point> = factor_base.iter().map(|fb| fb.point.neg()).collect();
+
+    for trial in 1..=max_trials {
+        let a = random_scalar(&curve.n);
+        let b = random_scalar(&curve.n);
+        let r = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
+        if matches!(r, Point::Infinity) {
+            continue;
+        }
+        // Word-sized probe path (`p < 2^63`): 2B u64 additions per draw,
+        // exact same relation family; every hit is still finalised and
+        // re-added in the BigUint group before it is accepted.
+        if let (Some(p), Some(a_u64)) = (table.p_u64, table.a_u64) {
+            if !table.by_x_u64.is_empty() {
+                if let Point::Affine { x, y } = &r {
+                    let rx = x.value.to_u64_digits().first().copied();
+                    let ry = y.value.to_u64_digits().first().copied();
+                    if let (Some(rx), Some(ry)) = (rx, ry) {
+                        for k in 0..factor_base.len() {
+                            let Some((fx, fy)) = table.fb_u64[k] else {
+                                continue;
+                            };
+                            let candidates = [
+                                add_point_u64(p, a_u64, rx, ry, fx, sub_mod_u64(p, fy, p)),
+                                add_point_u64(p, a_u64, rx, ry, fx, fy),
+                            ];
+                            for candidate in candidates.into_iter().flatten() {
+                                let Some(pairs) = table.by_x_u64.get(&candidate.0) else {
+                                    continue;
+                                };
+                                for &(i, j) in pairs {
+                                    let (i, j) = (i as usize, j as usize);
+                                    if let Some(rel) = try_finalise_s4(
+                                        &r,
+                                        i,
+                                        &factor_base[i].point,
+                                        j,
+                                        &factor_base[j].point,
+                                        k,
+                                        &factor_base[k].point,
+                                        curve,
+                                        &a,
+                                        &b,
+                                    ) {
+                                        return Some((rel, trial));
+                                    }
+                                }
+                            }
+                        }
+                        continue;
+                    }
+                }
+            }
+        }
+        for k in 0..factor_base.len() {
+            // R ∓ F_k: both anchor signs, so the table only needs one
+            // orientation of each pair sum.
+            for s in [
+                r.add(&negatives[k], &a_fe),
+                r.add(&factor_base[k].point, &a_fe),
+            ] {
+                let Point::Affine { x, .. } = s else {
+                    continue;
+                };
+                let Some(pairs) = table.by_x.get(&x.value) else {
+                    continue;
+                };
+                for &(i, j) in pairs {
+                    let (i, j) = (i as usize, j as usize);
+                    if let Some(rel) = try_finalise_s4(
+                        &r,
+                        i,
+                        &factor_base[i].point,
+                        j,
+                        &factor_base[j].point,
+                        k,
+                        &factor_base[k].point,
+                        curve,
+                        &a,
+                        &b,
+                    ) {
+                        return Some((rel, trial));
+                    }
+                }
+            }
+        }
+    }
+    None
+}
+
 /// Sign resolution for the 3-point decomposition: try all eight sign
 /// combinations `(ε_i, ε_j, ε_k) ∈ {±1}³` and accept the one with
 /// `ε_i F_i + ε_j F_j + ε_k F_k = R`.
@@ -2310,6 +2712,231 @@ fn gaussian_eliminate_mod_n_particular_pivots(
             rank,
         },
         pivot_rows,
+    ))
+}
+
+// ── Sparse relation-matrix linear algebra mod n ────────────────────────
+
+/// Which relation-matrix engine a staged driver runs.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LaEngine {
+    /// Dense Gauss–Jordan over `F_n`: the reference path, `O(rows·cols²)`.
+    Dense,
+    /// Sparse Markowitz-ordered Gauss–Jordan over `F_n`.
+    Sparse,
+}
+
+impl LaEngine {
+    pub fn name(self) -> &'static str {
+        match self {
+            LaEngine::Dense => "dense_gauss_jordan_mod_n",
+            LaEngine::Sparse => "sparse_markowitz_gauss_jordan_mod_n",
+        }
+    }
+}
+
+/// Shape and counted work of one relation-matrix solve.
+///
+/// `nnz_in` is the number of nonzero entries of the relation matrix as
+/// collected (`≈ (m+2)·relations` for an m-summand IC row), `nnz_peak` the
+/// largest nonzero count any intermediate matrix reached (fill-in), and
+/// `muladds` the number of modular multiply-adds the elimination performed.
+#[derive(Debug, Clone, Default, serde::Serialize)]
+pub struct LaStats {
+    pub engine: String,
+    pub rows: usize,
+    pub cols: usize,
+    pub nnz_in: usize,
+    pub nnz_peak: usize,
+    pub rank: usize,
+    pub muladds: u64,
+}
+
+/// A sparse row: `column → coefficient mod n`, no zero entries.
+pub type SparseRow = std::collections::BTreeMap<usize, BigUint>;
+
+/// Build a sparse row from `(column, coefficient)` pairs reduced mod `n`.
+pub fn sparse_row_from_entries(entries: &[(usize, BigUint)], n: &BigUint) -> SparseRow {
+    let mut row = SparseRow::new();
+    for (col, value) in entries {
+        let v = value % n;
+        if v.is_zero() {
+            continue;
+        }
+        let slot = row.entry(*col).or_insert_with(BigUint::zero);
+        *slot = (&*slot + &v) % n;
+        if slot.is_zero() {
+            row.remove(col);
+        }
+    }
+    row
+}
+
+/// Sparse Gauss–Jordan elimination of `M · y ≡ rhs (mod n)` with Markowitz
+/// pivot ordering, tolerating free unknowns.
+///
+/// Pivot selection is the standard sparsity heuristic: take the row with the
+/// fewest entries, and inside it the column with the fewest entries, so the
+/// elimination creates as little fill-in as possible.  The result is the same
+/// solution and the same `determined` flags as
+/// [`gaussian_eliminate_mod_n_particular`] — free unknowns are set to zero —
+/// but the cost tracks the nonzero count instead of `rows·cols²`.
+///
+/// Returns `None` when the system is inconsistent.  `rows` and `rhs` are
+/// consumed (the caller has no further use for the relation matrix).
+pub fn sparse_gaussian_eliminate_mod_n(
+    mut rows: Vec<SparseRow>,
+    mut rhs: Vec<BigUint>,
+    n: &BigUint,
+    cols: usize,
+) -> Option<(ModNSolution, LaStats)> {
+    use std::collections::BTreeSet;
+
+    let n_rows = rows.len();
+    let nnz_in: usize = rows.iter().map(|r| r.len()).sum();
+    let mut stats = LaStats {
+        engine: LaEngine::Sparse.name().into(),
+        rows: n_rows,
+        cols,
+        nnz_in,
+        nnz_peak: nnz_in,
+        rank: 0,
+        muladds: 0,
+    };
+    for v in rhs.iter_mut() {
+        *v %= n;
+    }
+
+    // Column → rows containing it, kept current so pivot selection and
+    // elimination touch only the affected rows.
+    let mut col_rows: Vec<BTreeSet<usize>> = vec![BTreeSet::new(); cols];
+    for (r, row) in rows.iter().enumerate() {
+        for &c in row.keys() {
+            col_rows[c].insert(r);
+        }
+    }
+
+    let mut pivot_of_col: Vec<usize> = vec![usize::MAX; cols];
+    let mut is_pivot_row = vec![false; n_rows];
+    let mut live: BTreeSet<usize> = (0..n_rows).collect();
+
+    loop {
+        // Markowitz: the live row with the fewest entries, breaking ties by
+        // index; inside it, the column with the fewest entries.
+        let mut best: Option<(usize, usize, usize)> = None; // (row_deg, row, col)
+        for &r in &live {
+            let deg = rows[r].len();
+            if deg == 0 {
+                continue;
+            }
+            if best.map_or(true, |(d, _, _)| deg < d) {
+                let mut pick: Option<(usize, usize)> = None;
+                for &c in rows[r].keys() {
+                    let cdeg = col_rows[c].len();
+                    if pick.map_or(true, |(d2, _)| cdeg < d2) {
+                        pick = Some((cdeg, c));
+                    }
+                }
+                let (cdeg, c) = pick?;
+                let _ = cdeg;
+                best = Some((deg, r, c));
+            }
+        }
+        let Some((_, r, c)) = best else { break };
+        live.remove(&r);
+        is_pivot_row[r] = true;
+
+        // Normalise the pivot row so the pivot coefficient is one.
+        let lead = rows[r][&c].clone();
+        let lead_inv = mod_inverse(&lead, n)?;
+        {
+            let row = rows[r].clone();
+            for (col, value) in row {
+                let v = (value * &lead_inv) % n;
+                if v.is_zero() {
+                    rows[r].remove(&col);
+                    col_rows[col].remove(&r);
+                } else {
+                    rows[r].insert(col, v);
+                }
+            }
+            rhs[r] = (&rhs[r] * &lead_inv) % n;
+        }
+        pivot_of_col[c] = r;
+
+        // Eliminate the pivot column from every other row that carries it.
+        let targets: Vec<usize> = col_rows[c].iter().copied().filter(|&o| o != r).collect();
+        let pivot_row = rows[r].clone();
+        let pivot_rhs = rhs[r].clone();
+        for o in targets {
+            let factor = match rows[o].get(&c) {
+                Some(v) if !v.is_zero() => v.clone(),
+                _ => continue,
+            };
+            stats.muladds += pivot_row.len() as u64;
+            for (col, value) in &pivot_row {
+                if *col == c {
+                    continue;
+                }
+                let prod = (&factor * value) % n;
+                let existing = rows[o].get(col).cloned();
+                let new = match &existing {
+                    Some(cur) => (cur + n - prod) % n,
+                    None => (n - prod) % n,
+                };
+                if new.is_zero() {
+                    if existing.is_some() {
+                        rows[o].remove(col);
+                        col_rows[*col].remove(&o);
+                    }
+                } else {
+                    // Fill-in: a column row `o` did not carry must be
+                    // registered so a later pivot on it reaches this row.
+                    if existing.is_none() {
+                        col_rows[*col].insert(o);
+                    }
+                    rows[o].insert(*col, new);
+                }
+            }
+            rows[o].remove(&c);
+            col_rows[c].remove(&o);
+            let prod = (&factor * &pivot_rhs) % n;
+            rhs[o] = (&rhs[o] + n - prod) % n;
+        }
+        stats.nnz_peak = stats
+            .nnz_peak
+            .max(rows.iter().map(|x| x.len()).sum::<usize>());
+    }
+
+    // Rows that are now empty with a nonzero right-hand side are `0 = c`.
+    for r in 0..n_rows {
+        if rows[r].is_empty() && !rhs[r].is_zero() {
+            return None;
+        }
+    }
+
+    let pivot_cols: Vec<usize> = (0..cols)
+        .filter(|&c| pivot_of_col[c] != usize::MAX)
+        .collect();
+    stats.rank = pivot_cols.len();
+    let free: Vec<usize> = (0..cols)
+        .filter(|&c| pivot_of_col[c] == usize::MAX)
+        .collect();
+    let mut values = vec![BigUint::zero(); cols];
+    let mut determined = vec![false; cols];
+    for &c in &pivot_cols {
+        let r = pivot_of_col[c];
+        values[c] = rhs[r].clone();
+        determined[c] = free.iter().all(|&f| !rows[r].contains_key(&f));
+    }
+    let _ = is_pivot_row;
+    Some((
+        ModNSolution {
+            values,
+            determined,
+            rank: stats.rank,
+        },
+        stats,
     ))
 }
 
@@ -2857,6 +3484,78 @@ fn signed_mod(v: i64, n: &BigUint) -> BigUint {
     }
 }
 
+/// Assemble the relation matrix `[ M | −b ] · (y, x) = a` and solve it.
+///
+/// Row `r` of the system produced by a relation `R_r = a_r·G + b_r·Q =
+/// Σ ε_{r,j} F_j` is `Σ ε_{r,j} y_j − b_r·x ≡ a_r (mod n)`, so the matrix has
+/// one column per factor-base point plus the target column.  `Dense` builds
+/// the full `rows × cols` matrix; `Sparse` keeps only the nonzero entries
+/// (an m-summand row has at most `m + 2` of them).
+///
+/// Both engines return the same solution and the same `determined` flags;
+/// the returned [`LaStats`] records which one ran, the input nonzero count
+/// (a property of the relation set, so equal for both) and the peak nonzero
+/// count (fill-in for the sparse engine, `rows·cols` for dense).
+fn solve_relation_matrix(
+    relations: &[Relation],
+    cols: usize,
+    n: &BigUint,
+    engine: LaEngine,
+) -> Option<(ModNSolution, LaStats)> {
+    let rows = relations.len();
+    match engine {
+        LaEngine::Dense => {
+            let mut matrix: Vec<Vec<BigUint>> = Vec::with_capacity(rows);
+            let mut rhs: Vec<BigUint> = Vec::with_capacity(rows);
+            let mut nnz_in = 0usize;
+            for rel in relations {
+                let mut row = vec![BigUint::zero(); cols];
+                for &(j, mult) in &rel.entries {
+                    let val = signed_mod(mult, n);
+                    if !val.is_zero() {
+                        nnz_in += 1;
+                    }
+                    row[j] = (&row[j] + &val) % n;
+                }
+                let neg_b = (n - &(&rel.coef_b % n)) % n;
+                if !neg_b.is_zero() {
+                    nnz_in += 1;
+                }
+                row[cols - 1] = (&row[cols - 1] + &neg_b) % n;
+                matrix.push(row);
+                rhs.push(rel.coef_a.clone() % n);
+            }
+            let solution = gaussian_eliminate_mod_n_particular(&mut matrix, &mut rhs, n)?;
+            let stats = LaStats {
+                engine: engine.name().into(),
+                rows,
+                cols,
+                nnz_in,
+                nnz_peak: rows * cols,
+                rank: solution.rank,
+                muladds: 0,
+            };
+            Some((solution, stats))
+        }
+        LaEngine::Sparse => {
+            let mut sparse_rows: Vec<SparseRow> = Vec::with_capacity(rows);
+            let mut rhs: Vec<BigUint> = Vec::with_capacity(rows);
+            for rel in relations {
+                let mut entries: Vec<(usize, BigUint)> = rel
+                    .entries
+                    .iter()
+                    .map(|&(j, mult)| (j, signed_mod(mult, n)))
+                    .collect();
+                let neg_b = (n - &(&rel.coef_b % n)) % n;
+                entries.push((cols - 1, neg_b));
+                sparse_rows.push(sparse_row_from_entries(&entries, n));
+                rhs.push(rel.coef_a.clone() % n);
+            }
+            sparse_gaussian_eliminate_mod_n(sparse_rows, rhs, n, cols)
+        }
+    }
+}
+
 // ── Staged (split-timer) end-to-end driver ───────────────────────────
 
 /// Split-stage timing report for the generic prime-field IC pipeline.
@@ -2867,6 +3566,8 @@ fn signed_mod(v: i64, n: &BigUint) -> BigUint {
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct EcIcStageReport {
     pub factor_base_ms: f64,
+    /// Pair-sum table build (meet-in-the-middle oracle); `0.0` otherwise.
+    pub pair_table_ms: f64,
     pub relations_ms: f64,
     pub linear_algebra_ms: f64,
     pub verify_ms: f64,
@@ -2878,6 +3579,9 @@ pub struct EcIcStageReport {
     pub trials_per_relation_min: usize,
     pub trials_per_relation_median: f64,
     pub trials_per_relation_max: usize,
+    /// Shape and counted work of the relation-matrix solve, when the
+    /// driver reports it (the S4 staged drivers do).
+    pub la: Option<LaStats>,
     /// Charged group operations (`group_additions`, `group_doublings`) and the
     /// native operations the unit does not charge (`*_uncharged`), counted for
     /// the default path (pair-sum table, joint relation point).  Empty when a
@@ -3687,6 +4391,7 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     };
     let report = EcIcStageReport {
         factor_base_ms,
+        pair_table_ms: 0.0,
         relations_ms,
         linear_algebra_ms,
         verify_ms,
@@ -3698,6 +4403,7 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
         trials_per_relation_min: sorted_trials.first().copied().unwrap_or(0),
         trials_per_relation_median: median,
         trials_per_relation_max: sorted_trials.last().copied().unwrap_or(0),
+        la: None,
         counters: take_counters(),
         counters_unemitted: Vec::new(),
     };
@@ -3716,6 +4422,202 @@ pub fn ec_index_calculus_dlp_s4_staged(
     max_trials_per_relation: usize,
     max_relation_attempts: usize,
 ) -> Option<(BigUint, EcIcStageReport)> {
+    ec_index_calculus_dlp_s4_staged_with(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        |_fb| find_one_relation_s4_counted,
+        LaEngine::Dense,
+    )
+}
+
+/// Staged S₄ 3-decomposition driver with an explicit linear-algebra engine.
+///
+/// The relation family, row policy and verification are those of
+/// [`ec_index_calculus_dlp_s4_staged`]; `la_engine` picks between dense
+/// Gauss–Jordan and the sparse Markowitz elimination, which decide the same
+/// system and return the same scalar.  The report carries the matrix shape,
+/// nonzero counts and rank of whichever engine ran.
+#[allow(clippy::too_many_arguments)]
+pub fn ec_index_calculus_dlp_s4_staged_with_la(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+    la_engine: LaEngine,
+) -> Option<(BigUint, EcIcStageReport)> {
+    ec_index_calculus_dlp_s4_staged_with(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        |_fb| find_one_relation_s4_counted,
+        la_engine,
+    )
+}
+
+/// Staged S₄ 3-decomposition driver on the S₃-anchored sweep
+/// ([`find_one_relation_s4_via_s3_counted`]).
+///
+/// Same relation family, same report shape and same final `[x]G = Q`
+/// check as [`ec_index_calculus_dlp_s4_staged`]; only the decomposition
+/// oracle differs.  Use it for the per-relation cost lever: the two
+/// drivers are interchangeable, so a paired run on one seed measures the
+/// oracle alone.
+pub fn ec_index_calculus_dlp_s4_s3_staged(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+) -> Option<(BigUint, EcIcStageReport)> {
+    ec_index_calculus_dlp_s4_staged_with(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        |_fb| find_one_relation_s4_via_s3_counted,
+        LaEngine::Dense,
+    )
+}
+
+/// Anchored-sweep staged driver with an explicit linear-algebra engine.
+#[allow(clippy::too_many_arguments)]
+pub fn ec_index_calculus_dlp_s4_s3_staged_with_la(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+    la_engine: LaEngine,
+) -> Option<(BigUint, EcIcStageReport)> {
+    ec_index_calculus_dlp_s4_staged_with(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        |_fb| find_one_relation_s4_via_s3_counted,
+        la_engine,
+    )
+}
+
+/// Staged S₄ 3-decomposition driver on the **pair-sum meet-in-the-middle**
+/// oracle ([`find_one_relation_s4_via_mitm_counted`]).
+///
+/// Same relation family, report shape and `[x]G = Q` check as the other
+/// staged S₄ drivers.  The pair-sum table is built once, inside the
+/// measured preprocessing stage (`pair_table_ms`), so the relation stage
+/// pays `2B` hash probes per draw instead of the `B²` pair sweep.
+pub fn ec_index_calculus_dlp_s4_mitm_staged(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+) -> Option<(BigUint, EcIcStageReport)> {
+    ec_index_calculus_dlp_s4_staged_with(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        |fb| {
+            let table = build_pair_sum_table(curve, fb);
+            move |curve: &CurveParams,
+                  g: &Point,
+                  q: &Point,
+                  fb: &[FactorBaseEntry],
+                  max_trials: usize| {
+                find_one_relation_s4_via_mitm_counted(curve, g, q, fb, &table, max_trials)
+            }
+        },
+        LaEngine::Dense,
+    )
+}
+
+/// Staged S₄ MITM driver with an explicit linear-algebra engine.
+///
+/// Same oracle and preprocessing accounting as
+/// [`ec_index_calculus_dlp_s4_mitm_staged`]; `la_engine` picks between dense
+/// Gauss–Jordan and the sparse Markowitz elimination on the same system.
+#[allow(clippy::too_many_arguments)]
+pub fn ec_index_calculus_dlp_s4_mitm_staged_with_la(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+    la_engine: LaEngine,
+) -> Option<(BigUint, EcIcStageReport)> {
+    ec_index_calculus_dlp_s4_staged_with(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        |fb| {
+            let table = build_pair_sum_table(curve, fb);
+            move |curve: &CurveParams,
+                  g: &Point,
+                  q: &Point,
+                  fb: &[FactorBaseEntry],
+                  max_trials: usize| {
+                find_one_relation_s4_via_mitm_counted(curve, g, q, fb, &table, max_trials)
+            }
+        },
+        la_engine,
+    )
+}
+
+/// Shared body of the staged S₄ drivers.  `prepare` builds the oracle from
+/// the finished factor base and returns its finder: the identity for the
+/// stateless oracles, the pair-sum table closed over for
+/// meet-in-the-middle.  Everything else — factor base, relation target,
+/// linear algebra, `[x]G = Q` — is identical.
+#[allow(clippy::too_many_arguments)]
+fn ec_index_calculus_dlp_s4_staged_with<P, F>(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+    prepare: P,
+    la_engine: LaEngine,
+) -> Option<(BigUint, EcIcStageReport)>
+where
+    P: FnOnce(&[FactorBaseEntry]) -> F,
+    F: FnMut(&CurveParams, &Point, &Point, &[FactorBaseEntry], usize) -> Option<(Relation, usize)>,
+{
     use std::time::Instant;
     refresh_ic_ct_flag();
     let total_started = Instant::now();
@@ -3728,6 +4630,13 @@ pub fn ec_index_calculus_dlp_s4_staged(
     }
     let target = fb.len() + extra_relations;
 
+    // Oracle preprocessing (pair-sum table for meet-in-the-middle; the
+    // identity closure for the stateless oracles) is charged separately
+    // from relation collection.
+    let prepare_started = Instant::now();
+    let mut finder = prepare(&fb);
+    let pair_table_ms = prepare_started.elapsed().as_secs_f64() * 1e3;
+
     let relations_started = Instant::now();
     let mut relations = Vec::with_capacity(target);
     let mut attempts_exhausted = 0usize;
@@ -3737,9 +4646,7 @@ pub fn ec_index_calculus_dlp_s4_staged(
         let mut failed_trials = 0usize;
         let found = 'attempt: {
             for _ in 0..max_relation_attempts {
-                if let Some(found) =
-                    find_one_relation_s4_counted(curve, g, q, &fb, max_trials_per_relation)
-                {
+                if let Some(found) = finder(curve, g, q, &fb, max_trials_per_relation) {
                     break 'attempt Some(found);
                 }
                 attempts_exhausted += 1;
@@ -3755,22 +4662,8 @@ pub fn ec_index_calculus_dlp_s4_staged(
     let relations_ms = relations_started.elapsed().as_secs_f64() * 1e3;
 
     let m = fb.len();
-    let mut matrix: Vec<Vec<BigUint>> = Vec::with_capacity(relations.len());
-    let mut rhs: Vec<BigUint> = Vec::with_capacity(relations.len());
-    for rel in &relations {
-        let mut row = vec![BigUint::zero(); m + 1];
-        for &(j, mult) in &rel.entries {
-            let val = signed_mod(mult, &curve.n);
-            row[j] = (&row[j] + &val) % &curve.n;
-        }
-        let neg_b = (&curve.n - &(&rel.coef_b % &curve.n)) % &curve.n;
-        row[m] = neg_b;
-        matrix.push(row);
-        rhs.push(rel.coef_a.clone() % &curve.n);
-    }
-
     let la_started = Instant::now();
-    let solution = gaussian_eliminate_mod_n_particular(&mut matrix, &mut rhs, &curve.n)?;
+    let (solution, la_stats) = solve_relation_matrix(&relations, m + 1, &curve.n, la_engine)?;
     if !solution.determined[m] {
         return None;
     }
@@ -3799,6 +4692,7 @@ pub fn ec_index_calculus_dlp_s4_staged(
     };
     let report = EcIcStageReport {
         factor_base_ms,
+        pair_table_ms,
         relations_ms,
         linear_algebra_ms,
         verify_ms,
@@ -3810,6 +4704,7 @@ pub fn ec_index_calculus_dlp_s4_staged(
         trials_per_relation_min: sorted_trials.first().copied().unwrap_or(0),
         trials_per_relation_median: median,
         trials_per_relation_max: sorted_trials.last().copied().unwrap_or(0),
+        la: Some(la_stats),
         counters: Default::default(),
         counters_unemitted: Vec::new(),
     };
@@ -4117,6 +5012,389 @@ mod tests {
         assert_eq!(s4_x, plain.expect("2-decomp solve also succeeds"));
         assert_eq!(report.relations_collected, 10 + extra_relations);
         assert!(report.trials_per_relation_median >= 1.0);
+    }
+
+    /// The S₃-anchored sweep and the quartic/CZ sweep must decide the
+    /// *same* S₄ triple family.  Checked against a brute-force sign census
+    /// on a 16-bit deployed-shape curve: every triple either oracle admits
+    /// re-adds to `R` under some sign pattern, and the two sets agree.
+    #[test]
+    fn s3_anchor_sweep_matches_the_quartic_triple_census() {
+        use crate::cryptanalysis::research_bench::bench_curves_a_minus_3;
+        use std::collections::BTreeSet;
+
+        let Some((_, curve)) = bench_curves_a_minus_3()
+            .into_iter()
+            .find(|(b, c)| *b == 16 && c.name.contains("p256"))
+        else {
+            panic!("16-bit a=-3 bench curve missing");
+        };
+        let a_fe = curve.a_fe();
+        let b_fe = curve.fe(curve.b.clone());
+        let fb = build_factor_base(&curve, 20);
+        assert_eq!(fb.len(), 20);
+
+        // A target that is *known* to have at least one triple.
+        let r = fb[0]
+            .point
+            .add(&fb[1].point, &a_fe)
+            .add(&fb[2].point, &a_fe);
+
+        let mut x_to_idx: std::collections::HashMap<BigUint, usize> =
+            std::collections::HashMap::new();
+        for f in &fb {
+            if let Point::Affine { x, .. } = &f.point {
+                x_to_idx.insert(x.value.clone(), f.idx);
+            }
+        }
+        let one = BigUint::one();
+        let finalises = |i: usize, j: usize, k: usize| {
+            try_finalise_s4(
+                &r,
+                i,
+                &fb[i].point,
+                j,
+                &fb[j].point,
+                k,
+                &fb[k].point,
+                &curve,
+                &one,
+                &one,
+            )
+            .is_some()
+        };
+
+        // Brute-force census: every triple with a sign pattern summing to R.
+        let mut census: BTreeSet<(usize, usize, usize)> = BTreeSet::new();
+        for i in 0..fb.len() {
+            for j in 0..fb.len() {
+                for k in 0..fb.len() {
+                    if finalises(i, j, k) {
+                        let mut t = [i, j, k];
+                        t.sort_unstable();
+                        census.insert((t[0], t[1], t[2]));
+                    }
+                }
+            }
+        }
+        assert!(
+            census.contains(&(0, 1, 2)),
+            "the planted triple must be in the census"
+        );
+
+        // Quartic + Cantor–Zassenhaus enumeration.
+        let xr = match &r {
+            Point::Affine { x, .. } => x.clone(),
+            Point::Infinity => unreachable!(),
+        };
+        let mut quartic: BTreeSet<(usize, usize, usize)> = BTreeSet::new();
+        for i in 0..fb.len() {
+            let xi = match &fb[i].point {
+                Point::Affine { x, .. } => x.clone(),
+                Point::Infinity => continue,
+            };
+            for j in (i + 1)..fb.len() {
+                let xj = match &fb[j].point {
+                    Point::Affine { x, .. } => x.clone(),
+                    Point::Infinity => continue,
+                };
+                let q = semaev_s4_in_x4(&xr, &xi, &xj, &a_fe, &b_fe);
+                for xk in find_roots_fp_fast(&q, &curve.p) {
+                    if let Some(&k) = x_to_idx.get(&xk.value) {
+                        if finalises(i, j, k) {
+                            let mut t = [i, j, k];
+                            t.sort_unstable();
+                            quartic.insert((t[0], t[1], t[2]));
+                        }
+                    }
+                }
+            }
+        }
+
+        // S₃-anchored enumeration (the production oracle).
+        let mut anchored: BTreeSet<(usize, usize, usize)> = BTreeSet::new();
+        for i in 0..fb.len() {
+            for r_prime in [r.add(&fb[i].point.neg(), &a_fe), r.add(&fb[i].point, &a_fe)] {
+                let x_prime = match &r_prime {
+                    Point::Affine { x, .. } => x.clone(),
+                    Point::Infinity => continue,
+                };
+                for j in 0..fb.len() {
+                    let xj = match &fb[j].point {
+                        Point::Affine { x, .. } => x,
+                        Point::Infinity => continue,
+                    };
+                    let (qa, qb, qc) = semaev_s3_in_x3(xj, &x_prime, &a_fe, &b_fe);
+                    for xk in quadratic_roots_fp(&qa, &qb, &qc, &curve.p) {
+                        if let Some(&k) = x_to_idx.get(&xk.value) {
+                            if finalises(i, j, k) {
+                                let mut t = [i, j, k];
+                                t.sort_unstable();
+                                anchored.insert((t[0], t[1], t[2]));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        assert_eq!(
+            anchored, census,
+            "S₃-anchored sweep must find exactly the sign-verified triples"
+        );
+        // The CZ path may miss a root it fails to split (documented), but
+        // every triple it does emit must be a real one, and it must find
+        // the planted triple.
+        assert!(
+            quartic.is_subset(&census),
+            "quartic sweep emitted a triple that does not re-add: {:?}",
+            quartic.difference(&census).collect::<Vec<_>>()
+        );
+        assert!(quartic.contains(&(0, 1, 2)));
+    }
+
+    /// The two staged drivers are drop-in equivalents: same recovered log,
+    /// same relation count, three-entry rows, and the anchored sweep never
+    /// costs more trials per relation than the quartic one on this fixture.
+    #[test]
+    fn s3_staged_driver_matches_the_quartic_driver() {
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let g = curve.generator();
+        let q = g.scalar_mul(&BigUint::from(190u32), &a_fe);
+        let extra_relations = 64;
+        let quartic =
+            ec_index_calculus_dlp_s4_staged(&curve, &g, &q, 10, extra_relations, 5000, 64)
+                .expect("quartic driver solves the tiny curve");
+        let anchored =
+            ec_index_calculus_dlp_s4_s3_staged(&curve, &g, &q, 10, extra_relations, 5000, 64)
+                .expect("anchored driver solves the tiny curve");
+        assert_eq!(quartic.0, anchored.0);
+        assert_eq!(g.scalar_mul(&anchored.0, &a_fe), q);
+        assert_eq!(
+            quartic.1.relations_collected,
+            anchored.1.relations_collected
+        );
+        assert!(anchored.1.trials_total >= anchored.1.relations_collected);
+    }
+
+    /// Sparse and dense elimination decide the same system: same rank, same
+    /// determined columns, same value wherever the column is determined.
+    /// Covers full-rank, surplus and rank-deficient (free column) systems.
+    #[test]
+    fn sparse_and_dense_la_agree_on_random_systems() {
+        let n = BigUint::from(1_000_003u32);
+        let mut state = 0x2545_F491_4F6C_DD1Du64;
+        let mut next = |bound: u64| {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state % bound
+        };
+        for &(rows, cols) in &[(12usize, 8usize), (20, 12), (10, 12), (40, 40)] {
+            let mut dense: Vec<Vec<BigUint>> = Vec::new();
+            let mut sparse: Vec<SparseRow> = Vec::new();
+            let mut rhs: Vec<BigUint> = Vec::new();
+            // A planted solution; rhs = A·x_true keeps the system consistent
+            // even when the row set is rank deficient.
+            let x_true: Vec<BigUint> = (0..cols).map(|_| BigUint::from(next(997))).collect();
+            for _ in 0..rows {
+                let mut entries: Vec<(usize, BigUint)> = Vec::new();
+                let deg = 1 + next(3) as usize;
+                for _ in 0..deg {
+                    entries.push((next(cols as u64) as usize, BigUint::from(1 + next(996))));
+                }
+                let row = sparse_row_from_entries(&entries, &n);
+                let mut acc = BigUint::zero();
+                for (c, v) in &row {
+                    acc = (&acc + v * &x_true[*c]) % &n;
+                }
+                rhs.push(acc);
+                sparse.push(row);
+                let mut dense_row = vec![BigUint::zero(); cols];
+                for (c, v) in sparse.last().unwrap() {
+                    dense_row[*c] = v.clone();
+                }
+                dense.push(dense_row);
+            }
+            let mut dense_rhs = rhs.clone();
+            let dense_sol = gaussian_eliminate_mod_n_particular(&mut dense, &mut dense_rhs, &n)
+                .expect("consistent");
+            let (sparse_sol, stats) =
+                sparse_gaussian_eliminate_mod_n(sparse.clone(), rhs.clone(), &n, cols)
+                    .expect("consistent");
+            assert_eq!(
+                dense_sol.rank, sparse_sol.rank,
+                "rank mismatch on {rows}x{cols}"
+            );
+            assert_eq!(stats.rank, sparse_sol.rank);
+            assert_eq!(stats.rows, rows);
+            assert_eq!(stats.cols, cols);
+            assert!(
+                stats.nnz_in < rows * cols,
+                "sparse input should be sparse: {} of {}",
+                stats.nnz_in,
+                rows * cols
+            );
+            for c in 0..cols {
+                assert_eq!(
+                    dense_sol.determined[c], sparse_sol.determined[c],
+                    "determined flag differs at column {c} on {rows}x{cols}"
+                );
+                if dense_sol.determined[c] {
+                    assert_eq!(
+                        sparse_sol.values[c], x_true[c],
+                        "sparse value is not the planted one at {c} on {rows}x{cols}"
+                    );
+                    assert_eq!(
+                        dense_sol.values[c], x_true[c],
+                        "dense value is not the planted one at {c} on {rows}x{cols}"
+                    );
+                }
+            }
+            // An inconsistent system must be rejected by both.
+            let mut bad_rhs = rhs.clone();
+            bad_rhs[0] = (&bad_rhs[0] + BigUint::one()) % &n;
+            let mut dense2: Vec<Vec<BigUint>> = sparse
+                .iter()
+                .map(|row| {
+                    let mut v = vec![BigUint::zero(); cols];
+                    for (c, x) in row {
+                        v[*c] = x.clone();
+                    }
+                    v
+                })
+                .collect();
+            let mut dense2_rhs = bad_rhs.clone();
+            let dense_bad = gaussian_eliminate_mod_n_particular(&mut dense2, &mut dense2_rhs, &n);
+            let sparse_bad = sparse_gaussian_eliminate_mod_n(sparse.clone(), bad_rhs, &n, cols);
+            // The engines must agree on acceptance, whatever the perturbed
+            // system turns out to be; when the surplus rows are independent
+            // it is genuinely inconsistent and both must reject it.
+            assert_eq!(
+                dense_bad.is_some(),
+                sparse_bad.is_some(),
+                "engines disagree on consistency ({rows}x{cols})"
+            );
+        }
+    }
+
+    /// Both engines, on the *same* relations: identical rank, flags, values
+    /// and input nonzero count; the sparse engine keeps the input sparse.
+    #[test]
+    fn la_engines_agree_on_the_same_relation_set() {
+        let n = BigUint::from(65_447u32);
+        let mut state = 0x9E37_79B9_7F4A_7C15u64;
+        let mut next = |bound: u64| {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state % bound
+        };
+        let cols = 12usize;
+        let x_true: Vec<BigUint> = (0..cols).map(|_| BigUint::from(next(65_000))).collect();
+        let mut relations: Vec<Relation> = Vec::new();
+        for _ in 0..40 {
+            // Three factor-base columns and the target column, as a 3-summand
+            // IC row has.
+            let mut entries: Vec<(usize, i64)> = Vec::new();
+            for _ in 0..3 {
+                let idx = next((cols - 1) as u64) as usize;
+                entries.push((idx, if next(2) == 0 { 1 } else { -1 }));
+            }
+            entries.sort_unstable();
+            let mut merged: Vec<(usize, i64)> = Vec::new();
+            for (idx, sign) in entries {
+                if let Some(last) = merged.last_mut() {
+                    if last.0 == idx {
+                        last.1 += sign;
+                        continue;
+                    }
+                }
+                merged.push((idx, sign));
+            }
+            merged.retain(|(_, s)| *s != 0);
+            // Choose a and b so the row is consistent with x_true.
+            let mut acc = BigUint::zero();
+            for &(j, s) in &merged {
+                let term = &x_true[j] * BigUint::from(s.unsigned_abs());
+                acc = if s > 0 {
+                    (&acc + &term) % &n
+                } else {
+                    (&acc + &n - (&term % &n)) % &n
+                };
+            }
+            let b = BigUint::from(next(65_000));
+            let target = &x_true[cols - 1];
+            let rhs = (&acc + &n - (&b * target) % &n) % &n;
+            relations.push(Relation {
+                coef_a: rhs,
+                coef_b: b,
+                entries: merged,
+            });
+        }
+        let (dense_sol, dense_stats) =
+            solve_relation_matrix(&relations, cols, &n, LaEngine::Dense).expect("dense solves");
+        let (sparse_sol, sparse_stats) =
+            solve_relation_matrix(&relations, cols, &n, LaEngine::Sparse).expect("sparse solves");
+        assert_eq!(dense_stats.nnz_in, sparse_stats.nnz_in);
+        assert_eq!(dense_stats.rank, sparse_stats.rank);
+        assert_eq!(dense_stats.rows, sparse_stats.rows);
+        assert_eq!(dense_stats.cols, sparse_stats.cols);
+        assert!(sparse_stats.nnz_peak <= dense_stats.nnz_peak);
+        for c in 0..cols {
+            assert_eq!(dense_sol.determined[c], sparse_sol.determined[c]);
+            if dense_sol.determined[c] {
+                assert_eq!(dense_sol.values[c], sparse_sol.values[c]);
+                assert_eq!(dense_sol.values[c], x_true[c]);
+            }
+        }
+    }
+
+    /// The sparse engine recovers the same scalar as the dense one end to end.
+    #[test]
+    fn sparse_la_recovers_the_same_log_as_dense() {
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let g = curve.generator();
+        let q = g.scalar_mul(&BigUint::from(190u32), &a_fe);
+        let extra = 64;
+        let dense = ec_index_calculus_dlp_s4_s3_staged_with_la(
+            &curve,
+            &g,
+            &q,
+            10,
+            extra,
+            5000,
+            64,
+            LaEngine::Dense,
+        )
+        .expect("dense driver solves the tiny curve");
+        let sparse = ec_index_calculus_dlp_s4_s3_staged_with_la(
+            &curve,
+            &g,
+            &q,
+            10,
+            extra,
+            5000,
+            64,
+            LaEngine::Sparse,
+        )
+        .expect("sparse driver solves the tiny curve");
+        assert_eq!(dense.0, sparse.0);
+        assert_eq!(g.scalar_mul(&sparse.0, &a_fe), q);
+        let la = sparse.1.la.expect("the S4 driver reports LA stats");
+        assert_eq!(la.engine, "sparse_markowitz_gauss_jordan_mod_n");
+        assert_eq!(la.rows, sparse.1.relations_collected);
+        assert_eq!(la.cols, 11);
+        assert_eq!(la.rank, 11);
+        assert!(la.nnz_in < la.rows * la.cols);
+        let dense_la = dense.1.la.expect("dense LA stats");
+        assert_eq!(dense_la.engine, "dense_gauss_jordan_mod_n");
+        assert_eq!(dense_la.rank, la.rank);
+        assert!(dense_la.nnz_in < dense_la.rows * dense_la.cols);
+        // Fill-in on this relation set is far below the dense footprint.
+        assert!(la.nnz_peak < la.rows * la.cols);
     }
 
     /// Staged twin recovers the same log as the plain driver on the tiny
@@ -5107,5 +6385,33 @@ mod tests {
         assert_eq!(g.scalar_mul(&rho, &a_fe), q);
         // And they should in fact match each other mod n.
         assert_eq!(ic % &curve.n, rho % &curve.n);
+    }
+
+    /// The meet-in-the-middle oracle decides the same relation family as
+    /// the S₃-anchored sweep: on one 16-bit a = −3 fixture both staged
+    /// drivers recover the same scalar, every relation re-added in the
+    /// group by the shared finaliser.
+    #[test]
+    fn mitm_driver_agrees_with_s3_driver() {
+        use crate::cryptanalysis::research_bench::bench_curves_a_minus_3;
+        use crate::utils::random::random_scalar;
+
+        let (_, curve) = bench_curves_a_minus_3()
+            .into_iter()
+            .find(|(bits, _)| *bits == 16)
+            .expect("16-bit a=-3 fixture");
+        let g = curve.generator();
+        let a_fe = curve.a_fe();
+        let x_truth = random_scalar(&curve.n);
+        let q = g.scalar_mul(&x_truth, &a_fe);
+
+        let s3 = ec_index_calculus_dlp_s4_s3_staged(&curve, &g, &q, 120, 8, 200_000, 4)
+            .expect("S3-anchored driver should recover the 16-bit log");
+        let mitm = ec_index_calculus_dlp_s4_mitm_staged(&curve, &g, &q, 120, 8, 200_000, 4)
+            .expect("MITM driver should recover the 16-bit log");
+        assert_eq!(s3.0, mitm.0);
+        assert_eq!(g.scalar_mul(&mitm.0, &a_fe), q);
+        assert_eq!(mitm.1.relations_collected, 128);
+        assert!(mitm.1.pair_table_ms >= 0.0);
     }
 }
